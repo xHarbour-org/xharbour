@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.35 2005/09/13 01:48:06 druzus Exp $
+ * $Id: hbapirdd.h,v 1.36 2005/09/17 21:35:41 druzus Exp $
  */
 
 /*
@@ -1099,6 +1099,7 @@ typedef RDDNODE * LPRDDNODE;
  *  PROTOTYPES
  *  ----------
  */
+extern int       HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType );
 extern ERRCODE   HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
 extern ERRCODE   HB_EXPORT hb_rddDisinherit( BYTE * drvName );
 extern USHORT    HB_EXPORT hb_rddExtendType( USHORT fieldType );

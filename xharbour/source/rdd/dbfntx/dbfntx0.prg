@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.7 2005/09/11 19:40:48 druzus Exp $
+ * $Id: dbfntx0.prg,v 1.8 2005/09/19 23:21:28 druzus Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #include "rddsys.ch"
 #include "dbinfo.ch"
 
+/*
 ANNOUNCE DBFNTX
 
 procedure DBFNTXInit
@@ -66,6 +67,7 @@ procedure DBFNTXInit
    rddInfo( RDDI_MEMOTYPE, DB_MEMO_DBT, "DBFNTX" )
 
 return
+*/
 
 /* NOTE: Commented out, because in Harbour the INIT order is not guaranteed,
          so it can happen that this error handler will be installed *before*

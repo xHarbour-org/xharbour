@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/09/17 04:30:39 lculik Exp $
+# $Id: Makefile,v 1.4 2005/02/18 21:20:04 druzus Exp $
 #
 
 ROOT = ../../
@@ -11,9 +11,6 @@ C_SOURCES=    \
 
 PRG_HEADERS=\
 	ads.ch \
-
-PRG_SOURCES=\
-	ads0.prg \
 
 LIBNAME=rddads
 ifneq ($(HB_ARCHITECTURE),dos)

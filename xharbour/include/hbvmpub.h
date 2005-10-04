@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.37 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbvmpub.h,v 1.38 2005/09/27 02:25:40 ronpinkas Exp $
  */
 
 /*
@@ -305,6 +305,15 @@
       PHB_SYMB    pSymbols;   /* module symbol table */
       PHB_ITEM ** pGlobals;   /* globals */
    } HB_PCODEFUNC, * PHB_PCODEFUNC;
+
+   typedef void (*HB_INIT_FUNC)(void *);
+   /* List of functions used by hb_vmAtInit()/hb_vmAtExit() */
+   typedef struct _HB_FUNC_LIST
+   {
+      HB_INIT_FUNC   pFunc;
+      void *         cargo;
+      struct _HB_FUNC_LIST * pNext;
+   } HB_FUNC_LIST, * PHB_FUNC_LIST;
 
    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x01 )

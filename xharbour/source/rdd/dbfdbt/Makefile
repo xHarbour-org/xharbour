@@ -1,14 +1,11 @@
 #
-# $Id: Makefile,v 1.1 2003/09/08 12:56:53 druzus Exp $
+# $Id: Makefile,v 1.2 2004/05/10 10:38:06 mauriliolongo Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
 	dbfdbt1.c \
-
-PRG_SOURCES=\
-	dbfdbt0.prg \
 
 ifeq ($(HB_MT),MT)
    MT_LIBNAME=dbfdbtmt

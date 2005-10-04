@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.29 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: hbver.c,v 1.30 2005/08/02 21:06:43 peterrees Exp $
  */
 
 /*
@@ -422,7 +422,7 @@ BOOL HB_EXPORT hb_iswinnt(void)
 char * hb_verCompiler( void )
 {
    char * pszCompiler;
-   char * szName;
+   char * szName, * szSub = "";
    int iVerMajor;
    int iVerMinor;
    int iVerPatch;
@@ -565,6 +565,10 @@ char * hb_verCompiler( void )
       szName = "GNU C";
    #endif
 
+   #if defined(__cplusplus)
+      szSub = "++";
+   #endif
+
    iVerMajor = __GNUC__;
    iVerMinor = __GNUC_MINOR__;
    #if defined(__GNUC_PATCHLEVEL__)
@@ -585,9 +589,9 @@ char * hb_verCompiler( void )
       if( iVerPatch != 0 )
       {
          #if defined(_MSC_VER)
-            sprintf( pszCompiler, "%s %hd.%02d.%hd", szName, iVerMajor, iVerMinor, iVerPatch );
+            sprintf( pszCompiler, "%s%s %hd.%02d.%hd", szName, szSub, iVerMajor, iVerMinor, iVerPatch );
          #else
-            sprintf( pszCompiler, "%s %hd.%hd.%hd", szName, iVerMajor, iVerMinor, iVerPatch );
+            sprintf( pszCompiler, "%s%s %hd.%hd.%hd", szName, szSub, iVerMajor, iVerMinor, iVerPatch );
          #endif
       }
       else

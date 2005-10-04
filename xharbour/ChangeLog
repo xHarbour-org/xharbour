@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4392 2005/10/03 16:59:36 bdj Exp $
+ * $Id: ChangeLog,v 1.4393 2005/10/03 19:09:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,68 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 04:03 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/common/hbver.c
+    * a small extension to GCC compiler string to inform about
+      C/C++ mode
+
+  * xharbour/source/vm/inet.c
+    * added IPPROTO_IP definition - some system may not have it
+
+  * xharbour/include/hbvm.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/hvm.c
+    + added hb_vmAtInit()/hb_vmAtExit(). This function allow to register
+      C functions which will be called just before (/after) .prg INIT
+      (/EXIT) procedures
+    - removed hb_vmDoInitRdd() function
+
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/rdd/dbcmd.c
+    * static hb_rddRegister() function changed to public
+
+  * xharbour/contrib/rdd_ads/Makefile
+  - xharbour/contrib/rdd_ads/ads0.prg
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/Makefile
+  - xharbour/source/rdd/dbf0.prg
+  * xharbour/source/rdd/dbf1.c
+  - xharbour/source/rdd/delim0.prg
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/rddsys.prg
+  - xharbour/source/rdd/sdf0.prg
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfcdx/Makefile
+  - xharbour/source/rdd/dbfcdx/dbfcdx0.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  - xharbour/source/rdd/dbfcdx/sixcdx0.prg
+  * xharbour/source/rdd/dbfdbt/Makefile
+  - xharbour/source/rdd/dbfdbt/dbfdbt0.prg
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/Makefile
+  - xharbour/source/rdd/dbffpt/dbffpt0.prg
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/Makefile
+  * xharbour/source/rdd/dbfntx/dbfntx0.prg
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/include/hbextern.ch
+    * changed RDD initialization code in all core RDDs.
+      As a side effect of this modification we do not longer need
+      internal RDD linker references with underscore at beginning.
+      As I can see on news group many user still use them. Mostly
+         REQUEST _ADS
+      I would like to hear an opinion if I should add such references
+      for backward compatibility or simply leave it as is to force
+      .prg code updating
+      BTW. ADS does not need any additional initialization code.
+         REQUEST ADS
+      is all what is necessary to have:
+         ADS, ADT, ADSCDX and ADSNTX RDDs ready to work
+      If programmer does not use VIA clause then only should set
+      rddSetDefault() to proper AD* RDD.
+      Non GNU make files has to be updated. I would like to ask Windows
+      developers to do that.
 
 2005-10-03 12:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * xdiff.txt

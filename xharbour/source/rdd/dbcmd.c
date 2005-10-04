@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.171 2005/09/26 10:08:22 druzus Exp $
+ * $Id: dbcmd.c,v 1.172 2005/09/27 09:20:37 druzus Exp $
  */
 
 /*
@@ -338,7 +338,7 @@ static LPRDDNODE hb_rddFindNode( char * szDriver, USHORT * uiIndex )
 /*
  * Register a RDD driver.
  */
-static int hb_rddRegister( char * szDriver, USHORT uiType )
+int HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType )
 {
    LPRDDNODE pRddNewNode;
    PHB_DYNS pGetFuncTable;

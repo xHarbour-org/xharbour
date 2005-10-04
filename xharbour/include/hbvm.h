@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.30 2005/09/23 21:55:06 likewolf Exp $
+ * $Id: hbvm.h,v 1.31 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -80,6 +80,12 @@ HB_EXTERN_BEGIN
 /* Harbour virtual machine init/exit functions */
 extern void HB_EXPORT hb_vmInit( BOOL bStartMainProc );
 extern int  HB_EXPORT hb_vmQuit( void );            /* Immediately quits the virtual machine */
+
+/* registration AtInit and AtExit functions - they are executed
+ * just before (after) .prg INIT (EXIT) procedures.
+ */
+void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo );
+void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
 extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */

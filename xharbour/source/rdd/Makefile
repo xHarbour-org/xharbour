@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2003/02/13 01:22:35 jonnymind Exp $
+# $Id: Makefile,v 1.7 2003/09/08 12:56:52 druzus Exp $
 #
 
 ROOT = ../../
@@ -14,15 +14,12 @@ C_SOURCES=\
 	hbdbsort.c \
 
 PRG_SOURCES=\
-	dbf0.prg \
 	dbfuncs.prg \
 	dbtotal.prg \
 	dblist.prg \
 	dbsort.prg \
 	dbstrux.prg \
 	dbupdat.prg \
-	sdf0.prg \
-	delim0.prg \
 	rddord.prg \
 	rddsys.prg \
  

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.497 2005/10/02 12:35:11 druzus Exp $
+ * $Id: hvm.c,v 1.498 2005/10/02 20:19:13 ronpinkas Exp $
  */
 
 /*
@@ -377,6 +377,9 @@ static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application g
 
 static BOOL s_fmInit = TRUE;
 
+static PHB_FUNC_LIST s_InitFunctions = NULL;
+static PHB_FUNC_LIST s_ExitFunctions = NULL;
+
 /* 21/10/00 - maurilio.longo@libero.it
    This Exception Handler gets called in case of an abnormal termination of an harbour program and
    displays a full stack trace at the harbour language level */
@@ -391,6 +394,66 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
   /* background function counter */
   static ULONG s_ulBackground = 0;
 #endif
+
+void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
+{
+   PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
+
+   pLst->pFunc = pFunc;
+   pLst->cargo = cargo;
+   pLst->pNext = s_InitFunctions;
+   s_InitFunctions = pLst;
+}
+
+void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo )
+{
+   PHB_FUNC_LIST pLst = ( PHB_FUNC_LIST ) hb_xgrab( sizeof( HB_FUNC_LIST ) );
+
+   pLst->pFunc = pFunc;
+   pLst->cargo = cargo;
+   pLst->pNext = s_ExitFunctions;
+   s_ExitFunctions = pLst;
+}
+
+static void hb_vmCleanModuleFunctions( void )
+{
+   PHB_FUNC_LIST pLst;
+
+   while( s_InitFunctions )
+   {
+      pLst = s_InitFunctions;
+      s_InitFunctions = pLst->pNext;
+      hb_xfree( pLst );
+   }
+   while( s_ExitFunctions )
+   {
+      pLst = s_ExitFunctions;
+      s_ExitFunctions = pLst->pNext;
+      hb_xfree( pLst );
+   }
+}
+
+static void hb_vmDoModuleInitFunctions( void )
+{
+   PHB_FUNC_LIST pLst = s_InitFunctions;
+
+   while( pLst )
+   {
+      pLst->pFunc( pLst->cargo );
+      pLst = pLst->pNext;
+   }
+}
+
+static void hb_vmDoModuleExitFunctions( void )
+{
+   PHB_FUNC_LIST pLst = s_ExitFunctions;
+
+   while( pLst )
+   {
+      pLst->pFunc( pLst->cargo );
+      pLst = pLst->pNext;
+   }
+}
 
 static BYTE * hb_vmUnhideString( BYTE * pSource, ULONG ulSize )
 {
@@ -477,34 +540,6 @@ static void hb_vmDoInitClip( void )
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
       hb_vmDo(0);
-   }
-}
-
-/* Initialize DBFCDX and DBFNTX if linked. */
-static void hb_vmDoInitRdd( void )
-{
-   PHB_DYNS pDynSym;
-   int i;
-   char * rddName[] = { "DBFDBTINIT",
-                        "DBFFPTINIT",
-                        "DBFNTXINIT",
-                        "DBFCDXINIT",
-                        "SIXCDXINIT",
-                        "RMDBFCDXINIT",
-                        "RMDBFNTXINIT",
-                        "ADSINIT",
-                        "RDDINIT",
-                        NULL };
-
-   for ( i = 0; rddName[i]; i++ )
-   {
-      pDynSym = hb_dynsymFind( rddName[i] );
-      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
-      {
-         hb_vmPushSymbol( pDynSym->pSymbol );
-         hb_vmPushNil();
-         hb_vmDo(0);
-      }
    }
 }
 
@@ -651,9 +686,8 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_TRACE( HB_TR_INFO, ("InitClip" ) );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
-   //printf( "Before InitRdd\n" );
-   HB_TRACE( HB_TR_INFO, ("InitRdd" ) );
-   hb_vmDoInitRdd();  // Initialize DBFCDX and DBFNTX if linked.
+   HB_TRACE( HB_TR_INFO, ("InitModuleFunctions" ) );
+   hb_vmDoModuleInitFunctions();
 
    //printf( "Before InitFunctions\n" );
    HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
@@ -828,6 +862,10 @@ int HB_EXPORT hb_vmQuit( void )
 
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    //printf("After ExitFunctions\n" );
+
+   /* process AtExit register functions */
+   hb_vmDoModuleExitFunctions();
+   hb_vmCleanModuleFunctions();
 
    /* release all known items stored in subsystems */
    hb_rddShutDown();
@@ -8166,7 +8204,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    HB_THREAD_STUB
 
    PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
+#ifdef HB_UNSHARE_REFERENCES
    PHB_ITEM pLocal;
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 

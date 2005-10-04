@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.57 2005/09/30 23:44:05 druzus Exp $
+* $Id: inet.c,v 1.58 2005/10/02 12:35:12 druzus Exp $
 */
 
 /*
@@ -1922,6 +1922,15 @@ HB_FUNC( INETDGRAMBIND )
 
       mreq.imr_multiaddr.s_addr = inet_addr( hb_parc( 4 ) ); // HELLO_GROUP
       mreq.imr_interface.s_addr = htonl( INADDR_ANY );
+
+#ifndef IPPROTO_IP
+      /*
+       * some systems may not have this definitions, it should
+       * be 0 what works with TCP/UDP sockets or explicitly set
+       * to IPPROTO_TCP/IPPROTO_UDP
+       */
+#     define IPPROTO_IP 0
+#endif
 
       if ( setsockopt( Socket->com, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char *) &mreq, sizeof( mreq )) < 0)
       {

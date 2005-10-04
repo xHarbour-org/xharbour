@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.132 2005/09/20 17:26:37 druzus Exp $
+ * $Id: dbfntx1.c,v 1.133 2005/09/25 16:14:21 druzus Exp $
  */
 
 /*
@@ -139,39 +139,12 @@
 #include "hbset.h"
 #include "hbmath.h"
 #include "hbrddntx.h"
+#include "rddsys.ch"
 #ifdef __XHARBOUR__
 #include "hbregex.h"
 #endif
 #ifndef HB_CDP_SUPPORT_OFF
    #include "hbapicdp.h"
-#endif
-
-#define __PRG_SOURCE__ __FILE__
-
-#ifdef HB_PCODE_VER
-   #undef HB_PRG_PCODE_VER
-   #define HB_PRG_PCODE_VER HB_PCODE_VER
-#endif
-
-HB_FUNC( _DBFNTX );
-HB_FUNC( DBFNTX_GETFUNCTABLE );
-
-HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
-{ "_DBFNTX",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFNTX )},             0 },
-{ "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFNTX_GETFUNCTABLE)} , 0 }
-HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup dbfntx1__InitSymbols
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_dbfntx1__InitSymbols = dbfntx1__InitSymbols;
-   #pragma data_seg()
 #endif
 
 #ifdef HB_NTX_DEBUG_DISP
@@ -7387,7 +7360,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ntxWhoCares
                            };
 
-HB_FUNC(_DBFNTX ) {;}
+HB_FUNC( DBFNTX ) {;}
 
 HB_FUNC( DBFNTX_GETFUNCTABLE )
 {
@@ -7424,3 +7397,65 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
       hb_retni( FAILURE );
    }
 }
+
+
+#define __PRG_SOURCE__ __FILE__
+
+#ifdef HB_PCODE_VER
+#  undef HB_PRG_PCODE_VER
+#  define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
+
+HB_FUNC_EXTERN( _DBF );
+
+static void hb_dbfntxRddInit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( hb_rddRegister( "DBF",    RDT_FULL ) <= 1 )
+   {
+      USHORT usResult;
+
+      hb_rddRegister( "DBFFPT", RDT_FULL );
+      usResult = hb_rddRegister( "DBFNTX", RDT_FULL );
+      if( usResult <= 1 )
+      {
+         if( usResult == 0 )
+         {
+            PHB_ITEM pItem = hb_itemPutNI( NULL, DB_MEMO_DBT );
+            SELF_RDDINFO( hb_rddGetNode( s_uiRddId ), RDDI_MEMOTYPE, 0, pItem );
+            hb_itemRelease( pItem );
+         }
+         return;
+      }
+   }
+
+   hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
+
+   /* not executed, only to force DBF RDD linking */
+   HB_FUNC_EXEC( _DBF );
+}
+
+HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
+{ "DBFNTX",              HB_FS_PUBLIC, {HB_FUNCNAME( DBFNTX )}, NULL },
+{ "DBFNTX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFNTX_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( dbfntx1__InitSymbols )
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_dbfntx_rdd_init_ )
+   hb_vmAtInit( hb_dbfntxRddInit, NULL );
+HB_CALL_ON_STARTUP_END( _hb_dbfntx_rdd_init_ )
+
+#if defined(HB_PRAGMA_STARTUP)
+#  pragma startup dbfntx1__InitSymbols
+#  pragma startup _hb_dbfntx_rdd_init_
+#elif defined(HB_MSC_STARTUP)
+#  if _MSC_VER >= 1010
+#     pragma data_seg( ".CRT$XIY" )
+#     pragma comment( linker, "/Merge:.CRT=.data" )
+#  else
+#     pragma data_seg( "XIY" )
+#  endif
+   static HB_$INITSYM hb_vm_auto_dbfntx1__InitSymbols = dbfntx1__InitSymbols;
+   static HB_$INITSYM hb_vm_auto_dbfntx_rdd_init = _hb_dbfntx_rdd_init_;
+#  pragma data_seg()
+#endif

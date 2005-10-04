@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.79 2005/09/22 01:11:58 druzus Exp $
+ * $Id: ads1.c,v 1.80 2005/09/25 16:14:21 druzus Exp $
  */
 
 /*
@@ -67,10 +67,9 @@
 #include "rddads.h"
 #include "hbset.h"
 #include "hbvm.h"
+#include "rddsys.ch"
 
 #include <ctype.h>
-
-#define __PRG_SOURCE__ __FILE__
 
 static int iSetListenerHandle = 0;
 static USHORT s_uiRddCount = 0;
@@ -94,38 +93,6 @@ extern BOOL adsOEM;
 extern BOOL bTestRecLocks;
 extern BOOL bDictionary;
 extern ADSHANDLE adsConnectHandle;
-
-#ifdef HB_PCODE_VER
-   #undef HB_PRG_PCODE_VER
-   #define HB_PRG_PCODE_VER HB_PCODE_VER
-#endif
-
-HB_FUNC( _ADS );
-HB_FUNC_STATIC( ADS_GETFUNCTABLE );
-HB_FUNC_STATIC( ADT_GETFUNCTABLE );
-HB_FUNC_STATIC( ADSNTX_GETFUNCTABLE );
-HB_FUNC_STATIC( ADSCDX_GETFUNCTABLE );
-
-HB_INIT_SYMBOLS_BEGIN( ads1__InitSymbols )
-{ "_ADS",                HB_FS_PUBLIC, {HB_FUNCNAME( _ADS )}, NULL },
-{ "ADS_GETFUNCTABLE",    HB_FS_PUBLIC, {HB_FUNCNAME( ADS_GETFUNCTABLE )}, NULL },
-{ "ADT_GETFUNCTABLE",    HB_FS_PUBLIC, {HB_FUNCNAME( ADT_GETFUNCTABLE )}, NULL },
-{ "ADSNTX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( ADSNTX_GETFUNCTABLE )}, NULL },
-{ "ADSCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( ADSCDX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( ads1__InitSymbols )
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup ads1__InitSymbols
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols;
-   #pragma data_seg()
-#endif
 
 static RDDFUNCS adsSuper;
 
@@ -4532,8 +4499,6 @@ static void adsRegisterRDD( USHORT * pusRddId )
    }
 }
 
-HB_FUNC( _ADS ) { ; }
-
 HB_FUNC_STATIC( ADS_GETFUNCTABLE )
 {
    HB_TRACE(HB_TR_DEBUG, ("ADS_GETFUNCTABLE()"));
@@ -4561,6 +4526,55 @@ HB_FUNC_STATIC( ADSCDX_GETFUNCTABLE )
 
    adsRegisterRDD( &s_uiRddIdADSCDX );
 }
+
+HB_FUNC( ADS ) { ; }
+
+#define __PRG_SOURCE__ __FILE__
+
+#ifdef HB_PCODE_VER
+   #undef HB_PRG_PCODE_VER
+   #define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
+
+static void hb_adsRddInit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( hb_rddRegister( "ADS", RDT_FULL ) > 1 ||
+       hb_rddRegister( "ADT", RDT_FULL ) > 1 ||
+       hb_rddRegister( "ADSCDX", RDT_FULL ) > 1 ||
+       hb_rddRegister( "ADSNTX", RDT_FULL ) > 1 )
+   {
+      hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
+   }
+}
+
+HB_INIT_SYMBOLS_BEGIN( ads1__InitSymbols )
+{ "ADS",                 HB_FS_PUBLIC, {HB_FUNCNAME( ADS )}, NULL },
+{ "ADS_GETFUNCTABLE",    HB_FS_PUBLIC, {HB_FUNCNAME( ADS_GETFUNCTABLE )}, NULL },
+{ "ADT_GETFUNCTABLE",    HB_FS_PUBLIC, {HB_FUNCNAME( ADT_GETFUNCTABLE )}, NULL },
+{ "ADSNTX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( ADSNTX_GETFUNCTABLE )}, NULL },
+{ "ADSCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( ADSCDX_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( ads1__InitSymbols )
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_ads_rdd_init_ )
+   hb_vmAtInit( hb_adsRddInit, NULL );
+HB_CALL_ON_STARTUP_END( _hb_ads_rdd_init_ )
+
+#if defined(HB_PRAGMA_STARTUP)
+#  pragma startup ads1__InitSymbols
+#  pragma startup _hb_ads_rdd_init_
+#elif defined(HB_MSC_STARTUP)
+#  if _MSC_VER >= 1010
+#     pragma data_seg( ".CRT$XIY" )
+#     pragma comment( linker, "/Merge:.CRT=.data" )
+#  else
+#     pragma data_seg( "XIY" )
+#  endif
+   static HB_$INITSYM hb_vm_auto_ads1__InitSymbols = ads1__InitSymbols;
+   static HB_$INITSYM hb_vm_auto_ads_rdd_init = _hb_ads_rdd_init_;
+#  pragma data_seg()
+#endif
 
 ADSAREAP hb_rddGetADSWorkAreaPointer( void )
 {

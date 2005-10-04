@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.219 2005/09/19 23:21:28 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.220 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -79,6 +79,7 @@
 #include "hbset.h"
 #include "hbrddcdx.h"
 #include "hbmath.h"
+#include "rddsys.ch"
 #ifdef __XHARBOUR__
 #include "hbregex.h"
 #endif
@@ -94,13 +95,6 @@
    #define hb_cdpcharcmp( c1, c2, cdpage )     ( (BYTE)(c1) - (BYTE)(c2) )
  */
 #endif
-
-#define __PRG_SOURCE__ __FILE__
-#ifdef HB_PCODE_VER
-   #undef HB_PRG_PCODE_VER
-   #define HB_PRG_PCODE_VER HB_PCODE_VER
-#endif
-
 
 /*
  * Tag->fRePos = TURE means that rootPage->...->childLeafPage path is
@@ -289,113 +283,6 @@ static RDDFUNCS cdxTable =
 
    ( DBENTRYP_SVP )   hb_cdxWhoCares
 };
-
-#if defined( HB_SIXCDX )
-
-HB_FUNC( _SIXCDX ) {;}
-
-HB_FUNC( SIXCDX_GETFUNCTABLE )
-{
-   RDDFUNCS * pTable;
-   USHORT * uiCount, uiRddId;
-
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
-   uiRddId = hb_parni( 4 );
-
-   HB_TRACE(HB_TR_DEBUG, ("SIXCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
-
-   if ( pTable )
-   {
-      ERRCODE errCode;
-
-      if ( uiCount )
-         * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
-      if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
-      if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
-      hb_retni( errCode );
-      if ( errCode == SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-      }
-   }
-   else
-      hb_retni( FAILURE );
-}
-
-
-HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
-{ "_SIXCDX",             HB_FS_PUBLIC, {HB_FUNCNAME( _SIXCDX )}, NULL },
-{ "SIXCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
-
-#else
-
-HB_FUNC( _DBFCDX ) {;}
-
-HB_FUNC( DBFCDX_GETFUNCTABLE )
-{
-   RDDFUNCS * pTable;
-   USHORT * uiCount, uiRddId;
-
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
-   uiRddId = hb_parni( 4 );
-
-   HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
-
-   if ( pTable )
-   {
-      ERRCODE errCode;
-
-      if ( uiCount )
-         * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
-      if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
-      if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
-      if ( errCode == SUCCESS )
-      {
-         /*
-          * we successfully register our RDD so now we can initialize it
-          * You may think that this place is RDD init statement, Druzus
-          */
-         s_uiRddId = uiRddId;
-      }
-      hb_retni( errCode );
-   }
-   else
-      hb_retni( FAILURE );
-}
-
-
-HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
-{ "_DBFCDX",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFCDX )}, NULL },
-{ "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
-
-#endif
-
-#if defined(HB_PRAGMA_STARTUP)
-   #pragma startup dbfcdx1__InitSymbols
-#elif defined(HB_MSC_STARTUP)
-   #if _MSC_VER >= 1010
-      #pragma data_seg( ".CRT$XIY" )
-      #pragma comment( linker, "/Merge:.CRT=.data" )
-   #else
-      #pragma data_seg( "XIY" )
-   #endif
-   static HB_$INITSYM hb_vm_auto_dbfcdx1__InitSymbols = dbfcdx1__InitSymbols;
-   #pragma data_seg()
-#endif
 
 
 #ifdef HB_CDX_DSPDBG_INFO
@@ -9192,3 +9079,160 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
    hb_cdp_page = cdpTmp;
 #endif
 }
+
+#define __PRG_SOURCE__ __FILE__
+#ifdef HB_PCODE_VER
+   #undef HB_PRG_PCODE_VER
+   #define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
+
+HB_FUNC_EXTERN( _DBF );
+
+#if defined( HB_SIXCDX )
+
+HB_FUNC( SIXCDX ) {;}
+
+HB_FUNC( SIXCDX_GETFUNCTABLE )
+{
+   RDDFUNCS * pTable;
+   USHORT * uiCount, uiRddId;
+
+   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiRddId = hb_parni( 4 );
+
+   HB_TRACE(HB_TR_DEBUG, ("SIXCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+
+   if ( pTable )
+   {
+      ERRCODE errCode;
+
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      hb_retni( errCode );
+      if ( errCode == SUCCESS )
+      {
+         /*
+          * we successfully register our RDD so now we can initialize it
+          * You may think that this place is RDD init statement, Druzus
+          */
+         s_uiRddId = uiRddId;
+      }
+   }
+   else
+      hb_retni( FAILURE );
+}
+
+static void hb_dbfcdxRddInit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( hb_rddRegister( "DBF",    RDT_FULL ) <= 1 )
+   {
+      hb_rddRegister( "DBFFPT", RDT_FULL );
+      if( hb_rddRegister( "SIXCDX", RDT_FULL ) <= 1 )
+      {
+         return;
+      }
+   }
+
+   hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
+
+   /* not executed, only to force DBF RDD linking */
+   HB_FUNC_EXEC( _DBF );
+}
+
+HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
+{ "SIXCDX",              HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX )}, NULL },
+{ "SIXCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
+
+#else
+
+HB_FUNC( DBFCDX ) {;}
+
+HB_FUNC( DBFCDX_GETFUNCTABLE )
+{
+   RDDFUNCS * pTable;
+   USHORT * uiCount, uiRddId;
+
+   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiRddId = hb_parni( 4 );
+
+   HB_TRACE(HB_TR_DEBUG, ("DBFCDX_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+
+   if ( pTable )
+   {
+      ERRCODE errCode;
+
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+      if ( errCode != SUCCESS )
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+      if ( errCode == SUCCESS )
+      {
+         /*
+          * we successfully register our RDD so now we can initialize it
+          * You may think that this place is RDD init statement, Druzus
+          */
+         s_uiRddId = uiRddId;
+      }
+      hb_retni( errCode );
+   }
+   else
+      hb_retni( FAILURE );
+}
+
+static void hb_dbfcdxRddInit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( hb_rddRegister( "DBF", RDT_FULL ) <= 1 )
+   {
+      hb_rddRegister( "DBFFPT", RDT_FULL );
+      if( hb_rddRegister( "DBFCDX", RDT_FULL ) <= 1 )
+      {
+         return;
+      }
+   }
+
+   hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
+
+   /* not executed, only to force DBF RDD linking */
+   HB_FUNC_EXEC( _DBF );
+}
+
+HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
+{ "DBFCDX",              HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX )}, NULL },
+{ "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
+
+#endif
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_dbfcdx_rdd_init_ )
+   hb_vmAtInit( hb_dbfcdxRddInit, NULL );
+HB_CALL_ON_STARTUP_END( _hb_dbfcdx_rdd_init_ )
+
+#if defined(HB_PRAGMA_STARTUP)
+#  pragma startup dbfcdx1__InitSymbols
+#  pragma startup _hb_dbfcdx_rdd_init_
+#elif defined(HB_MSC_STARTUP)
+#  if _MSC_VER >= 1010
+#     pragma data_seg( ".CRT$XIY" )
+#     pragma comment( linker, "/Merge:.CRT=.data" )
+#  else
+#     pragma data_seg( "XIY" )
+#  endif
+   static HB_$INITSYM hb_vm_auto_dbfcdx1__InitSymbols = dbfcdx1__InitSymbols;
+   static HB_$INITSYM hb_vm_auto_dbfcdx_rdd_init = _hb_dbfcdx_rdd_init_;
+#  pragma data_seg()
+#endif

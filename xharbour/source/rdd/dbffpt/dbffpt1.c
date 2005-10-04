@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.57 2005/09/20 17:26:37 druzus Exp $
+ * $Id: dbffpt1.c,v 1.58 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -70,15 +70,10 @@
 #include "hbdate.h"
 #include "hbrddfpt.h"
 #include "hbsxfunc.h"
+#include "rddsys.ch"
 
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
-#endif
-
-#define __PRG_SOURCE__ __FILE__
-#ifdef HB_PCODE_VER
-#  undef HB_PRG_PCODE_VER
-#  define HB_PRG_PCODE_VER HB_PCODE_VER
 #endif
 
 static RDDFUNCS fptSuper;
@@ -229,47 +224,6 @@ static RDDFUNCS fptTable =
 
    ( DBENTRYP_SVP )   hb_fptWhoCares
 };
-
-HB_FUNC( _DBFFPT ) {;}
-
-HB_FUNC( DBFFPT_GETFUNCTABLE )
-{
-   RDDFUNCS * pTable;
-   USHORT * uiCount;
-
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
-
-   HB_TRACE(HB_TR_DEBUG, ("DBFFPT_GETFUNCTABLE(%i, %p)", uiCount, pTable));
-
-   if( pTable )
-   {
-      if ( uiCount )
-         * uiCount = RDDFUNCSCOUNT;
-      hb_retni( hb_rddInherit( pTable, &fptTable, &fptSuper, ( BYTE * ) "DBF" ) );
-   }
-   else
-      hb_retni( FAILURE );
-}
-
-
-HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
-{ "_DBFFPT",             HB_FS_PUBLIC, {HB_FUNCNAME( _DBFFPT )}, NULL },
-{ "DBFFPT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFFPT_GETFUNCTABLE )}, NULL }
-HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
-
-#if defined(HB_PRAGMA_STARTUP)
-#  pragma startup dbffpt1__InitSymbols
-#elif defined(HB_MSC_STARTUP)
-#  if _MSC_VER >= 1010
-#     pragma data_seg( ".CRT$XIY" )
-#     pragma comment( linker, "/Merge:.CRT=.data" )
-#  else
-#     pragma data_seg( "XIY" )
-#  endif
-   static HB_$INITSYM hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols;
-#  pragma data_seg()
-#endif
 
 /*
  * generate Run-Time error
@@ -4027,3 +3981,76 @@ static ERRCODE hb_fptRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
 
    return SUCCESS;
 }
+
+/* for backward compatibility */
+HB_FUNC( DBFDBT ) {;}
+
+HB_FUNC( DBFFPT ) {;}
+
+HB_FUNC( DBFFPT_GETFUNCTABLE )
+{
+   RDDFUNCS * pTable;
+   USHORT * uiCount;
+
+   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
+   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+
+   HB_TRACE(HB_TR_DEBUG, ("DBFFPT_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+
+   if( pTable )
+   {
+      if ( uiCount )
+         * uiCount = RDDFUNCSCOUNT;
+      hb_retni( hb_rddInherit( pTable, &fptTable, &fptSuper, ( BYTE * ) "DBF" ) );
+   }
+   else
+      hb_retni( FAILURE );
+}
+
+
+#define __PRG_SOURCE__ __FILE__
+
+#ifdef HB_PCODE_VER
+#  undef HB_PRG_PCODE_VER
+#  define HB_PRG_PCODE_VER HB_PCODE_VER
+#endif
+
+HB_FUNC_EXTERN( _DBF );
+
+static void hb_dbffptRddInit( void * cargo )
+{
+   HB_SYMBOL_UNUSED( cargo );
+
+   if( hb_rddRegister( "DBF",    RDT_FULL ) > 1 ||
+       hb_rddRegister( "DBFFPT", RDT_FULL ) > 1 )
+   {
+      hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
+
+      /* not executed, only to force DBF RDD linking */
+      HB_FUNC_EXEC( _DBF );
+   }
+}
+
+HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
+{ "DBFFPT",              HB_FS_PUBLIC, {HB_FUNCNAME( DBFFPT )}, NULL },
+{ "DBFFPT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFFPT_GETFUNCTABLE )}, NULL }
+HB_INIT_SYMBOLS_END( dbffpt1__InitSymbols )
+
+HB_CALL_ON_STARTUP_BEGIN( _hb_dbffpt_rdd_init_ )
+   hb_vmAtInit( hb_dbffptRddInit, NULL );
+HB_CALL_ON_STARTUP_END( _hb_dbffpt_rdd_init_ )
+
+#if defined(HB_PRAGMA_STARTUP)
+#  pragma startup dbffpt1__InitSymbols
+#  pragma startup _hb_dbffpt_rdd_init_
+#elif defined(HB_MSC_STARTUP)
+#  if _MSC_VER >= 1010
+#     pragma data_seg( ".CRT$XIY" )
+#     pragma comment( linker, "/Merge:.CRT=.data" )
+#  else
+#     pragma data_seg( "XIY" )
+#  endif
+   static HB_$INITSYM hb_vm_auto_dbffpt1__InitSymbols = dbffpt1__InitSymbols;
+   static HB_$INITSYM hb_vm_auto_dbffpt_rdd_init = _hb_dbffpt_rdd_init_;
+#  pragma data_seg()
+#endif
