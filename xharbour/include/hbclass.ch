@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.34 2005/09/04 04:29:00 walito Exp $
+ * $Id: hbclass.ch,v 1.35 2005/09/27 23:49:47 ronpinkas Exp $
  */
 
 /*
@@ -976,8 +976,8 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
           static function _<AssignName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
-METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
-
 #endif /* HB_SHORTNAMES */
+
+#xcommand METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
 
 #endif /* HB_CLASS_CH_ */
