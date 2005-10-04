@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4393 2005/10/03 19:09:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4394 2005/10/04 02:05:30 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-04 00:13 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
+  * contrib/wvtgui/wvtwin.ch
+    + Added more constants:
+      #define FW_DONTCARE                  0
+      #define FW_THIN                    100
+      #define FW_EXTRALIGHT              200
+      #define FW_ULTRALIGHT              200
+      #define FW_LIGHT                   300
+      #define FW_NORMAL                  400
+      #define FW_REGULAR                 400
+      #define FW_MEDIUM                  500
+      #define FW_SEMIBOLD                600
+      #define FW_DEMIBOLD                600
+      #define FW_BOLD                    700
+      #define FW_EXTRABOLD               800
+      #define FW_ULTRABOLD               800
+      #define FW_HEAVY                   900
+      #define FW_BLACK                   900
 
 2005-10-05 04:03 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/common/hbver.c

@@ -1025,4 +1025,22 @@
 #define PS_TYPE_MASK            983040
 
 //-------------------------------------------------------------------//
+// font weight values
+#define FW_DONTCARE                  0
+#define FW_THIN                    100
+#define FW_EXTRALIGHT              200
+#define FW_ULTRALIGHT              200
+#define FW_LIGHT                   300
+#define FW_NORMAL                  400
+#define FW_REGULAR                 400
+#define FW_MEDIUM                  500
+#define FW_SEMIBOLD                600
+#define FW_DEMIBOLD                600
+#define FW_BOLD                    700
+#define FW_EXTRABOLD               800
+#define FW_ULTRABOLD               800
+#define FW_HEAVY                   900
+#define FW_BLACK                   900
+
+//-------------------------------------------------------------------//
 
