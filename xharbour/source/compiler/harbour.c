@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.109 2005/08/03 17:10:33 druzus Exp $
+ * $Id: harbour.c,v 1.110 2005/08/04 11:33:11 druzus Exp $
  */
 
 /*
@@ -2142,7 +2142,9 @@ void hb_compAnnounce( char * szFunName )
          hb_comp_functions.pLast->pNext = pFunc;
          hb_comp_functions.pLast = pFunc;
       }
+
       hb_comp_functions.iCount++;
+      hb_comp_iFunctionCnt++;
 
       /* this function have a very limited functionality
        */
