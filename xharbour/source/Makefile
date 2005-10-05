@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2004/08/25 17:02:57 lf_sfnet Exp $
+# $Id: Makefile,v 1.7 2005/10/05 20:25:43 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -37,6 +37,7 @@ DIRS=\
 	clipsamp \
 	odbc \
 	ct \
+	misc 
 
 ifneq ($(HB_ARCHITECTURE),dos)
 
