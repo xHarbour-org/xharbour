@@ -1,5 +1,5 @@
  /*
- * $Id: gtstd.c,v 1.24 2005/10/02 12:35:11 druzus Exp $
+ * $Id: gtstd.c,v 1.25 2005/10/04 20:35:35 druzus Exp $
  */
 
 /*
@@ -237,7 +237,7 @@ void HB_GT_FUNC(gt_Exit( void ))
    {
       hb_xfree( s_clipboard );
    }
-   
+
    HB_GT_FUNC(mouse_Exit());
 
 #if defined( OS_UNIX_COMPATIBLE )
@@ -279,7 +279,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    {
       if( _kbhit() ) ch = _getch();
    }
-   else if( !_eof( s_iFilenoStdin )
+   else if( !_eof( s_iFilenoStdin ) )
    {
       BYTE bChar;
       if( _read( s_iFilenoStdin, &bChar, 1 ) == 1 )
