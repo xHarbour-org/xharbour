@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4402 2005/10/05 13:58:33 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4403 2005/10/05 15:15:12 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 23:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/gtwvt/gtwvt.h
+  * contrib/wvtgui/hbgtwvt.h
+  * contrib/wvtgui/wvtutils.c
+    * Applying the proper codeblock handling, as suggested by Przemek.
+      In wvtgui this is only about Modal/Modeless Dialog feature.
+      As a side effect, I rename GLOBAL_DATA member cbFunc/cbFuncModal
+      into pcbFunc/pcbFuncModal. They now store pointer to codeblock,
+      not the codeblock itself.
 
 2005-10-05 17:20 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/tip/url.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.5 2005/07/13 16:13:14 bdj Exp $
+ * $Id: wvtutils.c,v 1.6 2005/07/22 17:23:21 lculik Exp $
  */
 
 /*
@@ -1254,7 +1254,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    if ( HB_IS_BLOCK( pFirst ) )
    {
       /* pFunc is pointing to stored code block (later) */
-      pFunc = ( PHB_ITEM ) &(_s->cbFunc[ iIndex ]);
+      pFunc = hb_itemNew( pFirst );
       iType = 2;
    }
    else if( pFirst->type == HB_IT_STRING )
@@ -1319,8 +1319,7 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
             /* if codeblock, store the codeblock and lock it there */
             if (HB_IS_BLOCK( pFirst ))
             {
-               hb_itemCopy( &(_s->cbFunc[ iIndex ]), (PHB_ITEM) pFirst);
-               HB_ITEM_LOCK( &(_s->cbFunc[ iIndex ]));
+               _s->pcbFunc[ iIndex ] = pFunc;
             }
 
             _s->pFunc[ iIndex ] = pFunc;
@@ -1335,6 +1334,11 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       }
       else
       {
+         //if codeblock item created earlier, release it
+         if (iType==2 && pFunc)
+         {
+            hb_itemRelease( pFunc );
+         }
          _s->hDlgModeless[ iIndex ] = NULL;
       }
    }
@@ -1373,11 +1377,10 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
    if ( HB_IS_BLOCK( pFirst ) )
    {
       /* pFunc is pointing to stored code block (later) */
-      pFunc = ( PHB_ITEM ) &( _s->cbFuncModal[ iIndex ] );
 
-      hb_itemCopy( &( _s->cbFuncModal[ iIndex ] ), ( PHB_ITEM ) pFirst );
-      HB_ITEM_LOCK( &( _s->cbFuncModal[ iIndex ] ) );
+      _s->pcbFuncModal[ iIndex ] = hb_itemNew( pFirst );
 
+      pFunc = _s->pcbFuncModal[ iIndex ];
       _s->pFuncModal[ iIndex ] = pFunc;
       _s->iTypeModal[ iIndex ] = 2;
    }

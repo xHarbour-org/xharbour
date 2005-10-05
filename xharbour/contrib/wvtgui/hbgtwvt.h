@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.3 2005/05/09 18:34:22 vouchcac Exp $
+ * $Id: hbgtwvt.h,v 1.4 2005/05/16 14:29:13 bdj Exp $
  */
 
 /*
@@ -263,11 +263,13 @@ typedef struct global_data
   wvtGradientFill pfnGF;               // Pointer to Address of the GradientFill function in MSImg32.dll
   HWND      hDlgModeless[ WVT_DLGML_MAX ]; // Handle to a modeless dialog
   PHB_ITEM  pFunc[ WVT_DLGML_MAX ];    // Function pointer for WndProc
-  HB_ITEM   cbFunc[ WVT_DLGML_MAX ];   //codeblock for WndProc
+  /* TODO: pcbFunc is redundant and should be removed */
+  PHB_ITEM  pcbFunc[ WVT_DLGML_MAX ];   //codeblock for WndProc
   int       iType[ WVT_DLGML_MAX ];    // Type of Function Pointers - Function 1, Block 2, Method 3
   HWND      hDlgModal[ WVT_DLGMD_MAX ];// Handle to a modeless dialog
   PHB_ITEM  pFuncModal[ WVT_DLGMD_MAX ];  // Function pointer for WndProc
-  HB_ITEM   cbFuncModal[ WVT_DLGMD_MAX ]; // codeblock for WndProc
+  /* TODO: pcbFuncModal is redundant and should be removed */
+  PHB_ITEM  pcbFuncModal[ WVT_DLGMD_MAX ]; // codeblock for WndProc
   int       iTypeModal[ WVT_DLGMD_MAX ];  // Type of Function Pointers - Function 1, Block 2, Method 3
   BOOL      bGui;
   HDC       hGuiDC;
