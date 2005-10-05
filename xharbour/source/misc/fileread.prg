@@ -1,5 +1,5 @@
 /*
- * $Id: fileread.prg,v 1.3 2001/09/10 22:04:29 vszakats Exp $
+ * $Id: fileread.prg,v 1.1 2003/04/14 16:09:13 lculik Exp $
  */
 
 /* Harbour Project source code

@@ -1,5 +1,5 @@
 /*
- * $Id: stringp.prg,v 1.2 2001/06/18 18:12:00 dholm Exp $
+ * $Id: stringp.prg,v 1.1 2003/04/14 16:09:14 lculik Exp $
  */
 
 /*

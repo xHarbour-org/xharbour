@@ -1,5 +1,5 @@
 /*
- * $Id: strfmt.c,v 1.1 2003/04/14 16:09:14 lculik Exp $
+ * $Id: strfmt.c,v 1.2 2004/03/18 03:45:01 ronpinkas Exp $
  */
 
 /*

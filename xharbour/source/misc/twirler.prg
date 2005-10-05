@@ -1,5 +1,5 @@
 //
-// $Id: twirler.prg,v 1.2 2001/03/16 16:34:31 dholm Exp $
+// $Id: twirler.prg,v 1.1 2003/04/14 16:09:14 lculik Exp $
 //
 
 // New libmisc twirler class

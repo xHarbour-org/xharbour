@@ -1,5 +1,5 @@
 /*
- * $Id: numtxthu.prg,v 1.2 2001/05/15 13:02:05 vszakats Exp $
+ * $Id: numtxthu.prg,v 1.1 2003/04/14 16:09:14 lculik Exp $
  */
 
 /*

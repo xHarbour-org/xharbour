@@ -1,5 +1,5 @@
 /*
- * $Id: nconvert.prg,v 1.2 2001/04/12 18:24:40 dholm Exp $
+ * $Id: nconvert.prg,v 1.1 2003/04/14 16:09:13 lculik Exp $
  */
 
 /*
