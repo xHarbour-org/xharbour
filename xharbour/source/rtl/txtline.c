@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.4 2005/07/07 01:21:24 peterrees Exp $
+ * $Id: txtline.c,v 1.5 2005/08/07 02:40:39 mlombardo Exp $
  */
 
 /*
@@ -444,9 +444,23 @@ HB_FUNC( MEMOLINE )
                * ( szRet + lPos + lSpAdded ) = * ( pszString + ulStartOffset + lPos );
             }
          }
+
+         // Strip chr(141) and chr(10) to be C53B compatible
+
+         for( lPos = lEnd; lPos >= 0; lPos-- )
+         {
+            if( szRet[ lPos ] == '\x8D' || szRet[ lPos ] == HB_CHAR_LF || szRet[ lPos ] == ' ' )
+            {
+               szRet[ lPos ] = ' ';
+            }
+            else
+            {
+               break;
+            }
+         }
+
          hb_retclenAdopt( szRet, ulLineSize );
          bLineFound = TRUE;
-//         break;
       }
       ulStartOffset = bEOF ? ulTextLen : ulStartOffset + ulEndOffset;
    }

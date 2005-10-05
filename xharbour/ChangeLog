@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4400 2005/10/05 03:56:06 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4401 2005/10/05 09:14:26 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 11:00 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/txtline.c
+    ! Strip chr(141) and chr(10) from end of line in memoline()
+      as C53B does
 
 2005-10-05 11:11 UTC+0200 Alex Strickland
   * source\vm\inet.c
