@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.5 2004/01/08 23:49:35 ronpinkas Exp $
+rem * $Id: bldtest.bat,v 1.6 2004/01/12 23:06:18 fsgiudice Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -23,8 +23,6 @@ set OLDENVMT=%HB_MT%
 set OLDENVGT=%HB_GT_LIB%
 set OLDENVC=%CFLAGS%
 
-set HB_ARCHITECTURE=w32
-set HB_COMPILER=bcc32
 set HB_INSTALL=..
 SET HB_BIN_INSTALL=%HB_INSTALL%\bin
 set HB_INC_INSTALL=%HB_INSTALL%\include
