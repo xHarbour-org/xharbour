@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.158 2005/10/02 12:35:11 druzus Exp $
+ * $Id: gtwvt.c,v 1.159 2005/10/03 16:59:36 bdj Exp $
  */
 
 /*
@@ -3606,7 +3606,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
       FreeResource( mem );
    }
 
-   return iPicture;
+   return (IPicture *) iPicture;
 }
 
 //--------------------------------------------------------------------//
