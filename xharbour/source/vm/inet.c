@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.58 2005/10/02 12:35:12 druzus Exp $
+* $Id: inet.c,v 1.59 2005/10/04 02:05:37 druzus Exp $
 */
 
 /*
@@ -380,7 +380,7 @@ HB_GARBAGE_FUNC( hb_inetSocketFinalize )
 
    if ( Socket->caPeriodic != NULL )
    {
-      hb_arrayRelease( Socket->caPeriodic );
+	  hb_itemRelease( Socket->caPeriodic );
       Socket->caPeriodic = NULL;
    }
 }
@@ -707,7 +707,7 @@ HB_FUNC( INETSETPERIODCALLBACK )
 
    if ( Socket->caPeriodic != NULL )
    {
-      hb_arrayRelease( Socket->caPeriodic );
+	  hb_itemRelease( Socket->caPeriodic );
    }
 
    Socket->caPeriodic  = hb_arrayClone( pArray, NULL );
@@ -747,7 +747,7 @@ HB_FUNC( INETCLEARPERIODCALLBACK )
 
    if ( Socket->caPeriodic != NULL )
    {
-      hb_arrayRelease( Socket->caPeriodic );
+	  hb_itemRelease( Socket->caPeriodic );
       Socket->caPeriodic = NULL;
    }
 }

@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4399 2005/10/04 20:53:49 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4400 2005/10/05 03:56:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 11:11 UTC+0200 Alex Strickland
+  * source\vm\inet.c
+    * Replaced calls to hb_arrayRelease( Socket->caPeriodic ) with
+      hb_itemRelease( Socket->caPeriodic )
 
 2005-10-04 20:39 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/gtstd/gtstd.c
