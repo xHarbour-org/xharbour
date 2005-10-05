@@ -1,1 +1,0 @@
-bld_b32 demo
