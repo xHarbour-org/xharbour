@@ -92,6 +92,10 @@
 
       EXTERN SIN, COS
 
+      #ifdef ADS
+         REQUEST ADS
+      #endif
+
       #ifdef SQL
          REQUEST SQLRDD
          REQUEST SR_ODBC
@@ -438,7 +442,7 @@ STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := 
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC13" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC14" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -9196,7 +9200,9 @@ RETURN .T.
 //--------------------------------------------------------------//
 INIT PROCEDURE PPInit
 
-   LOCAL nScreenWidth
+   LOCAL nScreenWidth, dDate := Stod( __DATE__ )
+
+   s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
 
    IF Type( "HB_GT_WVT()" ) == "UI"
       nScreenWidth := &( "Wvt_GetScreenWidth()" )
@@ -9757,7 +9763,7 @@ PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 
    PP_InitStd()
    PP_LoadRun()
-      
+
 RETURN
 
 //--------------------------------------------------------------//
@@ -10192,12 +10198,12 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    ENDIF
 
 /* Already pre-processed!
-   IF ! s_lRunLoaded  
+   IF ! s_lRunLoaded
       PP_InitStd()
       PP_LoadRun()
    ENDIF
 */
-      
+
    IF aProcedures == s_aProcedures
       bPreset := .F.
    ELSE
@@ -10291,7 +10297,7 @@ PROCEDURE PP_LoadRun()
 
    IF ! s_lRunLoaded
       s_lRunLoaded := .T.
-      
+
       InitRunRules()
       InitRunResults()
    ENDIF
@@ -10303,7 +10309,7 @@ PROCEDURE PP_LoadDot()
 
    IF ! s_lDotLoaded
       s_lDotLoaded := .T.
-      
+
       InitDotRules()
       InitDotResults()
    ENDIF
