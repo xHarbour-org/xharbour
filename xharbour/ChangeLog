@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4398 2005/10/04 20:06:07 druzus Exp $
+ * $Id: ChangeLog,v 1.4399 2005/10/04 20:53:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,6 +9,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-10-04 20:39 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/gtstd/gtstd.c
+    * Corrected typo, missing ')'
+  * source/rtl/gtwvt/gtwvt.c
+    * Missing type cast
+  * utils/xbscript/xbscript.prg
+    + Added optional REQUEST ADS guarded with #ifdef ADS
+    + Enhanced version information to include compilation date
+  * tests/bldtest.bat
+    - Remove BCC specific settings
 
 2005-10-04 13:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.c
