@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2004/08/05 12:21:16 lf_sfnet Exp $
+# $Id: Makefile,v 1.6 2004/08/25 17:02:57 lf_sfnet Exp $
 #
 
 ROOT = ../
@@ -42,6 +42,7 @@ ifneq ($(HB_ARCHITECTURE),dos)
 
 DIRS+=\
 	tip \
+	cgi
 
 endif
 
