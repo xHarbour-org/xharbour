@@ -1,5 +1,5 @@
 /*
- * $Id: url.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: url.prg,v 1.2 2005/09/23 13:31:36 gdrouillard Exp $
  */
 
 /*
@@ -185,8 +185,6 @@ METHOD BuildAddress() CLASS tURL
 
 RETURN cRet
 
-
-
 METHOD BuildQuery( ) CLASS tURL
    LOCAL cLine
 
@@ -202,7 +200,7 @@ METHOD BuildQuery( ) CLASS tURL
 RETURN cLine
 
 METHOD AddGetForm( cPostData )
-   LOCAL cData:='', nI, cTmp,y
+   LOCAL cData:='', nI, cTmp,y, cRet
 
    IF HB_IsHash( cPostData )
       FOR nI := 1 TO Len( cPostData )
@@ -239,8 +237,9 @@ METHOD AddGetForm( cPostData )
    ELSEIF HB_IsString( cPostData )
       cData := cPostData
    Endif
-   IF empty(cData)
-      return
+
+   IF !empty(cData)
+      cRet := ::cQuery+=if(empty(::cQuery),'','&')+cData
    ENDIF
-   ::cQuery+=if(empty(::cQuery),'','&')+cData
-   return
+
+RETURN cRet
