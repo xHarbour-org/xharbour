@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.16 2005/09/26 09:00:00 modalsit Exp $
+rem $Id: makallvc.bat,v 1.16 2005/09/26 12:00:14 modalsist Exp $
 rem 
 
 echo creating system files
@@ -35,20 +35,6 @@ if errorlevel 1 goto end
 :htmllib
 echo htmllib
 cd contrib\htmllib
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:internet
-echo internet
-cd contrib\internet
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:libmisc
-echo libmisc
-cd contrib\libmisc
 call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
@@ -107,20 +93,6 @@ if errorlevel 1 goto end
 :what32
 echo what32
 cd contrib\what32
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:whoo
-echo whoo
-cd contrib\Whoo
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:woopgui
-echo WoopGui
-cd contrib\WoopGUI
 call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end

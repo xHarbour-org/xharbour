@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallbc.bat,v 1.16 2005/09/26 09:00:00 modalsist Exp $
+rem $Id: makallbc.bat,v 1.16 2005/09/26 12:00:14 modalsist Exp $
 rem
 
 echo create system files
@@ -32,26 +32,6 @@ call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
-:htmllib
-echo htmllib
-cd contrib\htmllib
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:internet
-echo internet
-cd contrib\internet
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:libmisc
-echo libmisc
-cd contrib\libmisc
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
 
 :libnf
 echo libnf
@@ -108,20 +88,6 @@ if errorlevel 1 goto end
 :what32
 echo what32
 cd contrib\what32
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:whoo
-echo whoo
-cd contrib\Whoo
-call make_b32.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:woopgui
-echo WoopGui
-cd contrib\WoopGUI
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
