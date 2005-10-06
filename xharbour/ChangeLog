@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4419 2005/10/06 10:47:50 paultucker Exp $
+ * $Id: ChangeLog,v 1.4420 2005/10/06 18:24:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,12 +9,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-10-06 16:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/macro.c
+    * Always make copy of stringes compiled by macro compiler
+  * utils/xbscript/xbs_harb.ch
+    * Typo
+
 2005-10-06 15:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * contrib/hbzlib/zipplatform.cpp
     contrib/hbzlib/include/zipcollections.h
     contrib/hbzlib/include/zipstring.h
     * updated for allow compilation with mingw and gcc4
- 
+
 2005-10-06 06:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.gc
     * )\ => )/
