@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4417 2005/10/06 05:48:08 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4418 2005/10/06 09:13:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-06 06:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.gc
+    * )\ => )/
 
 2005-10-06 02:12 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.13 2005/09/23 21:55:02 likewolf Exp $
+# $Id: makefile.gc,v 1.14 2005/10/04 15:52:38 kaddath Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -279,73 +279,73 @@ $(HTML_LIB) : \
 	$(AR_CMD)
 
 $(HTML_OBJ_DIR)/counter.c : $(HTML_DIR)/counter.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/counter.o : $(HTML_OBJ_DIR)/counter.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/hterrsys.c : $(HTML_DIR)/hterrsys.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/hterrsys.o : $(HTML_OBJ_DIR)/hterrsys.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/htmbrows.c : $(HTML_DIR)/htmbrows.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/htmbrows.o : $(HTML_OBJ_DIR)/htmbrows.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/htmutil.c : $(HTML_DIR)/htmutil.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/htmutil.o : $(HTML_OBJ_DIR)/htmutil.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/jlist.c : $(HTML_DIR)/jlist.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/jlist.o : $(HTML_OBJ_DIR)/jlist.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/jwindow.c : $(HTML_DIR)/jwindow.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/jwindow.o : $(HTML_OBJ_DIR)/jwindow.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/ocgi.c : $(HTML_DIR)/ocgi.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/ocgi.o : $(HTML_OBJ_DIR)/ocgi.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/oedit.c : $(HTML_DIR)/oedit.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/oedit.o : $(HTML_OBJ_DIR)/oedit.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/ofile.c : $(HTML_DIR)/ofile.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/ofile.o : $(HTML_OBJ_DIR)/ofile.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/oframe.c : $(HTML_DIR)/oframe.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/oframe.o : $(HTML_OBJ_DIR)/oframe.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/ohtm.c : $(HTML_DIR)/ohtm.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/ohtm.o : $(HTML_OBJ_DIR)/ohtm.c
 	$(CC_CMD)
 
 $(HTML_OBJ_DIR)/oini.c : $(HTML_DIR)/oini.prg
-	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)\include -o$@ $^
+	$(HARBOUR_EXE) $^ $(HARBOURFLAGS) -i$(HTML_DIR)/include -o$@ $^
 
 $(HTML_OBJ_DIR)/oini.o : $(HTML_OBJ_DIR)/oini.c
 	$(CC_CMD)
@@ -504,28 +504,28 @@ $(OBJ_DIR)/url.o : $(OBJ_DIR)/url.c
 #-------------------------------------------------------------------------------
 
 PCREPOS_LIB_OBJS = \
-   $(OBJ_DIR)\chartables.o \
-   $(OBJ_DIR)\pcreposix.o \
-   $(OBJ_DIR)\pcre_compile.o \
-   $(OBJ_DIR)\pcre_config.o \
-   $(OBJ_DIR)\pcre_dfa_exec.o \
-   $(OBJ_DIR)\pcre_exec.o \
-   $(OBJ_DIR)\pcre_fullinfo.o \
-   $(OBJ_DIR)\pcre_get.o \
-   $(OBJ_DIR)\pcre_globals.o \
-   $(OBJ_DIR)\pcre_info.o \
-   $(OBJ_DIR)\pcre_maketables.o \
-   $(OBJ_DIR)\pcre_ord2utf8.o \
-   $(OBJ_DIR)\pcre_printint.o \
-   $(OBJ_DIR)\pcre_refcount.o \
-   $(OBJ_DIR)\pcre_study.o \
-   $(OBJ_DIR)\pcre_tables.o \
-   $(OBJ_DIR)\pcre_try_flipped.o \
-   $(OBJ_DIR)\pcre_ucp_findchar.o \
-   $(OBJ_DIR)\pcre_valid_utf8.o \
-   $(OBJ_DIR)\pcre_version.o \
-   $(OBJ_DIR)\pcre_xclass.o \
-   $(OBJ_DIR)\ucp_findchar.o
+   $(OBJ_DIR)/chartables.o \
+   $(OBJ_DIR)/pcreposix.o \
+   $(OBJ_DIR)/pcre_compile.o \
+   $(OBJ_DIR)/pcre_config.o \
+   $(OBJ_DIR)/pcre_dfa_exec.o \
+   $(OBJ_DIR)/pcre_exec.o \
+   $(OBJ_DIR)/pcre_fullinfo.o \
+   $(OBJ_DIR)/pcre_get.o \
+   $(OBJ_DIR)/pcre_globals.o \
+   $(OBJ_DIR)/pcre_info.o \
+   $(OBJ_DIR)/pcre_maketables.o \
+   $(OBJ_DIR)/pcre_ord2utf8.o \
+   $(OBJ_DIR)/pcre_printint.o \
+   $(OBJ_DIR)/pcre_refcount.o \
+   $(OBJ_DIR)/pcre_study.o \
+   $(OBJ_DIR)/pcre_tables.o \
+   $(OBJ_DIR)/pcre_try_flipped.o \
+   $(OBJ_DIR)/pcre_ucp_findchar.o \
+   $(OBJ_DIR)/pcre_valid_utf8.o \
+   $(OBJ_DIR)/pcre_version.o \
+   $(OBJ_DIR)/pcre_xclass.o \
+   $(OBJ_DIR)/ucp_findchar.o
 	$(AR_CMD)
 
 $(OBJ_DIR)/chartables.o : $(PCREPOS_DIR)/chartables.c
@@ -3857,9 +3857,9 @@ $(RDD_OBJ_DIR)/rddsys.o : $(RDD_OBJ_DIR)/rddsys.c
 #-------------------------------------------------------------------------------
 
 HBSIX_LIB_OBJS = \
-   $(OBJ_DIR)\sxcompr.o \
-   $(OBJ_DIR)\sxcrypt.o \
-   $(OBJ_DIR)\sxdate.o
+   $(OBJ_DIR)/sxcompr.o \
+   $(OBJ_DIR)/sxcrypt.o \
+   $(OBJ_DIR)/sxdate.o
 	$(AR_CMD)
 
 $(HBSIX_OBJ_DIR)/sxcompr.o : $(HBSIX_DIR)/sxcompr.c
@@ -3876,8 +3876,8 @@ $(HBSIX_OBJ_DIR)/sxdate.o : $(HBSIX_DIR)/sxdate.c
 #-------------------------------------------------------------------------------
 
 HSX_LIB_OBJS = \
-   $(OBJ_DIR)\hsx.o \
-   $(OBJ_DIR)\cftsfunc.o
+   $(OBJ_DIR)/hsx.o \
+   $(OBJ_DIR)/cftsfunc.o
 
 $(HSX_OBJ_DIR)/hsx.o : $(HSX_DIR)/hsx.c
 	$(CC_CMD)
