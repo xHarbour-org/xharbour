@@ -1,8 +1,8 @@
 /*
- * xBaseScript Project source code:
+ * xbScript Project source code:
  * Script Interpreter/ Dot Prompt Console / Pre-Processor
  *
- * Copyright 2000-2004 Ron Pinkas <ron@xharbour.com>
+ * Copyright 2000-2005 Ron Pinkas <ron@xharbour.com>
  * www - http://www.xbScript.com
  *
  * This program is free software; you can redistribute it and/or modify

@@ -1,5 +1,12 @@
 Thanks for reviewing xbScript, a full featured xHarbour (and xBase variations)
 Interpreter, Dot Prompt Console, and Clipper/xHarbour compatible Pre-Processor.
+xbScript
+-----------
+
+Script Interpreter/ Dot Prompt Console / Pre-Processor
+
+Copyright 2000-2005 Ron Pinkas <ron@xharbour.com>
+http://www.xbScript.com
 
 License:
 --------
@@ -76,8 +83,9 @@ xbScript has 3 personalities which are tied tightly together.
 
      DO filename.prg [Enter]
 
-   So that DOT will "run" the specified source file. This interpreter
-   mode is subject to few limitations:
+   So that DOT will "run" the specified source file.
+
+   This interpreter mode is subject to few limitations:
 
      a. It does support LOCAL/STATIC/PRIVATE/PUBLIC, but:
 
@@ -89,19 +97,24 @@ xbScript has 3 personalities which are tied tightly together.
      b. Non-declared variables are auto-created on assignment in Harbour
         but NOT in Clipper (yet).
 
-     c. It does support definition and execution of prg-defined
-        FUNCTIONs/PROCEDUREs.
-
-     d. It does support all control flow structures including:
+     c. It does support all control flow structures excluding SWITCH
+        including:
          - BEGIN SEQUENCE [BREAK] [RECOVER] END SEQUENCE
          - TRY [CATCH [<xCatcher>]] END.
          - FOR EACH <Enumerator> IN <Enumeration>
+
+     d. It does not support DETACHED LOCALs in codeblocks as the interpreter
+        does not implement real locals.
+
+  The interpreter does support definition and execution of prg-defined
+  FUNCTIONs/PROCEDUREs as well as OOP code (when compiled with xHarbour and
+  hbclass.ch is #included).
 
   This will create rp_dot.pp$ compilation trace file.
 
   xbScript is using pre-burned rules to support this functionality, unless a
   file named rp_dot.ch is present. If rp_dot.ch is present xbScript will load
-  rp_dot.ch instead of using the pre-burned rules. If this file doesn't 
+  rp_dot.ch instead of using the pre-burned rules. If this file doesn't
   include all the needed rules, the functionality of the the Dot Prompt mode
   may be faulty.
 
@@ -135,24 +148,29 @@ xbScript has 3 personalities which are tied tightly together.
        - LOCALS have scoping of locals but are implemented as privates
          so you can't have a LOCAL and a PRIVATE with the same name.
 
-     b. Non-declared variables are auto-created on assignment in Harbour
+     b. Non-declared variables are auto-created on assignment in [x]Harbour
         but NOT in Clipper (yet).
 
      c. It does support definition and execution of prg-defined
-        FUNCTIONs/PROCEDUREs as well as parameter passing and return values.
+        FUNCTIONs/PROCEDUREs and OOP code (when compiled with xHarbour) code
+        as well as parameter passing and return values.
 
-     d. It does support ALL control flow structures including BEGIN
-        SEQUENCE [BREAK] [RECOVER] END SEQUENCE TRY [CATCH [<xCatcher>]] END
-        and FOR EACH [HB_EnumIndex()] ][LOOP] [EXIT] NEXT.
+     d. It does support ALL control flow structures excluding SWITCH but
+        including BEGIN SEQUENCE [BREAK] [RECOVER] END SEQUENCE TRY
+        [CATCH [<xCatcher>]] END and FOR EACH [HB_EnumIndex()] ][LOOP] [EXIT]
+        NEXT.
 
-     e. The compiled module is automatically using -n (No implicit startup
+     e. It does not support DETACHED LOCALs in codeblocks as the interpreter
+        does not implement real locals.
+
+     f. The compiled module is automatically using -n (No implicit startup
         procedure) if the script starts with a Procedure/Function definition.
 
-     f. Built-in OLE COM Client gateway is included when PP is compiled with
+     g. Built-in OLE COM Client gateway is included when PP is compiled with
         xHarbour.
 
-  xbScript is using pre-burned rules to support this functionality, unless a 
+  xbScript is using pre-burned rules to support this functionality, unless a
   file named rp_run.ch is present. If rp_run.ch is present xbScript will load
-  rp_run.ch instead of using the pre-burned rules. If this file doesn't 
+  rp_run.ch instead of using the pre-burned rules. If this file doesn't
   include all the needed rules, the functionality of the the Interpreter mode
   may be faulty.

@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4412 2005/10/06 02:20:19 bdj Exp $
+ * $Id: ChangeLog,v 1.4413 2005/10/06 03:09:50 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 20:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/xbscript/xbscript.prg
+    * Minor revision to copyright notice
+  * utils/xbscript/xbscript.txt
+    + Copyright notice
+    + Added info about not supported detached locals, and minor revisions
 
 2005-10-05 20:09 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
