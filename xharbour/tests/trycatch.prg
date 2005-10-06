@@ -18,7 +18,7 @@ FUNCTION Main()
 
       Throw( ErrorNew( "MySys", 0, 1001, "MyOperation", "My Description", { "MyArg" } ) )
 
-      ? "Success"
+      ? "Oops"
    CATCH e
      ? "Caught", e:SubSystem, e:SubCode, e:Operation, e:Description, ValToPrg( e:Args )
    END

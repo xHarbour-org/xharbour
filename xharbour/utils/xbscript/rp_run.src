@@ -129,4 +129,8 @@
 
 #XTRANSLATE HB_EnumIndex() => PP_EnumIndex()
 
+#XTRANSLATE ErrorBlock( [<NewBlock>] ) => PP_ErrorBlock( <NewBlock> )
+#XTRANSLATE Break( [<Exp>] ) => PP_Break( <Exp> )
+#XTRANSLATE Throw( [<Exp>] ) => PP_Break( <Exp> )
+
 #XTRANSLATE IN <x> => $ <x>

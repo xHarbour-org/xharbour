@@ -437,12 +437,14 @@ STATIC s_bExternalRecovery
 STATIC s_anEnumIndex := {}, s_nForEachIndex := 0
 STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := {}
 
+STATIC s_bRTErrBlock
+
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC14" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC15" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -459,6 +461,8 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}
    LOCAL sDefine, sCH
+
+   s_bRTErrBlock := ErrorBlock()
 
    IF p1 != NIL
       sSwitch += p1
@@ -869,18 +873,21 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    LOCAL nBlock, nBlocks, xErr
    LOCAL nVar, nVars
-   LOCAL anRecover := {}, acRecover := {}, aSequence := {}, lRecover := .F.
+   LOCAL anRecover := {}, acRecover := {}, aSequence := {}, aLastSequence, lRecover := .F.
    LOCAL bErrHandler
-   LOCAL aBlocks, aCode, OpCode
+   LOCAL aBlocks, aCode, Code1, OpCode
    LOCAL nForEachIndex := s_nForEachIndex
    LOCAL aProc := aProcedures[nProc]
    LOCAL aPresetProc := s_aProc
+   LOCAL aTopProcStack, aProcStack
 
    s_aProc := aProc
 
    //TraceLog( "DOING: " + aProc[1] )
 
    IF s_nProcStack > 0
+      aProcStack := s_aProcStack[s_nProcStack]
+
       /* Saving and Releasing Statics of upper level. */
       IF s_aStatics != NIL
          nVars := Len( s_aStatics )
@@ -888,7 +895,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
          FOR nVar := 1 TO nVars
             s_aStatics[nVar][2] := M->&( s_aStatics[nVar][1] )
             __MXRelease( s_aStatics[nVar][1] )
-            //Alert( [Released upper static: ] + s_aStatics[nVar][1] + [ in ] + s_aProcStack[s_nProcStack][1] )
+            //Alert( [Released upper static: ] + s_aStatics[nVar][1] + [ in ] + aProcStack[1] )
             //TraceLog( [Saved and Released upper static: ] + s_aStatics[nVar][1] + [ in ] + aProc[1], s_aStatics[nVar][2] )
          NEXT
 
@@ -897,32 +904,32 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       /* Saving Privates of upper level. */
       nVars := Len( s_asPrivates )
-      aAdd( s_aProcStack[s_nProcStack], Array( nVars, 2 ) )
+      aAdd( aProcStack, Array( nVars, 2 ) )
 
       FOR nVar := 1 TO nVars
-         s_aProcStack[s_nProcStack][3][nVar][1] := s_asPrivates[nVar]
+         aProcStack[3][nVar][1] := s_asPrivates[nVar]
 
          #ifdef __HARBOUR__
-            s_aProcStack[s_nProcStack][3][nVar][2] := __MVGET( s_asPrivates[nVar] )
+            aProcStack[3][nVar][2] := __MVGET( s_asPrivates[nVar] )
          #else
-            s_aProcStack[s_nProcStack][3][nVar][2] := &( s_asPrivates[nVar] )
+            aProcStack[3][nVar][2] := &( s_asPrivates[nVar] )
          #endif
-         //Alert( [Saved upper Private: ] + s_asPrivates[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
+         //Alert( [Saved upper Private: ] + s_asPrivates[nVar] + [ in ] + aProcStack[1] )
       NEXT
 
       aSize( s_asPrivates, 0 )
 
       /* Saving and Releasing Locals of upper level. */
       nVars := Len( s_asLocals )
-      aAdd( s_aProcStack[s_nProcStack], Array( nVars, 2 ) )
+      aAdd( aProcStack, Array( nVars, 2 ) )
 
       FOR nVar := 1 TO nVars
-         s_aProcStack[s_nProcStack][4][nVar][1] := s_asLocals[nVar]
+         aProcStack[4][nVar][1] := s_asLocals[nVar]
 
          #ifdef __HARBOUR__
-            s_aProcStack[s_nProcStack][4][nVar][2] := __MVGet( s_asLocals[nVar] )
+            aProcStack[4][nVar][2] := __MVGet( s_asLocals[nVar] )
          #else
-            s_aProcStack[s_nProcStack][4][nVar][2] := &( s_asLocals[nVar] )
+            aProcStack[4][nVar][2] := &( s_asLocals[nVar] )
          #endif
 
          __MXRelease( s_asLocals[nVar] )
@@ -955,6 +962,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    aAdd( s_aProcStack, { aProc[1], 0 } )
    s_nProcStack++
+   aProcStack := s_aProcStack[s_nProcStack]
    s_lReturnRequested := .F.
 
    #ifdef __XHARBOUR__
@@ -965,32 +973,37 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
 
+   aTopProcStack := s_aProcStack[ Len( s_aProcStack ) ]
+
    // Do NOT optimize, can NOT use FOR EACH!!!
    nBlocks := Len( aProc[2] )
    FOR nBlock := 1 TO nBlocks
       aCode := aBlocks[nBlock]
+      Code1 := aCode[1]
       OpCode  := aCode[2]
 
+      //TraceLog( nBlock, Code1, OpCode )
+
       IF ValType( OpCode ) == 'B'
-         s_aProcStack[ Len( s_aProcStack ) ][2] := aCode[3] // Line No.
+         aProcStack[2] := aCode[3] // Line No.
 
          BEGIN SEQUENCE
 
             //TraceLog( "Line: " + Str( aCode[3], 3 ) )
 
-            IF aCode[1] == 0
+            IF Code1 == 0
                //? aCode[3]
                Eval( OpCode )
             ELSE
                IF ! Eval( OpCode ) // Jump if FALSE.
-                  nBlock := aCode[1]
+                  nBlock := Code1
                   //TraceLog( "Jump: " + Str( aCode[3], 3 ) )
                ENDIF
             ENDIF
 
          RECOVER USING xErr
 
-            //TraceLog( "Recovering!!!", xErr, anRecover )
+            //TraceLog( "Recovering!!!", xErr, anRecover, s_lReturnRequested, s_lTrying )
 
             IF s_lReturnRequested
                //TraceLog( "Return" )
@@ -999,16 +1012,14 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
                EXIT
             ELSE
                IF s_lTrying
-                  s_nForEachIndex := aSequence[ Len( aSequence ) ][1]
-                  s_lTrying := aSequence[ Len( aSequence ) ][2]
+                  s_nForEachIndex := aLastSequence[1]
+                  s_lTrying := aLastSequence[2]
 
                   #ifdef __XHARBOUR__
-                     WHILE HB_WithObjectCounter() > aSequence[ Len( aSequence ) ][3]
+                     WHILE HB_WithObjectCounter() > aLastSequence[3]
                         HB_SetWith()
                      END
                   #endif
-
-                  aSize( aSequence, Len( aSequence ) - 1 )
 
                   aSize( s_aEnumerations, s_nForEachIndex )
                   aSize( s_anEnumIndex, s_nForEachIndex )
@@ -1033,57 +1044,70 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
       ELSEIF OpCode == PP_OP_JUMP
 
-         nBlock := aCode[1]
+         nBlock := Code1
 
       ELSEIF OpCode == PP_OP_TRY
 
-         aAdd( acRecover, aCode[1][1] ) // Catcher Var
-         aAdd( anRecover, aCode[1][2] ) // Recovery Address
+         aAdd( acRecover, Code1[1] ) // Catcher Var
+         aAdd( anRecover, Code1[2] ) // Recovery Address
          #ifdef __XHARBOUR__
             aAdd( aSequence, { s_nForEachIndex, s_lTrying, HB_WithObjectCounter() } )
          #else
             aAdd( aSequence, { s_nForEachIndex, s_lTrying, 0 } )
          #endif
+         aLastSequence := aSequence[ Len( aSequence ) ]
 
          s_lTrying := .T.
 
+         //TraceLog( acRecover, anRecover, aSequence )
+
       ELSEIF OpCode == PP_OP_ENDTRY
 
+         s_lTrying := aLastSequence[2]
          aSize( acRecover, Len( acRecover ) - 1 )
-         aSize( anRecover, Len( anREcover ) - 1 )
+         aSize( anRecover, Len( anRecover ) - 1 )
          aSize( aSequence, Len( aSequence ) - 1 )
+         aLastSequence := aSequence[ Len( aSequence ) ]
 
-         s_lTrying := .F.
+         //TraceLog( acRecover, anRecover, aSequence )
 
       ELSEIF OpCode == PP_OP_BEGIN
 
-         aAdd( acRecover, aCode[1][1] ) // Catcher Var
-         aAdd( anRecover, aCode[1][2] ) // Recovery Address
+         aAdd( acRecover, Code1[1] ) // Catcher Var
+         aAdd( anRecover, Code1[2] ) // Recovery Address
          #ifdef __XHARBOUR__
             aAdd( aSequence, { s_nForEachIndex, s_lTrying, HB_WithObjectCounter() } )
          #else
             aAdd( aSequence, { s_nForEachIndex, s_lTrying, 0 } )
          #endif
+         aLastSequence := aSequence[ Len( aSequence ) ]
+         s_lTrying := .F.
+
+         //TraceLog( acRecover, anRecover, aSequence )
 
       ELSEIF OpCode == PP_OP_ENDBEGIN
 
+         s_lTrying := aLastSequence[2]
          aSize( acRecover, Len( acRecover ) - 1 )
-         aSize( anRecover, Len( anREcover ) - 1 )
+         aSize( anRecover, Len( anRecover ) - 1 )
          aSize( aSequence, Len( aSequence ) - 1 )
+         aLastSequence := aSequence[ Len( aSequence ) ]
+
+         //TraceLog( acRecover, anRecover, aSequence )
 
       ELSEIF OpCode == PP_OP_FOREACH
 
          s_nForEachIndex++
 
-         aAdd( s_aEnumerations, &( aCode[1][1] ) )
+         aAdd( s_aEnumerations, &( Code1[1] ) )
          aAdd( s_anEnumIndex, 1 )
-         aAdd( s_anEnumerator, aCode[1][2] )
+         aAdd( s_anEnumerator, Code1[2] )
          aAdd( s_anForEachStartingBlock, nBlock )
 
          IF Len( s_aEnumerations[ s_nForEachIndex ] ) > 1
             &( s_anEnumerator[ s_nForEachIndex ] ) := s_aEnumerations[ s_nForEachIndex ][1]
          ELSE
-            nBlock := aCode[1][3]
+            nBlock := Code1[3]
          ENDIF
 
       ELSEIF OpCode == PP_OP_ENDFOREACH .OR. OpCode == PP_OP_LOOPFOREACH
@@ -1139,7 +1163,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    nVars := Len( s_asPrivates )
    FOR nVar := 1 TO nVars
       __MXRelease( s_asPrivates[nVar] )
-      //Alert( [Released private: ] + s_asPrivates[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
+      //Alert( [Released private: ] + s_asPrivates[nVar] + [ in ] + aProcStack[1] )
    NEXT
    aSize( s_asPrivates, 0 )
 
@@ -1147,7 +1171,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    nVars := Len( s_asLocals )
    FOR nVar := 1 TO nVars
       __MXRelease( s_asLocals[nVar] )
-      //Alert( [Released local: ] + s_asLocals[nVar] + [ in ] + s_aProcStack[s_nProcStack][1] )
+      //Alert( [Released local: ] + s_asLocals[nVar] + [ in ] + aProcStack[1] )
    NEXT
    aSize( s_asLocals, 0 )
 
@@ -1155,6 +1179,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    aSize( s_aProcStack, s_nProcStack )
 
    IF s_nProcStack > 0
+      aProcStack := s_aProcStack[s_nProcStack]
       s_aProc := aPresetProc
 
       IF Len( aPresetProc ) > 2
@@ -1180,34 +1205,34 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
       ENDIF
 
       /* Restoring Privates of parrent. */
-      nVars := Len( s_aProcStack[s_nProcStack][3] )
+      nVars := Len( aProcStack[3] )
 
       FOR nVar := 1 TO nVars
-         aAdd( s_asPrivates, s_aProcStack[s_nProcStack][3][nVar][1] )
+         aAdd( s_asPrivates, aProcStack[3][nVar][1] )
          #ifdef __HARBOUR__
-            __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
-            __MVPut( s_aProcStack[s_nProcStack][3][nVar][1], s_aProcStack[s_nProcStack][3][nVar][2] )
+            __QQPub( aProcStack[3][nVar][1] )
+            __MVPut( aProcStack[3][nVar][1], aProcStack[3][nVar][2] )
          #else
-            __QQPub( s_aProcStack[s_nProcStack][3][nVar][1] )
-            &( s_aProcStack[s_nProcStack][3][nVar][1] ) := s_aProcStack[s_nProcStack][3][nVar][2]
+            __QQPub( aProcStack[3][nVar][1] )
+            &( aProcStack[3][nVar][1] ) := aProcStack[3][nVar][2]
          #endif
       NEXT
 
       /* Restoring Locals of parrent. */
-      nVars := Len( s_aProcStack[s_nProcStack][4] )
+      nVars := Len( aProcStack[4] )
       FOR nVar := 1 TO nVars
-         aAdd( s_asLocals, s_aProcStack[s_nProcStack][4][nVar][1] )
+         aAdd( s_asLocals, aProcStack[4][nVar][1] )
 
          #ifdef __HARBOUR__
-            __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
-            __MVPut( s_aProcStack[s_nProcStack][4][nVar][1], s_aProcStack[s_nProcStack][4][nVar][2] )
+            __QQPub( aProcStack[4][nVar][1] )
+            __MVPut( aProcStack[4][nVar][1], aProcStack[4][nVar][2] )
          #else
-            __QQPub( s_aProcStack[s_nProcStack][4][nVar][1] )
-            &( s_aProcStack[s_nProcStack][4][nVar][1] ) := s_aProcStack[s_nProcStack][4][nVar][2]
+            __QQPub( aProcStack[4][nVar][1] )
+            &( aProcStack[4][nVar][1] ) := aProcStack[4][nVar][2]
          #endif
       NEXT
 
-      aSize( s_aProcStack[s_nProcStack], 2 )
+      aSize( aProcStack, 2 )
    ELSE
       s_aProc := NIL
    ENDIF
@@ -1960,7 +1985,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                         ELSEIF s_acFlowType[ s_nFlowId ] == "B"
 
-                           aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
+                           IF aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][2] == PP_OP_JUMP
+                              aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
+                           ELSE
+                              aProcedures[ nProcId ][2][ s_aLoopJumps[s_nCompLoop][1] ][1] := { NIL , Len( aProcedures[ nProcId ][2] ) } // Patching the previous conditional Jump Instruction
+                           ENDIF
                            s_nCompLoop--
 
                            aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_ENDBEGIN, nLine } ) // Register Recovery Address and Catch Var.
@@ -2366,7 +2395,7 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
       s_sModule := sPresetModule
    RECOVER USING oError
-      //TraceLog( oError:Operations, oError:Description )
+      //TraceLog( oError:Operation, oError:Description )
       Eval( bErrHandler, oError )
    END
 
@@ -2443,9 +2472,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   //TraceLog( oErr:DEscription, oErr:ProcName, oErr:ProcLine )
+   //TraceLog( oErr:Description, oErr:Operation, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:Args ) )
 
-   oRecover := oErr
+   oRecover := __ObjClone( oErr )
 
    #ifdef __XHARBOUR__
       oRecover:ProcName   := PP_ProcName()
@@ -2453,7 +2482,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       oRecover:ModuleName := s_sFile
    #endif
 
-   IF oErr:SubCode == 1001
+   IF oErr:SubCode == 1001 .AND. oErr:SubSystem == "BASE"
       IF s_sModule != NIL
          sProc := s_sModule + oErr:Operation
          nProc := aScan( aProcedures, {|aProc| aProc[1] == sProc } )
@@ -2480,7 +2509,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
             PP_ExecProcedure( aProcedures, nProc )
          RECOVER USING oRecover
             lSuccess := .F.
-            oRecover:Cargo := oErr
+            IF oRecover:ClassName == "ERROR"
+               oRecover:Cargo := oErr
+            ENDIF
          END
 
          IF lSuccess
@@ -2490,7 +2521,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    ENDIF
 
    IF s_bExternalRecovery != NIL
-      IF oRecover:SubCode == 1001
+      IF oRecover:SubCode == 1001 .AND. oRecover:SubSystem == "BASE"
          //TraceLog( "Resolve: " + oRecover:Operation )
          s_xRet := Eval( s_bExternalRecovery, oRecover )
          //TraceLog( s_xRet )
@@ -2499,7 +2530,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    ENDIF
 
    //TraceLog( oErr:Description )
-   Break( oRecover )
+   //Break( oRecover )
+
+   RETURN Eval( s_bRTErrBlock, oRecover )
 
 RETURN NIL // Unreacable code
 
@@ -3307,7 +3340,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
       ENDIF
    ENDIF
 
-   IF ProcName(1) == "MAIN"
+   IF ProcName(1) == "PP_MAIN"
       FClose( hPP )
 
       IF bCCH
@@ -9542,6 +9575,9 @@ STATIC FUNCTION InitRunRules()
    aAdd( aTransRules, { 'PROCNAME' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'PROCLINE' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'HB_ENUMINDEX' , { {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .T. } )
+   aAdd( aTransRules, { 'ERRORBLOCK' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+   aAdd( aTransRules, { 'BREAK' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+   aAdd( aTransRules, { 'THROW' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'IN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
 
    /* Commands */
@@ -9627,6 +9663,9 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { { {   0, 'PP_ProcName( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_EnumIndex()' } }, { -1} ,  } )
+   aAdd( aTransResults, { { {   0, 'PP_ErrorBlock( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aTransResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aTransResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, '$ ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
 
    /* Commands Results*/
@@ -10351,6 +10390,17 @@ FUNCTION PP_Version()
 FUNCTION PP_EnumIndex()
 
 RETURN s_anEnumIndex[ s_nForEachIndex ]
+
+//--------------------------------------------------------------//
+FUNCTION PP_ErrorBlock( bNewBlock )
+
+   LOCAL bRet := s_bRTErrBlock
+
+   IF PCount() > 0
+      s_bRTErrBlock := bNewBlock
+   ENDIF
+
+RETURN bRet
 
 //--------------------------------------------------------------//
 #ifdef __CLIPPER__

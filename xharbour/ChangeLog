@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4408 2005/10/05 20:52:18 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4409 2005/10/05 21:39:33 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-05 18:32 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * tests/begin.prg
+  * tests/trycatch.prg
+    * Minor corrections in output
+
+  * utils/xbscript/rp_run.src
+  * utils/xbscript/xbscript.prg
+    + Added support for ErrorBlock(), Break() and Throw()
+    ! Fixed handling of BEGIN SEQUENCE with no RECOVER clause
+    ! Fixed handling of nested BEGIN SEQUENCE and/or TRY segments
+    * Optimized usage of arrays in PP_ExecProcedure
 
 2005-10-05 23:42 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/Makefile
@@ -24,7 +36,7 @@
 2005-10-05 22:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   + tests/cgitest
     * moved example, website, help from contrib/htmllib
-  - contrib/htmllib	 
+  - contrib/htmllib
     * removed contrib/htmllib
     * CVS cleanup work in progress
 

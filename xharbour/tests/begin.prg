@@ -1,5 +1,5 @@
 //
-// $Id: begin.prg,v 1.2 1999/10/25 11:25:53 vszel Exp $
+// $Id: begin.prg,v 1.1.1.1 2001/12/21 10:45:41 ronpinkas Exp $
 //
 // This files demonstrates the use of BEGIN/RECOVER/END SEQUENCE
 // and BREAK statement
@@ -16,7 +16,7 @@ PRIVATE mPrivate:='private value in MAIN'
     ? " Inside SEQUENCE 1"
     ? "  No break issued...."
   RECOVER
-    ? "  Recovering in 1 ..."
+    ? "  OOPS!!! Recovering in 1 ..."
   END SEQUENCE
   ? "After SEQUENCE 1"
 
@@ -79,7 +79,7 @@ PRIVATE mPrivate:='private value in MAIN'
 RETURN
 
 PROCEDURE Break1()
-PRIVATE mPrivate:='VALUE from Break1'
+  PRIVATE mPrivate:='VALUE from Break1'
 
   BREAK M->mPrivate
 
