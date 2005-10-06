@@ -2164,7 +2164,7 @@
               pcode[ 6] = 0;                 /* S_XRET */
 
               pcode[ 7] = HB_P_PUSHSYMNEAR;
-              pcode[ 8] = 29;               /* HB_APARAMS */
+              pcode[ 8] = 30;               /* HB_APARAMS */
 
               pcode[ 9] = HB_P_PUSHNIL;
 
@@ -2176,7 +2176,7 @@
               pcode[14] = 0;                /* S_APARAMS */
 
               pcode[15] = HB_P_PUSHSYMNEAR;
-              pcode[16] = 31;               /* PP_EXECPROCEDURE */
+              pcode[16] = 32;               /* PP_EXECPROCEDURE */
 
               pcode[17] = HB_P_PUSHNIL;
 
