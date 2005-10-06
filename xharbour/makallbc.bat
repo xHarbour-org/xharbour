@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallbc.bat,v 1.16 2005/09/26 12:00:14 modalsist Exp $
+rem $Id: makallbc.bat,v 1.17 2005/10/06 01:46:54 ronpinkas Exp $
 rem
 
 echo create system files
@@ -8,13 +8,6 @@ call make_b32 %1
 
 echo harbour.dll
 call dll_b32 %1
-if errorlevel 1 goto end
-
-:design
-echo design
-cd contrib\design
-call make_b32.bat %1
-cd ..\..
 if errorlevel 1 goto end
 
 :firebird
@@ -31,7 +24,6 @@ cd contrib\hbzlib
 call make_b32.bat %1
 cd ..\..
 if errorlevel 1 goto end
-
 
 :libnf
 echo libnf

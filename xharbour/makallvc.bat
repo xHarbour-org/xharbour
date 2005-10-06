@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: makallvc.bat,v 1.16 2005/09/26 12:00:14 modalsist Exp $
+rem $Id: makallvc.bat,v 1.17 2005/10/06 01:46:54 ronpinkas Exp $
 rem 
 
 echo creating system files
@@ -8,13 +8,6 @@ call make_vc %1
 
 echo harbour.dll
 call dll_vc %1
-if errorlevel 1 goto end
-
-:design
-echo design
-cd contrib\design
-call make_vc.bat %1
-cd ..\..
 if errorlevel 1 goto end
 
 :firebird
@@ -28,13 +21,6 @@ rem if errorlevel 1 goto end
 :hbzlib
 echo hbzip
 cd contrib\hbzlib
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
-
-:htmllib
-echo htmllib
-cd contrib\htmllib
 call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
