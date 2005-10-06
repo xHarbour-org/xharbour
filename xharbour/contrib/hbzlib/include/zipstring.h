@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
-// $Workfile: ZipString.h $
-// $Archive: /ZipArchive_STL/ZipString.h $
-// $Date: 2003/10/19 17:52:54 $ $Author: lculik $
+// $RCSfile: ZipString.h,v $
+// $Revision: 1.1.2.3 $ $Name:  $
+// $Date: 2005/04/11 18:14:32 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
-// is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
+// is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -29,12 +29,14 @@
 	system locale) or e.g. std::locale::global(std::locale("French"))
 	( to set it to a specified value); setlocale() function is not sufficient here.
 */
-#define _USE_OLD_RW_STL
 
+#define _USE_OLD_RW_STL
 #include <string>
 #include <algorithm>
 #include <stdarg.h>
 #include <stdio.h>
+#include <cctype>
+
 #include "ZipExport.h"
 
 #ifndef __GNUC__
@@ -75,29 +77,44 @@ class ZIP_API CZipString : public stdbs
 #ifndef __GNUC__
 	static int zslen(const TCHAR* lpsz)
 	{
-		return lpsz ? (int)std::char_traits<TCHAR>::length(lpsz) : 0;
+		if (!lpsz) return 0;
+
+		// we want to take into account the locale stuff (by using standard templates)
+
+		#ifdef _UNICODE
+			return std::wstring(lpsz).length();
+		#else
+			return std::string(lpsz).length();
+		#endif
 	}
 	static TCHAR tl(TCHAR c)
 	{
-		return std::tolower<TCHAR>(c, std::locale());
+		// use_facet doesn't work here well (doesn't convert all the local characters properly)
+		return std::tolower(c, std::locale());
 	}
 	static TCHAR tu(TCHAR c)
 	{
-		return std::toupper<TCHAR>(c, std::locale());
+		// use_facet doesn't work here well (doesn't convert all the local characters properly)
+		return std::toupper(c, std::locale());
 	}
 #else
-#if __GNUC__ <3
    	static int zslen(const TCHAR* lpsz)
    	{
+  		#if (__GNUC__ < 3) // I'm not sure which precisely version should be put here
       		return lpsz ? std::string_char_traits<TCHAR>::length(lpsz) : 0;
-	}
-#else
-   	static int zslen(const TCHAR* lpsz)
-   	{
+		#else
       		return lpsz ? std::char_traits<TCHAR>::length(lpsz) : 0;
-	}
+		#endif
 
-#endif	
+	}
+	static char tl(char c)
+	{
+		return (char)std::tolower(c);
+	}
+	static char tu(char c)
+	{
+		return (char)std::toupper(c);
+	}
 #endif
 
 
@@ -185,23 +202,11 @@ public:
 	}
 	void MakeLower() 
 	{
-#ifndef __GNUC__
-		// use_facet doesn't work here well (doesn't convert all the local characters properly)
 			std::transform(begin(),end(),begin(),tl);
-#else
- 
-      		std::transform(begin(),end(),begin(),tolower);
-#endif
 	}
 	void MakeUpper() 
 	{
-#ifndef __GNUC__
-		// use_facet doesn't work here well (doesn't convert all the local characters properly)
 			std::transform(begin(),end(),begin(),tu);
-#else     
-      		std::transform(begin(),end(),begin(),toupper);
-#endif
-
 	}
 	void MakeReverse()
 	{
@@ -252,14 +257,10 @@ public:
 	{
 		return Compare(lpsz) != 0;
 	}
-	#if __GNUC__ >=3 
-	#else
 	bool operator == (LPCTSTR lpsz)
 	{
 		return Compare(lpsz) == 0;
 	}
-	#endif
-	
 	int Find( TCHAR ch, int nStart = 0) const
 	{
 		return (int) find(ch, nStart);
@@ -306,3 +307,4 @@ typedef int (CZipString::*ZIPSTRINGCOMPARE)( LPCTSTR ) const;
 
 
 #endif //__ZIPSTRING_H__
+

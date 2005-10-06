@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive/ZipPlatform.cpp $
-// $Date: 2003/08/20 19:33:40 $ $Author: lculik $
+// $Date: 2003/09/14 15:01:28 $ $Author: paultucker $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -35,6 +35,10 @@
 #include "zipcompatibility.h"
 
 const TCHAR CZipPathComponent::m_cSeparator = _T('\\');
+
+#if defined(__MINGW32__)
+#define _UTIMBUF_DEFINED
+#endif
 
 
 #ifndef _UTIMBUF_DEFINED

@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
-// $Workfile: ZipCollections.h $
-// $Archive: /ZipArchive_STL/ZipCollections.h $
-// $Date: 2003/08/25 19:36:01 $ $Author: lculik $
+// $RCSfile: ZipCollections.h,v $
+// $Revision: 1.1.2.4 $ $Name:  $
+// $Date: 2005/03/26 07:31:09 $ $Author: Tadeusz Dracz $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
-// is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
+// is Copyrighted 2000-2005 by Tadeusz Dracz (http://www.artpol-software.com/)
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -36,18 +36,12 @@ template<class TYPE>
 class CZipArray : private std::vector<TYPE>
 {
 public:
- #if __GNUC__ >= 3	 
-     typedef typename std::vector<TYPE>::iterator iterator;	 
-     typedef typename std::vector<TYPE> inherited;	 
-#else
-
-    typedef std::vector<TYPE>::iterator iterator;
-	typedef std::vector<TYPE> inherited;
+    	typedef typename std::vector<TYPE>::iterator iterator;
+	typedef typename std::vector<TYPE> inherited;
 protected:
-#endif
 	iterator GetIterFromIndex(int uIndex)
 	{
-		iterator iter = begin();
+		iterator iter = this->begin();
 		iter += uIndex;
 		//	int t = 0; while (t != uIndex) {iter++;t++;}
 		return iter;
@@ -56,14 +50,14 @@ public:
 	void Sort(bool bAscending)
 	{
 		if (bAscending)
-			std::sort (begin (), end (), std::less<TYPE> ());
+			std::sort (this->begin (), this->end (), std::less<TYPE> ());
 		else
-			std::sort (begin (), end (), std::greater<TYPE> ());
+			std::sort (this->begin (), this->end (), std::greater<TYPE> ());
 	}
-	int GetSize() const{return (int)size();	}
-	int GetUpperBound() const {return size() - 1;}
+	int GetSize() const{return (int)this->size();	}
+	int GetUpperBound() const {return this->size() - 1;}
 	int Add(const TYPE& x) {push_back(x);return GetUpperBound();}
-	void RemoveAll() {clear();}
+	void RemoveAll() {this->clear();}
 	void RemoveAt(int uIndex) { erase(GetIterFromIndex(uIndex));}
 	void InsertAt(int uIndex, const TYPE& x){insert(GetIterFromIndex(uIndex), x);}
 #ifndef _MSC_VER
@@ -90,49 +84,44 @@ class ZIP_API CZipPtrList : private std::list<TYPE>
 {
 
 public:
-#if __GNUC__ >= 3	 
-     typedef typename std::list<TYPE>::iterator iterator;	 
-     typedef typename std::list<TYPE>::const_iterator const_iterator;	 
-#else
-    typedef std::list<TYPE>::iterator iterator;
-	typedef std::list<TYPE>::const_iterator const_iterator;
-#endif
-    int GetCount() const {return size();}
+	typedef typename std::list<TYPE>::iterator iterator;
+	typedef typename std::list<TYPE>::const_iterator const_iterator;
+	int GetCount() const {return this->size();}
 	void AddTail(const TYPE& x){push_back(x);}
 	void AddHead(const TYPE& x){push_front(x);}
-	void RemoveHead() {pop_front();}
-	void RemoveTail() {pop_back();}
-	void RemoveAll() {clear();}
-	TYPE& GetHead() {return front();}
-	TYPE GetHead() const {return front();}
-	TYPE& GetTail() {return back();}
-	TYPE GetTail() const {return back();}
-	iterator GetHeadPosition() { return begin();}
-	const_iterator GetHeadPosition() const { return begin();}
-	iterator GetTailPosition() { return back();}
+	void RemoveHead() {this->pop_front();}
+	void RemoveTail() {this->pop_back();}
+	void RemoveAll() {this->clear();}
+	TYPE& GetHead() {return this->front();}
+	TYPE GetHead() const {return this->front();}
+	TYPE& GetTail() {return this->back();}
+	TYPE GetTail() const {return this->back();}
+	iterator GetHeadPosition() { return this->begin();}
+	const_iterator GetHeadPosition() const { return this->begin();}
+	iterator GetTailPosition() { return this->back();}
 	TYPE& GetNext(iterator& pos) { return *pos++;}
 	const TYPE GetNext(const_iterator& pos) const{ return *pos++;}
 	TYPE& GetPrev(iterator& pos) { return *pos--;}
 	TYPE GetPrev(iterator& pos) const{ return *pos--;}
-	iterator Find(TYPE& x) { return std::find(begin(), end(), x);}
+	iterator Find(TYPE& x) { return std::find(this->begin(), this->end(), x);}
 	void RemoveAt(iterator& pos) { erase(pos);}
 	bool IteratorValid(const_iterator &iter) const
 	{
-		return iter != end();
+		return iter != this->end();
 	}
 	bool IteratorValid(iterator &iter)
 	{
-		return iter != end();
+		return iter != this->end();
 	}
 	iterator FindIndex(int iIndex)
 	{
-		iterator iter = begin();
+		iterator iter = this->begin();
 		int t = 0; while (t != iIndex) {iter++;t++;}
 		return iter;
 	}
 	const_iterator FindIndex(int iIndex) const
 	{
-		const_iterator iter = begin();
+		const_iterator iter = this->begin();
 		int t = 0; while (t != iIndex) {iter++;t++;}
 		return iter;
 	}
@@ -146,9 +135,11 @@ template<class KEY, class VALUE>
 class ZIP_API CZipMap : private std::map<KEY, VALUE>
 {
 public:
+	typedef typename std::map<KEY, VALUE>::const_iterator const_iterator;
+	typedef typename  std::map<KEY,VALUE, std::less<KEY>, std::allocator<std::pair<const KEY, VALUE> > >::value_type v_type;
 	void SetAt( KEY key, VALUE newValue)
 	{
-		insert(std::map<KEY, VALUE>::value_type(key, newValue));
+		insert(v_type(key, newValue));
 	}
 	BOOL RemoveKey( KEY key )
 	{
@@ -156,14 +147,14 @@ public:
 	}
 	BOOL Lookup( KEY key, VALUE& rValue ) const
 	{
-      #if __GNUC__ >= 3	                 
-              typename std::map<KEY,VALUE>::const_iterator iter ;	 
-      #else	 
-              const_iterator iter ;	 
-      #endif	 
-         iter = find(key) ;
+		const_iterator iter = find(key);
+
+#if (__GNUC__ >= 3) // I'm not sure which version precisely should be put here
+		if (iter == std::map<KEY, VALUE>::end())
+#else
 		if (iter == end())
-				return FALSE;
+#endif
+			return FALSE;
 		else
 		{
 			rValue = iter->second;
