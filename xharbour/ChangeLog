@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4414 2005/10/06 03:30:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4415 2005/10/06 03:59:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -16,7 +16,7 @@
   * utils/xbscript/xbstest.prg
     * Added test for on the fly assignment when run with an xHarbour build
   - tests\try.prg
-    * junk file
+    - junk file
 
 2005-10-05 20:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg

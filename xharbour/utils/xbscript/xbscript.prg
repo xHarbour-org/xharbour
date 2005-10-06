@@ -274,7 +274,7 @@
    EXTERNAL BROWSE
 
    EXTERNAL ARRAY,ASIZE,ATAIL,AINS,ADEL,AFILL,ASCAN,AEVAL,ACOPY,ACLONE,ADIR
-   EXTERNAL ASORT, RASCAN
+   EXTERNAL ASORT
 
    EXTERNAL ERRORLEVEL
 
@@ -676,6 +676,10 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
                CompileDefine( "__HARBOUR__" )
             #endif
 
+            #ifdef __XHARBOUR__
+               CompileDefine( "__XHARBOUR__" )
+            #endif
+
             PP_PreProFile( sCH, NIL, .F., .T. ) // Process ONLY #Directives!
 
             /* Reset.*/
@@ -780,7 +784,6 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       nProc := aScan( s_aProcedures, {|aProc| aProc[1] == sProc } )
    ENDIF
 
-   s_aParams := HB_aParams()
    #ifdef __XHARBOUR__
       s_aParams := HB_aParams()
       aDel( s_aParams, 1, .T. )
@@ -2472,15 +2475,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   TraceLog( oErr:Description, oErr:Operation, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:Args ) )
+   //TraceLog( oErr:Description, oErr:Operation, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:Args ) )
 
-   oRecover := __ObjClone( oErr )
-
-   #ifdef __XHARBOUR__
-      oRecover:ProcName   := PP_ProcName()
-      oRecover:ProcLine   := PP_ProcLine()
-      oRecover:ModuleName := s_sFile
-   #endif
+   oRecover := oErr
 
    IF oErr:SubCode == 1001 .AND. oErr:SubSystem == "BASE"
       IF s_sModule != NIL
@@ -2526,6 +2523,13 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    IF s_bExternalRecovery != NIL
       IF oRecover:SubCode == 1001 .AND. oRecover:SubSystem == "BASE"
          //TraceLog( "Resolve: " + oRecover:Operation )
+
+         #ifdef __XHARBOUR__
+            oRecover:ProcName   := PP_ProcName()
+            oRecover:ProcLine   := PP_ProcLine()
+            oRecover:ModuleName := s_sFile
+         #endif
+
          s_xRet := Eval( s_bExternalRecovery, oRecover )
          //TraceLog( s_xRet )
          RETURN s_xRet
@@ -7622,7 +7626,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                nMP := nTempMP
 
                // Clipper compatible - only repeatable if explictly used as repeatable in result, or is missing in result!
-               #if 0
+               #ifdef _0_
                   WHILE aRule[2][nMP][2] < 0
                      IF aRule[2][nMP][1] >= 0
 
@@ -10326,6 +10330,9 @@ PROCEDURE PP_InitStd()
    CompileDefine( "__PP__" )
    #ifdef __HARBOUR__
       CompileDefine( "__HARBOUR__" )
+   #endif
+   #ifdef __XHARBOUR__
+      CompileDefine( "__XHARBOUR__" )
    #endif
 
    s_lRunLoaded := .F.

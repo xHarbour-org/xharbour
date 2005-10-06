@@ -6,7 +6,7 @@ PROCEDURE Main
 
    LOCAL   cLocal
    PRIVATE cName := "Private", Counter
-
+   
    CLEAR SCREEN
 
    #ifdef HELLO
@@ -14,6 +14,14 @@ PROCEDURE Main
    #endif
 
    Alert( "Testing PP as Interpreter... " )
+
+   #ifdef __HARBOUR__
+      OnTheFly := "dynamically created by :="
+      ? OnTheFly
+   
+      OnTheFly2 = "dynamically created by ="
+      ? OnTheFly2      
+   #endif
 
    ? cName
 
