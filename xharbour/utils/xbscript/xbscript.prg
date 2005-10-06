@@ -438,6 +438,7 @@ STATIC s_anEnumIndex := {}, s_nForEachIndex := 0
 STATIC s_aEnumerations := {}, s_anEnumerator := {}, s_anForEachStartingBlock := {}
 
 STATIC s_bRTErrBlock
+STATIC s_bDefRTErrBlock := {|oErr| RP_Run_Err( oErr, s_aProcedures ) }
 
 #xtranslate Stringify( [<x>] ) => #<x>
 
@@ -461,8 +462,6 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}
    LOCAL sDefine, sCH
-
-   s_bRTErrBlock := ErrorBlock()
 
    IF p1 != NIL
       sSwitch += p1
@@ -974,7 +973,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
    aBlocks := aProc[2]
 
-   bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+   bErrHandler := ErrorBlock( s_bDefRTErrBlock )
 
    aTopProcStack := s_aProcStack[ Len( s_aProcStack ) ]
 
@@ -2539,7 +2538,11 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    //TraceLog( oErr:Description )
    //Break( oRecover )
 
-   RETURN Eval( s_bRTErrBlock, oRecover )
+   IF s_bRTErrBlock == NIL
+      Break( oRecover )
+   ELSE
+      RETURN Eval( s_bRTErrBlock, oRecover )
+   ENDIF
 
 RETURN NIL // Unreacable code
 
@@ -9242,7 +9245,10 @@ INIT PROCEDURE PPInit
 
    LOCAL nScreenWidth, dDate := Stod( __DATE__ )
 
+   s_bRTErrBlock := ErrorBlock()
+
    s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
+   s_cVer += " " + __TIME__
 
    IF Type( "HB_GT_WVT()" ) == "UI"
       nScreenWidth := &( "Wvt_GetScreenWidth()" )
@@ -10152,7 +10158,7 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
 
       RETURN s_xRet
    ElSE
-      bErrHandler := ErrorBlock( {|oErr| RP_Run_Err( oErr, aProcedures ) } )
+      bErrHandler := ErrorBlock( s_bDefRTErrBlock )
    ENDIF
 
    TRY

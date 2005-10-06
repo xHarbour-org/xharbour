@@ -86,6 +86,10 @@
 
      //TraceLog( "New" )
 
+     #ifdef AX
+        s_bRTErrBlock := NIL
+     #endif
+
   RETURN Self
 
   //----------------------------------------------------------------------------//
@@ -106,17 +110,17 @@
         IF nProcID == 0
            ::aCompiledProcs     := {}
            ::aInitExit          := {}
-           
+
            PP_RunInit( ::aCompiledProcs, ::aInitExit, ::nStartLine )
-           
+
            ::cCompiledText      := ""
            ::cPPed              := ""
-           
+
            ::acPPed             := {}
-           
+
            ::nCompiledLines     := 0
            ::nProcs             := 0
-           
+
            ::nNextStartProc     := 1
            ::nID                := 0
         ELSE
