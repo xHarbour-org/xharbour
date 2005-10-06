@@ -980,7 +980,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    FOR nBlock := 1 TO nBlocks
       aCode := aBlocks[nBlock]
       Code1 := aCode[1]
-      OpCode  := aCode[2]
+      OpCode := aCode[2]
 
       //TraceLog( nBlock, Code1, OpCode )
 
@@ -2472,7 +2472,7 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    LOCAL nProc, sProc
    LOCAL oRecover, lSuccess
 
-   //TraceLog( oErr:Description, oErr:Operation, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:Args ) )
+   TraceLog( oErr:Description, oErr:Operation, oErr:ProcName, oErr:ProcLine, ValToPrg( oErr:Args ) )
 
    oRecover := __ObjClone( oErr )
 
@@ -2511,6 +2511,9 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
             lSuccess := .F.
             IF oRecover:ClassName == "ERROR"
                oRecover:Cargo := oErr
+            ELSE
+               // Request to Break again
+               Break( oRecover )
             ENDIF
          END
 
