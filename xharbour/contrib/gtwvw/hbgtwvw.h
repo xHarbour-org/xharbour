@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.7 2005/05/04 16:47:22 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.8 2005/08/30 16:46:40 bdj Exp $
  */
 
 /*
@@ -299,7 +299,7 @@ typedef struct control_data
   BYTE    byCtrlClass;
   HWND    hWndCtrl;
   UINT    uiCtrlid;
-  HB_ITEM hiCodeBlock;
+  PHB_ITEM phiCodeBlock;
   BOOL    bBusy;
   RECT    rCtrl, rOffCtrl;
 
@@ -345,12 +345,14 @@ typedef struct app_data
   HWND      hDlgModeless[ WVW_DLGML_MAX ];        /* Handle to a modeless dialog                               */
 
   PHB_ITEM  pFunc[ WVW_DLGML_MAX ];               /* Function pointer for WndProc                              */
-  HB_ITEM   cbFunc[ WVW_DLGML_MAX ];              /* codeblock for WndProc */
+  /* TODO: pcbFunc is redundant and should be removed */
+  PHB_ITEM  pcbFunc[ WVW_DLGML_MAX ];              /* codeblock for WndProc */
   int       iType[ WVW_DLGML_MAX ];               /* Type of Function Pointers - Function 1, Block 2, Method 3 */
 
   HWND      hDlgModal[ WVW_DLGMD_MAX ];        /* Handle to a modal dialog                               */
   PHB_ITEM  pFuncModal[ WVW_DLGMD_MAX ];               /* Function pointer for WndProc                              */
-  HB_ITEM   cbFuncModal[ WVW_DLGMD_MAX ];              /* codeblock for WndProc */
+  /* TODO: pcbFuncModal is redundant and should be removed */
+  PHB_ITEM  pcbFuncModal[ WVW_DLGMD_MAX ];              /* codeblock for WndProc */
   int       iTypeModal[ WVW_DLGMD_MAX ];               /* Type of Function Pointers - Function 1, Block 2, Method 3 */
 
   BITMAP_HANDLE * pbhBitmapList;

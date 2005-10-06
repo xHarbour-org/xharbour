@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.21 2005/08/30 16:46:40 bdj Exp $
+ * $Id: gtwvw.c,v 1.22 2005/09/13 16:15:20 bdj Exp $
  */
 
 /*
@@ -341,7 +341,7 @@ static void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int 
 static HWND FindControlHandle(USHORT usWinNum, BYTE byCtrlClass, UINT uiCtrlid, byte * pbStyle);
 static UINT FindControlId(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, byte * pbStyle);
 static UINT LastControlId(USHORT usWinNum, BYTE byCtrlClass);
-static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid, HB_ITEM * phiCodeBlock, RECT rCtrl, RECT rOffCtrl, byte bStyle);
+static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid, PHB_ITEM phiCodeBlock, RECT rCtrl, RECT rOffCtrl, byte bStyle);
 
 static CONTROL_DATA * GetControlData(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid);
 
@@ -517,10 +517,10 @@ void HB_GT_FUNC( gt_Exit( void ) )
            pcd     = pWindowData->pcdCtrlList->pNext;
            DestroyWindow (pWindowData->pcdCtrlList->hWndCtrl) ;
 
-           if (pWindowData->pcdCtrlList->hiCodeBlock.type == HB_IT_BLOCK)
+           if (pWindowData->pcdCtrlList->phiCodeBlock)
            {
-              HB_ITEM_UNLOCK( &(pWindowData->pcdCtrlList->hiCodeBlock) );
-              hb_itemClear( &(pWindowData->pcdCtrlList->hiCodeBlock) );
+              hb_itemRelease( pWindowData->pcdCtrlList->phiCodeBlock );
+
            }
 
            hb_xfree( pWindowData->pcdCtrlList );
@@ -2481,6 +2481,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
          case 1:
          {
             pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushState();
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -2488,7 +2489,8 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            hb_vmPopState();
             break;
          }
 
@@ -2513,8 +2515,10 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_vmEvalBlockV( (PHB_ITEM) s_sApp.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) s_sApp.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+
               bReturn = hb_itemGetNL( pReturn );
+              hb_itemRelease( pReturn );
             }
             else
             {
@@ -2560,8 +2564,8 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
       {
          if ( s_sApp.pFunc[ iIndex ] != NULL && s_sApp.iType[ iIndex ] == 2 )
          {
-            HB_ITEM_UNLOCK( ( PHB_ITEM ) s_sApp.pFunc[ iIndex ] );
-            hb_itemClear( ( PHB_ITEM ) s_sApp.pFunc[ iIndex ] );
+            hb_itemRelease( s_sApp.pFunc[ iIndex ] );
+
          }
          s_sApp.hDlgModeless[ iIndex ] = NULL;
 
@@ -2614,6 +2618,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
          case 1:
          {
             pDynSym = ( PHB_DYNS ) pFunc;
+            hb_vmPushState();
             hb_vmPushSymbol( pDynSym->pSymbol );
             hb_vmPushNil();
             hb_vmPushLong( ( ULONG ) hDlg    );
@@ -2621,7 +2626,8 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            hb_vmPopState();
             break;
          }
 
@@ -2645,8 +2651,9 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
               hilParam.type = HB_IT_NIL;
               hb_itemPutNL( &hilParam, (ULONG) lParam );
 
-              pReturn = hb_vmEvalBlockV( (PHB_ITEM) s_sApp.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
+              pReturn = hb_itemDo( (PHB_ITEM) s_sApp.pFuncModal[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
+              hb_itemRelease( pReturn );
             }
             else
             {
@@ -2692,8 +2699,8 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
       {
          if ( s_sApp.pFuncModal[ iIndex ] != NULL && s_sApp.iTypeModal[ iIndex ] == 2 )
          {
-            HB_ITEM_UNLOCK( ( PHB_ITEM ) s_sApp.pFuncModal[ iIndex ] );
-            hb_itemClear( ( PHB_ITEM ) s_sApp.pFuncModal[ iIndex ] );
+            hb_itemRelease( s_sApp.pFuncModal[ iIndex ] );
+
          }
          s_sApp.hDlgModal[ iIndex ]   = NULL;
          s_sApp.pFuncModal[ iIndex ]  = NULL;
@@ -3230,6 +3237,7 @@ static void xUserPaintNow( USHORT usWinNum )
 
   s_pWindows[usWinNum]->bPaintPending = FALSE;
 
+  hb_vmPushState();
   hb_vmPushSymbol( s_sApp.pSymWVW_PAINT->pSymbol );
   hb_vmPushNil();
   hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -3243,7 +3251,8 @@ static void xUserPaintNow( USHORT usWinNum )
   */
 
   hb_vmDo( 1 );
-  hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+  hb_vmPopState();
 
   if ( !s_pWindows[usWinNum]->bPaintPending )
   {
@@ -3267,6 +3276,7 @@ static void xUserTimerNow( USHORT usWinNum, HWND hWnd, UINT message, WPARAM wPar
 
   bRunning = TRUE;
 
+  hb_vmPushState();
   hb_vmPushSymbol( s_sApp.pSymWVW_TIMER->pSymbol );
   hb_vmPushNil();
   hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -3275,7 +3285,8 @@ static void xUserTimerNow( USHORT usWinNum, HWND hWnd, UINT message, WPARAM wPar
   hb_vmPushLong( ( LONG ) wParam  );
   hb_vmPushLong( ( LONG ) lParam  );
   hb_vmDo( 5 );
-  hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+  hb_vmPopState();
 
   bRunning = FALSE;
 }
@@ -3408,6 +3419,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
     {
       if ( s_sApp.pSymWVW_MENUSELECT )
       {
+        hb_vmPushState();
         hb_vmPushSymbol( s_sApp.pSymWVW_MENUSELECT->pSymbol );
         hb_vmPushNil();
         hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -3416,7 +3428,8 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_vmPushLong( ( LONG ) wParam  );
         hb_vmPushLong( ( LONG ) lParam  );
         hb_vmDo( 5 );
-        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+        hb_vmPopState();
       }
       return( 0 );
     }
@@ -3730,12 +3743,14 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         if ( s_sApp.pSymWVW_SETFOCUS )
         {
+          hb_vmPushState();
           hb_vmPushSymbol( s_sApp.pSymWVW_SETFOCUS->pSymbol );
           hb_vmPushNil();
           hb_vmPushInteger( ( int ) (usWinNum)  );
           hb_vmPushLong( ( LONG ) hWnd    );
           hb_vmDo( 2 );
-          hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+          hb_vmPopState();
         }
 
       }
@@ -3758,12 +3773,14 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( s_sApp.pSymWVW_KILLFOCUS )
       {
+        hb_vmPushState();
         hb_vmPushSymbol( s_sApp.pSymWVW_KILLFOCUS->pSymbol );
         hb_vmPushNil();
         hb_vmPushInteger( ( int ) (usWinNum)  );
         hb_vmPushLong( ( LONG ) hWnd );
         hb_vmDo( 2 );
-        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+        hb_vmPopState();
       }
       return( 0 );
     }
@@ -4270,6 +4287,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
       if ( s_sApp.pSymWVW_SIZE )
       {
+        hb_vmPushState();
         hb_vmPushSymbol( s_sApp.pSymWVW_SIZE->pSymbol );
         hb_vmPushNil();
         hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -4278,7 +4296,8 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         hb_vmPushLong( ( LONG ) wParam  );
         hb_vmPushLong( ( LONG ) lParam  );
         hb_vmDo( 5 );
-        hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+        hb_vmPopState();
       }
 
       return( 0 );
@@ -5487,6 +5506,7 @@ static void hb_wvw_gtMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
 
     if ( s_sApp.pSymWVW_MOUSE && keyCode != 0 )
     {
+      hb_vmPushState();
       hb_vmPushSymbol( s_sApp.pSymWVW_MOUSE->pSymbol );
       hb_vmPushNil();
       hb_vmPushInteger( ( int ) (pWindowData->byWinId)  );
@@ -5495,7 +5515,8 @@ static void hb_wvw_gtMouseEvent( WIN_DATA * pWindowData, HWND hWnd, UINT message
       hb_vmPushLong( ( SHORT ) colrow.x );
       hb_vmPushLong( ( SHORT ) keyState );
       hb_vmDo( 5 );
-      hb_itemGetNL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+
+      hb_vmPopState();
     }
 
       hb_wvw_gtAddCharToInputQueue( keyCode );
@@ -5757,10 +5778,10 @@ static void hb_wvw_gtCloseWindow( void )
         pcd     = pWindowData->pcdCtrlList->pNext;
         DestroyWindow (pWindowData->pcdCtrlList->hWndCtrl) ;
 
-        if (pWindowData->pcdCtrlList->hiCodeBlock.type == HB_IT_BLOCK)
+        if (pWindowData->pcdCtrlList->phiCodeBlock)
         {
-           HB_ITEM_UNLOCK( &(pWindowData->pcdCtrlList->hiCodeBlock) );
-           hb_itemClear( &(pWindowData->pcdCtrlList->hiCodeBlock) );
+           hb_itemRelease( pWindowData->pcdCtrlList->phiCodeBlock );
+
         }
 
         hb_xfree( pWindowData->pcdCtrlList );
@@ -5851,6 +5872,7 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
   {
     BOOL bHandled;
 
+    hb_vmPushState();
     hb_vmPushSymbol( s_sApp.pSymWVW_INPUTFOCUS->pSymbol );
     hb_vmPushNil();
     hb_vmPushInteger( ( int ) (usWinNum)  );
@@ -5859,7 +5881,8 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
     hb_vmPushLong( ( LONG ) wParam  );
     hb_vmPushLong( ( LONG ) lParam  );
     hb_vmDo( 5 );
-    bHandled = hb_itemGetL( ( PHB_ITEM ) &HB_VM_STACK.Return );
+    bHandled = hb_itemGetL( &HB_VM_STACK.Return );
+    hb_vmPopState();
 
     if (bHandled)
     {
@@ -7804,12 +7827,12 @@ BOOL HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int 
 IPicture * HB_EXPORT hb_wvw_gtLoadPicture( char * image )
 {
   IStream  *iStream;
-  IPicture *iPicture;
+
+  LPVOID   iPicture = NULL;
   HGLOBAL  hGlobal;
   HANDLE   hFile;
   DWORD    nFileSize;
   DWORD    nReadByte;
-  IPicture *Result = NULL;
 
   hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
   if ( hFile != INVALID_HANDLE_VALUE )
@@ -7825,18 +7848,17 @@ IPicture * HB_EXPORT hb_wvw_gtLoadPicture( char * image )
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
-          if ( iPicture )
-          {
-            Result = iPicture;
-          }
+
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, &iPicture );
+
         }
         GlobalFree( hGlobal );
       }
     }
     CloseHandle( hFile );
   }
-  return( Result );
+
+  return ( IPicture * ) iPicture;
 }
 
 /*-------------------------------------------------------------------*/
@@ -9900,7 +9922,7 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
    {
 
       /* pFunc is pointing to stored code block (later) */
-      pFunc = ( PHB_ITEM ) &(s_sApp.cbFunc[ iIndex ]);
+      pFunc = hb_itemNew( pFirst );
       iType = 2;
    }
    else if( pFirst->type == HB_IT_STRING )
@@ -9967,8 +9989,8 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
             /* if codeblock, store the codeblock and lock it there */
             if (HB_IS_BLOCK( pFirst ))
             {
-               hb_itemCopy( &(s_sApp.cbFunc[ iIndex ]), (PHB_ITEM) pFirst);
-               HB_ITEM_LOCK( &(s_sApp.cbFunc[ iIndex ]));
+               s_sApp.pcbFunc[ iIndex ] = pFunc;
+
             }
 
             s_sApp.pFunc[ iIndex ] = pFunc;
@@ -9983,6 +10005,12 @@ HB_FUNC( WVW_CREATEDIALOGDYNAMIC )
       }
       else
       {
+
+         if (iType==2 && pFunc)
+         {
+            hb_itemRelease( pFunc );
+         }
+
          s_sApp.hDlgModeless[ iIndex ] = NULL;
       }
    }
@@ -10021,11 +10049,10 @@ HB_FUNC( WVW_CREATEDIALOGMODAL )
    if ( HB_IS_BLOCK( pFirst ) )
    {
       /* pFunc is pointing to stored code block (later) */
-      pFunc = ( PHB_ITEM ) &( s_sApp.cbFuncModal[ iIndex ] );
 
-      hb_itemCopy( &( s_sApp.cbFuncModal[ iIndex ] ), ( PHB_ITEM ) pFirst );
-      HB_ITEM_LOCK( &( s_sApp.cbFuncModal[ iIndex ] ) );
+      s_sApp.pcbFuncModal[ iIndex ] = hb_itemNew( pFirst );
 
+      pFunc = s_sApp.pcbFuncModal[ iIndex ];
       s_sApp.pFuncModal[ iIndex ] = pFunc;
       s_sApp.iTypeModal[ iIndex ] = 2;
    }
@@ -13967,7 +13994,7 @@ static UINT LastControlId(USHORT usWinNum, BYTE byCtrlClass)
   }
 }
 
-static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid, HB_ITEM * phiCodeBlock, RECT rCtrl, RECT rOffCtrl, byte bStyle)
+static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UINT uiCtrlid, PHB_ITEM phiCodeBlock, RECT rCtrl, RECT rOffCtrl, byte bStyle)
 {
   WIN_DATA * pWindowData = s_pWindows[usWinNum];
   CONTROL_DATA * pcdNew = (CONTROL_DATA *) hb_xgrab( sizeof( CONTROL_DATA ) );
@@ -13976,12 +14003,12 @@ static void AddControlHandle(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, U
   pcdNew->hWndCtrl = hWndCtrl;
   pcdNew->uiCtrlid = uiCtrlid;
 
-  pcdNew->hiCodeBlock.type = HB_IT_NIL;
+  pcdNew->phiCodeBlock = NULL;
 
   if (phiCodeBlock != NULL)
   {
-     hb_itemCopy( &(pcdNew->hiCodeBlock), phiCodeBlock);
-     HB_ITEM_LOCK( &(pcdNew->hiCodeBlock) );
+     pcdNew->phiCodeBlock = hb_itemNew( phiCodeBlock );
+
   }
 
   pcdNew->bBusy = FALSE;
@@ -14087,10 +14114,10 @@ static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UI
         pcd->byCtrlClass==WVW_CONTROL_PUSHBUTTON ||
         pcd->byCtrlClass==WVW_CONTROL_COMBOBOX
         )
-       && pcd->hiCodeBlock.type == HB_IT_BLOCK )
+       && pcd->phiCodeBlock )
 
   {
-     HB_ITEM hiWinNum, hiXBid, hiXBmsg, hiXBpos;
+     PHB_ITEM phiWinNum, phiXBid, phiXBmsg, phiXBpos;
      PHB_ITEM pReturn;
 
      if (pcd->bBusy)
@@ -14106,32 +14133,37 @@ static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UI
 
      pcd->bBusy = TRUE;
 
-     hiWinNum.type = HB_IT_NIL;
-     hb_itemPutNI( &hiWinNum, (int) usWinNum );
+     phiWinNum = hb_itemNew(NULL);
+     hb_itemPutNI( phiWinNum, (int) usWinNum );
 
-     hiXBid.type = HB_IT_NIL;
-     hb_itemPutNI( &hiXBid, (int) pcd->uiCtrlid );
+     phiXBid = hb_itemNew(NULL);
+     hb_itemPutNI( phiXBid, (int) pcd->uiCtrlid );
 
      if (pcd->byCtrlClass==WVW_CONTROL_SCROLLBAR)
      {
-        hiXBmsg.type = HB_IT_NIL;
-        hb_itemPutNI( &hiXBmsg, (int) LOWORD(wParam) );
+        phiXBmsg = hb_itemNew(NULL);
+        hb_itemPutNI( phiXBmsg, (int) LOWORD(wParam) );
 
-        hiXBpos.type = HB_IT_NIL;
-        hb_itemPutNI( &hiXBpos, (int) HIWORD(wParam) );
+        phiXBpos = hb_itemNew(NULL);
+        hb_itemPutNI( phiXBpos, (int) HIWORD(wParam) );
 
-        pReturn = hb_vmEvalBlockV( &(pcd->hiCodeBlock), 4, &hiWinNum, &hiXBid, &hiXBmsg, &hiXBpos );
+        pReturn = hb_itemDo( pcd->phiCodeBlock, 4, phiWinNum, phiXBid, phiXBmsg, phiXBpos );
+        hb_itemRelease( pReturn );
+        hb_itemRelease( phiXBmsg );
+        hb_itemRelease( phiXBpos );
      }
      else if (pcd->byCtrlClass==WVW_CONTROL_PUSHBUTTON)
      {
-        pReturn = hb_vmEvalBlockV( &(pcd->hiCodeBlock), 2, &hiWinNum, &hiXBid );
+
+        pReturn = hb_itemDo( pcd->phiCodeBlock, 2, phiWinNum, phiXBid );
+        hb_itemRelease( pReturn );
      }
 
      else if (pcd->byCtrlClass==WVW_CONTROL_COMBOBOX)
      {
         int     iCurSel;
 
-        HB_ITEM hiEvent, hiIndex;
+        PHB_ITEM phiEvent, phiIndex;
 
         switch (bEventType)
         {
@@ -14173,19 +14205,23 @@ static void RunControlBlock(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, UI
               **************************/
 
               /* now execute the codeblock */
-              hiEvent.type = HB_IT_NIL;
-              hb_itemPutNI( &hiEvent, (int) bEventType );
+              phiEvent = hb_itemNew(NULL);
+              hb_itemPutNI( phiEvent, (int) bEventType );
 
-              hiIndex.type = HB_IT_NIL;
-              hb_itemPutNI( &hiIndex, (int) iCurSel );
+              phiIndex = hb_itemNew(NULL);
+              hb_itemPutNI( phiIndex, (int) iCurSel );
 
-              pReturn = hb_vmEvalBlockV( &(pcd->hiCodeBlock), 4, &hiWinNum, &hiXBid, &hiEvent, &hiIndex );
+              pReturn = hb_itemDo( pcd->phiCodeBlock, 4, phiWinNum, phiXBid, phiEvent, phiIndex );
+              hb_itemRelease( pReturn );
+              hb_itemRelease( phiEvent );
+              hb_itemRelease( phiIndex );
 
            }
         }
      }
 
-     HB_SYMBOL_UNUSED( pReturn );
+     hb_itemRelease( phiWinNum );
+     hb_itemRelease( phiXBid );
 
      pcd->bBusy = FALSE;
 
@@ -14577,10 +14613,10 @@ HB_FUNC( WVW_XBDESTROY)
      pcdPrev->pNext = pcd->pNext;
    }
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    hb_xfree( pcd );
@@ -15034,10 +15070,10 @@ HB_FUNC( WVW_PBDESTROY)
      pcdPrev->pNext = pcd->pNext;
    }
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    hb_xfree( pcd );
@@ -15104,8 +15140,8 @@ HB_FUNC( WVW_PBSETCODEBLOCK )
 
    UINT uiPBid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_PUSHBUTTON, NULL, uiPBid);
-
-   if (!ISBLOCK(3) || pcd==NULL || pcd->bBusy)
+   PHB_ITEM phiCodeBlock = hb_param( 3, HB_IT_BLOCK );
+   if (!phiCodeBlock || pcd==NULL || pcd->bBusy)
    {
 
      /*
@@ -15134,15 +15170,13 @@ HB_FUNC( WVW_PBSETCODEBLOCK )
 
    pcd->bBusy = TRUE;
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
-   pcd->hiCodeBlock.type = HB_IT_NIL;
-   hb_itemCopy( &(pcd->hiCodeBlock), (HB_ITEM *) hb_param( 3, HB_IT_BLOCK ));
-   HB_ITEM_LOCK( &(pcd->hiCodeBlock) );
+   pcd->phiCodeBlock = hb_itemNew( phiCodeBlock );
 
    pcd->bBusy = FALSE;
 
@@ -15425,10 +15459,10 @@ HB_FUNC( WVW_PGDESTROY)
      pcdPrev->pNext = pcd->pNext;
    }
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    hb_xfree( pcd );
@@ -16004,10 +16038,10 @@ HB_FUNC( WVW_CBDESTROY)
      pcdPrev->pNext = pcd->pNext;
    }
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    hb_xfree( pcd );
@@ -16086,8 +16120,8 @@ HB_FUNC( WVW_CBSETCODEBLOCK )
 
    UINT uiCBid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_COMBOBOX, NULL, uiCBid);
-
-   if (!ISBLOCK(3) || pcd==NULL || pcd->bBusy)
+   PHB_ITEM phiCodeBlock = hb_param( 3, HB_IT_BLOCK );
+   if (!phiCodeBlock || pcd==NULL || pcd->bBusy)
    {
      hb_retl( FALSE );
      return;
@@ -16095,15 +16129,13 @@ HB_FUNC( WVW_CBSETCODEBLOCK )
 
    pcd->bBusy = TRUE;
 
-   if (pcd->hiCodeBlock.type == HB_IT_BLOCK)
+   if (pcd->phiCodeBlock)
    {
-      HB_ITEM_UNLOCK( &(pcd->hiCodeBlock) );
-      hb_itemClear( &(pcd->hiCodeBlock) );
+      hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
-   pcd->hiCodeBlock.type = HB_IT_NIL;
-   hb_itemCopy( &(pcd->hiCodeBlock), (HB_ITEM *) hb_param( 3, HB_IT_BLOCK ));
-   HB_ITEM_LOCK( &(pcd->hiCodeBlock) );
+   pcd->phiCodeBlock = hb_itemNew( phiCodeBlock );
 
    pcd->bBusy = FALSE;
 

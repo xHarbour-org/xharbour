@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4410 2005/10/06 01:33:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4411 2005/10/06 01:46:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-06 09:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    ! Fixed all callback calls to use hb_vmPushState()/hb_vmPopState().
+    * Applying the proper codeblock handling, as suggested by Przemek.
+      As a side effect, I rename GLOBAL_DATA member cbFunc/cbFuncModal
+      into pcbFunc/pcbFuncModal. They now store pointer to codeblock,
+      not the codeblock itself.
+      The same thing with CONTROL_DATA's hiCodeBlock --> phiCodeBlock.
+
+  * contrib/gtwvw/whatsnew.txt
+    * Updated with the above change.
 
 2005-10-05 18:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * makallbc.bat

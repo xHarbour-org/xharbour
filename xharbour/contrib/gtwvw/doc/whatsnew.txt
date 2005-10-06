@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.10 2005/06/19 16:47:39 bdj Exp $
+ * $Id: whatsnew.txt,v 1.11 2005/08/30 16:49:36 bdj Exp $
  */
 
 /*
@@ -16,6 +16,16 @@
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
 
+
+2005-10-06 09:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    ! Fixed all callback calls to use hb_vmPushState()/hb_vmPopState().
+    * Applying the proper codeblock handling, as suggested by Przemek.
+      As a side effect, I rename GLOBAL_DATA member cbFunc/cbFuncModal
+      into pcbFunc/pcbFuncModal. They now store pointer to codeblock,
+      not the codeblock itself.
+      The same thing with CONTROL_DATA's hiCodeBlock --> phiCodeBlock.
 
 =========================================================================
 2005-08-30 23:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id> :: BEGIN
