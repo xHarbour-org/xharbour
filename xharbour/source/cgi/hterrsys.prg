@@ -1,19 +1,6 @@
 /*
- * $Id: hterrsys.prg,v 1.1 2003/05/28 03:10:19 paultucker Exp $
+ * $Id: hterrsys.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
-
-/***
-*
-*	Errorsys.prg
-*
-*  Standard Clipper error handler
-*
-*  Copyright (c) 1990-1993, Computer Associates International, Inc.
-*  All rights reserved.
-*
-*  Compile:  /m /n /w
-*
-*/
 
 /*
  * Harbour Project source code:
