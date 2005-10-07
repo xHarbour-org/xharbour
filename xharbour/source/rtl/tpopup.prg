@@ -1,5 +1,5 @@
 /*
- * $Id: tpopup.prg,v 1.9 2004/07/13 19:51:41 paultucker Exp $
+ * $Id: tpopup.prg,v 1.10 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -500,6 +500,7 @@ METHOD SetCoors( nRow, nCol, lTop ) CLASS PopUpMenu
          ::left  -= nDif
          if !lTop
             ::top++
+            ::bottom++
          endif
       endif
 

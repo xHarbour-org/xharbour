@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4423 2005/10/07 01:43:31 druzus Exp $
+ * $Id: ChangeLog,v 1.4424 2005/10/07 03:43:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-06 19:20 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/tpopup.prg
+    ! minor fix on SetCoors() method. Bottom was not being updated if
+      popupmenu has more then one item. Reported by Robert(Bob) Smith
 
 2005-10-06 20:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c
