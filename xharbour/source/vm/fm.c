@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.69 2005/03/30 21:31:21 andijahja Exp $
+ * $Id: fm.c,v 1.70 2005/10/07 01:09:14 druzus Exp $
  */
 
 /*
@@ -155,8 +155,10 @@ static BOOL s_fInit = FALSE;
 
 #if defined( HB_THREAD_SUPPORT ) && \
     ( !defined( HB_SAFE_ALLOC ) || defined( HB_FM_STATISTICS ) )
-#  define HB_MEM_THLOCK()    if( s_fInit ) { HB_CRITICAL_LOCK( hb_allocMutex ); }
-#  define HB_MEM_THUNLOCK()  if( s_fInit ) { HB_CRITICAL_UNLOCK( hb_allocMutex ); }
+#  define HB_MEM_THLOCK()     do { if( !s_fInit ) { hb_xinit(); } \
+                                   HB_CRITICAL_LOCK( hb_allocMutex ); \
+                              } while( 0 )
+#  define HB_MEM_THUNLOCK()   HB_CRITICAL_UNLOCK( hb_allocMutex )
 #else
 #  define HB_MEM_THLOCK()
 #  define HB_MEM_THUNLOCK()
