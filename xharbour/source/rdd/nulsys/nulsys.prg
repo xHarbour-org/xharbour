@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.6 2003/07/27 01:23:11 ronpinkas Exp $
+ * $Id: nulsys.prg,v 1.7 2003/09/02 05:41:14 ronpinkas Exp $
  */
 
 /*
@@ -53,14 +53,6 @@
 // Harbour without RDD
 
 ANNOUNCE RDDSYS
-
-PROCEDURE RDDInit
-
-RETURN
-
-PROCEDURE DBFInit
-
-RETURN
 
 #pragma BEGINDUMP
 

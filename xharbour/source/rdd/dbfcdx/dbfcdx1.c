@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.220 2005/09/22 01:11:59 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.221 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -3060,8 +3060,8 @@ static int hb_cdxPageKeyIntBalance( LPCDXPAGE pPage, int iChildRet )
 #if 1
    if ( iNeedKeys == 1 && iBlncKeys > 1 && childs[0]->Left != CDX_DUMMYNODE &&
         childs[iBlncKeys-1]->Right != CDX_DUMMYNODE &&
-        iKeys >= CDX_BALANCE_INTPAGES << 1 &&
-        iKeys > pPage->TagParent->MaxKeys * 3 >> 1 )
+        iKeys >= ( CDX_BALANCE_INTPAGES << 1 ) &&
+        iKeys > ( pPage->TagParent->MaxKeys * 3 ) >> 1 )
    {
       iNeedKeys = 2;
    }

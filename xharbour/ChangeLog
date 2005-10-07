@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4420 2005/10/06 18:24:46 lculik Exp $
+ * $Id: ChangeLog,v 1.4421 2005/10/06 23:24:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-07 03:08 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+   * some warnings cleaned
+
+  * xharbour/source/rdd/nulsys/nulsys.prg
+   - removed not used RDDInit()/DBFInit()
+
+  * xharbour/include/thread.h
+    * set HB_SAFE_ALLOC by default - malloc()/free()/realloc() should
+      be MT safe by definition and this macro should be enabled only
+      for some buggy implementations
+
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/hvm.c
+    * do not use MUTEX until FM has not been initialized
 
 2005-10-06 16:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/macro.c

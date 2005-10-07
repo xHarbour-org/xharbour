@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.106 2005/06/17 17:04:22 lculik Exp $
+* $Id: thread.h,v 1.107 2005/09/04 04:29:00 walito Exp $
 */
 
 /*
@@ -67,14 +67,8 @@
    #endif
 #endif
 
-/* Check if malloc/free is thread safe */
-/* temporarily disabled
-#ifndef HB_SAFE_ALLOC
-#  if defined( HB_OS_LINUX ) && (defined(_THREAD_SAFE) || defined(_REENTRANT))
-#    define HB_SAFE_ALLOC
-#  endif
-#endif
-*/
+/* disable this macro if malloca/free() is not thread safe */
+#define HB_SAFE_ALLOC
 
 /* We should assert that cleanup functions must be in limited number */
 typedef void (*HB_CLEANUP_FUNC)(void *);

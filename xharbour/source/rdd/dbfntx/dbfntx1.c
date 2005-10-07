@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.133 2005/09/25 16:14:21 druzus Exp $
+ * $Id: dbfntx1.c,v 1.134 2005/10/04 02:05:35 druzus Exp $
  */
 
 /*
@@ -2984,7 +2984,7 @@ static BOOL hb_ntxTagKeyDel( LPTAGINFO pTag, LPKEYINFO pKey )
 
    while( iLevel > 0 )
    {
-      if( pPage->uiKeys < pTag->MaxKeys >> 1 )
+      if( pPage->uiKeys < ( pTag->MaxKeys >> 1 ) )
       {
          USHORT uiFirst, uiLast, uiBaseKey;
 

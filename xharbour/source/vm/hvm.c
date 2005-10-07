@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.498 2005/10/02 20:19:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.499 2005/10/04 02:05:36 druzus Exp $
  */
 
 /*
@@ -8756,13 +8756,6 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
    char *sModule;
    BOOL bFree = FALSE;
 
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-   }
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
    va_start( ap, pSymbols );
@@ -9487,13 +9480,6 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
    USHORT ui;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
-
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-   }
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
    pNewSymbols->pModuleSymbols = pSymbols;
