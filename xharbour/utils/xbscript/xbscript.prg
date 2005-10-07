@@ -445,7 +445,7 @@ STATIC s_bDefRTErrBlock := {|oErr| RP_Run_Err( oErr, s_aProcedures ) }
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC15" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC16" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -2022,9 +2022,9 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ENDIF
                ELSE
-                  nAt := At( '=', sBlock )
+                  nAt := AtSkipStrings( '=', sBlock )
                   IF nAt > 1 .AND. ( ! SubStr( sBlock, nAt - 1, 1 ) $ ":-+*/^%<>!" ) .AND. ( ! SubStr( sBlock, nAt + 1, 1 ) $ "=>" )
-                     nPos := At( ":=", sBlock )
+                     nPos := AtSkipStrings( ":=", sBlock )
 
                      IF nPos == 0 .OR. nPos > nAt
                         sBlock := Left( sBlock, nAt - 1 ) + ":" + SubStr( sBlock, nAt )
