@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.23 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.24 2005/09/13 22:46:53 fperillo Exp $
  */
 
 /*
@@ -901,7 +901,7 @@ void hb_compChkEnvironVar( char * szSwitch )
 	        {
 		    hb_pp_STD_CH_ADDITIVE = 1 ;
                     hb_pp_STD_CH = hb_strdup( s + 2 );
-		}	
+		}
 		else
                    hb_pp_STD_CH = hb_strdup( s + 1 );
                 break;
@@ -1012,7 +1012,6 @@ static void hb_compChkDefineSwitch( char * pszSwitch )
             {
                if ( szDefText[ i ] == cQuoted )
                {
-                  cQuoted = '\0';
                   i++;
                   break;
                }

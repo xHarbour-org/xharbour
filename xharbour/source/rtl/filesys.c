@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.151 2005/10/02 12:35:11 druzus Exp $
+ * $Id: filesys.c,v 1.152 2005/10/04 20:35:35 druzus Exp $
  */
 
 /*
@@ -738,15 +738,20 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       ULONG *ProcessID
       )
 {
-   FHANDLE hRet = FS_ERROR;
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )",
-      pFilename, fhStdin, fhStdout, fhStderr));
+   #ifdef HB_WIN32_IO
+      FHANDLE hRet;
+   #else
+      FHANDLE hRet = FS_ERROR;
+   #endif
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsOpenProcess(%s, %p, %p, %p )", pFilename, fhStdin, fhStdout, fhStderr));
 
 #if defined(OS_UNIX_COMPATIBLE) || ( defined( HB_OS_WIN_32 ) && ! defined( HB_WIN32_IO) ) || defined (HB_OS_OS2)
 {
-#ifndef MAXFD
-   #define MAXFD       1024
-#endif
+   #ifndef MAXFD
+      #define MAXFD       1024
+   #endif
+
    FHANDLE hPipeIn[2], hPipeOut[2], hPipeErr[2];
    FHANDLE hNull;
    char **argv;
@@ -754,39 +759,44 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
    char *command;
 
    #ifdef HB_OS_WIN_32
-   int pid;
-   #define pipe(x)   _pipe( x, 2048, _O_BINARY )
+      int pid;
+      #define pipe(x)   _pipe( x, 2048, _O_BINARY )
    #else
-   pid_t pid;
+      pid_t pid;
    #endif
 
    if( fhStdin != 0 && pipe( hPipeIn ) != 0 )
    {
       hb_fsSetIOError( FALSE, 0 );
       return (FHANDLE) -1;
-   #ifdef HB_OS_OS2
-   } else {
+ #ifdef HB_OS_OS2
+   }
+   else
+   {
       setmode( hPipeIn[0], O_BINARY );
       setmode( hPipeIn[1], O_BINARY );
-   #endif
+ #endif
    }
 
    if( fhStdout != 0 && pipe( hPipeOut ) != 0 )
    {
       hb_fsSetIOError( FALSE, 0 );
+
       if ( fhStdin != 0 )
       {
          close( hPipeIn[0] );
          close( hPipeIn[1] );
       }
+
       return (FHANDLE) -1;
-   #ifdef HB_OS_OS2
-   } else {
+ #ifdef HB_OS_OS2
+   }
+   else
+   {
       setmode( hPipeOut[0], O_BINARY );
       setmode( hPipeOut[1], O_BINARY );
-   #endif
+ #endif
    }
-
 
    if( fhStderr != 0 )
    {
@@ -795,6 +805,7 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          if ( pipe( hPipeErr ) != 0)
          {
             hb_fsSetIOError( FALSE, 0 );
+
             if ( fhStdin != 0 )
             {
                close( hPipeIn[0] );
@@ -805,16 +816,18 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
                close( hPipeOut[0] );
                close( hPipeOut[1] );
             }
+
             return (FHANDLE) -1;
-         #ifdef HB_OS_OS2
-         } else {
+       #ifdef HB_OS_OS2
+         }
+         else
+         {
             setmode( hPipeErr[0], O_BINARY );
             setmode( hPipeErr[1], O_BINARY );
-         #endif
+       #endif
          }
       }
    }
-
 
    #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    {
@@ -867,18 +880,19 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       argv[size] = 0;
 
       #if defined(__BORLANDC__) || defined(__WATCOMC__) || defined(__GNUC__)
-      iFlags = P_NOWAIT;
-      pid = spawnvp( iFlags, argv[0], argv );
+        iFlags = P_NOWAIT;
+        pid = spawnvp( iFlags, argv[0], argv );
       #else
-      iFlags = _P_NOWAIT;
-      pid = _spawnvp( iFlags, argv[0], argv );
+        iFlags = _P_NOWAIT;
+        pid = _spawnvp( iFlags, argv[0], argv );
       #endif
 
       #ifdef HB_OS_OS2
-      *ProcessID = (ULONG) pid;
+        *ProcessID = (ULONG) pid;
       #else
-      *ProcessID = (DWORD) pid;
+        *ProcessID = (DWORD) pid;
       #endif
+
       hb_xfree( command );
       hb_xfree( argv );
 
@@ -886,11 +900,11 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       dup2( oldstdout, 1 );
       dup2( oldstderr, 2 );
    }
-   if ( pid < 0 )
 
-   #else
+   if ( pid < 0 )
+  #else
    if( ( pid = fork() ) == -1 )
-   #endif
+  #endif
    {
       hb_fsSetIOError( FALSE, 0 );
       // closing unused handles should be nice
@@ -912,11 +926,14 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
          close( hPipeErr[0] );
          close( hPipeErr[1] );
       }
+
       return (FHANDLE) -1;
    }
 
-   if( pid != 0 ) {
+   if( pid != 0 )
+   {
       *ProcessID = (ULONG) pid;
+
       // I am the father
       if ( fhStdin != NULL )
       {
@@ -941,8 +958,9 @@ FHANDLE HB_EXPORT hb_fsOpenProcess( char *pFilename,
       hRet = (FHANDLE) pid;
 
    }
+
    // I am che child
-   #ifndef HB_OS_WIN_32
+ #ifndef HB_OS_WIN_32
    else
    {
       command = ( char * ) hb_xgrab( strlen( pFilename ) + 2 );

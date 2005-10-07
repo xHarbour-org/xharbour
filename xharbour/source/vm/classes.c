@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.168 2005/09/30 21:49:16 ronpinkas Exp $
+ * $Id: classes.c,v 1.169 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -2034,13 +2034,13 @@ HB_FUNC( __CLSNEW )
       ULONG ulSize = 0;  /* USHORT is small. Maximum 409 methods. In some
                            cases it is enough. This eliminate random GPFs
                            in this function for big classes */
-      ULONG nLenClsDatas = 0;
-      ULONG nLenInlines = 0;
+      ULONG nLenClsDatas;
+      ULONG nLenInlines;
       ULONG nLenDatas = hb_parni( 2 );
       PCLASS   pSprCls = NULL; // To void incorrect warning
       PMETHOD  pNewMethod;
       PMETHOD  pSprMethod;
-      USHORT   uiInit = 0, uiAt = 0;
+      USHORT   uiInit = 0, uiAt;
       int      iPos;
 
       for( i = 1; i <= uiSuper; i++ )
@@ -2539,7 +2539,7 @@ HB_FUNC( __CLSMODMSG )
             USHORT   uiScope = ( USHORT ) ( ISNUM( 4 ) ? hb_parni( 4 ) : HB_OO_CLSTP_EXPORTED );
 
             pMethod = pClass->pMethods + uiAt - 1;
-            pFunc   = pMethod->pFunction;
+            //pFunc   = pMethod->pFunction;
 
             switch( pMethod->uiType )
             {

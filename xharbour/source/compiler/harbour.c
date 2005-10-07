@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.110 2005/08/04 11:33:11 druzus Exp $
+ * $Id: harbour.c,v 1.111 2005/10/04 20:53:49 ronpinkas Exp $
  */
 
 /*
@@ -4065,7 +4065,7 @@ void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
    }
    else
    {
-      pSym = hb_compSymbolAdd( szSymbolName, &wSym, bFunction );
+      hb_compSymbolAdd( szSymbolName, &wSym, bFunction );
 
       if( bFunction )
       {

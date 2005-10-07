@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.103 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.104 2005/10/01 20:08:39 ronpinkas Exp $
  */
 
 /*
@@ -1879,10 +1879,13 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                            //printf( "String: '%s', Start: %i, Len: %i\n", pString->value.asString.string, pStart->value.asNum.lVal, pLen->value.asNum.lVal );
 
-                           sSubStr = (char *) hb_xgrab( ( ULONG ) pLen->value.asNum.lVal + 1 );
+                           sSubStr = (char *) hb_xgrab( (ULONG) pLen->value.asNum.lVal + 1 );
 
-                           memcpy( sSubStr, pString->value.asString.string + pStart->value.asNum.lVal - 1, ( ULONG ) pLen->value.asNum.lVal );
-                           sSubStr[ pLen->value.asNum.lVal ] = '\0';
+                           memcpy( (void *) sSubStr,
+                                   (const char *)( pString->value.asString.string + (int)( pStart->value.asNum.lVal - 1 ) ),
+                                   (size_t)( (ULONG)( pLen->value.asNum.lVal ) ) );
+
+                           sSubStr[ (int)( pLen->value.asNum.lVal ) ] = '\0';
 
                            pReduced = hb_compExprNew( HB_ET_STRING );
                            pReduced->ValType = HB_EV_STRING;

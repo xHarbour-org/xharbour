@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.23 2005/05/27 22:19:47 ronpinkas Exp $
+ * $Id: macro.slx,v 1.24 2005/06/01 02:09:27 ronpinkas Exp $
  */
 
 /*
@@ -530,7 +530,6 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
                if( *pTmp == '|' )
                {
                   *pTmp = '\\';
-                  pTmp++;
                   break;
                }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.42 2005/09/22 01:11:59 druzus Exp $
+ * $Id: inkey.c,v 1.43 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -202,7 +202,7 @@ static void hb_inkeyPop( void )
 static BOOL hb_inkeyNextCheck( HB_inkey_enum event_mask, int * iKey )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_inkeyNextCheck(%p)", iKey) );
-   
+
    if( s_StrBuffer )
    {
       *iKey = s_StrBuffer[ s_StrBufferPos ];
@@ -230,7 +230,7 @@ static void hb_inkeyPollDo( void )
    int iKey;
 
    HB_TRACE( HB_TR_DEBUG, ("hb_inkeyPollDo()") );
-   
+
    iKey = hb_gt_ReadKey( ( HB_inkey_enum ) INKEY_ALL );
 
    switch( iKey )
@@ -291,7 +291,7 @@ int hb_inkeyNext( HB_inkey_enum event_mask )
 int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
 {
    clock_t end_clock = 0;
-   BOOL fPop = FALSE;
+   BOOL fPop;
 
 #if defined( HB_OS_UNIX )
    /* NOTE: clock() returns a time used by a program - if it is suspended
@@ -317,12 +317,17 @@ int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
    {
       hb_inkeyPollDo();
       fPop = hb_inkeyNextCheck( event_mask, &s_inkeyLast );
+
       if( fPop )
+      {
          break;
+      }
 
       /* immediately break if a VM request is pending. */
       if( !fWait || hb_vmRequestQuery() != 0 )
+      {
          return 0;
+      }
 
       hb_idleState( TRUE );
    }
@@ -335,6 +340,7 @@ int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
       hb_inkeyPop();
       return s_inkeyLast;
    }
+
    return 0;
 }
 
