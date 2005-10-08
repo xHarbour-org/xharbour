@@ -1,5 +1,5 @@
 /*
- * $Id: forms.ch,v 1.2 2005/02/27 05:51:59 ronpinkas Exp $
+ * $Id: forms.ch,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -187,7 +187,7 @@
           [<oCtr>:SetonKUp(<(onkup)>);]            ;
           [<oCtr>:SetonKPress(<(onkprs)>);]        ;
           [<oCtr>:SetPicture(<(pic)>);]            ;
-          [<oCtr>:SetCaption(<(cap)>);]            ;
+          [<oCtr>:SetCaption(<cap>);]              ;
           [<oCtr>:SetStyle(<(style)>);]            ;
           [<oCtr>:SetId(<(id)>);]                  ;
           [<oCtr>:SetChecked( <.checked.>);]       ;

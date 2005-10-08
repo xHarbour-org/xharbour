@@ -2,7 +2,7 @@
 #include "html.ch"
 #include "forms.ch"
 
-request _DBFCDX
+request dbfcdx
 
 STATIC scSession  := ""
 STATIC scCmd := ""
@@ -51,7 +51,7 @@ scQuery := cQuery
 //
 
 IF FILE ("ADDBOOK.DBF")
-   USE ADDBOOK  VIA "_DBFCDX"
+   USE ADDBOOK  VIA "dbfcdx"
    IF !File( "addbook.cdx" )
       INDEX ON Addbook->LName TO Addbook.cdx
    ENDIF

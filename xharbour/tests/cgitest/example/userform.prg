@@ -1,6 +1,6 @@
 #include "website.ch"
 
-request _DBFCDX
+request DBFCDX
 
 STATIC scSession  := ""
 STATIC scCmd := ""
@@ -155,7 +155,7 @@ oHtm:write("<br><br>")
 
 SET Font "Verdana" SIZE 1 OF oHtm
 
-USE FIXING NEW VIA "_DBFCDX"
+USE FIXING NEW VIA "DBFCDX"
 
     HtmlBrowse( oHtm )
 
@@ -306,7 +306,7 @@ oHtm:putTextURL(htmlPadR("<b>3</b>. See the header STYLE clause",70),"javascript
 oHtm:putBreak()
 oHtm:putTextURL(htmlPadR("<b>4</b>. Click here for an action",70) ,"javascript:alert('onClick event')")
 oHtm:putBreak()
-END FONT "Courier" OF oHtm
+END FONT  OF oHtm
 
 
 oHtm:HLine()
@@ -715,12 +715,12 @@ DEFINE FORM oForm1 NAME "TestForm" ;
        CAPIMAGE "/images/sidebars/sbk.gif" ;
        BGIMAGE "/images/sidebars/sb1.gif" ;
        WIDTH 60 ;
-       ACTION "mailto:maspr@otenet.gr"  // --> NOTE !!!
+       ACTION "mailto:luiz@xharbour.com.br"  // --> NOTE !!!
 
 DEFINE EDIT oText1 NAME "text1" ;
        VALUE "" ;
        MAXCHARS 30 ;
-       CAPTION "<b>"+(htmlPadL("EditField1 : ",20) )+"</b>" ;
+       CAPTION "<b>"+(htmlPadL("EditField1 : ",20))+"</b>"  ;
        IN oForm1
 
 LINE BREAK IN oForm1
@@ -728,7 +728,7 @@ LINE BREAK IN oForm1
 DEFINE EDIT oText2 NAME "text2" ;
        VALUE "" ;
        MAXCHARS 30 ;
-       CAPTION "<b>"+(htmlPadL("EditField2 : ",20) )+"</b>" ;
+       CAPTION "<b>"+(htmlPadL("EditField2 : ",20))+"</b>"  ;
        IN oForm1
 
 LINE BREAK IN oForm1
@@ -1220,8 +1220,8 @@ LOCAL oHtm, cCur, cDateStart, cDateEnd, dDateStart, dDateEnd
 LOCAL n := 0
 LOCAL bOldError, oError
 
-//USE "F:\X000\DATA\HInv02" SHARED NEW VIA "_DBFCDX"
-USE HInv02 SHARED NEW VIA "_DBFCDX"
+//USE "F:\X000\DATA\HInv02" SHARED NEW VIA "dbfcdx"
+USE HInv02 SHARED NEW VIA "dbfcdx"
 IF NETERR()
    netError()
    RETURN
@@ -1345,8 +1345,8 @@ cRecno := SUBSTR( cRecno, 2 )
 oHtm:SetTextColor("black")
 oHtm:Setcenter( .T. )
 
-USE HInv02 SHARED NEW VIA "_DBFCDX"
-//USE "F:\X000\DATA\HInv02" SHARED NEW VIA "_DBFCDX"
+USE HInv02 SHARED NEW VIA "dbfcdx"
+//USE "F:\X000\DATA\HInv02" SHARED NEW VIA "dbfcdx"
 IF NETERR()
    netError()
    RETURN
@@ -1581,14 +1581,14 @@ RETURN
 FUNCTION ValidateSession(oCgi)
 LOCAL lRet := .F.
 CLOSE SESSION
-USE Session SHARED NEW VIA "_DBFCDX"
+USE Session SHARED NEW VIA "dbfcdx"
 IF FILE( "session.cdx")
    SET INDEX TO SESSION
 ELSE
-   USE Session EXCLUSIVE NEW VIA "_DBFCDX"
+   USE Session EXCLUSIVE NEW VIA "dbfcdx"
    INDEX ON SESSION->IP TAG TG_IP TO SESSION.CDX
    CLOSE SESSION
-   USE Session SHARED NEW VIA "_DBFCDX"
+   USE Session SHARED NEW VIA "dbfcdx"
    SET INDEX TO SESSION
 ENDIF
 Session->( dbGoTop() )
@@ -1613,7 +1613,7 @@ FUNCTION ReleaseSession(oCgi)
 
 LOCAL lRet := .F.
 USE
-USE Session SHARED NEW VIA "_DBFCDX"
+USE Session SHARED NEW VIA "dbfcdx"
 INDEX ON SESSION->IP TAG TG_IP TO SESSION.CDX
 
 
@@ -1621,13 +1621,13 @@ IF FILE( "session.cdx")
    SET INDEX TO SESSION
 ELSE
    USE
-   USE Session EXCLUSIVE NEW VIA "_DBFCDX"
+   USE Session EXCLUSIVE NEW VIA "dbfcdx"
    IF NETERR()
       RETURN .F.
    ENDIF
    INDEX ON SESSION->IP TAG TG_IP TO SESSION.CDX
    CLOSE SESSION
-   USE Session SHARED NEW VIA "_DBFCDX"
+   USE Session SHARED NEW VIA "dbfcdx"
    SET INDEX TO SESSION
 ENDIF
 

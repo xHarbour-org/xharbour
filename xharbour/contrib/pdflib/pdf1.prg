@@ -1,5 +1,5 @@
 /*
- * $Id: pdf1.prg,v 1.2 2004/07/26 09:13:56 lculik Exp $
+ * $Id: pdf1.prg,v 1.3 2004/07/27 09:26:22 lculik Exp $
  */
 
 /*
@@ -1201,6 +1201,7 @@ ENDIF
    Aadd( aTemp, nBits )
    Aadd( aTemp, nFrom )
    Aadd( aTemp, nLength )
+   Aadd( aTemp, 0 )
 
 RETURN aTemp
 
@@ -1241,6 +1242,7 @@ LOCAL aTemp   := {}
    Aadd( aTemp, nBits )
    Aadd( aTemp, nFrom )
    Aadd( aTemp, nLength )
+   aadd( aTemp,2)
 
 RETURN aTemp
 

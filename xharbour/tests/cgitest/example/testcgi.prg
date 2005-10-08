@@ -73,7 +73,7 @@ SAY "Web Server variables & a DBF Browser" ;
 FONT "courier" ;
 SIZE 3 ;
 TYPE "<B><I>" ;
-IN oHtm
+OF oHtm
 
 //oHtm:writeLN( "Web Server variables & a DBF Browser" )
 

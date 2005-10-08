@@ -1,6 +1,6 @@
 #include "website.ch"
 
-request _DBFCDX
+request dbfcdx
 
 STATIC scCmd      := ""
 STATIC scSiteRoot := ""
