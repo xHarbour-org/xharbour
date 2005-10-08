@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.155 2005/10/04 15:52:38 kaddath Exp $
+# $Id: makefile.bc,v 1.156 2005/10/08 18:32:05 ronpinkas Exp $
 #
 
 #
@@ -135,7 +135,7 @@ PCREPOS_DIR  = source\rtl\pcre
 TIP_DIR      = source\tip
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
-#SAMPLES_DIR  = source\clipsamp
+MISC_DIR     = source\misc
 CODEPAGE_DIR = source\codepage
 
 HBRUN_DIR    = utils\hbrun
@@ -2955,29 +2955,29 @@ $(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
 # SAMPLES.LIB dependencies
 #
 
-#$(SAM_OBJ_DIR)\environ.obj : $(SAMPLES_DIR)\environ.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\environ.obj : $(MISC_DIR)\environ.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\date.obj : $(SAMPLES_DIR)\date.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\date.obj : $(MISC_DIR)\date.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\dbf.obj : $(SAMPLES_DIR)\dbf.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\dbf.obj : $(MISC_DIR)\dbf.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\gauge.obj : $(SAMPLES_DIR)\gauge.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\gauge.obj : $(MISC_DIR)\gauge.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\num.obj : $(SAMPLES_DIR)\num.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\num.obj : $(MISC_DIR)\num.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\stack.obj : $(SAMPLES_DIR)\stack.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\stack.obj : $(MISC_DIR)\stack.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\status.obj : $(SAMPLES_DIR)\status.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\status.obj : $(MISC_DIR)\status.c
+   $(CC_CMD)
 
-#$(SAM_OBJ_DIR)\time.obj : $(SAMPLES_DIR)\time.c
-#   $(CC_CMD)
+$(SAM_OBJ_DIR)\time.obj : $(MISC_DIR)\time.c
+   $(CC_CMD)
 
 #
 # HBODBC.lib dependencies
