@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.22 2005/06/01 23:32:20 rodrigo_moreno Exp $
+ * $Id: postgres.c,v 1.23 2005/06/02 01:14:09 druzus Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -768,8 +768,12 @@ HB_FUNC(PQSETERRORVERBOSITY)
 
 HB_FUNC(LO_IMPORT)
 {
+    int ret = 0; 
+    
     if (hb_pcount() == 2)
-        hb_retnl( ( Oid ) lo_import( ( PGconn * ) hb_parptr(1), hb_parcx(2) ) );
+         ret = lo_import( ( PGconn * ) hb_parptr(1), hb_parcx(2) );
+
+    hb_retni(ret);         
 }
 
 HB_FUNC(LO_EXPORT)
