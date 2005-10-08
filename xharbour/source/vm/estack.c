@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.73 2005/10/08 00:38:02 ronpinkas Exp $
+ * $Id: estack.c,v 1.74 2005/10/08 00:51:43 ronpinkas Exp $
  */
 
 /*
@@ -314,26 +314,21 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 
       iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2;
 
-      if( iLocal >= 0 && iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt )
+      if( iLocal >= 0 && iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt && HB_IS_MEMVAR( pItem ) )
       {
-         //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
+         printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
 
-         if( HB_IS_MEMVAR( pItem ) )
+         pDetached = hb_itemUnRefOnce( pItem );
+
+         printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
+
+         if( HB_IS_BYREF( pDetached ) )
          {
-            //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
-
-            pDetached = hb_itemUnRefOnce( pItem );
-
-            //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
-
-            if( HB_IS_BYREF( pDetached ) )
-            {
-               hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
-               //printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
-            }
-
-            hb_itemClear( pItem );
+            hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
+            printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
          }
+
+         hb_itemClear( pItem );
       }
       else if( HB_IS_COMPLEX( pItem ) )
       {

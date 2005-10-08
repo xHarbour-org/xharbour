@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4426 2005/10/07 22:26:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4427 2005/10/08 00:37:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,10 +9,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-10-07 18:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/estack.c
+    * Elminated extranous if() missing an else test in last commit
+
 2005-10-07 17:37 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
-  *  source/vm/estack.c
-     ! Fixed horrible typo in logic of SEVER DETACHED LOCAL,
-       introduced in my last commit to estack.c
+  * source/vm/estack.c
+    ! Fixed horrible typo in logic of SEVER DETACHED LOCAL,
+      introduced in my last commit to estack.c
 
 2005-10-07 15:25 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
