@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4429 2005/10/08 08:54:51 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4430 2005/10/08 09:24:06 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-08 12:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/hsx/hsx.c
+    ! fixed typo in HB_IFDEL() which cause that 1 was always returned
 
 2005-10-08 11:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/vm/classes.c

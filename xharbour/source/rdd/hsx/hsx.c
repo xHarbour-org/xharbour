@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.6 2005/08/23 10:59:04 druzus Exp $
+ * $Id: hsx.c,v 1.7 2005/09/16 22:29:41 druzus Exp $
  */
 
 /*
@@ -957,7 +957,7 @@ static int hb_hsxIfDel( int iHandle, ULONG ulRecord )
          iRetVal = *pRecPtr & 0x80 ? HSX_SUCCESSFALSE : HSX_SUCCESS;
    }
    iRet = hb_hsxLock( iHandle, HSX_READUNLOCK, ulRecord );
-   if ( iRetVal == HSX_SUCCESS )
+   if ( iRet != HSX_SUCCESS )
       iRetVal = iRet;
    return iRetVal;
 }
