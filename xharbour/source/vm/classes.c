@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.169 2005/09/30 23:44:05 druzus Exp $
+ * $Id: classes.c,v 1.170 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -2535,7 +2535,6 @@ HB_FUNC( __CLSMODMSG )
          if( uiAt )
          {
             PMETHOD  pMethod;
-            PHB_FUNC pFunc;
             USHORT   uiScope = ( USHORT ) ( ISNUM( 4 ) ? hb_parni( 4 ) : HB_OO_CLSTP_EXPORTED );
 
             pMethod = pClass->pMethods + uiAt - 1;
