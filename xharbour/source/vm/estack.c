@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.72 2005/10/02 04:31:20 ronpinkas Exp $
+ * $Id: estack.c,v 1.73 2005/10/08 00:38:02 ronpinkas Exp $
  */
 
 /*
@@ -314,7 +314,7 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 
       iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2;
 
-      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt )
+      if( iLocal >= 0 && iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt )
       {
          //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
 
