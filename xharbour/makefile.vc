@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.152 2005/09/23 21:55:03 likewolf Exp $
+# $Id: makefile.vc,v 1.153 2005/10/04 15:52:38 kaddath Exp $
 #
 
 #
@@ -100,7 +100,7 @@ RTL_DIR      =source\rtl
 PCREPOS_DIR  =source\rtl\pcre
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
-SAMPLES_DIR  =source\clipsamp
+MISC_DIR     =source\misc
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
@@ -1092,7 +1092,7 @@ GTWVT_LIB_OBJS = \
 #
 # SAMPLES.LIB rules
 #
-{$(SAMPLES_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(MISC_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 SAMPLES_LIB_OBJS =  \
