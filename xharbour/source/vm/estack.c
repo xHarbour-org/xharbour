@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.71 2005/01/28 14:34:44 jacekp Exp $
+ * $Id: estack.c,v 1.72 2005/10/02 04:31:20 ronpinkas Exp $
  */
 
 /*
@@ -312,23 +312,28 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
    {
       PHB_ITEM pItem = *( HB_VM_STACK.pPos - 1 );
 
-      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase;
+      iLocal = HB_VM_STACK.pPos - HB_VM_STACK.pBase - 2;
 
-      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt && HB_IS_MEMVAR( pItem ) )
+      if( iLocal <= (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt )
       {
          //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
 
-         pDetached = hb_itemUnRefOnce( pItem );
-
-         //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
-
-         if( HB_IS_BYREF( pDetached ) )
+         if( HB_IS_MEMVAR( pItem ) )
          {
-            hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
-            //printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
-         }
+            //printf( "Func: %s Params: %i Local %i Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pItem->type );
 
-         hb_itemClear( pItem );
+            pDetached = hb_itemUnRefOnce( pItem );
+
+            //printf( "   Func: %s Params: %i Local %i UnRef Type: %i\n", (*HB_VM_STACK.pBase)->item.asSymbol.value->szName, (*HB_VM_STACK.pBase)->item.asSymbol.paramcnt, iLocal, pDetached->type );
+
+            if( HB_IS_BYREF( pDetached ) )
+            {
+               hb_itemCopy( pDetached, hb_itemUnRef( pDetached ) );
+               //printf( "Severed Detached Local: %i Type: %i\n", iLocal, pDetached->type );
+            }
+
+            hb_itemClear( pItem );
+         }
       }
       else if( HB_IS_COMPLEX( pItem ) )
       {
