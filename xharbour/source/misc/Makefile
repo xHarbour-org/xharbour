@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005/06/21 20:19:49 druzus Exp $
+# $Id: Makefile,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -10,7 +10,15 @@ C_SOURCES=\
 	mathx.c \
 	strfmt.c \
 	stringsx.c \
-
+	date.c \
+	dbf.c \
+	environ.c \
+	gauge.c \
+	num.c \
+	stack.c \
+	status.c \
+	time.c
+	
 PRG_SOURCES=\
 	fileread.prg \
 	nconvert.prg \

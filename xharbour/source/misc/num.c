@@ -1,5 +1,5 @@
 /*
- * $Id: num.c,v 1.2 2003/12/04 09:26:54 druzus Exp $
+ * $Id: num.c,v 1.3 2004/03/18 03:54:43 ronpinkas Exp $
  */
 
 /*

@@ -1,10 +1,10 @@
 /*
- * $Id: stack.c,v 1.3 2004/03/06 02:32:37 andijahja Exp $
+ * $Id: environ.c,v 1.4 2004/09/16 15:26:48 modalsist Exp $
  */
 
 /*
  * Harbour Project source code:
- * Stack structure
+ * Sample file functions
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
@@ -51,73 +51,73 @@
  */
 
 #include "hbapi.h"
-#include "hbapiitm.h"
+#include "hbapifs.h"
 
-/* StackNew() --> <aStack>
+/* FilePath( <cFile> ) --> cFilePath
+   Extract the full path name from a complete file name
+   * FilePath( "c:\harbour\bin\harbour.exe" ) --> "c:\harbour\bin\"
 */
-HB_FUNC( STACKNEW )
+HB_FUNC( FILEPATH )
 {
-   HB_ITEM Return;
-
-   Return.type = HB_IT_NIL;
-
-   hb_arrayNew( &Return, 0 );   /* Create array */
-
-   hb_itemReturnForward( &Return );
-}
-
-/*  StackPush( <aStack>, <xValue> ) --> <aStack>
-*/
-HB_FUNC( STACKPUSH )
-{
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pAny = hb_param( 2, HB_IT_ANY );
-
-   hb_arrayAdd( pArray, pAny );
-}
-
-/* StackPop( <aStack> ) --> <xValue>
-   Returns NIL if the stack is empty
-*/
-HB_FUNC( STACKPOP )
-{
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   LONG ulLen = hb_arrayLen( pArray );
-   HB_ITEM Last;
-
-   Last.type = HB_IT_NIL;
-
-   if( ulLen )
+   if( ISCHAR( 1 ) )
    {
-      hb_arrayLast( pArray, &Last );
-      hb_arrayDel( pArray, ulLen );
-      --ulLen;
-      hb_arraySize( pArray, HB_MAX( ulLen, 0 ) );
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retc( pFileName->szPath );
+      hb_xfree( pFileName );
    }
-
-   hb_itemReturnForward( &Last );
+   else
+      hb_retc( "" );
 }
 
-/* StackIsEmpty( <aStack> ) --> <lEmpty>
+/* FileBase( <cFile> ) --> cFileBase
 */
-HB_FUNC( STACKISEMPTY )
+HB_FUNC( FILEBASE )
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-
-   hb_retl( hb_arrayLen( pArray ) == 0 );
+   if( ISCHAR( 1 ) )
+   {
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retc( pFileName->szName );
+      hb_xfree( pFileName );
+   }
+   else
+      hb_retc( "" );
 }
 
-/* StackTop( <aStack> ) --> <xValue>
-   Returns the top item
+/* FileExt( <cFile> ) --> cFileExt
 */
-HB_FUNC( STACKTOP )
+
+
+HB_FUNC(FILEEXT )
 {
-   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   HB_ITEM Last;
+   if( ISCHAR( 1 ) )
+   {
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      if( pFileName->szExtension != NULL )
+      {
+         hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
+      }
+      else
+      {
+         hb_retc( "" );
+      }
+      hb_xfree( pFileName );
+   }
+   else
+   {
+      hb_retc( "" );
+   }
+}
 
-   Last.type = HB_IT_NIL;
-
-   hb_arrayLast( pArray, &Last );
-
-   hb_itemReturnForward( &Last );
+/* FileDrive( <cFile> ) --> cFileDrive
+*/
+HB_FUNC( FILEDRIVE )
+{
+   if( ISCHAR( 1 ) )
+   {
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retclen( pFileName->szDrive, 1 ); /* Only the drive letter */
+      hb_xfree( pFileName );
+   }
+   else
+      hb_retc( "" );
 }

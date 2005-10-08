@@ -1,5 +1,5 @@
 /*
- * $Id: gauge.c,v 1.6 2005/06/13 02:02:49 peterrees Exp $
+ * $Id: gauge.c,v 1.7 2005/09/22 01:11:58 druzus Exp $
  */
 
 /*

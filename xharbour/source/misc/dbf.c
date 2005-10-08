@@ -1,10 +1,10 @@
 /*
- * $Id: environ.c,v 1.3 2004/09/16 02:21:28 lculik Exp $
+ * $Id: dbf.c,v 1.2 2004/04/01 09:35:36 andijahja Exp $
  */
 
 /*
  * Harbour Project source code:
- * Sample file functions
+ * DBF() function (compatible with Summer'87)
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
@@ -51,73 +51,11 @@
  */
 
 #include "hbapi.h"
-#include "hbapifs.h"
+#include "hbapiitm.h"
 
-/* FilePath( <cFile> ) --> cFilePath
-   Extract the full path name from a complete file name
-   * FilePath( "c:\harbour\bin\harbour.exe" ) --> "c:\harbour\bin\"
-*/
-HB_FUNC( FILEPATH )
+HB_FUNC_EXTERN( ALIAS );
+
+HB_FUNC( DBF )
 {
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retc( pFileName->szPath );
-      hb_xfree( pFileName );
-   }
-   else
-      hb_retc( "" );
-}
-
-/* FileBase( <cFile> ) --> cFileBase
-*/
-HB_FUNC( FILEBASE )
-{
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retc( pFileName->szName );
-      hb_xfree( pFileName );
-   }
-   else
-      hb_retc( "" );
-}
-
-/* FileExt( <cFile> ) --> cFileExt
-*/
-
-
-HB_FUNC(FILEEXT )
-{
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      if( pFileName->szExtension != NULL )
-      {
-         hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
-      }
-      else
-      {
-         hb_retc( "" );
-      }
-      hb_xfree( pFileName );
-   }
-   else
-   {
-      hb_retc( "" );
-   }
-}
-
-/* FileDrive( <cFile> ) --> cFileDrive
-*/
-HB_FUNC( FILEDRIVE )
-{
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retclen( pFileName->szDrive, 1 ); /* Only the drive letter */
-      hb_xfree( pFileName );
-   }
-   else
-      hb_retc( "" );
+   HB_FUNCNAME( ALIAS )();
 }

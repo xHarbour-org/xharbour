@@ -1,10 +1,10 @@
 /*
- * $Id: dbf.c,v 1.1 2003/03/29 22:40:49 lculik Exp $
+ * $Id: stack.c,v 1.4 2005/09/22 01:11:58 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * DBF() function (compatible with Summer'87)
+ * Stack structure
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
@@ -53,9 +53,71 @@
 #include "hbapi.h"
 #include "hbapiitm.h"
 
-HB_FUNC_EXTERN( ALIAS );
-
-HB_FUNC( DBF )
+/* StackNew() --> <aStack>
+*/
+HB_FUNC( STACKNEW )
 {
-   HB_FUNCNAME( ALIAS )();
+   HB_ITEM Return;
+
+   Return.type = HB_IT_NIL;
+
+   hb_arrayNew( &Return, 0 );   /* Create array */
+
+   hb_itemReturnForward( &Return );
+}
+
+/*  StackPush( <aStack>, <xValue> ) --> <aStack>
+*/
+HB_FUNC( STACKPUSH )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pAny = hb_param( 2, HB_IT_ANY );
+
+   hb_arrayAdd( pArray, pAny );
+}
+
+/* StackPop( <aStack> ) --> <xValue>
+   Returns NIL if the stack is empty
+*/
+HB_FUNC( STACKPOP )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   LONG ulLen = hb_arrayLen( pArray );
+   HB_ITEM Last;
+
+   Last.type = HB_IT_NIL;
+
+   if( ulLen )
+   {
+      hb_arrayLast( pArray, &Last );
+      hb_arrayDel( pArray, ulLen );
+      --ulLen;
+      hb_arraySize( pArray, HB_MAX( ulLen, 0 ) );
+   }
+
+   hb_itemReturnForward( &Last );
+}
+
+/* StackIsEmpty( <aStack> ) --> <lEmpty>
+*/
+HB_FUNC( STACKISEMPTY )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+
+   hb_retl( hb_arrayLen( pArray ) == 0 );
+}
+
+/* StackTop( <aStack> ) --> <xValue>
+   Returns the top item
+*/
+HB_FUNC( STACKTOP )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   HB_ITEM Last;
+
+   Last.type = HB_IT_NIL;
+
+   hb_arrayLast( pArray, &Last );
+
+   hb_itemReturnForward( &Last );
 }

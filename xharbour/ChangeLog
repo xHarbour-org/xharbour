@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4427 2005/10/08 00:37:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4428 2005/10/08 01:41:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-08 10:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * bin/bld.bat
+    * removed samples lib and small fixes
+  * bin/pack_src.bat
+  * bin/pack_src.sh
+    * removed source/clipsamp added source/cgi source/misc
+  - source/clipsamp
+    * removed
+  + source/misc/date.c
+  + source/misc/dbf.c
+  + source/misc/environ.c
+  + source/misc/gauge.c
+  + source/misc/num.c
+  + source/misc/stack.c
+  + source/misc/time.c  
+  * source/misc/Makefile
+    * samples moved into misc lib
+  * source/Makefile 
+    * removed clipsamp
+	 * Non GNU Makefiles need to be updated
 
 2005-10-07 18:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/estack.c

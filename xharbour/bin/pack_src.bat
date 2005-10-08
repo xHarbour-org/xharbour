@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.10 2005/06/09 23:38:37 ronpinkas Exp $
+rem $Id: pack_src.bat,v 1.11 2005/09/15 12:55:34 druzus Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -201,12 +201,6 @@ rem SOURCE\VM
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/*.c
 %hb_archbin% %hb_archopt%  %hb_filename% source/vm/*.prg
 
-rem SOURCE\samples
-%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/Makefile
-%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.c
-%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.ch
-%hb_archbin% %hb_archopt%  %hb_filename% source/clipsamp/*.prg
-
 rem SOURCE\odbc
 %hb_archbin% %hb_archopt%  %hb_filename% source/odbc/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/odbc/*.c
@@ -222,6 +216,18 @@ rem SOURCE\ct
 %hb_archbin% %hb_archopt%  %hb_filename% source/ct/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/ct/*.[ch]
 %hb_archbin% %hb_archopt%  %hb_filename% source/ct/*.prg
+
+rem SOURCE\cgi
+%hb_archbin% %hb_archopt%  %hb_filename% source/cgi/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/cgi/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/cgi/*.ch
+%hb_archbin% %hb_archopt%  %hb_filename% source/cgi/*.prg
+
+rem SOURCE\misc
+%hb_archbin% %hb_archopt%  %hb_filename% source/misc/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/misc/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/misc/*.ch
+%hb_archbin% %hb_archopt%  %hb_filename% source/misc/*.prg
 
 rem TESTS
 REM %hb_archbin% %hb_archopt%  %hb_filename% tests/*.bat

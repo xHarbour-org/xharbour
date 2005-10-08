@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.16 2005/09/15 12:55:34 druzus Exp $
+# $Id: pack_src.sh,v 1.17 2005/09/16 22:29:40 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -222,12 +222,6 @@ $hb_collect source/vm/Makefile
 $hb_collect source/vm/*.[ch]
 $hb_collect source/vm/*.prg
 
-# SOURCE\samples
-$hb_collect source/clipsamp/Makefile
-$hb_collect source/clipsamp/*.c
-$hb_collect source/clipsamp/*.ch
-$hb_collect source/clipsamp/*.prg
-
 # SOURCE\odbc
 $hb_collect source/odbc/Makefile
 $hb_collect source/odbc/*.c
@@ -243,6 +237,17 @@ $hb_collect source/tip/*.prg
 $hb_collect source/ct/Makefile
 $hb_collect source/ct/*.[ch]
 $hb_collect source/ct/*.prg
+
+# SOURCE\cgi
+$hb_collect source/cgi/Makefile
+$hb_collect source/cgi/*.ch
+$hb_collect source/cgi/*.prg
+
+# SOURCE\misc
+$hb_collect source/misc/Makefile
+$hb_collect source/misc/*.c
+$hb_collect source/misc/*.ch
+$hb_collect source/misc/*.prg
 
 # TESTS
 $hb_collect tests/*.bat
