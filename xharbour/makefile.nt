@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.132 2005/09/23 21:55:02 likewolf Exp $
+# $Id: makefile.nt,v 1.133 2005/10/04 15:52:38 kaddath Exp $
 #
 
 #
@@ -121,9 +121,10 @@ PP_DIR       =source\pp
 RDD_DIR      =source\rdd
 RTL_DIR      =source\rtl
 PCREPOS_DIR  =source\rtl\pcre
+CGI_DIR      =source\cgi
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
-SAMPLES_DIR  =source\clipsamp
+MISC_DIR     =source\misc
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
@@ -170,6 +171,7 @@ C_FLAGS      =$(C_FLAGS) -DHB_MULTI_GT
 # Macros to access our library names
 #
 
+CGI_LIB          =$(LIB_DIR)\cgi.lib
 CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
 COMMON_LIB       =$(LIB_DIR)\common.lib
 CT_LIB           =$(LIB_DIR)\ct.lib
@@ -200,7 +202,7 @@ RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
 PCREPOS_LIB      =$(LIB_DIR)\pcrepos.lib
 TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
-SAMPLES_LIB      =$(LIB_DIR)\samples.lib
+MISC_LIB         =$(LIB_DIR)\libmisc.lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
 VM_LIB_OPT_CON   =$(LIB_DIR)\optcon.lib
@@ -295,8 +297,9 @@ LIBLIST = \
    $(DLL_MAIN_LIB) \
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
+   $(CGI_LIB) \
    $(TIP_LIB) \
-   $(SAMPLES_LIB) \
+   $(MISC_LIB) \
    $(ODBC_LIB) \
    $(CT_LIB)
 
@@ -1129,20 +1132,68 @@ GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
 
 #
-# SAMPLES.LIB rules
+# MISC.LIB rules
 #
-{$(SAMPLES_DIR)}.c{$(OBJ_DIR)}.obj::
+{$(MISC_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-SAMPLES_LIB_OBJS =  \
-   $(OBJ_DIR)\date.obj   \
-   $(OBJ_DIR)\dbf.obj    \
+{$(MISC_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+
+{$(MISC_DIR)}.prg{$(OBJ_DIR)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(MISC_LIB)2
+
+MISC_LIB_OBJS = \
+   $(OBJ_DIR)\date.obj \
+   $(OBJ_DIR)\dates2.obj \
+   $(OBJ_DIR)\dbf.obj \
    $(OBJ_DIR)\environ.obj \
-   $(OBJ_DIR)\gauge.obj  \
-   $(OBJ_DIR)\num.obj    \
-   $(OBJ_DIR)\stack.obj   \
+   $(OBJ_DIR)\gauge.obj \
+   $(OBJ_DIR)\hb_f.obj \
+   $(OBJ_DIR)\mathx.obj \
+   $(OBJ_DIR)\num.obj \
+   $(OBJ_DIR)\stack.obj \
+   $(OBJ_DIR)\strfmt.obj \
+   $(OBJ_DIR)\stringsx.obj \
    $(OBJ_DIR)\status.obj \
-   $(OBJ_DIR)\time.obj
+   $(OBJ_DIR)\time.obj \
+   \
+   $(OBJ_DIR)\fileread.obj \
+   $(OBJ_DIR)\nconvert.obj \
+   $(OBJ_DIR)\numtxten.obj \
+   $(OBJ_DIR)\numtxthu.obj \
+   $(OBJ_DIR)\stringp.obj \
+   $(OBJ_DIR)\twirler.obj
+
+
+#
+# CGI.LIB rules
+#
+
+{$(CGI_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(CGI_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+
+{$(CGI_DIR)}.prg{$(OBJ_DIR)}.obj::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(CGI_LIB)2
+
+CGI_LIB_OBJS = \
+    $(OBJ_DIR)\ohtm.obj \
+    $(OBJ_DIR)\htmbrows.obj \
+    $(OBJ_DIR)\oedit.obj \
+    $(OBJ_DIR)\ofile.obj \
+    $(OBJ_DIR)\jlist.obj   \
+    $(OBJ_DIR)\oini.obj \
+    $(OBJ_DIR)\jwindow.obj \
+    $(OBJ_DIR)\ocgi.obj \
+    $(OBJ_DIR)\oframe.obj \
+    $(OBJ_DIR)\counter.obj \
+    $(OBJ_DIR)\hterrsys.obj \
+    $(OBJ_DIR)\htmutil.obj 
 
 #
 # TIP.LIB rules
@@ -1669,6 +1720,9 @@ $(VM_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
 $(VM_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
    lib /out:$@ /SUBSYSTEM:WINDOWS $**
 
+$(CGI_LIB) : $(CGI_LIB_OBJS)
+   lib /out:$@ $**
+
 $(TIP_LIB) : $(TIP_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1698,7 +1752,7 @@ $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
    lib /out:$@ $**
 !endif
 
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+$(MISC_LIB) : $(MISC_LIB_OBJS)
    lib /out:$@ $**
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
@@ -1742,9 +1796,11 @@ $(RPC_LIB)2    : $(RPC_LIB_OBJS)
 $(COMMON_LIB)2 : $(COMMON_LIB_OBJS)
 $(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
 $(MACRO_LIB)2  : $(MACRO_LIB_OBJS)
+$(MISC_LIB)2   : $(MISC_LIB_OBJS)
 $(PP_LIB)2     : $(PP_LIB_OBJS)
 $(CT_LIB)2     : $(CT_LIB_OBJS)
 $(RDD_LIB)2    : $(RDD_LIB_OBJS)
+$(CGI_LIB)2    : $(CGI_LIB_OBJS)
 $(TIP_LIB)2    : $(TIP_LIB_OBJS)
 $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
 $(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)
