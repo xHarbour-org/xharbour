@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.159 2005/10/03 16:59:36 bdj Exp $
+ * $Id: gtwvt.c,v 1.160 2005/10/05 03:47:31 ronpinkas Exp $
  */
 
 /*
@@ -2572,7 +2572,7 @@ static DWORD hb_wvt_gtProcessMessages( void )
 {
    MSG  msg;
    int  iIndex;
-   BOOL bProcessed = FALSE;
+   BOOL bProcessed;
 
    /* See if we have some graphic object to draw */
    if ( hb_gt_gobjects == NULL )

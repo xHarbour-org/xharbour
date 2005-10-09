@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4434 2005/10/09 12:40:00 druzus Exp $
+ * $Id: ChangeLog,v 1.4435 2005/10/09 13:37:55 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-09 22:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+    * remove unnecessary initialization to avoid warning.
 
 2005-10-09 09:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.nt
@@ -47,7 +51,7 @@
 2005-10-08 11:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/vm/classes.c
     * removed unused pFunc
-	 * comment out debug printf
+    * comment out debug printf
 
 2005-10-08 10:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * bin/bld.bat
@@ -68,7 +72,7 @@
     * samples moved into misc lib
   * source/Makefile
     * removed clipsamp
-	 * Non GNU Makefiles need to be updated
+    * Non GNU Makefiles need to be updated
 
 2005-10-07 18:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/estack.c
