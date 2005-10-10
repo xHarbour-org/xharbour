@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.8 2005/09/02 18:29:03 druzus Exp $
+ * $Id: rddads.h,v 1.9 2005/09/25 16:14:21 druzus Exp $
  */
 
 /*
@@ -129,6 +129,14 @@ typedef ADSAREA * ADSAREAP;
                                  else \
                                     pArea->lpdbPendingRel = NULL; \
                               }
+
+typedef struct _ADSCONNECTINFO
+{
+   ADSHANDLE   hConnection;
+   BOOL        fDictionary;
+} ADSCONNECTINFO;
+typedef ADSCONNECTINFO * LPADSCONNECTINFO;
+
 
 ADSAREAP hb_rddGetADSWorkAreaPointer( void );
 

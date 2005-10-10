@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.81 2005/10/04 02:05:32 druzus Exp $
+ * $Id: ads1.c,v 1.82 2005/10/04 20:35:35 druzus Exp $
  */
 
 /*
@@ -92,9 +92,136 @@ extern BOOL adsOEM;
 #endif
 extern BOOL bTestRecLocks;
 extern BOOL bDictionary;
-extern ADSHANDLE adsConnectHandle;
+extern int adsConnectHandle;
 
 static RDDFUNCS adsSuper;
+
+
+/*
+ * -- CONNECTION FUNCTIONS --
+ */
+
+#define HB_ADSCONNECT_NUM     8         /* # of connections to allocate when more are needed */
+
+/* ADS connection information structure */
+
+   /*        Important Structure notes
+    *
+    *   In ADS/ACE, Connection 0 (zero) has special meaning to tell the ace client to
+    *   handle the connection automatically.  It's quite possible to select an explicit
+    *   connection for some tables, then go back to using connection 0 for others.
+    *   Rather than work around this when accessing the array of active connections
+    *   (s_adsConnections), we are keeping the first item in the array empty
+    *   to represent Connection 0 and allow 0 to be passed around as a iHandle
+    *   to select it.  Both its handle and hConnection will always be 0, and
+    *   fDictionary will always be FALSE.
+    *
+    *   Iterations through the array will start at the second item
+    *   (zero-based item number 1), and the count of active
+    *   connections will be the number of non-zero connections established.
+    */
+
+
+LPADSCONNECTINFO s_adsConnections = NULL;
+int s_iConnectTableSize = 0;
+int s_iConnectActive = 0;               /* # of active connections besides connection 0  */
+
+int adsAddConnection( ADSHANDLE hConnection, BOOL fDictionary )
+{
+   LPADSCONNECTINFO pConnect;
+   int iHandle;
+
+   HB_TRACE(HB_TR_DEBUG, ("adsAddConnection(%p,%d)", hConnection, fDictionary));
+
+
+   if( ! s_adsConnections )
+   {
+//   TraceLog( NULL, "init %d \n", iHandle );
+      s_adsConnections = ( LPADSCONNECTINFO ) hb_xgrab(
+                              sizeof( ADSCONNECTINFO ) * HB_ADSCONNECT_NUM );
+      memset( s_adsConnections, '\0',
+              sizeof( ADSCONNECTINFO ) * HB_ADSCONNECT_NUM );
+      s_iConnectTableSize = HB_ADSCONNECT_NUM;
+      s_iConnectActive = 1;
+      iHandle = 1;
+      pConnect = s_adsConnections + iHandle;
+   }
+   else if( s_iConnectActive == s_iConnectTableSize - 1 )
+   {
+      s_adsConnections = ( LPADSCONNECTINFO ) hb_xrealloc( s_adsConnections,
+          sizeof( ADSCONNECTINFO ) * ( s_iConnectTableSize + HB_ADSCONNECT_NUM ) );
+      memset( s_adsConnections + s_iConnectTableSize, '\0',
+              sizeof( ADSCONNECTINFO ) * HB_ADSCONNECT_NUM );
+      iHandle = s_iConnectTableSize;
+      s_iConnectTableSize += HB_ADSCONNECT_NUM;
+      pConnect = s_adsConnections + iHandle;
+   }
+   else
+   {
+      pConnect = s_adsConnections;
+      pConnect++;                       // skip Connection 0
+      for( iHandle = 1; iHandle < s_iConnectTableSize; ++iHandle, ++pConnect )
+      {
+         if( pConnect->hConnection == 0 )
+         {
+            break;                      // use this one
+         }
+      }
+      if( iHandle == s_iConnectTableSize )
+      {
+         hb_errInternal( 9999, "Internal ADS RDD structure corrupted.", "", "" );
+      }
+   }
+   pConnect->hConnection = hConnection;
+   pConnect->fDictionary = fDictionary;
+//   TraceLog( NULL, "set pConnect %p  hConnection  %d  fDictionary  %d \n", pConnect, pConnect->hConnection , fDictionary);
+   ++s_iConnectActive;
+
+   return iHandle;
+}
+
+void adsDelConnection( int iHandle )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsDelConnection(%d)", iHandle));
+
+   if( iHandle > 0 && iHandle < s_iConnectTableSize )
+   {
+      LPADSCONNECTINFO pConnect = s_adsConnections + iHandle;
+      if( pConnect->hConnection )
+      {
+         pConnect->hConnection = 0;
+         pConnect->fDictionary = FALSE;
+         --s_iConnectActive;
+      }
+   }
+}
+
+LPADSCONNECTINFO adsGetConnection( int iHandle )
+{
+   HB_TRACE(HB_TR_DEBUG, ("adsGetConnection(%d)", iHandle));
+
+   if( iHandle > 0 && iHandle < s_iConnectTableSize )
+   {
+      if( ( s_adsConnections + iHandle )->hConnection )
+      {
+         return s_adsConnections + iHandle;
+      }
+   }
+   return NULL;
+}
+
+ADSHANDLE adsConnIndexToHandle( int iHandle )  // often we just need the handle; simplify so caller need not check for null pointer
+{
+   LPADSCONNECTINFO pConnect;
+   HB_TRACE(HB_TR_DEBUG, ("adsConnIndexToHandle(%d)", iHandle));
+
+   pConnect = adsGetConnection( iHandle );
+   if ( pConnect )
+   {
+      return pConnect->hConnection;
+   }
+   return 0;
+}
 
 
 /*
@@ -289,7 +416,7 @@ static ADSHANDLE hb_adsFindBag( ADSAREAP pArea, char * szBagName )
    UNSIGNED16 u16Option, u16Count, u16len, u;
    ADSHANDLE hIndex = 0, hOrder;
    PHB_FNAME pFileName;
-   
+
    pFileName = hb_fsFNameSplit( szBagName );
    if( pFileName->szPath )
       u16Option = ADS_FULLPATHNAME;
@@ -760,7 +887,7 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
      * - both reset pending relations by resolving them
      */
 
-   /* reset our pending relations */   
+   /* reset our pending relations */
    SELF_RESETREL( pArea );
 
    /* force to reset ACE pending relations by resolving them */
@@ -771,7 +898,7 @@ static ERRCODE adsGoTo( ADSAREAP pArea, ULONG ulRecNo )
     * internals
     */
    ulRetVal = AdsGotoRecord( pArea->hTable, ( UNSIGNED32 ) ulRecNo );
-   
+
    if( ulRetVal == AE_INVALID_RECORD_NUMBER )
    {
       /*
@@ -1045,7 +1172,7 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
          /* Save flags */
          fBof = pArea->fBof;
          fEof = pArea->fEof;
-         
+
          AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, 0 );
          /* TODO: is this really necessary, doesn't AdsSkip(0) do that? */
          AdsRefreshRecord( pArea->hTable );
@@ -2014,7 +2141,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
             /* TODO: Doesn't ADS support longer then 64KB memo fields? */
 #if ADS_REQUIRE_VERSION >= 6
-            
+
             if( adsOEM )
             {
                /* TODO: it's a bug - such conversion should be done on
@@ -2218,7 +2345,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
 
-   hConnection = ( ADSHANDLE ) ( pCreateInfo->ulConnection ?
+   hConnection = adsConnIndexToHandle( pCreateInfo->ulConnection ?
                                  pCreateInfo->ulConnection : adsConnectHandle );
 
    pArea->szDataFileName = hb_strdup( ( char * ) pCreateInfo->abName );
@@ -2238,7 +2365,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    pField = pArea->lpFields;
    for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
    {
-      if( pField->uiLen > pArea->maxFieldLen )
+      if( ( ULONG ) pField->uiLen > pArea->maxFieldLen )
       {
         pArea->maxFieldLen = pField->uiLen;
       }
@@ -2371,7 +2498,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
       AdsShowError( (UNSIGNED8 *) "Error" );
       return FAILURE;
    }
-   /* 
+   /*
     * In Clipper CREATE() keeps darabase open on success [druzus]
     */
    pArea->hTable    = hTable;
@@ -2408,7 +2535,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
       case DBI_GETHEADERSIZE:
-         hb_itemPutNL( pItem, pArea->iFileType != ADS_ADT ? 0 : 
+         hb_itemPutNL( pItem, pArea->iFileType != ADS_ADT ? 0 :
                        32 + pArea->uiFieldCount * 32 + 2 );
          break;
 
@@ -2581,9 +2708,9 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
-   ADSHANDLE hTable = 0, hStatement = 0, hConnection;
-   UNSIGNED32  u32RetVal = 0, u32Length, ulLastErr = 0;
-   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN;
+   ADSHANDLE hTable = 0, hStatement = 0, hConnection = 0;
+   UNSIGNED32 u32RetVal, u32Length/*, ulLastErr = 0*/;
+//   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN;
    UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
@@ -2591,11 +2718,19 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    UNSIGNED16 pusBufLen, pusType, pusDecimals;
    DBFIELDINFO dbFieldInfo;
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ], *szSQL;
+   LPADSCONNECTINFO pConnect;
+   int iHandle;
+   BOOL fDictionary = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("adsOpen(%p)", pArea));
 
-   hConnection = ( ADSHANDLE ) ( pOpenInfo->ulConnection ?
-                                 pOpenInfo->ulConnection : adsConnectHandle );
+   iHandle = ( pOpenInfo->ulConnection ? (int) pOpenInfo->ulConnection : adsConnectHandle );
+   pConnect = adsGetConnection( iHandle );
+   if ( pConnect )
+   {
+      hConnection = pConnect->hConnection;
+      fDictionary = pConnect->fDictionary;
+   }
 
    szSQL = ( char * ) pOpenInfo->abName;
    if( pArea->hTable != 0 )
@@ -2643,35 +2778,31 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
    else
    {
-      BOOL fOpen = TRUE;
-      // When opening the file, first try with the correct settings for Advantage Data Dictionary
-      // if bDictionary was set
-      if( bDictionary && pArea->rddID == s_uiRddIdADS )
+      // Use an  Advantage Data Dictionary if fDictionary was set for this connection
+      if( fDictionary /*&& pArea->rddID == s_uiRddIdADS*/ )
       {
-         fOpen = FALSE;
          u32RetVal = AdsOpenTable( hConnection,
                         pOpenInfo->abName, pOpenInfo->atomAlias,
                         ADS_DEFAULT, adsCharType, adsLockType, adsRights,
                         ( pOpenInfo->fShared ? ADS_SHARED : ADS_EXCLUSIVE ) |
                         ( pOpenInfo->fReadonly ? ADS_READONLY : ADS_DEFAULT ),
                         &hTable );
-         if( u32RetVal != AE_SUCCESS )
-         {
-            AdsGetLastError( &ulLastErr, aucError, &usLength );
-            // If the Advantage Data Dictionary open fails with an error indicating that this table is not
-            // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
-            // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
+//         if( u32RetVal != AE_SUCCESS )
+//         {
+//            AdsGetLastError( &ulLastErr, aucError, &usLength );
+//            // If the Advantage Data Dictionary open fails with an error indicating that this table is not
+//            // in the dictionary, OR if we are not using a dictionary at all, try the open with standard settings.
+//            // This change allows the use of a Dictionary, and non Dictionary temp files at the same time.
 
-            /*
-             * I kept this behavior only in "ADS" RDD for backward compatibility
-             * some programs may not want to use it.
-             */
-            if( pArea->rddID == s_uiRddIdADS && ulLastErr == 5132L )
-               fOpen = TRUE;
-         }
+//            /*
+//             * I kept this behavior only in "ADS" RDD for backward compatibility
+//             * some programs may not want to use it.
+//             */
+//            if( pArea->rddID == s_uiRddIdADS && ulLastErr == 5132L )
+//               fOpen = TRUE;
+//         }
       }
-
-      if( fOpen )
+      else
       {
          u32RetVal = AdsOpenTable( hConnection,
                         pOpenInfo->abName, pOpenInfo->atomAlias,
@@ -3132,7 +3263,7 @@ static ERRCODE adsOrderListFocus( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
       if( HB_IS_STRING( pOrderInfo->itmOrder ) )
       {
          /* ADS can't handle a space-padded string--we have to trim it */
-         hb_strncpyUpperTrim( ( char * ) pucTagName, 
+         hb_strncpyUpperTrim( ( char * ) pucTagName,
                               hb_itemGetCPtr( pOrderInfo->itmOrder ),
                               ADS_MAX_TAG_NAME );
          if( !pucTagName[ 0 ] )
@@ -3329,7 +3460,7 @@ static ERRCODE adsOrderDestroy( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    {
       UNSIGNED8 pucTagName[ ADS_MAX_TAG_NAME + 1 ];
 
-      hb_strncpyUpperTrim( ( char * ) pucTagName, 
+      hb_strncpyUpperTrim( ( char * ) pucTagName,
                            hb_itemGetCPtr( pOrderInfo->itmOrder ),
                            ADS_MAX_TAG_NAME );
       u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &hIndex );
@@ -3380,7 +3511,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       {
          UNSIGNED8 pucTagName[ ADS_MAX_TAG_NAME + 1 ];
 
-         hb_strncpyUpperTrim( ( char * ) pucTagName, 
+         hb_strncpyUpperTrim( ( char * ) pucTagName,
                               hb_itemGetCPtr( pOrderInfo->itmOrder ),
                               ADS_MAX_TAG_NAME );
          u32RetVal = AdsGetIndexHandle( pArea->hTable, pucTagName, &hIndex );
@@ -3643,7 +3774,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
             u32 = AdsOpenIndex( pArea->hTable,
                        (UNSIGNED8*) hb_itemGetCPtr( pOrderInfo->atomBagName ),
                        NULL, &u16 );
-            
+
             if( u32 != AE_INDEX_ALREADY_OPEN )
             {
                /* Close the index if we open new one */
@@ -4309,6 +4440,11 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
             iSetListenerHandle = 0;
          }
          AdsApplicationExit();
+         if( s_adsConnections )
+         {
+            s_adsConnections = NULL;
+            s_iConnectTableSize = s_iConnectActive = 0;
+         }
       }
    }
 
@@ -4316,6 +4452,7 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
 
    return SUCCESS;
 }
+
 
 static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_ITEM pItem )
 {
@@ -4329,13 +4466,13 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
 
       case RDDI_CONNECTION:
       {
-         ULONG ulOldConnection = adsConnectHandle;
+         int iOldConnection = adsConnectHandle;
 
          if( hb_itemType( pItem ) & HB_IT_NUMERIC )
          {
-            adsConnectHandle = hb_itemGetNL( pItem );
+            adsConnectHandle = hb_itemGetNI( pItem );
          }
-         hb_itemPutNL( pItem, ulConnect ? ulConnect : ( ULONG ) ulOldConnection );
+         hb_itemPutNI( pItem, ulConnect ? ( int ) ulConnect : iOldConnection );
          break;
       }
       case RDDI_ISDBF:

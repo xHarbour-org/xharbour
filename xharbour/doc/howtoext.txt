@@ -10,7 +10,7 @@
                                  gc@niccolai.ws
 
 
-$Id: howtoext.txt,v 1.8 2004/05/02 21:48:53 druzus Exp $
+$Id: howtoext.txt,v 1.9 2004/05/24 08:23:04 brianhays Exp $
 
 
 STATUS OF THIS DOCUMENT
@@ -226,8 +226,9 @@ consider the data you receive as read only, unless the variable is passed
 by reference. In that latter case, you should receive the data as
 hb_param( num, HB_IT_BYREF ). This will provide you with a read-write instance
 of the variable, that you can alter to the point that you may even destroy it
-and set it to NIL, or put a completely different data type inside it. We'll
-go into further detail in the next session.
+and set it to NIL, or put a completely different data type inside it.
+If the parameter was not passed by reference, a NULL pointer is received.
+We'll go into further detail in the next session.
 
 The type you pass may be a combination of several HB_IT_* values; one most
 common case is the HB_IT_ALL value that combines all the values (except
@@ -524,9 +525,10 @@ had before, or provide different error messages if the variable is
 not passed by reference and if its passed by reference, but its
 not the right type. Finally, you may wish to have the parameter passed
 by reference, but act differently if it had an initial value or if it
-was NIL.
+was NIL.  You can test if parameter <num> was passed by reference with:
+   if( ISBYREF( num ) )
 
-It's then also possible to alter the content of deep variables passed as
+It's also possible to alter the content of deep variables passed as
 normal parameters; deep variables are strings, arrays, hashes, objects
 and in general any item whose PHB_ITEM->item.asXXXX.value field is
 just a pointer to "something else".

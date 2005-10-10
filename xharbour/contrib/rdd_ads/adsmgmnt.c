@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.7 2005/02/23 02:50:31 kaddath Exp $
+ * $Id: adsmgmnt.c,v 1.8 2005/04/15 22:34:17 what32 Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 
 /*
-               Advantage Managment API Examples
+               Advantage Management API Examples
 */
 
 ADSHANDLE hMgmtHandle = 0;

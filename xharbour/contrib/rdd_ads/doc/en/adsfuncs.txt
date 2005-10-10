@@ -1,5 +1,5 @@
 /*
- * $Id: adsfuncs.txt,v 1.11 2005/03/17 22:00:00 ptsarenko Exp $
+ * $Id: adsfuncs.txt,v 1.11 2005/03/17 20:24:03 ptsarenko Exp $
  */
 
 /*
@@ -1241,26 +1241,20 @@
 
 /*  $DOC$
  *  $FUNCNAME$
- *      ADSUSEDICTIONARY()
+ *      ADSUSEDICTIONARY()*
  *  $CATEGORY$
  *      Advantage Database RDD
  *  $ONELINER$
- *      This function specifies that you want to use a datadictionary connection
+ *      This function has been REMOVED.  It specified usage of a datadictionary connection
  *  $SYNTAX$
- *      ADSUSEDICTIONARY(<lUse>) --> lOldStatus
+ *      None
  *  $ARGUMENTS$
- *      <lUseDictionary> Toggle to say if you want to use a database inside a
- *      data dictionary or not.
+ *      None
  *  $RETURNS$
- *      <lOldStatus> -> The old status of this function
+ *      None
  *  $DESCRIPTION$
- *      This function toggles the usage or not of databases (.adt or .dbf files)
- *      that are stored on an Advantage Data Dictionary
+ *      This function no longer exists.  See the Data Dictionary topic
  *  $TESTS$
- *      AdsUseDictionary(.t.)
- *      DbUseAreaD(.t.,,"Custumer Data","custum",.t.,.f.)
- *      Browse()
- *      USE
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
@@ -1268,8 +1262,6 @@
  *  $PLATFORMS$
  *      Windows 32-bit, Linux
  *  $FILES$
- *      Library is RddAds
- *      Header is ads.ch
  *  $SEEALSO$
  *      ADSCONNECT60()
  *  $END$
@@ -1312,7 +1304,7 @@
  *      Library is RddAds
  *      Header is ads.ch
  *  $SEEALSO$
- *      ADSUSEDICTIONARY(),ADSDDADDTABLE()
+ *      ADSDDADDTABLE()
  *  $END$
  */
 

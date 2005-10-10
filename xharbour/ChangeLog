@@ -1,6 +1,6 @@
 
 /*
- * $Id: ChangeLog,v 1.4435 2005/10/09 13:37:55 paultucker Exp $
+ * $Id: ChangeLog,v 1.4436 2005/10/09 15:06:22 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-10 01:15 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    * Widespread changes to all handling of Connections.
+  * contrib/rdd_ads/rddads.h
+    + addedtypedef struct _ADSCONNECTINFO
+  * contrib/rdd_ads/adsmgmnt.c
+    * fixed minor typo
+
+  * doc\howtoext.txt
+    + added how to test if parameters are passed by reference
+  * contrib/rdd_ads/doc/en/adsfuncs.txt
+    * minor tweaks to docs
+
+  *** core connection array handling code supplied by Przemek
+
 
 2005-10-09 22:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/rtl/gtwvt/gtwvt.c
