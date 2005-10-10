@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.14 2005/10/04 15:52:38 kaddath Exp $
+# $Id: makefile.gc,v 1.15 2005/10/06 10:47:50 paultucker Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -40,7 +40,7 @@ PP_DIR       = $(HARBOUR_DIR)/source/pp
 RDD_DIR      = $(HARBOUR_DIR)/source/rdd
 HBSIX_DIR    = $(HARBOUR_DIR)/source/rdd/hbsix
 HSX_DIR      = $(HARBOUR_DIR)/source/rdd/hsx
-SAMPLES_DIR  = $(HARBOUR_DIR)/source/clipsamp
+MISC_DIR  = $(HARBOUR_DIR)/source/misc
 HBTEST_DIR   = $(HARBOUR_DIR)/utils/hbtest
 HBRUN_DIR    = $(HARBOUR_DIR)/utils/hbrun
 HBDOC_DIR    = $(HARBOUR_DIR)/utils/hbdoc
@@ -3713,28 +3713,28 @@ $(SAMPLES_LIB) : \
    $(SAM_OBJ_DIR)/time.o
 	$(AR_CMD)
 
-$(SAM_OBJ_DIR)/environ.o : $(SAMPLES_DIR)/environ.c
+$(SAM_OBJ_DIR)/environ.o : $(MISC_DIR)/environ.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/date.o : $(SAMPLES_DIR)/date.c
+$(SAM_OBJ_DIR)/date.o : $(MISC_DIR)/date.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/dbf.o : $(SAMPLES_DIR)/dbf.c
+$(SAM_OBJ_DIR)/dbf.o : $(MISC_DIR)/dbf.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/gauge.o : $(SAMPLES_DIR)/gauge.c
+$(SAM_OBJ_DIR)/gauge.o : $(MISC_DIR)/gauge.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/num.o : $(SAMPLES_DIR)/num.c
+$(SAM_OBJ_DIR)/num.o : $(MISC_DIR)/num.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/stack.o : $(SAMPLES_DIR)/stack.c
+$(SAM_OBJ_DIR)/stack.o : $(MISC_DIR)/stack.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/status.o : $(SAMPLES_DIR)/status.c
+$(SAM_OBJ_DIR)/status.o : $(MISC_DIR)/status.c
 	$(CC_CMD)
 
-$(SAM_OBJ_DIR)/time.o : $(SAMPLES_DIR)/time.c
+$(SAM_OBJ_DIR)/time.o : $(MISC_DIR)/time.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------

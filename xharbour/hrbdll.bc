@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.101 2005/09/27 17:09:14 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.102 2005/10/04 15:52:38 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -41,7 +41,6 @@ RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
-SAMPLES_DIR       = source\clipsamp
 HBSIX_DIR         = source\rdd\hbsix
 HSX_DIR           = source\rdd\hsx
 XBSCRIPT_DIR      = utils\xbscript

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.43 2005/09/27 05:24:54 paultucker Exp $
+# $Id: hrbdll.wc,v 1.44 2005/10/04 15:52:38 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -35,7 +35,6 @@ RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
-SAMPLES_DIR       = source\clipsamp
 CODEPAGE_DIR      = source\codepage
 XBSCRIPT_DIR      = utils\xbscript
 HBRUN_DIR         = utils\hbrun
