@@ -439,23 +439,13 @@ HB_FUNC( MEMOLINE )
             {
                lSpAdded += uiTabLen - ( (lPos+lSpAdded) % uiTabLen ) - 1;
             }
+            else if ( pszString[ ulStartOffset + lPos ] == '\x8D' || pszString[ ulStartOffset + lPos ] == HB_CHAR_LF )
+            {
+               lSpAdded--;
+            }
             else
             {
                * ( szRet + lPos + lSpAdded ) = * ( pszString + ulStartOffset + lPos );
-            }
-         }
-
-         // Strip chr(141) and chr(10) to be C53B compatible
-
-         for( lPos = lEnd; lPos >= 0; lPos-- )
-         {
-            if( szRet[ lPos ] == '\x8D' || szRet[ lPos ] == HB_CHAR_LF || szRet[ lPos ] == ' ' )
-            {
-               szRet[ lPos ] = ' ';
-            }
-            else
-            {
-               break;
             }
          }
 

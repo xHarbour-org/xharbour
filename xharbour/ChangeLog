@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4438 2005/10/10 15:17:02 modalsist Exp $
+ * $Id: ChangeLog,v 1.4439 2005/10/10 16:24:00 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-10 19:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/txtline.c
+    ! Strip chr(141) and chr(10) from returned line in memoline()
+      as C53B does, instead of removing it from end of line only.
 
 2005-10-10 09:21 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/makefile.dc
@@ -20,7 +25,7 @@
 
 2005-10-10 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/ctnet.c
-    + created 4th parameter <lShowError> in netredir function for Clipper 
+    + created 4th parameter <lShowError> in netredir function for Clipper
       compatibility. The default value of <lShowError> is false.
       The new syntax is:
       NetRedir(cLocalDevice,cNetDevice,[cPassWord],[lShowError]), if
