@@ -1,6 +1,5 @@
-
 /*
- * $Id: ChangeLog,v 1.4436 2005/10/09 15:06:22 bdj Exp $
+ * $Id: ChangeLog,v 1.4438 2005/10/10 00:00:00 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-10 12:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/ctnet.c
+    + created 4th parameter <lShowError> in netredir function for Clipper 
+      compatibility. The default value of <lShowError> is false.
+      The new syntax is:
+      NetRedir(cLocalDevice,cNetDevice,[cPassWord],[lShowError]), if
+      <lShowError> is not passed, the NetRedir will return only .T. or .F.
+      like Clipper's NetRedir, otherwise, will return .T. or .F. and an
+      alert error box if any error occurs.
+      NOTE: the alert error box was added in last netredir changes.
+
+  * doc/en/ct/net.txt
+    * doc updated.
 
 2005-10-10 01:15 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c

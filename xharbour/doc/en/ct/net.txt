@@ -29,11 +29,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, library is ct.
  *  $SEEALSO$
  *      NETREDIR(),NETLOCNAME()
  *  $END$
@@ -69,11 +69,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, library is ct.
  *  $SEEALSO$
  *      NETREDIR(),NETDISK()
  *  $END$
@@ -108,11 +108,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper Tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, library is ct.
  *  $SEEALSO$
  *      NETREDIR(),NETPRINTER()
  *  $END$
@@ -125,7 +125,7 @@
  *  $ONELINER$
  *      Redirects a local device to a server device
  *  $SYNTAX$
- *      NETREDIR(<cLocalDevice>, <cServerDevice>, [<cPassword>]) --> lRedirection
+ *      NETREDIR(<cLocalDevice>, <cServerDevice>, [<cPassword>], [<lShowError>] ) --> lRedirection
  *  $ARGUMENTS$
  *      <cLocalDevice>  Designates the name of the local device (LPTn:,
  *      PRN:, or d:).
@@ -135,6 +135,9 @@
  *
  *      <cPassword>  Can designate a password when it is required by the
  *      server.
+ *
+ *      <lShowError> If true shows an alert box if any error ocurrs. the default
+ *                   is false. This parameter is a xHarbour's extension.
  *  $RETURNS$
  *      NETREDIR() returns .T. when the specified local device has been
  *      redirected to the selected server device.
@@ -173,11 +176,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, lib is ct.
  *  $SEEALSO$
  *      NETCANCEL(),NETLOCNAME(),NETRMTNAME()
  *  $END$
@@ -215,11 +218,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, lib is ct.
  *  $SEEALSO$
  *      NETLOCNAME()
  *  $END$
@@ -256,11 +259,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, library is ct.
  *  $SEEALSO$
  *      NNETWORK()
  *  $END$
@@ -300,11 +303,11 @@
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      This function is xHarbour libct contrib
+ *      This function is Clipper tools compliant.
  *  $PLATFORMS$
  *      WINDOWS
  *  $FILES$
- *      Source is net.c, library is libct.
+ *      Source is ctnet.c, library is ct.
  *  $SEEALSO$
  *      NETWORK()
  *  $END$

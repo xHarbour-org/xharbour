@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.4 2004/09/21 02:40:39 paultucker Exp $
+ * $Id: ctnet.c,v 1.6 2005/10/10 00:00:00 modalsist Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -24,7 +24,7 @@
  * Return true if a current local printer seted by SET PRINTER TO was connected to a
  * network printer.
  *
- * NETREDIR( cLocalDevice, cSharedDevice [, cPassword ] ) -> lSuccess
+ * NETREDIR( cLocalDevice, cSharedDevice, [ cPassword ], [ lShowError] ) -> lSuccess
  * Return true if <cLocalDevice> was connected to <cSharedDevice> with <cPassword>, if any.
  *
  * NETRMTNAME( cLocalDevice ) -> cSharedName
@@ -200,12 +200,13 @@ HB_FUNC ( NETDISK )
 HB_FUNC ( NETREDIR )
 {
    DWORD dwResult;
+   char *cLocalDev  = hb_parcx( 1 );
    char *cSharedRes = hb_parcx( 2 );
    char *cPassword  = hb_parcx( 3 );
-   char *cLocalDev  = hb_parcx( 1 );
+   BOOL  bShowError = ( ISLOG(4) ? hb_parl(4) : FALSE );
    char szCommand[80];
 
-   if ( hb_pcount() == 3 && ISCHAR( 3 ) )
+   if ( hb_pcount() >= 3 && ISCHAR( 3 ) )
    {
       dwResult = WNetAddConnection( cSharedRes, cPassword, cLocalDev ) ;
    }
@@ -220,8 +221,11 @@ HB_FUNC ( NETREDIR )
    }
    else
    {
-      snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )", cLocalDev, cSharedRes, cPassword ); 
-      WNetErrorHandler( dwResult, szCommand ); 
+      if ( bShowError )
+        {
+        snprintf( szCommand, 80, "NETREDIR( \"%s\", \"%s\", \"%s\" )", cLocalDev, cSharedRes, cPassword ); 
+        WNetErrorHandler( dwResult, szCommand );
+        }
       hb_retl( FALSE );
    }
 
