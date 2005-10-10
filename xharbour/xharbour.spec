@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.84 2005/09/22 01:11:58 druzus Exp $
+# $Id: xharbour.spec,v 1.85 2005/09/25 16:14:20 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -569,8 +569,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libhbsix*.a
 %{_libdir}/%{name}/librtl*.a
 %{_libdir}/%{name}/libpcre*.a
-%{_libdir}/%{name}/libsamples.a
 %{_libdir}/%{name}/libvm*.a
+%{_libdir}/%{name}/libcgi*.a
+%{_libdir}/%{name}/libmisc*.a
 
 %files contrib
 %defattr(-,root,root,755)

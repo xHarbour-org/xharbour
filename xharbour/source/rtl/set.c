@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.68 2005/09/27 14:12:49 likewolf Exp $
+ * $Id: set.c,v 1.69 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -157,20 +157,6 @@ static int set_number( PHB_ITEM pItem, int iOldValue )
    else
    {
       return iOldValue;
-   }
-}
-
-static int set_numberul( PHB_ITEM pItem, ULONG ulOldValue )
-{
-   HB_TRACE(HB_TR_DEBUG, ("set_number(%p, %d)", pItem, ulOldValue));
-
-   if( HB_IS_NUMERIC( pItem ) )
-   {
-      return (ULONG)hb_itemGetNL( pItem );
-   }
-   else
-   {
-      return ulOldValue;
    }
 }
 
@@ -1519,13 +1505,15 @@ HB_FUNC( SET )
          hb_retnl( hb_set.HB_SET_BACKGROUNDTICK );
          if( args > 1 )
          {
-            if( set_numberul( pArg2, hb_set.HB_SET_BACKGROUNDTICK ) < 0 )
+            int iNewVal = set_number( pArg2, hb_set.HB_SET_BACKGROUNDTICK );
+
+            if( iNewVal < 0 )
             {
                hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
             }
             else
             {
-               hb_set.HB_SET_BACKGROUNDTICK = set_numberul( pArg2, hb_set.HB_SET_BACKGROUNDTICK );
+               hb_set.HB_SET_BACKGROUNDTICK = iNewVal == 0 ? 1000 : iNewVal;
             }
          }
          break;
@@ -1679,6 +1667,7 @@ void hb_setInitialize( void )
 
    hb_set.HB_SET_DBFLOCKSCHEME = 0;
    hb_set.HB_SET_BACKGROUNDTASKS = FALSE;
+   hb_set.HB_SET_BACKGROUNDTICK = 1000;
    hb_set.HB_SET_TRIMFILENAME = FALSE;
 
    hb_set.HB_SET_EOL = NULL;

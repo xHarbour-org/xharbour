@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.500 2005/10/07 01:09:14 druzus Exp $
+ * $Id: hvm.c,v 1.501 2005/10/07 01:43:31 druzus Exp $
  */
 
 /*
@@ -392,7 +392,7 @@ ULONG _System OS2TermHandler(PEXCEPTIONREPORTRECORD       p1,
 
 #ifndef HB_THREAD_SUPPORT
   /* background function counter */
-  static ULONG s_ulBackground = 0;
+  static int s_iBackground = 0;
 #endif
 
 void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo )
@@ -1111,23 +1111,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
 #endif
 
+#if ! defined( HB_THREAD_SUPPORT )
       if( hb_set.HB_SET_BACKGROUNDTASKS )
       {
-#ifndef HB_THREAD_SUPPORT
-         if( ++s_ulBackground > hb_set.HB_SET_BACKGROUNDTICK ?
-                                hb_set.HB_SET_BACKGROUNDTICK : 1000 )
+         if( ++s_iBackground > hb_set.HB_SET_BACKGROUNDTICK )
          {
             hb_backgroundRun();
-            s_ulBackground = 0;
+            s_iBackground = 0;
          }
-#else
-         // Run background functions every unlock period
-         if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
-         {
-            hb_backgroundRun();
-         }
-#endif
       }
+#endif
 
       switch( curPCode )
       {
@@ -3857,16 +3850,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
 
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
-      #if defined( HB_THREAD_SUPPORT )
-         if( HB_VM_STACK.iPcodeCount == HB_VM_UNLOCK_PERIOD )
+#if defined( HB_THREAD_SUPPORT )
+      if( ! --HB_VM_STACK.iPcodeCount )
+      {
+         HB_VM_STACK.iPcodeCount = HB_VM_UNLOCK_PERIOD;
+         HB_STACK_UNLOCK;
+         HB_TEST_CANCEL;
+         HB_STACK_LOCK;
+
+         /* Run background functions every unlock period */
+         if( hb_set.HB_SET_BACKGROUNDTASKS )
          {
-            HB_VM_STACK.iPcodeCount = 0;
-            HB_STACK_UNLOCK;
-            HB_TEST_CANCEL;
-            HB_STACK_LOCK;
+            hb_backgroundRun();
          }
-         HB_VM_STACK.iPcodeCount++;
-      #endif
+      }
+#endif
 
    }
    while( curPCode != HB_P_ENDPROC );

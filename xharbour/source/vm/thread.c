@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.193 2005/09/22 01:12:00 druzus Exp $
+* $Id: thread.c,v 1.194 2005/09/30 23:44:06 druzus Exp $
 */
 
 /*
@@ -321,7 +321,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->pSyncId = NULL;
    tc->Return.type = HB_IT_NIL;
    tc->bInUse = FALSE;
-   tc->iPcodeCount = 0;
+   tc->iPcodeCount = HB_VM_UNLOCK_PERIOD;
 
    tc->errorHandler = NULL;
    tc->errorBlock = hb_itemNew( NULL );

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.17 2005/09/16 22:29:40 druzus Exp $
+# $Id: pack_src.sh,v 1.18 2005/10/08 08:54:54 lf_sfnet Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -242,6 +242,8 @@ $hb_collect source/ct/*.prg
 $hb_collect source/cgi/Makefile
 $hb_collect source/cgi/*.ch
 $hb_collect source/cgi/*.prg
+$hb_collect source/cgi/include/Makefile
+$hb_collect source/cgi/include/*.ch
 
 # SOURCE\misc
 $hb_collect source/misc/Makefile
@@ -335,18 +337,18 @@ $hb_collect contrib/libnf/include/*.h
 $hb_collect contrib/libnf/include/*.ch
 
 # CONTRIB\LIBMISC
-$hb_collect contrib/libmisc/Makefile
-$hb_collect contrib/libmisc/*.[ch]
-$hb_collect contrib/libmisc/*.prg
-$hb_collect contrib/libmisc/*.ch
+#$hb_collect contrib/libmisc/Makefile
+#$hb_collect contrib/libmisc/*.[ch]
+#$hb_collect contrib/libmisc/*.prg
+#$hb_collect contrib/libmisc/*.ch
 
 # CONTRIB\HTMLLIB
-$hb_collect contrib/htmllib/Makefile
-$hb_collect contrib/htmllib/*.prg
-$hb_collect contrib/htmllib/example/*.*
-$hb_collect contrib/htmllib/help/*.*
-$hb_collect contrib/htmllib/include/Makefile
-$hb_collect contrib/htmllib/include/*.ch
+#$hb_collect contrib/htmllib/Makefile
+#$hb_collect contrib/htmllib/*.prg
+#$hb_collect contrib/htmllib/example/*.*
+#$hb_collect contrib/htmllib/help/*.*
+#$hb_collect contrib/htmllib/include/Makefile
+#$hb_collect contrib/htmllib/include/*.ch
 
 }
 

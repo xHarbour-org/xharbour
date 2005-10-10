@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.32 2005/03/06 23:43:20 andijahja Exp $
+ * $Id: hbset.h,v 1.33 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -220,7 +220,7 @@ typedef struct
    FHANDLE hb_set_winhan;
    char *  hb_set_printerjob;
    int     HB_SET_GTMODE;
-   ULONG   HB_SET_BACKGROUNDTICK;
+   int     HB_SET_BACKGROUNDTICK;
    BOOL    HB_SET_HARDCOMMIT;
    BOOL    HB_SET_FORCEOPT;
    PHB_ITEM HB_SET_EOL;

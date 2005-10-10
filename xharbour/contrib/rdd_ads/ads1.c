@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.82 2005/10/04 20:35:35 druzus Exp $
+ * $Id: ads1.c,v 1.83 2005/10/10 08:19:05 brianhays Exp $
  */
 
 /*
@@ -2346,7 +2346,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
 
    hConnection = adsConnIndexToHandle( pCreateInfo->ulConnection ?
-                                 pCreateInfo->ulConnection : adsConnectHandle );
+                                 ( int ) pCreateInfo->ulConnection : adsConnectHandle );
 
    pArea->szDataFileName = hb_strdup( ( char * ) pCreateInfo->abName );
 
@@ -2709,9 +2709,7 @@ static ERRCODE adsNewArea( ADSAREAP pArea )
 static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
 {
    ADSHANDLE hTable = 0, hStatement = 0, hConnection = 0;
-   UNSIGNED32 u32RetVal, u32Length/*, ulLastErr = 0*/;
-//   UNSIGNED16 usLength = ADS_MAX_ERROR_LEN;
-   UNSIGNED8  aucError[ ADS_MAX_ERROR_LEN + 1 ];
+   UNSIGNED32 u32RetVal, u32Length;
    USHORT uiFields = 0, uiCount;
    UNSIGNED8 szName[ ADS_MAX_FIELD_NAME + 1 ];
    /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
