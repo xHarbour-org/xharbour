@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4440 2005/10/10 22:35:50 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4441 2005/10/10 22:45:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-11 09:54 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
+  * contrib/wvtgui/wvtutils.c
+    ! Fixed a bug in the function Wvt_ChooseColor.
+      crCustClr[ i ] = ( ISARRAY( 3 ) ? ( COLORREF ) hb_parnl( 3, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+      ==>
+      crCustClr[ i ] = ( ISARRAY( 2 ) ? ( COLORREF ) hb_parnl( 2, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+  * contrib/gtwvw/gtwvw.c
+    ! Fixed the same bug in the function Wvw_ChooseColor.
 
 2005-10-11 00:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec

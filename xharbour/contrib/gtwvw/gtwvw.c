@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.22 2005/09/13 16:15:20 bdj Exp $
+ * $Id: gtwvw.c,v 1.23 2005/10/06 02:20:19 bdj Exp $
  */
 
 /*
@@ -11914,7 +11914,7 @@ HB_FUNC( WVW_CHOOSECOLOR )
    for( i = 0 ; i < 16 ; i++ )
    {
 
-     crCustClr[ i ] = ( ISARRAY( 3 ) ? (COLORREF) hb_parnl( 3, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+     crCustClr[ i ] = ( ISARRAY( 2 ) ? (COLORREF) hb_parnl( 2, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
    }
 
    cc.lStructSize    = sizeof( CHOOSECOLOR ) ;

@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.6 2005/07/22 17:23:21 lculik Exp $
+ * $Id: wvtutils.c,v 1.7 2005/10/05 16:11:48 bdj Exp $
  */
 
 /*
@@ -204,7 +204,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
 
    for( i = 0 ; i < 16 ; i++ )
    {
-     crCustClr[ i ] = ( ISARRAY( 3 ) ? ( COLORREF ) hb_parnl( 3, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+     crCustClr[ i ] = ( ISARRAY( 2 ) ? ( COLORREF ) hb_parnl( 2, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
    }
 
    cc.lStructSize   = sizeof( CHOOSECOLOR ) ;
