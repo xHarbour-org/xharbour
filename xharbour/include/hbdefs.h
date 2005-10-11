@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.75 2005/08/23 10:59:02 druzus Exp $
+ * $Id: hbdefs.h,v 1.76 2005/10/04 20:06:09 druzus Exp $
  */
 
 /*
@@ -71,7 +71,15 @@
 #define HB_LONG_LONG_OFF
 */
 
-#if defined( HB_OS_WIN_32 )
+#if defined( HB_OS_WIN_32 ) || defined( _WIN64 )
+   #if defined( _WIN64 )
+      #undef HB_LONG_LONG_OFF
+      #define HB_STRICT_ALIGNMENT
+      #if !defined( HB_OS_WIN_32 )
+         #define HB_OS_WIN_32
+      #endif
+   #endif
+
    #if !defined( HB_WIN32_IO_OFF )
       #define HB_WIN32_IO
    #endif
@@ -182,10 +190,6 @@
 
 #ifndef HB_LONG_LONG_OFF
 
-   #if defined(__DMC__)
-      #define __LONGLONG
-   #endif
-
    #if ! defined(_WINNT_H)
       #if !defined(LONGLONG)
          #if defined(__GNUC__)
@@ -244,7 +248,9 @@
  * below are some hacks which don't have to be true on some machines
  * please update it if necessary
  */
-#if ULONG_MAX > UINT_MAX && UINT_MAX > USHRT_MAX
+#if defined( _WIN64 )
+#  define HB_ARCH_64BIT
+#elif ULONG_MAX > UINT_MAX && UINT_MAX > USHRT_MAX
 #  define HB_ARCH_64BIT
 #elif ULONG_MAX == UINT_MAX && UINT_MAX > USHRT_MAX
 #  define HB_ARCH_32BIT
@@ -304,7 +310,7 @@
 #  endif
 #endif
 
-#if defined( HB_ARCH_64BIT )
+#if defined( HB_ARCH_64BIT ) && !defined( _WIN64 )
 #   if !defined( UINT64 )
       typedef ULONG        UINT64;
 #   endif
@@ -426,14 +432,18 @@
 typedef unsigned long HB_COUNTER;
 
 /* type for memory pointer diff */
-typedef long HB_PTRDIFF;
+#if defined( _WIN64 )
+   typedef LONGLONG HB_PTRDIFF;
+#else
+   typedef long HB_PTRDIFF;
+#endif
 
 #ifdef HB_LONG_LONG_OFF
-    typedef LONG HB_FOFFSET;
-    /* we can add hack with double as work around what should
-       effectively give 52bit file size limit */
+   typedef LONG HB_FOFFSET;
+   /* we can add hack with double as work around what should
+      effectively give 52bit file size limit */
 #else
-    typedef LONGLONG HB_FOFFSET;
+   typedef LONGLONG HB_FOFFSET;
 #endif
 
 /* maximum length of double number in decimal representation:
