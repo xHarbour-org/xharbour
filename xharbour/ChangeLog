@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4442 2005/10/11 12:55:06 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4443 2005/10/11 13:40:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-12 16:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    + Added implicit resolution of default ole method/property
+    + Added explicit support for default ole method/property
+      by means of pseudo property :OleValue
+    * Minor revision to resolve possible leaks.
+
+  * tests/testole.prg
+    + Added sample usage of implicit and explicit usage of default method.
+    + Added sample usage of array notation with ole collections.
 
 2005-10-11 15:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h

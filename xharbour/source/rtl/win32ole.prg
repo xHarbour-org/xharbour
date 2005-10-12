@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.84 2005/06/01 17:01:09 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.85 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -125,6 +125,10 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static BOOL *s_OleRefFlags = NULL;
 
+   static DISPPARAMS s_EmptyDispParams;
+
+   static VARIANTARG RetVal, OleVal;
+
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
@@ -139,6 +143,14 @@ INIT PROC HB_OLEINIT
       s_pSym_New         = hb_dynsymFindName( "NEW" );
       s_pSym_hObj        = hb_dynsymFindName( "HOBJ" );
       s_pSym_cClassName  = hb_dynsymFindName( "CCLASSNAME" );
+
+      s_EmptyDispParams.rgvarg            = NULL;
+      s_EmptyDispParams.cArgs             = 0;
+      s_EmptyDispParams.rgdispidNamedArgs = 0;
+      s_EmptyDispParams.cNamedArgs        = 0;
+
+      VariantInit( &RetVal );
+      VariantInit( &OleVal );
    }
 return
 
@@ -330,9 +342,6 @@ RETURN xRet
 #pragma BEGINDUMP
 
   // -----------------------------------------------------------------------
-
-  static VARIANTARG RetVal;
-
   static EXCEPINFO excep;
 
   static PHB_ITEM *aPrgParams = NULL;
@@ -340,6 +349,7 @@ RETURN xRet
   static BSTR bstrMessage;
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
+  static DISPID ValueID = DISPID_VALUE;
 
   //---------------------------------------------------------------------------//
 
@@ -473,7 +483,7 @@ RETURN xRet
            switch( uParam->type )
            {
               case HB_IT_NIL:
-                pArgs[ n ].n1.n2.vt   = VT_EMPTY;
+                //pArgs[ n ].n1.n2.vt   = VT_EMPTY;
                 break;
 
               case HB_IT_STRING:
@@ -591,7 +601,7 @@ RETURN xRet
 
               case HB_IT_ARRAY:
               {
-                 pArgs[ n ].n1.n2.vt = VT_EMPTY;
+                 //pArgs[ n ].n1.n2.vt = VT_EMPTY;
 
                  if( ! HB_IS_OBJECT( uParam ) )
                  {
@@ -894,11 +904,11 @@ RETURN xRet
           break;
 
         case VT_DECIMAL: // Decimal
-          {
+        {
           double tmp = 0;
           VarR8FromDec( &RetVal.n1.decVal, &tmp );
           hb_retnd( tmp );
-          }
+        }
           break;
 
         case VT_DATE:
@@ -974,12 +984,21 @@ RETURN xRet
 
      if( RetVal.n1.n2.vt == VT_DISPATCH && RetVal.n1.n2.n3.pdispVal )
      {
-        //printf( "Dispatch: %ld\n", ( LONG ) RetVal.n1.n2.n3.pdispVal );
+        //printf( "Returned Dispatch: %ld\n", ( LONG ) RetVal.n1.n2.n3.pdispVal );
+
+        /*
+           Intentionally using Init instead of Clear, because we keep refernce to
+           this dispatch in newly created Ole object, as per above.
+         */
+        VariantInit( &RetVal );
      }
      else
      {
         VariantClear( &RetVal );
      }
+
+     // Temp copy of default value, if used, no longer needed.
+     VariantClear( &OleVal );
   }
 
   //---------------------------------------------------------------------------//
@@ -1290,7 +1309,7 @@ RETURN xRet
 
   //---------------------------------------------------------------------------//
 
-  static void OleSetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
+  static HRESULT OleSetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      // 1 Based!!!
      if( ( s_OleRefFlags && s_OleRefFlags[ 1 ] ) || hb_param( 1, HB_IT_ARRAY ) )
@@ -1309,7 +1328,7 @@ RETURN xRet
 
        if( s_nOleError == S_OK )
        {
-          return;
+          return S_OK;
        }
      }
 
@@ -1324,11 +1343,13 @@ RETURN xRet
                                           NULL,    // No return value
                                           &excep,
                                           &uArgErr );
+
+     return s_nOleError;
   }
 
   //---------------------------------------------------------------------------//
 
-  static void OleInvoke( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
+  static HRESULT OleInvoke( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
@@ -1341,11 +1362,13 @@ RETURN xRet
                                           &RetVal,
                                           &excep,
                                           &uArgErr );
+
+     return s_nOleError;
   }
 
   //---------------------------------------------------------------------------//
 
-  static void OleGetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
+  static HRESULT OleGetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
@@ -1359,6 +1382,34 @@ RETURN xRet
                                           &excep,
                                           &uArgErr );
 
+     return s_nOleError;
+  }
+
+  //---------------------------------------------------------------------------//
+  static HRESULT OleGetValue( IDispatch *pDisp )
+  {
+     VariantClear( &RetVal );
+
+     if( OleInvoke( pDisp, ValueID, &s_EmptyDispParams ) == S_OK && RetVal.n1.n2.vt == VT_DISPATCH )
+     {
+        VariantCopy( &OleVal, &RetVal );
+        VariantClear( &RetVal );
+
+        return S_OK;
+     }
+     else
+     {
+        // Try to apply the requested message to the DEFAULT Property of the object if any.
+        if( OleGetProperty( pDisp, ValueID, &s_EmptyDispParams ) == S_OK && RetVal.n1.n2.vt == VT_DISPATCH )
+        {
+           VariantCopy( &OleVal, &RetVal );
+           VariantClear( &RetVal );
+
+           return S_OK;
+        }
+     }
+
+     return E_FAIL;
   }
 
   //---------------------------------------------------------------------------//
@@ -1377,7 +1428,14 @@ RETURN xRet
 
      pDisp = ( IDispatch * ) hb_parnl( -1 );
 
-     if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
+    OleGetID :
+
+     if( strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "OLEVALUE" ) == 0 || strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "_OLEVALUE" ) == 0 )
+     {
+        DispID = ValueID;
+        s_nOleError = S_OK;
+     }
+     else if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
         bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
@@ -1407,7 +1465,7 @@ RETURN xRet
      {
         GetParams( &DispParams );
 
-        VariantInit( &RetVal );
+        VariantClear( &RetVal );
 
         if( bSetFirst )
         {
@@ -1506,6 +1564,13 @@ RETURN xRet
      {
         PHB_ITEM pReturn;
         char *sDescription;
+
+        // Try to apply the requested message to the DEFAULT Method of the object if any.
+        if( OleGetValue( pDisp ) == S_OK )
+        {
+           pDisp = OleVal.n1.n2.n3.pdispVal;
+           goto OleGetID;
+        }
 
         //TraceLog( NULL, "Invoke Failed!\n" );
 

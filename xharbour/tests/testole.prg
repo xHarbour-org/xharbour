@@ -2,6 +2,9 @@
 
 #define CRLF Chr( 13 ) + Chr( 10 )
 
+// EXplicit usage of OLE DEFAULT Method when syntax implies it!!!
+#xtranslate :<!Method!>( <args,...> ) :\= => :<Method>( <args> ):OleValue :=
+
 PROCEDURE MAIN()
 
    LOCAL nOption
@@ -37,8 +40,14 @@ STATIC PROCEDURE Excel()
    oAS:Cells:Font:Name := "Arial"
    oAS:Cells:Font:Size := 12
 
-   oAS:Cells( 3, 1 ):Value := "Text:"
-   oAS:Cells( 3, 2 ):Value := "Here is some text"
+   // Explicit use of DEFAULT method by means of #xtranslate above!!!
+   oAS:Cells( 3, 1 ) := "Explict DEFAULT Method Text:"
+
+
+   // Array notation seem to have REVERSED indexs for the Cells Collections!!!
+   // Implicitly using DEFAULT Method
+   oAS:Cells[ 2, 3 ] := "Implicit DEFAULT Method using *reversed* array index notation!"
+
    oAS:Cells( 4, 1 ):Value := "Numeric:"
    oAS:Cells( 4, 2 ):NumberFormat := "#.##0,00"
    oAS:Cells( 4, 2 ):Value := 1234.50
