@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.6 2003/05/16 19:52:11 druzus Exp $
+ * $Id: mousesln.c,v 1.7 2004/05/25 20:27:23 druzus Exp $
  */
 
 /*
@@ -231,15 +231,18 @@ int HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ))
                 CHECK_BUTTON_DOWN(INKEY_LDOWN,GPM_B_LEFT,K_LBUTTONDOWN,K_LDBLCLK)
                 else
                 CHECK_BUTTON_DOWN(INKEY_RDOWN,GPM_B_RIGHT,K_RBUTTONDOWN,K_RDBLCLK)
+                else
+                CHECK_BUTTON_DOWN(INKEY_MMIDDLE,GPM_B_MIDDLE,K_MBUTTONDOWN,K_MDBLCLK)
             }
 
             else if( Evt.type & GPM_UP )
             {
                 if( ( EventMask & INKEY_LUP ) && ( Evt.buttons & GPM_B_LEFT ) )
                     return( K_LBUTTONUP );
-                else
-                if( ( EventMask & INKEY_RUP ) && ( Evt.buttons & GPM_B_RIGHT ) )
+                else if( ( EventMask & INKEY_RUP ) && ( Evt.buttons & GPM_B_RIGHT ) )
                     return( K_RBUTTONUP );
+                else if( ( EventMask & INKEY_MMIDDLE ) && ( Evt.buttons & GPM_B_MIDDLE ) )
+                    return( K_MBUTTONUP );
             }
         }
     }

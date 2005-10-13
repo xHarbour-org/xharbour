@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.55 2005/03/31 03:59:19 druzus Exp $
+ * $Id: gtcrs.c,v 1.56 2005/08/12 02:44:26 druzus Exp $
  */
 
 /*
@@ -778,7 +778,7 @@ static int wait_key( InOutBase * ioBase, int milisec )
          ioBase->cTermMouseBuf[3 - ioBase->nTermMouseChars] = ch;
          free_bufch( ioBase, i );
          i = 0;
-         if ( --( ioBase->nTermMouseChars ) == 0 )
+         if ( --ioBase->nTermMouseChars == 0 )
             set_tmevt( ioBase->cTermMouseBuf, &ioBase->mLastEvt );
          goto again;
       }
@@ -1049,7 +1049,7 @@ static int getMouseKey( mouseEvent * mEvt )
             ( ( mEvt->buttonstate & M_BUTTON_MDBLCK ) ? K_MDBLCLK :
               K_MBUTTONDOWN ) : K_MBUTTONUP;
          mEvt->lbuttons ^= M_BUTTON_MIDDLE;
-         mEvt->buttonstate &= ~M_BUTTON_MIDDLE;
+         mEvt->buttonstate &= ~M_BUTTON_MDBLCK;
       }
       else
          mEvt->lbuttons = mEvt->buttonstate;
@@ -1067,22 +1067,22 @@ static void chk_mevtdblck( mouseEvent * mEvt )
 
       TIMEVAL_GET( tv );
 
-      if ( mEvt->buttonstate & M_BUTTON_LEFT &&
-           ~( mEvt->lbuttons & M_BUTTON_LEFT ) )
+      if ( ( mEvt->buttonstate & M_BUTTON_LEFT ) &&
+          ~( mEvt->lbuttons & M_BUTTON_LEFT ) )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BL_time ) )
             mEvt->buttonstate |= M_BUTTON_LDBLCK;
          TIMEVAL_ADD( mEvt->BL_time, tv, mEvt->click_delay );
       }
-      if ( mEvt->buttonstate & M_BUTTON_MIDDLE &&
-           ~( mEvt->lbuttons & M_BUTTON_MIDDLE ) )
+      if ( ( mEvt->buttonstate & M_BUTTON_MIDDLE ) &&
+          ~( mEvt->lbuttons & M_BUTTON_MIDDLE ) )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BM_time ) )
             mEvt->buttonstate |= M_BUTTON_MDBLCK;
          TIMEVAL_ADD( mEvt->BM_time, tv, mEvt->click_delay );
       }
-      if ( mEvt->buttonstate & M_BUTTON_RIGHT &&
-           ~( mEvt->lbuttons & M_BUTTON_RIGHT ) )
+      if ( ( mEvt->buttonstate & M_BUTTON_RIGHT ) &&
+          ~( mEvt->lbuttons & M_BUTTON_RIGHT ) )
       {
          if ( TIMEVAL_LESS( tv, mEvt->BR_time ) )
             mEvt->buttonstate |= M_BUTTON_RDBLCK;

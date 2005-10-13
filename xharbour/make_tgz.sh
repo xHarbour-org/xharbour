@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.47 2005/04/07 23:18:36 likewolf Exp $
+# $Id: make_tgz.sh,v 1.48 2005/09/25 16:14:20 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -131,10 +131,10 @@ esac
 
 # Select the contribs to build
 case "$HB_ARCHITECTURE" in
-    linux)  hb_contrib="htmllib libmisc libnf rdd_ads" ;;
-    bsd)    hb_contrib="htmllib libmisc libnf" ;;
-    darwin) hb_contrib="htmllib libmisc libnf" ;;
-    dos)    hb_contrib="htmllib libmisc libnf" ;;
+    linux)  hb_contrib="libnf rdd_ads" ;;
+    bsd)    hb_contrib="libnf" ;;
+    darwin) hb_contrib="libnf" ;;
+    dos)    hb_contrib="libnf" ;;
 esac
 
 # Set other platform-specific build options
