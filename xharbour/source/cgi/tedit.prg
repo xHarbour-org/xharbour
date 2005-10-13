@@ -1,5 +1,5 @@
 /*
- * $Id: oedit.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: tedit.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -45,7 +45,7 @@
 
 #include "hbclass.ch"
 #include "common.ch"
-#include "forms.ch"
+#include "htmlform.ch"
 #include "html.ch"
 
 #define _OPTION_TEXT     1
