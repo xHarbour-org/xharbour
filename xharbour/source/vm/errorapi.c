@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.63 2005/08/01 22:21:56 druzus Exp $
+ * $Id: errorapi.c,v 1.64 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -1172,29 +1172,6 @@ HB_FUNC( __ERRRT_SBASE )
                          hb_parcx( 4 ),
                          ( USHORT ) hb_parni( 5 ),
                          hb_param( 6, HB_IT_ANY ) );
-}
-
-HB_FUNC( THROW )
-{
-   PHB_ITEM pError = hb_param( 1, HB_IT_ANY ), pResult;
-
-   if( HB_IS_OBJECT( pError ) )
-   {
-      pError = hb_itemNew( pError );
-
-      pResult = hb_errLaunchSubst( pError );
-
-      hb_itemRelease( pError );
-
-      if( pResult )
-      {
-         hb_itemRelease( hb_itemReturnForward( pResult ) );
-      }
-   }
-   else
-   {
-      hb_errRT_BASE( EG_ARG, 9101, NULL, "THROW", 1, hb_paramError( 1 ) );
-   }
 }
 
 USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )

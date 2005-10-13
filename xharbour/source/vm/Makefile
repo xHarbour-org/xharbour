@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2004/11/23 18:22:44 mauriliolongo Exp $
+# $Id: Makefile,v 1.21 2005/09/23 21:55:06 likewolf Exp $
 #
 
 ROOT = ../../
@@ -56,6 +56,7 @@ C_SOURCES=\
 	pvalue.c     \
 	runner.c     \
 	thread.c     \
+	throw.c      \
 
 PRG_SOURCES=\
 	harbinit.prg \
