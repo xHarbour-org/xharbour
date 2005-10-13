@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.11 2004/08/31 14:53:34 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.12 2005/10/13 08:05:24 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-10-13 16:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+
+2005-10-13 12:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * tp_/Makefile
+     * added linux.c module to library
+
+2005-10-13 10:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    + tp_/linux.c
      + Added linux low level serial module, tested with a
        a serial printer and a connection to a cash register.
