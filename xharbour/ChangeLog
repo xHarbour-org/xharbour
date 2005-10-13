@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4447 2005/10/13 12:49:35 druzus Exp $
+ * $Id: ChangeLog,v 1.4448 2005/10/13 22:22:57 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-09-27 23:10 UTC-0100 Ath <Ath1 at sourceforge.net>
+  * xharbour/hrbdll.bc
+    * add throw.obj/.c to borland dll makefile
+    
 2005-10-14 00:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/Makefile
   * xharbour/source/vm/errorapi.c
