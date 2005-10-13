@@ -1,12 +1,12 @@
 /*
- * $Id: strfmt.c,v 1.2 2004/03/18 03:45:01 ronpinkas Exp $
+ * $Id: environ.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
- * STRFORMAT() function
+ * Sample file functions
  *
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -51,112 +51,73 @@
  */
 
 #include "hbapi.h"
+#include "hbapifs.h"
 
-#define HB_STRFORMAT_PARNUM_MAX_ 9
-
-HB_FUNC( STRFORMAT )
+/* FilePath( <cFile> ) --> cFilePath
+   Extract the full path name from a complete file name
+   * FilePath( "c:\harbour\bin\harbour.exe" ) --> "c:\harbour\bin\"
+*/
+HB_FUNC( FILEPATH )
 {
-   char* pszMask = hb_parcx(1);
-   ULONG nMaskLen = hb_parclen(1);
-   ULONG nMaskPos;
-   ULONG nParNum = hb_pcount();
-   ULONG nLenTable [HB_STRFORMAT_PARNUM_MAX_];
-   char* pszVarTable [HB_STRFORMAT_PARNUM_MAX_];
-
-   ULONG nRetValLen;
-   char* pszRetVal;
-   char* pszRetValSave;
-
-   ULONG tmp;
-
-   if (nParNum < 1)
+   if( ISCHAR( 1 ) )
    {
-      hb_retc("");
-      return;
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retc( pFileName->szPath );
+      hb_xfree( pFileName );
    }
+   else
+      hb_retc( "" );
+}
 
-   nParNum--;
-
-   if (nParNum > HB_STRFORMAT_PARNUM_MAX_) nParNum = HB_STRFORMAT_PARNUM_MAX_;
-
-   for (tmp = 0; tmp < nParNum; tmp++)
+/* FileBase( <cFile> ) --> cFileBase
+*/
+HB_FUNC( FILEBASE )
+{
+   if( ISCHAR( 1 ) )
    {
-      nLenTable[tmp] = hb_parclen(tmp + 2);
-      pszVarTable[tmp] = hb_parcx(tmp + 2);
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retc( pFileName->szName );
+      hb_xfree( pFileName );
    }
+   else
+      hb_retc( "" );
+}
 
-   nMaskPos = 0;
+/* FileExt( <cFile> ) --> cFileExt
+*/
 
-   nRetValLen = 0;
-   while (nMaskPos < nMaskLen)
+
+HB_FUNC(FILEEXT )
+{
+   if( ISCHAR( 1 ) )
    {
-      if (pszMask[nMaskPos] == '%')
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      if( pFileName->szExtension != NULL )
       {
-         nMaskPos++;
-
-         if (pszMask[nMaskPos] == '\0')
-         {
-            break;
-         }
-         else if (pszMask[nMaskPos] == '%')
-         {
-            nRetValLen++;
-         }
-         else if (pszMask[nMaskPos] >= '1' && pszMask[nMaskPos] <= (int)(nParNum + '0'))
-         {
-            nRetValLen += nLenTable[pszMask[nMaskPos] - '1'];
-         }
-         else
-         {
-            /* ; do nothing */
-         }
+         hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
       }
       else
       {
-         nRetValLen++;
+         hb_retc( "" );
       }
-
-      nMaskPos++;
+      hb_xfree( pFileName );
    }
-
-   nMaskPos = 0;
-
-   pszRetVal = pszRetValSave = (char *) hb_xgrab(nRetValLen + 1);
-   while (nMaskPos < nMaskLen)
+   else
    {
-      if (pszMask[nMaskPos] == '%')
-      {
-         nMaskPos++;
-
-         if (pszMask[nMaskPos] == '\0')
-         {
-            break;
-         }
-         else if (pszMask[nMaskPos] == '%')
-         {
-            *pszRetVal++ = pszMask[nMaskPos];
-         }
-         else if (pszMask[nMaskPos] >= '1' && pszMask[nMaskPos] <= (int)(nParNum + '0'))
-         {
-            ULONG nPos = pszMask[nMaskPos] - '1';
-
-            memcpy(pszRetVal, pszVarTable[nPos], nLenTable[nPos]);
-            pszRetVal += nLenTable[nPos];
-         }
-         else
-         {
-            /* ; do nothing */
-         }
-      }
-      else
-      {
-         *pszRetVal++ = pszMask[nMaskPos];
-      }
-
-      nMaskPos++;
+      hb_retc( "" );
    }
+}
 
-   hb_retclen(pszRetValSave, nRetValLen);
-
-   hb_xfree(pszRetValSave);
+/* FileDrive( <cFile> ) --> cFileDrive
+*/
+HB_FUNC( FILEDRIVE )
+{
+   if( ISCHAR( 1 ) )
+   {
+      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
+      hb_retclen( pFileName->szDrive, 1 ); /* Only the drive letter */
+      hb_xfree( pFileName );
+   }
+   else
+      hb_retc( "" );
 }

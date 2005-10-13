@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.6 2005/03/06 19:22:08 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
 #
 
 #
@@ -122,18 +122,7 @@ LIBLIST = \
    $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(TOOLS_LIB)2
 
 TOOLS_LIB_OBJS = \
-   $(OBJ_DIR)\dates2.obj \
-   $(OBJ_DIR)\hb_f.obj \
-   $(OBJ_DIR)\mathx.obj \
-   $(OBJ_DIR)\strfmt.obj \
-   $(OBJ_DIR)\stringsx.obj \
-   \
-   $(OBJ_DIR)\fileread.obj \
-   $(OBJ_DIR)\nconvert.obj \
-   $(OBJ_DIR)\numtxten.obj \
-   $(OBJ_DIR)\numtxthu.obj \
-   $(OBJ_DIR)\stringp.obj \
-   $(OBJ_DIR)\twirler.obj
+   $(OBJ_DIR)\hb_f.obj 
 
 #
 # Our default target

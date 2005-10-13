@@ -1,5 +1,5 @@
 /*
- * $Id: nconvert.prg,v 1.1 2003/04/14 16:09:13 lculik Exp $
+ * $Id: nconvert.prg,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
  */
 
 /*

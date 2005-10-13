@@ -1,10 +1,10 @@
 /*
- * $Id: environ.c,v 1.4 2004/09/16 15:26:48 modalsist Exp $
+ * $Id: status.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
- * Sample file functions
+ * Moving indicator for large processes
  *
  * Copyright 2000 Jose Lalin <dezac@corevia.com>
  * www - http://www.harbour-project.org
@@ -50,74 +50,69 @@
  *
  */
 
+#include <ctype.h>
+
 #include "hbapi.h"
-#include "hbapifs.h"
+#include "hbapiitm.h"
+#include "hbapigt.h"
 
-/* FilePath( <cFile> ) --> cFilePath
-   Extract the full path name from a complete file name
-   * FilePath( "c:\harbour\bin\harbour.exe" ) --> "c:\harbour\bin\"
+#define ST_ROW       1     // Status item display row
+#define ST_COL       2     // Status item display column
+#define ST_COLOR     3     // Status item color
+#define ST_CURRENT   4     // Status item current position in aDisplay
+
+#define ST_LEN       ST_CURRENT  // Length of status array
+
+/* StatusNew( [<nRow>], [<nCol>], [<cColor>] ) --> <aStat>
 */
-HB_FUNC( FILEPATH )
+HB_FUNC( STATUSNEW )
 {
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retc( pFileName->szPath );
-      hb_xfree( pFileName );
-   }
-   else
-      hb_retc( "" );
+   PHB_ITEM pReturn = hb_itemArrayNew( ST_LEN );   /* Create array */
+   PHB_ITEM pItem;
+
+   pItem = hb_itemPutNL( NULL, ( ISNUM( ST_ROW ) ? hb_parni( ST_ROW ) : 0 ) );
+   hb_itemArrayPut( pReturn, ST_ROW, pItem );
+   hb_itemRelease( pItem );
+
+   pItem = hb_itemPutNL( NULL, ( ISNUM( ST_COL ) ? hb_parni( ST_COL ) : 0 ) );
+   hb_itemArrayPut( pReturn, ST_COL, pItem );
+   hb_itemRelease( pItem );
+
+   pItem = hb_itemPutC( NULL, ( ISCHAR( ST_COLOR ) ? hb_parcx( ST_COLOR ) : "W+/N" ) );
+   hb_itemArrayPut( pReturn, ST_COLOR, pItem );
+   hb_itemRelease( pItem );
+
+   pItem = hb_itemPutNL( NULL, 1 );
+   hb_itemArrayPut( pReturn, ST_CURRENT, pItem );
+   hb_itemRelease( pItem );
+
+   hb_itemReturn( pReturn );
+   hb_itemRelease( pReturn );
 }
 
-/* FileBase( <cFile> ) --> cFileBase
+/* StatusUpdate( <aStat> ) --> nil
 */
-HB_FUNC( FILEBASE )
+HB_FUNC( STATUSUPDATE )
 {
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retc( pFileName->szName );
-      hb_xfree( pFileName );
-   }
-   else
-      hb_retc( "" );
-}
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
 
-/* FileExt( <cFile> ) --> cFileExt
-*/
-
-
-HB_FUNC(FILEEXT )
-{
-   if( ISCHAR( 1 ) )
+   if( pArray )
    {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      if( pFileName->szExtension != NULL )
-      {
-         hb_retc( ( pFileName->szExtension ) + 1 ); /* Skip the dot */
-      }
-      else
-      {
-         hb_retc( "" );
-      }
-      hb_xfree( pFileName );
-   }
-   else
-   {
-      hb_retc( "" );
-   }
-}
+      char * szDisplay  = "|/-\\";
+      LONG lCurrent = hb_arrayGetNL( pArray, ST_CURRENT );
+      char * szOldColor[ CLR_STRLEN ];
+      PHB_ITEM pCurrent = hb_itemNew( NULL );
 
-/* FileDrive( <cFile> ) --> cFileDrive
-*/
-HB_FUNC( FILEDRIVE )
-{
-   if( ISCHAR( 1 ) )
-   {
-      PHB_FNAME pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-      hb_retclen( pFileName->szDrive, 1 ); /* Only the drive letter */
-      hb_xfree( pFileName );
+      lCurrent = ( ++lCurrent > 4 ? 1 : lCurrent );
+      hb_itemArrayPut( pArray, ST_CURRENT, hb_itemPutNL( pCurrent, lCurrent ) );
+
+      hb_gtGetColorStr( (char*) szOldColor );
+      hb_gtSetColorStr( hb_arrayGetCPtr( pArray, ST_COLOR ) );
+      hb_gtWriteAt( (USHORT) hb_arrayGetNL( pArray, ST_ROW ),
+                    (USHORT) hb_arrayGetNL( pArray, ST_COL ),
+                    ( BYTE * ) szDisplay + lCurrent - 1, 1, TRUE );
+
+      hb_gtSetColorStr( (char*) szOldColor );
+      hb_itemRelease( pCurrent );
    }
-   else
-      hb_retc( "" );
 }

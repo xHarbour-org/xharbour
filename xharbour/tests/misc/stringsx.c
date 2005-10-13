@@ -1,5 +1,5 @@
 /*
- * $Id: stringsx.c,v 1.2 2004/03/18 03:45:01 ronpinkas Exp $
+ * $Id: stringsx.c,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
  */
 
 #include "hbapi.h"

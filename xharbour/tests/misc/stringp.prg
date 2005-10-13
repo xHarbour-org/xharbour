@@ -1,5 +1,5 @@
 /*
- * $Id: stringp.prg,v 1.1 2003/04/14 16:09:14 lculik Exp $
+ * $Id: stringp.prg,v 1.1 2005/10/05 20:52:18 lf_sfnet Exp $
  */
 
 /*

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4444 2005/10/12 23:06:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4445 2005/10/13 07:51:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,51 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-13 14:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  - source/misc/dates2.c
+  - source/misc/fileread.prg
+  - source/misc/mathx.c
+  - source/misc/nconvert.prg
+  - source/misc/numtxten.prg
+  - source/misc/numtxthu.prg
+  - source/misc/strfmt.c
+  - source/misc/stringp.prg
+  - source/misc/stringsx.c
+  - source/misc/twirler.prg
+  - source/misc/date.c
+  - source/misc/dbf.c
+  - source/misc/environ.c
+  - source/misc/gauge.c
+  - source/misc/num.c
+  - source/misc/stack.c
+  - source/misc/status.c
+  - source/misc/time.c
+  + tests/misc/dates2.c
+  + tests/misc/fileread.prg
+  + tests/misc/mathx.c
+  + tests/misc/nconvert.prg
+  + tests/misc/numtxten.prg
+  + tests/misc/numtxthu.prg
+  + tests/misc/strfmt.c
+  + tests/misc/stringp.prg
+  + tests/misc/stringsx.c
+  + tests/misc/twirler.prg
+  + tests/misc/date.c
+  + tests/misc/dbf.c
+  + tests/misc/environ.c
+  + tests/misc/gauge.c
+  + tests/misc/num.c
+  + tests/misc/stack.c
+  + tests/misc/status.c
+  + tests/misc/time.c
+    * moved unused sources from source/misc to tests/misc
+  * source/misc/make_b32.bat
+  * source/misc/make_vc.bat
+  * source/misc/Makefile
+  * source/misc/makefile.bc
+  * source/misc/makefile.vc
+	 * updated makefiles please test them
 
 2005-10-13 00:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c

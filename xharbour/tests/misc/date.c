@@ -1,5 +1,5 @@
 /*
- * $Id: date.c,v 1.5 2005/09/22 01:11:58 druzus Exp $
+ * $Id: date.c,v 1.1 2005/10/08 08:54:54 lf_sfnet Exp $
  */
 
 /*
