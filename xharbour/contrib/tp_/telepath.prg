@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.9 2004/08/31 14:53:34 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.10 2005/10/13 08:05:24 mauriliolongo Exp $
  */
 
 /*
@@ -432,7 +432,7 @@ function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
       endif
 
       // I've found it
-      if nFirst > 0 //.AND. nFirst < nMaxLen
+      if nFirst > 0
          exit
 
       else
@@ -454,7 +454,7 @@ function tp_recvto( nPort, cDelim, nMaxlen, nTimeout )
 
    enddo
 
-   if nFirst > 0 //.AND. nFirst < nMaxLen
+   if nFirst > 0
       cRet := Left( aPorts[ nPort, TPFP_INBUF ], nFirst )
       aPorts[ nPort, TPFP_INBUF ] := SubStr( aPorts[ nPort, TPFP_INBUF ], nFirst + 1 )
    endif
@@ -599,7 +599,7 @@ return 0
 
 
 
-/* We can set, well, I think we cannot, CTS without setting RTS flowcontrol, so this
+/* We cannot set, well, _I_ think we cannot, CTS without setting RTS flowcontrol, so this
    function and tp_ctrlrts() do the same thing, that is set/reset CRTSCTS flowcontol */
 function tp_ctrlcts( nPort, nNewCtrl )
 
