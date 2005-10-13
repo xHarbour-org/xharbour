@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.25 2005/09/23 17:06:23 ronpinkas Exp $
+ * $Id: proc.c,v 1.26 2005/09/27 02:26:11 ronpinkas Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName 
 
    pSelf = *( pBase + 1 );
 
-   if( iLevel < 0 )
+   if( iLevel < 0 && HB_IS_SYMBOL( *pBase ) )
    {
       if( szName )
       {

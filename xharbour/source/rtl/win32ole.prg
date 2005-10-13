@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.85 2005/09/22 01:11:59 druzus Exp $
+ * $Id: win32ole.prg,v 1.86 2005/10/12 23:06:19 ronpinkas Exp $
  */
 
 /*
@@ -175,14 +175,23 @@ CLASS TOleAuto
    MESSAGE Set METHOD Invoke()
    MESSAGE Get METHOD Invoke()
 
-   METHOD Collection( xIndex, xValue ) OPERATOR "[]"
+   METHOD OleCollection( xIndex, xValue ) OPERATOR "[]"
 
-   // Needed to refernce, or hb_dynsymFindName() will fail
-   METHOD ForceSymbols() INLINE ::cClassName()
+   METHOD OleValuePlus( xArg )            OPERATOR "+"
+   METHOD OleValueMinus( xArg )           OPERATOR "-"
+   METHOD OleValueMultiply( xArg )        OPERATOR "*"
+   METHOD OleValueDivide( xArg )          OPERATOR "/"
+   METHOD OleValueModulus( xArg )         OPERATOR "%"
+   METHOD OleValueInc()                   OPERATOR "++"
+   METHOD OleValueDec()                   OPERATOR "--"
+   METHOD OleValuePower( xArg )           OPERATOR "^"
 
    ERROR HANDLER OnError()
 
    DESTRUCTOR Release()
+
+   // Needed to refernce, or hb_dynsymFindName() will fail
+   METHOD ForceSymbols() INLINE ::cClassName()
 
 ENDCLASS
 
@@ -214,7 +223,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
             oErr:SubCode       := -1
             oErr:SubSystem     := OLEExceptionSource()
 
-            RETURN Eval( ErrorBlock(), oErr )
+            RETURN Throw( oErr )
          ELSE
             oErr := ErrorNew()
             oErr:Args          := HB_aParams()
@@ -228,7 +237,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
             oErr:SubCode       := -1
             oErr:SubSystem     := "TOleAuto"
 
-            RETURN Eval( ErrorBlock(), oErr )
+            RETURN Throw( oErr )
          ENDIF
       ENDIF
 
@@ -254,7 +263,9 @@ RETURN Self
 PROCEDURE Release() CLASS TOleAuto
 
    IF ! Empty( ::hObj )
+      //TraceLog( ::cClassName, ::hObj )
       OleReleaseObject( ::hObj )
+      //::hObj := NIL
    ENDIF
 
 RETURN
@@ -282,7 +293,7 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
             oErr:SubCode       := -1
             oErr:SubSystem     := OLEExceptionSource()
 
-            RETURN Eval( ErrorBlock(), oErr )
+            RETURN Throw( oErr )
          ELSE
             oErr := ErrorNew()
             oErr:Args          := { cClass }
@@ -296,7 +307,7 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
             oErr:SubCode       := -1
             oErr:SubSystem     := "TOleAuto"
 
-            RETURN Eval( ErrorBlock(), oErr )
+            RETURN Throw( oErr )
          ENDIF
       ENDIF
 
@@ -318,7 +329,7 @@ RETURN HB_ExecFromArray( Self, cMethod, aDel( HB_aParams(), 1, .T. ) )
 
 //--------------------------------------------------------------------
 
-METHOD Collection( xIndex, xValue ) CLASS TOleAuto
+METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 
    LOCAL xRet
 
@@ -338,6 +349,198 @@ METHOD Collection( xIndex, xValue ) CLASS TOleAuto
 RETURN xRet
 
 //--------------------------------------------------------------------
+
+METHOD OleValuePlus( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue + xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '+'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1081
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueMinus( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue - xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '+'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1082
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueMultiply( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue * xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '*'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1083
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueDivide( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue / xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '/'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1084
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueModulus( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue % xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '%'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1085
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueInc() CLASS TOleAuto
+
+   LOCAL oErr
+
+   TRY
+      ++::OleValue
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '++'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1086
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN Self
+
+METHOD OleValueDec() CLASS TOleAuto
+
+   LOCAL oErr
+
+   TRY
+      --::OleValue
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '--'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1087
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN Self
+
+METHOD OleValuePower( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue ^ xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '^'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1088
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
 
 #pragma BEGINDUMP
 

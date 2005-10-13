@@ -3,7 +3,7 @@
 #define CRLF Chr( 13 ) + Chr( 10 )
 
 // EXplicit usage of OLE DEFAULT Method when syntax implies it!!!
-#xtranslate :<!Method!>( <args,...> ) :\= => :<Method>( <args> ):OleValue :=
+#xtranslate :<!Method!>( <args,...> ) := => :<Method>( <args> ):OleValue :=
 
 PROCEDURE MAIN()
 
@@ -46,11 +46,25 @@ STATIC PROCEDURE Excel()
 
    // Array notation seem to have REVERSED indexs for the Cells Collections!!!
    // Implicitly using DEFAULT Method
-   oAS:Cells[ 2, 3 ] := "Implicit DEFAULT Method using *reversed* array index notation!"
+   oAS:Cells[ 2, 3 ] := "Implicit DEFAULT Method using *reversed* array index notation"
+
+   // Operator overloading will qttempt explict resolutin using :OleValue
+   oAS:Cells[ 2, 3 ] += "!"
 
    oAS:Cells( 4, 1 ):Value := "Numeric:"
    oAS:Cells( 4, 2 ):NumberFormat := "#.##0,00"
-   oAS:Cells( 4, 2 ):Value := 1234.50
+
+   oAS:Cells[ 2, 4 ] := 1234.50
+   oAS:Cells[ 2, 4 ] *= 4
+   TraceLog( oAS:Cells[ 2, 4 ], oAS:Cells[ 2, 4 ]:Value )
+   oAS:Cells[ 2, 4 ] /= 2
+   TraceLog( oAS:Cells[ 2, 4 ], oAS:Cells[ 2, 4 ]:Value )
+
+   oAS:Cells[ 2, 4 ]++
+   TraceLog( oAS:Cells[ 2, 4 ], oAS:Cells[ 2, 4 ]:Value )
+   oAS:Cells[ 2, 4 ]--
+   TraceLog( oAS:Cells[ 2, 4 ], oAS:Cells[ 2, 4 ]:Value )
+
    oAS:Cells( 5, 1 ):Value := "Logical:"
    oAS:Cells( 5, 2 ):Value := .T.
    oAS:Cells( 6, 1 ):Value := "Date:"

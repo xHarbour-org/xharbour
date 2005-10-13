@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.501 2005/10/07 01:43:31 druzus Exp $
+ * $Id: hvm.c,v 1.502 2005/10/10 22:45:55 druzus Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
 
 /* Object */
 void    hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM ); /* call an overloaded operator */
-void    hb_vmOperatorCallUnary( PHB_ITEM, char * ); /* call an overloaded unary operator */
+void    hb_vmOperatorCallUnary( PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded unary operator */
 
 /* Database */
 static ERRCODE hb_vmSelectWorkarea( PHB_ITEM );  /* select the workarea using a given item or a substituted value */
@@ -2794,12 +2794,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( iAdd == 1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_INC ) )
             {
-               hb_vmOperatorCallUnary( pLocal, "__OPINC" );
+               hb_vmOperatorCallUnary( pLocal, "__OPINC", pLocal );
                break;
             }
             else if( iAdd == -1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_DEC ) )
             {
-               hb_vmOperatorCallUnary( pLocal, "__OPDEC" );
+               hb_vmOperatorCallUnary( pLocal, "__OPDEC", pLocal );
                break;
             }
             else if( ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_PLUS ) )
@@ -4547,7 +4547,7 @@ static void hb_vmInc( void )
    }
    else if( hb_objGetOpOver( pItem ) & HB_CLASS_OP_INC )
    {
-      hb_vmOperatorCallUnary( pItem, "__OPINC" );
+      hb_vmOperatorCallUnary( pItem, "__OPINC", pItem );
    }
    else
    {
@@ -4606,7 +4606,7 @@ static void hb_vmDec( void )
    }
    else if( hb_objGetOpOver( pItem ) & HB_CLASS_OP_DEC )
    {
-      hb_vmOperatorCallUnary( pItem, "__OPDEC" );
+      hb_vmOperatorCallUnary( pItem, "__OPDEC", pItem );
    }
    else
    {
@@ -5340,7 +5340,7 @@ static void hb_vmNot( void )
 
    else if( hb_objGetOpOver( pItem ) & HB_CLASS_OP_NOT )
    {
-      hb_vmOperatorCallUnary( pItem, "__OPNOT" );
+      hb_vmOperatorCallUnary( pItem, "__OPNOT", pItem );
    }
    else
    {
@@ -6348,16 +6348,12 @@ void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, P
     */
    HB_THREAD_STUB
 
-   HB_ITEM ItemMsg;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCall(%p, %p, %s)", pObjItem, pMsgItem, szSymbol));
 
-   ItemMsg.type = HB_IT_SYMBOL;
-   ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
-   ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
-   ItemMsg.item.asSymbol.uiSuperClass = 0;
+   //printf( "BEFORE %s Top: %i Type: %i\n", szSymbol, hb_stackTopOffset(), hb_stackItemFromTop( -1 )->type );
 
-   hb_vmPush( &ItemMsg );
+   hb_vmPushSymbol( hb_dynsymFind( szSymbol )->pSymbol );
+
    hb_vmPush( pObjItem );                             /* Push object              */
    hb_vmPush( pMsgItem );                             /* Push argument            */
 
@@ -6365,21 +6361,15 @@ void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, P
    {
       hb_vmPush( pArg );                             /* Push argument            */
       hb_vmSend( 2 );
-      hb_stackPop();               /* pArg */
    }
    else
    {
       hb_vmSend( 1 );
    }
 
-   // pMsgItem
-   //hb_stackPop();
+   //printf( "AFTER %s Top: %i Type: %i\n", szSymbol, hb_stackTopOffset(), hb_stackItemFromTop( -1 )->type );
 
-   // pObjItem
-   //hb_stackPop();
-
-   iPop++;
-   for(;--iPop;)
+   while( iPop-- )
    {
       hb_stackPop();
    }
@@ -6394,33 +6384,28 @@ void hb_vmOperatorCall( PHB_ITEM pObjItem, PHB_ITEM pMsgItem, char * szSymbol, P
    }
 }
 
-void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol )
+void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol, PHB_ITEM pResult )
 {
    /* NOTE: There is no need to test if specified symbol exists. It is checked
     * by the caller (if HB_IS_OBJECT() && HAS_METHOD() )
     */
    HB_THREAD_STUB
 
-   HB_ITEM ItemMsg;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmOperatorCallUnary(%p, %s)", pObjItem, szSymbol));
 
-   ItemMsg.type = HB_IT_SYMBOL;
-   ItemMsg.item.asSymbol.value = hb_dynsymFind( szSymbol )->pSymbol;
-   ItemMsg.item.asSymbol.stackbase = hb_stackTopOffset();
-   ItemMsg.item.asSymbol.uiSuperClass = 0;
+   //printf( "%s Top: %i Type: %i\n", szSymbol, hb_stackTopOffset(), hb_stackItemFromTop( -1 )->type );
 
-   hb_vmPush( &ItemMsg );
+   hb_vmPushSymbol( hb_dynsymFind( szSymbol )->pSymbol );
    hb_vmPush( pObjItem );                             /* Push object */
 
    hb_vmSend( 0 );
 
-   /* Push return value on the stack
-    * NOTE: for performance reason we could have avoided pop of the argument.
-    * and recycle it with the return value, but that would be WRONG in case of Argument BYREF.
-    */
-   hb_stackPop();
-   hb_itemPushForward( &(HB_VM_STACK.Return) );
+   //printf( "AFTER %s Top: %i Type: %i\n", szSymbol, hb_stackTopOffset(), hb_stackItemFromTop( -1 )->type );
+
+   if( pResult )
+   {
+      hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
+   }
 }
 
 /* ------------------------------- */
@@ -7072,6 +7057,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       // Constructor must ALWAYS return Self.
       if( bConstructor )
       {
+         //printf( "OOPS! Constructor!\n" );
          //hb_itemForwardValue( &(HB_VM_STACK.Return ), pSelf );
 
          if( s_uiActionRequest == 0 )
@@ -8399,7 +8385,7 @@ HB_EXPORT void hb_vmPopState( void )
    HB_THREAD_STUB
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPopState(%p)", pItem ) );
-    
+
    hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
    hb_stackDec();
    /* restore top item */

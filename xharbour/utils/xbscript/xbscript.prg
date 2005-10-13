@@ -445,7 +445,7 @@ STATIC s_bDefRTErrBlock := {|oErr| RP_Run_Err( oErr, s_aProcedures ) }
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC16" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC17" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -764,6 +764,14 @@ RETURN
 PROCEDURE PP_Break( xVal )
 
    Break( xVal )
+
+RETURN
+
+//--------------------------------------------------------------//
+
+PROCEDURE Throw( xVal )
+
+   PP_Break( xVal )
 
 RETURN
 
@@ -6653,13 +6661,20 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    aRule := { sKey, {}, bX }
 
    nNext := 0
-   DO WHILE ( nNext := AtInRules( "=>", sRule, nNext + 1 ) ) > 0
-      IF ! SubStr( sRule, nNext - 1, 1 ) == '\'
+   DO WHILE ( nNext := AtInRules( "=", sRule, nNext + 1 ) ) > 0
+      IF SubStr( sRule, nNext - 1, 1 ) == '\'
+         sRule := Left( sRule, nNext - 2 ) + SubStr( sRule, nNext )
+         nNext++
+      ELSEIF Left( LTrim( SubStr( sRule, nNext + 1 ) ), 1 ) == '>'
+         nTokenLen := 1
+         WHILE SubStr( sRule, nNext + nTokenLen, 1 ) != '>'
+            nTokenLen++
+         END
+         nTokenLen++
+
          EXIT
       ENDIF
    ENDDO
-
-   nTokenLen := 2
 
    IF nNext == 0
       Eval( ErrorBlock(), ErrorNew( [PP], 2059, [Compile-Rule], [Missing => in #directive], { sRule } ) )

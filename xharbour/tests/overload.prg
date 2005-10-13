@@ -1,5 +1,5 @@
 //
-// $Id: overload.prg,v 1.1.1.1 2001/12/21 10:45:56 ronpinkas Exp $
+// $Id: overload.prg,v 1.2 2005/07/17 00:10:20 ronpinkas Exp $
 //
 
 //
@@ -42,8 +42,8 @@ function Main()
    QOut( "Greater than or Equal:", oString <= "Hello" )
    QOut( "Concatenation + :", oString + "Hello" )
    QOut( "Concatenation - :", oString - "Hello" )
-   QOut( "++ :", oString++ )
-   QOut( "-- :", oString-- )
+   QOut( "++ :", oString++, oString:cValue )
+   QOut( "-- :", oString--, oString:cValue )
 
 return nil
 
@@ -63,8 +63,8 @@ create class tString
       OPERATOR "+"  ARG cArg INLINE ::cValue +  cArg
       OPERATOR "-"  ARG cArg INLINE ::cValue -  cArg
       OPERATOR "$"  ARG cArg INLINE ::cValue $  cArg
-      OPERATOR "++" INLINE ::cValue += '.'
-      OPERATOR "--" INLINE ::cValue := Left( ::cValue, Len( ::cValue ) - 1 )
+      OPERATOR "++" INLINE ::cValue += '.', Self
+      OPERATOR "--" INLINE ::cValue := Left( ::cValue, Len( ::cValue ) - 1 ), Self
 
 endclass
 

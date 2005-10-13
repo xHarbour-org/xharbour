@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.215 2005/08/19 18:14:00 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.216 2005/09/13 22:46:53 fperillo Exp $
  */
 
 /*
@@ -306,7 +306,7 @@ void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
 
 	       if( hb_pp_STD_CH_ADDITIVE )
 		  hb_pp_Table();
-	       
+
                hb_pp_Init();
 
                hb_pp_ReadRules();
@@ -1586,6 +1586,11 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
            sLine++;
            bOk = TRUE;
            break;
+        }
+        else
+        {
+           i--;
+           sLine--;
         }
 
         ipos = i;

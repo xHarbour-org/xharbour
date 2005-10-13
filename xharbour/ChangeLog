@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4443 2005/10/11 13:40:17 druzus Exp $
+ * $Id: ChangeLog,v 1.4444 2005/10/12 23:06:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-13 00:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/pp/ppcore.c
+    ! Fixed minor bug in ParseCommand() when '=' just before '=>'
+
+  * source/vm/hvm.c
+    ! Fixed Operator Overloading to override the subject item of
+      unary operators, with the return value of the respective method.
+    * Corrected stack and symbol management in hb_vmOperatorCall() and hb_vmOperatorCallUnary()
+
+  * source/vm/proc.c
+    ! Fixed GPF trap.
+
+  * tests/overload.prg
+    * Corrected, as needed by above correction in hvm.c
+
+  * source/rtl/win32ole.prg
+    + Added Operator overloading for +;-;*;/;%;^;++;--
+  * tests/testole.prg
+    + Added samples utilizing the new operators overloaded by TOleAuto
+
+  * utils/xbscript/xbscript.prg
+    + Added Throw() function to supercede and redirect non script Throw() to PP_Break()
+    + Added support for white space between '=' and '>' in rules.
+    * Minor correction to handling of '\=' in rules
 
 2005-10-12 16:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
