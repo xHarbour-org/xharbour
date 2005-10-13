@@ -1,5 +1,5 @@
 /*
- * $Id: htmutil.prg,v 1.1 2003/02/23 23:15:16 lculik Exp $
+ * $Id: htmutil.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -44,7 +44,7 @@
  */
 
 #include "html.ch"
-#include "default.ch"
+#include "common.ch"
 
 /****
 *
@@ -56,8 +56,8 @@
 
 PROC BackButton( cImage, oHtm )
 
-   DEFAULT cImage := "back.gif"
-   DEFAULT oHtm := oPage()
+   DEFAULT cImage TO "back.gif"
+   DEFAULT oHtm TO TCGIoPage()
 
    IMAGE( cImage ) ;
           URL "" ;
@@ -74,24 +74,24 @@ RETURN
 *
 */
 
-PROC BackFormButton( cImage, oForm )
+PROC BackFormButton( cImage, TCgioForm )
 
    LOCAL oBut
 
-   DEFAULT oForm := oForm()
+   DEFAULT TCgioForm TO TCgioForm()
 
    IF cImage == NIL
       DEFINE BUTTON oBut ;
          NAME "BackButton" ;
          VALUE "go Back" ;
          ONCLICK "history.back()" ;
-         IN oForm
+         IN TCgioForm
    ELSE
       DEFINE IMAGE oBut ;
          NAME "BackButton" ;
          SOURCE( cImage ) ;
          ONCLICK "history.back()" ;
-         IN oForm
+         IN TCgioForm
    ENDIF
 
 RETURN
@@ -110,13 +110,13 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
    LOCAL cStr    := ""
    LOCAL cLetter := ""
 
-   DEFAULT oHtm := oPage()
-   DEFAULT nNumber := 0
-   DEFAULT cDir := "/images/counters/"
-   DEFAULT nWidth := 50
-   DEFAULT nDigits := Len( Alltrim( Str( nNumber ) ) )
-   DEFAULT nBorder := 1
-   DEFAULT BGCOLOR := "black"
+   DEFAULT oHtm TO TCGIoPage()
+   DEFAULT nNumber TO 0
+   DEFAULT cDir TO "/images/counters/"
+   DEFAULT nWidth TO 50
+   DEFAULT nDigits TO Len( Alltrim( Str( nNumber ) ) )
+   DEFAULT nBorder TO 1
+   DEFAULT BGCOLOR TO "black"
 
    IF Valtype( nNumber ) == "N"
       cStr := Strzero( nNumber, nDigits )

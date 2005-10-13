@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2005/03/06 19:22:05 paultucker Exp $
+# $Id: makefile.vc,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
 #
 
 #
@@ -107,16 +107,16 @@ HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(CGI_LIB)2
 
 CGI_LIB_OBJS = \
-    $(OBJ_DIR)\ohtm.obj \
+    $(OBJ_DIR)\thtm.obj \
     $(OBJ_DIR)\htmbrows.obj \
-    $(OBJ_DIR)\oedit.obj \
-    $(OBJ_DIR)\ofile.obj \
-    $(OBJ_DIR)\jlist.obj   \
-    $(OBJ_DIR)\oini.obj \
-    $(OBJ_DIR)\jwindow.obj \
-    $(OBJ_DIR)\ocgi.obj \
-    $(OBJ_DIR)\oframe.obj \
-    $(OBJ_DIR)\counter.obj \
+    $(OBJ_DIR)\tedit.obj \
+    $(OBJ_DIR)\tfile.obj \
+    $(OBJ_DIR)\htjlist.obj   \
+    $(OBJ_DIR)\tini.obj \
+    $(OBJ_DIR)\hjwindow.obj \
+    $(OBJ_DIR)\tcgi.obj \
+    $(OBJ_DIR)\tframe.obj \
+    $(OBJ_DIR)\htcount.obj \
     $(OBJ_DIR)\hterrsys.obj \
     $(OBJ_DIR)\htmutil.obj 
 

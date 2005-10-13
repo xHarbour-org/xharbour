@@ -1,6 +1,6 @@
 
 /*
- * $Id: ocgi.prg,v 1.1 2003/02/23 23:15:17 lculik Exp $
+ * $Id: ocgi.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
  */
 
 #include "hbclass.ch"
-#include "default.ch"
+#include "common.ch"
 #include "html.ch"
 
-CLASS oCgi FROM HTML
+CLASS TCgioCgi FROM TCgiHtml
 
    DATA nH
    DATA Server_Software
@@ -93,7 +93,7 @@ ENDCLASS
 *
 */
 
-METHOD New( cInBuffer ) Class oCgi
+METHOD New( cInBuffer ) CLASS TCgioCgi
 
    LOCAL cBuff
    LOCAL i
@@ -102,7 +102,7 @@ METHOD New( cInBuffer ) Class oCgi
    LOCAL aVar  := {}
 
    // function in oHtm.prg
-   ::nH := PageHandle()
+   ::nH := TCgiPageHandle()
 
    ::Server_Software   := Getenv( "SERVER_SOFTWARE" )
    ::Server_Name       := Getenv( "SERVER_NAME" )
@@ -140,13 +140,13 @@ METHOD New( cInBuffer ) Class oCgi
 
       ::aQueryFields := {}
 
-      aTemp := Listasarray( ::Query_String, "&" )           // separate fields
+      aTemp := TCgiListAsArray( ::Query_String, "&" )           // separate fields
 
       IF Len( aTemp ) != 0
          FOR i := 1 TO Len( aTemp )
-            aVar := Listasarray( aTemp[ i ], "=" )
+            aVar := TCgiListAsArray( aTemp[ i ], "=" )
             IF Len( aVar ) == 2
-               Aadd( ::aQueryFields, { aVar[ 1 ], decodeURL( aVar[ 2 ] ) } )
+               Aadd( ::aQueryFields, { aVar[ 1 ], TCGIDecodeURL( aVar[ 2 ] ) } )
             ENDIF
          NEXT
       ENDIF
@@ -167,7 +167,7 @@ RETURN ::ToObject()                     //Self
 *        It subclasses the oCGI class to a *new* class
 */
 
-METHOD ToObject() CLAss ocgi
+METHOD ToObject() CLASS TCgioCgi
 
    LOCAL i
    LOCAL bBlock
@@ -184,7 +184,7 @@ METHOD ToObject() CLAss ocgi
    // --> create new oObject class from this one...
    sn ++
    //aDB := ClassNew( "NewCgi"+STRZERO(sn,3), {|| oCGI() }, "cgi" )
-   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), __CLS_PARAM( "oCgi" ) )
+   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), __CLS_PARAM( "TCgioCgi" ) )
 
    FOR i := 1 TO Len( ::aQueryFields )
 
@@ -219,7 +219,7 @@ METHOD ToObject() CLAss ocgi
    oNew:Content_Type      := ::Content_Type
    oNew:Content_Length    := ::Content_Length
    oNew:Annotation_Server := ::Annotation_Server
-   oNew:nH                := IIF( PageHandle() == NIL, STD_OUT, PageHandle() )
+   oNew:nH                := IIF( TCgiPageHandle() == NIL, STD_OUT, TCgiPageHandle() )
 
 RETURN oNew
 
@@ -227,12 +227,12 @@ RETURN oNew
 
 // ripped from HARBOUR
 
-METHOD CGIField( cQueryName ) Class oCgi
+METHOD CGIField( cQueryName ) CLASS TCgioCgi
 
    LOCAL cRet := ""
    LOCAL nRet
 
-   DEFAULT cQueryName := ""
+   DEFAULT cQueryName TO ""
 
    nRet := Ascan( ::aQueryFields, ;
                   { | x | Upper( x[ 1 ] ) = Upper( cQueryName ) } )

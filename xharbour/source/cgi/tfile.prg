@@ -1,5 +1,5 @@
 /*
- * $Id: ofile.prg,v 1.2 2003/02/25 15:35:49 lculik Exp $
+ * $Id: ofile.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -45,7 +45,7 @@
 
 #include "hbclass.ch"
 
-#include "default.ch"
+#include "common.ch"
 #include "fileio.ch"
 #include "ferror.ch"
 //#include "simpleio.ch"
@@ -56,7 +56,7 @@
 PROC TEST()
 
    LOCAL OF
-   OF := FileBase():New( "c:\autoexec.bat" )                //oFile.prg" )
+   OF := TCgiFilebase():New( "c:\autoexec.bat" )                //oFile.prg" )
    oF:Open()
    ? of:handle
    WHILE !oF:EOF()
@@ -67,7 +67,7 @@ PROC TEST()
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-CLASS FileBase      // ALIAS FB
+CLASS TCgiFilebase      // ALIAS FB
    DATA Buffer INIT ""                  // Self[1]
    DATA Name INIT ""
    DATA Handle      //INIT -999
@@ -150,7 +150,7 @@ CLASS FileBase      // ALIAS FB
 ENDCLASS
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD New( cName ) CLASS FileBase
+METHOD New( cName ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    ::Name      := cName
@@ -169,10 +169,10 @@ RETURN Self
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD Open( nMode ) CLASS FileBase
+METHOD Open( nMode ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-   DEFAULT nMode := FO_EXCLUSIVE        //SHARED
+   DEFAULT nMode TO FO_EXCLUSIVE        //SHARED
    ::Handle := Fopen( ::Name, nMode )
    IF ::Handle > 0
       ::Size()
@@ -183,11 +183,11 @@ RETURN ::Handle > 0
 **   ::Create( [<nAttrib>] ) --> lSuccess
 */
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD CREATE ( nAttr ) CLASS FileBase
+METHOD CREATE ( nAttr ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nSuccess
-   DEFAULT nAttr := 0
+   DEFAULT nAttr TO 0
    nSuccess := Fcreate( ::Name, nAttr )
    ::Handle := nSuccess
 
@@ -200,7 +200,7 @@ RETURN ( nSuccess != - 1 )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD Size() CLASS FileBase
+METHOD Size() CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nCurrent
@@ -219,13 +219,13 @@ RETURN ( nLength )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD _Read( nSize, cBuff ) CLASS FileBase
+METHOD _Read( nSize, cBuff ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nBytesRead
 
-   DEFAULT nSize := 1024
-   DEFAULT cBuff := Space( nSize )
+   DEFAULT nSize TO 1024
+   DEFAULT cBuff TO Space( nSize )
 
    ::BytesRead := Fread( ::Handle, @cBuff, nSize )
    ::Buffer    := cBuff
@@ -239,14 +239,14 @@ RETURN ( cBuff )    //nBytesRead )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD ReadAhead( nSize, cBuff ) CLASS FileBase
+METHOD ReadAhead( nSize, cBuff ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nBytesRead
    LOCAL nCurrent
 
-   DEFAULT nSize := 1024
-   DEFAULT cBuff := Space( nSize )
+   DEFAULT nSize TO 1024
+   DEFAULT cBuff TO Space( nSize )
 
    // --> save position in file
    nCurrent := FPOS( ::Handle )
@@ -264,14 +264,14 @@ RETURN ( cBuff )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD Readline( nSize ) CLASS FileBase
+METHOD Readline( nSize ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL cString
    LOCAL nCurrent
    LOCAL nCr
 
-   DEFAULT nSize := 1024
+   DEFAULT nSize TO 1024
 
    IF nSize <= 0
       RETURN ( "" )
@@ -294,7 +294,7 @@ RETURN ::Buffer
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD ReadByte() CLASS FileBase
+METHOD ReadByte() CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nRet
@@ -310,7 +310,7 @@ RETURN ( IIF( nBytes > 0, Asc( cBuff ), - 1 ) )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD ReadInt() CLASS FileBase
+METHOD ReadInt() CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nRet
@@ -326,7 +326,7 @@ RETURN ( IIF( nBytes > 0, Bin2i( cBuff ), - 1 ) )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD ReadLong() CLASS FileBase
+METHOD ReadLong() CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nRet
@@ -342,7 +342,7 @@ RETURN ( IIF( nBytes > 0, Bin2l( cBuff ), - 1 ) )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD WriteByte( nByte ) CLASS FileBase
+METHOD WriteByte( nByte ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL lSuccess := ( Fwrite( ::nHandle, Chr( nByte ), 1 ) == 1 )
@@ -353,7 +353,7 @@ RETURN lSuccess
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD WriteInt( nInt ) CLASS FileBase
+METHOD WriteInt( nInt ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL lSuccess := ( Fwrite( ::nHandle, I2bin( nInt ), 2 ) == 2 )
@@ -364,7 +364,7 @@ RETURN lSuccess
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD WriteLong( nLong ) CLASS FileBase
+METHOD WriteLong( nLong ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL lSuccess := ( Fwrite( ::nHandle, L2bin( nLong ), 4 ) == 4 )
@@ -378,7 +378,7 @@ RETURN ( lSuccess )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD GOTO( nLine ) CLASS FileBase
+METHOD GOTO( nLine ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nCount := 1
@@ -416,13 +416,13 @@ RETURN ( nPos )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD SKIP( nLines ) CLASS FileBase
+METHOD SKIP( nLines ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL nCount := 0
    LOCAL nPos   := FPOS( ::Handle )
 
-   DEFAULT nLines := 1
+   DEFAULT nLines TO 1
 
    IF nLines <= 0   // don't accept < 0
 
@@ -446,10 +446,10 @@ RETURN ( nPos )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD MaxPages( nPageSize ) CLASS FileBase
+METHOD MaxPages( nPageSize ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-   DEFAULT nPageSize := ::nPageSize
+   DEFAULT nPageSize TO ::nPageSize
 RETURN ( ::Size() / nPageSize )
 
 /*
@@ -457,11 +457,11 @@ RETURN ( ::Size() / nPageSize )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD PrevPage( nBytes ) CLASS FileBase
+METHOD PrevPage( nBytes ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 
-   DEFAULT nBytes := 1024
+   DEFAULT nBytes TO 1024
 
    IF nBytes <= 0
       RETURN ( "" )
@@ -481,11 +481,11 @@ RETURN ( ::cPage )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD NextPage( nBytes ) CLASS FileBase
+METHOD NextPage( nBytes ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 
-   DEFAULT nBytes := 1024
+   DEFAULT nBytes TO 1024
 
    IF nBytes <= 0
       RETURN ( "" )
@@ -502,7 +502,7 @@ RETURN ( ::cPage )
 **   ::PrevLine( [<nBytes>] ) --> ::Buffer
 */
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD PrevLine( npBytes ) CLASS FileBase
+METHOD PrevLine( npBytes ) CLASS TCgiFilebase
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    LOCAL fHandle    := ::Handle
@@ -515,7 +515,7 @@ METHOD PrevLine( npBytes ) CLASS FileBase
    LOCAL nPrev
    LOCAL cTemp
 
-   DEFAULT npBytes := 256
+   DEFAULT npBytes TO 256
 
    IF nOrigPos == 0
 
@@ -561,11 +561,11 @@ RETURN IIF( lMoved, ::Buffer, "" )
 /*
                 * * * * * UNCHECKED !!! * * * * *
 
-METHOD PrevLine( nBytes )    CLASS FileBase 
+METHOD PrevLine( nBytes )    CLASS TCgiFilebase 
 LOCAL cRet, cPage := ""
 LOCAL nAt   := 0
 LOCAL nPos  := FPOS( ::Handle )
-DEFAULT nBytes := 1024
+DEFAULT nBytes TO 1024
 
 IF nBytes <= 0
    RETURN( "" )

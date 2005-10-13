@@ -1,5 +1,5 @@
 /*
- * $Id: htmbrows.prg,v 1.1 2003/02/23 23:15:16 lculik Exp $
+ * $Id: htmbrows.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -46,7 +46,7 @@
  *
  */
 
-#include "default.ch"
+#include "common.ch"
 #include "html.ch"
 
 /****
@@ -74,8 +74,8 @@ PROC htmlBrowse( oHtm, cAction, lUseLinks, cTarget, cAlias )
    LOCAL aFlds  := Dbstruct()
    LOCAL cAlign
 
-   DEFAULT cAction := "confirm('RECORD: '+this.name+'\nPlace your action here !!!')"
-   DEFAULT lUseLinks := .F.
+   DEFAULT cAction TO "confirm('RECORD: '+this.name+'\nPlace your action here !!!')"
+   DEFAULT lUseLinks TO .F.
 
    /*
 // browse caption...
@@ -125,7 +125,7 @@ oHtm:endTable()
       FOR i := 1 TO Len( aFlds )
          cAlign := IF( aFlds[ i, 2 ] == "N", "RIGHT", "CENTER" )
          oHtm:newTableCell( cAlign,,,, "black" )
-         oHtm:Write( greek2Html( any2Str( Fieldget( i ) ) ) )
+         oHtm:Write( greek2Html( TCgiANY2STR( Fieldget( i ) ) ) )
          oHtm:EndTableCell()
       NEXT
       oHtm:endTableRow()
@@ -145,8 +145,8 @@ PROC htmlBrowseSql( oHtm, cAction, lUseLinks, cTarget, oServer, oQuery )
 
    LOCAL cAlign
 
-   DEFAULT cAction := "confirm('RECORD: '+this.name+'\nPlace your action here !!!')"
-   DEFAULT lUseLinks := .F.
+   DEFAULT cAction TO "confirm('RECORD: '+this.name+'\nPlace your action here !!!')"
+   DEFAULT lUseLinks TO .F.
 
    /*
 // browse caption...
@@ -199,7 +199,7 @@ oHtm:endTable()
 
          cAlign := IF( oCurRow:FieldType( i ) == "N", "RIGHT", "CENTER" )
          oHtm:newTableCell( cAlign,,,, "black" )
-         oHtm:Write( greek2Html( any2Str( oCurRow:FieldGet( i ) ) ) )
+         oHtm:Write( greek2Html( TCgiANY2STR( oCurRow:FieldGet( i ) ) ) )
          oHtm:EndTableCell()
       END
       oHtm:endTableRow()

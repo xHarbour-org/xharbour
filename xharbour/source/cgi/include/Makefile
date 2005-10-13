@@ -1,15 +1,14 @@
 #
-# $Id: Makefile,v 1.2 2005/04/08 12:56:31 likewolf Exp $
+# $Id: Makefile,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
 #
 
 ROOT = ../../../
 
 PRG_HEADERS=\
 	html.ch \
-	colors.ch \
-	default.ch \
+   htmlclrs.ch \
 	ferror.ch \
-	forms.ch \
+   htmlform.ch \
 	lowfiles.ch \
  
 include $(TOP)$(ROOT)config/header.cf

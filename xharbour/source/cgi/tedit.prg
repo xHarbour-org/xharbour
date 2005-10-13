@@ -1,5 +1,5 @@
 /*
- * $Id: oedit.prg,v 1.3 2004/04/27 16:57:21 lculik Exp $
+ * $Id: oedit.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -44,7 +44,7 @@
  */
 
 #include "hbclass.ch"
-#include "default.ch"
+#include "common.ch"
 #include "forms.ch"
 #include "html.ch"
 
@@ -54,7 +54,7 @@
 #define _OPTION_SELECTED 4
 #define _OPTION_DISABLED 5
 
-STATIC soForm
+STATIC sTCgioForm
 
 /****
 *
@@ -64,7 +64,7 @@ STATIC soForm
 */
 
    //METHOD Debug()         INLINE __clsDebug( self )
-CLASS HControl      // ALIAS hCtr
+CLASS TCgiHControl      // ALIAS hCtr
    DATA nH
    DATA Document
    DATA Form
@@ -195,13 +195,13 @@ ENDCLASS
 *
 */
 
-METHOD Put( lPut ) CLASS HControl
+METHOD Put( lPut ) CLASS TCgiHControl
 
    LOCAL i
    LOCAL cStr := ""
 
-   ::nH   := pageHandle()
-   ::form := currentForm()
+   ::nH   := TCgiPageHandle()
+   ::form := TCgiCurrentForm()
 
    ::cOutput += IIF( ::lBreak, CRLF() + "<BR>", CRLF() )
    IF ::lLabel
@@ -375,7 +375,7 @@ RETURN Self
 *
 */
 
-METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled ) CLASS HControl
+METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled ) CLASS TCgiHControl
 
    Aadd( ::aOptions, { cOption, cValue, cLabel, lSelected, lDisabled } )
 
@@ -394,7 +394,7 @@ METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
                       onblur, onchange, onselect, onclick, onmsover, onmsout, ;
                       onmsdown, onmsup, onkdown, onkup, onkprs, ;
                       pic, cap, dis, ro, lMulti, checked, ;
-                      align, wrap, type, Style, ID, lLabel ) CLASS HControl
+                      align, wrap, type, Style, ID, lLabel ) CLASS TCgiHControl
    ::name        := name
    ::rows        := ROWS
    ::cols        := COLS
@@ -437,7 +437,7 @@ METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
 */
 
    //METHOD Debug()           INLINE __clsDebug( self ) NOSELF
-CLASS Form
+CLASS TCgiForm
 
    DATA nH
    DATA aControls INIT {}
@@ -512,18 +512,18 @@ ENDCLASS
 *
 */
 
-METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS Form
+METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS TCgiForm
 
-   DEFAULT cName := "Form1"
-   DEFAULT cMethod := "POST"
-   DEFAULT lFrame := .F.
-   DEFAULT cCaption := ""
-   DEFAULT nWidth := 90
+   DEFAULT cName TO "Form1"
+   DEFAULT cMethod TO "POST"
+   DEFAULT lFrame TO .F.
+   DEFAULT cCaption TO ""
+   DEFAULT nWidth TO 90
 
    ::Name   := cName
    ::Method := cMethod
 
-   ::nH := PageHandle()
+   ::nH := TCgiPageHandle()
 
    ::Frame   := lFrame
    ::Caption := cCaption
@@ -531,7 +531,7 @@ METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS Form
 
    ::aControls := {}
 
-   soForm := Self
+   sTCgioForm := Self
 
 RETURN Self
 
@@ -542,9 +542,9 @@ RETURN Self
 *
 */
 
-METHOD Put( lPutControls ) CLASS Form
+METHOD Put( lPutControls ) CLASS TCgiForm
 
-   DEFAULT lPutControls := .F.
+   DEFAULT lPutControls TO .F.
 
    IF Valtype( ::width ) != "N"
       ::width := 90
@@ -678,7 +678,7 @@ RETURN Self
 *
 */
 
-METHOD END () CLASS Form
+METHOD END () CLASS TCgiForm
 
    Fwrite( ::nH, "</FORM>" + CRLF() )
 
@@ -699,7 +699,7 @@ RETURN Self
 *
 */
 
-METHOD getControl( cName ) CLASS Form
+METHOD getControl( cName ) CLASS TCgiForm
 
    LOCAL oRet
    LOCAL nPos := Ascan( ::aControls, { | e | e:name = cName } )
@@ -712,13 +712,13 @@ RETURN oRet
 
 /****
 *
-*     oForm()
+*     TCgioForm()
 *
 *     Return current form
 *
 */
 
-FUNCTION oForm()
+FUNCTION TCgioForm()
 
-RETURN soForm
+RETURN sTCgioForm
 

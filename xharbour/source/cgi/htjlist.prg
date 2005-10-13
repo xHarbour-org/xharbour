@@ -17,7 +17,7 @@
 
 #include "hbclass.ch"
 #include "html.ch"
-#include "default.ch"
+#include "common.ch"
 
 PROC TestJList()
 
@@ -52,7 +52,7 @@ PROC TestJList()
 *     Not finished yet.
 */
 
-CLASS NcList
+CLASS TCgiNcList
    DATA nH INIT STD_OUT
    DATA aScript INIT {}
    DATA aItems INIT {}
@@ -95,20 +95,20 @@ ENDCLASS
 */
 
 METHOD New( name, lOpen, width, height, bgColor, ;
-               FONT, fntColor, fntSize, cMinusImg, cPlusImg ) CLASS NcList
+               FONT, fntColor, fntSize, cMinusImg, cPlusImg ) CLASS TCgiNcList
 
    LOCAL cStr
 
-   DEFAULT name := "l"
-   DEFAULT lOpen := .F.
-   DEFAULT WIDTH := 200
-   DEFAULT HEIGHT := 22
-   DEFAULT BGCOLOR := "white"
-   DEFAULT FONT := "Verdana"
-   DEFAULT fntColor := "black"
-   DEFAULT fntSize := 2
-   DEFAULT cMinusImg := "minus.gif"
-   DEFAULT cPlusImg := "plus.gif"
+   DEFAULT name TO "l"
+   DEFAULT lOpen TO .F.
+   DEFAULT WIDTH TO 200
+   DEFAULT HEIGHT TO 22
+   DEFAULT BGCOLOR TO "white"
+   DEFAULT FONT TO "Verdana"
+   DEFAULT fntColor TO "black"
+   DEFAULT fntSize TO 2
+   DEFAULT cMinusImg TO "minus.gif"
+   DEFAULT cPlusImg TO "plus.gif"
 
    ::font      := FONT
    ::size      := fntSize
@@ -156,13 +156,13 @@ RETURN Self
 *
 */
 
-METHOD newNode( name, lOpen, width, height, bgColor ) CLASS NcList
+METHOD newNode( name, lOpen, width, height, bgColor ) CLASS TCgiNcList
 
    LOCAL cStr := ""
-   DEFAULT lOpen := .F.
-   DEFAULT WIDTH := 200
-   DEFAULT HEIGHT := 22
-   DEFAULT BGCOLOR := "white"
+   DEFAULT lOpen TO .F.
+   DEFAULT WIDTH TO 200
+   DEFAULT HEIGHT TO 22
+   DEFAULT BGCOLOR TO "white"
    cStr += ""       //SPACE(10)
    cStr += name + "= new List("
    cStr += IF( lOpen, "true,", "false," )
@@ -186,14 +186,14 @@ RETURN Self
 *
 */
 
-METHOD SetFont( name, font, fntColor, fntSize ) CLASS NcList
+METHOD SetFont( name, font, fntColor, fntSize ) CLASS TCgiNcList
 
    LOCAL cStr := ""
 
-   DEFAULT name := ::cCurrentNode
-   DEFAULT FONT := ::font
-   DEFAULT fntColor := ::fontColor
-   DEFAULT fntSize := ::Size
+   DEFAULT name TO ::cCurrentNode
+   DEFAULT FONT TO ::font
+   DEFAULT fntColor TO ::fontColor
+   DEFAULT fntSize TO ::Size
 
    cStr += name + [.setFont("<FONT ] + ;
       [ FACE = '] + font + [' ] + ;
@@ -212,12 +212,12 @@ RETURN self
 *
 */
 
-METHOD AddItem( name, url, bgColor ) CLASS NcList
+METHOD AddItem( name, url, bgColor ) CLASS TCgiNcList
 
    LOCAL cStr := ""
    LOCAL cUrl := ""
-   DEFAULT name := "o"
-   DEFAULT url := ""
+   DEFAULT name TO "o"
+   DEFAULT url TO ""
    cUrl := [<A HREF='] + url + ['>] + htmlSpace( 2 ) + name + htmlSpace( 2 )
    cStr += ::cCurrentNode + '.addItem( "' + cUrl + '"' + IF( bgColor != NIL, ',"' + bgColor + '"', "" ) + ');' + CRLF()
    ::nItems ++
@@ -232,13 +232,13 @@ RETURN self
 *
 */
 
-METHOD AddLink( name, url, img, bgColor ) CLASS NcList
+METHOD AddLink( name, url, img, bgColor ) CLASS TCgiNcList
 
    LOCAL cStr := ""
    LOCAL cUrl := ""
-   DEFAULT name := "o"
-   DEFAULT url := ""
-   DEFAULT img := "webpage.jpg"
+   DEFAULT name TO "o"
+   DEFAULT url TO ""
+   DEFAULT img TO "webpage.jpg"
    cUrl := "<A HREF='" + url + "'><IMG SRC='" + img + "' border=0 align=absmiddle>" + htmlSpace( 2 ) + name + htmlSpace( 2 )
    cStr += ::cCurrentNode + '.addItem( "' + curl + '"' + IF( bgColor != NIL, ',"' + bgColor + '"', "" ) + ');' + CRLF()
    ::nItems ++
@@ -253,7 +253,7 @@ RETURN self
 *
 */
 
-METHOD endNode( name, caption ) CLASS NcList
+METHOD endNode( name, caption ) CLASS TCgiNcList
 
    LOCAL cStr := ""
 
@@ -272,13 +272,13 @@ RETURN self
 *
 */
 
-METHOD Build( xPos, yPos ) CLASS NcList
+METHOD Build( xPos, yPos ) CLASS TCgiNcList
 
    LOCAL i    := 0
    LOCAL cStr := ""
 
-   DEFAULT xPos := 5
-   DEFAULT yPos := 5
+   DEFAULT xPos TO 5
+   DEFAULT yPos TO 5
 
    cStr += ::cMainNode + ".build(" + NTRIM( xPos ) + "," + NTRIM( yPos ) + ");" + CRLF()
    cStr += "}" + CRLF()
@@ -319,7 +319,7 @@ RETURN Self
 *
 */
 
-METHOD Put( cFile ) CLASS NcList
+METHOD Put( cFile ) CLASS TCgiNcList
 
    IF cFile == NIL
       ::nH := STD_OUT

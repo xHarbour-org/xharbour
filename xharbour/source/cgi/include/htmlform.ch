@@ -1,5 +1,5 @@
 /*
- * $Id: forms.ch,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: forms.ch,v 1.2 2005/10/08 14:13:49 lculik Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
           [COLOR <clr>]                                            ;
           [WIDTH <w>]                                              ;
           =>                                                       ;
-          <oFrm> := Form():New( [<name>], [<action>], [<method>],  ;
+          <oFrm> := TCgiForm():New( [<name>], [<action>], [<method>],  ;
                                 <.frame.>, <cap> )                ;;
           [<oFrm>:setTarget( <(target)> ) ;]                       ;
           [<oFrm>:setEncType( <(enctype)> ) ;]                     ;
@@ -121,7 +121,7 @@
           IN <oForm>                          ;
           =>                                  ;
           <oForm>:addControl( ;
-                  [ <obj>:= ] HControl():setControl(;
+                  [ <obj>:= ] TCgiHControl():setControl(;
                   <(name)>, <rows>, <cols>, <size>, <maxchars>, ;
                   <(value)>, ;
                   <(onfocus)>,<(onblur)>,<(onchange)>,<(onselect)>,;
@@ -166,7 +166,7 @@
           [<l:LABEL>]                         ;
           IN <oForm>                               ;
           =>                                       ;
-          <oCtr> := HControl()                    ;;
+          <oCtr> := TCGIHControl()                    ;;
           [<oCtr>:SetName( <(name)> ) ;]           ;
           [<oCtr>:SetSize( <size> ) ;]             ;
           [<oCtr>:SetRows( <rows> ) ;]             ;

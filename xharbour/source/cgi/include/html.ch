@@ -1,5 +1,5 @@
 /*
- * $Id: html.ch,v 1.2 2004/02/11 10:43:54 lculik Exp $
+ * $Id: html.ch,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -47,7 +47,7 @@
 
 #include "simpleio.ch"
 #include "forms.ch"
-#include "colors.ch"
+#include "htmlclrs.ch"
 
 #xTranslate  DEFAULT( <p>, <v> ) => <p> := IF( <p> == NIL, <v>, <p> )
 
@@ -146,7 +146,7 @@
           [<lcache:NOCACHE>]           ;
           OF <oHtml>                 ;
           =>                         ;
-          <oHtml> := html():new( <file>,<title>,<linktitle>,<charset>,;
+          <oHtml> := TCgiHTML():new( <file>,<title>,<linktitle>,<charset>,;
                                  [{<(javasrc)>}], ;
                                  [<bgimg>], [<bgcolor>], [<txtcolor>],;
                                  [{<(javacode)>}],;
@@ -188,7 +188,7 @@
           [MARGINWIDTH <nMarginWidth>] ;
           OF <oHtml>                 ;
           =>                         ;
-          <oHtml> := html():CGInew(<title>, <linktitle>, <charset>,;
+          <oHtml> := TCgiHTML():CGInew(<title>, <linktitle>, <charset>,;
                                    [{<(javasrc)>}], ;
                                    [<bgimg>], [<bgcolor>], [<txtcolor>],;
                                    [{<(javacode)>}],;
@@ -232,7 +232,7 @@
                               <.d.>, <.c.>, <.r.>,;
                               <clrdrk>, <clrlt>, <cClrBorder>,  ;
                               <nCellPadding>, <nCellSpacing>, ;
-                              __ALIGN__ [<aln>], <.x.>, <bgImage>, ;
+                              __HTML_ALING__ [<aln>], <.x.>, <bgImage>, ;
                               <cStyle>, <id> , <nof>)
 
 
@@ -246,7 +246,7 @@
           [HEIGHT <nHeight>]         ;
           OF <oHtm>                  ;
           =>                         ;
-          <oHtm>:TableHead( <cHead>, <cColor>, __ALIGN__ [<aln>], <cFont>, ;
+          <oHtm>:TableHead( <cHead>, <cColor>, __HTML_ALING__ [<aln>], <cFont>, ;
                             <nSize>, <cFntColor>, <nHeight> )
 
 
@@ -270,10 +270,10 @@
           [CLASS <cClass>]           ;
           OF <oHtm>                  ;
           =>                         ;
-          <oHtm>:newTableCell( __ALIGN__ [<aln>], <cColor>, <cFont>, ;
+          <oHtm>:newTableCell( __HTML_ALING__ [<aln>], <cColor>, <cFont>, ;
                                <nSize>, <cFntColor>, <nHeight>,      ;
                                <img>, <width>, !<.nowrap.>,          ;
-                               <cspan>, <rspan> ,__ALIGN__ [<valn>], <clrdrk>, <clrlt>, <bclrlt>, <cClass>)
+                               <cspan>, <rspan> ,__HTML_ALING__ [<valn>], <clrdrk>, <clrlt>, <bclrlt>, <cClass>)
 
 
 #xCommand TABLE CELL                 ;
@@ -290,7 +290,7 @@
           [<aln:LEFT,RIGHT,CENTER,MIDDLE,TOP,TEXTTOP,BOTTOM,ABSMIDDLE,ABSCENTER,ABSBOTTOM,BASELINE>];
           OF <oHtm>                  ;
           =>                         ;
-          <oHtm>:newTableCell( __ALIGN__ [<aln>], <cColor>, <cFont>, ;
+          <oHtm>:newTableCell( __HTML_ALING__ [<aln>], <cColor>, <cFont>, ;
                                <nSize>, <cFntColor>, <nHeight>, ;
                                <img>, <width>, !<.nowrap.>,;
                                <cspan>, <rspan> )
@@ -302,7 +302,7 @@
           [ALIGN <aln1:LEFT,RIGHT,CENTER,MIDDLE,TOP,TEXTTOP,BOTTOM,ABSMIDDLE,ABSCENTER,ABSBOTTOM,BASELINE>];
           OF <oHtm>                  ;
           =>                         ;
-          <oHtm>:NewTableRow( <cColor>, __ALIGN__ [<aln>], __ALIGN__ [<aln1>] );
+          <oHtm>:NewTableRow( <cColor>, __HTML_ALING__ [<aln>], __HTML_ALING__ [<aln1>] );
 
 #xCommand DEFINE FONT [<cFont>]       ;
           [<ftype:BOLD,ITALIC,ULINE,UNDERLINE>] ;
@@ -310,7 +310,7 @@
           [COLOR <c>]                 ;
           [OF <oHtm>]                 ;
           =>                          ;
-          <oHtm>:defineFont( [<(cFont)>], __FTYPE__ [<ftype>], ;
+          <oHtm>:defineFont( [<(cFont)>], __HTML_FTYPE__ [<ftype>], ;
                              [<s>], [<c>] )
 
 
@@ -444,7 +444,7 @@
           <oHtm>:putImage( <image>, <border>, <height>,;
                            <onclick>, <onmsover>, <onmsout>, ;
                            <name>, <alt>, ;
-                           <target>, <width>, <.break.>, <iD>, <map>, __ALIGN__ [<aln1>] , <hspace>)
+                           <target>, <width>, <.break.>, <iD>, <map>, __HTML_ALING__ [<aln1>] , <hspace>)
 
 #xCommand LINK <url>                ;
           [TEXT <text>]             ;
@@ -485,7 +485,7 @@
           =>                        ;
           <oHtm>:putImageURL( <image>,<border>,<height>,<url>,;
                              <onclick>, <onmsover>, <onmsout>, <name>, <alt>, ;
-                             <target>, <width>, <.break.>, <cClass>, <id>, < hspace >, __ALIGN__ [<aln1>]  )
+                             <target>, <width>, <.break.>, <cClass>, <id>, < hspace >, __HTML_ALING__ [<aln1>]  )
 
 
 #xCommand NEW FRAMEPAGE         ;
@@ -525,7 +525,7 @@
           <oFrm>:frame( [<name>], [<url>],             ;
                         !<.brd.>, !<.res.>, [<.scr.>], ;
                         [<mw>], [<mh>], [<target>],    ;
-                        __SCROLL__ [<scrl>] )
+                        __HTML_SCROLL__ [<scrl>] )
 
 #xCommand ENDSET <oFrm>        => <oFrm>:EndSet()
 #xCommand END FRAMEPAGE <oFrm> => <oFrm>:End()
@@ -552,8 +552,8 @@
           OF <oHtm>                          ;
           =>                                 ;
           <oHtm>:Marquee( <cText>, <cFont>, <cFntColor>, <nFntSize>, ;
-                   __POS__ [<pos>], <nWidth>, <nHeight>, <cbgColor>, ;
-                   __BEHAVE__ [<bhv>], __DIR__ [<dir>], ;
+                   __HTML_POS__ [<pos>], <nWidth>, <nHeight>, <cbgColor>, ;
+                   __HTML_BEHAVE__ [<bhv>], __HTML_DIR__ [<dir>], ;
                    <nScrollAmt>, <nScrollDel>, <loop>,;
                    [<(onmsover)>], [<(onmsout)>], [<(onclick)>], ;
                    [<(onstart)>], [<(onfinish)>] )
@@ -580,8 +580,8 @@
           OF <oHtm>                          ;
           =>                                 ;
           <oHtm>:StartMarquee( <cFont>, <cFntColor>, <nFntSize>, ;
-                   __POS__ [<pos>], <nWidth>, <nHeight>, <cbgColor>, ;
-                   __BEHAVE__ [<bhv>], __DIR__ [<dir>], ;
+                   __HTML_POS__ [<pos>], <nWidth>, <nHeight>, <cbgColor>, ;
+                   __HTML_BEHAVE__ [<bhv>], __HTML_DIR__ [<dir>], ;
                    <nScrollAmt>, <nScrollDel>, <loop>,;
                    [<(onmsover)>], [<(onmsout)>], [<(onclick)>], ;
                    [<(onstart)>], [<(onfinish)>] )
@@ -675,7 +675,7 @@
           [<aln:LEFT,RIGHT,MIDDLE,TOP,TEXTTOP,BOTTOM,ABSMIDDLE,ABSBOTTOM,BASELINE>];
           OF <oHtm>              ;
           =>                     ;
-          <oHtm>:ADDOBJECT(<cType>,<cClassid>,__ALING__ [<aln>],<cCode>,<.lDisable.>,<cCodeBase>,<cName>,<nWidth>,<nHeight>)
+          <oHtm>:ADDOBJECT(<cType>,<cClassid>,__HTML_ALING__ [<aln>],<cCode>,<.lDisable.>,<cCodeBase>,<cName>,<nWidth>,<nHeight>)
 
 #xCommand OBJECT PARAM   ;
           NAME <cName>   ;
@@ -723,47 +723,47 @@
           =>;
           <ohtm>:MapArea( <(Shape)>, <Alt>, <coord>, <Url> )
 
-#xtranslate __SCROLL__                => "AUTO"
-#xtranslate __SCROLL__ <scrl:NO>      => "NO"
-#xtranslate __SCROLL__ <scrl:OFF>     => "NO"
-#xtranslate __SCROLL__ <scrl:ON>      => "YES"
-#xtranslate __SCROLL__ <scrl:YES>     => "YES"
-#xtranslate __SCROLL__ <scrl:AUTO>    => "AUTO"
+#xtranslate __HTML_SCROLL__                => "AUTO"
+#xtranslate __HTML_SCROLL__ <scrl:NO>      => "NO"
+#xtranslate __HTML_SCROLL__ <scrl:OFF>     => "NO"
+#xtranslate __HTML_SCROLL__ <scrl:ON>      => "YES"
+#xtranslate __HTML_SCROLL__ <scrl:YES>     => "YES"
+#xtranslate __HTML_SCROLL__ <scrl:AUTO>    => "AUTO"
 
 
-#xtranslate __ALIGN__                 =>  NIL
-#xtranslate __ALIGN__ <aln:LEFT>      => "LEFT"
-#xtranslate __ALIGN__ <aln:RIGHT>     => "RIGHT"
-#xtranslate __ALIGN__ <aln:CENTER>    => "center"
-#xtranslate __ALIGN__ <aln:MIDDLE>    => "MIDDLE"
-#xtranslate __ALIGN__ <aln:TOP>       => "TOP"
-#xtranslate __ALIGN__ <aln:TEXTTOP>   => "TEXTTOP"
-#xtranslate __ALIGN__ <aln:BOTTOM>    => "BOTTOM"
-#xtranslate __ALIGN__ <aln:ABSMIDDLE> => "ABSMIDDLE"
-#xtranslate __ALIGN__ <aln:ABSCENTER> => "ABSMIDDLE"
-#xtranslate __ALIGN__ <aln:ABSBOTTOM> => "ABSBOTTOM"
-#xtranslate __ALIGN__ <aln:BASELINE>  => "BASELINE"
+#xtranslate __HTML_ALING__                 =>  NIL
+#xtranslate __HTML_ALING__ <aln:LEFT>      => "LEFT"
+#xtranslate __HTML_ALING__ <aln:RIGHT>     => "RIGHT"
+#xtranslate __HTML_ALING__ <aln:CENTER>    => "center"
+#xtranslate __HTML_ALING__ <aln:MIDDLE>    => "MIDDLE"
+#xtranslate __HTML_ALING__ <aln:TOP>       => "TOP"
+#xtranslate __HTML_ALING__ <aln:TEXTTOP>   => "TEXTTOP"
+#xtranslate __HTML_ALING__ <aln:BOTTOM>    => "BOTTOM"
+#xtranslate __HTML_ALING__ <aln:ABSMIDDLE> => "ABSMIDDLE"
+#xtranslate __HTML_ALING__ <aln:ABSCENTER> => "ABSMIDDLE"
+#xtranslate __HTML_ALING__ <aln:ABSBOTTOM> => "ABSBOTTOM"
+#xtranslate __HTML_ALING__ <aln:BASELINE>  => "BASELINE"
 
-#xtranslate __POS__                    => NIL
-#xtranslate __POS__ <pos:TOP>          => "TOP"
-#xtranslate __POS__ <pos:MIDDLE>       => "MIDDLE"
-#xtranslate __POS__ <pos:BOTTOM>       => "BOTTOM"
+#xtranslate __HTML_POS__                    => NIL
+#xtranslate __HTML_POS__ <pos:TOP>          => "TOP"
+#xtranslate __HTML_POS__ <pos:MIDDLE>       => "MIDDLE"
+#xtranslate __HTML_POS__ <pos:BOTTOM>       => "BOTTOM"
 
-#xtranslate __DIR__                    => NIL
-#xtranslate __DIR__ <dir:LEFT>         => "LEFT"
-#xtranslate __DIR__ <dir:RIGHT>        => "RIGHT"
+#xtranslate __HTML_DIR__                    => NIL
+#xtranslate __HTML_DIR__ <dir:LEFT>         => "LEFT"
+#xtranslate __HTML_DIR__ <dir:RIGHT>        => "RIGHT"
 
-#xtranslate __BEHAVE__                 => NIL
-#xtranslate __BEHAVE__ <bhv:SCROLL>    => "SCROLL"
-#xtranslate __BEHAVE__ <bhv:SLIDE>     => "SLIDE"
-#xtranslate __BEHAVE__ <bhv:ALTERNATE> => "ALTERNATE"
-#xtranslate __BEHAVE__ <bhv:ALT>       => "ALTERNATE"
+#xtranslate __HTML_BEHAVE__                 => NIL
+#xtranslate __HTML_BEHAVE__ <bhv:SCROLL>    => "SCROLL"
+#xtranslate __HTML_BEHAVE__ <bhv:SLIDE>     => "SLIDE"
+#xtranslate __HTML_BEHAVE__ <bhv:ALTERNATE> => "ALTERNATE"
+#xtranslate __HTML_BEHAVE__ <bhv:ALT>       => "ALTERNATE"
 
-#xtranslate __FTYPE__                    => NIL
-#xtranslate __FTYPE__ <ftype:ITALIC>     => "<I>"
-#xtranslate __FTYPE__ <ftype:BOLD>       => "<B>"
-#xtranslate __FTYPE__ <ftype:ULINE>      => "<U>"
-#xtranslate __FTYPE__ <ftype:UNDERLINE>  => "<U>"
+#xtranslate __HTML_FTYPE__                    => NIL
+#xtranslate __HTML_FTYPE__ <ftype:ITALIC>     => "<I>"
+#xtranslate __HTML_FTYPE__ <ftype:BOLD>       => "<B>"
+#xtranslate __HTML_FTYPE__ <ftype:ULINE>      => "<U>"
+#xtranslate __HTML_FTYPE__ <ftype:UNDERLINE>  => "<U>"
                                     
 
 #define  GREEK_CGI  {;

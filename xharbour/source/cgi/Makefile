@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2005/04/07 23:19:12 likewolf Exp $
+# $Id: Makefile,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -7,18 +7,19 @@ ROOT = ../../
 C_SOURCES=\
 
 PRG_SOURCES=\
-    ohtm.prg \
-    ocgi.prg \
-    oedit.prg \
-    oframe.prg \
-    oini.prg \
-    ofile.prg \
-    jwindow.prg \
+    thtm.prg \
+    tcgi.prg \
+    tedit.prg \
+    tframe.prg \
+    tini.prg \
+    tfile.prg \
+    hjwindow.prg \
     htmutil.prg \
-    counter.prg \
+    htcount.prg \
     hterrsys.prg \
     htmbrows.prg \
-    jlist.prg \
+    htjlist.prg \
+
 
 LIBNAME=cgi
 ifneq ($(HB_ARCHITECTURE),dos)

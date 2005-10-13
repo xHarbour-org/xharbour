@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2003/09/23 21:23:56 paultucker Exp $
+# $Id: makefile.bc,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
 #
 
 #
@@ -89,16 +89,16 @@ HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 # TOOLS.LIB rules
 #
 TOOLS_LIB_OBJS = \
-        $(OBJ_DIR)\ohtm.obj \
+        $(OBJ_DIR)\thtm.obj \
         $(OBJ_DIR)\htmbrows.obj \
-        $(OBJ_DIR)\oedit.obj \
-        $(OBJ_DIR)\ofile.obj \
-        $(OBJ_DIR)\jlist.obj \
-        $(OBJ_DIR)\oini.obj \
-        $(OBJ_DIR)\jwindow.obj \
-        $(OBJ_DIR)\ocgi.obj \
-        $(OBJ_DIR)\oframe.obj \
-        $(OBJ_DIR)\counter.obj \
+        $(OBJ_DIR)\tedit.obj \
+        $(OBJ_DIR)\tfile.obj \
+        $(OBJ_DIR)\htjlist.obj \
+        $(OBJ_DIR)\tini.obj \
+        $(OBJ_DIR)\hjwindow.obj \
+        $(OBJ_DIR)\tcgi.obj \
+        $(OBJ_DIR)\tframe.obj \
+        $(OBJ_DIR)\htcount.obj \
         $(OBJ_DIR)\hterrsys.obj \
         $(OBJ_DIR)\htmutil.obj 
 
@@ -124,10 +124,10 @@ CLEAN:
 $(TOOLS_LIB)  : $(TOOLS_LIB_OBJS)
 
 
-$(OBJ_DIR)\ohtm.c : $(TOOLS_DIR)\ohtm.prg
+$(OBJ_DIR)\thtm.c : $(TOOLS_DIR)\thtm.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\ohtm.obj : $(OBJ_DIR)\ohtm.c
+$(OBJ_DIR)\thtm.obj : $(OBJ_DIR)\thtm.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
@@ -138,59 +138,59 @@ $(OBJ_DIR)\htmbrows.obj : $(OBJ_DIR)\htmbrows.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\oedit.c : $(TOOLS_DIR)\oedit.prg
+$(OBJ_DIR)\tedit.c : $(TOOLS_DIR)\tedit.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\oedit.obj : $(OBJ_DIR)\oedit.c
+$(OBJ_DIR)\tedit.obj : $(OBJ_DIR)\tedit.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\ofile.c : $(TOOLS_DIR)\ofile.prg
+$(OBJ_DIR)\tfile.c : $(TOOLS_DIR)\tfile.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\ofile.obj : $(OBJ_DIR)\ofile.c
+$(OBJ_DIR)\tfile.obj : $(OBJ_DIR)\tfile.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\jlist.c : $(TOOLS_DIR)\jlist.prg
+$(OBJ_DIR)\htjlist.c : $(TOOLS_DIR)\htjlist.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\jlist.obj : $(OBJ_DIR)\jlist.c
+$(OBJ_DIR)\htjlist.obj : $(OBJ_DIR)\htjlist.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\oini.c : $(TOOLS_DIR)\oini.prg
+$(OBJ_DIR)\tini.c : $(TOOLS_DIR)\tini.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\oini.obj : $(OBJ_DIR)\oini.c
+$(OBJ_DIR)\tini.obj : $(OBJ_DIR)\tini.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\jwindow.c : $(TOOLS_DIR)\jwindow.prg
+$(OBJ_DIR)\hjwindow.c : $(TOOLS_DIR)\hjwindow.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\jwindow.obj : $(OBJ_DIR)\jwindow.c
+$(OBJ_DIR)\hjwindow.obj : $(OBJ_DIR)\hjwindow.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\ocgi.c : $(TOOLS_DIR)\ocgi.prg
+$(OBJ_DIR)\tcgi.c : $(TOOLS_DIR)\tcgi.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\ocgi.obj : $(OBJ_DIR)\ocgi.c
+$(OBJ_DIR)\tcgi.obj : $(OBJ_DIR)\tcgi.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\oframe.c : $(TOOLS_DIR)\oframe.prg
+$(OBJ_DIR)\tframe.c : $(TOOLS_DIR)\tframe.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\oframe.obj : $(OBJ_DIR)\oframe.c
+$(OBJ_DIR)\tframe.obj : $(OBJ_DIR)\tframe.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
-$(OBJ_DIR)\counter.c : $(TOOLS_DIR)\counter.prg
+$(OBJ_DIR)\htcount.c : $(TOOLS_DIR)\htcount.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 
-$(OBJ_DIR)\counter.obj : $(OBJ_DIR)\counter.c
+$(OBJ_DIR)\htcount.obj : $(OBJ_DIR)\htcount.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 

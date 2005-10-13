@@ -1,5 +1,5 @@
 /*
- * $Id: hterrsys.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: hterrsys.prg,v 1.2 2005/10/06 06:54:29 lf_sfnet Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ STATIC scErrFooter  := " "
 *
 *	Note:  automatically executes at startup
 */
-
+ANNOUNCE ERRORSYS
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 PROC Errorsys()
 
@@ -88,7 +88,7 @@ STATIC FUNC DefError( e )
    LOCAL cErrString := ""
    LOCAL nDispCount := Dispcount()
    LOCAL aError     := {}
-   LOCAL nH         := IF( PageHandle() == NIL, 0, PageHandle() )
+   LOCAL nH         := IF( TCgiPageHandle() == NIL, 0, TCgiPageHandle() )
 
    // by default, division by zero yields zero
    IF ( e:genCode == EG_ZERODIV )
@@ -195,7 +195,7 @@ STATIC FUNC DefError( e )
      FWrite( nH,  [<A HREF="alert('ERROR!!!')>"]+CRLF() )
 */
 
-   JavaCMD( nH, 'alert("There was an error processing your request:\n' + ;
+   TCGIJavaCMD( nH, 'alert("There was an error processing your request:\n' + ;
             'Look at the bottom of this page for\n' + ;
             'error description and parameters...");' )
    Fwrite( nH, "</FONT>" + CRLF() + "</BODY></HTML>" + CRLF() )

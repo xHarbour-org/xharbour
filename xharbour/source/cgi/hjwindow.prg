@@ -1,5 +1,5 @@
 /*
- * $Id: jwindow.prg,v 1.1 2003/02/23 23:15:16 lculik Exp $
+ * $Id: jwindow.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -45,10 +45,10 @@
 
 #include "hbclass.ch"
 #include "html.ch"
-#include "default.ch"
+#include "common.ch"
 
    //METHOD Debug()         INLINE __clsDebug( self ) NOSELF
-Class JWindow
+CLASS TCgiJWindow
 
    DATA nH
    DATA Name INIT ""
@@ -131,18 +131,18 @@ ENDCLASS
 *
 */
 
-METHOD New( cVarName, cUrl, cName, x, y, w, h ) Class JWindow
+METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TCgiJWindow
 
-   DEFAULT cVarName := "newWin"
-   DEFAULT cURL := " "
-   DEFAULT cName := cVarName            //"newWin"
-   DEFAULT x := 100
-   DEFAULT y := 100
-   DEFAULT h := 300
-   DEFAULT w := 300
+   DEFAULT cVarName TO "newWin"
+   DEFAULT cURL TO " "
+   DEFAULT cName TO cVarName            //"newWin"
+   DEFAULT x TO 100
+   DEFAULT y TO 100
+   DEFAULT h TO 300
+   DEFAULT w TO 300
 
-   ::nH      := PageHandle()
-   ::oHtm    := oPage()
+   ::nH      := TCgiPageHandle()
+   ::oHtm    := TCGIoPage()
    ::varName := cVarName
    ::URL     := cUrl
    ::Name    := cName
@@ -167,23 +167,23 @@ RETURN Self
 METHOD SetFeatures( alwaysRaised, alwaysLowered, ;
                        Resizable, Menubar, personalBar, ;
                        dependent, location, directories, ;
-                       Scrollbars, Status, TitleBar, Toolbar, copyHistory ) Class JWindow
+                       Scrollbars, Status, TitleBar, Toolbar, copyHistory ) CLASS TCgiJWindow
 
    LOCAL cStr := ""
 
-   DEFAULT alwaysRaised := ::alwaysRaised
-   DEFAULT alwaysLowered := ::alwaysLowered
-   DEFAULT Resizable := ::Resizable
-   DEFAULT Menubar := ::Menubar
-   DEFAULT personalBar := ::personalBar
-   DEFAULT dependent := ::dependent
-   DEFAULT location := ::location
-   DEFAULT directories := ::directories
-   DEFAULT Scrollbars := ::Scrollbars
-   DEFAULT Status := ::Status
-   DEFAULT TitleBar := ::TitleBar
-   DEFAULT Toolbar := ::Toolbar
-   DEFAULT copyHistory := ::copyHistory
+   DEFAULT alwaysRaised TO ::alwaysRaised
+   DEFAULT alwaysLowered TO ::alwaysLowered
+   DEFAULT Resizable TO ::Resizable
+   DEFAULT Menubar TO ::Menubar
+   DEFAULT personalBar TO ::personalBar
+   DEFAULT dependent TO ::dependent
+   DEFAULT location TO ::location
+   DEFAULT directories TO ::directories
+   DEFAULT Scrollbars TO ::Scrollbars
+   DEFAULT Status TO ::Status
+   DEFAULT TitleBar TO ::TitleBar
+   DEFAULT Toolbar TO ::Toolbar
+   DEFAULT copyHistory TO ::copyHistory
 
    IF alwaysRaised 
       cStr += "alwaysraised=yes,"
@@ -263,13 +263,13 @@ RETURN Self
 *
 */
 
-METHOD SetSize( x, y, h, w ) Class JWindow
+METHOD SetSize( x, y, h, w ) CLASS TCgiJWindow
 
    LOCAL cStr := ""
-   DEFAULT x := ::ScreenX, ;
-      y := ::ScreenY, ;
-      h := ::height, ;
-      w := ::width
+   DEFAULT x TO ::ScreenX, ;
+      y TO ::ScreenY, ;
+      h TO ::height, ;
+      w TO ::width
 
    ::ScreenX := x
    ::ScreenY := y
@@ -294,12 +294,12 @@ RETURN Self
 *
 */
 
-METHOD Put() Class JWindow
+METHOD Put() CLASS TCgiJWindow
 
    LOCAL cStr := ""
 
    IF ::nH == NIL
-      ::nH := pageHandle()
+      ::nH := TCgiPageHandle()
       IF ::nH == NIL
          RETURN Self
       ENDIF
@@ -319,7 +319,7 @@ METHOD Put() Class JWindow
       ::varName + "', '" + ;
       ::features + "')"
 
-   JavaCMD( ::nH, cStr )
+   TCGIJavaCMD( ::nH, cStr )
 
 RETURN Self
 
@@ -329,9 +329,9 @@ RETURN Self
 *
 */
 
-METHOD Write( c ) Class JWindow
+METHOD Write( c ) CLASS TCgiJWindow
 
-   JavaCMD( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
+   TCGIJavaCMD( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
 RETURN Self
 
 /****
@@ -341,7 +341,7 @@ RETURN Self
 *
 */
 
-METHOD Qout( c ) Class JWindow
+METHOD Qout( c ) CLASS TCgiJWindow
 
    Fwrite( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
 RETURN Self
@@ -354,7 +354,7 @@ RETURN Self
 *
 */
 
-METHOD Begin() Class JWindow
+METHOD Begin() CLASS TCgiJWindow
 
    LOCAL i
 
@@ -421,9 +421,9 @@ RETURN Self
 *
 */
 
-METHOD END () Class JWindow
+METHOD END () CLASS TCgiJWindow
 
-   JavaCMD( ::nH, ::varName + ".document.write('</BODY></HTML>')" + CRLF() )
+   TCGIJavaCMD( ::nH, ::varName + ".document.write('</BODY></HTML>')" + CRLF() )
 
 RETURN Self
 
@@ -437,11 +437,11 @@ RETURN Self
 
 METHOD ImageURL( cImage, cUrl, nHeight, nBorder, ;
                     cOnClick, cOnMsover, cOnMsout, ;
-                    cName, cAlt ) Class JWindow
+                    cName, cAlt ) CLASS TCgiJWindow
 
    LOCAL cStr := ""
 
-   DEFAULT cUrl := ""
+   DEFAULT cUrl TO ""
 
    IF cName != NIL
       cStr += ' NAME= "' + cName + '"' + CRLF()

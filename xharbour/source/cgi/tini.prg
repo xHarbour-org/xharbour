@@ -1,5 +1,5 @@
 /*
- * $Id: oini.prg,v 1.2 2003/02/24 16:09:43 lculik Exp $
+ * $Id: oini.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
  */
 
 /*
@@ -93,12 +93,12 @@
 // /
 
 #include "hbclass.ch"
-#include "default.ch"
+#include "common.ch"
 
 #ifdef TEST
 PROC TestMe()
 
-   LOCAL o := oINI():New( "Test.ini" )
+   LOCAL o := TCgiIni():New( "Test.ini" )
    //o:Open()
    o:Read()
    objectViewer( o )
@@ -120,7 +120,7 @@ PROC TestMe()
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-CLASS oIni FROM FileBase
+CLASS TCgiIni FROM TCgiFileBase
    DATA aLines INIT {}
    DATA aSections INIT {}
    DATA lineSize INIT 200
@@ -140,7 +140,7 @@ CLASS oIni FROM FileBase
 ENDCLASS
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-METHOD New( cFile ) CLASS oIni
+METHOD New( cFile ) CLASS TCgiIni
 
    //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 
@@ -159,7 +159,7 @@ RETURN Self
 **
 */
 
-METHOD READ() CLASS oIni
+METHOD READ() CLASS TCgiIni
 
    LOCAL nSection := 0
 
@@ -226,14 +226,14 @@ RETURN Self
 **  default data. Also it creates the section if it doesn't exist.
 */
 
-METHOD GET( cSection, cEntry, uDefault ) CLASS oIni
+METHOD GET( cSection, cEntry, uDefault ) CLASS TCgiIni
 
    LOCAL cRet
    LOCAL nPos
    LOCAL nSection
    LOCAL nEntry
 
-   DEFAULT uDefault := ""
+   DEFAULT uDefault TO ""
 
    cSection := "[" + Lower( Alltrim( cSection ) ) + "]"
    nSection := Ascan( ::aSections, { | e | e[ 1 ] = cSection } )
@@ -250,13 +250,13 @@ METHOD GET( cSection, cEntry, uDefault ) CLASS oIni
 
       ELSE          // Entry not found. Insert new entry
 
-         Aadd( ::aSections[ nSection, 2 ], cEntry + "=" + ANY2STR( uDefault ) )
+         Aadd( ::aSections[ nSection, 2 ], cEntry + "=" + TCgiANY2STR( uDefault ) )
          cRet := uDefault
       ENDIF
 
    ELSE             // insert new section and entry...
       Aadd( ::aSections, { cSection, ;
-                           { cEntry + "=" + ANY2STR( uDefault ) } } )
+                           { cEntry + "=" + TCgiANY2STR( uDefault ) } } )
       cRet := uDefault
 
    ENDIF
@@ -270,7 +270,7 @@ RETURN ( cRet )
 **
 */
 
-METHOD Put( cSection, cEntry, uValue ) CLASS oIni
+METHOD Put( cSection, cEntry, uValue ) CLASS TCgiIni
 
    LOCAL cRet     := ""
    LOCAL cComment
@@ -278,7 +278,7 @@ METHOD Put( cSection, cEntry, uValue ) CLASS oIni
    LOCAL nSection
    LOCAL nEntry
 
-   DEFAULT uValue := ""
+   DEFAULT uValue TO ""
 
    cSection := "[" + Lower( Alltrim( cSection ) ) + "]"
    nSection := Ascan( ::aSections, { | e | e[ 1 ] = cSection } )                //$ e[1] } )
@@ -297,20 +297,20 @@ METHOD Put( cSection, cEntry, uValue ) CLASS oIni
 
          // put new value
          ::aSections[ nSection, 2, nEntry ] := cEntry + "=" + ;
-                                               ANY2STR( uValue ) + ;
+                                               TCgiANY2STR( uValue ) + ;
                                                Space( 2 ) + ;
                                                cComment
 
       ELSE          // Entry not found. Insert new entry.
 
-         Aadd( ::aSections[ nSection, 2 ], cEntry + "=" + ANY2STR( uValue ) )
+         Aadd( ::aSections[ nSection, 2 ], cEntry + "=" + TCgiANY2STR( uValue ) )
          cRet := uValue
       ENDIF
 
    ELSE             // Section not found. Insert section and entry.
 
       Aadd( ::aSections, { cSection, ;
-                           { cEntry + "=" + ANY2STR( uValue ) } } )
+                           { cEntry + "=" + TCgiANY2STR( uValue ) } } )
       cRet := uValue
 
    ENDIF
@@ -324,12 +324,12 @@ RETURN ( cRet )
 **  saved, including comments...
 */
 
-METHOD Save( cComment ) CLASS oIni
+METHOD Save( cComment ) CLASS TCgiIni
 
    LOCAL i
    LOCAL j
 
-   DEFAULT cComment := ""
+   DEFAULT cComment TO ""
 
    ::Close()
 
@@ -360,7 +360,7 @@ METHOD Save( cComment ) CLASS oIni
 
 RETURN Self
 
-METHOD DumpSections() cLASS OINI
+METHOD DumpSections() cLASS TCgiIni
 
    LOCAL i
    LOCAL j
@@ -451,7 +451,7 @@ RETURN Alltrim( cRet )
 */
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-STATIC FUNCTION Any2Str( xVal )
+STATIC FUNCTION TCgiANY2STR( xVal )
 
    LOCAL cRet  := ""
    LOCAL cType := Valtype( xVal )
@@ -531,7 +531,7 @@ STATIC FUNCTION Token( cStr, cDelim, nToken )
    LOCAL cToken
    LOCAL nCounter := 1
 
-   DEFAULT nToken := 1
+   DEFAULT nToken TO 1
 
    WHILE .T.
 

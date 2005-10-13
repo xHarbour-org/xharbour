@@ -7,7 +7,7 @@
 
 #include "hbclass.ch"
 #include "html.ch"
-#include "default.ch"
+#include "common.ch"
 
 /****
 *

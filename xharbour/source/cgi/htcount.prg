@@ -1,6 +1,6 @@
 #include "html.ch"
-#include "forms.ch"
-#include "default.ch"
+#include "htmlform.ch"
+#include "common.ch"
 
 
 
@@ -15,10 +15,10 @@ SET DATE BRITISH
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
    lIsPost := .T.
-      oCgi := oCGI():New()     // get server parameters/variables
+      oCgi := TCgioCGI():New()     // get server parameters/variables
 ENDIF
 
-oHtm := HTML():CGINew( "Counter.htm", "My Counter File" )
+oHtm := TCGIHTML():CGINew( "Counter.htm", "My Counter File" )
 
 oHtm:SetPageColor(CLR_DARK_YELLOW )  //"#FFFFCC")
 oHtm:SetTextColor(CLR_WHITE)
