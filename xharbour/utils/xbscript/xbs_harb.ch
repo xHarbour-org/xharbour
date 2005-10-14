@@ -361,6 +361,7 @@
 
      METHOD OleValueEqual( xArg )           OPERATOR "="
      METHOD OleValueExactEqual( xArg )      OPERATOR "=="
+     METHOD OleValueNotEqual( xArg )        OPERATOR "!="
 
   ENDCLASS
 
