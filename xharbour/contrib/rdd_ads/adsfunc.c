@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.65 2005/09/25 16:14:21 druzus Exp $
+ * $Id: adsfunc.c,v 1.66 2005/10/10 08:19:05 brianhays Exp $
  */
 
 /*
@@ -1814,7 +1814,7 @@ HB_FUNC( ADSCONNECTIONTOHANDLE )        // convert index to true handle; second 
    int iHandle;
    ADSHANDLE hConnection = 0;
    BOOL fDictionary = FALSE;
-   PHB_ITEM pfDict = hb_param( 2, HB_IT_ANY );
+   PHB_ITEM pfDict = hb_param( 2, HB_IT_BYREF );
 
    iHandle = ( ISNUM( 1 ) ? hb_parni( 1 ) : adsConnectHandle );
    if( iHandle )
