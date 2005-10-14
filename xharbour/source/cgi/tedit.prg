@@ -1,5 +1,5 @@
 /*
- * $Id: tedit.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
+ * $Id: tedit.prg,v 1.2 2005/10/13 19:22:31 lculik Exp $
  */
 
 /*
@@ -58,13 +58,11 @@ STATIC sTCgioForm
 
 /****
 *
-*     Class HControl()
-*
+*     Class TCgiHControl()
 *
 */
 
-   //METHOD Debug()         INLINE __clsDebug( self )
-CLASS TCgiHControl      // ALIAS hCtr
+CLASS TCgiHControl 
    DATA nH
    DATA Document
    DATA Form
@@ -190,7 +188,7 @@ ENDCLASS
 
    /****
 *
-*     HControl():Put()
+*     TCgiHControl():Put()
 *
 *
 */
@@ -371,7 +369,7 @@ RETURN Self
 
 /****
 *
-*     HControl():AddOption()
+*     TCgiHControl():AddOption()
 *
 */
 
@@ -383,11 +381,10 @@ RETURN Self
 
 /****
 *
-*     HControl():setControl()
+*     TCgiHControl():setControl()
 *
 *     Batch set control properties/methods
 *
-*     All default to NIL. See controls.ch
 */
 
 METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
@@ -428,22 +425,19 @@ METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
 
    RETURN Self
 
-   /****
+/****
 *
-*     Class Form()
-*
-*
+*     Class TCgiForm()
 *
 */
 
-   //METHOD Debug()           INLINE __clsDebug( self ) NOSELF
 CLASS TCgiForm
 
    DATA nH
    DATA aControls INIT {}
    DATA Name INIT ""
    DATA Action
-   DATA METHOD      //"mailto:name@site"
+   DATA METHOD      
    DATA EncType INIT "multipart/form-data"
    DATA onSubmit
    DATA onReset
@@ -505,9 +499,9 @@ CLASS TCgiForm
 
 ENDCLASS
 
-   /****
+/****
 *
-*     Form():New()
+*     TCgiForm():New()
 *
 *
 */
@@ -537,8 +531,7 @@ RETURN Self
 
 /****
 *
-*     Form():Put()
-*
+*     TCgiForm():Put()
 *
 */
 
@@ -673,7 +666,7 @@ RETURN Self
 
 /****
 *
-*     Form():End()
+*     TCgiForm():End()
 *
 *
 */
@@ -693,7 +686,7 @@ RETURN Self
 
 /****
 *
-*     Form():getControl()
+*     TCgiForm():getControl()
 *
 *     Retrieve a form control object by name
 *

@@ -1,19 +1,52 @@
+/*
+ * $Id: thtm.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
+ */
 
-/****
-*
-*     oList.prg
-*
-*     Generates Javascript & DHTML list menus
-*     (see the website/jList dir for an example)
-*
-*     Uses list.js and resize.js (heavily modified) found at
-*     developer.Netscape.com
-*
-*
-*     (c) 1999-2000 Manos Aspradakis, Greece
-*     eMail : maspr@otenet.gr
-*
-*/
+/*
+ * Harbour Project source code:
+ *     Generates Javascript & DHTML list menus
+ *     (see the website/jList dir for an example)
+ *
+ *     Uses list.js and resize.js (heavily modified) found at
+ *     developer.Netscape.com
+ *
+ *
+ * Copyright 2000 Manos Aspradakis <maspr@otenet.gr>
+ * www - http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version, with one exception:
+ *
+ * The exception is that if you link the Harbour Runtime Library (HRL)
+ * and/or the Harbour Virtual Machine (HVM) with other files to produce
+ * an executable, this does not by itself cause the resulting executable
+ * to be covered by the GNU General Public License. Your use of that
+ * executable is in no way restricted on account of linking the HRL
+ * and/or HVM code into it.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA (or visit
+ * their web site at http://www.gnu.org/).
+ *
+ */
+/*
+ * The following parts are Copyright of the individual authors.
+ * www - http://www.harbour-project.org
+ *
+ * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
+ *    Porting this library to Harbour
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
 
 #include "hbclass.ch"
 #include "html.ch"
@@ -43,14 +76,6 @@ PROC TestJList()
    o:build()
    o:put( "test.htm" )
    RETURN
-
-   /****
-*     oList.prg
-*
-*     Implementation of the Javascript colapsible list object.
-*
-*     Not finished yet.
-*/
 
 CLASS TCgiNcList
    DATA nH INIT STD_OUT
@@ -86,11 +111,9 @@ CLASS TCgiNcList
 
 ENDCLASS
 
-   /****
+/****
+*
 *     Create main node
-*
-*
-*
 *
 */
 
@@ -150,8 +173,6 @@ RETURN Self
 
 /****
 *
-*
-*
 *     Add a new sub-node
 *
 */
@@ -180,8 +201,6 @@ RETURN Self
 
 /****
 *
-*
-*
 *     Set the font for an item or node
 *
 */
@@ -206,8 +225,6 @@ RETURN self
 
 /****
 *
-*
-*
 *     Add a menu item
 *
 */
@@ -226,8 +243,6 @@ RETURN self
 
 /****
 *
-*
-*
 *     Add a menu item
 *
 */
@@ -245,15 +260,7 @@ METHOD AddLink( name, url, img, bgColor ) CLASS TCgiNcList
    Aadd( ::aScript, cStr )
 RETURN self
 
-/****
-*
-*
-*
-*
-*
-*/
-
-METHOD endNode( name, caption ) CLASS TCgiNcList
+METHOD EndNode( name, caption ) CLASS TCgiNcList
 
    LOCAL cStr := ""
 
@@ -263,14 +270,6 @@ METHOD endNode( name, caption ) CLASS TCgiNcList
    ::nItems ++
    Aadd( ::aScript, cStr )
 RETURN self
-
-/****
-*
-*
-*
-*
-*
-*/
 
 METHOD Build( xPos, yPos ) CLASS TCgiNcList
 
@@ -310,14 +309,6 @@ METHOD Build( xPos, yPos ) CLASS TCgiNcList
    Aadd( ::aScript, cStr )
 
 RETURN Self
-
-/****
-*
-*
-*
-*
-*
-*/
 
 METHOD Put( cFile ) CLASS TCgiNcList
 

@@ -1,5 +1,5 @@
 /*
- * $Id: jwindow.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: hjwindow.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -47,7 +47,6 @@
 #include "html.ch"
 #include "common.ch"
 
-   //METHOD Debug()         INLINE __clsDebug( self ) NOSELF
 CLASS TCgiJWindow
 
    DATA nH
@@ -113,21 +112,19 @@ CLASS TCgiJWindow
    METHOD WriteLN( c ) INLINE ::qOut( c )
 
    METHOD SetFeatures( alwaysRaised, alwaysLowered, ;
-   Resizable, Menubar, personalBar, ;
-   dependent, location, directories, ;
-   Scrollbars, Status, TitleBar, Toolbar )
+                       Resizable, Menubar, personalBar, ;
+                       dependent, location, directories, ;
+                       Scrollbars, Status, TitleBar, Toolbar )
 
    METHOD ImageURL( cImage, cUrl, nHeight, nBorder, ;
-   cOnClick, cOnMsover, cOnMsout, ;
-   cName, cAlt )
+                    cOnClick, cOnMsover, cOnMsout, ;
+                    cName, cAlt )
 
 ENDCLASS
 
-   /****
+/****
 *
 *     Start a new window definition
-*
-*
 *
 */
 
@@ -135,7 +132,7 @@ METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TCgiJWindow
 
    DEFAULT cVarName TO "newWin"
    DEFAULT cURL TO " "
-   DEFAULT cName TO cVarName            //"newWin"
+   DEFAULT cName TO cVarName           
    DEFAULT x TO 100
    DEFAULT y TO 100
    DEFAULT h TO 300
@@ -152,15 +149,11 @@ METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TCgiJWindow
    ::height  := h
    ::width   := w
 
-   // objectViewer( self )
-
 RETURN Self
 
 /****
 *
 *     Set the properties of the window
-*
-*
 *
 */
 
@@ -259,8 +252,6 @@ RETURN Self
 *
 *     set the size for the window
 *
-*
-*
 */
 
 METHOD SetSize( x, y, h, w ) CLASS TCgiJWindow
@@ -289,8 +280,6 @@ RETURN Self
 /****
 *
 *     Open the window from within the current document
-*
-*
 *
 */
 
@@ -417,8 +406,6 @@ RETURN Self
 *
 *     End HTML output to the window
 *
-*
-*
 */
 
 METHOD END () CLASS TCgiJWindow
@@ -430,8 +417,6 @@ RETURN Self
 /****
 *
 *     Place an image link to the window
-*
-*
 *
 */
 

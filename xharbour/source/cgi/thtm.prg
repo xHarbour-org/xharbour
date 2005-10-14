@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.1 2005/10/13 21:36:45 lculik Exp $
+ * $Id: thtm.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
  */
 
 /*
@@ -47,45 +47,27 @@
 #include "hbclass.ch"
 #include "html.ch"
 
-
-STATIC snHtm   := NIL                   //0
+STATIC snHtm   := NIL                 
 STATIC scForm  := 0
 STATIC sTCGIoPage  := 0
 
 /****
 *
-*     Class HTML()
-*
+*     Class TCgiHtml()
 *
 *     Constructors :
 *
-*     Html():New()          Creates a new HTML document
+*     TCgiHtml():New()          Creates a new HTML document
 *
-*     Html():CGINew()       Creates a new CGI-HTML document
+*     TCgiHtml():CGINew()       Creates a new CGI-HTML document
 *
 */
 
-// --- INIT --- //
-   // --- HEADER --- //
-   // --- END --- //
-   // --- FONTS --- //
-   // --- OUTPUT --- //
-   // --- COSMETICS --- //
-/*                             nSize  := IIF( nSize == NIL, 3, nSize ),;
-                             nWidth := IIF( nWidth == NIL, 90, nWidth ),;
-                             FWrite( ::nH, '<P>'+CRLF()+'<HR SIZE = '+NUMTRIM(nSize)+' WIDTH = '+NUMTRIM(nWidth)+'%>')*/
-*/
-   // --- URLs --- //
-   // --- TABLES --- //
-   // --- LISTS --- //
-   // --- FORMS --- //
-   // --- JAVA SUPPORT --- //
-   // standard output
 CLASS TCgiHtml
 
    DATA nH
    DATA FName, TITLE
-   DATA FontFace INIT "Verdana"         // Note!
+   DATA FontFace INIT "Verdana"
    DATA FontSize INIT 1
    DATA FontColor INIT "black"
    DATA aImages
@@ -93,13 +75,12 @@ CLASS TCgiHtml
    DATA lFont INIT .F.
 
    METHOD New( cFile, cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
-   BGIMAGE, BGCOLOR, txtColor, cJavaCode, ;
-   onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
-   cStyle, aimages, baseURL, baseTarget, ;
-   nRefresh, cRefreshURL, cStyleScr, lnocache )
-   METHOD CGINew( cTitle, cLinkTitle, cCharSet, cScriptSRC, bgImage, bgColor, txtColor, cJavaCode, onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, cStyle, aImages, aServerSrc, baseURL, baseTarget, nRefresh, cRefreshURL, cStyleScr, lnocache, nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft )
+               BGIMAGE, BGCOLOR, txtColor, cJavaCode, ;
+               onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
+               cStyle, aimages, baseURL, baseTarget, ;
+               nRefresh, cRefreshURL, cStyleScr, lnocache )
 
-   /* METHOD Debug()         INLINE __clsDebug( self ) NOSELF */
+   METHOD CGINew( cTitle, cLinkTitle, cCharSet, cScriptSRC, bgImage, bgColor, txtColor, cJavaCode, onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, cStyle, aImages, aServerSrc, baseURL, baseTarget, nRefresh, cRefreshURL, cStyleScr, lnocache, nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft )
 
    METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' ) )
 
@@ -123,38 +104,32 @@ CLASS TCgiHtml
 
    METHOD SAY( str, font, size, type, color, style )
 
-   METHOD Qqout( c ) INLINE DEFAULT( c, "" ),;
-   Fwrite( ::nH, c )
+   METHOD Qqout( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, c )
 
-   METHOD Qout( c ) INLINE DEFAULT( c, "" ),;
-    Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
+   METHOD Qout( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
 
-   METHOD Write( c ) INLINE DEFAULT( c, "" ),;
-      Fwrite( ::nH, c )
+   METHOD Write( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, c )
 
-   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ;
-          Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
+   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
 
    METHOD SayColor( t, c ) INLINE DEFAULT( t, "" ), DEFAULT( c, "black" ),;
-          Fwrite( ::nH, '<FONT COLOR="' + c + '">' + t + '</FONT>' )
+                    Fwrite( ::nH, '<FONT COLOR="' + c + '">' + t + '</FONT>' )
 
    METHOD Space( n ) INLINE DEFAULT( n, 1 ), Fwrite( ::nH, Replicate( "&nbsp;", n ) )
 
-   METHOD PutImage( cImage, nBorder, nHeight, ;
-   cOnclick, cOnMsOver, cOnMsOut, ;
-   cName, cAlt, cTarget, nWidth, lBreak, ID, MAP, ALING, HSPACE )
+   METHOD PutImage( cImage, nBorder, nHeight, cOnclick, cOnMsOver, cOnMsOut, ;
+                    cName, cAlt, cTarget, nWidth, lBreak, ID, MAP, ALING, HSPACE )
 
-   METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. ),;
-   DEFAULT( nCols, 80 ),;
-   Fwrite( ::nH, "<PRE" + IIF( nCols != NIL, ' COLS="' + NUMTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() )
+   METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. ), DEFAULT( nCols, 80 ),;
+              Fwrite( ::nH, "<PRE" + IIF( nCols != NIL, ' COLS="' + NUMTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() )
 
    METHOD MultiCol( txt, cols, gutter, width ) INLINE DEFAULT( txt, "" ),;
-   DEFAULT( cols, 2 ),;
-   DEFAULT( gutter, 5 ),;
-   DEFAULT( width, 100 ),;
-   Fwrite( ::nH, '<MULTICOL COLS="' + NUMTRIM( cols ) + '" GUTTER="' + NUMTRIM( gutter ) + '" WIDTH="' + NUMTRIM( width ) + '">' ),;
-   Fwrite( ::nH, txt ),;
-   Fwrite( ::nH, "</MULTICOL>" )
+                    DEFAULT( cols, 2 ),;
+                    DEFAULT( gutter, 5 ),;
+                    DEFAULT( width, 100 ),;
+                    Fwrite( ::nH, '<MULTICOL COLS="' + NUMTRIM( cols ) + '" GUTTER="' + NUMTRIM( gutter ) + '" WIDTH="' + NUMTRIM( width ) + '">' ),;
+                    Fwrite( ::nH, txt ),;
+                    Fwrite( ::nH, "</MULTICOL>" )
 
    METHOD PutHeading( cText, nWeight, lCentered )
 
@@ -166,41 +141,32 @@ CLASS TCgiHtml
 
    METHOD PutBreak() INLINE Fwrite( ::nH, "<BR>" + CRLF() )
 
-   METHOD Marquee( cText, cFont, cFntColor, nFntSize, ;
-   cAlign, nWidth, nHeight, cbgColor, ;
-   cBehavior, cDirection, ;
-   nScrollAmt, nScrollDelay, LOOP, ;
-   onMsOver, onMsOut, onClick, onStart, onFinish )
+   METHOD Marquee( cText, cFont, cFntColor, nFntSize, cAlign, nWidth, nHeight, cbgColor, ;
+                   cBehavior, cDirection, nScrollAmt, nScrollDelay, LOOP, ;
+                   onMsOver, onMsOut, onClick, onStart, onFinish )
 
-   METHOD StartMarquee( cFont, cFntColor, nFntSize, ;
-   cAlign, nWidth, nHeight, cbgColor, ;
-   cBehavior, cDirection, ;
-   nScrollAmt, nScrollDelay, LOOP, ;
-   onMsOver, onMsOut, onClick, onStart, onFinish )
-   METHOD EndMarquee()
+   METHOD StartMarquee( cFont, cFntColor, nFntSize, cAlign, nWidth, nHeight, cbgColor, ;
+                        cBehavior, cDirection, nScrollAmt, nScrollDelay, LOOP, ;
+                        onMsOver, onMsOut, onClick, onStart, onFinish )
+                        METHOD EndMarquee()
 
    METHOD PutTextUrl( cText, cUrl, cOnClick, cOmMsOver, cOnMsout, cTarget,  font, clr, size, style, bld, lbreak, cClass )
 
    METHOD PutImageUrl( cImage, nBorder, nHeight, nWidth, cUrl, ;
-   cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, ALING )
+                       cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, ALING )
 
-   METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, ;
-   l3d, lRuleCols, lRuleRows, ;
-   cClrDark, cClrLight, ncellpadding, ncellspacing, ;
-   cAling, lRules, BGIMAGE, cStyle, ID, NOF )
+   METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, l3d, lRuleCols, lRuleRows, ;
+                       cClrDark, cClrLight, ncellpadding, ncellspacing, ;
+                       cAling, lRules, BGIMAGE, cStyle, ID, NOF )
 
-   METHOD TableHead( cHead, cColor, cAlign, ;
-   cFont, nSize, cFntColor, nHeight, cBgPic )
+   METHOD TableHead( cHead, cColor, cAlign, cFont, nSize, cFntColor, nHeight, cBgPic )
 
    METHOD NewTableRow( cColor )
 
    METHOD EndTableRow()
 
-   METHOD NewTableCell( cAlign, cColor, ;
-   cFont, nSize, cFntColor, nHeight, ;
-   cBgPic, ;
-   nWidth, lWrap, ;
-   nCSpan, nRSpan, cValing, clrdrk, clrlt, cBdrClr, cclass )
+   METHOD NewTableCell( cAlign, cColor, cFont, nSize, cFntColor, nHeight, cBgPic, ;
+                        nWidth, lWrap, nCSpan, nRSpan, cValing, clrdrk, clrlt, cBdrClr, cclass )
 
    METHOD EndTableCell( lFont )
 
@@ -228,53 +194,38 @@ CLASS TCgiHtml
 
    METHOD EndForm() INLINE Fwrite( ::nH, CRLF() + "</FORM>" + CRLF() )
 
-   METHOD Pushbutton( cName, cCaption, ;
-   cCgiApp, ;
-   cOnClick, ;
-   cOnFocus, cOnBlur, ;
-   cOnMsOver, cOnMsOut, ;
-   style, ID )
+   METHOD Pushbutton( cName, cCaption, cCgiApp, cOnClick, cOnFocus, cOnBlur, cOnMsOver, cOnMsOut, style, ID )
 
    METHOD endButton()
 
-   METHOD Button( cName, cCaption, ;
-   cOnClick, cCGIApp, ;
-   cOnMsOver, cOnMsOut, ;
-   style, ID )
+   METHOD Button( cName, cCaption, cOnClick, cCGIApp, cOnMsOver, cOnMsOut, style, ID )
 
-   METHOD iFrame( name, src, border, ;
-   marginwidth, marginheight, ;
-   scrolling, allign, ;
-   WIDTH, HEIGHT )
+   METHOD iFrame( name, src, border, marginwidth, marginheight, scrolling, allign, WIDTH, HEIGHT )
 
-   METHOD StartJava() INLINE ;
-   Fwrite( ::nH, '<SCRIPT LANGUAGE="JavaScript">' + CRLF() + ;
-   "<!--" + CRLF() )
+   METHOD StartJava() INLINE Fwrite( ::nH, '<SCRIPT LANGUAGE="JavaScript">' + CRLF() + "<!--" + CRLF() )
 
    METHOD PutJavaSource( c ) INLINE Fwrite( ::nH, Space( 5 ) + 'SRC="' + c + '"' + CRLF() )
 
    METHOD PutJava( c ) INLINE Fwrite( ::nH, Space( 5 ) + c + CRLF() )
 
-   METHOD EndJava() INLINE Fwrite( ::nH, "                  //-->" + CRLF() + ;
-   "</SCRIPT>" + CRLF() )
+   METHOD EndJava() INLINE Fwrite( ::nH, "                  //-->" + CRLF() + "</SCRIPT>" + CRLF() )
 
-   METHOD serverCode( c ) INLINE Fwrite( ::nH, "<SERVER>" + ;
-   Space( 9 ) + c + CRLF() + ;
-   "</SERVER>" + CRLF() )
+   METHOD serverCode( c ) INLINE Fwrite( ::nH, "<SERVER>" + Space( 9 ) + c + CRLF() + "</SERVER>" + CRLF() )
 
-   METHOD Fwrite( c ) INLINE ;
-   Fwrite( ::nH, c )
-   METHOD FWriteLN( c ) INLINE ;
-   Fwrite( ::nH, c + CRLF() )
+   METHOD Fwrite( c ) INLINE Fwrite( ::nH, c )
+
+   METHOD FWriteLN( c ) INLINE Fwrite( ::nH, c + CRLF() )
 
    METHOD Span( c, Style )
 
    /* NEW  COMMANDS */
-   METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, ;
-   cOnclick, cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, cText )
+   METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, cOnclick, ;
+                           cOnMsOver, cOnMsOut, cName, cAlt, cTarget, nWidth, lbreak, cClass, cText )
+
    METHOD Comment( cText )
 
-   METHOD ADDoBJECT( cType, cClassid, cAling, cCode, lDisable, cCodeBase, cName, nWidth, nHeight )
+   METHOD ADDoBJECT( cType, cClassid, cAling, cCode, lDisable, cCodeBase, ;
+                     cName, nWidth, nHeight )
 
    METHOD ADDPARAM( cName, cValue )
 
@@ -284,16 +235,16 @@ CLASS TCgiHtml
 
    /* MAP SUPPORT */
 
-   METHOD ENDMAP() INLINE ;
-   Fwrite( ::nH, "</MAP>" )
-   METHOD NewMap( cName ) INLINE ;
-   Fwrite( ::nH, "<MAP NAME=" + cName + ">" )
+   METHOD ENDMAP() INLINE Fwrite( ::nH, "</MAP>" )
+
+   METHOD NewMap( cName ) INLINE Fwrite( ::nH, "<MAP NAME=" + cName + ">" )
 
    METHOD MapArea( Shape, Alt, Coord, Url ) INLINE ;
-   Fwrite( ::nH, "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() )
+          Fwrite( ::nH, "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() )
+
 ENDCLASS
 
-   /****
+/****
 *
 *     TCgiHtml():New()
 *
@@ -447,7 +398,7 @@ RETURN self
 
 /****
 *
-*     Html():CGINew()
+*     TCgiHtml():CGINew()
 *
 *     Starts a new CGI-HTML stream file.
 */
@@ -656,7 +607,7 @@ RETURN self
 
 /****
 *
-*     Html():SetFont()
+*     TCgiHtml():SetFont()
 *
 *     obvious...
 */
@@ -717,7 +668,7 @@ RETURN Self
 
 /****
 *
-*     Html():StartFont()
+*     TCgiHtml():StartFont()
 *
 *     Begin a font definition. They may be nested but make sure you
 *     end the definition appropriately later
@@ -785,7 +736,7 @@ RETURN Self
 
 /****
 *
-*     Html():DefineFont()
+*     TCgiHtml():DefineFont()
 *
 *     Begin a font definition by font type "name".
 *     Use ::endFont() to cancel this font
@@ -839,7 +790,7 @@ RETURN Self
 
 /****
 *
-*     Html():EndFont()
+*     TCgiHtml():EndFont()
 *
 *     End a font definition
 */
@@ -852,7 +803,7 @@ RETURN Self
 
 /****
 *
-*     Html():say()
+*     TCgiHtml():say()
 *
 *
 *
@@ -948,7 +899,7 @@ RETURN Self
 
 /****
 *
-*     Html():paragraph()
+*     TCgiHtml():paragraph()
 *
 *
 *
@@ -979,7 +930,7 @@ RETURN Self
 
 /****
 *
-*     Html():HLine()
+*     TCgiHtml():HLine()
 *
 *     Put a Horizontal line
 */
@@ -1004,7 +955,7 @@ RETURN Self
 
 /****
 *
-*     Html():PutHeading()
+*     TCgiHtml():PutHeading()
 *
 *     Put an HTML heading ( large text )
 */
@@ -1028,7 +979,7 @@ RETURN Self
 
 /****
 *
-*     Html():putTextURL()
+*     TCgiHtml():putTextURL()
 *
 *     Put a text link.
 */
@@ -1117,7 +1068,7 @@ RETURN Self
 
 /****
 *
-*     Html():putImageURL()
+*     TCgiHtml():putImageURL()
 *
 *     Put an Image link.
 */
@@ -1238,7 +1189,7 @@ RETURN Self
 
 /****
 *
-*     Html():putImage()
+*     TCgiHtml():putImage()
 *
 *     Put an Image.
 */
@@ -1315,7 +1266,7 @@ RETURN Self
 
 /****
 *
-*     Html():Close()
+*     TCgiHtml():Close()
 *
 *     Close an HTML disk file
 *
@@ -1330,7 +1281,7 @@ RETURN Self
 
 /****
 *
-*     Html():CGIClose()
+*     TCgiHtml():CGIClose()
 *
 *     Close a CGI-HTML stream file
 */
@@ -1344,7 +1295,7 @@ RETURN Self
 
 /****
 *
-*     Html():defineTable()
+*     TCgiHtml():defineTable()
 *
 *     Start an HTML table definition.
 *
@@ -1457,7 +1408,7 @@ RETURN Self
 
 /****
 *
-*     Html():tableHead()
+*     TCgiHtml():tableHead()
 *
 *     Define a table column Header.
 *
@@ -1513,7 +1464,7 @@ RETURN Self
 
 /****
 *
-*     Html():newTableRow()
+*     TCgiHtml():newTableRow()
 *
 *     Start a table row definition.
 *
@@ -1541,7 +1492,7 @@ RETURN Self
 
 /****
 *
-*     Html():endTableRow()
+*     TCgiHtml():endTableRow()
 *
 *     End a table row definition.
 *
@@ -1554,7 +1505,7 @@ RETURN Self
 
 /****
 *
-*     Html():newTableCell()
+*     TCgiHtml():newTableCell()
 *
 *     Start a table cell definition.
 *
@@ -1661,7 +1612,7 @@ RETURN Self
 
 /****
 *
-*     Html():endTableCell()
+*     TCgiHtml():endTableCell()
 *
 *     End a table cell definition.
 *
@@ -1680,7 +1631,7 @@ RETURN Self
 
 /****
 *
-*     Html():endTable()
+*     TCgiHtml():endTable()
 *
 *     End a table definition.
 */
@@ -1697,7 +1648,7 @@ RETURN Self
 
 /****
 *
-*     Html():newForm()
+*     TCgiHtml():newForm()
 *
 *     Creates a new form
 *
@@ -1730,7 +1681,7 @@ RETURN Self
 
 /****
 *
-*     Html():FormGet()
+*     TCgiHtml():FormGet()
 *
 *     Adds a form edit field
 *
@@ -1759,7 +1710,7 @@ RETURN Self
 
 /****
 *
-*     Html():FormSubmit()
+*     TCgiHtml():FormSubmit()
 *
 *     Adds a form submit button
 *
@@ -1772,7 +1723,7 @@ RETURN Self
 
 /****
 *
-*     Html():FormImage()
+*     TCgiHtml():FormImage()
 *
 *     Adds a form image button
 *
@@ -1785,7 +1736,7 @@ RETURN Self
 
 /****
 *
-*     Html():FormReset()
+*     TCgiHtml():FormReset()
 *
 *     Adds a reset button
 *
@@ -1799,7 +1750,7 @@ RETURN Self
 
 /****
 *
-*     Html():pushButton()
+*     TCgiHtml():pushButton()
 *
 *     Insert a standalone push button and assign an action to it
 *     Either pass onClick or cCgiApp - not both
@@ -1863,7 +1814,7 @@ RETURN Self
 
 /****
 *
-*     Html():Button()
+*     TCgiHtml():Button()
 *
 *     Insert a standalone <BUTTON> push button and assign an action to it
 *
@@ -1918,7 +1869,7 @@ RETURN Self
 
 /****
 *
-*     Html():EndButton()
+*     TCgiHtml():EndButton()
 *
 *     End a <BUTTON> definition
 *
@@ -1931,7 +1882,7 @@ RETURN Self
 
 /****
 *
-*     Html():Marquee()
+*     TCgiHtml():Marquee()
 *
 *     Display a scrolling marquee effect
 *
@@ -1985,7 +1936,7 @@ RETURN Self
 
 /****
 *
-*     Html():StartMarquee()
+*     TCgiHtml():StartMarquee()
 *
 *     Start a scrolling marquee effect definition
 *
@@ -2037,7 +1988,7 @@ RETURN Self
 
 /****
 *
-*     Html():endMarquee()
+*     TCgiHtml():endMarquee()
 *
 *
 *
@@ -2050,7 +2001,7 @@ RETURN Self
 
 /****
 *
-*     Html():iFrame()
+*     TCgiHtml():iFrame()
 *
 *     Define an inline frame.
 *
@@ -2237,7 +2188,7 @@ RETURN scForm
 /****
 *     TCGIoPage()
 *
-*     Return the current HTML() object.
+*     Return the current TCgiHtml() object.
 *
 */
 
