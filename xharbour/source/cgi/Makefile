@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2005/10/13 16:29:45 lculik Exp $
+# $Id: Makefile,v 1.3 2005/10/14 06:31:47 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -15,11 +15,8 @@ PRG_SOURCES=\
     tfile.prg \
     hjwindow.prg \
     htmutil.prg \
-    htcount.prg \
     hterrsys.prg \
-    htmbrows.prg \
     htjlist.prg \
-
 
 LIBNAME=cgi
 
