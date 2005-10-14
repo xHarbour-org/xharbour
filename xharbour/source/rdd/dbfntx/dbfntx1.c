@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.134 2005/10/04 02:05:35 druzus Exp $
+ * $Id: dbfntx1.c,v 1.136 2005/10/14 23:00:00 ptsarenko Exp $
  */
 
 /*
