@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4450 2005/10/13 23:47:41 ath1 Exp $
+ * $Id: ChangeLog,v 1.4451 2005/10/14 02:43:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-13 23:09 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/langapi.c
+    * Fixed runtime error when HB_LANGSELECT() is called without
+      parameter (for get current language ID).
 
 2005-10-13 19:43 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.vc
