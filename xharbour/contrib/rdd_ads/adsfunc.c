@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.66 2005/10/10 08:19:05 brianhays Exp $
+ * $Id: adsfunc.c,v 1.67 2005/10/14 08:34:13 brianhays Exp $
  */
 
 /*
@@ -2166,7 +2166,8 @@ HB_FUNC( ADSCONNECT60 )
       ulRetVal = AdsGetHandleType( hConnect, &usType);
       if( ulRetVal == AE_SUCCESS )
       {
-         fDictionary = ( usType == ADS_DATABASE_CONNECTION );
+         fDictionary = ( usType == ADS_DATABASE_CONNECTION
+                      || usType == ADS_SYS_ADMIN_CONNECTION );
       }
       iHandle = adsAddConnection( hConnect, fDictionary );
       adsConnectHandle = iHandle;       // set new default

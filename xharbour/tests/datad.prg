@@ -12,7 +12,9 @@ FUNCTION MAIN
    local cErr
    local aStru := {{ "ID", "A", 1, 0}, {"Name", "C", 50, 0}, {"address", "C", 50, 0}, {"city", "C", 30, 0}, {"Age", "n", 3, 0}}
    local hConnection1, hConnection2
+   local lIsDict := .f.
 
+   CLS
 
    RddRegister("ads",1)
    RddSetDefault("Ads")
@@ -55,10 +57,11 @@ FUNCTION MAIN
    ENDIF
 
    // now the magic
-   IF adsConnect60("xharbour.add", 7/* All types of conection*/, "ADSSYS", "", , @hConnection1 )
+   IF adsConnect60("xharbour.add", 7/* All types of connection*/, "ADSSYS", "", , @hConnection1 )
       // The connection identifier to xharbour.add is now stored in hConnection1,
       // and this is now the default connection
-      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle()
+      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle(hConnection1, @lIsDict)
+      ? "Is a Data Dict connection? (Yes, admin is also DD):", lIsDict
 
       // Add one user
       AdsDDCreateUser(, "Luiz", "papael", "This is user Luiz")
@@ -76,12 +79,14 @@ FUNCTION MAIN
    AdsDisconnect(hConnection1)
    hConnection1 := nil     // you should always reset a variable holding a handle that is no longer valid
 
-   ? "Default connection is back to 0:", adsConnection()
+   ? "Default connection is back to 0:", adsConnection(), adsConnectionToHandle( nil, @lIsDict)
+   ? "Is a Data Dict connection? (No):", lIsDict
 
    // now open the tables and put some data
 
-   IF AdsConnect60("xharbour.add", 7/* All types of conection*/, "Luiz", "papael", , @hConnection1)
-      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle()
+   IF AdsConnect60("xharbour.add", 7/* All types of connection*/, "Luiz", "papael", , @hConnection1)
+      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle(hConnection1, @lIsDict)
+      ? "Is a Data Dict connection?", lIsDict
 
       FOR n := 1 TO  100
          IF AdsCreateSqlStatement("Data2", 3)
