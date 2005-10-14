@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.24 2005/08/04 23:54:14 druzus Exp $
+ * $Id: dynsym.c,v 1.25 2005/09/11 19:41:11 druzus Exp $
  */
 
 /*
@@ -294,7 +294,7 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
    {
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( HB_IS_SYMBOL(* HB_VM_STACK.pBase ) && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
