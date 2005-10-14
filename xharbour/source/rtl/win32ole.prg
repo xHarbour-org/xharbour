@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.86 2005/10/12 23:06:19 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.87 2005/10/13 07:51:58 ronpinkas Exp $
  */
 
 /*
@@ -185,6 +185,10 @@ CLASS TOleAuto
    METHOD OleValueInc()                   OPERATOR "++"
    METHOD OleValueDec()                   OPERATOR "--"
    METHOD OleValuePower( xArg )           OPERATOR "^"
+
+   METHOD OleValueEqual( xArg )           OPERATOR "="
+   METHOD OleValueExactEqual( xArg )      OPERATOR "=="
+   METHOD OleValueNotEqual( xArg )        OPERATOR "!="
 
    ERROR HANDLER OnError()
 
@@ -535,6 +539,78 @@ METHOD OleValuePower( xArg ) CLASS TOleAuto
       oErr:Operation     := '^'
       oErr:Severity      := ES_ERROR
       oErr:SubCode       := 1088
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueEqual( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue = xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '%'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1085
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue == xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '%'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1085
+      oErr:SubSystem     := "BASE"
+
+      RETURN Throw( oErr )
+   END
+
+RETURN xRet
+
+METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
+
+   LOCAL xRet, oErr
+
+   TRY
+      xRet := ::OleValue != xArg
+   CATCH
+      oErr := ErrorNew()
+      oErr:Args          := { Self, xArg }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "argument error"
+      oErr:GenCode       := EG_ARG
+      oErr:Operation     := '%'
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1085
       oErr:SubSystem     := "BASE"
 
       RETURN Throw( oErr )

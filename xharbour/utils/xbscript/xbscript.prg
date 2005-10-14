@@ -29,6 +29,7 @@
  *
  */
 
+
 #ifdef PP_QUIET
    #COMMAND @ Row(), 0 SAY <nLine> =>
 #endif
@@ -445,7 +446,7 @@ STATIC s_bDefRTErrBlock := {|oErr| RP_Run_Err( oErr, s_aProcedures ) }
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC17" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC18" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -1568,6 +1569,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    LOCAL sCounter, sStart, sEnd, sStep
    LOCAL Dummy
    LOCAL bErrHandler, oError
+   LOCAL nTemp
 
    LOCAL sEnumerator, sEnumeration
 
@@ -2033,6 +2035,18 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   nAt := AtSkipStrings( '=', sBlock )
                   IF nAt > 1 .AND. ( ! SubStr( sBlock, nAt - 1, 1 ) $ ":-+*/^%<>!" ) .AND. ( ! SubStr( sBlock, nAt + 1, 1 ) $ "=>" )
                      nPos := AtSkipStrings( ":=", sBlock )
+                     nTemp := nAt - 1
+
+                     WHILE nPos == 0 .OR. nPos > nAt
+                        IF IsAlpha( SubStr( sBlock, nTemp, 1 ) ) .OR. SubStr( sBlock, nTemp, 1 ) == '_'
+                           EXIT
+                        ELSEIF IsDigit( SubStr( sBlock, nTemp, 1 ) )
+                           nTemp--
+                        ELSE
+                           // NOT a valid LValue so don't conver '=' into ':='
+                           nPos := 1
+                        ENDIF
+                     END
 
                      IF nPos == 0 .OR. nPos > nAt
                         sBlock := Left( sBlock, nAt - 1 ) + ":" + SubStr( sBlock, nAt )
@@ -9253,130 +9267,6 @@ STATIC FUNCTION InitClsResults()
 
 RETURN .T.
 
-#ifdef __XHARBOUR__
-
-//--------------------------------------------------------------//
-INIT PROCEDURE PPInit
-
-   LOCAL nScreenWidth, dDate := Stod( __DATE__ )
-
-   s_bRTErrBlock := ErrorBlock()
-
-   s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
-   s_cVer += " " + __TIME__
-
-   IF Type( "HB_GT_WVT()" ) == "UI"
-      nScreenWidth := &( "Wvt_GetScreenWidth()" )
-
-      DO CASE
-         CASE nScreenWidth >= 1024
-            &( "Wvt_SetFont" )( 'Terminal', 20, 10 )
-         CASE nScreenWidth >= 800
-            &( "Wvt_SetFont" )( 'System', 16, 8, 600, 2 )
-         OTHERWISE
-            &(" Wvt_SetFont" )( 'Terminal', 12, 6 )
-      ENDCASE
-
-      &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
-      //SetMode( 25, 80 )
-   ENDIF
-
-RETURN
-//--------------------------------------------------------------//
-
-#else
-
-//--------------------------------------------------------------//
-INIT PROCEDURE PPInit
-
-   LOCAL FileHandle
-
-   FileHandle := FCreate('Trace.Log')
-   FClose(FileHandle)
-
-RETURN
-
-//--------------------------------------------------------------//
-FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
-
-   LOCAL FileHandle, ProcName, Counter := 1, aEntries
-
-   aEntries := {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15}
-
-   FileHandle := FOpen( 'Trace.Log', 1 )
-
-   FSeek(FileHandle, 0, 2)
-
-   FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
-
-   DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
-      FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
-   ENDDO
-
-   IF ! ( PP_ProcName(0) == "" )
-      FWrite( FileHandle, "Interpreter:"  + CRLF )
-      Counter := -1
-      DO WHILE ! ( ( ProcName := PP_ProcName( ++Counter ) ) == "" )
-         FWrite( FileHandle, space(30) + ProcName + '(' + Str( PP_Procline( Counter), 5 ) + ')' + CRLF )
-      ENDDO
-   ENDIF
-
-   FOR Counter := 1 to PCount()
-      FWrite( FileHandle, '>>>' + CStr( aEntries[Counter] ) + '<<<' + CRLF )
-   NEXT
-
-   FWrite( FileHandle, CRLF )
-
-   FClose(FileHandle)
-
-RETURN .T.
-
-//--------------------------------------------------------------//
-FUNCTION CStr( xExp )
-
-   LOCAL cType
-
-   IF xExp == NIL
-      RETURN 'NIL'
-   ENDIF
-
-   cType := ValType( xExp )
-
-   DO CASE
-      CASE cType = 'C'
-         RETURN xExp
-
-      CASE cType = 'D'
-         RETURN dToc( xExp )
-
-      CASE cType = 'L'
-         RETURN IIF( xExp, '.T.', '.F.' )
-
-      CASE cType = 'N'
-         RETURN Str( xExp )
-
-      CASE cType = 'M'
-         RETURN xExp
-
-      CASE cType = 'A'
-         RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
-
-      CASE cType = 'B'
-         RETURN '{|| Block }'
-
-      CASE cType = 'O'
-         RETURN "{ " + xExp:ClassName() + " Object }"
-
-      OTHERWISE
-         RETURN "Type: " + cType
-   ENDCASE
-
-RETURN ""
-
-//--------------------------------------------------------------//
-
-#endif
-
 //--------------------------------------------------------------//
 FUNCTION PP_QSelf( o )
 
@@ -10452,6 +10342,129 @@ RETURN oError
 //--------------------------------------------------------------//
 #ifdef __HARBOUR__
    #include "xbs_harb.ch"
+
+   //--------------------------------------------------------------//
+   INIT PROCEDURE PPInit
+
+      LOCAL nScreenWidth, dDate := Stod( __DATE__ )
+
+      s_bRTErrBlock := ErrorBlock()
+
+      s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
+      s_cVer += " " + __TIME__
+
+      ASSOCIATE CLASS StringOle WITH TYPE CHARACTER
+
+      IF Type( "HB_GT_WVT()" ) == "UI"
+         nScreenWidth := &( "Wvt_GetScreenWidth()" )
+
+         DO CASE
+            CASE nScreenWidth >= 1024
+               &( "Wvt_SetFont" )( 'Terminal', 20, 10 )
+            CASE nScreenWidth >= 800
+               &( "Wvt_SetFont" )( 'System', 16, 8, 600, 2 )
+            OTHERWISE
+               &(" Wvt_SetFont" )( 'Terminal', 12, 6 )
+         ENDCASE
+
+         &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
+         //SetMode( 25, 80 )
+      ENDIF
+
+   RETURN
+   //--------------------------------------------------------------//
+
+#else
+
+   //--------------------------------------------------------------//
+   INIT PROCEDURE PPInit
+
+      LOCAL FileHandle
+
+      FileHandle := FCreate('Trace.Log')
+      FClose(FileHandle)
+
+   RETURN
+
+   //--------------------------------------------------------------//
+   FUNCTION TraceLog(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15 )
+
+      LOCAL FileHandle, ProcName, Counter := 1, aEntries
+
+      aEntries := {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15}
+
+      FileHandle := FOpen( 'Trace.Log', 1 )
+
+      FSeek(FileHandle, 0, 2)
+
+      FWrite( FileHandle, '[' + ProcName(1) + '] (' + Str( Procline(1), 5 ) + ') Called from: '  + CRLF )
+
+      DO WHILE ! ( ( ProcName := ProcName( ++Counter ) ) == '' )
+         FWrite( FileHandle, space(30) + ProcName + '(' + Str( Procline( Counter), 5 ) + ')' + CRLF )
+      ENDDO
+
+      IF ! ( PP_ProcName(0) == "" )
+         FWrite( FileHandle, "Interpreter:"  + CRLF )
+         Counter := -1
+         DO WHILE ! ( ( ProcName := PP_ProcName( ++Counter ) ) == "" )
+            FWrite( FileHandle, space(30) + ProcName + '(' + Str( PP_Procline( Counter), 5 ) + ')' + CRLF )
+         ENDDO
+      ENDIF
+
+      FOR Counter := 1 to PCount()
+         FWrite( FileHandle, '>>>' + CStr( aEntries[Counter] ) + '<<<' + CRLF )
+      NEXT
+
+      FWrite( FileHandle, CRLF )
+
+      FClose(FileHandle)
+
+   RETURN .T.
+
+   //--------------------------------------------------------------//
+   FUNCTION CStr( xExp )
+
+      LOCAL cType
+
+      IF xExp == NIL
+         RETURN 'NIL'
+      ENDIF
+
+      cType := ValType( xExp )
+
+      DO CASE
+         CASE cType = 'C'
+            RETURN xExp
+
+         CASE cType = 'D'
+            RETURN dToc( xExp )
+
+         CASE cType = 'L'
+            RETURN IIF( xExp, '.T.', '.F.' )
+
+         CASE cType = 'N'
+            RETURN Str( xExp )
+
+         CASE cType = 'M'
+            RETURN xExp
+
+         CASE cType = 'A'
+            RETURN "{ Array of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
+
+         CASE cType = 'B'
+            RETURN '{|| Block }'
+
+         CASE cType = 'O'
+            RETURN "{ " + xExp:ClassName() + " Object }"
+
+         OTHERWISE
+            RETURN "Type: " + cType
+      ENDCASE
+
+   RETURN ""
+
+   //--------------------------------------------------------------//
+
 #endif
 
 //--------------------------------------------------------------//

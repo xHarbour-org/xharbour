@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4452 2005/10/14 04:08:27 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4453 2005/10/14 06:31:46 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-13 23:43 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/classes.h
+  * source/vm/classes.c
+    + Added support for HB_CLASS_OP_EXACTEQUAL -> "__OpExactEqual"
+
+  * source/vm/hvm.c
+  * source/vm/classes.c
+    + Added support for overloading of '==' Operator
+
+  * source/vm/classes.c
+    + Added overloading of :ClassName when native type is overloaded
+
+  * tests/associat.prg
+    + Added sample of :ClassName for overloaded native type
+
+  * source/rtl/win32ole.prg
+    + Added Operator overloading for =;==;!=
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    ! Fixed PP_CompileLine() to check for valid ID (LValue) left of '='
+      when processing = assignments.
+    + Added Class StringOle which overloads +;-;=;==;!= for support
+      default value of TOleAuto objects
 
 2005-10-14 08:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   - source/cgi/include/default.ch
@@ -18,6 +43,7 @@
   * source/cgi/*.prg
     * removed unused files and small cleanups
 
+>>>>>>> 1.4453
 2005-10-13 23:09 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/langapi.c
     * Fixed runtime error when HB_LANGSELECT() is called without
@@ -34,7 +60,7 @@
 2005-10-14 01:50 UTC-0100 Ath <Ath1 at sourceforge.net>
   * xharbour/hrbdll.bc
     * add throw.obj/.c to borland dll makefile
-    
+
 2005-10-14 00:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/Makefile
   * xharbour/source/vm/errorapi.c

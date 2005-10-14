@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.18 2005/09/04 04:29:00 walito Exp $
+ * $Id: classes.h,v 1.19 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -64,22 +64,23 @@ HB_EXTERN_BEGIN
 #define HB_CLASS_OP_INC             ( ( ULONG ) 0x00000040 )
 #define HB_CLASS_OP_DEC             ( ( ULONG ) 0x00000080 )
 #define HB_CLASS_OP_EQUAL           ( ( ULONG ) 0x00000100 )
-#define HB_CLASS_OP_NOTEQUAL        ( ( ULONG ) 0x00000200 )
-#define HB_CLASS_OP_LESS            ( ( ULONG ) 0x00000400 )
-#define HB_CLASS_OP_LESSEQUAL       ( ( ULONG ) 0x00000800 )
-#define HB_CLASS_OP_GREATER         ( ( ULONG ) 0x00001000 )
-#define HB_CLASS_OP_GREATEREQUAL    ( ( ULONG ) 0x00002000 )
-#define HB_CLASS_OP_ASSIGN          ( ( ULONG ) 0x00004000 )
-#define HB_CLASS_OP_INSTRING        ( ( ULONG ) 0x00008000 )
-#define HB_CLASS_OP_NOT             ( ( ULONG ) 0x00010000 )
-#define HB_CLASS_OP_AND             ( ( ULONG ) 0x00020000 )
-#define HB_CLASS_OP_OR              ( ( ULONG ) 0x00040000 )
-#define HB_CLASS_OP_ARRAYINDEX      ( ( ULONG ) 0x00080000 )
-#define HB_CLASS_OP_BITAND          ( ( ULONG ) 0x00100000 )
-#define HB_CLASS_OP_BITOR           ( ( ULONG ) 0x00200000 )
-#define HB_CLASS_OP_BITXOR          ( ( ULONG ) 0x00400000 )
-#define HB_CLASS_OP_BITSHIFTR       ( ( ULONG ) 0x00800000 )
-#define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x01000000 )
+#define HB_CLASS_OP_EXACTEQUAL      ( ( ULONG ) 0x00000200 )
+#define HB_CLASS_OP_NOTEQUAL        ( ( ULONG ) 0x00000400 )
+#define HB_CLASS_OP_LESS            ( ( ULONG ) 0x00000800 )
+#define HB_CLASS_OP_LESSEQUAL       ( ( ULONG ) 0x00001000 )
+#define HB_CLASS_OP_GREATER         ( ( ULONG ) 0x00002000 )
+#define HB_CLASS_OP_GREATEREQUAL    ( ( ULONG ) 0x00004000 )
+#define HB_CLASS_OP_ASSIGN          ( ( ULONG ) 0x00008000 )
+#define HB_CLASS_OP_INSTRING        ( ( ULONG ) 0x00010000 )
+#define HB_CLASS_OP_NOT             ( ( ULONG ) 0x00020000 )
+#define HB_CLASS_OP_AND             ( ( ULONG ) 0x00040000 )
+#define HB_CLASS_OP_OR              ( ( ULONG ) 0x00080000 )
+#define HB_CLASS_OP_ARRAYINDEX      ( ( ULONG ) 0x00100000 )
+#define HB_CLASS_OP_BITAND          ( ( ULONG ) 0x00200000 )
+#define HB_CLASS_OP_BITOR           ( ( ULONG ) 0x00400000 )
+#define HB_CLASS_OP_BITXOR          ( ( ULONG ) 0x00800000 )
+#define HB_CLASS_OP_BITSHIFTR       ( ( ULONG ) 0x01000000 )
+#define HB_CLASS_OP_BITSHIFTL       ( ( ULONG ) 0x02000000 )
 
 
 typedef struct hb_class_method
@@ -140,7 +141,7 @@ typedef struct
    PMETHDYN pMethDyn;
    USHORT * pFriends;
    PHB_ITEM pMtxSync;
-   
+
 } CLASS, * PCLASS;
 
 extern HB_SYMB  hb_symDestructor;

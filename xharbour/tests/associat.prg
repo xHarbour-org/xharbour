@@ -7,6 +7,9 @@ PROCEDURE Main()
    ASSOCIATE CLASS MyStringClass  WITH TYPE CHARACTER
    ASSOCIATE CLASS MyNumericClass WITH TYPE NUMERIC
 
+   ? cVar:ClassName
+   ? nVar:ClassName
+
    ? cVar:AsString
    ? cVar:Super:AsString
    ? cVar:Character:AsString

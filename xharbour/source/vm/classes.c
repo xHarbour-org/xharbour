@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.170 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: classes.c,v 1.171 2005/10/08 09:24:06 lf_sfnet Exp $
  */
 
 /*
@@ -131,8 +131,8 @@
  "**"    = __OpPower
  "++"    = __OpInc
  "--"    = __OpDec
- "=="    = __OpEqual
- "="     = __OpEqual (same as "==")
+ "=="    = __OpExactEqual
+ "="     = __OpEqual
  "!="    = __OpNotEqual
  "<>"    = __OpNotEqual (same as "!=")
  "#"     = __OpNotEqual (same as "!=")
@@ -797,19 +797,13 @@ HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
 HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
 {
    char * szClassName;
+   USHORT uiClass;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetClsName(%p)", pObject));
 
-   if( HB_IS_ARRAY( pObject ) )
+   if( ( uiClass = hb_objClassH( pObject ) ) > 0 )
    {
-      if( pObject->item.asArray.value->uiClass )
-      {
-         szClassName = ( s_pClasses + pObject->item.asArray.value->uiClass - 1 )->szName;
-      }
-      else
-      {
-         szClassName = "ARRAY";
-      }
+      szClassName = ( s_pClasses + uiClass - 1 )->szName;
    }
    else                                         /* built in types */
    {
@@ -817,6 +811,10 @@ HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
       {
          case HB_IT_NIL:
             szClassName = "NIL";
+            break;
+
+         case HB_IT_ARRAY:
+            szClassName = "ARRAY";
             break;
 
          case HB_IT_STRING:
@@ -1444,8 +1442,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
              }
              else if (strcmp( "==", szMessage) == 0 )
              {
-                pMessage = hb_dynsymGet( "__OpEqual" ) ;
-                fOpOver  = HB_CLASS_OP_EQUAL;
+                pMessage = hb_dynsymGet( "__OpExactEqual" ) ;
+                fOpOver  = HB_CLASS_OP_EXACTEQUAL;
              }
              else if (strcmp( "!=", szMessage) == 0 )
              {
