@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.503 2005/10/13 07:51:58 ronpinkas Exp $
+ * $Id: hvm.c,v 1.504 2005/10/14 06:47:06 ronpinkas Exp $
  */
 
 /*
@@ -616,14 +616,14 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
 
-   HB_TRACE( HB_TR_INFO, ("errInit" ) );
-   hb_errInit();
-
    /* Under mt, this is done by static initializers */
    #ifndef HB_THREAD_SUPPORT
       HB_TRACE( HB_TR_INFO, ("stackInit" ) );
       hb_stackInit();
    #endif
+
+   HB_TRACE( HB_TR_INFO, ("errInit" ) );
+   hb_errInit();
 
    HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
    hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
