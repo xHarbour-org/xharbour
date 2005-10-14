@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.156 2005/10/08 18:32:05 ronpinkas Exp $
+# $Id: makefile.bc,v 1.157 2005/10/08 18:40:30 ronpinkas Exp $
 #
 
 #
@@ -97,7 +97,6 @@ HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
-SAM_OBJ_DIR   = $(OBJ_DIR)
 OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
 OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
 
@@ -135,7 +134,6 @@ PCREPOS_DIR  = source\rtl\pcre
 TIP_DIR      = source\tip
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
-MISC_DIR     = source\misc
 CODEPAGE_DIR = source\codepage
 
 HBRUN_DIR    = utils\hbrun
@@ -211,7 +209,6 @@ TIP_LIB        = $(LIB_DIR)\tip$(HB_MT).lib
 VM_LIB         = $(LIB_DIR)\vm$(HB_MT).lib
 VM_LIB_OPT_CON = $(LIB_DIR)\optcon$(HB_MT).lib
 VM_LIB_OPT_GUI = $(LIB_DIR)\optgui$(HB_MT).lib
-SAMPLES_LIB    = $(LIB_DIR)\samples$(HB_MT).lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 DLL_MAIN_LIB   = $(LIB_DIR)\dllmain.lib
 GTCGI_LIB      = $(LIB_DIR)\gtcgi.lib
@@ -733,6 +730,7 @@ VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\pvalue.obj \
    $(VM_OBJ_DIR)\runner.obj \
    $(VM_OBJ_DIR)\thread.obj \
+   $(VM_OBJ_DIR)\throw.obj \
    \
    $(VM_OBJ_DIR)\harbinit.obj
 
@@ -1082,15 +1080,6 @@ HBMAKE_EXE_OBJS = \
 XBSCRIPT_EXE_OBJS = \
    $(OBJ_DIR)\xbscript.obj
 
-SAMPLES_LIB_OBJS =  \
-   $(SAM_OBJ_DIR)\environ.obj \
-   $(SAM_OBJ_DIR)\date.obj   \
-   $(SAM_OBJ_DIR)\dbf.obj    \
-   $(SAM_OBJ_DIR)\gauge.obj  \
-   $(SAM_OBJ_DIR)\num.obj    \
-   $(SAM_OBJ_DIR)\stack.obj   \
-   $(SAM_OBJ_DIR)\status.obj \
-   $(SAM_OBJ_DIR)\time.obj
 
 ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
@@ -1130,7 +1119,6 @@ PROJECT = \
    $(DBFCDX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
-   $(SAMPLES_LIB) \
    $(CT_LIB)
 
 !if !$d(HB_THREAD_SUPPORT)
@@ -1385,13 +1373,6 @@ $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 
 !
 
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
-    IF EXIST "$(SAMPLES_LIB)" $(DEL) "$(SAMPLES_LIB)" > NUL
-    $(LINKER) "$(SAMPLES_LIB)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
     IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
@@ -1778,6 +1759,8 @@ $(VM_OBJ_DIR)\runner.obj : $(VM_DIR)\runner.c
 $(VM_OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
    $(CC_CMD)
 
+$(VM_OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
+   $(CC_CMD)
 #
 # RTL.LIB dependencies
 #
@@ -2951,33 +2934,6 @@ $(OBJ_DIR)\gtsys.obj : $(RTL_DIR)\gtnul\gtsys.c
 {$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj:
    $(CC_CMD)
 
-#
-# SAMPLES.LIB dependencies
-#
-
-$(SAM_OBJ_DIR)\environ.obj : $(MISC_DIR)\environ.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\date.obj : $(MISC_DIR)\date.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\dbf.obj : $(MISC_DIR)\dbf.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\gauge.obj : $(MISC_DIR)\gauge.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\num.obj : $(MISC_DIR)\num.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\stack.obj : $(MISC_DIR)\stack.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\status.obj : $(MISC_DIR)\status.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\time.obj : $(MISC_DIR)\time.c
-   $(CC_CMD)
 
 #
 # HBODBC.lib dependencies

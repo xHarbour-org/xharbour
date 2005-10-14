@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.153 2005/10/04 15:52:38 kaddath Exp $
+# $Id: makefile.vc,v 1.154 2005/10/08 18:38:33 ronpinkas Exp $
 #
 
 #
@@ -100,7 +100,6 @@ RTL_DIR      =source\rtl
 PCREPOS_DIR  =source\rtl\pcre
 TIP_DIR      =source\tip
 VM_DIR       =source\vm
-MISC_DIR     =source\misc
 HBRUN_DIR    =utils\hbrun
 HBTEST_DIR   =utils\hbtest
 HBDOC_DIR    =utils\hbdoc
@@ -157,8 +156,10 @@ DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
 DBFNTXMT_LIB     =$(LIB_DIR)\dbfntx$(MT).lib
-HBSIX_LIB        =$(LIB_DIR)\hbsix$(HB_MT).lib
-HSX_LIB          =$(LIB_DIR)\hsx$(HB_MT).lib
+HBSIX_LIB        =$(LIB_DIR)\hbsix.lib
+HBSIXMT_LIB      =$(LIB_DIR)\hbsix$(MT).lib
+HSX_LIB          =$(LIB_DIR)\hsx.lib
+HSXMT_LIB        =$(LIB_DIR)\hsx$(MT).lib
 DEBUG_LIB        =$(LIB_DIR)\debug.lib
 LANG_LIB         =$(LIB_DIR)\lang.lib
 MACRO_LIB        =$(LIB_DIR)\macro.lib
@@ -175,7 +176,6 @@ RTLMT_LIB        =$(LIB_DIR)\rtl$(MT).lib
 PCREPOS_LIB      =$(LIB_DIR)\pcrepos.lib
 TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
-SAMPLES_LIB      =$(LIB_DIR)\samples.lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
 VM_LIB_OPT_CON   =$(LIB_DIR)\optcon.lib
@@ -271,7 +271,6 @@ LIBLIST = \
    $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(TIP_LIB) \
-   $(SAMPLES_LIB) \
    $(ODBC_LIB) \
    $(CT_LIB)
 
@@ -671,19 +670,19 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpua866.obj \
    $(OBJ_DIR)\cpuawin.obj \
    $(OBJ_DIR)\cpuakoi.obj \
-   $(OBJ_DIR)\uc1250.obj   \
-   $(OBJ_DIR)\uc1251.obj   \
-   $(OBJ_DIR)\uc1253.obj   \
-   $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc737.obj    \
-   $(OBJ_DIR)\uc850.obj    \
-   $(OBJ_DIR)\uc852.obj    \
-   $(OBJ_DIR)\uc866.obj    \
+   $(OBJ_DIR)\uc1250.obj \
+   $(OBJ_DIR)\uc1251.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc850.obj \
+   $(OBJ_DIR)\uc852.obj \
+   $(OBJ_DIR)\uc866.obj \
    $(OBJ_DIR)\uc8859_1.obj \
    $(OBJ_DIR)\uc8859_2.obj \
    $(OBJ_DIR)\uc88591b.obj \
-   $(OBJ_DIR)\uckoi8.obj   \
-   $(OBJ_DIR)\uckoi8u.obj  \
+   $(OBJ_DIR)\uckoi8.obj \
+   $(OBJ_DIR)\uckoi8u.obj \
    $(OBJ_DIR)\ucmaz.obj
 
 #
@@ -989,6 +988,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\pvalue.obj \
    $(OBJ_DIR)$(MT)\runner.obj \
    $(OBJ_DIR)$(MT)\thread.obj \
+   $(OBJ_DIR)$(MT)\throw.obj \
    \
    $(OBJ_DIR)$(MT)\harbinit.obj
 
@@ -1089,21 +1089,6 @@ GTWIN_LIB_OBJS = \
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
 
-#
-# SAMPLES.LIB rules
-#
-{$(MISC_DIR)}.c{$(OBJ_DIR)}.obj:
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-SAMPLES_LIB_OBJS =  \
-   $(OBJ_DIR)\date.obj   \
-   $(OBJ_DIR)\dbf.obj    \
-   $(OBJ_DIR)\environ.obj \
-   $(OBJ_DIR)\gauge.obj  \
-   $(OBJ_DIR)\num.obj    \
-   $(OBJ_DIR)\stack.obj   \
-   $(OBJ_DIR)\status.obj \
-   $(OBJ_DIR)\time.obj
 
 #
 # TIP.LIB rules
@@ -1658,9 +1643,6 @@ $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
 $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
    lib /out:$@ $**
 !endif
-
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
-   lib /out:$@ $**
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
    lib /out:$@ $**

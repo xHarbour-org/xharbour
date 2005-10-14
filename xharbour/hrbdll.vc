@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.77 2005/09/27 05:24:54 paultucker Exp $
+# $Id: hrbdll.vc,v 1.78 2005/10/04 15:52:38 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -441,6 +441,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pvalue.obj \
   $(OBJ_DIR)\runner.obj \
   $(OBJ_DIR)\thread.obj \
+  $(OBJ_DIR)\throw.obj \
 # Vm prg
   $(OBJ_DIR)\harbinit.obj \
 #
@@ -1053,6 +1054,9 @@ $(OBJ_DIR)\runner.obj : $(VM_DIR)\runner.c
    $(CC_CMD)
 
 $(OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
    $(CC_CMD)
 
 $(OBJ_DIR)\borinit.obj : $(VM_DIR)\borinit.c
