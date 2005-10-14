@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.10 2005/09/27 05:24:54 paultucker Exp $
+# $Id: hrbdll.dc,v 1.11 2005/10/04 15:52:38 kaddath Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -305,6 +305,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\tget.obj \
    $(OBJ_DIR)\tgetint.obj \
    $(OBJ_DIR)\tgetlist.obj \
+   $(OBJ_DIR)\throw.obj \
    $(OBJ_DIR)\tlabel.obj \
    $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\tmenuitm.obj \
@@ -816,6 +817,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\tget.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tgetint.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tgetlist.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\throw.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tlabel.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\ttable.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tmenuitm.obj   + >> harbourdll.rsp
@@ -1787,6 +1789,9 @@ $(OBJ_DIR)\tgetlist.c : $(RTL_DIR)\tgetlist.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\tgetlist.obj : $(OBJ_DIR)\tgetlist.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
    $(CC_CMD)
 
 $(OBJ_DIR)\tlabel.c : $(RTL_DIR)\tlabel.prg

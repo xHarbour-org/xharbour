@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.12 2005/09/27 05:24:54 paultucker Exp $
+# $Id: hrbdll.gc,v 1.13 2005/10/04 15:52:38 kaddath Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -253,6 +253,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/tget.o \
    $(OBJ_DIR)/tgetint.o \
    $(OBJ_DIR)/tgetlist.o \
+   $(OBJ_DIR)/throw.o \
    $(OBJ_DIR)/tlabel.o \
    $(OBJ_DIR)/tmenuitm.o \
    $(OBJ_DIR)/tobject.o \
@@ -1286,6 +1287,9 @@ $(OBJ_DIR)/tgetlist.c : $(RTL_DIR)/tgetlist.prg
 
 $(OBJ_DIR)/tgetlist.o : $(OBJ_DIR)/tgetlist.c
 	$(CC_CMD)
+
+$(OBJ_DIR)/throw.o : $(OBJ_DIR)/throw.c
+        $(CC_CMD)
 
 $(OBJ_DIR)/tlabel.c : $(RTL_DIR)/tlabel.prg
 	$(HARBOUR_CMD)

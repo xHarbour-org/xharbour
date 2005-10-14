@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.44 2005/10/04 15:52:38 kaddath Exp $
+# $Id: hrbdll.wc,v 1.45 2005/10/10 16:25:10 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -346,6 +346,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\tget.obj \
   $(OBJ_DIR)\tgetint.obj \
   $(OBJ_DIR)\tgetlist.obj \
+  $(OBJ_DIR)\throw.obj \
   $(OBJ_DIR)\tlabel.obj \
   $(OBJ_DIR)\tmenuitm.obj \
   $(OBJ_DIR)\tobject.obj \
@@ -1657,6 +1658,9 @@ $(OBJ_DIR)\tgetlist.c : $(RTL_DIR)\tgetlist.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\tgetlist.obj : $(OBJ_DIR)\tgetlist.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
    $(CC_CMD)
 
 $(OBJ_DIR)\tlabel.c : $(RTL_DIR)\tlabel.prg
