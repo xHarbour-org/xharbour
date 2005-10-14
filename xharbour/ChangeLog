@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4460 2005/10/14 19:54:34 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4461 2005/10/14 20:36:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-14 15:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    ! Fixed GPF Trap in hb_dynsymGet() was assuming that
+      (* HB_VM_STACK.pBase) is a symbol.
 
 2005-10-14 13:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
