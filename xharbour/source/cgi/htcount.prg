@@ -61,7 +61,7 @@ oHtm:cgiClose()
 RETURN
 
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 FUNCTION IncCounter()
 LOCAL n := 0
 
@@ -74,7 +74,7 @@ MEMOWRIT( "counter.dat", STR( n+1 ) )
 RETURN n
 
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
  FUNCTION GetCounter()
 LOCAL n := 0
 

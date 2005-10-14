@@ -1,5 +1,5 @@
 /*
- * $Id: ohtm.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: thtm.prg,v 1.1 2005/10/13 21:36:45 lculik Exp $
  */
 
 /*
@@ -1691,9 +1691,9 @@ METHOD EndTable() CLASS TCgiHtml
    Fwrite( ::nH, CRLF() /*+"<!-- End of Table -->"*/ + CRLF() + CRLF() )
 RETURN Self
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 //   FORMS...
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 
 /****
 *
@@ -2206,9 +2206,9 @@ Return Self
 
 */
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 // International Support...
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 
 /****
 *
@@ -2392,7 +2392,7 @@ FUNCTION TCgiLinkStyle( cHoverStyle, cHoverClr, cHoverBG, ;
 
 RETURN cStr
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 FUNCTION TCgiANY2STR( xVal )
 
    LOCAL xRet := NIL
@@ -2425,7 +2425,7 @@ FUNCTION TCgiANY2STR( xVal )
 
 RETURN ( xRet )
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 FUNCTION TCgiHTMLTCgiANY2STR( xVal )
 
    LOCAL xRet := NIL
@@ -2458,7 +2458,7 @@ FUNCTION TCgiHTMLTCgiANY2STR( xVal )
 
 RETURN ( xRet )
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 FUNCTION TCgiListAsArray( cList, cDelimiter )
 
    LOCAL nPos          // Position of cDelimiter in cList

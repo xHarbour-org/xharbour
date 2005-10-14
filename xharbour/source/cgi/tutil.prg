@@ -17,10 +17,10 @@
 *
 */
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNCTION aoData( oObject )
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
    LOCAL aInfo    := Asort( __ClassSel( oObject:ClassH() ) )
    LOCAL aData    := {}
    LOCAL aMethods := {}

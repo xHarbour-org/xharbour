@@ -1,5 +1,5 @@
 /*
- * $Id: hterrsys.prg,v 1.2 2005/10/06 06:54:29 lf_sfnet Exp $
+ * $Id: hterrsys.prg,v 1.3 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -43,7 +43,6 @@
  *
  */
 
-#include "default.ch"
 #include "error.ch"
 
 #define DEF_ERR_HEADER "Date : "+DTOC(Date())+"<BR>"+;
@@ -68,10 +67,10 @@ STATIC scErrFooter  := " "
 *	Note:  automatically executes at startup
 */
 ANNOUNCE ERRORSYS
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 PROC Errorsys()
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
    Errorblock( { | e | DefError( e ) } )
 RETURN
 
@@ -79,10 +78,10 @@ RETURN
 *	DefError()
 */
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNC DefError( e )
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
    LOCAL i
    LOCAL cMessage   := ""
    LOCAL cErrString := ""
@@ -180,20 +179,10 @@ STATIC FUNC DefError( e )
 
    cErrString += "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF()
    Fwrite( nH, "<BR>" + cErrString + CRLF() )
-   //컴컴컴컴  Write/Append Error Log
    Memowrit( "Error.Log", Hardcr( cErrString ) + CRLF() + ;
              Hardcr( Memoread( "Error.Log" ) ) )
 
    Fwrite( nH, "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF() )
-
-   /*
-     FWrite( nH,  "<FORM NAME='MyForm'>"+CRLF() )
-     FWrite( nH,  "<INPUT TYPE=BUTTON NAME='MyButton'"+CRLF() )
-     FWrite( nH,  "onFocus=")
-     FWrite( nH,  ["alert('Hello')">]+CRLF() )
-     FWrite( nH,  "</FORM>"+CRLF() )
-     FWrite( nH,  [<A HREF="alert('ERROR!!!')>"]+CRLF() )
-*/
 
    TCGIJavaCMD( nH, 'alert("There was an error processing your request:\n' + ;
             'Look at the bottom of this page for\n' + ;
@@ -202,16 +191,15 @@ STATIC FUNC DefError( e )
 
    CLOSE ALL
 
-   // give up
    Errorlevel( 1 )
    QUIT
 
 RETURN ( .F. )
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 FUNCTION SetCorruptFunc( bFunc )
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
    IF Valtype( bFunc ) == "B"
       sbFixCorrupt := bFunc
    ENDIF
@@ -225,10 +213,10 @@ RETURN ( scErrFooter )
 /***
 *	ErrorMessage()
 */
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNC ErrorMessage( e )
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
    LOCAL cMessage := ""
 
    // start error message

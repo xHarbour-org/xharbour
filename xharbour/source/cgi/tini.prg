@@ -1,5 +1,5 @@
 /*
- * $Id: oini.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: tini.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -95,31 +95,6 @@
 #include "hbclass.ch"
 #include "common.ch"
 
-#ifdef TEST
-PROC TestMe()
-
-   LOCAL o := TCgiIni():New( "Test.ini" )
-   //o:Open()
-   o:Read()
-   objectViewer( o )
-   ? "handle", o:handle
-   ? o:Get( "methods", "method45", 45 )
-   ? o:Get( "methods", "method455", .t. )
-   ? o:Put( "methods", "method8", .f. )
-   ? o:Get( "Test", "Test1", 1234567890 )
-   o:DumpSections()
-   ? "handle", o:handle
-   o:Save( ";" + CRLF() + ;
-           ";TEST.INI" + CRLF() + ;
-           ";Created on " + Dtoc( Date() ) + " - " + Time() + CRLF() + ;
-           ";" + CRLF() )
-   o:close()
-   RETURN
-
-#endif
-
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 CLASS TCgiIni FROM TCgiFileBase
    DATA aLines INIT {}
    DATA aSections INIT {}
@@ -139,10 +114,10 @@ CLASS TCgiIni FROM TCgiFileBase
 
 ENDCLASS
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
 METHOD New( cFile ) CLASS TCgiIni
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
 
    Super():New( cFile )
    ::Name      := cFile
@@ -450,7 +425,7 @@ RETURN Alltrim( cRet )
 *
 */
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNCTION TCgiANY2STR( xVal )
 
    LOCAL cRet  := ""
@@ -481,7 +456,7 @@ STATIC FUNCTION TCgiANY2STR( xVal )
 
 RETURN cRet
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNCTION Str2Any( cVal, uType )
 
    LOCAL bError
@@ -524,7 +499,7 @@ STATIC FUNCTION Str2Any( cVal, uType )
 
 RETURN uRet
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 STATIC FUNCTION Token( cStr, cDelim, nToken )
 
    LOCAL nPos

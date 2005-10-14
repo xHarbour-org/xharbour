@@ -1,5 +1,5 @@
 /*
- * $Id: oframe.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: tframe.prg,v 1.1 2005/10/13 21:36:44 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ CLASS TCgiFrameSet
 
 ENDCLASS
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+   
 METHOD New( cFName, cTitle ) CLASS TCgiFrameSet
 
    LOCAL cStr := ""
@@ -94,7 +94,7 @@ METHOD New( cFName, cTitle ) CLASS TCgiFrameSet
 
 RETURN Self
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS TCgiFrameSet
 
    LOCAL i
@@ -150,14 +150,14 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS TCgiFrameSet
 
 RETURN Self
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 METHOD Endset() CLASS TCgiFrameSet
 
    Fwrite( ::nH, " </FRAMESET>" + CRLF() )
 
 RETURN Self
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 METHOD END () CLASS TCgiFrameSet
 
    Fwrite( ::nH, "</HTML>" + CRLF() )
@@ -168,7 +168,7 @@ METHOD END () CLASS TCgiFrameSet
 
 RETURN Self
 
-//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+
 METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
                  marginwidth, marginheight, cTarget, cScrolling ) CLASS TCgiFrameSet
 
