@@ -2254,11 +2254,19 @@
            //C functions added after (_INITSTATICS) symbol
            // Reverted!
            static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
+           static int iHB_APARAMS = 0, iPP_EXECPROCEDURE = 0;
+
            int iProcedures, iProcedure, iBase = s_iDyn;
 
            PHB_PCODEFUNC pDynFunc;
            PHB_DYNS pDynSym;
            DYN_PROC *pDynList;
+
+           if( iHB_APARAMS == 0 )
+           {
+              iHB_APARAMS       = hb_dynsymFind( "HB_APARAMS" )->pSymbol - symbols;
+              iPP_EXECPROCEDURE = hb_dynsymFind( "PP_EXECPROCEDURE" )->pSymbol - symbols;
+           }
 
            if( pProcedures )
            {
@@ -2308,7 +2316,7 @@
               pcode[ 6] = 0;                 /* S_XRET */
 
               pcode[ 7] = HB_P_PUSHSYMNEAR;
-              pcode[ 8] = 30;               /* HB_APARAMS */
+              pcode[ 8] = iHB_APARAMS;
 
               pcode[ 9] = HB_P_PUSHNIL;
 
@@ -2320,7 +2328,7 @@
               pcode[14] = 0;                /* S_APARAMS */
 
               pcode[15] = HB_P_PUSHSYMNEAR;
-              pcode[16] = 32;               /* PP_EXECPROCEDURE */
+              pcode[16] = iPP_EXECPROCEDURE;
 
               pcode[17] = HB_P_PUSHNIL;
 
@@ -2352,10 +2360,10 @@
               pDynSym = hb_dynsymGet( sFunctionName );
               //TraceLog( NULL, "Dyn: %p %s\n", pDynSym, sFunctionName );
 
-              pDynList[ iBase + iProcedure ].iID         = iProcedure;
-              pDynList[ iBase + iProcedure ].pDynFunc    = pDynFunc;
-              pDynList[ iBase + iProcedure ].pDynSym     = pDynSym;
-              pDynList[ iBase + iProcedure ].pPresetFunc = pDynSym->pSymbol->value.pFunPtr;
+              pDynList[ iBase + iProcedure ].iID          = iProcedure;
+              pDynList[ iBase + iProcedure ].pDynFunc     = pDynFunc;
+              pDynList[ iBase + iProcedure ].pDynSym      = pDynSym;
+              pDynList[ iBase + iProcedure ].pPresetFunc  = pDynSym->pSymbol->value.pFunPtr;
               pDynList[ iBase + iProcedure ].cPresetScope = pDynSym->pSymbol->cScope;
 
               pDynSym->pSymbol->value.pFunPtr = (PHB_FUNC) pDynFunc;

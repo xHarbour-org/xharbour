@@ -891,7 +891,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
    LOCAL aProc := aProcedures[nProc]
    LOCAL aPresetProc := s_aProc
    LOCAL aTopProcStack, aProcStack
-
+   
    s_aProc := aProc
 
    //TraceLog( "DOING: " + aProc[1] )
@@ -2040,7 +2040,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      WHILE nPos == 0 .OR. nPos > nAt
                         IF IsAlpha( SubStr( sBlock, nTemp, 1 ) ) .OR. SubStr( sBlock, nTemp, 1 ) == '_'
                            EXIT
-                        ELSEIF IsDigit( SubStr( sBlock, nTemp, 1 ) )
+                        ELSEIF IsDigit( SubStr( sBlock, nTemp, 1 ) ) .OR. SubStr( sBlock, nTemp, 1 ) == ' '
                            nTemp--
                         ELSE
                            // NOT a valid LValue so don't conver '=' into ':='
@@ -10022,7 +10022,7 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
    LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure, bPreset, aPresetProcedures
    LOCAL nProc
-
+   
    #ifdef __XHARBOUR__
       #ifdef DYN
          LOCAL nPresetDyn
@@ -10137,7 +10137,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    LOCAL nProc, nProcs, xRet
    LOCAL oError, bErrHandler := ErrorBlock()
    LOCAL aProc, bPreset, aPresetProcedures
-
+   
    #ifdef __XHARBOUR__
       #ifdef DYN
          LOCAL nPresetDyn
