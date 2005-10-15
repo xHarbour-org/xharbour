@@ -1,5 +1,5 @@
 /*
- * $Id: langapi.c,v 1.8 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: langapi.c,v 1.9 2005/10/14 04:08:28 guerra000 Exp $
  */
 
 /*

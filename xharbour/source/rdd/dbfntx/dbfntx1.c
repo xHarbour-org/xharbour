@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.136 2005/10/14 23:00:00 ptsarenko Exp $
+ * $Id: dbfntx1.c,v 1.136 2005/10/14 19:54:39 ptsarenko Exp $
  */
 
 /*
@@ -6716,10 +6716,14 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutNI( pInfo->itmResult, pTag->KeyDec );
             break;
          case DBOI_KEYVAL:
-            if( hb_ntxCurKeyRefresh( pTag ) )
-               hb_ntxKeyGetItem( pInfo->itmResult, pTag->CurKeyInfo, pTag, TRUE );
-            else
-               hb_itemClear( pInfo->itmResult );
+            if( hb_ntxTagLockRead( pTag ) )
+            {
+               if( hb_ntxCurKeyRefresh( pTag ) )
+                  hb_ntxKeyGetItem( pInfo->itmResult, pTag->CurKeyInfo, pTag, TRUE );
+               else
+                  hb_itemClear( pInfo->itmResult );
+               hb_ntxTagUnLockRead( pTag );
+            }
             break;
          case DBOI_SKIPUNIQUE:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipUnique( pTag,
