@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.28 2005/02/24 10:44:08 andijahja Exp $
+ * $Id: gtnul.c,v 1.29 2005/02/27 11:56:05 andijahja Exp $
  */
 
 /*
@@ -54,9 +54,10 @@
 
 /* *********************************************************************** */
 
-#ifndef HB_MULTI_GT
+#if ( ! defined( HB_SINGLE_GT ) ) && ( ! defined( HB_MULTI_GT ) )
 #  define HB_MULTI_GT
 #endif
+
 /* This definition has to be placed before #include "hbapigt.h" */
 #define HB_GT_NAME	NUL
 
@@ -83,9 +84,10 @@ static int hb_gtFindNoNul( void );
    char * s_defaultGT = "std";
 #endif
 
-static PHB_GT_INIT s_gtInit[ HB_GT_MAX_ ];
-static HB_GT_FUNCS GT_FUNCS;
-
+#ifdef HB_MULTI_GT
+   static PHB_GT_INIT s_gtInit[ HB_GT_MAX_ ];
+   static HB_GT_FUNCS GT_FUNCS;
+#endif
 
 static USHORT s_uiDispCount;
 static USHORT s_uiMaxCol = 80;
@@ -109,6 +111,8 @@ void hb_NUL_gt_ForceLink( void )
 }
 
 /* ********************************************************************** */
+
+#ifdef HB_MULTI_GT
 
 static int hb_gtFindPos( char * pszID )
 {
@@ -167,6 +171,7 @@ BOOL HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit )
 
    return FALSE;
 }
+#endif
 
 
 /* ********************************************************************** */
@@ -715,6 +720,7 @@ void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iS
 
 /* ********************************************************************** */
 
+#ifdef HB_MULTI_GT
 void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
 {
    int iPos;
@@ -1118,8 +1124,6 @@ static HB_GT_FUNCS GT_FUNCS = {
     mouse_GetBounds:        HB_GT_FUNC( mouse_GetBounds ),
 };
 */
-
-#ifdef HB_MULTI_GT
 
 static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
 {

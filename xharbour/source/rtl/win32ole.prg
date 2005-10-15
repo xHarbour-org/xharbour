@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.87 2005/10/13 07:51:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.88 2005/10/14 06:47:06 ronpinkas Exp $
  */
 
 /*
@@ -1523,54 +1523,48 @@ RETURN xRet
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
      IUnknown *pUnk = NULL;
-     IDispatch *pDisp;
+     IDispatch *pDisp = NULL;
      //LPOLESTR pOleStr = NULL;
 
-     s_nOleError = S_OK;
+     bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
 
-     if( ( s_nOleError == S_OK ) || ( s_nOleError == (HRESULT) S_FALSE) )
+     if( hb_parcx( 1 )[ 0 ] == '{' )
      {
-        bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
+        s_nOleError = CLSIDFromString( bstrClassID, (LPCLSID) &ClassID );
+     }
+     else
+     {
+        s_nOleError = CLSIDFromProgID( bstrClassID, (LPCLSID) &ClassID );
+     }
 
-        if( hb_parcx( 1 )[ 0 ] == '{' )
+     //s_nOleError = ProgIDFromCLSID( &ClassID, &pOleStr );
+     //wprintf( L"Result %i ProgID: '%s'\n", s_nOleError, pOleStr );
+
+     SysFreeString( bstrClassID );
+
+     if( hb_pcount() == 2 )
+     {
+        if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           s_nOleError = CLSIDFromString( bstrClassID, (LPCLSID) &ClassID );
+           bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
+           s_nOleError = CLSIDFromString( bstrClassID, &iid );
+           SysFreeString( bstrClassID );
         }
         else
         {
-           s_nOleError = CLSIDFromProgID( bstrClassID, (LPCLSID) &ClassID );
+           memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
         }
 
-        //s_nOleError = ProgIDFromCLSID( &ClassID, &pOleStr );
-        //wprintf( L"Result %i ProgID: '%s'\n", s_nOleError, pOleStr );
+        riid = &iid;
+     }
 
-        SysFreeString( bstrClassID );
-
-        if( hb_pcount() == 2 )
-        {
-           if( hb_parcx( 2 )[ 0 ] == '{' )
-           {
-              bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
-              s_nOleError = CLSIDFromString( bstrClassID, &iid );
-              SysFreeString( bstrClassID );
-           }
-           else
-           {
-              memcpy( ( LPVOID ) &iid, hb_parcx( 2 ), sizeof( iid ) );
-           }
-
-           riid = &iid;
-        }
+     if( s_nOleError == S_OK )
+     {
+        s_nOleError = GetActiveObject( (REFCLSID) &ClassID, NULL, &pUnk );
 
         if( s_nOleError == S_OK )
         {
-           s_nOleError = GetActiveObject( (REFCLSID) &ClassID, NULL, &pUnk );
-
-           if( s_nOleError == S_OK )
-           {
-              pDisp = NULL;
-              s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, (void **) &pDisp );
-           }
+           s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, (void **) &pDisp );
         }
      }
 
