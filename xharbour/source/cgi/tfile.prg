@@ -1,5 +1,5 @@
 /*
- * $Id: tfile.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
+ * $Id: tfile.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
  */
 
 /*
@@ -46,12 +46,11 @@
 #include "hbclass.ch"
 #include "common.ch"
 #include "fileio.ch"
+#include "cgi.ch"
 
 #translate FPOS(<f>) => FSEEK( <f>, 0, FS_RELATIVE )
 
-   
-   
-CLASS TCgiFilebase      
+CLASS TCgiFile      
    DATA Buffer INIT ""  
    DATA Name INIT ""
    DATA Handle      
@@ -134,7 +133,7 @@ CLASS TCgiFilebase
 ENDCLASS
 
    
-METHOD New( cName ) CLASS TCgiFilebase
+METHOD New( cName ) CLASS TCgiFile
 
    
    ::Name      := cName
@@ -153,7 +152,7 @@ RETURN Self
 */
 
 
-METHOD Open( nMode ) CLASS TCgiFilebase
+METHOD Open( nMode ) CLASS TCgiFile
 
    
    DEFAULT nMode TO FO_EXCLUSIVE      
@@ -167,7 +166,7 @@ RETURN ::Handle > 0
 **   ::Create( [<nAttrib>] ) --> lSuccess
 */
 
-METHOD CREATE ( nAttr ) CLASS TCgiFilebase
+METHOD CREATE ( nAttr ) CLASS TCgiFile
 
    
    LOCAL nSuccess
@@ -184,7 +183,7 @@ RETURN ( nSuccess != - 1 )
 */
 
 
-METHOD Size() CLASS TCgiFilebase
+METHOD Size() CLASS TCgiFile
 
    
    LOCAL nCurrent
@@ -203,7 +202,7 @@ RETURN ( nLength )
 */
 
 
-METHOD _Read( nSize, cBuff ) CLASS TCgiFilebase
+METHOD _Read( nSize, cBuff ) CLASS TCgiFile
 
    
    LOCAL nBytesRead
@@ -223,7 +222,7 @@ RETURN ( cBuff )    //nBytesRead )
 */
 
 
-METHOD ReadAhead( nSize, cBuff ) CLASS TCgiFilebase
+METHOD ReadAhead( nSize, cBuff ) CLASS TCgiFile
 
    
    LOCAL nBytesRead
@@ -248,7 +247,7 @@ RETURN ( cBuff )
 */
 
 
-METHOD Readline( nSize ) CLASS TCgiFilebase
+METHOD Readline( nSize ) CLASS TCgiFile
 
    
    LOCAL cString
@@ -278,7 +277,7 @@ RETURN ::Buffer
 */
 
 
-METHOD ReadByte() CLASS TCgiFilebase
+METHOD ReadByte() CLASS TCgiFile
 
    
    LOCAL nRet
@@ -294,7 +293,7 @@ RETURN ( IIF( nBytes > 0, Asc( cBuff ), - 1 ) )
 */
 
 
-METHOD ReadInt() CLASS TCgiFilebase
+METHOD ReadInt() CLASS TCgiFile
 
    
    LOCAL nRet
@@ -310,7 +309,7 @@ RETURN ( IIF( nBytes > 0, Bin2i( cBuff ), - 1 ) )
 */
 
 
-METHOD ReadLong() CLASS TCgiFilebase
+METHOD ReadLong() CLASS TCgiFile
 
    
    LOCAL nRet
@@ -326,7 +325,7 @@ RETURN ( IIF( nBytes > 0, Bin2l( cBuff ), - 1 ) )
 */
 
 
-METHOD WriteByte( nByte ) CLASS TCgiFilebase
+METHOD WriteByte( nByte ) CLASS TCgiFile
 
    
    LOCAL lSuccess := ( Fwrite( ::nHandle, Chr( nByte ), 1 ) == 1 )
@@ -337,7 +336,7 @@ RETURN lSuccess
 */
 
 
-METHOD WriteInt( nInt ) CLASS TCgiFilebase
+METHOD WriteInt( nInt ) CLASS TCgiFile
 
    
    LOCAL lSuccess := ( Fwrite( ::nHandle, I2bin( nInt ), 2 ) == 2 )
@@ -348,7 +347,7 @@ RETURN lSuccess
 */
 
 
-METHOD WriteLong( nLong ) CLASS TCgiFilebase
+METHOD WriteLong( nLong ) CLASS TCgiFile
 
    
    LOCAL lSuccess := ( Fwrite( ::nHandle, L2bin( nLong ), 4 ) == 4 )
@@ -362,7 +361,7 @@ RETURN ( lSuccess )
 */
 
 
-METHOD GOTO( nLine ) CLASS TCgiFilebase
+METHOD Goto( nLine ) CLASS TCgiFile
 
    
    LOCAL nCount := 1
@@ -400,7 +399,7 @@ RETURN ( nPos )
 */
 
 
-METHOD SKIP( nLines ) CLASS TCgiFilebase
+METHOD SKIP( nLines ) CLASS TCgiFile
 
    
    LOCAL nCount := 0
@@ -430,7 +429,7 @@ RETURN ( nPos )
 */
 
 
-METHOD MaxPages( nPageSize ) CLASS TCgiFilebase
+METHOD MaxPages( nPageSize ) CLASS TCgiFile
 
    
    DEFAULT nPageSize TO ::nPageSize
@@ -441,7 +440,7 @@ RETURN ( ::Size() / nPageSize )
 */
 
 
-METHOD PrevPage( nBytes ) CLASS TCgiFilebase
+METHOD PrevPage( nBytes ) CLASS TCgiFile
 
    
 
@@ -465,7 +464,7 @@ RETURN ( ::cPage )
 */
 
 
-METHOD NextPage( nBytes ) CLASS TCgiFilebase
+METHOD NextPage( nBytes ) CLASS TCgiFile
 
    
 
@@ -486,7 +485,7 @@ RETURN ( ::cPage )
 **   ::PrevLine( [<nBytes>] ) --> ::Buffer
 */
 
-METHOD PrevLine( npBytes ) CLASS TCgiFilebase
+METHOD PrevLine( npBytes ) CLASS TCgiFile
 
    
    LOCAL fHandle    := ::Handle

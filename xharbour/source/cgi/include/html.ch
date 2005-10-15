@@ -1,5 +1,5 @@
 /*
- * $Id: html.ch,v 1.2 2005/10/13 16:29:46 lculik Exp $
+ * $Id: html.ch,v 1.3 2005/10/13 19:22:30 lculik Exp $
  */
 
 /*
@@ -48,76 +48,6 @@
 #include "simpleio.ch"
 #include "htmlform.ch"
 #include "htmlclrs.ch"
-
-#xTranslate  DEFAULT( <p>, <v> ) => <p> := IF( <p> == NIL, <v>, <p> )
-
-
-#define STD_IN       0
-#define STD_OUT      1
-
-
-#define _WHITE_BLUE_STYLE   "<!-- "+;
-                                " A:visited {text-decoration:none;color:blue;background:none;} "+;
-                                " A:link {text-decoration:none;color:blue;background:none;} "+;
-                                " A:active {text-decoration:none;color:blue;background:none;} "+;
-                                " A:hover {text-decoration:none;color:white;background:blue;} "+;
-                                "-->"
-#define _BLUE_WHITE_STYLE   "<!-- "+;
-                                 "A:visited {text-decoration:none;color:white;background:none;} "+;
-                                 "A:link {text-decoration:none;color:white;background:none;} "+;
-                                 "A:active {text-decoration:none;color:white;background:none;} "+;
-                                 "A:hover {text-decoration:none;color:blue;background:white;}  "+;
-                                 "-->"
-#define _WHITE_RED_STYLE    "<!-- "+;
-                                 "A:visited {text-decoration:none;color:red;background:none;} "+;
-                                 "A:link {text-decoration:none;color:red;background:none;} "+;
-                                 "A:active {text-decoration:none;color:red;background:none;} "+;
-                                 "A:hover {text-decoration:none;color:white;background:red;} "+;
-                                 "-->"
-#define _WHITE_BLACK_STYLE  "<!-- "+;
-                                 "A:visited {text-decoration:none;color:black;background:none;}"+;
-                                 "A:link {text-decoration:none;color:black;background:none;} "+;
-                                 "A:active {text-decoration:none;color:black;background:none;}"+;
-                                 "A:hover {text-decoration:none;color:white;background:black;} "+;
-                                 " -->"
-
-#define LINE_BREAK   "<BR>"
-#define BOLD_ON      "<B>"
-#define BOLD_OFF     "</B>"
-
-#define _HTML_SPACE  chr(38)+"nbsp;"
-
-#xTranslate HTMLSpace( <n> )     => replicate( "&nbsp;", <n> )  //"&#32;"
-
-#xTranslate :putLink( <c>, <u> ) => :putTextURL( <c>, <u> )
-
-
-
-#define CLR_LIGHT_YELLOW  "#fffffc0"
-#define CLR_DARK_YELLOW   "#fffffcc"
-#define CLR_DARKER_YELLOW "#fffff80"
-#define CLR_LIGHT_BLUE    "#DEEFEF"  //"00000ff"
-#define CLR_MAGENTA       "#FFD0FF"
-#define CLR_CYAN          "#D0FFFFF"
-#define CLR_LIGHT_GRAY    "#F0F0F0"
-
-#define CLR_BLACK         "black"      //"#0000000"
-#define CLR_MAROON        "maroon"
-#define CLR_GREEN         "green"
-#define CLR_OLIVE         "olive"
-#define CLR_NAVY          "navy"
-#define CLR_PURPLE        "purple"
-#define CLR_TEAL          "teal"
-#define CLR_GRAY          "gray"
-#define CLR_SILVER        "silver"
-#define CLR_RED           "red"
-#define CLR_LIME          "lime"
-#define CLR_YELLOW        "yellow"
-#define CLR_BLUE          "blue"
-#define CLR_FUCHSIA       "fuchsia"
-#define CLR_AQUA          "aqua"
-#define CLR_WHITE         "white"      //"#fffffff"
-
 
 #xCommand DEFINE HTML                ;
           [FILE <file>]              ;
@@ -765,66 +695,6 @@
 #xtranslate __HTML_FTYPE__ <ftype:ULINE>      => "<U>"
 #xtranslate __HTML_FTYPE__ <ftype:UNDERLINE>  => "<U>"
                                     
-
-#define  GREEK_CGI  {;
-                    {"Ä","%C1"},;
-                    {"Å","%C2"},;
-                    {"Ç","%C3"},;
-                    {"É","%C4"},;
-                    {"Ñ","%C5"},;
-                    {"Ö","%C6"},;
-                    {"Ü","%C7"},;
-                    {"á","%C8"},;
-                    {"à","%C9"},;
-                    {"â","%CA"},;
-                    {"ä","%CB"},;
-                    {"ã","%CC"},;
-                    {"å","%CD"},;
-                    {"ç","%CE"},;
-                    {"é","%CF"},;
-                    {"è","%D0"},;
-                    {"ê","%D1"},;
-                    {"ë","%D3"},;
-                    {"í","%D4"},;
-                    {"ì","%D5"},;
-                    {"î","%D6"},;
-                    {"ï","%D7"},;
-                    {"ñ","%D8"},;
-                    {"ó","%D9"},;
-                    {"ò","%E1"},;
-                    {"ô","%E2"},;
-                    {"ö","%E3"},;
-                    {"õ","%E4"},;
-                    {"ú","%E5"},;
-                    {"ù","%E6"},;
-                    {"û","%E7"},;
-                    {"ü","%E8"},;
-                    {"†","%E9"},;
-                    {"°","%EA"},;
-                    {"¢","%EB"},;
-                    {"£","%EC"},;
-                    {"§","%ED"},;
-                    {"•","%EE"},;
-                    {"¶","%EF"},;
-                    {"ß","%F0"},;
-                    {"®","%F1"},;
-                    {"©","%F3"},;
-                    {"´","%F4"},;
-                    {"¨","%F5"},;
-                    {"≠","%F6"},;
-                    {"Æ","%F7"},;
-                    {"Ø","%F8"},;
-                    {"‡","%F9"},;
-                    {"™","%F2"},;
-                    {"·","%DC"},;
-                    {"‚","%DD"},;
-                    {"„","%DE"},;
-                    {"Â","%DF"},;
-                    {"Ê","%FC"},;
-                    {"Á","%FD"},;
-                    {"È","%FE"} ;
-                    }
-
 
 #define _HTML_CH
 #endif

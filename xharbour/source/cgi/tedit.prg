@@ -1,5 +1,5 @@
 /*
- * $Id: tedit.prg,v 1.2 2005/10/13 19:22:31 lculik Exp $
+ * $Id: tedit.prg,v 1.3 2005/10/14 07:25:11 lf_sfnet Exp $
  */
 
 /*
@@ -45,8 +45,7 @@
 
 #include "hbclass.ch"
 #include "common.ch"
-#include "htmlform.ch"
-#include "html.ch"
+#include "cgi.ch"
 
 #define _OPTION_TEXT     1
 #define _OPTION_VALUE    2
@@ -54,15 +53,15 @@
 #define _OPTION_SELECTED 4
 #define _OPTION_DISABLED 5
 
-STATIC sTCgioForm
+STATIC soForm
 
 /****
 *
-*     Class TCgiHControl()
+*     Class THtmlControl()
 *
 */
 
-CLASS TCgiHControl 
+CLASS THtmlControl
    DATA nH
    DATA Document
    DATA Form
@@ -179,27 +178,26 @@ CLASS TCgiHControl
    METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled )
 
    METHOD SetControl( name, rows, cols, size, maxchars, value, onfocus, ;
-   onblur, onchange, onselect, onclick, onmsover, onmsout, ;
-   onmsdown, onmsup, onkdown, onkup, onkprs, ;
-   pic, cap, dis, ro, lMulti, checked, ;
-   align, wrap, type, Style, ID, lLabel )
+                      onblur, onchange, onselect, onclick, onmsover, onmsout, ;
+                      onmsdown, onmsup, onkdown, onkup, onkprs, ;
+                      pic, cap, dis, ro, lMulti, checked, ;
+                      align, wrap, type, Style, ID, lLabel )
 
 ENDCLASS
 
-   /****
+/****
 *
-*     TCgiHControl():Put()
-*
+*     THtmlControl():Put()
 *
 */
 
-METHOD Put( lPut ) CLASS TCgiHControl
+METHOD Put( lPut ) CLASS THtmlControl
 
    LOCAL i
    LOCAL cStr := ""
 
-   ::nH   := TCgiPageHandle()
-   ::form := TCgiCurrentForm()
+   ::nH   := HtmlPageHandle()
+   ::form := HtmlFormName()
 
    ::cOutput += IIF( ::lBreak, CRLF() + "<BR>", CRLF() )
    IF ::lLabel
@@ -369,11 +367,11 @@ RETURN Self
 
 /****
 *
-*     TCgiHControl():AddOption()
+*     THtmlControl():AddOption()
 *
 */
 
-METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled ) CLASS TCgiHControl
+METHOD AddOption( cOption, cValue, cLabel, lSelected, lDisabled ) CLASS THtmlControl
 
    Aadd( ::aOptions, { cOption, cValue, cLabel, lSelected, lDisabled } )
 
@@ -381,17 +379,18 @@ RETURN Self
 
 /****
 *
-*     TCgiHControl():setControl()
+*     THtmlControl():setControl()
 *
 *     Batch set control properties/methods
 *
 */
 
-METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
-                      onblur, onchange, onselect, onclick, onmsover, onmsout, ;
-                      onmsdown, onmsup, onkdown, onkup, onkprs, ;
-                      pic, cap, dis, ro, lMulti, checked, ;
-                      align, wrap, type, Style, ID, lLabel ) CLASS TCgiHControl
+METHOD SetControl( name, rows, cols, size, maxchars, value, onfocus, ;
+                   onblur, onchange, onselect, onclick, onmsover, onmsout, ;
+                   onmsdown, onmsup, onkdown, onkup, onkprs, ;
+                   pic, cap, dis, ro, lMulti, checked, ;
+                   align, wrap, type, Style, ID, lLabel ) CLASS THtmlControl
+
    ::name        := name
    ::rows        := ROWS
    ::cols        := COLS
@@ -427,11 +426,11 @@ METHOD setControl( name, rows, cols, size, maxchars, value, onfocus, ;
 
 /****
 *
-*     Class TCgiForm()
+*     Class THtmlForm()
 *
 */
 
-CLASS TCgiForm
+CLASS THtmlForm
 
    DATA nH
    DATA aControls INIT {}
@@ -501,12 +500,11 @@ ENDCLASS
 
 /****
 *
-*     TCgiForm():New()
-*
+*     THtmlForm():New()
 *
 */
 
-METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS TCgiForm
+METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS THtmlForm
 
    DEFAULT cName TO "Form1"
    DEFAULT cMethod TO "POST"
@@ -517,7 +515,7 @@ METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS TCgiForm
    ::Name   := cName
    ::Method := cMethod
 
-   ::nH := TCgiPageHandle()
+   ::nH := HtmlPageHandle()
 
    ::Frame   := lFrame
    ::Caption := cCaption
@@ -525,17 +523,17 @@ METHOD New( cName, cAction, cMethod, lFrame, cCaption, nWidth ) CLASS TCgiForm
 
    ::aControls := {}
 
-   sTCgioForm := Self
+   soForm := Self
 
 RETURN Self
 
 /****
 *
-*     TCgiForm():Put()
+*     THtmlForm():Put()
 *
 */
 
-METHOD Put( lPutControls ) CLASS TCgiForm
+METHOD Put( lPutControls ) CLASS THtmlForm
 
    DEFAULT lPutControls TO .F.
 
@@ -666,12 +664,11 @@ RETURN Self
 
 /****
 *
-*     TCgiForm():End()
-*
+*     THtmlForm():End()
 *
 */
 
-METHOD END () CLASS TCgiForm
+METHOD End() CLASS THtmlForm
 
    Fwrite( ::nH, "</FORM>" + CRLF() )
 
@@ -686,13 +683,13 @@ RETURN Self
 
 /****
 *
-*     TCgiForm():getControl()
+*     THtmlForm():GetControl()
 *
 *     Retrieve a form control object by name
 *
 */
 
-METHOD getControl( cName ) CLASS TCgiForm
+METHOD GetControl( cName ) CLASS THtmlForm
 
    LOCAL oRet
    LOCAL nPos := Ascan( ::aControls, { | e | e:name = cName } )
@@ -705,13 +702,12 @@ RETURN oRet
 
 /****
 *
-*     TCgioForm()
+*     HtmlFormObject()
 *
-*     Return current form
+*     Return current form object
 *
 */
 
-FUNCTION TCgioForm()
+FUNCTION HtmlFormObject()
 
-RETURN sTCgioForm
-
+   RETURN soForm

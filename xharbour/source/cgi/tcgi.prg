@@ -1,6 +1,6 @@
 
 /*
- * $Id: ocgi.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: tcgi.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -46,9 +46,9 @@
 
 #include "hbclass.ch"
 #include "common.ch"
-#include "html.ch"
+#include "cgi.ch"
 
-CLASS TCgioCgi FROM TCgiHtml
+CLASS TCgi FROM THtml
 
    DATA nH
    DATA Server_Software
@@ -79,21 +79,13 @@ CLASS TCgioCgi FROM TCgiHtml
 
    METHOD New( c )
 
-   METHOD CGIField( c )
+   METHOD Field( c )
 
-   METHOD toObject()
+   METHOD ToObject()
 
 ENDCLASS
 
-   /****
-*
-*     oCgi():new()
-*
-*
-*
-*/
-
-METHOD New( cInBuffer ) CLASS TCgioCgi
+METHOD New( cInBuffer ) CLASS TCgi
 
    LOCAL cBuff
    LOCAL i
@@ -101,8 +93,7 @@ METHOD New( cInBuffer ) CLASS TCgioCgi
    LOCAL aTemp := {}
    LOCAL aVar  := {}
 
-   // function in oHtm.prg
-   ::nH := TCgiPageHandle()
+   ::nH := HtmlPageHandle()
 
    ::Server_Software   := Getenv( "SERVER_SOFTWARE" )
    ::Server_Name       := Getenv( "SERVER_NAME" )
@@ -140,34 +131,32 @@ METHOD New( cInBuffer ) CLASS TCgioCgi
 
       ::aQueryFields := {}
 
-      aTemp := TCgiListAsArray( ::Query_String, "&" )           // separate fields
+      aTemp := ListAsArray( ::Query_String, "&" )           // separate fields
 
       IF Len( aTemp ) != 0
          FOR i := 1 TO Len( aTemp )
-            aVar := TCgiListAsArray( aTemp[ i ], "=" )
+            aVar := ListAsArray( aTemp[ i ], "=" )
             IF Len( aVar ) == 2
-               Aadd( ::aQueryFields, { aVar[ 1 ], TCGIDecodeURL( aVar[ 2 ] ) } )
+               Aadd( ::aQueryFields, { aVar[ 1 ], HtmlDecodeUrl( aVar[ 2 ] ) } )
             ENDIF
          NEXT
       ENDIF
 
    ENDIF
 
-
-RETURN ::ToObject()                     //Self
-//#ifdef _CLASS_CH
-
+   RETURN ::ToObject()                   
+ 
 /****
 *
-*        oCgi():ToObject()
+*        TCgi():ToObject()
 *
 *        Creates instance variables out of CGI FORM return values
 *        or URL encoded content.
 *
-*        It subclasses the oCGI class to a *new* class
+*        It subclasses the TCgi class to a *new* class
 */
 
-METHOD ToObject() CLASS TCgioCgi
+METHOD ToObject() CLASS TCgi
 
    LOCAL i
    LOCAL bBlock
@@ -183,8 +172,7 @@ METHOD ToObject() CLASS TCgioCgi
 
    // --> create new oObject class from this one...
    sn ++
-   //aDB := ClassNew( "NewCgi"+STRZERO(sn,3), {|| oCGI() }, "cgi" )
-   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), __CLS_PARAM( "TCgioCgi" ) )
+   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), __CLS_PARAM( "TCgi" ) )
 
    FOR i := 1 TO Len( ::aQueryFields )
 
@@ -219,15 +207,11 @@ METHOD ToObject() CLASS TCgioCgi
    oNew:Content_Type      := ::Content_Type
    oNew:Content_Length    := ::Content_Length
    oNew:Annotation_Server := ::Annotation_Server
-   oNew:nH                := IIF( TCgiPageHandle() == NIL, STD_OUT, TCgiPageHandle() )
+   oNew:nH                := IIF( HtmlPageHandle() == NIL, STD_OUT, HtmlPageHandle() )
 
-RETURN oNew
+   RETURN oNew
 
-//#endif
-
-// ripped from HARBOUR
-
-METHOD CGIField( cQueryName ) CLASS TCgioCgi
+METHOD Field( cQueryName ) CLASS TCgi
 
    LOCAL cRet := ""
    LOCAL nRet
@@ -241,9 +225,7 @@ METHOD CGIField( cQueryName ) CLASS TCgioCgi
       cRet := ::aQueryFields[ nRet, 2 ]
    ENDIF
 
-RETURN ( cRet )
-
-// ripped from HARBOUR
+   RETURN ( cRet )
 
 FUNCTION ParseString( cString, cDelim, nRet )
 
@@ -271,35 +253,43 @@ FUNCTION ParseString( cString, cDelim, nRet )
 
    NEXT i
 
-RETURN ( aElem[ nRet ] )
+   RETURN ( aElem[ nRet ] )
 
-// ripped from HARBOUR
+/****
+*
+*     CgiParseVar()
+*
+*     Separates elements of a CGI query environment variable
+*
+*/
 
-FUNCTION Hex2Dec( cHex )
+FUNCTION CgiParseVar( cEnvVar )
 
-   LOCAL aHex := { { "0", 00 }, ;
-                   { "1", 01 }, ;
-                   { "2", 02 }, ;
-                   { "3", 03 }, ;
-                   { "4", 04 }, ;
-                   { "5", 05 }, ;
-                   { "6", 06 }, ;
-                   { "7", 07 }, ;
-                   { "8", 08 }, ;
-                   { "9", 09 }, ;
-                   { "A", 10 }, ;
-                   { "B", 11 }, ;
-                   { "C", 12 }, ;
-                   { "D", 13 }, ;
-                   { "E", 14 }, ;
-                   { "F", 15 } }
-   LOCAL nRet
-   LOCAL nRes
+   cEnvVar := HtmlDecodeURL( cEnvVar )
 
-   nRet := Ascan( aHex, { | x | Upper( x[ 1 ] ) = Upper( Left( cHex, 1 ) ) } )
-   nRes := aHex[ nRet, 2 ] * 16
-   nRet := Ascan( aHex, { | x | Upper( x[ 1 ] ) = Upper( Right( cHex, 1 ) ) } )
-   nRes += aHex[ nRet, 2 ]
+   IF "=" $ cEnvVar .and. Len( cEnvVar ) > At( "=", cEnvVar )
+      cEnvVar := Alltrim( Substr( cEnvVar, At( "=", cEnvVar ) + 1 ) )
+   ELSE
+      cEnvVar := ""
+   ENDIF
 
-RETURN ( nRes )
+RETURN cEnvVar
 
+STATIC FUNCTION ListAsArray( cList, cDelimiter )
+
+   LOCAL nPos          // Position of cDelimiter in cList
+   LOCAL aList := {}   // Define an empty array
+
+   DEFAULT cDelimiter TO ","
+
+   // Loop while there are more items to extract
+   DO WHILE ( nPos := At( cDelimiter, cList ) ) != 0
+
+      // Add the item to aList and remove it from cList
+      Aadd( aList, Alltrim( Substr( cList, 1, nPos - 1 ) ) )
+      cList := Substr( cList, nPos + 1 )
+
+   ENDDO
+   Aadd( aList, cList )                 // Add final element
+
+   RETURN ( aList )    // Return the array

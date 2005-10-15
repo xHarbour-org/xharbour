@@ -1,5 +1,5 @@
 /*
- * $Id: forms.ch,v 1.2 2005/10/08 14:13:49 lculik Exp $
+ * $Id: htmlform.ch,v 1.1 2005/10/13 16:29:46 lculik Exp $
  */
 
 /*
@@ -121,7 +121,7 @@
           IN <oForm>                          ;
           =>                                  ;
           <oForm>:addControl( ;
-                  [ <obj>:= ] TCgiHControl():setControl(;
+                  [ <obj>:= ] THtmlControl():SetControl(;
                   <(name)>, <rows>, <cols>, <size>, <maxchars>, ;
                   <(value)>, ;
                   <(onfocus)>,<(onblur)>,<(onchange)>,<(onselect)>,;
@@ -166,7 +166,7 @@
           [<l:LABEL>]                         ;
           IN <oForm>                               ;
           =>                                       ;
-          <oCtr> := TCGIHControl()                    ;;
+          <oCtr> := THtmlControl()                 ;;
           [<oCtr>:SetName( <(name)> ) ;]           ;
           [<oCtr>:SetSize( <size> ) ;]             ;
           [<oCtr>:SetRows( <rows> ) ;]             ;
@@ -204,7 +204,7 @@
           [<sel:SELECTED>]                    ;
           [<dis:DISABLED>]                    ;
           =>;
-          <oSelect>:addOption( <text>, <value>, <label>, <.sel.>, <.dis.> )
+          <oSelect>:AddOption( <text>, <value>, <label>, <.sel.>, <.dis.> )
 
 #xcommand ADD OPTION <text> [OF <oSelect>]    ;
           [VALUE <value>]                     ;
@@ -212,7 +212,7 @@
           [<sel:SELECTED>]                    ;
           [<dis:DISABLED>]                    ;
           =>;
-          <oSelect>:addOption( <text>, <value>, <label>, <.sel.>, <.dis.> )
+          <oSelect>:AddOption( <text>, <value>, <label>, <.sel.>, <.dis.> )
 
 
 // --> Literals

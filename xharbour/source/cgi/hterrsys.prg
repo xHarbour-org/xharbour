@@ -1,5 +1,5 @@
 /*
- * $Id: hterrsys.prg,v 1.3 2005/10/13 16:29:45 lculik Exp $
+ * $Id: hterrsys.prg,v 1.4 2005/10/14 06:31:47 lf_sfnet Exp $
  */
 
 /*
@@ -44,16 +44,13 @@
  */
 
 #include "error.ch"
+#include "cgi.ch"
 
-#define DEF_ERR_HEADER "Date : "+DTOC(Date())+"<BR>"+;
-"Time : " + Time() + "<BR>"
+#define DEF_ERR_HEADER "Date : "+DTOC(Date())+"<BR>"+"Time : " + Time() + "<BR>"
 
 // put messages to STDERR
 #command ? <list,...>   =>  ?? Chr(13) + Chr(10) ; ?? <list>
 #command ?? <list,...>  =>  OutErr(<list>)
-
-// used below
-#xTranslate NTRIM(<n>) => ALLTrim( Str( <n> ) )
 
 REQUEST HARDCR
 REQUEST MEMOWRIT
@@ -61,11 +58,13 @@ REQUEST MEMOWRIT
 STATIC sbFixCorrupt
 STATIC scErrFooter  := " "
 
+
 /***
 *	ErrorSys()
 *
 *	Note:  automatically executes at startup
 */
+/* TOFIX: Luiz please review it
 ANNOUNCE ERRORSYS
 
 PROC Errorsys()
@@ -73,7 +72,7 @@ PROC Errorsys()
    
    Errorblock( { | e | DefError( e ) } )
 RETURN
-
+*/
 /***
 *	DefError()
 */
@@ -87,7 +86,7 @@ STATIC FUNC DefError( e )
    LOCAL cErrString := ""
    LOCAL nDispCount := Dispcount()
    LOCAL aError     := {}
-   LOCAL nH         := IF( TCgiPageHandle() == NIL, 0, TCgiPageHandle() )
+   LOCAL nH         := IF( HtmlPageHandle() == NIL, 0, HtmlPageHandle() )
 
    // by default, division by zero yields zero
    IF ( e:genCode == EG_ZERODIV )
@@ -184,7 +183,7 @@ STATIC FUNC DefError( e )
 
    Fwrite( nH, "</TD>" + CRLF() + "</TR>" + CRLF() + "</TABLE>" + CRLF() )
 
-   TCGIJavaCMD( nH, 'alert("There was an error processing your request:\n' + ;
+   HtmlJsCmd( nH, 'alert("There was an error processing your request:\n' + ;
             'Look at the bottom of this page for\n' + ;
             'error description and parameters...");' )
    Fwrite( nH, "</FONT>" + CRLF() + "</BODY></HTML>" + CRLF() )

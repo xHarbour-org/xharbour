@@ -1,10 +1,10 @@
 /*
- * $Id: hjwindow.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
+ * $Id: hjwindow.prg,v 1.2 2005/10/14 07:25:11 lf_sfnet Exp $
  */
 
 /*
  * Harbour Project source code:
- * Java Window Class
+ * JavaScript Window Class
  *
  * Copyright 2000 Manos Aspradakis <maspr@otenet.gr>
  * www - http://www.harbour-project.org
@@ -44,10 +44,10 @@
  */
 
 #include "hbclass.ch"
-#include "html.ch"
 #include "common.ch"
+#include "cgi.ch"
 
-CLASS TCgiJWindow
+CLASS TJsWindow
 
    DATA nH
    DATA Name INIT ""
@@ -128,7 +128,7 @@ ENDCLASS
 *
 */
 
-METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TCgiJWindow
+METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TJsWindow
 
    DEFAULT cVarName TO "newWin"
    DEFAULT cURL TO " "
@@ -138,8 +138,8 @@ METHOD New( cVarName, cUrl, cName, x, y, w, h ) CLASS TCgiJWindow
    DEFAULT h TO 300
    DEFAULT w TO 300
 
-   ::nH      := TCgiPageHandle()
-   ::oHtm    := TCGIoPage()
+   ::nH      := HtmlPageHandle()
+   ::oHtm    := HtmlPageObject()
    ::varName := cVarName
    ::URL     := cUrl
    ::Name    := cName
@@ -160,7 +160,7 @@ RETURN Self
 METHOD SetFeatures( alwaysRaised, alwaysLowered, ;
                        Resizable, Menubar, personalBar, ;
                        dependent, location, directories, ;
-                       Scrollbars, Status, TitleBar, Toolbar, copyHistory ) CLASS TCgiJWindow
+                       Scrollbars, Status, TitleBar, Toolbar, copyHistory ) CLASS TJsWindow
 
    LOCAL cStr := ""
 
@@ -254,7 +254,7 @@ RETURN Self
 *
 */
 
-METHOD SetSize( x, y, h, w ) CLASS TCgiJWindow
+METHOD SetSize( x, y, h, w ) CLASS TJsWindow
 
    LOCAL cStr := ""
    DEFAULT x TO ::ScreenX, ;
@@ -283,12 +283,12 @@ RETURN Self
 *
 */
 
-METHOD Put() CLASS TCgiJWindow
+METHOD Put() CLASS TJsWindow
 
    LOCAL cStr := ""
 
    IF ::nH == NIL
-      ::nH := TCgiPageHandle()
+      ::nH := HtmlPageHandle()
       IF ::nH == NIL
          RETURN Self
       ENDIF
@@ -308,7 +308,7 @@ METHOD Put() CLASS TCgiJWindow
       ::varName + "', '" + ;
       ::features + "')"
 
-   TCGIJavaCMD( ::nH, cStr )
+   HtmlJsCmd( ::nH, cStr )
 
 RETURN Self
 
@@ -318,9 +318,9 @@ RETURN Self
 *
 */
 
-METHOD Write( c ) CLASS TCgiJWindow
+METHOD Write( c ) CLASS TJsWindow
 
-   TCGIJavaCMD( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
+   HtmlJsCmd( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
 RETURN Self
 
 /****
@@ -330,7 +330,7 @@ RETURN Self
 *
 */
 
-METHOD Qout( c ) CLASS TCgiJWindow
+METHOD Qout( c ) CLASS TJsWindow
 
    Fwrite( ::nH, ::varName + ".document.write('" + c + "')" + CRLF() )
 RETURN Self
@@ -343,7 +343,7 @@ RETURN Self
 *
 */
 
-METHOD Begin() CLASS TCgiJWindow
+METHOD Begin() CLASS TJsWindow
 
    LOCAL i
 
@@ -408,9 +408,9 @@ RETURN Self
 *
 */
 
-METHOD END () CLASS TCgiJWindow
+METHOD END () CLASS TJsWindow
 
-   TCGIJavaCMD( ::nH, ::varName + ".document.write('</BODY></HTML>')" + CRLF() )
+   HtmlJsCmd( ::nH, ::varName + ".document.write('</BODY></HTML>')" + CRLF() )
 
 RETURN Self
 
@@ -422,7 +422,7 @@ RETURN Self
 
 METHOD ImageURL( cImage, cUrl, nHeight, nBorder, ;
                     cOnClick, cOnMsover, cOnMsout, ;
-                    cName, cAlt ) CLASS TCgiJWindow
+                    cName, cAlt ) CLASS TJsWindow
 
    LOCAL cStr := ""
 
@@ -461,6 +461,4 @@ METHOD ImageURL( cImage, cUrl, nHeight, nBorder, ;
               cStr + '></A>' )
    ENDIF
 RETURN Self
-
-//*** EOF ***//
 

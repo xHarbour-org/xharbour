@@ -1,5 +1,5 @@
 /*
- * $Id: htmutil.prg,v 1.1 2005/10/05 20:25:43 lf_sfnet Exp $
+ * $Id: htmutil.prg,v 1.2 2005/10/13 16:29:45 lculik Exp $
  */
 
 /*
@@ -43,64 +43,58 @@
  *
  */
 
-#include "html.ch"
 #include "common.ch"
+#include "html.ch"
 
 /****
 *
 *     backButton()
 *
-*
-*
 */
 
-PROC BackButton( cImage, oHtm )
+PROCEDURE BackButton( cImage, oHtm )
 
    DEFAULT cImage TO "back.gif"
-   DEFAULT oHtm TO TCGIoPage()
+   DEFAULT oHtm TO HtmlPageObject()
 
    IMAGE( cImage ) ;
           URL "" ;
           ONCLICK "history.back()" ;
           OF oHtm
 
-RETURN
+   RETURN
 
 /****
 *
 *     BackFormButton()
 *
-*
-*
 */
 
-PROC BackFormButton( cImage, TCgioForm )
+PROCEDURE BackFormButton( cImage, oForm )
 
    LOCAL oBut
 
-   DEFAULT TCgioForm TO TCgioForm()
+   DEFAULT oForm TO HtmlFormObject()
 
    IF cImage == NIL
       DEFINE BUTTON oBut ;
          NAME "BackButton" ;
          VALUE "go Back" ;
          ONCLICK "history.back()" ;
-         IN TCgioForm
+         IN oForm
    ELSE
       DEFINE IMAGE oBut ;
          NAME "BackButton" ;
          SOURCE( cImage ) ;
          ONCLICK "history.back()" ;
-         IN TCgioForm
+         IN oForm
    ENDIF
 
-RETURN
+   RETURN
 
 /****
 *
 *     PutCounter()
-*
-*
 *
 */
 
@@ -110,7 +104,7 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
    LOCAL cStr    := ""
    LOCAL cLetter := ""
 
-   DEFAULT oHtm TO TCGIoPage()
+   DEFAULT oHtm TO HtmlPageObject()
    DEFAULT nNumber TO 0
    DEFAULT cDir TO "/images/counters/"
    DEFAULT nWidth TO 50
@@ -147,61 +141,4 @@ FUNCTION PutCounter( oHtm, nNumber, cDir, nDigits, nWidth, bgColor, nBorder )
 
 RETURN Nil
 
-/****
-*
-*     HtmlPadL()
-*
-*
-*
-*/
-
-FUNCTION HtmlPadL( cStr, n )
-
-   LOCAL cRet    := ""
-   LOCAL nStrLen
-   LOCAL nSpaces
-
-   IF n == NIL
-      RETURN cStr
-   ENDIF
-
-   nStrLen := Len( cStr )
-   nSpaces := n - Len( cStr )
-
-   IF n <= 0
-      cRet := Right( cStr, n )
-   ELSE
-      cRet := Replicate( _HTML_SPACE, nSpaces ) + cStr
-   ENDIF
-
-RETURN cRet
-
-/****
-*
-*     HtmlPadR()
-*
-*
-*
-*/
-
-FUNCTION HtmlPadR( cStr, n )
-
-   LOCAL cRet    := ""
-   LOCAL nStrLen
-   LOCAL nSpaces
-
-   IF n == NIL
-      RETURN cStr
-   ENDIF
-
-   nStrLen := Len( cStr )
-   nSpaces := n - Len( cStr )
-
-   IF n <= 0
-      cRet := LEFT( cStr, n )
-   ELSE
-      cRet := cStr + Replicate( _HTML_SPACE, nSpaces )
-   ENDIF
-
-RETURN cRet
 

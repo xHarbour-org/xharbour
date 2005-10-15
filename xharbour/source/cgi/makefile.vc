@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.2 2005/10/13 16:29:45 lculik Exp $
+# $Id: makefile.vc,v 1.3 2005/10/14 15:44:39 lf_sfnet Exp $
 #
 
 #
@@ -111,7 +111,6 @@ CGI_LIB_OBJS = \
     $(OBJ_DIR)\tedit.obj \
     $(OBJ_DIR)\tfile.obj \
     $(OBJ_DIR)\htjlist.obj   \
-    $(OBJ_DIR)\tini.obj \
     $(OBJ_DIR)\hjwindow.obj \
     $(OBJ_DIR)\tcgi.obj \
     $(OBJ_DIR)\tframe.obj \

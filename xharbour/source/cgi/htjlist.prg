@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
+ * $Id: htjlist.prg,v 1.2 2005/10/14 07:25:11 lf_sfnet Exp $
  */
 
 /*
@@ -49,35 +49,10 @@
  */
 
 #include "hbclass.ch"
-#include "html.ch"
 #include "common.ch"
+#include "cgi.ch"
 
-PROC TestJList()
-
-   LOCAL o
-
-   o := ncList():new(, .T., 200, 22 )   //, "#336699",, "white" )
-   o:newNode( "node1" )                 //,,,,"lightblue"  )
-   o:AddLink( "test", "test" )
-   o:AddLink( "test", "test" )
-   o:AddLink( "test", "test" )
-   o:endNode( "node1", "NODE #1" )
-   o:fontColor := "white"
-   o:newNode( "node2" )                 //,,,,"lightblue" )
-   o:AddLink( "test", "test" )
-   o:AddLink( "test", "test" )
-   o:AddLink( "test", "test" )
-   o:AddLink( "Test Link", "www.test.com" )                 //, "lightblue")
-   o:AddLink( "Test Link", "www.test.com" )                 //,, "lightblue")
-   o:AddLink( "Test Link", "www.test.com" )                 //,, "lightblue")
-   o:AddItem( "Test Link", "www.test.com" )                 //, "lightblue")
-   o:AddItem( "Test Link", "www.test.com" )                 //, "lightblue")
-   o:endNode( "node2", "NODE #2" )
-   o:build()
-   o:put( "test.htm" )
-   RETURN
-
-CLASS TCgiNcList
+CLASS TJsList
    DATA nH INIT STD_OUT
    DATA aScript INIT {}
    DATA aItems INIT {}
@@ -93,7 +68,7 @@ CLASS TCgiNcList
    DATA FontColor INIT "black"
 
    METHOD New( name, lOpen, width, height, bgColor, ;
-   FONT, fntColor, fntSize, cMinusIg, cPlusImg )
+               FONT, fntColor, fntSize, cMinusIg, cPlusImg )
 
    METHOD NewNode( name, lOpen, width, height, bgColor )
 
@@ -118,7 +93,7 @@ ENDCLASS
 */
 
 METHOD New( name, lOpen, width, height, bgColor, ;
-               FONT, fntColor, fntSize, cMinusImg, cPlusImg ) CLASS TCgiNcList
+               FONT, fntColor, fntSize, cMinusImg, cPlusImg ) CLASS TJsList
 
    LOCAL cStr
 
@@ -177,7 +152,7 @@ RETURN Self
 *
 */
 
-METHOD newNode( name, lOpen, width, height, bgColor ) CLASS TCgiNcList
+METHOD NewNode( name, lOpen, width, height, bgColor ) CLASS TJsList
 
    LOCAL cStr := ""
    DEFAULT lOpen TO .F.
@@ -205,7 +180,7 @@ RETURN Self
 *
 */
 
-METHOD SetFont( name, font, fntColor, fntSize ) CLASS TCgiNcList
+METHOD SetFont( name, font, fntColor, fntSize ) CLASS TJsList
 
    LOCAL cStr := ""
 
@@ -229,7 +204,7 @@ RETURN self
 *
 */
 
-METHOD AddItem( name, url, bgColor ) CLASS TCgiNcList
+METHOD AddItem( name, url, bgColor ) CLASS TJsList
 
    LOCAL cStr := ""
    LOCAL cUrl := ""
@@ -247,7 +222,7 @@ RETURN self
 *
 */
 
-METHOD AddLink( name, url, img, bgColor ) CLASS TCgiNcList
+METHOD AddLink( name, url, img, bgColor ) CLASS TJsList
 
    LOCAL cStr := ""
    LOCAL cUrl := ""
@@ -260,7 +235,7 @@ METHOD AddLink( name, url, img, bgColor ) CLASS TCgiNcList
    Aadd( ::aScript, cStr )
 RETURN self
 
-METHOD EndNode( name, caption ) CLASS TCgiNcList
+METHOD EndNode( name, caption ) CLASS TJsList
 
    LOCAL cStr := ""
 
@@ -271,7 +246,7 @@ METHOD EndNode( name, caption ) CLASS TCgiNcList
    Aadd( ::aScript, cStr )
 RETURN self
 
-METHOD Build( xPos, yPos ) CLASS TCgiNcList
+METHOD Build( xPos, yPos ) CLASS TJsList
 
    LOCAL i    := 0
    LOCAL cStr := ""
@@ -310,7 +285,7 @@ METHOD Build( xPos, yPos ) CLASS TCgiNcList
 
 RETURN Self
 
-METHOD Put( cFile ) CLASS TCgiNcList
+METHOD Put( cFile ) CLASS TJsList
 
    IF cFile == NIL
       ::nH := STD_OUT

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2005/10/14 06:31:47 lf_sfnet Exp $
+# $Id: Makefile,v 1.4 2005/10/14 15:44:39 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -11,11 +11,10 @@ PRG_SOURCES=\
     tcgi.prg \
     tedit.prg \
     tframe.prg \
-    tini.prg \
     tfile.prg \
     hjwindow.prg \
-    htmutil.prg \
     hterrsys.prg \
+    htmutil.prg \
     htjlist.prg \
 
 LIBNAME=cgi

@@ -1,5 +1,5 @@
 /*
- * $Id: tframe.prg,v 1.1 2005/10/13 21:36:44 lculik Exp $
+ * $Id: tframe.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
  */
 
 /*
@@ -45,12 +45,14 @@
 
 #include "hbclass.ch"
 #include "common.ch"
-#include "html.ch"
+#include "cgi.ch"
 
 
-CLASS TCgiFrameSet
+CLASS THtmlFrameSet
+
    DATA nH
    DATA FName
+
    DATA TITLE INIT "FrameSet01"
 
    METHOD New( fName, title )
@@ -67,7 +69,7 @@ CLASS TCgiFrameSet
 ENDCLASS
 
    
-METHOD New( cFName, cTitle ) CLASS TCgiFrameSet
+METHOD New( cFName, cTitle ) CLASS THtmlFrameSet
 
    LOCAL cStr := ""
 
@@ -94,8 +96,7 @@ METHOD New( cFName, cTitle ) CLASS TCgiFrameSet
 
 RETURN Self
 
-
-METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS TCgiFrameSet
+METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
    LOCAL i
    LOCAL cStr := ""
@@ -151,14 +152,14 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS TCgiFrameSet
 RETURN Self
 
 
-METHOD Endset() CLASS TCgiFrameSet
+METHOD Endset() CLASS THtmlFrameSet
 
    Fwrite( ::nH, " </FRAMESET>" + CRLF() )
 
 RETURN Self
 
 
-METHOD END () CLASS TCgiFrameSet
+METHOD END () CLASS THtmlFrameSet
 
    Fwrite( ::nH, "</HTML>" + CRLF() )
 
@@ -170,7 +171,7 @@ RETURN Self
 
 
 METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
-                 marginwidth, marginheight, cTarget, cScrolling ) CLASS TCgiFrameSet
+                 marginwidth, marginheight, cTarget, cScrolling ) CLASS THtmlFrameSet
 
    LOCAL cStr
 
@@ -178,7 +179,7 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
    DEFAULT lResize TO .T.
    DEFAULT lScrolling TO .F.
    DEFAULT cScrolling TO "AUTO"
-   DEFAULT cTarget TO "_self"           //"_blank"
+   DEFAULT cTarget TO "_self"  
 
    cStr := "  <FRAME "
 
@@ -202,8 +203,6 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
 
    IF !lResize
       cStr += " NORESIZE"
-      //else
-      //cStr += " RESIZE"
    ENDIF
 
    IF cScrolling != NIL
@@ -229,5 +228,5 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
    cStr += ">" + CRLF()
 
    Fwrite( ::nH, cStr )
-RETURN Self
 
+   RETURN Self
