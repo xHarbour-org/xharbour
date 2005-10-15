@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.504 2005/10/14 06:47:06 ronpinkas Exp $
+ * $Id: hvm.c,v 1.505 2005/10/14 20:36:13 ronpinkas Exp $
  */
 
 /*
@@ -9130,19 +9130,12 @@ void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
 
    //printf( "Recover %i\n", s_lRecoverBase );
 
-   if( hb_vm_pSequence && hb_vm_pSequence->lBase )
+   if( pItem && hb_vm_pSequence && hb_vm_pSequence->lBase )
    {
-      if( pItem )
-      {
-         hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->lBase - 1 ), pItem );
-      }
+      hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->lBase - 1 ), pItem );
+   }
 
-      s_uiActionRequest = HB_BREAK_REQUESTED;
-   }
-   else
-   {
-      s_uiActionRequest = HB_QUIT_REQUESTED;
-   }
+   s_uiActionRequest = HB_BREAK_REQUESTED;
 }
 
 USHORT HB_EXPORT hb_vmRequestQuery( void )
