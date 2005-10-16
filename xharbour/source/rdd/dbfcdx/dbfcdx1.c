@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.224 2005/10/16 11:00:00 ptsarenko Exp $
+ * $Id: dbfcdx1.c,v 1.224 2005/10/16 10:28:54 ptsarenko Exp $
  */
 
 /*
@@ -60,7 +60,6 @@
 #if !defined( HB_SIXCDX )
 #  define HB_CDX_PACKTRAIL
 #endif
-
 
 #define HB_CDX_DBGCODE
 /*
@@ -5309,13 +5308,10 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pTag->pIndex->pArea->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdp_page )
    {
-      ULONG ulLen = hb_itemGetCLen( pWildItm );
-      szPattern = ( char * ) hb_xgrab( ulLen + 1 );
-      memcpy( szPattern, hb_itemGetCPtr( pWildItm ), ulLen );
-      szPattern[ ulLen ] = '\0';
-      hb_cdpnTranslate( szPattern, hb_cdp_page, pTag->pIndex->pArea->cdPage, ulLen );
+      szPattern = hb_strdup( szPattern );
+      hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
    }
 #endif
 
@@ -5389,7 +5385,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       pArea->fEof = FALSE;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pTag->pIndex->pArea->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdp_page )
    {
       hb_xfree( szPattern );
    }
@@ -5399,6 +5395,25 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 }
 
 #if defined(__XHARBOUR__)
+
+static BOOL hb_cdxRegexMatch( CDXAREAP pArea, PHB_REGEX pRegEx, LPCDXKEY pKey )
+{
+   char * szKey = ( char * ) pKey->val;
+#ifndef HB_CDP_SUPPORT_OFF
+   char szBuff[ CDX_MAXKEY + 1 ];
+
+   if( pArea->cdPage != hb_cdp_page )
+   {
+      hb_strncpy( szBuff, szKey, pKey->len );
+      hb_cdpnTranslate( szBuff, pArea->cdPage, hb_cdp_page, pKey->len );
+      szKey = szBuff;
+   }
+#else
+   HB_SYMBOL_UNUSED( pArea );
+#endif
+   return hb_regexMatch( pRegEx, szKey, FALSE );
+}
+
 /*
  * skip while regular expression on index key val doesn't return TRUE
  */
@@ -5439,12 +5454,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipNext( pTag );
       while ( !pTag->TagEOF )
       {
-         if( hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
+         if( hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
+                 hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
             {
                fFound = TRUE;
                break;
@@ -5460,12 +5475,12 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
          hb_cdxTagSkipPrev( pTag );
       while ( !pTag->TagBOF )
       {
-         if( hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
+         if( hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
          {
             ULONG ulRecNo = pArea->ulRecNo;
             SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
             if ( pArea->ulRecNo == ulRecNo ||
-                 hb_regexMatch( &RegEx, (const char *) pTag->CurKey->val, FALSE ) )
+                 hb_cdxRegexMatch( pArea, &RegEx, pTag->CurKey ) )
             {
                fFound = TRUE;
                break;

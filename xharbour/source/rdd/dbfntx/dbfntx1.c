@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.138 2005/10/16 11:00:00 ptsarenko Exp $
+ * $Id: dbfntx1.c,v 1.138 2005/10/16 10:28:55 ptsarenko Exp $
  */
 
 /*
@@ -438,6 +438,8 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
 #ifndef HB_CDP_SUPPORT_OFF
          if( fTrans )
             hb_cdpnTranslate( pKey->key, hb_cdp_page, pTag->Owner->Owner->cdPage, pTag->KeyLength );
+#else
+         HB_SYMBOL_UNUSED( fTrans );
 #endif
          break;
       case 'N':
@@ -481,6 +483,8 @@ static PHB_ITEM hb_ntxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
                pItem = hb_itemPutCPtr( pItem, pVal, pTag->KeyLength );
             }
             else
+#else
+            HB_SYMBOL_UNUSED( fTrans );
 #endif
             {
                pItem = hb_itemPutCL( pItem, pKey->key, pTag->KeyLength );
@@ -4050,13 +4054,10 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pTag->Owner->Owner->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdp_page )
    {
-      ULONG ulLen = hb_itemGetCLen( pWildItm );
-      szPattern = ( char * ) hb_xgrab( ulLen + 1 );
-      memcpy( szPattern, hb_itemGetCPtr( pWildItm ), ulLen );
-      szPattern[ ulLen ] = '\0';
-      hb_cdpnTranslate( szPattern, hb_cdp_page, pTag->Owner->Owner->cdPage, ulLen );
+      szPattern = hb_strdup( szPattern );
+      hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
    }
 #endif
 
@@ -4120,7 +4121,7 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
       pArea->fEof = FALSE;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   if( pTag->Owner->Owner->cdPage != hb_cdp_page )
+   if( pArea->cdPage != hb_cdp_page )
    {
       hb_xfree( szPattern );
    }
@@ -4130,6 +4131,24 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
 }
 
 #if defined(__XHARBOUR__)
+
+static BOOL hb_ntxRegexMatch( LPTAGINFO pTag, PHB_REGEX pRegEx, char * szKey )
+{
+#ifndef HB_CDP_SUPPORT_OFF
+   char szBuff[ NTX_MAX_KEY + 1 ];
+
+   if( pTag->Owner->Owner->cdPage != hb_cdp_page )
+   {
+      hb_strncpy( szBuff, pTag->CurKeyInfo->key, pTag->KeyLength );
+      hb_cdpnTranslate( szBuff, pTag->Owner->Owner->cdPage, hb_cdp_page, pTag->KeyLength );
+      szKey = szBuff;
+   }
+#else
+   HB_SYMBOL_UNUSED( pTag );
+#endif
+   return hb_regexMatch( pRegEx, szKey, FALSE );
+}
+
 /*
  * skip while regular expression on index key val doesn't return TRUE
  */
@@ -4170,12 +4189,13 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
          {
             if( SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra ) != SUCCESS )
                break;
-            if( hb_regexMatch( &RegEx, (const char *) pTag->CurKeyInfo->key, FALSE ) )
+
+            if( hb_ntxRegexMatch( pTag, &RegEx, ( char * ) pTag->CurKeyInfo->key ) )
             {
                ULONG ulRecNo = pArea->ulRecNo;
                SELF_SKIPFILTER( ( AREAP ) pArea, fForward ? 1 : -1 );
                if( pArea->ulRecNo == ulRecNo ||
-                   hb_regexMatch( &RegEx, (const char *) pTag->CurKeyInfo->key, FALSE ) )
+                   hb_ntxRegexMatch( pTag, &RegEx, ( char * ) pTag->CurKeyInfo->key ) )
                {
                   fFound = TRUE;
                   break;
@@ -4231,7 +4251,7 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag, PHB_ITEM pItem )
    {
       if( pArea->lpdbPendingRel )
          SELF_FORCEREL( ( AREAP ) pArea );
-      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, FALSE, NULL );
+      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, TRUE, NULL );
    }
    else
    {
@@ -4271,7 +4291,7 @@ static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag, PHB_ITEM pItem )
    {
       if( pArea->lpdbPendingRel )
          SELF_FORCEREL( ( AREAP ) pArea );
-      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, FALSE, NULL );
+      pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, TRUE, NULL );
    }
    else
    {
