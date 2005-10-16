@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.30 2005/09/30 23:44:05 druzus Exp $
+* $Id: hbserv.c,v 1.31 2005/10/04 20:35:35 druzus Exp $
 */
 
 /*
@@ -746,8 +746,7 @@ HB_FUNC( HB_STARTSERVICE )
    if ( iCount > 2 || ( sp_hooks == NULL && iCount > 1 ) )
    {
       //TODO: Right error code here
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Service must be started before starting threads", NULL,
-            0);
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Service must be started before starting threads", NULL, 0);
       return;
    }
    #endif

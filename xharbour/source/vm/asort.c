@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.13 2005/08/28 19:25:33 walito Exp $
+ * $Id: asort.c,v 1.14 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -64,8 +64,22 @@
 
 /* #define HB_ASORT_OPT_ITEMCOPY  - use hbsetup.h to enable/disable it*/
 
-static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2 )
+static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
 {
+   if( pBlock )
+   {
+      hb_vmPushSymbol( &hb_symEval );
+      hb_vmPush( pBlock );
+      hb_vmPush( pItem1 );
+      hb_vmPush( pItem2 );
+      hb_vmSend( 2 );
+
+      if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) )
+         return HB_VM_STACK.Return.item.asLogical.value;
+   }
+
+   /* Do native compare when no codeblock is supplied */
+
    if( HB_IS_STRING( pItem1 ) && HB_IS_STRING( pItem2 ) )
       return hb_itemStrCmp( pItem1, pItem2, FALSE ) < 0;
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
@@ -108,45 +122,13 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 
 static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_ITEM pBlock )
 {
-   LONG i;
-   LONG j;
-   LONG p;
-
-   HB_ITEM pivot;
+   LONG i, j, p;
 
    /* select pivot and exchange with 1st element */
-   p = lb + ( ( ub - lb ) / 2 );
-
-   memcpy( &pivot, pItems + p, sizeof( HB_ITEM ) );
-
-   #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( &pivot ) && pivot.item.asArray.value )
-      {
-         hb_arrayResetHolder( pivot.item.asArray.value, (void *) ( pItems + p ), (void *) &pivot );
-      }
-      else if( HB_IS_BYREF( &pivot ) && HB_IS_MEMVAR( &pivot ) == FALSE && pivot.item.asRefer.offset == 0 )
-      {
-         hb_arrayResetHolder( pivot.item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + p ), ( void *) &pivot );
-      }
-
-   #endif
-
-   HB_ITEM_LOCK( &pivot );
-
+   p = lb + ( ( ub - lb ) >> 1 );
    if( p != lb )
    {
-      memcpy( pItems + p, pItems + lb, sizeof( HB_ITEM ) );
-
-      #ifndef HB_ARRAY_USE_COUNTER
-         if( HB_IS_ARRAY( pItems + p ) && ( pItems + p )->item.asArray.value )
-         {
-            hb_arrayResetHolder( ( pItems + p )->item.asArray.value, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
-         }
-         else if( HB_IS_BYREF( pItems + p ) && HB_IS_MEMVAR( pItems + p ) == FALSE && ( pItems + p )->item.asRefer.offset == 0 )
-         {
-            hb_arrayResetHolder( ( pItems + p )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + lb ), (void *) ( pItems + p ) );
-         }
-      #endif
+      hb_itemSwap( pItems + lb, pItems + p );
    }
 
    /* sort lb+1..ub based on pivot */
@@ -155,57 +137,14 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
 
    while( TRUE )
    {
-      if( pBlock )
+      while( i < j && hb_itemIsLess( pItems + i, pItems + lb, pBlock ) )
       {
-         /* Call the codeblock to compare the items */
-         while( i < j )
-         {
-            hb_vmPushSymbol( &hb_symEval );
-            hb_vmPush( pBlock );
-            hb_vmPush( pItems + i );
-            hb_vmPush( &pivot );
-            hb_vmSend( 2 );
-
-            if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( pItems + i, &pivot ) ) )
-            {
-               i++;
-            }
-            else
-            {
-               break;
-            }
-         }
-
-         while( j >= i )
-         {
-            hb_vmPushSymbol( &hb_symEval );
-            hb_vmPush( pBlock );
-            hb_vmPush( &pivot );
-            hb_vmPush( pItems + j );
-            hb_vmSend( 2 );
-
-            if( ( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) ? HB_VM_STACK.Return.item.asLogical.value : hb_itemIsLess( &pivot, pItems + j ) ) )
-            {
-               j--;
-            }
-            else
-            {
-               break;
-            }
-         }
+         i++;
       }
-      else
-      {
-         /* Do native compare when no codeblock is supplied */
-         while( i < j && hb_itemIsLess( pItems + i, &pivot ) )
-         {
-            i++;
-         }
 
-         while( j >= i && hb_itemIsLess( &pivot, pItems + j ) )
-         {
-            j--;
-         }
+      while( j >= i && hb_itemIsLess( pItems + lb, pItems + j, pBlock ) )
+      {
+         j--;
       }
 
       if( i >= j )
@@ -214,69 +153,16 @@ static LONG hb_arraySortQuickPartition( PHB_ITEM pItems, LONG lb, LONG ub, PHB_I
       }
 
       /* Swap the items */
-      {
-         HB_ITEM temp;
-
-         #ifndef HB_ARRAY_USE_COUNTER
-            if( HB_IS_ARRAY( pItems + j ) && ( pItems + j )->item.asArray.value )
-            {
-               hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + i ) );
-            }
-            else if( HB_IS_BYREF( pItems + j ) && HB_IS_MEMVAR( pItems + j ) == FALSE && ( pItems + j )->item.asRefer.offset == 0 )
-            {
-               hb_arrayResetHolder( ( pItems + j )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + j ), (void *) ( pItems + i ) );
-            }
-
-            if( HB_IS_ARRAY( pItems + i ) && ( pItems + i )->item.asArray.value )
-            {
-               hb_arrayResetHolder( ( pItems + i )->item.asArray.value, (void *) ( pItems + i ), (void *) ( pItems + j ) );
-            }
-            else if( HB_IS_BYREF( pItems + i ) && HB_IS_MEMVAR( pItems + i ) == FALSE && ( pItems + i )->item.asRefer.offset == 0 )
-            {
-               hb_arrayResetHolder( ( pItems + i )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + i ), (void *) ( pItems + j ) );
-            }
-         #endif
-
-         memcpy( &temp, pItems + j, sizeof( HB_ITEM ) );
-         memcpy( pItems + j, pItems + i, sizeof( HB_ITEM ) );
-         memcpy( pItems + i, &temp, sizeof( HB_ITEM ) );
-      }
-
+      hb_itemSwap( pItems + i, pItems + j );
       j--;
       i++;
    }
 
    /* pivot belongs in pItems[j] */
-   if( lb != j )
+   if( j > lb )
    {
-      memcpy( pItems + lb, pItems + j, sizeof( HB_ITEM ) );
-
-      #ifndef HB_ARRAY_USE_COUNTER
-         if( HB_IS_ARRAY( pItems + j ) && ( pItems + j )->item.asArray.value )
-         {
-            hb_arrayResetHolder( ( pItems + j )->item.asArray.value, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
-         }
-         else if( HB_IS_BYREF( pItems + j ) && HB_IS_MEMVAR( pItems + j ) == FALSE && ( pItems + j )->item.asRefer.offset == 0 )
-         {
-            hb_arrayResetHolder( ( pItems + j )->item.asRefer.BasePtr.pBaseArray, (void *) ( pItems + j ), (void *) ( pItems + lb ) );
-         }
-      #endif
+      hb_itemSwap( pItems + lb, pItems + j );
    }
-
-   memcpy( pItems + j, &pivot, sizeof( HB_ITEM ) );
-
-   #ifndef HB_ARRAY_USE_COUNTER
-      if( HB_IS_ARRAY( &pivot ) && pivot.item.asArray.value )
-      {
-         hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
-      }
-      else if( HB_IS_BYREF( &pivot ) && HB_IS_MEMVAR( &pivot ) == FALSE && pivot.item.asRefer.offset == 0 )
-      {
-         hb_arrayResetHolder( pivot.item.asArray.value, (void *) &pivot, (void *) ( pItems + j ) );
-      }
-   #endif
-
-   HB_ITEM_UNLOCK( &pivot );
 
    return j;
 }

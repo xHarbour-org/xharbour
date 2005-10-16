@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4469 2005/10/16 10:28:53 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4470 2005/10/16 12:04:30 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-16 21:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/hbserv.c
+    * formatting
+
+  * xharbour/source/rtl/win32ole.prg
+    ! fixed compilation for MT mode by replacing hb_stack.Return with
+      hb_stackReturnItem()
+
+  * xharbour/source/vm/asort.c
+    * use only API functions to manipulate items in sorted array
+
+  * xharbour/source/vm/extend.c
+    ! fixed compilation for MT mode by replacing hb_stack.Return with
+      hb_stackReturnItem()
+    * replace HB_VM_STACK.Return with hb_stackReturnItem() - by default
+      hb_stackReturnItem() is a macro to HB_VM_STACK.Return so it will
+      not cause any additional function call
+
+  * xharbour/source/vm/hvm.c
+    * casting for C++ compilation
 
 2005-10-16 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c

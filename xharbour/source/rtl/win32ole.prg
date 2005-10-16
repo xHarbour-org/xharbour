@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.88 2005/10/14 06:47:06 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.89 2005/10/15 02:37:08 ronpinkas Exp $
  */
 
 /*
@@ -1138,7 +1138,7 @@ RETURN xRet
              hb_itemPushForward( &OleAuto );
              hb_vmPushLong( ( LONG ) RetVal.n1.n2.n3.pdispVal );
              hb_vmSend( 1 );
-             //printf( "Dispatch: %ld %ld\n", ( LONG ) RetVal.n1.n2.n3.pdispVal, (LONG) hb_stack.Return.item.asArray.value );
+             //printf( "Dispatch: %ld %ld\n", ( LONG ) RetVal.n1.n2.n3.pdispVal, (LONG) hb_stackReturnItem()->item.asArray.value );
           }
           break;
 
@@ -1226,7 +1226,7 @@ RETURN xRet
                     hb_vmPushNil();
                     hb_vmDo( 0 );
 
-                    hb_itemForwardValue( &Add, &hb_stack.Return );
+                    hb_itemForwardValue( &Add, hb_stackReturnItem() );
                  }
 
                  if( s_pSym_New && Add.type )
