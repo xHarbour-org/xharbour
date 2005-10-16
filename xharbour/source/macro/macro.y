@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.18 2005/05/27 22:19:47 ronpinkas Exp $
+ * $Id: macro.y,v 1.19 2005/06/01 02:09:27 ronpinkas Exp $
  */
 
 /*
@@ -82,7 +82,7 @@
 #define HB_MAX_PENDING_MACRO_EXP 16
 
 static HB_EXPR_PTR s_Pending[ HB_MAX_PENDING_MACRO_EXP ];
-static int s_iPending = 0;
+static int s_iPending;
 
 /* This is workaround of yyparse() declaration bug in bison.simple
 */
@@ -103,7 +103,7 @@ static int s_iPending = 0;
 #undef YYLEX_PARAM
 #define YYLEX_PARAM   ( (HB_MACRO_PTR)YYPARSE_PARAM ) /* additional parameter passed to yylex */
 
-extern int yyparse( void * );	/* to make happy some purist compiler */
+extern int yyparse( void * );   /* to make happy some purist compiler */
 extern void * hb_compFlexNew( HB_MACRO_PTR );
 extern void hb_compFlexDelete( void * );
 
@@ -419,7 +419,7 @@ MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                  {
                                     /* invalid variable name
                                      */
-				    HB_TRACE(HB_TR_DEBUG, ("macro -> invalid variable name: %s", $1));
+                HB_TRACE(HB_TR_DEBUG, ("macro -> invalid variable name: %s", $1));
 
                                     hb_xfree( $1 );
                                     YYABORT;
@@ -1046,6 +1046,9 @@ int hb_macroYYParse( HB_MACRO_PTR pMacro )
       HB_CRITICAL_LOCK( hb_macroMutex );
    #endif
 
+   // Reset
+   s_iPending = 0;
+
    lexBuffer = hb_compFlexNew( pMacro );
 
    pMacro->status = HB_MACRO_CONT;
@@ -1068,4 +1071,3 @@ void yyerror( char * s )
 {
    HB_SYMBOL_UNUSED( s );
 }
-
