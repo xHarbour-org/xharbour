@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.136 2005/10/14 19:54:39 ptsarenko Exp $
+ * $Id: dbfntx1.c,v 1.138 2005/10/16 11:00:00 ptsarenko Exp $
  */
 
 /*
@@ -4049,6 +4049,17 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
       return fForward ? !pArea->fEof : !pArea->fBof;
    }
 
+#ifndef HB_CDP_SUPPORT_OFF
+   if( pTag->Owner->Owner->cdPage != hb_cdp_page )
+   {
+      ULONG ulLen = hb_itemGetCLen( pWildItm );
+      szPattern = ( char * ) hb_xgrab( ulLen + 1 );
+      memcpy( szPattern, hb_itemGetCPtr( pWildItm ), ulLen );
+      szPattern[ ulLen ] = '\0';
+      hb_cdpnTranslate( szPattern, hb_cdp_page, pTag->Owner->Owner->cdPage, ulLen );
+   }
+#endif
+
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
 
@@ -4107,6 +4118,13 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
       pArea->fBof = FALSE;
    else
       pArea->fEof = FALSE;
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if( pTag->Owner->Owner->cdPage != hb_cdp_page )
+   {
+      hb_xfree( szPattern );
+   }
+#endif
 
    return fFound;
 }

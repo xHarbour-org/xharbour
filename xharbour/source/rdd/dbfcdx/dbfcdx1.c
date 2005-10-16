@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.223 2005/10/04 23:00:00 ptsarenko Exp $
+ * $Id: dbfcdx1.c,v 1.224 2005/10/16 11:00:00 ptsarenko Exp $
  */
 
 /*
@@ -5308,6 +5308,17 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       return fForward ? pArea->fPositioned : !pArea->fBof;
    }
 
+#ifndef HB_CDP_SUPPORT_OFF
+   if( pTag->pIndex->pArea->cdPage != hb_cdp_page )
+   {
+      ULONG ulLen = hb_itemGetCLen( pWildItm );
+      szPattern = ( char * ) hb_xgrab( ulLen + 1 );
+      memcpy( szPattern, hb_itemGetCPtr( pWildItm ), ulLen );
+      szPattern[ ulLen ] = '\0';
+      hb_cdpnTranslate( szPattern, hb_cdp_page, pTag->pIndex->pArea->cdPage, ulLen );
+   }
+#endif
+
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
 
@@ -5376,6 +5387,13 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       pArea->fBof = FALSE;
    else
       pArea->fEof = FALSE;
+
+#ifndef HB_CDP_SUPPORT_OFF
+   if( pTag->pIndex->pArea->cdPage != hb_cdp_page )
+   {
+      hb_xfree( szPattern );
+   }
+#endif
 
    return fFound;
 }
