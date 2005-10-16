@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.83 2005/10/10 08:19:05 brianhays Exp $
+ * $Id: ads1.c,v 1.84 2005/10/10 22:45:53 druzus Exp $
  */
 
 /*
@@ -4440,6 +4440,7 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
          AdsApplicationExit();
          if( s_adsConnections )
          {
+            hb_xfree( s_adsConnections );
             s_adsConnections = NULL;
             s_iConnectTableSize = s_iConnectActive = 0;
          }
