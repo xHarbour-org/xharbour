@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.152 2005/09/15 13:52:03 lculik Exp $
+ * $Id: hbmake.prg,v 1.153 2005/09/17 21:15:20 lculik Exp $
  */
 
 /*
@@ -2668,7 +2668,7 @@ FUNCTION CreateMakeFile( cFile )
             cDefBccLibsMt := strtran(cDefBccLibsMt,"gtwin","gtwvw")
          endif
 
-         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lGTWVT,"optgui",iif(!s_lasdll,"optcon","")) + iif( !s_lMt, "", "mt" )+".lib "  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
+         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lFWH .or. lMiniGui .or. lWhoo .or. lHwgui .or. lGtWvt .or. lGtWvw   ,"optgui",iif(!s_lasdll,"optcon","")) + iif( !s_lMt, "", "mt" )+".lib "  + IIF( ! s_lMt, cDefBccLibs, cDefBccLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc
@@ -2710,7 +2710,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = ilink32" + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lGtWvw .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
       FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
