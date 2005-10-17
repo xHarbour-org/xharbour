@@ -49,7 +49,7 @@
      DATA aCommRules, aCommResults
      DATA lRunLoaded, lClsLoaded, lFWLoaded
 
-     METHOD New()              CONSTRUCTOR
+     METHOD New( bRTEBlock )              CONSTRUCTOR
 
      METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
      METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
@@ -61,6 +61,7 @@
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
      METHOD SetStaticProcedures()                       INLINE s_aProcedures := ::aCompiledProcs
+     METHOD GetLine( nLine )                            INLINE IIF( nLine > 0 .AND. nLine < Len( ::acPPed ), ::acPPed[ nLine ], "" )
 
      #ifdef __XHARBOUR__
        METHOD EvalExpression()
@@ -88,7 +89,7 @@
      //TraceLog( "New" )
 
      #ifdef AX
-        s_bRTErrBlock := NIL
+        s_bDefRTEBlock := {|e| Break( e ) }
      #endif
 
   RETURN Self
@@ -98,7 +99,7 @@
 
      LOCAL nLine, nLines, sLine, nProcID := ::nProcs
      LOCAL bErrHandler, oError
-     LOCAL nStart, acPPed
+     LOCAL nStart, acPPed, nOffset
 
      IF Empty( ::cText )
         RETURN .F.
@@ -140,7 +141,9 @@
            PP_ModuleName( ::cName )
         ENDIF
 
+        //OutputDebugString( "PrePro:" + EOL + ::cText + EOL )
         ::cPPed := PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
+        //OutputDebugString( ::cPPed + EOL )
         nLines  := Len( ::acPPed )
         //TraceLog( ::cText, ::cPPed, nLines )
 
@@ -153,10 +156,12 @@
         acPPed := ::acPPed
         nStart := ::nCompiledLines + 1
 
+        nOffset := 0
         FOR nLine := nStart TO nLines
            IF ! Empty( acPPed[ nLine ] )
               EXIT
            ENDIF
+           nOffset++
         NEXT
 
         // No Code!
@@ -174,9 +179,12 @@
 
         FOR nLine := nStart TO nLines
            sLine := acPPed[nLine]
-           IF sLine != NIL
-              //TraceLog( "COMPLE: " + sLine )
-              PP_CompileLine( sLine, nLine - nStart + 1, ::aCompiledProcs, ::aInitExit, @nProcId )
+           IF Empty( sLine )
+              nOffset++
+              //OutputDebugString( "Skipped Line" + EOL )
+           ELSE
+              //OutputDebugString( "COMPILE: (" + Str( nLine ) + "->" + Str( nLine + nOffset - nStart + 1 ) + ") " + sLine + EOL )
+              PP_CompileLine( sLine, nLine + nOffset - nStart + 1, ::aCompiledProcs, ::aInitExit, @nProcId )
            ENDIF
         NEXT
 
@@ -219,7 +227,7 @@
      LOCAL bErrHandler
 
      #ifdef AX
-       LOCAL bRecoveryBlock
+        LOCAL bRecoveryBlock
      #endif
 
      bErrHandler := ErrorBlock( {|e| Break(e) } )
@@ -1466,7 +1474,6 @@
            #define AX
         #pragma ENDDUMP
       #endif
-
     #endif
 
     #pragma BEGINDUMP
@@ -1484,6 +1491,16 @@
       #endif
 
       static BOOL s_bArrayPrefix = FALSE;
+
+      #ifdef AX
+        #include <windows.h>
+
+        //----------------------------------------------------------------------------//
+        HB_FUNC( OUTPUTDEBUGSTRING )
+        {
+           OutputDebugString( hb_parcx(1) );
+        }
+      #endif
 
       //----------------------------------------------------------------------------//
       HB_FUNC_STATIC( SETARRAYPREFIX )
@@ -2228,10 +2245,6 @@
     #pragma BEGINDUMP
 
       #ifdef __XHARBOUR__
-
-        #ifdef AX
-          #include <windows.h>
-        #endif
 
         #include "hbpcode.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4471 2005/10/16 19:31:15 druzus Exp $
+ * $Id: ChangeLog,v 1.4472 2005/10/16 21:37:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 05:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    * Rewrote error handling from scratch to allow complete seperation
+      between script level errors, and engine level errors.
+      Script errors ara always handled by meas of the PP_ErrorBlock()
+      while engine errors are handled by means of ErrorBlock()
+    ! Fixed handling of script level error in all script flow constructs
+    + Added Script specific default Error Handler
+    * Fixed script line number in compilation from TInterpreter()
 
 2005-10-16 14:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/macro/macro.y
