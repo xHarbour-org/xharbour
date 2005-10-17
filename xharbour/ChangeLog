@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4473 2005/10/17 12:19:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4474 2005/10/17 20:02:11 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 13:06 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
+  * contrib/rdd_ads/ads1.c
+    * changed function AdsSkip().
+        // In addition, if lToSkip > 1 we need to iterate calls to AdsSkip(1) and
+        // test the filter each time since, even if the server has a filter set,
+        // AdsSkip(5) may only test the filter after 5 raw skips (according to the
+        // Extended Systems developers.)
+
+      The changes applied in the above causes big databases to slow down tremendously.
+
+      If Children present then go iterate calls to AdsSkip(1) and test the filter each time
+      as Mr. Brian Hays said. If No Children... then send lToSkip as it is to ADS. We gain speed!!
+
 2005-10-17 18:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg
     ! minor fix
-    
+
 2005-10-17 05:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
   * utils/xbscript/xbscript.prg
