@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4474 2005/10/17 20:02:11 lculik Exp $
+ * $Id: ChangeLog,v 1.4475 2005/10/17 20:16:28 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 22:52 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
+  * contrib/wvtgui/wvtwin.ch
+    + Added more constants:
+      #define DEFAULT_QUALITY              0
+      #define DRAFT_QUALITY                1
+      #define PROOF_QUALITY                2
+      #define NONANTIALIASED_QUALITY       3 // (WINVER >= 0x0400)
+      #define ANTIALISED_QUALITY           4 // (WINVER >= 0x0400)
 
 2005-10-17 13:06 UTC-0800 Tony Bretado <jabrecer@yahoo.com>
   * contrib/rdd_ads/ads1.c

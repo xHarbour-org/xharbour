@@ -1043,4 +1043,12 @@
 #define FW_BLACK                   900
 
 //-------------------------------------------------------------------//
+// font quality values
+#define DEFAULT_QUALITY              0
+#define DRAFT_QUALITY                1
+#define PROOF_QUALITY                2
+#define NONANTIALIASED_QUALITY       3 // (WINVER >= 0x0400)
+#define ANTIALISED_QUALITY           4 // (WINVER >= 0x0400)
+
+//-------------------------------------------------------------------//
 
