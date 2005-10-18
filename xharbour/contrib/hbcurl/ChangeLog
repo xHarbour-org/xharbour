@@ -1,0 +1,23 @@
+/*
+ * $Id: ChangeLog,v 1.4477 2005/10/18 00:56:29 ronpinkas Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2005-10-18 21:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  + contrib/hbcurl
+  + contrib/hbcurl/gauge.c
+  + contrib/hbcurl/hbcurl.c
+  + contrib/hbcurl/hbcurl.ch
+    ! hbcurl contains the .PRG level callable functions.
+      Also the function names is the same name of curl library.
+
+  + contrib/hbcurl/ftpupload.prg
+    ! initial upload of libcurl
+    Ftpupload.prg is an example of how to upload/download an file with
+    same connection. Also demostrate on how to use an progress bar 
+    
