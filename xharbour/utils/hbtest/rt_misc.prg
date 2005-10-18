@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.6 2004/11/21 21:44:31 druzus Exp $
+ * $Id: rt_misc.prg,v 1.7 2005/03/20 02:13:45 andijahja Exp $
  */
 
 /*
@@ -761,6 +761,7 @@ STATIC FUNCTION HB_TString()
 
       oClass:AddData( "cValue" )
 
+      oClass:AddInline( "="    , {| self, cTest | ::cValue =  cTest } )
       oClass:AddInline( "=="   , {| self, cTest | ::cValue == cTest } )
       oClass:AddInline( "!="   , {| self, cTest | ::cValue != cTest } )
       oClass:AddInline( "<"    , {| self, cTest | ::cValue <  cTest } )

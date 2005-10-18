@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4478 2005/10/18 02:53:57 bdj Exp $
+ * $Id: ChangeLog,v 1.4479 2005/10/18 05:54:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 23:09 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/hbtest/rt_misc.prg
+    + Added missing operator '=' to class HB_TString()
 
 2005-10-17 22:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbsetup.h
