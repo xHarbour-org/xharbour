@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.31 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbvm.h,v 1.32 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -110,13 +110,14 @@ extern void    HB_EXPORT hb_vmRequestReset( void );
 /* Public PCode functions */
 
 /* Execution */
-HB_EXPORT extern void    hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
-HB_EXPORT extern void    hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
-HB_EXPORT extern void    hb_vmSend( USHORT uiParams ); /* sends a message to an object */
+HB_EXPORT extern void     hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
+HB_EXPORT extern void     hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
+HB_EXPORT extern void     hb_vmSend( USHORT uiParams ); /* sends a message to an object */
 HB_EXPORT extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
 /* executes passed codeblock with variable number of arguments */
 HB_EXPORT extern PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
-HB_EXPORT extern PHB_ITEM hb_vmEvalBlockOrMacro( HB_ITEM_PTR pItem ); /* executes codeblock or macro pointed by given item */
+HB_EXPORT extern PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem ); /* executes codeblock or macro pointed by given item */
+HB_EXPORT extern void     hb_vmDestroyBlockOrMacro( PHB_ITEM pItem ); /* destroy codeblock or macro in given item */
 
 /* Push */
 HB_EXPORT extern void    hb_vmPush( PHB_ITEM pItem );     /* pushes a generic item onto the stack */

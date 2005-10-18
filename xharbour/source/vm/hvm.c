@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.507 2005/10/16 19:32:45 druzus Exp $
+ * $Id: hvm.c,v 1.508 2005/10/18 00:56:29 ronpinkas Exp $
  */
 
 /*
@@ -375,8 +375,6 @@ static int s_iBaseLine;
 
 static   HB_ITEM  s_aGlobals;         /* Harbour array to hold all application global variables */
 
-static BOOL s_fmInit = TRUE;
-
 static PHB_FUNC_LIST s_InitFunctions = NULL;
 static PHB_FUNC_LIST s_ExitFunctions = NULL;
 
@@ -501,6 +499,7 @@ static void hb_vmDoInitError( void )
     * initialization is limited). The real erro block will be set
     * by CLIPInit function [druzus].
     */
+   HB_THREAD_STUB
    PHB_DYNS pDynSym = hb_dynsymFind( "__ERRORBLOCK" );
 
    if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
@@ -522,12 +521,7 @@ static void hb_vmDoInitError( void )
       hb_vmPushNil();
       hb_vmDo(0);
       hb_vm_BreakBlock = hb_itemNew( NULL );
-
-      #ifdef HB_THREAD_SUPPORT
-         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
-      #else
-         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stackST.Return ) );
-      #endif
+      hb_itemForwardValue( hb_vm_BreakBlock, hb_stackReturnItem() );
    }
    else
    {
@@ -551,37 +545,12 @@ static void hb_vmDoInitClip( void )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
-   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-      PHB_DYNS pDynSymHbNoMouse;
-   #endif
-
-   #if defined(HB_OS_OS2)
-      EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
-      APIRET rc = NO_ERROR;                           /* Return code                   */
-   #endif
-
-   // Moved to hb_vmProcessSymbols() because hb_xgrab is used from static initializers before we get here.
-   // Here again incase hb_vmInit() hb_vmQuit() are called multiple times by host application.
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-      hb_gcInit();
-   }
+#if defined(HB_OS_OS2)
+   EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
+   APIRET rc = NO_ERROR;                           /* Return code                   */
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmInit()"));
-
-   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-      pDynSymHbNoMouse = hb_dynsymFind( "HB_NOMOUSE" );
-   #endif
-
-   #if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-      if( pDynSymHbNoMouse )
-      {
-         b_MouseEnable = FALSE;
-      }
-   #endif
 
    /* initialize internal data structures */
    s_aStatics.type = HB_IT_NIL;
@@ -590,26 +559,29 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_bDebugShowLines = FALSE;
    s_bDebuggerIsWorking = FALSE;
 
-   #ifndef HB_THREAD_SUPPORT
-      hb_vm_pSequence = NULL;
-      s_uiActionRequest = 0;
+   hb_xinit();
+   hb_gcInit();
 
-      hb_vm_pFinally = NULL;
-   #endif
+#ifdef HB_THREAD_SUPPORT
+   HB_TRACE( HB_TR_INFO, ("threadInit") );
+   hb_threadInit();
+#endif
+
+   HB_TRACE( HB_TR_INFO, ("stackInit") );
+   hb_stackInit();
 
 #ifndef HB_THREAD_SUPPORT
-   HB_VM_STACK.pItems = NULL; /* keep this here as it is used by fm.c */
-   HB_VM_STACK.Return.type = HB_IT_NIL;
-   /* under threads, thread context have been already initialized */
-
-   //JC1: idem: undet threads this is already done
-   for ( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
+   /* In MT mode this is a part of stack initialization code */
+   hb_vm_pSequence = NULL;
+   s_uiActionRequest = 0;
+   hb_vm_pFinally = NULL;
+   for( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
    {
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
    }
    hb_vm_wWithObjectCounter = 0;
 
-   for ( hb_vm_wEnumCollectionCounter = 0; hb_vm_wEnumCollectionCounter < HB_MAX_ENUMERATIONS; hb_vm_wEnumCollectionCounter++ )
+   for( hb_vm_wEnumCollectionCounter = 0; hb_vm_wEnumCollectionCounter < HB_MAX_ENUMERATIONS; hb_vm_wEnumCollectionCounter++ )
    {
       hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type = HB_IT_NIL;
       hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
@@ -621,43 +593,42 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
 
-   /* Under mt, this is done by static initializers */
-   #ifndef HB_THREAD_SUPPORT
-      HB_TRACE( HB_TR_INFO, ("stackInit" ) );
-      hb_stackInit();
-   #endif
-
-   HB_TRACE( HB_TR_INFO, ("errInit" ) );
+   HB_TRACE( HB_TR_INFO, ("errInit") );
    hb_errInit();
 
-   HB_TRACE( HB_TR_INFO, ("dynsymNew" ) );
+   HB_TRACE( HB_TR_INFO, ("dynsymNew") );
    hb_dynsymNew( &hb_symEval, NULL );  /* initialize dynamic symbol for evaluating codeblocks */
-   HB_TRACE( HB_TR_INFO, ("setInitialize" ) );
+
+   HB_TRACE( HB_TR_INFO, ("setInitialize") );
    hb_setInitialize();        /* initialize Sets */
-   HB_TRACE( HB_TR_INFO, ("conInit" ) );
+
+   HB_TRACE( HB_TR_INFO, ("conInit") );
    hb_conInit();    /* initialize Console */
 
-   #ifndef HB_THREAD_SUPPORT
-      // in threads, it is called from thread stack constructor
-      HB_TRACE( HB_TR_INFO, ("memvarsInit" ) );
-      hb_memvarsInit();
-   #endif
+#ifndef HB_THREAD_SUPPORT
+   /* in threads, it is called from thread stack constructor */
+   HB_TRACE( HB_TR_INFO, ("memvarsInit") );
+   hb_memvarsInit();
+#endif
 
-   HB_TRACE( HB_TR_INFO, ("il18Init" ) );
-   hb_i18nInit( NULL, NULL);  // try to open default language.
+   HB_TRACE( HB_TR_INFO, ("il18Init") );
+   hb_i18nInit( NULL, NULL );  // try to open default language.
 
-   //HB_TRACE( HB_TR_INFO, ("SymbolInit_RT" ) );
+   HB_TRACE( HB_TR_INFO, ("SymbolInit_RT") );
    hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
 
    /* Set the language to the default */
+   hb_langSelectID( HB_MACRO2STRING( HB_LANG_DEFAULT ) );
 
-   /* This trick is needed to stringify the macro value */
-   #define HB_LANG_SELECT_DEFAULT( id ) HB_LANG_SELECT_DEFAULT_( id )
-   #define HB_LANG_SELECT_DEFAULT_( id ) hb_langSelectID( #id )
-   HB_LANG_SELECT_DEFAULT( HB_LANG_DEFAULT );
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+   if( hb_dynsymFind( "HB_NOMOUSE" ) )
+   {
+      b_MouseEnable = FALSE;
+   }
+#endif
 
    /* Check for some internal switches */
-   HB_TRACE( HB_TR_INFO, ("cmdarg" ) );
+   HB_TRACE( HB_TR_INFO, ("cmdarg") );
    hb_cmdargProcessVM();
 
    #ifndef HB_NO_PROFILER
@@ -678,24 +649,24 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
     * in InitStatics, the real (full feature) error block will be installed
     * in InitClip()
     */
-   HB_TRACE( HB_TR_INFO, ("InitError" ) );
+   HB_TRACE( HB_TR_INFO, ("InitError") );
    hb_vmDoInitError();
 
    /* Call functions that initializes static variables
     * Static variables have to be initialized before any INIT functions
     * because INIT function can use static variables.
     */
-   HB_TRACE( HB_TR_INFO, ("InitStatics" ) );
+   HB_TRACE( HB_TR_INFO, ("InitStatics") );
    hb_vmDoInitStatics();
 
-   HB_TRACE( HB_TR_INFO, ("InitClip" ) );
+   HB_TRACE( HB_TR_INFO, ("InitClip") );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
-   HB_TRACE( HB_TR_INFO, ("InitModuleFunctions" ) );
+   HB_TRACE( HB_TR_INFO, ("InitModuleFunctions") );
    hb_vmDoModuleInitFunctions();
 
    //printf( "Before InitFunctions\n" );
-   HB_TRACE( HB_TR_INFO, ("InitFunctions" ) );
+   HB_TRACE( HB_TR_INFO, ("InitFunctions") );
    hb_vmDoInitFunctions(); /* process defined INIT functions */
 
    /* This is undocumented CA-Clipper, if there's a function called _APPMAIN
@@ -822,26 +793,26 @@ int HB_EXPORT hb_vmQuit( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmQuit(%i)"));
 
-   #ifdef HB_THREAD_SUPPORT
-      /* Quit sequences for non-main thread */
-      /* We are going to quit now, so we don't want to have mutexes
-         blocking our output */
-      hb_set.HB_SET_OUTPUTSAFETY = FALSE;
+#ifdef HB_THREAD_SUPPORT
+   /* Quit sequences for non-main thread */
+   /* We are going to quit now, so we don't want to have mutexes
+      blocking our output */
+   hb_set.HB_SET_OUTPUTSAFETY = FALSE;
 
-      if (! HB_SAME_THREAD( hb_main_thread_id, HB_CURRENT_THREAD()) )
-      {
-         hb_vm_bQuitRequest = TRUE;
-         #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
-            HB_DISABLE_ASYN_CANC
-            HB_STACK_LOCK
-            hb_threadCancelInternal(); // never returns
-         #else
-            pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
-            HB_STACK_LOCK
-            pthread_exit(0);
-         #endif
-      }
-   #endif
+   if (! HB_SAME_THREAD( hb_main_thread_id, HB_CURRENT_THREAD()) )
+   {
+      hb_vm_bQuitRequest = TRUE;
+      #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+         HB_DISABLE_ASYN_CANC
+         HB_STACK_LOCK
+         hb_threadCancelInternal(); // never returns
+      #else
+         pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+         HB_STACK_LOCK
+         pthread_exit(0);
+      #endif
+   }
+#endif
 
    if( bQuitting == FALSE )
    {
@@ -853,15 +824,15 @@ int HB_EXPORT hb_vmQuit( void )
    }
 
    //printf("\nvmQuit()\n" );
-   #ifdef HB_THREAD_SUPPORT
-      hb_threadKillAll();
-      hb_threadWaitAll();
-   #endif
+#ifdef HB_THREAD_SUPPORT
+   hb_threadKillAll();
+   hb_threadWaitAll();
+#endif
 
-   #ifdef HB_MACRO_STATEMENTS
-     hb_pp_Free();
-     //printf("After PP\n" );
-   #endif
+#ifdef HB_MACRO_STATEMENTS
+   hb_pp_Free();
+   //printf("After PP\n" );
+#endif
 
    s_uiActionRequest = 0;         /* EXIT procedures should be processed */
 
@@ -987,19 +958,12 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After GC before Memvar\n" );
 
 #ifndef HB_THREAD_SUPPORT
-   hb_memvarsRelease();    /* clear all PUBLIC variables */
-#else
-   hb_memvarsRelease( &hb_stack );
-#endif
+   hb_memvarsRelease();         /* clear all PUBLIC variables */
    //printf("After Memvar\n" );
+#endif
 
    hb_stackFree();
-
    //printf("After hbStackFree\n" );
-#ifdef HB_THREAD_SUPPORT
-   hb_threadExit();
-   //printf("After thread exit\n" );
-#endif
 
    hb_itemRelease( hb_vm_BreakBlock );
 
@@ -1041,12 +1005,9 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("After traceExit\n" );
 
 #ifdef HB_THREAD_SUPPORT
-   // JC1: Under MT, the HB_VM_STACK must continue to retreive the correct stack,
-   // even without pItems available, up to this moment
-   hb_threadCloseHandles();
+   hb_threadExit();
+   //printf("After thread exit\n" );
 #endif
-
-   s_fmInit = TRUE;
 
    return s_iErrorLevel;
 }
@@ -7227,13 +7188,13 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockV( HB_ITEM_PTR pBlock, ULONG ulArgCount, ...
 
 /* Evaluates a passed codeblock item or macro pointer item
  */
-HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockOrMacro( HB_ITEM_PTR pItem )
+HB_EXPORT PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem )
 {
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmEvalBlockOrMacro(%p)", pItem));
 
-   if ( pItem->type == HB_IT_BLOCK )
+   if( pItem->type == HB_IT_BLOCK )
    {
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pItem );
@@ -7242,7 +7203,7 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockOrMacro( HB_ITEM_PTR pItem )
    else
    {
       HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pItem );
-      if ( pMacro )
+      if( pMacro )
       {
          hb_macroRun( pMacro );
          hb_itemForwardValue( hb_stackReturnItem(), hb_stackItemFromTop( - 1 ) );
@@ -7255,6 +7216,23 @@ HB_EXPORT HB_ITEM_PTR hb_vmEvalBlockOrMacro( HB_ITEM_PTR pItem )
    }
    return hb_stackReturnItem();
 }
+
+/*
+ * destroy codeblock or macro in given item
+ */
+HB_EXPORT void hb_vmDestroyBlockOrMacro( PHB_ITEM pItem )
+{
+   if( pItem->type == HB_IT_POINTER )
+   {
+      HB_MACRO_PTR pMacro = ( HB_MACRO_PTR ) hb_itemGetPtr( pItem );
+      if( pMacro )
+      {
+         hb_macroDelete( pMacro );
+      }
+   }
+   hb_itemRelease( pItem );
+}
+
 
 HB_EXPORT void hb_vmFunction( USHORT uiParams )
 {
@@ -8744,15 +8722,12 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
    char *sModule;
    BOOL bFree = FALSE;
 
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-      hb_gcInit();
-   }
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
+
+#ifdef HB_THREAD_SUPPORT
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
+#endif
 
    va_start( ap, pSymbols );
 
@@ -9468,15 +9443,12 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
    PSYMBOLS pNewSymbols;
    USHORT ui;
 
-   if( s_fmInit )
-   {
-      s_fmInit = FALSE;
-      /* JC1: xinit initializes also thread, which initializes the main stack */
-      hb_xinit();
-      hb_gcInit();
-   }
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
+
+#ifdef HB_THREAD_SUPPORT
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
+#endif
 
    pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
    pNewSymbols->pModuleSymbols = pSymbols;

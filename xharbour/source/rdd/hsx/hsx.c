@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.8 2005/10/08 10:39:29 druzus Exp $
+ * $Id: hsx.c,v 1.9 2005/10/09 12:40:06 druzus Exp $
  */
 
 /*
@@ -219,7 +219,9 @@
       in VM codepage are respected and lCase switch works properly
 */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapifs.h"
 #include "hbapirdd.h"
 #include "hbapierr.h"

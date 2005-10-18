@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.2 2005/09/16 22:29:41 druzus Exp $
+ * $Id: sxcompr.c,v 1.3 2005/09/19 23:21:29 druzus Exp $
  */
 
 /*
@@ -121,6 +121,7 @@
 
 */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbsxfunc.h"
 
 /* number of bits for encoded item (position,length) */

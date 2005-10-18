@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.76 2005/10/08 09:24:06 lf_sfnet Exp $
+ * $Id: estack.c,v 1.77 2005/10/18 00:56:29 ronpinkas Exp $
  */
 
 /*
@@ -62,22 +62,24 @@
 #include "hbfast.h"
 #include "hbapierr.h"
 
-#ifndef HB_THREAD_SUPPORT
-   #define hb_stack hb_stackST
-#endif
-
-extern BOOL hb_isService(void);
-
 HB_EXTERN_BEGIN
 
 /* ------------------------------- */
 
-HB_STACK hb_stack;
-HB_STACK * hb_stack_ptr = &hb_stack;
+#ifdef HB_THREAD_SUPPORT
+HB_STACK hb_stackMT;
+#else
+HB_STACK hb_stackST;
+HB_STACK * hb_stack_ptr = &hb_stackST;
+#endif
+
+BOOL hb_stack_ready;
 
 HB_EXPORT HB_STACK *hb_GetStack( void )
 {
-    return &hb_stack;
+   HB_THREAD_STUB;
+
+   return &HB_VM_STACK;
 }
 
 /* ------------------------------- */
@@ -214,60 +216,61 @@ void hb_stackIncrease( void )
 
 void hb_stackInit( void )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
+
 #ifndef HB_THREAD_SUPPORT
-   LONG i;
+
+   hb_stackST.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
+   hb_stackST.pBase  = hb_stackST.pItems;
+   hb_stackST.pPos   = hb_stackST.pItems;     /* points to the first stack item */
+   hb_stackST.wItems = STACK_INITHB_ITEMS;
+
+   {
+      LONG i;
+      for( i = 0; i < hb_stackST.wItems; ++i )
+      {
+         hb_stackST.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+      }
+   }
+   ( * hb_stackST.pPos )->type = HB_IT_NIL;
+   hb_stackST.Return.type = HB_IT_NIL;
+
+#else
+
+   hb_threadSetupStack( &hb_stackMT, HB_CURRENT_THREAD() );
+
 #endif
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_stackInit()"));
-   // Optimized to directly accessing hb_stack instead of HB_VM_STACK
-
-   /*JC1: Under threads, the stack is not present until it is created here. Notice that
-     calling xgrab is an error also WITHOUT threads, as the xgrab routine accesses
-     a variable (the stack) that cannot be initialized yet */
-
-   hb_stack.pItems = NULL;  // tell xgrab we are not ready
-
-   #ifndef HB_THREAD_SUPPORT
-   hb_stack.pItems = ( HB_ITEM_PTR * ) hb_xgrab( sizeof( HB_ITEM_PTR ) * STACK_INITHB_ITEMS );
-
-   hb_stack.pBase  = hb_stack.pItems;
-   hb_stack.pPos   = hb_stack.pItems;     /* points to the first stack item */
-   hb_stack.wItems = STACK_INITHB_ITEMS;
-
-   for( i=0; i < hb_stack.wItems; ++i )
-   {
-      hb_stack.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-   }
-
-   ( * hb_stack.pPos )->type = HB_IT_NIL;
-
-   // other data to be initialized under MT
-   #else
-   hb_ht_stack = 0; // signal xgrab we are not ready
-   hb_threadSetupStack( &hb_stack, HB_CURRENT_THREAD() );
-   hb_ht_stack = &hb_stack; // then this, preparing the head stack
-   #endif
+   hb_stack_ready = TRUE;
 }
 
 void hb_stackFree( void )
 {
-   LONG i;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_stackFree()"));
 
-   i = hb_stack.wItems - 1;
+   hb_stack_ready = FALSE;
 
-   while( i >= 0 )
+#ifndef HB_THREAD_SUPPORT
+
    {
-      hb_xfree( hb_stack.pItems[ i-- ] );
+      LONG i = hb_stackST.wItems - 1;
+      while( i >= 0 )
+      {
+         hb_xfree( hb_stackST.pItems[ i-- ] );
+      }
    }
+   hb_xfree( hb_stackST.pItems );
 
-   hb_xfree( hb_stack.pItems );
+   hb_stackST.pItems = NULL;
+   hb_stackST.pBase  = NULL;
+   hb_stackST.pPos   = NULL;
+   hb_stackST.wItems = 0;
 
-   hb_stack.pItems = NULL;
-   hb_stack.pBase  = NULL;
-   hb_stack.pPos   = NULL;
-   hb_stack.wItems = 0;
+#else
+
+   hb_threadDestroyStack( &hb_stackMT );
+
+#endif
 }
 
 void hb_stackRemove( LONG lUntilPos )

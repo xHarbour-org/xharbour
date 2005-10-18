@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbsxfunc.h,v 1.1 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_SXFUNC_H_
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapifs.h"
 #include "hbapirdd.h"
 #include "hbapierr.h"

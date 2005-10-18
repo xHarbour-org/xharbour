@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.4 2004/03/18 03:59:13 ronpinkas Exp $
+ * $Id: gtext.c,v 1.5 2004/05/25 20:27:23 druzus Exp $
  */
 
 /*
@@ -56,7 +56,9 @@
 /* *********************************************************************** */
 
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbapigt.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 
 HB_FUNC( HB_SETDISPCP )

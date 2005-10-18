@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.28 2005/09/13 01:48:36 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.29 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -53,7 +53,9 @@
  *
  */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbapierr.h"
 #include "hbapilng.h"

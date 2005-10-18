@@ -1,15 +1,11 @@
 #
-# $Id: Makefile,v 1.4 2003/01/17 12:28:34 likewolf Exp $
+# $Id: Makefile,v 1.5 2005/10/04 02:05:35 druzus Exp $
 #
 
 ROOT = ../../../
 
 C_SOURCES=\
 	dbfntx1.c \
-
-ifeq ($(HB_MT),MT)
-   MT_LIBNAME=dbfntxmt
-endif
 
 LIBNAME=dbfntx
 

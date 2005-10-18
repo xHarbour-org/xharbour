@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.108 2005/10/07 01:09:14 druzus Exp $
+* $Id: thread.h,v 1.109 2005/10/18 00:56:29 ronpinkas Exp $
 */
 
 /*
@@ -691,10 +691,10 @@ typedef struct tag_HB_SHARED_RESOURCE
    #if __GNUC__ >= 3 && defined( HB_THREAD_TLS_BUG )
       #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
          #define HB_THREAD_STUB\
-            HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stack : hb_thread_stack;
+            HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stackMT : hb_thread_stack;
          #define HB_VM_STACK (*_pStack_)
       #else
-         #define HB_VM_STACK (*( ( ((unsigned long)&hb_thread_stack) & 0xf0000000)==0xf0000000 ? &hb_stack : hb_thread_stack ))
+         #define HB_VM_STACK (*( ( ((unsigned long)&hb_thread_stack) & 0xf0000000)==0xf0000000 ? &hb_stackMT : hb_thread_stack ))
          #define HB_THREAD_STUB
       #endif
    #else
@@ -774,7 +774,6 @@ extern void hb_threadDestroyStack( HB_STACK *pStack );
 extern HB_STACK *hb_threadGetStack( HB_THREAD_T th_id );
 extern void hb_threadInit( void );
 extern void hb_threadExit( void );
-extern void hb_threadCloseHandles( void );
 extern int hb_threadCountStacks( void );
 extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
 extern void HB_EXPORT hb_threadWaitAll( void );

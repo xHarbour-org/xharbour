@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.94 2005/07/05 08:31:58 likewolf Exp $
+ * $Id: gtwin.c,v 1.95 2005/10/18 00:56:29 ronpinkas Exp $
  */
 
 /*
@@ -88,9 +88,6 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
-
-// TODO, MT version of this lib, even if just compiled with HB_THREAD_SUPPORT
-#define hb_stackST (*hb_GetStack())
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"
@@ -2365,8 +2362,7 @@ void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
 
    if ( ! OpenClipboard( NULL ) )
    {
-     hb_retl( FALSE );
-     return;
+      return;
    }
    EmptyClipboard();
 

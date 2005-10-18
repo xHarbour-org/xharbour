@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sxdate.c,v 1.1 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
  *
  */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbsxfunc.h"
 
 char * hb_sxDtoP( char * pDate, LONG lJulian )

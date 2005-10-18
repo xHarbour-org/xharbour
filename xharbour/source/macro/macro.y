@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.19 2005/06/01 02:09:27 ronpinkas Exp $
+ * $Id: macro.y,v 1.20 2005/10/16 21:39:14 ronpinkas Exp $
  */
 
 /*

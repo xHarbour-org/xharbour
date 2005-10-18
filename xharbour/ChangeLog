@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4479 2005/10/18 05:54:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4480 2005/10/18 06:10:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-18 14:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbstack.h
+  * xharbour/include/hbvm.h
+  * xharbour/include/thread.h
+  * xharbour/source/macro/macro.y
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/garbage.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/thread.c
+    * cleaned MT initialization code.
+    ! fixed two GPF trap in MT code
+    * FM module now can work without MT initialization
+    * changed hb_stack in MT mode to hb_stackMT.
+      Ron I'm not sure about hb_stackST - it may force upgrade of 3-rd party
+      libs though I like it. Just simply I'm only not sure we should make it
+      now - if yes then I vote to also change USHORT in HB_ITEM to HB_TYPE
+      to reduce number of API changes.
+
+  * xharbour/source/rdd/dbfcdx/Makefile
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/Makefile
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/Makefile
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/Makefile
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rdd/hbsix/sxcompr.c
+  * xharbour/source/rdd/hbsix/sxcrypt.c
+  * xharbour/source/rdd/hbsix/sxdate.c
+  * xharbour/include/hbsxfunc.h
+  * xharbour/source/rdd/hsx/hsx.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtwvt/gtwvt.h
+  * xharbour/source/rtl/gtnul/gtext.c
+    * use HB_NO_DEFAULT_API_MACROS to create single binaries for ST and MT
+      mode
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwin/mousewin.c
+    * reverted Ron's modifications and removed wrong hb_retl( FALSE )
 
 2005-10-17 23:09 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/hbtest/rt_misc.prg

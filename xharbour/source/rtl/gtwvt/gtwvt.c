@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.160 2005/10/05 03:47:31 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.161 2005/10/09 15:06:20 bdj Exp $
  */
 
 /*
@@ -89,6 +89,7 @@
    #define _WIN32_IE 0x0400
 #endif
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "gtwvt.h"
 
 #if defined(__WATCOMC__)
@@ -4445,7 +4446,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
          }
@@ -4580,7 +4581,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
          }

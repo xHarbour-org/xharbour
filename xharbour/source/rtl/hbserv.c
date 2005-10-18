@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.31 2005/10/04 20:35:35 druzus Exp $
+* $Id: hbserv.c,v 1.32 2005/10/16 19:32:45 druzus Exp $
 */
 
 /*
@@ -766,7 +766,7 @@ HB_FUNC( HB_STARTSERVICE )
             return;
          }
          #ifdef HB_THREAD_SUPPORT
-         pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stack );
+         pthread_setspecific( hb_pkCurrentStack, (void *) &hb_stackMT );
          #endif
       }
    }

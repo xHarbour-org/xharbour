@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.194 2005/09/30 23:44:06 druzus Exp $
+* $Id: thread.c,v 1.195 2005/10/10 22:45:56 druzus Exp $
 */
 
 /*
@@ -113,11 +113,12 @@
    #endif
 #endif
 
-HB_STACK *hb_ht_stack = 0;
-HB_STACK *last_stack;
+HB_STACK *hb_ht_stack = NULL;
+HB_STACK *last_stack = NULL;
 HB_MUTEX_STRUCT *hb_ht_mutex;
 HB_THREAD_T hb_main_thread_id;
 
+static BOOL s_hb_threadIsInit = FALSE;
 static HB_CRITICAL_T s_thread_unique_id_mutex;
 static UINT s_thread_unique_id;
 
@@ -155,87 +156,85 @@ BOOL hb_bIdleFence;
 
 void hb_threadInit( void )
 {
-   #ifdef HB_OS_OS2
-   /* It is ahead of all initializations since every condition requires it */
-   DosCreateEventSem(NULL, (PHEV) &hb_hevWakeUpAll, 0L, FALSE);
-   #endif
+   if( !s_hb_threadIsInit )
+   {
+#ifdef HB_OS_OS2
+      /* It is ahead of all initializations since every condition requires it */
+      DosCreateEventSem(NULL, (PHEV) &hb_hevWakeUpAll, 0L, FALSE);
+#endif
 
-   HB_CRITICAL_INIT( hb_allocMutex );
-   HB_CRITICAL_INIT( hb_garbageAllocMutex );
-   HB_CRITICAL_INIT( hb_macroMutex );
-   HB_CRITICAL_INIT( hb_outputMutex );
-   HB_CRITICAL_INIT( hb_mutexMutex );
-   HB_CRITICAL_INIT( hb_dynsymMutex );
-   HB_COND_INIT( hb_threadStackCond );
-   s_thread_unique_id = 1;
-   HB_CRITICAL_INIT( s_thread_unique_id_mutex );
-   HB_SHARED_INIT( hb_runningStacks, 0 );
+      HB_CRITICAL_INIT( hb_allocMutex );
+      HB_CRITICAL_INIT( hb_garbageAllocMutex );
+      HB_CRITICAL_INIT( hb_macroMutex );
+      HB_CRITICAL_INIT( hb_outputMutex );
+      HB_CRITICAL_INIT( hb_mutexMutex );
+      HB_CRITICAL_INIT( hb_dynsymMutex );
+      HB_COND_INIT( hb_threadStackCond );
+      s_thread_unique_id = 1;
+      HB_CRITICAL_INIT( s_thread_unique_id_mutex );
+      HB_SHARED_INIT( hb_runningStacks, 0 );
 
-   #if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
+#if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
       /* If your OS doesn't support trylock, you can implement it here;
        * if it does, add it to #if. */
 //      HB_CRITICAL_INIT( s_mtxTryLock );
-   #endif
+#endif
 
-   last_stack = NULL;
-   hb_main_thread_id = HB_CURRENT_THREAD();
+      last_stack = NULL;
+      hb_ht_stack = &hb_stackMT;
+      hb_main_thread_id = HB_CURRENT_THREAD();
 
-   hb_ht_mutex = NULL;
+      hb_ht_mutex = NULL;
 
-   /* Idle fence is true by default */
-   hb_bIdleFence = TRUE;
+      /* Idle fence is true by default */
+      hb_bIdleFence = TRUE;
 
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       HB_CRITICAL_INIT( hb_cancelMutex );
-   #endif
+#endif
 
-   #if ! defined( HB_THREAD_TLS_KEYWORD )
+#if ! defined( HB_THREAD_TLS_KEYWORD )
       /* hb_thread_stack does not need initialization */
       #ifdef HB_OS_WIN_32
          hb_dwCurrentStack = TlsAlloc();
-         TlsSetValue( hb_dwCurrentStack, (void *)&hb_stack );
+         TlsSetValue( hb_dwCurrentStack, (void *) hb_ht_stack );
 
       #elif defined(HB_OS_OS2)
          DosAllocThreadLocalMemory(1, (PULONG *) &hb_dwCurrentStack);
-         *hb_dwCurrentStack = (PVOID) &hb_stack;
+         *hb_dwCurrentStack = (PVOID) hb_ht_stack;
 
       #else
          pthread_key_create( &hb_pkCurrentStack, NULL );
-         pthread_setspecific( hb_pkCurrentStack, (void *)&hb_stack );
+         pthread_setspecific( hb_pkCurrentStack, (void *) hb_ht_stack );
       #endif
-   #else
+#else
       #if ! defined( HB_THREAD_TLS_BUG )
-         hb_thread_stack = &hb_stack;
+         hb_thread_stack = hb_ht_stack;
       #endif
-   #endif
-
+#endif
+      s_hb_threadIsInit = TRUE;
+   }
 }
 
 void hb_threadExit( void )
 {
-   hb_threadDestroyStack( &hb_stack );
-}
+   if( s_hb_threadIsInit )
+   {
+      /* Destroyng all shell locks mutexes */
+      HB_SHARED_DESTROY( hb_runningStacks );
+      HB_CRITICAL_DESTROY( hb_mutexMutex );
+      HB_CRITICAL_DESTROY( hb_outputMutex );
+      HB_CRITICAL_DESTROY( hb_macroMutex );
+      HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
+      HB_CRITICAL_DESTROY( hb_allocMutex );
+      HB_CRITICAL_DESTROY( hb_dynsymMutex );
+      HB_COND_DESTROY(hb_threadStackCond);
 
-void hb_threadCloseHandles( void )
-{
-   // Now we destroy the things that makes MT stack to exist,
-   // so, after this one the VM must really quit
-
-   /* Destroyng all shell locks mutexes */
-   HB_SHARED_DESTROY( hb_runningStacks );
-   HB_CRITICAL_DESTROY( hb_mutexMutex );
-   HB_CRITICAL_DESTROY( hb_outputMutex );
-   HB_CRITICAL_DESTROY( hb_macroMutex );
-   HB_CRITICAL_DESTROY( hb_garbageAllocMutex );
-   HB_CRITICAL_DESTROY( hb_allocMutex );
-   HB_CRITICAL_DESTROY( hb_dynsymMutex );
-   HB_COND_DESTROY(hb_threadStackCond);
-
-   #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
+#if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
       HB_CRITICAL_DESTROY( hb_cancelMutex );
-   #endif
+#endif
 
-   #if !defined( HB_THREAD_TLS_KEYWORD )
+#if !defined( HB_THREAD_TLS_KEYWORD )
       #ifdef HB_OS_WIN_32
          TlsFree( hb_dwCurrentStack );
 
@@ -246,16 +245,20 @@ void hb_threadCloseHandles( void )
       #else
          pthread_key_delete( hb_pkCurrentStack );
       #endif
-   #endif
+#endif
 
-   #if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
+#if defined( HB_OS_UNIX ) && !defined( HB_OS_LINUX ) && !defined( HB_OS_BSD )
       /* If your OS doesn't support trylock, you can implement it here;
        * if it does, add it to #if. */
 //      HB_CRITICAL_DESTROY( s_mtxTryLock );
-   #endif
+#endif
 
-   HB_CRITICAL_DESTROY( s_thread_unique_id_mutex );
-   hb_ht_stack = NULL; //signal we are not ready anymore to collect vm stats
+      HB_CRITICAL_DESTROY( s_thread_unique_id_mutex );
+      hb_ht_stack = NULL;
+      last_stack = NULL;
+
+      s_hb_threadIsInit = FALSE;
+   }
 }
 
 
@@ -474,22 +477,21 @@ void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs )
 */
 HB_STACK *hb_threadLinkStack( HB_STACK *tc )
 {
-   HB_STACK *p;
+   HB_STACK **p;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_threadLinkStack(%p)", tc));
 
+   p = &hb_ht_stack;
 
-   p = hb_ht_stack;
-
-   while( p->next )
+   while( *p )
    {
-      p = p->next;
+      p = &(*p)->next;
    }
 
-   p->next = tc;
+   *p = tc;
    tc->next = NULL;
 
-   //last_stack = p;
+   //last_stack = *p;
 
    return tc;
 }
@@ -506,7 +508,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
    /* Free each element of the stack, but not for main stack; main stack
       is freed by hb_stackFree as in ST */
-   if( pStack != &hb_stack )
+//   if( pStack != &hb_stackMT )
    {
       for( pPos = pStack->pItems; pPos < pStack->pPos; pPos++)
       {
@@ -545,7 +547,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    // releases this thread's memvars
-   if( pStack != &hb_stack )
+   //if( pStack != &hb_stackMT )
    {
       // Main thread should have them removed before arriving here.
       hb_memvarsRelease( pStack );
@@ -568,7 +570,7 @@ void hb_threadDestroyStack( HB_STACK *pStack )
    }
 
    // Free only if we are not destroying the main stack
-   if ( pStack != &hb_stack )
+   if ( pStack != &hb_stackMT )
    {
       while( pStack->pSequence )
       {
@@ -600,33 +602,21 @@ void hb_threadDestroyStack( HB_STACK *pStack )
 
 HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
 {
-   HB_STACK *p, *prev;
+   HB_STACK **p;
 
-   if ( hb_ht_stack == NULL )
+   p = &hb_ht_stack;
+
+   while ( *p && *p != pStack )
    {
-      return NULL;
+      p = &(*p)->next;
    }
 
-   /* never unlinks the main stack */
-   prev = hb_ht_stack;
-   p = hb_ht_stack->next;
-
-   while ( p && p != pStack )
+   if( *p )
    {
-      prev = p;
-      p = p->next;
-   }
-
-   if( p )
-   {
-      /*unlink the stack*/
-      if ( prev )
+      *p = (*p)->next;
+      if( *p == last_stack )
       {
-         prev->next = p->next;
-      }
-      else
-      {
-         hb_ht_stack = p->next;
+         last_stack = NULL;
       }
    }
    else
@@ -639,7 +629,7 @@ HB_STACK *hb_threadUnlinkStack( HB_STACK* pStack )
 
    HB_COND_SIGNAL( hb_threadStackCond );
 
-   return p;
+   return *p;
 }
 
 
@@ -674,8 +664,10 @@ HB_STACK *hb_threadGetStack( HB_THREAD_T id )
 
    }
 
-   hb_errRT_BASE_SubstR( EG_ARG, 1099, "Can't find thread ID", "INTERNAL THREADING", 1, hb_paramError( 1 ) );
-
+   if( !p )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, "Can't find thread ID", "INTERNAL THREADING", 1, hb_paramError( 1 ) );
+   }
    HB_SHARED_UNLOCK( hb_runningStacks );
    return p;
 }

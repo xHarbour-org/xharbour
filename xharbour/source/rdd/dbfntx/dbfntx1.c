@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.138 2005/10/16 10:28:55 ptsarenko Exp $
+ * $Id: dbfntx1.c,v 1.139 2005/10/16 12:04:45 druzus Exp $
  */
 
 /*
@@ -131,7 +131,9 @@
 #define HB_NTX_DEBUG_DISP
 */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbapierr.h"
 #include "hbapilng.h"
@@ -512,16 +514,6 @@ static PHB_ITEM hb_ntxKeyGetItem( PHB_ITEM pItem, LPKEYINFO pKey,
       pItem = hb_itemNew( NULL );
 
    return pItem;
-}
-
-/*
- * destroy compiled expression
- */
-static void hb_ntxDestroyExp( PHB_ITEM pExp )
-{
-   if( hb_itemType( pExp ) != HB_IT_BLOCK )
-      hb_macroDelete( ( HB_MACRO_PTR ) hb_itemGetPtr( pExp ) );
-   hb_itemRelease( pExp );
 }
 
 /*
@@ -1445,9 +1437,9 @@ static void hb_ntxTagFree( LPTAGINFO pTag )
    if( pTag->ForExpr )
       hb_xfree( pTag->ForExpr );
    if( pTag->pKeyItem )
-      hb_ntxDestroyExp( pTag->pKeyItem );
+      hb_vmDestroyBlockOrMacro( pTag->pKeyItem );
    if( pTag->pForItem )
-      hb_ntxDestroyExp( pTag->pForItem );
+      hb_vmDestroyBlockOrMacro( pTag->pForItem );
    if( pTag->HotKeyInfo )
       hb_ntxKeyFree( pTag->HotKeyInfo );
    hb_ntxKeyFree( pTag->CurKeyInfo );
@@ -1533,7 +1525,7 @@ static LPTAGINFO hb_ntxTagLoad( LPNTXINDEX pIndex, ULONG ulBlock,
    {
       if( SELF_COMPILE( ( AREAP ) pIndex->Owner, lpNTX->for_expr ) == FAILURE )
       {
-         hb_ntxDestroyExp( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
          return NULL;
       }
       pForExp = pIndex->Owner->valResult;
@@ -5947,7 +5939,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    errCode = SELF_EVALBLOCK( ( AREAP ) pArea, pKeyExp );
    if( errCode != SUCCESS )
    {
-      hb_ntxDestroyExp( pKeyExp );
+      hb_vmDestroyBlockOrMacro( pKeyExp );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       return errCode;
    }
@@ -5982,7 +5974,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    /* Make sure KEY has proper type and iLen is not 0 */
    if( bType == 'U' || iLen == 0 )
    {
-      hb_ntxDestroyExp( pKeyExp );
+      hb_vmDestroyBlockOrMacro( pKeyExp );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       hb_ntxErrorRT( pArea, bType == 'U' ? EG_DATATYPE : EG_DATAWIDTH,
                      1026, NULL, 0, 0 );
@@ -6006,7 +5998,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          errCode = SELF_COMPILE( ( AREAP ) pArea, ( BYTE * ) szFor );
          if( errCode != SUCCESS )
          {
-            hb_ntxDestroyExp( pKeyExp );
+            hb_vmDestroyBlockOrMacro( pKeyExp );
             SELF_GOTO( ( AREAP ) pArea, ulRecNo );
             return errCode;
          }
@@ -6023,8 +6015,8 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       errCode = SELF_EVALBLOCK( ( AREAP ) pArea, pForExp );
       if( errCode != SUCCESS )
       {
-         hb_ntxDestroyExp( pKeyExp );
-         hb_ntxDestroyExp( pForExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return errCode;
       }
@@ -6033,8 +6025,8 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pArea->valResult = NULL;
       if( uiType != HB_IT_LOGICAL )
       {
-         hb_ntxDestroyExp( pKeyExp );
-         hb_ntxDestroyExp( pForExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          hb_ntxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDFOR, NULL, 0, 0 );
          return FAILURE;
@@ -6086,18 +6078,18 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    {
       if( pIndex->fReadonly )
       {
-         hb_ntxDestroyExp( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
          if( pForExp != NULL )
-            hb_ntxDestroyExp( pForExp );
+            hb_vmDestroyBlockOrMacro( pForExp );
          hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pIndex->IndexName, 0, 0 );
          return FAILURE;
       }
 #if 0 /* enable this code if you want to forbid tag deleting in shared mode */
       else if( pIndex->fShared )
       {
-         hb_ntxDestroyExp( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
          if( pForExp != NULL )
-            hb_ntxDestroyExp( pForExp );
+            hb_vmDestroyBlockOrMacro( pForExp );
          hb_ntxErrorRT( pArea, EG_SHARED, EDBF_SHARED, pIndex->IndexName, 0, 0 );
          return FAILURE;
       }
@@ -6137,9 +6129,9 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
       if( hFile == FS_ERROR )
       {
-         hb_ntxDestroyExp( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
          if( pForExp != NULL )
-            hb_ntxDestroyExp( pForExp );
+            hb_vmDestroyBlockOrMacro( pForExp );
          /* hb_ntxSetTagNumbers() */
          return FAILURE;
       }
@@ -6175,9 +6167,9 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          {
             *pIndexPtr = pIndex->pNext;
             hb_ntxIndexFree( pIndex );
-            hb_ntxDestroyExp( pKeyExp );
+            hb_vmDestroyBlockOrMacro( pKeyExp );
             if( pForExp != NULL )
-               hb_ntxDestroyExp( pForExp );
+               hb_vmDestroyBlockOrMacro( pForExp );
             /* hb_ntxSetTagNumbers() */
             hb_ntxErrorRT( pArea, EG_CORRUPTION, EDBF_CORRUPT, szFileName, 0, 0 );
             return errCode;
@@ -6194,9 +6186,9 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    if( ! iTag && pIndex->iTags == CTX_MAX_TAGS )
    {
-      hb_ntxDestroyExp( pKeyExp );
+      hb_vmDestroyBlockOrMacro( pKeyExp );
       if( pForExp != NULL )
-         hb_ntxDestroyExp( pForExp );
+         hb_vmDestroyBlockOrMacro( pForExp );
       /* hb_ntxSetTagNumbers() */
       hb_ntxErrorRT( pArea, EG_LIMIT, EDBF_LIMITEXCEEDED, pIndex->IndexName, 0, 0 );
       return FAILURE;
@@ -6539,7 +6531,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                      if( pTag->ForExpr )
                         hb_xfree( pTag->ForExpr );
                      if( pTag->pForItem )
-                        hb_ntxDestroyExp( pTag->pForItem );
+                        hb_vmDestroyBlockOrMacro( pTag->pForItem );
                      if( pForItem )
                      {
                         pTag->ForExpr = hb_strndup( szForExpr, NTX_MAX_EXP );
@@ -6557,7 +6549,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                      hb_ntxTagUnLockWrite( pTag );
                   }
                   if( pForItem )
-                     hb_ntxDestroyExp( pForItem );
+                     hb_vmDestroyBlockOrMacro( pForItem );
                }
             }
             break;

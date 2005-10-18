@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.31 2005/10/03 03:48:29 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.32 2005/10/18 00:56:29 ronpinkas Exp $
  */
 
 /*
@@ -96,7 +96,14 @@ typedef struct
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
 
 } HB_STACK;
+
+extern HB_STACK hb_stackST;
+extern HB_STACK * hb_stack_ptr;
+#else
+extern HB_STACK hb_stackMT;
 #endif
+
+extern BOOL hb_stack_ready;
 
 HB_EXPORT HB_STACK *hb_GetStack( void );
 
@@ -110,12 +117,6 @@ HB_EXPORT HB_STACK *hb_GetStack( void );
   #endif
 #endif
 
-#ifdef HB_THREAD_SUPPORT
-   extern HB_STACK hb_stack;
-#else
-   extern HB_STACK hb_stackST;
-#endif
-extern HB_STACK * hb_stack_ptr;
 
 typedef struct
 {

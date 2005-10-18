@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.84 2005/09/23 15:00:53 ronpinkas Exp $
+ * $Id: garbage.c,v 1.85 2005/09/27 02:26:06 ronpinkas Exp $
  */
 
 /*
@@ -851,18 +851,18 @@ void hb_gcReleaseAll( void )
 
 void hb_gcInit( void )
 {
-    s_pCurrBlock = NULL;
-    s_pLockedBlock = NULL;
+   s_pCurrBlock = NULL;
+   s_pLockedBlock = NULL;
 
-    #ifdef GC_RECYCLE
-       s_pAvailableItems = NULL;
-       s_pAvailableBaseArrays = NULL;
-    #endif
+#ifdef GC_RECYCLE
+   s_pAvailableItems = NULL;
+   s_pAvailableBaseArrays = NULL;
+#endif
 
-    s_bCollecting = FALSE;
-    hb_gc_bReleaseAll = FALSE;
-    s_uUsedFlag = HB_GC_USED_FLAG;
-    s_uAllocated = 0;
+   s_bCollecting = FALSE;
+   hb_gc_bReleaseAll = FALSE;
+   s_uUsedFlag = HB_GC_USED_FLAG;
+   s_uAllocated = 0;
 }
 
 BOOL hb_gcSetCollecting( BOOL bCollecting )

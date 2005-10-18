@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2005/05/10 10:22:27 druzus Exp $
+# $Id: Makefile,v 1.10 2005/10/04 02:05:33 druzus Exp $
 #
 
 ROOT = ../../../
@@ -7,10 +7,6 @@ ROOT = ../../../
 C_SOURCES=\
 	dbfcdx1.c \
 	sixcdx1.c \
-
-ifeq ($(HB_MT),MT)
-   MT_LIBNAME=$(LIBNAME)mt
-endif
 
 LIBNAME=dbfcdx
 

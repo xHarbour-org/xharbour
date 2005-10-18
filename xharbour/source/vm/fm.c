@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.70 2005/10/07 01:09:14 druzus Exp $
+ * $Id: fm.c,v 1.71 2005/10/07 01:43:31 druzus Exp $
  */
 
 /*
@@ -68,16 +68,6 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
-/*
-* JC1:
-* In MT system, the stack of the virtual machine may not be ready
-* to accept hb_x* request of accessing the stack to store data about
-* memory consumption.
-* For this reason, an IFDEF marked with a  *** comment has been added
-* to make sure that the stack is currently able to accept the requests
-* from FM.
-*/
 
 #define HB_OS_WIN_32_USED
 #define HB_THREAD_OPTIMIZE_STACK
@@ -149,16 +139,23 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 
 #endif
 
-#ifdef HB_THREAD_SUPPORT
-static BOOL s_fInit = FALSE;
-#endif
-
 #if defined( HB_THREAD_SUPPORT ) && \
     ( !defined( HB_SAFE_ALLOC ) || defined( HB_FM_STATISTICS ) )
-#  define HB_MEM_THLOCK()     do { if( !s_fInit ) { hb_xinit(); } \
-                                   HB_CRITICAL_LOCK( hb_allocMutex ); \
+
+#  define HB_MEM_THLOCK()     do { \
+                                 if( hb_stack_ready ) \
+                                 { \
+                                    HB_CRITICAL_LOCK( hb_allocMutex ); \
+                                 } \
                               } while( 0 )
-#  define HB_MEM_THUNLOCK()   HB_CRITICAL_UNLOCK( hb_allocMutex )
+
+#  define HB_MEM_THUNLOCK()   do { \
+                                 if( hb_stack_ready ) \
+                                 { \
+                                    HB_CRITICAL_UNLOCK( hb_allocMutex ); \
+                                 } \
+                              } while( 0 )
+
 #else
 #  define HB_MEM_THLOCK()
 #  define HB_MEM_THUNLOCK()
@@ -226,11 +223,7 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
    {
       HB_THREAD_STUB
 
-      if(
-         #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
-            hb_ht_stack == &hb_stack &&
-         #endif
-         HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
+      if( hb_stack_ready && HB_VM_STACK.pBase != HB_VM_STACK.pItems )
       {
           /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
@@ -344,11 +337,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    {
       HB_THREAD_STUB
 
-      if(
-         #if defined( HB_THREAD_SUPPORT )  /*** Se JC1: notes at begin */
-            hb_ht_stack != 0 &&
-         #endif
-         HB_VM_STACK.pItems && ( HB_VM_STACK.pBase != HB_VM_STACK.pItems ) )
+      if( hb_stack_ready && HB_VM_STACK.pBase != HB_VM_STACK.pItems )
       {
          /* PRG line number */
          ( ( PHB_MEMINFO ) pMem )->uiProcLine = (*(HB_VM_STACK.pBase))->item.asSymbol.lineno;
@@ -640,14 +629,6 @@ void HB_EXPORT hb_xinit( void ) /* Initialize fixed memory subsystem */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xinit()"));
 
-#ifdef HB_THREAD_SUPPORT
-   if( !s_fInit )
-   {
-      s_fInit = TRUE;
-      hb_threadInit();
-      hb_stackInit();
-   }
-#endif
 }
 
 
@@ -1062,41 +1043,15 @@ ULONG hb_xquery( USHORT uiMode )
       break;
 
    case HB_MEM_STACKITEMS: /* Harbour extension (Total items allocated for the stack)      */
-      #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
-         if ( hb_ht_stack == &hb_stack )
-         {
-      #endif
-
-         ulResult = HB_VM_STACK.wItems;
-
-      #ifdef HB_THREAD_SUPPORT
-         }
-         else
-         {
-            ulResult = 0;
-         }
-      #endif
+      ulResult = hb_stack_ready ? HB_VM_STACK.wItems : 0;
       break;
 
    case HB_MEM_STACK:      /* Harbour extension (Total memory size used by the stack [bytes]) */
-      #ifdef HB_THREAD_SUPPORT  /*** Se JC1: notes at begin */
-         if ( hb_ht_stack == &hb_stack )
-         {
-      #endif
-
-         ulResult = HB_VM_STACK.wItems * sizeof( HB_ITEM );
-
-      #ifdef HB_THREAD_SUPPORT
-         }
-         else
-         {
-            ulResult = 0;
-         }
-      #endif
+      ulResult = hb_stack_ready ? HB_VM_STACK.wItems * sizeof( HB_ITEM ) : 0;
       break;
 
    case HB_MEM_STACK_TOP : /* Harbour extension (Total items currently on the stack)      */
-      ulResult = hb_stackTopOffset( );
+      ulResult = hb_stack_ready ? hb_stackTopOffset() : 0;
       break;
 
    case HB_MEM_LIST_BLOCKS : /* Harbour extension (List all allocated blocks)      */

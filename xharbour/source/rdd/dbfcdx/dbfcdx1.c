@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.224 2005/10/16 10:28:54 ptsarenko Exp $
+ * $Id: dbfcdx1.c,v 1.225 2005/10/16 12:04:44 druzus Exp $
  */
 
 /*
@@ -70,7 +70,9 @@
 #define HB_CDX_DBGUPDT
 */
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbapierr.h"
 #include "hbapilng.h"
@@ -712,16 +714,6 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
       pItem = hb_itemNew( NULL );
 
    return pItem;
-}
-
-/*
- * destroy compiled expression
- */
-static void hb_cdxDestroyExp( PHB_ITEM pExp )
-{
-   if ( hb_itemType( pExp ) != HB_IT_BLOCK )
-      hb_macroDelete( ( HB_MACRO_PTR ) hb_itemGetPtr( pExp ) );
-   hb_itemRelease( pExp );
 }
 
 /*
@@ -3568,11 +3560,11 @@ static void hb_cdxTagFree( LPCDXTAG pTag )
    if ( pTag->KeyExpr != NULL )
       hb_xfree( pTag->KeyExpr );
    if ( pTag->pKeyItem != NULL )
-      hb_cdxDestroyExp( pTag->pKeyItem );
+      hb_vmDestroyBlockOrMacro( pTag->pKeyItem );
    if ( pTag->ForExpr != NULL )
       hb_xfree( pTag->ForExpr );
    if ( pTag->pForItem != NULL )
-      hb_cdxDestroyExp( pTag->pForItem );
+      hb_vmDestroyBlockOrMacro( pTag->pForItem );
    hb_cdxKeyFree( pTag->CurKey );
    if ( pTag->HotKey )
       hb_cdxKeyFree( pTag->HotKey );
@@ -7217,7 +7209,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    SELF_GOTO( ( AREAP ) pArea, 0 );
    if ( SELF_EVALBLOCK( ( AREAP ) pArea, pKeyExp ) == FAILURE )
    {
-      hb_cdxDestroyExp( pKeyExp );
+      hb_vmDestroyBlockOrMacro( pKeyExp );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       return FAILURE;
    }
@@ -7245,7 +7237,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
    if ( bType == 'U' || uiLen == 0 )
    {
-      hb_cdxDestroyExp( pKeyExp );
+      hb_vmDestroyBlockOrMacro( pKeyExp );
       SELF_GOTO( ( AREAP ) pArea, ulRecNo );
       hb_cdxErrorRT( pArea, bType == 'U' ? EG_DATATYPE : EG_DATAWIDTH,
                      1026, NULL, 0, 0 );
@@ -7268,7 +7260,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          /* Otherwise, try compiling the conditional expression string */
          if ( SELF_COMPILE( (AREAP) pArea, pArea->lpdbOrdCondInfo->abFor ) == FAILURE )
          {
-            hb_cdxDestroyExp( pKeyExp );
+            hb_vmDestroyBlockOrMacro( pKeyExp );
             SELF_GOTO( ( AREAP ) pArea, ulRecNo );
             return FAILURE;
          }
@@ -7283,8 +7275,8 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
       if ( SELF_EVALBLOCK( ( AREAP ) pArea, pForExp ) == FAILURE )
       {
-         hb_cdxDestroyExp( pKeyExp );
-         hb_cdxDestroyExp( pForExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return FAILURE;
       }
@@ -7293,8 +7285,8 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       pArea->valResult = NULL;
       if ( uiType != HB_IT_LOGICAL )
       {
-         hb_cdxDestroyExp( pKeyExp );
-         hb_cdxDestroyExp( pForExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          /* TODO: !!! runtime error ? */
          return FAILURE;
@@ -7416,9 +7408,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
 
       if ( hFile == FS_ERROR )
       {
-         hb_cdxDestroyExp( pKeyExp );
+         hb_vmDestroyBlockOrMacro( pKeyExp );
          if ( pForExp != NULL )
-            hb_cdxDestroyExp( pForExp );
+            hb_vmDestroyBlockOrMacro( pForExp );
          return FAILURE;
       }
    }
@@ -7703,7 +7695,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             }
             if ( pTag->pForItem != NULL )
             {
-               hb_cdxDestroyExp( pTag->pForItem );
+               hb_vmDestroyBlockOrMacro( pTag->pForItem );
                pTag->pForItem = NULL;
             }
             if ( hb_itemGetCLen( pOrderInfo->itmNewVal ) > 0 )
@@ -7725,7 +7717,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                      pArea->valResult = NULL;
                   }
                   if ( pForItem )
-                     hb_cdxDestroyExp( pForItem );
+                     hb_vmDestroyBlockOrMacro( pForItem );
                }
             }
          }
