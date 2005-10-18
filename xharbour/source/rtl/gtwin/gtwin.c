@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.93 2005/06/29 06:15:03 likewolf Exp $
+ * $Id: gtwin.c,v 1.94 2005/07/05 08:31:58 likewolf Exp $
  */
 
 /*
@@ -88,6 +88,9 @@
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
+
+// TODO, MT version of this lib, even if just compiled with HB_THREAD_SUPPORT
+#define hb_stackST (*hb_GetStack())
 
 #ifndef HB_CDP_SUPPORT_OFF
 #include "hbapicdp.h"

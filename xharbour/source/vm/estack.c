@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.75 2005/10/08 01:41:41 ronpinkas Exp $
+ * $Id: estack.c,v 1.76 2005/10/08 09:24:06 lf_sfnet Exp $
  */
 
 /*
@@ -61,6 +61,10 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapierr.h"
+
+#ifndef HB_THREAD_SUPPORT
+   #define hb_stack hb_stackST
+#endif
 
 extern BOOL hb_isService(void);
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4475 2005/10/17 20:16:28 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4476 2005/10/18 00:53:06 marcosgambeta Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 17:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbstack.h
+  * include/thread.h
+  * source/vm/estack.c
+  * source/vm/hvm.c
+    * Renamed hb_stack to hb_stackST in ST compilation
+
+    /* NOTE: This change will now forc a LINK Error if an appliaction
+             attempts to link, both ST and MT compiled modules.
+
+             This change will also force a compilation error by any
+             3rd party code, attemting to access hb_stack directly
+             rather than using hbapi.h stack access functions/macros.
+
+  * source/rtl/gtwin/gtwin.c
+  * source/rtl/gtwin/mousewin.c
+    * Added stack indirection by means of hb_GetStack() because gtwin.lib
+      is only compiled under ST, but also linked with HBTestMT.exe
+    + Added TODO item - at minimum we need to update make files to build
+      gtwinmt.lib if we want to remove the indirection.
 
 2005-10-17 22:52 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
   * contrib/wvtgui/wvtwin.ch
@@ -207,7 +228,6 @@
   * source/cgi/*.prg
     * removed unused files and small cleanups
 
->>>>>>> 1.4453
 2005-10-13 23:09 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/langapi.c
     * Fixed runtime error when HB_LANGSELECT() is called without

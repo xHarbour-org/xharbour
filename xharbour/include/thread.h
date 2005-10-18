@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.107 2005/09/04 04:29:00 walito Exp $
+* $Id: thread.h,v 1.108 2005/10/07 01:09:14 druzus Exp $
 */
 
 /*
@@ -291,7 +291,7 @@ extern PPVOID hb_dwCurrentStack;
 
    #ifdef HB_OS_HPUX
    #define pthread_mutexattr_setkind_np pthread_mutexattr_settype
-   #else 
+   #else
    /* ODD: this definition is missing on some linux headers;
       we should remove it when this bug is fixed */
    int pthread_mutexattr_setkind_np( pthread_mutexattr_t * attr, int kind );
@@ -846,7 +846,7 @@ void hb_threadCancelInternal( void );
    #define HB_THREAD_STUB
 
    #ifndef HB_VM_STACK
-      #define HB_VM_STACK hb_stack
+      #define HB_VM_STACK hb_stackST
       /* This version eliminates the problem with DLL linking */
       /* #define HB_VM_STACK (*hb_stack_ptr) */
    #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: mousewin.c,v 1.6 2003/12/22 21:48:26 druzus Exp $
+ * $Id: mousewin.c,v 1.7 2004/05/10 20:36:53 peterrees Exp $
  */
 
 /*
@@ -57,6 +57,9 @@
 
 #include <windows.h>
 #include "hbapigt.h"
+
+// TODO, MT version of this lib, even if just compiled with HB_THREAD_SUPPORT
+#define hb_stackST (*hb_GetStack())
 
 #if defined(__IBMCPP__)
    #undef WORD                            /* 2 bytes unsigned */

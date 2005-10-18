@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.506 2005/10/15 03:32:17 ronpinkas Exp $
+ * $Id: hvm.c,v 1.507 2005/10/16 19:32:45 druzus Exp $
  */
 
 /*
@@ -522,7 +522,12 @@ static void hb_vmDoInitError( void )
       hb_vmPushNil();
       hb_vmDo(0);
       hb_vm_BreakBlock = hb_itemNew( NULL );
-      hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
+
+      #ifdef HB_THREAD_SUPPORT
+         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stack.Return ) );
+      #else
+         hb_itemForwardValue( hb_vm_BreakBlock, &( hb_stackST.Return ) );
+      #endif
    }
    else
    {
@@ -9317,18 +9322,18 @@ HB_FUNC( HB_DBG_PROCLEVEL )
 
        HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
-       if( hb_stack.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+       if( hb_stackST.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
        {
-          hb_gcItemRef( &(hb_stack.Return) );
+          hb_gcItemRef( &(hb_stackST.Return) );
        }
        //printf( "After ReturnRef\n" );
 
-       if( hb_stack.pPos > hb_stack.pItems )
+       if( hb_stackST.pPos > hb_stackST.pItems )
        {
           /* the eval stack is not cleared yet */
-          HB_ITEM_PTR * pItem = hb_stack.pPos - 1;
+          HB_ITEM_PTR * pItem = hb_stackST.pPos - 1;
 
-          while( pItem != hb_stack.pItems )
+          while( pItem != hb_stackST.pItems )
           {
              if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
              {
