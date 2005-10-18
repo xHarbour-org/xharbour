@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.23 2005/10/06 02:20:19 bdj Exp $
+ * $Id: gtwvw.c,v 1.24 2005/10/11 12:55:07 marcosgambeta Exp $
  */
 
 /*
@@ -1320,7 +1320,7 @@ USHORT HB_GT_FUNC( gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar,
         usTop = usBottom;
         usBottom = temp;
       }
-      hb_wvw_GTFUNCPrologue(4, &usTop, &usCol, NULL, &usBottom);
+      hb_wvw_GTFUNCPrologue(3, &usTop, &usCol, &usBottom, NULL);
     }
 
     sWidth  = hb_wvw_gt_usGetScreenWidth( s_pWindows[ s_usCurWindow ] );

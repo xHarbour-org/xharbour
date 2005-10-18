@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4476 2005/10/18 00:53:06 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4477 2005/10/18 00:56:29 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-18 09:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    ! Typo fixed in gt_VertLine() causing incorrect dispbox() in MainCoord mode
+  * contrib/gtwvw/doc/whatsnew.txt
+    * change recorded
 
 2005-10-17 17:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbstack.h
@@ -120,8 +126,8 @@
   - source/cgi/tutil.prg
   * source/cgi/*
     * too many changes to list, almost a rewrite
-	 * but now it can be integrated in shared libraries
-	 * libcgi should be considered in EXPERIMENTAL state
+    * but now it can be integrated in shared libraries
+    * libcgi should be considered in EXPERIMENTAL state
 
 2005-10-14 23:34 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
@@ -305,7 +311,7 @@
   * source/misc/Makefile
   * source/misc/makefile.bc
   * source/misc/makefile.vc
-	 * updated makefiles please test them
+    * updated makefiles please test them
 
 2005-10-13 00:46 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
