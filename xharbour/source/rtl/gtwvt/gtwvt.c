@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.161 2005/10/09 15:06:20 bdj Exp $
+ * $Id: gtwvt.c,v 1.162 2005/10/18 12:14:33 druzus Exp $
  */
 
 /*
@@ -4520,8 +4520,7 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
       {
          if ( _s.pFunc[ iIndex ] != NULL && _s.iType[ iIndex ] == 2 )
          {
-            HB_ITEM_UNLOCK( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
-            hb_itemClear( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
+            hb_itemRelease( ( PHB_ITEM ) _s.pFunc[ iIndex ] );
          }
          _s.hDlgModeless[ iIndex ] = NULL;
          _s.pFunc[ iIndex ] = NULL;
@@ -4654,9 +4653,9 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
       {
          if ( _s.pFuncModal[ iIndex ] != NULL && _s.iTypeModal[ iIndex ] == 2 )
          {
-            HB_ITEM_UNLOCK( ( PHB_ITEM ) _s.pFuncModal[ iIndex ] );
-            hb_itemClear( ( PHB_ITEM ) _s.pFuncModal[ iIndex ] );
+            hb_itemRelease( ( PHB_ITEM ) _s.pFuncModal[ iIndex ] );
          }
+
          _s.hDlgModal[ iIndex ]   = NULL;
          _s.pFuncModal[ iIndex ]  = NULL;
          _s.iTypeModal[ iIndex ]  = ( int ) NULL;

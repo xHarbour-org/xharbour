@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.39 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbsetup.h,v 1.40 2005/10/18 05:43:02 ronpinkas Exp $
  */
 
 /*
@@ -440,10 +440,14 @@
 #if defined(__XCC__) || defined(__POCC__) || defined(_MSC_VER) || defined(__BORLANDC__)
    #if defined(__MT__) || defined(_MT)
       #ifndef HB_THREAD_SUPPORT
-         #define HB_THREAD_SUPPORT
+         #pragma message( "Warning: MT C compilation but HB_THREAD_SUPPORT not defined." )
+         //#define HB_THREAD_SUPPORT
       #endif
    #else
-       #undef HB_THREAD_SUPPORT
+       #ifdef HB_THREAD_SUPPORT
+          #error HB_THREAD_SUPPORT can not be used without MT support of C compiler!
+          #undef HB_THREAD_SUPPORT
+       #endif
    #endif
 #endif
 
