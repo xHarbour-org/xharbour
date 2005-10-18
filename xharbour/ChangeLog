@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4480 2005/10/18 06:10:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4481 2005/10/18 12:14:29 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-18 13:01 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/estack.c
+    - Removed redundant hb_GetStack()
 
 2005-10-18 14:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbstack.h

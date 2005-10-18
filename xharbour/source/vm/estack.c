@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.77 2005/10/18 00:56:29 ronpinkas Exp $
+ * $Id: estack.c,v 1.78 2005/10/18 12:14:33 druzus Exp $
  */
 
 /*
@@ -74,13 +74,6 @@ HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
 
 BOOL hb_stack_ready;
-
-HB_EXPORT HB_STACK *hb_GetStack( void )
-{
-   HB_THREAD_STUB;
-
-   return &HB_VM_STACK;
-}
 
 /* ------------------------------- */
 
