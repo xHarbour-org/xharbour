@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.38 2005/04/27 20:20:26 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.39 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -151,7 +151,7 @@
  * which we can make at any time then he _must_ to make at least the
  * following operation before writing to string buffer:
  *    pItem = hb_intemUnShare( pItem );
- * 
+ *
  * In valid code this macro cause only slowness so it's disabled by default.
  */
 
@@ -432,6 +432,19 @@
 #else
    #define HB_EXTERN_BEGIN
    #define HB_EXTERN_END
+#endif
+
+/*
+ * Auto SYNCH our HB_THREAD_SUPPORT flag with Compiler MT mode.
+ */
+#if defined(__XCC__) || defined(__POCC__) || defined(_MSC_VER) || defined(__BORLANDC__)
+   #if defined(__MT__) || defined(_MT)
+      #ifndef HB_THREAD_SUPPORT
+         #define HB_THREAD_SUPPORT
+      #endif
+   #else
+       #undef HB_THREAD_SUPPORT
+   #endif
 #endif
 
 #endif /* HB_SETUP_H_ */
