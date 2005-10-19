@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.225 2005/10/16 12:04:44 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.226 2005/10/18 12:14:32 druzus Exp $
  */
 
 /*
@@ -7271,7 +7271,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    /* Test conditional expression */
    if ( pForExp )
    {
-      USHORT uiType;
+      BOOL fOK;
 
       if ( SELF_EVALBLOCK( ( AREAP ) pArea, pForExp ) == FAILURE )
       {
@@ -7280,15 +7280,15 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return FAILURE;
       }
-      uiType = hb_itemType( pArea->valResult );
+      fOK = hb_itemType( pArea->valResult ) == HB_IT_LOGICAL;
       hb_itemRelease( pArea->valResult );
       pArea->valResult = NULL;
-      if ( uiType != HB_IT_LOGICAL )
+      if ( ! fOK )
       {
          hb_vmDestroyBlockOrMacro( pKeyExp );
          hb_vmDestroyBlockOrMacro( pForExp );
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
-         /* TODO: !!! runtime error ? */
+         hb_cdxErrorRT( pArea, EG_DATATYPE, EDBF_INVALIDFOR, NULL, 0, 0 );
          return FAILURE;
       }
    }

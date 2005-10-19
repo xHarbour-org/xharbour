@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.173 2005/10/04 02:05:33 druzus Exp $
+ * $Id: dbcmd.c,v 1.174 2005/10/04 20:06:34 druzus Exp $
  */
 
 /*
@@ -4239,7 +4239,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
 
    if( errCode == SUCCESS )
    {
-      hb_rddSelectWorkAreaNumber( lpaSource->uiArea );
+      hb_rddSelectWorkAreaNumber( dbTransInfo.lpaSource->uiArea );
 
       dbTransInfo.dbsci.itmCobFor   = pCobFor;
       dbTransInfo.dbsci.lpstrFor    = pStrFor;
@@ -4255,7 +4255,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
       dbTransInfo.dbsci.fIgnoreDuplicates = FALSE;
       dbTransInfo.dbsci.fBackword         = FALSE;
 
-      errCode = SELF_TRANS( lpaSource, &dbTransInfo );
+      errCode = SELF_TRANS( dbTransInfo.lpaSource, &dbTransInfo );
    }
 
    if( dbTransInfo.lpTransItems )

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.171 2005/10/08 09:24:06 lf_sfnet Exp $
+ * $Id: classes.c,v 1.172 2005/10/14 06:47:06 ronpinkas Exp $
  */
 
 /*
@@ -1343,7 +1343,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
    if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS   pClass   = s_pClasses + ( uiClass - 1 );
-      PHB_DYNS pMessage ;
+      PHB_DYNS pMessage = NULL;
       USHORT   uiAt;
       PMETHOD  pNewMeth;
       ULONG    fOpOver = 0;

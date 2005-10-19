@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.139 2005/10/16 12:04:45 druzus Exp $
+ * $Id: dbfntx1.c,v 1.140 2005/10/18 12:14:32 druzus Exp $
  */
 
 /*
@@ -6010,7 +6010,7 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    /* Test conditional expression */
    if( pForExp )
    {
-      USHORT uiType;
+      BOOL fOK;
 
       errCode = SELF_EVALBLOCK( ( AREAP ) pArea, pForExp );
       if( errCode != SUCCESS )
@@ -6020,10 +6020,10 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
          return errCode;
       }
-      uiType = hb_itemType( pArea->valResult );
+      fOK = hb_itemType( pArea->valResult ) == HB_IT_LOGICAL;
       hb_itemRelease( pArea->valResult );
       pArea->valResult = NULL;
-      if( uiType != HB_IT_LOGICAL )
+      if( ! fOK )
       {
          hb_vmDestroyBlockOrMacro( pKeyExp );
          hb_vmDestroyBlockOrMacro( pForExp );
