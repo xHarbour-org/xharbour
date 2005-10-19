@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.1 2005/01/22 15:21:11 lf_sfnet Exp $
+ * $Id: wvtclass.prg,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
  */
 
 /*
@@ -2714,7 +2714,7 @@ case ::nBarType == WVT_SCROLLBAR_HORZ
 
    case ::lAnchored .and. nKey == K_LBUTTONUP
       ::lAnchored := .f.
-      ::lHit := .t.
+      lHit := .t.
 
    otherwise
 
