@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.36 2005/09/17 21:35:41 druzus Exp $
+ * $Id: hbapirdd.h,v 1.37 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -153,11 +153,11 @@ struct _RDDNODE;
 
 typedef struct
 {
-   BYTE * atomName;        /* FIELD (symbol) name */
-   USHORT uiType;          /* FIELD type */
-   USHORT uiTypeExtended;  /* FIELD type extended */
-   USHORT uiLen;           /* Overall FIELD length */
-   USHORT uiDec;           /* Decimal places of numeric FIELD */
+   BYTE *   atomName;         /* FIELD (symbol) name */
+   HB_TYPE  uiType;           /* FIELD type */
+   USHORT   uiTypeExtended;   /* FIELD type extended */
+   USHORT   uiLen;            /* Overall FIELD length */
+   USHORT   uiDec;            /* Decimal places of numeric FIELD */
 } DBFIELDINFO;
 
 typedef DBFIELDINFO * LPDBFIELDINFO;
@@ -488,7 +488,7 @@ typedef DBLOCKINFO * LPDBLOCKINFO;
 
 typedef struct _FIELD
 {
-   USHORT  uiType;           /* Field type */
+   HB_TYPE uiType;           /* Field type */
    USHORT  uiTypeExtended;   /* Field type - extended */
    USHORT  uiLen;            /* Field length */
    USHORT  uiDec;            /* Decimal length */
@@ -1101,10 +1101,12 @@ typedef RDDNODE * LPRDDNODE;
  */
 extern int       HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType );
 extern ERRCODE   HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName );
-extern ERRCODE   HB_EXPORT hb_rddDisinherit( BYTE * drvName );
-extern USHORT    HB_EXPORT hb_rddExtendType( USHORT fieldType );
-extern USHORT    HB_EXPORT hb_rddFieldType( USHORT extendType );
 extern LPRDDNODE HB_EXPORT hb_rddGetNode( USHORT uiNode );
+#if 0
+extern ERRCODE   HB_EXPORT hb_rddDisinherit( BYTE * drvName );
+extern USHORT    HB_EXPORT hb_rddExtendType( HB_TYPE fieldType );
+extern HB_TYPE   HB_EXPORT hb_rddFieldType( USHORT extendType );
+#endif
 
 typedef short (* WACALLBACK )( AREA *, int );
 extern ERRCODE HB_EXPORT hb_rddIterateWorkAreas ( WACALLBACK pCallBack, int data );

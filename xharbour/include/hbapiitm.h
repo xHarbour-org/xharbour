@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.38 2005/09/11 19:39:31 druzus Exp $
+ * $Id: hbapiitm.h,v 1.39 2005/09/22 01:11:58 druzus Exp $
  */
 
 /*
@@ -130,11 +130,11 @@ extern HB_EXPORT BOOL      hb_itemRelease      ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM  hb_itemReturn       ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM  hb_itemReturnForward( PHB_ITEM pItem );
 extern HB_EXPORT ULONG     hb_itemSize         ( PHB_ITEM pItem );
-extern HB_EXPORT USHORT    hb_itemType         ( PHB_ITEM pItem );
+extern HB_EXPORT HB_TYPE   hb_itemType         ( PHB_ITEM pItem );
 extern HB_EXPORT char *    hb_itemTypeStr      ( PHB_ITEM pItem );
 /* Non Clipper compliant internal API */
 
-extern HB_EXPORT PHB_ITEM  hb_itemParamPtr ( USHORT uiParam, int iMask );
+extern HB_EXPORT PHB_ITEM  hb_itemParamPtr ( USHORT uiParam, LONG lMask );
 extern HB_EXPORT int       hb_itemStrCmp   ( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact ); /* our string compare */
 extern HB_EXPORT void      hb_itemCopy     ( PHB_ITEM pDest, PHB_ITEM pSource );
 extern HB_EXPORT void      hb_itemClear    ( PHB_ITEM pItem );

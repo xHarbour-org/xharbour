@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.173 2005/10/02 12:35:11 druzus Exp $
+ * $Id: hbapi.h,v 1.174 2005/10/18 21:25:46 ronpinkas Exp $
  */
 
 /*
@@ -67,28 +67,28 @@ HB_EXTERN_BEGIN
 #define HB_MAX_ENUMERATIONS 16
 
 /* items types and type checking macros */
-#define HB_IT_NIL       ( ( USHORT ) 0x0000 )
-#define HB_IT_POINTER   ( ( USHORT ) 0x0001 )
-#define HB_IT_INTEGER   ( ( USHORT ) 0x0002 )
-#define HB_IT_HASH      ( ( USHORT ) 0x0004 )
-#define HB_IT_LONG      ( ( USHORT ) 0x0008 )
-#define HB_IT_DOUBLE    ( ( USHORT ) 0x0010 )
-#define HB_IT_DATE      ( ( USHORT ) 0x0020 )
-#define HB_IT_LOGICAL   ( ( USHORT ) 0x0080 )
-#define HB_IT_SYMBOL    ( ( USHORT ) 0x0100 )
-#define HB_IT_ALIAS     ( ( USHORT ) 0x0200 )
-#define HB_IT_STRING    ( ( USHORT ) 0x0400 )
-#define HB_IT_MEMOFLAG  ( ( USHORT ) 0x0800 )
+#define HB_IT_NIL       ( ( HB_TYPE ) 0x0000 )
+#define HB_IT_POINTER   ( ( HB_TYPE ) 0x0001 )
+#define HB_IT_INTEGER   ( ( HB_TYPE ) 0x0002 )
+#define HB_IT_HASH      ( ( HB_TYPE ) 0x0004 )
+#define HB_IT_LONG      ( ( HB_TYPE ) 0x0008 )
+#define HB_IT_DOUBLE    ( ( HB_TYPE ) 0x0010 )
+#define HB_IT_DATE      ( ( HB_TYPE ) 0x0020 )
+#define HB_IT_LOGICAL   ( ( HB_TYPE ) 0x0080 )
+#define HB_IT_SYMBOL    ( ( HB_TYPE ) 0x0100 )
+#define HB_IT_ALIAS     ( ( HB_TYPE ) 0x0200 )
+#define HB_IT_STRING    ( ( HB_TYPE ) 0x0400 )
+#define HB_IT_MEMOFLAG  ( ( HB_TYPE ) 0x0800 )
 #define HB_IT_MEMO      ( HB_IT_MEMOFLAG | HB_IT_STRING )
-#define HB_IT_BLOCK     ( ( USHORT ) 0x1000 )
-#define HB_IT_BYREF     ( ( USHORT ) 0x2000 )
-#define HB_IT_MEMVAR    ( ( USHORT ) 0x4000 )
-#define HB_IT_ARRAY     ( ( USHORT ) 0x8000 )
+#define HB_IT_BLOCK     ( ( HB_TYPE ) 0x1000 )
+#define HB_IT_BYREF     ( ( HB_TYPE ) 0x2000 )
+#define HB_IT_MEMVAR    ( ( HB_TYPE ) 0x4000 )
+#define HB_IT_ARRAY     ( ( HB_TYPE ) 0x8000 )
 #define HB_IT_OBJECT    HB_IT_ARRAY
-#define HB_IT_NUMERIC   ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
-#define HB_IT_NUMINT    ( ( USHORT ) ( HB_IT_INTEGER | HB_IT_LONG ) )
-#define HB_IT_ANY       ( ( USHORT ) 0xFFFF )
-#define HB_IT_COMPLEX   ( ( USHORT ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
+#define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
+#define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
+#define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFF )
+#define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
 
@@ -251,7 +251,7 @@ extern HB_EXPORT char *   hb_pards( int iParam, ... ); /* retrieve a date as a s
 extern HB_EXPORT char *   hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
 extern HB_EXPORT LONG     hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
 extern HB_EXPORT ULONG    hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
-extern HB_EXPORT int      hb_parinfo( int iParam ); /* Determine the param count or data type */
+extern HB_EXPORT ULONG    hb_parinfo( int iParam ); /* Determine the param count or data type */
 extern HB_EXPORT int      hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
 extern HB_EXPORT double   hb_parnd( int iParam, ... ); /* retrieve a numeric parameter as a double */
 extern HB_EXPORT int      hb_parni( int iParam, ... ); /* retrieve a numeric parameter as a integer */
@@ -259,7 +259,7 @@ extern HB_EXPORT LONG     hb_parnl( int iParam, ... ); /* retrieve a numeric par
 extern HB_EXPORT HB_LONG  hb_parnint( int iParam, ... ); /* retrieve a numeric parameter as a HB_LONG */
 extern HB_EXPORT void *   hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
 extern HB_EXPORT void *   hb_parpointer( int iParam ); /* retrieve ONLY a pointer from ONLY HB_IT_POINTER, or retunrs NULL */
-extern HB_EXPORT PHB_ITEM hb_param( int iParam, int iMask ); /* retrieve a generic parameter */
+extern HB_EXPORT PHB_ITEM hb_param( int iParam, LONG lMask ); /* retrieve a generic parameter */
 extern HB_EXPORT PHB_ITEM hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
 
@@ -432,7 +432,7 @@ extern HB_EXPORT double    hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* r
 extern HB_EXPORT double    hb_itemGetNDDec( PHB_ITEM pItem, int * piDec );
 extern HB_EXPORT char *    hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
 extern HB_EXPORT LONG      hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a LONG integer */
-extern HB_EXPORT USHORT    hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
+extern HB_EXPORT HB_TYPE   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern HB_EXPORT void      hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
 extern HB_EXPORT ULONG     hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar ); /* scan an array for a given item, or until code-block item returns TRUE */
 extern HB_EXPORT BOOL      hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */

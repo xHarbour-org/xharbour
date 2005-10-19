@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.76 2005/10/04 20:06:09 druzus Exp $
+ * $Id: hbdefs.h,v 1.77 2005/10/11 13:40:17 druzus Exp $
  */
 
 /*
@@ -427,6 +427,10 @@
 /* #define PCODE_LONG_LIM(l)     HB_LIM_INT32( l ) */
 
 /* #define PCODE_LONG_LIM(l)     HB_LIM_LONG( l ) */
+
+/* type of HB_ITEM */
+/* typedef USHORT HB_TYPE; */
+typedef UINT32 HB_TYPE;
 
 /* type of reference counter */
 typedef unsigned long HB_COUNTER;

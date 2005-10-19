@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.508 2005/10/18 00:56:29 ronpinkas Exp $
+ * $Id: hvm.c,v 1.509 2005/10/18 12:14:59 druzus Exp $
  */
 
 /*
@@ -8366,7 +8366,7 @@ HB_EXPORT void hb_vmPopState( void )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPopState(%p)", pItem ) );
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_vmPopState()" ) );
 
    hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
    hb_stackDec();

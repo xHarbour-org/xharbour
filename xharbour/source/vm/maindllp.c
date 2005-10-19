@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.11 2005/02/26 20:42:01 andijahja Exp $
+ * $Id: maindllp.c,v 1.12 2005/02/27 21:28:25 andijahja Exp $
  */
 
 /*
@@ -160,14 +160,14 @@ char * hb_parc( int iParam, ... )
    }
 }
 
-PHB_ITEM hb_param( int iParam, int iMask ) /* retrieve a generic parameter */
+PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 {
    PHB_ITEM pReturn;
    FARPROC pParam=GetProcAddress( GetModuleHandle( NULL ), "_hb_param" );
 
    if( pParam )
    {
-      pReturn=( ( HB_PARAM ) pParam )( iParam,iMask );
+      pReturn=( ( HB_PARAM ) pParam )( iParam,lMask );
    }
 
    return pReturn;
@@ -370,17 +370,17 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
 }
 
 #undef hb_parinfo
-int hb_parinfo( int iParam ) /* Determine the param count or data type */
+ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 {
-   int iReturn;
+   ULONG ulReturn;
    FARPROC pParinfo=GetProcAddress( GetModuleHandle( NULL ), "_hb_parinfo" );
 
    if( pParinfo )
    {
-      iReturn=( ( HB_PARINFO ) pParinfo )( iParam );
+      ulReturn=( ( HB_PARINFO ) pParinfo )( iParam );
    }
 
-   return iReturn;
+   return ulReturn;
 }
 
 #undef hb_parclen

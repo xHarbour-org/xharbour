@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4483 2005/10/18 21:25:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4484 2005/10/18 23:41:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-19 04:12 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapiitm.h
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/hbtypes.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/maindllp.c
+    * type of HB_ITEM changed from USHORT to HB_ITEM
+
+  * xharbour/include/hbdefs.h
+    + added HB_TYPE declaration for HB_ITEM type.
+      Now it's defined as UINT32 but can be easy changed here
+      and previous value USHORT restored
+
+    Please test, If this will creates to much troubles we can define
+    HB_TYPE as USHORT in incoming release for backward binary compatibility.
 
 2005-10-18 16:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbsetup.h

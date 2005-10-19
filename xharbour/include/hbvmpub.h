@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.38 2005/09/27 02:25:40 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.39 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -206,7 +206,7 @@
    /* items hold at the virtual machine stack */
    typedef struct _HB_ITEM
    {
-      USHORT type;
+      HB_TYPE type;
       union
       {
          struct hb_struArray   asArray;

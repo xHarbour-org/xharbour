@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.121 2005/09/11 19:41:11 druzus Exp $
+ * $Id: arrays.c,v 1.122 2005/09/27 02:25:40 ronpinkas Exp $
  */
 
 /*
@@ -727,21 +727,16 @@ void HB_EXPORT * hb_arrayGetPtr( PHB_ITEM pArray, ULONG ulIndex )
    return NULL;
 }
 
-USHORT HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
+HB_TYPE HB_EXPORT hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex )
 {
-   USHORT uType;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetType(%p, %lu)", pArray, ulIndex));
 
    if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
-      uType = hb_itemType( pArray->item.asArray.value->pItems + ulIndex - 1 );
-   }
-   else
-   {
-      uType = 0;
+      return hb_itemType( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
 
-   return uType;
+   return 0;
 }
 
 BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )

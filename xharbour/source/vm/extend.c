@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.52 2005/09/15 12:55:36 druzus Exp $
+ * $Id: extend.c,v 1.53 2005/10/16 19:32:45 druzus Exp $
  */
 
 /*
@@ -88,11 +88,11 @@
 
 HB_EXTERN_BEGIN
 
-PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
+PHB_ITEM HB_EXPORT hb_param( int iParam, LONG lMask )
 {
    HB_THREAD_STUB
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %d)", iParam, iMask));
+   HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %ld)", iParam, lMask));
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -102,19 +102,19 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, int iMask )
       {
          pItem = hb_itemUnRef( pItem );
 
-         if( iMask == HB_IT_BYREF )
+         if( lMask == HB_IT_BYREF )
          {
             return pItem;
          }
       }
 
-      if( ( USHORT ) iMask == HB_IT_ANY || pItem->type & ( USHORT ) iMask )
+      if( ( HB_TYPE ) lMask == HB_IT_ANY || pItem->type & ( HB_TYPE ) lMask )
       {
          return pItem;
       }
       else
       {
-         if( iMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
+         if( ( HB_TYPE ) lMask == HB_IT_NUMERIC && HB_IS_NUMERIC( pItem ) )
          {
             return pItem;
          }
@@ -770,7 +770,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
       return 0;
 }
 
-int  HB_EXPORT hb_parinfo( int iParam )
+ULONG  HB_EXPORT hb_parinfo( int iParam )
 {
    HB_THREAD_STUB
 
@@ -778,13 +778,13 @@ int  HB_EXPORT hb_parinfo( int iParam )
 
    if( iParam == 0 )
    {
-      return ( int ) hb_pcount();
+      return ( ULONG ) hb_pcount();
    }
    else
    {
       if( ( iParam > 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
       {
-         USHORT uiType = ( iParam == -1 ) ? hb_stackReturnItem()->type : ( hb_stackItemFromBase( iParam ) )->type;
+         HB_TYPE uiType = ( iParam == -1 ) ? hb_stackReturnItem()->type : ( hb_stackItemFromBase( iParam ) )->type;
 
          if( uiType & HB_IT_BYREF )
          {
@@ -796,7 +796,7 @@ int  HB_EXPORT hb_parinfo( int iParam )
             }
          }
 
-         return ( int ) uiType;
+         return ( ULONG ) uiType;
       }
       else
          return 0;

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.118 2005/09/11 19:41:11 druzus Exp $
+ * $Id: itemapi.c,v 1.119 2005/09/30 23:44:06 druzus Exp $
  */
 
 /*
@@ -169,11 +169,11 @@ HB_ITEM HB_EXPORT hb_itemParamStack( USHORT uiParam )
 
 /* Internal Item API. Use this with care. */
 
-PHB_ITEM HB_EXPORT hb_itemParamPtr( USHORT uiParam, int iMask )
+PHB_ITEM HB_EXPORT hb_itemParamPtr( USHORT uiParam, LONG lMask )
 {
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParamPtr(%hu, %d)", uiParam, iMask));
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParamPtr(%hu, %ld)", uiParam, lMask));
 
-   return hb_param( ( int ) uiParam, iMask );
+   return hb_param( ( int ) uiParam, lMask );
 }
 
 USHORT HB_EXPORT hb_itemPCount( void )
@@ -1101,13 +1101,13 @@ ULONG HB_EXPORT hb_itemSize( PHB_ITEM pItem )
    return 0;
 }
 
-USHORT HB_EXPORT hb_itemType( PHB_ITEM pItem )
+HB_TYPE HB_EXPORT hb_itemType( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemType(%p)", pItem));
 
    if( pItem )
    {
-      return ( USHORT ) pItem->type;
+      return ( HB_TYPE ) pItem->type;
    }
    else
    {
@@ -1119,7 +1119,7 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemTypeStr(%p)", pItem));
 
-   switch( pItem->type & ~HB_IT_BYREF )
+   switch( pItem->type )
    {
       case HB_IT_ARRAY:
          return ( ( char * ) ( hb_arrayIsObject( pItem ) ? "O" : "A" ) );
@@ -1630,7 +1630,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
    {
       HB_LONG lNumber;
 
-      switch( pNumber->type & ~HB_IT_BYREF )
+      switch( pNumber->type )
       {
          case HB_IT_INTEGER:
             lNumber = pNumber->item.asInteger.value;
@@ -1786,7 +1786,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemString(%p, %p, %p)", pItem, ulLen, bFreeReq));
 
-   switch( pItem->type & ~HB_IT_BYREF )
+   switch( pItem->type )
    {
       case HB_IT_STRING:
       case HB_IT_MEMO:
