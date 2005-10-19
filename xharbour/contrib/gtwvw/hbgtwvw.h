@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.8 2005/08/30 16:46:40 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.9 2005/10/06 02:20:19 bdj Exp $
  */
 
 /*
@@ -117,6 +117,7 @@
 #include "inkey.ch"
 #include "error.ch"
 #include "hbvm.h"
+#include "hbstack.h"
 
 /*-------------------------------------------------------------------*/
 

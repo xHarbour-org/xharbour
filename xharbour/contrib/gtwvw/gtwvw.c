@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.24 2005/10/11 12:55:07 marcosgambeta Exp $
+ * $Id: gtwvw.c,v 1.25 2005/10/18 02:53:56 bdj Exp $
  */
 
 /*
@@ -97,6 +97,7 @@
     #define _WIN32_IE 0x0400
 #endif
 
+#define HB_NO_DEFAULT_API_MACROS
 #include "hbgtwvw.h"
 
 #include <windows.h>
@@ -2489,7 +2490,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
          }
@@ -2626,7 +2627,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
-            bReturn = hb_itemGetNL( &HB_VM_STACK.Return );
+            bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
          }
@@ -5881,7 +5882,7 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
     hb_vmPushLong( ( LONG ) wParam  );
     hb_vmPushLong( ( LONG ) lParam  );
     hb_vmDo( 5 );
-    bHandled = hb_itemGetL( &HB_VM_STACK.Return );
+    bHandled = hb_itemGetL( hb_stackReturnItem() );
     hb_vmPopState();
 
     if (bHandled)

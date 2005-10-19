@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.12 2005/10/06 02:20:19 bdj Exp $
+ * $Id: whatsnew.txt,v 1.13 2005/10/18 02:53:57 bdj Exp $
  */
 
 /*
@@ -15,6 +15,15 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+
+2005-10-19 18:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+    + include "hbstack.h"
+
+  * contrib/gtwvw/gtwvw.c
+    + #define HB_NO_DEFAULT_API_MACROS
+    ! replace &HB_VM_STACK.Return with hb_stackReturnItem()
 
 
 2005-10-18 09:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
