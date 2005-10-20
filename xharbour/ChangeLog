@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4489 2005/10/19 17:16:20 vouchcac Exp $
+ * $Id: ChangeLog,v 1.4490 2005/10/20 18:07:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-20 11:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/rp_run.src
+    + Added support for QUIT overloading in place of stnadard rules
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    * Minor refinments to recent revision.
 
 2005-10-20 11:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include\hbextern.ch

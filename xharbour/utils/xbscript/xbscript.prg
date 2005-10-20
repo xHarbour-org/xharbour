@@ -956,7 +956,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
 
                   nBlock := s_anRecover[ nSequence ]
                   nSequence--
-               ELSEIF Len( s_anRecover ) > 0 // anREcover not empty or we couldn't get here!
+               ELSEIF ! Empty( s_anRecover )
                   //TraceLog( "Return to RECOVER of parrent", PP_ProcName(), PP_ProcLine() )
                   lRecover := .T.
                   EXIT
@@ -992,7 +992,12 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
          aSize( s_acRecover, Len( s_acRecover ) - 1 )
          aSize( s_anRecover, Len( s_acRecover ) )
          aSize( s_aSequence, Len( s_acRecover ) )
-         aLastSequence := s_aSequence[ nSequence := Len( s_aSequence ) ]
+
+         IF ( nSequence := Len( s_aSequence ) ) > 0
+            aLastSequence := s_aSequence[ nSequence ]
+         ELSE
+            aLastSequence := NIL
+         ENDIF
 
          //TraceLog( s_acRecover, s_anRecover, s_aSequence )
 
@@ -1016,7 +1021,12 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
          aSize( s_acRecover, Len( s_acRecover ) - 1 )
          aSize( s_anRecover, Len( s_acRecover ) )
          aSize( s_aSequence, Len( s_acRecover ) )
-         aLastSequence := s_aSequence[ nSequence := Len( s_aSequence ) ]
+
+         IF ( nSequence := Len( s_aSequence ) ) > 0
+            aLastSequence := s_aSequence[ nSequence ]
+         ELSE
+            aLastSequence := NIL
+         ENDIF
 
          //TraceLog( s_acRecover, s_anRecover, s_aSequence )
 
@@ -2383,7 +2393,7 @@ PROCEDURE PP_SetReturn( xRet )
 
    s_xRet := xRet
 
-   TraceLog( xRet )
+   //TraceLog( xRet )
 
    s_lReturnRequested := .T.
    BREAK .T.
@@ -2513,15 +2523,22 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
 
    // Script Error within a TRY block.
    IF s_lTrying
+      //Alert( "Break within Script TRY!" )
       Break( oRecover )
    ENDIF
 
    BEGIN SEQUENCE
+      //Alert( "Script Error" )
       s_xRet := Eval( s_bRTEBlock, oRecover )
-   RECOVER
-      IF Len( s_anRecover ) > 0
+      //Alert( "Script Error returned:" + ValType( s_xRet ) )
+
+      IF ValType( s_xRet ) != 'L' .AND. ( ! oRecover:CanSubStitute )
+         Alert( "SCRIPT - Error Recovery Failure!" )
          Break( oRecover )
       ENDIF
+   RECOVER
+      //Alert( "Recovered after RTE Handler!" )
+      Break( oRecover )
    END
 
 RETURN s_xRet
@@ -8806,8 +8823,8 @@ STATIC FUNCTION InitResults()
   aAdd( aCommResults, { { {   0, '__TypeFile( ' }, {   0,   1 }, {   0, ', ' }, {   0,   2 }, {   0, ' ) ' }, {   1, '; COPY FILE ' }, {   1,   1 }, {   1, ' TO ' }, {   1,   3 } }, { -1,  4, -1,  6, -1, -1,  4, -1,  4} , { NIL, NIL, NIL }  } )
   aAdd( aCommResults, { { {   0, '__TypeFile( ' }, {   0,   1 }, {   0, ', ' }, {   0,   2 }, {   0, ' )' } }, { -1,  4, -1,  6, -1} , { NIL, NIL }  } )
   aAdd( aCommResults, { { {   0, 'EXTERNAL ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
-  aAdd( aCommResults, { { {   0, 'Break()' } }, { -1} ,  } )
-  aAdd( aCommResults, { { {   0, 'Break()' } }, { -1} ,  } )
+  aAdd( aCommResults, { { {   0, '__Quit()' } }, { -1} ,  } )
+  aAdd( aCommResults, { { {   0, '__Quit()' } }, { -1} ,  } )
   aAdd( aCommResults, { { {   0, '__Run( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  2, -1} , { NIL }  } )
   aAdd( aCommResults, { { {   0, '__Run( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
   aAdd( aCommResults, { { {   0, 'RUN ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
@@ -9495,6 +9512,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aTransRules, { 'ERRORBLOCK' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'BREAK' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'THROW' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
+   aAdd( aTransRules, { '__Quit' , { {    0,   0, '(', NIL, NIL }, {    1,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .T. } )
    aAdd( aTransRules, { 'IN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
 
    /* Commands */
@@ -9581,6 +9599,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aTransResults, { { {   0, 'PP_ProcLine( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_EnumIndex()' } }, { -1} ,  } )
    aAdd( aTransResults, { { {   0, 'PP_ErrorBlock( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
+   aAdd( aTransResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, 'PP_Break( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aTransResults, { { {   0, '$ ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
@@ -10164,6 +10183,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
          PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
       NEXT
    RECOVER USING oError
+      TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
    END SEQUENCE
 
    ErrorBlock( bErrHandler )
@@ -10298,16 +10318,16 @@ STATIC FUNCTION DefRTEHandler( e )
 
    LOCAL cMessage, aOptions, nChoice, nLevel
 
-   IF e:genCode == EG_ZERODIV
+   IF e:genCode == EG_ZERODIV .AND. e:CanSubStitute
      RETURN 0
    ENDIF
 
-   IF e:genCode == EG_OPEN .and. e:osCode == 32 .and. e:canDefault
+   IF e:genCode == EG_OPEN .and. e:osCode == 32 .and. e:CanDefault
      NetErr( .T. )
      RETURN .F.
    ENDIF
 
-   IF e:genCode == EG_APPENDLOCK .and. e:canDefault
+   IF e:genCode == EG_APPENDLOCK .and. e:CanDefault
      NetErr( .T. )
      RETURN .F.
    ENDIF
@@ -10316,11 +10336,11 @@ STATIC FUNCTION DefRTEHandler( e )
 
    aOptions := { "Quit" }
 
-   IF e:canRetry
+   IF e:CanRetry
       aAdd( aOptions, "Retry" )
    ENDIF
 
-   IF e:canDefault
+   IF e:CanDefault
       aAdd( aOptions, "Default" )
    ENDIF
 
@@ -10404,7 +10424,6 @@ FUNCTION PP_ErrorMessage( e )
      cMessage += Pad( ";*Called from " + ProcName( nLevel ) + "(" + LTrim( Str( ProcLine( nLevel ) ) ) + ")", nPad )
      nLevel++
   ENDDO
-
 
 RETURN cMessage
 

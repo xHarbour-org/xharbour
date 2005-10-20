@@ -1471,7 +1471,9 @@
 
       #ifdef AX
         #pragma BEGINDUMP
-           #define AX
+           #ifndef AX        
+              #define AX
+           #endif
         #pragma ENDDUMP
       #endif
     #endif
