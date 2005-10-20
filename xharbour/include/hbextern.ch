@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.16 2005/09/25 16:14:21 druzus Exp $
+ * $Id: hbextern.ch,v 1.17 2005/10/04 02:05:32 druzus Exp $
  */
 
 /*
@@ -333,6 +333,8 @@ EXTERNAL VERSION
 EXTERNAL WORD
 EXTERNAL YEAR
 
+EXTERNAL MENUMODAL
+
 /* Harbour extensions, always on */
 
 EXTERNAL HB_ARGC
@@ -501,6 +503,9 @@ EXTERNAL SDF, SDF_GETFUNCTABLE
 
 EXTERNAL RDDSYS
 
+EXTERNAL DBRELATION
+EXTERNAL DBRSELECT
+
 /* CA-Cl*pper 5.2 compatible undocumented functions */
 
 #ifdef HB_C52_UNDOC
@@ -610,6 +615,9 @@ EXTERNAL POPUP
 EXTERNAL RADIOBUTTO
 EXTERNAL RADIOGROUP
 EXTERNAL TOPBAR
+
+EXTERNAL _PUSHBUTT_
+EXTERNAL _LISTBOX_
 
 #endif /* HB_COMPAT_C53 */
 
