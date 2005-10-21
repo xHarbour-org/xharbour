@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4490 2005/10/20 18:07:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4491 2005/10/20 18:56:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-10-21 16:35 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+  * source/rtl/tbrowse.prg
+    + Added class TDataCache to cache rows fetched from datasource and not have to
+      reload them on every movement. This makes it possible for left/right movements
+      of tbrowse to use cached data which is needed when browsing big tables
+      with filters leaving only few records visible.
+      Try to set a filter like alias->(RecNo()) % 5000 == 0 to a few thousands records
+      long .dbf file to see how much this is needed.
+    ! ::DeHilite() was not working on linux (and terminals) due to a fix of mine
+      ( 2004-08-06 11:30 UTC+0200 ) which was needed to be compatible with clipper
+      but needs a datacache to be correctly implemented.
+    ! ::colPos direct assignement now works as expected, moving hilited cell
+    + ::rowPos direct assignement now works as expected, moving hilited cell (limited
+      to visible rows)
+    ! ::Invalidate() is used instead of ::RefreshAll()/Current() when possible, now that
+      there is a datacache it makes a big difference using cached data instead of
+      reloading them.
+    * When K_PGDN is pressed clipper tbrowse repaints rows starting bottom-most and
+      going up, this saves only a few dbSkip()s, but makes a notable difference on a heavvy
+      filtered .dbf file.
+    * ::aColumnsSep and ::aColorSpec moved to protected section of TBrowse, clipper tbrowse
+      has not such iVars. Wvt needs to be changed to respect this.
+
+   /* NB: I've made a lot of tests trying to be sure that I did not break anything and
+          I want to thank Lorenzo Fiorini for his help in doing tests and finding out
+          problems with datacache, but I've made a lot of changes so it is possible
+          that something needs some fine tuning.
+   */
 
 2005-10-20 11:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/rp_run.src
