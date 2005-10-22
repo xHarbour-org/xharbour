@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.39 2005/04/23 06:52:18 guerra000 Exp $
+ * $Id: hash.c,v 1.40 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -2315,7 +2315,7 @@ HB_FUNC( HMERGE )
 /**********************************************************
 * Setup and set options
 ***********************************************************/
-static void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
+void HB_EXPORT hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase )
 {
    PHB_BASEHASH pBase = pHash->item.asHash.value;
 
