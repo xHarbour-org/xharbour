@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.6 2004/01/12 23:06:18 fsgiudice Exp $
+rem * $Id: bldtest.bat,v 1.7 2005/10/05 03:21:27 ronpinkas Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -22,18 +22,17 @@ rem Saving current HB_MT state
 set OLDENVMT=%HB_MT%
 set OLDENVGT=%HB_GT_LIB%
 set OLDENVC=%CFLAGS%
+set OLD_HB_ARCHITECTURE=%HB_ARCHITECTURE%
+set OLD_HB_COMPILER=%HB_COMPILER%
+set OLD_HB_USER_LIBS=%HB_USER_LIBS%
 
 set HB_INSTALL=..
+if %HB_ARCHITECTURE%.==. set HB_ARCHITECTURE=w32
+if %HB_COMPILER%.==.     set HB_COMPILER=bcc32
 SET HB_BIN_INSTALL=%HB_INSTALL%\bin
 set HB_INC_INSTALL=%HB_INSTALL%\include
 set HB_LIB_INSTALL=%HB_INSTALL%\lib
-set HB_ZIP_LIB=hbzip.lib
-
-rem Check help request
-IF %1.==. GOTO SHOWHELP
-IF %1.==/?. GOTO SHOWHELP
-IF %1.==/H. GOTO SHOWHELP
-IF %1.==/h. GOTO SHOWHELP
+set HB_USER_LIBS=
 
 echo.
 echo.BldTest.bat - /? or /h to display options
@@ -41,8 +40,14 @@ echo.
 
 :ARGUMENTS
 rem Check parameters
-IF %1.==/MT. GOTO SETMT
-IF %1.==/mt. GOTO SETMT
+IF %1.==.     GOTO SHOWHELP
+IF %1.==/?.   GOTO SHOWHELP
+IF %1.==/H.   GOTO SHOWHELP
+IF %1.==/h.   GOTO SHOWHELP
+IF %1.==/MT.  GOTO SETMT
+IF %1.==/mt.  GOTO SETMT
+IF %1.==/cgi. GOTO SETCGI
+IF %1.==/CGI. GOTO SETCGI
 IF %1.==/WVT. GOTO SETWVT
 IF %1.==/wvt. GOTO SETWVT
 
@@ -62,6 +67,15 @@ echo.Setting Windows Virtual Terminal (WVT) mode
 echo.
 SET HB_GT_LIB=gtwvt
 SET CFLAGS=-W
+SHIFT
+SET BLDDEFAULT=N
+GOTO ARGUMENTS
+
+:SETCGI
+echo.Setting CGI Terminal (CGI) mode
+echo.
+SET HB_GT_LIB=gtcgi
+SET CFLAGS=
 SHIFT
 SET BLDDEFAULT=N
 GOTO ARGUMENTS
@@ -115,10 +129,11 @@ GOTO ENDSET
 
 :SHOWHELP
 echo.
-echo."bldtest [/MT|/mt|WVT/wvt|/?|/H|/h] prgname"
+echo."bldtest [/MT|/mt|/CGI|/cgi|WVT|/wvt|/?|/H|/h] prgname"
 echo.
 echo. /MT       = Set MT envinronment to build test program in MultiThread mode
 echo.             otherwise program will be compiled in SingleThread mode
+echo. /CGI      = Uses GTCGI instead of GTWIN to build test program.
 echo. /WVT      = Uses GTWVT instead of GTWIN to build test program.
 echo. /? or /H  = Show this help
 echo. prgname   = Name of prg file to compile without extension [.prg]
@@ -129,7 +144,14 @@ rem Restore Old Settings
 set HB_MT=%OLDENVMT%
 set HB_GT_LIB=%OLDENVGT%
 set CFLAGS=%OLDENVC%
+set HB_ARCHITECTURE=%OLD_HB_ARCHITECTURE%
+set HB_COMPILER=%OLD_HB_COMPILER%
+set HB_USER_LIBS=%OLD_HB_USER_LIBS%
+
 set OLDENVGT=
 set OLDENVC=
 set OLDENVMT=
 set BLDDEFAULT=
+set OLD_HB_ARCHITECTURE=
+set OLD_HB_COMPILER=
+set OLD_HB_USER_LIBS=
