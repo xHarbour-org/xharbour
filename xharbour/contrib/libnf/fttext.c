@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.7 2005/05/03 02:47:51 andijahja Exp $
+ * $Id: fttext.c,v 1.8 2005/05/16 21:45:39 andijahja Exp $
  */
 
 /*
@@ -59,6 +59,8 @@
 #include "hbvmpub.h"
 #include "hbpcode.h"
 #include "hbinit.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
 
 #define __PRG_SOURCE__ __FILE__
 #undef HB_PRG_PCODE_VER
@@ -339,7 +341,7 @@ HB_FUNC( FT_FSEEK )
       if( pResult )
       {
          nCurrent = hb_itemGetNL( pResult );
-         
+
          hb_retl( nCurrent > 0 );
 
          if( !nCurrent )
@@ -439,7 +441,7 @@ HB_FUNC ( FT_FARRAY )
 {
    if( pCurFile )
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), hb_parl(1) ? &(pCurFile->pOrigin) : &(pCurFile->pArray) );
+      hb_itemCopy( hb_stackReturnItem(), hb_parl(1) ? &(pCurFile->pOrigin) : &(pCurFile->pArray) );
    }
 }
 
