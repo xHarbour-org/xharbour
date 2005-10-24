@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: gdtest.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -26,6 +26,11 @@ PROCEDURE Main()
       ? "On Windows: SET GDFONTPATH=c:\windows\fonts"
       ? "On Linux  : export GDFONTPATH=/usr/share/fonts/default/TrueType"
       ?
+   ENDIF
+
+   // Check output directory
+   IF !ISDirectory( IMAGES_OUT )
+      DirMake( IMAGES_OUT )
    ENDIF
 
    ? gdVersion()
