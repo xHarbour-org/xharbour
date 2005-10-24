@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.217 2005/10/13 07:51:58 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.218 2005/10/24 01:23:15 ronpinkas Exp $
  */
 
 /*
@@ -4005,7 +4005,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
                }
 
                /* Modified by Giancarlo Niccolai 2003-06-20 */
-               if( **ptri == '"' && ( bEsc == FALSE || (*ptri)[-1] != '\\'  ))
+               if( **ptri == '"' && ( bEsc == FALSE || (*ptri)[-1] != '\\' || ( (*ptri)[-2] == '\\' && (*ptri)[-1] == '\\' ) ) )
                {
                   break;
                }
@@ -6405,7 +6405,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
      /* END */
      else
      {
-        if( ( *(szText+lPos) == '\'' || *(szText+lPos) == '`' ) && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+        if( ( *(szText+lPos) == '\'' || *(szText+lPos) == '`' ) && ( lPos == 0 || ( *(szText+lPos-1) != '\\' || ( *(szText+lPos-2) == '\\' && *(szText+lPos-1) == '\\' ) ) ) )
         {
            State = STATE_QUOTE1;
            lPos++;
@@ -6417,7 +6417,7 @@ static int md_strAt( char * szSub, int lSubLen, char * szText, BOOL checkword, B
            lPos+=2;
            continue;
         }
-        else if( *(szText+lPos) == '\"' && ( lPos == 0 || *(szText+lPos-1) != '\\' ) )
+        else if( *(szText+lPos) == '\"' && ( lPos == 0 || *(szText+lPos-1) != '\\' || ( *(szText+lPos-2) == '\\' && *(szText+lPos-1) == '\\' ) ) )
         {
            State = STATE_QUOTE2;
            lPos++;
@@ -7132,7 +7132,7 @@ static int NextName( char ** sSource, char * sDest )
     /** Added by Giancarlo Niccolai 2003-06-20 */
      else if( State == STATE_QUOTE4 )
      {
-        if( **sSource == '\"' && (*sSource)[-1] != '\\' )
+        if( **sSource == '\"' && (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) )
         {
            State = STATE_NORMAL;
         }
@@ -7359,7 +7359,7 @@ static int NextParm( char ** sSource, char * sDest )
      /** Added by Giancarlo Niccolai 2003-06-20 */
      else if( State == STATE_QUOTE4 )
      {
-        if( **sSource == '\"' && (*sSource)[-1] != '\\')
+        if( **sSource == '\"' && (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) )
         {
            State = STATE_NORMAL;
         }
@@ -7690,39 +7690,41 @@ int hb_pp_NextToken( char** pLine, char *sToken )
 
          goto Done;
       }
-   }
 
-   /* Added by Giancarlo Niccolai 2003-06-20 */
-   if( nLen > 1 && IS_ESC_STRING( sLine[0] ) )
-   {
-      pTmp = sLine + 2; // e" is long 2!
+      /* Added by Giancarlo Niccolai 2003-06-20 */
+      if( nLen >= 3 && IS_ESC_STRING( sLine[0] ) )
+      {
+         pTmp = sLine + 2; // e" is long 2!
 
-      while ( 1 ) {
-
-         pTmp = strchr( pTmp, '"' );
-
-         if( pTmp == NULL )
+         do
          {
-            sToken[0] = '"';
-            sToken[1] = '\0';
-            break;
-         }
-         else
-         {
-            if( pTmp[-1] != '\\' )
+
+            pTmp = strchr( pTmp, '"' );
+
+            if( pTmp == NULL )
             {
-               strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
-               sToken[( pTmp - sLine ) + 1] = '\0';
+               sToken[0] = '"';
+               sToken[1] = '\0';
                break;
             }
+            else
+            {
+               if( pTmp[-1] != '\\' || ( pTmp[-2] == '\\' && pTmp[-1] == '\\' ) )
+               {
+                  strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
+                  sToken[( pTmp - sLine ) + 1] = '\0';
+                  break;
+               }
 
-            pTmp++; // skip current "
+               pTmp++; // skip current "
+            }
          }
-      }
+         while( TRUE );
 
-      goto Done;
+         goto Done;
+      }
+      /* END - Added by Giancarlo Niccolai */
    }
-   /* END - Added by Giancarlo Niccolai */
 
    if( isalpha( ( BYTE ) sLine[0] ) || sLine[0] == '_' )
    {
@@ -7743,6 +7745,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    {
       sToken[0] = sLine[0];
       Counter = 1;
+
       while( isdigit( ( BYTE ) sLine[Counter] ) || sLine[Counter] == '\\' )
       {
          sToken[Counter] = sLine[Counter];
@@ -7756,6 +7759,7 @@ int hb_pp_NextToken( char** pLine, char *sToken )
          Counter++;
          sToken[Counter] = sLine[Counter];
          Counter++;
+
          while( isdigit( ( BYTE ) sLine[Counter] ) || sLine[Counter] == '\\' )
          {
             sToken[Counter] = sLine[Counter];
