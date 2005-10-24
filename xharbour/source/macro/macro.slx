@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.24 2005/06/01 02:09:27 ronpinkas Exp $
+ * $Id: macro.slx,v 1.25 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -277,35 +277,39 @@ SELF_CONTAINED_WORDS_ARE {
 /* Intermediate Words when ambigious. */
 #define QSELF       802
 
+#define HB_FIELD_ALIAS  LEX_CUSTOM_ACTION - 4
+
 /* Words. */
 LANGUAGE_WORDS_ARE {
-                     LEX_WORD( ".F."       ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
-                     LEX_WORD( ".N."       ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
-                     LEX_WORD( ".T."       ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
-                     LEX_WORD( ".Y."       ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
-                     LEX_WORD( "FIELD"     ) AS_TOKEN( FIELD       ),
-                     LEX_WORD( "HAS"       ) AS_TOKEN( HB_AFTER_EXP - MATCH      ),
-                     LEX_WORD( "IF"        ) AS_TOKEN( IIF         ),
-                     LEX_WORD( "IIF"       ) AS_TOKEN( IIF         ),
-                     LEX_WORD( "IN"        ) AS_TOKEN( HB_AFTER_EXP - '$'        ),
-                     LEX_WORD( "LIKE"      ) AS_TOKEN( HB_AFTER_EXP - LIKE       ),
-                     LEX_WORD( "NIL"       ) AS_TOKEN( NIL        + DONT_REDUCE  ),
-                     LEX_WORD( "QSELF"     ) AS_TOKEN( QSELF       ),
-                  /* LEX_WORD( "SELF"      ) AS_TOKEN( SELF        ), */
-                     LEX_WORD( "_FIELD"    ) AS_TOKEN( FIELD       )
+                     LEX_WORD( ".F."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
+                     LEX_WORD( ".N."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
+                     LEX_WORD( ".T."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
+                     LEX_WORD( ".Y."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
+                  /* LEX_WORD( "FIELD"        ) AS_TOKEN( FIELD       ), */
+                     LEX_WORD( "FIELD?WS?->"  ) AS_TOKEN( HB_FIELD_ALIAS     ),
+                     LEX_WORD( "HAS"          ) AS_TOKEN( HB_AFTER_EXP - MATCH      ),
+                     LEX_WORD( "IF"           ) AS_TOKEN( IIF         ),
+                     LEX_WORD( "IIF"          ) AS_TOKEN( IIF         ),
+                     LEX_WORD( "IN"           ) AS_TOKEN( HB_AFTER_EXP - '$'        ),
+                     LEX_WORD( "LIKE"         ) AS_TOKEN( HB_AFTER_EXP - LIKE       ),
+                     LEX_WORD( "NIL"          ) AS_TOKEN( NIL        + DONT_REDUCE  ),
+                     LEX_WORD( "QSELF"        ) AS_TOKEN( QSELF       ),
+                  /* LEX_WORD( "SELF"         ) AS_TOKEN( SELF        ), */
+                  /* LEX_WORD( "_FIELD"       ) AS_TOKEN( FIELD       ),  */
+                     LEX_WORD( "_FIELD?WS?->" ) AS_TOKEN( HB_FIELD_ALIAS     ),
                    };
 
 /* When reservered words are used as Identifier. */
-#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 4
+#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 5
 
-#define HB_ID_FIELD     LEX_CUSTOM_ACTION - 5
 #define HB_ID_QSELF     LEX_CUSTOM_ACTION - 6
 #define HB_ID_IIF       LEX_CUSTOM_ACTION - 7
 
+
 LANGUAGE_RULES_ARE {
 		    /* This _FIELD_ is NOT at BOL wants only ->. */
-                    IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
-                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_ID_FIELD       , 0             ),
+                 /* IF_SEQUENCE_IS( FIELD       , ALIASOP     , 0      , 0          ) PASS_THROUGH(),
+                    IF_SEQUENCE_IS( FIELD       , 0           , 0      , 0          ) REDUCE_TO( HB_ID_FIELD       , 0             ), */
 
                  /* IF_SEQUENCE_IS( SELF        , ':'         , 0      , 0          ) PASS_THROUGH(),
                     IF_SEQUENCE_IS( SELF        , 0           , 0      , 0          ) REDUCE_TO( HB_ID_SELF        , 0             ), */
@@ -543,9 +547,9 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          pYYLVAL->string = hb_strdup( sPair );
          return LITERAL + DONT_REDUCE ;
 
-      case HB_ID_FIELD :
-         pYYLVAL->string = hb_strdup( "FIELD" );
-         return IDENTIFIER + DONT_REDUCE;
+      case HB_FIELD_ALIAS :
+         aiHold[ (*ptr_iHold)++ ] = ALIASOP;
+         return FIELD;
 
       case HB_ID_QSELF :
          pYYLVAL->string = hb_strdup( "QSELF" );
