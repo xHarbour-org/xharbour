@@ -1,0 +1,73 @@
+/*
+ * $Id: ChangeLog,v 1.4493 2005/10/23 10:35:30 fsgiudice Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+2005-10-24 15:10 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  + contrib/gd
+
+    + /bgd.dll
+    + /Rules.make
+    + /Makefile
+    + /MAKE_B32.BAT
+    + /MAKEFILE.BC
+    + /README.txt
+    + /ChangeLog
+    + /doc/entities.html
+    + /doc/GD Graphics Library.url
+    + /doc/gd-license.txt
+    + /doc/gdlib.txt
+    + /doc/index.html
+    + /doc/libfreetype-license.txt
+    + /doc/libjpeg-license.txt
+    + /doc/libpng-license.txt
+    + /doc/win32-readme.txt
+    + /doc/zlib-license.txt
+    + /env/makeb32.env
+    + /env/makelib.b32
+    + /env/bccWin32.Mak
+    + /include/gd.h
+    + /include/gdcache.h
+    + /include/gdfontg.h
+    + /include/gdfontl.h
+    + /include/gdfontmb.h
+    + /include/gdfonts.h
+    + /include/gdfontt.h
+    + /include/gdfx.h
+    + /include/gdhelpers.h
+    + /include/gd_io.h
+    + /include/jisx0208.h
+    + /include/wbmp.h
+    + /include/gd.ch
+    + /source/gd.prg
+    + /source/gdchart.prg
+    + /source/Makefile
+    + /source/gdwrp.c
+    + /source/gdimage.prg
+    + /tests/images_in
+    + /tests/images_out
+    + /tests/Makefile
+    + /tests/Makefile.linux
+    + /tests/Makefile.mingw32
+    + /tests/setfont.bat
+    + /tests/bldtest.bat
+    + /tests/test_out.prg
+    + /tests/gdtest.prg
+    + /tests/gdtestcls.prg
+    + /tests/images_in/xharbour.jpg
+    + /tests/images_in/italia.gif
+    + /tests/images_in/fsg.jpg
+    + /tests/images_out/
+
+    + first upload
+
+ /*
+    Please look at README.txt
+ */
+

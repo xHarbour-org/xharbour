@@ -1,0 +1,47 @@
+#
+# File:		makelib.b32
+# Author:	Julian Smart
+# Created:	1999
+# Updated:
+# Copyright:
+#
+# Include file for libraries. Set LIBTARGET and OBJECTS
+# before including this file.
+
+# WXWIN and BCCDIR are set by parent make
+
+!include $(APP_DIR)\env\makeb32.env
+
+lib: $(APPLIB)
+
+#$(APPDLL)
+
+$(APPLIB): $(APPOBJ)
+   -@if exist $(APPLIB) erase $(APPLIB)
+   $(lib) "$(APPLIB)" /P512 @&&!
++$(**: = &^
++)
+
+!
+
+$(APPDLL): $(APPOBJ)
+   -@if exist $(APPDLL) erase $(APPDLL)
+   rem impdef lib\harbour.def $(HBR_DIR)\lib\harbour.dll
+   rem implib lib\harbour.lib $(HBR_DIR)\lib\harbour.dll
+   $(link)  -aa -Tpd -Gn @&&!
+$** c0d32w.obj
+$(APPDLL)
+
+lib\libbgd.lib $(HBR_DIR)\lib\harbour.lib $(HBR_DIR)\lib\hbct.lib cw32.lib import32.lib uuid.lib
+
+!
+
+clean:
+        -@if exist obj\*.obj erase obj\*.obj >nul
+        -@if exist obj\*.exe erase obj\*.exe >nul
+        -@if exist obj\*.res erase obj\*.res >nul
+        -@if exist obj\*.map erase obj\*.map >nul
+        -@if exist obj\*.rws erase obj\*.rws >nul
+        -@if exist $(APPLIB) erase $(APPLIB) >nul
+
+

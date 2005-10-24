@@ -1,0 +1,12 @@
+##################################
+# $Id: Makefile.linux,v 1.3 2004/01/30 18:34:12 lculik Exp $
+#
+# Makefile for TGD Test program
+#
+
+
+PRGFLAGS=-I../include
+LIBS=-L../lib -lgdlib -L/usr/lib -lgd -lpng -lz -ljpeg -lfreetype -lm -lct
+
+TARGETS=gdtest gdtestcls
+include ../Rules.make
