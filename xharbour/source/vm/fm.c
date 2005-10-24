@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.71 2005/10/07 01:43:31 druzus Exp $
+ * $Id: fm.c,v 1.72 2005/10/18 12:14:59 druzus Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 #define HB_OS_WIN_32_USED
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbdate.h"
 #include "hbver.h"
@@ -1090,7 +1091,7 @@ ULONG hb_xquery( USHORT uiMode )
 
 HB_FUNC( MEMORY )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retnl( hb_xquery( hb_parni( 1 ) ) );
 }
 

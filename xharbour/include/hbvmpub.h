@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.39 2005/10/04 02:05:32 druzus Exp $
+ * $Id: hbvmpub.h,v 1.40 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -196,11 +196,11 @@
 
    struct hb_struSymbol
    {
-      LONG stackbase;
-      USHORT lineno;
-      USHORT paramcnt;
-      PHB_SYMB value;
-      UINT uiSuperClass;
+      LONG        stackbase;
+      USHORT      lineno;
+      USHORT      paramcnt;
+      PHB_SYMB    value;
+      UINT        uiSuperClass;
    };
 
    /* items hold at the virtual machine stack */
@@ -269,12 +269,12 @@
    /* internal structure for codeblocks */
    typedef struct _HB_CODEBLOCK
    {
-      char* procname;
+      char *     procname;
       USHORT     lineno;
-      BYTE       *pCode;       /* codeblock pcode */
-      PHB_ITEM   pLocals;      /* table with referenced local variables */
       USHORT     uiLocals;     /* number of referenced local variables */
+      PHB_ITEM   pLocals;      /* table with referenced local variables */
       PHB_SYMB   pSymbols;     /* codeblocks symbols */
+      BYTE       *pCode;       /* codeblock pcode */
       HB_COUNTER ulCounter;    /* numer of references to this codeblock */
       BOOL       dynBuffer;    /* is pcode buffer allocated dynamically */
       PHB_ITEM   **pGlobals;

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.17 2005/09/23 21:55:06 likewolf Exp $
+ * $Id: debug.c,v 1.18 2005/09/27 05:24:55 paultucker Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapiitm.h"

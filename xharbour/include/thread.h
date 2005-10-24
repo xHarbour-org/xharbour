@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.109 2005/10/18 00:56:29 ronpinkas Exp $
+* $Id: thread.h,v 1.110 2005/10/18 12:14:32 druzus Exp $
 */
 
 /*
@@ -676,7 +676,7 @@ typedef struct tag_HB_SHARED_RESOURCE
    /* Use standard hb_threadGetCurrentStack(), that can be macroed into a
       TLS function, like TlsGetValue() or pthread_getspecific, i.e. */
 
-   #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
+   #if defined( HB_THREAD_OPTIMIZE_STACK ) && defined( HB_STACK_MACROS )
       #define HB_VM_STACK (*_pStack_)
       #define HB_THREAD_STUB\
          HB_STACK *_pStack_ = hb_threadGetCurrentStack();
@@ -689,7 +689,7 @@ typedef struct tag_HB_SHARED_RESOURCE
 
    /* Use __thread keyword where available */
    #if __GNUC__ >= 3 && defined( HB_THREAD_TLS_BUG )
-      #if defined( HB_THREAD_OPTIMIZE_STACK ) && ! defined( HB_NO_DEFAULT_STACK_MACROS )
+      #if defined( HB_THREAD_OPTIMIZE_STACK ) && defined( HB_STACK_MACROS )
          #define HB_THREAD_STUB\
             HB_STACK *_pStack_ = ( ((unsigned long)&hb_thread_stack) & 0xf0000000) == 0xf0000000 ? &hb_stackMT : hb_thread_stack;
          #define HB_VM_STACK (*_pStack_)
@@ -863,6 +863,24 @@ void hb_threadCancelInternal( void );
    #define hb_dynsymLock()
    #define hb_dynsymUnlock()
 
+#endif
+
+#ifdef HB_API_MACROS
+#  define HB_THREAD_STUB_API        HB_THREAD_STUB
+#else
+#  define HB_THREAD_STUB_API
+#endif
+
+#ifdef HB_STACK_MACROS
+#  define HB_THREAD_STUB_STACK      HB_THREAD_STUB
+#else
+#  define HB_THREAD_STUB_STACK
+#endif
+
+#if defined( HB_STACK_MACROS ) || defined( HB_API_MACROS )
+#  define HB_THREAD_STUB_ANY        HB_THREAD_STUB
+#else
+#  define HB_THREAD_STUB_ANY
 #endif
 
 #endif

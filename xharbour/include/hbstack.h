@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.32 2005/10/18 00:56:29 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.33 2005/10/18 12:14:32 druzus Exp $
  */
 
 /*
@@ -103,20 +103,7 @@ extern HB_STACK * hb_stack_ptr;
 extern HB_STACK hb_stackMT;
 #endif
 
-extern BOOL hb_stack_ready;
-
-HB_EXPORT HB_STACK *hb_GetStack( void );
-
-#if defined( HB_NO_DEFAULT_API_MACROS ) && !defined( HB_NO_DEFAULT_STACK_MACROS )
-  #define HB_NO_DEFAULT_STACK_MACROS
-#endif
-
-#ifndef HB_NO_DEFAULT_STACK_MACROS
-  #ifndef HB_STACK_MACROS
-    #define HB_STACK_MACROS
-  #endif
-#endif
-
+extern BOOL HB_EXPORT hb_stack_ready;
 
 typedef struct
 {
@@ -134,6 +121,7 @@ typedef struct
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
+   #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
 
    #define hb_stackDec( )              do \
                                        { \
@@ -189,6 +177,7 @@ typedef struct
    extern HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void );
    extern HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos );
    extern HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void );
+   extern char *      HB_EXPORT hb_stackDateBuffer( void );
 
    extern void        HB_EXPORT hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern void        HB_EXPORT hb_stackPop( void );        /* pops an item from the stack */

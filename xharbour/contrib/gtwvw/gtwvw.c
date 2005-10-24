@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.25 2005/10/18 02:53:56 bdj Exp $
+ * $Id: gtwvw.c,v 1.26 2005/10/19 10:58:45 bdj Exp $
  */
 
 /*
@@ -97,7 +97,6 @@
     #define _WIN32_IE 0x0400
 #endif
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbgtwvw.h"
 
 #include <windows.h>

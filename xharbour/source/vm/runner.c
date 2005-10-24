@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.41 2005/09/11 19:41:11 druzus Exp $
+ * $Id: runner.c,v 1.42 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -60,6 +60,7 @@
  *  __HRBDOFU()
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbapiitm.h"

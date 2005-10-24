@@ -1,5 +1,5 @@
 /*
- * $Id: philes.c,v 1.29 2005/05/19 02:20:18 druzus Exp $
+ * $Id: philes.c,v 1.30 2005/09/11 19:41:01 druzus Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #endif
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapifs.h"
 #include "hbapierr.h"

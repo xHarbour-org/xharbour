@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.47 2005/05/25 13:18:01 druzus Exp $
+ * $Id: errorsys.prg,v 1.48 2005/07/10 03:40:14 lculik Exp $
  */
 
 /*
@@ -550,11 +550,11 @@ LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
          hb_vmPushLong( 8 );
          hb_vmDo( 2 );
 
-         if( HB_VM_STACK.Return.type == HB_IT_OBJECT )
+         if( hb_stackReturnItem()->type == HB_IT_OBJECT )
          {
             HB_ITEM Buffer, Adopt;
 
-            hb_itemForwardValue( &Exception, &HB_VM_STACK.Return );
+            hb_itemForwardValue( &Exception, hb_stackReturnItem() );
 
             Buffer.type = HB_IT_STRING;
             Buffer.item.asString.value = (char *) ExceptionInfo;
@@ -576,7 +576,7 @@ LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
       //TraceLog( NULL, "Done\n" );
    }
 
-   return hb_itemGetNL( &HB_VM_STACK.Return );
+   return hb_itemGetNL( hb_stackReturnItem() );
 }
 
 HB_FUNC( SETERRORMODE )

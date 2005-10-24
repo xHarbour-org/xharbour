@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: throw.c,v 1.1 2005/10/13 22:22:58 druzus Exp $
  */
 
 /*
@@ -33,6 +33,7 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 
 HB_FUNC( THROW )

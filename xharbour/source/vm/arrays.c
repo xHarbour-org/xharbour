@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.122 2005/09/27 02:25:40 ronpinkas Exp $
+ * $Id: arrays.c,v 1.123 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -68,6 +68,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapiitm.h"
@@ -490,22 +491,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
 #ifdef HB_UNSHARE_REFERENCES
-      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
-
-      if( pElement->type == HB_IT_STRING && ( pElement->item.asString.bStatic || *( pElement->item.asString.pulHolders ) > 1 ) )
-      {
-         char *sString = (char*) hb_xgrab( pElement->item.asString.length + 1 );
-
-         memcpy( sString, pElement->item.asString.value, pElement->item.asString.length + 1 );
-
-         // Does NOT clear ->type.
-         hb_itemReleaseString( pElement );
-
-         pElement->item.asString.value = sString;
-         pElement->item.asString.bStatic = FALSE;
-         pElement->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( pElement->item.asString.pulHolders ) = 1;
-      }
+      hb_itemUnShare( pArray->item.asArray.value->pItems + ( ulIndex - 1 ) );
 #endif
 
       pItem->type = HB_IT_BYREF;

@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.5 2004/12/15 13:39:35 druzus Exp $
+ * $Id: utils.c,v 1.6 2005/01/09 06:08:26 likewolf Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbdate.h"
 #include "hbapifs.h"
 #include "hbapierr.h"

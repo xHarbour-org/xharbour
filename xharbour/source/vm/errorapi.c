@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.64 2005/09/22 01:12:00 druzus Exp $
+ * $Id: errorapi.c,v 1.65 2005/10/13 22:22:58 druzus Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbfast.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: break.c,v 1.2 2002/12/08 20:10:50 ronpinkas Exp $
+ * $Id: break.c,v 1.3 2003/03/08 22:59:13 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbvm.h"
 

@@ -1,5 +1,5 @@
 /*
- * $Id: sxcrypt.c,v 1.1 2005/09/15 12:55:35 druzus Exp $
+ * $Id: sxcrypt.c,v 1.2 2005/10/18 12:14:33 druzus Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
  *
  */
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbsxfunc.h"
 
 #define rnd_mul1  0x0de6d

@@ -58,6 +58,7 @@
 
 #define HB_OS_WIN_32_USED
 #include "hbapi.h"
+#include "hbapiitm.h"
 
 BOOL hb_GetDefaultPrinter(LPTSTR pPrinterName, LPDWORD pdwBufferSize);
 BOOL hb_GetPrinterNameByPort(LPTSTR pPrinterName, LPDWORD pdwBufferSize,LPTSTR pPortName, BOOL bSubStr);

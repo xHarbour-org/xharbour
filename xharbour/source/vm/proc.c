@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.26 2005/09/27 02:26:11 ronpinkas Exp $
+ * $Id: proc.c,v 1.27 2005/10/13 07:51:58 ronpinkas Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "classes.h"

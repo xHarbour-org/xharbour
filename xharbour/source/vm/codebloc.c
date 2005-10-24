@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.50 2005/09/22 23:02:26 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.51 2005/09/27 02:26:06 ronpinkas Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 /* The Harbour implementation of codeblocks */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbvm.h"

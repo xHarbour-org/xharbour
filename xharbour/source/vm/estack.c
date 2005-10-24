@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.78 2005/10/18 12:14:33 druzus Exp $
+ * $Id: estack.c,v 1.79 2005/10/18 20:02:10 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 #define HB_OS_WIN_32_USED
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbdefs.h"
 #include "hbstack.h"
@@ -73,7 +74,7 @@ HB_STACK hb_stackST;
 HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
 
-BOOL hb_stack_ready;
+BOOL HB_EXPORT hb_stack_ready = FALSE;
 
 /* ------------------------------- */
 
@@ -420,7 +421,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
 #undef hb_stackTopItem
 HB_ITEM_PTR HB_EXPORT hb_stackTopItem( void )
 {
-    return *HB_VM_STACK.pPos;
+    return * HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem
@@ -445,6 +446,13 @@ HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void )
    return &( HB_VM_STACK.Return );
 }
 
+#undef hb_stackDateBuffer
+char * HB_EXPORT hb_stackDateBuffer( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackDateBuffer()"));
+
+   return HB_VM_STACK.szDate;
+}
 
 /* NOTE: DEBUG function */
 void hb_stackDispLocal( void )

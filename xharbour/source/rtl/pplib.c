@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.9 2005/01/02 03:31:13 guerra000 Exp $
+ * $Id: pplib.c,v 1.10 2005/02/28 11:56:28 andijahja Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #include "hbpp.h"
 #include "hbcomp.h"
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapierr.h"
 
 #ifdef HB_EXTENSION

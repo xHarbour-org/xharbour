@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.9 2004/04/08 13:26:53 druzus Exp $
+ * $Id: trim.c,v 1.10 2004/04/14 10:32:13 druzus Exp $
  */
 
 /*
@@ -53,56 +53,6 @@
 #include "hbapiitm.h"
 #include "hbapierr.h"
 
-extern char *hb_vm_sNull;
-extern char *hb_vm_acAscii[256];
-
-/* Memo type is handled here */
-static PHB_ITEM hb_itemPutCLM( PHB_ITEM pItem, char * szText, ULONG ulLen, BOOL bIsMemo )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLM(%p, %s, %lu)", pItem, szText, ulLen));
-
-#if 0
-   if( pItem )
-   {
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
-#endif
-
-   pItem->type = bIsMemo ? HB_IT_MEMO : HB_IT_STRING ;
-
-   if( szText == NULL || ulLen == 0 )
-   {
-      pItem->item.asString.length  = 0;
-      pItem->item.asString.value   = hb_vm_sNull;
-      pItem->item.asString.bStatic = TRUE;
-   }
-   else if( ulLen == 1 )
-   {
-      pItem->item.asString.length  = 1;
-      pItem->item.asString.value   = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
-      pItem->item.asString.bStatic = TRUE;
-   }
-   else
-   {
-      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( pItem->item.asString.pulHolders ) = 1;
-      pItem->item.asString.bStatic         = FALSE;
-      pItem->item.asString.length          = ulLen;
-      pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
-      hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
-      pItem->item.asString.value[ ulLen ]  = '\0';
-   }
-
-   return pItem;
-}
-
 /* trims from the left, and returns a new pointer to szText */
 /* also returns the new length in lLen */
 HB_EXPORT char * hb_strLTrim( const char * szText, ULONG * ulLen )
@@ -145,13 +95,20 @@ HB_FUNC( LTRIM )
 
    if( pText )
    {
-      ULONG ulLen = pText->item.asString.length;
-      char * szText = hb_strLTrim( pText->item.asString.value, &ulLen );
+      ULONG ulLen, ulSrc;
+      char * szText;
 
-      hb_itemPutCLM( &(HB_VM_STACK).Return,
-                     szText,
-                     ulLen,
-                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
+      ulLen = ulSrc = pText->item.asString.length;
+      szText = hb_strLTrim( pText->item.asString.value, &ulLen );
+
+      if( ulLen == ulSrc )
+      {
+         hb_itemReturn( pText );
+      }
+      else
+      {
+         hb_retclen( szText, ulLen );
+      }
    }
    else
    {
@@ -169,16 +126,24 @@ HB_FUNC( RTRIM )
 
    if( pText )
    {
+      ULONG ulLen, ulSrc;
+      char * szText = pText->item.asString.value;
+
+      ulSrc = pText->item.asString.length;
 #ifdef HB_EXTENSION
-      hb_itemPutCLM( &(HB_VM_STACK).Return,
-                     pText->item.asString.value,
-                     hb_strRTrimLen( pText->item.asString.value, pText->item.asString.length, ISLOG( 2 ) ? hb_parl( 2 ) : FALSE ),
-                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
+      ulLen = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
 #else
-      hb_itemPutCLM( &(HB_VM_STACK).Return,
-                     pText->item.asString.value,
-                     hb_strRTrimLen( pText->item.asString.value,pText->item.asString.length, FALSE ), hb_param(1,HB_IT_MEMOFLAG) != NULL );
+      ulLen = hb_strRTrimLen( szText, ulSrc, FALSE );
 #endif
+
+      if( ulLen == ulSrc )
+      {
+         hb_itemReturn( pText );
+      }
+      else
+      {
+         hb_retclen( szText, ulLen );
+      }
    }
    else
       /* NOTE: "TRIM" is right here [vszakats] */
@@ -201,16 +166,25 @@ HB_FUNC( ALLTRIM )
 
    if( pText )
    {
-      char * pszText;
-      ULONG ulLen = hb_strRTrimLen( pText->item.asString.value, pText->item.asString.length,
-         ISLOG( 2 ) ? hb_parl( 2 ) : FALSE );
+      ULONG ulLen, ulSrc;
+      char * szText = pText->item.asString.value;
 
-      pszText = hb_strLTrim( pText->item.asString.value, &ulLen );
+      ulSrc = pText->item.asString.length;
+#ifdef HB_EXTENSION
+      ulLen = hb_strRTrimLen( szText, ulSrc, ISLOG( 2 ) && hb_parl( 2 ) );
+#else
+      ulLen = hb_strRTrimLen( szText, ulSrc, FALSE );
+#endif
+      szText = hb_strLTrim( szText, &ulLen );
 
-      hb_itemPutCLM( &(HB_VM_STACK).Return,
-                     pszText,
-                     ulLen,
-                     hb_param(1,HB_IT_MEMOFLAG) != NULL );
+      if( ulLen == ulSrc )
+      {
+         hb_itemReturn( pText );
+      }
+      else
+      {
+         hb_retclen( szText, ulLen );
+      }
    }
    else
 #ifdef HB_COMPAT_C53

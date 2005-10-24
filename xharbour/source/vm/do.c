@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.3 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: do.c,v 1.4 2005/05/24 21:05:56 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"

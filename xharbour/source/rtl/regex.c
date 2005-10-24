@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.51 2005/09/02 18:30:41 druzus Exp $
+ * $Id: regex.c,v 1.52 2005/09/11 21:35:29 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbdefs.h"
 #include "hbstack.h"
 #include "hbapi.h"
@@ -198,8 +199,6 @@ extern HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOO
  */
 BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 {
-   HB_THREAD_STUB
-
    #ifndef REGEX_MAX_GROUPS
       #define REGEX_MAX_GROUPS 16
    #endif
@@ -212,6 +211,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
    PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
+   PHB_ITEM pRetArray;
    BOOL fFree = FALSE;
 
    if( pRegEx == NULL )
@@ -266,17 +266,19 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             iMatches++;
-            hb_arrayNew( &(HB_VM_STACK.Return), iMatches );
+            pRetArray = hb_itemArrayNew( iMatches );
 
             for ( i = 0; i < iMatches; i++ )
             {
                if (aMatches[i].rm_eo > -1 )
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_itemPutCL( hb_arrayGetItemPtr( pRetArray, i + 1 ),
+                                pString->item.asString.value + aMatches[i].rm_so,
+                                aMatches[i].rm_eo - aMatches[i].rm_so );
                }
                else
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr(&(HB_VM_STACK.Return), i + 1 ), "",0 );
+                  hb_itemPutCL( hb_arrayGetItemPtr( pRetArray, i + 1 ), "", 0 );
                }
             }
 
@@ -284,6 +286,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                hb_freeregex( pReg );
             }
+            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
 
             return TRUE;
          }
@@ -313,14 +316,13 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             int iMax = hb_parni( 5 );
             int iCount = 1;
 
-            hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+            pRetArray = hb_itemArrayNew( 0 );
 
             Match.type = HB_IT_NIL;
-
             do
             {
                hb_itemPutCL( &Match, str, aMatches[0].rm_so );
-               hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
+               hb_arrayAddForward( pRetArray, &Match );
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
@@ -329,15 +331,16 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
             hb_itemPutCL( &Match, str, strlen( str ) );
-            hb_arrayAddForward( &(HB_VM_STACK.Return), &Match );
-         }
+            hb_arrayAddForward( pRetArray, &Match );
+   
+            if( fFree )
+            {
+               hb_freeregex( pReg );
+            }
+            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
 
-         if( fFree )
-         {
-            hb_freeregex( pReg );
+            return TRUE;
          }
-
-         return TRUE;
 
          case 4: // Wants Results AND positions
          {
@@ -353,7 +356,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             iMatches++;
-            hb_arrayNew( &(HB_VM_STACK.Return), iMatches );
+            pRetArray = hb_itemArrayNew( iMatches );
 
             for ( i = 0; i < iMatches; i++ )
             {
@@ -379,15 +382,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
                }
 
-               hb_itemArrayPut( &(HB_VM_STACK.Return), i + 1, &aSingleMatch );
+               hb_itemArrayPut( pRetArray, i + 1, &aSingleMatch );
             }
 
             if ( fFree )
                hb_freeregex( pReg );
+            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
             return TRUE;
-
          }
-
       }
    }
 
@@ -400,8 +403,9 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    if( cRequest == 3 )
    {
-      hb_arrayNew( &(HB_VM_STACK.Return), 0 );
-      hb_arrayAdd( &(HB_VM_STACK.Return), pString );
+      pRetArray = hb_itemArrayNew( 1 );
+      hb_arraySet( pRetArray, 1, pString );
+      hb_itemRelease( hb_itemReturnForward( pRetArray ) );
       return TRUE;
    }
 
@@ -471,9 +475,7 @@ HB_EXPORT int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
 
 HB_FUNC( HB_ATX )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    #define REGEX_MAX_GROUPS 16
    regex_t *pReg ;
    regmatch_t aMatches[REGEX_MAX_GROUPS];
@@ -540,9 +542,7 @@ HB_FUNC( HB_ATX )
 
 HB_FUNC( WILD2REGEX )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    char sRegEx[ _POSIX_PATH_MAX ];
    int iLen = Wild2RegEx( hb_parcx( 1 ), sRegEx, hb_parl( 2 ) );
 
@@ -564,9 +564,7 @@ HB_FUNC( HB_REGEXATX )
 // Returns just .T. if match found or .F. otherwise.
 HB_FUNC( HB_REGEXMATCH )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retl ( hb_regex( hb_parl(3) ? 1 : 2, NULL, NULL ) );
 }
 
@@ -578,9 +576,7 @@ HB_FUNC( HB_REGEXSPLIT )
 
 HB_FUNC( HB_REGEXCOMP )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
 
    regex_t re;
    char *cRegex;
@@ -628,9 +624,7 @@ HB_FUNC( HB_REGEXCOMP )
 
 HB_FUNC( HB_ISREGEXSTRING )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    hb_retl( pRegEx && hb_isregexstring( pRegEx ) );
 }

@@ -72,10 +72,6 @@ Procedure Main()
 Return
 
 #pragma BEGINDUMP
-
-  #define HB_NO_DEFAULT_API_MACROS
-  #define HB_NO_DEFAULT_STACK_MACROS
-
   #include "hbapi.h"
 
   #pragma pack(1)

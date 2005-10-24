@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.25 2005/09/11 19:41:11 druzus Exp $
+ * $Id: dynsym.c,v 1.26 2005/10/14 22:53:34 ronpinkas Exp $
  */
 
 /*
@@ -53,7 +53,10 @@
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
 #include "thread.h"
 
 //JC1: the search of an intem could depend on the current thread stack
@@ -245,7 +248,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
 HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol if not found */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
 
@@ -292,11 +295,12 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
 
    if( ! pDynSym )       /* Does it exists ? */
    {
+      PHB_ITEM pBase = hb_stackBaseItem();
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      if( HB_IS_SYMBOL(* HB_VM_STACK.pBase ) && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
       {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
+         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
       else
       {
@@ -311,7 +315,7 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
 
 PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a symbol if not found CASE SENSITIVE! */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
@@ -325,10 +329,12 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
 
    if( ! pDynSym )       /* Does it exists ? */
    {
+      PHB_ITEM pBase = hb_stackBaseItem();
+
       //TraceLog( NULL, "Creating: %s\n", szName );
-      if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
       {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
+         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
       else
       {
@@ -739,18 +745,13 @@ HB_EXPORT USHORT *hb_dynsymCount( void )
 
 HB_FUNC( __DYNSCOUNT ) /* How much symbols do we have: dsCount = __dynsymCount() */
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retnl( ( LONG ) s_uiDynSymbols );
 }
 
 HB_FUNC( __DYNSGETNAME ) /* Get name of symbol: cSymbol = __dynsymGetName( dsIndex ) */
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
-
+   HB_THREAD_STUB_API
    LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_dynsymLock();
@@ -793,9 +794,7 @@ HB_FUNC( __DYNSGETINDEX ) /* Gimme index number of symbol: dsIndex = __dynsymGet
 HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure pointer,
                           given its symbol index */
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    LONG lIndex = hb_parnl( 1 ); /* NOTE: This will return zero if the parameter is not numeric */
 
    hb_dynsymLock();
@@ -816,9 +815,7 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
                                      called and consumed times { nTimes, nTime }
                                      , given the dynamic symbol index */
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    /* NOTE: This will return zero if the parameter is not numeric */
    LONG lIndex = hb_parnl( 1 );
 

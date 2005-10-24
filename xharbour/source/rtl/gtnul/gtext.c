@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.5 2004/05/25 20:27:23 druzus Exp $
+ * $Id: gtext.c,v 1.6 2005/10/18 12:14:33 druzus Exp $
  */
 
 /*
@@ -56,7 +56,6 @@
 /* *********************************************************************** */
 
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbapigt.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"

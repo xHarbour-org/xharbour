@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.c,v 1.1 2005/01/14 19:22:17 ptsarenko Exp $
+ * $Id: datetime.c,v 1.2 2005/05/24 21:19:38 lculik Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbdate.h"
 
 HB_FUNC( BOM )

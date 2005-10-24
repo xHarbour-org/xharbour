@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.57 2005/06/13 02:02:49 peterrees Exp $
+ * $Id: console.c,v 1.58 2005/10/02 12:35:11 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -239,7 +239,7 @@ char HB_EXPORT * hb_conNewLine( void )
 /****************************************************************************/
 HB_FUNC( HB_OSNEWLINE )
 {
-   HB_THREAD_STUB;
+   HB_THREAD_STUB_API;
    hb_retc( s_szCrLf );
 }
 
@@ -398,7 +398,7 @@ static void hb_conOut( USHORT uiParam, hb_out_func_typedef * pOutFunc )
 /****************************************************************************/
 HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iPCount = hb_pcount(), iParam;
 
@@ -417,7 +417,7 @@ HB_FUNC( OUTSTD ) /* writes a list of values to the standard output device */
 /****************************************************************************/
 HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iPCount = hb_pcount(), iParam;
 
@@ -436,7 +436,7 @@ HB_FUNC( OUTERR ) /* writes a list of values to the standard error device */
 /****************************************************************************/
 HB_FUNC( QQOUT ) /* writes a list of values to the current device (screen or printer) and is affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iPCount = hb_pcount(), iParam;
 
@@ -465,7 +465,8 @@ HB_FUNC( QOUT )
 
    HB_CONSOLE_SAFE_LOCK
 
-   if( (hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )) {
+   if( hb_set.HB_SET_PRINTER && hb_set.hb_set_printhan != FS_ERROR )
+   {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
       USHORT uiCount;
 
@@ -508,14 +509,14 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
 /****************************************************************************/
 HB_FUNC( PROW ) /* Returns the current printer row position */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retnl( ( long ) s_uiPRow );
 }
 
 /****************************************************************************/
 HB_FUNC( PCOL ) /* Returns the current printer row position */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retnl( ( long ) s_uiPCol );
 }
 
@@ -595,7 +596,7 @@ HB_FUNC( SETPRC ) /* Sets the current printer row and column positions */
 /****************************************************************************/
 HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or printer), but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    HB_CONSOLE_SAFE_LOCK
 
@@ -626,7 +627,7 @@ HB_FUNC( DEVOUT ) /* writes a single value to the current device (screen or prin
 /****************************************************************************/
 HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    char * pszString = NULL;
    ULONG ulLen;
@@ -670,7 +671,7 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    BOOL bSetPos = ISLOG( 5 ) ? hb_parl( 5 ) : s_DispOutAtSetPos ;
    char * pszString = NULL;
    ULONG ulLen;
@@ -710,12 +711,12 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
 
 HB_FUNC( DISPOUTATSETPOS )
 {
-   HB_THREAD_STUB
-    hb_retl( s_DispOutAtSetPos ) ;
-    if ( ISLOG( 1 ) )
-    {
-       s_DispOutAtSetPos = hb_parl( 1 ) ;
-    }
+   HB_THREAD_STUB_API
+   hb_retl( s_DispOutAtSetPos ) ;
+   if ( ISLOG( 1 ) )
+   {
+      s_DispOutAtSetPos = hb_parl( 1 ) ;
+   }
 }
 
 /****************************************************************************/

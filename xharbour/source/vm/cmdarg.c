@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.16 2005/03/06 00:53:04 andijahja Exp $
+ * $Id: cmdarg.c,v 1.17 2005/03/09 07:16:28 andijahja Exp $
  */
 
 /*
@@ -50,7 +50,9 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbmemory.ch"
 

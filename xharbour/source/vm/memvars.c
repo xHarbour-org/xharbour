@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.109 2005/09/11 19:41:11 druzus Exp $
+ * $Id: memvars.c,v 1.110 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -77,6 +77,7 @@
 
 #include <ctype.h> /* for toupper() function */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapiitm.h"
@@ -871,23 +872,7 @@ void hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb )
          }
 
 #ifdef HB_UNSHARE_REFERENCES
-         if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
-         {
-            char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
-
-            memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
-
-            if( pReference->item.asString.bStatic == FALSE )
-            {
-                // Not changinh ->type
-                hb_itemReleaseString( pReference );
-            }
-
-            pReference->item.asString.value = sString;
-            pReference->item.asString.bStatic = FALSE;
-            pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-            *( pReference->item.asString.pulHolders ) = 1;
-         }
+         hb_itemUnShare( pReference );
 #endif
          //TraceLog( NULL, "Ref to %s (%i) type: %i counter: %i\n", pMemvarSymb->szName, pDyn->hMemvar, pReference->type, s_globalTable[ pDyn->hMemvar ].counter );
 
@@ -1496,7 +1481,7 @@ static HB_DYNS_PTR hb_memvarFindSymbol( HB_ITEM_PTR pName )
 
 HB_FUNC( __MVPUBLIC )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iCount = hb_pcount();
 
@@ -1541,7 +1526,7 @@ HB_FUNC( __MVPUBLIC )
 
 HB_FUNC( __MVPRIVATE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iCount = hb_pcount();
 
@@ -1586,7 +1571,7 @@ HB_FUNC( __MVPRIVATE )
 
 HB_FUNC( __MVXRELEASE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iCount = hb_pcount();
 
@@ -1631,7 +1616,7 @@ HB_FUNC( __MVXRELEASE )
 
 HB_FUNC( __MVRELEASE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    // Arbitary value which should be big enough.
    char szRegEx[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN ];
@@ -1669,7 +1654,7 @@ HB_FUNC( __MVRELEASE )
 
 HB_FUNC( __MVSCOPE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    int iMemvar = HB_MV_ERROR;
 
@@ -1693,7 +1678,7 @@ HB_FUNC( __MVCLEAR )
 
 HB_FUNC( __MVDBGINFO )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    int iCount = hb_pcount();
 
@@ -1724,7 +1709,7 @@ HB_FUNC( __MVDBGINFO )
              */
          }
 
-         hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+         hb_itemCopy( hb_stackReturnItem(), pValue );
          /* pValue points directly to the item structure used by this variable
           * this item cannot be released
           */
@@ -1747,7 +1732,7 @@ HB_FUNC( __MVDBGINFO )
 
 HB_FUNC( __MVEXIST )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
    PHB_DYNS pDyn = NULL;
@@ -1757,7 +1742,7 @@ HB_FUNC( __MVEXIST )
 
 HB_FUNC( __MVGET )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_ITEM_PTR pName = hb_param( 1, HB_IT_STRING );
 
@@ -1803,7 +1788,7 @@ HB_FUNC( __MVGET )
                {
                   PHB_SYMB pSymbol = pDynVar->pSymbol;
 
-                  hb_memvarGetValue( &( HB_VM_STACK.Return ), pSymbol );
+                  hb_memvarGetValue( hb_stackReturnItem(), pSymbol );
 
                   uiAction = E_DEFAULT;
                }
@@ -1872,7 +1857,7 @@ HB_FUNC( __MVPUT )
          hb_memvarCreateFromDynSymbol( pDyn, VS_PRIVATE, pValue );
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+      hb_itemForwardValue( hb_stackReturnItem(), pValue );
    }
    else
    {
@@ -1890,7 +1875,7 @@ HB_FUNC( __MVPUT )
          hb_itemRelease( pRetValue );
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+      hb_itemForwardValue( hb_stackReturnItem(), pValue );
    }
 }
 
@@ -2023,7 +2008,7 @@ static HB_DYNS_FUNC( hb_memvarSave )
 
 HB_FUNC( __MVSAVE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    /* Clipper also checks for the number of arguments here */
    if( hb_pcount() >= 3 && ISCHAR( 1 ) && ISCHAR( 2 ) && ISLOG( 3 ) )
@@ -2381,10 +2366,10 @@ void hb_memvarsIsMemvarRef( void )
 
 HB_HANDLE hb_memvarGetVarHandle( char *szName )
 {
-   HB_THREAD_STUB
    PHB_DYNS pDyn;
 
    #ifdef HB_THREAD_SUPPORT
+      HB_THREAD_STUB
       char szNewName[270];
 
       sprintf( szNewName, ":TH:%d:%s", HB_VM_STACK.th_vm_id, szName );

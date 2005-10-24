@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.226 2005/10/18 12:14:32 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.227 2005/10/19 14:22:57 druzus Exp $
  */
 
 /*
@@ -70,7 +70,6 @@
 #define HB_CDX_DBGUPDT
 */
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"

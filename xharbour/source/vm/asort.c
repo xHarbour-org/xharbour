@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.14 2005/09/30 23:44:05 druzus Exp $
+ * $Id: asort.c,v 1.15 2005/10/16 19:32:45 druzus Exp $
  */
 
 /*
@@ -58,6 +58,7 @@
          SORTING AND SEARCHING ALGORITHMS: A COOKBOOK, BY THOMAS NIEMANN
          http://members.xoom.com/_XMCM/thomasn/s_man.htm */
 
+#include "hbvmopt.h"
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hbstack.h"

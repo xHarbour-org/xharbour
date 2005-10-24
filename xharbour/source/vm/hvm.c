@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.509 2005/10/18 12:14:59 druzus Exp $
+ * $Id: hvm.c,v 1.510 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -79,6 +79,7 @@
 #include <time.h>
 #include <ctype.h>
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -499,7 +500,7 @@ static void hb_vmDoInitError( void )
     * initialization is limited). The real erro block will be set
     * by CLIPInit function [druzus].
     */
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_DYNS pDynSym = hb_dynsymFind( "__ERRORBLOCK" );
 
    if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
@@ -839,7 +840,7 @@ int HB_EXPORT hb_vmQuit( void )
    hb_vmDoExitFunctions();       /* process defined EXIT functions */
    //printf("After ExitFunctions\n" );
 
-   /* process AtExit register functions */
+   /* process AtExit registered functions */
    hb_vmDoModuleExitFunctions();
    hb_vmCleanModuleFunctions();
 
@@ -2654,41 +2655,25 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_PUSHGLOBALREF:
-             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBALREF") );
-             {
-                short iGlobal    = pCode[ w + 1 ];
-                PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBALREF") );
+            {
+               short iGlobal    = pCode[ w + 1 ];
+               PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
 
-                pTop->type = HB_IT_BYREF;
+               pTop->type = HB_IT_BYREF;
 
-                pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
-                pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
-                pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+               pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
+               pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
+               pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
 #ifdef HB_UNSHARE_REFERENCES
-                if( (*pGlobals)[ iGlobal ]->type & HB_IT_STRING && ( (*pGlobals)[ iGlobal ]->item.asString.bStatic || *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) > 1 ) )
-                {
-                   char *sString = (char*) hb_xgrab( (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
-
-                   memcpy( sString, (*pGlobals)[ iGlobal ]->item.asString.value, (*pGlobals)[ iGlobal ]->item.asString.length + 1 );
-
-                   if( (*pGlobals)[ iGlobal ]->item.asString.bStatic == FALSE )
-                   {
-                      hb_itemReleaseStringX( (*pGlobals)[ iGlobal ] );
-                   }
-
-                   (*pGlobals)[ iGlobal ]->item.asString.value = sString;
-                   (*pGlobals)[ iGlobal ]->item.asString.bStatic = FALSE;
-                   (*pGlobals)[ iGlobal ]->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-                   *( (*pGlobals)[ iGlobal ]->item.asString.pulHolders ) = 1;
-                }
+               hb_itemUnShare( (*pGlobals)[ iGlobal ] );
 #endif
+               hb_stackPush();
+            }
 
-                hb_stackPush();
-             }
-
-             w += 2;
-             break;
+            w += 2;
+            break;
 
          case HB_P_PUSHLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCAL") );
@@ -3879,7 +3864,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
 static void hb_vmNegate( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_ITEM pItem;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmNegate()"));
@@ -8170,9 +8155,6 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    HB_THREAD_STUB
 
    PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
-#ifdef HB_UNSHARE_REFERENCES
-   PHB_ITEM pLocal;
-#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 
@@ -8187,28 +8169,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
       {
          iLocal += hb_stackBaseItem()->item.asSymbol.paramcnt - 256;
       }
-
 #ifdef HB_UNSHARE_REFERENCES
-      pLocal = *( HB_VM_STACK.pBase + iLocal + 1 );
-
-      if( pLocal->type & HB_IT_STRING && ( pLocal->item.asString.bStatic || *( pLocal->item.asString.pulHolders ) > 1 ) )
-      {
-         char *sString = (char*) hb_xgrab( pLocal->item.asString.length + 1 );
-
-         memcpy( sString, pLocal->item.asString.value, pLocal->item.asString.length + 1 );
-
-         if( pLocal->item.asString.bStatic == FALSE )
-         {
-            hb_itemReleaseStringX( pLocal );
-         }
-
-         pLocal->item.asString.value = sString;
-         pLocal->item.asString.bStatic = FALSE;
-         pLocal->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( pLocal->item.asString.pulHolders ) = 1;
-      }
+      hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
 #endif
-
       pTop->item.asRefer.BasePtr.itemsbasePtr = &HB_VM_STACK.pItems;
    }
    else
@@ -8256,26 +8219,7 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushStaticByRef(%hu)", uiStatic));
 
 #ifdef HB_UNSHARE_REFERENCES
-   {
-      PHB_ITEM pReference = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
-
-      if( pReference->type & HB_IT_STRING && ( pReference->item.asString.bStatic || *( pReference->item.asString.pulHolders ) > 1 ) )
-      {
-         char *sString = (char*) hb_xgrab( pReference->item.asString.length + 1 );
-
-         memcpy( sString, pReference->item.asString.value, pReference->item.asString.length + 1 );
-
-         if( pReference->item.asString.bStatic == FALSE )
-         {
-            hb_itemReleaseStringX( pReference );
-         }
-
-         pReference->item.asString.value = sString;
-         pReference->item.asString.bStatic = FALSE;
-         pReference->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *( pReference->item.asString.pulHolders ) = 1;
-      }
-   }
+   hb_itemUnShare( s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1 );
 #endif
 
    pTop->type = HB_IT_BYREF;
@@ -9069,7 +9013,7 @@ void hb_vmForceLink( void )
 
 HB_FUNC( ERRORLEVEL )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    hb_retni( s_iErrorLevel );
 
@@ -9186,7 +9130,7 @@ void hb_vmRequestDebug( void )
  * if .T. is passed */
 HB_FUNC( HB_DBG_INVOKEDEBUG )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    BOOL bRequest = s_bDebugRequest;
 
@@ -9232,7 +9176,7 @@ HB_FUNC( HB_DBG_VMVARSLIST )
  * $End$ */
 HB_FUNC( HB_DBG_VMVARSLEN )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    hb_retnl( s_aStatics.item.asArray.value->ulLen );
 }
@@ -9276,7 +9220,7 @@ hb_dbg_ProcLevel( void )
 
 HB_FUNC( HB_DBG_PROCLEVEL )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    hb_retnl( s_ulProcLevel - 1 );   /* Don't count self */
 }
@@ -9407,7 +9351,7 @@ HB_FUNC( __VMVARGLIST )
 HB_FUNC( __SETPROFILER )
 {
    #ifndef HB_NO_PROFILER
-      HB_THREAD_STUB
+      HB_THREAD_STUB_API
 
       BOOL bOldValue = hb_bProfiler;
 
@@ -9423,7 +9367,7 @@ HB_FUNC( __SETPROFILER )
  * $End$ */
 HB_FUNC( __TRACEPRGCALLS )
 {
-      HB_THREAD_STUB
+      HB_THREAD_STUB_API
    #ifndef HB_NO_TRACE
       BOOL bOldValue = hb_bTracePrgCalls;
 
@@ -9611,7 +9555,7 @@ HB_FUNC( HB_QSELF )
 
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    hb_retnl( HB_P_LAST_PCODE - 1 );
 }
@@ -9621,7 +9565,7 @@ HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
 HB_FUNC( __OPGETPRF )
 {
    #ifndef HB_NO_PROFILER
-      HB_THREAD_STUB
+      HB_THREAD_STUB_API
 
       ULONG ulOpcode = hb_parnl( 1 );
 
@@ -9778,7 +9722,7 @@ HB_FUNC( __VMVARSSET )
 
 HB_FUNC( HB_MULTITHREAD )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 #if defined(HB_THREAD_SUPPORT)
    hb_retl( TRUE );
 #else
@@ -9788,7 +9732,7 @@ HB_FUNC( HB_MULTITHREAD )
 
 HB_FUNC( HB_VMMODE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 #if defined(HB_NO_PROFILER) && defined(HB_NO_TRACE) && !defined(HB_GUI)
    // optimized for console applications
    hb_retni( 2 );

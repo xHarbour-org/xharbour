@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.18 2004/07/21 23:03:57 fsgiudice Exp $
+ * $Id: bkgtsks.c,v 1.19 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ HB_FUNC( HB_BACKGROUNDRESET )
 /* add a new background task and return its handle */
 HB_FUNC( HB_BACKGROUNDADD )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    HB_ITEM_PTR pBlock    = hb_param( 1, HB_IT_ANY );
    HB_ITEM_PTR pMillisec = hb_param( 2, HB_IT_NUMERIC );

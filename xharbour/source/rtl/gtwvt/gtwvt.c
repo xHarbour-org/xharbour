@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.162 2005/10/18 12:14:33 druzus Exp $
+ * $Id: gtwvt.c,v 1.163 2005/10/18 23:41:48 ronpinkas Exp $
  */
 
 /*
@@ -89,7 +89,6 @@
    #define _WIN32_IE 0x0400
 #endif
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "gtwvt.h"
 
 #if defined(__WATCOMC__)

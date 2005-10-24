@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.6 2005/10/10 00:00:00 modalsist Exp $
+ * $Id: ctnet.c,v 1.6 2005/10/10 15:17:48 modalsist Exp $
  *
  * xHarbour Project source code:
  * CT3 NET functions to PC-LAN/MS-NET.
@@ -85,6 +85,7 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbset.h"
 #include "hbapierr.h"
 

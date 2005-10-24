@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.40 2005/09/22 01:12:00 druzus Exp $
+ * $Id: hash.c,v 1.41 2005/10/22 08:49:07 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapiitm.h"

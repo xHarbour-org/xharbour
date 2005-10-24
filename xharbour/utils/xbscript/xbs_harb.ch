@@ -1464,14 +1464,11 @@
 
       #pragma BEGINDUMP
          #define __XHARBOUR__
-
-         #define HB_NO_DEFAULT_API_MACROS
-         #define HB_NO_DEFAULT_STACK_MACROS
       #pragma ENDDUMP
 
       #ifdef AX
         #pragma BEGINDUMP
-           #ifndef AX        
+           #ifndef AX
               #define AX
            #endif
         #pragma ENDDUMP

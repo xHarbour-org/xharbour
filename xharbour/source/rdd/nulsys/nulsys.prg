@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.prg,v 1.7 2003/09/02 05:41:14 ronpinkas Exp $
+ * $Id: nulsys.prg,v 1.8 2005/10/07 01:09:14 druzus Exp $
  */
 
 /*
@@ -50,7 +50,7 @@
  *
  */
 
-// Harbour without RDD
+/* Harbour without RDD */
 
 ANNOUNCE RDDSYS
 

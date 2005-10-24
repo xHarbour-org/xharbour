@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.8 2004/02/14 21:01:18 andijahja Exp $
+ * $Id: dynlibhb.c,v 1.9 2005/05/24 21:05:56 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 
 #define HB_OS_WIN_32_USED
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbvm.h"

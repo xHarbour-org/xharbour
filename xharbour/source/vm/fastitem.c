@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.76 2005/04/24 11:25:42 druzus Exp $
+ * $Id: fastitem.c,v 1.77 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -74,7 +75,7 @@ void hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
 
 void HB_EXPORT hb_itemPushForward( PHB_ITEM pItem )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemPushForward(%p)", pItem ) );
 
@@ -117,13 +118,13 @@ void HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturn(%p)", pItem ) );
 
    if( pItem )
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
+      hb_itemCopy( hb_stackReturnItem(), pItem );
    }
 
    return pItem;
@@ -131,13 +132,13 @@ PHB_ITEM HB_EXPORT hb_itemReturn( PHB_ITEM pItem )
 
 PHB_ITEM HB_EXPORT hb_itemReturnForward( PHB_ITEM pItem )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnForward(%p)", pItem ) );
 
    if( pItem )
    {
-      hb_itemForwardValue( &(HB_VM_STACK.Return), pItem );
+      hb_itemForwardValue( hb_stackReturnItem(), pItem );
    }
 
    return pItem;
@@ -715,7 +716,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 
 void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    PHB_ITEM pTop = hb_stackTopItem();
 

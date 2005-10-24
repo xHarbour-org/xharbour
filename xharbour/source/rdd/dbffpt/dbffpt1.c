@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.60 2005/10/18 12:14:32 druzus Exp $
+ * $Id: dbffpt1.c,v 1.61 2005/10/19 14:23:03 druzus Exp $
  */
 
 /*
@@ -61,7 +61,6 @@
 /*#  define HB_MEMO_SAFELOCK */
 #endif
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"

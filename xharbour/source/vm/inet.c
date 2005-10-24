@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.59 2005/10/04 02:05:37 druzus Exp $
+* $Id: inet.c,v 1.60 2005/10/05 09:15:04 alexstrickland Exp $
 */
 
 /*
@@ -51,6 +51,7 @@
 *
 */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"

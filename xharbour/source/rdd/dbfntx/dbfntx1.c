@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.140 2005/10/18 12:14:32 druzus Exp $
+ * $Id: dbfntx1.c,v 1.141 2005/10/19 14:23:03 druzus Exp $
  */
 
 /*
@@ -131,7 +131,6 @@
 #define HB_NTX_DEBUG_DISP
 */
 
-#define HB_NO_DEFAULT_API_MACROS
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"

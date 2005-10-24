@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.4 2005/05/16 21:45:40 andijahja Exp $
+ * $Id: ctwin.c,v 1.5 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #include <ctype.h>
 
+#include "hbapiitm.h"
 #include "hbapigt.h"
 #include "hbset.h"
 #include "hb_io.h"

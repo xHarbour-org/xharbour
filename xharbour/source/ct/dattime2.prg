@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.4 2005/01/15 17:00:00 ptsarenko Exp $
+ * $Id: dattime2.prg,v 1.4 2005/01/15 15:38:02 ptsarenko Exp $
  */
 
 /*
@@ -196,6 +196,7 @@ local cYear
 #pragma BEGINDUMP
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbdate.h"
 
 BOOL ct_isleap(int iYear)

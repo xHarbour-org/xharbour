@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.4 2004/04/01 09:35:36 andijahja Exp $
+ * $Id: dbftools.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbapirdd.h"
 
 HB_FUNC_EXTERN( FIELDPOS );

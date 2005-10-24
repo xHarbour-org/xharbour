@@ -1,5 +1,5 @@
 /*
- * $Id: evalhb.c,v 1.1.1.1 2001/12/21 10:41:04 ronpinkas Exp $
+ * $Id: evalhb.c,v 1.2 2002/01/22 00:23:28 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"

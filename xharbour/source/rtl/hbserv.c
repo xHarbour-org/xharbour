@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.32 2005/10/16 19:32:45 druzus Exp $
+* $Id: hbserv.c,v 1.33 2005/10/18 12:14:33 druzus Exp $
 */
 
 /*
@@ -56,6 +56,7 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 #include "hbvm.h"
+#include "hbstack.h"
 #include "hbserv.h"
 
 #include <stdio.h>

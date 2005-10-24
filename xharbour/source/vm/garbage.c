@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.85 2005/09/27 02:26:06 ronpinkas Exp $
+ * $Id: garbage.c,v 1.86 2005/10/18 12:14:59 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"

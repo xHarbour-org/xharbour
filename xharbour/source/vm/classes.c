@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.172 2005/10/14 06:47:06 ronpinkas Exp $
+ * $Id: classes.c,v 1.173 2005/10/19 14:23:03 druzus Exp $
  */
 
 /*
@@ -165,6 +165,7 @@
 
 #include <math.h>
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -1975,14 +1976,13 @@ HB_FUNC( __CLSADDMSG )
  */
 HB_FUNC( __CLSNEW )
 {
+   HB_THREAD_STUB_API
    PCLASS pNewCls;
-
    PHB_ITEM pahSuper = hb_param( 4, HB_IT_ARRAY );
    USHORT i, j, uiSuper = 0;
    USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
    USHORT uiClass;
 
-   HB_THREAD_STUB
 
    HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
 
@@ -2334,9 +2334,9 @@ HB_FUNC( __CLSDELMSG )
  */
 HB_FUNC( __CLSINST )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
-   hb_clsInst( ( USHORT ) hb_parni( 1 ), &HB_VM_STACK.Return );
+   hb_clsInst( ( USHORT ) hb_parni( 1 ), hb_stackReturnItem() );
 }
 
 /*
@@ -2622,11 +2622,12 @@ HB_FUNC( __CLSMODMSG )
 
 HB_FUNC( __CLSMSGASSIGNED )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    PHB_ITEM pObject = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
    USHORT uiClass;
+   BOOL fResult = FALSE;
 
    if( pObject )
    {
@@ -2636,10 +2637,6 @@ HB_FUNC( __CLSMSGASSIGNED )
    {
       uiClass = 0;
    }
-
-
-   HB_VM_STACK.Return.type = HB_IT_LOGICAL;
-   HB_VM_STACK.Return.item.asLogical.value = FALSE;
 
    if( uiClass && uiClass <= s_uiClasses && pString )
    {
@@ -2651,10 +2648,11 @@ HB_FUNC( __CLSMSGASSIGNED )
 
          if( pMethod && pMethod->pFunction != hb___msgVirtual )         /* NON Virtual method */
          {
-            HB_VM_STACK.Return.item.asLogical.value = TRUE;
+            fResult = TRUE;
          }
       }
    }
+   hb_retl( fResult );
 }
 
 /*
@@ -2664,7 +2662,7 @@ HB_FUNC( __CLSMSGASSIGNED )
  */
 HB_FUNC( __OBJGETCLSNAME )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
    USHORT uiClass;
 
@@ -2697,7 +2695,7 @@ HB_FUNC( __OBJGETCLSNAME )
  */
 HB_FUNC( __OBJHASMSG )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
 
@@ -2770,7 +2768,7 @@ HB_FUNC( __OBJCLONE )
 
 PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_DYNS pMsgSym;
    PHB_SYMB pSymbol;
 
@@ -2809,12 +2807,12 @@ PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *sMsg, ULONG ulArg, ... )
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__ObjSendMsg()", 0 );
    }
 
-   return &(HB_VM_STACK.Return);
+   return hb_stackReturnItem();
 }
 
 PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    hb_vmPushSymbol( pSymbol );
    hb_vmPush( pObj );
@@ -2836,7 +2834,7 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
 
    hb_vmSend( (USHORT) ulArg );
 
-   return &(HB_VM_STACK.Return);
+   return hb_stackReturnItem();
 }
 
 /*
@@ -2846,7 +2844,7 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
  */
 HB_FUNC( __OBJSENDMSG )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
    PHB_ITEM pObject  = hb_param( 1, HB_IT_OBJECT );
    USHORT uiPCount = hb_pcount();
 
@@ -2931,7 +2929,7 @@ HB_FUNC( __OBJSENDMSGCASE )
 HB_FUNC( __CLSINSTSUPER )
 {
    BOOL bFound = FALSE;
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    if( hb_pcount() >= 1 )
    {
@@ -2949,7 +2947,7 @@ HB_FUNC( __CLSINSTSUPER )
          hb_vmPushNil();
          hb_vmDo( 0 );                         /* Execute super class      */
 
-         if( HB_IS_OBJECT( &HB_VM_STACK.Return ) )
+         if( HB_IS_OBJECT( hb_stackReturnItem() ) )
          {
             for( uiClass = 0; ! bFound && uiClass < s_uiClasses; uiClass++ )
             {                                      /* Locate the entry         */
@@ -2984,7 +2982,7 @@ HB_FUNC( __CLSINSTSUPER )
  */
 HB_FUNC( __CLS_CNTCLSDATA )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
 
    if( uiClass )
@@ -3003,7 +3001,7 @@ HB_FUNC( __CLS_CNTCLSDATA )
  */
 HB_FUNC( __CLS_CNTDATA )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
 
    if( uiClass )
@@ -3018,7 +3016,7 @@ HB_FUNC( __CLS_CNTDATA )
  */
 HB_FUNC( __CLS_DECDATA )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
 
    if( uiClass )
@@ -3033,7 +3031,7 @@ HB_FUNC( __CLS_DECDATA )
  */
 HB_FUNC( __CLS_INCDATA )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    USHORT uiClass = ( USHORT ) hb_parni( 1 );
 
    if( uiClass && uiClass <= s_uiClasses )
@@ -3114,17 +3112,14 @@ HB_FUNC( __CLASSSEL )
 /* to be used from Classes ERROR HANDLER method */
 HB_FUNC( __GETMESSAGE )
 {
-   HB_THREAD_STUB
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
-
-   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-   hb_retcAdoptStatic( ( *pBase )->item.asSymbol.value->szName );
+   HB_THREAD_STUB_STACK
+   PHB_ITEM pBase = hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.stackbase );
+   hb_retcAdoptStatic( pBase->item.asSymbol.value->szName );
 }
 
 HB_FUNC( __CLSPARENT )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retl( hb_clsIsParent( hb_parni( 1 ) , hb_parcx( 2 ) ) );
 }
 
@@ -3146,7 +3141,7 @@ HB_FUNC( __SENDER )
 
    if( iLevel == 0 && oSender != NULL && oSender->type == HB_IT_OBJECT )
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), oSender );
+      hb_itemCopy( hb_stackReturnItem(), oSender );
    }
 }
 
@@ -3212,8 +3207,7 @@ HB_EXPORT USHORT hb_objClassH( PHB_ITEM pObject )
 
 HB_FUNC( __CLASSH )
 {
-   HB_THREAD_STUB
-
+   HB_THREAD_STUB_API
    hb_retni( hb_objClassH( hb_param( 1, HB_IT_ANY ) ) );
 }
 
@@ -3222,7 +3216,7 @@ HB_FUNC( __CLASSH )
  */
 HB_FUNC( __EVAL )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pObject = hb_param( 1, HB_IT_BLOCK );
    USHORT uiPCount = hb_pcount();
 
@@ -3255,8 +3249,7 @@ HB_FUNC( __EVAL )
  */
 static HARBOUR hb___msgClsH( void )
 {
-   HB_THREAD_STUB
-
+   HB_THREAD_STUB_STACK
    hb_retni( hb_objClassH( hb_stackSelfItem() ) );
 }
 
@@ -3268,7 +3261,7 @@ static HARBOUR hb___msgClsH( void )
  */
 static HARBOUR hb___msgClsParent( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_ITEM pItemRef;
    PHB_ITEM pItemParam;
    USHORT uiClass;
@@ -3314,7 +3307,7 @@ static HARBOUR hb___msgClsParent( void )
  */
 static HARBOUR hb___msgClsName( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    PHB_ITEM pItemRef = hb_stackSelfItem();
 
    pItemRef = hb_itemUnRef( pItemRef );
@@ -3332,7 +3325,7 @@ static HARBOUR hb___msgClsName( void )
  */
 static HARBOUR hb___msgClsFullSel( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
    USHORT uiClass;
    HB_ITEM Return;
@@ -3409,7 +3402,7 @@ static HARBOUR hb___msgClsFullSel( void )
  */
 static HARBOUR hb___msgClsSel( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
    USHORT uiClass;
    HB_ITEM Return ;
@@ -3508,7 +3501,7 @@ static HARBOUR hb___msgEvalInline( void )
 // Eval message for blocks is handled at VM level.
 static HARBOUR hb___msgEval( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
 
    HB_ITEM_PTR pSelf = hb_stackSelfItem();
    if( HB_IS_BLOCK( pSelf ) )
@@ -3568,7 +3561,7 @@ static HARBOUR hb___msgSuper( void )
 /*
 static HARBOUR hb___msgClass( void )
 {
-   hb_itemCopy( &(HB_VM_STACK.Return), hb_stackSelfItem() );
+   hb_itemCopy( hb_stackReturnItem(), hb_stackSelfItem() );
 }
 */
 
@@ -3579,7 +3572,7 @@ static HARBOUR hb___msgClass( void )
  */
 HARBOUR hb___msgGetClsData( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_STACK
    USHORT uiClass;
    PHB_ITEM pObject = hb_stackSelfItem();
 
@@ -3587,7 +3580,7 @@ HARBOUR hb___msgGetClsData( void )
 
    if( uiClass && uiClass <= s_uiClasses )
    {
-      hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
+      hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, hb_stackReturnItem() );
    }
 }
 
@@ -3613,7 +3606,7 @@ HARBOUR hb___msgSetClsData( void )
       hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, pReturn );
    }
 
-   hb_itemCopy( &(HB_VM_STACK.Return), pReturn );
+   hb_itemCopy( hb_stackReturnItem(), pReturn );
 }
 
 /*
@@ -3628,7 +3621,7 @@ HARBOUR hb___msgGetShrData( void )
 
    if( uiSprCls && uiSprCls <= s_uiClasses )
    {
-      hb_arrayGet( s_pClasses[ uiSprCls - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, &(HB_VM_STACK.Return) );
+      hb_arrayGet( s_pClasses[ uiSprCls - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, hb_stackReturnItem() );
    }
 }
 
@@ -3649,7 +3642,7 @@ HARBOUR hb___msgSetShrData( void )
       hb_arraySet( s_pClasses[ uiSprCls - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, pReturn );
    }
 
-   hb_itemCopy( &(HB_VM_STACK.Return), pReturn );
+   hb_itemCopy( hb_stackReturnItem(), pReturn );
 }
 
 /*
@@ -3669,7 +3662,7 @@ HARBOUR hb___msgGetData( void )
       hb_arraySize( pObject, uiIndex ); /* Make large enough */
    }
 
-   hb_arrayGet( pObject, uiIndex, &(HB_VM_STACK.Return) );
+   hb_arrayGet( pObject, uiIndex, hb_stackReturnItem() );
 }
 
 /*
@@ -3789,7 +3782,7 @@ USHORT hb_clsMaxClasses( void )
 
 HB_FUNC( __CLS_PARAM )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    HB_ITEM Array;
    USHORT uiParam = ( USHORT ) hb_pcount();
    USHORT n;
@@ -3818,7 +3811,7 @@ HB_FUNC( __CLS_PARAM )
 /* it will avoid any default object to be inherited */
 HB_FUNC( __CLS_PAR00 )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    HB_ITEM Array;
    USHORT uiParam = ( USHORT ) hb_pcount();
    USHORT n;
@@ -3836,7 +3829,7 @@ HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times *
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {
    #ifndef HB_NO_PROFILER
-      HB_THREAD_STUB
+      HB_THREAD_STUB_API
 
       PHB_DYNS pMsg = hb_dynsymFindName( hb_parcx( 2 ) );
       PMETHOD pMethod = hb_objGetpMthd( pMsg, (USHORT) hb_parni( 1 ) );
@@ -4041,8 +4034,8 @@ void hb_clsFinalize( PHB_ITEM pObject )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pDestructor && ( *( HB_VM_STACK.pBase ) )->item.asSymbol.uiSuperClass == 0 &&
-          strcmp( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
+      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.uiSuperClass == 0 &&
+          strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
          // To DISABLE GC here where no refernce to this object will cause GPF for double release!
          BOOL bCollecting = hb_gcSetCollecting( TRUE );
@@ -4231,7 +4224,7 @@ HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunctio
  */
 HB_FUNC( HB_OBJMSGPTR )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
    PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
 
@@ -4283,7 +4276,7 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
    USHORT uiClass;
    char *szClass;
 
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    szClass = hb_strUpperCopy( hb_parcx(1), hb_parclen(1) );
 
@@ -4314,17 +4307,21 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
 void hb_clsSetModule( USHORT uiClass )
 {
-   HB_THREAD_STUB
-
-   if( uiClass && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+   if( uiClass )
    {
-      ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
+      HB_THREAD_STUB_STACK
+      PHB_ITEM pBase = hb_stackBaseItem();
 
-      #if 0
-         printf( "Class: '%s' Caller: '%s' Module: '%s'\n", ( s_pClasses + ( uiClass - 1 ) )->szName,
-                                                            (* HB_VM_STACK.pBase)->item.asSymbol.value->szName,
-                                                            ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols->szModuleName );
-      #endif
+      if( pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      {
+         ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = pBase->item.asSymbol.value->pDynSym->pModuleSymbols;
+
+         #if 0
+            printf( "Class: '%s' Caller: '%s' Module: '%s'\n", ( s_pClasses + ( uiClass - 1 ) )->szName,
+                                                               pBase->item.asSymbol.value->szName,
+                                                               ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols->szModuleName );
+         #endif
+      }
    }
 }
 
@@ -4339,7 +4336,7 @@ void hb_clsSetModule( USHORT uiClass )
  */
 HB_FUNC( __SETCLASSSCOPE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    BOOL bOldClsScope = s_bClsScope;
 
    if ( ISLOG( 1 ) )
@@ -4377,7 +4374,7 @@ hb_clsSetScope( BOOL bClsScope )
  */
 HB_FUNC( __SETCLASSAUTOINIT )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    BOOL bOldClsAutoInit = s_bClsAutoInit;
 
    if ( ISLOG( 1 ) )
@@ -4390,7 +4387,7 @@ HB_FUNC( __SETCLASSAUTOINIT )
 
 HB_FUNC( __CLSFRIENDLY )   // __ClsFriend( oObj, oFriend )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pObj    = hb_param( 1, HB_IT_OBJECT );
    PHB_ITEM pFriend = hb_param( 2, HB_IT_OBJECT );
 

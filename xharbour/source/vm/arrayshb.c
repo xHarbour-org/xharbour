@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.59 2005/05/16 21:45:40 andijahja Exp $
+ * $Id: arrayshb.c,v 1.60 2005/09/22 01:12:00 druzus Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 
 #include <ctype.h>
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbvm.h"
 #include "hbfast.h"

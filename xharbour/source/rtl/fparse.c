@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.13 2005/04/14 04:41:09 andijahja Exp $
+ * $Id: fparse.c,v 1.14 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ FPARSE( cFile, cDelimiter ) -> array
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbfast.h"
 /* adjustable, but this should be sufficient in normal situation */
 #define MAX_READ 4096
@@ -425,7 +426,7 @@ HB_FUNC( FPARSE )
    }
 
    /* return main array */
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &Array );
+   hb_itemReturnForward( &Array );
 
    /* clean up */
    hb_xfree( string );
@@ -490,7 +491,7 @@ HB_FUNC( FPARSEEX )
    }
 
    /* return main array */
-   hb_itemForwardValue( &(HB_VM_STACK).Return, &Array );
+   hb_itemReturnForward( &Array );
 
    /* clean up */
    hb_xfree( string );

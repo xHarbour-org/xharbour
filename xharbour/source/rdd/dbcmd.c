@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.174 2005/10/04 20:06:34 druzus Exp $
+ * $Id: dbcmd.c,v 1.175 2005/10/19 14:22:57 druzus Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include <ctype.h>
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbvm.h"

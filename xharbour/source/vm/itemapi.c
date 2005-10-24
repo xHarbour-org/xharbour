@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.119 2005/09/30 23:44:06 druzus Exp $
+ * $Id: itemapi.c,v 1.120 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -87,6 +87,7 @@
 
 #include <stdio.h>
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"

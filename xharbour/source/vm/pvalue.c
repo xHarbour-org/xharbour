@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.3 2002/12/19 18:15:36 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.4 2003/08/21 04:02:13 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbstack.h"

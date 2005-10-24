@@ -1,5 +1,5 @@
 #
-# $Id$
+# $Id: Makefile,v 1.1 2005/09/15 12:55:35 druzus Exp $
 #
 
 ROOT = ../../../
@@ -10,9 +10,5 @@ C_SOURCES=\
 	sxdate.c \
 
 LIBNAME=hbsix
-
-ifeq ($(HB_MT),MT)
-   MT_LIBNAME=$(LIBNAME)mt
-endif
 
 include $(TOP)$(ROOT)config/lib.cf

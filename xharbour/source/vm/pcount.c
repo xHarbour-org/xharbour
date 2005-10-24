@@ -1,5 +1,5 @@
 /*
- * $Id: pcount.c,v 1.1.1.1 2001/12/21 10:40:58 ronpinkas Exp $
+ * $Id: pcount.c,v 1.2 2002/10/09 20:43:00 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,7 @@
  *
  */
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 

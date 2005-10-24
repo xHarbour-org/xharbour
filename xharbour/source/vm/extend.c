@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.53 2005/10/16 19:32:45 druzus Exp $
+ * $Id: extend.c,v 1.54 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -77,8 +77,10 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbstack.h"
 #include "hbset.h"
 #include "hbdate.h"
 #include "thread.h"
@@ -90,7 +92,7 @@ HB_EXTERN_BEGIN
 
 PHB_ITEM HB_EXPORT hb_param( int iParam, LONG lMask )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_param(%d, %ld)", iParam, lMask));
 
@@ -144,7 +146,7 @@ PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
 
 BOOL HB_EXPORT hb_extIsArray( int iParam )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
@@ -161,7 +163,7 @@ BOOL HB_EXPORT hb_extIsArray( int iParam )
 
 char HB_EXPORT * hb_parc( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parc(%d, ...)", iParam));
 
@@ -196,7 +198,7 @@ char HB_EXPORT * hb_parc( int iParam, ... )
 
 char HB_EXPORT * hb_parcx( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parcx(%d, ...)", iParam));
 
@@ -231,7 +233,7 @@ char HB_EXPORT * hb_parcx( int iParam, ... )
 
 ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parclen(%d, ...)", iParam));
 
@@ -270,7 +272,7 @@ ULONG  HB_EXPORT hb_parclen( int iParam, ... )
 
 ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parcsiz(%d, ...)", iParam));
 
@@ -311,7 +313,7 @@ ULONG  HB_EXPORT hb_parcsiz( int iParam, ... )
 
 char  HB_EXPORT * hb_pards( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pards(%d, ...)", iParam));
 
@@ -326,7 +328,7 @@ char  HB_EXPORT * hb_pards( int iParam, ... )
 
       if( HB_IS_DATE( pItem ) )
       {
-         return hb_dateDecStr( HB_VM_STACK.szDate, pItem->item.asDate.value );
+         return hb_dateDecStr( hb_stackDateBuffer(), pItem->item.asDate.value );
       }
       else if( HB_IS_ARRAY( pItem ) )
       {
@@ -337,18 +339,18 @@ char  HB_EXPORT * hb_pards( int iParam, ... )
          ulArrayIndex = va_arg( va, ULONG );
          va_end( va );
 
-         return hb_arrayGetDS( pItem, ulArrayIndex, HB_VM_STACK.szDate );
+         return hb_arrayGetDS( pItem, ulArrayIndex, hb_stackDateBuffer() );
       }
    }
 
-   return hb_dateDecStr( HB_VM_STACK.szDate, 0 );
+   return hb_dateDecStr( hb_stackDateBuffer(), 0 );
 }
 
 /* NOTE: szDate must be a 9 chars wide buffer. [vszakats] */
 
 char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pardsbuff(%p, %d, ...)", szDate, iParam));
 
@@ -385,7 +387,7 @@ char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
 
 LONG  HB_EXPORT hb_pardl( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pardl(%d, ...)", iParam));
 
@@ -420,7 +422,7 @@ LONG  HB_EXPORT hb_pardl( int iParam, ... )
 
 int  HB_EXPORT hb_parl( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parl(%d, ...)", iParam));
 
@@ -471,7 +473,7 @@ int  HB_EXPORT hb_parl( int iParam, ... )
 
 double  HB_EXPORT hb_parnd( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parnd(%d, ...)", iParam));
 
@@ -522,7 +524,7 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
 
 int  HB_EXPORT hb_parni( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parni(%d, ...)", iParam));
 
@@ -573,7 +575,7 @@ int  HB_EXPORT hb_parni( int iParam, ... )
 
 LONG  HB_EXPORT hb_parnl( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
 
@@ -632,7 +634,7 @@ LONG  HB_EXPORT hb_parnl( int iParam, ... )
 
 HB_LONG  HB_EXPORT hb_parnint( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parnl(%d, ...)", iParam));
 
@@ -692,7 +694,7 @@ HB_LONG  HB_EXPORT hb_parnint( int iParam, ... )
 /* NEW function - to retrieve a pointer from a harbour level */
 void *hb_parptr( int iParam, ... )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
 
@@ -727,9 +729,7 @@ void *hb_parptr( int iParam, ... )
 
 void *hb_parpointer( int iParam )
 {
-#ifdef HB_API_MACROS
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
 
@@ -772,7 +772,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
 
 ULONG  HB_EXPORT hb_parinfo( int iParam )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_parinfo(%d)", iParam));
 
@@ -806,17 +806,21 @@ ULONG  HB_EXPORT hb_parinfo( int iParam )
 #undef hb_pcount
 int  HB_EXPORT hb_pcount( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
+   PHB_ITEM pBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
-   return ( int )( ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt < 255 ? ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt : ( *( HB_VM_STACK.pBase ) )->item.asSymbol.paramcnt - 256 );
+   pBase = hb_stackBaseItem();
+   return ( int )( pBase->item.asSymbol.paramcnt < 255 ?
+                   pBase->item.asSymbol.paramcnt :
+                   pBase->item.asSymbol.paramcnt - 256 );
 }
 
 #undef hb_ret
 void  HB_EXPORT hb_ret( void )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_ANY
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ret()"));
 

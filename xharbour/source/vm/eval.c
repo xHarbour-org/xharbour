@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.24 2005/09/04 04:29:01 walito Exp $
+ * $Id: eval.c,v 1.25 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbapiitm.h"
@@ -504,7 +505,7 @@ void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
 
 HB_FUNC( HB_EXECFROMARRAY )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pArgs = NULL, pSelf = NULL, pString;

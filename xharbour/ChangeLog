@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4492 2005/10/21 14:37:40 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4493 2005/10/23 10:35:30 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,95 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-24 02:54 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  + xharbour/include/hbvmopt.h
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbstack.h
+  * xharbour/include/hbvmpub.h
+  * xharbour/include/thread.h
+  * xharbour/contrib/gtwvw/gtwvw.c
+  * xharbour/source/ct/ctnet.c
+  * xharbour/source/ct/ctwin.c
+  * xharbour/source/ct/datetime.c
+  * xharbour/source/ct/dattime2.prg
+  * xharbour/source/ct/dbftools.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rdd/hbsix/Makefile
+  * xharbour/source/rdd/hbsix/sxcompr.c
+  * xharbour/source/rdd/hbsix/sxcrypt.c
+  * xharbour/source/rdd/hbsix/sxdate.c
+  * xharbour/source/rdd/hsx/hsx.c
+  * xharbour/source/rdd/nulsys/Makefile
+  * xharbour/source/rdd/nulsys/nulsys.prg
+  * xharbour/source/rtl/bkgtsks.c
+  * xharbour/source/rtl/console.c
+  * xharbour/source/rtl/direct.c
+  * xharbour/source/rtl/errorsys.prg
+  * xharbour/source/rtl/fparse.c
+  * xharbour/source/rtl/gtapi.c
+  * xharbour/source/rtl/hbserv.c
+  * xharbour/source/rtl/philes.c
+  * xharbour/source/rtl/pplib.c
+  * xharbour/source/rtl/regex.c
+  * xharbour/source/rtl/tprinter.c
+  * xharbour/source/rtl/trim.c
+  * xharbour/source/rtl/version.c
+  * xharbour/source/rtl/gtnul/gtext.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/tip/utils.c
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/arrayshb.c
+  * xharbour/source/vm/asort.c
+  * xharbour/source/vm/break.c
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/cmdarg.c
+  * xharbour/source/vm/codebloc.c
+  * xharbour/source/vm/dbgentry.c
+  * xharbour/source/vm/debug.c
+  * xharbour/source/vm/do.c
+  * xharbour/source/vm/dynlibhb.c
+  * xharbour/source/vm/dynsym.c
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/estack.c
+  * xharbour/source/vm/eval.c
+  * xharbour/source/vm/evalhb.c
+  * xharbour/source/vm/extend.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/fm.c
+  * xharbour/source/vm/garbage.c
+  * xharbour/source/vm/hash.c
+  * xharbour/source/vm/hbi18n.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/inet.c
+  * xharbour/source/vm/itemapi.c
+  * xharbour/source/vm/macro.c
+  * xharbour/source/vm/memvars.c
+  * xharbour/source/vm/pcount.c
+  * xharbour/source/vm/proc.c
+  * xharbour/source/vm/pvalue.c
+  * xharbour/source/vm/runner.c
+  * xharbour/source/vm/thread.c
+  * xharbour/source/vm/throw.c
+  * xharbour/tests/tstcstru.prg
+  * xharbour/utils/xbscript/xbs_harb.ch
+    * removed default API and stack macros. Now API/stack macros can be
+      enabled by including hb_vmopt.h file.
+      This file should be included _ONLY_ by core code because binary
+      object/libraries generated after can work only with _EXACTLY_ the
+      same HVM compiled the same C alignment switches
+    * source/hvm/* files updated to include hb_vmopt.h
+    - removed #define HB_NO_DEFAULT_API_MACROS for other source files
+      It's not necessary now.
+      It should be safe to also remove -DHB_NO_DEFAULT_API_MACROS from
+      non GNU make files which used this macro to created xharbour.dll
+      Without it xharbour.dll should have noticeable faster HVM without
+      any side effects
+    ! fixed some files for proper compilation without API macros
 
 2005-10-23 10:37 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
   * tests/bldtest.bat

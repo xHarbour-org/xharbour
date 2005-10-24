@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.56 2005/06/13 02:02:49 peterrees Exp $
+ * $Id: gtapi.c,v 1.57 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -81,6 +81,7 @@
 #include <ctype.h>
 
 #include "hbapigt.h"
+#include "hbapiitm.h"
 #include "hbset.h"
 #include "hb_io.h"
 #include "hbvm.h"

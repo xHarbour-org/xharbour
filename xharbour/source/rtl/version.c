@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.8 2005/03/09 05:35:25 andijahja Exp $
+ * $Id: version.c,v 1.9 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
  */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbinit.h"
 #include "hbapilng.h"

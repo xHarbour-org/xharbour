@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.55 2004/11/21 21:44:17 druzus Exp $
+ * $Id: direct.c,v 1.56 2005/09/02 18:30:41 druzus Exp $
  */
 
 /*
@@ -473,7 +473,7 @@ HB_FUNC( DIRECTORYRECURSE )
 
       hb_fsDirectoryRecursive( &Dir, szRecurse, szFName, szAttributes, bMatchCase );
 
-      hb_itemForwardValue( &(HB_VM_STACK).Return, &Dir );
+      hb_itemReturnForward( &Dir );
 
       if( fDirSpec )
       {
@@ -503,5 +503,7 @@ HB_FUNC( DIRECTORYRECURSE )
 
 HB_FUNC( DIRECTORY )
 {
-   hb_fsDirectory( &(HB_VM_STACK).Return, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
+   PHB_ITEM pDir = hb_itemNew( NULL );
+   hb_fsDirectory( pDir, hb_parcx(1), hb_parcx(2), hb_parl(3), hb_parl(4) );
+   hb_itemRelease( hb_itemReturnForward( pDir ) );
 }

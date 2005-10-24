@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.54 2005/09/11 19:41:11 druzus Exp $
+ * $Id: macro.c,v 1.55 2005/10/06 23:08:56 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
  */
 #define HB_MACRO_SUPPORT
 
+#include "hbvmopt.h"
 #include "hbmacro.h"
 #include "hbcomp.h"
 #include "hbstack.h"

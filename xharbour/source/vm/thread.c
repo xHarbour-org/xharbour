@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.195 2005/10/10 22:45:56 druzus Exp $
+* $Id: thread.c,v 1.196 2005/10/18 12:15:00 druzus Exp $
 */
 
 /*
@@ -54,6 +54,7 @@
 /* JC1: Now including all this files to make threadsleep available in ST */
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -1848,9 +1849,7 @@ HB_FUNC( JOINTHREAD )
 */
 HB_FUNC( THREADGETCURRENT )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retnl( (LONG) HB_CURRENT_THREAD() );
 }
 
@@ -1953,9 +1952,7 @@ HB_FUNC( GETSYSTEMTHREADID )
 */
 HB_FUNC( ISSAMETHREAD )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    PHB_THREAD_ID pThread1 = (PHB_THREAD_ID) hb_parptr( 1 );
    PHB_THREAD_ID pThread2 = (PHB_THREAD_ID) hb_parptr( 2 );
 
@@ -1993,9 +1990,7 @@ HB_FUNC( ISSAMETHREAD )
 */
 HB_FUNC( ISVALIDTHREAD )
 {
-#if defined( HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
    if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
@@ -2035,9 +2030,7 @@ HB_FUNC( KILLALLTHREADS )
 */
 HB_FUNC( THREADIDLEFENCE )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    BOOL bOld;
 
    HB_SHARED_LOCK( hb_runningStacks );
@@ -2061,9 +2054,7 @@ HB_FUNC( THREADIDLEFENCE )
 */
 HB_FUNC( HB_THREADGETTRYERRORARRAY )
 {
-#if defined(HB_API_MACROS)
    HB_THREAD_STUB
-#endif
    hb_itemReturn( HB_VM_STACK.aTryCatchHandlerStack );
 }
 
@@ -2073,9 +2064,7 @@ HB_FUNC( HB_THREADGETTRYERRORARRAY )
 */
 HB_FUNC( HB_THREADCOUNTSTACKS )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retni( hb_threadCountStacks() );
 }
 
@@ -2248,10 +2237,8 @@ PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
 
 HB_FUNC( HB_MUTEXCREATE )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
-   hb_threadMutexCreate( &HB_VM_STACK.Return );
+   HB_THREAD_STUB_STACK
+   hb_threadMutexCreate( hb_stackReturnItem() );
 }
 
 /*
@@ -2269,9 +2256,7 @@ HB_FUNC( DESTROYMUTEX )
 */
 BOOL hb_threadMutexLock( PHB_ITEM pItem, BOOL bError )
 {
-#if defined(HB_API_MACROS)
    HB_THREAD_STUB
-#endif
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
 
    if( Mutex == NULL || Mutex->sign != HB_MUTEX_SIGNATURE )
@@ -2311,9 +2296,7 @@ BOOL hb_threadMutexLock( PHB_ITEM pItem, BOOL bError )
 
 HB_FUNC( HB_MUTEXLOCK )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retl( hb_threadMutexLock( hb_param( 1, HB_IT_POINTER ), TRUE ) );
 }
 
@@ -2324,9 +2307,7 @@ HB_FUNC( HB_MUTEXLOCK )
 */
 BOOL hb_threadMutexTimeOutLock( PHB_ITEM pItem, int iTimeOut, BOOL bError )
 {
-#if defined(HB_API_MACROS)
    HB_THREAD_STUB
-#endif
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    DWORD dwTimeOut = (DWORD) iTimeOut;
@@ -2380,9 +2361,7 @@ BOOL hb_threadMutexTimeOutLock( PHB_ITEM pItem, int iTimeOut, BOOL bError )
 
 HB_FUNC( HB_MUTEXTIMEOUTLOCK )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retl( hb_threadMutexTimeOutLock( hb_param( 1, HB_IT_POINTER ), hb_parni(2), TRUE ) );
 }
 
@@ -2392,9 +2371,7 @@ HB_FUNC( HB_MUTEXTIMEOUTLOCK )
 */
 BOOL hb_threadMutexTryLock( PHB_ITEM pItem, BOOL bError )
 {
-#if defined(HB_API_MACROS)
    HB_THREAD_STUB
-#endif
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_itemGetPtr( pItem );
    BOOL bLock;
 
@@ -2440,9 +2417,7 @@ BOOL hb_threadMutexTryLock( PHB_ITEM pItem, BOOL bError )
 
 HB_FUNC( HB_MUTEXTRYLOCK )
 {
-#if defined(HB_API_MACROS)
-   HB_THREAD_STUB
-#endif
+   HB_THREAD_STUB_API
    hb_retl( hb_threadMutexTryLock( hb_param( 1, HB_IT_POINTER ), TRUE ) );
 }
 
@@ -2490,9 +2465,7 @@ HB_FUNC( HB_MUTEXUNLOCK )
 */
 static void s_subscribeInternal( int mode )
 {
-#if defined(HB_API_MACROS)
    HB_THREAD_STUB
-#endif
    HB_MUTEX_STRUCT *Mutex = (HB_MUTEX_STRUCT *) hb_parptr(1);
    PHB_ITEM pStatus = hb_param( 3, HB_IT_BYREF );
    int iWaitRes;

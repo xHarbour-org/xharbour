@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.19 2005/09/22 01:12:00 druzus Exp $
+ * $Id: hbi18n.c,v 1.20 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -52,6 +52,7 @@
 
 #define HB_THREAD_OPTIMIZE_STACK
 
+#include "hbvmopt.h"
 #include "hbsetup.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
@@ -449,7 +450,7 @@ BOOL hb_i18n_load_language( char *language )
 */
 HB_FUNC( HB_I18NLOADTABLE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pParam = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pHeader;
    PHB_ITEM pTable;
@@ -568,7 +569,7 @@ HB_FUNC( HB_I18NSORTTABLE )
 */
 HB_FUNC( HB_I18NSAVETABLE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pParam = hb_param( 1, HB_IT_ANY );
    PHB_ITEM pHeader = hb_param( 2, HB_IT_ARRAY );
    PHB_ITEM pTable = hb_param( 3, HB_IT_ARRAY );
@@ -669,14 +670,14 @@ HB_FUNC( HB_I18NSETPATH )
 /* Gets default directory */
 HB_FUNC( HB_I18NGETPATH )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retc( s_default_i18n_dir );
 }
 
 /* Sets current language (return true on success) */
 HB_FUNC( HB_I18NSETLANGUAGE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
 
    char *language;
    PHB_ITEM pStr = hb_param( 1, HB_IT_STRING );
@@ -710,25 +711,25 @@ HB_FUNC( HB_I18NSETLANGUAGE )
 
 HB_FUNC( HB_I18NGETLANGUAGE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retc( s_current_language );
 }
 
 HB_FUNC( HB_I18NGETLANGUAGENAME )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retc( s_current_language_name );
 }
 
 HB_FUNC( HB_I18NGETBASELANGUAGE )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retc( s_base_language );
 }
 
 HB_FUNC( HB_I18NGETBASELANGUAGENAME )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retc( s_base_language_name );
 }
 
@@ -761,7 +762,7 @@ HB_FUNC( HB_I18NSETBASELANGUAGE )
 
 HB_FUNC( HB_I18NINITIALIZED )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    hb_retl( s_i18n_table != NULL );
 }
 
@@ -826,7 +827,7 @@ void hb_i18nExit( void )
 */
 HB_FUNC( HB_HFIND )
 {
-   HB_THREAD_STUB
+   HB_THREAD_STUB_API
    PHB_ITEM pHash = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pKey = hb_param( 2, HB_IT_STRING );
    PHB_ITEM pRet;
