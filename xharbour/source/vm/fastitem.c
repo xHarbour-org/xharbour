@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.77 2005/09/22 01:12:00 druzus Exp $
+ * $Id: fastitem.c,v 1.78 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -811,8 +811,6 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-   *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
    ( &(HB_VM_STACK.Return) )->item.asString.bStatic = TRUE;
    ( &(HB_VM_STACK.Return) )->item.asString.value   = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length  = ulLen;
