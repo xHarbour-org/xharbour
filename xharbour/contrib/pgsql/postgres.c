@@ -1,5 +1,5 @@
 /*
- * $Id: postgres.c,v 1.23 2005/06/02 01:14:09 druzus Exp $
+ * $Id: postgres.c,v 1.24 2005/10/08 15:37:52 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -55,6 +55,7 @@
 #include <hbapi.h>
 #include <hbapifs.h>
 #include <hbapiitm.h>
+#include <hbstack.h>
 #include <hbfast.h>
 #include "libpq-fe.h"
 
@@ -471,7 +472,7 @@ HB_FUNC(PQMETADATA)
                 hb_arrayAddForward(&aNew, &aTemp);
             }
 
-            hb_itemForwardValue( &(HB_VM_STACK).Return, &aNew);
+            hb_itemForwardValue( hb_stackReturnItem(), &aNew);
         }
     }
 }
