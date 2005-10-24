@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.216 2005/09/13 22:46:53 fperillo Exp $
+ * $Id: ppcore.c,v 1.217 2005/10/13 07:51:58 ronpinkas Exp $
  */
 
 /*
@@ -3507,6 +3507,16 @@ static int RemoveNotInstanciated( char * stroka )
           }
           break;
 
+        // MUST be before STATE_QUOTE2!!!
+        /** Added by Giancarlo Niccolai 2003-06-20 */
+        case STATE_QUOTE4:
+          if( *ptr == '\"' && ( ptr[-1] != '\\' || ( ptr[-2] == '\\' && ptr[-1] == '\\' ) ) )
+          {
+             State = STATE_NORMAL;
+          }
+          break;
+        /** END */
+
         case STATE_QUOTE2:
           if( *ptr == '\"' )
           {
@@ -3520,15 +3530,6 @@ static int RemoveNotInstanciated( char * stroka )
              State = STATE_NORMAL;
           }
           break;
-
-        /** Added by Giancarlo Niccolai 2003-06-20 */
-        case STATE_QUOTE4:
-          if( *ptr == '\"' && ptr[-1] != '\\' )
-          {
-             State = STATE_NORMAL;
-          }
-          break;
-        /** END */
      }
 
      cLastChar = *ptr;
@@ -6139,23 +6140,46 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
           cLast = cha;
           break;
 
-        case STATE_QUOTE1: if(cha=='\'')
-          s_ParseState = STATE_NORMAL;
+        case STATE_QUOTE1:
+          if(cha=='\'')
+          {
+             s_ParseState = STATE_NORMAL;
+          }
           break;
 
-        case STATE_QUOTE2: if(cha=='\"')
-          s_ParseState = STATE_NORMAL;
-          break;
-
-        case STATE_QUOTE3: if(cha==']')
-          s_ParseState = STATE_NORMAL;
-          break;
-
+        // MUST be before STATE_QUOTE2!!!
         /* Giancarlo Niccolai added 2003-06-20 */
-        case STATE_QUOTE4: if( cha=='\"' && s_prevchar != '\\')
-          s_ParseState = STATE_NORMAL;
+        case STATE_QUOTE4:
+          if( cha == '\"' )
+          {
+             if( s_prevchar != '\\' )
+             {
+                s_ParseState = STATE_NORMAL;
+             }
+          }
+          else if( cha == '\\' )
+          {
+             if( s_prevchar != '\\' )
+             {
+                s_prevchar = cha;
+             }
+          }
           break;
         /* END */
+
+        case STATE_QUOTE2:
+          if(cha=='\"')
+          {
+             s_ParseState = STATE_NORMAL;
+          }
+          break;
+
+        case STATE_QUOTE3:
+          if(cha==']')
+          {
+             s_ParseState = STATE_NORMAL;
+          }
+          break;
 
         default:
           switch( cha )
@@ -7672,9 +7696,11 @@ int hb_pp_NextToken( char** pLine, char *sToken )
    if( nLen > 1 && IS_ESC_STRING( sLine[0] ) )
    {
       pTmp = sLine + 2; // e" is long 2!
+
       while ( 1 ) {
 
          pTmp = strchr( pTmp, '"' );
+
          if( pTmp == NULL )
          {
             sToken[0] = '"';
@@ -7683,11 +7709,13 @@ int hb_pp_NextToken( char** pLine, char *sToken )
          }
          else
          {
-            if ( pTmp[-1] != '\\' ) {
+            if( pTmp[-1] != '\\' )
+            {
                strncpy( (char *) sToken, sLine, ( pTmp - sLine ) + 1 );
                sToken[( pTmp - sLine ) + 1] = '\0';
                break;
             }
+
             pTmp++; // skip current "
          }
       }

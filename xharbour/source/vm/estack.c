@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.79 2005/10/18 20:02:10 ronpinkas Exp $
+ * $Id: estack.c,v 1.80 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -74,12 +74,12 @@ HB_STACK hb_stackST;
 HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
 
-BOOL HB_EXPORT hb_stack_ready = FALSE;
+HB_EXPORT BOOL hb_stack_ready = FALSE;
 
 /* ------------------------------- */
 
 #undef hb_stackPop
-void HB_EXPORT hb_stackPop( void )
+HB_EXPORT void hb_stackPop( void )
 {
    HB_THREAD_STUB
 
@@ -101,7 +101,7 @@ void HB_EXPORT hb_stackPop( void )
 }
 
 #undef hb_stackDec
-void HB_EXPORT hb_stackDec( void )
+HB_EXPORT void hb_stackDec( void )
 {
    HB_THREAD_STUB
 
@@ -114,7 +114,7 @@ void HB_EXPORT hb_stackDec( void )
 }
 
 #undef hb_stackPush
-void HB_EXPORT hb_stackPush( void )
+HB_EXPORT void hb_stackPush( void )
 {
    LONG CurrIndex;   /* index of current top item */
    LONG TopIndex;    /* index of the topmost possible item */
@@ -348,14 +348,14 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 }
 
 #undef hb_stackTopOffset
-LONG HB_EXPORT hb_stackTopOffset( void )
+HB_EXPORT LONG hb_stackTopOffset( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.pPos - HB_VM_STACK.pItems;
 }
 
 #undef hb_stackBaseOffset
-LONG HB_EXPORT hb_stackBaseOffset( void )
+HB_EXPORT LONG hb_stackBaseOffset( void )
 {
    HB_THREAD_STUB
    return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
@@ -376,7 +376,7 @@ LONG HB_EXPORT hb_stackBaseOffset( void )
 #endif
 
 #undef hb_stackItem
-HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos )
+HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos )
 {
 
    if( iItemPos < 0 )
@@ -386,7 +386,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItem( LONG iItemPos )
 }
 
 #undef hb_stackItemFromTop
-HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
+HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 {
 
    if( nFromTop > 0 )
@@ -398,7 +398,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromTop( int nFromTop )
 }
 
 #undef hb_stackItemFromBase
-HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
+HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 {
 
    if( nFromBase <= 0 )
@@ -419,13 +419,13 @@ HB_ITEM_PTR HB_EXPORT hb_stackItemFromBase( int nFromBase )
 }
 
 #undef hb_stackTopItem
-HB_ITEM_PTR HB_EXPORT hb_stackTopItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackTopItem( void )
 {
     return * HB_VM_STACK.pPos;
 }
 
 #undef hb_stackBaseItem
-HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackBaseItem( void )
 {
    return * HB_VM_STACK.pBase;
 }
@@ -433,13 +433,13 @@ HB_ITEM_PTR HB_EXPORT hb_stackBaseItem( void )
 /* Returns SELF object, an evaluated codeblock or NIL for normal func/proc
 */
 #undef hb_stackSelfItem
-HB_ITEM_PTR HB_EXPORT hb_stackSelfItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackSelfItem( void )
 {
    return * ( HB_VM_STACK.pBase + 1 );
 }
 
 #undef hb_stackReturnItem
-HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void )
+HB_EXPORT HB_ITEM_PTR hb_stackReturnItem( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackReturnItem()"));
 
@@ -447,7 +447,7 @@ HB_ITEM_PTR HB_EXPORT hb_stackReturnItem( void )
 }
 
 #undef hb_stackDateBuffer
-char * HB_EXPORT hb_stackDateBuffer( void )
+HB_EXPORT char * hb_stackDateBuffer( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDateBuffer()"));
 
