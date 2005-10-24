@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.219 2005/10/24 04:47:36 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.220 2005/10/24 17:00:08 ronpinkas Exp $
  */
 
 /*
@@ -6164,6 +6164,10 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
                 s_prevchar = cha;
              }
           }
+          else
+          {
+             s_prevchar = cha;
+          }
           break;
         /* END */
 
@@ -6254,7 +6258,7 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
               break;
 
             case '/':
-              if( readed>0 && buffer[readed-1] == '/' )
+              if( readed > 0 && buffer[readed-1] == '/' )
               {
                 bOK = FALSE;
                 readed--;
