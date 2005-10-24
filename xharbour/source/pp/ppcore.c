@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.218 2005/10/24 01:23:15 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.219 2005/10/24 04:47:36 ronpinkas Exp $
  */
 
 /*
@@ -7132,7 +7132,7 @@ static int NextName( char ** sSource, char * sDest )
     /** Added by Giancarlo Niccolai 2003-06-20 */
      else if( State == STATE_QUOTE4 )
      {
-        if( **sSource == '\"' && (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) )
+        if( **sSource == '\"' && ( (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) ) )
         {
            State = STATE_NORMAL;
         }
@@ -7359,7 +7359,7 @@ static int NextParm( char ** sSource, char * sDest )
      /** Added by Giancarlo Niccolai 2003-06-20 */
      else if( State == STATE_QUOTE4 )
      {
-        if( **sSource == '\"' && (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) )
+        if( **sSource == '\"' && ( (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) ) )
         {
            State = STATE_NORMAL;
         }
