@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4496 2005/10/24 02:14:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4497 2005/10/24 02:20:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-24 02:54 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/libnf/Makefile
+    + added missing fttext.c
+  * xharbour/contrib/libnf/fttext.c
+    * GCC warning cleaned
+
+  * xharbour/contrib/xwt/Rules.make
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_calendar.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_browse.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_calendar.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_checkbox.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_colorselect.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_combobox.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_fileselect.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_fontselect.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_framewnd.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_image.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_listbox.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_progressbar.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_radiobutton.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_textbox.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_togglebutton.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_treelist.c
+  * xharbour/contrib/xwt/src/xwt_gtk/xwt_gtk_viewport.c
+    * updated included headers
+
+  * xharbour/include/Makefile
+    + added hbvmopt.h
 
 2005-10-23 19:20 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * contrib/xwt/src/xwt_win/xwt_win_framewnd.c

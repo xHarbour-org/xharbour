@@ -3,7 +3,7 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_calendar.c,v 1.2 2004/01/26 13:52:21 lculik Exp $
+   $Id: xwt_calendar.c,v 1.3 2004/01/26 20:30:15 lculik Exp $
 
    GTK Calendar widget  
 */
@@ -143,4 +143,4 @@ void gtk_XwtCalendar_GetDate( GtkXwtCalendarSelectionDialog *p, long *year,long 
    *day = d;
    TraceLog(NULL,"data vinda do controle %i%i%i\n",y,m,d);
    TraceLog(NULL,"data ajustada no controle %p%p%p\n",year,month,day);
- }
+}

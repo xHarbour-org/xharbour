@@ -4,7 +4,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk.c,v 1.32 2004/08/21 17:27:14 lf_sfnet Exp $
+   $Id: xwt_gtk.c,v 1.33 2004/12/01 00:50:03 peterrees Exp $
 
    Global declarations, common functions
 
@@ -14,6 +14,7 @@
 */
 
 #include <hbapi.h>
+#include <hbapiitm.h>
 #include <xwt_gtk.h>
 #include <xwt_api.h>
 #include <xwt_calendar.h>
@@ -1111,7 +1112,8 @@ BOOL xwt_drv_get_property( PXWT_WIDGET wWidget, PXWT_PROPERTY prop )
          return TRUE;
 
       case XWT_PROP_GETDATE:
-            gtk_calendar_get_date (GTK_CALENDAR( wSelf ),&prop->year, &prop->month, &prop->day);
+            gtk_calendar_get_date ( GTK_CALENDAR( wSelf ),
+                                    &prop->year, &prop->month, &prop->day );
          return TRUE;
 
       case XWT_PROP_STATUS:

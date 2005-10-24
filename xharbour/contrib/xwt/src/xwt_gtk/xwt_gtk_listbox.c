@@ -3,12 +3,13 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_combobox.c,v 1.2 2004/01/26 20:30:31 lculik Exp $
+   $Id: xwt_gtk_listbox.c,v 1.1 2004/01/30 18:34:12 lculik Exp $
 
    GTK interface - management of combobox
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

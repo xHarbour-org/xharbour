@@ -3,12 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_radiobutton.c,v 1.2 2003/04/21 06:56:33 jonnymind Exp $
+   $Id: xwt_gtk_radiobutton.c,v 1.3 2003/06/08 14:05:36 jonnymind Exp $
 
    GTK interface - management of radio button widget
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

@@ -3,12 +3,13 @@
 
    (C) 2004 Luiz Rafael Culik
 
-   $Id: xwt_gtk_calendar.c,v 1.3 2004/01/26 20:30:31 lculik Exp $
+   $Id: xwt_gtk_calendar.c,v 1.4 2004/11/21 21:43:35 druzus Exp $
 
    GTK interface - File Selection Box 
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_calendar.h>
 #include <xwt_api.h>
 #include <xwt_gtk.h>

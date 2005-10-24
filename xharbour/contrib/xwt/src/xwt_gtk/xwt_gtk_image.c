@@ -3,12 +3,13 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_image.c,v 1.4 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_image.c,v 1.5 2003/08/27 20:09:24 xthefull Exp $
 
    GTK interface - Clickable image widget
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

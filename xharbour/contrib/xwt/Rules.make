@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.9 2004/08/08 11:24:05 lf_sfnet Exp $
+# $Id: Rules.make,v 1.10 2004/08/21 17:27:13 lf_sfnet Exp $
 #
 # Rules for making simwin
 #
@@ -32,14 +32,18 @@ ifeq ($(HB_MULTI_GT),yes)
       GT_LIBS=-lgtnul -lgtcrs  -lncurses
    endif
 else
-   GT_LIBS += -lgtcgi
+   ifeq ($(HB_COMPILER),mingw32)
+      GT_LIBS += -lgtcgi
+   else
+      GT_LIBS += -lgtcgi -lgtcrs -lncurses
+   endif
 endif
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)
-LIBFILES_ = -ldebug -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdx -ldbfdbt -lcommon -lm -lpthread
+LIBFILES_ = -ldebug -lvmmt -lrtlmt -lrddmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdx -ldbffpt -lhbsix -lcommon -lgtnul -lrtlmt $(GT_LIBS) -lpcrepos -lm -lpthread
 else
-LIBFILES_ = -ldebug -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbfdbt -lcommon -lm
+LIBFILES_ = -ldebug -lvm -lrtl -llang -lrdd -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhbsix -lcommon -lgtnul -lrtl $(GT_LIBS) -lpcrepos -lm
 endif
 
 ifeq ($(HB_COMPILER),mingw32)

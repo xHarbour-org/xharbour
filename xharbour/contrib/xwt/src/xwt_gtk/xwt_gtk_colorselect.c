@@ -3,12 +3,13 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fontselect.c,v 1.1 2003/09/02 22:42:32 lculik Exp $
+   $Id: xwt_gtk_colorselect.c,v 1.1 2004/02/08 13:00:08 lculik Exp $
 
    GTK interface - File Selection Box 
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

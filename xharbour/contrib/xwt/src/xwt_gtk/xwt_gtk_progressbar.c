@@ -3,7 +3,7 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fileselect.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_progressbar.c,v 1.1 2004/02/08 13:00:08 lculik Exp $
 
    GTK interface - File Selection Box 
 */

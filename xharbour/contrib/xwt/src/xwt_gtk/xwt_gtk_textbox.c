@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_textbox.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
+   $Id: xwt_gtk_textbox.c,v 1.3 2004/08/21 17:27:14 lf_sfnet Exp $
 
    Text box - basic input field
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

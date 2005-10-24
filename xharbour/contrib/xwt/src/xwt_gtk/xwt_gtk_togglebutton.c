@@ -3,12 +3,13 @@
 
    (C) 2003 Rafa Carmona ( Thefull )
 
-   $Id: xwt_gtk_togglebutton.c,v 1.1 2003/05/11 15:14:43 jonnymind Exp $
+   $Id: xwt_gtk_togglebutton.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
 
    GTK interface - management of toggle button widget
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

@@ -3,13 +3,15 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_browse.c,v 1.3 2004/08/08 11:24:05 lf_sfnet Exp $
+   $Id: xwt_gtk_browse.c,v 1.4 2004/12/31 11:55:49 druzus Exp $
 
    GTK interface - browse widget
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include "hbfast.h"
+#include "hbstack.h"
 #include "hbvm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>

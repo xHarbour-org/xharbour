@@ -3,12 +3,14 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_framewnd.c,v 1.4 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_framewnd.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
 
    GTK interface - Frame window
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
@@ -144,7 +146,7 @@ void xwt_gtk_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
       PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
 
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
+      xwtData = (PXWT_WIDGET) hb_stackReturnItem()->item.asPointer.value;
       gtk_menu_bar_append (GTK_MENU_BAR (frame->menu_bar),
          GTK_WIDGET( xwtData->get_top_widget( xwtData->widget_data ) ) );
    }
@@ -163,7 +165,7 @@ void xwt_gtk_resetMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    {
       PHB_ITEM pMenuItem = pBaseArray->pItems + ulPos;
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
-      xwtData = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
+      xwtData = (PXWT_WIDGET) hb_stackReturnItem()->item.asPointer.value;
       gtk_container_remove (GTK_CONTAINER (frame->menu_bar), 
          GTK_WIDGET( xwtData->get_top_widget( xwtData->widget_data ) ) );        
    }

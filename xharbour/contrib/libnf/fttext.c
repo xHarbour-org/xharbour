@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.8 2005/05/16 21:45:39 andijahja Exp $
+ * $Id: fttext.c,v 1.9 2005/10/24 02:14:11 ronpinkas Exp $
  */
 
 /*
@@ -55,12 +55,12 @@
 
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hbapiitm.h"
 #include "hbfast.h"
+#include "hbstack.h"
 #include "hbvmpub.h"
 #include "hbpcode.h"
 #include "hbinit.h"
-#include "hbapiitm.h"
-#include "hbstack.h"
 
 #define __PRG_SOURCE__ __FILE__
 #undef HB_PRG_PCODE_VER
@@ -454,7 +454,7 @@ HB_FUNC ( FT_FACTIVE )
 //------------------------------------------------------------------------------
 HB_FUNC ( FT_FBUFFERSIZE )
 {
-   LONG uNewBuff = ISNUM(1) ? hb_parnl(1) : uBuffSize;
+   LONG uNewBuff = ISNUM(1) ? hb_parnl(1) : ( LONG ) uBuffSize;
 
    hb_retnl( uBuffSize );
 

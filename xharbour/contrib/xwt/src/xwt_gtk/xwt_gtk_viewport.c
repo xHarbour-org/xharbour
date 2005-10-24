@@ -3,11 +3,12 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_viewport.c,v 1.3 2003/07/23 15:58:10 lculik Exp $
+   $Id: xwt_gtk_viewport.c,v 1.4 2003/08/27 20:09:24 xthefull Exp $
 
    Viewport - an infinite scroller container & drawing area
 */
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 

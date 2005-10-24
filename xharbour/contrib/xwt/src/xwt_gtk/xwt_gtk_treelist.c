@@ -3,12 +3,14 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_gtk_treelist.c,v 1.2 2003/06/08 14:05:36 jonnymind Exp $
+   $Id: xwt_gtk_treelist.c,v 1.3 2003/11/08 00:45:56 jonnymind Exp $
 
    GTK interface - management of checkbox widget
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
@@ -91,7 +93,7 @@ BOOL xwt_gtk_treelist_set_content( PXWT_WIDGET xwtData, PHB_ITEM pContent )
    {
       do {
          hb_objSendMsg( pContent, "XCONTENT", 0 );
-         pData = &HB_VM_STACK.Return;
+         pData = hb_stackReturnItem();
       } while ( HB_IS_OBJECT( pData ) );
    }
    else if( HB_IS_ARRAY( pContent ) )

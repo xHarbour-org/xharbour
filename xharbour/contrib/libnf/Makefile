@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2002/06/24 19:58:23 dholm Exp $
+# $Id: Makefile,v 1.1 2003/10/08 14:03:56 lculik Exp $
 #
 
 ROOT = ../../
@@ -11,8 +11,9 @@ C_SOURCES = \
 	color2n.c \
 	ctrl.c \
 	descend.c \
-        dispc.c \
-        ftattr.c \
+	dispc.c \
+	ftattr.c \
+	fttext.c \
 	getenvrn.c \
 	getver.c \
 	getvid.c \

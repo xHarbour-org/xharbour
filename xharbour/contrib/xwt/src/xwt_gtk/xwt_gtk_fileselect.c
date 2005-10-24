@@ -3,12 +3,13 @@
 
    (C) 2003 Luiz Rafael Culik
 
-   $Id: xwt_gtk_fileselect.c,v 1.4 2003/06/08 14:05:35 jonnymind Exp $
+   $Id: xwt_gtk_fileselect.c,v 1.5 2003/07/23 15:58:10 lculik Exp $
 
    GTK interface - File Selection Box 
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
 #include <xwt_api.h>
 #include <xwt_gtk.h>
 
