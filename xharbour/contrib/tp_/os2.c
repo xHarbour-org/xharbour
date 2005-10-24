@@ -1,5 +1,5 @@
 /*
- * $Id: os2.c,v 1.3 2004/08/31 14:53:34 mauriliolongo Exp $
+ * $Id: os2.c,v 1.4 2005/01/14 15:39:06 mauriliolongo Exp $
  */
 
 /*
@@ -267,4 +267,12 @@ HB_FUNC( P_ISCTS ) {
 
       hb_retl( FALSE );
    }
+}
+
+
+
+HB_FUNC( P_CTRLCTS ) {
+
+   hb_retni( 0 );
+
 }

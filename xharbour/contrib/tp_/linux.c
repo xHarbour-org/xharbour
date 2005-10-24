@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: linux.c,v 1.1 2005/10/13 08:05:24 mauriliolongo Exp $
  */
 
 /*
@@ -72,15 +72,15 @@
 
 HB_FUNC( P_OPEN ) {
 
-	int fd; /* File descriptor for the port */
+   int fd; /* File descriptor for the port */
 
-  	fd = open( hb_parcx( 1 ), O_RDWR | O_NOCTTY | O_NDELAY );
+   fd = open( hb_parcx( 1 ), O_RDWR | O_NOCTTY | O_NDELAY );
 
    if (fd != -1) {
-		fcntl( fd, F_SETFL, 0 );
- 	}
+      fcntl( fd, F_SETFL, 0 );
+   }
 
- 	hb_retnl( fd );
+   hb_retnl( fd );
 }
 
 
@@ -103,110 +103,110 @@ HB_FUNC( P_INITPORTSPEED ) {
    tcgetattr( port, &options );
 
    // let's set baud rate
-	switch ( hb_parnl( 2 ) ) {
+   switch ( hb_parnl( 2 ) ) {
 
-		case 0:
-			baud = B0;	// Drop line
-			break;
+      case 0:
+         baud = B0;  // Drop line
+         break;
 
-		case 50:
-			baud = B50;
-			break;
+      case 50:
+         baud = B50;
+         break;
 
-		case 75:
-			baud = B75;
-			break;
+      case 75:
+         baud = B75;
+         break;
 
-		case 110:
-			baud = B110;
-			break;
+      case 110:
+         baud = B110;
+         break;
 
-		case 150:
-			baud = B150;
-			break;
+      case 150:
+         baud = B150;
+         break;
 
-		case 200:
-			baud = B200;
-			break;
+      case 200:
+         baud = B200;
+         break;
 
-		case 300:
-			baud = B300;
-			break;
+      case 300:
+         baud = B300;
+         break;
 
-		case 600:
-			baud = B600;
-			break;
+      case 600:
+         baud = B600;
+         break;
 
-		case 1200:
-			baud = B1200;
-			break;
+      case 1200:
+         baud = B1200;
+         break;
 
-		case 1800:
-			baud = B1800;
-			break;
+      case 1800:
+         baud = B1800;
+         break;
 
-		case 2400:
-			baud = B2400;
-			break;
+      case 2400:
+         baud = B2400;
+         break;
 
-		case 4800:
-			baud = B4800;
-			break;
+      case 4800:
+         baud = B4800;
+         break;
 
-		case 9600:
-			baud = B9600;
-			break;
+      case 9600:
+         baud = B9600;
+         break;
 
-		case 19200:
-			baud = B19200;
-			break;
+      case 19200:
+         baud = B19200;
+         break;
 
-		case 38400:
-			baud = B38400;
-			break;
+      case 38400:
+         baud = B38400;
+         break;
 
-		case 57600:
-			baud = B57600;
-			break;
+      case 57600:
+         baud = B57600;
+         break;
 
-		case 115200:
-			baud = B115200;
-			break;
+      case 115200:
+         baud = B115200;
+         break;
 
-		case 230400:
-			baud = B230400;
-			break;
-	}
+      case 230400:
+         baud = B230400;
+         break;
+   }
 
-	cfsetispeed( &options, baud );
+   cfsetispeed( &options, baud );
    cfsetospeed( &options, baud );
 
    // Enable the receiver and set local mode...
    options.c_cflag |= ( CLOCAL | CREAD );
 
    // Raw input from device
-	cfmakeraw( &options );
+   cfmakeraw( &options );
 
-	// Reset data bits ( cfmakeraw() puts it to CS8 )
-	options.c_cflag &= ~CSIZE;
+   // Reset data bits ( cfmakeraw() puts it to CS8 )
+   options.c_cflag &= ~CSIZE;
 
    // Data bits
    if ( hb_parni( 3 ) == 8 ) {
 
-  		options.c_cflag |= CS8;
+      options.c_cflag |= CS8;
 
-	} else {
+   } else {
 
-		options.c_cflag |= CS7;
-	}
+      options.c_cflag |= CS7;
+   }
 
-	// Stop bits
-	if ( hb_parni( 5 ) == 1 ) {
-		options.c_cflag &= ~CSTOPB;
-	}
+   // Stop bits
+   if ( hb_parni( 5 ) == 1 ) {
+      options.c_cflag &= ~CSTOPB;
+   }
 
-	// Parity, only No, Even, Odd supported
-	switch ( *ptr )  {
+   // Parity, only No, Even, Odd supported
+   switch ( *ptr )  {
 
       case 'N':
       case 'n':
@@ -218,17 +218,17 @@ HB_FUNC( P_INITPORTSPEED ) {
       case 'O':
       case 'o':
          options.c_cflag |= PARENB;
-			options.c_cflag |= PARODD;
+         options.c_cflag |= PARODD;
 
-			options.c_iflag |= INPCK;
+         options.c_iflag |= INPCK;
          break;
 
       case 'E':
       case 'e':
          options.c_cflag |= PARENB;
-			options.c_cflag &= ~PARODD;
+         options.c_cflag &= ~PARODD;
 
-			options.c_iflag |= INPCK;
+         options.c_iflag |= INPCK;
          break;
    }
 
@@ -247,8 +247,8 @@ HB_FUNC( P_INITPORTSPEED ) {
 
 HB_FUNC( P_READPORT ) {
 
-	char Buffer[512];
-	int nRead;
+   char Buffer[512];
+   int nRead;
 
    nRead = read( hb_parnl( 1 ), Buffer, 512 );
 
@@ -258,7 +258,7 @@ HB_FUNC( P_READPORT ) {
 
    } else {
 
-		hb_retclen( Buffer, nRead );
+      hb_retclen( Buffer, nRead );
    }
 }
 
@@ -266,25 +266,25 @@ HB_FUNC( P_READPORT ) {
 
 HB_FUNC( P_WRITEPORT ) {
 
-	long n;
+   long n;
 
-	n = write( hb_parnl( 1 ), hb_parcx( 2 ), hb_parclen( 2 ) );
+   n = write( hb_parnl( 1 ), hb_parcx( 2 ), hb_parclen( 2 ) );
 
    if ( n < 0 ) {
 
-		hb_retnl( -1 );
+      hb_retnl( -1 );
 
-	} else {
+   } else {
 
-		hb_retnl( n );
-	}
+      hb_retnl( n );
+   }
 }
 
 
 
 HB_FUNC( P_DRAIN ) {
 
-	hb_retnl( tcdrain( hb_parnl( 1 ) ) );
+   hb_retnl( tcdrain( hb_parnl( 1 ) ) );
 
 }
 
@@ -319,7 +319,7 @@ HB_FUNC( P_ISDCD ) {
    rc = ioctl( hb_parnl( 1 ), TIOCMGET, &status );
 
    if ( rc == 0 ) {
-   	hb_retl( ( status & TIOCM_CD ) == TIOCM_CD );
+      hb_retl( ( status & TIOCM_CD ) == TIOCM_CD );
 
    } else {
 
@@ -337,7 +337,7 @@ HB_FUNC( P_ISRI ) {
    rc = ioctl( hb_parnl( 1 ), TIOCMGET, &status );
 
    if ( rc == 0 ) {
-   	hb_retl( ( status & TIOCM_RI ) == TIOCM_RI );
+      hb_retl( ( status & TIOCM_RI ) == TIOCM_RI );
 
    } else {
 
@@ -355,7 +355,7 @@ HB_FUNC( P_ISDSR ) {
    rc = ioctl( hb_parnl( 1 ), TIOCMGET, &status );
 
    if ( rc == 0 ) {
-   	hb_retl( ( status & TIOCM_DSR ) == TIOCM_DSR );
+      hb_retl( ( status & TIOCM_DSR ) == TIOCM_DSR );
 
    } else {
 
@@ -373,7 +373,7 @@ HB_FUNC( P_ISCTS ) {
    rc = ioctl( hb_parnl( 1 ), TIOCMGET, &status );
 
    if ( rc == 0 ) {
-   	hb_retl( ( status & TIOCM_CTS ) == TIOCM_CTS );
+      hb_retl( ( status & TIOCM_CTS ) == TIOCM_CTS );
 
    } else {
 
@@ -385,7 +385,7 @@ HB_FUNC( P_ISCTS ) {
 
 HB_FUNC( P_CTRLCTS ) {
 
-	struct termios options;
+   struct termios options;
    int port = hb_parnl( 1 );
    int newvalue = hb_pcount() == 2 ? hb_parnl( 2 ) : -1;
    int curvalue;
@@ -395,18 +395,18 @@ HB_FUNC( P_CTRLCTS ) {
    curvalue = ( options.c_cflag & CRTSCTS ) == CRTSCTS;
 
    if ( newvalue == 0  ) {
-		options.c_cflag &= ~CRTSCTS;
+      options.c_cflag &= ~CRTSCTS;
 
-	} else {
-		if ( newvalue == 1 ) {
-			options.c_cflag |= CRTSCTS;
-		}
-	}
+   } else {
+      if ( newvalue == 1 ) {
+         options.c_cflag |= CRTSCTS;
+      }
+   }
 
-	if ( newvalue >= 0 ) {
-		rc = tcsetattr( port, TCSAFLUSH, &options );
-	}
+   if ( newvalue >= 0 ) {
+      rc = tcsetattr( port, TCSAFLUSH, &options );
+   }
 
-	hb_retni( curvalue ? 1 : 0 );
+   hb_retni( curvalue ? 1 : 0 );
 
 }

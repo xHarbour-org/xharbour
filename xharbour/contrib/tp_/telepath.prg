@@ -1,5 +1,5 @@
 /*
- * $Id: telepath.prg,v 1.10 2005/10/13 08:05:24 mauriliolongo Exp $
+ * $Id: telepath.prg,v 1.11 2005/10/13 08:12:18 mauriliolongo Exp $
  */
 
 /*
