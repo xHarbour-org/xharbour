@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.21 2005/05/31 21:42:25 ronpinkas Exp $
+ * $Id: persist.prg,v 1.22 2005/09/24 07:03:40 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ CLASS HBPersistent
 
 ENDCLASS
 
-METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
+METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPersistent
 
    EXTERN HB_RestoreBlock
 
@@ -100,10 +100,23 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars ) CLASS HBPersistent
 
    oPure := __ClsInst( QSelf():ClassH )
 
-   // Start with defalt values of clean instance.
-   FOR EACH xProperty IN Self
-      xProperty := oPure[ HB_EnumIndex() ]
-   NEXT
+   IF lPropertiesOnly == nil        // for objects with a long lifetime that may call this multiple times,
+      lPropertiesOnly := .f.        // you may not want non-Property ivars cleared
+   ENDIF
+
+   // Start with default values of clean instance.
+   IF lPropertiesOnly
+      aLines := __CLSGetPropertiesAndValues( oPure )
+      FOR EACH xProperty IN aLines     // This re-initializes PROPERTIES only
+         __objSendMsg( Self, aLines[ HB_EnumIndex(), 1], aLines[ HB_EnumIndex(), 2] )
+      NEXT
+      aLines := nil
+   ELSE
+      // This re-initializes ALL ivars
+      FOR EACH xProperty IN Self
+         xProperty := oPure[ HB_EnumIndex() ]
+      NEXT
+   ENDIF
 
    // To support macros down below.
    HB_SetWith( Self )

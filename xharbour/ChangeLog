@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4499 2005/10/24 04:04:32 druzus Exp $
+ * $Id: ChangeLog,v 1.4500 2005/10/24 04:47:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-23 22:20 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * source/rtl/persist.prg
+    ! Added 3rd arg lPropertiesOnly to ::LoadFromText()
+      // for objects with a long lifetime that may call this multiple times,
+      // you may not want non-Property ivars cleared
+      Default behavior is identical to prior version; if you pass .t.
+      then ONLY (and ALL) Properties are re-initialized then set to any
+      stored values.
 
 2005-10-23 21:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/pp/ppcore.c
