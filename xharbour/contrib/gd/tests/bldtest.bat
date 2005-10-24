@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.8 2005/10/23 10:37:22 fsgiudice Exp $
+rem * $Id: bldtest.bat,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -31,8 +31,8 @@ if %HB_ARCHITECTURE%.==. set HB_ARCHITECTURE=w32
 if %HB_COMPILER%.==.     set HB_COMPILER=bcc32
 SET HB_BIN_INSTALL=%HB_INSTALL%\bin
 set HB_INC_INSTALL=..\include;%HB_INSTALL%\include
-set HB_LIB_INSTALL=..\lib;%HB_INSTALL%\lib
-set HB_USER_LIBS=gdlib.lib libbgd.lib
+set HB_LIB_INSTALL=%HB_INSTALL%\lib
+set HB_USER_LIBS=..\lib\gdlib.lib ..\lib\libbgd.lib
 
 echo.
 echo.BldTest.bat - /? or /h to display options
