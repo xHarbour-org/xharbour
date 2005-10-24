@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.2 2004/03/17 02:29:00 druzus Exp $
+ * $Id: hbtypes.h,v 1.3 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -72,9 +72,9 @@ typedef PHB_ITEM ( * HB_PARAM)( int iParam, LONG lMask );
 typedef PHB_ITEM ( * HB_PARAMERROR)( int iParam );
 typedef int      ( * HB_PCOUNTS )( void );
 typedef void     ( * HB_RET)( void );
-typedef void     ( * HB_RETC)( char * szText );
-typedef void     ( * HB_RETCLEN)( char * szText, ULONG ulLen );
-typedef void     ( * HB_RETDS)( char * szDate );
+typedef void     ( * HB_RETC)( const char * szText );
+typedef void     ( * HB_RETCLEN)( const char * szText, ULONG ulLen );
+typedef void     ( * HB_RETDS)( const char * szDate );
 typedef void     ( * HB_RETD)( int iYear, int iMonth, int iDay );
 typedef void     ( * HB_RETDL)( LONG lJulian );
 typedef void     ( * HB_RETL)( int iTrueFalse );
@@ -92,7 +92,6 @@ typedef ULONG    ( * HB_PARCLEN)( int iParam );
 typedef ULONG    ( * HB_PARCSIZ)( int iParam );
 typedef char *   ( * HB_PARDS)( int iParam );
 typedef char *   ( * HB_PARDSBUFF)( char * szDate,int iParam);
-typedef int      ( * HB_PARINFO)( int iParam );
 typedef int      ( * HB_PARL)( int iParam );
 typedef double   ( * HB_PARND)( int iParam );
 typedef int      ( * HB_PARNI)( int iParam );

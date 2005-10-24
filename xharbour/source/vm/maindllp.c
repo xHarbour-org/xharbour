@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.12 2005/02/27 21:28:25 andijahja Exp $
+ * $Id: maindllp.c,v 1.13 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ int HB_EXPORT  hb_pcount( void )          /* returns the number of suplied param
 }
 
 #undef hb_retc
-void hb_retc( char * szText )   /* returns a string */
+void hb_retc( const char * szText )   /* returns a string */
 {
    FARPROC pRetc=GetProcAddress( GetModuleHandle( NULL ), "_hb_retc" );
 
@@ -212,7 +212,7 @@ void hb_retc( char * szText )   /* returns a string */
 }
 
 #undef hb_retclen
-void hb_retclen( char * szText, ULONG ulLen ) /* returns a string with a specific length */
+void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a specific length */
 {
    FARPROC pRetclen=GetProcAddress( GetModuleHandle( NULL ), "_hb_retclen" );
 
@@ -223,7 +223,7 @@ void hb_retclen( char * szText, ULONG ulLen ) /* returns a string with a specifi
 }
 
 #undef hb_retds
-void hb_retds( char * szDate )  /* returns a date, must use yyyymmdd format */
+void hb_retds( const char * szDate )  /* returns a date, must use yyyymmdd format */
 {
    FARPROC pRetds=GetProcAddress( GetModuleHandle( NULL ), "_hb_retds" );
 
