@@ -3,52 +3,55 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_win_framewnd.c,v 1.4 2003/10/14 23:12:12 jonnymind Exp $
+   $Id: xwt_win_framewnd.c,v 1.5 2004/11/30 04:55:16 paultucker Exp $
 
    MS-Windows interface - Frame window
 */
 
 #include "hbapi.h"
+#include "hbapiitm.h"
+#include "hbstack.h"
+
 #include <xwt_api.h>
 #include <xwt_win.h>
 
 
 /* Destroy given frame window */
-         
+
 void xwt_win_free_wnd( void *wnd )
 {
    PXWT_WIN_DATA self = (PXWT_WIN_DATA) wnd;
    CloseHandle( self->hMain );
-   
-   if ( self->hMainWidget != NULL ) 
+
+   if ( self->hMainWidget != NULL )
    {
       DestroyWindow( self->hMainWidget );
       self->hMainWidget = NULL;
    }
-   
-   if ( self->hStatusBar != NULL ) 
+
+   if ( self->hStatusBar != NULL )
    {
       DestroyWindow( self->hStatusBar );
       self->hStatusBar = NULL;
    }
 
-   if ( self->pMenu != NULL ) 
+   if ( self->pMenu != NULL )
    {
       PHB_BASEARRAY pBar = self->pMenu;
       ULONG ulPos;
-      
+
       /*
       for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
       {
          PHB_ITEM pMenuItem = pBar->pItems + ulPos;
          hb_objSendMsg( pMenuItem, "DESTROY",0 );
-         
+
       }*/
 
       hb_gcUnlock( self->pMenu );
       self->pMenu = NULL;
    }
-   
+
    hb_xfree( self );
 }
 
@@ -59,7 +62,7 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
    PHB_BASEARRAY pBar = pMenuArray->item.asArray.value;
    ULONG ulPos;
    HMENU hMenu;
-   
+
    hMenu= CreateMenu();
 
    // manage menu-level style
@@ -73,7 +76,7 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
 
    /* Generic menuitem settings */
    miInfo.cbSize = sizeof(MENUITEMINFO);
-  
+
    for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
    {
       PHB_ITEM pMenuItem = pBar->pItems + ulPos;
@@ -83,18 +86,18 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
       hb_objSendMsg( pMenuItem, "ORAWWIDGET",0 );
       widget = (PXWT_WIDGET) HB_VM_STACK.Return.item.asPointer.value;
       menuData = (PXWT_WIN_MENUDATA) widget->widget_data;
-      
+
       miInfo.fMask = MIIM_DATA | MIIM_TYPE ;
       miInfo.fType = MFT_STRING;
-      
+
       //gets the string;
       miInfo.cch = strlen( menuData->szLabel );
       miInfo.dwTypeData = menuData->szLabel;
-      
+
       // set backreference to this menu item
       miInfo.dwItemData = (ULONG_PTR) widget;
       miInfo.hbmpItem = NULL;
-      
+
       // is it a menu item?
       hb_objSendMsg( pMenuItem, "GETTYPE",0 );
       if (  hb_itemGetNI( &HB_VM_STACK.Return ) == XWT_TYPE_MENU )
@@ -109,10 +112,10 @@ static HMENU xwt_win_createMenuFromArray( PHB_ITEM pMenuArray )
          hb_objSendMsg( pMenuItem, "NID",0 );
          miInfo.wID = hb_itemGetNI( &HB_VM_STACK.Return );
       }
-      
+
       InsertMenuItem( hMenu, ulPos, TRUE, &miInfo );
-   }   
-   
+   }
+
    return hMenu;
 }
 
@@ -124,34 +127,34 @@ void xwt_win_setMenuBar( PXWT_WIDGET xwtData, PHB_ITEM pMenuArray )
    HMENU hMenu, hOldMenu;
    PXWT_WIN_DATA frame;
 
-   /* The menu array must survive function boundaries */      
+   /* The menu array must survive function boundaries */
    hb_gcLock( pMenuArray );
 
    /* we must compose the menu by scanning the PHB_ITEM widget hyerarcy */
    frame = (PXWT_WIN_DATA) xwtData->widget_data;
-   
+
    hMenu = xwt_win_createMenuFromArray( pMenuArray );
-   
+
    hOldMenu = GetMenu( frame->hMain );
    SetMenu( frame->hMain, hMenu );
    if ( hOldMenu != NULL && hOldMenu != NULL)
    {
       DestroyMenu( hOldMenu );
    }
-   frame->pMenu = pMenuArray->item.asArray.value;   
-   
+   frame->pMenu = pMenuArray->item.asArray.value;
+
    DrawMenuBar( wnd->hMain );
 }
 
 void xwt_win_resetMenuBar( PXWT_WIDGET xwtData )
 {
    PXWT_WIN_DATA self = (PXWT_WIN_DATA) xwtData->widget_data;
-   
-   if ( self->pMenu != NULL ) 
+
+   if ( self->pMenu != NULL )
    {
       PHB_BASEARRAY pBar = self->pMenu;
       ULONG ulPos;
-      
+
       for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
       {
          PHB_ITEM pMenuItem = pBar->pItems + ulPos;
@@ -167,21 +170,21 @@ static PHB_ITEM xwt_win_findMenuItem( PHB_BASEARRAY pBar, UINT uiId )
 {
    PHB_ITEM pRet;
    ULONG ulPos;
-   
+
    for ( ulPos = 0; ulPos < pBar->ulLen; ulPos++ )
    {
       PHB_ITEM pMenuItem = pBar->pItems + ulPos;
-      
+
       hb_objSendMsg( pMenuItem, "GETTYPE",0 );
       if (  hb_itemGetNI( &HB_VM_STACK.Return ) == XWT_TYPE_MENUITEM )
-      {   
+      {
          hb_objSendMsg( pMenuItem, "NID",0 );
          if( uiId == (unsigned)  hb_itemGetNI( &HB_VM_STACK.Return ) )
          {
             return pMenuItem;
          }
       }
-      else 
+      else
       {
          hb_objSendMsg( pMenuItem, "ACHILDREN",0 );
          pRet = xwt_win_findMenuItem( HB_VM_STACK.Return.item.asArray.value, uiId );
@@ -191,10 +194,10 @@ static PHB_ITEM xwt_win_findMenuItem( PHB_BASEARRAY pBar, UINT uiId )
          }
       }
    }
-   
+
    return NULL;
 }
-  
+
 
 
 LRESULT CALLBACK xwt_gtk_framewndproc(
