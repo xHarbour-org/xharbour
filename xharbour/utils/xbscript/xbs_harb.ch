@@ -29,48 +29,44 @@
   //----------------------------------------------------------------------------//
   CLASS  TInterpreter
 
+     CLASSDATA g_nID           INIT 0
+     CLASSDATA nImpliedMainID  INIT 0
+
+     DATA nID
+     DATA cName                INIT ""
+
      DATA cCompiledText        INIT ""
      DATA nCompiledLines       INIT 0
      DATA nNextStartProc       INIT 1
      DATA cText                INIT ""
      DATA acPPed               INIT {}
      DATA cPPed                INIT ""
-     DATA aCompiledProcs
-     DATA aInitExit
-     DATA nProcs               INIT 0
-     DATA aScriptHostGlobals   INIT {}
+     DATA aCompiledProcs       INIT {}
+     DATA aInitExit            INIT {{},{}}
      DATA bWantsErrorObject    INIT .T.
      DATA nStartLine           INIT 1
-     DATA cName                INIT ""
-     DATA nID                  INIT 0
 
      DATA aDefRules, aDefResults
      DATA aTransRules, aTransResults
      DATA aCommRules, aCommResults
      DATA lRunLoaded, lClsLoaded, lFWLoaded
 
-     METHOD New( bRTEBlock )              CONSTRUCTOR
+     METHOD New( cName )                                CONSTRUCTOR
 
      METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
      METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
-     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::aScriptHostGlobals := {}, ::nProcs := 0, ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ), ::cName := cName )
+     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
+     METHOD SetStaticProcs()                            INLINE s_aProcedures := ::aCompiledProcs
      METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
-     METHOD SetStaticProcedures()                       INLINE s_aProcedures := ::aCompiledProcs
      METHOD GetLine( nLine )                            INLINE IIF( nLine > 0 .AND. nLine < Len( ::acPPed ), ::acPPed[ nLine ], "" )
 
      #ifdef __XHARBOUR__
        METHOD EvalExpression()
-
-       #ifdef AX
-         METHOD IsProcedure( cName )
-         METHOD ScriptSiteAddGlobal( cName, pDisp )
-         METHOD ScriptSiteResetGlobals()
-       #endif
      #endif
 
      METHOD ClearRules()       INLINE PP_ResetRules()
@@ -84,49 +80,43 @@
   ENDCLASS
 
   //----------------------------------------------------------------------------//
-  METHOD New() CLASS TInterpreter
+  METHOD New( cName ) CLASS TInterpreter
 
-     //TraceLog( "New" )
+     ::cName := cName
+     ::nID := ::g_nID++
 
-     #ifdef AX
-        s_bDefRTEBlock := {|e| Break( e ) }
-     #endif
+     //TraceLog( ::cName, ::nID )
 
   RETURN Self
 
   //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
 
-     LOCAL nLine, nLines, sLine, nProcID := ::nProcs
-     LOCAL bErrHandler, oError
-     LOCAL nStart, acPPed, nOffset
+     LOCAL nLine, nLines, sLine, nProcID
+     LOCAL oError
+     LOCAL nStart, acPPed := ::acPPed, nOffset
+     LOCAL bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
      IF Empty( ::cText )
         RETURN .F.
      ENDIF
 
-     bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
+     nProcID := Len( ::aCompiledProcs )
 
      BEGIN SEQUENCE
 
         IF nProcID == 0
-           ::aCompiledProcs     := {}
-           ::aInitExit          := {}
-
            PP_RunInit( ::aCompiledProcs, ::aInitExit, ::nStartLine )
 
            ::cCompiledText      := ""
            ::cPPed              := ""
 
-           ::acPPed             := {}
+           aSize( acPPed, 0 )
 
            ::nCompiledLines     := 0
-           ::nProcs             := 0
-
-           ::nNextStartProc     := 1
-           ::nID                := 0
+           //::nNextStartProc     := 1
         ELSE
-           ::nNextStartProc := nProcID + 1
+           //::nNextStartProc := nProcID + 1
 
            // Restore Rules Engine state.
            aDefRules   := ::aDefRules  ; aDefResults   := ::aDefResults
@@ -135,16 +125,12 @@
            s_lRunLoaded := ::lRunLoaded; s_lClsLoaded := ::lClsLoaded; s_lFWLoaded := ::lFWLoaded
         ENDIF
 
-        IF Empty( ::cName )
-           PP_ModuleName( "" )
-        ELSE
-           PP_ModuleName( ::cName )
-        ENDIF
+        PP_ModuleName( ::cName )
 
         //OutputDebugString( "PrePro:" + EOL + ::cText + EOL )
-        ::cPPed := PP_PreProText( ::cText, ::acPPed, .T., .F., ::nStartLine, ::cName )
+        ::cPPed := PP_PreProText( ::cText, acPPed, .T., .F., ::nStartLine, ::cName )
         //OutputDebugString( ::cPPed + EOL )
-        nLines  := Len( ::acPPed )
+        nLines  := Len( acPPed )
         //TraceLog( ::cText, ::cPPed, nLines )
 
         // Save the Rules Engine state.
@@ -153,7 +139,6 @@
         ::aCommRules  := aClone( aCommRules ) ; ::aCommResults  := aClone( aCommResults )
         ::lRunLoaded := s_lRunLoaded; ::lClsLoaded := s_lClsLoaded; ::lFWLoaded := s_lFWLoaded
 
-        acPPed := ::acPPed
         nStart := ::nCompiledLines + 1
 
         nOffset := 0
@@ -173,7 +158,7 @@
 
         IF nProcID > 0
            IF ! Left( acPPed[nStart], 7 ) == "PP_PROC"
-              acPPed[ nStart ] := "PP_PROC Implied_Main" + LTrim( Str( ::nID++ ) ) + ";" + acPPed[ nStart ]
+              acPPed[ nStart ] := "PP_PROC Implied_Main" + LTrim( Str( ::nImpliedMainID++ ) ) + ";" + acPPed[ nStart ]
            ENDIF
         ENDIF
 
@@ -209,7 +194,6 @@
      ::cText := ""
 
      IF nProcID > 0
-        ::nProcs := nProcId
         ::cCompiledText += ::cText
         ::nCompiledLines := nLines
      ENDIF
@@ -221,16 +205,10 @@
   RETURN nProcId > 0
 
   //----------------------------------------------------------------------------//
-  METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 ) CLASS  TInterpreter
+  METHOD Run( ... ) CLASS  TInterpreter
 
-     LOCAL aParams := HB_aParams(), xRet, oError
-     LOCAL bErrHandler
-
-     #ifdef AX
-        LOCAL bRecoveryBlock
-     #endif
-
-     bErrHandler := ErrorBlock( {|e| Break(e) } )
+     LOCAL xRet, oError
+     LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } )
 
      BEGIN SEQUENCE
 
@@ -243,14 +221,8 @@
            ENDIF
         ENDIF
 
-        IF ::nProcs > 0
-           #ifdef AX
-             IF Len( ::aScriptHostGlobals ) > 0
-                bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( @oErr, oErr:Args ) } )
-             ENDIF
-           #endif
-
-           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, ::nProcs, aParams, ::nNextStartProc )
+        IF Len( ::aCompiledProcs ) > 0
+           xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, Len( ::aCompiledProcs ), HB_aParams(), ::nNextStartProc )
         ELSE
             oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
             oError:ProcLine := 0
@@ -265,12 +237,6 @@
 
      END SEQUENCE
 
-     #ifdef AX
-       IF Len( ::aScriptHostGlobals ) > 0
-          PP_RecoveryBlock( bRecoveryBlock )
-       ENDIF
-     #endif
-
      ErrorBlock( bErrHandler )
 
      IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
@@ -283,15 +249,8 @@
   #ifdef __XHARBOUR__
     METHOD EvalExpression( cExp, aParams, nLine, bScriptProc ) CLASS  TInterpreter
 
-       LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } ), xRet
-
-       #ifdef AX
-         LOCAL bRecoveryBlock
-
-         IF Len( ::aScriptHostGlobals ) > 0
-            bRecoveryBlock := PP_RecoveryBlock( {|oErr| ResolveSiteGlobals( @oErr ) } )
-         ENDIF
-       #endif
+       LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } )
+       LOCAL xRet
 
        BEGIN SEQUENCE
           IF aParams != NIL .AND. cExp[-1] == ')'
@@ -304,17 +263,11 @@
           // xRet will be returned below.
        END SEQUENCE
 
-       #ifdef AX
-         IF Len( ::aScriptHostGlobals ) > 0
-            PP_RecoveryBlock( bRecoveryBlock )
-         ENDIF
-       #endif
-
        ErrorBlock( bErrHandler )
 
     RETURN xRet
 
-  //----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------//
     #ifdef DYN
       EXIT PROCEDURE PP_Cleanup()
          //TraceLog( "Exit" )
@@ -325,41 +278,7 @@
   #endif
 
   //----------------------------------------------------------------------------//
-  #ifdef AX
-    METHOD IsProcedure( cName ) CLASS  TInterpreter
 
-       cName := Upper( cName )
-
-       //TraceLog( cName, ::aCompiledProcs )
-
-    RETURN aScan( ::aCompiledProcs, {|aProc| aProc[1] == cName } ) > 0
-
-    //----------------------------------------------------------------------------//
-    METHOD ScriptSiteAddGlobal( cName, pDisp ) CLASS  TInterpreter
-
-       LOCAL oGlobal := TOleAuto():New( pDisp, cName )
-
-       aAdd( ::aScriptHostGlobals, { cName, pDisp, oGlobal } )
-
-       __QQPub( cName )
-       __MVPUT( cName, oGlobal )
-
-       //TraceLog( cName, pDisp, oGlobal, Type( cName ) )
-
-    RETURN Self
-
-    //----------------------------------------------------------------------------//
-    METHOD ScriptSiteResetGlobals() CLASS  TInterpreter
-
-       LOCAL aGlobal
-
-       FOR EACH aGlobal IN ::aScriptHostGlobals
-          __MVXRELEASE( aGlobal[1] )
-       NEXT
-
-    RETURN .T.
-
-  #endif
   //--------------------------------------------------------------//
 
   CLASS StringOle FROM Character
@@ -1466,13 +1385,6 @@
          #define __XHARBOUR__
       #pragma ENDDUMP
 
-      #ifdef AX
-        #pragma BEGINDUMP
-           #ifndef AX
-              #define AX
-           #endif
-        #pragma ENDDUMP
-      #endif
     #endif
 
     #pragma BEGINDUMP
@@ -1490,16 +1402,6 @@
       #endif
 
       static BOOL s_bArrayPrefix = FALSE;
-
-      #ifdef AX
-        #include <windows.h>
-
-        //----------------------------------------------------------------------------//
-        HB_FUNC( OUTPUTDEBUGSTRING )
-        {
-           OutputDebugString( hb_parcx(1) );
-        }
-      #endif
 
       //----------------------------------------------------------------------------//
       HB_FUNC_STATIC( SETARRAYPREFIX )
@@ -2249,30 +2151,36 @@
 
         typedef struct
         {
-           int iID;
            PHB_PCODEFUNC pDynFunc;
            PHB_DYNS pDynSym;
            PHB_FUNC pPresetFunc;
            HB_SYMBOLSCOPE cPresetScope;
         } DYN_PROC;
 
-        static DYN_PROC *s_pDynList;
-        static int s_iDyn = 0;
+        typedef struct
+        {
+           int iProcs;
+           DYN_PROC pProcsArray[];
+        } DYN_PROCS_LIST;
+
+        static DYN_PROCS_LIST *s_pDynList = NULL;
 
         //---------------------------------------------------------------------------//
         HB_FUNC( PP_GENDYNPROCEDURES )
         {
            PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
+           PHB_ITEM pxList;
+
            //C functions added after (_INITSTATICS) symbol
            // Reverted!
            static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
            static int iHB_APARAMS = 0, iPP_EXECPROCEDURE = 0;
 
-           int iProcedures, iProcedure, iBase = s_iDyn;
+           int iProcedures, iProcedure, iBase, iIndex, iPos;
 
            PHB_PCODEFUNC pDynFunc;
            PHB_DYNS pDynSym;
-           DYN_PROC *pDynList;
+           DYN_PROCS_LIST *pDynList;
 
            if( iHB_APARAMS == 0 )
            {
@@ -2286,46 +2194,107 @@
            }
            else
            {
-              iProcedures = 0;
-           }
-
-           if( iProcedures == 0 )
-           {
-              TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
-              hb_retnl( iBase );
+              //TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
+              hb_retnl( 0 );
               return;
            }
 
-           //TraceLog( NULL, "PP_GenDynProcedures() %i %i\n", iBase, iProcedures );
+           iIndex = hb_parnl( 2 );
 
-           if( s_iDyn )
+           if( iIndex )
            {
-              pDynList = (DYN_PROC *) hb_xrealloc( s_pDynList, sizeof( DYN_PROC ) * ( iBase + iProcedures ) );
+              iProcedure = iIndex - 1;
            }
            else
            {
-              pDynList = (DYN_PROC *) hb_xgrab( sizeof( DYN_PROC ) * iProcedures );
+              iProcedure = 0;
            }
 
-           for( iProcedure = 0; iProcedure < iProcedures; iProcedure++ )
+           if( iProcedures - iProcedure == 0 )
+           {
+              //TraceLog( NULL, "*** Nothing to process *** PP_GENDYNPROCEDURES()\n" );
+              hb_retnl( 0 );
+              return;
+           }
+
+           //TraceLog( NULL, "PP_GenDynProcedures() Len: %i Index: %i Base: %i\n", iProcedures, iIndex, iBase );
+
+           pxList = hb_param( 3, HB_IT_BYREF );
+
+           if( pxList )
+           {
+              if( HB_IS_POINTER( pxList ) )
+              {
+                 pDynList = (DYN_PROCS_LIST *) pxList->item.asPointer.value;
+              }
+              else
+              {
+                 pDynList = NULL;
+              }
+           }
+           else
+           {
+              pDynList = s_pDynList;
+           }
+
+           if( pDynList )
+           {
+              iBase = pDynList->iProcs;
+              pDynList->iProcs += iProcedures - iProcedure;
+              pDynList = (DYN_PROCS_LIST *) hb_xrealloc( pDynList, sizeof(int) + ( sizeof( DYN_PROC ) * pDynList->iProcs ) );
+           }
+           else
+           {
+              iBase = 0;
+              pDynList = (DYN_PROCS_LIST *) hb_xgrab( sizeof(int) + ( sizeof( DYN_PROC ) * ( iProcedures - iProcedure ) ) );
+              pDynList->iProcs = iProcedures - iProcedure;
+
+              if( pxList == NULL )
+              {
+                 s_pDynList = pDynList;
+              }
+           }
+
+           for( iPos = 0; iProcedure < iProcedures; iProcedure++, iPos++ )
            {
               char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
 
-              BYTE *pcode = (BYTE *) hb_xgrab( 31 );
+              iIndex = iProcedure + 1;
 
-              #ifdef AX
-                TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' #%i\n", sFunctionName, iProcedure );
-              #endif
+              //TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' Pos: %i Index: %i\n", sFunctionName, iBase + iPos, iIndex );
 
-              pcode[ 0] = HB_P_SFRAME;
-              pcode[ 1] = HB_LOBYTE( iLastSym );
-              pcode[ 2] = HB_HIBYTE( iLastSym );
+              BYTE *pcode = (BYTE *) hb_xgrab( 15 );
 
-              pcode[ 3] = HB_P_PUSHNIL;
+              /*
+                 PP_ExecProcedure( pProcedures, iIndex, HB_aParams() )
 
-              pcode[ 4] = HB_P_POPSTATIC;
-              pcode[ 5] = 28;
-              pcode[ 6] = 0;                 /* S_XRET */
+                 ->
+
+                 hb_vmPushSymbol( "PP_ExcecProcedure" );
+
+                 hb_vmPushNil();
+
+                 hb_vmPushBaseArray( pProcedures->item.asArray.value );
+
+                 hb_vmPushLong( iIndex );
+
+                    hb_vmPushSymbol( "HB_aParams" );
+                    hb_vmPushNil();
+                    hb_vmFunction( 0 );
+
+                 hb_vmDo( 3 );
+              */
+
+              pcode[ 0] = HB_P_PUSHSYMNEAR;
+              pcode[ 1] = iPP_EXECPROCEDURE;
+
+              pcode[ 2] = HB_P_PUSHNIL;
+
+              pcode[ 3] = HB_P_PUSHNIL; // will default to s_aProcedures
+
+              pcode[ 4] = HB_P_PUSHINT;
+              pcode[ 5] = HB_LOBYTE( iIndex );
+              pcode[ 6] = HB_HIBYTE( iIndex );
 
               pcode[ 7] = HB_P_PUSHSYMNEAR;
               pcode[ 8] = iHB_APARAMS;
@@ -2335,33 +2304,10 @@
               pcode[10] = HB_P_FUNCTIONSHORT;
               pcode[11] =  0;
 
-              pcode[12] = HB_P_POPSTATIC;
-              pcode[13] = 37;
-              pcode[14] = 0;                /* S_APARAMS */
+              pcode[12] =  HB_P_DOSHORT;
+              pcode[13] =  3;
 
-              pcode[15] = HB_P_PUSHSYMNEAR;
-              pcode[16] = iPP_EXECPROCEDURE;
-
-              pcode[17] = HB_P_PUSHNIL;
-
-              pcode[18] = HB_P_PUSHSTATIC;
-              pcode[19] = 27;
-              pcode[20] = 0;                 /* S_APROCEDURES */
-
-              pcode[21] = HB_P_PUSHINT;
-              pcode[22] = HB_LOBYTE( iProcedure + 1 );
-              pcode[23] = HB_HIBYTE( iProcedure + 1 );
-
-              pcode[24] =  HB_P_DOSHORT;
-              pcode[25] =  2;
-
-              pcode[26] = HB_P_PUSHSTATIC;
-              pcode[27] = 28;
-              pcode[28] = 0;                 /* S_XRET */
-
-              pcode[29] =  HB_P_RETVALUE;
-
-              pcode[30] = HB_P_ENDPROC;
+              pcode[14] = HB_P_ENDPROC;
 
               pDynFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
 
@@ -2372,11 +2318,10 @@
               pDynSym = hb_dynsymGet( sFunctionName );
               //TraceLog( NULL, "Dyn: %p %s\n", pDynSym, sFunctionName );
 
-              pDynList[ iBase + iProcedure ].iID          = iProcedure;
-              pDynList[ iBase + iProcedure ].pDynFunc     = pDynFunc;
-              pDynList[ iBase + iProcedure ].pDynSym      = pDynSym;
-              pDynList[ iBase + iProcedure ].pPresetFunc  = pDynSym->pSymbol->value.pFunPtr;
-              pDynList[ iBase + iProcedure ].cPresetScope = pDynSym->pSymbol->cScope;
+              pDynList->pProcsArray[ iBase + iPos ].pDynFunc     = pDynFunc;
+              pDynList->pProcsArray[ iBase + iPos ].pDynSym      = pDynSym;
+              pDynList->pProcsArray[ iBase + iPos ].pPresetFunc  = pDynSym->pSymbol->value.pFunPtr;
+              pDynList->pProcsArray[ iBase + iPos ].cPresetScope = pDynSym->pSymbol->cScope;
 
               pDynSym->pSymbol->value.pFunPtr = (PHB_FUNC) pDynFunc;
               pDynSym->pSymbol->cScope |= HB_FS_PCODEFUNC;
@@ -2385,78 +2330,78 @@
            //hb_retptr( (void *) pDynList );
            hb_retnl( iBase );
 
-           s_pDynList = pDynList;
-           s_iDyn += iProcedures;
+           if( hb_param( 3, HB_IT_BYREF ) )
+           {
+              hb_storptr( pDynList, 3 );
+           }
 
-           //TraceLog( NULL, "Base: %i, New: %i\n", iBase, s_iDyn );
+           //TraceLog( NULL, "Base: %i, New: %i\n", iBase, pDynList->iProcs );
         }
 
         //---------------------------------------------------------------------------//
-        HB_FUNC_STATIC( PP_RELEASEDYNPROCEDURES )
+        HB_FUNC( PP_RELEASEDYNPROCEDURES )
         {
            int i, iProcedures, iBase;
-           DYN_PROC *pDynList;
+           DYN_PROCS_LIST *pDynList;
 
-           PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
-           PHB_ITEM pDynProcs = hb_param( 2, HB_IT_POINTER );
+           PHB_ITEM pxList = hb_param( 2, HB_IT_POINTER );
 
-           if( pProcedures && pDynProcs )
+           if( pxList )
            {
-              iProcedures = pProcedures->item.asArray.value->ulLen;
-              pDynList = (DYN_PROC *) pDynProcs->item.asPointer.value;
-              iBase = 0;
+              pDynList = (DYN_PROCS_LIST *) pxList->item.asPointer.value;
            }
            else
            {
-              iProcedures = s_iDyn;
               pDynList = s_pDynList;
-              iBase = hb_parnl( 1 );
            }
+
+           if( pDynList == NULL )
+           {
+              //TraceLog( NULL, "*** EMPTY List! ***\n" );
+              return;
+           }
+
+           iBase = hb_parnl( 1 );
+
+           iProcedures = pDynList->iProcs;
 
            if( iProcedures == iBase )
            {
+              //TraceLog( NULL, "*** Nothing to release ***\n" );
               return;
            }
 
            for( i = iProcedures - 1; i >= iBase; i-- )
            {
-              #ifdef AX
-                TraceLog( NULL, "Release #%i ID: %i, Dyn: '%s' %p, %p, %p\n", i, pDynList[i].iID, pDynList[i].pDynSym->pSymbol->szName,
-                                 pDynList[i].pDynFunc,
-                                 pDynList[i].pDynFunc->pCode,
-                                 pDynList[i].pDynSym->pSymbol->value.pFunPtr );
-              #endif
-
-              if( pDynList[i].pDynSym->pSymbol->value.pFunPtr == (PHB_FUNC) pDynList[i].pDynFunc )
+              if( pDynList->pProcsArray[i].pDynSym->pSymbol->value.pFunPtr == (PHB_FUNC) pDynList->pProcsArray[i].pDynFunc )
               {
-                 pDynList[i].pDynSym->pSymbol->value.pFunPtr = pDynList[i].pPresetFunc ;
-                 pDynList[i].pDynSym->pSymbol->cScope = pDynList[i].cPresetScope ;
+                 pDynList->pProcsArray[i].pDynSym->pSymbol->value.pFunPtr = pDynList->pProcsArray[i].pPresetFunc ;
+                 pDynList->pProcsArray[i].pDynSym->pSymbol->cScope        = pDynList->pProcsArray[i].cPresetScope ;
               }
               else
               {
                  TraceLog( NULL, "*** FUNCTION MISMATCH ***\n" );
               }
 
-              hb_xfree( (void *) ( pDynList[i].pDynFunc->pCode ) );
-              hb_xfree( (void *) ( pDynList[i].pDynFunc ) );
+              hb_xfree( (void *) ( pDynList->pProcsArray[i].pDynFunc->pCode ) );
+              hb_xfree( (void *) ( pDynList->pProcsArray[i].pDynFunc ) );
            }
 
            if( iBase )
            {
-              pDynList = (DYN_PROC *) hb_xrealloc( (void *) pDynList, sizeof( DYN_PROC ) * iBase );
+              pDynList = (DYN_PROCS_LIST *) hb_xrealloc( (void *) pDynList, sizeof( int ) + ( sizeof( DYN_PROC ) * iBase ) );
+              pDynList->iProcs = iBase;
            }
            else
            {
               hb_xfree( (void *) pDynList );
+              pDynList = NULL;
            }
 
-           if( ! ( pProcedures && pDynProcs ) )
+           if( ! pxList )
            {
               s_pDynList = pDynList;
-              s_iDyn = iBase;
            }
-
-           //TraceLog( NULL, "s_iDyn: %i\n", s_iDyn );
         }
         //---------------------------------------------------------------------------//
 

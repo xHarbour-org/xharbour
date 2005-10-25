@@ -122,7 +122,7 @@
 #COMMAND LOCAL <var,...>      => PP_Locals( { <"var"> } )
 #COMMAND STATIC <var,...>     => PP_Statics( { <"var"> } )
 
-#COMMAND FIELD <var,...>      =>
+#COMMAND FIELD <!var!> [, <morevars,...>] => <-var-> <-morevars->
 
 #XTRANSLATE ProcName( [<n>] ) => PP_ProcName( <n> )
 #XTRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )

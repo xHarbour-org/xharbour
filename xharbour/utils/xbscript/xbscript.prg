@@ -330,7 +330,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #ifndef REVISION
   #define REVISION .0
 #endif
-STATIC s_cVer := "1.0.RC20" + Stringify( REVISION )
+STATIC s_cVer := "1.0.RC21" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -771,7 +771,6 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    #endif
 
    IF nProc > 0
-      s_xRet := NIL
       //? p1, p2, p3, p3, p4, p5, p6, p7, p8, p9
       //? "METHOD:", sProcName, s_aParams[1], s_aParams[2], s_aParams[3]
       //TraceLog()
@@ -787,22 +786,45 @@ RETURN s_xRet
 
 //--------------------------------------------------------------//
 
-FUNCTION PP_ExecProcedure( aProcedures, nProc )
+FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
 
    LOCAL nBlock, nBlocks, xErr
    LOCAL nVar, nVars
-   LOCAL aLastSequence, lRecover := .F.
+   LOCAL aLastSequence, lRecover
    LOCAL aBlocks, aCode, Code1, OpCode
-   LOCAL nForEachIndex := s_nForEachIndex
-   LOCAL aProc := aProcedures[nProc]
-   LOCAL aPresetProc := s_aProc
+   LOCAL nForEachIndex
+   LOCAL aProc
+   LOCAL aPresetProc
    LOCAL aTopProcStack, aProcStack
-   LOCAL nLocalRecover := Len( s_anRecover )
-   LOCAL nSequence := 0
+   LOCAL nLocalRecover
+   LOCAL nSequence
 
+   //TraceLog( aProcedures, nProc, aParams, aProc[1] )
+
+   IF aProcedures == NIL
+      aProcedures := s_aProcedures
+   ENDIF
+
+   aProc := aProcedures[nProc]
+
+   IF PCount() > 2
+      IF aParams == NIL
+         s_aParams := {}
+      ELSE
+         s_aParams := aParams
+      ENDIF
+   ENDIF
+
+   s_xRet := NIL
    s_aProc := aProc
 
    //TraceLog( "DOING: " + aProc[1] )
+
+   lRecover      := .F.
+   nForEachIndex := s_nForEachIndex
+   aPresetProc   := s_aProc
+   nLocalRecover := Len( s_anRecover )
+   nSequence     := 0
 
    IF s_nProcStack > 0
       aProcStack := s_aProcStack[s_nProcStack]
@@ -924,7 +946,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc )
             //TraceLog( "Recovering!!!", xErr, s_anRecover, s_lReturnRequested, s_lTrying )
 
             IF s_lReturnRequested
-               TraceLog( "Return" )
+               //TraceLog( "Return" )
                // Return from this procedure requested by PP_SetReturn()
                s_lReturnRequested := .F.
                EXIT
@@ -1348,10 +1370,23 @@ STATIC PROCEDURE ExecuteLine( sPPed )
 
    BEGIN SEQUENCE
 
-      WHILE ( nNext := AtSkipStrings( ';', sTemp ) ) > 0
-         sBlock := Left( sTemp, nNext - 1 )
-         ExtractLeadingWS( @sBlock )
-         DropTrailingWS( @sBlock )
+      WHILE ! Empty( sTemp )
+         nNext := AtSkipStrings( ';', sTemp )
+
+         IF nNext > 0
+            sBlock := Left( sTemp, nNext - 1 )
+            sTemp  := AllTrim( SubStr( sTemp, nNext + 1 ) )
+         ELSE
+            sBlock := sTemp
+            sTemp := ""
+         ENDIF
+
+         sBlock := ParseAssign( AllTRim( sBlock ) )
+         #ifdef USE_C_BOOST
+            SetArrayPrefix( .F. )
+         #else
+            s_bArrayPrefix := .F.
+         #endif
 
          sTemp2 := sBlock
          WHILE ( nNextAssign := At( ":=", sTemp2 ) ) > 0
@@ -1406,62 +1441,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
                aSize( s_abBlocks, 0 )
             #endif
          ENDIF
-
-         sTemp  := RTrim( SubStr( sTemp, nNext + 1 ) )
-         ExtractLeadingWS( @sTemp )
       ENDDO
-
-      sBlock := sTemp
-      DropTrailingWS( @sBlock )
-
-      IF ! ( sBlock == '' )
-         sTemp2 := sBlock
-         WHILE ( nNextAssign := At( ":=", sTemp2 ) ) > 0
-            sLeft  := Left( sTemp2, nNextAssign - 1 )
-            sTemp2 := SubStr( sTemp2, nNextAssign + 2 )
-
-            DropTrailingWS( @sLeft )
-            nLen := Len( sLeft )
-            WHILE nLen > 0
-               IF SubStr( sLeft, nLen, 1 ) $ " (,=><*+-\^&@["
-                  EXIT
-               ENDIF
-               nLen--
-            ENDDO
-            IF nLen == 0
-               sSymbol := sLeft
-            ELSE
-               sSymbol := SubStr( sLeft, nLen + 1 )
-            ENDIF
-            IF ( Type( sSymbol ) = 'U' )
-               __QQPub( sSymbol )
-            ENDIF
-         ENDDO
-
-         IF sBlock = "__"
-            sSymbol := Upper( SubStr( sBlock, 3, 12 ) ) // Len( "SetOtherwise" )
-         ELSE
-            sSymbol := ""
-         ENDIF
-         IF nIf == 0 .OR. ;
-            sSymbol = "SETIF" .OR. sSymbol = "SETELSE" .OR. sSymbol = "SETELSEIF" .OR. sSymbol = "SETEND" .OR. ;
-            sSymbol = "SETDOCASE" .OR. sSymbol = "SETCASE" .OR. sSymbol = "SETOTHERWISE" .OR. sSymbol = "SETENDCASE" .OR. ;
-            abIf[ nIf ]
-
-            @ 0,0 SAY "PP: "
-            @ 0,4 SAY Pad( sBlock, 76 ) COLOR "N/R"
-            DevPos( s_nRow, s_nCol )
-
-            sBlock := "{|| " + sBlock + " }"
-            #ifdef __CLIPPER__
-               /* Clipper Macro Compiler can't compile nested blocks! */
-               CompileNestedBlocks( sBlock, @sBlock )
-               //TraceLog( sBlock )
-            #endif
-
-            Eval( &sBlock )
-         ENDIF
-      ENDIF
 
       s_nRow := Row()
       s_nCol := Col()
@@ -1501,7 +1481,6 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    LOCAL Dummy
    LOCAL oError
    LOCAL nTemp
-
    LOCAL sEnumerator, sEnumeration
 
    ExtractLeadingWS( @sPPed )
@@ -1986,26 +1965,12 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ENDIF
                ELSE
-                  nAt := AtSkipStrings( '=', sBlock )
-                  IF nAt > 1 .AND. ( ! SubStr( sBlock, nAt - 1, 1 ) $ ":-+*/^%<>!" ) .AND. ( ! SubStr( sBlock, nAt + 1, 1 ) $ "=>" )
-                     nPos := AtSkipStrings( ":=", sBlock )
-                     nTemp := nAt - 1
-
-                     WHILE nPos == 0 .OR. nPos > nAt
-                        IF IsAlpha( SubStr( sBlock, nTemp, 1 ) ) .OR. SubStr( sBlock, nTemp, 1 ) == '_'
-                           EXIT
-                        ELSEIF IsDigit( SubStr( sBlock, nTemp, 1 ) ) .OR. SubStr( sBlock, nTemp, 1 ) == ' '
-                           nTemp--
-                        ELSE
-                           // NOT a valid LValue so don't conver '=' into ':='
-                           nPos := 1
-                        ENDIF
-                     END
-
-                     IF nPos == 0 .OR. nPos > nAt
-                        sBlock := Left( sBlock, nAt - 1 ) + ":" + SubStr( sBlock, nAt )
-                     ENDIF
-                  ENDIF
+                  sBlock := ParseAssign( sBlock )
+                  #ifdef USE_C_BOOST
+                     SetArrayPrefix( .F. )
+                  #else
+                     s_bArrayPrefix := .F.
+                  #endif
                ENDIF
 
                //TraceLog( sBlock, sSymbol )
@@ -2034,6 +1999,66 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    END SEQUENCE
 
 RETURN aProcedures
+
+//--------------------------------------------------------------//
+
+FUNCTION ParseAssign( sBlock )
+
+   LOCAL cID
+   LOCAL cLValue := ""
+   LOCAL cOp     := ""
+   LOCAL nAt
+   LOCAL cPad
+
+   //TraceLog( sBlock )
+
+   WHILE ! Empty( cID := NextToken( @sBlock ) )
+      IF IsAlpha( cID ) .OR. Left( cID, 1 ) == '_'
+         cLValue += cID
+         cOp := DropTrailingWS( NextToken( @sBlock ), @cPad )
+
+         IF cOp == '='
+            RETURN cLValue + ':=' + cPad + sBlock
+         ELSEIF cOp == "->"
+            cLValue += ( cOp + cPad )
+         ELSE
+            EXIT
+         ENDIF
+      ELSE
+         RETURN cLValue + cID + sBlock
+      ENDIF
+   END
+
+   WHILE cOp == "[" .OR. cOp == ':'
+      IF cOp == '['
+         nAt := AtSkipStrings( ']', sBlock )
+
+         IF nAt > 0
+            cOp += ( cPad + Left( sBlock, nAt ) )
+            sBlock := SubStr( sBlock, nAt + 1 )
+            cLValue += cOp
+
+            #ifdef USE_C_BOOST
+               SetArrayPrefix( .T. )
+            #else
+               s_bArrayPrefix := .T.
+            #endif
+
+            cOp := DropTrailingWS( NextToken( @sBlock ), @cPad )
+         ELSE
+            RETURN cLValue + cOp + cPad + sBlock
+         ENDIF
+      ELSE
+         cLValue += ( cOp + cPad )
+         cOp := DropTrailingWS( NextToken( @sBlock ), @cPad )
+      ENDIF
+   END
+
+   IF cOp == '='
+      RETURN cLValue + ':=' + cPad + sBlock
+   ENDIF
+
+RETURN cLValue + cOp + cPad + sBlock
 
 //--------------------------------------------------------------//
 
@@ -2478,17 +2503,10 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       ENDIF
 
       IF nProc > 0
-         s_xRet := NIL
-         IF ValType( oErr:Args ) == 'A'
-            s_aParams := oErr:Args
-         ELSE
-            s_aParams := {}
-         ENDIF
-
          lSuccess := .T.
 
          BEGIN SEQUENCE
-            PP_ExecProcedure( aProcedures, nProc )
+            PP_ExecProcedure( aProcedures, nProc, oErr:Args )
          RECOVER USING oRecover
             lSuccess := .F.
             IF oRecover:ClassName == "ERROR"
@@ -3005,7 +3023,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          BREAK "&&"
                       ENDIF
                       nMaxPos   := nLen - 1
-                      TraceLog( "***" )
                       nPosition := 0
                       LOOP
                    ELSE
@@ -3833,6 +3850,13 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       //? "After Defines:", sLine
 
       sLine := sBackupLine
+
+      // Reset at new line.
+      #ifdef USE_C_BOOST
+         SetArrayPrefix( .F. )
+      #else
+         s_bArrayPrefix := .F.
+      #endif
 
       sPassed := ""
       DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
@@ -5025,12 +5049,12 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
       RETURN NIL
    ENDIF
 
-   // *** To be removed after final testing !!!
-   IF Left( sLine, 1 ) == ' '
-      //TraceLog( "!!!Left Pad: " + sLine )
-      //Alert( [!!!Left Pad: ] + sLine )
-      sLine := LTrim( sLine )
+   IF Empty( lDontRecord )
+      lDontRecord := .F.
    ENDIF
+
+   // *** To be removed after final testing !!!
+   sLine := LTrim( sLine )
 
    nLen := Len( sLine )
    s1 := Left( sLine, 1 )
@@ -9564,7 +9588,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'PUBLIC' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'LOCAL' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'STATIC' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
-   aAdd( aCommRules, { 'FIELD' , { {    1,   0, NIL, 'A', NIL } } , .F. } )
+   aAdd( aCommRules, { 'FIELD' , { {    1,   0, NIL, '!', NIL }, {    2,   1, ',', 'A', NIL } } , .F. } )
 
    IF aScan( aDefRules, {|aDefine| aDefine[1] == "WIN" } ) > 0
       aAdd( aCommRules, { 'ALERT' , { {    1,   0, '(', '<', NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
@@ -9653,7 +9677,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP_Publics( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Locals( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Statics( { ' }, {   0,   1 }, {   0, ' } )' } }, { -1,  3, -1} , { NIL }  } )
-   aAdd( aCommResults, { , , { NIL }  } )
+   aAdd( aCommResults, { { {   0, ' ' }, {   0,   1 }, {   0, ' ' }, {   0,   2 } }, { -1,  0, -1,  0} , { NIL, NIL }  } )
 
    IF aScan( aDefRules, {|aDefine| aDefine[1] == "WIN" } ) > 0
       aAdd( aCommResults, { { {   0, 'MessageBox( 0, CStr( ' }, {   0,   1 }, {   0, ' ), "xBaseScript for Windows", 0 )' } }, { -1,  1, -1} , { NIL }  } )
@@ -10016,8 +10040,8 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
    LOCAL nProc
 
    #ifdef __XHARBOUR__
-      #ifdef DYN
-         LOCAL nPresetDyn
+      #if defined( DYN ) .AND. defined( AUTODYN )
+         LOCAL pDynFunctions
       #endif
    #endif
 
@@ -10025,33 +10049,25 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
       nLine := 0
    ENDIF
 
-   IF aProcedures == s_aProcedures
-      bPreset := .F.
-   ELSE
-      bPreset := .T.
+   aPresetProcedures := s_aProcedures
+   s_aProcedures     := aProcedures
 
-      aPresetProcedures := s_aProcedures
-      s_aProcedures := aProcedures
-
-      #ifdef __XHARBOUR__
-         #ifdef DYN
-            nPresetDyn := PP_GenDynProcedures( aProcedures )
-         #endif
+   #ifdef __XHARBOUR__
+      #if defined( DYN ) .AND. defined( AUTODYN )
+          PP_GenDynProcedures( aProcedures, 1, @pDynFunctions )
       #endif
-   ENDIF
+   #endif
 
    IF bScriptProc .AND. ( nProc := aScan( aProcedures, {|aProc| aProc[1] == cExp } ) ) > 0
       PP_ExecProcedure( s_aProcedures, nProc )
 
-      IF bPreset
-         s_aProcedures := aPresetProcedures
+      s_aProcedures := aPresetProcedures
 
-         #ifdef __XHARBOUR__
-            #ifdef DYN
-               PP_ReleaseDynProcedures( nPresetDyn )
-            #endif
+      #ifdef __XHARBOUR__
+         #if defined( DYN ) .AND. defined( AUTODYN )
+            PP_ReleaseDynProcedures( 0, pDynFunctions )
          #endif
-      ENDIF
+      #endif
 
       RETURN s_xRet
    ElSE
@@ -10110,15 +10126,13 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
       BREAK
    END
 
-    IF bPreset
-      s_aProcedures := aPresetProcedures
+   s_aProcedures := aPresetProcedures
 
-         #ifdef __XHARBOUR__
-         #ifdef DYN
-            PP_ReleaseDynProcedures( nPresetDyn )
-         #endif
-      #endif
-    ENDIF
+   #ifdef __XHARBOUR__
+     #if defined( DYN ) .AND. defined( AUTODYN )
+        PP_ReleaseDynProcedures( 0, pDynFunctions )
+     #endif
+   #endif
 
    ErrorBlock( bErrHandler )
 
@@ -10134,7 +10148,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    #ifdef __XHARBOUR__
       #ifdef DYN
-         LOCAL nPresetDyn
+         LOCAL pDynFunctions
       #endif
    #endif
 
@@ -10155,13 +10169,13 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
       aPresetProcedures := s_aProcedures
       s_aProcedures := aProcedures
-
-      #ifdef __XHARBOUR__
-         #ifdef DYN
-            nPresetDyn := PP_GenDynProcedures( aProcedures )
-         #endif
-      #endif
    ENDIF
+
+   #ifdef __XHARBOUR__
+      #if defined( DYN ) .AND. defined( AUTODYN )
+         PP_GenDynProcedures( aProcedures, 1, @pDynFunctions )
+      #endif
+   #endif
 
    bErrHandler := ErrorBlock( s_bInterceptRTEBlock )
 
@@ -10183,20 +10197,18 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
          PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
       NEXT
    RECOVER USING oError
-      TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
+      //TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
    END SEQUENCE
 
    ErrorBlock( bErrHandler )
 
-   IF bPreset
-     s_aProcedures := aPresetProcedures
+   s_aProcedures := aPresetProcedures
 
-     #ifdef __XHARBOUR__
-        #ifdef DYN
-           PP_ReleaseDynProcedures( nPresetDyn )
-        #endif
+   #ifdef __XHARBOUR__
+     #if defined( DYN ) .AND. defined( AUTODYN )
+        PP_ReleaseDynProcedures( 0, pDynFunctions )
      #endif
-   ENDIF
+   #endif
 
    IF oError != NIL
       Break( oError )
@@ -10298,6 +10310,22 @@ FUNCTION PP_EnumIndex()
 RETURN s_anEnumIndex[ s_nForEachIndex ]
 
 //--------------------------------------------------------------//
+FUNCTION PP_DefaultErrorBlock( bNewBlock )
+
+   LOCAL bRet := s_bDefRTEBlock
+
+   IF PCount() > 0
+      s_bDefRTEBlock := bNewBlock
+
+      IF s_lTrying
+         s_lTrying := .F.
+         s_aSequence[ Len( s_aSequence ) ][2] := .F.
+      ENDIF
+   ENDIF
+
+RETURN bRet
+
+//--------------------------------------------------------------//
 FUNCTION PP_ErrorBlock( bNewBlock )
 
    LOCAL bRet := s_bRTEBlock
@@ -10372,6 +10400,11 @@ RETURN .F.
 FUNCTION PP_ErrorMessage( e )
 
   LOCAL cMessage, nArg, nArgs, nPad, nLevel
+
+  IF e:ClassName != "ERROR"
+     //TraceLog( e )
+     RETURN ProcName() + ": Invalid Object argument from: " + ProcName(1) + "(" + Str( ProcLine(1) ) + ")"
+  ENDIF
 
   IF e:severity > ES_WARNING
      cMessage := "Error "

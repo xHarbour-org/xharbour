@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4513 2005/10/25 20:06:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4514 2005/10/25 20:23:25 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,33 @@
   * source/rtl/win32prn.prg
     ! HB_FUNC_STATIC( CREATEFONT ) - remove dwCharSet >= 0 test
       which was always true.
+
+2005-10-20 13:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/rp_run.src
+    * Corrected #command FIELD ... to not conflict with FIELD-> expressions.
+
+  * utils/xbscript/xbs_harb.ch
+    - Removed code guarded with #ifdef AX
+    + Added nID property auto generated using a class a new class data g_nID
+    % Rewrote PP_GenDynProcedures() and PP_ReleaseDynProcedures()
+    * Other refinments
+
+  * utils/xbscript/xbscript.prg
+    * Improved PP_ExecProcedure() to accept optional aParams argument,
+      to default aProcedures to s_aProcedures, to reset s_xRet
+    - Removed duplicate code segment in PP_ExecuteLine()
+    + Added actual parser function ParseAssign() to detrmine assignment context
+      of the 1st '=' Operator in a line.
+    + Added few missing bSetarray flags.
+    * Corrected burned-in #Command FIELD as per above change rp_run.src.
+    * Refinments in PP_Eval() and PP_Exec()
+    + New FUNCTION PP_DefaultErrorBlock( bNewBlock ) to override the default
+      script Error Handler.
+    * Additional validation on PP_ErrorMessage()
+
+  * hrbdll.vc
+    - Removed no longer needed defines -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS
+
 
 2005-10-25 12:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

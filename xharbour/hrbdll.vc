@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.78 2005/10/04 15:52:38 kaddath Exp $
+# $Id: hrbdll.vc,v 1.79 2005/10/14 02:43:56 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -2680,7 +2680,7 @@ $(OBJ_DIR)\rt_ccall.c : $(HBTEST_DIR)\rt_ccall.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -Fo$@ $**
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBMAKE.EXE dependencies ³Û
@@ -2753,7 +2753,7 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS -Fo$@ $**
+   $(CC) $(CLIBFLAGS) -Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBDOCDLL.EXE dependencies ³Û
