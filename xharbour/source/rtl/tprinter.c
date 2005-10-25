@@ -305,16 +305,18 @@ HB_FUNC( GETPRINTERS )
    HANDLE hPrinter ;
    DWORD Flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
    BOOL bPrinterNamesOnly= TRUE ;
+   BOOL bLocalPrintersOnly= FALSE ;
    PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
    PRINTER_INFO_5 *buffer, *pPrinterEnum;
    PRINTER_INFO_2 *pPrinterInfo2 ;
    ULONG needed = 0 , returned=0, a;
-   HB_ITEM SubItems, File, Port, ArrayPrinter;
+   HB_ITEM SubItems, File, Port, Net, ArrayPrinter;
 
    ArrayPrinter.type = HB_IT_NIL;
    SubItems.type = HB_IT_NIL;
    File.type = HB_IT_NIL;
    Port.type = HB_IT_NIL;
+   Net.type = HB_IT_NIL;
 
    hb_arrayNew( &ArrayPrinter, 0 );
 
@@ -325,6 +327,8 @@ HB_FUNC( GETPRINTERS )
    {
       bPrinterNamesOnly = !hb_parl(1) ;
    }
+
+   bLocalPrintersOnly = ISLOG(2) ? hb_parl(2) : FALSE;
 
    if ( hb_iswinnt() )
    {
@@ -341,36 +345,61 @@ HB_FUNC( GETPRINTERS )
                {
                   for ( a = 0 ; a < returned ; a++, pPrinterEnum4++)
                   {
-                     hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
-                     hb_arrayAddForward( &ArrayPrinter , &File );
+                     if(!bLocalPrintersOnly || pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_LOCAL)
+                     {
+                        hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
+                        hb_arrayAddForward( &ArrayPrinter , &File );
+                     }
                   }
                }
                else
                {
                   for ( a = 0 ; a < returned ; a++, pPrinterEnum4++)
                   {
-                     if ( OpenPrinter( pPrinterEnum4->pPrinterName, &hPrinter, NULL ) )
+                     if(!bLocalPrintersOnly || pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_LOCAL)
                      {
-                        GetPrinter( hPrinter, 2, NULL, 0, &needed );
-                        if ( needed > 0 )
+                        if ( OpenPrinter( pPrinterEnum4->pPrinterName, &hPrinter, NULL ) )
                         {
-                           pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
-                           if ( pPrinterInfo2 )
+                           GetPrinter( hPrinter, 2, NULL, 0, &needed );
+                           if ( needed > 0 )
                            {
-                              hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
-                              hb_arrayNew( &SubItems, 0 );
-                              if ( GetPrinter( hPrinter, 2, (LPBYTE) pPrinterInfo2, needed, &needed ) )
+                              pPrinterInfo2 = ( PRINTER_INFO_2 * ) hb_xgrab( needed ) ;
+                              if ( pPrinterInfo2 )
                               {
-                                 hb_itemPutC( &Port,pPrinterInfo2->pPortName );
+                                 hb_arrayNew( &SubItems, 0 );
+                                 hb_itemPutC( &File, pPrinterEnum4->pPrinterName );
+
+                                 if ( GetPrinter( hPrinter, 2, (LPBYTE) pPrinterInfo2, needed, &needed ) )
+                                 {
+                                    hb_itemPutC( &Port,pPrinterInfo2->pPortName );
+                                 }
+                                 else
+                                 {
+                                    hb_itemPutC( &Port,"Error" );
+                                 }
+
+                                 if ( pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_LOCAL)
+                                 {
+                                    hb_itemPutC( &Net,"LOCAL" );
+                                 }
+                                 else
+                                 {
+                                    if ( pPrinterEnum4->Attributes & PRINTER_ATTRIBUTE_NETWORK)
+                                    {
+                                       hb_itemPutC( &Net,"NETWORK" );
+                                    }
+                                    else
+                                    {
+                                       hb_itemPutC( &Net, "ERROR" );
+                                    }
+                                 }
+
+                                 hb_arrayAddForward( &SubItems, &File ) ;
+                                 hb_arrayAddForward( &SubItems, &Port ) ;
+                                 hb_arrayAddForward( &SubItems, &Net ) ;
+                                 hb_arrayAddForward( &ArrayPrinter, &SubItems );
+                                 hb_xfree(pPrinterInfo2) ;
                               }
-                              else
-                              {
-                                 hb_itemPutC( &Port,"Error" );
-                              }
-                              hb_arrayAddForward( &SubItems, &File ) ;
-                              hb_arrayAddForward( &SubItems, &Port ) ;
-                              hb_arrayAddForward( &ArrayPrinter, &SubItems );
-                              hb_xfree(pPrinterInfo2) ;
                            }
                         }
                         CloseHandle(hPrinter) ;
@@ -395,19 +424,40 @@ HB_FUNC( GETPRINTERS )
             {
                for ( a = 0 ; a < returned ; a++, pPrinterEnum++)
                {
-                  if (bPrinterNamesOnly )
+                  if(!bLocalPrintersOnly || pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL)
                   {
-                     hb_itemPutC( &File, pPrinterEnum->pPrinterName );
-                     hb_arrayAddForward( &ArrayPrinter , &File );
-                  }
-                  else
-                  {
-                     hb_arrayNew( &SubItems, 0 );
-                     hb_itemPutC( &File, pPrinterEnum->pPrinterName );
-                     hb_itemPutC( &Port, pPrinterEnum->pPortName );
-                     hb_arrayAddForward( &SubItems , &File ) ;
-                     hb_arrayAddForward( &SubItems , &Port ) ;
-                     hb_arrayAddForward( &ArrayPrinter , &SubItems );
+                     if (bPrinterNamesOnly )
+                     {
+                        hb_itemPutC( &File, pPrinterEnum->pPrinterName );
+                        hb_arrayAddForward( &ArrayPrinter , &File );
+                     }
+                     else
+                     {
+                        hb_arrayNew( &SubItems, 0 );
+                        hb_itemPutC( &File, pPrinterEnum->pPrinterName );
+                        hb_itemPutC( &Port, pPrinterEnum->pPortName );
+
+                        if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_LOCAL)
+                        {
+                           hb_itemPutC( &Net,"LOCAL" );
+                        }
+                        else
+                        {
+                           if ( pPrinterEnum->Attributes & PRINTER_ATTRIBUTE_NETWORK)
+                           {
+                              hb_itemPutC( &Net,"NETWORK" );
+                           }
+                           else
+                           {
+                              hb_itemPutC( &Net, "ERROR" );
+                           }
+                        }
+
+                        hb_arrayAddForward( &SubItems , &File ) ;
+                        hb_arrayAddForward( &SubItems , &Port ) ;
+                        hb_arrayAddForward( &SubItems, &Net ) ;
+                        hb_arrayAddForward( &ArrayPrinter , &SubItems );
+                     }
                   }
                }
             }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4515 2005/10/25 20:49:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4516 2005/10/25 20:52:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-17 13:06 UTC-0800 Tony Bretado <tony@bretado.com>
+  * source/rtl/tprinter.c
+    + Added 2nd arg bLocalPrintersOnly to GetPrinters(). Example: GetPrinters(Nil, .t.)
+        Where bLocalPrintersOnly could be TRUE || FALSE
+        So you can request array of LOCAL Printers when this Arg == TRUE.
+        Default is FALSE to keep previous compatibility.
+    + Added 3rd item to each subarray when calling GetPrinters(.t.).
+        Before each subarray was {PrinterName, PrinterPort}
+        Now is {PrinterName, PrinterPort, PrinterScope} where PrinterScope could be "LOCAL" || "NETWORK" || "ERROR"
+    // I have tested both under WinXP & Win98
 
 2005-10-20 13:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/rp_run.src
