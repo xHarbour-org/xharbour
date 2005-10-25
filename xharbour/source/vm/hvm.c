@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.510 2005/10/19 02:18:54 druzus Exp $
+ * $Id: hvm.c,v 1.511 2005/10/24 01:04:37 druzus Exp $
  */
 
 /*
@@ -789,6 +789,7 @@ void hb_vmReleaseLocalSymbols( void )
 int HB_EXPORT hb_vmQuit( void )
 {
    static BOOL bQuitting = FALSE;
+   unsigned int i;
 
    HB_THREAD_STUB
 
@@ -866,6 +867,24 @@ int HB_EXPORT hb_vmQuit( void )
    if( hb_set.HB_SET_EOL )
    {
       hb_itemRelease( hb_set.HB_SET_EOL );
+   }
+
+   // FOR EACH Enumerations.
+   for( i = 0; i < hb_vm_wEnumCollectionCounter; i++ )
+   {
+      if( HB_IS_COMPLEX(  &( hb_vm_aEnumCollection[ i ] ) ) )
+      {
+         hb_itemClear( &( hb_vm_aEnumCollection[ i ] ) );
+      }
+   }
+
+   // WITH OBJECT
+   for( i = 0; i < hb_vm_wWithObjectCounter; i++ )
+   {
+      if( HB_IS_COMPLEX( &( hb_vm_aWithObject[ i ] ) ) )
+      {
+         hb_itemClear( &( hb_vm_aWithObject[ i ] ) );
+      }
    }
 
    /* release all remaining items */

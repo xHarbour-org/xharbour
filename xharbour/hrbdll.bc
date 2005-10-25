@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.103 2005/10/10 16:25:10 kaddath Exp $
+# $Id: hrbdll.bc,v 1.104 2005/10/13 23:46:45 ath1 Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -3440,7 +3440,7 @@ $(OBJ_DIR)\rt_ccall.c : $(HBTEST_DIR)\rt_ccall.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
-   $(CC) $(CLIBFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBMAKE.EXE dependencies ³Û
@@ -3518,7 +3518,7 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
-   $(CC) $(CLIBFLAGS) -D"HB_NO_DEFAULT_API_MACROS" -D"HB_NO_DEFAULT_STACK_MACROS" -o$@ $**
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ HBDOCDLL.EXE dependencies ³Û
