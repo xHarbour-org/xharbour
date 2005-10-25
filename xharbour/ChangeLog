@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4510 2005/10/25 15:18:32 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4511 2005/10/25 17:10:36 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-25 12:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    * Restored HB_P_*ADDINT hb_vmPlus(), hb_vmMinus(), hb_vmInc(), hb_vmDec()
+      to return number when char subtype used in NUMRRIC contect.
+
+  * utils/hbtest/rt_misc.prg
+    * Corrected wrong expected result.
 
 2005-10-25 10:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

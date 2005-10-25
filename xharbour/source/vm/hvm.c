@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.513 2005/10/25 17:20:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.514 2005/10/25 17:22:33 ronpinkas Exp $
  */
 
 /*
@@ -2755,8 +2755,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
             {
-               pLocal->item.asString.value = hb_vm_acAscii[ (BYTE) ( pLocal->item.asString.value[0] + iAdd ) ];
-               break;
+               HB_LONG lNewVal, lVal = pLocal->item.asString.value[0];
+
+               lNewVal = lVal + iAdd;
+
+               if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+               {
+                  HB_ITEM_PUT_NUMINTRAW( pLocal, lNewVal );
+                  break;
+               }
+               else
+               {
+                  dNewVal = ( double ) lVal + ( double ) iAdd;
+               }
             }
             else if( HB_IS_DOUBLE( pLocal ) )
             {
@@ -2941,8 +2952,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
             {
-               pTop->item.asString.value = hb_vm_acAscii[ (BYTE) ( pTop->item.asString.value[0] + iAdd ) ];
-               break;
+               HB_LONG lNewVal, lVal = pTop->item.asString.value[0];
+
+               lNewVal = lVal + iAdd;
+
+               if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+               {
+                  HB_ITEM_PUT_NUMINTRAW( pTop, lNewVal );
+                  break;
+               }
+               else
+               {
+                  dNewVal = ( double ) lVal + ( double ) iAdd;
+               }
             }
             else if( ( hb_objGetOpOver( pTop ) & HB_CLASS_OP_PLUS ) )
             {
@@ -4008,6 +4030,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    /* Intentionally using HB_IS_NUMERIC() instead of HB_IS_NUMBER() on the right
       Clipper consider DATE + NUMBER => DATE and DATE + DATE => DATE
    */
+   /*
    else if( HB_IS_STRING( pLeft ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
       BYTE bByte = (BYTE) ( hb_itemGetND( pLeft ) + hb_itemGetND( pRight ) );
@@ -4035,6 +4058,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
       }
 
    }
+   */
    else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
       hb_itemPutDL( pResult, (LONG) hb_itemGetND( pLeft ) + (LONG) hb_itemGetND( pRight ) );
@@ -4139,6 +4163,7 @@ static void hb_vmMinus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
    }
+   /*
    else if( ( HB_IS_STRING( pItem1 ) || HB_IS_STRING( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
       double dNumber2 = hb_vmPopNumber();
@@ -4152,6 +4177,7 @@ static void hb_vmMinus( void )
          pItem1->item.asString.length = 1;
       }
    }
+   */
    else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
       double dNumber2 = hb_vmPopNumber();
@@ -4164,10 +4190,15 @@ static void hb_vmMinus( void )
       HB_LONG lNumber2 = hb_vmPopHBLong();
       HB_LONG lNumber1 = hb_vmPopHBLong();
       HB_LONG lResult = lNumber1 - lNumber2;
+
       if ( lNumber2 <= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
+      {
          hb_vmPushNumInt( lResult );
+      }
       else
+      {
          hb_vmPushDouble( ( double ) lNumber1 - ( double ) lNumber2, 0 );
+      }
    }
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
    {
@@ -4485,7 +4516,11 @@ static void hb_vmInc( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[0] + 1 ) ];
+      pItem->type = HB_IT_INTEGER;
+      pItem->item.asInteger.value = pItem->item.asString.value[0];
+
+      pItem->item.asInteger.value++;
+      pItem->item.asInteger.length = HB_INT_LENGTH( pItem->item.asInteger.value );
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -4544,7 +4579,11 @@ static void hb_vmDec( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[0] - 1 ) ];
+      pItem->type = HB_IT_INTEGER;
+      pItem->item.asInteger.value = pItem->item.asString.value[0];
+
+      pItem->item.asInteger.value--;
+      pItem->item.asInteger.length = HB_INT_LENGTH( pItem->item.asInteger.value );
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -5163,8 +5202,10 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
          hb_itemRelease( pResult );
       }
       else
+      {
          /* NOTE: Return from the inside. */
          return;
+      }
    }
 
    dStep = hb_vmPopNumber();
@@ -5181,8 +5222,10 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
          hb_itemRelease( pResult );
       }
       else
+      {
          /* NOTE: Return from the inside. */
          return;
+      }
    }
 
    if ( hb_stackItemFromTop( -1 )->type == HB_IT_LOGICAL )
@@ -5203,10 +5246,14 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
             hb_itemRelease( pResult );
          }
          else
+         {
             /* NOTE: Return from the inside. */
             return;
+         }
       }
+
       lCurrent = hb_vmPopLogical();
+
       if( dStep >= 0 )           /* Positive loop. Use LESS */
       {
          hb_vmPushLogical( lCurrent <= lEnd );
@@ -5222,6 +5269,7 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
       double dCurrent;
 
       dEnd = hb_vmPopNumber();
+
       while( ! HB_IS_NUMERIC( hb_stackItemFromTop( -1 ) ) )
       {
          PHB_ITEM pItem1 = hb_stackItemFromTop( -1 );
@@ -5237,7 +5285,9 @@ static void hb_vmForTest( void )        /* Test to check the end point of the FO
             /* NOTE: Return from the inside. */
             return;
       }
+
       dCurrent = hb_vmPopNumber();
+
       if( dStep >= 0 )          /* Positive loop. Use LESS */
       {
          hb_vmPushLogical( dCurrent <= dEnd );

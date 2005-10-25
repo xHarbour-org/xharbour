@@ -1,5 +1,5 @@
 /*
- * $Id: rt_misc.prg,v 1.7 2005/03/20 02:13:45 andijahja Exp $
+ * $Id: rt_misc.prg,v 1.8 2005/10/18 06:10:32 ronpinkas Exp $
  */
 
 /*
@@ -196,7 +196,7 @@ FUNCTION Main_MISC()
    TEST_LINE( TFORNEXT( .T., .F., NIL )       , .T.                                       )
    TEST_LINE( TFORNEXT( .F., .F., NIL )       , "E BASE 1086 Argument error ++ A:1:L:.F. F:S" )
    TEST_LINE( TFORNEXT( 100, 101, NIL )       , 102                                       )
-   TEST_LINE( TFORNEXT( "A", "A", NIL )       , "B" )
+   TEST_LINE( TFORNEXT( "A", "A", NIL )       , 66 )
    TEST_LINE( TFORNEXT( NIL, NIL, NIL )       , "E BASE 1075 Argument error > A:2:U:NIL;U:NIL F:S" )
    TEST_LINE( TFORNEXT( .F., .T.,   1 )       , "E BASE 1081 Argument error + A:2:L:.F.;N:1 F:S"   )
    TEST_LINE( TFORNEXT( .F., .T.,  -1 )       , .F.                                       )
