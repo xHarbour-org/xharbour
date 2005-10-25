@@ -1,5 +1,5 @@
 /*
- * $Id: README.txt,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: README.txt,v 1.2 2005/10/25 00:51:25 fsgiudice Exp $
  */
 
 /*
@@ -43,10 +43,13 @@ Actually platforms supported are:
 - GNU systems / GCC
 
 to build library on Win32 with BCC use:
-make_b32.bat
+Download bdg.dll from this link:
+   http://www.boutell.com/gd/http/gdwin32.zip
+then
+   make_b32.bat
 
 on GNU system use:
-make install
+   make install
 
 DOCUMENTATION
 =============
@@ -65,6 +68,7 @@ test_out.prg is a sample of a cgi application for windows (I have to complete it
 
 NOTES
 =====
+
 
 WARNING: if you are using Windows platform, copy bgd.dll in tests before use it.
 

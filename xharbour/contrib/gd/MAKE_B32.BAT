@@ -7,6 +7,8 @@ set HB_MT=
 set HB_GT_LIB=gtcgi
 rem if exist %PRGNAME%.exe del %PRGNAME%.exe
 
+if not exist bdg.dll goto NODLL
+
 if not exist .\lib md .\lib
 if not exist .\obj md .\obj
 
@@ -33,6 +35,14 @@ goto end
 impdef -a lib\libbgd.def bgd.dll
 implib -a lib\libbgd.lib lib\libbgd.def
 copy lib\*.lib ..\..\lib
+
+goto end
+
+:NODLL
+
+echo.
+echo.Missing bdg.dll, please download it
+echo.
 
 :end
 if exist *.tds del *.tds
