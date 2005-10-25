@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4514 2005/10/25 20:23:25 peterrees Exp $
+ * $Id: ChangeLog,v 1.4515 2005/10/25 20:49:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,6 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-2005-10-26 09:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
-  * source/rtl/win32prn.prg
-    ! HB_FUNC_STATIC( CREATEFONT ) - remove dwCharSet >= 0 test
-      which was always true.
 
 2005-10-20 13:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/rp_run.src
@@ -38,6 +34,10 @@
   * hrbdll.vc
     - Removed no longer needed defines -DHB_NO_DEFAULT_API_MACROS -DHB_NO_DEFAULT_STACK_MACROS
 
+2005-10-26 09:21 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    ! HB_FUNC_STATIC( CREATEFONT ) - remove dwCharSet >= 0 test
+      which was always true.
 
 2005-10-25 12:58 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
