@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.16 2004/07/09 19:55:05 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.17 2005/01/09 20:39:52 likewolf Exp $
  */
 
 /*
@@ -113,26 +113,26 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
    /* A hack to enforce cursor setting in Giancarlo's HBEditor */
    SetCursor( SC_SPECIAL1 )
 
-   Super:New("", nTop, nLeft, nBottom, nRight, .F., -1)
-   Super:SetColor(cColor)
+   ::Super:New("", nTop, nLeft, nBottom, nRight, .F., -1)
+   ::Super:SetColor(cColor)
 
    /* A hack to enforce cursor setting in Eduardo's HBEditor */
    ::nCurrentCursor := SC_SPECIAL1
 
    /* A hack to inhibit word-wrapping in Giancarlo's HBEditor */
    ::lWordWrap := .F.
-  
-   Super:LoadFile(cFileName)
+
+   ::Super:LoadFile(cFileName)
 
 return Self
 
 
 METHOD GetLine(nRow) CLASS TBrwText
-RETURN IIf( ::lLineNumbers, AllTrim( Str( nRow ) ) + ": ", "" ) + Super:GetLine( nRow )
+RETURN IIf( ::lLineNumbers, AllTrim( Str( nRow ) ) + ": ", "" ) + ::Super:GetLine( nRow )
 
 
 METHOD GotoLine( n ) CLASS TBrwText
-   Super:GotoLine( n )
+   ::Super:GotoLine( n )
 return Self
 
 
@@ -165,12 +165,12 @@ METHOD RefreshCurrent() CLASS TBrwText
 return Self
 
 
-/* This method is to restore correct cursor position after Super:Resize() */
+/* This method is to restore correct cursor position after ::Super:Resize() */
 METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS TBrwText
    LOCAL nRow
 
    nRow := ::nRow
-   Super:Resize( nTop, nLeft, nBottom, nRight )
+   ::Super:Resize( nTop, nLeft, nBottom, nRight )
    ::GotoLine( nRow )
 RETURN Self
 
@@ -182,8 +182,8 @@ METHOD ScrollTo( nCol ) CLASS TBrwText
       ::RefreshWindow()
       ::SetPos( ::Row(), ::nLeft )
    ENDIF
-RETURN Self   
-   
+RETURN Self
+
 
 METHOD Search( cString, lCaseSensitive, nMode ) CLASS TBrwText
 
