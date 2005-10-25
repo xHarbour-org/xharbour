@@ -1,5 +1,5 @@
 /*
- * $Id: gdtestcls.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: gdtestcls.prg,v 1.2 2005/10/24 23:05:07 fsgiudice Exp $
  */
 
 /*
@@ -306,6 +306,10 @@ PROCEDURE Main()
 
    /* Destroy images in memory */
    // Class does it auto
+
+   ?
+   ? "Look at " + IMAGES_OUT + " folder for output images"
+   ?
 
 RETURN
 

@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: README.txt,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -25,6 +25,10 @@ Folder structure:
   +- include        : include files
   +- lib            : output library folder
   +- obj            : output object folder
+  +- samples        : samples folder
+  |  |
+  |  +- counter     : a sample counter
+  |
   +- source         : source files
   +- tests          : test files
      |

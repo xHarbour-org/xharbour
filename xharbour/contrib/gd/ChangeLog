@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2 2005/10/24 23:05:05 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.3 2005/10/24 23:15:00 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-25 02:43 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  * contrib/gd/tests/gdtest.prg
+  * contrib/gd/tests/gdtestcls.prg
+    * some fixes
+
+  * contrib/gd/README.txt
+    * updated
+
+  + contrib/gd/samples
+    + added a samples directory
+
+  + contrib/gd/samples/counter/bldtest.bat
+  + contrib/gd/samples/counter/counter.prg
+  + contrib/gd/samples/counter/digits
+  + contrib/gd/samples/counter/digits/57chevy.gif
+  + contrib/gd/samples/counter/digits/7seg.gif
+  + contrib/gd/samples/counter/digits/brsd.gif
+  + contrib/gd/samples/counter/digits/digib.gif
+  + contrib/gd/samples/counter/digits/digitmania.url
+  + contrib/gd/samples/counter/digits/fdb.gif
+  + contrib/gd/samples/counter/digits/jelly.gif
+  + contrib/gd/samples/counter/digits/odb.gif
+  + contrib/gd/samples/counter/digits/odw.gif
+  + contrib/gd/samples/counter/digits/pdg.gif
+  + contrib/gd/samples/counter/digits/pdw.gif
+    + added a counter sample
+
+  /*
+    A first sample: an image counter
+    to build: bldtest counter
+    to run:   counter
+        to have a random number using 57chevy.gif as base image
+        or:   counter 372647 odb.gif
+        to have a fixed number with odb.gif as base image
+
+    base images from digitmania
+
+    Enjoy!
+
+    Francesco
+
+  */
 
 2005-10-25 01:14 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
 
