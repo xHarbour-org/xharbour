@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.34 2005/07/06 21:32:35 peterrees Exp $
+ * $Id: memoedit.prg,v 1.35 2005/09/20 06:23:10 vouchcac Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ CLASS TMemoEditor FROM HBEditor
    DATA  xUserFunction                    // User Function called to change default MemoEdit() behaviour
 
    METHOD MemoInit( cUserFunction )       // This method is called after ::New() returns to perform ME_INIT actions
-   METHOD Edit()                          // Calls super:Edit(nKey) but is needed to handle configurable keys
+   METHOD Edit()                          // Calls ::Super:Edit(nKey) but is needed to handle configurable keys
    METHOD KeyboardHook( nKey )            // Gets called every time there is a key not handled directly by HBEditor
    METHOD IdleHook()                      // Gets called every time there are no more keys to hanlde
 
@@ -123,95 +123,111 @@ METHOD Edit() CLASS TMemoEditor
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    //
-   if ISCHARACTER( ::xUserFunction )  // Removed '::lEditAllow' condition, Ath 2004-05-25, again 2004-11-30
+   if ISCHARACTER( ::xUserFunction )
 
       while ! ::lExitEdit
 
          // I need to test this condition here since I never block inside HBEditor:Edit()
          // if there is an user function
-         //
          if NextKey() == 0
             ::IdleHook()
          endif
 
          nKey := Inkey( 0 )
 
-	 //	For Clipper compatibility:
-         //  Ath 2004-05-25: All keys should be processed by the UDF before internal processing continues
-
-         nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
-
-         if nUserkey <> nil
-            ::HandleUserKey( nKey, @nUserKey )       // Optionally delete nHandleKey content if NOT used, Ath 2004-05-25
-
-            if nUserkey = nil
-               super:Edit( nKey )
-            endif
-
-         else
-            // Evaluate SetKey settings *after* the user-function is called, just like Clipper, Ath 2004-05-25
          if ( bKeyBlock := Setkey( nKey ) ) <> NIL
             Eval( bKeyBlock, ::ProcName, ::ProcLine, ReadVar() )
             Loop
          endif
 
+         /* 24/10/2005 - <maurilio.longo@libero.it>
+                         Taken from clipper norton guide:
+
+                           The user function: <cUserFunction>, a user-defined function
+                           specified as an argument, handles key exceptions and reconfigures
+                           special keys.  The user function is called at various times by
+                           MEMOEDIT(), most often in response to keys it does not recognize.
+                           Keys that instigate a key exception are all available control keys,
+                           function keys, and Alt keys.  Since these keys are not processed by
+                           MEMOEDIT(), they can be reconfigured.  Some of these keys have a
+                           default action assigned to them.  In the user function, you perform
+                           various actions, depending on the current MEMOEDIT() mode, then
+                           RETURN a value telling MEMOEDIT() what to do next.
+
+                           When the user function argument is specified, MEMOEDIT() defines two
+                           classes of keys: nonconfigurable and key exceptions.  When a
+                           nonconfigurable key is pressed, MEMOEDIT() executes it, otherwise a
+                           key exception is generated and the user function is called.  When
+                           there are no keys left in the keyboard buffer for MEMOEDIT() to
+                           process, the user function is called once again.
+         */
+
          // Is it a configurable key ?
-         //
          if nKey IN aConfigurableKeys
             nUserKey := ::xDo( iif( ::lDirty, ME_UNKEYX, ME_UNKEY ) )
+            // Don't pass nUserKey by reference since ::HandleUserKey() defaults it to zero
             ::HandleUserKey( nKey, nUserKey )
 
          else
-            super:Edit( nKey )
+            // Key exceptions go to TEditor which, being not able to handle them (think about K_Fn)
+            // calls ::KeyboardHook() which calls user-function if available
+            ::Super:Edit( nKey )
 
-         endif
          endif
 
       enddo
 
-   else  // if ::lEditAllow
-      // If There is not a user function enter standard HBEditor
-      // ::Edit() method which is able to handle everything
-      super:Edit( nKey )
+   else
+      if ::lEditAllow
+         // If There is not a user function enter standard HBEditor
+         // ::Edit() method which is able to handle everything
+         ::Super:Edit( nKey )
 
-// Clipper compatibility: removed
-//   else
-//      // Edit not allowed, so I scroll text area instead of moving cursor
-//      while ! ::lExitEdit
-//
-//         if NextKey() == 0
-//            ::IdleHook()
-//         endif
-//
-//         nKey := InKey( 0 )
-//
-//         switch nKey
-//         case K_UP
-//            if ::nFirstRow > 1
-//               ::nFirstRow--
-//               ::nRow--
-//               ::RefreshWindow()
-//            endif
-//            exit
-//
-//         case K_DOWN
-//            if ::nFirstRow < ::naTextLen
-//               ::nFirstRow++
-//               ::nRow++
-//               ::RefreshWindow()
-//            endif
-//            exit
-//
-//         default
-//            // Just handle this key and then return
-//            super:BrowseText( nKey, .T. )
-//         end
-//
-//      enddo
+      else
+         /* 24/10/2005 - <maurilio.longo@libero.it>
+                         Partly supported for read-only memoedits when there is no user-function
+                         Not completely clipper compatible, but, maybe, better than nothing
+         */
+         while ! ::lExitEdit
 
+            if NextKey() == 0
+               ::IdleHook()
+            endif
+
+            nKey := InKey( 0 )
+
+            if ( bKeyBlock := Setkey( nKey ) ) <> NIL
+               Eval( bKeyBlock, ::ProcName, ::ProcLine, ReadVar() )
+               Loop
+            endif
+
+            switch nKey
+               case K_UP
+                  if ::nFirstRow > 1
+                     ::nFirstRow--
+                     ::nRow--
+                     ::RefreshWindow()
+                  endif
+                  exit
+
+               case K_DOWN
+                  if ::nFirstRow < ::naTextLen
+                     ::nFirstRow++
+                     ::nRow++
+                     ::RefreshWindow()
+                  endif
+                  exit
+
+               default
+                  // Just handle this key and then return
+                  ::Super:Edit( nKey )
+               end
+         enddo
+      endif
    endif
 
 return Self
+
 
 //-------------------------------------------------------------------//
 //
@@ -247,13 +263,12 @@ return Self
 METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
-
    #ifdef HB_NEW_KCTRL
-   // I Have to add the value of K_CTRL_x when HB_NEW_KCTRL is not defined since those values cause
-   // infinite loop
-   static aUnHandledKeys := { 10,       11,       12,       14,       15,       16,       17,       20,       21 }
+      // I Have to add the values that K_CTRL_x keys have when HB_NEW_KCTRL is not defined since those values cause
+      // infinite loop
+      static aUnHandledKeys := { 10,       11,       12,       14,       15,       16,       17,       20,       21 }
    #else
-   static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
+      static aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
    #endif
 
    static aMouseKeys := { K_LBUTTONUP, K_MWFORWARD, K_MWBACKWARD }
@@ -273,7 +288,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
          if ( nKey > 0 .AND. nKey <= 256 .OR. nKey IN { K_ALT_W, K_CTRL_W } .OR. nKey IN aMouseKeys ) .AND.;
             ! ( nKey IN aUnHandledKeys )
 
-            super:Edit( nKey )
+            ::Super:Edit( nKey )
 
          endif
          exit
@@ -315,7 +330,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
       case K_CTRL_W
          if ! ( nUserKey IN aUnHandledKeys )
 
-            super:Edit( nUserKey )
+            ::Super:Edit( nUserKey )
 
          endif
          exit
@@ -323,7 +338,7 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
       case ME_DATA
          if nKey > 0 .AND. nKey <= 256 .AND. ! ( nKey IN aUnHandledKeys )
 
-            super:Edit( nKey )
+            ::Super:Edit( nKey )
 
          endif
          exit
@@ -334,14 +349,17 @@ METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
       case ME_TOGGLESCROLL
          // TODO: HBEditor does not support vertical scrolling of text inside window without moving cursor position
+         /* 24/10/2005 - <maurilio.longo@libero.it>
+                         Partly supported for read-only memoedits when there is no user-function
+         */
          exit
 
       case ME_WORDRIGHT
-         ::WordRight()  // MoveCursor(K_CTRL_RIGHT)
+         ::WordRight()
          exit
 
       case ME_BOTTOMRIGHT
-         ::Bottom()     // MoveCursor(K_CTRL_END)
+         ::Bottom()
          exit
 
       default
@@ -360,6 +378,7 @@ METHOD xDo( nStatus ) CLASS TMemoEditor
    LOCAL nCurCur := SetCursor()
    LOCAL xRes
 
+   // Latest parameter, Self, is an xHarbour extension, maybe should be guarded as such with some ifdef
    xRes := Do( ::xUserFunction, nStatus, ::nRow, ::nCol - 1, Self )
 
    ::SetPos( nCurRow, nCurCol )
@@ -397,7 +416,10 @@ FUNCTION MemoEdit(cString,;
    DEFAULT nRight          TO MaxCol()
    DEFAULT lEditMode       TO .T.
    DEFAULT nLineLength     TO nRight - nLeft
-   DEFAULT nTabSize        TO 4
+   /* 24/10/2005 - <maurilio.longo@libero.it>
+                   NG says 4, but clipper 5.2e inserts 3 spaces when pressing K_TAB
+   */
+   DEFAULT nTabSize        TO 3
    DEFAULT nTextBuffRow    TO 1
    DEFAULT nTextBuffColumn TO 0
    DEFAULT nWindowRow      TO 0
@@ -408,14 +430,21 @@ FUNCTION MemoEdit(cString,;
       cUserFunction = nil
    endif
 
-   // Original MemoEdit() converts Tabs into spaces;
-   //
-   oEd := TMemoEditor():New( cString, nTop, nLeft, nBottom, nRight, ;
-              lEditMode, nLineLength, nTabSize, nTextBuffRow, nTextBuffColumn, nWindowRow, nWindowColumn )
+   /* 24/10/2005 - <maurilio.longo@libero.it>
+                   Clipper MemoEdit() converts Tabs into spaces
+   */
+   oEd := TMemoEditor():New( StrTran( cString, Chr( K_TAB ), Space( nTabSize ) ),;
+                             nTop, nLeft, nBottom, nRight,;
+                             lEditMode,;
+                             nLineLength,;
+                             nTabSize,;
+                             nTextBuffRow,;
+                             nTextBuffColumn,;
+                             nWindowRow,;
+                             nWindowColumn )
 
    oEd:ProcName := ProcName( 1 )
    oEd:ProcLine := ProcLine( 1 )
-
 
    oEd:MemoInit( cUserFunction )
    oEd:RefreshWindow()

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4507 2005/10/24 19:07:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4508 2005/10/24 23:29:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-25 12:55 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/memoedit.prg
+     ! fixed double call to UDF for every char typed. Only particular, well defined,
+       chars cause UDF to be called.
+     ! Memoedit converts K_TABs into nTabSize K_SPACEs inside editbuffer, this was wrongly
+       removed. Please note that we're not completely clipper compatible in K_TAB management
+       because clipper memoedit does not remove all K_TABs from edit buffer when
+       K_CTRL_W is called, while we do (or, better, since HBEditor is not able to treat a
+       K_TAB like a string of spaces, we have to do).
+     + If there is no UDF and memoedit is readonly K_UP/K_DOWN scroll memoedit content
+       instead of moving cursor. This is partly compatible with clipper behaviour. To be
+       made completely compatibile changes to HBEditor are needed.
 
 2005-10-24 16:28 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/macro/macro.slx
