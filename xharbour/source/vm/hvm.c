@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.511 2005/10/24 01:04:37 druzus Exp $
+ * $Id: hvm.c,v 1.512 2005/10/25 17:11:33 ronpinkas Exp $
  */
 
 /*
@@ -869,22 +869,20 @@ int HB_EXPORT hb_vmQuit( void )
       hb_itemRelease( hb_set.HB_SET_EOL );
    }
 
-   // FOR EACH Enumerations.
-   for( i = 0; i < hb_vm_wEnumCollectionCounter; i++ )
+   // Reset FOR EACH.
+   while( hb_vm_wEnumCollectionCounter > wEnumCollectionCounter )
    {
-      if( HB_IS_COMPLEX(  &( hb_vm_aEnumCollection[ i ] ) ) )
-      {
-         hb_itemClear( &( hb_vm_aEnumCollection[ i ] ) );
-      }
+      hb_vm_wEnumCollectionCounter--;
+      hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+      //hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
+      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
    }
 
-   // WITH OBJECT
-   for( i = 0; i < hb_vm_wWithObjectCounter; i++ )
+   // Reset WITH OBJECT.
+   while( hb_vm_wWithObjectCounter > wWithObjectCounter )
    {
-      if( HB_IS_COMPLEX( &( hb_vm_aWithObject[ i ] ) ) )
-      {
-         hb_itemClear( &( hb_vm_aWithObject[ i ] ) );
-      }
+      --hb_vm_wWithObjectCounter;
+      hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
    }
 
    /* release all remaining items */
