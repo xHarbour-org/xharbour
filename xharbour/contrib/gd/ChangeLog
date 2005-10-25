@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4 2005/10/25 00:51:25 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5 2005/10/25 08:36:55 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-10-25 18:07 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  * contrib/gd/MAKE_B32.BAT
+    * fixed bgd.dll name
+      (thanks to Dener)
+
 2005-10-25 10:31 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
 
-  - contrib/gd/bdg.dll
-  + contrib/gd/bdg.dll_download.url
-    * removed from bdg.dll from CVS 2.9 MB (sorry)
+  - contrib/gd/bgd.dll
+  + contrib/gd/bgd.dll_download.url
+    * removed from bgd.dll from CVS 2.9 MB (sorry)
       and added a link to gdwin32.zip from Thomas Boutell's website
       to download it.
   * contrib/gd/README.txt
     * updated
   * contrib/gd/MAKE_B32.BAT
-    * check if bdg.dll exists
+    * check if bgd.dll exists
 
 2005-10-25 02:43 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
 

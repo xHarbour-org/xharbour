@@ -7,7 +7,7 @@ set HB_MT=
 set HB_GT_LIB=gtcgi
 rem if exist %PRGNAME%.exe del %PRGNAME%.exe
 
-if not exist bdg.dll goto NODLL
+if not exist bgd.dll goto NODLL
 
 if not exist .\lib md .\lib
 if not exist .\obj md .\obj
@@ -41,7 +41,10 @@ goto end
 :NODLL
 
 echo.
-echo.Missing bdg.dll, please download it
+echo.Missing bgd.dll, please download it from:
+echo.http://www.boutell.com/gd/http/gdwin32.zip
+echo.
+echo.Make aborted.
 echo.
 
 :end
