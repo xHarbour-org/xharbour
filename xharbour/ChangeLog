@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4522 2005/10/26 08:55:47 brianhays Exp $
+ * $Id: ChangeLog,v 1.4523 2005/10/26 15:53:00 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-26 13:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * More conservative processing in AnsiToSysString(), AnsiToWide(), & WideToAnsi()
+    * Revised ANSITOWIDE() and WIDETOANSI() to use AnsiToWide() & WideToAnsi() instead of redundant code
+    * Exported AnsiToSysString(), AnsiToWide(), & WideToAnsi()
 
 2005-10-26 22:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/samples/wvwtest9.bat
@@ -66,11 +72,11 @@
   * contrib/gtwvw/gtwvw.c
     ! Same changes above in the function Wvw_ChooseColor.
 
-2005-10-20 19:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+2005-10-25 19:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
     * Moved free standing declation to top of block.
 
-2005-10-17 13:06 UTC-0800 Tony Bretado <tony@bretado.com>
+2005-10-25 13:06 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/tprinter.c
     + Added 2nd arg bLocalPrintersOnly to GetPrinters(). Example: GetPrinters(Nil, .t.)
         Where bLocalPrintersOnly could be TRUE || FALSE
@@ -81,7 +87,7 @@
         Now is {PrinterName, PrinterPort, PrinterScope} where PrinterScope could be "LOCAL" || "NETWORK" || "ERROR"
     // I have tested both under WinXP & Win98
 
-2005-10-20 13:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+2005-10-25 13:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/rp_run.src
     * Corrected #command FIELD ... to not conflict with FIELD-> expressions.
 

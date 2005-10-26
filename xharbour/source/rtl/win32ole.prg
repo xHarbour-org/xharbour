@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.89 2005/10/15 02:37:08 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.90 2005/10/16 19:32:45 druzus Exp $
  */
 
 /*
@@ -67,13 +67,11 @@ FUNCTION CreateObject( cString )
 RETURN TOleAuto():New( cString )
 
 //----------------------------------------------------------------------------//
-
 FUNCTION GetActiveObject( cString )
 
 RETURN TOleAuto():GetActiveObject( cString )
 
 //----------------------------------------------------------------------------//
-
 #pragma BEGINDUMP
 
    #ifndef CINTERFACE
@@ -132,7 +130,6 @@ RETURN TOleAuto():GetActiveObject( cString )
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
-
 INIT PROC HB_OLEINIT
 
    HB_INLINE()
@@ -162,7 +159,6 @@ EXIT PROC HB_OLEEXIT
 return
 
 //----------------------------------------------------------------------------//
-
 CLASS TOleAuto
 
    DATA hObj
@@ -200,7 +196,6 @@ CLASS TOleAuto
 ENDCLASS
 
 //--------------------------------------------------------------------
-
 METHOD New( uObj, cClass ) CLASS TOleAuto
 
    LOCAL oErr
@@ -262,7 +257,6 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
 RETURN Self
 
 //--------------------------------------------------------------------
-
 // Destructor!
 PROCEDURE Release() CLASS TOleAuto
 
@@ -275,7 +269,6 @@ PROCEDURE Release() CLASS TOleAuto
 RETURN
 
 //--------------------------------------------------------------------
-
 METHOD GetActiveObject( cClass ) CLASS TOleAuto
 
    LOCAL oErr
@@ -324,7 +317,6 @@ METHOD GetActiveObject( cClass ) CLASS TOleAuto
 RETURN Self
 
 //--------------------------------------------------------------------
-
 METHOD Invoke( ... ) CLASS TOleAuto
 
    LOCAL cMethod := HB_aParams()[1]
@@ -332,7 +324,6 @@ METHOD Invoke( ... ) CLASS TOleAuto
 RETURN HB_ExecFromArray( Self, cMethod, aDel( HB_aParams(), 1, .T. ) )
 
 //--------------------------------------------------------------------
-
 METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 
    LOCAL xRet
@@ -353,7 +344,6 @@ METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 RETURN xRet
 
 //--------------------------------------------------------------------
-
 METHOD OleValuePlus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -631,7 +621,6 @@ RETURN xRet
   static DISPID ValueID = DISPID_VALUE;
 
   //---------------------------------------------------------------------------//
-
   static double DateToDbl( LPSTR cDate )
   {
      double nDate;
@@ -642,7 +631,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static LPSTR DblToDate( double nDate )
   {
      static char cDate[9] = "00000000";
@@ -653,75 +641,117 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-  #if 0
-  static LPWSTR AnsiToWide( LPSTR cString )
+  HB_EXPORT BSTR AnsiToSysString( LPSTR cString )
   {
-     UINT uLen;
-     LPWSTR wString;
+     int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
-     uLen  = strlen( cString ) + 1;
-
-     if( uLen > 1 )
+     if( nConvertedLen )
      {
-        wString = ( BSTR ) hb_xgrab( uLen * 2 );
-        MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, uLen );
+        BSTR bstrString = SysAllocStringLen( NULL, nConvertedLen - 1 );
+
+        if( MultiByteToWideChar( CP_ACP, 0, cString, -1, bstrString, nConvertedLen ) )
+        {
+           return bstrString;
+        }
+        else
+        {
+           SysFreeString( bstrString );
+        }
      }
-     else
+
+     return NULL;
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_EXPORT LPWSTR AnsiToWide( LPSTR cString )
+  {
+     int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
+
+     if( nConvertedLen )
      {
-        // *** This is a speculation about L"" - need to be verified.
-        wString = (BSTR) hb_xgrab( 2 );
-        wString[0] = L'\0';
+        LPWSTR wString = ( BSTR ) hb_xgrab( nConvertedLen * 2 );
+
+        if( MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, nConvertedLen - 1 ) )
+        {
+           return wString;
+        }
+        else
+        {
+           hb_xfree( wString );
+        }
      }
 
      //printf( "\nAnsi: '%s'\n", cString );
      //wprintf( L"\nWide: '%s'\n", wString );
-
-     return wString;
-  }
-  #endif
-
-  static BSTR AnsiToSysString( LPSTR cString )
-  {
-     BSTR bstrString;
-     int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 ) -1;
-
-     bstrString = SysAllocStringLen( NULL, nConvertedLen );
-
-     if( bstrString )
-     {
-        bstrString[0] = '\0';
-        MultiByteToWideChar( CP_ACP, 0, cString, -1,  bstrString, nConvertedLen );
-     }
-
-     return bstrString;
+     return NULL;
   }
 
   //---------------------------------------------------------------------------//
-
-  static LPSTR WideToAnsi( BSTR wString )
+  HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
   {
-     char *cString;
+     char *cString = hb_parc( 1 );
+
+     if( cString )
+     {
+        BSTR wString = AnsiToWide( cString );
+
+        if( wString )
+        {
+           hb_retclenAdoptRaw( (char *) wString, SysStringLen( wString ) );
+           return;
+        }
+     }
+
+     hb_ret();
+     return;
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_EXPORT LPSTR WideToAnsi( BSTR wString )
+  {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
      if( nConvertedLen )
      {
-        cString = (char *) hb_xgrab( nConvertedLen );
-        WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL );
-     }
-     else
-     {
-        cString = (char *) hb_xgrab( 1 );
-        cString[0] = '\0';
+        char *cString = (char *) hb_xgrab( nConvertedLen );
+
+        if( WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen - 1, NULL, NULL ) )
+        {
+           return cString;
+        }
+        else
+        {
+           hb_xfree( cString );
+        }
      }
 
      //wprintf( L"\nWide: '%s'\n", wString );
      //printf( "\nAnsi: '%s'\n", cString );
 
-     return cString;
+     return NULL;
   }
 
   //---------------------------------------------------------------------------//
+  HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
+  {
+     BSTR wString = ( BSTR ) hb_parc( 1 );
 
+     if( wString )
+     {
+        char *cString = WideToAnsi( wString );
+
+        if( cString )
+        {
+           hb_retclenAdopt( cString, strlen( cString ) );
+           return;
+        }
+     }
+
+     hb_ret();
+     return;
+  }
+
+  //---------------------------------------------------------------------------//
   static void GetParams( DISPPARAMS *pDispParams )
   {
      VARIANTARG * pArgs = NULL;
@@ -769,7 +799,7 @@ RETURN xRet
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   hb_itemPutCRawStatic( uParam, (char *) AnsiToSysString( hb_parcx( nArg ) ), uParam->item.asString.length * 2 + 1 );
+                   hb_itemPutCRawStatic( uParam, (char *) AnsiToSysString( hb_parc( nArg ) ), uParam->item.asString.length * 2 + 1 );
 
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
@@ -778,7 +808,7 @@ RETURN xRet
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToSysString( hb_parcx( nArg ) );
+                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToSysString( hb_parc( nArg ) );
                    //wprintf( L"*** >%s<\n", pArgs[ n ].n1.n2.n3.bstrVal );
                 }
                 break;
@@ -947,7 +977,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static void FreeParams( DISPPARAMS *pDispParams )
   {
      int n, nParam;
@@ -1088,7 +1117,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static void RetValue( void )
   {
      LPSTR cString;
@@ -1281,7 +1309,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC( OLESHOWEXCEPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
@@ -1299,7 +1326,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( OLEEXCEPTIONSOURCE )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
@@ -1312,7 +1338,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( OLEEXCEPTIONDESCRIPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
@@ -1325,14 +1350,12 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( OLEERROR )
   {
      hb_retnl( (LONG) s_nOleError );
   }
 
   //---------------------------------------------------------------------------//
-
   static char * Ole2TxtError( void )
   {
      switch( (LONG) s_nOleError )
@@ -1419,53 +1442,12 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
-  HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
-  {
-     UINT uLen;
-     BSTR wString;
-     char *cString = hb_parcx( 1 );
-
-     if( cString == NULL )
-     {
-        hb_ret();
-        return;
-     }
-
-     uLen = strlen( cString ) + 1;
-
-     wString = ( BSTR ) hb_xgrab( uLen * 2 );
-     MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, uLen, wString, uLen );
-
-     hb_retclenAdopt( (char *) wString, uLen * 2 - 1 );
-  }
-
-  //---------------------------------------------------------------------------//
-
-  HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
-  {
-     UINT uLen;
-     BSTR wString = ( BSTR ) hb_parcx( 1 );
-     char *cString;
-
-     uLen = SysStringLen( wString ) + 1;
-
-     cString = ( char * ) hb_xgrab( uLen );
-
-     WideCharToMultiByte( CP_ACP, WC_COMPOSITECHECK, wString, uLen, cString, uLen, NULL, NULL );
-
-     hb_retclenAdopt( cString, uLen - 1 );
-  }
-
-  //---------------------------------------------------------------------------//
-
   HB_FUNC( MESSAGEBOX )
   {
      hb_retni( MessageBox( ( HWND ) hb_parnl( 1 ), hb_parcx( 2 ), hb_parcx( 3 ), hb_parni( 4 ) ) );
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR bstrClassID;
@@ -1516,7 +1498,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR bstrClassID;
@@ -1572,7 +1553,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   HB_FUNC_STATIC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
   {
      IDispatch *pDisp = ( IDispatch * ) hb_parnl( 1 );
@@ -1581,7 +1561,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static HRESULT OleSetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      // 1 Based!!!
@@ -1621,7 +1600,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static HRESULT OleInvoke( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
@@ -1640,7 +1618,6 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
-
   static HRESULT OleGetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
