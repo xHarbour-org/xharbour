@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4517 2005/10/25 21:04:09 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4518 2005/10/26 02:19:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-26 02:35 UTC-0300 Marcos Antonio Gambeta <marcos_gambeta@hotmail.com>
+  * contrib/wvtgui/wvtwin.ch
+    + Added more constants:
+      #define CC_RGBINIT               0x00000001
+      #define CC_FULLOPEN              0x00000002
+      #define CC_PREVENTFULLOPEN       0x00000004
+      #define CC_SHOWHELP              0x00000008
+      #define CC_ENABLEHOOK            0x00000010
+      #define CC_ENABLETEMPLATE        0x00000020
+      #define CC_ENABLETEMPLATEHANDLE  0x00000040
+      #define CC_SOLIDCOLOR            0x00000080 // WINVER >= 0x0400
+      #define CC_ANYCOLOR              0x00000100 // WINVER >= 0x0400
+  * contrib/wvtgui/wvtutils.c
+    ! Function Wvt_ChooseColor changed to return -1 when the dialog box is canceled
+      and 0 when the black color (red=0/green=0/blue=0) is selected.
+    ! Flag CC_SHOWHELP removed from the default flags because the button "Help" don't
+      do anything.
+  * contrib/gtwvw/gtwvw.c
+    ! Same changes above in the function Wvw_ChooseColor.
 
 2005-10-20 19:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

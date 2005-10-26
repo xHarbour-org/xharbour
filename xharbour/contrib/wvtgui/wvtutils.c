@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.7 2005/10/05 16:11:48 bdj Exp $
+ * $Id: wvtutils.c,v 1.8 2005/10/11 12:55:08 marcosgambeta Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
    cc.hwndOwner     = _s->hWnd ;
    cc.rgbResult     = ISNIL( 1 ) ?  0 : ( COLORREF ) hb_parnl( 1 ) ;
    cc.lpCustColors  = crCustClr ;
-   cc.Flags         = ( WORD ) ( ISNIL( 3 ) ? CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN | CC_SHOWHELP : hb_parnl( 3 ) );
+   cc.Flags         = ( WORD ) ( ISNIL( 3 ) ? CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN : hb_parnl( 3 ) );
 
    if ( ChooseColor( &cc ) )
    {
@@ -219,7 +219,7 @@ HB_FUNC( WVT_CHOOSECOLOR )
    }
    else
    {
-      hb_retnl( 0 );
+      hb_retnl( -1 );
    }
 }
 
