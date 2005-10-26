@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4524 2005/10/26 20:07:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4525 2005/10/26 20:10:24 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-26 14:29 UTC-0800 Tony Bretado <tony@bretado.com>
+  * contrib/rdd_ads/ads1.c
+    * changed function AdsSkip().
+        // Minor Optimizations when skipping If No filters are present Or
+        // if current filters are optimized for ADS Server.
+        // thanks to Brian Hays for guided me on this.
 
 2005-10-27 00:07 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.sly

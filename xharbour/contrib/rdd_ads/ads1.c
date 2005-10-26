@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.86 2005/10/17 20:16:54 jabrecer Exp $
+ * $Id: ads1.c,v 1.87 2005/10/26 08:34:18 brianhays Exp $
  */
 
 /*
@@ -1077,26 +1077,29 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
             pArea->fEof = FALSE;
          }
 
-         // Tony Bretado <jabrecer@yahoo.com> 10/17/2005 12:33PM
-         // If Children present then go iterate calls to AdsSkip(1) and test the filter each time
-         // as Mr. Brian Hays said. I wonder if this is really needed under ADS.
-         if( pArea->lpdbRelations )
+         // Tony Bretado <jabrecer@yahoo.com> 10/26/2005    1:47PM
+         if( pArea->dbfi.itmCobExpr == NULL || pArea->dbfi.fOptimized )
          {
+//            MessageBox(0, "Down-Optimized", "Filter", 0);   // This line for testing only
+            AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, lToSkip );
+            hb_adsUpdateAreaFlags( pArea );
+            /* Force relational movement in child WorkAreas */
+            if( pArea->lpdbRelations )
+               SELF_SYNCCHILDREN( ( AREAP ) pArea );
+            errCode = SELF_SKIPFILTER( ( AREAP ) pArea, lToSkip );
+         }
+         else
+         {
+//            MessageBox(0, "Down-Not Optimized", "Filter", 0);   // This line for testing only
             while( errCode == SUCCESS && !pArea->fEof && lToSkip-- )
             {
                AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, 1 );
                hb_adsUpdateAreaFlags( pArea );
                /* Force relational movement in child WorkAreas */
-               SELF_SYNCCHILDREN( ( AREAP ) pArea );
+               if( pArea->lpdbRelations )
+                  SELF_SYNCCHILDREN( ( AREAP ) pArea );
                errCode = SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
             }
-         }
-         // If No Children... then send lToSkip as it is to ADS. We gain speed!!
-         else
-         {
-            AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, lToSkip );
-            hb_adsUpdateAreaFlags( pArea );
-            errCode = SELF_SKIPFILTER( ( AREAP ) pArea, lToSkip );
          }
 
          pArea->fBof = FALSE;
@@ -1114,25 +1117,29 @@ static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
             pArea->fBof = FALSE;
          }
 
-         // Tony Bretado <jabrecer@yahoo.com> 10/17/2005 12:33PM
-         // See my previous note about this optimization.
-         if( pArea->lpdbRelations )
+         // Tony Bretado <jabrecer@yahoo.com> 10/26/2005    1:47PM
+         if( pArea->dbfi.itmCobExpr == NULL || pArea->dbfi.fOptimized )
          {
+//            MessageBox(0, "Up-Optimized", "Filter", 0);   // This line for testing only
+            AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, lToSkip );
+            hb_adsUpdateAreaFlags( pArea );
+            /* Force relational movement in child WorkAreas */
+            if( pArea->lpdbRelations )
+               SELF_SYNCCHILDREN( ( AREAP ) pArea );
+            errCode = SELF_SKIPFILTER( ( AREAP ) pArea, lToSkip );
+         }
+         else
+         {
+//            MessageBox(0, "Up-Not Optimized", "Filter", 0);  // This line for testing only
             while( errCode == SUCCESS && !pArea->fBof && lToSkip++ )
             {
                AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, -1 );
                hb_adsUpdateAreaFlags( pArea );
                /* Force relational movement in child WorkAreas */
-               SELF_SYNCCHILDREN( ( AREAP ) pArea );
+               if( pArea->lpdbRelations )
+                  SELF_SYNCCHILDREN( ( AREAP ) pArea );
                errCode = SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
             }
-         }
-         // If No Children... then send lToSkip as it is to ADS. We gain speed!!
-         else
-         {
-            AdsSkip( (pArea->hOrdCurrent) ? pArea->hOrdCurrent : pArea->hTable, lToSkip );
-            hb_adsUpdateAreaFlags( pArea );
-            errCode = SELF_SKIPFILTER( ( AREAP ) pArea, lToSkip );
          }
 
          pArea->fEof = FALSE;
