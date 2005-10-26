@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.123 2005/09/30 01:22:55 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.124 2005/10/21 14:37:42 mauriliolongo Exp $
  */
 
 /*
@@ -385,13 +385,16 @@ CLASS TBrowse
    DATA skipBlock             // Code block used to reposition data source
    DATA stable                // Indicates if the TBrowse object is stable
 
-#ifdef HB_COMPAT_C53
+   #ifdef HB_COMPAT_C53
    DATA nRow                  // Row number for the actual cell
    DATA nCol                  // Col number for the actual cell
    DATA aKeys
    DATA mColpos,mrowPos,message
-#endif
+   #endif
 
+   #ifdef HB_EXTENSION
+   DATA aColumnsSep           // Holds the column position where seperators are marked . for Wvt_DrawGridVert()
+   #endif
 
    ACCESS border              INLINE ::cBorder
    ASSIGN border( cBorder )   INLINE ::SetBorder( cBorder )
@@ -474,13 +477,6 @@ CLASS TBrowse
 #endif
 
    PROTECTED:     /* P R O T E C T E D */
-
-   /* 06/08/2004 - <maurilio.longo@libero.it>
-                   next two DATAs should not be public, at least protected
-      21/10/2005 - Moved to protected section
-   */
-   DATA aColumnsSep                       // Holds the column position where seperators are marked . for Wvt_DrawGridVert()
-   DATA aColorSpec                        // Holds colors of Tbrowse:ColorSpec
 
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
                                           // _M_GotoXY because this method will mostly be called to handle mouse requests
@@ -566,12 +562,12 @@ CLASS TBrowse
    DATA oDataCache
    DATA lPaintBottomUp                    // .T. after a PG_DN, paints browser from bottom to top, optimizing
                                           // dbSkip()s calls. ( Clipper works this way )
-
 #ifdef HB_COMPAT_C53
    DATA rect
    DATA aVisibleCols
    DATA aSetStyle
 #endif
+   DATA aColorSpec                        // Holds colors of Tbrowse:ColorSpec
 
 ENDCLASS
 
