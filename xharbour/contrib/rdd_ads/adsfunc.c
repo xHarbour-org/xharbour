@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.67 2005/10/14 08:34:13 brianhays Exp $
+ * $Id: adsfunc.c,v 1.68 2005/10/14 09:03:42 brianhays Exp $
  */
 
 /*
@@ -70,11 +70,6 @@
 extern ERRCODE adsCloseCursor( ADSAREAP pArea );
 
 
-extern int adsAddConnection( ADSHANDLE hConnection, BOOL fDictionary );
-extern void adsDelConnection( int iHandle );
-extern LPADSCONNECTINFO adsGetConnection( int iHandle );
-extern ADSHANDLE adsConnIndexToHandle( int iHandle );
-
 int adsFileType = ADS_CDX;
 int adsLockType = ADS_PROPRIETARY_LOCKING;
 int adsRights = 1;
@@ -82,8 +77,7 @@ int adsCharType = ADS_ANSI;
 #if ADS_REQUIRE_VERSION >= 6
 BOOL adsOEM = FALSE;
 #endif
-int /*ADSHANDLE */ adsConnectHandle = 0;
-//BOOL bDictionary = FALSE;               /* Use Data Dictionary? */
+ADSHANDLE  adsConnectHandle = 0;
 BOOL bTestRecLocks = FALSE;             /* Debug Implicit locks */
 
 #if !defined( ADS_LINUX )
@@ -212,12 +206,14 @@ HB_FUNC( ADSISSERVERLOADED )
 
 HB_FUNC( ADSGETCONNECTIONTYPE )
 {
+   // WARNING: This does NOT return the Type of a connection Handle-- it returns whether
+   // connected to ADS_REMOTE_SERVER, ADS_AIS_SERVER, or ADS_LOCAL_SERVER
+
    UNSIGNED16 pusConnectType = 0;
    UNSIGNED32 ulRetVal;
-   int iHandle = ISNUM( 1 ) ?  hb_parni( 1 ) : adsConnectHandle;
-   ADSHANDLE hConnToCheck = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnToCheck = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
 
-      // caller can specify a connection. Otherwise use default handle index.
+      // caller can specify a connection. Otherwise use default handle.
       // The global adsConnectHandle will continue to be 0 if no adsConnect60 (Data
       // Dictionary) calls are made. Simple table access uses an implicit connection
       // whose handle we don't see unless you get it from an opened table
@@ -298,9 +294,7 @@ HB_FUNC( ADSGETSERVERTIME )
 
    SIGNED32 plTime = 0;
 
-   int iHandle = ISNUM( 1 ) ?  hb_parni( 1 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
-//   ADSHANDLE hConnect = ISNUM( 1 ) ? (ADSHANDLE) hb_parnl( 1 ) : adsConnectHandle;
+   ADSHANDLE hConnect = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
 
    ulRetVal = AdsGetServerTime( hConnect, pucDateBuf, &pusDateBufLen, &plTime, pucTimeBuf, &pusTimeBufLen );
 
@@ -1338,7 +1332,6 @@ HB_FUNC( ADSISTABLEENCRYPTED )
 HB_FUNC( ADSCONNECT )
 {
    UNSIGNED32 ulRetVal;
-   int iHandle;
    ADSHANDLE hConnect = 0;
 
    if( hb_pcount() > 0 && ISCHAR( 1 ) )
@@ -1346,8 +1339,7 @@ HB_FUNC( ADSCONNECT )
       ulRetVal = AdsConnect( (UNSIGNED8*) hb_parcx( 1 ), &hConnect  );
       if( ulRetVal == AE_SUCCESS )
       {
-         iHandle = adsAddConnection( hConnect, FALSE );
-         adsConnectHandle = iHandle;
+         adsConnectHandle = hConnect;
          hb_retl( 1 );
       }
       else
@@ -1374,20 +1366,18 @@ HB_FUNC( ADSDISCONNECT )
     *
     */
    UNSIGNED32 ulRetVal = ~AE_SUCCESS;
-   int iHandle = ISNUM( 1 ) ?  hb_parni( 1 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
 
-   // Only allow disconnect of 0 if explicitly passed or no arg was passed and adsConnectHandle is 0
+   // Only allow disconnect of 0 if explicitly passed or adsConnectHandle is 0
    // (hConnect might be 0 if caller accidentally disconnects twice; this should not close all connections!)
-   if ( hConnect != 0 || iHandle == 0 )
+   if ( hConnect != 0 || ISNUM( 1 ) )
    {
       ulRetVal = AdsDisconnect( hConnect );
    }
 
-   adsDelConnection( iHandle );
    if( ulRetVal == AE_SUCCESS )
    {
-      if ( iHandle == adsConnectHandle )
+      if ( hConnect == adsConnectHandle )
       {
          adsConnectHandle = 0;
       }
@@ -1406,8 +1396,7 @@ HB_FUNC( ADSCREATESQLSTATEMENT )
    ADSHANDLE adsStatementHandle;
    char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ];
    BOOL fResult = FALSE;
-   int iHandle = ISNUM( 3 ) ?  hb_parni( 3 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 3 ) ?  hb_parnl( 3 ) : adsConnectHandle;
 
    if( hConnect )
    {
@@ -1808,51 +1797,34 @@ HB_FUNC( ADSGETNUMINDEXES )              /* cExpr */
    hb_retni( pusCnt );
 }
 
-HB_FUNC( ADSCONNECTIONTOHANDLE )        // convert index to true handle; second arg byref declares if is DDict
-{                                       // could add 3rd arg to get original string via AdsGetConnectionPath()
-   LPADSCONNECTINFO pConnect;
-   int iHandle;
-   ADSHANDLE hConnection = 0;
-   BOOL fDictionary = FALSE;
-   PHB_ITEM pfDict = hb_param( 2, HB_IT_BYREF );
-
-   iHandle = ( ISNUM( 1 ) ? hb_parni( 1 ) : adsConnectHandle );
-   if( iHandle )
-   {
-      pConnect = adsGetConnection( iHandle );
-      if ( pConnect )
-      {
-         hConnection = pConnect->hConnection;
-         fDictionary = pConnect->fDictionary;
-      }
-   }
-   hb_retnl( hConnection );
-
-   if ( pfDict )                        // passed second arg byreference
-   {
-      hb_storl( fDictionary, 2);
-   }
-}
-
 HB_FUNC( ADSCONNECTION )                // Get/Set func to switch between connections
 {
-   int iOldHandle = adsConnectHandle;
-   int iNewHandle ;
+   ADSHANDLE hOldHandle = adsConnectHandle;
 
-   if( ISNUM( 1 ) )                     // set new default; make sure it's valid
+   if( ISNUM( 1 ) )                     // set new default
    {
-      iNewHandle = hb_parni( 1 );
-      if ( iNewHandle == 0 || adsGetConnection( iNewHandle ) != NULL )
-      {
-         adsConnectHandle = iNewHandle;
-      }
-      else
-      {
-         hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSCONNECTION" );
-      }
+      adsConnectHandle = hb_parnl( 1 );
    }
-   hb_retni( iOldHandle );
+   hb_retnl( hOldHandle );
 }
+
+HB_FUNC( ADSGETHANDLETYPE )             // DD, admin, table
+{
+   UNSIGNED32 ulRetVal ;
+   UNSIGNED16 usType;
+   ADSHANDLE hConnect = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
+
+   ulRetVal = AdsGetHandleType( hConnect, &usType);
+   if( ulRetVal == AE_SUCCESS )
+   {
+      hb_retnl( usType );
+   }else
+   {
+      hb_retnl( AE_INVALID_HANDLE );
+   }
+}
+
+
 
 HB_FUNC( ADSGETLASTERROR )
 {
@@ -2070,8 +2042,7 @@ HB_FUNC( ADSCACHEOPENCURSORS )
 HB_FUNC( ADSGETNUMACTIVELINKS )         // requires 6.2 ! Only valid for a DataDict
 {
    UNSIGNED16 pusNumLinks = 0;
-   int iHandle = ISNUM( 1 ) ?  hb_parni( 1 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
 
    if( hConnect )
    {
@@ -2087,8 +2058,7 @@ HB_FUNC( ADSDDADDTABLE )
    UNSIGNED8 *pTableName     = (UNSIGNED8 *) hb_parcx( 1 );
    UNSIGNED8 *pTableFileName = (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED8 *pTableIndexFileName = (UNSIGNED8 *) hb_parcx( 3 );
-   int iHandle = ISNUM( 4 ) ?  hb_parni( 4 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 4 ) ?  hb_parnl( 4 ) : adsConnectHandle;
 
    ulRetVal = AdsDDAddTable( hConnect, pTableName, pTableFileName, adsFileType, adsCharType, pTableIndexFileName, NULL );
 
@@ -2100,7 +2070,6 @@ HB_FUNC( ADSDDADDTABLE )
    {
       hb_retl( 0 );
    }
-
 }
 
 HB_FUNC( ADSDDADDUSERTOGROUP )
@@ -2108,8 +2077,7 @@ HB_FUNC( ADSDDADDUSERTOGROUP )
    UNSIGNED32 ulRetVal;
    UNSIGNED8 *pGroup = (UNSIGNED8 *) hb_parcx( 1 );
    UNSIGNED8 *pName  = (UNSIGNED8 *) hb_parcx( 2 );
-   int iHandle = ISNUM( 3 ) ?  hb_parni( 3 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 3 ) ?  hb_parnl( 3 ) : adsConnectHandle;
 
    ulRetVal = AdsDDAddUserToGroup( hConnect,
                                    pGroup,
@@ -2126,17 +2094,6 @@ HB_FUNC( ADSDDADDUSERTOGROUP )
 
 }
 
-//HB_FUNC( ADSUSEDICTIONARY )
-//{
-//   BOOL bOld = bDictionary;
-//   if( ISLOG( 1 ) )
-//   {
-//      bDictionary = hb_parl( 1 ) ;
-//   }
-
-//   hb_retl( bOld );
-//}
-
 HB_FUNC( ADSCONNECT60 )
 {
    UNSIGNED32 ulRetVal ;
@@ -2146,7 +2103,6 @@ HB_FUNC( ADSCONNECT60 )
    UNSIGNED8  *pucPassword   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL ;
    UNSIGNED32 ulOptions      = ISNUM( 5 ) ? hb_parnl( 5 ) : ADS_DEFAULT ;
    ADSHANDLE hConnect = 0;
-//   adsConnIndexToHandle( iHandle );
 
    ulRetVal = AdsConnect60( pucServerPath,
                             usServerTypes,
@@ -2157,10 +2113,9 @@ HB_FUNC( ADSCONNECT60 )
 
    if( ulRetVal == AE_SUCCESS )
    {
-      // how to determine if is a DataDict?
+      // determine if is a DataDict
       UNSIGNED16 usType;
       BOOL fDictionary = FALSE;
-      int iHandle;
       PHB_ITEM  piByRefHandle = hb_param( 6, HB_IT_BYREF );
 
       ulRetVal = AdsGetHandleType( hConnect, &usType);
@@ -2169,12 +2124,11 @@ HB_FUNC( ADSCONNECT60 )
          fDictionary = ( usType == ADS_DATABASE_CONNECTION
                       || usType == ADS_SYS_ADMIN_CONNECTION );
       }
-      iHandle = adsAddConnection( hConnect, fDictionary );
-      adsConnectHandle = iHandle;       // set new default
+      adsConnectHandle = hConnect;       // set new default
 
       if ( piByRefHandle )
       {
-         hb_storni( iHandle, 6 );
+         hb_stornl( hConnect, 6 );
       }
 
       hb_retl( 1 );
@@ -2183,7 +2137,6 @@ HB_FUNC( ADSCONNECT60 )
    {
       hb_retl( 0 );
    }
-
 }
 
 HB_FUNC( ADSDDCREATE )
@@ -2192,7 +2145,6 @@ HB_FUNC( ADSDDCREATE )
    UNSIGNED8  *pucDictionaryPath = (UNSIGNED8 *) hb_parcx( 1 );
    UNSIGNED16 usEncrypt          = (UNSIGNED16) ISNUM( 2 ) ? hb_parnl( 0 ) : 0;
    UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? (UNSIGNED8 *) hb_parcx( 3 ) : NULL;
-   int iHandle;
    ADSHANDLE hConnect = 0;
 
    ulRetVal = AdsDDCreate( ( UNSIGNED8 *)pucDictionaryPath,
@@ -2203,14 +2155,12 @@ HB_FUNC( ADSDDCREATE )
    if( ulRetVal == AE_SUCCESS )
    {
       hb_retl( 1 );
-      iHandle = adsAddConnection( hConnect, TRUE );
-      adsConnectHandle = iHandle;
+      adsConnectHandle = hConnect;
    }
    else
    {
       hb_retl( 0 );
    }
-
 }
 
 
@@ -2221,8 +2171,7 @@ HB_FUNC( ADSDDCREATEUSER )
    UNSIGNED8 *pucUserName      = ISCHAR( 2 ) ? (UNSIGNED8 *) hb_parcx( 2 ) : NULL;
    UNSIGNED8 *pucPassword      = ISCHAR( 3 ) ? (UNSIGNED8 *) hb_parcx( 3 ) : NULL;
    UNSIGNED8 *pucDescription   = ISCHAR( 4 ) ? (UNSIGNED8 *) hb_parcx( 4 ) : NULL;
-   int iHandle = ISNUM( 5 ) ?  hb_parni( 5 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 5 ) ?  hb_parnl( 5 ) : adsConnectHandle;
 
    ulRetVal = AdsDDCreateUser( hConnect, pucGroupName,
                                pucUserName, pucPassword, pucDescription );
@@ -2238,8 +2187,7 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
    UNSIGNED16 ulLength;
    UNSIGNED16 ulBuffer;
    BOOL bChar = FALSE;
-   int iHandle = ISNUM( 2 ) ?  hb_parni( 2 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 2 ) ?  hb_parnl( 2 ) : adsConnectHandle;
 
    switch ( ulProperty )
    {
@@ -2289,8 +2237,7 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
    UNSIGNED16 ulBuffer;
    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
    PHB_ITEM pParam = hb_param( 2, HB_IT_ANY ) ;
-   int iHandle = ISNUM( 2 ) ?  hb_parni( 2 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 2 ) ?  hb_parnl( 2 ) : adsConnectHandle;
 
    switch( ulProperty )
    {
@@ -2345,8 +2292,7 @@ HB_FUNC( ADSDDGETUSERPROPERTY )
    UNSIGNED16 usPropertyID      = hb_parni( 2 );
    UNSIGNED8  *pvProperty       = (UNSIGNED8 *) hb_parcx( 3 );
    UNSIGNED16 usPropertyLen     = hb_parni( 4 );
-   int iHandle = ISNUM( 5 ) ?  hb_parni( 5 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 5 ) ?  hb_parnl( 5 ) : adsConnectHandle;
 
    ulRetVal = AdsDDGetUserProperty( hConnect, pucUserName, usPropertyID,
                                     pvProperty, &usPropertyLen );
@@ -2418,9 +2364,7 @@ HB_FUNC( ADSRESTRUCTURETABLE )
    UNSIGNED8 *pucAddFields    = (UNSIGNED8 *) hb_parcx( 2 );
    UNSIGNED8 *pucDeleteFields = (UNSIGNED8 *) hb_parcx( 3 );
    UNSIGNED8 *pucChangeFields = (UNSIGNED8 *) hb_parcx( 4 );
-   int iHandle = ISNUM( 5 ) ?  hb_parni( 5 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
-
+   ADSHANDLE hConnect = ISNUM( 5 ) ?  hb_parnl( 5 ) : adsConnectHandle;
 
    ulRetVal = AdsRestructureTable( hConnect, pTableName, NULL,
                   adsFileType, adsCharType, adsLockType,
@@ -2428,7 +2372,6 @@ HB_FUNC( ADSRESTRUCTURETABLE )
                   pucAddFields,
                   pucDeleteFields,
                   pucChangeFields );
-
 
    hb_retl( (long) ulRetVal );
 
@@ -2481,9 +2424,7 @@ HB_FUNC( ADSDIRECTORY )
    UNSIGNED16 usFileNameLen;
    SIGNED32   sHandle = 0;
    PHB_ITEM   pitmDir, pitmFileName;
-   int iHandle = ISNUM( 2 ) ?  hb_parni( 2 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
-
+   ADSHANDLE hConnect = ISNUM( 2 ) ?  hb_parnl( 2 ) : adsConnectHandle;
 
    pitmDir = hb_itemNew( NULL );
    hb_arrayNew( pitmDir, 0 );
@@ -2509,8 +2450,7 @@ HB_FUNC( ADSDIRECTORY )
 HB_FUNC( ADSCHECKEXISTENCE )
 {
    UNSIGNED16 usExist;
-   int iHandle = ISNUM( 2 ) ?  hb_parni( 2 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 2 ) ?  hb_parnl( 2 ) : adsConnectHandle;
 
    hb_retl( AdsCheckExistence( hConnect, ( UNSIGNED8* ) hb_parcx( 1 ), &usExist ) == AE_SUCCESS && usExist );
 }
@@ -2521,8 +2461,7 @@ UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileNa
 
 HB_FUNC( ADSDELETEFILE )
 {
-   int iHandle = ISNUM( 2 ) ?  hb_parni( 2 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 2 ) ?  hb_parnl( 2 ) : adsConnectHandle;
    hb_retl( AdsDeleteFile( hConnect, ( UNSIGNED8* ) hb_parcx( 1 ) ) == AE_SUCCESS );
 }
 
@@ -2533,8 +2472,7 @@ HB_FUNC( ADSSTMTSETTABLEPASSWORD )
    UNSIGNED32 ulRetVal;
    char * pucTableName = hb_parcx( 1 );
    char * pucPassword = hb_parcx( 2 );
-   int iHandle = ISNUM( 3 ) ?  hb_parni( 3 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 3 ) ?  hb_parnl( 3 ) : adsConnectHandle;
 
    if( !pucTableName || ( strlen( pucTableName ) == 0 ) || !pucPassword || ( strlen( pucPassword ) == 0 ) )
    {
@@ -2568,8 +2506,7 @@ HB_FUNC( ADSSTMTSETTABLEPASSWORD )
 
 HB_FUNC( ADSCLOSECACHEDTABLES )
 {
-   int iHandle = ISNUM( 1 ) ?  hb_parni( 1 ) : adsConnectHandle;
-   ADSHANDLE hConnect = adsConnIndexToHandle( iHandle );
+   ADSHANDLE hConnect = ISNUM( 1 ) ?  hb_parnl( 1 ) : adsConnectHandle;
 
    if( hConnect )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4519 2005/10/26 04:41:49 marcosgambeta Exp $
+ * $Id: ChangeLog,v 1.4520 2005/10/26 07:10:11 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-26 01:30 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/adsfunc.c
+    * added AdsGetHandleType()
+
+    ! Completely re-worked Connection handling. The array of connections
+      is gone as a simpler way was found. There are no more "indexes",
+      and all connection handling is via real connection handles.
+
+  * tests/datad.prg
+    * updated and expanded this Demo of ADS Connection handling
+  * contrib/rdd_ads/ads.ch
+    * added connection types
 
 2005-10-26 09:10 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg

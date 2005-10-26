@@ -1,5 +1,5 @@
 /*
- * $Id: ads.ch,v 1.5 2004/06/10 06:39:40 brianhays Exp $
+ * $Id: ads.ch,v 1.6 2005/02/23 02:50:30 kaddath Exp $
  */
 
 /*
@@ -133,6 +133,20 @@
       => AdsSetCharType( if( upper( <(x)> ) == "OEM", 2, 1 ) )
 
 #command COMMIT                 => AdsWriteAllRecords()
+
+/* ACE Handle types */
+#define ADS_CONNECTION            1
+#define ADS_TABLE                 2
+#define ADS_INDEX_ORDER           3
+#define ADS_STATEMENT             4
+#define ADS_CURSOR                5
+#define ADS_DATABASE_CONNECTION   6
+#define ADS_SYS_ADMIN_CONNECTION  7
+#define ADS_FTS_INDEX_ORDER       8
+
+#define AE_NO_CONNECTION          5036
+
+
 #command BEGIN TRANSACTION      => AdsBeginTransaction()
 
 #command COMMIT TRANSACTION     => AdsCommitTransaction()

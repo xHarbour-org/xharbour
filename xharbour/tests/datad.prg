@@ -35,13 +35,13 @@ FUNCTION MAIN
    IF !File("xharbour.add")
       ADSDDCREATE("xharbour.add",, "Xharbour ADS demo for data dictionary")
       // This also creates an Administrative Handle that is set as the default
-      ? "Default connection is now this admin ID and true handle:", adsConnection(), adsConnectionToHandle()
+      ? "Default connection is now this admin handle:", adsConnection()
       AdsDisconnect()   // disconnect current default.
                         // if you wanted to retain this connection for later, you could use
                         // hAdminCon := adsConnection(0)
                         // This get/set call would return the current connection, then set it to 0
 
-      ? "Default connection is now this ID and true handle (zero):", adsConnection(), adsConnectionToHandle()
+      ? "Default connection is now this handle (zero):", adsConnection()
 
       // now create two free tables with same structure
       DbCreate("Table1", aStru)
@@ -58,10 +58,12 @@ FUNCTION MAIN
 
    // now the magic
    IF adsConnect60("xharbour.add", 7/* All types of connection*/, "ADSSYS", "", , @hConnection1 )
-      // The connection identifier to xharbour.add is now stored in hConnection1,
+      // The connection handle to xharbour.add is now stored in hConnection1,
       // and this is now the default connection
-      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle(hConnection1, @lIsDict)
-      ? "Is a Data Dict connection? (Yes, admin is also DD):", lIsDict
+
+      ? "Default connection is now this handle:", adsConnection()
+      ? "Is a Data Dict connection?  (ADS_DATABASE_CONNECTION=6, "
+      ? "  ADS_SYS_ADMIN_CONNECTION=7):", AdsGetHandleType()
 
       // Add one user
       AdsDDCreateUser(, "Luiz", "papael", "This is user Luiz")
@@ -79,14 +81,14 @@ FUNCTION MAIN
    AdsDisconnect(hConnection1)
    hConnection1 := nil     // you should always reset a variable holding a handle that is no longer valid
 
-   ? "Default connection is back to 0:", adsConnection(), adsConnectionToHandle( nil, @lIsDict)
-   ? "Is a Data Dict connection? (No):", lIsDict
+   ? "Default connection is back to 0:", adsConnection()
+   ? "Is a Data Dict connection? (AE_INVALID_HANDLE = 5018):", AdsGetHandleType()
 
    // now open the tables and put some data
 
    IF AdsConnect60("xharbour.add", 7/* All types of connection*/, "Luiz", "papael", , @hConnection1)
-      ? "Default connection is now this ID and true handle:", adsConnection(), adsConnectionToHandle(hConnection1, @lIsDict)
-      ? "Is a Data Dict connection?", lIsDict
+      ? "Default connection is now this handle:", adsConnection()
+      ? "Connection type?", AdsGetHandleType()
 
       FOR n := 1 TO  100
          IF AdsCreateSqlStatement("Data2", 3)
@@ -120,10 +122,4 @@ FUNCTION MAIN
    @ 24, 0 say ""
 
 RETURN NIL
-
-
-
-
-
-
 
