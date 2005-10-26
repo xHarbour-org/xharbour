@@ -2258,32 +2258,11 @@
            for( iPos = 0; iProcedure < iProcedures; iProcedure++, iPos++ )
            {
               char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
+              BYTE *pcode = (BYTE *) hb_xgrab( 15 );
 
               iIndex = iProcedure + 1;
 
               //TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' Pos: %i Index: %i\n", sFunctionName, iBase + iPos, iIndex );
-
-              BYTE *pcode = (BYTE *) hb_xgrab( 15 );
-
-              /*
-                 PP_ExecProcedure( pProcedures, iIndex, HB_aParams() )
-
-                 ->
-
-                 hb_vmPushSymbol( "PP_ExcecProcedure" );
-
-                 hb_vmPushNil();
-
-                 hb_vmPushBaseArray( pProcedures->item.asArray.value );
-
-                 hb_vmPushLong( iIndex );
-
-                    hb_vmPushSymbol( "HB_aParams" );
-                    hb_vmPushNil();
-                    hb_vmFunction( 0 );
-
-                 hb_vmDo( 3 );
-              */
 
               pcode[ 0] = HB_P_PUSHSYMNEAR;
               pcode[ 1] = iPP_EXECPROCEDURE;
