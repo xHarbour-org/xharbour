@@ -1,5 +1,5 @@
 /*
- * $Id: wvwtest9.prg $
+ * $Id: wvwtest9.prg,v 1.1 2004/10/28 07:49:06 bdj Exp $
  */
 //-------------------------------------------------------------------//
 //
@@ -92,6 +92,8 @@ local kF1, kF2, kF3
 local kF9, kF10, kF11
 local oMouse
 local ch
+
+   SET( _SET_EVENTMASK, INKEY_ALL )
 
    SET DATE BRITISH
    SET SCOREBOARD OFF
@@ -715,7 +717,7 @@ STATIC FUNCTION DbSkipBlock( n, oTbr )
 
    if n = 0
       DBSkip( 0 )
-      
+
    elseif n > 0
       do while nSkipped != n .and. TBNext( oTbr )
          nSkipped++

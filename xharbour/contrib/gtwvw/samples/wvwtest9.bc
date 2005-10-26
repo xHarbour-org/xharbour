@@ -8,7 +8,7 @@
 #
 # Our environments
 #
-HARBOURDIR=c:\software\xharbour
+HARBOURDIR=..\..\..
 HARBOURLIB=$(HARBOURDIR)\lib
 HARBOUREXE=$(HARBOURDIR)\bin\harbour.exe
 CTLIBDIR=$(HARBOURDIR)\contrib\libct

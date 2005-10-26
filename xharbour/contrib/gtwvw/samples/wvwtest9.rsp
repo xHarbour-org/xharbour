@@ -3,17 +3,18 @@ wvwmouse.obj++
 winapi.obj++
 c:\software\borland\bcc55\lib\c0w32.obj, ++
 c:wvwtest9.exe,wvwtest9.map, ++
-c:\SOFTWARE\xharbour\lib\gtwvw.lib ++
-c:\SOFTWARE\xharbour\lib\rtl.lib ++
-c:\SOFTWARE\xharbour\lib\vm.lib ++
-c:\SOFTWARE\xharbour\lib\rdd.lib ++
-c:\SOFTWARE\xharbour\lib\dbfntx.lib ++
-c:\SOFTWARE\xharbour\lib\dbfdbt.lib ++
-c:\SOFTWARE\xharbour\lib\lang.lib ++
-c:\SOFTWARE\xharbour\lib\macro.lib ++
-c:\SOFTWARE\xharbour\lib\debug.lib ++
-c:\SOFTWARE\xharbour\lib\common.lib ++
-c:\SOFTWARE\xharbour\lib\pp.lib ++
+..\..\..\lib\gtwvw.lib ++
+..\..\..\lib\rtl.lib ++
+..\..\..\lib\vm.lib ++
+..\..\..\lib\rdd.lib ++
+..\..\..\lib\dbfntx.lib ++
+..\..\..\lib\dbffpt.lib ++
+..\..\..\lib\hbsix.lib ++
+..\..\..\lib\lang.lib ++
+..\..\..\lib\macro.lib ++
+..\..\..\lib\debug.lib ++
+..\..\..\lib\common.lib ++
+..\..\..\lib\pp.lib ++
 c:\software\borland\bcc55\lib\cw32.lib ++
 c:\software\borland\bcc55\lib\import32.lib,
 wvwtest9.res
