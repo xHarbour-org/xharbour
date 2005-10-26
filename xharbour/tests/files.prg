@@ -1,5 +1,5 @@
 /*
- * $Id: files.prg,v 1.1 2001/02/23 18:44:00 alkresin Exp $
+ * $Id: files.prg,v 1.1.1.1 2001/12/21 10:45:46 ronpinkas Exp $
  */
 
 // This test was written by Jose Gimenez (JFG) <jfgimenez@wanadoo.es>
@@ -27,8 +27,7 @@ PROCEDURE FILES()
 
 #ifdef CON_ADS
 
-   rddRegister( "ADS", 1 )
-   rddsetdefault( "ADS" )
+   rddsetdefault( "ADSCDX" )
    SET SERVER LOCAL
    SET FILETYPE TO CDX
    SET CHARTYPE TO OEM

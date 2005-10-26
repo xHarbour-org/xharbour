@@ -16,8 +16,7 @@ FUNCTION MAIN
 
    CLS
 
-   RddRegister("ads",1)
-   RddSetDefault("Ads")
+   RddSetDefault("AdsADT")
    AdsSetServerType ( 7 )
    SET Filetype to ADT
 

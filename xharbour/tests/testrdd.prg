@@ -57,8 +57,7 @@ case Left( cRDDType := Upper( AllTrim( cRDDType ) ), 3 ) == "ADS"
     #define ADS_CDX           2
     #define ADS_ADT           3
 
-    RDDRegister( "ADS", 1 )
-    RDDSetDefault( "ADS" )
+    RDDSetDefault( "ADSCDX" )
 
     if Empty( cADSMode )
         NotifyUser( "Missing ADS mode" )

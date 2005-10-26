@@ -9,8 +9,7 @@ PROCEDURE TestAds( cDBF )
   ENDIF
 
   #ifdef __HARBOUR__
-     RddRegister( "ADS", 1 )
-     RddSetDefault( "ADS" )
+     RddSetDefault( "ADSCDX" )
      AdsSetServerType( 1 )
      AdsSetFileType( 2 )
   #endif
