@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4523 2005/10/26 15:53:00 bdj Exp $
+ * $Id: ChangeLog,v 1.4524 2005/10/26 20:07:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-27 00:07 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/harbour.sly
+    ! Generate a line number PCODE for WITH OBJECT line.
 
 2005-10-26 13:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

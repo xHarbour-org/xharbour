@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.90 2005/08/01 22:18:53 druzus Exp $
+ * $Id: harbour.sly,v 1.91 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -2600,6 +2600,7 @@ ForEach    : FOREACH IdentName  /* 1  2 */
            ;
 
 WithObject   : WITHOBJ Expression {
+                                     hb_compLinePush();
                                      hb_compGenWithObject($2);
 
                                      if( s_iControlLevel++ == 0 )
