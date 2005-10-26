@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.7 2005/09/27 14:12:50 likewolf Exp $
+ * $Id: dbgentry.c,v 1.8 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -963,7 +963,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
       if ( c == '.' )
       {
          if ( watch->szExpr[ i + 1 ]
-              && !strchr( "TtFf", watch->szExpr[ i + 1 ] )
+              && strchr( "TtFf", watch->szExpr[ i + 1 ] )
               && watch->szExpr[ i + 2 ] == '.' )
          {
             i += 3;
