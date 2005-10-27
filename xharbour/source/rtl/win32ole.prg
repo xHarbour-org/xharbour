@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.90 2005/10/16 19:32:45 druzus Exp $
+ * $Id: win32ole.prg,v 1.91 2005/10/26 20:07:35 ronpinkas Exp $
  */
 
 /*
@@ -715,7 +715,7 @@ RETURN xRet
      {
         char *cString = (char *) hb_xgrab( nConvertedLen );
 
-        if( WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen - 1, NULL, NULL ) )
+        if( WideCharToMultiByte( CP_ACP, 0, wString, -1, cString, nConvertedLen, NULL, NULL ) )
         {
            return cString;
         }
