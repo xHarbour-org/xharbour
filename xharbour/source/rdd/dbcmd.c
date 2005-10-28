@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.175 2005/10/19 14:22:57 druzus Exp $
+ * $Id: dbcmd.c,v 1.176 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -1632,7 +1632,7 @@ static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
       return FAILURE;
    }
    pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   
+
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
    pInfo.abName = ( BYTE * ) szFileName;
@@ -1700,7 +1700,7 @@ static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
       return FAILURE;
    }
    pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-   
+
    /* Fill pInfo structure */
    pInfo.uiArea = pArea->uiArea;
    pInfo.abName = ( BYTE * ) szFileName;
@@ -2704,6 +2704,7 @@ HB_FUNC( ORDCREATE )
 {
    HB_THREAD_STUB
    DBORDERCREATEINFO dbOrderInfo;
+   DBCONSTRAINTINFO dbConstrInfo;
    AREAP pArea = HB_CURRENT_WA;
 
    if( pArea )
@@ -2720,9 +2721,23 @@ HB_FUNC( ORDCREATE )
       }
       dbOrderInfo.itmCobExpr = hb_param( 4, HB_IT_BLOCK );
       if( ISLOG( 5 ) )
+      {
          dbOrderInfo.fUnique = hb_parl( 5 );
+      }
       else
+      {
          dbOrderInfo.fUnique = hb_set.HB_SET_UNIQUE;
+      }
+
+      dbConstrInfo.abConstrName = ( BYTE * ) hb_parcx( 6 );
+      dbConstrInfo.abTargetName = ( BYTE * ) hb_parcx( 7 );
+      dbConstrInfo.itmRelationKey = hb_param( 8, HB_IT_ARRAY );
+      if ( dbConstrInfo.abConstrName && dbConstrInfo.abTargetName && dbConstrInfo.itmRelationKey )
+      {
+         dbConstrInfo.fEnabled = hb_parl( 9 );
+         dbOrderInfo.lpdbConstraintInfo = &dbConstrInfo;
+      }
+
       SELF_ORDCREATE( pArea, &dbOrderInfo );
    }
    else

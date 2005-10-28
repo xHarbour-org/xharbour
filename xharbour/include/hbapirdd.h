@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.37 2005/10/04 02:05:32 druzus Exp $
+ * $Id: hbapirdd.h,v 1.38 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -231,13 +231,24 @@ typedef DBORDERCONDINFO * LPDBORDERCONDINFO;
 
 typedef struct
 {
-   LPDBORDERCONDINFO lpdbOrdCondInfo; /* Conditional information */
-   BYTE *            abBagName;       /* Name of the Order bag */
-   BYTE *            atomBagName;     /* Name of the Order */
-   PHB_ITEM          itmOrder;
-   BOOL              fUnique;         /* Flag to determine if all keys are unique */
-   PHB_ITEM          itmCobExpr;      /* Code block containing the KEY expression */
-   PHB_ITEM          abExpr;          /* String containing the KEY expression */
+   BYTE *             abConstrName;       /* Name of relational integrity constraint */
+   BYTE *             abTargetName;       /* Name of target relation table */
+   PHB_ITEM           itmRelationKey;     /* Array of columns in source table to match target primary key */
+   BOOL               fEnabled;           /* Is constraint enabled ? */
+} DBCONSTRAINTINFO;
+
+typedef DBCONSTRAINTINFO * LPDBCONSTRAINTINFO;
+
+typedef struct
+{
+   LPDBORDERCONDINFO  lpdbOrdCondInfo;    /* Conditional information */
+   BYTE *             abBagName;          /* Name of the Order bag */
+   BYTE *             atomBagName;        /* Name of the Order */
+   PHB_ITEM           itmOrder;
+   BOOL               fUnique;            /* Flag to determine if all keys are unique */
+   PHB_ITEM           itmCobExpr;         /* Code block containing the KEY expression */
+   PHB_ITEM           abExpr;             /* String containing the KEY expression */
+   LPDBCONSTRAINTINFO lpdbConstraintInfo; /* Relational constraint info */
 } DBORDERCREATEINFO;
 
 typedef DBORDERCREATEINFO * LPDBORDERCREATEINFO;
