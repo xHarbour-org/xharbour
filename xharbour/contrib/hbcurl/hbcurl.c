@@ -1,3 +1,54 @@
+/*
+ * xHarbour Project source code:
+ * Curl lib low level (client api) interface code.
+ *
+ * Copyright 2005 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+ * www - http://www.xharbour.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ * See doc/license.txt for licensing terms.
+ *
+ */
+
+
 #include <curl/curl.h>
 #include <curl/types.h>
 #include <curl/easy.h>
@@ -83,272 +134,272 @@ HB_FUNC(CURL_EASY_SETOPT)
    int iOption = hb_parni( 2 );
    switch (iOption)
    {
-   case HB_INFILESIZE_LARGE:
+   case HB_CURLOPT_INFILESIZE_LARGE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_INFILESIZE_LARGE, (curl_off_t) hb_parnl( 3 ) );
       break;
-   case HB_RESUME_FROM_LARGE:
+   case HB_CURLOPT_RESUME_FROM_LARGE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_RESUME_FROM_LARGE, (curl_off_t) hb_parnl( 3 ) );
       break;     
-   case HB_MAXFILESIZE_LARGE:
+   case HB_CURLOPT_MAXFILESIZE_LARGE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_MAXFILESIZE_LARGE, (curl_off_t) hb_parnl( 3 ) );
       break;   
-   case HB_POSTFIELDSIZE_LARGE:
+   case HB_CURLOPT_POSTFIELDSIZE_LARGE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_POSTFIELDSIZE_LARGE, (curl_off_t) hb_parnl( 3 ) );
       break;   
-   case HB_PORT:
+   case HB_CURLOPT_PORT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PORT, hb_parnl( 3 ) );
       break;      
-   case HB_TIMEOUT:
+   case HB_CURLOPT_TIMEOUT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TIMEOUT, hb_parnl( 3 ) );
       break;      
 
-   case HB_INFILESIZE:
+   case HB_CURLOPT_INFILESIZE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_INFILESIZE, hb_parnl( 3 ) );
       break;               
 
-   case HB_LOW_SPEED_TIME:
+   case HB_CURLOPT_LOW_SPEED_TIME:
       res = curl_easy_setopt(pConn->curl, CURLOPT_LOW_SPEED_TIME, hb_parnl( 3 ) );
       break;               
-   case HB_RESUME_FROM:
+   case HB_CURLOPT_RESUME_FROM:
       res = curl_easy_setopt(pConn->curl, CURLOPT_RESUME_FROM, hb_parnl( 3 ) );
       break;               
-   case HB_CRLF:
+   case HB_CURLOPT_CRLF:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CRLF, hb_parnl( 3 ) );
       break;               
-   case HB_SSLVERSION:
+   case HB_CURLOPT_SSLVERSION:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLVERSION, hb_parnl( 3 ) );
       break;               
-   case HB_TIMECONDITION:
+   case HB_CURLOPT_TIMECONDITION:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TIMECONDITION, hb_parnl( 3 ) );
       break;               
-   case HB_TIMEVALUE:
+   case HB_CURLOPT_TIMEVALUE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TIMEVALUE, hb_parnl( 3 ) );
       break;                  
-   case HB_VERBOSE:
+   case HB_CURLOPT_VERBOSE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_VERBOSE, hb_parnl( 3 ) );
       break;               
-   case HB_HEADER:
+   case HB_CURLOPT_HEADER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HEADER, hb_parnl( 3 ) );
       break;               
-   case HB_NOPROGRESS:
+   case HB_CURLOPT_NOPROGRESS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_NOPROGRESS, hb_parnl( 3 ) );
       break;               
-   case HB_FAILONERROR:
+   case HB_CURLOPT_FAILONERROR:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FAILONERROR, hb_parnl( 3 ) );
       break;               
-   case HB_UPLOAD:
+   case HB_CURLOPT_UPLOAD:
       res = curl_easy_setopt(pConn->curl, CURLOPT_UPLOAD, hb_parnl( 3 ) );
       break;               
-   case HB_POST:
+   case HB_CURLOPT_POST:
       res = curl_easy_setopt(pConn->curl, CURLOPT_POST, hb_parnl( 3 ) );
       break;               
-   case HB_FTPLISTONLY:
+   case HB_CURLOPT_FTPLISTONLY:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTPLISTONLY, hb_parnl( 3 ) );
       break;               
-   case HB_FTPAPPEND:
+   case HB_CURLOPT_FTPAPPEND:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTPAPPEND, hb_parnl( 3 ) );
       break;               
-   case HB_NETRC:
+   case HB_CURLOPT_NETRC:
       res = curl_easy_setopt(pConn->curl, CURLOPT_NETRC, hb_parnl( 3 ) );
       break;               
-   case HB_FOLLOWLOCATION:
+   case HB_CURLOPT_FOLLOWLOCATION:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FOLLOWLOCATION, hb_parnl( 3 ) );
       break;               
-   case HB_TRANSFERTEXT:
+   case HB_CURLOPT_TRANSFERTEXT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TRANSFERTEXT, hb_parnl( 3 ) );
       break;               
-   case HB_PUT:
+   case HB_CURLOPT_PUT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PUT, hb_parnl( 3 ) );
       break;               
       
-   case HB_AUTOREFERER:
+   case HB_CURLOPT_AUTOREFERER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_AUTOREFERER, hb_parnl( 3 ) );
       break;    
   
-   case HB_PROXYPORT:
+   case HB_CURLOPT_PROXYPORT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROXYPORT, hb_parnl( 3 ) );
       break;  
 
-   case HB_POSTFIELDSIZE:
+   case HB_CURLOPT_POSTFIELDSIZE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_POSTFIELDSIZE, hb_parnl( 3 ) );
       break;
    
-   case HB_HTTPPROXYTUNNEL:
+   case HB_CURLOPT_HTTPPROXYTUNNEL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HTTPPROXYTUNNEL, hb_parnl( 3 ) );
       break;   
   
-   case HB_SSL_VERIFYPEER:
+   case HB_CURLOPT_SSL_VERIFYPEER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSL_VERIFYPEER, hb_parnl( 3 ) );
       break;
     
-   case HB_MAXREDIRS:
+   case HB_CURLOPT_MAXREDIRS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_MAXREDIRS, hb_parnl( 3 ) );
       break;    
   
-   case HB_FILETIME:
+   case HB_CURLOPT_FILETIME:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FILETIME, hb_parnl( 3 ) );
       break;
     
-   case HB_MAXCONNECTS:
+   case HB_CURLOPT_MAXCONNECTS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_MAXCONNECTS, hb_parnl( 3 ) );
       break;
   
-   case HB_CLOSEPOLICY:
+   case HB_CURLOPT_CLOSEPOLICY:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CLOSEPOLICY, hb_parnl( 3 ) );
       break;
   
-   case HB_FRESH_CONNECT:
+   case HB_CURLOPT_FRESH_CONNECT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FRESH_CONNECT, hb_parnl( 3 ) );
       break;
   
-   case HB_FORBID_REUSE:
+   case HB_CURLOPT_FORBID_REUSE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FORBID_REUSE, hb_parnl( 3 ) );
       break;
   
-   case HB_CONNECTTIMEOUT:
+   case HB_CURLOPT_CONNECTTIMEOUT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CONNECTTIMEOUT, hb_parnl( 3 ) );
       break;
   
-   case HB_HTTPGET:
+   case HB_CURLOPT_HTTPGET:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HTTPGET, hb_parnl( 3 ) );
       break;
   
-   case HB_SSL_VERIFYHOST:
+   case HB_CURLOPT_SSL_VERIFYHOST:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSL_VERIFYHOST, hb_parnl( 3 ) );
       break;
-   case HB_HTTP_VERSION:
+   case HB_CURLOPT_HTTP_VERSION:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HTTP_VERSION, hb_parnl( 3 ) );
       break;
      
-   case HB_FTP_USE_EPSV:
+   case HB_CURLOPT_FTP_USE_EPSV:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_USE_EPSV, hb_parnl( 3 ) );
       break;
     
-   case HB_SSLENGINE_DEFAULT:
+   case HB_CURLOPT_SSLENGINE_DEFAULT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLENGINE_DEFAULT, hb_parnl( 3 ) );
       break;
             
-   case HB_DNS_USE_GLOBAL_CACHE:
+   case HB_CURLOPT_DNS_USE_GLOBAL_CACHE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_DNS_USE_GLOBAL_CACHE, hb_parnl( 3 ) );
       break;
     
-   case HB_DNS_CACHE_TIMEOUT:
+   case HB_CURLOPT_DNS_CACHE_TIMEOUT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_DNS_CACHE_TIMEOUT, hb_parnl( 3 ) );
       break;
           
-   case HB_COOKIESESSION:
+   case HB_CURLOPT_COOKIESESSION:
       res = curl_easy_setopt(pConn->curl, CURLOPT_COOKIESESSION, hb_parnl( 3 ) );
       break;
     
-   case HB_BUFFERSIZE:
+   case HB_CURLOPT_BUFFERSIZE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_BUFFERSIZE, hb_parnl( 3 ) );
       break;
   
-   case HB_NOSIGNAL:
+   case HB_CURLOPT_NOSIGNAL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_NOSIGNAL, hb_parnl( 3 ) );
       break;
   
-   case HB_PROXYTYPE:
+   case HB_CURLOPT_PROXYTYPE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROXYTYPE, hb_parnl( 3 ) );
       break;
   
-   case HB_UNRESTRICTED_AUTH:
+   case HB_CURLOPT_UNRESTRICTED_AUTH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_UNRESTRICTED_AUTH, hb_parnl( 3 ) );
       break;
   
-   case HB_FTP_USE_EPRT:
+   case HB_CURLOPT_FTP_USE_EPRT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_USE_EPRT, hb_parnl( 3 ) );
       break;
   
-   case HB_HTTPAUTH:
+   case HB_CURLOPT_HTTPAUTH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HTTPAUTH, hb_parnl( 3 ) );
       break;
   
-   case HB_FTP_CREATE_MISSING_DIRS:
+   case HB_CURLOPT_FTP_CREATE_MISSING_DIRS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_CREATE_MISSING_DIRS, hb_parnl( 3 ) );
       break;
   
-   case HB_PROXYAUTH:
+   case HB_CURLOPT_PROXYAUTH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROXYAUTH, hb_parnl( 3 ) );
       break;
   
-   case HB_FTP_RESPONSE_TIMEOUT:
+   case HB_CURLOPT_FTP_RESPONSE_TIMEOUT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_RESPONSE_TIMEOUT , hb_parnl( 3 ) );
       break;
   
-   case HB_IPRESOLVE:
+   case HB_CURLOPT_IPRESOLVE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_IPRESOLVE, hb_parnl( 3 ) );
       break;
   
-   case HB_MAXFILESIZE:
+   case HB_CURLOPT_MAXFILESIZE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_MAXFILESIZE, hb_parnl( 3 ) );
       break;
   
-   case HB_FTP_SSL:
+   case HB_CURLOPT_FTP_SSL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_SSL, hb_parnl( 3 ) );
       break;
   
-   case HB_TCP_NODELAY:
+   case HB_CURLOPT_TCP_NODELAY:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TCP_NODELAY, hb_parnl( 3 ) );
       break;
   
-   case HB_FTPSSLAUTH:
+   case HB_CURLOPT_FTPSSLAUTH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTPSSLAUTH, hb_parnl( 3 ) );
       break;
       
-   case HB_IGNORE_CONTENT_LENGTH:
+   case HB_CURLOPT_IGNORE_CONTENT_LENGTH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_IGNORE_CONTENT_LENGTH, hb_parnl( 3 ) );
       break;
   
-   case HB_URL:
+   case HB_CURLOPT_URL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_URL, hb_parcx( 3 ) );
       break;        
 
-   case HB_PROXY:
+   case HB_CURLOPT_PROXY:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROXY, hb_parcx( 3 ) );
       break;        
     
-   case HB_USERPWD:
+   case HB_CURLOPT_USERPWD:
       res = curl_easy_setopt(pConn->curl, CURLOPT_USERPWD, hb_parcx( 3 ) );
       break;        
   
-   case HB_PROXYUSERPWD:
+   case HB_CURLOPT_PROXYUSERPWD:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROXYUSERPWD, hb_parcx( 3 ) );
       break;        
    
-   case HB_RANGE:
+   case HB_CURLOPT_RANGE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_RANGE, hb_parcx( 3 ) );
       break;        
 
-   case HB_INFILE:
+   case HB_CURLOPT_INFILE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_INFILE, pConn->szFile );
       break;        
 
-   case HB_ERRORBUFFER:
+   case HB_CURLOPT_ERRORBUFFER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_ERRORBUFFER, hb_parcx( 3 ) );
       break;        
       
-   case HB_POSTFIELDS:
+   case HB_CURLOPT_POSTFIELDS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_POSTFIELDS , hb_parcx( 3 ) );
       break;              
 
-   case HB_REFERER:
+   case HB_CURLOPT_REFERER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_REFERER , hb_parcx( 3 ) );
       break;        
 
-   case HB_FTPPORT:
+   case HB_CURLOPT_FTPPORT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTPPORT , hb_parcx( 3 ) );
       break;        
 
-   case HB_USERAGENT:
+   case HB_CURLOPT_USERAGENT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_USERAGENT , hb_parcx( 3 ) );
       break;        
         
-   case HB_COOKIE:
+   case HB_CURLOPT_COOKIE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_COOKIE , hb_parcx( 3 ) );
       break;          
   
-   case HB_HTTPHEADER :
+   case HB_CURLOPT_HTTPHEADER :
    {
       PHB_ITEM pHttpHeaders = hb_param( 3, HB_IT_ARRAY );
       ULONG ulPos  ; 
@@ -361,7 +412,7 @@ HB_FUNC(CURL_EASY_SETOPT)
    }      
       break;          
   
-   case HB_HTTPPOST:
+   case HB_CURLOPT_HTTPPOST:
    {
       PHB_ITEM pHttpPost = hb_param( 3, HB_IT_ARRAY );
       ULONG ulPos ; 
@@ -379,15 +430,15 @@ HB_FUNC(CURL_EASY_SETOPT)
    }      
       break;          
   
-   case HB_SSLCERT:
+   case HB_CURLOPT_SSLCERT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLCERT , hb_parcx( 3 ) );
       break;          
   
-   case HB_SSLKEYPASSWD:  
+   case HB_CURLOPT_SSLKEYPASSWD:  
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLKEYPASSWD , hb_parcx( 3 ) );
       break;          
         
-   case HB_QUOTE:
+   case HB_CURLOPT_QUOTE:
    {
       PHB_ITEM pHttpHeaders = hb_param( 3, HB_IT_ARRAY );
       ULONG ulPos ; 
@@ -401,23 +452,23 @@ HB_FUNC(CURL_EASY_SETOPT)
       
       break;          
   
-   case HB_WRITEHEADER:
+   case HB_CURLOPT_WRITEHEADER:
       res = curl_easy_setopt(pConn->curl, CURLOPT_WRITEHEADER , hb_parcx( 3 ) ); //pointer or file *
       break;          
   
-   case HB_COOKIEFILE:
+   case HB_CURLOPT_COOKIEFILE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_COOKIEFILE , hb_parcx( 3 ) );
       break;          
         
-   case HB_CUSTOMREQUEST:
+   case HB_CURLOPT_CUSTOMREQUEST:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CUSTOMREQUEST , hb_parcx( 3 ) );
       break;         
   
-   case HB_STDERR:
+   case HB_CURLOPT_STDERR:
       res = curl_easy_setopt(pConn->curl, CURLOPT_STDERR , hb_parcx( 3 ) ); //File *
       break;           
   
-   case HB_POSTQUOTE:
+   case HB_CURLOPT_POSTQUOTE:
    {
       PHB_ITEM pHttpHeaders = hb_param( 3, HB_IT_ARRAY );
       ULONG ulPos ; 
@@ -430,63 +481,63 @@ HB_FUNC(CURL_EASY_SETOPT)
    }         
       break;         
   
-   case HB_WRITEINFO: //verificar
+   case HB_CURLOPT_WRITEINFO: //verificar
       res = curl_easy_setopt(pConn->curl, CURLOPT_WRITEINFO , hb_parcx( 3 ) );
       break;           
         
-   case HB_PROGRESSDATA:
+   case HB_CURLOPT_PROGRESSDATA:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PROGRESSDATA , hb_parcx( 3 ) );
       break;             
   
-   case HB_INTERFACE:
+   case HB_CURLOPT_INTERFACE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_INTERFACE , hb_parcx( 3 ) );
       break;               
   
-   case HB_KRB4LEVEL:
+   case HB_CURLOPT_KRB4LEVEL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_KRB4LEVEL , hb_parcx( 3 ) );
       break;               
    
-   case HB_CAINFO:
+   case HB_CURLOPT_CAINFO:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CAINFO , hb_parcx( 3 ) );
       break;                 
 
-   case HB_TELNETOPTIONS:
+   case HB_CURLOPT_TELNETOPTIONS:
       res = curl_easy_setopt(pConn->curl, CURLOPT_TELNETOPTIONS , hb_parcx( 3 ) ); //usa curl_slist
       break;                 
   
-   case HB_RANDOM_FILE:
+   case HB_CURLOPT_RANDOM_FILE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_RANDOM_FILE , hb_parcx( 3 ) ); 
       break;                   
   
-   case HB_EGDSOCKET:
+   case HB_CURLOPT_EGDSOCKET:
       res = curl_easy_setopt(pConn->curl, CURLOPT_EGDSOCKET , hb_parcx( 3 ) ); 
       break;                   
   
-   case HB_COOKIEJAR:
+   case HB_CURLOPT_COOKIEJAR:
       res = curl_easy_setopt(pConn->curl, CURLOPT_COOKIEJAR , hb_parcx( 3 ) ); 
       break;        
   
-   case HB_SSL_CIPHER_LIST:
+   case HB_CURLOPT_SSL_CIPHER_LIST:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSL_CIPHER_LIST , hb_parcx( 3 ) ); 
       break;          
   
-   case HB_SSLCERTTYPE:
+   case HB_CURLOPT_SSLCERTTYPE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLCERTTYPE , hb_parcx( 3 ) ); 
       break;          
   
-   case HB_SSLKEY:
+   case HB_CURLOPT_SSLKEY:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLKEY , hb_parcx( 3 ) );
       break;          
   
-   case HB_SSLKEYTYPE:
+   case HB_CURLOPT_SSLKEYTYPE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLKEYTYPE , hb_parcx( 3 ) );
       break;          
   
-   case HB_SSLENGINE:
+   case HB_CURLOPT_SSLENGINE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSLENGINE , hb_parcx( 3 ) ); 
       break;            
   
-   case HB_PREQUOTE:      
+   case HB_CURLOPT_PREQUOTE:      
    {
       PHB_ITEM pHttpHeaders = hb_param( 3, HB_IT_ARRAY );
       ULONG ulPos ; 
@@ -499,70 +550,70 @@ HB_FUNC(CURL_EASY_SETOPT)
    }         
       break;              
   
-   case HB_DEBUGDATA:
+   case HB_CURLOPT_DEBUGDATA:
       res = curl_easy_setopt(pConn->curl, CURLOPT_DEBUGDATA , hb_parcx( 3 ) ); // usa pointer
       break;              
             
-   case HB_CAPATH:
+   case HB_CURLOPT_CAPATH:
       res = curl_easy_setopt(pConn->curl, CURLOPT_CAPATH , hb_parcx( 3 ) ); 
       break; 
       
- /*  case HB_SHARE:
+ /*  case HB_CURLOPT_SHARE:
        res = curl_easy_setopt(pConn->curl, CURLOPT_SHARE , hb_parcx( 3 ) ); 
        break;              */
         
-   case HB_ENCODING:
+   case HB_CURLOPT_ENCODING:
       res = curl_easy_setopt(pConn->curl, CURLOPT_ENCODING , hb_parcx( 3 ) ); 
       break;   
   
-   case HB_PRIVATE:
+   case HB_CURLOPT_PRIVATE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_PRIVATE , hb_parcx( 3 ) ); 
       break;   
           
-   case HB_HTTP200ALIASES:
+   case HB_CURLOPT_HTTP200ALIASES:
       res = curl_easy_setopt(pConn->curl, CURLOPT_HTTP200ALIASES , hb_parcx( 3 ) );  // USA struct curl_slist structs
       break;   
 
-   case HB_SSL_CTX_DATA:
+   case HB_CURLOPT_SSL_CTX_DATA:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SSL_CTX_DATA , hb_parcx( 3 ) );  //usa pointer
       break;      
       
-   case HB_NETRC_FILE:
+   case HB_CURLOPT_NETRC_FILE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_NETRC_FILE , hb_parcx( 3 ) ); 
       break;   
   
-   case HB_SOURCE_USERPWD:
+   case HB_CURLOPT_SOURCE_USERPWD:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_USERPWD , hb_parcx( 3 ) ); 
       break;     
   
-   case HB_SOURCE_PREQUOTE:
+   case HB_CURLOPT_SOURCE_PREQUOTE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_PREQUOTE , hb_parcx( 3 ) ); //usa pointer
       break;   
   
-   case HB_SOURCE_POSTQUOTE:
+   case HB_CURLOPT_SOURCE_POSTQUOTE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_POSTQUOTE , hb_parcx( 3 ) );  //usa pointer
       break;     
       
-   case HB_IOCTLDATA:
+   case HB_CURLOPT_IOCTLDATA:
       res = curl_easy_setopt(pConn->curl, CURLOPT_IOCTLDATA , hb_parcx( 3 ) );  //pointer
       break;       
 
-   case HB_SOURCE_URL:
+   case HB_CURLOPT_SOURCE_URL:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_URL , hb_parcx( 3 ) ); 
       break;     
   
-   case HB_SOURCE_QUOTE:
+   case HB_CURLOPT_SOURCE_QUOTE:
       res = curl_easy_setopt(pConn->curl, CURLOPT_SOURCE_QUOTE , hb_parcx( 3 ) ); 
       break;     
   
-   case HB_FTP_ACCOUNT:
+   case HB_CURLOPT_FTP_ACCOUNT:
       res = curl_easy_setopt(pConn->curl, CURLOPT_FTP_ACCOUNT , hb_parcx( 3 ) ); 
       break;     
   
-   case HB_COOKIELIST:
+   case HB_CURLOPT_COOKIELIST:
       res = curl_easy_setopt(pConn->curl, CURLOPT_COOKIELIST , hb_parcx( 3 ) ); 
       break;
-   case HB_SETUPLOADFILE:
+   case HB_CURLOPT_SETUPLOADFILE:
    {
       res = 1;
 
@@ -574,7 +625,7 @@ HB_FUNC(CURL_EASY_SETOPT)
       pConn->szFile = fopen( hb_parc( 3 ), "rb" );
    }
       break;
-   case HB_SETDOWNLOADFILE:
+   case HB_CURLOPT_SETDOWNLOADFILE:
    {
       res = 1;
       //You can download many files at same session, if we using same session,
@@ -597,13 +648,13 @@ HB_FUNC(CURL_EASY_SETOPT)
       curl_easy_setopt(pConn->curl, CURLOPT_WRITEDATA, &pConn->fFile );
    }
       break;
-   case HB_CLOSEUPLOADFILE:
+   case HB_CURLOPT_CLOSEUPLOADFILE:
    {
       res = 1;
       fclose( pConn->szFile );
    }
       break;
-   case HB_SETPROGRESS:
+   case HB_CURLOPT_SETPROGRESS:
    {
      PHB_ITEM pBar = hb_param( 3, HB_IT_BLOCK );
   
