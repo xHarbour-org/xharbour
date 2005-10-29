@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4528 2005/10/27 16:20:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4529 2005/10/28 12:55:01 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,127 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-29 02:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ace.h
+    * disable #pragma warning( error : 4706 ) for GNUC to avoid
+      warnings in MinGW build
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/rddads.h
+    * moved declaration of public variables to header file to avoid possible
+      problems with different version in each file
+    + added ADS_USE_OEM_TRANSLATION macro set by default when 
+      ADS_REQUIRE_VERSION >= 6 && defined( HB_OS_WIN_32 )
+      If someone want then can add such translation also to older ADS
+      versions without accessing new ADS functions - I do not see any
+      reason to limit it only to ADS_REQUIRE_VERSION >= 6
+    * cleaned the code which called hb_ansioem() and hb_oemansi()
+      to avoid redundant memory allocation and freeing.
+    - removed hb_ansioem() and hb_oemansi() functions and added
+      hb_adsOemToAnsi(), hb_adsAnsiToOem(), hb_adsOemAnsiFree()
+      which are functions or dummy macros - using them make code much
+      more simple then it was and faster because there is no unnecessary
+      memory allocating and freeing.
+    ! fixed bugs with direct modifications of string item internals by
+      old hb_ansioem()/hb_oemansi() - Brian you cannot change the contents
+      of string buffer returned by hb_parc[x]() or hb_itemGetCPtr() - it
+      could be shared item, static area or even part of PCODE which will
+      be overwritten causing GPF or later RT errors or bad application
+      behavior.
+    * fixed casting of ADS connection handle when return and retrive
+      to/from item by adding macros to operate on it:
+      HB_ADS_PARCONNECTION( n ), HB_ADS_RETCONNECTION( h ),
+      HB_ADS_GETCONNECTION( p ), HB_ADS_PUTCONNECTION( p, h ),
+      HB_ADS_DEFCONNECTION( v )
+      Now you can chose any form for translation of ADS connection handle
+      to HB_ITEM by simple modification of this macros. You can also enable/
+      disable your own connection handles in one place only. When ExtSys will
+      release ACE for XP64 then you will only have to change this macros
+      in rdd_ads.h.
+
+  * xharbour/include/hbcomp.h
+    * changed cScope in FUNCTION and COMSYMBOL structures from char to
+      HB_SYMBOLSCOPE
+
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/thread.c
+    + added HB_FS_LOCAL symbol scope
+
+  * xharbour/include/thread.h
+    * changed declarations of HB_THREAD_T for WIN32 from DWORD to unsigned
+      just like in MS documentation
+    * fixed order of __thread position in TLS stack declarations.
+      This attribute has to be first just after static or extern if any.
+
+  * xharbour/source/compiler/genc.c
+    * use HB_FS_LOCAL symbol scope attribute instead of (PHB_DYNS) 1
+
+  * xharbour/source/compiler/harbour.c
+    * use HB_FS_LOCAL symbol scope attribute instead of (PHB_DYNS) 1
+  
+  * xharbour/source/rtl/win32ole.prg
+    * cleaned code to avoid broken strict-aliasing GCC warnings
+
+  * xharbour/source/vm/arrayshb.c
+    * restored valid code of RT errors disabled to reduced number of hbtest
+      warnings when in fact the problem is in hbtest which was hacked much
+      earlier to hide this errors
+
+  * xharbour/source/vm/dynsym.c
+    * use HB_FS_LOCAL instead of (PHB_DYNS) 1
+    * removed no longer necessary (PHB_DYNS) 1 RT checking
+
+  * xharbour/source/vm/classes.c
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/proc.c
+    * removed no longer necessary (PHB_DYNS) 1 RT checking
+
+  * xharbour/source/vm/hvm.c
+    * removed no longer necessary (PHB_DYNS) 1 RT checking
+    ! fixed HB_NOMOUSE() feature I broke in last commit
+    * changed bit shift operations to work on HB_LONG type not LONG only.
+      They should support the biggest served by VM integer type.
+    * eliminate C stack level in HB_P_INC by reducing redundant code
+      seems that using HB_ITEM was a goal itself even with the cost
+      of speed in some cases ;-)
+    ! fixed result substitution by error handler in HB_P_IVARREF
+    ! fixed HVM stack corruption in HB_P_LOCALNEARADDINT and result
+      substitution by error handler
+    ! fixed HVM stack corruption in HB_P_LOCALNEARSETSTR and
+      HB_P_LOCALNEARSETSTRHIDDEN with __OPASSIGN operator is overloaded
+    ! fixed memory leak in HB_P_ADDINT, HB_P_SWITCHCASE, HB_P_LEFT and
+      RT error with substitution
+    ! fixed stack cleaning in HB_P_POPGLOBAL and __OPASSIGN operator
+    ! fixed memory leak hb_vmSelectWorkarea() and RT error with substitution
+    * cleaned hb_vmClassError() - really interesting construction. I guess
+      created to eliminate false FM memory leak error with the cost of
+      dropping unreferenced array in memory what was forcing using GC
+      in all code which extensively use this RT error. Good example that
+      FM statistic may force someone to create odd hack with RT bead impact
+      in valid code :-(
+    * cleaned in hb_vmSend() SUPER object casting. This code was modified
+      and "optimized" such many times that about half of construction inside
+      didn't have any sense.
+    ! fixed possible GPF in hb_vmDebuggerEndProc() and .prg level debuger
+      HB_VM_STACK.Return was stored in C stack HB_ITEM.
+    ! fixed memory leak and error substitution hb_vmPushAliasedField()
+    ! keep unused part of stack clean in hb_vmPopLocal(), hb_vmPopStatic()
+      when __OPASSIGN overloaded operator is called
+
+     Please check me. I haven't planed to make above changes and it's a side
+     effect of checking for RT errors and eliminating false FM log when
+     program is interrupted in error handler. I just look at some of RT
+     errors calls and found the above. Sorry but I cannot left it. It has
+     to be well tested. Even small typo in HVM code may cause unpredictable
+     results and problems.
+
+  * xharbour/source/vm/itemapi.c
+    * removed one unused function which should be never seen by someone
+      who tries to learn C looking at xHarbour source code ;-)
+
+  * xharbour/source/vm/memvars.c
+    * removed no longer necessary comment
 
 2005-10-28 10:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * include\hbapirdd.h
