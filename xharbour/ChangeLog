@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4530 2005/10/29 00:12:21 druzus Exp $
+ * $Id: ChangeLog,v 1.4531 2005/10/29 18:53:38 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-29 23:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/dbghelp.prg
+  * source/debug/debugger.prg
+    + Added capability to inspect watchpoint values.
+    ! Moved editing of watchpoint expressions to Ctrl-Enter, because Enter
+      is used to inspect watchpoint values (Clipper compatibility).
 
 2005-10-29 22:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * doc/en/hvm.txt

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.62 2005/09/25 21:24:39 likewolf Exp $
+ * $Id: debugger.prg,v 1.63 2005/09/27 14:12:49 likewolf Exp $
  */
 
 /*
@@ -312,6 +312,7 @@ CLASS TDebugger
    METHOD WatchpointsShow()
    METHOD WatchpointsHide()
    METHOD WatchpointEdit( nVar )
+   METHOD WatchpointInspect( nPos )
    METHOD WatchGetInfo( nWatch )
 
    METHOD VarGetInfo( aVar )
@@ -1171,9 +1172,9 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
       xResult += "; arguments:"
       AEval( oErr:args, {|x| xResult += " " + AllTrim( CStr( x ) ) } )
     ENDIF
-      lValid := .F.
-   END SEQUENCE
-   ErrorBlock( bOldErrorBlock )
+    lValid := .F.
+  END SEQUENCE
+  ErrorBlock( bOldErrorBlock )
 RETURN xResult
 
 
@@ -1324,7 +1325,7 @@ METHOD HandleEvent() CLASS TDebugger
          case nKey == K_UP .or. nKey == K_DOWN .or. nKey == K_HOME .or. ;
               nKey == K_END .or. nKey == K_ENTER .or. nKey == K_PGDN .or. ;
               nKey == K_PGUP .or. nKey == K_DEL .or. nKey == K_LEFT .or. ;
-              nKey == K_RIGHT
+              nKey == K_RIGHT .or. nKey == K_CTRL_ENTER
               oWnd := ::aWindows[ ::nCurrentWindow ]
               oWnd:KeyPressed( nKey )
 
@@ -2895,6 +2896,17 @@ METHOD WatchpointEdit( nPos ) CLASS TDebugger
 RETURN self
 
 
+METHOD WatchpointInspect( nPos ) CLASS TDebugger
+  LOCAL xValue, lValid
+
+  ::RestoreAppState()
+  xValue := ::GetExprValue( ::aWatch[ nPos ][ WP_EXPR ], @lValid )
+  ::SaveAppState()
+  
+  ::InputBox( ::aWatch[ nPos ][ WP_EXPR ], xValue, , .F. )
+RETURN Self
+
+
 METHOD WatchpointsHide() CLASS TDebugger
 
    ::oWndPnt:Hide()
@@ -2968,14 +2980,17 @@ METHOD WatchPointsShow() CLASS TDebugger
 
       ::oWndPnt:bPainted := { || if(Len(::aWatch) > 0, ( ::oBrwPnt:RefreshAll():ForceStable(),RefreshVarsS(::oBrwPnt) ),) }
 
-      ::oWndPnt:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
-      , ::oBrwPnt:Down(), nil ), iif( nKey == K_UP, ::oBrwPnt:Up(), nil ) ;
+      ::oWndPnt:bKeyPressed := { | nKey | ;
+      ( iif( nKey == K_DOWN, ::oBrwPnt:Down(), nil ) ;
+      , iif( nKey == K_UP, ::oBrwPnt:Up(), nil ) ;
       , iif( nKey == K_PGDN, ::oBrwPnt:PageDown(), nil ) ;
       , iif( nKey == K_PGUP, ::oBrwPnt:PageUp(), nil ) ;
       , iif( nKey == K_HOME, ::oBrwPnt:GoTop(), nil ) ;
       , iif( nKey == K_END, ::oBrwPnt:GoBottom(), nil ) ;
       , iif( nKey == K_DEL, ::WatchpointDel( ::oBrwPnt:Cargo[1] ), nil ) ;
-      , iif( nKey == K_ENTER, ::WatchpointEdit( ::oBrwPnt:Cargo[1] ), nil ), ::oBrwPnt:ForceStable() ) }
+      , iif( nKey == K_ENTER, ::WatchpointEdit( ::oBrwPnt:Cargo[1] ), nil ) ;
+      , iif( nKey == K_CTRL_ENTER, ::WatchpointInspect( ::oBrwPnt:Cargo[ 1 ] ), nil ) ;
+      , ::oBrwPnt:ForceStable() ) }
 
       AAdd( ::aWindows, ::oWndPnt )
       ::oWndPnt:Show()

@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.2 2002/10/19 18:50:24 antoniolinares Exp $
+ * $Id: dbghelp.prg,v 1.1 2003/06/09 20:45:01 lculik Exp $
  */
 
 /*
@@ -457,7 +457,9 @@ static function GetTopics()
         "expressions, and their current values.",;
         "",;
         "Watchpoints and Tracepoints may be defined and deleted via",;
-        "options on the Point menu.",;
+        "options on the Point menu. You can edit a Watchpoint or",;
+        "Tracepoint expression by selecting it in the Watch window",;
+        "and pressing CTRL-ENTER.",;
         "",;
         "If the Watch window is active, pressing ENTER will inspect",;
         "the value of the selected expression. The navigation keys",;
