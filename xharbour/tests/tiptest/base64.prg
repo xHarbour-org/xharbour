@@ -12,7 +12,7 @@
 * base64test -q [-d]  to use quoted printable encoding/decoding.
 * base64test -u [-d]  to use url encoding/decoding.
 *
-* $Id: base64.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
+* $Id: base64.prg,v 1.2 2005/03/17 00:55:42 ath1 Exp $
 *****/
 
 #Define hSTDIN 0
@@ -29,7 +29,7 @@ PROCEDURE MAIN( ... )
 
    /* Parameter parsing */
    FOR nLen := 1 TO PCount()
-      cData := Lower( HB_PValue( nLen ) )
+      cData := Lower( PValue( nLen ) )
       DO CASE
          CASE cData == '-h'
             lHelp := .T.

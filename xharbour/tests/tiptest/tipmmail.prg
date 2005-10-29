@@ -20,7 +20,7 @@
 * This test writes data to standard output, and is
 * compiled only under GTCGI;
 *
-* $Id: testmmail.prg,v 1.1 2003/12/02 04:08:17 jonnymind Exp $
+* $Id: tipmmail.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
 *****/
 
 PROCEDURE MAIN( ... )
@@ -38,7 +38,7 @@ PROCEDURE MAIN( ... )
 
    i := 1
    DO WHILE i < PCount()
-      cData := HB_PValue(i)
+      cData := PValue(i)
 
       IF lower( cData ) == "-h"
          Usage()
@@ -47,35 +47,35 @@ PROCEDURE MAIN( ... )
 
       IF lower( cData ) == "-f"
          i++
-         cData := HB_PValue(i)
+         cData := PValue(i)
          IF cData != NIL
             oMail:hHeaders[ "From" ] := cData
          ENDIF
       ELSEIF lower( cData ) == "-t"
          i++
-         cData := HB_PValue(i)
+         cData := PValue(i)
          IF cData != NIL
             oMail:hHeaders[ "To" ] := cData
          ENDIF
       ELSEIF lower( cData ) == "-s"
          i++
-         cData := HB_PValue(i)
+         cData := PValue(i)
          IF cData != NIL
             oMail:hHeaders[ "Subject" ] := cData
          ENDIF
       ELSEIF lower( cData ) == "-b"
          i++
-         cData := HB_PValue(i)
+         cData := PValue(i)
          IF cData != NIL
             oMail:SetBody( cData + e"\r\n" )
          ENDIF
       ELSEIF lower( cData ) == "-m"
          i++
-         cData := HB_PValue(i)
+         cData := PValue(i)
          IF cData != NIL
             cData := Memoread( cData )
             IF Empty(cData)
-               ? "FATAL: Can't read", HB_PValue(i)
+               ? "FATAL: Can't read", PValue(i)
                QUIT
             ENDIF
             oMail:SetBody( cData + e"\r\n")
@@ -83,14 +83,14 @@ PROCEDURE MAIN( ... )
       ELSE  // it is an attachment file
          cData := Memoread( cData )
          IF Empty(cData)
-            ? "FATAL: Can't read attachment", HB_PValue(i)
+            ? "FATAL: Can't read attachment", PValue(i)
             QUIT
          ENDIF
          oAttach := TipMail():New()
 
          oAttach:SetEncoder( "base64" )
          //TODO: mime type magic auto-finder
-         HB_FNameSplit( HB_PValue(i),,@cFname, @cFext )
+         HB_FNameSplit( PValue(i),,@cFname, @cFext )
          // Some EMAIL readers use Content-Type to check for filename
          oAttach:hHeaders[ "Content-Type" ] := ;
                "application/X-TIP-Attachment; filename=";

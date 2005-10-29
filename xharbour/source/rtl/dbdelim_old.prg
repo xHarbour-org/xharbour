@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.10 2004/03/10 12:15:37 andijahja Exp $
+ * $Id: dbdelim_old.prg,v 1.2 2004/03/10 19:43:55 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.10 2004/03/10 12:15:37 andijahja Exp $" )
+HB_FILE_VER( "$Id: dbdelim_old.prg,v 1.2 2004/03/10 19:43:55 andijahja Exp $" )
 
 #define AppendEOL( handle )       FWrite( handle, CHR( 13 ) + CHR( 10 ) )
 #define AppendEOF( handle )       FWrite( handle, CHR( 26 ) )
@@ -319,7 +319,7 @@ STATIC FUNCTION AppendToDb(cLine,cDelim,aStruct)
       cBuffer:=RemoveQuote(aMyval[ii])
       SWITCH aStruct[ ii,2 ]
          CASE "D"
-            vRes := HB_STOD( cBuffer )
+            vRes := STOD( cBuffer )
             EXIT
          CASE "L"
             vRes := Upper( cBuffer ) $ "T1Y"

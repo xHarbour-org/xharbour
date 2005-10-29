@@ -1,5 +1,5 @@
 //
-// $Id: multiarg.prg,v 1.4 2001/11/01 08:18:39 davep Exp $
+// $Id: multiarg.prg,v 1.1.1.1 2001/12/21 10:45:57 ronpinkas Exp $
 //
 
 //
@@ -15,16 +15,26 @@
 // Placed in the public domain
 //
 function Main()
+   LOCAL x
 
    ShoutArg( 1, "1", 2.5, .T. )
    ShoutArg( 2, "1", 2.5, .T. )
    ShoutArg( 3, "1", 2.5, .T. )
    ShoutArg( 4, "1", 2.5, .T. )
    ShoutArg( 5, "1", 2.5, .T. )
+   SetArg( x, 444 )
+   ? x
+   SetArg( @x, 555 )
+   ? x
 return nil
 
 
 function ShoutArg( nArg, x1,x2,x3,x4,x5,x6,x7,x8,x9,x10 )
 
-  QOut( nArg, "==", HB_PValue( nArg ) )
+  QOut( nArg, "==", PValue( nArg ) )
+return nil
+
+function SetArg( x, xValue )
+  QOut( "PValue( 1, xValue ) == ", PValue( 1, xValue ) )
+  QOut( "PValue( 1 ) == ", PValue( 1 ) )
 return nil

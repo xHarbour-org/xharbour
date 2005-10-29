@@ -1,5 +1,5 @@
 /*
- * $Id: rt_math.prg,v 1.5 2004/02/11 04:02:54 druzus Exp $
+ * $Id: rt_math.prg,v 1.6 2004/02/15 20:21:40 andijahja Exp $
  */
 
 /*
@@ -299,20 +299,20 @@ FUNCTION Main_MATH()
 
    TEST_LINE( Max(NIL, NIL)                                 , "E BASE 1093 Argument error MAX A:2:U:NIL;U:NIL F:S"     )
    TEST_LINE( Max(10, NIL)                                  , "E BASE 1093 Argument error MAX A:2:N:10;U:NIL F:S"      )
-   TEST_LINE( Max(HB_SToD("19800101"), 10)                  , "E BASE 1093 Argument error MAX A:2:D:19800101;N:10 F:S" )
-   TEST_LINE( Max(HB_SToD("19800101"), HB_SToD("19800101")) , HB_SToD("19800101")                  )
-   TEST_LINE( Max(HB_SToD("19800102"), HB_SToD("19800101")) , HB_SToD("19800102")                  )
-   TEST_LINE( Max(HB_SToD("19800101"), HB_SToD("19800102")) , HB_SToD("19800102")                  )
+   TEST_LINE( Max(SToD("19800101"), 10)                  , "E BASE 1093 Argument error MAX A:2:D:19800101;N:10 F:S" )
+   TEST_LINE( Max(SToD("19800101"), SToD("19800101")) , SToD("19800101")                  )
+   TEST_LINE( Max(SToD("19800102"), SToD("19800101")) , SToD("19800102")                  )
+   TEST_LINE( Max(SToD("19800101"), SToD("19800102")) , SToD("19800102")                  )
    TEST_LINE( Max(snIntP, snLongP)                          , 100000                               )
 #ifdef __HARBOUR__
    TEST_LINE( Max(@snIntP, @snLongP)                        , 100000                               ) /* Bug in CA-Cl*pper, it will return: "E BASE 1093 Argument error MAX F:S" */
 #endif
    TEST_LINE( Min(NIL, NIL)                                 , "E BASE 1092 Argument error MIN A:2:U:NIL;U:NIL F:S"     )
    TEST_LINE( Min(10, NIL)                                  , "E BASE 1092 Argument error MIN A:2:N:10;U:NIL F:S"      )
-   TEST_LINE( Min(HB_SToD("19800101"), 10)                  , "E BASE 1092 Argument error MIN A:2:D:19800101;N:10 F:S" )
-   TEST_LINE( Min(HB_SToD("19800101"), HB_SToD("19800101")) , HB_SToD("19800101")                  )
-   TEST_LINE( Min(HB_SToD("19800102"), HB_SToD("19800101")) , HB_SToD("19800101")                  )
-   TEST_LINE( Min(HB_SToD("19800101"), HB_SToD("19800102")) , HB_SToD("19800101")                  )
+   TEST_LINE( Min(SToD("19800101"), 10)                  , "E BASE 1092 Argument error MIN A:2:D:19800101;N:10 F:S" )
+   TEST_LINE( Min(SToD("19800101"), SToD("19800101")) , SToD("19800101")                  )
+   TEST_LINE( Min(SToD("19800102"), SToD("19800101")) , SToD("19800101")                  )
+   TEST_LINE( Min(SToD("19800101"), SToD("19800102")) , SToD("19800101")                  )
    TEST_LINE( Min(snIntP, snLongP)                          , 10                                   )
 #ifdef __HARBOUR__
    TEST_LINE( Min(@snIntP, @snLongP)                        , 10                                   ) /* Bug in CA-Cl*pper, it will return: "E BASE 1092 Argument error MIN F:S" */

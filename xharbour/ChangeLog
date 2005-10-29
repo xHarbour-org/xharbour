@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4529 2005/10/28 12:55:01 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4530 2005/10/29 00:12:21 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-29 22:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * doc/en/hvm.txt
+  * include/hbextern.ch
+  * source/rtl/dateshb.c
+  * source/vm/pvalue.c
+    ! Renamed HB_PVALUE() to PVALUE() and added an optional XBase++-compatible
+      second parameter.
+    ! Removed HB_STOD().
+  * contrib/mysql/dbf2mysql.prg
+  * contrib/pgsql/tests/cache.prg
+  * contrib/pgsql/tests/dbf2pg.prg
+  * source/rtl/dbdelim_old.prg
+  * source/rtl/dbsdf.prg
+  * source/rtl/dircmd.prg
+  * source/rtl/hblog.prg
+  * source/rtl/persist.prg
+  * source/rtl/trpccli.prg
+  * tests/tiptest/base64.prg
+  * tests/tiptest/tipmmail.prg
+  * utils/hbtest/hbtest.prg
+  * utils/hbtest/rt_date.prg
+  * utils/hbtest/rt_hvm.prg
+  * utils/hbtest/rt_hvma.prg
+  * utils/hbtest/rt_init.ch
+  * utils/hbtest/rt_math.prg
+  * utils/hbtest/rt_misc.prg
+  * utils/hbtest/rt_str.prg
+  * utils/hbtest/rt_stra.prg
+  * utils/hbtest/rt_trans.prg
+    ! HB_PVALUE() -> PVALUE(), HB_STOD() -> STOD().
+  * tests/multiarg.prg
+    + Added a test for PVALUE() with a second parameter.
+  * source/vm/fastitem.c
+    ! Fixed a couple of traces.
 
 2005-10-29 02:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ace.h

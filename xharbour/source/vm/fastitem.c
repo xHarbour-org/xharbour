@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.78 2005/10/24 01:04:36 druzus Exp $
+ * $Id: fastitem.c,v 1.79 2005/10/24 17:48:15 druzus Exp $
  */
 
 /*
@@ -781,7 +781,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptRaw( '%s', %lu )", szText, ulLen ) );
 
 
    if( ( &(HB_VM_STACK.Return) )->type )
@@ -803,7 +803,7 @@ void HB_EXPORT hb_retclenAdoptRawStatic( char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
+   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptRawStatic( '%s', %lu )", szText, ulLen ) );
 
    if( ( &(HB_VM_STACK.Return) )->type )
    {

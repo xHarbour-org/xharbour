@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.20 2005/02/08 18:35:32 ronpinkas Exp $
+* $Id: hblog.prg,v 1.21 2005/08/17 00:22:09 kaddath Exp $
 */
 
 /*
@@ -245,7 +245,7 @@ METHOD New() CLASS HB_Logger
    LOCAL nCount
 
    FOR nCount := 1 TO PCount()
-      ::AddChannel( HB_PValue( nCount ) )
+      ::AddChannel( PValue( nCount ) )
    NEXT
 RETURN Self
 

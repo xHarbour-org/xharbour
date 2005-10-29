@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.22 2005/09/24 07:03:40 ronpinkas Exp $
+ * $Id: persist.prg,v 1.23 2005/10/24 05:26:12 brianhays Exp $
  */
 
 /*
@@ -71,7 +71,7 @@
 #include "hbclass.ch"
 #include "common.ch"
 
-extern HB_STOD
+extern STOD
 
 CLASS HBPersistent
 
@@ -337,7 +337,7 @@ STATIC FUNCTION ValToText( xValue )
          EXIT
 
       CASE "D"
-         cText := 'HB_STOD( "' + DToS( xValue ) + '" )'
+         cText := 'STOD( "' + DToS( xValue ) + '" )'
 
       CASE "B"
          cText := ValToPrgExp( xValue  )

@@ -1,5 +1,5 @@
 /*
- * $Id: rt_init.ch,v 1.3 2001/05/15 13:02:07 vszakats Exp $
+ * $Id: rt_init.ch,v 1.1.1.1 2001/12/21 10:44:45 ronpinkas Exp $
  */
 
 /*
@@ -70,8 +70,8 @@ INIT PROCEDURE RT_InitStatics()
    snLongN   := -100000
    snDoubleN := -10.567 /* Use different number of decimals than the default */
    snDoubleI := 0   // Log( 0 )
-   sdDate    := HB_SToD( "19840325" )
-   sdDateE   := HB_SToD( "" )
+   sdDate    := SToD( "19840325" )
+   sdDateE   := SToD( "" )
    slFalse   := .F.
    slTrue    := .T.
    soObject  := ErrorNew()

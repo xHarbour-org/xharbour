@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.txt,v 1.1.1.1 2001/12/21 10:48:51 ronpinkas Exp $
+ * $Id: hvm.txt,v 1.2 2004/01/29 14:37:41 likewolf Exp $
  */
 
 /*
@@ -140,34 +140,36 @@
 
 /*  $DOC$
  *  $FUNCNAME$
- *      HB_PVALUE()
+ *      PVALUE()
  *  $CATEGORY$
  *      Parameter Checks
  *  $ONELINER$
  *      Retrieves the value of an argument.
  *  $SYNTAX$
- *      HB_PVALUE( <nArg> ) --> <xExp>
+ *      PVALUE( <nArg>, [ <xNewValue> ] ) --> <xExp>
  *  $ARGUMENTS$
- *      A number that indicates the argument to check.   </par>
+ *      <nArg> is a number that indicates the argument to check.
+ *      <xNewValue> is an optional value to be assigned to that argument.   </par>
  *  $RETURNS$
  *      <xExp> Returns the value stored by an argument.   </par>
  *  $DESCRIPTION$
- *      This function is useful to check the value stored in an argument.   </par>
+ *      This function is useful to check the value stored in an argument
+ *      or to store a new value to an argument passed by reference.   </par>
  *  $EXAMPLES$
  *      See Test
  *  </fixed>
  *  $TESTS$
  *      function Test( nValue, cString )
  *         if PCount() == 2
- *            ? hb_PValue( 1 ), nValue
- *            ? hb_PValue( 2 ), cString
+ *            ? PValue( 1 ), nValue
+ *            ? PValue( 2 ), cString
  *         endif
  *      return nil
  *  </fixed>
  *  $STATUS$
  *      R
  *  $COMPLIANCE$
- *      HB_PVALUE() is a new function and hence not CA-Clipper compliant.   </par>
+ *      PVALUE() is not CA-Clipper compliant, but is Alaska XBase++ compliant.   </par>
  *  $FILES$
  *      Library is vm
  *  $SEEALSO$
@@ -211,7 +213,7 @@
  *  $FILES$
  *      Library is vm
  *  $SEEALSO$
- *      HB_PVALUE()
+ *      PVALUE()
  *  $END$
  */
 

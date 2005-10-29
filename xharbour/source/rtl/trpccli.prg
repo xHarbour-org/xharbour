@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.28 2004/09/26 16:37:02 jonnymind Exp $
+ * $Id: trpccli.prg,v 1.29 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -627,7 +627,7 @@ METHOD Call( ... ) CLASS tRPCClient
       RETURN NIL
    ENDIF
 
-   oCalling := HB_PValue( 1 )
+   oCalling := PValue( 1 )
    IF ValType( oCalling ) == "A"
       cFunction := oCalling[1]
       ADel( oCalling, 1 )
@@ -637,7 +637,7 @@ METHOD Call( ... ) CLASS tRPCClient
       cFunction := oCalling
       aParams := Array( Pcount() -1 )
       FOR nCount := 2 TO Pcount()
-         aParams[nCount - 1] :=  HB_PValue( nCount )
+         aParams[nCount - 1] := PValue( nCount )
       NEXT
    ENDIF
 
@@ -694,14 +694,14 @@ METHOD SetPeriodCallback( ... ) CLASS tRPCClient
    #ifdef HB_THREAD_SUPPORT
    HB_MutexLock( ::mtxBusy )
    #endif
-   ::nTimeout := HB_PValue( 1 )
-   ::nTimeLimit := HB_PValue( 2 )
+   ::nTimeout := PValue( 1 )
+   ::nTimeLimit := PValue( 2 )
 
-   caCalling := HB_PValue( 3 )
+   caCalling := PValue( 3 )
    IF ValType( caCalling ) != "A"
       caCalling := Array( Pcount() -2 )
       FOR nCount := 3 TO Pcount()
-         caCalling[nCount - 2] :=  HB_PValue( nCount )
+         caCalling[nCount - 2] :=  PValue( nCount )
       NEXT
    ENDIF
    ::caPerCall := caCalling

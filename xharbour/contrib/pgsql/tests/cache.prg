@@ -1,5 +1,5 @@
 /*
- * $Id: cache.prg,v 1.2 2004/06/24 20:35:47 rodrigo_moreno Exp $
+ * $Id: cache.prg,v 1.3 2004/07/13 14:34:25 rodrigo_moreno Exp $
  *
  * This samples show how to use dbf to cache postgres records.
  *
@@ -442,7 +442,7 @@ Function SQLPrepare( cQuery, x01, x02, x03, x04, x05, x06, x07, x08, x09, x10,;
     
     /* Substitui parametros por valores passados */
     for i := 2 to PCount()
-      x := hb_PValue(i)
+      x := PValue(i)
       
       if ! ISNIL(x) .and. Empty(x)
         x := 'null'

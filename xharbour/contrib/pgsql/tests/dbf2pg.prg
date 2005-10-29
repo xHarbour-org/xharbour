@@ -1,6 +1,6 @@
 /*
  *
- * $Id: dbf2pg.prg,v 1.6 2004/07/13 14:34:25 rodrigo_moreno Exp $
+ * $Id: dbf2pg.prg,v 1.7 2004/07/16 20:52:04 rodrigo_moreno Exp $
  *
  * Harbour Project source code:
  * dbf2pg.prg - converts a .dbf file into a Postgres table
@@ -94,26 +94,26 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
    // Scan parameters and setup workings
    while (i <= PCount())
       
-      cTok := hb_PValue(i++)
+      cTok := PValue(i++)
 
       do case
       case cTok == "-h"
-         cHostName := hb_PValue(i++)
+         cHostName := PValue(i++)
 
       case cTok == "-d"
-         cDataBase := hb_PValue(i++)
+         cDataBase := PValue(i++)
 
       case cTok == "-t"
-         cTable := hb_PValue(i++)
+         cTable := PValue(i++)
 
       case cTok == "-f"
-         cFile := hb_PValue(i++)
+         cFile := PValue(i++)
 
       case cTok == "-u"
-         cUser := hb_PValue(i++)
+         cUser := PValue(i++)
 
       case cTok == "-p"
-         cPassWord := hb_PValue(i++)
+         cPassWord := PValue(i++)
 
       case cTok == "-c"
          lCreateTable := .T.
@@ -125,13 +125,13 @@ procedure main(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14, c15,
          lUseTrans := .T.
          
       case cTok == "-m"
-         nCommit := val(hb_PValue(i++))
+         nCommit := val(PValue(i++))
 
       case cTok == "-r"
-         nRecno := val(hb_PValue(i++))
+         nRecno := val(PValue(i++))
 
       case cTok == "-e"
-         cPath := hb_PValue(i++)
+         cPath := PValue(i++)
 
       otherwise
          help()

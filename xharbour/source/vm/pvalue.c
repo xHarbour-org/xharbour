@@ -1,10 +1,10 @@
 /*
- * $Id: pvalue.c,v 1.4 2003/08/21 04:02:13 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.5 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * HB_PVALUE() function
+ * PVALUE() function
  *
  * Copyright 1999 Eddie Runia <eddie@runia.com>
  * www - http://www.harbour-project.org
@@ -55,7 +55,7 @@
 #include "hbapiitm.h"
 #include "hbstack.h"
 
-HB_FUNC( HB_PVALUE )
+HB_FUNC( PVALUE )
 {
    USHORT uiParam = hb_parni( 1 ), uiParams;
    PHB_ITEM *pBase = HB_VM_STACK.pItems + ( hb_stackBaseItem() )->item.asSymbol.stackbase; /* Skip function + self */
@@ -64,7 +64,13 @@ HB_FUNC( HB_PVALUE )
 
    if( uiParam && uiParam <= uiParams ) /* Valid number */
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), *( pBase + 1 + uiParam ) );
+      PHB_ITEM pItem = *( pBase + 1 + uiParam );
+      
+      hb_itemReturn( pItem );
+      if ( hb_pcount() > 1 && HB_IS_BYREF( pItem ) )
+      {
+         hb_itemCopy( pItem, hb_param( 2, HB_IT_ANY ) );
+      }
    }
    else
    {

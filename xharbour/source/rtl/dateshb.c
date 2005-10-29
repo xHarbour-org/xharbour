@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.10 2004/11/21 21:44:17 druzus Exp $
+ * $Id: dateshb.c,v 1.11 2005/03/23 19:46:48 druzus Exp $
  */
 
 /*
@@ -65,9 +65,9 @@
  *    DATE()
  *
  * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
- *    HB_STOD()
+ *    STOD()
  *
- * Copyright 2004 Giancarlo niccolai <gc -at- niccolai -dot- ws>
+ * Copyright 2004 Giancarlo Niccolai <gc -at- niccolai -dot- ws>
  *    TIMEOFDAY()
  *
  * See doc/license.txt for licensing terms.
@@ -219,11 +219,6 @@ HB_FUNC( DTOS )
 HB_FUNC( STOD )
 {
    hb_retds( hb_parclen( 1 ) >= 8 ? hb_parc( 1 ) : NULL );
-}
-
-HB_FUNC( HB_STOD )
-{
-   HB_FUNCNAME( STOD )();
 }
 
 HB_FUNC( YEAR )

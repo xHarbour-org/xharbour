@@ -1,5 +1,5 @@
 /*
- * $Id: dircmd.prg,v 1.1.1.1 2001/12/21 10:41:28 ronpinkas Exp $
+ * $Id: dircmd.prg,v 1.2 2002/10/16 05:39:26 andijahja Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ STATIC PROCEDURE PutDBF( aDirEntry )
    LOCAL fhnd
    LOCAL buffer
    LOCAL nRecCount := 0
-   LOCAL dLastUpdate := hb_SToD( "" )
+   LOCAL dLastUpdate := SToD( "" )
 
    IF ( fhnd := FOpen( aDirEntry[ F_NAME ] ) ) != F_ERROR
 
@@ -107,9 +107,9 @@ STATIC PROCEDURE PutDBF( aDirEntry )
            Bin2W( Left( buffer, 1 ) ) == 131 )
 
          nRecCount := Bin2L( SubStr( buffer, 5, 4 ) )
-         dLastUpdate := hb_SToD( StrZero( Bin2W( SubStr( buffer, 2, 1 ) ) + 1900, 4 ) +;
-                                 StrZero( Bin2W( SubStr( buffer, 3, 1 ) ), 2 ) +;
-                                 StrZero( Bin2W( SubStr( buffer, 4, 1 ) ), 2 ) )
+         dLastUpdate := SToD( StrZero( Bin2W( SubStr( buffer, 2, 1 ) ) + 1900, 4 ) +;
+                              StrZero( Bin2W( SubStr( buffer, 3, 1 ) ), 2 ) +;
+                              StrZero( Bin2W( SubStr( buffer, 4, 1 ) ), 2 ) )
 
       ENDIF
 

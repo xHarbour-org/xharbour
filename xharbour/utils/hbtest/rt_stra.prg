@@ -1,5 +1,5 @@
 /*
- * $Id: rt_stra.prg,v 1.3 2003/12/18 21:12:44 ronpinkas Exp $
+ * $Id: rt_stra.prg,v 1.4 2004/03/02 21:55:24 andijahja Exp $
  */
 
 /*
@@ -493,7 +493,7 @@ FUNCTION New_STRINGS()
    TEST_LINE( HB_ValToStr( 4 )                     , "         4"    )
    TEST_LINE( HB_ValToStr( 4.0 / 2 )               , "         2.00" )
    TEST_LINE( HB_ValToStr( "String" )              , "String"        )
-   TEST_LINE( HB_ValToStr( HB_SToD( "20010101" ) ) , "2001.01.01"    )
+   TEST_LINE( HB_ValToStr( SToD( "20010101" ) )    , "2001.01.01"    )
    TEST_LINE( HB_ValToStr( NIL )                   , "NIL"           )
    TEST_LINE( HB_ValToStr( .F. )                   , "F"             )
    TEST_LINE( HB_ValToStr( .T. )                   , "T"             )

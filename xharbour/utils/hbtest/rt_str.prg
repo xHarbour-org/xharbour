@@ -1,5 +1,5 @@
 /*
- * $Id: rt_str.prg,v 1.6 2004/11/21 21:44:31 druzus Exp $
+ * $Id: rt_str.prg,v 1.7 2005/05/16 21:45:42 andijahja Exp $
  */
 
 /*
@@ -603,9 +603,9 @@ FUNCTION Main_STR()
    TEST_LINE( Pad(100000, 8, "-")                , "100000--"       )
    TEST_LINE( Pad(-100000, 8, "-")               , "-100000-"       )
    TEST_LINE( Pad(5000000000, 15)                , "5000000000     ")
-   TEST_LINE( Pad(HB_SToD("19840325"), 12)       , "1984.03.25  "   )
-   TEST_LINE( Pad(Year(HB_SToD("19840325")), 5)  , "1984 "          )
-   TEST_LINE( Pad(Day(HB_SToD("19840325")), 5)   , "25   "          )
+   TEST_LINE( Pad(SToD("19840325"), 12)       , "1984.03.25  "   )
+   TEST_LINE( Pad(Year(SToD("19840325")), 5)  , "1984 "          )
+   TEST_LINE( Pad(Day(SToD("19840325")), 5)   , "25   "          )
 #ifdef __HARBOUR__
    TEST_LINE( Pad(@scString, 10)                 , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
    TEST_LINE( Pad(scString, @snIntP)             , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
@@ -634,9 +634,9 @@ FUNCTION Main_STR()
    TEST_LINE( PadR(100000, 8)                    , "100000  "       )
    TEST_LINE( PadR(100000, 8, "-")               , "100000--"       )
    TEST_LINE( PadR(-100000, 8, "-")              , "-100000-"       )
-   TEST_LINE( PadR(HB_SToD("19840325"), 12)      , "1984.03.25  "   )
-   TEST_LINE( PadR(Year(HB_SToD("19840325")), 5) , "1984 "          )
-   TEST_LINE( PadR(Day(HB_SToD("19840325")), 5)  , "25   "          )
+   TEST_LINE( PadR(SToD("19840325"), 12)      , "1984.03.25  "   )
+   TEST_LINE( PadR(Year(SToD("19840325")), 5) , "1984 "          )
+   TEST_LINE( PadR(Day(SToD("19840325")), 5)  , "25   "          )
 #ifdef __HARBOUR__
    TEST_LINE( PadR(@scString, 10)                , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
    TEST_LINE( PadR(scString, @snIntP)            , "HELLO     "     ) /* Bug in CA-Cl*pper, it will return "" */
@@ -665,9 +665,9 @@ FUNCTION Main_STR()
    TEST_LINE( PadL(100000, 8)                    , "  100000"       )
    TEST_LINE( PadL(100000, 8, "-")               , "--100000"       )
    TEST_LINE( PadL(-100000, 8, "-")              , "--100000"       )
-   TEST_LINE( PadL(HB_SToD("19840325"), 12)      , "  1984.03.25"   )
-   TEST_LINE( PadL(Year(HB_SToD("19840325")), 5) , " 1984"          )
-   TEST_LINE( PadL(Day(HB_SToD("19840325")), 5)  , "   25"          )
+   TEST_LINE( PadL(SToD("19840325"), 12)      , "  1984.03.25"   )
+   TEST_LINE( PadL(Year(SToD("19840325")), 5) , " 1984"          )
+   TEST_LINE( PadL(Day(SToD("19840325")), 5)  , "   25"          )
 #ifdef __HARBOUR__
    TEST_LINE( PadL(@scString, 10)                , "     HELLO"     ) /* Bug in CA-Cl*pper, it will return "" */
    TEST_LINE( PadL(scString, @snIntP)            , "     HELLO"     ) /* Bug in CA-Cl*pper, it will return "" */
@@ -696,9 +696,9 @@ FUNCTION Main_STR()
    TEST_LINE( PadC(100000, 8)                    , " 100000 "       )
    TEST_LINE( PadC(100000, 8, "-")               , "-100000-"       )
    TEST_LINE( PadC(-100000, 8, "-")              , "-100000-"       )
-   TEST_LINE( PadC(HB_SToD("19840325"), 12)      , " 1984.03.25 "   )
-   TEST_LINE( PadC(Year(HB_SToD("19840325")), 5) , "1984 "          )
-   TEST_LINE( PadC(Day(HB_SToD("19840325")), 5)  , " 25  "          )
+   TEST_LINE( PadC(SToD("19840325"), 12)      , " 1984.03.25 "   )
+   TEST_LINE( PadC(Year(SToD("19840325")), 5) , "1984 "          )
+   TEST_LINE( PadC(Day(SToD("19840325")), 5)  , " 25  "          )
 #ifdef __HARBOUR__
    TEST_LINE( PadC(@scString, 10)                , "  HELLO   "     ) /* Bug in CA-Cl*pper, it will return "" */
    TEST_LINE( PadC(scString, @snIntP)            , "  HELLO   "     ) /* Bug in CA-Cl*pper, it will return "" */
