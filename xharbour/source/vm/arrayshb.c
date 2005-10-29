@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.60 2005/09/22 01:12:00 druzus Exp $
+ * $Id: arrayshb.c,v 1.61 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -199,21 +199,7 @@ HB_FUNC( ASIZE )
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
    else
    {
-#if 0
       hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
-#else
-      if ( hb_pcount() == 0 )
-      {
-         HB_ITEM_NEW( Err1 );
-         HB_ITEM_NEW( Err2 );
-
-         hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", 2, &Err1, &Err2 );
-      }
-      else
-      {
-         hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-      }
-#endif
    }
 #endif
 }
@@ -409,17 +395,8 @@ HB_FUNC( AFILL )
                thrown by AEVAL().  [vszakats] */
         hb_errRT_BASE( EG_ARG, 2017, NULL, "AEVAL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
       #else
-#if 0
         hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", HB_MIN( hb_pcount(), 4 ), hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
-#else
-        HB_ITEM_NEW( Err1 );
-        HB_ITEM_NEW( Err2 );
-        HB_ITEM_NEW( Err3 );
-        HB_ITEM_NEW( Err4 );
-
-        hb_errRT_BASE( EG_ARG, 9999, NULL, "AFILL", 4, pArray ? hb_paramError( 1 ) : &Err1, pValue ? hb_paramError( 2 ) : &Err2, &Err3, &Err4 );
       #endif
-#endif
    }
 }
 

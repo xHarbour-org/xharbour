@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.514 2005/10/25 17:22:33 ronpinkas Exp $
+ * $Id: hvm.c,v 1.515 2005/10/25 20:01:45 ronpinkas Exp $
  */
 
 /*
@@ -192,6 +192,8 @@ static void    hb_vmOr( void );              /* performs the logical OR on the l
 static void    hb_vmBitAnd( void );          /* performs the bit AND on the latest two values, removes them and leaves result on the stack */
 static void    hb_vmBitOr( void );           /* performs the bit OR on the latest two values, removes them and leaves result on the stack */
 static void    hb_vmBitXor( void );          /* performs the bit XOR on the latest two values, removes them and leaves result on the stack */
+static void    hb_vmBitShifLeft( void );     /* performs the bit left shift on the latest two values, removes them and leaves result on the stack */
+static void    hb_vmBitShifRight( void );    /* performs the bit right shift on the latest two values, removes them and leaves result on the stack */
 
 /* Array */
 static void    hb_vmArrayPush( void );       /* pushes an array element to the stack, removing the array and the index from the stack */
@@ -590,6 +592,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_vm_wEnumCollectionCounter = 0;
 #endif
 
+#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+   if( hb_dynsymFind( "HB_NOMOUSE" ) )
+   {
+      b_MouseEnable = FALSE;
+   }
+#endif
+
    s_aGlobals.type = HB_IT_NIL;
    hb_arrayNew( &s_aGlobals, 0 );
    //printf( "Allocated s_aGlobals: %p Owner: %p\n", &s_aGlobals, s_aGlobals.item.asArray.value->pOwners );
@@ -620,13 +629,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    /* Set the language to the default */
    hb_langSelectID( HB_MACRO2STRING( HB_LANG_DEFAULT ) );
-
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
-   if( hb_dynsymFind( "HB_NOMOUSE" ) )
-   {
-      b_MouseEnable = FALSE;
-   }
-#endif
 
    /* Check for some internal switches */
    HB_TRACE( HB_TR_INFO, ("cmdarg") );
@@ -1176,92 +1178,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_BITSHIFTR :
-         {
-            PHB_ITEM pItem1;
-            PHB_ITEM pItem2;
-
             HB_TRACE(HB_TR_DEBUG, ("HB_P_BITSHIFTR"));
-
-            pItem1 = hb_stackItemFromTop( -2 );
-            pItem2 = hb_stackItemFromTop( -1 );
-
-            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-            {
-               long l1 = hb_itemGetNL( pItem1 );
-               long l2 = hb_itemGetNL( pItem2 );
-
-               /* NOTE: Clipper always returns the result of power
-                        with the SET number of decimal places. */
-               if( HB_IS_STRING( pItem2 ) )
-               {
-                  hb_itemReleaseString( pItem1 );
-               }
-
-               pItem1->type = HB_IT_LONG;
-               pItem1->item.asLong.value = l1 >> l2;
-
-               hb_stackPop();
-            }
-            else
-            {
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1600, NULL, ">>", 2, pItem1, pItem2 );
-
-               if( pResult )
-               {
-                  hb_stackPop();
-                  hb_stackPop();
-                  hb_itemPushForward( pResult );
-                  hb_itemRelease( pResult );
-               }
-            }
-         }
-
-         w++;
-         break;
+            hb_vmBitShifRight();
+            w++;
+            break;
 
          case HB_P_BITSHIFTL :
-         {
-            PHB_ITEM pItem1;
-            PHB_ITEM pItem2;
-
             HB_TRACE(HB_TR_DEBUG, ("HB_P_BITSHIFTL"));
-
-            pItem1 = hb_stackItemFromTop( -2 );
-            pItem2 = hb_stackItemFromTop( -1 );
-
-            if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
-            {
-               long l1 = hb_itemGetNL( pItem1 );
-               long l2 = hb_itemGetNL( pItem2 );
-
-               /* NOTE: Clipper always returns the result of power
-                        with the SET number of decimal places. */
-               if( HB_IS_STRING( pItem2 ) )
-               {
-                  hb_itemReleaseString( pItem1 );
-               }
-
-               pItem1->type = HB_IT_LONG;
-               pItem1->item.asLong.value = l1 << l2;
-
-               hb_stackPop();
-            }
-            else
-            {
-               PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1601, NULL, "<<", 2, pItem1, pItem2 );
-
-               if( pResult )
-               {
-                  hb_stackPop();
-                  hb_stackPop();
-                  hb_itemPushForward( pResult );
-                  hb_itemRelease( pResult );
-               }
-            }
-         }
-
-         w++;
-         break;
+            hb_vmBitShifLeft();
+            w++;
+            break;
 
          case HB_P_INC:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_INC") );
@@ -1462,12 +1388,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   if( pArray->item.asArray.value->pOwners->pNext )
                  #endif
                   {
-                     PHB_ITEM pItemByRef = hb_stackItemFromTop( -2 );
-                     HB_ITEM_NEW( Array );
-
-                     hb_itemForwardValue( &Array, pArray );
-
-                     hb_arrayGetByRef( &Array, (ULONG) lIndex, pItemByRef );
+                     /* move the array on stack to index position to free the
+                        place for new reference */
+                     hb_itemForwardValue( pIndex, pArray );
+                     hb_arrayGetByRef( pIndex, (ULONG) lIndex, pArray );
+                     /* pop the source array (at index position) from stack */
                      hb_stackPop();
                   }
                   else
@@ -1916,7 +1841,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             HB_THREAD_STUB
 
-            PHB_ITEM pSelf = hb_stackItemFromTop( -1 );
+            PHB_ITEM pSelf = hb_stackItemFromTop( -1 ), pMsg = hb_stackItemFromTop( -2 );
 
             if( HB_IS_OBJECT( pSelf ) )
             {
@@ -1924,7 +1849,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                BOOL bSymbol;
                PHB_FUNC pFunc;
 
-               pFunc = hb_objGetMthd( pSelf, hb_stackItemFromTop( -2 )->item.asSymbol.value, FALSE, &bConstructor, 2, &bSymbol );
+               pFunc = hb_objGetMthd( pSelf, pMsg->item.asSymbol.value, FALSE, &bConstructor, 2, &bSymbol );
 
                if( pFunc == hb___msgGetData )
                {
@@ -1934,19 +1859,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   }
 
                   // Recycle the Symbol Item.
-                  hb_arrayGetByRef( pSelf, (HB_VM_STACK.pMethod)->uiData, *( HB_VM_STACK.pPos - 2 ) );
+                  hb_arrayGetByRef( pSelf, (HB_VM_STACK.pMethod)->uiData, pMsg );
                }
                else if( pFunc == hb___msgGetClsData )
                {
                   // Recycle the Symbol Item.
-                  hb_arrayGetByRef( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, *( HB_VM_STACK.pPos - 2 ) );
+                  hb_arrayGetByRef( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, pMsg );
                }
                else if( pFunc == hb___msgGetShrData )
                {
                   if( (HB_VM_STACK.pMethod)->uiSprClass )
                   {
                      // Recycle the Symbol Item.
-                     hb_arrayGetByRef( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, *( HB_VM_STACK.pPos - 2 ) );
+                     hb_arrayGetByRef( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, pMsg );
                   }
                }
                else if( s_uiActionRequest != HB_BREAK_REQUESTED )
@@ -1954,14 +1879,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   /*
                    hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "No instance variable", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
                    *
-                   (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
-                  */
+                   pMsg->type = HB_IT_NIL;
+                   */
 
                   hb_vmSend( 0 );
 
-                  // Thread Safety.
-                  hb_stackPush();
-                  hb_itemForwardValue( *( HB_VM_STACK.pPos - 1 ), &(HB_VM_STACK.Return) );
+                  hb_itemPushForward( &(HB_VM_STACK.Return) );
 
                   w++;
                   break;
@@ -1969,33 +1892,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else if ( HB_IS_HASH( pSelf ) )
             {
-               char * szIndex = hb_stackItemFromTop( -2 )->item.asSymbol.value->szName;
+               char * szIndex = pMsg->item.asSymbol.value->szName;
                ULONG ulPos;
 
                if( strcmp( szIndex, "CLASSNAME" ) == 0 )
                {
-                  hb_itemPutC( *( HB_VM_STACK.pPos - 2 ), "HASH" );
+                  hb_itemPutC( pMsg, "HASH" );
                }
                else if( strcmp( szIndex, "CLASSH" ) == 0 )
                {
-                  hb_itemPutNI( *( HB_VM_STACK.pPos - 2 ), 0 );
+                  hb_itemPutNI( pMsg, 0 );
                }
                else if( strcmp( szIndex, "KEYS" ) == 0 )
                {
-                  hb_hashGetKeys( *( HB_VM_STACK.pPos - 2 ), pSelf );
+                  hb_hashGetKeys( pMsg, pSelf );
                }
                else if( strcmp( szIndex, "VALUES" ) == 0 )
                {
-                  hb_hashGetValues( *( HB_VM_STACK.pPos - 2 ), pSelf );
+                  hb_hashGetValues( pMsg, pSelf );
                }
                else
                {
                   HB_ITEM_NEW( hbIndex );
                   hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
 
-                  if ( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
+                  if( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
                   {
-                     hb_hashGet( pSelf, ulPos, *( HB_VM_STACK.pPos - 2 ) );
+                     hb_hashGet( pSelf, ulPos, pMsg );
                   }
                   else
                   {
@@ -2005,8 +1928,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             }
             else
             {
-               hb_errRT_BASE_SubstR( EG_NOOBJECT, 1004, "Not object", hb_stackItemFromTop( -2 )->item.asSymbol.value->szName, 1, pSelf );
-               (*( HB_VM_STACK.pPos - 2 ))->type = HB_IT_NIL;
+               hb_errRT_BASE_SubstR( EG_NOOBJECT, 1004, "Not object", pMsg->item.asSymbol.value->szName, 1, pSelf );
+               hb_itemForwardValue( pMsg, &(HB_VM_STACK.Return) );
             }
 
             // Symbol was recycled.
@@ -2720,434 +2643,415 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_LOCALNEARADDINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
-         {
-            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
-            int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
-            double dNewVal;
-
-            w += 4;
-
-            if( HB_IS_BYREF( pLocal ) )
             {
-               pLocal = hb_itemUnRef( pLocal );
-            }
-
-            if( HB_IS_NUMINT( pLocal ) )
-            {
-               HB_LONG lNewVal, lVal = HB_ITEM_GET_NUMINTRAW( pLocal );
-
-               lNewVal = lVal + iAdd;
-
-               if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
-               {
-                  HB_ITEM_PUT_NUMINTRAW( pLocal, lNewVal );
-                  break;
-               }
-               else
-               {
-                  dNewVal = ( double ) lVal + ( double ) iAdd;
-               }
-            }
-            else if( HB_IS_DATE( pLocal ) )
-            {
-               pLocal->item.asDate.value += iAdd;
-               break;
-            }
-            else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
-            {
-               HB_LONG lNewVal, lVal = pLocal->item.asString.value[0];
-
-               lNewVal = lVal + iAdd;
-
-               if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
-               {
-                  HB_ITEM_PUT_NUMINTRAW( pLocal, lNewVal );
-                  break;
-               }
-               else
-               {
-                  dNewVal = ( double ) lVal + ( double ) iAdd;
-               }
-            }
-            else if( HB_IS_DOUBLE( pLocal ) )
-            {
-               dNewVal = pLocal->item.asDouble.value + ( double ) iAdd;
-            }
-            else if( iAdd == 1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_INC ) )
-            {
-               hb_vmOperatorCallUnary( pLocal, "__OPINC", pLocal );
-               break;
-            }
-            else if( iAdd == -1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_DEC ) )
-            {
-               hb_vmOperatorCallUnary( pLocal, "__OPDEC", pLocal );
-               break;
-            }
-            else if( ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_PLUS ) )
-            {
-               HB_ITEM Add;
-
-               Add.type = HB_IT_INTEGER;
-               Add.item.asInteger.value = iAdd;
-               Add.item.asInteger.length = 10;
-
-               hb_vmOperatorCall( pLocal, &Add, "__OPPLUS", NULL, 0, pLocal );
-               break;
-            }
-            else
-            {
-               HB_ITEM_NEW( Add );
-               PHB_ITEM pResult;
-
-               hb_itemPutNI( &Add, ( int ) iAdd );
-               pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, &Add );
-
-               if( pResult )
-               {
-                  hb_itemForwardValue( pLocal, pResult );
-               }
-
-               break;
-            }
-
-            if( ! HB_IS_DOUBLE( pLocal ) )
-            {
-               pLocal->type = HB_IT_DOUBLE;
-               pLocal->item.asDouble.decimal = 0;
-            }
-
-            pLocal->item.asDouble.value = dNewVal;
-            pLocal->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
-            break;
-         }
-
-         case HB_P_LOCALNEARSETINT:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
-         {
-            PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
-            int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
-
-            if( HB_IS_BYREF( pLocal ) )
-            {
-               pLocal = hb_itemUnRef( pLocal );
-            }
-
-            if( ( ! HB_IS_NUMBER( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
-            {
-               hb_vmPushInteger( iNewVal );
-               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
+               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
+               double dNewVal;
 
                w += 4;
-               break;
-            }
-            else
-            {
-              hb_itemClear( pLocal );
-            }
 
-            pLocal->type = HB_IT_INTEGER;
-            pLocal->item.asInteger.length = 10;
-            pLocal->item.asInteger.value = iNewVal;
-            w += 4;
-            break;
-         }
-
-         case HB_P_LOCALNEARSETSTR:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
-         {
-            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
-            USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
-
-            if( HB_IS_BYREF( pLocal ) )
-            {
-               pLocal = hb_itemUnRef( pLocal );
-            }
-
-            if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
-            {
-               hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
-               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
-
-               w += ( 4 + uiSize );
-               break;
-            }
-            else
-            {
-               hb_itemClear( pLocal );
-            }
-
-            pLocal->type = HB_IT_STRING;
-            pLocal->item.asString.bStatic = TRUE;
-            pLocal->item.asString.value = ( char * ) ( pCode ) + w + 4 ;
-            pLocal->item.asString.length = ( ULONG ) ( uiSize - 1 );
-
-            w += ( 4 + uiSize );
-            break;
-         }
-
-         case HB_P_LOCALNEARSETSTRHIDDEN:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTRHIDDEN") );
-         {
-            PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
-            ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
-            USHORT uiBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
-            BYTE *pBuffer;
-
-            pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 4, ulSize );
-
-            if( HB_IS_BYREF( pLocal ) )
-            {
-               pLocal = hb_itemUnRef( pLocal );
-            }
-
-            if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
-            {
-               hb_stackPush();
-               hb_itemPutCPtr( *( HB_VM_STACK.pPos - 1 ), (char *) pBuffer, ulSize - 1 );
-
-               hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, pLocal );
-            }
-            else
-            {
-               hb_itemPutCPtr( pLocal, (char *) pBuffer, ulSize - 1 );
-            }
-
-            w += ( 7 + uiBufferLen );
-            break;
-         }
-
-         case HB_P_ADDINT:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
-         {
-            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
-            double dNewVal = 0.0;
-
-            w += 3;
-
-            if( HB_IS_NUMINT( pTop ) )
-            {
-               HB_LONG lNewVal, lVal = HB_ITEM_GET_NUMINTRAW( pTop );
-
-               lNewVal = lVal + iAdd;
-
-               if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+               if( HB_IS_BYREF( pLocal ) )
                {
-                  HB_ITEM_PUT_NUMINTRAW( pTop, lNewVal );
-                  break;
+                  pLocal = hb_itemUnRef( pLocal );
                }
-               else
+
+               if( HB_IS_NUMINT( pLocal ) )
                {
-                  dNewVal = ( double ) lVal + ( double ) iAdd;
-               }
-            }
-            else if( HB_IS_DOUBLE( pTop ) )
-            {
-               dNewVal = pTop->item.asDouble.value + ( double ) iAdd;
-            }
-            else if( HB_IS_DATE( pTop ) )
-            {
-               pTop->item.asDate.value += iAdd;
-               break;
-            }
-            else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
-            {
-               HB_LONG lNewVal, lVal = pTop->item.asString.value[0];
+                  HB_LONG lNewVal, lVal = HB_ITEM_GET_NUMINTRAW( pLocal );
 
-               lNewVal = lVal + iAdd;
+                  lNewVal = lVal + iAdd;
 
-               if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
-               {
-                  HB_ITEM_PUT_NUMINTRAW( pTop, lNewVal );
-                  break;
-               }
-               else
-               {
-                  dNewVal = ( double ) lVal + ( double ) iAdd;
-               }
-            }
-            else if( ( hb_objGetOpOver( pTop ) & HB_CLASS_OP_PLUS ) )
-            {
-               HB_ITEM Add;
-
-               Add.type = HB_IT_INTEGER;
-               Add.item.asInteger.value = iAdd;
-               Add.item.asInteger.length = 10;
-
-               hb_vmOperatorCall( pTop, &Add, "__OPPLUS", NULL, 0, pTop );
-               break;
-            }
-            else
-            {
-               {
-                  HB_ITEM_NEW( Add );
-                  PHB_ITEM pResult;
-
-                  hb_itemPutNI( &Add, ( int ) iAdd );
-
-                  if( iAdd > 0 )
+                  if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
                   {
-                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, &Add );
+                     HB_ITEM_PUT_NUMINTRAW( pLocal, lNewVal );
+                     break;
                   }
                   else
                   {
-                     Add.item.asInteger.value *= -1;
-                     Add.item.asInteger.length = 10;
+                     dNewVal = ( double ) lVal + ( double ) iAdd;
+                  }
+               }
+               else if( HB_IS_DATE( pLocal ) )
+               {
+                  pLocal->item.asDate.value += iAdd;
+                  break;
+               }
+               else if( HB_IS_STRING( pLocal ) && pLocal->item.asString.length == 1 )
+               {
+                  HB_LONG lNewVal, lVal = pLocal->item.asString.value[0];
 
-                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, &Add );
+                  lNewVal = lVal + iAdd;
+
+                  if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+                  {
+                     HB_ITEM_PUT_NUMINTRAW( pLocal, lNewVal );
+                     break;
+                  }
+                  else
+                  {
+                     dNewVal = ( double ) lVal + ( double ) iAdd;
+                  }
+               }
+               else if( HB_IS_DOUBLE( pLocal ) )
+               {
+                  dNewVal = pLocal->item.asDouble.value + ( double ) iAdd;
+               }
+               else if( iAdd == 1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_INC ) )
+               {
+                  hb_vmOperatorCallUnary( pLocal, "__OPINC", pLocal );
+                  break;
+               }
+               else if( iAdd == -1 && ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_DEC ) )
+               {
+                  hb_vmOperatorCallUnary( pLocal, "__OPDEC", pLocal );
+                  break;
+               }
+               else if( ( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_PLUS ) )
+               {
+                  PHB_ITEM pAdd = hb_stackTopItem();
+                  hb_vmPushInteger( iAdd );
+                  hb_vmOperatorCall( pLocal, pAdd, "__OPPLUS", NULL, 1, pLocal );
+                  break;
+               }
+               else
+               {
+                  PHB_ITEM pResult, pAdd = hb_stackTopItem();
+
+                  hb_vmPushInteger( iAdd );
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pLocal, pAdd );
+
+                  if( pResult )
+                  {
+                     hb_stackPop();
+                     hb_itemForwardValue( pLocal, pResult );
+                     hb_itemRelease( pResult ); 
+                  }
+                  break;
+               }
+
+               if( ! HB_IS_DOUBLE( pLocal ) )
+               {
+                  pLocal->type = HB_IT_DOUBLE;
+                  pLocal->item.asDouble.decimal = 0;
+               }
+               pLocal->item.asDouble.value = dNewVal;
+               pLocal->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
+               break;
+            }
+
+         case HB_P_LOCALNEARSETINT:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
+            {
+               PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
+               int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
+
+               if( HB_IS_BYREF( pLocal ) )
+               {
+                  pLocal = hb_itemUnRef( pLocal );
+               }
+
+               if( ( ! HB_IS_NUMBER( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
+               {
+                  hb_vmPushInteger( iNewVal );
+                  hb_vmOperatorCall( pLocal, hb_stackItemFromTop( -1 ), "__OPASSIGN", NULL, 1, pLocal );
+               }
+               else
+               {
+                  hb_itemPutNI( pLocal, iNewVal );
+               }
+               w += 4;
+               break;
+            }
+
+         case HB_P_LOCALNEARSETSTR:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
+            {
+               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
+
+               if( HB_IS_BYREF( pLocal ) )
+               {
+                  pLocal = hb_itemUnRef( pLocal );
+               }
+
+               if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
+               {
+                  hb_itemPushStaticString( ( char * ) ( pCode ) + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                  hb_vmOperatorCall( pLocal, hb_stackItemFromTop( -1 ), "__OPASSIGN", NULL, 1, pLocal );
+               }
+               else
+               {
+                  hb_itemPutCRawStatic( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
+               }
+               w += ( 4 + uiSize );
+               break;
+            }
+
+         case HB_P_LOCALNEARSETSTRHIDDEN:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTRHIDDEN") );
+            {
+               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
+               USHORT uiBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
+               BYTE *pBuffer;
+
+               pBuffer = hb_vmUnhideString( ( BYTE * ) ( pCode ) + w + 4, ulSize );
+
+               if( HB_IS_BYREF( pLocal ) )
+               {
+                  pLocal = hb_itemUnRef( pLocal );
+               }
+
+               if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
+               {
+                  hb_stackPush();
+                  hb_itemPutCPtr( hb_stackItemFromTop( -1 ), (char *) pBuffer, ulSize - 1 );
+                  hb_vmOperatorCall( pLocal, *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 1, pLocal );
+               }
+               else
+               {
+                  hb_itemPutCPtr( pLocal, (char *) pBuffer, ulSize - 1 );
+               }
+               w += ( 7 + uiBufferLen );
+               break;
+            }
+
+         case HB_P_ADDINT:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
+            {
+               PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+               int iAdd = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
+               double dNewVal = 0.0;
+
+               w += 3;
+
+               if( HB_IS_NUMINT( pTop ) )
+               {
+                  HB_LONG lNewVal, lVal = HB_ITEM_GET_NUMINTRAW( pTop );
+
+                  lNewVal = lVal + iAdd;
+
+                  if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+                  {
+                     HB_ITEM_PUT_NUMINTRAW( pTop, lNewVal );
+                     break;
+                  }
+                  else
+                  {
+                     dNewVal = ( double ) lVal + ( double ) iAdd;
+                  }
+               }
+               else if( HB_IS_DOUBLE( pTop ) )
+               {
+                  dNewVal = pTop->item.asDouble.value + ( double ) iAdd;
+               }
+               else if( HB_IS_DATE( pTop ) )
+               {
+                  pTop->item.asDate.value += iAdd;
+                  break;
+               }
+               else if( HB_IS_STRING( pTop ) && pTop->item.asString.length == 1 )
+               {
+                  HB_LONG lNewVal, lVal = pTop->item.asString.value[0];
+
+                  lNewVal = lVal + iAdd;
+
+                  if ( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+                  {
+                     HB_ITEM_PUT_NUMINTRAW( pTop, lNewVal );
+                     break;
+                  }
+                  else
+                  {
+                     dNewVal = ( double ) lVal + ( double ) iAdd;
+                  }
+               }
+               else if( ( hb_objGetOpOver( pTop ) & HB_CLASS_OP_PLUS ) )
+               {
+                  PHB_ITEM pAdd = hb_stackTopItem();
+                  hb_vmPushInteger( iAdd );
+                  hb_vmOperatorCall( pTop, pAdd, "__OPPLUS", NULL, 1, pTop );
+                  break;
+               }
+               else
+               {
+                  PHB_ITEM pResult, pAdd = hb_stackTopItem();
+
+                  if( iAdd > 0 )
+                  {
+                     hb_vmPushInteger( iAdd );
+                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pTop, pAdd );
+                  }
+                  else
+                  {
+                     hb_vmPushInteger( -iAdd );
+                     pResult = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pTop, pAdd );
                   }
 
                   if( pResult )
                   {
+                     hb_stackPop();
                      hb_itemForwardValue( pTop, pResult );
-                     break;
+                     hb_itemRelease( pResult ); 
                   }
+                  break;
                }
-            }
 
-            if( ! HB_IS_DOUBLE( pTop ) )
-            {
-               pTop->type = HB_IT_DOUBLE;
-               pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
-            }
+               if( ! HB_IS_DOUBLE( pTop ) )
+               {
+                  pTop->type = HB_IT_DOUBLE;
+                  pTop->item.asDouble.decimal = hb_set.HB_SET_DECIMALS;
+               }
 
-            pTop->item.asDouble.value = dNewVal;
-            pTop->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
-            break;
-         }
+               pTop->item.asDouble.value = dNewVal;
+               pTop->item.asDouble.length = HB_DBL_LENGTH( dNewVal );
+               break;
+            }
 
          case HB_P_SWITCHCASE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SWITCHCASE") );
-         {
-            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            LONG lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
+            {
+               PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+               LONG lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
 
-            if( pTop->type & HB_IT_INTEGER )
-            {
-               hb_vmPushLogical( (LONG) ( pTop->item.asInteger.value ) == lCase );
+               if( pTop->type & HB_IT_INTEGER )
+               {
+                  hb_vmPushLogical( (LONG) ( pTop->item.asInteger.value ) == lCase );
+               }
+               else if( pTop->type & HB_IT_LONG )
+               {
+                  hb_vmPushLogical( (LONG) pTop->item.asLong.value == lCase );
+               }
+               else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
+               {
+                  hb_vmPushLogical( (LONG) ( ( BYTE ) pTop->item.asString.value[0] ) == lCase );
+               }
+               else
+               {
+                  PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1604, NULL, "SWITCH", 1, pTop );
+                  if( pResult )
+                  {
+                     hb_vmPush( pResult );
+                     hb_itemRelease( pResult );
+                  }
+               }
+               w += 5;
+               break;
             }
-            else if( pTop->type & HB_IT_LONG )
-            {
-               hb_vmPushLogical( (LONG) pTop->item.asLong.value == lCase );
-            }
-            else if( pTop->type & HB_IT_STRING && pTop->item.asString.length == 1 )
-            {
-               hb_vmPushLogical( (LONG) ( ( BYTE ) pTop->item.asString.value[0] ) == lCase );
-            }
-            else
-            {
-               hb_vmPush( hb_errRT_BASE_Subst( EG_ARG, 1604, NULL, "SWITCH", 1, pTop ) );
-            }
-
-            w += 5;
-            break;
-         }
 
          case HB_P_LEFT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LEFT") );
-         {
-            USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-            PHB_ITEM pString = hb_stackItemFromTop( -1 );
-            char *sString;
-
-            if( HB_IS_STRING( pString ) )
             {
-               if( ( ULONG ) iNewLen < pString->item.asString.length )
+               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+               PHB_ITEM pString = hb_stackItemFromTop( -1 );
+               char *sString;
+
+               if( HB_IS_STRING( pString ) )
                {
-                  if( pString->item.asString.bStatic )
+                  if( ( ULONG ) iNewLen < pString->item.asString.length )
                   {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value, iNewLen );
-                     sString[ iNewLen ] = '\0';
-                     pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+                     if( pString->item.asString.bStatic )
+                     {
+                        sString = (char*) hb_xgrab( iNewLen + 1 );
+                        memcpy( sString, pString->item.asString.value, iNewLen );
+                        sString[ iNewLen ] = '\0';
+                        pString->item.asString.bStatic = FALSE;
+                        pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
 
-                     *( pString->item.asString.pulHolders ) = 1;
-                     pString->item.asString.value = sString;
-                     pString->item.asString.length = iNewLen;
-                  }
-                  else if( *( pString->item.asString.pulHolders ) == 1 )
-                  {
-                     pString->item.asString.value[ iNewLen ] = '\0';
-                     pString->item.asString.length = iNewLen;
-                  }
-                  else
-                  {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value, iNewLen );
-                     sString[ iNewLen ] = '\0';
+                        *( pString->item.asString.pulHolders ) = 1;
+                        pString->item.asString.value = sString;
+                        pString->item.asString.length = iNewLen;
+                     }
+                     else if( *( pString->item.asString.pulHolders ) == 1 )
+                     {
+                        pString->item.asString.value[ iNewLen ] = '\0';
+                        pString->item.asString.length = iNewLen;
+                     }
+                     else
+                     {
+                        sString = (char*) hb_xgrab( iNewLen + 1 );
+                        memcpy( sString, pString->item.asString.value, iNewLen );
+                        sString[ iNewLen ] = '\0';
 
-                     hb_itemReleaseStringX( pString );
+                        hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-                     *( pString->item.asString.pulHolders ) = 1;
-                     pString->item.asString.value = sString;
-                     pString->item.asString.length = iNewLen;
+                        pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+                        *( pString->item.asString.pulHolders ) = 1;
+                        pString->item.asString.value = sString;
+                        pString->item.asString.length = iNewLen;
+                     }
                   }
                }
-            }
-            else
-            {
-               HB_ITEM_NEW( Tmp );
-               hb_errRT_BASE_SubstR( EG_ARG, 1124, NULL, "LEFT", 2, pString, hb_itemPutNI( &Tmp, iNewLen ) );
-            }
+               else
+               {
+                  PHB_ITEM pResult;
 
-            w += 3;
-            break;
-         }
+                  hb_vmPushInteger( iNewLen );
+                  pResult = hb_errRT_BASE_Subst( EG_ARG, 1124, NULL, "LEFT", 2, pString, hb_stackItemFromTop( -1 ) );
+                  if( pResult )
+                  {
+                     hb_stackPop();
+                     hb_itemForwardValue( pString, pResult );
+                     hb_itemRelease( pResult );
+                  }
+               }
+
+               w += 3;
+               break;
+            }
 
          case HB_P_RIGHT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_RIGHT") );
-         {
-            USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-            PHB_ITEM pString = hb_stackItemFromTop( -1 );
-            char *sString;
-
-            if( HB_IS_STRING( pString ) )
             {
-               if( ( ULONG ) iNewLen < pString->item.asString.length )
+               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+               PHB_ITEM pString = hb_stackItemFromTop( -1 );
+               char *sString;
+
+               if( HB_IS_STRING( pString ) )
                {
-                  if( pString->item.asString.bStatic )
+                  if( ( ULONG ) iNewLen < pString->item.asString.length )
                   {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
-                     sString[ iNewLen ] = '\0';
-                     pString->item.asString.bStatic = FALSE;
-                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-                  *( pString->item.asString.pulHolders ) = 1;
-                     pString->item.asString.value = sString;
-                     pString->item.asString.length = iNewLen;
-                  }
-                  else if( *( pString->item.asString.pulHolders ) == 1 )
-                  {
-                     memmove( pString->item.asString.value, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
-                     pString->item.asString.value[ iNewLen ] = '\0';
-                     pString->item.asString.length = iNewLen;
-                  }
-                  else
-                  {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
-                     sString[ iNewLen ] = '\0';
+                     if( pString->item.asString.bStatic )
+                     {
+                        sString = (char*) hb_xgrab( iNewLen + 1 );
+                        memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
+                        sString[ iNewLen ] = '\0';
+                        pString->item.asString.bStatic = FALSE;
+                        pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+                        *( pString->item.asString.pulHolders ) = 1;
+                        pString->item.asString.value = sString;
+                        pString->item.asString.length = iNewLen;
+                     }
+                     else if( *( pString->item.asString.pulHolders ) == 1 )
+                     {
+                        memmove( pString->item.asString.value, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
+                        pString->item.asString.value[ iNewLen ] = '\0';
+                        pString->item.asString.length = iNewLen;
+                     }
+                     else
+                     {
+                        sString = (char*) hb_xgrab( iNewLen + 1 );
+                        memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
+                        sString[ iNewLen ] = '\0';
 
-                     hb_itemReleaseStringX( pString );
+                        hb_itemReleaseStringX( pString );
 
-                     pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-                     *( pString->item.asString.pulHolders ) = 1;
-                     pString->item.asString.value = sString;
-                     pString->item.asString.length = iNewLen;
+                        pString->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+                        *( pString->item.asString.pulHolders ) = 1;
+                        pString->item.asString.value = sString;
+                        pString->item.asString.length = iNewLen;
+                     }
                   }
                }
-            }
-            else
-            {
-               /* Clipper doesn't error */
-               hb_itemPutC( pString, NULL );
-            }
+               else
+               {
+                  /* Clipper doesn't error */
+                  hb_itemPutC( pString, NULL );
+               }
 
-            w += 3;
-            break;
-         }
+               w += 3;
+               break;
+            }
 
          case HB_P_PUSHLOCALREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALREF") );
@@ -3262,22 +3166,24 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPGLOBAL:
          {
+            PHB_ITEM pTop = hb_stackItemFromTop( -1 );
             BYTE iGlobal = pCode[ w + 1 ];
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
             if( ( HB_IS_NUMBER( (*pGlobals)[ iGlobal ] ) && HB_IS_NUMBER( *( HB_VM_STACK.pPos - 1 ) ) ) ||
-                ( (*pGlobals)[ iGlobal ] )->type == ( *( HB_VM_STACK.pPos - 1 ) )->type )
+                ( (*pGlobals)[ iGlobal ] )->type == pTop->type )
             {
-               hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
+               hb_itemForwardValue( (*pGlobals)[ iGlobal ], pTop );
             }
             else if( hb_objGetOpOver( (*pGlobals)[ iGlobal ] ) & HB_CLASS_OP_ASSIGN )
             {
-               hb_vmOperatorCall( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ), "__OPASSIGN", NULL, 0, (*pGlobals)[ iGlobal ] );
+               hb_vmOperatorCall( (*pGlobals)[ iGlobal ], pTop, "__OPASSIGN", NULL, 0, (*pGlobals)[ iGlobal ] );
+               hb_itemClear( pTop );
             }
             else
             {
-              hb_itemForwardValue( (*pGlobals)[ iGlobal ], *( HB_VM_STACK.pPos - 1 ) );
+              hb_itemForwardValue( (*pGlobals)[ iGlobal ], pTop );
             }
 
             hb_stackDec();
@@ -5818,6 +5724,67 @@ static void hb_vmBitXor( void )
    }
 }
 
+static void hb_vmBitShifLeft( void )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pItem2;
+   PHB_ITEM pItem1;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmBitShiftLeft()"));
+
+   pItem1 = hb_stackItemFromTop( -2 );
+   pItem2 = hb_stackItemFromTop( -1 );
+
+   if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+   {
+      hb_itemPutNInt( pItem1, hb_itemGetNInt( pItem1 ) << hb_itemGetNI( pItem2 ) );
+      hb_stackPop();
+   }
+   else
+   {
+      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1601, NULL, "<<", 2, pItem1, pItem2 );
+
+      if( pResult )
+      {
+         hb_stackPop();
+         hb_stackPop();
+         hb_itemPushForward( pResult );
+         hb_itemRelease( pResult );
+      }
+   }
+}
+
+static void hb_vmBitShifRight( void )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pItem2;
+   PHB_ITEM pItem1;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmBitShiftRight()"));
+
+   pItem1 = hb_stackItemFromTop( -2 );
+   pItem2 = hb_stackItemFromTop( -1 );
+
+   if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
+   {
+      hb_itemPutNInt( pItem1, hb_itemGetNInt( pItem1 ) >> hb_itemGetNI( pItem2 ) );
+      hb_stackPop();
+   }
+   else
+   {
+      PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1601, NULL, ">>", 2, pItem1, pItem2 );
+
+      if( pResult )
+      {
+         hb_stackPop();
+         hb_stackPop();
+         hb_itemPushForward( pResult );
+         hb_itemRelease( pResult );
+      }
+   }
+}
 
 /* ------------------------------- */
 /* Array                           */
@@ -6476,7 +6443,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
          /* Alias was evaluated from an expression, for example: (cVar)->field
           */
          {
-         /* expand '&' operator if exists */
+            /* expand '&' operator if exists */
             char *cAlias;
             BOOL bNewString;
 
@@ -6513,6 +6480,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
             if( pSubstVal )
             {
                bSuccess = hb_vmSelectWorkarea( pSubstVal );
+               hb_itemRelease( pSubstVal );
             }
             else
             {
@@ -6636,7 +6604,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
+            if( bProfiler && pSym->pDynSym )
             {
                pSym->pDynSym->ulRecurse++;
             }
@@ -6666,7 +6634,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
+            if( bProfiler && pSym->pDynSym )
             {
                pSym->pDynSym->ulCalls++;                   /* profiler support */
 
@@ -6719,27 +6687,28 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 */
 static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
 {
+   HB_THREAD_STUB
    char sDesc[128];
-   HB_ITEM_NEW( ArgsArray );
    PHB_ITEM pArgsArray;
 
    // Should be optimized by rewriting hb_arrayFrom*() to accept Pointer to use.
    pArgsArray = hb_arrayFromStack( uiParams );
-   hb_itemForwardValue( &ArgsArray, pArgsArray );
+   hb_vmPush( pArgsArray );
    hb_itemRelease( pArgsArray );
 
    if( *szMsg == '_' )
    {
       //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no property", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, &ArgsArray );
+      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, hb_stackItemFromTop( -1 ) );
    }
    else
    {
       //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no exported method", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, &ArgsArray );
+      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, hb_stackItemFromTop( -1 ) );
    }
+   hb_stackPop();
 }
 
 HB_EXPORT void hb_vmSend( USHORT uiParams )
@@ -6877,7 +6846,6 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
          if( HB_IS_OBJECT( pSelf ) )
          {
-            lPopSuper = FALSE;
             pSelfBase = pSelf->item.asArray.value;
 
             if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
@@ -6892,29 +6860,16 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
                //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
 
-               if( pSelfBase )
-               {
-                  hb_itemCopy( &RealSelf, pSelfBase->pItems ) ;  // hb_arrayGetItemPtr(pSelf,1) ;
-               }
-               else
-               {
-                  //TraceLog( NULL, "OOPS!!! Object: '%s' Message: '%s' Len: %i\n", hb_objGetClsName( pSelf ), pSym->szName, pSelfBase->ulLen );
-                  hb_errInternal( HB_EI_ERRUNRECOV, "Faked super object has no datas (missing real self)!", NULL, NULL );
-               }
+               /* Replace the current stacked value with real self */
+               hb_itemCopy( &RealSelf, pSelfBase->pItems );
+               hb_itemForwardValue( pSelf, &RealSelf );
 
-               /* and take back the good pSelfBase */
-               if( HB_IS_OBJECT( &RealSelf ) )
-               {
-                  pSelfBase = (&RealSelf)->item.asArray.value;
-               }
-
-               /* Now I should exchnage it with the current stacked value */
-               hb_itemSwap( pSelf, &RealSelf );
-               hb_itemClear( &RealSelf ) ; /* and release the fake one */
-
-               /* Push current SuperClass handle */
                if( HB_IS_OBJECT( pSelf ) )
                {
+                  /* Take back the good pSelfBase */
+                  pSelfBase = pSelf->item.asArray.value;
+
+                  /* Push current SuperClass handle */
                   lPopSuper = TRUE ;
 
                   if( ! pSelf->item.asArray.value->puiClsTree )
@@ -7041,7 +6996,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
-      if ( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
+      if( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
       {
          USHORT nPos = pSelfBase->puiClsTree[0] - 1;
 
@@ -7083,10 +7038,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             if( ( ! HB_IS_OBJECT( &( HB_VM_STACK.Return ) ) ) || pSelf->item.asArray.value != HB_VM_STACK.Return.item.asArray.value )
             {
-               PHB_ITEM pNewSelf = hb_itemNew( &( HB_VM_STACK.Return ) );
-               PHB_ITEM pResult  = hb_errRT_BASE_Subst( EG_BADSELF, 1605, NULL, pSym->szName, 2, pSelf, pNewSelf );
+               PHB_ITEM pResult;
 
-               hb_itemRelease( pNewSelf );
+               hb_vmPush( &( HB_VM_STACK.Return ) );
+               pResult  = hb_errRT_BASE_Subst( EG_BADSELF, 1605, NULL, pSym->szName, 2, pSelf, hb_stackItemFromTop( -1 ) );
+               hb_stackPop();
 
                if( pResult )
                {
@@ -7523,29 +7479,31 @@ static void hb_vmDebuggerEndProc( void )
 {
    HB_THREAD_STUB
 
-   HB_ITEM_NEW( item );
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerEndProc()"));
-
-   hb_itemForwardValue( &item, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
 
    s_bDebugShowLines = FALSE;
    s_bDebuggerIsWorking = TRUE;
-   if ( hb_vm_pFunDbgEntry )
+   if( hb_vm_pFunDbgEntry )
    {
       hb_vm_pFunDbgEntry( HB_DBG_ENDPROC, 0, NULL, 0, 0 );
    }
    else
    {
+      PHB_ITEM pReturn = hb_stackTopItem();
+      hb_stackPush();
+      hb_itemForwardValue( pReturn, &(HB_VM_STACK.Return) ); /* saves the previous returned value */
+
       hb_vmPushSymbol( s_pSymDbgEntry );
       hb_vmPushNil();
       hb_vmPushLongConst( HB_DBG_ENDPROC );
       hb_vmDo( 1 );
+
+      hb_itemForwardValue( &(HB_VM_STACK.Return), pReturn ); /* restores the previous returned value */
+      hb_stackDec();
    }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
 
-   hb_itemForwardValue( &(HB_VM_STACK.Return), &item ); /* restores the previous returned value */
 }
 
 static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a specific source code line */
@@ -7888,7 +7846,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    #if 0
       printf( "Symbol: %s\n", pSym->szName );
 
-      if( pSym->pDynSym && pSym->pDynSym != (PHB_DYNS) 1 )
+      if( pSym->pDynSym )
       {
          printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
 
@@ -7905,7 +7863,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
 
    if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL &&
-      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym && (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym )
    {
       pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
    }
@@ -8106,11 +8064,17 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
        ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) ||
        ( pAlias->type == HB_IT_BLOCK ) || ( pAlias->type == HB_IT_DATE ) )
    {
-      PHB_ITEM pFName = hb_itemNew( NULL );
+      PHB_ITEM pResult;
 
-      hb_itemPutC( pFName, pSym->szName );
-      hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, pFName );
-      hb_itemRelease( pFName );
+      hb_vmPushString( pSym->szName, strlen( pSym->szName ) );
+      pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, hb_stackItemFromTop( -1 ) );
+      hb_stackPop();
+
+      if( pResult )
+      {
+         hb_itemForwardValue( pAlias, pResult );
+         hb_itemRelease( pResult );
+      }
    }
    else
    {
@@ -8681,6 +8645,7 @@ static void hb_vmPopLocal( SHORT iLocal )
    else if( hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
    {
       hb_vmOperatorCall( pLocal, pVal, "__OPASSIGN", NULL, 0, pLocal );
+      hb_itemClear( pVal );
    }
    else
    {
@@ -8714,6 +8679,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
    else if( hb_objGetOpOver( pStatic ) & HB_CLASS_OP_ASSIGN )
    {
       hb_vmOperatorCall( pStatic, pVal, "__OPASSIGN", NULL, 0, pStatic );
+      hb_itemClear( pVal );
    }
    else
    {

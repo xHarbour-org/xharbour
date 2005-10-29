@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.110 2005/10/18 12:14:32 druzus Exp $
+* $Id: thread.h,v 1.111 2005/10/24 01:04:25 druzus Exp $
 */
 
 /*
@@ -104,7 +104,7 @@ typedef void (*HB_CLEANUP_FUNC)(void *);
       int nWaitersToUnblock;
    } HB_WINCOND_T, *PHB_WINCOND_T;
 
-   #define HB_THREAD_T                 DWORD
+   #define HB_THREAD_T                 unsigned
 
    #define HB_CRITICAL_T               CRITICAL_SECTION
    #define HB_CRITICAL_INIT( x )       InitializeCriticalSection( &(x) )
@@ -701,9 +701,11 @@ typedef struct tag_HB_SHARED_RESOURCE
       #define HB_VM_STACK ( *hb_thread_stack )
       #define HB_THREAD_STUB
    #endif
+   #undef  hb_threadGetCurrentStack
+   #define hb_threadGetCurrentStack() ( hb_thread_stack )
 
    #if __GNUC__ >= 3 || defined( __BORLANDC__ )
-      extern HB_STACK __thread *hb_thread_stack;
+      extern __thread HB_STACK *hb_thread_stack;
    #elif defined( _MSC_VER )
       extern HB_STACK __declspec(thread) *hb_thread_stack;
    #else

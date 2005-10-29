@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.110 2005/09/22 01:12:00 druzus Exp $
+ * $Id: memvars.c,v 1.111 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
@@ -737,9 +737,6 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
 
          if( HB_IS_OBJECT( pSetItem ) && (hb_objGetOpOver( pSetItem ) & HB_CLASS_OP_ASSIGN ) )
          {
-            // hb_vmOperatorCall() will POP 2 arguments.
-            /* hb_vmPushNil(); */
-            /* hb_vmPushNil(); */
             hb_vmOperatorCall( pSetItem, pItem, "__OPASSIGN", NULL, 0, pSetItem );
          }
          else

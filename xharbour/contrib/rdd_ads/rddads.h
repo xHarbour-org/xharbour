@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.9 2005/09/25 16:14:21 druzus Exp $
+ * $Id: rddads.h,v 1.10 2005/10/10 08:19:05 brianhays Exp $
  */
 
 /*
@@ -57,13 +57,16 @@
 #include "hbapirdd.h"
 #include "ace.h"
 
-#define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
+HB_EXTERN_BEGIN
+
+
+
 /*
-*  ADS WORKAREA
-*  --------
-*  The Workarea Structure of Advantage Database Server RDD
-*
-*/
+ *  ADS WORKAREA
+ *  --------
+ *  The Workarea Structure of Advantage Database Server RDD
+ *
+ */
 
 
 typedef struct _ADSAREA_
@@ -92,12 +95,12 @@ typedef struct _ADSAREA_
    USHORT uiMaxFieldNameLength;
 
    /*
-   *  ADS's additions to the workarea structure
-   *
-   *  Warning: The above section MUST match WORKAREA exactly!  Any
-   *  additions to the structure MUST be added below, as in this
-   *  example.
-   */
+    *  ADS's additions to the workarea structure
+    *
+    *  Warning: The above section MUST match WORKAREA exactly!  Any
+    *  additions to the structure MUST be added below, as in this
+    *  example.
+    */
 
    LPDBRELINFO lpdbPendingRel;   /* Pointer to parent rel struct */
 
@@ -130,15 +133,44 @@ typedef ADSAREA * ADSAREAP;
                                     pArea->lpdbPendingRel = NULL; \
                               }
 
-typedef struct _ADSCONNECTINFO
-{
-   ADSHANDLE   hConnection;
-   BOOL        fDictionary;
-} ADSCONNECTINFO;
-typedef ADSCONNECTINFO * LPADSCONNECTINFO;
+
+#define HB_RDD_ADS_VERSION_STRING "ADS RDD 1.4"
+
+#if ADS_REQUIRE_VERSION >= 6 && defined( HB_OS_WIN_32 )
+#  define ADS_USE_OEM_TRANSLATION
+#else
+#  undef ADS_USE_OEM_TRANSLATION
+#endif
+
+#define HB_ADS_PARCONNECTION( n )      ( ISNUM( n ) ?  ( ADSHANDLE ) hb_parnl( n ) : adsConnectHandle )
+#define HB_ADS_RETCONNECTION( h )      hb_retnl( h )
+#define HB_ADS_GETCONNECTION( p )      ( ( hb_itemType( p ) & HB_IT_NUMERIC ) ? ( ADSHANDLE ) hb_itemGetNL( p ) : adsConnectHandle )
+#define HB_ADS_PUTCONNECTION( p, h )   hb_itemPutNL( ( p ), ( LONG ) ( h ) )
+#define HB_ADS_DEFCONNECTION( v )      ( ( v ) ? ( ADSHANDLE ) ( v ) : adsConnectHandle )
 
 
-ADSAREAP hb_rddGetADSWorkAreaPointer( void );
+extern int adsFileType;                 /* current global setting */
+extern int adsLockType;
+extern int adsRights;
+extern int adsCharType;
+extern BOOL bTestRecLocks;
+extern ADSHANDLE adsConnectHandle;
+extern ERRCODE adsCloseCursor( ADSAREAP pArea );
+extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
+
+#ifdef ADS_USE_OEM_TRANSLATION
+   extern BOOL adsOEM;
+   extern char * hb_adsOemToAnsi( char * pcString, ULONG ulLen );
+   extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
+   void hb_adsOemAnsiFree( char * pcString );
+#else
+#  define hb_adsOemToAnsi( s, l )     ( s )
+#  define hb_adsAnsiToOem( s, l )     ( s )
+#  define hb_adsOemAnsiFree( s )
+#endif
+
+
+HB_EXTERN_END
 
 UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
                                       UNSIGNED8  *pucFldName,
@@ -149,4 +181,3 @@ UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
                                       UNSIGNED8  *pucFldName,
                                       UNSIGNED8  *pucBuf,
                                       UNSIGNED32 *pulLen );
-

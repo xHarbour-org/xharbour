@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.111 2005/10/04 20:53:49 ronpinkas Exp $
+ * $Id: harbour.c,v 1.112 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -2083,7 +2083,7 @@ PINLINE hb_compInlineAdd( char * szFunName )
 
       if( pSym )
       {
-         pSym->cScope |= HB_FS_STATIC;
+         pSym->cScope |= HB_FS_STATIC | HB_FS_LOCAL;
       }
    }
    pInline = hb_compInlineNew( szFunName );
@@ -2129,7 +2129,7 @@ void hb_compAnnounce( char * szFunName )
       hb_compSymbolAdd( szFunName, NULL, TRUE );
       /* pSym->cScope = HB_FS_PUBLIC; // already is */
 
-      pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC );
+      pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC | HB_FS_LOCAL );
       pFunc->bFlags |= FUN_PROCEDURE;
 
       if( hb_comp_functions.iCount == 0 )

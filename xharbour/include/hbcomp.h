@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.36 2005/04/21 01:30:46 andijahja Exp $
+ * $Id: hbcomp.h,v 1.37 2005/09/13 22:46:53 fperillo Exp $
  */
 
 /*
@@ -159,32 +159,32 @@ typedef struct _VAR
 /* structure to hold a Clipper defined function */
 typedef struct __FUNC
 {
-   char *       szName;                   /* name of a defined Clipper function */
-   char         cScope;                   /* scope of a defined Clipper function */
-   BYTE         bFlags;                   /* some flags we may need */
-   USHORT       wParamCount;              /* number of declared parameters */
-   USHORT       wParamNum;                /* current parameter number */
-   PVAR         pLocals;                  /* pointer to local variables list */
-   PVAR         pStatics;                 /* pointer to static variables list */
-   PVAR         pFields;                  /* pointer to fields variables list */
-   PVAR         pMemvars;                 /* pointer to memvar variables list */
-   PVAR         pPrivates;                /* pointer to private variables list */
-   PENUMDEF     pEnums;                   /* pointer to Enumeration definitions list */
-   BYTE *       pCode;                    /* pointer to a memory block where pcode is stored */
-   ULONG        lPCodeSize;               /* total memory size for pcode */
-   ULONG        lPCodePos;                /* actual pcode offset */
-   int          iStaticsBase;             /* base for this function statics */
-   ULONG *      pNOOPs;                   /* pointer to the NOOP array */
-   ULONG *      pJumps;                   /* pointer to the Jumps array */
-   ULONG        iNOOPs;                   /* NOOPs Counter */
-   ULONG        iJumps;                   /* Jumps Counter */
-   BYTE *       pStack;                   /* Compile Time Stack */
-   USHORT       iStackSize;               /* Compile Time Stack size */
-   int          iStackIndex;              /* Compile Time Stack index */
-   PCOMDECLARED pStackFunctions[ 8 ];     /* Declared Functions on the Compile Time Stack */
-   int          iStackFunctions;          /* Index into DEclared Functions on Compile Time Stack */
-   PCOMCLASS    pStackClasses[ 8 ];       /* Declared Classes on the Compile Time Stack */
-   int          iStackClasses;            /* Index into Declared Classes on Compile Time Stack */
+   char *         szName;                 /* name of a defined Clipper function */
+   HB_SYMBOLSCOPE cScope;                 /* scope of a defined Clipper function */
+   BYTE           bFlags;                 /* some flags we may need */
+   USHORT         wParamCount;            /* number of declared parameters */
+   USHORT         wParamNum;              /* current parameter number */
+   PVAR           pLocals;                /* pointer to local variables list */
+   PVAR           pStatics;               /* pointer to static variables list */
+   PVAR           pFields;                /* pointer to fields variables list */
+   PVAR           pMemvars;               /* pointer to memvar variables list */
+   PVAR           pPrivates;              /* pointer to private variables list */
+   PENUMDEF       pEnums;                 /* pointer to Enumeration definitions list */
+   BYTE *         pCode;                  /* pointer to a memory block where pcode is stored */
+   ULONG          lPCodeSize;             /* total memory size for pcode */
+   ULONG          lPCodePos;              /* actual pcode offset */
+   int            iStaticsBase;           /* base for this function statics */
+   ULONG *        pNOOPs;                 /* pointer to the NOOP array */
+   ULONG *        pJumps;                 /* pointer to the Jumps array */
+   ULONG          iNOOPs;                 /* NOOPs Counter */
+   ULONG          iJumps;                 /* Jumps Counter */
+   BYTE *         pStack;                 /* Compile Time Stack */
+   USHORT         iStackSize;             /* Compile Time Stack size */
+   int            iStackIndex;            /* Compile Time Stack index */
+   PCOMDECLARED   pStackFunctions[ 8 ];   /* Declared Functions on the Compile Time Stack */
+   int            iStackFunctions;        /* Index into DEclared Functions on Compile Time Stack */
+   PCOMCLASS      pStackClasses[ 8 ];     /* Declared Classes on the Compile Time Stack */
+   int            iStackClasses;          /* Index into Declared Classes on Compile Time Stack */
    struct __FUNC * pOwner;                /* pointer to the function/procedure that owns the codeblock */
    struct __FUNC * pNext;                 /* pointer to the next defined function */
 } _FUNC, * PFUNCTION;
@@ -219,10 +219,10 @@ typedef struct
 /* compiler symbol support structure */
 typedef struct _COMSYMBOL
 {
-   char *    szName;          /* the name of the symbol */
-   char      cScope;          /* the scope of the symbol */
-   BYTE      cType;
-   BOOL      bFunc;           /* is it a function name (TRUE) or memvar (FALSE) */
+   char *         szName;     /* the name of the symbol */
+   HB_SYMBOLSCOPE cScope;     /* the scope of the symbol */
+   BYTE           cType;
+   BOOL           bFunc;      /* is it a function name (TRUE) or memvar (FALSE) */
    union
    {
       PCOMCLASS pClass;

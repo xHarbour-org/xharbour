@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.91 2005/10/26 20:07:35 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.92 2005/10/27 16:21:23 ronpinkas Exp $
  */
 
 /*
@@ -1453,8 +1453,11 @@ RETURN xRet
      BSTR bstrClassID;
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
-     IDispatch *pDisp;
-
+     void *pDisp = NULL; // IDispatch
+     /* void * 
+      * used intentionally to inform compiler that there is no
+      * strict-aliasing
+      */
      bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
 
      if( hb_parcx( 1 )[ 0 ] == '{' )
@@ -1489,8 +1492,7 @@ RETURN xRet
      if( s_nOleError == S_OK )
      {
         //TraceLog( NULL, "Class: %i\n", ClassID );
-        pDisp = NULL;
-        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, (void **) &pDisp );
+        s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
         //TraceLog( NULL, "Result: %i\n", s_nOleError );
      }
 
@@ -1504,8 +1506,11 @@ RETURN xRet
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
      IUnknown *pUnk = NULL;
-     IDispatch *pDisp = NULL;
-     //LPOLESTR pOleStr = NULL;
+     void *pDisp = NULL; // IDispatch
+     /* void * 
+      * used intentionally to inform compiler that there is no
+      * strict-aliasing
+      */
 
      bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
 
@@ -1545,7 +1550,7 @@ RETURN xRet
 
         if( s_nOleError == S_OK )
         {
-           s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, (void **) &pDisp );
+           s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, &pDisp );
         }
      }
 

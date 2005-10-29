@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.26 2005/10/14 22:53:34 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.27 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
         }
       }
 
-      if( pSymbol->pDynSym == (PHB_DYNS) 1 && pDynSym->pModuleSymbols == NULL )
+      if( pDynSym->pModuleSymbols == NULL && ( pSymbol->cScope & HB_FS_LOCAL ) )
       {
          pDynSym->pModuleSymbols = pModuleSymbols;
          //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
@@ -228,7 +228,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    }
 #endif
 
-   if( pSymbol->pDynSym == (PHB_DYNS) 1 )
+   if( pSymbol->cScope & HB_FS_LOCAL )
    {
       pDynSym->pModuleSymbols = pModuleSymbols;
       //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
@@ -298,7 +298,7 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
       PHB_ITEM pBase = hb_stackBaseItem();
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }
@@ -332,7 +332,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
       PHB_ITEM pBase = hb_stackBaseItem();
 
       //TraceLog( NULL, "Creating: %s\n", szName );
-      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym )
       {
          pDynSym = hb_dynsymNew( hb_symbolNew( szName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
       }

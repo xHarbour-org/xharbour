@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.120 2005/10/19 02:18:54 druzus Exp $
+ * $Id: itemapi.c,v 1.121 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
@@ -143,30 +143,6 @@ PHB_ITEM HB_EXPORT hb_itemParam( USHORT uiParam )
 
    return pNew;
 }
-
-#if 0
-/*
-Deffed Out. This function is against a common programming concept when dealing
-with structure because it returns value of a pointer.
-*/
-HB_ITEM HB_EXPORT hb_itemParamStack( USHORT uiParam )
-{
-   HB_ITEM pNew;
-   PHB_ITEM pItem;
-
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParamStack(%hu)", uiParam));
-
-   pNew.type = HB_IT_NIL;
-   pItem = hb_param( uiParam, HB_IT_ANY );
-
-   if( pItem )
-   {
-      hb_itemCopy( &pNew, pItem );
-   }
-
-   return pNew;
-}
-#endif
 
 /* Internal Item API. Use this with care. */
 

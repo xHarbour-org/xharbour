@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.173 2005/10/19 14:23:03 druzus Exp $
+ * $Id: classes.c,v 1.174 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -488,12 +488,9 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          }
          else
          {
-            if( pRealClass->pModuleSymbols == NULL || (*pBase)->item.asSymbol.value->pDynSym == NULL ||
-                (*pBase)->item.asSymbol.value->pDynSym == (PHB_DYNS) 1 || (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols == NULL )
-            {
-               // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
-            }
-            else
+            if( pRealClass->pModuleSymbols != NULL &&
+                (*pBase)->item.asSymbol.value->pDynSym != NULL &&
+                (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols != NULL )
             {
                #ifdef DEBUG_SCOPE
                   printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
@@ -505,6 +502,10 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
                   // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
                   return TRUE;
                }
+            }
+            else
+            {
+               // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
             }
          }
 
@@ -4312,7 +4313,7 @@ void hb_clsSetModule( USHORT uiClass )
       HB_THREAD_STUB_STACK
       PHB_ITEM pBase = hb_stackBaseItem();
 
-      if( pBase->item.asSymbol.value->pDynSym && pBase->item.asSymbol.value->pDynSym != (PHB_DYNS) 1 )
+      if( pBase->item.asSymbol.value->pDynSym )
       {
          ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = pBase->item.asSymbol.value->pDynSym->pModuleSymbols;
 

@@ -66,8 +66,10 @@
 
 /* This forces a warning for single equals in if statements */
 #ifdef WIN32
-   // 16-bit compiler doesn't seem to like this
-   #pragma warning( error : 4706 )
+   /* 16-bit compiler doesn't seem to like this */
+   #ifndef __GNUC__
+      #pragma warning( error : 4706 )
+   #endif
 
    #define ADS_PATH_DELIMITER    '\\'
 #endif

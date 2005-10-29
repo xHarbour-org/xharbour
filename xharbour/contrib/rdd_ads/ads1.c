@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.87 2005/10/26 08:34:18 brianhays Exp $
+ * $Id: ads1.c,v 1.88 2005/10/26 21:38:32 jabrecer Exp $
  */
 
 /*
@@ -72,26 +72,12 @@
 #include <ctype.h>
 
 static int iSetListenerHandle = 0;
+
 static USHORT s_uiRddCount = 0;
 static USHORT s_uiRddIdADS = ( USHORT ) -1;
 static USHORT s_uiRddIdADT = ( USHORT ) -1;
 static USHORT s_uiRddIdADSNTX = ( USHORT ) -1;
 static USHORT s_uiRddIdADSCDX = ( USHORT ) -1;
-
-#if ADS_REQUIRE_VERSION >= 6
-void hb_oemansi(char* pcString, LONG lLen);
-void hb_ansioem(char* pcString, LONG lLen);
-#endif
-
-extern int adsFileType;                 /* current global setting */
-extern int adsLockType;
-extern int adsRights;
-extern int adsCharType;
-#if ADS_REQUIRE_VERSION >= 6
-extern BOOL adsOEM;
-#endif
-extern BOOL bTestRecLocks;
-extern adsConnectHandle;
 
 static RDDFUNCS adsSuper;
 
@@ -478,7 +464,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB
                if( pItem->type == HB_IT_STRING )
                {
                   /* bTypeError = FALSE; */
-#if ADS_REQUIRE_VERSION >= 6
+#ifdef ADS_USE_OEM_TRANSLATION
                   if( adsOEM )
                   {
                      u16DataType = ADS_RAWKEY;
@@ -867,7 +853,7 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    {
       pszKey = ( UNSIGNED8* ) hb_itemGetCPtr( pKey );
       u16KeyLen = ( UNSIGNED16 ) hb_itemGetCLen( pKey );
-#if ADS_REQUIRE_VERSION >= 6
+#ifdef ADS_USE_OEM_TRANSLATION
       u16KeyType = adsOEM ? ADS_RAWKEY : ADS_STRINGKEY;
 #else
       u16KeyType = ADS_STRINGKEY;
@@ -1722,7 +1708,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             memset( pBuffer, ' ', pField->uiLen );
          }
-#if ADS_REQUIRE_VERSION >= 6
+#ifdef ADS_USE_OEM_TRANSLATION
          else if( adsOEM )
          {
             AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length );
@@ -1817,38 +1803,38 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
 
       case HB_IT_MEMO:
-         {
-           UNSIGNED8 *pucBuf;
-           UNSIGNED32 pulLen;
+      {
+         UNSIGNED8 *pucBuf;
+         UNSIGNED32 pulLen;
 
-           if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
-           {
-               hb_itemPutC( pItem, "" );
-           }
-           else
-           {
-              if( pulLen > 0 )
-              {
-                 pulLen++;                 /* make room for NULL */
-                 pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
-                 AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
-#if ADS_REQUIRE_VERSION >= 6
-                 if( adsOEM )
-                 {
-                    hb_ansioem( ( char * ) pucBuf, pulLen);
-                 }
-#endif
-                 hb_itemPutCL( pItem, ( char * ) pucBuf, pulLen );
-                 hb_xfree( pucBuf );
-              }
-              else
-              {
-                 hb_itemPutC( pItem, "" );
-              }
-           }
-           hb_itemSetCMemo( pItem );
-           break;
+         if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
+         {
+            hb_itemPutC( pItem, "" );
          }
+         else
+         {
+            if( pulLen > 0 )
+            {
+               char * szRet;
+
+               pulLen++;                 /* make room for NULL */
+               pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
+               AdsGetString( pArea->hTable, ADSFIELD( uiIndex ), pucBuf, &pulLen, ADS_NONE );
+
+               szRet = hb_adsAnsiToOem( ( char * ) pucBuf, pulLen );
+               hb_itemPutCL( pItem, szRet, pulLen );
+               hb_adsOemAnsiFree( szRet );
+
+               hb_xfree( pucBuf );
+            }
+            else
+            {
+               hb_itemPutC( pItem, "" );
+            }
+         }
+         hb_itemSetCMemo( pItem );
+         break;
+      }
    }
    return SUCCESS;
 }
@@ -1996,7 +1982,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                uiCount = pField->uiLen;
             }
 
-#if ADS_REQUIRE_VERSION >= 6
+#ifdef ADS_USE_OEM_TRANSLATION
             if( adsOEM )
             {
                ulRetVal = AdsSetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), (UNSIGNED8*)hb_itemGetCPtr( pItem ), uiCount );
@@ -2041,22 +2027,16 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_MEMO:
          if( HB_IS_STRING( pItem ) )
          {
+            char * szRet;
+
             bTypeError = FALSE;
             uiCount = ( USHORT ) hb_itemGetCLen( pItem );
             /* TODO: Doesn't ADS support longer then 64KB memo fields? */
-#if ADS_REQUIRE_VERSION >= 6
 
-            if( adsOEM )
-            {
-               /* TODO: it's a bug - such conversion should be done on
-                        string copy not item itself. It will change all
-                        instances of this string. Also for static strings
-                        it may cause GPF for some platform. */
-               hb_oemansi( hb_itemGetCPtr( pItem ), uiCount );
-            }
-#endif
+            szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), uiCount );
             ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
-                                     (UNSIGNED8*) hb_itemGetCPtr( pItem ), uiCount );
+                                     (UNSIGNED8*) szRet, uiCount );
+            hb_adsOemAnsiFree( szRet );
          }
          break;
    }
@@ -2249,7 +2229,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
 
-   hConnection = pCreateInfo->ulConnection ? pCreateInfo->ulConnection : adsConnectHandle ;
+   hConnection = HB_ADS_DEFCONNECTION( pCreateInfo->ulConnection );
 
    pArea->szDataFileName = hb_strdup( ( char * ) pCreateInfo->abName );
 
@@ -2618,20 +2598,20 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
    /* See adsGettValue() for why we don't use pArea->uiMaxFieldNameLength here */
    UNSIGNED16 pusBufLen, pusType, pusDecimals;
    DBFIELDINFO dbFieldInfo;
-   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ], *szSQL;
+   char szAlias[ HARBOUR_MAX_RDD_ALIAS_LENGTH + 1 ], * szFile;
    BOOL fDictionary = FALSE;
 
    HB_TRACE(HB_TR_DEBUG, ("adsOpen(%p)", pArea));
 
-   hConnection = pOpenInfo->ulConnection ? pOpenInfo->ulConnection : adsConnectHandle;
+   hConnection = HB_ADS_DEFCONNECTION( pOpenInfo->ulConnection );
    u32RetVal = AdsGetHandleType( hConnection, &pusType);
    if( u32RetVal == AE_SUCCESS )
    {
       fDictionary = ( pusType == ADS_DATABASE_CONNECTION
                    || pusType == ADS_SYS_ADMIN_CONNECTION );
    }
+   szFile = ( char * ) pOpenInfo->abName;
 
-   szSQL = ( char * ) pOpenInfo->abName;
    if( pArea->hTable != 0 )
    {
       /*
@@ -2644,31 +2624,22 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       hTable = pArea->hTable;
       hStatement = pArea->hStatement;
    }
-   else if( szSQL && hb_strnicmp( szSQL, "SELECT ", 7 ) == 0 )
+   else if( szFile && hb_strnicmp( szFile, "SELECT ", 7 ) == 0 )
    {
       u32RetVal = AdsCreateSQLStatement( hConnection, &hStatement );
       if( u32RetVal == AE_SUCCESS )
       {
+         char * szSQL = hb_adsOemToAnsi( szFile, strlen( szFile ) );
+
          if( pArea->iFileType == ADS_CDX )
          {
             AdsStmtSetTableType( hStatement, pArea->iFileType );
          }
-#if ADS_REQUIRE_VERSION >= 6
-         if( adsOEM )
-         {
-            szSQL = hb_strdup( szSQL );
-            hb_oemansi( szSQL, strlen( szSQL ) );
-         }
-#endif
 
          u32RetVal = AdsExecuteSQLDirect( hStatement, (UNSIGNED8 *) szSQL, &hTable );
 
-#if ADS_REQUIRE_VERSION >= 6
-         if( adsOEM )
-         {
-            hb_xfree( szSQL );
-         }
-#endif
+         hb_adsOemAnsiFree( szSQL );
+
          if( u32RetVal != AE_SUCCESS )
          {
             AdsCloseSQLStatement( hStatement );
@@ -3932,29 +3903,19 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
       if( bValidExpr )
       {
-#if ADS_REQUIRE_VERSION >= 6
-         if( adsOEM )
-         {
-            // hb_oemansi() transform inplace, we need writable buffer!
-            pucFilter = hb_strdup( pucFilter );
+         char * szFilter = hb_adsOemToAnsi( pucFilter, 
+                                 hb_itemGetCLen( pFilterInfo->abFilterText ) );
 
-            hb_oemansi( pucFilter, hb_itemGetCLen( pFilterInfo->abFilterText ) );
-         }
-#endif
          if( hb_set.HB_SET_OPTIMIZE )
          {
-            u32RetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) pucFilter, usResolve );
+            u32RetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) szFilter, usResolve );
          }
          else
          {
-            u32RetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) pucFilter );
+            u32RetVal = AdsSetFilter( pArea->hTable, (UNSIGNED8*) szFilter );
          }
-#if ADS_REQUIRE_VERSION >= 6
-         if( adsOEM )
-         {
-             hb_xfree( (void *) pucFilter );
-         }
-#endif
+
+         hb_adsOemAnsiFree( szFilter );
       }     /* else let SUPER handle filtering */
       pArea->dbfi.fOptimized = u32RetVal == AE_SUCCESS;
       return SUCCESS;
@@ -4337,11 +4298,8 @@ static ERRCODE adsRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
       {
          ADSHANDLE hOldConnection = adsConnectHandle;
 
-         if( hb_itemType( pItem ) & HB_IT_NUMERIC )
-         {
-            adsConnectHandle = hb_itemGetNL( pItem );
-         }
-         hb_itemPutNL( pItem, ulConnect ? ulConnect : hOldConnection );
+         adsConnectHandle = HB_ADS_GETCONNECTION( pItem );
+         HB_ADS_PUTCONNECTION( pItem, hOldConnection );
          break;
       }
       case RDDI_ISDBF:

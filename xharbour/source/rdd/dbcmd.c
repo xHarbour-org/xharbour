@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.176 2005/10/24 01:04:25 druzus Exp $
+ * $Id: dbcmd.c,v 1.177 2005/10/28 12:55:04 mlombardo Exp $
  */
 
 /*
@@ -2729,13 +2729,17 @@ HB_FUNC( ORDCREATE )
          dbOrderInfo.fUnique = hb_set.HB_SET_UNIQUE;
       }
 
-      dbConstrInfo.abConstrName = ( BYTE * ) hb_parcx( 6 );
-      dbConstrInfo.abTargetName = ( BYTE * ) hb_parcx( 7 );
+      dbConstrInfo.abConstrName = ( BYTE * ) hb_parc( 6 );
+      dbConstrInfo.abTargetName = ( BYTE * ) hb_parc( 7 );
       dbConstrInfo.itmRelationKey = hb_param( 8, HB_IT_ARRAY );
-      if ( dbConstrInfo.abConstrName && dbConstrInfo.abTargetName && dbConstrInfo.itmRelationKey )
+      if( dbConstrInfo.abConstrName && dbConstrInfo.abTargetName && dbConstrInfo.itmRelationKey )
       {
          dbConstrInfo.fEnabled = hb_parl( 9 );
          dbOrderInfo.lpdbConstraintInfo = &dbConstrInfo;
+      }
+      else
+      {
+         dbOrderInfo.lpdbConstraintInfo = NULL;
       }
 
       SELF_ORDCREATE( pArea, &dbOrderInfo );

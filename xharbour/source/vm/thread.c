@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.196 2005/10/18 12:15:00 druzus Exp $
+* $Id: thread.c,v 1.197 2005/10/24 01:04:38 druzus Exp $
 */
 
 /*
@@ -106,9 +106,9 @@
 
 #if defined( HB_THREAD_TLS_KEYWORD )
    #if __GNUC__ >= 3 || defined( __BORLANDC__ )
-   HB_STACK __thread  *hb_thread_stack;
+      __thread HB_STACK *hb_thread_stack;
    #elif defined( _MSC_VER )
-   HB_STACK __declspec(thread) *hb_thread_stack;
+      HB_STACK __declspec(thread) *hb_thread_stack;
    #else
       #error "This platform does not support __thread keyword; undefine HB_THREAD_TLS_KEYWORD & recompile"
    #endif
@@ -1672,7 +1672,7 @@ HB_FUNC( STARTTHREAD )
 /*   #ifndef __BORLANDC__
       if( ( th_h = CreateThread( NULL, 0, hb_create_a_thread, (void *) pStack , CREATE_SUSPENDED, &th_id ) ) != NULL )
    #else*/
-   if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, (UINT *) &th_id) ) != 0L )
+   if( ( th_h = (HANDLE)_beginthreadex( NULL, 0, hb_create_a_thread, (void *) pStack, CREATE_SUSPENDED, &th_id ) ) != 0L )
 //   #endif
 #elif defined(HB_OS_OS2)
    if ((th_id = _beginthread( (void *) hb_create_a_thread, NULL, 128 * 1024, (void *) pStack)) >= 0)

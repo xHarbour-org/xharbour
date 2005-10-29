@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.108 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: genc.c,v 1.109 2005/10/04 20:06:09 druzus Exp $
  */
 
 /*
@@ -403,12 +403,32 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          }
          else
          {
+            if( pSym->bFunc )
+            {
+               if( ( pSym->cScope & HB_FS_LOCAL ) == 0 )
+               {
+                  /* is it a function defined in this module */
+                  if( hb_compFunctionFind( pSym->szName ) ||
+                      hb_compInlineFind( pSym->szName ) ||
+                      hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
+                  {
+                     pSym->cScope |= HB_FS_LOCAL;
+                  }
+               }
+               if( ( pSym->cScope & HB_FS_LOCAL ) == 0 )
+               {
+                  if ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
+                  {
+                     pSym->cScope |= HB_FS_STATIC | HB_FS_LOCAL;
+                  }
+               }
+            }
+
             fprintf( yyc, "{ \"%s\", ", pSym->szName );
 
-            if( ( pSym->cScope & HB_FS_STATIC ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
+            if( pSym->cScope & HB_FS_STATIC )
             {
                fprintf( yyc, "HB_FS_STATIC" );
-
             }
             else if( pSym->cScope & HB_FS_INIT )
             {
@@ -417,11 +437,15 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             else if( pSym->cScope & HB_FS_EXIT )
             {
                fprintf( yyc, "HB_FS_EXIT" );
-
             }
             else
             {
                fprintf( yyc, "HB_FS_PUBLIC" );
+            }
+
+            if( pSym->cScope & HB_FS_LOCAL )
+            {
+               fprintf( yyc, " | HB_FS_LOCAL" );
             }
 
             if( pSym->cScope & VS_MEMVAR )
@@ -443,27 +467,20 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
             /* specify the function address if it is a defined function or an
                external called function */
-            if( pSym->bFunc && hb_compFunctionFind( pSym->szName ) ) /* is it a function defined in this module */
+            if( pSym->bFunc && ( pSym->cScope & HB_FS_LOCAL ) != 0 ) /* is it a function defined in this module */
             {
                if( pSym->cScope & HB_FS_INIT )
                {
-                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", (int) strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else if( pSym->cScope & HB_FS_EXIT )
                {
-                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, (PHB_DYNS) 1 }", (int) strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else
                {
-                  fprintf( yyc, ", {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pSym->szName );
+                  fprintf( yyc, ", {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
                }
-            }
-            else if( pSym->bFunc &&
-               ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) ||
-                 hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) ||
-                 hb_compInlineFind( pSym->szName ) ) )
-            {
-               fprintf( yyc, ", {HB_FUNCNAME( %s )}, (PHB_DYNS) 1 }", pSym->szName );
             }
             else if( pSym->bFunc && hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
             {
@@ -848,7 +865,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
          {
             if ( hb_compFunCallFind( pTemp->szName ) )
             {
-               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC", NULL );
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
 
                if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc )
                {
@@ -856,7 +873,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
                   strcat( szEntries, " | HB_FS_FIRST" );
                }
 
-               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
             }
          }
          else
@@ -864,19 +881,19 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
             if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc  )
             {
                bStartFunc = TRUE;
-               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC", NULL );
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
                strcat( szEntries, " | HB_FS_FIRST" );
-               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
             }
          }
 
          if( pTemp->Type == HB_PROTO_FUNC_EXIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_EXIT, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_EXIT | HB_FS_LOCAL, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
          }
          else if( pTemp->Type == HB_PROTO_FUNC_INIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_INIT, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, (PHB_DYNS) 1 },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_INIT | HB_FS_LOCAL, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
          }
       }
 
