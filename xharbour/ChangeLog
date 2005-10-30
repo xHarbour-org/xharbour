@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4535 2005/10/30 14:45:48 druzus Exp $
+ * $Id: ChangeLog,v 1.4536 2005/10/30 16:31:15 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-30 18:07 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbf1.c
+    ! Fixed stupid typo in my last commit
 
 2005-10-30 19:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbdebug.ch
@@ -23,7 +27,7 @@
   * source/debug/debugger.prg
     * A minor formatting fix.
 
-2005-10-30 15:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2005-10-30 15:42 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbvm.h
   * xharbour/source/vm/hvm.c
   * xharbour/source/debug/debugger.prg
