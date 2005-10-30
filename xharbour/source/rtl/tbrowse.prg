@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.126 2005/10/30 13:00:00 ptsarenko Exp $
+ * $Id: tbrowse.prg,v 1.127 2005/10/30 16:00:00 ptsarenko Exp $
  */
 
 /*
@@ -664,7 +664,6 @@ METHOD Invalidate() CLASS TBrowse
 
    ::stable := .F.
    ::lRedrawFrame := .T.
-   ::oDataCache:Invalidate()
 
 Return Self
 
@@ -886,6 +885,8 @@ METHOD Configure( nMode ) CLASS TBrowse
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
       ::oDataCache := TDataCache():New( Self )
+   else
+      ::oDataCache:Invalidate()
    endif
 
    ::Invalidate()
