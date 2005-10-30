@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.24 2005/09/13 01:48:06 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.25 2005/09/16 22:29:40 druzus Exp $
  */
 
 /*
@@ -57,9 +57,6 @@
 #include "hbapirdd.h"
 #include "hbdbferr.h"
 #include "hbdbf.h"
-#ifndef HB_CDP_SUPPORT_OFF
-#include "hbapicdp.h"
-#endif
 
 HB_EXTERN_BEGIN
 
@@ -159,6 +156,7 @@ typedef struct _DBFAREA
    USHORT heapSize;
    USHORT rddID;
    USHORT uiMaxFieldNameLength;
+   PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
 
    /*
    *  DBFS's additions to the workarea structure
@@ -207,9 +205,6 @@ typedef struct _DBFAREA
    ULONG    ulNumLocksPos;          /* Number of records locked */
    BYTE *   pCryptKey;              /* Pointer to encryption key */
    PHB_DYNS pTriggerSym;            /* DynSym pointer to trigger function */
-#ifndef HB_CDP_SUPPORT_OFF
-   PHB_CODEPAGE cdPage;             /* Area's codepage pointer  */
-#endif
 } DBFAREA;
 
 typedef DBFAREA * LPDBFAREA;

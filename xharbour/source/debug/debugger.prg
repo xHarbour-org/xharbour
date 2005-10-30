@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.63 2005/09/27 14:12:49 likewolf Exp $
+ * $Id: debugger.prg,v 1.64 2005/10/29 19:39:33 likewolf Exp $
  */
 
 /*
@@ -137,9 +137,6 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
     CASE nMode == HB_DBG_GETENTRY
       HB_INLINE()
       {
-         extern void ( *hb_vm_pFunDbgEntry )( int nMode, int nLine, char *szName, int nIndex, int nFrame );
-         extern void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
-       
          hb_vm_pFunDbgEntry = hb_dbgEntry;
       }
 

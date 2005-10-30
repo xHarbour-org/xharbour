@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.133 2005/09/25 16:14:21 druzus Exp $
+ * $Id: dbf1.c,v 1.134 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -3340,7 +3340,7 @@ static ERRCODE hb_dbfTrans( DBFAREAP pArea, LPDBTRANSINFO pTransInfo )
 
    if( pTransInfo->uiFlags & DBTF_MATCH )
    {
-      if( pArea->fHasMemo )
+      if( pArea->fHasMemo || pArea->cdPage != pTransInfo->cdPage )
          pTransInfo->uiFlags &= ~DBTF_PUTREC;
       else if( pArea->rddID == pTransInfo->lpaDest->rddID )
          pTransInfo->uiFlags |= DBTF_PUTREC;

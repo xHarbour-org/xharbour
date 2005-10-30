@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.515 2005/10/25 20:01:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.516 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -310,7 +310,7 @@ static BOOL     s_bDebugRequest;    /* debugger invoked via the VM */
 static BOOL     s_bDebugShowLines;  /* update source code line on the debugger display */
 static BOOL     s_bDebuggerIsWorking; /* to know when __DBGENTRY is beeing invoked */
 static PHB_SYMB s_pSymDbgEntry = NULL; /* Cached __DBGENTRY symbol */
-void (*hb_vm_pFunDbgEntry)( int nMode, int nLine, char *szName, int nIndex, int nFrame ) = NULL;
+HB_EXPORT void (*hb_vm_pFunDbgEntry)( int nMode, int nLine, char *szName, int nIndex, int nFrame ) = NULL;
 
 /* Stores level of procedures call stack */
 static ULONG    s_ulProcLevel = 0;

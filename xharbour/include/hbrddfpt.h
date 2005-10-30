@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.20 2005/09/15 12:55:35 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.21 2005/09/20 17:26:37 druzus Exp $
  */
 
 /*
@@ -57,9 +57,6 @@
 #include "hbdbf.h"
 #include "hbdbferr.h"
 #include "hbapirdd.h"
-#ifndef HB_CDP_SUPPORT_OFF
-#include "hbapicdp.h"
-#endif
 #define HB_EXTERNAL_RDDDBF_USE
 #include "hbrdddbf.h"
 

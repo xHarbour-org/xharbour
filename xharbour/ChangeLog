@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4534 2005/10/30 15:54:05 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4534 2005/10/30 14:24:09 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-30 15:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbvm.h
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/debug/debugger.prg
+    * moved declaration of hb_vm_pFunDbgEntry to header file to resolve
+      problem with using debugger when xHarbour is compiled by C++ compiler.
+
+  * xharbour/contrib/rdd_ads/rddads.h
+  * xharbour/include/hbapirdd.h
+  * xharbour/include/hbrddcdx.h
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbrdddbt.h
+  * xharbour/include/hbrddfpt.h
+  * xharbour/include/hbrddntx.h
+  * xharbour/source/rdd/dbf1.c
+    * added PHB_CODEPAGE cdPage to common work area part to resolve the
+      problem with different automatic CDP translations in COPY TO /
+      APPENED FROM
 
 2005-10-30 16:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/tbrowse.prg
