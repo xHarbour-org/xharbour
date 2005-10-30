@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.516 2005/10/29 06:45:02 druzus Exp $
+ * $Id: hvm.c,v 1.517 2005/10/30 14:45:49 druzus Exp $
  */
 
 /*
@@ -212,6 +212,7 @@ static void    hb_vmSwapAlias( void );           /* swaps items on the eval stac
 
 /* Execution */
 static HARBOUR hb_vmDoBlock( void );             /* executes a codeblock */
+static void    hb_vmDebuggerExit( void );        /* shuts down the debugger */
 static void    hb_vmLocalName( USHORT uiLocal, char * szLocalName ); /* locals and parameters index and name information for the debugger */
 // static void    hb_vmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
 static void    hb_vmStaticName( USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
@@ -860,6 +861,9 @@ int HB_EXPORT hb_vmQuit( void )
    //printf("\nAfter inkey\n" );
 
    hb_i18nExit();
+
+   /* deactivate debugger */
+   hb_vmDebuggerExit();
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    if( pHVMFuncService )
@@ -7277,6 +7281,43 @@ HB_EXPORT void hb_vmFunction( USHORT uiParams )
     */
    hb_itemCopy( ( * HB_VM_STACK.pPos ), &(HB_VM_STACK.Return) );
    hb_stackPush();
+}
+
+
+static void hb_vmDummyDebugEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmDummyDebugEntry"));
+
+   HB_SYMBOL_UNUSED( nMode );
+   HB_SYMBOL_UNUSED( nLine );
+   HB_SYMBOL_UNUSED( szName );
+   HB_SYMBOL_UNUSED( nIndex );
+   HB_SYMBOL_UNUSED( nFrame );
+}
+
+static void hb_vmDebuggerExit( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmDebuggerExit"));
+
+   /* is debugger linked ? */
+   if ( hb_vm_pFunDbgEntry || s_pSymDbgEntry )
+   {
+      /* inform debugger that we are quitting now */
+      if ( hb_vm_pFunDbgEntry )
+      {
+         hb_vm_pFunDbgEntry( HB_DBG_VMQUIT, 0, NULL, 0, 0 );
+      }
+      else
+      {
+         hb_vmPushSymbol( s_pSymDbgEntry );
+         hb_vmPushNil();
+         hb_vmPushLongConst( HB_DBG_VMQUIT );
+         hb_vmDo( 1 );
+      }
+   }
+   /* set dummy debugger function to avoid debugger activation in .prg
+    *       destructors if any */
+   hb_vm_pFunDbgEntry = hb_vmDummyDebugEntry;
 }
 
 static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and parameters index and name information for the debugger */

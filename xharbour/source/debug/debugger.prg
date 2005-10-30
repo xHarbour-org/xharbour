@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.64 2005/10/29 19:39:33 likewolf Exp $
+ * $Id: debugger.prg,v 1.65 2005/10/30 14:45:49 druzus Exp $
  */
 
 /*
@@ -2916,7 +2916,7 @@ METHOD WatchpointsHide() CLASS TDebugger
 return nil
 
 
-METHOD WatchPointsShow() CLASS TDebugger
+METHOD WatchpointsShow() CLASS TDebugger
 
    local nWidth, n := 1
    Local oCol

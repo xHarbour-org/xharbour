@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4534 2005/10/30 14:24:09 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4535 2005/10/30 14:45:48 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-30 19:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbdebug.ch
+  * source/vm/dbgentry.c
+  * source/vm/hvm.c
+    * Stop using GC. Now HVM at termination calls the debugger entry
+      function with HB_DBG_VMQUIT so that the debugger can run its
+      cleanup routines. It is guaranteed that it is the last call of
+      the debugger entry function. In hvm.c, I used code suggested by
+      Przemek, no fix was necessary ;)
+    ! Fixed some memory leaks.
+    ! Fixed recurse debugger calls when calling a function with debug
+      info from within the debugger.
+  * source/debug/debugger.prg
+    * A minor formatting fix.
 
 2005-10-30 15:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbvm.h

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.8 2005/10/24 01:04:36 druzus Exp $
+ * $Id: dbgentry.c,v 1.9 2005/10/26 23:04:37 likewolf Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 #define FILENAME_EQUAL(s1, s2) ( !hb_stricmp( (s1), (s2) ) )
 #endif
 
+#ifdef DEBUGGER_USES_GC
 
 #define ALLOC( size ) \
    hb_gcLock( hb_gcAlloc( size, NULL ) )
@@ -80,6 +81,15 @@
 #define STRNDUP( dest, source, len ) \
    ( ( dest = strncpy( (char *) ALLOC( len + 1 ), source, len ) ), \
      ( dest[ len ] = '\0' ) )
+
+#else
+
+#define ALLOC hb_xgrab
+#define FREE hb_xfree
+#define STRDUP hb_strdup
+#define STRNDUP( dest, source, len ) ( dest = hb_strndup( (source), (len) ) )
+
+#endif
 
 #define ARRAY_ADD( type, array, length ) \
    ( (type *)( array_add( sizeof( type ), (void **)&array, &length ) ) )
@@ -144,6 +154,7 @@ typedef struct
 {
    BOOL bQuit;
    BOOL bGo;
+   BOOL bInside;
    int nBreakPoints;
    HB_BREAKPOINT *aBreak;
    int nTracePoints;
@@ -167,7 +178,7 @@ typedef struct
 } HB_DEBUGINFO;
 
 
-static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static HB_DEBUGINFO *info = &s_Info;
 
 
@@ -205,6 +216,8 @@ static BOOL
 hb_dbgIsInitStatics( void );
 static BOOL
 hb_dbgEqual( HB_ITEM *pItem1, HB_ITEM *pItem2 );
+static void
+hb_dbgQuit( HB_DEBUGINFO *info );
 static PHB_ITEM
 hb_dbgVarGet( HB_VARINFO *scope );
 static void
@@ -400,7 +413,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
    ULONG nProcLevel;
    char szProcName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
 
-   if ( info->bQuit )
+   if ( ( info->bInside || info->bQuit ) && nMode != HB_DBG_VMQUIT )
       return;
 
    switch ( nMode )
@@ -550,6 +563,10 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
 
          info->bCodeBlock = FALSE;
          hb_dbgEndProc( info );
+         return;
+
+      case HB_DBG_VMQUIT:
+         hb_dbgQuit( info );
          return;
    }
 }
@@ -701,6 +718,12 @@ hb_dbgClearWatch( HB_WATCHPOINT *pWatch )
    }
    if ( pWatch->nVars )
    {
+      int i;
+
+      for (i = 0; i < pWatch->nVars; i++)
+      {
+         FREE( pWatch->aVars[ i ] );
+      }
       FREE( pWatch->aVars );
    }
 }
@@ -825,7 +848,9 @@ hb_dbgEval( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
 
       hb_arrayCopy( aVars, aNewVars, NULL, NULL, NULL );
 
+      info->bInside = TRUE;
       xResult = hb_itemDo( watch->pBlock, 1, aNewVars );
+      info->bInside = FALSE;
 
       for ( i = 0; i < watch->nVars; i++ )
       {
@@ -836,6 +861,8 @@ hb_dbgEval( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
          {
             hb_dbgVarSet( &watch->aScopes[ i ], xNewValue );
          }
+         hb_itemRelease( xOldValue );
+         hb_itemRelease( xNewValue );
       }
 
       hb_itemRelease( aVars );
@@ -1222,6 +1249,24 @@ hb_dbgIsInitStatics( void )
 }
 
 
+static void
+hb_dbgQuit( HB_DEBUGINFO *info )
+{
+   while ( info->nWatchPoints )
+   {
+      hb_dbgDelWatch( info, info->nWatchPoints - 1 );
+   }
+   while ( info->nBreakPoints )
+   {
+      hb_dbgDelBreak( info, info->nBreakPoints - 1 );
+   }
+   while ( info->nCallStackLen )
+   {
+      hb_dbgEndProc( info );
+   }
+}
+
+
 HB_EXPORT void
 hb_dbgSetCBTrace( void *handle, BOOL bCBTrace )
 {
@@ -1264,18 +1309,6 @@ hb_dbgSetQuit( void *handle )
    HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
    
    info->bQuit = TRUE;
-   while ( info->nWatchPoints )
-   {
-      hb_dbgDelWatch( info, info->nWatchPoints - 1 );
-   }
-   while ( info->nBreakPoints )
-   {
-      hb_dbgDelBreak( info, info->nBreakPoints - 1 );
-   }
-   while ( info->nCallStackLen )
-   {
-      hb_dbgEndProc( info );
-   }
 }
 
 

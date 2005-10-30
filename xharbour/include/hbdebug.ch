@@ -1,5 +1,5 @@
 /*
- * $Id: hbdebug.ch,v 1.1 2004/01/27 09:56:08 likewolf Exp $
+ * $Id: hbdebug.ch,v 1.2 2005/09/23 21:55:06 likewolf Exp $
  */
 
 /*
@@ -63,5 +63,6 @@
 #define HB_DBG_SHOWLINE       5  /* show current line */
 #define HB_DBG_GETENTRY       6  /* initialize C __dbgEntry function pointer */
 #define HB_DBG_ACTIVATE       7  /* activate debugger interface */
+#define HB_DBG_VMQUIT         8  /* call internal debugger destructors */
 
 #endif /* HB_DEBUGGER_CH_ */
