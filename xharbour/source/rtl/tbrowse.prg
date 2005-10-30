@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.124 2005/10/21 14:37:42 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.126 2005/10/30 13:00:00 ptsarenko Exp $
  */
 
 /*
@@ -664,6 +664,7 @@ METHOD Invalidate() CLASS TBrowse
 
    ::stable := .F.
    ::lRedrawFrame := .T.
+   ::oDataCache:Invalidate()
 
 Return Self
 
