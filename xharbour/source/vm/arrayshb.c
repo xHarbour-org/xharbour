@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.61 2005/10/24 01:04:36 druzus Exp $
+ * $Id: arrayshb.c,v 1.62 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
 #include "hbapierr.h"
 #include "hbapilng.h"
 #include "cstruct.ch"
-
+#include "hbset.h"
 
 /* This function creates an array item using 'iDimension' as an index
  * to retrieve the number of elements from the parameter list.
@@ -297,7 +297,7 @@ HB_FUNC( ADEL )
 HB_FUNC( AFILL )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   PHB_ITEM pValue = NULL;
+   PHB_ITEM pValue;
 
    if( pArray )
    {
@@ -409,10 +409,8 @@ HB_FUNC( ASCAN )
    {
       ULONG ulStart   = hb_parnl( 3 );
       ULONG ulCount   = hb_parnl( 4 );
-      BOOL bExact     = hb_parl( 5 );
-      BOOL bAllowChar = hb_parl( 6 );
 
-      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, bExact, bAllowChar ) );
+      hb_retnl( hb_arrayScan( pArray, pValue, ISNUM( 3 ) ? &ulStart : NULL, ISNUM( 4 ) ? &ulCount : NULL, hb_parl( 5 ), hb_parl( 6 ) ) );
    }
    else
    {
