@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.13 2005/10/18 02:53:57 bdj Exp $
+ * $Id: whatsnew.txt,v 1.14 2005/10/19 10:59:11 bdj Exp $
  */
 
 /*
@@ -16,6 +16,11 @@
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
 
+
+2005-10-31 23:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    * wvw_pbcreate() now support bitmap on buttons.
+    ! wvw_pbsetfocus() and wvw_cbsetfocus() was always returning .f., fixed.
 
 2005-10-19 18:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h

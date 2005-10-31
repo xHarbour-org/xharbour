@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.27 2005/10/24 01:02:50 druzus Exp $
+ * $Id: gtwvw.c,v 1.28 2005/10/26 04:42:22 marcosgambeta Exp $
  */
 
 /*
@@ -1320,6 +1320,7 @@ USHORT HB_GT_FUNC( gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar,
         usTop = usBottom;
         usBottom = temp;
       }
+
       hb_wvw_GTFUNCPrologue(3, &usTop, &usCol, &usBottom, NULL);
     }
 
@@ -2489,6 +2490,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
+
             bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
@@ -2626,6 +2628,7 @@ HB_EXPORT BOOL CALLBACK hb_wvw_gtDlgProcModal( HWND hDlg, UINT message, WPARAM w
             hb_vmPushLong( ( ULONG ) wParam  );
             hb_vmPushLong( ( ULONG ) lParam  );
             hb_vmDo( 4 );
+
             bReturn = hb_itemGetNL( hb_stackReturnItem() );
             hb_vmPopState();
             break;
@@ -5881,6 +5884,7 @@ static void hb_wvw_gtInputNotAllowed( USHORT usWinNum, UINT message, WPARAM wPar
     hb_vmPushLong( ( LONG ) wParam  );
     hb_vmPushLong( ( LONG ) lParam  );
     hb_vmDo( 5 );
+
     bHandled = hb_itemGetL( hb_stackReturnItem() );
     hb_vmPopState();
 
@@ -13185,7 +13189,8 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib)
 static HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
 {
   BITMAP_HANDLE * pbh = s_sApp.pbhBitmapList;
-  BOOL bStrictDimension = !(*piWidth==-1 && *piHeight==-1);
+
+  BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
   while (pbh)
   {
 
@@ -13220,6 +13225,178 @@ static void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int 
   pbhNew->pNext = s_sApp.pbhBitmapList;
 
   s_sApp.pbhBitmapList = pbhNew;
+}
+
+static HBITMAP hPrepareBitmap(char * szBitmap, UINT uiBitmap,
+                              int iExpWidth, int iExpHeight,
+                              BOOL bMap3Dcolors,
+                              HWND hCtrl )
+{
+   HBITMAP hBitmap;
+
+   if (szBitmap)
+   {
+      /* loading from file */
+      int iWidth, iHeight;
+
+      hBitmap = FindBitmapHandle(szBitmap, &iExpWidth, &iExpHeight);
+
+      if (!hBitmap)
+      {
+         BITMAPINFO        * pPackedDib = NULL;
+         HDC                 hdc;
+
+         if (!bMap3Dcolors)
+         {
+
+            pPackedDib = PackedDibLoad (szBitmap) ;
+         }
+
+         if (pPackedDib || bMap3Dcolors)
+         {
+
+              hdc = GetDC (hCtrl) ;
+
+              if (!bMap3Dcolors)
+              {
+
+                 hBitmap = CreateDIBitmap (hdc,
+                                           (PBITMAPINFOHEADER) pPackedDib,
+                                           CBM_INIT,
+                                           PackedDibGetBitsPtr (pPackedDib),
+                                           pPackedDib,
+                                           DIB_RGB_COLORS) ;
+
+                 if (hBitmap==NULL)
+                 {
+                     return NULL;
+                 }
+
+                 iWidth = PackedDibGetWidth(pPackedDib);
+                 iHeight = PackedDibGetHeight(pPackedDib);
+              }
+              else
+              {
+
+                 hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) NULL,
+                                       szBitmap,
+                                       IMAGE_BITMAP,
+                                       iExpWidth,
+                                       iExpHeight,
+
+                                       LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
+
+                 if (hBitmap==NULL)
+                 {
+                     return NULL;
+                 }
+
+                 iWidth = iExpWidth;
+                 iHeight= iExpHeight;
+              }
+
+              if (iExpWidth==0 && iExpHeight==0)
+              {
+                 iWidth = iExpWidth;
+                 iHeight= iExpHeight;
+              }
+
+              if (iExpWidth!=iWidth || iExpHeight!=iHeight)
+              {
+
+                HDC hdcSource, hdcTarget;
+                HBITMAP hBitmap2;
+                BOOL bResult;
+
+                hdcSource = CreateCompatibleDC(hdc);
+                SelectObject(hdcSource, hBitmap);
+
+                hdcTarget = CreateCompatibleDC(hdc);
+                hBitmap2 = CreateCompatibleBitmap(hdcSource, iExpWidth, iExpHeight);
+                SelectObject(hdcTarget, hBitmap2);
+
+                bResult = StretchBlt(
+                                      hdcTarget,      /* handle to destination DC                 */
+                                      0,              /* x-coord of destination upper-left corner */
+                                      0,              /* y-coord of destination upper-left corner */
+                                      iExpWidth,      /* width of destination rectangle           */
+                                      iExpHeight,     /* height of destination rectangle          */
+                                      hdcSource,      /* handle to source DC                      */
+                                      0,              /* x-coord of source upper-left corner      */
+                                      0,              /* y-coord of source upper-left corner      */
+                                      iWidth,         /* width of source rectangle                */
+                                      iHeight,        /* height of source rectangle               */
+                                      SRCCOPY         /* raster operation code                    */
+                                    );
+
+                if (!bResult)
+                {
+
+                  MessageBox( NULL, TEXT( "Cannot shrink/stretch bitmap for WVW Control" ),
+                              szAppName, MB_ICONERROR );
+
+                  DeleteObject(hBitmap2);
+                }
+                else
+                {
+
+                  DeleteObject(hBitmap);
+                  hBitmap = hBitmap2;
+                  iWidth = iExpWidth;
+                  iHeight = iExpHeight;
+                }
+
+                DeleteDC(hdcSource);
+                DeleteDC(hdcTarget);
+
+              }
+
+              ReleaseDC (hCtrl, hdc) ;
+
+              AddBitmapHandle(szBitmap, hBitmap, iWidth, iHeight);
+
+              if (pPackedDib)
+              {
+
+                 hb_xfree (pPackedDib) ;
+              }
+         }
+         else
+         {
+            return NULL;
+         }
+      }
+   }
+
+   else  /* loading from resources */
+   {
+      UINT uiOptions = bMap3Dcolors ? LR_LOADMAP3DCOLORS : LR_DEFAULTCOLOR;
+      char szResname[_MAX_PATH+1];
+      sprintf( szResname, "?%u", uiBitmap );
+
+      hBitmap = FindBitmapHandle(szResname, &iExpWidth, &iExpHeight);
+
+      if (!hBitmap)
+      {
+
+         hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_hInstance,
+                               (LPCTSTR) MAKEINTRESOURCE( (WORD) uiBitmap ),
+                               IMAGE_BITMAP,
+                               iExpWidth,
+                               iExpHeight,
+
+                               uiOptions);
+
+         if (hBitmap==NULL)
+         {
+            return NULL;
+         }
+
+         AddBitmapHandle(szResname, hBitmap, iExpWidth, iExpHeight);
+      }
+   }  /* loading from resources */
+
+   return hBitmap;
 }
 
 /* add one button to existing Toolbar */
@@ -13276,174 +13453,20 @@ static BOOL AddTBButton(HWND hWndToolbar, char * szBitmap, UINT uiBitmap, char *
       iExpWidth = pWindowData->iTBImgWidth;
       iExpHeight = pWindowData->iTBImgHeight;
 
-      if (szBitmap)
+      hBitmap = hPrepareBitmap(szBitmap, uiBitmap,
+                              iExpWidth, iExpHeight,
+                              bMap3Dcolors,
+                              hWndToolbar );
+
+      if (!hBitmap)
       {
-         /* loading from file */
-
-         int iWidth, iHeight;
-
-         hBitmap = FindBitmapHandle(szBitmap, &iExpWidth, &iExpHeight);
-
-         if (!hBitmap)
-         {
-
-            BITMAPINFO        * pPackedDib = NULL;
-            HDC                 hdc;
-
-            if (!bMap3Dcolors)
-            {
-
-               pPackedDib = PackedDibLoad (szBitmap) ;
-
-            }
-
-            if (pPackedDib || bMap3Dcolors)
-            {
-
-                 hdc = GetDC (hWndToolbar) ;
-
-                 if (!bMap3Dcolors)
-                 {
-
-                    hBitmap = CreateDIBitmap (hdc,
-                                              (PBITMAPINFOHEADER) pPackedDib,
-                                              CBM_INIT,
-                                              PackedDibGetBitsPtr (pPackedDib),
-                                              pPackedDib,
-                                              DIB_RGB_COLORS) ;
-
-                    iWidth = PackedDibGetWidth(pPackedDib);
-                    iHeight = PackedDibGetHeight(pPackedDib);
-
-                 }
-                 else
-                 {
-
-                    hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) NULL,
-                                          szBitmap,
-                                          IMAGE_BITMAP,
-                                          iExpWidth,
-                                          iExpHeight,
-
-                                          LR_LOADFROMFILE | LR_LOADMAP3DCOLORS);
-
-                    if (hBitmap==NULL)
-                    {
-                        return FALSE;
-                    }
-
-                    iWidth = iExpWidth;
-                    iHeight= iExpHeight;
-
-                 }
-
-                 if (iExpWidth!=iWidth || iExpHeight!=iHeight)
-                 {
-
-                   HDC hdcSource, hdcTarget;
-                   HBITMAP hBitmap2;
-                   BOOL bResult;
-
-                   hdcSource = CreateCompatibleDC(hdc);
-                   SelectObject(hdcSource, hBitmap);
-
-                   hdcTarget = CreateCompatibleDC(hdc);
-                   hBitmap2 = CreateCompatibleBitmap(hdcSource, iExpWidth, iExpHeight);
-                   SelectObject(hdcTarget, hBitmap2);
-
-                   bResult = StretchBlt(
-                                         hdcTarget,      /* handle to destination DC                 */
-                                         0,              /* x-coord of destination upper-left corner */
-                                         0,              /* y-coord of destination upper-left corner */
-                                         iExpWidth,      /* width of destination rectangle           */
-                                         iExpHeight,     /* height of destination rectangle          */
-                                         hdcSource,      /* handle to source DC                      */
-                                         0,              /* x-coord of source upper-left corner      */
-                                         0,              /* y-coord of source upper-left corner      */
-                                         iWidth,         /* width of source rectangle                */
-                                         iHeight,        /* height of source rectangle               */
-                                         SRCCOPY         /* raster operation code                    */
-                                       );
-
-                   if (!bResult)
-                   {
-
-                     MessageBox( NULL, TEXT( "Cannot shrink/stretch bitmap for Toolbar" ),
-                                 szAppName, MB_ICONERROR );
-
-                     DeleteObject(hBitmap2);
-                   }
-                   else
-                   {
-
-                     DeleteObject(hBitmap);
-                     hBitmap = hBitmap2;
-                     iWidth = iExpWidth;
-                     iHeight = iExpHeight;
-                   }
-
-                   DeleteDC(hdcSource);
-                   DeleteDC(hdcTarget);
-
-                 }
-
-                 ReleaseDC (hWndToolbar, hdc) ;
-
-                 AddBitmapHandle(szBitmap, hBitmap, iWidth, iHeight);
-
-                 if (pPackedDib)
-                 {
-
-                    hb_xfree (pPackedDib) ;
-
-                 }
-            }
-            else
-            {
-               return FALSE;
-            }
-         }
-
-         tbab.hInst = NULL;
-         tbab.nID   = (UINT) hBitmap;
-         iNewBitmap = SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
-
+         return FALSE;
       }
 
-      else  /* loading from resources */
-      {
+      tbab.hInst = NULL;
+      tbab.nID   = (UINT) hBitmap;
+      iNewBitmap = SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
 
-         UINT uiOptions = bMap3Dcolors ? LR_LOADMAP3DCOLORS : LR_DEFAULTCOLOR;
-         char szResname[_MAX_PATH+1];
-         sprintf( szResname, "?%u", uiBitmap );
-
-         hBitmap = FindBitmapHandle(szResname, &iExpWidth, &iExpHeight);
-
-         if (!hBitmap)
-         {
-
-            hBitmap = ( HBITMAP ) LoadImage( ( HINSTANCE ) hb_hInstance,
-                                  (LPCTSTR) MAKEINTRESOURCE( (WORD) uiBitmap ),
-                                  IMAGE_BITMAP,
-                                  iExpWidth,
-                                  iExpHeight,
-
-                                  uiOptions);
-
-            if (hBitmap==NULL)
-            {
-
-               return FALSE;
-            }
-
-            AddBitmapHandle(szResname, hBitmap, iExpWidth, iExpHeight);
-         }
-
-         tbab.hInst = NULL;
-         tbab.nID   = (UINT) hBitmap;
-         iNewBitmap = SendMessage(hWndToolbar, TB_ADDBITMAP, (WPARAM) 1, (WPARAM) &tbab);
-
-      }
    }
    else /* system bitmap */
    {
@@ -14889,7 +14912,8 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
   return( CallWindowProc( (WNDPROC) OldProc, hWnd, message, wParam, lParam ) );
 }
 
-/*WVW_PBcreate( [nWinNum], nTop, nLeft, nBottom, nRight, cText, cImage/nImage, bBlock, aOffset)
+/*WVW_PBcreate( [nWinNum], nTop, nLeft, nBottom, nRight, cText, cImage/nImage, bBlock, aOffset,;
+ *              nStretchBitmap, lMap3Dcolors)
  *create pushbutton for window nWinNum
  *nTop: row of top/left corner (in character unit)
  *nLeft: col of top/left corner (in character unit)
@@ -14897,9 +14921,23 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
  *nRight: col of bottom/right corner (in character unit) defaults==??
  *cText: caption, default == ""
  *
- *reserved for future: (TODO):
+ *
  *cImage: bitmap file name, can be supplied as nImage: bitmap resource id
- *this parm is now ignored
+ *
+ *nStretchBitmap: a number between 0 and 1 (inclusive) as a factor to
+ *                stretch the bitmap.
+ *                1.0: bitmap covers the whole button
+ *                0.5: bitmap covers 50% of button
+ *                0: bitmap is not stretch
+ *               (default is 1)
+ *
+ *lMap3Dcolors: defaults to .f.
+ *           if .t. the following color mapping will be performed:
+ *              RGB(192,192,192) --> COLOR_3DFACE   ("transparent")
+ *              RGB(128,128,128) --> COLOR_3DSHADOW
+ *              RGB(223,223,223) --> COLOR_3DLIGHT
+ *           This might be desirable to have transparent effect.
+ *           LIMITATION: this will work on 256 colored bitmaps only
  *
  *aOffset: array {y1,x1,y2,x2} of offsets to corner pixels, to adjust
  *         dimension of pushbutton.
@@ -14937,9 +14975,8 @@ HB_FUNC( WVW_PBCREATE)
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
-
-   HB_SYMBOL_UNUSED( szBitmap );
-   HB_SYMBOL_UNUSED( uiBitmap );
+   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1;
+   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE;
 
    if (!ISBLOCK(8))
    {
@@ -14990,6 +15027,11 @@ HB_FUNC( WVW_PBCREATE)
 
    iStyle = BS_PUSHBUTTON;
 
+   if (szBitmap || uiBitmap)
+   {
+      iStyle |= BS_BITMAP;
+   }
+
    hWndPB = CreateWindowEx(
        0L,
        "BUTTON",
@@ -15009,6 +15051,28 @@ HB_FUNC( WVW_PBCREATE)
    {
      RECT rXB = { 0 }, rOffXB = { 0 };
      WNDPROC OldProc;
+
+     if (szBitmap || uiBitmap)
+     {
+        HBITMAP  hBitmap;
+        int      iExpWidth, iExpHeight;
+
+        iExpWidth = iRight - iLeft + 1;
+        iExpHeight= iBottom - iTop + 1;
+        hBitmap = hPrepareBitmap(szBitmap, uiBitmap,
+                                dStretch*iExpWidth, dStretch*iExpHeight,
+                                bMap3Dcolors,
+                                hWndPB );
+
+        if (hBitmap)
+        {
+
+          SendMessage(hWndPB,
+                      BM_SETIMAGE,
+                      (WPARAM) IMAGE_BITMAP,
+                      (LPARAM) hBitmap);
+        }
+     }
 
      rXB.top = usTop;     rXB.left= usLeft;
      rXB.bottom=usBottom; rXB.right =usRight;
@@ -15092,7 +15156,8 @@ HB_FUNC( WVW_PBSETFOCUS )
 
   if (hWndPB)
   {
-    hb_retl(hWndPB == SetFocus(hWndPB));
+
+    hb_retl( SetFocus(hWndPB) != NULL );
   }
   else
   {
@@ -16059,7 +16124,7 @@ HB_FUNC( WVW_CBSETFOCUS )
 
   if (hWndCB)
   {
-    hb_retl(hWndCB == SetFocus(hWndCB));
+    hb_retl( SetFocus(hWndCB) != NULL );
   }
   else
   {
