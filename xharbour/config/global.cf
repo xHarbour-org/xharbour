@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.7 2005/09/15 12:55:35 druzus Exp $
+# $Id: global.cf,v 1.8 2005/09/16 22:29:40 druzus Exp $
 #
 
 GRANDP = ../../
@@ -9,9 +9,11 @@ HB_DB_DRIVERS=\
 	nulsys \
 	dbfntx \
 	dbfcdx \
+	dbfdbt \
 	dbffpt \
 	hbsix \
-	hsx \
+	hsx
+
 
 ifneq ($(HB_DB_DRVEXT),)
 HB_DB_DRIVERS += $(HB_DB_DRVEXT)
