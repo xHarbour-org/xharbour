@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.81 2005/10/31 03:51:36 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.82 2005/10/31 07:46:20 ronpinkas Exp $
  */
 
 /*
@@ -441,6 +441,8 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
 PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
+   ULONG ulLen = ( szText ? strlen( szText ) : 0 );
+
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
    if( pItem == NULL )
@@ -448,18 +450,18 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
       pItem = hb_itemNew( NULL );
    }
 
-   HB_STRING_ALLOC( pItem, ( szText ? strlen( szText ) : 0 ) )
+   HB_STRING_ALLOC( pItem, ulLen )
 
-   if( pItem->item.asString.length )
+   if( ulLen )
    {
-      if( pItem->item.asString.length == 1 )
+      if( ulLen == 1 )
       {
          pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
       }
       else
       {
          // Alocation above already set the '\0' terminator!
-         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, pItem->item.asString.length );
+         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
       }
    }
    else
@@ -483,7 +485,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
 
    if( ulLen )
    {
-      if( pItem->item.asString.length == 1 )
+      if( ulLen == 1 )
       {
          pItem->item.asString.value = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
       }
@@ -577,7 +579,6 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
    pItem->item.asString.bStatic = TRUE;
    pItem->item.asString.length  = ulLen;
    pItem->item.asString.value   = szText;
-
 
    return pItem;
 }
