@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.83 2005/10/31 09:07:27 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.84 2005/10/31 20:37:48 ronpinkas Exp $
  */
 
 /*
@@ -445,11 +445,6 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
-   if( pItem == NULL )
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
    // Safety incase of overlaping buffers.
    if( HB_IS_STRING( pItem ) && pItem->item.asString.bStatic == FALSE &&
        szText >= pItem->item.asString.value &&
@@ -460,6 +455,11 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
       hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
 
       return hb_itemPutCPtr( pItem, sCopy, ulLen );
+   }
+
+   if( pItem == NULL )
+   {
+      pItem = hb_itemNew( NULL );
    }
 
    HB_STRING_ALLOC( pItem, ulLen )
@@ -488,11 +488,6 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem == NULL )
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
    // Safety incase of overlaping buffers.
    if( HB_IS_STRING( pItem ) && pItem->item.asString.bStatic == FALSE &&
        szText >= pItem->item.asString.value &&
@@ -503,6 +498,11 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
       hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
 
       return hb_itemPutCPtr( pItem, sCopy, ulLen );
+   }
+
+   if( pItem == NULL )
+   {
+      pItem = hb_itemNew( NULL );
    }
 
    HB_STRING_ALLOC( pItem, ulLen )
