@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.28 2005/10/24 01:04:38 druzus Exp $
+ * $Id: proc.c,v 1.29 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -110,7 +110,7 @@ HB_FUNC( PROCFILE )
 
 /* NOTE: szName size must be an at least: HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 */
 
-char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
+HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase, pSelf;
    USHORT uiSuperClass;

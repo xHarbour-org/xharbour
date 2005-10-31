@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.177 2005/10/31 03:51:36 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.178 2005/10/31 07:46:20 ronpinkas Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ HB_EXTERN_BEGIN
 
 #define HB_STRING_ALLOC( p, len ) \
                \
-               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 ) \
+               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 && len ) \
                { \
                   HB_STRING_REALLOC( p, len ); \
                } \
@@ -674,7 +674,7 @@ extern           void     hb_conXSaveRestRelease( void ); /* release the save/re
 extern char *   hb_compReservedName( char * szName ); /* determines if a string contains a reserve word */
 
 /* misc */
-extern char *   hb_procinfo( int iLevel, char * szName, USHORT *uLine, char *szModuleName ); /* retrieve a procedure source location info */
+HB_EXPORT extern char *   hb_procinfo( int iLevel, char * szName, USHORT *uLine, char *szModuleName ); /* retrieve a procedure source location info */
 
 /* macro compiler */
 
