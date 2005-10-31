@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.48 2005/07/10 03:40:14 lculik Exp $
+ * $Id: errorsys.prg,v 1.49 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -552,14 +552,12 @@ LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
 
          if( hb_stackReturnItem()->type == HB_IT_OBJECT )
          {
-            HB_ITEM Buffer, Adopt;
+            HB_ITEM_NEW( Buffer );
+            HB_ITEM Adopt;
 
             hb_itemForwardValue( &Exception, hb_stackReturnItem() );
 
-            Buffer.type = HB_IT_STRING;
-            Buffer.item.asString.value = (char *) ExceptionInfo;
-            Buffer.item.asString.length = sizeof( EXCEPTION_POINTERS );
-            Buffer.item.asString.bStatic = TRUE;
+            hb_itemPutCLStatic( &Buffer, (char *) ExceptionInfo, sizeof( EXCEPTION_POINTERS ) );
 
             Adopt.type = HB_IT_LOGICAL;
             Adopt.item.asLogical.value = FALSE;

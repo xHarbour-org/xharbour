@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.518 2005/10/30 16:32:01 likewolf Exp $
+ * $Id: hvm.c,v 1.519 2005/10/31 03:51:36 ronpinkas Exp $
  */
 
 /*
@@ -265,7 +265,6 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
 // HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
-static void    hb_itemReleaseStringX( PHB_ITEM pItem );
 
 
 // extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
@@ -3890,38 +3889,6 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
          }
       }
    }
-   /* Intentionally using HB_IS_NUMERIC() instead of HB_IS_NUMBER() on the right
-      Clipper consider DATE + NUMBER => DATE and DATE + DATE => DATE
-   */
-   /*
-   else if( HB_IS_STRING( pLeft ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
-   {
-      BYTE bByte = (BYTE) ( hb_itemGetND( pLeft ) + hb_itemGetND( pRight ) );
-
-      hb_itemClear( pResult );
-
-      pResult->type = HB_IT_STRING;
-      pResult->item.asString.value = hb_vm_acAscii[ bByte ];
-      pResult->item.asString.bStatic = TRUE;
-      pResult->item.asString.length = 1;
-   }
-   else if( ( HB_IS_STRING( pRight ) && HB_IS_NUMERIC( pRight ) ) && HB_IS_NUMINT( pLeft ) )
-   {
-      HB_LONG lNumber1 = hb_itemGetNInt( pLeft );
-      HB_LONG lNumber2 = hb_itemGetNInt( pRight );
-      HB_LONG lResult = lNumber1 + lNumber2;
-
-      if( lNumber2 >= 0 ? lResult >= lNumber1 : lResult < lNumber1 )
-      {
-         hb_itemPutNInt( pResult, lResult );
-      }
-      else
-      {
-         hb_itemPutNDDec( pResult, ( double ) lNumber1 + ( double ) lNumber2, 0 );
-      }
-
-   }
-   */
    else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
       hb_itemPutDL( pResult, (LONG) hb_itemGetND( pLeft ) + (LONG) hb_itemGetND( pRight ) );
@@ -4021,21 +3988,6 @@ static void hb_vmMinus( void )
          hb_errRT_BASE( EG_STROVERFLOW, 1210, NULL, "-", 2, pItem1, pItem2 );
       }
    }
-   /*
-   else if( ( HB_IS_STRING( pItem1 ) || HB_IS_STRING( pItem2 ) ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
-   {
-      double dNumber2 = hb_vmPopNumber();
-
-      pItem1->item.asString.value = hb_vm_acAscii[ (BYTE) ( hb_itemGetND( pItem1 ) - dNumber2 ) ];
-
-      if( pItem1->type != HB_IT_STRING )
-      {
-         pItem1->type = HB_IT_STRING;
-         pItem1->item.asString.bStatic = TRUE;
-         pItem1->item.asString.length = 1;
-      }
-   }
-   */
    else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
       double dNumber2 = hb_vmPopNumber();
@@ -5907,32 +5859,11 @@ static void hb_vmArrayPush( void )
 
       if( (ULONG) lIndex < pArray->item.asString.length )
       {
-         if( pArray->item.asString.bStatic )
-         {
-            pArray->item.asString.value = hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[lIndex] ) ];
-         }
-         else
-         {
-            BYTE cChar = pArray->item.asString.value[lIndex];
-
-            hb_itemReleaseStringX( pArray );
-
-            pArray->item.asString.value   = hb_vm_acAscii[ cChar ];
-            pArray->item.asString.bStatic = TRUE;
-         }
-
-         pArray->item.asString.length  = 1;
+         hb_itemPutCLStatic( pArray, hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[ lIndex ] ) ], 1 );
       }
       else
       {
-         if( pArray->item.asString.bStatic == FALSE )
-         {
-            hb_itemReleaseStringX( pArray );
-         }
-
-         pArray->item.asString.value  = hb_vm_sNull;
-         pArray->item.asString.length = 0;
-         pArray->item.asString.bStatic = TRUE;
+         hb_itemPutCLStatic( pArray, NULL, 0 );
       }
    }
  #endif
@@ -9429,19 +9360,6 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
             hb_dynsymNew( pSymbol, pNewSymbols );
          }
       }
-   }
-}
-
-static void hb_itemReleaseStringX( PHB_ITEM pItem )
-{
-   /*
-   This is a copy of hb_itemReleaseString() with logic for
-   checking bStatic flag removed.
-   */
-   if( --*( pItem->item.asString.pulHolders ) == 0 )
-   {
-      hb_xfree( pItem->item.asString.pulHolders );
-      hb_xfree( pItem->item.asString.value );
    }
 }
 

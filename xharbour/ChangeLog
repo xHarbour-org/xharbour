@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4538 2005/10/31 03:51:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4539 2005/10/31 05:55:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-30 23:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+    + Added missing ()
+  * source/rtl/errorsys.prg
+  * source/vm/arrays.c
+  * source/vm/hvm.c
+  * source/vm/inet.c
+  * source/vm/memvars.c
+    * Replaced more direct string item manipulation to utilize API
+  * source/vm/hvm.c
+    - Removed commented sections and unused function hb_itemReleaseStringX().
+  * source/vm/fastitem.c
+    * Minor revision
 
 2005-10-30 21:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
@@ -23,7 +37,7 @@
   * source/vm/hvm.c
   * source/vm/itemapi.c
   * source/vm/fastitem.c
-    * Replaced all direct item manipulation to utilize API
+    * Replaced all direct string item manipulation to utilize API
     * Centralized string allocation logic by means of above 2 macros
 
   /*

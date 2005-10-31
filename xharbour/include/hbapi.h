@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.176 2005/10/24 01:04:24 druzus Exp $
+ * $Id: hbapi.h,v 1.177 2005/10/31 03:51:36 ronpinkas Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ HB_EXTERN_BEGIN
                   \
                   if( len < LONG_MAX ) \
                   { \
-                     ulAllocate = len << 1; \
+                     ulAllocate = (len) << 1; \
                   } \
                   else \
                   { \
@@ -201,7 +201,7 @@ HB_EXTERN_BEGIN
                   if( len > 1 ) \
                   { \
                      (p)->item.asString.bStatic         = FALSE; \
-                     (p)->item.asString.value           = ( char * ) hb_xgrab( len + 1 ); \
+                     (p)->item.asString.value           = ( char * ) hb_xgrab( (len) + 1 ); \
                      (p)->item.asString.value[ len ]    = '\0'; \
                      (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
                      *( (p)->item.asString.pulHolders ) = 1; \

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.111 2005/10/24 01:04:38 druzus Exp $
+ * $Id: memvars.c,v 1.112 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -946,17 +946,13 @@ char * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen )
 {
    HB_THREAD_STUB
 
-   HB_ITEM itName;
+   HB_ITEM_NEW( itName );
    HB_DYNS_PTR pDynVar;
    char * szValue = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_memvarGetStrValuePtr(%s, %p)", szVarName, pulLen));
 
-   itName.type = HB_IT_STRING;
-   itName.item.asString.value  = szVarName;
-   itName.item.asString.length = *pulLen;
-   itName.item.asString.bStatic = TRUE;
-   itName.item.asString.pulHolders = NULL;
+   hb_itemPutCLStatic( &itName, szVarName, *pulLen );
 
    pDynVar = hb_memvarFindSymbol( &itName );
 

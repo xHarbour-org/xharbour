@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.60 2005/10/05 09:15:04 alexstrickland Exp $
+* $Id: inet.c,v 1.61 2005/10/24 01:04:38 druzus Exp $
 */
 
 /*
@@ -787,10 +787,7 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          iMaxLen = ( int ) pBuffer->item.asString.length;
 #if 0
          /* Should we issue a runtime error? */
-         pBuffer->item.asString.value =
-            ( char * ) hb_xrealloc( pBuffer->item.asString.value, iMaxLen + 1 );
-         pBuffer->item.asString.value[ iMaxLen ] = '\0';
-         pBuffer->item.asString.length = iMaxLen;
+         HB_STRING_REALLOC( pBuffer, iMaxLen );
 #endif
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.80 2005/10/29 18:53:39 likewolf Exp $
+ * $Id: fastitem.c,v 1.81 2005/10/31 03:51:36 ronpinkas Exp $
  */
 
 /*
@@ -479,9 +479,9 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
       pItem = hb_itemNew( NULL );
    }
 
-   HB_STRING_ALLOC( pItem, ( szText ? ulLen : 0 ) )
+   HB_STRING_ALLOC( pItem, ulLen )
 
-   if( pItem->item.asString.length )
+   if( ulLen )
    {
       if( pItem->item.asString.length == 1 )
       {
@@ -490,7 +490,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
       else
       {
          // Alocation above already set the '\0' terminator!
-         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, pItem->item.asString.length );
+         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
       }
    }
    else
