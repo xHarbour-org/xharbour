@@ -1,5 +1,5 @@
 /*
- * $Id: README.txt,v 1.2 2005/10/25 00:51:25 fsgiudice Exp $
+ * $Id: README.txt,v 1.3 2005/10/25 08:36:55 fsgiudice Exp $
  */
 
 /*
@@ -51,6 +51,9 @@ then
 on GNU system use:
    make install
 
+   ** requirements: gd, gd-devel, libpng, libpng-devel, libjpeg, libjpeg-devel,
+                    freetype, freetype-devel, zlib, zlib-devel
+
 DOCUMENTATION
 =============
 
@@ -65,6 +68,11 @@ For samples look at tests dir.
 gdtest.prg is an API test application
 gdtestcls.prg is a GDImage/GDChart Class test application
 test_out.prg is a sample of a cgi application for windows (I have to complete it).
+
+to compile:
+   in Windows/BCC : bldtest.bat <app_without_prg_ext> (for full static)
+                    dll_b32.bat <app_without_prg_ext> (for dll version - needs harbour.dll)
+   in Linux       : . bldtest.sh <app_without_prg_ext>
 
 NOTES
 =====

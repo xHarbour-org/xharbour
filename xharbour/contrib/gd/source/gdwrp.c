@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.2 2005/10/30 01:32:59 fsgiudice Exp $
  */
 
 /*
@@ -98,13 +98,13 @@ static void * LoadImageFromHandle( FHANDLE fhandle, int sz )
 {
    void *iptr;
 
-   if ( fhandle == NULL )
+   if ( !( fhandle ) )
    {
       fhandle = 0; // 0 = std input
    }
 
    /* Read file */
-   ( BYTE *) iptr = ( BYTE * ) hb_xgrab( sz );
+   iptr = ( BYTE * ) hb_xgrab( sz );
    hb_fsReadLarge( fhandle, ( BYTE *) iptr, (ULONG) sz );
    //   TraceLog( NULL, "Error dim %i, read %i", sz, iRead );
 
@@ -121,15 +121,13 @@ static void * LoadImageFromFile( char *szFile, int *sz )
 
    if ( ( fhandle = hb_fsOpen( ( BYTE * ) szFile, FO_READ ) ) != FS_ERROR )
    {
-      int iRead;
-
       /* get lenght */
       *sz = hb_fsSeek( fhandle, 0, FS_END );
       /* rewind */
       hb_fsSeek( fhandle, 0, FS_SET );
 
       /* Read file */
-      ( BYTE *) iptr = ( BYTE * ) hb_xgrab( *sz );
+      iptr = ( BYTE * ) hb_xgrab( *sz );
       hb_fsReadLarge( fhandle, ( BYTE *) iptr, (ULONG) *sz );
       //   TraceLog( NULL, "Error dim %i, read %i", sz, iRead );
 
@@ -145,7 +143,7 @@ static void * LoadImageFromFile( char *szFile, int *sz )
 
 static void SaveImageToHandle( FHANDLE fhandle, void *iptr, int sz )
 {
-   if ( fhandle == NULL )
+   if ( !(fhandle) )
    {
       fhandle = 1; // 1 = std output
    }
@@ -208,7 +206,7 @@ static void GDImageCreateFrom( int nType )
       return;
    }
 
-   if ( iptr != NULL && sz != NULL )
+   if ( iptr && sz )
    {
       /* Create Image */
       switch ( nType )
@@ -715,7 +713,6 @@ HB_FUNC( GDIMAGEPOLYGON ) // original: void gdImagePolygon(gdImagePtr im, gdPoin
       int pointsTotal;
       int color;
       PHB_ITEM pPoints;
-      PHB_ITEM pPoint;
       int i;
 
       /* Max Points of polygon */
@@ -758,7 +755,7 @@ HB_FUNC( GDIMAGEPOLYGON ) // original: void gdImagePolygon(gdImagePtr im, gdPoin
 }
 
 /* ---------------------------------------------------------------------------*/
-
+#if ( GD_VERS >= 2033 )
 HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im, gdPointPtr points, int pointsTotal, int color)
                           // implementation: void gdImageOpenPolygon(gdImagePtr im, gdPointPtr points, int color)
 {
@@ -773,7 +770,6 @@ HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im
       int pointsTotal;
       int color;
       PHB_ITEM pPoints;
-      PHB_ITEM pPoint;
       int i;
 
       /* Max Points of polygon */
@@ -814,7 +810,7 @@ HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im
       }
    }
 }
-
+#endif
 /* ---------------------------------------------------------------------------*/
 
 HB_FUNC( GDIMAGERECTANGLE ) // void gdImageRectangle(gdImagePtr im, int x1, int y1, int x2, int y2, int color)
@@ -922,7 +918,6 @@ HB_FUNC( GDIMAGEFILLEDPOLYGON ) // original: void gdImageFilledPolygon(gdImagePt
       int pointsTotal;
       int color;
       PHB_ITEM pPoints;
-      PHB_ITEM pPoint;
       int i;
 
       /* Max Points of polygon */
@@ -2169,7 +2164,6 @@ HB_FUNC( GDIMAGEGETTHICKNESS ) // void gdImageGetThickness(gdImagePtr im)
       )
    {
       gdImagePtr im;
-      int thickness;
 
       /* Retrieve image pointer */
       im = hb_parptr( 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: gdimage.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -142,7 +142,9 @@ CLASS GDImage
 
    // Functions usefull for polygons
    METHOD Polygon( aPoints, lFilled, color )
+#if ( GD_VERS >= 2033 )   
    METHOD OpenPolygon( aPoints, color )
+#endif   
    METHOD AddPoint( x, y )                 INLINE aAdd( ::aPoints, { x, y } )
    METHOD ResetPoints()                    INLINE ::aPoints := {}
    METHOD Points()                         INLINE Len( ::aPoints )
@@ -305,11 +307,13 @@ METHOD Polygon( aPoints, lFilled, color ) CLASS GDImage
   ENDIF
 RETURN Self
 
+#if ( GD_VERS >= 2033 )
 METHOD OpenPolygon( aPoints, color ) CLASS GDImage
   DEFAULT aPoints TO ::aPoints
   DEFAULT color   TO ::pColor
   gdImageOpenPolygon( ::pImage, aPoints, color )
 RETURN Self
+#endif
 
 METHOD Rectangle( x1, y1, x2, y2, lFilled, color ) CLASS GDImage
   DEFAULT lFilled TO FALSE
@@ -343,7 +347,7 @@ METHOD Ellipse( x, y, nWidth, nHeight, lFilled, color ) CLASS GDImage
 RETURN Self
 
 METHOD LoadFromFile( cFile ) CLASS GDImage
-   LOCAL aLoad, hInfo
+   LOCAL aLoad
    aLoad := gdImageFromFile( cFile )
    //TraceLog( ValToPrg( aLoad ) )
 

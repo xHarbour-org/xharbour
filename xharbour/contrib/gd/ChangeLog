@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.6 2005/10/25 16:07:54 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.7 2005/10/30 01:32:57 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,41 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-31 01:20 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  * contrib/gd/source/gdwrp.c
+  * contrib/gd/source/gdimage.prg
+  * contrib/gd/source/gd.prg
+    * fixed some warnings
+
+  * contrib/gd/include/gd.h
+  * contrib/gd/include/gd.ch
+  * contrib/gd/source/gdimage.c
+  * contrib/gd/source/gdwrp.c
+    * guarded gd version.
+      for linux gd last version is 2.0.28 (i.e. Fedora Core 3)
+      for windows gd last version is 2.0.33
+      if your distribution is different please update header files
+      this is needed because some functions are missing in 2.0.28
+
+  - contrib/gd/Rules.make
+  - contrib/gd/test/Makefile
+  - contrib/gd/test/Makefile.linux
+  - contrib/gd/test/Makefile.mingw32
+  + contrib/gd/test/bldtest.sh
+  + contrib/gd/test/dll_b32.bat
+  + contrib/gd/test/dll_b32.mak
+  + contrib/gd/samples/counter/bldtest.sh
+  + contrib/gd/samples/counter/dll_b32.bat
+  + contrib/gd/samples/counter/dll_b32.mak
+  * contrib/gd/README.txt
+
+    * updated compilation batches for windows dll and linux
+
+      now for windows: bldtest gdtest (full static)
+                       dll_b32 gdtest (dll version - needs harbour.dll)
+          for linux  : . bldtest.sh gdtest
 
 2005-10-30 02:32 UTC+0200 Francesco Saverio Giudice <info@fsgiudice.com>
 

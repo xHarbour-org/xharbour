@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: gd.ch,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -56,6 +56,11 @@
  *
  */
 
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+  #define GD_VERS  2033
+#else
+  #define GD_VERS  2028
+#endif  
 
 /* The maximum number of palette entries in palette-based images.
 	In the wonderful new world of gd 2.0, you can of course have

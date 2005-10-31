@@ -5,6 +5,13 @@ extern "C" {
 #ifndef GD_H
 #define GD_H 1
 
+#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+  #define GD_VERS  2033
+#else
+  #define GD_VERS  2028
+#endif  
+
+
 /* Do the DLL dance: dllexport when building the DLL,
 	dllimport when importing from it, nothing when
 	not on Silly Silly Windows (tm Aardman Productions). */
