@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4536 2005/10/30 16:31:15 likewolf Exp $
+ * $Id: ChangeLog,v 1.4537 2005/10/30 17:08:48 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,68 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-30 19:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbvmpub.h
+    + added memeber "ULONG allocated" to asString structure;
+  * include/hbapi.h
+    + Added HB_STRING_ALLOC( pItem, len ) and HB_STRING_REALLOC( pItem, len )
+  * source/vm/debug.c
+  * source/vm/hvm.c
+  * source/vm/itemapi.c
+  * source/vm/fastitem.c
+    * Replaced all direct item manipulation to utilize API
+    * Centralized string allocation logic by means of above 2 macros
+
+  /*
+     Implementation of HB_STRING_REALLOC is experimental and should be reviewd
+     by the group. The auto expansion factor of doubling was only a tentative
+     value. Such value may be changed to another hard coded value, use some
+     R/T setting, or even be completely conditional using R/T setting.
+
+     The above change was initiated by an observation of an xHarbour user
+     that string concatenations in xHarbour is exponentially slower with larger
+     strings. After above change slow down is linear, as it should be.
+
+     Test used:
+
+        #define LOOPS_1 100000
+        #define LOOPS_2 1000000
+        #define LOOPS_3 10000000
+
+        PROCEDURE Main()
+
+           LOCAL n, cStr, nSec
+
+           cStr := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_1
+              cStr += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+           cStr := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_2
+              cStr += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+           cStr := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_3
+              cStr += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+        RETURN
+   */
 
 2005-10-30 18:07 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c
@@ -107,7 +169,7 @@
   * xharbour/contrib/rdd_ads/rddads.h
     * moved declaration of public variables to header file to avoid possible
       problems with different version in each file
-    + added ADS_USE_OEM_TRANSLATION macro set by default when 
+    + added ADS_USE_OEM_TRANSLATION macro set by default when
       ADS_REQUIRE_VERSION >= 6 && defined( HB_OS_WIN_32 )
       If someone want then can add such translation also to older ADS
       versions without accessing new ADS functions - I do not see any
@@ -155,7 +217,7 @@
 
   * xharbour/source/compiler/harbour.c
     * use HB_FS_LOCAL symbol scope attribute instead of (PHB_DYNS) 1
-  
+
   * xharbour/source/rtl/win32ole.prg
     * cleaned code to avoid broken strict-aliasing GCC warnings
 

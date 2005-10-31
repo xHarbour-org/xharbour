@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.175 2005/10/19 02:18:54 druzus Exp $
+ * $Id: hbapi.h,v 1.176 2005/10/24 01:04:24 druzus Exp $
  */
 
 /*
@@ -142,8 +142,9 @@ HB_EXTERN_BEGIN
                                       ( HB_LONG ) p->item.asInteger.value : \
                                       ( HB_LONG ) p->item.asLong.value )
 
-#define HB_ITEM_PUT_NUMINTRAW( p, v )  \
-               do { \
+#define HB_ITEM_PUT_NUMINTRAW( p, v ) \
+               do \
+               { \
                   if( HB_LIM_INT( v ) ) \
                   { \
                      (p)->type = HB_IT_INTEGER; \
@@ -156,7 +157,61 @@ HB_EXTERN_BEGIN
                      (p)->item.asLong.value = (v); \
                      (p)->item.asLong.length = HB_LONG_LENGTH( v ); \
                   } \
-               } while ( 0 )
+               } \
+               while( 0 )
+
+#define HB_STRING_REALLOC( p, len ) \
+               \
+               if( (p)->item.asString.allocated <= len ) \
+               { \
+                  ULONG ulAllocate; \
+                  \
+                  if( len < LONG_MAX ) \
+                  { \
+                     ulAllocate = len << 1; \
+                  } \
+                  else \
+                  { \
+                     ulAllocate = len; \
+                  } \
+                  \
+                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate ); \
+                  (p)->item.asString.allocated = ulAllocate; \
+               } \
+               \
+               (p)->item.asString.value[ len ] = '\0'; \
+               (p)->item.asString.length = len;
+
+#define HB_STRING_ALLOC( p, len ) \
+               \
+               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 ) \
+               { \
+                  HB_STRING_REALLOC( p, len ); \
+               } \
+               else \
+               { \
+                  if( HB_IS_COMPLEX( p ) ) \
+                  { \
+                     hb_itemClear( p ); \
+                  } \
+                  \
+                  (p)->type = HB_IT_STRING; \
+                  (p)->item.asString.length = len; \
+                  \
+                  if( len > 1 ) \
+                  { \
+                     (p)->item.asString.bStatic         = FALSE; \
+                     (p)->item.asString.value           = ( char * ) hb_xgrab( len + 1 ); \
+                     (p)->item.asString.value[ len ]    = '\0'; \
+                     (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
+                     *( (p)->item.asString.pulHolders ) = 1; \
+                     (p)->item.asString.allocated       = len; \
+                  } \
+                  else \
+                  { \
+                     (p)->item.asString.bStatic = TRUE; \
+                  } \
+               }
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
 

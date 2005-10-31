@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.18 2005/09/27 05:24:55 paultucker Exp $
+ * $Id: debug.c,v 1.19 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -63,21 +63,16 @@
  * $End$ */
 static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 {
-   HB_ITEM Temp;
+   HB_ITEM_NEW( Temp );
 
    HB_TRACE(HB_TR_DEBUG, ("AddToArray(%p, %p, %lu)", pItem, pReturn, ulPos));
 
    if( pItem->type == HB_IT_SYMBOL )
-   {                                            /* Symbol is pushed as text */
-	 (&Temp)->type = HB_IT_STRING;
-      (&Temp)->item.asString.length = strlen( pItem->item.asSymbol.value->szName ) + 2;
-      (&Temp)->item.asString.value = ( char * ) hb_xgrab( (&Temp)->item.asString.length + 1 );
+   {
+      /* Symbol is pushed as text */
+      HB_STRING_ALLOC( &Temp, strlen( pItem->item.asSymbol.value->szName ) + 2 )
 
       sprintf( (&Temp)->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
-
-      (&Temp)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( (&Temp)->item.asString.pulHolders ) = 1;
-      (&Temp)->item.asString.bStatic         = FALSE;
 
       hb_arraySetForward( pReturn, ulPos, &Temp );
       // hb_itemRelease( pTemp );               /* Get rid of temporary str.*/

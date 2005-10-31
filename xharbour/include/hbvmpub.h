@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.41 2005/10/24 01:04:25 druzus Exp $
+ * $Id: hbvmpub.h,v 1.42 2005/10/29 06:42:17 druzus Exp $
  */
 
 /*
@@ -192,6 +192,7 @@
       char            *value;
       BOOL            bStatic;
       HB_COUNTER      *pulHolders; /* number of holders of this string */
+      ULONG           allocated;
    };
 
    struct hb_struSymbol

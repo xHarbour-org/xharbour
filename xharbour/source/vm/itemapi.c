@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.121 2005/10/24 01:04:38 druzus Exp $
+ * $Id: itemapi.c,v 1.122 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -1281,15 +1281,14 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
       {
          char *sString = ( char* ) hb_xgrab( pItem->item.asString.length + 1 );
 
-         memcpy( sString, pItem->item.asString.value, pItem->item.asString.length + 1 );
+         hb_xmemcpy( (void *) sString, (void *) pItem->item.asString.value, pItem->item.asString.length );
+
          if( !pItem->item.asString.bStatic )
          {
             --( *pItem->item.asString.pulHolders );
          }
-         pItem->item.asString.value = sString;
-         pItem->item.asString.bStatic = FALSE;
-         pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-         *pItem->item.asString.pulHolders = 1;
+
+         hb_itemPutCL( pItem, sString, pItem->item.asString.length );
       }
    }
 
