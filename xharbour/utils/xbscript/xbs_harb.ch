@@ -2024,7 +2024,7 @@
 
          if( i > 0 )
          {
-            if( ISBYREF( 1 )
+            if( ISBYREF( 1 ) )
             {
                hb_storclen( pLine->item.asString.value + i, iLen - i, 1 );
             }
@@ -2033,7 +2033,7 @@
          pTmp = ( char * ) hb_xgrab( i + 1 );
          memset( pTmp, ' ', i );
 
-         if( ISBYREF( 2 )
+         if( ISBYREF( 2 ) )
          {
             hb_storclen( pTmp, i, 2 );
          }
@@ -2073,17 +2073,17 @@
             pString[i] = '\0';
          }
 
-         if( ISBYREF( 1 )
+         if( ISBYREF( 1 ) )
          {
             hb_storclen( pString, i, 1 );
          }
 
-         if( ISBYREF( 2 )
+         if( ISBYREF( 2 ) )
          {
             char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
             memset( pTmp, ' ', iLen - i );
-            hb_storcLenAdopt( pTmp, iLen - i, 2 );
+            hb_storclenAdopt( pTmp, iLen - i, 2 );
          }
 
          #ifdef __XHARBOUR__
@@ -2121,7 +2121,7 @@
             pString[i] = '\0';
          }
 
-         if( ISBYREF( 1 )
+         if( ISBYREF( 1 ) )
          {
             hb_storclen( pString, i, 1 );
          }
