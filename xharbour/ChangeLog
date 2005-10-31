@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4546 2005/10/31 14:08:55 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4548 2005/10/31 18:40:33 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-31 12:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+    * Refinment to last correction
+
+  * source/vm/fastitem.c
+    + Added protection afainst overlapping buffers in hb_itemPutC() and hb_itemPutCL()
+      /* This fixes very intresting traps. */
+
+  * utils/xbscript/xbs_harb.ch
+    * Minor similification
+  * utils/xbscript/xbscript.prg
+    + Added missing GenCode arg to ErrorNew() calls
 
 2005-10-31 19:40 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/codepage/cpitiso.c

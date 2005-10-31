@@ -583,19 +583,19 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       PP_InitStd()
 
       IF Len( aDefRules ) != Len( aDefResults )
-         Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
          // Safety
          BREAK
       ENDIF
 
       IF Len( aTransRules ) != Len( aTransResults )
-         Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
          // Safety
          BREAK
       ENDIF
 
       IF Len( aCommRules ) != Len( aCommResults )
-         Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
          // Safety
          BREAK
       ENDIF
@@ -777,7 +777,7 @@ FUNCTION PP_ExecMethod( sProcName, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       //Inkey(0)
       PP_ExecProcedure( s_aProcedures, nProc )
    ELSE
-      Eval( s_bRTEBlock, ErrorNew( [PP], 1004, sProcName, [Missing Method: ], s_aParams ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1004, sProcName, [Missing Method: ], s_aParams ) )
       // Safety
       BREAK
    ENDIF
@@ -1088,7 +1088,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
          // Do nothing.
       ELSE
 
-          Eval( ErrorBlock(), ErrorNew( [PP], 1005, ProcName(), [Unsupported OPCode.], { s_aProc, nBlock } ) )
+          Eval( ErrorBlock(), ErrorNew( [PP], 0, 1005, ProcName(), [Unsupported OPCode.], { s_aProc, nBlock } ) )
           // Safety
           BREAK
 
@@ -1612,7 +1612,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      IF s_nFlowId > 0 .AND. s_acFlowType[ s_nFlowId ] == "E"
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_ENDFOREACH, nLine } ) // Register Recovery Address and Catch Var.
                      ELSEIF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "F"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2029, [Parse], [NEXT does not match FOR], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2029, [Parse], [NEXT does not match FOR], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1660,7 +1660,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CATCH"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "T"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2046, [Parse], [CATCH with no TRY in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [CATCH with no TRY in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1676,7 +1676,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__RECOVER"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "B"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2046, [Parse], [RECOVER with no BEGIN SEQUENCE in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [RECOVER with no BEGIN SEQUENCE in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1709,7 +1709,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__LOOP"
 
                      IF s_nCompLoop == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2012, [Parse], [LOOP with no loop in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2012, [Parse], [LOOP with no loop in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1728,7 +1728,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__EXIT"
 
                      IF s_nCompLoop == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2011, [Parse], [EXIT with no loop in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2011, [Parse], [EXIT with no loop in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1741,7 +1741,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ENDDO"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "W"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2028, [Parse], [ENDDO does not match WHILE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2028, [Parse], [ENDDO does not match WHILE], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1773,7 +1773,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CASE"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2031, [Parse], [CASE does not match DO CASE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [CASE does not match DO CASE], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1790,7 +1790,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__OTHERWISE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2031, [Parse], [OTHERWISE does not match DO CASE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [OTHERWISE does not match DO CASE], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1809,7 +1809,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ENDCASE"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2030, [Parse], [ENDCASE with no DO CASE in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2030, [Parse], [ENDCASE with no DO CASE in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1841,7 +1841,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSEIF"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2026, [Parse], [ELSEIF does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2026, [Parse], [ELSEIF does not match IF], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1858,7 +1858,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2025, [Parse], [ELSE does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2025, [Parse], [ELSE does not match IF], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1874,7 +1874,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__ENDIF"
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2027, [Parse], [ENDIF does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [ENDIF does not match IF], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1894,7 +1894,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__END"
 
                      IF s_nFlowId == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 2027, [Parse], [END with no Flow-Control structure in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [END with no Flow-Control structure in sight!], sBlock ) )
                         // Safety
                         BREAK
                      ELSE
@@ -2129,7 +2129,7 @@ PROCEDURE PP_LocalParams( aVars )
 
          aAdd( s_asLocals, cVar )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2169,7 +2169,7 @@ PROCEDURE PP_Params( aVars )
 
          aAdd( s_asPrivates, cVar )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2034, cVar, [ Declared Parameter redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2208,7 +2208,7 @@ PROCEDURE PP_Privates( aVars )
 
          aAdd( s_asPrivates, cVar )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2016, cVar, [ Private redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2016, cVar, [ Private redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2247,7 +2247,7 @@ PROCEDURE PP_Locals( aVars )
 
          aAdd( s_asLocals, cVar )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2016, cVar, [ Local redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2016, cVar, [ Local redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2285,7 +2285,7 @@ PROCEDURE PP_Publics( aVars )
 
          aAdd( s_asPublics, cVar )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2016, cVar, [ Public redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2016, cVar, [ Public redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2331,7 +2331,7 @@ PROCEDURE PP_Statics( aVars )
 
          aAdd( s_aStatics, { cVar, NIL } )
       ELSE
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2034, cVar, [ Declared Static redeclaration: ], aVars ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2034, cVar, [ Declared Static redeclaration: ], aVars ) )
          // Safety
          BREAK
       ENDIF
@@ -2369,19 +2369,19 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
          InitRunResults()
 
          IF Len( aDefRules ) != Len( aDefResults )
-            Eval( ErrorBlock(), ErrorNew( [PP], 9001, [Rules], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+            Eval( ErrorBlock(), ErrorNew( [PP], 0, 9001, [Rules], [#DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
             // Safety
             BREAK
          ENDIF
 
          IF Len( aTransRules ) != Len( aTransResults )
-            Eval( ErrorBlock(), ErrorNew( [PP], 9001, [Rules], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+            Eval( ErrorBlock(), ErrorNew( [PP], 0, 9001, [Rules], [#TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
             // Safety
             BREAK
          ENDIF
 
          IF Len( aCommRules ) != Len( aCommResults )
-            Eval( ErrorBlock(), ErrorNew( [PP], 9001, [Rules], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+            Eval( ErrorBlock(), ErrorNew( [PP], 0, 9001, [Rules], [#COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
             // Safety
             BREAK
          ENDIF
@@ -2605,7 +2605,7 @@ FUNCTION __SetEnd()
    IF nIf > 0
       nIf--
    ELSE
-      Eval( s_bRTEBlock, ErrorNew( [PP], 9002, [Flow], [END with no IF in sight!] ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 9002, [Flow], [END with no IF in sight!] ) )
       // Safety
       BREAK
    ENDIF
@@ -2657,7 +2657,7 @@ FUNCTION __SetEndCase()
    IF nIf > 0
       nIf--
    ELSE
-      Eval( s_bRTEBlock, ErrorNew( [PP], 9002, [Flow], [ENDCAE with no DOCASE in sight!] ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 9002, [Flow], [ENDCAE with no DOCASE in sight!] ) )
       // Safety
       BREAK
    ENDIF
@@ -2814,7 +2814,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    ENDIF
 
    IF hSource == -1
-      Eval( s_bRTEBlock, ErrorNew( [PP], 3007, sSource, [ERROR! opening: ] + Str( FError(), 2 ),  ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3007, sSource, [ERROR! opening: ] + Str( FError(), 2 ),  ) )
       // Safety
       BREAK
    ENDIF
@@ -2839,7 +2839,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
             hPP := FCreate( sSource + sPPOExt )
          ENDIF
          IF hPP == -1
-            Eval( s_bRTEBlock, ErrorNew( [PP], 3006, sSource + sPPOExt, [Can't create preprocessed output file: ] + Str( FError(), 2 ),  ) )
+            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3006, sSource + sPPOExt, [Can't create preprocessed output file: ] + Str( FError(), 2 ),  ) )
             // Safety
             BREAK
          ENDIF
@@ -2862,123 +2862,170 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
    BEGIN SEQUENCE
 
-   WHILE ( nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE ) ) > 2
-      nPosition := 1
-      nMaxPos   := nLen - 1
+      WHILE ( nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE ) ) > 2
+         nPosition := 1
+         nMaxPos   := nLen - 1
 
-      WHILE nPosition < nMaxPos
+         WHILE nPosition < nMaxPos
 
-          cPrev := cChar
-          cChar := SubStr( sBuffer, nPosition, 1 )
+             cPrev := cChar
+             cChar := SubStr( sBuffer, nPosition, 1 )
 
-          DO CASE
-             CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '*' )
-                nPosition++
+             DO CASE
+                CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '*' )
+                   nPosition++
 
-                WHILE .T.
-                   nClose := At( "*/", sBuffer, nPosition + 1 )
+                   WHILE .T.
+                      nClose := At( "*/", sBuffer, nPosition + 1 )
 
-                   IF nClose == 0
-                      nNext := nPosition + 2
-                      WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0
-                         nLine++
-                         IF bCount
-                            @ Row(), 0 SAY nLine
-                         ENDIF
-
-                         IF bBlanks
-                            FWrite( hPP, CRLF )
-                            IF lMaintainPending
-                               aAdd( aPendingLines, "" )
+                      IF nClose == 0
+                         nNext := nPosition + 2
+                         WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0
+                            nLine++
+                            IF bCount
+                               @ Row(), 0 SAY nLine
                             ENDIF
-                         ENDIF
 
-                         nNext++
-                      ENDDO
-
-                      //FSeek( hSource, -1, 1 )
-                      nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      IF nLen < 2
-                         Eval( s_bRTEBlock, ErrorNew( [PP], 2083, [Pre-Process], [Unterminated /* */ comment],  ) )
-                         // Safety
-                         BREAK
-                      ENDIF
-
-                      nMaxPos   := nLen - 1
-                      //TraceLog( "***" )
-                      nPosition := 0
-                      LOOP
-                   ELSE
-                      nNext := nPosition + 1
-                      nClose -= nPosition
-
-                      WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0 .AND. ( nNext - nPosition ) <= nClose + 1
-                         nLine++
-                         IF bCount
-                            @ Row(), 0 SAY nLine
-                         ENDIF
-                         IF bBlanks
-                            FWrite( hPP, CRLF )
-                            IF lMaintainPending
-                               aAdd( aPendingLines, "" )
+                            IF bBlanks
+                               FWrite( hPP, CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, "" )
+                               ENDIF
                             ENDIF
-                         ENDIF
-                         nNext++
-                      ENDDO
 
-                      nPosition += ( nClose + 1 )
-                      cChar := ''
-                      EXIT
-                   ENDIF
-                ENDDO
-
-             CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '/' )
-                nPosition++
-                WHILE .T.
-                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
-
-                   IF nClose == 0
-                      //FSeek( hSource, -1, 1 )
-                      nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      IF nLen < 2
-                         BREAK "//"
-                      ENDIF
-                      nMaxPos   := nLen - 1
-                      //TraceLog( "***" )
-                      nPosition := 0
-                      LOOP
-                   ELSE
-                      nClose -= nPosition
-                      nLine++
-
-                      IF bCount
-                         @ Row(), 0 SAY nLine
-                      ENDIF
-
-                      DropTrailingWS( @sLine, @sRight )
-
-                      IF Right( sLine, 1 ) == ';'
-                         nLen  := Len( sLine )
-                         sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
-                         IF bBlanks
-                            FWrite( hPP, CRLF )
-                            IF lMaintainPending
-                               aAdd( aPendingLines, "" )
-                            ENDIF
-                         ENDIF
-
-                         /* Right after the NL */
-                         nPosition += ( nClose + 1 )
-
-                         /* Skip leading spaces in continued next line. */
-                         WHILE SubStr( sBuffer, nPosition, 1 ) $ ' ' + Chr(9)
-                            nPosition++
+                            nNext++
                          ENDDO
-                         nPosition--
-                         //sLine += sRight
-                         cChar := ' '
-                         EXIT
+
+                         //FSeek( hSource, -1, 1 )
+                         nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         IF nLen < 2
+                            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2083, [Pre-Process], [Unterminated /* */ comment],  ) )
+                            // Safety
+                            BREAK
+                         ENDIF
+
+                         nMaxPos   := nLen - 1
+                         //TraceLog( "***" )
+                         nPosition := 0
+                         LOOP
                       ELSE
+                         nNext := nPosition + 1
+                         nClose -= nPosition
+
+                         WHILE ( nNext := At( Chr(10), sBuffer, nNext ) ) > 0 .AND. ( nNext - nPosition ) <= nClose + 1
+                            nLine++
+                            IF bCount
+                               @ Row(), 0 SAY nLine
+                            ENDIF
+                            IF bBlanks
+                               FWrite( hPP, CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, "" )
+                               ENDIF
+                            ENDIF
+                            nNext++
+                         ENDDO
+
+                         nPosition += ( nClose + 1 )
+                         cChar := ''
+                         EXIT
+                      ENDIF
+                   ENDDO
+
+                CASE ( cChar == '/' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '/' )
+                   nPosition++
+                   WHILE .T.
+                      nClose := At( Chr(10), sBuffer, nPosition + 1 )
+
+                      IF nClose == 0
+                         //FSeek( hSource, -1, 1 )
+                         nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         IF nLen < 2
+                            BREAK "//"
+                         ENDIF
+                         nMaxPos   := nLen - 1
+                         //TraceLog( "***" )
+                         nPosition := 0
+                         LOOP
+                      ELSE
+                         nClose -= nPosition
+                         nLine++
+
+                         IF bCount
+                            @ Row(), 0 SAY nLine
+                         ENDIF
+
+                         DropTrailingWS( @sLine, @sRight )
+
+                         IF Right( sLine, 1 ) == ';'
+                            nLen  := Len( sLine )
+                            sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
+                            IF bBlanks
+                               FWrite( hPP, CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, "" )
+                               ENDIF
+                            ENDIF
+
+                            /* Right after the NL */
+                            nPosition += ( nClose + 1 )
+
+                            /* Skip leading spaces in continued next line. */
+                            WHILE SubStr( sBuffer, nPosition, 1 ) $ ' ' + Chr(9)
+                               nPosition++
+                            ENDDO
+                            nPosition--
+                            //sLine += sRight
+                            cChar := ' '
+                            EXIT
+                         ELSE
+                            IF LTrim( sLine ) == ''
+                               IF bBlanks
+                                  FWrite( hPP, CRLF )
+                                  IF lMaintainPending
+                                     aAdd( aPendingLines, "" )
+                                  ENDIF
+                               ENDIF
+                            ELSE
+                               IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                                  sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                                  IF bBlanks .OR. ! ( sLine == '' )
+                                     FWrite( hPP, sLine + CRLF )
+                                     IF lMaintainPending
+                                        aAdd( aPendingLines, sLine )
+                                     ENDIF
+                                  ENDIF
+                               ENDIF
+                            ENDIF
+
+                            nPosition += ( nClose )
+                            sLine := ''
+                            cChar := ''
+                            EXIT
+                         ENDIF
+                      ENDIF
+                   ENDDO
+
+                CASE ( cChar == '&' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '&' )
+                   nPosition++
+                   WHILE .T.
+                      nClose := At( Chr(10), sBuffer, nPosition + 1 )
+
+                      IF nClose == 0
+                         //FSeek( hSource, -1, 1 )
+                         nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         IF nLen < 2
+                            BREAK "&&"
+                         ENDIF
+                         nMaxPos   := nLen - 1
+                         nPosition := 0
+                         LOOP
+                      ELSE
+                         nClose -= nPosition
+                         nLine++
+                         IF bCount
+                            @ Row(), 0 SAY nLine
+                         ENDIF
                          IF LTrim( sLine ) == ''
                             IF bBlanks
                                FWrite( hPP, CRLF )
@@ -2997,62 +3044,49 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                                ENDIF
                             ENDIF
                          ENDIF
-
                          nPosition += ( nClose )
                          sLine := ''
                          cChar := ''
                          EXIT
                       ENDIF
-                   ENDIF
-                ENDDO
+                   ENDDO
 
-             CASE ( cChar == '&' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '&' )
-                nPosition++
-                WHILE .T.
-                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
+                CASE ( cChar == '*' )
+                   IF LTrim( sLine ) == ''
+                      WHILE .T.
+                         nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
-                   IF nClose == 0
-                      //FSeek( hSource, -1, 1 )
-                      nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      IF nLen < 2
-                         BREAK "&&"
-                      ENDIF
-                      nMaxPos   := nLen - 1
-                      nPosition := 0
-                      LOOP
-                   ELSE
-                      nClose -= nPosition
-                      nLine++
-                      IF bCount
-                         @ Row(), 0 SAY nLine
-                      ENDIF
-                      IF LTrim( sLine ) == ''
-                         IF bBlanks
-                            FWrite( hPP, CRLF )
-                            IF lMaintainPending
-                               aAdd( aPendingLines, "" )
+                         IF nClose == 0
+                            //FSeek( hSource, -1, 1 )
+                            nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                            IF nLen < 2
+                               BREAK "*"
                             ENDIF
-                         ENDIF
-                      ELSE
-                         IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
-                            sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                            IF bBlanks .OR. ! ( sLine == '' )
-                               FWrite( hPP, sLine + CRLF )
+                            nMaxPos   := nLen - 1
+                            nPosition := 1
+                            LOOP
+                         ELSE
+                            nClose -= nPosition
+                            nLine++
+                            IF bCount
+                               @ Row(), 0 SAY nLine
+                            ENDIF
+                            IF bBlanks
+                               FWrite( hPP, CRLF )
                                IF lMaintainPending
-                                  aAdd( aPendingLines, sLine )
+                                  aAdd( aPendingLines, "" )
                                ENDIF
                             ENDIF
+                            nPosition += ( nClose )
+                            sLine := ''
+                            cChar := ''
+                            EXIT
                          ENDIF
-                      ENDIF
-                      nPosition += ( nClose )
-                      sLine := ''
-                      cChar := ''
-                      EXIT
+                      ENDDO
                    ENDIF
-                ENDDO
 
-             CASE ( cChar == '*' )
-                IF LTrim( sLine ) == ''
+             #ifdef __PLATFORM__UNIX
+                CASE ( nLine == 0 .AND. nPosition == 1 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
                    WHILE .T.
                       nClose := At( Chr(10), sBuffer, nPosition + 1 )
 
@@ -3060,7 +3094,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          //FSeek( hSource, -1, 1 )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
-                            BREAK "*"
+                            BREAK "#!"
                          ENDIF
                          nMaxPos   := nLen - 1
                          nPosition := 1
@@ -3083,155 +3117,153 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          EXIT
                       ENDIF
                    ENDDO
-                ENDIF
+             #endif
 
-          #ifdef __PLATFORM__UNIX
-             CASE ( nLine == 0 .AND. nPosition == 1 .AND. cChar == '#' .AND. SubStr( sBuffer, nPosition + 1, 1 ) == '!' )
-                WHILE .T.
-                   nClose := At( Chr(10), sBuffer, nPosition + 1 )
+                CASE ( cChar == '"' )
+                   WHILE .T.
+                      nClose := At( '"', sBuffer, nPosition + 1 )
+                      nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
 
-                   IF nClose == 0
-                      //FSeek( hSource, -1, 1 )
-                      nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      IF nLen < 2
-                         BREAK "#!"
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
+                         EXIT
                       ENDIF
-                      nMaxPos   := nLen - 1
-                      nPosition := 1
+
+                      IF nClose == 0
+                         sTmp      := SubStr( sBuffer, nPosition )
+                         nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer   := sTmp + sBuffer
+                         nMaxPos   := nLen - 1
+                         nPosition := 1
+                         LOOP
+                      ELSE
+                         nClose    -= nPosition
+                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         nPosition += ( nClose )
+                         EXIT
+                      ENDIF
+                   ENDDO
+
+                CASE ( cChar == "'" )
+                   WHILE .T.
+                      nClose   := At( "'", sBuffer, nPosition + 1 )
+                      nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
+
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
+                         EXIT
+                      ENDIF
+
+                      IF nClose == 0
+                         sTmp      := SubStr( sBuffer, nPosition )
+                         nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer   := sTmp + sBuffer
+                         nMaxPos   := nLen - 1
+                         nPosition := 1
+                         LOOP
+                      ELSE
+                         nClose    -= nPosition
+                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         nPosition += ( nClose )
+                         EXIT
+                      ENDIF
+                   ENDDO
+
+                CASE ( cChar == '[' )
+                   IF LTrim( sLine ) = "#" .OR. ( IsAlpha( cPrev ) .OR. IsDigit( cPrev ) .OR. cPrev $ "])}._"  )
+                      sLine += cChar
+                      nPosition++
                       LOOP
-                   ELSE
-                      nClose -= nPosition
-                      nLine++
-                      IF bCount
-                         @ Row(), 0 SAY nLine
+                   ENDIF
+
+                   WHILE .T.
+                      nClose   := At( ']', sBuffer, nPosition + 1 )
+                      nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
+
+                      IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
+                         EXIT
                       ENDIF
+
+                      IF nClose == 0
+                         sTmp      := SubStr( sBuffer, nPosition )
+                         nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
+                         sBuffer   := sTmp + sBuffer
+                         nMaxPos   := nLen - 1
+                         nPosition := 1
+                         LOOP
+                      ELSE
+                         nClose    -= nPosition
+                         sLine     += SubStr( sBuffer, nPosition, nClose )
+                         nPosition += ( nClose )
+                         EXIT
+                      ENDIF
+                   ENDDO
+
+                   IF nClose > 0 .AND. nClose < nNewLine
+                      cChar := ']'
+                   ENDIF
+
+                CASE cChar == Chr(9)
+                   sLine += "    "
+                   cChar := ''
+
+                CASE cChar == Chr(10)
+                   DropTrailingWS( @sLine, @sRight )
+
+                   nLine++
+                   IF bCount
+                      @ Row(), 0 SAY nLine
+                   ENDIF
+
+                   IF Right( sLine, 1 ) == ';'
+                      nLen  := Len( sLine )
+                      sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
                       IF bBlanks
                          FWrite( hPP, CRLF )
                          IF lMaintainPending
                             aAdd( aPendingLines, "" )
                          ENDIF
                       ENDIF
-                      nPosition += ( nClose )
+
+                      /* Skip leading spaces in continued next line. */
+                      nPosition++
+                      WHILE SubStr( sBuffer, nPosition, 1 ) $ ' ' + Chr(9)
+                         nPosition++
+                      ENDDO
+                      nPosition--
+                      //sLine += sRight
+                      cChar := ' '
+                   ELSE
+                      IF LTrim( sLine ) == ''
+                         IF bBlanks
+                            FWrite( hPP, CRLF )
+                            IF lMaintainPending
+                               aAdd( aPendingLines, "" )
+                            ENDIF
+                         ENDIF
+                      ELSE
+                         //sLine += sRight
+                         IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
+                            sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
+                            IF bBlanks .OR. ! ( sLine == '' )
+                               FWrite( hPP, sLine + CRLF )
+                               IF lMaintainPending
+                                  aAdd( aPendingLines, sLine )
+                               ENDIF
+                            ENDIF
+                         ENDIF
+                      ENDIF
                       sLine := ''
                       cChar := ''
-                      EXIT
-                   ENDIF
-                ENDDO
-          #endif
-
-             CASE ( cChar == '"' )
-                WHILE .T.
-                   nClose := At( '"', sBuffer, nPosition + 1 )
-                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
-
-                   IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
-                      EXIT
                    ENDIF
 
-                   IF nClose == 0
-                      sTmp      := SubStr( sBuffer, nPosition )
-                      nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      sBuffer   := sTmp + sBuffer
-                      nMaxPos   := nLen - 1
-                      nPosition := 1
-                      LOOP
-                   ELSE
-                      nClose    -= nPosition
-                      sLine     += SubStr( sBuffer, nPosition, nClose )
-                      nPosition += ( nClose )
-                      EXIT
-                   ENDIF
-                ENDDO
-
-             CASE ( cChar == "'" )
-                WHILE .T.
-                   nClose   := At( "'", sBuffer, nPosition + 1 )
-                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
-
-                   IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
-                      EXIT
-                   ENDIF
-
-                   IF nClose == 0
-                      sTmp      := SubStr( sBuffer, nPosition )
-                      nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      sBuffer   := sTmp + sBuffer
-                      nMaxPos   := nLen - 1
-                      nPosition := 1
-                      LOOP
-                   ELSE
-                      nClose    -= nPosition
-                      sLine     += SubStr( sBuffer, nPosition, nClose )
-                      nPosition += ( nClose )
-                      EXIT
-                   ENDIF
-                ENDDO
-
-             CASE ( cChar == '[' )
-                IF LTrim( sLine ) = "#" .OR. ( IsAlpha( cPrev ) .OR. IsDigit( cPrev ) .OR. cPrev $ "])}._"  )
-                   sLine += cChar
+                CASE cChar == Chr(13)
                    nPosition++
                    LOOP
-                ENDIF
 
-                WHILE .T.
-                   nClose   := At( ']', sBuffer, nPosition + 1 )
-                   nNewLine := At( Chr(10), sBuffer, nPosition + 1 )
-
-                   IF nNewLine > 0 .AND. ( nClose == 0 .OR. nClose > nNewLine )
-                      EXIT
+                CASE cChar == Chr(26)
+                   nLine++
+                   IF bCount
+                      @ Row(), 0 SAY nLine
                    ENDIF
-
-                   IF nClose == 0
-                      sTmp      := SubStr( sBuffer, nPosition )
-                      nLen      := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
-                      sBuffer   := sTmp + sBuffer
-                      nMaxPos   := nLen - 1
-                      nPosition := 1
-                      LOOP
-                   ELSE
-                      nClose    -= nPosition
-                      sLine     += SubStr( sBuffer, nPosition, nClose )
-                      nPosition += ( nClose )
-                      EXIT
-                   ENDIF
-                ENDDO
-
-                IF nClose > 0 .AND. nClose < nNewLine
-                   cChar := ']'
-                ENDIF
-
-             CASE cChar == Chr(9)
-                sLine += "    "
-                cChar := ''
-
-             CASE cChar == Chr(10)
-                DropTrailingWS( @sLine, @sRight )
-
-                nLine++
-                IF bCount
-                   @ Row(), 0 SAY nLine
-                ENDIF
-
-                IF Right( sLine, 1 ) == ';'
-                   nLen  := Len( sLine )
-                   sLine := DropTrailingWS( Left( sLine, nLen - 1 ), @sRight )
-                   IF bBlanks
-                      FWrite( hPP, CRLF )
-                      IF lMaintainPending
-                         aAdd( aPendingLines, "" )
-                      ENDIF
-                   ENDIF
-
-                   /* Skip leading spaces in continued next line. */
-                   nPosition++
-                   WHILE SubStr( sBuffer, nPosition, 1 ) $ ' ' + Chr(9)
-                      nPosition++
-                   ENDDO
-                   nPosition--
-                   //sLine += sRight
-                   cChar := ' '
-                ELSE
                    IF LTrim( sLine ) == ''
                       IF bBlanks
                          FWrite( hPP, CRLF )
@@ -3240,7 +3272,6 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          ENDIF
                       ENDIF
                    ELSE
-                      //sLine += sRight
                       IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
                          sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
                          IF bBlanks .OR. ! ( sLine == '' )
@@ -3253,53 +3284,23 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                    ENDIF
                    sLine := ''
                    cChar := ''
-                ENDIF
+             ENDCASE
 
-             CASE cChar == Chr(13)
-                nPosition++
-                LOOP
+             sLine += cChar
+             nPosition++
 
-             CASE cChar == Chr(26)
-                nLine++
-                IF bCount
-                   @ Row(), 0 SAY nLine
-                ENDIF
-                IF LTrim( sLine ) == ''
-                   IF bBlanks
-                      FWrite( hPP, CRLF )
-                      IF lMaintainPending
-                         aAdd( aPendingLines, "" )
-                      ENDIF
-                   ENDIF
-                ELSE
-                   IF bDirectivesOnly == .F. .OR. Left( sLine, 1 ) == '#'
-                      sLine := PP_PreProLine( sLine, nLine, sPath + sSource )
-                      IF bBlanks .OR. ! ( sLine == '' )
-                         FWrite( hPP, sLine + CRLF )
-                         IF lMaintainPending
-                            aAdd( aPendingLines, sLine )
-                         ENDIF
-                      ENDIF
-                   ENDIF
-                ENDIF
-                sLine := ''
-                cChar := ''
-          ENDCASE
+         ENDDO
 
-          sLine += cChar
-          nPosition++
+         FSeek( hSource, -2 + ( nPosition - nMaxPos ), 1 )
 
       ENDDO
 
-      FSeek( hSource, -2 + ( nPosition - nMaxPos ), 1 )
-
-   ENDDO
-
    RECOVER USING oError
+
       IF ValType( oError ) == 'C'
          //TraceLog( "No EOL after: ", cError )
          //Alert( [No EOL after: ] + cError )
-         oError := ErrorNew( [PP], 1002, [Pre-Process], [Missing EOL], { sLine, oError } )
+         oError := ErrorNew( [PP], 0, 1002, [Pre-Process], [Missing EOL], { sLine, oError } )
       ENDIF
 
       IF ValType( oError ) == 'O'
@@ -3452,7 +3453,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          //TraceLog( "Circularity!", sLine )
          //Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
          //? sLine
-         Eval( s_bRTEBlock, ErrorNew( [PP], 2083, [Pre-Process], [Ciruclarity Detected],  ) )
+         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2083, [Pre-Process], [Ciruclarity Detected],  ) )
          // Safety
          BREAK
       ENDIF
@@ -3493,7 +3494,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          sDirective := RTrim( Upper( NextToken( @sLine ) ) )
 
          IF ( nLen := Len( sDirective ) ) < 4
-            Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
+            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
             // Safety
             BREAK
          ENDIF
@@ -3530,7 +3531,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             IF nIfDef > 0
                nIfDef--
             ELSE
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2069, [Pre-Process], [#endif with no #ifdef in sight],  ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2069, [Pre-Process], [#endif with no #ifdef in sight],  ) )
                // Safety
                BREAK
             ENDIF
@@ -3586,7 +3587,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
          ELSEIF sDirective == Left( "ERROR", nLen )
 
-            Eval( s_bRTEBlock, ErrorNew( [PP], 2069, [#error], sLine,  ) )
+            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2069, [#error], sLine,  ) )
             // Safety
             BREAK
 
@@ -3630,17 +3631,17 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   InitClsRules()
                   InitClsResults()
                   IF Len( aDefRules ) != Len( aDefResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
                      // Safety
                      BREAK
                   ENDIF
                   IF Len( aTransRules ) != Len( aTransResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
                      // Safety
                      BREAK
                   ENDIF
                   IF Len( aCommRules ) != Len( aCommResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -3655,17 +3656,17 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                      InitClsRules()
                      InitClsResults()
                      IF Len( aDefRules ) != Len( aDefResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
                         // Safety
                         BREAK
                      ENDIF
                      IF Len( aTransRules ) != Len( aTransResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
                         // Safety
                         BREAK
                      ENDIF
                      IF Len( aCommRules ) != Len( aCommResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
                         // Safety
                         BREAK
                      ENDIF
@@ -3675,17 +3676,17 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                   InitFWResults()
 
                   IF Len( aDefRules ) != Len( aDefResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [FW #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
                      // Safety
                      BREAK
                   ENDIF
                   IF Len( aTransRules ) != Len( aTransResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [FW #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
                      // Safety
                      BREAK
                   ENDIF
                   IF Len( aCommRules ) != Len( aCommResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 1003, [Pre-Processing], [FW #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -3733,7 +3734,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
             ELSE
 
-               Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
                // Safety
                BREAK
 
@@ -3870,7 +3871,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             //WAIT
 
             IF sPassed == "" .AND. aScan( aTranslated, nRule ) > 0
-               Eval( s_bRTEBlock, ErrorNew( "PP", 2079, [Pre-Process], [Ciruclarity Detected], { sToken } ) )
+               Eval( s_bRTEBlock, ErrorNew( "PP", 0, 2079, [Pre-Process], [Ciruclarity Detected], { sToken } ) )
                // Safety
                BREAK
             ELSE
@@ -4491,7 +4492,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ELSE
                   IF ValType( aMarkers ) != 'A' .OR. nMarkerId > Len( aMarkers )
                      //TraceLog( "Oops", nRule, sKey, nMarkerId, ValType( aMarkers ), IIF( ValType( aMarkers ) == 'A', Len( aMarkers ) , "No array" ) )
-                     Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Pre-Process], [Unexpected case], { nRule, sKey, nMarkerId, aMarkers } ) )
+                     Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Pre-Process], [Unexpected case], { nRule, sKey, nMarkerId, aMarkers } ) )
                   ELSE
                      aMarkers[nMarkerId] := xMarker
                   ENDIF
@@ -5023,7 +5024,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
       ENDIF
    ENDDO
 
-   Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Match-Rule], [Logic Failure],  ) )
+   Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Match-Rule], [Logic Failure],  ) )
 
 RETURN 0
 
@@ -5261,7 +5262,7 @@ STATIC FUNCTION NextToken( sLine, lDontRecord )
       ELSE
 
          TraceLog( "Unexpected case: ", sLine )
-         Eval( ErrorBlock(), ErrorNew( [PP], 3010, [Next-Token], [Unexpected case], { sLine } ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Next-Token], [Unexpected case], { sLine } ) )
          sReturn := sLine
 
       ENDIF
@@ -5568,7 +5569,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     ENDIF
                  ENDIF
               ELSE
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Invalid &], { sExp, sNextToken } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Invalid &], { sExp, sNextToken } ) )
                  // Safety
                  BREAK
               ENDIF
@@ -5601,7 +5602,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
                  //TraceLog( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp, sLine  )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp } ) )
                  // Safety
                  BREAK
               ELSE
@@ -5612,14 +5613,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
                  //TraceLog( "ERROR!(2) Unbalanced '(' at: " + sExp, sLine )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp } ) )
                  // Safety
                  BREAK
               ELSEIF Left( sToken, 1 ) == ')'
                  sExp += sToken
               ELSE
                  //TraceLog( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp, sLine )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced (], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp } ) )
                  // Safety
                  BREAK
               ENDIF
@@ -5654,7 +5655,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
                     //TraceLog( "ERROR! Unbalanced '{|...' at: " + sExp )
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|...], { sExp } ) )
+                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {|...], { sExp } ) )
                     // Safety
                     BREAK
                  ELSE
@@ -5674,7 +5675,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                     #endif
                  ELSE
                     //TraceLog( "ERROR! Unbalanced '{|...|' at: " + sExp, sNextToken, sNextLine )
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|...|], { sExp } ) )
+                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {|...|], { sExp } ) )
                     // Safety
                     BREAK
                  ENDIF
@@ -5683,7 +5684,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
               IF sTemp == NIL
                  //TraceLog( "ERROR! Empty '{||'" )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {||], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {||], { sExp } ) )
                  // Safety
                  BREAK
               ELSE
@@ -5693,7 +5694,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
                  //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                  // Safety
                  BREAK
               ELSEIF Left( sToken, 1 ) == '}'
@@ -5701,7 +5702,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               ELSE
                  sLine := sToken + sLine
                  //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {|], { sExp } ) )
+                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {|], { sExp } ) )
                  // Safety
                  BREAK
               ENDIF
@@ -5722,7 +5723,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
                  IF sTemp == NIL
                     //TraceLog( "ERROR! Unbalanced '{...'", sLine )
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {...], { sExp } ) )
+                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {...], { sExp } ) )
                     // Safety
                     BREAK
                  ELSE
@@ -5732,7 +5733,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sToken := NextToken( @sLine ) // Close
                  IF sToken == NIL
                     //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
+                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                     // Safety
                     BREAK
                  ELSEIF Left( sToken, 1 ) == '}'
@@ -5740,7 +5741,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  ELSE
                     sLine := sToken + sLine
                     //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced {], { sExp } ) )
+                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {], { sExp } ) )
                     // Safety
                     BREAK
                  ENDIF
@@ -5756,7 +5757,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp  += sToken
            sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
            IF sTemp == NIL
-              Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
+              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               // Safety
               BREAK
            ELSE
@@ -5765,14 +5766,14 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
            sToken := NextToken( @sLine ) // Close
            IF sToken == NIL
-              Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
+              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               // Safety
               BREAK
            ELSEIF Left( sToken, 1 ) == ']'
               sExp += sToken
            ELSE
               sLine := sToken + sLine
-              Eval( s_bRTEBlock, ErrorNew( [PP], 3010, [Next-Token], [Unbalanced [], { sExp } ) )
+              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
               // Safety
               BREAK
            ENDIF
@@ -6681,7 +6682,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
    ENDDO
 
    IF nNext == 0
-      Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Missing => in #directive], { sRule } ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Missing => in #directive], { sRule } ) )
       // Safety
       BREAK
    ELSE
@@ -6824,7 +6825,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -6841,7 +6842,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
                   // Safety
                   BREAK
                ENDIF
@@ -6873,7 +6874,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -6890,7 +6891,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
                   // Safety
                   BREAK
                ENDIF
@@ -6922,7 +6923,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      sRule := SubStr( sRule, 2 )
                      ExtractLeadingWS( @sRule )
                   ELSE
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -6939,7 +6940,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sAnchor := NIL
                   LOOP
                ELSE
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
                   // Safety
                   BREAK
                ENDIF
@@ -7034,7 +7035,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                      aAdd( aWords, Upper( RTrim( Left( sRule, nCloseAt - 1 ) ) ) )
                      EXIT
                   ELSE
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<:'], { sRule } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<:'], { sRule } ) )
                      // Safety
                      BREAK
                   ENDIF
@@ -7076,7 +7077,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                nOptional := ( -nOptional )
             ENDIF
          ELSE
-            Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unblanced MP: '<'], { sRule } ) )
+            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<'], { sRule } ) )
             // Safety
             BREAK
          ENDIF
@@ -7135,7 +7136,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
          // Some token sneaked in ...
          //TraceLog( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
-         Eval( ErrorBlock(), ErrorNew( [PP], 2059, [Compile-Rule], [Unexpected case], { sRule } ) )
+         Eval( ErrorBlock(), ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unexpected case], { sRule } ) )
 
          IF ! ( sAnchor == NIL )
             //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
@@ -7164,7 +7165,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    IF nOptional <> 0
       //TraceLog( "ERROR Unclose Optional group, nOptional = " + Str( nOptional, 3 ), aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5] )
-      Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed Optional group], { sRule, nOptional } ) )
+      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unclosed Optional group], { sRule, nOptional } ) )
       // Safety
       BREAK
    ENDIF
@@ -7265,7 +7266,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := Left( sResult, nOptionalAt - 1 ) + SubStr( sResult, nCloseOptionalAt + 1 )
                LOOP
             ELSE
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                // Safety
                BREAK
             ENDIF
@@ -7286,7 +7287,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             IF nCloseOptionalAt == 0
                //TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                // Safety
                BREAK
             ENDIF
@@ -7306,7 +7307,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                ENDIF
             ELSE
                //TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unclosed repeatable group], { sResult, nOptionalAt } ) )
                // Safety
                BREAK
             ENDIF
@@ -7333,7 +7334,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
       IF nOptionalAt > 0
 
          IF nOptional <> 0
-            Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Nested repeatable group], { sResult } ) )
+            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Nested repeatable group], { sResult } ) )
             // Safety
             BREAK
          ELSE
@@ -7406,7 +7407,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<-'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<-'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7424,7 +7425,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
                      // Safety
                      BREAK
                   ELSE
@@ -7440,7 +7441,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '#<'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '#<'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7456,7 +7457,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<-'], { sResult, sTemp } ) )
                   // Safety
                   BREAK
                ELSE
@@ -7474,7 +7475,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<"'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<"'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7492,7 +7493,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecgnized RP '<"'], { sResult, sTemp } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecgnized RP '<"'], { sResult, sTemp } ) )
                      // Safety
                      BREAK
                   ELSE
@@ -7511,7 +7512,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<('], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<('], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7529,7 +7530,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<('], { sResult, sTemp } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<('], { sResult, sTemp } ) )
                      // Safety
                      BREAK
                   ELSE
@@ -7548,7 +7549,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<{'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<{'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7566,7 +7567,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unreconized RP '<{'], { sResult, sTemp } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unreconized RP '<{'], { sResult, sTemp } ) )
                      // Safety
                      BREAK
                   ELSE
@@ -7585,7 +7586,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( ">", sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<.'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<.'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7603,7 +7604,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                   sResult := SubStr( sResult, nNext + 1 )
                   ExtractLeadingWS( @sResult, @sPad )
                   IF nId == 0
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<.'], { sResult, sTemp } ) )
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<.'], { sResult, sTemp } ) )
                      // Safety
                      BREAK
                   ELSE
@@ -7618,7 +7619,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
             nNext := At( '>', sResult )
             IF nNext == 0
-               Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unbalanced RP '<'], { sResult } ) )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<'], { sResult } ) )
                // Safety
                BREAK
             ELSE
@@ -7636,7 +7637,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
                   aEval( aMarkers, {|sMarker| TraceLog( sResult, sTemp, sMarker ) } )
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 2059, [Compile-Rule], [Unrecognized RP '<'], { sResult, sTemp } ) )
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<'], { sResult, sTemp } ) )
                   // Safety
                   BREAK
                ELSE
@@ -7668,7 +7669,7 @@ STATIC FUNCTION CompileRule( sRule, aRules, aResults, bX, bUpper )
 
    IF nOptional <> 0
       //TraceLog( "ERROR! Internal logic failure, nOptional = " + Str( nOptional, 3 ) + " [" + Str( ProcLine(0), 4 ) + "]", aRP[1], aRP[2] )
-      Eval( ErrorBlock(), ErrorNew( [PP], 9003, [Compile-Rule], [Internal logic failure], { sResult, nOptional } ) )
+      Eval( ErrorBlock(), ErrorNew( [PP], 0, 9003, [Compile-Rule], [Internal logic failure], { sResult, nOptional } ) )
       BREAK
    ENDIF
 
@@ -9748,7 +9749,7 @@ RETURN .T.
 PROCEDURE PP_RunInit( aProcedures, aInitExit, nLine )
 
    IF ValType( aProcedures ) != 'A' .OR. ValType( aInitExit ) != 'A'
-      Eval( ErrorBlock(), ErrorNew( [PP], 9004, [Run-Init], [Invalid parameters], { aProcedures, aInitExit, nLine } ) )
+      Eval( ErrorBlock(), ErrorNew( [PP], 0, 9004, [Run-Init], [Invalid parameters], { aProcedures, aInitExit, nLine } ) )
    ELSE
       aSize( aProcedures, 0 )
 
@@ -10458,10 +10459,11 @@ RETURN cMessage
 //--------------------------------------------------------------//
 #ifdef __CLIPPER__
 
-FUNCTION ErrorNewX(  SubSystem, SubCode, Operation, Description, Args, ModuleName )
+FUNCTION ErrorNewX(  SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName )
 
    LOCAL oError := ErrorNew()
 
+   oError:GenCode := GenCode
    oError:SubSystem := SubSystem
    oError:SubCode := SubCode
    oError:Operation := Operation

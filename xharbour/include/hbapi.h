@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.179 2005/10/31 11:45:17 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.180 2005/10/31 12:56:35 druzus Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ HB_EXTERN_BEGIN
 
 #define HB_STRING_ALLOC( p, len ) \
                \
-               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 && len ) \
+               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 && len > 1 ) \
                { \
                   HB_STRING_REALLOC( p, len ); \
                } \

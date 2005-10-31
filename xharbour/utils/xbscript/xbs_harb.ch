@@ -1446,7 +1446,7 @@
          nLen = pLine->item.asString.length;
 
          #ifdef DEBUG_TOKEN
-           hb_procinfo( 1, (char *) &sProc, &uiLine );
+           hb_procinfo( 1, (char *) &sProc, &uiLine, NULL );
            printf( "%s[%i] Processing: '%s'\n", (char *) sProc, uiLine, sLine );
          #endif
 
@@ -1838,25 +1838,10 @@
          }
          sReturn[nLen] = '\0';
 
-         if( ISBYREF( 1 ) )
-         {
-            if( sLine[0] == '\0' )
-            {
-               hb_storc( "", 1 );
-            }
-            else
-            {
-               hb_storc( sLine, 1 );
-            }
-            //printf( "\nToken: '%s' value: '%s'\n", sReturn, pLine->item.asString.value );
-         }
-         else
-         {
-            //printf( "\nToken: '%s' ***value: '%s'\n", sReturn, pLine->item.asString.value );
-         }
+         hb_storc( sLine, 1 );
 
          #ifdef DEBUG_TOKEN
-           printf( "Token: '%s'\n", sReturn );
+           printf( "Token: '%s' pLine: '%s'\n", sReturn, pLine ->item.asString.value);
          #endif
 
          hb_retclen( sReturn, nLen );
@@ -1959,18 +1944,15 @@
              cLastChar = cChar;
           }
 
-          if( ISBYREF( 2 ) )
+          if( nStart <= 0 )
           {
-             if( nStart <= 0 )
-             {
-                hb_storc( "", 2 );
-                //printf( "\nNot Skipped: \n" );
-             }
-             else
-             {
-                hb_storclen( sLine, nStart, 2 );
-                //printf( "\nSkipped: '%.*s'\n", nStart, sLine );
-             }
+             hb_storclen( NULL, 0, 2 );
+             //printf( "\nNot Skipped: \n" );
+          }
+          else
+          {
+             hb_storclen( sLine, nStart, 2 );
+             //printf( "\nSkipped: '%.*s'\n", nStart, sLine );
           }
 
           if( nStart >= 0 )
@@ -1978,22 +1960,18 @@
              char *sIdentifier = (char *) hb_xgrab( ( nAt - nStart ) + 1 );
 
              strncpy( sIdentifier, sLine + nStart, ( nAt - nStart ) );
-             sIdentifier[nAt - nStart] = '\0';
+             sIdentifier[ nAt - nStart ] = '\0';
 
              //printf( "\nLine: '%s' nStart: %i nAt: %i sIdentifier: '%s'\n", sLine, nStart, nAt, sIdentifier );
 
-             if( ISBYREF( 1 ) )
-             {
-                hb_storc( sLine + nAt, 1 );
-             }
+             hb_storc( sLine + nAt, 1 );
 
              //printf( "\nIdentifier: '%s'\n", sIdentifier );
 
              #ifdef __XHARBOUR__
-               hb_retcAdopt( sIdentifier );
+               hb_retclenAdopt( sIdentifier, nAt - nStart );
              #else
-               hb_retc( sIdentifier );
-               hb_xfree( sIdentifier );
+               hb_retclen_buffer( sIdentifier, nAt - nStart, i );
              #endif
           }
           else
@@ -2024,19 +2002,13 @@
 
          if( i > 0 )
          {
-            if( ISBYREF( 1 ) )
-            {
-               hb_storclen( pLine->item.asString.value + i, iLen - i, 1 );
-            }
+            hb_storclen( pLine->item.asString.value + i, iLen - i, 1 );
          }
 
          pTmp = ( char * ) hb_xgrab( i + 1 );
          memset( pTmp, ' ', i );
 
-         if( ISBYREF( 2 ) )
-         {
-            hb_storclen( pTmp, i, 2 );
-         }
+         hb_storclen( pTmp, i, 2 );
 
          #ifdef __XHARBOUR__
            hb_retclenAdopt( pTmp, i );
@@ -2073,15 +2045,11 @@
             pString[i] = '\0';
          }
 
-         if( ISBYREF( 1 ) )
-         {
-            hb_storclen( pString, i, 1 );
-         }
+         hb_storclen( pString, i, 1 );
 
          if( ISBYREF( 2 ) )
          {
             char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
-
             memset( pTmp, ' ', iLen - i );
             hb_storclenAdopt( pTmp, iLen - i, 2 );
          }
@@ -2121,10 +2089,7 @@
             pString[i] = '\0';
          }
 
-         if( ISBYREF( 1 ) )
-         {
-            hb_storclen( pString, i, 1 );
-         }
+         hb_storclen( pString, i, 1 );
 
          #ifdef __XHARBOUR__
            hb_retclenAdopt( pString, i );
