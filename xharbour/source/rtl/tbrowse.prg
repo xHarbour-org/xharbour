@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.127 2005/10/30 16:00:00 ptsarenko Exp $
+ * $Id: tbrowse.prg,v 1.127 2005/10/30 14:24:45 ptsarenko Exp $
  */
 
 /*
@@ -461,9 +461,9 @@ CLASS TBrowse
    METHOD DeHilite()                      // Dehighlights the current cell
    METHOD ForceStable()                   // Performs a full stabilization
    METHOD Hilite()                        // Highlights the current cell
-   METHOD Invalidate()                    // Forces entire redraw during next stabilization
-   METHOD RefreshAll()                    // Causes all data to be recalculated during the next stabilize
-   METHOD RefreshCurrent()                // Causes the current row to be refilled and repainted on next stabilize
+   METHOD Invalidate()                    // See top of method code
+   METHOD RefreshAll()                    // See top of method code
+   METHOD RefreshCurrent()                // Same as RefreshAll(), but only for current row
 
    METHOD Stabilize()                     // Performs incremental stabilization
 
@@ -657,6 +657,18 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
 Return Self
 
 //-------------------------------------------------------------------//
+/* from clipper NG:
+
+   Invalidate() --> self
+
+   TBrowse:Invalidate() causes the next stabilization of the TBrowse
+   object to redraw the entire TBrowse display, including headings,
+   footings, and all data rows.  Note that sending this message has no
+   effect on the values in the data rows; it simply forces the display to
+   updated during the next stabilization.  To force the data to be
+   refreshed from the underlying data source, send the
+   TBrowse:RefreshAll() message.
+*/
 
 METHOD Invalidate() CLASS TBrowse
 
@@ -668,6 +680,13 @@ METHOD Invalidate() CLASS TBrowse
 Return Self
 
 //-------------------------------------------------------------------//
+/* from clipper NG:
+
+   RefreshAll() --> self
+
+   Internally marks all data rows as invalid, causing them to be
+   refilled and redisplayed during the next stabilize loop.
+*/
 
 METHOD RefreshAll() CLASS TBrowse
 
@@ -2709,7 +2728,13 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 Return nNotLeftCol
 
 //-------------------------------------------------------------------//
+/* from clipper NG:
 
+   RefreshCurrent() --> self
+
+   Internally marks the current data row as invalid, causing it to be
+   refilled and redisplayed during the next stabilize loop.
+*/
 METHOD RefreshCurrent() CLASS TBrowse
 
    local i
