@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4544 2005/10/31 12:56:34 druzus Exp $
+ * $Id: ChangeLog,v 1.4545 2005/10/31 13:37:02 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-10-31 15:10 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/config/global.cf
+     * removed dbfdbt from HB_DB_DRIVERS list as per Przemyslaw request
 
 2005-10-31 14:35 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/config/global.cf
