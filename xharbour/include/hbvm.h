@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.33 2005/10/18 12:14:32 druzus Exp $
+ * $Id: hbvm.h,v 1.34 2005/10/30 14:45:48 druzus Exp $
  */
 
 /*
@@ -145,7 +145,8 @@ HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
 HB_EXPORT extern void hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
 
 /* Debugger API */
-HB_EXPORT extern void (*hb_vm_pFunDbgEntry)( int nMode, int nLine, char *szName, int nIndex, int nFrame );
+typedef void (*HB_DBGENTRY_FUNC) ( int , int , char *, int , int );
+HB_EXPORT extern HB_DBGENTRY_FUNC hb_vm_pFunDbgEntry;
 HB_EXPORT extern BOOL hb_dbg_InvokeDebug( BOOL bInvoke );
 HB_EXPORT extern ULONG hb_dbg_ProcLevel( void );
 HB_EXPORT extern PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset );

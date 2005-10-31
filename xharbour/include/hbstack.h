@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.34 2005/10/24 01:04:24 druzus Exp $
+ * $Id: hbstack.h,v 1.35 2005/10/24 01:23:15 ronpinkas Exp $
  */
 
 /*
@@ -125,8 +125,6 @@ typedef struct
 
    #define hb_stackDec( )              do \
                                        { \
-                                          HB_THREAD_STUB \
-                                          \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
                                           { \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
@@ -136,8 +134,6 @@ typedef struct
 
    #define hb_stackPop( )              do \
                                        { \
-                                          HB_THREAD_STUB \
-                                          \
                                           if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
                                           { \
                                              hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
@@ -156,8 +152,6 @@ typedef struct
 
    #define hb_stackPush( )             do \
                                        { \
-                                          HB_THREAD_STUB \
-                                          \
                                           if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
                                           { \
                                              hb_stackIncrease(); \

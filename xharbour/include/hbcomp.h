@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.37 2005/09/13 22:46:53 fperillo Exp $
+ * $Id: hbcomp.h,v 1.38 2005/10/29 06:42:17 druzus Exp $
  */
 
 /*
@@ -382,6 +382,7 @@ extern ULONG hb_compSequenceBegin( void ); /* Generate the opcode to open BEGIN/
 extern ULONG hb_compSequenceEnd( void );  /* Generate the opcode to close BEGIN/END sequence */
 extern ULONG hb_compTryBegin( void ); /* Generate the opcode to open TRY/END tryuence */
 extern ULONG hb_compTryEnd( void );  /* Generate the opcode to close TRY/END tryuence */
+extern void  hb_compSequenceFinish( ULONG, int );
 
 extern void hb_compGenPCode1( BYTE );             /* generates 1 byte of pcode */
 extern void hb_compGenPData1( BYTE );             /* generates 1 byte of pcode argument */
@@ -390,9 +391,6 @@ extern void hb_compGenPCode3( BYTE, BYTE, BYTE, BOOL ); /* generates 3 bytes of 
 extern void hb_compGenPCode4( BYTE, BYTE, BYTE, BYTE, BOOL ); /* generates 4 bytes of pcode + flag for optional StrongType() */
 extern void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, BOOL );  /* copy bytes to a pcode buffer + flag for optional StrongType() */
 
-extern ULONG hb_compSequenceBegin( void );
-extern ULONG hb_compSequenceEnd( void );
-extern void hb_compSequenceFinish( ULONG, int );
 
 /* Codeblocks */
 extern void hb_compCodeBlockStart( void );        /* starts a codeblock creation */
