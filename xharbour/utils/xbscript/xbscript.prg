@@ -2520,6 +2520,11 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
          IF lSuccess
             RETURN s_xRet
          ENDIF
+      ELSE
+        IF s_bExternalRecovery != NIL
+           //TraceLog( "Resolve: " + oRecover:Operation )
+           RETURN Eval( s_bExternalRecovery, oRecover )
+        ENDIF
       ENDIF
    ENDIF
 
@@ -2528,16 +2533,6 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
       oRecover:ProcLine   := PP_ProcLine()
       oRecover:ModuleName := s_sFile
    #endif
-
-   IF s_bExternalRecovery != NIL
-      IF oRecover:SubCode == 1001 .AND. oRecover:SubSystem == "BASE"
-         //TraceLog( "Resolve: " + oRecover:Operation )
-
-         s_xRet := Eval( s_bExternalRecovery, oRecover )
-         //TraceLog( s_xRet )
-         RETURN s_xRet
-      ENDIF
-   ENDIF
 
    // Script Error within a TRY block.
    IF s_lTrying
@@ -10035,7 +10030,7 @@ RETURN xRet
 //--------------------------------------------------------------//
 FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
 
-   LOCAL bErrHandler := ErrorBlock( s_bInterceptRTEBlock ), oError, xRet
+   LOCAL bErrHandler, oError, xRet
    LOCAL aProcedure, bPreset, aPresetProcedures
    LOCAL nProc
 
@@ -10120,10 +10115,6 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
          xRet := &cExp
       ENDIF
    CATCH oError
-      //Alert( "(" + oError:ProcName + "[" + Str( oError:ProcLine, 5 ) + "]) " + ProcName() + ":" + oError:Operation + "->" + oError:Description )
-      Eval( s_bRTEBlock, oError )
-      // Safety
-      BREAK
    END
 
    s_aProcedures := aPresetProcedures
@@ -10135,6 +10126,10 @@ FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
    #endif
 
    ErrorBlock( bErrHandler )
+
+   IF oError != NIL
+      Break( oError )
+   ENDIF
 
 RETURN xRet
 #endif
@@ -10312,18 +10307,15 @@ RETURN s_anEnumIndex[ s_nForEachIndex ]
 //--------------------------------------------------------------//
 FUNCTION PP_DefaultErrorBlock( bNewBlock )
 
-   LOCAL bRet := s_bDefRTEBlock
+   LOCAL bRet
 
    IF PCount() > 0
+      bRet := s_bDefRTEBlock
       s_bDefRTEBlock := bNewBlock
-
-      IF s_lTrying
-         s_lTrying := .F.
-         s_aSequence[ Len( s_aSequence ) ][2] := .F.
-      ENDIF
+      RETURN bRet
    ENDIF
 
-RETURN bRet
+RETURN s_bDefRTEBlock
 
 //--------------------------------------------------------------//
 FUNCTION PP_ErrorBlock( bNewBlock )
@@ -10331,15 +10323,18 @@ FUNCTION PP_ErrorBlock( bNewBlock )
    LOCAL bRet := s_bRTEBlock
 
    IF PCount() > 0
+      bRet := s_bRTEBlock
       s_bRTEBlock := bNewBlock
 
       IF s_lTrying
          s_lTrying := .F.
          s_aSequence[ Len( s_aSequence ) ][2] := .F.
       ENDIF
+
+      RETURN bRet
    ENDIF
 
-RETURN bRet
+RETURN s_bRTEBlock
 
 //--------------------------------------------------------------//
 STATIC FUNCTION DefRTEHandler( e )
@@ -10403,7 +10398,7 @@ FUNCTION PP_ErrorMessage( e )
 
   IF e:ClassName != "ERROR"
      //TraceLog( e )
-     RETURN ProcName() + ": Invalid Object argument from: " + ProcName(1) + "(" + Str( ProcLine(1) ) + ")"
+     RETURN ProcName() + ": Argument is not an Error object. From: " + ProcName(1) + "(" + Str( ProcLine(1) ) + ")"
   ENDIF
 
   IF e:severity > ES_WARNING

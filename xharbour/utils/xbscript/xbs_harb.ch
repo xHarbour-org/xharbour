@@ -1842,11 +1842,11 @@
          {
             if( sLine[0] == '\0' )
             {
-               hb_itemPutC( pLine, NULL );
+               hb_storc( "", 1 );
             }
             else
             {
-               hb_itemPutCPtr( pLine, hb_strdup( sLine ), strlen( sLine ) );
+               hb_storc( sLine, 1 );
             }
             //printf( "\nToken: '%s' value: '%s'\n", sReturn, pLine->item.asString.value );
          }
@@ -1963,13 +1963,13 @@
           {
              if( nStart <= 0 )
              {
-                hb_itemPutC( pSkipped, NULL );
+                hb_storc( "", 2 );
                 //printf( "\nNot Skipped: \n" );
              }
              else
              {
-                hb_itemPutCL( pSkipped, sLine, nStart );
-                //printf( "\nSkipped: '%s'\n", pSkipped->item.asString.value );
+                hb_storclen( sLine, nStart, 2 );
+                //printf( "\nSkipped: '%.*s'\n", nStart, sLine );
              }
           }
 
@@ -1984,7 +1984,7 @@
 
              if( ISBYREF( 1 ) )
              {
-                hb_itemPutCPtr( pLine, hb_strdup( sLine + nAt ), strlen( sLine + nAt ) );
+                hb_storc( sLine + nAt, 1 );
              }
 
              //printf( "\nIdentifier: '%s'\n", sIdentifier );
@@ -2024,19 +2024,18 @@
 
          if( i > 0 )
          {
-            if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+            if( ISBYREF( 1 )
             {
-               hb_itemPutCPtr( pLine, hb_strdup( pLine->item.asString.value + i ), iLen - i );
+               hb_storclen( pLine->item.asString.value + i, iLen - i, 1 );
             }
          }
 
          pTmp = ( char * ) hb_xgrab( i + 1 );
          memset( pTmp, ' ', i );
 
-         if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
+         if( ISBYREF( 2 )
          {
-            PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
-            hb_itemPutCL( pWS, pTmp, i );
+            hb_storclen( pTmp, i, 2 );
          }
 
          #ifdef __XHARBOUR__
@@ -2074,18 +2073,17 @@
             pString[i] = '\0';
          }
 
-         if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+         if( ISBYREF( 1 )
          {
-            hb_itemPutCL( pLine, pString, i );
+            hb_storclen( pString, i, 1 );
          }
 
-         if( HB_IS_BYREF( hb_stackItemFromBase( 2 ) ) )
+         if( ISBYREF( 2 )
          {
-            PHB_ITEM pWS = hb_itemUnRef( hb_stackItemFromBase( 2 ) );
             char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
 
             memset( pTmp, ' ', iLen - i );
-            hb_itemPutCPtr( pWS, pTmp, iLen - i );
+            hb_storcLenAdopt( pTmp, iLen - i, 2 );
          }
 
          #ifdef __XHARBOUR__
@@ -2123,9 +2121,9 @@
             pString[i] = '\0';
          }
 
-         if( HB_IS_BYREF( hb_stackItemFromBase( 1 ) ) )
+         if( ISBYREF( 1 )
          {
-            hb_itemPutCL( pLine, pString, i );
+            hb_storclen( pString, i, 1 );
          }
 
          #ifdef __XHARBOUR__
