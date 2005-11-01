@@ -1,5 +1,5 @@
 /*
- * $Id: file.c,v 1.17 2004/07/21 21:50:33 peterrees Exp $
+ * $Id: file.c,v 1.18 2004/07/22 10:55:21 paultucker Exp $
  */
 
 /*
@@ -101,9 +101,8 @@ BOOL HB_EXPORT hb_fsIsDirectory( BYTE * pFilename )
    BOOL bResult = FALSE;
    int iFileName ;
 
-   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
-
-   iFileName = strlen( (char*) pFilename ) ;
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename) );
+   iFileName = strlen( (char*) pFilename );
 
    if ( iFileName )
    {

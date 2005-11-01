@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.152 2005/10/04 20:35:35 druzus Exp $
+ * $Id: filesys.c,v 1.153 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -1479,7 +1479,7 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-   pFilename = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pFilename) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
@@ -1543,7 +1543,7 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
-   pFilename = (BYTE*)hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
    // allowing async cancelation here
@@ -1606,7 +1606,7 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreateEx(%p, %hu, %hu)", pFilename, uiAttr, uiFlags));
 
-   pFilename = hb_filecase( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
    // allowing async cancelation here
@@ -1657,7 +1657,6 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsClose(%p)", hFileHandle));
-
 
 #if defined(HB_FS_FILE_IO)
 
@@ -2724,7 +2723,7 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
 
-   pFilename = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * ) pFilename) );
+   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
 
    HB_STACK_UNLOCK
 
@@ -2770,8 +2769,8 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
 
-   pOldName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pOldName) );
-   pNewName = ( BYTE *) hb_fileNameConv( hb_strdup( ( char * )pNewName) );
+   pOldName = hb_fileNameConv( hb_strdup( ( char * ) pOldName ) );
+   pNewName = hb_fileNameConv( hb_strdup( ( char * ) pNewName ) );
 
    HB_STACK_UNLOCK
 
@@ -2809,7 +2808,8 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
-   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
+
+   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
 
@@ -2852,8 +2852,9 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
    HB_THREAD_STUB
    BOOL bResult;
 
-   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", (char*) pDirname));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", ( char* ) pDirname));
+
+   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
 
    HB_STACK_UNLOCK
 
@@ -2886,9 +2887,10 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
-   pDirname = (BYTE*)hb_fileNameConv( hb_strdup( ( char * )pDirname) );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRmDir(%s)", (char*) pDirname));
+
+   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
 
    HB_STACK_LOCK
 
@@ -2989,30 +2991,31 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
       /* NOTE: A trailing underscore is not returned on this platform,
                so we don't need to strip it. [vszakats] */
 
+      ulLen = strlen( ( char * ) pbyBuffer );
+
 #if defined(OS_HAS_DRIVE_LETTER)
       if( pbyStart[ 1 ] == OS_DRIVE_DELIMITER )
+      {
          pbyStart += 2;
+         ulLen -= 2;
+      }
 #endif
       if( strchr( OS_PATH_DELIMITER_LIST, pbyStart[ 0 ] ) )
       {
          pbyStart++;
+         ulLen--;
       }
 
       if( pbyBuffer != pbyStart )
       {
          memmove( pbyBuffer, pbyStart, ulLen );
       }
-   }
 
-   /* Strip the trailing (back)slash if there's one */
-
-   {
-      ULONG ulLen = strlen( ( char * ) pbyBuffer );
-
+      /* Strip the trailing (back)slash if there's one */
       if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulLen - 1 ] ) )
-      {
-         pbyBuffer[ ulLen - 1 ] = '\0';
-      }
+         ulLen--;
+
+      pbyBuffer[ ulLen ] = '\0';
    }
 
    return 0; // correct if it arrives here
@@ -3163,12 +3166,10 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 #else
 
    uiResult = 0;
+   hb_fsSetError( ( USHORT ) FS_ERROR );
 
 #endif
 
-   /* 27/08/04 - <maurilio.longo@libero.it>
-                 This is wrong, IMHO, should set 0 if HB_FS_GETDRIVE() returned something */
-   hb_fsSetError( ( USHORT ) FS_ERROR );
    return ( BYTE ) uiResult; /* Return the drive number, base 0. */
 }
 
@@ -3471,65 +3472,8 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
    }
 }
 
-/* TODO: remove it */
-char HB_EXPORT * hb_fileTrim( BYTE * szFile)  /* Caller must free the buffer returned */
-{
-   char * szFileTrim ;
-   ULONG ulLen;
-
-   ulLen =  hb_strRTrimLen( (char*) szFile, strlen( (char*) szFile ), FALSE );
-   szFile = (BYTE*) hb_strLTrim( (char*) szFile, &ulLen );
-   szFileTrim = (char * ) hb_xgrab( ulLen + 1 );
-   memcpy( (char*) szFileTrim, (char*) szFile, ulLen );
-   szFileTrim[ulLen] = '\0';
-
-   return szFileTrim;
-}
-
-/* TODO: remove it */
-BYTE HB_EXPORT * hb_filecase(char *str) {
-   // Convert file and dir case. The allowed SET options are:
-   // LOWER - Convert all caracters of file to lower
-   // UPPER - Convert all caracters of file to upper
-   // MIXED - Leave as is
-
-   // The allowed environment options are:
-   // FILECASE - define the case of file
-   // DIRCASE - define the case of path
-   // DIRSEPARATOR - define separator of path (Ex. "/")
-
-   size_t a;
-   char *filename;
-   char *dirname=str;
-   size_t dirlen;
-
-   // Look for filename (Last "\" or DIRSEPARATOR)
-   if( hb_set.HB_SET_DIRSEPARATOR != '\\' ) {
-      for(a=0;a<strlen(str);a++)
-         if( str[a] == '\\' )
-            str[a] = hb_set.HB_SET_DIRSEPARATOR;
-   }
-   if(( filename = strrchr( str, hb_set.HB_SET_DIRSEPARATOR )) != NULL)
-      filename++;
-   else
-      filename=str;
-   dirlen=filename-str;
-
-   // FILECASE
-   if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
-      hb_strLower( filename, strlen(filename) );
-   else if( hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER )
-      hb_strUpper( filename, strlen(filename) );
-
-   // DIRCASE
-   if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )
-      hb_strLower(dirname,dirlen);
-   else if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
-      hb_strUpper(dirname,dirlen);
-   return (( BYTE * ) str);
-}
-
 BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
+/*
    // Convert file and dir case. The allowed SET options are:
    // LOWER - Convert all caracters of file to lower
    // UPPER - Convert all caracters of file to upper
@@ -3539,7 +3483,7 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
    // FILECASE - define the case of file
    // DIRCASE - define the case of path
    // DIRSEPARATOR - define separator of path (Ex. "/")
-
+*/
    char *filename;
    ULONG ulDirLen, ulFileLen;
 
@@ -3557,7 +3501,7 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
       str[ulLen] = '\0';
    }
 
-   // Look for filename (Last "\" or DIRSEPARATOR)
+   /* Look for filename (Last "\" or DIRSEPARATOR) */
    if( hb_set.HB_SET_DIRSEPARATOR != '\\' )
    {
       char *p = str;
@@ -3582,7 +3526,7 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
    ulFileLen = strlen( filename );
    ulDirLen = filename - str;
 
-   // FILECASE
+   /* FILECASE */
    if ( ulFileLen > 0 )
    {
       if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
@@ -3591,7 +3535,7 @@ BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
          hb_strUpper( filename, strlen(filename) );
    }
 
-   // DIRCASE
+   /* DIRCASE */
    if ( ulDirLen > 0 )
    {
       if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )

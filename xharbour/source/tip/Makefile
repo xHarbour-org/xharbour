@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/12/10 03:10:24 mlombardo Exp $
+# $Id: Makefile,v 1.4 2005/11/01 13:31:17 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -23,5 +23,5 @@ PRG_SOURCES= \
 	smtpcln.prg	\
 
 LIBNAME=tip
-	
+
 include $(TOP)$(ROOT)config/lib.cf

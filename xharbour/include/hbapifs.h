@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.41 2005/05/19 02:20:15 druzus Exp $
+ * $Id: hbapifs.h,v 1.42 2005/08/01 22:17:34 druzus Exp $
  */
 
 /*
@@ -170,13 +170,13 @@ int HB_EXPORT hb_fsProcessValue( FHANDLE fhProc, BOOL bWait );
 #  define HB_SHARELOCK_SIZE         0x1UL
 #endif
 
-#define HB_DRIVE_LENGTH_MAX   10
+#define HB_MAX_DRIVE_LENGTH   10
 #define HB_MAX_FILE_EXT       10
 
 /* Filename support */
 typedef struct
 {
-   char   szBuffer[ _POSIX_PATH_MAX + HB_DRIVE_LENGTH_MAX + 4 ];
+   char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
    char * szPath;
    char * szName;
    char * szExtension;
@@ -224,10 +224,7 @@ extern USHORT    HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr );
 extern ULONG     HB_EXPORT hb_fsAttrToRaw( USHORT uiAttr );
 extern USHORT    HB_EXPORT hb_fsAttrEncode( const char * szAttr );
 extern char      HB_EXPORT * hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
-extern BYTE      HB_EXPORT * hb_filecase ( char * ); /* Convert string to environment case */
-
-extern char      HB_EXPORT * hb_fileTrim( BYTE * szFile) ; /* Caller must free the buffer returned */
-extern BYTE HB_EXPORT * hb_fileNameConv(char *str) ;
+extern BYTE HB_EXPORT * hb_fileNameConv( char *str );
 
 extern BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet );
 

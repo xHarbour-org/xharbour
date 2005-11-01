@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.6 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: hbfsapi.c,v 1.7 2005/08/01 22:18:27 druzus Exp $
  */
 
 /*
@@ -170,7 +170,7 @@ PHB_FNAME hb_fsFNameSplit( char * pszFileName )
    if( pFileName->szPath )
    {
       iPos = 0;
-      while( iPos < HB_DRIVE_LENGTH_MAX && pFileName->szPath[ iPos ] != '\0' )
+      while( iPos < HB_MAX_DRIVE_LENGTH && pFileName->szPath[ iPos ] != '\0' )
       {
          if( pFileName->szPath[ iPos ] == ':' )
          {

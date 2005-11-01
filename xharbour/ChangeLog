@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4554 2005/11/01 18:30:15 likewolf Exp $
+ * $Id: ChangeLog,v 1.4555 2005/11/01 21:46:46 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-01 22:58 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapifs.h
+    * changed HB_DRIVE_LENGTH_MAX to HB_MAX_DRIVE_LENGTH to be compilant
+      with HB_MAX_FILE_EXT
+    - removed hb_filecase() and hb_fileTrim() functions
+      all conversions should be done by hb_fileNameConv()
+
+  * xharbour/source/common/hbfsapi.c
+    * changed HB_DRIVE_LENGTH_MAX to HB_MAX_DRIVE_LENGTH to be compilant
+      with HB_MAX_FILE_EXT
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! respect UNIQUE flag in CUSTOM indexes
+
+  * xharbour/source/rtl/file.c
+    ! use hb_fileNameConv() instead of hb_filecase() which didn't make
+      all translations
+
+  * xharbour/source/rtl/filesys.c
+    ! use hb_fileNameConv() instead of hb_filecase() which didn't make
+      all translations
+    - removed hb_filecase() and hb_fileTrim() functions
+      all conversions should be done by hb_fileNameConv()
+    ! fixed possible GPF in hb_fsCurDirBuf()
+
+  * xharbour/source/rtl/fnsplit.c
+    * replaced:
+         ISCHAR( n ) ? hb_parcx( n ) : NULL;
+      by:
+         hb_parc( n );
+
+  * xharbour/source/tip/Makefile
+    * formatting
 
 2005-10-25 13:06 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/tprinter.c

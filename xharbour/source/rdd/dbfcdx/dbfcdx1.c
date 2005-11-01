@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.227 2005/10/19 14:22:57 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.228 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -4239,9 +4239,9 @@ static ULONG hb_cdxTagKeySeek( LPCDXTAG pTag, LPCDXKEY pKey )
 static BOOL hb_cdxTagKeyAdd( LPCDXTAG pTag, LPCDXKEY pKey )
 {
    hb_cdxTagOpen( pTag );
-   if ( hb_cdxPageSeekKey( pTag->RootPage, pKey,
-                           pTag->UniqueKey ? CDX_IGNORE_REC_NUM : pKey->rec,
-                           TRUE ) != 0 || pTag->Custom )
+   if( hb_cdxPageSeekKey( pTag->RootPage, pKey,
+                          pTag->UniqueKey ? CDX_IGNORE_REC_NUM : pKey->rec,
+                          TRUE ) != 0 || ( pTag->Custom && !pTag->UniqueKey ) )
    {
       hb_cdxPageKeyInsert( pTag->RootPage, pKey );
       pTag->curKeyState &= ~( CDX_CURKEY_RAWPOS | CDX_CURKEY_LOGPOS |
