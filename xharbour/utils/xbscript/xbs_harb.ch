@@ -59,11 +59,10 @@
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
-     METHOD SetStaticProcs()                            INLINE s_aProcedures := ::aCompiledProcs
      METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
 
-     METHOD GetLine( nLine )                            INLINE IIF( nLine > 0 .AND. nLine < Len( ::acPPed ), ::acPPed[ nLine ], "" )
+     METHOD GetLine( nLine )                            INLINE nLine -= ( ::nStartLine - 1 ), IIF( nLine > 0 .AND. nLine <= Len( ::acPPed ), ::acPPed[ nLine ], "" )
 
      #ifdef __XHARBOUR__
        METHOD EvalExpression()
@@ -94,7 +93,7 @@
 
      LOCAL nLine, nLines, sLine, nProcID
      LOCAL oError
-     LOCAL nStart, acPPed := ::acPPed, nOffset
+     LOCAL nStart, acPPed := ::acPPed
      LOCAL bErrHandler := ErrorBlock( {|oErr| Break( oErr ) } )
 
      IF Empty( ::cText )
@@ -141,12 +140,10 @@
 
         nStart := ::nCompiledLines + 1
 
-        nOffset := 0
         FOR nLine := nStart TO nLines
            IF ! Empty( acPPed[ nLine ] )
               EXIT
            ENDIF
-           nOffset++
         NEXT
 
         // No Code!
@@ -164,12 +161,9 @@
 
         FOR nLine := nStart TO nLines
            sLine := acPPed[nLine]
-           IF Empty( sLine )
-              nOffset++
-              //OutputDebugString( "Skipped Line" + EOL )
-           ELSE
-              //OutputDebugString( "COMPILE: (" + Str( nLine ) + "->" + Str( nLine + nOffset - nStart + 1 ) + ") " + sLine + EOL )
-              PP_CompileLine( sLine, nLine + nOffset - nStart + 1, ::aCompiledProcs, ::aInitExit, @nProcId )
+           IF ! Empty( sLine )
+              //OutputDebugString( "COMPILE: (" + Str( nLine ) + ") " + sLine + EOL )
+              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
            ENDIF
         NEXT
 
@@ -222,11 +216,14 @@
         ENDIF
 
         IF Len( ::aCompiledProcs ) > 0
+           //asPrivates := s_asPrivates; asPublics := s_asPublics; asLocals := s_asLocals; aStatics := s_aStatics; aParams := s_aParams
+           s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_aStatics := NIL; s_aParams := {}
+
            xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, Len( ::aCompiledProcs ), HB_aParams(), ::nNextStartProc )
         ELSE
-            oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
-            oError:ProcLine := 0
-            Break( oError )
+           oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
+           oError:ProcLine := 0
+           Break( oError )
         ENDIF
 
      RECOVER USING oError
@@ -2134,8 +2131,6 @@
            PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
            PHB_ITEM pxList;
 
-           //C functions added after (_INITSTATICS) symbol
-           // Reverted!
            static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
            static int iHB_APARAMS = 0, iPP_EXECPROCEDURE = 0;
 

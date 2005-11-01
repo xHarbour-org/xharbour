@@ -799,8 +799,6 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
    LOCAL nLocalRecover
    LOCAL nSequence
 
-   //TraceLog( aProcedures, nProc, aParams, aProc[1] )
-
    IF aProcedures == NIL
       aProcedures := s_aProcedures
    ENDIF
