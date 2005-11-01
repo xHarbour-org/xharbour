@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.65 2005/10/30 14:45:49 druzus Exp $
+ * $Id: debugger.prg,v 1.66 2005/10/30 16:32:01 likewolf Exp $
  */
 
 /*
@@ -591,9 +591,10 @@ RETURN NIL
 
 
 METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
-
-   do case
+  IF ::oBrwText != NIL
+    DO CASE
       case nKey == K_HOME
+         
            ::oBrwText:GoTop()
            if ::oWndCode:lFocused
               SetCursor( SC_SPECIAL1 )
@@ -626,9 +627,9 @@ METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
       case nKey == K_PGDN
            ::oBrwText:PageDown()
 
-   endcase
-
-return nil
+    ENDCASE
+  ENDIF
+RETURN NIL
 
 
 METHOD Colors() CLASS TDebugger
