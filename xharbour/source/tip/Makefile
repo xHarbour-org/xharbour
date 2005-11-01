@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2004/08/29 00:26:25 druzus Exp $
+# $Id: Makefile,v 1.3 2004/12/10 03:10:24 mlombardo Exp $
 #
 
 ROOT = ../../
@@ -21,10 +21,7 @@ PRG_SOURCES= \
 	client.prg \
 	ftpcln.prg \
 	smtpcln.prg	\
-	
-LIBNAME=tip
-ifeq ($(HB_MT),MT)
-  MT_LIBNAME=tipmt
-endif
 
+LIBNAME=tip
+	
 include $(TOP)$(ROOT)config/lib.cf

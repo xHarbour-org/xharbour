@@ -9,8 +9,6 @@ PRG_SOURCES=\
 
 LIBNAME=hbpg
 
-include $(TOP)$(ROOT)config/header.cf
-INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
 
 ifeq ($(HB_COMPILER),mingw32)
