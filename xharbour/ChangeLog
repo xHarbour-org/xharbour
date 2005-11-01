@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4553 2005/11/01 13:30:35 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4554 2005/11/01 18:30:15 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-10-25 13:06 UTC-0800 Tony Bretado <tony@bretado.com>
+  * source/rtl/tprinter.c
+    + Added 4rd item to each subarray when calling GetPrinters(.t.).
+        Before each subarray was {PrinterName, PrinterPort, PrinterScope}
+        Now is {PrinterName, PrinterPort, PrinterScope, DriverName}
+    // I have tested both under WinXP & Win98
 
 2005-11-01 21:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg
@@ -16,7 +23,7 @@
   * source/misc/Makefile
   * source/tip/Makefile
     * removed lib MT build
-  * contrib/pgsql/Makefile	 
+  * contrib/pgsql/Makefile
     * removed useless header's install
 
 2005-11-01 08:40 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
