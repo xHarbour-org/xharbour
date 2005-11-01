@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.55 2005/10/06 23:08:56 ronpinkas Exp $
+ * $Id: macro.c,v 1.56 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
@@ -129,8 +129,11 @@ void HB_EXPORT hb_macroDelete( HB_MACRO_PTR pMacro )
 
    hb_xfree( (void *) pMacro->pCodeInfo->pCode );
    hb_xfree( (void *) pMacro->pCodeInfo );
+
    if( pMacro->Flags & HB_MACRO_DEALLOCATE )
+   {
       hb_xfree( pMacro );
+   }
 }
 
 /* checks if a correct ITEM was passed from the virtual machine eval stack
@@ -223,31 +226,21 @@ static void hb_macroEvaluate( HB_MACRO_PTR pMacro )
 }
 
 
-static void hb_macroSyntaxError( HB_MACRO_PTR pMacro )
+static void hb_macroSyntaxError( HB_MACRO_PTR pMacro, const char *sSource )
 {
    HB_ITEM_PTR pResult;
-   HB_ITEM_PTR pError = NULL;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError(%p)", pMacro));
+   HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError.(%s)", sSource));
 
-   if( pMacro )
+   if( pMacro->pError )
    {
-      HB_TRACE(HB_TR_DEBUG, ("hb_macroSyntaxError.(%s)", pMacro->string));
-
-      pError = pMacro->pError;
-   }
-
-   if( pError )
-   {
-      hb_errLaunch( pError );
-      hb_itemRelease( pError );
-
+      hb_errLaunch( pMacro->pError );
+      hb_itemRelease( pMacro->pError );
       hb_macroDelete( pMacro );
    }
    else
    {
-      /* Using Stack to avoid reported memory leak if the Error System will QUIT the app. */
-      hb_vmPushString( pMacro->string, pMacro->length );
+      hb_vmPushString( sSource, pMacro->length );
 
       hb_macroDelete( pMacro );
 
@@ -519,7 +512,8 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
    {
       HB_MACRO struMacro;
       int iStatus;
-      char * szString = pItem->item.asString.value;
+      const char * szString = pItem->item.asString.value;
+      char *szCopy;
       int iLen = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
@@ -577,22 +571,26 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
          }
 
          hb_pp_ParseExpression( ptr, pOut );
-         szString = pText;
+         szCopy = pText;
          iLen = strlen( szString );
       }
 #else
-      szString = hb_strdup( szString );
+      szCopy = hb_strdup( szString );
 #endif
 
-      iStatus = hb_macroParse( &struMacro, szString, iLen );
+      iStatus = hb_macroParse( &struMacro, szCopy, iLen );
 
+      if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
+      {
+         hb_macroSyntaxError( &struMacro, szString );
+      }
 #ifndef HB_THREAD_SUPPORT
-      if( iContext && ( ( hb_vm_iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( hb_vm_iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
+      else if( iContext && ( ( hb_vm_iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( hb_vm_iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
 #else
-      if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
+      else if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
 #endif
       {
-         hb_macroSyntaxError( &struMacro );
+         hb_macroSyntaxError( &struMacro, szString );
       }
 
 #ifdef HB_MACRO_STATEMENTS
@@ -602,7 +600,7 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
         hb_xfree( pOut );
       }
 #else
-      hb_xfree( (void *) szString );
+      hb_xfree( (void *) szCopy );
 #endif
 
       hb_stackPop();    /* remove compiled string */
@@ -648,10 +646,6 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
             #endif
          }
       }
-      else
-      {
-         hb_macroSyntaxError( &struMacro );
-      }
    }
 }
 
@@ -666,15 +660,15 @@ void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
 
    if( hb_macroCheckParam( pItem ) )
    {
-      char * szString;
+      char *szCopy;
       HB_MACRO struMacro;
       int iStatus;
       ULONG ulLen = pItem->item.asString.length;
 
-      szString = hb_strdup( pItem->item.asString.value );
+      szCopy = hb_strdup( pItem->item.asString.value );
 
       ulLen--;
-      while( szString[ulLen] == ' ' )
+      while( szCopy[ulLen] == ' ' )
       {
          ulLen--;
       }
@@ -685,19 +679,20 @@ void HB_EXPORT hb_macroSetValue( HB_ITEM_PTR pItem, BYTE flags )
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (flags & HB_SM_RT_MACRO) ? s_macroFlags : flags;
 
-      iStatus = hb_macroParse( &struMacro, szString, ulLen );
+      iStatus = hb_macroParse( &struMacro, szCopy, ulLen );
 
-      hb_xfree( (void *) szString );
+      if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
+      {
+         hb_macroSyntaxError( &struMacro, pItem->item.asString.value );
+      }
+
+      hb_xfree( (void *) szCopy );
 
       hb_stackPop();    /* remove compiled string */
 
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
-      }
-      else
-      {
-         hb_macroSyntaxError( &struMacro );
       }
    }
 }
@@ -747,25 +742,30 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       /* grab memory for "alias->var"
       */
       int iLen = pAlias->item.asString.length + 2 + pVar->item.asString.length;
-      char * szString = ( char * ) hb_xgrab( iLen + 1 );
+      char * szCopy = ( char * ) hb_xgrab( iLen + 1 );
       HB_MACRO struMacro;
       int iStatus;
 
-      memcpy( szString, pAlias->item.asString.value, pAlias->item.asString.length );
-      szString[ pAlias->item.asString.length ]     = '-';
-      szString[ pAlias->item.asString.length + 1 ] = '>';
-      memcpy( szString + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
-      szString[ iLen ] = '\0';
+      memcpy( szCopy, pAlias->item.asString.value, pAlias->item.asString.length );
+      szCopy[ pAlias->item.asString.length ]     = '-';
+      szCopy[ pAlias->item.asString.length + 1 ] = '>';
+      memcpy( szCopy + pAlias->item.asString.length + 2, pVar->item.asString.value, pVar->item.asString.length );
+      szCopy[ iLen ] = '\0';
 
       struMacro.Flags      = iFlag;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
 
-      iStatus = hb_macroParse( &struMacro, szString, iLen );
+      iStatus = hb_macroParse( &struMacro, szCopy, iLen );
 
-      hb_xfree( (void *) szString );
-      struMacro.string = NULL;
+      if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
+      {
+         hb_macroSyntaxError( &struMacro, szCopy );
+      }
+
+      hb_xfree( (void *) szCopy );
+      //struMacro.string = NULL;
 
       hb_stackPop();    /* remove compiled variable name */
       hb_stackPop();    /* remove compiled alias */
@@ -773,10 +773,6 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
-      }
-      else
-      {
-         hb_macroSyntaxError( &struMacro );
       }
    }
    else if( hb_macroCheckParam( pVar ) )
@@ -786,28 +782,29 @@ static void hb_macroUseAliased( HB_ITEM_PTR pAlias, HB_ITEM_PTR pVar, int iFlag,
        */
       HB_MACRO struMacro;
       int iStatus;
-      char * szString;
+      char * szCopy;
 
       struMacro.Flags      = iFlag | HB_MACRO_GEN_ALIASED;
       struMacro.uiNameLen  = HB_SYMBOL_NAME_LEN;
       struMacro.status     = HB_MACRO_CONT;
       struMacro.supported  = (bSupported & HB_SM_RT_MACRO) ? s_macroFlags : bSupported;
 
-      szString = hb_strdup( pVar->item.asString.value );
+      szCopy = hb_strdup( pVar->item.asString.value );
 
-      iStatus = hb_macroParse( &struMacro, szString, pVar->item.asString.length );
+      iStatus = hb_macroParse( &struMacro, szCopy, pVar->item.asString.length );
 
-      hb_xfree( (void *) szString );
+      if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
+      {
+         hb_macroSyntaxError( &struMacro, pVar->item.asString.value );
+      }
+
+      hb_xfree( (void *) szCopy );
 
       hb_stackPop();    /* remove compiled string */
 
       if( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) )
       {
          hb_macroEvaluate( &struMacro );
-      }
-      else
-      {
-         hb_macroSyntaxError( &struMacro );
       }
    }
 }
@@ -892,7 +889,7 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
       {
          bNewBuffer = TRUE;
          szString = (char *) hb_xgrab( ulLength + 1 );
-         strncpy( szString, pItem->item.asString.value, ulLength );
+         memcpy( (void *) szString, (void *) pItem->item.asString.value, ulLength );
          szString[ulLength] = '\0';
       }
 
@@ -920,10 +917,6 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
          {
             hb_xfree( (void *) szString );   /* free space allocated in hb_macroTextSubst */
          }
-
-         // Recycle
-         //hb_stackPop();    /* remove compiled string */
-         //hb_vmPushString( pMacro->string, pMacro->length );
 
          hb_errRT_BASE_Subst( EG_SYNTAX, 1449, NULL, "&", 1, hb_stackItemFromTop( -1 ) );
       }
@@ -1704,7 +1697,6 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen, HB_MACRO_DECL )
    hb_compGenPCode3( HB_P_MPUSHSTR, HB_LOBYTE( ulStrLen ), HB_HIBYTE( ulStrLen ), HB_MACRO_PARAM );
    hb_compGenPCodeN( ( BYTE * ) szText, ulStrLen, HB_MACRO_PARAM );
 }
-
 
 void hb_compGenPCode1( BYTE byte, HB_MACRO_DECL )
 {

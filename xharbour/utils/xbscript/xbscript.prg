@@ -1088,7 +1088,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
          // Do nothing.
       ELSE
 
-          Eval( ErrorBlock(), ErrorNew( [PP], 0, 1005, ProcName(), [Unsupported OPCode.], { s_aProc, nBlock } ) )
+          Eval( ErrorBlock(), ErrorNew( [PP], 0, 1005, ProcName(), [Unsupported OPCode.], { s_aProc, OpCode, nBlock } ) )
           // Safety
           BREAK
 
@@ -1612,7 +1612,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      IF s_nFlowId > 0 .AND. s_acFlowType[ s_nFlowId ] == "E"
                         aAdd( aProcedures[ nProcId ][2], { NIL, PP_OP_ENDFOREACH, nLine } ) // Register Recovery Address and Catch Var.
                      ELSEIF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "F"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2029, [Parse], [NEXT does not match FOR], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2029, [Parse], [NEXT does not match FOR], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1660,7 +1660,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CATCH"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "T"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [CATCH with no TRY in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [CATCH with no TRY in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1676,7 +1676,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__RECOVER"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "B"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [RECOVER with no BEGIN SEQUENCE in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2046, [Parse], [RECOVER with no BEGIN SEQUENCE in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1709,7 +1709,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__LOOP"
 
                      IF s_nCompLoop == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2012, [Parse], [LOOP with no loop in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2012, [Parse], [LOOP with no loop in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1728,7 +1728,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__EXIT"
 
                      IF s_nCompLoop == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2011, [Parse], [EXIT with no loop in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2011, [Parse], [EXIT with no loop in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1741,7 +1741,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ENDDO"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "W"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2028, [Parse], [ENDDO does not match WHILE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2028, [Parse], [ENDDO does not match WHILE], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1773,7 +1773,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__CASE"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [CASE does not match DO CASE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [CASE does not match DO CASE], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1790,7 +1790,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__OTHERWISE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "C" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [OTHERWISE does not match DO CASE], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2031, [Parse], [OTHERWISE does not match DO CASE], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1809,7 +1809,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ENDCASE"
 
                      IF s_nFlowId == 0 .OR. s_acFlowType[ s_nFlowId ] != "C"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2030, [Parse], [ENDCASE with no DO CASE in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2030, [Parse], [ENDCASE with no DO CASE in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1841,7 +1841,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSEIF"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2026, [Parse], [ELSEIF does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2026, [Parse], [ELSEIF does not match IF], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1858,7 +1858,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__ELSE"
 
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I" .OR. s_aIfJumps[ s_nCompIf ][4]
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2025, [Parse], [ELSE does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2025, [Parse], [ELSE does not match IF], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1874,7 +1874,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                   ELSEIF sBlock = "PP__ENDIF"
                      IF s_nCompIf == 0 .OR. s_aIfJumps[ s_nCompIf ][3] != "I"
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [ENDIF does not match IF], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [ENDIF does not match IF], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1894,7 +1894,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                   ELSEIF sBlock = "PP__END"
 
                      IF s_nFlowId == 0
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [END with no Flow-Control structure in sight!], sBlock ) )
+                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2027, [Parse], [END with no Flow-Control structure in sight!], { sBlock } ) )
                         // Safety
                         BREAK
                      ELSE
@@ -1981,12 +1981,13 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
       ENDDO
 
    RECOVER USING oError
-      IF( ValType( oError ) == 'O' )
-         //TraceLog( oError:SubSystem, oError:Operation, oError:Description )
+      IF( oError:ClassName == "ERROR" )
+         //TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args[1], sBlock )
+
          IF oError:Operation == '&'
             oError:SubSystem := "PP"
             oError:Operation := "Parse"
-            oError:Description := "Syntax Error, Line: " + Str( nLine, 5 )
+            oError:Description := "Syntax Error;Script line: " + Str( nLine, 5 ) + ";Engine line: " + Str( oError:ProcLine, 5 )
             oError:Args := { sBlock }
          ENDIF
 
@@ -2352,7 +2353,7 @@ RETURN
 FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
    LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
-   LOCAL oError
+   LOCAL oError, bErrorHandler
    LOCAL aProcedures
 
    IF bBlanks == NIL
@@ -2398,7 +2399,9 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
       s_sModule := cFile
       bCompile  := .T.
+      bErrorHandler := ErrorBlock( {|e| Break(e) } )
       PP_PreProFile( cFile, sPPOExt, bBlanks )
+      ErrorBlock( bErrorHandler )
       bCompile  := .F.
    //ENDIF
 
