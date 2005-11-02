@@ -1,0 +1,84 @@
+# $Id: makefile.pc,v 1.000 2005/10/28 00:00:00 modalsist Exp $
+
+#
+# Makefile for Pelles C/C++ compiler.
+#
+
+# ---------------------------------------------------------------
+# "echo." intentionally used instead of "echo", to avoid conflicts
+# with external commands named echo.
+# using macros for ECHO and DEL to allow overiding such as:
+#
+#    set ECHO=cmd /c echo
+#    set DEL=cmd /c del
+#
+# The above might be needed on Windows 2000 and XP.
+# ---------------------------------------------------------------
+
+!ifndef ECHO
+# don't indent definitions
+ECHO = echo.
+!endif
+!ifndef DEL
+# You might need to set 'ECHO=echo.' - but don't set 'DEL=del.' !!!
+DEL = del
+!endif
+
+
+BIN_DIR =$(HB_DIR)\BIN
+LIB_DIR =$(HB_DIR)\LIB
+INC_DIR =$(HB_DIR)\INLCUDE
+
+HARBOUR_EXE =$(BIN_DIR)\harbour.exe
+
+POCC_EXE     =$(POCC_DIR)\BIN\POCC.EXE
+POLIB_EXE    =$(POCC_DIR)\BIN\POLIB.EXE
+POCC_LIB_DIR =$(POCC_DIR)\LIB
+
+WVTGUI_LIB     = $(TARGET_LIB_DIR)\wvtgui.lib
+WVTGUI_OBJ_DIR = $(TARGET_OBJ_DIR)
+
+
+C_FLAGS     = /Ze /Go /Ot /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"
+HB_FLAGS    = -m -n
+
+HARBOUR_CMD = $(HARBOUR_EXE) $(HB_FLAGS) $** -o$@
+POCC_CMD    = $(POCC_EXE) $(C_FLAGS) /Fo$@ $**
+POLIB_CMD   = $(POLIB_EXE) /OUT:$@ $**
+
+#
+# WVTGUI.LIB rules
+#
+
+WVTGUI_OBJS = \
+   $(WVTGUI_OBJ_DIR)\wvtcore.obj  \
+   $(WVTGUI_OBJ_DIR)\wvtutils.obj \
+   $(WVTGUI_OBJ_DIR)\wvtpaint.obj \
+   $(WVTGUI_OBJ_DIR)\wvtclass.obj
+
+
+$(WVTGUI_LIB) : $(WVTGUI_OBJS)
+   $(POLIB_CMD)
+
+# 
+# WVTGUI.LIB dependencies
+# 
+
+$(WVTGUI_OBJ_DIR)\wvtclass.c   : wvtclass.prg
+   $(HARBOUR_CMD)
+
+$(WVTGUI_OBJ_DIR)\wvtclass.obj : $(TARGET_OBJ_DIR)\wvtclass.c
+   $(POCC_CMD)
+
+$(WVTGUI_OBJ_DIR)\wvtpaint.c   : wvtpaint.prg
+   $(HARBOUR_CMD)
+
+$(WVTGUI_OBJ_DIR)\wvtpaint.obj : $(TARGET_OBJ_DIR)\wvtpaint.c
+   $(POCC_CMD)
+
+$(WVTGUI_OBJ_DIR)\wvtcore.obj  : wvtcore.c
+   $(POCC_CMD)
+
+$(WVTGUI_OBJ_DIR)\wvtutils.obj : wvtutils.c
+   $(POCC_CMD)
+

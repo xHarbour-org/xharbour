@@ -1,0 +1,41 @@
+# $Id: makefile.pc,v 1.000 2005/10/28 00:00:00 modalsist Exp $
+
+#
+# Makefile for Pelles C/C++ compiler.
+#
+
+
+BIN_DIR =$(HB_DIR)\BIN
+LIB_DIR =$(HB_DIR)\LIB
+INC_DIR =$(HB_DIR)\INLCUDE
+
+
+POCC_EXE      =$(POCC_DIR)\BIN\POCC.EXE
+POLIB_EXE     =$(POCC_DIR)\BIN\POLIB.EXE
+GTWVW_LIB     =$(TARGET_LIB_DIR)\gtwvw.lib
+GTWVW_OBJ_DIR =$(TARGET_OBJ_DIR)
+
+C_FLAGS     = /Ze /Go /Ot /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"
+HB_FLAGS    = -m -n
+
+POCC_CMD    = $(POCC_EXE) $(C_FLAGS) /Fo$@ $**
+POLIB_CMD   = $(POLIB_EXE) /OUT:$@ $**
+
+#
+# WVWLIB.LIB rules
+#
+
+GTWVW_OBJS = \
+   $(GTWVW_OBJ_DIR)\gtwvw.obj
+
+
+$(GTWVW_LIB) : $(GTWVW_OBJS)
+   $(POLIB_CMD)
+
+# 
+# WVWLIB.LIB dependencies
+# 
+
+$(GTWVW_OBJ_DIR)\gtwvw.obj : gtwvw.c
+   $(POCC_CMD)
+

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4559 2005/11/02 09:27:43 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4560 2005/11/02 17:08:22 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-02 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  ! make_pc.bat
+  ! makefile.pc
+  ! dll_pc.bat
+  ! hrbdll.pc
+    * fixed makefiles for binaries/core libs and dll with Pelles C Compiler.
+      Now this use pelles pomake.exe instead previous borland make.exe.
+
+  + makallpc.bat
+    * added makefile for pelles compiler. Note that make files for all
+      contribs with pelles are in progress.
+
+  + contrib/gtwvw/make_pc.bat
+  + contrib/gtwvw/makefile.pc
+    * added makefiles for gtwvw.lib with Pelles C.
+
+  ! contrib/gtwvw/samples/wvwtest9.prg
+    * changed call of LisWint() function to OS_IsWinNt()
+
+  + contrib/wvtgui/make_pc.bat
+  + contrib/wvtgui/makefile.pc
+    * added makefiles for wvtgui.lib with Pelles C.
 
 
 2005-11-03 00:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>

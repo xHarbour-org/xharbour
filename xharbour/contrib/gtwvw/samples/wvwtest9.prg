@@ -1,5 +1,5 @@
 /*
- * $Id: wvwtest9.prg,v 1.1 2004/10/28 07:49:06 bdj Exp $
+ * $Id: wvwtest9.prg,v 1.2 2005/10/26 15:53:00 bdj Exp $
  */
 //-------------------------------------------------------------------//
 //
@@ -31,7 +31,7 @@
 #include "inkey.ch"
 #include "common.ch"
 #include "setcurs.ch"
-#include "winuser.ch"  //from what32
+#include "..\..\what32\include\winuser.ch"  // from what32 contrib
 
 #DEFINE CRLF chr(13)+chr(10)
 
@@ -1082,7 +1082,7 @@ FUNCTION SetDefaultWindowSize()
           Result:= Wvw_SetFont(,'Terminal',20,10)
         CASE lYesNo("I am preparing the 'best' font for you..." + CRLF+;
                     "Sorry, is your screenWidth >= 800 ?")
-          IF LisWinNt()
+          IF OS_IsWinNt()
              Result:= Wvw_SetFont(,'Lucida Console',16,-8)
           ELSE
              Result:= Wvw_SetFont(,'System',16,-8)
