@@ -1428,6 +1428,7 @@
          BOOL lDontRecord;
          size_t Counter, nLen, nStringLen;
 
+         //#define DEBUG_TOKEN
          #ifdef DEBUG_TOKEN
            char sProc[64];
            USHORT uiLine;
@@ -1838,7 +1839,7 @@
          hb_storc( sLine, 1 );
 
          #ifdef DEBUG_TOKEN
-           printf( "Token: '%s' pLine: '%s'\n", sReturn, pLine ->item.asString.value);
+           printf( "Token: '%s' Len: %i pLine: '%s'\n", sReturn, nLen, pLine ->item.asString.value );
          #endif
 
          hb_retclen( sReturn, nLen );
@@ -1853,13 +1854,15 @@
          size_t nAt, nLen;
          int nStart = -1;
 
-         if( pLine == NULL || pLine->item.asString.length == 0 )
+         if( pLine->item.asString.length == 0 )
          {
             hb_ret();
          }
 
          sLine = pLine->item.asString.value;
          nLen  = pLine->item.asString.length;
+
+         //printf( "Scaning: '%s' for ID\n", sLine );
 
          for( nAt = 0; nAt < nLen; nAt++ )
          {
@@ -1940,158 +1943,147 @@
              cLastChar = cChar;
           }
 
-          if( nStart <= 0 )
-          {
-             hb_storclen( NULL, 0, 2 );
-             //printf( "\nNot Skipped: \n" );
-          }
-          else
-          {
-             hb_storclen( sLine, nStart, 2 );
-             //printf( "\nSkipped: '%.*s'\n", nStart, sLine );
-          }
-
           if( nStart >= 0 )
           {
-             char *sIdentifier = (char *) hb_xgrab( ( nAt - nStart ) + 1 );
+             char *sIdentifier;
 
-             strncpy( sIdentifier, sLine + nStart, ( nAt - nStart ) );
-             sIdentifier[ nAt - nStart ] = '\0';
+             // The skipped portion projected to BYREF 2
+             hb_storclen( sLine, nStart, 2 );
+             //printf( "\nSkipped: '%.*s'\n", nStart, sLine );
 
-             //printf( "\nLine: '%s' nStart: %i nAt: %i sIdentifier: '%s'\n", sLine, nStart, nAt, sIdentifier );
+             nLen = nAt - nStart;
+
+             sIdentifier = (char *) hb_xgrab( nLen + 1 );
+
+             strncpy( sIdentifier, sLine + nStart, nLen );
+             sIdentifier[ nLen ] = '\0';
+
+             //printf( "\nLine: '%s' nStart: %i nAt: %i sIdentifier: '%s' Residual '%s'\n", sLine, nStart, nAt, sIdentifier, sLine + nAt );
 
              hb_storc( sLine + nAt, 1 );
 
-             //printf( "\nIdentifier: '%s'\n", sIdentifier );
-
              #ifdef __XHARBOUR__
-               hb_retclenAdopt( sIdentifier, nAt - nStart );
+               //printf( "Adopt Identifier: '%.*s' Len: %i\n", nLen, sIdentifier, nLen );
+               hb_retclenAdopt( sIdentifier, nLen );
              #else
-               hb_retclen_buffer( sIdentifier, nAt - nStart, i );
+               hb_retclen_buffer( sIdentifier, nLen );
              #endif
           }
           else
           {
+             //printf( "No ID found in '%s'\n", sLine );
              hb_ret();
           }
       }
 
       //----------------------------------------------------------------------------//
-      HB_FUNC( EXTRACTLEADINGWS )
+      HB_FUNC_STATIC( EXTRACTLEADINGWS )
       {
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
-         size_t iLen, i = 0;
-         char *pTmp;
+         size_t iLeading = 0;
 
-         if( pLine == NULL )
+         if( pLine->item.asString.length == 0 )
          {
             hb_retclen( "", 0 );
+            hb_storclen( NULL, 0, 2 );
+
+            return;
+         }
+
+         while( pLine->item.asString.value[iLeading] == ' ' )
+         {
+            iLeading++;
+         }
+
+         // MUST be FIRST, before manipulation below
+         // The leading spaces.
+         hb_retclen( pLine->item.asString.value, iLeading );
+         //printf( "Returned EXTRACTed: '%s'\n", hb_parc(-1) );
+
+         // MUST be SECOND, before manipulation below
+         hb_storclen( hb_parc(-1), iLeading, 2 );
+         //printf( "BYREF EXTRACTed: '%s'\n", hb_parc(-1) );
+
+         if( iLeading )
+         {
+            // The string following the spaces.
+            //printf( "BYREF Pure: '%s'\n", pLine->item.asString.value + iLeading );
+            hb_storclen( pLine->item.asString.value + iLeading, pLine->item.asString.length - iLeading, 1 );
+         }
+      }
+
+      //----------------------------------------------------------------------------//
+      HB_FUNC_STATIC( DROPTRAILINGWS )
+      {
+         PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
+         size_t iLen, i, iDrop = 0;
+
+         if( pLine->item.asString.length == 0 )
+         {
+            hb_retclen( "", 0 );
+            hb_storclen( NULL, 0, 2 );
+
             return;
          }
 
          iLen = pLine->item.asString.length;
 
-         while( pLine->item.asString.value[i] == ' ' )
-         {
-            i++;
-         }
-
-         if( i > 0 )
-         {
-            hb_storclen( pLine->item.asString.value + i, iLen - i, 1 );
-         }
-
-         pTmp = ( char * ) hb_xgrab( i + 1 );
-         memset( pTmp, ' ', i );
-
-         hb_storclen( pTmp, i, 2 );
-
-         #ifdef __XHARBOUR__
-           hb_retclenAdopt( pTmp, i );
-         #else
-           hb_retclen_buffer( pTmp, i );
-         #endif
-      }
-
-      //----------------------------------------------------------------------------//
-      HB_FUNC( DROPTRAILINGWS )
-      {
-         PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
-         char *pString;
-         size_t iLen, i;
-
-         if( pLine == NULL )
-         {
-            hb_retclen( "", 0 );
-            return;
-         }
-
-         pString = hb_itemGetC( pLine );
-         iLen    = hb_itemGetCLen( pLine );
-
          i = iLen - 1;
-
-         while( pString[i] == ' ' )
+         while( i && pLine->item.asString.value[ i ] == ' ' )
          {
+            iDrop++;
             i--;
          }
 
-         if( ++i < iLen )
+         // The trimmed string.
+         //printf( "RETURN Trimed string: '%.*s' Len: %i\n", iLen - iDrop, pLine->item.asString.value, iLen - iDrop );
+         hb_retclen( pLine->item.asString.value, iLen - iDrop );
+
+         // The traling spaces MUST be FIRST before manipulation below!
+         //printf( "Trailing: '%.*s' Len: %i\n", iDrop, pLine->item.asString.value + ( iLen - iDrop ), iDrop );
+         hb_storclen( pLine->item.asString.value + ( iLen - iDrop ), iDrop, 2 );
+
+         // The returned trimmed string projected to the BYREF argument.
+         if( iDrop )
          {
-            pString[i] = '\0';
+            //printf( "COPY Trimed string: '%s' Len: %i\n", hb_parc(-1), hb_parclen(-1) );
+            hb_storclen( hb_parc(-1), iLen - iDrop, 1 );
          }
-
-         hb_storclen( pString, i, 1 );
-
-         if( ISBYREF( 2 ) )
-         {
-            char *pTmp = ( char * ) hb_xgrab( iLen - i + 1 );
-            memset( pTmp, ' ', iLen - i );
-            hb_storclenAdopt( pTmp, iLen - i, 2 );
-         }
-
-         #ifdef __XHARBOUR__
-           hb_retclenAdopt( pString, i );
-         #else
-           hb_retclen_buffer( pString, i );
-         #endif
       }
 
       //----------------------------------------------------------------------------//
-      HB_FUNC( DROPEXTRATRAILINGWS )
+      HB_FUNC_STATIC( DROPEXTRATRAILINGWS )
       {
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
-         char *pString;
-         size_t iLen, i;
+         size_t iLen, i, iDrop = 0;
 
-         if( pLine == NULL )
+         if( pLine->item.asString.length == 0 )
          {
             hb_retclen( "", 0 );
+            hb_storclen( NULL, 0, 2 );
+
             return;
          }
 
-         pString = hb_itemGetC( pLine );
-         iLen    = hb_itemGetCLen( pLine );
+         iLen = pLine->item.asString.length;
 
          i = iLen - 1;
-
-         while( i > 1 && pString[i] == ' ' && pString[i - 1] == ' ' )
+         while( i > 1 && pLine->item.asString.value[ i ] == ' ' && pLine->item.asString.value[ i - 1 ] == ' ' )
          {
+            iDrop++;
             i--;
          }
 
-         if( ++i < iLen )
+         // The trimmed string.
+         //printf( "RETURN Shaved string: '%.*s' Len: %i\n", iLen - iDrop, pLine->item.asString.value, iLen - iDrop );
+         hb_retclen( pLine->item.asString.value, iLen - iDrop );
+
+         // The returned trimmed string projected to the BYREF argument.
+         if( iDrop )
          {
-            pString[i] = '\0';
+            //printf( "COPY Shaved string: '%s' Len: %i\n", hb_parc(-1), hb_parclen(-1) );
+            hb_storclen( hb_parc(-1), iLen - iDrop, 1 );
          }
-
-         hb_storclen( pString, i, 1 );
-
-         #ifdef __XHARBOUR__
-           hb_retclenAdopt( pString, i );
-         #else
-           hb_retclen_buffer( pString, i );
-         #endif
       }
 
     #pragma ENDDUMP

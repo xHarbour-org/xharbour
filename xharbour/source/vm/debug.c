@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.19 2005/10/24 01:04:36 druzus Exp $
+ * $Id: debug.c,v 1.20 2005/10/31 03:51:36 ronpinkas Exp $
  */
 
 /*
@@ -69,10 +69,12 @@ static void AddToArray( PHB_ITEM pItem, PHB_ITEM pReturn, ULONG ulPos )
 
    if( pItem->type == HB_IT_SYMBOL )
    {
-      /* Symbol is pushed as text */
-      HB_STRING_ALLOC( &Temp, strlen( pItem->item.asSymbol.value->szName ) + 2 )
+      int iLen = strlen( pItem->item.asSymbol.value->szName ) + 2;
+      char *sTemp = (char *) hb_xgrab( iLen + 1 );
 
-      sprintf( (&Temp)->item.asString.value, "[%s]", pItem->item.asSymbol.value->szName );
+      sprintf( sTemp, "[%s]", pItem->item.asSymbol.value->szName );
+
+      hb_itemPutCPtr( &Temp, sTemp, iLen );
 
       hb_arraySetForward( pReturn, ulPos, &Temp );
       // hb_itemRelease( pTemp );               /* Get rid of temporary str.*/

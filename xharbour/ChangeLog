@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4560 2005/11/02 17:08:22 bdj Exp $
+ * $Id: ChangeLog,v 1.4561 2005/11/02 17:59:30 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,45 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-02 11:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbvmpub.h
+  * source/vm/fastitem.c
+  * source/vm/itemapi.c
+  * source/vm/hvm.c
+    - Removed redundant asString.bStatic and replaced with asString.allocated
+
+  * include/hbapi.h
+    % Optimized HB_STRING_ALLOC()
+    * Renamed HB_STRING_REALLOC() to __HB_STRING_REALLOC() to signify undocumented macro.
+
+  * include/hbapi.h
+  * source/vm/classes.c
+  * source/rtl/str2ptr.c
+  * source/rtl/chrasc.c
+    * Renamed hb_*Adopt*Static*() to hb_*Static*() as adopt is inherent with static strings.
+
+  * source/vm/debug.c
+    * Revised to use hb_itemPutCPtr()
+
+  * source/vm/inet.c
+    * HB_STRING_REALLOC() -> HB_STRING_ALLOC()
+
+  * source/vm/fastitem.c
+    % Optimized hb_itemPutC() and hb_itemPutCL()
+
+  * source/vm/itemapi.c
+    - Removed commented code.
+
+  * source/vm/hvm.c
+    * Simplified HB_P_LEFT and HB_P_RIGHT
+    * Revised hb_vmPlus() for strings
+
+  * utils/xbscript/xbs_harb.ch
+    * Simplified usage of strings API
+
+  * utils/xbscript/xbscript.prg
+    * Cleanup
 
 2005-11-02 16:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   ! make_pc.bat

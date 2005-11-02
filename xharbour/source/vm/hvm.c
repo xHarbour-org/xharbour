@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.521 2005/10/31 12:56:35 druzus Exp $
+ * $Id: hvm.c,v 1.522 2005/10/31 22:41:53 ronpinkas Exp $
  */
 
 /*
@@ -2952,9 +2952,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   if( ( ULONG ) iNewLen < pString->item.asString.length )
                   {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value, iNewLen );
-                     hb_itemPutCPtr( pString, sString, iNewLen );
+                     hb_itemPutCL( pString, pString->item.asString.value, iNewLen );
                   }
                }
                else
@@ -2986,9 +2984,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   if( ( ULONG ) iNewLen < pString->item.asString.length )
                   {
-                     sString = (char*) hb_xgrab( iNewLen + 1 );
-                     memcpy( sString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
-                     hb_itemPutCPtr( pString, sString, iNewLen );
+                     hb_itemPutCL( pString, pString->item.asString.value + pString->item.asString.length - iNewLen, iNewLen );
                   }
                }
                else
@@ -3854,19 +3850,16 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
             {
                ULONG ulNewLen = ulLen1 + ulLen2;
 
-               if( pLeft == pResult && pLeft->item.asString.bStatic == FALSE && ( *( pLeft->item.asString.pulHolders ) == 1 ) )
+               if( ! ( pLeft == pResult && pLeft->item.asString.allocated && ( *( pLeft->item.asString.pulHolders ) == 1 ) ) )
                {
-                  HB_STRING_REALLOC( pResult, ulNewLen );
-               }
-               else
-               {
-                  char *sLeft = pLeft->item.asString.value;
+                  char *sResult = (char *) hb_xgrab( ulNewLen + 1 );
 
-                  HB_STRING_ALLOC( pResult, ulNewLen );
-
-                  hb_xmemcpy( (void * ) pResult->item.asString.value, (void *) sLeft, ulLen1 );
+                  hb_xmemcpy( sResult, pLeft->item.asString.value, ulLen1 );
+                  hb_itemPutCPtr( pResult, sResult, ulLen1 );
                }
 
+               // At minimum sets length and terminator.
+               __HB_STRING_REALLOC( pResult, ulNewLen );
                hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
             }
             else
@@ -5290,7 +5283,7 @@ static void hb_vmBitAnd( void )
       char*  pNewString;
       ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
@@ -5325,7 +5318,7 @@ static void hb_vmBitAnd( void )
       ULONG  ulLen = pItem1->item.asString.length;
       char*  pNewString;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
@@ -5404,7 +5397,7 @@ static void hb_vmBitOr( void )
       char*  pNewString;
       ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
@@ -5439,7 +5432,7 @@ static void hb_vmBitOr( void )
       ULONG  ulLen = pItem1->item.asString.length;
       char*  pNewString;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
@@ -5521,7 +5514,7 @@ static void hb_vmBitXor( void )
       char*  pNewString;
       ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen1 + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
@@ -5556,7 +5549,7 @@ static void hb_vmBitXor( void )
       ULONG  ulLen = pItem1->item.asString.length;
       char*  pNewString;
 
-      if( pItem1->item.asString.bStatic || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
       {
          pNewString = (char*) hb_xgrab( ulLen + 1 );
          hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
@@ -6046,7 +6039,7 @@ static void hb_vmArrayPop( void )
             bNewChar = (BYTE) pValue->item.asDouble.value;
          }
 
-         if( pArray->item.asString.bStatic || *( pArray->item.asString.pulHolders ) > 1 )
+         if( pArray->item.asString.allocated == 0 || *( pArray->item.asString.pulHolders ) > 1 )
          {
             char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 

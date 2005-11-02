@@ -1504,12 +1504,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
             sTemp  := ""
          ENDIF
 
-         ExtractLeadingWS( @sBlock )
-         DropTrailingWS( @sBlock )
-
          //TraceLog( sBlock )
 
          IF ! Empty( sBlock )
+            sBlock := AllTrim( sBlock )
+
             IF sBlock = "#line"
                LOOP
             ENDIF
@@ -5031,295 +5030,6 @@ RETURN 0
 
 //--------------------------------------------------------------//
 
-#ifndef USE_C_BOOST
-
-STATIC FUNCTION NextToken( sLine, lDontRecord )
-
-   LOCAL sReturn, Counter, nLen, nClose
-   LOCAL s1, s2, s3
-   LOCAL sDigits
-   LOCAL sToken
-
-   //TraceLog( sLine, lDontRecord )
-
-   IF Empty( sLine )
-      RETURN NIL
-   ENDIF
-
-   IF Empty( lDontRecord )
-      lDontRecord := .F.
-   ENDIF
-
-   // *** To be removed after final testing !!!
-   sLine := LTrim( sLine )
-
-   nLen := Len( sLine )
-   s1 := Left( sLine, 1 )
-
-   BEGIN SEQUENCE
-
-      IF nLen >= 2
-
-         s2 := Left( sLine, 2 )
-
-         IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\=>\^^\<<\>>"
-
-            sReturn := s2
-
-            BREAK
-
-         ELSEIF s2 == "[["
-
-            nClose := AT( ']]', sLine )
-            IF nClose == 0
-               //Alert( "ERROR! [NextToken()] Unterminated '[[' at: " + sLine + "[" + Str( ProcLine() ) + "]"  )
-               sReturn := "["  // Clipper does NOT consider '[[' a single token
-            ELSE
-               sReturn := Left( sLine, nClose + 2 )
-            ENDIF
-
-            BREAK
-
-         ELSEIF s2 $ "0x\0X"
-            sReturn := s2
-
-            FOR Counter := 3TO nLen
-               s1 := SubStr( sLine, Counter, 1 )
-               IF ! ( IsDigit( s1 ) .OR. s1 $ "abcdefABCDEF" )
-                  EXIT
-               ENDIF
-               sReturn += s1
-            NEXT
-
-            BREAK
-
-         ENDIF
-
-      ENDIF
-
-      IF IsAlpha( s1 ) .OR. s1 == '_'
-
-         sReturn := s1
-         FOR Counter := 2 TO nLen
-            s1 := SubStr( sLine, Counter, 1 )
-            IF ! ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 == "_" )
-               EXIT
-            ENDIF
-            sReturn += s1
-         NEXT
-
-         BREAK
-
-      ELSEIF IsDigit( s1 )
-
-         sReturn := s1
-         FOR Counter := 2 TO nLen
-            s1 := SubStr( sLine, Counter, 1 )
-            IF ! ( IsDigit( s1 ) )
-               EXIT
-            ENDIF
-            sReturn += s1
-         NEXT
-
-         // Consume the point (and subsequent digits) only if digits follow...
-         IF s1 == '.'
-            sDigits := ""
-            DO WHILE IsDigit( ( s1 := SubStr( sLine, ++Counter, 1 ) ) )
-               sDigits += s1
-            ENDDO
-
-            IF ! ( sDigits == "" )
-               sReturn += ( '.' + sDigits )
-            ENDIF
-         ENDIF
-
-         // Either way we are done.
-         BREAK
-
-      ELSEIF s1 == '.'
-
-         sDigits := ""
-         FOR Counter := 2 TO nLen
-            s1 := SubStr( sLine, Counter, 1 )
-            IF ! ( IsDigit( s1 ) )
-               EXIT
-            ENDIF
-
-            sDigits += s1
-         NEXT
-
-         // Must have accumulated decimal digits.
-         IF ! ( sDigits == "" )
-            sReturn := '.' + sDigits
-
-            BREAK
-         ENDIF
-
-         IF nLen >= 5 .AND. SubStr( sLine, 5, 1 ) == '.'
-
-            s3 := Upper( SubStr( sLine, 2, 3 ) )
-            IF s3 == 'AND'
-
-               sReturn := ".AND."
-
-               BREAK
-
-            ELSEIF s3 == 'NOT'
-
-               sReturn := "!"
-               /* Skip the unaccounted letters ( .NOT. <-> ! ) */
-               sLine := SubStr( sLine, 5 )
-
-               BREAK
-
-            ENDIF
-
-         ENDIF
-
-         IF nLen >= 4 .AND. SubStr( sLine, 4, 1 ) == '.' .AND. Upper( SubStr( sLine, 2, 2 ) ) == 'OR'
-
-            sReturn := ".OR."
-
-            BREAK
-
-         ENDIF
-
-         IF nLen >= 3 .AND. SubStr( sLine, 3, 1 ) == '.' .AND. Upper( SubStr( sLine, 2, 1 ) ) $ "TF"
-
-            sReturn := Upper( Left( sLine, 3 ) )
-
-            BREAK
-
-         ENDIF
-
-         sReturn := '.'
-
-         BREAK
-
-      ELSEIF s1 == '"'
-
-         nClose := AT( '"', sLine, 2 )
-         IF nClose == 0
-            //Alert( 'ERROR! [NextToken()] Unterminated ["] at: ' + sLine )
-            sReturn := '"'
-         ELSE
-            sReturn := Left( sLine, nClose )
-         ENDIF
-
-         BREAK
-
-      ELSEIF s1 == "'"
-
-         nClose := AT( "'", sLine, 2 )
-         IF nClose == 0
-            //Alert( "ERROR! [NextToken()] Unterminated ['] at: " + sLine )
-            sReturn := "'"
-         ELSE
-            sReturn := SubStr( sLine, 2, nClose - 2 )
-            IF ! ( '"' $ sReturn )
-               sReturn := '"' + sReturn + '"'
-            ELSE
-               sReturn := "'" + sReturn + "'"
-            ENDIF
-         ENDIF
-
-         BREAK
-
-      ELSEIF s1 == '['
-
-         IF s_bArrayPrefix
-            sReturn := '['
-         ELSE
-            nClose := AT( ']', sLine )
-            IF nClose == 0
-               //Alert( "ERROR! [NextToken()] Unterminated '[' at: " + sLine + "[" + Str( ProcLine() ) + "]" )
-               sReturn := '['
-            ELSE
-               sReturn := SubStr( sLine, 2, nClose - 2 )
-               IF ! ( '"' $ sReturn )
-                  sReturn := '"' + sReturn + '"'
-               ELSEIF ! ( "'" $ sReturn )
-                  sReturn := "'" + sReturn + "'"
-               ELSE
-                  sReturn := '[' + sReturn + ']'
-               ENDIF
-            ENDIF
-         ENDIF
-
-         BREAK
-
-      ELSEIF s1 == "\"
-
-         sReturn := s2
-
-         BREAK
-
-      ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$~"
-
-         sReturn := s1
-
-         BREAK
-
-      ELSE
-
-         TraceLog( "Unexpected case: ", sLine )
-         Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Next-Token], [Unexpected case], { sLine } ) )
-         sReturn := sLine
-
-      ENDIF
-
-   END SEQUENCE
-
-   sLine := SubStr( sLine, Len( sReturn ) + 1 )
-
-   IF lDontRecord == .F.
-      IF Left( sReturn, 1 ) == '.' .AND. Len( sReturn ) > 1 .AND. Right( sReturn, 1 ) == '.'
-         s_bArrayPrefix := .F.
-      ELSE
-         s1             := Right( sReturn, 1 )
-
-         IF Upper( s1 ) == 'R'
-            sToken := Upper( sReturn )
-            IF sToken == "RETU" .OR. sToken == "RETUR" .OR. sToken == "RETURN"
-               s_bArrayPrefix := .F.
-            ELSE
-               s_bArrayPrefix := .T.
-            ENDIF
-         ELSE
-            s_bArrayPrefix := ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 $ "])}._" )
-         ENDIF
-      ENDIF
-   ENDIF
-
-   sReturn += ExtractLeadingWS( @sLine )
-
-   #ifdef PP_RECURSIVE
-
-      IF s_bRecursive
-         s1 := Left( sReturn, 1 )
-         IF ( IsAlpha( s1 ) .OR. s1 == '_' ) .AND. MatchRule( sReturn, @sLine, aDefRules, aDefResults, .F., .F. ) > 0
-            RETURN NextToken( @sLine, .T. )
-         ENDIF
-
-         IF MatchRule( sReturn, @sLine, aTransRules, aTransResults, .F., .T. ) > 0
-            //? '>', sLine, '<'
-            RETURN NextToken( @sLine, .T. )
-         ENDIF
-
-         //? sReturn, "not defined/translated."
-         //WAIT
-      ENDIF
-
-   #endif
-
-   //TraceLog( "TOKEN = >" + sReturn + "<", sLine, s_bArrayPrefix )
-
-RETURN sReturn
-
-#endif
-
-//--------------------------------------------------------------//
-
 STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
   LOCAL sExp, sTemp, Counter, sPad, sToken, sList
@@ -8069,78 +7779,427 @@ RETURN Len( aDefRules )
 
 #ifndef USE_C_BOOST
 
-FUNCTION ExtractLeadingWS( sLine, sWS )
+   //--------------------------------------------------------------//
 
-   LOCAL Counter, cChar, nLen := Len( sLine )
+   STATIC FUNCTION NextToken( sLine, lDontRecord )
 
-   //? "Removing Leading: '" + sLine + "'"
+      LOCAL sReturn, Counter, nLen, nClose
+      LOCAL s1, s2, s3
+      LOCAL sDigits
+      LOCAL sToken
 
-   sWS := ''
-   FOR Counter := 1 TO nLen
-      cChar := SubStr( sLine, Counter, 1 )
-      IF cChar == ' ' //$ ( ' ' + Chr(9) ) // Tabs converted to spaces
-         sWS += cChar
-      ELSE
-         EXIT
+      //TraceLog( sLine, lDontRecord )
+
+      IF Empty( sLine )
+         RETURN NIL
       ENDIF
-   NEXT
 
-   IF Counter > 1
-      sLine := SubStr( sLine, Counter )
-   ENDIF
+      IF Empty( lDontRecord )
+         lDontRecord := .F.
+      ENDIF
 
-   //? "Removed: '" + sWs + "' sLine: " + sLine
+      // *** To be removed after final testing !!!
+      sLine := LTrim( sLine )
 
-RETURN sWS
+      nLen := Len( sLine )
+      s1 := Left( sLine, 1 )
 
-#endif
+      BEGIN SEQUENCE
 
-//--------------------------------------------------------------//
+         IF nLen >= 2
 
-#ifndef USE_C_BOOST
+            s2 := Left( sLine, 2 )
 
-FUNCTION DropTrailingWS( sLine, sWS )
+            IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\=>\^^\<<\>>"
 
-   LOCAL nLenSource, nLen := Len( sLine ), cChar
+               sReturn := s2
 
-   nLenSource := nLen
+               BREAK
 
-   //? "Before Drop: '" + sLine + "'"
+            ELSEIF s2 == "[["
 
-   /* Tabs are converted to spaces at PP_PreProFile() */
+               nClose := AT( ']]', sLine )
+               IF nClose == 0
+                  //Alert( "ERROR! [NextToken()] Unterminated '[[' at: " + sLine + "[" + Str( ProcLine() ) + "]"  )
+                  sReturn := "["  // Clipper does NOT consider '[[' a single token
+               ELSE
+                  sReturn := Left( sLine, nClose + 2 )
+               ENDIF
 
-   WHILE nLen > 0 .AND. ( cChar := SubStr( sLine, nLen, 1 ) ) == ' ' //$ ( ' ' + Chr(9) ) // Tabs converted to spaces
-      nLen--
-   ENDDO
+               BREAK
 
-   sLine := Left( sLine, nLen )
-   sWS   := Space( nLenSource - nLen )
+            ELSEIF s2 $ "0x\0X"
+               sReturn := s2
 
-   //? "After Drop: '" + sLine + "'"
+               FOR Counter := 3 TO nLen
+                  s1 := SubStr( sLine, Counter, 1 )
+                  IF ! ( IsDigit( s1 ) .OR. s1 $ "abcdefABCDEF" )
+                     EXIT
+                  ENDIF
+                  sReturn += s1
+               NEXT
 
-RETURN sLine
+               BREAK
 
-#endif
+            ENDIF
 
-//--------------------------------------------------------------//
+         ENDIF
 
-#ifndef USE_C_BOOST
+         IF IsAlpha( s1 ) .OR. s1 == '_'
 
-FUNCTION DropExtraTrailingWS( sLine )
+            sReturn := s1
+            FOR Counter := 2 TO nLen
+               s1 := SubStr( sLine, Counter, 1 )
+               IF ! ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 == "_" )
+                  EXIT
+               ENDIF
+               sReturn += s1
+            NEXT
 
-   LOCAL nLen := Len( sLine )
-   /* Tabs are converted to spaces at PP_PreProFile() */
+            BREAK
 
-   //? "Before Extra: '" + sLine + "'"
+         ELSEIF IsDigit( s1 )
 
-   WHILE nLen > 2 .AND. ( SubStr( sLine, nLen, 1 ) == ' ' /* $ ( ' ' + Chr(9) ) */ ) .AND. ;
-                        ( SubStr( sLine, nLen - 1, 1 ) == ' ' ) //$ ( ' ' + Chr(9) ) )
-      nLen--
-   ENDDO
+            sReturn := s1
+            FOR Counter := 2 TO nLen
+               s1 := SubStr( sLine, Counter, 1 )
+               IF ! ( IsDigit( s1 ) )
+                  EXIT
+               ENDIF
+               sReturn += s1
+            NEXT
 
-   sLine := Left( sLine, nLen )
+            // Consume the point (and subsequent digits) only if digits follow...
+            IF s1 == '.'
+               sDigits := ""
+               DO WHILE IsDigit( ( s1 := SubStr( sLine, ++Counter, 1 ) ) )
+                  sDigits += s1
+               ENDDO
 
-RETURN sLine
+               IF ! ( sDigits == "" )
+                  sReturn += ( '.' + sDigits )
+               ENDIF
+            ENDIF
+
+            // Either way we are done.
+            BREAK
+
+         ELSEIF s1 == '.'
+
+            sDigits := ""
+            FOR Counter := 2 TO nLen
+               s1 := SubStr( sLine, Counter, 1 )
+               IF ! ( IsDigit( s1 ) )
+                  EXIT
+               ENDIF
+
+               sDigits += s1
+            NEXT
+
+            // Must have accumulated decimal digits.
+            IF ! ( sDigits == "" )
+               sReturn := '.' + sDigits
+
+               BREAK
+            ENDIF
+
+            IF nLen >= 5 .AND. SubStr( sLine, 5, 1 ) == '.'
+
+               s3 := Upper( SubStr( sLine, 2, 3 ) )
+               IF s3 == 'AND'
+
+                  sReturn := ".AND."
+
+                  BREAK
+
+               ELSEIF s3 == 'NOT'
+
+                  sReturn := "!"
+                  /* Skip the unaccounted letters ( .NOT. <-> ! ) */
+                  sLine := SubStr( sLine, 5 )
+
+                  BREAK
+
+               ENDIF
+
+            ENDIF
+
+            IF nLen >= 4 .AND. SubStr( sLine, 4, 1 ) == '.' .AND. Upper( SubStr( sLine, 2, 2 ) ) == 'OR'
+
+               sReturn := ".OR."
+
+               BREAK
+
+            ENDIF
+
+            IF nLen >= 3 .AND. SubStr( sLine, 3, 1 ) == '.' .AND. Upper( SubStr( sLine, 2, 1 ) ) $ "TF"
+
+               sReturn := Upper( Left( sLine, 3 ) )
+
+               BREAK
+
+            ENDIF
+
+            sReturn := '.'
+
+            BREAK
+
+         ELSEIF s1 == '"'
+
+            nClose := AT( '"', sLine, 2 )
+            IF nClose == 0
+               //Alert( 'ERROR! [NextToken()] Unterminated ["] at: ' + sLine )
+               sReturn := '"'
+            ELSE
+               sReturn := Left( sLine, nClose )
+            ENDIF
+
+            BREAK
+
+         ELSEIF s1 == "'"
+
+            nClose := AT( "'", sLine, 2 )
+            IF nClose == 0
+               //Alert( "ERROR! [NextToken()] Unterminated ['] at: " + sLine )
+               sReturn := "'"
+            ELSE
+               sReturn := SubStr( sLine, 2, nClose - 2 )
+               IF ! ( '"' $ sReturn )
+                  sReturn := '"' + sReturn + '"'
+               ELSE
+                  sReturn := "'" + sReturn + "'"
+               ENDIF
+            ENDIF
+
+            BREAK
+
+         ELSEIF s1 == '['
+
+            IF s_bArrayPrefix
+               sReturn := '['
+            ELSE
+               nClose := AT( ']', sLine )
+               IF nClose == 0
+                  //Alert( "ERROR! [NextToken()] Unterminated '[' at: " + sLine + "[" + Str( ProcLine() ) + "]" )
+                  sReturn := '['
+               ELSE
+                  sReturn := SubStr( sLine, 2, nClose - 2 )
+                  IF ! ( '"' $ sReturn )
+                     sReturn := '"' + sReturn + '"'
+                  ELSEIF ! ( "'" $ sReturn )
+                     sReturn := "'" + sReturn + "'"
+                  ELSE
+                     sReturn := '[' + sReturn + ']'
+                  ENDIF
+               ENDIF
+            ENDIF
+
+            BREAK
+
+         ELSEIF s1 == "\"
+
+            sReturn := s2
+
+            BREAK
+
+         ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$~"
+
+            sReturn := s1
+
+            BREAK
+
+         ELSE
+
+            TraceLog( "Unexpected case: ", sLine )
+            Eval( ErrorBlock(), ErrorNew( [PP], 0, 3010, [Next-Token], [Unexpected case], { sLine } ) )
+            sReturn := sLine
+
+         ENDIF
+
+      END SEQUENCE
+
+      sLine := SubStr( sLine, Len( sReturn ) + 1 )
+
+      IF lDontRecord == .F.
+         IF Left( sReturn, 1 ) == '.' .AND. Len( sReturn ) > 1 .AND. Right( sReturn, 1 ) == '.'
+            s_bArrayPrefix := .F.
+         ELSE
+            s1             := Right( sReturn, 1 )
+
+            IF Upper( s1 ) == 'R'
+               sToken := Upper( sReturn )
+               IF sToken == "RETU" .OR. sToken == "RETUR" .OR. sToken == "RETURN"
+                  s_bArrayPrefix := .F.
+               ELSE
+                  s_bArrayPrefix := .T.
+               ENDIF
+            ELSE
+               s_bArrayPrefix := ( IsAlpha( s1 ) .OR. IsDigit( s1 ) .OR. s1 $ "])}._" )
+            ENDIF
+         ENDIF
+      ENDIF
+
+      sReturn += ExtractLeadingWS( @sLine )
+
+      #ifdef PP_RECURSIVE
+
+         IF s_bRecursive
+            s1 := Left( sReturn, 1 )
+            IF ( IsAlpha( s1 ) .OR. s1 == '_' ) .AND. MatchRule( sReturn, @sLine, aDefRules, aDefResults, .F., .F. ) > 0
+               RETURN NextToken( @sLine, .T. )
+            ENDIF
+
+            IF MatchRule( sReturn, @sLine, aTransRules, aTransResults, .F., .T. ) > 0
+               //? '>', sLine, '<'
+               RETURN NextToken( @sLine, .T. )
+            ENDIF
+
+            //? sReturn, "not defined/translated."
+            //WAIT
+         ENDIF
+
+      #endif
+
+      //TraceLog( "TOKEN = >" + sReturn + "<", sLine, s_bArrayPrefix )
+
+   RETURN sReturn
+
+   //--------------------------------------------------------------//
+
+   STATIC FUNCTION NextIdentifier( sLine, sSkipped )
+
+      LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := '0', nStart, sIdentifier, sTmp
+
+      FOR nAt := 1 TO nLen
+          cChar := SubStr( sLine, nAt, 1 )
+
+          IF cChar $ ' ,([{|^*/+-=!#<>:&$'
+             IF nStart != NIL
+                EXIT
+             ENDIF
+             LOOP // No need to record cLastChar
+          ELSEIF cChar $ ')]}'
+             IF nStart != NIL
+                EXIT
+             ENDIF
+          ELSEIF cChar $ '"'+"'"
+             DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
+             ENDDO
+             LOOP // No need to record cLastChar
+          ELSEIF cChar == '['
+             IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
+                DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
+                ENDDO
+             ENDIF
+             cLastChar := ']'
+             LOOP // Recorded cLastChar
+          ELSEIF cChar == '.'
+             IF cLastChar == '_' .OR. IsAlpha( cLastChar )
+                EXIT
+             ENDIF
+
+             sTmp := Upper( SubStr( sLine, nAt + 1, 4 ) )
+             IF sTmp = "T."
+                nAt += 2
+                LOOP
+             ELSEIF sTmp = "F."
+                nAt += 2
+                LOOP
+             ELSEIF sTmp = "OR."
+                nAt += 3
+                LOOP
+             ELSEIF sTmp = "AND."
+                nAt += 4
+                LOOP
+             ELSEIF sTmp = "NOT."
+                nAt += 4
+                LOOP
+             ENDIF
+          ELSEIF nStart == NIL .AND. ( IsAlpha( cChar ) .OR. cChar == '_' )
+             nStart := nAt
+          ENDIF
+
+          cLastChar := cChar
+       NEXT
+
+       IF nStart != NIL
+          sIdentifier := SubStr( sLine, nStart, nAt - nStart )
+          sSkipped    := Left( sLine, nStart - 1 )
+          sLine       := SubStr( sLine, nAt )
+       ENDIF
+
+       //TraceLog( sIdentifier, sLine, sSkipped, cChar, cLastChar, nStart, nAt, nLen )
+
+   RETURN sIdentifier
+
+   //--------------------------------------------------------------//
+
+   STATIC FUNCTION ExtractLeadingWS( sLine, sWS )
+
+      LOCAL Counter, cChar, nLen := Len( sLine )
+
+      //? "Removing Leading: '" + sLine + "'"
+
+      sWS := ''
+      FOR Counter := 1 TO nLen
+         cChar := SubStr( sLine, Counter, 1 )
+         IF cChar == ' ' //$ ( ' ' + Chr(9) ) // Tabs converted to spaces
+            sWS += cChar
+         ELSE
+            EXIT
+         ENDIF
+      NEXT
+
+      IF Counter > 1
+         sLine := SubStr( sLine, Counter )
+      ENDIF
+
+      //? "Removed: '" + sWs + "' sLine: " + sLine
+
+   RETURN sWS
+
+   //--------------------------------------------------------------//
+
+   STATIC FUNCTION DropTrailingWS( sLine, sWS )
+
+      LOCAL nLenSource, nLen := Len( sLine ), cChar
+
+      nLenSource := nLen
+
+      //? "Before Drop: '" + sLine + "'"
+
+      /* Tabs are converted to spaces at PP_PreProFile() */
+
+      WHILE nLen > 0 .AND. ( cChar := SubStr( sLine, nLen, 1 ) ) == ' ' //$ ( ' ' + Chr(9) ) // Tabs converted to spaces
+         nLen--
+      ENDDO
+
+      sLine := Left( sLine, nLen )
+      sWS   := Space( nLenSource - nLen )
+
+      //? "After Drop: '" + sLine + "'"
+
+   RETURN sLine
+
+   //--------------------------------------------------------------//
+
+   STATIC FUNCTION DropExtraTrailingWS( sLine )
+
+      LOCAL nLen := Len( sLine )
+      /* Tabs are converted to spaces at PP_PreProFile() */
+
+      //? "Before Extra: '" + sLine + "'"
+
+      WHILE nLen > 2 .AND. ( SubStr( sLine, nLen, 1 ) == ' ' /* $ ( ' ' + Chr(9) ) */ ) .AND. ;
+                           ( SubStr( sLine, nLen - 1, 1 ) == ' ' ) //$ ( ' ' + Chr(9) ) )
+         nLen--
+      ENDDO
+
+      sLine := Left( sLine, nLen )
+
+   RETURN sLine
+
+   //--------------------------------------------------------------//
 
 #endif
 
@@ -9316,78 +9375,6 @@ FUNCTION PP_QSelf( o )
    ENDIF
 
 RETURN s_oSelf
-
-//--------------------------------------------------------------//
-
-#ifndef USE_C_BOOST
-
-STATIC FUNCTION NextIdentifier( sLine, sSkipped )
-
-   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := '0', nStart, sIdentifier, sTmp
-
-   FOR nAt := 1 TO nLen
-       cChar := SubStr( sLine, nAt, 1 )
-
-       IF cChar $ ' ,([{|^*/+-=!#<>:&$'
-          IF nStart != NIL
-             EXIT
-          ENDIF
-          LOOP // No need to record cLastChar
-       ELSEIF cChar $ ')]}'
-          IF nStart != NIL
-             EXIT
-          ENDIF
-       ELSEIF cChar $ '"'+"'"
-          DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
-          ENDDO
-          LOOP // No need to record cLastChar
-       ELSEIF cChar == '['
-          IF ! ( IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "])}_." )
-             DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != ']'
-             ENDDO
-          ENDIF
-          cLastChar := ']'
-          LOOP // Recorded cLastChar
-       ELSEIF cChar == '.'
-          IF cLastChar == '_' .OR. IsAlpha( cLastChar )
-             EXIT
-          ENDIF
-
-          sTmp := Upper( SubStr( sLine, nAt + 1, 4 ) )
-          IF sTmp = "T."
-             nAt += 2
-             LOOP
-          ELSEIF sTmp = "F."
-             nAt += 2
-             LOOP
-          ELSEIF sTmp = "OR."
-             nAt += 3
-             LOOP
-          ELSEIF sTmp = "AND."
-             nAt += 4
-             LOOP
-          ELSEIF sTmp = "NOT."
-             nAt += 4
-             LOOP
-          ENDIF
-       ELSEIF nStart == NIL .AND. ( IsAlpha( cChar ) .OR. cChar == '_' )
-          nStart := nAt
-       ENDIF
-
-       cLastChar := cChar
-    NEXT
-
-    IF nStart != NIL
-       sIdentifier := SubStr( sLine, nStart, nAt - nStart )
-       sSkipped    := Left( sLine, nStart - 1 )
-       sLine       := SubStr( sLine, nAt )
-    ENDIF
-
-    //TraceLog( sIdentifier, sLine, sSkipped, cChar, cLastChar, nStart, nAt, nLen )
-
-RETURN sIdentifier
-
-#endif
 
 //--------------------------------------------------------------//
 FUNCTION AtInRules( sFind, sLine, nStart )

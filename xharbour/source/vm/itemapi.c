@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.124 2005/10/31 12:56:37 druzus Exp $
+ * $Id: itemapi.c,v 1.125 2005/11/01 23:43:55 druzus Exp $
  */
 
 /*
@@ -209,88 +209,6 @@ PHB_ITEM HB_EXPORT hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIt
 
    return pArray;
 }
-
-/* Defed out - using String Sharing Versions in source/vm/fastitem.c. */
-#if 0
-PHB_ITEM hb_itemPutC( PHB_ITEM pItem, const char * szText )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
-
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
-   if( szText == NULL )
-   {
-      szText = "";
-   }
-
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = strlen( szText );
-   pItem->item.asString.value = ( char * ) hb_xgrab( pItem->item.asString.length + 1 );
-   strcpy( pItem->item.asString.value, szText );
-
-   return pItem;
-}
-
-PHB_ITEM hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
-
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
-   /* NOTE: CA-Clipper seems to be buggy here, it will return ulLen bytes of
-            trash if the szText buffer is NULL, at least with hb_retclen().
-            [vszakats] */
-
-   if( szText == NULL )
-   {
-      szText = "";
-      ulLen = 0;
-   }
-
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = ( char * ) hb_xgrab( ulLen + 1 );
-   hb_xmemcpy( pItem->item.asString.value, szText, ulLen );
-   pItem->item.asString.value[ ulLen ] = '\0';
-
-   return pItem;
-}
-
-PHB_ITEM hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
-
-   if( pItem )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem = hb_itemNew( NULL );
-   }
-
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = ulLen;
-   pItem->item.asString.value = szText;
-   pItem->item.asString.value[ ulLen ] = '\0';
-
-   return pItem;
-}
-#endif
 
 void HB_EXPORT hb_itemSetCMemo( PHB_ITEM pItem )
 {
@@ -1277,13 +1195,13 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
 
    if( HB_IS_STRING( pItem ) )
    {
-      if( pItem->item.asString.bStatic || *( pItem->item.asString.pulHolders ) > 1 )
+      if( pItem->item.asString.allocated == 0 || *( pItem->item.asString.pulHolders ) > 1 )
       {
          char *sString = ( char* ) hb_xgrab( pItem->item.asString.length + 1 );
 
          hb_xmemcpy( (void *) sString, (void *) pItem->item.asString.value, pItem->item.asString.length + 1 );
 
-         if( !pItem->item.asString.bStatic )
+         if( pItem->item.asString.allocated )
          {
             --( *pItem->item.asString.pulHolders );
          }

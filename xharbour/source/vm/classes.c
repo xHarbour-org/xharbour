@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.174 2005/10/24 01:04:36 druzus Exp $
+ * $Id: classes.c,v 1.175 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -2671,7 +2671,7 @@ HB_FUNC( __OBJGETCLSNAME )
    {
       uiClass = pObject->item.asArray.value->uiClass;
 
-      hb_retcAdoptStatic( s_pClasses[ uiClass - 1 ].szName );
+      hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
    }
    else
    {
@@ -2679,7 +2679,7 @@ HB_FUNC( __OBJGETCLSNAME )
 
       if( uiClass <= s_uiClasses )
       {
-         hb_retcAdoptStatic( s_pClasses[ uiClass - 1 ].szName );
+         hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
       }
       else
       {
@@ -3115,7 +3115,7 @@ HB_FUNC( __GETMESSAGE )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pBase = hb_stackItem( ( hb_stackBaseItem() )->item.asSymbol.stackbase );
-   hb_retcAdoptStatic( pBase->item.asSymbol.value->szName );
+   hb_retcStatic( pBase->item.asSymbol.value->szName );
 }
 
 HB_FUNC( __CLSPARENT )
@@ -3313,7 +3313,7 @@ static HARBOUR hb___msgClsName( void )
 
    pItemRef = hb_itemUnRef( pItemRef );
 
-   hb_retcAdoptStatic( hb_objGetClsName( pItemRef ) );
+   hb_retcStatic( hb_objGetClsName( pItemRef ) );
 }
 
 

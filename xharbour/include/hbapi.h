@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.180 2005/10/31 12:56:35 druzus Exp $
+ * $Id: hbapi.h,v 1.181 2005/10/31 20:37:48 ronpinkas Exp $
  */
 
 /*
@@ -160,7 +160,8 @@ HB_EXTERN_BEGIN
                } \
                while( 0 )
 
-#define HB_STRING_REALLOC( p, len ) \
+// Should NEVER be called directly - always use HB_STRING_ALLOC()
+#define __HB_STRING_REALLOC( p, len ) \
                \
                if( (p)->item.asString.allocated <= len ) \
                { \
@@ -182,35 +183,25 @@ HB_EXTERN_BEGIN
                (p)->item.asString.value[ len ] = '\0'; \
                (p)->item.asString.length = len;
 
+// This is a very low level macro use with caution, it EXPECTs an item of type HB_IT_STRING !!!
 #define HB_STRING_ALLOC( p, len ) \
                \
-               if( HB_IS_STRING( p ) && (p)->item.asString.bStatic == FALSE && *( (p)->item.asString.pulHolders ) == 1 && len > 1 ) \
+               if( (p)->item.asString.allocated && *( (p)->item.asString.pulHolders ) == 1 ) \
                { \
-                  HB_STRING_REALLOC( p, len ); \
+                  __HB_STRING_REALLOC( p, len ); \
                } \
                else \
                { \
-                  if( HB_IS_COMPLEX( p ) ) \
-                  { \
-                     hb_itemClear( p ); \
-                  } \
+                  hb_itemClear( p ); \
                   \
                   (p)->type = HB_IT_STRING; \
-                  (p)->item.asString.length = len; \
                   \
-                  if( len > 1 ) \
-                  { \
-                     (p)->item.asString.bStatic         = FALSE; \
-                     (p)->item.asString.value           = ( char * ) hb_xgrab( (len) + 1 ); \
-                     (p)->item.asString.value[ len ]    = '\0'; \
-                     (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
-                     *( (p)->item.asString.pulHolders ) = 1; \
-                     (p)->item.asString.allocated       = len; \
-                  } \
-                  else \
-                  { \
-                     (p)->item.asString.bStatic = TRUE; \
-                  } \
+                  (p)->item.asString.length          = len; \
+                  (p)->item.asString.value           = ( char * ) hb_xgrab( (len) + 1 ); \
+                  (p)->item.asString.value[ len ]    = '\0'; \
+                  (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
+                  *( (p)->item.asString.pulHolders ) = 1; \
+                  (p)->item.asString.allocated       = len; \
                }
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
@@ -345,13 +336,13 @@ extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
     #define hb_retc( szText )                    hb_itemPutC( hb_stackReturnItem(), (szText) )
     #define hb_retclen( szText, ulLen )          hb_itemPutCL( hb_stackReturnItem(), (szText), (ulLen) )
 
-    #define hb_retcAdopt( szText )                    hb_itemPutCPtr( hb_stackReturnItem(), (szText), strlen( szText ) )
-    #define hb_retclenAdopt( szText, ulLen )          hb_itemPutCPtr( hb_stackReturnItem(), (szText), (ulLen) )
-    #define hb_retcAdoptStatic( szText )              hb_itemPutCStatic( hb_stackReturnItem(), (szText) )
-    #define hb_retclenAdoptStatic( szText, ulLen )    hb_itemPutCLStatic( hb_stackReturnItem(), (szText), (ulLen) )
+    #define hb_retcAdopt( szText )               hb_itemPutCPtr( hb_stackReturnItem(), (szText), strlen( szText ) )
+    #define hb_retclenAdopt( szText, ulLen )     hb_itemPutCPtr( hb_stackReturnItem(), (szText), (ulLen) )
+    #define hb_retcStatic( szText )              hb_itemPutCStatic( hb_stackReturnItem(), (szText) )
+    #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLStatic( hb_stackReturnItem(), (szText), (ulLen) )
 
-    #define hb_retclenAdoptRaw( szText, ulLen )       hb_itemPutCRaw( hb_stackReturnItem(), (szText), (ulLen) )
-    #define hb_retclenAdoptRawStatic( szText, ulLen ) hb_itemPutCRawStatic( hb_stackReturnItem(), (szText), (ulLen) )
+    #define hb_retclenAdoptRaw( szText, ulLen )  hb_itemPutCRaw( hb_stackReturnItem(), (szText), (ulLen) )
+    #define hb_retclenRawStatic( szText, ulLen ) hb_itemPutCRawStatic( hb_stackReturnItem(), (szText), (ulLen) )
 
     #define hb_retds( szDate )                   hb_itemPutDS( hb_stackReturnItem(), (szDate) )
     #define hb_retd( iYear, iMonth, iDay )       hb_itemPutD( hb_stackReturnItem(), (iYear), (iMonth), (iDay) )
@@ -382,11 +373,13 @@ extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
 
     extern void  HB_EXPORT  hb_retcAdopt( char * szText );
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
-    extern void  HB_EXPORT  hb_retcAdoptStatic( char * szText );
-    extern void  HB_EXPORT  hb_retclenAdoptStatic( char * szText, ULONG ulLen );
-
     extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
-    extern void  HB_EXPORT  hb_retclenAdoptRawStatic( char * szText, ULONG ulLen );
+
+    extern void  HB_EXPORT  hb_retcStatic( char * szText );
+    extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
+
+    extern void  HB_EXPORT  hb_retclenRaw( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retclenRawStatic( char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */
