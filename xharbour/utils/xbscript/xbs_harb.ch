@@ -1848,7 +1848,6 @@
       HB_FUNC_STATIC( NEXTIDENTIFIER )
       {
          PHB_ITEM pLine    = hb_param( 1, HB_IT_STRING );
-         PHB_ITEM pSkipped = hb_param( 2, HB_IT_ANY );
          char *sLine;
          char cChar, cLastChar = ' ';
          size_t nAt, nLen;
