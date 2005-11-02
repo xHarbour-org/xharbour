@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.9 2005/10/06 02:20:19 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.10 2005/10/19 10:58:46 bdj Exp $
  */
 
 /*
@@ -132,19 +132,6 @@
 
 #define WVW_ID_SYSTEM_TIMER      1
 
-/* 20040802 old settings:
-#define WVW_ID_BASE_STATUSBAR  100
-#define WVW_ID_BASE_TIMER      200
-
-#define WVW_ID_BASE_TOOLTIP    300
-
-#define WVW_ID_BASE_TOOLBAR    400
-
-#define WVW_ID_BASE_SCROLLBAR  500
-
-#define WVW_ID_BASE_PUSHBUTTON 600
-*/
-
 #define WVW_ID_BASE_STATUSBAR  100
 #define WVW_ID_BASE_TIMER      100
 
@@ -157,8 +144,10 @@
 #define WVW_ID_BASE_PROGRESSBAR 100
 
 #define WVW_ID_BASE_PUSHBUTTON 64000
+#define WVW_ID_BASE_CHECKBOX   64000
 
 #define WVW_ID_MAX_PUSHBUTTON  WVW_ID_BASE_PUSHBUTTON+200-1
+#define WVW_ID_MAX_CHECKBOX    WVW_ID_BASE_CHECKBOX+200-1
 /* ie. effectively there are max 200 buttons on a window */
 
 #define WVW_ID_BASE_COMBOBOX   WVW_ID_MAX_PUSHBUTTON+1
@@ -290,6 +279,7 @@ typedef struct bitmap_handle
 
 #define WVW_CONTROL_SCROLLBAR  1
 #define WVW_CONTROL_PUSHBUTTON 2
+#define WVW_CONTROL_CHECKBOX   2
 #define WVW_CONTROL_PROGRESSBAR  3
 #define WVW_CONTROL_COMBOBOX   4
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4558 2005/11/02 01:35:29 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4559 2005/11/02 09:27:43 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2005-11-03 00:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    * supporting checkbox. new functions:
+      + wvw_CXcreate()
+      + wvw_CXdestroy()
+      + wvw_CXsetfocus()
+      + wvw_CXenable()
+      + wvw_CXsetcodeblock()
+      + wvw_CXsetcheck()
+      + wvw_CXgetcheck()
 
 2005-11-02 09:20 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg

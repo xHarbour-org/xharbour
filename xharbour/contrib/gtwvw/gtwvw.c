@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.28 2005/10/26 04:42:22 marcosgambeta Exp $
+ * $Id: gtwvw.c,v 1.29 2005/10/31 16:57:29 bdj Exp $
  */
 
 /*
@@ -14912,6 +14912,137 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
   return( CallWindowProc( (WNDPROC) OldProc, hWnd, message, wParam, lParam ) );
 }
 
+
+/************************
+* BEGIN button supporters
+* for pushbutton and checkbox
+*************************/
+
+/*ASSUME: WVW_ID_BASE_PUSHBUTTON == WVW_ID_BASE_CHECKBOX
+ *        WVW_CONTROL_PUSHBUTTON == WVW_CONTROL_CHECKBOX
+ */
+static UINT ButtonCreate( USHORT usWinNum, USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT usRight, LPCTSTR  lpszCaption,
+                          char * szBitmap, UINT uiBitmap, PHB_ITEM phbiCodeBlock,
+                          int iOffTop, int iOffLeft, int iOffBottom, int iOffRight,
+                          double dStretch, BOOL bMap3Dcolors,
+                          int iStyle )
+{
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+   HWND hWndParent = pWindowData->hWnd;
+   HWND hWndButton;
+   POINT xy = { 0 };
+   int   iTop, iLeft, iBottom, iRight;
+   UINT uiPBid;
+
+   if (pWindowData->hPBfont==NULL)
+   {
+      pWindowData->hPBfont = CreateFontIndirect( &s_lfPB );
+      if (pWindowData->hPBfont==NULL)
+      {
+        return 0;
+      }
+   }
+
+   if (s_bMainCoordMode)
+   {
+     hb_wvw_HBFUNCPrologue(usWinNum, &usTop, &usLeft, &usBottom, &usRight);
+   }
+
+   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usLeft, usTop );
+   iTop    = xy.y + iOffTop ;
+   iLeft   = xy.x + iOffLeft;
+
+   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
+
+   xy.y   -= pWindowData->byLineSpacing;
+
+   iBottom = xy.y - 1 + iOffBottom;
+   iRight  = xy.x - 1 + iOffRight;
+
+   uiPBid = LastControlId(usWinNum, WVW_CONTROL_PUSHBUTTON);
+   if (uiPBid==0)
+   {
+     uiPBid = WVW_ID_BASE_PUSHBUTTON;
+   }
+   else
+   {
+     uiPBid++;
+   }
+
+   if (szBitmap || uiBitmap)
+   {
+      iStyle |= BS_BITMAP;
+   }
+
+   hWndButton = CreateWindowEx(
+       0L,                          // no extended styles
+       "BUTTON",                 // pushbutton/checkbox control class
+       (LPSTR) lpszCaption,                // text for caption
+       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,         // button styles
+       iLeft,                           // horizontal position
+       iTop,                           // vertical position
+       iRight-iLeft+1,                         // width of the button
+       iBottom-iTop+1,                         // height
+       hWndParent,                   // handle to parent window
+       (HMENU) uiPBid,           // id for this button control
+       (HINSTANCE) hb_hInstance,                  // instance owning this window
+       (LPVOID) NULL           // pointer not needed
+   );
+
+   if(hWndButton)
+   {
+     RECT rXB = { 0 }, rOffXB = { 0 };
+     WNDPROC OldProc;
+
+     if (szBitmap || uiBitmap)
+     {
+        HBITMAP  hBitmap;
+        int      iExpWidth, iExpHeight;
+
+        iExpWidth = iRight - iLeft + 1;
+        iExpHeight= iBottom - iTop + 1;
+        hBitmap = hPrepareBitmap(szBitmap, uiBitmap,
+                                dStretch*iExpWidth, dStretch*iExpHeight,
+                                bMap3Dcolors,
+                                hWndButton );
+
+        if (hBitmap)
+        {
+          SendMessage(hWndButton,              // handle to destination window
+                      BM_SETIMAGE,              // message to send
+                      (WPARAM) IMAGE_BITMAP,          // image type
+                      (LPARAM) hBitmap);          // handle to the image (HANDLE)
+        }
+     }
+
+     rXB.top = usTop;     rXB.left= usLeft;
+     rXB.bottom=usBottom; rXB.right =usRight;
+     rOffXB.top = iOffTop;     rOffXB.left= iOffLeft;
+     rOffXB.bottom=iOffBottom; rOffXB.right =iOffRight;
+
+     AddControlHandle(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndButton, uiPBid, (HB_ITEM *) phbiCodeBlock, rXB, rOffXB, (byte) iStyle);
+
+     OldProc = (WNDPROC) SetWindowLong (hWndButton,
+                                        GWL_WNDPROC, (LONG) hb_wvw_gtBtnProc) ;
+
+     StoreControlProc(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndButton, OldProc);
+
+     SendMessage( hWndButton, WM_SETFONT, (WPARAM) pWindowData->hPBfont, (LPARAM) TRUE);
+
+     return uiPBid;
+   }
+   else
+   {
+     return 0;
+   }
+
+}
+
+/*************************
+* END button supporters   //20051102
+* for pushbutton and checkbox
+*************************/
+
 /*WVW_PBcreate( [nWinNum], nTop, nLeft, nBottom, nRight, cText, cImage/nImage, bBlock, aOffset,;
  *              nStretchBitmap, lMap3Dcolors)
  *create pushbutton for window nWinNum
@@ -14941,10 +15072,7 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
  *
  *aOffset: array {y1,x1,y2,x2} of offsets to corner pixels, to adjust
  *         dimension of pushbutton.
- *         defaults for vertical scroll bar: {0,+3,0,0}
- *         defaults for horiz scroll bar: {+3-linespacing,0,0,0}
- *         NOTES: these defaults are meant to make room for other common
- *                GUI elements like raised/recessed lines.
+ *         defaults for pushbutton: {-2,-2,+2,+2}
  *
  *bBlock:  codeblock to execute on every BN_CLICK event.
  *         This codeblock will be evaluated with these parameters:
@@ -14960,11 +15088,6 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
 HB_FUNC( WVW_PBCREATE)
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
-   WIN_DATA * pWindowData = s_pWindows[usWinNum];
-   HWND hWndParent = pWindowData->hWnd;
-   HWND hWndPB;
-   POINT xy = { 0 };
-   int   iTop, iLeft, iBottom, iRight;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
    int   iStyle;
    UINT uiPBid;
@@ -14975,8 +15098,8 @@ HB_FUNC( WVW_PBCREATE)
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
-   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1;
-   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE;
+   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1; //20051025
+   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE; //20051025
 
    if (!ISBLOCK(8))
    {
@@ -14984,117 +15107,17 @@ HB_FUNC( WVW_PBCREATE)
      return;
    }
 
-   if (pWindowData->hPBfont==NULL)
-   {
-      pWindowData->hPBfont = CreateFontIndirect( &s_lfPB );
-      if (pWindowData->hPBfont==NULL)
-      {
-        hb_retnl(0);
-        return;
-      }
-   }
-
    iOffTop    = !ISNIL( 9 ) ? hb_parni( 9,1 ) : -2 ;
    iOffLeft   = !ISNIL( 9 ) ? hb_parni( 9,2 ) : -2 ;
    iOffBottom = !ISNIL( 9 ) ? hb_parni( 9,3 ) : +2 ;
    iOffRight  = !ISNIL( 9 ) ? hb_parni( 9,4 ) : +2;
 
-   if (s_bMainCoordMode)
-   {
-     hb_wvw_HBFUNCPrologue(usWinNum, &usTop, &usLeft, &usBottom, &usRight);
-   }
-
-   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usLeft, usTop );
-   iTop    = xy.y + iOffTop ;
-   iLeft   = xy.x + iOffLeft;
-
-   xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
-
-   xy.y   -= pWindowData->byLineSpacing;
-
-   iBottom = xy.y - 1 + iOffBottom;
-   iRight  = xy.x - 1 + iOffRight;
-
-   uiPBid = LastControlId(usWinNum, WVW_CONTROL_PUSHBUTTON);
-   if (uiPBid==0)
-   {
-     uiPBid = WVW_ID_BASE_PUSHBUTTON;
-   }
-   else
-   {
-     uiPBid++;
-   }
-
-   iStyle = BS_PUSHBUTTON;
-
-   if (szBitmap || uiBitmap)
-   {
-      iStyle |= BS_BITMAP;
-   }
-
-   hWndPB = CreateWindowEx(
-       0L,
-       "BUTTON",
-       (LPSTR) lpszCaption,
-       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,
-       iLeft,
-       iTop,
-       iRight-iLeft+1,
-       iBottom-iTop+1,
-       hWndParent,
-       (HMENU) uiPBid,
-       (HINSTANCE) hb_hInstance,
-       (LPVOID) NULL
-   );
-
-   if(hWndPB)
-   {
-     RECT rXB = { 0 }, rOffXB = { 0 };
-     WNDPROC OldProc;
-
-     if (szBitmap || uiBitmap)
-     {
-        HBITMAP  hBitmap;
-        int      iExpWidth, iExpHeight;
-
-        iExpWidth = iRight - iLeft + 1;
-        iExpHeight= iBottom - iTop + 1;
-        hBitmap = hPrepareBitmap(szBitmap, uiBitmap,
-                                dStretch*iExpWidth, dStretch*iExpHeight,
-                                bMap3Dcolors,
-                                hWndPB );
-
-        if (hBitmap)
-        {
-
-          SendMessage(hWndPB,
-                      BM_SETIMAGE,
-                      (WPARAM) IMAGE_BITMAP,
-                      (LPARAM) hBitmap);
-        }
-     }
-
-     rXB.top = usTop;     rXB.left= usLeft;
-     rXB.bottom=usBottom; rXB.right =usRight;
-     rOffXB.top = iOffTop;     rOffXB.left= iOffLeft;
-     rOffXB.bottom=iOffBottom; rOffXB.right =iOffRight;
-
-     AddControlHandle(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndPB, uiPBid, (HB_ITEM *) hb_param( 8, HB_IT_BLOCK ), rXB, rOffXB, (byte) iStyle);
-
-     OldProc = (WNDPROC) SetWindowLong (hWndPB,
-                                        GWL_WNDPROC, (LONG) hb_wvw_gtBtnProc) ;
-
-     StoreControlProc(usWinNum, WVW_CONTROL_PUSHBUTTON, hWndPB, OldProc);
-
-     SendMessage( hWndPB, WM_SETFONT, (WPARAM) pWindowData->hPBfont, (LPARAM) TRUE);
-
-     hb_retnl( (LONG) uiPBid );
-   }
-   else
-   {
-
-     hb_retnl( (LONG) 0 );
-   }
+   uiPBid = ButtonCreate( usWinNum, usTop, usLeft, usBottom, usRight, lpszCaption,
+                          szBitmap, uiBitmap, hb_param( 8, HB_IT_BLOCK ),
+                          iOffTop, iOffLeft, iOffBottom, iOffRight,
+                          dStretch, bMap3Dcolors,
+                          BS_PUSHBUTTON );
+   hb_retnl( (LONG) uiPBid );
 }
 
 /*WVW_PBdestroy( [nWinNum], nPBid )
@@ -15343,6 +15366,259 @@ HB_FUNC( WVW_PBSETFONT )
 
 /*-------------------------------------------------------------------*/
 /* PUSHBUTTON ends                                                   */
+/*-------------------------------------------------------------------*/
+
+/*-------------------------------------------------------------------*/
+/* CHECKBOX begins                                                   */
+/*-------------------------------------------------------------------*/
+
+/*WVW_CXcreate( [nWinNum], nTop, nLeft, nBottom, nRight, cText, cImage/nImage, bBlock, aOffset,;
+ *              nStretchBitmap, lMap3Dcolors)
+ *create CHECKBOX for window nWinNum
+ *nTop: row of top/left corner (in character unit)
+ *nLeft: col of top/left corner (in character unit)
+ *nBottom: row of bottom/right corner (in character unit) defaults==nTop
+ *nRight: col of bottom/right corner (in character unit) defaults==??
+ *cText: caption, default == ""
+ *
+ *cImage: bitmap file name, can be supplied as nImage: bitmap resource id
+ *nStretchBitmap: a number between 0 and 1 (inclusive) as a factor to
+ *                stretch the bitmap.
+ *                1.0: bitmap covers the whole button
+ *                0.5: bitmap covers 50% of button
+ *                0: bitmap is not stretch
+ *               (default is 1)
+ *lMap3Dcolors: defaults to .f.
+ *           if .t. the following color mapping will be performed:
+ *              RGB(192,192,192) --> COLOR_3DFACE   ("transparent")
+ *              RGB(128,128,128) --> COLOR_3DSHADOW
+ *              RGB(223,223,223) --> COLOR_3DLIGHT
+ *           This might be desirable to have transparent effect.
+ *           LIMITATION: this will work on 256 colored bitmaps only
+ *
+ *aOffset: array {y1,x1,y2,x2} of offsets to corner pixels, to adjust
+ *         dimension of CHECKBOX.
+ *         defaults for CHECKBOX: {-2,-2,+2,+2}
+ *
+ *bBlock:  codeblock to execute on every BN_CLICK event.
+ *         This codeblock will be evaluated with these parameters:
+ *         nWinNum: window number
+ *         nCXid  : CHECKBOX id
+ *
+ *returns control id of newly created CHECKBOX of windows nWinNum
+ *returns 0 if failed
+ *
+ *example:
+ */
+
+HB_FUNC( WVW_CXCREATE)
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   int   iOffTop, iOffLeft, iOffBottom, iOffRight;
+   int   iStyle;
+   UINT uiPBid;
+   USHORT   usTop    = hb_parni( 2 ),
+            usLeft   = hb_parni( 3 ),
+            usBottom = hb_parni( 4 ),
+            usRight  = hb_parni( 5 );
+   LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
+   char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
+   UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
+   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1;
+   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE;
+
+   if (!ISBLOCK(8))
+   {
+     hb_retnl(0);
+     return;
+   }
+
+   iOffTop    = !ISNIL( 9 ) ? hb_parni( 9,1 ) : -2 ;
+   iOffLeft   = !ISNIL( 9 ) ? hb_parni( 9,2 ) : -2 ;
+   iOffBottom = !ISNIL( 9 ) ? hb_parni( 9,3 ) : +2 ;
+   iOffRight  = !ISNIL( 9 ) ? hb_parni( 9,4 ) : +2;
+
+   uiPBid = ButtonCreate( usWinNum, usTop, usLeft, usBottom, usRight, lpszCaption,
+                          szBitmap, uiBitmap, hb_param( 8, HB_IT_BLOCK ),
+                          iOffTop, iOffLeft, iOffBottom, iOffRight,
+                          dStretch, bMap3Dcolors,
+                          BS_AUTOCHECKBOX);
+   hb_retnl( (LONG) uiPBid );
+}
+
+/*WVW_CXdestroy( [nWinNum], nCXid )
+ *destroy checkbox nCXid for window nWinNum
+ */
+HB_FUNC( WVW_CXDESTROY)
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+   WIN_DATA * pWindowData = s_pWindows[usWinNum];
+   UINT uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   CONTROL_DATA * pcd = pWindowData->pcdCtrlList;
+   CONTROL_DATA * pcdPrev = NULL;
+
+   while (pcd)
+   {
+     if (pcd->byCtrlClass == WVW_CONTROL_CHECKBOX && pcd->uiCtrlid == uiCXid)
+     {
+       break;
+     }
+     pcdPrev = pcd;
+     pcd = pcd->pNext;
+   }
+
+   if (pcd==NULL) { return; }
+
+   DestroyWindow (pcd->hWndCtrl) ;
+
+   if (pcdPrev==NULL)
+   {
+     pWindowData->pcdCtrlList = pcd->pNext;
+   }
+   else
+   {
+     pcdPrev->pNext = pcd->pNext;
+   }
+
+   if (pcd->phiCodeBlock)
+   {
+      hb_itemRelease( pcd->phiCodeBlock );
+   }
+
+   hb_xfree( pcd );
+}
+
+
+/*WVW_CXsetFocus( [nWinNum], nButtonId )
+ *set the focus to checkbox nButtonId in window nWinNum
+ */
+HB_FUNC( WVW_CXSETFOCUS )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
+  byte   bStyle; //dummy
+  HWND   hWndCX = FindControlHandle(usWinNum, WVW_CONTROL_CHECKBOX, uiCtrlId, &bStyle);
+
+  if (hWndCX)
+  {
+    hb_retl( SetFocus(hWndCX) != NULL );
+  }
+  else
+  {
+    hb_retl(FALSE);
+  }
+}
+
+/*WVW_CXenable( [nWinNum], nButtonId, [lToggle] )
+ *enable/disable checkbox nButtonId on window nWinNum
+ *(lToggle defaults to .t., ie. enabling the checkbox)
+ *return previous state of the checkbox (TRUE:enabled FALSE:disabled)
+ *(if nButtonId is invalid, this function returns FALSE too)
+ */
+HB_FUNC( WVW_CXENABLE )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
+  BOOL   bEnable  = ISNIL(3) ? TRUE : hb_parl(3);
+  byte   bStyle;
+  HWND   hWndCX = FindControlHandle(usWinNum, WVW_CONTROL_CHECKBOX, uiCtrlId, &bStyle);
+
+  if (hWndCX)
+  {
+    hb_retl( EnableWindow(hWndCX, bEnable)==0 );
+
+    if (!bEnable)
+    {
+       SetFocus( s_pWindows[ usWinNum ]->hWnd );
+    }
+  }
+  else
+  {
+    hb_retl(FALSE);
+  }
+}
+
+/*WVW_CXsetcodeblock( [nWinNum], nCXid, bBlock )
+ *assign (new) codeblock bBlock to button nCXid for window nWinNum
+ *
+ * return .t. if successful
+ */
+HB_FUNC( WVW_CXSETCODEBLOCK )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_CHECKBOX, NULL, uiCXid);
+   PHB_ITEM phiCodeBlock = hb_param( 3, HB_IT_BLOCK ); //20051005
+   if (!phiCodeBlock || pcd==NULL || pcd->bBusy)  //20051005 was: (!ISBLOCK(3) || pcd==NULL || pcd->bBusy)
+   {
+     hb_retl( FALSE );
+     return;
+   }
+
+   pcd->bBusy = TRUE;
+
+   if (pcd->phiCodeBlock)
+   {
+      hb_itemRelease( pcd->phiCodeBlock );
+   }
+
+   pcd->phiCodeBlock = hb_itemNew( phiCodeBlock );
+
+   pcd->bBusy = FALSE;
+
+   hb_retl( TRUE );
+}
+
+/*WVW_CXsetcheck( [nWinNum], nCXid, nCheckState )
+ *assigns check-state of checkbox nCXid
+ *           0==unchecked    BST_UNCHECKED
+ *           1==checked      BST_CHECKED
+ *           2==indeterminate BST_INDETERMINATE
+ *this function always returns .t.
+ */
+HB_FUNC( WVW_CXSETCHECK )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT  uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   ULONG ulCheck = (ULONG) ( ISNIL( 3 ) ? BST_CHECKED  : hb_parni( 3 ) );
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_CHECKBOX, NULL, uiCXid);
+
+   if (pcd->hWndCtrl)
+   {
+      SendMessage(pcd->hWndCtrl,
+                  BM_SETCHECK, (WPARAM) ulCheck, (LPARAM) 0);
+   }
+
+   hb_retl( TRUE );
+}
+
+/*WVW_CXgetcheck( [nWinNum], nCXid )
+ *returns check-state of checkbox nCXid
+ *           0==unchecked    BST_UNCHECKED
+ *           1==checked      BST_CHECKED
+ *           2==indeterminate BST_INDETERMINATE
+ */
+HB_FUNC( WVW_CXGETCHECK )
+{
+   USHORT usWinNum = WVW_WHICH_WINDOW;
+
+   UINT  uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
+   ULONG ulCheck;
+   CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_CHECKBOX, NULL, uiCXid);
+
+   if (pcd->hWndCtrl)
+   {
+      ulCheck = SendMessage(pcd->hWndCtrl,
+                            BM_GETCHECK, (WPARAM) 0, (LPARAM) 0);
+   }
+
+   hb_retnl( ulCheck );
+}
+
+/*-------------------------------------------------------------------*/
+/* CHECKBOX ends                                                     */
 /*-------------------------------------------------------------------*/
 
 /*-------------------------------------------------------------------*/
