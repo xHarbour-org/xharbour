@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.17 2005/03/31 14:34:02 andijahja Exp $
+ * $Id: hbexpra.c,v 1.18 2005/10/01 19:36:29 ronpinkas Exp $
  */
 
 /*
@@ -116,14 +116,14 @@ static BYTE s_PrecedTable[] = {
    HB_ET_NIL,                 /*   HB_EO_NOT,         */
    HB_EO_EQUAL,               /*   HB_EO_EQUAL,       relational operators */
    HB_EO_EQUAL,               /*   HB_EO_EQ,          */
-   HB_EO_EQUAL,               /*   HB_EO_LT,          */
-   HB_EO_EQUAL,               /*   HB_EO_GT,          */
-   HB_EO_EQUAL,               /*   HB_EO_LE,          */
-   HB_EO_EQUAL,               /*   HB_EO_GE,          */
+   HB_EO_LT,                  /*   HB_EO_LT,          */
+   HB_EO_LT,                  /*   HB_EO_GT,          */
+   HB_EO_LT,                  /*   HB_EO_LE,          */
+   HB_EO_LT,                  /*   HB_EO_GE,          */
    HB_EO_EQUAL,               /*   HB_EO_NE,          */
    HB_EO_IN,                  /*   HB_EO_IN,          */
-   HB_EO_MATCH,               /*   HB_EO_MATCH,       */
-   HB_EO_LIKE,                /*   HB_EO_LIKE,        */
+   HB_EO_LT,                  /*   HB_EO_MATCH,       */
+   HB_EO_LT,                  /*   HB_EO_LIKE,        */
    HB_EO_PLUS,                /*   HB_EO_PLUS,        addition */
    HB_EO_PLUS,                /*   HB_EO_MINUS,       */
    HB_EO_MULT,                /*   HB_EO_MULT,        multiple */

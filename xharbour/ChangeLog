@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4561 2005/11/02 17:59:30 modalsist Exp $
+ * $Id: ChangeLog,v 1.4562 2005/11/02 19:46:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-02 14:32 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbexpra.c
+  * source/compiler/harbour.sly
+  * source/macro/macro.y
+    ! Fixed Operator Precedence to 1 step lower for =, ==, !=, <>, and !=
+      relative to <, >, <=, >=, $, LIKE, and HAS /* Clipper compatability */
+
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+    * Replaced word magic with revision
 
 2005-11-02 11:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbvmpub.h

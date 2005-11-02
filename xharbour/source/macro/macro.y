@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.20 2005/10/16 21:39:14 ronpinkas Exp $
+ * $Id: macro.y,v 1.21 2005/10/18 12:14:32 druzus Exp $
  */
 
 /*
@@ -185,14 +185,14 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 
 /*assigment - from right to left*/
 %right INASSIGN
-%right  PLUSEQ MINUSEQ
-%right  MULTEQ DIVEQ MODEQ
-%right  EXPEQ
+%right PLUSEQ MINUSEQ
+%right MULTEQ DIVEQ MODEQ
+%right EXPEQ
 
 /*logical operators*/
-%right  OR
-%right  AND
-%right  NOT
+%right OR
+%right AND
+%right NOT
 
 /* Bitwise */
 %right BITOR
@@ -200,7 +200,8 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %right BITAND
 
 /*relational operators*/
-%right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
+%right '=' EQ NE1 NE2
+%right '<' '>' LE GE '$' LIKE MATCH
 
 /* Bit shift */
 %right BITSHIFTR BITSHIFTL

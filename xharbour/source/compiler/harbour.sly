@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.91 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.92 2005/10/26 20:11:41 likewolf Exp $
  */
 
 /*
@@ -200,14 +200,14 @@ static void hb_compDebugStart( void ) { };
 
 /*assigment - from right to left*/
 %right INASSIGN
-%right  PLUSEQ MINUSEQ
-%right  MULTEQ DIVEQ MODEQ
-%right  EXPEQ
+%right PLUSEQ MINUSEQ
+%right MULTEQ DIVEQ MODEQ
+%right EXPEQ
 
 /*logical operators*/
-%right  OR
-%right  AND
-%right  NOT
+%right OR
+%right AND
+%right NOT
 
 /* Bitwise */
 %right BITOR
@@ -215,7 +215,8 @@ static void hb_compDebugStart( void ) { };
 %right BITAND
 
 /*relational operators*/
-%right  '=' '<' '>' EQ NE1 NE2 LE GE '$' LIKE MATCH
+%right '=' EQ NE1 NE2
+%right '<' '>' LE GE '$' LIKE MATCH
 
 /* Bit shift */
 %right BITSHIFTR BITSHIFTL
@@ -1511,42 +1512,42 @@ Get        : _Get_ LValue ','
                         hb_compErrorLValue( $2 );
                         return 0;
                   }
-   
-                  hb_compExprAddListExpr( pGetArgList, pVarName ); /* Var Name   */ 
-               } 
 
-             ',' EmptyExpression 
+                  hb_compExprAddListExpr( pGetArgList, pVarName ); /* Var Name   */
+               }
+
+             ',' EmptyExpression
                { /* $9 */
-                  hb_compExprAddListExpr( pGetArgList, $8 ); /* Picture    */ 
+                  hb_compExprAddListExpr( pGetArgList, $8 ); /* Picture    */
                }
 
-             ',' EmptyExpression 
+             ',' EmptyExpression
                { /* $12 */
-                  hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */ 
+                  hb_compExprAddListExpr( pGetArgList, $11 ); /* ValidBlock */
                }
 
-             ',' EmptyExpression 
+             ',' EmptyExpression
                { /* $15 */
-                  hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */ 
-   
+                  hb_compExprAddListExpr( pGetArgList, $14 ); /* WhenBlock  */
+
                   if( pGetVarArray )
                   {
                     HB_EXPR_PTR pArrayVar, pIndex;
-               
+
                     // We need to scan the Array backwards and build a list of the Index Expressions.
                     pArrayVar = HB_EXPR_USE( pGetVarArray->value.asList.pExprList, HB_EA_REDUCE );
                     pIndex = HB_EXPR_USE( pGetVarArray->value.asList.pIndex, HB_EA_REDUCE );
                     pIndex->pNext = NULL;
-         
+
                     while( pArrayVar->ExprType == HB_ET_ARRAYAT )
                     {
                        pArrayVar->value.asList.pIndex->pNext = pIndex;
                        pIndex = pArrayVar->value.asList.pIndex;
                        pArrayVar = pArrayVar->value.asList.pExprList;
                     }
-         
+
                     pIndex = hb_compExprNewList( pIndex );
-         
+
                     /* Array with Index Expressions as 6th parameter */
                     hb_compExprAddListExpr( pGetArgList, hb_compExprNewArray( pIndex ) );
                   }
@@ -1555,7 +1556,7 @@ Get        : _Get_ LValue ','
              GetAExt ')'
                { /* $17 */
                   HB_EXPR_PTR pGetFunction;
-   
+
                   if( pGetVarArray && pGetVarArray->ExprType == HB_ET_ARRAYAT )
                   {
                      pGetFunction = hb_compExprNewFunName( "__GETA");
@@ -1564,7 +1565,7 @@ Get        : _Get_ LValue ','
                   {
                      pGetFunction = hb_compExprNewFunName( "__GET");
                   }
-   
+
                   $$ = hb_compExprNewFunCall( pGetFunction, pGetArgList );
                }
            ;
@@ -1877,7 +1878,7 @@ Declaration: DECLARE IdentName '(' { hb_compDeclaredAdd( $2 ); hb_comp_szDeclare
                    hb_comp_szFromClass = NULL;
                  }
                }
-               
+
                hb_comp_szDeclaredFun = NULL;
                hb_comp_cVarType = ' ';
                hb_comp_iVarScope = VS_NONE;
@@ -1928,13 +1929,13 @@ DecData    : IdentName { hb_comp_pLastMethod = hb_compMethodAdd( hb_comp_pLastCl
                  char * szSetData = ( char * ) hb_xgrab( strlen( $1 ) + 2 );
 
                  /* List Type overrides if exists. */
-                 if( hb_comp_cDataListType ) 
+                 if( hb_comp_cDataListType )
                  {
                     hb_comp_cVarType = hb_comp_cDataListType;
-                 }   
+                 }
 
                  hb_comp_pLastMethod->cType = hb_comp_cVarType;
-                 
+
                  if ( toupper( hb_comp_cVarType ) == 'S' )
                  {
                    pClass = hb_compClassFind( hb_comp_szFromClass );
