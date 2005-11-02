@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.127 2005/10/30 14:24:45 ptsarenko Exp $
+ * $Id: tbrowse.prg,v 1.128 2005/10/31 08:25:11 mauriliolongo Exp $
  */
 
 /*
@@ -2594,6 +2594,7 @@ METHOD DeHilite() CLASS TBrowse
    LOCAL nRow := ::nRowPos + ::nRowData
    LOCAL nCol
    LOCAL nNotLeftCol    // Screen col position of first char of not left justified columns
+   LOCAL xValue
 
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
@@ -2602,7 +2603,17 @@ METHOD DeHilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, ::oDataCache:GetCell( ::nRowPos, ::nColPos ), TBC_CLR_STANDARD )
+      xValue := ::oDataCache:GetCell( ::nRowPos, ::nColPos )
+
+      /* 02/11/2005 - <maurilio.longo@libero.it>
+                      Happens when browse is not ::stable, clipper does the same thing,
+                      it clears current cell
+      */
+      if xValue == NIL
+         xValue := Space( ::aColsInfo[ ::nColPos, o_WidthCell ] )
+      endif
+
+      nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, xValue, TBC_CLR_STANDARD )
 
       SetPos( nRow, iif( nNotLeftCol <> NIL, nNotLeftCol, nCol ) )
 
@@ -2617,6 +2628,7 @@ METHOD Hilite() CLASS TBrowse
    LOCAL nRow := ::nRowPos + ::nRowData
    LOCAL nCol
    LOCAL nNotLeftCol    // Screen col position of first char of not left justified columns
+   LOCAL xValue
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
 
@@ -2624,7 +2636,17 @@ METHOD Hilite() CLASS TBrowse
 
       SetPos( nRow, nCol )
 
-      nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, ::oDataCache:GetCell( ::nRowPos, ::nColPos ), TBC_CLR_ENHANCED )
+      xValue := ::oDataCache:GetCell( ::nRowPos, ::nColPos )
+
+      /* 02/11/2005 - <maurilio.longo@libero.it>
+                      Happens when browse is not ::stable, clipper does the same thing,
+                      it clears current cell
+      */
+      if xValue == NIL
+         xValue := Space( ::aColsInfo[ ::nColPos, o_WidthCell ] )
+      endif
+
+      nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, xValue, TBC_CLR_ENHANCED )
 
       SetPos( nRow, iif( nNotLeftCol <> NIL, nNotLeftCol, nCol ) )
 
