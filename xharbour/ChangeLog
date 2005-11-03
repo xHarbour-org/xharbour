@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4562 2005/11/02 19:46:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4563 2005/11/02 22:43:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-02 22:53 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+  * source/vm/arrays.c
+    + Added: BOOL hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+
+  * include/hbpcode.h
+  * include/hbexprop.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/common/expropt1.c
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+  * source/compiler/genc.c
+  * source/compiler/hbfix.c
+  * source/compiler/hbpcode.c
+  * source/vm/hvm.c
+    + Added HB_P_ARRAYPOPPLUS
+
+  /*
+     This greatly optimizes ...[...] += ...
+
+     Here is a test sample:
+
+        #define LOOPS_1 100000
+        #define LOOPS_2 1000000
+        #define LOOPS_3 10000000
+
+        PROCEDURE Main()
+
+           LOCAL n, aArray := Array(1), nSec
+
+           aArray[1] := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_1
+              aArray[1] += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+           aArray[1] := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_2
+              aArray[1] += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+           aArray[1] := ""
+           nSec := Seconds()
+
+           FOR n := 1 TO LOOPS_3
+              aArray[1] += "Some more text"
+           NEXT
+
+           ? Seconds() - nSec
+
+        RETURN
+   */
 
 2005-11-02 14:32 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexpra.c

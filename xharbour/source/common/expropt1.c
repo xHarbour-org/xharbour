@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.16 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: expropt1.c,v 1.17 2005/07/28 15:37:29 ronpinkas Exp $
  */
 
 /*
@@ -136,8 +136,8 @@ static char * s_OperTable[] = {
    "<<",           /* HB_EO_BITSHIFTL */
    "-",            /* HB_EO_NEGATE    */
    "++",           /* HB_EO_PREINC    */
-   "--"            /* HB_EO_PREDEC    */   
-};                 
+   "--"            /* HB_EO_PREDEC    */
+};
 
 /* ************************************************************************* */
 
@@ -340,6 +340,7 @@ HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR pArrList )
    pArrList->ulLength = 0;
 
    pExpr = pArrList->value.asList.pExprList;   /* get first element on the list */
+
    /* Now we need to replace all EO_NONE expressions with ET_NIL expressions
     * If EO_NONE is the first expression and there is no more expressions
     * then it is an empty array {} and ET_NIL cannot be used
@@ -362,6 +363,7 @@ HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR pArrList )
          ++pArrList->ulLength;
       }
    }
+
    pArrList->value.asList.pIndex = NULL;
    return pArrList;
 }

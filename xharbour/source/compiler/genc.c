@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.109 2005/10/04 20:06:09 druzus Exp $
+ * $Id: genc.c,v 1.110 2005/10/29 06:42:35 druzus Exp $
  */
 
 /*
@@ -3687,6 +3687,15 @@ static HB_GENC_FUNC( hb_p_arraypushref )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_arraypopplus )
+{
+   HB_SYMBOL_UNUSED( pFunc );
+   HB_SYMBOL_UNUSED( lPCodePos );
+
+   fprintf( cargo->yyc, "\tHB_P_ARRAYPOPPLUS,\n" );
+   return 1;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -3861,7 +3870,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_finally,
    hb_p_endfinally,
    hb_p_localnearadd,
-   hb_p_arraypushref
+   hb_p_arraypushref,
+   hb_p_arraypopplus
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

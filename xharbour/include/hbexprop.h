@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.15 2005/07/16 03:04:26 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.16 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,7 @@
 #define HB_EXPROP_H_
 
 #include "hbapi.h"
+#include "hbpcode.h"
 
 HB_EXTERN_BEGIN
 
@@ -213,6 +214,7 @@ typedef struct HB_EXPR_
          struct HB_EXPR_ *pExprList;    /* list elements */
          struct HB_EXPR_ *pIndex;       /* array index, others */
          BOOL bByRef;
+         HB_PCODE PopOp;
       } asList;
       struct
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.104 2005/10/01 20:08:39 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.105 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -81,24 +81,24 @@ extern int hb_compFieldGetPos( char *, PFUNCTION );
 
 #if defined( HB_MACRO_SUPPORT )
    void hb_compExprDelOperator( HB_EXPR_PTR, HB_MACRO_DECL );
-   void hb_compExprUseOperEq( HB_EXPR_PTR, BYTE, HB_MACRO_DECL );
+   void hb_compExprUseOperEq( HB_EXPR_PTR, HB_PCODE, HB_MACRO_DECL );
    void hb_compExprPushPreOp( HB_EXPR_PTR, BYTE, HB_MACRO_DECL );
    void hb_compExprPushPostOp( HB_EXPR_PTR, BYTE, HB_MACRO_DECL );
    void hb_compExprUsePreOp( HB_EXPR_PTR, BYTE, HB_MACRO_DECL );
    void hb_compExprUseAliasMacro( HB_EXPR_PTR, BYTE, HB_MACRO_DECL );
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq, HB_MACRO_DECL );
+   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE, HB_MACRO_DECL );
    ULONG hb_compExprReduceList( HB_EXPR_PTR, HB_MACRO_DECL );
 
    #define HB_SUPPORT_XBASE     ( HB_COMP_ISSUPPORTED(HB_SM_XBASE) )
    #define HB_SUPPORT_HARBOUR   ( HB_COMP_ISSUPPORTED(HB_SM_HARBOUR) )
 #else
    void hb_compExprDelOperator( HB_EXPR_PTR );
-   void hb_compExprUseOperEq( HB_EXPR_PTR, BYTE );
+   void hb_compExprUseOperEq( HB_EXPR_PTR, HB_PCODE );
    void hb_compExprPushPreOp( HB_EXPR_PTR, BYTE );
    void hb_compExprPushPostOp( HB_EXPR_PTR, BYTE );
    void hb_compExprUsePreOp( HB_EXPR_PTR, BYTE );
    void hb_compExprUseAliasMacro( HB_EXPR_PTR, BYTE );
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq );
+   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE );
    ULONG hb_compExprReduceList( HB_EXPR_PTR );
 
    #define HB_SUPPORT_XBASE     ( HB_COMP_ISSUPPORTED(HB_COMPFLAG_XBASE) )
@@ -1322,7 +1322,15 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             }
          #endif
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
-            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOP );
+
+            if( pSelf->value.asList.PopOp == HB_P_PLUS )
+            {
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOPPLUS );
+            }
+            else
+            {
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ARRAYPOP );
+            }
 
          #ifndef HB_C52_STRICT
             if( bRemoveRef )

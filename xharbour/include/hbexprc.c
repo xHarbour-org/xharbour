@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.15 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: hbexprc.c,v 1.16 2005/07/17 01:59:56 ronpinkas Exp $
  */
 
 /*
@@ -61,12 +61,14 @@
  */
 
 #include <math.h>
+
 #include "hbcomp.h"
 #include "hbmacro.ch"
-
-extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
+#include "hbpcode.h"
 
 #include "hbexemem.h"
+
+extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 
 /* ************************************************************************* */
 
@@ -93,9 +95,9 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
  * pExpr is an expression created by hb_compExprNew<operator>Eq functions
  */
 #if defined( HB_MACRO_SUPPORT )
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq, HB_MACRO_DECL )
+   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
 #else
-   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
+   void hb_compExprPushOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
@@ -186,6 +188,22 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
    /* TODO: add a special code for arrays to correctly handle a[ i++ ]++
     */
+   else if( bOpEq == HB_P_PLUS && pSelf->value.asOperator.pLeft->ExprType == HB_ET_ARRAYAT )
+   {
+      //printf( "Optimize ArrayAt\n" );
+      pSelf->value.asOperator.pLeft->value.asList.PopOp = bOpEq;
+
+      /* push argument value */
+      HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
+      /* apply operator and pop the new value into variable and remove it from the stack */
+      HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+      /* push the the new value */
+      HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+      return;
+   }
    else
    {
     #if defined( HB_MACRO_SUPPORT )
@@ -235,13 +253,17 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
          }
       }
     #endif
+
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-      /* push increment value */
+
+      /* push argument value */
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
       /* perform operation and duplicate the new value */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
+
       /* pop the new value into variable and leave the copy on the stack */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
    }
@@ -251,9 +273,9 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
  * used standalone as a statement (it cannot leave the value on the stack)
  */
 #if defined( HB_MACRO_SUPPORT )
-void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq, HB_MACRO_DECL )
+void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq, HB_MACRO_DECL )
 #else
-void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
+void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 #endif
 {
    /* NOTE: an object instance variable needs special handling
@@ -300,10 +322,10 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
          HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 0, ( BOOL ) 1 );
       }
 
-      /* push increment value */
+      /* push argument value */
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
-      /* increase operation */
+      /* Operator */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
 
       /* Now do the assignment - call pop message with one argument */
@@ -318,6 +340,19 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
 
       /* pop the unneeded value from the stack */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
+   }
+   else if( bOpEq == HB_P_PLUS && pSelf->value.asOperator.pLeft->ExprType == HB_ET_ARRAYAT )
+   {
+      //printf( "Optimize ArrayAt\n" );
+      pSelf->value.asOperator.pLeft->value.asList.PopOp = bOpEq;
+
+      /* push argument value */
+      HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
+
+      /* apply operator and pop the new value into variable and remove it from the stack */
+      HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+      return;
    }
    else
    {
@@ -370,10 +405,10 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, BYTE bOpEq )
       /* push old value */
       HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
-      /* push increment value */
+      /* push argument value */
       HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
 
-      /* add */
+      /* Operator */
       HB_EXPR_GENPCODE1( hb_compGenPCode1, bOpEq );
 
       /* pop the new value into variable and remove it from the stack */

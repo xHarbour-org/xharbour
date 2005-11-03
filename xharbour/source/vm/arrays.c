@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.125 2005/10/31 07:46:20 ronpinkas Exp $
+ * $Id: arrays.c,v 1.126 2005/10/31 22:41:53 ronpinkas Exp $
  */
 
 /*
@@ -462,6 +462,41 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
       {
          hb_itemCopy( pItem, pElement );
       }
+
+      return TRUE;
+   }
+   else
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+      else
+      {
+         pItem->type = HB_IT_NIL;
+      }
+   }
+
+   return FALSE;
+}
+
+BOOL HB_EXPORT hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      PHB_ITEM pElement = pArray->item.asArray.value->pItems + ( ulIndex - 1 );
+
+      if( HB_IS_BYREF( pElement ) )
+      {
+         hb_itemForwardValue( pItem, hb_itemUnRef( pElement ) );
+      }
+      else
+      {
+         hb_itemForwardValue( pItem, pElement );
+      }
+
       return TRUE;
    }
    else

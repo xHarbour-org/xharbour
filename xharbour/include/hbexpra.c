@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.18 2005/10/01 19:36:29 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.19 2005/11/02 22:44:18 ronpinkas Exp $
  */
 
 /*
@@ -345,6 +345,7 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
    pExpr->value.asList.pExprList = pArray;
    pExpr->value.asList.pIndex = pIndex;
    pExpr->value.asList.bByRef = FALSE;
+   pExpr->value.asList.PopOp  = HB_P_NOOP;
 
    return pExpr;
 }

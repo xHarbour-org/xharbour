@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.522 2005/10/31 22:41:53 ronpinkas Exp $
+ * $Id: hvm.c,v 1.523 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -197,7 +197,7 @@ static void    hb_vmBitShifRight( void );    /* performs the bit right shift on 
 
 /* Array */
 static void    hb_vmArrayPush( void );       /* pushes an array element to the stack, removing the array and the index from the stack */
-static void    hb_vmArrayPop( void );        /* pops a value from the stack */
+static void    hb_vmArrayPop( HB_PCODE pcode );      /* pops a value from the stack */
 static void    hb_vmArrayDim( USHORT uiDimensions ); /* generates an uiDimensions Array and initialize those dimensions from the stack values */
 static void    hb_vmArrayGen( ULONG ulElements ); /* generates an ulElements Array and fills it from the stack values */
 static void    hb_vmArrayNew( HB_ITEM_PTR, USHORT ); /* creates array */
@@ -1419,7 +1419,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_ARRAYPOP:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYPOP") );
-            hb_vmArrayPop();
+            hb_vmArrayPop( HB_P_NOOP );
+            w++;
+            break;
+
+         case HB_P_ARRAYPOPPLUS:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYPOPPLUS") );
+            hb_vmArrayPop( HB_P_PLUS );
             w++;
             break;
 
@@ -2946,7 +2952,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                PHB_ITEM pString = hb_stackItemFromTop( -1 );
-               char *sString;
 
                if( HB_IS_STRING( pString ) )
                {
@@ -2978,7 +2983,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                PHB_ITEM pString = hb_stackItemFromTop( -1 );
-               char *sString;
 
                if( HB_IS_STRING( pString ) )
                {
@@ -5874,7 +5878,7 @@ static void hb_vmArrayPush( void )
    }
 }
 
-static void hb_vmArrayPop( void )
+static void hb_vmArrayPop( HB_PCODE pcode )
 {
    HB_THREAD_STUB
 
@@ -5993,7 +5997,23 @@ static void hb_vmArrayPop( void )
          /* Remove MEMOFLAG if exists (assignment from field). */
          pValue->type &= ~HB_IT_MEMOFLAG;
 
-         hb_arraySet( pArray, (ULONG) lIndex, pValue );
+         if( pcode == HB_P_PLUS )
+         {
+            PHB_ITEM pElement = hb_itemNew( NULL );
+
+            hb_arrayGetForward( pArray, (ULONG) lIndex, pElement );
+
+            hb_vmPlus( pElement, pValue, pElement );
+
+            hb_arraySetForward( pArray, (ULONG) lIndex, pElement );
+
+            hb_itemRelease( pElement );
+         }
+         else
+         {
+            hb_arraySetForward( pArray, (ULONG) lIndex, pValue );
+         }
+
          hb_stackPop();
          hb_stackPop();
          hb_stackPop();    /* remove the value from the stack just like other POP operations */

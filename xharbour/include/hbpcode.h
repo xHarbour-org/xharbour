@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.27 2005/07/17 01:59:56 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.28 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -232,9 +232,10 @@ typedef enum
    HB_P_ENDFINALLY,            /* 166 CATCH */
    HB_P_LOCALNEARADD,          /* 167 */
    HB_P_ARRAYPUSHREF,          /* 168 */
+   HB_P_ARRAYPOPPLUS,          /* 169 */
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 169 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 170 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */
