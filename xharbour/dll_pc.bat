@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.3 2005/03/31 19:51:24 andijahja Exp $
+rem $Id: dll_pc.bat,v 1.4 2005/11/02 18:00:13 modalsist Exp $
 rem
 rem Batch File For Building xHarbour DLL with PellesC under MS-Windows
 rem
@@ -8,16 +8,16 @@ rem
 
 
 REM *************************************
-REM *** ADJUST ONLY THE 3 SETS BELLOW ***
+REM *** CHANGE ONLY THE 3 SETS BELLOW ***
 REM *************************************
 
-SET HB_DIR=c:\xmycvs
+SET HB_DIR=.\
 SET POCC_DIR=c:\pellesc
 SET BISON_DIR=c:\bison
 
-REM *******************************************
-REM *** DON'T CHANGE THESE VARIABLES BELLOW ***
-REM *******************************************
+REM *****************************************
+REM *** DON'T CHANGE THE VARIABLES BELLOW ***
+REM *****************************************
 
 SET _PATH=%PATH%
 SET _LIB=%LIB%
@@ -31,6 +31,8 @@ SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 SET TARGET_OBJ_DIR=%HB_DIR%\obj\pocc\dll
 SET TARGET_LIB_DIR=%HB_DIR%\lib\pocc
 SET TARGET_BIN_DIR=%HB_DIR%\bin\pocc
+
+SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
@@ -128,22 +130,23 @@ if "%1" == "CLEAN" goto CLEAN
 
 :EXIT
 
- SET POCC_DIR=
- SET HB_DIR=
- SET BISON_DIR=
+SET POCC_DIR=
+SET HB_DIR=
+SET BISON_DIR=
+SET BISON_SIMPLE=
 
- SET TARGET_TARGET_OBJ_DIR=
- SET TARGET_TARGET_LIB_DIR=
- SET TARGET_TARGET_BIN_DIR=
- SET HB_MT=
+SET TARGET_TARGET_OBJ_DIR=
+SET TARGET_TARGET_LIB_DIR=
+SET TARGET_TARGET_BIN_DIR=
+SET HB_MT=
 
- SET PATH=%_PATH%
- SET LIB=%_LIB%
- SET INCLUDE=%_INCLUDE%
+SET PATH=%_PATH%
+SET LIB=%_LIB%
+SET INCLUDE=%_INCLUDE%
 
- SET _PATH=
- SET _LIB=
- SET _INCLUDE=
+SET _PATH=
+SET _LIB=
+SET _INCLUDE=
 
 
 

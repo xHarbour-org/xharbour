@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.0 2005/10/26 00:00:00 modalsist Exp $
+rem $Id: make_pc.bat,v 1.4 2005/11/02 18:00:13 modalsist Exp $
 rem
 rem Batch file for building xHarbour under MS-Windows with Pelles C compiler.
 rem
@@ -9,16 +9,16 @@ rem
 rem 
 
 REM *************************************
-REM *** ADJUST ONLY THE 3 SETS BELLOW ***
+REM *** CHANGE ONLY THE 3 SETS BELLOW ***
 REM *************************************
 
-SET HB_DIR=c:\xmycvs
+SET HB_DIR=.\
 SET POCC_DIR=c:\pellesc
 SET BISON_DIR=c:\bison
 
-REM *******************************************
-REM *** DON'T CHANGE THESE VARIABLES BELLOW ***
-REM *******************************************
+REM *****************************************
+REM *** DON'T CHANGE THE VARIABLES BELLOW ***
+REM *****************************************
 
 SET _PATH=%PATH%
 SET _LIB=%LIB%
@@ -32,6 +32,9 @@ SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 SET TARGET_OBJ_DIR=%HB_DIR%\obj\pocc
 SET TARGET_LIB_DIR=%HB_DIR%\lib\pocc
 SET TARGET_BIN_DIR=%HB_DIR%\bin\pocc
+
+SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
+
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
@@ -79,6 +82,66 @@ if "%1" == "CLEAN" goto CLEAN
 
    echo Cleaning binaries and core libs
 
+   if exist %HB_DIR%\bin\harbour.exe              del %HB_DIR%\bin\harbour.exe
+   if exist %HB_DIR%\bin\hbdoc.exe                del %HB_DIR%\bin\hbdoc.exe
+   if exist %HB_DIR%\bin\hbmake.exe               del %HB_DIR%\bin\hbmake.exe
+   if exist %HB_DIR%\bin\hbtest.exe               del %HB_DIR%\bin\hbtest.exe
+   if exist %HB_DIR%\bin\hbtestmt.exe             del %HB_DIR%\bin\hbtestmt.exe
+   if exist %HB_DIR%\bin\hbrun.exe                del %HB_DIR%\bin\hbrun.exe
+   if exist %HB_DIR%\bin\hbrunmt.exe              del %HB_DIR%\bin\hbrunmt.exe
+   if exist %HB_DIR%\bin\hbpp.exe                 del %HB_DIR%\bin\hbpp.exe
+   if exist %HB_DIR%\bin\xbscript.exe             del %HB_DIR%\bin\xbscript.exe
+
+   if exist %HB_DIR%\lib\codepage.lib         del %HB_DIR%\lib\codepage.lib
+   if exist %HB_DIR%\lib\common.lib           del %HB_DIR%\lib\common.lib
+   if exist %HB_DIR%\lib\ct.lib               del %HB_DIR%\lib\ct.lib
+   if exist %HB_DIR%\lib\ctmt.lib             del %HB_DIR%\lib\ctmt.lib
+   if exist %HB_DIR%\lib\dbfcdx.lib           del %HB_DIR%\lib\dbfcdx.lib
+   if exist %HB_DIR%\lib\dbfcdxmt.lib         del %HB_DIR%\lib\dbfcdxmt.lib
+   if exist %HB_DIR%\lib\dbfdbt.lib           del %HB_DIR%\lib\dbfdbt.lib
+   if exist %HB_DIR%\lib\dbfdbtmt.lib         del %HB_DIR%\lib\dbfdbtmt.lib
+   if exist %HB_DIR%\lib\dbffpt.lib           del %HB_DIR%\lib\dbffpt.lib
+   if exist %HB_DIR%\lib\dbffptmt.lib         del %HB_DIR%\lib\dbffptmt.lib
+   if exist %HB_DIR%\lib\dbfntx.lib           del %HB_DIR%\lib\dbfntx.lib
+   if exist %HB_DIR%\lib\dbfntxmt.lib         del %HB_DIR%\lib\dbfntxmt.lib
+   if exist %HB_DIR%\lib\debug.lib            del %HB_DIR%\lib\debug.lib
+   if exist %HB_DIR%\lib\dllmain.lib          del %HB_DIR%\lib\dllmain.lib
+   if exist %HB_DIR%\lib\harbour.lib          del %HB_DIR%\lib\harbour.lib
+   if exist %HB_DIR%\lib\hbodbc.lib           del %HB_DIR%\lib\hbodbc.lib
+   if exist %HB_DIR%\lib\hbodbcmt.lib         del %HB_DIR%\lib\hbodbcmt.lib
+   if exist %HB_DIR%\lib\hbsix.lib            del %HB_DIR%\lib\hbsix.lib
+   if exist %HB_DIR%\lib\hbsixmt.lib          del %HB_DIR%\lib\hbsixmt.lib
+   if exist %HB_DIR%\lib\hsx.lib              del %HB_DIR%\lib\hsx.lib
+   if exist %HB_DIR%\lib\hsxmt.lib            del %HB_DIR%\lib\hsxmt.lib
+   if exist %HB_DIR%\lib\gtnul.lib            del %HB_DIR%\lib\gtnul.lib
+   if exist %HB_DIR%\lib\gtstd.lib            del %HB_DIR%\lib\gtstd.lib
+   if exist %HB_DIR%\lib\gtwin.lib            del %HB_DIR%\lib\gtwin.lib
+   if exist %HB_DIR%\lib\gtcgi.lib            del %HB_DIR%\lib\gtcgi.lib
+   if exist %HB_DIR%\lib\gtpca.lib            del %HB_DIR%\lib\gtpca.lib
+   if exist %HB_DIR%\lib\gtwvt.lib            del %HB_DIR%\lib\gtwvt.lib
+   if exist %HB_DIR%\lib\lang.lib             del %HB_DIR%\lib\lang.lib
+   if exist %HB_DIR%\lib\macro.lib            del %HB_DIR%\lib\macro.lib
+   if exist %HB_DIR%\lib\macromt.lib          del %HB_DIR%\lib\macromt.lib
+   if exist %HB_DIR%\lib\nulsys.lib           del %HB_DIR%\lib\nulsys.lib
+   if exist %HB_DIR%\lib\optcon.lib           del %HB_DIR%\lib\optcon.lib
+   if exist %HB_DIR%\lib\optconmt.lib         del %HB_DIR%\lib\optconmt.lib
+   if exist %HB_DIR%\lib\optgui.lib           del %HB_DIR%\lib\optgui.lib
+   if exist %HB_DIR%\lib\optguimt.lib         del %HB_DIR%\lib\optguimt.lib
+   if exist %HB_DIR%\lib\pcrepos.lib          del %HB_DIR%\lib\pcrepos.lib
+   if exist %HB_DIR%\lib\pcreposmt.lib        del %HB_DIR%\lib\pcreposmt.lib
+   if exist %HB_DIR%\lib\pp.lib               del %HB_DIR%\lib\pp.lib
+   if exist %HB_DIR%\lib\ppmt.lib             del %HB_DIR%\lib\ppmt.lib
+   if exist %HB_DIR%\lib\rdd.lib              del %HB_DIR%\lib\rdd.lib
+   if exist %HB_DIR%\lib\rddmt.lib            del %HB_DIR%\lib\rddmt.lib
+   if exist %HB_DIR%\lib\rtl.lib              del %HB_DIR%\lib\rtl.lib
+   if exist %HB_DIR%\lib\rtlmt.lib            del %HB_DIR%\lib\rtlmt.lib
+   if exist %HB_DIR%\lib\tip.lib              del %HB_DIR%\lib\tip.lib
+   if exist %HB_DIR%\lib\tipmt.lib            del %HB_DIR%\lib\tipmt.lib
+   if exist %HB_DIR%\lib\vm.lib               del %HB_DIR%\lib\vm.lib
+   if exist %HB_DIR%\lib\vmmt.lib             del %HB_DIR%\lib\vmmt.lib
+
+   REM Cleaning temp bin folder
+
    if exist %TARGET_BIN_DIR%\harbour.exe          del %TARGET_BIN_DIR%\harbour.exe
    if exist %TARGET_BIN_DIR%\harbour.exp          del %TARGET_BIN_DIR%\harbour.exp
 
@@ -105,6 +168,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %TARGET_BIN_DIR%\xbscript.exe         del %TARGET_BIN_DIR%\xbscript.exe
    if exist %TARGET_BIN_DIR%\xbscriptdll.exe      del %TARGET_BIN_DIR%\xbscriptdll.exe
 
+   REM Cleaning temp lib folder
 
    if exist %TARGET_LIB_DIR%\codepage.lib         del %TARGET_LIB_DIR%\codepage.lib
    if exist %TARGET_LIB_DIR%\common.lib           del %TARGET_LIB_DIR%\common.lib
@@ -154,6 +218,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %TARGET_LIB_DIR%\vm.lib               del %TARGET_LIB_DIR%\vm.lib
    if exist %TARGET_LIB_DIR%\vmmt.lib             del %TARGET_LIB_DIR%\vmmt.lib
 
+   REM Cleaning temp obj folder
+
    if exist %TARGET_OBJ_DIR%\*.c                  del %TARGET_OBJ_DIR%\*.c
    if exist %TARGET_OBJ_DIR%\*.h                  del %TARGET_OBJ_DIR%\*.h
    if exist %TARGET_OBJ_DIR%\*.obj                del %TARGET_OBJ_DIR%\*.obj
@@ -195,6 +261,8 @@ if "%1" == "CLEAN" goto CLEAN
 SET POCC_DIR=
 SET HB_DIR=
 SET BISON_DIR=
+SET BISON_SIMPLE=
+
 SET TARGET_OBJ_DIR=
 SET TARGET_LIB_DIR=
 SET TARGET_BIN_DIR=
