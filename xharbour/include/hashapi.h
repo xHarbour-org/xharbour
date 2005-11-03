@@ -1,5 +1,5 @@
 /*
- * $Id: hashapi.h,v 1.3 2004/03/31 13:58:12 andijahja Exp $
+ * $Id: hashapi.h,v 1.4 2005/10/22 08:49:06 ronpinkas Exp $
  */
 
 /*
@@ -67,6 +67,7 @@ ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash );
 BOOL HB_EXPORT hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
 BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
 BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
 void HB_EXPORT hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase );
 
 void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulLength );

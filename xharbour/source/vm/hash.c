@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.41 2005/10/22 08:49:07 ronpinkas Exp $
+ * $Id: hash.c,v 1.42 2005/10/24 01:04:37 druzus Exp $
  */
 
 /*
@@ -1155,6 +1155,63 @@ BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
          {
             hb_itemCopy( pItem, pElement );
          }
+         return TRUE;
+      }
+   }
+
+   if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
+   else
+   {
+      pItem->type = HB_IT_NIL;
+   }
+
+   return FALSE;
+}
+
+BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
+{
+   PHB_ITEM pElement;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashGetForward(%p, %lu, %p) Base: %p Keys: %p Values: %p", pHash, ulReturn, pItem, pHash->item.asHash.value, pHash->item.asHash.value->pKeys, pHash->item.asHash.value->pValues));
+
+   if( HB_IS_HASH( pHash ) && ulReturn > 0 )
+   {
+      if ( pHash->item.asHash.value->uiLevel > 0 )
+      {
+         ULONG ulTotal = 0;
+
+         if ( pHash->item.asHash.value->ulTotalLen < ulReturn )
+         {
+            return FALSE;
+         }
+
+         pElement = pHash->item.asHash.value->pValues;
+
+         while( ulTotal + pElement->item.asHash.value->ulTotalLen < ulReturn )
+         {
+            ulTotal += pElement->item.asHash.value->ulTotalLen;
+            pElement ++;
+         }
+
+         return hb_hashGetForward( pElement, ulReturn - ulTotal, pItem );
+      }
+
+      if  ( ulReturn <= pHash->item.asHash.value->ulLen )
+      {
+         pElement = pHash->item.asHash.value->pValues + ( ulReturn - 1 );
+
+         if( HB_IS_BYREF( pElement ) )
+         {
+            hb_itemForwardValue( pItem, hb_itemUnRef( pElement ) );
+         }
+         else
+         {
+            hb_itemForwardValue( pItem, pElement );
+         }
+
          return TRUE;
       }
    }

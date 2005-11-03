@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.523 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: hvm.c,v 1.524 2005/11/03 06:55:30 ronpinkas Exp $
  */
 
 /*
@@ -5902,15 +5902,40 @@ static void hb_vmArrayPop( HB_PCODE pcode )
    {
       hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", pValue, 2, NULL );
       hb_itemPushForward( &(HB_VM_STACK.Return ) );
+
       return;
    }
 
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
-      hb_hashAdd( pArray, ULONG_MAX, pIndex, pValue );
+      if( pcode == HB_P_PLUS )
+      {
+         ULONG ulPos;
+         PHB_ITEM pElem = hb_itemNew( NULL );
+
+         if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
+         {
+            hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+            return;
+         }
+
+         hb_hashGetForward( pArray, ulPos, pElem );
+
+         hb_vmPlus( pElem, pValue, pElem );
+
+         hb_hashSetForward( pArray, ulPos, pElem );
+
+         hb_itemRelease( pElem );
+      }
+      else
+      {
+         hb_hashAdd( pArray, ULONG_MAX, pIndex, pValue );
+      }
+
       hb_stackPop();
       hb_stackPop();
       hb_stackPop();
+
       return;
    }
 
@@ -5931,8 +5956,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
    {
       lIndex = ( LONG ) ( BYTE ) pIndex->item.asString.value[0];
    }
-   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) &&
-            strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
+   else if( HB_IS_STRING( pIndex ) && HB_IS_OBJECT( pArray ) && strcmp( "TASSOCIATIVEARRAY", hb_objGetClsName( pArray ) ) == 0 )
    {
       char szMessage[ HB_SYMBOL_NAME_LEN ];
 
@@ -6068,7 +6092,14 @@ static void hb_vmArrayPop( HB_PCODE pcode )
             hb_itemPutCPtr( pArray, sNew, pArray->item.asString.length );
          }
 
-         pArray->item.asString.value[ lIndex ] = bNewChar;
+         if( pcode == HB_P_PLUS )
+         {
+            pArray->item.asString.value[ lIndex ] += bNewChar;
+         }
+         else
+         {
+            pArray->item.asString.value[ lIndex ] = bNewChar;
+         }
 
          hb_stackPop();
          hb_stackPop();

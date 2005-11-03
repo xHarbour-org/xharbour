@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.126 2005/10/31 22:41:53 ronpinkas Exp $
+ * $Id: arrays.c,v 1.127 2005/11/03 06:55:30 ronpinkas Exp $
  */
 
 /*
@@ -482,7 +482,7 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
 BOOL HB_EXPORT hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetForward(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
 
    if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
    {
