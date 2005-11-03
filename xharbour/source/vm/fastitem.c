@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.86 2005/10/31 20:44:12 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.87 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -690,6 +690,8 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
 
 PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 {
+   ULONG ulLen = ( szText ? strlen( szText ) : 0 );
+
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
 
    if( pItem )
@@ -706,16 +708,15 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 
    pItem->type = HB_IT_STRING;
    pItem->item.asString.allocated = 0;
+   pItem->item.asString.length  = ulLen;
 
-   if( szText == NULL )
+   if( ulLen )
    {
-      pItem->item.asString.length  = 0;
-      pItem->item.asString.value   = hb_vm_sNull;
+      pItem->item.asString.value = szText;
    }
    else
    {
-      pItem->item.asString.length  = strlen( szText );
-      pItem->item.asString.value   = szText;
+      pItem->item.asString.value = hb_vm_sNull;
    }
 
    return pItem;
@@ -740,7 +741,15 @@ PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLe
    pItem->type = HB_IT_STRING;
    pItem->item.asString.allocated = 0;
    pItem->item.asString.length  = ulLen;
-   pItem->item.asString.value   = szText;
+
+   if( ulLen )
+   {
+      pItem->item.asString.value   = szText;
+   }
+   else
+   {
+      pItem->item.asString.value   = hb_vm_sNull;
+   }
 
    return pItem;
 }

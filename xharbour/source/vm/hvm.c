@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.524 2005/11/03 06:55:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.525 2005/11/03 07:32:51 ronpinkas Exp $
  */
 
 /*
@@ -5859,7 +5859,7 @@ static void hb_vmArrayPush( void )
       }
       else
       {
-         hb_itemPutCLStatic( pArray, NULL, 0 );
+         hb_itemPutCL( pArray, NULL, 0 );
       }
    }
  #endif

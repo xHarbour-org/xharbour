@@ -1,5 +1,5 @@
 /*
- * $Id: substr.c,v 1.5 2004/02/14 21:01:17 andijahja Exp $
+ * $Id: substr.c,v 1.6 2004/02/23 08:31:57 andijahja Exp $
  */
 
 /*
@@ -67,8 +67,11 @@ HB_FUNC( SUBSTR )
       if( lPos < 0 )
       {
          lPos += ( LONG ) pText->item.asString.length;
+
          if( lPos < 0 )
+         {
             lPos = 0;
+         }
       }
       else if( lPos )
       {
@@ -86,7 +89,9 @@ HB_FUNC( SUBSTR )
                lLen = hb_parnl( 3 );
 
                if( lLen > ( LONG ) pText->item.asString.length - lPos )
+               {
                   lLen = ( LONG ) pText->item.asString.length - lPos;
+               }
             }
             else
             {
@@ -96,7 +101,9 @@ HB_FUNC( SUBSTR )
             }
          }
          else
+         {
             lLen = ( LONG ) pText->item.asString.length - lPos;
+         }
 
          if( lLen > 0 )
          {

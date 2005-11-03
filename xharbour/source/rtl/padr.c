@@ -1,5 +1,5 @@
 /*
- * $Id: padr.c,v 1.6 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: padr.c,v 1.7 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -63,9 +63,13 @@ HB_FUNC( PADR )
    char * szText;
 
    if ( ISNUM( 2 ) )
+   {
       szText = hb_itemPadConv( hb_param( 1, HB_IT_ANY ), &ulSize, &bFreeReq );
+   }
    else
+   {
       szText = NULL;
+   }
 
    if( szText )
    {
@@ -97,6 +101,7 @@ HB_FUNC( PADR )
 
          hb_retclen( szText, lLen );
       }
+
       if ( bFreeReq )
       {
          hb_xfree( szText );
