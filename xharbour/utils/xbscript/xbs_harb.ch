@@ -1854,7 +1854,7 @@
          size_t nAt, nLen;
          int nStart = -1;
 
-         if( pLine->item.asString.length == 0 )
+         if( pLine == NULL || pLine->item.asString.length == 0 )
          {
             hb_ret();
          }
@@ -1982,7 +1982,7 @@
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
          size_t iLeading = 0;
 
-         if( pLine->item.asString.length == 0 )
+         if( pLine == NULL || pLine->item.asString.length == 0 )
          {
             hb_retclen( "", 0 );
             hb_storclen( NULL, 0, 2 );
@@ -2018,7 +2018,7 @@
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
          size_t iLen, i, iDrop = 0;
 
-         if( pLine->item.asString.length == 0 )
+         if( pLine == NULL || pLine->item.asString.length == 0 )
          {
             hb_retclen( "", 0 );
             hb_storclen( NULL, 0, 2 );
@@ -2057,7 +2057,7 @@
          PHB_ITEM pLine = hb_param( 1, HB_IT_STRING );
          size_t iLen, i, iDrop = 0;
 
-         if( pLine->item.asString.length == 0 )
+         if( pLine == NULL || pLine->item.asString.length == 0 )
          {
             hb_retclen( "", 0 );
             hb_storclen( NULL, 0, 2 );
