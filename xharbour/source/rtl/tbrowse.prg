@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.128 2005/10/31 08:25:11 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.130 2005/11/04 21:28:00 ptsarenko Exp $
  */
 
 /*
@@ -2477,7 +2477,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
          if ::aColsInfo[ nCol, o_Obj ]:ColorBlock == NIL
             cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
          else
-            cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, cColBlanks ), TBC_CLR_STANDARD ) - 1 )
+            cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, BlankValue( ::aColsInfo[ nCol ] ) ), TBC_CLR_STANDARD ) - 1 )
          endif
 
 
@@ -2610,7 +2610,7 @@ METHOD DeHilite() CLASS TBrowse
                       it clears current cell
       */
       if xValue == NIL
-         xValue := Space( ::aColsInfo[ ::nColPos, o_WidthCell ] )
+         xValue := BlankValue( ::aColsInfo[ ::nColPos ] )
       endif
 
       nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, xValue, TBC_CLR_STANDARD )
@@ -2643,7 +2643,7 @@ METHOD Hilite() CLASS TBrowse
                       it clears current cell
       */
       if xValue == NIL
-         xValue := Space( ::aColsInfo[ ::nColPos, o_WidthCell ] )
+         xValue := BlankValue( ::aColsInfo[ ::nColPos ] )
       endif
 
       nNotLeftCol := ::DispCell( ::nRowPos, ::nColPos, xValue, TBC_CLR_ENHANCED )
@@ -3244,6 +3244,26 @@ static function Color2Array( cColorSpec )
    AAdd( a_, Trim( cColorSpec ) )
 
 Return a_
+
+//-------------------------------------------------------------------//
+
+static function BlankValue( aColInfo )
+local xValue
+
+switch aColInfo[ o_Type ]
+   case 'N'
+      xValue := 0
+      exit
+   case 'D'
+      xValue := CTOD( "" )
+      exit
+   case 'L'
+      xValue := .F.
+      exit
+   default
+      xValue := Space( aColInfo[ o_WidthCell ] )
+end
+Return xValue
 
 //-------------------------------------------------------------------//
 //
