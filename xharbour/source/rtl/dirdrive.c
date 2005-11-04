@@ -1,5 +1,5 @@
 /*
- * $Id: dirdrive.c,v 1.1.1.1 2001/12/21 10:41:28 ronpinkas Exp $
+ * $Id: dirdrive.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( DIRCHANGE )
    USHORT uiErrorOld = hb_fsError();
 
    if( ISCHAR( 1 ) )
-      hb_retni( hb_fsChDir( ( BYTE * ) hb_parcx( 1 ) ) ? 0 : hb_fsError() );
+      hb_retni( hb_fsChDir( ( BYTE * ) hb_parc( 1 ) ) ? 0 : hb_fsError() );
    else
       hb_retni( -1 );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.154 2005/11/01 22:05:49 druzus Exp $
+ * $Id: filesys.c,v 1.155 2005/11/04 02:20:11 druzus Exp $
  */
 
 /*
@@ -3007,14 +3007,14 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
          ulLen--;
       }
 
-      if( pbyBuffer != pbyStart )
+      /* Strip the trailing (back)slash if there's one */
+      if( ulLen && strchr( OS_PATH_DELIMITER_LIST, pbyStart[ ulLen - 1 ] ) )
+         ulLen--;
+
+      if( ulLen && pbyBuffer != pbyStart )
       {
          memmove( pbyBuffer, pbyStart, ulLen );
       }
-
-      /* Strip the trailing (back)slash if there's one */
-      if( strchr( OS_PATH_DELIMITER_LIST, pbyBuffer[ ulLen - 1 ] ) )
-         ulLen--;
 
       pbyBuffer[ ulLen ] = '\0';
    }
