@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.4 2003/01/27 03:44:13 walito Exp $
+ * $Id: treport.prg,v 1.5 2004/02/15 11:57:49 lculik Exp $
  */
 
 /*
@@ -280,9 +280,9 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
       // Column total elements      
       // nCol := 1
       FOR EACH aReport IN ::aReportData[RPT_COLUMNS]
-         IF aReport[RCT_TOTAL]
+         IF aReport[RCT_TOTAL]              
             FOR EACH aTotal IN ::aReportTotals
-               aTotal[ HB_EnumIndex() ] := 0
+               AFill( aTotal, 0 )
             NEXT
          ENDIF       
          // nCol++
