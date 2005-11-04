@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4571 2005/11/04 12:05:19 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4571 2005/11/04 19:28:35 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-04 14:02 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+  * source/vm/inet.c
+    * Restore to before recent change by Przemek.
+
+  * include/hbapi.h
+    * Minor correction
+  * source/vm/fastitem.c
+    + Added missing reset of pItem->item.asString.value[ulLen] to '\0' in hb_itemPutC[L]()
+    * Corrected comparison of ulLen > pItem->item.asString.allocated to >=
+
+  * source/vm/hvm.c
+    * Merged Przemek's changes of HB_IS_GCITEM and bit manipulation functions
+
+  * source/vm/inet.c
+    * Merged Przemek's additional comment
+
+  * source/vm/memvars.c
+    + Added error generation on read failure
 
 2005-11-04 21:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/tbrowse.prg

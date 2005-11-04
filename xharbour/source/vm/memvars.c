@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.112 2005/10/29 06:45:02 druzus Exp $
+ * $Id: memvars.c,v 1.113 2005/10/31 07:46:20 ronpinkas Exp $
  */
 
 /*
@@ -2199,6 +2199,10 @@ HB_FUNC( __MVRESTORE )
                   {
                      hb_itemPutCPtr( &Item, ( char * ) pbyString, uiWidth - 1 );
                   }
+                  else
+                  {
+                     hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
+                  }
 
                   break;
                }
@@ -2210,6 +2214,10 @@ HB_FUNC( __MVRESTORE )
                   if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
                   {
                      hb_itemPutNLen( &Item, HB_GET_LE_DOUBLE( pbyNumber ), uiWidth - ( uiDec ? ( uiDec + 1 ) : 0 ), uiDec );
+                  }
+                  else
+                  {
+                     hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
                   }
 
                   break;
@@ -2223,6 +2231,10 @@ HB_FUNC( __MVRESTORE )
                   {
                      hb_itemPutDL( &Item, ( LONG ) HB_GET_LE_DOUBLE( pbyNumber ) );
                   }
+                  else
+                  {
+                     hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
+                  }
 
                   break;
                }
@@ -2235,12 +2247,18 @@ HB_FUNC( __MVRESTORE )
                   {
                      hb_itemPutL( &Item, pbyLogical[ 0 ] != 0 );
                   }
+                  else
+                  {
+                     hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
+                  }
 
                   break;
                }
 
                default:
                {
+                  // passing uiType as char * only to match declared arg type - will be processed as int by srintf.
+                  hb_errInternal( 9100, "Restore failed, unsupported type: %i for: '%s'\n", (char *) uiType, hb_itemGetCPtr( &Name ) );
                   hb_itemClear( &Item );
                }
             }

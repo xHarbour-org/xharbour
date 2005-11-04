@@ -787,9 +787,9 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          iMaxLen = ( int ) pBuffer->item.asString.length;
 #if 0
          /* Should we issue a runtime error? */
-
+         
          /* above is hb_itemUnShare() so it's safe to call this function */
-         hb_itemResizeString( pBuffer );
+         HB_STRING_ALLOC( pBuffer, iMaxLen );
 #endif
       }
    }

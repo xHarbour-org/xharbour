@@ -168,25 +168,6 @@ void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )
    }
 }
 
-/*
- * This function can be safely called only if HB_IS_STRINGWR( pItem )
- * returns TRUE
- */
-void HB_EXPORT hb_itemResizeString( PHB_ITEM pItem, ULONG ulLen )
-{
-   HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemResizeString(%p,%lu)", pItem, ulLen ) );
-
-   if( pItem->item.asString.allocated <= ulLen )
-   {
-      ULONG ulAllocate = ulLen < LONG_MAX ? ulLen << 1 : ulLen + 1;
-
-      pItem->item.asString.value = ( char * ) hb_xrealloc( pItem->item.asString.value, ulAllocate );
-      pItem->item.asString.allocated = ulAllocate;
-   }
-   pItem->item.asString.value[ ulLen ] = '\0';
-   pItem->item.asString.length = ulLen;
-}
-
 void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_itemClear(%p) type: %i", pItem, pItem ? pItem->type : 0 ) );
@@ -459,82 +440,50 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
    }
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
-
-   if( ulLen == 0 )
-   {
-      szText = hb_vm_sNull;
-   }
-   else if( ulLen == 1 )
-   {
-      szText = hb_vm_acAscii[ ( BYTE ) ( szText[0] ) ];
-   }
-
-   if( pItem == NULL )
-   {
-      pItem = hb_itemNew( NULL );
-   }
-   else if( ulLen > 1 && HB_IS_STRINGWR( pItem ) )
-   {
-      /* Test for overlaping buffers! */
-      if( szText >= pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
-      {
-         char *sCopy = ( char * ) hb_xgrab( ulLen + 1 );
-
-         hb_xmemcpy( ( void * ) sCopy, ( void * ) szText, ulLen );
-
-         return hb_itemPutCPtr( pItem, sCopy, ulLen );
-      }
-      hb_itemResizeString( pItem, ulLen );
-      memcpy( pItem->item.asString.value, szText, ulLen );
-
-      return pItem;
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      /* if ulLen <= 1 or it's not HB_IS_STRINGWR() then
-         we can safely call hb_itemClear() */
-      hb_itemClear( pItem );
-   }
-
-   pItem->type = HB_IT_STRING;
-   pItem->item.asString.length = ulLen;
-   if( ulLen <= 1 )
-   {
-      pItem->item.asString.value = ( char * ) szText;
-      pItem->item.asString.allocated = 0;
-   }
-   else
-   {
-      pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
-      pItem->item.asString.value[ ulLen ]  = '\0';
-      pItem->item.asString.allocated       = ulLen + 1;
-      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( pItem->item.asString.pulHolders ) = 1;
-      hb_xmemcpy( ( void * ) pItem->item.asString.value, ( void * ) szText, ulLen );
-   }
-
-   return pItem;
-}
-
 PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
 {
    ULONG ulLen = ( szText ? strlen( szText ) : 0 );
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutC(%p, %s)", pItem, szText));
 
-   return hb_itemPutCL( pItem, szText, ulLen );
-}
-
-PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
-{
-   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
-
    if( pItem == NULL )
    {
       pItem = hb_itemNew( NULL );
+   }
+
+   if( HB_IS_STRING( pItem ) )
+   {
+       // Test for overlaping buffers!
+       if( szText >= pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
+       {
+          char *sCopy = (char *) hb_xgrab( ulLen + 1 );
+
+          hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+
+          return hb_itemPutCPtr( pItem, sCopy, ulLen );
+       }
+
+       // Recycle!
+       if( ulLen > 1 && pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
+       {
+          if( ulLen >= pItem->item.asString.allocated )
+          {
+             // Safe to realocate.
+             __HB_STRING_REALLOC( pItem, ulLen );
+          }
+          else
+          {
+             pItem->item.asString.length = ulLen;
+             pItem->item.asString.value[ ulLen ] = '\0';
+          }
+
+          // Safe.
+          memcpy( pItem->item.asString.value, szText, ulLen );
+
+          return pItem;
+       }
+
+       hb_itemReleaseString( pItem );
    }
    else if( HB_IS_COMPLEX( pItem ) )
    {
@@ -542,12 +491,141 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.length     = ulLen;
-   pItem->item.asString.value      = szText;
-   pItem->item.asString.allocated  = ulLen + 1;
-   pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-   *( pItem->item.asString.pulHolders ) = 1;
-   szText[ ulLen ] = '\0';
+   pItem->item.asString.allocated = 0;
+
+   if( ulLen )
+   {
+      if( ulLen == 1 )
+      {
+         pItem->item.asString.value  = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
+         pItem->item.asString.length = 1;
+      }
+      else
+      {
+         HB_STRING_ALLOC( pItem, ulLen )
+
+         // Alocation above already set the 'length and the terminator!
+         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
+      }
+   }
+   else
+   {
+      pItem->item.asString.value  = hb_vm_sNull;
+      pItem->item.asString.length = 0;
+   }
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCL(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem == NULL )
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   if( HB_IS_STRING( pItem ) )
+   {
+       // Test for overlaping buffers!
+       if( szText >= pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
+       {
+          char *sCopy = (char *) hb_xgrab( ulLen + 1 );
+
+          hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+
+          return hb_itemPutCPtr( pItem, sCopy, ulLen );
+       }
+
+       // Recycle!
+       if( ulLen > 1 && pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
+       {
+          if( ulLen >= pItem->item.asString.allocated )
+          {
+             // Safe to realocate.
+             __HB_STRING_REALLOC( pItem, ulLen );
+          }
+          else
+          {
+             pItem->item.asString.length = ulLen;
+             pItem->item.asString.value[ ulLen ] = '\0';
+          }
+
+          // Safe.
+          memcpy( pItem->item.asString.value, szText, ulLen );
+
+          return pItem;
+       }
+
+       hb_itemReleaseString( pItem );
+   }
+   else if( HB_IS_COMPLEX( pItem ) )
+   {
+      hb_itemClear( pItem );
+   }
+
+   pItem->type = HB_IT_STRING;
+   pItem->item.asString.allocated = 0;
+
+   if( ulLen )
+   {
+      if( ulLen == 1 )
+      {
+         pItem->item.asString.value  = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
+         pItem->item.asString.length = 1;
+      }
+      else
+      {
+         HB_STRING_ALLOC( pItem, ulLen )
+
+         // Alocation above already set the 'length and the terminator!
+         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
+      }
+   }
+   else
+   {
+      pItem->item.asString.value  = hb_vm_sNull;
+      pItem->item.asString.length = 0;
+   }
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCPtr(%p, %s, %lu)", pItem, szText, ulLen));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_STRING;
+
+   if( ulLen )
+   {
+
+      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( pItem->item.asString.pulHolders ) = 1;
+      szText[ulLen] = '\0';
+   }
+   else
+   {
+      hb_xfree( szText );
+      szText = hb_vm_sNull;
+   }
+
+   pItem->item.asString.allocated = ulLen;
+   pItem->item.asString.length    = ulLen;
+   pItem->item.asString.value     = szText;
 
    return pItem;
 }
@@ -556,29 +634,34 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRaw(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
    }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
 
    pItem->type = HB_IT_STRING;
-   pItem->item.asString.length =
-   pItem->item.asString.allocated = ulLen;
+
    if( ulLen )
    {
-      pItem->item.asString.value      = szText;
-      pItem->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
    }
    else
    {
       hb_xfree( szText );
-      pItem->item.asString.value      = hb_vm_sNull;
+      szText = hb_vm_sNull;
    }
+
+   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.value     = szText;
+   pItem->item.asString.allocated = ulLen;
 
    return pItem;
 }
@@ -587,13 +670,16 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCRawStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
    }
 
    pItem->type = HB_IT_STRING;
@@ -610,19 +696,30 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCStatic(%p, %s)", pItem, szText) );
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
    }
 
    pItem->type = HB_IT_STRING;
    pItem->item.asString.allocated = 0;
    pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = ulLen ? szText : hb_vm_sNull;
+
+   if( ulLen )
+   {
+      pItem->item.asString.value  = szText;
+   }
+   else
+   {
+      pItem->item.asString.value  = hb_vm_sNull;
+   }
 
    return pItem;
 }
@@ -631,19 +728,30 @@ PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLe
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
    }
 
    pItem->type = HB_IT_STRING;
    pItem->item.asString.allocated = 0;
    pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = ulLen ? szText : hb_vm_sNull;
+
+   if( ulLen )
+   {
+      pItem->item.asString.value  = szText;
+   }
+   else
+   {
+      pItem->item.asString.value  = hb_vm_sNull;
+   }
 
    return pItem;
 }
@@ -652,13 +760,16 @@ PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
-   }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
    }
 
    pItem->type = HB_IT_POINTER;
@@ -672,21 +783,25 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
 
-   if( pItem == NULL )
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
    {
       pItem = hb_itemNew( NULL );
    }
-   else if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
 
    pItem->type = HB_IT_POINTER;
-   pItem->item.asPointer.value = pValue;
+   pItem->item.asPointer.value   = pValue;
    pItem->item.asPointer.collect = TRUE;
 
    return pItem;
 }
+
 
 void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 {
@@ -711,7 +826,28 @@ void HB_EXPORT hb_retcAdopt( char * szText )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcAdopt(%s)", szText ) );
 
-   hb_itemPutCPtr( hb_stackReturnItem(), szText, strlen( szText ) );
+
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.length = strlen( szText );
+
+   if( ( &(HB_VM_STACK.Return) )->item.asString.length )
+   {
+      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+   }
+   else
+   {
+      hb_xfree( szText );
+      szText = hb_vm_sNull;
+   }
+
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ( &(HB_VM_STACK.Return) )->item.asString.length;
 }
 
 #undef hb_retclenAdopt
@@ -721,7 +857,29 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdopt( '%s', %lu )", szText, ulLen ) );
 
-   hb_itemPutCPtr( hb_stackReturnItem(), szText, ulLen );
+
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+
+   if( ulLen )
+   {
+      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+      szText[ulLen] = '\0';
+   }
+   else
+   {
+      hb_xfree( szText );
+      szText = hb_vm_sNull;
+   }
+
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ulLen;
 }
 
 #undef hb_retclenAdoptRaw
@@ -731,7 +889,28 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenAdoptRaw( '%s', %lu )", szText, ulLen ) );
 
-   hb_itemPutCRaw( hb_stackReturnItem(), szText, ulLen );
+
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+
+   if( ulLen )
+   {
+      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+   }
+   else
+   {
+      hb_xfree( szText );
+      szText = hb_vm_sNull;
+   }
+
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ulLen;
 }
 
 #undef hb_retclenRawStatic
@@ -741,7 +920,16 @@ void HB_EXPORT hb_retclenRawStatic( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenRawStatic( '%s', %lu )", szText, ulLen ) );
 
-   hb_itemPutCRawStatic( hb_stackReturnItem(), szText, ulLen );
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+
 }
 
 #undef hb_retcStatic
@@ -751,7 +939,16 @@ void HB_EXPORT hb_retcStatic( char * szText )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retcStatic(%s)", szText ) );
 
-   hb_itemPutCStatic( hb_stackReturnItem(), szText );
+
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = strlen( szText );
 }
 
 #undef hb_retclenStatic
@@ -761,7 +958,16 @@ void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
 
    HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenStatic(%s)", szText ) );
 
-   hb_itemPutCLStatic( hb_stackReturnItem(), szText, ulLen );
+   if( ( &(HB_VM_STACK.Return) )->type )
+   {
+      hb_itemClear( &(HB_VM_STACK.Return) );
+   }
+
+   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
+   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
+
 }
 
 BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )

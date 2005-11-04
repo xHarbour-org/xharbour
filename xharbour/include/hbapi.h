@@ -163,6 +163,49 @@ HB_EXTERN_BEGIN
                } \
                while( 0 )
 
+// Should NEVER be called directly - always use HB_STRING_ALLOC()
+#define __HB_STRING_REALLOC( p, len ) \
+               \
+               if( (p)->item.asString.allocated <= len ) \
+               { \
+                  ULONG ulAllocate; \
+                  \
+                  if( len < LONG_MAX ) \
+                  { \
+                     ulAllocate = (len) << 1; \
+                  } \
+                  else \
+                  { \
+                     ulAllocate = (len) + 1; \
+                  } \
+                  \
+                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate ); \
+                  (p)->item.asString.allocated = ulAllocate; \
+               } \
+               \
+               (p)->item.asString.value[ len ] = '\0'; \
+               (p)->item.asString.length = len;
+
+// This is a very low level macro use with caution, it EXPECTs an item of type HB_IT_STRING !!!
+#define HB_STRING_ALLOC( p, len ) \
+               \
+               if( (p)->item.asString.allocated && *( (p)->item.asString.pulHolders ) == 1 ) \
+               { \
+                  __HB_STRING_REALLOC( p, len ); \
+               } \
+               else \
+               { \
+                  hb_itemClear( p ); \
+                  \
+                  (p)->type = HB_IT_STRING; \
+                  \
+                  (p)->item.asString.length          = len; \
+                  (p)->item.asString.value           = ( char * ) hb_xgrab( (len) + 1 ); \
+                  (p)->item.asString.value[ len ]    = '\0'; \
+                  (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
+                  *( (p)->item.asString.pulHolders ) = 1; \
+                  (p)->item.asString.allocated       = len; \
+               }
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
 
