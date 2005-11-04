@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4566 2005/11/03 11:28:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.4567 2005/11/03 18:32:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-04 03:12 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+    + added HB_IS_GCITEM() and HB_IS_STRINGWR() macros
+    - removed __HB_STRING_REALLOC(), HB_STRING_ALLOC()
+
+  * xharbour/include/hbapiitm.h
+    + added hb_itemResizeString()
+
+  * xharbour/source/vm/fastitem.c
+    + added hb_itemResizeString()
+    * rewritten hb_itemPutCL()
+    * hb_itemPutCPtr() always use given buffer
+    * changed hb_retc*() functions to use hb_itemPutC*() to not replicate
+      the same code
+
+  * xharbour/source/vm/hvm.c
+    * use HB_IS_GCITEM() and HB_IS_STRINGWR() macros
+    * changed hb_vmPlus()
+    % simplified bit manipulation functions
+
+  * xharbour/source/vm/inet.c
+    * updated commented out code
+
+  * xharbour/source/vm/itemapi.c
+    ! fixed hb_itemUnShare()
+
+  * xharbour/source/vm/thread.c
+    * use HB_IS_GCITEM() macro
+
+  * xharbour/source/rtl/filesys.c
+    ! fixed possible wrong result or GPF in hb_fsChDirBuf()
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! respect FOR condition in custom indexes
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * cleanup
+
+  The above string handling modifications should fixed some problems which
+  appears recently in different places (f.e. problems with APPEND FROM) and
+  IMHO simplify HVM code so it will be much easier to update in the future.
+  source/rtl/hbxml.c have to be updated yet. For sure this code makes sth
+  wrong with strings though it may work.
 
 2005-11-03 10:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/padr.c

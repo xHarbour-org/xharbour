@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.141 2005/10/19 14:23:03 druzus Exp $
+ * $Id: dbfntx1.c,v 1.142 2005/10/24 01:04:32 druzus Exp $
  */
 
 /*
@@ -4234,14 +4234,17 @@ static BOOL hb_ntxOrdKeyAdd( LPTAGINFO pTag, PHB_ITEM pItem )
    BOOL fResult = FALSE;
    LPKEYINFO pKey;
 
-   if( !pTag->Custom || pArea->fEof || ( pTag->pForItem &&
-       !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   if( !pArea->fPositioned )
+      return FALSE;
+
+   if( pTag->pForItem && !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) )
       return FALSE;
 
    if( pTag->Template && pItem && hb_itemType( pItem ) != HB_IT_NIL )
    {
-      if( pArea->lpdbPendingRel )
-         SELF_FORCEREL( ( AREAP ) pArea );
       pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, TRUE, NULL );
    }
    else
@@ -4274,14 +4277,17 @@ static BOOL hb_ntxOrdKeyDel( LPTAGINFO pTag, PHB_ITEM pItem )
    BOOL fResult = FALSE;
    LPKEYINFO pKey;
 
-   if( !pTag->Custom || pArea->fEof || ( pTag->pForItem &&
-       !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+   if( pArea->lpdbPendingRel )
+      SELF_FORCEREL( ( AREAP ) pArea );
+
+   if( !pArea->fPositioned )
+      return FALSE;
+
+   if( pTag->pForItem && !hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) )
       return FALSE;
 
    if( pTag->Template && pItem && hb_itemType( pItem ) != HB_IT_NIL )
    {
-      if( pArea->lpdbPendingRel )
-         SELF_FORCEREL( ( AREAP ) pArea );
       pKey = hb_ntxKeyPutItem( NULL, pItem, pArea->ulRecNo, pTag, TRUE, NULL );
    }
    else

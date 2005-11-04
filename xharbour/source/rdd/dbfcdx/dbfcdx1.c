@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.228 2005/10/24 01:04:25 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.229 2005/11/01 22:05:20 druzus Exp $
  */
 
 /*
@@ -6638,7 +6638,7 @@ static ERRCODE hb_cdxGoCold( CDXAREAP pArea )
             pKey = hb_cdxKeyEval( pKey, pTag );
 
             if ( pTag->pForItem != NULL )
-               fAdd = hb_cdxEvalCond ( pArea, pTag->pForItem, TRUE );
+               fAdd = hb_cdxEvalCond( pArea, pTag->pForItem, TRUE );
             else
                fAdd = TRUE;
 
@@ -8010,18 +8010,28 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          {
             if ( pTag->Custom )
             {
-               LPCDXKEY pKey;
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
-               hb_cdxIndexLockWrite( pTag->pIndex );
-               if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
-                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
+
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
+                  pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
-                  pKey = hb_cdxKeyEval( NULL, pTag );
-               pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                                             hb_cdxTagKeyAdd( pTag, pKey ) );
-               hb_cdxIndexUnLockWrite( pTag->pIndex );
-               hb_cdxKeyFree( pKey );
+               {
+                  LPCDXKEY pKey;
+                  hb_cdxIndexLockWrite( pTag->pIndex );
+                  if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
+                     pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
+                  else
+                     pKey = hb_cdxKeyEval( NULL, pTag );
+                  pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                                                hb_cdxTagKeyAdd( pTag, pKey ) );
+                  hb_cdxIndexUnLockWrite( pTag->pIndex );
+                  hb_cdxKeyFree( pKey );
+               }
             }
             else
             {
@@ -8039,18 +8049,28 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          {
             if ( pTag->Custom )
             {
-               LPCDXKEY pKey;
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
-               hb_cdxIndexLockWrite( pTag->pIndex );
-               if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
-                  pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
+
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
+                  pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
-                  pKey = hb_cdxKeyEval( NULL, pTag );
-               pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                                             hb_cdxTagKeyDel( pTag, pKey ) );
-               hb_cdxIndexUnLockWrite( pTag->pIndex );
-               hb_cdxKeyFree( pKey );
+               {
+                  LPCDXKEY pKey;
+                  hb_cdxIndexLockWrite( pTag->pIndex );
+                  if ( pOrderInfo->itmNewVal && !HB_IS_NIL( pOrderInfo->itmNewVal ) )
+                     pKey = hb_cdxKeyPutItem( NULL, pOrderInfo->itmNewVal, pArea->ulRecNo, pTag, TRUE, TRUE );
+                  else
+                     pKey = hb_cdxKeyEval( NULL, pTag );
+                  pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                                                hb_cdxTagKeyDel( pTag, pKey ) );
+                  hb_cdxIndexUnLockWrite( pTag->pIndex );
+                  hb_cdxKeyFree( pKey );
+               }
             }
             else
             {

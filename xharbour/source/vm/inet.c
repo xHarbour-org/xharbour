@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.62 2005/10/31 07:46:20 ronpinkas Exp $
+* $Id: inet.c,v 1.63 2005/11/02 19:46:38 ronpinkas Exp $
 */
 
 /*
@@ -787,7 +787,9 @@ static void s_inetRecvInternal( char *szFuncName, int iMode )
          iMaxLen = ( int ) pBuffer->item.asString.length;
 #if 0
          /* Should we issue a runtime error? */
-         HB_STRING_ALLOC( pBuffer, iMaxLen );
+
+         /* above is hb_itemUnShare() so it's safe to call this function */
+         hb_itemResizeString( pBuffer );
 #endif
       }
    }

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.197 2005/10/24 01:04:38 druzus Exp $
+* $Id: thread.c,v 1.198 2005/10/29 06:45:02 druzus Exp $
 */
 
 /*
@@ -723,7 +723,7 @@ void hb_threadIsLocalRef( void )
 
    while( pStack )
    {
-      if( pStack->Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+      if( HB_IS_GCITEM( &(pStack->Return) ) )
       {
          hb_gcItemRef( &(pStack->Return) );
       }
@@ -734,7 +734,7 @@ void hb_threadIsLocalRef( void )
 
          while( pItem != pStack->pItems )
          {
-            if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+            if( HB_IS_GCITEM( *pItem ) )
             {
                hb_gcItemRef( *pItem );
             }
@@ -746,7 +746,7 @@ void hb_threadIsLocalRef( void )
       // FOR EACH Enumerations.
       for( i = 0; i < pStack->wEnumCollectionCounter; i++ )
       {
-         if( ( &( pStack->aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+         if( HB_IS_GCITEM( &( pStack->aEnumCollection[ i ] ) ) )
          {
             hb_gcItemRef( &( pStack->aEnumCollection[ i ] ) );
          }
@@ -755,7 +755,7 @@ void hb_threadIsLocalRef( void )
       // WITH OBJECT
       for( i = 0; i < pStack->wWithObjectCounter; i++ )
       {
-         if( ( &( pStack->aWithObject[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+         if( HB_IS_GCITEM( &( pStack->aWithObject[ i ] ) ) )
          {
             hb_gcItemRef( &( pStack->aWithObject[ i ] ) );
          }

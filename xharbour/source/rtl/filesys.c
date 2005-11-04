@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.153 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: filesys.c,v 1.154 2005/11/01 22:05:49 druzus Exp $
  */
 
 /*
@@ -2985,6 +2985,7 @@ USHORT HB_EXPORT  hb_fsCurDirBuff( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulLen
 
    /* Strip the leading drive spec, and leading backslash if there's one. */
 
+   if( pbyBuffer[ 0 ] )
    {
       BYTE * pbyStart = pbyBuffer;
 

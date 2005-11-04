@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.182 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.183 2005/11/03 06:54:36 ronpinkas Exp $
  */
 
 /*
@@ -89,6 +89,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
 #define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFF )
 #define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
+#define HB_IT_GCITEM    ( ( HB_TYPE ) ( HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_HASH | HB_IT_POINTER | HB_IT_BYREF ) )
 
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
 
@@ -112,8 +113,10 @@ HB_EXTERN_BEGIN
 #define HB_IS_POINTER( p )    ( ( p )->type & HB_IT_POINTER )
 #define HB_IS_HASH( p )       ( ( p )->type == HB_IT_HASH )
 #define HB_IS_ORDERABLE( p )  ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
+#define HB_IS_STRINGWR( p )   ( ( p )->type & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
 #define HB_IS_COMPLEX( p )    ( ( p )->type & HB_IT_COMPLEX )
 #define HB_IS_SIMPLE( p )     ( ( p )->type & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
+#define HB_IS_GCITEM( p )     ( ( p )->type & HB_IT_GCITEM )
 #define HB_IS_BADITEM( p )    ( ( p )->type & HB_IT_COMPLEX && ( p )->type & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) )
 
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
@@ -160,49 +163,6 @@ HB_EXTERN_BEGIN
                } \
                while( 0 )
 
-// Should NEVER be called directly - always use HB_STRING_ALLOC()
-#define __HB_STRING_REALLOC( p, len ) \
-               \
-               if( (p)->item.asString.allocated <= len ) \
-               { \
-                  ULONG ulAllocate; \
-                  \
-                  if( len < LONG_MAX ) \
-                  { \
-                     ulAllocate = (len) << 1; \
-                  } \
-                  else \
-                  { \
-                     ulAllocate = len; \
-                  } \
-                  \
-                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate ); \
-                  (p)->item.asString.allocated = ulAllocate; \
-               } \
-               \
-               (p)->item.asString.value[ len ] = '\0'; \
-               (p)->item.asString.length = len;
-
-// This is a very low level macro use with caution, it EXPECTs an item of type HB_IT_STRING !!!
-#define HB_STRING_ALLOC( p, len ) \
-               \
-               if( (p)->item.asString.allocated && *( (p)->item.asString.pulHolders ) == 1 ) \
-               { \
-                  __HB_STRING_REALLOC( p, len ); \
-               } \
-               else \
-               { \
-                  hb_itemClear( p ); \
-                  \
-                  (p)->type = HB_IT_STRING; \
-                  \
-                  (p)->item.asString.length          = len; \
-                  (p)->item.asString.value           = ( char * ) hb_xgrab( (len) + 1 ); \
-                  (p)->item.asString.value[ len ]    = '\0'; \
-                  (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
-                  *( (p)->item.asString.pulHolders ) = 1; \
-                  (p)->item.asString.allocated       = len; \
-               }
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
 

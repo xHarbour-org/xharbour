@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.525 2005/11/03 07:32:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.526 2005/11/03 18:33:11 ronpinkas Exp $
  */
 
 /*
@@ -3854,17 +3854,26 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
             {
                ULONG ulNewLen = ulLen1 + ulLen2;
 
-               if( ! ( pLeft == pResult && pLeft->item.asString.allocated && ( *( pLeft->item.asString.pulHolders ) == 1 ) ) )
+               if( HB_IS_STRINGWR( pResult ) )
+               {
+                  hb_itemResizeString( pResult, ulNewLen );
+                  if( pResult != pLeft )
+                  {
+                     hb_xmemcpy( (void *) pResult->item.asString.value,
+                                 (void *) pLeft->item.asString.value, ulLen1 );
+                  }
+                  hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ),
+                              (void *) pRight->item.asString.value, ulLen2 );
+               }
+               else
                {
                   char *sResult = (char *) hb_xgrab( ulNewLen + 1 );
-
-                  hb_xmemcpy( sResult, pLeft->item.asString.value, ulLen1 );
-                  hb_itemPutCPtr( pResult, sResult, ulLen1 );
+                  hb_xmemcpy( (void *) sResult,
+                              (void *) pLeft->item.asString.value, ulLen1 );
+                  hb_xmemcpy( (void *) ( sResult + ulLen1 ),
+                              (void *) pRight->item.asString.value, ulLen2 );
+                  hb_itemPutCPtr( pResult, sResult, ulNewLen );
                }
-
-               // At minimum sets length and terminator.
-               __HB_STRING_REALLOC( pResult, ulNewLen );
-               hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
             }
             else
             {
@@ -3877,12 +3886,9 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
             hb_itemCopy( pResult, pRight );
          }
       }
-      else
+      else if( ulLen1 && pResult != pLeft )
       {
-         if( pResult != pLeft )
-         {
-            hb_itemCopy( pResult, pLeft );
-         }
+         hb_itemCopy( pResult, pLeft );
       }
    }
    else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
@@ -5280,64 +5286,56 @@ static void hb_vmBitAnd( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      char*  pString1 = pItem1->item.asString.value;
       ULONG  ulLen1 = pItem1->item.asString.length;
-      char*  pString2 = pItem2->item.asString.value;
       ULONG  ulLen2 = pItem2->item.asString.length;
-      char*  pNewString;
-      ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen1 && ulLen2 )
       {
-         pNewString = (char*) hb_xgrab( ulLen1 + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen1 );
-      }
-      else
-      {
-         pNewString = pString1;
-      }
+         char*  pString1 = pItem1->item.asString.value;
+         char*  pString2 = pItem2->item.asString.value;
+         ULONG  ulPos1, ulPos2;
 
-      if ( ulLen1 && ulLen2 )
-      {
-         ulPos2 = 0;
-
-         for ( ulPos1 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         if( ! HB_IS_STRINGWR( pItem1 ) )
          {
-            pNewString[ulPos1] &= pString2[ulPos2++];
+            pString1 = (char*) hb_xgrab( ulLen1 + 1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_itemPutCPtr( pItem1, pString1, ulLen1 );
+         }
 
-            if ( ulPos2 == ulLen2 )
+         for( ulPos1 = ulPos2 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         {
+            pString1[ulPos1] &= pString2[ulPos2];
+
+            if( ++ulPos2 == ulLen2 )
             {
                ulPos2 = 0;
             }
          }
       }
-
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      char   cVal = (char) hb_itemGetNL( pItem2 );
-      char*  pString = pItem1->item.asString.value;
       ULONG  ulLen = pItem1->item.asString.length;
-      char*  pNewString;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen )
       {
-         pNewString = (char*) hb_xgrab( ulLen + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen );
-      }
-      else
-      {
-         pNewString = pString;
-      }
+         char   cVal = (char) hb_itemGetNL( pItem2 );
+         char*  pString = pItem1->item.asString.value;
 
-      while ( ulLen )
-      {
-         pNewString[--ulLen] &= cVal;
-      }
+         if( ! HB_IS_STRINGWR( pItem1 ) )
+         {
+            pString = (char*) hb_xgrab( ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_itemPutCPtr( pItem1, pString, ulLen );
+         }
 
+         do
+         {
+            pString[ulLen] &= cVal;
+         }
+         while( --ulLen );
+      }
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -5394,64 +5392,56 @@ static void hb_vmBitOr( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      char*  pString1 = pItem1->item.asString.value;
       ULONG  ulLen1 = pItem1->item.asString.length;
-      char*  pString2 = pItem2->item.asString.value;
       ULONG  ulLen2 = pItem2->item.asString.length;
-      char*  pNewString;
-      ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen1 && ulLen2 )
       {
-         pNewString = (char*) hb_xgrab( ulLen1 + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen1 );
-      }
-      else
-      {
-         pNewString = pString1;
-      }
+         char*  pString1 = pItem1->item.asString.value;
+         char*  pString2 = pItem2->item.asString.value;
+         ULONG  ulPos1, ulPos2;
 
-      if ( ulLen1 && ulLen2 )
-      {
-         ulPos2 = 0;
-
-         for ( ulPos1 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         if( ! HB_IS_STRINGWR( pItem1 ) )
          {
-            pNewString[ulPos1] |= pString2[ulPos2++];
+            pString1 = (char*) hb_xgrab( ulLen1 + 1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_itemPutCPtr( pItem1, pString1, ulLen1 );
+         }
 
-            if ( ulPos2 == ulLen2 )
+         for( ulPos1 = ulPos2 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         {
+            pString1[ulPos1] |= pString2[ulPos2];
+
+            if( ++ulPos2 == ulLen2 )
             {
                ulPos2 = 0;
             }
          }
       }
-
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      char   cVal = (char) hb_itemGetNL( pItem2 );
-      char*  pString = pItem1->item.asString.value;
       ULONG  ulLen = pItem1->item.asString.length;
-      char*  pNewString;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen )
       {
-         pNewString = (char*) hb_xgrab( ulLen + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen );
-      }
-      else
-      {
-         pNewString = pString;
-      }
+         char   cVal = (char) hb_itemGetNL( pItem2 );
+         char*  pString = pItem1->item.asString.value;
 
-      while ( ulLen )
-      {
-         pNewString[--ulLen] |= cVal;
-      }
+         if( ! HB_IS_STRINGWR( pItem1 ) )
+         {
+            pString = (char*) hb_xgrab( ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_itemPutCPtr( pItem1, pString, ulLen );
+         }
 
+         do
+         {
+            pString[ulLen] |= cVal;
+         }
+         while( --ulLen );
+      }
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -5511,64 +5501,56 @@ static void hb_vmBitXor( void )
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
    {
-      char*  pString1 = pItem1->item.asString.value;
       ULONG  ulLen1 = pItem1->item.asString.length;
-      char*  pString2 = pItem2->item.asString.value;
       ULONG  ulLen2 = pItem2->item.asString.length;
-      char*  pNewString;
-      ULONG  ulPos1, ulPos2;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen1 && ulLen2 )
       {
-         pNewString = (char*) hb_xgrab( ulLen1 + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString1, ulLen1 + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen1 );
-      }
-      else
-      {
-         pNewString = pString1;
-      }
+         char*  pString1 = pItem1->item.asString.value;
+         char*  pString2 = pItem2->item.asString.value;
+         ULONG  ulPos1, ulPos2;
 
-      if ( ulLen1 && ulLen2 )
-      {
-         ulPos2 = 0;
-
-         for ( ulPos1 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         if( ! HB_IS_STRINGWR( pItem1 ) )
          {
-            pNewString[ulPos1] ^= pString2[ulPos2++];
+            pString1 = (char*) hb_xgrab( ulLen1 + 1 );
+            hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
+            hb_itemPutCPtr( pItem1, pString1, ulLen1 );
+         }
 
-            if ( ulPos2 == ulLen2 )
+         for( ulPos1 = ulPos2 = 0;  ulPos1 < ulLen1;  ulPos1++ )
+         {
+            pString1[ulPos1] ^= pString2[ulPos2];
+
+            if( ++ulPos2 == ulLen2 )
             {
                ulPos2 = 0;
             }
          }
       }
-
       hb_stackPop();
    }
    else if( HB_IS_STRING( pItem1 ) &&  HB_IS_NUMERIC( pItem2 ) )
    {
-      char   cVal = (char) hb_itemGetNL( pItem2 );
-      char*  pString = pItem1->item.asString.value;
       ULONG  ulLen = pItem1->item.asString.length;
-      char*  pNewString;
 
-      if( pItem1->item.asString.allocated == 0 || ( *( pItem1->item.asString.pulHolders ) > 1 ) )
+      if( ulLen )
       {
-         pNewString = (char*) hb_xgrab( ulLen + 1 );
-         hb_xmemcpy( (void*) pNewString, (void*) pString, ulLen + 1 );
-         hb_itemPutCPtr( pItem1, pNewString, ulLen );
-      }
-      else
-      {
-         pNewString = pString;
-      }
+         char   cVal = (char) hb_itemGetNL( pItem2 );
+         char*  pString = pItem1->item.asString.value;
 
-      while( ulLen )
-      {
-         pNewString[--ulLen] ^= cVal;
-      }
+         if( ! HB_IS_STRINGWR( pItem1 ) )
+         {
+            pString = (char*) hb_xgrab( ulLen + 1 );
+            hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
+            hb_itemPutCPtr( pItem1, pString, ulLen );
+         }
 
+         do
+         {
+            pString[ulLen] ^= cVal;
+         }
+         while( --ulLen );
+      }
       hb_stackPop();
    }
    else if( HB_IS_NUMERIC( pItem1 ) &&  HB_IS_STRING( pItem2 ) )
@@ -6083,7 +6065,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
             bNewChar = (BYTE) pValue->item.asDouble.value;
          }
 
-         if( pArray->item.asString.allocated == 0 || *( pArray->item.asString.pulHolders ) > 1 )
+         if( ! HB_IS_STRINGWR( pArray ) )
          {
             char *sNew = (char *) hb_xgrab( pArray->item.asString.length + 1 );
 
@@ -9199,7 +9181,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
 
        HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
-       if( hb_stackST.Return.type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+       if( HB_IS_GCITEM( &hb_stackST.Return ) )
        {
           hb_gcItemRef( &(hb_stackST.Return) );
        }
@@ -9212,7 +9194,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
 
           while( pItem != hb_stackST.pItems )
           {
-             if( ( *pItem )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+             if( HB_IS_GCITEM( *pItem ) )
              {
                 hb_gcItemRef( *pItem );
              }
@@ -9224,7 +9206,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
        // FOR EACH Enumerations.
        for( i = 0; i < hb_vm_wEnumCollectionCounter; i++ )
        {
-          if( ( &( hb_vm_aEnumCollection[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+          if( HB_IS_GCITEM( &( hb_vm_aEnumCollection[ i ] ) ) )
           {
              hb_gcItemRef( &( hb_vm_aEnumCollection[ i ] ) );
           }
@@ -9233,7 +9215,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
        // WITH OBJECT
        for( i = 0; i < hb_vm_wWithObjectCounter; i++ )
        {
-          if( ( &( hb_vm_aWithObject[ i ] ) )->type & (HB_IT_BYREF | HB_IT_POINTER | HB_IT_ARRAY | HB_IT_HASH | HB_IT_BLOCK) )
+          if( HB_IS_GCITEM( &( hb_vm_aWithObject[ i ] ) ) )
           {
              hb_gcItemRef( &( hb_vm_aWithObject[ i ] ) );
           }
