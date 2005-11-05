@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4572 2005/11/04 22:03:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4573 2005/11/04 22:51:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-05 10:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/tbrowse.prg
+     ! fixed ::DispCell() coloring of background of cells when column has
+       a color block.
 
 2005-11-04 14:50 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

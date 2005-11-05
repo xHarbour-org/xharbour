@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.130 2005/11/04 21:28:00 ptsarenko Exp $
+ * $Id: tbrowse.prg,v 1.130 2005/11/04 19:29:07 ptsarenko Exp $
  */
 
 /*
@@ -2677,18 +2677,18 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
       Return nil // nCol
    endif
 
+   cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
+
    if ::lRect .AND.;
       nRow >= ::aRect[ 1 ] .AND. nColumn >= ::aRect[ 2 ] .AND.;
       nRow <= ::aRect[ 3 ] .AND. nColumn <= ::aRect[ 4 ]
 
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, nColor ) - 1 )
-      cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
    else
 
       if oCol:ColorBlock == NIL
          cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
-         cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
       else
 
@@ -2698,12 +2698,11 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
             ::aHighCellColor := oCol:DefColor
          endif
 
-         cColor    := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, nColor ) - 1 )
-         cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, TBC_CLR_STANDARD ) - 1 )
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, nColor ) - 1 )
 
       endif
-
    endif
+
 
    Switch aColsInfo[ o_Type ]
    case "C"
