@@ -1,5 +1,5 @@
 /*
- * $Id: hbmlang.c,v 1.3 2005/03/31 04:03:10 druzus Exp $
+ * $Id: hbmlang.c,v 1.4 2005/06/13 02:02:50 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -131,7 +131,59 @@ HB_FUNC(GETUSERLANG)
      hb_retnl( lRet );
 }
 
+/*
+ * $Id: gauge.c,v 1.1 2005/10/18 23:34:24 lculik Exp $
+ */
 
+/*
+ * Harbour Project source code:
+ * Gauge functions
+ *
+ * Copyright 2000 Jose Lalin <dezac@corevia.com>
+ * www - http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
+
+#include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapigt.h"
 
@@ -158,55 +210,37 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent );
 */
 HB_FUNC( GAUGENEW )
 {
-   PHB_ITEM pReturn = hb_itemArrayNew( B_LEN );   /* Create array */
-   PHB_ITEM pItem;
+   HB_ITEM Return;
 
-   pItem = hb_itemPutNL( NULL, ( ISNUM( B_TOP ) ? hb_parni( B_TOP ) : 0 ) );
-   hb_itemArrayPut( pReturn, B_TOP, pItem );
-   hb_itemRelease( pItem );
+   Return.type = HB_IT_NIL;
 
-   pItem = hb_itemPutNL( NULL, ( ISNUM( B_LEFT ) ? hb_parni( B_LEFT ) : 0 ) );
-   hb_itemArrayPut( pReturn, B_LEFT, pItem );
-   hb_itemRelease( pItem );
+   hb_arrayNew( &Return, B_LEN );   /* Create array */
 
-   pItem = hb_itemPutNL( NULL,
-              ( ISNUM( B_BOTTOM ) ?
-                 ( hb_parni( B_BOTTOM ) < hb_parni( B_TOP ) + 2 ?
-                     hb_parni( B_TOP ) + 2 : hb_parni( B_BOTTOM ) ) : 0 ) );
-   hb_itemArrayPut( pReturn, B_BOTTOM, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_TOP ), ( ISNUM( B_TOP ) ? hb_parni( B_TOP ) : 0 ) );
+   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_LEFT ), ( ISNUM( B_LEFT ) ? hb_parni( B_LEFT ) : 0 ) );
 
-   pItem = hb_itemPutNL( NULL,
-              ( ISNUM( B_RIGHT ) ?
-                 ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 4 ?
-                    hb_parni( B_LEFT ) + 4 : hb_parni( B_RIGHT ) ) : 0 ) );
-   hb_itemArrayPut( pReturn, B_RIGHT, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_BOTTOM ),
+      ( ISNUM( B_BOTTOM ) ?
+      ( hb_parni( B_BOTTOM ) < hb_parni( B_TOP ) + 2 ?
+      hb_parni( B_TOP ) + 2 : hb_parni( B_BOTTOM ) ) : 0 ) );
 
-   pItem = hb_itemPutC( NULL, ( ISCHAR( B_BACKCOLOR ) ? hb_parc( B_BACKCOLOR ) : "W/N" ) );
-   hb_itemArrayPut( pReturn, B_BACKCOLOR, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutNL( hb_arrayGetItemPtr( &Return, B_RIGHT ),
+      ( ISNUM( B_RIGHT ) ?
+      ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 4 ?
+      hb_parni( B_LEFT ) + 4 : hb_parni( B_RIGHT ) ) : 0 ) );
 
-   pItem = hb_itemPutC( NULL, ( ISCHAR( B_BARCOLOR ) ? hb_parc( B_BARCOLOR ) : "W+/N" ) );
-   hb_itemArrayPut( pReturn, B_BARCOLOR, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BACKCOLOR),( ISCHAR( B_BACKCOLOR ) ? hb_parcx( B_BACKCOLOR ) : "W/N" )) ;
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCOLOR), ( ISCHAR( B_BARCOLOR ) ? hb_parcx( B_BARCOLOR ) : "W+/N" ));
 
-   pItem = hb_itemPutL( NULL, !( ISNUM( B_RIGHT ) &&
-                                 ISNUM( B_LEFT ) &&
-                                 ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
-   hb_itemArrayPut( pReturn, B_DISPLAYNUM, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutL( hb_arrayGetItemPtr( &Return, B_DISPLAYNUM ),
+      !( ISNUM( B_RIGHT ) &&
+      ISNUM( B_LEFT ) &&
+      ( hb_parni( B_RIGHT ) < hb_parni( B_LEFT ) + 9 ) ) );
 
-   pItem = hb_itemPutC( NULL, ( ISCHAR( B_BARCHAR ) ? hb_parc( B_BARCHAR ) : "\xdb" ) );
-   hb_itemArrayPut( pReturn, B_BARCHAR, pItem );
-   hb_itemRelease( pItem );
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_BARCHAR),( ISCHAR( B_BARCHAR ) ? hb_parcx( B_BARCHAR ) : ( char * ) '\xdb'));
+   hb_itemPutC( hb_arrayGetItemPtr( &Return, B_PERCENT), 0 );
 
-   pItem = hb_itemPutNL( NULL, 0 );
-   hb_itemArrayPut( pReturn, B_PERCENT, pItem );
-   hb_itemRelease( pItem );
-
-   hb_itemReturn( pReturn );
-   hb_itemRelease( pReturn );
+   hb_itemReturn( &Return );
 }
 
 /* GaugeDisplay( aGauge ) --> aGauge
@@ -242,7 +276,7 @@ HB_FUNC( GAUGEDISPLAY )
 
       hb_gtSetColorStr( szOldColor );
 
-      hb_gaugeUpdate( pArray, (float) hb_arrayGetNL( pArray, B_PERCENT ) );
+      hb_gaugeUpdate( pArray, ( float ) hb_arrayGetND( pArray, B_PERCENT ) );
 
       hb_itemReturn( pArray );
    }
@@ -271,7 +305,7 @@ static void hb_gaugeUpdate( PHB_ITEM pArray, float fPercent )
    int iMax;
    char szOldColor[ CLR_STRLEN ];
    char * szStr = "        ";
-   char szPct[ 4 ];
+   char szPct[ 5 ];
 
    hb_gtGetColorStr( szOldColor );
    hb_gtSetColorStr( hb_arrayGetCPtr( pArray, B_BARCOLOR ) );

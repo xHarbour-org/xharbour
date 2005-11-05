@@ -63,7 +63,7 @@
     DECLARE GetMakeDir() as String
     DECLARE HB_ARGV( n as numeric ) as string
     DECLARE HbMake_FileDate( c as String ) as string
-    DECLARE GetPccDir() as String
+    DECLARE GetPoccDir() as String
 
 #endif
 
@@ -297,7 +297,7 @@ FUNCTION GetVccDir()
 RETURN cPath
 
 *--------------------
-FUNCTION GetPccDir()
+FUNCTION GetPoccDir()
 *--------------------
 
    LOCAL cPath   := ''
@@ -588,7 +588,6 @@ FUNCTION GetInstaledLibs( clibs, lGcc )
    aadd(aDefLib,'vm'+ cSuffix)
    aadd(aDefLib,'vmmt'+ cSuffix)
    aadd(aDefLib,'ziparchive'+ cSuffix)
-   aadd(aDefLib,'pcrepos'+ cSuffix)   
 
 
    IF lGcc

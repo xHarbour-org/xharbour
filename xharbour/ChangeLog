@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4573 2005/11/04 22:51:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4574 2005/11/05 09:15:46 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-05 13:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils/hbmake/hbmake.prg
+    * version 1.155
+    ! fixed gtwvt and gtwvw libs into lib list of hbmake. Now we doesn't
+      need appoint wvwgui.lib as an external lib, this is already done when
+      we choose gtwvt or gtwvw as graphical lib.
+    + added Pelles C as an alternative to C compiler under MS-Windows platform.
+    + added "[/pc|-pc]" as parameter to activate Pelles as C compiler. 
+    + hbmake can activate correspondent C compiler by extension of make file:
+
+      ex: hbmake hello.bc -e  to activate Borland C (default)
+          hbmake hello.vc -e  to activate MS-Visual C
+          hbmake hello.pc -e  to activate Pelles C
+
+  * utils/hbmake/hbmutils.prg
+    * added GetPoccDir() function to get Pelles C dir.
+
+  * utils/hbmake/hbmlang.c
+    ! updated gauge functions from xharbour/contrib/hbcurl/gauge.c
+      The source gauge.c could be moved to rtl lib or other core lib to
+      avoid redundancies. This source is present in 4 places:
+      contrib/hbcurl, source/clipsamp, tests/misc and embedded in
+      utils/hbmake/hbmlang.c.
+
+  * utils/hbmake/tmake.prg
+    * clean up in the code:
+      methods: Reset(), WriteMakeFileHeader(), SetMakeCommands(),
+               WriteMakeFile() and WriteLibMakeFile() was removed.
+
+     + added "DATA cMacro"
+
+
+      NOTE: The makefile header now begins with "#BCC","#MSVC","#POCC" or
+            "#GCC" in accordance with the respective C compiler.
+            The sets BCB, BHC, MAKEDIR and HMAKEDIR was changed:
+
+            From:
+
+            #BCC
+            VERSION=BCB.01
+            !ifndef BCB
+            BCB = $(MAKEDIR)
+            !endif
+
+            !ifndef BHC
+            BHC = $(HMAKEDIR)
+            !endif
+
+            To:
+
+            #BCC
+            VERSION=BCB.01
+            !ifndef CC_DIR
+            CC_DIR = $(MAKE_DIR)
+            !endif
+
+            !ifndef HB_DIR
+            HB_DIR = $(HARBOUR_DIR)
+            !endif
+
+      *** Because these changes all make files must be recreated newly ***
+   
 
 2005-11-05 10:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg
