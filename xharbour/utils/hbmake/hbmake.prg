@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.155 2005/11/05 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.155 2005/11/05 15:01:52 modalsist Exp $
  */
 
 /*
@@ -618,6 +618,10 @@ FUNCTION ParseMakeFile( cFile )
 
             IF aTemp[ 1 ] == "COMPRESS"
                s_lCompress := "YES" IN aTemp[ 2 ]
+            ENDIF
+
+            IF aTemp[ 1 ] == "GUI"
+               s_lGui := "YES" IN aTemp[ 2 ]
             ENDIF
 
             IF aTemp[ 1 ] == "EXTERNALLIB"
@@ -1432,7 +1436,9 @@ FUNCTION GetParaDefines( cTemp )
    ELSEIF  "/.." IN cTemp
       cTemp := Substr( cTemp, 1, At( "/..", cTemp ) - 1 )
    ENDIF
-
+   if at("=",ctemp) == 0
+      cTemp += [=""]
+   endif
    aSet := ListAsArray2( cTemp, "=" )
    nPos := AScan( s_aDefines, { | x | x[ 1 ] == aSet[ 1 ] } )
 
