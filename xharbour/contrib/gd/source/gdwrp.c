@@ -170,6 +170,25 @@ static void SaveImageToFile( char *szFile, void *iptr, int sz )
 
 /* ---------------------------------------------------------------------------*/
 
+static void AddImageToFile( char *szFile, void *iptr, int sz )
+{
+   FHANDLE fhandle;
+
+   if ( ( fhandle = hb_fsOpen( ( BYTE * ) szFile, FO_READWRITE ) ) != FS_ERROR )
+   {
+      /* move to end of file */
+      hb_fsSeek(fhandle, 0, FS_END);
+
+      /* Write Image */
+      SaveImageToHandle( fhandle, ( BYTE *) iptr, (ULONG) sz );
+
+      /* Close file */
+      hb_fsClose( fhandle );
+   }
+}
+
+/* ---------------------------------------------------------------------------*/
+
 static void GDImageCreateFrom( int nType )
 {
    gdImagePtr im;
@@ -191,10 +210,28 @@ static void GDImageCreateFrom( int nType )
         ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
       )
    {
+
       /* Retrieve image pointer */
       iptr = hb_parptr( 1 );
       /* Retrieve image size */
       sz     = hb_parni( 2 );
+   }
+   else if ( hb_pcount() == 2 &&
+        ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) &&
+        ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
+      )
+   {
+
+      FHANDLE fhandle;
+
+      /* Retrieve file handle */
+      fhandle = ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) ? hb_parnl( 1 ) : 0; // 0 = std input
+      /* Retrieve image size */
+      sz     = hb_parni( 2 );
+
+      /* retrieve image from handle */
+      iptr = LoadImageFromHandle( fhandle, sz );
+
    }
    else
    {
@@ -3669,5 +3706,186 @@ HB_FUNC( GDIMAGEINTERLACE ) // void gdImageInterlace(gdImagePtr im, int interlac
       }
    }
 }
+
+/* ---------------------------------------------------------------------------*/
+
+//BGD_DECLARE(void *) gdImageGifAnimBeginPtr(gdImagePtr im, int *size, int GlobalCM, int Loops);
+// implementation: (void *) gdImageGifAnimBegin( gdImagePtr im, cFile | nHandle, int GlobalCM, int Loops);
+HB_FUNC( GDIMAGEGIFANIMBEGIN )
+{
+   if ( hb_pcount() == 4 &&
+        hb_parinfo( 1 ) & HB_IT_POINTER &&
+        ( hb_parinfo( 2 ) & HB_IT_STRING || hb_parinfo( 2 ) & HB_IT_NUMERIC || ISNIL( 2 ) ) &&
+        hb_parinfo( 3 ) & HB_IT_NUMERIC &&
+        hb_parinfo( 4 ) & HB_IT_NUMERIC
+      )
+   {
+      gdImagePtr im;
+      void *iptr;
+      int size;
+      int GlobalCM, Loops;
+
+      /* Retrieve image pointer */
+      im = hb_parptr( 1 );
+
+      /* Retrieve global color map value */
+      GlobalCM = hb_parni( 3 );
+
+      /* Retrieve Loops value */
+      Loops = hb_parni( 4 );
+
+      /* run function */
+      iptr = gdImageGifAnimBeginPtr(im, &size, GlobalCM, Loops);
+
+      /* Check if 2nd parameter is a file name or an handle */
+      if ( hb_parinfo( 2 ) & HB_IT_STRING )
+      {
+         char *szFile;
+         szFile = hb_parcx( 2 );
+
+         SaveImageToFile( szFile, iptr, size );
+      }
+      else if ( hb_parinfo( 2 ) & HB_IT_NUMERIC || ISNIL( 2 ) )
+      {
+         FHANDLE fhandle;
+
+         /* Retrieve file handle */
+         fhandle = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ) ? hb_parnl( 2 ) : 1; // 0 = std output
+
+         SaveImageToHandle( fhandle, iptr, size );
+
+      }
+
+   }
+   else
+   {
+      // Parameter error
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
+            "GDIMAGEGIFANIMBEGIN", 3,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+         return;
+      }
+   }
+}
+
+/* ---------------------------------------------------------------------------*/
+
+//BGD_DECLARE(void *) gdImageGifAnimAddPtr(gdImagePtr im, int *size, int LocalCM, int LeftOfs, int TopOfs, int Delay, int Disposal, gdImagePtr previm);
+// implementation: (void *) gdImageGifAnimAdd( gdImagePtr im, cFile | nHandle, int LocalCM, int LeftOfs, int TopOfs, int Delay, int Disposal, gdImagePtr previm);
+HB_FUNC( GDIMAGEGIFANIMADD )
+{
+   if ( hb_pcount() == 8 &&
+        hb_parinfo( 1 ) & HB_IT_POINTER &&
+        ( hb_parinfo( 2 ) & HB_IT_STRING || hb_parinfo( 2 ) & HB_IT_NUMERIC || ISNIL( 2 ) ) &&
+        hb_parinfo( 3 ) & HB_IT_NUMERIC &&
+        hb_parinfo( 4 ) & HB_IT_NUMERIC &&
+        hb_parinfo( 5 ) & HB_IT_NUMERIC &&
+        hb_parinfo( 6 ) & HB_IT_NUMERIC &&
+        hb_parinfo( 7 ) & HB_IT_NUMERIC &&
+        ( hb_parinfo( 8 ) & HB_IT_POINTER || ISNIL( 8 ) )
+      )
+   {
+      gdImagePtr im, previm;
+      void *iptr;
+      int size;
+      int LocalCM, LeftOfs, TopOfs, Delay, Disposal;
+
+      /* Retrieve parameters */
+      im       = hb_parptr( 1 );
+
+      LocalCM  = hb_parni( 3 );
+      LeftOfs  = hb_parni( 4 );
+      TopOfs   = hb_parni( 5 );
+      Delay    = hb_parni( 6 );
+      Disposal = hb_parni( 7 );
+      previm   = hb_parptr( 8 );
+
+      /* Run function and return value */
+      iptr = gdImageGifAnimAddPtr(im, &size, LocalCM, LeftOfs, TopOfs, Delay, Disposal, previm);
+
+      /* Check if 2nd parameter is a file name or an handle */
+      if ( hb_parinfo( 2 ) & HB_IT_STRING )
+      {
+         char *szFile;
+         szFile = hb_parcx( 2 );
+
+         AddImageToFile( szFile, iptr, size );
+      }
+      else if ( hb_parinfo( 2 ) & HB_IT_NUMERIC || ISNIL( 2 ) )
+      {
+         FHANDLE fhandle;
+
+         /* Retrieve file handle */
+         fhandle = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ) ? hb_parnl( 2 ) : 1; // 1 = std output
+
+         SaveImageToHandle( fhandle, iptr, size );
+
+      }
+
+   }
+   else
+   {
+      // Parameter error
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
+            "GDIMAGEGIFANIMADD", 8,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
+            hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 )
+         );
+         return;
+      }
+   }
+}
+
+/* ---------------------------------------------------------------------------*/
+
+//BGD_DECLARE(void *) gdImageGifAnimEndPtr(int *size);
+// implementation: gdImageGifAnimEnd( cFile | nHandle );
+HB_FUNC( GDIMAGEGIFANIMEND )
+{
+   if ( hb_pcount() == 1 &&
+        ( hb_parinfo( 1 ) & HB_IT_STRING || hb_parinfo( 1 ) & HB_IT_NUMERIC || ISNIL( 1 ) )
+      )
+   {
+      void *iptr;
+      int size;
+
+      /* Run function and return value */
+      iptr = gdImageGifAnimEndPtr(&size);
+
+      /* Check if 1st parameter is a file name or an handle */
+      if ( hb_parinfo( 1 ) & HB_IT_STRING )
+      {
+         char *szFile;
+         szFile = hb_parcx( 1 );
+
+         AddImageToFile( szFile, iptr, size );
+      }
+      else if ( hb_parinfo( 2 ) & HB_IT_NUMERIC || ISNIL( 2 ) )
+      {
+         FHANDLE fhandle;
+
+         /* Retrieve file handle */
+         fhandle = ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) ? hb_parnl( 1 ) : 1; // 1 = std output
+
+         SaveImageToHandle( fhandle, iptr, size );
+
+      }
+
+   }
+   else
+   {
+      // Parameter error
+      {
+         hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
+            "GDIMAGEGIFANIMEND", 1,
+            hb_paramError( 1 )
+         );
+         return;
+      }
+   }
+}
+
 
 /* ---------------------------------------------------------------------------*/

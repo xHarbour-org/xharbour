@@ -1,5 +1,5 @@
 /*
- * $Id: gd.ch,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: gd.ch,v 1.2 2005/10/31 00:27:47 fsgiudice Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
   #define GD_VERS  2033
 #else
   #define GD_VERS  2028
-#endif  
+#endif
 
 /* The maximum number of palette entries in palette-based images.
 	In the wonderful new world of gd 2.0, you can of course have
@@ -132,6 +132,14 @@
 
 /* resolution affects ttf font rendering, particularly hinting */
 #define GD_RESOLUTION           96	/* pixels per inch */
+
+/* Legal values for Disposal. gdDisposalNone is always used by
+	the built-in optimizer if previm is passed. */
+#define gdDisposalUnknown             0
+#define gdDisposalNone                1
+#define gdDisposalRestoreBackground   2
+#define gdDisposalRestorePrevious     3
+
 
 /* FSG - text alignment */
 #define gdAlignLeft   0
