@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.15 2005/10/06 10:47:50 paultucker Exp $
+# $Id: makefile.gc,v 1.17 2005/11/06 16:25:10 ptsarenko Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2628,6 +2628,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/cstruct.o \
    $(RTL_OBJ_DIR)/dbdelim.o \
    $(RTL_OBJ_DIR)/dbedit.o \
+   $(RTL_OBJ_DIR)/dbjoin.o \
    $(RTL_OBJ_DIR)/dbsdf.o \
    $(RTL_OBJ_DIR)/devoutp.o \
    $(RTL_OBJ_DIR)/dircmd.o \
@@ -2818,6 +2819,12 @@ $(RTL_OBJ_DIR)/dbedit.c : $(RTL_DIR)/dbedit.prg
 	$(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)/dbedit.o : $(RTL_OBJ_DIR)/dbedit.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/dbjoin.c : $(RTL_DIR)/dbjoin.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/dbjoin.o : $(RTL_OBJ_DIR)/dbjoin.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/dbsdf.c : $(RTL_DIR)/dbsdf.prg

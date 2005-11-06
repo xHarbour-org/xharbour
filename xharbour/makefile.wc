@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.49 2005/10/04 15:52:38 kaddath Exp $
+# $Id: makefile.wc,v 1.51 2005/11/06 16:25:11 ptsarenko Exp $
 #
 
 #
@@ -429,6 +429,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\cstruct.obj \
    $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
+   $(RTL_OBJ_DIR)\dbjoin.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
@@ -1769,6 +1770,12 @@ $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HRB_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
+   $(HRB_CMD)
+
+$(RTL_OBJ_DIR)\dbjoin.obj : $(RTL_OBJ_DIR)\dbjoin.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg

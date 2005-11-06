@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.9 2003/12/13 17:09:48 mlombardo Exp $
+ * $Id: dbsdf.prg,v 1.11 2005/11/06 13:53:39 ptsarenko Exp $
  */
 
 /*
@@ -61,9 +61,12 @@
 #define UNIX_EOL        chr(10)
 #define WINDOWS_EOL     chr(13)+chr(10)
 
-PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
+PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
    LOCAL index, handle, cFileName := cFile, nStart, nCount, oErr, nFileLen, cField
    LOCAL lLineEnd, cLine, nOptmLen := 0
+#ifndef HB_CDP_SUPPORT_OFF
+   LOCAL cHB_Cdp := HB_SetCodepage()
+#endif
 
    // Process the file name argument.
    index := RAT( ".", cFileName )
@@ -139,12 +142,20 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
                IF EMPTY( aFields )
                   // Process all fields.
                   FOR index := 1 TO FCOUNT()
+#ifndef HB_CDP_SUPPORT_OFF
+                     ExportFixed( handle, FIELDGET( index ), cHB_Cdp, cCdp )
+#else
                      ExportFixed( handle, FIELDGET( index ) )
+#endif
                   NEXT index
                ELSE
                   // Process the specified fields.
                   FOR EACH cField IN aFields
+#ifndef HB_CDP_SUPPORT_OFF
+                     ExportFixed( handle, FIELDGET( FieldPos( cField ) ), cHB_Cdp, cCdp )
+#else
                      ExportFixed( handle, FIELDGET( FieldPos( cField ) ) )
+#endif
                   NEXT
                ENDIF
                // Set up for the start of the next record.
@@ -186,6 +197,11 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
             APPEND BLANK
 
             HB_FReadLine( handle, @cLine, { WINDOWS_EOL, UNIX_EOL }, nOptmLen )
+#ifndef HB_CDP_SUPPORT_OFF
+            IF cCdp <> nil .and. cHB_Cdp <> nil .and. cHB_Cdp <> cCdp
+               cLine := HB_Translate(cLine, cCdp, cHB_Cdp)
+            ENDIF
+#endif
 
             /* Next HB_FReadLine will be optimized */
             nOptmLen := len( cLine ) + 1
@@ -221,9 +237,14 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest 
    ENDIF
 Return
 
-STATIC FUNCTION ExportFixed( handle, xField )
+STATIC FUNCTION ExportFixed( handle, xField, cHB_Cdp, cCdp )
    SWITCH VALTYPE( xField )
       CASE "C"
+#ifndef HB_CDP_SUPPORT_OFF
+         IF cCdp <> nil .and. cHB_Cdp <> nil .and. cHB_Cdp <> cCdp
+            xField := HB_Translate(xField, cHB_Cdp, cCdp)
+         ENDIF
+#endif
          FWrite( handle, xField )
          EXIT
       CASE "D"

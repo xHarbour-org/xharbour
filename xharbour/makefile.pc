@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.00 2005/10/26 00:00:00 modalsist Exp $
+# $Id: makefile.pc,v 1.15 2005/11/06 18:00:13 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ MAKEFILE FOR PELLES C ³Û
@@ -880,6 +880,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\cstruct.obj \
    $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
+   $(RTL_OBJ_DIR)\dbjoin.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
@@ -1293,6 +1294,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\cstruct.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbdelim.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dbjoin.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dircmd.obj   >> poccrtl.rsp
@@ -2234,6 +2236,12 @@ $(RTL_OBJ_DIR)\dbedit.c : $(RTL_SRC_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
+   $(POCC_CMD)
+
+$(RTL_OBJ_DIR)\dbjoin.c : $(RTL_SRC_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\dbjoin.obj : $(RTL_OBJ_DIR)\dbjoin.c
    $(POCC_CMD)
 
 $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_SRC_DIR)\dbsdf.prg

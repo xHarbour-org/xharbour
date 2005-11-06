@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.11 2005/10/04 15:52:38 kaddath Exp $
+# $Id: hrbdll.dc,v 1.13 2005/11/06 15:55:38 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -269,6 +269,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cstr.obj \
    $(OBJ_DIR)\dbdelim.obj \
    $(OBJ_DIR)\dbedit.obj \
+   $(OBJ_DIR)\dbjoin.obj \
    $(OBJ_DIR)\dbsdf.obj \
    $(OBJ_DIR)\devoutp.obj \
    $(OBJ_DIR)\dircmd.obj \
@@ -781,6 +782,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\cstr.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbdelim.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbedit.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\dbjoin.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbsdf.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\devoutp.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dircmd.obj     + >> harbourdll.rsp
@@ -1260,6 +1262,12 @@ $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbedit.obj : $(OBJ_DIR)\dbedit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg

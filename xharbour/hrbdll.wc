@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.45 2005/10/10 16:25:10 kaddath Exp $
+# $Id: hrbdll.wc,v 1.47 2005/11/06 15:55:38 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -172,6 +172,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dateshb.obj \
   $(OBJ_DIR)\dbtotal.obj \
   $(OBJ_DIR)\defpath.obj \
+  $(OBJ_DIR)\dbjoin.obj \
   $(OBJ_DIR)\dbsdf.obj \
   $(OBJ_DIR)\descend.obj \
   $(OBJ_DIR)\direct.obj \
@@ -1076,6 +1077,12 @@ $(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg

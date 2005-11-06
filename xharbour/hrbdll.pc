@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.15 2005/10/31 00:00:00 modalsist Exp $
+# $Id: hrbdll.pc,v 1.16 2005/11/06 18:00:13 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -280,6 +280,7 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\cstr.obj \
    $(TARGET_OBJ_DIR)\dbdelim.obj \
    $(TARGET_OBJ_DIR)\dbedit.obj \
+   $(TARGET_OBJ_DIR)\dbjoin.obj \
    $(TARGET_OBJ_DIR)\dbsdf.obj \
    $(TARGET_OBJ_DIR)\devoutp.obj \
    $(TARGET_OBJ_DIR)\dircmd.obj \
@@ -798,6 +799,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\cstr.obj       >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbdelim.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbedit.obj     >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\dbjoin.obj     >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbsdf.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\devoutp.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dircmd.obj     >> make_tmp
@@ -1280,6 +1282,12 @@ $(TARGET_OBJ_DIR)\dbedit.c : $(RTL_SRC_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\dbedit.obj : $(TARGET_OBJ_DIR)\dbedit.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\dbjoin.c : $(RTL_SRC_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(TARGET_OBJ_DIR)\dbjoin.obj : $(TARGET_OBJ_DIR)\dbjoin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\dbsdf.c : $(RTL_SRC_DIR)\dbsdf.prg

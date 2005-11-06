@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4574 2005/11/05 09:15:46 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4576 2005/11/06 13:00:56 ptsaernko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,54 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-06 13:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rdd/dbf1.c
+    + Added hb_dbfTranslateRec function. I don't want to add codedpage
+      traslation functionality to GETREC/PUTREC functions because of memo
+      fields presence. May be it's better to move translation GETREC/PUTREC
+      and left only memo translation in GETVALUE/PUTVALUE ?
+      Przemek please review
+
+  * source/pp/pptable.c
+  * source/rdd/dbcmd.c
+  * source/rdd/hbdbsort.c
+  * source/rdd/dbsort.prg
+  * source/rdd/dbstrux.prg
+  * source/rdd/dbtotal.prg
+  * source/rtl/dbdelim.prg
+  * source/rtl/dbsdf.prg
+    + Added support for CONNECTION and CODEPAGE clause in these commands:
+      COPY TO ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      APPEND FROM ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      COPY TO DELIMITED ... [CODEPAGE <cCdp>]
+      COPY TO SDF ... [CODEPAGE <cCdp>]
+      APPEND FROM DELIMITED ... [CODEPAGE <cCdp>]
+      APPEND FROM SDF ... [CODEPAGE <cCdp>]
+      CREATE FROM ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      TOTAL ON ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      SORT ON ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+
+  + source/rtl/dbjoin.prg
+    + added old exotic clipper JOIN WITH command with additional CONNECTION
+      and CODEPAGE clause
+  * source/rtl/dummy.prg
+    - removed __dbJoin()
+  * source/rtl/Makefile
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.nt
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * hrbdll.bc
+  * hrbdll.dc
+  * hrbdll.gc
+  * hrbdll.pc
+  * hrbdll.vc
+  * hrbdll.wc
+    * added dbjoin.prg
 
 2005-11-05 13:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

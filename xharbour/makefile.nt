@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.134 2005/10/09 13:37:56 paultucker Exp $
+# $Id: makefile.nt,v 1.136 2005/11/06 02:43:56 ptsarenko Exp $
 #
 
 #
@@ -514,6 +514,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\cstruct.obj \
    $(OBJ_DIR)$(MT)\dbdelim.obj \
    $(OBJ_DIR)$(MT)\dbedit.obj \
+   $(OBJ_DIR)$(MT)\dbjoin.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \

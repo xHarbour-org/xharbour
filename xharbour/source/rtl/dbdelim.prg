@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.17 2005/04/19 23:19:47 ronpinkas Exp $
+ * $Id: dbdelim.prg,v 1.19 2005/11/06 13:51:39 ptsarenko Exp $
  */
 
 /*
@@ -56,9 +56,9 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.17 2005/04/19 23:19:47 ronpinkas Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.18 2005/07/08 17:51:39 druzus Exp $" )
 
-PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
+PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
 
    local index, handle, nStart, nCount
    local cSeparator := ",", cDelim := CHR( 34 )
@@ -123,7 +123,7 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
             ENDIF
          ENDIF
 
-         DBF2TEXT( bWhile, bFor, aFields, cDelim, handle, cSeparator, nCount )
+         DBF2TEXT( bWhile, bFor, aFields, cDelim, handle, cSeparator, nCount, cCdp )
 
          FClose( handle )
       ENDIF
@@ -134,7 +134,7 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
          Eval( ErrorBlock(), __dbDelimErr( EG_OPEN, 1001, cFileName ) )
       ELSE
 
-         AppendToDb( cFileName, cSeparator, handle )
+         AppendToDb( cFileName, cSeparator, handle, cCdp )
 
       endif
    endif
@@ -156,10 +156,13 @@ STATIC FUNCTION __dbDelimErr( genCode, subCode, cFileName )
 
 RETURN oErr
 
-PROCEDURE AppendToDb( cFile, cDelimiter, hFile )
+PROCEDURE AppendToDb( cFile, cDelimiter, hFile, cCdpSrc )
 
    LOCAL sLine, aEol := { Chr(13) + Chr(10), Chr(10) }
    LOCAL nEOF, aValues, nFields, cValue, nLen
+#ifndef HB_CDP_SUPPORT_OFF
+   LOCAL cHB_Cdp := HB_SetCodepage()
+#endif
 
    IF hFile == NIL
       hFile := FOpen( cFile, FO_READ + FO_SHARED )
@@ -204,6 +207,11 @@ PROCEDURE AppendToDb( cFile, cDelimiter, hFile )
                   EXIT
 
                CASE 'C'
+#ifndef HB_CDP_SUPPORT_OFF
+                  IF cCdpSrc <> nil .and. cHB_Cdp <> nil .and. cHB_Cdp <> cCdpSrc
+                     cValue := HB_Translate(cValue, cCdpSrc, cHB_Cdp)
+                  ENDIF
+#endif
                   FieldPut( HB_EnumIndex(), cValue )
                   EXIT
             END

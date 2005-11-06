@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.135 2005/10/30 14:45:49 druzus Exp $
+ * $Id: dbf1.c,v 1.137 2005/11/06 13:08:53 ptsarenko Exp $
  */
 
 /*
@@ -3229,6 +3229,23 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
    return SELF_GOTO( ( AREAP ) pArea, 1 );
 }
 
+#ifndef HB_CDP_SUPPORT_OFF
+void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest )
+{
+   USHORT uiIndex;
+   LPFIELD pField;
+
+   for( uiIndex = 0, pField = pArea->lpFields; uiIndex < pArea->uiFieldCount; uiIndex++, pField++ )
+   {
+      if( pField->uiType == HB_IT_STRING )
+      {
+         hb_cdpnTranslate( pBuffer + pArea->pFieldOffset[ uiIndex ], cdp_src, cdp_dest, pField->uiLen );
+      }
+   }
+
+}
+#endif
+
 /*
  * Physically reorder a database.
  */
@@ -3306,6 +3323,12 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
 
          /* Copy data */
          memcpy( pBuffer, pArea->pRecord, pArea->uiRecordLen );
+#ifndef HB_CDP_SUPPORT_OFF
+         if( pArea->cdPage != hb_cdp_page )
+         {
+            hb_dbfTranslateRec( pArea, pBuffer, pArea->cdPage, hb_cdp_page );
+         }
+#endif
          pBuffer += pArea->uiRecordLen;
          uiCount++;
       }

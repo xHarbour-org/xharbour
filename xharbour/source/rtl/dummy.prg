@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.3 2002/08/28 00:27:41 lculik Exp $
+ * $Id: dummy.prg,v 1.5 2005/11/06 13:31:04 ptsarenko Exp $
  */
 
 /*
@@ -57,8 +57,6 @@
 #ifdef HB_COMPAT_C53
 FUNCTION ordCond()         ; RETURN NIL
 #endif
-
-FUNCTION __dbJoin()        ; RETURN NIL
 
 /* NOTE: Internal functions */
 FUNCTION __dbFList()       ; RETURN {}

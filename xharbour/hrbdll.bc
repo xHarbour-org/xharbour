@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.104 2005/10/13 23:46:45 ath1 Exp $
+# $Id: hrbdll.bc,v 1.106 2005/11/06 17:11:30 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -186,6 +186,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dateshb.obj \
   $(OBJ_DIR)\dbtotal.obj \
   $(OBJ_DIR)\defpath.obj \
+  $(OBJ_DIR)\dbjoin.obj \
   $(OBJ_DIR)\dbsdf.obj \
   $(OBJ_DIR)\descend.obj \
   $(OBJ_DIR)\direct.obj \
@@ -847,6 +848,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dateshb.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\defpath.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbtotal.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbjoin.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dbsdf.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\descend.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\direct.obj            + >> hdll.tmp
@@ -1668,6 +1670,12 @@ $(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg

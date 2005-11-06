@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.177 2005/10/28 12:55:04 mlombardo Exp $
+ * $Id: dbcmd.c,v 1.179 2005/11/06 13:43:14 ptsarenko Exp $
  */
 
 /*
@@ -4214,7 +4214,8 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
                                    PHB_ITEM pCobFor, PHB_ITEM pStrFor,
                                    PHB_ITEM pCobWhile, PHB_ITEM pStrWhile,
                                    PHB_ITEM pNext, PHB_ITEM pRecID,
-                                   PHB_ITEM pRest )
+                                   PHB_ITEM pRest,
+                                   char *szCpId )
 {
    AREAP lpaSource, lpaDest, lpaClose = NULL;
    DBTRANSINFO dbTransInfo;
@@ -4234,7 +4235,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
       if( errCode == SUCCESS )
       {
          errCode = hb_rddCreateTable( szFileName, pStruct, szDriver,
-                                      TRUE, 0, "", NULL, ulConnection );
+                                      TRUE, 0, "", szCpId, ulConnection );
          if( errCode == SUCCESS )
          {
             dbTransInfo.lpaDest = lpaClose = lpaDest =
@@ -4248,7 +4249,7 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
    {
       lpaDest = pArea;
       errCode = hb_rddOpenTable( szFileName, szDriver, 0, "", TRUE, TRUE,
-                                 NULL, ulConnection );
+                                 szCpId, ulConnection );
       if( errCode == SUCCESS )
       {
          lpaClose = lpaSource = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -4309,7 +4310,8 @@ HB_FUNC( __DBAPP )
                NULL,                          /* lpStrWhile */
                hb_param( 5, HB_IT_NUMERIC ),  /* Next */
                ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
-               hb_param( 7, HB_IT_LOGICAL ) );/* Rest */
+               hb_param( 7, HB_IT_LOGICAL ),  /* Rest */
+               hb_parc( 10 ) );               /* Codepage */
       }
       else
       {
@@ -4337,7 +4339,8 @@ HB_FUNC( __DBCOPY )
                NULL,                          /* lpStrWhile */
                hb_param( 5, HB_IT_NUMERIC ),  /* Next */
                ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
-               hb_param( 7, HB_IT_LOGICAL ) );/* Rest */
+               hb_param( 7, HB_IT_LOGICAL ),  /* Rest */
+               hb_parc( 10 ) );               /* Codepage */
       }
       else
       {
@@ -4539,6 +4542,9 @@ HB_FUNC( DBF2TEXT )
    FHANDLE handle = (FHANDLE) hb_parnl(5);
    BYTE *cSep     = (BYTE *) hb_parc( 6 );
    int nCount     = (int) hb_parnl( 7 );
+#ifndef HB_CDP_SUPPORT_OFF
+   PHB_CODEPAGE cdp = hb_cdpFind( (char *) hb_parc( 8 ) );
+#endif
 
    AREAP pArea = HB_CURRENT_WA;
 
@@ -4605,11 +4611,17 @@ HB_FUNC( DBF2TEXT )
                }
 
                SELF_GETVALUE( pArea, ui, &Tmp );
+#ifndef HB_CDP_SUPPORT_OFF
+               if( HB_IS_STRING( &Tmp ) && cdp && (cdp != hb_cdp_page) )
+               {
+                  hb_cdpnTranslate( Tmp.item.asString.value, hb_cdp_page, cdp, Tmp.item.asString.length );
+               }
+#endif
                bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
                hb_itemClear( &Tmp );
             }
          }
-         // Only requested fields are exorted here
+         // Only requested fields are exported here
          else
          {
             USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
@@ -4629,6 +4641,12 @@ HB_FUNC( DBF2TEXT )
                         hb_fsWriteLarge( handle, cSep, iSepLen );
                      }
                      SELF_GETVALUE( pArea, iPos, &Tmp );
+#ifndef HB_CDP_SUPPORT_OFF
+                     if( HB_IS_STRING( &Tmp ) && cdp && (cdp != hb_cdp_page) )
+                     {
+                        hb_cdpnTranslate( Tmp.item.asString.value, hb_cdp_page, cdp, Tmp.item.asString.length );
+                     }
+#endif
                      bWriteSep = hb_ExportVar( handle, &Tmp, cDelim );
                      hb_itemClear( &Tmp );
                   }
