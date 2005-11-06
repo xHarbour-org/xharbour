@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.2 2005/10/30 01:32:59 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.3 2005/10/31 00:27:47 fsgiudice Exp $
  */
 
 /*
@@ -416,6 +416,14 @@ HB_FUNC( GDIMAGECREATE ) // gdImagePtr gdImageCreate(sx, sy)
          return;
       }
    }
+}
+
+/* ---------------------------------------------------------------------------*/
+
+HB_FUNC( GDIMAGECREATEPALETTE ) // gdImagePtr gdImageCreatePalette(sx, sy)
+{
+   // Alias of GDCreate()
+   HB_FUNCNAME( GDIMAGECREATE )();
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.8 2005/10/31 00:27:45 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.9 2005/10/31 00:39:18 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-06 16:48 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  * contrib/gd/source/gdwrp.c
+    + added GTIMAGECREATEPALETTE as alias of GDIMAGECREATE
+  + contrib/gd/tests/antialiased.prg
+    + test of gdImageSetAntiAliased() function
+      thanks to Jorge Mason for requesting it
 
 2005-10-31 01:37 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
 
