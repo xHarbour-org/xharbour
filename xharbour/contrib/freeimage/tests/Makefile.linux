@@ -1,0 +1,13 @@
+##################################
+# $Id: Makefile.linux,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+#
+# Makefile for FreeImage Test program
+#
+# WARNING: actually not tested
+#
+
+PRGFLAGS=-I../include
+LIBS=-L../lib -lgdlib -L/usr/lib -lgd -lpng -lz -ljpeg -lfreetype -lm -lct
+
+TARGETS=fitest
+include ../Rules.make

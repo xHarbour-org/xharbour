@@ -1,0 +1,49 @@
+/*
+ * $Id: ChangeLog,v 1.4 2005/10/25 00:51:25 fsgiudice Exp $
+ */
+
+/* Use this format for the entry headers:
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   For example:
+   2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
+*/
+
+
+2005-11-07 02:10 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+
+  + contrib/freeimage
+
+  + contrib\freeimage\Rules.make
+  + contrib\freeimage\ChangeLog
+  + contrib\freeimage\Makefile
+  + contrib\freeimage\MAKE_B32.BAT
+  + contrib\freeimage\FreeImage.dll_download.url
+  + contrib\freeimage\MAKEFILE.BC
+  + contrib\freeimage\README.txt
+  + contrib\freeimage\doc\FreeImage_Project.url
+  + contrib\freeimage\doc\license-fi.txt
+  + contrib\freeimage\doc\license-gpl.txt
+  + contrib\freeimage\env\bccWin32.Mak
+  + contrib\freeimage\env\makeb32.env
+  + contrib\freeimage\env\makelib.b32
+  + contrib\freeimage\include\FreeImage.h
+  + contrib\freeimage\include\FreeImage.ch
+  + contrib\freeimage\source\Makefile
+  + contrib\freeimage\source\fi_wrp.c
+  + contrib\freeimage\source\fi_winfu.c
+  + contrib\freeimage\tests\bldtest.bat
+  + contrib\freeimage\tests\fitest.prg
+  + contrib\freeimage\tests\Makefile.linux
+  + contrib\freeimage\tests\dll_b32.bat
+  + contrib\freeimage\tests\dll_b32.mak
+  + contrib\freeimage\tests\bldtest.sh
+  + contrib\freeimage\tests\images_in\fsg.jpg
+  + contrib\freeimage\tests\images_in\italia.gif
+  + contrib\freeimage\tests\images_in\xharbour.jpg
+
+    + first upload
+
+ /*
+    Please look at README.txt
+ */
+
