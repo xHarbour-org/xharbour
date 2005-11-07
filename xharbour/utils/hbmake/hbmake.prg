@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.155 2005/11/05 15:01:52 modalsist Exp $
+ * $Id: hbmake.prg,v 1.157 2005/11/07 00:00:00 modalsist Exp $
  */
 
 /*
@@ -387,10 +387,14 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    __RUN( (s_cLinkCommands) )
 
    IF s_lCompress .AND. !s_lLibrary
-      SET CURSOR ON
-      setpos(9,0)
-      __Run( " upx -9 "+ (s_cAppName) )
-      SET CURSOR OFF
+      IF s_lLinux
+         __Run( " strip "+ (s_cAppName) )
+      ELSE
+         SET CURSOR ON
+         setpos(9,0)
+         __Run( " upx -9 "+ (s_cAppName) )
+         SET CURSOR OFF
+      ENDIF
    ENDIF
 
    tracelog( s_lasdll)
@@ -5115,7 +5119,7 @@ LOCAL aLang := {}
       AAdd( aLang, "This app use Graphical libraries")
       AAdd( aLang, "Do you use 3rd Party Rdd")
       AAdd( aLang, "Compress this app")
-      AAdd( aLang, "Compress the app after Linked(use upx)")
+      AAdd( aLang, "Compress the app after Linked (use "+iif(s_lLinux,"strip","upx")+") ?" )
       AAdd( aLang, "Your app will be linked to user harbour.dll")
       AAdd( aLang, "Where the .obj/.o files will be generates")
       AAdd( aLang, "Inform executable name (without .exe extention)" )
@@ -5184,7 +5188,7 @@ LOCAL aLang := {}
       AAdd( aLang, "Esta App usa Lib Grafica o No")
       AAdd( aLang, "Usted usa Rdd de terceros")
       AAdd( aLang, "Comprimir app")
-      AAdd( aLang, "Prensar la App despu‚s de enlazada (usar upx)")
+      AAdd( aLang, "Prensar la App despu‚s de enlazada (usar "+iif(s_lLinux,"strip","upx")+") ?")
       AAdd( aLang, "Su aplicacion ser  ligada para usar la harbour.dll")
       AAdd( aLang, "Donde los ficheros *.obj ser n generados")
       AAdd( aLang, "Informe lo nombre de lo executable (sin la extension .exe)")
@@ -5306,7 +5310,7 @@ LOCAL aLang := {}
       /* 53 */
       AAdd( aLang, "Comprimir App ?")
       /* 54 */
-      AAdd( aLang, "Comprimir a aplica‡Æo ap¢s linkada (usar UPX) ?")
+      AAdd( aLang, "Comprimir a aplica‡Æo ap¢s linkada (usar "+iif(s_lLinux,"strip","upx")+") ?")
       /* 55 */
       AAdd( aLang, "Sua aplica‡Æo ser  linkada para usar a harbour.dll ?")
       /* 56 */
