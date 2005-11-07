@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.229 2005/11/01 22:05:20 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.230 2005/11/04 02:20:10 druzus Exp $
  */
 
 /*
@@ -8980,9 +8980,11 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                iRecBuff = 0;
             }
             pArea->pRecord = pSort->pRecBuff + iRecBuff * pArea->uiRecordLen;
-            pArea->fValidBuffer = TRUE;
             pArea->ulRecNo = ulRecNo;
-            pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+            if( SELF_GETREC( ( AREAP ) pArea, NULL ) == FAILURE )
+               break;
+            pArea->fValidBuffer = pArea->fPositioned = TRUE;
+            pArea->fDeleted = pArea->pRecord[ 0 ] == '*';
             /* Force relational movement in child WorkAreas */
             if( pArea->lpdbRelations )
                SELF_SYNCCHILDREN( ( AREAP ) pArea );

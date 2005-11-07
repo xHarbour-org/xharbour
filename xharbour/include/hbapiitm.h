@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.40 2005/10/19 02:18:54 druzus Exp $
+ * $Id: hbapiitm.h,v 1.41 2005/11/04 02:20:10 druzus Exp $
  */
 
 /*
@@ -149,6 +149,7 @@ extern HB_EXPORT BOOL      hb_itemStrBuf   ( char *szResult, PHB_ITEM pNumber, i
 extern HB_EXPORT PHB_ITEM  hb_itemValToStr ( PHB_ITEM pItem ); /* Convert any scalar to a string */
 extern HB_EXPORT char *    hb_itemPadConv  ( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeReq ); /* Convert item to a string for PAD* functions */
 extern HB_EXPORT void      hb_itemSwap     ( PHB_ITEM pItem1, PHB_ITEM pItem2 );
+extern HB_EXPORT PHB_ITEM  hb_itemClone    ( PHB_ITEM pItem );
 
 #ifndef HB_LONG_LONG_OFF
    extern HB_EXPORT LONGLONG  hb_itemGetNLL   ( PHB_ITEM pItem );

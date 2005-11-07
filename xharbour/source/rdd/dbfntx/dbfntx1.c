@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.142 2005/10/24 01:04:32 druzus Exp $
+ * $Id: dbfntx1.c,v 1.143 2005/11/04 02:20:11 druzus Exp $
  */
 
 /*
@@ -5185,9 +5185,11 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                iRecBuff = 0;
             }
             pArea->pRecord = pSort->pBuffIO + iRecBuff * pArea->uiRecordLen;
-            pArea->fValidBuffer = TRUE;
             pArea->ulRecNo = ulRecNo;
-            pArea->fDeleted = ( pArea->pRecord[ 0 ] == '*' );
+            if( SELF_GETREC( ( AREAP ) pArea, NULL ) == FAILURE )
+               break;
+            pArea->fValidBuffer = pArea->fPositioned = TRUE;
+            pArea->fDeleted = pArea->pRecord[ 0 ] == '*';
             /* Force relational movement in child WorkAreas */
             if( pArea->lpdbRelations )
             {
@@ -5693,7 +5695,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                         {
                            if( pTag->ChgOnly )
                               fAdd = FALSE;
-                           else if( !pTag->Partial )
+                           else if( !pTag->Partial && !pTag->UniqueKey )
                               hb_ntxErrorRT( pTag->Owner->Owner,
                                              EG_CORRUPTION, EDBF_CORRUPT,
                                              pTag->Owner->IndexName, 0, 0 );

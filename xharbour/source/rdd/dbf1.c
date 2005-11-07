@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.137 2005/11/06 13:08:53 ptsarenko Exp $
+ * $Id: dbf1.c,v 1.137 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -258,8 +258,24 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
       }
    }
 
-   /* Set record encryption flag */
-   pArea->fEncrypted = FALSE;
+   /* Read data from file */
+   hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
+                   ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
+                   ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
+   if( hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
+       pArea->uiRecordLen )
+   {
+      PHB_ITEM pError = hb_errNew();
+
+      hb_errPutGenCode( pError, EG_READ );
+      hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
+      hb_errPutSubCode( pError, EDBF_READ );
+      hb_errPutOsCode( pError, hb_fsError() );
+      hb_errPutFileName( pError, pArea->szDataFileName );
+      SELF_ERROR( ( AREAP ) pArea, pError );
+      hb_itemRelease( pError );
+      return FALSE;
+   }
 
    if( SELF_GETREC( ( AREAP ) pArea, NULL ) == FAILURE )
       return FALSE;
@@ -1265,25 +1281,6 @@ static ERRCODE hb_dbfGetRec( DBFAREAP pArea, BYTE ** pBuffer )
    }
    else
    {
-      /* Read data from file */
-      hb_fsSeekLarge( pArea->hDataFile, ( HB_FOFFSET ) pArea->uiHeaderLen +
-                      ( HB_FOFFSET ) ( pArea->ulRecNo - 1 ) *
-                      ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
-      if( hb_fsRead( pArea->hDataFile, pArea->pRecord, pArea->uiRecordLen ) !=
-          pArea->uiRecordLen )
-      {
-         PHB_ITEM pError = hb_errNew();
-
-         hb_errPutGenCode( pError, EG_READ );
-         hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
-         hb_errPutSubCode( pError, EDBF_READ );
-         hb_errPutOsCode( pError, hb_fsError() );
-         hb_errPutFileName( pError, pArea->szDataFileName );
-         SELF_ERROR( ( AREAP ) pArea, pError );
-         hb_itemRelease( pError );
-         return FAILURE;
-      }
-
       if( pArea->pRecord[ 0 ] == 'D' || pArea->pRecord[ 0 ] == 'E' )
       {
          pArea->fEncrypted = TRUE;
@@ -3239,7 +3236,7 @@ void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, P
    {
       if( pField->uiType == HB_IT_STRING )
       {
-         hb_cdpnTranslate( pBuffer + pArea->pFieldOffset[ uiIndex ], cdp_src, cdp_dest, pField->uiLen );
+         hb_cdpnTranslate( ( char * ) pBuffer + pArea->pFieldOffset[ uiIndex ], cdp_src, cdp_dest, pField->uiLen );
       }
    }
 

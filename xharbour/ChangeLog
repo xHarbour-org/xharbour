@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4579 2005/11/06 20:10:14 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4580 2005/11/07 00:12:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-07 01:54 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapiitm.h
+  * xharbour/source/vm/itemapi.c
+    + added hb_itemClone() function
+
+  * xharbour/source/rdd/dbf1.c
+    * casting for C++ compilation
+    * separate record decoding from record reading for easier integration
+      with upper level RDDs
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * call record decoding method in buffered indexing
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * call record decoding method in buffered indexing.
+    ! do not report RT error for unique indexes when previous keys is
+      not found - such situation may happen due to irregular unique index
+      updating.
 
 2005-11-06 21:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * utils/hbmake/hbmake.prg

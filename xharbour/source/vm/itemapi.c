@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.126 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.127 2005/11/04 02:20:11 druzus Exp $
  */
 
 /*
@@ -1100,6 +1100,22 @@ void hb_itemSwap( PHB_ITEM pItem1, PHB_ITEM pItem2 )
 }
 #endif
 
+PHB_ITEM HB_EXPORT hb_itemClone( PHB_ITEM pItem )
+{
+   if( HB_IS_ARRAY( pItem ) )
+   {
+      return hb_arrayClone( pItem, NULL );
+   }
+   else if( HB_IS_HASH( pItem ) )
+   {
+      return hb_hashClone( pItem, NULL );
+   }
+   else
+   {
+      return hb_itemNew( pItem );
+   }
+}
+
 /* Internal API, not standard Clipper */
 /* De-references item passed by the reference */
 
@@ -1210,7 +1226,25 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
 
 
 /* Internal API, not standard Clipper */
+/* clone the given item */
+PHB_ITEM HB_EXPORT hb_itemClone( PHB_ITEM pItem )
+{
+   if( HB_IS_ARRAY( pItem ) )
+   {
+      return hb_arrayClone( pItem, NULL );
+   }
+   else if( HB_IS_HASH( pItem ) )
+   {
+      return hb_hashClone( pItem, NULL );
+   }
+   else
+   {
+      return hb_itemNew( pItem );
+   }
+}
 
+
+/* Internal API, not standard Clipper */
 /* Check whether two strings are equal (0), smaller (-1), or greater (1) */
 int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact )
 {
