@@ -1,5 +1,5 @@
 /*
- * $Id: gdtest.prg,v 1.3 2005/10/25 00:51:25 fsgiudice Exp $
+ * $Id: fitest.prg,v 1.1 2005/11/07 01:13:06 fsgiudice Exp $
  */
 
 /*
@@ -23,9 +23,9 @@ PROCEDURE Main()
    LOCAL bkcolor       IS RGBQUAD
    LOCAL iccprofile    IS FIICCPROFILE
 
-   ? "x"
-   AltD( .T. )
-   Inkey(0)
+   //? "Press Alt-D + Enter to activate debug"
+   //AltD( .T. )
+   //Inkey(0)
 
    // Check output directory
    IF !ISDirectory( IMAGES_OUT )
@@ -152,7 +152,7 @@ PROCEDURE Main()
    ? "Info           :", ValToPrg( bmpinfo )
    ? bmpinfo:SayMembers(" ", .t., .t.)
    ? "-----------------------------------------------------"
-   ? ValType( bmpinfo:dEVALUE() )
+   ? ValType( bmpinfo:Devalue() )
    //Tracelog( "bmpinfoheader", ValToPrg( bmpinfoheader ), ;
    //          bmpinfoheader:SayMembers(, .t.), bmpinfoheader:Value(), bmpinfoheader:DeValue(), hb_dumpvar( bmpinfoheader:Array() ), hb_dumpvar( bmpinfoheader:acMembers ) )
 
