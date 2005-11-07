@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.90 2005/11/04 22:04:09 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.91 2005/11/07 20:29:59 ronpinkas Exp $
  */
 
 /*
@@ -505,7 +505,16 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
       }
       else
       {
-         HB_STRING_ALLOC( pItem, ulLen )
+         pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
+         pItem->item.asString.value[ ulLen ]  = '\0';
+
+         pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( pItem->item.asString.pulHolders ) = 1;
+
+         pItem->item.asString.length          = ulLen;
+         pItem->item.asString.allocated       = ulLen;
+
+         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
 
          // Alocation above already set the 'length and the terminator!
          hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
@@ -583,9 +592,15 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
       }
       else
       {
-         HB_STRING_ALLOC( pItem, ulLen )
+         pItem->item.asString.value           = ( char * ) hb_xgrab( ulLen + 1 );
+         pItem->item.asString.value[ ulLen ]  = '\0';
 
-         // Alocation above already set the 'length and the terminator!
+         pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( pItem->item.asString.pulHolders ) = 1;
+
+         pItem->item.asString.length          = ulLen;
+         pItem->item.asString.allocated       = ulLen;
+
          hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
       }
    }
