@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.39 2005/03/09 01:51:56 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.40 2005/05/17 23:52:07 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 #include "hboo.ch"
 #include "error.ch"
 
-#define CLASS_PROPERTIES 5
+#define CLASS_PROPERTIES 6
 
 static s_aActiveStructure
 static s_aClasses := {}
@@ -130,6 +130,7 @@ Function __ActiveStructure( cStructure, nAlign )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "GetPointer", @GetPointer() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
       FOR EACH cMember IN acMembers
@@ -138,6 +139,9 @@ Function __ActiveStructure( cStructure, nAlign )
 
       Counter := Len( acMembers ) + 1
       __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY, acTypes )
+
+      Counter++
+      __clsAddMsg( hClass,  "aCMembers"     , Counter, HB_OO_MSG_PROPERTY, acMembers, HB_OO_CLSTP_READONLY )
 
       Counter++
       __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, nAlign, HB_OO_CLSTP_READONLY )
@@ -480,26 +484,44 @@ Function HB_IS_CStructure( x )
 RETURN Left( x:ClassName(), 11 ) == "C Structure"
 
 //---------------------------------------------------------------------------//
-Static Function SayMembers( cPad )
+Static Function SayMembers( cPad, lShowMembers, lReturnString )
 
-   LOCAL xProperty
+   LOCAL xProperty, acMembers, cOut := ""
 
    IF cPad == NIL
       cPad := ""
    ENDIF
+   IF lShowMembers == NIL
+      lShowMembers := .F.
+   ENDIF
+   IF lReturnString == NIL
+      lReturnString := .F.
+   ENDIF
 
-   QOut( cPad + SubStr( QSelf():ClassName, 13 ) )
-   QOut( cPad + Replicate( "-", Len( SubStr( QSelf():ClassName, 13 ) ) ) )
+   //QOut( cPad + SubStr( QSelf():ClassName, 13 ) )
+   //QOut( cPad + Replicate( "-", Len( SubStr( QSelf():ClassName, 13 ) ) ) )
+
+   cOut += cPad + SubStr( QSelf():ClassName, 13 )
+   cOut += hb_OSNewLine() + cPad + Replicate( "-", Len( SubStr( QSelf():ClassName, 13 ) ) )
 
    FOR EACH xProperty IN QSelf():Array
       IF HB_IS_CStructure( xProperty )
-         xProperty:SayMembers( cPad + cPad )
+         IF lReturnString
+            cOut += hb_OSNewLine() + hb_OSNewLine() + xProperty:SayMembers( cPad + cPad, lShowMembers, lReturnString )
+         ELSE
+            xProperty:SayMembers( cPad + cPad, lShowMembers )
+         ENDIF
       ELSE
-         QOut( cPad + ":", xProperty )
+         //QOut( cPad + IIF( lShowMembers, acMembers[ hb_EnumIndex() ], "" ) + ":", xProperty )
+         cOut += hb_OSNewLine() + cPad + IIF( lShowMembers, QSelf():acMembers[ hb_EnumIndex() ], "" ) + ":" + cStr( xProperty )
       END
    NEXT
 
-RETURN QSelf()
+   IF !lReturnString
+      QOut( cOut )
+   ENDIF
+
+RETURN IIF( lReturnString, cOut, QSelf() )
 
 //---------------------------------------------------------------------------//
 STATIC Function Reset()
@@ -535,6 +557,13 @@ STATIC Function Buffer( Buffer, lAdopt )
 RETURN QSelf()
 
 //---------------------------------------------------------------------------//
+STATIC Function GetPointer()
+QSelf():InternalBuffer := HB_ArrayToStructure( QSelf(), QSelf():aCTypes, QSelf():nAlign )
+
+RETURN hb_String2Pointer( QSelf():InternalBuffer )
+
+//---------------------------------------------------------------------------//
+
 STATIC Function Value()
 
    //LOCAL aValues := {}
@@ -546,6 +575,7 @@ STATIC Function Value()
 RETURN QSelf():InternalBuffer
 
 //---------------------------------------------------------------------------//
+
 STATIC Function DeValue( lAdopt )
 
    //LOCAL aValues := {}
