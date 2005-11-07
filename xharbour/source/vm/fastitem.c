@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.88 2005/11/03 18:33:11 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.90 2005/11/04 22:04:09 ronpinkas Exp $
  */
 
 /*
@@ -453,37 +453,40 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
 
    if( HB_IS_STRING( pItem ) )
    {
-       // Test for overlaping buffers!
-       if( szText >= pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
-       {
-          char *sCopy = (char *) hb_xgrab( ulLen + 1 );
+      // Recycle!
+      if( pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
+      {
+         if( szText == pItem->item.asString.value )
+         {
+            pItem->item.asString.value[ ulLen ] = '\0';
+            pItem->item.asString.length = ulLen;
 
-          hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+            return pItem;
+         }
+         else if( szText > pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
+         {
+            char *sCopy = (char *) hb_xgrab( ulLen + 1 );
 
-          return hb_itemPutCPtr( pItem, sCopy, ulLen );
-       }
+            hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
 
-       // Recycle!
-       if( ulLen > 1 && pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
-       {
-          if( ulLen >= pItem->item.asString.allocated )
-          {
-             // Safe to realocate.
-             __HB_STRING_REALLOC( pItem, ulLen );
-          }
-          else
-          {
-             pItem->item.asString.length = ulLen;
-             pItem->item.asString.value[ ulLen ] = '\0';
-          }
+            return hb_itemPutCPtr( pItem, sCopy, ulLen );
+         }
+         else
+         {
+            // Safe to realocate if needed.
+            __HB_STRING_REALLOC( pItem, ulLen );
 
-          // Safe.
-          memcpy( pItem->item.asString.value, szText, ulLen );
+            // Safe, no need to use memmove()
+            memcpy( pItem->item.asString.value, szText, ulLen );
 
-          return pItem;
-       }
-
-       hb_itemReleaseString( pItem );
+            return pItem;
+         }
+      }
+      else
+      {
+         // No need to check buffer overlapping - string is will NOT be released!
+         hb_itemReleaseString( pItem );
+      }
    }
    else if( HB_IS_COMPLEX( pItem ) )
    {
@@ -528,37 +531,40 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
 
    if( HB_IS_STRING( pItem ) )
    {
-       // Test for overlaping buffers!
-       if( szText >= pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
-       {
-          char *sCopy = (char *) hb_xgrab( ulLen + 1 );
+      // Recycle!
+      if( pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
+      {
+         if( szText == pItem->item.asString.value )
+         {
+            pItem->item.asString.value[ ulLen ] = '\0';
+            pItem->item.asString.length = ulLen;
 
-          hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
+            return pItem;
+         }
+         else if( szText > pItem->item.asString.value && szText <= pItem->item.asString.value + pItem->item.asString.length )
+         {
+            char *sCopy = (char *) hb_xgrab( ulLen + 1 );
 
-          return hb_itemPutCPtr( pItem, sCopy, ulLen );
-       }
+            hb_xmemcpy( (void *) sCopy, (void *) szText, ulLen );
 
-       // Recycle!
-       if( ulLen > 1 && pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
-       {
-          if( ulLen >= pItem->item.asString.allocated )
-          {
-             // Safe to realocate.
-             __HB_STRING_REALLOC( pItem, ulLen );
-          }
-          else
-          {
-             pItem->item.asString.length = ulLen;
-             pItem->item.asString.value[ ulLen ] = '\0';
-          }
+            return hb_itemPutCPtr( pItem, sCopy, ulLen );
+         }
+         else
+         {
+            // Safe to realocate if needed.
+            __HB_STRING_REALLOC( pItem, ulLen );
 
-          // Safe.
-          memcpy( pItem->item.asString.value, szText, ulLen );
+            // Safe, no need to use memmove()
+            memcpy( pItem->item.asString.value, szText, ulLen );
 
-          return pItem;
-       }
-
-       hb_itemReleaseString( pItem );
+            return pItem;
+         }
+      }
+      else
+      {
+         // No need to check buffer overlapping - string is will NOT be released!
+         hb_itemReleaseString( pItem );
+      }
    }
    else if( HB_IS_COMPLEX( pItem ) )
    {
