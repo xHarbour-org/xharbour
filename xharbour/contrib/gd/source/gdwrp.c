@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.3 2005/10/31 00:27:47 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.5 2005/11/06 23:15:55 fsgiudice Exp $
  */
 
 /*
@@ -3750,7 +3750,7 @@ HB_FUNC( GDIMAGEGIFANIMBEGIN )
          FHANDLE fhandle;
 
          /* Retrieve file handle */
-         fhandle = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ) ? hb_parnl( 2 ) : 1; // 0 = std output
+         fhandle = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ) ? hb_parnl( 2 ) : 1; // 1 = std output
 
          SaveImageToHandle( fhandle, iptr, size );
 

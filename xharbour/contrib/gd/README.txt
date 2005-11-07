@@ -1,5 +1,5 @@
 /*
- * $Id: README.txt,v 1.3 2005/10/25 08:36:55 fsgiudice Exp $
+ * $Id: README.txt,v 1.4 2005/10/31 00:27:45 fsgiudice Exp $
  */
 
 /*
@@ -43,7 +43,7 @@ Actually platforms supported are:
 - GNU systems / GCC
 
 to build library on Win32 with BCC use:
-Download bdg.dll from this link:
+Download bgd.dll from this link:
    http://www.boutell.com/gd/http/gdwin32.zip
 then
    make_b32.bat
@@ -65,9 +65,14 @@ SAMPLES
 =======
 
 For samples look at tests dir.
-gdtest.prg is an API test application
-gdtestcls.prg is a GDImage/GDChart Class test application
-test_out.prg is a sample of a cgi application for windows (I have to complete it).
+gdtest.prg      is an API test application
+gdtestcls.prg   is a GDImage/GDChart Class test application
+test_out.prg    is a sample of a cgi application for windows (I have to complete it).
+antialiased.prg shows how apply anti-alias to lines.
+animgif.prg     is a sample to create an animated gif.
+
+in sample folder:
+counter.prg     is sample applications of a graphic web counter.
 
 to compile:
    in Windows/BCC : bldtest.bat <app_without_prg_ext> (for full static)
@@ -81,5 +86,5 @@ NOTES
 WARNING: if you are using Windows platform, copy bgd.dll in tests before use it.
 
 At this time (24/10/2005 CET) it builds on Windows with last CVS.
-Not recently testd on GNU system, but it have to run correctly.
+Not recently tested on GNU system, but it have to run correctly.
 
