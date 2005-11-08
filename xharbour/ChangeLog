@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4588 2005/11/08 11:20:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.4589 2005/11/08 17:32:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2005-11-08 09:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly
-    + Added logic to NOT pass BYREF variables declared as FIELD
+    + Added logic to NOT pass BYREF variables which are declared as FIELD into DO ... WITH ...
       /* Clipper compatability */
 
 2005-11-08 09:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
