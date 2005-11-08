@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.528 2005/11/04 22:04:09 ronpinkas Exp $
+ * $Id: hvm.c,v 1.529 2005/11/08 02:04:40 druzus Exp $
  */
 
 /*
@@ -3583,7 +3583,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /* manually inlined hb_vmRequestEndProc() for some C compilers
              * which does not make such optimisation
              */
-            s_uiActionRequest = HB_ENDPROC_REQUESTED; 
+            s_uiActionRequest = HB_ENDPROC_REQUESTED;
             break;
 
          default:
@@ -9509,16 +9509,13 @@ HB_FUNC( HB_SAVEBLOCK )
 
    if ( pBlock )
    {
-      PSYMBOLS pModuleSymbols = hb_vmFindModule( pBlock->item.asBlock.value->pSymbols );
+      PSYMBOLS pModuleSymbols = pModuleSymbols ? hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
 
-      if( pModuleSymbols )
-      {
-         hb_arrayNew( &( HB_VM_STACK.Return ), 3 );
+      hb_arrayNew( &( HB_VM_STACK.Return ), 3 );
 
-         hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols->szModuleName );
-         hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
-         hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
-      }
+      hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+      hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
+      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
    }
 }
 
@@ -9541,48 +9538,45 @@ HB_FUNC( HB_RESTOREBLOCK )
 
       if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER )
       {
+         PHB_ITEM * pBase = HB_VM_STACK.pBase;
+         HB_ITEM Block;
+         PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
+
          pModuleSymbols = hb_vmFindModuleByName( ModuleName.item.asString.value );
 
-         if( pModuleSymbols )
+         Block.type = HB_IT_BLOCK;
+         Block.item.asBlock.value = hb_codeblockMacroNew( (BYTE *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
+         Block.item.asBlock.value->uLen = (USHORT) PCode.item.asString.length;
+         Block.item.asBlock.value->pSymbols = pModuleSymbols ? pModuleSymbols->pModuleSymbols : NULL;
+         Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
+
+         Block.item.asBlock.statics = HB_VM_STACK.iStatics;
+
+         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+
+         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )
          {
-            PHB_ITEM * pBase = HB_VM_STACK.pBase;
-            HB_ITEM Block;
-            PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
-
-            Block.type = HB_IT_BLOCK;
-            Block.item.asBlock.value = hb_codeblockMacroNew( (BYTE *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
-            Block.item.asBlock.value->uLen = (USHORT) PCode.item.asString.length;
-            Block.item.asBlock.value->pSymbols = pModuleSymbols->pModuleSymbols;
-            Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
-
-            Block.item.asBlock.statics = HB_VM_STACK.iStatics;
-
-            pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-            if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )
-            {
-               Block.item.asBlock.value->procname = ( *( pBase + 1 ) )->item.asBlock.value->procname;
-               Block.item.asBlock.value->lineno = ( *( pBase + 1 ) )->item.asBlock.value->lineno;
-            }
-            else
-            {
-               Block.item.asBlock.value->procname = ( *pBase )->item.asSymbol.value->szName;
-               Block.item.asBlock.value->lineno = ( *pBase )->item.asSymbol.lineno;
-            }
-
-            if( pSelf && HB_IS_OBJECT( pSelf ) )
-            {
-               Block.item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
-            }
-            else
-            {
-               Block.item.asBlock.value->uiClass = 0;
-            }
-
-            //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
-
-            hb_itemForwardValue( &( HB_VM_STACK.Return ), &Block );
+            Block.item.asBlock.value->procname = ( *( pBase + 1 ) )->item.asBlock.value->procname;
+            Block.item.asBlock.value->lineno = ( *( pBase + 1 ) )->item.asBlock.value->lineno;
          }
+         else
+         {
+            Block.item.asBlock.value->procname = ( *pBase )->item.asSymbol.value->szName;
+            Block.item.asBlock.value->lineno = ( *pBase )->item.asSymbol.lineno;
+         }
+
+         if( pSelf && HB_IS_OBJECT( pSelf ) )
+         {
+            Block.item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
+         }
+         else
+         {
+            Block.item.asBlock.value->uiClass = 0;
+         }
+
+         //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
+
+         hb_itemForwardValue( &( HB_VM_STACK.Return ), &Block );
       }
 
       hb_itemClear( &ModuleName );
