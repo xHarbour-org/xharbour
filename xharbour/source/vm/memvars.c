@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.113 2005/10/31 07:46:20 ronpinkas Exp $
+ * $Id: memvars.c,v 1.114 2005/11/04 22:04:09 ronpinkas Exp $
  */
 
 /*
@@ -2257,8 +2257,11 @@ HB_FUNC( __MVRESTORE )
 
                default:
                {
+                  char szType[6];
+
+                  sprintf( szType, "%i", uiType );
                   // passing uiType as char * only to match declared arg type - will be processed as int by srintf.
-                  hb_errInternal( 9100, "Restore failed, unsupported type: %i for: '%s'\n", (char *) uiType, hb_itemGetCPtr( &Name ) );
+                  hb_errInternal( 9100, "Restore failed, unsupported type: %i for: '%s'\n", szType, hb_itemGetCPtr( &Name ) );
                   hb_itemClear( &Item );
                }
             }

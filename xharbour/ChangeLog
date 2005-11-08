@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4584 2005/11/07 20:29:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4585 2005/11/07 23:43:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-08 03:02 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+     * some minor modifications
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+     + added much stronger balancing on index updated controlled by
+       HB_NTX_STRONG_BALANCE macro - enabled by default.
+       It will cause that indexes created online (not by INDEX ON) are
+       from 20% to 50% shorter. It's done with some small cost (IMHO
+       acceptable) on updated but later give noticeable speed improvement
+       because smaller index has to be scanned in pending operations.
+       To improvement if linear to index size.
+
+  * xharbour/source/vm/hvm.c
+    % modified main VM loop to reduce one comparison repeated in each loop
+      it increase PCODE evaluation speed about 2-3% in speedtst.exe
+      Ron, please look at note I left in HB_P_ENDBLOCK action and if you
+      think it should be updated to work in the same way as macro end or
+      HB_P_ENDPROC and begin to respect hb_vm_pFinally update it.
+
+  * xharbour/source/vm/memvars.c
+    ! fixed GPF in internal error
 
 2005-11-07 15:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/fastitem.c

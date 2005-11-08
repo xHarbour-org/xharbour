@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.179 2005/11/06 13:43:14 ptsarenko Exp $
+ * $Id: dbcmd.c,v 1.179 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -2301,7 +2301,7 @@ HB_FUNC( FIELDDEC )
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_DEC, &Item ) == SUCCESS)
          {
-            hb_itemForwardValue( hb_stackReturnItem(), &Item );
+            hb_itemReturnForward( &Item );
             return;
          }
       }
@@ -2329,7 +2329,7 @@ HB_FUNC( FIELDGET )
          SELF_GETVALUE( pArea, uiField, pItem );
    }
 
-   hb_itemForwardValue( hb_stackReturnItem(), pItem );
+   hb_itemReturnForward( pItem );
    hb_itemRelease( pItem );
 }
 
@@ -2347,7 +2347,7 @@ HB_FUNC( FIELDLEN )
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_LEN, &Item ) == SUCCESS )
          {
-            hb_itemForwardValue( hb_stackReturnItem(), &Item );
+            hb_itemReturnForward( &Item );
             return;
          }
       }
@@ -2429,7 +2429,7 @@ HB_FUNC( FIELDTYPE )
 
          if( SELF_FIELDINFO( pArea, uiIndex, DBS_TYPE, &Item ) == SUCCESS )
          {
-            hb_itemForwardValue( hb_stackReturnItem(), &Item );
+            hb_itemReturnForward( &Item );
             return;
          }
       }
@@ -2477,9 +2477,9 @@ HB_FUNC( HEADER )
       hb_retni( 0 );
    else
    {
-      HB_ITEM_NEW( RecSize );
-      SELF_INFO( pArea, DBI_GETHEADERSIZE, &RecSize );
-      hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
+      HB_ITEM_NEW( HdrSize );
+      SELF_INFO( pArea, DBI_GETHEADERSIZE, &HdrSize );
+      hb_itemReturnForward( &HdrSize );
    }
 }
 
@@ -2543,7 +2543,7 @@ HB_FUNC( LUPDATE )
    {
       HB_ITEM_NEW( Item );
       SELF_INFO( pArea, DBI_LASTUPDATE, &Item );
-      hb_itemForwardValue( hb_stackReturnItem(), &Item );
+      hb_itemReturnForward( &Item );
    }
    else
       hb_retds( "" );
@@ -3378,7 +3378,9 @@ HB_FUNC( RECNO )
 
    hb_itemPutNL( &RecNo, 0 );
    if( pArea )
+   {
       SELF_RECID( pArea, &RecNo );
+   }
    hb_itemReturnForward( &RecNo );
 }
 
@@ -3391,7 +3393,7 @@ HB_FUNC( RECSIZE )
    {
       HB_ITEM_NEW( RecSize );
       SELF_INFO( pArea, DBI_GETRECSIZE, &RecSize );
-      hb_itemForwardValue( hb_stackReturnItem(), &RecSize );
+      hb_itemReturnForward( &RecSize );
    }
    else
       hb_retni( 0 );

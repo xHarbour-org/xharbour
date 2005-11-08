@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.143 2005/11/04 02:20:11 druzus Exp $
+ * $Id: dbfntx1.c,v 1.144 2005/11/07 01:02:55 druzus Exp $
  */
 
 /*
@@ -124,6 +124,9 @@
 /* #define HB_NTX_NOMULTITAG */
 
 /* #define HB_NTX_EXTERNAL_PAGEBUFFER */
+
+#define HB_NTX_STRONG_BALANCE
+
 
 /*
 #define HB_NTX_DEBUG
@@ -2893,7 +2896,12 @@ static BOOL hb_ntxTagKeyAdd( LPTAGINFO pTag, LPKEYINFO pKey )
          hb_ntxPageRelease( pTag, pPage );
       pPage = hb_ntxPageLoad( pTag, pTag->stack[ iLevel ].page );
       if( ! pPage )
+      {
+         if( pNewKey )
+            hb_ntxKeyFree( pNewKey );
+         pTag->stackLevel = 0;
          return FALSE;
+      }
       iKey = pTag->stack[ iLevel ].ikey;
       if( pPage->uiKeys < pTag->MaxKeys )
       {
@@ -2902,11 +2910,80 @@ static BOOL hb_ntxTagKeyAdd( LPTAGINFO pTag, LPKEYINFO pKey )
       }
       else
       {
+         pTag->stackLevel = 0;
+#if defined( HB_NTX_STRONG_BALANCE )
+         if( iLevel > 0 )
+         {
+            LPPAGEINFO pBasePage;
+            USHORT uiFirst, uiLast, uiBaseKey;
+            pBasePage = hb_ntxPageLoad( pTag, pTag->stack[ iLevel - 1 ].page );
+            if( !pBasePage )
+            {
+               hb_ntxPageRelease( pTag, pPage );
+               if( pNewKey )
+                  hb_ntxKeyFree( pNewKey );
+               return FALSE;
+            }
+            uiFirst = uiLast = uiBaseKey = pTag->stack[ iLevel -1 ].ikey;
+            if( uiLast < pBasePage->uiKeys && hb_ntxGetKeyPage( pBasePage, uiLast + 1 ) != 0 )
+               uiLast++;
+            else if( uiFirst > 0 && hb_ntxGetKeyPage( pBasePage, uiFirst - 1 ) != 0 )
+               uiFirst--;
+            if( uiFirst != uiLast )
+            {
+               LPPAGEINFO pFirst, pLast;
+
+               if( uiFirst == uiBaseKey )
+               {
+                  pFirst = pPage;
+                  pLast = hb_ntxPageLoad( pTag, hb_ntxGetKeyPage( pBasePage, uiLast ) );
+                  if( ! pLast )
+                  {
+                     hb_ntxPageRelease( pTag, pPage );
+                     hb_ntxPageRelease( pTag, pBasePage );
+                     if( pNewKey )
+                        hb_ntxKeyFree( pNewKey );
+                     return FALSE;
+                  }
+                  uiBaseKey = iKey;
+               }
+               else
+               {
+                  pLast = pPage;
+                  pFirst = hb_ntxPageLoad( pTag, hb_ntxGetKeyPage( pBasePage, uiFirst ) );
+                  if( ! pFirst )
+                  {
+                     hb_ntxPageRelease( pTag, pPage );
+                     hb_ntxPageRelease( pTag, pBasePage );
+                     if( pNewKey )
+                        hb_ntxKeyFree( pNewKey );
+                     return FALSE;
+                  }
+                  uiBaseKey = pFirst->uiKeys + iKey + 1;
+               }
+               if( pFirst->uiKeys + pLast->uiKeys <= ( pTag->MaxKeys - 1 ) << 1 )
+               {
+                  hb_ntxBalancePages( pTag, pBasePage, uiFirst, pFirst, pLast );
+                  if( pFirst->uiKeys >= uiBaseKey )
+                     hb_ntxPageKeyAdd( pTag, pFirst, uiBaseKey, pKey->Tag, pKey->Xtra, pKey->key );
+                  else
+                     hb_ntxPageKeyAdd( pTag, pLast, uiBaseKey - pFirst->uiKeys - 1, pKey->Tag, pKey->Xtra, pKey->key );
+                  pKey = NULL;
+               }
+               if( pFirst != pPage )
+                  hb_ntxPageRelease( pTag, pFirst );
+               else
+                  hb_ntxPageRelease( pTag, pLast );
+               hb_ntxPageRelease( pTag, pBasePage );
+               if( !pKey )
+                  break;
+            }
+         }
+#endif
          pKey = hb_ntxPageSplit( pTag, pPage, pKey, iKey );
          if( pNewKey )
             hb_ntxKeyFree( pNewKey );
          pNewKey = pKey;
-         pTag->stackLevel = 0;
       }
       iLevel--;
    }

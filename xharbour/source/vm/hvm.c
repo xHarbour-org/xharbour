@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.526 2005/11/03 18:33:11 ronpinkas Exp $
+ * $Id: hvm.c,v 1.528 2005/11/04 22:04:09 ronpinkas Exp $
  */
 
 /*
@@ -1042,7 +1042,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    LONG w = 0;
    BOOL bCanRecover = FALSE;
-   BYTE curPCode;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
@@ -1075,10 +1074,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    }
 #endif
 
-   do
+   while( TRUE )
    {
-      curPCode = pCode[ w ];
-
 #ifndef HB_NO_PROFILER
       if( hb_bProfiler )
       {
@@ -1086,7 +1083,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
          ulPastClock = ulActualClock;
-         ulLastOpcode = curPCode;
+         ulLastOpcode = pCode[ w ];
          hb_ulOpcodesCalls[ ulLastOpcode ]++;
       }
 #endif
@@ -1112,7 +1109,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
       }
 #endif
 
-      switch( curPCode )
+      switch( pCode[ w ] )
       {
          /* Operators ( mathematical / character / misc ) */
 
@@ -2055,21 +2052,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             while( pCode[ w++ ] ) {}
             break;
 
-         case HB_P_ENDBLOCK:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDBLOCK") );
-            hb_vmEndBlock();
-
-            /* end of a codeblock - stop evaluation */
-            if( pSymbols )
-            {
-               hb_memvarSetPrivatesBase( ulPrivateBase );
-            }
-
-            /*
-             * *** NOTE!!! Return!!!
-             */
-            return;
-
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
          case HB_P_TRYBEGIN:
@@ -2124,7 +2106,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             pSequence->wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
             pSequence->wWithObjectCounter     = hb_vm_wWithObjectCounter;
 
-            if( curPCode == HB_P_TRYBEGIN )
+            if( pCode[ w ] == HB_P_TRYBEGIN )
             {
                pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
             }
@@ -3578,18 +3560,30 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             w++;
             break;
 
-         case HB_P_ENDPROC:
-            if( hb_vm_pFinally )
-            {
-               #ifdef DEBUG_FINALLY
-                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
-               #endif
+         case HB_P_ENDBLOCK:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDBLOCK") );
+            hb_vmEndBlock();
 
-               hb_vm_pFinally->bDeferred = TRUE;
-               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
-               w = hb_vm_pFinally->lFinally;
-               curPCode = HB_P_NOOP;
+            /* IMHO It will be cleaner to make exactly the same action here
+               as for HB_P_ENDPROC, instead of this direct return, Druzus */
+
+            /* end of a codeblock - stop evaluation */
+            if( pSymbols )
+            {
+               hb_memvarSetPrivatesBase( ulPrivateBase );
             }
+
+            /*
+             * *** NOTE!!! Return!!!
+             */
+            return;
+
+         case HB_P_ENDPROC:
+            HB_TRACE(HB_TR_INFO, ("HB_P_ENDPROC"));
+            /* manually inlined hb_vmRequestEndProc() for some C compilers
+             * which does not make such optimisation
+             */
+            s_uiActionRequest = HB_ENDPROC_REQUESTED; 
             break;
 
          default:
@@ -3608,7 +3602,29 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
       if( s_uiActionRequest )
       {
-         if( s_uiActionRequest & HB_BREAK_REQUESTED )
+         if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
+         {
+            /* request to stop current procedure was issued
+             * (from macro evaluation)
+             */
+            if( hb_vm_pFinally )
+            {
+               #ifdef DEBUG_FINALLY
+                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
+               #endif
+
+               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
+               w = hb_vm_pFinally->lFinally;
+               s_uiActionRequest = 0;
+            }
+            else
+            {
+               s_uiActionRequest = 0;
+               break;
+            }
+         }
+         else if( s_uiActionRequest & HB_BREAK_REQUESTED )
          {
             if( hb_vm_pFinally )
             {
@@ -3671,28 +3687,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             exit( hb_vmQuit() );
             break;
          }
-         else if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
-         {
-            /* request to stop current procedure was issued
-             * (from macro evaluation)
-             */
-            if( hb_vm_pFinally )
-            {
-               #ifdef DEBUG_FINALLY
-                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
-               #endif
-
-               hb_vm_pFinally->bDeferred = TRUE;
-               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
-               w = hb_vm_pFinally->lFinally;
-               s_uiActionRequest = 0;
-            }
-            else
-            {
-               s_uiActionRequest = 0;
-               break;
-            }
-         }
       }
 
       /* JC1: now we can safely test for cancellation & tell garbage we are ready*/
@@ -3713,7 +3707,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 #endif
 
    }
-   while( curPCode != HB_P_ENDPROC );
 
    /* No cancellation here */
    HB_DISABLE_ASYN_CANC;
