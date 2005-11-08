@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.8 2005/09/04 04:29:00 walito Exp $
+ * $Id: hboo.ch,v 1.9 2005/09/05 05:37:26 walito Exp $
  */
 
 /*
@@ -91,7 +91,7 @@
 #define HB_OO_CLS_INSTANCED       1 /* The class was instanced one time almost */
 #define HB_OO_CLS_CLASSCTOR     512
 #define HB_OO_CLS_ONERROR_SYMB 2048
-#define HB_OO_CLS_DESTRUC_SYMB 4096 
+#define HB_OO_CLS_DESTRUC_SYMB 4096
 
 
 /* Message types */
@@ -137,5 +137,9 @@
 
 #define HB_OO_MCLSCTOR_INSTANCE 1
 #define HB_OO_MCLSCTOR_CLONE    2
+
+#define FOREACH_BEGIN           1
+#define FOREACH_ENUMERATE       2
+#define FOREACH_END             3
 
 #endif /* HB_OO_CH_ */

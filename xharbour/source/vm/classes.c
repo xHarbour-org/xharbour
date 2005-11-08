@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.175 2005/10/29 06:45:02 druzus Exp $
+ * $Id: classes.c,v 1.176 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -1517,6 +1517,13 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                 fOpOver  = HB_CLASS_OP_AND;
              }
              break;
+
+          default:
+             if( strcmp( "FOR EACH", szMessage ) == 0 )
+             {
+                pMessage = hb_dynsymGet( "__OpForEach" ) ;
+                fOpOver  = HB_CLASS_OP_FOREACH;
+             }
       }
 
       if( ! fOpOver )

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.529 2005/11/08 02:04:40 druzus Exp $
+ * $Id: hvm.c,v 1.530 2005/11/08 17:59:24 ronpinkas Exp $
  */
 
 /*
@@ -1567,7 +1567,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
             hb_stackPop();
 
-            if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY && hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_STRING )
+            if( hb_objGetOpOver( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) ) & HB_CLASS_OP_FOREACH )
+            {
+               HB_ITEM_NEW( ForEachOp );
+
+               hb_itemPutNI( &ForEachOp, FOREACH_BEGIN );
+
+               hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), &ForEachOp, "__OPFOREACH", NULL, 0, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+            }
+            else if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY && hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_STRING )
             {
                hb_errRT_BASE( EG_ARG, 1602, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
             }
@@ -1597,9 +1605,34 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vm_wEnumCollectionCounter )
             {
-               hb_vmPushLogical( hb_arrayGetByRef( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
-                                                   ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
-                                                   hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
+               ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ];
+
+               if( hb_objGetOpOver( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ) ) & HB_CLASS_OP_FOREACH )
+               {
+                  HB_ITEM_NEW( ForEachOp );
+                  HB_ITEM_NEW( ForEachIndex );
+
+                  hb_itemPutNI( &ForEachOp, FOREACH_ENUMERATE );
+                  hb_itemPutNL( &ForEachIndex, hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ] );
+
+                  hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ), &ForEachOp, "__OPFOREACH", &ForEachIndex, 0, hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] );
+
+                  if( s_uiActionRequest == HB_BREAK_REQUESTED )
+                  {
+                     s_uiActionRequest = 0;
+                     hb_vmPushLogical( FALSE );
+                  }
+                  else
+                  {
+                     hb_vmPushLogical( TRUE );
+                  }
+               }
+               else
+               {
+                  hb_vmPushLogical( hb_arrayGetByRef( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
+                                                      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
+                                                      hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
+               }
             }
             else
             {
@@ -1614,7 +1647,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vm_wEnumCollectionCounter )
             {
-                --hb_vm_wEnumCollectionCounter;
+               --hb_vm_wEnumCollectionCounter;
+
+               if( hb_objGetOpOver( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) ) & HB_CLASS_OP_FOREACH )
+               {
+                  HB_ITEM_NEW( ForEachOp );
+
+                  hb_itemPutNI( &ForEachOp, FOREACH_END );
+
+                  hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), &ForEachOp, "__OPFOREACH", NULL, 0, NULL );
+               }
             }
 
             hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
