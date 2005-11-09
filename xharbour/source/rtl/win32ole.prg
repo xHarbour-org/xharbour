@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.93 2005/10/29 06:44:49 druzus Exp $
+ * $Id: win32ole.prg,v 1.94 2005/11/09 03:34:49 ronpinkas Exp $
  */
 
 /*
@@ -633,10 +633,8 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
          xRet := HB_Inline( ::pOleEnumerator )
          {
-            IEnumVARIANT *pEnumVariant = hb_parptr(1);
-            ULONG *pcElementFetched;
-
-            *pcElementFetched = 0;
+            IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
+            ULONG *pcElementFetched = NULL;
 
             if( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) == S_OK )
             {
@@ -654,7 +652,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
       CASE FOREACH_END
          HB_Inline( ::pOleEnumerator )
          {
-            IEnumVARIANT *pEnumVariant = hb_parptr(1);
+            IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
 
             pEnumVariant->lpVtbl->Release( pEnumVariant );
          }
@@ -1841,7 +1839,7 @@ RETURN Self
      {
         IEnumVARIANT *pEnumVariant = NULL;
 
-        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, (void *) &pEnumVariant );
+        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, (void **) &pEnumVariant );
 
         if( s_nOleError == S_OK )
         {
