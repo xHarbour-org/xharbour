@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.40 2005/05/17 23:52:07 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.41 2005/11/07 01:35:12 fsgiudice Exp $
  */
 
 /*
@@ -441,6 +441,7 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "SayMembers", @SayMembers() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Init"      , @Init()       , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "Pointer"   , @Pointer()    , HB_OO_MSG_METHOD )
+      __clsAddMsg( hClass,  "GetPointer", @GetPointer() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
       IF Abs( CType ) == 1
@@ -456,6 +457,9 @@ Function HB_CTypeArrayID( CType, nLen )
       NEXT
 
       __clsAddMsg( hClass,  "aCTypes"       , Counter, HB_OO_MSG_PROPERTY, aCTypes )
+
+      Counter++
+      __clsAddMsg( hClass,  "aCMembers"     , Counter, HB_OO_MSG_PROPERTY, acMembers, HB_OO_CLSTP_READONLY )
 
       Counter++
       __clsAddMsg( hClass,  "nAlign"        , Counter, HB_OO_MSG_PROPERTY, 1, HB_OO_CLSTP_READONLY )
