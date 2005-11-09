@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4595 2005/11/09 03:34:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4596 2005/11/09 04:39:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-08 22:43 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbapi.h
+  * source/vm/fastitem.c
+    * Modified asString.allocated to be 0 based to overcome logical ambiguity
+      in hb_itemPutCRaw() and hb_retclenAdoptRaw()
+
+  * source/vm/itemapi.c
+    ! Fixed hb_itemUnShare() to enforce length of greater than 1
+      /* Clipper FREad() compatability */
 
 2005-11-08 20:39 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbapi.h

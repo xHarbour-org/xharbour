@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.185 2005/11/04 22:04:09 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.186 2005/11/09 04:39:43 ronpinkas Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ HB_EXTERN_BEGIN
 // Should NEVER be called directly - always use HB_STRING_ALLOC()
 #define __HB_STRING_REALLOC( p, len ) \
                \
-               if( (p)->item.asString.allocated <= len ) \
+               if( (p)->item.asString.allocated <= (len) ) \
                { \
                   ULONG ulAllocate; \
                   \
@@ -179,7 +179,7 @@ HB_EXTERN_BEGIN
                      ulAllocate = (len) + 1; \
                   } \
                   \
-                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate + 1 ); \
+                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate ); \
                   (p)->item.asString.allocated = ulAllocate; \
                } \
                \
@@ -204,7 +204,7 @@ HB_EXTERN_BEGIN
                   (p)->item.asString.value[ len ]    = '\0'; \
                   (p)->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) ); \
                   *( (p)->item.asString.pulHolders ) = 1; \
-                  (p)->item.asString.allocated       = len; \
+                  (p)->item.asString.allocated       = (len) + 1; \
                }
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL

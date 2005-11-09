@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.92 2005/11/07 23:43:11 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.93 2005/11/09 04:39:43 ronpinkas Exp $
  */
 
 /*
@@ -512,7 +512,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
          *( pItem->item.asString.pulHolders ) = 1;
 
          pItem->item.asString.length          = ulLen;
-         pItem->item.asString.allocated       = ulLen;
+         pItem->item.asString.allocated       = ulLen + 1;
 
          hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
 
@@ -599,7 +599,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
          *( pItem->item.asString.pulHolders ) = 1;
 
          pItem->item.asString.length          = ulLen;
-         pItem->item.asString.allocated       = ulLen;
+         pItem->item.asString.allocated       = ulLen + 1;
 
          hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
       }
@@ -633,17 +633,19 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
    if( ulLen )
    {
+      szText[ulLen] = '\0';
+
       pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
-      szText[ulLen] = '\0';
+      pItem->item.asString.allocated       = ulLen + 1;
    }
    else
    {
       hb_xfree( szText );
       szText = hb_vm_sNull;
+      pItem->item.asString.allocated = 0;
    }
 
-   pItem->item.asString.allocated = ulLen;
    pItem->item.asString.length    = ulLen;
    pItem->item.asString.value     = szText;
 
@@ -859,15 +861,16 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    {
       ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+      ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ( &(HB_VM_STACK.Return) )->item.asString.length + 1;
    }
    else
    {
       hb_xfree( szText );
       szText = hb_vm_sNull;
+      ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
    }
 
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ( &(HB_VM_STACK.Return) )->item.asString.length;
+   ( &(HB_VM_STACK.Return) )->item.asString.value = szText;
 }
 
 #undef hb_retclenAdopt
@@ -887,19 +890,21 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
 
    if( ulLen )
    {
+      szText[ulLen] = '\0';
+
       ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
-      szText[ulLen] = '\0';
+      ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ulLen + 1;
    }
    else
    {
       hb_xfree( szText );
       szText = hb_vm_sNull;
+      ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
    }
 
    ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = ulLen;
 }
 
 #undef hb_retclenAdoptRaw
