@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.183 2005/11/03 06:54:36 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.185 2005/11/04 22:04:09 ronpinkas Exp $
  */
 
 /*
@@ -179,7 +179,7 @@ HB_EXTERN_BEGIN
                      ulAllocate = (len) + 1; \
                   } \
                   \
-                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate ); \
+                  (p)->item.asString.value     = ( char * ) hb_xrealloc( (p)->item.asString.value, ulAllocate + 1 ); \
                   (p)->item.asString.allocated = ulAllocate; \
                } \
                \

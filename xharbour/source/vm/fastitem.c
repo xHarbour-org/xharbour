@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.91 2005/11/07 20:29:59 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.92 2005/11/07 23:43:11 ronpinkas Exp $
  */
 
 /*
@@ -633,7 +633,6 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
 
    if( ulLen )
    {
-
       pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
       szText[ulLen] = '\0';
@@ -680,7 +679,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
       szText = hb_vm_sNull;
    }
 
-   pItem->item.asString.length  = ulLen;
+   pItem->item.asString.length    = ulLen;
    pItem->item.asString.value     = szText;
    pItem->item.asString.allocated = ulLen;
 
