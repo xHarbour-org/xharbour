@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.129 2005/11/07 01:58:10 druzus Exp $
+ * $Id: itemapi.c,v 1.130 2005/11/09 06:43:47 ronpinkas Exp $
  */
 
 /*
@@ -1197,14 +1197,14 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
    {
       if( pItem->item.asString.allocated == 0 || *( pItem->item.asString.pulHolders ) > 1 )
       {
-         ULONG ulLen = pItem->item.asString.length ? pItem->item.asString.length : 1;
-         char *sString = ( char* ) hb_xgrab( ulLen + 1 );
+         ULONG ulLen1 = pItem->item.asString.length;
+         ULONG ulLen2 = ulLen1 ? ulLen1 : 1;
+         char *sString = ( char* ) hb_xgrab( ulLen2 + 1 );
 
-         sString[ ulLen] = '\0';
+         hb_xmemcpy( (void *) sString, (void *) pItem->item.asString.value, ulLen1 + 1 );
 
-         hb_xmemcpy( (void *) sString, (void *) pItem->item.asString.value, pItem->item.asString.length + 1 );
-
-         hb_itemPutCPtr( pItem, sString, ulLen );
+         hb_itemPutCPtr( pItem, sString, ulLen2 );
+         pItem->item.asString.length = ulLen1;
       }
    }
 
