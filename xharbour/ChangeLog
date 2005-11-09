@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4592 2005/11/08 21:24:04 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4593 2005/11/09 00:29:54 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-09 02:06 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  + xharbour/tests/tstcstru1.prg
+    + Like tstcstru.prg but changed to show use of
+      :Pointer(), :GetPointer() and :SayMembers() methods
 
 2005-11-09 01:27 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * xharbour/source/rtl/cstruct.prg
