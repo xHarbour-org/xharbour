@@ -43,12 +43,11 @@ STATIC PROCEDURE Excel()
    // Explicit use of DEFAULT method by means of #xtranslate above!!!
    oAS:Cells( 3, 1 ) := "Explict DEFAULT Method Text:"
 
-
    // Array notation seem to have REVERSED indexs for the Cells Collections!!!
    // Implicitly using DEFAULT Method
    oAS:Cells[ 2, 3 ] := "Implicit DEFAULT Method using *reversed* array index notation"
 
-   // Operator overloading will qttempt explict resolutin using :OleValue
+   // Operator overloading will attempt explict resolutin using :OleValue
    oAS:Cells[ 2, 3 ] += "!"
 
    oAS:Cells( 4, 1 ):Value := "Numeric:"

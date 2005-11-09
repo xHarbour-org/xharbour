@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4593 2005/11/09 00:29:54 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.4594 2005/11/09 01:11:58 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-08 19:33 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvm.c
+    + Added missing HB_P_PLUS support in hb_vmarrayPop() for overloaded ARRAYINDEX
+
+  * source/rtl/win32ole.prg
+    % Optimized OleValue support by adding explicit Methods ::OleValue() and ::_OleValue( xSetValue )
+    + Added overloading of FOR EACH to support enumeration of OLE Collections.
+
+  * tests/testole.prg
+    * Comment typo corrected
 
 2005-11-09 02:06 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   + xharbour/tests/tstcstru1.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.92 2005/10/27 16:21:23 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.93 2005/10/29 06:44:49 druzus Exp $
  */
 
 /*
@@ -113,6 +113,8 @@ RETURN TOleAuto():GetActiveObject( cString )
       #define HB_LONG_LONG_OFF
    #endif
 
+   static void RetValue( void );
+
    static HRESULT  s_nOleError;
    static HB_ITEM  OleAuto;
 
@@ -163,6 +165,7 @@ CLASS TOleAuto
 
    DATA hObj
    DATA cClassName
+   DATA pOleEnumerator
 
    METHOD New( uObj, cClass ) CONSTRUCTOR
    METHOD GetActiveObject( cClass ) CONSTRUCTOR
@@ -170,6 +173,11 @@ CLASS TOleAuto
    METHOD Invoke()
    MESSAGE Set METHOD Invoke()
    MESSAGE Get METHOD Invoke()
+
+   METHOD OleValue()
+   METHOD _OleValue( xSetValue )
+
+   METHOD OleNewEnumerator()
 
    METHOD OleCollection( xIndex, xValue ) OPERATOR "[]"
 
@@ -185,6 +193,8 @@ CLASS TOleAuto
    METHOD OleValueEqual( xArg )           OPERATOR "="
    METHOD OleValueExactEqual( xArg )      OPERATOR "=="
    METHOD OleValueNotEqual( xArg )        OPERATOR "!="
+
+   METHOD OleEnumerate( nEnumOp, nIndex ) OPERATOR "FOR EACH"
 
    ERROR HANDLER OnError()
 
@@ -608,6 +618,53 @@ METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
+
+   LOCAL xRet
+
+   SWITCH nEnumOp
+      CASE FOREACH_BEGIN
+         ::pOleEnumerator := ::OleNewEnumerator
+         EXIT
+
+      CASE FOREACH_ENUMERATE
+         //xRet := ::Item( nIndex )
+         //xRet := ::pOleEnumerator:Next()
+
+         xRet := HB_Inline( ::pOleEnumerator )
+         {
+            IEnumVARIANT *pEnumVariant = hb_parptr(1);
+            ULONG *pcElementFetched;
+
+            *pcElementFetched = 0;
+
+            if( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) == S_OK )
+            {
+               RetValue();
+            }
+            else
+            {
+               hb_vmRequestBreak( NULL );
+            }
+         }
+
+         RETURN xRet
+         //EXIT
+
+      CASE FOREACH_END
+         HB_Inline( ::pOleEnumerator )
+         {
+            IEnumVARIANT *pEnumVariant = hb_parptr(1);
+
+            pEnumVariant->lpVtbl->Release( pEnumVariant );
+         }
+
+         ::pOleEnumerator := NIL
+         EXIT
+   END
+
+RETURN Self
+
 #pragma BEGINDUMP
 
   // -----------------------------------------------------------------------
@@ -619,6 +676,7 @@ RETURN xRet
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
   static DISPID ValueID = DISPID_VALUE;
+  static DISPID NewEnumID = DISPID_NEWENUM;
 
   //---------------------------------------------------------------------------//
   static double DateToDbl( LPSTR cDate )
@@ -1279,7 +1337,8 @@ RETURN xRet
 /*- end ----------------------------->8-------------------------------------*/
 
         default:
-          //printf( "Default %i!\n", RetVal.n1.n2.vt );
+          TraceLog( NULL, "Unexpected return type %i!\n", RetVal.n1.n2.vt );
+
           if( s_nOleError == S_OK )
           {
              s_nOleError = E_UNEXPECTED;
@@ -1454,7 +1513,7 @@ RETURN xRet
      IID ClassID, iid;
      LPIID riid = (LPIID) &IID_IDispatch;
      void *pDisp = NULL; // IDispatch
-     /* void * 
+     /* void *
       * used intentionally to inform compiler that there is no
       * strict-aliasing
       */
@@ -1507,7 +1566,7 @@ RETURN xRet
      LPIID riid = (LPIID) &IID_IDispatch;
      IUnknown *pUnk = NULL;
      void *pDisp = NULL; // IDispatch
-     /* void * 
+     /* void *
       * used intentionally to inform compiler that there is no
       * strict-aliasing
       */
@@ -1583,10 +1642,10 @@ RETURN xRet
                                              &excep,
                                              &uArgErr );
 
-       if( s_nOleError == S_OK )
-       {
-          return S_OK;
-       }
+        if( s_nOleError == S_OK )
+        {
+           return S_OK;
+        }
      }
 
      memset( (LPBYTE) &excep, 0, sizeof( excep ) );
@@ -1668,6 +1727,144 @@ RETURN xRet
   }
 
   //---------------------------------------------------------------------------//
+  static void OleThrowError( void )
+  {
+     PHB_ITEM pReturn;
+     char *sDescription;
+
+     hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
+     if( s_nOleError == DISP_E_EXCEPTION )
+     {
+        // Intentional to avoid report of memory leak if fatal error.
+        char *sTemp = WideToAnsi( excep.bstrDescription );
+        sDescription = (char *) malloc( strlen( sTemp ) + 1 );
+        strcpy( sDescription, sTemp );
+        hb_xfree( sTemp );
+     }
+     else
+     {
+        sDescription = Ole2TxtError();
+     }
+
+     //TraceLog( NULL, "Desc: '%s'\n", sDescription );
+
+     pReturn = hb_errRT_SubstParams( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+
+     if( s_nOleError == DISP_E_EXCEPTION )
+     {
+        free( (void *) sDescription );
+     }
+
+     if( pReturn )
+     {
+        hb_itemRelease( hb_itemReturn( pReturn ) );
+     }
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC_STATIC( TOLEAUTO_OLEVALUE ) // (hOleObject, szMethodName, uParams...)
+  {
+     IDispatch *pDisp;
+
+     hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
+     pDisp = ( IDispatch * ) hb_parnl( -1 );
+
+     VariantClear( &RetVal );
+
+     OleGetProperty( pDisp, ValueID, &s_EmptyDispParams );
+
+     if( s_nOleError == S_OK )
+     {
+        RetValue();
+     }
+     else
+     {
+        OleThrowError();
+     }
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC_STATIC( TOLEAUTO__OLEVALUE ) // (hOleObject, szMethodName, uParams...)
+  {
+     IDispatch *pDisp;
+     DISPPARAMS DispParams;
+
+     hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
+     pDisp = ( IDispatch * ) hb_parnl( -1 );
+
+     VariantClear( &RetVal );
+
+     GetParams( &DispParams );
+
+     DispParams.rgdispidNamedArgs = &lPropPut;
+     DispParams.cNamedArgs = 1;
+
+     OleSetProperty( pDisp, ValueID, &DispParams );
+
+     if( s_nOleError == S_OK )
+     {
+        hb_itemReturn( hb_stackItemFromBase( 1 ) );
+     }
+     else
+     {
+        OleThrowError();
+     }
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC_STATIC( TOLEAUTO_OLENEWENUMERATOR ) // (hOleObject, szMethodName, uParams...)
+  {
+     IDispatch *pDisp;
+
+     hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+     hb_vmPush( hb_stackSelfItem() );
+     hb_vmSend( 0 );
+
+     pDisp = ( IDispatch * ) hb_parnl( -1 );
+
+     VariantClear( &RetVal );
+
+     OleGetProperty( pDisp, NewEnumID, &s_EmptyDispParams );
+
+     //TraceLog( NULL, "Dispatch: %p, Result: %i Type %i\n", pDisp, s_nOleError, RetVal.n1.n2.vt );
+
+     if( s_nOleError == S_OK )
+     {
+        IEnumVARIANT *pEnumVariant = NULL;
+
+        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, (void *) &pEnumVariant );
+
+        if( s_nOleError == S_OK )
+        {
+           /*
+              Intentionally using Init instead of Clear, because we keep refernce to
+              this unknown, as per below.
+            */
+           VariantInit( &RetVal );
+
+           hb_retptr( pEnumVariant );
+        }
+        else
+        {
+           hb_ret();
+        }
+     }
+     else
+     {
+        OleThrowError();
+     }
+  }
+
+  //---------------------------------------------------------------------------//
   HB_FUNC_STATIC( TOLEAUTO_ONERROR )
   {
      IDispatch *pDisp;
@@ -1685,12 +1882,13 @@ RETURN xRet
 
     OleGetID :
 
+     /*
      if( strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "OLEVALUE" ) == 0 || strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "_OLEVALUE" ) == 0 )
      {
         DispID = ValueID;
         s_nOleError = S_OK;
      }
-     else if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
+     else*/ if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
         bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
@@ -1817,9 +2015,6 @@ RETURN xRet
      }
      else
      {
-        PHB_ITEM pReturn;
-        char *sDescription;
-
         // Try to apply the requested message to the DEFAULT Method of the object if any.
         if( OleGetValue( pDisp ) == S_OK )
         {
@@ -1828,37 +2023,7 @@ RETURN xRet
         }
 
         //TraceLog( NULL, "Invoke Failed!\n" );
-
-        hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
-        hb_vmPush( hb_stackSelfItem() );
-        hb_vmSend( 0 );
-
-        if( s_nOleError == DISP_E_EXCEPTION )
-        {
-           // Intentional to avoid report of memory leak if fatal error.
-           char *sTemp = WideToAnsi( excep.bstrDescription );
-           sDescription = (char *) malloc( strlen( sTemp ) + 1 );
-           strcpy( sDescription, sTemp );
-           hb_xfree( sTemp );
-        }
-        else
-        {
-           sDescription = Ole2TxtError();
-        }
-
-        //TraceLog( NULL, "Desc: '%s'\n", sDescription );
-
-        pReturn = hb_errRT_SubstParams( hb_parcx( -1 ), EG_OLEEXECPTION, (ULONG) s_nOleError, sDescription, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
-
-        if( s_nOleError == DISP_E_EXCEPTION )
-        {
-           free( (void *) sDescription );
-        }
-
-        if( pReturn )
-        {
-           hb_itemRelease( hb_itemReturn( pReturn ) );
-        }
+        OleThrowError();
      }
   }
 

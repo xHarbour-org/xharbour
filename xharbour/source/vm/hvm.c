@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.530 2005/11/08 17:59:24 ronpinkas Exp $
+ * $Id: hvm.c,v 1.531 2005/11/08 21:24:05 ronpinkas Exp $
  */
 
 /*
@@ -5917,8 +5917,22 @@ static void hb_vmArrayPop( HB_PCODE pcode )
 
    if( hb_objGetOpOver( pArray ) & HB_CLASS_OP_ARRAYINDEX )
    {
-      hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", pValue, 2, NULL );
-      hb_itemPushForward( &(HB_VM_STACK.Return ) );
+      if( pcode == HB_P_PLUS )
+      {
+         PHB_ITEM pElement = hb_itemNew( NULL );
+
+         hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", NULL, 0, pElement );
+         hb_vmPlus( pElement, pValue, pElement );
+
+         hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", pElement, 2, NULL );
+         hb_itemPushForward( &(HB_VM_STACK.Return ) );
+         hb_itemRelease( pElement );
+      }
+      else
+      {
+         hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", pValue, 2, NULL );
+         hb_itemPushForward( &(HB_VM_STACK.Return ) );
+      }
 
       return;
    }
