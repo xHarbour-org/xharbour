@@ -61,6 +61,8 @@
      METHOD Compile()
      METHOD Run( p1, p2, p3, p4, p5, p6, p7, p8, p9 )
      METHOD RunFile( cFile, aParams, cPPOExt, bBlanks ) INLINE PP_Run( cFile, aParams, cPPOExt, bBlanks )
+     METHOD SetStaticProcedures()                       INLINE s_aProcedures := ::aCompiledProcs
+
 
      METHOD GetLine( nLine )                            INLINE nLine -= ( ::nStartLine - 1 ), IIF( nLine > 0 .AND. nLine <= Len( ::acPPed ), ::acPPed[ nLine ], "" )
 
