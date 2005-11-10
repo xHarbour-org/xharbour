@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4598 2005/11/09 15:40:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4599 2005/11/09 20:12:37 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-10 03:46 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! check results of AdsGetIndexExpr() and AdsGetIndexCondition()
+      in DBORDERINFO() to avoid returning of random data when they fail
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * force to set 0 byte at the end of index key data to avoid any bad
+      interactions with future VM API modifications
+  * xharbour/source/vm/hvm.c
+    ! fixed bug I introduced in recent commit in bit manipulations
+      operators
+    ! fixed typo in HB_SAVEBLOCK()
 
 2005-11-09 12:11 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch

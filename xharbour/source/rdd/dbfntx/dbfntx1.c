@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.144 2005/11/07 01:02:55 druzus Exp $
+ * $Id: dbfntx1.c,v 1.145 2005/11/08 02:04:40 druzus Exp $
  */
 
 /*
@@ -358,7 +358,7 @@ static LPKEYINFO hb_ntxKeyNew( LPKEYINFO pKeyFrom, int keylen )
    }
    else
    {
-      *(pKey->key) = '\0';
+      pKey->key[ keylen ] = '\0';
       pKey->Tag = pKey->Xtra = 0;
    }
    return pKey;

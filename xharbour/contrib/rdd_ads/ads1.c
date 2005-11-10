@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.88 2005/10/26 21:38:32 jabrecer Exp $
+ * $Id: ads1.c,v 1.89 2005/10/29 06:42:03 druzus Exp $
  */
 
 /*
@@ -3379,19 +3379,24 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
    switch( uiIndex )
    {
       case DBOI_CONDITION:
-         if( hIndex )
+         if( hIndex && AdsGetIndexCondition( hIndex, aucBuffer, &u16len ) == AE_SUCCESS )
          {
-            AdsGetIndexCondition( hIndex, aucBuffer, &u16len );
+            hb_itemPutCL( pOrderInfo->itmResult, (char*) aucBuffer, u16len );
          }
-
-         hb_itemPutCL( pOrderInfo->itmResult, (char*)aucBuffer, u16len );
+         else
+         {
+            hb_itemPutC( pOrderInfo->itmResult, "" );
+         }
          break;
 
       case DBOI_EXPRESSION:
-         if( hIndex )
+         if( hIndex && AdsGetIndexExpr( hIndex, aucBuffer, &u16len) == AE_SUCCESS )
          {
-            AdsGetIndexExpr( hIndex, aucBuffer, &u16len);
             hb_itemPutCL( pOrderInfo->itmResult, ( char* ) aucBuffer, u16len );
+         }
+         else
+         {
+            hb_itemPutC( pOrderInfo->itmResult, "" );
          }
 
          break;

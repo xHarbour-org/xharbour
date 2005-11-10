@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.531 2005/11/08 21:24:05 ronpinkas Exp $
+ * $Id: hvm.c,v 1.532 2005/11/09 03:34:49 ronpinkas Exp $
  */
 
 /*
@@ -5320,16 +5320,16 @@ static void hb_vmBitAnd( void )
 
       if( ulLen1 && ulLen2 )
       {
-      char*  pString1 = pItem1->item.asString.value;
-      char*  pString2 = pItem2->item.asString.value;
-      ULONG  ulPos1, ulPos2;
+         char*  pString1 = pItem1->item.asString.value;
+         char*  pString2 = pItem2->item.asString.value;
+         ULONG  ulPos1, ulPos2;
 
          if( ! HB_IS_STRINGWR( pItem1 ) )
-      {
+         {
             pString1 = (char*) hb_xgrab( ulLen1 + 1 );
             hb_xmemcpy( (void*) pString1, (void*) pItem1->item.asString.value, ulLen1 );
             hb_itemPutCPtr( pItem1, pString1, ulLen1 );
-      }
+         }
 
          for( ulPos1 = ulPos2 = 0;  ulPos1 < ulLen1;  ulPos1++ )
          {
@@ -5350,21 +5350,20 @@ static void hb_vmBitAnd( void )
 
       if( ulLen )
       {
-      char   cVal = (char) hb_itemGetNL( pItem2 );
-      char*  pString = pItem1->item.asString.value;
+         char   cVal = (char) hb_itemGetNL( pItem2 );
+         char*  pString = pItem1->item.asString.value;
 
          if( ! HB_IS_STRINGWR( pItem1 ) )
-      {
+         {
             pString = (char*) hb_xgrab( ulLen + 1 );
             hb_xmemcpy( (void*) pString, (void*) pItem1->item.asString.value, ulLen + 1 );
             hb_itemPutCPtr( pItem1, pString, ulLen );
-      }
+         }
 
-         do
-      {
+         while( ulLen-- )
+         {
             pString[ulLen] &= cVal;
-      }
-         while( --ulLen );
+         }
       }
 
       hb_stackPop();
@@ -5468,11 +5467,10 @@ static void hb_vmBitOr( void )
             hb_itemPutCPtr( pItem1, pString, ulLen );
          }
 
-         do
+         while( ulLen-- )
          {
             pString[ulLen] |= cVal;
          }
-         while( --ulLen );
       }
 
       hb_stackPop();
@@ -5579,11 +5577,10 @@ static void hb_vmBitXor( void )
             hb_itemPutCPtr( pItem1, pString, ulLen );
          }
 
-         do
+         while( ulLen-- )
          {
             pString[ulLen] ^= cVal;
          }
-         while( --ulLen );
       }
 
       hb_stackPop();
@@ -9563,9 +9560,10 @@ HB_FUNC( HB_SAVEBLOCK )
 
    PHB_ITEM pBlock = hb_param( 1, HB_IT_BLOCK );
 
-   if ( pBlock )
+   if( pBlock )
    {
-      PSYMBOLS pModuleSymbols = pModuleSymbols ? hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
+      PSYMBOLS pModuleSymbols = pBlock->item.asBlock.value->pSymbols ?
+               hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
 
       hb_arrayNew( &( HB_VM_STACK.Return ), 3 );
 
