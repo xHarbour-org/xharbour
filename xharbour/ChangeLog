@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4599 2005/11/09 20:12:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4600 2005/11/10 02:49:46 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-11 01:52 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbf1.c
+    ! fixed updating FVP DBF header when structural index is created
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    ! fixed "V" fields support in FPT files
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    + added RT error if index open fails
 
 2005-11-10 03:46 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

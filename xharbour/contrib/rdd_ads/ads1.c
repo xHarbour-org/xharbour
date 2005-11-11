@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.89 2005/10/29 06:42:03 druzus Exp $
+ * $Id: ads1.c,v 1.90 2005/11/10 02:50:16 druzus Exp $
  */
 
 /*
@@ -3026,6 +3026,8 @@ static ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
                         ahIndex, &u16ArrayLen );
    if( u32RetVal != AE_SUCCESS && u32RetVal != AE_INDEX_ALREADY_OPEN )
    {
+      commonError( pArea, EG_OPEN, ( USHORT ) u32RetVal,
+                   ( char * ) hb_itemGetCPtr( pOrderInfo->atomBagName ), 0 );
       return FAILURE;
    }
    if( !pArea->hOrdCurrent )

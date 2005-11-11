@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.137 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dbf1.c,v 1.138 2005/11/07 01:02:54 druzus Exp $
  */
 
 /*
@@ -3952,7 +3952,7 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
          pArea->bMemoType  = DB_MEMO_NONE;
          pArea->bCryptType = DB_CRYPT_NONE;
 
-         pArea->fHasTags = pArea->dbfHeader.bHasTags & 0x01;
+         pArea->fHasTags = ( pArea->dbfHeader.bHasTags & 0x01 ) != 0;
 
          switch( pArea->dbfHeader.bVersion )
          {
@@ -3960,9 +3960,11 @@ static ERRCODE hb_dbfReadDBHeader( DBFAREAP pArea )
                pArea->fAutoInc = TRUE;
             case 0x30:
                pArea->bTableType = DB_DBF_VFP;
-               pArea->bMemoType = DB_MEMO_FPT;
                if( pArea->dbfHeader.bHasTags & 0x02 )
+               {
+                  pArea->bMemoType = DB_MEMO_FPT;
                   pArea->fHasMemo = TRUE;
+               }
                break;
 
             case 0x03:
@@ -4071,20 +4073,21 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    if( pArea->bTableType == DB_DBF_VFP )
    {
       pArea->dbfHeader.bVersion = ( pArea->fAutoInc ? 0x31 : 0x30 );
-      if( pArea->bMemoType == DB_MEMO_FPT )
+      if( pArea->fHasMemo && pArea->bMemoType == DB_MEMO_FPT )
          pArea->dbfHeader.bHasTags |= 0x02;
    }
    else 
    {
-      if( pArea->bMemoType == DB_MEMO_DBT )
-         pArea->dbfHeader.bVersion = 0x83;
-      else if( pArea->bMemoType == DB_MEMO_FPT )
-         pArea->dbfHeader.bVersion = 0xF5;
-      else if( pArea->bMemoType == DB_MEMO_SMT )
-         pArea->dbfHeader.bVersion = 0xE5;
-      else
-         pArea->dbfHeader.bVersion = 0x03;
-
+      pArea->dbfHeader.bVersion = 0x03;
+      if( pArea->fHasMemo )
+      {
+         if( pArea->bMemoType == DB_MEMO_DBT )
+            pArea->dbfHeader.bVersion = 0x83;
+         else if( pArea->bMemoType == DB_MEMO_FPT )
+            pArea->dbfHeader.bVersion = 0xF5;
+         else if( pArea->bMemoType == DB_MEMO_SMT )
+            pArea->dbfHeader.bVersion = 0xE5;
+      }
       if( pArea->fTableEncrypted && pArea->bCryptType == DB_CRYPT_SIX )
          pArea->dbfHeader.bVersion = ( pArea->dbfHeader.bVersion & 0xf0 ) | 0x06;
    }
