@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.5 2005/02/19 10:08:39 andijahja Exp $
+ * $Id: dispc.c,v 1.6 2005/05/16 21:45:24 andijahja Exp $
  */
 
 /*
@@ -904,18 +904,7 @@ HB_FUNC( FT_DISPFILE )
 static int keyin()
 {
     int ch;
-
-
-    ch = 0;
-    while ( ch == 0x00 )                   /* check to see if it's extended */
-    {
-        ch = hb_inkeyTranslate( hb_gtReadKey( ( HB_inkey_enum ) 0 ), ( HB_inkey_enum ) 0);
-        if (ch == 257)   /* error compiling with bcc55 */
-           ch = 27;      /* ESC with CapsLock ON = 257, with CapsLock OFF = 27 */
-        hb_idleState( 0 );
-    }
-
-
+    ch = hb_inkey( TRUE, 0.0, INKEY_ALL );
     return ( ch );
 }
 
