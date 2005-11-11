@@ -58,7 +58,7 @@
 FUNCTION FT_BLINK( cMsg, nRow, nCol )
 
   * Declare color restore var.
-  LOCAL cSavColor
+  LOCAL cSavColor, lBlinkStatus
 
   * Return if no msg.
   IF (cMsg == NIL) ; RETURN NIL; ENDIF
@@ -68,12 +68,15 @@ FUNCTION FT_BLINK( cMsg, nRow, nCol )
   nCol := IF( nCol == NIL, COL(), nCol )
 
   cSavColor := SETCOLOR()                // Save colors to restore on exit.
+  lBlinkStatus := SETBLINK( .T. )        // Save setblink
 
   * IF blink colors not already set, add blink to current foreground color.
+
   SETCOLOR( IF( ("*" $ LEFT(cSavColor,4)), cSavColor, "*" + cSavColor ) )
 
   @ nRow, nCol SAY cMsg                  // Say the dreaded blinking msg.
   SETCOLOR( cSavColor )                  // It's a wrap, restore colors & exit.
+  SETBLINK( lBlinkStatus )               // Restore setblink status
 
 RETURN NIL
 
