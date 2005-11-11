@@ -1,5 +1,5 @@
 /*
- * $Id: dispc.c,v 1.6 2005/05/16 21:45:24 andijahja Exp $
+ * $Id: dispc.c,v 1.7 2005/11/11 21:13:34 marceloanelli Exp $
  */
 
 /*
@@ -904,7 +904,7 @@ HB_FUNC( FT_DISPFILE )
 static int keyin()
 {
     int ch;
-    ch = hb_inkey( TRUE, 0.0, INKEY_ALL );
+    ch = hb_inkey( TRUE, 0.0, ( HB_inkey_enum ) INKEY_ALL );
     return ( ch );
 }
 
