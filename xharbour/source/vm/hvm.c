@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.532 2005/11/09 03:34:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.533 2005/11/10 02:50:18 druzus Exp $
  */
 
 /*
@@ -5710,18 +5710,42 @@ static void hb_vmArrayPush( void )
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
       ULONG ulPos;
-      HB_ITEM_NEW( hbElem );
+      PHB_ITEM pTemp;
 
-      if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
+      if( HB_IS_NUMBER( pIndex ) && hb_hashGetCompatibility( pArray ) )
       {
-         hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
-         return;
+         // Associative Array compatibility
+         LONG lPos = hb_itemGetNL( pIndex );
+         
+         if( lPos < 0 )
+         {
+            lPos += 1 + hb_hashLen( pArray );
+         }
+
+         ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
+         
+         if( ulPos == 0 )
+         {
+            hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+            return;
+         }
+      }
+      else
+      {
+         // Hash compatibility
+         if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
+         {
+            hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+            return;
+         }
       }
 
-      hb_hashGet( pArray, ulPos, &hbElem );
+      pTemp = hb_itemNew( NULL );
+      hb_hashGet( pArray, ulPos, pTemp );
 
       hb_stackPop();
-      hb_itemForwardValue( hb_stackItemFromTop( -1 ), &hbElem );
+      hb_itemForwardValue( hb_stackItemFromTop( -1 ), pTemp );
+      hb_itemRelease( pTemp );
       return;
    }
 
@@ -5936,16 +5960,48 @@ static void hb_vmArrayPop( HB_PCODE pcode )
 
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {
-      if( pcode == HB_P_PLUS )
-      {
-         ULONG ulPos;
-         PHB_ITEM pElem = hb_itemNew( NULL );
+      ULONG ulPos;
 
-         if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
+      if( HB_IS_NUMBER( pIndex ) && hb_hashGetCompatibility( pArray ) )
+      {
+         // Compatibilidad con Associative Array
+         LONG lPos = hb_itemGetNL( pIndex );
+         
+         if( lPos < 0 )
+         {
+            lPos += 1 + hb_hashLen( pArray );
+         }
+
+         ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
+         
+         if( ulPos == 0 )
          {
             hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
             return;
          }
+      }
+      else
+      {
+         if( pcode == HB_P_PLUS )
+         {
+            PHB_ITEM pElem = hb_itemNew( NULL );
+
+            if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
+            {
+               hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+               return;
+            }
+         }
+         else
+         {
+            hb_hashAdd( pArray, ULONG_MAX, pIndex, pValue );
+            goto ArrayPop_Finalization;
+         }
+      }
+
+      if( pcode == HB_P_PLUS )
+      {
+         PHB_ITEM pElem = hb_itemNew( NULL );
 
          hb_hashGetForward( pArray, ulPos, pElem );
 
@@ -5957,8 +6013,10 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       }
       else
       {
-         hb_hashAdd( pArray, ULONG_MAX, pIndex, pValue );
+         hb_hashSet( pArray, ulPos, pValue );
       }
+
+   ArrayPop_Finalization:
 
       hb_stackPop();
       hb_stackPop();

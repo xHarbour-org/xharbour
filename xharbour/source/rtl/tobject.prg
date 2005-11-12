@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.16 2005/05/27 22:19:54 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.17 2005/05/28 05:36:18 ronpinkas Exp $
  */
 
 /*
@@ -179,10 +179,13 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode, aArgs )
 RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOMETHOD, nCode, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
 
 FUNCTION TAssociativeArray( ... )
+   LOCAL hHash
 
    IF PCount() == 0
       TraceLog( "Warning! TAssociativeArray() has been superceded by Hash(). Please correct your sources." )
-      RETURN Hash()
+      hHash := Hash()
+      HSetAACompatibility( hHash, .T. )
+      RETURN hHash
    ENDIF
 
 RETURN Throw( ErrorNew( "TObject", 0, 1001, ProcName(), "No longer supported, please use Hash().", HB_aParams() ) )

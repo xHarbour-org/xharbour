@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.42 2005/10/24 01:04:37 druzus Exp $
+ * $Id: hash.c,v 1.43 2005/11/03 07:32:51 ronpinkas Exp $
  */
 
 /*
@@ -258,21 +258,25 @@ static BOOL hb_hashSurfaceScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulReturn )
 
 static void hb_calcTotalLenght( PHB_BASEHASH pBase )
 {
-   ULONG ulTot = 0;
-   ULONG ulPosLoop;
 
    if ( pBase->uiLevel == 0 )
    {
       pBase->ulTotalLen = pBase->ulLen;
       return;
    }
-
-   for( ulPosLoop = 0; ulPosLoop < pBase->ulLen; ulPosLoop ++ )
+   else
    {
-      ulTot += ( pBase->pValues + ulPosLoop )->item.asHash.value->ulTotalLen;
-   }
+      PHB_ITEM pValues = pBase->pValues;
+      ULONG ulTot = 0;
+      ULONG ulPosLoop  = pBase->ulLen + 1;
+      
+      for( ; --ulPosLoop; pValues++ )
+      {
+         ulTot += pValues->item.asHash.value->ulTotalLen;
+      }
 
-   pBase->ulTotalLen = ulTot;
+      pBase->ulTotalLen = ulTot;
+   }
 }
 
 /*****************************************************
@@ -305,6 +309,9 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
 
    pBaseHash->pKeys = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
    pBaseHash->pValues = (PHB_ITEM) hb_xgrab( sizeof( HB_ITEM ) * HB_HASH_ALLOC_BLOCK );
+
+   // Associative Array compatibility
+   pBaseHash->pAccessAA = NULL;
 
    for( ulPosLoop = 0; ulPosLoop < HB_HASH_ALLOC_BLOCK; ulPosLoop++ )
    {
@@ -593,6 +600,14 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
             ( pBaseHash->pKeys + ulPosLoop )->type = HB_IT_NIL;
             ( pBaseHash->pValues + ulPosLoop )->type = HB_IT_NIL;
          }
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+            /* Do not need initialization the position is initialized when a new value is added in a Hash
+               is not possible to access to not initialized values ( >ulLen ) */
+         }
       }
 
       // find the point where I have to insert the data.
@@ -602,6 +617,12 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
          hb_itemCopy( pBaseHash->pKeys, pKey );
          pBaseHash->pValues->type = HB_IT_NIL;
          hb_itemCopy( pBaseHash->pValues, pValue );
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            (*pBaseHash->pAccessAA) = 1;
+         }
       }
       else
       {
@@ -637,6 +658,26 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
          pPos = pBaseHash->pKeys + ( ulPos - 1 );
          pPos->type = HB_IT_NIL;
          hb_itemCopy( pPos, pKey );
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            ULONG *pulPos;
+            ULONG ulAccessLen;
+            
+            ulAccessLen = pBaseHash->ulLen - 1;
+            
+            *(pBaseHash->pAccessAA + ulAccessLen) = ulPos; // - 1;ulpos
+
+            // to number the values grater or equal than a position.
+            for( pulPos = pBaseHash->pAccessAA, ulLen = ulAccessLen; ulLen > 0 ; ulLen--, pulPos++ )
+            {
+               if( *pulPos >= ulPos )
+               {
+                  (*pulPos)++;
+               }
+            }
+         }
       }
 
       return TRUE;
@@ -745,6 +786,14 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
             ( pBaseHash->pKeys + ulPosLoop )->type = HB_IT_NIL;
             ( pBaseHash->pValues + ulPosLoop )->type = HB_IT_NIL;
          }
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+            /* Do not need initialization the position is initialized when a new value is added in a Hash
+               is not possible to access to not initialized values ( >ulLen ) */
+         }
       }
 
       // find the point where I have to insert the data.
@@ -754,6 +803,12 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
          hb_itemForwardValue( pBaseHash->pKeys, pKey );
          pBaseHash->pValues->type = HB_IT_NIL;
          hb_itemForwardValue( pBaseHash->pValues, pValue );
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            (*pBaseHash->pAccessAA) = 1;
+         }
       }
       else
       {
@@ -789,6 +844,26 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
          pPos = pBaseHash->pKeys + ( ulPos - 1 );
          pPos->type = HB_IT_NIL;
          hb_itemForwardValue( pPos, pKey );
+
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            ULONG *pulPos;
+            ULONG ulAccessLen;
+            
+            ulAccessLen = pBaseHash->ulLen - 1;
+
+            *(pBaseHash->pAccessAA + ulAccessLen) = ulPos; // - 1;ulpos
+
+            // to number the values grater or equal than a position.
+            for( pulPos = pBaseHash->pAccessAA, ulLen = ulAccessLen; ulLen > 0 ; ulLen--, pulPos++ )
+            {
+               if( *pulPos >= ulPos )
+               {
+                  (*pulPos)++;
+               }
+            }
+         }
       }
 
       return TRUE;
@@ -908,6 +983,40 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
          hb_itemClear( pBaseHash->pValues + ( ulPos - 1 ) );
          hb_itemClear( pBaseHash->pKeys + ( ulPos - 1 ) );
 
+         // Associative Array compatibility
+         if( pBaseHash->pAccessAA )
+         {
+            ULONG *pulPos;
+            BOOL bSearch;
+            ULONG ulAccessLen;
+            ULONG ulFor;
+
+            ulAccessLen = pBaseHash->ulLen - 1;
+
+            bSearch = TRUE;
+            for( pulPos = pBaseHash->pAccessAA, ulFor = ulAccessLen; ulFor ; ulFor--, pulPos++ )
+            {
+               if( bSearch )
+               {
+                  if( *pulPos == ulPos )
+                  {
+                     bSearch = FALSE;
+                     *pulPos = *( pulPos + 1 );
+                  }
+               }
+               else
+               {
+                  *pulPos = *( pulPos + 1 );
+               }
+        
+            // to number the values grater than a position.
+               if( *pulPos > ulPos )
+               {
+                  (*pulPos)--;
+               }
+            }
+         }
+
          if ( ulLen > 1 ) // if ulLen == 1 just set ulLen to 0.
          {
             memcpy( pBaseHash->pKeys + ( ulPos - 1 ), pBaseHash->pKeys + ulPos, sizeof( HB_ITEM ) * ( ulLen - ulPos ) );
@@ -993,6 +1102,14 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
                   ( pBaseHash->pKeys + ulPosLoop )->type = HB_IT_NIL;
                   ( pBaseHash->pValues + ulPosLoop )->type = HB_IT_NIL;
                }
+
+               // Associative Array compatibility
+               if( pBaseHash->pAccessAA )
+               {
+                  pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * pBaseHash->ulAllocated );
+                  /* Do not need initialization the position is initialized when a new value is added in a Hash
+                     is not possible to access to not initialized values ( >ulLen ) */
+               }
             }
          }
 
@@ -1004,19 +1121,6 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
    }
 
    return FALSE;
-}
-
-ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash )
-{
-   ULONG ulLen = 0;
-   HB_TRACE(HB_TR_DEBUG, ("hb_hashLen(%p)", pHash));
-
-   if( HB_IS_HASH( pHash ) )
-   {
-      ulLen = pHash->item.asHash.value->ulTotalLen;
-   }
-
-   return ulLen;
 }
 
 
@@ -1305,6 +1409,14 @@ void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulNewLen )
          ( pBaseHash->pValues + ulPosLoop )->type = HB_IT_NIL;
       }
 
+      // Associative Array compatibility
+      if( pBaseHash->pAccessAA )
+      {
+         pBaseHash->pAccessAA = ( ULONG * ) hb_xrealloc( pBaseHash->pAccessAA, sizeof( ULONG ) * ulNewLen );
+         /* Do not need initialization the position is initialized when a new value is added in a Hash
+            is not possible to access to not initialized values ( >ulLen ) */
+      }
+
       pBaseHash->ulAllocated = ulNewLen;
    }
 }
@@ -1342,19 +1454,31 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
 
    hb_hashPreallocate( pDest, pSrcBase->ulAllocated );
 
+   // Associative Array compatibility
+   if( pSrcBase->pAccessAA )
+   {
+      pDestBase->pAccessAA = (ULONG *) hb_xgrab( sizeof( ULONG ) * pDestBase->ulAllocated );
+   }
+   
    for( ulCount = 0; ulCount < ulLen; ulCount++, pKey++, pVal++ )
    {
       hb_itemCopy( pDestBase->pKeys + ulCount, pKey );
       hb_itemCopy( pDestBase->pValues + ulCount, pVal );
    }
 
-   pDestBase->ulLen = ulLen;
+   // Associative Array compatibility
+   if( pDestBase->pAccessAA )
+   {
+      memcpy( pDestBase->pAccessAA, pSrcBase->pAccessAA, sizeof( ULONG ) * pSrcBase->ulAllocated );
+   }
+
+   pDestBase->ulLen      = ulLen;
    pDestBase->ulTotalLen = pSrcBase->ulTotalLen;
    pDestBase->ulPageSize = pSrcBase->ulPageSize;
-   pDestBase->uiLevel = pSrcBase->uiLevel;
-   pDestBase->fOrder = pSrcBase->fOrder;
-   pDestBase->bCase = pSrcBase->bCase;
-   pDestBase->bAutoAdd = pSrcBase->bAutoAdd;
+   pDestBase->uiLevel    = pSrcBase->uiLevel;
+   pDestBase->fOrder     = pSrcBase->fOrder;
+   pDestBase->bCase      = pSrcBase->bCase;
+   pDestBase->bAutoAdd   = pSrcBase->bAutoAdd;
 
    return pDest;
 }
@@ -1553,6 +1677,39 @@ void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource, ULONG ulStart, UL
    }
 }
 
+BOOL HB_EXPORT hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent )
+{
+   if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->uiLevel == 0 && hb_hashLen( pHash ) == 0 )
+   {
+      PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
+      
+      if( bCompatAA )
+      {
+         if( ! pBaseHash->pAccessAA )
+         {
+            pBaseHash->pAccessAA = (ULONG *) hb_xgrab( sizeof( ULONG ) * pBaseHash->ulAllocated );
+         }
+         return TRUE;
+      }
+      else
+      {
+         if( pBaseHash->pAccessAA )
+         {
+            hb_xfree( pBaseHash->pAccessAA );
+            pBaseHash->pAccessAA = NULL;
+         }
+         return TRUE;
+      }
+   }
+   else if( !bSilent )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETAACOMPATIBILITY", 2,
+           hb_paramError( 1 ), hb_paramError( 2 ));
+   }
+   return FALSE;
+}
+
+
 void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
 {
    HB_TRACE( HB_TR_DEBUG, ( "hb_hashReleaseBase( %p )", pBaseHash ) );
@@ -1609,6 +1766,13 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
       HB_TRACE( HB_TR_INFO, ( "Release pValues %p", pBaseHash->pValues ) );
       hb_xfree( pBaseHash->pValues );
       pBaseHash->pValues = NULL;
+
+      // Associative Array compatibility      
+      if( pBaseHash->pAccessAA )
+      {
+         hb_xfree( pBaseHash->pAccessAA );
+         pBaseHash->pAccessAA = NULL;
+      }
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseHash %p", pBaseHash ) );
@@ -1684,6 +1848,13 @@ HB_GARBAGE_FUNC( hb_hashReleaseGarbage )
       HB_TRACE( HB_TR_INFO, ( "Release pValues %p", pBaseHash->pValues ) );
       hb_xfree( pBaseHash->pValues );
       pBaseHash->pValues = NULL;
+
+      // Associative Array compatibility
+      if( pBaseHash->pAccessAA )
+      {
+         hb_xfree( pBaseHash->pAccessAA );
+         pBaseHash->pAccessAA = NULL;
+      }
    }
 
    HB_TRACE( HB_TR_INFO, ( "Release pBaseHash %p", pBaseHash ) );
@@ -1921,7 +2092,7 @@ HB_FUNC( HGETPOS )
    if ( pHash == NULL || pKey == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
-         "HGET", 2, hb_paramError(1), hb_paramError( 2 ) );
+         "HGETPOS", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
    }
 
@@ -1932,6 +2103,43 @@ HB_FUNC( HGETPOS )
    else
    {
       hb_retnl( ulPos );
+   }
+}
+
+HB_FUNC( HAAGETPOS )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pKey = hb_param( 2, HB_IT_STRING | HB_IT_DATE | HB_IT_NUMERIC );
+   ULONG ulPos, ui;
+   ULONG * pAccess;
+
+   if ( pHash == NULL || pKey == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL,
+         "HGETAAPOS", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   if( ! hb_hashScan( pHash, pKey, &ulPos ) )
+   {
+      hb_retnl( 0 );
+   }
+   else
+   {
+      ui = pHash->item.asHash.value->ulTotalLen - 1;
+      pAccess = pHash->item.asHash.value->pAccessAA + ui;
+      
+      do
+      {
+         if( *( pAccess ) == ulPos )
+         {
+            break;
+         }
+         pAccess--;
+      }
+      while( ui-- > 0 );
+      
+      hb_retnl( ui + 1 );
    }
 }
 
@@ -2056,13 +2264,42 @@ HB_FUNC( HGETKEYAT )
    hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetKeyAt(pHash, ulPos ) );
 }
 
+HB_FUNC( HAAGETKEYAT )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
+   ULONG ulPos;
+
+   if( pHash == NULL || pPos == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HAAGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   if( ! pHash->item.asHash.value->pAccessAA )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, "Is not a Hash with Associative Array compatibility", "HAAGETKEYAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   ulPos = hb_itemGetNL( pPos );
+
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash ) )
+   {
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HAAGETKEYAT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
+
+   hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetKeyAt(pHash, *(pHash->item.asHash.value->pAccessAA + ulPos - 1 ) ) );
+}
+
 HB_FUNC( HGETVALUEAT )
 {
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
    ULONG ulPos;
 
-   if ( pHash == NULL || pPos == NULL )
+   if( pHash == NULL || pPos == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
       return;
@@ -2070,13 +2307,42 @@ HB_FUNC( HGETVALUEAT )
 
    ulPos = hb_itemGetNL( pPos );
 
-   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HGETVALUEAT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
    hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetValueAt(pHash, ulPos ) );
+}
+
+HB_FUNC( HAAGETVALUEAT )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
+   ULONG ulPos;
+
+   if( pHash == NULL || pPos == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HAAGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   if( ! pHash->item.asHash.value->pAccessAA )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, "Is not a Hash with Associative Array compatibility", "HAAGETVALUEAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   ulPos = hb_itemGetNL( pPos );
+
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash ) )
+   {
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HAAGETVALUEAT", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
+
+   hb_itemCopy ( &HB_VM_STACK.Return, hb_hashGetValueAt(pHash, *(pHash->item.asHash.value->pAccessAA + ulPos - 1 ) ) );
 }
 
 HB_FUNC( HSETVALUEAT )
@@ -2087,7 +2353,7 @@ HB_FUNC( HSETVALUEAT )
    PHB_ITEM pItem;
    ULONG ulPos;
 
-   if ( pHash == NULL || pPos == NULL || pValue == NULL )
+   if( pHash == NULL || pPos == NULL || pValue == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
@@ -2095,13 +2361,47 @@ HB_FUNC( HSETVALUEAT )
 
    ulPos = hb_itemGetNL( pPos );
 
-   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HSETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
 
    pItem = hb_hashGetValueAt( pHash, ulPos );
+   hb_itemCopy( pItem, pValue );
+}
+
+HB_FUNC( HAASETVALUEAT )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pPos = hb_param( 2, HB_IT_NUMERIC );
+   PHB_ITEM pValue = hb_param( 3, HB_IT_ANY );
+   PHB_ITEM pItem;
+   ULONG ulPos;
+
+   if( pHash == NULL || pPos == NULL || pValue == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HAASETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+      return;
+   }
+
+   if( ! pHash->item.asHash.value->pAccessAA )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, "Is not a Hash with Associative Array compatibility", "HAASETVALUEAT", 3, hb_paramError(1), hb_paramError( 2 ), hb_paramError(3) );
+      return;
+   }
+
+   ulPos = hb_itemGetNL( pPos );
+
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash ) )
+   {
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HAASETVALUEAT", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+      return;
+   }
+
+   pItem = hb_hashGetValueAt( pHash, *( pHash->item.asHash.value->pAccessAA + ulPos - 1 ) );
+   
+   
    hb_itemCopy( pItem, pValue );
 }
 
@@ -2114,7 +2414,7 @@ HB_FUNC( HGETPAIRAT )
 
    ULONG ulPos;
 
-   if ( pHash == NULL || pPos == NULL )
+   if( pHash == NULL || pPos == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETPAIRAT", 4, hb_paramError(1), hb_paramError( 2 ), hb_paramError(3), hb_paramError( 4 ) );
       return;
@@ -2122,7 +2422,7 @@ HB_FUNC( HGETPAIRAT )
 
    ulPos = hb_itemGetNL( pPos );
 
-   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETPAIRAT", 4, hb_paramError(1), hb_paramError( 2 ), hb_paramError(3), hb_paramError( 4 ) );
       return;
@@ -2134,7 +2434,7 @@ HB_FUNC( HGETPAIRAT )
 
    ArrRet.type = HB_IT_NIL;
 
-   if ( pKey == NULL || pValue == NULL )
+   if( pKey == NULL || pValue == NULL )
    {
       hb_arrayNew( &ArrRet, 2 );
 
@@ -2155,14 +2455,14 @@ HB_FUNC( HDELAT )
    PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
    ULONG ulPos;
 
-   if ( pHash == NULL || pKey == NULL )
+   if( pHash == NULL || pKey == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HDELAT", 2, hb_paramError(1), hb_paramError(2));
       return;
    }
    ulPos = hb_itemGetNL( pKey );
 
-   if ( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
    {
       hb_errRT_BASE( EG_BOUND, 1187, NULL, "HDELAT", 2, hb_paramError(1), hb_paramError(2) );
       return;
@@ -2171,6 +2471,34 @@ HB_FUNC( HDELAT )
    hb_hashRemove( pHash, ulPos );
 }
 
+HB_FUNC( HAADELAT )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pKey = hb_param( 2, HB_IT_NUMERIC );
+   ULONG ulPos;
+
+   if( pHash == NULL || pKey == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HAADELAT", 2, hb_paramError(1), hb_paramError(2));
+      return;
+   }
+
+   if( ! pHash->item.asHash.value->pAccessAA )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, "Is not a Hash with Associative Array compatibility", "HAADELAT", 2, hb_paramError(1), hb_paramError( 2 ) );
+      return;
+   }
+
+   ulPos = hb_itemGetNL( pKey );
+
+   if( ulPos < 1 || ulPos > hb_hashLen( pHash )  )
+   {
+      hb_errRT_BASE( EG_BOUND, 1187, NULL, "HAADELAT", 2, hb_paramError(1), hb_paramError(2) );
+      return;
+   }
+
+   hb_hashRemove( pHash, *( pHash->item.asHash.value->pAccessAA + ulPos - 1 ) );
+}
 
 /**************************************************************
 * Keys/values arrays
@@ -2180,7 +2508,7 @@ HB_FUNC( HGETKEYS )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    HB_ITEM Keys;
 
-   if ( pHash == NULL  )
+   if( pHash == NULL )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETKEYS", 1, hb_paramError(1) );
       return;
@@ -2197,7 +2525,7 @@ HB_FUNC( HGETVALUES )
    PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
    HB_ITEM Values;
 
-   if ( pHash == NULL  )
+   if( pHash == NULL  )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVALUES", 1, hb_paramError(1) );
       return;
@@ -2206,6 +2534,35 @@ HB_FUNC( HGETVALUES )
    Values.type = HB_IT_NIL;
    hb_hashGetValues(&Values, pHash );
    hb_itemForwardValue( &HB_VM_STACK.Return, &Values );
+}
+
+HB_FUNC( HGETVAAPOS )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   HB_ITEM Arr, Pos;
+   PHB_BASEHASH pBaseHash;
+   ULONG ulLen, ulPosLoop;
+   
+   if( pHash == NULL  )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVAAPOS", 1, hb_paramError(1) );
+      return;
+   }
+
+   Arr.type = HB_IT_NIL;
+   Pos.type = HB_IT_NIL;
+   
+   pBaseHash = pHash->item.asHash.value;
+   
+   ulLen = pBaseHash->ulLen;
+   hb_arrayNew( &Arr, ulLen );
+
+   for( ulPosLoop = 1 ; ulPosLoop <= ulLen; ulPosLoop++ )
+   {
+      hb_itemPutNL( &Pos, *(pBaseHash->pAccessAA + ulPosLoop - 1) );
+      hb_arraySetForward( &Arr, ulPosLoop, &Pos );
+   }
+   hb_itemForwardValue( &HB_VM_STACK.Return, &Arr );
 }
 
 /***********************************************************
@@ -2219,25 +2576,26 @@ HB_FUNC( HFILL )
    PHB_ITEM pV;
    ULONG ulPosLoop, ulLen;
 
-   if ( pHash == NULL || pVal == NULL  )
+   if( pHash == NULL || pVal == NULL  )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HFILL", 2, hb_paramError(1), hb_paramError(2) );
       return;
    }
 
-   if ( pHash->item.asHash.value->uiLevel == 0 )
+   if( pHash->item.asHash.value->uiLevel == 0 )
    {
       pV = pHash->item.asHash.value->pValues;
-      ulLen = pHash->item.asHash.value->ulLen;
+      ulLen = pHash->item.asHash.value->ulLen + 1;
 
-      for ( ulPosLoop = 1 ; ulPosLoop <= ulLen; ulPosLoop ++, pV++ )
+      while( --ulLen )
       {
-         hb_itemCopy( pV, pVal );
+         hb_itemCopy( pV++, pVal );
       }
    }
    else
    {
-      for ( ulPosLoop = 1; ulPosLoop <= hb_hashLen( pHash ); ulPosLoop ++ )
+      ulLen = hb_hashLen( pHash );
+      for( ulPosLoop = 1; ulPosLoop <= ulLen; ulPosLoop ++ )
       {
          hb_itemCopy( hb_hashGetValueAt( pHash, ulPosLoop ), pVal );
       }
@@ -2416,8 +2774,8 @@ HB_FUNC( HGETCASEMATCH )
 
    if( ! pHash )
    {
-         hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETCASEMATCH", 2,
-            hb_paramError( 1 ), hb_paramError( 2 ));
+         hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETCASEMATCH", 1,
+            hb_paramError( 1 ));
    }
    else
    {
@@ -2481,6 +2839,14 @@ HB_FUNC( HSETPARTITION )
    if( hb_hashLen( pHash ) > 0 )
    {
       hb_errRT_BASE( EG_ARG, 2017, "Can't change partitioning in a non-empty hash",
+            "HSETPARTITION", 3,
+            hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
+      return;
+   }
+
+   if( pHash->item.asHash.value->pAccessAA )
+   {
+      hb_errRT_BASE( EG_ARG, 2017, "Can't set partitioning in a hash with associative array compatibility",
             "HSETPARTITION", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ));
       return;
@@ -2579,3 +2945,91 @@ HB_FUNC( HALLOCATE )
    hb_paramError( 1 ), hb_paramError( 2 ));
 
 }
+
+HB_FUNC( HSETAACOMPATIBILITY )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+   PHB_ITEM pSet  = hb_param( 2, HB_IT_LOGICAL );
+
+   if( pHash && pSet )
+   {
+      hb_retl( hb_hashSetAACompatibility( pHash, hb_itemGetL( pSet ), FALSE ) );
+   }
+   else   
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETAACOMPATIBILITY", 2,
+           hb_paramError( 1 ), hb_paramError( 2 ));
+   }
+}
+
+HB_FUNC( HGETAACOMPATIBILITY )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+
+   if( pHash )
+   {
+      hb_retl( pHash->item.asHash.value->pAccessAA != NULL );
+   }
+   else   
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETAACOMPATIBILITY", 1,
+           hb_paramError( 1 ));
+   }
+}
+
+HB_FUNC( HAAGETREALPOS )
+{
+   PHB_ITEM pHash = hb_param( 1, HB_IT_HASH );
+
+   if( pHash )
+   {
+      hb_retnl( hb_hashAAGetRealPos( pHash, (ULONG) hb_parnl( 2 ) ) );
+   }
+   else   
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HAAGETREALPOS", 1,
+           hb_paramError( 1 ));
+   }
+}
+
+HB_EXTERN_BEGIN
+
+#undef hb_hashAAGetRealPos
+ULONG HB_EXPORT hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos )
+{
+   if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->pAccessAA &&
+       ulPos && ulPos <= hb_hashLen( pHash ) )
+   {
+      return *(pHash->item.asHash.value->pAccessAA + ulPos - 1 );
+   }
+   return 0;
+}
+
+#undef hb_hashLen
+ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash )
+{
+   ULONG ulLen = 0;
+   HB_TRACE(HB_TR_DEBUG, ("hb_hashLen(%p)", pHash));
+
+   if( HB_IS_HASH( pHash ) )
+   {
+      ulLen = pHash->item.asHash.value->ulTotalLen;
+   }
+
+   return ulLen;
+}
+
+#undef hb_hashGetCompatibility
+BOOL HB_EXPORT hb_hashGetCompatibility( PHB_ITEM pHash )
+{
+   if( pHash && HB_IS_HASH( pHash ) )
+   {
+      if( pHash->item.asHash.value->pAccessAA )
+      {
+         return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+HB_EXTERN_END

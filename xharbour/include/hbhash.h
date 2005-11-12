@@ -1,5 +1,5 @@
 /*
- * $Id: hbhash.h,v 1.1.1.1 2001/12/21 10:47:20 ronpinkas Exp $
+ * $Id: hbhash.h,v 1.2 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ typedef struct HB_HASH_TABLE_
    ULONG ulUsed;                /* number of used slots */
    HB_HASH_FUNC_PTR pKeyFunc;   /* pointer to func that returns key value */
    HB_HASH_FUNC_PTR pDeleteItemFunc; /* ptr to func that deletes value stured in the table */
-   HB_HASH_FUNC_PTR pCompFunc;       /* ptr to func that compares two itmes */
+   HB_HASH_FUNC_PTR pCompFunc;       /* ptr to func that compares two items */
 } HB_HASH_TABLE, *HB_HASH_TABLE_PTR;
 
 extern HB_HASH_TABLE_PTR hb_hashTableCreate( ULONG ulSize, 

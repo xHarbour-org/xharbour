@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.43 2005/10/31 03:51:36 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.44 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -264,6 +264,7 @@
       USHORT   uiLevel;      /* Pagination depth level */
       ULONG    ulTotalLen;   /* Total lenght in paged hashes */
       ULONG    ulPageSize;   /* Maximum size allowed per page */
+      ULONG *  pAccessAA;    /* Associative Array pointer */
    } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
    /* internal structure for codeblocks */
