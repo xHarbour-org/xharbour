@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.95 2005/11/09 03:48:20 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.96 2005/11/12 09:46:27 ronpinkas Exp $
  */
 
 /*
@@ -1852,9 +1852,9 @@ RETURN Self
 
      if( s_nOleError == S_OK )
      {
-        IEnumVARIANT *pEnumVariant = NULL;
+        LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
-        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, (void **) &pEnumVariant );
+        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
 
         if( s_nOleError == S_OK )
         {

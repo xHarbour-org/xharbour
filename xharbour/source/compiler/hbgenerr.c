@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.20 2005/03/10 23:19:39 andijahja Exp $
+ * $Id: hbgenerr.c,v 1.21 2005/03/30 21:30:00 andijahja Exp $
  */
 
 /*
@@ -147,22 +147,22 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
 
    if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
    {
-      printf( "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+      fprintf( hb_comp_errFile, "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
    }
 
-   printf( "Error %c%04i  ", cPrefix, iError );
+   fprintf( hb_comp_errFile, "Error %c%04i  ", cPrefix, iError );
 
    if( cPrefix == 'F' && iError == HB_PP_ERR_UNKNOWN_RESULTMARKER )
    {
       /* AJ: Some compilers performs [f]printf("<%s>",string) incorrecltly */
-      printf( "Unknown result marker %s%s%s in #directive", "<", szError1, ">" );
+      fprintf( hb_comp_errFile, "Unknown result marker %s%s%s in #directive", "<", szError1, ">" );
    }
    else
    {
-      printf( szErrors[ iError - 1 ], szError1, szError2 );
+      fprintf( hb_comp_errFile, szErrors[ iError - 1 ], szError1, szError2 );
    }
 
-   printf( "\n" );
+   fprintf( hb_comp_errFile, "\n" );
 
    hb_comp_iErrorCount++;
    hb_comp_bError = TRUE;
@@ -183,12 +183,12 @@ void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const c
    {
       if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
       {
-         printf( "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+         fprintf( hb_comp_errFile, "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
       }
 
-      printf( "Warning %c%04i  ", cPrefix, iWarning );
-      printf( szText + 1, szWarning1, szWarning2 );
-      printf( "\n" );
+      fprintf( hb_comp_errFile, "Warning %c%04i  ", cPrefix, iWarning );
+      fprintf( hb_comp_errFile, szText + 1, szWarning1, szWarning2 );
+      fprintf( hb_comp_errFile, "\n" );
 
       hb_comp_bAnyWarning = TRUE;    /* report warnings at exit */
    }

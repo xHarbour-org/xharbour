@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.12 2005/01/11 23:53:43 likewolf Exp $
+ * $Id: gencobj.c,v 1.13 2005/03/31 14:34:04 andijahja Exp $
  */
 
 /*
@@ -104,7 +104,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
       yyc = fopen( pszCfg, "rt" );
       if( ! yyc )
       {
-         printf( "\nError: Can't open %s file.\n", pszCfg );
+         fprintf( hb_comp_errFile, "\nError: Can't open %s file.\n", pszCfg );
          return;
       }
 
@@ -245,7 +245,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
          }
          else
          {
-            printf( "Failed to execute: \"%s\"\n", szCommandLine );
+            fprintf( hb_comp_errFile, "Failed to execute: \"%s\"\n", szCommandLine );
          }
       }
 
@@ -268,7 +268,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    }
    else
    {
-      printf( "Error: No compiler defined in %s\n", HB_CFG_FILENAME );
+      fprintf( hb_comp_errFile, "Error: No compiler defined in %s\n", HB_CFG_FILENAME );
    }
 
    if( pszCfg )

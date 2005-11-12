@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.54 2005/10/19 02:18:54 druzus Exp $
+ * $Id: extend.c,v 1.55 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -104,7 +104,7 @@ PHB_ITEM HB_EXPORT hb_param( int iParam, LONG lMask )
       {
          pItem = hb_itemUnRef( pItem );
 
-         if( lMask == HB_IT_BYREF )
+         if( ( HB_TYPE ) lMask == HB_IT_BYREF )
          {
             return pItem;
          }

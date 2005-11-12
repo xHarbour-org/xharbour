@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.38 2005/10/29 06:42:17 druzus Exp $
+ * $Id: hbcomp.h,v 1.39 2005/10/31 12:56:35 druzus Exp $
  */
 
 /*
@@ -558,6 +558,9 @@ extern short          hb_comp_iGlobals;
 /* PreProcessor Tracing support. */
 extern BOOL           hb_comp_bTracePP;
 extern FILE           *hb_comp_PPTrace;
+
+/* error messages output */
+extern FILE           *hb_comp_errFile;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.39 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.40 2005/11/03 06:55:29 ronpinkas Exp $
  */
 
 /*
@@ -513,7 +513,7 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
       }
       else
       {
-         printf( "--- Invalid opcode %i in hb_compPCodeEval() ---\n", opcode );
+         fprintf( hb_comp_errFile, "--- Invalid opcode %i in hb_compPCodeEval() ---\n", opcode );
          ++ulPos;
       }
    }
@@ -3164,7 +3164,7 @@ void hb_compStrongType( int iSize )
        /* TODO Error Message after finalizing all possible pcodes. */
        if( pFunc->iStackIndex < 1 )
        {
-          printf( "Oops - Stack: %i\n", pFunc->iStackIndex );
+          fprintf( hb_comp_errFile, "Oops - Stack: %i\n", pFunc->iStackIndex );
           break;
        }
 
@@ -3570,7 +3570,7 @@ void hb_compStrongType( int iSize )
    /* TODO Error or trace messages when completed. */
    if( pFunc->iStackIndex < 0 )
    {
-      printf( "\nStrongType Stack underflow!\n" );
+      fprintf( hb_comp_errFile, "\nStrongType Stack underflow!\n" );
       pFunc->iStackIndex = 0;
    }
 #endif

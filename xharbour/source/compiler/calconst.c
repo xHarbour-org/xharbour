@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.7 2004/11/01 21:36:46 druzus Exp $
+ * $Id: calconst.c,v 1.8 2005/03/31 14:34:03 andijahja Exp $
  */
 
 /*
@@ -43,7 +43,6 @@ char * NextTokenInConstant( char **sExp );
 static int Precedence( PBIOP Exp );
 static double Reduce( PBIOP Exp );
 double CalcConstant( char **pExp );
-
 #define VALUE( sToken ) ( (sToken)[0] == '0' && (sToken)[1] == 'x' ? (double) strtol( sToken, NULL, 0 ) : atof( sToken ) )
 
 #ifdef STAND_ALONE

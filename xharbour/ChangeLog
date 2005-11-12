@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4606 2005/11/12 09:46:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4607 2005/11/12 16:25:51 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-12 19:46 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbcomp.h
+  * xharbour/source/compiler/calconst.c
+  * xharbour/source/compiler/gencobj.c
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/hbgenerr.c
+  * xharbour/source/compiler/hbpcode.c
+    * emit warning and error messages to stderr instead of stdout
+      Now it's enabled only for *nix platforms. I left the decision
+      about non unix platforms to developers which use them.
+      Personally I will want to add it for MinGW and DJGPP when xharbour
+      compiler is run from shell environment.
+
+  * xharbour/source/rtl/win32ole.prg
+  * xharbour/source/vm/extend.c
+    * casting
 
 2005-11-12 12:17 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/calendar.prg

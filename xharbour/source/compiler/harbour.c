@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.112 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: harbour.c,v 1.113 2005/10/29 06:42:35 druzus Exp $
  */
 
 /*
@@ -203,6 +203,8 @@ int            hb_comp_iJumpOptimize = 1;
 char *         hb_comp_szDeclaredFun = NULL;
 char *         hb_Command_Line;	 /* Switches to be documented in generated C file */
 
+FILE *         hb_comp_errFile = NULL;
+
 BOOL           hb_comp_bAutoOpen = TRUE;
 BOOL           hb_comp_bError = FALSE;
 USHORT         hb_comp_cInlineID = 0;
@@ -301,6 +303,11 @@ int main( int argc, char * argv[] )
    ArgV = (char **) argv;
 
    hb_comp_pOutPath = NULL;
+#if defined( HOST_OS_UNIX_COMPATIBLE )
+   hb_comp_errFile = stderr;
+#else 
+   hb_comp_errFile = stdout;
+#endif
 
    /* Activate Harbour extensions by default. */
    hb_comp_Supported  = HB_COMPFLAG_HARBOUR;
@@ -558,7 +565,7 @@ void hb_conOutErr( const char * pStr, ULONG ulLen )
 {
    HB_SYMBOL_UNUSED( ulLen );
 
-   printf( pStr );
+   fprintf( hb_comp_errFile, pStr );
 }
 
 char * hb_conNewLine( void )
@@ -748,7 +755,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    // STATIC vars can not be declared in an Extebded Codeblock <|...| ...>.
    if( hb_comp_functions.iCount > 1 && hb_comp_functions.pLast->szName == NULL && hb_comp_iVarScope == VS_STATIC )
    {
-      printf( "%i Proc: %s\n", hb_comp_functions.iCount, hb_comp_functions.pLast->szName );
+      fprintf( hb_comp_errFile, "%i Proc: %s\n", hb_comp_functions.iCount, hb_comp_functions.pLast->szName );
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FOLLOWS_EXEC, "STATIC", NULL );
    }
 
@@ -5377,7 +5384,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
          }
          else
          {
-            printf( "Cannot open input file: %s\n", szFileName );
+            fprintf( hb_comp_errFile, "Cannot open input file: %s\n", szFileName );
 
             /* printf( "No code generated\n" ); */
             iStatus = EXIT_FAILURE;
@@ -5580,7 +5587,7 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
          }
          else
          {
-            printf( "Cannot open %s, assumed external\n", szFileName );
+            fprintf( hb_comp_errFile, "Cannot open %s, assumed external\n", szFileName );
          }
       }
    }
@@ -5673,7 +5680,7 @@ static int hb_compProcessRSPFile( char* szRspName, int argc, char * argv[] )
 
    if ( !inFile )
    {
-      printf( "Cannot open input file: %s\n", szRspName );
+      fprintf( hb_comp_errFile, "Cannot open input file: %s\n", szRspName );
       iStatus = EXIT_FAILURE;
    }
    else
