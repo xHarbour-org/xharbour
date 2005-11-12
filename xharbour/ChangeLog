@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4609 2005/11/12 20:27:11 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4610 2005/11/12 20:50:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-12 13:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbdefs.h
+    * Moved #include "hbtrace.h" to bottom to follw definitions required by hbtrace.h
+
+    /* I beg to have a #include manager ASAP */
 
 2005-11-12 12:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbtrace.h

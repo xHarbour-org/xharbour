@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.77 2005/10/11 13:40:17 druzus Exp $
+ * $Id: hbdefs.h,v 1.78 2005/10/19 02:18:54 druzus Exp $
  */
 
 /*
@@ -64,7 +64,6 @@
 #endif
 
 #include "hbsetup.h"
-#include "hbtrace.h"
 
 /*
 #define HB_CLIPPER_INT_ITEMS
@@ -1164,5 +1163,8 @@ typedef BYTE HB_ATTR;
 
 #define HB_CHAR_SOFT1           ( ( char ) 141 )
 #define HB_CHAR_SOFT2           ( ( char ) HB_CHAR_LF )
+
+// UGLY hack
+#include "hbtrace.h"
 
 #endif /* HB_DEFS_H_ */
