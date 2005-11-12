@@ -20,7 +20,6 @@
 #define KEY_ELEM 1
 #define BLK_ELEM 2
 
-STATIC nWait := 0.2
 
 function Main()
   LOCAL var0, nstart, nstop, nelapsed, nCtr
@@ -47,9 +46,8 @@ function Main()
   ? " FT_RESTARR()     Restore a Clipper array from a disc file"
   ? " FT_SAVEARR()     Save Clipper array to a disc file."
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_ADDITION example
@@ -89,12 +87,11 @@ function Main()
   ?
   release aList, aList2
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
-  // FT_AAVG example
+  // FT_ADDITION example
   //
   aSubTotals := { 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2 }
   setcolor ('w+/b')
@@ -120,13 +117,13 @@ function Main()
   ?
   release aSubTotals
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_ADESSORT example
   //
+  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADESSORT"
@@ -134,34 +131,28 @@ function Main()
   ?
   ?
   ? "aNames : "
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   AEVAL( aNames, { |x| QQOUT( x + ",") } )
   ?
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ADESSORT( aNames )
   ? PADR("FT_ADESSORT( aNames ) ->", 30)
   AEVAL( var0, { |x| QQOUT(x + ",") } )
   ?
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ADESSORT( aNames, 3 )
   ? PADR("FT_ADESSORT( aNames, 3 ) ->", 30)
   AEVAL( var0, { |x| QQOUT(x + ",") } )
   ?
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ADESSORT( aNames, , 3 )
   ? PADR("FT_ADESSORT( aNames, , 3 ) ->", 30)
   AEVAL( var0, { |x| QQOUT(x + ",") } )
   ?
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ADESSORT( aNames, 2, 5 )
   ? PADR("FT_ADESSORT( aNames, 2, 5 ) ->", 30)
   AEVAL( var0, { |x| QQOUT(x + ",") } )
   ?
   release aNames
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_AEMAXLEN example
@@ -194,9 +185,8 @@ function Main()
   ?
   release myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_AEMINLEN example
@@ -229,9 +219,8 @@ function Main()
   ?
   release myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_AEMEDIAN example
@@ -267,15 +256,13 @@ function Main()
   ?
   release myarray0, myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_ANOMATCHES example
   //
   setcolor ('w+/b')
-  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ANOMATCHES"
   ? "อออออออออออออออออออออออออออออออออออออออออออออ"
@@ -284,25 +271,28 @@ function Main()
   ? "myarray0 = DIRECTORY()"
   ?
   ? "aNames : "
+  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   AEVAL( aNames, { |x| QQOUT( x + ",") } )
   ?
+  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ANOMATCHES( aNames, { |x| at( 'a', x ) > 0 } )
   ? PADR('FT_ANOMATCHES( aNames, { |x| at( "a", x ) > 0 } ) ->',60)
   ?? var0
   ?
+  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ANOMATCHES( aNames, { |x| at( 'an', x ) > 0 } )
   ? PADR('FT_ANOMATCHES( aNames, { |x| at( "an", x ) > 0 } ) ->',60)
   ?? var0
   ?
+  aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   var0 := FT_ANOMATCHES( aNames, { |x| at( 'an', x ) > 0 }, 1, 3 )
   ? PADR('FT_ANOMATCHES( aNames, { |x| at( "an", x ) > 0 }, 1, 3 ) ->',60)
   ?? var0
   ?
   release aNames
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_AREDIT example
@@ -338,9 +328,8 @@ function Main()
   ? "Return Value   :", cRet
   ? "Lastkey() = ESC:", LASTKEY() == K_ESC
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_ASUM example
@@ -369,9 +358,8 @@ function Main()
   ?
   release aSubTotals
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_RESTARR AND FT_SAVEARR example
@@ -404,9 +392,8 @@ function Main()
   ENDIF
   release aArray, aSave, nErrorCode
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_CALENDAR example
@@ -431,9 +418,8 @@ function Main()
   @ 16, 10 SAY 'Day         :'+aRet[6]
   @ 17, 10 SAY 'Julian Day  :'+str(aRet[7],3,0)
   @ 18, 10 SAY 'Current Time:'+aRet[8]
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 
   //
   // FT_DISPFILE example
@@ -448,9 +434,8 @@ function Main()
   cKey := FT_DISPFILE()
   FT_DFCLOSE()
   @ 23, 10 SAY "Key that terminated FT_DISPFILE() was: " + '[' + cKey + ']'
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+  FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
   inkey(0)
-  FT_BLINKW32CANCEL()
 RETURN( NIL )
 
 FUNCTION TestGet( b, ar, nDim, nElem)
