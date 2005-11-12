@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4603 2005/11/11 21:36:24 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4604 2005/11/11 23:53:41 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-12 04:09 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! clear order conditions after indexing
+  * xharbour/source/rdd/dbf1.c
+    * make BOF/EOF flag updating exactly the same as in Clipper
+      in dbSkip(0) when we are at phantom record.
 
 2005-11-11 19:47 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/blink.prg

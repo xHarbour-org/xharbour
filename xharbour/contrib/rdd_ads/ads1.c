@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.90 2005/11/10 02:50:16 druzus Exp $
+ * $Id: ads1.c,v 1.91 2005/11/11 01:08:08 druzus Exp $
  */
 
 /*
@@ -3165,6 +3165,7 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    UNSIGNED16 u16 = 0;
    UNSIGNED8  pucWhile[ ( ADS_MAX_KEY_LENGTH << 1 ) + 3 ];
    UNSIGNED16 u16Len = ADS_MAX_KEY_LENGTH;
+   BOOL fClose = TRUE;
 
    HB_TRACE(HB_TR_DEBUG, ("adsOrderCreate(%p, %p)", pArea, pOrderInfo));
 
@@ -3176,6 +3177,11 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
                                     !pArea->lpdbOrdCondInfo->fAdditive ) )
    {
       SELF_ORDLSTCLEAR( ( AREAP ) pArea );
+      fClose = FALSE;
+   }
+   else if( pArea->lpdbOrdCondInfo->fAdditive )
+   {
+      fClose = FALSE;
    }
 
    if( !pOrderInfo->abBagName || *(pOrderInfo->abBagName) == '\0' )
@@ -3265,8 +3271,11 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    u32RetVal = AdsCreateIndex( hTableOrIndex, pOrderInfo->abBagName,
            pOrderInfo->atomBagName, (UNSIGNED8*)hb_itemGetCPtr( pExprItem ),
-           ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->abFor ) ? (UNSIGNED8*)pArea->lpdbOrdCondInfo->abFor : (UNSIGNED8*)"",
+           ( pArea->lpdbOrdCondInfo && pArea->lpdbOrdCondInfo->abFor ) ?
+           (UNSIGNED8*)pArea->lpdbOrdCondInfo->abFor : (UNSIGNED8*) "",
            pucWhile, u32Options, &hIndex);
+
+   SELF_ORDSETCOND( ( AREAP ) pArea, NULL );
 
    if( u32RetVal != AE_SUCCESS )
    {
@@ -3278,17 +3287,16 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
       pArea->hOrdCurrent = hIndex;
    }
 
-   if( pArea->lpdbOrdCondInfo && !pArea->lpdbOrdCondInfo->fAll &&
-                                 !pArea->lpdbOrdCondInfo->fAdditive )
+   if( fClose )
    {
       ADSHANDLE ahIndex[50];
       UNSIGNED16 pusArrayLen = 50;
 
-      SELF_ORDLSTCLEAR( ( AREAP ) pArea );
       u32RetVal = AdsOpenIndex( pArea->hTable,
-        (UNSIGNED8*) pOrderInfo->abBagName, ahIndex, &pusArrayLen );
+                     (UNSIGNED8*) pOrderInfo->abBagName, ahIndex, &pusArrayLen );
       if( u32RetVal != AE_SUCCESS  && u32RetVal != AE_INDEX_ALREADY_OPEN )
       {
+         SELF_ORDSETCOND( ( AREAP ) pArea, NULL );
          return FAILURE;
       }
       pArea->hOrdCurrent = ahIndex[0];

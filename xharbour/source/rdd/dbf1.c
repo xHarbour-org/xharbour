@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.138 2005/11/07 01:02:54 druzus Exp $
+ * $Id: dbf1.c,v 1.139 2005/11/11 01:08:08 druzus Exp $
  */
 
 /*
@@ -239,7 +239,7 @@ static BOOL hb_dbfReadRecord( DBFAREAP pArea )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfReadRecord(%p)", pArea));
 
-   if( pArea->fEof )
+   if( !pArea->fPositioned )
    {
       pArea->fValidBuffer = TRUE;
       return TRUE;
@@ -1059,24 +1059,17 @@ static ERRCODE hb_dbfSkipRaw( DBFAREAP pArea, LONG lToSkip )
 
    if( lToSkip == 0 )
    {
-      if( pArea->fPositioned )
-      {
-         BOOL bBof, bEof;
+      BOOL bBof, bEof;
 
-         /* Save flags */
-         bBof = pArea->fBof;
-         bEof = pArea->fEof;
+      /* Save flags */
+      bBof = pArea->fBof;
+      bEof = pArea->fEof;
 
-         uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
+      uiError = SELF_GOTO( ( AREAP ) pArea, pArea->ulRecNo );
 
-         /* Restore flags */
-         pArea->fBof = bBof;
-         pArea->fEof = bEof;
-      }
-      else
-      {
-         uiError = SUCCESS;
-      }
+      /* Restore flags */
+      pArea->fBof = bBof;
+      pArea->fEof = bEof;
    }
    else if( lToSkip < 0 && ( ULONG ) ( -lToSkip ) >= pArea->ulRecNo )
    {
