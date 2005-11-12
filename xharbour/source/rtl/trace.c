@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.16 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: trace.c,v 1.17 2004/04/28 18:30:40 druzus Exp $
  */
 
 /*
@@ -92,7 +92,7 @@ void hb_traceExit( void )
 
 }
 
-void TraceLog( const char * sFile, const char * sTraceMsg, ... )
+HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 {
    FILE *hFile;
 

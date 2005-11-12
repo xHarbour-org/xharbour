@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.96 2005/11/12 09:46:27 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.97 2005/11/12 18:47:30 druzus Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ RETURN TOleAuto():GetActiveObject( cString )
    static HRESULT  s_nOleError;
    static HB_ITEM  OleAuto;
 
-   static PHB_DYNS s_pSym_OleAuto;
+   static PHB_DYNS s_pSym_TOleAuto;
    static PHB_DYNS s_pSym_hObj;
    static PHB_DYNS s_pSym_New;
    static PHB_DYNS s_pSym_cClassName;
@@ -138,7 +138,7 @@ INIT PROC HB_OLEINIT
    {
       s_nOleError = OleInitialize( NULL );
 
-      s_pSym_OleAuto     = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_TOleAuto     = hb_dynsymFindName( "TOLEAUTO" );
       s_pSym_New         = hb_dynsymFindName( "NEW" );
       s_pSym_hObj        = hb_dynsymFindName( "HOBJ" );
       s_pSym_cClassName  = hb_dynsymFindName( "CCLASSNAME" );
@@ -1082,9 +1082,9 @@ RETURN Self
 
                    OleAuto.type = HB_IT_NIL;
 
-                   if( s_pSym_OleAuto )
+                   if( s_pSym_TOleAuto )
                    {
-                      hb_vmPushSymbol( s_pSym_OleAuto->pSymbol );
+                      hb_vmPushSymbol( s_pSym_TOleAuto->pSymbol );
                       hb_vmPushNil();
                       hb_vmDo( 0 );
 
@@ -1253,7 +1253,7 @@ RETURN Self
 
            pOleAuto = hb_itemNew( NULL );
 
-           hb_vmPushSymbol( s_pSym_OleAuto->pSymbol );
+           hb_vmPushSymbol( s_pSym_TOleAuto->pSymbol );
            hb_vmPushNil();
            hb_vmDo( 0 );
 
