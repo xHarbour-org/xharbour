@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.12 2003/09/03 12:51:36 paultucker Exp $
+ * $Id: hbtrace.h,v 1.13 2003/11/30 12:32:30 druzus Exp $
  */
 
 /*
@@ -59,7 +59,7 @@ HB_EXTERN_BEGIN
 
 extern void hb_traceInit( void );
 extern void hb_traceExit( void );
-extern void TraceLog( const char * sFile, const char * sTraceMsg, ... );
+extern HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... );
 
 /*
  * Tracing levels.

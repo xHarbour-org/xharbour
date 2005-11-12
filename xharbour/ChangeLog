@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4608 2005/11/12 18:47:25 druzus Exp $
+ * $Id: ChangeLog,v 1.4609 2005/11/12 20:27:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,10 @@
 */
 
 2005-11-12 12:26 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbtrace.h
   * source/rtl/trace.c
     * Exported TraceLog()
+
   * source/rtl/win32ole.prg
     * Minor rename
 
