@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4604 2005/11/11 23:53:41 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.4605 2005/11/12 03:35:54 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-12 01:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    + Added support for returning Arrays of any supported type
 
 2005-11-12 04:09 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c
