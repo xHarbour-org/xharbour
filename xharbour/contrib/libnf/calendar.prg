@@ -121,6 +121,7 @@ FUNCTION FT_CALENDAR (nRow, nCol, cColor, lShadow, lShowHelp)
  LOCAL  nJump :=0, nKey :=0, cSavColor, cSaveScreen, cSaveCursor
  LOCAL  aRetVal[8]
  LOCAL  nHelpRow, cSaveHelp, lHelpIsDisplayed :=.F.
+ LOCAL  nDay1, nDay2, dDate
 
  nRow    := IIF ( nRow <> NIL, nRow, 1 )           //check display row
  nCol    := IIF ( nCol <> NIL, nCol, 63)           //check display col
@@ -154,16 +155,28 @@ FUNCTION FT_CALENDAR (nRow, nCol, cColor, lShadow, lShowHelp)
        nJump = nJump + 1
 
     CASE nKey == K_UP
-       nJump = nJump - 30
+       nDay1  := Day( DATE() + nJump )
+       nDay2  := Day( DATE() + nJump - 30 )
+       nDay1  := nDay2 - nDay1
+       nJump = nJump - 30 - nDay1
 
     CASE nKey == K_DOWN
-       nJump = nJump + 30
+       nDay1  := Day( DATE() + nJump )
+       nDay2  := Day( DATE() + nJump + 30 )
+       nDay1  := nDay2 - nDay1
+       nJump = nJump + 30 - nDay1
 
     CASE nKey == K_PGUP
-       nJump = nJump - 365
+       nDay1  := Day( DATE() + nJump )
+       nDay2  := Day( DATE() + nJump - 365 )
+       nDay1  := nDay2 - nDay1
+       nJump = nJump - 365 - nDay1
 
     CASE nKey == K_PGDN
-       nJump = nJump + 365
+       nDay1  := Day( DATE() + nJump )
+       nDay2  := Day( DATE() + nJump + 365 )
+       nDay1  := nDay2 - nDay1
+       nJump = nJump + 365 - nDay1
 
     CASE nKey == K_RIGHT
        nJump = nJump - 7

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4605 2005/11/12 03:35:54 druzus Exp $
+ * $Id: ChangeLog,v 1.4606 2005/11/12 09:46:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-12 12:17 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/calendar.prg
+    + fixed month next, month previous, year next and year previous
+      navigation to real date valuea instead of -30, +30, -365 and
+      +365 days fixed jump to obtain correct navigation skips.
+  * contrib/libnf/blink.prg
+    + Added two functions for simulate blink on OS where is not present:
+      FT_BLINKW32( <Message>, <Row>, <Col>, <Blink Time> )
+        Display a blinking message on Row, Col at blinkt time. Only one
+        blink message for now.
+      FT_BLINKW32CANCEL()
+        Cancel previous set blinking message
+
+  * contrib/libnf/samples/libnf.prg
+    + Demo and test program added for FT_ADESSORT(), FT_AEMAXLEN(),
+      FT_AEMINLEN(), FT_AMEDIAN(), FT_ANOMATCHES() and FT_AREDIT()
 
 2005-11-12 01:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

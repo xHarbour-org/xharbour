@@ -49,6 +49,9 @@
  *  $END$
  */
 
+STATIC cxMsg, nxRow, nxCol, nxTask
+STATIC tAnterior, lDoit, nxWait
+
 #ifdef FT_TEST
   FUNCTION MAIN()
      FT_BLINK( "WAIT", 5, 10 )
@@ -80,3 +83,49 @@ FUNCTION FT_BLINK( cMsg, nRow, nCol )
 
 RETURN NIL
 
+FUNCTION FT_BLINKW32( cMsg, nRow, nCol, nWait )
+
+  * Return if no msg.
+  IF (cMsg == NIL) ; RETURN NIL; ENDIF
+
+  * Set default row and col to current.
+  nRow      := IIF( nRow == NIL, ROW(), nRow )
+  nCol      := IIF( nCol == NIL, COL(), nCol )
+
+  nxWait    := IIF( nWait == NIL, 1, nWait )
+  cxMsg     := cMsg
+  nxRow     := nRow
+  nxCol     := nCol
+  tAnterior := NIL
+  lDoit     := NIL
+  nxTask := HB_IDLEADD( {|| FT_BLINKW32IT() } )
+RETURN NIL
+
+FUNCTION FT_BLINKW32CANCEL()
+  HB_IDLEDEL( nxTask )
+RETURN NIL
+
+FUNCTION FT_BLINKW32IT()
+  LOCAL cSavColor, lBlinkStatus
+
+  tAnterior := IIF( tAnterior == NIL, SECONDS(), tAnterior )
+  lDoit     := IIF( lDoit == NIL, .F., lDoit )
+  IF SECONDS() < tAnterior    // Hemos pasado la medianoche
+    tAnterior := SECONDS()
+  ENDIF
+  IF SECONDS() - tAnterior > nxWait
+    tAnterior := SECONDS()
+    cSavColor    := SETCOLOR()
+    lBlinkStatus := SETBLINK( .T. )
+    SETCOLOR( IF( ("*" $ LEFT(cSavColor,4)), cSavColor, "*" + cSavColor ) )
+    IF lDoit
+      @ nxRow, nxCol SAY SPACE( LEN( cxMsg ) )
+      lDoit := .F.
+    ELSE
+      @ nxRow, nxCol SAY cxMsg
+      lDoit := .T.
+    ENDIF
+    SETCOLOR( cSavColor )
+    SETBLINK( lBlinkStatus )
+  ENDIF
+RETURN NIL
