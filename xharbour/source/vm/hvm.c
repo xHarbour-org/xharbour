@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.534 2005/11/12 22:49:31 walito Exp $
+ * $Id: hvm.c,v 1.535 2005/11/13 06:20:05 walito Exp $
  */
 
 /*
@@ -1562,22 +1562,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             break;
 
          case HB_P_FOREACH:
+         {
+            PHB_ITEM pEnumeration = &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] );
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FOREACH") );
 
-            hb_itemForwardValue( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_stackItemFromTop( -1 ) );
+            hb_itemForwardValue( pEnumeration, hb_stackItemFromTop( -1 ) );
             hb_stackPop();
 
-            if( hb_objGetOpOver( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) ) & HB_CLASS_OP_FOREACH )
+            if( hb_objGetOpOver( pEnumeration ) & HB_CLASS_OP_FOREACH )
             {
                HB_ITEM_NEW( ForEachOp );
 
                hb_itemPutNI( &ForEachOp, FOREACH_BEGIN );
 
-               hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), &ForEachOp, "__OPFOREACH", NULL, 0, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+               hb_vmOperatorCall( pEnumeration, &ForEachOp, "__OPFOREACH", NULL, 0, pEnumeration );
             }
-            else if( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_ARRAY && hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ].type != HB_IT_STRING )
+            else if( HB_IS_ARRAY( pEnumeration ) || HB_IS_STRING( pEnumeration ) )
             {
-               hb_errRT_BASE( EG_ARG, 1602, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
+                // No prep needed.
+            }
+            else if( HB_IS_HASH( pEnumeration ) && hb_hashGetCompatibility( pEnumeration ) )
+            {
+                // No prep needed.
+            }
+            else
+            {
+               hb_errRT_BASE( EG_ARG, 1602, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pEnumeration, hb_itemPutNI( * HB_VM_STACK.pPos, 1 ) );
             }
 
             hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] = hb_itemUnRef( hb_stackItemFromTop( -1 ) );
@@ -1592,30 +1603,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                while( hb_vm_wEnumCollectionCounter )
                {
                   hb_vm_wEnumCollectionCounter--;
-                  hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+                  hb_itemClear( pEnumeration );
                   hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
                }
             }
 
             w++;
             break;
+         }
 
          case HB_P_ENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
 
             if( hb_vm_wEnumCollectionCounter )
             {
-               ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ];
+               PHB_ITEM pEnumeration = &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] );
+               PHB_ITEM pEnumerator  = hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ];
+               ULONG ulEnumIndex     = ++hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ];
 
-               if( hb_objGetOpOver( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ) ) & HB_CLASS_OP_FOREACH )
+               if( hb_objGetOpOver( pEnumeration ) & HB_CLASS_OP_FOREACH )
                {
                   HB_ITEM_NEW( ForEachOp );
                   HB_ITEM_NEW( ForEachIndex );
 
                   hb_itemPutNI( &ForEachOp, FOREACH_ENUMERATE );
-                  hb_itemPutNL( &ForEachIndex, hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ] );
+                  hb_itemPutNL( &ForEachIndex, ulEnumIndex );
 
-                  hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ), &ForEachOp, "__OPFOREACH", &ForEachIndex, 0, hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] );
+                  hb_vmOperatorCall( pEnumeration, &ForEachOp, "__OPFOREACH", &ForEachIndex, 0, pEnumerator );
 
                   if( s_uiActionRequest == HB_BREAK_REQUESTED )
                   {
@@ -1627,15 +1641,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      hb_vmPushLogical( TRUE );
                   }
                }
+               else if( HB_IS_ARRAY( pEnumeration ) || HB_IS_STRING( pEnumeration ) )
+               {
+                  hb_vmPushLogical( hb_arrayGetByRef( pEnumeration, ulEnumIndex, pEnumerator ) );
+               }
+               else if( HB_IS_HASH( pEnumeration ) && hb_hashGetCompatibility( pEnumeration ) )
+               {
+                  ulEnumIndex = hb_hashAAGetRealPos( pEnumeration, ulEnumIndex );
+
+                  if( ulEnumIndex )
+                  {
+                     hb_hashGet( pEnumeration, ulEnumIndex, pEnumerator );
+                     hb_vmPushLogical( TRUE );
+                  }
+                  else
+                  {
+                     hb_vmPushLogical( FALSE );
+                  }
+               }
                else
                {
-                  hb_vmPushLogical( hb_arrayGetByRef( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter - 1 ] ),
-                                                      hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter - 1 ],
-                                                      hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter - 1 ] ) );
+                  // Should never get here!
+                  hb_vmPushLogical( FALSE );
                }
             }
             else
             {
+               // Should never get here!
                hb_vmPushLogical( FALSE );
             }
 
@@ -5716,14 +5748,14 @@ static void hb_vmArrayPush( void )
       {
          // Associative Array compatibility
          LONG lPos = hb_itemGetNL( pIndex );
-         
+
          if( lPos < 0 )
          {
             lPos += 1 + hb_hashLen( pArray );
          }
 
          ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
-         
+
          if( ulPos == 0 )
          {
             hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
@@ -5966,14 +5998,14 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       {
          // Compatibilidad con Associative Array
          LONG lPos = hb_itemGetNL( pIndex );
-         
+
          if( lPos < 0 )
          {
             lPos += 1 + hb_hashLen( pArray );
          }
 
          ulPos = hb_hashAAGetRealPos( pArray, (ULONG) lPos );
-         
+
          if( ulPos == 0 )
          {
             hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
