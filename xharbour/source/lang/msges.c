@@ -1,5 +1,5 @@
 /*
- * $Id: msges.c,v 1.10 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: msges.c,v 1.11 2005/06/10 22:51:36 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Espa¤ol",                   /* Name (in native language) */
       "ES",                        /* RFC ID */
       "850",                       /* Codepage */
-      "$Revision: 1.10 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
+      "$Revision: 1.11 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
 
       /* Month names */
 
@@ -188,10 +188,10 @@ static HB_LANG s_lang =
       "Desbordamiento negativo en la Pila",
       "Un item estaba siendo copiado sobre s¡ mismo desde %s",
       "S¡mbolo item no v lido pasado como memvar %s",
-      "Memory buffer overflow",
-      "hb_xgrab requested to allocate zero bytes",
-      "hb_xrealloc requested to resize to zero bytes",
-      "hb_xalloc requested to allocate zero bytes",
+      "Desbordamiento de buffer de memoria",
+      "hb_xgrab requiri¢ apartar cero bytes",
+      "hb_xrealloc requiri¢ redimensionar a cero bytes",
+      "hb_xalloc requiri¢ apartar cero bytes",
 
       /* Texts */
 

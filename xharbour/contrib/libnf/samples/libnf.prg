@@ -5,6 +5,8 @@
    LIBNF.PRG
 
    Simplest demo program to show usage for libnf
+   
+   NOTE: for xHarbour define is_xharbour and undefine it for clipper
 
 */
 
@@ -26,30 +28,44 @@ function Main()
   LOCAL var0, nstart, nstop, nelapsed, nCtr
   local aRet[8], i
   LOCAL ar[3, 26], aBlocks[3], aHeadings[3], nElem := 1, bGetFunc, cRet
+  //
+  // Local task
+  //
+  #ifdef is_xharbour
+    REQUEST HB_LANG_ES
+	  HB_LANGSELECT("ES")
+    MyLanguage := HB_LANGSELECT()
+    //ALERT( "Language ID: " + MyLanguage )
+  #endif
 
   //
-  // First group of routines
+  // Array group of routines
   //
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF ARRAY FUNCTIONS FROM LIBNF"
   ? "อออออออออออออออออออออออออออออออออออออออออออ"
   ?
-  ? " FT_AADDITION()   Add elements unique of source array to target array"
-  ? " FT_AAVG()        Average numeric values in an array"
-  ? " FT_ADESSORT()    Sort an array in descending order"
-  ? " FT_AEMAXLEN()    Find longest element within an array"
-  ? " FT_AEMINLEN()    Find shortest element within an array"
-  ? " FT_AMEDIAN()     Find middle value in array, or average of two middle values"
-  ? " FT_ANOMATCHES()  Find the number of array elements meeting a condition"
-  ? " FT_AREDIT()      2 dimensional array editing function using TBrowse"
-  ? " FT_ASUM()        Sum the elements of an array"
-  ? " FT_RESTARR()     Restore a Clipper array from a disc file"
-  ? " FT_SAVEARR()     Save Clipper array to a disc file."
+  ? "FT_AADDITION()   Add elements unique of source array to target array"
+  ? "FT_AAVG()        Average numeric values in an array"
+  ? "FT_ADESSORT()    Sort an array in descending order"
+  ? "FT_AEMAXLEN()    Find longest element within an array"
+  ? "FT_AEMINLEN()    Find shortest element within an array"
+  ? "FT_AMEDIAN()     Find middle value in array, or average of two middle values"
+  ? "FT_ANOMATCHES()  Find the number of array elements meeting a condition"
+  ? "FT_AREDIT()      2 dimensional array editing function using TBrowse"
+  ? "FT_ASUM()        Sum the elements of an array"
+  ? "FT_RESTARR()     Restore a Clipper array from a disc file"
+  ? "FT_SAVEARR()     Save Clipper array to a disc file."
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_ADDITION example
@@ -89,9 +105,14 @@ function Main()
   ?
   release aList, aList2
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_AAVG example
@@ -120,9 +141,14 @@ function Main()
   ?
   release aSubTotals
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_ADESSORT example
@@ -159,9 +185,14 @@ function Main()
   ?
   release aNames
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_AEMAXLEN example
@@ -194,9 +225,14 @@ function Main()
   ?
   release myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_AEMINLEN example
@@ -229,9 +265,14 @@ function Main()
   ?
   release myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_AEMEDIAN example
@@ -267,9 +308,14 @@ function Main()
   ?
   release myarray0, myarray1
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_ANOMATCHES example
@@ -300,9 +346,14 @@ function Main()
   ?
   release aNames
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_AREDIT example
@@ -338,9 +389,14 @@ function Main()
   ? "Return Value   :", cRet
   ? "Lastkey() = ESC:", LASTKEY() == K_ESC
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_ASUM example
@@ -369,9 +425,14 @@ function Main()
   ?
   release aSubTotals
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_RESTARR AND FT_SAVEARR example
@@ -404,9 +465,180 @@ function Main()
   ENDIF
   release aArray, aSave, nErrorCode
 
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // Conversion group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF CONVERSION FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_BYT2BIT()     Convert byte to string of 1's and 0's"
+  ? "FT_BYT2HEX()     Convert byte to hexadecimal version of its binary value"
+  ? "FT_D2E()         Convert decimal to scientific notation"
+  ? "FT_DEC2BIN()     Convert decimal to binary"
+  ? "FT_E2D()         Convert scientific notation string to a decimal"
+  ? "FT_ESCCODE()     Convert Lotus style escape codes"
+  ? "FT_HEX2DEC()     Convert a hex number to decimal"
+  ? "FT_INVCLR()      Get the inverse of a color"
+  ? "FT_NTOW()        Translate numeric value to words"
+  ? "FT_SQZN()        Compress a numeric value into a character string"
+  ? "FT_STOD()        Convert a date string to a Clipper date data type"
+  ? "FT_UNSQZN()      Uncompress a numeric compressed by FT_SQZN()"
+  ? "FT_XTOY()        Convert from any data type to any other data type"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_BYT2BIT() example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BYT2BIT()"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ?
+  var0 := FT_BYT2BIT( 'a' )
+  ? PADR("FT_BYT2BIT( 'a' ) ->", 44) + var0
+  ?
+  var0 := FT_BYT2BIT( 'mac' )
+  ? PADR("FT_BYT2BIT( 'mac' )", 44) + var0
+  ?
+  var0 := FT_BYT2BIT( 'A' )
+  ? PADR("FT_BYT2BIT( 'A' ) ->", 44) + var0
+  ?
+  var0 := FT_BYT2BIT( 'C' )
+  ? PADR("FT_BYT2BIT( 'C' ) ->", 44) + var0
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // DOS / BIOS group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF DOS/BIOS FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_CHDIR()       Change the current directory"
+  ? "FT_DEFAULT()     Retrieve and optionally change the current default drive"
+  ? "FT_DOSVER        Return the current DOS major and minor version as a string"
+  ? "FT_DSKFREE()     Return the amount of available disk space"
+  ? "FT_DSKSIZE()     Return the maximum capacity of a fixed disk"
+  ? "FT_IAMIDLE()     Inform the operating system that the application is idle."
+  ? "FT_INP()         Retrieve a byte from a specified I/O port"
+  ? "FT_INT86()       Execute a software interrupt"
+  ? "FT_ISPRINT()     Check printer status"
+  ? "FT_ISSHARE()     Determine if DOS Share is installed"
+  ? "FT_MKDIR()       Create a subdirectory"
+  ? "FT_OUTP()        Write a byte to a specified I/O port"
+  ? "FT_PEEK()        Retrieve a byte from a specified memory location."
+  ? "FT_POKE()        Write a byte to a specified memory location"
+  ? "FT_REBOOT()      Force a warm or cold boot"
+  ? "FT_RMDIR()       Delete a subdirectory"
+  ? "FT_SETDATE()     Set the DOS system date"
+  ? "FT_SETTIME()     Set the DOS system time"
+  ? "FT_SYSMEM()      Determine the amount of conventional memory installed"
+  ? "FT_TEMPFIL()     Create a file with a unique name"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // DATE / TIME group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF DATE / TIME FUNCTIONS FROM LIBNF"
+  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_ACCTADJ()     Adjust beginning or ending fiscal pd. dates to acctg. dates"
+  ? "FT_ACCTMONTH()   Return accounting month data"
+  ? "FT_ACCTQTR()     Return accounting quarter data"
+  ? "FT_ACCTWEEK()    Return accounting week data"
+  ? "FT_ACCTYEAR()    Return accounting year data"
+  ? "FT_ADDWKDY()     Return true number of days to add given number of workdays"
+  ? "FT_CALENDAR()    Display date/time calendar, find a date, return calendar data."
+  ? "FT_CIV2MIL()     Convert usual civilian format time to military time."
+  ? "FT_DATECNFG()    Set beginning of year/week for FT_ date functions"
+  ? "FT_DAYOFYR()     Return calendar, fiscal or accounting day data"
+  ? "FT_DAYTOBOW()    Calculate no. of days between date and beginning of week"
+  ? "FT_DOY()         Find number of day within year"
+  ? "FT_EASTER()      Return the date of Easter"
+  ? "FT_ELAPMIN()     Return difference, in minutes, between two mil format times."
+  ? "FT_ELAPSED()     Return elapsed time between two days and/or times"
+  ? "FT_ELTIME()      Compute difference between times in hours, minutes, seconds."
+  ? "FT_FDAY()        Return first day of the month"
+  ? "FT_LDAY()        Return last day of the month"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // DATE / TIME group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF DATE / TIME FUNCTIONS FROM LIBNF"
+  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_MADD()        Add or subtract months to/from a date"
+  ? "FT_MIL2CIV()     Convert time in military format to civilian format."
+  ? "FT_MIL2MIN()     Convert time in military format to number of minute of day."
+  ? "FT_MIN2DHM()     Convert numeric minutes to days, hours and minutes."
+  ? "FT_MIN2MIL()     Convert minute of day to military format time."
+  ? "FT_MONTH()       Return Calendar or Fiscal Month Data"
+  ? "FT_QTR()         Return Calendar or Fiscal Quarter Data."
+  ? "FT_SYS2MIL()     Convert system time to military time format."
+  ? "FT_WEEK()        Return calendar or fiscal week data"
+  ? "FT_WORKDAYS()    Return number of work days between two dates"
+  ? "FT_WOY()         Find number of week within year"
+  ? "FT_YEAR()        Return calendar or fiscal year data"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_CALENDAR example
@@ -431,9 +663,83 @@ function Main()
   @ 16, 10 SAY 'Day         :'+aRet[6]
   @ 17, 10 SAY 'Julian Day  :'+str(aRet[7],3,0)
   @ 18, 10 SAY 'Current Time:'+aRet[8]
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // ENVIRONMENT group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF ENVIRONMENT FUNCTIONS FROM LIBNF"
+  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_GETE()        Return the entire current environment"
+  ? "FT_LINKED()      Determine if a function was linked in"
+  ? "FT_ORIGIN()      Report the drive, path and filename of the current program"
+  ? "FT_RESTSETS()    Restore status of all SET command settings"
+  ? "FT_SAVESETS()    Save the status of all the SET command settings"
+  ? "FT_SETCENTURY()  Check/Set the CENTURY Setting"
+  ? "FT_TREE()        Locate all directories and subdirectories on a drive"
+  ? "FT_WHEREIS()     Locate all occurrences of a filespec on a drive"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // EVENT group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF EVENT FUNCTIONS FROM LIBNF"
+  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_IDLE()       Generate an idle event to allow incremental garbage collection."
+  ? "FT_ONIDLE()     Evaluate a designated code block during idle states."
+  ? "FT_ONTICK()     Evaluate a designated code block at a designated interval."
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FILE I/O group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF FILE I/O FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_DFCLOSE()     Close file displayed by FT_DISPFILE()"
+  ? "FT_DFSETUP()     Set up parameters for FT_DISPFILE()"
+  ? "FT_DISPFILE()    Browse a text file"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
 
   //
   // FT_DISPFILE example
@@ -448,9 +754,214 @@ function Main()
   cKey := FT_DISPFILE()
   FT_DFCLOSE()
   @ 23, 10 SAY "Key that terminated FT_DISPFILE() was: " + '[' + cKey + ']'
-  FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
-  inkey(0)
-  FT_BLINKW32CANCEL()
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // GAME group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF GAME FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? " FT_PEGS()        FT_PEGS GAME (all work and no play...)"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // KEYBOARD / MOUSE group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF KEYBOARD / MOUSE FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_ALT()         Determine status of the Alt key"
+  ? "FT_CAPLOCK()     Determine and optionally change the status of CapLock key"
+  ? "FT_CTRL()        Determine status of the Ctrl key"
+  ? "FT_LASTKEY()     Force LastKey() to return a programmer-defined value."
+  ? "FT_MBUTPRS()     Retrieve button press status"
+  ? "FT_MBUTREL()     Get mouse button release information"
+  ? "FT_MCONOFF()     Turn mouse cursur off if in specified region"
+  ? "FT_MCURSOR()     Set the mouse cursor"
+  ? "FT_MDBLCLK()     Return true if a double click was detected"
+  ? "FT_MDEFCRS()     Define the mouse cursor"
+  ? "FT_MGETCOORD()   Get mouse cursor position (text coord.) and button status"
+  ? "FT_MGETPAGE()    Get the display page for the mouse pointer"
+  ? "FT_MGETPOS()     Get mouse cursor position and button status"
+  ? "FT_MGETSENS()    Get the mouse sensitivity parameters"
+  ? "FT_MGETX()       Get mouse cursor row position"
+  ? "FT_MGETY()       Get mouse cursor column position"
+  ? "FT_MHIDECRS()    Decrement internal mouse cursor flag and hide mouse cursor"
+  ? "FT_MINIT()       Initialize the mouse driver, vars and return status of mouse"
+  ? "FT_MINREGION()   Test if the mouse cursor is in the passed region"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // KEYBOARD / MOUSE group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF KEYBOARD / MOUSE FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_MMICKEYS()    Get mickeys"
+  ? "FT_MRESET()      Reset mouse driver and return status of mouse"
+  ? "FT_MSETCOORD()   Position the mouse cursor using text screen coordinates"
+  ? "FT_MSETPAGE()    Set the display page for the mouse pointer"
+  ? "FT_MSETPOS()     Position the mouse cursor using virtual screen coordinates"
+  ? "FT_MSETSENS()    Set the mouse sensitivity parameters"
+  ? "FT_MSHOWCRS()    Increment internal cursor flag and display mouse cursor"
+  ? "FT_MVERSION()    Get the mouse driver version"
+  ? "FT_MXLIMIT()     Set vertical bounds of mouse using virtual screen coord."
+  ? "FT_MYLIMIT()     Set horiz. bounds of mouse using virtual screen coordinates"
+  ? "FT_NUMLOCK()     Return status of NumLock key"
+  ? "FT_PRTSCR()      Enable or disable the Print Screen key"
+  ? "FT_PUTKEY()      Stuff a keystroke into the keyboard buffer"
+  ? "FT_SCANCODE()    Wait for keypress and return keyboard scan code"
+  ? "FT_SETKEYS()     Get array of keys redirected via the SetKey() or SET KEY"
+  ? "FT_SETRATE()     Set the keyboard delay and repeat rate on PC/AT & PS/2"
+  ? "FT_SHIFT()       Determine status of shift key"
+  ? "FT_SINKEY()      Replacement for INKEY() that tests for SET KEY procedures"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // MATH group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF MATH FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_GCD()         Calculate greatest common divisor of two numbers"
+  ? "FT_NETPV()       Calculate net present value"
+  ? "FT_RAND1()       Generate a random number"
+  ? "FT_ROUND()       Rounds a number to a specific place"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // MENU / PROMPTS group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF MENU / PROMPTS FUNCTIONS FROM LIBNF"
+  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ?
+  ? "FT_ADDER()       Pop up a simple calculator"
+  ? "FT_BLINK()       Display a blinking message on the screen"
+  ? "FT_BRWSWHL()     Browse an indexed database limited to a while condition"
+  ? "FT_CLRSEL()      User Selectable Colour Routine"
+  ? "FT_DISPMSG()     Display a message and optionally waits for a keypress"
+  ? "FT_FILL()        Declare menu options for FT_MENU1()"
+  ? "FT_MENU1()       Pulldown menu system"
+  ? "FT_MENU2()       Vertical lightbar menu"
+  ? "FT_MENUTO()      Execute light bar menu using prompts created with @...PROMPT"
+  ? "FT_PENDING()     Display same-line pending messages after a wait."
+  ? "FT_PICKDAY()     Picklist of days of week"
+  ? "FT_PROMPT()      Define a menu item for use with FT_MenuTo()"
+  ? "FT_SLEEP         Wait for a specified amount of time"
+  ? "FT_XBOX()        Display a self-sizing message box and message"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_ADDER example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADDER"
+  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? 
+  nSickHrs := 0
+  nPersHrs := 0
+  nVacaHrs := 0
+  GetList  := {}
+  SET SCOREBOARD OFF
+  //_ftSetScrColor( STD_SCREEN, STD_VARIABLE)
+  setcolor ('w+/b')
+  CLS
+  
+  SET KEY K_ALT_A  TO FT_Adder        // Make <ALT-A> call FT_Adder
+
+  * SIMPLE Sample of program data entry!
+
+  @ 12,5 SAY 'Please enter the total Sick, Personal, and Vacation hours.'
+  @ 15,22 SAY 'Sick hrs.'
+  @ 15,40 SAY 'Pers. hrs.'
+  @ 15,60 SAY 'Vaca. hrs.'
+  @ 23,20 SAY 'Press <ALT-A> to Pop - Up the Adder.'
+  @ 24,20 SAY 'Press <ESC> to Quit the adder Demo.'
+  DO WHILE .T.                               // Get the sick, personal, & vaca
+    @ 16,24 GET nSickHrs PICTURE '9999.999'  // Normally I have a VALID()
+    @ 16,43 GET nPersHrs PICTURE '9999.999'  // to make sure the value is
+    @ 16,63 GET nVacaHrs PICTURE '9999.999'  // within the allowable range.
+    SET CURSOR ON                            // But, like I said it is a
+    CLEAR TYPEAHEAD                          // SIMPLE example <g>.
+    READ
+    SET CURSOR OFF
+    IF LASTKEY() == K_ESC                    // <ESC> - ABORT
+      CLEAR TYPEAHEAD
+      EXIT
+    ENDIF
+  ENDDO
+  SET CURSOR ON
+  SET KEY K_ALT_A                     // Reset <ALT-A>
+  
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
 RETURN( NIL )
 
 FUNCTION TestGet( b, ar, nDim, nElem)

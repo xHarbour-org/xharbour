@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4612 2005/11/12 22:59:34 walito Exp $
+ * $Id: ChangeLog,v 1.4613 2005/11/13 06:21:20 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-13 16:58 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/samples/libnf.prg
+    + Demo and test program added for FT_ASUM(), FT_RESTARR(), FT_SAVEARR() and
+      FT_ADDER
+    + Same program corrected to be compiled in for Clipper 5.x for check.
+      Link it with Nanfor.lib
+  * contrib/libnf/samples/TODO
+    + Added.
+  * source/lang/msges.c
+  * source/lang/msgeswin.c
+    + Translation of last four expressions.
 
 2005-11-13 03:25 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * source/vm/hvm.c
