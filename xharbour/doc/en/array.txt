@@ -1,5 +1,5 @@
 /*
- * $Id: array.txt,v 1.1.1.1 2001/12/21 10:48:10 ronpinkas Exp $
+ * $Id: array.txt,v 1.2 2005/04/23 06:55:45 guerra000 Exp $
  */
 
 /*
@@ -618,5 +618,46 @@
  *      Library is vm
  *  $SEEALSO$
  *      ASCAN()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_ATOKENS()
+ *  $CATEGORY$
+ *      Array
+ *  $ONELINER$
+ *      Split a string into an array of tokens
+ *  $SYNTAX$
+ *      HB_ATOKENS( <cLine>, [<cDelim>], [ <bSkipStrings>, [<bDoubleQuoteOnly>] ] ) --> aTokens
+ *  $ARGUMENTS$
+ *      <cLine>     A string to split.
+ *
+ *      <cDelim>    Delimiter character. By default, space character is used.
+ *
+ *      <bSkipStrings> Ignore tokens enclosed in single-quote or double-quote
+ *                     characters. Default: .F.
+ *
+ *      <bDoubleQuoteOnly> Specifies that a single-quote character isn't
+ *                         considered a quote character. Default: .F.
+ *  $RETURNS$
+ *      <aTokens> An array of string tokens extracted from array.
+ *  $DESCRIPTION$
+ *      This function provides a quick and easy way to convert a character
+ *      string <cLine> to an array of strings using <cDelim> character as a
+ *      delimiter.
+ *  $EXAMPLES$
+ *      aTokens := HB_ATOKENS( "Veni, vidi, vici." )
+ *      ? Len( aTokens ) // 3
+ *      ? aTokens[ 1 ]   // Veni,
+ *      ? aTokens[ 2 ]   // vidi,
+ *      ? aTokens[ 3 ]   // vici.
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      This function is a xHarbour extension.
+ *  $FILES$
+ *      Library is vm
+ *  $SEEALSO$
  *  $END$
  */
