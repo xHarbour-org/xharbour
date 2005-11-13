@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.533 2005/11/10 02:50:18 druzus Exp $
+ * $Id: hvm.c,v 1.534 2005/11/12 22:49:31 walito Exp $
  */
 
 /*
@@ -5984,8 +5984,6 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       {
          if( pcode == HB_P_PLUS )
          {
-            PHB_ITEM pElem = hb_itemNew( NULL );
-
             if( ! hb_hashScan(pArray, pIndex, &ulPos ) )
             {
                hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
