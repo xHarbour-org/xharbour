@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.21 2005/09/23 21:55:06 likewolf Exp $
+# $Id: Makefile,v 1.22 2005/10/13 22:22:58 druzus Exp $
 #
 
 ROOT = ../../
@@ -68,8 +68,7 @@ endif
 LIBNAME=vm
 
 DIRS=\
-	optcon  \
-	optgui  \
+	fmstat \
 
 ifeq ($(HB_COMPILER),mingw32)
    DIRS += mainstd

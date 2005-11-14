@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.41 2005/10/18 23:41:48 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.42 2005/10/19 16:19:09 ronpinkas Exp $
  */
 
 /*
@@ -124,11 +124,9 @@
  * Note that if you turn this on, Harbour will be slighlty slower, larger
  * and will consume more memory.
  *
- * By default this is turned on. Define HB_FM_STATISTICS_OFF to turn it off.
+ * By default this is turned off.
 */
-#if !defined(HB_FM_STATISTICS_OFF) && !defined(HB_OPT_CON) && !defined(HB_OPT_GUI)
-   #define HB_FM_STATISTICS
-#endif
+/*#define HB_FM_STATISTICS*/
 
 /* ***********************************************************************
  *

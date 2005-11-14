@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4616 2005/11/13 23:59:47 likewolf Exp $
+ * $Id: ChangeLog,v 1.4617 2005/11/14 13:41:18 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-14 23:15 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * include/hbsetup.h
+  * source/vm/Makefile
+  * source/vm/hvm.c
+  - source/vm/optcon
+  - source/vm/optgui
+  + source/vm/fmstat/Makefile
+    * removed dirs optcon and optgui added dir fmstat
+	 * removed defines HB_FM_STATISTICS_OFF, HB_OPT_GUI, HB_OPT_CON 
+	 * now HB_FM_STATISTICS is NOT defined by default
+	 * link libfmstat<mt> before libvm to get memory statistics
+	 * please update non gnu makefiles
 
 2005-11-14 09:40 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/samples/libnf.prg

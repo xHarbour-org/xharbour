@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.535 2005/11/13 06:20:05 walito Exp $
+ * $Id: hvm.c,v 1.536 2005/11/13 21:58:50 ronpinkas Exp $
  */
 
 /*
@@ -112,22 +112,6 @@
 
 #if !defined( HB_OS_DOS ) && !defined( HB_OS_DARWIN_5 )
    #include "hbserv.h"
-#endif
-
-#ifdef HB_OPT_CON
-   #undef HB_NO_PROFILER
-   #define HB_NO_PROFILER
-   #undef HB_NO_TRACE
-   #define HB_NO_TRACE
-#endif
-
-#ifdef HB_OPT_GUI
-   #undef HB_NO_PROFILER
-   #define HB_NO_PROFILER
-   #undef HB_NO_TRACE
-   #define HB_NO_TRACE
-   #undef HB_GUI
-   #define HB_GUI
 #endif
 
 #ifdef HB_VM_REQUESTS
