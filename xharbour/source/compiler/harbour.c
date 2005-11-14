@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.113 2005/10/29 06:42:35 druzus Exp $
+ * $Id: harbour.c,v 1.114 2005/11/12 18:47:29 druzus Exp $
  */
 
 /*
@@ -563,9 +563,7 @@ ULONG hb_xquery( USHORT uiMode )
 
 void hb_conOutErr( const char * pStr, ULONG ulLen )
 {
-   HB_SYMBOL_UNUSED( ulLen );
-
-   fprintf( hb_comp_errFile, pStr );
+   fprintf( hb_comp_errFile, "%.*s", ( int ) ulLen, pStr );
 }
 
 char * hb_conNewLine( void )

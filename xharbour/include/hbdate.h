@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.6 2004/11/21 21:43:37 druzus Exp $
+ * $Id: hbdate.h,v 1.7 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -63,6 +63,7 @@ extern void     HB_EXPORT hb_dateTimeStr( char * pszTime );
 extern char     HB_EXPORT * hb_dateCMonth( int iMonth );
 extern char     HB_EXPORT * hb_dateCDOW( int iDay );
 extern int      HB_EXPORT hb_dateDOW( int iYear, int iMonth, int iDay );
+extern int      HB_EXPORT hb_dateJulianDOW( LONG lJulian );
 extern char     HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
 extern LONG     HB_EXPORT hb_dateEncode( int iYear, int iMonth, int iDay );
 extern void     HB_EXPORT hb_dateDecode( LONG julian, int * piYear, int * piMonth, int * piDay );

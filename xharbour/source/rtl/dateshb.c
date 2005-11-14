@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.11 2005/03/23 19:46:48 druzus Exp $
+ * $Id: dateshb.c,v 1.12 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -286,7 +286,6 @@ HB_FUNC( TIME )
 HB_FUNC( TIMEOFDAY )
 {
    char szResult[ 9 ];
-   int iSeconds = hb_parni(1);
 
    if ( hb_pcount() == 0 )
    {
@@ -294,6 +293,7 @@ HB_FUNC( TIMEOFDAY )
    }
    else
    {
+      int iSeconds = hb_parni(1);
       iSeconds %= 3600*24;
       sprintf( szResult, "%02d:%02d:%02d",
          iSeconds/3600 , (iSeconds % 3600)/60, iSeconds % 60 );
@@ -316,20 +316,7 @@ HB_FUNC( DOW )
 
    if( pDate )
    {
-      LONG lDate = pDate->item.asDate.value;
-
-      if( lDate )
-      {
-         int iYear, iMonth, iDay;
-
-         hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
-
-         hb_retnilen( hb_dateDOW( iYear, iMonth, iDay ), 3 );
-      }
-      else
-      {
-         hb_retnilen( 0, 3 );
-      }
+      hb_retnilen( hb_dateJulianDOW( pDate->item.asDate.value ), 3 );
    }
    else
    {

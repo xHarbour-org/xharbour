@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.86 2005/10/18 12:14:59 druzus Exp $
+ * $Id: garbage.c,v 1.87 2005/10/24 01:04:37 druzus Exp $
  */
 
 /*
@@ -281,15 +281,10 @@ HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pOrigin )
       pAlloc->locked = 1;
       pAlloc->used   = s_uUsedFlag;
 
+      pItem->type = HB_IT_NIL;
       if( pOrigin )
       {
-         pItem->type = HB_IT_NIL;
          hb_itemCopy( pItem, pOrigin );
-      }
-      else
-      {
-         memset( pItem, 0, sizeof( HB_ITEM ) );
-         pItem->type = HB_IT_NIL;
       }
 
       HB_THREAD_GUARD( hb_garbageAllocMutex, hb_gcLink( &s_pLockedBlock, pAlloc ) );

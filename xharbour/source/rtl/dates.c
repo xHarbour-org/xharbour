@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.9 2004/11/21 21:44:17 druzus Exp $
+ * $Id: dates.c,v 1.10 2005/03/31 03:58:51 druzus Exp $
  */
 
 /*
@@ -84,23 +84,24 @@
    #define HB_DATE_YEAR_LIMIT    9999
 #endif
 
+#define HB_STR_DATE_BASE      1721060     /* 0000/01/01 */
+
 LONG HB_EXPORT hb_dateEncode( int iYear, int iMonth, int iDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateEncode(%d, %d, %d)", iYear, iMonth, iDay));
 
    /* Perform date validation */
-   if( iYear >= 1 && iYear <= HB_DATE_YEAR_LIMIT &&
+   if( iYear >= 0 && iYear <= HB_DATE_YEAR_LIMIT &&
        iMonth >= 1 && iMonth <= 12 &&
        iDay >= 1 )
    {
       /* Month, year, and lower day limits are simple,
          but upper day limit is dependent upon month and leap year */
-      int auiDayLimit[ 12 ] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+      static int auiDayLimit[ 12 ] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-      if( ( ( iYear % 4 == 0 && iYear % 100 != 0 ) || iYear % 400 == 0 ) )
-         auiDayLimit[ 1 ] = 29;
-
-      if( iDay <= auiDayLimit[ iMonth - 1 ] )
+      if( iDay <= auiDayLimit[ iMonth - 1 ] ||
+          ( iDay == 29 && iMonth == 2 &&
+            ( iYear & 3 ) == 0 && ( iYear % 100 != 0 || iYear % 400 == 0 ) ) )
       {
          int iFactor = ( iMonth < 3 ) ? -1 : 0;
 
@@ -118,7 +119,7 @@ void HB_EXPORT hb_dateDecode( LONG lJulian, int *piYear, int *piMonth, int *piDa
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDecode(%ld, %p, %p, %p)", lJulian, piYear, piMonth, piDay));
 
-   if( lJulian > 0 )
+   if( lJulian >= HB_STR_DATE_BASE )
    {
       LONG U, V, W, X;
 
@@ -146,7 +147,7 @@ void HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrPut(%p, %d, %d, %d)", szDate, iYear, iMonth, iDay));
 
-   if( iYear >= 0 && iMonth && iDay )
+   if( iYear >= 0 && iMonth >= 0 && iDay >= 0 )
    {
       szDate[ 0 ] = ( ( iYear % 10000 ) / 1000 ) + '0';
       szDate[ 1 ] = ( ( iYear % 1000 ) / 100 ) + '0';
@@ -159,10 +160,10 @@ void HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
       szDate[ 6 ] = ( iDay / 10 ) + '0';
       szDate[ 7 ] = ( iDay % 10 ) + '0';
    }
-   else if ( iYear || iMonth || iDay )
-      memset( szDate, '0', 8 );
    else
-      memset( szDate, ' ', 8 );
+   {
+      memset( szDate, '0', 8 );
+   }
 }
 
 void HB_EXPORT hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay )
@@ -197,8 +198,15 @@ char HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dateDecStr(%p, %ld)", szDate, lJulian));
 
-   hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
-   hb_dateStrPut( szDate, iYear, iMonth, iDay );
+   if( lJulian <= 0 )
+   {
+      memset( szDate, ' ', 8 );
+   }
+   else
+   {
+      hb_dateDecode( lJulian, &iYear, &iMonth, &iDay );
+      hb_dateStrPut( szDate, iYear, iMonth, iDay );
+   }
    szDate[ 8 ] = '\0';
 
    return szDate;
@@ -259,14 +267,14 @@ char HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, con
                   case 4:
                      if( ! used_d && format_count < size )
                      {
-//                        szFormattedDate[ format_count++ ] = '0';
+/*                        szFormattedDate[ format_count++ ] = '0'; */
                         szFormattedDate[ format_count++ ] = szDate[ 6 ];
                         digit_count--;
                      }
                   case 3:
                      if( ! used_d && format_count < size )
                      {
-//                        szFormattedDate[ format_count++ ] = '0';
+/*                        szFormattedDate[ format_count++ ] = '0'; */
                         szFormattedDate[ format_count++ ] = szDate[ 6 ];
                         digit_count--;
                      }
@@ -293,14 +301,14 @@ char HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, con
                   case 4:
                      if( ! used_m && format_count < size )
                      {
-//                        szFormattedDate[ format_count++ ] = '0';
+/*                        szFormattedDate[ format_count++ ] = '0'; */
                         szFormattedDate[ format_count++ ] = szDate[ 4 ];
                         digit_count--;
                      }
                   case 3:
                      if( ! used_m && format_count < size )
                      {
-//                        szFormattedDate[ format_count++ ] = '0';
+/*                        szFormattedDate[ format_count++ ] = '0'; */
                         szFormattedDate[ format_count++ ] = szDate[ 4 ];
                         digit_count--;
                      }
@@ -385,6 +393,16 @@ char HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, con
    szFormattedDate[ format_count ] = '\0';
 
    return szFormattedDate;
+}
+
+int HB_EXPORT hb_dateJulianDOW( LONG lJulian )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateJulianDOW(%ld)", lJulian));
+
+   if( lJulian >= HB_STR_DATE_BASE )
+      return ( int ) ( ( lJulian + 1 ) % 7 ) + 1;
+   else
+      return 0;
 }
 
 int HB_EXPORT hb_dateDOW( int iYear, int iMonth, int iDay )
