@@ -35,7 +35,32 @@ function Main()
     REQUEST HB_LANG_ES
 	  HB_LANGSELECT("ES")
     MyLanguage := HB_LANGSELECT()
-    //ALERT( "Language ID: " + MyLanguage )
+  #endif
+
+  //
+  // Cover
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST FUNCTIONS FROM LIBNF"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? "Next screens will be a functions  list contained in the library libnf,"
+  ? "a port in  xHarbour of the  Nanforum Library for Clipper.  The list is"
+  ? "organized as the original Norton Guide for the library. After the list"
+  ? "for each group of functions will be a demo of them."
+  ?
+  ? "A few new functions are added to the library  libnf in order to expand"
+  ? "is power in this new xBase chapter.  The demo of this function will be"
+  ? "in the group where they must included."
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
   #endif
 
   //
@@ -44,7 +69,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF ARRAY FUNCTIONS FROM LIBNF"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_AADDITION()   Add elements unique of source array to target array"
   ? "FT_AAVG()        Average numeric values in an array"
@@ -73,7 +98,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AADDITION"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   aList1 := {"apple", "orange", "pear"}
   aList2 := {"apple ", "banana", "PEAR"}
@@ -121,7 +146,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AAVG"
-  ? "อออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   ? "aSubTotals : "
@@ -156,7 +181,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADESSORT"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   ? "aNames : "
@@ -201,7 +226,7 @@ function Main()
   myarray1 := DIRECTORY()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AEMAXLEN"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "myarray1 = DIRECTORY()"
   ?
@@ -241,7 +266,7 @@ function Main()
   myarray1 := DIRECTORY()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AEMINLEN"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "myarray1 = DIRECTORY()"
   ?
@@ -282,7 +307,7 @@ function Main()
   myarray1 := {}
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AMEDIAN"
-  ? "ออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   ? "myarray0 = DIRECTORY()"
@@ -324,7 +349,7 @@ function Main()
   aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ANOMATCHES"
-  ? "อออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   ? "myarray0 = DIRECTORY()"
@@ -361,7 +386,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AREDIT"
-  ? "อออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   * set up 2 dimensional array ar[]
   FOR i = 1 TO 26
     ar[1, i] := i          //  1  ->  26  Numeric
@@ -405,7 +430,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ASUM"
-  ? "อออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   ? "aSubTotals : "
@@ -444,7 +469,7 @@ function Main()
   setcolor ('w+/b')
   cls
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_RESTARR AND FT_SAVEARR"
-  ? "อออออออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "Saving array ..."
   ?
@@ -480,7 +505,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF CONVERSION FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_BYT2BIT()     Convert byte to string of 1's and 0's"
   ? "FT_BYT2HEX()     Convert byte to hexadecimal version of its binary value"
@@ -511,14 +536,14 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BYT2BIT()"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ?
   var0 := FT_BYT2BIT( 'a' )
   ? PADR("FT_BYT2BIT( 'a' ) ->", 44) + var0
   ?
-  var0 := FT_BYT2BIT( 'mac' )
-  ? PADR("FT_BYT2BIT( 'mac' )", 44) + var0
+  var0 := FT_BYT2BIT( 'm' )
+  ? PADR("FT_BYT2BIT( 'm' ) ->", 44) + var0
   ?
   var0 := FT_BYT2BIT( 'A' )
   ? PADR("FT_BYT2BIT( 'A' ) ->", 44) + var0
@@ -537,12 +562,43 @@ function Main()
   #endif
 
   //
+  // FT_BYT2HEX() example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BYT2HEX()"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ?
+  var0 := FT_BYT2HEX( 'a' )
+  ? PADR("FT_BYT2HEX( 'a' ) ->", 44) + var0
+  ?
+  var0 := FT_BYT2HEX( 'm' )
+  ? PADR("FT_BYT2HEX( 'm' ) ->", 44) + var0
+  ?
+  var0 := FT_BYT2HEX( 'A' )
+  ? PADR("FT_BYT2HEX( 'A' ) ->", 44) + var0
+  ?
+  var0 := FT_BYT2HEX( 'C' )
+  ? PADR("FT_BYT2HEX( 'C' ) ->", 44) + var0
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
   // DOS / BIOS group of routines
   //
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF DOS/BIOS FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_CHDIR()       Change the current directory"
   ? "FT_DEFAULT()     Retrieve and optionally change the current default drive"
@@ -580,7 +636,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF DATE / TIME FUNCTIONS FROM LIBNF"
-  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_ACCTADJ()     Adjust beginning or ending fiscal pd. dates to acctg. dates"
   ? "FT_ACCTMONTH()   Return accounting month data"
@@ -616,7 +672,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF DATE / TIME FUNCTIONS FROM LIBNF"
-  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_MADD()        Add or subtract months to/from a date"
   ? "FT_MIL2CIV()     Convert time in military format to civilian format."
@@ -646,13 +702,13 @@ function Main()
   setcolor ('w+/b')
   cls
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_CALENDAR"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   keyboard chr (28)
   aRet := ft_calendar (10,40,'w+/rb',.t.,.t.) //display calendar, return all.
   cls
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_CALENDAR"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   @  9, 10 SAY 'FT_CALENDAR return values'
   @ 11, 10 SAY 'Date        :'+dtoc(aRet[1])
@@ -679,7 +735,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF ENVIRONMENT FUNCTIONS FROM LIBNF"
-  ? "อออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_GETE()        Return the entire current environment"
   ? "FT_LINKED()      Determine if a function was linked in"
@@ -705,7 +761,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF EVENT FUNCTIONS FROM LIBNF"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_IDLE()       Generate an idle event to allow incremental garbage collection."
   ? "FT_ONIDLE()     Evaluate a designated code block during idle states."
@@ -726,7 +782,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF FILE I/O FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_DFCLOSE()     Close file displayed by FT_DISPFILE()"
   ? "FT_DFSETUP()     Set up parameters for FT_DISPFILE()"
@@ -747,7 +803,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_DISPFILE"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ? "Press aAbB to terminate."
   @ 4,9 TO 21,71
   FT_DFSETUP("libnf.prg", 5, 10, 20, 70, 1, 48, 124, "AaBb" , .f., 5, 132, 4096)
@@ -770,7 +826,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF GAME FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? " FT_PEGS()        FT_PEGS GAME (all work and no play...)"
 
@@ -789,7 +845,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF KEYBOARD / MOUSE FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_ALT()         Determine status of the Alt key"
   ? "FT_CAPLOCK()     Determine and optionally change the status of CapLock key"
@@ -826,7 +882,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF KEYBOARD / MOUSE FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_MMICKEYS()    Get mickeys"
   ? "FT_MRESET()      Reset mouse driver and return status of mouse"
@@ -862,7 +918,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF MATH FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_GCD()         Calculate greatest common divisor of two numbers"
   ? "FT_NETPV()       Calculate net present value"
@@ -884,7 +940,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "DEMO AND TEST OF MENU / PROMPTS FUNCTIONS FROM LIBNF"
-  ? "ออออออออออออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ?
   ? "FT_ADDER()       Pop up a simple calculator"
   ? "FT_BLINK()       Display a blinking message on the screen"
@@ -916,7 +972,7 @@ function Main()
   setcolor ('w+/b')
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADDER"
-  ? "อออออออออออออออออออออออออออออออออออออออออออ"
+  ? REPLICATE( "อ", 78 )
   ? 
   nSickHrs := 0
   nPersHrs := 0
@@ -924,8 +980,8 @@ function Main()
   GetList  := {}
   SET SCOREBOARD OFF
   //_ftSetScrColor( STD_SCREEN, STD_VARIABLE)
-  setcolor ('w+/b')
-  CLS
+  //setcolor ('w+/b')
+  //CLS
   
   SET KEY K_ALT_A  TO FT_Adder        // Make <ALT-A> call FT_Adder
 
@@ -953,6 +1009,154 @@ function Main()
   SET CURSOR ON
   SET KEY K_ALT_A                     // Reset <ALT-A>
   
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_BLINKW32 example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BLINK AND FT_BLINKW32 / BLINKW32CANCEL"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? 'FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )'
+  ? 'inkey(0)'
+  ? 'FT_BLINKW32CANCEL()'
+  ?
+  ? "Will produce a blink message as in each of this pages in OS where"
+  ? "normal hardware blink not operate."
+  ? "NOTE: this functions are an xHarbour expansion to Nanforum library."
+  ?
+  ? 'FT_BLINK( "[ Hit a key to continue ]", 24, 0 )'
+  ? 'inkey(0)'
+  ?
+  ? "Will produce a blink message as in each of this pages in OS where"
+  ? "normal hardware blink operate."
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // NETWARE group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF NETWARE FUNCTIONS FROM LIBNF"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? "FT_NWLSTAT()     Return the current Novell NetWare logical station number"
+  ? "FT_NWSEMCLOSE()  Close a NetWare semaphore"
+  ? "FT_NWSEMEX()     Examine a NetWare semaphore's value and open count"
+  ? "FT_NWSEMLOCK()   Perform a semaphore lock"
+  ? "FT_NWSEMOPEN()   Open or create a NetWare semaphore"
+  ? "FT_NWSEMSIG()    Signal a NetWare semaphore (increment)"
+  ? "FT_NWSEMUNLOCK() Unlock a semaphore locked by FT_NWSEMLOCK()"
+  ? "FT_NWSEMWAIT()   Wait on a NetWare semaphore (decrement)"
+  ? "FT_NWUID()       Return the current Novell NetWare User ID"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // STRING group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF STRING FUNCTIONS FROM LIBNF"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? "FT_AT2()         Find position of the nth occurrence of a substring"
+  ? "FT_BITCLR()      Clear (reset) selected bit in a byte"
+  ? "FT_BITSET()      Set selected bit in a byte"
+  ? "FT_BYTEAND()     Perform bit-wise AND on two ASCII characters (bytes)"
+  ? "FT_BYTENEG()     Perform bit-wise negation on an ASCII character"
+  ? "FT_BYTENOT()     Perform bit-wise NOT on an ASCII character (byte)"
+  ? "FT_BYTEOR()      Perform bit-wise OR on two ASCII characters (bytes)"
+  ? "FT_BYTEXOR()     Perform bit-wise XOR on two ASCII characters (bytes)"
+  ? "FT_FINDITH()     Find the ith occurrence of a substring within a string"
+  ? "FT_ISBIT()       Test the status of an individual bit"
+  ? "FT_ISBITON()     Determine the state of individual bits in a number"
+  ? "FT_METAPH()      Convert a character string to MetaPhone format"
+  ? "FT_NOOCCUR()     Find the number of times one string occurs in another"
+  ? "FT_PCHR()        Convert printer control codes"
+  ? "FT_PROPER()      Convert a string to proper-name case"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // VIDEO group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF VIDEO FUNCTIONS FROM LIBNF"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? "FT_ADAPTER()     Report the type of video adapter installed"
+  ? "FT_CLS()         Clear screen"
+  ? "FT_GETMODE()     Get the video mode"
+  ? "FT_GETVCUR()     Return info about the cursor on a specified video page"
+  ? "FT_GETVPG()      Get the currently selected video page"
+  ? "FT_POPVID()      Restore previously saved video states."
+  ? "FT_PUSHVID()     Save current video states on internal stack."
+  ? "FT_RESTATT()     Restore the attribute bytes of a specified screen region."
+  ? "FT_REVATTR()     Reverse colors of specified screen coordinates"
+  ? "FT_REVCHR()      Reverse the color of a single character on the screen"
+  ? "FT_RGNSTACK()    Push or pop a saved screen region on or off the stack"
+  ? "FT_RSTRGN()      Restore region of the screen saved with FT_SAVRGN()"
+  ? "FT_SAVEATT()     Save the attribute bytes of a specified screen region."
+  ? "FT_SAVRGN()      Save a screen region for later display"
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // VIDEO group of routines
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "DEMO AND TEST OF VIDEO FUNCTIONS FROM LIBNF"
+  ? REPLICATE( "อ", 78 )
+  ?
+  ? "FT_SETATTR()     Change color attributes of screen region"
+  ? "FT_SETMODE()     Set the video mode"
+  ? "FT_SETVCUR()     Set the cursor position on a specified video page"
+  ? "FT_SETVPG()      Set the current video page"
+  ? "FT_SHADOW()      Draw a non-destructive shadow on the screen"
+  ? "FT_VIDSTR()      Display string on screen in specified attribute"
+  ? "FT_WRTCHR()      Display character on screen"
+
   #ifdef is_xharbour
     FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
     inkey(0)

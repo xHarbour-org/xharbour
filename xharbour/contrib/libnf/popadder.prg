@@ -200,6 +200,8 @@
 STATIC lAdderOpen := .F.,                                                    ;
        aKeys, aWindow, nWinColor, aWinColor, aStdColor
 
+STATIC cMyLanguage
+
 #ifdef FT_TEST
 
   FUNCTION TEST
@@ -272,7 +274,8 @@ FUNCTION FT_Adder()
         nOldLastKey := LASTKEY(),                                            ;
         lShowRight  := .T.,                                                  ;
         aAdder      := ARRAY(23)
-
+  LOCAL cMessage
+  cMyLanguage := HB_LANGSELECT()
   // Must prevent recursive calls
   IF lAdderOpen
     RETURN NIL
@@ -389,10 +392,30 @@ FUNCTION FT_Adder()
           _ftSetWinColor(W_CURR,W_PROMPT)
           CLEAR TYPEAHEAD
         ELSE
-          _ftError('there are ' + IF(nTotTran > 0, 'only ' +                 ;
-                   LTRIM(STR(nTotTran, 3, 0)), 'no') +                       ;
-                   ' transactions entered so far.'   +                       ;
-                   ' No need to scroll!')
+          IF cMyLanguage == "ES"
+            if nTotTran > 0
+              cMessage := 'No existe ninguna transacci¢n realizada hasta ahora.'
+            ELSE
+              cMessage := sprintf( 'Existen solamente %s transacciones realizadas hasta ahora.', nTotTran )
+            ENDIF
+            cMessage := cMessage + ' No se requiere avanzar la cinta!'
+          ELSEIF cMyLanguage == "IT"
+            if nTotTran > 0
+              cMessage := 'Non esiste nessun calcolo fatto finora.'
+            ELSE
+              cMessage := sprintf( 'Esistono solo %s calcoli fatti finora.', nTotTran )
+            ENDIF
+            cMessage := cMessage + ' Non bisogna avanzar la carta!!'
+          ELSE
+            if nTotTran > 0
+              cMessage := 'There are no transactions entered so far.'
+            ELSE
+              cMessage := sprintf( 'There are %s transactions entered so far.', nTotTran )
+            ENDIF
+            cMessage := cMessage + ' No need to scroll!'
+          ENDIF
+          _ftError( cMessage )
+
         ENDIF
       CASE nKey == 7                    // Delete - Clear adder
         _ftClearAdder(aAdder)
@@ -414,13 +437,32 @@ FUNCTION FT_Adder()
             lAdderOpen := .F.           // Reset the recursive flag
             lDone      := .T.
           ELSE
-            _ftError('but I can not return the total from the '+             ;
-                    'adder to this variable. You must quit the adder using'+ ;
-                    ' the <ESC> key and then enter the total manually.')
+            IF cMyLanguage == "ES"
+              cMessage := 'pero no puedo retornar el total desde la calculadora a esta variable, ' + ;
+                          'deber  salir de la misma con la tecla <ESC> e ingresando el valor manualmente.'
+            ELSEIF cMyLanguage == "IT"
+              cMessage := 'but I can not return the total from the adder to this variable. ' + ;
+                          'You must quit the adder using the <ESC> key and then enter the ' + ;
+                          'total manually.'
+            ELSE
+              cMessage := 'but I can not return the total from the adder to this variable. ' + ;
+                          'You must quit the adder using the <ESC> key and then enter the ' + ;
+                          'total manually.'
+            ENDIF
+            _ftError( cMessage )
           ENDIF
         ELSE
-          _ftError('the calculation is not finished yet! You must have'+     ;
-                  ' a TOTAL before you can return it to the program.')
+            IF cMyLanguage == "ES"
+              cMessage := 'el c lculo no ha sido terminado aun! Usted deber ' + ;
+                          ' TOTALIZAR antes de regresar al programa.'
+            ELSEIF cMyLanguage == "IT"
+              cMessage := 'the calculation is not finished yet! You must have'+ ;
+                          ' a TOTAL before you can return it to the program.'
+            ELSE
+              cMessage := 'the calculation is not finished yet! You must have'+ ;
+                          ' a TOTAL before you can return it to the program.'
+            ENDIF
+            _ftError( cMessage )
         ENDIF
     ENDCASE
   ENDDO  (WHILE .T.  Data entry from keyboard)
@@ -445,8 +487,15 @@ RETURN NIL
   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 */
 STATIC FUNCTION _ftAddScreen(aAdder)
-  LOCAL nCol
-  _ftPushWin(2+nTopOS,2+nAddSpace,22+nTopOS,30+nAddSpace,'   Adder   ',      ;
+  LOCAL nCol, cTitle
+  IF cMyLanguage == "ES"
+    cTitle := '  Sumadora '
+  ELSEIF cMyLanguage == "IT"
+    cTitle := '   Adder   '
+  ELSE
+    cTitle := '   Adder   '
+  ENDIF
+  _ftPushWin(2+nTopOS,2+nAddSpace,22+nTopOS,30+nAddSpace, cTitle,      ;
           '<F-1> for Help',,B_DOUBLE)
   nCol := 5+nAddSpace
   @  7+nTopOS, nCol SAY '      ÚÄÄÄ¿ ÚÄÄÄ¿ ÚÄÄÄ¿'
@@ -507,12 +556,20 @@ RETURN NIL
 */
 STATIC FUNCTION _ftChangeDec(aAdder, nNumDec)
 
-  LOCAL cDefTotPict  := '9999999999999999999'
+  LOCAL cDefTotPict  := '9999999999999999999', cPreg
+
+  IF cMyLanguage == "ES"
+    cPreg := 'Cuantos decimales quiere Usted ver?'
+  ELSEIF cMyLanguage == "IT"
+    cPreg := 'Quanti decimali volete vedere?'
+  ELSE
+    cPreg := 'How many decimals do you want to display?'
+  ENDIF
 
   IF nNumDec == NIL
     nNumDec := 0
 
-    nNumDec := _ftQuest('How many decimals do you want to display?',         ;
+    nNumDec := _ftQuest(cPreg,         ;
                         nNumDec, '9', {|oGet| _ftValDeci(oGet)})
 
     cTotPict := _ftPosRepl(cDefTotPict, '.', 19 - ABS(nNumDec))
@@ -548,13 +605,23 @@ RETURN NIL
 */
 STATIC FUNCTION _ftDispTotal(aAdder)
 
-  LOCAL cTotStr
+  LOCAL cTotStr, cPreg, cAvis
+
+  IF cMyLanguage == "ES"
+    cAvis := '****  ERROR  **** '
+    cPreg := 'el n£mero es demasiado grande para verlo! Creo la respuesta es '
+  ELSEIF cMyLanguage == "IT"
+    cAvis := '****  ERRORE  **** '
+    cPreg := 'il numero e troppo grande per vederlo! Credo l arisposta ‚ '
+  ELSE
+    cAvis := '****  ERROR  **** '
+    cPreg := 'that number is to big to display! I believe the answer was '
+  ENDIF
 
   IF nTotal>VAL(_ftCharRem(',',cTotPict))
     cTotStr   := _ftStuffComma(LTRIM(STR(nTotal)))
-    @ 4+nTopOS, 8+nAddSpace SAY '****  ERROR  **** '
-    _ftError('that number is to big to display! I believe the answer was ' + ;
-              cTotStr+'.')
+    @ 4+nTopOS, 8+nAddSpace SAY cAvis
+    _ftError( cPreg + cTotStr+'.')
     lAddError := .T.
     _ftUpdateTrans(aAdder, .T., NIL)
     _ftClearAdder(aAdder)
@@ -584,13 +651,23 @@ RETURN NIL
 */
 STATIC FUNCTION _ftDispSubTot(aAdder)
 
-  LOCAL cStotStr
+  LOCAL cStotStr, cPreg, cAvis
+
+  IF cMyLanguage == "ES"
+    cAvis := '****  ERROR  **** '
+    cPreg := 'el n£mero es demasiado grande para verlo! Creo la respuesta es '
+  ELSEIF cMyLanguage == "IT"
+    cAvis := '****  ERRORE  **** '
+    cPreg := 'il numero e troppo grande per vederlo! Credo l arisposta ‚ '
+  ELSE
+    cAvis := '****  ERROR  **** '
+    cPreg := 'that number is to big to display! I believe the answer was '
+  ENDIF
 
   IF nNumTotal>VAL(_ftCharRem(',',cTotPict))
     cStotStr  := _ftStuffComma(LTRIM(STR(nNumTotal)))
-    @ 4+nTopOS, 8+nAddSpace SAY '****  ERROR  **** '
-    _ftError('that number is to big to display! I believe the answer was ' + ;
-              cStotStr+'.')
+    @ 4+nTopOS, 8+nAddSpace SAY cAvis
+    _ftError( cPreg + cStotStr+'.')
     lAddError := .T.
     _ftUpdateTrans(aAdder, .T.,nNumTotal)
     _ftClearAdder(aAdder)
@@ -664,6 +741,21 @@ RETURN NIL
   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 */
 STATIC FUNCTION _ftAddTotal(aAdder)
+  LOCAL cTOT, cSTOT, cAdv
+  IF cMyLanguage == "ES"
+    cSTOT := '<SUBTOTAL>'
+    cTOT  := '   <TOTAL>'
+    cAdv  := "no se puede dividir por CERO!"
+  ELSEIF cMyLanguage == "IT"
+    cSTOT := '<SUBTOTALE>'
+    cTOT  := '  <TOTALE>'
+    cAdv  := "non si puo dividere per ZERO!"
+  ELSE
+    cSTOT := '<SUBTOTAL>'
+    cTOT  := '   <TOTAL>'
+    cAdv  := "you can't divide by ZERO!"
+  ENDIF
+
   _ftEraseTotSubTot(aAdder)
   lDecSet   := .F.
   nDecDigit :=  0
@@ -687,7 +779,7 @@ STATIC FUNCTION _ftAddTotal(aAdder)
     IF _ftRoundIt(nTotal,nMaxDeci)!=0 .OR. _ftRoundIt(nNumTotal,nMaxDeci)!=0
       IF !lMultDiv
         _ftSetWinColor(W_CURR,W_SCREEN)
-        @ 6+nTopOS, 18+nAddSpace SAY '<SUBTOTAL>'
+        @ 6+nTopOS, 18+nAddSpace SAY cSTOT
         _ftSetWinColor(W_CURR,W_PROMPT)
       ENDIF
       IF _ftRoundIt(nNumTotal,nMaxDeci)!=0
@@ -706,7 +798,7 @@ STATIC FUNCTION _ftAddTotal(aAdder)
       ELSEIF nAddMode == 4              // Divide
         nTotal := _ftDivide(aAdder, nTotal,nNumTotal)
         IF lDivError
-          _ftError("you can't divide by ZERO!")
+          _ftError( cAdv )
           lDivError := .F.
         ENDIF
       ENDIF
@@ -809,6 +901,16 @@ RETURN NIL
 */
 STATIC FUNCTION _ftMultDiv(aAdder, nKey)
 
+  LOCAL cAdv
+
+  IF cMyLanguage == "ES"
+    cAdv  := "no se puede dividir por CERO!"
+  ELSEIF cMyLanguage == "IT"
+    cAdv  := "non si puo dividere per ZERO!"
+  ELSE
+    cAdv  := "you can't divide by ZERO!"
+  ENDIF
+
   lMultDiv  := .T.
   _ftEraseTotSubTot(aAdder)
   lTotalOk  := .F.
@@ -841,7 +943,7 @@ STATIC FUNCTION _ftMultDiv(aAdder, nKey)
       _ftUpdateTrans(aAdder, .F.,nNumTotal)
       nTotal:=_ftDivide(aAdder, nTotal,nNumTotal)
       IF lDivError
-        _ftError("you can't divide by ZERO!")
+        _ftError( cAdv )
         lDivError := .F.
       ENDIF
       nNumTotal := 0
@@ -869,26 +971,70 @@ RETURN NIL
 */
 STATIC FUNCTION _ftAddHelp
 
-  LOCAL cMess := 'This Adder works like a desk top calculator. You may add,'+;
-                 ' subtract, multiply, or divide. '           + CRLF + CRLF +;
-                 'When adding or subtracting, the first entry is entered '  +;
-                 'into the accumulator and each sucessive entry is '        +;
-                 'subtotaled. When you press <ENTER> the SubTotal is also ' +;
-                 'shown on the tape. The second time you press <ENTER> the '+;
-                 'adder is Totaled. When multiplying or dividing the '      +;
-                 '<ENTER> is a Total the first time pressed.' + CRLF + CRLF +;
-                 'Hot Keys:'                                           +CRLF+;
-                 '         <D>ecimals Ä change # of decimals'          +CRLF+;
-                 '         <M>ove     Ä the Adder from right to left'  +CRLF+;
-                 '         <T>ape     Ä turn Tape Display On or Off'   +CRLF+;
-                 '         <S>croll   Ä the tape display'       + CRLF +CRLF+;
-                 '         <DEL> ÄÄÄÂÄÄ 1st Clear entry'               +CRLF+;
-                 '                  ÀÄÄ 2nd Clear ADDER'               +CRLF+;
-                 '         <ESC>      Ä Quit'                          +CRLF+;
-                 '         <F10>      Ä return a <TOTAL> to the active get'
+  LOCAL cMess, cMes1, cMes2
+  IF cMyLanguage == "ES"
+    cMes1 := 'AYUDA DE LA CALCULADORA'
+    cMes2 := 'pulse una tecla para seguir...'
+    cMess := 'Esta calculadora trabaja como una de mesa. Usted puede' + ;
+             ' sumar, restar, multiplicar y dividir. ' + CRLF + CRLF + ;
+             'Cuando suma o resta el primer n£mero es ingresado en ' + ;
+             'el acumulador y los siguientes ser n subtotalizados. ' + ;
+             'Cuando pulsa <ENTER> el Subtotal es mostrado en la cinta. ' + ;
+             'El siguiente <ENTER> totalizar  la calculadora. Al dividir '+ ;
+             '¢ multiplicar el primer <ENTER> la calculadora ' + ;
+             'totalizar .                               ' + CRLF + CRLF + ;
+             'Teclas: :'  + CRLF + ;
+             '  <D> decimales Ä cambie el # de decimales' + CRLF + ;
+             '  <M> mover     Ä mueve la calculadora de lado' + CRLF + ;
+             '  <T> cinta     - visualiza la cinta o no ' + CRLF + ;
+             '  <S> rotar     - browse de la cinta        ' + CRLF + CRLF + ;
+             '  <DEL> borra  ÄÄÄÂÄÄ 1§ borra la entrada' + CRLF + ;
+             '                  ÀÄÄ 2§ borra la calculadora' + CRLF + ;
+             '  <ESC>         Ä salir de la calculadora' + CRLF + ;
+             '  <F10>         - salir con el <TOTAL> en los get activos'
+  ELSEIF cMyLanguage == "IT"
+    cMes1 := 'ADDER HELP'
+    cMes2 := 'press any key to continue...'
+    cMess := 'This Adder works like a desk top calculator. You may add,'+;
+             ' subtract, multiply, or divide. ' + CRLF + CRLF +;
+             'When adding or subtracting, the first entry is entered '  +;
+             'into the accumulator and each sucessive entry is '        +;
+             'subtotaled. When you press <ENTER> the SubTotal is also ' +;
+             'shown on the tape. The second time you press <ENTER> the '+;
+             'adder is Totaled. When multiplying or dividing the '      +;
+             '<ENTER> is a Total the first time pressed.' + CRLF + CRLF +;
+             'Hot Keys:'                                           +CRLF+;
+             '         <D>ecimals Ä change # of decimals'          +CRLF+;
+             '         <M>ove     Ä the Adder from right to left'  +CRLF+;
+             '         <T>ape     Ä turn Tape Display On or Off'   +CRLF+;
+             '         <S>croll   Ä the tape display'       + CRLF +CRLF+;
+             '         <DEL> ÄÄÄÂÄÄ 1st Clear entry'               +CRLF+;
+             '                  ÀÄÄ 2nd Clear ADDER'               +CRLF+;
+             '         <ESC>      Ä Quit'                          +CRLF+;
+             '         <F10>      Ä return a <TOTAL> to the active get'
+  ELSE
+    cMes1 := 'ADDER HELP'
+    cMes2 := 'press any key to continue...'
+    cMess := 'This Adder works like a desk top calculator. You may add,'+;
+             ' subtract, multiply, or divide. ' + CRLF + CRLF +;
+             'When adding or subtracting, the first entry is entered '  +;
+             'into the accumulator and each sucessive entry is '        +;
+             'subtotaled. When you press <ENTER> the SubTotal is also ' +;
+             'shown on the tape. The second time you press <ENTER> the '+;
+             'adder is Totaled. When multiplying or dividing the '      +;
+             '<ENTER> is a Total the first time pressed.' + CRLF + CRLF +;
+             'Hot Keys:'                                           +CRLF+;
+             '         <D>ecimals Ä change # of decimals'          +CRLF+;
+             '         <M>ove     Ä the Adder from right to left'  +CRLF+;
+             '         <T>ape     Ä turn Tape Display On or Off'   +CRLF+;
+             '         <S>croll   Ä the tape display'       + CRLF +CRLF+;
+             '         <DEL> ÄÄÄÂÄÄ 1st Clear entry'               +CRLF+;
+             '                  ÀÄÄ 2nd Clear ADDER'               +CRLF+;
+             '         <ESC>      Ä Quit'                          +CRLF+;
+             '         <F10>      Ä return a <TOTAL> to the active get'
+  ENDIF
 
-   _ftPushMessage(cMess, .T., 'ADDER HELP', 'press any key to continue...',  ;
-                  'QUIET')
+   _ftPushMessage(cMess, .T., cMes1, cMes2, 'QUIET')
 
 
 RETURN NIL
@@ -1060,10 +1206,18 @@ RETURN(nNumerator/nDenominator)
 */
 STATIC FUNCTION _ftValDeci(oGet)
 
-  LOCAL lRtnValue := .T.
+  LOCAL lRtnValue := .T., cAdv
+
+  IF cMyLanguage == "ES"
+    cAdv  := 'no m s de 8 decimales porfavor!'
+  ELSEIF cMyLanguage == "IT"
+    cAdv  := 'non pi£ di 8 decimali perfavore!'
+  ELSE
+    cAdv  := 'no more than 8 decimal places please!'
+  ENDIF
 
   IF oGet:VarGet() > 8
-    _ftError('no more than 8 decimal places please!')
+    _ftError( cAdv)
     lRtnValue := .F.
   ENDIF
 
@@ -1085,7 +1239,16 @@ RETURN lRtnValue
   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 */
 STATIC FUNCTION _ftDisplayTape(aAdder, nKey)
-  LOCAL nDispTape, nTopTape := 1
+  LOCAL nDispTape, nTopTape := 1, cAdv
+
+  IF cMyLanguage == "ES"
+    cAdv  := 'CINTA '
+  ELSEIF cMyLanguage == "IT"
+    cAdv  := 'CARTA '
+  ELSE
+    cAdv  := ' TAPE '
+  ENDIF
+
   IF (nKey == 84 .OR. nKey == 116) .AND. lTape  // Stop displaying tape
     lTape := .F.
     RESTSCREEN(4+nTopOS,6+nTapeSpace,22+nTopOS,35+nTapeSpace,cTapeScr)
@@ -1107,7 +1270,7 @@ STATIC FUNCTION _ftDisplayTape(aAdder, nKey)
     SETCOLOR('R+/W')
     @ 4+nTopOS,6+nTapeSpace,21+nTopOS,33+nTapeSpace BOX B_SINGLE
     SETCOLOR('GR+/W')
-    @ 4+nTopOS,17+nTapeSpace SAY ' TAPE '
+    @ 4+nTopOS,17+nTapeSpace SAY cAdv
     SETCOLOR('N/W')
     IF nTotTran>15
       nTopTape := nTotTran-15
@@ -1307,6 +1470,15 @@ STATIC FUNCTION _ftQuest(cMessage,xVarVal,cPict,bValid,lNoESC,nWinColor,nTop)
   LOCAL GETLIST := {},                                                       ;
         cOldDevice  := SET(_SET_DEVICE, 'SCREEN'),                           ;
         lOldPrint   := SET(_SET_PRINTER, .F.)
+  LOCAL cAdv
+
+  IF cMyLanguage == "ES"
+    cAdv  := 'Usted no puede abortar! Por favor ingrese una respuesta.'
+  ELSEIF cMyLanguage == "IT"
+    cAdv  := 'non si puo abortare! Per piacere impostare una risposta.'
+  ELSE
+    cAdv  := 'you cannot Abort! Please enter an answer.'
+  ENDIF
 
   nOldRow   := ROW()
   nOldCol   := COL()
@@ -1363,7 +1535,7 @@ STATIC FUNCTION _ftQuest(cMessage,xVarVal,cPict,bValid,lNoESC,nWinColor,nTop)
                                         // without reissuing the gets
     ReadModal({oNewGet})
     IF LASTKEY() == K_ESC .AND. lNoESC  // They pressed <ESC>
-      _ftError('you cannot Abort! Please enter an answer.')
+      _ftError( cAdv )
     ELSE
       EXIT
     ENDIF
@@ -1442,7 +1614,7 @@ STATIC FUNCTION _ftError(cMessage, xDontReset)
         nOldLastKey,cErrorScr,nMessLen,nWide,nNumRows,nKey,                  ;
         cOldDevic,lOldPrint,                                                 ;
         lResetLKey := IF(xDontReset==NIL, .T., .F.)
-
+  LOCAL cLocMess, cErrMess
   nOldLastKey := LASTKEY()
   nOldRow  := ROW()
   nOldCol  := COL()
@@ -1450,7 +1622,19 @@ STATIC FUNCTION _ftError(cMessage, xDontReset)
   cOldColor:= _ftSetSCRColor(STD_ERROR)
   cOldDevic := SET(_SET_DEVICE, 'SCREEN')
   lOldPrint := SET(_SET_PRINTER, .F.)
-  cMessage := "I'm sorry but, " + cMessage
+  IF cMyLanguage == "ES"
+    cMessage := "Disculpe, " + cMessage
+    cErrMess := ' ERROR '
+    cLocMess := 'Pulse una tecla para seguir...'
+  ELSEIF cMyLanguage == "IT"
+    cMessage := "Scusate, " + cMessage
+    cErrMess := ' ERRORE '
+    cLocMess := 'Premete un tasto per continuare...'
+  ELSE
+    cMessage := "I'm sorry but, " + cMessage
+    cErrMess := ' ERROR '
+    cLocMess := 'Press any key to continue...'
+  ENDIF
   nMessLen := LEN(cMessage)
   nWide    := IF(nMessLen>66,66,IF(nMessLen<12,12,nMessLen))
   nNumRows := MLCOUNT(cMessage,nWide)
@@ -1463,8 +1647,8 @@ STATIC FUNCTION _ftError(cMessage, xDontReset)
   _ftShadow(nBot+1,nLeft+2,nBot+1,nRight+2,8)
   _ftShadow(nTop+1,nRight+1,nBot  ,nRight+2,8)
   @ nTop,nLeft,nBot,nRight BOX B_SINGLE
-  @ nTop,nLeft+INT(nWide/2)-1 SAY ' ERROR '
-  @ nBot-1,nLeft+INT(nWide-28)/2+3 SAY 'Press any key to continue...'
+  @ nTop,nLeft+INT(nWide/2)-1 SAY cErrMess
+  @ nBot-1,nLeft+INT(nWide-Len(cLocMess))/2+3 SAY cLocMess
   DISPMESSAGE cMessage,nTop+1,nLeft+3,nBot-2,nRight-3
   TONE(70,5)
   FT_INKEY 0 TO nKey
@@ -1957,6 +2141,33 @@ RETURN LEN(cString)-LEN(LTRIM(cString))
   ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 */
 STATIC FUNCTION _ftPosIns(cString,cChar,nPosit)
-RETURN LEFT(cString,nPosit-1)+cChar+SUBSTR(cString,nPosit)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+RETURN LEFT(cString,nPosit-1)+cChar+SUBSTR(cString,nPosit)
 
+// Planning multi-language support
+/*  1 step
+  IF cMyLanguage == "ES"
+    cMessage := 'el c lculo no ha sido terminado aun! Usted deber ' + ;
+                ' TOTALIZAR antes de regresar al programa.'
+  ELSEIF cMyLanguage == "IT"
+    cMessage := 'the calculation is not finished yet! You must have'+ ;
+                ' a TOTAL before you can return it to the program.'
+  ELSE
+    cMessage := 'the calculation is not finished yet! You must have'+ ;
+                ' a TOTAL before you can return it to the program.'
+  ENDIF
+  _ftError( cMessage )
+*/
+
+/*  2 step
+  IF nTotTran > 0
+     _ftError( sprintf( HB_LANGMESSAGE( nnn + 0 ), nTotTran ) + ;
+               HB_LANGMESSAGE( nnn + 2 ) )
+  ELSE
+     _ftError( HB_LANGMESSAGE( nnn + 1 ) + ;
+               HB_LANGMESSAGE( nnn + 2 ) )
+  ENDIF
+  // nnn + 0 points to "There are only %s transactions entered so far."
+  // nnn + 1 points to "There are no transactions entered so far."
+  // nnn + 2 points to "No need to scroll!"
+*/
 

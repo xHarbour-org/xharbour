@@ -1,5 +1,5 @@
 /*
- * $Id: TODO,v 1.3 2005/11/13 08:39-04:00 Marcelo Anelli Exp $
+ * $Id: TODO,v 1.1 2005/11/13 21:01:01 marceloanelli Exp $
  */
 
                   libnf To-Do list
@@ -16,10 +16,11 @@ sample test / demo program
 
 Adding support for multi-language
 for:
-popadder.prg  
+popadder.prg                                 mac (done)
 
 Adding support for muti-platform
 blink.prg
+popadder.prg for CR/LF                       mac
 
 =======================================================================
 Detail descriptions for Tasks:
