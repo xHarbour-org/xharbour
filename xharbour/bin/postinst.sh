@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: postinst.sh,v 1.16 2005/01/30 06:45:44 druzus Exp $
+# $Id: postinst.sh,v 1.17 2005/05/11 13:09:30 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -58,19 +58,4 @@ then
        [ "$HB_COMPILER" = "mingw32" ]; then
         mk_hblibso "${hb_root}"
     fi
-    # build fm lib with memory statistic
-    (cd ${hb_root}/source/vm
-    C_USR=${C_USR//-DHB_FM_STATISTICS_OFF/}
-    rm -f fm.o
-    ${MAKE} -r fm.o
-    ${AR} ${HB_LIB_INSTALL}/libfm.a fm.o
-    [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfm.a
-    rm -f fm.o
-    if [ "${HB_MT}" = "MT" ]; then
-        ${MAKE} -r fm.o 'HB_LIBCOMP_MT=YES'
-        ${AR} ${HB_LIB_INSTALL}/libfmmt.a fm.o
-        [ -n "${RANLIB}" ] && ${RANLIB} ${HB_LIB_INSTALL}/libfmmt.a
-        rm -f fm.o
-    fi
-    )
 fi

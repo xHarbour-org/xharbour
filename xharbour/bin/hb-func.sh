@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.59 2005/09/17 21:35:41 druzus Exp $
+# $Id: hb-func.sh,v 1.60 2005/09/19 23:21:27 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -385,7 +385,7 @@ if [ "\${HB_ARCHITECTURE}" = "darwin" ] || [ "\${HB_ARCHITECTURE}" = "sunos" ]; 
 else
     HARBOUR_LIBS="-Wl,--start-group \${HARBOUR_LIBS} -Wl,--end-group"
 fi
-l="fm"
+l="fmstat"
 [ "\${HB_MT}" = "MT" ] && [ -f "\${HB_LIB_INSTALL}/lib\${l}mt.a" ] && l="\${l}mt"
 if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
     if [ "\${HB_STATIC}" = "yes" ] && [ "\${HB_FM_REQ}" = "STAT" ]; then
@@ -527,7 +527,7 @@ mk_hblibso()
     for l in ${hb_libs}
     do
         case $l in
-            debug|profiler|fm|hbodbc|gtalleg|rddads) ;;
+            debug|profiler|fmstat|hbodbc|gtalleg|rddads) ;;
             *)
                 ls="lib${l}.a"
                 if [ -f lib${l}mt.a ]
