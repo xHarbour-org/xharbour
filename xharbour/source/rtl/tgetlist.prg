@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.30 2004/11/08 18:58:10 ronpinkas Exp $
+ * $Id: tgetlist.prg,v 1.31 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -850,7 +850,8 @@ METHOD GetReadVar() CLASS HBGetList
 
    if oGet:Subscript != NIL
       for n := 1 TO Len( oGet:Subscript )
-         cName += "[" + LTrim( Str( oGet:Subscript[ n ] ) ) + "]"
+         /* cName += "[" + LTrim( Str( oGet:Subscript[ n ] ) ) + "]" */
+         cName += "[" + LTrim( ValToPrg( oGet:Subscript[ n ] ) ) + "]"
       next
    end
 

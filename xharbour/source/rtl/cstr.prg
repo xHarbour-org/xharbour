@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.25 2005/05/27 03:06:40 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.26 2005/05/27 22:19:51 ronpinkas Exp $
  */
 
 /*
@@ -173,8 +173,11 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
             RETURN "[" + xVal + "]"
          ELSE
+            RETURN '"' + StrTran( xVal, '"', '" + Chr( 34 ) + "' ) + '"'
+/*
             Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
             EXIT
+*/
          ENDIF
 
       CASE 'D'
