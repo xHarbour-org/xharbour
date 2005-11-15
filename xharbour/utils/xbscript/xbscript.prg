@@ -87,6 +87,7 @@
 
    // Enable extended syntax.
    #ifdef __XHARBOUR__
+      #define __MACRO_COMPILE__
       #define __FOR_EACH__
       #define __WITH_
       #define __STRING_INDEX__
@@ -922,7 +923,11 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
       //TraceLog( nBlock, Code1, OpCode )
       //OutputDebugString( "Block: " + Str( nBlock ) + "Op: " + CStr( OpCode ) )
 
+    #ifdef __MACRO_COMPILE__
+      IF ValType( OpCode ) == 'C'
+    #else
       IF ValType( OpCode ) == 'B'
+    #endif
          aProcStack[2] := aCode[3] // Line No.
 
          BEGIN SEQUENCE
@@ -931,9 +936,17 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
 
             IF Code1 == 0
                //? aCode[3]
-               Eval( OpCode )
+               #ifdef __MACRO_COMPILE__
+                  HB_vmExecute( opCode )
+               #else
+                  Eval( OpCode )
+               #endif   
             ELSE
+              #ifdef __MACRO_COMPILE__
+               IF ! HB_vmExecute( OpCode ) // Jump if FALSE.
+              #else
                IF ! Eval( OpCode ) // Jump if FALSE.
+              #endif
                   nBlock := Code1
                   //TraceLog( "Jump: " + Str( aCode[3], 3 ) )
                ENDIF
@@ -1596,14 +1609,22 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                         aProcedures[nProcId] := { sSymbol, {} }
                      ENDIF
 
-                     aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sCounter + ":=" + sStart + "}" ), nLine } ) // Loop back
-
+                     #ifdef __MACRO_COMPILE__
+                        aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( sCounter + ":=" + sStart ), nLine } ) // Loop back
+                     #else
+                        aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sCounter + ":=" + sStart + "}" ), nLine } ) // Loop back                     
+                     #endif
+                     
                      sBlock := sCounter + "<=" + sEnd
 
                      s_nCompLoop++
                      aSize( s_aLoopJumps, s_nCompLoop )
-                     s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "F", &( "{||" + sCounter + ":=" + sCounter + "+" + sStep + "}" ) } // Address of line to later place conditional Jump instruction into.
-
+                     
+                     #ifdef __MACRO_COMPILE__
+                         s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "F", HB_MacroCompile( sCounter + ":=" + sCounter + "+" + sStep ) } // Address of line to later place conditional Jump instruction into.
+                     #else                     
+                         s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "F", &( "{||" + sCounter + ":=" + sCounter + "+" + sStep + "}" ) } // Address of line to later place conditional Jump instruction into.
+                     #endif
                   ELSEIF sBlock = "PP__NEXT"
 
                      IF s_nFlowId > 0 .AND. s_acFlowType[ s_nFlowId ] == "E"
@@ -1938,8 +1959,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                         ELSEIF s_acFlowType[ s_nFlowId ] == "O"
 
-                           aAdd( aProcedures[ nProcId ][2], { 0, &( "{|| HB_SetWith() }" ), nLine } ) // Reset
-
+                           #ifdef __MACRO_COMPILE__
+                              aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( "HB_SetWith()" ), nLine } ) // Reset
+                           #else                           
+                              aAdd( aProcedures[ nProcId ][2], { 0, &( "{|| HB_SetWith() }" ), nLine } ) // Reset
+                           #endif
                         ELSE
 
                            aProcedures[ nProcId ][2][ s_aIfJumps[s_nCompIf][1] ][1] := Len( aProcedures[ nProcId ][2] ) // Patching the previous conditional Jump Instruction
@@ -1971,7 +1995,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                ENDIF
 
                //TraceLog( sBlock, sSymbol )
-               aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
+               #ifdef __MACRO_COMPILE__
+                  aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( sBlock ), nLine } )
+               #else
+                  aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )               
+               #endif
             ENDIF
          ENDIF
 

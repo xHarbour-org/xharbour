@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.56 2005/10/24 01:04:38 druzus Exp $
+ * $Id: macro.c,v 1.57 2005/11/01 01:46:50 ronpinkas Exp $
  */
 
 /*
@@ -865,6 +865,36 @@ HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
    }
 
    return pMacro;
+}
+
+HB_FUNC( HB_MACROCOMPILE )
+{
+   char * szString = hb_parc(1);
+   HB_MACRO_PTR pMacro;
+   int iStatus;
+
+   pMacro = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
+   pMacro->Flags     = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH ;
+   pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
+   pMacro->status    = HB_MACRO_CONT;
+   pMacro->supported = HB_SM_HARBOUR;
+
+   szString = (char *) hb_strdup( szString );
+   iStatus = hb_macroParse( pMacro, szString, strlen( szString ) );
+   hb_xfree( (void *) szString );
+
+   //printf( "Status: %i %i Code: %s Len: %i\n", iStatus, pMacro->status, (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
+
+   if( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) )
+   {
+      hb_retclen( (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
+
+      hb_macroDelete( pMacro );
+   }
+   else
+   {
+      hb_macroSyntaxError( pMacro, hb_parc(1) );
+   }
 }
 
 /* This function handles a macro function calls, e.g. var :=&macro()

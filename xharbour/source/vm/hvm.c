@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.536 2005/11/13 21:58:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.537 2005/11/14 22:16:51 lf_sfnet Exp $
  */
 
 /*
@@ -918,20 +918,20 @@ int HB_EXPORT hb_vmQuit( void )
    if( s_aStatics.type == HB_IT_ARRAY )
    {
       HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
-	  //#define DEBUG_STATICS
-	  #ifdef DEBUG_STATICS
-	  {
-		 ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
-		 ULONG ulIndex;
-		 char sBuffer[128];
+     //#define DEBUG_STATICS
+     #ifdef DEBUG_STATICS
+     {
+       ULONG ulLen = s_aStatics.item.asArray.value->ulLen;
+       ULONG ulIndex;
+       char sBuffer[128];
 
-		 for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
-		 {
-			sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
-			OutputDebugString( sBuffer );
-		 }
-	  }
-	  #endif
+       for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
+       {
+         sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
+         OutputDebugString( sBuffer );
+       }
+     }
+     #endif
 
       hb_arrayRelease( &s_aStatics );
       s_aStatics.type = HB_IT_NIL;
@@ -3799,6 +3799,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    // is under way, or another VM might return in control
 
    //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
+}
+
+HB_FUNC( HB_VMEXECUTE )
+{
+   HB_THREAD_STUB_STACK
+
+   hb_vmExecute( (const BYTE *) hb_parc(1), (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) );
+   
+   hb_itemForwardValue( &(HB_VM_STACK.Return ), hb_stackItemFromTop( -1 ) );
+
+   hb_stackPop();;
 }
 
 /* ------------------------------- */

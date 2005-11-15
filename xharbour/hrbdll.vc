@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.81 2005/11/06 20:50:13 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.81 2005/11/06 10:59:13 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -1988,9 +1988,6 @@ $(OBJ_DIR)\macrob.obj : $(MACRO_DIR)\macrob.c
 
 $(OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
    $(CC_CMD)
-
-$(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
-   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC_CMD)

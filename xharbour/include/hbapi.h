@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.186 2005/11/09 04:39:43 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.187 2005/11/09 06:43:47 ronpinkas Exp $
  */
 
 /*
@@ -345,7 +345,6 @@ extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
     #define hb_retclenStatic( szText, ulLen )    hb_itemPutCLStatic( hb_stackReturnItem(), (szText), (ulLen) )
 
     #define hb_retclenAdoptRaw( szText, ulLen )  hb_itemPutCRaw( hb_stackReturnItem(), (szText), (ulLen) )
-    #define hb_retclenRawStatic( szText, ulLen ) hb_itemPutCRawStatic( hb_stackReturnItem(), (szText), (ulLen) )
 
     #define hb_retds( szDate )                   hb_itemPutDS( hb_stackReturnItem(), (szDate) )
     #define hb_retd( iYear, iMonth, iDay )       hb_itemPutD( hb_stackReturnItem(), (iYear), (iMonth), (iDay) )
@@ -382,7 +381,6 @@ extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
     extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retclenRaw( char * szText, ULONG ulLen );
-    extern void  HB_EXPORT  hb_retclenRawStatic( char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
     extern void  HB_EXPORT  hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */

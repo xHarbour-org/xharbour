@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4624 2005/11/15 18:45:20 druzus Exp $
+ * $Id: ChangeLog,v 1.4625 2005/11/15 19:01:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-15 12:16 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * hrbdll.vc
+  * makefile.nt
+  * makefile.vc
+    * nulsys.prg -> .c
+
+  * include/hbapi.h
+  * source/vm/fastitem.c
+    - Removed redundant hb_retclenRawStatic()
+  * source/rtl/chrasc.c
+  * source/rtl/str2ptr.c
+    * hb_retclenRawstatic() -> hb_retclenStatic()
+
+  * source/vm/hvm.c
+    + Added prg level HB_vmExecute( <cPCode> [, pSym [, pGlobals ] ] )
+  * source/vm/macro.c
+    + Added prg level HB_CompileMacro( <cExp> ) -> cPCode
+
+  * utils/xbscript/xbscript.prg
+    * Work in progress, support more direct pcode compilation.
 
 2005-11-15 11:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * makefile.bc

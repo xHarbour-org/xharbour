@@ -1,5 +1,5 @@
 /*
- * $Id: str2ptr.c,v 1.4 2005/03/15 18:02:53 ronpinkas Exp $
+ * $Id: str2ptr.c,v 1.5 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -62,15 +62,15 @@ HB_FUNC( HB_POINTER2STRING )
 
    if( HB_IS_POINTER( pPointer ) && pLen )
    {
-      hb_retclenRawStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( (char *) hb_itemGetPtr( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
    }
    else if( HB_IS_INTEGER( pPointer ) && pLen )
    {
-      hb_retclenRawStatic( (char *) hb_itemGetNI( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( (char *) hb_itemGetNI( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
    }
    else if( HB_IS_LONG( pPointer ) && pLen )
    {
-      hb_retclenRawStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
+      hb_retclenStatic( (char *) hb_itemGetNL( pPointer ), (ULONG) hb_itemGetNL( pLen ) );
    }
    else
    {

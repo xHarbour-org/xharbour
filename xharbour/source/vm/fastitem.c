@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.93 2005/11/09 04:39:43 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.94 2005/11/09 06:43:47 ronpinkas Exp $
  */
 
 /*
@@ -936,25 +936,6 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
    ( &(HB_VM_STACK.Return) )->item.asString.allocated = ulLen;
-}
-
-#undef hb_retclenRawStatic
-void HB_EXPORT hb_retclenRawStatic( char * szText, ULONG ulLen )
-{
-   HB_THREAD_STUB
-
-   HB_TRACE_STEALTH( HB_TR_INFO, ("hb_retclenRawStatic( '%s', %lu )", szText, ulLen ) );
-
-   if( ( &(HB_VM_STACK.Return) )->type )
-   {
-      hb_itemClear( &(HB_VM_STACK.Return) );
-   }
-
-   ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
-
 }
 
 #undef hb_retcStatic
