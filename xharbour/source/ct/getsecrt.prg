@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.4 2005/09/16 15:02:42 lculik Exp $
+ * $Id: getsecrt.prg,v 1.5 2005/09/29 16:51:29 lculik Exp $
  */
 
 /*
@@ -53,6 +53,8 @@
  */
 
 
+#include "setcurs.ch"
+
 MEMVAR nLen
 #command @ <row>, <col> GET <var>                                ;
                         [<clauses,...>]                          ;
@@ -71,9 +73,10 @@ MEMVAR nLen
 #include "common.ch"
 proc GetPassword( oGet, nLen )
 
-LOCAL nKey,              ;
+  LOCAL nKey,              ;
       nChar,             ;
       cKey
+  Local nSaveCursor := 0
 
   // read the GET if the WHEN condition is satisfied
   IF ( GetPreValidate(oGet) )
@@ -89,7 +92,9 @@ LOCAL nKey,              ;
 
       // apply keystrokes until exit
       DO WHILE ( oGet:exitState == GE_NOEXIT )
+        SetCursor( iif( nSaveCursor == SC_NONE, SC_NORMAL, nSaveCursor ) )
         nKey := InKey(0)
+        setCursor( SC_NONE )
         IF nKey >= 32 .AND. nKey <= 255
           oGet:cargo += Chr(nKey)
           GetApplyKey( oGet, Asc( "*" ) )
