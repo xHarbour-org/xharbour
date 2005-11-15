@@ -1,5 +1,5 @@
 /*
- * $Id: dates.c,v 1.10 2005/03/31 03:58:51 druzus Exp $
+ * $Id: dates.c,v 1.11 2005/11/14 00:18:32 druzus Exp $
  */
 
 /*
@@ -147,7 +147,7 @@ void HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrPut(%p, %d, %d, %d)", szDate, iYear, iMonth, iDay));
 
-   if( iYear >= 0 && iMonth >= 0 && iDay >= 0 )
+   if( iYear >= 0 && iMonth > 0 && iDay > 0 )
    {
       szDate[ 0 ] = ( ( iYear % 10000 ) / 1000 ) + '0';
       szDate[ 1 ] = ( ( iYear % 1000 ) / 100 ) + '0';
