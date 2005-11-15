@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4623 2005/11/15 18:06:40 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.4624 2005/11/15 18:45:20 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-15 11:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * makefile.bc
+  * hrbdll.bc
+    * nulsys.prg -> .c
 
 2005-11-15 19:43 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/tgetlist.prg
@@ -27,7 +32,7 @@
     * FT_BLINKW32( <Message>, <Row>, <Col>, <Blink Time> ) with support
         for more than one blink message.
   * contrib/libnf/samples/libnf.prg
-    + Demo and test added for FT_D2E(), FT_DEC2BIN() and FT_E2D()  
+    + Demo and test added for FT_D2E(), FT_DEC2BIN() and FT_E2D()
 
 2005-11-15 14:37 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbf1.c
@@ -59,14 +64,14 @@
   - source/vm/optgui
   + source/vm/fmstat/Makefile
     * removed dirs optcon and optgui added dir fmstat
-	 * removed defines HB_FM_STATISTICS_OFF, HB_OPT_GUI, HB_OPT_CON 
+	 * removed defines HB_FM_STATISTICS_OFF, HB_OPT_GUI, HB_OPT_CON
 	 * now HB_FM_STATISTICS is NOT defined by default
 	 * link libfmstat<mt> before libvm to get memory statistics
 	 * please update non gnu makefiles
 
 2005-11-14 09:40 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/samples/libnf.prg
-    + Demo and test program added for FT_BYT2BIT(), FT_BYT2HEX(), FT_BLINK, 
+    + Demo and test program added for FT_BYT2BIT(), FT_BYT2HEX(), FT_BLINK,
       FT_BLINKW32 / FT_BLINW32CANCEL
   * contrib/libnf/popadder.prg
     + Text of messages and help in English (original), spanish and italian
