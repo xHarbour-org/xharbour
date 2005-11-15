@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.106 2005/11/06 10:59:13 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.107 2005/11/15 19:01:27 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -2512,7 +2512,7 @@ $(OBJ_DIR)\macrob.obj : $(MACRO_DIR)\macrob.c
 $(OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
    $(CC_CMD)
 
-$(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
+$(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.159 2005/11/06 10:59:14 ptsarenko Exp $
+# $Id: makefile.bc,v 1.160 2005/11/15 19:01:27 ronpinkas Exp $
 #
 
 #
@@ -2723,7 +2723,7 @@ $(MACRO_OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
 # NULSYS.LIB dependencies
 #
 
-$(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
+$(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
    $(CC_CMD)
 
 #
