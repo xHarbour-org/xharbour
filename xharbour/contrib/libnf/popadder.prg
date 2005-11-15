@@ -140,7 +140,8 @@
 #define B_DOUBLE 'ÉÍ»º¼ÍÈº '
 #define B_SINGLE 'ÚÄ¿³ÙÄÀ³ '
 
-#define CRLF CHR(13)+CHR(10)
+#define CRLF Hb_OsNewLine()
+
 #define nTotTran LEN(aTrans)
 
 #command DEFAULT <p> TO <val> [,<pn> TO <valn>] =>         ;
@@ -658,7 +659,7 @@ STATIC FUNCTION _ftDispSubTot(aAdder)
     cPreg := 'el n£mero es demasiado grande para verlo! Creo la respuesta es '
   ELSEIF cMyLanguage == "IT"
     cAvis := '****  ERRORE  **** '
-    cPreg := 'il numero e troppo grande per vederlo! Credo l arisposta ‚ '
+    cPreg := 'il numero e troppo grande per vederlo! Credo la risposta ‚ '
   ELSE
     cAvis := '****  ERROR  **** '
     cPreg := 'that number is to big to display! I believe the answer was '
@@ -2142,32 +2143,3 @@ RETURN LEN(cString)-LEN(LTRIM(cString))
 */
 STATIC FUNCTION _ftPosIns(cString,cChar,nPosit)
 RETURN LEFT(cString,nPosit-1)+cChar+SUBSTR(cString,nPosit)
-
-// Planning multi-language support
-/*  1 step
-  IF cMyLanguage == "ES"
-    cMessage := 'el c lculo no ha sido terminado aun! Usted deber ' + ;
-                ' TOTALIZAR antes de regresar al programa.'
-  ELSEIF cMyLanguage == "IT"
-    cMessage := 'the calculation is not finished yet! You must have'+ ;
-                ' a TOTAL before you can return it to the program.'
-  ELSE
-    cMessage := 'the calculation is not finished yet! You must have'+ ;
-                ' a TOTAL before you can return it to the program.'
-  ENDIF
-  _ftError( cMessage )
-*/
-
-/*  2 step
-  IF nTotTran > 0
-     _ftError( sprintf( HB_LANGMESSAGE( nnn + 0 ), nTotTran ) + ;
-               HB_LANGMESSAGE( nnn + 2 ) )
-  ELSE
-     _ftError( HB_LANGMESSAGE( nnn + 1 ) + ;
-               HB_LANGMESSAGE( nnn + 2 ) )
-  ENDIF
-  // nnn + 0 points to "There are only %s transactions entered so far."
-  // nnn + 1 points to "There are no transactions entered so far."
-  // nnn + 2 points to "No need to scroll!"
-*/
-

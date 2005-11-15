@@ -1,11 +1,11 @@
 /*
- * $Id: libnf.prg,v 1.0 2005/11/11 18:56 mac Exp $
+ * $Id: libnf.prg,v 1.5 2005/11/14 13:41:20 marceloanelli Exp $
  */
 /*
    LIBNF.PRG
 
    Simplest demo program to show usage for libnf
-   
+
    NOTE: for xHarbour define is_xharbour and undefine it for clipper
 
 */
@@ -33,7 +33,7 @@ function Main()
   //
   #ifdef is_xharbour
     REQUEST HB_LANG_ES
-	  HB_LANGSELECT("ES")
+    HB_LANGSELECT("ES")
     MyLanguage := HB_LANGSELECT()
   #endif
 
@@ -62,6 +62,7 @@ function Main()
     FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
     inkey(0)
   #endif
+  SET KEY K_F1 TO
 
   //
   // Array group of routines
@@ -148,7 +149,6 @@ function Main()
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AAVG"
   ? REPLICATE( "Í", 78 )
   ?
-  ?
   ? "aSubTotals : "
   AEVAL( aSubTotals, { |x| QQOUT( transform( x, "9.99" ) + ",") } )
   ?
@@ -182,7 +182,6 @@ function Main()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADESSORT"
   ? REPLICATE( "Í", 78 )
-  ?
   ?
   ? "aNames : "
   aNames := { 'Mary', 'Albert' , 'John', 'Frank', 'Daniel', 'Giuliano'}
@@ -309,7 +308,6 @@ function Main()
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_AMEDIAN"
   ? REPLICATE( "Í", 78 )
   ?
-  ?
   ? "myarray0 = DIRECTORY()"
   ?
   //aEval( myarray0, {|v| qout( padr(v[1],12), v[2], v[3], v[4], v[5] ) } )
@@ -350,7 +348,6 @@ function Main()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ANOMATCHES"
   ? REPLICATE( "Í", 78 )
-  ?
   ?
   ? "myarray0 = DIRECTORY()"
   ?
@@ -431,7 +428,6 @@ function Main()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ASUM"
   ? REPLICATE( "Í", 78 )
-  ?
   ?
   ? "aSubTotals : "
   AEVAL( aSubTotals, { |x| QQOUT( transform( x, "999.99" ) + ",") } )
@@ -538,7 +534,6 @@ function Main()
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BYT2BIT()"
   ? REPLICATE( "Í", 78 )
   ?
-  ?
   var0 := FT_BYT2BIT( 'a' )
   ? PADR("FT_BYT2BIT( 'a' ) ->", 44) + var0
   ?
@@ -569,7 +564,6 @@ function Main()
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_BYT2HEX()"
   ? REPLICATE( "Í", 78 )
   ?
-  ?
   var0 := FT_BYT2HEX( 'a' )
   ? PADR("FT_BYT2HEX( 'a' ) ->", 44) + var0
   ?
@@ -581,6 +575,96 @@ function Main()
   ?
   var0 := FT_BYT2HEX( 'C' )
   ? PADR("FT_BYT2HEX( 'C' ) ->", 44) + var0
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_D2E() example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_D2E()"
+  ? REPLICATE( "Í", 78 )
+  ?
+  var0 := FT_D2E( 12.345, 2 )
+  ? PADR("FT_D2E( 12.345, 2 ) ->", 44) + var0
+  ?
+  var0 := FT_D2E( -12.345, 3 )
+  ? PADR("FT_D2E( -12.345, 3 ) ->", 44) + var0
+  ?
+  var0 := FT_D2E( 0.00000543, 2 )
+  ? PADR("FT_D2E( 0.00000543, 2 ) ->", 44) + var0
+  ?
+  var0 := FT_D2E( 1010000000, 5 )
+  ? PADR("FT_D2E( 1010000000, 5 ) ->", 44) + var0
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_DEC2BIN() example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_DEC2BIN()"
+  ? REPLICATE( "Í", 78 )
+  ?
+  var0 := FT_DEC2BIN(255)
+  ? PADR("FT_DEC2BIN(255) ->", 44) + var0
+  ?
+  var0 := FT_DEC2BIN(105)
+  ? PADR("FT_DEC2BIN(105) ->", 44) + var0
+  ?
+  var0 := FT_DEC2BIN(1)
+  ? PADR("FT_DEC2BIN(1) ->", 44) + var0
+  ?
+  var0 := FT_DEC2BIN(15)
+  ? PADR("FT_DEC2BIN(15) ->", 44) + var0
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_E2D() example
+  //
+  setcolor ('w+/b')
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_E2D()"
+  ? REPLICATE( "Í", 78 )
+  ?
+  var0 := FT_E2D( "1.23E1" )
+  ? PADR("FT_E2D( '1.23E1' ) ->", 34) + transform( var0, "9999999999.999999" )
+  ?
+  var0 := FT_E2D( "-1.235E1" )
+  ? PADR("FT_E2D( '-1.235E1' ) ->", 34) + transform( var0, "9999999999.999999" )
+  ?
+  var0 := FT_E2D( "5.43E-6" )
+  ? PADR("FT_E2D( '5.43E-6' ) ->", 34) + transform( var0, "9999999999.99999999" )
+  ?
+  var0 := FT_E2D( "1.101E6" )
+  ? PADR("FT_E2D( '1.101E6' ) ->", 34) + transform( var0, "9999999999.999999" )
   ?
 
   #ifdef is_xharbour
@@ -973,7 +1057,7 @@ function Main()
   CLS
   ? "TEST TO DEMONSTRATE EXAMPLES OF FT_ADDER"
   ? REPLICATE( "Í", 78 )
-  ? 
+  ?
   nSickHrs := 0
   nPersHrs := 0
   nVacaHrs := 0
@@ -982,7 +1066,7 @@ function Main()
   //_ftSetScrColor( STD_SCREEN, STD_VARIABLE)
   //setcolor ('w+/b')
   //CLS
-  
+
   SET KEY K_ALT_A  TO FT_Adder        // Make <ALT-A> call FT_Adder
 
   * SIMPLE Sample of program data entry!
@@ -1008,7 +1092,7 @@ function Main()
   ENDDO
   SET CURSOR ON
   SET KEY K_ALT_A                     // Reset <ALT-A>
-  
+
   #ifdef is_xharbour
     FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
     inkey(0)
@@ -1041,11 +1125,17 @@ function Main()
   ? "normal hardware blink operate."
 
   #ifdef is_xharbour
-    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    FT_BLINKW32( "[ Hit a key to continue ]", 21, 0, nwait )
+    FT_BLINKW32( "[ Hit a key to continue ]", 22, 10, nwait )
+    FT_BLINKW32( "[ Hit a key to continue ]", 23, 20, nwait )
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 30, nwait )
     inkey(0)
     FT_BLINKW32CANCEL()
   #else
-    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    FT_BLINK( "[ Hit a key to continue ]", 21, 0 )
+    FT_BLINK( "[ Hit a key to continue ]", 22, 10 )
+    FT_BLINK( "[ Hit a key to continue ]", 23, 20 )
+    FT_BLINK( "[ Hit a key to continue ]", 24, 30 )
     inkey(0)
   #endif
 

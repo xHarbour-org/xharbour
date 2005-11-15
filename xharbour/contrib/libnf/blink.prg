@@ -49,8 +49,9 @@
  *  $END$
  */
 
-STATIC cxMsg, nxRow, nxCol, nxTask
+STATIC cxMsg, nxRow, nxCol, nxTask := NIL
 STATIC tAnterior, lDoit, nxWait
+STATIC aFT_Blinks := {}
 
 #ifdef FT_TEST
   FUNCTION MAIN()
@@ -98,16 +99,23 @@ FUNCTION FT_BLINKW32( cMsg, nRow, nCol, nWait )
   nxCol     := nCol
   tAnterior := NIL
   lDoit     := NIL
-  nxTask := HB_IDLEADD( {|| FT_BLINKW32IT() } )
+  IF ( nxTask == NIL )
+    nxTask := HB_IDLEADD( {|| FT_BLINKW32IT() } )
+    aFT_Blinks := { { nxRow, nxCol, cxMsg } }
+  ELSE
+    AADD( aFT_Blinks, { nxRow, nxCol, cxMsg } )
+  ENDIF
 RETURN NIL
 
 FUNCTION FT_BLINKW32CANCEL()
+  aFT_Blinks := {}
   HB_IDLEDEL( nxTask )
+  nxTask := NIL
 RETURN NIL
 
 FUNCTION FT_BLINKW32IT()
   LOCAL cSavColor, lBlinkStatus
-
+  LOCAL i, aBlinks
   tAnterior := IIF( tAnterior == NIL, SECONDS(), tAnterior )
   lDoit     := IIF( lDoit == NIL, .F., lDoit )
   IF SECONDS() < tAnterior    // Hemos pasado la medianoche
@@ -118,11 +126,20 @@ FUNCTION FT_BLINKW32IT()
     cSavColor    := SETCOLOR()
     lBlinkStatus := SETBLINK( .T. )
     SETCOLOR( IF( ("*" $ LEFT(cSavColor,4)), cSavColor, "*" + cSavColor ) )
+    IF Len( aFT_BLINKS ) < 1
+      RETURN NIL
+    ENDIF
+    FOR i := 1 TO Len( aFT_Blinks )
+      aBlinks := aFT_Blinks[ i ]
+      IF lDoit
+        @ aBlinks[ 1 ], aBlinks[ 2 ] SAY SPACE( LEN( aBlinks[ 3 ] ) )
+      ELSE
+        @ aBlinks[ 1 ], aBlinks[ 2 ] SAY aBlinks[ 3 ]
+      ENDIF
+    NEXT
     IF lDoit
-      @ nxRow, nxCol SAY SPACE( LEN( cxMsg ) )
       lDoit := .F.
     ELSE
-      @ nxRow, nxCol SAY cxMsg
       lDoit := .T.
     ENDIF
     SETCOLOR( cSavColor )
