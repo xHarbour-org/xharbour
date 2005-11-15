@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4620 2005/11/15 01:52:59 lculik Exp $
+ * $Id: ChangeLog,v 1.4621 2005/11/15 13:45:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -52,6 +52,31 @@
       The translations are coded inline due to big text in the original
       code.
     ! minor fixes to code.
+
+2005-11-14 01:14 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdate.h
+    + added hb_dateJulianDOW() - retrieve day of week from Julian's date
+
+  * xharbour/source/compiler/harbour.c
+    ! fix possible buffer overflow in hb_conOutErr()
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    ! fix stupid typo in my last commit
+
+  * xharbour/source/rtl/dates.c
+    % optimized hb_dateEncode()
+    + added HB_STR_DATE_BASE for conversion to string - Clipper
+      compatibility though we are not 100% Clipper compatible STOD()
+      because we will have to reduce functionality (supported date
+      range) to reach it.
+    * some minor fixes for Clipper compatibility
+
+  * xharbour/source/rtl/dateshb.c
+    * use faster and Clipper compatible hb_dateJulianDOW() instead of
+      hb_dateDOW()
+
+  * xharbour/source/vm/garbage.c
+    - removed unnecessary memset() on newly created items
 
 2005-11-14 03:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * doc/en/array.txt
