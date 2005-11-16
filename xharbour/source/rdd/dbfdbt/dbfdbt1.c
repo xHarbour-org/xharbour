@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.30 2005/10/18 12:14:32 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.31 2005/10/24 01:04:31 druzus Exp $
  */
 
 /*
@@ -849,8 +849,8 @@ static void hb_dbfdbtRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( dbfdbt1__InitSymbols )
-{ "DBFDBT",              HB_FS_PUBLIC, {HB_FUNCNAME( DBFDBT )}, NULL },
-{ "DBFDBT_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFDBT_GETFUNCTABLE )}, NULL }
+{ "DBFDBT",              {HB_FS_PUBLIC}, {HB_FUNCNAME( DBFDBT )}, NULL },
+{ "DBFDBT_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( DBFDBT_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfdbt1__InitSymbols )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_dbfdbt_rdd_init_ )

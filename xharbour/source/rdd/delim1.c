@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.13 2005/09/17 21:35:41 druzus Exp $
+ * $Id: delim1.c,v 1.14 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -208,8 +208,8 @@ static void hb_delimRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
-{ "DELIM",              HB_FS_PUBLIC, {HB_FUNCNAME( DELIM )}, NULL },
-{ "DELIM_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DELIM_GETFUNCTABLE )}, NULL }
+{ "DELIM",              {HB_FS_PUBLIC}, {HB_FUNCNAME( DELIM )}, NULL },
+{ "DELIM_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( DELIM_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( delim1__InitSymbols )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_delim_rdd_init_ )

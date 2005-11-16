@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.110 2005/10/29 06:42:35 druzus Exp $
+ * $Id: genc.c,v 1.111 2005/11/03 06:55:29 ronpinkas Exp $
  */
 
 /*
@@ -383,7 +383,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize static variables
             */
-            fprintf( yyc, "{ \"(_INITSTATICS)\", HB_FS_INITEXIT, {hb_INITSTATICS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITSTATICS)\", {HB_FS_INITEXIT}, {hb_INITSTATICS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '[' )
          {
@@ -391,7 +391,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"(_INITGLOBALS)\", HB_FS_INITEXIT, {hb_INITGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITGLOBALS)\", {HB_FS_INITEXIT}, {hb_INITGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '{' )
          {
@@ -399,7 +399,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", HB_FS_INITEXIT, {hb_REGISTERGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", {HB_FS_INITEXIT}, {hb_REGISTERGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
@@ -424,7 +424,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                }
             }
 
-            fprintf( yyc, "{ \"%s\", ", pSym->szName );
+            fprintf( yyc, "{ \"%s\", {", pSym->szName );
 
             if( pSym->cScope & HB_FS_STATIC )
             {
@@ -471,24 +471,24 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                if( pSym->cScope & HB_FS_INIT )
                {
-                  fprintf( yyc, ", {HB_INIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else if( pSym->cScope & HB_FS_EXIT )
                {
-                  fprintf( yyc, ", {HB_EXIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
+                  fprintf( yyc, "}, {HB_EXIT_FUNCNAME( %.*s )}, NULL }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
                else
                {
-                  fprintf( yyc, ", {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
+                  fprintf( yyc, "}, {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
                }
             }
             else if( pSym->bFunc && hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
             {
-               fprintf( yyc, ", {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
+               fprintf( yyc, "}, {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
             }
             else
             {
-               fprintf( yyc, ", {NULL}, NULL }" );   /* memvar */
+               fprintf( yyc, "}, {NULL}, NULL }" );   /* memvar */
             }
          }
 
@@ -865,7 +865,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
          {
             if ( hb_compFunCallFind( pTemp->szName ) )
             {
-               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", {HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
 
                if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc )
                {
@@ -873,7 +873,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
                   strcat( szEntries, " | HB_FS_FIRST" );
                }
 
-               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
+               hb_xstrcat( szEntries, "}, {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
             }
          }
          else
@@ -881,19 +881,19 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
             if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc  )
             {
                bStartFunc = TRUE;
-               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
+               hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", {HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
                strcat( szEntries, " | HB_FS_FIRST" );
-               hb_xstrcat( szEntries, ", {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
+               hb_xstrcat( szEntries, "}, {HB_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
             }
          }
 
          if( pTemp->Type == HB_PROTO_FUNC_EXIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_EXIT | HB_FS_LOCAL, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
          }
          else if( pTemp->Type == HB_PROTO_FUNC_INIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", HB_FS_INIT | HB_FS_LOCAL, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, NULL },\n", NULL );
          }
       }
 

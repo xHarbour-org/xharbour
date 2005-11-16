@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.13 2005/09/17 21:35:41 druzus Exp $
+ * $Id: sdf1.c,v 1.14 2005/10/04 02:05:33 druzus Exp $
  */
 
 /*
@@ -206,8 +206,8 @@ static void hb_sdfRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
-{ "SDF",              HB_FS_PUBLIC, {HB_FUNCNAME( SDF )}, NULL },
-{ "SDF_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
+{ "SDF",              {HB_FS_PUBLIC}, {HB_FUNCNAME( SDF )}, NULL },
+{ "SDF_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_sdf_rdd_init_ )

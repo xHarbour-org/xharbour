@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.44 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.45 2005/11/12 22:49:30 walito Exp $
  */
 
 /*
@@ -64,16 +64,22 @@
    struct _HB_DYNS;
    struct _SYMBOLS;
    struct _HB_PCODEFUNC;
-
+/*
+   // Now it should not be longer necessary
    #if defined(_MSC_VER) && _MSC_VER < 1000
       #pragma pack(8)
    #endif
+*/
 
    /* symbol support structure */
    typedef struct
    {
       char *            szName;        /* the name of the symbol */
-      HB_SYMBOLSCOPE    cScope;        /* the scope of the symbol */
+      union
+      {
+         HB_SYMBOLSCOPE    value;      /* the scope of the symbol */
+         void *            pointer;    /* filler to force alignment */
+      } scope;
       union
       {
          PHB_FUNC          pFunPtr;       /* function address for function symbol table entries */
@@ -83,9 +89,12 @@
       struct _HB_DYNS * pDynSym;       /* pointer to its dynamic symbol if defined */
    } HB_SYMB, * PHB_SYMB;
 
+/*
+   // Now it should not be longer necessary
    #if defined(_MSC_VER) && _MSC_VER < 1000
       #pragma pack()
    #endif
+*/
 
    typedef struct _SYMBOLS
    {
@@ -189,8 +198,8 @@
    struct hb_struString
    {
       ULONG           length;
-      char            *value;
       ULONG           allocated;
+      char            *value;
       HB_COUNTER      *pulHolders; /* number of holders of this string */
    };
 

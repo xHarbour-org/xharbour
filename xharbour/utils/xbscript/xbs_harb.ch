@@ -2251,10 +2251,10 @@
               pDynList->pProcsArray[ iBase + iPos ].pDynFunc     = pDynFunc;
               pDynList->pProcsArray[ iBase + iPos ].pDynSym      = pDynSym;
               pDynList->pProcsArray[ iBase + iPos ].pPresetFunc  = pDynSym->pSymbol->value.pFunPtr;
-              pDynList->pProcsArray[ iBase + iPos ].cPresetScope = pDynSym->pSymbol->cScope;
+              pDynList->pProcsArray[ iBase + iPos ].cPresetScope = pDynSym->pSymbol->scope.value;
 
               pDynSym->pSymbol->value.pFunPtr = (PHB_FUNC) pDynFunc;
-              pDynSym->pSymbol->cScope |= HB_FS_PCODEFUNC;
+              pDynSym->pSymbol->scope.value |= HB_FS_PCODEFUNC;
            }
 
            //hb_retptr( (void *) pDynList );
@@ -2306,7 +2306,7 @@
               if( pDynList->pProcsArray[i].pDynSym->pSymbol->value.pFunPtr == (PHB_FUNC) pDynList->pProcsArray[i].pDynFunc )
               {
                  pDynList->pProcsArray[i].pDynSym->pSymbol->value.pFunPtr = pDynList->pProcsArray[i].pPresetFunc ;
-                 pDynList->pProcsArray[i].pDynSym->pSymbol->cScope        = pDynList->pProcsArray[i].cPresetScope ;
+                 pDynList->pProcsArray[i].pDynSym->pSymbol->scope.value   = pDynList->pProcsArray[i].cPresetScope ;
               }
               else
               {

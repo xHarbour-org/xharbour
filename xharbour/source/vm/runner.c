@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.42 2005/09/22 01:12:00 druzus Exp $
+ * $Id: runner.c,v 1.43 2005/10/24 01:04:38 druzus Exp $
  */
 
 /*
@@ -479,7 +479,7 @@ static void hb_hrbInitStatic( PHRB_BODY pHrbBody )
       /* Initialize static variables first */
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check _INITSTATICS functions */
       {
-         if( ( pHrbBody->pSymRead[ ul ].cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
+         if( ( pHrbBody->pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
          {
             /* call (_INITSTATICS) function. This function assigns
              * literal values to static variables only. There is no need
@@ -513,7 +513,7 @@ static void hb_hrbInit( PHRB_BODY pHrbBody, int argc, char * argv[] )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check INIT functions */
       {
-         if( ( pHrbBody->pSymRead[ ul ].cScope & HB_FS_INITEXIT ) == HB_FS_INIT )
+         if( ( pHrbBody->pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == HB_FS_INIT )
          {
             hb_vmPushSymbol( pHrbBody->pSymRead + ul );
             hb_vmPushNil();
@@ -537,12 +537,12 @@ static void hb_hrbExit( PHRB_BODY pHrbBody )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check EXIT functions     */
       {
-         if( ( pHrbBody->pSymRead[ ul ].cScope & HB_FS_INITEXIT ) == HB_FS_EXIT )
+         if( ( pHrbBody->pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == HB_FS_EXIT )
          {
             hb_vmPushSymbol( pHrbBody->pSymRead + ul );
             hb_vmPushNil();
             hb_vmDo( 0 );                   /* Run exit function        */
-            pHrbBody->pSymRead[ ul ].cScope = pHrbBody->pSymRead[ ul ].cScope & ( ~HB_FS_EXIT );
+            pHrbBody->pSymRead[ ul ].scope.value = pHrbBody->pSymRead[ ul ].scope.value & ( ~HB_FS_EXIT );
                                             /* Exit function cannot be
                                                handled by main in hvm.c */
          }
@@ -647,15 +647,15 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
       {
          pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, FALSE, ulBodySize, &ulBodyOffset );
          //printf( "at offset %i, found symbol %s, scope %i, type %i\n", ulBodyOffset, pSymRead[ ul ].szName, szHrbBody[ulBodyOffset], szHrbBody[ulBodyOffset+1] );
-         pSymRead[ ul ].cScope  = szHrbBody[ulBodyOffset++];
+         pSymRead[ ul ].scope.value  = szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].pDynSym = NULL;
 
          /* temporary hack for old HRB modules I'll remove it in some time, Druzus */
-         if ( ( pSymRead[ ul ].cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == 0 )
-            pSymRead[ ul ].cScope |= HB_FS_PUBLIC;
+         if ( ( pSymRead[ ul ].scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == 0 )
+            pSymRead[ ul ].scope.value |= HB_FS_PUBLIC;
 
-         if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].cScope & HB_FS_FIRST && ! ( pSymRead[ ul ].cScope & HB_FS_INITEXIT ) )
+         if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].scope.value & HB_FS_FIRST && ! ( pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) )
          {
             pHrbBody->ulSymStart = ul;
          }
@@ -704,7 +704,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             {
                /* Exists and NOT static ?  */
                /*
-               if( hb_dynsymFind( pSymRead[ ul ].szName ) && ! ( pSymRead[ ul ].cScope & HB_FS_STATIC ) )
+               if( hb_dynsymFind( pSymRead[ ul ].szName ) && ! ( pSymRead[ ul ].scope.value & HB_FS_STATIC ) )
                {
                   hb_errRT_BASE( EG_ARG, 9999, "Duplicate symbol", pSymRead[ ul ].szName );
                   hb_hrbUnLoad( pHrbBody );
@@ -714,7 +714,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
                */
 
                pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) pDynFunc[ ulPos ].pCodeFunc;
-               pSymRead[ ul ].cScope |= HB_FS_PCODEFUNC;
+               pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC; /* | HB_FS_LOCAL; */
 
                //printf( "Function pointer is %p\n", pSymRead[ ul ].value.pFunPtr );
             }
@@ -732,9 +732,9 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             if( pDynSym )
             {
                pSymRead[ ul ].value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
-               if( pDynSym->pSymbol->cScope & HB_FS_PCODEFUNC )
+               if( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC )
                {
-                  pSymRead[ ul ].cScope |= HB_FS_PCODEFUNC;
+                  pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC;
                }
             }
             else

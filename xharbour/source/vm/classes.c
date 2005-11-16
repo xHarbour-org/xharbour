@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.176 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: classes.c,v 1.177 2005/11/08 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ static BOOL     s_bClsAutoInit = TRUE;
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
        hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0;
 
-HB_SYMB  hb_symDestructor = { "__Destructor", HB_FS_PUBLIC, {NULL}, NULL };
+HB_SYMB  hb_symDestructor = { "__Destructor", {HB_FS_PUBLIC}, {NULL}, NULL };
 
 /* All functions contained in classes.c */
 
@@ -1878,7 +1878,7 @@ HB_FUNC( __CLSADDMSG )
 
       if( pFunc_or_BlockPointer != NULL )
       {
-         uiID = ((PHB_SYMB) pFunc_or_BlockPointer)->cScope;
+         uiID = ((PHB_SYMB) pFunc_or_BlockPointer)->scope.value;
       }
       else
       {
@@ -4049,10 +4049,12 @@ void hb_clsFinalize( PHB_ITEM pObject )
          BOOL bCollecting = hb_gcSetCollecting( TRUE );
          PHB_FUNC pDestructor = pClass->pDestructor;
 
+         /* TODO: This code is not MT safe so MT programs cannot use
+            destructors */
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
             hb_symDestructor.value.pFunPtr = ((PHB_SYMB) pDestructor)->value.pFunPtr;
-            hb_symDestructor.cScope = ((PHB_SYMB) pDestructor)->cScope;
+            hb_symDestructor.scope.value = ((PHB_SYMB) pDestructor)->scope.value;
          }
          else
          {

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.230 2005/11/04 02:20:10 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.231 2005/11/07 01:02:54 druzus Exp $
  */
 
 /*
@@ -9194,8 +9194,8 @@ static void hb_dbfcdxRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
-{ "SIXCDX",              HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX )}, NULL },
-{ "SIXCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
+{ "SIXCDX",              {HB_FS_PUBLIC}, {HB_FUNCNAME( SIXCDX )}, NULL },
+{ "SIXCDX_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
 #else
@@ -9258,8 +9258,8 @@ static void hb_dbfcdxRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
-{ "DBFCDX",              HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX )}, NULL },
-{ "DBFCDX_GETFUNCTABLE", HB_FS_PUBLIC, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
+{ "DBFCDX",              {HB_FS_PUBLIC}, {HB_FUNCNAME( DBFCDX )}, NULL },
+{ "DBFCDX_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( DBFCDX_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( dbfcdx1__InitSymbols )
 
 #endif

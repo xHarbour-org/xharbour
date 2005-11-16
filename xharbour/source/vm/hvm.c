@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.537 2005/11/14 22:16:51 lf_sfnet Exp $
+ * $Id: hvm.c,v 1.538 2005/11/15 20:17:13 ronpinkas Exp $
  */
 
 /*
@@ -280,7 +280,7 @@ extern void hb_clsSetModule( USHORT uiClass );
 
 /* virtual machine state */
 
-HB_SYMB  hb_symEval = { "__EVAL", HB_FS_PUBLIC, {hb_vmDoBlock}, NULL }; /* symbol to evaluate codeblocks */
+HB_SYMB  hb_symEval = { "__EVAL", {HB_FS_PUBLIC}, {hb_vmDoBlock}, NULL }; /* symbol to evaluate codeblocks */
 
 static HB_ITEM  s_aStatics;         /* Harbour array to hold all application statics variables */
 static USHORT   s_uiStatics;        /* Number of statics added after processing hb_vmStatics() */
@@ -6631,7 +6631,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Calling: %s", pSym->szName));
 
          //printf( "Doing: '%s'\n", pSym->szName );
-         if ( pSym->cScope & HB_FS_PCODEFUNC )
+         if ( pSym->scope.value & HB_FS_PCODEFUNC )
          {
             /* Running pCode dynamic function from .HRB */
             hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
@@ -6981,7 +6981,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
          if( pFunc )
          {
-            if( pSymbol->cScope & HB_FS_PCODEFUNC )
+            if( pSymbol->scope.value & HB_FS_PCODEFUNC )
             {
                /* Running pCode dynamic function from .HRB */
                hb_vmExecute( ((PHB_PCODEFUNC)pFunc)->pCode, ((PHB_PCODEFUNC)pFunc)->pSymbols, ((PHB_PCODEFUNC)pFunc)->pGlobals );
@@ -8846,7 +8846,7 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
       PHB_SYMB pSymbol = pSymbols + ui;
       HB_SYMBOLSCOPE hSymScope;
 
-      hSymScope = pSymbol->cScope;
+      hSymScope = pSymbol->scope.value;
 
       pNewSymbols->hScope |= hSymScope;
 
@@ -8920,7 +8920,7 @@ static void hb_vmDoInitStatics( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_INITEXIT )
             {
@@ -8953,7 +8953,7 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_EXIT )
             {
@@ -8992,7 +8992,7 @@ static void hb_vmDoInitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->cScope & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_INIT )
             {
@@ -9493,7 +9493,7 @@ void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols
       PHB_SYMB pSymbol = pSymbols + ui;
       HB_SYMBOLSCOPE hSymScope;
 
-      hSymScope = pSymbol->cScope;
+      hSymScope = pSymbol->scope.value;
 
       pNewSymbols->hScope |= hSymScope;
 

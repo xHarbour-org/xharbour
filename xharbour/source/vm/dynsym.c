@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.27 2005/10/24 01:04:36 druzus Exp $
+ * $Id: dynsym.c,v 1.28 2005/10/29 06:45:02 druzus Exp $
  */
 
 /*
@@ -110,8 +110,8 @@ PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
 
    pSymbol = ( PHB_SYMB ) hb_xgrab( sizeof( HB_SYMB ) );
    pSymbol->szName = ( char * ) hb_xgrab( strlen( szName ) + 1 );
-   pSymbol->cScope = HB_FS_ALLOCATED; /* to know what symbols to release when exiting the app */
    strcpy( pSymbol->szName, szName );
+   pSymbol->scope.value = HB_FS_ALLOCATED; /* to know what symbols to release when exiting the app */
    pSymbol->value.pFunPtr = NULL;
    pSymbol->pDynSym = NULL;
 
@@ -137,7 +137,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
          /* reenabled - it's still wrong, Druzus */
          /* see note below */
          /* register only non static functions */
-         if( ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
+         if( ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
          {
             //TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
          }
@@ -147,7 +147,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
            /* The DynSym existed without function pointer */
 
            /* free runtime allocated symbols */
-           if( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+           if( ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
            {
               hb_xfree( pDynSym->pSymbol->szName );
               hb_xfree( pDynSym->pSymbol );
@@ -160,7 +160,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
         }
       }
 
-      if( pDynSym->pModuleSymbols == NULL && ( pSymbol->cScope & HB_FS_LOCAL ) )
+      if( pDynSym->pModuleSymbols == NULL && ( pSymbol->scope.value & HB_FS_LOCAL ) )
       {
          pDynSym->pModuleSymbols = pModuleSymbols;
          //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
@@ -211,7 +211,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
     * disabled at least for debugging.
     */
    if( pSymbol->value.pFunPtr &&
-       ( pSymbol->cScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
+       ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
    {
       /*
        * This symbol points to static function - we cannot register
@@ -228,7 +228,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    }
 #endif
 
-   if( pSymbol->cScope & HB_FS_LOCAL )
+   if( pSymbol->scope.value & HB_FS_LOCAL )
    {
       pDynSym->pModuleSymbols = pModuleSymbols;
       //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
@@ -673,7 +673,7 @@ void HB_EXPORT hb_dynsymRelease( void )
       pDynSym = ( s_pDynItems + uiPos )->pDynSym;
 
       /* it is a allocated symbol ? */
-      if( ( pDynSym->pSymbol->cScope & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+      if( ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
       {
          hb_xfree( pDynSym->pSymbol->szName );
          hb_xfree( pDynSym->pSymbol );
