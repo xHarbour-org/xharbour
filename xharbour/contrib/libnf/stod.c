@@ -1,5 +1,5 @@
 /*
- * $Id: stod.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: stod.c,v 1.2 2004/03/18 03:46:55 ronpinkas Exp $
  */
 
 /*
@@ -53,12 +53,5 @@
 
 HB_FUNC(FT_STOD)
 {
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
-   {
-
-      hb_retds( hb_parcx(1) ) ;
-
-      return;
-   }
-#endif
+	hb_retds( hb_parclen( 1 ) >= 8 ? hb_parc( 1 ) : NULL );
 }

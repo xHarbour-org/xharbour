@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4626 2005/11/15 20:17:12 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4627 2005/11/15 23:08:49 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-15 22:39 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/stod.c
+    ! fixed to support al OS, is exactly as STOD()
+  * contrib/libnf/samples/libnf.prg
+    + Demo and test added for FT_DTOS()
 
 2005-11-16 00:06 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * hrbdll.vc
@@ -91,10 +97,10 @@
   - source/vm/optgui
   + source/vm/fmstat/Makefile
     * removed dirs optcon and optgui added dir fmstat
-	 * removed defines HB_FM_STATISTICS_OFF, HB_OPT_GUI, HB_OPT_CON
-	 * now HB_FM_STATISTICS is NOT defined by default
-	 * link libfmstat<mt> before libvm to get memory statistics
-	 * please update non gnu makefiles
+   * removed defines HB_FM_STATISTICS_OFF, HB_OPT_GUI, HB_OPT_CON
+   * now HB_FM_STATISTICS is NOT defined by default
+   * link libfmstat<mt> before libvm to get memory statistics
+   * please update non gnu makefiles
 
 2005-11-14 09:40 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/samples/libnf.prg

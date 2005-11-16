@@ -37,6 +37,8 @@ function Main()
     MyLanguage := HB_LANGSELECT()
   #endif
 
+  nKey := 0
+
   //
   // Cover
   //
@@ -665,6 +667,37 @@ function Main()
   ?
   var0 := FT_E2D( "1.101E6" )
   ? PADR("FT_E2D( '1.101E6' ) ->", 34) + transform( var0, "9999999999.999999" )
+  ?
+
+  #ifdef is_xharbour
+    FT_BLINKW32( "[ Hit a key to continue ]", 24, 0, nwait )
+    inkey(0)
+    FT_BLINKW32CANCEL()
+  #else
+    FT_BLINK( "[ Hit a key to continue ]", 24, 0 )
+    inkey(0)
+  #endif
+
+  //
+  // FT_STOD() example
+  //
+  setcolor ('w+/b')
+  set century on
+  CLS
+  ? "TEST TO DEMONSTRATE EXAMPLES OF FT_STOD()"
+  ? REPLICATE( "Í", 78 )
+  ?
+  var0 := FT_STOD( "19901127" )
+  ? PADR("FT_STOD( '19901127' ) ->", 44) + Transform( var0, '@d' )
+  ?
+  var0 := FT_STOD( '20060117' )
+  ? PADR("FT_STOD( '20060117' ) ->", 44) + Transform( var0, '@d' )
+  ?
+  var0 := FT_STOD( '20060406' )
+  ? PADR("FT_STOD( '20060406' ) ->", 44) + Transform( var0, '@d' )
+  ?
+  var0 := FT_STOD( '20041231' )
+  ? PADR("FT_STOD( '20041231' ) ->", 44) + Transform( var0, '@d' )
   ?
 
   #ifdef is_xharbour
