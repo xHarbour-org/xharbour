@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.130 2005/11/04 19:29:07 ptsarenko Exp $
+ * $Id: tbrowse.prg,v 1.131 2005/11/05 09:16:23 mauriliolongo Exp $
  */
 
 /*
@@ -136,9 +136,20 @@
 
 // ===================================================================================================
 
-/* 20/07/05 - <maurilio.longo@libero.it>
-              TBrowse Data Cache class
-   17/10/05   Passes all tests I've done, including DBU
+/* 11/11/2005 - <maurilio.longo@libero.it>
+                Every cell inside tbrowse cache
+*/
+CLASS TDataCell
+   DATA  xData                         // Cell value
+   DATA  aColor                        // Cell colorBlock result
+   DATA  aColorRect  INIT NIL          // Cell color if it is inside a color rect
+
+   METHOD New()      INLINE Self
+END CLASS
+
+/* 20/07/2005 - <maurilio.longo@libero.it>
+                TBrowse Data Cache class
+   17/10/2005   Passes all tests I've done, including DBU
 */
 CLASS TDataCache
 
@@ -153,14 +164,23 @@ CLASS TDataCache
 
    METHOD   GetCell( nRow, nCol )      // Retrieves the content of column n of current row
 
+   // Retrieves the color (if any) of column n of current row, it can
+   // be called ONLY after GetCell() for the same row,col has been called
+   METHOD   GetCellColor( nRow, nCol ) INLINE IIF( Empty( ::aCache[ nRow ][ nCol ]:aColorRect ),;
+                                                   ::aCache[ nRow ][ nCol ]:aColor,;
+                                                   ::aCache[ nRow ][ nCol ]:aColorRect )
+
+   // Sets colorrect to cells defined by aRect
+   METHOD   SetColorRect( aRect, aColors )
+
    /* Please note that here Invalidate() means discard all data and force a reload from
       datasource as need to show a certain row arises. On the other hand, inside a TBrowse ::Invalidate()
       means only that all data will be re-painted onto screen but _not_ reloaded from
       datasource. To reload data a call to RefreshCurrent()/RefreshAll() needs to be done.
    */
-   METHOD   Invalidate( nRow )   INLINE  iif( nRow == NIL,;
-                                              ( AFill( ::aCache, NIL ), ::InitCache( .T. ) ),;
-                                              iif( nRow > 0 .AND. nRow <= Len( ::aCache ), ::aCache[ nRow ] := NIL, NIL ) )
+   METHOD   Invalidate( nRow )         INLINE  iif( nRow == NIL,;
+                                                    ( AFill( ::aCache, NIL ), ::InitCache( .T. ) ),;
+                                                    iif( nRow > 0 .AND. nRow <= Len( ::aCache ), ::aCache[ nRow ] := NIL, NIL ) )
 
    METHOD   InitCache( lInternal )     // Resets cache
 
@@ -169,6 +189,9 @@ CLASS TDataCache
 
    DATA  aCache                        // Array with cached data
    DATA  oCachedBrowse                 // TBrowse object I'm caching
+
+   DATA  aRect
+   DATA  aColors
 
    METHOD FillRow( nRow )              // Fills a row of aCache with data from datasource
 
@@ -182,11 +205,14 @@ METHOD New( oBrowse ) CLASS TDataCache
 
    default nRows TO oBrowse:rowCount
 
-   ::aCache := AFill( Array( nRows ), NIL )
+   ::aCache := Array( nRows )
    ::oCachedBrowse := oBrowse
 
    ::nCurRow := 1
    ::nLastRow := 1
+
+   ::aRect := {}
+   ::aColors := NIL
 
 RETURN Self
 
@@ -240,6 +266,9 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
                else
                   AIns( ::aCache, 1 )
+                  if ::nLastRow < Len( ::aCache )
+                     ::nLastRow += 1
+                  endif
 
                endif
 
@@ -305,8 +334,36 @@ RETURN nToTop
 
 METHOD FillRow( nRow ) CLASS TDataCache
 
+   local aCol, oCell
+   local nRectPos
+
    ::aCache[ nRow ] := {}
-   AEval( ::oCachedBrowse:aColsInfo, { | aCol | AAdd( ::aCache[ nRow ], Eval( aCol[ o_Obj ]:block ) ) } )
+
+   for each aCol in ::oCachedBrowse:aColsInfo
+
+      oCell := TDataCell():New()
+
+      with object oCell
+         :xData := Eval( aCol[ o_Obj ]:block )
+         :aColor := IIF( Empty( aCol[ o_Obj ]:colorBlock ),;
+                         NIL,;
+                         Eval( aCol[ o_Obj ]:colorBlock, :xData ) )
+
+         if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
+            if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
+               :aColorRect := ::aColors
+            endif
+         endif
+      end
+
+      AAdd( ::aCache[ nRow ], oCell )
+   next
+
+   if ! Empty( ::aRect ) .AND. nRectPos > 0
+      ADel( ::aRect, nRectPos )
+      ASize( ::aRect, Len( ::aRect ) - 1 )
+
+   endif
 
 Return Self
 
@@ -335,7 +392,37 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    endif
 
-RETURN ::aCache[ nRow ][ nCol ]
+RETURN ::aCache[ nRow ][ nCol ]:xData
+
+
+
+METHOD SetColorRect( aRect, aColors ) CLASS TDataCache
+
+   local nRow, nCol, lDelayed := .F.
+
+   for nRow := aRect[ 1 ] to aRect[ 3 ]
+
+      if Empty( ::aCache[ nRow ] )
+
+         AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ] } )
+         lDelayed := .T.
+
+      else
+
+         for nCol := aRect[ 2 ] to aRect[ 4 ]
+
+            ::aCache[ nRow ][ nCol ]:aColorRect := aColors
+
+         next
+
+      endif
+   next
+
+   if lDelayed
+      ::aColors := aColors
+   endif
+
+return Self
 
 
 
@@ -455,7 +542,7 @@ CLASS TBrowse
    METHOD GetColumn( nColumn )            // Gets a specific TBColumn object
    METHOD SetColumn( nColumn, oCol )      // Replaces one TBColumn object with another
    METHOD ColWidth( nColumn )             // Returns the display width of a particular column
-   METHOD ColorRect()                     // Alters the color of a rectangular group of cells
+   METHOD ColorRect( aRect, aColors )     // Alters the color of a rectangular group of cells
    METHOD Configure( nMode )              // Reconfigures the internal settings of the TBrowse object
                                           // nMode is an undocumented parameter in CA-Cl*pper
    METHOD DeHilite()                      // Dehighlights the current cell
@@ -507,7 +594,10 @@ CLASS TBrowse
    METHOD SetColPos( nColPos )            // Performs a "direct jump" to a given column
 
    DATA aRect                             // The rectangle specified with ColorRect()
-   DATA aRectColor                        // The color positions to use in the rectangle specified with ColorRect()
+   DATA aRectColor                        // Colors to use in the rectangle specified with ColorRect()
+                                          // Both are used only if TBrowse is not lConfigured, otherwise a call
+                                          // to ::oDataCache:SetColorRect() is done
+
    DATA aRedraw                           // Array of logical items indicating, is appropriate row need to be redraw
    DATA lHeaders                          // Internal variable which indicates whether there are column headers to paint
    DATA lFooters                          // Internal variable which indicates whether there are column footers to paint
@@ -556,9 +646,8 @@ CLASS TBrowse
    DATA cSpacePre                         // Blank Space prior to first column
    DATA cSpaceLast                        // Blank space after the last column
    DATA cSpaceWidth                       // Spaces of browse width
-   DATA lRect
+   //DATA lRect
 
-   DATA aHighCellColor                    // Result of colorblock evaluation of currently highlighted cell
    DATA oDataCache
    DATA lPaintBottomUp                    // .T. after a PG_DN, paints browser from bottom to top, optimizing
                                           // dbSkip()s calls. ( Clipper works this way )
@@ -648,8 +737,8 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpacePre       := ''
    ::cSpaceLast      := ''
    ::cSpaceWidth     := ''
-   ::lRect           := .f.
-   ::aHighCellColor  := {}
+   //::lRect           := .f.
+   //::aHighCellColor  := {}
 
    ::oDataCache := TDataCache():New( Self )
    ::lPaintBottomUp  := .F.
@@ -703,7 +792,6 @@ Return Self
 METHOD Configure( nMode ) CLASS TBrowse
 
    LOCAL n, nHeight, aCol, xVal, nFreeze, oErr, lInitializing := .f.
-   LOCAl aColRetrieveBlocks
 
    default nMode to 0
 
@@ -799,7 +887,7 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    next
 
-   if empty( ::aColorSpec )
+   if Empty( ::aColorSpec )
       ::aColorSpec := Color2Array( ::cColorSpec )
    endif
 
@@ -904,6 +992,11 @@ METHOD Configure( nMode ) CLASS TBrowse
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
       ::oDataCache := TDataCache():New( Self )
+      if ! Empty( ::aRect )
+         ::oDataCache:SetColorRect( ::aRect, ::aRectColor )
+         ::aRect := {}
+         ::aRectColor := {}
+      endif
    else
       ::oDataCache:Invalidate()
    endif
@@ -1274,7 +1367,7 @@ Return nWidth
 METHOD Down() CLASS TBrowse
 
    ::Moved()
-   ::nRecsToSkip := 1
+   ::nRecsToSkip++
 
 Return Self
 
@@ -1283,7 +1376,7 @@ Return Self
 METHOD Up() CLASS TBrowse
 
    ::Moved()
-   ::nRecsToSkip := -1
+   ::nRecsToSkip--
 
 Return Self
 
@@ -2017,45 +2110,39 @@ Return Self
 
 //---------------------------------------------------------------------//
 
-METHOD ColorRect( aRect, aRectColor ) CLASS TBrowse
+METHOD ColorRect( aRect, aColors ) CLASS TBrowse
 
    local i
 
-   /* Since we're going to change aRect we need to refresh previous
-      aRect covered area
-   */
-   if ::lRect .AND. ! Empty( ::aRedraw )
-      for i := ::aRect[ 1 ] to ::aRect[ 3 ]
-         ::aRedraw[ i ] := .T.
-      next
-   endif
+   if ::lConfigured
 
-   // Let's set a new aRect region
-   if Len( aRect ) > 0
-      ::aRect       := Array( 4 )
-      ::aRectColor  := aRectColor
+      ::oDataCache:SetColorRect( { Max( aRect[ 1 ], 1 ),;
+                                   Max( aRect[ 2 ], 1 ),;
+                                   Min( aRect[ 3 ], ::rowCount ),;
+                                   Min( aRect[ 4 ], ::colCount ) },;
+                                 aColors )
 
-      ::aRect[ 1 ] := Max( aRect[ 1 ], 1 )
-      ::aRect[ 3 ] := Min( aRect[ 3 ], ::rowCount )
-      ::aRect[ 2 ] := Max( aRect[ 2 ], 1 )
-      ::aRect[ 4 ] := Min( aRect[ 4 ], ::colCount )
-      ::lRect      := .t.
+      /* and now let's refresh new aRect covered area */
+      If ! Empty( ::aRedraw )
+         for i := Max( aRect[ 1 ], 1 ) to Min( aRect[ 3 ], ::rowCount )
+            ::aRedraw[ i ] := .T.
+         next
+      endif
+
+      ::Stable := .F.
+      ::ForceStable()
 
    else
-      ::aRect      := {}
-      ::aRectColor := {}
-      ::lRect      := .f.
+
+      // During ::Configure() I could change cache, so I save colorrect parameters
+      ::aRect       := { Max( aRect[ 1 ], 1 ),;
+                         Max( aRect[ 2 ], 1 ),;
+                         Min( aRect[ 3 ], ::rowCount ),;
+                         Min( aRect[ 4 ], ::colCount ) }
+      ::aRectColor  := aColors
+
    endif
 
-   /* and now let's refresh new aRect covered area */
-   If ::lRect .AND. ! Empty( ::aRedraw )
-      for i := ::aRect[ 1 ] to ::aRect[ 3 ]
-         ::aRedraw[ i ] := .T.
-      next
-   endif
-
-   ::Stable := .F.
-   ::ForceStable()
 
 Return Self
 
@@ -2204,32 +2291,19 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
    endif
 
-   // From this point there is stabilization of rows which is made up of three phases
-   // 1st repositioning of data source
-   // 2nd redrawing of rows, after each row we exit stabilization loop with .F.
-   // 3rd if all rows have been redrawn we set ::stable state to .T.
-   //
+   /* From this point there is stabilization of rows which is made up of three phases
+      - repositioning of data source _and_
+      - redrawing of rows, after each row we exit stabilization loop with .F.
+      - if all rows have been redrawn we set ::stable state to .T.
+   */
    if ! ::stable
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
-      if ::CheckRowsToBeRedrawn()
-         // Exit first stage of stabilization
-         //
-         SetCursor( nOldCursor )
-         if ! lForceStable
-            return .F.
-         endif
-
-      endif
-
+      // Every time I enter stabilization loop I need to draw _at least_ one row.
+      ::CheckRowsToBeRedrawn()
 
       DispBegin()
 
-      /* 15/10/2005 - <maurilio.longo@libero.it>
-                      With datacache we probably need to position datasource under
-                      our own feet before drawing last row.
-                      This has to be checked/fixed.
-      */
       while ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
 
          ::DrawARow( nRowToDraw )
@@ -2670,7 +2744,7 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    // Screen col position of first char for not left justified columns
    LOCAL nNotLeftCol
-   LOCAL cColor, cColorBKG
+   LOCAL cColor, cColorBKG, aCellColor
 
    // if called when the column type is not defined, then do nothing
    if Empty( aColsInfo[ o_Type ] )
@@ -2679,28 +2753,18 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
-   if ::lRect .AND.;
-      nRow >= ::aRect[ 1 ] .AND. nColumn >= ::aRect[ 2 ] .AND.;
-      nRow <= ::aRect[ 3 ] .AND. nColumn <= ::aRect[ 4 ]
-
-      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aRectColor, nColor ) - 1 )
+   if oCol:ColorBlock == NIL
+      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
 
    else
-
-      if oCol:ColorBlock == NIL
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
-
-      else
-
-         // If colorblock returns an empty array and DefColor exists clipper uses defcolor
-         ::aHighCellColor := Eval( oCol:ColorBlock, xValue )
-         if Empty( ::aHighCellColor ) .AND. Valtype( oCol:DefColor ) == "A"
-            ::aHighCellColor := oCol:DefColor
-         endif
-
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aHighCellColor, nColor ) - 1 )
-
+      // If colorblock returns an empty array and DefColor exists clipper uses defcolor
+      aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
+      if Empty( aCellColor ) .AND. Valtype( oCol:DefColor ) == "A"
+         aCellColor := oCol:DefColor
       endif
+
+      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aCellColor, nColor ) - 1 )
+
    endif
 
 
@@ -2763,16 +2827,6 @@ METHOD RefreshCurrent() CLASS TBrowse
    if ! Empty( ::aRedraw )
 
       ::aRedraw[ ::nRowPos ] := .T.
-
-      if ::lRect
-         for i := ::aRect[ 1 ] to ::aRect[ 3 ]
-            ::aRedraw[ i ] := .T.
-         next
-      endif
-      ::lRect := .F.
-      ::aRect := {}
-      ::aRectColor := {}
-
       ::oDataCache:Invalidate( ::nRowPos )
 
    endif

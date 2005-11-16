@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4629 2005/11/16 07:19:51 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4630 2005/11/16 07:23:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-16 10:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/tbrowse.prg
+     * TBrowse cache has to cache colorblock evaluation result since it
+       is possible to have a colorblock like {|| iif( Recno() .... ) } which
+       is not valid if we read clipper documentation, but clipper handles
+       it anyway.
+     ! ColorRect() can set more than a colored region on a TBrowse and this
+       region has to live until after it is moved out of sight with a vertical
+       movement, but it has to remain visibile during horizontal movements.
+     ! Fixed a bug reported on the newsgroup ( dbEdit() after a dbGoBottom() )
+       using the fix supplied by <dos513@email.si>
+
 
 2005-11-15 23:18 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/macro/macro.y
