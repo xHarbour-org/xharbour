@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.19 2005/10/10 22:45:53 druzus Exp $
+# $Id: pack_src.sh,v 1.20 2005/11/16 12:37:05 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -221,6 +221,11 @@ $hb_collect source/rtl/gtalleg/*.sfc
 $hb_collect source/vm/Makefile
 $hb_collect source/vm/*.[ch]
 $hb_collect source/vm/*.prg
+
+# SOURCE\VM\FMSTAT
+$hb_collect source/vm/fmstat/Makefile
+$hb_collect source/vm/fmstat/*.[ch]
+$hb_collect source/vm/fmstat/*.prg
 
 # SOURCE\odbc
 $hb_collect source/odbc/Makefile

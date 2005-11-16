@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005/02/24 15:32:30 lf_sfnet Exp $
+# $Id: Makefile,v 1.1 2005/11/14 22:16:52 lf_sfnet Exp $
 #
 
 vpath %.c ../
@@ -12,10 +12,9 @@ C_SOURCES=\
 LIBNAME=fmstat
 
 ifeq ($(HB_MT),MT)
-   MT_LIBNAME=fmstatmt
+   MT_LIBNAME=$(LIBNAME)mt
 endif
 
 include $(TOP)$(ROOT)config/lib.cf
 
 C_USR += -DHB_FM_STATISTICS
-
