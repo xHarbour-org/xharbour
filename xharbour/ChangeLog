@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4633 2005/11/16 12:36:51 druzus Exp $
+ * $Id: ChangeLog,v 1.4634 2005/11/16 13:25:19 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-16 19:45 UTC+0200 Mindaugas Kavaliauskas (dbtopas/at/dbtopas.lt)
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/hash.c
+  * xharbour/source/vm/fastitem.c
+    + ulHolder counter for Hash implemented. Hash memory is released 
+      if hash is not referenced. No need to call garbage collector.
 
 2005-11-16 14:11 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.sh

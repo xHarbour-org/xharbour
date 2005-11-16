@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.45 2005/11/12 22:49:30 walito Exp $
+ * $Id: hbvmpub.h,v 1.46 2005/11/16 12:16:38 druzus Exp $
  */
 
 /*
@@ -263,17 +263,18 @@
 
    typedef struct _HB_BASEHASH
    {
-      PHB_ITEM pKeys;
-      PHB_ITEM pValues;      /* pointer to the array items */
-      ULONG    ulLen;        /* number of items in the array */
-      ULONG    ulAllocated;  /* items allocated in keys and values */
+      PHB_ITEM    pKeys;
+      PHB_ITEM    pValues;        /* pointer to the array items */
+      ULONG       ulLen;          /* number of items in the array */
+      ULONG       ulAllocated;    /* items allocated in keys and values */
       PHB_HASH_ORDER_FUNC fOrder; /* returns -1, 0 or 1 */
-      BOOL     bCase;        /* Case sensitivity */
-      BOOL     bAutoAdd;     /* Signal error if key is not found on assign */
-      USHORT   uiLevel;      /* Pagination depth level */
-      ULONG    ulTotalLen;   /* Total lenght in paged hashes */
-      ULONG    ulPageSize;   /* Maximum size allowed per page */
-      ULONG *  pAccessAA;    /* Associative Array pointer */
+      BOOL        bCase;          /* Case sensitivity */
+      BOOL        bAutoAdd;       /* Signal error if key is not found on assign */
+      USHORT      uiLevel;        /* Pagination depth level */
+      ULONG       ulTotalLen;     /* Total lenght in paged hashes */
+      ULONG       ulPageSize;     /* Maximum size allowed per page */
+      ULONG*      pAccessAA;      /* Associative Array pointer */
+      HB_COUNTER  ulHolders;      /* number of holders of this hash */
    } HB_BASEHASH, * PHB_BASEHASH, * HB_BASEHASH_PTR;
 
    /* internal structure for codeblocks */

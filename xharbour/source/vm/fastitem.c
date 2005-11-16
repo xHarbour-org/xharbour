@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.94 2005/11/09 06:43:47 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.95 2005/11/15 20:17:13 ronpinkas Exp $
  */
 
 /*
@@ -247,6 +247,17 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
 
          break;
       }
+
+      case HB_IT_HASH :
+      {
+         if( --( pItem->item.asHash.value->ulHolders ) == 0 )
+         {
+            hb_hashRelease( pItem );
+         }
+
+         break;
+      }
+
    }
 
    pItem->type = HB_IT_NIL;
@@ -330,6 +341,17 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
 
          break;
       }
+
+      case HB_IT_HASH :
+      {
+         if( --( pItem->item.asHash.value->ulHolders ) == 0 )
+         {
+            hb_hashRelease( pItem );
+         }
+
+         break;
+      }
+
    }
 
    pItem->type = HB_IT_NIL;
@@ -434,6 +456,11 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
                   hb_arrayRegisterHolder( pSource->item.asRefer.BasePtr.pBaseArray, (void *) pSource->item.asRefer.BasePtr.pBaseArray );
                #endif
             }
+            break;
+         }
+         case HB_IT_HASH :
+         {
+            pSource->item.asHash.value->ulHolders++;
             break;
          }
       }

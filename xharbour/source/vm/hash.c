@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.43 2005/11/03 07:32:51 ronpinkas Exp $
+ * $Id: hash.c,v 1.44 2005/11/12 22:49:31 walito Exp $
  */
 
 /*
@@ -322,6 +322,7 @@ PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem ) /* creates a new hash */
    pBaseHash->fOrder = s_hashOrderComplex;
    pBaseHash->bCase = TRUE;
    pBaseHash->bAutoAdd = TRUE;
+   pBaseHash->ulHolders = 1;
 
    // ITEM TYPE MUST BE SET FOR LAST!
    pItem->item.asHash.value = pBaseHash;
