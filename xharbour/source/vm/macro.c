@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.57 2005/11/01 01:46:50 ronpinkas Exp $
+ * $Id: macro.c,v 1.58 2005/11/15 20:17:14 ronpinkas Exp $
  */
 
 /*
@@ -874,7 +874,7 @@ HB_FUNC( HB_MACROCOMPILE )
    int iStatus;
 
    pMacro = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
-   pMacro->Flags     = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH ;
+   pMacro->Flags     = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH | HB_MACRO_GEN_LIST;
    pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
    pMacro->status    = HB_MACRO_CONT;
    pMacro->supported = HB_SM_HARBOUR;

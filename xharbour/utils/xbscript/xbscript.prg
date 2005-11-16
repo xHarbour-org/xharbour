@@ -940,7 +940,7 @@ FUNCTION PP_ExecProcedure( aProcedures, nProc, aParams )
                   HB_vmExecute( opCode )
                #else
                   Eval( OpCode )
-               #endif   
+               #endif
             ELSE
               #ifdef __MACRO_COMPILE__
                IF ! HB_vmExecute( OpCode ) // Jump if FALSE.
@@ -1494,6 +1494,11 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    LOCAL nTemp
    LOCAL sEnumerator, sEnumeration
 
+   #define __CONCILE_PCODE__
+   #ifdef __CONCILE_PCODE__
+      LOCAL aBlocks, aCode, Code1, OpCode
+   #endif
+
    ExtractLeadingWS( @sPPed )
    DropTrailingWS( @sPPed )
 
@@ -1537,6 +1542,47 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
             ENDIF
 
             IF sBlock = "PP_PROC"
+               #ifdef __CONCILE_PCODE__
+                  IF nProcID > 0
+                     aBlocks := aProcedures[-1][2]
+                     FOR EACH aCode IN aBlocks
+                         Code1  := aCode[1]
+                         OpCode := aCode[2]
+
+                         IF ValType( OpCode ) == 'C'
+                            TraceLog( "Code: " + OpCode )
+                         ELSE
+                            SWITCH OpCode
+                               CASE PP_OP_JUMP
+                                  TraceLog( "Jump", Code1 )
+                                  EXIT
+                               CASE PP_OP_TRY
+                                  TraceLog( "Try", Code1 )
+                                  EXIT
+                               CASE PP_OP_ENDTRY
+                                  TraceLog( "EndTry", Code1 )
+                                  EXIT
+                               CASE PP_OP_BEGIN
+                                  TraceLog( "Begin", Code1 )
+                                  EXIT
+                               CASE PP_OP_ENDBEGIN
+                                  TraceLog( "EndBegin", Code1 )
+                                  EXIT
+                               CASE PP_OP_FOREACH
+                                  TraceLog( "ForEach", Code1 )
+                                  EXIT
+                               CASE PP_OP_LOOPFOREACH
+                                  TraceLog( "LoopForEach", Code1 )
+                                  EXIT
+                               CASE PP_OP_ENDFOREACH
+                                  TraceLog( "EndForEach", Code1 )
+                                  EXIT
+                            END
+                         ENDIF
+                     NEXT
+                  ENDIF
+               #endif
+
                sSymbol := Upper( LTrim( SubStr( sBlock, At( ' ', sBlock ) ) ) )
                aSize( aProcedures, ++nProcId )
 
@@ -1567,8 +1613,8 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      s_acFlowType[ s_nFlowId ] := "E"
 
                      sBlock := SubStr( sBlock, 13 )
-                     sEnumerator := Left( sBlock, ( nAt := AT( "~IN~", sBlock ) ) - 1 )
-                     sEnumeration := SubStr( sBlock, nAt + 4 )
+                     sEnumerator := Left( sBlock, ( nAt := AT( "~$~", sBlock ) ) - 1 )
+                     sEnumeration := SubStr( sBlock, nAt + 3 )
 
                      // No procedure declaration.
                      IF nProcId == 0
@@ -1612,17 +1658,21 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                      #ifdef __MACRO_COMPILE__
                         aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( sCounter + ":=" + sStart ), nLine } ) // Loop back
                      #else
-                        aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sCounter + ":=" + sStart + "}" ), nLine } ) // Loop back                     
+                        aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sCounter + ":=" + sStart + "}" ), nLine } ) // Loop back
                      #endif
-                     
-                     sBlock := sCounter + "<=" + sEnd
+
+                     IF Val( sStep ) < 0
+                        sBlock := sCounter + ">=" + sEnd
+                     ELSE
+                        sBlock := sCounter + "<=" + sEnd
+                     ENDIF
 
                      s_nCompLoop++
                      aSize( s_aLoopJumps, s_nCompLoop )
-                     
+
                      #ifdef __MACRO_COMPILE__
                          s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "F", HB_MacroCompile( sCounter + ":=" + sCounter + "+" + sStep ) } // Address of line to later place conditional Jump instruction into.
-                     #else                     
+                     #else
                          s_aLoopJumps[ s_nCompLoop ] := { Len( aProcedures[ nProcId ][2] ) + 1, {}, "F", &( "{||" + sCounter + ":=" + sCounter + "+" + sStep + "}" ) } // Address of line to later place conditional Jump instruction into.
                      #endif
                   ELSEIF sBlock = "PP__NEXT"
@@ -1961,7 +2011,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
                            #ifdef __MACRO_COMPILE__
                               aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( "HB_SetWith()" ), nLine } ) // Reset
-                           #else                           
+                           #else
                               aAdd( aProcedures[ nProcId ][2], { 0, &( "{|| HB_SetWith() }" ), nLine } ) // Reset
                            #endif
                         ELSE
@@ -1998,7 +2048,7 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
                #ifdef __MACRO_COMPILE__
                   aAdd( aProcedures[ nProcId ][2], { 0, HB_MacroCompile( sBlock ), nLine } )
                #else
-                  aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )               
+                  aAdd( aProcedures[ nProcId ][2], { 0, &( "{||" + sBlock + "}" ), nLine } )
                #endif
             ENDIF
          ENDIF
@@ -4451,7 +4501,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
             ENDIF
 
             IF bDbgMatch
-               ? "sKey =", sKey, "Anchor =", sAnchor, "nMarkerId =", nMarkerId, "sToken =", sToken, "xMarker =", xMarker, "<="
+               ? "sKey =", sKey, "Anchor =", sAnchor, "nMarkerId =", nMarkerId, "sToken =", sToken, "xMarker =", ValToPrg( xMarker ), "<="
             ENDIF
 
             IF ValType( xMarker ) == 'C'
@@ -4560,6 +4610,7 @@ STATIC FUNCTION MatchRule( sKey, sLine, aRules, aResults, bStatement, bUpper )
                ENDIF
 
                IF nMatch > nMatches
+                  //TraceLog( ValToPrg( aMatchers ), ValToPrg( aMarkers ) )
                   sPPO := PPOut( aResults[nRule], aMarkers, aMatchers )
 
                   IF bDbgMatch
@@ -5911,9 +5962,15 @@ STATIC FUNCTION PPOut( aResults, aMarkers, aMatchers )
            IF ValType( aResults[1][Counter][2] ) == 'N'
               xValue := aMarkers[ aResults[1][Counter][2] ]
 
-              IF aMatchers[aResults[1][Counter][2]][4] != 'A' .AND. ValType( xValue ) == 'A' .AND. Len( xValue ) > 1
-                 //TraceLog( "Too many values for non repeatable result pattern!", Counter )
-                 RETURN .F.
+              IF aMatchers[ aResults[1][Counter][2] ][4] != 'A' .AND. ValType( xValue ) == 'A' .AND. Len( xValue ) > 1
+                 // Case: ?? 1, 2 => QQOut( 1, 2 )
+                 IF aMatchers[ aResults[1][Counter][2] ][4] != NIL
+                    IF bDbgPPO
+                       //TraceLog( ValToPrg( aResults ), aResults[1][Counter][2], aMatchers[aResults[1][Counter][2]][4], "Too many values for non repeatable result pattern!", Counter )
+                       ? "Too many values for non repeatable result pattern!", Counter
+                    ENDIF
+                    RETURN .F.
+                 ENDIF
               ENDIF
            ELSE
               sResult += aResults[1][Counter][2]
@@ -9569,7 +9626,7 @@ STATIC FUNCTION InitRunRules()
    aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, ':=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'FOR' , { {    1,   0, NIL, '<', NIL }, {    2,   0, '=', '<', NIL }, {    3,   0, 'TO', '<', NIL }, {    4,   1, 'STEP', '<', NIL } } , .F. } )
-   aAdd( aCommRules, { 'FOR' , { {    1,   0, 'EACH', '<', NIL }, {    2,   0, 'IN', '<', NIL } } , .F. } )
+   aAdd( aCommRules, { 'FOR' , { {    1,   0, 'EACH', '<', NIL }, {    2,   0, '$', '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'LOOP' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'EXIT' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'NEXT' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
@@ -9658,7 +9715,7 @@ STATIC FUNCTION InitRunResults()
    aAdd( aCommResults, { { {   0, 'PP__ENDCASE ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__FOR ' }, {   0,   1 }, {   0, ':=' }, {   0,   2 }, {   0, '~TO~' }, {   0,   3 }, {   0, '~STEP~' }, {   0,   4 } }, { -1,  1, -1,  1, -1,  1, -1,  1} , { NIL, NIL, NIL, NIL }  } )
-   aAdd( aCommResults, { { {   0, 'PP__FOREACH ' }, {   0,   1 }, {   0, '~IN~' }, {   0,   2 } }, { -1,  1, -1,  1} , { NIL, NIL }  } )
+   aAdd( aCommResults, { { {   0, 'PP__FOREACH ' }, {   0,   1 }, {   0, '~$~' }, {   0,   2 } }, { -1,  1, -1,  1} , { NIL, NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__LOOP ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__EXIT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP__NEXT ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )

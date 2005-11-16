@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.21 2005/10/18 12:14:32 druzus Exp $
+ * $Id: macro.y,v 1.22 2005/11/02 22:44:18 ronpinkas Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <string>  IDENTIFIER LITERAL MACROVAR MACROTEXT
 %type <valDouble>  NUM_DOUBLE
 %type <valLong>    NUM_LONG
-%type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockNoVar
+%type <asExpr>  ByRefArg Argument ArgList BlockExpList BlockVarList BlockNoVar
 %type <asExpr>  NumValue NumAlias
 %type <asExpr>  NilValue
 %type <asExpr>  LiteralValue
@@ -282,17 +282,27 @@ Main : Expression '\n'  {
 
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
+     | ByRefArg         {
+                           if( ! ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST ) )
+                           {
+                              HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
+                              hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+                              hb_compExprDelete( $1, HB_MACRO_PARAM );
+                              YYABORT;
+                           }
+
+                           $1 = ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( $1 ) : hb_compExprNewArgList( $1 );
+
+                           HB_MACRO_DATA->exprType = hb_compExprType( $1 );
+
+                           hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+
+                           hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
+                        }
      | AsParamList      {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
 
-                           if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
-                           {
-                              hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
-                           else
-                           {
-                              hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
+                           hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
 
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
@@ -552,9 +562,12 @@ ArgList    : Argument                     {
            | ArgList ',' Argument         { $$ = hb_compExprAddListExpr( $1, $3 ); }
            ;
 
-Argument   : EmptyExpression                   { $$ = $1; }
-           | '@' IDENTIFIER                    { $$ = hb_compExprNewVarRef( $2 ); }
-           | '@' IDENTIFIER '(' ')'            { $$ = hb_compExprNewFunRef( $2 ); }
+ByRefArg   : '@' IDENTIFIER               { $$ = hb_compExprNewVarRef( $2 ); }
+           ;
+
+Argument   : EmptyExpression              { $$ = $1; }
+           | ByRefArg                     { $$ = $1; }
+           | '@' IDENTIFIER '(' ')'       { $$ = hb_compExprNewFunRef( $2 ); }
            ;
 
 /* Object's instance variable
@@ -641,26 +654,26 @@ Expression : SimpleExpression                 { $$ = $1; HB_MACRO_CHECK( $$ ) }
            | PareExpList                      { $$ = $1; HB_MACRO_CHECK( $$ ) }
 ;
 
-RootParamList : EmptyExpression ',' {
-                                      if( !(HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST) )
-                                      {
-                                         HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
-                                         hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
-                                         hb_compExprDelete( $1, HB_MACRO_PARAM );
-                                         YYABORT;
-                                      }
-                                    }
-                EmptyExpression     {
-                                      HB_MACRO_DATA->iListElements = 1;
-                                      $$ = hb_compExprAddListExpr( ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( $1 ) : hb_compExprNewArgList( $1 ), $4 );
-                                    }
+RootParamList : Argument ',' {
+                                if( !(HB_MACRO_DATA->Flags & HB_MACRO_GEN_LIST) )
+                                {
+                                   HB_TRACE(HB_TR_DEBUG, ("macro -> invalid expression: %s", HB_MACRO_DATA->string));
+                                   hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+                                   hb_compExprDelete( $1, HB_MACRO_PARAM );
+                                   YYABORT;
+                                }
+                             }
+                Argument     {
+                                HB_MACRO_DATA->iListElements = 1;
+                                $$ = hb_compExprAddListExpr( ( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PARE ) ? hb_compExprNewList( $1 ) : hb_compExprNewArgList( $1 ), $4 );
+                             }
               ;
 
-AsParamList  : RootParamList                    { $$ = $1; }
-             | AsParamList ',' EmptyExpression  { HB_MACRO_DATA->iListElements++; $$ = hb_compExprAddListExpr( $1, $3 ); }
+AsParamList  : RootParamList             { $$ = $1; }
+             | AsParamList ',' Argument  { HB_MACRO_DATA->iListElements++; $$ = hb_compExprAddListExpr( $1, $3 ); }
 ;
 
-EmptyExpression: /* nothing => nil */        { $$ = hb_compExprNewEmpty(); }
+EmptyExpression: /* nothing => nil */    { $$ = hb_compExprNewEmpty(); }
            | Expression
 ;
 

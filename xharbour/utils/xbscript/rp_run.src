@@ -79,7 +79,7 @@
 
 #COMMAND FOR <counter> := <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
 #COMMAND FOR <counter> =  <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
-#COMMAND FOR EACH <enumerator> IN <enumeration>          => PP__FOREACH <enumerator>~IN~<enumeration>
+#COMMAND FOR EACH <enumerator> $ <enumeration>          => PP__FOREACH <enumerator>~$~<enumeration>
 
 #COMMAND LOOP [<x,...>]                                  => PP__LOOP [<-x->]
 #COMMAND EXIT [<x,...>]                                  => PP__EXIT [<-x->]
