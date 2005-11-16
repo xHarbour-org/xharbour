@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4628 2005/11/16 02:42:30 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.4629 2005/11/16 07:19:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -46,7 +46,7 @@
     * hb_retclenRawstatic() -> hb_retclenStatic()
 
   * source/vm/hvm.c
-    + Added prg level HB_vmExecute( <cPCode> [, pSym [, pGlobals ] ] )
+    + Added prg level HB_vmExecute( <cPCode> [, pSym [, pGlobals ] ] ) -> xRet
   * source/vm/macro.c
     + Added prg level HB_CompileMacro( <cExp> ) -> cPCode
 
