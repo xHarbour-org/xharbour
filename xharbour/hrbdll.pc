@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.16 2005/11/06 18:00:13 ptsarenko Exp $
+# $Id: hrbdll.pc,v 1.17 2005/11/16 00:00:00 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -65,21 +65,21 @@ HBRUN_SRC_DIR    = $(HB_DIR)\utils\hbrun
 HBDOC_SRC_DIR    = $(HB_DIR)\utils\hbdoc
 HBMAKE_SRC_DIR   = $(HB_DIR)\utils\hbmake
 HBTEST_SRC_DIR   = $(HB_DIR)\utils\hbtest
-DEBUG_SRC_DIR    = $(HB_DIR)\source\debug
-HBTIP_SRC_DIR    = $(HB_DIR)\source\tip
 
-CT_SRC_DIR       = $(HB_DIR)\source\ct
-MACRO_SRC_DIR    = $(HB_DIR)\source\macro
-COMPILER_SRC_DIR = $(HB_DIR)\source\compiler
-COMMON_SRC_DIR   = $(HB_DIR)\source\common
 CODEPAGE_SRC_DIR = $(HB_DIR)\source\codepage
-ODBC_SRC_DIR     = $(HB_DIR)\source\odbc
+COMMON_SRC_DIR   = $(HB_DIR)\source\common
+COMPILER_SRC_DIR = $(HB_DIR)\source\compiler
+CT_SRC_DIR       = $(HB_DIR)\source\ct
+DEBUG_SRC_DIR    = $(HB_DIR)\source\debug
+LANG_SRC_DIR     = $(HB_DIR)\source\lang
+MACRO_SRC_DIR    = $(HB_DIR)\source\macro
 PP_SRC_DIR       = $(HB_DIR)\source\pp
-VM_SRC_DIR       = $(HB_DIR)\source\vm
+ODBC_SRC_DIR     = $(HB_DIR)\source\odbc
+RDD_SRC_DIR      = $(HB_DIR)\source\rdd
 RTL_SRC_DIR      = $(HB_DIR)\source\rtl
 PCREPOS_SRC_DIR  = $(HB_DIR)\source\rtl\pcre
-LANG_SRC_DIR     = $(HB_DIR)\source\lang
-RDD_SRC_DIR      = $(HB_DIR)\source\rdd
+TIP_SRC_DIR      = $(HB_DIR)\source\tip
+VM_SRC_DIR       = $(HB_DIR)\source\vm
 HBSIX_SRC_DIR    = $(HB_DIR)\source\rdd\hbsix
 HSX_SRC_DIR      = $(HB_DIR)\source\rdd\hsx
 
@@ -2569,79 +2569,79 @@ $(TARGET_OBJ_DIR)\mousewin.obj : $(RTL_SRC_DIR)\gtwin\mousewin.c
 # TIP DEPENDENCIES
 #
 
-$(TARGET_OBJ_DIR)\base64x.obj : $(HBTIP_SRC_DIR)\base64x.c
+$(TARGET_OBJ_DIR)\base64x.obj : $(TIP_SRC_DIR)\base64x.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\utils.obj : $(HBTIP_SRC_DIR)\utils.c
+$(TARGET_OBJ_DIR)\utils.obj : $(TIP_SRC_DIR)\utils.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\client.c : $(HBTIP_SRC_DIR)\client.prg
+$(TARGET_OBJ_DIR)\client.c : $(TIP_SRC_DIR)\client.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\client.obj : $(TARGET_OBJ_DIR)\client.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\credent.c : $(HBTIP_SRC_DIR)\credent.prg
+$(TARGET_OBJ_DIR)\credent.c : $(TIP_SRC_DIR)\credent.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\credent.obj : $(TARGET_OBJ_DIR)\credent.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\encb64.c : $(HBTIP_SRC_DIR)\encb64.prg
+$(TARGET_OBJ_DIR)\encb64.c : $(TIP_SRC_DIR)\encb64.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\encb64.obj : $(TARGET_OBJ_DIR)\encb64.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\encoder.c : $(HBTIP_SRC_DIR)\encoder.prg
+$(TARGET_OBJ_DIR)\encoder.c : $(TIP_SRC_DIR)\encoder.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\encoder.obj : $(TARGET_OBJ_DIR)\encoder.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\encqp.c : $(HBTIP_SRC_DIR)\encqp.prg
+$(TARGET_OBJ_DIR)\encqp.c : $(TIP_SRC_DIR)\encqp.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\encqp.obj : $(TARGET_OBJ_DIR)\encqp.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\encurl.c : $(HBTIP_SRC_DIR)\encurl.prg
+$(TARGET_OBJ_DIR)\encurl.c : $(TIP_SRC_DIR)\encurl.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\encurl.obj : $(TARGET_OBJ_DIR)\encurl.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\ftpcln.c : $(HBTIP_SRC_DIR)\ftpcln.prg
+$(TARGET_OBJ_DIR)\ftpcln.c : $(TIP_SRC_DIR)\ftpcln.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\ftpcln.obj : $(TARGET_OBJ_DIR)\ftpcln.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\httpcln.c : $(HBTIP_SRC_DIR)\httpcln.prg
+$(TARGET_OBJ_DIR)\httpcln.c : $(TIP_SRC_DIR)\httpcln.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\httpcln.obj : $(TARGET_OBJ_DIR)\httpcln.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\mail.c : $(HBTIP_SRC_DIR)\mail.prg
+$(TARGET_OBJ_DIR)\mail.c : $(TIP_SRC_DIR)\mail.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\mail.obj : $(TARGET_OBJ_DIR)\mail.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\popcln.c : $(HBTIP_SRC_DIR)\popcln.prg
+$(TARGET_OBJ_DIR)\popcln.c : $(TIP_SRC_DIR)\popcln.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\popcln.obj : $(TARGET_OBJ_DIR)\popcln.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\smtpcln.c : $(HBTIP_SRC_DIR)\smtpcln.prg
+$(TARGET_OBJ_DIR)\smtpcln.c : $(TIP_SRC_DIR)\smtpcln.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\smtpcln.obj : $(TARGET_OBJ_DIR)\smtpcln.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\url.c : $(HBTIP_SRC_DIR)\url.prg
+$(TARGET_OBJ_DIR)\url.c : $(TIP_SRC_DIR)\url.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\url.obj : $(TARGET_OBJ_DIR)\url.c
