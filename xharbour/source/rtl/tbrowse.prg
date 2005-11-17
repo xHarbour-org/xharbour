@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.131 2005/11/05 09:16:23 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.132 2005/11/16 09:06:53 mauriliolongo Exp $
  */
 
 /*
@@ -2753,16 +2753,12 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
-   if oCol:ColorBlock == NIL
+   // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
+   aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
+   if Empty( aCellColor )
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
 
    else
-      // If colorblock returns an empty array and DefColor exists clipper uses defcolor
-      aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
-      if Empty( aCellColor ) .AND. Valtype( oCol:DefColor ) == "A"
-         aCellColor := oCol:DefColor
-      endif
-
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aCellColor, nColor ) - 1 )
 
    endif

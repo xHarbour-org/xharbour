@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4635 2005/11/16 17:54:40 snaiperis Exp $
+ * $Id: ChangeLog,v 1.4636 2005/11/17 00:51:06 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-17 10:00 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/tbrowse.prg
+     ! fixed color-rect use when column has no color-block
 
 2005-11-16 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * make_pc.bat
@@ -18,7 +22,7 @@
   * xharbour/include/hbvmpub.h
   * xharbour/source/vm/hash.c
   * xharbour/source/vm/fastitem.c
-    + ulHolder counter for Hash implemented. Hash memory is released 
+    + ulHolder counter for Hash implemented. Hash memory is released
       if hash is not referenced. No need to call garbage collector.
 
 2005-11-16 14:11 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
