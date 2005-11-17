@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.44 2005/11/12 22:49:31 walito Exp $
+ * $Id: hash.c,v 1.45 2005/11/16 17:54:41 snaiperis Exp $
  */
 
 /*
@@ -432,6 +432,7 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
             pNewBase->fOrder = pPageBase->fOrder;
             pNewBase->uiLevel = pPageBase->uiLevel;
             pNewBase->ulPageSize = pPageBase->ulPageSize;
+            pNewBase->ulHolders = 1;
 
             // WARNING: May be an odd number. Leave this line as it is.
             pNewBase->ulAllocated = pPageBase->ulLen - (pPageBase->ulPageSize / 2);
