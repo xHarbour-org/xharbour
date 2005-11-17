@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.132 2005/11/16 09:06:53 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.133 2005/11/17 09:03:55 mauriliolongo Exp $
  */
 
 /*
@@ -337,7 +337,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
    local aCol, oCell
    local nRectPos
 
-   ::aCache[ nRow ] := {}
+   ::aCache[ nRow ] := Array( ::oCachedBrowse:colCount )
 
    for each aCol in ::oCachedBrowse:aColsInfo
 
@@ -356,7 +356,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
          endif
       end
 
-      AAdd( ::aCache[ nRow ], oCell )
+      ::aCache[ nRow ][ HB_EnumIndex() ] := oCell
    next
 
    if ! Empty( ::aRect ) .AND. nRectPos > 0
