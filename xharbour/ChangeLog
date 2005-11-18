@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4642 2005/11/18 12:58:36 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4643 2005/11/18 18:07:04 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-11-17 19:05 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+2005-11-18 19:10 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * ChangeLog
+     * Ooops... :) I was thinking today is the 17th...
+
+2005-11-18 19:05 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg
      * Removed unused iVar
 
-2005-11-17 13:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+2005-11-18 13:55 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg
      ! ::ColorRect() should not do a ::Hilite() on current cell
      ! multiple ::ColorRect()s can now be set before TBrowse is stable
