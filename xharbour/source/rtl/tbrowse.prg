@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.133 2005/11/17 09:03:55 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.134 2005/11/17 10:47:06 mauriliolongo Exp $
  */
 
 /*
@@ -170,8 +170,8 @@ CLASS TDataCache
                                                    ::aCache[ nRow ][ nCol ]:aColor,;
                                                    ::aCache[ nRow ][ nCol ]:aColorRect )
 
-   // Sets colorrect to cells defined by aRect
-   METHOD   SetColorRect( aRect, aColors )
+   // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
+   METHOD   SetColorRect( aRect )
 
    /* Please note that here Invalidate() means discard all data and force a reload from
       datasource as need to show a certain row arises. On the other hand, inside a TBrowse ::Invalidate()
@@ -189,9 +189,7 @@ CLASS TDataCache
 
    DATA  aCache                        // Array with cached data
    DATA  oCachedBrowse                 // TBrowse object I'm caching
-
-   DATA  aRect
-   DATA  aColors
+   DATA  aRect                         // Array with pending color-rects
 
    METHOD FillRow( nRow )              // Fills a row of aCache with data from datasource
 
@@ -212,7 +210,6 @@ METHOD New( oBrowse ) CLASS TDataCache
    ::nLastRow := 1
 
    ::aRect := {}
-   ::aColors := NIL
 
 RETURN Self
 
@@ -351,7 +348,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
 
          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
             if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
-               :aColorRect := ::aColors
+               :aColorRect := ::aRect[ nRectPos ][ 4 ]
             endif
          endif
       end
@@ -360,9 +357,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
    next
 
    if ! Empty( ::aRect ) .AND. nRectPos > 0
-      ADel( ::aRect, nRectPos )
-      ASize( ::aRect, Len( ::aRect ) - 1 )
-
+      ADel( ::aRect, nRectPos, .T. )
    endif
 
 Return Self
@@ -396,31 +391,26 @@ RETURN ::aCache[ nRow ][ nCol ]:xData
 
 
 
-METHOD SetColorRect( aRect, aColors ) CLASS TDataCache
+METHOD SetColorRect( aRect ) CLASS TDataCache
 
-   local nRow, nCol, lDelayed := .F.
+   local nRow, nCol
 
    for nRow := aRect[ 1 ] to aRect[ 3 ]
 
       if Empty( ::aCache[ nRow ] )
 
-         AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ] } )
-         lDelayed := .T.
+         // A five elements array shrinks to a four one
+         // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
+         AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
 
       else
 
          for nCol := aRect[ 2 ] to aRect[ 4 ]
-
-            ::aCache[ nRow ][ nCol ]:aColorRect := aColors
-
+            ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
          next
 
       endif
    next
-
-   if lDelayed
-      ::aColors := aColors
-   endif
 
 return Self
 
@@ -646,7 +636,7 @@ CLASS TBrowse
    DATA cSpacePre                         // Blank Space prior to first column
    DATA cSpaceLast                        // Blank space after the last column
    DATA cSpaceWidth                       // Spaces of browse width
-   //DATA lRect
+   DATA lRectPainting                     // .T. when ::ColorRect() calls ::ForceStable() to paint a colored region
 
    DATA oDataCache
    DATA lPaintBottomUp                    // .T. after a PG_DN, paints browser from bottom to top, optimizing
@@ -700,7 +690,6 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
 
    ::lRedrawFrame    := .T.
    ::aRect           := {}
-   ::aRectColor      := {}
    ::nColsWidth      := 0
    ::nColsVisible    := 0
    ::nHeaderHeight   := 0
@@ -737,8 +726,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::cSpacePre       := ''
    ::cSpaceLast      := ''
    ::cSpaceWidth     := ''
-   //::lRect           := .f.
-   //::aHighCellColor  := {}
+   ::lRectPainting   := .f.
 
    ::oDataCache := TDataCache():New( Self )
    ::lPaintBottomUp  := .F.
@@ -992,11 +980,11 @@ METHOD Configure( nMode ) CLASS TBrowse
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
       ::oDataCache := TDataCache():New( Self )
-      if ! Empty( ::aRect )
-         ::oDataCache:SetColorRect( ::aRect, ::aRectColor )
-         ::aRect := {}
-         ::aRectColor := {}
-      endif
+      // here 'n' is an array
+      for each n in ::aRect
+         ::oDataCache:SetColorRect( n )
+      next
+      ::aRect := {}
    else
       ::oDataCache:Invalidate()
    endif
@@ -2119,8 +2107,8 @@ METHOD ColorRect( aRect, aColors ) CLASS TBrowse
       ::oDataCache:SetColorRect( { Max( aRect[ 1 ], 1 ),;
                                    Max( aRect[ 2 ], 1 ),;
                                    Min( aRect[ 3 ], ::rowCount ),;
-                                   Min( aRect[ 4 ], ::colCount ) },;
-                                 aColors )
+                                   Min( aRect[ 4 ], ::colCount ),;
+                                   aColors } )
 
       /* and now let's refresh new aRect covered area */
       If ! Empty( ::aRedraw )
@@ -2130,17 +2118,17 @@ METHOD ColorRect( aRect, aColors ) CLASS TBrowse
       endif
 
       ::Stable := .F.
+      ::lRectPainting := .T.
       ::ForceStable()
 
    else
 
       // During ::Configure() I could change cache, so I save colorrect parameters
-      ::aRect       := { Max( aRect[ 1 ], 1 ),;
-                         Max( aRect[ 2 ], 1 ),;
-                         Min( aRect[ 3 ], ::rowCount ),;
-                         Min( aRect[ 4 ], ::colCount ) }
-      ::aRectColor  := aColors
-
+      AAdd( ::aRect, { Max( aRect[ 1 ], 1 ),;
+                       Max( aRect[ 2 ], 1 ),;
+                       Min( aRect[ 3 ], ::rowCount ),;
+                       Min( aRect[ 4 ], ::colCount ),;
+                       aColors } )
    endif
 
 
@@ -2346,12 +2334,14 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    endif
 
    // NOTE: DBU relies upon current cell being reHilited() even if already stable
-   //
-   if ::AutoLite
+   // 18/11/2005 - ::ColorRect() sets ::lRectPainting, when set, ::Hilite should not be called since we're only painting a color-rect region
+   if ! ::lRectPainting .AND. ::AutoLite
       ::Hilite()
    else
       ::PosCursor()
    endif
+
+   ::lRectPainting := .F.
 
    SetCursor( nOldCursor )
 
@@ -2748,21 +2738,19 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    // if called when the column type is not defined, then do nothing
    if Empty( aColsInfo[ o_Type ] )
-      Return nil // nCol
+      Return nil
    endif
 
    cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
 
-   // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
    aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
+
+   // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
    if Empty( aCellColor )
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
-
    else
       cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aCellColor, nColor ) - 1 )
-
    endif
-
 
    Switch aColsInfo[ o_Type ]
    case "C"
