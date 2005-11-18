@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.6 2005/05/01 00:18:02 lculik Exp $
+ * $Id: client.prg,v 1.7 2005/09/23 13:38:12 gdrouillard Exp $
  */
 
 /*
@@ -64,11 +64,12 @@
 */
 
 CLASS tIPClient
-   CLASSDATA bInitSocks INIT .F.
-   CLASSDATA cCRLF INIT InetCRLF()
-   DATA oUrl            //url to wich to connect
-   DATA oCredentials    //credential needed to access the service
-   DATA nStatus         //basic status
+
+   CLASSDATA   bInitSocks  INIT .F.
+   CLASSDATA   cCRLF       INIT InetCRLF()
+   DATA oUrl                                 // url to wich to connect
+   DATA oCredentials                         // credential needed to access the service
+   DATA nStatus                              // basic status
    DATA SocketCon
    Data lTrace
    Data nHandle
@@ -93,7 +94,7 @@ CLASS tIPClient
    /** Gauge control; it can be a codeblock or a function pointer. */
    DATA exGauge
 
-   METHOD New( oUrl, oCredentials )
+   METHOD New( oUrl, oCredentials, lTrace )
    METHOD Open()
 
    METHOD Read( iLen )
@@ -104,18 +105,24 @@ CLASS tIPClient
    METHOD Reset()
    METHOD Close()
    METHOD Data( cData )
-   /* New Methods */
+
+   PROTECTED:
+
+   /* Methods to log data if needed */
    METHOD InetRecv( SocketCon, cStr1, len)
    METHOD InetRecvLine( SocketCon, nLen, size )
-   METHOD InetRecvAll( SocketCon, cStr1, nLen )
+   METHOD InetRecvAll( SocketCon, cStr1, len )
    METHOD InetCount( SocketCon )
-   METHOD InetSendAll( SocketCon,  cData , nLen )
+   METHOD InetSendAll( SocketCon,  cData, nLen )
    METHOD InetErrorCode(SocketCon)
    METHOD InetConnect( cServer, nPort, SocketCon )
+
+   METHOD Log()
+
 ENDCLASS
 
 
-METHOD New( oUrl, oCredentials,lTrace ) CLASS tIPClient
+METHOD New( oUrl, oCredentials, lTrace ) CLASS tIPClient
    LOCAL oRet
    Default lTrace to .F.
    IF .not. ::bInitSocks
@@ -125,13 +132,13 @@ METHOD New( oUrl, oCredentials,lTrace ) CLASS tIPClient
 
    DO CASE
       CASE oUrl:cProto == "http"
-         oRet := tIPClientHTTP():New(lTrace)
+         oRet := tIPClientHTTP():New( lTrace )
       CASE oUrl:cProto == "pop"
-         oRet := tIPClientPOP():New(lTrace)
+         oRet := tIPClientPOP():New( lTrace )
       CASE oUrl:cProto == "smtp"
-         oRet := tIPClientSMTP():New(lTrace)
+         oRet := tIPClientSMTP():New( lTrace )
       CASE oUrl:cProto == "ftp"
-         oRet := tIPClientFTP():New(lTrace)
+         oRet := tIPClientFTP():New( lTrace )
    ENDCASE
 
    IF Empty( oRet )
@@ -148,9 +155,13 @@ METHOD New( oUrl, oCredentials,lTrace ) CLASS tIPClient
    oRet:nLastRead := 0
    oRet:bEof := .F.
    oRet:lTRace := lTRace
+
 RETURN oRet
 
+
+
 METHOD Open( cUrl ) CLASS tIPClient
+
    LOCAL nPort
 
    IF HB_IsString( cUrl )
@@ -167,26 +178,41 @@ METHOD Open( cUrl ) CLASS tIPClient
 
    InetSetTimeout( ::SocketCon, ::nConnTimeout )
    ::InetConnect( ::oUrl:cServer, nPort, ::SocketCon )
+
    IF ::InetErrorCode( ::SocketCon ) != 0
       RETURN .F.
    ENDIF
+
 RETURN .T.
 
+
+
 METHOD Close() CLASS tIPClient
+
    local nRet:=-1
+
    IF .not. Empty( ::SocketCon )
-      nRet:=InetClose( ::SocketCon )
+
+      nRet := InetClose( ::SocketCon )
+
       ::SocketCon:=nil
+
    ENDIF
+
 RETURN(nRet)
+
+
 
 METHOD Reset() CLASS tIPClient
    ::bInitialized := .F.
    ::bEof := .F.
 RETURN .T.
 
+
+
 METHOD Commit() CLASS tIPClient
 RETURN .T.
+
 
 
 METHOD Read( nLen ) CLASS tIPClient
@@ -215,8 +241,8 @@ METHOD Read( nLen ) CLASS tIPClient
       // read an amount of data
       cStr0 := Space( nLen )
 
-// S.R. if len of file is less than 1024 InetRecvAll return 0
-//      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
+      // S.R. if len of file is less than 1024 InetRecvAll return 0
+      //      ::nLastRead := InetRecvAll( ::SocketCon, @cStr0, nLen )
 
       ::InetRecvAll( ::SocketCon, @cStr0, nLen )
       ::nLastRead := ::InetCount( ::SocketCon )
@@ -225,7 +251,7 @@ METHOD Read( nLen ) CLASS tIPClient
       IF ::nLastRead != nLen
          ::bEof := .T.
          cStr0 := Substr( cStr0, 1, ::nLastRead )
-// S.R.         RETURN NIL
+         // S.R.         RETURN NIL
       ENDIF
 
       IF ::nRead == ::nLength
@@ -277,6 +303,7 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
 RETURN .T.
 
 
+
 METHOD WriteFromFile( cFile ) CLASS tIPClient
    LOCAL nFin
    LOCAL cData
@@ -324,6 +351,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 RETURN .T.
 
 
+
 METHOD Data( cData ) CLASS tIPClient
    ::InetSendall( ::SocketCon, "DATA" + ::cCRLF )
    IF .not. ::GetOk()
@@ -332,6 +360,8 @@ METHOD Data( cData ) CLASS tIPClient
    ::InetSendall(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
 
+
+
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
 
    IF Empty( nLen )
@@ -339,103 +369,153 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
    ENDIF
 
    ::nLastWrite := ::InetSendall( ::SocketCon,  cData , nLen )
+
    IF .not. Empty( bCommit ) .and. bCommit
+
       ::Commit()
+
    ENDIF
 
 RETURN ::nLastWrite
+
+
+
 METHOD InetSendAll( SocketCon, nLen, size ) CLASS tIPClient
 
-Local nRet
+   Local nRet
 
-    if ::lTrace
-       fWrite(::nHandle, [ Parameters recieved  on function InetSendAll  : SocketCon ] +cStr(SocketCon) + [  size  ] +cStr(size) + [  nLen  ] + cstr(nlen)  +hb_osnewline())
-    endif
+   nRet := InetSendAll( SocketCon, nLen, size )
 
-    nRet := InetSendAll( SocketCon, nLen, size )
+   if ::lTrace
 
-    if ::lTrace
-       fWrite(::nHandle, [ Data returned from the server on  InetSendAll: nRet  ] +cstr(nRet) +hb_osnewline())
-    endif
+      ::Log( SocketCon, size, nlen, nRet )
+
+   endif
+
 Return nRet
+
+
 
 METHOD InetCount( SocketCon ) CLASS tIPClient
-Local nRet
 
-    if ::lTrace
-       fWrite(::nHandle, [ Parameters recieved  on function InetCount  : SocketCon ] +cStr(socketcon)+hb_osnewline() )
-    endif
+   Local nRet
 
-    nRet:= InetCount( SocketCon )
+   nRet := InetCount( SocketCon )
 
-    if ::lTrace
-       fWrite(::nHandle, [Data returned from the server on  InetCount : nRet  ] +cStr(nRet)+hb_osnewline())
-    endif
+   if ::lTrace
+
+      ::Log( SocketCon, nRet )
+
+   endif
+
 Return nRet
 
-METHOD InetRecv( SocketCon, cStr1, len) CLASS tIPClient
-Local nRet
 
-    if ::lTrace
-       fWrite(::nHandle, [Parameters recieved on function InetRecv to recieve data :  : SocketCon ] +cStr(SocketCon)+ [ cStr1 ]+cStr1+[ len ]+cstr(len) +hb_osnewline())
-    endif
 
-    nRet:= InetRecv( SocketCon, @cStr1, len )
+METHOD InetRecv( SocketCon, cStr1, len ) CLASS tIPClient
 
-    if ::lTrace
-       fWrite(::nHandle, [ Data returned from the server on  InetRecv:  nRet  ]+ cstr(nret) + [ cStr1 ] + if(valtype( cStr1) == "U","NIL",cstr1)+ hb_osnewline())
-    endif
+   Local nRet
+
+   nRet := InetRecv( SocketCon, @cStr1, len )
+
+   if ::lTrace
+
+      ::Log( SocketCon, "", len, iif( nRet >= 0, cStr1, nRet ) )
+
+   endif
+
 Return nRet
+
 
 
 METHOD InetRecvLine( SocketCon, nLen, size ) CLASS tIPClient
 
-Local cRet :=""
+   Local cRet
 
-    if ::lTrace
-       fWrite(::nHandle, [ Parameters recieved on function InetRecvLine to recieve data : SocketCon ] +cstr(SocketCon)+ [ nLen ]+cstr(nlen)+ [ size ]+cstr(size) +hb_osnewline() )
-    endif
+   cRet := InetRecvLine( SocketCon, @nLen, size )
 
-    cRet := InetRecvLine( SocketCon, @nLen, size )
+   if ::lTrace
 
-    if ::lTrace
-       fWrite(::nHandle, [ Data returned from the server on  InetRecv : cRet  ] + if(valtype( cRet) == "U","NIL",cRet)  +hb_osnewline())
-    endif
+      ::Log( SocketCon, "", size, cRet )
+
+   endif
+
 Return cRet
 
-METHOD InetRecvAll( SocketCon, cStr1, len) CLASS tIPClient
-Local nRet
 
-    if ::lTrace
-       fWrite(::nHandle, [Parameters recieved on function InetRecvAll to recieve data:  Parametros recebidos : SocketCon ] +cStr(SocketCon) +  [  cStr1  ]+ cStr1 +[  len  ] +cstr(len) +hb_osnewline())
-    endif
 
-     InetRecvAll( SocketCon, @cStr1, len )
+METHOD InetRecvAll( SocketCon, cStr1, len ) CLASS tIPClient
 
-    if ::lTrace
-       fWrite(::nHandle, [  Data returned from the server on  InetRecvAll : cStr1  ] +if(valtype( cStr1) == "U","NIL",cstr1) +hb_osnewline())
-    endif
-Return self
+   Local nRet
 
-METHOD InetErrorCode(SocketCon)
-Local nRet := 0
+   nRet := InetRecvAll( SocketCon, @cStr1, len )
 
-    if ::lTrace
-       fWrite(::nHandle, [Parameters recieved on function InetErrorCode:  SocketCon ] +cStr(SocketCon) +hb_osnewline())
-    endif
+   if ::lTrace
 
-    nRet := InetErrorCode( ::SocketCon )
+      ::Log( SocketCon, "", len, iif( nRet >= 0, cStr1, nRet ) )
 
-    if ::lTrace
-       fWrite(::nHandle, [ Data returned from the server on  InetErrorCode:  nRet  ]+ cstr(nret) + hb_osnewline())
-    endif
+   endif
 
 Return nRet
 
-METHOD InetConnect( cServer, nPort, SocketCon )
-    if ::lTrace
-       fWrite(::nHandle, [Parameters recieved on function InetConnect:  Server ] +cServer + [ Port ] +cStr( nPort ) + [SocketCon ] +cStr(SocketCon) + hb_osnewline())
-    endif
+
+
+METHOD InetErrorCode( SocketCon ) CLASS tIPClient
+
+   Local nRet
+
+   nRet := InetErrorCode( SocketCon )
+
+   if ::lTrace
+
+      ::Log( SocketCon, nRet )
+
+   endif
+
+Return nRet
+
+
+/* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
+METHOD InetConnect( cServer, nPort, SocketCon ) CLASS tIPClient
 
    InetConnect( cServer, nPort, SocketCon )
+
+   if ::lTrace
+
+      ::Log( cServer, nPort, SocketCon )
+
+   endif
+
 Return Nil
+
+
+/* Called from another method with list of parameters and, as last parameter, return code
+   of function being logged.
+   Example, I want to log MyFunc( a, b, c ) which returns m,
+            ::Log( a, b, c, m )
+*/
+METHOD Log( ... ) CLASS tIPClient
+
+   LOCAL xVar
+   LOCAL cMsg := DToS( Date() ) + "-" + Time() + Space( 2 ) + ;
+                 SubStr( ProcName( 1 ), Rat( ":", ProcName( 1 ) ) ) +;
+                 "( "
+
+   for each xVar in hb_aParams()
+
+      cMsg += StrTran( StrTran( AllTrim( CStr( xVar ) ), Chr( 13 ) ), Chr( 10 ) ) +;
+              iif ( hb_EnumIndex() < PCount() - 1, ", ", "" )
+
+      if hb_EnumIndex() == PCount() - 1
+         cMsg += " )" + hb_OsNewLine() + ">> "
+
+      elseif hb_EnumIndex() == PCount()
+         cMsg += hb_OsNewLine() + hb_OsNewLine()
+
+      endif
+
+   next
+
+   fWrite( ::nHandle, cMsg )
+
+RETURN Self

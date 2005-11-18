@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4639 2005/11/17 11:11:35 snaiperis Exp $
+ * $Id: ChangeLog,v 1.4640 2005/11/17 22:14:46 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-18 10:00 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/tip/client.prg
+     * changed logging code to remove all those messy messages and try to
+       have a cleaner log
+   * source/tip/popcln.prg
+     ! ::Retrieve() was not calling ::InetReceive() so there was no logging
+
+   /* BTW: ::InetXXX methods parameters don't follow InetXXX() functions
+           name conventions and sometimes have subtle differencies in
+           parameter handling. Should be fixed, imho.
+   */
 
 2005-11-17 20:20 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/getsecrt.prg

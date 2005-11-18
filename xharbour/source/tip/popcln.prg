@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.2 2005/04/05 13:42:48 mauriliolongo Exp $
+ * $Id: popcln.prg,v 1.3 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 
 CLASS tIPClientPOP FROM tIPClient
 
-   METHOD New()
+   METHOD New( lTrace )
    METHOD Open()
    METHOD Close()
    METHOD Read( iLen )
@@ -77,7 +77,8 @@ CLASS tIPClientPOP FROM tIPClient
 ENDCLASS
 
 
-METHOD New(lTrace) CLASS tIPClientPOP
+METHOD New( lTrace ) CLASS tIPClientPOP
+
    local cFile :="pop3"
    local n := 0
 
@@ -93,7 +94,7 @@ METHOD New(lTrace) CLASS tIPClientPOP
            n++
          enddo
          ::nHandle := fcreate(cFile+alltrim(str(n,2))+".log")
-      endif        
+      endif
    endif
 
 RETURN Self
@@ -315,7 +316,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
 
       cBuffer := Space(1024)
 
-      nRead := InetRecv( ::SocketCon, @cBuffer, 1024 )
+      nRead := ::InetRecv( ::SocketCon, @cBuffer, 1024 )
 
       cRet += Left(cBuffer, nRead)
 
