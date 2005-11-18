@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.163 2005/10/18 23:41:48 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.164 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -3916,6 +3916,26 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 //-------------------------------------------------------------------//
 
+int kbdShiftsState( void )
+{
+   BYTE kbBuffer[ 256 ];
+   int  kbdShifts;
+   kbdShifts = 0;
+   GetKeyboardState( kbBuffer );
+   if ( kbBuffer[ VK_SHIFT ] & 0x080 ) kbdShifts += GTI_KBD_SHIFT;
+   if ( kbBuffer[ VK_CONTROL ] & 0x080 ) kbdShifts += GTI_KBD_CTRL;
+   if ( kbBuffer[ VK_MENU ] & 0x080 ) kbdShifts += GTI_KBD_ALT;
+   if ( kbBuffer[ VK_LWIN ] & 0x080 ) kbdShifts += GTI_KBD_LWIN;
+   if ( kbBuffer[ VK_RWIN ] & 0x080 ) kbdShifts += GTI_KBD_RWIN;
+   if ( kbBuffer[ VK_APPS ] & 0x080 ) kbdShifts += GTI_KBD_MENU;
+   if ( kbBuffer[ VK_SCROLL ] & 0x080 ) kbdShifts += GTI_KBD_SCROLOCK;
+   if ( kbBuffer[ VK_NUMLOCK ] & 0x080 ) kbdShifts += GTI_KBD_NUMLOCK;
+   if ( kbBuffer[ VK_CAPITAL ] & 0x080 ) kbdShifts += GTI_KBD_CAPSLOCK;
+   return kbdShifts;
+}
+
+//-------------------------------------------------------------------//
+
 void HB_GT_FUNC( gt_ProcessMessages( void ) )
 {
   hb_wvt_gtProcessMessages();
@@ -4154,6 +4174,9 @@ int HB_GT_FUNC( gt_info( int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 
       case GTI_VIEWMAXHEIGHT:
          return _GetScreenHeight();
+
+      case GTI_KBDSHIFTS:
+         return kbdShiftsState();
 
    }
 
