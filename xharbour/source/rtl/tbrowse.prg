@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.134 2005/11/17 10:47:06 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.135 2005/11/18 12:58:40 mauriliolongo Exp $
  */
 
 /*
@@ -583,10 +583,7 @@ CLASS TBrowse
    METHOD PreConfigVertical( uValue )     // This method calculates variables related to vertical coordinates
    METHOD SetColPos( nColPos )            // Performs a "direct jump" to a given column
 
-   DATA aRect                             // The rectangle specified with ColorRect()
-   DATA aRectColor                        // Colors to use in the rectangle specified with ColorRect()
-                                          // Both are used only if TBrowse is not lConfigured, otherwise a call
-                                          // to ::oDataCache:SetColorRect() is done
+   DATA aRect                             // One or more rectangles and colors associated specified with ColorRect()
 
    DATA aRedraw                           // Array of logical items indicating, is appropriate row need to be redraw
    DATA lHeaders                          // Internal variable which indicates whether there are column headers to paint
