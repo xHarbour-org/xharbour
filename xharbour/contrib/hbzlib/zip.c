@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.40 2004/07/27 02:29:08 lculik Exp $
+ * $Id: zip.c,v 1.41 2005/04/23 16:21:01 lculik Exp $
  */
 
 /*
@@ -666,7 +666,10 @@ HB_FUNC( HB_UNZIPFILE )
       UnzipFiles.type = HB_IT_NIL;
       hb_arrayNew( &UnzipFiles, 0 );
 
+      if(  hb_TestForPKS( szZipFileName ) <=0 ) 
+      {
       hb___GetFileNamesFromZip( szZipFileName, TRUE );
+      
 
       if( pUnzip )
       {
@@ -716,12 +719,13 @@ HB_FUNC( HB_UNZIPFILE )
                              &UnzipFiles,
                              &iProgress );
       }
-
+   
       hb_xfree( szZipFileName );
       hb_itemClear( &iProgress );
       hb_itemClear( &UnzipFiles );
       hb_fsChDir( pCurDir ) ;
       hb_xfree( pCurDir ) ;
+    }
    }
 
    hb_retl( bRet );

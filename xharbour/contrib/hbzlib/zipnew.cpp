@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.23 2005/03/18 22:35:30 andijahja Exp $
+ * $Id: zipnew.cpp,v 1.24 2005/04/23 16:21:02 lculik Exp $
  */
 
 /*
@@ -217,7 +217,7 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 {
    int iNumberOfFiles;
    ULONG ulCount;
-   int iOMode = hb_CheckSpanMode( szFile );
+   int iOMode ;
    bool iReturn = true;
 
    CZipArchive szZip;
@@ -229,7 +229,8 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
    }
    try
    {
-      switch( iOMode )
+
+      switch( hb_CheckSpanMode( szFile ))
       {
          case 0:
             szZip.Open( szFile, pZipI.iReadOnly ? CZipArchive::zipOpenReadOnly : CZipArchive::zipOpen, 0 );
@@ -567,7 +568,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    bool iReturn = true;
    ULONG ulCount;
    int iCause;
-   int iMode = hb_CheckSpanMode( szFile );
+   int iMode ;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
 
    BOOL bChange = FALSE;
@@ -585,7 +586,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
 
    try
    {
-      switch( iMode )
+      switch( hb_CheckSpanMode( szFile ) )
       {
          case 0:
             szZip.Open( szFile, pZipI.iReadOnly ? CZipArchive::zipOpenReadOnly : CZipArchive::zipOpen, 0 );
@@ -794,7 +795,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
    bool iReturn = true;
    ULONG ulCount;
    int iCause;
-   int iMode = hb_CheckSpanMode( szFile );
+   int iMode ;
 
    CZipArchive szZip;
    SpanCallback span;
@@ -808,7 +809,7 @@ int hb_UnzipSelIndex( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPas
 
    try
    {
-      switch( iMode )
+      switch( hb_CheckSpanMode( szFile ) )
       {
          case 0:
             szZip.Open( szFile, pZipI.iReadOnly ? CZipArchive::zipOpenReadOnly : CZipArchive::zipOpen, 0 );
@@ -1168,6 +1169,113 @@ int hb_CheckSpanMode( char * szFile )
          szZip.Close( true );
          iReturn = 103;
       }
+      
+      else if ( e.m_iCause == CZipException::generic )
+      {
+         szZip.Close( true );
+         iReturn = 100;
+      }      
+      else if ( e.m_iCause == CZipException::badZipFile )
+      {
+         szZip.Close( true );
+         iReturn = 101;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::badCrc )
+      {
+         szZip.Close( true );
+         iReturn = 102;
+      }
+
+
+      
+      else if ( e.m_iCause == CZipException::aborted )
+      {
+         szZip.Close( true );
+         iReturn = 104;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::abortedAction )
+      {
+         szZip.Close( true );
+         iReturn = 105;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::abortedSafely )
+      {
+         szZip.Close( true );
+         iReturn = 106;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::nonRemovable )
+      {
+         szZip.Close( true );
+         iReturn = 107;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::tooManyVolumes )
+      {
+         szZip.Close( true );
+         iReturn = 108;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::tooLongFileName )
+      {
+         szZip.Close( true );
+         iReturn = 109;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::badPassword )
+      {
+         szZip.Close( true );
+         iReturn = 110;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::dirWithSize )
+      {
+         szZip.Close( true );
+         iReturn = 111;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::internal )
+      {
+         szZip.Close( true );
+         iReturn = 112;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::notRemoved )
+      {
+         szZip.Close( true );
+         iReturn = 113;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::notRenamed )
+      {
+         szZip.Close( true );
+         iReturn = 114;
+      }
+
+      
+      else if ( e.m_iCause == CZipException::platfNotSupp)
+      {
+         szZip.Close( true );
+         iReturn = 115;
+      }
+
+
+
+
    }
    if ( ! iReturn )
    {

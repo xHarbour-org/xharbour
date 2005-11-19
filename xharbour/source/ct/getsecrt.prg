@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.6 2005/11/15 01:53:01 lculik Exp $
+ * $Id: getsecrt.prg,v 1.7 2005/11/17 22:14:51 lculik Exp $
  */
 
 /*
@@ -102,8 +102,9 @@ proc GetPassword( oGet, nLen )
           oGet:cargo := Substr( oGet:cargo, 1, Len( oGet:cargo ) - 1 )
           GetapplyKey( oGet, nKey)
         ELSEIF nKey == K_ESC
+          oGet:Undo()
           oGet:ExitState := GE_ESCAPE
-          exit
+          EXIT
         ELSEIF nKey == K_ENTER
           GetApplyKey( oGet, nKey )
         ENDIF
