@@ -1,5 +1,5 @@
 /*
- * $Id: msgbgwin.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: msgbgwin.c,v 1.4 2005/06/10 22:51:36 ronpinkas Exp $
  */
 
 /*
@@ -62,11 +62,11 @@ static HB_LANG s_lang =
       /* Identification */
 
       "BGWIN",                     /* ID */
-      "English",                   /* Name (in English) */
+      "Bulgarian",                 /* Name (in English) */
       "Български",                 /* Name (in native language) */
       "BG",                        /* RFC ID */
       "1251",                      /* Codepage */
-      "$Revision: 1.3 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
+      "$Revision: 1.4 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
 
       /* Month names */
 

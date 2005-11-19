@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.17 2004/12/31 11:55:49 druzus Exp $
+ * $Id: hbapicdp.h,v 1.18 2005/01/03 16:59:15 ronpinkas Exp $
  */
 
 /*
@@ -143,6 +143,7 @@ extern PHB_CODEPAGE hb_cdp_page;
 #define CPID_KOI_8      "koi-8"
 #define CPID_KOI_8U     "koi-8u"
 #define CPID_MAZ        "plmaz"
+#define CPID_MIK        "bgmik"
 #define UNITB_437       &hb_uniTbl_437
 #define UNITB_737       &hb_uniTbl_737
 #define UNITB_850       &hb_uniTbl_850
@@ -158,6 +159,7 @@ extern PHB_CODEPAGE hb_cdp_page;
 #define UNITB_KOI_8     &hb_uniTbl_KOI_8
 #define UNITB_KOI_8U    &hb_uniTbl_KOI_8U
 #define UNITB_MAZ       &hb_uniTbl_mazovia
+#define UNITB_MIK       &hb_uniTbl_MIK
 #define UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
@@ -175,6 +177,7 @@ extern HB_UNITABLE hb_uniTbl_8859_2;
 extern HB_UNITABLE hb_uniTbl_KOI_8;
 extern HB_UNITABLE hb_uniTbl_KOI_8U;
 extern HB_UNITABLE hb_uniTbl_mazovia;
+extern HB_UNITABLE hb_uniTbl_MIK;
 
 HB_EXTERN_END
 

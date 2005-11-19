@@ -1,10 +1,12 @@
 #
-# $Id: Makefile,v 1.16 2005/01/23 14:00:00 ptsarenko Exp $
+# $Id: Makefile,v 1.16 2005/01/23 12:14:43 ptsarenko Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
+      cpbgmik.c  \
+      cpbgwin.c  \
       cpeldos.c  \
       cpelwin.c  \
       cpesdos.c  \
@@ -52,6 +54,7 @@ C_SOURCES=\
       uckoi8.c   \
       uckoi8u.c  \
       ucmaz.c    \
+      ucmik.c    \
 
 LIBNAME=codepage
 

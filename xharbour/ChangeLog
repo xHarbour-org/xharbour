@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4644 2005/11/18 18:12:05 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4645 2005/11/18 23:19:26 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-19 18:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapicdp.h
+  * source/codepage/Makefile
+  + source/codepage/cpbgmik.c
+  + source/codepage/cpbgwin.c
+  + source/codepage/ucmik.c
+  * source/lang/Makefile
+  + source/lang/msgbgmik.c
+    + Added Bulgarian MIK and 1251 codepages, thanks to Rosen Vladimirov.
+      Non-GNU Makefiles need to be updated!
+  * source/lang/msgbgwin.c
+    ! Fixed a typo.
 
 2005-11-18 19:08 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * source\rtl\gtwvt\gtwvt.c
