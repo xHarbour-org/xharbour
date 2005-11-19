@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.164 2005/10/24 01:04:35 druzus Exp $
+ * $Id: gtwvt.c,v 1.165 2005/11/18 23:19:27 marceloanelli Exp $
  */
 
 /*
@@ -3928,9 +3928,9 @@ int kbdShiftsState( void )
    if ( kbBuffer[ VK_LWIN ] & 0x080 ) kbdShifts += GTI_KBD_LWIN;
    if ( kbBuffer[ VK_RWIN ] & 0x080 ) kbdShifts += GTI_KBD_RWIN;
    if ( kbBuffer[ VK_APPS ] & 0x080 ) kbdShifts += GTI_KBD_MENU;
-   if ( kbBuffer[ VK_SCROLL ] & 0x080 ) kbdShifts += GTI_KBD_SCROLOCK;
-   if ( kbBuffer[ VK_NUMLOCK ] & 0x080 ) kbdShifts += GTI_KBD_NUMLOCK;
-   if ( kbBuffer[ VK_CAPITAL ] & 0x080 ) kbdShifts += GTI_KBD_CAPSLOCK;
+   if ( kbBuffer[ VK_SCROLL ] & 0x01 ) kbdShifts += GTI_KBD_SCROLOCK;
+   if ( kbBuffer[ VK_NUMLOCK ] & 0x01 ) kbdShifts += GTI_KBD_NUMLOCK;
+   if ( kbBuffer[ VK_CAPITAL ] & 0x01 ) kbdShifts += GTI_KBD_CAPSLOCK;
    return kbdShifts;
 }
 
