@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4647 2005/11/19 16:27:01 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.4648 2005/11/19 17:24:13 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-19 13:55 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * source\rtl\gtwin\gtwin.c
+    + Added function kbdShiftsState for using with GTINFO(GTI_KBDSHIFTS) but
+      with ALT detection disabled for now.
 
 2005-11-19 15:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/getsecrt.prg

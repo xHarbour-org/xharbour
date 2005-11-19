@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.95 2005/10/18 00:56:29 ronpinkas Exp $
+ * $Id: gtwin.c,v 1.96 2005/10/18 12:14:33 druzus Exp $
  */
 
 /*
@@ -1931,7 +1931,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
             /* national codepage translation */
             if( ch > 0 && ch <= 255 )
             {
-	         ch = s_keyTrans[ ch ];
+           ch = s_keyTrans[ ch ];
             }
          }
       }
@@ -2423,6 +2423,24 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
+int kbdShiftsState( void )
+{
+   int  kbdShifts;
+   kbdShifts = 0;
+   if ( GetKeyState( VK_SHIFT ) & 0x080 ) kbdShifts += GTI_KBD_SHIFT;
+   if ( GetKeyState( VK_CONTROL ) & 0x080 ) kbdShifts += GTI_KBD_CTRL;
+   //if ( GetKeyState( VK_MENU ) & 0x080 ) kbdShifts += GTI_KBD_ALT;
+   if ( GetKeyState( VK_LWIN ) & 0x080 ) kbdShifts += GTI_KBD_LWIN;
+   if ( GetKeyState( VK_RWIN ) & 0x080 ) kbdShifts += GTI_KBD_RWIN;
+   if ( GetKeyState( VK_APPS ) & 0x080 ) kbdShifts += GTI_KBD_MENU;
+   if ( GetKeyState( VK_SCROLL ) & 0x01 ) kbdShifts += GTI_KBD_SCROLOCK;
+   if ( GetKeyState( VK_NUMLOCK ) & 0x01 ) kbdShifts += GTI_KBD_NUMLOCK;
+   if ( GetKeyState( VK_CAPITAL ) & 0x01 ) kbdShifts += GTI_KBD_CAPSLOCK;
+   return kbdShifts;
+}
+
+/* *********************************************************************** */
+
 void HB_GT_FUNC( gt_ProcessMessages( void ) )
 {
    return;
@@ -2474,6 +2492,9 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       {
          return s_csbi.srWindow.Right - s_csbi.srWindow.Left;
       }
+
+      case GTI_KBDSHIFTS:
+         return kbdShiftsState();
 
    }
    // DEFAULT: there's something wrong if we are here.
