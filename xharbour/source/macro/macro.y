@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.22 2005/11/02 22:44:18 ronpinkas Exp $
+ * $Id: macro.y,v 1.23 2005/11/16 07:19:52 ronpinkas Exp $
  */
 
 /*
@@ -257,9 +257,13 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 Main : Expression '\n'  {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
 
-                           if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
+                           if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PUSH )
                            {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
+                           else if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_STATEMENT )
+                           {
+                              hb_compExprDelete( hb_compExprGenStatement( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
                            }
                            else
                            {
@@ -274,6 +278,10 @@ Main : Expression '\n'  {
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
                            {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
+                           }
+                           else if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_STATEMENT )
+                           {
+                              hb_compExprDelete( hb_compExprGenStatement( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
                            }
                            else
                            {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4648 2005/11/19 17:24:13 lculik Exp $
+ * $Id: ChangeLog,v 1.4649 2005/11/19 18:01:53 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-19 11:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/arrayshb.c
+    + Added HB_THISARRAY( <nID|pPoiner> ) => aArray
+  * include/hbextern.ch
+    + Added HB_ArrayID, HB_ThisArray
+
+  * include/hbmacro.h
+  * source/macro/macro.y
+    + Added HB_MACRO_GEN_STATEMENT
+
+  * source/vm/macro.c
+    + Added support for 2nd optional arg [nFlags]
+    + Added argument checking
+    * Corrected to use memcpy() instead of hb_strdup()
+
+  * source/vm/hvm.c
+    ! Fixed GPF trap related to FINALLY
+    + Added stack cleanup and argument checking in HB_VMEXECUTE()
 
 2005-11-19 13:55 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * source\rtl\gtwin\gtwin.c
@@ -18,7 +37,7 @@
     ! added oget:undo() when  esc key is presses
   * contrib/hbzlib/zip.c
     contrib/hbzlib/zipnew.cpp
-    ! fixed hb_unzipfile() when invalid file os passed  
+    ! fixed hb_unzipfile() when invalid file os passed
 
 2005-11-19 12:20 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * source\rtl\gtwvt\gtwvt.c

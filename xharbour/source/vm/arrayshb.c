@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.62 2005/10/29 06:45:02 druzus Exp $
+ * $Id: arrayshb.c,v 1.63 2005/10/31 22:41:53 ronpinkas Exp $
  */
 
 /*
@@ -170,6 +170,35 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
    else
    {
       hb_retptr( NULL );
+   }
+}
+
+// Programmer responability that the ID is of a [still] VALID Array!!!
+HB_FUNC( HB_THISARRAY )
+{
+   PHB_ITEM pArrayID = hb_param( 1, HB_IT_POINTER | HB_IT_NUMINT );
+   PHB_ITEM pArray = &(HB_VM_STACK.Return);
+
+   hb_itemClear( pArray );
+
+   if( pArrayID )
+   {
+      pArray->type = HB_IT_ARRAY;
+
+      if( HB_IS_POINTER( pArrayID ) )
+      {
+         pArray->item.asArray.value = (PHB_BASEARRAY) hb_itemGetPtr( pArrayID );
+      }
+      else
+      {
+         pArray->item.asArray.value = (PHB_BASEARRAY) hb_itemGetNL( pArrayID );
+      }
+
+      #ifdef HB_ARRAY_USE_COUNTER
+         pArray->item.asArray.value->ulHolders++;
+      #else
+         hb_arrayRegisterHolder( pArray->item.asArray.value, (void *) pArray );
+      #endif
    }
 }
 

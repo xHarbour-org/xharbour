@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.8 2004/04/15 16:04:27 likewolf Exp $
+ * $Id: hbmacro.h,v 1.9 2004/11/21 21:43:38 druzus Exp $
  */
 
 /*
@@ -78,13 +78,14 @@ HB_EXTERN_BEGIN
 
 /* flags for compilation process
  */
-#define HB_MACRO_GEN_PUSH     1   /* generate PUSH pcodes */
-#define HB_MACRO_GEN_POP      2   /* generate POP pcodes */
-#define HB_MACRO_GEN_ALIASED  4   /* force aliased variable */
-#define HB_MACRO_GEN_TYPE     8   /* check the type of expression (from TYPE() function) */
-#define HB_MACRO_GEN_PARE     16  /* generate parentesized list */
-#define HB_MACRO_GEN_LIST     32  /* generate push operation for every comma separated expressions */
-#define HB_MACRO_DEALLOCATE   128 /* macro structure is allocated on the heap */
+#define HB_MACRO_GEN_PUSH        1 /* generate PUSH pcodes */
+#define HB_MACRO_GEN_POP         2 /* generate POP pcodes */
+#define HB_MACRO_GEN_ALIASED     4 /* force aliased variable */
+#define HB_MACRO_GEN_TYPE        8 /* check the type of expression (from TYPE() function) */
+#define HB_MACRO_GEN_PARE       16 /* generate parentesized list */
+#define HB_MACRO_GEN_LIST       32 /* generate push operation for every comma separated expressions */
+#define HB_MACRO_DEALLOCATE    128 /* macro structure is allocated on the heap */
+#define HB_MACRO_GEN_STATEMENT 256 /* generate STATEMENT pcodes */
 
 /* values returned from compilation process
  */

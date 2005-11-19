@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.538 2005/11/15 20:17:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.539 2005/11/16 12:16:46 druzus Exp $
  */
 
 /*
@@ -1029,6 +1029,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
+   PHB_FINALLY pOuterFinally = hb_vm_pFinally;
+
 #ifndef HB_GUI
    static unsigned short uiPolls = 1;
 #endif
@@ -1047,6 +1049,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
     * macro evaluation belong to a function/procedure where macro
     * compiler was called.
     */
+
+   hb_vm_pFinally = NULL;
 
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
@@ -2232,6 +2236,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                hb_vm_pFinally = pFinally;
 
+               //#define DEBUG_FINALLY
                #ifdef DEBUG_FINALLY
                   printf( "Finally at: %li\n", pFinally->lFinally );
                #endif
@@ -2270,7 +2275,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_FINALLY:
            if( hb_vm_pFinally )
            {
-              hb_vm_pFinally->bDeferred = TRUE;
+              /*
+                 Probably a bug - can't remeber WHY flagged deffered, but if at all,
+                 should have saved the deferred action!
+
+                 if not found, than this PCode can be safely removed, and compiler
+                 fixed to generate Jump - 1 for TRYEND case (same as TRYRECOVER jump).
+
+                 hb_vm_pFinally->bDeferred = TRUE;
+               */
 
               #ifdef DEBUG_FINALLY
                  printf( "Finally after CATCH:\n" );
@@ -3634,6 +3647,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
+            // Restore
+            hb_vm_pFinally = pOuterFinally;
             return;
 
          case HB_P_ENDPROC:
@@ -3799,17 +3814,45 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    // is under way, or another VM might return in control
 
    //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
+
+   // Restore
+   hb_vm_pFinally = pOuterFinally;
 }
 
 HB_FUNC( HB_VMEXECUTE )
 {
    HB_THREAD_STUB_STACK
 
-   hb_vmExecute( (const BYTE *) hb_parc(1), (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) );
-   
-   hb_itemForwardValue( &(HB_VM_STACK.Return ), hb_stackItemFromTop( -1 ) );
+   const BYTE *szString = (const BYTE *) hb_parc(1);
 
-   hb_stackPop();;
+   if( szString )
+   {
+      LONG lOffset = hb_stackTopOffset();
+
+      hb_vmExecute( szString, (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) );
+
+      if( hb_stackTopOffset() > lOffset )
+      {
+         #if 1
+            if( s_uiActionRequest == 0 )
+            {
+               hb_itemForwardValue( &(HB_VM_STACK.Return ), hb_stackItemFromTop( -1 ) );
+
+               do
+               {
+                  hb_stackPop();
+               }
+               while( hb_stackTopOffset() > lOffset );
+            }
+         #else
+            hb_itemCopy( &(HB_VM_STACK.Return ), hb_stackItemFromTop( -1 ) );
+         #endif
+      }
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_vmExecute", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+   }
 }
 
 /* ------------------------------- */

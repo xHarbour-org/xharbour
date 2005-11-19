@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.58 2005/11/15 20:17:14 ronpinkas Exp $
+ * $Id: macro.c,v 1.59 2005/11/16 07:19:52 ronpinkas Exp $
  */
 
 /*
@@ -869,31 +869,53 @@ HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
 
 HB_FUNC( HB_MACROCOMPILE )
 {
-   char * szString = hb_parc(1);
-   HB_MACRO_PTR pMacro;
-   int iStatus;
+   char *sString = hb_parc(1);
 
-   pMacro = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
-   pMacro->Flags     = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH | HB_MACRO_GEN_LIST;
-   pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
-   pMacro->status    = HB_MACRO_CONT;
-   pMacro->supported = HB_SM_HARBOUR;
-
-   szString = (char *) hb_strdup( szString );
-   iStatus = hb_macroParse( pMacro, szString, strlen( szString ) );
-   hb_xfree( (void *) szString );
-
-   //printf( "Status: %i %i Code: %s Len: %i\n", iStatus, pMacro->status, (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
-
-   if( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) )
+   if( sString )
    {
-      hb_retclen( (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
+      ULONG ulLen  = hb_parclen( 1 );
+      int iFlags   = hb_parni( 2 );
 
-      hb_macroDelete( pMacro );
+      char *sMacro = (char *) hb_xgrab( ulLen + 1 );
+
+      HB_MACRO_PTR pMacro;
+      int iStatus;
+
+      memcpy( sMacro, sString, ulLen + 1 );
+
+      if( iFlags == 0 )
+      {
+        iFlags = HB_MACRO_GEN_PUSH | HB_MACRO_GEN_LIST;
+      }
+
+      pMacro = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
+      pMacro->Flags     = HB_MACRO_DEALLOCATE | iFlags;
+      pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
+      pMacro->status    = HB_MACRO_CONT;
+      pMacro->supported = HB_SM_HARBOUR | HB_SM_SHORTCUTS;
+
+      hb_comp_bShortCuts = pMacro->supported & HB_SM_SHORTCUTS;
+
+      iStatus = hb_macroParse( pMacro, sMacro, ulLen );
+
+      hb_xfree( (void *) sMacro );
+
+      //printf( "Status: %i %i Code: %s Len: %i\n", iStatus, pMacro->status, (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
+
+      if( iStatus == HB_MACRO_OK && ( pMacro->status & HB_MACRO_CONT ) )
+      {
+         hb_retclen( (char *) pMacro->pCodeInfo->pCode, pMacro->pCodeInfo->lPCodePos );
+
+         hb_macroDelete( pMacro );
+      }
+      else
+      {
+         hb_macroSyntaxError( pMacro, hb_parc(1) );
+      }
    }
    else
    {
-      hb_macroSyntaxError( pMacro, hb_parc(1) );
+      HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, hb_paramError( 1 ) );
    }
 }
 
