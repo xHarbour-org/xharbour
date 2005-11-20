@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4650 2005/11/19 19:12:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4651 2005/11/19 19:17:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-21 01:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    * use FALSE as initial value of EnableShortCuts, to have the
+      same behaviour on ALT key as gtwvt.
 
 2005-11-19 11:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/arrayshb.c

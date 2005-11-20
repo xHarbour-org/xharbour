@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.30 2005/11/02 17:08:21 bdj Exp $
+ * $Id: gtwvw.c,v 1.31 2005/11/19 16:27:01 marceloanelli Exp $
  */
 
 /*
@@ -5104,7 +5104,7 @@ static void gt_hbInitStatics( USHORT usWinNum, LPCTSTR lpszWinName, USHORT usRow
     s_sApp.AltF4Close       = FALSE;
 
     pWindowData->InvalidateWindow = TRUE;
-    pWindowData->EnableShortCuts  = TRUE;
+    pWindowData->EnableShortCuts  = FALSE;
 
     pWindowData->bToolTipActive   = FALSE;
     pWindowData->hWndTT           = NULL;
