@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.31 2005/11/19 16:27:01 marceloanelli Exp $
+ * $Id: gtwvw.c,v 1.32 2005/11/20 18:02:16 bdj Exp $
  */
 
 /*
@@ -1922,7 +1922,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
-int kbdShiftsState( void )
+static int kbdShiftsState( void )
 {
    BYTE kbBuffer[ 256 ];
    int  kbdShifts;

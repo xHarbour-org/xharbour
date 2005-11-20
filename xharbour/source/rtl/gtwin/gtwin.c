@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.96 2005/10/18 12:14:33 druzus Exp $
+ * $Id: gtwin.c,v 1.97 2005/11/19 18:01:54 marceloanelli Exp $
  */
 
 /*
@@ -2423,7 +2423,7 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 /* *********************************************************************** */
 
-int kbdShiftsState( void )
+static int kbdShiftsState( void )
 {
    int  kbdShifts;
    kbdShifts = 0;
