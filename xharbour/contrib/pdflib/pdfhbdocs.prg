@@ -1,5 +1,5 @@
 /*
- * $Id: pdfhbdocs.prg,v 1.2 2004/07/27 02:27:24 lculik Exp $
+ * $Id: pdfhbdocs.prg,v 1.3 2004/07/29 01:53:09 lculik Exp $
  */
 
 /*
@@ -1272,46 +1272,6 @@ RETURN NIL
    "\x58\x02\x58\x02\x58\x02\x58\x02\x58\x02\x58\x02\x58\x02\x58\x02"
    } ;
            const int szFontTable_size = 5376 ;
-
-   HB_FUNC( SETFONTARRAY )
-   {
-   HB_ITEM Matrix ;
-           HB_ITEM Row, Col ;
-           char y[ 2 ] ;
-           int n1 = hb_parni( 1 ) ;
-           int n2 = hb_parni( 2 ) ;
-           int nPos ;
-           int n12 = 2 * n2 ;
-           int i ;
-           int ni, nj ;
-           Matrix.type = HB_IT_NIL ;
-           Col.type = HB_IT_NIL ;
-           Row.type = HB_IT_NIL ;
-           hb_arrayNew( &Matrix, n1 ) ;
-           for ( ni = 1 ;   ni <= n1 ;   ni ++ )
-   {
-   hb_arrayNew( &Col, n2 ) ;
-                for ( nj = 1 ;   nj <= n2 ;   nj ++ )
-   {
-   nPos = ( ni - 1 ) * n12 + ( nj - 1 ) * 2 + 1 ;
-             y[ 0 ] = szFontTable[ nPos - 1 ] ;
-             y[ 1 ] = szFontTable[ nPos ] ;
-             y[ 2 ] = '\0' ;
-
-   hb_arraySetForward( &Col, nj, hb_itemPutNI( &Row, Bin2i( y ) ) ) ;
-                       }
-   hb_arraySetForward( &Matrix, ni, &Col ) ;
-                       }
-   // hb_itemForwardValue( &(HB_VM_STACK).Return, &Matrix);
-   hb_itemReturn( &Matrix ) ;
-                  }
-
-   //HB_FUNC( HB_PDFSETFONT)
-   //{
-   //   float fFont =hb_parnd( 1 );
-   //   hb_itemPutND(&FONTSIZEPOINTS, fFont );
-   //   hb_itemPutND(&LEAD,hb_itemGetND(&FONTSIZEPOINTS) * 1.0);
-   //}
 
    HB_FUNC( CALCDATA )
    {
