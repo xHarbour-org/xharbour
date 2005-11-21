@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.32 2005/11/20 18:02:16 bdj Exp $
+ * $Id: gtwvw.c,v 1.33 2005/11/20 18:11:47 marceloanelli Exp $
  */
 
 /*
@@ -8328,6 +8328,21 @@ HB_FUNC( WVW_SETWINDOWCENTRE )
 {
   USHORT usWinNum = WVW_WHICH_WINDOW;
   hb_wvw_gtSetCentreWindow( usWinNum, hb_parl( 2 ), hb_parl( 3 ) ) ;
+}
+
+/*-------------------------------------------------------------------*/
+
+/*WVW_EnableShortCuts( nWinNum, lEnable )
+ * lEnable defaults to .t.
+ *
+ * returns old setting of EnableShortCuts
+ */
+HB_FUNC( WVW_ENABLESHORTCUTS )
+{
+  USHORT usWinNum = WVW_WHICH_WINDOW;
+  BOOL   bEnable  = ISNIL(2) ? TRUE : hb_parl(2);
+
+  hb_retl( hb_wvw_gtEnableShortCuts( usWinNum, bEnable ) );
 }
 
 /*-------------------------------------------------------------------*/

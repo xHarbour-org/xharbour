@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4654 2005/11/20 20:44:22 lculik Exp $
+ * $Id: ChangeLog,v 1.4655 2005/11/21 16:13:30 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-21 23:55 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    + wvw_enableshortcuts(nwinnum, lenable)
+      To enable/disable shortcut behaviour with ALT key.
 
 2005-11-21 18:15 UTC+0200 Mindaugas Kavaliauskas (dbtopas/at/dbtopas.lt)
   * xharbour/source/vm/hash.c
