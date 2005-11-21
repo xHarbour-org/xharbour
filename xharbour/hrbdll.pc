@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.17 2005/11/16 00:00:00 modalsist Exp $
+# $Id: hrbdll.pc,v 1.17 2005/11/17 00:51:06 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -88,7 +88,7 @@ HSX_SRC_DIR      = $(HB_DIR)\source\rdd\hsx
 #
 
 ALL: $(HARBOUR_DLL) \
-     $(HBDOCDLL_EXE) \ 
+     $(HBDOCDLL_EXE) \
      $(HBRUNDLL_EXE) \
      $(HBTESTDLL_EXE) \
      $(HBMAKEDLL_EXE) \
@@ -440,61 +440,78 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\hbdbsort.obj \
    $(TARGET_OBJ_DIR)\dbnubs.obj \
    \
+   $(TARGET_OBJ_DIR)\cpbgmik.obj \
+   $(TARGET_OBJ_DIR)\cpbgwin.obj \
+   $(TARGET_OBJ_DIR)\cpeldos.obj \
+   $(TARGET_OBJ_DIR)\cpelwin.obj \
    $(TARGET_OBJ_DIR)\cpesdos.obj \
    $(TARGET_OBJ_DIR)\cpesmwin.obj \
    $(TARGET_OBJ_DIR)\cpeswin.obj \
    $(TARGET_OBJ_DIR)\cpgedos.obj \
    $(TARGET_OBJ_DIR)\cpgewin.obj \
+   $(TARGET_OBJ_DIR)\cphr1250.obj \
+   $(TARGET_OBJ_DIR)\cphr437.obj \
+   $(TARGET_OBJ_DIR)\cphr852.obj \
+   $(TARGET_OBJ_DIR)\cphu852.obj \
+   $(TARGET_OBJ_DIR)\cphuwin.obj \
    $(TARGET_OBJ_DIR)\cpit437.obj \
    $(TARGET_OBJ_DIR)\cpit850.obj \
    $(TARGET_OBJ_DIR)\cpitisb.obj \
    $(TARGET_OBJ_DIR)\cpitiso.obj \
    $(TARGET_OBJ_DIR)\cpltwin.obj \
-   $(TARGET_OBJ_DIR)\cppt850.obj \
-   $(TARGET_OBJ_DIR)\cpptiso.obj \
    $(TARGET_OBJ_DIR)\cppl852.obj \
    $(TARGET_OBJ_DIR)\cppliso.obj \
    $(TARGET_OBJ_DIR)\cpplmaz.obj \
    $(TARGET_OBJ_DIR)\cpplwin.obj \
+   $(TARGET_OBJ_DIR)\cppt850.obj \
+   $(TARGET_OBJ_DIR)\cpptiso.obj \
    $(TARGET_OBJ_DIR)\cpru866.obj \
-   $(TARGET_OBJ_DIR)\cpruwin.obj \
-   $(TARGET_OBJ_DIR)\cpsrwin.obj \
    $(TARGET_OBJ_DIR)\cprukoi.obj \
-   $(TARGET_OBJ_DIR)\cphr437.obj \
-   $(TARGET_OBJ_DIR)\cphr852.obj \
-   $(TARGET_OBJ_DIR)\cphr1250.obj \
+   $(TARGET_OBJ_DIR)\cpruwin.obj \
+   $(TARGET_OBJ_DIR)\cpsl852.obj \
+   $(TARGET_OBJ_DIR)\cpsliso.obj \
+   $(TARGET_OBJ_DIR)\cpslwin.obj \
+   $(TARGET_OBJ_DIR)\cpsrwin.obj \
    $(TARGET_OBJ_DIR)\cpua866.obj \
-   $(TARGET_OBJ_DIR)\cpuawin.obj \
    $(TARGET_OBJ_DIR)\cpuakoi.obj \
-   $(TARGET_OBJ_DIR)\uc1250.obj   \
-   $(TARGET_OBJ_DIR)\uc1251.obj   \
-   $(TARGET_OBJ_DIR)\uc1257.obj   \
-   $(TARGET_OBJ_DIR)\uc850.obj    \
-   $(TARGET_OBJ_DIR)\uc852.obj    \
-   $(TARGET_OBJ_DIR)\uc866.obj    \
+   $(TARGET_OBJ_DIR)\cpuawin.obj \
+   $(TARGET_OBJ_DIR)\uc1250.obj \
+   $(TARGET_OBJ_DIR)\uc1251.obj \
+   $(TARGET_OBJ_DIR)\uc1253.obj \
+   $(TARGET_OBJ_DIR)\uc1257.obj \
+   $(TARGET_OBJ_DIR)\uc737.obj \
+   $(TARGET_OBJ_DIR)\uc850.obj \
+   $(TARGET_OBJ_DIR)\uc852.obj \
+   $(TARGET_OBJ_DIR)\uc866.obj \
    $(TARGET_OBJ_DIR)\uc8859_1.obj \
    $(TARGET_OBJ_DIR)\uc8859_2.obj \
    $(TARGET_OBJ_DIR)\uc88591b.obj \
-   $(TARGET_OBJ_DIR)\uckoi8.obj   \
-   $(TARGET_OBJ_DIR)\uckoi8u.obj  \
+   $(TARGET_OBJ_DIR)\uckoi8.obj \
+   $(TARGET_OBJ_DIR)\uckoi8u.obj \
    $(TARGET_OBJ_DIR)\ucmaz.obj \
-   $(TARGET_OBJ_DIR)\cphu852.obj \
-   $(TARGET_OBJ_DIR)\cphuwin.obj \
+   $(TARGET_OBJ_DIR)\ucmik.obj \
    \
-   $(TARGET_OBJ_DIR)\msgen.obj \
+   $(TARGET_OBJ_DIR)\msgbgmik.obj \
+   $(TARGET_OBJ_DIR)\msgbgwin.obj \
+   $(TARGET_OBJ_DIR)\msgby866.obj \
+   $(TARGET_OBJ_DIR)\msgbywin.obj \
    $(TARGET_OBJ_DIR)\msgca.obj \
    $(TARGET_OBJ_DIR)\msgcs852.obj \
    $(TARGET_OBJ_DIR)\msgcsiso.obj \
    $(TARGET_OBJ_DIR)\msgcskam.obj \
    $(TARGET_OBJ_DIR)\msgcswin.obj \
    $(TARGET_OBJ_DIR)\msgde.obj \
+   $(TARGET_OBJ_DIR)\msgdewin.obj \
+   $(TARGET_OBJ_DIR)\msgen.obj \
    $(TARGET_OBJ_DIR)\msgeo.obj \
    $(TARGET_OBJ_DIR)\msges.obj \
+   $(TARGET_OBJ_DIR)\msgeswin.obj \
    $(TARGET_OBJ_DIR)\msgeu.obj \
    $(TARGET_OBJ_DIR)\msgfr.obj \
    $(TARGET_OBJ_DIR)\msggl.obj \
    $(TARGET_OBJ_DIR)\msghe862.obj \
    $(TARGET_OBJ_DIR)\msghewin.obj \
+   $(TARGET_OBJ_DIR)\msghr1250.obj \
    $(TARGET_OBJ_DIR)\msghr437.obj \
    $(TARGET_OBJ_DIR)\msghr852.obj \
    $(TARGET_OBJ_DIR)\msghriso.obj \
@@ -505,6 +522,7 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\msgis850.obj \
    $(TARGET_OBJ_DIR)\msgit.obj \
    $(TARGET_OBJ_DIR)\msgko.obj \
+   $(TARGET_OBJ_DIR)\msgltwin.obj \
    $(TARGET_OBJ_DIR)\msgpl852.obj \
    $(TARGET_OBJ_DIR)\msgpliso.obj \
    $(TARGET_OBJ_DIR)\msgplmaz.obj \
@@ -512,17 +530,19 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\msgpt.obj \
    $(TARGET_OBJ_DIR)\msgro.obj \
    $(TARGET_OBJ_DIR)\msgru866.obj \
+   $(TARGET_OBJ_DIR)\msgrukoi.obj \
    $(TARGET_OBJ_DIR)\msgruwin.obj \
+   $(TARGET_OBJ_DIR)\msgsl852.obj \
+   $(TARGET_OBJ_DIR)\msgsliso.obj \
+   $(TARGET_OBJ_DIR)\msgslwin.obj \
    $(TARGET_OBJ_DIR)\msgsr852.obj \
    $(TARGET_OBJ_DIR)\msgsriso.obj \
    $(TARGET_OBJ_DIR)\msgsrwin.obj \
-   $(TARGET_OBJ_DIR)\msgzhgb.obj \
+   $(TARGET_OBJ_DIR)\msgua866.obj \
+   $(TARGET_OBJ_DIR)\msguakoi.obj \
+   $(TARGET_OBJ_DIR)\msguawin.obj \
    $(TARGET_OBJ_DIR)\msgzhb5.obj \
-   $(TARGET_OBJ_DIR)\msgltwin.obj \
-   $(TARGET_OBJ_DIR)\msghr1250.obj \
-   $(TARGET_OBJ_DIR)\msgby866.obj \
-   $(TARGET_OBJ_DIR)\msgbywin.obj \
-   $(TARGET_OBJ_DIR)\msgbgwin.obj \
+   $(TARGET_OBJ_DIR)\msgzhgb.obj \
    \
    $(TARGET_OBJ_DIR)\dbfcdx1.obj \
    \
@@ -953,35 +973,46 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\workarea.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\hbdbsort.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbnubs.obj     >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpbgmik.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpbgwin.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpeldos.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpelwin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpesdos.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpesmwin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpeswin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpgedos.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpgewin.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cphr1250.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cphr437.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cphr852.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cphu852.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cphuwin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpit437.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpit850.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpitisb.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpitiso.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpltwin.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cppt850.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cpptiso.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cppl852.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cppliso.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpplmaz.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpplwin.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cppt850.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpptiso.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpru866.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cpruwin.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cpsrwin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cprukoi.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cphr437.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cphr852.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cphr1250.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpruwin.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpsl852.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpsliso.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpslwin.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpsrwin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpua866.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cpuawin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cpuakoi.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\cpuawin.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc1250.obj     >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc1251.obj     >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\uc1253.obj     >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc1257.obj     >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\uc737.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc850.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc852.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uc866.obj      >> make_tmp
@@ -991,22 +1022,28 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\uckoi8.obj     >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\uckoi8u.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\ucmaz.obj      >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cphu852.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\cphuwin.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgen.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\ucmik.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgbgmik.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgbgwin.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgby866.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgbywin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgca.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgcs852.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgcsiso.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgcskam.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgcswin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgde.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgdewin.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgen.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgeo.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msges.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgeswin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgeu.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgfr.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msggl.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msghe862.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msghewin.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msghr1250.obj  >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msghr437.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msghr852.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msghriso.obj   >> make_tmp
@@ -1017,6 +1054,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\msgis850.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgit.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgko.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgltwin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgpl852.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgpliso.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgplmaz.obj   >> make_tmp
@@ -1024,17 +1062,19 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\msgpt.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgro.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgru866.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgrukoi.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgruwin.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgsl852.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgsliso.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgslwin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgsr852.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgsriso.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgsrwin.obj   >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgzhgb.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgua866.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msguakoi.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msguawin.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\msgzhb5.obj    >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgltwin.obj   >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msghr1250.obj  >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgby866.obj   >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgbywin.obj   >> make_tmp
-   $(ECHO) $(TARGET_OBJ_DIR)\msgbgwin.obj   >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\msgzhgb.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbfcdx1.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbffpt1.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbfntx1.obj    >> make_tmp
@@ -1171,7 +1211,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\hsx.obj        >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\cftsfunc.obj   >> make_tmp
    $(ECHO) $(POCC_LIBRARY) >> make_tmp
-   $(POLINK_EXE) /OUT:$(HARBOUR_DLL) $(DLLFLAGS) @make_tmp 
+   $(POLINK_EXE) /OUT:$(HARBOUR_DLL) $(DLLFLAGS) @make_tmp
    @if exist make_tmp $(DEL) make_tmp
 
 
@@ -2291,6 +2331,18 @@ $(TARGET_OBJ_DIR)\rddsys.obj : $(TARGET_OBJ_DIR)\rddsys.c
 
 # CODEPAGE
 
+$(TARGET_OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_SRC_DIR)\cpbgmik.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_SRC_DIR)\cpbgwin.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpeldos.obj : $(CODEPAGE_SRC_DIR)\cpeldos.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpelwin.obj : $(CODEPAGE_SRC_DIR)\cpelwin.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\cpesdos.obj : $(CODEPAGE_SRC_DIR)\cpesdos.c
    $(POCC_CMD)
 
@@ -2304,6 +2356,21 @@ $(TARGET_OBJ_DIR)\cpgedos.obj : $(CODEPAGE_SRC_DIR)\cpgedos.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\cpgewin.obj : $(CODEPAGE_SRC_DIR)\cpgewin.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cphr1250.obj : $(CODEPAGE_SRC_DIR)\cphr1250.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cphr437.obj : $(CODEPAGE_SRC_DIR)\cphr437.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cphr852.obj : $(CODEPAGE_SRC_DIR)\cphr852.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cphu852.obj : $(CODEPAGE_SRC_DIR)\cphu852.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cphuwin.obj : $(CODEPAGE_SRC_DIR)\cphuwin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\cpit437.obj : $(CODEPAGE_SRC_DIR)\cpit437.c
@@ -2321,12 +2388,6 @@ $(TARGET_OBJ_DIR)\cpitiso.obj : $(CODEPAGE_SRC_DIR)\cpitiso.c
 $(TARGET_OBJ_DIR)\cpltwin.obj : $(CODEPAGE_SRC_DIR)\cpltwin.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cppt850.obj : $(CODEPAGE_SRC_DIR)\cppt850.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\cpptiso.obj : $(CODEPAGE_SRC_DIR)\cpptiso.c
-   $(POCC_CMD)
-
 $(TARGET_OBJ_DIR)\cppl852.obj : $(CODEPAGE_SRC_DIR)\cppl852.c
    $(POCC_CMD)
 
@@ -2339,34 +2400,40 @@ $(TARGET_OBJ_DIR)\cpplmaz.obj : $(CODEPAGE_SRC_DIR)\cpplmaz.c
 $(TARGET_OBJ_DIR)\cpplwin.obj : $(CODEPAGE_SRC_DIR)\cpplwin.c
    $(POCC_CMD)
 
+$(TARGET_OBJ_DIR)\cppt850.obj : $(CODEPAGE_SRC_DIR)\cppt850.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpptiso.obj : $(CODEPAGE_SRC_DIR)\cpptiso.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\cpru866.obj : $(CODEPAGE_SRC_DIR)\cpru866.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\cpruwin.obj : $(CODEPAGE_SRC_DIR)\cpruwin.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_SRC_DIR)\cpsrwin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\cprukoi.obj : $(CODEPAGE_SRC_DIR)\cprukoi.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cphr437.obj : $(CODEPAGE_SRC_DIR)\cphr437.c
+$(TARGET_OBJ_DIR)\cpruwin.obj : $(CODEPAGE_SRC_DIR)\cpruwin.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cphr852.obj : $(CODEPAGE_SRC_DIR)\cphr852.c
+$(TARGET_OBJ_DIR)\cpsl852.obj : $(CODEPAGE_SRC_DIR)\cpsl852.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cphr1250.obj : $(CODEPAGE_SRC_DIR)\cphr1250.c
+$(TARGET_OBJ_DIR)\cpsliso.obj : $(CODEPAGE_SRC_DIR)\cpsliso.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpslwin.obj : $(CODEPAGE_SRC_DIR)\cpslwin.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_SRC_DIR)\cpsrwin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\cpua866.obj : $(CODEPAGE_SRC_DIR)\cpua866.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cpuawin.obj : $(CODEPAGE_SRC_DIR)\cpuawin.c
+$(TARGET_OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_SRC_DIR)\cpuakoi.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_SRC_DIR)\cpuakoi.c
+$(TARGET_OBJ_DIR)\cpuawin.obj : $(CODEPAGE_SRC_DIR)\cpuawin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\uc1250.obj : $(CODEPAGE_SRC_DIR)\uc1250.c
@@ -2375,7 +2442,13 @@ $(TARGET_OBJ_DIR)\uc1250.obj : $(CODEPAGE_SRC_DIR)\uc1250.c
 $(TARGET_OBJ_DIR)\uc1251.obj : $(CODEPAGE_SRC_DIR)\uc1251.c
    $(POCC_CMD)
 
+$(TARGET_OBJ_DIR)\uc1253.obj : $(CODEPAGE_SRC_DIR)\uc1253.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\uc1257.obj : $(CODEPAGE_SRC_DIR)\uc1257.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\uc737.obj : $(CODEPAGE_SRC_DIR)\uc737.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\uc850.obj : $(CODEPAGE_SRC_DIR)\uc850.c
@@ -2405,13 +2478,22 @@ $(TARGET_OBJ_DIR)\uckoi8u.obj : $(CODEPAGE_SRC_DIR)\uckoi8u.c
 $(TARGET_OBJ_DIR)\ucmaz.obj : $(CODEPAGE_SRC_DIR)\ucmaz.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\cphu852.obj : $(CODEPAGE_SRC_DIR)\cphu852.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\cphuwin.obj : $(CODEPAGE_SRC_DIR)\cphuwin.c
+$(TARGET_OBJ_DIR)\ucmik.obj : $(CODEPAGE_SRC_DIR)\ucmik.c
    $(POCC_CMD)
 
 # LANG
+
+$(TARGET_OBJ_DIR)\msgbgmik.obj : $(LANG_SRC_DIR)\msgbgmik.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgbgwin.obj : $(LANG_SRC_DIR)\msgbgwin.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgby866.obj : $(LANG_SRC_DIR)\msgby866.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgbywin.obj : $(LANG_SRC_DIR)\msgbywin.c
+   $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgca.obj : $(LANG_SRC_DIR)\msgca.c
    $(POCC_CMD)
@@ -2431,6 +2513,9 @@ $(TARGET_OBJ_DIR)\msgcswin.obj : $(LANG_SRC_DIR)\msgcswin.c
 $(TARGET_OBJ_DIR)\msgde.obj : $(LANG_SRC_DIR)\msgde.c
    $(POCC_CMD)
 
+$(TARGET_OBJ_DIR)\msgdewin.obj : $(LANG_SRC_DIR)\msgdewin.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\msgen.obj : $(LANG_SRC_DIR)\msgen.c
    $(POCC_CMD)
 
@@ -2438,6 +2523,9 @@ $(TARGET_OBJ_DIR)\msgeo.obj : $(LANG_SRC_DIR)\msgeo.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msges.obj : $(LANG_SRC_DIR)\msges.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgeswin.obj : $(LANG_SRC_DIR)\msgeswin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgeu.obj : $(LANG_SRC_DIR)\msgeu.c
@@ -2455,10 +2543,13 @@ $(TARGET_OBJ_DIR)\msghe862.obj : $(LANG_SRC_DIR)\msghe862.c
 $(TARGET_OBJ_DIR)\msghewin.obj : $(LANG_SRC_DIR)\msghewin.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\msghr852.obj : $(LANG_SRC_DIR)\msghr852.c
+$(TARGET_OBJ_DIR)\msghr1250.obj : $(LANG_SRC_DIR)\msghr1250.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msghr437.obj : $(LANG_SRC_DIR)\msghr437.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msghr852.obj : $(LANG_SRC_DIR)\msghr852.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msghriso.obj : $(LANG_SRC_DIR)\msghriso.c
@@ -2473,19 +2564,19 @@ $(TARGET_OBJ_DIR)\msghucwi.obj : $(LANG_SRC_DIR)\msghucwi.c
 $(TARGET_OBJ_DIR)\msghuwin.obj : $(LANG_SRC_DIR)\msghuwin.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\msgis850.obj : $(LANG_SRC_DIR)\msgis850.c
-   $(POCC_CMD)
-
 $(TARGET_OBJ_DIR)\msgid.obj : $(LANG_SRC_DIR)\msgid.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\msgltwin.obj : $(LANG_SRC_DIR)\msgltwin.c
+$(TARGET_OBJ_DIR)\msgis850.obj : $(LANG_SRC_DIR)\msgis850.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgit.obj : $(LANG_SRC_DIR)\msgit.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgko.obj : $(LANG_SRC_DIR)\msgko.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgltwin.obj : $(LANG_SRC_DIR)\msgltwin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgpl852.obj : $(LANG_SRC_DIR)\msgpl852.c
@@ -2509,10 +2600,19 @@ $(TARGET_OBJ_DIR)\msgro.obj : $(LANG_SRC_DIR)\msgro.c
 $(TARGET_OBJ_DIR)\msgru866.obj : $(LANG_SRC_DIR)\msgru866.c
    $(POCC_CMD)
 
+$(TARGET_OBJ_DIR)\msgrukoi.obj : $(LANG_SRC_DIR)\msgrukoi.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\msgruwin.obj : $(LANG_SRC_DIR)\msgruwin.c
    $(POCC_CMD)
 
-$(TARGET_OBJ_DIR)\msgrukoi.obj : $(LANG_SRC_DIR)\msgrukoi.c
+$(TARGET_OBJ_DIR)\msgsl852.obj : $(LANG_SRC_DIR)\msgsl852.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgsliso.obj : $(LANG_SRC_DIR)\msgsliso.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msgslwin.obj : $(LANG_SRC_DIR)\msgslwin.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgsr852.obj : $(LANG_SRC_DIR)\msgsr852.c
@@ -2524,22 +2624,19 @@ $(TARGET_OBJ_DIR)\msgsriso.obj : $(LANG_SRC_DIR)\msgsriso.c
 $(TARGET_OBJ_DIR)\msgsrwin.obj : $(LANG_SRC_DIR)\msgsrwin.c
    $(POCC_CMD)
 
+$(TARGET_OBJ_DIR)\msgua866.obj : $(LANG_SRC_DIR)\msgua866.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msguakoi.obj : $(LANG_SRC_DIR)\msguakoi.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\msguawin.obj : $(LANG_SRC_DIR)\msguawin.c
+   $(POCC_CMD)
+
 $(TARGET_OBJ_DIR)\msgzhb5.obj : $(LANG_SRC_DIR)\msgzhb5.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\msgzhgb.obj : $(LANG_SRC_DIR)\msgzhgb.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\msghr1250.obj : $(LANG_SRC_DIR)\msghr1250.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\msgby866.obj : $(LANG_SRC_DIR)\msgby866.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\msgbywin.obj : $(LANG_SRC_DIR)\msgbywin.c
-   $(POCC_CMD)
-
-$(TARGET_OBJ_DIR)\msgbgwin.obj : $(LANG_SRC_DIR)\msgbgwin.c
    $(POCC_CMD)
 
 # DBFCDX

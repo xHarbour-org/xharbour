@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.47 2005/11/06 15:55:38 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.47 2005/11/06 10:59:13 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -418,6 +418,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbfcdx1.obj \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgbgmik.obj \
   $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
   $(OBJ_DIR)\msgbywin.obj \
@@ -522,6 +523,8 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
+  $(OBJ_DIR)\cpbgmik.obj \
+  $(OBJ_DIR)\cpbgwin.obj \
   $(OBJ_DIR)\cpeldos.obj \
   $(OBJ_DIR)\cpelwin.obj \
   $(OBJ_DIR)\cpesdos.obj \
@@ -569,6 +572,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uckoi8.obj \
   $(OBJ_DIR)\uckoi8u.obj \
   $(OBJ_DIR)\ucmaz.obj \
+  $(OBJ_DIR)\ucmik.obj \
 #
 # pplib
 #
@@ -1760,6 +1764,9 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC_CMD)
 
+$(OBJ_DIR)\msgbgmik.obj : $(LANG_DIR)\msgbgmik.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
    $(CC_CMD)
 
@@ -2057,6 +2064,12 @@ $(OBJ_DIR)\traceprg.c : $(RTL_DIR)\traceprg.prg
 $(OBJ_DIR)\traceprg.obj : $(OBJ_DIR)\traceprg.c
    $(CC_CMD)
 
+$(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
    $(CC_CMD)
 
@@ -2196,6 +2209,9 @@ $(OBJ_DIR)\uckoi8u.obj : $(CODEPAGE_DIR)\uckoi8u.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbrandom.obj : $(RTL_DIR)\hbrandom.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.82 2005/11/15 20:17:12 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.83 2005/11/15 23:08:49 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -514,6 +514,7 @@ HARBOUR_DLL_OBJS = \
 #
 # Lang
 #
+  $(OBJ_DIR)\msgbgmik.obj \
   $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
   $(OBJ_DIR)\msgbywin.obj \
@@ -587,6 +588,8 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
+  $(OBJ_DIR)\cpbgmik.obj \
+  $(OBJ_DIR)\cpbgwin.obj \
   $(OBJ_DIR)\cpeldos.obj \
   $(OBJ_DIR)\cpelwin.obj \
   $(OBJ_DIR)\cpesdos.obj \
@@ -634,6 +637,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uckoi8.obj \
   $(OBJ_DIR)\uckoi8u.obj \
   $(OBJ_DIR)\ucmaz.obj \
+  $(OBJ_DIR)\ucmik.obj \
 #
 # hbtip
 #
@@ -1814,6 +1818,9 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
    $(CC_CMD)
 
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgbgmik.obj : $(LANG_DIR)\msgbgmik.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c

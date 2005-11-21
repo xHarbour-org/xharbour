@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cpbgwin.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_BG1251 )
 HB_CALL_ON_STARTUP_END( hb_codepage_Init_BG1251 )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_RU1251
+   #pragma startup hb_codepage_Init_BG1251
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )

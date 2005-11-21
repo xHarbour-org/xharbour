@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.13 2005/11/06 15:55:38 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.13 2005/11/06 10:59:13 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -429,61 +429,78 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\hbdbsort.obj \
    $(OBJ_DIR)\dbnubs.obj \
    \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
+   $(OBJ_DIR)\cpeldos.obj \
+   $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
    $(OBJ_DIR)\cpgedos.obj \
    $(OBJ_DIR)\cpgewin.obj \
+   $(OBJ_DIR)\cphr1250.obj \
+   $(OBJ_DIR)\cphr437.obj \
+   $(OBJ_DIR)\cphr852.obj \
+   $(OBJ_DIR)\cphu852.obj \
+   $(OBJ_DIR)\cphuwin.obj \
    $(OBJ_DIR)\cpit437.obj \
    $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
    $(OBJ_DIR)\cpitiso.obj \
    $(OBJ_DIR)\cpltwin.obj \
-   $(OBJ_DIR)\cppt850.obj \
-   $(OBJ_DIR)\cpptiso.obj \
    $(OBJ_DIR)\cppl852.obj \
    $(OBJ_DIR)\cppliso.obj \
    $(OBJ_DIR)\cpplmaz.obj \
    $(OBJ_DIR)\cpplwin.obj \
+   $(OBJ_DIR)\cppt850.obj \
+   $(OBJ_DIR)\cpptiso.obj \
    $(OBJ_DIR)\cpru866.obj \
-   $(OBJ_DIR)\cpruwin.obj \
-   $(OBJ_DIR)\cpsrwin.obj \
    $(OBJ_DIR)\cprukoi.obj \
-   $(OBJ_DIR)\cphr437.obj \
-   $(OBJ_DIR)\cphr852.obj \
-   $(OBJ_DIR)\cphr1250.obj \
+   $(OBJ_DIR)\cpruwin.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
+   $(OBJ_DIR)\cpsrwin.obj \
    $(OBJ_DIR)\cpua866.obj \
-   $(OBJ_DIR)\cpuawin.obj \
    $(OBJ_DIR)\cpuakoi.obj \
-   $(OBJ_DIR)\uc1250.obj   \
-   $(OBJ_DIR)\uc1251.obj   \
-   $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc850.obj    \
-   $(OBJ_DIR)\uc852.obj    \
-   $(OBJ_DIR)\uc866.obj    \
+   $(OBJ_DIR)\cpuawin.obj \
+   $(OBJ_DIR)\uc1250.obj \
+   $(OBJ_DIR)\uc1251.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc850.obj \
+   $(OBJ_DIR)\uc852.obj \
+   $(OBJ_DIR)\uc866.obj \
    $(OBJ_DIR)\uc8859_1.obj \
    $(OBJ_DIR)\uc8859_2.obj \
    $(OBJ_DIR)\uc88591b.obj \
-   $(OBJ_DIR)\uckoi8.obj   \
-   $(OBJ_DIR)\uckoi8u.obj  \
+   $(OBJ_DIR)\uckoi8.obj \
+   $(OBJ_DIR)\uckoi8u.obj \
    $(OBJ_DIR)\ucmaz.obj \
-   $(OBJ_DIR)\cphu852.obj \
-   $(OBJ_DIR)\cphuwin.obj \
+   $(OBJ_DIR)\ucmik.obj \
    \
-   $(OBJ_DIR)\msgen.obj \
+   $(OBJ_DIR)\msgbgmik.obj \
+   $(OBJ_DIR)\msgbgwin.obj \
+   $(OBJ_DIR)\msgby866.obj \
+   $(OBJ_DIR)\msgbywin.obj \
    $(OBJ_DIR)\msgca.obj \
    $(OBJ_DIR)\msgcs852.obj \
    $(OBJ_DIR)\msgcsiso.obj \
    $(OBJ_DIR)\msgcskam.obj \
    $(OBJ_DIR)\msgcswin.obj \
    $(OBJ_DIR)\msgde.obj \
+   $(OBJ_DIR)\msgdewin.obj \
+   $(OBJ_DIR)\msgen.obj \
    $(OBJ_DIR)\msgeo.obj \
    $(OBJ_DIR)\msges.obj \
+   $(OBJ_DIR)\msgeswin.obj \
    $(OBJ_DIR)\msgeu.obj \
    $(OBJ_DIR)\msgfr.obj \
    $(OBJ_DIR)\msggl.obj \
    $(OBJ_DIR)\msghe862.obj \
    $(OBJ_DIR)\msghewin.obj \
+   $(OBJ_DIR)\msghr1250.obj \
    $(OBJ_DIR)\msghr437.obj \
    $(OBJ_DIR)\msghr852.obj \
    $(OBJ_DIR)\msghriso.obj \
@@ -494,6 +511,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\msgis850.obj \
    $(OBJ_DIR)\msgit.obj \
    $(OBJ_DIR)\msgko.obj \
+   $(OBJ_DIR)\msgltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
@@ -501,17 +519,19 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\msgpt.obj \
    $(OBJ_DIR)\msgro.obj \
    $(OBJ_DIR)\msgru866.obj \
+   $(OBJ_DIR)\msgrukoi.obj \
    $(OBJ_DIR)\msgruwin.obj \
+   $(OBJ_DIR)\msgsl852.obj \
+   $(OBJ_DIR)\msgsliso.obj \
+   $(OBJ_DIR)\msgslwin.obj \
    $(OBJ_DIR)\msgsr852.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgsrwin.obj \
-   $(OBJ_DIR)\msgzhgb.obj \
+   $(OBJ_DIR)\msgua866.obj \
+   $(OBJ_DIR)\msguakoi.obj \
+   $(OBJ_DIR)\msguawin.obj \
    $(OBJ_DIR)\msgzhb5.obj \
-   $(OBJ_DIR)\msgltwin.obj \
-   $(OBJ_DIR)\msghr1250.obj \
-   $(OBJ_DIR)\msgby866.obj \
-   $(OBJ_DIR)\msgbywin.obj \
-   $(OBJ_DIR)\msgbgwin.obj \
+   $(OBJ_DIR)\msgzhgb.obj \
    \
    $(OBJ_DIR)\dbfcdx1.obj \
    \
@@ -936,35 +956,46 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\workarea.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hbdbsort.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbnubs.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpbgmik.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpbgwin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpeldos.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpelwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpesdos.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpesmwin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpeswin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpgedos.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpgewin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cphr1250.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cphr437.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cphr852.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cphu852.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cphuwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpit437.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpit850.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpitisb.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpitiso.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpltwin.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cppt850.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cpptiso.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cppl852.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cppliso.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpplmaz.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpplwin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cppt850.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpptiso.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpru866.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cpruwin.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cpsrwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cprukoi.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cphr437.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cphr852.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cphr1250.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpruwin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsl852.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsliso.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpslwin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsrwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpua866.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cpuawin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpuakoi.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpuawin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc1250.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc1251.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\uc1253.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc1257.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\uc737.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc850.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc852.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uc866.obj      + >> harbourdll.rsp
@@ -974,22 +1005,28 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\uckoi8.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\uckoi8u.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\ucmaz.obj      + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cphu852.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\cphuwin.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgen.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\ucmik.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgbgmik.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgbgwin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgby866.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgbywin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgca.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgcs852.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgcsiso.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgcskam.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgcswin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgde.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgdewin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgen.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgeo.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msges.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgeswin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgeu.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgfr.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msggl.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msghe862.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msghewin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msghr1250.obj  + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msghr437.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msghr852.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msghriso.obj   + >> harbourdll.rsp
@@ -1000,6 +1037,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\msgis850.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgit.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgko.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgltwin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgpl852.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgpliso.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgplmaz.obj   + >> harbourdll.rsp
@@ -1007,17 +1045,19 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\msgpt.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgro.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgru866.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgrukoi.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgruwin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgsl852.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgsliso.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgslwin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgsr852.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgsriso.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgsrwin.obj   + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgzhgb.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgua866.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msguakoi.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msguawin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgzhb5.obj    + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgltwin.obj   + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msghr1250.obj  + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgby866.obj   + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgbywin.obj   + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\msgbgwin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgzhgb.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfcdx1.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbffpt1.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfntx1.obj    + >> harbourdll.rsp
@@ -2271,6 +2311,18 @@ $(OBJ_DIR)\rddsys.obj : $(OBJ_DIR)\rddsys.c
 
 # CODEPAGE
 
+$(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
    $(CC_CMD)
 
@@ -2284,6 +2336,21 @@ $(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c
@@ -2301,12 +2368,6 @@ $(OBJ_DIR)\cpitiso.obj : $(CODEPAGE_DIR)\cpitiso.c
 $(OBJ_DIR)\cpltwin.obj : $(CODEPAGE_DIR)\cpltwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cppt850.obj : $(CODEPAGE_DIR)\cppt850.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpptiso.obj : $(CODEPAGE_DIR)\cpptiso.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\cppl852.obj : $(CODEPAGE_DIR)\cppl852.c
    $(CC_CMD)
 
@@ -2319,34 +2380,40 @@ $(OBJ_DIR)\cpplmaz.obj : $(CODEPAGE_DIR)\cpplmaz.c
 $(OBJ_DIR)\cpplwin.obj : $(CODEPAGE_DIR)\cpplwin.c
    $(CC_CMD)
 
+$(OBJ_DIR)\cppt850.obj : $(CODEPAGE_DIR)\cppt850.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpptiso.obj : $(CODEPAGE_DIR)\cpptiso.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cpru866.obj : $(CODEPAGE_DIR)\cpru866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpruwin.obj : $(CODEPAGE_DIR)\cpruwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cprukoi.obj : $(CODEPAGE_DIR)\cprukoi.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cphr437.obj : $(CODEPAGE_DIR)\cphr437.c
+$(OBJ_DIR)\cpruwin.obj : $(CODEPAGE_DIR)\cpruwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cphr852.obj : $(CODEPAGE_DIR)\cphr852.c
+$(OBJ_DIR)\cpsl852.obj : $(CODEPAGE_DIR)\cpsl852.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
+$(OBJ_DIR)\cpsliso.obj : $(CODEPAGE_DIR)\cpsliso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpua866.obj : $(CODEPAGE_DIR)\cpua866.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpuawin.obj : $(CODEPAGE_DIR)\cpuawin.c
+$(OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_DIR)\cpuakoi.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpuakoi.obj : $(CODEPAGE_DIR)\cpuakoi.c
+$(OBJ_DIR)\cpuawin.obj : $(CODEPAGE_DIR)\cpuawin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
@@ -2355,7 +2422,13 @@ $(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
 $(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
    $(CC_CMD)
 
+$(OBJ_DIR)\uc1253.obj : $(CODEPAGE_DIR)\uc1253.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc737.obj : $(CODEPAGE_DIR)\uc737.c
    $(CC_CMD)
 
 $(OBJ_DIR)\uc850.obj : $(CODEPAGE_DIR)\uc850.c
@@ -2385,13 +2458,22 @@ $(OBJ_DIR)\uckoi8u.obj : $(CODEPAGE_DIR)\uckoi8u.c
 $(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
+$(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
    $(CC_CMD)
 
 # LANG
+
+$(OBJ_DIR)\msgbgmik.obj : $(LANG_DIR)\msgbgmik.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
+   $(CC_CMD)
 
 $(OBJ_DIR)\msgca.obj : $(LANG_DIR)\msgca.c
    $(CC_CMD)
@@ -2411,6 +2493,9 @@ $(OBJ_DIR)\msgcswin.obj : $(LANG_DIR)\msgcswin.c
 $(OBJ_DIR)\msgde.obj : $(LANG_DIR)\msgde.c
    $(CC_CMD)
 
+$(OBJ_DIR)\msgdewin.obj : $(LANG_DIR)\msgdewin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\msgen.obj : $(LANG_DIR)\msgen.c
    $(CC_CMD)
 
@@ -2418,6 +2503,9 @@ $(OBJ_DIR)\msgeo.obj : $(LANG_DIR)\msgeo.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msges.obj : $(LANG_DIR)\msges.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgeswin.obj : $(LANG_DIR)\msgeswin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgeu.obj : $(LANG_DIR)\msgeu.c
@@ -2435,10 +2523,13 @@ $(OBJ_DIR)\msghe862.obj : $(LANG_DIR)\msghe862.c
 $(OBJ_DIR)\msghewin.obj : $(LANG_DIR)\msghewin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
+$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msghr437.obj : $(LANG_DIR)\msghr437.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msghr852.obj : $(LANG_DIR)\msghr852.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msghriso.obj : $(LANG_DIR)\msghriso.c
@@ -2453,19 +2544,19 @@ $(OBJ_DIR)\msghucwi.obj : $(LANG_DIR)\msghucwi.c
 $(OBJ_DIR)\msghuwin.obj : $(LANG_DIR)\msghuwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\msgis850.obj : $(LANG_DIR)\msgis850.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\msgid.obj : $(LANG_DIR)\msgid.c
    $(CC_CMD)
 
-$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
+$(OBJ_DIR)\msgis850.obj : $(LANG_DIR)\msgis850.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgit.obj : $(LANG_DIR)\msgit.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgko.obj : $(LANG_DIR)\msgko.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgltwin.obj : $(LANG_DIR)\msgltwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgpl852.obj : $(LANG_DIR)\msgpl852.c
@@ -2489,10 +2580,19 @@ $(OBJ_DIR)\msgro.obj : $(LANG_DIR)\msgro.c
 $(OBJ_DIR)\msgru866.obj : $(LANG_DIR)\msgru866.c
    $(CC_CMD)
 
+$(OBJ_DIR)\msgrukoi.obj : $(LANG_DIR)\msgrukoi.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\msgruwin.obj : $(LANG_DIR)\msgruwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\msgrukoi.obj : $(LANG_DIR)\msgrukoi.c
+$(OBJ_DIR)\msgsl852.obj : $(LANG_DIR)\msgsl852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgsliso.obj : $(LANG_DIR)\msgsliso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgslwin.obj : $(LANG_DIR)\msgslwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgsr852.obj : $(LANG_DIR)\msgsr852.c
@@ -2504,22 +2604,19 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
    $(CC_CMD)
 
+$(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msguakoi.obj : $(LANG_DIR)\msguakoi.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msguawin.obj : $(LANG_DIR)\msguawin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\msgzhb5.obj : $(LANG_DIR)\msgzhb5.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msghr1250.obj : $(LANG_DIR)\msghr1250.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgby866.obj : $(LANG_DIR)\msgby866.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgbywin.obj : $(LANG_DIR)\msgbywin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
    $(CC_CMD)
 
 # DBFCDX

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.107 2005/11/15 19:01:27 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.108 2005/11/15 23:08:49 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -430,6 +430,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbfcdx1.obj \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx1.obj \
+  $(OBJ_DIR)\msgbgmik.obj \
   $(OBJ_DIR)\msgbgwin.obj \
   $(OBJ_DIR)\msgby866.obj \
   $(OBJ_DIR)\msgbywin.obj \
@@ -539,6 +540,8 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
+  $(OBJ_DIR)\cpbgmik.obj \
+  $(OBJ_DIR)\cpbgwin.obj \
   $(OBJ_DIR)\cpeldos.obj \
   $(OBJ_DIR)\cpelwin.obj \
   $(OBJ_DIR)\cpesdos.obj \
@@ -586,6 +589,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\uckoi8.obj \
   $(OBJ_DIR)\uckoi8u.obj \
   $(OBJ_DIR)\ucmaz.obj \
+  $(OBJ_DIR)\ucmik.obj \
 #
 # hbtip
 #
@@ -792,6 +796,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\box.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\chrasc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cdpapi.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpbgmik.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpbgwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpeldos.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpelwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpesdos.obj           + >> hdll.tmp
@@ -839,6 +845,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\uckoi8.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uckoi8u.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\ucmaz.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\ucmik.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\colorind.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\console.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\copyfile.obj          + >> hdll.tmp
@@ -1099,6 +1106,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbfcdx1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbffpt1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx1.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\msgbgmik.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgbgwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgby866.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\msgbywin.obj          + >> hdll.tmp
@@ -2341,6 +2349,9 @@ $(OBJ_DIR)\xhelp.obj : $(RTL_DIR)\xhelp.c
 $(OBJ_DIR)\xsavescr.obj : $(RTL_DIR)\xsavescr.c
    $(CC_CMD)
 
+$(OBJ_DIR)\msgbgmik.obj : $(LANG_DIR)\msgbgmik.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\msgbgwin.obj : $(LANG_DIR)\msgbgwin.c
    $(CC_CMD)
 
@@ -2683,6 +2694,12 @@ $(OBJ_DIR)\stream.c : $(RTL_DIR)\stream.prg
 $(OBJ_DIR)\stream.obj : $(OBJ_DIR)\stream.c
    $(CC_CMD)
 
+$(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
    $(CC_CMD)
 
@@ -2834,6 +2851,9 @@ $(OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
    $(CC_CMD)
 
 # hbtip
