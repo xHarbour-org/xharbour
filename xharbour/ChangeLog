@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4657 2005/11/21 22:24:34 kaddath Exp $
+ * $Id: ChangeLog,v 1.4658 2005/11/22 02:01:41 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-21 11:30 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
+  * include/hbvmpub.h
+  * source/vm/arrays.c
+  * source/vm/arrayshb.c
+    + Support for memory prealloc in arrays.
+    + ASIZEALLOC( <array>, <num> ) -> <array> - Set the pre-alloc step.
+    + ALENALLOC( <array> ) -> <num> - Get the pre-alloc step.
+  * source/vm/hash.c
+    ! Fix initialization of pAccessAA member in partition.
 
 2005-11-22 03:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapifs.h
