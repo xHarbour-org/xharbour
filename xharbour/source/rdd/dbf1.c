@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.141 2005/11/15 13:45:20 druzus Exp $
+ * $Id: dbf1.c,v 1.142 2005/11/16 12:16:38 druzus Exp $
  */
 
 /*
@@ -2773,7 +2773,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
    }
 
    /* Create default alias if necessary */
-   if( !pOpenInfo->atomAlias )
+   if( !pOpenInfo->atomAlias && pFileName->szName )
    {
       hb_strncpyUpperTrim( szAlias, pFileName->szName, HARBOUR_MAX_RDD_ALIAS_LENGTH );
       pOpenInfo->atomAlias = ( BYTE * ) szAlias;

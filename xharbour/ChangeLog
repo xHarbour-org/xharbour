@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4656 2005/11/21 16:56:19 bdj Exp $
+ * $Id: ChangeLog,v 1.4657 2005/11/21 22:24:34 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-22 03:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapifs.h
+  * xharbour/source/rtl/filesys.c
+     * hb_fsSetDevMode() changed to return a BOOL value 
+       to be compatible with the CA-Clipper undocumented 
+       _tdevraw() function -thanks to Victor.
+
+  * xharbour/source/rdd/dbcmd.c
+    ! fixed the problem with fieldput(<n>,nil) at phantom recrod reported
+      by Victor
+    * do not use C level HB_ITEM
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed possible GPF when "/an/existing/path/" was used as file name.
+      No in DOS in such case it will casue RT error that file:
+         /an/existing/path/.<ext>
+      cannot be created (like in Clipper) but in other systems (f.e. Linux)
+      which allow to use such file names it will work without any problems.
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * do not use C level HB_ITEM
+
+  * xharbour/source/rtl/strpeek.c
+    * use hb_itemUnShare() in STRPOKE()
+
+  * xharbour/source/vm/itemapi.c
+    * comment fixing
 
 2005-11-21 14:22 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/hrbdll.bc

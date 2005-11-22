@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.130 2005/11/09 06:43:47 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.131 2005/11/09 15:41:33 ronpinkas Exp $
  */
 
 /*
@@ -1182,7 +1182,7 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
 }
 
 /* Internal API, not standard Clipper */
-/* De-references item passed by the reference */
+/* UnShare string buffer of given item */
 
 PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
 {

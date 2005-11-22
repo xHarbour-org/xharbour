@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.155 2005/11/04 02:20:11 druzus Exp $
+ * $Id: filesys.c,v 1.156 2005/11/04 12:06:00 druzus Exp $
  */
 
 /*
@@ -1680,7 +1680,7 @@ void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
 #endif
 }
 
-void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
+BOOL    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_fsSetDevMode(%p, %hu)", hFileHandle, uiDevMode));
 
@@ -1701,6 +1701,8 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
          break;
    }
    hb_fsSetIOError( iRet != -1, 0 );
+
+   return iRet != -1;
 }
 #elif defined(_MSC_VER) || defined(__MINGW32__) || defined(__DMC__)
 {
@@ -1717,19 +1719,31 @@ void    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
          break;
    }
    hb_fsSetIOError( iRet != -1, 0 );
+
+   return iRet != -1;
 }
 #elif defined( HB_OS_UNIX )
+
+   HB_SYMBOL_UNUSED( hFileHandle );
+
+   if( uiDevMode == FD_TEXT )
+   {
+      hb_fsSetError( ( USHORT ) FS_ERROR );
+      return FALSE;
+   }
+
+   hb_fsSetError( 0 );
+   return TRUE;
+
+#else
 
    HB_SYMBOL_UNUSED( hFileHandle );
    HB_SYMBOL_UNUSED( uiDevMode );
    hb_fsSetError( ( USHORT ) FS_ERROR );
 
-#else
-
-   hb_fsSetError( (USHORT) FS_ERROR );
+   return FALSE;
 
 #endif
-
 }
 
 USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
