@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.160 2005/11/15 19:01:27 ronpinkas Exp $
+# $Id: makefile.bc,v 1.162 2005/11/22 20:00:00 ptsarenko Exp $
 #
 
 #
@@ -838,6 +838,8 @@ TIP_LIB_OBJS = \
 #
 
 CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
    $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
@@ -967,6 +969,8 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\getinfo.obj \
    $(CT_OBJ_DIR)\getsecrt.obj \
    $(CT_OBJ_DIR)\invrtwin.obj \
+   $(CT_OBJ_DIR)\keysec.obj \
+   $(CT_OBJ_DIR)\keytime.obj \
    $(CT_OBJ_DIR)\like.obj \
    $(CT_OBJ_DIR)\numconv.obj \
    $(CT_OBJ_DIR)\screen2.obj \
@@ -3312,6 +3316,18 @@ $(CT_OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
    $(HB_CMD)
 
 $(CT_OBJ_DIR)\invrtwin.obj : $(CT_OBJ_DIR)\invrtwin.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
+   $(HB_CMD)
+
+$(CT_OBJ_DIR)\keysec.obj : $(CT_OBJ_DIR)\keysec.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\keytime.c : $(CT_DIR)\keytime.prg
+   $(HB_CMD)
+
+$(CT_OBJ_DIR)\keytime.obj : $(CT_OBJ_DIR)\keytime.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\like.c : $(CT_DIR)\like.prg

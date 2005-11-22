@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.16 2005/11/16 00:00:00 modalsist Exp $
+# $Id: makefile.pc,v 1.17 2005/11/22 20:51:06 ptsarenko Exp $
 #
 # makefile for Pelles C compiler
 #
@@ -485,6 +485,8 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\fcopy.obj \
    $(CT_OBJ_DIR)\pack.obj \
    $(CT_OBJ_DIR)\settime.obj \
+   $(CT_OBJ_DIR)\keysec.obj \
+   $(CT_OBJ_DIR)\keytime.obj \
    $(CT_OBJ_DIR)\like.obj \
    $(CT_OBJ_DIR)\lton.obj \
    $(CT_OBJ_DIR)\maxline.obj \
@@ -544,6 +546,10 @@ RDD_LIB_OBJS = \
 
 
 CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
+   $(OBJ_DIR)\cpeldos.obj \
+   $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
@@ -1483,6 +1489,18 @@ $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
 # ≥ CODEPAGE.LIB dependencies ≥€
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
+
+$(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
+   $(CC_CMD)
 
 $(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
    $(CC_CMD)
@@ -3290,6 +3308,18 @@ $(CT_OBJ_DIR)\numcount.obj : $(CT_DIR)\numcount.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\numline.obj : $(CT_DIR)\numline.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
+   $(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)\keysec.obj : $(CT_OBJ_DIR)\keysec.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\keytime.c : $(CT_DIR)\keytime.prg
+   $(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)\keytime.obj : $(CT_OBJ_DIR)\keytime.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\like.c : $(CT_DIR)\like.prg

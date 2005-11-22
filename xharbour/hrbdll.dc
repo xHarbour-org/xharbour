@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.13 2005/11/06 10:59:13 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.15 2005/11/22 20:25:32 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -635,6 +635,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\fcopy.obj \
    $(OBJ_DIR)\pack.obj \
    $(OBJ_DIR)\settime.obj \
+   $(OBJ_DIR)\keysec.obj \
+   $(OBJ_DIR)\keytime.obj \
    $(OBJ_DIR)\like.obj \
    $(OBJ_DIR)\lton.obj \
    $(OBJ_DIR)\maxline.obj \
@@ -1155,6 +1157,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\fcopy.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\pack.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\settime.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\keysec.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\keytime.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\like.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\lton.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\maxline.obj    + >> harbourdll.rsp
@@ -3016,6 +3020,18 @@ $(OBJ_DIR)\numcount.obj : $(CT_DIR)\numcount.c
    $(CC_CMD)
 
 $(OBJ_DIR)\numline.obj : $(CT_DIR)\numline.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\keysec.c : $(CT_DIR)\keysec.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\keysec.obj : $(OBJ_DIR)\keysec.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\keytime.c : $(CT_DIR)\keytime.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\keytime.obj : $(OBJ_DIR)\keytime.c
    $(CC_CMD)
 
 $(OBJ_DIR)\like.c : $(CT_DIR)\like.prg

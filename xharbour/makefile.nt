@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.136 2005/11/06 10:59:14 ptsarenko Exp $
+# $Id: makefile.nt,v 1.138 2005/11/22 20:17:12 ptsarenko Exp $
 #
 
 #
@@ -1270,6 +1270,8 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\getinfo.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
    $(OBJ_DIR)$(MT)\invrtwin.obj \
+   $(OBJ_DIR)$(MT)\keysec.obj \
+   $(OBJ_DIR)$(MT)\keytime.obj \
    $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.156 2005/11/06 10:59:14 ptsarenko Exp $
+# $Id: makefile.vc,v 1.158 2005/11/22 20:17:13 ptsarenko Exp $
 #
 
 #
@@ -638,6 +638,8 @@ LANG_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
    $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
@@ -1217,6 +1219,8 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\getinfo.obj \
    $(OBJ_DIR)$(MT)\getsecrt.obj \
    $(OBJ_DIR)$(MT)\invrtwin.obj \
+   $(OBJ_DIR)$(MT)\keysec.obj \
+   $(OBJ_DIR)$(MT)\keytime.obj \
    $(OBJ_DIR)$(MT)\like.obj \
    $(OBJ_DIR)$(MT)\numconv.obj \
    $(OBJ_DIR)$(MT)\screen2.obj \

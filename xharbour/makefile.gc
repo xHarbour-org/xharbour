@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.17 2005/11/06 16:25:10 ptsarenko Exp $
+# $Id: makefile.gc,v 1.18 2005/11/22 20:59:14 ptsarenko Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -1524,6 +1524,8 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/fcopy.o \
    $(CT_OBJ_DIR)/pack.o \
    $(CT_OBJ_DIR)/settime.o \
+   $(CT_OBJ_DIR)/keysec.o \
+   $(CT_OBJ_DIR)/keytime.o \
    $(CT_OBJ_DIR)/like.o \
    $(CT_OBJ_DIR)/lton.o \
    $(CT_OBJ_DIR)/maxline.o \
@@ -1834,6 +1836,18 @@ $(CT_OBJ_DIR)/numcount.o : $(LIBCT_DIR)/numcount.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/numline.o : $(LIBCT_DIR)/numline.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/keysec.c : $(LIBCT_DIR)/keysec.prg
+	$(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)/keysec.o : $(CT_OBJ_DIR)/keysec.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/keytime.c : $(LIBCT_DIR)/keytime.prg
+	$(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)/keytime.o : $(CT_OBJ_DIR)/keytime.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/like.c : $(LIBCT_DIR)/like.prg

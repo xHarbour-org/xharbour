@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.17 2005/11/17 00:51:06 modalsist Exp $
+# $Id: hrbdll.pc,v 1.19 2005/11/22 20:25:32 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -646,6 +646,8 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\fcopy.obj \
    $(TARGET_OBJ_DIR)\pack.obj \
    $(TARGET_OBJ_DIR)\settime.obj \
+   $(TARGET_OBJ_DIR)\keysec.obj \
+   $(TARGET_OBJ_DIR)\keytime.obj \
    $(TARGET_OBJ_DIR)\like.obj \
    $(TARGET_OBJ_DIR)\lton.obj \
    $(TARGET_OBJ_DIR)\maxline.obj \
@@ -1172,6 +1174,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\fcopy.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\pack.obj       >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\settime.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\keysec.obj     >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\keytime.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\like.obj       >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\lton.obj       >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\maxline.obj    >> make_tmp
@@ -3040,6 +3044,18 @@ $(TARGET_OBJ_DIR)\numcount.obj : $(CT_SRC_DIR)\numcount.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\numline.obj : $(CT_SRC_DIR)\numline.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\keysec.c : $(CT_SRC_DIR)\keysec.prg
+   $(HARBOUR_CMD)
+
+$(TARGET_OBJ_DIR)\keysec.obj : $(TARGET_OBJ_DIR)\keysec.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\keytime.c : $(CT_SRC_DIR)\keytime.prg
+   $(HARBOUR_CMD)
+
+$(TARGET_OBJ_DIR)\keytime.obj : $(TARGET_OBJ_DIR)\keytime.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\like.c : $(CT_SRC_DIR)\like.prg

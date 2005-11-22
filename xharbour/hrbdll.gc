@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.15 2005/11/06 15:55:38 ptsarenko Exp $
+# $Id: hrbdll.gc,v 1.16 2005/11/22 20:59:13 ptsarenko Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -529,6 +529,8 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/fcopy.o \
    $(OBJ_DIR)/pack.o \
    $(OBJ_DIR)/settime.o \
+   $(OBJ_DIR)/keysec.o \
+   $(OBJ_DIR)/keytime.o \
    $(OBJ_DIR)/like.o \
    $(OBJ_DIR)/lton.o \
    $(OBJ_DIR)/maxline.o \
@@ -2361,6 +2363,18 @@ $(OBJ_DIR)/numcount.o : $(CT_DIR)/numcount.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/numline.o : $(CT_DIR)/numline.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/keysec.c : $(CT_DIR)/keysec.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/keysec.o : $(OBJ_DIR)/keysec.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/keytime.c : $(CT_DIR)/keytime.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/keytime.o : $(OBJ_DIR)/keytime.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/like.c : $(CT_DIR)/like.prg
