@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.3 2005/04/30 15:14:29 lculik Exp $
+ * $Id: popcln.prg,v 1.4 2005/11/18 08:59:57 mauriliolongo Exp $
  */
 
 /*
@@ -274,6 +274,7 @@ METHOD UIDL( nMsgId ) CLASS tIPClientPOP
 RETURN cRet
 
 
+
 METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
    LOCAL nPos
    LOCAL cStr, cRet, nRetLen, cBuffer, nRead
@@ -286,23 +287,6 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
       ENDIF
       ::bInitialized := .T.
    ENDIF
-
-   /* old code, one char at a time, slow
-   cRet := ""
-   DO WHILE ::InetErrorCode( ::SocketCon ) == 0
-      cStr := ::InetRecvLine( ::SocketCon, @nPos, 1024 )
-      IF cStr != NIL
-         IF cStr == "."
-            ::bEof := .T.
-            EXIT
-         ELSE
-            cRet += cStr + ::cCRLF
-            IF .not. Empty( nLen ) .and. nLen < Len( cRet )
-               EXIT
-            ENDIF
-         ENDIF
-      ENDIF
-   ENDDO*/
 
    cRet := ""
    nRetLen := 1
@@ -318,11 +302,11 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
 
       nRead := ::InetRecv( ::SocketCon, @cBuffer, 1024 )
 
-      cRet += Left(cBuffer, nRead)
+      cRet += Left( cBuffer, nRead )
 
-      IF At(::cCRLF + "." + ::cCRLF, cRet, nRetLen) <> 0
+      IF ( nPos := At( ::cCRLF + "." + ::cCRLF, cRet, nRetLen ) ) <> 0
          // Remove ".CRLF"
-         cRet := Left(cRet, Len(cRet) - 3)
+         cRet := Left( cRet, nPos + 1 )
          ::bEof := .T.
 
       ELSEIF ! Empty( nLen ) .AND. nLen < Len( cRet )
@@ -339,10 +323,9 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
       RETURN NIL
    ENDIF
 
-   // Remove byte-stuffed termination octet(s) if any
-   cRet := StrTran(cRet, ::cCRLF + "..", ::cCRLF + ".")
+       // Remove byte-stuffed termination octet(s) if any
+RETURN StrTran( cRet, ::cCRLF + "..", ::cCRLF + "." )
 
-RETURN cRet
 
 
 METHOD Delete( nId ) CLASS tIPClientPOP

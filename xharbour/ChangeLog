@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4658 2005/11/22 02:01:41 druzus Exp $
+ * $Id: ChangeLog,v 1.4659 2005/11/22 02:49:33 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-22 19:00 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/tip/popcln.prg
+     * little code cleanup in ::Retrieve() method.
 
 2005-11-21 11:30 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
   * include/hbvmpub.h
@@ -21,8 +25,8 @@
 2005-11-22 03:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapifs.h
   * xharbour/source/rtl/filesys.c
-     * hb_fsSetDevMode() changed to return a BOOL value 
-       to be compatible with the CA-Clipper undocumented 
+     * hb_fsSetDevMode() changed to return a BOOL value
+       to be compatible with the CA-Clipper undocumented
        _tdevraw() function -thanks to Victor.
 
   * xharbour/source/rdd/dbcmd.c
