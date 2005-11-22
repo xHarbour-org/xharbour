@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.46 2005/11/16 12:16:38 druzus Exp $
+ * $Id: hbvmpub.h,v 1.47 2005/11/16 17:54:41 snaiperis Exp $
  */
 
 /*
@@ -250,6 +250,8 @@
       USHORT     uiClass;      /* offset to the classes base if it is an object */
       USHORT     uiPrevCls;    /* for fixing after access super */
       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
+      ULONG      ulAllocated;
+      ULONG      ulBlock;
 #ifndef HB_ARRAY_USE_COUNTER
       PHB_ARRAY_HOLDER pOwners;
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.63 2005/10/31 22:41:53 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.64 2005/11/19 19:12:23 ronpinkas Exp $
  */
 
 /*
@@ -231,6 +231,37 @@ HB_FUNC( ASIZE )
       hb_errRT_BASE( EG_ARG, 2023, NULL, "ASIZE", HB_MIN( hb_pcount(), 2 ), hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 #endif
+}
+
+HB_FUNC( ASIZEALLOC )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pPreAlloc = hb_param( 2, HB_IT_NUMERIC );
+   
+   if( pArray && pPreAlloc )
+   {
+      pArray->item.asArray.value->ulBlock = (ULONG) hb_itemGetNL( pPreAlloc );
+
+      /* returns the array itself */
+      if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
+      {
+         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+      }
+      else
+      {
+         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+      }
+   }
+}
+
+HB_FUNC( ALENALLOC )
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+   
+   if( pArray )
+   {
+      hb_retnl( (LONG) pArray->item.asArray.value->ulBlock );
+   }
 }
 
 HB_FUNC( ATAIL )

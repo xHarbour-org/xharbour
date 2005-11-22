@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.127 2005/11/03 06:55:30 ronpinkas Exp $
+ * $Id: arrays.c,v 1.128 2005/11/03 07:32:51 ronpinkas Exp $
  */
 
 /*
@@ -127,14 +127,20 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
       hb_arrayRegisterHolder( pBaseArray, (void *) pItem );
    #endif
 
-   pBaseArray->ulLen = ulLen;
-   pBaseArray->uiClass    = 0;
-   pBaseArray->uiPrevCls  = 0;
-   pBaseArray->puiClsTree = NULL;
+   pBaseArray->ulLen       = ulLen;
+   pBaseArray->ulAllocated = ulLen;
+   pBaseArray->uiClass     = 0;
+   pBaseArray->uiPrevCls   = 0;
+   pBaseArray->puiClsTree  = NULL;
+   pBaseArray->ulBlock     = 0;
 
-   for( ulPos = 0; ulPos < ulLen; ulPos++ )
+   if( ulLen )
    {
-      ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+      register PHB_ITEM pItems = pBaseArray->pItems + ulLen;
+      do
+      {
+         ( --pItems )->type = HB_IT_NIL;
+      } while( --ulLen );
    }
 
    pItem->item.asArray.value = pBaseArray;
@@ -155,7 +161,14 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
 
       if( pBaseArray->ulLen < ULONG_MAX )
       {
-         hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
+         {
+            pBaseArray->ulLen++;
+         }
+         else
+         {
+            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         }
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
          hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
@@ -176,7 +189,14 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
 
       if( pBaseArray->ulLen < ULONG_MAX )
       {
-         hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         if( pBaseArray->ulAllocated > pBaseArray->ulLen )
+         {
+            pBaseArray->ulLen++;
+         }
+         else
+         {
+            hb_arraySize( pArray, pBaseArray->ulLen + 1 );
+         }
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
          hb_itemForwardValue( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
@@ -223,26 +243,38 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 
       if( ulLen != pBaseArray->ulLen )
       {
+         ULONG ulAllocated;
          ULONG ulPos;
 
          if( pBaseArray->ulLen == 0 )
          {
-            pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulLen * sizeof( HB_ITEM ) );
+            register PHB_ITEM pItems;
+            ulAllocated = ulLen + pBaseArray->ulBlock;
+            pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulAllocated * sizeof( HB_ITEM ) );
 
-            for( ulPos = 0; ulPos < ulLen; ulPos++ )
+            pItems = pBaseArray->pItems + ulAllocated;
+            ulPos = ulAllocated;
+            
+            do
             {
-               ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
-            }
+               ( --pItems )->type = HB_IT_NIL;
+            } while( --ulPos );
          }
          else
          {
-            if( pBaseArray->ulLen < ulLen )
+            ulAllocated = pBaseArray->ulAllocated;
+
+            if( pBaseArray->ulAllocated < ulLen )
             {
                #ifndef HB_ARRAY_USE_COUNTER
                   PHB_ITEM pOldItems = pBaseArray->pItems;
+               #else
+                  PHB_ITEM pOldItems;
                #endif
 
-               pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
+               ulAllocated = ulLen + pBaseArray->ulBlock;
+
+               pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulAllocated );
 
                #ifndef HB_ARRAY_USE_COUNTER
                   if( pBaseArray->pItems != pOldItems )
@@ -262,60 +294,74 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                #endif
 
                /* set value for new items */
-               for( ulPos = pBaseArray->ulLen; ulPos < ulLen; ulPos++ )
+               pOldItems = pBaseArray->pItems + ulAllocated;
+               ulPos = ulAllocated - pBaseArray->ulAllocated;
+               do
                {
-                  ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
-               }
+                  ( --pOldItems )->type = HB_IT_NIL;
+               } while( --ulPos );
             }
             else if( pBaseArray->ulLen > ulLen )
             {
+               PHB_ITEM pOldItems;
+               
                /* release old items */
-               for( ulPos = ulLen; ulPos < pBaseArray->ulLen; ulPos++ )
+               pOldItems = pBaseArray->pItems + pBaseArray->ulLen;
+               ulPos = pBaseArray->ulLen - ulLen;
+               do
                {
-                  if( HB_IS_COMPLEX( pBaseArray->pItems + ulPos ) )
+                  --pOldItems;
+                  if( HB_IS_COMPLEX( pOldItems ) )
                   {
-                     hb_itemClear( pBaseArray->pItems + ulPos );
+                     hb_itemClear( pOldItems );
                   }
                   else
                   {
-                     ( pBaseArray->pItems + ulPos )->type = HB_IT_NIL;
+                     pOldItems->type = HB_IT_NIL;
                   }
-               }
+               } while( --ulPos );
 
                if( ulLen == 0 )
                {
                   hb_xfree( pBaseArray->pItems );
                   pBaseArray->pItems = NULL;
+                  ulAllocated = 0;
                }
                else
                {
                   #ifndef HB_ARRAY_USE_COUNTER
                      PHB_ITEM pOldItems = pBaseArray->pItems;
                   #endif
+                  register ULONG ulArrayPrealloc = pBaseArray->ulBlock;
+                  
+                  if( ulLen + ulArrayPrealloc * 2 <= pBaseArray->ulAllocated )
+                  {
+                     ulAllocated = ulLen + ulArrayPrealloc;
 
-                  pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulLen );
+                     pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulAllocated );
 
-                  #ifndef HB_ARRAY_USE_COUNTER
-                     if( pBaseArray->pItems != pOldItems )
-                     {
-                        for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                     #ifndef HB_ARRAY_USE_COUNTER
+                        if( pBaseArray->pItems != pOldItems )
                         {
-                           if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
+                           for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
                            {
-                              hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
-                           }
-                           else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
-                           {
-                              hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
+                              if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
+                              {
+                                 hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
+                              }
+                              else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
+                              {
+                                 hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
+                              }
                            }
                         }
-                     }
-                  #endif
+                     #endif
+                  }
                }
             }
          }
-
-         pBaseArray->ulLen = ulLen;
+         pBaseArray->ulLen       = ulLen;
+         pBaseArray->ulAllocated = ulAllocated;
       }
 
       return TRUE;
