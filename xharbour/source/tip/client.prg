@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.7 2005/09/23 13:38:12 gdrouillard Exp $
+ * $Id: client.prg,v 1.8 2005/11/18 08:59:57 mauriliolongo Exp $
  */
 
 /*
@@ -503,8 +503,14 @@ METHOD Log( ... ) CLASS tIPClient
 
    for each xVar in hb_aParams()
 
-      cMsg += StrTran( StrTran( AllTrim( CStr( xVar ) ), Chr( 13 ) ), Chr( 10 ) ) +;
-              iif ( hb_EnumIndex() < PCount() - 1, ", ", "" )
+      // Preserves CRLF on result
+      if hb_EnumIndex() < PCount()
+         cMsg += StrTran( StrTran( AllTrim( CStr( xVar ) ), Chr( 13 ) ), Chr( 10 ) )
+      else
+         cMsg += CStr( xVar )
+      endif
+
+      cMsg += iif ( hb_EnumIndex() < PCount() - 1, ", ", "" )
 
       if hb_EnumIndex() == PCount() - 1
          cMsg += " )" + hb_OsNewLine() + ">> "
