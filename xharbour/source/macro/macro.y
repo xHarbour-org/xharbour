@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.23 2005/11/16 07:19:52 ronpinkas Exp $
+ * $Id: macro.y,v 1.24 2005/11/19 19:12:23 ronpinkas Exp $
  */
 
 /*
@@ -573,9 +573,70 @@ ArgList    : Argument                     {
 ByRefArg   : '@' IDENTIFIER               { $$ = hb_compExprNewVarRef( $2 ); }
            ;
 
-Argument   : EmptyExpression              { $$ = $1; }
-           | ByRefArg                     { $$ = $1; }
-           | '@' IDENTIFIER '(' ')'       { $$ = hb_compExprNewFunRef( $2 ); }
+Argument   : EmptyExpression           { $$ = $1; }
+           | '@' Expression            {
+                                          switch( $2->ExprType )
+                                          {
+                                             case HB_ET_VARIABLE:
+                                               $$ = $2;
+                                               $$->ExprType = HB_ET_VARREF;
+                                               $$->ValType = HB_EV_VARREF;
+                                               break;
+
+                                             case HB_ET_ALIASVAR:
+                                             {
+                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol;
+
+                                               if( strcmp( szAlias, "M" ) == 0 || strncmp( szAlias, "MEMVAR", 4 > strlen( szAlias ) ? 4 : strlen( szAlias ) ) == 0 )
+                                               {
+                                                  $$ = $2->value.asAlias.pVar;
+
+                                                  $2->value.asAlias.pVar = NULL;
+                                                  hb_compExprDelete( $2, HB_MACRO_PARAM  );
+
+                                                  if( $$->ExprType == HB_ET_MACRO )
+                                                  {
+                                                     $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF;
+                                                  }
+                                                  else
+                                                  {
+                                                     $$->ExprType = HB_ET_MEMVARREF;
+                                                     $$->ValType = HB_EV_VARREF;
+                                                  }
+                                               }
+                                               break;
+                                             }
+
+                                             case HB_ET_FUNCALL:
+                                                $$ = $2->value.asFunCall.pFunName;
+
+                                                $2->value.asFunCall.pFunName = NULL;
+                                                hb_compExprDelete( $2, HB_MACRO_PARAM  );
+
+                                                $$->ExprType = HB_ET_FUNREF;
+                                                $$->ValType = HB_EV_FUNREF;
+                                                break;
+
+                                             case HB_ET_SEND:
+                                               $$ = $2;
+                                               $$->value.asMessage.bByRef = TRUE;
+                                               break;
+
+                                             case HB_ET_MACRO:
+                                               $$ = $2;
+                                               $$->value.asMacro.SubType = HB_ET_MACRO_VAR_REF;
+                                               break;
+
+                                             case HB_ET_ARRAYAT:
+                                               $$ = $2;
+                                               $$->value.asList.bByRef = TRUE;
+                                               break;
+
+                                             default:
+                                               hb_macroError( EG_SYNTAX, HB_MACRO_PARAM );
+                                               $$ = $2;
+                                          }
+                                       }
            ;
 
 /* Object's instance variable
