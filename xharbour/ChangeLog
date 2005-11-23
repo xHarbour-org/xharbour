@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4662 2005/11/23 12:19:03 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4663 2005/11/23 13:25:42 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-23 18:15 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/tbrowse.prg
+     * Changed the ::Invalidate() method of TDataCache since invalidation
+       has to be done just before stabilization starts (clipper compatibility)
+     * ::SetColPos() performs a ::ForceStable() if called on a ::stable TBrowse
+       Clipper is ::stable after an assignement to ::colPos
 
 2005-11-23 11:23 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h

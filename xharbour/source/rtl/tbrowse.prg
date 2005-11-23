@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.135 2005/11/18 12:58:40 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.136 2005/11/18 18:07:05 mauriliolongo Exp $
  */
 
 /*
@@ -179,19 +179,25 @@ CLASS TDataCache
       datasource. To reload data a call to RefreshCurrent()/RefreshAll() needs to be done.
    */
    METHOD   Invalidate( nRow )         INLINE  iif( nRow == NIL,;
-                                                    ( AFill( ::aCache, NIL ), ::InitCache( .T. ) ),;
-                                                    iif( nRow > 0 .AND. nRow <= Len( ::aCache ), ::aCache[ nRow ] := NIL, NIL ) )
+                                                    ::lInvalid := .T. ,;
+                                                    iif( nRow > 0 .AND. nRow <= Len( ::aCache ), ::aCache[ nRow ] := NIL, NIL ) ),;
+                                               Self
 
-   METHOD   InitCache( lInternal )     // Resets cache
-
-
+   /* Needed for clipper compatibility, invalidation of cache must happen just before
+      stabilization of tbrowse. Note, this handles only full invalidation, not row invalidation
+   */
+   METHOD   PerformInvalidation()      INLINE  iif( ::lInvalid ,;
+                                                    ( AFill( ::aCache, NIL ), ::InitCache(), ::lInvalid := .F., Self ),;
+                                                    Self )
    HIDDEN:
 
    DATA  aCache                        // Array with cached data
    DATA  oCachedBrowse                 // TBrowse object I'm caching
    DATA  aRect                         // Array with pending color-rects
+   DATA  lInvalid                      // .T. if ::Invalidate() has been called without a recno
 
-   METHOD FillRow( nRow )              // Fills a row of aCache with data from datasource
+   METHOD   InitCache( lInternal )     // Resets cache
+   METHOD   FillRow( nRow )            // Fills a row of aCache with data from datasource
 
 END CLASS
 
@@ -208,8 +214,8 @@ METHOD New( oBrowse ) CLASS TDataCache
 
    ::nCurRow := 1
    ::nLastRow := 1
-
    ::aRect := {}
+   ::lInvalid := .F.
 
 RETURN Self
 
@@ -416,28 +422,22 @@ return Self
 
 
 
-METHOD InitCache( lInternal ) CLASS TDataCache
+METHOD InitCache() CLASS TDataCache
 
-   local nSkipped, nCurRow
+   local nCurRow
 
-   default lInternal to .F.
-
-   if lInternal
-
-      // this is needed when number of shown rows decreases due to a phantom record
-      // being removed; for example, using DBU, dbGoBottom(), Down(), Up()
-      // Clipper does this as well! :)
-      if ::nCurRow > 1
-         nSkipped := ::dbSkip( -( ::nCurRow - 1 ) )
-         ::nCurRow := 1
-      else
-         // This will force a dbSkip( 0 ), when row gets requested by TBrowse, which,
-         // in turn, forces a reload of row from datasource, this cannot be done now
-         // since data has to be fetched from datasource only during stabilization
-         // phase
-         ::aCache[ ::nCurRow ] := NIL
-      endif
-
+   // this is needed when number of shown rows decreases due to a phantom record
+   // being removed; for example, using DBU, dbGoBottom(), Down(), Up()
+   // Clipper does this as well! :)
+   if ::nCurRow > 1
+      ::dbSkip( -( ::nCurRow - 1 ) )
+      ::nCurRow := 1
+   else
+      // This will force a dbSkip( 0 ), when row gets requested by TBrowse, which,
+      // in turn, forces a reload of row from datasource, this cannot be done now
+      // since data has to be fetched from datasource only during stabilization
+      // phase
+      ::aCache[ ::nCurRow ] := NIL
    endif
 
    ::nLastRow := Len( ::aCache )
@@ -1536,6 +1536,11 @@ METHOD SetColPos( nColPos ) CLASS TBrowse
 
       endif
 
+      /* 23/11/2005 - <maurilio.longo@libero.it>
+                      Clipper compatibility, after a colpos assignement, clipper tbrowse is ::stable
+      */
+      ::ForceStable()
+
    endif
 
 return ::nColPos
@@ -2231,6 +2236,9 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       ::configure( 2 )
    endif
 
+   // Execute a pending invalidation of cache
+   ::oDataCache:PerformInvalidation()
+
    // I need to set columns width If TBrowse was never displayed before
    //
    if ::lNeverDisplayed
@@ -2239,7 +2247,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       //       for first time
       //
       ::lNeverDisplayed := .F.
-      ::oDataCache:InitCache()
 
       // Force re-evaluation of frozen space since I could not calc it before
       // being columns width not set
