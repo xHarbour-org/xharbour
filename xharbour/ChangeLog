@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4665 2005/11/23 19:40:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4666 2005/11/24 14:35:02 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-11-24 15:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Enhanced TOLEAUTO_OLENEWENUMERATOR to support interim IDispatch
+    * Enhanced VariantToItem() to support interim IUnknown
+    * Minor optimization in VariantToItem() of VT_BYREF & VT_VARIANT
 
 2005-11-24 15:31 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/tip/client.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.97 2005/11/12 18:47:30 druzus Exp $
+ * $Id: win32ole.prg,v 1.98 2005/11/12 20:27:12 ronpinkas Exp $
  */
 
 /*
@@ -1227,8 +1227,15 @@ RETURN Self
   HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
   {
      PHB_ITEM pOleAuto;
+     IDispatch *pDispatch = NULL;
 
      hb_itemClear( pItem );
+
+     // Don't "optimize" (VT_ARRAY | VT_VARIANT) must not match!
+     while( pVariant->n1.n2.vt == VT_BYREF || pVariant->n1.n2.vt == VT_VARIANT )
+     {
+        pVariant = pVariant->n1.n2.n3.pvarVal;
+     }
 
      switch( pVariant->n1.n2.vt )
      {
@@ -1245,8 +1252,18 @@ RETURN Self
            hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_TRUE ? TRUE : FALSE );
            break;
 
+        case VT_UNKNOWN:
+           pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, &pDispatch );
+           // Intentionally fall through
+
         case VT_DISPATCH:
-           if( pVariant->n1.n2.n3.pdispVal == NULL )
+
+           if( pVariant->n1.n2.vt == VT_DISPATCH )
+           {
+              pDispatch = pVariant->n1.n2.n3.pdispVal;
+           }
+
+           if( pDispatch == NULL )
            {
               break;
            }
@@ -1267,7 +1284,7 @@ RETURN Self
               //TOleAuto():New( nDispatch )
               hb_vmPushSymbol( s_pSym_New->pSymbol );
               hb_itemPushForward( pOleAuto );
-              hb_vmPushLong( ( LONG ) pVariant->n1.n2.n3.pdispVal );
+              hb_vmPushLong( ( LONG ) pDispatch );
               hb_vmSend( 1 );
 
               hb_itemRelease( pOleAuto );
@@ -1280,8 +1297,13 @@ RETURN Self
                  hb_itemForwardValue( pItem, hb_stackReturnItem() );
               }
 
-              //printf( "Dispatch: %ld %ld\n", ( LONG ) pVariant->n1.n2.n3.pdispVal, (LONG) hb_stackReturnItem()->item.asArray.value );
-              pVariant->n1.n2.n3.pdispVal->lpVtbl->AddRef( pVariant->n1.n2.n3.pdispVal );
+              //printf( "Dispatch: %ld %ld\n", ( LONG ) pDispatch, (LONG) hb_stackReturnItem()->item.asArray.value );
+
+              // If retrieved from IUnknown than allready added!
+              if( pVariant->n1.n2.vt == VT_DISPATCH )
+              {
+                 pDispatch->lpVtbl->AddRef( pDispatch );
+              }
            }
            break;
 
@@ -1336,9 +1358,11 @@ RETURN Self
         case VT_NULL:
            break;
 
+        /*
         case VT_VARIANT:
            VariantToItem( pItem, pVariant->n1.n2.n3.pvarVal );
            break;
+        */
 
         case VT_ARRAY | VT_VARIANT:
         {
@@ -1846,15 +1870,22 @@ RETURN Self
 
      VariantClear( &RetVal );
 
-     OleGetProperty( pDisp, NewEnumID, &s_EmptyDispParams );
-
-     //TraceLog( NULL, "Dispatch: %p, Result: %i Type %i\n", pDisp, s_nOleError, RetVal.n1.n2.vt );
-
-     if( s_nOleError == S_OK )
+     if( OleGetProperty( pDisp, NewEnumID, &s_EmptyDispParams ) == S_OK || OleInvoke( pDisp, NewEnumID, &s_EmptyDispParams ) == S_OK )
      {
         LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
-        s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
+        if( RetVal.n1.n2.vt == VT_UNKNOWN )
+        {
+           s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
+        }
+        else if( RetVal.n1.n2.vt == VT_DISPATCH )
+        {
+           s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, &IID_IEnumVARIANT, &pEnumVariant );
+        }
+        else
+        {
+           s_nOleError = E_FAIL;
+        }
 
         if( s_nOleError == S_OK )
         {
@@ -2039,7 +2070,6 @@ RETURN Self
         OleThrowError();
      }
   }
-
 #pragma ENDDUMP
 
 #endif
