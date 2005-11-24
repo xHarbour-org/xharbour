@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4664 2005/11/23 17:16:47 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4665 2005/11/23 19:40:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-11-24 15:31 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/tip/client.prg
+     * little changes to ::Log() code
+   * source/tip/popcln.prg
+     ! fixed a bug in ::Retrieve() which could cause the miss of
+       the end of mail sequence and the report of a timeout error.
 
 2005-11-23 11:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
    * include/hbclass.ch

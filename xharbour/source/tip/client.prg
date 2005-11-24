@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.8 2005/11/18 08:59:57 mauriliolongo Exp $
+ * $Id: client.prg,v 1.9 2005/11/23 12:19:06 mauriliolongo Exp $
  */
 
 /*
@@ -516,7 +516,7 @@ METHOD Log( ... ) CLASS tIPClient
          cMsg += " )" + hb_OsNewLine() + ">> "
 
       elseif hb_EnumIndex() == PCount()
-         cMsg += hb_OsNewLine() + hb_OsNewLine()
+         cMsg += " <<" + hb_OsNewLine() + hb_OsNewLine()
 
       endif
 

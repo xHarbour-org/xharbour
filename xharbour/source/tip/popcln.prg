@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.4 2005/11/18 08:59:57 mauriliolongo Exp $
+ * $Id: popcln.prg,v 1.5 2005/11/22 18:01:48 mauriliolongo Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ CLASS tIPClientPOP FROM tIPClient
    METHOD Read( iLen )
    METHOD Stat()
    METHOD List()
-   METHOD Retreive( nMsgId )
+   METHOD Retreive( nId, nLen )
    METHOD Delete()
    METHOD Quit()
    METHOD Noop()                 // Can be called repeatedly to keep-alive the connection
@@ -276,8 +276,10 @@ RETURN cRet
 
 
 METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
+
    LOCAL nPos
    LOCAL cStr, cRet, nRetLen, cBuffer, nRead
+   LOCAL cEOM := ::cCRLF + "." + ::cCRLF        // End Of Mail
 
    IF .not. ::bInitialized
       ::InetSendall( ::SocketCon, "RETR "+ Str( nId ) + ::cCRLF )
@@ -289,7 +291,7 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
    ENDIF
 
    cRet := ""
-   nRetLen := 1
+   nRetLen := 0
    nRead := 0
 
    /* 04/05/2004 - <maurilio.longo@libero.it>
@@ -304,7 +306,12 @@ METHOD Retreive( nId, nLen ) CLASS tIPClientPOP
 
       cRet += Left( cBuffer, nRead )
 
-      IF ( nPos := At( ::cCRLF + "." + ::cCRLF, cRet, nRetLen ) ) <> 0
+      /* 24/11/2005 - <maurilio.longo@libero.it>
+                      "- Len( cEOM )" to be sure to always find a full EOM,
+                      otherwise if response breaks EOM in two, it will never
+                      be found
+      */
+      IF ( nPos := At( cEOM, cRet, Max( nRetLen - Len( cEOM ), 1 ) ) ) <> 0
          // Remove ".CRLF"
          cRet := Left( cRet, nPos + 1 )
          ::bEof := .T.
