@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.98 2005/11/12 20:27:12 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.99 2005/11/24 23:54:00 ronpinkas Exp $
  */
 
 /*
@@ -1253,7 +1253,7 @@ RETURN Self
            break;
 
         case VT_UNKNOWN:
-           pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, &pDispatch );
+           pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDispatch );
            // Intentionally fall through
 
         case VT_DISPATCH:
