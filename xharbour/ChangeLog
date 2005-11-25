@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4667 2005/11/24 23:53:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4668 2005/11/25 13:49:04 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2005-11-25 10:44 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Fixed 1 reffernce leak in TOLEAUTO_OLENEWENUMERATOR()
+
 2005-11-25 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/tbrowse.prg
      ! ::HowManyCol() could put tbrowse in an inconsistent state.
@@ -15,7 +19,7 @@
 
 2005-11-24 15:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
-    * Enhanced TOLEAUTO_OLENEWENUMERATOR to support interim IDispatch
+    * Enhanced TOLEAUTO_OLENEWENUMERATOR() to support interim IDispatch
     * Enhanced VariantToItem() to support interim IUnknown
     * Minor optimization in VariantToItem() of VT_BYREF & VT_VARIANT
 

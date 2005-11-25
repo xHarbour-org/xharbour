@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.99 2005/11/24 23:54:00 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.100 2005/11/25 02:27:18 ronpinkas Exp $
  */
 
 /*
@@ -1858,6 +1858,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
+
   HB_FUNC_STATIC( TOLEAUTO_OLENEWENUMERATOR ) // (hOleObject, szMethodName, uParams...)
   {
      IDispatch *pDisp;
@@ -1889,11 +1890,7 @@ RETURN Self
 
         if( s_nOleError == S_OK )
         {
-           /*
-              Intentionally using Init instead of Clear, because we keep refernce to
-              this unknown, as per below.
-            */
-           VariantInit( &RetVal );
+           VariantClear( &RetVal );
 
            hb_retptr( pEnumVariant );
         }
