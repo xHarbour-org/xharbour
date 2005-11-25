@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4666 2005/11/24 14:35:02 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4667 2005/11/24 23:53:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-25 14:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/tbrowse.prg
+     ! ::HowManyCol() could put tbrowse in an inconsistent state.
+       Applied fix from <lotusint@sancharnet.in> from a newsgroup message
 
 2005-11-24 15:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

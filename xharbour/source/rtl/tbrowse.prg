@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.136 2005/11/18 18:07:05 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.137 2005/11/23 17:16:47 mauriliolongo Exp $
  */
 
 /*
@@ -1808,12 +1808,12 @@ METHOD HowManyCol() CLASS TBrowse
    tryLeftVisible := ::leftVisible
 
    // ::nColPos is to the left of leftVisible
-   if ::nFrozenCols==0 .and. tryLeftVisible > ::nColPos
+   if ::nFrozenCols == 0 .AND. tryLeftVisible > ::nColPos
       tryLeftVisible := ::nColPos
    endif
 
    do while .t.
-      nColsVisible := tryLeftVisible-1
+      nColsVisible := Max( 0, tryLeftVisible - 1 )
 
       while nColsVisible < ::nColumns
          // which column is displayed to the left of next col?
@@ -1827,8 +1827,8 @@ METHOD HowManyCol() CLASS TBrowse
 
          // next, we must check against [nLeftCol], not [nColsVisible]:
          if ( nColsVisible >= tryLeftVisible .or. ::nFrozenCols > 0 ) .and.;
-                                             (nLeftCol > 0) .and.;
-                                             ::aColsInfo[ nLeftCol,o_Width ] > 0
+            (nLeftCol > 0) .and.;
+            ::aColsInfo[ nLeftCol,o_Width ] > 0
 
             nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
          endif
@@ -1870,9 +1870,9 @@ METHOD HowManyCol() CLASS TBrowse
       nColsWidth := saveColsWidth
    enddo //retry until ::nColPos fit into display
 
-   ::leftVisible  := tryLeftVisible //x
-   ::rightVisible := nColsVisible
-   ::nColsVisible := nColsVisible
+   ::leftVisible  := Max( 1, tryLeftVisible )
+   ::rightVisible := Max( 1, nColsVisible )
+   ::nColsVisible := Max( 1, nColsVisible )
    ::nColsWidth   := nColsWidth
    ::cSpacePre    := space( INT( ( ::nVisWidth - ::nColsWidth ) / 2 ) )
    ::cSpaceLast   := space( ::nVisWidth - len( ::cSpacePre ) - ::nColsWidth )
