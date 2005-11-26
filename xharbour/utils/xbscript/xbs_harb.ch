@@ -2272,15 +2272,16 @@
            for( iPos = 0; iProcedure < iProcedures; iProcedure++, iPos++ )
            {
               char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
+              BYTE *pcode;
 
               iIndex = iProcedure + 1;
 
               //TraceLog( "ppgendyn.log", "PP_GENDYNPROCEDURE: '%s' Pos: %i Index: %i\n", sFunctionName, iBase + iPos, iIndex );
 
               #ifdef __CONCILE_PCODE__
-                  BYTE *pcode = (BYTE *) hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 2 );
+                  pcode = (BYTE *) hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 2 );
               #else
-                  BYTE *pcode = (BYTE *) hb_xgrab( 15 );
+                  pcode = (BYTE *) hb_xgrab( 15 );
 
                   pcode[ 0] = HB_P_PUSHSYMNEAR;
                   pcode[ 1] = iPP_EXECPROCEDURE;
