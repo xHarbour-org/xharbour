@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.539 2005/11/16 12:16:46 druzus Exp $
+ * $Id: hvm.c,v 1.540 2005/11/19 19:12:23 ronpinkas Exp $
  */
 
 /*
@@ -1676,6 +1676,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   hb_itemPutNI( &ForEachOp, FOREACH_END );
 
                   hb_vmOperatorCall( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ), &ForEachOp, "__OPFOREACH", NULL, 0, NULL );
+                  hb_itemClear( &HB_VM_STACK.Return );
                }
             }
 
@@ -7639,7 +7640,7 @@ HB_EXPORT void hb_vmPushState( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushState()"));
 
-   /* safe top item which can be processed at this moment */
+   /* Save top item which can be processed at this moment */
    hb_stackPush();
 
    hb_itemForwardValue( * HB_VM_STACK.pPos, &(HB_VM_STACK.Return) );
@@ -8424,7 +8425,8 @@ HB_EXPORT void hb_vmPopState( void )
 
    hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
    hb_stackDec();
-   /* restore top item */
+
+   /* Restore top item */
    hb_stackDec();
 }
 

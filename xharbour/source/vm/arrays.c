@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.128 2005/11/03 07:32:51 ronpinkas Exp $
+ * $Id: arrays.c,v 1.129 2005/11/22 02:33:47 walito Exp $
  */
 
 /*
@@ -1222,7 +1222,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
       // To avoid DOUBLE freeing - when poped off in hb_clsFinalize()
       #ifdef HB_ARRAY_USE_COUNTER
-         FakedObject.item.asArray.value->ulHolders = 1;
+         FakedObject.item.asArray.value->ulHolders = LONG_MAX; // don't use ULONG_MAX!!!
       #else
          hb_arrayRegisterHolder( pBaseArray, (void *) &FakedObject );
       #endif

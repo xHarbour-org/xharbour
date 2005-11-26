@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.177 2005/11/08 21:24:04 ronpinkas Exp $
+ * $Id: classes.c,v 1.178 2005/11/16 12:16:45 druzus Exp $
  */
 
 /*
@@ -4042,11 +4042,10 @@ void hb_clsFinalize( PHB_ITEM pObject )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.uiSuperClass == 0 &&
-          strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
+      if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
          // To DISABLE GC here where no refernce to this object will cause GPF for double release!
-         BOOL bCollecting = hb_gcSetCollecting( TRUE );
+         BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
          PHB_FUNC pDestructor = pClass->pDestructor;
 
          /* TODO: This code is not MT safe so MT programs cannot use
@@ -4060,13 +4059,35 @@ void hb_clsFinalize( PHB_ITEM pObject )
          {
             hb_symDestructor.value.pFunPtr = pDestructor;
          }
-         // Save the existing Return Value if any.
-         hb_vmPushState();
+
+         // Save the existing Return Value and Top Item if any.
+         if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+         {
+            // Don't process HB_VM_STACK.Return!
+            bPop = FALSE;
+
+            /* Save top item which can be processed at this moment */
+            hb_stackPush();
+         }
+         else
+         {
+            hb_vmPushState();
+         }
+
          hb_vmPushSymbol( &hb_symDestructor );
          hb_vmPush( pObject ); // Do NOT Forward!!!
          hb_vmSend( 0 );
-         // Restore the existing Return Value if any.
-         hb_vmPopState();
+
+         // Restore the existing Return Value and Top Item if any.
+         if( bPop )
+         {
+            hb_vmPopState();
+         }
+         else
+         {
+            /* Restore top item */
+            hb_stackDec();
+         }
 
          hb_gcSetCollecting( bCollecting );
       }

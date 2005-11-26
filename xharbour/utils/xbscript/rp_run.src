@@ -64,7 +64,7 @@
 
 // Must precede rule for DO CASE.
 #COMMAND DO <!proc!> => <proc>()
-#COMMAND DO <!proc!> WITH <arg1> [, <argN>] => <proc>( <arg1>[, <argN>] )
+#COMMAND DO <!proc!> WITH <arg1> [, <argN>] => <proc>( @<arg1> [, @<argN>] )
 
 #COMMAND IF <ifExp>         => PP__IF <ifExp>
 #COMMAND ELSEIF <elseifExp> => PP__ELSEIF <elseifExp>
@@ -73,8 +73,10 @@
 #COMMAND END [<x,...>]      => PP__END [<-x->]
 
 #COMMAND DO CASE            => PP__DOCASE
+#COMMAND SWITCH <x>         => PP__SWITCH <x>
 #COMMAND CASE <caseExp>     => PP__CASE <caseExp>
 #COMMAND OTHERWISE          => PP__OTHERWISE
+#COMMAND DEFAULT            => PP__DEFAULT
 #COMMAND ENDCASE [<x,...>]  => PP__ENDCASE [<-x->]
 
 #COMMAND FOR <counter> := <start> TO <end> [STEP <step>] => PP__FOR <counter>:=<start>~TO~<end>~STEP~<step>
@@ -91,6 +93,7 @@
 
 #COMMAND TRY                                             => PP__TRY
 #COMMAND CATCH [<catcher>]                               => PP__CATCH <catcher>
+#COMMAND FINALLY                                         => PP__FINALLY
 
 #COMMAND BEGIN SEQUENCE                                  => PP__BEGIN
 #COMMAND BREAK [<exp>]                                   => PP_Break( <exp> )
@@ -113,24 +116,25 @@
 #COMMAND FUNCTION <!name!>( <par,...> )  => PP_PROC <name> ; PP_LocalParams( { <"par"> } )
 #COMMAND FUNCTION <!name!>[()]           => PP_PROC <name>
 
-#COMMAND RETURN [<retExp>]             => PP_SetReturn( <retExp> )
+#COMMAND RETURN [<retExp>]    => PP__RETURN( <retExp> )
 
-#COMMAND PARAMETERS <par,...> => PP_Params( { <"par"> } )
-#COMMAND PRIVATE <var,...>    => PP_Privates( { <"var"> } )
-#COMMAND DECLARE <var,...>    => PP_Privates( { <"var"> } )
-#COMMAND PUBLIC <var,...>     => PP_Publics( { <"var"> } )
-#COMMAND LOCAL <var,...>      => PP_Locals( { <"var"> } )
-#COMMAND STATIC <var,...>     => PP_Statics( { <"var"> } )
+#COMMAND PARAMETERS <par,...> => PP__Params( { <"par"> } )
+#COMMAND PRIVATE <var,...>    => PP__Privates( { <"var"> } )
+#COMMAND DECLARE <var,...>    => PP__Privates( { <"var"> } )
+#COMMAND PUBLIC <var,...>     => PP__Publics( { <"var"> } )
+#COMMAND LOCAL <var,...>      => PP__Locals( { <"var"> } )
+#COMMAND STATIC <var,...>     => PP__Statics( { <"var"> } )
 
 #COMMAND FIELD <!var!> [, <morevars,...>] => <-var-> <-morevars->
 
-#XTRANSLATE ProcName( [<n>] ) => PP_ProcName( <n> )
-#XTRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )
+#ifndef __CONCILE_PCODE__
+   #XTRANSLATE ProcName( [<n>] ) => PP_ProcName( <n> )
+   #XTRANSLATE ProcLine( [<n>] ) => PP_ProcLine( <n> )
 
-#XTRANSLATE HB_EnumIndex() => PP_EnumIndex()
-
-#XTRANSLATE ErrorBlock( [<NewBlock>] ) => PP_ErrorBlock( <NewBlock> )
-#XTRANSLATE Break( [<Exp>] ) => PP_Break( <Exp> )
-#XTRANSLATE Throw( [<Exp>] ) => PP_Break( <Exp> )
+   #XTRANSLATE HB_EnumIndex() => PP_EnumIndex()
+   #XTRANSLATE ErrorBlock( [<NewBlock>] ) => PP_ErrorBlock( <NewBlock> )
+   #XTRANSLATE Throw( [<Exp>] )  => PP__THROW( <Exp> )
+   #XTRANSLATE __Quit( [<Exp>] ) => Break( <Exp> )
+#endif
 
 #XTRANSLATE IN <x> => $ <x>

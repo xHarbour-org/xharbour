@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.100 2005/11/25 02:27:18 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.101 2005/11/25 18:45:37 ronpinkas Exp $
  */
 
 /*
@@ -630,7 +630,6 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
       CASE FOREACH_ENUMERATE
          //xRet := ::Item( nIndex )
          //xRet := ::pOleEnumerator:Next()
-
          xRet := HB_Inline( ::pOleEnumerator )
          {
             IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
@@ -1209,11 +1208,23 @@ RETURN Self
 
            VariantInit( &mElem );
 
+           #define PTROFINDEX
+
+           #ifdef PTROFINDEX
+              mElem.n1.n2.vt = ( psa->n1.n2.vt & ~VT_ARRAY ) | VT_BYREF;
+           #endif
+
            //printf( "   Get: %i\n", i );
 
+          #ifdef PTROFINDEX
+           if( SafeArrayPtrOfIndex( psa->n1.n2.n3.parray, rgIndices, &( mElem.n1.n2.n3.byref ) ) == S_OK )
+          #else
            if( SafeArrayGetElement( psa->n1.n2.n3.parray, rgIndices, &mElem ) == S_OK )
+          #endif
            {
               VariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
+
+              // VariantClear() performed by VariantToItem()!
               //printf( "   Type: %i\n", ( pArray->item.asArray.value->pItems + ( i - iFrom ) )->type );
            }
         }
@@ -1232,7 +1243,7 @@ RETURN Self
      hb_itemClear( pItem );
 
      // Don't "optimize" (VT_ARRAY | VT_VARIANT) must not match!
-     while( pVariant->n1.n2.vt == VT_BYREF || pVariant->n1.n2.vt == VT_VARIANT )
+     while( pVariant->n1.n2.vt == ( VT_BYREF | VT_VARIANT ) || pVariant->n1.n2.vt == VT_VARIANT || pVariant->n1.n2.vt == VT_BYREF )
      {
         pVariant = pVariant->n1.n2.n3.pvarVal;
      }
@@ -1888,10 +1899,10 @@ RETURN Self
            s_nOleError = E_FAIL;
         }
 
+        VariantClear( &RetVal );
+
         if( s_nOleError == S_OK )
         {
-           VariantClear( &RetVal );
-
            hb_retptr( pEnumVariant );
         }
         else

@@ -32,6 +32,8 @@
      CLASSDATA g_nID           INIT 0
      CLASSDATA nImpliedMainID  INIT 0
 
+     DATA bInterceptRTEBlock
+
      DATA nID
      DATA cName                INIT ""
 
@@ -50,6 +52,11 @@
      DATA aTransRules, aTransResults
      DATA aCommRules, aCommResults
      DATA lRunLoaded, lClsLoaded, lFWLoaded
+
+     #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+        DATA lConciled         INIT .F.
+        DATA pDynList
+     #endif
 
      METHOD New( cName )                                CONSTRUCTOR
 
@@ -78,6 +85,10 @@
        METHOD LoadFiveWin()      INLINE PP_LoadFw()
      #endif
 
+     #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+        DESTRUCTOR Reset()
+     #endif
+
   ENDCLASS
 
   //----------------------------------------------------------------------------//
@@ -89,6 +100,23 @@
      //TraceLog( ::cName, ::nID )
 
   RETURN Self
+
+  //----------------------------------------------------------------------------//
+  // Destructor!
+  #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+
+      PROCEDURE Reset() CLASS TInterpreter
+
+         TraceLog( "Destructor: " + ::cName )
+
+         IF ::pDynList != NIL
+            PP_ReleaseDynProcedures( 0, ::pDynList )
+            ::pDynList := NIL
+         ENDIF
+
+      RETURN
+
+  #endif
 
   //----------------------------------------------------------------------------//
   METHOD Compile() CLASS  TInterpreter
@@ -205,6 +233,7 @@
 
      LOCAL xRet, oError
      LOCAL bErrHandler := ErrorBlock( {|e| Break(e) } )
+     LOCAL bInterceptRTEBlock
 
      BEGIN SEQUENCE
 
@@ -221,7 +250,29 @@
            //asPrivates := s_asPrivates; asPublics := s_asPublics; asLocals := s_asLocals; aStatics := s_aStatics; aParams := s_aParams
            s_asPrivates := {}; s_asPublics := {}; s_asLocals := {}; s_aStatics := NIL; s_aParams := {}
 
+           IF ::bInterceptRTEBlock != NIL
+              bInterceptRTEBlock := PP_InterceptRTEBlock( ::bInterceptRTEBlock )
+           ENDIF
+
+           #ifdef __CONCILE_PCODE__
+              IF ! ::lConciled
+                 ::lConciled := .T.
+                 ::pDynList := ConcileProcedures( ::aCompiledProcs )
+              ENDIF
+           #else
+             #ifdef DYN
+                 IF ! ::lConciled
+                    ::lConciled := .T.
+                    PP_GenDynProcedures( ::aCompiledProcs, 1, @::pDynList )
+                 ENDIF
+             #endif
+           #endif
+
            xRet := PP_Exec( ::aCompiledProcs, ::aInitExit, Len( ::aCompiledProcs ), HB_aParams(), ::nNextStartProc )
+
+           IF ::bInterceptRTEBlock != NIL
+              PP_InterceptRTEBlock( bInterceptRTEBlock )
+           ENDIF
         ELSE
            oError := ErrorNew( [PP], 1003, [Interpreter], [Can't execute after compilation error], {} )
            oError:ProcLine := 0
@@ -231,7 +282,7 @@
      RECOVER USING oError
 
         IF ! ::bWantsErrorObject
-           Eval( bErrHandler, oError )
+           RETURN Eval( bErrHandler, oError )
         ENDIF
 
      END SEQUENCE
@@ -1379,11 +1430,15 @@
   #ifdef USE_C_BOOST
 
     #ifdef __XHARBOUR__
-
       #pragma BEGINDUMP
          #define __XHARBOUR__
       #pragma ENDDUMP
+    #endif
 
+    #ifdef __CONCILE_PCODE__
+      #pragma BEGINDUMP
+         #define __CONCILE_PCODE__
+      #pragma ENDDUMP
     #endif
 
     #pragma BEGINDUMP
@@ -1870,7 +1925,7 @@
          {
              cChar = sLine[nAt];
 
-             if( strchr( " ,([{|^*/+-=!#<>:&$", cChar ) )
+             if( strchr( " ,([{|^*/+-%=!#<>:&$", cChar ) )
              {
                 if( nStart >= 0 )
                 {
@@ -2124,8 +2179,12 @@
            PHB_ITEM pProcedures = hb_param( 1, HB_IT_ARRAY );
            PHB_ITEM pxList;
 
-           static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
-           static int iHB_APARAMS = 0, iPP_EXECPROCEDURE = 0;
+           #ifdef __CONCILE_PCODE__
+              //
+           #else
+              static int iLastSym = sizeof( symbols ) / sizeof( HB_SYMB ) - 1;// - 9;
+              static int iHB_APARAMS = 0, iPP_EXECPROCEDURE = 0;
+           #endif
 
            int iProcedures, iProcedure, iBase, iIndex, iPos;
 
@@ -2133,11 +2192,15 @@
            PHB_DYNS pDynSym;
            DYN_PROCS_LIST *pDynList;
 
-           if( iHB_APARAMS == 0 )
-           {
-              iHB_APARAMS       = hb_dynsymFind( "HB_APARAMS" )->pSymbol - symbols;
-              iPP_EXECPROCEDURE = hb_dynsymFind( "PP_EXECPROCEDURE" )->pSymbol - symbols;
-           }
+           #ifdef __CONCILE_PCODE__
+              //
+           #else
+              if( iHB_APARAMS == 0 )
+              {
+                 iHB_APARAMS       = hb_dynsymFind( "HB_APARAMS" )->pSymbol - symbols;
+                 iPP_EXECPROCEDURE = hb_dynsymFind( "PP_EXECPROCEDURE" )->pSymbol - symbols;
+              }
+           #endif
 
            if( pProcedures )
            {
@@ -2145,7 +2208,7 @@
            }
            else
            {
-              //TraceLog( NULL, "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
+              TraceLog( "ppgendyn.log", "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
               hb_retnl( 0 );
               return;
            }
@@ -2163,12 +2226,10 @@
 
            if( iProcedures - iProcedure == 0 )
            {
-              //TraceLog( NULL, "*** Nothing to process *** PP_GENDYNPROCEDURES()\n" );
+              TraceLog( "ppgendyn.log", "*** Nothing to process *** PP_GENDYNPROCEDURES()\n" );
               hb_retnl( 0 );
               return;
            }
-
-           //TraceLog( NULL, "PP_GenDynProcedures() Len: %i Index: %i Base: %i\n", iProcedures, iIndex, iBase );
 
            pxList = hb_param( 3, HB_IT_BYREF );
 
@@ -2206,38 +2267,45 @@
               }
            }
 
+           //TraceLog( "ppgendyn.log", "PP_GenDynProcedures() Len: %i Index: %i Base: %i\n", iProcedures, iIndex, iBase );
+
            for( iPos = 0; iProcedure < iProcedures; iProcedure++, iPos++ )
            {
               char *sFunctionName = hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 1 );
-              BYTE *pcode = (BYTE *) hb_xgrab( 15 );
 
               iIndex = iProcedure + 1;
 
-              //TraceLog( NULL, "PP_GENDYNPROCEDURE: '%s' Pos: %i Index: %i\n", sFunctionName, iBase + iPos, iIndex );
+              //TraceLog( "ppgendyn.log", "PP_GENDYNPROCEDURE: '%s' Pos: %i Index: %i\n", sFunctionName, iBase + iPos, iIndex );
 
-              pcode[ 0] = HB_P_PUSHSYMNEAR;
-              pcode[ 1] = iPP_EXECPROCEDURE;
+              #ifdef __CONCILE_PCODE__
+                  BYTE *pcode = (BYTE *) hb_arrayGetCPtr( pProcedures->item.asArray.value->pItems + iProcedure, 2 );
+              #else
+                  BYTE *pcode = (BYTE *) hb_xgrab( 15 );
 
-              pcode[ 2] = HB_P_PUSHNIL;
+                  pcode[ 0] = HB_P_PUSHSYMNEAR;
+                  pcode[ 1] = iPP_EXECPROCEDURE;
 
-              pcode[ 3] = HB_P_PUSHNIL; // will default to s_aProcedures
+                  pcode[ 2] = HB_P_PUSHNIL;
 
-              pcode[ 4] = HB_P_PUSHINT;
-              pcode[ 5] = HB_LOBYTE( iIndex );
-              pcode[ 6] = HB_HIBYTE( iIndex );
+                  pcode[ 3] = HB_P_PUSHNIL; // will default to s_aProcedures
 
-              pcode[ 7] = HB_P_PUSHSYMNEAR;
-              pcode[ 8] = iHB_APARAMS;
+                  pcode[ 4] = HB_P_PUSHINT;
+                  pcode[ 5] = HB_LOBYTE( iIndex );
+                  pcode[ 6] = HB_HIBYTE( iIndex );
 
-              pcode[ 9] = HB_P_PUSHNIL;
+                  pcode[ 7] = HB_P_PUSHSYMNEAR;
+                  pcode[ 8] = iHB_APARAMS;
 
-              pcode[10] = HB_P_FUNCTIONSHORT;
-              pcode[11] =  0;
+                  pcode[ 9] = HB_P_PUSHNIL;
 
-              pcode[12] =  HB_P_DOSHORT;
-              pcode[13] =  3;
+                  pcode[10] = HB_P_FUNCTIONSHORT;
+                  pcode[11] =  0;
 
-              pcode[14] = HB_P_ENDPROC;
+                  pcode[12] =  HB_P_DOSHORT;
+                  pcode[13] =  3;
+
+                  pcode[14] = HB_P_ENDPROC;
+              #endif
 
               pDynFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
 
@@ -2246,7 +2314,7 @@
               pDynFunc->pGlobals = NULL;
 
               pDynSym = hb_dynsymGet( sFunctionName );
-              //TraceLog( NULL, "Dyn: %p %s\n", pDynSym, sFunctionName );
+              //TraceLog( "ppgendyn.log", "Dyn: %p %s\n", pDynSym, sFunctionName );
 
               pDynList->pProcsArray[ iBase + iPos ].pDynFunc     = pDynFunc;
               pDynList->pProcsArray[ iBase + iPos ].pDynSym      = pDynSym;
@@ -2265,7 +2333,7 @@
               hb_storptr( pDynList, 3 );
            }
 
-           //TraceLog( NULL, "Base: %i, New: %i\n", iBase, pDynList->iProcs );
+           //TraceLog( "ppgendyn.log", "Base: %i, New: %i\n", iBase, pDynList->iProcs );
         }
 
         //---------------------------------------------------------------------------//
@@ -2287,7 +2355,7 @@
 
            if( pDynList == NULL )
            {
-              //TraceLog( NULL, "*** EMPTY List! ***\n" );
+              TraceLog( "ppgendyn.log", "*** EMPTY List! ***\n" );
               return;
            }
 
@@ -2297,7 +2365,7 @@
 
            if( iProcedures == iBase )
            {
-              //TraceLog( NULL, "*** Nothing to release ***\n" );
+              TraceLog( "ppgendyn.log", "*** Nothing to release ***\n" );
               return;
            }
 
@@ -2310,10 +2378,15 @@
               }
               else
               {
-                 TraceLog( NULL, "*** FUNCTION MISMATCH ***\n" );
+                 TraceLog( "ppgendyn.log", "*** FUNCTION MISMATCH ***\n" );
               }
 
-              hb_xfree( (void *) ( pDynList->pProcsArray[i].pDynFunc->pCode ) );
+              #ifdef __CONCILE_PCODE__
+                 // pcode was not allocated here.
+              #else
+                 hb_xfree( (void *) ( pDynList->pProcsArray[i].pDynFunc->pCode ) );
+              #endif
+
               hb_xfree( (void *) ( pDynList->pProcsArray[i].pDynFunc ) );
            }
 

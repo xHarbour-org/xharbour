@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.115 2005/11/08 02:04:40 druzus Exp $
+ * $Id: memvars.c,v 1.116 2005/11/08 03:44:37 ronpinkas Exp $
  */
 
 /*
@@ -1861,7 +1861,7 @@ HB_FUNC( __MVPUT )
       /* TODO: This should be expanded a little to report a passed incorrect
        * value to the error handler
        */
-      HB_ITEM_PTR pRetValue = hb_errRT_BASE_Subst( EG_ARG, 3010, NULL, NULL, 1, hb_paramError( 1 ) );
+      HB_ITEM_PTR pRetValue = hb_errRT_BASE_Subst( EG_ARG, 3010, NULL, NULL, 2, hb_paramError( 1 ), hb_paramError(2) );
 
       if( pRetValue )
       {

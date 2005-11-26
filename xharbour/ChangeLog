@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4668 2005/11/25 13:49:04 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4669 2005/11/25 18:45:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,61 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-11-26 14:15 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Minor optimization in SafeArrayToArray()
+    * Minor correction to VT_BYREF in VariantToItem()
+    * Corrected rare possible leak in TOLEAUTO_OLENEWENUMERATOR()
+
+  * source/vm/arrays.c
+    * Minor safety adjustment in hb_arrayReleaseBase()
+
+  * source/vm/classes.c
+    ! Fixed GPF trap related to hb_vmPushState()
+
+  * source/vm/hvm.c
+    ! Bypass GPF trap related to HB_P_ENDENUMERATE (still not sure what was the exact trigger)
+
+  * source/vm/memvars.c
+    * Added 2nd argument to error message in __MVPUT()
+
+  * utils/xbscript/xbsclass.ch
+    * Synched with hbclass.ch
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    ! Added missing operator '%' to NextIdentifier()
+
+  * utils/xbscript/xbscript.prg
+    + Added support for #[x]uncommand and [x]untranslate
+
+  * utils/xbscript/rp_run.src
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    + New optional native xHarbour PCODE compiler enabled by default under __XHARBOUR__
+      /* Maybe disabled by using -DNOCONCILEPCODE */
+
+    /*
+       This new release of xbScript is now factors faster (practically same speed as
+       xHarbour compiled executables in most applications), and practically 100%
+       xHarbour compatible, supporting all xHarbour syntax, except:
+
+         - Module wide STATIC variables
+         - Extended Codblocks (Extended INLINE Methods are supported using other approach)
+         - LOCAL, and STATIC variables are simulated using PRIVATE memvars.
+         - MEVARS, and FIELDS declarations are ignored.
+         - Detached LOCALs in Codeblocks, as we don't have real LOCALs.
+
+      Since script functions are now implemented as true native functions, the execution
+      stack is practically identical to compiled applications, and also allows for
+      native debug support of scripted modules.
+
+      For debug purposes this release has few extra error reporting handlers that will be cleaned
+      ASAP.
+
+      Please reports any unexpected behaviour.
+    */
 
 2005-11-25 10:44 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
