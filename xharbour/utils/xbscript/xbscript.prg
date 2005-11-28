@@ -869,6 +869,7 @@ RETURN
 
         SetProcedure( aProcedures, nLine, sSymbol )
         nProcID := Len( aProcedures )
+        aProcedure := aProcedures[-1]
      ELSE
         // No procedure declaration.
         IF nProcId == 0
@@ -876,6 +877,7 @@ RETURN
 
            SetProcedure( aProcedures, nLine, sSymbol )
            nProcID := Len( aProcedures )
+           aProcedure := aProcedures[-1]
         ELSE
            IF s_InlineMethodID == 0
               aProcedure := aProcedures[nProcID]
@@ -889,7 +891,7 @@ RETURN
            aFlow := aProcedure[3]
 
          // Debug only!
-         #if 1
+         #if 0
           TRY
          #endif
 
@@ -1270,14 +1272,14 @@ RETURN
 
               ELSE
 
-                 Alert( ProcName() + " Oops!" )
+                 TraceLog( "Unexpected case!" )
 
               ENDIF
 
            ENDIF
 
          // Debug only!
-         #if 1
+         #if 0
           CATCH oErr
 
              Alert( oErr:ProcName + "(" + str( oErr:ProcLine, 5 ) + ")" )
@@ -1290,6 +1292,8 @@ RETURN
          #endif
 
         ELSE
+
+           //OutputDebugString( aProcedure[1] )
 
            aProcedure[6] := .T.
 
@@ -1359,6 +1363,8 @@ RETURN
   PROCEDURE SetProcedure( aProcedures, nLine, sSymbol )
 
      LOCAL aProcedure, cPCode
+
+     //OutputDebugString( sSymbol )
 
      //#define OPTIMIZE_SETLINE
      #ifdef OPTIMIZE_SETLINE
@@ -4366,7 +4372,6 @@ FUNCTION RP_Run_Err( oErr, aProcedures )
    ENDIF
 
    BEGIN SEQUENCE
-      //Alert( "Script Error" )
       s_xRet := Eval( s_bRTEBlock, oRecover )
       //Alert( "Script Error returned:" + ValType( s_xRet ) )
 
