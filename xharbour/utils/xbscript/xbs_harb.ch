@@ -498,11 +498,6 @@
     RETURN
   #endif
 
-  //--------------------------------------------------------------//
-  FUNCTION PP_CompileText( sLines )
-
-  RETURN PP_CompileLine( sLines )
-
   //----------------------------------------------------------------------------//
   #ifdef WIN
     FUNCTION Alert( cMsg, aOptions )

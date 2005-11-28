@@ -838,7 +838,7 @@ RETURN
      LOCAL cVars, aVars, cVar
      LOCAL sSwitch
 
-       STATIC s_InlineMethodID := 0
+     STATIC s_InlineMethodID := 0
 
      // Debug only!
      #if 1
@@ -3788,6 +3788,8 @@ PROCEDURE RP_Dot()
 
    aFill( aKBCommands, sLine )
 
+   bCompile := .F.
+
    DO WHILE .T.
       sLine := aKBCommands[ nKBCommand ]
 
@@ -3907,7 +3909,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
             DropTrailingWS( @sLeft )
             nLen := Len( sLeft )
             WHILE nLen > 0
-               IF SubStr( sLeft, nLen, 1 ) $ " (,=><*+-\^&@["
+               IF SubStr( sLeft, nLen, 1 ) $ " (,=><*+-\^%&@["
                   EXIT
                ENDIF
                nLen--
@@ -3927,6 +3929,7 @@ STATIC PROCEDURE ExecuteLine( sPPed )
          ELSE
             sSymbol := ""
          ENDIF
+
          IF nIf == 0 .OR. ;
             sSymbol = "SETIF" .OR. sSymbol = "SETELSE" .OR. sSymbol = "SETELSEIF" .OR. sSymbol = "SETEND" .OR. ;
             sSymbol = "SETDOCASE" .OR. sSymbol = "SETCASE" .OR. sSymbol = "SETOTHERWISE" .OR. sSymbol = "SETENDCASE" .OR. ;
