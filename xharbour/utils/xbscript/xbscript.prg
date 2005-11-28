@@ -123,6 +123,9 @@
         #define HB_P_JUMP           26
         #define HB_P_JUMPFALSE      29
         #define HB_P_LESSEQUAL      34
+
+        #define HB_P_LINE           36
+
         #define HB_P_NOOP           67
         #define HB_P_POP            73
 
@@ -1448,14 +1451,18 @@ RETURN
      LOCAL cPCode := aProcedure[2]
 
      //RETURN
-     //TraceLog( aProcedure )
+     //TraceLog( nLine )
 
     #ifdef OPTIMIZE_SETLINE
      IF cPCode[-1] == Chr( HB_P_NOOP )
         IF aProcedure[4] == 0 .OR. ( nLine - aProcedure[4] ) > 255
-           aProcedure[4] := nLine
+           IF aProcedure[4] == 0
+              aProcedure[4] := nLine
+              cPCode[-1] := Chr( HB_P_BASELINE )
+           ELSE
+              cPCode[-1] := Chr( HB_P_LINE )
+           ENDIF
 
-           cPCode[-1] := Chr( HB_P_BASELINE )
            cPCode += Chr( BYTE1( nLine ) ) + Chr( BYTE2( nLine ) )
         ELSEIF nLine != aProcedure[4]
            cPCode[-1] := Chr( HB_P_LINEOFFSET )
@@ -1463,10 +1470,12 @@ RETURN
         ENDIF
      ELSE
     #endif
-        IF aProcedure[4] == 0 .OR. ( nLine - aProcedure[4] ) > 255
+        IF aProcedure[4] == 0
            aProcedure[4] := nLine
            cPCode += Chr( HB_P_BASELINE ) + Chr( BYTE1( nLine ) ) + Chr( BYTE2( nLine ) )
-        ELSEIF nLine != aProcedure[4]
+        ELSEIF ( nLine - aProcedure[4] ) > 255
+           cPCode += Chr( HB_P_LINE ) + Chr( BYTE1( nLine ) ) + Chr( BYTE2( nLine ) )
+        ELSE//IF nLine != aProcedure[4]
            cPCode += Chr( HB_P_LINEOFFSET ) + Chr( nLine - aProcedure[4] )
         ENDIF
     #ifdef OPTIMIZE_SETLINE
