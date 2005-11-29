@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4673 2005/11/28 07:18:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4674 2005/11/28 19:46:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2005-11-28 21:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * utils/hbmake/hbmake.prg
+    ! minor fix
+    
 2005-11-28 11:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/common/expropt2.c
     - Removed optimizations of <Exp> [!]= .T.|.F. which are not Clipper compatabile

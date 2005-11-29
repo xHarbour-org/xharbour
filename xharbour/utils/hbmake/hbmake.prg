@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.158 2005/11/08 00:00:00 modalsist Exp $
+ * $Id: hbmake.prg,v 1.158 2005/11/08 11:20:25 modalsist Exp $
  */
 
 /*
@@ -4303,7 +4303,7 @@ FUNCTION SetBuildLib()
                IF s_lGcc
                   FWrite( s_nMakeFileHandle, "CREATE " + " lib" + cRead + CRLF )
                   cLib := "lib" + cRead
-                  FWrite( s_nMakeFileHandle, cRead + CRLF )
+//                  FWrite( s_nMakeFileHandle, cRead + CRLF )
                ELSE
                   cRead := strtran(cRead,",","")
                   cRead := strtran(cRead,"+","")
