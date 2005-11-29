@@ -1422,7 +1422,11 @@ RETURN
 
      LOCAL cPCode
 
-     IF ! Empty( sReturn )
+     IF Empty( sReturn )
+        IF Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][1] $ "CS" .AND. aProcedure[3][-1][3] < 0
+           Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
+        ENDIF
+     ELSE
         SetLine( aProcedure, nLine )
         cPCode := aProcedure[2]
 
@@ -1446,12 +1450,16 @@ RETURN
 
   //--------------------------------------------------------------//
 
-  PROCEDURE SetLine( aProcedure, nLine )
+  PROCEDURE SetLine( aProcedure, nLine, lCase )
 
      LOCAL cPCode := aProcedure[2]
 
      //RETURN
      //TraceLog( nLine )
+
+     IF lCase != .T. .AND. Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][1] $ "CS" .AND. aProcedure[3][-1][3] < 0
+        Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
+     ENDIF
 
     #ifdef OPTIMIZE_SETLINE
      IF cPCode[-1] == Chr( HB_P_NOOP )
@@ -1495,6 +1503,10 @@ RETURN
 
      //TraceLog( aProcedure[1] )
 
+     IF Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][1] $ "CS" .AND. aProcedure[3][-1][3] < 0
+        Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
+     ENDIF
+
      cPureVar := Upper( cPureVar )
 
      IF nKind == VAR_LOCALPARAM .AND. aProcedure[6]
@@ -1535,6 +1547,10 @@ RETURN
      LOCAL aVars
      LOCAL cID, cInit, cArraySize
      LOCAL nVarID
+
+     IF Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][1] $ "CS" .AND. aProcedure[3][-1][3] < 0
+        Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
+     ENDIF
 
      IF ( nAt := At( ":=", cVar ) ) > 0
         cPureVar := Upper( Left( cVar, nAt - 1 ) )
@@ -1623,21 +1639,17 @@ RETURN
      LOCAL aFlow := { cKind, nLine, 0, .F., {}, 0, {}, {} }
      LOCAL cPCode
 
-     IF Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][3] < 0
-        Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
-     ENDIF
-
      // Top
      IF cKind == 'W'
+        #ifdef OPTIMIZE_SETLINE
+          IF aProcedure[2][-1] == Chr( HB_P_NOOP )
+             aFlow[6] := Len( aProcedure[2] )
+          ELSE
+        #endif
+             aFlow[6] := Len( aProcedure[2] ) + 1
           #ifdef OPTIMIZE_SETLINE
-            IF aProcedure[2][-1] == Chr( HB_P_NOOP )
-           aFlow[6] := Len( aProcedure[2] )
-            ELSE
-          #endif
-           aFlow[6] := Len( aProcedure[2] ) + 1
-          #ifdef OPTIMIZE_SETLINE
-            ENDIF
-         #endif
+          ENDIF
+        #endif
      ENDIF
 
      SetLine( aProcedure, nLine )
@@ -1665,10 +1677,6 @@ RETURN
 
      LOCAL aFlow := { "S", nLine, -Len( aProcedure[2] ), .F., {}, 0 }
      LOCAL cPCode
-
-     IF Len( aProcedure[3] ) > 0 .AND. aProcedure[3][-1][3] < 0
-        Throw( ErrorNew( [PP], 0, 2099, [Parse], [Code placed before first case handler, line: ] + Str( aProcedure[3][-1][2] ), { nLine } ) )
-     ENDIF
 
      SetLine( aProcedure, nLine )
      cPCode := aProcedure[2]
@@ -1730,7 +1738,7 @@ RETURN
         aProcedure[2] := cPCode
      ENDIF
 
-     SetLine( aProcedure, nLine )
+     SetLine( aProcedure, nLine, aFlow[1] $ "CS" )
      cPCode := aProcedure[2]
 
      IF aFlow[1] == 'S'
