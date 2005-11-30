@@ -735,11 +735,17 @@ RETURN
 //------------------------------- *** RP DOT and Interpreter Functions *** -------------------------------//
 
 //--------------------------------------------------------------//
- PROCEDURE PP_Break( xVal )
+PROCEDURE PP_Break( xVal )
 
-    Break( xVal )
+  Break( xVal )
 
- RETURN
+RETURN
+
+PROCEDURE PP_ResetStack()
+
+   aSize( s_aProcStack, 0 )
+
+RETURN
 
 //------------------------------------------------------------------//
 
@@ -1325,15 +1331,13 @@ RETURN
 
   PROCEDURE PCodeProlog( aProcedure )
 
-     STATIC s_aStack := {}
-
      LOCAL cVar
 
-     aProcedure[8] := s_aStack
-     aAdd( s_aStack, aProcedure )
+     aProcedure[8] := s_aProcStack
+     aAdd( s_aProcStack, aProcedure )
 
-     IF Len( s_aStack ) > 1
-        aProcedure := s_aStack[-2]
+     IF Len( s_aProcStack ) > 1
+        aProcedure := s_aProcStack[-2]
 
         aSize( aProcedure[9], Len( aProcedure[5][VAR_LOCAL] ) )
 
