@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.25 2005/01/09 23:19:31 ronpinkas Exp $
+ * $Id: achoice.prg,v 1.28 2005/05/13 01:30:32 jabrecer Exp $
  */
 
 /*
@@ -392,42 +392,42 @@ LOCAL nBottom
    IF nBounce != 2
       IF ::nFirstRow != nLastFirstRow
          IF ABS( ::nFirstRow - nLastFirstRow ) > nSize
-            ::DrawRows( 0, nSize, .T. )
+            ::DrawRows( 0, nSize, .F. )
          ELSEIF ::nFirstRow < nLastFirstRow
             ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
-            ::DrawRows( 0, nLastFirstRow - ::nFirstRow - 1, .T. )
+            ::DrawRows( 0, nLastFirstRow - ::nFirstRow - 1, .F. )
          ELSE
             ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
-            ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .T. )
+            ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .F. )
          ENDIF
       ENDIF
-      ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .f.)
+      // Since it will not hilite selected item, it's useless
+      // ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .F. )
    ENDIF
 RETURN ( nBounce != 2 )
 
 METHOD DrawRows( nFrom, nTo, lHilite, lOut ) CLASS TAChoice
 LOCAL nCurOption
-   lOut := if(lOut == Nil, .t., lOut)
-   DispBegin()
-   DO WHILE nFrom <= nTo
-      nCurOption := ::nFirstRow + nFrom
-      IF nCurOption > ::nItems
-         EXIT
-      ELSEIF nCurOption == ::nOption .AND. lHilite
-         ColorSelect( CLR_ENHANCED )
-      ELSEIF IsAvailableItem( nCurOption )
-         ColorSelect( CLR_STANDARD )
-      ELSE
-         ColorSelect( CLR_UNSELECTED )
-      ENDIF
-      If lOut
+   IF VALTYPE( lOut ) != "L" .OR. lOut
+      DispBegin()
+      DO WHILE nFrom <= nTo
+         nCurOption := ::nFirstRow + nFrom
+         IF nCurOption > ::nItems
+            EXIT
+         ELSEIF nCurOption == ::nOption .AND. lHilite
+            ColorSelect( CLR_ENHANCED )
+         ELSEIF IsAvailableItem( nCurOption )
+            ColorSelect( CLR_STANDARD )
+         ELSE
+            ColorSelect( CLR_UNSELECTED )
+         ENDIF
          DispOutAt( ::nTop + nFrom, ::nLeft, PadR( ::acItems[ ::nFirstRow + nFrom ], ::nRight - ::nLeft + 1 ) )
-      EndIf
-      nFrom++
-   ENDDO
+         nFrom++
+      ENDDO
+      DispEnd()
+      ColorSelect( CLR_STANDARD )
+   ENDIF
    SetPos( ::nTop + ::nOption - ::nFirstRow, ::nLeft )
-   ColorSelect( CLR_STANDARD )
-   DispEnd()
 RETURN nil
 
 METHOD HitTest( nRow, nCol ) CLASS TAChoice
