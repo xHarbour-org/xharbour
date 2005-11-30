@@ -544,9 +544,13 @@
 #define ADS_MAX_DATEMASK         12
 #define ADS_MAX_ERROR_LEN        600
 #define ADS_MAX_INDEX_EXPR_LEN   510   /* this is only accurate for index expressions */
-#define ADS_MAX_KEY_LENGTH       4082  /* maximum key value length.  This is the max key length
-                                        * of ADI indexes.  Max CDX key length is 240.  Max
-                                        * NTX key length is 256 */
+
+#if ADS_REQUIRE_VERSION >= 8
+   #define ADS_MAX_KEY_LENGTH   4082   /* maximum key value length.  This is the max key length */
+#else                                  /* of ADI indexes.  Max CDX key length is 240.  Max */
+   #define ADS_MAX_KEY_LENGTH    256   /* NTX key length is 256 */
+#endif   
+ 
 #define ADS_MAX_FIELD_NAME       128
 #define ADS_MAX_DBF_FIELD_NAME   10    /* maximum length of field name in a DBF */
 #define ADS_MAX_INDEXES          15    /* physical index files, NOT index orders */
