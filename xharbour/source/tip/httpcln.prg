@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.3 2005/09/23 13:31:36 gdrouillard Exp $
+ * $Id: httpcln.prg,v 1.4 2005/09/23 14:06:24 mlombardo Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
 
       // Convert to length
       // Set length so that super::Read reads in at max cLine bytes.
-      ::nLength := HB_HexToNum( cLine ) + ::nRead
+      ::nLength := HexToNum( cLine ) + ::nRead
 
    ENDIF
 

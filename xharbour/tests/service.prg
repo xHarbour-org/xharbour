@@ -19,7 +19,7 @@
 *
 * (C) 2003 Giancarlo Niccolai
 *
-* $Id: service.prg,v 1.10 2004/03/06 12:56:59 jonnymind Exp $
+* $Id: service.prg,v 1.11 2004/03/06 13:20:32 jonnymind Exp $
 *
 
 #include "hbserv.ch"
@@ -147,9 +147,9 @@ FUNCTION SignalFault(nSignal, aParams )
               ")  in Module: "+ ProcFile( n ) + HB_OsNewLine()
       n++
    END
-   cRet += "Internal address: 0x"+AllTrim( HB_NumToHex( aParams[4] ) )+ HB_OSNewLine()
+   cRet += "Internal address: 0x"+AllTrim( Num?ToHex( aParams[4] ) )+ HB_OSNewLine()
    cRet += "Low-level code: " + AllTrim( str( aParams[1] ) ) +"/"+;
-      AllTrim( HB_NumToHex(aParams[2])) + ": " + ;
+      AllTrim( NumToHex(aParams[2])) + ": " + ;
       HB_SignalDesc( aParams[1], aParams[2] ) + HB_OSNewLine()
 
    LOG "The program has caused an internal error. Framestack: " + HB_OSNewLine() + cRet;

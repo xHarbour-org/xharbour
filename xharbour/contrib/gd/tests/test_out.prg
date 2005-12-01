@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: test_out.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -298,7 +298,7 @@ FUNCTION URLDecode( cStr )
 
          CASE cCar == "%"
             i ++
-            cRet += Chr( HB_HexToNum( SubStr( cStr, i, 2 ) ) )
+            cRet += Chr( HexToNum( SubStr( cStr, i, 2 ) ) )
             i ++
 
          OTHERWISE
@@ -338,7 +338,7 @@ FUNCTION URLEncode( cStr )
 
          OTHERWISE
             nVal := Asc( cCar )
-            cRet += "%" + HB_NumToHex( nVal )
+            cRet += "%" + NumToHex( nVal )
       ENDCASE
    NEXT
 

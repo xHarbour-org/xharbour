@@ -19,7 +19,7 @@ read
 nSerial := VolSerial( cDrive )
 
 if nSerial != -1
-  cHex := hb_numtohex( nSerial )
+  cHex := NumToHex( nSerial )
   ? Stuff(if(!empty(cHex),cHex,"00000000"),5,0,"-")
 else
   alert("Drive "+Subs(cDrive,1,2)+" does not available.")

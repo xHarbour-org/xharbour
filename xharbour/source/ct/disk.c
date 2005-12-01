@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.10 2005/03/18 09:47:00 modalsist Exp $
+ * $Id: disk.c,v 1.10 2005/03/18 13:39:37 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -331,8 +331,8 @@ HB_FUNC( GETVOLINFO )
  * Sintax is: VolSerial("x:\")
  * Note that the trailing backslash is required.
  *
- * To convert in the hex format, call hb_numtohex() function. 
- * Example: hb_numtohex( volserial("c:\")). 
+ * To convert in the hex format, call numtohex() function. 
+ * Example: numtohex( volserial("c:\")). 
  * See volser.prg in xharbour\tests\cttest folder.
  */
 
