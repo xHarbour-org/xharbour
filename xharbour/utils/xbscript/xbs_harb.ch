@@ -86,7 +86,7 @@
      #endif
 
      #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
-        DESTRUCTOR Reset()
+        DESTRUCTOR Finalize()
      #endif
 
   ENDCLASS
@@ -105,7 +105,7 @@
   // Destructor!
   #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
 
-      PROCEDURE Reset() CLASS TInterpreter
+      PROCEDURE Finalize() CLASS TInterpreter
 
          TraceLog( "Destructor: " + ::cName )
 

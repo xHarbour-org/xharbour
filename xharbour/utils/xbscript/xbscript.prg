@@ -741,8 +741,17 @@ PROCEDURE PP_Break( xVal )
 
 RETURN
 
-PROCEDURE PP_ResetStack()
+PROCEDURE PP_ResetStack( aProcedures )
 
+   LOCAL aProcedure
+
+   IF ! Empty( aProcedures )
+      FOR EACH aProcedure IN aProcedures
+         // Reset Stack Pointer
+         aProcedure[8] := NIL
+      NEXT
+   ENDIF
+   
    aSize( s_aProcStack, 0 )
 
 RETURN
