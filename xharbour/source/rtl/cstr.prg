@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.26 2005/05/27 22:19:51 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.27 2005/11/15 18:45:21 druzus Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ FUNCTION CStr( xExp )
          RETURN "{ " + xExp:ClassName() + " Object }"
 
       CASE 'P'
-         RETURN HB_NumToHex( xExp )
+         RETURN NumToHex( xExp )
 
       CASE 'H'
          RETURN "{ Hash of " +  LTrim( Str( Len( xExp ) ) ) + " Items }"
@@ -118,7 +118,7 @@ FUNCTION CStrToVal( cExp, cType )
          RETURN cExp
 
       CASE 'P'
-         RETURN HB_HexToNum( cExp )
+         RETURN HexToNum( cExp )
 
       CASE 'D'
          IF cExp[3] >= '0' .AND. cExp[3] <= '9' .AND. cExp[5] >= '0' .AND. cExp[5] <= '9'
@@ -228,7 +228,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN ValToPrgExp( xVal )
 
       CASE 'P'
-         RETURN "0x" + HB_NumToHex( xVal )
+         RETURN "0x" + NumToHex( xVal )
 
       CASE 'O'
          IF nPad == NIL
@@ -359,7 +359,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          RETURN cRet
 
       CASE 'P'
-         RETURN "HB_HexToNum('" + HB_NumToHex( xVal ) + "')"
+         RETURN "HexToNum('" + NumToHex( xVal ) + "')"
 
       CASE 'O'
          aVars := __objGetValueDiff( xVal )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.12 2004/08/13 11:11:58 alexstrickland Exp $
+ * $Id: hbhex2n.c,v 1.13 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -59,13 +59,26 @@
 #include "hbapierr.h"
 
 
-HB_FUNC( HB_NUMTOHEX )
+HB_FUNC( NUMTOHEX )
 {
-   int iCipher;
-   char ret[33];
-   int len = 33;
-   HB_ULONG ulNum;
-   if( ISNUM(1) )
+   int       iDigit;
+   char      ret[ 33 ];
+   int       iLen, iDefaultLen;
+   HB_ULONG  ulNum;
+
+   if( ISNUM( 2 ) )
+   {
+      iLen = hb_parni( 2 );
+      iLen = ( iLen < 1 ) ? 1 : ( ( iLen > 32 ) ? 32 : iLen );
+      iDefaultLen = 0;
+   }
+   else
+   {
+      iLen = 32;
+      iDefaultLen = 1;
+   }
+                    
+   if( ISNUM( 1 ) )
    {
       ulNum = hb_parnint( 1 );
    }
@@ -75,193 +88,165 @@ HB_FUNC( HB_NUMTOHEX )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_NUMTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "NUMTOHEX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
-   ret[--len] = '\0';
-   while ( ulNum > 0 )
-   {
-      iCipher = (int) (ulNum & 0x0f);
-      if ( iCipher < 10 )
-      {
-         ret[ --len ] = '0' + iCipher;
-      }
-      else
-      {
-         ret[ --len ] = 'A' + ( iCipher - 10 );
-      }
+
+   ret[ iLen ] = '\0';
+   do {
+      iDigit = (int) ( ulNum & 0x0F );
+      ret[ --iLen ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 ); 
       ulNum >>= 4;
-   }
-   hb_retc( &ret[ len ] );
+   } while ( iDefaultLen ? ulNum > 0 : iLen > 0 );
+
+   hb_retc( &ret[ iLen ] );
 }
 
 
-HB_FUNC( HB_HEXTONUM )
+HB_FUNC( HEXTONUM )
 {
-   HB_ULONG ulNum = 0;
-   char *cHex, c;
-   int iCipher;
+   HB_ULONG   ulNum = 0;
+   char       *cHex, c;
+   int        iDigit;
 
    if( ! ISCHAR(1) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTONUM", 1, hb_param(1,HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HEXTONUM", 1, hb_paramError( 1 ) );
       return;
    }
    cHex = hb_parc( 1 );
 
    while ( *cHex )
    {
-      c = *cHex;
       ulNum <<= 4;
+ 
+      c = *cHex;
       if ( c >= '0' && c <= '9' )
       {
-         iCipher = ( c - '0' );
+         iDigit = c - '0';
       }
       else if ( c >= 'A' && c <= 'F' )
       {
-         iCipher = ( c - 'A' ) + 10;
+         iDigit = c - 'A' + 10;
       }
       else if ( c >= 'a' && c <= 'f' )
       {
-         iCipher = ( c - 'a' ) + 10;
+         iDigit = c - 'a' + 10;
       }
       else
       {
          ulNum = 0;
          break;
       }
-      ulNum += iCipher;
+      ulNum += iDigit;
       cHex++;
    }
    hb_retnint( ulNum );
 }
 
-HB_FUNC( HB_STRTOHEX )
+
+HB_FUNC( STRTOHEX )
 {
-   char *outbuff;
-   char *cStr;
-   char *c;
-   USHORT iNum;
-   int i, len;
-   int iCipher;
+   char   *cOutBuf;
+   char   *cStr;
+   char   *c;
+   char   *cSep = "";
+   unsigned char  ucChar;
+   ULONG  ul, ulLen, ulLenSep = 0;
+   int    iDigit;
 
    if( ! ISCHAR(1) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_STRTOHEX", 1, hb_param(1,HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "STRTOHEX", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
       return;
    }
 
-   cStr = hb_parc( 1 );
-   len = (int) hb_parclen( 1 );
-   outbuff = (char *) hb_xgrab( (len * 2) + 1 );
-   c = outbuff;
-
-   for( i = 0; i < len; i++ )
+   if ( ISCHAR( 2 ) )
    {
-
-      iNum = (int) cStr[i];
-      c[0] = '0';
-      c[1] = '0';
-
-      iCipher = (int) (iNum % 16);
-
-      if ( iCipher < 10 )
-      {
-         c[1] = '0' + iCipher;
-      }
-      else
-      {
-         c[1] = 'A' + (iCipher - 10 );
-      }
-      iNum >>=4;
-
-      iCipher = iNum % 16;
-      if ( iCipher < 10 )
-      {
-         c[0] = '0' + iCipher;
-      }
-      else
-      {
-         c[0] = 'A' + (iCipher - 10 );
-      }
-
-      c+=2;
+     cSep = hb_parc( 2 );
+     ulLenSep = hb_parclen( 2 );
    }
+  
+   cStr = hb_parc( 1 );
+   ulLen = hb_parclen( 1 );
+   c = cOutBuf = (char*) hb_xgrab( ulLen * 2 + ( ulLen - 1 ) * ulLenSep + 1 );
 
-   outbuff[len*2] = '\0';
-   hb_retc( outbuff );
-   hb_xfree( outbuff );
+   for( ul = 0; ul < ulLen; ul++ )
+   {
+      if ( ulLenSep && ul )
+      {
+         memcpy( c, cSep, ulLenSep );
+         c += ulLenSep;
+      }
+
+      ucChar = (unsigned char) cStr[ ul ];
+
+      iDigit = (int) ( ucChar & 0x0F );
+      c[ 1 ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+
+      ucChar >>= 4;
+
+      iDigit = (int) ucChar;
+      c[ 0 ] = iDigit + ( iDigit < 10 ? '0' : 'A' - 10 );
+
+      c += 2;
+   }
+   hb_retclen( cOutBuf, c - cOutBuf );
+   hb_xfree( cOutBuf );
 }
 
-HB_FUNC( HB_HEXTOSTR )
+
+HB_FUNC( HEXTOSTR )
 {
-   char *outbuff;
-   char *cStr;
+   char *cOutBuf, *cStr;
    char c;
-   int i, len, nalloc;
-   int iCipher, iNum;
+   int  iByte, iFirst;
+   ULONG  ul, ulLen, ulPos, ulAlloc;
 
    if( ! ISCHAR(1) )
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HB_HEXTOSTR", 1, hb_param(1,HB_IT_ANY) );
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HEXTOSTR", 1, hb_paramError( 1 ) );
       return;
    }
 
    cStr = (char *) hb_parc( 1 );
-   len = (int) hb_parclen( 1 );
-   nalloc = (int) (len/2);
-   outbuff = (char *) hb_xgrab( nalloc + 1 );
+   ulLen = hb_parclen( 1 );
+   ulAlloc = (int) ( ulLen / 2 );
+   cOutBuf = (char *) hb_xgrab( ulAlloc + 1 );
 
-   for( i = 0; i < nalloc; i++ )
+   ulPos = 0;
+   iByte = 0;
+   iFirst = 1;
+
+   for ( ul = 0; ul < ulLen; ul++ )
    {
-      // First byte
+      iByte <<= 4;
 
-      c = *cStr;
-      iNum = 0;
-      iNum <<= 4;
-      iCipher = 0;
-
+      c = *cStr++;
       if ( c >= '0' && c <= '9' )
       {
-         iCipher = (ULONG) ( c - '0' );
+         iByte += c - '0';
       }
       else if ( c >= 'A' && c <= 'F' )
       {
-         iCipher = (ULONG) ( c - 'A' )+10;
+         iByte += c - 'A' + 10;
       }
       else if ( c >= 'a' && c <= 'f' )
       {
-         iCipher = (ULONG) ( c - 'a' )+10;
+         iByte += c - 'a' + 10;
       }
-
-      iNum += iCipher;
-      cStr++;
-
-      // Second byte
-
-      c = *cStr;
-      iNum <<= 4;
-      iCipher = 0;
-
-      if ( c >= '0' && c <= '9' )
+      else 
       {
-         iCipher = (ULONG) ( c - '0' );
-      }
-      else if ( c >= 'A' && c <= 'F' )
-      {
-         iCipher = (ULONG) ( c - 'A' )+10;
-      }
-      else if ( c >= 'a' && c <= 'f' )
-      {
-         iCipher = (ULONG) ( c - 'a' )+10;
+        continue;
       }
 
-      iNum += iCipher;
-      cStr++;
-      outbuff[i] = iNum;
+      iFirst ^= 1;
+      if ( iFirst )
+      {
+        cOutBuf[ ulPos++ ] = (char) iByte;
+        iByte = 0;
+      }
    }
-
-   outbuff[nalloc] = '\0';
-   hb_retclen( outbuff, nalloc );
-   hb_xfree( outbuff );
+   hb_retclen( cOutBuf, ulPos );
+   hb_xfree( cOutBuf );
 }

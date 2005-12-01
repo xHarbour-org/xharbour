@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4677 2005/11/30 06:43:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4678 2005/11/30 10:54:48 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-01 15:25 UTC+0200 Mindaugas Kavaliauskas (dbtopas/at/dbtopas.lt)
+  * xharbour/source/rtl/hbhex2n.c
+  * xharbour/source/rtl/cstr.c
+  * xharbour/source/rtl/tclass.c
+    * removed HB_ prefix and new exhancements implemented in 
+      NumToHex(), HexToNum(), StrToHex(), HexToStr().
+      NumToHex( nNumber [, nLen ] ): 
+         NumToHex( 300 )      // "12C"
+         NumToHex( 300, 2 )   // "2C" (as byte)
+         NumToHex( 300, 4 )   // "012C" (as word)
+         NumToHex( 300, 8 )   // "0000012C" (as long)
+      StrToHex( cString [, cSeparator ] ):
+        StrToHex( "Hello" )       // "48656C6C6F"
+        StrToHex( "Hello", " " )  // "48 65 6C 6C 6F"
+        StrToHex( "ETHMAC", ":" ) // "45:54:48:4D:41:43" (like ethernet MAC)
+      HexToStr() ignores invalid characters and it can be used for 
+      conversion of separated heximal strings:
+        HexToStr( "45:54:48:4D:41:43" )   // "ETHMAC"
 
 2005-11-30 08:46 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h
