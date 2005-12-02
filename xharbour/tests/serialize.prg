@@ -1,6 +1,6 @@
 ****************************************************
 * Serialize.prg
-* $Id: serialize.prg,v 1.8 2003/11/10 01:48:29 jonnymind Exp $
+* $Id: serialize.prg,v 1.9 2003/11/14 23:17:31 ronpinkas Exp $
 * Test for the hb_serial family function
 *
 * This serialization functions allow to store consistently any
@@ -40,6 +40,7 @@ PROCEDURE MAIN()
    cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 2100010101 )
+   altd()
    cTmp += HB_Serialize( {'a'=>'1', 'b'=> 2, 10 =>{1,2},  'z' =>{1=>2, 0=>3}  } )
    cTmp += HB_Serialize( SomeClass():New("A parameter") )
    cTmp += HB_Serialize( "Last String, closing test" )
@@ -103,7 +104,7 @@ CLASS SomeClass
 
    DATA cData PERSISTENT
 
-   METHOD New( cDt ) CONSTRUCTOR
+   METHOD New( cDt )
 
    METHOD SomeMethod()
 
@@ -113,10 +114,10 @@ METHOD SomeMethod() CLASS SomeClass
 
    ? ProcName() + '[' + LTrim( Str( ProcLine() ) ) + ']', ::cData
 
-RETURN .T.
+RETURN .t.
 
 METHOD New( cData ) CLASS SomeClass
 
    ::cData := cData
 
-RETURN .T.
+RETURN self

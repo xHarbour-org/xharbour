@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.60 2005/09/19 23:21:27 druzus Exp $
+# $Id: hb-func.sh,v 1.61 2005/11/14 22:48:18 lf_sfnet Exp $
 #
 
 # ---------------------------------------------------------------
@@ -432,9 +432,9 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        hb_cc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-        hb_cc "\$@" \${LINK_OPT} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 
