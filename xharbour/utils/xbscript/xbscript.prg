@@ -412,7 +412,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .0
+  #define REVISION .1
 #endif
 STATIC s_cVer := "2.0 RC1" + Stringify( REVISION )
 
