@@ -1,11 +1,11 @@
 /*
- * $Id: macrob.c,v 1.7 2004/05/24 07:34:01 ronpinkas Exp $
+ * $Id: macrob.c,v 1.8 2004/06/16 00:07:27 ronpinkas Exp $
  */
 
 /* hbexprb.c is also included from ../compiler/exproptb.c
  * However it produces a slighty different code if used in
  * macro compiler (there is an additional parameter passed to some functions)
- * 0 - ignore this magic number - this is used to force compilation
+ * 1.9 - ignore this revision number - this is used to force compilation
 */
 
 #define HB_MACRO_SUPPORT

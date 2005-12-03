@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.59 2005/11/16 07:19:52 ronpinkas Exp $
+ * $Id: macro.c,v 1.60 2005/11/19 19:12:23 ronpinkas Exp $
  */
 
 /*
@@ -72,7 +72,7 @@
 BOOL hb_comp_bShortCuts = TRUE;
 
 /* various flags for macro compiler */
-static ULONG s_macroFlags = HB_SM_SHORTCUTS;
+static ULONG s_macroFlags = HB_SM_HARBOUR | HB_SM_XBASE | HB_SM_SHORTCUTS;
 
 static void hb_macroUseAliased( HB_ITEM_PTR, HB_ITEM_PTR, int, BYTE );
 static void hb_compMemvarCheck( char * szVarName, HB_MACRO_DECL );
@@ -892,7 +892,7 @@ HB_FUNC( HB_MACROCOMPILE )
       pMacro->Flags     = HB_MACRO_DEALLOCATE | iFlags;
       pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
       pMacro->status    = HB_MACRO_CONT;
-      pMacro->supported = HB_SM_HARBOUR | HB_SM_SHORTCUTS;
+      pMacro->supported = HB_SM_HARBOUR | HB_SM_XBASE | HB_SM_SHORTCUTS;
 
       hb_comp_bShortCuts = pMacro->supported & HB_SM_SHORTCUTS;
 

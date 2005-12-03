@@ -87,6 +87,8 @@
    EXTERN dbClearRel
    REQUEST DBFFPT
 
+   #includ "hbmacro.ch"
+
    // Enable extended syntax.
    #ifdef __XHARBOUR__
       #ifndef NODYN
@@ -139,7 +141,7 @@
         #define HB_P_LINEOFFSET    134
 
         #define HB_P_WITHOBJECT    135
-        #define HB_P_ENDWITHOBJECT 136
+        #define HB_P_ENDWITHOBJECT 138
 
         #define HB_P_FOREACH       139
         #define HB_P_ENUMERATE     140
@@ -751,7 +753,7 @@ PROCEDURE PP_ResetStack( aProcedures )
          aProcedure[8] := NIL
       NEXT
    ENDIF
-   
+
    aSize( s_aProcStack, 0 )
 
 RETURN
@@ -1324,6 +1326,8 @@ RETURN
            #endif
 
            SetLine( aProcedure, nLine )
+
+           //TraceLog( nLine, sLine )
 
            cPCode := HB_MacroCompile( sLine, PP_CONTEXT_STATEMENT )
            cPCode[-1] := HB_P_NOOP
@@ -2374,10 +2378,14 @@ RETURN
 
   PROCEDURE FinalizeWithObject( aProcedure, nLine )
 
-     LOCAL aFlow := aProcedure[3]
+     //LOCAL aFlow := aProcedure[3][-1]
      LOCAL cPCode := aProcedure[2]
 
-     cPCode += Chr( HB_P_ENDWITHOBJECT )
+     IF cPCode[-1] == HB_P_NOOP
+        cPCode[-1] := HB_P_ENDWITHOBJECT
+     ELSE
+        cPCode += Chr( HB_P_ENDWITHOBJECT )
+     ENDIF
 
      aProcedure[2] := cPCode
 
@@ -12522,23 +12530,32 @@ RETURN oError
       s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
       s_cVer += " " + __TIME__
 
-      ASSOCIATE CLASS StringOle WITH TYPE CHARACTER
+      /*
+      HB_SetMacro( HB_SM_HARBOUR,   .T. )
+      HB_SetMacro( HB_SM_XBASE,     .T. )
+      HB_SetMacro( HB_SM_SHORTCUTS, .T. )
+      */
 
-      IF Type( "HB_GT_WVT()" ) == "UI"
-         nScreenWidth := &( "Wvt_GetScreenWidth()" )
+      #ifdef __XHARBOUR__
+        ASSOCIATE CLASS StringOle WITH TYPE CHARACTER
 
-         DO CASE
-            CASE nScreenWidth >= 1024
-               &( "Wvt_SetFont" )( 'Terminal', 20, 10 )
-            CASE nScreenWidth >= 800
-               &( "Wvt_SetFont" )( 'System', 16, 8, 600, 2 )
-            OTHERWISE
-               &(" Wvt_SetFont" )( 'Terminal', 12, 6 )
-         ENDCASE
 
-         &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
-         //SetMode( 25, 80 )
-      ENDIF
+        IF Type( "HB_GT_WVT()" ) == "UI"
+           nScreenWidth := &( "Wvt_GetScreenWidth()" )
+
+           DO CASE
+              CASE nScreenWidth >= 1024
+                 &( "Wvt_SetFont" )( 'Terminal', 20, 10 )
+              CASE nScreenWidth >= 800
+                 &( "Wvt_SetFont" )( 'System', 16, 8, 600, 2 )
+              OTHERWISE
+                 &(" Wvt_SetFont" )( 'Terminal', 12, 6 )
+           ENDCASE
+
+           &( "Wvt_SetCodePage" )( 255 )  // #define OEM_CHARSET 255 - from wingdi.h
+           //SetMode( 25, 80 )
+        ENDIF
+      #endif
 
    RETURN
    //--------------------------------------------------------------//

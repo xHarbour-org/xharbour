@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.105 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.106 2005/11/03 06:54:57 ronpinkas Exp $
  */
 
 /*
@@ -2918,6 +2918,7 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
              */
             hb_compWarnMeaningless( pSelf );
          }
+         break;
 
       case HB_EA_DELETE:
 #if defined( HB_MACRO_SUPPORT )
@@ -2929,7 +2930,14 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
             }
 
-            HB_XFREE( pSelf->value.asMessage.szMessage );
+            if( pSelf->value.asMessage.pMacroMessage )
+            {
+               HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
+            }
+            else if( pSelf->value.asMessage.szMessage )
+            {
+               HB_XFREE( pSelf->value.asMessage.szMessage );
+            }
          }
 #endif
          break;
