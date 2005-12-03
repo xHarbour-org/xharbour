@@ -1,12 +1,20 @@
 /*
- * $Id: ChangeLog,v 1.4681 2005/12/02 22:22:31 lculik Exp $
+ * $Id: ChangeLog,v 1.4682 2005/12/03 05:21:01 ronpinkas Exp $
  */
-
+                            
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-03 16:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * tests/cgitest/examples/website.ini
+    ! change to use xharbour internals
+  * tests/cgitest/examples/*.prg
+    ! changes all to work with new library
+  * source/cgi/thtm.prg
+    ! minor fix
 
 2005-12-02 21:20 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbexprb.c

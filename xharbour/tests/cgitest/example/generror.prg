@@ -11,9 +11,10 @@ LOCAL oCgi, cQuery
 SET DATE BRITISH
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
-      oCgi   := oCGI():New()
-      cQuery := UPPER(oCgi:query_String)
+      oCgi   := TCGI():New()
+      cQuery := UPPER(oCgi:query_String)          // just in case...
 ELSE
+      oCgi   := TCGI():New()
       cQuery := UPPER(GETENV("QUERY_STRING"))
 ENDIF
        
@@ -39,7 +40,8 @@ RETURN
 STATIC Function dbError( oCgi )
 LOCAL oHtm
 
-oHtm := HTML():CGINew( "userForm.html", "User Validation" )
+oHtm := THTML():CGINew( "userForm.html", "User Validation" )
+
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")
@@ -67,7 +69,7 @@ RETURN NIL
 STATIC Function StringError( oCgi )
 LOCAL oHtm
 
-oHtm := HTML():CGINew( "userForm.html", "User Validation" )
+oHtm := THTML():CGINew( "userForm.html", "User Validation" )
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")
@@ -104,7 +106,7 @@ RETURN NIL
 
 PROCEDURE BlankPage( oCgi )
 LOCAL oHtm
-oHtm := HTML():CGINew(, "ACTION Error !!!" )
+oHtm := THTML():CGINew(, "ACTION Error !!!" )
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")

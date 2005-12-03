@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.3 2005/10/14 07:25:11 lf_sfnet Exp $
+ * $Id: thtm.prg,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -267,8 +267,9 @@ METHOD New( cFile, cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    DEFAULT cLinkTitle TO cTitle
    DEFAULT cRefreshURL TO ""
    DEFAULT cCharset TO "windows-1253"
-
+   tracelog(cFile)
    ::nH    := Fcreate( cFile )
+   tracelog(::nh)
    ::Title := cTitle
    ::FName := cFile
 

@@ -15,10 +15,10 @@ SET DATE BRITISH
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
    lIsPost := .T.
-      oCgi := TCgioCGI():New()     // get server parameters/variables
+      oCgi := TCGI():New()     // get server parameters/variables
 ENDIF
 
-oHtm := TCGIHTML():CGINew( "Counter.htm", "My Counter File" )
+oHtm := THTML():CGINew( "Counter.htm", "My Counter File" )
 
 oHtm:SetPageColor(CLR_DARK_YELLOW )  //"#FFFFCC")
 oHtm:SetTextColor(CLR_WHITE)

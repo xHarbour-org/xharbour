@@ -24,8 +24,8 @@ ENDIF
 
 IF "%" $ cCmd
 
-   cCmd := DecodeURL( cCmd )
-   aCmd := listAsArray( cCmd, " ")
+   cCmd := HTMLDecodeURL( cCmd )
+   aCmd := HB_ATOKENS( cCmd, " ")
    cCmd := aCmd[1]
 
    IF LEN( aCmd ) > 1
@@ -33,7 +33,7 @@ IF "%" $ cCmd
       cSiteRoot := aCmd[2]
 
       IF EMPTY( cSiteRoot )
-         cSiteRoot := "c:\web\"
+         cSiteRoot := "c:\apache2\htdocs"
       ENDIF
 
    ENDIF
@@ -44,18 +44,16 @@ scCmd := cCmd
 
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(oCgi:query_String)          // just in case...
 ELSE
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(GETENV("QUERY_STRING"))
 ENDIF
 
 scQuery := cQuery
 
-soIni := oIni():New("website.ini")
-soIni:read()
-soIni:close()
+soIni := hb_readini("website.ini")
 
 //
 //  simple redirection based on command line arguments.
@@ -254,7 +252,7 @@ RETURN
 PROCEDURE BlankPage( oCgi )
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 LOCAL oHtm
-oHtm := HTML():CGINew(, "ACTION Error !!!" )
+oHtm := THTML():CGINew(, "ACTION Error !!!" )
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")

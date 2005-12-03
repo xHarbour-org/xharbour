@@ -23,8 +23,8 @@ ENDIF
 // the following code solves this problem:
 
 IF "%" $ cCmd
-   cCmd := DecodeURL( cCmd )
-   aCmd := listAsArray( cCmd, " ")
+   cCmd := HTMLDecodeURL( cCmd )
+   aCmd := HB_ATOKENS( cCmd, " ")
    cCmd := aCmd[1]
    IF LEN( aCmd ) > 1
       cRecno := aCmd[2]
@@ -35,10 +35,10 @@ scCmd := cCmd
 
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(oCgi:query_String)          // just in case...
 ELSE
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(GETENV("QUERY_STRING"))
 ENDIF
 
@@ -143,7 +143,7 @@ RETURN
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 PROC GetAddbk(oCgi, cRecno)
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-LOCAL oHtm := HTML():CGINew(, "Browse AddressBook" )
+LOCAL oHtm := THTML():CGINew(, "Browse AddressBook" )
 LOCAL oForm
 LOCAL oFNAME
 LOCAL oLNAME
@@ -330,7 +330,7 @@ PROCEDURE BlankPage( oCgi )
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 LOCAL oHtm
 
-oHtm := HTML():CGINew(, "ACTION Error !!!" )
+oHtm := THTML():CGINew(, "ACTION Error !!!" )
 
 oHtm:SetPageColor("white")
 oHtm:SetTextColor("black")

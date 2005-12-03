@@ -19,8 +19,8 @@ IF cCmd == NIL
 ENDIF
 
 IF "%" $ cCmd
-   cCmd := DecodeURL( cCmd )
-   aCmd := listAsArray( cCmd, " ")
+   cCmd := HTMLDecodeURL( cCmd )
+   aCmd := HB_ATOKENS( cCmd, " ")
    cCmd := aCmd[1]
    IF LEN( aCmd ) > 1
       cRecno := aCmd[2]
@@ -31,19 +31,16 @@ scCmd := cCmd
 
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(oCgi:query_String)          // just in case...
 ELSE
-      oCgi   := oCGI():New()
+      oCgi   := TCGI():New()
       cQuery := UPPER(GETENV("QUERY_STRING"))
 ENDIF
 
 scQuery := cQuery
 
-soIni := oIni():New("website.ini")
-soIni:read()
-soIni:close()
-
+soIni := hb_readini("website.ini")
 
 //
 //  simple redirection based on command line arguments.
@@ -1258,7 +1255,7 @@ IF VALTYPE(cCur) == "C" .AND. ;
       RETURN
    ENDIF
 
-   oHtm := HTML():CGINew(, "Success !!!" )
+   oHtm := THTML():CGINew(, "Success !!!" )
      
    oHtm:SetPageColor("white")
    oHtm:SetTextColor("black")

@@ -1,15 +1,15 @@
-#include "default.ch"
+
 #include "html.ch"
-#include "forms.ch"
+#include "htmlform.ch"
 
 // addresses
-#define WEB_ROOT          soIni:get("general","webSiteRoot", "c:\web\")
-#define WEB_EMAIL         soIni:get("info","email")
+#define WEB_ROOT          IniGet("general","webSiteRoot", "c:\apache2\htdocs")
+#define WEB_EMAIL         IniGet("info","email")
 
 // images
-#define COMMON_BGIMAGE    soIni:get("common", "bgImage")
-#define COMMON_BGCOLOR    soIni:get("common","bgColor")
-#define COMMON_EMAIL      soIni:get("common", "email")
-#define COMMON_SIDEBAR    soIni:Get("common","sideBar")
-#define COMMON_LOGO       soIni:Get("common","logo")
+#define COMMON_BGIMAGE    IniGet("common", "bgImage")
+#define COMMON_BGCOLOR    IniGet("common","bgColor")
+#define COMMON_EMAIL      IniGet("common", "email")
+#define COMMON_SIDEBAR    IniGet("common","sideBar")
+#define COMMON_LOGO       IniGet("common","logo")
 #define COMMON_COUNTER    "/images/counters/counter0/"
