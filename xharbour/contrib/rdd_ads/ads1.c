@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.92 2005/11/12 03:35:55 druzus Exp $
+ * $Id: ads1.c,v 1.93 2005/11/16 12:16:38 druzus Exp $
  */
 
 /*
@@ -3918,7 +3918,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
       if( bValidExpr )
       {
-         char * szFilter = hb_adsOemToAnsi( pucFilter, 
+         char * szFilter = hb_adsOemToAnsi( pucFilter,
                                  hb_itemGetCLen( pFilterInfo->abFilterText ) );
 
          if( hb_set.HB_SET_OPTIMIZE )

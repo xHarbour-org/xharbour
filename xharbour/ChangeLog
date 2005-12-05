@@ -1,12 +1,28 @@
 /*
- * $Id: ChangeLog,v 1.4682 2005/12/03 05:21:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4683 2005/12/03 18:22:55 lculik Exp $
  */
-                            
+
 /* Use this format for the entry headers:
    YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-05 12:57 UTC-0800 Tony Bretado <tony@bretado.com>
+  * contrib/rdd_ads/AdsMgmnt.c
+    ! Fix AdsMgGetUserNames()
+        Now Returns a 2-D array of information about users currently
+        connected to the Advantage Database Server. The length of the first
+        dimension of the array will be equal to the number of users (Up to 2000) who either
+        have the specified table open, who have the specified index open, or
+        who are connected.  The second dimension of the array has Three elements
+        containing:
+                [n][1] = (string)  Name of the connected user
+                [n][2] = (numeric) NetWare connection number. Only Applicable to ADS for Netware.
+                [n][3] = (string)  IP or IPX address of user.
+
+    * AdsMgKillUser()
+        Now Returns an UNSIGNED16 indicating the error number or 0 when user got killed ok.
 
 2005-12-03 16:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * tests/cgitest/examples/website.ini

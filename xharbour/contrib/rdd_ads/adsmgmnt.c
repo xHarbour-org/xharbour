@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.8 2005/04/15 22:34:17 what32 Exp $
+ * $Id: adsmgmnt.c,v 1.9 2005/10/10 08:19:05 brianhays Exp $
  */
 
 /*
@@ -370,10 +370,20 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 {
 
    UNSIGNED32  ulRetVal;
-   UNSIGNED16  ulMaxUsers = 100;        /* needed for array memory allocation; caller can set with 2nd arg */
+   UNSIGNED16  ulMaxUsers = 2000;        /* needed for array memory allocation; caller can set with 2nd arg */
    UNSIGNED16  ulCount;
    UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
    ADS_MGMT_USER_INFO * pastUserInfo;
+
+   HB_ITEM ArrayUser, SubItems, Name, Conn, Addr;
+
+   ArrayUser.type = HB_IT_NIL;
+   SubItems.type  = HB_IT_NIL;
+   Name.type      = HB_IT_NIL;
+   Conn.type      = HB_IT_NIL;
+   Addr.type      = HB_IT_NIL;
+
+   hb_arrayNew( &ArrayUser, 0 );
 /*
 //   ADS_MGMT_USER_INFO  astUserInfo[MAX_NUM_USERS];
 // bh:  Enhancement:  Get # of tables from ADS_MGMT_ACTIVITY_INFO.stUsers instead of set size
@@ -404,11 +414,23 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
       */
    if ( ulRetVal == AE_SUCCESS )
    {
-      hb_reta( ulMaxUsers );
       for ( ulCount = 0; ulCount < ulMaxUsers; ulCount++ )
       {
-         hb_storc( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1 );
+//         hb_storc( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1 );
+
+         hb_arrayNew( &SubItems, 0 );
+
+         hb_itemPutC( &Name, pastUserInfo[ulCount].aucUserName );
+         hb_itemPutNL(&Conn, pastUserInfo[ulCount].usConnNumber );
+         hb_itemPutC( &Addr, pastUserInfo[ulCount].aucAddress );
+
+         hb_arrayAddForward( &SubItems, &Name ) ;
+         hb_arrayAddForward( &SubItems, &Conn ) ;
+         hb_arrayAddForward( &SubItems, &Addr ) ;
+         hb_arrayAddForward( &ArrayUser, &SubItems );
       }
+
+      hb_itemReturnForward( &ArrayUser );
    }
    else
    {
@@ -519,7 +541,7 @@ HB_FUNC( ADSMGKILLUSER )
 */
 HB_FUNC( ADSMGKILLUSER )
 {
-   AdsMgKillUser( hMgmtHandle, (UNSIGNED8 *) hb_parc(1), (UNSIGNED16) hb_parnl(2) );
+   hb_retnl( (UNSIGNED16) AdsMgKillUser( hMgmtHandle, (UNSIGNED8 *) hb_parc(1), (UNSIGNED16) hb_parnl(2) ));
 }
 
 HB_FUNC( ADSMGGETHANDLE )
