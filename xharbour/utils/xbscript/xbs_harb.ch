@@ -53,8 +53,9 @@
      DATA aCommRules, aCommResults
      DATA lRunLoaded, lClsLoaded, lFWLoaded
 
+     DATA nNextDynProc         INIT 1
+
      #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
-        DATA lConciled         INIT .F.
         DATA pDynList
      #endif
 
@@ -62,7 +63,7 @@
 
      METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
      METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
-     METHOD SetScript( cText, nStartLine, cName )       INLINE ( ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
+     METHOD SetScript( cText, nStartLine, cName )       INLINE ( IIF( Empty( ::cText ), , ::nNextDynProc := 1 ), ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -107,7 +108,7 @@
 
       PROCEDURE Finalize() CLASS TInterpreter
 
-         TraceLog( "Destructor: " + ::cName )
+         //TraceLog( ::nId, ::cName )
 
          IF ::pDynList != NIL
             PP_ReleaseDynProcedures( 0, ::pDynList )
@@ -255,15 +256,16 @@
            ENDIF
 
            #ifdef __CONCILE_PCODE__
-              IF ! ::lConciled
-                 ::lConciled := .T.
-                 ::pDynList := ConcileProcedures( ::aCompiledProcs )
+              IF ::nNextDynProc <= Len( ::aCompiledProcs )
+                 //TraceLog( ::nID, ::cName, ::aCompiledProcs, ::nNextStartProc )
+                 ConcileProcedures( ::aCompiledProcs, ::nNextDynProc, @::pDynList )
+                 ::nNextDynProc := Len( ::aCompiledProcs ) + 1
               ENDIF
            #else
              #ifdef DYN
-                 IF ! ::lConciled
-                    ::lConciled := .T.
-                    PP_GenDynProcedures( ::aCompiledProcs, 1, @::pDynList )
+                 IF ::nNextDynProc <= Len( ::aCompiledProcs )
+                    PP_GenDynProcedures( ::aCompiledProcs, ::nNextDynProc, @::pDynList )
+                    ::nNextDynProc := Len( ::aCompiledProcs ) + 1
                  ENDIF
              #endif
            #endif
@@ -2163,7 +2165,7 @@
         typedef struct
         {
            int iProcs;
-           DYN_PROC pProcsArray[];
+           DYN_PROC pProcsArray[1]; // Compile time only!!!
         } DYN_PROCS_LIST;
 
         static DYN_PROCS_LIST *s_pDynList = NULL;
@@ -2374,8 +2376,10 @@
               }
               else
               {
-                 TraceLog( "ppgendyn.log", "*** FUNCTION MISMATCH ***\n" );
+                 TraceLog( "ppgendyn.log", "*** FUNCTION MISMATCH (%i) '%s' ***\n", i, pDynList->pProcsArray[i].pDynSym->pSymbol->szName );
               }
+
+              //TraceLog( "ppgendyn.log", "PP_RELEASEDYNPROCEDURES (%i) '%s' ***\n", i, pDynList->pProcsArray[i].pDynSym->pSymbol->szName );
 
               #ifdef __CONCILE_PCODE__
                  // pcode was not allocated here.

@@ -412,7 +412,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .1
+  #define REVISION .2
 #endif
 STATIC s_cVer := "2.0 RC1" + Stringify( REVISION )
 
@@ -795,14 +795,13 @@ RETURN
 
   //--------------------------------------------------------------//
 
-  FUNCTION ConcileProcedures( aProcedures )
+  FUNCTION ConcileProcedures( aProcedures, nDynOffset, pDynFunctions )
 
      STATIC s_aProcsContainer := {}
      LOCAL  s_hDynFuncLists := Hash()
 
      LOCAL cPCode
      LOCAL aProcedure
-     LOCAL pDynFunctions
      LOCAL cID := CStr( HB_ArrayID( aProcedures ) )
 
      // Last processed not validfated.
@@ -826,13 +825,17 @@ RETURN
      NEXT
 
      IF hScan( s_hDynFuncLists, cID ) == 0
-        s_hDynFuncLists[ cID ] := 0
+        s_hDynFuncLists[ cID ] := pDynFunctions
      ENDIF
 
      pDynFunctions := s_hDynFuncLists[ cID ]
 
+     IF Empty( nDynOffset )
+        nDynOffset := 1
+     ENDIF
+
      //Alert( "Generating" )
-     PP_GenDynProcedures( aProcedures, 1, @pDynFunctions )
+     PP_GenDynProcedures( aProcedures, nDynOffset, @pDynFunctions )
 
      s_hDynFuncLists[ cID ] := pDynFunctions
 
@@ -12152,7 +12155,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    LOCAL aProc, bPreset, aPresetProcedures
 
    #ifdef __CONCILE_PCODE__
-      LOCAL cParamList, cParam
+      LOCAL cParamList, xParam
    #endif
 
    #ifdef DEBUG_PCODE
@@ -12198,12 +12201,16 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
                IF ! Empty( s_aParams )
                   cParamList := ""
 
-                  FOR EACH cParam IN s_aParams
-                     IF ! cParam[1] IN E"'\"["
-                        cParam := '"' + cParam + '"'
+                  FOR EACH xParam IN s_aParams
+                     IF ValType( xParam ) == 'C'
+                        IF ! xParam[1] IN E"'\"["
+                           xParam := '"' + xParam + '"'
+                        ENDIF
+                     ELSE
+                        xParam := ValToPrgExp( xParam )
                      ENDIF
 
-                     cParamList += cParam + ','
+                     cParamList += xParam + ','
                   NEXT
 
                   cParamList[-1] := ' '
