@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.67 2005/10/29 06:45:02 druzus Exp $
+ * $Id: errorapi.c,v 1.68 2005/12/06 07:19:10 ronpinkas Exp $
  */
 
 /*
@@ -1557,7 +1557,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, const char * szText, const char 
    /* release console settings */
    hb_conRelease();
 
-   if( 1 || hb_cmdargCheck( "ERRGPF" ) )
+   if( hb_cmdargCheck( "ERRGPF" ) )
    {
        int *pGPF = NULL;
        *pGPF = 0;
