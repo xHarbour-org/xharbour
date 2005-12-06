@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.9 2005/10/10 08:19:05 brianhays Exp $
+ * $Id: adsmgmnt.c,v 1.10 2005/12/05 21:41:48 jabrecer Exp $
  */
 
 /*
@@ -54,6 +54,9 @@
 #define HB_OS_WIN_32_USED
 
 #include "rddads.h"
+
+#include "hbapi.h"
+#include "hbapiitm.h"
 
 
 /*
@@ -420,9 +423,9 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 
          hb_arrayNew( &SubItems, 0 );
 
-         hb_itemPutC( &Name, pastUserInfo[ulCount].aucUserName );
+         hb_itemPutC( &Name, (char *) pastUserInfo[ulCount].aucUserName );
          hb_itemPutNL(&Conn, pastUserInfo[ulCount].usConnNumber );
-         hb_itemPutC( &Addr, pastUserInfo[ulCount].aucAddress );
+         hb_itemPutC( &Addr, (char *) pastUserInfo[ulCount].aucAddress );
 
          hb_arrayAddForward( &SubItems, &Name ) ;
          hb_arrayAddForward( &SubItems, &Conn ) ;
