@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4685 2005/12/06 07:19:05 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4686 2005/12/06 20:54:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-07 09:29 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/achoice.prg
+    ! Uncommented line (I had commented) for re-positioning cursor.
+    ! Text-color selection moved out to "lOut" IF structure (color
+      will be assigned although the IF is not processed).
 
 2005-12-06 12:54 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbsclass.ch

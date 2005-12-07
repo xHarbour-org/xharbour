@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.28 2005/05/13 01:30:32 jabrecer Exp $
+ * $Id: achoice.prg,v 1.29 2005/11/30 03:45:39 guerra000 Exp $
  */
 
 /*
@@ -401,8 +401,7 @@ LOCAL nBottom
             ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .F. )
          ENDIF
       ENDIF
-      // Since it will not hilite selected item, it's useless
-      // ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .F. )
+      ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .F. )
    ENDIF
 RETURN ( nBounce != 2 )
 
@@ -425,8 +424,8 @@ LOCAL nCurOption
          nFrom++
       ENDDO
       DispEnd()
-      ColorSelect( CLR_STANDARD )
    ENDIF
+   ColorSelect( CLR_STANDARD )
    SetPos( ::nTop + ::nOption - ::nFirstRow, ::nLeft )
 RETURN nil
 
