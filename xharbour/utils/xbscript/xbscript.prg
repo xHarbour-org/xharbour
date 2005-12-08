@@ -412,7 +412,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .2
+  #define REVISION .3
 #endif
 STATIC s_cVer := "2.0 RC1" + Stringify( REVISION )
 
@@ -1667,7 +1667,7 @@ RETURN
           ELSE
         #endif
              aFlow[6] := Len( aProcedure[2] ) + 1
-          #ifdef OPTIMIZE_SETLINE
+        #ifdef OPTIMIZE_SETLINE
           ENDIF
         #endif
      ENDIF
@@ -1860,6 +1860,9 @@ RETURN
 
      IF aFlow[1] == 'S'
         cPCode += Chr( HB_P_POP )
+     ELSE
+        // Incase there will be no more code.
+        cPCode += Chr( HB_P_NOOP )
      ENDIF
 
      aProcedure[2] := cPCode

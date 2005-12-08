@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.101 2005/11/25 18:45:37 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.102 2005/11/26 22:18:07 ronpinkas Exp $
  */
 
 /*
@@ -1254,7 +1254,14 @@ RETURN Self
         {
            char *sString = WideToAnsi( pVariant->n1.n2.n3.bstrVal );
 
-           hb_itemPutCPtr( pItem, sString, strlen( sString ) );
+           if( sString )
+           {
+              hb_itemPutCPtr( pItem, sString, strlen( sString ) );
+           }
+           else
+           {
+              hb_itemPutC( pItem, NULL );
+           }
 
            break;
         }
