@@ -798,9 +798,8 @@ RETURN
   FUNCTION ConcileProcedures( aProcedures, nDynOffset, pDynFunctions )
 
      STATIC s_aProcsContainer := {}
-     LOCAL  s_hDynFuncLists := Hash()
 
-     LOCAL cPCode
+     LOCAL s_hDynFuncLists := Hash()
      LOCAL aProcedure
      LOCAL cID := CStr( HB_ArrayID( aProcedures ) )
 
@@ -811,17 +810,7 @@ RETURN
         //TraceLog( aProcedure[1] )
         aAdd( s_aProcsContainer, aProcedure )
 
-        cPCode := aProcedure[2]
-
-        IF cPCode[-1] == Chr( HB_P_NOOP )
-           cPCode[-1] := HB_P_ENDPROC
-        ELSEIF cPCode[-1] == Chr( HB_P_ENDPROC )
-           //
-        ELSE
-           cPCode += Chr( HB_P_ENDPROC )
-        ENDIF
-
-        aProcedure[2] := cPCode
+        aProcedure[2] += Chr( HB_P_ENDPROC )
      NEXT
 
      IF hScan( s_hDynFuncLists, cID ) == 0
@@ -1860,9 +1849,6 @@ RETURN
 
      IF aFlow[1] == 'S'
         cPCode += Chr( HB_P_POP )
-     ELSE
-        // Incase there will be no more code.
-        cPCode += Chr( HB_P_NOOP )
      ENDIF
 
      aProcedure[2] := cPCode
