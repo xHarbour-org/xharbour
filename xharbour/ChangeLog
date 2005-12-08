@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4688 2005/12/08 03:36:54 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4689 2005/12/08 04:50:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-08 20:00 UTC+0100 Henryk Olkowski <oh1@op.pl>
+  ! fixed use MROW(),MROW() and CT3 Windows
+
+  * source/include/ctwin.ch
+     ! removed CTWINON, CTWINOFF
+  * source/include/hbapigt.h
+  * source/rtl/gtapi.c
+     ! added new C functions:   hb_ctMouseCol() hb_ctMouseRow()
+     ! added new PRG functions: WMCol() WMRow() WMSetPos() WSetMouse() WInfo()
+     ! fixed hb_ctExit(): removed use hb_ctWAClose()
+     ! fixed hb_ctWSelect(): Window-0 not moved
+  * source/rtl/alert.prg
+  * source/rtl/listbox.prg
+  * source/rtl/menuto.prg
+  * source/rtl/tbrowse.prg
+  * source/rtl/teditor.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/ttopbar.prg
+     ! replaced: MCOL() ==> WMCol()
+     ! replaced: MROW() ==> WMRow()
+  + tests/cttest/wmrow.prg
+     ! test WMROW(), WMCOL(), WSTACK(), WINFO()
 
 2005-12-07 20:49 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg

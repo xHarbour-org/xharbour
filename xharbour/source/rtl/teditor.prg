@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.64 2005/07/11 04:13:40 peterrees Exp $
+/* $Id: teditor.prg,v 1.65 2005/09/20 06:23:31 vouchcac Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.64 2005/07/11 04:13:40 peterrees Exp $
+/* $Id: teditor.prg,v 1.65 2005/09/20 06:23:31 vouchcac Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -976,8 +976,8 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
    Switch nKey
    case K_LBUTTONUP
 
-      nRow := mRow()
-      nCol := mCol()
+      nRow := WMRow()
+      nCol := WMCol()
 
       if ( nRow >= ::nTop .and. nRow <= ::nBottom )
          if nCol >= ::nLeft .and. nCol <= ::nRight

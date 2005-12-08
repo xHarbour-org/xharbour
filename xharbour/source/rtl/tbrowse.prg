@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.137 2005/11/23 17:16:47 mauriliolongo Exp $
+ * $Id: tbrowse.prg,v 1.138 2005/11/25 13:49:34 mauriliolongo Exp $
  */
 
 /*
@@ -3034,7 +3034,7 @@ METHOD InitKeys( o ) CLASS TBrowse
               { K_RIGHT,       {| oB, nKey | oB:Right()   , 0 } } ,;
               { K_UP,          {| oB, nKey | oB:Up()      , 0 } } ,;
               { K_ESC,         {| oB, nKey | -1               } } ,;
-              { K_LBUTTONDOWN, {| oB, nKey | tbmouse( ob, mrow(), mcol() ) } } }
+              { K_LBUTTONDOWN, {| oB, nKey | tbmouse( ob, WMRow(), WMCol() ) } } }
 Return o
 
 //-------------------------------------------------------------------//
@@ -3319,4 +3319,3 @@ Return TBrowse():New( nTop, nLeft, nBottom, nRight )
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
-

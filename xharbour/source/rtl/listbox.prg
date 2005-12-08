@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.19 2004/07/14 22:44:18 paultucker Exp $
+ * $Id: listbox.prg,v 1.20 2004/07/30 11:42:44 maurifull Exp $
  */
 
 /*
@@ -547,10 +547,10 @@ Method _SCROLL( nMethod ) Class HBListBox
 
    Switch nMethod
       CASE HTSCROLLTHUMBDRAG
-         nMouseRow := Mrow()
+         nMouseRow := WMRow()
          Do While ( ( nKey := Inkey( 0 ) ) != 1003 )
             IF nKey == K_MOUSEMOVE
-               nMouRow := Mrow()
+               nMouRow := WMRow()
                IF nMouRow <=::vScroll:start()
                   nMouRow :=::vScroll:start() + 1
                ENDIF

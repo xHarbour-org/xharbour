@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.41 2005/06/13 02:02:47 peterrees Exp $
+ * $Id: hbapigt.h,v 1.42 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -365,6 +365,8 @@ extern SHORT      HB_EXPORT  hb_ctSetPos( SHORT iRow, SHORT iCol );
 extern SHORT      HB_EXPORT  hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
 extern SHORT      HB_EXPORT  hb_ctMaxCol( BOOL lMode );
 extern SHORT      HB_EXPORT  hb_ctMaxRow( BOOL lMode );
+extern int        HB_EXPORT  hb_ctMouseCol( void );
+extern int        HB_EXPORT  hb_ctMouseRow( void );
 extern SHORT      HB_EXPORT  hb_ctWAClose( void );
 extern SHORT      HB_EXPORT  hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
 extern SHORT      HB_EXPORT  hb_ctWCenter( BOOL WCen );

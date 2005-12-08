@@ -1,5 +1,5 @@
 /*
- * $Id: menuto.prg,v 1.12 2004/02/13 16:55:31 jonnymind Exp $
+ * $Id: menuto.prg,v 1.13 2005/06/13 02:02:50 peterrees Exp $
  */
 
 /*
@@ -197,14 +197,16 @@ function __MenuTo( bBlock, cVariable )
          Switch nKey
 
          case K_MOUSEMOVE
-            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], mrow(), mcol()) ) > 0 )
+            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], ;
+                   WMRow(), WMCol()) ) > 0 )
                 n := nMouseClik
             endif
             EXIT
 
          case K_LBUTTONDOWN
          case K_LDBLCLK
-            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], mrow(), mcol()) ) > 0 )
+            if ( ( nMouseClik := hittest(s_aLevel[ nPointer-1 ], ;
+                   WMRow(), WMCol()) ) > 0 )
                 n := nMouseClik
             endif
             /** JC: TEMPORARY CHANGE
@@ -300,4 +302,3 @@ static function HITTEST( aMenu, nMouseRow, nMouseCol )
 //     nPos++
    NEXT
    return 0
-

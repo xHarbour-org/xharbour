@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.8 2005/03/18 16:39:29 maurifull Exp $
+ * $Id: ttopbar.prg,v 1.9 2005/10/01 20:45:26 lculik Exp $
  */
 
 /*
@@ -100,7 +100,7 @@ RETURN oTopMenu:Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
 //--------------------------------------------------------------------------//
 FUNCTION TopBar( nRow, nLeft, nRight )
 
- 
+
    LOCAL oTopBar := nil
 
    IF ISNUMBER( nRow ) .AND. ISNUMBER( nLeft ) .AND. ISNUMBER( nRight )
@@ -556,7 +556,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          SET( _SET_EVENTMASK, nEvent )
 
          IF ( nKey == K_LBUTTONDOWN .OR. nKey == K_LDBLCLK )
-            nSelection := ::HitTest( MRow(), MCol() )
+            nSelection := ::HitTest( WMRow(), WMCol() )
 
          ELSEIF ( ( nSelection := ::GetAccel( nKey ) ) != 0 )
 
@@ -780,7 +780,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          IF ( ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem ) )
             // Added the following to test Get System HitTest():
             IF ( !( GetList == NIL ) .AND. ;
-               HitTest( GetList, MROW(), MCOL(), oMenuMsg:aMsg ) != 0 )
+               HitTest( GetList, WMRow(), WMCol(), oMenuMsg:aMsg ) != 0 )
                GETACTIVE():ExitState := GE_MOUSEHIT
                // Reset Get System values:
                // ReadStats( SNLASTEXIT, GE_MOUSEHIT )
@@ -829,7 +829,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          lLeftDown := .T.
          EXIT
 
-      case K_LBUTTONUP 
+      case K_LBUTTONUP
          //====== mouse left button release.
 
          lLeftDown := .F.
@@ -874,7 +874,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
                @ 20, 70 SAY STR( nNewItem, 3 )
                INKEY(0)
                @ 20, 70 SAY SPACE( 3 ) */
-         
+
                IF ( ! ::PushMenu( .T. ) )
                   oMenuMsg:Show( Self, .F. )
                   nRETURN := ::Execute()
@@ -1102,7 +1102,7 @@ METHOD Execute() CLASS TopBarMenu
          SETCURSOR( ::nOldCursor )
          EVAL( oNewMenu:Data, oNewMenu )
          SETCURSOR( SC_NONE )
-         
+
       ENDIF
 
       RETURN ( oNewMenu:Id )
@@ -1123,7 +1123,7 @@ METHOD MHitTest( oNewMenu, nNewLevel, nNewItem ) CLASS TopBarMenu
 
    FOR nNewLevel := ::nMenuLevel TO 1 STEP -1
       oNewMenu   := ::aMenuList[ nNewLevel ]
-      nNewItem   := oNewMenu:HitTest( mRow(), mCol() )
+      nNewItem   := oNewMenu:HitTest( WMRow(), WMCol() )
       IF ( nNewItem < 0 )
          // Test for the mouse on Menu separator or border
          RETURN ( .F. )
