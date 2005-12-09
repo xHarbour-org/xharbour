@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.178 2005/11/16 12:16:45 druzus Exp $
+ * $Id: classes.c,v 1.179 2005/11/26 22:18:07 ronpinkas Exp $
  */
 
 /*
@@ -3737,6 +3737,7 @@ static HARBOUR hb___msgDelegate( void )
             }
          }
       }
+      pSelf = pObject;
    }
 
    if( pSelf )
@@ -3747,7 +3748,7 @@ static HARBOUR hb___msgDelegate( void )
       {
          pClass = s_pClasses + uiClass - 1;
 
-         if( uiIndex && pClass->uiMethods <= uiIndex )
+         if( uiIndex && pClass->uiMethods >= uiIndex )
          {
             pMethod = pClass->pMethods + uiIndex - 1;
 
