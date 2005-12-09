@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.11 2005/11/06 23:15:44 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.12 2005/11/07 00:39:04 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-09 18:30 UTC-0300 Laverson Espindola <laverson.espindola@newage-software.com.br>
+  * source\gdwrp.c
+    ! Added missing castings to make MSVC happy
+  * make_vc.bat
+  * makefile.nt
+    + Added MSVC building files
+  * makemsvcimport.bat
+    + Utility to create import lib from GD DLL
+  * source\gdbar.prg
+  * source\gdbarcode.prg
+    + Added barcode generation routines
+  * samples\barcode\bartest.prg
+  * samples\barcode\bldtest.bat
+  * samples\barcode\bldtestvc.bat
+    + Added barcode sample
+  * README.txt
+  * MAKEFILE.BC
+    ! Updated with BarCode stuff
 
 2005-11-07 01:37 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
 

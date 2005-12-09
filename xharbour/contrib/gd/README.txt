@@ -1,5 +1,5 @@
 /*
- * $Id: README.txt,v 1.4 2005/10/31 00:27:45 fsgiudice Exp $
+ * $Id: README.txt,v 1.5 2005/11/07 00:39:04 fsgiudice Exp $
  */
 
 /*
@@ -70,6 +70,7 @@ gdtestcls.prg   is a GDImage/GDChart Class test application
 test_out.prg    is a sample of a cgi application for windows (I have to complete it).
 antialiased.prg shows how apply anti-alias to lines.
 animgif.prg     is a sample to create an animated gif.
+bartest.prg     is a sample to create barcodes with GD Library.
 
 in sample folder:
 counter.prg     is sample applications of a graphic web counter.

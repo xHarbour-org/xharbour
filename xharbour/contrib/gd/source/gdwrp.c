@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.5 2005/11/06 23:15:55 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.6 2005/11/07 00:39:11 fsgiudice Exp $
  */
 
 /*
@@ -89,6 +89,7 @@
 #define IMAGE_PNG      3
 #define IMAGE_WBMP     4
 #define IMAGE_GD       5
+
 
 /* ---------------------------------------------------------------------------*/
 /* Internal functions                                                         */
@@ -290,7 +291,7 @@ static void GDImageSaveTo( int nType )
       int level, fg;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+       im = (gdImagePtr)hb_parptr(1);
 
       /* Get file name or an output handler */
       if ( !( ISNIL(2) ||
@@ -596,7 +597,7 @@ HB_FUNC( GDIMAGEDESTROY ) // gdImageDestroy(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Destroy the image */
       gdImageDestroy( im );
@@ -625,7 +626,7 @@ HB_FUNC( GDIMAGESETPIXEL ) // void gdImageSetPixel(gdImagePtr im, int x, int y, 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve coord values */
       x = hb_parni( 2 );
@@ -668,7 +669,7 @@ HB_FUNC( GDIMAGELINE ) // void gdImageLine(gdImagePtr im, int x1, int y1, int x2
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve coord values */
       x1 = hb_parni( 2 );
@@ -714,7 +715,7 @@ HB_FUNC( GDIMAGEDASHEDLINE ) // void gdImageDashedLine(gdImagePtr im, int x1, in
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve coord values */
       x1 = hb_parni( 2 );
@@ -764,7 +765,7 @@ HB_FUNC( GDIMAGEPOLYGON ) // original: void gdImagePolygon(gdImagePtr im, gdPoin
       gdPoint points[50]; // TODO: make this dynamic
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
@@ -821,7 +822,7 @@ HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im
       gdPoint points[50]; // TODO: make this dynamic
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
@@ -874,7 +875,7 @@ HB_FUNC( GDIMAGERECTANGLE ) // void gdImageRectangle(gdImagePtr im, int x1, int 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve coord values */
       x1 = hb_parni( 2 );
@@ -919,7 +920,7 @@ HB_FUNC( GDIMAGERECTANGLE ) // void gdImageRectangle(gdImagePtr im, int x1, int 
 //      int cx, cy, w, h, color;
 //
 //      /* Retrieve image pointer */
-//      im = hb_parptr( 1 );
+//      im = (gdImagePtr) hb_parptr( 1 );
 //
 //      /* Retrieve point values */
 //      cx = hb_parni( 2 );
@@ -969,7 +970,7 @@ HB_FUNC( GDIMAGEFILLEDPOLYGON ) // original: void gdImageFilledPolygon(gdImagePt
       gdPoint points[50];
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point array */
       pPoints     = hb_param( 2, HB_IT_ARRAY );
@@ -1022,7 +1023,7 @@ HB_FUNC( GDIMAGEFILLEDRECTANGLE ) // void gdImageFilledRectangle(gdImagePtr im, 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve coord values */
       x1 = hb_parni( 2 );
@@ -1069,7 +1070,7 @@ HB_FUNC( GDIMAGEARC ) // void gdImageArc(gdImagePtr im, int cx, int cy, int w, i
       int cx, cy, w, h, s, e, color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point values */
       cx = hb_parni( 2 );
@@ -1119,7 +1120,7 @@ HB_FUNC( GDIMAGEFILLEDARC ) // void gdImageFilledArc(gdImagePtr im, int cx, int 
       int cx, cy, w, h, s, e, color, style;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point values */
       cx = hb_parni( 2 );
@@ -1171,7 +1172,7 @@ HB_FUNC( GDIMAGEFILLEDELLIPSE ) // void gdImageFilledEllipse(gdImagePtr im, int 
       int cx, cy, w, h, color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve point values */
       cx = hb_parni( 2 );
@@ -1215,7 +1216,7 @@ HB_FUNC( GDIMAGEFILLTOBORDER ) // void gdImageFillToBorder(gdImagePtr im, int x,
       int x, y, border, color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve point values */
       x = hb_parni( 2 );
@@ -1257,7 +1258,7 @@ HB_FUNC( GDIMAGEFILL ) // void gdImageFill(gdImagePtr im, int x, int y, int colo
       int x, y, color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve point values */
       x = hb_parni( 2 );
@@ -1294,7 +1295,7 @@ HB_FUNC( GDIMAGESETANTIALIASED ) // void gdImageSetAntiAliased(gdImagePtr im, in
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve color value */
       color = hb_parni( 2 );
@@ -1330,7 +1331,7 @@ HB_FUNC( GDIMAGESETANTIALIASEDDONTBLEND ) // void gdImageSetAntiAliasedDontBlend
       int dont_blend;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve color value */
       color = hb_parni( 2 );
@@ -1367,10 +1368,10 @@ HB_FUNC( GDIMAGESETBRUSH ) // void gdImageSetBrush(gdImagePtr im, gdImagePtr bru
       gdImagePtr brush;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve brush pointer */
-      brush = hb_parptr( 2 );
+      brush = (gdImagePtr)hb_parptr( 2 );
 
       /* Set Brush */
       gdImageSetBrush(im, brush);
@@ -1401,10 +1402,10 @@ HB_FUNC( GDIMAGESETTILE ) // void gdImageSetTile(gdImagePtr im, gdImagePtr tile)
       gdImagePtr tile;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve tile pointer */
-      tile = hb_parptr( 2 );
+      tile = (gdImagePtr)hb_parptr( 2 );
 
       /* Set Tile */
       gdImageSetTile(im, tile);
@@ -1441,7 +1442,7 @@ HB_FUNC( GDIMAGESETSTYLE ) // original: void gdImageSetStyle(gdImagePtr im, int 
       int styles[50]; // TODO: make this dynamic
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve style array */
       pStyles     = hb_param( 2, HB_IT_ARRAY );
@@ -1481,7 +1482,7 @@ HB_FUNC( GDIMAGESETTHICKNESS ) // void gdImageSetThickness(gdImagePtr im, int th
       int oldthick;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve thickness value */
       thickness = hb_parni( 2 );
@@ -1521,7 +1522,7 @@ HB_FUNC( GDIMAGEALPHABLENDING ) // void gdImageAlphaBlending(gdImagePtr im, int 
       int blending;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve blending value - logical */
       blending = hb_parl( 2 );
@@ -1555,7 +1556,7 @@ HB_FUNC( GDIMAGESAVEALPHA ) // void gdImageSaveAlpha(gdImagePtr im, int saveFlag
       int saveFlag;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value - logical */
       saveFlag = hb_parl( 2 );
@@ -1592,7 +1593,7 @@ HB_FUNC( GDIMAGESETCLIP ) // void gdImageSetClip(gdImagePtr im, int x1, int y1, 
       int x1, y1, x2, y2;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve coords value */
       x1 = hb_parni( 2 );
@@ -1633,7 +1634,7 @@ HB_FUNC( GDIMAGEGETCLIP ) // original: void gdImageGetClip(gdImagePtr im, int *x
       pClipArray.type = HB_IT_NIL;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Get clipping rectangle */
       gdImageGetClip(im, &x1, &y1, &x2, &y2);
@@ -1677,7 +1678,7 @@ HB_FUNC( GDIMAGECOLORSTOTAL ) // int gdImageColorsTotal(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Get Colors total */
       hb_retni( gdImageColorsTotal(im) );
@@ -1708,7 +1709,7 @@ HB_FUNC( GDIMAGEALPHA ) // int gdImageAlpha(gdImagePtr im, int color)
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -1742,7 +1743,7 @@ HB_FUNC( GDIMAGERED ) // int gdImageRed(gdImagePtr im, int color)
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -1776,7 +1777,7 @@ HB_FUNC( GDIMAGEGREEN ) // int gdImageGreen(gdImagePtr im, int color)
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -1810,7 +1811,7 @@ HB_FUNC( GDIMAGEBLUE ) // int gdImageBlue(gdImagePtr im, int color)
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -1842,7 +1843,7 @@ HB_FUNC( GDIMAGESX ) // int gdImageSX(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Get Image Width in pixels */
       hb_retni( gdImageSX(im) );
@@ -1871,7 +1872,7 @@ HB_FUNC( GDIMAGESY ) // int gdImageSX(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Get Image Height in pixels */
       hb_retni( gdImageSY(im) );
@@ -1903,7 +1904,7 @@ HB_FUNC( GDIMAGEGETPIXEL ) // int gdImageGetPixel(gdImagePtr im, int x, int y)
       int x,y;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve coord value */
       x = hb_parni( 2 );
@@ -1939,7 +1940,7 @@ HB_FUNC( GDIMAGEBOUNDSSAFE ) // int gdImageBoundsSafe(gdImagePtr im, int x, int 
       int x,y;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve coord value */
       x = hb_parni( 2 );
@@ -1972,7 +1973,7 @@ HB_FUNC( GDIMAGEGETINTERLACED ) // int gdImageGetInterlaced(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Image is interlaced ? */
       hb_retl( gdImageGetInterlaced(im) );
@@ -2001,7 +2002,7 @@ HB_FUNC( GDIMAGEGETTRANSPARENT ) // int gdImageGetTransparent(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Image is trasparent ? */
       hb_retl( gdImageGetTransparent(im) );
@@ -2030,7 +2031,7 @@ HB_FUNC( GDIMAGETRUECOLOR ) // int gdImageTrueColor(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Is TrueColor ? */
       hb_retl( gdImageTrueColor(im) );
@@ -2062,7 +2063,7 @@ HB_FUNC( GDIMAGETRUECOLORTOPALETTE ) // void gdImageTrueColorToPalette (gdImageP
       int ditherFlag, colorsWanted;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve ditherFlag - logical */
       ditherFlag = hb_parl( 2 );
@@ -2101,7 +2102,7 @@ HB_FUNC( GDIMAGECREATEPALETTEFROMTRUECOLOR ) // gdImagePtr gdImageCreatePaletteF
       int ditherFlag, colorsWanted;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve ditherFlag - logical */
       ditherFlag = hb_parl( 2 );
@@ -2142,7 +2143,7 @@ HB_FUNC( GDIMAGEPALETTEPIXEL ) // int gdImagePalettePixel(gdImagePtr im, int x, 
       int x,y;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve coord value */
       x = hb_parni( 2 );
@@ -2178,7 +2179,7 @@ HB_FUNC( GDIMAGETRUECOLORPIXEL ) // int gdImageTrueColorPixel(gdImagePtr im, int
       int x,y;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve coord value */
       x = hb_parni( 2 );
@@ -2211,7 +2212,7 @@ HB_FUNC( GDIMAGEGETTHICKNESS ) // void gdImageGetThickness(gdImagePtr im)
       gdImagePtr im;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Return previous */
       hb_retni( im->thick );
@@ -2318,10 +2319,10 @@ HB_FUNC( GDIMAGESTRING ) // void gdImageChar(gdImagePtr im, gdFontPtr font, int 
       unsigned char *s;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve font pointer */
-      font = hb_parptr( 2 );
+      font = (gdFontPtr)hb_parptr( 2 );
 
       /* Retrieve coord value */
       x = hb_parni( 3 );
@@ -2340,7 +2341,7 @@ HB_FUNC( GDIMAGESTRING ) // void gdImageChar(gdImagePtr im, gdFontPtr font, int 
       else
       {
          /* Retrieve string value */
-         s = hb_parcx( 5 );
+         s = ( unsigned char * )hb_parcx( 5 );
          gdImageString(im, font, x, y, s, color);
       }
 
@@ -2378,10 +2379,10 @@ HB_FUNC( GDIMAGESTRINGUP ) // void gdImageCharUp(gdImagePtr im, gdFontPtr font, 
       unsigned char *s;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve font pointer */
-      font = hb_parptr( 2 );
+      font = (gdFontPtr)hb_parptr( 2 );
 
       /* Retrieve coord value */
       x = hb_parni( 3 );
@@ -2400,7 +2401,7 @@ HB_FUNC( GDIMAGESTRINGUP ) // void gdImageCharUp(gdImagePtr im, gdFontPtr font, 
       else
       {
          /* Retrieve string value */
-         s = hb_parcx( 5 );
+         s = ( unsigned char * )hb_parcx( 5 );
          gdImageStringUp(im, font, x, y, s, color);
       }
 
@@ -2447,7 +2448,7 @@ HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brec
       char *err;
 
       /* Retrieve image pointer */
-      im = ( hb_parinfo( 1 ) & HB_IT_POINTER ? hb_parptr( 1 ) : NULL );
+      im = (gdImagePtr)( hb_parinfo( 1 ) & HB_IT_POINTER ? hb_parptr( 1 ) : NULL );
       //TraceLog( NULL, "Image pointer: %p\n\r", im );
 
       /* Retrieve rectangle array */
@@ -2548,7 +2549,7 @@ HB_FUNC( GDIMAGESTRINGFTCIRCLE ) // char *gdImageStringFTCircle(gdImagePtr im, i
       char *err;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve pos value */
       cx = hb_parni( 2 );
@@ -2624,7 +2625,7 @@ HB_FUNC( GDFONTGETWIDTH )
       gdFontPtr font;
 
       /* Retrieve font pointer */
-      font = hb_parptr( 1 );
+      font = (gdFontPtr)hb_parptr( 1 );
 
       /* Return value */
       hb_retni( font->w );
@@ -2653,7 +2654,7 @@ HB_FUNC( GDFONTGETHEIGHT )
       gdFontPtr font;
 
       /* Retrieve font pointer */
-      font = hb_parptr( 1 );
+      font = (gdFontPtr)hb_parptr( 1 );
 
       /* Return value */
       hb_retni( font->h );
@@ -2691,7 +2692,7 @@ HB_FUNC( GDIMAGECOLORALLOCATE ) // int gdImageColorAllocate(gdImagePtr im, int r
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2730,7 +2731,7 @@ HB_FUNC( GDIMAGECOLORDEALLOCATE ) // void gdImageColorDeallocate(gdImagePtr im, 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -2769,7 +2770,7 @@ HB_FUNC( GDIMAGECOLORALLOCATEALPHA ) // int gdImageColorAllocateAlpha(gdImagePtr
       int a;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2815,7 +2816,7 @@ HB_FUNC( GDIMAGECOLORCLOSEST ) // int gdImageColorClosest(gdImagePtr im, int r, 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2859,7 +2860,7 @@ HB_FUNC( GDIMAGECOLORCLOSESTALPHA ) // int gdImageColorClosestAlpha(gdImagePtr i
       int a;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2905,7 +2906,7 @@ HB_FUNC( GDIMAGECOLORCLOSESTHWB ) //  gdImageColorClosestHWB(gdImagePtr im, int 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2947,7 +2948,7 @@ HB_FUNC( GDIMAGECOLOREXACT ) // int gdImageColorExact(gdImagePtr im, int r, int 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -2989,7 +2990,7 @@ HB_FUNC( GDIMAGECOLORRESOLVE ) // int gdImageColorResolve(gdImagePtr im, int r, 
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -3033,7 +3034,7 @@ HB_FUNC( GDIMAGECOLORRESOLVEALPHA ) // int gdImageColorResolveAlpha(gdImagePtr i
       int a;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve RGB values */
       r = hb_parni( 2 );
@@ -3076,7 +3077,7 @@ HB_FUNC( GDIMAGECOLORTRANSPARENT ) // void gdImageColorTransparent(gdImagePtr im
       int color;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve saveFlag value */
       color = hb_parni( 2 );
@@ -3196,10 +3197,10 @@ HB_FUNC( GDIMAGECOPY ) // void gdImageCopy(gdImagePtr dst, gdImagePtr src, int d
       int dstX, dstY, srcX, srcY, w, h;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parni( 3 );
@@ -3253,10 +3254,10 @@ HB_FUNC( GDIMAGECOPYRESIZED ) // void gdImageCopyResized(gdImagePtr dst, gdImage
       int dstW, dstH, srcW, srcH;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parni( 3 );
@@ -3317,10 +3318,10 @@ HB_FUNC( GDIMAGECOPYRESAMPLED ) // void gdImageCopyResampled(gdImagePtr dst, gdI
       int dstW, dstH, srcW, srcH;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parni( 3 );
@@ -3380,10 +3381,10 @@ HB_FUNC( GDIMAGECOPYROTATED ) // void gdImageCopyRotated(gdImagePtr dst, gdImage
       int srcX, srcY, srcW, srcH, angle;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parnd( 3 );
@@ -3439,10 +3440,10 @@ HB_FUNC( GDIMAGECOPYMERGE ) // void gdImageCopyMerge(gdImagePtr dst, gdImagePtr 
       int dstX, dstY, srcX, srcY, w, h, pct;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst =(gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parni( 3 );
@@ -3498,10 +3499,10 @@ HB_FUNC( GDIMAGECOPYMERGEGRAY ) // void gdImageCopyMergeGray(gdImagePtr dst, gdI
       int dstX, dstY, srcX, srcY, w, h, pct;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Retrieve destination pos value */
       dstX = hb_parni( 3 );
@@ -3549,10 +3550,10 @@ HB_FUNC( GDIMAGEPALETTECOPY ) // void gdImagePaletteCopy(gdImagePtr dst, gdImage
       gdImagePtr dst, src;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Perform copy */
       gdImagePaletteCopy(dst, src);
@@ -3582,7 +3583,7 @@ HB_FUNC( GDIMAGESQUARETOCIRCLE ) // void gdImageSquareToCircle(gdImagePtr im, in
       int radius;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve radius value */
       radius = hb_parni( 2 );
@@ -3616,7 +3617,7 @@ HB_FUNC( GDIMAGESHARPEN ) // void gdImageSharpen(gdImagePtr im, int pct)
       int pct;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve percentual value */
       pct = hb_parni( 2 );
@@ -3653,10 +3654,10 @@ HB_FUNC( GDIMAGECOMPARE ) // int gdImageCompare(gdImagePtr im1, gdImagePtr im2)
       gdImagePtr dst, src;
 
       /* Retrieve destination image pointer */
-      dst = hb_parptr( 1 );
+      dst = (gdImagePtr)hb_parptr( 1 );
 
       /* Retrieve source image pointer */
-      src = hb_parptr( 2 );
+      src = (gdImagePtr)hb_parptr( 2 );
 
       /* Compare images - if return <> 0 check value for infos */
       hb_retni( gdImageCompare(dst, src) );
@@ -3686,7 +3687,7 @@ HB_FUNC( GDIMAGEINTERLACE ) // void gdImageInterlace(gdImagePtr im, int interlac
       int interlace;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve interlace value */
       interlace = hb_parl( 2 );
@@ -3726,7 +3727,7 @@ HB_FUNC( GDIMAGEGIFANIMBEGIN )
       int GlobalCM, Loops;
 
       /* Retrieve image pointer */
-      im = hb_parptr( 1 );
+      im = (gdImagePtr) hb_parptr( 1 );
 
       /* Retrieve global color map value */
       GlobalCM = hb_parni( 3 );
@@ -3792,14 +3793,14 @@ HB_FUNC( GDIMAGEGIFANIMADD )
       int LocalCM, LeftOfs, TopOfs, Delay, Disposal;
 
       /* Retrieve parameters */
-      im       = hb_parptr( 1 );
+      im       = (gdImagePtr)hb_parptr( 1 );
 
       LocalCM  = hb_parni( 3 );
       LeftOfs  = hb_parni( 4 );
       TopOfs   = hb_parni( 5 );
       Delay    = hb_parni( 6 );
       Disposal = hb_parni( 7 );
-      previm   = hb_parptr( 8 );
+      previm   = (gdImagePtr)hb_parptr( 8 );
 
       /* Run function and return value */
       iptr = gdImageGifAnimAddPtr(im, &size, LocalCM, LeftOfs, TopOfs, Delay, Disposal, previm);

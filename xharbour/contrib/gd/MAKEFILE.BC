@@ -23,7 +23,7 @@ APPLIB      = lib\$(APP_NAME).lib
 
 APPDLL      = lib\$(APP_NAME).dll
 
-APPOBJ      = gd.obj gdwrp.obj gdimage.obj gdchart.obj
+APPOBJ      = gd.obj gdwrp.obj gdimage.obj gdchart.obj gdbar.obj gdbarcode.obj
 
 !include $(APP_DIR)\env\makelib.b32
 
