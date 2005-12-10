@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4690 2005/12/08 19:11:09 oh1 Exp $
+ * $Id: ChangeLog,v 1.4691 2005/12/09 03:45:31 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-10 01:35 UTC+0100 Henryk Olkowski <oh1@op.pl>
+  ! Corrected use MROW(),MROW() and CT3 Windows
+
+  * source/rtl/alert.prg
+  * source/rtl/listbox.prg
+  * source/rtl/menuto.prg
+  * source/rtl/tbrowse.prg
+  * source/rtl/teditor.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/ttopbar.prg
+     ! reverted the last own changes: MCOL() ==> WMCol(), MROW() ==> WMRow()
+  * source/ct/ctwin.c
+  * source/rtl/gtapi.c
+     ! deleted PRG functions: WMCol() WMRow()
+     ! add function hb_ctWind()
+     ! move function WINFO() ==> source/ct/ctwin.c
+     ! move function WMSETPOS() ==> source/ct/ctwin.c
+     ! move function WSETMOUSE() ==> source/ct/ctwin.c
+  * source/rtl/mouseapi.c
+     ! updated functions: MCol() MRow()
+        MCol(.t.)           - return mouse column position in screen,
+        MCol() or MCol(.f.) - return mouse column position in CT3 window
+                              (or screen if window not exist)
+  - tests/cttest/wmrow.prg
+  + tests/cttest/mrow.prg
+     ! new test MROW(), MCOL(), WSTACK(), WINFO()
 
 2005-12-08 21:40 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/classes.c
