@@ -1,5 +1,5 @@
 /*
- * $Id: ttopbar.prg,v 1.9 2005/10/01 20:45:26 lculik Exp $
+ * $Id: ttopbar.prg,v 1.10 2005/12/08 19:06:12 oh1 Exp $
  */
 
 /*
@@ -556,7 +556,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          SET( _SET_EVENTMASK, nEvent )
 
          IF ( nKey == K_LBUTTONDOWN .OR. nKey == K_LDBLCLK )
-            nSelection := ::HitTest( WMRow(), WMCol() )
+            nSelection := ::HitTest( MRow(), MCol() )
 
          ELSEIF ( ( nSelection := ::GetAccel( nKey ) ) != 0 )
 
@@ -780,7 +780,7 @@ METHOD Modal( nSelection, nMsgRow, nMsgLeft, nMsgRight, ;
          IF ( ! ::MHitTest( @oNewMenu, @nNewLevel, @nNewItem ) )
             // Added the following to test Get System HitTest():
             IF ( !( GetList == NIL ) .AND. ;
-               HitTest( GetList, WMRow(), WMCol(), oMenuMsg:aMsg ) != 0 )
+               HitTest( GetList, MRow(), MCol(), oMenuMsg:aMsg ) != 0 )
                GETACTIVE():ExitState := GE_MOUSEHIT
                // Reset Get System values:
                // ReadStats( SNLASTEXIT, GE_MOUSEHIT )
@@ -1123,7 +1123,7 @@ METHOD MHitTest( oNewMenu, nNewLevel, nNewItem ) CLASS TopBarMenu
 
    FOR nNewLevel := ::nMenuLevel TO 1 STEP -1
       oNewMenu   := ::aMenuList[ nNewLevel ]
-      nNewItem   := oNewMenu:HitTest( WMRow(), WMCol() )
+      nNewItem   := oNewMenu:HitTest( MRow(), MCol() )
       IF ( nNewItem < 0 )
          // Test for the mouse on Menu separator or border
          RETURN ( .F. )

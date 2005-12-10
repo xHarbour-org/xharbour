@@ -4,7 +4,7 @@
 
 /*
  * xHarbour Project source code:
- *   CT3 - Test WMROW(), WMCOL(), WSTACK(), WINFO()
+ *   CT3 - Test MROW(), MCOL(), WSTACK(), WINFO()
  *
  * Copyright 2005 Henryk Olkowski <oh1@op.pl>
  * www - http://www.xharbour.org
@@ -106,17 +106,17 @@ while c!=K_ESC
  dispend()
 
  c:=inkey(0,INKEY_ALL)
- row:=WMRow(); col:=WMCol()
+ row:=MRow(); col:=MCol()
 
  setcolor(iif(nwind==wselect(),"n/r*","n/gr*"))
  setpos(0,0)
- row:=MRow(); col:=MCol()
- ? " WINDOW-0=","   MROW=",str(row,3),"   MCOL=",str(col,3)
-
- row:=WMRow(); col:=WMCol()
- ?; ? " WINDOW-2=","  WMROW=",str(row,3),"  WMCOL=",str(col,3)
+ row:=MRow(.t.); col:=MCol(.t.)
+ ? " WINDOW-0","  MRow(.t.)=",str(row,3),"  MCol(.t.)=",str(col,3)
 
  row:=MRow(); col:=MCol()
+ ?; ? " WINDOW-2","       MRow=",str(row,3),"       MCol=",str(col,3)
+
+ row:=MRow(.t.); col:=MCol(.t.)
  ws:=wstack(); nwind:=-1
  for i:=len(ws) to 1 step -1
   wi:=winfo(ws[i])
@@ -125,7 +125,7 @@ while c!=K_ESC
   endif
  endfor i
 
- ?; ? " WINDOW-"+str(nwind,1)+"=","    ROW=",str(row,3),"    COL=",str(col,3)
+ ?; ? " WINDOW-"+str(nwind,1),"        Row=",str(row,3),"        Col=",str(col,3)
 end
 
 wselect(0)

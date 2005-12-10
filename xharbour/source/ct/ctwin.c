@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.5 2005/09/22 01:11:59 druzus Exp $
+ * $Id: ctwin.c,v 1.6 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -74,14 +74,17 @@
   WFLASTROW()  - Return position of the bottom row of formatted area
   WFORMAT()    - Set the usable area within a window
   WFROW()      - Return position of the top row of formatted area
+  WINFO()      - Get the windows info                                     (New)
   WLASTCOL()   - Return position of the rightmost column
   WLASTROW()   - Return position of the bottom row
   WMODE()      - Set the screen border overstep mode
   WMOVE()      - Moves a window
+  WMSETPOS()   - Set the mouse row and column for windows                 (New)
   WNUM()       - Get the highest windows handle
   WOPEN()      - Opens a new window
   WROW()       - Return position of the top row
   WSELECT()    - Activate window
+  WSETMOUSE()  - Set the mouse cursor, row and column for windows         (New)
   WSETMOVE()   - Set the interactive movement mode
   WSETSHADOW() - Set the window shadow color
   WSTACK()     - Get the array of windows handle                          (New)
@@ -286,6 +289,87 @@ HB_FUNC( WFROW ) /* Return position of the top row of formatted area */
    hb_retni( UFRow );
 }
 /****************************************************************************/
+/* Get the windows info ( New ) */
+/*  Return array(8): 1-WFRow, 2-WFCol, 3-WLRow, 4-WLCol,
+                     5-UFRow, 6-UFCol, 7-ULRow, 8-ULCol
+*/
+HB_FUNC( WINFO )
+{
+   SHORT     iWnd, WMax;
+   PHB_ITEM  pInfo, pN;
+   HB_CT_WND * wnd;
+   HB_CT_WND ** Wind;
+
+   hb_ctWind( &Wind, &WMax );
+
+   if( hb_pcount() > 0 && ISNUM( 1 ) )
+   {
+      iWnd = hb_parni( 1 );
+   }
+   else
+   {
+      wnd = hb_ctWCurrent();
+      iWnd = wnd->NCur;
+   }
+
+   pInfo = hb_itemArrayNew( 8 );
+
+   if( iWnd >= 0 && iWnd < WMax && Wind[ iWnd ] != NULL )
+   {
+      wnd  = Wind[ iWnd ];
+
+      pN = hb_itemPutNL( NULL, wnd->WFRow );
+      hb_arraySet( pInfo, 1, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->WFCol );
+      hb_arraySet( pInfo, 2, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->WLRow );
+      hb_arraySet( pInfo, 3, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->WLCol );
+      hb_arraySet( pInfo, 4, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->UFRow );
+      hb_arraySet( pInfo, 5, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->UFCol );
+      hb_arraySet( pInfo, 6, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->ULRow );
+      hb_arraySet( pInfo, 7, pN );
+      hb_itemRelease( pN );
+
+      pN = hb_itemPutNL( NULL, wnd->ULCol );
+      hb_arraySet( pInfo, 8, pN );
+      hb_itemRelease( pN );
+   }
+   else
+   {
+     pN = hb_itemPutNL( NULL, 0 );
+     hb_arraySet( pInfo, 1, pN );
+     hb_arraySet( pInfo, 2, pN );
+     hb_arraySet( pInfo, 5, pN );
+     hb_arraySet( pInfo, 6, pN );
+     hb_itemRelease( pN );
+
+     pN = hb_itemPutNL( NULL, -1 );
+     hb_arraySet( pInfo, 3, pN );
+     hb_arraySet( pInfo, 4, pN );
+     hb_arraySet( pInfo, 7, pN );
+     hb_arraySet( pInfo, 8, pN );
+     hb_itemRelease( pN );
+   }
+
+   hb_itemRelease( hb_itemReturn( pInfo ) );
+}
+/****************************************************************************/
 HB_FUNC( WLASTCOL ) /* Return position of the rightmost column */
 {
    HB_CT_WND * wnd;
@@ -399,6 +483,39 @@ HB_FUNC( WROW ) /* Return position of the top row */
 HB_FUNC( WSELECT ) /* Activate window */
 {
    hb_retni( hb_ctWSelect( ISNUM( 1 ) ? hb_parni( 1 ) : -1 ) );
+}
+/****************************************************************************/
+HB_FUNC( WSETMOUSE ) /* Set the mouse cursor, row and column for windows (New) */
+{
+   HB_CT_WND * wnd;
+
+   wnd = hb_ctWCurrent();
+
+   hb_retl( hb_mouseGetCursor() );
+
+   if( ISLOG( 1 ) )
+      hb_mouseSetCursor( hb_parl( 1 ) );
+
+   {
+      PHB_ITEM pRow = hb_param( 2, HB_IT_NUMERIC );
+      PHB_ITEM pCol = hb_param( 3, HB_IT_NUMERIC );
+
+      if( pRow || pCol )
+      {
+         hb_mouseSetPos( pRow ? hb_itemGetNI( pRow ) + wnd->UFRow : hb_mouseRow() ,
+                         pCol ? hb_itemGetNI( pCol ) + wnd->UFCol : hb_mouseCol() );
+      }
+   }
+}
+/****************************************************************************/
+HB_FUNC( WMSETPOS ) /* Set the mouse row and column for windows (New) */
+{
+   HB_CT_WND * wnd;
+
+   wnd = hb_ctWCurrent();
+
+   if( ISNUM( 1 ) && ISNUM( 2 ) )
+      hb_mouseSetPos( hb_parni( 1 ) + wnd->UFRow, hb_parni( 2 ) + wnd->UFCol);
 }
 /****************************************************************************/
 HB_FUNC( WSETMOVE ) /* Set the interactive movement mode */

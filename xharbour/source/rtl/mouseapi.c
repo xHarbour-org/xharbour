@@ -1,5 +1,5 @@
 /*
- * $Id: mouseapi.c,v 1.6 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: mouseapi.c,v 1.7 2004/07/09 11:52:09 likewolf Exp $
  */
 
 /*
@@ -183,17 +183,25 @@ HB_FUNC( MSETCURSOR )
    if( ISLOG( 1 ) )
       hb_mouseSetCursor( hb_parl( 1 ) );
 }
-
+/****************************************************************************/
+/* Get the mouse row number for screen/window */
 HB_FUNC( MROW )
 {
-   hb_retni( hb_mouseRow() );
+   if( hb_parl( 1 ) )
+    hb_retni( hb_mouseRow() );
+   else
+    hb_retni( hb_ctMouseRow() );
 }
-
+/****************************************************************************/
+/* Get the mouse column number for screen/window */
 HB_FUNC( MCOL )
 {
-   hb_retni( hb_mouseCol() );
+   if( hb_parl( 1 ) )
+    hb_retni( hb_mouseCol() );
+   else
+    hb_retni( hb_ctMouseCol() );
 }
-
+/****************************************************************************/
 HB_FUNC( MSETPOS )
 {
    if( ISNUM( 1 ) && ISNUM( 2 ) )
@@ -308,4 +316,3 @@ HB_FUNC( MSETBOUNDS )
 }
 
 #endif
-

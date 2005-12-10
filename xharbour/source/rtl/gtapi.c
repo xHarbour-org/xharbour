@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.58 2005/10/24 01:04:35 druzus Exp $
+ * $Id: gtapi.c,v 1.59 2005/12/08 19:01:20 oh1 Exp $
  */
 
 /*
@@ -2021,6 +2021,7 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
   hb_ctWCurrent()    - Get the current windows info
   hb_ctWFormat()     - Set the usable area within a window
   hb_ctWFree()       - Free HB_CT_WND Table
+  hb_ctWind()        - Get the array of windows descriptions
   hb_ctWMode()       - Set the screen border overstep mode
   hb_ctWMove()       - Moves a window
   hb_ctWNew()        - Create new HB_CT_WND Table
@@ -2029,13 +2030,8 @@ void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize )
   hb_ctWSelect()     - Activate Window
   hb_ctWSetMove()    - Set the interactive movement mode
   hb_ctWSetShadow()  - Set the window shadow color
+  hb_ctWStack()      - Get the array of windows handle
   hb_ctWStep()       - Set the step width of interactive window movement
-
-  WMCOL()            - Get the mouse column number for screen/window      (New)
-  WMROW()            - Get the mouse row number for screen/window         (New)
-  WINFO()            - Get the windows info                               (New)
-  WSETMOUSE()        - Set the mouse cursor, row and column for windows   (New)
-  WMSETPOS()         - Set the mouse row and column for windows           (New)
 
    Static functions:
 
@@ -2933,11 +2929,18 @@ SHORT HB_EXPORT hb_ctWSetShadow( SHORT nAttr )
    return pAttr;
 }
 /****************************************************************************/
-/* Get the array of windows handle ( New ) */
+/* Get the array of windows handle */
 void HB_EXPORT hb_ctWStack( SHORT ** Stac, SHORT * SMax )
 {
    *Stac = ct_Stac;
    *SMax = ct_SMax;
+}
+/****************************************************************************/
+/* Get the array of windows descriptions */
+void HB_EXPORT hb_ctWind( HB_CT_WND *** Wind, SHORT * WMax )
+{
+   *Wind = ct_Wind;
+   *WMax = ct_WMax;
 }
 /****************************************************************************/
 /* Set the step width of interactive window movement */
@@ -2980,122 +2983,5 @@ int HB_EXPORT hb_ctMouseCol( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_ctmouseCol()"));
 
    return hb_mouseCol() - ct_UFCol;
-}
-/****************************************************************************/
-/****************************************************************************/
-/* Get the mouse column number for screen/window ( New ) */
-HB_FUNC( WMCOL )
-{
-   hb_retni( hb_ctMouseCol() );
-}
-/****************************************************************************/
-/* Get the mouse row number for screen/window ( New ) */
-HB_FUNC( WMROW )
-{
-   hb_retni( hb_ctMouseRow() );
-}
-/****************************************************************************/
-/* Get the windows info ( New ) */
-/*  Return array(8): 1-ct_WFRow, 2-ct_WFCol, 3-ct_WLRow, 4-ct_WLCol,
-                     5-ct_UFRow, 6-ct_UFCol, 7-ct_ULRow, 8-ct_ULCol
-*/
-HB_FUNC( WINFO )
-{
-   SHORT     iWnd;
-   PHB_ITEM  pInfo, pN;
-   HB_CT_WND * Wnd;
-
-   if( hb_pcount() > 0 && ISNUM( 1 ) )
-   {
-      iWnd = hb_parni( 1 );
-   }
-   else
-   {
-      iWnd = ct_NCur;
-   }
-
-   pInfo = hb_itemArrayNew( 8 );
-
-   if( iWnd >= 0 && iWnd < ct_WMax && ct_Wind[ iWnd ] != NULL )
-   {
-      Wnd  = ct_Wind[ iWnd ];
-
-      pN = hb_itemPutNL( NULL, Wnd->WFRow );
-      hb_arraySet( pInfo, 1, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->WFCol );
-      hb_arraySet( pInfo, 2, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->WLRow );
-      hb_arraySet( pInfo, 3, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->WLCol );
-      hb_arraySet( pInfo, 4, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->UFRow );
-      hb_arraySet( pInfo, 5, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->UFCol );
-      hb_arraySet( pInfo, 6, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->ULRow );
-      hb_arraySet( pInfo, 7, pN );
-      hb_itemRelease( pN );
-
-      pN = hb_itemPutNL( NULL, Wnd->ULCol );
-      hb_arraySet( pInfo, 8, pN );
-      hb_itemRelease( pN );
-   }
-   else
-   {
-     pN = hb_itemPutNL( NULL, 0 );
-     hb_arraySet( pInfo, 1, pN );
-     hb_arraySet( pInfo, 2, pN );
-     hb_arraySet( pInfo, 5, pN );
-     hb_arraySet( pInfo, 6, pN );
-     hb_itemRelease( pN );
-
-     pN = hb_itemPutNL( NULL, -1 );
-     hb_arraySet( pInfo, 3, pN );
-     hb_arraySet( pInfo, 4, pN );
-     hb_arraySet( pInfo, 7, pN );
-     hb_arraySet( pInfo, 8, pN );
-     hb_itemRelease( pN );
-   }
-
-   hb_itemRelease( hb_itemReturn( pInfo ) );
-}
-/****************************************************************************/
-/* Set the mouse cursor, row and column for windows (New) */
-HB_FUNC( WSETMOUSE )
-{
-   hb_retl( hb_mouseGetCursor() );
-
-   if( ISLOG( 1 ) )
-      hb_mouseSetCursor( hb_parl( 1 ) );
-
-   {
-      PHB_ITEM pRow = hb_param( 2, HB_IT_NUMERIC );
-      PHB_ITEM pCol = hb_param( 3, HB_IT_NUMERIC );
-
-      if( pRow || pCol )
-      {
-         hb_mouseSetPos( pRow ? hb_itemGetNI( pRow ) + ct_UFRow : hb_mouseRow() ,
-                         pCol ? hb_itemGetNI( pCol ) + ct_UFCol : hb_mouseCol() );
-      }
-   }
-}
-/****************************************************************************/
-/* Set the mouse row and column for windows (New) */
-HB_FUNC( WMSETPOS )
-{
-   if( ISNUM( 1 ) && ISNUM( 2 ) )
-      hb_mouseSetPos( hb_parni( 1 ) + ct_UFRow, hb_parni( 2 ) + ct_UFCol);
 }
 /****************************************************************************/

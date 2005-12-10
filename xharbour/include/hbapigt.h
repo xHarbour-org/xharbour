@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.42 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbapigt.h,v 1.43 2005/12/08 18:59:45 oh1 Exp $
  */
 
 /*
@@ -374,6 +374,7 @@ extern SHORT      HB_EXPORT  hb_ctWClose( void );
 extern HB_EXPORT  HB_CT_WND* hb_ctWCurrent( void );
 extern SHORT      HB_EXPORT  hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
 extern void       HB_EXPORT  hb_ctWFree( HB_CT_WND * wnd );
+extern void       HB_EXPORT  hb_ctWind( HB_CT_WND *** Wind, SHORT * WMax );
 extern void       HB_EXPORT  hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
 extern SHORT      HB_EXPORT  hb_ctWMove( SHORT FRow, SHORT FCol );
 extern HB_EXPORT  HB_CT_WND* hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );

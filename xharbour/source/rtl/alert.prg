@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.16 2005/06/13 02:02:49 peterrees Exp $
+ * $Id: alert.prg,v 1.17 2005/12/08 19:03:20 oh1 Exp $
  */
 
 /*
@@ -438,8 +438,8 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
             CASE K_LBUTTONDOWN
 
-               nMRow  := WMRow()
-               nMCol  := WMCol()
+               nMRow  := MRow()
+               nMCol  := MCol()
                nPos   := 0
                nCount := Len( aSay )
 

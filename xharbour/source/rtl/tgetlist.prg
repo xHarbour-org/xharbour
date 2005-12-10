@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.32 2005/11/15 18:45:21 druzus Exp $
+ * $Id: tgetlist.prg,v 1.33 2005/12/08 19:06:12 oh1 Exp $
  */
 
 /*
@@ -381,8 +381,8 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
 #ifdef HB_COMPAT_C53
       case K_LBUTTONDOWN
       case K_LDBLCLK
-         nMouseRow    := WMRow()
-         nMouseColumn := WMCol()
+         nMouseRow    := MRow()
+         nMouseColumn := MCol()
 
          IF ( !( VALTYPE( oMenu ) == "O" ) )
             nButton := 0
@@ -1185,8 +1185,8 @@ METHOD GUIApplyKey(  oGUI, nKey, oMenu, oGetMsg ) CLASS HBGetList
 
    case K_LBUTTONDOWN
    case K_LDBLCLK
-      nMouseRow    := WMRow()
-      nMouseColumn := WMCol()
+      nMouseRow    := MRow()
+      nMouseColumn := MCol()
 
       IF ( !( VALTYPE( oMenu ) == "O" ) )
          nButton := 0
@@ -1396,7 +1396,7 @@ METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
       if oGet:exitState == GE_NOEXIT  // Added.
          if ::nHitcode == HTCELL
             //TraceLog( 'hitcode ',::nHitcode )
-            // Replaces call to TBMouse( oTB, WMRow(), WMCol() ):
+            // Replaces call to TBMouse( oTB, MRow(), MCol() ):
             oTB:RowPos := oTb:mRowPos
             oTB:ColPos := oTb:mColPos
             oTB:Invalidate()
@@ -1525,8 +1525,8 @@ METHOD TBApplyKey( oGet, oTB, nKey, oMenu, oGetMsg ) CLASS HBGETLIST
 
    case K_LBUTTONDOWN
    case K_LDBLCLK
-      nMouseRow    := WMRow()
-      nMouseColumn := WMCol()
+      nMouseRow    := MRow()
+      nMouseColumn := MCol()
 
       IF ( !( VALTYPE( oMenu ) == "O" ) )
          nButton := 0
