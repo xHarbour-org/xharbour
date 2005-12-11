@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.35 2005/01/10 18:45:38 druzus Exp $
+ * $Id: gtsln.c,v 1.36 2005/03/31 04:00:57 druzus Exp $
  */
 
 /*
@@ -58,10 +58,8 @@
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
-#ifndef HB_SLN_UTF8
 /* does terminal works in Unicode (UTF-8) mode? */
-int SLsmg_Is_Unicode = 0;
-#endif
+BOOL hb_sln_Is_Unicode = FALSE;
 
 /* Slang color names */
 static char * s_colorNames[] =
@@ -86,8 +84,11 @@ static char * s_colorNames[] =
 };
 
 /* to convert Clipper colors into Slang ones */
+#ifdef HB_SLN_UTF8
+static SLsmg_Color_Type s_colorTab[ 256 ];
+#else
 static SLsmg_Char_Type s_colorTab[ 256 ];
-
+#endif
 /* to convert displayed characters */
 static SLsmg_Char_Type s_outputTab[ 256 ];
 
@@ -112,13 +113,6 @@ static ULONG s_clipsize = 0;
 
 /* indicate if we are currently running a command from system */
 static BOOL s_bSuspended = FALSE;
-
-/* delay for waiting on characters after ESC key */
-extern int s_gtSLN_escDelay;
-
-/* to convert DeadKey+letter to national character */
-extern unsigned char s_convKDeadKeys[];
-extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
 
 #define _GetScreenWidth()  SLtt_Screen_Cols
 #define _GetScreenHeight() SLtt_Screen_Rows
@@ -157,7 +151,7 @@ static void hb_sln_colorTrans( void )
        * bit 7 is a blinking attribute - not used when console is not in
        * UTF-8 mode because we are using it for changing into ACSC
        */
-      bg = ( i >> 4 ) & ( SLsmg_Is_Unicode ? 0x0F : 0x07 );
+      bg = ( i >> 4 ) & ( hb_sln_Is_Unicode ? 0x0F : 0x07 );
       /*
        * in Clipper default color i 0x07 when in Slang 0x00,
        * we make a small trick with XOR 7 to make default colors
@@ -165,7 +159,11 @@ static void hb_sln_colorTrans( void )
        */
       clr = ( bg << 4 ) | ( fg ^ 0x07 );
       SLtt_set_color( clr, ( char * ) NULL, s_colorNames[ fg ], s_colorNames[ bg ] );
-      s_colorTab[ i ] = SLSMG_BUILD_CHAR( 0, clr );
+#ifdef HB_SLN_UTF8
+      s_colorTab[ i ] = clr;
+#else
+      HB_SLN_BUILD_RAWCHAR( s_colorTab[ i ], 0, clr );
+#endif
    }
 }
 
@@ -219,12 +217,16 @@ static void hb_sln_setSingleBox( void )
 static void hb_sln_setACSCtrans( void )
 {
    unsigned char * p, ch;
-   SLsmg_Char_Type chBoard[3] = { 0, 0, 0 }, chArrow[4];
+   SLsmg_Char_Type chBoard[3], chArrow[4];
 
-   chArrow[ 0 ] = SLSMG_BUILD_CHAR( '<', 0 );
-   chArrow[ 1 ] = SLSMG_BUILD_CHAR( '>', 0 );
-   chArrow[ 2 ] = SLSMG_BUILD_CHAR( 'v', 0 );
-   chArrow[ 3 ] = SLSMG_BUILD_CHAR( '^', 0 );
+   HB_SLN_BUILD_RAWCHAR( chBoard[ 0 ], 0, 0 );
+   HB_SLN_BUILD_RAWCHAR( chBoard[ 1 ], 0, 0 );
+   HB_SLN_BUILD_RAWCHAR( chBoard[ 2 ], 0, 0 );
+
+   HB_SLN_BUILD_RAWCHAR( chArrow[ 0 ], '<', 0 );
+   HB_SLN_BUILD_RAWCHAR( chArrow[ 1 ], '>', 0 );
+   HB_SLN_BUILD_RAWCHAR( chArrow[ 2 ], 'v', 0 );
+   HB_SLN_BUILD_RAWCHAR( chArrow[ 3 ], '^', 0 );
 
    /* init an alternate chars table */
    if( ( p = ( unsigned char * ) SLtt_Graphics_Char_Pairs ) )
@@ -235,10 +237,11 @@ static void hb_sln_setACSCtrans( void )
       for( i = 0; i < len; i += 2 )
       {
          ch = *p++;
-         SLch = ( ( SLsmg_Char_Type )( *p++ ) ) | HB_SLN_ACSC_ATTR;
+         HB_SLN_BUILD_RAWCHAR( SLch, *p++, 0 );
+         HB_SLN_SET_ACSC( SLch );
          switch( ch )
          {
-#ifdef HB_SLN_UTF8
+#ifdef HB_SLN_UNICODE
             case SLSMG_HLINE_CHAR_TERM   :   s_outputTab[ 196 ] = SLch; break;
             case SLSMG_VLINE_CHAR_TERM   :   s_outputTab[ 179 ] = SLch; break;
             case SLSMG_ULCORN_CHAR_TERM  :   s_outputTab[ 218 ] = SLch; break;
@@ -291,14 +294,15 @@ static void hb_sln_setACSCtrans( void )
 #endif
          }
       }
-      SLch = 0;
-      for ( i = 0; i < 3 && SLch == 0; i++ )
+
+      HB_SLN_BUILD_RAWCHAR( SLch, 0, 0 );
+      for ( i = 0; i < 3 && !HB_SLN_IS_CHAR( SLch ); i++ )
          SLch = chBoard[ i ];
-      if ( SLch == 0 )
-         SLch = SLSMG_BUILD_CHAR( '#', 0 );
+      if ( !HB_SLN_IS_CHAR( SLch ) )
+         HB_SLN_BUILD_RAWCHAR( SLch, '#', 0 );
       for ( i = 0; i < 3; i++ )
       {
-         if ( chBoard[ i ] == 0 )
+         if ( !HB_SLN_IS_CHAR( chBoard[ i ] ) )
             chBoard[ i ] = SLch;
       }
       s_outputTab[ 176 ] = chBoard[ 0 ];
@@ -311,7 +315,7 @@ static void hb_sln_setACSCtrans( void )
       s_outputTab[ 25 ] = s_outputTab[ 31 ] = chArrow[ 2 ];
       s_outputTab[ 24 ] = s_outputTab[ 30 ] = chArrow[ 3 ];
 
-#ifdef HB_SLN_UTF8
+#ifdef HB_SLN_UNICODE
       /*
        * There is a bug in SLANG lib patched for UTF-8 support
        * SLSMG_UTEE_CHAR_TERM is reverted with SLSMG_DTEE_CHAR_TERM
@@ -347,59 +351,65 @@ static void hb_sln_setCharTrans( PHB_CODEPAGE cdpHost, PHB_CODEPAGE cdpTerm, BOO
    for( i = 0; i < 256; i++ )
    {
 #ifndef HB_CDP_SUPPORT_OFF
-      if ( SLsmg_Is_Unicode )
+      if( hb_sln_Is_Unicode )
          iDst = hb_cdpGetU16( cdpHost, ( BYTE ) i );
       else
 #endif
          iDst = i;
 
-      if ( iDst < 32 )
+      if( iDst < 32 )
          /* under Unix control-chars are not visible in a general meaning */
-         s_outputTab[ i ] = SLSMG_BUILD_CHAR( '.', 0 );
-      else if ( ! SLsmg_Is_Unicode && i >= 128 )
-         s_outputTab[ i ] = SLSMG_BUILD_CHAR( iDst, 0 ) | HB_SLN_ACSC_ATTR;
+         HB_SLN_BUILD_RAWCHAR( s_outputTab[ i ], '.', 0 );
+      else if( ! hb_sln_Is_Unicode && i >= 128 )
+      {
+         HB_SLN_BUILD_RAWCHAR( s_outputTab[ i ], iDst, 0 );
+         HB_SLN_SET_ACSC( s_outputTab[ i ] );
+      }
       else
-         s_outputTab[ i ] = SLSMG_BUILD_CHAR( iDst, 0 );
+         HB_SLN_BUILD_RAWCHAR( s_outputTab[ i ], iDst, 0 );
       s_outboxTab[ i ] = s_outputTab[ i ];
    }
 
-   if ( ! SLsmg_Is_Unicode )
+
+   if( ! hb_sln_Is_Unicode )
    {
       hb_sln_setACSCtrans();
+
       /* QUESTION: do we have double, single-double, ... frames under xterm ? */
       if( hb_gt_UnderXterm )
          hb_sln_setSingleBox();
+
       memcpy( s_outboxTab, s_outputTab, sizeof( s_outputTab ) );
 
 #ifndef HB_CDP_SUPPORT_OFF
-      if ( cdpHost && cdpHost->nChars )
+      if( cdpHost && cdpHost->nChars )
       {
-#ifdef HB_SLN_UTF8
+#ifdef HB_SLN_UNICODE
          HB_SYMBOL_UNUSED( cdpTerm );
 #else
          BOOL fTrans = cdpTerm && cdpTerm->nChars == cdpHost->nChars;
 #endif
 
-         for ( i = 0; i < cdpHost->nChars; i++ )
+         for( i = 0; i < cdpHost->nChars; i++ )
          {
             iSrc = ( unsigned char ) cdpHost->CharsUpper[ i ];
-#ifdef HB_SLN_UTF8
+#ifdef HB_SLN_UNICODE
             iDst = hb_cdpGetU16( cdpHost, ( BYTE ) iSrc );
 #else
             iDst = fTrans ? ( unsigned char ) cdpTerm->CharsUpper[ i ] : iSrc;
 #endif
-            s_outputTab[ iSrc ] = SLSMG_BUILD_CHAR( iDst, 0 );
-            if ( fBox )
+            HB_SLN_BUILD_RAWCHAR( s_outputTab[ iSrc ], iDst, 0 );
+            if( fBox )
                s_outboxTab[ iSrc ] = s_outputTab[ iSrc ];
 
             iSrc = ( unsigned char ) cdpHost->CharsLower[ i ];
-#ifdef HB_SLN_UTF8
+#ifdef HB_SLN_UNICODE
             iDst = hb_cdpGetU16( cdpHost, ( BYTE ) iSrc );
 #else
             iDst = fTrans ? ( unsigned char ) cdpTerm->CharsLower[ i ] : iSrc;
 #endif
-            s_outputTab[ iSrc ] = SLSMG_BUILD_CHAR( iDst, 0 );
-            if ( fBox )
+            HB_SLN_BUILD_RAWCHAR( s_outputTab[ iSrc ], iDst, 0 );
+            if( fBox )
                s_outboxTab[ iSrc ] = s_outputTab[ iSrc ];
          }
       }
@@ -456,12 +466,46 @@ static void hb_sln_setKeyTrans( PHB_CODEPAGE cdpHost, PHB_CODEPAGE cdpTerm )
          ch = ( unsigned char ) p[ i + 1 ];
          s_convKDeadKeys[ i + 1 ] = ( unsigned char ) p[ i ];
          s_convKDeadKeys[ i + 2 ] = ch;
-         s_inputTab[ ch ] = SLSMG_BUILD_CHAR( ch, 0 );
+         s_inputTab[ ch ] = ch;
       }
       hb_xfree( ( void * ) p );
    }
 }
 
+/* *********************************************************************** */
+#ifdef HB_SLN_UTF8
+static BOOL hb_sln_isUTF8( int iStdOut, int iStdIn )
+{
+   if( isatty( iStdOut ) && isatty( iStdIn ) )
+   {
+      char * szBuf = "\r\303\255\033[6n";
+      struct timeval tv;
+      fd_set rdfds;
+
+      write( iStdOut, szBuf, strlen( szBuf ) );
+      FD_ZERO( &rdfds );
+      FD_SET( iStdIn, &rdfds );
+      tv.tv_sec = 1;
+      tv.tv_usec = 0;
+      if( select( iStdIn + 1, &rdfds, NULL, NULL, &tv ) > 0 )
+      {
+         char rdbuf[ 100 ];
+         int n, y, x;
+         n = read( iStdIn, rdbuf, sizeof( rdbuf ) - 1 );
+         if( n >= 6 )
+         {
+            rdbuf[ n ] = '\0';
+            if( sscanf( rdbuf, "\033[%d;%dR", &y, &x ) == 2 )
+            {
+               if( x == 2 )
+                  return TRUE;
+            }
+         }
+      }
+   }
+   return FALSE;
+}
+#endif
 /* *********************************************************************** */
 
 /* I think this function should not be void. It should be BOOL */
@@ -482,6 +526,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     s_uiDispCount = 0;
 
+#ifdef HB_SLN_UTF8
+    /* hb_sln_Is_Unicode = SLutf8_enable( -1 ); */
+#endif
+
     /* read a terminal descripion from a terminfo database */
     SLtt_get_terminfo();
 
@@ -497,7 +545,12 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
                 SLang_TT_Write_FD = SLang_TT_Read_FD;
 
 #ifdef HB_SLN_UTF8
-//            SLsmg_Setlocale = 0;
+            if( ! hb_sln_Is_Unicode &&
+                  hb_sln_isUTF8( SLang_TT_Write_FD, SLang_TT_Read_FD ) )
+                hb_sln_Is_Unicode = SLutf8_enable( 1 );
+#endif
+#ifdef HB_SLN_UNICODE
+            /* SLsmg_Setlocale = 0; */
 #endif
             /* initialize a screen handling subsytem */
             if( SLsmg_init_smg() != -1 )
@@ -528,7 +581,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
                    characters using it's UNICODE values so we can use
                    blink bit as in Clipper.
                  */
-                if ( SLsmg_Is_Unicode )
+#ifdef HB_SLN_UNICODE
+                hb_sln_Is_Unicode = SLsmg_Is_Unicode;
+#endif
+                if( hb_sln_Is_Unicode )
                 {
                     SLtt_Blink_Mode = 1;
                     SLtt_Use_Blink_For_ACS = 1;
@@ -820,7 +876,7 @@ static void HB_GT_FUNC(gt_xPutch( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE 
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xPutch(%hu, %hu, %d, %i)", uiRow, uiCol, (int) byAttr, byChar));
 
-    SLchar = HB_SLN_BUILD_CHAR( byChar, byAttr );
+    HB_SLN_BUILD_CHAR( SLchar, byChar, byAttr );
 
     SLsmg_gotorc( uiRow, uiCol );
     SLsmg_write_raw( &SLchar, 1 );
@@ -838,7 +894,7 @@ void HB_GT_FUNC(gt_Puts( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE * pbyStr,
     pScr = ( SLsmg_Char_Type * ) hb_xgrab( ( ulLen + 1 ) * sizeof( SLsmg_Char_Type ) );
     for( i = 0; i < ulLen; i++ )
     {
-        *( pScr + i ) = HB_SLN_BUILD_CHAR( *pbyStr++, byAttr );;
+        HB_SLN_BUILD_CHAR( pScr[ i ], pbyStr[ i ], byAttr );
     }
 
     SLsmg_gotorc( uiRow, uiCol );
@@ -1128,7 +1184,7 @@ void HB_GT_FUNC(gt_Replicate( USHORT uiRow, USHORT uiCol, BYTE byAttr, BYTE byCh
 
     pScr = ( SLsmg_Char_Type * ) hb_xgrab( ( ulLen + 1 ) * sizeof( SLsmg_Char_Type ) );
 
-    SLchar = HB_SLN_BUILD_CHAR( byChar, byAttr );
+    HB_SLN_BUILD_CHAR( SLchar, byChar, byAttr );
 
     for( i = 0; i < ulLen; i++ )
         *( pScr + i ) = SLchar;

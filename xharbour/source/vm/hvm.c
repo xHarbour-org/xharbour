@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.540 2005/11/19 19:12:23 ronpinkas Exp $
+ * $Id: hvm.c,v 1.541 2005/11/26 22:18:07 ronpinkas Exp $
  */
 
 /*
@@ -2217,7 +2217,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_vm_pSequence = hb_vm_pSequence->pPrev;
             hb_xfree( (void *) pFree );
 
-            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );;
+            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             break;
          }
 

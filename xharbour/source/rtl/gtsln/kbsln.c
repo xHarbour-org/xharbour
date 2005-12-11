@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.16 2005/01/12 16:36:23 druzus Exp $
+ * $Id: kbsln.c,v 1.17 2005/03/31 04:00:57 druzus Exp $
  */
 
 /*
@@ -106,9 +106,6 @@
 static int s_hb_gt_Abort_key = 28;
 
 /* *********************************************************************** */
-
-/* indicates that screen size has changed */
-extern BOOL hb_gt_sln_bScreen_Size_Changed;
 
 /* DeadKey definition's ENVVAR name. This EnvVar contains */
 /* an ASCII value of a key, which serves as a DeadKey */
@@ -414,8 +411,8 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
             return tmp;
     }
 
-#if !defined( HB_CDP_SUPPORT_OFF ) && defined( HB_SLN_UTF8 )
-    if ( SLsmg_Is_Unicode && ch < 256 )
+#if !defined( HB_CDP_SUPPORT_OFF ) && ( defined( HB_SLN_UTF8 ) || defined( HB_SLN_UNICODE ) )
+    if ( hb_sln_Is_Unicode && ch < 256 )
     {
         int n = 0;
         USHORT uc = 0;
@@ -426,7 +423,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
             while ( n > 0 )
             {
-                if( SLang_input_pending( s_gtSLN_escDelay == 0 ? 10 : 
+                if( SLang_input_pending( s_gtSLN_escDelay == 0 ? -100 :
                                          - HB_MAX( s_gtSLN_escDelay, 0 ) ) == 0 )
                     break;
                 buf[ i++ ] = SLang_getkey();

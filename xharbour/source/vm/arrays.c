@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.129 2005/11/22 02:33:47 walito Exp $
+ * $Id: arrays.c,v 1.130 2005/11/26 22:18:07 ronpinkas Exp $
  */
 
 /*
@@ -88,7 +88,6 @@ int hb_arrayMode( void );
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
-   ULONG ulPos;
 
    //#define DEBUG_ARRAYS
    #define DEBUG_OWNERS

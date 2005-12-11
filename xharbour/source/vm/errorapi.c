@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.68 2005/12/06 07:19:10 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.69 2005/12/06 18:05:02 ronpinkas Exp $
  */
 
 /*
@@ -296,7 +296,7 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
       /* Don't run on quit request */
-      if ( hb_vm_bQuitRequest  )
+      if( hb_vm_bQuitRequest )
       {
          return 0; /* Meaningless here */
       }
@@ -477,7 +477,7 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
       /* Don't run on quit request */
-      if( hb_vm_bQuitRequest  )
+      if( hb_vm_bQuitRequest )
       {
          return NULL; /* Meaningless here */
       }

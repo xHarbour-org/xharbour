@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.93 2005/11/16 12:16:38 druzus Exp $
+ * $Id: ads1.c,v 1.94 2005/12/05 21:41:48 jabrecer Exp $
  */
 
 /*
@@ -461,7 +461,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB
          switch( u16KeyType )
          {
             case ADS_STRING:
-               if( pItem->type == HB_IT_STRING )
+               if( HB_IS_STRING( pItem ) )
                {
                   /* bTypeError = FALSE; */
 #ifdef ADS_USE_OEM_TRANSLATION
@@ -479,7 +479,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB
 
             case ADS_NUMERIC:
             {
-               if( pItem->type & HB_IT_NUMERIC )
+               if( HB_IS_NUMERIC( pItem ) )
                {
                   double dTemp;
                   /* bTypeError = FALSE; */
@@ -493,7 +493,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB
             }
 
             case ADS_DATE:
-               if( pItem->type == HB_IT_DATE )
+               if( HB_IS_DATE( pItem ) )
                {
                   double dTemp;
                   /* bTypeError = FALSE; */
@@ -1645,10 +1645,22 @@ static ERRCODE adsFieldName( ADSAREAP pArea, USHORT uiIndex, void * szName )
 
 static ERRCODE adsFlush( ADSAREAP pArea )
 {
-   HB_SYMBOL_UNUSED( pArea );
    HB_TRACE(HB_TR_DEBUG, ("adsFlush(%p)", pArea ));
 
-   AdsWriteRecord( pArea->hTable );
+   /* This function should flush current record buffer if hot and
+      send to OS request to flush its file buffers to disk, so instead
+      of AdsWriteRecord(), AdsFlushFileBuffers() should be used */
+   /* AdsWriteRecord( pArea->hTable ); */
+
+   if( !pArea->fReadonly )
+   {
+#if ADS_REQUIRE_VERSION >= 6
+      AdsFlushFileBuffers( pArea->hTable );
+#else
+      AdsWriteRecord( pArea->hTable );
+#endif
+   }
+
    return SUCCESS;
 }
 

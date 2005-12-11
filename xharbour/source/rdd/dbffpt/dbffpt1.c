@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.65 2005/11/16 12:16:45 druzus Exp $
+ * $Id: dbffpt1.c,v 1.66 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -1151,7 +1151,10 @@ static ULONG hb_fptCountSMTItemLength( FPTAREAP pArea, PHB_ITEM pItem,
          break;
       case HB_IT_MEMO:
       case HB_IT_STRING:
-         ulSize = 3 + HB_MIN( pItem->item.asString.length, 0xFFFF );
+         ulLen = hb_itemGetCLen( pItem );
+         if( ulLen > 0xFFFF )
+            ulLen = 0xFFFF;
+         ulSize = ulLen + 3;
          break;
       case HB_IT_LOGICAL:
          ulSize = 2;
@@ -1248,6 +1251,7 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 {
    ULONG ulLen, i, ulSize = 0;
    HB_LONG iVal;
+   LONG lVal;
    double dVal;
    int iWidth, iDec;
 
@@ -1270,12 +1274,14 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
       case HB_IT_STRING:
       case HB_IT_MEMO:
          *(*bBufPtr)++ = SMT_IT_CHAR;
-         ulLen = HB_MIN( pItem->item.asString.length, 0xFFFF );
+         ulLen = hb_itemGetCLen( pItem );
+         if( ulLen > 0xFFFF )
+            ulLen = 0xFFFF;
          HB_PUT_LE_UINT16( *bBufPtr, ulLen );
          *bBufPtr += 2;
          if ( ulLen > 0 )
          {
-            memcpy( *bBufPtr, pItem->item.asString.value, ulLen );
+            memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( ( char *) *bBufPtr, hb_cdp_page, pArea->cdPage, ulLen );
 #endif
@@ -1307,13 +1313,14 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 
       case HB_IT_DATE:
          *(*bBufPtr)++ = SMT_IT_DATE;
-         HB_PUT_LE_UINT32( *bBufPtr, pItem->item.asDate.value );
+         lVal = hb_itemGetDL( pItem );
+         HB_PUT_LE_UINT32( *bBufPtr, lVal );
          *bBufPtr += 4;
          break;
 
       case HB_IT_LOGICAL:
          *(*bBufPtr)++ = SMT_IT_LOGICAL;
-         *(*bBufPtr)++ = pItem->item.asLogical.value ? 1 : 0;
+         *(*bBufPtr)++ = hb_itemGetL( pItem ) ? 1 : 0;
          break;
 
       case HB_IT_NIL:
@@ -1554,11 +1561,11 @@ static ULONG hb_fptCountSixItemLength( FPTAREAP pArea, PHB_ITEM pItem,
       case HB_IT_MEMO:
       case HB_IT_STRING:
          ulSize = SIX_ITEM_BUFSIZE;
-         ulLen = pItem->item.asString.length;
-         if ( pArea->uiMemoVersion == DB_MEMOVER_SIX )
+         ulLen = hb_itemGetCLen( pItem );
+         if( pArea->uiMemoVersion == DB_MEMOVER_SIX && ulLen > 0xFFFF )
          {
             /* only 2 bytes (SHORT) for SIX compatibility */
-            ulLen = HB_MIN( ulLen, 0xFFFF );
+            ulLen = 0xFFFF;
          }
          ulSize += ulLen;
          break;
@@ -1580,6 +1587,8 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 {
    ULONG ulLen, i, ulSize;
    HB_LONG iVal;
+   LONG lVal;
+   double dVal;
    int iWidth, iDec;
    PHB_ITEM pTmpItem;
 
@@ -1612,6 +1621,7 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          {
             HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_LNUM );
             HB_PUT_LE_UINT16( &(*bBufPtr)[2], iWidth );
+            HB_PUT_LE_UINT16( &(*bBufPtr)[4], iDec );
             HB_PUT_LE_UINT32( &(*bBufPtr)[6], iVal );
             *bBufPtr += SIX_ITEM_BUFSIZE;
          }
@@ -1626,39 +1636,42 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          break;
 
       case HB_IT_DOUBLE:
+         dVal = hb_itemGetND( pItem );
+         hb_itemGetNLen( pItem, &iWidth, &iDec );
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_DNUM );
-         HB_PUT_LE_UINT16( &(*bBufPtr)[2], pItem->item.asDouble.length );
-         HB_PUT_LE_UINT16( &(*bBufPtr)[4], pItem->item.asDouble.decimal );
-         HB_PUT_LE_DOUBLE( &(*bBufPtr)[6], pItem->item.asDouble.value );
+         HB_PUT_LE_UINT16( &(*bBufPtr)[2], iWidth );
+         HB_PUT_LE_UINT16( &(*bBufPtr)[4], iDec );
+         HB_PUT_LE_DOUBLE( &(*bBufPtr)[6], dVal );
          *bBufPtr += SIX_ITEM_BUFSIZE;
          break;
 
       case HB_IT_DATE:
+         lVal = hb_itemGetDL( pItem );
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_LDATE );
-         HB_PUT_LE_UINT32( &(*bBufPtr)[6], pItem->item.asDate.value );
+         HB_PUT_LE_UINT32( &(*bBufPtr)[6], lVal );
          *bBufPtr += SIX_ITEM_BUFSIZE;
          break;
 
       case HB_IT_LOGICAL:
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_LOG );
-         (*bBufPtr)[6] = pItem->item.asLogical.value ? 1 : 0;
+         (*bBufPtr)[6] = hb_itemGetL( pItem ) ? 1 : 0;
          *bBufPtr += SIX_ITEM_BUFSIZE;
          break;
 
       case HB_IT_STRING:
       case HB_IT_MEMO:
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_CHAR );
-         ulLen = pItem->item.asString.length;
-         if ( pArea->uiMemoVersion == DB_MEMOVER_SIX )
+         ulLen = hb_itemGetCLen( pItem );
+         if( pArea->uiMemoVersion == DB_MEMOVER_SIX && ulLen > 0xFFFF )
          {
             /* only 2 bytes (SHORT) for SIX compatibility */
-            ulLen = HB_MIN( ulLen, 0xFFFF );
+            ulLen = 0xFFFF;
          }
          HB_PUT_LE_UINT32( &(*bBufPtr)[2], ulLen );
          *bBufPtr += SIX_ITEM_BUFSIZE;
          if ( ulLen > 0 )
          {
-            memcpy( *bBufPtr, pItem->item.asString.value, ulLen );
+            memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( ( char *) *bBufPtr, hb_cdp_page, pArea->cdPage, ulLen );
 #endif
@@ -1786,9 +1799,9 @@ static ULONG hb_fptCountFlexItemLength( FPTAREAP pArea, PHB_ITEM pItem,
          break;
       case HB_IT_MEMO:
       case HB_IT_STRING:
-         ulLen = pItem->item.asString.length;
-         /* only 2 bytes (SHORT) for SIX compatibility */
-         ulLen = HB_MIN( ulLen, 0xFFFF );
+         ulLen = hb_itemGetCLen( pItem );
+         if( ulLen > 0xFFFF )
+            ulLen = 0xFFFF;
          ulSize += ulLen + 2;
          break;
       case HB_IT_DATE:
@@ -1815,6 +1828,9 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 {
    ULONG ulLen, i;
    HB_LONG iVal;
+   LONG lVal;
+   double dVal;
+   int iWidth, iDec;
 
    switch ( hb_itemType( pItem ) )
    {
@@ -1831,10 +1847,12 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
       case HB_IT_MEMO:
       case HB_IT_STRING:
          *(*bBufPtr)++ = FPTIT_FLEXAR_STR;
-         ulLen = pItem->item.asString.length & 0xFFFF;
+         ulLen = hb_itemGetCLen( pItem );
+         if( ulLen > 0xFFFF )
+            ulLen = 0xFFFF;
          HB_PUT_LE_UINT16( *bBufPtr, ( USHORT ) ulLen );
          *bBufPtr += 2;
-         memcpy( *bBufPtr, pItem->item.asString.value, ulLen );
+         memcpy( *bBufPtr, hb_itemGetCPtr( pItem ), ulLen );
 #ifndef HB_CDP_SUPPORT_OFF
          hb_cdpnTranslate( ( char *) *bBufPtr, hb_cdp_page, pArea->cdPage, ulLen );
 #endif
@@ -1842,7 +1860,8 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          break;
       case HB_IT_DATE:
          *(*bBufPtr)++ = FPTIT_FLEXAR_DATE;
-         HB_PUT_LE_UINT32( *bBufPtr, pItem->item.asDate.value );
+         lVal = hb_itemGetDL( pItem );
+         HB_PUT_LE_UINT32( *bBufPtr, lVal );
          *bBufPtr += 4;
          break;
       case HB_IT_INTEGER:
@@ -1879,14 +1898,16 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          }
          break;
       case HB_IT_DOUBLE:
+         dVal = hb_itemGetND( pItem );
+         hb_itemGetNLen( pItem, &iWidth, &iDec );
          *(*bBufPtr)++ = FPTIT_FLEXAR_DBL;
-         *(*bBufPtr)++ = (BYTE) pItem->item.asDouble.length;
-         *(*bBufPtr)++ = (BYTE) pItem->item.asDouble.decimal;
-         HB_PUT_LE_DOUBLE( *bBufPtr, pItem->item.asDouble.value );
+         *(*bBufPtr)++ = (BYTE) iWidth;
+         *(*bBufPtr)++ = (BYTE) iDec;
+         HB_PUT_LE_DOUBLE( *bBufPtr, dVal );
          *bBufPtr += 8;
          break;
       case HB_IT_LOGICAL:
-         *(*bBufPtr)++ = pItem->item.asLogical.value ?
+         *(*bBufPtr)++ = hb_itemGetL( pItem ) ?
                                    FPTIT_FLEXAR_TRUE : FPTIT_FLEXAR_FALSE;
          break;
       case HB_IT_NIL:
@@ -2568,14 +2589,15 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    BYTE  *bBufPtr = NULL, *bBufAlloc = NULL;
    ERRCODE errCode;
    HB_LONG iVal;
+   LONG lVal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptPutMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( HB_IS_STRING( pItem ) )
    {
       ulType = FPTIT_TEXT;
-      ulSize = pItem->item.asString.length;
-      bBufPtr = ( BYTE *) pItem->item.asString.value;
+      ulSize = hb_itemGetCLen( pItem );
+      bBufPtr = ( BYTE *) hb_itemGetCPtr( pItem );
 #ifndef HB_CDP_SUPPORT_OFF
       if( ulSize > 0 && pArea->cdPage != hb_cdp_page )
       {
@@ -2638,13 +2660,14 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             ulSize = 0;
             break;
          case HB_IT_LOGICAL:
-            ulType = pItem->item.asLogical.value ? FPTIT_FLEX_TRUE : FPTIT_FLEX_FALSE;
+            ulType = hb_itemGetL( pItem ) ? FPTIT_FLEX_TRUE : FPTIT_FLEX_FALSE;
             ulSize = 0;
             break;
          case HB_IT_DATE:
             ulType = FPTIT_FLEX_LDATE;
             ulSize = 4;
-            HB_PUT_LE_UINT32( itmBuffer, pItem->item.asDate.value );
+            lVal = hb_itemGetDL( pItem );
+            HB_PUT_LE_UINT32( itmBuffer, lVal );
             bBufPtr = itmBuffer;
             break;
          case HB_IT_INTEGER:
@@ -2681,11 +2704,14 @@ static ERRCODE hb_fptPutMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             }
             break;
          case HB_IT_DOUBLE:
+         {
+            double d = hb_itemGetND( pItem );
             ulType = FPTIT_FLEX_DOUBLE;
             ulSize = 8;
-            HB_PUT_LE_DOUBLE( itmBuffer, pItem->item.asDouble.value );
+            HB_PUT_LE_DOUBLE( itmBuffer, d );
             bBufPtr = itmBuffer;
             break;
+         }
          default:
             ulType = FPTIT_BINARY;
             ulSize = 0;
@@ -3041,7 +3067,7 @@ static ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             return EDBF_DATATYPE;
          lVal = hb_itemGetNInt( pItem );
          if( HB_IS_DOUBLE( pItem ) ?
-                        ! HB_DBL_LIM_INT32( pItem->item.asDouble.value ) :
+                        ! HB_DBL_LIM_INT32( hb_itemGetND( pItem ) ) :
                         ! HB_LIM_INT32( lVal ) )
          {
             return EDBF_DATAWIDTH;
@@ -3128,10 +3154,13 @@ static ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
          }
          else if( HB_IS_STRING( pItem ) )
          {
-            uiType = HB_MIN( pItem->item.asString.length, HB_VF_CHAR );
+            ULONG ulLen = hb_itemGetCLen( pItem );
 
+            if( ulLen > HB_VF_CHAR )
+               ulLen = HB_VF_CHAR;
+            uiType = ( USHORT ) ulLen;
             pAlloc = ( BYTE * ) hb_xgrab( uiType + 1 );
-            memcpy( pAlloc, pItem->item.asString.value, uiType );
+            memcpy( pAlloc, hb_itemGetCPtr( pItem ), uiType );
 #ifndef HB_CDP_SUPPORT_OFF
             hb_cdpnTranslate( ( char * ) pAlloc, hb_cdp_page, pArea->cdPage, uiType );
 #endif
@@ -3841,7 +3870,9 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
        pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO )
    {
       ULONG ulBlock, ulSize, ulType;
+      BOOL bDeleted;
 
+      SELF_DELETED( ( AREAP ) pArea, &bDeleted );
       switch( uiType )
       {
          case DBS_BLOB_GET:         /* BLOBGet() { <nStart>, <nCount> } */
@@ -3854,7 +3885,7 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
             hb_dbfGetMemoData( (DBFAREAP) pArea, uiIndex - 1,
                                &ulBlock, &ulSize, &ulType );
             hb_itemPutNInt( pItem, ( HB_FOFFSET ) ulBlock * pArea->uiMemoBlockSize +
-                                   pArea->bMemoType == DB_MEMO_FPT ? sizeof( FPTBLOCK ) : 0 );
+                                   ( pArea->bMemoType == DB_MEMO_FPT ? sizeof( FPTBLOCK ) : 0 ) );
             return SUCCESS;
          case DBS_BLOB_POINTER:
             hb_dbfGetMemoData( (DBFAREAP) pArea, uiIndex - 1,

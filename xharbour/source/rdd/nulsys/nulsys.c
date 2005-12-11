@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: nulsys.c,v 1.1 2005/11/15 13:45:20 druzus Exp $
  */
 
 /*
@@ -148,7 +148,9 @@ HB_FUNC( DBSEEK ) { hb_retl( FALSE ); }
 
 HB_FUNC( DBSKIP ) { hb_retni( 0 ); }
 
+#ifdef HB_COMPAT_XPP
 HB_FUNC( DBSKIPPER ) { hb_retni( 0 ); }
+#endif
 
 HB_FUNC( DBAPPEND ) {}
 

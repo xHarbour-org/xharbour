@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.10 2004/12/28 07:16:14 druzus Exp $
+ * $Id: gtsln.h,v 1.11 2005/01/10 18:45:39 druzus Exp $
  */
 
 /*
@@ -82,11 +82,38 @@
  * need to modified it for your slang version because UTF-8 patches
  * are still unoficial
  */
-#if UTF8 && SLSMG_HLINE_CHAR_TERM
+#if ( UTF8 && SLSMG_HLINE_CHAR_TERM )
+    #define HB_SLN_UNICODE
+#elif SLANG_VERSION >= 20000
     #define HB_SLN_UTF8
 #endif
 
 /* missing defines in previous versions of Slang - this may not work ok ! */
+#ifdef HB_SLN_UTF8
+
+#define HB_SLN_SET_ACSC( slch )                 \
+            do { \
+               (slch).color |= SLSMG_ACS_MASK; \
+            } while( 0 )
+#define HB_SLN_BUILD_CHAR( slch, ch, attr )     \
+            do { \
+                (slch).color = s_currOutTab[ (BYTE) (ch) ].color | \
+                               s_colorTab[ (BYTE) (attr) ]; \
+                (slch).nchars = 1; \
+                (slch).wchars[ 0 ] = s_currOutTab[ (BYTE) (ch) ].wchars[ 0 ]; \
+            } while( 0 )
+
+#define HB_SLN_BUILD_RAWCHAR( slch, ch, attr )  \
+            do { \
+                (slch).color = (attr); \
+                (slch).nchars = 1; \
+                (slch).wchars[ 0 ] = ( SLwchar_Type ) (ch); \
+            } while( 0 )
+
+#define HB_SLN_IS_CHAR( slch )     ( (slch).wchars[ 0 ] != 0 )
+
+#else /* !defined(HB_SLN_UTF8) */
+
 #if SLANG_VERSION < 10400
     typedef unsigned short SLsmg_Char_Type;
     #define SLSMG_EXTRACT_CHAR( x ) ( ( x ) & 0xFF )
@@ -111,12 +138,23 @@
 #endif
 #endif
 
-#define HB_SLN_ACSC_ATTR        SLSMG_BUILD_CHAR( 0, 0x80 )
-#define HB_SLN_BUILD_CHAR( ch, attr )   ( s_currOutTab[ (BYTE) ch ] | s_colorTab[ (BYTE) attr ] )
+#define HB_SLN_SET_ACSC( slch )                 \
+            do { \
+               (slch) = SLSMG_BUILD_CHAR( (slch), 0x80 ); \
+            } while( 0 )
+#define HB_SLN_BUILD_CHAR( slch, ch, attr )     \
+            do { \
+                (slch) = s_currOutTab[ (BYTE) (ch) ] | s_colorTab[ (BYTE) (attr) ]; \
+            } while( 0 )
 
-#ifndef HB_SLN_UTF8
-extern int SLsmg_Is_Unicode;
-#endif
+#define HB_SLN_BUILD_RAWCHAR( slch, ch, attr )  \
+            do { \
+                (slch) = SLSMG_BUILD_CHAR( (ch), (attr) ); \
+            } while( 0 )
+
+#define HB_SLN_IS_CHAR( slch )     ( (slch) != 0 )
+
+#endif /* HB_SLN_UTF8 */
 
 /* *********************************************************************** */
 
@@ -126,6 +164,7 @@ extern int SLsmg_Is_Unicode;
 
 /* *********************************************************************** */
 
+extern BOOL hb_sln_Is_Unicode;
 extern BOOL hb_gt_UnderLinuxConsole;
 extern BOOL hb_gt_UnderXterm;
 extern unsigned char s_inputTab[ 256 ];
@@ -133,10 +172,20 @@ extern unsigned char s_inputTab[ 256 ];
 extern PHB_CODEPAGE s_gtSln_cdpIN;
 #endif
 
+/* delay for waiting on characters after ESC key */
+extern int s_gtSLN_escDelay;
+
 /* *********************************************************************** */
 
-void HB_GT_FUNC(gt_Init_TermType());
-int  HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ));
-void HB_GT_FUNC(mouse_FixTrash());
+/* to convert DeadKey+letter to national character */
+extern int HB_GT_FUNC(gt_Init_Terminal( int phase ));
+extern unsigned char s_convKDeadKeys[];
+
+/* indicates that screen size has changed */
+extern volatile BOOL hb_gt_sln_bScreen_Size_Changed;
+
+extern void HB_GT_FUNC(gt_Init_TermType());
+extern int  HB_GT_FUNC(mouse_Inkey( HB_inkey_enum EventMask ));
+extern void HB_GT_FUNC(mouse_FixTrash());
 
 /* *********************************************************************** */

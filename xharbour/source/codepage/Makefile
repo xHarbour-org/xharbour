@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.16 2005/01/23 12:14:43 ptsarenko Exp $
+# $Id: Makefile,v 1.17 2005/11/19 15:52:04 likewolf Exp $
 #
 
 ROOT = ../../
@@ -14,6 +14,7 @@ C_SOURCES=\
       cpesmwin.c \
       cpgedos.c  \
       cpgewin.c  \
+      cpfrdos.c  \
       cphr437.c  \
       cphr852.c  \
       cphr1250.c \

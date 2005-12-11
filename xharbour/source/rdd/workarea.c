@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.55 2005/09/15 12:55:35 druzus Exp $
+ * $Id: workarea.c,v 1.56 2005/09/25 16:14:21 druzus Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
  */
 
 #include <ctype.h>
+#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbinit.h"
@@ -205,7 +206,7 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
    {
       if ( fBottom )
       {
-         /* GOTO EOF (phantom) record - 
+         /* GOTO EOF (phantom) record -
             this is the only one place where GOTO is used by xHarbour
             directly and RDD which does not operate on numbers should
             serve this method only as SELF_GOEOF() synonym. If it's a
@@ -915,7 +916,7 @@ ERRCODE hb_waLocate( AREAP pArea, BOOL fContinue )
             break;
          }
 
-         if( !fContinue && 
+         if( !fContinue &&
              ( pArea->dbsi.itmRecID || ( pArea->dbsi.lNext && --lNext < 1 ) ) )
             break;
 

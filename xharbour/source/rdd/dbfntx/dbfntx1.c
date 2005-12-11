@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.147 2005/11/16 12:16:45 druzus Exp $
+ * $Id: dbfntx1.c,v 1.148 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -426,17 +426,17 @@ static LPKEYINFO hb_ntxKeyPutItem( LPKEYINFO pKey, PHB_ITEM pItem, ULONG ulRecNo
    switch( hb_ntxItemType( pItem ) )
    {
       case 'C':
-         len = pItem->item.asString.length;
+         len = hb_itemGetCLen( pItem );
          if( len < ( ULONG ) pTag->KeyLength )
          {
-            memcpy( pKey->key, pItem->item.asString.value, len );
+            memcpy( pKey->key, hb_itemGetCPtr( pItem ), len );
             memset( pKey->key + len, ' ', pTag->KeyLength - len );
             if( puiLen )
                *puiLen = ( USHORT ) len;
          }
          else
          {
-            memcpy( pKey->key, pItem->item.asString.value, pTag->KeyLength );
+            memcpy( pKey->key, hb_itemGetCPtr( pItem ), pTag->KeyLength );
          }
          pKey->key[ pTag->KeyLength ] = '\0';
 #ifndef HB_CDP_SUPPORT_OFF
@@ -5303,8 +5303,8 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
                case HB_IT_STRING:
                case HB_IT_STRING | HB_IT_MEMO:
                   hb_ntxSortKeyAdd( pSort, pArea->ulRecNo,
-                                    pItem->item.asString.value,
-                                    pItem->item.asString.length );
+                                    hb_itemGetCPtr( pItem ),
+                                    hb_itemGetCLen( pItem ) );
                   break;
 
                case HB_IT_INTEGER:
@@ -6383,11 +6383,12 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          pIndexPtr = &(*pIndexPtr)->pNext;
       *pIndexPtr = pIndex;
    }
-   if( pIndex->Production && !pArea->fReadonly && !pArea->fHasTags &&
+   if( pIndex->Production && !pArea->fHasTags &&
        s_fStruct && ( s_fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
    {
       pArea->fHasTags = TRUE;
-      SELF_WRITEDBHEADER( ( AREAP ) pArea );
+      if( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) == 0 )
+         SELF_WRITEDBHEADER( ( AREAP ) pArea );
    }
    /* hb_ntxSetTagNumbers() */
    pArea->lpCurTag = pTag;
@@ -6429,11 +6430,12 @@ static ERRCODE ntxOrderDestroy( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
             *pIndexPtr = pIndex->pNext;
             pIndex->fDelete = TRUE;
             hb_ntxIndexFree( pIndex );
-            if( fProd && !pArea->fReadonly && pArea->fHasTags &&
+            if( fProd && pArea->fHasTags &&
                 s_fStruct && ( s_fStrictStruct || hb_set.HB_SET_AUTOPEN ) )
             {
                pArea->fHasTags = FALSE;
-               SELF_WRITEDBHEADER( ( AREAP ) pArea );
+               if( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) != 0 )
+                  SELF_WRITEDBHEADER( ( AREAP ) pArea );
             }
          }
          else if( pIndex->fReadonly )

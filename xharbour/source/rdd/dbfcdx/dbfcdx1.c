@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.232 2005/11/16 12:16:39 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.233 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -7464,12 +7464,13 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       if ( hb_stricmp( szFileName, szCpndTagName ) == 0 )
       {
          pArea->fHasTags = fProd = TRUE;
+         if ( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) == 0 )
+         {
 #ifdef HB_CDX_CLIP_AUTOPEN
-         if ( !pArea->fReadonly && hb_set.HB_SET_AUTOPEN )
-#else
-         if ( !pArea->fReadonly )
+            if ( hb_set.HB_SET_AUTOPEN )
 #endif
-            SELF_WRITEDBHEADER( ( AREAP ) pArea );
+               SELF_WRITEDBHEADER( ( AREAP ) pArea );
+         }
       }
    }
    if ( !fOpenedIndex )
@@ -7529,12 +7530,13 @@ static ERRCODE hb_cdxOrderDestroy( CDXAREAP pArea, LPDBORDERINFO pOrderInfo )
                   if ( pArea->fHasTags )
                   {
                      pArea->fHasTags = FALSE;
+                     if ( !pArea->fReadonly && ( pArea->dbfHeader.bHasTags & 0x01 ) != 0 )
+                     {
 #ifdef HB_CDX_CLIP_AUTOPEN
-                     if ( !pArea->fReadonly && hb_set.HB_SET_AUTOPEN )
-#else
-                     if ( !pArea->fReadonly )
+                        if ( hb_set.HB_SET_AUTOPEN )
 #endif
-                        SELF_WRITEDBHEADER( ( AREAP ) pArea );
+                           SELF_WRITEDBHEADER( ( AREAP ) pArea );
+                     }
                   }
                }
                else
