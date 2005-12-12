@@ -1,5 +1,5 @@
 /*
- * $Id: fcopy.prg,v 1.1 2004/08/27 07:25:45 mauriliolongo Exp $
+ * $Id: fcopy.prg,v 1.2 2004/10/22 20:37:13 likewolf Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ Function FileCopy(cSource, cDest, lMode)
                lDone := (nSrcBytes == 0)
             endif
             nTotBytes += nDestBytes
-      Enddo
+         Enddo
 
    //    if lStillOpen
    //       fSeek(nSrcHand, nTotBytes, FS_SET)
@@ -109,6 +109,10 @@ Function FileCopy(cSource, cDest, lMode)
             fClose(nSrcHand)
    //    endif
          fClose(nDestHand)
+
+         // Set date and time to target file as the same as source file. 
+         Setfdati( cDest, filedate(cSource) , filetime(cSource) )
+
     ELSE
       fClose(nSrcHand)
      ENDIF

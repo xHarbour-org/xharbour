@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.17 2005/12/08 19:03:20 oh1 Exp $
+ * $Id: alert.prg,v 1.18 2005/12/10 00:33:33 oh1 Exp $
  */
 
 /*
@@ -219,19 +219,9 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
       if ColorValid(cColor11) .and. ColorValid(cColor12)
 
-        // if color pair is passed in numeric format, then we need to convert for
-        // letter format to avoid blinking in some circumstances.
-        if IsDigit( cColor11 )
-           cColor11 := COLORLETTER( cColor11 )
-        endif
-
         cColorNorm := cColor11
 
         if !empty(cColor12)
-
-            if IsDigit( cColor12 )
-               cColor12 := COLORLETTER( cColor12 )
-            endif
 
             cColorNorm := cColor11+"/"+cColor12
 
@@ -259,17 +249,10 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
          if ColorValid(cColor21) .and. ColorValid(cColor22)
 
-            if IsDigit( cColor21 )
-               cColor21 := COLORLETTER( cColor21 )
-            endif
 
             cColorHigh := cColor21
 
             if !empty(cColor22)
-
-                if IsDigit( cColor22 )
-                   cColor22 := COLORLETTER( cColor22 )
-                endif
 
                 // extracting color attributes from background color.
                 cColor22 := StrTran( cColor22, "+", "" )
@@ -521,26 +504,6 @@ PROCEDURE __NONOALERT()
 
 #endif
 
-//-----------------------------------//
-// 2004/Setp/15 - Eduardo Fernandes
-// Convert number color format to character color format.
-STATIC FUNCTION COLORLETTER( cColor )
-
-Local nColor
-Local aColor := {"N","B","G","BG","R","RB","GR","W","N+",;
-                 "B+","G+","BG+","R+","RB+","GR+","W+"}
-
-  if !IsCharacter( cColor )
-     cColor:=""
-  endif
-
-  cColor := StrTran( cColor, " ","")
-  cColor := StrTran( cColor, "*","")
-  cColor := StrTran( cColor, "+","")
-
-  nColor := Min( Abs( Val( cColor ) ), 15 )
-
-RETURN (  cColor := aColor[ nColor + 1 ] )
 
 //-----------------------------------//
 // 2004/Setp/15 - Eduardo Fernandes
