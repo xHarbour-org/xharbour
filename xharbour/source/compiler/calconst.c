@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.8 2005/03/31 14:34:03 andijahja Exp $
+ * $Id: calconst.c,v 1.9 2005/11/12 18:47:29 druzus Exp $
  */
 
 /*
@@ -286,7 +286,15 @@ char * NextTokenInConstant( char **pExp )
    }
 
    // Operator
-   if( strchr( "+-*/&|()!=<>", (*pExp)[0] ) )
+   if( (*pExp)[0] == '<' && (*pExp)[1] == '>' )
+   {
+      sToken[0] = '!';
+      sToken[1] = '=';
+      sToken[2] = '\0';
+
+      (*pExp) += 2;
+   }
+   else if( strchr( "+-*/&|()!=<>", (*pExp)[0] ) )
    {
       sToken[0] = (*pExp)[0];
       sToken[1] = '\0';
@@ -394,13 +402,14 @@ char * NextTokenInConstant( char **pExp )
       } while( isalnum( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' );
    }
 
-   if(
-       ( sToken[0] == '&' && (*pExp)[0] == '&' ) ||
-       ( sToken[0] == '|' && (*pExp)[0] == '|' ) ||
-       ( sToken[0] == '=' && (*pExp)[0] == '=' ) ||
-       ( sToken[0] == '!' && (*pExp)[0] == '=' ) ||
-       ( sToken[0] == '<' && (*pExp)[0] == '=' ) ||
-       ( sToken[0] == '>' && (*pExp)[0] == '=' )
+   // Might be a first char of a double char operator!
+   if( sToken[1] == '\0' &&
+       ( ( sToken[0] == '&' && (*pExp)[0] == '&' ) ||
+         ( sToken[0] == '|' && (*pExp)[0] == '|' ) ||
+         ( sToken[0] == '=' && (*pExp)[0] == '=' ) ||
+         ( sToken[0] == '!' && (*pExp)[0] == '=' ) ||
+         ( sToken[0] == '<' && (*pExp)[0] == '=' ) ||
+         ( sToken[0] == '>' && (*pExp)[0] == '=' ) )
      )
    {
       sToken[1] = (*pExp)[0];
