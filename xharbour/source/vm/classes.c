@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.179 2005/11/26 22:18:07 ronpinkas Exp $
+ * $Id: classes.c,v 1.180 2005/12/09 03:45:34 guerra000 Exp $
  */
 
 /*
@@ -222,7 +222,6 @@ static USHORT   hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos );
 static void     hb_clsSaveMethod( PHB_DYNS pMsg, int iPivot, PCLASS pClass, USHORT uiAt );
 static void     hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt );
 
-static PMETHOD  hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
 static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym );
 
 
@@ -1255,7 +1254,7 @@ HB_EXPORT BOOL hb_clsHasMsg( USHORT uiClass, char *szMsg )
    return FALSE;
 }
 
-static PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
+HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
 {
    PCLASS pClass = s_pClasses + ( uiClass - 1 );
    USHORT uiAt;

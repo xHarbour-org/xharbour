@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.20 2005/10/14 06:47:06 ronpinkas Exp $
+ * $Id: classes.h,v 1.21 2005/11/08 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -160,6 +160,7 @@ extern HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope );
 
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 extern HB_EXPORT ULONG   hb_objGetOpOver( const PHB_ITEM pObject );
+extern HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
 
 void * hb_mthRequested( void );
 
