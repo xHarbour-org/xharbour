@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.541 2005/11/26 22:18:07 ronpinkas Exp $
+ * $Id: hvm.c,v 1.542 2005/12/11 12:37:25 druzus Exp $
  */
 
 /*
@@ -5028,7 +5028,7 @@ static void hb_vmInstringOrArray( void )
    }
    else if( HB_IS_ARRAY( pItem2 ) )
    {
-      BOOL bResult = hb_arrayScan( pItem2, pItem1, NULL, NULL, FALSE, FALSE );
+      BOOL bResult = hb_arrayScan( pItem2, pItem1, NULL, NULL, TRUE, FALSE );
 
       hb_stackPop();
       hb_stackPop();
