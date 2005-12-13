@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.61 2005/11/14 22:48:18 lf_sfnet Exp $
+# $Id: hb-func.sh,v 1.62 2005/12/02 22:22:39 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -292,7 +292,7 @@ HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
-LINK_OPT=""
+LINK_OPT="${CC_L_USR}"
 CC_OPT=""
 
 HB_GPM_LIB=""
