@@ -1,5 +1,5 @@
 /*
- * $Id: calconst.c,v 1.9 2005/11/12 18:47:29 druzus Exp $
+ * $Id: calconst.c,v 1.10 2005/12/13 20:11:22 ronpinkas Exp $
  */
 
 /*
@@ -285,8 +285,81 @@ char * NextTokenInConstant( char **pExp )
       (*pExp)++;
    }
 
-   // Operator
-   if( (*pExp)[0] == '<' && (*pExp)[1] == '>' )
+   // Numbers
+   if( isdigit( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '-' || (*pExp)[0] == '+' )
+   {
+      int i = 0;
+
+      if( (*pExp)[0] == '0' && (*pExp)[1] == 'x' )
+      {
+         sToken[0] = (*pExp)[0];
+         sToken[1] = (*pExp)[1];
+         (*pExp) += 2;
+
+         i = 2;
+
+         // Hex
+         while( i < 31 && isxdigit( ( BYTE ) (*pExp)[0] ) )
+         {
+            sToken[i++] = (*pExp)[0];
+            (*pExp)++;
+         }
+
+         sToken[i] = '\0';
+         return sToken;
+      }
+      else
+      {
+         sToken[0] = '\0';
+
+         while( (*pExp)[0] == '-' || (*pExp)[0] == '+' )
+         {
+            if( (*pExp)[0] == '-' )
+            {
+               if( sToken[0] == '-' )
+               {
+                  sToken[0] = '\0';
+                  i = 0;
+               }
+               else
+               {
+                  sToken[0] = '-';
+                  i = 1;
+               }
+            }
+            else
+            {
+              // Postitive is already implied!
+            }
+
+            (*pExp)++;
+         }
+      }
+
+      // Number
+      do
+      {
+         sToken[i++] = (*pExp)[0];
+         (*pExp)++;
+      } while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) );
+
+      // Decimals
+      if( i < 31 && (*pExp)[0] == '.' )
+      {
+         sToken[i++] = (*pExp)[0];
+         (*pExp)++;
+
+         while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) )
+         {
+            sToken[i++] = (*pExp)[0];
+            (*pExp)++;
+         }
+      }
+
+      sToken[i] = '\0';
+   }
+   // Operators
+   else if( (*pExp)[0] == '<' && (*pExp)[1] == '>' )
    {
       sToken[0] = '!';
       sToken[1] = '=';
@@ -345,51 +418,6 @@ char * NextTokenInConstant( char **pExp )
       sToken[1] = '\0';
 
       (*pExp) += 3;
-   }
-   else if( isdigit( ( BYTE ) (*pExp)[0] ) )
-   {
-      int i = 0;
-
-      if( (*pExp)[0] == '0' && (*pExp)[1] == 'x' )
-      {
-         sToken[0] = (*pExp)[0];
-         sToken[1] = (*pExp)[1];
-         (*pExp) += 2;
-
-         i = 2;
-
-         // Hex
-         while( i < 31 && isxdigit( ( BYTE ) (*pExp)[0] ) )
-         {
-            sToken[i++] = (*pExp)[0];
-            (*pExp)++;
-         }
-
-         sToken[i] = '\0';
-         return sToken;
-      }
-
-      // Number
-      do
-      {
-         sToken[i++] = (*pExp)[0];
-         (*pExp)++;
-      } while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) );
-
-      // Decimals
-      if( i < 31 && (*pExp)[0] == '.' )
-      {
-         sToken[i++] = (*pExp)[0];
-         (*pExp)++;
-
-         while( i < 31 && isdigit( ( BYTE ) (*pExp)[0] ) )
-         {
-            sToken[i++] = (*pExp)[0];
-            (*pExp)++;
-         }
-      }
-
-      sToken[i] = '\0';
    }
    else if( isalpha( ( BYTE ) (*pExp)[0] ) || (*pExp)[0] == '_' )
    {
