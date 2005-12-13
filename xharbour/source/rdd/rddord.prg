@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.4 2004/07/27 21:05:06 druzus Exp $
+ * $Id: rddord.prg,v 1.5 2005/12/13 12:03:36 druzus Exp $
  */
 
 /*
@@ -116,6 +116,7 @@ FUNCTION ORDWILDSEEK( cPattern, lCont, lBack )
    LOCAL lFound := .F.
    LOCAL xScopeTop, xScopeBottom, cFixed
    LOCAL nFixed := 0, i
+   LOCAL c
 
    IF VALTYPE( lCont ) != "L"
       lCont := .F.
