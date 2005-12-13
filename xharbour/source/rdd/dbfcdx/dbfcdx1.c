@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.233 2005/11/22 02:01:43 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.234 2005/12/11 12:38:47 druzus Exp $
  */
 
 /*
@@ -608,7 +608,7 @@ static BYTE hb_cdxItemType( PHB_ITEM pItem )
 static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LPCDXTAG pTag, BOOL fTrans, BOOL fSize )
 {
    BYTE buf[CDX_MAXKEY], *ptr;
-   BYTE len = 0;
+   ULONG ulLen = 0;
    double d;
 
    ptr = &buf[0];
@@ -616,31 +616,33 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
    switch ( hb_cdxItemType( pItem ) )
    {
       case 'C':
-         len = (BYTE) HB_MIN( pItem->item.asString.length, (ULONG) pTag->uiLen );
-         if ( fSize && len < pTag->uiLen )
+         ulLen = hb_itemGetCLen( pItem );
+         if( ulLen > (ULONG) pTag->uiLen )
+            ulLen = pTag->uiLen;
+         if ( fSize && ulLen < (ULONG) pTag->uiLen )
          {
-            memcpy( ptr, pItem->item.asString.value, len );
-            memset( ptr + len, pTag->bTrail, pTag->uiLen - len );
-            len = ( BYTE ) pTag->uiLen;
+            memcpy( ptr, hb_itemGetCPtr( pItem ), ulLen );
+            memset( ptr + ulLen, pTag->bTrail, pTag->uiLen - ulLen );
+            ulLen = pTag->uiLen;
          }
          else
          {
-            ptr = ( BYTE * ) pItem->item.asString.value;
+            ptr = ( BYTE * ) hb_itemGetCPtr( pItem );
          }
          break;
       case 'N':
          d = hb_itemGetND( pItem );
          HB_DBL2ORD( &d, ptr );
-         len = 8;
+         ulLen = 8;
          break;
       case 'D':
-         d = (double) pItem->item.asDate.value;
+         d = (double) hb_itemGetDL( pItem );
          HB_DBL2ORD( &d, ptr );
-         len = 8;
+         ulLen = 8;
          break;
       case 'L':
          *ptr = (BYTE) ( hb_itemGetL( pItem ) ? 'T' : 'F' );
-         len = 1;
+         ulLen = 1;
          break;
       default:
          ptr = NULL;
@@ -650,7 +652,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
 #endif
          break;
    }
-   pKey = hb_cdxKeyPut( pKey, ptr, len, ulRec );
+   pKey = hb_cdxKeyPut( pKey, ptr, ulLen, ulRec );
 #ifndef HB_CDP_SUPPORT_OFF
    if ( fTrans && pTag->uiType == 'C' )
       hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pKey->len );
@@ -7203,7 +7205,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       pKeyExp = hb_itemNew( pOrderInfo->itmCobExpr );
    else /* Otherwise, try compiling the key expression string */
    {
-      if ( SELF_COMPILE( (AREAP) pArea, ( BYTE * ) pOrderInfo->abExpr->item.asString.value ) == FAILURE )
+      if( SELF_COMPILE( (AREAP) pArea, ( BYTE * ) hb_itemGetCPtr( pOrderInfo->abExpr ) ) == FAILURE )
          return FAILURE;
       pKeyExp = pArea->valResult;
       pArea->valResult = NULL;
@@ -7440,7 +7442,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       hb_cdxIndexCreateStruct( pIndex, szCpndTagName );
    }
 
-   pTag = hb_cdxIndexAddTag( pIndex, szTagName, pOrderInfo->abExpr->item.asString.value,
+   pTag = hb_cdxIndexAddTag( pIndex, szTagName, hb_itemGetCPtr( pOrderInfo->abExpr ),
                       pKeyExp, bType, uiLen, szFor, pForExp,
                       fAscend , pOrderInfo->fUnique, fCustom, FALSE );
 
@@ -9029,8 +9031,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                case HB_IT_STRING:
                case HB_IT_STRING | HB_IT_MEMO:
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo,
-                                    ( BYTE * ) pItem->item.asString.value,
-                                    HB_CDXMAXKEY( pItem->item.asString.length ) );
+                                    ( BYTE * ) hb_itemGetCPtr( pItem ),
+                                    hb_itemGetCLen( pItem ) );
                   break;
 
                case HB_IT_INTEGER:
@@ -9042,7 +9044,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                   break;
 
                case HB_IT_DATE:
-                  d = (double) pItem->item.asDate.value;
+                  d = (double) hb_itemGetDL( pItem );
                   HB_DBL2ORD( &d, &cTemp[0] );
                   hb_cdxSortKeyAdd( pSort, pArea->ulRecNo, cTemp, 8 );
                   break;

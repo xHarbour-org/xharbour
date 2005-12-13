@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx0.prg,v 1.8 2005/09/19 23:21:28 druzus Exp $
+ * $Id: dbfntx0.prg,v 1.9 2005/10/04 02:05:35 druzus Exp $
  */
 
 /*
@@ -50,11 +50,11 @@
  *
  */
 
+/*
 #include "error.ch"
 #include "rddsys.ch"
 #include "dbinfo.ch"
 
-/*
 ANNOUNCE DBFNTX
 
 procedure DBFNTXInit

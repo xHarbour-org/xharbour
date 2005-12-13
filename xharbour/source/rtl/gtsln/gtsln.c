@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.c,v 1.36 2005/03/31 04:00:57 druzus Exp $
+ * $Id: gtsln.c,v 1.37 2005/12/11 12:37:50 druzus Exp $
  */
 
 /*
@@ -150,8 +150,15 @@ static void hb_sln_colorTrans( void )
       /*
        * bit 7 is a blinking attribute - not used when console is not in
        * UTF-8 mode because we are using it for changing into ACSC
+       * In SLANG 2.0 the character attributes are hold in USHORT not BYTE
+       * so we can use all colors, blinking bit and ACSC switch without
+       * any problems also when console is not in UTF-8 mode.
        */
+#ifdef HB_SLN_UTF8 /* slang 2.0 */
+      bg = ( i >> 4 ) & 0x0F;
+#else
       bg = ( i >> 4 ) & ( hb_sln_Is_Unicode ? 0x0F : 0x07 );
+#endif
       /*
        * in Clipper default color i 0x07 when in Slang 0x00,
        * we make a small trick with XOR 7 to make default colors
@@ -474,7 +481,7 @@ static void hb_sln_setKeyTrans( PHB_CODEPAGE cdpHost, PHB_CODEPAGE cdpTerm )
 
 /* *********************************************************************** */
 #ifdef HB_SLN_UTF8
-static BOOL hb_sln_isUTF8( int iStdOut, int iStdIn )
+static int hb_sln_isUTF8( int iStdOut, int iStdIn )
 {
    if( isatty( iStdOut ) && isatty( iStdIn ) )
    {
@@ -497,13 +504,12 @@ static BOOL hb_sln_isUTF8( int iStdOut, int iStdIn )
             rdbuf[ n ] = '\0';
             if( sscanf( rdbuf, "\033[%d;%dR", &y, &x ) == 2 )
             {
-               if( x == 2 )
-                  return TRUE;
+               return x == 2 ? 1 : 0;
             }
          }
       }
    }
-   return FALSE;
+   return -1;
 }
 #endif
 /* *********************************************************************** */
@@ -526,10 +532,6 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
 
     s_uiDispCount = 0;
 
-#ifdef HB_SLN_UTF8
-    /* hb_sln_Is_Unicode = SLutf8_enable( -1 ); */
-#endif
-
     /* read a terminal descripion from a terminfo database */
     SLtt_get_terminfo();
 
@@ -545,9 +547,8 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
                 SLang_TT_Write_FD = SLang_TT_Read_FD;
 
 #ifdef HB_SLN_UTF8
-            if( ! hb_sln_Is_Unicode &&
-                  hb_sln_isUTF8( SLang_TT_Write_FD, SLang_TT_Read_FD ) )
-                hb_sln_Is_Unicode = SLutf8_enable( 1 );
+            hb_sln_Is_Unicode = SLutf8_enable(
+                        hb_sln_isUTF8( SLang_TT_Write_FD, SLang_TT_Read_FD ) );
 #endif
 #ifdef HB_SLN_UNICODE
             /* SLsmg_Setlocale = 0; */
@@ -580,10 +581,18 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
                    to switch into ACSC because we can display all supported
                    characters using it's UNICODE values so we can use
                    blink bit as in Clipper.
+                   In SLANG 2.0 the character attributes are hold in USHORT
+                   not BYTE so we can use all colors, blinking bit and ACSC
+                   switch without any problems also when console is not in
+                   UTF-8 mode.
                  */
-#ifdef HB_SLN_UNICODE
+#ifdef HB_SLN_UTF8
+                SLtt_Blink_Mode = 1;
+                SLtt_Use_Blink_For_ACS = 0;
+#else
+#  ifdef HB_SLN_UNICODE
                 hb_sln_Is_Unicode = SLsmg_Is_Unicode;
-#endif
+#  endif
                 if( hb_sln_Is_Unicode )
                 {
                     SLtt_Blink_Mode = 1;
@@ -594,6 +603,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
                     SLtt_Blink_Mode = 0;
                     SLtt_Use_Blink_For_ACS = 0;
                 }
+#endif
                 SLsmg_Display_Eight_Bit = 128;
                 SLsmg_Newline_Behavior = SLSMG_NEWLINE_SCROLLS;
 
@@ -1119,7 +1129,21 @@ void HB_GT_FUNC(gt_SetBlink( BOOL bBlink ))
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetBlink(%d)", (int) bBlink));
 
     /* TODO: current implementation disables blinking/intensity */
-    HB_SYMBOL_UNUSED( bBlink );
+    /* HB_SYMBOL_UNUSED( bBlink ); */
+
+    /*
+     * We cannot switch remote terminal between blinking and highlight mode
+     * for server side using standard termcap/terminfo codes - few rather
+     * exotic terminals have such capabilities but this are non standard
+     * extensions which can be hard coded only for given hardware (or
+     * software terminal emulator). I think that if it's necessary then
+     * user should add such tricks yourself to his programs using
+     * outstd( <cBlinkSequence> )
+     * The only one thing I can make in portable way which will always
+     * work is disabling sending BLINK attribute to remote terminal. So
+     * in GTSLN like in GTCRS the function SetBlink( .f. ) does it, [Druzus]
+     */
+    SLtt_Blink_Mode = bBlink ? 1 : 0;
 }
 
 /* *********************************************************************** */

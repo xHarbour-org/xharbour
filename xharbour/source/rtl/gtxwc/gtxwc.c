@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.13 2005/08/12 02:44:26 druzus Exp $
+ * $Id: gtxwc.c,v 1.14 2005/08/16 19:35:16 lf_sfnet Exp $
  */
 
 /*
@@ -2522,7 +2522,7 @@ static void hb_xvt_gtInvalidateChar( PXWND_DEF wnd,
 static void hb_xvt_gtInvalidatePts( PXWND_DEF wnd,
                                     int left, int top, int right, int bottom )
 {
-   if ( wnd->fInvalidPts == FALSE )
+   if ( ! wnd->fInvalidPts )
    {
       wnd->rInvalidPts.top    = top;
       wnd->rInvalidPts.left   = left;
