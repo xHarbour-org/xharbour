@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4695 2005/12/13 20:34:15 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4696 2005/12/13 20:42:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-13 22:17 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/ChangeLog
+    * updated ChangeLog file
 
 2005-12-13 12:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/calconst.c
@@ -23,6 +27,89 @@
 2005-12-13 11:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
     * Revised hb_vmInstringOrArray() to call hb_arrayScan() with bExact set to TRUE
+
+2005-12-12 13:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * small modification for easier system lib overloading
+
+  * xharbour/source/rdd/rddord.prg
+    * sets scopes in ordWildSeek()
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    * formatting
+
+  * xharbour/source/rdd/rddord.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+
+  * xharbour/source/rdd/dbfntx/dbfntx0.prg
+    * minor clean-up
+
+  * xharbour/source/rtl/gtsln/gtsln.c
+    * added autodetection of UTF-8 mode for SLANG2.0 - there is no standard
+      way to detect terminal mode so usually locale settings are used.
+      I made small trick by sending two-bytes UTF-8 char and then
+      asking terminal about cursor position report - if the column was
+      increased by 1 character then we are in UTF-8 mode. If terminal
+      doesn't answer in 1 second then I'm using standard locale settings.
+
+2005-12-11 08:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    ! use ITEM macros instead of direct accessing HB_ITEM members
+    * AdsFlushFileBuffers() in FLUSH() (commit) method
+
+  * xharbour/source/codepage/Makefile
+  + xharbour/source/codepage/cpfrdos.c
+    + added FR codepage
+
+  * xharbour/source/codepage/uc1250.c
+  * xharbour/source/codepage/uc1251.c
+  * xharbour/source/codepage/uc1253.c
+  * xharbour/source/codepage/uc1257.c
+  * xharbour/source/codepage/uc737.c
+  * xharbour/source/codepage/uc850.c
+  * xharbour/source/codepage/uc852.c
+  * xharbour/source/codepage/uc866.c
+  * xharbour/source/codepage/uc88591b.c
+  * xharbour/source/codepage/uc8859_1.c
+  * xharbour/source/codepage/uc8859_2.c
+  * xharbour/source/codepage/uckoi8.c
+  * xharbour/source/codepage/uckoi8u.c
+  * xharbour/source/codepage/ucmaz.c
+  * xharbour/source/codepage/ucmik.c
+    * updated unicode tables for codes 0-31 to point at DOS characters
+
+  * xharbour/source/compiler/exproptb.c
+  * xharbour/source/macro/macrob.c
+    * added EOL at EOF
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rdd/nulsys/nulsys.c
+    * cleaned all direct access of HB_ITEM members
+    * modified a little bit setting pending relations
+    * do not update DBF header when structural index is created and
+      the header already have structural index flag set
+
+  * xharbour/source/rtl/gtsln/Makefile
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtsln/gtsln.h
+  * xharbour/source/rtl/gtsln/kbsln.c
+    + added support for SLANG 2.0
+
+  * xharbour/source/vm/arrays.c
+    - removed unused ulPos variable
+
+  * xharbour/source/vm/errorapi.c
+  * xharbour/source/vm/hvm.c
+    * formatting
+
+  * xharbour/utils/xbscript/xbscript.prg
+    ! fixed direct running .prg files as scripts in *nixes
 
 2005-12-10 01:35 UTC+0100 Henryk Olkowski <oh1@op.pl>
   ! Corrected use MROW(),MROW() and CT3 Windows
