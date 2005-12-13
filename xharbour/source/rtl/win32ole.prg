@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.102 2005/11/26 22:18:07 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.103 2005/12/08 03:36:55 ronpinkas Exp $
  */
 
 /*
@@ -678,26 +678,6 @@ RETURN Self
   HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
 
   //---------------------------------------------------------------------------//
-  static double DateToDbl( LPSTR cDate )
-  {
-     double nDate;
-
-     nDate = hb_dateEncStr( cDate ) - 0x0024d9abL;
-
-     return ( nDate );
-  }
-
-  //---------------------------------------------------------------------------//
-  static LPSTR DblToDate( double nDate )
-  {
-     static char cDate[9] = "00000000";
-
-     hb_dateDecStr( cDate, (LONG) nDate + 0x0024d9abL );
-
-     return ( cDate );
-  }
-
-  //---------------------------------------------------------------------------//
   HB_EXPORT BSTR AnsiToSysString( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
@@ -726,9 +706,9 @@ RETURN Self
 
      if( nConvertedLen )
      {
-        LPWSTR wString = ( BSTR ) hb_xgrab( nConvertedLen * 2 );
+        LPWSTR wString = (LPWSTR) hb_xgrab( nConvertedLen * 2 );
 
-        if( MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, nConvertedLen - 1 ) )
+        if( MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, wString, nConvertedLen ) )
         {
            return wString;
         }
@@ -738,8 +718,6 @@ RETURN Self
         }
      }
 
-     //printf( "\nAnsi: '%s'\n", cString );
-     //wprintf( L"\nWide: '%s'\n", wString );
      return NULL;
   }
 
@@ -953,15 +931,16 @@ RETURN Self
               case HB_IT_DATE:
                 if( bByRef )
                 {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_DATE;
-                   uParam->item.asDouble.value = DateToDbl( hb_pards( nArg ) );
-                   pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
+                   uParam->item.asDouble.value = (double) ( uParam->item.asDate.value - 2415019 );
                    uParam->type = HB_IT_DOUBLE;
+
+                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_DATE;
+                   pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
                 }
                 else
                 {
-                   pArgs[ n ].n1.n2.vt   = VT_DATE;
-                   pArgs[ n ].n1.n2.n3.dblVal = DateToDbl( hb_pards( nArg ) );
+                   pArgs[ n ].n1.n2.vt = VT_DATE;
+                   pArgs[ n ].n1.n2.n3.dblVal = (double) ( uParam->item.asDate.value - 2415019 );
                 }
                 break;
 
@@ -1129,7 +1108,7 @@ RETURN Self
 
                  case VT_BYREF | VT_DATE:
                    //printf( "Date\n" );
-                   hb_itemPutDS( aPrgParams[ n ], DblToDate( *( pDispParams->rgvarg[ n ].n1.n2.n3.pdblVal ) ) );
+                   hb_itemPutDL( aPrgParams[ n ], (long) ( *( pDispParams->rgvarg[ n ].n1.n2.n3.pdblVal ) ) + 2415019 );
                    break;
 
                  /*
@@ -1369,7 +1348,7 @@ RETURN Self
         }
 
         case VT_DATE:
-           hb_itemPutDS( pItem, DblToDate( pVariant->n1.n2.n3.dblVal ) );
+           hb_itemPutDL( pItem, (long) ( pVariant->n1.n2.n3.dblVal ) + 2415019 );
            break;
 
         case VT_EMPTY:
