@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4701 2005/12/14 05:25:19 paultucker Exp $
+ * $Id: ChangeLog,v 1.4702 2005/12/14 07:04:02 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -143,6 +143,16 @@
 
   * xharbour/utils/xbscript/xbscript.prg
     ! fixed direct running .prg files as scripts in *nixes
+
+2005-12-12 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/alert.prg
+    - removed colorletter() static function.
+      This function was created to avoid blinking, but since setblink
+      doesn't work in xHarbour, so this function is useless.
+
+  * source/ct/fcopy.prg
+    ! fixed filecopy to set date and time to the target file as the same
+      as source file. Bug reported by Joao C. Rosseto.
 
 2005-12-10 01:35 UTC+0100 Henryk Olkowski <oh1@op.pl>
   ! Corrected use MROW(),MROW() and CT3 Windows
