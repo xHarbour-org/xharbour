@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.18 2005/11/22 20:59:14 ptsarenko Exp $
+# $Id: makefile.gc,v 1.18 2005/11/22 18:59:17 ptsarenko Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -1512,6 +1512,7 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/ct.o \
    $(CT_OBJ_DIR)/ctmisc.o \
    $(CT_OBJ_DIR)/getsecrt.o \
+   $(CT_OBJ_DIR)/ctwin.o \
    $(CT_OBJ_DIR)/datetime.o \
    $(CT_OBJ_DIR)/dattime2.o \
    $(CT_OBJ_DIR)/invrtwin.o \
@@ -1736,6 +1737,9 @@ $(CT_OBJ_DIR)/ctmisc.c : $(LIBCT_DIR)/ctmisc.prg
 $(CT_OBJ_DIR)/ctmisc.o : $(CT_OBJ_DIR)/ctmisc.c
 	$(CC_CMD)
 
+$(CT_OBJ_DIR)/ctwin.o : $(LIBCT_DIR)/ctwin.c
+	$(CC_CMD)
+
 $(CT_OBJ_DIR)/datetime.o : $(LIBCT_DIR)/datetime.c
 	$(CC_CMD)
 
@@ -1772,11 +1776,11 @@ $(CT_OBJ_DIR)/invrtwin.c : $(LIBCT_DIR)/invrtwin.prg
 $(CT_OBJ_DIR)/invrtwin.o : $(CT_OBJ_DIR)/invrtwin.c
 	$(CC_CMD)
 
-$(CT_OBJ_DIR)/ctwin.c : $(LIBCT_DIR)/ctwin.prg
-	$(HARBOUR_CMD)
+# $(CT_OBJ_DIR)/ctwin.c : $(LIBCT_DIR)/ctwin.prg
+# 	$(HARBOUR_CMD)
 
-$(CT_OBJ_DIR)/ctwin.o : $(CT_OBJ_DIR)/ctwin.c
-	$(CC_CMD)
+# $(CT_OBJ_DIR)/ctwin.o : $(CT_OBJ_DIR)/ctwin.c
+# 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/blank.c : $(LIBCT_DIR)/blank.prg
 	$(HARBOUR_CMD)

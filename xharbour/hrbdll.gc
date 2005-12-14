@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.16 2005/11/22 20:59:13 ptsarenko Exp $
+# $Id: hrbdll.gc,v 1.16 2005/11/22 18:59:16 ptsarenko Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -517,6 +517,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/ct.o \
    $(OBJ_DIR)/ctmisc.o \
    $(OBJ_DIR)/getsecrt.o \
+   $(OBJ_DIR)/ctwin.o \
    $(OBJ_DIR)/datetime.o \
    $(OBJ_DIR)/dattime2.o \
    $(OBJ_DIR)/invrtwin.o \
@@ -2266,6 +2267,9 @@ $(OBJ_DIR)/ctmisc.c : $(CT_DIR)/ctmisc.prg
 $(OBJ_DIR)/ctmisc.o : $(OBJ_DIR)/ctmisc.c
 	$(CC_CMD)
 
+$(OBJ_DIR)/ctwin.o : $(CT_DIR)/ctwin.c
+	$(CC_CMD)
+
 $(OBJ_DIR)/datetime.o : $(CT_DIR)/datetime.c
 	$(CC_CMD)
 
@@ -2299,11 +2303,11 @@ $(OBJ_DIR)/invrtwin.c : $(CT_DIR)/invrtwin.prg
 $(OBJ_DIR)/invrtwin.o : $(OBJ_DIR)/invrtwin.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/ctwin.c : $(CT_DIR)/ctwin.prg
-	$(HARBOUR_CMD)
+# $(OBJ_DIR)/ctwin.c : $(CT_DIR)/ctwin.prg
+# 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)/ctwin.o : $(OBJ_DIR)/ctwin.c
-	$(CC_CMD)
+# $(OBJ_DIR)/ctwin.o : $(OBJ_DIR)/ctwin.c
+# 	$(CC_CMD)
 
 $(OBJ_DIR)/blank.c : $(CT_DIR)/blank.prg
 	$(HARBOUR_CMD)
