@@ -1,10 +1,10 @@
 /*
- * $Id: cpsrwin.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpsrwin.c,v 1.5 2005/12/14 23:22:03 ptsarenko Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module (RUWIN)
+ * National Collation Support Module (SRWIN)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
@@ -50,8 +50,8 @@
  *
  */
 
-/* Language name: Russian */
-/* ISO language code (2 chars): RU */
+/* Language name: Serbian */
+/* ISO language code (2 chars): SR */
 /* Codepage: Windows-1251 */
 
 #include <ctype.h>

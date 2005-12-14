@@ -1,5 +1,5 @@
 /*
- * $Id: numconv.prg,v 1.1 2003/03/04 21:04:44 lculik Exp $
+ * $Id: numconv.prg,v 1.2 2005/12/14 23:03:00 ptsarenko Exp $
  */
 
 /*
@@ -72,10 +72,17 @@ IF nBase > 36 .OR. nBase < 2
    RETURN ""
 ENDIF
 
+if xNum < 0
+  xNum += 4294967296
+endif
 cNum = B10TOBN( xNum, @nBase )
 
-IF ISNUMBER( nLenght ) .AND. ISCHARACTER( cPad ) .AND. LEN( cNum ) < nLenght
-   cNum = REPLICATE( cPad, nLenght - LEN( cNum ) ) + cNum
+IF ISNUMBER( nLenght )
+   IF LEN(cNum) > nLenght
+      cNum = REPLICATE( "*", nLenght )
+   ELSEIF ISCHARACTER( cPad ) .AND. LEN( cNum ) < nLenght
+      cNum = REPLICATE( cPad, nLenght - LEN( cNum ) ) + cNum
+   ENDIF
 ENDIF
 
 RETURN cNum
@@ -108,11 +115,15 @@ RETURN nNum
 
 
 STATIC FUNCTION B10TOBN( nNum, nBase )
+LOCAL nInt
 IF nNum > 0
    
-   RETURN B10TOBN( INT( nNum / nBase), @nBase ) +;
+   nInt := INT( nNum / nBase)
+   RETURN IIF(nInt==0, "", B10TOBN( nInt, @nBase )) +;
           SUBSTR( WORLD, ( nNum % nBase ) + 1, 1 )
 
+ELSEIF nNum == 0
+   RETURN "0"
 ENDIF
 RETURN ""
 
