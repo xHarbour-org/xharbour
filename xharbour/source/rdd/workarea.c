@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.56 2005/09/25 16:14:21 druzus Exp $
+ * $Id: workarea.c,v 1.57 2005/12/11 12:38:47 druzus Exp $
  */
 
 /*
@@ -66,6 +66,8 @@
 #include "hbset.h"
 #include "hbrddwrk.h"
 
+// AUTONUMERIC!
+#define HB_DBF_AUTOINC              15    /* 4 byte auto-increment value */
 
 /*
  * -- METHODS --
@@ -187,7 +189,7 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
          if( HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult ) )
          {
-            
+
             if ( SELF_SKIPRAW( pArea, lUpDown ) != SUCCESS )
                return FAILURE;
             continue;
@@ -363,6 +365,14 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiDec = uiDec;
             break;
 
+         // AUTONUMERIC!
+         case 'A':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            pFieldInfo.uiTypeExtended = HB_DBF_AUTOINC;
+            pFieldInfo.uiLen = 4;
+            pFieldInfo.uiDec = 0;
+            break;
+
          default:
             return FAILURE;
       }
@@ -431,7 +441,16 @@ ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pIt
                break;
 
             case HB_IT_INTEGER:
-               hb_itemPutC( pItem, "I" );
+               // AUTONUMERIC!
+               if( pField->uiTypeExtended == HB_DBF_AUTOINC )
+               {
+                  // hb_itemPutC( pItem, "AUTOINC" );
+                  hb_itemPutC( pItem, "A" );
+               }
+               else
+               {
+                  hb_itemPutC( pItem, "I" );
+               }
                break;
 
             case HB_IT_DOUBLE:

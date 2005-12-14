@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.143 2005/11/22 02:01:43 druzus Exp $
+ * $Id: dbf1.c,v 1.144 2005/12/11 12:38:47 druzus Exp $
  */
 
 /*
@@ -66,6 +66,9 @@
 #include "hbsxfunc.h"
 #include "error.ch"
 #include "rddsys.ch"
+
+// AUTONUMERIC!
+#define HB_DBF_AUTOINC              15    /* 4 byte auto-increment value */
 
 #ifndef HB_CDP_SUPPORT_OFF
 #  include "hbapicdp.h"
@@ -182,7 +185,8 @@ static RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
  * Common functions.
  */
 
-static void hb_dbfSetBlankRecord( DBFAREAP pArea )
+// AUTONUMERIC!
+static void hb_dbfSetBlankRecord( DBFAREAP pArea, BOOL bClearReadOnly )
 {
    BYTE *pPtr = pArea->pRecord, bFill = ' ', bNext;
    ULONG ulSize = 1; /* 1 byte ' ' for DELETE flag */
@@ -206,7 +210,16 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea )
          bNext = ' ';
       }
 
-      if( bNext == bFill )
+      // AUTONUMERIC!
+      if( pField->uiTypeExtended == HB_DBF_AUTOINC && ! bClearReadOnly )
+      {
+         memset( pPtr, bFill, ulSize );
+         pPtr += ulSize + uiLen;
+         /* In this case do NOT clear field */
+         ulSize = 0;
+         bFill = bNext;
+      }
+      else if( bNext == bFill )
       {
          ulSize += uiLen;
       }
@@ -956,7 +969,8 @@ static ERRCODE hb_dbfGoTo( DBFAREAP pArea, ULONG ulRecNo )
       pArea->fPositioned = pArea->fDeleted = pArea->fEncrypted = FALSE;
 
       /* Clear record buffer */
-      hb_dbfSetBlankRecord( pArea );
+      // AUTONUMERIC!
+      hb_dbfSetBlankRecord( pArea, TRUE );
    }
    pArea->fFound = FALSE;
 
@@ -1106,6 +1120,7 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    PHB_ITEM pError;
    BOOL bLocked;
    ERRCODE uiError;
+   USHORT uiCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfAppend(%p, %d)", pArea, (int) bUnLockAll));
 
@@ -1160,8 +1175,65 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
       }
    }
 
+   // AUTONUMERIC!
+   /* Updates autonumeric fields */
+   if( pArea->fAutoInc )
+   {
+      ULONG ulNumber;
+      DBFFIELD pField;
+
+      for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
+      {
+         if( pArea->lpFields[ uiCount ].uiTypeExtended == HB_DBF_AUTOINC )
+         {
+            hb_fsSeek( pArea->hDataFile, sizeof( DBFHEADER ) + ( sizeof( DBFFIELD ) * uiCount ), FS_SET );
+            if( hb_fsRead( pArea->hDataFile, ( BYTE * ) &pField, sizeof( DBFFIELD ) ) != sizeof( DBFFIELD ) )
+            {
+               pError = hb_errNew();
+               hb_errPutGenCode( pError, EG_READ );
+               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_READ ) );
+               hb_errPutSubCode( pError, EDBF_READ );
+               hb_errPutOsCode( pError, hb_fsError() );
+               hb_errPutFlags( pError, EF_CANDEFAULT );
+               hb_errPutFileName( pError, pArea->szDataFileName );
+               SELF_ERROR( ( AREAP ) pArea, pError );
+               hb_itemRelease( pError );
+               return FAILURE;
+            }
+            else
+            {
+               ulNumber = ( HB_LONG ) HB_GET_LE_INT32( &pField.bCounter );
+               if( pField.bStep )
+               {
+                  ulNumber += ( ULONG ) ( unsigned char ) pField.bStep;
+               }
+               else
+               {
+                  ulNumber++;
+               }
+               HB_PUT_LE_UINT32( &pField.bCounter, ulNumber );
+               HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiCount ], ulNumber );
+               hb_fsSeek( pArea->hDataFile, sizeof( DBFHEADER ) + ( sizeof( DBFFIELD ) * uiCount ), FS_SET );
+               if( hb_fsWrite( pArea->hDataFile, ( BYTE * ) &pField, sizeof( DBFFIELD ) ) != sizeof( DBFFIELD ) )
+               {
+                  pError = hb_errNew();
+                  hb_errPutGenCode( pError, EG_WRITE );
+                  hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_WRITE ) );
+                  hb_errPutSubCode( pError, EDBF_WRITE );
+                  hb_errPutOsCode( pError, hb_fsError() );
+                  hb_errPutFlags( pError, EF_CANDEFAULT );
+                  hb_errPutFileName( pError, pArea->szDataFileName );
+                  SELF_ERROR( ( AREAP ) pArea, pError );
+                  hb_itemRelease( pError );
+                  return FAILURE;
+               }
+            }
+         }
+      }
+   }
+
    /* Clear record buffer and update pArea */
-   hb_dbfSetBlankRecord( pArea ) ;
+   hb_dbfSetBlankRecord( pArea, FALSE ) ;
 
    pArea->fValidBuffer = pArea->fUpdateHeader = pArea->fRecordChanged =
    pArea->fAppend = pArea->fPositioned = TRUE;
@@ -1542,6 +1614,8 @@ static ERRCODE hb_dbfGoHot( DBFAREAP pArea )
  */
 static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
 {
+   USHORT uiCount, uiLen;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutRec(%p, %p)", pArea, pBuffer));
 
    if( pBuffer != NULL )
@@ -1556,7 +1630,34 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
          return FAILURE;
 
       /* Copy data to buffer */
-      memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+      // AUTONUMERIC!
+      if( pArea->fAutoInc )
+      {
+         ULONG ulSize = 1; /* 1 byte ' ' for DELETE flag */
+         BYTE *pPtr = pArea->pRecord;
+
+         for( uiCount = 0; uiCount < pArea->uiFieldCount; uiCount++ )
+         {
+            uiLen = pArea->lpFields[ uiCount ].uiLen;
+
+            if( pArea->lpFields[ uiCount ].uiTypeExtended == HB_DBF_AUTOINC )
+            {
+               memcpy( pPtr, pBuffer, ulSize );
+               pPtr    += ulSize + uiLen;
+               pBuffer += ulSize + uiLen;
+               ulSize = 0;
+            }
+            else
+            {
+               ulSize += uiLen;
+            }
+         }
+         memcpy( pPtr, pBuffer, ulSize );
+      }
+      else
+      {
+         memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
+      }
 
       /*
        * TODO: such operation should be forbidden
@@ -1647,7 +1748,16 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    uiError = SUCCESS;
    uiIndex--;
    pField = pArea->lpFields + uiIndex;
-   if( pField->uiType == HB_IT_MEMO )
+   // AUTONUMERIC!
+   if( pField->uiTypeExtended == HB_DBF_AUTOINC && HB_IS_NUMBER( pItem ) )
+   {
+      if( ! hb_itemGetNL( pItem ) == ( HB_LONG ) HB_GET_LE_INT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ) )
+      {
+         // TODO: This is a file readonly error. Must use a "proper" error.
+         uiError = EDBF_READONLY;
+      }
+   }
+   else if( pField->uiType == HB_IT_MEMO )
       uiError = EDBF_DATATYPE;
    else
    {
@@ -2221,15 +2331,29 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
             break;
 
          case HB_IT_INTEGER:
-            pThisField->bType = 'I';
-            if( ( pField->uiLen > 4 && pField->uiLen != 8 ) ||
-                pField->uiLen == 0 )
+            // AUTONUMERIC
+            if( pField->uiTypeExtended == HB_DBF_AUTOINC )
             {
-               pField->uiLen = 4;
+               pArea->fAutoInc = TRUE;
+               pThisField->bType = 'A';
+               pThisField->bLen = 4;
+               pThisField->bDec = 0;
+               // memset( pThisField->bCounter, 0, 4 );
+               pThisField->bStep = 1;
+               pArea->uiRecordLen += pThisField->bLen;
             }
-            pThisField->bLen = ( BYTE ) pField->uiLen;
-            pThisField->bDec = 0;
-            pArea->uiRecordLen += pThisField->bLen;
+            else
+            {
+               pThisField->bType = 'I';
+               if( ( pField->uiLen > 4 && pField->uiLen != 8 ) ||
+                   pField->uiLen == 0 )
+               {
+                  pField->uiLen = 4;
+               }
+               pThisField->bLen = ( BYTE ) pField->uiLen;
+               pThisField->bDec = 0;
+               pArea->uiRecordLen += pThisField->bLen;
+            }
             break;
 
          default:
@@ -2467,7 +2591,8 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             if( pArea->fAppend )
             {
-               hb_dbfSetBlankRecord( pArea );
+               // AUTONUMERIC!
+               hb_dbfSetBlankRecord( pArea, FALSE );
                pArea->fDeleted = FALSE;
             }
             else
@@ -3000,6 +3125,15 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          case 'Y':
             pFieldInfo.uiType = HB_IT_DOUBLE;
             pFieldInfo.uiDec = pField->bDec;
+
+         // AUTONUMERIC!
+         case 'A':
+            pFieldInfo.uiType = HB_IT_INTEGER;
+            pFieldInfo.uiTypeExtended = HB_DBF_AUTOINC;
+            pFieldInfo.uiLen = 4;
+            pFieldInfo.uiDec = 0;
+            pArea->fAutoInc = TRUE;
+            break;
 
          default:
             errCode = FAILURE;
