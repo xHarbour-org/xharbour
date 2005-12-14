@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.148 2005/11/22 02:01:43 druzus Exp $
+ * $Id: dbfntx1.c,v 1.149 2005/12/11 12:38:47 druzus Exp $
  */
 
 /*
@@ -5730,7 +5730,8 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
                for( i = 0; i < pIndex->iTags; i++ )
                {
                   pTag = pIndex->lpTags[ i ];
-                  if( pTag->Custom || ( pTag->Owner->Compound && !pTag->HeadBlock ) ||
+                  if( pIndex->fReadonly || pTag->Custom ||
+                      ( pTag->Owner->Compound && !pTag->HeadBlock ) ||
                       ( fAppend && pTag->ChgOnly ) )
                      continue;
 
@@ -5838,14 +5839,17 @@ static ERRCODE ntxGoHot( NTXAREAP pArea )
 
          while( pIndex )
          {
-            for( i = 0; i < pIndex->iTags; i++ )
+            if( !pIndex->fReadonly )
             {
-               pTag = pIndex->lpTags[ i ];
-               if( !pTag->Custom )
+               for( i = 0; i < pIndex->iTags; i++ )
                {
-                  pTag->HotKeyInfo = hb_ntxEvalKey( pTag->HotKeyInfo, pTag );
-                  pTag->HotFor = ( pTag->pForItem == NULL ||
-                              hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) );
+                  pTag = pIndex->lpTags[ i ];
+                  if( !pTag->Custom )
+                  {
+                     pTag->HotKeyInfo = hb_ntxEvalKey( pTag->HotKeyInfo, pTag );
+                     pTag->HotFor = ( pTag->pForItem == NULL ||
+                                 hb_ntxEvalCond( pArea, pTag->pForItem, TRUE ) );
+                  }
                }
             }
             pIndex = pIndex->pNext;
@@ -6807,7 +6811,12 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             if( pInfo->itmResult )
                hb_itemClear( pInfo->itmResult );
          case DBOI_KEYADD:
-            if ( pTag->Custom )
+            if( pTag->Owner->fReadonly )
+            {
+               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pTag->Owner->IndexName, 0, 0 );
+               return FAILURE;
+            }
+            if( pTag->Custom )
             {
                hb_itemPutL( pInfo->itmResult,
                             hb_ntxOrdKeyAdd( pTag, pInfo->itmNewVal ) );
@@ -6815,10 +6824,16 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             else
             {
                hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+               return FAILURE;
             }
             break;
          case DBOI_KEYDELETE:
-            if ( pTag->Custom )
+            if( pTag->Owner->fReadonly )
+            {
+               hb_ntxErrorRT( pArea, EG_READONLY, EDBF_READONLY, pTag->Owner->IndexName, 0, 0 );
+               return FAILURE;
+            }
+            if( pTag->Custom )
             {
                hb_itemPutL( pInfo->itmResult,
                             hb_ntxOrdKeyDel( pTag, pInfo->itmNewVal ) );
@@ -6826,6 +6841,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             else
             {
                hb_ntxErrorRT( pArea, 0, 1052, NULL, 0, 0 );
+               return FAILURE;
             }
             break;
          case DBOI_KEYTYPE:
