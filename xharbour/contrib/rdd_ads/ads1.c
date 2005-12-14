@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.94 2005/12/05 21:41:48 jabrecer Exp $
+ * $Id: ads1.c,v 1.95 2005/12/11 12:38:26 druzus Exp $
  */
 
 /*
@@ -350,6 +350,11 @@ static void adsGetKeyItem( ADSAREAP pArea, PHB_ITEM pItem, int iKeyType,
 
    switch( iKeyType )
    {
+   /*
+      TODO: ADS_RAW only partially supported.  Presumed string.
+            ADT files can use ";" concatentation operator, which returns index key types as Raw
+   */
+      case ADS_RAW:
       case ADS_STRING:
          hb_itemPutCL( pItem, pKeyBuf, iKeyLen );
          break;
@@ -404,11 +409,6 @@ static void adsGetKeyItem( ADSAREAP pArea, PHB_ITEM pItem, int iKeyType,
       default:
          hb_itemClear( pItem );
 
-   /*
-      TODO: ADS_RAW Currently unsupported
-            Returns nil; Throw an error re unsupported type ?
-      case ADS_RAW:
-   */
    }
 }
 
@@ -460,6 +460,7 @@ static ERRCODE adsScopeSet( ADSAREAP pArea, ADSHANDLE hOrder, USHORT nScope, PHB
          /* make sure passed item has same type as index */
          switch( u16KeyType )
          {
+            case ADS_RAW:               /* adt files need the ";" concatenation operator (instead of "+") to be optimized */
             case ADS_STRING:
                if( HB_IS_STRING( pItem ) )
                {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4702 2005/12/14 07:04:02 paultucker Exp $
+ * $Id: ChangeLog,v 1.4703 2005/12/14 10:02:31 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2005-12-14 03:00 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    + added support for ADS's special ";" concatenation operator for
+      .adi indexes. The index type is handled as RAW, but it
+      is required for multikey indexes to be optimized.
 
 2005-12-14 02:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.vc
