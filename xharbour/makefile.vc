@@ -1,5 +1,5 @@
 #
-# $Id: makefile.nt,v 1.138 2005/11/22 18:59:17 ptsarenko Exp $
+# $Id: makefile.vc,v 1.159 2005/12/14 05:25:19 paultucker Exp $
 #
 
 #
@@ -281,14 +281,13 @@ LIBSNONMT = \
    $(LANG_LIB) \
    $(NULSYS_LIB) \
    $(DLL_MAIN_LIB) \
-   $(MACRO_LIB) \
    $(HB_GT_LIB) \
    $(CGI_LIB)
 
 # These have an MT equivalent.
 LIBS = \
+   $(MACRO_LIB) \
    $(RTL_LIB) \
-   $(DEBUG_LIB) \
    $(PP_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
@@ -299,8 +298,8 @@ LIBS = \
    $(VM_LIB) \
    $(VM_LIB_OPT_CON) \
    $(VM_LIB_OPT_GUI) \
-   $(TIP_LIB) \
    $(ODBC_LIB) \
+   $(TIP_LIB) \
    $(CT_LIB) \
    $(LIBSNONMT)
 
