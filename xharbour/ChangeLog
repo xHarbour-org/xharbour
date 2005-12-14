@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4699 2005/12/13 22:11:21 druzus Exp $
+ * $Id: ChangeLog,v 1.4700 2005/12/14 03:20:36 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-14 00:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  - makefile.nt
+    * no longer needed - but report problems if makefile.vc causes trouble.
+    * (should only be an issue - if at all - under Win98)
+    * similar files in contrib dirs will be phased out eventually.
+  * makefile.vc
+    * Was makefile.nt - added support to work in non-batch mode if needed
+    * under Win98 where the command line length may be an issue in batch mode
+    * Also changed LIBLIST handling for proper MT support. (fix hbtestmt build)
+  * make_vc.bat
+    * use make_vc /y for 'non batch' builds. (much slower)
+  * bin/build.bat
+    * minor correction to MT lib list for msvc.
 
 2005-12-13 21:17 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rdd/dbf1.c

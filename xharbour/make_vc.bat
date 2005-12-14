@@ -1,6 +1,6 @@
 @echo off
 rem 
-rem $Id: make_vc.bat,v 1.11 2003/05/26 05:58:49 paultucker Exp $
+rem $Id: make_vc.bat,v 1.12 2003/06/24 08:37:21 andijahja Exp $
 rem 
 
 rem ---------------------------------------------------------------
@@ -24,7 +24,7 @@ if "%1"=="/?" set rem=echo.
 %rem%    prior to executing this batch file, then the Multi-Threaded versions
 %rem%    of the programs will be active in the bin dir - otherwise, it will
 %rem%    be the standard versions.
-%rem% /Y non batch mode (forces makefile.vc)
+%rem% /Y non batch mode (for Win_98 build env for instance)
 %rem% ---------------------------------------------------------------
 set rem=
 if "%1"=="/?" goto exit
@@ -48,26 +48,22 @@ if not exist obj\vcmt\opt md obj\vcmt\opt
 if not exist obj\vcmt\opt\console md obj\vcmt\opt\console
 if not exist obj\vcmt\opt\gui md obj\vcmt\opt\gui
 
-SET MK_FILE=makefile.vc
 SET _HBMT=%HB_MT%
-if "%OS%" == "Windows_NT" set MK_FILE=makefile.nt
-if "%1" == "/Y" set MK_FILE=makefile.vc
-if "%1" == "/y" set MK_FILE=makefile.vc
-if "%2" == "/Y" set MK_FILE=makefile.vc
-if "%2" == "/y" set MK_FILE=makefile.vc
+SET HB_FL=
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
-
+if "%1" == "/y" set HB_FL=/y
+if "%1" == "/Y" set HB_FL=/y
+if "%HB_FL%" == "/y" shift
 :BUILD
 
    SET HB_MT=
 echo.
-echo using %mk_file%
-   nmake /f %MK_FILE% %1 %2 %3 > make_vc.log
+   nmake /f makefile.vc %HB_FL% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto BUILD_ERR
    SET HB_MT=MT
 rem do not pass /a (if used) the second time!
-   nmake /f %MK_FILE% %2 %3 >> make_vc.log
+   nmake /f makefile.vc %HB_FL% %2 %3 >> make_vc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
@@ -84,14 +80,14 @@ rem do not pass /a (if used) the second time!
 :CLEAN
 
    SET HB_MT=
-   nmake /f %MK_FILE% %1
+   nmake /f makefile.vc %1
    SET HB_MT=MT
-   nmake /f %MK_FILE% %1
+   nmake /f makefile.vc %1
    rem in this case, the makefile handles most cleanup. Add what you need here
    if exist make_vc.log del make_vc.log
    rem etc.
 
 :EXIT
-SET MK_FILE=
+SET HB_FL=
 SET HB_MT=%_HBMT%
 SET _HBMT=

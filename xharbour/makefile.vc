@@ -1,5 +1,11 @@
 #
-# $Id: makefile.vc,v 1.158 2005/11/22 20:17:13 ptsarenko Exp $
+# $Id: makefile.nt,v 1.138 2005/11/22 18:59:17 ptsarenko Exp $
+#
+
+#
+# Makefile.nt - This file is identical to makefile.vc, except that
+# under something higher than Win9x, you should see overall improved
+# speed of building Harbour.
 #
 
 #
@@ -38,7 +44,24 @@
 #    OBJ lists for the appropriate library.
 #    NOTE: put .prg related obj's last in the lib list.
 #
-#   See makefile.nt for a batch mode (read: faster) version of this file.
+# 2. This is a recursive script.  If you change the name of this file,
+#    be sure to change MK_FILE (a few lines down) to the new name as well.
+#
+# 3. Recurrsion rules are quite simple:
+#     If you specifiy /a on the command line, files in the obj\vc dir
+#     will be deleted, and when nmake recurses, it's without the /a flag
+#
+#     If a .prg.obj rule is fired, nmake will execute this script with
+#     a specific target as a parameter immediatley after compiling a given
+#     set of prg files.
+#      ie: Harbour $<
+#          nmake /fmakefile.vc obj\vc\rtl.lib2
+#     which will simply get make to re-evaluate the dependancy list for the
+#     lib, and as a result, it will execute the C compiler using the .c.obj
+#     rule below to create the obj's for the prg's that were created just
+#     prior to the recurrsive call. Once the obj's are created, the
+#     recurrsion is complete.
+#     See additional notes under RTL.LIB below.
 #
 
 # ---------------------------------------------------------------
@@ -50,7 +73,7 @@
 #    set DEL=cmd /c del
 #
 # The above might be needed on Windows 2000 and XP.
-# The macros are referenced in makefile.bc
+# The macros are referenced in makefile.vc
 # ---------------------------------------------------------------
 
 !ifndef ECHO
@@ -237,10 +260,10 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 # override builtin
 
-.c.obj:
+.c.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-.cpp.obj:
+.cpp.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 #
@@ -249,33 +272,40 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 
 # TODO: Add GTSLN and GTCRS
 
-LIBLIST = \
-   $(RTL_LIB) \
+# For linking MT as in LibsMT2 below
+LIBSNONMT = \
    $(PCREPOS_LIB) \
    $(COMMON_LIB) \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
-   $(PP_LIB) \
    $(LANG_LIB) \
+   $(NULSYS_LIB) \
+   $(DLL_MAIN_LIB) \
+   $(MACRO_LIB) \
+   $(HB_GT_LIB) \
+   $(CGI_LIB)
+
+# These have an MT equivalent.
+LIBS = \
+   $(RTL_LIB) \
+   $(DEBUG_LIB) \
+   $(PP_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
-   $(NULSYS_LIB) \
    $(VM_LIB) \
    $(VM_LIB_OPT_CON) \
    $(VM_LIB_OPT_GUI) \
-   $(DLL_MAIN_LIB) \
-   $(MACRO_LIB) \
-   $(HB_GT_LIB) \
    $(TIP_LIB) \
    $(ODBC_LIB) \
-   $(CT_LIB)
+   $(CT_LIB) \
+   $(LIBSNONMT)
 
 !ifdef HB_MT
-LIBLISTMT = \
+LIBSMT = \
    $(MACROMT_LIB) \
    $(RTLMT_LIB) \
    $(PPMT_LIB) \
@@ -293,12 +323,6 @@ LIBLISTMT = \
    $(CTMT_LIB)
 !endif
 
-#
-# macro.lib needs to be listed twice
-#
-
-LIBS = \
-   $(LIBLIST)
 
 #
 # programs that require user32.lib (for OemToAnsi)
@@ -312,19 +336,46 @@ LIBS2 = \
    oleaut32.lib \
    advapi32.lib
 
+LIBSMT2 = \
+   $(LIBSMT) \
+   $(LIBSNONMT) \
+   user32.lib \
+   winspool.lib \
+   ole32.lib \
+   oleaut32.lib \
+   advapi32.lib
+
+
 #
 # RTL.LIB rules
 #
+# how this works:
+#
+#  {target>.prg{objdir}.obj
+#  Harbour (flags) -oobjdir\ $<
+#    The list of dependant prgs is sent to the harbour compiler
+#    Since the rule is .prg to .obj and the compiler spits out
+#    C code (as we use it), we need to get those into obj format.
+#    Since $(<:.prg=.c) doesn't work, we execute this script again
+#    with a specific target via:
+#  nMake /fmakefile.vc target.lib2 (in batch mode only)
+#    If you view that target at the bottom of this file, all it does
+#    is cause make to evaluate the obj list of dependants which then
+#    causes the .c.obj rule above to fire. (by inference)
 
-{$(RTL_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RTL_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RTL_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)2
+!endif
 
 # List C modules first, then PRG modules
 
@@ -543,7 +594,7 @@ RTL_LIB_OBJS = \
 # PCREPOS.LIB rules
 #
 
-{$(PCREPOS_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(PCREPOS_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -Fo$(OBJ_DIR)\ $<
 
 PCREPOS_LIB_OBJS = \
@@ -574,7 +625,7 @@ PCREPOS_LIB_OBJS = \
 # LANG.LIB rules
 #
 
-{$(LANG_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(LANG_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 LANG_LIB_OBJS = \
@@ -634,12 +685,10 @@ LANG_LIB_OBJS = \
 # CODEPAGE.LIB rules
 #
 
-{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(CODEPAGE_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 CODEPAGE_LIB_OBJS = \
-   $(OBJ_DIR)\cpbgmik.obj \
-   $(OBJ_DIR)\cpbgwin.obj \
    $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
@@ -692,7 +741,7 @@ CODEPAGE_LIB_OBJS = \
 # MACRO.LIB rules
 #
 
-{$(MACRO_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(MACRO_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 MACRO_LIB_OBJS = \
@@ -706,15 +755,20 @@ MACRO_LIB_OBJS = \
 # RDD.LIB rules
 #
 
-{$(RDD_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RDD_LIB)2
+!endif
+
 
 RDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbcmd.obj \
@@ -738,7 +792,7 @@ RDD_LIB_OBJS = \
 # NULSYS.LIB rules
 #
 
-{$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj:
+{$(RDD_DIR)\nulsys}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 NULSYS_LIB_OBJS = \
@@ -748,15 +802,19 @@ NULSYS_LIB_OBJS = \
 # DBFNTX.LIB rules
 #
 
-{$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFNTX_LIB)2
+!endif
 
 DBFNTX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfntx1.obj
@@ -765,15 +823,19 @@ DBFNTX_LIB_OBJS = \
 # DBFCDX.LIB rules
 #
 
-{$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFCDX_LIB)2
+!endif
 
 DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx1.obj
@@ -782,15 +844,19 @@ DBFCDX_LIB_OBJS = \
 # DBFFPT.LIB rules
 #
 
-{$(RDD_DIR)\dbffpt}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbffpt}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFFPT_LIB)2
+!endif
 
 DBFFPT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbffpt1.obj
@@ -799,15 +865,19 @@ DBFFPT_LIB_OBJS = \
 # HBSIX.LIB rules
 #
 
-{$(RDD_DIR)\hbsix}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\hbsix}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HBSIX_LIB)2
+!endif
 
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
@@ -818,15 +888,19 @@ HBSIX_LIB_OBJS = \
 # HSX.LIB rules
 #
 
-{$(RDD_DIR)\hsx}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\hsx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HSX_LIB)2
+!endif
 
 HSX_LIB_OBJS = \
    $(OBJ_DIR)\hsx.obj \
@@ -836,7 +910,7 @@ HSX_LIB_OBJS = \
 # PP.LIB rules
 #
 
-{$(PP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(PP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) -Ow $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 PP_LIB_OBJS = \
@@ -850,15 +924,19 @@ PP_LIB_OBJS = \
 # DEBUG.LIB rules
 #
 
-{$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(DEBUG_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.c:
+{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
-{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj:
+{$(DEBUG_DIR)}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DEBUG_LIB)2
+!endif
 
 DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgaltd.obj \
@@ -878,7 +956,7 @@ DEBUG_LIB_OBJS = \
 # COMMON.LIB rules
 #
 
-{$(COMMON_DIR)}.c{$(OBJ_DIR)}.obj:
+{$(COMMON_DIR)}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 COMMON_LIB_OBJS = \
@@ -897,15 +975,19 @@ COMMON_LIB_OBJS = \
 # OPTCON.LIB rules
 #
 
-{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj:
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -Fo$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.c:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OPT_CON_OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_CON)2
+!endif
 
 VM_LIB_OPT_CON_OBJS = \
    $(OBJ_DIR)$(MT)\OPT\CONSOLE\hvm.obj \
@@ -916,15 +998,19 @@ VM_LIB_OPT_CON_OBJS = \
 # OPTGUI.LIB rules
 #
 
-{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\GUI}.obj:
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
    $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -DHB_GUI -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $< /link /SUBSYSTEM:WINDOWS
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.c:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\GUI\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $*.c /link /SUBSYSTEM:WINDOWS
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_GUI)2
+!endif
 
 VM_LIB_OPT_GUI_OBJS = \
    $(OBJ_DIR)$(MT)\OPT\GUI\hvm.obj \
@@ -935,15 +1021,19 @@ VM_LIB_OPT_GUI_OBJS = \
 # VM.LIB rules
 #
 
-{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB)2
+!endif
 
 VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\arrays.obj \
@@ -996,7 +1086,7 @@ DLL_MAIN_OBJS = \
 # GTCGI.LIB rules
 #
 
-{$(RTL_DIR)\gtcgi}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtcgi}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTCGI_LIB_OBJS = \
@@ -1007,7 +1097,7 @@ GTCGI_LIB_OBJS = \
 # GTDOS.LIB rules
 #
 
-{$(RTL_DIR)\gtdos}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtdos}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTDOS_LIB_OBJS = \
@@ -1018,7 +1108,7 @@ GTDOS_LIB_OBJS = \
 # GTALLEG.LIB rules
 #
 
-{$(RTL_DIR)\gtalleg}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtalleg}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTALLEG_LIB_OBJS = \
@@ -1029,7 +1119,7 @@ GTALLEG_LIB_OBJS = \
 # GTNUL.LIB rules
 #
 
-{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTNUL_LIB_OBJS = \
@@ -1039,7 +1129,7 @@ GTNUL_LIB_OBJS = \
 # GTPCA.LIB rules
 #
 
-{$(RTL_DIR)\gtpca}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtpca}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTPCA_LIB_OBJS = \
@@ -1050,7 +1140,7 @@ GTPCA_LIB_OBJS = \
 # GTSTD.LIB rules
 #
 
-{$(RTL_DIR)\gtstd}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtstd}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTSTD_LIB_OBJS = \
@@ -1061,7 +1151,7 @@ GTSTD_LIB_OBJS = \
 # GTWIN.LIB rules
 #
 
-{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTWIN_LIB_OBJS = \
@@ -1072,32 +1162,58 @@ GTWIN_LIB_OBJS = \
 # GTWVT.LIB rules
 #
 
-{$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c:
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
 
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj:
+{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)\gtwvt2
+!endif
 
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
 
 
 #
+# CGI.LIB rules
+#
+
+{$(CGI_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+{$(CGI_DIR)}.prg{$(OBJ_DIR)}.c::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+
+{$(CGI_DIR)}.prg{$(OBJ_DIR)}.obj::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(CGI_LIB)2
+!endif
+
+#
 # TIP.LIB rules
 #
-{$(TIP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(TIP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(TIP_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(TIP_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(TIP_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(TIP_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(TIP_LIB)2
+!endif
 
 # List C modules first, then PRG modules
 
@@ -1123,15 +1239,19 @@ TIP_LIB_OBJS = \
 # CT.LIB rules
 #
 
-{$(CT_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(CT_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(CT_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(CT_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(CT_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(CT_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS) /f$(MK_FILE) $(CT_LIB)2
+!endif
 
 #
 # Please don't reorder this list if you don't know why it's the way it is!
@@ -1234,15 +1354,19 @@ CT_LIB_OBJS = \
 #
 # ODBC.LIB rules
 #
-{$(ODBC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj:
+{$(ODBC_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.c:
+{$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj:
+{$(ODBC_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(ODBC_LIB)2
+!endif
 
 ODBC_LIB_OBJS =       \
       $(OBJ_DIR)$(MT)\odbc.obj \
@@ -1255,8 +1379,8 @@ TARGETS= \
    $(COMMON_LIB) \
    $(PP_LIB) \
    $(HARBOUR_EXE) \
-   $(LIBLIST) \
-   $(LIBLISTMT) \
+   $(LIBS) \
+   $(LIBSMT) \
    $(HB_GT_LIBS) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
@@ -1317,7 +1441,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
                                         $(OBJ_DIR)$(MT)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2) $(EXTRALIB)
+                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT) $(LIBS2) $(EXTRALIB)
 
 #
 # HBTEST.EXE rules
@@ -1382,7 +1506,8 @@ $(HBTESTMT_EXE) : \
                                       $(OBJ_DIR)$(MT)\rt_str.c \
                                       $(OBJ_DIR)$(MT)\rt_stra.c \
                                       $(OBJ_DIR)$(MT)\rt_trans.c \
-                       -o $(HBTESTMT_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBLISTMT) $(LIBS2) $(EXTRALIB)
+                       -o $(HBTESTMT_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT2) $(EXTRALIB)
+
 !endif
 
 #
@@ -1668,9 +1793,39 @@ $(OBJ_DIR)$(MT)\macroy.c : $(MACRO_DIR)\macro.y
    bison -p hb_comp -d --no-line $** -o$@
 
 $(OBJ_DIR)$(MT)\macroy.obj : $(OBJ_DIR)$(MT)\macroy.c
-   $(CC) $(CLIBFLAGS) -W3 -Fo$@  $**
+   $(CC) $(CLIBFLAGS) -Fo$@  $**
 
 $(OBJ_DIR)$(MT)\macroslx.obj : $(MACRO_DIR)\macroslx.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR)$(MT) -W3 -Fo$@ $**
+   $(CC) $(CLIBFLAGS) -I$(OBJ_DIR)$(MT) -Fo$@ $**
    -$(DEL) $(OBJ_DIR)\unistd.h
+
+# dummy targets used for prg to c creation
+
+$(RTL_LIB)2    : $(RTL_LIB_OBJS)
+$(RTL_LIB)\gtwvt2 : $(GTWVT_LIB_OBJS)
+$(RPC_LIB)2    : $(RPC_LIB_OBJS)
+$(COMMON_LIB)2 : $(COMMON_LIB_OBJS)
+$(DEBUG_LIB)2  : $(DEBUG_LIB_OBJS)
+$(MACRO_LIB)2  : $(MACRO_LIB_OBJS)
+$(PP_LIB)2     : $(PP_LIB_OBJS)
+$(CT_LIB)2     : $(CT_LIB_OBJS)
+$(RDD_LIB)2    : $(RDD_LIB_OBJS)
+$(CGI_LIB)2    : $(CGI_LIB_OBJS)
+$(TIP_LIB)2    : $(TIP_LIB_OBJS)
+$(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
+$(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)
+$(DBFNTX_LIB)2 : $(DBFNTX_LIB_OBJS)
+$(HBSIX_LIB)2  : $(HBSIX_LIB_OBJS)
+$(HSX_LIB)2    : $(HSX_LIB_OBJS)
+$(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
+$(VM_LIB)2     : $(VM_LIB_OBJS)
+$(VM_LIB_OPT_CON)2 : $(VM_LIB_OPT_CON_OBJS)
+$(VM_LIB_OPT_GUI)2 : $(VM_LIB_OPT_GUI_OBJS)
+$(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
+$(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
+$(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)
+$(GTWIN_LIB)2  : $(GTWIN_LIB_OBJS)
+$(GTALLEG_LIB)2 : $(GTALLEG_LIB_OBJS)
+$(GTWVT_LIB)2  : $(GTWVT_LIB_OBJS)
+$(ODBC_LIB)2   : $(ODBC_LIB_OBJS)
