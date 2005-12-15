@@ -1,5 +1,5 @@
 /*
- * $Id: ctchksum.c,v 1.2 2004/03/18 03:43:08 ronpinkas Exp $
+ * $Id: ctchksum.c,v 1.2 2005/12/15 17:03:00 ptsarenko Exp $
  */
 
 /*
@@ -65,5 +65,13 @@ HB_FUNC( CHECKSUM )
    /* NOTE: Using hb_retnd() instead of hb_retnl() to always return a
             positive value. */
 
-   hb_retnd( ( ULONG ) ( ( ulResult & 0x00FFFFFF ) | ( ( ulLen & 0xFF ) << 24 ) ) );
+   ulResult = ( ULONG ) ( ( ulResult & 0x00FFFFFF ) | ( ( ulLen & 0xFF ) << 24 ) );
+   if( ulResult <= INT32_MAX )
+   {
+      hb_retnl( ulResult );
+   }
+   else
+   {
+      hb_retnd( ulResult );
+   }
 }
