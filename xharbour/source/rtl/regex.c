@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.53 2005/10/24 01:04:35 druzus Exp $
+ * $Id: regex.c,v 1.54 2005/12/16 03:49:36 fsgiudice Exp $
  */
 
 /*
@@ -394,14 +394,15 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          case 5: // Wants *ALL* Results AND positions
          {
+            PHB_ITEM pAtxArray;
+            HB_ITEM aSingleMatch;
+
             char  *str = pString->item.asString.value;
             int   iMax       = hb_parni( 5 );  // max nuber of matches I want, 0 = unlimited
             int   iGetMatch  = hb_parni( 6 );  // Gets if want only one single match or a sub-match
             BOOL  fOnlyMatch = TRUE;           // if TRUE returns only matches and sub-matches, not positions
             ULONG ulOffSet   = 0;
             int   iCount     = 1;
-
-            PHB_ITEM pAtxArray;
 
             if ( hb_parinfo( 7 ) & HB_IT_LOGICAL )
             {
@@ -413,9 +414,6 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
             do
             {
-
-               HB_ITEM aSingleMatch;
-
                // Count sucessful matches
                for ( i = 0; i < iMaxMatch; i ++ )
                {
@@ -427,67 +425,99 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
                iMatches++;
 
-               if ( iGetMatch == 0 )
+               // If I want all matches
+               if ( iGetMatch == 0 || // Check boundaries
+                    ( iGetMatch < 0 || iGetMatch > iMatches  )
+                  )
                {
                   pAtxArray = hb_itemArrayNew( iMatches );
-               }
 
-               for ( i = 0; i < iMatches; i++ )
-               {
-                  if ( iGetMatch == 0 ||
-                       ( iGetMatch > 0 && iGetMatch <= iMatches && iGetMatch == i+1 )
-                     )
+                  for ( i = 0; i < iMatches; i++ )
                   {
-                     aSingleMatch.type = HB_IT_NIL;
+                      aSingleMatch.type = HB_IT_NIL;
 
-                     if ( !fOnlyMatch )
+                      if ( !fOnlyMatch )
+                      {
+                         if ( aMatches[i].rm_eo != -1 )
+                         {
+                            hb_arrayNew( &aSingleMatch, 3 );
+
+                            //matched string
+                            hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+
+                            // begin of match
+                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
+
+                            // End of match
+                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
+                         }
+                         else
+                         {
+                            hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
+                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
+                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
+                         }
+                      }
+                      else
+                      {
+                         if ( aMatches[i].rm_eo != -1 )
+                         {
+                            //matched string
+                            hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                         }
+                         else
+                         {
+                            hb_itemPutCL( &aSingleMatch, "", 0 );
+                         }
+                      }
+                      hb_itemArrayPut( pAtxArray, i + 1, &aSingleMatch );
+                  }
+
+                  hb_arrayAddForward( pRetArray, pAtxArray );
+
+               }
+               else // Here I get only single matches
+               {
+
+                  i = iGetMatch - 1;
+
+                  aSingleMatch.type = HB_IT_NIL;
+
+                  if ( !fOnlyMatch )
+                  {
+                     if ( aMatches[i].rm_eo != -1 )
                      {
-                        if ( aMatches[i].rm_eo != -1 )
-                        {
-                           hb_arrayNew( &aSingleMatch, 3 );
+                        hb_arrayNew( &aSingleMatch, 3 );
 
-                           //matched string
-                           hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                        //matched string
+                        hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
 
-                           // begin of match
-                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
+                        // begin of match
+                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
 
-                           // End of match
-                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
-                        }
-                        else
-                        {
-                           hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
-                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
-                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
-                        }
+                        // End of match
+                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
                      }
                      else
                      {
-                        if ( aMatches[i].rm_eo != -1 )
-                        {
-                           //matched string
-                           hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
-                        }
-                        else
-                        {
-                           hb_itemPutCL( &aSingleMatch, "", 0 );
-                        }
+                        hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
+                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
+                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
                      }
-
-                    if ( iGetMatch == 0 )
-                    {
-                       hb_itemArrayPut( pAtxArray, i + 1, &aSingleMatch );
-                    }
                   }
-               }
+                  else
+                  {
+                     if ( aMatches[i].rm_eo != -1 )
+                     {
+                        //matched string
+                        hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                     }
+                     else
+                     {
+                        hb_itemPutCL( &aSingleMatch, "", 0 );
+                     }
+                  }
 
-               if ( iGetMatch == 0 )
-               {
-                  hb_arrayAddForward( pRetArray, pAtxArray );
-               }
-               else
-               {
                   hb_arrayAddForward( pRetArray, &aSingleMatch );
                }
 
