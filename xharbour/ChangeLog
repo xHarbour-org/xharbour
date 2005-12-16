@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4709 2005/12/16 03:47:33 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.4710 2005/12/16 10:15:52 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-07 08:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/macro.c
+    * Minor correction
 
 2005-12-16 11:06 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.60 2005/11/19 19:12:23 ronpinkas Exp $
+ * $Id: macro.c,v 1.61 2005/12/03 05:21:02 ronpinkas Exp $
  */
 
 /*
@@ -916,6 +916,12 @@ HB_FUNC( HB_MACROCOMPILE )
    else
    {
       HB_ITEM_PTR pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, hb_paramError( 1 ) );
+
+      if( pResult )
+      {
+         hb_itemReturnForward( pResult );
+         hb_itemRelease( pResult );
+      }
    }
 }
 
