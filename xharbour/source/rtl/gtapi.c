@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.60 2005/12/10 00:33:33 oh1 Exp $
+ * $Id: gtapi.c,v 1.61 2005/12/16 01:10:18 jabrecer Exp $
  */
 
 /*
@@ -2543,15 +2543,6 @@ SHORT HB_EXPORT hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol )
 
    ct_WCur->iRow = s_iRow - ct_UFRow;
    ct_WCur->iCol = s_iCol - ct_UFCol;
-
-   // Tony (ABC)   12/15/2005      4:23PM
-   if( ISNIL( 1 ) && ISNIL( 2 ) && ISNIL( 3 ) && ISNIL( 4 ) )
-   {
-      FRow = -ct_UFRow;
-      FCol = -ct_UFCol;
-      LRow = -ct_ULRow;
-      LCol = -ct_ULCol;
-   };
 
    FRow = ct_UFRow + FRow;
    FCol = ct_UFCol + FCol;

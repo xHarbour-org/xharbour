@@ -1,5 +1,5 @@
 /*
- * $Id: ctwin.c,v 1.6 2005/10/24 01:04:25 druzus Exp $
+ * $Id: ctwin.c,v 1.7 2005/12/10 00:30:19 oh1 Exp $
  */
 
 /*
@@ -265,13 +265,27 @@ HB_FUNC( WFLASTROW ) /* Return position of the bottom row of formatted area */
 /****************************************************************************/
 HB_FUNC( WFORMAT ) /* Set the usable area within a window */
 {
+   HB_CT_WND * wnd;
    SHORT NCur;
 
    NCur = hb_ctWSelect( -2 );
 
    if( NCur >= 1 )
-      NCur = hb_ctWFormat( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
-                           hb_parni( 4 ) );
+   {
+      if( hb_pcount() == 0 )
+      {
+         wnd = hb_ctWCurrent();
+         NCur = hb_ctWFormat( wnd->WFRow - wnd->UFRow,
+                              wnd->WFCol - wnd->UFCol,
+                              wnd->ULRow - wnd->WLRow,
+                              wnd->ULCol - wnd->WLCol );
+      }
+      else if( ISNUM( 1 ) && ISNUM( 2 ) && ISNUM( 3 ) && ISNUM( 4 ) )
+      {
+         NCur = hb_ctWFormat( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                              hb_parni( 4 ) );
+      }
+   }
 
    hb_retni( NCur );
 }
