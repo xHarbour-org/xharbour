@@ -1,8 +1,7 @@
 ***********************************************************
 *        Translations for CTWIN library                   *
 ***********************************************************
-// Tony (ABC)   12/12/2005      2:37PM
-// /* oh1 2005-12-08
+/* oh1 2005-12-08
 #xcommand CTWINON =>;
  #xtranslate ACHOICE(       =>   ctw_ACHOICE(        ;;
  #xtranslate COL()          =>   ctw_COL()           ;;
@@ -26,10 +25,9 @@
  #xtranslate TBROWSENEW(    =>   ctw_TBROWSENEW(     ;;
  #xtranslate TBROWSEDB(     =>   ctw_TBROWSEDB(      ;;
  #xtranslate __AtPrompt(    =>   ctw___AtPrompt(
-// */
+*/
 
-// Tony (ABC)   12/12/2005      2:38PM
-// /* oh1 2005-12-08
+/* oh1 2005-12-08
 #xcommand CTWINOFF =>;
  #xuntranslate ACHOICE(       => ;;
  #xuntranslate COL()          => ;;
@@ -53,4 +51,4 @@
  #xuntranslate TBROWSENEW(    => ;;
  #xuntranslate TBROWSEDB(     => ;;
  #xuntranslate __AtPrompt(    =>
-// */
+*/
