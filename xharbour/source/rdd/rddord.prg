@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.5 2005/12/13 12:03:36 druzus Exp $
+ * $Id: rddord.prg,v 1.6 2005/12/13 19:02:31 ronpinkas Exp $
  */
 
 /*
@@ -109,61 +109,3 @@ FUNCTION ORDSETFOCU( xOrder, cFile )
 
 FUNCTION ORDSETRELA( xArea, bRelation, cRelation )
    RETURN ORDSETRELATION( xArea, bRelation, cRelation )
-
-#ifdef HB_COMPAT_XPP
-
-FUNCTION ORDWILDSEEK( cPattern, lCont, lBack )
-   LOCAL lFound := .F.
-   LOCAL xScopeTop, xScopeBottom, cFixed
-   LOCAL nFixed := 0, i
-   LOCAL c
-
-   IF VALTYPE( lCont ) != "L"
-      lCont := .F.
-   ENDIF
-   IF VALTYPE( lBack ) != "L"
-      lBack := .F.
-   ENDIF
-
-   FOR EACH c IN cPattern
-      IF c $ "?*"
-         EXIT
-      ENDIF
-      ++nFixed
-   NEXT
-   IF nFixed > 0
-      cFixed := LEFT( cPattern, nFixed )
-      xScopeTop := ordScope( 0 )
-      xScopeBottom := ordScope( 1 )
-      IF !VALTYPE( xScopeTop ) == "C" .or. cFixed >= xScopeTop
-         ordScope( 0, cFixed )
-      ENDIF
-      IF !VALTYPE( xScopeBottom ) == "C" .or. cFixed <= xScopeBottom
-         ordScope( 1, cFixed )
-      ENDIF
-   ENDIF
-   IF ! lCont
-      IF lBack
-         DBGOBOTTOM()
-      ELSE
-         DBGOTOP()
-      ENDIF
-#ifdef __XHARBOUR__
-      lFound := WildMatch( cPattern, ORDKEYVAL() )
-#else
-      lFound := HB_WildMatch( cPattern, ORDKEYVAL() )
-#endif
-   ENDIF
-
-   IF ! lFound
-      lFound := DBORDERINFO( IIF( lBack, DBOI_SKIPWILDBACK, DBOI_SKIPWILD ),,, cPattern )
-   ENDIF
-
-   IF nFixed > 0
-      ordScope( 0, xScopeTop )
-      ordScope( 1, xScopeBottom )
-   ENDIF
-
-   RETURN lFound
-
-#endif

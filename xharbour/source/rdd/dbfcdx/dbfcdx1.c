@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.234 2005/12/11 12:38:47 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.235 2005/12/13 12:03:36 druzus Exp $
  */
 
 /*
@@ -5292,6 +5292,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 {
    BOOL fFound = FALSE, fFirst = TRUE;
    char *szPattern = hb_itemGetCPtr( pWildItm );
+   int iFixed = 0, iStop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipWild(%p, %p, %i, %p)", pArea, pTag, fForward, pWildItm));
 
@@ -5312,6 +5313,11 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
    }
 #endif
+   while( iFixed < pTag->uiLen && szPattern[ iFixed ] &&
+          szPattern[ iFixed ] != '*' && szPattern[ iFixed ] != '?' )
+   {
+      ++iFixed;
+   }
 
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
@@ -5326,6 +5332,30 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
            ( fForward ? pTag->UsrAscend : !pTag->UsrAscend ) )
          fFirst = FALSE;
    }
+
+   iStop = pTag->UsrAscend ? -1 : 1;
+   if( !fForward )
+      iStop = -iStop;
+
+   if( iFixed && !pTag->TagEOF && pTag->CurKey->rec != 0 &&
+       hb_cdxValCompare( pTag, ( BYTE * ) szPattern, iFixed,
+                         pTag->CurKey->val, iFixed, FALSE ) == -iStop )
+   {
+      LPCDXKEY pKey = NULL;
+
+      pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed, 
+                     pTag->UsrAscend ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM );
+      if( !hb_cdxTagKeyFind( pTag, pKey ) )
+      {
+         if( fForward )
+            pTag->TagEOF = TRUE;
+         else
+            pTag->TagBOF = TRUE;
+      }
+      hb_cdxKeyFree( pKey );
+      fFirst = FALSE;
+   }
+
    if ( fForward )
    {
       if ( fFirst )
@@ -5334,7 +5364,9 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       {
          if ( hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
          {
-            ULONG ulRecNo = pArea->ulRecNo;
+            ULONG ulRecNo = pTag->CurKey->rec;
+            if( SELF_GOTO( ( AREAP ) pArea, ulRecNo ) != SUCCESS )
+               break;
             SELF_SKIPFILTER( ( AREAP ) pArea, 1 );
             if ( pArea->ulRecNo == ulRecNo ||
                  hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
@@ -5343,9 +5375,15 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                break;
             }
          }
+         if( iFixed && hb_cdxValCompare( pTag, ( BYTE * ) szPattern, iFixed,
+                                pTag->CurKey->val, iFixed, FALSE ) == iStop )
+         {
+            break;
+         }
          hb_cdxTagSkipNext( pTag );
       }
-      SELF_GOTO( ( AREAP ) pArea, fFound ? pTag->CurKey->rec : 0 );
+      if( !fFound )
+         SELF_GOTO( ( AREAP ) pArea, 0 );
    }
    else
    {
@@ -5355,7 +5393,9 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
       {
          if ( hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
          {
-            ULONG ulRecNo = pArea->ulRecNo;
+            ULONG ulRecNo = pTag->CurKey->rec;
+            if( SELF_GOTO( ( AREAP ) pArea, ulRecNo ) != SUCCESS )
+               break;
             SELF_SKIPFILTER( ( AREAP ) pArea, -1 );
             if ( pArea->ulRecNo == ulRecNo ||
                  hb_strMatchWild( (const char *) pTag->CurKey->val, szPattern ) )
@@ -5364,11 +5404,14 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                break;
             }
          }
+         if( iFixed && hb_cdxValCompare( pTag, ( BYTE * ) szPattern, iFixed,
+                                pTag->CurKey->val, iFixed, FALSE ) == iStop )
+         {
+            break;
+         }
          hb_cdxTagSkipPrev( pTag );
       }
-      if ( fFound )
-         SELF_GOTO( ( AREAP ) pArea, pTag->CurKey->rec );
-      else
+      if ( !fFound )
       {
          SELF_GOTOP( ( AREAP ) pArea );
          pArea->fBof = TRUE;

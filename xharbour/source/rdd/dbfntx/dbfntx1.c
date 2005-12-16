@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.149 2005/12/11 12:38:47 druzus Exp $
+ * $Id: dbfntx1.c,v 1.150 2005/12/14 07:24:07 druzus Exp $
  */
 
 /*
@@ -352,7 +352,7 @@ static LPKEYINFO hb_ntxKeyNew( LPKEYINFO pKeyFrom, int keylen )
    pKey = ( LPKEYINFO ) hb_xgrab( sizeof( KEYINFO ) + keylen );
    if( pKeyFrom )
    {
-      memcpy( pKey->key, pKeyFrom->key, keylen );
+      memcpy( pKey->key, pKeyFrom->key, keylen + 1 );
       pKey->Tag = pKeyFrom->Tag;
       pKey->Xtra = pKeyFrom->Xtra;
    }
@@ -372,7 +372,7 @@ static LPKEYINFO hb_ntxKeyCopy( LPKEYINFO pKeyDest, LPKEYINFO pKey, int keylen )
    if( !pKeyDest )
       pKeyDest = hb_ntxKeyNew( NULL, keylen );
 
-   memcpy( pKeyDest->key, pKey->key, keylen );
+   memcpy( pKeyDest->key, pKey->key, keylen + 1 );
    pKeyDest->Tag = pKey->Tag;
    pKeyDest->Xtra = pKey->Xtra;
 
@@ -4122,6 +4122,7 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
    NTXAREAP pArea = pTag->Owner->Owner;
    char *szPattern = hb_itemGetCPtr( pWildItm );
    BOOL fFound = FALSE;
+   int iFixed = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ntxOrdSkipWild(%p, %d, %p)", pTag, fForward, pWildItm));
 
@@ -4139,6 +4140,11 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
       hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
    }
 #endif
+   while( iFixed < pTag->KeyLength && szPattern[ iFixed ] &&
+          szPattern[ iFixed ] != '*' && szPattern[ iFixed ] != '?' )
+   {
+      ++iFixed;
+   }
 
    if( pArea->lpdbPendingRel )
       SELF_FORCEREL( ( AREAP ) pArea );
@@ -4153,18 +4159,40 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
       hb_ntxTagRefreshScope( pTag );
       if( hb_ntxCurKeyRefresh( pTag ) )
       {
-         if( fForward )
+         int iStop = fForward ? -1 : 1;
+         if( pTag->fUsrDescend )
+            iStop = -iStop;
+         if( iFixed && hb_ntxValCompare( pTag, szPattern, iFixed,
+                             pTag->CurKeyInfo->key, iFixed, FALSE ) == -iStop )
+         {
+            LPKEYINFO pKey = NULL;
+            pKey = hb_ntxKeyNew( NULL, pTag->KeyLength );
+            memcpy( pKey->key, szPattern, iFixed );
+            pKey->key[ iFixed ] = '\0';
+            pKey->Xtra = pArea->lpCurTag->fUsrDescend ==
+                         pArea->lpCurTag->AscendKey ? NTX_MAX_REC_NUM :
+                                                      NTX_IGNORE_REC_NUM;
+            if( !hb_ntxTagKeyFind( pTag, pKey, iFixed ) )
+            {
+               if( fForward )
+                  pTag->TagEOF = TRUE;
+               else
+                  pTag->TagBOF = TRUE;
+            }
+            hb_ntxKeyFree( pKey );
+         }
+         else if( fForward )
             hb_ntxTagSkipNext( pTag );
          else
             hb_ntxTagSkipPrev( pTag );
 
          while( fForward ? !pTag->TagEOF : !pTag->TagBOF )
          {
-            if( SELF_GOTO( ( AREAP ) pArea, pTag->CurKeyInfo->Xtra ) != SUCCESS )
-               break;
             if( hb_strMatchWild( pTag->CurKeyInfo->key, szPattern ) )
             {
-               ULONG ulRecNo = pArea->ulRecNo;
+               ULONG ulRecNo = pTag->CurKeyInfo->Xtra;
+               if( SELF_GOTO( ( AREAP ) pArea, ulRecNo ) != SUCCESS )
+                  break;
                SELF_SKIPFILTER( ( AREAP ) pArea, fForward ? 1 : -1 );
                if( pArea->ulRecNo == ulRecNo ||
                    hb_strMatchWild( pTag->CurKeyInfo->key, szPattern ) )
@@ -4172,6 +4200,11 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
                   fFound = TRUE;
                   break;
                }
+            }
+            if( iFixed && hb_ntxValCompare( pTag, szPattern, iFixed,
+                             pTag->CurKeyInfo->key, iFixed, FALSE ) == iStop )
+            {
+               break;
             }
             if( fForward )
                hb_ntxTagSkipNext( pTag );

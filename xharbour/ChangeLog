@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4708 2005/12/16 01:03:49 jabrecer Exp $
+ * $Id: ChangeLog,v 1.4709 2005/12/16 03:47:33 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-16 11:06 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/rddord.prg
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * ORDWILDSEEK() function (wrapper to dbOrderInfo())
+      rewritten in C to reduce .prg level overhead
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+    * added EOL at EOF
 
 2005-12-16 04:42 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/regex.c

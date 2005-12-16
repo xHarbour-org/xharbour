@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.181 2005/11/22 02:01:43 druzus Exp $
+ * $Id: dbcmd.c,v 1.182 2005/12/11 12:38:47 druzus Exp $
  */
 
 /*
@@ -3160,6 +3160,61 @@ HB_FUNC( ORDCOUNT )
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDCOUNT" );
 }
 
+#endif
+
+#ifdef HB_COMPAT_XPP
+HB_FUNC( ORDWILDSEEK )
+{
+   HB_THREAD_STUB
+   AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
+   BOOL fFound = FALSE;
+
+   if( pArea )
+   {
+      char * szPatern = hb_parc( 1 );
+
+      if( szPatern )
+      {
+         BOOL fCont = hb_parl( 2 ), fBack = hb_parl( 3 );
+         DBORDERINFO OrderInfo;
+
+         memset( &OrderInfo, 0, sizeof( DBORDERINFO ) );
+         OrderInfo.itmResult = hb_itemNew( NULL );
+
+         if( !fCont )
+         {
+            char * szKey;
+
+            if( fBack )
+               SELF_GOBOTTOM( pArea );
+            else
+               SELF_GOTOP( pArea );
+
+            SELF_ORDINFO( pArea, DBOI_KEYVAL, &OrderInfo );
+            szKey = hb_itemGetCPtr( OrderInfo.itmResult );
+
+            fFound = hb_strMatchWild( szKey, szPatern );
+         }
+         if( !fFound )
+         {
+            OrderInfo.itmNewVal = hb_param( 1, HB_IT_STRING );
+            SELF_ORDINFO( pArea, fBack ? DBOI_SKIPWILDBACK : DBOI_SKIPWILD,
+                          &OrderInfo );
+            fFound = hb_itemGetL( OrderInfo.itmResult );
+         }
+         hb_itemRelease( OrderInfo.itmResult );
+      }
+      else
+      {
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBFILEPUTBADPARAMETER, NULL, "ORDWILDSEEK" );
+      }
+   }
+   else
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDWILDSEEK" );
+   }
+   hb_retl( fFound );
+}
 #endif
 
 HB_FUNC( ORDLISTADD )

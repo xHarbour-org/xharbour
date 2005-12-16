@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.57 2005/12/11 12:38:47 druzus Exp $
+ * $Id: workarea.c,v 1.58 2005/12/14 03:20:39 guerra000 Exp $
  */
 
 /*
