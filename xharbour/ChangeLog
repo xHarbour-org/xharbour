@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4707 2005/12/15 19:01:06 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4708 2005/12/16 01:03:49 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-16 04:42 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * source/rtl/regex.c
+    * fixed HB_REGEXATX start position (before 0-based, now 1-based)
+    + New HB_REGEXALL() function
+      This function returns all occurrences from a regex search.
+  + tests/regexall.prg
+    + shows HB_RegExAll() capabilities
+
+   Syntax:
+
+   /*-------------------------------------------------------------------------
+     2005-12-16 - Francesco Saverio Giudice
+     HB_RegExAll( cRegex, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, lOnlyMatch ) -> aAllRegexMatches
+
+     This function return all matches from a Regex search.
+     It is a mix from hb_RegEx() and hb_RegExAtX()
+
+     PARAMETERS:
+       cRegex         - Regex pattern string or precompiled Regex
+       cString        - The string you want to search
+       lCaseSensitive - default = FALSE
+       lNewLine       - default = FALSE
+       nMaxMatches    - default = unlimited, this limit number of matches that have to return
+       nGetMatch      - default = unlimited, this returns only one from Match + Sub-Matches
+       lOnlyMatch     - default = TRUE, if TRUE returns Matches, otherwise it returns also start and end positions
+
+     -------------------------------------------------------------------------*/
 
 2005-12-15 17:02 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/include/ctwin.ch

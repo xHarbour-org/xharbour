@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.52 2005/09/11 21:35:29 druzus Exp $
+ * $Id: regex.c,v 1.53 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -243,7 +243,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       aMatches[0].rm_eo = pRegEx->item.asString.length;
    }
 
-   if( cRequest != 0 && cRequest != 4)
+   if( cRequest != 0 && cRequest != 4 && cRequest != 5)
    {
       iMaxMatch = 1;
    }
@@ -332,7 +332,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                mean an empty split field at the end of the string */
             hb_itemPutCL( &Match, str, strlen( str ) );
             hb_arrayAddForward( pRetArray, &Match );
-   
+
             if( fFree )
             {
                hb_freeregex( pReg );
@@ -370,7 +370,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
 
                   // begin of match
-                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), aMatches[i].rm_so );
+                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), aMatches[i].rm_so + 1 );
 
                   // End of match
                   hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), aMatches[i].rm_eo );
@@ -387,6 +387,120 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
             if ( fFree )
                hb_freeregex( pReg );
+            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
+            return TRUE;
+         }
+
+         case 5: // Wants *ALL* Results AND positions
+         {
+            char  *str = pString->item.asString.value;
+            int   iMax       = hb_parni( 5 );  // max nuber of matches I want, 0 = unlimited
+            int   iGetMatch  = hb_parni( 6 );  // Gets if want only one single match or a sub-match
+            BOOL  fOnlyMatch = TRUE;           // if TRUE returns only matches and sub-matches, not positions
+            ULONG ulOffSet   = 0;
+            int   iCount     = 1;
+
+            PHB_ITEM pAtxArray;
+
+            if ( hb_parinfo( 7 ) & HB_IT_LOGICAL )
+            {
+               fOnlyMatch = hb_parl( 7 );
+            }
+
+            // Set new array
+            pRetArray = hb_itemArrayNew( 0 );
+
+            do
+            {
+
+               HB_ITEM aSingleMatch;
+
+               // Count sucessful matches
+               for ( i = 0; i < iMaxMatch; i ++ )
+               {
+                  if ( aMatches[i].rm_eo != -1 )
+                  {
+                     iMatches = i;
+                  }
+               }
+
+               iMatches++;
+
+               if ( iGetMatch == 0 )
+               {
+                  pAtxArray = hb_itemArrayNew( iMatches );
+               }
+
+               for ( i = 0; i < iMatches; i++ )
+               {
+                  if ( iGetMatch == 0 ||
+                       ( iGetMatch > 0 && iGetMatch <= iMatches && iGetMatch == i+1 )
+                     )
+                  {
+                     aSingleMatch.type = HB_IT_NIL;
+
+                     if ( !fOnlyMatch )
+                     {
+                        if ( aMatches[i].rm_eo != -1 )
+                        {
+                           hb_arrayNew( &aSingleMatch, 3 );
+
+                           //matched string
+                           hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+
+                           // begin of match
+                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
+
+                           // End of match
+                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
+                        }
+                        else
+                        {
+                           hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
+                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
+                           hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
+                        }
+                     }
+                     else
+                     {
+                        if ( aMatches[i].rm_eo != -1 )
+                        {
+                           //matched string
+                           hb_itemPutCL( &aSingleMatch, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                        }
+                        else
+                        {
+                           hb_itemPutCL( &aSingleMatch, "", 0 );
+                        }
+                     }
+
+                    if ( iGetMatch == 0 )
+                    {
+                       hb_itemArrayPut( pAtxArray, i + 1, &aSingleMatch );
+                    }
+                  }
+               }
+
+               if ( iGetMatch == 0 )
+               {
+                  hb_arrayAddForward( pRetArray, pAtxArray );
+               }
+               else
+               {
+                  hb_arrayAddForward( pRetArray, &aSingleMatch );
+               }
+
+               str += aMatches[ 0 ].rm_eo;
+               ulOffSet += ( aMatches[0].rm_eo - aMatches[0].rm_so );
+               iCount++;
+            }
+            while( *str && (iMax == 0 || iMax >= iCount) && regexec( pReg, str, iMaxMatch, aMatches, EFlags ) == 0 );
+
+            if( fFree )
+            {
+               hb_freeregex( pReg );
+            }
             hb_itemRelease( hb_itemReturnForward( pRetArray ) );
 
             return TRUE;
@@ -559,6 +673,28 @@ HB_FUNC( HB_REGEX )
 HB_FUNC( HB_REGEXATX )
 {
    hb_regex( 4, NULL, NULL );
+}
+
+/*-------------------------------------------------------------------------
+  2005-12-16 - Francesco Saverio Giudice
+  HB_RegExAll( cRegex, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, lOnlyMatch ) -> aAllRegexMatches
+
+  This function return all matches from a Regex search.
+  It is a mix from hb_RegEx() and hb_RegExAtX()
+
+  PARAMETERS:
+    cRegex         - Regex pattern string or precompiled Regex
+    cString        - The string you want to search
+    lCaseSensitive - default = FALSE
+    lNewLine       - default = FALSE
+    nMaxMatches    - default = unlimited, this limit number of matches that have to return
+    nGetMatch      - default = unlimited, this returns only one from Match + Sub-Matches
+    lOnlyMatch     - default = TRUE, if TRUE returns Matches, otherwise it returns also start and end positions
+
+  -------------------------------------------------------------------------*/
+HB_FUNC( HB_REGEXALL )
+{
+   hb_regex( 5, NULL, NULL );
 }
 
 // Returns just .T. if match found or .F. otherwise.
