@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.54 2005/12/16 03:49:36 fsgiudice Exp $
+ * $Id: regex.c,v 1.55 2005/12/16 22:55:27 fsgiudice Exp $
  */
 
 /*
@@ -361,11 +361,10 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             for ( i = 0; i < iMatches; i++ )
             {
                aSingleMatch.type = HB_IT_NIL;
+               hb_arrayNew( &aSingleMatch, 3 );
 
                if ( aMatches[i].rm_eo != -1 )
                {
-                  hb_arrayNew( &aSingleMatch, 3 );
-
                   //matched string
                   hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
 
@@ -435,12 +434,13 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   for ( i = 0; i < iMatches; i++ )
                   {
                       aSingleMatch.type = HB_IT_NIL;
+                      hb_arrayNew( &aSingleMatch, 3 );
 
                       if ( !fOnlyMatch )
                       {
+
                          if ( aMatches[i].rm_eo != -1 )
                          {
-                            hb_arrayNew( &aSingleMatch, 3 );
 
                             //matched string
                             hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
@@ -485,10 +485,10 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
                   if ( !fOnlyMatch )
                   {
+                     hb_arrayNew( &aSingleMatch, 3 );
+
                      if ( aMatches[i].rm_eo != -1 )
                      {
-                        hb_arrayNew( &aSingleMatch, 3 );
-
                         //matched string
                         hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
 
