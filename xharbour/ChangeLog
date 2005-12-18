@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4713 2005/12/16 22:52:45 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.4714 2005/12/17 15:10:59 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-18 18:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * moved alt-numpad handling to a seperate function.  This will allow
+      the ability to turn this compatible handling off if you desire.
+      (Minor wrapper yet to be written)
+    * moved Top-row Caps log bug handling code to a seperate function
+      This code is disabled by default.  Its sole purpose is to correct
+      an MS bug under Win9x when Keyb support is not loaded.
+      Nothing happens if this is enabled under other than Win9x, but
+      for proper usage, you really need to give the user the ability to enable
+      or disable this code at runtime.  (via an .ini file perhaps)
+      (Minor wrapper yet to be written)
+    * CPU Usage is tamed
+    * Console IO locking now in MT mode.
+      However you set gt to gtwin, now set to gtwinmt for MT Builds.
+    * makefile.vc
+      + gtwinmt.lib
+    * I'm not really done with this, but what's here now should work.
+      Please work it and report any problems!
 
 2005-12-17 16:08 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/regex.c
