@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.56 2005/10/08 08:54:54 lf_sfnet Exp $
+rem $Id: bld.bat,v 1.57 2005/12/14 05:25:20 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -52,7 +52,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    echo.
    echo     HB_ARCHITECTURE:
    echo       - dos   (HB_GT_LIB=gtdos by default)
-   echo       - w32   (HB_GT_LIB=gtwin by default)
+   echo       - w32   (HB_GT_LIB=gtwin by default or gtwinmt if hb_mt=MT)
    echo       - linux (HB_GT_LIB=gtstd by default)
    echo       - os2   (HB_GT_LIB=gtos2 by default)
    echo.
@@ -221,8 +221,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 :A_W32
 
    if not "%HB_ARCHITECTURE%" == "w32" goto A_OS2
-   if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
    if "%HB_COMPILER%" == "msvc"    goto C_MSVC
+   if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
    if "%HB_COMPILER%" == "watcom"  goto C_WATCOM
    if "%HB_COMPILER%" == "mingw32"  goto C_MINGW32
 
@@ -253,6 +253,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 :C_MSVC
    if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
+   if not "%HB_MT%" == "" if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwinmt
+   if "%HB_MT%" == "" if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
    if "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\hsx%HB_MT%.lib %HB_LIB_INSTALL%\hbsix%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct%HB_MT%.lib %HB_LIB_INSTALL%\tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
 
