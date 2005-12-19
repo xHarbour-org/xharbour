@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.15 2005/11/22 20:25:32 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.16 2005/12/19 18:59:16 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -595,6 +595,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\justify.obj \
    $(OBJ_DIR)\keyset.obj \
    $(OBJ_DIR)\misc1.obj \
+   $(OBJ_DIR)\misc2.obj \
+   $(OBJ_DIR)\misc3.obj \
 #  $(OBJ_DIR)\ctnet.obj \
    $(OBJ_DIR)\num1.obj \
    $(OBJ_DIR)\numat.obj \
@@ -1117,6 +1119,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\justify.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\keyset.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\misc1.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\misc2.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\misc3.obj      + >> harbourdll.rsp
 #  $(ECHO) $(OBJ_DIR)\ctnet.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\num1.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\numat.obj      + >> harbourdll.rsp
@@ -2897,6 +2901,12 @@ $(OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\misc2.obj : $(CT_DIR)\misc2.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\misc3.obj : $(CT_DIR)\misc3.c
    $(CC_CMD)
 
 $(OBJ_DIR)\tab.obj : $(CT_DIR)\tab.c

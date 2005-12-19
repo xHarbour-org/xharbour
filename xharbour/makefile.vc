@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.160 2005/12/14 07:12:44 paultucker Exp $
+# $Id: makefile.vc,v 1.162 2005/12/19 23:10:26 ptsarenko Exp $
 #
 
 #
@@ -1305,6 +1305,8 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\lton.obj \
    $(OBJ_DIR)$(MT)\maxline.obj \
    $(OBJ_DIR)$(MT)\misc1.obj \
+   $(OBJ_DIR)$(MT)\misc2.obj \
+   $(OBJ_DIR)$(MT)\misc3.obj \
    $(OBJ_DIR)$(MT)\num1.obj \
    $(OBJ_DIR)$(MT)\numat.obj \
    $(OBJ_DIR)$(MT)\numcount.obj \

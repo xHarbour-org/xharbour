@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.52 2005/11/22 10:59:14 ptsarenko Exp $
+# $Id: makefile.wc,v 1.53 2005/12/19 18:59:18 ptsarenko Exp $
 #
 
 #
@@ -863,6 +863,8 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\lton.obj \
    $(CT_OBJ_DIR)\maxline.obj \
    $(CT_OBJ_DIR)\misc1.obj \
+   $(CT_OBJ_DIR)\misc2.obj \
+   $(CT_OBJ_DIR)\misc3.obj \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
    $(CT_OBJ_DIR)\numcount.obj \
@@ -3183,6 +3185,12 @@ $(CT_OBJ_DIR)\maxline.obj : $(CT_DIR)\maxline.c
   $(CC_CMD)
 
 $(CT_OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
+  $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc2.obj : $(CT_DIR)\misc2.c
+  $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc3.obj : $(CT_DIR)\misc3.c
   $(CC_CMD)
 
 $(CT_OBJ_DIR)\num1.obj : $(CT_DIR)\num1.c

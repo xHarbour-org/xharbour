@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.110 2005/11/22 20:25:32 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.111 2005/12/19 18:59:16 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -650,6 +650,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\keyset.obj \
   $(OBJ_DIR)\lton.obj \
   $(OBJ_DIR)\misc1.obj \
+  $(OBJ_DIR)\misc2.obj \
+  $(OBJ_DIR)\misc3.obj \
   $(OBJ_DIR)\maxline.obj \
   $(OBJ_DIR)\num1.obj \
   $(OBJ_DIR)\numat.obj \
@@ -1251,6 +1253,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\keyset.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\lton.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\misc1.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\misc2.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\misc3.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\maxline.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\num1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\numat.obj             + >> hdll.tmp
@@ -3062,6 +3066,12 @@ $(OBJ_DIR)\lton.obj : $(CT_DIR)\lton.c
   $(CC_CMD)
 
 $(OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
+  $(CC_CMD)
+
+$(OBJ_DIR)\misc2.obj : $(CT_DIR)\misc2.c
+  $(CC_CMD)
+
+$(OBJ_DIR)\misc3.obj : $(CT_DIR)\misc3.c
   $(CC_CMD)
 
 $(OBJ_DIR)\maxline.obj : $(CT_DIR)\maxline.c

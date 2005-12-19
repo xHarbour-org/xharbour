@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.19 2005/11/22 20:25:32 ptsarenko Exp $
+# $Id: hrbdll.pc,v 1.20 2005/12/19 18:59:16 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -606,6 +606,8 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\justify.obj \
    $(TARGET_OBJ_DIR)\keyset.obj \
    $(TARGET_OBJ_DIR)\misc1.obj \
+   $(TARGET_OBJ_DIR)\misc2.obj \
+   $(TARGET_OBJ_DIR)\misc3.obj \
    $(TARGET_OBJ_DIR)\ctnet.obj \
    $(TARGET_OBJ_DIR)\num1.obj \
    $(TARGET_OBJ_DIR)\numat.obj \
@@ -1134,6 +1136,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\justify.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\keyset.obj     >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\misc1.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\misc2.obj      >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\misc3.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\ctnet.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\num1.obj       >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\numat.obj      >> make_tmp
@@ -2921,6 +2925,12 @@ $(TARGET_OBJ_DIR)\ftoc.obj : $(CT_SRC_DIR)\ftoc.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\misc1.obj : $(CT_SRC_DIR)\misc1.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\misc2.obj : $(CT_SRC_DIR)\misc2.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\misc3.obj : $(CT_SRC_DIR)\misc3.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\tab.obj : $(CT_SRC_DIR)\tab.c

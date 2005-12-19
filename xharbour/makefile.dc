@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.15 2005/11/22 20:59:14 ptsarenko Exp $
+# $Id: makefile.dc,v 1.16 2005/12/19 18:59:17 ptsarenko Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -579,6 +579,8 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\justify.obj \
    $(CT_OBJ_DIR)\keyset.obj \
    $(CT_OBJ_DIR)\misc1.obj \
+   $(CT_OBJ_DIR)\misc2.obj \
+   $(CT_OBJ_DIR)\misc3.obj \
    $(CT_OBJ_DIR)\ctnet.obj \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
@@ -1403,6 +1405,8 @@ $(CT_LIB) : $(CT_LIB_OBJS)
    $(ECHO) $(CT_OBJ_DIR)\justify.obj >> ct.rsp
    $(ECHO) $(CT_OBJ_DIR)\keyset.obj >> ct.rsp
    $(ECHO) $(CT_OBJ_DIR)\misc1.obj >> ct.rsp
+   $(ECHO) $(CT_OBJ_DIR)\misc2.obj >> ct.rsp
+   $(ECHO) $(CT_OBJ_DIR)\misc3.obj >> ct.rsp
    $(ECHO) $(CT_OBJ_DIR)\ctnet.obj >> ct.rsp
    $(ECHO) $(CT_OBJ_DIR)\num1.obj >> ct.rsp
    $(ECHO) $(CT_OBJ_DIR)\numat.obj >> ct.rsp
@@ -3720,6 +3724,12 @@ $(CT_OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc2.obj : $(CT_DIR)\misc2.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc3.obj : $(CT_DIR)\misc3.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\tab.obj : $(CT_DIR)\tab.c

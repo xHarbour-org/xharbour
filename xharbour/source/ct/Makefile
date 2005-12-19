@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2005/11/22 20:00:00 ptsarenko Exp $
+# $Id: Makefile,v 1.18 2005/12/19 21:59:19 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -47,6 +47,8 @@ C_SOURCES = \
    lton.c \
    maxline.c \
    misc1.c \
+   misc2.c \
+   misc3.c \
    num1.c \
    numat.c \
    numcount.c \

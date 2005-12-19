@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.17 2005/11/22 20:51:06 ptsarenko Exp $
+# $Id: makefile.pc,v 1.18 2005/12/19 18:59:17 ptsarenko Exp $
 #
 # makefile for Pelles C compiler
 #
@@ -444,6 +444,8 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\justify.obj \
    $(CT_OBJ_DIR)\keyset.obj \
    $(CT_OBJ_DIR)\misc1.obj \
+   $(CT_OBJ_DIR)\misc2.obj \
+   $(CT_OBJ_DIR)\misc3.obj \
    $(CT_OBJ_DIR)\ctnet.obj \
    $(CT_OBJ_DIR)\num1.obj \
    $(CT_OBJ_DIR)\numat.obj \
@@ -3182,6 +3184,12 @@ $(CT_OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\misc1.obj : $(CT_DIR)\misc1.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc2.obj : $(CT_DIR)\misc2.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\misc3.obj : $(CT_DIR)\misc3.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\tab.obj : $(CT_DIR)\tab.c
