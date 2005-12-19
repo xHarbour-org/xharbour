@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.58 2005/12/14 03:20:39 guerra000 Exp $
+ * $Id: workarea.c,v 1.59 2005/12/16 10:18:09 druzus Exp $
  */
 
 /*
@@ -65,9 +65,6 @@
 #include "hbapierr.h"
 #include "hbset.h"
 #include "hbrddwrk.h"
-
-// AUTONUMERIC!
-#define HB_DBF_AUTOINC              15    /* 4 byte auto-increment value */
 
 /*
  * -- METHODS --
@@ -365,14 +362,6 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
                pFieldInfo.uiDec = uiDec;
             break;
 
-         // AUTONUMERIC!
-         case 'A':
-            pFieldInfo.uiType = HB_IT_INTEGER;
-            pFieldInfo.uiTypeExtended = HB_DBF_AUTOINC;
-            pFieldInfo.uiLen = 4;
-            pFieldInfo.uiDec = 0;
-            break;
-
          default:
             return FAILURE;
       }
@@ -441,16 +430,7 @@ ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pIt
                break;
 
             case HB_IT_INTEGER:
-               // AUTONUMERIC!
-               if( pField->uiTypeExtended == HB_DBF_AUTOINC )
-               {
-                  // hb_itemPutC( pItem, "AUTOINC" );
-                  hb_itemPutC( pItem, "A" );
-               }
-               else
-               {
-                  hb_itemPutC( pItem, "I" );
-               }
+               hb_itemPutC( pItem, "I" );
                break;
 
             case HB_IT_DOUBLE:
