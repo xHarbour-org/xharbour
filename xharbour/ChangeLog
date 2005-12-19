@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4715 2005/12/18 23:05:20 paultucker Exp $
+ * $Id: ChangeLog,v 1.4716 2005/12/19 01:12:27 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -32,6 +32,8 @@
       + gtwinmt.lib
     * I'm not really done with this, but what's here now should work.
       Please work it and report any problems!
+    * include\gtinfo.ch
+      + GTI_KBDSPECIAL
 
 2005-12-17 16:08 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * source/rtl/regex.c
