@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.12 2005/11/07 00:39:04 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.13 2005/12/09 20:38:08 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-12 14:06 UTC-0300 Laverson Espindola <laverson.espindola@newage-software.com.br>
+  * source\gdbar.prg
+    ! Added new parameters <cpath_img> in construtor class TCode
+      default "image_bar/", to output image, this suggestion from Francesco Saverio Giudice.
 
 2005-12-09 18:30 UTC-0300 Laverson Espindola <laverson.espindola@newage-software.com.br>
   * source\gdwrp.c

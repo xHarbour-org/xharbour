@@ -60,7 +60,6 @@
 #define IMG_FORMAT_WBMP  4
 #define IMG_FORMAT_GIF   8
 #define IMG_QUALITY      95
-#define IMG_OUT "images_bar/"
 
 CLASS TBarCode  FROM GDImage
 
@@ -72,13 +71,15 @@ CLASS TBarCode  FROM GDImage
    DATA lastX     AS NUMERIC
    DATA lastY     AS NUMERIC
    DATA error     AS NUMERIC
+   DATA out_img   AS CHARACTER
 
    // Barcode attributes
    DATA Parity
-   DATA LeftHand_Even
-   DATA Right_Hand
-   DATA LeftHand_Odd
-   DATA keys
+   DATA LeftHand_Even  AS ARRAY
+   DATA Right_Hand     AS ARRAY
+   DATA LeftHand_Odd   AS ARRAY
+   DATA keys           AS ARRAY
+
    DATA book      AS LOGICAL INIT .F.
    DATA acode     AS ARRAY
    DATA KeysModeA AS CHARACTER
@@ -109,6 +110,7 @@ CLASS TBarCode  FROM GDImage
    METHOD ResetColor()
    METHOD CheckCode()
    METHOD CheckValInArray(cchar)
+   METHOD GetPathImageOut()
 
 ENDCLASS
 
@@ -124,8 +126,8 @@ METHOD CreateBar( sx, sy, filename, ccolor ) CLASS TBarCode
    ::filename  := filename
 
    // directory of images
-   IF !ISDirectory( IMG_OUT )
-      DirMake( IMG_OUT )
+   IF !ISDirectory( ::GetPathImageOut()  )
+      DirMake( ::GetPathImageOut() )
    ENDIF
 
    ::FillColor  := ::setcolor( ::color_f[1] ,::color_f[2] ,::color_f[3] )
@@ -268,6 +270,11 @@ METHOD CheckValInArray(cchar) CLASS TBarCode
 
 Return uret
 
+METHOD GetPathImageOut() CLASS TBarCode
+
+	Return ::out_img
+
+
 METHOD Finish( image_style, quality ) CLASS TBarCode
 
    LOCAL oImgResize
@@ -282,21 +289,23 @@ METHOD Finish( image_style, quality ) CLASS TBarCode
    // Redefine  image
    //oImgResize := ::CopyResampled( 0, 0, ::Width(), ::Height(), 0, 0, ( ::LastX + 1 ) , ::LastY )
 
+//   Tracelog(::out_img, ::filename)
+
    If image_style == IMG_FORMAT_PNG
 
-     ::SavePng(  IMG_OUT+ ::filename+".png" )
+     ::SavePng(  ::out_img + ::filename+".png" )
 
    Elseif image_style == IMG_FORMAT_JPEG
 
-      ::Savejpeg( IMG_OUT + ::filename+".jpg", quality )
+      ::Savejpeg( ::out_img + ::filename+".jpg", quality )
 
    ElseIf image_style == IMG_FORMAT_WBMP
 
-      ::SaveWBmp( IMG_OUT + ::filename+".bmp")
+      ::SaveWBmp( ::out_img + ::filename+".bmp")
 
    ElseIf image_style == IMG_FORMAT_GIF
 
-      ::SaveGif(  IMG_OUT+ ::filename+".gif")
+      ::SaveGif(  ::out_img + ::filename+".gif")
 
    EndIf
 

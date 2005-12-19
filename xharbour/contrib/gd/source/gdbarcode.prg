@@ -64,8 +64,10 @@
 
 CLASS TCode FROM TBarCode
 
+
+   METHOD New( nTypeCode,cpath_img ) CONSTRUCTOR
+
    // EAN-13 ISBN
-   METHOD New() CONSTRUCTOR
    METHOD draw13(cText)
    METHOD DrawText13()
 
@@ -80,9 +82,11 @@ CLASS TCode FROM TBarCode
 
 ENDCLASS
 
-METHOD New(nTypeCode) CLASS TCode
+METHOD New( nTypeCode,cpath_img ) CLASS TCode
 
    Local ii
+
+   DEFAULT cpath_img TO "images_bar/"
 
    If ( nTypeCode == 13 .OR.;
         nTypeCode ==  8 )
@@ -118,6 +122,9 @@ METHOD New(nTypeCode) CLASS TCode
       Next
 
    EndIf
+
+   // Path to output image
+   ::out_img := cpath_img
 
 Return SELF
 

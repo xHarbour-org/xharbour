@@ -61,6 +61,9 @@ Function Main()
 
    bar:Configure( 50 , black, white, 1 , 1 )
 
+   // output image
+   bar:out_img := "image/"
+
    bar:CreateBar( 559, 88,"Bar128",white)
 
    // 1- code bar
