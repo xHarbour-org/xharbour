@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.13 2005/02/13 17:42:03 paultucker Exp $
+ * $Id: gtinfo.ch,v 1.14 2005/08/16 19:35:16 lf_sfnet Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 #define GTI_DESKTOPHEIGHT  7  /* Get height of desktop in pixels */
 #define GTI_DESKTOPDEPTH   8  /* Amount of bits used for colors in system */
 #define GTI_KBDSHIFTS     10  /* Keyboard shift/ctrl/alt, caps/num/scroll & winkeys state */
+#define GTI_KBDSPECIAL    11  /* Keyboard special handling (now for Win98 Caps lock issue) */
 #define GTI_DESKTOPROWS   20  /* Get Size of desktop in character rows */
 #define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
 #define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
