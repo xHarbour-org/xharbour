@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4718 2005/12/19 19:13:49 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4719 2005/12/20 01:43:35 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-20 02:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * bin/bld.bat
+    * minor fixup for hbsx under bcc
+  * source/rtl/gtwin/gtwin.c
+    * for the moment, MT mode is for msvc only!
+
 2005-12-20 14:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     ! HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
@@ -52,6 +59,7 @@
     * CPU Usage is tamed
     * Console IO locking now in MT mode.
       However you set gt to gtwin, now set to gtwinmt for MT Builds.
+      (NOTE: for MSVC only for now)
     * makefile.vc
       + gtwinmt.lib
     * I'm not really done with this, but what's here now should work.

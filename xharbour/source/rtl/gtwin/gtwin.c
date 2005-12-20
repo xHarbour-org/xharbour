@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.98 2005/11/20 18:11:47 marceloanelli Exp $
+ * $Id: gtwin.c,v 1.99 2005/12/18 23:10:43 paultucker Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ extern BOOL b_MouseEnable;
 #endif
 
 
-#ifdef _MT
+#if defined( _MT ) && defined( _MSC_VER ) 
 #define _CONIO_LOCK 8
 HB_EXTERN_BEGIN
 void __cdecl _lock(int);
