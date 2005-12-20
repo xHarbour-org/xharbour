@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4718 2005/12/19 21:40:02 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4718 2005/12/19 19:13:49 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2005-12-20 14:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    ! HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
+      comment out all pDevMode->dmFields = pDevMode->dmFields || DM_XXXXXX ;
 
 2005-12-19 21:30 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   + source/ct/misc2.c
