@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.17 2005/09/27 21:18:49 ath1 Exp $
+ * $Id: win32prn.prg,v 1.18 2005/10/25 20:23:50 peterrees Exp $
  */
 
 /*
@@ -953,32 +953,32 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
           if (ISNUM(3) ) //&& hb_parnl(3) > 0)
           {
             pDevMode->dmPaperSize     = ( short ) hb_parnl(3) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_PAPERSIZE ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_PAPERSIZE ;
           }
           if (ISLOG(4))
           {
             pDevMode->dmOrientation   = ( short ) (hb_parl(4) ? 2 : 1) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_ORIENTATION ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_ORIENTATION ;
           }
           if (ISNUM(5) && hb_parnl(5) > 0)
           {
             pDevMode->dmCopies        = ( short ) hb_parnl(5) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_COPIES ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_COPIES ;
           }
           if (ISNUM(6) ) //&& hb_parnl(6) > 0)
           {
             pDevMode->dmDefaultSource = ( short ) hb_parnl(6) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_DEFAULTSOURCE ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_DEFAULTSOURCE ;
           }
           if (ISNUM(7) ) //&& hb_parnl(7) > 0)
           {
             pDevMode->dmDuplex = ( short ) hb_parnl(7) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_DUPLEX ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_DUPLEX ;
           }
           if (ISNUM(8) ) //&& hb_parnl(8) <> 0)
           {
             pDevMode->dmPrintQuality = ( short ) hb_parnl(8) ;
-            pDevMode->dmFields = pDevMode->dmFields || DM_PRINTQUALITY ;
+//            pDevMode->dmFields = pDevMode->dmFields || DM_PRINTQUALITY ;
           }
           Result= (BOOL) ResetDC(hDC, pDevMode) ;
           hb_xfree(pDevMode) ;
