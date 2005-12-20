@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4719 2005/12/20 01:43:35 peterrees Exp $
+ * $Id: ChangeLog,v 1.4720 2005/12/20 07:50:49 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-20 01:25 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
+  * source/vm/errorapi.c
+    ! Fix, release idle fence when use TRY or RECOVER
 
 2005-12-20 02:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * bin/bld.bat
@@ -210,6 +214,11 @@
 2005-12-13 11:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c
     * Revised hb_vmInstringOrArray() to call hb_arrayScan() with bExact set to TRUE
+
+2005-12-13 10:30 UTC-0300 Walter Negro <anegro-AT-overnet.com.ar>
+  * include/classes.h
+  * source/vm/classes.c
+    * Export function hb_objGetpMthd
 
 2005-12-12 13:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
