@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.69 2005/12/06 18:05:02 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.70 2005/12/11 12:37:25 druzus Exp $
  */
 
 /*
@@ -523,6 +523,11 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
+
+         /* Allow other threads to go */
+         #if defined( HB_THREAD_SUPPORT )
+            hb_threadIdleEnd();
+         #endif
          return NULL;
       }
       else
