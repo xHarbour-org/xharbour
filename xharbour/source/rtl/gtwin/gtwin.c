@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.99 2005/12/18 23:10:43 paultucker Exp $
+ * $Id: gtwin.c,v 1.100 2005/12/20 07:50:54 paultucker Exp $
  */
 
 /*
@@ -141,7 +141,7 @@ extern BOOL b_MouseEnable;
 #endif
 
 
-#if defined( _MT ) && defined( _MSC_VER ) 
+#if defined( _MT ) && defined( HB_MSC_STARTUP ) 
 #define _CONIO_LOCK 8
 HB_EXTERN_BEGIN
 void __cdecl _lock(int);
@@ -193,7 +193,7 @@ static INPUT_RECORD s_irInBuf[ INPUT_BUFFER_LEN ];
 static BYTE         s_charTransRev[ 256 ];
 static BYTE         s_charTrans[ 256 ];
 static BYTE         s_keyTrans[ 256 ];
-
+static int          s_iRelCount;
 int    s_mouseLast;               /* Last mouse button to be pressed                   */
 
 extern int hb_mouse_iCol;
@@ -616,6 +616,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     s_uiDispCount = 0;
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
     s_bSpecialKeyHandling = FALSE;
+    s_iRelCount = 0;
 
     /* initialize code page translation */
     for ( i = 0; i < 256; i++ )
@@ -1739,7 +1740,12 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       /* Check for keyboard input */
       do
       {
-         hb_idleSleep( 0.01 );
+         if( ++s_iRelCount > 100 )
+         {
+            s_iRelCount = 0;
+            hb_idleSleep( 0.01 );
+         }
+
          s_cNumRead = 0;
          GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
 
