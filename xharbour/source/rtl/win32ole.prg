@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.104 2005/12/13 21:39:34 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.105 2005/12/21 09:31:04 ronpinkas Exp $
  */
 
 /*
@@ -260,8 +260,19 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
          ::cClassName := LTrim( Str( uObj ) )
       ENDIF
    ELSE
-      MessageBox( 0, "Invalid parameter type to constructor TOleAuto():New()!", "OLE Interface", 0 )
-      ::hObj := 0
+      oErr := ErrorNew()
+      oErr:Args          := HB_aParams()
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "Invalid argument to contrustor!"
+      oErr:GenCode       := 0
+      oErr:Operation     := ProcName()
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := -1
+      oErr:SubSystem     := "TOleAuto"
+
+      RETURN Throw( oErr )
    ENDIF
 
 RETURN Self
