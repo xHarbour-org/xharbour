@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.103 2005/12/08 03:36:55 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.104 2005/12/13 21:39:34 ronpinkas Exp $
  */
 
 /*
@@ -1533,7 +1533,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+  HB_FUNC( CREATEOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR bstrClassID;
      IID ClassID, iid;
@@ -1585,7 +1585,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
+  HB_FUNC( GETOLEOBJECT ) // ( cOleName | cCLSID  [, cIID ] )
   {
      BSTR bstrClassID;
      IID ClassID, iid;
@@ -1636,14 +1636,16 @@ RETURN Self
         if( s_nOleError == S_OK )
         {
            s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, &pDisp );
+
+           pUnk->lpVtbl->Release( pUnk );
+
+           hb_retnl( ( LONG ) pDisp );
         }
      }
-
-     hb_retnl( ( LONG ) pDisp );
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
+  HB_FUNC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
   {
      IDispatch *pDisp = ( IDispatch * ) hb_parnl( 1 );
 

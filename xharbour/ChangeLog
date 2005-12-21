@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4721 2005/12/20 15:31:12 walito Exp $
+ * $Id: ChangeLog,v 1.4722 2005/12/21 05:15:42 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-21 01:28 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Exported CreateOleObject() and ReleaseOleObject()
+    * Minor correction
 
 2005-12-21 00:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c
@@ -93,7 +98,7 @@
        Updated for full compatibility with clipper CA-Tools and moved
        to WFORMAT() in ctwin.c
 
-2005-12-07 08:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+2005-12-16 08:51 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/macro.c
     * Minor correction
 
