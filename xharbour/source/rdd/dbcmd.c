@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.182 2005/12/11 12:38:47 druzus Exp $
+ * $Id: dbcmd.c,v 1.183 2005/12/16 10:18:09 druzus Exp $
  */
 
 /*
@@ -4745,3 +4745,6 @@ HB_FUNC( DBF2TEXT )
    hb_fsWriteLarge( handle, (BYTE*) "\x1A", 1 );
    hb_itemRelease( pTmp );
 }
+
+#include "dbsql.c"
+

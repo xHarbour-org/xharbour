@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 2.00 2005/08/03 12:00:00 modalsist Exp $
+ * $Id: tget.prg,v 1.100 2005/08/03 17:39:22 modalsist Exp $
  */
 
 /*
@@ -255,7 +255,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := ""
       else
          ::cPicFunc := Upper( SubStr( cPicture, 1, nAt - 1 ) )
-         ::cPicMask := SubStr( cPicture, nAt + 1 )
+         ::cPicMask := LTrim( SubStr( cPicture, nAt + 1 ) )
       endif
 
 //      AnalyzePicture( @::cPicFunc )
