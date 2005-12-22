@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.100 2005/12/20 07:50:54 paultucker Exp $
+ * $Id: gtwin.c,v 1.101 2005/12/21 05:15:47 paultucker Exp $
  */
 
 /*
@@ -1646,10 +1646,8 @@ static void Handle_Alt_Key( int * paltisdown, int * paltnum, unsigned short wKey
    }
 }
 
-static int SpecialHandling( WORD * wChar, int wKey )
+static int SpecialHandling( WORD * wChar, int wKey, int ch )
 {
-   int ch;
-
    switch (wKey)
    {
       case 2:
@@ -1837,7 +1835,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
              */
 
             if ( s_bSpecialKeyHandling )
-               ch = SpecialHandling( &wChar, wKey );
+               ch = SpecialHandling( &wChar, wKey, ch );
 
             if ( s_wRepeated == 0 )
             {
