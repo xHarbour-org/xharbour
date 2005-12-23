@@ -1,5 +1,5 @@
 /*
- * $Id: rddord.prg,v 1.6 2005/12/13 19:02:31 ronpinkas Exp $
+ * $Id: rddord.prg,v 1.7 2005/12/16 10:18:09 druzus Exp $
  */
 
 /*
@@ -49,8 +49,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-#include "hbsetup.ch"
 
 #include "common.ch"
 #include "dbinfo.ch"

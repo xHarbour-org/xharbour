@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4724 2005/12/22 09:19:29 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4725 2005/12/22 12:21:49 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-23 11:45 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbextern.ch
+    + added: ORDWILDSEEK, WILDMATCH, RDDINFO
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/rddord.prg
+  * xharbour/source/rdd/workarea.c
+    * formatting and some warning cleaning
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+    * declared some functions as static
+
+  * xharbour/source/vm/hvm.c
+    ! fixed problem caused by += optimization used ofr array items
 
 2005-12-22 07:20 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c

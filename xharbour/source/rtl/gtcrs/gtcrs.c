@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.56 2005/08/12 02:44:26 druzus Exp $
+ * $Id: gtcrs.c,v 1.57 2005/10/13 12:49:35 druzus Exp $
  */
 
 /*
@@ -1401,7 +1401,7 @@ static char *tiGetS( char *capname )
    return ptr;
 }
 
-void get_acsc( InOutBase * ioBase, unsigned char c, chtype * pch )
+static void get_acsc( InOutBase * ioBase, unsigned char c, chtype * pch )
 {
    unsigned char *ptr;
 
@@ -1791,7 +1791,7 @@ static int gt_setsize( InOutBase * ioBase, int rows, int cols )
    return ret;
 }
 
-void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char *kdst )
+static void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char *kdst )
 {
    unsigned char c;
    int n;
@@ -1814,7 +1814,7 @@ void setKeyTrans( InOutBase * ioBase, unsigned char *ksrc, unsigned char *kdst )
    }
 }
 
-void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
+static void setDispTrans( InOutBase * ioBase, char *src, char *dst, int box )
 {
    unsigned char c, d;
    int i, aSet = 0;

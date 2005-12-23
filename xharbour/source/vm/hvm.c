@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.542 2005/12/11 12:37:25 druzus Exp $
+ * $Id: hvm.c,v 1.543 2005/12/13 19:14:16 ronpinkas Exp $
  */
 
 /*
@@ -5770,6 +5770,11 @@ static void hb_vmArrayPush( void )
 
    pIndex = hb_stackItemFromTop( -1 );
    pArray = hb_stackItemFromTop( -2 );
+
+   if( HB_IS_BYREF( pArray ) )
+   {
+      pArray = hb_itemUnRef( pArray );
+   }
 
    if( hb_objGetOpOver( pArray ) & HB_CLASS_OP_ARRAYINDEX )
    {

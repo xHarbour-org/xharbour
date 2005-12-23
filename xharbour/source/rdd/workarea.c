@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.59 2005/12/16 10:18:09 druzus Exp $
+ * $Id: workarea.c,v 1.60 2005/12/19 01:12:43 guerra000 Exp $
  */
 
 /*
@@ -65,6 +65,7 @@
 #include "hbapierr.h"
 #include "hbset.h"
 #include "hbrddwrk.h"
+
 
 /*
  * -- METHODS --
@@ -186,7 +187,6 @@ ERRCODE hb_waSkipFilter( AREAP pArea, LONG lUpDown )
          pResult = hb_vmEvalBlock( pArea->dbfi.itmCobExpr );
          if( HB_IS_LOGICAL( pResult ) && !hb_itemGetL( pResult ) )
          {
-
             if ( SELF_SKIPRAW( pArea, lUpDown ) != SUCCESS )
                return FAILURE;
             continue;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.146 2005/12/16 10:18:09 druzus Exp $
+ * $Id: dbf1.c,v 1.143 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -1106,7 +1106,6 @@ static ERRCODE hb_dbfAppend( DBFAREAP pArea, BOOL bUnLockAll )
    PHB_ITEM pError;
    BOOL bLocked;
    ERRCODE uiError;
-   USHORT uiCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfAppend(%p, %d)", pArea, (int) bUnLockAll));
 
@@ -1543,8 +1542,6 @@ static ERRCODE hb_dbfGoHot( DBFAREAP pArea )
  */
 static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
 {
-   USHORT uiCount, uiLen;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutRec(%p, %p)", pArea, pBuffer));
 
    if( pBuffer != NULL )
@@ -1558,6 +1555,7 @@ static ERRCODE hb_dbfPutRec( DBFAREAP pArea, BYTE * pBuffer )
       if( !pArea->fRecordChanged && SELF_GOHOT( ( AREAP ) pArea ) == FAILURE )
          return FAILURE;
 
+      /* Copy data to buffer */
       memcpy( pArea->pRecord, pBuffer, pArea->uiRecordLen );
 
       /*
