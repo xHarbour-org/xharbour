@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.4 2004/05/12 02:25:08 druzus Exp $
+ * $Id: bit2.c,v 1.2 2005/12/25 17:02:59 ptsarenko Exp $
  */
 
 /*
@@ -60,10 +60,9 @@ static LONG __hex2long( char *cNum1, int iLenHex );
 static LONG __getparam( int iParam );
 
 
-
 HB_FUNC( CLEARBIT )
 {
-  LONG lNumClearBit = -1;
+  LONG lNumClearBit;
   LONG lNum1;
   int  iNum2;
   int  iPCount, iFor;
@@ -74,6 +73,8 @@ HB_FUNC( CLEARBIT )
                                if necessary */
 
   if ( ISNUM(1) || ISCHAR(1) )
+  {
+    lNumClearBit = lNum1;
 
     for ( iFor=2; iFor <= iPCount; iFor++)
     {
@@ -82,10 +83,11 @@ HB_FUNC( CLEARBIT )
          iNum2 = hb_parni( iFor );
 
          if ( (iNum2 >= 1) && (iNum2 <= 32) )
+         {
            /* if bit to clear this between 1 and 32 */
 
-           lNumClearBit = lNum1 & ~( 1L << (iNum2 - 1) );
-
+           lNumClearBit = lNumClearBit & ~( 1L << (iNum2 - 1) );
+         }
          else
          {
            lNumClearBit = -1L;
@@ -98,10 +100,14 @@ HB_FUNC( CLEARBIT )
         break;
       }
     }
+  }
   else
     lNumClearBit = -1L;
 
-  hb_retnl( lNumClearBit );
+  if ( lNumClearBit == -1L )
+     hb_retnl( lNumClearBit );
+  else
+     hb_retnd( (ULONG) lNumClearBit );
 
 }
 
@@ -109,7 +115,7 @@ HB_FUNC( CLEARBIT )
 
 HB_FUNC( SETBIT )
 {
-  LONG lNumSetBit = -1L;
+  LONG lNumSetBit;
   LONG lNum1;
   int  iNum2;
   int  iPCount, iFor;
@@ -120,6 +126,8 @@ HB_FUNC( SETBIT )
                                if necessary */
 
   if ( ISNUM(1) || ISCHAR(1) )
+  {
+    lNumSetBit = lNum1;
 
     for ( iFor=2; iFor <= iPCount; iFor++)
     {
@@ -128,10 +136,12 @@ HB_FUNC( SETBIT )
          iNum2 = hb_parni( iFor );
 
          if ( (iNum2 >= 1) && (iNum2 <= 32) )
+           {
            /* if bit to clear this between 1 and 32 */
 
-           lNumSetBit = lNum1 | ( 1L << (iNum2 - 1) );
+           lNumSetBit = lNumSetBit | ( 1L << (iNum2 - 1) );
 
+           }
          else
          {
            lNumSetBit = -1L;
@@ -144,10 +154,14 @@ HB_FUNC( SETBIT )
         break;
       }
     }
+  }
   else
     lNumSetBit = -1L;
 
-  hb_retnl( lNumSetBit );
+  if ( lNumSetBit == -1L )
+      hb_retnl( lNumSetBit );
+  else
+      hb_retnd( (ULONG) lNumSetBit );
 
 }
 

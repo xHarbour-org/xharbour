@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.111 2005/12/19 18:59:16 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.112 2005/12/25 19:13:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -48,6 +48,7 @@ HBRUN_DIR         = utils\hbrun
 HBDOC_DIR         = utils\hbdoc
 HBMAKE_DIR        = utils\hbmake
 HBTEST_DIR        = utils\hbtest
+CONTRIB_DIR       = contrib
 
 !if $d(HB_RDDADS)
 RDDADS_DIR        = contrib\rdd_ads
@@ -737,9 +738,14 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwvt.obj
 !else
+!if $(HB_GT_LIB) == gtwvw
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\gtwvw.obj
+!else
 HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\gtwin.obj \
   $(OBJ_DIR)\mousewin.obj
+!endif
 !endif
 !endif
 
@@ -1173,8 +1179,12 @@ $(HARBOUR_DLL)  : \
 !if $(HB_GT_LIB) == gtwvt
   echo. $(OBJ_DIR)\gtwvt.obj             + >> hdll.tmp
 !else
+!if $(HB_GT_LIB) == gtwvw
+  echo. $(OBJ_DIR)\gtwvw.obj             + >> hdll.tmp
+!else
   echo. $(OBJ_DIR)\gtwin.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\mousewin.obj          + >> hdll.tmp
+!endif
 !endif
 !endif
   echo. $(OBJ_DIR)\dbgentry.obj          + >> hdll.tmp
@@ -2617,6 +2627,9 @@ $(OBJ_DIR)\tbrwtext.obj : $(OBJ_DIR)\tbrwtext.c
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
    $(CC_CMD)
 
+$(OBJ_DIR)\gtwvw.obj : $(CONTRIB_DIR)\gtwvw\gtwvw.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
@@ -2641,11 +2654,20 @@ $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
 
 !else
 
+!if $(HB_GT_LIB) == gtwvw
+
+$(OBJ_DIR)\gtwvw.obj : $(CONTRIB_DIR)\gtwvw\gtwvw.c
+   $(CC_CMD)
+
+!else
+
 $(OBJ_DIR)\gtwin.obj : $(RTL_DIR)\gtwin\gtwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
    $(CC_CMD)
+
+!endif
 
 !endif
 
