@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.7 2005/12/09 20:38:09 mlombardo Exp $
+ * $Id: gdwrp.c,v 1.8 2005/12/26 22:07:00 fsgiudice Exp $
  */
 
 /*
@@ -1093,7 +1093,7 @@ HB_FUNC( GDIMAGEARC ) // void gdImageArc(gdImagePtr im, int cx, int cy, int w, i
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEARC", 2,
+            "GDIMAGEARC", 8,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ) );
          return;
@@ -1235,7 +1235,7 @@ HB_FUNC( GDIMAGEFILLTOBORDER ) // void gdImageFillToBorder(gdImagePtr im, int x,
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEFILLTOBORDER", 2,
+            "GDIMAGEFILLTOBORDER", 5,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ) );
          return;
@@ -1610,7 +1610,7 @@ HB_FUNC( GDIMAGESETCLIP ) // void gdImageSetClip(gdImagePtr im, int x1, int y1, 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESETCLIP", 2,
+            "GDIMAGESETCLIP", 5,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ) );
          return;
@@ -1655,7 +1655,7 @@ HB_FUNC( GDIMAGEGETCLIP ) // original: void gdImageGetClip(gdImagePtr im, int *x
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEGETCLIP", 2,
+            "GDIMAGEGETCLIP", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -1689,7 +1689,7 @@ HB_FUNC( GDIMAGECOLORSTOTAL ) // int gdImageColorsTotal(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORSTOTAL", 2,
+            "GDIMAGECOLORSTOTAL", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -1854,7 +1854,7 @@ HB_FUNC( GDIMAGESX ) // int gdImageSX(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESX", 2,
+            "GDIMAGESX", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -1883,7 +1883,7 @@ HB_FUNC( GDIMAGESY ) // int gdImageSX(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESY", 2,
+            "GDIMAGESY", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -1919,7 +1919,7 @@ HB_FUNC( GDIMAGEGETPIXEL ) // int gdImageGetPixel(gdImagePtr im, int x, int y)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEGETPIXEL", 2,
+            "GDIMAGEGETPIXEL", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -1955,7 +1955,7 @@ HB_FUNC( GDIMAGEBOUNDSSAFE ) // int gdImageBoundsSafe(gdImagePtr im, int x, int 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEBOUNDSSAFE", 2,
+            "GDIMAGEBOUNDSSAFE", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -1984,7 +1984,7 @@ HB_FUNC( GDIMAGEGETINTERLACED ) // int gdImageGetInterlaced(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEGETINTERLACED", 2,
+            "GDIMAGEGETINTERLACED", 3,
             hb_paramError( 1 ) );
          return;
       }
@@ -2013,7 +2013,7 @@ HB_FUNC( GDIMAGEGETTRANSPARENT ) // int gdImageGetTransparent(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEGETTRANSPARENT", 2,
+            "GDIMAGEGETTRANSPARENT", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -2042,7 +2042,7 @@ HB_FUNC( GDIMAGETRUECOLOR ) // int gdImageTrueColor(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGETRUECOLOR", 2,
+            "GDIMAGETRUECOLOR", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -2080,7 +2080,7 @@ HB_FUNC( GDIMAGETRUECOLORTOPALETTE ) // void gdImageTrueColorToPalette (gdImageP
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGETRUECOLORTOPALETTE", 2,
+            "GDIMAGETRUECOLORTOPALETTE", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -2122,7 +2122,7 @@ HB_FUNC( GDIMAGECREATEPALETTEFROMTRUECOLOR ) // gdImagePtr gdImageCreatePaletteF
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECREATEPALETTEFROMTRUECOLOR", 2,
+            "GDIMAGECREATEPALETTEFROMTRUECOLOR", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -2158,7 +2158,7 @@ HB_FUNC( GDIMAGEPALETTEPIXEL ) // int gdImagePalettePixel(gdImagePtr im, int x, 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEPALETTEPIXEL", 2,
+            "GDIMAGEPALETTEPIXEL", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -2194,7 +2194,7 @@ HB_FUNC( GDIMAGETRUECOLORPIXEL ) // int gdImageTrueColorPixel(gdImagePtr im, int
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGETRUECOLORPIXEL", 2,
+            "GDIMAGETRUECOLORPIXEL", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -2223,7 +2223,7 @@ HB_FUNC( GDIMAGEGETTHICKNESS ) // void gdImageGetThickness(gdImagePtr im)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGEGETTHICKNESS", 2,
+            "GDIMAGEGETTHICKNESS", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -2351,7 +2351,7 @@ HB_FUNC( GDIMAGESTRING ) // void gdImageChar(gdImagePtr im, gdFontPtr font, int 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESTRING", 2,
+            "GDIMAGESTRING", 6,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ) );
          return;
@@ -2411,7 +2411,7 @@ HB_FUNC( GDIMAGESTRINGUP ) // void gdImageCharUp(gdImagePtr im, gdFontPtr font, 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESTRINGUP", 2,
+            "GDIMAGESTRINGUP", 6,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ) );
          return;
@@ -2623,7 +2623,7 @@ HB_FUNC( GDIMAGESTRINGFTCIRCLE ) // char *gdImageStringFTCircle(gdImagePtr im, i
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESTRINGFTCIRCLE", 2,
+            "GDIMAGESTRINGFTCIRCLE", 11,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ), hb_paramError( 10 ), hb_paramError( 11 ) );
@@ -2670,7 +2670,7 @@ HB_FUNC( GDFONTGETWIDTH )
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDFONTGETWIDTH", 2,
+            "GDFONTGETWIDTH", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -2699,7 +2699,7 @@ HB_FUNC( GDFONTGETHEIGHT )
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDFONTGETHEIGHT", 2,
+            "GDFONTGETHEIGHT", 1,
             hb_paramError( 1 ) );
          return;
       }
@@ -2745,7 +2745,7 @@ HB_FUNC( GDIMAGECOLORALLOCATE ) // int gdImageColorAllocate(gdImagePtr im, int r
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORALLOCATE", 2,
+            "GDIMAGECOLORALLOCATE", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -2826,7 +2826,7 @@ HB_FUNC( GDIMAGECOLORALLOCATEALPHA ) // int gdImageColorAllocateAlpha(gdImagePtr
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORALLOCATEALPHA", 2,
+            "GDIMAGECOLORALLOCATEALPHA", 5,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ) );
          return;
@@ -2869,7 +2869,7 @@ HB_FUNC( GDIMAGECOLORCLOSEST ) // int gdImageColorClosest(gdImagePtr im, int r, 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORCLOSEST", 2,
+            "GDIMAGECOLORCLOSEST", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -2916,7 +2916,7 @@ HB_FUNC( GDIMAGECOLORCLOSESTALPHA ) // int gdImageColorClosestAlpha(gdImagePtr i
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORCLOSESTALPHA", 2,
+            "GDIMAGECOLORCLOSESTALPHA", 5,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ) );
          return;
@@ -2959,7 +2959,7 @@ HB_FUNC( GDIMAGECOLORCLOSESTHWB ) //  gdImageColorClosestHWB(gdImagePtr im, int 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORCLOSESTHWB", 2,
+            "GDIMAGECOLORCLOSESTHWB", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -3001,7 +3001,7 @@ HB_FUNC( GDIMAGECOLOREXACT ) // int gdImageColorExact(gdImagePtr im, int r, int 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLOREXACT", 2,
+            "GDIMAGECOLOREXACT", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -3043,7 +3043,7 @@ HB_FUNC( GDIMAGECOLORRESOLVE ) // int gdImageColorResolve(gdImagePtr im, int r, 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORRESOLVE", 2,
+            "GDIMAGECOLORRESOLVE", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -3090,7 +3090,7 @@ HB_FUNC( GDIMAGECOLORRESOLVEALPHA ) // int gdImageColorResolveAlpha(gdImagePtr i
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOLORRESOLVEALPHA", 2,
+            "GDIMAGECOLORRESOLVEALPHA", 5,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ) );
          return;
@@ -3162,7 +3162,7 @@ HB_FUNC( GDTRUECOLOR ) // int gdTrueColor(int red, int green, int blue)
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDTRUECOLOR", 2,
+            "GDTRUECOLOR", 3,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
          return;
       }
@@ -3201,7 +3201,7 @@ HB_FUNC( GDTRUECOLORALPHA ) // int gdTrueColorAlpha(int red, int green, int blue
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDTRUECOLORALPHA", 2,
+            "GDTRUECOLORALPHA", 4,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ) );
          return;
       }
@@ -3258,7 +3258,7 @@ HB_FUNC( GDIMAGECOPY ) // void gdImageCopy(gdImagePtr dst, gdImagePtr src, int d
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPY", 2,
+            "GDIMAGECOPY", 8,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ) );
          return;
@@ -3321,7 +3321,7 @@ HB_FUNC( GDIMAGECOPYRESIZED ) // void gdImageCopyResized(gdImagePtr dst, gdImage
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPYRESIZED", 2,
+            "GDIMAGECOPYRESIZED", 10,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ), hb_paramError( 10 ) );
@@ -3385,7 +3385,7 @@ HB_FUNC( GDIMAGECOPYRESAMPLED ) // void gdImageCopyResampled(gdImagePtr dst, gdI
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPYRESAMPLED", 2,
+            "GDIMAGECOPYRESAMPLED", 10,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ), hb_paramError( 10 ) );
@@ -3445,7 +3445,7 @@ HB_FUNC( GDIMAGECOPYROTATED ) // void gdImageCopyRotated(gdImagePtr dst, gdImage
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPYROTATED", 2,
+            "GDIMAGECOPYROTATED", 9,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ) );
@@ -3504,7 +3504,7 @@ HB_FUNC( GDIMAGECOPYMERGE ) // void gdImageCopyMerge(gdImagePtr dst, gdImagePtr 
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPYMERGE", 2,
+            "GDIMAGECOPYMERGE", 9,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ) );
@@ -3563,7 +3563,7 @@ HB_FUNC( GDIMAGECOPYMERGEGRAY ) // void gdImageCopyMergeGray(gdImagePtr dst, gdI
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGECOPYMERGEGRAY", 2,
+            "GDIMAGECOPYMERGEGRAY", 9,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
             hb_paramError( 9 ) );
