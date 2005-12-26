@@ -1,5 +1,5 @@
 /*
- * $Id: gdimage.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: gdimage.prg,v 1.2 2005/10/31 00:27:47 fsgiudice Exp $
  */
 
 /*
@@ -215,7 +215,8 @@ CLASS GDImage
    METHOD SetFontName( cFontName )         INLINE ::cFontName  := cFontName
    METHOD SetFontPitch( nPitch )           INLINE ::nFontPitch := nPitch
    METHOD SetFontAngle( nAngle )           INLINE ::nFontAngle := nAngle
-   METHOD SayFreeType( x, y, cString, cFontName, nPitch, nAngle, color )
+   METHOD SayFreeType( x, y, cString, cFontName, nPitch, nAngle, color, nAlign, ;
+                       nLineSpacing, nCharMap, nResolution )
 
    METHOD SayFreeTypeCircle( x, y, cStringTop, cStringBottom, color, nRadius, nTextRadius, nFillPortion, cFontName, nPitch ) ;
                                            INLINE DEFAULT( color, ::pColor ), gdImageStringFTCircle( ::pImage, x, y, nRadius, ;
@@ -636,7 +637,8 @@ METHOD Say( x, y, cString, color, nAlign ) CLASS GDImage
   gdImageString( ::pImage, ::pFont, nPosX, y, cString, color )
 RETURN Self
 
-METHOD SayFreeType( x, y, cString, cFontName, nPitch, nAngle, color, nAlign )  CLASS GDImage
+METHOD SayFreeType( x, y, cString, cFontName, nPitch, nAngle, color, nAlign, ;
+                    nLineSpacing, nCharMap, nResolution )  CLASS GDImage
   LOCAL nWidth, nLen
   LOCAL nPosX
 
@@ -659,7 +661,8 @@ METHOD SayFreeType( x, y, cString, cFontName, nPitch, nAngle, color, nAlign )  C
      nPosX  := x
   ENDIF
 
-  gdImageStringFT( ::pImage, color, cFontName, nPitch, ::Radians( nAngle ), nPosX, y, cString )
+  gdImageStringFT( ::pImage, color, cFontName, nPitch, ::Radians( nAngle ), nPosX, y, ;
+                   cString, nLineSpacing, nCharMap, nResolution )
 
 RETURN Self
 

@@ -1,5 +1,5 @@
 /*
- * $Id:  Exp $
+ * $Id: gd.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
  */
 
 /*
@@ -123,12 +123,13 @@ FUNCTION gdImageFTSize( string, fontname, ptsize, angle )
 
 RETURN { nWidth, nHeight, nX, nY }
 
-FUNCTION gdImageStringFT( im, fg, fontname, ptsize, angle, x, y, string, strex )
+FUNCTION gdImageStringFT( im, fg, fontname, ptsize, angle, x, y, string, ;
+                          linespacing, charmap, resolution )
   LOCAL cErr
   LOCAL aRect := Array(8)
-  cErr := gdImageStringFTEx( , @aRect, fg, fontname, ptsize, angle, x, y, string )
+  cErr := gdImageStringFTEx( , @aRect, fg, fontname, ptsize, angle, x, y, string, linespacing, charmap, resolution )
   IF cErr == ""
-     cErr := gdImageStringFTEx( im, aRect, fg, fontname, ptsize, angle, x, y, string )
+     cErr := gdImageStringFTEx( im, aRect, fg, fontname, ptsize, angle, x, y, string, linespacing, charmap, resolution )
   ENDIF
 RETURN cErr
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.13 2005/12/09 20:38:08 mlombardo Exp $
+ * $Id: ChangeLog,v 1.14 2005/12/19 16:33:54 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2005-12-26 22:58 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * contrib/gd/source/gdwrp.c
+    * gdImageStringFTEx
+      + added new parameters: linespacing (default 1.05)
+                              charmap     (default gdFTEX_Unicode)
+                              resolution  (default 96 dpi)
+  * contrib/gd/source/gd.prg
+    * changed gdImageStringFT accordling with new parameters
+  * contrib/gd/source/gdimage.prg
+    * changed SayFreeType() method accordling with new parameters
+  + contrib/gd/tests/testdpi.prg
+    + added sample showing dpi changes
+  * contrib/gd/include/gd.h
+    * minor formatting
+
+  /*
+    Added new parameters not handled before to alter dpi in string drawing
+    As per request of Rene Gladis
+   */
 
 2005-12-12 14:06 UTC-0300 Laverson Espindola <laverson.espindola@newage-software.com.br>
   * source\gdbar.prg

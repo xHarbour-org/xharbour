@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.6 2005/11/07 00:39:11 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.7 2005/12/09 20:38:09 mlombardo Exp $
  */
 
 /*
@@ -2420,8 +2420,9 @@ HB_FUNC( GDIMAGESTRINGUP ) // void gdImageCharUp(gdImagePtr im, gdFontPtr font, 
 }
 
 /* ---------------------------------------------------------------------------*/
-
-HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brect, int fg, char *fontname, double ptsize, double angle, int x, int y, char *string, gdFTStringExtraPtr strex)
+// char *gdImageStringFTEx(gdImagePtr im, int *brect, int fg, char *fontname, double ptsize, double angle, int x, int y, char *string, gdFTStringExtraPtr strex)
+// implementation: cError := gdImageStringFTEx( im, aRect, int fg, cFontname, nPtSize, nAngle, x, y, cString, nLinespacing, nCharmap, nResolution )
+HB_FUNC( GDIMAGESTRINGFTEX )
 {
    //TraceLog( NULL, "Parameters: %i, Type 1 =%i=\n\r", hb_pcount(), hb_parinfo( 1 ) );
 
@@ -2438,6 +2439,7 @@ HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brec
       )
    {
       gdImagePtr im;
+      gdFTStringExtra extra;
       int fg;
       char *fontname;
       double ptsize, angle;
@@ -2446,6 +2448,10 @@ HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brec
       PHB_ITEM pRect;
       int aRect[8];
       char *err;
+      int flags;
+      double linespacing;
+      int charmap;
+      int resolution;
 
       /* Retrieve image pointer */
       im = (gdImagePtr)( hb_parinfo( 1 ) & HB_IT_POINTER ? hb_parptr( 1 ) : NULL );
@@ -2483,13 +2489,41 @@ HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brec
       string = hb_parcx( 9 );
       //TraceLog( NULL, "String: %s\n\r", string );
 
+      /* EXTENDED FLAGS */
+      flags       = 0;
+
+      /* Retrieve line spacing */
+      if ( hb_parinfo( 10 ) & HB_IT_DOUBLE )
+      {
+         linespacing = hb_parnd( 10 );
+         flags |= gdFTEX_LINESPACE;
+      }
+
+      /* Retrieve charmap */
+      if ( hb_parinfo( 11 ) & HB_IT_NUMERIC )
+      {
+         charmap = hb_parni( 11 );
+         flags |= gdFTEX_CHARMAP;
+      }
+
+      /* Retrieve resolution */
+      if ( hb_parinfo( 12 ) & HB_IT_NUMERIC )
+      {
+         resolution = hb_parni( 12 );
+         flags |= gdFTEX_RESOLUTION;
+      }
+
+      if ( !( flags == 0 ) )
+      {
+         extra.flags       = flags;
+         extra.linespacing = ( flags & gdFTEX_LINESPACE  ? linespacing : 1.05 );
+         extra.charmap     = ( flags & gdFTEX_CHARMAP    ? charmap : gdFTEX_Unicode );
+         extra.hdpi        = ( flags & gdFTEX_RESOLUTION ? resolution : 96 );
+         extra.vdpi        = ( flags & gdFTEX_RESOLUTION ? resolution : 96 );
+      }
+
       /* Write string */
-      //TraceLog( NULL, "aRect before: %i,%i,%i,%i,%i,%i,%i,%i,%i\n\r",
-      //                aRect[0],aRect[1],aRect[2],aRect[3],aRect[4],aRect[5],aRect[6],aRect[7] );
-      err = gdImageStringFTEx(im, &aRect[0], fg, fontname, ptsize, angle, x, y, string, 0);
-      //TraceLog( NULL, "aRect after : %i,%i,%i,%i,%i,%i,%i,%i,%i\n\r",
-      //                aRect[0],aRect[1],aRect[2],aRect[3],aRect[4],aRect[5],aRect[6],aRect[7] );
-      //TraceLog( NULL, "Error: %s\n\r", err );
+      err = gdImageStringFTEx(im, &aRect[0], fg, fontname, ptsize, angle, x, y, string, ( !( flags == 0 ) ? &extra : 0 ));
       if ( !( err ) )
       {
          /* Save in array the correct text rectangle dimensions */
@@ -2510,10 +2544,10 @@ HB_FUNC( GDIMAGESTRINGFTEX ) // char *gdImageStringFTEx(gdImagePtr im, int *brec
       // Parameter error
       {
          hb_errRT_BASE_SubstR( EG_ARG, 0, NULL,
-            "GDIMAGESTRINGFTEX", 2,
+            "GDIMAGESTRINGFTEX", 12,
             hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ), hb_paramError( 4 ),
             hb_paramError( 5 ), hb_paramError( 6 ), hb_paramError( 7 ), hb_paramError( 8 ),
-            hb_paramError( 9 ) );
+            hb_paramError( 9 ), hb_paramError( 10 ), hb_paramError( 11 ), hb_paramError( 12 ) );
          return;
       }
    }

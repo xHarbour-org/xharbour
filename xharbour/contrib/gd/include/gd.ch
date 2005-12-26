@@ -1,5 +1,5 @@
 /*
- * $Id: gd.ch,v 1.2 2005/10/31 00:27:47 fsgiudice Exp $
+ * $Id: gd.ch,v 1.3 2005/11/06 23:15:55 fsgiudice Exp $
  */
 
 /*
@@ -55,6 +55,10 @@
  * See doc/license files for licensing terms.
  *
  */
+
+#ifndef GD_CH
+#define GD_CH
+
 
 #if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
   #define GD_VERS  2033
@@ -145,3 +149,5 @@
 #define gdAlignLeft   0
 #define gdAlignCenter 1
 #define gdAlignRight  2
+
+#endif // GD_CH
