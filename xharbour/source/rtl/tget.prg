@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.100 2005/08/03 17:39:22 modalsist Exp $
+ * $Id: tget.prg,v 1.101 2005/12/22 09:19:33 lf_sfnet Exp $
  */
 
 /*
@@ -801,7 +801,11 @@ Added: lUntransform := ( "R" IN ::cPicFunc )
 
          endif
 
-         for nFor := ::FirstEditable( ) to ::LastEditable( )
+         // Tony (ABC)   12/22/2005      3:53PM
+         // The mask to delete has to be created according to the whole buffer!!
+         // Because it is applied below as:   cBuffer := StrDel( cBuffer, cMaskDel )
+         for nFor := 1 to len(cBuffer)
+//         for nFor := ::FirstEditable( ) to ::LastEditable( )
              cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
              if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
                 nPad ++
@@ -809,6 +813,8 @@ Added: lUntransform := ( "R" IN ::cPicFunc )
          next
       endif
 
+      // Tony (ABC)   12/22/2005      3:53PM
+      // I found that cMaskDel was shorter than cBuffer. Fixed bug.
       cBuffer := StrDel( cBuffer, cMaskDel )
 
       cBuffer := StrTran( cBuffer, "$", " " )
