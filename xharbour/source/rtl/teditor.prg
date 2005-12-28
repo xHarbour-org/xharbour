@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.66 2005/12/08 19:06:12 oh1 Exp $
+/* $Id: teditor.prg,v 1.67 2005/12/10 00:33:37 oh1 Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.66 2005/12/08 19:06:12 oh1 Exp $
+/* $Id: teditor.prg,v 1.67 2005/12/10 00:33:37 oh1 Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1299,8 +1299,8 @@ METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
    ELSE
       AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
    ENDIF
-   ::naTextLen++
-
+//   ::naTextLen++
+   ::naTextLen:= LEN( ::aText ) // AINS() does not change ::aText length
 return Self
 
 //-------------------------------------------------------------------//
