@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.158 2005/11/08 11:20:25 modalsist Exp $
+ * $Id: hbmake.prg,v 1.159 2005/11/29 23:00:50 lculik Exp $
  */
 
 /*
@@ -1857,7 +1857,7 @@ FUNCTION CreateMakeFile( cFile )
    @ 01,01       say s_aLangMessages[ 28 ]
    @ 01,16,06,21 get cOS listbox { "Win32", "OS/2", "Linux" } message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cOS)  DROPDOWN
    @ 01,23       say s_aLangMessages[ 29 ]
-   @ 01,47,06,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
+   @ 01,47,08,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC","MINGW" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,56       say s_aLangMessages[ 30 ]
    @ 01,67,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
    @ 02,01       say s_aLangMessages[ 48 ]
