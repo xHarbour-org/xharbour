@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.159 2005/11/29 23:00:50 lculik Exp $
+ * $Id: hbmake.prg,v 1.160 2005/12/28 14:58:25 lculik Exp $
  */
 
 /*
@@ -2717,7 +2717,11 @@ FUNCTION CreateMakeFile( cFile )
       ELSEIF cOS == "OS/2"
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSEIF  "MINGW" IN cCompiler
-         FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
+         IF lHwGui
+            FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + "-lhwgui -lhbxml -lprocmisc -lhwg_qhtm " +  IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF)
+         else
+            FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
+         endif
       ELSE
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cDefGccLibs, cDefGccLibs ) + CRLF )
       ENDIF
@@ -2783,7 +2787,7 @@ FUNCTION CreateMakeFile( cFile )
    ELSEIF s_lGcc
 
       FWrite( s_nMakeFileHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" )  + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" )  + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + CRLF )
