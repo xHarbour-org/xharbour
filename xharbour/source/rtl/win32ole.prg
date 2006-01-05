@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.105 2005/12/21 09:31:04 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.106 2005/12/21 19:29:01 ronpinkas Exp $
  */
 
 /*
@@ -684,7 +684,6 @@ RETURN Self
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
   static DISPID ValueID = DISPID_VALUE;
-  static DISPID NewEnumID = DISPID_NEWENUM;
 
   HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
 
@@ -1214,7 +1213,7 @@ RETURN Self
            {
               VariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
 
-              // VariantClear() performed by VariantToItem()!
+              VariantClear( &mElem );
               //printf( "   Type: %i\n", ( pArray->item.asArray.value->pItems + ( i - iFrom ) )->type );
            }
         }
@@ -1391,7 +1390,7 @@ RETURN Self
           return E_FAIL;
      }
 
-     VariantClear( pVariant );
+     //VariantClear( pVariant );
 
      return S_OK;
   }
@@ -1400,6 +1399,8 @@ RETURN Self
   static void RetValue( void )
   {
      VariantToItem( hb_stackReturnItem(), &RetVal );
+
+     VariantClear( &RetVal );
 
      return;
   }
@@ -1881,7 +1882,7 @@ RETURN Self
 
      VariantClear( &RetVal );
 
-     if( OleGetProperty( pDisp, NewEnumID, &s_EmptyDispParams ) == S_OK || OleInvoke( pDisp, NewEnumID, &s_EmptyDispParams ) == S_OK )
+     if( OleGetProperty( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) == S_OK || OleInvoke( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) == S_OK )
      {
         LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
