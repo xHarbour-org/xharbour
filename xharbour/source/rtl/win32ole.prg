@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.106 2005/12/21 19:29:01 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.107 2006/01/05 17:10:12 ronpinkas Exp $
  */
 
 /*
@@ -1651,7 +1651,10 @@ RETURN Self
 
            pUnk->lpVtbl->Release( pUnk );
 
-           hb_retnl( ( LONG ) pDisp );
+           if( s_nOleError == S_OK )
+           {
+              hb_retnl( ( LONG ) pDisp );
+           }
         }
      }
   }

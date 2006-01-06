@@ -158,7 +158,6 @@ STATIC PROCEDURE OUTLOOK()
 
    oList := oOL:CreateItem( 7 )  // olDistributionListItem
    oList:DLName := "Distribution List"
-   oList:Display( .F. )
 
 RETURN
 
