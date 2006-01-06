@@ -186,6 +186,10 @@
          REQUEST ADS
       #endif
 
+      #ifdef GD
+         #include "gdexternal.ch"
+      #endif
+
       #ifdef SQL
          REQUEST SQLRDD
          REQUEST SR_ODBC
