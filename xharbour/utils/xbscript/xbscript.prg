@@ -5493,7 +5493,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             sConstant := StrTran( sConstant, ".AND.", "!= 0 .AND. 0 !=" )
             sConstant := StrTran( sConstant, ".OR.", "!= 0 .OR. 0 !=" )
 
-            sConstant := StrTran( sConstant, "&&", "!= 0 .AND .0 !=" )
+            sConstant := StrTran( sConstant, "&&", "!= 0 .AND. 0 !=" )
             sConstant := StrTran( sConstant, "||", "!= 0 .OR. 0 !=" )
 
             WHILE ( nAt := At( "defined", sConstant ) ) > 0
