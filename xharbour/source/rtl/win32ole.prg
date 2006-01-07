@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.107 2006/01/05 17:10:12 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.108 2006/01/06 16:18:29 ronpinkas Exp $
  */
 
 /*
@@ -1423,7 +1423,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( OLEEXCEPTIONSOURCE )
+  HB_FUNC( OLEEXCEPTIONSOURCE )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1435,7 +1435,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( OLEEXCEPTIONDESCRIPTION )
+  HB_FUNC( OLEEXCEPTIONDESCRIPTION )
   {
      if( (LONG) s_nOleError == DISP_E_EXCEPTION )
      {
@@ -1447,7 +1447,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC_STATIC( OLEERROR )
+  HB_FUNC( OLEERROR )
   {
      hb_retnl( (LONG) s_nOleError );
   }
