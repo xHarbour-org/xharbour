@@ -416,9 +416,9 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .3
+  #define REVISION .1
 #endif
-STATIC s_cVer := "2.0 RC1" + Stringify( REVISION )
+STATIC s_cVer := "2.0 RC2" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
@@ -5278,6 +5278,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL sSkipped
    LOCAL bArrayPrefix
    LOCAL bPresetCompile
+   LOCAL sRight, nAt, sConstant
 
    #ifdef __XHARBOUR__
       LOCAL sTemp
@@ -5371,13 +5372,21 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          sLine := LTrim( SubStr( sLine, 2 ) )
          sDirective := RTrim( Upper( NextToken( @sLine ) ) )
 
-         IF ( nLen := Len( sDirective ) ) < 4
+         IF ( nLen := Len( sDirective ) ) < 4 .AND. sDirective != "IF"
             Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
             // Safety
             BREAK
          ENDIF
 
-         IF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+         IF sDirective == "IF" .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+
+            nIfDef++
+            aSize( abIfDef, nIfDef )
+            abIfDef[ nIfDef ] := .F.
+            sLine := ''
+            LOOP
+
+         ELSEIF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
 
             nIfDef++
             aSize( abIfDef, nIfDef )
@@ -5472,6 +5481,57 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
          ELSEIF sDirective == Left( "UNDEF", nLen )
 
             RemoveDefine( sLine )
+            sLine := ''
+            LOOP
+
+         ELSEIF sDirective == "IF"
+
+            sConstant := AllTrim( sLine )
+            sConstant := StrTran( sConstant, ".T.", "1" )
+            sConstant := StrTran( sConstant, ".F.", "0" )
+
+            sConstant := StrTran( sConstant, ".AND.", "!= 0 .AND. 0 !=" )
+            sConstant := StrTran( sConstant, ".OR.", "!= 0 .OR. 0 !=" )
+
+            sConstant := StrTran( sConstant, "&&", "!= 0 .AND .0 !=" )
+            sConstant := StrTran( sConstant, "||", "!= 0 .OR. 0 !=" )
+
+            WHILE ( nAt := At( "defined", sConstant ) ) > 0
+               sLeft := Left( sConstant, nAt - 1 )
+               sRight := LTrim( SubStr( sConstant, nAt + 7 ) )
+
+               IF Left( sRight, 1 ) == '('
+                  sRight := LTrim( SubStr( sRight, 2 ) )
+                  sToken := NextToken( @sRight )
+                  sRight := LTrim( sRight )
+
+                  IF Left( sRight, 1 ) == ')'
+                     sRight := SubStr( sRight, 2 )
+                     sConstant := sLeft + IIF( aScan( aDefRules, {|aDefine| aDefine[1] == sToken } ) > 0, "1", "0" ) + sRight
+                  ELSE
+                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
+                     // Safety
+                     BREAK
+                  ENDIF
+               ELSE
+                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
+                  // Safety
+                  BREAK
+               ENDIF
+            END
+
+            IF Type( sConstant ) $ "NL"
+               //TraceLog( sConstant, &(sConstant) )
+               nIfDef++
+               aSize( abIfDef, nIfDef )
+               abIfDef[nIfDef] := ! Empty( &( sConstant ) )
+            ELSE
+               //TraceLog( sConstant )
+               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
+               // Safety
+               BREAK
+            ENDIF
+
             sLine := ''
             LOOP
 
