@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.8 2005/12/26 22:07:00 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.9 2005/12/26 22:17:45 fsgiudice Exp $
  */
 
 /*
@@ -135,6 +135,12 @@ static void * LoadImageFromFile( char *szFile, int *sz )
       /* Close file */
       hb_fsClose( fhandle );
    }
+   else
+   {
+      /* File error */
+      iptr = NULL;
+      *sz  = 0;
+   }
 
    return iptr;
 
@@ -197,6 +203,8 @@ static void GDImageCreateFrom( int nType )
    int sz;
    void *iptr;
 
+   //TraceLog( NULL, "Params = %i, 1 = %i, 2 = %i \n\r", hb_pcount(), hb_parinfo( 1 ), hb_parinfo( 2 ) );
+
    if ( hb_pcount() == 1 &&
         ( hb_parinfo( 1 ) & HB_IT_STRING )
       )
@@ -253,16 +261,16 @@ static void GDImageCreateFrom( int nType )
               im = gdImageCreateFromJpegPtr( sz, ( BYTE *) iptr );
               break;
          case IMAGE_GIF  :
-              im = gdImageCreateFromGifPtr( sz, ( BYTE *)iptr);
+              im = gdImageCreateFromGifPtr( sz, ( BYTE *) iptr );
               break;
          case IMAGE_PNG  :
-              im = gdImageCreateFromPngPtr( sz, ( BYTE *)iptr);
+              im = gdImageCreateFromPngPtr( sz, ( BYTE *) iptr );
               break;
          case IMAGE_WBMP :
-              im = gdImageCreateFromWBMPPtr( sz, ( BYTE *)iptr);
+              im = gdImageCreateFromWBMPPtr( sz, ( BYTE *) iptr );
               break;
          case IMAGE_GD   :
-              im = gdImageCreateFromGdPtr( sz, ( BYTE *)iptr);
+              im = gdImageCreateFromGdPtr( sz, ( BYTE *) iptr );
               break;
       }
 
@@ -397,7 +405,7 @@ static void GDImageSaveTo( int nType )
       }
 
       /* Free memory */
-      gdFree (iptr);
+      gdFree( iptr );
    }
    else
    {
@@ -1647,7 +1655,7 @@ HB_FUNC( GDIMAGEGETCLIP ) // original: void gdImageGetClip(gdImagePtr im, int *x
       hb_itemPutNI( hb_arrayGetItemPtr( &pClipArray, 4 ), y2 );
 
       /* return array */
-      hb_itemReturn( &pClipArray );
+      hb_itemReturnForward( &pClipArray );
 
    }
    else

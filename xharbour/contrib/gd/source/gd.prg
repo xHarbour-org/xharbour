@@ -1,5 +1,5 @@
 /*
- * $Id: gd.prg,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+ * $Id: gd.prg,v 1.2 2005/12/26 22:07:00 fsgiudice Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ FUNCTION gdImageFromFile( cFile )
              hFile[ "drive" ] := cDrive
              cType  := "jpeg"
              cMime  := "image/jpeg"
-             oImage := GDImage():CreateFromJpeg( cFile )
+             oImage := GDImage():LoadFromJpeg( cFile )
 
 
         CASE cExt == ".gif"
@@ -163,7 +163,7 @@ FUNCTION gdImageFromFile( cFile )
              hFile[ "drive" ] := cDrive
              cType  := "gif"
              cMime  := "image/gif"
-             oImage := GDImage():CreateFromGif( cFile )
+             oImage := GDImage():LoadFromGif( cFile )
 
 
         CASE cExt == ".png"
@@ -174,7 +174,7 @@ FUNCTION gdImageFromFile( cFile )
              hFile[ "drive" ] := cDrive
              cType  := "png"
              cMime  := "image/png"
-             oImage := GDImage():CreateFromPng( cFile )
+             oImage := GDImage():LoadFromPng( cFile )
      ENDCASE
 
   ENDIF
