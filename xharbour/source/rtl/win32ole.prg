@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.108 2006/01/06 16:18:29 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.109 2006/01/07 18:22:56 ronpinkas Exp $
  */
 
 /*
@@ -138,7 +138,7 @@ INIT PROC HB_OLEINIT
    {
       s_nOleError = OleInitialize( NULL );
 
-      s_pSym_TOleAuto     = hb_dynsymFindName( "TOLEAUTO" );
+      s_pSym_TOleAuto    = hb_dynsymFindName( "TOLEAUTO" );
       s_pSym_New         = hb_dynsymFindName( "NEW" );
       s_pSym_hObj        = hb_dynsymFindName( "HOBJ" );
       s_pSym_cClassName  = hb_dynsymFindName( "CCLASSNAME" );
@@ -646,7 +646,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
             IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
             ULONG *pcElementFetched = NULL;
 
-            if( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) == S_OK )
+            if( SUCCEEDED( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) ) )
             {
                RetValue();
             }
@@ -958,7 +958,25 @@ RETURN Self
               {
                  //pArgs[ n ].n1.n2.vt = VT_EMPTY;
 
-                 if( ! HB_IS_OBJECT( uParam ) )
+                 if( HB_IS_OBJECT( uParam ) )
+                 {
+                    if( hb_clsIsParent( uParam->item.asArray.value->uiClass , "TOLEAUTO" ) )
+                    {
+                       hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                       hb_vmPush( uParam );
+                       hb_vmSend( 0 );
+                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
+                       pArgs[ n ].n1.n2.vt = VT_DISPATCH;
+                       pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                       //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
+
+                    }
+                    else
+                    {
+                       TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
+                    }
+                 }
+                 else
                  {
                     SAFEARRAYBOUND rgsabound;
                     PHB_ITEM       elem;
@@ -976,7 +994,7 @@ RETURN Self
                     {
                        elem = hb_arrayGetItemPtr( uParam, i+1 );
 
-                       if( strcmp( hb_objGetClsName( elem ), "TOLEAUTO" ) == 0 )
+                       if( HB_IS_OBJECT( elem ) && hb_clsIsParent( elem->item.asArray.value->uiClass, "TOLEAUTO" ) )
                        {
                           VARIANT mVariant;
 
@@ -990,24 +1008,6 @@ RETURN Self
                           mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
                           SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
                        }
-                    }
-                 }
-                 else
-                 {
-                    if( hb_clsIsParent( uParam->item.asArray.value->uiClass , "TOLEAUTO" ) )
-                    {
-                       hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                       hb_vmPush( uParam );
-                       hb_vmSend( 0 );
-                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
-                       pArgs[ n ].n1.n2.vt = VT_DISPATCH;
-                       pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                       //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
-
-                    }
-                    else
-                    {
-                       TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
                     }
                  }
               }
@@ -1206,9 +1206,9 @@ RETURN Self
            //printf( "   Get: %i\n", i );
 
           #ifdef PTROFINDEX
-           if( SafeArrayPtrOfIndex( psa->n1.n2.n3.parray, rgIndices, &( mElem.n1.n2.n3.byref ) ) == S_OK )
+           if( SUCCEEDED( SafeArrayPtrOfIndex( psa->n1.n2.n3.parray, rgIndices, &( mElem.n1.n2.n3.byref ) ) ) )
           #else
-           if( SafeArrayGetElement( psa->n1.n2.n3.parray, rgIndices, &mElem ) == S_OK )
+           if( SUCCEEDED( SafeArrayGetElement( psa->n1.n2.n3.parray, rgIndices, &mElem ) ) )
           #endif
            {
               VariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
@@ -1472,6 +1472,9 @@ RETURN Self
         case REGDB_E_WRITEREGDB:
            return "REGDB_E_WRITEREGDB";
 
+        case E_FAIL:
+           return "E_FAIL";
+
         case E_OUTOFMEMORY:
            return "E_OUTOFMEMORY";
 
@@ -1586,7 +1589,7 @@ RETURN Self
         riid = &iid;
      }
 
-     if( s_nOleError == S_OK )
+     if( SUCCEEDED( s_nOleError ) )
      {
         //TraceLog( NULL, "Class: %i\n", ClassID );
         s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
@@ -1641,17 +1644,17 @@ RETURN Self
         riid = &iid;
      }
 
-     if( s_nOleError == S_OK )
+     if( SUCCEEDED( s_nOleError ) )
      {
         s_nOleError = GetActiveObject( (REFCLSID) &ClassID, NULL, &pUnk );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
            s_nOleError = pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) riid, &pDisp );
 
            pUnk->lpVtbl->Release( pUnk );
 
-           if( s_nOleError == S_OK )
+           if( SUCCEEDED( s_nOleError ) )
            {
               hb_retnl( ( LONG ) pDisp );
            }
@@ -1685,9 +1688,9 @@ RETURN Self
                                              &excep,
                                              &uArgErr );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
-           return S_OK;
+           return s_nOleError;
         }
      }
 
@@ -1747,22 +1750,22 @@ RETURN Self
   {
      VariantClear( &RetVal );
 
-     if( OleInvoke( pDisp, ValueID, &s_EmptyDispParams ) == S_OK && RetVal.n1.n2.vt == VT_DISPATCH )
+     if( SUCCEEDED( OleInvoke( pDisp, ValueID, &s_EmptyDispParams ) ) && RetVal.n1.n2.vt == VT_DISPATCH )
      {
         VariantCopy( &OleVal, &RetVal );
         VariantClear( &RetVal );
 
-        return S_OK;
+        return s_nOleError;
      }
      else
      {
         // Try to apply the requested message to the DEFAULT Property of the object if any.
-        if( OleGetProperty( pDisp, ValueID, &s_EmptyDispParams ) == S_OK && RetVal.n1.n2.vt == VT_DISPATCH )
+        if( SUCCEEDED( OleGetProperty( pDisp, ValueID, &s_EmptyDispParams ) ) && RetVal.n1.n2.vt == VT_DISPATCH )
         {
            VariantCopy( &OleVal, &RetVal );
            VariantClear( &RetVal );
 
-           return S_OK;
+           return s_nOleError;
         }
      }
 
@@ -1824,7 +1827,7 @@ RETURN Self
 
         OleGetProperty( pDisp, ValueID, &s_EmptyDispParams );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
            RetValue();
         }
@@ -1860,7 +1863,7 @@ RETURN Self
 
         FreeParams( &DispParams );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
            hb_itemReturn( hb_stackItemFromBase( 1 ) );
         }
@@ -1885,7 +1888,7 @@ RETURN Self
 
      VariantClear( &RetVal );
 
-     if( OleGetProperty( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) == S_OK || OleInvoke( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) == S_OK )
+     if( SUCCEEDED( ( s_nOleError = OleGetProperty( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) ) ) )
      {
         LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
@@ -1904,7 +1907,7 @@ RETURN Self
 
         VariantClear( &RetVal );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
            hb_retptr( pEnumVariant );
         }
@@ -1950,7 +1953,7 @@ RETURN Self
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
 
-        if( s_nOleError == S_OK )
+        if( SUCCEEDED( s_nOleError ) )
         {
            bSetFirst = TRUE;
         }
@@ -1960,7 +1963,7 @@ RETURN Self
         s_nOleError = E_PENDING;
      }
 
-     if( s_nOleError != S_OK )
+     if( FAILED( s_nOleError ) )
      {
         // Try again without removing the assign prefix (_).
         bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
@@ -1969,7 +1972,7 @@ RETURN Self
         //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
      }
 
-     if( s_nOleError == S_OK )
+     if( SUCCEEDED( s_nOleError ) )
      {
         GetParams( &DispParams );
 
@@ -1983,7 +1986,7 @@ RETURN Self
            OleSetProperty( pDisp, DispID, &DispParams );
            //TraceLog( NULL, "OleSetProperty %i\n", s_nOleError );
 
-           if( s_nOleError == S_OK )
+           if( SUCCEEDED( s_nOleError ) )
            {
               hb_itemReturn( hb_stackItemFromBase( 1 ) );
            }
@@ -1994,30 +1997,30 @@ RETURN Self
            }
         }
 
-        if( bSetFirst == FALSE || s_nOleError != S_OK )
+        if( bSetFirst == FALSE || FAILED( s_nOleError ) )
         {
            OleInvoke( pDisp, DispID, &DispParams );
            //TraceLog( NULL, "OleInvoke %i\n", s_nOleError );
 
-           if( s_nOleError == S_OK )
+           if( SUCCEEDED( s_nOleError ) )
            {
               RetValue();
            }
         }
 
         // Collections are properties that do require arguments!
-        if( s_nOleError != S_OK /* && hb_pcount() == 0 */ )
+        if( FAILED( s_nOleError ) /* && hb_pcount() == 0 */ )
         {
            OleGetProperty( pDisp, DispID, &DispParams );
            //TraceLog( NULL, "OleGetProperty %i\n", s_nOleError );
 
-           if( s_nOleError == S_OK )
+           if( SUCCEEDED( s_nOleError ) )
            {
               RetValue();
            }
         }
 
-        if( s_nOleError != S_OK && hb_pcount() >= 1 )
+        if( FAILED( s_nOleError ) && hb_pcount() >= 1 )
         {
            DispParams.rgdispidNamedArgs = &lPropPut;
            DispParams.cNamedArgs = 1;
@@ -2025,7 +2028,7 @@ RETURN Self
            OleSetProperty( pDisp, DispID, &DispParams );
            //TraceLog( NULL, "OleSetProperty %i\n", s_nOleError );
 
-           if( s_nOleError == S_OK )
+           if( SUCCEEDED( s_nOleError ) )
            {
               hb_itemReturn( hb_stackItemFromBase( 1 ) );
            }
@@ -2034,7 +2037,7 @@ RETURN Self
         FreeParams( &DispParams );
      }
 
-     if( s_nOleError == S_OK )
+     if( SUCCEEDED( s_nOleError ) )
      {
         //TraceLog( NULL, "Invoke Succeeded!\n" );
 
@@ -2071,7 +2074,7 @@ RETURN Self
      else
      {
         // Try to apply the requested message to the DEFAULT Method of the object if any.
-        if( OleGetValue( pDisp ) == S_OK )
+        if( SUCCEEDED( ( s_nOleError = OleGetValue( pDisp ) ) ) )
         {
            pDisp = OleVal.n1.n2.n3.pdispVal;
            goto OleGetID;
