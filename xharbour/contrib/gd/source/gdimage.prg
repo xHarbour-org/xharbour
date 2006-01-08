@@ -1,5 +1,5 @@
 /*
- * $Id: gdimage.prg,v 1.2 2005/10/31 00:27:47 fsgiudice Exp $
+ * $Id: gdimage.prg,v 1.3 2005/12/26 22:07:00 fsgiudice Exp $
  */
 
 /*
@@ -99,14 +99,14 @@ CLASS GDImage
    METHOD LoadFromGd( cFile )              INLINE ::pImage := gdImageCreateFromGD( cFile ), Self
    METHOD LoadFromGif( cFile )             INLINE ::pImage := gdImageCreateFromGif( cFile ), Self
 
-   // Load From a specific File handle - these functions are an alias of above
+   // Load From a specific File handle
    METHOD InputPng( nHandle, nSize )       INLINE ::pImage := gdImageCreateFromPng( nHandle, nSize ), Self
    METHOD InputJpeg( nHandle, nSize )      INLINE ::pImage := gdImageCreateFromJpeg( nHandle, nSize ), Self
    METHOD InputWBmp( nHandle, nSize )      INLINE ::pImage := gdImageCreateFromWBMP( nHandle, nSize ), Self
    METHOD InputGd( nHandle, nSize )        INLINE ::pImage := gdImageCreateFromGD( nHandle, nSize ), Self
    METHOD InputGif( nHandle, nSize )       INLINE ::pImage := gdImageCreateFromGif( nHandle, nSize ), Self
 
-   // Create from an image in memory - these functions are an alias of above
+   // Create from an image pointer in memory
    METHOD CreateFromPng( pImage, nSize )   INLINE ::pImage := gdImageCreateFromPng( pImage, nSize ), Self
    METHOD CreateFromJpeg( pImage, nSize )  INLINE ::pImage := gdImageCreateFromJpeg( pImage, nSize ), Self
    METHOD CreateFromWBmp( pImage, nSize )  INLINE ::pImage := gdImageCreateFromWBMP( pImage, nSize ), Self
@@ -115,19 +115,26 @@ CLASS GDImage
 
    METHOD LoadFromFile( cFile )
 
-   // Save To File
+   // Save To File Name
    METHOD SavePng( cFile, nLevel )         INLINE gdImagePng( ::pImage, cFile, nLevel )
    METHOD SaveJpeg( cFile, nLevel )        INLINE gdImageJpeg( ::pImage, cFile, nLevel )
    METHOD SaveWBmp( cFile, nFG )           INLINE gdImageWBmp( ::pImage, cFile, nFG )
    METHOD SaveGd( cFile )                  INLINE gdImageGd( ::pImage, cFile )
    METHOD SaveGif( cFile )                 INLINE gdImageGif( ::pImage, cFile )
 
-   // Output To a specified File handle - these functions are an alias of above
-   METHOD OutputPng( nHandle, nLevel )     INLINE gdImagePng( ::pImage, nHandle, nLevel )
-   METHOD OutputJpeg( nHandle, nLevel )    INLINE gdImageJpeg( ::pImage, nHandle, nLevel )
-   METHOD OutputWBmp( nHandle, nFG )       INLINE gdImageWBmp( ::pImage, nHandle, nFG )
-   METHOD OutputGd( nHandle )              INLINE gdImageGd( ::pImage, nHandle )
-   METHOD OutputGif( nHandle )             INLINE gdImageGif( ::pImage, nHandle ) // nHandle can be NIL
+   // Output To a specified File handle
+   METHOD OutputPng( nHandle, nLevel )     INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImagePng( ::pImage, nHandle, nLevel )
+   METHOD OutputJpeg( nHandle, nLevel )    INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImageJpeg( ::pImage, nHandle, nLevel )
+   METHOD OutputWBmp( nHandle, nFG )       INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImageWBmp( ::pImage, nHandle, nFG )
+   METHOD OutputGd( nHandle )              INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImageGd( ::pImage, nHandle )
+   METHOD OutputGif( nHandle )             INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImageGif( ::pImage, nHandle )
+
+   // Output To a string
+   METHOD ToStringPng( nLevel )            INLINE gdImagePng( ::pImage, NIL, nLevel )
+   METHOD ToStringJpeg( nLevel )           INLINE gdImageJpeg( ::pImage, NIL, nLevel )
+   METHOD ToStringWBmp( nFG )              INLINE gdImageWBmp( ::pImage, NIL, nFG )
+   METHOD ToStringGd()                     INLINE gdImageGd( ::pImage, NIL )
+   METHOD ToStringGif()                    INLINE gdImageGif( ::pImage, NIL )
 
    // Destructor
    METHOD Destroy()                        INLINE gdImageDestroy( ::pImage )
@@ -142,9 +149,9 @@ CLASS GDImage
 
    // Functions usefull for polygons
    METHOD Polygon( aPoints, lFilled, color )
-#if ( GD_VERS >= 2033 )   
+#if ( GD_VERS >= 2033 )
    METHOD OpenPolygon( aPoints, color )
-#endif   
+#endif
    METHOD AddPoint( x, y )                 INLINE aAdd( ::aPoints, { x, y } )
    METHOD ResetPoints()                    INLINE ::aPoints := {}
    METHOD Points()                         INLINE Len( ::aPoints )

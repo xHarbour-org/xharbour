@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.9 2005/12/26 22:17:45 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.10 2006/01/08 01:52:10 fsgiudice Exp $
  */
 
 /*
@@ -214,6 +214,8 @@ static void GDImageCreateFrom( int nType )
       /* Retrieve image */
       iptr   = LoadImageFromFile( szFile, &sz );
    }
+
+   /* From Image Pointer + size */
    else if ( hb_pcount() == 2 &&
         ( hb_parinfo( 1 ) & HB_IT_POINTER ) &&
         ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
@@ -225,6 +227,8 @@ static void GDImageCreateFrom( int nType )
       /* Retrieve image size */
       sz     = hb_parni( 2 );
    }
+
+   /* From file handle */
    else if ( hb_pcount() == 2 &&
         ( hb_parinfo( 1 ) & HB_IT_NUMERIC ) &&
         ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
@@ -301,7 +305,7 @@ static void GDImageSaveTo( int nType )
       /* Retrieve image pointer */
        im = (gdImagePtr)hb_parptr(1);
 
-      /* Get file name or an output handler */
+      /* Get file name or an output handler or NIL it I want a return string */
       if ( !( ISNIL(2) ||
               hb_parinfo( 2 ) & HB_IT_STRING ||
               hb_parinfo( 2 ) & HB_IT_NUMERIC ) )
@@ -395,13 +399,22 @@ static void GDImageSaveTo( int nType )
          SaveImageToFile( szFile, iptr, sz );
 
       }
-      else
+
+      /* Write to file handle (1 = std output) */
+      else if ( hb_parinfo( 2 ) & HB_IT_NUMERIC )
       {
          /* Write to std output or to a passed file */
-         fhandle = ( hb_parinfo( 2 ) & HB_IT_NUMERIC ) ? hb_parnl( 2 ) : 1; // 1 = std output
-         //
-         ///* Write Image */
+         fhandle = ( hb_parnl( 2 ) > -1 ) ? hb_parnl( 2 ) : 1 ; // 1 = std output
+
+         /* Write Image */
          SaveImageToHandle( fhandle, iptr, sz );
+      }
+
+      /* Return image as string) */
+      else
+      {
+         /* Return as string */
+         hb_retclen( (BYTE *) iptr, (ULONG) sz );
       }
 
       /* Free memory */
@@ -2499,6 +2512,11 @@ HB_FUNC( GDIMAGESTRINGFTEX )
 
       /* EXTENDED FLAGS */
       flags       = 0;
+
+      /* defaults */
+      linespacing = 1.05;
+      charmap     = gdFTEX_Unicode;
+      resolution  = 96;
 
       /* Retrieve line spacing */
       if ( hb_parinfo( 10 ) & HB_IT_DOUBLE )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.16 2005/12/26 22:17:45 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.17 2006/01/08 01:52:10 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-08 23:28 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * contrib/gd/source/gdwrp.c
+    + added save image to string
+  * contrib/gd/source/gdimage.prg
+    + added ToString*() methods, fixed Output*() methods
+
+  /*
+    Now it is possible to get an image into a string using ToString*() methods.
+    Sample:
+      oImage := GDImage( 200, 200 )
+      ....
+      cImage := oImage:ToStringJPeg()
+  */
 
 2006-01-08 02:47 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * contrib/gd/source/gdwrp.c
