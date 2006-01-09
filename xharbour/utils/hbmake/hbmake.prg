@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.160 2005/12/28 14:58:25 lculik Exp $
+ * $Id: hbmake.prg,v 1.161 2006/01/01 18:40:56 lculik Exp $
  */
 
 /*
@@ -393,7 +393,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       SET CURSOR OFF
    ENDIF
 
-   tracelog( s_lasdll)
+   
 
    IF s_lasdll .or. lower(right(s_cAppName,3)) == 'dll'
        __Run( ReplaceMacros("implib $(HB_DIR)\lib\" + left(s_cAppName,at(".",s_cAppName)-1)+".lib " +s_cAppName ))
@@ -1057,7 +1057,7 @@ FUNCTION SetBuild()
                    ENDIF
 
                    IF s_lMinGW
-                      s_cLinkCommands += cRead + " "
+                      s_cLinkCommands += strtran(cRead,"/","\") + " "
                    ELSE
                       FWrite( s_nMakeFileHandle, cRead + CRLF )
                    ENDIF
@@ -1448,9 +1448,17 @@ FUNCTION GetParaDefines( cTemp )
       nMakePos := AScan( s_aDefines, { | x | x[ 1 ] == cRead } )
 
       IF nMakePos = 0
+         if(aSet[1] == "MYDEFINES")
+         ASet[ 2 ] := Strtran( aSet[ 2 ], ",", ";" )
+         else
          ASet[ 2 ] := Strtran( aSet[ 2 ], ",", " " )
+         endif
          AAdd( s_aDefines, { aSet[ 1 ], aSet[ 2 ] } )
          AAdd( s_aMacros, { aSet[ 1 ], aSet[ 2 ] } )
+      else
+         s_aDefines[nMakepos,2] +=";"+aSet[ 2 ] 
+         s_aMacros[nMakepos,2]+=";"+ aSet[ 2 ] 
+         
       ENDIF
 
    ENDIF
@@ -2082,9 +2090,9 @@ FUNCTION CreateMakeFile( cFile )
          AAdd( s_aCommands, { ".c.o:", "$(CC_DIR)\bin\gcc -I$(HB_DIR)/include $(CFLAG1) $(CFLAG2) -I. -o$* $**" } )
 
          IF s_lExtended
-            AAdd( s_aCommands, { ".prg.o:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+" -go -I$(HB_DIR)/include $(HARBOURFLAGS)  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.o:", "$(HB_DIR)\bin\harbour -D__EXPORT__  -n"+if(s_lasdll,"1","")+" -go -I$(HB_DIR)/include $(HARBOURFLAGS) " +IIF( lHwgui, " -I$(HWGUI)/include","" ) +" -o$* $**" } )
          ELSE
-            AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)/include $(HARBOURFLAGS)  -o$* $**" } )
+            AAdd( s_aCommands, { ".prg.c:", "$(HB_DIR)\bin\harbour -n -I$(HB_DIR)/include $(HARBOURFLAGS) " +IIF( lHwgui, " -I$(HWGUI)/include","" ) +"   -o$* $**" } )
          ENDIF
 
       ENDIF
@@ -2362,7 +2370,7 @@ FUNCTION CreateMakeFile( cFile )
    ELSEIF lMiniGui
       FWrite( s_nMakeFileHandle, "MINIGUI = " + alltrim(cMiniPath) + CRLF )
    ELSEIF lHwGui
-      FWrite( s_nMakeFileHandle, "HWGUI = " + alltrim(cHwPath) + CRLF )
+      FWrite( s_nMakeFileHandle, "HWGUI = " + if(!s_lMinGW,alltrim(cHwPath),strtran(alltrim(cHwPath),"\","/")) + CRLF )
    ELSEIF lGtwvt
       FWrite( s_nMakeFileHandle, "GTWVT = " + CRLF )
    ELSEIF lGtwvw
@@ -4590,11 +4598,11 @@ FUNCTION BuildGccCfgFile()
    LOCAL cCfg 
    LOCAL nCfg
    LOCAL cDir := s_cHarbourDir
-   LOCAL cBhc := Alltrim( Strtran( ReplaceMacros( '$(HB_DIR)' ), '\', '/' ) )
+//   LOCAL cBhc := Alltrim( Strtran( ReplaceMacros( '$(HB_DIR)' ), '\', '/' ) )
 
-   cDir := Strtran( cDir, '/', '\' )
+//   cDir := Strtran( cDir, '/', '\' )
 
-   cCfg := cDir + '\bin\'+s_cHarbourCFG
+   cCfg := s_cHarbourDir + '\bin\'+s_cHarbourCFG
 
    IF !File( cCfg ) .or. s_lForce
 
@@ -4613,7 +4621,7 @@ FUNCTION BuildGccCfgFile()
       endif
 
       FWrite( nCfg, "CC=gcc" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + cBhc + "/include $(C_USR)  -L" + cBhc + "/lib" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + s_cHarbourDir + "/include $(C_USR)  -L" + s_cHarbourDir + "/lib" ) + CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )
