@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.44 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: inkey.c,v 1.45 2006/01/12 13:16:08 druzus Exp $
  */
 
 /*
@@ -111,13 +111,15 @@ static PHB_ITEM s_inKeyBlockAfter  = NULL;
 
 int hb_inkeyTranslate( int iKey, HB_inkey_enum event_mask )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyTranslate(%d,%d)", iKey, iEventMask));
+   int iMask;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyTranslate(%d,%d)", iKey, ( int ) event_mask));
+
    /*
     * Why bitfield has been defined as enum type?
     * Bit operations on enum types are forbidden in
     * many C/C++ compilers
     */
-   int iMask;
 
    switch( iKey )
    {
