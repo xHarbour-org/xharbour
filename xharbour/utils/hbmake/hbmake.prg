@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.161 2006/01/01 18:40:56 lculik Exp $
+ * $Id: hbmake.prg,v 1.162 2006/01/09 11:30:30 lculik Exp $
  */
 
 /*
@@ -466,7 +466,7 @@ FUNCTION ParseMakeFile( cFile )
    #ENDIF
 
    cBuffer := Trim( Substr( ReadLN( @s_lEof ), 1 ) )
-
+   
    AAdd( s_aDefines, { "HARBOUR_DIR", s_cHarbourDir } )
 
    IF s_lBcc
@@ -1907,9 +1907,7 @@ FUNCTION CreateMakeFile( cFile )
    lRddAds   := "RddAds"   IN cRdd
    lMediator := "Mediator" IN cRdd
    lApollo   := "Apollo"   IN cRdd
-
-   tracelog(lUseXharbourDll)
-
+  
    IF lUseXharbourDll
       cDefLibGccLibs := cHARso
       cDefaultLibs   := cHarbDll

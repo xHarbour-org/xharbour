@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4739 2006/01/08 21:57:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4740 2006/01/09 11:30:28 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-12 00:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/dbdelim.prg
+    ! minor fix to not add an phanton record when importing data
+    ( reported by Emmerson Henning  on xharbour news)
+  * utils/hbmake/hbmake.prg
+    ! Remove an lonely Tracelog() function call
 
 2006-01-09 09:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg
