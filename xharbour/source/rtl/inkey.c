@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.43 2005/09/30 23:44:05 druzus Exp $
+ * $Id: inkey.c,v 1.44 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -97,6 +97,7 @@ static int *  s_inkeyBuffer = s_defaultKeyBuffer;
 static int    s_inkeyBufferSize = HB_DEFAULT_INKEY_BUFSIZE;
 static int    s_inkeyHead = 0;
 static int    s_inkeyTail = 0;
+static int    s_iLastPut = 0;
 
 static BYTE * s_StrBuffer = NULL;
 static ULONG  s_StrBufferSize;
@@ -110,6 +111,7 @@ static PHB_ITEM s_inKeyBlockAfter  = NULL;
 
 int hb_inkeyTranslate( int iKey, HB_inkey_enum event_mask )
 {
+   HB_TRACE(HB_TR_DEBUG, ("hb_inkeyTranslate(%d,%d)", iKey, iEventMask));
    /*
     * Why bitfield has been defined as enum type?
     * Bit operations on enum types are forbidden in
@@ -169,7 +171,22 @@ void HB_EXPORT hb_inkeyPut( int iKey )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeyPut(%d)", iKey));
 
-   s_inkeyBuffer[ iHead++ ] = iKey;
+   if( iKey == K_MOUSEMOVE )
+   {
+      /*
+       * Clipper dos not store in buffer repeated mouse movement
+       * IMHO it's good idea to reduce unnecessary inkey buffer
+       * overloading so I also implemented it, [druzus]
+       */
+      if( s_iLastPut == iKey && s_inkeyHead != s_inkeyTail )
+         return;
+   }
+
+   /*
+    * When the buffer is full new event overwrite the last one
+    * in the buffer - it's Clipper behavior, [druzus]
+    */
+   s_inkeyBuffer[ iHead++ ] = s_iLastPut = iKey;
    if( iHead >= s_inkeyBufferSize )
    {
       iHead = 0;
@@ -233,26 +250,25 @@ static void hb_inkeyPollDo( void )
 
    iKey = hb_gt_ReadKey( ( HB_inkey_enum ) INKEY_ALL );
 
-   switch( iKey )
-   {
-      case HB_BREAK_FLAG:           /* Check for Ctrl+Break */
-      case K_ALT_C:                 /* Check for normal Alt+C */
-         if( hb_set.HB_SET_CANCEL )
-         {
-            hb_vmRequestCancel();   /* Request cancellation */
-            return;
-         }
-         break;
-      case K_ALT_D:                 /* Check for normal Alt+D */
-         if( hb_set.HB_SET_DEBUG )
-         {
-            hb_vmRequestDebug();    /* Request the debugger */
-            return;
-         }
-   }
-
    if( iKey )
    {
+      switch( iKey )
+      {
+         case HB_BREAK_FLAG:           /* Check for Ctrl+Break */
+         case K_ALT_C:                 /* Check for normal Alt+C */
+            if( hb_set.HB_SET_CANCEL )
+            {
+               hb_vmRequestCancel();   /* Request cancellation */
+               return;
+            }
+            break;
+         case K_ALT_D:                 /* Check for normal Alt+D */
+            if( hb_set.HB_SET_DEBUG )
+            {
+               hb_vmRequestDebug();    /* Request the debugger */
+               return;
+            }
+      }
       hb_inkeyPut( iKey );
    }
 }

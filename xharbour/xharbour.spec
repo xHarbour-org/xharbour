@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.85 2005/09/25 16:14:20 druzus Exp $
+# $Id: xharbour.spec,v 1.86 2005/10/10 22:45:53 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -13,11 +13,11 @@
 ######################################################################
 # Conditional build:
 # --with static      - link all binaries with static libs
-# --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
+# --without adsrdd   - do not build ADS RDD
 # --without gpl      - do not build code which needs GPL 3-rd party libs
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT and GTXWC
@@ -72,7 +72,7 @@
 %define hb_ldir  export HB_LIB_INSTALL=%{_libdir}/%{name}
 %define hb_opt   export HB_GTALLEG=%{?_with_allegro:yes}
 %define hb_cmrc  export HB_COMMERCE=%{?_without_gpl:yes}
-%define hb_ctrb  %{!?_without_nf:libnf} %{?_with_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
+%define hb_ctrb  %{!?_without_nf:libnf} %{!?_without_adsrdd:rdd_ads} %{?_with_mysql:mysql} %{?_with_pgsql:pgsql}
 %define hb_env   %{hb_arch} ; %{hb_cc} ; %{hb_cflag} ; %{hb_lflag} ; %{hb_mt} ; %{hb_gt} ; %{hb_gpm} ; %{hb_sln} ; %{hb_x11} ; %{hb_mgt} ; %{hb_bdir} ; %{hb_idir} ; %{hb_ldir} ; %{hb_opt} ; %{hb_cmrc}
 
 %define hb_host  www.xharbour.org
@@ -577,7 +577,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,755)
 %dir %{_libdir}/%{name}
 %{!?_without_nf: %{_libdir}/%{name}/libnf*.a}
-%{?_with_adsrdd: %{_libdir}/%{name}/librddads*.a}
+%{!?_without_adsrdd: %{_libdir}/%{name}/librddads*.a}
 %{?_with_mysql: %{_libdir}/%{name}/libmysql*.a}
 %{?_with_pgsql: %{_libdir}/%{name}/libhbpg*.a}
 

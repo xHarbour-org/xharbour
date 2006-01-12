@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.184 2005/12/22 09:20:05 lf_sfnet Exp $
+ * $Id: dbcmd.c,v 1.183 2005/12/16 10:18:09 druzus Exp $
  */
 
 /*
@@ -66,7 +66,6 @@
 #define HB_THREAD_OPTIMIZE_STACK
 
 #include <ctype.h>
-#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbstack.h"
 #include "hbvm.h"
@@ -567,13 +566,9 @@ static ERRCODE hb_rddGetAliasNumber( char * szAlias, int * iArea )
    {
       PHB_DYNS pSymAlias = hb_dynsymFindName( szAlias );
 
-      if( pSymAlias && pSymAlias->hArea )
+      *iArea = pSymAlias ? ( int ) hb_dynsymAreaHandle( pSymAlias ) : 0;
+      if( *iArea == 0 )
       {
-         *iArea = pSymAlias->hArea;
-      }
-      else
-      {
-         *iArea = 0;
          return FAILURE;
       }
    }
@@ -907,13 +902,13 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
 
    LOCK_AREA
    pSymAlias = hb_dynsymGet( szAlias );
-   if( pSymAlias->hArea )
+   if( hb_dynsymAreaHandle( pSymAlias ) != 0 )
    {
       pSymAlias = NULL;
    }
    else
    {
-      pSymAlias->hArea = iArea;
+      hb_dynsymSetAreaHandle( pSymAlias, iArea );
    }
    UNLOCK_AREA
 
@@ -967,12 +962,14 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
    ERRCODE bResult;
    char * szName;
+   int iArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));
 
-   if( pSymAlias->pDynSym->hArea )
+   iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
+   if( iArea )
    {
-      bResult = hb_rddSelectWorkAreaNumber( pSymAlias->pDynSym->hArea );
+      bResult = hb_rddSelectWorkAreaNumber( iArea );
    }
    else
    {
@@ -1000,9 +997,10 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 
             if( uiAction == E_RETRY )
             {
-               if( pSymAlias->pDynSym->hArea )
+               iArea = ( int ) hb_dynsymAreaHandle( pSymAlias->pDynSym );
+               if( iArea )
                {
-                  bResult = hb_rddSelectWorkAreaNumber( pSymAlias->pDynSym->hArea );
+                  bResult = hb_rddSelectWorkAreaNumber( iArea );
                   uiAction = E_DEFAULT;
                }
             }
@@ -4509,6 +4507,10 @@ HB_FUNC( DBSKIPPER )
 }
 #endif
 
+
+
+
+
 // Escaping delimited strings. Need to be cleaned/optimized/improved
 static char *hb_strescape( char *szInput, int lLen, char *cDelim )
 {
@@ -4540,9 +4542,13 @@ static char *hb_strescape( char *szInput, int lLen, char *cDelim )
 }
 
 // Export field values to text file
+#ifndef HB_CDP_SUPPORT_OFF
+static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim, PHB_CODEPAGE cdp )
+#else
 static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
+#endif
 {
-   switch( pValue->type )
+   switch( hb_itemType( pValue ) )
    {
       // a "C" field
       case HB_IT_STRING:
@@ -4550,7 +4556,14 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
          char *szStrEsc;
          char *szString;
 
-         szStrEsc = hb_strescape( pValue->item.asString.value, pValue->item.asString.length, cDelim );
+         szStrEsc = hb_strescape( hb_itemGetCPtr( pValue ),
+                                  hb_itemGetCLen( pValue ), cDelim );
+#ifndef HB_CDP_SUPPORT_OFF
+         if( cdp )
+         {
+            hb_cdpnTranslate( szStrEsc, hb_cdp_page, cdp, hb_itemGetCLen( pValue ) );
+         }
+#endif
          szString = hb_xstrcpy( NULL,cDelim,szStrEsc,cDelim,NULL);
 
          // FWrite( handle, szString )
@@ -4574,7 +4587,7 @@ static BOOL hb_ExportVar( int handle, PHB_ITEM pValue, char *cDelim )
       // an "L" field
       case HB_IT_LOGICAL:
       {
-         hb_fsWriteLarge( handle, (BYTE*) ( pValue->item.asLogical.value ? "T" : "F" ), 1 );
+         hb_fsWriteLarge( handle, (BYTE*) ( hb_itemGetL( pValue )  ? "T" : "F" ), 1 );
          break;
       }
       // an "N" field
@@ -4631,13 +4644,18 @@ HB_FUNC( DBF2TEXT )
    BOOL bEof = TRUE;
    BOOL bBof = TRUE;
 
-   BOOL bNoFieldPassed = ( pFields == NULL || pFields->item.asArray.value->ulLen == 0 ) ;
+   BOOL bNoFieldPassed = ( pFields == NULL || hb_arrayLen( pFields ) == 0 );
 
 
    if( ! handle )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_EVAL_BADPARAMETER, NULL, "DBF2TEXT" );
       return;
+   }
+
+   if( cdp && cdp == hb_cdp_page )
+   {
+      cdp = NULL;
    }
 
    pTmp = hb_itemNew( NULL );
@@ -4687,19 +4705,17 @@ HB_FUNC( DBF2TEXT )
 
                SELF_GETVALUE( pArea, ui, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
-               if( HB_IS_STRING( pTmp ) && cdp && (cdp != hb_cdp_page) )
-               {
-                  hb_cdpnTranslate( pTmp->item.asString.value, hb_cdp_page, cdp, pTmp->item.asString.length );
-               }
-#endif
+               bWriteSep = hb_ExportVar( handle, pTmp, cDelim, cdp );
+#else
                bWriteSep = hb_ExportVar( handle, pTmp, cDelim );
+#endif
                hb_itemClear( pTmp );
             }
          }
          // Only requested fields are exported here
          else
          {
-            USHORT uiFieldCopy = ( USHORT ) pFields->item.asArray.value->ulLen;
+            USHORT uiFieldCopy = ( USHORT ) hb_arrayLen( pFields );
             USHORT uiItter;
 
             for ( uiItter = 1; uiItter <= uiFieldCopy; uiItter++ )
@@ -4717,12 +4733,10 @@ HB_FUNC( DBF2TEXT )
                      }
                      SELF_GETVALUE( pArea, iPos, pTmp );
 #ifndef HB_CDP_SUPPORT_OFF
-                     if( HB_IS_STRING( pTmp ) && cdp && (cdp != hb_cdp_page) )
-                     {
-                        hb_cdpnTranslate( pTmp->item.asString.value, hb_cdp_page, cdp, pTmp->item.asString.length );
-                     }
-#endif
+                     bWriteSep = hb_ExportVar( handle, pTmp, cDelim, cdp );
+#else
                      bWriteSep = hb_ExportVar( handle, pTmp, cDelim );
+#endif
                      hb_itemClear( pTmp );
                   }
                }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.150 2005/12/14 07:24:07 druzus Exp $
+ * $Id: dbfntx1.c,v 1.151 2005/12/16 10:22:22 druzus Exp $
  */
 
 /*
@@ -4165,7 +4165,7 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
          if( iFixed && hb_ntxValCompare( pTag, szPattern, iFixed,
                              pTag->CurKeyInfo->key, iFixed, FALSE ) == -iStop )
          {
-            LPKEYINFO pKey = NULL;
+            LPKEYINFO pKey;
             pKey = hb_ntxKeyNew( NULL, pTag->KeyLength );
             memcpy( pKey->key, szPattern, iFixed );
             pKey->key[ iFixed ] = '\0';
@@ -7259,7 +7259,7 @@ static ERRCODE ntxOrderListDelete( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
 {
    char szTagName[ NTX_MAX_TAGNAME + 1 ];
    char szFileName[ _POSIX_PATH_MAX + 1 ];
-   LPNTXINDEX pIndex = NULL, * pIndexPtr;
+   LPNTXINDEX pIndex, * pIndexPtr;
    BOOL fProd;
 
    HB_TRACE(HB_TR_DEBUG, ("ntxOrderListDelete(%p, %p)", pArea, pOrderInfo));

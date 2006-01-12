@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.57 2005/10/13 12:49:35 druzus Exp $
+ * $Id: gtcrs.c,v 1.58 2005/12/23 10:47:53 druzus Exp $
  */
 
 /*
@@ -1203,6 +1203,14 @@ static void mouse_init( InOutBase * ioBase )
 #ifdef HAVE_GPM_H
    else if ( ioBase->terminal_type == TERM_LINUX )
    {
+#ifdef HB_GPM_NOICE_DISABLE
+      int iNull, iErr;
+
+      iErr = dup( 2 );
+      iNull = open( "/dev/null", O_RDWR );
+      dup2( iNull, 2 );
+      close( iNull );
+#endif
       ioBase->Conn.eventMask =
          GPM_MOVE | GPM_DRAG | GPM_UP | GPM_DOWN | GPM_DOUBLE;
       /* give me move events but handle them anyway */
@@ -1224,6 +1232,10 @@ static void mouse_init( InOutBase * ioBase )
             Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row,
                              gpm_consolefd );
       }
+#ifdef HB_GPM_NOICE_DISABLE
+      dup2( iErr, 2 );
+      close( iErr );
+#endif
    }
 #endif
 }

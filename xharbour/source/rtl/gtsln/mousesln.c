@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.7 2004/05/25 20:27:23 druzus Exp $
+ * $Id: mousesln.c,v 1.8 2005/10/13 12:49:36 druzus Exp $
  */
 
 /*
@@ -56,6 +56,8 @@
 #include <sys/time.h>
 #ifdef HAVE_GPM_H
     #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <fcntl.h>
     #include <gpm.h>
     Gpm_Connect Conn;
 #endif
@@ -280,6 +282,14 @@ void HB_GT_FUNC(mouse_Init( void ))
 #ifdef HAVE_GPM_H
     else if( hb_gt_UnderLinuxConsole )
     {
+#ifdef HB_GPM_NOICE_DISABLE
+        int iNull, iErr;
+
+        iErr = dup( 2 );
+        iNull = open( "/dev/null", O_RDWR );
+        dup2( iNull, 2 );
+        close( iNull );
+#endif
 
         Conn.eventMask = GPM_MOVE | GPM_UP | GPM_DOWN | GPM_DRAG | GPM_DOUBLE;
         /* give me move events but handle them anyway */
@@ -303,6 +313,10 @@ void HB_GT_FUNC(mouse_Init( void ))
             s_iMouseButtons = Gpm_GetSnapshot( NULL );
             HB_GT_FUNC(mouse_FixTrash());
         }
+#ifdef HB_GPM_NOICE_DISABLE
+        dup2( iErr, 2 );
+        close( iErr );
+#endif
     }
 #endif
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.9 2005/01/11 23:53:45 likewolf Exp $
+ * $Id: seconds.c,v 1.10 2005/06/22 15:30:55 druzus Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
  */
 
 #include "hbapi.h"
+#include "hbdate.h"
 
 #include <time.h>
 
@@ -116,7 +117,7 @@ HB_EXPORT double hb_dateSeconds( void )
     n == 12 cstime -> sum of the system CPU time of the current + child process
     n == 13 cu+cs  -> sum of cutime + cstime
 */
-HB_EXPORT double hb_secondsCPU(int n)
+HB_EXPORT double hb_secondsCPU( int n )
 {
    double d = 0.0;
 

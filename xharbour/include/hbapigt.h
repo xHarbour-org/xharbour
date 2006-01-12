@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.43 2005/12/08 18:59:45 oh1 Exp $
+ * $Id: hbapigt.h,v 1.44 2005/12/10 00:29:21 oh1 Exp $
  */
 
 /*
@@ -139,9 +139,9 @@ typedef enum
 
 
 #if defined( HB_COMPAT_C53 ) && !defined( HB_C52_STRICT )
-#  define HB_DEFAULT_INKEY_BUFSIZE  15
-#else
 #  define HB_DEFAULT_INKEY_BUFSIZE  50
+#else
+#  define HB_DEFAULT_INKEY_BUFSIZE  15
 #endif
 
 

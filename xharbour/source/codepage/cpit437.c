@@ -1,5 +1,5 @@
 /*
- * $Id: cpit437.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpit437.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  36    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  40    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -84,8 +84,8 @@
 
 static HB_CODEPAGE s_codepage = { "IT437",
     CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
-    "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
-    "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
+    "AAAAAéèBCDEEêFGHIIIJKLMNOOOPQRSTUUUVWXYZ",
+    "aaÖ†ÉÑÜbcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( IT437 );

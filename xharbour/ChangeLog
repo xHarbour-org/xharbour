@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4740 2006/01/09 11:30:28 lculik Exp $
+ * $Id: ChangeLog,v 1.4741 2006/01/12 02:04:35 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,55 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-12 14:15 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/dynsym.c
+    + added new functions: hb_dynsymName(), hb_dynsymMemvarHandle(),
+      hb_dynsymAreaHandle(), hb_dynsymSetAreaHandle()
+
+  * xharbour/include/hbapigt.h
+    ! fixed default keyboard buffer size - it was reverted,
+      should be 15 for CL52 and 50 for CL53
+
+  * xharbour/source/codepage/cpit437.c
+  * xharbour/source/codepage/cpit850.c
+  * xharbour/source/codepage/cpitiso.c
+    * updated to respected translatable letter set,
+      Lorenzo, AFAIR you few weeks ago you inform you will do that
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/workarea.c
+    * cleaned to not access directly VM internals
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * few warning cleaned
+
+  * xharbour/source/rtl/gtapi.c
+    ! fixed GPF on application exit when CT Window is active
+
+  * xharbour/source/rtl/inkey.c
+    * do not store in buffer repeated K_MOUSEMOVE events - Clipper
+      compatible
+
+  * xharbour/source/rtl/seconds.c
+    * aded missing header for proper C++ compilation
+
+  * xharbour/source/rtl/gtnul/gtext.c
+    * removed unnecessary comment
+
+  * xharbour/source/rtl/gtcrs/Makefile
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtsln/Makefile
+  * xharbour/source/rtl/gtsln/mousesln.c
+    * added dirty hack for badly patched GPM lib which shows some
+      internal messages on console (stderr) - enabled when set:
+         C_USR=-DHB_GPM_NOICE_DISABLE
+
+  * xharbour/make_rpm.sh
+  * xharbour/xharbour.spec
+    * changed '--with adsrdd' to '--without adsrdd' - now ADS RDD
+      is built by default
 
 2006-01-12 00:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/rtl/dbdelim.prg

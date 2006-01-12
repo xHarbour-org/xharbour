@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.61 2005/12/16 01:10:18 jabrecer Exp $
+ * $Id: gtapi.c,v 1.62 2005/12/16 22:36:23 oh1 Exp $
  */
 
 /*
@@ -2103,6 +2103,9 @@ static void hb_ctExit( void )
 
    if( ct_Init )
    {
+      if( ct_NCur > 0 )
+         hb_ctWSelect( 0 );
+
       ct_Init = FALSE;
 
 /*      hb_ctWAClose();   oh1 */

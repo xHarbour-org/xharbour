@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.7 2005/03/13 12:44:41 likewolf Exp $
+# $Id: Makefile,v 1.8 2005/12/11 12:37:50 druzus Exp $
 #
 
 ROOT = ../../../
@@ -32,6 +32,9 @@ endif
 
 ifeq ($(HB_GPM_MOUSE),yes)
 CFLAGS += -DHAVE_GPM_H
+ifeq ($(HB_GPM_NOICE_DISABLE),yes)
+  CFLAGS += -DHB_GPM_NOICE_DISABLE
+endif
 endif
 
 ifeq ($(HB_MULTI_GT),yes)

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.235 2005/12/13 12:03:36 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.236 2005/12/16 10:21:43 druzus Exp $
  */
 
 /*
@@ -5341,7 +5341,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
        hb_cdxValCompare( pTag, ( BYTE * ) szPattern, iFixed,
                          pTag->CurKey->val, iFixed, FALSE ) == -iStop )
    {
-      LPCDXKEY pKey = NULL;
+      LPCDXKEY pKey;
 
       pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed, 
                      pTag->UsrAscend ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM );

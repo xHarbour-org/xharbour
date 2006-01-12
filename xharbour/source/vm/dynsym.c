@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.28 2005/10/29 06:45:02 druzus Exp $
+ * $Id: dynsym.c,v 1.29 2005/11/16 12:16:45 druzus Exp $
  */
 
 /*
@@ -639,6 +639,34 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
    hb_dynsymUnlock();
 
    return NULL;
+}
+
+char * HB_EXPORT hb_dynsymName( PHB_DYNS pDynSym )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymName(%p)", pDynSym));
+
+   return pDynSym->pSymbol->szName;
+}
+
+HB_HANDLE HB_EXPORT hb_dynsymMemvarHandle( PHB_DYNS pDynSym )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymMemvarHandle(%p)", pDynSym));
+
+   return pDynSym->hMemvar;
+}
+
+HB_HANDLE HB_EXPORT hb_dynsymAreaHandle( PHB_DYNS pDynSym )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymAreaHandle(%p)", pDynSym));
+
+   return pDynSym->hArea;
+}
+
+void HB_EXPORT hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, int iArea )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymSetAreaHandle(%p,%d)", pDynSym, iArea));
+
+   pDynSym->hArea = iArea;
 }
 
 USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )

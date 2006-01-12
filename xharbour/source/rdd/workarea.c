@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.60 2005/12/19 01:12:43 guerra000 Exp $
+ * $Id: workarea.c,v 1.44 2005/09/25 19:39:45 druzus Exp $
  */
 
 /*
@@ -56,7 +56,6 @@
  */
 
 #include <ctype.h>
-#include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbinit.h"
@@ -505,9 +504,9 @@ ERRCODE hb_waAlias( AREAP pArea, BYTE * szAlias )
    HB_TRACE(HB_TR_DEBUG, ("hb_waAlias(%p, %p)", pArea, szAlias));
 
    hb_strncpy( ( char * ) szAlias,
-               ( pArea->atomAlias && ( ( PHB_DYNS ) pArea->atomAlias )->hArea )
-               ? ( ( PHB_DYNS ) pArea->atomAlias )->pSymbol->szName : "",
-               HARBOUR_MAX_RDD_ALIAS_LENGTH );
+      pArea->atomAlias && hb_dynsymAreaHandle( ( PHB_DYNS ) pArea->atomAlias )
+      ? hb_dynsymName( ( PHB_DYNS ) pArea->atomAlias ) : "",
+      HARBOUR_MAX_RDD_ALIAS_LENGTH );
 
    return SUCCESS;
 }
@@ -575,7 +574,7 @@ ERRCODE hb_waClose( AREAP pArea )
    }
 
    if( pArea->atomAlias )
-      ( ( PHB_DYNS ) pArea->atomAlias )->hArea = 0;
+      hb_dynsymSetAreaHandle( ( PHB_DYNS ) pArea->atomAlias, 0 );
 
    return SUCCESS;
 }

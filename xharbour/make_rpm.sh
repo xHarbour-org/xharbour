@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_rpm.sh,v 1.28 2005/05/31 21:47:35 lculik Exp $
+# $Id: make_rpm.sh,v 1.29 2005/06/02 00:43:37 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -13,12 +13,12 @@
 ######################################################################
 # Conditional build:
 # --with static      - link all binaries with static libs
-# --with adsrdd      - build ads RDD
 # --with mysql       - build mysql lib
 # --with pgsql       - build pgsql lib
 # --with odbc        - build build odbc lib
 # --with hrbsh       - build /etc/profile.d/harb.sh (not necessary)
 # --with allegro     - build GTALLEG - Allegro based GT driver
+# --without adsrdd   - do not build ADS RDD
 # --without gpl      - do not build code which needs GPL 3-rd party libs
 # --without nf       - do not build nanforum lib
 # --without x11      - do not build GTXVT and GTXWC

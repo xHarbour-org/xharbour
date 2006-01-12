@@ -1,5 +1,5 @@
 /*
- * $Id: gtext.c,v 1.6 2005/10/18 12:14:33 druzus Exp $
+ * $Id: gtext.c,v 1.7 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -50,8 +50,6 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-/* NOTE: User programs should never call this layer directly! */
 
 /* *********************************************************************** */
 

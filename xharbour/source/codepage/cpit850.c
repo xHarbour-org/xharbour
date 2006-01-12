@@ -1,5 +1,5 @@
 /*
- * $Id: cpit850.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpit850.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  36   /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  40   /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
@@ -86,8 +86,8 @@
 
 static HB_CODEPAGE s_codepage = { "IT850",
     CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
-    "AÖ†BCDEäÇFGHIç°JKLMNOï¢PQRSTUó£VWXYZ",
-    "aÖ†bcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
+    "A∑µ∂«éèBCDE‘êFGHIﬁ÷JKLMNO„‡PQRSTUÎÈVWXYZ",
+    "aÖ†É∆ÑÜbcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( IT850 );

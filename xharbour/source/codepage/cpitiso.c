@@ -1,5 +1,5 @@
 /*
- * $Id: cpitiso.c,v 1.6 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: cpitiso.c,v 1.7 2005/10/31 18:41:22 lf_sfnet Exp $
  */
 
 /*
@@ -87,7 +87,7 @@
 static HB_CODEPAGE s_codepage = { "ITISO",
     CPID_8859_1, UNITB_8859_1, NUMBER_OF_CHARACTERS,
     "AÀÁÂÃÄÅBCDEÈÉFGHIÌÍJKLMNOÒÓPQRSTUÙÚVWXYZ",
-    "aàáâãäåbcdeèéfghiìíjklmnoòópqrstuùúvwxyz",        
+    "aàáâãäåbcdeèéfghiìíjklmnoòópqrstuùúvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( ITISO );
