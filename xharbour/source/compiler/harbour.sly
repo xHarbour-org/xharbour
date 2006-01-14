@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.93 2005/11/02 22:44:18 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.94 2005/11/08 17:32:13 ronpinkas Exp $
  */
 
 /*
@@ -492,9 +492,9 @@ CrlfStmnt  : { hb_compLinePushIfInside(); } Crlf
            ;
 
 LineStat   : Crlf          { $<lNumber>$ = 0; hb_comp_bDontGenLineNum = TRUE; }
+           | Line          { $<lNumber>$ = 0; }
            | Statement     { $<lNumber>$ = 1; }
            | Declaration   { $<lNumber>$ = 1; }
-           | Line          { $<lNumber>$ = 1; }
            | ControlError  { char LineAsString[32]; sprintf( LineAsString, "at line %i", s_iLastControlLine - 1 ); hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNCLOSED_STRU, LineAsString, NULL ); }
            ;
 

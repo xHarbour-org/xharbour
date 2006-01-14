@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4744 2006/01/14 17:43:34 paultucker Exp $
+ * $Id: ChangeLog,v 1.4745 2006/01/14 18:35:43 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-14 15:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/harbour.sly
+    * LineStat value for #line directive changed to 0 (no coding impact)
+  * source/rtl/win32ole.prg
+    * Minor optimization
+  * source/vm/dynsym.c
+    * Compile error of HB_EXPORT
 
 2006-01-14 01:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gt.c
@@ -33,7 +41,7 @@
       Default is disabled. */
 
     + #define GTI_KBDALT     12 /* This will get/set the status of the alt-numpad
-      key handling.  
+      key handling.
       Default is Enabled. */
 
 2006-01-12 18:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)

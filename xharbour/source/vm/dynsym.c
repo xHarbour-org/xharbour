@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.29 2005/11/16 12:16:45 druzus Exp $
+ * $Id: dynsym.c,v 1.30 2006/01/12 13:16:10 druzus Exp $
  */
 
 /*
@@ -641,7 +641,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
    return NULL;
 }
 
-char * HB_EXPORT hb_dynsymName( PHB_DYNS pDynSym )
+HB_EXPORT char * hb_dynsymName( PHB_DYNS pDynSym )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymName(%p)", pDynSym));
 

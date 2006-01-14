@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.109 2006/01/07 18:22:56 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.110 2006/01/08 20:37:54 ronpinkas Exp $
  */
 
 /*
@@ -138,10 +138,10 @@ INIT PROC HB_OLEINIT
    {
       s_nOleError = OleInitialize( NULL );
 
-      s_pSym_TOleAuto    = hb_dynsymFindName( "TOLEAUTO" );
-      s_pSym_New         = hb_dynsymFindName( "NEW" );
-      s_pSym_hObj        = hb_dynsymFindName( "HOBJ" );
-      s_pSym_cClassName  = hb_dynsymFindName( "CCLASSNAME" );
+      s_pSym_TOleAuto    = hb_dynsymFind( "TOLEAUTO" );
+      s_pSym_New         = hb_dynsymFind( "NEW" );
+      s_pSym_hObj        = hb_dynsymFind( "HOBJ" );
+      s_pSym_cClassName  = hb_dynsymFind( "CCLASSNAME" );
 
       s_EmptyDispParams.rgvarg            = NULL;
       s_EmptyDispParams.cArgs             = 0;
@@ -1127,9 +1127,6 @@ RETURN Self
                    hb_itemClear( aPrgParams[ n ] );
                    break;
                  */
-
-                 default:
-                   TraceLog( NULL, "*** Unexpected Type: %i***\n", pDispParams->rgvarg[ n ].n1.n2.vt );
               }
            }
            else
