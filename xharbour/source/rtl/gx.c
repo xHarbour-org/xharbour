@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.19 2004/11/23 17:04:22 lf_sfnet Exp $
+ * $Id: gx.c,v 1.20 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -247,6 +247,7 @@ HB_FUNC( GTINFO )
 {
    PHB_ITEM pInfo = hb_param( 1, HB_IT_NUMERIC );
    PHB_ITEM pSet = hb_param( 2, HB_IT_NUMERIC );
+   char *param = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
 
    /* Parameter error */
    if ( pInfo == NULL )
@@ -256,21 +257,10 @@ HB_FUNC( GTINFO )
       return;
    }
 
-   /* Is it a query? */
-   if ( pSet == NULL && !ISCHAR(2) )
-   {
-      /* Parameter void * still unused, for future developement. */
-      hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), FALSE, 0, NULL ) ) );
-   }
-   else
-   {
-      /* Parameter void * still unused, for future developement. */
-      char *param = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
-
-      hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ), TRUE,
-                hb_itemGetNI( pSet ), param ) ) );
-   }
-
+   hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ),
+                                  hb_pcount() > 1,
+                                  ISCHAR(2) ? 0 : hb_itemGetNI( pSet ),
+                                  param ) ) );
 }
 
 HB_FUNC( GFXPRIMITIVE )
