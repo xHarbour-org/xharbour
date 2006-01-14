@@ -1,5 +1,5 @@
 /*
- * $Id: gx.c,v 1.20 2005/09/22 01:11:59 druzus Exp $
+ * $Id: gx.c,v 1.21 2006/01/14 18:38:24 paultucker Exp $
  */
 
 /*
@@ -246,8 +246,7 @@ HB_FUNC( GTPROCESSMESSAGES )
 HB_FUNC( GTINFO )
 {
    PHB_ITEM pInfo = hb_param( 1, HB_IT_NUMERIC );
-   PHB_ITEM pSet = hb_param( 2, HB_IT_NUMERIC );
-   char *param = ISCHAR(2) ? hb_parc(2) : hb_parc(3);
+   PHB_ITEM pSet  = hb_param( 2, HB_IT_NUMERIC );
 
    /* Parameter error */
    if ( pInfo == NULL )
@@ -259,8 +258,8 @@ HB_FUNC( GTINFO )
 
    hb_retni( HB_GT_FUNC( gt_info( hb_itemGetNI( pInfo ),
                                   hb_pcount() > 1,
-                                  ISCHAR(2) ? 0 : hb_itemGetNI( pSet ),
-                                  param ) ) );
+                                  hb_itemGetNI( pSet ),
+                                  ISCHAR(2) ? hb_parc(2) : hb_parc(3) ) ) );
 }
 
 HB_FUNC( GFXPRIMITIVE )
