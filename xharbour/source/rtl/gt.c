@@ -1,5 +1,5 @@
 /*
- * $Id: gt.c,v 1.2 2003/05/16 19:52:08 druzus Exp $
+ * $Id: gt.c,v 1.3 2004/09/08 00:17:11 druzus Exp $
  */
 
 /*
@@ -75,4 +75,8 @@ HB_FUNC( HB_GT_VERSION )
    hb_retc( hb_gt_Version( hb_parni( 1 ) ) );
 }
 
+HB_FUNC( HB_GT_INFO )
+{
+   hb_retni( hb_gt_info( hb_parni(1), (BOOL) hb_parl(2), hb_parni(3), hb_parc(4) ) );
+}
 #endif

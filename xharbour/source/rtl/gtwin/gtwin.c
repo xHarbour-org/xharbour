@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.101 2005/12/21 05:15:47 paultucker Exp $
+ * $Id: gtwin.c,v 1.102 2005/12/22 12:23:39 paultucker Exp $
  */
 
 /*
@@ -141,24 +141,12 @@ extern BOOL b_MouseEnable;
 #endif
 
 
-#if defined( _MT ) && defined( HB_MSC_STARTUP ) 
-#define _CONIO_LOCK 8
-HB_EXTERN_BEGIN
-void __cdecl _lock(int);
-void __cdecl _unlock(int);
-HB_EXTERN_END
-#define _mlock(l)               _lock(l)
-#define _munlock(l)             _unlock(l)
-#else
-#define _mlock(l)
-#define _munlock(l)
-#endif
-
 /* *********************************************************************** */
 
 #define MK_SCREEN_UPDATE() HB_GT_FUNC(gt_ScreenUpdate())
 
 static BOOL s_bSpecialKeyHandling;
+static BOOL s_bAltKeyHandling;
 static DWORD s_dwAltGrBits;        /* JC: used to verify ALT+GR on different platforms */
 static BOOL s_bBreak;            /* Used to signal Ctrl+Break to hb_inkeyPoll() */
 static USHORT s_uiDispCount;
@@ -400,9 +388,7 @@ static void HB_GT_FUNC(gt_xSetCursorPos( void ))
 
     s_csbi.dwCursorPosition.Y = s_sCurRow;
     s_csbi.dwCursorPosition.X = s_sCurCol;
-    _mlock(_CONIO_LOCK);
     SetConsoleCursorPosition( s_HOutput, s_csbi.dwCursorPosition );
-    _munlock(_CONIO_LOCK);
 }
 
 /* *********************************************************************** */
@@ -444,9 +430,7 @@ static void HB_GT_FUNC(gt_xSetCursorStyle( void ))
         break;
     }
     s_usOldCurStyle = s_usCursorStyle;
-    _mlock(_CONIO_LOCK);
     SetConsoleCursorInfo( s_HOutput, &cci );
-    _munlock(_CONIO_LOCK);
 }
 
 /* *********************************************************************** */
@@ -455,7 +439,6 @@ static void HB_GT_FUNC(gt_xScreenUpdate( void ))
 {
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xScreenUpdate()"));
 
-    _mlock(_CONIO_LOCK);
     if ( s_pCharInfoScreen != NULL )
     {
         if ( s_uiDispCount == 0 && s_usUpdtTop <= s_usUpdtBottom )
@@ -493,7 +476,6 @@ static void HB_GT_FUNC(gt_xScreenUpdate( void ))
             HB_GT_FUNC(gt_xSetCursorPos());
 
     }
-    _munlock(_CONIO_LOCK);
 }
 
 /* *********************************************************************** */
@@ -561,7 +543,6 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
 
     HB_TRACE(HB_TR_DEBUG, ("hb_gt_xInitScreenParam()"));
 
-    _mlock(_CONIO_LOCK);
     if ( s_pCharInfoScreen != NULL )
         hb_xfree( s_pCharInfoScreen );
 
@@ -582,7 +563,6 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
                            s_csbi.dwSize,      /* size of destination buffer */
                            coDest,             /* upper-left cell to write data to */
                            &s_csbi.srWindow);  /* screen buffer rectangle to read from */
-    _munlock(_CONIO_LOCK);
 }
 
 /* *********************************************************************** */
@@ -616,6 +596,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
     s_uiDispCount = 0;
     s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
     s_bSpecialKeyHandling = FALSE;
+    s_bAltKeyHandling = TRUE;
     s_iRelCount = 0;
 
     /* initialize code page translation */
@@ -1120,7 +1101,6 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
 
-    _mlock(_CONIO_LOCK);
    if( s_HOutput != INVALID_HANDLE_VALUE )
    {
       while( s_uiDispCount )
@@ -1197,7 +1177,6 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       }
    }
 
-   _munlock(_CONIO_LOCK);
    return Ret;
 }
 
@@ -1494,7 +1473,6 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
-   _mlock(_CONIO_LOCK);
    GetConsoleMode( s_HInput, &s_dwimode );
    GetConsoleMode( s_HOutput, &s_dwomode );
    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
@@ -1503,7 +1481,6 @@ BOOL HB_GT_FUNC(gt_Suspend())
    {
       SetConsoleMode( s_HInput, s_dwimode & ~ENABLE_MOUSE_INPUT );
    }
-   _munlock(_CONIO_LOCK);
    return TRUE;
 }
 
@@ -1511,7 +1488,6 @@ BOOL HB_GT_FUNC(gt_Suspend())
 
 BOOL HB_GT_FUNC(gt_Resume())
 {
-   _mlock(_CONIO_LOCK);
    SetConsoleCtrlHandler( NULL, FALSE );
    SetConsoleMode( s_HInput, s_dwimode );
    SetConsoleMode( s_HOutput, s_dwomode );
@@ -1521,7 +1497,6 @@ BOOL HB_GT_FUNC(gt_Resume())
    TODO:
    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
 */
-   _munlock(_CONIO_LOCK);
    return TRUE;
 }
 
@@ -1720,7 +1695,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_ReadKey(%d)", (int) eventmask));
 
-   _mlock(_CONIO_LOCK);
    /* First check for Ctrl+Break, which is handled by gt/gtwin.c */
 
    if( s_bBreak )
@@ -1772,19 +1746,22 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                          altisdown, s_wRepeated, s_cNumRead, s_cNumIndex);
                }
 #endif
-               if( altisdown )
+               if( s_bAltKeyHandling )
                {
-                  Handle_Alt_Key( &altisdown, &altnum, wKey, &ch );
-               }
-               else
-               {
-//                if ( wKey == 0x38 &&
-//                     s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
-                  if ( wKey == 0x38 &&
-                       s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown &&
-                       s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState & ((RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED) & !(LEFT_CTRL_PRESSED) ))
+                  if( altisdown )
                   {
-                     altisdown = 1;
+                     Handle_Alt_Key( &altisdown, &altnum, wKey, &ch );
+                  }
+                  else
+                  {
+//                   if ( wKey == 0x38 &&
+//                        s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+                     if ( wKey == 0x38 &&
+                          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown &&
+                          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState & ((RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED) & !(LEFT_CTRL_PRESSED) ))
+                     {
+                        altisdown = 1;
+                     }
                   }
                }
             }
@@ -2071,7 +2048,6 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    }
 #endif
 
-   _munlock(_CONIO_LOCK);
    return ch;
 }
 
@@ -2572,6 +2548,18 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
          else
          {
             return (int) s_bSpecialKeyHandling;
+         }
+
+      case GTI_KBDALT:
+         if (bUpdate)
+         {
+            iRet = s_bAltKeyHandling;
+            s_bAltKeyHandling = (BOOL) iParam;
+            return iRet;
+         }
+         else
+         {
+            return (int) s_bAltKeyHandling;
          }
 
    }

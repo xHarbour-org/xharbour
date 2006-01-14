@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.14 2005/08/16 19:35:16 lf_sfnet Exp $
+ * $Id: gtinfo.ch,v 1.15 2005/12/19 02:38:25 paultucker Exp $
  */
 
 /*
@@ -70,7 +70,20 @@
 #define GTI_DESKTOPHEIGHT  7  /* Get height of desktop in pixels */
 #define GTI_DESKTOPDEPTH   8  /* Amount of bits used for colors in system */
 #define GTI_KBDSHIFTS     10  /* Keyboard shift/ctrl/alt, caps/num/scroll & winkeys state */
-#define GTI_KBDSPECIAL    11  /* Keyboard special handling (now for Win98 Caps lock issue) */
+#define GTI_KBDSPECIAL    11 /* This will get/set the status of the top row
+                             shift state handling. Enable to correct a
+                             documented keyboard handling bug under Win9x.
+                             Enable if the caps-lock key affects the top
+                             row keys.  (Alternate language keys are not
+                             handled properly by this temporary fix.
+                             Default is disabled.
+                             */
+
+#define GTI_KBDALT        12 /* This will get/set the status of the alt-numpad
+                             key handling.
+                             Default is Enabled.
+                             */
+
 #define GTI_DESKTOPROWS   20  /* Get Size of desktop in character rows */
 #define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
 #define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */

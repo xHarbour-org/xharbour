@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4742 2006/01/12 13:15:55 druzus Exp $
+ * $Id: ChangeLog,v 1.4743 2006/01/12 17:09:53 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-14 12:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+  * bin/bld.bat
+    - gtwinmt.lib - not needed.
+  * contrib/gd/source/gdwrp.c
+    * changed a cast in retclen call
+  * source/rtl/gt.c
+    + GT_INFO( iInfo [, lUpdate [, iParam [, cParam ]]] ) -> iStatus
+  * source/rtl/gtwin/gtwin.c
+    * modified Readkey for following support
+  * include/gtinfo.ch
+    * #define GTI_KBDSPECIAL 11 /* This will get/set the status of the top row
+      shift state handling. Enable to correct a documented keyboard handling bug
+      under Win9x.  Enable if the caps-lock key affects the top row keys.
+      (Alternate language keys are not handled properly by this temporary fix.
+      Default is disabled. */
+
+    + #define GTI_KBDALT     12 /* This will get/set the status of the alt-numpad
+      key handling.  
+      Default is Enabled. */
 
 2006-01-12 18:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/inkey.c

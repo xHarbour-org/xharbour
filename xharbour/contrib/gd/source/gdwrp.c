@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.10 2006/01/08 01:52:10 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.11 2006/01/08 22:29:24 fsgiudice Exp $
  */
 
 /*
@@ -414,7 +414,7 @@ static void GDImageSaveTo( int nType )
       else
       {
          /* Return as string */
-         hb_retclen( (BYTE *) iptr, (ULONG) sz );
+         hb_retclen( (const char *) iptr, (ULONG) sz );
       }
 
       /* Free memory */

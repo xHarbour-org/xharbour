@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.162 2005/12/19 23:10:26 ptsarenko Exp $
+# $Id: makefile.vc,v 1.162 2005/12/19 19:13:50 ptsarenko Exp $
 #
 
 #
@@ -213,7 +213,6 @@ GTNUL_LIB        =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB        =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB        =$(LIB_DIR)\gtstd.lib
 GTWIN_LIB        =$(LIB_DIR)\gtwin.lib
-GTWINMT_LIB      =$(LIB_DIR)\gtwin$(MT).lib
 GTWVT_LIB        =$(LIB_DIR)\gtwvt.lib
 !ifdef HB_GTALLEG
 GTALLEG_LIB      =$(LIB_DIR)\gtalleg.lib
@@ -243,16 +242,11 @@ HB_GT_LIBS = \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
    $(GTALLEG_LIB) \
-   $(GTWVT_LIB) \
-   $(GTWINMT_LIB)
+   $(GTWVT_LIB)
 
 !ifndef HB_GT_LIB
 # don't indent definitions
-!ifdef HB_MT
-HB_GT_LIB = $(GTWINMT_LIB)
-!else
 HB_GT_LIB = $(GTWIN_LIB)
-!endif
 !else
 # don't indent definitions
 HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
@@ -1156,12 +1150,12 @@ GTSTD_LIB_OBJS = \
 # GTWIN.LIB rules
 #
 
-{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+{$(RTL_DIR)\gtwin}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 GTWIN_LIB_OBJS = \
-   $(OBJ_DIR)$(MT)\gtwin.obj \
-   $(OBJ_DIR)$(MT)\mousewin.obj
+   $(OBJ_DIR)\gtwin.obj \
+   $(OBJ_DIR)\mousewin.obj
 
 #
 # GTWVT.LIB rules
@@ -1684,9 +1678,6 @@ $(TIPMT_LIB) : $(TIP_LIB_OBJS)
    lib /out:$@ $**
 
 $(CTMT_LIB) : $(CT_LIB_OBJS)
-   lib /out:$@ $**
-
-$(GTWINMT_LIB) : $(GTWIN_LIB_OBJS)
    lib /out:$@ $**
 
 !else
