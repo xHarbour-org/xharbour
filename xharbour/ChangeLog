@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4747 2006/01/15 03:36:44 lculik Exp $
+ * $Id: ChangeLog,v 1.4748 2006/01/15 20:25:37 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2006-01-15 20:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/codepage/cppt850.c
+    + added ASCII 166 and 167 chars to portuguese codepage table.
+  * source/codepage/cpptiso.c
+    + added ANSI 170 and 176 chars to portuguese codepage table.
+
 2006-01-16 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     * Change HB_FUNC_STATIC( LOADBITMAPFILE ) to work with
