@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.18 2005/10/25 20:23:50 peterrees Exp $
+ * $Id: win32prn.prg,v 1.19 2005/12/20 01:50:17 peterrees Exp $
  */
 
 /*
@@ -1009,7 +1009,7 @@ HB_FUNC_STATIC( LOADBITMAPFILE )
       if (pbmfh)
       {
         bSuccess = ReadFile (hFile, pbmfh, dwFileSize, &dwBytesRead, NULL) ;
-        bSuccess = bSuccess && (dwBytesRead == dwFileSize) && (pbmfh->bfType == * (WORD *) "BM") && (pbmfh->bfSize == dwFileSize) ;
+        bSuccess = bSuccess && (dwBytesRead == dwFileSize) && (pbmfh->bfType == * (WORD *) "BM") ; //&& (pbmfh->bfSize == dwFileSize) ;
       }
     }
     CloseHandle (hFile) ;

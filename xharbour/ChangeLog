@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4746 2006/01/14 23:07:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4747 2006/01/15 03:36:44 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,11 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2006-01-16 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    * Change HB_FUNC_STATIC( LOADBITMAPFILE ) to work with
+      bitmaps created by freeimage as requested by Luiz
 
 2006-01-15 01:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
-  * source/rtl/dbsdf.prg 
+  * source/rtl/dbsdf.prg
   * fixes problem reporte by Bradley Bell when using append from file for condition SDF
-    
+
 2006-01-14 15:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly
     * LineStat value for #line directive changed to 0 (no coding impact)
