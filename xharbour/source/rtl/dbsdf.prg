@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.11 2005/11/06 13:53:39 ptsarenko Exp $
+ * $Id: dbsdf.prg,v 1.11 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -214,23 +214,31 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest,
                      FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   Endif
                   IF lLineEnd
+                     IF !Eval( bFor )
+                        DbDelete()
+                     ENDIF
                      EXIT
                   ENDIF
                NEXT index
+
             ELSE
                // Process the specified fields.
                FOR EACH cField IN aFields
                   if ! FieldType( index := FieldPos( cField ) ) == "M"
                      FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   endif
+
                   IF lLineEnd
+                     IF !Eval( bFor )
+                        DbDelete()
+                     ENDIF
                      EXIT
                   ENDIF
                NEXT
             ENDIF
 
          ENDDO
-
+         Pack
          FClose( handle )
 
       ENDIF

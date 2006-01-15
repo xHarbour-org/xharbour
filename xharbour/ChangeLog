@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4745 2006/01/14 18:35:43 paultucker Exp $
+ * $Id: ChangeLog,v 1.4746 2006/01/14 23:07:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-01-15 01:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/dbsdf.prg 
+  * fixes problem reporte by Bradley Bell when using append from file for condition SDF
+    
 2006-01-14 15:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.sly
     * LineStat value for #line directive changed to 0 (no coding impact)
