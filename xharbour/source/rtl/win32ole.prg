@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.110 2006/01/08 20:37:54 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.111 2006/01/14 23:10:47 ronpinkas Exp $
  */
 
 /*
@@ -683,7 +683,6 @@ RETURN Self
   static BSTR bstrMessage;
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
-  static DISPID ValueID = DISPID_VALUE;
 
   HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
 
@@ -1261,8 +1260,9 @@ RETURN Self
            // Intentionally fall through
 
         case VT_DISPATCH:
+        case VT_DISPATCH | VT_BYREF:
 
-           if( pVariant->n1.n2.vt == VT_DISPATCH )
+           if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
            {
               pDispatch = pVariant->n1.n2.n3.pdispVal;
            }
@@ -1304,7 +1304,7 @@ RETURN Self
               //printf( "Dispatch: %ld %ld\n", ( LONG ) pDispatch, (LONG) hb_stackReturnItem()->item.asArray.value );
 
               // If retrieved from IUnknown than allready added!
-              if( pVariant->n1.n2.vt == VT_DISPATCH )
+              if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
               {
                  pDispatch->lpVtbl->AddRef( pDispatch );
               }
@@ -1568,7 +1568,7 @@ RETURN Self
 
      SysFreeString( bstrClassID );
 
-     //TraceLog( NULL, "Result: %i\n", s_nOleError );
+     //TraceLog( NULL, "Result: %p\n", s_nOleError );
 
      if( hb_pcount() == 2 )
      {
@@ -1590,7 +1590,7 @@ RETURN Self
      {
         //TraceLog( NULL, "Class: %i\n", ClassID );
         s_nOleError = CoCreateInstance( (REFCLSID) &ClassID, NULL, CLSCTX_SERVER, (REFIID) riid, &pDisp );
-        //TraceLog( NULL, "Result: %i\n", s_nOleError );
+        //TraceLog( NULL, "Result: %p\n", s_nOleError );
      }
 
      hb_retnl( ( LONG ) pDisp );
@@ -1664,6 +1664,8 @@ RETURN Self
   {
      IDispatch *pDisp = ( IDispatch * ) hb_parnl( 1 );
 
+     //TraceLog( NULL, "OleReleaseObject( %p )\n", pDisp );
+
      s_nOleError = pDisp->lpVtbl->Release( pDisp );
   }
 
@@ -1678,7 +1680,7 @@ RETURN Self
         s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                              DispID,
                                              (REFIID) &IID_NULL,
-                                             LOCALE_USER_DEFAULT,
+                                             LOCALE_SYSTEM_DEFAULT,
                                              DISPATCH_PROPERTYPUTREF,
                                              pDispParams,
                                              NULL,    // No return value
@@ -1696,7 +1698,7 @@ RETURN Self
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
+                                          LOCALE_SYSTEM_DEFAULT,
                                           DISPATCH_PROPERTYPUT,
                                           pDispParams,
                                           NULL,    // No return value
@@ -1714,7 +1716,7 @@ RETURN Self
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
+                                          LOCALE_SYSTEM_DEFAULT,
                                           DISPATCH_METHOD,
                                           pDispParams,
                                           &RetVal,
@@ -1732,7 +1734,7 @@ RETURN Self
      s_nOleError = pDisp->lpVtbl->Invoke( pDisp,
                                           DispID,
                                           (REFIID) &IID_NULL,
-                                          LOCALE_USER_DEFAULT,
+                                          LOCALE_SYSTEM_DEFAULT,
                                           DISPATCH_PROPERTYGET,
                                           pDispParams,
                                           &RetVal,
@@ -1747,23 +1749,14 @@ RETURN Self
   {
      VariantClear( &RetVal );
 
-     if( SUCCEEDED( OleInvoke( pDisp, ValueID, &s_EmptyDispParams ) ) && RetVal.n1.n2.vt == VT_DISPATCH )
+     // Try to apply the requested message to the DEFAULT Property of the object if any.
+     if( SUCCEEDED( OleGetProperty( pDisp, DISPID_VALUE, &s_EmptyDispParams ) ) &&
+         ( RetVal.n1.n2.vt == VT_DISPATCH || RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) ) )
      {
         VariantCopy( &OleVal, &RetVal );
         VariantClear( &RetVal );
 
         return s_nOleError;
-     }
-     else
-     {
-        // Try to apply the requested message to the DEFAULT Property of the object if any.
-        if( SUCCEEDED( OleGetProperty( pDisp, ValueID, &s_EmptyDispParams ) ) && RetVal.n1.n2.vt == VT_DISPATCH )
-        {
-           VariantCopy( &OleVal, &RetVal );
-           VariantClear( &RetVal );
-
-           return s_nOleError;
-        }
      }
 
      return E_FAIL;
@@ -1822,7 +1815,8 @@ RETURN Self
 
         VariantClear( &RetVal );
 
-        OleGetProperty( pDisp, ValueID, &s_EmptyDispParams );
+        OleGetProperty( pDisp, DISPID_VALUE, &s_EmptyDispParams );
+        //TraceLog( NULL, "GetDefault: %p\n", s_nOleError );
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -1856,7 +1850,8 @@ RETURN Self
         DispParams.rgdispidNamedArgs = &lPropPut;
         DispParams.cNamedArgs = 1;
 
-        OleSetProperty( pDisp, ValueID, &DispParams );
+        OleSetProperty( pDisp, DISPID_VALUE, &DispParams );
+        //TraceLog( NULL, "SetDefault: %p\n", s_nOleError );
 
         FreeParams( &DispParams );
 
@@ -1893,7 +1888,7 @@ RETURN Self
         {
            s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
         }
-        else if( RetVal.n1.n2.vt == VT_DISPATCH )
+        else if( RetVal.n1.n2.vt == VT_DISPATCH || RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
         {
            s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, &IID_IEnumVARIANT, &pEnumVariant );
         }
@@ -1940,15 +1935,15 @@ RETURN Self
      /*
      if( strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "OLEVALUE" ) == 0 || strcmp( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, "_OLEVALUE" ) == 0 )
      {
-        DispID = ValueID;
+        DispID = DISPID_VALUE;
         s_nOleError = S_OK;
      }
      else*/ if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
         bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
-        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_USER_DEFAULT, &DispID );
+        s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, &DispID );
         SysFreeString( bstrMessage );
-        //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
+        //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %p\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -1966,7 +1961,7 @@ RETURN Self
         bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, 0, &DispID );
         SysFreeString( bstrMessage );
-        //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
+        //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %p\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
      }
 
      if( SUCCEEDED( s_nOleError ) )
@@ -2009,7 +2004,7 @@ RETURN Self
         if( FAILED( s_nOleError ) /* && hb_pcount() == 0 */ )
         {
            OleGetProperty( pDisp, DispID, &DispParams );
-           //TraceLog( NULL, "OleGetProperty %i\n", s_nOleError );
+           //TraceLog( NULL, "OleGetProperty(%i) %i\n", DispParams.cArgs, s_nOleError );
 
            if( SUCCEEDED( s_nOleError ) )
            {
@@ -2073,6 +2068,7 @@ RETURN Self
         // Try to apply the requested message to the DEFAULT Method of the object if any.
         if( SUCCEEDED( ( s_nOleError = OleGetValue( pDisp ) ) ) )
         {
+           //TraceLog( NULL, "Try using DISPID_VALUE\n" );
            pDisp = OleVal.n1.n2.n3.pdispVal;
            goto OleGetID;
         }

@@ -2,7 +2,7 @@
 
 #define CRLF Chr( 13 ) + Chr( 10 )
 
-// EXplicit usage of OLE DEFAULT Method when syntax implies it!!!
+// Explicit usage of OLE DEFAULT Method when syntax implies it!!!
 #xtranslate :<!Method!>( <args,...> ) := => :<Method>( <args> ):OleValue :=
 
 PROCEDURE MAIN()
@@ -158,7 +158,7 @@ STATIC PROCEDURE OUTLOOK()
 
    oList := oOL:CreateItem( 7 )  // olDistributionListItem
    oList:DLName := "Distribution List"
-   oList:Display(.T.)
+   oList:Display(.F.)
 
 RETURN
 
