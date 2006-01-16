@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.111 2006/01/14 23:10:47 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.112 2006/01/16 03:40:35 ronpinkas Exp $
  */
 
 /*
@@ -646,7 +646,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
             IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
             ULONG *pcElementFetched = NULL;
 
-            if( SUCCEEDED( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) ) )
+            if( pEnumVariant->lpVtbl->Next( pEnumVariant, 1, &RetVal, pcElementFetched ) == S_OK )
             {
                RetValue();
             }
@@ -1741,6 +1741,8 @@ RETURN Self
                                           &excep,
                                           &uArgErr );
 
+     //TraceLog( NULL, "OleGetValue: %p\n", s_nOleError );
+
      return s_nOleError;
   }
 
@@ -1880,7 +1882,8 @@ RETURN Self
 
      VariantClear( &RetVal );
 
-     if( SUCCEEDED( ( s_nOleError = OleGetProperty( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) ) ) )
+     if( SUCCEEDED( OleGetProperty( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) ) ||
+         SUCCEEDED( OleInvoke( pDisp, DISPID_NEWENUM, &s_EmptyDispParams ) ) )
      {
         LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
@@ -1910,6 +1913,7 @@ RETURN Self
      }
      else
      {
+        TraceLog( NULL, "OOps! %p\n", s_nOleError );
         OleThrowError();
      }
   }
