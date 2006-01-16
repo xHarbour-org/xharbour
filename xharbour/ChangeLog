@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4749 2006/01/15 22:54:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.4750 2006/01/16 03:38:24 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2006-01-16 18:41 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * include/hbver.h
+  * xharbour.spec
+  * bin/pack_bin.bat
+  * bin/pack_src.bat
+    * Prepared for 0.99.60
 
 2006-01-15 19:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
