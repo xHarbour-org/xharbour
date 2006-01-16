@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.112 2006/01/16 03:40:35 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.113 2006/01/16 20:46:57 ronpinkas Exp $
  */
 
 /*
@@ -684,10 +684,10 @@ RETURN Self
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
 
-  HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
+  HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT BSTR AnsiToSysString( LPSTR cString )
+  HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -709,7 +709,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPWSTR AnsiToWide( LPSTR cString )
+  HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
   {
      int nConvertedLen = MultiByteToWideChar( CP_ACP, MB_PRECOMPOSED, cString, -1, NULL, 0 );
 
@@ -737,7 +737,7 @@ RETURN Self
 
      if( cString )
      {
-        BSTR wString = AnsiToWide( cString );
+        BSTR wString = hb_oleAnsiToWide( cString );
 
         if( wString )
         {
@@ -751,7 +751,7 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_EXPORT LPSTR WideToAnsi( BSTR wString )
+  HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
   {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
 
@@ -782,7 +782,7 @@ RETURN Self
 
      if( wString )
      {
-        char *cString = WideToAnsi( wString );
+        char *cString = hb_oleWideToAnsi( wString );
 
         if( cString )
         {
@@ -843,7 +843,7 @@ RETURN Self
               case HB_IT_MEMO:
                 if( bByRef )
                 {
-                   hb_itemPutCRawStatic( uParam, (char *) AnsiToSysString( hb_parc( nArg ) ), uParam->item.asString.length * 2 + 1 );
+                   hb_itemPutCRawStatic( uParam, (char *) hb_oleAnsiToSysString( hb_parc( nArg ) ), uParam->item.asString.length * 2 + 1 );
 
                    pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
                    pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
@@ -852,7 +852,7 @@ RETURN Self
                 else
                 {
                    pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   pArgs[ n ].n1.n2.n3.bstrVal = AnsiToSysString( hb_parc( nArg ) );
+                   pArgs[ n ].n1.n2.n3.bstrVal = hb_oleAnsiToSysString( hb_parc( nArg ) );
                    //wprintf( L"*** >%s<\n", pArgs[ n ].n1.n2.n3.bstrVal );
                 }
                 break;
@@ -1042,7 +1042,7 @@ RETURN Self
               {
                  case VT_BYREF | VT_BSTR:
                    //printf( "String\n" );
-                   sString = WideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
+                   sString = hb_oleWideToAnsi( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
                    SysFreeString( *( pDispParams->rgvarg[ n ].n1.n2.n3.pbstrVal ) );
 
@@ -1158,7 +1158,7 @@ RETURN Self
      }
   }
 
-  PHB_ITEM SafeArrayToArray( VARIANT *psa, UINT iDim, long* rgIndices )
+  static PHB_ITEM SafeArrayToArray( VARIANT *psa, UINT iDim, long* rgIndices )
   {
      long iFrom, iTo, i;
      PHB_ITEM pArray;
@@ -1207,7 +1207,7 @@ RETURN Self
            if( SUCCEEDED( SafeArrayGetElement( psa->n1.n2.n3.parray, rgIndices, &mElem ) ) )
           #endif
            {
-              VariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
+              hb_oleVariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
 
               VariantClear( &mElem );
               //printf( "   Type: %i\n", ( pArray->item.asArray.value->pItems + ( i - iFrom ) )->type );
@@ -1220,7 +1220,7 @@ RETURN Self
      return pArray;
   }
 
-  HRESULT VariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
+  HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
   {
      PHB_ITEM pOleAuto;
      IDispatch *pDispatch = NULL;
@@ -1235,9 +1235,19 @@ RETURN Self
 
      switch( pVariant->n1.n2.vt )
      {
+        case VT_BSTR | VT_BYREF:
         case VT_BSTR:
         {
-           char *sString = WideToAnsi( pVariant->n1.n2.n3.bstrVal );
+           char *sString;
+
+           if( pVariant->n1.n2.vt & VT_BYREF )
+           {
+              sString = hb_oleWideToAnsi( *pVariant->n1.n2.n3.pbstrVal );
+           }
+           else
+           {
+              sString = hb_oleWideToAnsi( pVariant->n1.n2.n3.bstrVal );
+           }
 
            if( sString )
            {
@@ -1251,10 +1261,19 @@ RETURN Self
            break;
         }
 
+        case VT_BOOL | VT_BYREF:
         case VT_BOOL:
-           hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_TRUE ? TRUE : FALSE );
+           if( pVariant->n1.n2.vt & VT_BYREF )
+           {
+              hb_itemPutL( pItem, *pVariant->n1.n2.n3.pboolVal == VARIANT_TRUE ? TRUE : FALSE );
+           }
+           else
+           {
+              hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_TRUE ? TRUE : FALSE );
+           }
            break;
 
+        case VT_UNKNOWN | VT_BYREF:
         case VT_UNKNOWN:
            pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDispatch );
            // Intentionally fall through
@@ -1364,7 +1383,7 @@ RETURN Self
 
         /*
         case VT_VARIANT:
-           VariantToItem( pItem, pVariant->n1.n2.n3.pvarVal );
+           hb_oleVariantToItem( pItem, pVariant->n1.n2.n3.pvarVal );
            break;
         */
 
@@ -1383,7 +1402,7 @@ RETURN Self
         }
 
         default:
-          TraceLog( NULL, "Unexpected type %i!\n", pVariant->n1.n2.vt );
+          TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
           return E_FAIL;
      }
 
@@ -1395,7 +1414,7 @@ RETURN Self
   //---------------------------------------------------------------------------//
   static void RetValue( void )
   {
-     VariantToItem( hb_stackReturnItem(), &RetVal );
+     hb_oleVariantToItem( hb_stackReturnItem(), &RetVal );
 
      VariantClear( &RetVal );
 
@@ -1409,8 +1428,8 @@ RETURN Self
      {
         LPSTR source, description;
 
-        source = WideToAnsi( excep.bstrSource );
-        description = WideToAnsi( excep.bstrDescription );
+        source = hb_oleWideToAnsi( excep.bstrSource );
+        description = hb_oleWideToAnsi( excep.bstrDescription );
 
         MessageBox( NULL, description, source, MB_ICONHAND );
 
@@ -1426,7 +1445,7 @@ RETURN Self
      {
         LPSTR source;
 
-        source = WideToAnsi( excep.bstrSource );
+        source = hb_oleWideToAnsi( excep.bstrSource );
         hb_retcAdopt( source );
      }
   }
@@ -1438,7 +1457,7 @@ RETURN Self
      {
         LPSTR description;
 
-        description = WideToAnsi( excep.bstrDescription );
+        description = hb_oleWideToAnsi( excep.bstrDescription );
         hb_retcAdopt( description );
      }
   }
@@ -1555,7 +1574,7 @@ RETURN Self
       * used intentionally to inform compiler that there is no
       * strict-aliasing
       */
-     bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
+     bstrClassID = hb_oleAnsiToSysString( hb_parcx( 1 ) );
 
      if( hb_parcx( 1 )[ 0 ] == '{' )
      {
@@ -1574,7 +1593,7 @@ RETURN Self
      {
         if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
+           bstrClassID = hb_oleAnsiToSysString( hb_parcx( 2 ) );
            s_nOleError = CLSIDFromString( bstrClassID, &iid );
            SysFreeString( bstrClassID );
         }
@@ -1609,7 +1628,7 @@ RETURN Self
       * strict-aliasing
       */
 
-     bstrClassID = AnsiToSysString( hb_parcx( 1 ) );
+     bstrClassID = hb_oleAnsiToSysString( hb_parcx( 1 ) );
 
      if( hb_parcx( 1 )[ 0 ] == '{' )
      {
@@ -1629,7 +1648,7 @@ RETURN Self
      {
         if( hb_parcx( 2 )[ 0 ] == '{' )
         {
-           bstrClassID = AnsiToSysString( hb_parcx( 2 ) );
+           bstrClassID = hb_oleAnsiToSysString( hb_parcx( 2 ) );
            s_nOleError = CLSIDFromString( bstrClassID, &iid );
            SysFreeString( bstrClassID );
         }
@@ -1777,7 +1796,7 @@ RETURN Self
      if( s_nOleError == DISP_E_EXCEPTION )
      {
         // Intentional to avoid report of memory leak if fatal error.
-        char *sTemp = WideToAnsi( excep.bstrDescription );
+        char *sTemp = hb_oleWideToAnsi( excep.bstrDescription );
         sDescription = (char *) malloc( strlen( sTemp ) + 1 );
         strcpy( sDescription, sTemp );
         hb_xfree( sTemp );
@@ -1944,7 +1963,7 @@ RETURN Self
      }
      else*/ if( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[0] == '_' && ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName[1] && hb_pcount() >= 1 )
      {
-        bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
+        bstrMessage = hb_oleAnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1 );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, LOCALE_SYSTEM_DEFAULT, &DispID );
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "1. ID of: '%s' -> %i Result: %p\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName + 1, DispID, s_nOleError );
@@ -1962,7 +1981,7 @@ RETURN Self
      if( FAILED( s_nOleError ) )
      {
         // Try again without removing the assign prefix (_).
-        bstrMessage = AnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+        bstrMessage = hb_oleAnsiToSysString( ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
         s_nOleError = pDisp->lpVtbl->GetIDsOfNames( pDisp, (REFIID) &IID_NULL, (wchar_t **) &bstrMessage, 1, 0, &DispID );
         SysFreeString( bstrMessage );
         //TraceLog( NULL, "2. ID of: '%s' -> %i Result: %p\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, DispID, s_nOleError );
