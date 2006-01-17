@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.87 2006/01/12 13:15:58 druzus Exp $
+# $Id: xharbour.spec,v 1.88 2006/01/16 17:44:39 enricomaria Exp $
 #
 
 # ---------------------------------------------------------------
@@ -287,6 +287,9 @@ rm -rf $RPM_BUILD_ROOT
 
 %build
 %{hb_env}
+case "`uname -m`" in
+    *[_@]64)    export C_USR="$C_USR -fPIC" ;;
+esac
 
 make -r
 
@@ -306,6 +309,9 @@ done
 # Install harbour itself.
 
 %{hb_env}
+case "`uname -m`" in
+    *[_@]64)    export C_USR="$C_USR -fPIC" ;;
+esac
 
 export _DEFAULT_BIN_DIR=$HB_BIN_INSTALL
 export _DEFAULT_INC_DIR=$HB_INC_INSTALL

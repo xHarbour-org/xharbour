@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.48 2005/09/25 16:14:20 druzus Exp $
+# $Id: make_tgz.sh,v 1.49 2005/10/13 12:49:35 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -79,6 +79,20 @@ HB_LIBDIRNAME="lib"
 
 ETC="/etc"
 
+HB_ARCH64=""
+if [ "$HB_ARCHITECTURE" = "linux" ]
+then
+    HB_CPU=`uname -m`
+    case "$HB_CPU" in
+        *[_@]64)
+            export C_USR="$C_USR -fPIC"
+            HB_ARCH64="yes"
+            ;;
+        *)
+            ;;
+    esac
+fi
+
 # Select the platform-specific installation prefix and ownership
 HB_INSTALL_OWNER=root
 case "$HB_ARCHITECTURE" in
@@ -89,7 +103,7 @@ case "$HB_ARCHITECTURE" in
 	;;
     linux)
         [ -z "$HB_INSTALL_PREFIX" ] && HB_INSTALL_PREFIX="/usr"
-        [ -d "$HB_INSTALL_PREFIX/lib64" ] && HB_LIBDIRNAME="lib64"
+        [ -d "$HB_INSTALL_PREFIX/lib64" ] && [ "${HB_ARCH64}" = yes ] && HB_LIBDIRNAME="lib64"
         HB_INSTALL_GROUP=root
         ;;
     w32)
