@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.543 2005/12/13 19:14:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.544 2005/12/23 10:47:54 druzus Exp $
  */
 
 /*
@@ -4645,9 +4645,16 @@ static void hb_vmEqual( BOOL bExact )
       hb_stackPop();
       hb_vmPushLogical( bResult );
    }
+   else if( bExact && HB_IS_BLOCK( pItem1 ) && HB_IS_BLOCK( pItem2 ) )
+   {
+      BOOL bResult = pItem1->item.asBlock.value == pItem2->item.asBlock.value;
+      hb_stackPop();
+      hb_stackPop();
+      hb_vmPushLogical( bResult );
+   }
    else if( pItem1->type != pItem2->type ||
             ( HB_IS_BLOCK( pItem1 ) && HB_IS_BLOCK( pItem2 ) ) ||
-            ( ! bExact && HB_IS_ARRAY( pItem1 ) && HB_IS_ARRAY( pItem2 ) ) )
+            ( HB_IS_ARRAY( pItem1 ) && HB_IS_ARRAY( pItem2 ) ) )
    {
       PHB_ITEM pResult;
 

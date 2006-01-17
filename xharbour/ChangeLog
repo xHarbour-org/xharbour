@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4753 2006/01/16 22:45:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4754 2006/01/17 00:45:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-16 17:03 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/vm/hvc.c
+    + Added support for block equality with ==
+  + test/tstequal.prg
+    + sample testing equality of Array, Block, Hash, and Pointer types.
 
 2006-01-16 16:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/errorsys.prg
