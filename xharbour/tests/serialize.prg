@@ -40,7 +40,6 @@ PROCEDURE MAIN()
    cTmp += HB_Serialize( CtoD( "2/2/2001" ) )
    cTmp += HB_Serialize( { 1, 2, { "a", "b" }, 3 } )
    cTmp += HB_Serialize( 2100010101 )
-   altd()
    cTmp += HB_Serialize( {'a'=>'1', 'b'=> 2, 10 =>{1,2},  'z' =>{1=>2, 0=>3}  } )
    cTmp += HB_Serialize( SomeClass():New("A parameter") )
    cTmp += HB_Serialize( "Last String, closing test" )
@@ -48,7 +47,7 @@ PROCEDURE MAIN()
    /* now we deserialize */
    cSerial := HB_DeserialBegin( cTmp )
 
-   xVal := HB_DeserialNext( cSerial )
+   xVal := HB_DeserialNext( @cSerial )
 
    ?
    DO WHILE xVal != NIL
@@ -69,7 +68,7 @@ PROCEDURE MAIN()
             ? "*("+ValType(xVal)+"):", xVal
       END
 
-      xVal := HB_DeserialNext( cSerial )
+      xVal := HB_DeserialNext( @cSerial )
    ENDDO
 
    ? "Done. Press any key to terminate."
@@ -104,7 +103,7 @@ CLASS SomeClass
 
    DATA cData PERSISTENT
 
-   METHOD New( cDt )
+   METHOD New( cDt ) CONSTRUCTOR
 
    METHOD SomeMethod()
 
@@ -114,10 +113,10 @@ METHOD SomeMethod() CLASS SomeClass
 
    ? ProcName() + '[' + LTrim( Str( ProcLine() ) ) + ']', ::cData
 
-RETURN .t.
+RETURN .T.
 
 METHOD New( cData ) CLASS SomeClass
 
    ::cData := cData
 
-RETURN self
+RETURN Self
