@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.3 2005/02/12 16:11:53 jonnymind Exp $
+* $Id: tiptest.prg,v 1.4 2005/02/22 11:06:48 jonnymind Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -76,6 +76,8 @@ PROCEDURE MAIN( cUrl, cFile )
       @4,5 SAY "Invalid url " + cUrl
       Terminate()
    ENDIF
+
+   oUrl:cUserid := STRTRAN(oUrl:cUserid, "&at;", "@") 
 
    @4,5 SAY "Connecting to " + oUrl:cProto + "://" + oUrl:cServer
    IF oClient:Open( oUrl )
