@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.113 2006/01/16 20:46:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.114 2006/01/16 22:45:48 ronpinkas Exp $
  */
 
 /*
@@ -1275,7 +1275,10 @@ RETURN Self
 
         case VT_UNKNOWN | VT_BYREF:
         case VT_UNKNOWN:
-           pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDispatch );
+           if( pVariant->n1.n2.n3.punkVal )
+           {
+              pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDispatch );
+           }
            // Intentionally fall through
 
         case VT_DISPATCH:
