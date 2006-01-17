@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.66 2005/10/30 16:32:01 likewolf Exp $
+ * $Id: debugger.prg,v 1.67 2005/11/01 18:30:19 likewolf Exp $
  */
 
 /*
@@ -402,7 +402,7 @@ METHOD Activate() CLASS TDebugger
   ELSE
     ::SaveAppScreen()
   ENDIF
-  ::loadVars()
+  ::LoadVars()
   ::ShowVars()
   IF( ::oWndPnt != NIL )
     ::WatchpointsShow()
@@ -1606,9 +1606,7 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       nCount := __mvDbgInfo( HB_MV_PUBLIC )
       for n := nCount to 1 step -1
          xValue := __mvDbgInfo( HB_MV_PUBLIC, n, @cName )
-         //if cName != "__DBGSTATICS"  // reserved public used by the debugger
-            AAdd( aBVars, { cName, xValue, "Public" } )
-         //endif
+         AAdd( aBVars, { cName, xValue, "Public" } )
       next
    endif
 
@@ -1616,7 +1614,9 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       nCount := __mvDbgInfo( HB_MV_PRIVATE )
       for n := nCount to 1 step -1
          xValue := __mvDbgInfo( HB_MV_PRIVATE, n, @cName )
-         AAdd( aBVars, { cName, xValue, "Private" } )
+         IF cName != "?"  /* Check if this memvar has been released */
+            AAdd( aBVars, { cName, xValue, "Private" } )
+         ENDIF
       next
    endif
 
