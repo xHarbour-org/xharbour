@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.30 2006/01/12 13:16:10 druzus Exp $
+ * $Id: dynsym.c,v 1.31 2006/01/14 23:10:47 ronpinkas Exp $
  */
 
 /*
@@ -716,28 +716,6 @@ void HB_EXPORT hb_dynsymRelease( void )
 }
 
 
-PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction( PHB_FUNC pFunc )
-{
-   USHORT uiPos;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFindFromFunction(%p)", pFunc ));
-
-   hb_dynsymLock();
-
-   for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
-   {
-      if( s_pDynItems[ uiPos ].pDynSym->pSymbol->value.pFunPtr == pFunc )
-      {
-         hb_dynsymUnlock();
-         return s_pDynItems[ uiPos ].pDynSym;
-      }
-   }
-
-   hb_dynsymUnlock();
-
-   return NULL;
-}
-
 // NOT TESTED YET!!!
 PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 {
@@ -953,24 +931,6 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName_r( char * szName, PHB_DYNS pDest )
    hb_dynsymLock();
 
    pRet = hb_dynsymFindName( szName );
-   if ( pRet )
-   {
-      memcpy( pDest, pRet, sizeof( HB_DYNS ) );
-      hb_dynsymUnlock();
-      return pDest;
-   }
-
-   hb_dynsymUnlock();
-   return NULL;
-}
-
-PHB_DYNS HB_EXPORT hb_dynsymFindFromFunction_r( PHB_FUNC pFunc, PHB_DYNS pDest )
-{
-   PHB_DYNS pRet;
-
-   hb_dynsymLock();
-
-   pRet = hb_dynsymFindFromFunction( pFunc );
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );

@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.49 2005/10/24 01:04:35 druzus Exp $
+ * $Id: errorsys.prg,v 1.50 2005/10/31 07:46:20 ronpinkas Exp $
  */
 
 /*
@@ -523,17 +523,11 @@ RETURN cArguments
 
 #include <windows.h>
 
-static PHB_FUNC s_xHbFunc;
+static PHB_SYMB s_xHbFunc = NULL;
 
 LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
 {
-   PHB_DYNS pExecSym;
-
-   hb_dynsymLock();
-   pExecSym = hb_dynsymFindFromFunction( s_xHbFunc );
-   hb_dynsymUnlock();
-
-   if( pExecSym )
+   if( s_xHbFunc )
    {
       HB_ITEM Exception;
       PHB_DYNS pDyn = hb_dynsymFind( "HB_CSTRUCTURE" );
@@ -566,7 +560,7 @@ LONG WINAPI PRGUnhandledExceptionFilter( EXCEPTION_POINTERS *ExceptionInfo )
          }
       }
 
-      hb_vmPushSymbol( pExecSym->pSymbol );
+      hb_vmPushSymbol( s_xHbFunc );
       hb_vmPushNil();
       hb_itemPushForward( &Exception );
       hb_vmDo( 1 );
@@ -586,7 +580,7 @@ HB_FUNC( SETUNHANDLEDEXCEPTIONFILTER )
 {
    LPTOP_LEVEL_EXCEPTION_FILTER pDefaultHandler;
 
-   s_xHbFunc = (PHB_FUNC) hb_parptr( 1 );
+   s_xHbFunc = (PHB_SYMB) hb_parptr( 1 );
 
    pDefaultHandler = SetUnhandledExceptionFilter( PRGUnhandledExceptionFilter );
    //TraceLog( NULL, "Default: %p\n", pDefaultHandler );
