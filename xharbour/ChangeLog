@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4755 2006/01/17 01:05:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4756 2006/01/17 02:14:48 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-15 01:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/dbsdf.prg
+    * fixes problem reporte by Bradley Bell (now properly setting end of import line)
+  * source/tip/client.prg
+    ! Added Support to Calling ExGauge From ReadToFile() method, as suggested by Juan Galvez
+      on xharbour news
+  * tests/tiptest/tiptest.prg
+    ! minor change  to automaticaly convert &at; to @ on usernames
 
 2006-01-17 03:10 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/make_gnu.sh

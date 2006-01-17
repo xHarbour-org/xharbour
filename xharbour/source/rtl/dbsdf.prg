@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.11 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dbsdf.prg,v 1.12 2006/01/15 03:37:18 lculik Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest,
                   if ! FieldType( index ) == "M"
                      FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   Endif
-                  IF lLineEnd
+                  IF lLineEnd .or. index == FCount()
                      IF !Eval( bFor )
                         DbDelete()
                      ENDIF
@@ -228,8 +228,8 @@ PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest,
                      FieldPut( index, ImportFixed( @cLine, index, @lLineEnd ) )
                   endif
 
-                  IF lLineEnd
-                     IF !Eval( bFor )
+                  IF lLineEnd .or. ( hb_enumIndex() == LEN( aFields ) )
+                     IF !Eval( bFor ) 
                         DbDelete()
                      ENDIF
                      EXIT

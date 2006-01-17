@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.9 2005/11/23 12:19:06 mauriliolongo Exp $
+ * $Id: client.prg,v 1.10 2005/11/24 14:35:12 mauriliolongo Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ CLASS tIPClient
    METHOD Open()
 
    METHOD Read( iLen )
-   METHOD ReadToFile( cFile, nMode )
+   METHOD ReadToFile( cFile, nMode, nSize )
    METHOD Write( cData, iLen, bCommit )
    METHOD Commit()
    METHOD WriteFromFile( cFile )
@@ -263,12 +263,19 @@ RETURN cStr0
 
 
 
-METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
+METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    LOCAL nFout
    LOCAL cData
+   LOCAL nSent 
 
    IF Empty ( nMode )
       nMode := FO_CREAT
+   ENDIF
+
+   nSent := 0
+
+   IF !Empty( ::exGauge )
+      HB_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
    ENDIF
 
    ::nStatus := 1
@@ -296,6 +303,12 @@ METHOD ReadToFile( cFile, nMode ) CLASS tIPClient
          Fclose( nFout )
          RETURN .F.
       ENDIF
+
+      nSent += Len( cData )
+      IF !Empty( ::exGauge )
+         HB_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
+      ENDIF
+
    ENDDO
 
    ::nStatus := 2
