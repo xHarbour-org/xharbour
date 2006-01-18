@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.39 2005/10/31 12:56:35 druzus Exp $
+ * $Id: hbcomp.h,v 1.40 2005/11/12 18:47:27 druzus Exp $
  */
 
 /*
@@ -408,6 +408,7 @@ extern void hb_compGenStaticName( char * );
 /* Global variables */
 extern void hb_compGlobalsDefStart( void );
 extern void hb_compGlobalsDefEnd( void );
+extern void hb_compGenGlobalName( char * );
 
 extern HB_EXPR_PTR hb_compErrorStatic( char *, HB_EXPR_PTR );
 extern HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR );

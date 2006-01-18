@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.114 2005/11/12 18:47:29 druzus Exp $
+ * $Id: harbour.c,v 1.115 2005/11/14 00:18:32 druzus Exp $
  */
 
 /*
@@ -1088,6 +1088,30 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
             }
             break;
       }
+   }
+}
+
+void hb_compGenGlobalName( char *szVarName )
+{
+   if( hb_comp_bDebugInfo )
+   {
+      BYTE * pBuffer;
+      int iVar;
+      int iVarLen = strlen( szVarName );
+
+      hb_compGlobalsDefStart();
+      
+      iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+
+      pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
+      pBuffer[0] = HB_P_LOCALNAME;
+      pBuffer[1] = HB_LOBYTE( iVar );
+      pBuffer[2] = HB_HIBYTE( iVar );
+      memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, iVarLen + 1 );
+      hb_compGenPCodeN( pBuffer, iVarLen + 4 , 0 );
+      hb_xfree( pBuffer );
+
+      hb_compGlobalsDefEnd();
    }
 }
 
@@ -4715,7 +4739,7 @@ void hb_compGlobalsDefStart( void )
 }
 
 /*
- * End of definition of static variable
+ * End of definition of global variable
  * Return to previously pcoded function.
  */
 void hb_compGlobalsDefEnd( void )

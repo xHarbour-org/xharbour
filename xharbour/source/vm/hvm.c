@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.544 2005/12/23 10:47:54 druzus Exp $
+ * $Id: hvm.c,v 1.545 2006/01/17 01:05:24 ronpinkas Exp $
  */
 
 /*
@@ -7383,6 +7383,21 @@ static void hb_vmDebuggerExit( void )
    hb_vm_pFunDbgEntry = hb_vmDummyDebugEntry;
 }
 
+static void hb_vmCacheDbgEntry( void )
+{
+   /* Cache __DBGENTRY symbol to speed everything up */
+   if ( !hb_vm_pFunDbgEntry && !s_pSymDbgEntry )
+   {
+      s_pSymDbgEntry = hb_dynsymFind( "__DBGENTRY" )->pSymbol;
+
+      /* Try to get C dbgEntry() function pointer */
+      hb_vmPushSymbol( s_pSymDbgEntry );
+      hb_vmPushNil();
+      hb_vmPushLongConst( HB_DBG_GETENTRY );
+      hb_vmDo( 1 );
+   }
+}
+
 static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and parameters index and name information for the debugger */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmLocalName(%hu, %s)", uiLocal, szLocalName));
@@ -7391,6 +7406,9 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
    s_bDebugShowLines = FALSE;
 
    s_bDebuggerIsWorking = TRUE;
+
+   hb_vmCacheDbgEntry();
+   
    if ( hb_vm_pFunDbgEntry )
    {
       hb_vm_pFunDbgEntry( HB_DBG_LOCALNAME, 0, szLocalName, uiLocal, 0 );
@@ -7445,17 +7463,7 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
 
    s_bDebuggerIsWorking = TRUE;
 
-   /* Cache __DBGENTRY symbol to speed everything up */
-   if ( !hb_vm_pFunDbgEntry && !s_pSymDbgEntry )
-   {
-      s_pSymDbgEntry = hb_dynsymFind( "__DBGENTRY" )->pSymbol;
-
-      /* Try to get C dbgEntry() function pointer */
-      hb_vmPushSymbol( s_pSymDbgEntry );
-      hb_vmPushNil();
-      hb_vmPushLongConst( HB_DBG_GETENTRY );
-      hb_vmDo( 1 );
-   }
+   hb_vmCacheDbgEntry();
 
    if ( hb_vm_pFunDbgEntry )
    {
@@ -9469,6 +9477,34 @@ HB_FUNC( __VMVARGLIST )
    hb_itemForwardValue( &(HB_VM_STACK.Return), pGlobals );
    hb_itemRelease( pGlobals );
 }
+
+HB_EXPORT USHORT
+hb_dbg_vmVarGCount( void )
+{
+   return s_aGlobals.item.asArray.value->ulLen;
+}
+
+HB_EXPORT PHB_ITEM
+hb_dbg_vmVarGGet( int nGlobal, int nOffset )
+{
+   return s_aGlobals.item.asArray.value->pItems + nGlobal + nOffset - 1;
+}
+
+HB_FUNC( HB_DBG_VMVARGGET )
+{
+   HB_THREAD_STUB
+
+   hb_itemCopy( &(HB_VM_STACK.Return),
+                hb_dbg_vmVarGGet( hb_parni( 1 ), hb_parni( 2 ) ) );
+}
+
+HB_FUNC( HB_DBG_VMVARGSET )
+{
+   PHB_ITEM pItem = s_aGlobals.item.asArray.value->pItems + hb_parni( 1 ) + hb_parni( 2 ) - 1;
+   
+   hb_itemCopy( hb_itemUnRef( pItem ), hb_itemParamPtr( 3, HB_IT_ANY ) );
+}
+
 
 /* $Doc$
  * $FuncName$     __SETPROFILER( <lOnOff> ) --> <lOldValue>

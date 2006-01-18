@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.67 2005/11/01 18:30:19 likewolf Exp $
+ * $Id: debugger.prg,v 1.68 2006/01/17 14:47:55 likewolf Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ procedure __dbgAltDEntry()
 return
 
 
-procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // debugger entry point
+procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )  // debugger entry point
   LOCAL bStartup := .F.
   
   DO CASE
@@ -150,6 +150,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
       s_oDebugger:aCallStack := uParam3
       s_oDebugger:aStaticModules := uParam4
       s_oDebugger:aBreakPoints := uParam5
+      s_oDebugger:aGlobals := uParam6
       IF bStartup
         IF s_oDebugger:lRunAtStartup
           HB_INLINE( uParam1 )
@@ -182,13 +183,14 @@ CLASS TDebugger
    DATA   aProcStack    //stack of all procedures
    DATA   nProcLevel    //procedure level where the debugger is currently
    DATA   aStaticModules // array of modules with static variables
+   DATA   aGlobals // array of GLOBAL variables
    DATA   aColors
    DATA   aWatch
    DATA   aLastCommands, nCommand, oGetListCommand
    DATA   lAnimate, lEnd, lCaseSensitive, lMonoDisplay, lSortVars
    DATA   cSearchString, cPathForFiles, cSettingsFileName, aPathDirs
    DATA   nTabWidth, nSpeed
-   DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lAll
+   DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lShowGlobals, lAll
    DATA   lShowCallStack
    DATA   lGo           //stores if GO was requested
    DATA   lActive INIT .F.
@@ -226,6 +228,9 @@ CLASS TDebugger
    METHOD FindNext()
    METHOD FindPrevious()
    METHOD GetExprValue( xExpr, lValid )
+
+   METHOD Global()
+
    METHOD Go()
    METHOD GoToLine( nLine )
    METHOD HandleEvent()
@@ -336,6 +341,7 @@ METHOD New() CLASS TDebugger
    ::aWatch            := {}
    ::aCallStack        := {}
    ::aStaticModules    := {}
+   ::aGlobals          := {}
    ::aProcStack        := {}
    ::aVars             := {}
    ::lCaseSensitive    := .f.
@@ -357,6 +363,7 @@ METHOD New() CLASS TDebugger
    ::lShowPrivates     := .f.
    ::lShowStatics      := .f.
    ::lShowLocals       := .f.
+   ::lShowGlobals      := .F.
    ::lAll              := .f.
    ::lSortVars         := .f.
    ::cSettingsFileName := "init.cld"
@@ -416,7 +423,7 @@ return nil
 METHOD All() CLASS TDebugger
 
    ::lShowPublics := ::lShowPrivates := ::lShowStatics := ;
-   ::lShowLocals := ::lAll := ! ::lAll
+   ::lShowLocals := ::lShowGlobals := ::lAll := ! ::lAll
 
    ::RefreshVars()
 
@@ -850,6 +857,8 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
      CASE starts( "MONITOR", cCommand )
         cParam := Upper( cParam )
         DO CASE
+           CASE starts( "GLOBAL", cParam )
+              ::Global()
            CASE starts( "LOCAL", cParam )
               ::Local()
            CASE starts( "PRIVATE", cParam )
@@ -1173,7 +1182,16 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
     lValid := .F.
   END SEQUENCE
   ErrorBlock( bOldErrorBlock )
+  ::RefreshVars()
 RETURN xResult
+
+
+METHOD Global() CLASS TDebugger
+
+   ::lShowGlobals := ! ::lShowGlobals
+   ::RefreshVars()
+
+return nil
 
 
 METHOD Go() CLASS TDebugger
@@ -1614,11 +1632,15 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       nCount := __mvDbgInfo( HB_MV_PRIVATE )
       for n := nCount to 1 step -1
          xValue := __mvDbgInfo( HB_MV_PRIVATE, n, @cName )
-         IF cName != "?"  /* Check if this memvar has been released */
-            AAdd( aBVars, { cName, xValue, "Private" } )
-         ENDIF
+         AAdd( aBVars, { cName, xValue, "Private" } )
       next
    endif
+
+   IF ::lShowGlobals
+      FOR n := 1 TO Len( ::aGlobals )
+        AAdd( aBVars, ::aGlobals[ n ] )
+      NEXT
+   ENDIF
 
    IF ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
       if ::lShowStatics
@@ -1943,13 +1965,14 @@ RETURN NIL
 
 
 METHOD RefreshVars() CLASS TDebugger
+   ::oPulldown:GetItemByIdent( "GLOBAL" ):checked := ::lShowGlobals
    ::oPulldown:GetItemByIdent( "LOCAL" ):checked := ::lShowLocals
    ::oPulldown:GetItemByIdent( "PRIVATE" ):checked := ::lShowPrivates
    ::oPulldown:GetItemByIdent( "PUBLIC" ):checked := ::lShowPublics
    ::oPulldown:GetItemByIdent( "STATIC" ):checked := ::lShowStatics
    ::oPulldown:GetItemByIdent( "ALL" ):checked := ::lAll
    IF ::lActive
-      if ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
+      if ::lShowGlobals .OR. ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
          ::LoadVars()
          ::ShowVars()
       else
@@ -2200,6 +2223,10 @@ METHOD SaveSettings() CLASS TDebugger
       if ::lShowPrivates
          cInfo += "Monitor Private" + HB_OsNewLine()
       endif
+      
+      if ::lShowGlobals
+         cInfo += "Monitor Global" + HB_OsNewLine()
+      endif
 
       if ::lSortVars
          cInfo += "Monitor Sort" + HB_OsNewLine()
@@ -2435,7 +2462,7 @@ METHOD ShowVars() CLASS TDebugger
    endif
 
    if ! ( ::lShowLocals .or. ::lShowStatics .or. ::lShowPrivates .or. ;
-          ::lShowPublics )
+          ::lShowPublics .or. ::lShowGlobals )
       return nil
    endif
 
@@ -2445,7 +2472,8 @@ METHOD ShowVars() CLASS TDebugger
 
       ::oWndVars := TDbWindow():New( nTop, 0, nTop+Min( 5, Len( ::aVars )+1 ),;
          ::nMaxCol - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
-         "Monitor:" + iif( ::lShowLocals, " Local", "" ) + ;
+         "Monitor:" + ;
+         iif( ::lShowGlobals, " Global", "" ) + iif( ::lShowLocals, " Local", "" ) + ;
          iif( ::lShowStatics, " Static", "" ) + iif( ::lShowPrivates, " Private", "" ) + ;
          iif( ::lShowPublics, " Public", "" ) )
 
@@ -2498,6 +2526,7 @@ METHOD ShowVars() CLASS TDebugger
    else
 
       ::oWndVars:cCaption := "Monitor:" + ;
+      iif( ::lShowGlobals, " Global", "" ) + ;
       iif( ::lShowLocals, " Local", "" ) + ;
       iif( ::lShowStatics, " Static", "" ) + ;
       iif( ::lShowPrivates, " Private", "" ) + ;
@@ -2687,6 +2716,11 @@ METHOD VarGetInfo( aVar ) CLASS TDebugger
 
   uValue := ::VarGetValue( aVar )
   do case
+    case cType == "G"
+      return ( aVar[ VAR_NAME ] + " <Global, " + ;
+               ValType( uValue ) + ;
+               ">: " + ValToStr( uValue ) )
+
     case cType == "L"
       return aVar[ VAR_NAME ] + " <Local, " + ;
        ValType( uValue ) + ;
@@ -2710,7 +2744,10 @@ METHOD VarGetValue( aVar ) CLASS TDebugger
   LOCAL cProc
   LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
-  IF( cType == "L" )
+  IF cType == "G"
+    uValue = hb_dbg_vmVarGGet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ] )
+
+  ELSEIF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[ VAR_LEVEL ]
     uValue := hb_dbg_vmVarLGet( nProcLevel, aVar[ VAR_POS ] )
 
@@ -2730,7 +2767,10 @@ METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
   LOCAL cProc
   LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
-  IF( cType == "L" )
+  IF cType == "G"
+    hb_dbg_vmVarGSet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ], uValue )
+  
+  ELSEIF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
     hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
 

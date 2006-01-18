@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.1 2003/06/09 20:45:01 lculik Exp $
+ * $Id: dbghelp.prg,v 1.2 2005/10/29 19:39:33 likewolf Exp $
  */
 
 /*
@@ -669,6 +669,9 @@ static function GetTopics()
         "",;
         "    Static",;
         "    Monitor Static variables.",;
+        "",;
+        "    Global",;
+        "    Monitor Global variables.",;
         "",;
         "    All",;
         "    Monitor All variables.",;

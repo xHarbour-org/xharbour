@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4763 2006/01/18 22:55:54 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.4763 2006/01/18 20:46:40 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-19 02:40 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbcomp.h
+  * include/hbextern.ch
+  * include/hbvm.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/debug/dbghelp.prg
+  * source/debug/dbgmenu.prg
+  * source/debug/debugger.prg
+  * source/vm/dbgentry.c
+  * source/vm/hvm.c
+    + Added debugging support for GLOBAL variables.
+    ! Reflect changes in monitored variables after expression evaluation.
 
 2006-01-18 22:40 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/keysec.prg

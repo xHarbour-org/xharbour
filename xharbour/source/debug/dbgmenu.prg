@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.7 2004/05/10 01:47:49 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.8 2004/06/06 22:46:44 likewolf Exp $
  */
 
 /*
@@ -146,6 +146,10 @@ function __dbgBuildMenu( oDebugger )  // Builds the debugger pulldown menu
             ACTION oDebugger:Local() ;
             CHECKED oDebugger:lShowLocals
             
+         MENUITEM oPublic PROMPT " ~Global" IDENT "GLOBAL" ;
+            ACTION oDebugger:Global() ;
+            CHECKED oDebugger:lShowGlobals
+
          SEPARATOR
          MENUITEM oAll PROMPT " ~All" IDENT "ALL" ;
             ACTION oDebugger:All() ;

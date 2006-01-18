@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.9 2005/10/26 23:04:37 likewolf Exp $
+ * $Id: dbgentry.c,v 1.10 2005/10/30 16:32:01 likewolf Exp $
  */
 
 /*
@@ -173,12 +173,14 @@ typedef struct
    HB_CALLSTACKINFO *aCallStack;
    int nStaticModules;
    HB_STATICMODULEINFO *aStaticModules;
+   int nGlobals;
+   HB_VARINFO *aGlobals;
    int bCBTrace;
    BOOL ( *pFunInvoke )( void );
 } HB_DEBUGINFO;
 
 
-static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static HB_DEBUGINFO *info = &s_Info;
 
 
@@ -212,6 +214,8 @@ static BOOL
 hb_dbgIsAltD( void );
 static BOOL
 hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine );
+static BOOL
+hb_dbgIsInitGlobals( void );
 static BOOL
 hb_dbgIsInitStatics( void );
 static BOOL
@@ -254,6 +258,7 @@ hb_dbgActivate( HB_DEBUGINFO *info )
       PHB_ITEM aCallStack = hb_itemArrayNew( info->nCallStackLen );
       PHB_ITEM aStaticModules;
       PHB_ITEM aBreak;
+      PHB_ITEM aGlobals;
 
       for ( i = 0; i < info->nCallStackLen; i++ )
       {
@@ -291,6 +296,7 @@ hb_dbgActivate( HB_DEBUGINFO *info )
 
       aStaticModules = hb_dbgActivateStaticModuleArray( info );
       aBreak = hb_dbgActivateBreakArray( info );
+      aGlobals = hb_dbgActivateVarArray( info->nGlobals, info->aGlobals );
 
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
@@ -300,12 +306,14 @@ hb_dbgActivate( HB_DEBUGINFO *info )
       hb_vmPush( aCallStack );
       hb_vmPush( aStaticModules );
       hb_vmPush( aBreak );
+      hb_vmPush( aGlobals );
 
       hb_itemRelease( aCallStack );
       hb_itemRelease( aStaticModules );
       hb_itemRelease( aBreak );
+      hb_itemRelease( aGlobals );
 
-      hb_vmDo( 6 );
+      hb_vmDo( 7 );
    }
 }
 
@@ -595,9 +603,16 @@ hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction )
 static void
 hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 {
-   HB_CALLSTACKINFO *top = &info->aCallStack[ info->nCallStackLen - 1 ];
+   if ( hb_dbgIsInitGlobals() )
+   {
+      hb_dbgAddVar( &info->nGlobals, &info->aGlobals, szName, 'G', nIndex, hb_dbg_vmVarGCount() );
+   }
+   else
+   {
+      HB_CALLSTACKINFO *top = &info->aCallStack[ info->nCallStackLen - 1 ];
 
-   hb_dbgAddVar( &top->nLocals, &top->aLocals, szName, 'L', nIndex, nFrame );
+      hb_dbgAddVar( &top->nLocals, &top->aLocals, szName, 'L', nIndex, nFrame );
+   }
 }
 
 
@@ -1171,6 +1186,22 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
          if ( j < static_module->nVars )
             continue;
       }
+
+      for ( j = 0; j < info->nGlobals; j++ )
+      {
+         var = &info->aGlobals[ j ];
+         if ( !strcmp( name, var->szName ) )
+         {
+            scopes[ i ].cType = 'G';
+            scopes[ i ].nFrame = var->nFrame;
+            scopes[ i ].nIndex = var->nIndex;
+            hb_itemArrayPut( aVars, i + 1, hb_dbgVarGet( &scopes[ i ] ) );
+            break;
+         }
+      }
+      if ( j < info->nGlobals )
+         continue;
+
       scopes[ i ].cType = 'M';
       scopes[ i ].szName = STRDUP( name );
       pItem = hb_dbgVarGet( &scopes[ i ] );
@@ -1240,6 +1271,16 @@ hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine )
 
 
 static BOOL
+hb_dbgIsInitGlobals( void )
+{
+   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
+
+   hb_procinfo( 0, szName, NULL, NULL );
+   return !strcmp( szName, "(_INITGLOBALS)" );
+}
+
+
+static BOOL
 hb_dbgIsInitStatics( void )
 {
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
@@ -1263,6 +1304,11 @@ hb_dbgQuit( HB_DEBUGINFO *info )
    while ( info->nCallStackLen )
    {
       hb_dbgEndProc( info );
+   }
+   if ( info->nGlobals )
+   {
+      FREE( info->aGlobals );
+      info->nGlobals = 0;
    }
 }
 
@@ -1372,6 +1418,8 @@ hb_dbgVarGet( HB_VARINFO *scope )
 {
    switch ( scope->cType )
    {
+      case 'G':
+         return hb_dbg_vmVarGGet( scope->nFrame, scope->nIndex );
       case 'L':
          return hb_dbg_vmVarLGet( scope->nFrame, scope->nIndex );
       case 'S':
@@ -1393,6 +1441,7 @@ hb_dbgVarSet( HB_VARINFO *scope, HB_ITEM *xNewValue )
 {
    switch ( scope->cType )
    {
+      case 'G':
       case 'L':
       case 'S':
          hb_itemCopy( hb_dbgVarGet( scope ), xNewValue );
