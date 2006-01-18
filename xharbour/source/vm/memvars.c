@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.116 2005/11/08 03:44:37 ronpinkas Exp $
+ * $Id: memvars.c,v 1.117 2005/11/26 22:18:08 ronpinkas Exp $
  */
 
 /*
@@ -512,7 +512,11 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
       }
    }
 
-   s_privateStackBase = ulBase;
+   /* s_privateStackBase can be 0 if any privates have been CLEARed */
+   if ( ulBase < s_privateStackBase )
+   {
+      s_privateStackBase = ulBase;
+   }
 }
 
 /*
@@ -1178,28 +1182,12 @@ static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
       if( pDynVar->hMemvar )
       {
          PHB_ITEM pRef;
+         BOOL bMatch;
 
          pRef = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
-         if( bInclude )
-         {
-            if( hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE ) )
-            {
-               /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
-               s_globalTable[ pDynVar->hMemvar ].counter = 0;
-               */
-
-               if( HB_IS_COMPLEX( pRef ) )
-               {
-                  hb_itemClear( pRef );
-               }
-               else
-               {
-                  pRef->type = HB_IT_NIL;
-               }
-            }
-         }
-         else if( hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE ) )
+         bMatch = hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE );
+         if ( bInclude ? bMatch : !bMatch )
          {
             /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
             s_globalTable[ pDynVar->hMemvar ].counter = 0;
@@ -1666,7 +1654,9 @@ HB_FUNC( __MVSCOPE )
 
 HB_FUNC( __MVCLEAR )
 {
+   HB_THREAD_STUB
    hb_dynsymEval( hb_memvarClear, NULL );
+   s_privateStackBase = s_privateStackCnt = 0;
 }
 
 HB_FUNC( __MVDBGINFO )
@@ -2111,6 +2101,7 @@ HB_FUNC( __MVRESTORE )
       if( ! bAdditive )
       {
          hb_dynsymEval( hb_memvarClear, NULL );
+         s_privateStackBase = s_privateStackCnt = 0;
       }
 
       /* xHarbour extended feature, save variables with 64 chars long */

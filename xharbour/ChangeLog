@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4760 2006/01/17 15:12:01 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.4761 2006/01/18 09:11:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-18 16:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/memvars.c
+    ! Reset s_privateStackBase and s_privateStackCnt to 0 on CLEAR MEMORY
+      or a RESTORE FROM without ADDITIVE clause.
+    ! Fixed RELEASE ALL EXCEPT <wildcard> (was doing just the opposite).
 
 2006-01-18 01:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
