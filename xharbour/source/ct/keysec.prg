@@ -1,5 +1,5 @@
 /*
- *  $Id: keysec.prg,v 1.1 2005/11/22 20:00:00 ptsarenko Exp $
+ *  $Id: keysec.prg,v 1.2 2006/01/18 22:30:19 ptsarenko Exp $
  */
 
 /*
@@ -50,15 +50,15 @@
  *
  */
 
-Static nHandle := 0
+Static pHandle
 Static nSeconds, nsKey, nsTime, nsCounter, lsMode
 
 Function KeySec(nKey, nTime, nCounter, lMode)
 Local lActivated := .f.
 
-if nHandle != 0
-   HB_IdleDel(nHandle)
-   nHandle := 0
+if pHandle != nil
+   HB_IdleDel(pHandle)
+   pHandle := nil
 endif
 
 if nKey != nil
@@ -79,7 +79,7 @@ if nKey != nil
    lsMode := lMode
    nSeconds := Seconds()
 
-   nHandle := HB_IdleAdd({|| doKeySec()})
+   pHandle := HB_IdleAdd({|| doKeySec()})
    lActivated := .t.
 
 endif
@@ -96,8 +96,8 @@ elseif nsCounter != 0 .and. nSec - nSeconds >= nsTime
       nsCounter --
    endif
    if nsCounter == 0
-      HB_IdleDel(nHandle)
-      nHandle := 0
+      HB_IdleDel(pHandle)
+      pHandle := nil
    else
       nSeconds := nSec
    endif
