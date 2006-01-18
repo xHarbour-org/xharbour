@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.114 2006/01/16 22:45:48 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.115 2006/01/17 05:14:20 ronpinkas Exp $
  */
 
 /*
@@ -964,9 +964,11 @@ RETURN Self
                        hb_vmPushSymbol( s_pSym_hObj->pSymbol );
                        hb_vmPush( uParam );
                        hb_vmSend( 0 );
+
                        //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
                        pArgs[ n ].n1.n2.vt = VT_DISPATCH;
                        pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                       pArgs[ n ].n1.n2.n3.pdispVal->lpVtbl->AddRef( pArgs[ n ].n1.n2.n3.pdispVal );
                        //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
 
                     }
@@ -1005,6 +1007,8 @@ RETURN Self
 
                           mVariant.n1.n2.vt = VT_DISPATCH;
                           mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                          mVariant.n1.n2.n3.pdispVal->lpVtbl->AddRef( mVariant.n1.n2.n3.pdispVal );
+
                           SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
                        }
                     }
@@ -1029,6 +1033,8 @@ RETURN Self
 
      if( pDispParams->cArgs > 0 )
      {
+        IDispatch *pDisp = NULL;
+
         for( n = 0; n < ( int ) pDispParams->cArgs; n++ )
         {
            nParam = pDispParams->cArgs - n;
@@ -1058,13 +1064,30 @@ RETURN Self
                    break;
                  */
 
-                 case VT_DISPATCH:
-                 case VT_BYREF | VT_DISPATCH:
-                   //TraceLog( NULL, "Dispatch %p\n", pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal );
-                   if( pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal == NULL )
+                 case ( VT_BYREF | VT_DISPATCH ):
+                   if( *pDispParams->rgvarg[ n ].n1.n2.n3.ppdispVal == NULL )
                    {
                       hb_itemClear( aPrgParams[ n ] );
                       break;
+                   }
+                   else
+                   {
+                      pDisp = *pDispParams->rgvarg[ n ].n1.n2.n3.ppdispVal;
+                   }
+                   // Intentionally fall through.
+
+                 case VT_DISPATCH:
+                   if( pDispParams->rgvarg[ n ].n1.n2.vt == VT_DISPATCH )
+                   {
+                      if( pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal == NULL )
+                      {
+                         hb_itemClear( aPrgParams[ n ] );
+                         break;
+                      }
+                      else
+                      {
+                         pDisp = pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal;
+                      }
                    }
 
                    OleAuto.type = HB_IT_NIL;
@@ -1080,17 +1103,19 @@ RETURN Self
 
                    if( s_pSym_New && OleAuto.type )
                    {
+                      pDisp->lpVtbl->AddRef( pDisp );
+
                       //TOleAuto():New( nDispatch )
                       hb_vmPushSymbol( s_pSym_New->pSymbol );
                       hb_itemPushForward( &OleAuto );
-                      hb_vmPushLong( ( LONG ) pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal );
+                      hb_vmPushLong( ( LONG ) pDisp );
                       hb_vmSend( 1 );
 
                       hb_itemForwardValue( aPrgParams[ n ], &(HB_VM_STACK.Return) );
                    }
-                   // Can't CLEAR this Variant
-                   continue;
+                   break;
 
+                 // Already using the PHB_ITEM allocated value
                  /*
                  case VT_BYREF | VT_I2:
                    //printf( "Int %i\n", pDispParams->rgvarg[ n ].n1.n2.n3.iVal );
@@ -1126,22 +1151,6 @@ RETURN Self
                    hb_itemClear( aPrgParams[ n ] );
                    break;
                  */
-              }
-           }
-           else
-           {
-              switch( pDispParams->rgvarg[ n ].n1.n2.vt )
-              {
-                 case VT_BSTR:
-                   break;
-
-                 case VT_DISPATCH:
-                   //TraceLog( NULL, "***NOT REF*** Dispatch %p\n", pDispParams->rgvarg[ n ].n1.n2.n3.pdispVal );
-                   // Can'r CLEAR this Variant.
-                   continue;
-
-                 //case VT_ARRAY | VT_VARIANT:
-                 //  SafeArrayDestroy( pDispParams->rgvarg[ n ].n1.n2.n3.parray );
               }
            }
 
@@ -1223,7 +1232,7 @@ RETURN Self
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
   {
      PHB_ITEM pOleAuto;
-     IDispatch *pDispatch = NULL;
+     IDispatch *pDisp = NULL;
 
      hb_itemClear( pItem );
 
@@ -1273,23 +1282,33 @@ RETURN Self
            }
            break;
 
-        case VT_UNKNOWN | VT_BYREF:
-        case VT_UNKNOWN:
-           if( pVariant->n1.n2.n3.punkVal )
+        case ( VT_UNKNOWN | VT_BYREF ):
+           if( *pVariant->n1.n2.n3.ppunkVal )
            {
-              pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDispatch );
+              (*pVariant->n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *pVariant->n1.n2.n3.ppunkVal, &IID_IDispatch, (void **) &pDisp );
            }
            // Intentionally fall through
 
-        case VT_DISPATCH:
-        case VT_DISPATCH | VT_BYREF:
-
-           if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
+        case VT_UNKNOWN:
+           if( pVariant->n1.n2.vt == VT_UNKNOWN && pVariant->n1.n2.n3.punkVal )
            {
-              pDispatch = pVariant->n1.n2.n3.pdispVal;
+              pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDisp );
+           }
+           // Intentionally fall through
+
+        case ( VT_DISPATCH | VT_BYREF ):
+           if( pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
+           {
+              pDisp = *pVariant->n1.n2.n3.ppdispVal;
            }
 
-           if( pDispatch == NULL )
+        case VT_DISPATCH:
+           if( pVariant->n1.n2.vt == VT_DISPATCH )
+           {
+              pDisp = pVariant->n1.n2.n3.pdispVal;
+           }
+
+           if( pDisp == NULL )
            {
               break;
            }
@@ -1307,10 +1326,16 @@ RETURN Self
 
            if( pOleAuto->type )
            {
+              // If retrieved from IUnknown than allready added!
+              if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
+              {
+                 pDisp->lpVtbl->AddRef( pDisp );
+              }
+
               //TOleAuto():New( nDispatch )
               hb_vmPushSymbol( s_pSym_New->pSymbol );
               hb_itemPushForward( pOleAuto );
-              hb_vmPushLong( ( LONG ) pDispatch );
+              hb_vmPushLong( ( LONG ) pDisp );
               hb_vmSend( 1 );
 
               hb_itemRelease( pOleAuto );
@@ -1323,13 +1348,7 @@ RETURN Self
                  hb_itemForwardValue( pItem, hb_stackReturnItem() );
               }
 
-              //printf( "Dispatch: %ld %ld\n", ( LONG ) pDispatch, (LONG) hb_stackReturnItem()->item.asArray.value );
-
-              // If retrieved from IUnknown than allready added!
-              if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
-              {
-                 pDispatch->lpVtbl->AddRef( pDispatch );
-              }
+              //printf( "Dispatch: %ld %ld\n", ( LONG ) pDisp, (LONG) hb_stackReturnItem()->item.asArray.value );
            }
            break;
 
@@ -1774,8 +1793,7 @@ RETURN Self
      VariantClear( &RetVal );
 
      // Try to apply the requested message to the DEFAULT Property of the object if any.
-     if( SUCCEEDED( OleGetProperty( pDisp, DISPID_VALUE, &s_EmptyDispParams ) ) &&
-         ( RetVal.n1.n2.vt == VT_DISPATCH || RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) ) )
+     if( SUCCEEDED( OleGetProperty( pDisp, DISPID_VALUE, &s_EmptyDispParams ) ) &&  ( RetVal.n1.n2.vt == VT_DISPATCH || RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) ) )
      {
         VariantCopy( &OleVal, &RetVal );
         VariantClear( &RetVal );
@@ -1909,11 +1927,19 @@ RETURN Self
      {
         LPVOID pEnumVariant = NULL; /* IEnumVARIANT */
 
-        if( RetVal.n1.n2.vt == VT_UNKNOWN )
+        if( RetVal.n1.n2.vt == ( VT_UNKNOWN | VT_BYREF ) )
+        {
+           s_nOleError = (*RetVal.n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppunkVal, &IID_IEnumVARIANT, &pEnumVariant );
+        }
+        else if( RetVal.n1.n2.vt == VT_UNKNOWN )
         {
            s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
         }
-        else if( RetVal.n1.n2.vt == VT_DISPATCH || RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
+        else if( RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
+        {
+           s_nOleError = (*RetVal.n1.n2.n3.ppdispVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppdispVal, &IID_IEnumVARIANT, &pEnumVariant );
+        }
+        else if( RetVal.n1.n2.vt == VT_DISPATCH )
         {
            s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, &IID_IEnumVARIANT, &pEnumVariant );
         }
