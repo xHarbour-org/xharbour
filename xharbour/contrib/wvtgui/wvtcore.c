@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.4 2005/07/22 17:23:21 lculik Exp $
+ * $Id: wvtcore.c,v 1.5 2005/09/13 16:15:21 bdj Exp $
  */
 
 /*
@@ -684,7 +684,7 @@ HB_FUNC( WVT_DRAWLABEL )
 //
 HB_FUNC( WVT_DRAWOUTLINE )
 {
-   HPEN  hPen;
+   HPEN  hPen, hOldPen, hOldPenGUI;
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
 
@@ -700,7 +700,7 @@ HB_FUNC( WVT_DRAWOUTLINE )
       hPen = CreatePen( hb_parni( 5 ), 0, ( ISNIL( 7 ) ? 0 : ( COLORREF ) hb_parnl( 7 ) ) );
       if ( hPen )
       {
-         SelectObject( _s->hdc, hPen );
+         hOldPen = SelectObject( _s->hdc, hPen );
       }
    }
    else
@@ -714,17 +714,20 @@ HB_FUNC( WVT_DRAWOUTLINE )
    {
       if ( hPen )
       {
-         SelectObject( _s->hGuiDC, hPen );
+         hOldPenGUI = SelectObject( _s->hGuiDC, hPen );
       }
       else
       {
-         SelectObject( _s->hGuiDC, _s->penBlack );
+         hOldPenGUI = SelectObject( _s->hGuiDC, _s->penBlack );
          hb_wvt_DrawOutline( _s->hGuiDC, iTop, iLeft, iBottom, iRight );
       }
    }
 
    if ( hPen )
    {
+      SelectObject( _s->hdc, hOldPen );
+      if ( _s->bGui )
+         SelectObject( _s->hGuiDC, hOldPenGUI );
       DeleteObject( hPen );
    }
 }
@@ -743,7 +746,7 @@ HB_FUNC( WVT_DRAWLINE )
    int      iOrient, iFormat, iAlign, iStyle, iThick;
    int      x, y, iOffset;
    COLORREF cr;
-   HPEN     hPen;
+   HPEN     hPen, hOldPen, hOldPenGUI;
 
    //   Resolve Parameters
    iOrient = ISNIL( 5 ) ? 0 : hb_parni( 5 );
@@ -807,6 +810,9 @@ HB_FUNC( WVT_DRAWLINE )
    }
 
    hPen = CreatePen( iStyle, iThick, cr );
+   hOldPen = SelectObject( _s->hdc, hPen );
+   if ( _s->bGui )
+      hOldPenGUI = SelectObject( _s->hGuiDC, hPen );
 
    switch ( iFormat )
    {
@@ -923,6 +929,9 @@ HB_FUNC( WVT_DRAWLINE )
       break;
    }
 
+   SelectObject( _s->hdc, hOldPen );
+   if ( _s->bGui )
+      SelectObject( _s->hGuiDC, hOldPenGUI );
    DeleteObject( hPen );
    hb_retl( TRUE );
 }

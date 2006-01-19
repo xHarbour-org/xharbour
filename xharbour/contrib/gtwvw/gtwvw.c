@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.33 2005/11/20 18:11:47 marceloanelli Exp $
+ * $Id: gtwvw.c,v 1.34 2005/11/21 16:56:18 bdj Exp $
  */
 
 /*
@@ -10944,7 +10944,7 @@ HB_FUNC( WVW_DRAWLABEL )
 HB_FUNC( WVW_DRAWOUTLINE )
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
-   HPEN  hPen;
+   HPEN  hPen, hOldPen;
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
 
@@ -10978,7 +10978,7 @@ HB_FUNC( WVW_DRAWOUTLINE )
       hPen = CreatePen( hb_parni( 6 ), 0, ( ISNIL( 8 ) ? 0 : ( COLORREF ) hb_parnl( 8 ) ) );
       if ( hPen )
       {
-         SelectObject( pWindowData->hdc, hPen );
+         hOldPen = SelectObject( pWindowData->hdc, hPen );
       }
    }
    else
@@ -10991,6 +10991,7 @@ HB_FUNC( WVW_DRAWOUTLINE )
 
    if ( hPen )
    {
+      SelectObject( pWindowData->hdc, hOldPen );
       DeleteObject( hPen );
    }
 
@@ -11015,7 +11016,7 @@ HB_FUNC( WVW_DRAWLINE )
    int      iOrient, iFormat, iAlign, iStyle, iThick;
    int      x, y;
    COLORREF cr;
-   HPEN     hPen;
+   HPEN     hPen, hOldPen;
    USHORT   usTop    = hb_parni( 2 ),
             usLeft   = hb_parni( 3 ),
             usBottom = hb_parni( 4 ),
@@ -11107,6 +11108,7 @@ HB_FUNC( WVW_DRAWLINE )
    }
 
    hPen = CreatePen( iStyle, iThick, cr );
+   hOldPen = SelectObject( pWindowData->hdc, hPen );
 
    switch ( iFormat )
    {
@@ -11174,6 +11176,7 @@ HB_FUNC( WVW_DRAWLINE )
       break;
    }
 
+   SelectObject( pWindowData->hdc, hOldPen );
    DeleteObject( hPen );
    hb_retl( TRUE );
 }
