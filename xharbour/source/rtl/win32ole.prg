@@ -1232,7 +1232,8 @@ RETURN Self
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
   {
      PHB_ITEM pOleAuto;
-     IDispatch *pDisp = NULL;
+     IUnknown  *pUnk   = NULL;
+     IDispatch *pDisp  = NULL;
      SAFEARRAY *parray = NULL;
 
      hb_itemClear( pItem );
@@ -1280,16 +1281,18 @@ RETURN Self
            break;
 
         case ( VT_UNKNOWN | VT_BYREF ):
-           if( *pVariant->n1.n2.n3.ppunkVal )
-           {
-              (*pVariant->n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *pVariant->n1.n2.n3.ppunkVal, &IID_IDispatch, (void **) &pDisp );
-           }
+           pUnk = *pVariant->n1.n2.n3.ppunkVal;
            // Intentionally fall through
 
         case VT_UNKNOWN:
-           if( pVariant->n1.n2.vt == VT_UNKNOWN && pVariant->n1.n2.n3.punkVal )
+           if( pVariant->n1.n2.vt == VT_UNKNOWN )
            {
-              pVariant->n1.n2.n3.punkVal->lpVtbl->QueryInterface( pVariant->n1.n2.n3.punkVal, &IID_IDispatch, (void **) &pDisp );
+              pUnk = *pVariant->n1.n2.n3.ppunkVal;
+           }
+
+           if( pUnk )
+           {
+              pUnk->lpVtbl->QueryInterface( pUnk, &IID_IDispatch, (void **) &pDisp );
            }
            // Intentionally fall through
 
@@ -1307,6 +1310,11 @@ RETURN Self
 
            if( pDisp == NULL )
            {
+              if( pUnk )
+              {
+                 hb_itemPutPtr( pItem, pUnk );
+              }
+
               break;
            }
 
