@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4765 2006/01/18 23:54:51 lculik Exp $
+ * $Id: ChangeLog,v 1.4766 2006/01/19 01:59:58 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-19 04:30 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * Better handling of top-row shift problem for Win98 (not perfect, just better)
+    * some of the change here may need to be added to other win based GT's
 
 2006-01-19 03:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
