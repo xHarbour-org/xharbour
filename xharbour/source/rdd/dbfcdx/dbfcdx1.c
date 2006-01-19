@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.236 2005/12/16 10:21:43 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.237 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -5201,12 +5201,12 @@ static BOOL hb_cdxDBOISkipEval( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipEval(%p, %p, %i, %p)", pArea, pTag, fForward, pEval));
 
-   if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+   if( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
 
-   if ( ! pTag || ! HB_IS_BLOCK( pEval ) )
+   if( ! pTag || hb_itemType( pEval ) != HB_IT_BLOCK )
    {
-      if ( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) == FAILURE )
+      if( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) == FAILURE )
          return FALSE;
       return fForward ? !pArea->fEof : !pArea->fBof;
    }
@@ -7875,7 +7875,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 #endif
 
       case DBOI_SCOPEEVAL:
-         if ( pTag && hb_arrayLen( pOrderInfo->itmNewVal ) == DBRMI_SIZE &&
+         if ( pTag && pOrderInfo->itmNewVal &&
+              hb_arrayLen( pOrderInfo->itmNewVal ) == DBRMI_SIZE &&
               hb_arrayGetPtr( pOrderInfo->itmNewVal, DBRMI_FUNCTION ) != NULL )
          {
             pOrderInfo->itmResult = hb_itemPutNL( pOrderInfo->itmResult,

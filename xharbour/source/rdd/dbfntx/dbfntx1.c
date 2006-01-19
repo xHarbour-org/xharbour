@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.151 2005/12/16 10:22:22 druzus Exp $
+ * $Id: dbfntx1.c,v 1.152 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -4046,7 +4046,7 @@ static BOOL hb_ntxOrdSkipEval( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pEval )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_ntxOrdSkipEval(%p, %d, %p)", pTag, fForward, pEval));
 
-   if( ! HB_IS_BLOCK( pEval ) )
+   if( hb_itemType( pEval ) != HB_IT_BLOCK )
    {
       if( SELF_SKIP( ( AREAP ) pArea, fForward ? 1 : -1 ) != SUCCESS )
          return FALSE;
@@ -6929,7 +6929,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
                                              uiIndex == DBOI_FINDRECCONT ) );
             break;
          case DBOI_SCOPEEVAL:
-            if( hb_arrayLen( pInfo->itmNewVal ) == DBRMI_SIZE &&
+            if( hb_itemType( pInfo->itmNewVal ) == HB_IT_ARRAY &&
+                hb_arrayLen( pInfo->itmNewVal ) == DBRMI_SIZE &&
                 hb_arrayGetPtr( pInfo->itmNewVal, DBRMI_FUNCTION ) != NULL )
             {
                hb_itemPutNL( pInfo->itmResult, hb_ntxOrdScopeEval( pTag,

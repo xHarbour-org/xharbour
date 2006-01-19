@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4764 2006/01/18 23:44:00 likewolf Exp $
+ * $Id: ChangeLog,v 1.4765 2006/01/18 23:54:51 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-19 03:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed GPF when DBOI_SKIPEVAL, DBOI_SKIPEVALBACK, DBOI_SCOPEEVAL
+      called without valid parameters
+
 2006-01-18 22:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/tip/client.prg
     ! Added Missing ::Commit call to  ReadToFile() method
