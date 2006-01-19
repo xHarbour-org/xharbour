@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.116 2006/01/18 09:11:20 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.118 2006/01/19 23:24:33 ronpinkas Exp $
  */
 
 /*
@@ -1301,6 +1301,7 @@ RETURN Self
            {
               pDisp = *pVariant->n1.n2.n3.ppdispVal;
            }
+           // Intentionally fall through
 
         case VT_DISPATCH:
            if( pVariant->n1.n2.vt == VT_DISPATCH )
