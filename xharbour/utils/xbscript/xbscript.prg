@@ -188,6 +188,13 @@
 
       #ifdef GD
          #include "gdexternal.ch"
+
+         #pragma BEGINDUMP
+            #ifdef _MSC_VER
+               #pragma comment( lib, "\\xHarbour\\lib\\GDlib.lib" )
+               #pragma comment( lib, "\\xHarbour\\lib\\BGD.lib" )
+            #endif
+         #pragma ENDDUMP
       #endif
 
       #ifdef SQL

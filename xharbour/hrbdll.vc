@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.86 2005/12/19 18:59:16 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.86 2005/12/19 19:13:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -2936,7 +2936,7 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS) $(HARBOUR_LIB)
    echo. $(OBJ_DIR)\mainstd.obj  > make.tmp
    echo. $(OBJ_DIR)\xbscript.obj >> make.tmp
    echo. $(HARBOUR_LIB) >> make.tmp
-   LINK @make.tmp /nologo /out:$(XBSCRIPTDLL_EXE) /subsystem:console
+   LINK @make.tmp /nologo /out:$(XBSCRIPTDLL_EXE) /subsystem:console /FORCE:MULTIPLE
 
 $(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
