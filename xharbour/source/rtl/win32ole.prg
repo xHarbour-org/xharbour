@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.119 2006/01/19 23:44:56 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.120 2006/01/20 02:07:34 ronpinkas Exp $
  */
 
 /*
@@ -796,10 +796,210 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
+  HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
+  {
+     BOOL bByRef;
+
+     if( HB_IS_BYREF( pItem ) )
+     {
+        pItem = hb_itemUnRef( pItem );
+        bByRef = TRUE;
+     }
+     else
+     {
+        bByRef = FALSE;
+     }
+
+     switch( pItem->type )
+     {
+        case HB_IT_NIL:
+          //pVariant->n1.n2.vt   = VT_EMPTY;
+          break;
+
+        case HB_IT_STRING:
+        case HB_IT_MEMO:
+          if( bByRef )
+          {
+             hb_itemPutCRawStatic( pItem, (char *) hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) ), hb_itemGetCLen( pItem ) * 2 + 1 );
+
+             pVariant->n1.n2.vt   = VT_BYREF | VT_BSTR;
+             pVariant->n1.n2.n3.pbstrVal = (BSTR *) &( pItem->item.asString.value );
+             //wprintf( L"*** BYREF >%s<\n", *pVariant->n1.n2.n3.bstrVal );
+          }
+          else
+          {
+             pVariant->n1.n2.vt   = VT_BSTR;
+             pVariant->n1.n2.n3.bstrVal = hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) );
+             //wprintf( L"*** >%s<\n", pVariant->n1.n2.n3.bstrVal );
+          }
+          break;
+
+        case HB_IT_LOGICAL:
+          if( bByRef )
+          {
+             pVariant->n1.n2.vt = VT_BYREF | VT_BOOL;
+             pVariant->n1.n2.n3.pboolVal = (short *) &( pItem->item.asLogical.value ) ;
+             pItem->type = HB_IT_LONG;
+          }
+          else
+          {
+             pVariant->n1.n2.vt = VT_BOOL;
+             pVariant->n1.n2.n3.boolVal = hb_itemGetL( pItem ) ? VARIANT_TRUE : VARIANT_FALSE;
+          }
+          break;
+
+        case HB_IT_INTEGER:
+#if HB_INT_MAX == INT16_MAX
+           if( bByRef )
+           {
+              pVariant->n1.n2.vt = VT_BYREF | VT_I2;
+              pVariant->n1.n2.n3.piVal = &( pItem->item.asInteger.value ) ;
+           }
+           else
+           {
+              pVariant->n1.n2.vt = VT_I2;
+              pVariant->n1.n2.n3.iVal = hb_itemGetNI( pItem );
+           }
+           break;
+#else
+           if( bByRef )
+           {
+              pVariant->n1.n2.vt = VT_BYREF | VT_I4;
+              pVariant->n1.n2.n3.plVal = (long *) &( pItem->item.asInteger.value ) ;
+           }
+           else
+           {
+              pVariant->n1.n2.vt = VT_I4;
+              pVariant->n1.n2.n3.lVal = hb_itemGetNL( pItem );
+           }
+           break;
+#endif
+        case HB_IT_LONG:
+#if HB_LONG_MAX == INT32_MAX || defined( HB_LONG_LONG_OFF )
+           if( bByRef )
+           {
+              pVariant->n1.n2.vt = VT_BYREF | VT_I4;
+              pVariant->n1.n2.n3.plVal = (long *) &( pItem->item.asLong.value ) ;
+           }
+           else
+           {
+              pVariant->n1.n2.vt = VT_I4;
+              pVariant->n1.n2.n3.lVal = hb_itemGetNL( pItem );
+           }
+#else
+           if( bByRef )
+           {
+              pVariant->n1.n2.vt = VT_BYREF | VT_I8;
+              pVariant->n1.n2.n3.pllVal = &( pItem->item.asLong.value ) ;
+           }
+           else
+           {
+              pVariant->n1.n2.vt = VT_I8;
+              pVariant->n1.n2.n3.llVal = hb_itemGetNLL( pItem );
+           }
+#endif
+           break;
+
+        case HB_IT_DOUBLE:
+           if( bByRef )
+           {
+              pVariant->n1.n2.vt = VT_BYREF | VT_R8;
+              pVariant->n1.n2.n3.pdblVal = &( pItem->item.asDouble.value ) ;
+              pItem->type = HB_IT_DOUBLE;
+           }
+           else
+           {
+              pVariant->n1.n2.vt   = VT_R8;
+              pVariant->n1.n2.n3.dblVal = hb_itemGetND( pItem );
+           }
+           break;
+
+        case HB_IT_DATE:
+          if( bByRef )
+          {
+             pItem->item.asDouble.value = (double) ( pItem->item.asDate.value - 2415019 );
+             pItem->type = HB_IT_DOUBLE;
+
+             pVariant->n1.n2.vt = VT_BYREF | VT_DATE;
+             pVariant->n1.n2.n3.pdblVal = &( pItem->item.asDouble.value ) ;
+          }
+          else
+          {
+             pVariant->n1.n2.vt = VT_DATE;
+             pVariant->n1.n2.n3.dblVal = (double) ( pItem->item.asDate.value - 2415019 );
+          }
+          break;
+
+        case HB_IT_ARRAY:
+        {
+           //pVariant->n1.n2.vt = VT_EMPTY;
+
+           if( HB_IS_OBJECT( pItem ) )
+           {
+              if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "TOLEAUTO" ) )
+              {
+                 hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                 hb_vmPush( pItem );
+                 hb_vmSend( 0 );
+
+                 //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
+                 pVariant->n1.n2.vt = VT_DISPATCH;
+                 pVariant->n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                 pVariant->n1.n2.n3.pdispVal->lpVtbl->AddRef( pVariant->n1.n2.n3.pdispVal );
+                 //printf( "\nDispatch: %p\n", pVariant->n1.n2.n3.pdispVal );
+
+              }
+              else
+              {
+                 TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( pItem ) );
+              }
+           }
+           else
+           {
+              SAFEARRAYBOUND rgsabound;
+              PHB_ITEM       elem;
+              long           count;
+              long           i;
+
+              count = hb_arrayLen( pItem );
+
+              rgsabound.cElements = count;
+              rgsabound.lLbound = 0;
+              pVariant->n1.n2.vt        = VT_ARRAY | VT_VARIANT;
+              pVariant->n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
+
+              for( i = 0; i < count; i++ )
+              {
+                 elem = hb_arrayGetItemPtr( pItem, i+1 );
+
+                 if( HB_IS_OBJECT( elem ) && hb_clsIsParent( elem->item.asArray.value->uiClass, "TOLEAUTO" ) )
+                 {
+                    VARIANT mVariant;
+
+                    VariantInit( &mVariant );
+
+                    hb_vmPushSymbol( s_pSym_hObj->pSymbol );
+                    hb_vmPush( elem );
+                    hb_vmSend( 0 );
+
+                    mVariant.n1.n2.vt = VT_DISPATCH;
+                    mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
+                    mVariant.n1.n2.n3.pdispVal->lpVtbl->AddRef( mVariant.n1.n2.n3.pdispVal );
+
+                    SafeArrayPutElement( pVariant->n1.n2.n3.parray, &i, &mVariant );
+                 }
+              }
+           }
+        }
+        break;
+     }
+  }
+
+  //---------------------------------------------------------------------------//
   static void GetParams( DISPPARAMS *pDispParams )
   {
      VARIANTARG * pArgs = NULL;
-     PHB_ITEM uParam;
+     PHB_ITEM pParam;
      int n, nArgs, nArg;
      BOOL bByRef;
 
@@ -819,203 +1019,27 @@ RETURN Self
         {
            // Parameters are processed in reversed order.
            nArg = nArgs - n;
-
            VariantInit( &( pArgs[ n ] ) );
 
-           uParam = hb_param( nArg, HB_IT_ANY );
+           pParam = hb_stackItemFromBase( nArg );
 
-           bByRef = HB_IS_BYREF( hb_stackItemFromBase( nArg ) );
+           bByRef = HB_IS_BYREF( pParam );
 
            // 1 Based!!!
            s_OleRefFlags[ nArg ] = bByRef;
 
-           //TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, hb_stackItemFromBase( nArg  )->type, uParam->type, bByRef );
-
-           aPrgParams[ n ] = uParam;
-
-           switch( uParam->type )
+           if( bByRef )
            {
-              case HB_IT_NIL:
-                //pArgs[ n ].n1.n2.vt   = VT_EMPTY;
-                break;
-
-              case HB_IT_STRING:
-              case HB_IT_MEMO:
-                if( bByRef )
-                {
-                   hb_itemPutCRawStatic( uParam, (char *) hb_oleAnsiToSysString( hb_parc( nArg ) ), uParam->item.asString.length * 2 + 1 );
-
-                   pArgs[ n ].n1.n2.vt   = VT_BYREF | VT_BSTR;
-                   pArgs[ n ].n1.n2.n3.pbstrVal = (BSTR *) &( uParam->item.asString.value );
-                   //wprintf( L"*** BYREF >%s<\n", *pArgs[ n ].n1.n2.n3.bstrVal );
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt   = VT_BSTR;
-                   pArgs[ n ].n1.n2.n3.bstrVal = hb_oleAnsiToSysString( hb_parc( nArg ) );
-                   //wprintf( L"*** >%s<\n", pArgs[ n ].n1.n2.n3.bstrVal );
-                }
-                break;
-
-              case HB_IT_LOGICAL:
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_BOOL;
-                   pArgs[ n ].n1.n2.n3.pboolVal = (short *) &( uParam->item.asLogical.value ) ;
-                   uParam->type = HB_IT_LONG;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BOOL;
-                   pArgs[ n ].n1.n2.n3.boolVal = hb_parl( nArg ) ? VARIANT_TRUE : VARIANT_FALSE;
-                }
-                break;
-
-              case HB_IT_INTEGER:
-#if HB_INT_MAX == INT16_MAX
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I2;
-                   pArgs[ n ].n1.n2.n3.piVal = &( uParam->item.asInteger.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_I2;
-                   pArgs[ n ].n1.n2.n3.iVal = hb_parni( nArg );
-                }
-                break;
-#else
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
-                   pArgs[ n ].n1.n2.n3.plVal = (long *) &( uParam->item.asInteger.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_I4;
-                   pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
-                }
-                break;
-#endif
-              case HB_IT_LONG:
-#if HB_LONG_MAX == INT32_MAX || defined( HB_LONG_LONG_OFF )
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I4;
-                   pArgs[ n ].n1.n2.n3.plVal = (long *) &( uParam->item.asLong.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_I4;
-                   pArgs[ n ].n1.n2.n3.lVal = hb_parnl( nArg );
-                }
-#else
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_I8;
-                   pArgs[ n ].n1.n2.n3.pllVal = &( uParam->item.asLong.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_I8;
-                   pArgs[ n ].n1.n2.n3.llVal = hb_parnll( nArg );
-                }
-#endif
-                break;
-
-              case HB_IT_DOUBLE:
-                if( bByRef )
-                {
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_R8;
-                   pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
-                   uParam->type = HB_IT_DOUBLE;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt   = VT_R8;
-                   pArgs[ n ].n1.n2.n3.dblVal = hb_parnd( nArg );
-                }
-                break;
-
-              case HB_IT_DATE:
-                if( bByRef )
-                {
-                   uParam->item.asDouble.value = (double) ( uParam->item.asDate.value - 2415019 );
-                   uParam->type = HB_IT_DOUBLE;
-
-                   pArgs[ n ].n1.n2.vt = VT_BYREF | VT_DATE;
-                   pArgs[ n ].n1.n2.n3.pdblVal = &( uParam->item.asDouble.value ) ;
-                }
-                else
-                {
-                   pArgs[ n ].n1.n2.vt = VT_DATE;
-                   pArgs[ n ].n1.n2.n3.dblVal = (double) ( uParam->item.asDate.value - 2415019 );
-                }
-                break;
-
-              case HB_IT_ARRAY:
-              {
-                 //pArgs[ n ].n1.n2.vt = VT_EMPTY;
-
-                 if( HB_IS_OBJECT( uParam ) )
-                 {
-                    if( hb_clsIsParent( uParam->item.asArray.value->uiClass , "TOLEAUTO" ) )
-                    {
-                       hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                       hb_vmPush( uParam );
-                       hb_vmSend( 0 );
-
-                       //TraceLog( NULL, "\n#%i Dispatch: %ld\n", n, hb_parnl( -1 ) );
-                       pArgs[ n ].n1.n2.vt = VT_DISPATCH;
-                       pArgs[ n ].n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                       pArgs[ n ].n1.n2.n3.pdispVal->lpVtbl->AddRef( pArgs[ n ].n1.n2.n3.pdispVal );
-                       //printf( "\nDispatch: %p\n", pArgs[ n ].n1.n2.n3.pdispVal );
-
-                    }
-                    else
-                    {
-                       TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( uParam ) );
-                    }
-                 }
-                 else
-                 {
-                    SAFEARRAYBOUND rgsabound;
-                    PHB_ITEM       elem;
-                    long           count;
-                    long           i;
-
-                    count = hb_arrayLen( uParam );
-
-                    rgsabound.cElements = count;
-                    rgsabound.lLbound = 0;
-                    pArgs[ n ].n1.n2.vt        = VT_ARRAY | VT_VARIANT;
-                    pArgs[ n ].n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
-
-                    for( i = 0; i < count; i++ )
-                    {
-                       elem = hb_arrayGetItemPtr( uParam, i+1 );
-
-                       if( HB_IS_OBJECT( elem ) && hb_clsIsParent( elem->item.asArray.value->uiClass, "TOLEAUTO" ) )
-                       {
-                          VARIANT mVariant;
-
-                          VariantInit( &mVariant );
-
-                          hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                          hb_vmPush( elem );
-                          hb_vmSend( 0 );
-
-                          mVariant.n1.n2.vt = VT_DISPATCH;
-                          mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                          mVariant.n1.n2.n3.pdispVal->lpVtbl->AddRef( mVariant.n1.n2.n3.pdispVal );
-
-                          SafeArrayPutElement( pArgs[ n ].n1.n2.n3.parray, &i, &mVariant );
-                       }
-                    }
-                 }
-              }
-              break;
+              aPrgParams[ n ] = hb_itemUnRef( pParam );
            }
+           else
+           {
+              aPrgParams[ n ] = pParam;
+           }
+
+           //TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, pParam->type, aPrgParams[ n ]->type, bByRef );
+
+           hb_oleItemToVariant( &( pArgs[ n ] ), pParam );
         }
      }
 
@@ -1167,6 +1191,7 @@ RETURN Self
      }
   }
 
+  //---------------------------------------------------------------------------//
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt )
   {
      long iFrom, iTo, i;
@@ -1236,7 +1261,7 @@ RETURN Self
      PHB_ITEM pOleAuto;
      IUnknown  *pUnk   = NULL;
      IDispatch *pDisp  = NULL;
-     SAFEARRAY *parray = NULL;
+     SAFEARRAY *parray;// = NULL;
 
      hb_itemClear( pItem );
 
