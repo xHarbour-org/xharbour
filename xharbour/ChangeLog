@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4771 2006/01/20 02:52:20 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4772 2006/01/20 09:09:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2006-01-20 12:08 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+2006-01-20 12:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg
     ! Fixed RTE when evaluating expressions with inactive Monitor.
 

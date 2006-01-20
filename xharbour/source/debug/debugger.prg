@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.68 2006/01/17 14:47:55 likewolf Exp $
+ * $Id: debugger.prg,v 1.69 2006/01/18 23:44:05 likewolf Exp $
  */
 
 /*
@@ -1433,6 +1433,9 @@ return nil
 
 
 METHOD HideVars() CLASS TDebugger
+   IF ::oWndVars == NIL
+      RETURN NIL
+   ENDIF
 
    ::oWndVars:Hide()
    ::oWndCode:nTop := 1
