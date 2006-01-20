@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.118 2006/01/19 23:24:33 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.119 2006/01/19 23:44:56 ronpinkas Exp $
  */
 
 /*
@@ -1167,7 +1167,7 @@ RETURN Self
      }
   }
 
-  static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices )
+  static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt )
   {
      long iFrom, iTo, i;
      PHB_ITEM pArray;
@@ -1190,7 +1190,7 @@ RETURN Self
 
            //printf( "   Sub: %i\n", i );
 
-           pSubArray = SafeArrayToArray( parray, iDim - 1, rgIndices );
+           pSubArray = SafeArrayToArray( parray, iDim - 1, rgIndices, vt );
 
            hb_arraySetForward( pArray, i - iFrom + 1, pSubArray );
 
@@ -1198,28 +1198,30 @@ RETURN Self
         }
         else
         {
-           VARIANT  mElem;
+           VARIANT mElem;
+           void *pTarget;
 
            VariantInit( &mElem );
 
-           #define PTROFINDEX
-
-           #ifdef PTROFINDEX
-              mElem.n1.n2.vt = VT_BYREF;
-           #endif
+           if( vt == VT_VARIANT )
+           {
+              pTarget = &mElem;
+           }
+           else
+           {
+              mElem.n1.n2.vt = vt;
+              pTarget = &mElem.n1.n2.n3.cVal;
+           }
 
            //printf( "   Get: %i\n", i );
 
-          #ifdef PTROFINDEX
-           if( SUCCEEDED( SafeArrayPtrOfIndex( parray, rgIndices, &( mElem.n1.n2.n3.byref ) ) ) )
-          #else
-           if( SUCCEEDED( SafeArrayGetElement( parray, rgIndices, &mElem ) ) )
-          #endif
+           if( SUCCEEDED( SafeArrayGetElement( parray, rgIndices, pTarget ) ) )
            {
+              //TraceLog( NULL, "Type: %p in: %s(%i)\n", mElem.n1.n2.vt, __FILE__, __LINE__ );
+
               hb_oleVariantToItem( pArray->item.asArray.value->pItems + ( i - iFrom ), &mElem );
 
               VariantClear( &mElem );
-              //printf( "   Type: %i\n", ( pArray->item.asArray.value->pItems + ( i - iFrom ) )->type );
            }
         }
      }
@@ -1464,47 +1466,55 @@ RETURN Self
              break;
           */
 
-        case ( VT_ARRAY | VT_VARIANT | VT_BYREF ):
-           parray = *pVariant->n1.n2.n3.pparray;
-           // Intentionally fall through.
-
-        case ( VT_ARRAY | VT_VARIANT ):
-          {
-             UINT iDims;
-             long * rgIndices;
-             PHB_ITEM pArray;
-
-             if( pVariant->n1.n2.vt == ( VT_ARRAY | VT_VARIANT ) )
-             {
-                parray = pVariant->n1.n2.n3.parray;
-             }
-
-             if( parray )
-             {
-                iDims = SafeArrayGetDim( parray );
-                rgIndices = (long *) hb_xgrab( sizeof(long) * iDims );
-                pArray = SafeArrayToArray( parray, iDims, rgIndices );
-
-                hb_xfree( (void *) rgIndices );
-
-                hb_itemForwardValue( pItem, pArray );
-                hb_itemRelease( pArray );
-             }
-             else
-             {
-                hb_arrayNew( pItem, 0 );
-             }
-
-             break;
-          }
-
         case VT_PTR:
            hb_itemPutPtr( pItem, pVariant->n1.n2.n3.byref );
            break;
 
         default:
-          TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
-          return E_FAIL;
+           if( pVariant->n1.n2.vt & VT_ARRAY )
+           {
+              UINT iDims;
+              long * rgIndices;
+              PHB_ITEM pArray;
+              VARTYPE vt;
+
+              if( pVariant->n1.n2.vt & VT_BYREF )
+              {
+                 parray = *pVariant->n1.n2.n3.pparray;
+              }
+              else
+              {
+                 parray = pVariant->n1.n2.n3.parray;
+              }
+
+              if( parray )
+              {
+                 iDims = SafeArrayGetDim( parray );
+                 rgIndices = (long *) hb_xgrab( sizeof(long) * iDims );
+
+                 vt = pVariant->n1.n2.vt;
+                 vt &= ~VT_ARRAY;
+                 vt &= ~VT_BYREF;
+
+                 //TraceLog( NULL, "Type: %p in: %s(%i)\n", vt, __FILE__, __LINE__ );
+
+                 pArray = SafeArrayToArray( parray, iDims, rgIndices, vt );
+
+                 hb_xfree( (void *) rgIndices );
+
+                 hb_itemForwardValue( pItem, pArray );
+                 hb_itemRelease( pArray );
+              }
+              else
+              {
+                 hb_arrayNew( pItem, 0 );
+              }
+           }
+           else
+           {
+              TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
+              return E_FAIL;
+           }
      }
 
      //VariantClear( pVariant );
