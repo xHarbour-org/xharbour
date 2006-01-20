@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4772 2006/01/20 09:09:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.4773 2006/01/20 09:14:00 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-20 02:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    + Added support for array paramaters.
+    + Added VT and VTArray classes (used to direct Item to Variant conversion)
+  + include/vt.ch
+    + New header with VT_* constants
+  + tests/olestream.prg
+    + New sample testing support for array, and demo of VTArray() class directed conversion.
 
 2006-01-20 12:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg

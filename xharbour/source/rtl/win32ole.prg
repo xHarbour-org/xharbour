@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.120 2006/01/20 02:07:34 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.121 2006/01/20 02:52:22 ronpinkas Exp $
  */
 
 /*
@@ -153,12 +153,30 @@ INIT PROC HB_OLEINIT
    }
 return
 
+//----------------------------------------------------------------------------//
 EXIT PROC HB_OLEEXIT
    HB_INLINE()
    {
       OleUninitialize();
    }
 return
+
+//----------------------------------------------------------------------------//
+CLASS VT
+   DATA vt
+   DATA Value
+   METHOD New( xVal ) CONSTRUCTOR
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+METHOD New( vt, xVal ) CLASS VT
+   ::vt := vt
+   ::Value := xVal
+RETURN Self
+
+//----------------------------------------------------------------------------//
+CLASS VTArray FROM VT
+ENDCLASS
 
 //----------------------------------------------------------------------------//
 CLASS TOleAuto
@@ -799,6 +817,10 @@ RETURN Self
   HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
   {
      BOOL bByRef;
+     VARIANT mVariant;
+     VARTYPE vt;
+     SAFEARRAYBOUND rgsabound;
+     void *pSource = NULL;
 
      if( HB_IS_BYREF( pItem ) )
      {
@@ -949,6 +971,21 @@ RETURN Self
                  //printf( "\nDispatch: %p\n", pVariant->n1.n2.n3.pdispVal );
 
               }
+              else if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "VTARRAY" ) )
+              {
+                 // oArrayType:vt
+                 vt = (VARTYPE) hb_itemGetNL( hb_arrayGetItemPtr( pItem, 2 ) );
+                 // oArrayType:Value
+                 pItem = hb_arrayGetItemPtr( pItem, 3 );
+
+                 rgsabound.cElements = hb_arrayLen( pItem );
+                 rgsabound.lLbound = 0;
+
+                 hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, 1 ) );
+                 pSource = &mVariant.n1.n2.n3.cVal;
+
+                 goto ItemToVariant_ProcessArray;
+              }
               else
               {
                  TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( pItem ) );
@@ -956,38 +993,50 @@ RETURN Self
            }
            else
            {
-              SAFEARRAYBOUND rgsabound;
-              PHB_ITEM       elem;
-              long           count;
-              long           i;
+              unsigned long  i;
+              HB_TYPE type;
 
-              count = hb_arrayLen( pItem );
-
-              rgsabound.cElements = count;
+              rgsabound.cElements = hb_arrayLen( pItem );
               rgsabound.lLbound = 0;
-              pVariant->n1.n2.vt        = VT_ARRAY | VT_VARIANT;
-              pVariant->n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
 
-              for( i = 0; i < count; i++ )
+              VariantInit( &mVariant );
+
+              type = hb_arrayGetItemPtr( pItem, 1 )->type;
+
+              for( i = 1; i < rgsabound.cElements; i++ )
               {
-                 elem = hb_arrayGetItemPtr( pItem, i+1 );
-
-                 if( HB_IS_OBJECT( elem ) && hb_clsIsParent( elem->item.asArray.value->uiClass, "TOLEAUTO" ) )
+                 if( type != hb_arrayGetItemPtr( pItem, i + 1 )->type )
                  {
-                    VARIANT mVariant;
-
-                    VariantInit( &mVariant );
-
-                    hb_vmPushSymbol( s_pSym_hObj->pSymbol );
-                    hb_vmPush( elem );
-                    hb_vmSend( 0 );
-
-                    mVariant.n1.n2.vt = VT_DISPATCH;
-                    mVariant.n1.n2.n3.pdispVal = ( IDispatch * ) hb_parnl( -1 );
-                    mVariant.n1.n2.n3.pdispVal->lpVtbl->AddRef( mVariant.n1.n2.n3.pdispVal );
-
-                    SafeArrayPutElement( pVariant->n1.n2.n3.parray, &i, &mVariant );
+                    break;
                  }
+              }
+
+              if( i == rgsabound.cElements )
+              {
+                 hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, 1 ) );
+                 vt = VT_ARRAY | mVariant.n1.n2.vt;
+                 pSource = &mVariant.n1.n2.n3.cVal;
+              }
+              else
+              {
+                 vt = VT_ARRAY | VT_VARIANT;
+                 pSource = &mVariant;
+              }
+
+            ItemToVariant_ProcessArray:
+
+              //TraceLog( NULL, "Array type: %p\n", vt );
+
+              pVariant->n1.n2.vt = VT_ARRAY | vt;
+              pVariant->n1.n2.n3.parray = SafeArrayCreate( vt, 1, &rgsabound );
+              i = 0;
+              SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, pSource );
+
+              for( i = 1; i < rgsabound.cElements; i++ )
+              {
+                 hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, i + 1 ) );
+                 SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, pSource );
+                 VariantClear( &mVariant );
               }
            }
         }
