@@ -23,7 +23,7 @@ PROCEDURE Backup( cFile )
 
    objStream:Open()
    objStream:Type := 1//adTypeBinary
-   objStream:Write( VTArray( VY_UI1, aStream ) )
+   objStream:Write( VTArray( VT_UI1, aStream ) )
    objStream:SaveToFile( cFile + ".bak" )
    objStream:Close()
 
