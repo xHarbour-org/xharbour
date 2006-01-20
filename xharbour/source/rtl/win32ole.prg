@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.122 2006/01/20 10:39:28 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.123 2006/01/20 18:41:52 ronpinkas Exp $
  */
 
 /*
@@ -1303,7 +1303,7 @@ RETURN Self
            if( vt == VT_I1 || vt == VT_UI1 )
            {
               sArray = (char *) hb_xgrab( iLen );
-              hb_itemPutCPtr( pArray, sArray, iLen );
+              hb_itemPutCRaw( pArray, sArray, iLen );
 
               pTarget = NULL;
            }
