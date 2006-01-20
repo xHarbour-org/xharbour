@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4773 2006/01/20 09:14:00 likewolf Exp $
+ * $Id: ChangeLog,v 1.4774 2006/01/20 10:36:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-20 10:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    % Optimized Array to SafeArray and SafeArray to Array logic
+      to use HB_IT_STRING for VT_I1 and VT_UI1
+  * tests/olestream.prg
+    * Corrected silly typo
 
 2006-01-20 02:36 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

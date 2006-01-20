@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.121 2006/01/20 02:52:22 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.122 2006/01/20 10:39:28 ronpinkas Exp $
  */
 
 /*
@@ -820,7 +820,7 @@ RETURN Self
      VARIANT mVariant;
      VARTYPE vt;
      SAFEARRAYBOUND rgsabound;
-     void *pSource = NULL;
+     void *pSource;// = NULL;
 
      if( HB_IS_BYREF( pItem ) )
      {
@@ -978,6 +978,24 @@ RETURN Self
                  // oArrayType:Value
                  pItem = hb_arrayGetItemPtr( pItem, 3 );
 
+                 if( ( vt == VT_I1 || vt == VT_UI1 ) && HB_IS_STRING( pItem ) )
+                 {
+                    unsigned long i;
+
+                    rgsabound.cElements = hb_itemGetCLen( pItem );
+                    rgsabound.lLbound = 0;
+
+                    pVariant->n1.n2.vt = ( VT_ARRAY | vt );
+                    pVariant->n1.n2.n3.parray = SafeArrayCreate( vt, 1, &rgsabound );
+
+                    for( i = 0; i < rgsabound.cElements; i++ )
+                    {
+                       SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, &( hb_itemGetCPtr( pItem )[i]) );
+                    }
+
+                    break;
+                 }
+
                  rgsabound.cElements = hb_arrayLen( pItem );
                  rgsabound.lLbound = 0;
 
@@ -1019,7 +1037,7 @@ RETURN Self
               }
               else
               {
-                 vt = VT_ARRAY | VT_VARIANT;
+                 vt = ( VT_ARRAY | VT_VARIANT );
                  pSource = &mVariant;
               }
 
@@ -1243,51 +1261,74 @@ RETURN Self
   //---------------------------------------------------------------------------//
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt )
   {
-     long iFrom, iTo, i;
+     long iFrom, iTo, iLen, i;
      PHB_ITEM pArray;
 
      SafeArrayGetLBound( parray, iDim, &iFrom );
      SafeArrayGetUBound( parray, iDim, &iTo );
 
      pArray = hb_itemNew( NULL );
-     hb_arrayNew( pArray, iTo - iFrom + 1 );
+     iLen = iTo - iFrom + 1;
+     hb_arrayNew( pArray, iLen );
 
-     //printf( "Dim: %i\n", iDim );
-
-     for( i = iFrom; i <= iTo; i++ )
+     if( iDim > 1 )
      {
-        rgIndices[ iDim - 1 ] = i;
+        PHB_ITEM pSubArray;
 
-        if( iDim > 1 )
+        for( i = iFrom; i <= iTo; i++ )
         {
-           PHB_ITEM pSubArray;
+           rgIndices[ iDim - 1 ] = i;
 
            //printf( "   Sub: %i\n", i );
 
            pSubArray = SafeArrayToArray( parray, iDim - 1, rgIndices, vt );
-
            hb_arraySetForward( pArray, i - iFrom + 1, pSubArray );
-
            hb_itemRelease( pSubArray );
+        }
+     }
+     else
+     {
+        VARIANT mElem;
+        void *pTarget;
+        char *sArray;
+
+        VariantInit( &mElem );
+
+        if( vt == VT_VARIANT )
+        {
+           pTarget = &mElem;
         }
         else
         {
-           VARIANT mElem;
-           void *pTarget;
-
-           VariantInit( &mElem );
-
-           if( vt == VT_VARIANT )
+           if( vt == VT_I1 || vt == VT_UI1 )
            {
-              pTarget = &mElem;
+              sArray = (char *) hb_xgrab( iLen );
+              hb_itemPutCPtr( pArray, sArray, iLen );
+
+              pTarget = NULL;
            }
            else
            {
-              mElem.n1.n2.vt = vt;
               pTarget = &mElem.n1.n2.n3.cVal;
            }
+        }
 
-           //printf( "   Get: %i\n", i );
+        for( i = iFrom; i <= iTo; i++ )
+        {
+           rgIndices[ iDim - 1 ] = i;
+
+           if( vt != VT_VARIANT )
+           {
+              // Get cleared on VariantClear() - don't place out of loop!
+              mElem.n1.n2.vt = vt;
+
+              if( vt == VT_I1 || vt == VT_UI1 )
+              {
+                 SafeArrayGetElement( parray, rgIndices, &( sArray[ i - iFrom ] ) );
+
+                 continue;
+              }
+           }
 
            if( SUCCEEDED( SafeArrayGetElement( parray, rgIndices, pTarget ) ) )
            {
@@ -1300,7 +1341,7 @@ RETURN Self
         }
      }
 
-     //printf( "Return len: %i\n", pArray->item.asArray.value->ulLen );
+     //TraceLog( NULL, "Return len: %i\n", pArray->item.asArray.value->ulLen );
 
      return pArray;
   }
