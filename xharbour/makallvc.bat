@@ -1,7 +1,7 @@
 @echo off
-rem 
-rem $Id: makallvc.bat,v 1.17 2005/10/06 01:46:54 ronpinkas Exp $
-rem 
+rem
+rem $Id: makallvc.bat,v 1.18 2005/10/06 05:48:09 marcosgambeta Exp $
+rem
 
 echo creating system files
 call make_vc %1
@@ -88,4 +88,13 @@ echo xwt
 cd contrib\xwt
 call make_vc.bat %1
 cd ..\..
+if errorlevel 1 goto end
+
+:gd
+echo gd
+cd contrib\gd
+call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
 :end
