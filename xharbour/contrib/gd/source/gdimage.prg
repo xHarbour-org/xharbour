@@ -1,5 +1,5 @@
 /*
- * $Id: gdimage.prg,v 1.3 2005/12/26 22:07:00 fsgiudice Exp $
+ * $Id: gdimage.prg,v 1.4 2006/01/08 22:29:24 fsgiudice Exp $
  */
 
 /*
@@ -122,6 +122,8 @@ CLASS GDImage
    METHOD SaveGd( cFile )                  INLINE gdImageGd( ::pImage, cFile )
    METHOD SaveGif( cFile )                 INLINE gdImageGif( ::pImage, cFile )
 
+   METHOD SaveToFile( cFile )              INLINE gdImageToFile( Self, cFile )
+
    // Output To a specified File handle
    METHOD OutputPng( nHandle, nLevel )     INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImagePng( ::pImage, nHandle, nLevel )
    METHOD OutputJpeg( nHandle, nLevel )    INLINE IIF( nHandle == NIL, nHandle := 1, ), gdImageJpeg( ::pImage, nHandle, nLevel )
@@ -135,6 +137,8 @@ CLASS GDImage
    METHOD ToStringWBmp( nFG )              INLINE gdImageWBmp( ::pImage, NIL, nFG )
    METHOD ToStringGd()                     INLINE gdImageGd( ::pImage, NIL )
    METHOD ToStringGif()                    INLINE gdImageGif( ::pImage, NIL )
+
+   METHOD ToString()                       INLINE gdImageToString( Self )
 
    // Destructor
    METHOD Destroy()                        INLINE gdImageDestroy( ::pImage )

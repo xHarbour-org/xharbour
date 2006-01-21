@@ -1,5 +1,5 @@
 /*
- * $Id: gd.prg,v 1.2 2005/12/26 22:07:00 fsgiudice Exp $
+ * $Id: gd.prg,v 1.3 2006/01/08 01:52:10 fsgiudice Exp $
  */
 
 /*
@@ -180,6 +180,60 @@ FUNCTION gdImageFromFile( cFile )
   ENDIF
 
 RETURN { oImage, hFile, cType, cMime }
+
+FUNCTION gdImageToString( oImage )
+  LOCAL cString
+
+  //Tracelog( "oImage, oImage:ClassName, oImage:IsDerivedFrom( 'GDIMAGE' )", ;
+  //          oImage, oImage:ClassName, oImage:IsDerivedFrom( 'GDIMAGE' ) )
+
+  IF ValType( oImage ) == "O" .AND. ( oImage:ClassName == "GDIMAGE" .OR. oImage:IsDerivedFrom( "GDIMAGE" ) )
+     WITH OBJECT oImage
+        IF :cType <> NIL
+           DO CASE
+              CASE :cType == "jpeg"
+                   cString := :ToStringJpeg()
+              CASE :cType == "gif"
+                   cString := :ToStringGif()
+              CASE :cType == "png"
+                   cString := :ToStringPng()
+           ENDCASE
+        ENDIF
+     END
+  ENDIF
+RETURN cString
+
+PROCEDURE gdImageToFile( oImage, cFile )
+  LOCAL cString, cExt
+
+  DEFAULT cFile TO "image"
+
+  //Tracelog( "oImage, oImage:ClassName, oImage:IsDerivedFrom( 'GDIMAGE' )", ;
+  //          oImage, oImage:ClassName, oImage:IsDerivedFrom( 'GDIMAGE' ) )
+
+  IF ValType( oImage ) == "O" .AND. ( oImage:ClassName == "GDIMAGE" .OR. oImage:IsDerivedFrom( "GDIMAGE" ) )
+     WITH OBJECT oImage
+        IF :cType <> NIL
+           DO CASE
+              CASE :cType == "jpeg"
+                   cString := :ToStringJpeg()
+                   cExt    := "jpg"
+              CASE :cType == "gif"
+                   cString := :ToStringGif()
+                   cExt    := "gif"
+              CASE :cType == "png"
+                   cString := :ToStringPng()
+                   cExt    := "png"
+           ENDCASE
+           IF cString <> NIL
+              MemoWrit( cFile + "." + cExt, cString )
+           ENDIF
+        ENDIF
+     END
+  ENDIF
+
+RETURN
+
 /*
 
    ////aRect := { 10, 40, 100, 40, 100, 20, 10, 20 } //Array(8)

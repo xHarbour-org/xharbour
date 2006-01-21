@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.17 2006/01/08 01:52:10 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.18 2006/01/08 22:29:24 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-21 01:45 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
+  * contrib/gd/source/gd.prg
+    + added functions:
+      gdImageToString( oImage ) -> cImageString
+        return a string containing binary image
+        check oImage:cType for image type: jpeg, gif or png
+      gdImageToFile( oImage, cFileName ) -> NIL
+        Create an image file (as cFileName + "." + oImage:cType)
+
+  * contrib/gd/source/gdimage.prg
+    + added ToString() method, this choose right ToString*() method reading cType property
+    + added ToFile( cFile ) method, this choose right ToString*() method reading cType property
+      and create an image file
+
+  + contrib/gd/include/gdexternal.ch
+    external gd functions declaration
+
+  + contrib/gd/tests/tostring.prg
+    sample for tostring() and SaveToFile() methods
 
 2006-01-08 23:28 UTC+0100 Francesco Saverio Giudice <info@fsgiudice.com>
   * contrib/gd/source/gdwrp.c
