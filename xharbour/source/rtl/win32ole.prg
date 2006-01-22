@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.125 2006/01/22 06:32:47 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.126 2006/01/22 07:12:36 ronpinkas Exp $
  */
 
 /*
@@ -1293,13 +1293,14 @@ RETURN Self
      {
         PHB_ITEM pSubArray;
 
+        hb_arrayNew( pArray, iLen );
+
         for( i = iFrom; i <= iTo; i++ )
         {
            rgIndices[ iDim - 1 ] = i;
 
            //printf( "   Sub: %i\n", i );
 
-           hb_arrayNew( pArray, iLen );
            pSubArray = SafeArrayToArray( parray, iDim - 1, rgIndices, vt );
            hb_arraySetForward( pArray, i - iFrom + 1, pSubArray );
            hb_itemRelease( pSubArray );
