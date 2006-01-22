@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.162 2006/01/09 11:30:30 lculik Exp $
+ * $Id: hbmake.prg,v 1.163 2006/01/12 02:04:37 lculik Exp $
  */
 
 /*
@@ -537,6 +537,8 @@ FUNCTION ParseMakeFile( cFile )
             IF Len( aTemp ) > 1
 
                 IF  "$" IN aTemp[ 2 ]
+                  TraceLog([processando macro ] + aTemp[1] + [ valor ] + atemp[2])
+
 
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                       AAdd( s_aMacros, { aTemp[ 1 ], Strtran( ReplaceMacros( aTemp[ 2 ] ), "\", "/" ) } )
@@ -564,6 +566,8 @@ FUNCTION ParseMakeFile( cFile )
                               s_lMSVcc  := .F.
                               s_lPocc   := .F.
                               s_aDefines[2] := { "MAKE_DIR", GetGccDir() }
+                              s_aDefines[3] := { "HARBOUR_DIR", s_cHarbourDir }                              
+
                            ENDIF
 
                         NEXT
@@ -716,6 +720,14 @@ FUNCTION ParseMakeFile( cFile )
 
          ENDIF
 
+      ENDIF
+      IF s_lMingw .and. s_lGcc
+         x := ascan(s_aMacros,{|x|  X[1] == "HB_DIR"})
+         IF x>0
+            IF s_aMacros[x,2] != s_cHarbourDir
+               s_aMacros[x,2] := s_cHarbourDir
+            ENDIF
+         ENDIF
       ENDIF
 
       IF lBuildSec
@@ -2750,7 +2762,7 @@ FUNCTION CreateMakeFile( cFile )
 
    IF s_lBcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(HB_DIR)\lib"+iif(lFwh,";$(FWH)\lib -c","")+iif(!empty(s_cUserInclude)," -I" + alltrim( s_cUserInclude ),"") + " " +CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -c -L$(HB_DIR)\lib"+iif(lFwh,";$(FWH)\lib ","")+iif(!empty(s_cUserInclude)," -I" + alltrim( s_cUserInclude ),"") + " " +CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -I$(HB_DIR)\include;$(CC_DIR)\include" + iif( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
