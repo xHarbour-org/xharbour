@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.124 2006/01/20 18:52:43 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.125 2006/01/22 06:32:47 ronpinkas Exp $
  */
 
 /*
@@ -1315,6 +1315,8 @@ RETURN Self
 
         if( vt == VT_VARIANT )
         {
+           hb_arrayNew( pArray, iLen );
+
            pTarget = &mElem;
         }
         else
