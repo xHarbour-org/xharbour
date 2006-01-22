@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.123 2006/01/20 18:41:52 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.124 2006/01/20 18:52:43 ronpinkas Exp $
  */
 
 /*
@@ -821,6 +821,8 @@ RETURN Self
      VARTYPE vt;
      SAFEARRAYBOUND rgsabound;
      void *pSource;// = NULL;
+     unsigned long i;
+     char *sString;
 
      if( HB_IS_BYREF( pItem ) )
      {
@@ -840,9 +842,22 @@ RETURN Self
 
         case HB_IT_STRING:
         case HB_IT_MEMO:
+        {
+          ULONG ulLen = hb_itemGetCLen( pItem );
+
+          sString = hb_itemGetCPtr( pItem );
+
+          // Check for hidden signature of SafeArrayToArray().
+          if( (int) (pItem->item.asString.allocated - ulLen) >= 5 &&
+              sString[ ulLen ] == 0x7A && sString[ ulLen + 1 ] == 0x7B && sString[ ulLen + 2 ] == 0x7C && sString[ ulLen + 3 ] == 0x7D )
+          {
+             vt = (VARTYPE) sString[ ulLen + 4 ];
+             goto ItemToVariant_StringArray;
+          }
+
           if( bByRef )
           {
-             hb_itemPutCRawStatic( pItem, (char *) hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) ), hb_itemGetCLen( pItem ) * 2 + 1 );
+             hb_itemPutCRawStatic( pItem, (char *) hb_oleAnsiToSysString( sString ), ulLen * 2 + 1 );
 
              pVariant->n1.n2.vt   = VT_BYREF | VT_BSTR;
              pVariant->n1.n2.n3.pbstrVal = (BSTR *) &( pItem->item.asString.value );
@@ -851,10 +866,11 @@ RETURN Self
           else
           {
              pVariant->n1.n2.vt   = VT_BSTR;
-             pVariant->n1.n2.n3.bstrVal = hb_oleAnsiToSysString( hb_itemGetCPtr( pItem ) );
+             pVariant->n1.n2.n3.bstrVal = hb_oleAnsiToSysString( sString );
              //wprintf( L"*** >%s<\n", pVariant->n1.n2.n3.bstrVal );
           }
           break;
+        }
 
         case HB_IT_LOGICAL:
           if( bByRef )
@@ -980,7 +996,9 @@ RETURN Self
 
                  if( ( vt == VT_I1 || vt == VT_UI1 ) && HB_IS_STRING( pItem ) )
                  {
-                    unsigned long i;
+                    sString = hb_itemGetCPtr( pItem );
+
+                   ItemToVariant_StringArray:
 
                     rgsabound.cElements = hb_itemGetCLen( pItem );
                     rgsabound.lLbound = 0;
@@ -990,7 +1008,7 @@ RETURN Self
 
                     for( i = 0; i < rgsabound.cElements; i++ )
                     {
-                       SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, &( hb_itemGetCPtr( pItem )[i]) );
+                       SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, &( sString[i]) );
                     }
 
                     break;
@@ -1267,9 +1285,9 @@ RETURN Self
      SafeArrayGetLBound( parray, iDim, &iFrom );
      SafeArrayGetUBound( parray, iDim, &iTo );
 
-     pArray = hb_itemNew( NULL );
      iLen = iTo - iFrom + 1;
-     hb_arrayNew( pArray, iLen );
+
+     pArray = hb_itemNew( NULL );
 
      if( iDim > 1 )
      {
@@ -1281,6 +1299,7 @@ RETURN Self
 
            //printf( "   Sub: %i\n", i );
 
+           hb_arrayNew( pArray, iLen );
            pSubArray = SafeArrayToArray( parray, iDim - 1, rgIndices, vt );
            hb_arraySetForward( pArray, i - iFrom + 1, pSubArray );
            hb_itemRelease( pSubArray );
@@ -1302,13 +1321,25 @@ RETURN Self
         {
            if( vt == VT_I1 || vt == VT_UI1 )
            {
-              sArray = (char *) hb_xgrab( iLen );
-              hb_itemPutCRaw( pArray, sArray, iLen );
+              // Ugly hack, but needed to allocate our signature as hidden bytes!
+              hb_itemPutCL( pArray, NULL, 0 );
+              HB_STRING_ALLOC( pArray, iLen + 5 );
+              pArray->item.asString.length = iLen;
+
+              sArray = hb_itemGetCPtr( pArray );
+
+              sArray[ iLen ]     = 0x7A;
+              sArray[ iLen + 1 ] = 0x7B;
+              sArray[ iLen + 2 ] = 0x7C;
+              sArray[ iLen + 3 ] = 0x7D;
+              sArray[ iLen + 4 ] = (char)(vt);
 
               pTarget = NULL;
            }
            else
            {
+              hb_arrayNew( pArray, iLen );
+
               pTarget = &mElem.n1.n2.n3.cVal;
            }
         }
