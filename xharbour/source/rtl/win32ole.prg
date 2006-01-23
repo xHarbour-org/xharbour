@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.128 2006/01/23 00:31:40 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.129 2006/01/23 00:53:47 ronpinkas Exp $
  */
 
 /*
@@ -1044,6 +1044,7 @@ RETURN Self
                  hb_vmPushSymbol( s_pSym_vt->pSymbol );
                  hb_vmPush( pItem );
                  hb_vmSend( 0 );
+
                  vt = (VARTYPE) hb_parnl(-1);
 
                  // aArray := oVTArray:Value
@@ -1063,6 +1064,8 @@ RETURN Self
                     rgsabound.cElements = hb_itemGetCLen( pItem );
                     rgsabound.lLbound = 0;
 
+                    //TraceLog( NULL, "Array len: %i type: %i in: %s(%i) \n", rgsabound.cElements, vt, __FILE__, __LINE__ );
+
                     pVariant->n1.n2.vt = ( VT_ARRAY | vt );
                     pVariant->n1.n2.n3.parray = SafeArrayCreate( vt, 1, &rgsabound );
 
@@ -1074,10 +1077,7 @@ RETURN Self
                     break;
                  }
 
-                 rgsabound.cElements = hb_arrayLen( pItem );
-                 rgsabound.lLbound = 0;
-
-                 hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, 1 ) );
+                 VariantInit( &mVariant );
                  pSource = &mVariant.n1.n2.n3.cVal;
 
                  goto ItemToVariant_ProcessArray;
@@ -1090,45 +1090,21 @@ RETURN Self
            else
            {
               unsigned long  i;
-              HB_TYPE type;
+
+              VariantInit( &mVariant );
+              pSource = &mVariant;
+
+            ItemToVariant_ProcessArray:
 
               rgsabound.cElements = hb_arrayLen( pItem );
               rgsabound.lLbound = 0;
 
-              VariantInit( &mVariant );
+              //TraceLog( NULL, "Array len: %i type: %i in: %s(%i) \n", rgsabound.cElements, vt, __FILE__, __LINE__ );
 
-              type = hb_arrayGetItemPtr( pItem, 1 )->type;
+              pVariant->n1.n2.vt = (VT_ARRAY | VT_VARIANT);
+              pVariant->n1.n2.n3.parray = SafeArrayCreate( VT_VARIANT, 1, &rgsabound );
 
-              for( i = 1; i < rgsabound.cElements; i++ )
-              {
-                 if( type != hb_arrayGetItemPtr( pItem, i + 1 )->type )
-                 {
-                    break;
-                 }
-              }
-
-              if( i == rgsabound.cElements )
-              {
-                 hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, 1 ) );
-                 vt = VT_ARRAY | mVariant.n1.n2.vt;
-                 pSource = &mVariant.n1.n2.n3.cVal;
-              }
-              else
-              {
-                 vt = ( VT_ARRAY | VT_VARIANT );
-                 pSource = &mVariant;
-              }
-
-            ItemToVariant_ProcessArray:
-
-              //TraceLog( NULL, "Array type: %p\n", vt );
-
-              pVariant->n1.n2.vt = VT_ARRAY | vt;
-              pVariant->n1.n2.n3.parray = SafeArrayCreate( vt, 1, &rgsabound );
-              i = 0;
-              SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, pSource );
-
-              for( i = 1; i < rgsabound.cElements; i++ )
+              for( i = 0; i < rgsabound.cElements; i++ )
               {
                  hb_oleItemToVariant( &mVariant, hb_arrayGetItemPtr( pItem, i + 1 ) );
                  SafeArrayPutElement( pVariant->n1.n2.n3.parray, (LONG *) &i, pSource );
@@ -1340,14 +1316,18 @@ RETURN Self
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt )
   {
      long iFrom, iTo, iLen, i;
-     PHB_ITEM pArray;
+     PHB_ITEM pArray = hb_itemNew( NULL );;
+
+     if( parray == NULL )
+     {
+        hb_arrayNew( pArray, 0 );
+        return pArray;
+     }
 
      SafeArrayGetLBound( parray, iDim, &iFrom );
      SafeArrayGetUBound( parray, iDim, &iTo );
 
      iLen = iTo - iFrom + 1;
-
-     pArray = hb_itemNew( NULL );
 
      if( iDim > 1 )
      {
