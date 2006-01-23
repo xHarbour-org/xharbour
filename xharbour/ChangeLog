@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4778 2006/01/22 06:32:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4779 2006/01/22 21:58:50 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-22 16:21 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Renamed class VT to VTWrapper, and thus VTArray to VTArrayWrapper
+    + Added [] and "FOR EACH" operator overloading for VTArrayWrapper()
+    + Added auto wrapping of non VT_VARIANT arrays with VTarrayWrapper() class
+      /*
+         This means such retuned value can be directly passed to OLE Methods
+         without having to wrap it explicitly with VTArray() and having to
+         specify the native VT_* which the array is consisting of. Yet, such
+         array can still be indexed and enumerated at prg level code, if needed.
+       */
 
 2006-01-22 18:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg

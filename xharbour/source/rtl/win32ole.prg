@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.126 2006/01/22 07:12:36 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.127 2006/01/22 07:19:55 ronpinkas Exp $
  */
 
 /*
@@ -122,6 +122,9 @@ RETURN TOleAuto():GetActiveObject( cString )
    static PHB_DYNS s_pSym_hObj;
    static PHB_DYNS s_pSym_New;
    static PHB_DYNS s_pSym_cClassName;
+   static PHB_DYNS s_pSym_VTArrayWrapper;
+   static PHB_DYNS s_pSym_vt;
+   static PHB_DYNS s_pSym_Value;
 
    static BOOL *s_OleRefFlags = NULL;
 
@@ -138,10 +141,13 @@ INIT PROC HB_OLEINIT
    {
       s_nOleError = OleInitialize( NULL );
 
-      s_pSym_TOleAuto    = hb_dynsymFind( "TOLEAUTO" );
-      s_pSym_New         = hb_dynsymFind( "NEW" );
-      s_pSym_hObj        = hb_dynsymFind( "HOBJ" );
-      s_pSym_cClassName  = hb_dynsymFind( "CCLASSNAME" );
+      s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
+      s_pSym_New            = hb_dynsymFind( "NEW" );
+      s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
+      s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
+      s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
+      s_pSym_vt             = hb_dynsymFind( "VT" );
+      s_pSym_Value          = hb_dynsymFind( "VALUE" );
 
       s_EmptyDispParams.rgvarg            = NULL;
       s_EmptyDispParams.cArgs             = 0;
@@ -162,21 +168,55 @@ EXIT PROC HB_OLEEXIT
 return
 
 //----------------------------------------------------------------------------//
-CLASS VT
+CLASS VTWrapper
    DATA vt
    DATA Value
-   METHOD New( xVal ) CONSTRUCTOR
+
+   METHOD New( vt, xVal ) CONSTRUCTOR
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-METHOD New( vt, xVal ) CLASS VT
+METHOD New( vt, xVal ) CLASS VTWrapper
+
    ::vt := vt
    ::Value := xVal
+
+   //TraceLog( vt, ::vt, xVal, ::Value )
+
 RETURN Self
 
 //----------------------------------------------------------------------------//
-CLASS VTArray FROM VT
+CLASS VTArrayWrapper FROM VTWrapper
+
+   METHOD AsArray( nIndex, xValue ) OPERATOR "[]"
+   METHOD Enumerate( nEnumOp, nIndex ) OPERATOR "FOR EACH"
+
 ENDCLASS
+
+//----------------------------------------------------------------------------//
+METHOD AsArray( nIndex, xValue ) CLASS VTArrayWrapper
+
+RETURN IIF( PCount() == 1, ::Value[nIndex], ::Value[nIndex] := xValue )
+
+//----------------------------------------------------------------------------//
+METHOD Enumerate( nEnumOp, nIndex ) CLASS VTarrayWrapper
+
+   LOCAL oErr
+
+   SWITCH nEnumOp
+      CASE FOREACH_BEGIN
+         RETURN ::Value
+
+      CASE FOREACH_ENUMERATE
+         // Can never happen!
+         EXIT
+
+      CASE FOREACH_END
+         // Can never happen!
+         EXIT
+   END
+
+ RETURN Self
 
 //----------------------------------------------------------------------------//
 CLASS TOleAuto
@@ -407,6 +447,7 @@ METHOD OleValuePlus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueMinus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -431,6 +472,7 @@ METHOD OleValueMinus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueMultiply( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -455,6 +497,7 @@ METHOD OleValueMultiply( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueDivide( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -479,6 +522,7 @@ METHOD OleValueDivide( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueModulus( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -503,6 +547,7 @@ METHOD OleValueModulus( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueInc() CLASS TOleAuto
 
    LOCAL oErr
@@ -527,6 +572,7 @@ METHOD OleValueInc() CLASS TOleAuto
 
 RETURN Self
 
+//--------------------------------------------------------------------
 METHOD OleValueDec() CLASS TOleAuto
 
    LOCAL oErr
@@ -551,6 +597,7 @@ METHOD OleValueDec() CLASS TOleAuto
 
 RETURN Self
 
+//--------------------------------------------------------------------
 METHOD OleValuePower( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -575,6 +622,7 @@ METHOD OleValuePower( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -599,6 +647,7 @@ METHOD OleValueEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -623,6 +672,7 @@ METHOD OleValueExactEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
 
    LOCAL xRet, oErr
@@ -647,6 +697,7 @@ METHOD OleValueNotEqual( xArg ) CLASS TOleAuto
 
 RETURN xRet
 
+//--------------------------------------------------------------------
 METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
 
    LOCAL xRet
@@ -987,12 +1038,21 @@ RETURN Self
                  //printf( "\nDispatch: %p\n", pVariant->n1.n2.n3.pdispVal );
 
               }
-              else if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "VTARRAY" ) )
+              else if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "VTARRAYWRAPPER" ) )
               {
-                 // oArrayType:vt
-                 vt = (VARTYPE) hb_itemGetNL( hb_arrayGetItemPtr( pItem, 2 ) );
-                 // oArrayType:Value
-                 pItem = hb_arrayGetItemPtr( pItem, 3 );
+                 // vt := oVTArray:vt
+                 hb_vmPushSymbol( s_pSym_vt->pSymbol );
+                 hb_vmPush( pItem );
+                 hb_vmSend( 0 );
+                 vt = (VARTYPE) hb_parnl(-1);
+
+                 // aArray := oVTArray:Value
+                 hb_vmPushSymbol( s_pSym_Value->pSymbol );
+                 hb_vmPush( pItem );
+                 hb_vmSend( 0 );
+
+                 // Intentionally not using hb_itemCopy() or hb_itemForwardValue()
+                 pItem = hb_stackReturnItem();
 
                  if( ( vt == VT_I1 || vt == VT_UI1 ) && HB_IS_STRING( pItem ) )
                  {
@@ -1326,7 +1386,7 @@ RETURN Self
            {
               // Ugly hack, but needed to allocate our signature as hidden bytes!
               hb_itemPutCL( pArray, NULL, 0 );
-              HB_STRING_ALLOC( pArray, iLen + 5 );
+              HB_STRING_ALLOC( pArray, (ULONG)(iLen + 5) );
               pArray->item.asString.length = iLen;
 
               sArray = hb_itemGetCPtr( pArray );
@@ -1377,9 +1437,26 @@ RETURN Self
 
      //TraceLog( NULL, "Return len: %i\n", pArray->item.asArray.value->ulLen );
 
+     // Wrap our array with VTArrayWrapper() class ( aArray := VTArrayWrapper( vt, aArray) )
+     if( HB_IS_ARRAY( pArray ) && vt != VT_VARIANT )
+     {
+        PHB_ITEM pVT = hb_itemPutNL( hb_itemNew( NULL ), (LONG) vt );
+
+        hb_vmPushSymbol( s_pSym_VTArrayWrapper->pSymbol );
+        hb_vmPushNil();
+        hb_itemPushForward( pVT );
+        hb_itemPushForward( pArray );
+        hb_vmDo( 2 );
+
+        hb_itemForwardValue( pArray, hb_stackReturnItem() );
+
+        hb_itemRelease( pVT );
+     }
+
      return pArray;
   }
 
+  //---------------------------------------------------------------------------//
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant )
   {
      PHB_ITEM pOleAuto;
@@ -2322,15 +2399,13 @@ RETURN Self
      if( SUCCEEDED( s_nOleError ) )
      {
         //TraceLog( NULL, "Invoke Succeeded!\n" );
-
-        if( HB_IS_OBJECT( &HB_VM_STACK.Return ) )
+        if( HB_IS_OBJECT( hb_stackReturnItem() ) && hb_clsIsParent( hb_stackReturnItem()->item.asArray.value->uiClass , "TOLEAUTO" ) )
         {
-           HB_ITEM Return;
+           PHB_ITEM pReturn = hb_itemNew( NULL );
            HB_ITEM OleClassName;
            char sOleClassName[ 256 ];
 
-           Return.type = HB_IT_NIL;
-           hb_itemForwardValue( &Return, &HB_VM_STACK.Return );
+           hb_itemForwardValue( pReturn, &HB_VM_STACK.Return );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
            hb_vmPush( hb_stackSelfItem() );
@@ -2346,11 +2421,12 @@ RETURN Self
            hb_itemPutC( &OleClassName, sOleClassName );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
-           hb_vmPush( &Return );
+           hb_vmPush( pReturn );
            hb_itemPushForward( &OleClassName );
            hb_vmSend( 1 );
 
-           hb_itemReturnForward( &Return );
+           hb_itemReturnForward( pReturn );
+           hb_itemRelease( pReturn );
         }
      }
      else
