@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.127 2006/01/22 07:19:55 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.128 2006/01/23 00:31:40 ronpinkas Exp $
  */
 
 /*
@@ -146,7 +146,7 @@ INIT PROC HB_OLEINIT
       s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
       s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
       s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
-      s_pSym_vt             = hb_dynsymFind( "VT" );
+      s_pSym_vt             = hb_dynsymGetCase( "VT" );
       s_pSym_Value          = hb_dynsymFind( "VALUE" );
 
       s_EmptyDispParams.rgvarg            = NULL;
