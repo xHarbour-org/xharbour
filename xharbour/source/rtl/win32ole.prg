@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.130 2006/01/23 20:02:13 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.131 2006/01/24 02:40:54 ronpinkas Exp $
  */
 
 /*
@@ -1335,6 +1335,10 @@ RETURN Self
                 hb_itemClear( pItem );
                 break;
               */
+
+              case VT_BYREF | VT_VARIANT:
+                hb_oleItemToVariant( pVariant->n1.n2.n3.pvarVal, pItem );
+                break;
 
               default:
                 if( (VARTYPE) ( pVariant->n1.n2.vt & ( VT_BYREF | VT_ARRAY ) ) == (VARTYPE) ( VT_BYREF | VT_ARRAY ) )
