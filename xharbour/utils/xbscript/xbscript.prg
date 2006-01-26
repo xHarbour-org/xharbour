@@ -423,7 +423,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .1
+  #define REVISION .2
 #endif
 STATIC s_cVer := "2.0 RC2" + Stringify( REVISION )
 
@@ -4095,15 +4095,27 @@ FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
    RECOVER USING oError
 
       IF( oError:ClassName == "ERROR" )
-         TraceLog( oError:SubSystem, oError:Operation, oError:Description, ValToPrg( oError:Args ), sBlock )
+         TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args, sBlock )
 
          IF oError:Operation == '&'
             oError:SubSystem := "PP"
             oError:Operation := "Parse"
             oError:Description := "Syntax Error;Script line: " + Str( nLine, 5 ) + ";Engine line: " + Str( oError:ProcLine, 5 )
             oError:Args := { sBlock }
+
+            oError:ProcLine := nLine
+            IF nProcID > 0
+               oError:ProcName := aProcedures[ nProcID ]
+            ENDIF
+            oError:ModuleName := s_sFile
          ELSEIF oError:SubSystem == "PP"
             oError:Description += ";Script line: " + Str( nLine, 5 ) + ";Engine line: " + Str( oError:ProcLine, 5 )
+
+            oError:ProcLine := nLine
+            IF nProcID > 0
+               oError:ProcName := aProcedures[ nProcID ]
+            ENDIF
+            oError:ModuleName := s_sFile
          ELSE
             oError:Description += ";Engine line: " + oError:ProcName + "(" + Str( oError:ProcLine, 5 ) + ")"
          ENDIF
@@ -4689,9 +4701,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    ENDIF
 
    IF hSource == -1
-      Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3007, sSource, [ERROR! opening: ] + Str( FError(), 2 ),  ) )
-      // Safety
-      BREAK
+      Break( ErrorNew( [PP], 0, 3007, sSource, [ERROR! opening: ] + Str( FError(), 2 ), { sSource } ) )
    ENDIF
 
    IF nPath > 1
@@ -4714,9 +4724,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
             hPP := FCreate( sSource + sPPOExt )
          ENDIF
          IF hPP == -1
-            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3006, sSource + sPPOExt, [Can't create preprocessed output file: ] + Str( FError(), 2 ),  ) )
-            // Safety
-            BREAK
+            Break( ErrorNew( [PP], 0, 3006, sSource + sPPOExt, [Can't create preprocessed output file: ] + Str( FError(), 2 ), { sSource, sPPOExt } ) )
          ENDIF
       ENDIF
    ELSE
@@ -4738,10 +4746,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
    BEGIN SEQUENCE
 
       WHILE ( nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE ) ) > 2
+         //TraceLog( nLen, sBuffer )
          nPosition := 1
          nMaxPos   := nLen - 1
 
-         WHILE nPosition < nMaxPos
+         WHILE nPosition < nMaxPos .OR. SubStr( sBuffer, nPosition, 1 ) == Chr(10)
 
              cPrev := cChar
              cChar := SubStr( sBuffer, nPosition, 1 )
@@ -4774,9 +4783,7 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
                          //FSeek( hSource, -1, 1 )
                          nLen := FRead( hSource, @sBuffer, PP_BUFFER_SIZE )
                          IF nLen < 2
-                            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2083, [Pre-Process], [Unterminated /* */ comment],  ) )
-                            // Safety
-                            BREAK
+                            Break( ErrorNew( [PP], 0, 2083, [Pre-Process], [Unterminated /* */ comment], { sLine, nLine } ) )
                          ENDIF
 
                          nMaxPos   := nLen - 1
@@ -5170,18 +5177,19 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
 
       ENDDO
 
-      //? '"' + SubStr( Left( sBuffer, nLen ), nPosition ) + '"', nLen, nPosition
-
       //? "Closing: " + sSource
 
       FClose( hSource )
 
+      //? Asc( cChar ), "'" + sLine + "'"
       //? sSource, nPosition, nMaxPos, nLen, SubStr( sLine, nPosition, 40 )
       //WAIT
 
       sLine += SubStr( sBuffer, nPosition, Max( 0, ( nMaxPos + 2 ) - nPosition ) )
+
       sLine := StrTran( sLine, Chr(09), "   " )
       DropTrailingWS( @sLine )
+
       sLine := StrTran( sLine, Chr(10), '' )
       sLine := StrTran( sLine, Chr(13), '' )
       sLine := StrTran( sLine, Chr(26), '' )
@@ -5252,7 +5260,8 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
       ENDIF
 
       IF ValType( oError ) == 'O'
-         //Alert( Str( oError:ProcLine ) )
+         //oError:Description += ";Script line: " + Str( nLine ) + ";Source: " + sLine
+
          Eval( s_bRTEBlock, oError )
          // Safety
          BREAK
@@ -5328,549 +5337,568 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       ENDIF
    ENDIF
 
-   WHILE .T.
-      //? "Processing: '" + sLine + "'"
-      //? nPendingLines, nIfDef, IIF( nIfDef > 0, abIfDef[nIfDef] , )
-      //WAIT
+   BEGIN SEQUENCE
 
-      IF nCycles < MAX_CICLES
-         nCycles++
-      ELSE
-         //TraceLog( "Circularity!", sLine )
-         //Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
-         //? sLine
-         Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2083, [Pre-Process], [Ciruclarity Detected],  ) )
-         // Safety
-         BREAK
-      ENDIF
+      WHILE .T.
+         //? "Processing: '" + sLine + "'"
+         //? nPendingLines, nIfDef, IIF( nIfDef > 0, abIfDef[nIfDef] , )
+         //WAIT
 
-      IF sLine == NIL
-         sLine := ''
-         sLeft := ''
-      ELSE
-         sLeft := ExtractLeadingWS( @sLine )
-      ENDIF
-
-      IF sLine == ''
-         IF nPendingLines > 0
-            sLine := aPendingLines[1]
-            aDel( aPendingLines, 1 )
-            nPendingLines--
-
-            LOOP
+         IF nCycles < MAX_CICLES
+            nCycles++
+         ELSE
+            //TraceLog( "Circularity!", sLine )
+            //Alert( [ERROR! Circularity detected ]+"[" + sSource + "(" + LTrim( Str( nLine ) ) + ")]" )
+            //? sLine
+            Break( ErrorNew( [PP], 0, 2083, [Pre-Process], [Ciruclarity Detected], { sLine, nLine, sSource } ) )
          ENDIF
 
-         EXIT
-      ENDIF
-
-      IF s_sIncludeFile != NIL
-         IF ! Empty( sSource )
-            aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) )
-         ENDIF
-         s_sIncludeFile := NIL
-      ENDIF
-
-      //TraceLog( "Processing: '" + sLine +"'" )
-      //? "Processing: '" + sLine +"'"
-      //WAIT
-
-      IF Left( sLine, 1 ) == '#'
-
-         sLine := LTrim( SubStr( sLine, 2 ) )
-         sDirective := RTrim( Upper( NextToken( @sLine ) ) )
-
-         IF ( nLen := Len( sDirective ) ) < 4 .AND. sDirective != "IF"
-            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
-            // Safety
-            BREAK
+         IF sLine == NIL
+            sLine := ''
+            sLeft := ''
+         ELSE
+            sLeft := ExtractLeadingWS( @sLine )
          ENDIF
 
-         IF sDirective == "IF" .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
+         IF sLine == ''
+            IF nPendingLines > 0
+               sLine := aPendingLines[1]
+               aDel( aPendingLines, 1 )
+               nPendingLines--
 
-            nIfDef++
-            aSize( abIfDef, nIfDef )
-            abIfDef[ nIfDef ] := .F.
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
-
-            nIfDef++
-            aSize( abIfDef, nIfDef )
-            abIfDef[ nIfDef ] := .F.
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "IFNDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
-
-            nIfDef++
-            aSize( abIfDef, nIfDef )
-            abIfDef[ nIfDef ] := .F.
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "ELSE" .AND. nIfDef > 1 .AND. ! abIfDef[ nIfDef - 1 ]
-
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "ELSE"
-
-            abIfDef[ nIfDef ] := ! abIfDef[ nIfDef ]
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == Left( "ENDIF", nLen )
-
-            IF nIfDef > 0
-               nIfDef--
-            ELSE
-               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2069, [Pre-Process], [#endif with no #ifdef in sight],  ) )
-               // Safety
-               BREAK
+               LOOP
             ENDIF
 
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "LINE"
-
-            aAdd( asOutLines, "#line " + sLine )
-            sLine := ''
-            LOOP
-
+            EXIT
          ENDIF
 
-         IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
-            //? "Ignored: " + sLine
-            sLine := ''
-            LOOP
+         IF s_sIncludeFile != NIL
+            IF ! Empty( sSource )
+               aAdd( asOutLines, "#line " + LTrim( Str( nLine ) ) )
+            ENDIF
+            s_sIncludeFile := NIL
          ENDIF
 
-         ExtractLeadingWS( @sLine )
+         //TraceLog( "Processing: '" + sLine +"'" )
+         //? "Processing: '" + sLine +"'"
+         //WAIT
 
-         #ifdef __XHARBOUR__
-            FOR EACH sTemp IN aPendingLines
-               IF sTemp != NIL .AND. sTemp[1] != '#'
-                  sLine += '; ' + sTemp
-                  sTemp := NIL
-               ELSE
-                  EXIT
-               ENDIF
-            NEXT
-         #else
-            FOR nPendLine := 1 TO nPendingLines
-               IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
-                  sLine += '; ' + aPendingLines[ nPendLine ]
-                  aPendingLines[ nPendLine ] := NIL
-               ELSE
-                  EXIT
-               ENDIF
-            NEXT
-         #endif
+         IF Left( sLine, 1 ) == '#'
 
-         #ifdef OUTPUT_DIRECTIVES
-            aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
-         #endif
+            sLine := LTrim( SubStr( sLine, 2 ) )
+            sDirective := RTrim( Upper( NextToken( @sLine ) ) )
 
-         IF sDirective == Left( "DEFINE", nLen )
+            IF ( nLen := Len( sDirective ) ) < 4 .AND. sDirective != "IF"
+               Break( ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective, { sLine, nLine, sSource } ) )
+            ENDIF
 
-            CompileDefine( sLine )
-            sLine := ''
-            LOOP
+            IF sDirective == "IF" .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
 
-         ELSEIF sDirective == Left( "ERROR", nLen )
-
-            Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2069, [#error], sLine,  ) )
-            // Safety
-            BREAK
-
-         ELSEIF sDirective == Left( "UNDEF", nLen )
-
-            RemoveDefine( sLine )
-            sLine := ''
-            LOOP
-
-         ELSEIF sDirective == "IF"
-
-            sConstant := AllTrim( sLine )
-            sConstant := StrTran( sConstant, ".T.", "1" )
-            sConstant := StrTran( sConstant, ".F.", "0" )
-
-            sConstant := StrTran( sConstant, ".AND.", "!= 0 .AND. 0 !=" )
-            sConstant := StrTran( sConstant, ".OR.", "!= 0 .OR. 0 !=" )
-
-            sConstant := StrTran( sConstant, "&&", "!= 0 .AND. 0 !=" )
-            sConstant := StrTran( sConstant, "||", "!= 0 .OR. 0 !=" )
-
-            WHILE ( nAt := At( "defined", sConstant ) ) > 0
-               sLeft := Left( sConstant, nAt - 1 )
-               sRight := LTrim( SubStr( sConstant, nAt + 7 ) )
-
-               IF Left( sRight, 1 ) == '('
-                  sRight := LTrim( SubStr( sRight, 2 ) )
-                  sToken := NextToken( @sRight )
-                  sRight := LTrim( sRight )
-
-                  IF Left( sRight, 1 ) == ')'
-                     sRight := SubStr( sRight, 2 )
-                     sConstant := sLeft + IIF( aScan( aDefRules, {|aDefine| aDefine[1] == sToken } ) > 0, "1", "0" ) + sRight
-                  ELSE
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
-                     // Safety
-                     BREAK
-                  ENDIF
-               ELSE
-                  Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
-                  // Safety
-                  BREAK
-               ENDIF
-            END
-
-            IF Type( sConstant ) $ "NL"
-               //TraceLog( sConstant, &(sConstant) )
                nIfDef++
                aSize( abIfDef, nIfDef )
-               abIfDef[nIfDef] := ! Empty( &( sConstant ) )
-            ELSE
-               //TraceLog( sConstant )
-               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine } ) )
-               // Safety
-               BREAK
-            ENDIF
+               abIfDef[ nIfDef ] := .F.
+               sLine := ''
+               LOOP
 
-            sLine := ''
-            LOOP
+            ELSEIF sDirective == Left( "IFDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
 
-         ELSEIF sDirective == Left( "IFDEF", nLen )
+               nIfDef++
+               aSize( abIfDef, nIfDef )
+               abIfDef[ nIfDef ] := .F.
+               sLine := ''
+               LOOP
 
-            SetIfDef( sLine, .T. )
-            sLine := ''
-            LOOP
+            ELSEIF sDirective == Left( "IFNDEF", nLen ) .AND. nIfDef > 0 .AND. ! abIfDef[ nIfDef ]
 
-         ELSEIF sDirective == Left( "IFNDEF", nLen )
+               nIfDef++
+               aSize( abIfDef, nIfDef )
+               abIfDef[ nIfDef ] := .F.
+               sLine := ''
+               LOOP
 
-            SetIfDef( sLine, .F. )
-            sLine := ''
-            LOOP
+            ELSEIF sDirective == "ELSE" .AND. nIfDef > 1 .AND. ! abIfDef[ nIfDef - 1 ]
 
-         ELSEIF sDirective == Left( "INCLUDE", nLen )
+               sLine := ''
+               LOOP
 
-            ExtractLeadingWS( @sLine )
-            DropTrailingWS( @sLine )
+            ELSEIF sDirective == "ELSE"
 
-            // Added Oct-16-2004 to support #defines and translates.
-            bPresetCompile := bCompile
-            bCompile := .F.
-            sLine := PP_PreProLine( sLine )
-            bCompile := bPresetCompile
+               abIfDef[ nIfDef ] := ! abIfDef[ nIfDef ]
+               sLine := ''
+               LOOP
 
-            // Strip the ""
-            sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
+            ELSEIF sDirective == Left( "ENDIF", nLen )
 
-            IF Upper( sLine ) == "RP_RUN.CH" .AND. s_lRunLoaded
-               // already loaded.
-            ELSEIF Upper( sLine ) == "HBCLASS.CH"
-               IF ! s_lClsLoaded
-                  s_lClsLoaded := .T.
-                  InitClsRules()
-                  InitClsResults()
-                  IF Len( aDefRules ) != Len( aDefResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
-                     // Safety
-                     BREAK
-                  ENDIF
-                  IF Len( aTransRules ) != Len( aTransResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
-                     // Safety
-                     BREAK
-                  ENDIF
-                  IF Len( aCommRules ) != Len( aCommResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
-                     // Safety
-                     BREAK
-                  ENDIF
+               IF nIfDef > 0
+                  nIfDef--
+               ELSE
+                  Break( ErrorNew( [PP], 0, 2069, [Pre-Process], [#endif with no #ifdef in sight], { sLine, nLine, sSource } ) )
                ENDIF
 
-          #ifdef FW
-            ELSEIF Upper( sLine ) == "FIVEWIN.CH"
-               IF ! s_lFWLoaded
-                  s_lFWLoaded := .T.
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == "LINE"
+
+               aAdd( asOutLines, "#line " + sLine )
+               sLine := ''
+               LOOP
+
+            ENDIF
+
+            IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
+               //? "Ignored: " + sLine
+               sLine := ''
+               LOOP
+            ENDIF
+
+            ExtractLeadingWS( @sLine )
+
+            #ifdef __XHARBOUR__
+               FOR EACH sTemp IN aPendingLines
+                  IF sTemp != NIL .AND. sTemp[1] != '#'
+                     sLine += '; ' + sTemp
+                     sTemp := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #else
+               FOR nPendLine := 1 TO nPendingLines
+                  IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
+                     sLine += '; ' + aPendingLines[ nPendLine ]
+                     aPendingLines[ nPendLine ] := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #endif
+
+            #ifdef OUTPUT_DIRECTIVES
+               aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
+            #endif
+
+            IF sDirective == Left( "DEFINE", nLen )
+
+               CompileDefine( sLine )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "ERROR", nLen )
+
+               Break( ErrorNew( [PP], 0, 2069, [#error], sLine, { sLine, nLine, sSource } ) )
+
+            ELSEIF sDirective == Left( "UNDEF", nLen )
+
+               RemoveDefine( sLine )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == "IF"
+
+               sConstant := AllTrim( sLine )
+               sConstant := StrTran( sConstant, ".T.", "1" )
+               sConstant := StrTran( sConstant, ".F.", "0" )
+
+               sConstant := StrTran( sConstant, ".AND.", "!= 0 .AND. 0 !=" )
+               sConstant := StrTran( sConstant, ".OR.", "!= 0 .OR. 0 !=" )
+
+               sConstant := StrTran( sConstant, "&&", "!= 0 .AND. 0 !=" )
+               sConstant := StrTran( sConstant, "||", "!= 0 .OR. 0 !=" )
+
+               WHILE ( nAt := At( "defined", sConstant ) ) > 0
+                  sLeft := Left( sConstant, nAt - 1 )
+                  sRight := LTrim( SubStr( sConstant, nAt + 7 ) )
+
+                  IF Left( sRight, 1 ) == '('
+                     sRight := LTrim( SubStr( sRight, 2 ) )
+                     sToken := NextToken( @sRight )
+                     sRight := LTrim( sRight )
+
+                     IF Left( sRight, 1 ) == ')'
+                        sRight := SubStr( sRight, 2 )
+                        sConstant := sLeft + IIF( aScan( aDefRules, {|aDefine| aDefine[1] == sToken } ) > 0, "1", "0" ) + sRight
+                     ELSE
+                        Break( ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine, nLine, sSource } ) )
+                     ENDIF
+                  ELSE
+                     Break( ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine, nLine, sSource } ) )
+                  ENDIF
+               END
+
+               IF Type( sConstant ) $ "NL"
+                  //TraceLog( sConstant, &(sConstant) )
+                  nIfDef++
+                  aSize( abIfDef, nIfDef )
+                  abIfDef[nIfDef] := ! Empty( &( sConstant ) )
+               ELSE
+                  //TraceLog( sConstant )
+                  Break( ErrorNew( [PP], 0, 26, [Pre-Processing], [Invalid constant expression], { sLine, nLine, sSource } ) )
+               ENDIF
+
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "IFDEF", nLen )
+
+               SetIfDef( sLine, .T. )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "IFNDEF", nLen )
+
+               SetIfDef( sLine, .F. )
+               sLine := ''
+               LOOP
+
+            ELSEIF sDirective == Left( "INCLUDE", nLen )
+
+               ExtractLeadingWS( @sLine )
+               DropTrailingWS( @sLine )
+
+               // Added Oct-16-2004 to support #defines and translates.
+               bPresetCompile := bCompile
+               bCompile := .F.
+               sLine := PP_PreProLine( sLine )
+               bCompile := bPresetCompile
+
+               // Strip the ""
+               sLine := SubStr( sLine, 2, Len( sLine ) - 2 )
+
+               IF Upper( sLine ) == "RP_RUN.CH" .AND. s_lRunLoaded
+                  // already loaded.
+               ELSEIF Upper( sLine ) == "HBCLASS.CH"
                   IF ! s_lClsLoaded
                      s_lClsLoaded := .T.
                      InitClsRules()
                      InitClsResults()
                      IF Len( aDefRules ) != Len( aDefResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
-                        // Safety
-                        BREAK
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
                      ENDIF
                      IF Len( aTransRules ) != Len( aTransResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
-                        // Safety
-                        BREAK
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
                      ENDIF
                      IF Len( aCommRules ) != Len( aCommResults )
-                        Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
-                        // Safety
-                        BREAK
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
                      ENDIF
                   ENDIF
 
-                  InitFWRules()
-                  InitFWResults()
+             #ifdef FW
+               ELSEIF Upper( sLine ) == "FIVEWIN.CH"
+                  IF ! s_lFWLoaded
+                     s_lFWLoaded := .T.
+                     IF ! s_lClsLoaded
+                        s_lClsLoaded := .T.
+                        InitClsRules()
+                        InitClsResults()
+                        IF Len( aDefRules ) != Len( aDefResults )
+                           Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                        ENDIF
+                        IF Len( aTransRules ) != Len( aTransResults )
+                           Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                        ENDIF
+                        IF Len( aCommRules ) != Len( aCommResults )
+                           Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [CLASS #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                        ENDIF
+                     ENDIF
 
-                  IF Len( aDefRules ) != Len( aDefResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
-                     // Safety
-                     BREAK
+                     InitFWRules()
+                     InitFWResults()
+
+                     IF Len( aDefRules ) != Len( aDefResults )
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #DEFINE Rules size mismatch], { aDefRules, aDefResults } ) )
+                     ENDIF
+                     IF Len( aTransRules ) != Len( aTransResults )
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
+                     ENDIF
+                     IF Len( aCommRules ) != Len( aCommResults )
+                        Break( ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
+                     ENDIF
                   ENDIF
-                  IF Len( aTransRules ) != Len( aTransResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #TRANSLATE Rules size mismatch], { aTransRules, aTransResults } ) )
-                     // Safety
-                     BREAK
+             #endif
+
+               ELSE
+                  IF bCompile .OR. ( hPP != NIL .AND. hPP > 0 )
+                     PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
+                  ELSE
+                     PP_PreProFile( sLine, NIL, .T., .F., aPendingLines ) // Intentionally not using s_sIncludeFile
+                     aAdd( aPendingLines, "#line " + LTrim( Str( nLine ) ) + " " + sSource )
+                     nPendingLines := Len( aPendingLines )
                   ENDIF
-                  IF Len( aCommRules ) != Len( aCommResults )
-                     Eval( s_bRTEBlock, ErrorNew( [PP], 0, 1003, [Pre-Processing], [FW #COMMAND Rules size mismatch], { aCommRules, aCommResults } ) )
-                     // Safety
-                     BREAK
-                  ENDIF
+
+                  /* Recursion safety - don't use the Static might be modified. */
+                  s_sIncludeFile := sLine
                ENDIF
-          #endif
+
+               //TraceLog( sLine )
+               sLine := ''
+               LOOP
 
             ELSE
-               IF bCompile .OR. ( hPP != NIL .AND. hPP > 0 )
-                  PP_PreProFile( sLine ) // Intentionally not using s_sIncludeFile
+
+               IF Left( sDirective, 1 ) == 'X'
+                  bX := .T.
+                  sDirective := SubStr( sDirective, 2 )
+                  nLen--
                ELSE
-                  PP_PreProFile( sLine, NIL, .T., .F., aPendingLines ) // Intentionally not using s_sIncludeFile
-                  aAdd( aPendingLines, "#line " + LTrim( Str( nLine ) ) + " " + sSource )
-                  nPendingLines := Len( aPendingLines )
+                  bX := .F.
                ENDIF
 
-               /* Recursion safety - don't use the Static might be modified. */
-               s_sIncludeFile := sLine
+               IF sDirective == Left( 'TRANSLATE', nLen )
+
+                  CompileRule( sLine, aTransRules, aTransResults, bX, .F. )
+                  sLine := ''
+                  LOOP
+
+               ELSEIF sDirective == Left( 'COMMAND', nLen )
+
+                  CompileRule( sLine, aCommRules, aCommResults, bX, .F. )
+                  sLine := ''
+                  LOOP
+
+               ELSEIF sDirective == Left( 'UNTRANSLATE', nLen )
+
+                  CompileRule( sLine, aTransRules, aTransResults, bX, .T. )
+                  sLine := ''
+                  LOOP
+
+               ELSEIF sDirective == Left( 'UNCOMMAND', nLen )
+
+                  CompileRule( sLine, aCommRules, aCommResults, bX, .T. )
+                  sLine := ''
+                  LOOP
+
+               ELSE
+
+                  Break( ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective, { sLine, nLine, sSource } ) )
+
+               ENDIF
+
+            ENDIF
+
+         ENDIF
+
+         #ifdef PP_RECURSIVE
+            s_bRecursive := .T.
+         #endif
+
+         BEGIN SEQUENCE
+
+            IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
+               //? "Ignored: " + sLine
+               sLine := ''
+               BREAK
             ENDIF
 
             //TraceLog( sLine )
-            sLine := ''
-            LOOP
+            s_sPending := ""
+            aEval( aPendingLines, {|s| IIF( s != NIL, s_sPending += '; ' + s, ) } )
 
-         ELSE
+            sBackupLine := sLine
+            sPassed     := ""
+            DO WHILE ( sToken := NextIdentifier( @sLine, @sSkipped ) ) != NIL
+               //? "Token = '"  + sToken + "'"
+               //WAIT
 
-            IF Left( sDirective, 1 ) == 'X'
-               bX := .T.
-               sDirective := SubStr( sDirective, 2 )
-               nLen--
-            ELSE
-               bX := .F.
-            ENDIF
+               sPassed += sSkipped
 
-            IF sDirective == Left( 'TRANSLATE', nLen )
-
-               CompileRule( sLine, aTransRules, aTransResults, bX, .F. )
-               sLine := ''
-               LOOP
-
-            ELSEIF sDirective == Left( 'COMMAND', nLen )
-
-               CompileRule( sLine, aCommRules, aCommResults, bX, .F. )
-               sLine := ''
-               LOOP
-
-            ELSEIF sDirective == Left( 'UNTRANSLATE', nLen )
-
-               CompileRule( sLine, aTransRules, aTransResults, bX, .T. )
-               sLine := ''
-               LOOP
-
-            ELSEIF sDirective == Left( 'UNCOMMAND', nLen )
-
-               CompileRule( sLine, aCommRules, aCommResults, bX, .T. )
-               sLine := ''
-               LOOP
-
-            ELSE
-
-               Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Pre-Process], [Unknown directive: ] + sDirective,  ) )
-               // Safety
-               BREAK
-
-            ENDIF
-
-         ENDIF
-
-      ENDIF
-
-      #ifdef PP_RECURSIVE
-         s_bRecursive := .T.
-      #endif
-
-    BEGIN SEQUENCE
-
-      IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
-         //? "Ignored: " + sLine
-         sLine := ''
-         BREAK
-      ENDIF
-
-      //TraceLog( sLine )
-      s_sPending := ""
-      aEval( aPendingLines, {|s| IIF( s != NIL, s_sPending += '; ' + s, ) } )
-
-      sBackupLine := sLine
-      sPassed     := ""
-      DO WHILE ( sToken := NextIdentifier( @sLine, @sSkipped ) ) != NIL
-         //? "Token = '"  + sToken + "'"
-         //WAIT
-
-         sPassed += sSkipped
-
-         // Save incase MatchRule fails.
-         #ifdef USE_C_BOOST
-            bArrayPrefix := GetArrayPrefix()
-         #else
-            bArrayPrefix := s_bArrayPrefix
-         #endif
-
-         IF ( nRule := MatchRule( sToken, @sLine, aDefRules, aDefResults, .F., .F. ) ) > 0
-            //? "DEFINED: " + sLine
-            //WAIT
-
-            aAdd( aDefined, nRule )
-
-            nPosition := 0
-            WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
-               nPendingLines++
-               IF nPendingLines > Len( aPendingLines )
-                  aSize( aPendingLines, nPendingLines )
-               ENDIF
-
-               nPosition++
-               aIns( aPendingLines, nPosition )
-               aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
-
-               #ifdef REVIEW
-                  IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, aPendingLines[ nPosition ] )
-                  ENDIF
+               // Save incase MatchRule fails.
+               #ifdef USE_C_BOOST
+                  bArrayPrefix := GetArrayPrefix()
+               #else
+                  bArrayPrefix := s_bArrayPrefix
                #endif
 
-               //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
-               sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
+               IF ( nRule := MatchRule( sToken, @sLine, aDefRules, aDefResults, .F., .F. ) ) > 0
+                  //? "DEFINED: " + sLine
+                  //WAIT
+
+                  aAdd( aDefined, nRule )
+
+                  nPosition := 0
+                  WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
+                     nPendingLines++
+                     IF nPendingLines > Len( aPendingLines )
+                        aSize( aPendingLines, nPendingLines )
+                     ENDIF
+
+                     nPosition++
+                     aIns( aPendingLines, nPosition )
+                     aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
+
+                     #ifdef REVIEW
+                        IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
+                           aAdd( asOutLines, aPendingLines[ nPosition ] )
+                        ENDIF
+                     #endif
+
+                     //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
+                     sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
+                  ENDDO
+
+                  IF nPosition == 0
+                     #ifdef REVIEW
+                        IF Left( sLine, 1 ) == '#' .AND. ! bCompile
+                           aAdd( asOutLines, sLine )
+                        ENDIF
+                     #endif
+
+                     sLine := sLeft + sPassed + sLine
+                  ELSE
+                     IF ! Empty( sLine )
+                         nPendingLines++
+                         IF nPendingLines > Len( aPendingLines )
+                            aSize( aPendingLines, nPendingLines )
+                         ENDIF
+
+                         nPosition++
+                         aIns( aPendingLines, nPosition )
+                         aPendingLines[ nPosition ] := sLine
+                     ENDIF
+
+                     //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
+                     sLine := sLeft + sPassed + aPendingLines[1]
+                     aDel( aPendingLines, 1 )
+                     nPendingLines--
+                  ENDIF
+
+                  // Re-Reprocess the line ...
+                  BREAK
+               ELSE
+                  // Restore since MatchRule() faild.
+                  #ifdef USE_C_BOOST
+                     SetArrayPrefix( bArrayPrefix )
+                  #else
+                     s_bArrayPrefix := bArrayPrefix
+                  #endif
+               ENDIF
+
+               sPassed += sToken
             ENDDO
 
-            IF nPosition == 0
-               #ifdef REVIEW
-                  IF Left( sLine, 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, sLine )
-                  ENDIF
-               #endif
+            // Now process Translates...
+            //? "After Defines:", sLine
 
-               sLine := sLeft + sPassed + sLine
-            ELSE
-               IF ! Empty( sLine )
-                   nPendingLines++
-                   IF nPendingLines > Len( aPendingLines )
-                      aSize( aPendingLines, nPendingLines )
-                   ENDIF
+            sLine := sBackupLine
 
-                   nPosition++
-                   aIns( aPendingLines, nPosition )
-                   aPendingLines[ nPosition ] := sLine
-               ENDIF
-
-               //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
-               sLine := sLeft + sPassed + aPendingLines[1]
-               aDel( aPendingLines, 1 )
-               nPendingLines--
-            ENDIF
-
-            // Re-Reprocess the line ...
-            BREAK
-         ELSE
-            // Restore since MatchRule() faild.
+            // Reset at new line.
             #ifdef USE_C_BOOST
-               SetArrayPrefix( bArrayPrefix )
+               SetArrayPrefix( .F. )
             #else
-               s_bArrayPrefix := bArrayPrefix
+               s_bArrayPrefix := .F.
             #endif
-         ENDIF
 
-         sPassed += sToken
-      ENDDO
+            sPassed := ""
+            DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
+               //? "Token = '"  + sToken + "'"
+               //WAIT
 
-      // Now process Translates...
-      //? "After Defines:", sLine
+               // Save incase MatchRule fails.
+               #ifdef USE_C_BOOST
+                  bArrayPrefix := GetArrayPrefix()
+               #else
+                  bArrayPrefix := s_bArrayPrefix
+               #endif
 
-      sLine := sBackupLine
+               IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
+                  //? "TRANSLATED: " + sLine
+                  //WAIT
 
-      // Reset at new line.
-      #ifdef USE_C_BOOST
-         SetArrayPrefix( .F. )
-      #else
-         s_bArrayPrefix := .F.
-      #endif
+                  IF sPassed == "" .AND. aScan( aTranslated, nRule ) > 0
+                     Break( ErrorNew( "PP", 0, 2079, [Pre-Process], [Ciruclarity Detected], { sLine, nLine, sSource, sToken } ) )
+                  ELSE
+                     aAdd( aTranslated, nRule )
+                  ENDIF
 
-      sPassed := ""
-      DO WHILE ( sToken := NextToken( @sLine ) ) != NIL
-         //? "Token = '"  + sToken + "'"
-         //WAIT
+                  IF Empty( s_sPending )
+                     nPendingLines := 0
+                     aSize( aPendingLines, 0 )
+                  ENDIF
 
-         // Save incase MatchRule fails.
-         #ifdef USE_C_BOOST
-            bArrayPrefix := GetArrayPrefix()
-         #else
-            bArrayPrefix := s_bArrayPrefix
-         #endif
+                  nPosition := 0
+                  WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
+                     nPendingLines++
+                     IF nPendingLines > Len( aPendingLines )
+                        aSize( aPendingLines, nPendingLines )
+                     ENDIF
 
-         IF ( nRule := MatchRule( sToken, @sLine, aTransRules, aTransResults, .F., .T. ) ) > 0
-            //? "TRANSLATED: " + sLine
-            //WAIT
+                     nPosition++
+                     aIns( aPendingLines, nPosition )
+                     aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
 
-            IF sPassed == "" .AND. aScan( aTranslated, nRule ) > 0
-               Eval( s_bRTEBlock, ErrorNew( "PP", 0, 2079, [Pre-Process], [Ciruclarity Detected], { sToken } ) )
-               // Safety
-               BREAK
-            ELSE
-               aAdd( aTranslated, nRule )
-            ENDIF
+                     #ifdef REVIEW
+                        IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
+                           aAdd( asOutLines, aPendingLines[ nPosition ] )
+                        ENDIF
+                     #endif
 
-            IF Empty( s_sPending )
-               nPendingLines := 0
-               aSize( aPendingLines, 0 )
-            ENDIF
+                     //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
+                     sLine := SubStr( sLine, nNewLineAt + 1 )
+                  ENDDO
 
-            nPosition := 0
-            WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
-               nPendingLines++
-               IF nPendingLines > Len( aPendingLines )
-                  aSize( aPendingLines, nPendingLines )
+                  IF nPosition == 0
+                     #ifdef REVIEW
+                        IF Left( sLine, 1 ) == '#' .AND. ! bCompile
+                           aAdd( asOutLines, sLine )
+                        ENDIF
+                     #endif
+
+                     sLine := sLeft + sPassed + sLine
+                  ELSE
+                     IF ! Empty( sLine )
+                        nPendingLines++
+                        IF nPendingLines > Len( aPendingLines )
+                           aSize( aPendingLines, nPendingLines )
+                        ENDIF
+
+                        nPosition++
+                        aIns( aPendingLines, nPosition )
+                        aPendingLines[ nPosition ] := sLine
+                     ENDIF
+                     //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
+                     sLine := sLeft + sPassed + aPendingLines[1]
+                     aDel( aPendingLines, 1 )
+                     nPendingLines--
+                  ENDIF
+
+                  BREAK
+               ELSE
+                  // Restore since MatchRule() faild.
+                  #ifdef USE_C_BOOST
+                     SetArrayPrefix( bArrayPrefix )
+                  #else
+                     s_bArrayPrefix := bArrayPrefix
+                  #endif
                ENDIF
 
-               nPosition++
-               aIns( aPendingLines, nPosition )
-               aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
-
-               #ifdef REVIEW
-                  IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, aPendingLines[ nPosition ] )
-                  ENDIF
-               #endif
-
-               //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPendingLines]
-               sLine := SubStr( sLine, nNewLineAt + 1 )
+               sPassed += sToken
             ENDDO
 
-            IF nPosition == 0
-               #ifdef REVIEW
-                  IF Left( sLine, 1 ) == '#' .AND. ! bCompile
-                     aAdd( asOutLines, sLine )
-                  ENDIF
-               #endif
+            sLine := sPassed //sBackupLine
 
-               sLine := sLeft + sPassed + sLine
-            ELSE
-               IF ! Empty( sLine )
+            sToken := NextToken( @sLine )
+
+            IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
+               //? "COMMANDED: " + sLine
+               //? '"' + sLeft +'"', '"' + sPassed + '"'
+               //WAIT
+
+               /*
+               IF aScan( aCommanded, nRule ) > 0
+                  Alert( [Cyclic directive: #command ] + sToken )
+               BREAK
+               ELSE
+                  aAdd( aCommanded, nRule )
+               ENDIF
+               */
+
+               IF Empty( s_sPending )
+                  nPendingLines := 0
+                  aSize( aPendingLines, 0 )
+               ENDIF
+
+               nPosition := 0
+               WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
                   nPendingLines++
                   IF nPendingLines > Len( aPendingLines )
                      aSize( aPendingLines, nPendingLines )
@@ -5878,116 +5906,88 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                   nPosition++
                   aIns( aPendingLines, nPosition )
-                  aPendingLines[ nPosition ] := sLine
+                  aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
+
+                  #ifdef REVIEW
+                     IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, aPendingLines[ nPosition ] )
+                     ENDIF
+                  #endif
+
+                  //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
+                  sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
+               ENDDO
+
+               IF nPosition == 0
+                  #ifdef REVIEW
+                     IF Left( sLine, 1 ) == '#' .AND. ! bCompile
+                        aAdd( asOutLines, sLine )
+                     ENDIF
+                  #endif
+
+                  sLine := sLeft + sLine
+               ELSE
+                  IF ! Empty( sLine )
+                     nPendingLines++
+
+                     IF nPendingLines > Len( aPendingLines )
+                        aSize( aPendingLines, nPendingLines )
+                     ENDIF
+
+                     nPosition++
+                     aIns( aPendingLines, nPosition )
+                     aPendingLines[ nPosition ] := sLine
+                  ENDIF
+
+                  //? "Pending #", nPendingLines,  sLine, aPendingLines[nPosition]
+                  sLine := sLeft + aPendingLines[1]
+                  aDel( aPendingLines, 1 )
+                  nPendingLines--
                ENDIF
-               //? "Pending #", nPendingLines, sLine, aPendingLines[nPendingLines]
-               sLine := sLeft + sPassed + aPendingLines[1]
-               aDel( aPendingLines, 1 )
-               nPendingLines--
+
+               BREAK
             ENDIF
 
-            BREAK
-         ELSE
-            // Restore since MatchRule() faild.
-            #ifdef USE_C_BOOST
-               SetArrayPrefix( bArrayPrefix )
-            #else
-               s_bArrayPrefix := bArrayPrefix
-            #endif
-         ENDIF
+            aAdd( asOutLines, sLeft + sPassed )
+            sLine := ""
 
-         sPassed += sToken
+         RECOVER USING oError
+
+           IF ValType( oError ) == 'O'
+              //Alert( oError )
+              Break( oError ) // We have another wrapper outside.
+           ENDIF
+
+           LOOP
+
+         END SEQUENCE
+
+
       ENDDO
 
-      sLine := sPassed //sBackupLine
+   RECOVER USING oError
 
-      sToken := NextToken( @sLine )
+     IF( oError:ClassName == "ERROR" )
+        TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args )
 
-      IF sToken != NIL .AND. ( nRule := MatchRule( sToken, @sLine, aCommRules, aCommResults, .T., .T. ) ) > 0
-         //? "COMMANDED: " + sLine
-         //? '"' + sLeft +'"', '"' + sPassed + '"'
-         //WAIT
+        IF oError:SubSystem == "PP"
+           oError:Description += ";Script line: " + Str( nLine, 5 ) + ";Engine line: " + Str( oError:ProcLine, 5 )
 
-         /*
-         IF aScan( aCommanded, nRule ) > 0
-            Alert( [Cyclic directive: #command ] + sToken )
-            BREAK
-         ELSE
-            aAdd( aCommanded, nRule )
-         ENDIF
-         */
+           oError:ProcLine := nLine
+           IF s_nProcID > 0
+              oError:ProcName := s_aProcedures[ s_nProcID ]
+           ENDIF
+           oError:ModuleName := s_sFile
+        ELSE
+           oError:Description += ";Engine line: " + oError:ProcName + "(" + Str( oError:ProcLine, 5 ) + ")"
+        ENDIF
 
-         IF Empty( s_sPending )
-            nPendingLines := 0
-            aSize( aPendingLines, 0 )
-         ENDIF
+        Break( oError )
+     ELSE
+        TraceLog( "UNEXPEXTED CASE!", oError )
+     ENDIF
 
-         nPosition := 0
-         WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
-            nPendingLines++
-            IF nPendingLines > Len( aPendingLines )
-               aSize( aPendingLines, nPendingLines )
-            ENDIF
-
-            nPosition++
-            aIns( aPendingLines, nPosition )
-            aPendingLines[ nPosition ] := Left( sLine, nNewLineAt - 1 )
-
-            #ifdef REVIEW
-               IF Left( aPendingLines[ nPosition ], 1 ) == '#' .AND. ! bCompile
-                  aAdd( asOutLines, aPendingLines[ nPosition ] )
-               ENDIF
-            #endif
-
-            //? "Pending #", nPendingLines,  Left( sLine, nNewLineAt - 1 ), aPendingLines[nPosition]
-            sLine := LTrim( SubStr( sLine, nNewLineAt + 1 ) )
-         ENDDO
-
-         IF nPosition == 0
-            #ifdef REVIEW
-               IF Left( sLine, 1 ) == '#' .AND. ! bCompile
-                  aAdd( asOutLines, sLine )
-               ENDIF
-            #endif
-
-            sLine := sLeft + sLine
-         ELSE
-            IF ! Empty( sLine )
-               nPendingLines++
-
-               IF nPendingLines > Len( aPendingLines )
-                  aSize( aPendingLines, nPendingLines )
-               ENDIF
-
-               nPosition++
-               aIns( aPendingLines, nPosition )
-               aPendingLines[ nPosition ] := sLine
-            ENDIF
-
-            //? "Pending #", nPendingLines,  sLine, aPendingLines[nPosition]
-            sLine := sLeft + aPendingLines[1]
-            aDel( aPendingLines, 1 )
-            nPendingLines--
-         ENDIF
-
-         BREAK
-      ENDIF
-
-      aAdd( asOutLines, sLeft + sPassed )
-      sLine := ""
-
-    RECOVER USING oError
-
-      IF ValType( oError ) == 'O'
-         //Alert( oError )
-         Break( oError ) // We have another wrapper outside.
-      ENDIF
-
-      LOOP
-
-    END SEQUENCE
-
-   ENDDO
+   END SEQUENCE
 
    #ifdef PP_RECURSIVE
       s_bRecursive := .F.
@@ -12533,17 +12533,19 @@ FUNCTION PP_ErrorMessage( e )
   ENDIF
 
   IF ValType( e:description ) == 'C'
-    cMessage += ("  " + e:description)
+    cMessage += (";Description: " + e:description)
   ENDIF
 
   IF ValType( e:filename ) == 'C' .AND. ! Empty( e:filename )
-    cMessage += ": " + e:filename
-  ELSEIF ValType( e:operation ) == 'C'
-    cMessage += ": " + e:operation
+    cMessage += ";Offending file: " + e:filename
+  ENDIF
+
+  IF ValType( e:operation ) == 'C'
+    cMessage += ";Operation: " + e:operation
   ENDIF
 
   IF ValType( e:osCode ) == 'N' .AND. ! Empty( e:osCode )
-     cMessage += " (DOS Error " + LTrim( Str( e:osCode ) ) + ")"
+     cMessage += ";DOS Error: " + LTrim( Str( e:osCode ) )
   ENDIF
 
   nPad := Len( cMessage ) + 1
@@ -12555,6 +12557,20 @@ FUNCTION PP_ErrorMessage( e )
         cMessage += Pad( ";#" + LTrim( Str( nArg ) ) + " Type: " + ValType( e:args[ nArg ] ) + " -> " + CStr( e:args[ nArg] ), nPad )
      NEXT
   ENDIF
+
+  IF ValType( e:ModuleName ) != 'C'
+     e:ModuleName := "Unspecified module"
+  ENDIF
+
+  IF ValType( e:ProcName ) != 'C'
+     e:ProcName := "No explicit Procedure"
+  ENDIF
+
+  IF ValType( e:ProcLine ) != 'N'
+     e:ProcLine := 0
+  ENDIF
+
+  cMessage += Pad( ";Error at: " + e:ModuleName + "->" + e:ProcName + "(" + LTrim( Str( e:ProcLine ) ) + ")", nPad )
 
   FOR nLevel := 0 TO s_nProcStack - 1
      cMessage += Pad( ";Called from " + s_aProcStack[ s_nProcStack - nLevel ][1] + "(" + LTrim( Str( s_aProcStack[ s_nProcStack - nLevel ][2] ) ) + ")", nPad )

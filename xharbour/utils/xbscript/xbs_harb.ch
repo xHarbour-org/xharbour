@@ -2205,7 +2205,7 @@
            }
            else
            {
-              TraceLog( "ppgendyn.log", "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
+              //TraceLog( "ppgendyn.log", "*** EMPTY *** PP_GENDYNPROCEDURES()\n" );
               hb_retnl( 0 );
               return;
            }
@@ -2223,7 +2223,7 @@
 
            if( iProcedures - iProcedure == 0 )
            {
-              TraceLog( "ppgendyn.log", "*** Nothing to process *** PP_GENDYNPROCEDURES()\n" );
+              //TraceLog( "ppgendyn.log", "*** Nothing to process *** PP_GENDYNPROCEDURES()\n" );
               hb_retnl( 0 );
               return;
            }
@@ -2353,7 +2353,7 @@
 
            if( pDynList == NULL )
            {
-              TraceLog( "ppgendyn.log", "*** EMPTY List! ***\n" );
+              //TraceLog( "ppgendyn.log", "*** EMPTY List! ***\n" );
               return;
            }
 
@@ -2363,7 +2363,7 @@
 
            if( iProcedures == iBase )
            {
-              TraceLog( "ppgendyn.log", "*** Nothing to release ***\n" );
+              //TraceLog( "ppgendyn.log", "*** Nothing to release ***\n" );
               return;
            }
 
