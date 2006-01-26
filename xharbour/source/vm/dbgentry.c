@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.10 2005/10/30 16:32:01 likewolf Exp $
+ * $Id: dbgentry.c,v 1.11 2006/01/18 23:44:05 likewolf Exp $
  */
 
 /*
@@ -1015,7 +1015,7 @@ hb_dbgEvalMakeBlock( HB_WATCHPOINT *watch )
             i += 4;
          }
          else if ( !hb_strnicmp( watch->szExpr + i + 1, "AND.", 4 )
-                   && !hb_strnicmp( watch->szExpr + i + 1, "NOT.", 4 ) )
+                   || !hb_strnicmp( watch->szExpr + i + 1, "NOT.", 4 ) )
          {
             i += 5;
          }
