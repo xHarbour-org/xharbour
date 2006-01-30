@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4784 2006/01/26 09:21:34 likewolf Exp $
+ * $Id: ChangeLog,v 1.4785 2006/01/30 02:51:21 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2006-01-30 10:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed error of array bound error in configure method, Reported by
+      Teo Fonrouge.
+    ! fixed repositioning of colpos after delcolum. Reported by Marco Boschi. 
+      Created ::nPrevDelColPos data to control it.
 
 2006-01-30 03:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbcmd.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.139 2005/12/08 19:06:12 oh1 Exp $
+ * $Id: tbrowse.prg,v 1.140 2005/12/10 00:33:33 oh1 Exp $
  */
 
 /*
@@ -645,6 +645,9 @@ CLASS TBrowse
 #endif
    DATA aColorSpec                        // Holds colors of Tbrowse:ColorSpec
 
+   DATA nPrevDelColPos                    // Save previous colpos before delcolumn(). For clipper compatibility.
+
+
 ENDCLASS
 
 //-------------------------------------------------------------------//
@@ -727,6 +730,8 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
 
    ::oDataCache := TDataCache():New( Self )
    ::lPaintBottomUp  := .F.
+
+   ::nPrevDelColPos   := 0
 
 Return Self
 
@@ -973,7 +978,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
                            iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
 
-   if Len( ::aRedraw ) <> ::RowCount
+   if Len( ::aRedraw ) <> ::RowCount .AND. ::RowCount > 0 
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
       ::oDataCache := TDataCache():New( Self )
@@ -1125,6 +1130,10 @@ METHOD DelColumn( nPos ) CLASS TBrowse
       Throw( ErrorNew( "BASE", 0, 1132, , "Bound error: array access" ) )
       return NIL
    endif
+
+   IF ::nPrevDelColPos = 0
+      ::nPrevDelColPos := ::nColPos
+   ENDIF
 
    //  Need to adjust variables in case last column is deleted
    //  Fixes and important bug
@@ -2219,6 +2228,16 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
       return .t.
    endif
+
+
+   // 2006/Jan/28 - E.F. - Clipper compatibility.
+   // Restore ::nColPos after delcolumn(), because delcolumn() method
+   // can be called more than one time before stabilization.
+   IF ::nPrevDelColPos > 0 
+      ::nColPos := Min(::nPrevDelColPos,::nColumns)
+      ::nPrevDelColPos := 0
+   ENDIF
+
 
    /* First, since ::nColPos can go "out of bounds" we need
       to put 1 <= ::nColpos <= ::nColumns
