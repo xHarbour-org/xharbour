@@ -398,7 +398,7 @@ ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_ITEM pIt
    switch( uiType )
    {
       case DBS_NAME:
-         hb_itemPutC( pItem, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName );
+         hb_itemPutC( pItem, hb_dynsymName( ( PHB_DYNS ) pField->sym ) );
          break;
 
       case DBS_TYPE:
@@ -470,13 +470,8 @@ ERRCODE hb_waFieldName( AREAP pArea, USHORT uiIndex, void * szName )
       return FAILURE;
 
    pField = pArea->lpFields + uiIndex - 1;
-   /*
-   strncpy( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
-            HARBOUR_MAX_RDD_FIELDNAME_LENGTH );
-   */
-   ((char *) szName)[0] = '\0';
-   strncat( ( char * ) szName, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName,
-            pArea->uiMaxFieldNameLength );
+   hb_strncpy( ( char * ) szName, hb_dynsymName( ( PHB_DYNS ) pField->sym ),
+               pArea->uiMaxFieldNameLength );
    return SUCCESS;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.10 2005/12/05 21:41:48 jabrecer Exp $
+ * $Id: adsmgmnt.c,v 1.11 2005/12/06 18:26:19 ronpinkas Exp $
  */
 
 /*
@@ -378,19 +378,10 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
    UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
    ADS_MGMT_USER_INFO * pastUserInfo;
 
-   HB_ITEM ArrayUser, SubItems, Name, Conn, Addr;
-
-   ArrayUser.type = HB_IT_NIL;
-   SubItems.type  = HB_IT_NIL;
-   Name.type      = HB_IT_NIL;
-   Conn.type      = HB_IT_NIL;
-   Addr.type      = HB_IT_NIL;
-
-   hb_arrayNew( &ArrayUser, 0 );
 /*
-//   ADS_MGMT_USER_INFO  astUserInfo[MAX_NUM_USERS];
-// bh:  Enhancement:  Get # of tables from ADS_MGMT_ACTIVITY_INFO.stUsers instead of set size
-*/
+   ADS_MGMT_USER_INFO  astUserInfo[MAX_NUM_USERS];
+   bh:  Enhancement:  Get # of tables from ADS_MGMT_ACTIVITY_INFO.stUsers instead of set size
+ */
    if ( ISNUM( 2 ) )
    {
       ulMaxUsers = (UNSIGNED16) hb_parnl( 2 );
@@ -398,42 +389,39 @@ HB_FUNC( ADSMGGETUSERNAMES )   /* Return array of connected users */
 
    pastUserInfo = (ADS_MGMT_USER_INFO *) hb_xgrab( sizeof( ADS_MGMT_USER_INFO ) * ulMaxUsers );
       /*
-      //   AdsMgGetUserNames ( ADSHANDLE hMgmtConnect,
-      //                      UNSIGNED8 *pucFileName,
-      //                      ADS_MGMT_USER_INFO astUserInfo[],
-      //                      UNSIGNED16 *pusArrayLen,
-      //                      UNSIGNED16 *pusStructSize );
+         AdsMgGetUserNames ( ADSHANDLE hMgmtConnect,
+                            UNSIGNED8 *pucFileName,
+                            ADS_MGMT_USER_INFO astUserInfo[],
+                            UNSIGNED16 *pusArrayLen,
+                            UNSIGNED16 *pusStructSize );
       */
    ulRetVal = AdsMgGetUserNames( hMgmtHandle, ISCHAR( 1 ) ? (UNSIGNED8 *) hb_parcx( 1 ) : NULL,
                                  pastUserInfo,
                                  &ulMaxUsers,
                                  &usStructSize );
       /*
-      //if ( sizeof( ADS_MGMT_USER_INFO ) < usStructSize )
-      //   {
-      //      HB_TRACE(HB_TR_INFO, ("The \nUser Information structure on the server is larger.
-      //         \nMore info is available with the current ACE.H." ));
-      //   }
+      if ( sizeof( ADS_MGMT_USER_INFO ) < usStructSize )
+         {
+            HB_TRACE(HB_TR_INFO, ("The \nUser Information structure on the server is larger.
+               \nMore info is available with the current ACE.H." ));
+         }
       */
    if ( ulRetVal == AE_SUCCESS )
    {
-      for ( ulCount = 0; ulCount < ulMaxUsers; ulCount++ )
+      PHB_ITEM pArray = hb_itemArrayNew( ulMaxUsers ), pArrayItm;
+
+      for ( ulCount = 1; ulCount <= ulMaxUsers; ulCount++ )
       {
-//         hb_storc( (char *) pastUserInfo[ulCount].aucUserName , -1, ulCount+1 );
-
-         hb_arrayNew( &SubItems, 0 );
-
-         hb_itemPutC( &Name, (char *) pastUserInfo[ulCount].aucUserName );
-         hb_itemPutNL(&Conn, pastUserInfo[ulCount].usConnNumber );
-         hb_itemPutC( &Addr, (char *) pastUserInfo[ulCount].aucAddress );
-
-         hb_arrayAddForward( &SubItems, &Name ) ;
-         hb_arrayAddForward( &SubItems, &Conn ) ;
-         hb_arrayAddForward( &SubItems, &Addr ) ;
-         hb_arrayAddForward( &ArrayUser, &SubItems );
+         pArrayItm = hb_arrayGetItemPtr( pArray, ulCount );
+         hb_arrayNew( pArrayItm, 3 );
+         hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 1 ),
+                      ( char * ) pastUserInfo[ulCount].aucUserName );
+         hb_itemPutNL( hb_arrayGetItemPtr( pArrayItm, 2 ),
+                       pastUserInfo[ulCount].usConnNumber );
+         hb_itemPutC( hb_arrayGetItemPtr( pArrayItm, 3 ),
+                      ( char * ) pastUserInfo[ulCount].aucAddress );
       }
-
-      hb_itemReturnForward( &ArrayUser );
+      hb_itemRelease( hb_itemReturn( pArray ) );
    }
    else
    {

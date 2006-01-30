@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.95 2005/12/11 12:38:26 druzus Exp $
+ * $Id: ads1.c,v 1.96 2005/12/14 11:07:32 brianhays Exp $
  */
 
 /*
@@ -2353,29 +2353,33 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
         case HB_IT_MEMO:
             if( pField->uiTypeExtended != ADS_VARCHAR )
             {
-               if( strlen((( PHB_DYNS ) pField->sym )->pSymbol->szName) > (unsigned int) pArea->uiMaxFieldNameLength )
+               char * szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
+               if( strlen( szName ) > (unsigned int) pArea->uiMaxFieldNameLength )
                {
-                   strncpy( (char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName, pArea->uiMaxFieldNameLength );
+                   strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
                    sprintf( (char*)ucBuffer, "%s,%s;", ucField, cType );
                }
                else
                {
-                   sprintf( (char*)ucBuffer, "%s,%s;", ( ( PHB_DYNS ) pField->sym )->pSymbol->szName, cType );
+                   sprintf( (char*)ucBuffer, "%s,%s;", szName, cType );
                }
                break;
             }
 
-        default :
-            if( strlen( ( ( PHB_DYNS ) pField->sym )->pSymbol->szName) > (unsigned int) pArea->uiMaxFieldNameLength )
+        default:
             {
-                strncpy( (char*)ucField, (( PHB_DYNS ) pField->sym )->pSymbol->szName, pArea->uiMaxFieldNameLength );
-                sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
+               char * szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
+               if( strlen( szName) > (unsigned int) pArea->uiMaxFieldNameLength )
+               {
+                   strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
+                   sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
+               }
+               else
+               {
+                   sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", szName, cType, pField->uiLen, pField->uiDec );
+               }
+               break;
             }
-            else
-            {
-                sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", (( PHB_DYNS ) pField->sym )->pSymbol->szName, cType, pField->uiLen, pField->uiDec );
-            }
-            break;
      }
 
      strcat( (char*)ucfieldDefs, (char*)ucBuffer );

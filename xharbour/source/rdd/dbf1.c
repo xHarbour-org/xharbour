@@ -524,7 +524,7 @@ static void hb_dbfGetLockArray( DBFAREAP pArea, PHB_ITEM pItem )
  * This function is common for different DBF based RDD implementation
  * so I don't make it static
  */
-ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode )
+HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode )
 {
    ERRCODE errEGcode;
 
@@ -582,7 +582,7 @@ ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
+HB_EXPORT ULONG hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
 {
    ULONG ulBlock= 0;
 
@@ -615,7 +615,7 @@ ULONG HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex )
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-void HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
+HB_EXPORT void hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfPutMemoBlock(%p, %hu, %lu)", pArea, uiIndex, ulBlock));
 
@@ -647,7 +647,7 @@ void HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex, ULONG ulBlock
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-ERRCODE HB_EXPORT hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
+HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                      ULONG * pulBlock, ULONG * pulSize,
                                      ULONG * pulType )
 {
@@ -706,7 +706,7 @@ ERRCODE HB_EXPORT hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-ERRCODE HB_EXPORT hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
+HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                      ULONG ulBlock, ULONG ulSize, ULONG ulType )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfSetMemoData(%p, %hu, %lu, %lu, %lu)", pArea, uiIndex, ulBlock, ulSize, ulType));
@@ -757,7 +757,7 @@ ERRCODE HB_EXPORT hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool )
+HB_EXPORT BOOL hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool )
 {
    switch ( bScheme )
    {
@@ -799,7 +799,7 @@ BOOL HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET
  * This function is common for different MEMO implementation
  * so I left it in DBF.
  */
-BOOL HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos )
+HB_EXPORT BOOL hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos )
 {
    HB_FOFFSET ulPos, ulPool, ulSize = 1;
    BOOL fRet = FALSE, fWait;
@@ -2140,7 +2140,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
    {
       LPFIELD pField = pArea->lpFields + uiCount;
       strncpy( ( char * ) pThisField->bName,
-               ( ( PHB_DYNS ) pField->sym )->pSymbol->szName, 10 );
+               hb_dynsymName( ( PHB_DYNS ) pField->sym ), 10 );
       pArea->pFieldOffset[ uiCount ] = pArea->uiRecordLen;
       /* field offset */
       if( pArea->bTableType == DB_DBF_VFP )

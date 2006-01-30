@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4783 2006/01/26 02:03:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4784 2006/01/26 09:21:34 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-30 03:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/nulsys/nulsys.c
+  * xharbour/contrib/rdd_ads/ads1.c
+    * cleaned the HB_EXPORT usage and replaced direct access HVM internals
+      by functions
+
+  * xharbour/contrib/rdd_ads/adsmgmnt.c
+    * rewritten ADSMGGETUSERNAMES() - now it does not access any item
+      internals, is safe for future automatic GC activation and is faster
+      because array resizing has been eliminated.
+      I cannot test it so I'd like to ask Luiz to check this function
+      for some possible typos.
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/dynsym.c
+    + added hb_dynsymSymbol()
+
+  * xharbour/source/rtl/val.c
+    ! fixed the default size of returned numeric value to be Clipper
+      compatible
+
+  * xharbour/source/vm/itemapi.c
+    ! fixed string comparision with SET EXACT ON
 
 2006-01-26 12:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c

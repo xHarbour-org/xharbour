@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.188 2005/11/15 20:17:13 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.189 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -585,6 +585,7 @@ extern HB_EXPORT PHB_DYNS    hb_dynsymFindName( char * szName ); /* converts to 
 extern HB_EXPORT void        hb_dynsymLog( void );             /* displays all dynamic symbols */
 extern HB_EXPORT void        hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
 extern HB_EXPORT USHORT      hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern HB_EXPORT PHB_SYMB    hb_dynsymSymbol( PHB_DYNS pDynSym );
 extern HB_EXPORT char *      hb_dynsymName( PHB_DYNS pDynSym ); /* return dynamic symbol name */
 extern HB_EXPORT HB_HANDLE   hb_dynsymMemvarHandle( PHB_DYNS pDynSym ); /* return memvar handle number bound with given dynamic symbol */
 extern HB_EXPORT HB_HANDLE   hb_dynsymAreaHandle( PHB_DYNS pDynSym ); /* return work area number bound with given dynamic symbol */

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.131 2005/11/09 15:41:33 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.132 2005/11/22 02:01:44 druzus Exp $
  */
 
 /*
@@ -1253,8 +1253,10 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    {
       /* SET EXACT ON and not using == */
       /* Don't include trailing spaces */
-      while( ulLenFirst > 0 && szFirst[ ulLenFirst - 1 ] == ' ' ) ulLenFirst--;
-      while( ulLenSecond > 0 && szSecond[ ulLenSecond - 1 ] == ' ' ) ulLenSecond--;
+      while( ulLenFirst > ulLenSecond && szFirst[ ulLenFirst - 1 ] == ' ' )
+         ulLenFirst--;
+      while( ulLenSecond > ulLenFirst && szSecond[ ulLenSecond - 1 ] == ' ' )
+         ulLenSecond--;
    }
 
    ulMinLen = ulLenFirst < ulLenSecond ? ulLenFirst : ulLenSecond;

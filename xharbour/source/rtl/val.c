@@ -1,5 +1,5 @@
 /*
- * $Id: val.c,v 1.18 2004/09/09 21:27:53 druzus Exp $
+ * $Id: val.c,v 1.19 2004/11/21 21:44:20 druzus Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_FUNC( VAL )
       fDbl = hb_valStrnToNum( szText, iLen, &lValue, &dValue , &iDec, &iWidth );
 
       if ( !fDbl )
-         hb_retnintlen( lValue, iLen );
+         hb_retnintlen( lValue, iWidth );
       else
          hb_retnlen( dValue, iWidth, iDec );
    }

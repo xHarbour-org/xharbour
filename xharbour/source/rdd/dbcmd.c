@@ -303,7 +303,7 @@ static RDDFUNCS waTable = { hb_waBof,
 /*
  * Get RDD node poionter
  */
-LPRDDNODE HB_EXPORT hb_rddGetNode( USHORT uiNode )
+HB_EXPORT LPRDDNODE hb_rddGetNode( USHORT uiNode )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_rddGetNode(%hu)", uiNode));
 
@@ -373,7 +373,7 @@ static char * hb_rddDefaultDrv( char * szDriver )
 /*
  * Register a RDD driver.
  */
-int HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType )
+HB_EXPORT int hb_rddRegister( char * szDriver, USHORT uiType )
 {
    LPRDDNODE pRddNewNode;
    PHB_DYNS pGetFuncTable;
@@ -407,7 +407,7 @@ int HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType )
    pRddNewNode->rddID = s_uiRddMax;
 
    /* Call <szDriver>_GETFUNCTABLE() */
-   hb_vmPushSymbol( pGetFuncTable->pSymbol );
+   hb_vmPushSymbol( hb_dynsymSymbol( pGetFuncTable ) );
    hb_vmPushNil();
    hb_vmPushPointer( ( void * ) &uiFunctions );
    hb_vmPushPointer( ( void * ) &pRddNewNode->pTable );
@@ -444,7 +444,7 @@ int HB_EXPORT hb_rddRegister( char * szDriver, USHORT uiType )
  * pSuperTable - a current table in a RDDNODE
  * szDrvName - a driver name that will be inherited
  */
-ERRCODE HB_EXPORT hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName )
+HB_EXPORT ERRCODE hb_rddInherit( PRDDFUNCS pTable, PRDDFUNCS pSubTable, PRDDFUNCS pSuperTable, BYTE * szDrvName )
 {
    LPRDDNODE pRddNode;
    USHORT uiCount;
@@ -644,7 +644,7 @@ static AREAP hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
  * Closes and releases the current WorkArea preparing it
  * to be used with a new database.
  */
-void HB_EXPORT hb_rddReleaseCurrentArea( void )
+HB_EXPORT void hb_rddReleaseCurrentArea( void )
 {
    HB_THREAD_STUB
    USHORT uiWaPos;
@@ -760,7 +760,7 @@ static void hb_rddCloseAll( void )
 /*
  * Shutdown the RDD system.
  */
-void HB_EXPORT hb_rddShutDown( void )
+HB_EXPORT void hb_rddShutDown( void )
 {
    USHORT uiCount;
 
@@ -790,7 +790,7 @@ void HB_EXPORT hb_rddShutDown( void )
 /*
  * Insert the new WorkArea node
  */
-USHORT HB_EXPORT hb_rddInsertAreaNode( char *szDriver )
+HB_EXPORT USHORT hb_rddInsertAreaNode( char *szDriver )
 {
    HB_THREAD_STUB
 
@@ -923,7 +923,7 @@ HB_EXPORT void * hb_rddAllocWorkAreaAlias( char * szAlias, int iArea )
 /*
  * Return the current WorkArea number.
  */
-int HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
+HB_EXPORT int hb_rddGetCurrentWorkAreaNumber( void )
 {
    HB_THREAD_STUB
 
@@ -935,7 +935,7 @@ int HB_EXPORT hb_rddGetCurrentWorkAreaNumber( void )
 /*
  * Select a WorkArea by the number.
  */
-ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
+HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 {
    HB_THREAD_STUB
 
@@ -958,7 +958,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaNumber( int iArea )
 /*
  * Select a WorkArea by the symbol name.
  */
-ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
+HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
    ERRCODE bResult;
    char * szName;
@@ -973,7 +973,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
    }
    else
    {
-      szName = pSymAlias->pDynSym->pSymbol->szName;
+      szName = hb_dynsymName( pSymAlias->pDynSym );
 
       if( szName[ 0 ] && ! szName[ 1 ] && toupper( szName[ 0 ] ) >= 'A' && toupper( szName[ 0 ] ) <= 'K' )
       {
@@ -1016,7 +1016,7 @@ ERRCODE HB_EXPORT hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 /*
  * Select a WorkArea by the name.
  */
-ERRCODE HB_EXPORT hb_rddSelectWorkAreaAlias( char * szAlias )
+HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( char * szAlias )
 {
    ERRCODE bResult;
    int iArea;
@@ -1072,7 +1072,7 @@ HB_EXPORT void * hb_rddGetCurrentWorkAreaPointer( void )
 /*
  * call a pCallBack function with all open workareas ###
  */
-ERRCODE HB_EXPORT hb_rddIterateWorkAreas( WACALLBACK pCallBack, int data )
+HB_EXPORT ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, int data )
 {
    USHORT uiIndex;
 
@@ -1093,7 +1093,7 @@ ERRCODE HB_EXPORT hb_rddIterateWorkAreas( WACALLBACK pCallBack, int data )
 /*
  * Find a field index by name
  */
-USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
+HB_EXPORT USHORT hb_rddFieldIndex( AREAP pArea, char * szName )
 {
    USHORT uiCount = 0;
    LPFIELD pField;
@@ -1114,7 +1114,7 @@ USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
       while( pField )
       {
          ++uiCount;
-         if( strcmp( szSym, ( ( PHB_DYNS ) pField->sym )->pSymbol->szName ) == 0 )
+         if( strcmp( szSym, hb_dynsymName( ( PHB_DYNS ) pField->sym ) ) == 0 )
             return uiCount;
          pField = pField->lpfNext;
       }
@@ -1126,7 +1126,7 @@ USHORT HB_EXPORT hb_rddFieldIndex( AREAP pArea, char * szName )
  * find a field expression index, this function strips _FIELD->, FIELD->,
  * alias-> prefixes
  */
-USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField )
+HB_EXPORT USHORT hb_rddFieldExpIndex( AREAP pArea, char * szField )
 {
    int n;
 
@@ -1184,7 +1184,7 @@ USHORT HB_EXPORT hb_rddFieldExpIndex( AREAP pArea, char * szField )
 /*
  * Obtain the current value of a field.
  */
-ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+HB_EXPORT ERRCODE hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
@@ -1213,7 +1213,7 @@ ERRCODE HB_EXPORT hb_rddFieldGet( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Assign a value to a field.
  */
-ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+HB_EXPORT ERRCODE hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    HB_THREAD_STUB
    AREAP pArea = HB_CURRENT_WA;
@@ -1242,7 +1242,7 @@ ERRCODE HB_EXPORT hb_rddFieldPut( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 /*
  * Obtain the current value of a field.
  */
-ERRCODE HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+HB_EXPORT ERRCODE hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE bSuccess;
    USHORT uiAction;
@@ -1282,7 +1282,7 @@ ERRCODE HB_EXPORT hb_rddGetFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol 
 /*
  * Assign a value to a field.
  */
-ERRCODE HB_EXPORT hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
+HB_EXPORT ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol )
 {
    ERRCODE bSuccess;
    USHORT uiAction;
@@ -4417,7 +4417,7 @@ HB_FUNC( __DBCOPY )
    }
 }
 
-ERRCODE HB_EXPORT hb_rddGetTempAlias( char * szAliasTmp )
+HB_EXPORT ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 {
    int i, iArea;
 
