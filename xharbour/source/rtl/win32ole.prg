@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.131 2006/01/24 02:40:54 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.132 2006/01/24 06:40:32 ronpinkas Exp $
  */
 
 /*
@@ -886,10 +886,12 @@ RETURN Self
         bByRef = FALSE;
      }
 
+     VariantClear( pVariant );
+
      switch( pItem->type )
      {
         case HB_IT_NIL:
-          //pVariant->n1.n2.vt   = VT_EMPTY;
+          //pVariant->n1.n2.vt = VT_EMPTY;
           break;
 
         case HB_IT_STRING:

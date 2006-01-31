@@ -423,7 +423,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .2
+  #define REVISION .3
 #endif
 STATIC s_cVer := "2.0 RC2" + Stringify( REVISION )
 
@@ -12213,6 +12213,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
    LOCAL nProc, nProcs, xRet
    LOCAL bErrHandler, oError
    LOCAL aProc, bPreset, aPresetProcedures
+   LOCAL aStack
 
    #ifdef __CONCILE_PCODE__
       LOCAL cParamList, xParam
@@ -12296,7 +12297,22 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
          #endif
       NEXT
    RECOVER USING oError
-      TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
+      //TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
+
+      #ifdef __XHARBOUR__
+        IF oError:ClassName == "ERROR"
+           FOR EACH aStack IN oError:aaStack
+              IF aScan( aProcedures, {|__aProc| __aProc[1] == aStack[2] } ) > 0
+                 oError:ModuleName := s_sFile
+                 oError:ProcName := aStack[2]
+                 oError:ProcLine := aStack[3]
+
+                 //OutputDebugString( "File: '" + oError:ModuleName + "' Proc: '" + oError:ProcName + "' Line: " + Str( oError:ProcLine ) )
+                 EXIT
+              ENDIF
+           NEXT
+        ENDIF
+      #endif
 
       #ifdef DEBUG_PCODE
          TraceLog( aProcedures[nProc][1], aProcedures[nProc][2] )

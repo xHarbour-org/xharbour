@@ -72,7 +72,7 @@
      METHOD SetStaticProcedures()                       INLINE s_aProcedures := ::aCompiledProcs
 
 
-     METHOD GetLine( nLine )                            INLINE nLine -= ( ::nStartLine - 1 ), IIF( nLine > 0 .AND. nLine <= Len( ::acPPed ), ::acPPed[ nLine ], "" )
+     METHOD GetLine( nLine )
 
      #ifdef __XHARBOUR__
        METHOD EvalExpression()
@@ -194,7 +194,7 @@
            sLine := acPPed[nLine]
            IF ! Empty( sLine )
               //OutputDebugString( "COMPILE: (" + Str( nLine ) + ") " + sLine + EOL )
-              PP_CompileLine( sLine, nLine, ::aCompiledProcs, ::aInitExit, @nProcId )
+              PP_CompileLine( sLine, nLine + ::nStartLine, ::aCompiledProcs, ::aInitExit, @nProcId )
            ENDIF
         NEXT
 
@@ -296,6 +296,19 @@
      ENDIF
 
   RETURN xRet
+
+  //----------------------------------------------------------------------------//
+  METHOD GetLine( nLine ) CLASS TInterpreter
+
+     //OutputDebugString( "StartLine:" + Str( ::nStartLine ) + " Line:" + Str( nLine ) + " Len:" + Str( Len( ::acPPed ) ) )
+
+     nLine -= ::nStartLine
+
+     IF nLine > 0 .AND. nLine <= Len( ::acPPed )
+        RETURN ::acPPed[ nLine ]
+     ENDIF
+
+  RETURN ""
 
   //----------------------------------------------------------------------------//
   #ifdef __XHARBOUR__

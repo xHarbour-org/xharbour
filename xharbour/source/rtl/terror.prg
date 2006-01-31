@@ -1,5 +1,5 @@
 /*
- * $Id: terror.prg,v 1.16 2005/04/04 05:56:49 ronpinkas Exp $
+ * $Id: terror.prg,v 1.17 2005/04/20 23:29:54 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,7 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
 
    STATIC lInErr := .F., s_oClass
    LOCAL oErr
+   LOCAL nLevel, aaStack
 
    //TraceLog( SubSystem, GenCode, SubCode, Operation, Description, Args, ModuleName, ProcName, ProcLine )
 
@@ -101,6 +102,8 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
       #endif
 
       s_oClass:AddData( "ModuleName"   , "" )
+
+      s_oClass:AddData( "aaStack"      , {} )
 
       s_oClass:AddInline( "New", {|Self| Self } )
 
@@ -143,6 +146,13 @@ FUNCTION ErrorNew( SubSystem, GenCode, SubCode, Operation, Description, Args, Mo
    ELSE
       oErr:ProcLine := ProcLine
    ENDIF
+
+   nLevel := 1
+   aaStack := oErr:aaStack
+   WHILE ! Empty( ProcName( nLevel ) )
+      aAdd( aaStack, { ProcFile( nLevel ), ProcName( nLevel ), ProcLine( nLevel ) } )
+      nLevel++
+   ENDDO
 
    #ifdef HB_THREAD_SUPPORT
       oErr:RunningThreads := HB_ThreadCountStacks()

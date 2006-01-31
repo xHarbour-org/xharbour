@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4786 2006/01/30 12:36:04 modalsist Exp $
+ * $Id: ChangeLog,v 1.4787 2006/01/31 21:38:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-31 13:43 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/terror.prg
+    + Added new property ::aaStack - array of subarrays of { ProcFile(), ProcName(), ProcLine() }
+      /*
+         This allows to capture the Call Stack of an error when error is intercepted
+         by any error trapping for later processing by outer handler[s]
+       */
+
+  * source/rtl/win32ole.prg
+    * Safety VariantClear( pVariant ) in hb_oleItemToVariant()
+
+  * utils/xbscript/xbs_harb.ch
+  * utils/xbscript/xbscript.prg
+    * Refined error handling to [when possible] report the script line of an error
 
 2006-01-31 22:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/pcre/ChangeLog
@@ -19,7 +34,7 @@
   * source/rtl/tbrowse.prg
     ! fixed error of array bound error in configure method, Reported by
       Teo Fonrouge.
-    ! fixed repositioning of colpos after delcolum. Reported by Marco Boschi. 
+    ! fixed repositioning of colpos after delcolum. Reported by Marco Boschi.
       Created ::nPrevDelColPos data to control it.
 
 2006-01-30 03:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
