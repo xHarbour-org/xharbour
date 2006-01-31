@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.1 2005/09/02 18:30:50 druzus Exp $
+ * $Id: ChangeLog,v 1.2 2005/09/27 09:20:37 druzus Exp $
  */
 
 /*
@@ -16,6 +16,12 @@
  * 2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
  *
  */
+
+2006-01-31 22:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * Makefile
+  * config.h
+    * moved SUPPORT_UCP and SUPPORT_UTF8 setting to reduce command line
+      overhead in DOS builds
 
 2005-09-27 10:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * pcre_globals.c

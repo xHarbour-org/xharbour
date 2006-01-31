@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4785 2006/01/30 02:51:21 druzus Exp $
+ * $Id: ChangeLog,v 1.4786 2006/01/30 12:36:04 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-01-31 22:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rtl/pcre/ChangeLog
+  * xharbour/source/rtl/pcre/Makefile
+  * xharbour/source/rtl/pcre/config.h
+    * moved SUPPORT_UCP and SUPPORT_UTF8 setting to reduce command line
+      overhead in DOS builds
+
 2006-01-30 10:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed error of array bound error in configure method, Reported by

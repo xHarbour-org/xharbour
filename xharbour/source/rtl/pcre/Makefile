@@ -1,5 +1,5 @@
 #
-# $Id:$
+# $Id: Makefile,v 1.1 2005/08/31 11:21:11 mauriliolongo Exp $
 #
 
 ROOT = ../../../
@@ -30,6 +30,3 @@ C_SOURCES=\
 LIBNAME=pcrepos
 
 include $(TOP)$(ROOT)config/lib.cf
-
-CFLAGS += -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10
-

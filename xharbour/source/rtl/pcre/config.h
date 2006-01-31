@@ -104,4 +104,13 @@ Makefile (use --disable-stack-for-recursion). */
 
 /* #define NO_RECURSE */
 
+/* xHarbour stuff - default definitions */
+#ifndef SUPPORT_UTF8
+#define SUPPORT_UTF8
+#endif
+
+#ifndef SUPPORT_UCP
+#define SUPPORT_UCP
+#endif
+
 /* End */
