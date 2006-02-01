@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.7 2005/11/17 22:14:51 lculik Exp $
+ * $Id: getsecrt.prg,v 1.2 2005/11/29 15:21:31 ghodgson Exp $
  */
 
 /*
@@ -120,6 +120,9 @@ proc GetPassword( oGet, nLen )
   ENDIF
 
   IF oGet:exitState != GE_ESCAPE
+      IF nLen = NIL
+         nLen := len(oGet:varget())
+      ENDIF
      oGet:varPut( oGet:cargo + Space( nLen - Len( oGet:cargo ) ) )
   ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4789 2006/02/01 08:02:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4790 2006/02/01 15:41:39 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-01 13:25 UTC-0500 Gerald Drouillard <gerald@drouillard.ca>
+  * getsecrt.prg
+    * modified proc GetPassword( oGet, nLen ) so that the nLen param is optional to be compatable
+      with older versions of getpassword.
 
 2006-02-01 13:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makallpc.bat
