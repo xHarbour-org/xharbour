@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallpc.bat,v 1.00 2005/11/01 00:00:00 modalsist Exp $
+rem $Id: makallpc.bat,v 1.1 2005/11/02 18:00:15 modalsist Exp $
 rem
 rem MakeFile for build xHarbour binaries, core libs and contribs under
 rem Pelles C Compiler.
@@ -21,12 +21,17 @@ rem if exist make_pc.bat call make_pc %1
 rem cd ..\..
 rem if errorlevel 1 goto end
 
+:gd
+cd contrib\gd
+if exist make_pc.bat call make_pc %1
+cd ..\..
+rem if errorlevel 1 goto end
+
 :gtwvw
 cd contrib\gtwvw
 if exist make_pc.bat call make_pc %1
 cd ..\..
 rem if errorlevel 1 goto end
-
 
 :hbzlib
 cd contrib\hbzlib

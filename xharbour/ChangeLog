@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4788 2006/01/31 21:45:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4789 2006/02/01 08:02:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-01 13:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makallpc.bat
+    + added gd lib entry. Note that the make_pc.bat file to build gd lib
+      still not were created.
+  * hrbdll.pc
+    + added missing files.
 
 2006-02-01 00:01 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbs_harb.ch
