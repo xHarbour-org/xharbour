@@ -157,9 +157,7 @@
 
         PP_ModuleName( ::cName )
 
-        //OutputDebugString( "PrePro:" + EOL + ::cText + EOL )
         ::cPPed := PP_PreProText( ::cText, acPPed, .T., .F., ::nStartLine, ::cName )
-        //OutputDebugString( ::cPPed + EOL )
         nLines  := Len( acPPed )
         //TraceLog( ::cText, ::cPPed, nLines )
 
@@ -199,29 +197,37 @@
         NEXT
 
      RECOVER USING oError
-         IF ValType( nLine ) == 'N'
-            oError:ProcLine := nLine
-         ELSE
-            oError:ProcLine += ::nStartLine
-         ENDIF
 
-         nProcID := -1
+        //TraceLog( nLine, ::nStartLine, oError:ProcLine )
 
-         IF ! ::bWantsErrorObject
-            ::cText := ""
-            Eval( bErrHandler, oError )
-         ENDIF
+        IF ! Empty( oError:Cargo )
+           aAdd( acPPed, oError:Cargo )
+           oError:Cargo := NIL
+        ENDIF
+
+        IF ValType( nLine ) == 'N'
+           oError:ProcLine := nLine
+        ELSE
+           oError:ProcLine += ::nStartLine
+        ENDIF
+
+        nProcID := -1
+
+        IF ! ::bWantsErrorObject
+           ::cText := ""
+           Eval( bErrHandler, oError )
+        ENDIF
 
      END SEQUENCE
 
      ErrorBlock( bErrHandler )
 
-     ::cText := ""
-
      IF nProcID > 0
         ::cCompiledText += ::cText
         ::nCompiledLines := nLines
      ENDIF
+
+     ::cText := ""
 
      IF ::bWantsErrorObject .AND. oError:ClassName == "ERROR"
         RETURN oError
@@ -300,12 +306,14 @@
   //----------------------------------------------------------------------------//
   METHOD GetLine( nLine ) CLASS TInterpreter
 
-     //OutputDebugString( "StartLine:" + Str( ::nStartLine ) + " Line:" + Str( nLine ) + " Len:" + Str( Len( ::acPPed ) ) )
+     //TraceLog( ::nStartLine, nLine, ::acPPed, ::cText )
 
      nLine -= ::nStartLine
 
-     IF nLine > 0 .AND. nLine <= Len( ::acPPed )
-        RETURN ::acPPed[ nLine ]
+     IF nLine > 0
+        IF nLine <= Len( ::acPPed )
+           RETURN ::acPPed[ nLine ]
+        ENDIF
      ENDIF
 
   RETURN ""

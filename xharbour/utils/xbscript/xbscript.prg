@@ -5302,7 +5302,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
       LOCAL nPendLine
    #endif
 
-   //TraceLog( sLine )
+   //TraceLog( sLine, nLine )
 
    s_bRTEBlock := s_bDefRTEBlock
 
@@ -5559,7 +5559,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                // Added Oct-16-2004 to support #defines and translates.
                bPresetCompile := bCompile
                bCompile := .F.
-               sLine := PP_PreProLine( sLine )
+               sLine := PP_PreProLine( sLine, nLine, sSource )
                bCompile := bPresetCompile
 
                // Strip the ""
@@ -5968,10 +5968,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    RECOVER USING oError
 
      IF( oError:ClassName == "ERROR" )
-        TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args )
+        //TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args )
+        oError:Cargo := sLine
 
         IF oError:SubSystem == "PP"
-           oError:Description += ";Script line: " + Str( nLine, 5 ) + ";Engine line: " + Str( oError:ProcLine, 5 )
+           oError:Description += ";Script line: " + CStr( nLine ) + ";Engine line: " + CStr( oError:ProcLine )
 
            oError:ProcLine := nLine
            IF s_nProcID > 0
@@ -5979,7 +5980,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
            ENDIF
            oError:ModuleName := s_sFile
         ELSE
-           oError:Description += ";Engine line: " + oError:ProcName + "(" + Str( oError:ProcLine, 5 ) + ")"
+           oError:Description += ";Engine line: " + oError:ProcName + "(" + CStr( oError:ProcLine ) + ")"
         ENDIF
 
         Break( oError )
@@ -9330,7 +9331,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                sResult := SubStr( sResult, nNext + 1 )
                ExtractLeadingWS( @sResult, @sPad )
                IF nId == 0
-                  aEval( aMarkers, {|sMarker| TraceLog( sResult, sTemp, sMarker ) } )
+                  //aEval( aMarkers, {|sMarker| TraceLog( sResult, sTemp, sMarker ) } )
                   Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unrecognized RP '<'], { sResult, sTemp } ) )
                   // Safety
                   BREAK
@@ -12036,7 +12037,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
    sTemp := asLines[nLine]
 
    IF sTemp != NIL
-      sTemp := PP_PreProLine( sTemp )
+      sTemp := PP_PreProLine( sTemp, nStartLine + nLine - 1, sSource )
       sLines += sTemp
    ENDIF
 
