@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.63 2005/12/13 12:02:33 druzus Exp $
+# $Id: hb-func.sh,v 1.64 2006/02/03 07:36:16 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -11,6 +11,7 @@
 #
 # See doc/license.txt for licensing terms.
 # ---------------------------------------------------------------
+
 
 get_hbplatform()
 {

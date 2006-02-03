@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.236 2005/12/16 10:21:43 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.239 2006/02/03 07:36:16 druzus Exp $
  */
 
 /*
@@ -4826,6 +4826,7 @@ static void hb_cdxOrdListClear( CDXAREAP pArea, BOOL fAll, LPCDXINDEX pKeepInd )
    if ( pArea->lpIndexes )
    {
       LPCDXINDEX pIndex, * pIndexPtr;
+
       if ( !fAll )
       {
          /* TODO: we have to control this on open */

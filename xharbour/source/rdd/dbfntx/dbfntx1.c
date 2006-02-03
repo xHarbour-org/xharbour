@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: dbfntx1.c,v 1.155 2006/02/03 07:36:17 druzus Exp $
  */
 
 /*
@@ -126,7 +126,6 @@
 /* #define HB_NTX_EXTERNAL_PAGEBUFFER */
 
 #define HB_NTX_STRONG_BALANCE
-
 
 /*
 #define HB_NTX_DEBUG
