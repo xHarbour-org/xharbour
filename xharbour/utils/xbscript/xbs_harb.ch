@@ -41,6 +41,7 @@
      DATA nCompiledLines       INIT 0
      DATA nNextStartProc       INIT 1
      DATA cText                INIT ""
+     DATA acLines              INIT {}
      DATA acPPed               INIT {}
      DATA cPPed                INIT ""
      DATA aCompiledProcs       INIT {}
@@ -61,9 +62,17 @@
 
      METHOD New( cName )                                CONSTRUCTOR
 
-     METHOD AddLine( cLine )                            INLINE ( ::cText += ( cLine + Chr(10) ) )
-     METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
-     METHOD SetScript( cText, nStartLine, cName )       INLINE ( IIF( Empty( ::cText ), , ::nNextDynProc := 1 ), ::cText := cText, ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
+     METHOD AddLine( cLine )                            INLINE ( aAdd( ::acLines, cLine ), ::cText += ( cLine + Chr(10) ) )
+
+     METHOD AddText( cText, nStartLine )                INLINE ( ::cText += cText, ;
+                                                                 ::acLines := HB_aTokens( StrTran( ::cText, Chr(13), "" ), Chr(10) ), ;
+                                                                 ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, ::nCompiledLines + 1 ) )
+
+     METHOD SetScript( cText, nStartLine, cName )       INLINE ( IIF( Empty( ::cText ), , ::nNextDynProc := 1 ), ;
+                                                                 ::cText := cText, ;
+                                                                 ::acLines := HB_aTokens( StrTran( cText, Chr(13), "" ), Chr(10) ), ;
+                                                                 ::nStartLine := IIF( ValType( nStartLine ) == 'N', nStartLine, 1 ) )
+
      METHOD GetPPO()                                    INLINE ( ::cPPed )
 
      METHOD Compile()
@@ -200,17 +209,6 @@
 
         //TraceLog( nLine, ::nStartLine, oError:ProcLine )
 
-        IF ! Empty( oError:Cargo )
-           aAdd( acPPed, oError:Cargo )
-           oError:Cargo := NIL
-        ENDIF
-
-        IF ValType( nLine ) == 'N'
-           oError:ProcLine := nLine
-        ELSE
-           oError:ProcLine += ::nStartLine
-        ENDIF
-
         nProcID := -1
 
         IF ! ::bWantsErrorObject
@@ -306,17 +304,27 @@
   //----------------------------------------------------------------------------//
   METHOD GetLine( nLine ) CLASS TInterpreter
 
-     //TraceLog( ::nStartLine, nLine, ::acPPed, ::cText )
+     LOCAL sLine
+
+     TraceLog( ::nStartLine, nLine, ::cText, ValToPrg( ::acLines ), ValToPrg( ::acPPed ) )
 
      nLine -= ::nStartLine
 
      IF nLine > 0
-        IF nLine <= Len( ::acPPed )
-           RETURN ::acPPed[ nLine ]
+        IF nLine <= Len( ::acLines )
+           sLine := AllTrim( ::acLines[ nLine ] )
+        ELSE
+           sLine := "Missing Source line: " + Str( nLine )
         ENDIF
+
+        IF nLine <= Len( ::acPPed ) .AND. ValType( ::acPPed[ nLine ] ) == 'C'
+           sLine += EOL + "PPed: " + allTrim( ::acPPed[ nLine ] )
+        ENDIF
+     ELSE
+        sLine := "Invalid Line:" + Str( nLine )
      ENDIF
 
-  RETURN ""
+  RETURN sLine
 
   //----------------------------------------------------------------------------//
   #ifdef __XHARBOUR__

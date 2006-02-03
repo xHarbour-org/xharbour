@@ -5968,8 +5968,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    RECOVER USING oError
 
      IF( oError:ClassName == "ERROR" )
-        //TraceLog( oError:SubSystem, oError:Operation, oError:Description, oError:Args )
-        oError:Cargo := sLine
+        //TraceLog( nLine, oError:SubSystem, oError:Operation, oError:Description, oError:Args )
 
         IF oError:SubSystem == "PP"
            oError:Description += ";Script line: " + CStr( nLine ) + ";Engine line: " + CStr( oError:ProcLine )
@@ -11876,7 +11875,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
    ENDIF
 
    IF nStartLine == NIL
-      nStartLine := 1
+      nStartLine := 0
    ENDIF
 
    IF sSource == NIL
@@ -12021,7 +12020,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
          ENDIF
       ENDDO
 
-      sTemp := PP_PreProLine( sTemp, nStartLine + nLine - 1, sSource )
+      sTemp := PP_PreProLine( sTemp, nStartLine + nLine, sSource )
 
       sLines += sTemp
       sLines += ";"
@@ -12037,7 +12036,7 @@ FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSou
    sTemp := asLines[nLine]
 
    IF sTemp != NIL
-      sTemp := PP_PreProLine( sTemp, nStartLine + nLine - 1, sSource )
+      sTemp := PP_PreProLine( sTemp, nStartLine + nLine, sSource )
       sLines += sTemp
    ENDIF
 
@@ -12297,13 +12296,15 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
             PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
          #endif
       NEXT
+
    RECOVER USING oError
-      //TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine } ), ) )
+
+      //TraceLog( oError, IIF( oError:ClassName == "ERROR", ValToPrg( { oError:Description, oError:Operation, oError:ProcName, oError:ProcLine, oError:aaStack } ), "Not Error!" ) )
 
       #ifdef __XHARBOUR__
         IF oError:ClassName == "ERROR"
            FOR EACH aStack IN oError:aaStack
-              IF aScan( aProcedures, {|__aProc| __aProc[1] == aStack[2] } ) > 0
+              IF aScan( aProcedures, {|__aProc| /*TraceLog( __aProc[1], aStack[2] ),*/ Upper( __aProc[1] ) == aStack[2] } ) > 0
                  oError:ModuleName := s_sFile
                  oError:ProcName := aStack[2]
                  oError:ProcLine := aStack[3]
