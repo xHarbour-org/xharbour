@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4793 2006/02/03 01:33:56 andijahja Exp $
+ * $Id: ChangeLog,v 1.4794 2006/02/03 03:51:46 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2006-02-02 21:47 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/rtl/tget.prg
-    * At any "9" picture, only a "-" symbol is allowed when data type is
+    * At any "9" picture, a "-" symbol is allowed only when data type is
       numeric (character type doesn't allows it, like in Clipper).
 
 2006-02-03 07:30 UTC+0700 Andi Jahja <andijahja@xharbour.com>
