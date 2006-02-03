@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.5 2005/09/13 16:15:21 bdj Exp $
+ * $Id: wvtcore.c,v 1.6 2006/01/19 16:24:40 bdj Exp $
  */
 
 /*
@@ -700,7 +700,7 @@ HB_FUNC( WVT_DRAWOUTLINE )
       hPen = CreatePen( hb_parni( 5 ), 0, ( ISNIL( 7 ) ? 0 : ( COLORREF ) hb_parnl( 7 ) ) );
       if ( hPen )
       {
-         hOldPen = SelectObject( _s->hdc, hPen );
+         hOldPen = (HPEN) SelectObject( _s->hdc, hPen );
       }
    }
    else
@@ -714,11 +714,11 @@ HB_FUNC( WVT_DRAWOUTLINE )
    {
       if ( hPen )
       {
-         hOldPenGUI = SelectObject( _s->hGuiDC, hPen );
+         hOldPenGUI = (HPEN) SelectObject( _s->hGuiDC, hPen );
       }
       else
       {
-         hOldPenGUI = SelectObject( _s->hGuiDC, _s->penBlack );
+         hOldPenGUI = (HPEN) SelectObject( _s->hGuiDC, _s->penBlack );
          hb_wvt_DrawOutline( _s->hGuiDC, iTop, iLeft, iBottom, iRight );
       }
    }
@@ -810,9 +810,9 @@ HB_FUNC( WVT_DRAWLINE )
    }
 
    hPen = CreatePen( iStyle, iThick, cr );
-   hOldPen = SelectObject( _s->hdc, hPen );
+   hOldPen = (HPEN) SelectObject( _s->hdc, hPen );
    if ( _s->bGui )
-      hOldPenGUI = SelectObject( _s->hGuiDC, hPen );
+      hOldPenGUI = (HPEN) SelectObject( _s->hGuiDC, hPen );
 
    switch ( iFormat )
    {

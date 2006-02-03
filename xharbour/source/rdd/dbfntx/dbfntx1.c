@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.152 2006/01/12 13:15:59 druzus Exp $
+ * $Id: dbfntx1.c,v 1.153 2006/01/19 01:59:59 druzus Exp $
  */
 
 /*
@@ -3794,7 +3794,7 @@ static BOOL hb_ntxOrdKeyGoto( LPTAGINFO pTag, ULONG ulKeyNo )
       return FALSE;
    hb_ntxTagRefreshScope( pTag );
    hb_ntxTagGoTop( pTag );
-   while( !pTag->TagEOF && --ulKeyNo );
+   while( !pTag->TagEOF && --ulKeyNo )
    {
       hb_ntxTagSkipNext( pTag );
    }

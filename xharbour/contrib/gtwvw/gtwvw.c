@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.34 2005/11/21 16:56:18 bdj Exp $
+ * $Id: gtwvw.c,v 1.35 2006/01/19 16:24:39 bdj Exp $
  */
 
 /*
@@ -5625,7 +5625,7 @@ static USHORT hb_wvw_gtOpenWindow( LPCTSTR lpszWinName, int iRow1, int iCol1, in
       wndclass.lpfnWndProc   = hb_wvw_gtWndProc;
       wndclass.cbClsExtra    = 0;
       wndclass.cbWndExtra    = 0;
-      wndclass.hInstance     = hb_hInstance;
+      wndclass.hInstance     = (HINSTANCE) hb_hInstance;
       wndclass.hIcon         = NULL;
       wndclass.hCursor       = LoadCursor( NULL, IDC_ARROW );
       wndclass.hbrBackground = NULL;
@@ -10978,7 +10978,7 @@ HB_FUNC( WVW_DRAWOUTLINE )
       hPen = CreatePen( hb_parni( 6 ), 0, ( ISNIL( 8 ) ? 0 : ( COLORREF ) hb_parnl( 8 ) ) );
       if ( hPen )
       {
-         hOldPen = SelectObject( pWindowData->hdc, hPen );
+         hOldPen = (HPEN) SelectObject( pWindowData->hdc, hPen );
       }
    }
    else
@@ -11108,7 +11108,7 @@ HB_FUNC( WVW_DRAWLINE )
    }
 
    hPen = CreatePen( iStyle, iThick, cr );
-   hOldPen = SelectObject( pWindowData->hdc, hPen );
+   hOldPen = (HPEN) SelectObject( pWindowData->hdc, hPen );
 
    switch ( iFormat )
    {
@@ -13795,7 +13795,7 @@ HB_FUNC( WVW_TBADDBUTTON )
    char * szBitmap = ISCHAR(3) ? (char*) hb_parcx(3) : NULL;
    UINT uiBitmap = ISNUM(3) ? (UINT) hb_parni(3) : 0;
 
-   char * szLabel= ISNIL(4) ? "" : (char*) hb_parcx(4);
+   char * szLabel= ISNIL(4) ? (char*) "" : (char*) hb_parcx(4);
    int  iBitmapType = ISNIL(5) ? 0 : (int) hb_parni(5);
    BOOL bMap3Dcolors   = ISLOG(6) ? hb_parl(6) : FALSE;
    HWND hWndTB;

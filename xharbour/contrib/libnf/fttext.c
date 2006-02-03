@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.10 2005/10/24 04:01:52 druzus Exp $
+ * $Id: fttext.c,v 1.11 2005/11/16 12:16:37 druzus Exp $
  */
 
 /*
@@ -731,7 +731,7 @@ HB_FUNC( FT_FAPPEND )
    {
       HB_ITEM_NEW( Tmp );
       LONG lStart;
-      char *szAppend = ISCHAR(2) ? hb_parcx(2) : "";
+      char *szAppend = ISCHAR(2) ? hb_parcx(2) : (char*) "";
 
       for( lStart = 1; lStart <= lAppend ; lStart ++ )
       {

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.132 2006/01/24 06:40:32 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.133 2006/01/31 21:47:56 ronpinkas Exp $
  */
 
 /*
@@ -1564,7 +1564,7 @@ RETURN Self
 
            if( pUnk )
            {
-              pUnk->lpVtbl->QueryInterface( pUnk, &IID_IDispatch, (void **) &pDisp );
+              pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
            }
            // Intentionally fall through
 
@@ -2288,19 +2288,19 @@ RETURN Self
 
         if( RetVal.n1.n2.vt == ( VT_UNKNOWN | VT_BYREF ) )
         {
-           s_nOleError = (*RetVal.n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppunkVal, &IID_IEnumVARIANT, &pEnumVariant );
+           s_nOleError = (*RetVal.n1.n2.n3.ppunkVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppunkVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
         }
         else if( RetVal.n1.n2.vt == VT_UNKNOWN )
         {
-           s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, &IID_IEnumVARIANT, &pEnumVariant );
+           s_nOleError = RetVal.n1.n2.n3.punkVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.punkVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
         }
         else if( RetVal.n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
         {
-           s_nOleError = (*RetVal.n1.n2.n3.ppdispVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppdispVal, &IID_IEnumVARIANT, &pEnumVariant );
+           s_nOleError = (*RetVal.n1.n2.n3.ppdispVal)->lpVtbl->QueryInterface( *RetVal.n1.n2.n3.ppdispVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
         }
         else if( RetVal.n1.n2.vt == VT_DISPATCH )
         {
-           s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, &IID_IEnumVARIANT, &pEnumVariant );
+           s_nOleError = RetVal.n1.n2.n3.pdispVal->lpVtbl->QueryInterface( RetVal.n1.n2.n3.pdispVal, (REFIID) &IID_IEnumVARIANT, &pEnumVariant );
         }
         else
         {
