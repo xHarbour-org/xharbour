@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.153 2006/01/19 01:59:59 druzus Exp $
+ * $Id$
  */
 
 /*
@@ -3490,9 +3490,9 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
       memset( &pExtInfo, 0, sizeof( pExtInfo ) );
       pExt = pExtInfo.itmResult = hb_itemPutC( NULL, "" );
       if( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS &&
-          hb_itemGetCLen( pExtInfo.itmResult ) > 0 )
+          hb_itemGetCLen( pExt ) > 0 )
       {
-         pFileName->szExtension = hb_itemGetCPtr( pExtInfo.itmResult );
+         pFileName->szExtension = hb_itemGetCPtr( pExt );
       }
    }
    hb_fsFNameMerge( szFileName, pFileName );
@@ -3509,6 +3509,17 @@ static void hb_ntxCreateFName( NTXAREAP pArea, char * szBagName, BOOL * fProd,
 
          *fProd = pTableFileName->szName &&
                   hb_stricmp( pTableFileName->szName, pFileName->szName ) == 0;
+         if( *fProd && pFileName->szExtension && ! pExt )
+         {
+            DBORDERINFO pExtInfo;
+            memset( &pExtInfo, 0, sizeof( pExtInfo ) );
+            pExt = pExtInfo.itmResult = hb_itemPutC( NULL, "" );
+            if( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS )
+            {
+               *fProd = hb_stricmp( pFileName->szExtension,
+                                    hb_itemGetCPtr( pExt ) ) == 0;
+            }
+         }
          hb_xfree( pTableFileName );
       }
    }
@@ -7195,6 +7206,7 @@ static ERRCODE ntxOrderListAdd( NTXAREAP pArea, LPDBORDERINFO pOrderInfo )
       pIndex->fReadonly = fReadonly;
       pIndex->fShared = fShared;
       pIndex->DiskFile = hFile;
+      pIndex->Production = fProd;
 
       pIndexPtr = &pArea->lpIndexes;
       while( *pIndexPtr )

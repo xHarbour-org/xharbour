@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.237 2006/01/12 13:15:59 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.236 2005/12/16 10:21:43 druzus Exp $
  */
 
 /*
@@ -4834,6 +4834,20 @@ static void hb_cdxOrdListClear( CDXAREAP pArea, BOOL fAll, LPCDXINDEX pKeepInd )
          pFileNameCdx = hb_fsFNameSplit( pArea->lpIndexes->szFileName );
          fAll = hb_stricmp( pFileNameDbf->szName ? pFileNameDbf->szName : "",
                             pFileNameCdx->szName ? pFileNameCdx->szName : "" ) != 0;
+         if( !fAll )
+         {
+            DBORDERINFO pExtInfo;
+            PHB_ITEM pExt;
+
+            memset( &pExtInfo, 0, sizeof( pExtInfo ) );
+            pExt = pExtInfo.itmResult = hb_itemPutC( NULL, "" );
+            if( SELF_ORDINFO( ( AREAP ) pArea, DBOI_BAGEXT, &pExtInfo ) == SUCCESS )
+            {
+               fAll = hb_stricmp( pFileNameCdx->szExtension,
+                                  hb_itemGetCPtr( pExt ) ) != 0;
+            }
+            hb_itemRelease( pExt );
+         }
          hb_xfree( pFileNameDbf );
          hb_xfree( pFileNameCdx );
       }
@@ -4860,11 +4874,12 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
 {
    LPCDXINDEX pIndex;
    PHB_FNAME pFileName;
-   char * szBaseName, * szBasePath;
+   char * szBaseName, * szBasePath, * szBaseExt;
 
    pFileName = hb_fsFNameSplit( szBagName );
    szBaseName = hb_strdup( pFileName->szName ? pFileName->szName : "" );
    szBasePath = pFileName->szPath ? hb_strdup( pFileName->szPath ) : NULL;
+   szBaseExt = pFileName->szExtension ? hb_strdup( pFileName->szExtension ) : NULL;
    hb_strUpper( szBaseName, strlen(szBaseName) );
 
    pIndex = pArea->lpIndexes;
@@ -4874,12 +4889,15 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
       pFileName = hb_fsFNameSplit( pIndex->szFileName );
       if ( !hb_stricmp( pFileName->szName ? pFileName->szName : "", szBaseName ) &&
            ( !szBasePath ||
-             ( pFileName->szPath && !hb_stricmp( pFileName->szPath, szBasePath ) ) ) )
+             ( pFileName->szPath && !hb_stricmp( pFileName->szPath, szBasePath ) ) ) &&
+           ( !szBaseExt ||
+             ( pFileName->szExtension && !hb_stricmp( pFileName->szPath, szBaseExt ) ) ) )
          break;
       pIndex = pIndex->pNext;
    }
    hb_xfree( pFileName );
    hb_xfree( szBaseName );
+   hb_xfree( szBaseExt );
    if ( szBasePath )
       hb_xfree( szBasePath );
    return pIndex;
