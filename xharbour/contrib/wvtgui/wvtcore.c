@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.6 2006/01/19 16:24:40 bdj Exp $
+ * $Id: wvtcore.c,v 1.7 2006/02/03 01:33:58 andijahja Exp $
  */
 
 /*
@@ -631,7 +631,7 @@ HB_FUNC( WVT_DRAWIMAGE )
 HB_FUNC( WVT_DRAWLABEL )
 {
    POINT    xy = { 0 };
-   HFONT    hFont;
+   HFONT    hFont, hOldFont, hOldFontGui;
    LOGFONT  logfont = { 0 };
 
    logfont.lfEscapement     = ( ISNIL(  5 ) ? 0 : ( hb_parni( 5 ) * 10 ) );
@@ -653,22 +653,28 @@ HB_FUNC( WVT_DRAWLABEL )
    hFont = CreateFontIndirect( &logfont );
    if ( hFont )
    {
+
       xy           = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
       SetBkColor( _s->hdc, ISNIL( 7 ) ? _s->background : ( COLORREF ) hb_parnl( 7 ) );
       SetTextColor( _s->hdc, ISNIL( 6 ) ? _s->foreground : ( COLORREF ) hb_parnl( 6 ) );
       SetTextAlign( _s->hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-      SelectObject( _s->hdc, hFont );
+      hOldFont = SelectObject( _s->hdc, hFont );
 
       ExtTextOut( _s->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
+
+      SelectObject( _s->hdc, hOldFont );
+
       if ( _s->bGui )
       {
          SetBkColor( _s->hGuiDC, ISNIL( 7 ) ? _s->background : ( COLORREF ) hb_parnl( 7 ) );
          SetTextColor( _s->hGuiDC, ISNIL( 6 ) ? _s->foreground : ( COLORREF ) hb_parnl( 6 ) );
          SetTextAlign( _s->hGuiDC, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-         SelectObject( _s->hGuiDC, hFont );
+         hOldFontGui = SelectObject( _s->hGuiDC, hFont );
 
          ExtTextOut( _s->hGuiDC, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
+
+         SelectObject( _s->hGuiDC, hOldFontGui );
       }
 
       DeleteObject( hFont );
@@ -727,7 +733,9 @@ HB_FUNC( WVT_DRAWOUTLINE )
    {
       SelectObject( _s->hdc, hOldPen );
       if ( _s->bGui )
+      {
          SelectObject( _s->hGuiDC, hOldPenGUI );
+      }
       DeleteObject( hPen );
    }
 }
@@ -812,7 +820,9 @@ HB_FUNC( WVT_DRAWLINE )
    hPen = CreatePen( iStyle, iThick, cr );
    hOldPen = (HPEN) SelectObject( _s->hdc, hPen );
    if ( _s->bGui )
+   {
       hOldPenGUI = (HPEN) SelectObject( _s->hGuiDC, hPen );
+   }
 
    switch ( iFormat )
    {
@@ -931,7 +941,9 @@ HB_FUNC( WVT_DRAWLINE )
 
    SelectObject( _s->hdc, hOldPen );
    if ( _s->bGui )
+   {
       SelectObject( _s->hGuiDC, hOldPenGUI );
+   }
    DeleteObject( hPen );
    hb_retl( TRUE );
 }

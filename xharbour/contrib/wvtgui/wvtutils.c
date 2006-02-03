@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.8 2005/10/11 12:55:08 marcosgambeta Exp $
+ * $Id: wvtutils.c,v 1.9 2005/10/26 04:42:22 marcosgambeta Exp $
  */
 
 /*
@@ -1592,6 +1592,20 @@ HB_FUNC( WVT_LBADDSTRING )
 
 //-------------------------------------------------------------------//
 
+HB_FUNC( WVT_LBGETCOUNT )
+{
+   hb_retnl( SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_GETCOUNT, 0, 0 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WVT_LBDELETESTRING )
+{
+   SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_DELETESTRING, hb_parni( 3 ), 0 );
+}
+
+//-------------------------------------------------------------------//
+
 HB_FUNC( WVT_LBSETCURSEL )
 {
    SendMessage( GetDlgItem( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ) ), LB_SETCURSEL, hb_parni( 3 ), 0 );
@@ -2015,6 +2029,56 @@ HB_FUNC( WIN_DRAWTEXT )
 }
 
 //-------------------------------------------------------------------//
+
+HB_FUNC( WIN_GETWINDOWRECT )
+{
+   RECT     rc = { 0 };
+   HB_ITEM  info;
+   HB_ITEM  temp;
+
+   GetWindowRect( ( HWND ) hb_parnl( 1 ), &rc );
+
+   info.type = HB_IT_NIL;
+   temp.type = HB_IT_NIL;
+
+   hb_arrayNew( &info, 4 );
+
+   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, rc.left   ) );
+   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, rc.top    ) );
+   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, rc.right  ) );
+   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, rc.bottom ) );
+
+   hb_itemReturn( &info );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_MOVEWINDOW )
+{
+   MoveWindow( (HWND) hb_parnl( 1 ), hb_parnl( 2 ), hb_parnl( 3 ), hb_parnl( 4 ), hb_parnl( 5 ), hb_parl( 6 ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETPARENT )
+{
+   hb_retnl( ( long ) SetParent(  (HWND) hb_parnl( 1 ), (HWND) hb_parnl( 2 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_SETWINDOWLONG )
+{
+   hb_retnl( SetWindowLong( ( HWND ) hb_parnl( 1 ), hb_parni( 2 ), hb_parnl( 3 ) ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_ISWINDOW )
+{
+   hb_retl( IsWindow( (HWND) hb_parnl( 1 ) ) );
+}
+
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 
