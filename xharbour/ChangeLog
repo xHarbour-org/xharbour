@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4797 2006/02/03 07:35:46 druzus Exp $
+ * $Id: ChangeLog,v 1.4798 2006/02/03 07:37:43 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-02-03 15:17 UTC-0800 Pritpal Bedi (pritpal@vouchcac.com>
+  * xharbour/contrib/wvtgui/wvtcore.c
+  * xharbour/contrib/wvtgui/wvtutils.c
+  * xharbour/contrib/wvtgui/wvtwin.ch
+    ! Wvt_DrawLabel()
+      Fixed resource leak.
+    + Added few functions and constants.
+  
 2006-02-03 08:32 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
     * added -lpthread for -fullstatic linking in xhblnk/xhbmk when
