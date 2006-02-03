@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4795 2006/02/03 03:54:49 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4796 2006/02/03 07:20:22 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-03 08:32 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * added -lpthread for -fullstatic linking in xhblnk/xhbmk when
+      one of XWindow GT (GTXWC, GTXVT) is linked - it's necessary
+      for new XWindow client libraries
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed the problem with having indexes with exactly the same
+      file (path) and tag names but different extensions reported
+      recently on xharbour-news - Thanks to Roberto Fumagalli for
+      information and code example
 
 2006-02-03 05:20 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg

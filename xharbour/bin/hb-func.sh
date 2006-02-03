@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.62 2005/12/02 22:22:39 lculik Exp $
+# $Id: hb-func.sh,v 1.63 2005/12/13 12:02:33 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -318,8 +318,9 @@ fi
 [ -n "\${HB_GPM_LIB}" ] && SYSTEM_LIBS="\${SYSTEM_LIBS} -l\${HB_GPM_LIB}"
 
 if [ "\${HB_STATIC}" = "full" ]; then
-    if [ "\${HB_STATIC}" = "full" ]; then
-        SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
+    SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
+    if [ "\${HB_ARCHITECTURE}" = "linux" ]; then
+       SYSTEM_LIBS="\${SYSTEM_LIBS} -lpthread"
     fi
     LINK_OPT="\${LINK_OPT} -static"
     HB_STATIC="yes"
