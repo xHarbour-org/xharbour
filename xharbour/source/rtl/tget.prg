@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.101 2005/12/22 09:19:33 lf_sfnet Exp $
+ * $Id: tget.prg,v 1.102 2005/12/27 21:06:41 jabrecer Exp $
  */
 
 /*
@@ -1310,8 +1310,10 @@ METHOD Input( cChar ) CLASS Get
          exit
 
       case "9"
-         if ! IsDigit( cChar ) .and. cChar != "-"
-            cChar := ""
+         if ! IsDigit( cChar )
+            If cChar != "-" .OR. ::Type != "N"
+               cChar := ""
+            EndIf
          endif
          exit
 
@@ -1901,4 +1903,3 @@ FUNCTION Isdefcolor()
 RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
 
 #endif
-
