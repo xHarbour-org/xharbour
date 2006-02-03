@@ -306,9 +306,9 @@
 
      LOCAL sLine
 
-     TraceLog( ::nStartLine, nLine, ::cText, ValToPrg( ::acLines ), ValToPrg( ::acPPed ) )
+     //TraceLog( ::nStartLine, nLine, ::cText, ValToPrg( ::acLines ), ValToPrg( ::acPPed ) )
 
-     nLine -= ::nStartLine
+     //nLine -= ::nStartLine
 
      IF nLine > 0
         IF nLine <= Len( ::acLines )
