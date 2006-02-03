@@ -199,17 +199,7 @@
 
       #ifdef SQL
          REQUEST SQLRDD
-         REQUEST SR_ODBC
-
-         #ifdef MYSQL
-            REQUEST SR_MYSQL
-         #endif
-         #ifdef PGS
-            REQUEST SR_PGS
-         #endif
-         #ifdef ORACLE
-            REQUEST SR_Oracle
-         #endif
+         #include "sqlextern.ch"
       #endif
 
       #ifdef ZIP
