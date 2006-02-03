@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.163 2006/01/12 02:04:37 lculik Exp $
+ * $Id: hbmake.prg,v 1.164 2006/01/22 21:59:58 lculik Exp $
  */
 
 /*
@@ -537,9 +537,7 @@ FUNCTION ParseMakeFile( cFile )
             IF Len( aTemp ) > 1
 
                 IF  "$" IN aTemp[ 2 ]
-                  TraceLog([processando macro ] + aTemp[1] + [ valor ] + atemp[2])
-
-
+                  
                   IF s_lGcc .AND. aTemp[ 1 ] = "CFLAG1" .OR. s_lGcc .AND. aTemp[ 1 ] = "CFLAG2"
                       AAdd( s_aMacros, { aTemp[ 1 ], Strtran( ReplaceMacros( aTemp[ 2 ] ), "\", "/" ) } )
 
