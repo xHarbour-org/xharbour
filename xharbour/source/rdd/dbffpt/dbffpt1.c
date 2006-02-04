@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.67 2005/12/11 12:38:47 druzus Exp $
+ * $Id: dbffpt1.c,v 1.68 2006/02/04 10:01:53 druzus Exp $
  */
 
 /*
@@ -2306,8 +2306,8 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
          }
          break;
       default:
-         fprintf(stderr,"Uknown FLEX array item: 0x%x = %d\n", usType, usType); fflush(stderr);
-         //errCode = EDBF_CORRUPT;
+         /* fprintf(stderr,"Uknown FLEX array item: 0x%x = %d\n", usType, usType); fflush(stderr); */
+         errCode = EDBF_CORRUPT;
          hb_itemClear( pItem );
          break;
    }
