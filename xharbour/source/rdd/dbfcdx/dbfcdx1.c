@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.239 2006/02/03 07:36:16 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.240 2006/02/03 07:43:57 druzus Exp $
  */
 
 /*
@@ -4892,15 +4892,16 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
            ( !szBasePath ||
              ( pFileName->szPath && !hb_stricmp( pFileName->szPath, szBasePath ) ) ) &&
            ( !szBaseExt ||
-             ( pFileName->szExtension && !hb_stricmp( pFileName->szPath, szBaseExt ) ) ) )
+             ( pFileName->szExtension && !hb_stricmp( pFileName->szExtension, szBaseExt ) ) ) )
          break;
       pIndex = pIndex->pNext;
    }
    hb_xfree( pFileName );
    hb_xfree( szBaseName );
-   hb_xfree( szBaseExt );
    if ( szBasePath )
       hb_xfree( szBasePath );
+   if ( szBaseExt )
+       hb_xfree( szBaseExt );
    return pIndex;
 }
 
