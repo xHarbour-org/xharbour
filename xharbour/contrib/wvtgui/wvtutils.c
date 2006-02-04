@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.9 2005/10/26 04:42:22 marcosgambeta Exp $
+ * $Id: wvtutils.c,v 1.10 2006/02/03 23:19:18 vouchcac Exp $
  */
 
 /*
@@ -2081,5 +2081,21 @@ HB_FUNC( WIN_ISWINDOW )
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
+
+HB_FUNC( WVT_GETFONTHANDLE )
+{
+   HFONT hFont;
+   int   iSlot = hb_parni( 1 )-1;
+
+   if ( iSlot >= 0 && iSlot < WVT_PICTURES_MAX )
+   {
+      hFont = _s->hUserFonts[ iSlot ];
+   }
+
+   hb_retnl( ( ULONG ) hFont );
+}
+
+//----------------------------------------------------------------------//
+
 
 
