@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.27 2005/04/17 00:23:53 mlombardo Exp $
+ * $Id: hbsrlraw.c,v 1.28 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -177,10 +177,19 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       break;
 
       case HB_IT_LONG:
-         ulRet = 10;
+         ulRet = HB_LONG_LENGTH( pItem->item.asLong.value );
          cRet = (BYTE *) hb_xgrab( ulRet + 1 );
          cRet[0] = (BYTE)'N';
-         cRet[1] = (BYTE)'L';
+
+         if ( ulRet == 20 )
+         {
+            cRet[1] = (BYTE)'X';
+         }
+         else
+         {
+            cRet[1] = (BYTE)'L';
+         }
+
          hb_createlen8( cRet + 2, pItem->item.asLong.value );
       break;
 
