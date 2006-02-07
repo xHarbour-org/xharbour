@@ -317,11 +317,13 @@
            sLine := "Missing Source line: " + Str( nLine )
         ENDIF
 
-        IF nLine <= Len( ::acPPed ) .AND. ValType( ::acPPed[ nLine ] ) == 'C'
-           sLine += EOL + "PPed: " + allTrim( ::acPPed[ nLine ] )
-        ENDIF
+        #if 0
+          IF nLine <= Len( ::acPPed ) .AND. ValType( ::acPPed[ nLine ] ) == 'C'
+             sLine += EOL + "PPed: " + allTrim( ::acPPed[ nLine ] )
+          ENDIF
+        #endif
      ELSE
-        sLine := "Invalid Line:" + Str( nLine )
+        sLine := "Out of range, line:" + Str( nLine )
      ENDIF
 
   RETURN sLine
