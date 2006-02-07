@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.59 2005/10/24 01:04:35 druzus Exp $
+ * $Id: console.c,v 1.60 2006/02/07 01:02:24 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -495,7 +495,7 @@ HB_FUNC( __EJECT ) /* Ejects the current page from the printer */
    if( hb_set_SetPrinterStart() )
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
-      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 1 );
+      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
 //      hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D\x0C", 2 );
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
       hb_set_SetPrinterStop();
