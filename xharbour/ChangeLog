@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4806 2006/02/07 01:22:45 peterrees Exp $
+ * $Id: ChangeLog,v 1.4807 2006/02/07 01:53:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-09 09:13 UTC-0500 Gerald Drouillard <gerald@drouillard.ca>
+  * source/rtl/tbrowse.prg
+    ! Fix for :setcolpos() changed line:
+         if ! ::stable .AND. nColPos >= 1 .AND. nColPos <= ::nColumns
+      to
+         if ::lNeverDisplayed .OR. (! ::stable .AND. nColPos <= ::rightVisible .AND. nColPos >= ::leftVisible)
+      as this shortcut would mess up the tbrowse if the colpos was set outside left and right visible columns.
 
 2006-02-06 17:52 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h

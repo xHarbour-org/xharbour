@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.140 2005/12/10 00:33:33 oh1 Exp $
+ * $Id: tbrowse.prg,v 1.141 2006/01/30 12:37:47 modalsist Exp $
  */
 
 /*
@@ -978,7 +978,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
                            iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
 
-   if Len( ::aRedraw ) <> ::RowCount .AND. ::RowCount > 0 
+   if Len( ::aRedraw ) <> ::RowCount .AND. ::RowCount > 0
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
       ::oDataCache := TDataCache():New( Self )
@@ -1496,8 +1496,7 @@ METHOD SetColPos( nColPos ) CLASS TBrowse
 
    default nColPos to 0
 
-   // If ! ::stable I simply set highlighted column hoping it is not out of screen.
-   if ! ::stable .AND. nColPos >= 1 .AND. nColPos <= ::nColumns
+   if ::lNeverDisplayed .OR. (! ::stable .AND. nColPos <= ::rightVisible .AND. nColPos >= ::leftVisible)
       return ::nColPos := nColPos
 
    elseif nColPos <> 0 .AND. nColPos <> ::nColPos
