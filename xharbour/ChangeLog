@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4807 2006/02/07 01:53:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4808 2006/02/09 14:20:54 gdrouillard Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-10 13:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Enhanced support of BYREF arguments
+
+  * source/vm/errorapi.c
+    ! Fixed internal error when C code calls the error system after a pending request from prior error.
 
 2006-02-09 09:13 UTC-0500 Gerald Drouillard <gerald@drouillard.ca>
   * source/rtl/tbrowse.prg

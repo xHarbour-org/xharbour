@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.133 2006/01/31 21:47:56 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.134 2006/02/03 01:33:58 andijahja Exp $
  */
 
 /*
@@ -1228,139 +1228,167 @@ RETURN Self
 
            nParam = pDispParams->cArgs - n;
 
-           //TraceLog( NULL, "*** N: %i, Param: %i Type: %i\n", n, nParam, pVariant->n1.n2.vt );
+           //TraceLog( NULL, "*** N: %i, Param: %i Type: %i, ByRef: %i\n", n, nParam, pVariant->n1.n2.vt, s_OleRefFlags[ nParam ] );
 
-           switch( pVariant->n1.n2.vt )
+           if( s_OleRefFlags[ nParam ] )
            {
-              case VT_BYREF | VT_BSTR:
-                //printf( "String\n" );
-                sString = hb_oleWideToAnsi( *( pVariant->n1.n2.n3.pbstrVal ) );
-
-                SysFreeString( *( pVariant->n1.n2.n3.pbstrVal ) );
-
-                hb_itemPutCPtr( pItem, sString, strlen( sString ) );
-                break;
-
-              // Already using the PHB_ITEM allocated value
-              /*
-              case VT_BYREF | VT_BOOL:
-                //printf( "Logical\n" );
-                ( pItem )->type = HB_IT_LOGICAL;
-                ( pItem )->item.asLogical.value = pVariant->n1.n2.n3.boolVal ;
-                break;
-              */
-
-              case ( VT_BYREF | VT_DISPATCH ):
-                if( *pVariant->n1.n2.n3.ppdispVal == NULL )
-                {
-                   hb_itemClear( pItem );
+              switch( pVariant->n1.n2.vt )
+              {
+                 case VT_BYREF | VT_BSTR:
+                   sString = hb_oleWideToAnsi( *( pVariant->n1.n2.n3.pbstrVal ) );
+                   hb_itemPutCPtr( pItem, sString, strlen( sString ) );
                    break;
-                }
-                else
-                {
-                   pDisp = *pVariant->n1.n2.n3.ppdispVal;
-                }
-                // Intentionally fall through.
 
-              case VT_DISPATCH:
-                if( pVariant->n1.n2.vt == VT_DISPATCH )
-                {
-                   if( pVariant->n1.n2.n3.pdispVal == NULL )
+                 case VT_BSTR:
+                   sString = hb_oleWideToAnsi( pVariant->n1.n2.n3.bstrVal );
+                   hb_itemPutCPtr( pItem, sString, strlen( sString ) );
+                   break;
+
+                 case VT_BYREF | VT_BOOL:
+                   ( pItem )->type = HB_IT_LOGICAL;
+                   ( pItem )->item.asLogical.value = *pVariant->n1.n2.n3.pboolVal ;
+                   break;
+
+                 case VT_BOOL:
+                   ( pItem )->type = HB_IT_LOGICAL;
+                   ( pItem )->item.asLogical.value = pVariant->n1.n2.n3.boolVal ;
+                   break;
+
+                 case ( VT_BYREF | VT_DISPATCH ):
+                   if( *pVariant->n1.n2.n3.ppdispVal == NULL )
                    {
                       hb_itemClear( pItem );
                       break;
                    }
                    else
                    {
-                      pDisp = pVariant->n1.n2.n3.pdispVal;
+                      pDisp = *pVariant->n1.n2.n3.ppdispVal;
                    }
-                }
+                   // Intentionally fall through.
 
-                OleAuto.type = HB_IT_NIL;
+                 case VT_DISPATCH:
+                   if( pVariant->n1.n2.vt == VT_DISPATCH )
+                   {
+                      if( pVariant->n1.n2.n3.pdispVal == NULL )
+                      {
+                         hb_itemClear( pItem );
+                         break;
+                      }
+                      else
+                      {
+                         pDisp = pVariant->n1.n2.n3.pdispVal;
+                      }
+                   }
 
-                if( s_pSym_TOleAuto )
-                {
-                   hb_vmPushSymbol( s_pSym_TOleAuto->pSymbol );
-                   hb_vmPushNil();
-                   hb_vmDo( 0 );
+                   OleAuto.type = HB_IT_NIL;
 
-                   hb_itemForwardValue( &OleAuto, &(HB_VM_STACK.Return) );
-                }
+                   if( s_pSym_TOleAuto )
+                   {
+                      hb_vmPushSymbol( s_pSym_TOleAuto->pSymbol );
+                      hb_vmPushNil();
+                      hb_vmDo( 0 );
 
-                if( s_pSym_New && OleAuto.type )
-                {
-                   pDisp->lpVtbl->AddRef( pDisp );
+                      hb_itemForwardValue( &OleAuto, &(HB_VM_STACK.Return) );
+                   }
 
-                   //TOleAuto():New( nDispatch )
-                   hb_vmPushSymbol( s_pSym_New->pSymbol );
-                   hb_itemPushForward( &OleAuto );
-                   hb_vmPushLong( ( LONG ) pDisp );
-                   hb_vmSend( 1 );
+                   if( s_pSym_New && OleAuto.type )
+                   {
+                      pDisp->lpVtbl->AddRef( pDisp );
 
-                   hb_itemForwardValue( pItem, &(HB_VM_STACK.Return) );
-                }
-                break;
+                      //TOleAuto():New( nDispatch )
+                      hb_vmPushSymbol( s_pSym_New->pSymbol );
+                      hb_itemPushForward( &OleAuto );
+                      hb_vmPushLong( ( LONG ) pDisp );
+                      hb_vmSend( 1 );
 
-              // Already using the PHB_ITEM allocated value
-              /*
-              case VT_BYREF | VT_I2:
-                //printf( "Int %i\n", pVariant->n1.n2.n3.iVal );
-                hb_itemPutNI( pItem, ( int ) pVariant->n1.n2.n3.iVal );
-                break;
+                      hb_itemForwardValue( pItem, &(HB_VM_STACK.Return) );
+                   }
+                   break;
 
-              case VT_BYREF | VT_I4:
-                //printf( "Long %ld\n", pVariant->n1.n2.n3.lVal );
-                hb_itemPutNL( pItem, ( LONG ) pVariant->n1.n2.n3.lVal );
-                break;
+                 case VT_BYREF | VT_I2:
+                   hb_itemPutNI( pItem, ( int ) *pVariant->n1.n2.n3.piVal );
+                   break;
 
-#ifndef HB_LONG_LONG_OFF
-              case VT_BYREF | VT_I8:
-                //printf( "Long %Ld\n", pVariant->n1.n2.n3.llVal );
-                hb_itemPutNLL( pItem, ( LONGLONG ) pVariant->n1.n2.n3.llVal );
-                break;
-#endif
+                 case VT_I2:
+                   hb_itemPutNI( pItem, ( int ) pVariant->n1.n2.n3.iVal );
+                   break;
 
-              case VT_BYREF | VT_R8:
-                //printf( "Double\n" );
-                hb_itemPutND( pItem,  pVariant->n1.n2.n3.dblVal );
-                break;
-              */
+                 case VT_BYREF | VT_I4:
+                   hb_itemPutNL( pItem, ( LONG ) *pVariant->n1.n2.n3.plVal );
+                   break;
 
-              case VT_BYREF | VT_DATE:
-                //printf( "Date\n" );
-                hb_itemPutDL( pItem, (long) ( *( pVariant->n1.n2.n3.pdblVal ) ) + 2415019 );
-                break;
+                 case VT_I4:
+                   hb_itemPutNL( pItem, ( LONG ) pVariant->n1.n2.n3.lVal );
+                   break;
 
-              /*
-              case VT_BYREF | VT_EMPTY:
-                //printf( "Nil\n" );
-                hb_itemClear( pItem );
-                break;
-              */
+    #ifndef HB_LONG_LONG_OFF
+                 case VT_BYREF | VT_I8:
+                   hb_itemPutNLL( pItem, ( LONGLONG ) *pVariant->n1.n2.n3.pllVal );
+                   break;
+    #endif
 
-              case VT_BYREF | VT_VARIANT:
-                hb_oleItemToVariant( pVariant->n1.n2.n3.pvarVal, pItem );
-                break;
+    #ifndef HB_LONG_LONG_OFF
+                 case VT_I8:
+                   hb_itemPutNLL( pItem, ( LONGLONG ) pVariant->n1.n2.n3.llVal );
+                   break;
+    #endif
 
-              default:
-                if( (VARTYPE) ( pVariant->n1.n2.vt & ( VT_BYREF | VT_ARRAY ) ) == (VARTYPE) ( VT_BYREF | VT_ARRAY ) )
-                {
-                   VARTYPE vt;
-                   PHB_ITEM pArray;
-                   UINT iDims = SafeArrayGetDim( *pVariant->n1.n2.n3.pparray );
-                   long *rgIndices = (long *) hb_xgrab( sizeof(long) * iDims );
+                 case VT_BYREF | VT_R8:
+                   hb_itemPutND( pItem, *pVariant->n1.n2.n3.pdblVal );
+                   break;
 
-                   vt = pVariant->n1.n2.vt;
-                   vt &= ~VT_ARRAY;
-                   vt &= ~VT_BYREF;
+                 case VT_R8:
+                   hb_itemPutND( pItem, pVariant->n1.n2.n3.dblVal );
+                   break;
 
-                   pArray = SafeArrayToArray( *pVariant->n1.n2.n3.pparray, iDims, rgIndices, vt );
+                 case VT_BYREF | VT_DATE:
+                   hb_itemPutDL( pItem, (long) ( *( pVariant->n1.n2.n3.pdblVal ) ) + 2415019 );
+                   break;
 
-                   hb_xfree( (void *) rgIndices );
+                 case VT_DATE:
+                   hb_itemPutDL( pItem, (long) (pVariant->n1.n2.n3.dblVal) + 2415019 );
+                   break;
 
-                   hb_itemForwardValue( pItem, pArray );
-                   hb_itemRelease( pArray );
-                }
+                 case VT_BYREF | VT_EMPTY:
+                 case VT_EMPTY:
+                   hb_itemClear( pItem );
+                   break;
+
+                 case VT_BYREF | VT_VARIANT:
+                   hb_oleItemToVariant( pVariant->n1.n2.n3.pvarVal, pItem );
+                   break;
+
+                 default:
+                   if( (VARTYPE) ( pVariant->n1.n2.vt & ( VT_BYREF | VT_ARRAY ) ) == (VARTYPE) ( VT_BYREF | VT_ARRAY ) )
+                   {
+                      VARTYPE vt;
+                      PHB_ITEM pArray;
+                      UINT iDims = SafeArrayGetDim( *pVariant->n1.n2.n3.pparray );
+                      long *rgIndices = (long *) hb_xgrab( sizeof(long) * iDims );
+
+                      vt = pVariant->n1.n2.vt;
+                      vt &= ~VT_ARRAY;
+                      vt &= ~VT_BYREF;
+
+                      pArray = SafeArrayToArray( *pVariant->n1.n2.n3.pparray, iDims, rgIndices, vt );
+
+                      hb_xfree( (void *) rgIndices );
+
+                      hb_itemForwardValue( pItem, pArray );
+                      hb_itemRelease( pArray );
+                   }
+                   else
+                   {
+                      TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
+                   }
+              }
+           }
+           else
+           {
+              if( pVariant->n1.n2.vt & VT_BYREF )
+              {
+                 TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
+              }
            }
 
            VariantClear( &(pDispParams->rgvarg[ n ] ) );

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.70 2005/12/11 12:37:25 druzus Exp $
+ * $Id: errorapi.c,v 1.71 2005/12/20 04:18:59 walito Exp $
  */
 
 /*
@@ -284,14 +284,24 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
 {
    HB_THREAD_STUB
+
    #ifdef HB_THREAD_SUPPORT
-   BOOL old_bIdleFence;
+      BOOL old_bIdleFence;
    #endif
 
-   USHORT uiAction = E_DEFAULT; /* Needed to avoid GCC -O2 warning */
+   USHORT uiAction = hb_vmRequestQuery();
    USHORT usRequest;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errLaunch(%p)", pError));
+
+   if( uiAction )
+   {
+      return E_BREAK;
+   }
+   else
+   {
+      uiAction = E_DEFAULT;
+   }
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
@@ -1090,9 +1100,16 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pError = hb_errNew();
+   PHB_ITEM pError;
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
+
+   if( hb_vmRequestQuery() )
+   {
+      return NULL;
+   }
+
+   pError = hb_errNew();
 
    hb_errPutSeverity( pError, uiSeverity );
    hb_errPutSubSystem( pError, szSubSystem ? szSubSystem : HB_ERR_SS_BASE );
@@ -1127,9 +1144,16 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pError = hb_errNew();
+   PHB_ITEM pError;
    char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5 ];
    USHORT uLine;
+
+   if( hb_vmRequestQuery() )
+   {
+      return NULL;
+   }
+
+   pError = hb_errNew();
 
    hb_errPutSeverity( pError, uiSeverity );
    hb_errPutSubSystem( pError, szSubSystem ? szSubSystem : HB_ERR_SS_BASE );
