@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.71 2005/12/20 04:18:59 walito Exp $
+ * $Id: errorapi.c,v 1.72 2006/02/10 21:32:00 ronpinkas Exp $
  */
 
 /*
@@ -483,6 +483,11 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
    #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errLaunchSubst(%p)", pError));
+
+   if( hb_vmRequestQuery() )
+   {
+      return NULL;
+   }
 
    /* Act as an idle inspector */
    #ifdef HB_THREAD_SUPPORT
