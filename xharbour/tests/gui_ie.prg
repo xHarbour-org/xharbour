@@ -4,9 +4,10 @@ PROCEDURE Main()
 
    TEXT INTO cHtml
 <html>
-   <header>
+   <head>
        <p>Header</p>
-   </header>
+   </head>
+
    <body>
       <p>Body</p>
    </body>
