@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.66 2005/11/06 13:00:00 ptsarenko Exp $
+ * $Id: pptable.c,v 1.66 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -465,6 +465,7 @@ void hb_pp_Table( void )
    static COMMANDS sC___257 = {0,"SET","DBFLOCKSCHEME TO \1A00","Set(_SET_DBFLOCKSCHEME, \1A00 )",&sC___256 };
    static COMMANDS sC___258 = {0,"SET","DBFLOCKSCHEME TO","Set(_SET_DBFLOCKSCHEME, 0 )",&sC___257 };
    static COMMANDS sC___259 = {0,"SET","ERRORLOG TO \1A40 \16\1B20 ADDITIVE>\17","Set( _SET_ERRORLOG, \1A30, \1B50 )",&sC___258 };
+   static COMMANDS sC___260 = {0,"TEXT","INTO \1A00", "\1A00 := \"\"; HB_SetWith({|_1| \1A00 += (_1 + HB_OSNewLine() ) } ) ; text __TextInto,HB_SetWith",&sC___259 };
 
    /*
     * NOTE: below section within #ifdef - MUST update hb_pp_topCommand in 2 places AND
@@ -472,37 +473,37 @@ void hb_pp_Table( void )
     */
 
 #if defined( HB_COMPAT_C53 )
-   static COMMANDS sC___260 = {0,"@","\1A00,\1B00 GET \1C00 CHECKBOX \16VALID \1D00\17 \16WHEN \1E00\17 \16CAPTION \1F00\17 \16MESSAGE \1G00\17 \16COLOR \1H00\17 \16FOCUS \1I00\17 \16STATE \1J00\17 \16STYLE \1K00\17 \16SEND \1L00\17 \16GUISEND \1M00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C30,NIL,\1D40,\1E40 ) ) ; ATail(GetList):Control := _CheckBox_(\1C00,\1F00,\1G00,\1H00,\1I40,\1J40,\1K00 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1L00\17 \16; ATail(GetList):Control:\1M00\17 ; ATail(GetList):Control:Display()",&sC___259 };
-   static COMMANDS sC___261 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 RADIOGROUP \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16CAPTION \1I00\17 \16MESSAGE \1J00\17 \16COLOR \1K00\17 \16FOCUS \1L00\17 \16STYLE \1M00\17 \16SEND \1N00\17 \16GUISEND \1O00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; ATail(GetList):Control := _RadioGrp_(ATail(Getlist):row,ATail(Getlist):col,\1C00,\1D00,\1E00,\1F00,\1I00,\1J00,\1K00,\1L40,\1M00 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1N00\17 \16; ATail(GetList):Control:\1O00\17 ; ATail(GetList):Control:Display()",&sC___260 };
-   static COMMANDS sC___262 = {0,"@","\1A00,\1B00 GET \1C00 PUSHBUTTON \16VALID \1D00\17 \16WHEN \1E00\17 \16CAPTION \1F00\17 \16MESSAGE \1G00\17 \16COLOR \1H00\17 \16FOCUS \1I00\17 \16STATE \1J00\17 \16STYLE \1K00\17 \16SEND \1L00\17 \16GUISEND \1M00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C30,NIL,\1D40,\1E40 ) ) ; ATail(GetList):Control := _PushButt_(\1F00,\1G00,\1H00,\1I40,\1J40,\1K00,) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1L00\17 \16; ATail(GetList):Control:\1M00\17 ; ATail(GetList):Control:Display()",&sC___261 };
-   static COMMANDS sC___263 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 LISTBOX \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16CAPTION \1I00\17 \16MESSAGE \1J00\17 \16COLOR \1K00\17 \16FOCUS \1L00\17 \16STATE \1M00\17 \16\1N20  DROPDOWN>\17 \16\1O20  SCROLLBAR>\17 \16SEND \1P00\17 \16GUISEND \1Q00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; ATail(GetList):Control := _ListBox_(ATail(Getlist):row,ATail(Getlist):col,\1C00,\1D00,\1E00,\1F00,\1I00,\1J00,\1K00,\1L40,\1M40,\1N50,\1O50 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1P00\17 \16; ATail(GetList):Control:\1Q00\17 ; ATail(GetList):Control:Display()",&sC___262 };
-   static COMMANDS sC___264 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 TBROWSE \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16MESSAGE \1I00\17 \16SEND \1J00\17 \16GUISEND \1K00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; \1F00:ntop := ATail(Getlist):row ; \1F00:nleft := ATail(Getlist):col ; \1F00:nbottom := \1C00 ; \1F00:nright := \1D00 ; \1F00:Configure() ; ATail(GetList):Control := \1F00 ; ATail(GetList):reader := { | a,b,c,d | TBReader( a, b, c, d ) } \16; ATail(GetList):Control:Message := \1I00\17 \16; ATail(GetList):\1J00\17 \16; ATail(GetList):Control:\1K00\17",&sC___263 };
-   static COMMANDS sC___265 = {0,"READ","\16MSG AT \1A00,\1B00,\1C00 \16MSG COLOR \1D00\17\17",
-       "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___264 };
-   static COMMANDS sC___266 = {0,"@","\1A00,\1B00 GET \1C00 \16PICTURE \1D00\17 \16VALID \1E00\17 \16WHEN \1F00\17 \16CAPTION \1G00\17 \16MESSAGE \1H00\17 \16SEND \1I00\17",
-       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) \16; ATail(GetList):Caption := \1G00\17 \16; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1\17 \16; ATail(GetList):message := \1H00\17 \16; ATail(GetList):\1I00\17 ; ATail(GetList):Display()",&sC___265 };
-   static COMMANDS sC___267 = {0,"SET","MBLOCKSIZE TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___266 };
-   static COMMANDS sC___268 = {0,"SET","MEMOBLOCK TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___267 };
-   static COMMANDS sC___269 = {0,"SET","MFILEEXT TO \1A00","Set( _SET_MFILEEXT, \1A00 )",&sC___268 };
-   static COMMANDS sC___270 = {0,"SET","AUTOSHARE TO \1A00","Set( _SET_AUTOSHARE, \1A00 )",&sC___269 };
-   static COMMANDS sC___271 = {0,"SET","AUTOSHARE TO","Set( _SET_AUTOSHARE, 0 )",&sC___270 };
-   static COMMANDS sC___272 = {0,"SET","AUTORDER TO \1A00","Set( _SET_AUTORDER, \1A00 )",&sC___271 };
-   static COMMANDS sC___273 = {0,"SET","AUTORDER TO","Set( _SET_AUTORDER, 0 )",&sC___272 };
-   static COMMANDS sC___274 = {0,"SET","STRICTREAD \1A20 ON,OFF,&>","Set(_SET_STRICTREAD,\1A30 )",&sC___273 };
-   static COMMANDS sC___275 = {0,"SET","STRICTREAD (\1A00)","Set(_SET_STRICTREAD,\1A00 )",&sC___274 };
-   static COMMANDS sC___276 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___275 };
-   static COMMANDS sC___277 = {0,"SET","BACKGROUND TASKS \1A20 ON,OFF,&>","Set(_SET_BACKGROUNDTASKS,\1A30 )",&sC___276 };
-   static COMMANDS sC___278 = {0,"SET","GTMODE TO \1A30","Set( _SET_GTMODE,\1A30 )",&sC___277 };
-   static COMMANDS sC___279 = {0,"SET","BACKGROUNDTICK \1A00","Set( _SET_BACKGROUNDTICK, \1A00 )",&sC___278 };
-   static COMMANDS sC___280 = {0,"SET","HARDCOMMIT \1A20 ON,OFF,&>","Set(_SET_HARDCOMMIT,\1A30 )",&sC___279 };
-   static COMMANDS sC___281 = {0,"SET","HARDCOMMIT (\1A00)","Set(_SET_HARDCOMMIT,\1A00 )",&sC___280 };
-   static COMMANDS sC___282 = {0,"SET","FORCE OPTIMIZATION \1A20 ON,OFF,&>","Set(_SET_FORCEOPT,\1A30 )",&sC___281 };
-   static COMMANDS sC___283 = {0,"SET","EOL \1A00","Set( _SET_EOL, \1A00 )",&sC___282 };
+   static COMMANDS sC___261 = {0,"@","\1A00,\1B00 GET \1C00 CHECKBOX \16VALID \1D00\17 \16WHEN \1E00\17 \16CAPTION \1F00\17 \16MESSAGE \1G00\17 \16COLOR \1H00\17 \16FOCUS \1I00\17 \16STATE \1J00\17 \16STYLE \1K00\17 \16SEND \1L00\17 \16GUISEND \1M00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C30,NIL,\1D40,\1E40 ) ) ; ATail(GetList):Control := _CheckBox_(\1C00,\1F00,\1G00,\1H00,\1I40,\1J40,\1K00 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1L00\17 \16; ATail(GetList):Control:\1M00\17 ; ATail(GetList):Control:Display()",&sC___260 };
+   static COMMANDS sC___262 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 RADIOGROUP \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16CAPTION \1I00\17 \16MESSAGE \1J00\17 \16COLOR \1K00\17 \16FOCUS \1L00\17 \16STYLE \1M00\17 \16SEND \1N00\17 \16GUISEND \1O00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; ATail(GetList):Control := _RadioGrp_(ATail(Getlist):row,ATail(Getlist):col,\1C00,\1D00,\1E00,\1F00,\1I00,\1J00,\1K00,\1L40,\1M00 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1N00\17 \16; ATail(GetList):Control:\1O00\17 ; ATail(GetList):Control:Display()",&sC___261 };
+   static COMMANDS sC___263 = {0,"@","\1A00,\1B00 GET \1C00 PUSHBUTTON \16VALID \1D00\17 \16WHEN \1E00\17 \16CAPTION \1F00\17 \16MESSAGE \1G00\17 \16COLOR \1H00\17 \16FOCUS \1I00\17 \16STATE \1J00\17 \16STYLE \1K00\17 \16SEND \1L00\17 \16GUISEND \1M00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C30,NIL,\1D40,\1E40 ) ) ; ATail(GetList):Control := _PushButt_(\1F00,\1G00,\1H00,\1I40,\1J40,\1K00,) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1L00\17 \16; ATail(GetList):Control:\1M00\17 ; ATail(GetList):Control:Display()",&sC___262 };
+   static COMMANDS sC___264 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 LISTBOX \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16CAPTION \1I00\17 \16MESSAGE \1J00\17 \16COLOR \1K00\17 \16FOCUS \1L00\17 \16STATE \1M00\17 \16\1N20  DROPDOWN>\17 \16\1O20  SCROLLBAR>\17 \16SEND \1P00\17 \16GUISEND \1Q00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; ATail(GetList):Control := _ListBox_(ATail(Getlist):row,ATail(Getlist):col,\1C00,\1D00,\1E00,\1F00,\1I00,\1J00,\1K00,\1L40,\1M40,\1N50,\1O50 ) ; ATail(GetList):reader := { | a,b,c,d | GuiReader(a,b,c,d ) } \16; ATail(GetList):\1P00\17 \16; ATail(GetList):Control:\1Q00\17 ; ATail(GetList):Control:Display()",&sC___263 };
+   static COMMANDS sC___265 = {0,"@","\1A00,\1B00,\1C00,\1D00 GET \1E00 TBROWSE \1F00 \16VALID \1G00\17 \16WHEN \1H00\17 \16MESSAGE \1I00\17 \16SEND \1J00\17 \16GUISEND \1K00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1E00,\1E30,NIL,\1G40,\1H40 ) ) ; \1F00:ntop := ATail(Getlist):row ; \1F00:nleft := ATail(Getlist):col ; \1F00:nbottom := \1C00 ; \1F00:nright := \1D00 ; \1F00:Configure() ; ATail(GetList):Control := \1F00 ; ATail(GetList):reader := { | a,b,c,d | TBReader( a, b, c, d ) } \16; ATail(GetList):Control:Message := \1I00\17 \16; ATail(GetList):\1J00\17 \16; ATail(GetList):Control:\1K00\17",&sC___264 };
+   static COMMANDS sC___266 = {0,"READ","\16MSG AT \1A00,\1B00,\1C00 \16MSG COLOR \1D00\17\17",
+       "ReadModal(GetList,NIL,NIL,\1A00,\1B00,\1C00,\1D00 ) ; GetList := {}",&sC___265 };
+   static COMMANDS sC___267 = {0,"@","\1A00,\1B00 GET \1C00 \16PICTURE \1D00\17 \16VALID \1E00\17 \16WHEN \1F00\17 \16CAPTION \1G00\17 \16MESSAGE \1H00\17 \16SEND \1I00\17",
+       "SetPos(\1A00,\1B00 ) ; AAdd(GetList,_GET_(\1C00,\1C20,\1D00,\1E40,\1F40 ) ) \16; ATail(GetList):Caption := \1G00\17 \16; ATail(GetList):CapRow := ATail(Getlist):row ; ATail(GetList):CapCol := ATail(Getlist):col - __CapLength(\1G00) - 1\17 \16; ATail(GetList):message := \1H00\17 \16; ATail(GetList):\1I00\17 ; ATail(GetList):Display()",&sC___266 };
+   static COMMANDS sC___268 = {0,"SET","MBLOCKSIZE TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___267 };
+   static COMMANDS sC___269 = {0,"SET","MEMOBLOCK TO \1A00","Set( _SET_MBLOCKSIZE, \1A00 )",&sC___268 };
+   static COMMANDS sC___270 = {0,"SET","MFILEEXT TO \1A00","Set( _SET_MFILEEXT, \1A00 )",&sC___269 };
+   static COMMANDS sC___271 = {0,"SET","AUTOSHARE TO \1A00","Set( _SET_AUTOSHARE, \1A00 )",&sC___270 };
+   static COMMANDS sC___272 = {0,"SET","AUTOSHARE TO","Set( _SET_AUTOSHARE, 0 )",&sC___271 };
+   static COMMANDS sC___273 = {0,"SET","AUTORDER TO \1A00","Set( _SET_AUTORDER, \1A00 )",&sC___272 };
+   static COMMANDS sC___274 = {0,"SET","AUTORDER TO","Set( _SET_AUTORDER, 0 )",&sC___273 };
+   static COMMANDS sC___275 = {0,"SET","STRICTREAD \1A20 ON,OFF,&>","Set(_SET_STRICTREAD,\1A30 )",&sC___274 };
+   static COMMANDS sC___276 = {0,"SET","STRICTREAD (\1A00)","Set(_SET_STRICTREAD,\1A00 )",&sC___275 };
+   static COMMANDS sC___277 = {0,"SET","OUTPUT SAFETY \1A20 ON,OFF,&>","Set(_SET_OUTPUTSAFETY,\1A30 )",&sC___276 };
+   static COMMANDS sC___278 = {0,"SET","BACKGROUND TASKS \1A20 ON,OFF,&>","Set(_SET_BACKGROUNDTASKS,\1A30 )",&sC___277 };
+   static COMMANDS sC___279 = {0,"SET","GTMODE TO \1A30","Set( _SET_GTMODE,\1A30 )",&sC___278 };
+   static COMMANDS sC___280 = {0,"SET","BACKGROUNDTICK \1A00","Set( _SET_BACKGROUNDTICK, \1A00 )",&sC___279 };
+   static COMMANDS sC___281 = {0,"SET","HARDCOMMIT \1A20 ON,OFF,&>","Set(_SET_HARDCOMMIT,\1A30 )",&sC___280 };
+   static COMMANDS sC___282 = {0,"SET","HARDCOMMIT (\1A00)","Set(_SET_HARDCOMMIT,\1A00 )",&sC___281 };
+   static COMMANDS sC___283 = {0,"SET","FORCE OPTIMIZATION \1A20 ON,OFF,&>","Set(_SET_FORCEOPT,\1A30 )",&sC___282 };
+   static COMMANDS sC___284 = {0,"SET","EOL \1A00","Set( _SET_EOL, \1A00 )",&sC___283 };
 #endif
 
    static COMMANDS sT___01 = {1,"_GET_","(\1A00,\1B00 )","_GET_(\1A00,\1B00,NIL,NIL,NIL )",NULL };
@@ -510,9 +511,9 @@ void hb_pp_Table( void )
    static COMMANDS sT___03 = {1,"_GET_","(\1A00,\1B00,\1C00,\1D00 )","_GET_(\1A00,\1B00,\1C00,\1D00,NIL )",&sT___02 };
 
 #if defined( HB_COMPAT_C53 )
-   hb_pp_topCommand = &sC___283;
+   hb_pp_topCommand = &sC___284;
 #else
-   hb_pp_topCommand = &sC___259;
+   hb_pp_topCommand = &sC___260;
 #endif
 
    hb_pp_topDefine = &sD___72;

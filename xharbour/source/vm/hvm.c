@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.545 2006/01/17 01:05:24 ronpinkas Exp $
+ * $Id: hvm.c,v 1.546 2006/01/18 23:44:05 likewolf Exp $
  */
 
 /*
@@ -7408,7 +7408,7 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
    s_bDebuggerIsWorking = TRUE;
 
    hb_vmCacheDbgEntry();
-   
+
    if ( hb_vm_pFunDbgEntry )
    {
       hb_vm_pFunDbgEntry( HB_DBG_LOCALNAME, 0, szLocalName, uiLocal, 0 );
@@ -9501,7 +9501,7 @@ HB_FUNC( HB_DBG_VMVARGGET )
 HB_FUNC( HB_DBG_VMVARGSET )
 {
    PHB_ITEM pItem = s_aGlobals.item.asArray.value->pItems + hb_parni( 1 ) + hb_parni( 2 ) - 1;
-   
+
    hb_itemCopy( hb_itemUnRef( pItem ), hb_itemParamPtr( 3, HB_IT_ANY ) );
 }
 
@@ -9842,6 +9842,14 @@ HB_FUNC( HB_WITHOBJECTCOUNTER )
    HB_THREAD_STUB
 
    hb_retnl( hb_vm_wWithObjectCounter ) ;
+}
+
+HB_FUNC( __TEXTINTO )
+{
+   HB_THREAD_STUB
+
+   hb_itemCopy( hb_stackSelfItem(), &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter - 1 ] ) );
+   hb_symEval.value.pFunPtr();
 }
 
 HB_FUNC( __VMVARSLIST )

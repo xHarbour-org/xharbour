@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4808 2006/02/09 14:20:54 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.4809 2006/02/10 21:31:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-11 16:10 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/pp/pptable.c
+    + Added support for TEXT INTO <LValue>
+  * source/vm/hvm.c
+    + Added __TEXTINTO() to siupport implementation of new TEXT INTO command
+  + tests/gui_ie.prg
+    + New sample of TEXT INTO command
 
 2006-02-10 13:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg
