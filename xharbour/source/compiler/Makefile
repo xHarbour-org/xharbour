@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/07/31 18:56:12 druzus Exp $
+# $Id: Makefile,v 1.4 2004/10/23 12:02:08 druzus Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -50,8 +50,10 @@ C_SOURCES=\
 	hbgenerr.c \
 	hbpcode.c \
 	hbusage.c \
+	hbdead.c \
 	hbfix.c \
 	hbident.c \
+	hbstripl.c \
 	expropta.c \
 	exproptb.c \
 	exproptc.c \

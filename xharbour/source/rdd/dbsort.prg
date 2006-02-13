@@ -1,5 +1,5 @@
 /*
- * $Id: dbsort.prg,v 1.3 2005/11/06 13:39:20 ptsarenko Exp $
+ * $Id: dbsort.prg,v 1.3 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -62,12 +62,6 @@ FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
    aStruct := dbStruct()
    IF Empty( aStruct )
       RETURN .F.
-   ENDIF
-
-   /* Sort returns an empty table if source table contains only one record  */
-   IF Lastrec() == 1
-      COPY TO ( cToFileName )
-      RETURN .T.
    ENDIF
 
    BEGIN SEQUENCE

@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.95 2006/01/14 23:10:37 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.96 2006/01/18 23:44:05 likewolf Exp $
  */
 
 /*
@@ -2659,7 +2659,7 @@ BeginSeq   : BEGINSEQ {
                    --hb_comp_wSeqCounter;  /* RECOVER is also considered as end of sequence */
                 }
 
-                //hb_compSequenceFinish( $<lNumber>2, $<iNumber>4 );
+                hb_compSequenceFinish( $<lNumber>2, $<lNumber>4 );
                 hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                 s_iControlLevel--;
              }

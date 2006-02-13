@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.111 2005/11/03 06:55:29 ronpinkas Exp $
+ * $Id: genc.c,v 1.112 2005/11/16 12:16:38 druzus Exp $
  */
 
 /*
@@ -1736,7 +1736,7 @@ static HB_GENC_FUNC( hb_p_localname )
    }
    fprintf( cargo->yyc, " 0,\n" );
 
-   return (USHORT) ( lPCodePos - ulStart + 1 );
+   return lPCodePos - ulStart + 1;
 }
 
 static HB_GENC_FUNC( hb_p_macropop )
@@ -1876,7 +1876,7 @@ static HB_GENC_FUNC( hb_p_modulename )
    }
    fprintf( cargo->yyc, " 0,\n" );
 
-   return (USHORT) ( lPCodePos - ulStart + 1 );
+   return lPCodePos - ulStart + 1;
 }
 
 static HB_GENC_FUNC( hb_p_modulus )
@@ -2274,7 +2274,7 @@ static HB_GENC_FUNC( hb_p_pushblock )
       lPCodePos += 2;
    }
 
-   return (USHORT) (lPCodePos - ulStart);
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_pushblockshort )
@@ -2644,7 +2644,7 @@ static HB_GENC_FUNC( hb_p_pushstr )
    }
    fprintf( cargo->yyc, "\n" );
 
-   return (USHORT) (lPCodePos - ulStart);
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_pushstrshort )
@@ -2688,7 +2688,7 @@ static HB_GENC_FUNC( hb_p_pushstrshort )
    }
    fprintf( cargo->yyc, "\n" );
 
-   return (USHORT) ( lPCodePos - ulStart );
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_pushsym )
@@ -2826,7 +2826,7 @@ static HB_GENC_FUNC( hb_p_statics )
       fprintf( cargo->yyc, "\t/* symbol (_INITSTATICS), %i statics */", HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 3 ] ) ) );
    }
    fprintf( cargo->yyc, "\n" );
-   return (USHORT) lByteCount;
+   return lByteCount;
 }
 
 static HB_GENC_FUNC( hb_p_staticname )
@@ -2857,7 +2857,7 @@ static HB_GENC_FUNC( hb_p_staticname )
    }
    fprintf( cargo->yyc, " 0,\n" );
 
-   return (USHORT) ( lPCodePos - ulStart + 1 );
+   return lPCodePos - ulStart + 1;
 }
 
 static HB_GENC_FUNC( hb_p_swapalias )
@@ -3099,7 +3099,7 @@ static HB_GENC_FUNC( hb_p_localnearsetstr )
 
    fprintf( cargo->yyc, "\n" );
 
-   return ( USHORT ) ( lPCodePos - ulStart );
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_left )
@@ -3488,7 +3488,7 @@ static HB_GENC_FUNC( hb_p_pushstrhidden )
    }
    fprintf( cargo->yyc, "\n" );
 
-   return (USHORT) (lPCodePos - ulStart);
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
@@ -3561,7 +3561,7 @@ static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
 
    fprintf( cargo->yyc, "\n" );
 
-   return ( USHORT ) ( lPCodePos - ulStart );
+   return lPCodePos - ulStart;
 }
 
 static HB_GENC_FUNC( hb_p_trybegin )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.3 2005/11/06 13:20:01 ptsarenko Exp $
+ * $Id: hbdbsort.c,v 1.3 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ void hb_dbQSortComplete( LPDBQUICKSORT pQuickSort )
    AREAP pArea;
 
    ulRecCount = hb_fsSeek( pQuickSort->hFile, 0, FS_END ) / pQuickSort->uiRecordLen;
-   if( ulRecCount > 1 )
+   if( ulRecCount >= 1 )
    {
       hb_dbQSortDo( pQuickSort, 1, ulRecCount );
       pArea = pQuickSort->pSortInfo->dbtri.lpaDest;

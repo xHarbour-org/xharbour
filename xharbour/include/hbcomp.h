@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.40 2005/11/12 18:47:27 druzus Exp $
+ * $Id: hbcomp.h,v 1.41 2006/01/18 23:44:03 likewolf Exp $
  */
 
 /*
@@ -254,11 +254,12 @@ typedef struct _AUTOOPEN
 
 /* definitions for hb_compPCodeEval() support */
 typedef void * HB_VOID_PTR;
-#define HB_PCODE_FUNC( func, type ) USHORT func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
+#define HB_PCODE_FUNC( func, type ) ULONG func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
 typedef  HB_PCODE_FUNC( HB_PCODE_FUNC_, HB_VOID_PTR );
 typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
-void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * , BOOL );
+extern void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void *, BOOL );
+extern void hb_compPCodeTrace( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
 
 #define VS_NONE           0
 #define VS_LOCAL          1
@@ -305,6 +306,7 @@ extern void hb_compVariableAdd( char * szVarName, BYTE cType ); /* add a new par
 extern PVAR hb_compVariableFind( PVAR pVars, USHORT wOrder ); /* returns a variable if defined or zero */
 extern PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar );
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the order + 1 of a variable if defined or zero */
+extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
 
 extern PCOMSYMBOL hb_compSymbolAdd( char *, USHORT *, BOOL );
 extern PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL );    /* releases all memory allocated by symbol and returns the next one */
@@ -438,12 +440,17 @@ extern int hb_compCompile( char * szPrg, int argc, char * argv[] );
 /* Misc functions defined in harbour.c */
 extern void hb_compFinalizeFunction( void ); /* fixes all last defined function returns jumps offsets */
 extern void hb_compNOOPadd( PFUNCTION pFunc, ULONG ulPos );
+extern void hb_compNOOPfill( PFUNCTION pFunc, ULONG ulFrom, int iCount, BOOL fPop, BOOL fCheck );
+extern BOOL hb_compIsJump( PFUNCTION pFunc, ULONG ulPos );
 /* internationalization */
 extern void hb_compAddI18nString( char *szString );
 
-
 /* Misc functions defined in hbfix.c */
 extern void hb_compFixFuncPCode( PFUNCTION );
+/* Misc functions defined in hbstripl.c */
+extern void hb_compStripFuncLines( PFUNCTION pFunc );
+/* Misc functions defined in hbdead.c */
+extern void hb_compCodeTraceMarkDead( PFUNCTION pFunc );
 
 /* Misc functions defined in harbour.y */
 extern int hb_compYACCMain( char * szName );
@@ -560,6 +567,9 @@ extern short          hb_comp_iGlobals;
 extern BOOL           hb_comp_bTracePP;
 extern FILE           *hb_comp_PPTrace;
 
+/* table with PCODEs' length */
+extern const BYTE     hb_comp_pcode_len[];
+
 /* error messages output */
 extern FILE           *hb_comp_errFile;
 
@@ -579,6 +589,7 @@ extern FILE           *hb_comp_errFile;
 #define HB_COMPFLAG_HARBOUR        1    /* -kh */
 #define HB_COMPFLAG_XBASE          2    /* -kx */
 #define HB_COMPFLAG_HB_INLINE      4    /* -ki */
+#define HB_COMPFLAG_OPTJUMP       16    /* -kj turn off jump optimalization */
 #define HB_COMPFLAG_RT_MACRO      64    /* -kr */
 
 #ifdef HB_MACRO_SUPPORT

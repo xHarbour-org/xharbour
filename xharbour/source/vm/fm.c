@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.72 2005/10/18 12:14:59 druzus Exp $
+ * $Id: fm.c,v 1.73 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -756,21 +756,21 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       {
          HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %lu) %s(%i), \"%s\"",
             ui++,
-            (char *) ( pMemBlock + 1 ),
+            (char *) pMemBlock + HB_MEMINFO_SIZE,
             pMemBlock->ulSize,
             pMemBlock->szProcName,
             pMemBlock->uiProcLine,
-            hb_mem2str( pMemBlock + 1, pMemBlock->ulSize ) ) );
+            hb_mem2str( ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize ) ) );
 
          if ( hLog )
          {
             fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n",
                ui-1,
-               (char *) ( pMemBlock + 1 ),
+               (char *) pMemBlock + HB_MEMINFO_SIZE,
                pMemBlock->ulSize,
                pMemBlock->szProcName,
                pMemBlock->uiProcLine,
-               hb_mem2str( pMemBlock + 1, pMemBlock->ulSize ) );
+               hb_mem2str( ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize ) );
          }
       }
 
@@ -1068,11 +1068,11 @@ ULONG hb_xquery( USHORT uiMode )
         {
            TraceLog( NULL, "Block %i %p (size %lu) %s(%i), \"%s\"\n",
               ui++,
-              (char *) ( pMemBlock + 1 ),
+              ( char * ) pMemBlock + HB_MEMINFO_SIZE,
               pMemBlock->ulSize,
               pMemBlock->szProcName,
               pMemBlock->uiProcLine,
-              hb_mem2str( pMemBlock + 1, pMemBlock->ulSize ) );
+              hb_mem2str( ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize ) );
         }
 
         ulResult = s_lMemoryConsumed;

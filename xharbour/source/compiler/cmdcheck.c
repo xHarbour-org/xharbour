@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.24 2005/09/13 22:46:53 fperillo Exp $
+ * $Id: cmdcheck.c,v 1.25 2005/10/07 03:43:20 ronpinkas Exp $
  */
 
 /*
@@ -725,7 +725,7 @@ void hb_compChkEnvironVar( char * szSwitch )
 
                          case 'c':
                             /* clear all flags - minimal set of features */
-                            hb_comp_Supported = 0;
+                            hb_comp_Supported = HB_COMPFLAG_OPTJUMP;
                             break;
 
                          case 'x':
@@ -734,6 +734,10 @@ void hb_compChkEnvironVar( char * szSwitch )
 
                          case 'i':
                             hb_comp_Supported |= HB_COMPFLAG_HB_INLINE;
+                            break;
+
+                         case 'J':
+                            hb_comp_Supported &= ~HB_COMPFLAG_OPTJUMP;
                             break;
 
                          case 'r':

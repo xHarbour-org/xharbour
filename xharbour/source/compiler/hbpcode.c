@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.40 2005/11/03 06:55:29 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.41 2005/11/12 18:47:30 druzus Exp $
  */
 
 /*
@@ -225,7 +225,7 @@ static char *pCodeList[] =
     "HB_P_LAST_PCODE"             /* 170 this defines the number of defined pcodes */
 };
 
-static BYTE s_pcode_len[] = {
+const BYTE hb_comp_pcode_len[] = {
    1,        /* HB_P_AND,                  */
    1,        /* HB_P_ARRAYPUSH,            */
    1,        /* HB_P_ARRAYPOP,             */
@@ -468,7 +468,7 @@ static PVAR hb_compPrivateFind( char * szPrivateName )
 void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * cargo, BOOL bWriteList )
 {
    ULONG ulPos = 0;
-   USHORT usSkip;
+   ULONG ulSkip;
    BYTE opcode;
    HB_PCODE_FUNC_PTR pCall;
 
@@ -477,12 +477,11 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
    PCODELIST pCodeCurrent = NULL;
 
    /* Make sure that table is correct */
-   assert( sizeof( s_pcode_len ) == HB_P_LAST_PCODE );
+   assert( sizeof( hb_comp_pcode_len ) == HB_P_LAST_PCODE );
 
    while( ulPos < pFunc->lPCodePos )
    {
       opcode = pFunc->pCode[ ulPos ];
-
       if( opcode < HB_P_LAST_PCODE )
       {
          if( bWriteList )
@@ -495,21 +494,21 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
             }
          }
 
-         usSkip = s_pcode_len[ opcode ];
+         ulSkip = hb_comp_pcode_len[ opcode ];
          pCall = pFunctions[ opcode ];
 
          if( pCall )
          {
-            if( usSkip )
+            if( ulSkip )
             {
                pCall( pFunc, ulPos, cargo );
             }
             else
             {
-               usSkip = pCall( pFunc, ulPos, cargo );
+               ulSkip = pCall( pFunc, ulPos, cargo );
             }
          }
-         ulPos += (ULONG) usSkip;
+         ulPos += ulSkip;
       }
       else
       {
@@ -533,6 +532,34 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
          pCodeFirst = pCodeTemp;
       }
       fprintf( hb_comp_pCodeList, "TYPES=%i\nCALLS=%i\n\n", ipCodeCount, ipCodeUsed );
+   }
+}
+
+void hb_compPCodeTrace( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * cargo )
+{
+   ULONG ulPos = 0;
+   BYTE opcode;
+   HB_PCODE_FUNC_PTR pCall;
+
+   /* Make sure that table is correct */
+   assert( sizeof( hb_comp_pcode_len ) == HB_P_LAST_PCODE );
+
+   while( ulPos < pFunc->lPCodePos )
+   {
+      opcode = pFunc->pCode[ ulPos ];
+      if( opcode < HB_P_LAST_PCODE )
+      {
+         pCall = pFunctions[ opcode ];
+         if( pCall )
+            ulPos = pCall( pFunc, ulPos, cargo );
+         else
+            ulPos += hb_comp_pcode_len[ opcode ];
+      }
+      else
+      {
+         fprintf( hb_comp_errFile, "--- Invalid opcode %i in hb_compPCodeTrace() ---\n", opcode );
+         ++ulPos;
+      }
    }
 }
 

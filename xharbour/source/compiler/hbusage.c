@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.30 2005/09/13 22:46:53 fperillo Exp $
+ * $Id: hbusage.c,v 1.31 2006/02/04 01:22:03 andijahja Exp $
  */
 
 /*
@@ -125,6 +125,7 @@ void hb_compPrintModes( void )
            "\n          i               enable support for HB_INLINE",
            "\n          r               runtime settings enabled",
            "\n          x               extended xbase mode",
+           "\n          J               turn off jump optimization in pcode",
            "\n          ?               this info",
            "\n"
    };

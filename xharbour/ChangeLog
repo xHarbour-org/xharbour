@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4810 2006/02/12 00:11:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4811 2006/02/13 12:16:25 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,56 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-13 23:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbcomp.h
+  * xharbour/source/compiler/Makefile
+  * xharbour/source/compiler/cmdcheck.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/compiler/hbfix.c
+  * xharbour/source/compiler/hbpcode.c
+  * xharbour/source/compiler/hbusage.c
+  + xharbour/source/compiler/hbdead.c
+  + xharbour/source/compiler/hbstripl.c
+    + added dead code eliminator (f.e. inside WHILE .F. / IF .F. blocks)
+    + added repeated HB_P_LINE* pcodes stripping - the can appear after
+      dead code elimination
+    + added optimization for WHILE .T. / IF .T.
+    * added -kJ switch which disable jump optimization
+      (works like in Harbour)
+    * restored BEGIN SEQUENCE / RECOVER / END elimination with empty
+      SEQUENCE body
+    * rewritten jump optimization to to support multi passes
+
+  * xharbour/source/rdd/dbf1.c
+    * enabled 'Y' (currency) field support - mapped to double
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbsort.prg
+  * xharbour/source/rdd/hbdbsort.c
+    ! fixed some bugs in sort command
+
+  * xharbour/source/rdd/dbstrux.prg
+  * xharbour/source/rdd/dbtotal.prg
+    - removed no longer necessary using of temporary aliases
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * casting
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * disabled validation of unused index pages - Clipper left them
+      dirty so xHarbour reported that index is corrupted
+
+  * xharbour/source/vm/fm.c
+    ! fixed pointer updating in memory statistic presentation on machines
+      with strict alignment
+
+  * xharbour/xharbour.spec
+  * xharbour/bin/pack_bin.bat
+  * xharbour/bin/pack_src.bat
+    * updated version number to 0.99.61
 
 2006-02-13 04:15 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbver.h

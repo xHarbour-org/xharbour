@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.143 2005/11/22 02:01:43 druzus Exp $
+ * $Id: dbf1.c,v 1.149 2006/01/30 02:51:23 druzus Exp $
  */
 
 /*
@@ -3000,6 +3000,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          case 'Y':
             pFieldInfo.uiType = HB_IT_DOUBLE;
             pFieldInfo.uiDec = pField->bDec;
+            break;
 
          default:
             errCode = FAILURE;
