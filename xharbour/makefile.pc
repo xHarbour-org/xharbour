@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.18 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: makefile.pc,v 1.20 2006/02/14 00:00:00 modalsist Exp $
 #
 # makefile for Pelles C compiler
 #
@@ -302,6 +302,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\harbour.obj \
    $(OBJ_DIR)\harboury.obj \
    $(OBJ_DIR)\cmdcheck.obj \
+   $(OBJ_DIR)\hbdead.obj \
+   $(OBJ_DIR)\hbstripl.obj \
    $(OBJ_DIR)\hbusage.obj \
    $(OBJ_DIR)\hbident.obj \
    $(OBJ_DIR)\hbgenerr.obj \
@@ -988,6 +990,8 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\harboury.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbslex.obj    >> make.tmp
    $(ECHO) $(OBJ_DIR)\cmdcheck.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdead.obj    >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbstripl.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbusage.obj   >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbident.obj   >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbgenerr.obj  >> make.tmp
@@ -1069,6 +1073,11 @@ $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
 $(OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbdead.obj : $(COMPILER_DIR)\hbdead.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbstripl.obj : $(COMPILER_DIR)\hbstripl.c
+   $(CC_CMD)
 
 # 旼컴컴컴컴컴컴커
 # � LIB Creation 넴
