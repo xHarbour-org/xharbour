@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4811 2006/02/13 12:16:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4812 2006/02/13 23:10:11 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-14 01:50 UTC-0100 Ath <Ath1 at sourceforge.net>
+  * xharbour/hrbdll.*
+  * xharbour/makefile.*
+    * add sixcdx.lib to all makefiles, generates a separate .lib file
 
 2006-02-13 23:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbcomp.h
