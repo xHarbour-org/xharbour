@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.72 2006/02/10 21:32:00 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.73 2006/02/10 21:40:12 ronpinkas Exp $
  */
 
 /*
@@ -344,6 +344,8 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       /* Launch the error handler: "lResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
 
+      /* set DOSERROR() to last OS error code */
+      s_uiErrorDOS = hb_errGetOsCode( pError );
 
       if( s_errorHandler )
       {
@@ -523,6 +525,9 @@ PHB_ITEM HB_EXPORT hb_errLaunchSubst( PHB_ITEM pError )
 
       /* Launch the error handler: "xResult := EVAL( ErrorBlock(), oError )" */
       s_iLaunchCount++;
+
+      /* set DOSERROR() to last OS error code */
+      s_uiErrorDOS = hb_errGetOsCode( pError );
 
       if( s_errorHandler )
       {

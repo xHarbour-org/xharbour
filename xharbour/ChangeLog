@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4812 2006/02/13 23:10:11 druzus Exp $
+ * $Id: ChangeLog,v 1.4813 2006/02/14 00:31:58 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-14 02:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+    ! fixed some macros to return boolean value - on systems where
+      BOOL type is not mapped to int the old versions may not work
+      properly
+
+  * xharbour/source/rdd/dbcmd.c
+    * fixed GPF in DBF2TEXT when work are is not in use.
+
+  * xharbour/source/rtl/dbdelim.prg
+    * generate 2001 RT error when work are not in used before
+      export file is created.
+
+  * xharbour/source/vm/errorapi.c
+    * set DOSERROR() to oError:OSCODE when RT error is generated
+      It's documented Clipper behavior.
+
+  * xharbour/source/vm/extend.c
+    + added hb_extIsObject() which works like existing hb_extIsArray()
 
 2006-02-14 01:50 UTC-0100 Ath <Ath1 at sourceforge.net>
   * xharbour/hrbdll.*

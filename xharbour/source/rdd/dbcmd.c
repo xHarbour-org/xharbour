@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.187 2006/01/30 02:51:23 druzus Exp $
+ * $Id: dbcmd.c,v 1.188 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -4633,6 +4633,12 @@ HB_FUNC( DBF2TEXT )
 
    BOOL bNoFieldPassed = ( pFields == NULL || hb_arrayLen( pFields ) == 0 );
 
+
+   if( !pArea )
+   {
+      hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "COPY TO" );
+      return;
+   }
 
    if( ! handle )
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.55 2005/10/24 01:04:36 druzus Exp $
+ * $Id: extend.c,v 1.56 2005/11/12 18:47:30 druzus Exp $
  */
 
 /*
@@ -148,12 +148,29 @@ BOOL HB_EXPORT hb_extIsArray( int iParam )
 {
    HB_THREAD_STUB_ANY
 
-   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
-   {
-      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+   if( iParam == -1 )
+      return HB_IS_ARRAY( hb_stackReturnItem() );
 
-      return HB_IS_ARRAY( pItem );
-   }
+   else if( iParam >= 0 && iParam <= hb_pcount() )
+      return HB_IS_ARRAY( hb_stackItemFromBase( iParam ) );
+
+   else
+      return FALSE;
+}
+
+/* function to be called from pcode DLLs to detect if the extend system
+ * is going to use an object item */
+
+HB_EXPORT BOOL hb_extIsObject( int iParam )
+{
+   HB_THREAD_STUB_ANY
+
+   if( iParam == -1 )
+      return HB_IS_OBJECT( hb_stackReturnItem() );
+
+   else if( iParam >= 0 && iParam <= hb_pcount() )
+      return HB_IS_OBJECT( hb_stackItemFromBase( iParam ) );
+
    else
       return FALSE;
 }

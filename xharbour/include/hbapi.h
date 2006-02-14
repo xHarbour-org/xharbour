@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.189 2006/01/12 13:15:59 druzus Exp $
+ * $Id: hbapi.h,v 1.190 2006/01/30 02:51:23 druzus Exp $
  */
 
 /*
@@ -87,37 +87,40 @@ HB_EXTERN_BEGIN
 #define HB_IT_OBJECT    HB_IT_ARRAY
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
-#define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFF )
+#define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFFFFFF )
 #define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
 #define HB_IT_GCITEM    ( ( HB_TYPE ) ( HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_HASH | HB_IT_POINTER | HB_IT_BYREF ) )
 
+#define HB_ITEM_TYPE( p )   ( ( p )->type )
+#define HB_OBJ_CLASS( p )   ( ( p )->item.asArray.value->uiClass )
+
 #define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
 
-#define HB_IS_BYREF( p )      ( ( p )->type & HB_IT_BYREF )
-#define HB_IS_ARRAY( p )      ( ( p )->type == HB_IT_ARRAY )
-#define HB_IS_NIL( p )        ( ( p )->type == HB_IT_NIL )
-#define HB_IS_BLOCK( p )      ( ( p )->type == HB_IT_BLOCK )
-#define HB_IS_DATE( p )       ( ( p )->type == HB_IT_DATE )
-#define HB_IS_DOUBLE( p )     ( ( p )->type == HB_IT_DOUBLE )
-#define HB_IS_INTEGER( p )    ( ( p )->type == HB_IT_INTEGER )
-#define HB_IS_LOGICAL( p )    ( ( p )->type == HB_IT_LOGICAL )
-#define HB_IS_LONG( p )       ( ( p )->type == HB_IT_LONG )
-#define HB_IS_NUMERIC( p )    ( ( p )->type & HB_IT_NUMERIC  || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
-#define HB_IS_NUMBER( p )     ( ( p )->type & HB_IT_NUMERIC )
-#define HB_IS_NUMINT( p )     ( ( p )->type & HB_IT_NUMINT )
-#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && ( p )->item.asArray.value->uiClass )
-#define HB_IS_STRING( p )     ( ( p )->type & HB_IT_STRING )
-#define HB_IS_MEMO( p )       ( ( p )->type & HB_IT_MEMO )
-#define HB_IS_SYMBOL( p )     ( ( p )->type == HB_IT_SYMBOL )
-#define HB_IS_MEMVAR( p )     ( ( p )->type & HB_IT_MEMVAR )
-#define HB_IS_POINTER( p )    ( ( p )->type & HB_IT_POINTER )
-#define HB_IS_HASH( p )       ( ( p )->type == HB_IT_HASH )
-#define HB_IS_ORDERABLE( p )  ( ( p )->type & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) )
-#define HB_IS_STRINGWR( p )   ( ( p )->type & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
-#define HB_IS_COMPLEX( p )    ( ( p )->type & HB_IT_COMPLEX )
-#define HB_IS_SIMPLE( p )     ( ( p )->type & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
-#define HB_IS_GCITEM( p )     ( ( p )->type & HB_IT_GCITEM )
-#define HB_IS_BADITEM( p )    ( ( p )->type & HB_IT_COMPLEX && ( p )->type & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) )
+#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_BYREF ) != 0 )
+#define HB_IS_ARRAY( p )      ( HB_ITEM_TYPE( p ) == HB_IT_ARRAY )
+#define HB_IS_NIL( p )        ( HB_ITEM_TYPE( p ) == HB_IT_NIL )
+#define HB_IS_BLOCK( p )      ( HB_ITEM_TYPE( p ) == HB_IT_BLOCK )
+#define HB_IS_DATE( p )       ( HB_ITEM_TYPE( p ) == HB_IT_DATE )
+#define HB_IS_DOUBLE( p )     ( HB_ITEM_TYPE( p ) == HB_IT_DOUBLE )
+#define HB_IS_INTEGER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_INTEGER )
+#define HB_IS_LOGICAL( p )    ( HB_ITEM_TYPE( p ) == HB_IT_LOGICAL )
+#define HB_IS_LONG( p )       ( HB_ITEM_TYPE( p ) == HB_IT_LONG )
+#define HB_IS_NUMERIC( p )    ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+#define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
+#define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
+#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
+#define HB_IS_STRING( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_STRING ) != 0 )
+#define HB_IS_MEMO( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMO ) != 0 )
+#define HB_IS_SYMBOL( p )     ( HB_ITEM_TYPE( p ) == HB_IT_SYMBOL )
+#define HB_IS_MEMVAR( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMVAR ) != 0 )
+#define HB_IS_POINTER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_POINTER )
+#define HB_IS_HASH( p )       ( HB_ITEM_TYPE( p ) == HB_IT_HASH )
+#define HB_IS_ORDERABLE( p )  ( ( HB_ITEM_TYPE( p ) & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) != 0 )
+#define HB_IS_STRINGWR( p )   ( HB_ITEM_TYPE( p ) & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
+#define HB_IS_COMPLEX( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 )
+#define HB_IS_SIMPLE( p )     ( ( HB_ITEM_TYPE( p ) & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
+#define HB_IS_GCITEM( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_GCITEM ) != 0 )
+#define HB_IS_BADITEM( p )    ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX && HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) )
 
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
 #define HB_IT_NUMERINT        HB_IT_NUMINT
@@ -134,9 +137,9 @@ HB_EXTERN_BEGIN
 #define ISLOG( n )         ( hb_param( n, HB_IT_LOGICAL ) != NULL )
 #define ISDATE( n )        ( hb_param( n, HB_IT_DATE ) != NULL )
 #define ISMEMO( n )        ( hb_param( n, HB_IT_MEMO ) != NULL )
-#define ISBYREF( n )       ( hb_parinfo( n ) & HB_IT_BYREF ) /* NOTE: Intentionally using a different method */
+#define ISBYREF( n )       ( ( hb_parinfo( n ) & HB_IT_BYREF ) != 0 ) /* NOTE: Intentionally using a different method */
 #define ISARRAY( n )       ( hb_param( n, HB_IT_ARRAY ) != NULL )
-#define ISOBJECT( n )      ( ISARRAY( n ) && hb_param( n, HB_IT_ARRAY )->item.asArray.value->uiClass != 0 )
+#define ISOBJECT( n )      ( hb_extIsObject( n ) )
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL ) /* Not available in CA-Cl*pper. */
 #define ISHASH( n )        ( hb_param( n, HB_IT_HASH ) != NULL ) /* Not available in CA-Cl*pper. */
@@ -311,6 +314,7 @@ extern HB_EXPORT void *   hb_parpointer( int iParam ); /* retrieve ONLY a pointe
 extern HB_EXPORT PHB_ITEM hb_param( int iParam, LONG lMask ); /* retrieve a generic parameter */
 extern HB_EXPORT PHB_ITEM hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
+extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
 
 #ifndef HB_LONG_LONG_OFF
    extern LONGLONG HB_EXPORT hb_parnll( int iParam, ... ); /* retrieve a numeric parameter as a double */

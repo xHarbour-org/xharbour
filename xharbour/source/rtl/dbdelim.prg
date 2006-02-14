@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.19 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dbdelim.prg,v 1.20 2006/01/12 02:04:37 lculik Exp $
  */
 
 /*
@@ -56,7 +56,7 @@
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.19 2005/11/06 10:59:16 ptsarenko Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.20 2006/01/12 02:04:37 lculik Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
 
@@ -110,8 +110,9 @@ PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext
 
    IF lExport
       // COPY TO DELIMITED
-      handle := FCREATE( cFileName )
-      IF handle == F_ERROR
+      if !USED()
+         Eval( ErrorBlock(), __dbDelimErr( EG_NOTABLE, 2001 ) )
+      ELSEIF ( handle := FCREATE( cFileName ) ) == F_ERROR
          Eval( ErrorBlock(), __dbDelimErr( EG_CREATE, 1002, cFileName ) )
       ELSE
          IF nStart > -1
@@ -151,7 +152,9 @@ STATIC FUNCTION __dbDelimErr( genCode, subCode, cFileName )
    oErr:description:= HB_LANGERRMSG( oErr:genCode )
    oErr:canRetry   := .T.
    oErr:canDefault := .T.
-   oErr:fileName   := cFileName
+   IF cFileName != NIL
+      oErr:fileName   := cFileName
+   ENDIF
    oErr:osCode     := FERROR()
 
 RETURN oErr
