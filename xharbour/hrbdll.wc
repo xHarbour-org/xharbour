@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.50 2005/12/19 18:59:16 ptsarenko Exp $
+# $Id: hrbdll.wc,v 1.50 2005/12/19 19:13:50 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -416,6 +416,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\expropt2.obj \
   $(OBJ_DIR)\reserved.obj \
   $(OBJ_DIR)\dbfcdx1.obj \
+  $(OBJ_DIR)\sixcdx1.obj \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx1.obj \
   $(OBJ_DIR)\msgbgmik.obj \
@@ -1949,6 +1950,9 @@ $(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sixcdx1.obj : $(RDD_DIR)\dbfcdx\sixcdx1.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbffpt1.obj : $(RDD_DIR)\dbffpt\dbffpt1.c

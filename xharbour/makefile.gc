@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.20 2005/12/19 21:42:25 ptsarenko Exp $
+# $Id: makefile.gc,v 1.20 2005/12/19 19:13:50 ptsarenko Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -114,6 +114,7 @@ ODBC_LIB     = $(LIB_DIR)/libhbodbc$(THREAD_MODE).a
 PP_LIB       = $(LIB_DIR)/libpp$(THREAD_MODE).a
 MACRO_LIB    = $(LIB_DIR)/libmacro$(THREAD_MODE).a
 DBFCDX_LIB   = $(LIB_DIR)/libdbfcdx$(THREAD_MODE).a
+SIXCDX_LIB   = $(LIB_DIR)/libsixcdx$(THREAD_MODE).a
 DBFFPT_LIB   = $(LIB_DIR)/libdbffpt$(THREAD_MODE).a
 DBFNTX_LIB   = $(LIB_DIR)/libdbfntx$(THREAD_MODE).a
 HBSIX_LIB    = $(LIB_DIR)/libhbsix$(THREAD_MODE).a
@@ -152,6 +153,7 @@ LIB_TO_LINK = \
    $(LANG_LIB) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
+   $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(HBSIX_LIB) \
@@ -173,6 +175,7 @@ MINGW_LIBRARY = \
    -lgtwin \
    -lmacro$(THREAD_MODE) \
    -ldbfcdx$(THREAD_MODE) \
+   -lsixcdx$(THREAD_MODE) \
    -ldbfntx$(THREAD_MODE) \
    -ldbffpt$(THREAD_MODE) \
    -lcommon \
@@ -197,6 +200,7 @@ CC_CMD_DLL  = $(CC) $(CFLAGS) -DHB_EXEMEM_USED -mdll -o $@ $^
 PROJECT += \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
+   $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(RTL_LIB) \
@@ -2479,6 +2483,17 @@ $(DBFCDX_LIB) : \
 	$(AR_CMD)
 
 $(CDX_OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# libsixcdx.a
+#-------------------------------------------------------------------------------
+
+$(SIXCDX_LIB) : \
+   $(CDX_OBJ_DIR)/sixcdx1.o
+	$(AR_CMD)
+
+$(CDX_OBJ_DIR)/sixcdx1.o : $(RDD_DIR)/dbfcdx/sixcdx1.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------

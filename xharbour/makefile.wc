@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.53 2005/12/19 18:59:18 ptsarenko Exp $
+# $Id: makefile.wc,v 1.53 2005/12/19 19:13:50 ptsarenko Exp $
 #
 
 #
@@ -162,6 +162,7 @@ COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 CT_LIB         = $(LIB_DIR)\ct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
+SIXCDX_LIB     = $(LIB_DIR)\sixcdx.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
 HBSIX_LIB      = $(LIB_DIR)\hbsix.lib
@@ -188,6 +189,7 @@ RDD_STLIB        = $(RDD_LIB)
 DBFFPT_STLIB     = $(DBFFPT_LIB)
 DBFNTX_STLIB     = $(DBFNTX_LIB)
 DBFCDX_STLIB     = $(DBFCDX_LIB)
+SIXCDX_STLIB     = $(SIXCDX_LIB)
 HBSIX_STLIB      = $(HBSIX_LIB)
 HSX_STLIB        = $(HSX_LIB)
 PP_STLIB         = $(PP_LIB)
@@ -205,6 +207,7 @@ RDD_LIB        = $(LIB_DIR)\rddmt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffptmt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
+SIXCDX_LIB     = $(LIB_DIR)\sixcdxmt.lib
 HBSIX_LIB      = $(LIB_DIR)\hbsixmt.lib
 HSX_LIB        = $(LIB_DIR)\hsxmt.lib
 PP_LIB         = $(LIB_DIR)\ppmt.lib
@@ -619,6 +622,9 @@ DBFNTX_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj
+
+SIXCDX_LIB_OBJS = \
+   $(CDX_OBJ_DIR)\sixcdx1.obj
 
 HBSIX_LIB_OBJS = \
    $(HBSIX_OBJ_DIR)\sxcompr.obj \
@@ -1110,6 +1116,7 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
+   $(SIXCDX_LIB) \
    $(HB_GT_LIBS) \
    $(CODEPAGE_LIB) \
    $(SAMPLES_LIB) \
@@ -1134,6 +1141,9 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+    LIB386 /nologo /out:$@ $**
+
+$(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
@@ -2709,6 +2719,13 @@ $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
 #
+# SIXCDX.LIB dependencies
+#
+
+$(CDX_OBJ_DIR)\sixcdx1.obj : $(RDD_DIR)\dbfcdx\sixcdx1.c
+   $(CC_CMD)
+
+#
 # HBSIX.LIB dependencies
 #
 
@@ -3545,6 +3562,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HBRUN_EXE) /subsystem:console
@@ -3590,6 +3608,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HBTEST_EXE) /subsystem:console
    $(DEL) make.tmp
@@ -3700,6 +3719,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(SIXCDX_STLIB) >> make.tmp
 !ifdef HB_DOC_PDF
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\pdfhbdoc.obj >> make.tmp
@@ -3856,6 +3876,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HBMAKE_EXE) /subsystem:console
    $(DEL) make.tmp
@@ -3929,6 +3950,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    LINK386 @make.tmp /nologo /out:$(XBSCRIPT_EXE) /subsystem:console
    $(DEL) make.tmp
 

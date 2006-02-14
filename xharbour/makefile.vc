@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.162 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: makefile.vc,v 1.163 2006/01/14 17:46:15 paultucker Exp $
 #
 
 #
@@ -174,7 +174,9 @@ COMMON_LIB       =$(LIB_DIR)\common.lib
 CT_LIB           =$(LIB_DIR)\ct.lib
 CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
+SIXCDX_LIB       =$(LIB_DIR)\sixcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
+SIXCDXMT_LIB     =$(LIB_DIR)\SIXcdx$(MT).lib
 DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
@@ -291,6 +293,7 @@ LIBS = \
    $(PP_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
+   $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(HBSIX_LIB) \
@@ -310,6 +313,7 @@ LIBSMT = \
    $(PPMT_LIB) \
    $(RDDMT_LIB) \
    $(DBFCDXMT_LIB) \
+   $(SIXCDXMT_LIB) \
    $(DBFFPTMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(HBSIXMT_LIB) \
@@ -838,6 +842,27 @@ DBFNTX_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx1.obj
+
+#
+# SIXCDX.LIB rules
+#
+
+{$(RDD_DIR)\sixcdx}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\sixcdx}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\sixcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(SIXCDX_LIB)2
+!endif
+
+SIXCDX_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\sixcdx1.obj
 
 #
 # DBFFPT.LIB rules
@@ -1647,6 +1672,9 @@ $(RDDMT_LIB) : $(RDD_LIB_OBJS)
 $(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
+$(SIXCDXMT_LIB) : $(SIXCDX_LIB_OBJS)
+   lib /out:$@ $**
+
 $(DBFFPTMT_LIB) : $(DBFFPT_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1713,6 +1741,9 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
@@ -1815,6 +1846,7 @@ $(RDD_LIB)2    : $(RDD_LIB_OBJS)
 $(CGI_LIB)2    : $(CGI_LIB_OBJS)
 $(TIP_LIB)2    : $(TIP_LIB_OBJS)
 $(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
+$(SIXCDX_LIB)2 : $(SIXCDX_LIB_OBJS)
 $(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)
 $(DBFNTX_LIB)2 : $(DBFNTX_LIB_OBJS)
 $(HBSIX_LIB)2  : $(HBSIX_LIB_OBJS)

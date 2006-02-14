@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.20 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: hrbdll.pc,v 1.21 2006/02/01 15:41:40 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -548,7 +548,7 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\msgzhgb.obj \
    \
    $(TARGET_OBJ_DIR)\dbfcdx1.obj \
-   \
+   $(TARGET_OBJ_DIR)\sixcdx1.obj \
    $(TARGET_OBJ_DIR)\dbffpt1.obj \
    \
    $(TARGET_OBJ_DIR)\dbfntx1.obj \
@@ -1029,6 +1029,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
 # DBF
 #
    $(ECHO) $(TARGET_OBJ_DIR)\dbfcdx1.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\sixcdx1.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbffpt1.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\dbfntx1.obj    >> make_tmp
 #
@@ -2748,6 +2749,11 @@ $(TARGET_OBJ_DIR)\msgzhgb.obj : $(LANG_SRC_DIR)\msgzhgb.c
 # DBFCDX
 
 $(TARGET_OBJ_DIR)\dbfcdx1.obj : $(RDD_SRC_DIR)\dbfcdx\dbfcdx1.c
+   $(POCC_CMD)
+
+# SIXCDX
+
+$(TARGET_OBJ_DIR)\sixcdx1.obj : $(RDD_SRC_DIR)\dbfcdx\sixcdx1.c
    $(POCC_CMD)
 
 # DBFFPT

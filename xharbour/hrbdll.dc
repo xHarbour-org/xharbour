@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.16 2005/12/19 18:59:16 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.16 2005/12/19 19:13:50 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -534,7 +534,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\msgzhgb.obj \
    \
    $(OBJ_DIR)\dbfcdx1.obj \
-   \
+   $(OBJ_DIR)\sixcdx1.obj \
    $(OBJ_DIR)\dbffpt1.obj \
    \
    $(OBJ_DIR)\dbfntx1.obj \
@@ -1063,6 +1063,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\msgzhb5.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgzhgb.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfcdx1.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sixcdx1.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbffpt1.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dbfntx1.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\gtwin.obj      + >> harbourdll.rsp
@@ -2630,6 +2631,11 @@ $(OBJ_DIR)\msgzhgb.obj : $(LANG_DIR)\msgzhgb.c
 # DBFCDX
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+# SIXCDX
+
+$(OBJ_DIR)\sixcdx1.obj : $(RDD_DIR)\dbfcdx\sixcdx1.c
    $(CC_CMD)
 
 # DBFFPT
