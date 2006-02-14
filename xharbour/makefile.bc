@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.163 2005/12/19 18:59:16 ptsarenko Exp $
+# $Id: makefile.bc,v 1.163 2005/12/19 19:13:50 ptsarenko Exp $
 #
 
 #
@@ -996,6 +996,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbident.obj \
    $(OBJ_DIR)\hbgenerr.obj \
    $(OBJ_DIR)\hbpcode.obj \
+   $(OBJ_DIR)\hbdead.obj \
+   $(OBJ_DIR)\hbstripl.obj \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
    $(OBJ_DIR)\gencobj.obj \
@@ -1491,6 +1493,8 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbident.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbgenerr.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbpcode.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdead.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbstripl.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfix.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\gencobj.obj >> make.tmp
@@ -1531,6 +1535,12 @@ $(OBJ_DIR)\hbgenerr.obj : $(COMPILER_DIR)\hbgenerr.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbpcode.obj : $(COMPILER_DIR)\hbpcode.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbdead.obj : $(COMPILER_DIR)\hbdead.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbstripl.obj : $(COMPILER_DIR)\hbstripl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c

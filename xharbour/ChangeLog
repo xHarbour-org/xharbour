@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4813 2006/02/14 00:31:58 ath1 Exp $
+ * $Id: ChangeLog,v 1.4814 2006/02/14 01:43:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-13 22:12 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * ./makefile.bc
+    * Added hbdead.c and hbstripl.c to harbour.exe generation.
 
 2006-02-14 02:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h
