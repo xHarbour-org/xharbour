@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.11 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: dbgentry.c,v 1.12 2006/01/26 09:21:36 likewolf Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 #include "hbapiitm.h"
+#include "hbapirdd.h"
 #include "hbdebug.ch"
 #include "hbfast.h"
 #include "classes.h"
@@ -1209,6 +1210,10 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
       {
          hb_itemArrayPut( aVars, i + 1, pItem );
       }
+      if ( scopes[ i ].cType == 'F' )
+      {
+         hb_itemRelease( pItem );
+      }
    }
    watch->aScopes = scopes;
    return aVars;
@@ -1426,9 +1431,28 @@ hb_dbgVarGet( HB_VARINFO *scope )
          return hb_dbg_vmVarSGet( scope->nFrame, scope->nIndex );
       case 'M':
       {
-         HB_HANDLE hMemVar = hb_memvarGetVarHandle( scope->szName );
+         PHB_DYNS pDyn;
 
-         return hb_memvarGetValueByHandle( hMemVar );
+         pDyn = hb_dynsymFind( scope->szName );
+         if ( pDyn != NULL )
+         {
+            if ( pDyn->hMemvar == 0 )
+            {
+               PHB_ITEM pItem = hb_itemNew( NULL );
+
+               if ( hb_rddFieldGet( pItem, pDyn->pSymbol ) == SUCCESS )
+               {
+                  scope->cType = 'F';
+                  return pItem;
+               }
+               hb_itemRelease( pItem );
+            }
+            else
+            {
+               return hb_memvarGetValueByHandle( pDyn->hMemvar );
+            }
+         }
+         return NULL;
       }
       default:
          return NULL;
