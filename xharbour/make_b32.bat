@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.22 2005/03/02 20:30:55 andijahja Exp $
+rem $Id: make_b32.bat,v 1.23 2005/03/31 19:51:25 andijahja Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -11,9 +11,11 @@ rem Instead, make a local copy and modify that one, or make a call to
 rem this batch file from your customized one. [vszakats]
 rem ---------------------------------------------------------------
 
+if "%1" == "clean" goto CLEAN
+if "%1" == "CLEAN" goto CLEAN
+
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
-if not exist obj\b32\bin md obj\b32\bin
 if not exist obj\b32\mt md obj\b32\mt
 
 rem added optimize subdir for optimized library
@@ -31,8 +33,6 @@ if not exist lib\b32 md lib\b32
 if not exist bin md bin
 if not exist bin\b32 md bin\b32
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
 
 :BUILD
    make -l EXE_OBJ_DIR=obj\b32\bin OBJ_DIR=obj\b32 -fmakefile.bc %1 %2 %3 > make_b32.log
@@ -45,6 +45,9 @@ if "%1" == "CLEAN" goto CLEAN
    copy bin\b32\*.exe bin\*.* > nul
    copy lib\b32\*.lib lib\*.* > nul
    if exist lib\b32\*.bak del lib\b32\*.bak
+   if exist bin\b32\*.tds del bin\b32\*.tds
+   if exist bin\b32\*.map del bin\b32\*.map
+   if exist make_b32.log  del make_b32.log >null
    goto EXIT
 
 :BUILD_ERR
@@ -63,12 +66,14 @@ if "%1" == "CLEAN" goto CLEAN
    if exist bin\hbrun.exe      del bin\hbrun.exe
    if exist bin\hbrunmt.exe    del bin\hbrunmt.exe
    if exist bin\hbtest.exe     del bin\hbtest.exe
+   if exist bin\hbtestmt.exe   del bin\hbtestmt.exe
    if exist bin\xbscript.exe   del bin\xbscript.exe
 
    if exist lib\xharbour.lib   del lib\xharbour.lib
-   if exist lib\dllmain.lib    del lib\dllmain.lib
    if exist lib\codepage.lib   del lib\codepage.lib
    if exist lib\common.lib     del lib\common.lib
+   if exist lib\ct.lib         del lib\ct.lib
+   if exist lib\ctmt.lib       del lib\ctmt.lib
    if exist lib\dbfcdx.lib     del lib\dbfcdx.lib
    if exist lib\dbfcdxmt.lib   del lib\dbfcdxmt.lib
    if exist lib\dbfdbt.lib     del lib\dbfdbt.lib
@@ -78,6 +83,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\dbfntx.lib     del lib\dbfntx.lib
    if exist lib\dbfntxmt.lib   del lib\dbfntxmt.lib
    if exist lib\debug.lib      del lib\debug.lib
+   if exist lib\dllmain.lib    del lib\dllmain.lib
    if exist lib\gtcgi.lib      del lib\gtcgi.lib
    if exist lib\gtnul.lib      del lib\gtnul.lib
    if exist lib\gtpca.lib      del lib\gtpca.lib
@@ -86,11 +92,11 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\gtwvt.lib      del lib\gtwvt.lib
    if exist lib\hbodbc.lib     del lib\hbodbc.lib
    if exist lib\hbodbcmt.lib   del lib\hbodbcmt.lib
+   if exist lib\hbsix.lib      del lib\hbsix.lib
+   if exist lib\hbsixmt.lib    del lib\hbsixmt.lib
+   if exist lib\hsx.lib        del lib\hsx.lib
+   if exist lib\hsxmt.lib      del lib\hsxmt.lib
    if exist lib\lang.lib       del lib\lang.lib
-   if exist lib\ct.lib         del lib\ct.lib
-   if exist lib\ctmt.lib       del lib\ctmt.lib
-   if exist lib\tip.lib        del lib\tip.lib
-   if exist lib\tipmt.lib      del lib\tipmt.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
    if exist lib\nulsys.lib     del lib\nulsys.lib
@@ -98,6 +104,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\optconmt.lib   del lib\optconmt.lib
    if exist lib\optgui.lib     del lib\optgui.lib
    if exist lib\optguimt.lib   del lib\optguimt.lib
+   if exist lib\pcrepos.lib    del lib\pcrepos.lib
    if exist lib\pp.lib         del lib\pp.lib
    if exist lib\ppmt.lib       del lib\ppmt.lib
    if exist lib\rdd.lib        del lib\rdd.lib
@@ -106,6 +113,10 @@ if "%1" == "CLEAN" goto CLEAN
    if exist lib\rtlmt.lib      del lib\rtlmt.lib
    if exist lib\samples.lib    del lib\samples.lib
    if exist lib\samplesmt.lib  del lib\samplesmt.lib
+   if exist lib\sixcdx.lib     del lib\sixcdx.lib
+   if exist lib\sixcdxmt.lib   del lib\sixcdxmt.lib
+   if exist lib\tip.lib        del lib\tip.lib
+   if exist lib\tipmt.lib      del lib\tipmt.lib
    if exist lib\vm.lib         del lib\vm.lib
    if exist lib\vmmt.lib       del lib\vmmt.lib
 

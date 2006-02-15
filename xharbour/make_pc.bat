@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.6 2005/11/16 00:00:00 modalsist Exp $
+rem $Id: make_pc.bat,v 1.6 2005/11/17 00:51:06 modalsist Exp $
 rem
 rem Batch file Pelles C compiler.
 rem
@@ -132,6 +132,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\rddmt.lib            del %HB_DIR%\lib\rddmt.lib
    if exist %HB_DIR%\lib\rtl.lib              del %HB_DIR%\lib\rtl.lib
    if exist %HB_DIR%\lib\rtlmt.lib            del %HB_DIR%\lib\rtlmt.lib
+   if exist %HB_DIR%lib\sixcdx.lib            del %HB_DIR%lib\sixcdx.lib
+   if exist %HB_DIR%lib\sixcdxmt.lib          del %HB_DIR%lib\sixcdxmt.lib
    if exist %HB_DIR%\lib\tip.lib              del %HB_DIR%\lib\tip.lib
    if exist %HB_DIR%\lib\tipmt.lib            del %HB_DIR%\lib\tipmt.lib
    if exist %HB_DIR%\lib\vm.lib               del %HB_DIR%\lib\vm.lib
