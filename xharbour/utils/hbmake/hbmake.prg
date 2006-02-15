@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.164 2006/01/22 21:59:58 lculik Exp $
+ * $Id: hbmake.prg,v 1.165 2006/02/03 07:21:42 lculik Exp $
  */
 
 /*
@@ -2548,6 +2548,7 @@ FUNCTION CreateMakeFile( cFile )
       cDefLibGccLibs   += " -lrddads -ladsloc "
       cDefaultLibsMt   += " rddads.lib ace32.lib"
       cDefLibGccLibsMt += " -lrddads -ladsloc "
+      cDefGccLibsw     += " -lrddads -lads32 "
       cExtraLibs += " -lrddads -ladsloc "
    ENDIF
 
@@ -2687,7 +2688,11 @@ FUNCTION CreateMakeFile( cFile )
             IF s_lMt
                cOldLib       := " " + cDefGccLibsMt
                cDefGccLibsMt := cHtmlLib + " " + cOldLib + " " + cLibs
-            ENDIF
+            else
+               cOldLib       := " " + cDefGccLibsw
+               cDefGccLibsw  := cHtmlLib + " " + cOldLib + " " + cLibs
+            endif
+
 
         ENDIF
 
