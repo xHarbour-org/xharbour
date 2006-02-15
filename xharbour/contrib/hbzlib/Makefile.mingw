@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2004/02/14 13:23:15 lculik Exp $
+# $Id: Makefile.mingw,v 1.1 2006/02/15 00:37:01 lculik Exp $
 #
 
 ROOT = ../../
@@ -43,7 +43,7 @@ INSTALL_RULE_HEADERS := $(INSTALL_RULE)
 include $(TOP)$(ROOT)config/lib.cf
 
 
-CFLAGS := $(CFLAGS) -I../../Linux -I../.. -I/usr/include
+CFLAGS := $(CFLAGS)  -I../.. -I/usr/include -DZLIB_DLL;WIN32;ASSERT
 
 
 
