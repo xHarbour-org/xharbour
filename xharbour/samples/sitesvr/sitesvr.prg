@@ -1,5 +1,5 @@
 /*
- * $Id: sitesvr.prg,v 1.10 2003/11/28 16:10:50 jonnymind Exp $
+ * $Id: sitesvr.prg,v 1.11 2003/12/11 14:44:52 jonnymind Exp $
  */
 
 ***********************************************************
@@ -46,7 +46,7 @@ PROCEDURE Main( cPort)
    ********************************************
    * SITE.DBF our DBF database
    * SITE01.NTX : index on ID field
-   * SITE02.NTX : index on "str( parent ) + '-' + NAME
+   * SITE02.NTX : index on "str( parent ) + '-' + NAME"
    * This second index allows to pinpoint a page in an area
    *
 

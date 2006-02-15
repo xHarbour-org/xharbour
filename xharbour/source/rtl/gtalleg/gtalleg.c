@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.36 2005/02/27 11:56:05 andijahja Exp $
+ * $Id: gtalleg.c,v 1.37 2005/07/13 19:12:45 maurifull Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "hbapi.h"
 #include "hbapigt.h"
 #include "hbapifs.h"
+#include "hbapierr.h"
 #include "hbset.h"
 #include "hbvm.h"
 #include "inkey.ch"
@@ -234,9 +235,9 @@ static void hb_gt_DoCursor()
       }
    }
 
-   if ( s_bVisible && s_usDispCount > 1 )
+   if( s_bVisible && s_usDispCount > 1 )
    {
-   s_bVisible = FALSE;  // prevent cursor flicker on buffered screen i/o
+      s_bVisible = FALSE;  // prevent cursor flicker on buffered screen i/o
    }
 }
 
@@ -253,7 +254,10 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    s_iStdErr = iFilenoStderr;
    s_usCursorStyle = SC_NORMAL;
 
-   allegro_init();
+   if( allegro_init() != 0 )
+   {
+      hb_errInternal( 9997, "Screen driver initialization failure: %s", allegro_error, NULL );
+   }
 
    iRet = al_desktop_color_depth();
 
@@ -1977,7 +1981,7 @@ void HB_GT_FUNC( gt_ProcessMessages( void ) )
 
 int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) )
 {
-AL_BITMAP *dst;
+   AL_BITMAP *dst;
 
 #ifdef DEBUG
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_gfxPrimitive(%d, %d, %d, %d, %d, %d)", iType, iTop, iLeft, iBottom, iRight, iColor));
@@ -2021,7 +2025,7 @@ AL_BITMAP *dst;
       case GFX_CLIPRIGHT:
         return s_iCRight;
       case GFX_SETCLIP:
-        al_set_clip(dst, iLeft, iTop, iRight, iBottom);
+        set_clip_rect(dst, iLeft, iTop, iRight, iBottom);
         s_iCTop = iTop;
         s_iCLeft = iLeft;
         s_iCBottom = iBottom;

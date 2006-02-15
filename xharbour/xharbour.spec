@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.89 2006/01/17 02:18:14 druzus Exp $
+# $Id: xharbour.spec,v 1.90 2006/02/13 23:10:19 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -60,7 +60,7 @@
 %define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cc    export HB_COMPILER=gcc
 %define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
-%define hb_lflag export L_USR=%{?_with_static:-static}
+%define hb_lflag export L_USR="${CC_L_USR} %{?_with_static:-static}"
 %define hb_mt    export HB_MT=MT
 %define hb_mgt   export HB_MULTI_GT=yes
 %define hb_gt    export HB_GT_LIB=gtcrs
@@ -370,8 +370,8 @@ fi
 if [ "%{!?_with_static:1}" ]
 then
     unset HB_GTALLEG
-    export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11}"
-    #export L_USR="-L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11} %{?_with_allegro:%(allegro-config --static)}"
+    export L_USR="${CC_L_USR} -L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11}"
+    #export L_USR="${CC_L_USR} -L${HB_LIB_INSTALL} -l%{name} -lncurses %{!?_without_gtsln:-lslang} %{!?_without_gpm:-lgpm} %{!?_without_x11:-L/usr/X11R6/%{_lib} -lX11} %{?_with_allegro:%(allegro-config --static)}"
     export PRG_USR="\"-D_DEFAULT_INC_DIR='${_DEFAULT_INC_DIR}'\""
     for utl in hbmake hbrun hbpp hbdoc xbscript
     do

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4819 2006/02/15 00:42:39 lculik Exp $
+ * $Id: ChangeLog,v 1.4820 2006/02/15 11:43:17 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-15 20:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+  * xharbour/bin/hb-func.sh
+    * some modification in xhb* scripts building - adding passing
+      predefined compiler and linker switches, higher priority
+      to user libraries specified by -l<libname> linker option
+      given
+
+  * xharbour/include/hbcomp.h
+  * xharbour/include/hbpp.h
+  * xharbour/source/compiler/cmdcheck.c
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/harbour.slx
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/compiler/hbpcode.c
+  * xharbour/source/macro/macro.y
+  * xharbour/source/pp/ppcomp.c
+  * xharbour/source/pp/ppcore.c
+  * xharbour/source/pp/pragma.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * moved most of extern declaration to header files
+
+  * xharbour/source/compiler/harbour.c
+    * disable line striping optimization when -l compiler switch
+      (suppress line number information) is set - in such case
+      it's only waste of time
+
+  * xharbour/samples/sitesvr/sitesvr.prg
+    * formatting
+
+  * xharbour/source/rtl/regex.c
+    ! fixed size of given string setting
+
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+    * check if allegro initialization success at startup to avoid GPF
+      when allegro cannot be initialized
+
+  * xharbour/source/vm/errorapi.c
+    * increased output error buffer
 
 2006-02-15 09:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * make_b32.bat

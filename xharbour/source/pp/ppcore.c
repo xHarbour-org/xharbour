@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.220 2005/10/24 17:00:08 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.221 2005/10/24 19:07:59 ronpinkas Exp $
  */
 
 /*
@@ -224,17 +224,11 @@ static char s_sToken[2048];
 
 static char *s_pTerminator;
 
-extern BOOL hb_pp_bInline;
-extern int hb_pp_LastOutLine;
-
 int *hb_pp_aiLastIf = NULL, *hb_pp_aiOuterIfLevel = NULL;
 
 /* Counter for Matching BEGINDUMP and ENDDUMP */
 int iBeginDump = 0;
 int iEndDump = 0;
-
-/* Counter for comment */
-extern BOOL hb_pp_bInComment;
 
 /* Table with parse errors */
 char * hb_pp_szErrors[] =

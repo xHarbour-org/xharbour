@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.69 2005/05/27 22:19:46 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.70 2005/06/01 02:09:27 ronpinkas Exp $
  */
 
 /*
@@ -953,7 +953,6 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 
 static int hb_comp_SLX_CustomAction( int x )
 {
-   extern BOOL hb_pp_bInline;
    char *pTmp;
 
    DEBUG_INFO( printf( "Custom Action for %i after: %i\n", x, iLastToken ) );

@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.64 2006/02/03 07:36:16 druzus Exp $
+# $Id: hb-func.sh,v 1.65 2006/02/03 07:43:56 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -293,8 +293,10 @@ HB_MAIN_FUNC=\`echo \${HB_MAIN_FUNC}|tr '[a-z]' '[A-Z]'\`
 
 HB_PATHS="-I\${HB_INC_INSTALL}"
 GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
-LINK_OPT="${CC_L_USR}"
-CC_OPT=""
+
+LN_OPT="${CC_L_USR}"
+CC_OPT="${CC_C_USR}"
+HB_OPT="${CC_PRG_USR}"
 
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
@@ -321,13 +323,16 @@ fi
 if [ "\${HB_STATIC}" = "full" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} -ldl"
     if [ "\${HB_ARCHITECTURE}" = "linux" ]; then
-       SYSTEM_LIBS="\${SYSTEM_LIBS} -lpthread"
+        SYSTEM_LIBS="\${SYSTEM_LIBS} -lpthread"
     fi
-    LINK_OPT="\${LINK_OPT} -static"
+    LN_OPT="\${LN_OPT} -static"
     HB_STATIC="yes"
 fi
-if [ "\${HB_XBGTK}" = "yes" ] || [ "\${HB_HWGUI}" = "yes" ]; then
+
+if [ "\${HB_XBGTK}" = "yes" ]; then
     SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0\`"
+elif [ "\${HB_HWGUI}" = "yes" ]; then
+    SYSTEM_LIBS="\${SYSTEM_LIBS} \`pkg-config --libs gtk+-2.0 --libs libgnomeprint-2.2\`"
 fi
 
 HB_LNK_REQ=""
@@ -354,7 +359,7 @@ else
     if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
         pref="lib"
         ext=".dylib"
-        LINK_OPT="-bind_at_load -multiply_defined suppress"
+        LN_OPT="\${LN_OPT} -bind_at_load -multiply_defined suppress"
     elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
         pref=""
         ext=".dll"
@@ -398,12 +403,9 @@ if [ -f "\${HB_LIB_INSTALL}/lib\${l}.a" ]; then
 fi
 
 if [ "\${HB_ARCHITECTURE}" = "darwin" ]; then
-    CC_OPT="-no-cpp-precomp -Wno-long-double"
+    CC_OPT="\${CC_OPT} -no-cpp-precomp -Wno-long-double"
 elif [ "\${HB_ARCHITECTURE}" = "sunos" ]; then
     HB_STRIP="no"
-elif [ "\${HB_ARCHITECTURE}" = "w32" ]; then
-    CC_OPT="$CC_C_USR"
-    HB_OPT="$CC_PRG_USR"
 fi
 
 FOUTC="\${DIROUT}/\${FILEOUT%.*}.c"
@@ -434,9 +436,9 @@ hb_link()
     fi
     if [ -n "\${HB_LNK_REQ}" ] || [ -n "\${HB_GT_REQ}" ] || [ -n "\${HB_MAIN_FUNC}" ]; then
         hb_lnk_request > \${_TMP_FILE_} && \\
-        hb_cc "\$@" "\${_TMP_FILE_}" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" "\${_TMP_FILE_}" \${LN_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     else
-        hb_cc "\$@" \${LINK_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
+        hb_cc "\$@" \${LN_OPT} \${GCC_PATHS} \${HARBOUR_LIBS} \${HB_USRLIBS} \${SYSTEM_LIBS} -o "\${FOUTE}"
     fi
 }
 

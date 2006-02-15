@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.112 2005/11/16 12:16:38 druzus Exp $
+ * $Id: genc.c,v 1.113 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -79,11 +79,6 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
  hb_comp_iGenVarList is first initialized in harbour.c as FALSE
  The value is TRUE when /gc3 is used
 */
-extern BOOL hb_comp_iGenVarList;
-extern char *hb_comp_FileAsSymbol;
-extern char *hb_comp_PrgFileName;
-
-extern char *hb_Command_Line;
 
 /*
  hb_comp_pCodeList is the file handle on which pCode Listing will be written

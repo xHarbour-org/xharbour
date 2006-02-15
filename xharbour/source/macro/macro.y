@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.25 2005/11/23 19:40:02 ronpinkas Exp $
+ * $Id: macro.y,v 1.26 2005/12/03 05:21:02 ronpinkas Exp $
  */
 
 /*
@@ -104,8 +104,6 @@ static int s_iPending;
 #define YYLEX_PARAM   ( (HB_MACRO_PTR)YYPARSE_PARAM ) /* additional parameter passed to yylex */
 
 extern int yyparse( void * );   /* to make happy some purist compiler */
-extern void * hb_compFlexNew( HB_MACRO_PTR );
-extern void hb_compFlexDelete( void * );
 
 extern void yyerror( char * ); /* parsing error management function */
 

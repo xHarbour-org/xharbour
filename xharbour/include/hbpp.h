@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.6 2003/11/30 12:32:30 druzus Exp $
+ * $Id: hbpp.h,v 1.7 2004/11/03 21:20:05 ronpinkas Exp $
  */
 
 /*
@@ -96,6 +96,7 @@ extern int    hb_pp_ReadRules( void );
 extern void   hb_pp_Init( void );
 extern void   hb_pp_Free( void );
 extern void   CloseInclude( void );
+extern int    hb_pp_ParseDefine( char * );
 extern int    hb_pp_ParseDirective( char * ); /* Parsing preprocessor directives ( #... ) */
 extern int    hb_pp_ParseExpression( char *, char * ); /* Parsing a line ( without preprocessor directive ) */
 extern int    hb_pp_WrStr( FILE *, char * );
@@ -110,6 +111,12 @@ extern int    hb_pp_nCondCompile;
 extern char * hb_pp_szErrors[];
 extern char * hb_pp_szWarnings[];
 extern int    hb_pp_nEmptyStrings;
+extern BOOL   hb_pp_bInline;
+extern int    hb_pp_LastOutLine;
+extern BOOL   hb_pp_bInComment;           /* Counter for comment */
+extern int    iBeginDump;
+extern int    iEndDump;
+
 
 /* PPCOMP.C exported functions */
 

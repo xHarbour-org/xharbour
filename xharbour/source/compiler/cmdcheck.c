@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.25 2005/10/07 03:43:20 ronpinkas Exp $
+ * $Id: cmdcheck.c,v 1.26 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -49,11 +49,6 @@
 
 #include "hbcomp.h"
 #include "hbexemem.h"
-
-extern int  hb_pp_ParseDefine( char * );
-extern int  hb_pp_ParseDirective( char * );
-extern BOOL hb_comp_iGenVarList;
-extern char *hb_Command_Line;
 
 /* TODO: Add support for this compiler switches
    -r -t || hb_getenv( "TMP" )

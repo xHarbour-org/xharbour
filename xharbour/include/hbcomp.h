@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.41 2006/01/18 23:44:03 likewolf Exp $
+ * $Id: hbcomp.h,v 1.42 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -307,6 +307,9 @@ extern PVAR hb_compVariableFind( PVAR pVars, USHORT wOrder ); /* returns a varia
 extern PVAR hb_compLocalVariableFind( PFUNCTION pFunc, USHORT wVar );
 extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the order + 1 of a variable if defined or zero */
 extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
+extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
+extern int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
+extern int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
 
 extern PCOMSYMBOL hb_compSymbolAdd( char *, USHORT *, BOOL );
 extern PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL );    /* releases all memory allocated by symbol and returns the next one */
@@ -346,7 +349,12 @@ extern void     hb_compEnumMemberAdd( char * szName );
 #define hb_compErrorDuplVar( c ) hb_macroError( EG_SYNTAX, HB_MACRO_PARAM )
 #define hb_compWarnMeaningless( p )
 
+extern void * hb_compFlexNew( HB_MACRO_PTR );
+extern void hb_compFlexDelete( void * );
+
 #else /* HB_MACRO_SUPPORT */
+
+extern void hb_compPrepareOptimize( void );
 
 extern BOOL hb_compVariableMacroCheck( char * ); /* checks if passed variable can be used in macro */
 
@@ -488,6 +496,8 @@ extern PCOMDECLARED   hb_comp_pLastMethod;
 extern char *         hb_comp_szFromEnum;
 
 extern HB_PATHNAMES * hb_comp_pIncludePath;
+extern char *         hb_comp_FileAsSymbol;
+extern char *         hb_comp_PrgFileName;
 extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;
 extern PHB_FNAME      hb_comp_pFileName;
@@ -523,6 +533,8 @@ extern PHB_FNAME      hb_comp_pOutPath;
 extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
 
+extern BOOL           hb_comp_iGenVarList;
+
 /* Andi Jahja */
 extern BOOL           hb_comp_bFileVersionInfo;
 
@@ -542,6 +554,7 @@ extern USHORT         hb_comp_wCaseCounter;
 extern USHORT         hb_comp_wWithObjCounter;
 
 extern char *         hb_comp_szDeclaredFun;
+extern char *         hb_Command_Line;
 
 extern char *         hb_comp_szLastMethod;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.44 2005/09/25 19:39:45 druzus Exp $
+ * $Id: workarea.c,v 1.63 2006/01/30 02:51:24 druzus Exp $
  */
 
 /*
@@ -1511,7 +1511,7 @@ ERRCODE hb_waEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 /*
  * RDD info
  */
-extern ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM pItem )
+ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM pItem )
 {
    BOOL fResult;
    int iResult;

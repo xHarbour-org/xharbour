@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.116 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: harbour.c,v 1.117 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -132,7 +132,6 @@ static int hb_compProcessRSPFile( char *, int, char * argv[] ); /* process respo
 
 /* int hb_compSort_ULONG( ULONG * ulLeft, ULONG * ulRight ); */
 static void hb_compOptimizeJumps( void );
-void hb_compPrepareOptimize( void );
 static void hb_compOptimizeFrames( PFUNCTION pFunc );
 
 static void hb_compDeclaredInit( void );
@@ -263,9 +262,6 @@ extern void *  yylval  ;
 #endif
 extern int     yynerrs ;
 
-extern char * hb_comp_buffer;
-extern char * hb_comp_szAnnounce;
-
 extern void yyrestart( FILE * );
 
 /*
@@ -278,10 +274,6 @@ FILE *hb_comp_VariableList = NULL;
 /* PreProcessor Tracing support. */
 BOOL hb_comp_bTracePP = FALSE;
 FILE *hb_comp_PPTrace = NULL;
-
-/* Counter for Matching BEGINDUMP and ENDDUMP */
-extern int iBeginDump;
-extern int iEndDump;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
@@ -4272,7 +4264,7 @@ static void hb_compOptimizeJumps( void )
    {
       LONG lOffset;
 
-      if( iPass == 2 && ! hb_comp_bDebugInfo )
+      if( iPass == 2 && ! hb_comp_bDebugInfo && hb_comp_bLineNumbers )
          hb_compStripFuncLines( hb_comp_functions.pLast );
 
       if( hb_comp_functions.pLast->iJumps > 0 )

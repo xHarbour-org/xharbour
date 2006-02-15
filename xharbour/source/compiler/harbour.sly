@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.96 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: harbour.sly,v 1.97 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -40,7 +40,6 @@
 /* Compile using: bison -d -v harbour.y */
 
 extern FILE *yyin;      /* currently yacc parsed file */
-extern int hb_comp_iLine;       /* currently parsed file line number */
 extern char *yytext;
 
 #ifdef __cplusplus
@@ -129,13 +128,6 @@ static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
 static HB_EXPR_PTR pBlockSimple;
 
 static int s_iLastControlLine = 0, s_iControlLevel = 0;
-
-extern int hb_compLocalGetPos( char * szVarName );   /* returns the order + 1 of a local variable */
-extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is a static variable */
-extern int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
-extern int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
-extern USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName );
-extern void hb_compPrepareOptimize( void );
 
 extern char * hb_comp_SLX_LastBlock( BOOL bReset );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.41 2005/11/12 18:47:30 druzus Exp $
+ * $Id: hbpcode.c,v 1.42 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -400,7 +400,6 @@ const BYTE hb_comp_pcode_len[] = {
    1         /* HB_P_ARRAYPOPPLUS          */
 };
 
-extern BOOL hb_comp_iGenVarList;
 extern FILE *hb_comp_pCodeList;
 static PCODELIST pCodeFirst = NULL;
 

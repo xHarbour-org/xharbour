@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.9 2005/03/10 23:19:40 andijahja Exp $
+ * $Id: pragma.c,v 1.10 2005/03/31 14:34:07 andijahja Exp $
  */
 
 /*
@@ -68,14 +68,9 @@ static BOOL s_bTracePragma = FALSE;
 /* Size of abreviated pragma commands */
 #define PRAGMAS_LEN       8
 
-extern BOOL hb_pp_bInline;
-
 /* TODO:  Add support for:
           RequestLib    /R
 */
-
-extern int iBeginDump;
-extern int iEndDump;
 
 void hb_pp_ParsePragma( char * szLine, BOOL bValidCode )
 {

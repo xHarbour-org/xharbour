@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.55 2005/12/16 22:55:27 fsgiudice Exp $
+ * $Id: regex.c,v 1.56 2005/12/17 15:11:04 fsgiudice Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ HB_EXPORT void hb_regexFree( PHB_REGEX pRegEx )
    }
 }
 
-extern HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
+HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
 {
    BOOL fMatch;
 
@@ -232,23 +232,13 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                        pNewLine != NULL && pNewLine->item.asLogical.value,
                        &fFree );
 
-   /* now check if it is a precompiled regex */
-   if ( hb_isregexstring( pRegEx ) ) //( pRegEx->item.asString.length > 3 && memcmp( pRegEx->item.asString.value, "***", 3 ) == 0 )
-   {
-      aMatches[0].rm_eo = pRegEx->item.asString.length - 3 -
-                          ((real_pcre *) pReg->re_pcre)->size;
-   }
-   else
-   {
-      aMatches[0].rm_eo = pRegEx->item.asString.length;
-   }
-
-   if( cRequest != 0 && cRequest != 4 && cRequest != 5)
+   if( cRequest != 0 && cRequest != 4 && cRequest != 5 )
    {
       iMaxMatch = 1;
    }
 
    aMatches[0].rm_so = 0;
+   aMatches[0].rm_eo = pString->item.asString.length;
 
    if( regexec( pReg, pString->item.asString.value, iMaxMatch, aMatches, EFlags ) == 0 )
    {

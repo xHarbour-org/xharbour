@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.69 2006/02/04 10:04:10 druzus Exp $
+ * $Id: dbffpt1.c,v 1.70 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -2367,8 +2367,8 @@ static ERRCODE hb_fptReadRawBlock( FPTAREAP pArea, BYTE * bBuffer, FHANDLE hFile
    return errCode;
 }
 
-extern ERRCODE hb_fptReadBlobBlock( FPTAREAP pArea, PHB_ITEM pItem, FHANDLE hFile,
-                                    ULONG ulBlock, USHORT uiMode )
+ERRCODE hb_fptReadBlobBlock( FPTAREAP pArea, PHB_ITEM pItem, FHANDLE hFile,
+                             ULONG ulBlock, USHORT uiMode )
 {
    ULONG ulSize;
    BYTE buffer[ 4 ];
@@ -2410,7 +2410,7 @@ extern ERRCODE hb_fptReadBlobBlock( FPTAREAP pArea, PHB_ITEM pItem, FHANDLE hFil
    return SUCCESS;
 }
 
-extern ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock, ULONG ulSize )
+ERRCODE hb_fptReadSMTBlock( FPTAREAP pArea, PHB_ITEM pItem, ULONG ulBlock, ULONG ulSize )
 {
    if( ulBlock == 0 )
       return EDBF_CORRUPT;

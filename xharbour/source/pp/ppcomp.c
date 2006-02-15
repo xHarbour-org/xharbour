@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.10 2004/10/22 02:40:35 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.11 2005/03/30 21:30:01 andijahja Exp $
  */
 
 /*
@@ -66,19 +66,16 @@
 #include "hbpp.h"
 #include "hbcomp.h"
 
-BOOL hb_pp_bInline = FALSE;
-
 static char s_szLine[ HB_PP_STR_SIZE ];
 static char s_szOutLine[ HB_PP_STR_SIZE ];
 int hb_pp_LastOutLine = 1;
 
+BOOL hb_pp_bInline = FALSE;
 BOOL hb_pp_bInComment = FALSE;
 
 /*
 BOOL bDebug = FALSE;
 */
-
-extern void CloseInclude( void );
 
 int hb_pp_Internal( FILE * handl_o, char * sOut )
 {

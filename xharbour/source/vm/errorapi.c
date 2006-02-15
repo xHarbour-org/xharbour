@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.73 2006/02/10 21:40:12 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.74 2006/02/14 01:47:07 druzus Exp $
  */
 
 /*
@@ -1549,7 +1549,7 @@ USHORT HB_EXPORT hb_errRT_TOOLS( ULONG ulGenCode, ULONG ulSubCode, const char * 
 
 void HB_EXPORT hb_errInternal( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 )
 {
-   char title[64], buffer[ 256 ];
+   char title[64], buffer[ 1024 ];
    FILE *fpError;
    BOOL bLang;
 
