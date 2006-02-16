@@ -1,5 +1,5 @@
 /*
- * $Id: ssf.h,v 1.11 2005/02/15 21:06:34 andijahja Exp $
+ * $Id: ssf.h,v 1.12 2005/07/13 19:12:45 maurifull Exp $
  */
 
 /*
@@ -190,7 +190,11 @@
 #define al_blit blit
 #define al_clear_to_color clear_to_color
 #ifndef al_set_clip
+#if ALLEGRO_SUB_VERSION < 2
 #define al_set_clip set_clip
+#else
+#define al_set_clip set_clip_rect
+#endif
 #endif
 #endif
 
