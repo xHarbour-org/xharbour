@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.37 2005/07/13 19:12:45 maurifull Exp $
+ * $Id: gtalleg.c,v 1.38 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -2025,7 +2025,7 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
       case GFX_CLIPRIGHT:
         return s_iCRight;
       case GFX_SETCLIP:
-        set_clip_rect(dst, iLeft, iTop, iRight, iBottom);
+        al_set_clip(dst, iLeft, iTop, iRight, iBottom);
         s_iCTop = iTop;
         s_iCLeft = iLeft;
         s_iCBottom = iBottom;
