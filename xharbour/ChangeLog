@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4822 2006/02/16 01:40:35 maurifull Exp $
+ * $Id: ChangeLog,v 1.4823 2006/02/16 21:30:56 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-16 20:53 UTC-0500 Gerald Drouillard <Gerald@drouillard.ca>
+  * xharbour/source/tip/ftpcln.prg
+    ! fix :mget().  It now uses :downloadfile() instead of :retr()
 
 2006-02-16 18:30 UTC+0100 Mauricio Abre <mgabre@gmail.com>
   * xharbour/source/rtl/gtalleg/ssf.h

@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.10 2005/09/02 16:32:18 lculik Exp $
+ * $Id: ftpcln.prg,v 1.11 2005/09/08 23:41:36 lculik Exp $
  */
 
 /*
@@ -504,7 +504,7 @@ METHOD MGET( cSpec ) CLASS tIPClientFTP
 
       FOR x := 1 TO y
          cFile := Trim( MemoLine( cStr, 255, x ) )
-         ::retr( cFile, cFile )
+         ::downloadfile( cFile, cFile )
       NEXT
 
    ENDIF
@@ -631,4 +631,3 @@ RETURN lRet
 METHOD MKD( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "MKD " + cPath + ::cCRLF )
 RETURN ::GetReply()
-
