@@ -1,20 +1,20 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.6 2005/11/17 00:51:06 modalsist Exp $
+rem $Id: make_pc.bat,v 1.7 2006/02/15 11:43:18 modalsist Exp $
 rem
-rem Batch file Pelles C compiler.
+rem Make batch file for Pelles C compiler.
 rem
 rem NOTE: Pelles C is a free C/C++ compliler for MS-Windows platform.
-rem       http://www.smorgasbordet.com/pellesc/index.htm
+rem       http://www.smorgasbordet.com/pellesc
 rem
 rem 
 
-REM ******************************************
-REM *** If necessary, change only 3 sets below
-REM ******************************************
+REM *****************************************
+REM *** If necessary, change only 3 next sets
+REM *****************************************
 
 SET HB_DIR=.\
-SET POCC_DIR=c:\pellesc
-SET BISON_DIR=c:\bison
+SET POCC_DIR=C:\PellesC
+SET BISON_DIR=C:\Bison
 
 
 SET _PATH=%PATH%
@@ -132,8 +132,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\rddmt.lib            del %HB_DIR%\lib\rddmt.lib
    if exist %HB_DIR%\lib\rtl.lib              del %HB_DIR%\lib\rtl.lib
    if exist %HB_DIR%\lib\rtlmt.lib            del %HB_DIR%\lib\rtlmt.lib
-   if exist %HB_DIR%lib\sixcdx.lib            del %HB_DIR%lib\sixcdx.lib
-   if exist %HB_DIR%lib\sixcdxmt.lib          del %HB_DIR%lib\sixcdxmt.lib
+   if exist %HB_DIR%\lib\sixcdx.lib           del %HB_DIR%\lib\sixcdx.lib
+   if exist %HB_DIR%\lib\sixcdxmt.lib         del %HB_DIR%\lib\sixcdxmt.lib
    if exist %HB_DIR%\lib\tip.lib              del %HB_DIR%\lib\tip.lib
    if exist %HB_DIR%\lib\tipmt.lib            del %HB_DIR%\lib\tipmt.lib
    if exist %HB_DIR%\lib\vm.lib               del %HB_DIR%\lib\vm.lib
@@ -212,6 +212,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %LIB_DIR%\rddmt.lib            del %LIB_DIR%\rddmt.lib
    if exist %LIB_DIR%\rtl.lib              del %LIB_DIR%\rtl.lib
    if exist %LIB_DIR%\rtlmt.lib            del %LIB_DIR%\rtlmt.lib
+   if exist %LIB_DIR%\sixcdx.lib           del %LIB_DIR%\sixcdx.lib
+   if exist %LIB_DIR%\sixcdxmt.lib         del %LIB_DIR%\sixcdxmt.lib
    if exist %LIB_DIR%\tip.lib              del %LIB_DIR%\tip.lib
    if exist %LIB_DIR%\tipmt.lib            del %LIB_DIR%\tipmt.lib
    if exist %LIB_DIR%\vm.lib               del %LIB_DIR%\vm.lib
