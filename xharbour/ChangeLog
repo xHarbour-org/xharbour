@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4825 2006/02/17 18:52:02 modalsist Exp $
+ * $Id: ChangeLog,v 1.4826 2006/02/21 14:52:25 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,64 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-21 20:20 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/make_tgz.sh
+  * xharbour/xharbour.spec
+    * removed not longer used HB_FM_STATISTICS_OFF macro
+
+  * xharbour/bin/hb-func.sh
+    * added support for -L<librarypath> in xhbmk
+
+  * xharbour/contrib/mysql/mysql.c
+    * minor modification to eliminate accessing uninitialized variable
+
+  * xharbour/contrib/rdd_ads/Makefile
+    * removed not longer necessary MT version of ADS RDD
+      Please make the same in non GNU Makefiles. As I can see many of
+      libraries are build in two version when in fact they not have MT
+      dependent code.
+
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    * removed some unnecessary #include ...
+
+  * xharbour/include/gtinfo.h
+    - removed not longer used GTI_XCURSOR*
+    + added GTI_CURSORBLINKRATE to control cursor blinking frequency in milliseconds
+
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+    * added UTF8 related functions: hb_cdpUTF8StringLength(),
+      hb_cdpStringInUTF8Length(), hb_cdpUTF8ToStrn().
+    * Changed name of hb_cdpStrnToUTF() function to hb_cdpStrnToUTF8()
+      to avoid confusions with UTF16
+
+  * xharbour/include/hberrors.h
+  * xharbour/source/compiler/hbgenerr.c
+    + added to new errors (memory corruption and memory overflow) for
+      compiler level FM statistic.
+
+  * xharbour/source/common/hbver.c
+    * reenabled memory statistic information in compiler build info.
+
+  * xharbour/source/compiler/harbour.c
+    + added FM statistic module -  when harbour.c is compiled with
+      HB_FM_STATISTICS macro then it uses memory statistics like the
+      one used by HVM. There is many of memory leaks in xHarbour
+      compiler which have to be fixed. Recently Ryszard cleared all
+      memory leeks in Harbour so it will be good to borrow this
+      modifications.
+    ! fixed hb_conOutErr() to properly display data when given size is 0
+
+  * xharbour/source/ct/Makefile
+    * Removed unnecessary MT version of CT library - it also does not have
+      any MT code.
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/rtl/gtxwc/gtxwc.h
+    * added support for clipboard
+    * added support for cursor shape - like in DOS/VGA
 
 2006-02-21 17:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.sly
