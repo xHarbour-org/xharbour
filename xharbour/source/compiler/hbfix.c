@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.33 2005/11/03 06:55:29 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.34 2006/02/13 23:10:23 druzus Exp $
  */
 
 /*
@@ -411,7 +411,7 @@ static HB_FIX_FUNC( hb_p_false )
          case HB_P_JUMPTRUENEAR:
          case HB_P_JUMPTRUE:
          case HB_P_JUMPTRUEFAR:
-            if( ! hb_compIsJump( pFunc, pFunc->pCode[ lPCodePos + 1 ] ) )
+            if( ! hb_compIsJump( pFunc, lPCodePos + 1 ) )
             {
                int iCount = 1;
 
@@ -463,7 +463,7 @@ static HB_FIX_FUNC( hb_p_true )
          case HB_P_JUMPFALSENEAR:
          case HB_P_JUMPFALSE:
          case HB_P_JUMPFALSEFAR:
-            if( ! hb_compIsJump( pFunc, pFunc->pCode[ lPCodePos + 1 ] ) )
+            if( ! hb_compIsJump( pFunc, lPCodePos + 1 ) )
             {
                int iCount = 1;
    
