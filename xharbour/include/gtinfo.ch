@@ -1,5 +1,5 @@
 /*
- * $Id: gtinfo.ch,v 1.15 2005/12/19 02:38:25 paultucker Exp $
+ * $Id: gtinfo.ch,v 1.16 2006/01/14 17:46:18 paultucker Exp $
  */
 
 /*
@@ -60,57 +60,54 @@
 #ifndef HB_GTINFO_CH_
 #define HB_GTINFO_CH_
 
-#define GTI_ISGRAPHIC      0  /* 1 if GT has graphic support / pixel oriented */
-#define GTI_SCREENWIDTH    1  /* Get/set width of application window in pixels */
-#define GTI_SCREENHEIGHT   2  /* Get/set height of appl. window in pixels */
-#define GTI_SCREENDEPTH    3  /* Amount of bits used for colors in the application */
-#define GTI_FONTSIZE       4  /* Get/set height of application font in pixels */
-#define GTI_FONTWIDTH      5  /* Get/set width of application font characters */
-#define GTI_DESKTOPWIDTH   6  /* Get width of desktop in pixels */
-#define GTI_DESKTOPHEIGHT  7  /* Get height of desktop in pixels */
-#define GTI_DESKTOPDEPTH   8  /* Amount of bits used for colors in system */
-#define GTI_KBDSHIFTS     10  /* Keyboard shift/ctrl/alt, caps/num/scroll & winkeys state */
-#define GTI_KBDSPECIAL    11 /* This will get/set the status of the top row
-                             shift state handling. Enable to correct a
-                             documented keyboard handling bug under Win9x.
-                             Enable if the caps-lock key affects the top
-                             row keys.  (Alternate language keys are not
-                             handled properly by this temporary fix.
-                             Default is disabled.
-                             */
+#define GTI_ISGRAPHIC          0  /* 1 if GT has graphic support / pixel oriented */
+#define GTI_SCREENWIDTH        1  /* Get/set width of application window in pixels */
+#define GTI_SCREENHEIGHT       2  /* Get/set height of appl. window in pixels */
+#define GTI_SCREENDEPTH        3  /* Amount of bits used for colors in the application */
+#define GTI_FONTSIZE           4  /* Get/set height of application font in pixels */
+#define GTI_FONTWIDTH          5  /* Get/set width of application font characters */
+#define GTI_DESKTOPWIDTH       6  /* Get width of desktop in pixels */
+#define GTI_DESKTOPHEIGHT      7  /* Get height of desktop in pixels */
+#define GTI_DESKTOPDEPTH       8  /* Amount of bits used for colors in system */
+#define GTI_KBDSHIFTS         10  /* Keyboard shift/ctrl/alt, caps/num/scroll & winkeys state */
+#define GTI_KBDSPECIAL        11  /* This will get/set the status of the top row
+                                     shift state handling. Enable to correct a
+                                     documented keyboard handling bug under Win9x.
+                                     Enable if the caps-lock key affects the top
+                                     row keys.  (Alternate language keys are not
+                                     handled properly by this temporary fix.
+                                     Default is disabled.
+                                  */
 
-#define GTI_KBDALT        12 /* This will get/set the status of the alt-numpad
-                             key handling.
-                             Default is Enabled.
-                             */
+#define GTI_KBDALT            12  /* This will get/set the status of the alt-numpad
+                                     key handling.
+                                     Default is Enabled.
+                                  */
 
-#define GTI_DESKTOPROWS   20  /* Get Size of desktop in character rows */
-#define GTI_DESKTOPCOLS   21  /* Get Size of desktop in character cols */
-#define GTI_FONTWEIGHT    22  /* Get/set the weight of the font used in application */
-#define GTI_FONTQUALITY   23  /* Get/set quality of font rendering in the appl. */
-#define GTI_FONTNAME      24  /* Set-only font name */
-#define GTI_CODEPAGE      25  /* codepage */
-#define GTI_WINTITLE      26  /* title */
-#define GTI_ICONFILE      27  /* icon file */
-#define GTI_ICONRES       28  /* icon resource */
-#define GTI_MOUSESTATUS   29  /* mouse enabled = 1 mouse disabled = 0 */
+#define GTI_CURSORBLINKRATE   19  /* Get/Set cursor blinking rate in milliseconds */
+#define GTI_DESKTOPROWS       20  /* Get Size of desktop in character rows */
+#define GTI_DESKTOPCOLS       21  /* Get Size of desktop in character cols */
+#define GTI_FONTWEIGHT        22  /* Get/set the weight of the font used in application */
+#define GTI_FONTQUALITY       23  /* Get/set quality of font rendering in the appl. */
+#define GTI_FONTNAME          24  /* Set-only font name */
+#define GTI_CODEPAGE          25  /* codepage */
+#define GTI_WINTITLE          26  /* title */
+#define GTI_ICONFILE          27  /* icon file */
+#define GTI_ICONRES           28  /* icon resource */
+#define GTI_MOUSESTATUS       29  /* mouse enabled = 1 mouse disabled = 0 */
 
-#define GTI_INPUTFD       30  /* Get Standard input stream of application/GT */
-#define GTI_OUTPUTFD      31  /* Get Standard output stream of application/GT */
-#define GTI_ERRORFD       32  /* Get Standard error stream of application/GT */
+#define GTI_INPUTFD           30  /* Get Standard input stream of application/GT */
+#define GTI_OUTPUTFD          31  /* Get Standard output stream of application/GT */
+#define GTI_ERRORFD           32  /* Get Standard error stream of application/GT */
 
-#define GTI_ESCDELAY      33  /* Get/Set escape key delay */
+#define GTI_ESCDELAY          33  /* Get/Set escape key delay */
 
 /* these 2 are used for MaxCol(?) and MaxRow(?) */
-#define GTI_VIEWMAXHEIGHT 34  /* Maximum viewable height:for current mode */
-#define GTI_VIEWMAXWIDTH  35  /* Maximum viewable width:either win or full scrn */
+#define GTI_VIEWMAXHEIGHT     34  /* Maximum viewable height:for current mode */
+#define GTI_VIEWMAXWIDTH      35  /* Maximum viewable width:either win or full scrn */
 
-#define GTI_VIEWPORTHEIGHT 36  /* Current viewport height:for current mode */
-#define GTI_VIEWPORTWIDTH  37  /* Current viewport width:either win or full scrn */
-
-#define GTI_XCURSORCOLOR1  38  
-#define GTI_XCURSORCOLOR2  39  
-#define GTI_XCURSORBLINKRATE 40
+#define GTI_VIEWPORTHEIGHT    36  /* Current viewport height:for current mode */
+#define GTI_VIEWPORTWIDTH     37  /* Current viewport width:either win or full scrn */
 
 /* these are used _by_ MaxRow/Col */
 #define GTI_WINDOW         0  /* Maximum window size ('window' in CT terms) */

@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_tgz.sh,v 1.49 2005/10/13 12:49:35 druzus Exp $
+# $Id: make_tgz.sh,v 1.50 2006/01/17 02:18:14 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -24,7 +24,7 @@ hb_pref="xhb"
 hb_contrib=""
 hb_sysdir="yes"
 hb_exesuf=""
-export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+export C_USR="-O3"
 
 [ -z "$HB_INSTALL_PREFIX" ] && [ -n "$PREFIX" ] && export HB_INSTALL_PREFIX="$PREFIX"
 

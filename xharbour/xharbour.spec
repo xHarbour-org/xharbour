@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.90 2006/02/13 23:10:19 druzus Exp $
+# $Id: xharbour.spec,v 1.91 2006/02/15 19:33:00 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -59,7 +59,7 @@
 %define hb_pref  xhb
 %define hb_arch  export HB_ARCHITECTURE=linux
 %define hb_cc    export HB_COMPILER=gcc
-%define hb_cflag export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+%define hb_cflag export C_USR="-O3"
 %define hb_lflag export L_USR="${CC_L_USR} %{?_with_static:-static}"
 %define hb_mt    export HB_MT=MT
 %define hb_mgt   export HB_MULTI_GT=yes
@@ -361,7 +361,7 @@ cat > $RPM_BUILD_ROOT/etc/profile.d/harb.sh <<EOF
 %{hb_ldir}
 %{hb_gt}
 export HB_LEX="SIMPLEX"
-export C_USR="-DHB_FM_STATISTICS_OFF -O3"
+export C_USR="-O3"
 EOF
 chmod 755 $RPM_BUILD_ROOT/etc/profile.d/harb.sh
 fi

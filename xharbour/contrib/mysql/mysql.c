@@ -1,5 +1,5 @@
 /*
- * $Id: mysql.c,v 1.11 2004/06/18 03:41:51 peterrees Exp $
+ * $Id: mysql.c,v 1.12 2004/06/19 12:11:07 peterrees Exp $
  */
 
 /*
@@ -345,9 +345,9 @@ HB_FUNC(DATATOSQL)
    iSize= hb_parclen(1) ;
    iFromSize = iSize ;
 
+   FromBuffer = hb_parc( 1 ) ;
    if ( iSize )
    {
-     FromBuffer = hb_parcx( 1 ) ;
      ToBuffer = ( char *) hb_xgrab( ( iSize*2 ) + 1 );
      if ( ToBuffer )
      {

@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.70 2005/10/29 06:42:03 druzus Exp $
+ * $Id: adsfunc.c,v 1.71 2005/12/11 12:38:26 druzus Exp $
  */
 
 /*
@@ -52,8 +52,6 @@
 
 #define HB_OS_WIN_32_USED
 
-#include "hbsetup.h"
-
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"
@@ -63,7 +61,6 @@
 #include "hbdate.h"
 #include "hbapierr.h"
 #include "rddads.h"
-#include "hbstack.h"
 
 #define HARBOUR_MAX_RDD_FILTER_LENGTH     256
 #define MAX_STR_LEN 255

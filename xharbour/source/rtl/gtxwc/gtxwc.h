@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.h,v 1.2 2004/12/28 07:16:15 druzus Exp $
+ * $Id: gtxwc.h,v 1.3 2005/02/06 20:35:43 druzus Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 #include "hbapicdp.h"
 #endif
 
+#include <unistd.h>
 #include <signal.h>
 #include <sys/time.h>
 

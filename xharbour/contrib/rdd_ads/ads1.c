@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.96 2005/12/14 11:07:32 brianhays Exp $
+ * $Id: ads1.c,v 1.97 2006/01/30 02:51:23 druzus Exp $
  */
 
 /*
@@ -54,8 +54,6 @@
 #define SUPERTABLE ( &adsSuper )
 #define HB_OS_WIN_32_USED
 #define MAX_STR_LEN 255
-
-#include "hbdefs.h"
 
 #include "hbapi.h"
 #include "hbinit.h"

@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.21 2005/03/30 21:29:14 andijahja Exp $
+ * $Id: hberrors.h,v 1.22 2005/05/28 05:36:17 ronpinkas Exp $
  */
 
 /*
@@ -124,6 +124,8 @@ HB_EXTERN_BEGIN
 #define HB_COMP_ERR_CREATE_PPT                  62
 #define HB_COMP_ERR_UNBALANCE_PRAGMAS           63
 #define HB_COMP_ERR_UNTERMINATED_COMMENTS       64
+#define HB_COMP_ERR_MEMOVERFLOW                 65
+#define HB_COMP_ERR_MEMCORRUPT                  66
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

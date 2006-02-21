@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.14 2005/08/16 19:35:16 lf_sfnet Exp $
+ * $Id: gtxwc.c,v 1.15 2005/12/13 12:03:42 druzus Exp $
  */
 
 /*
@@ -296,6 +296,14 @@ static char *rgb_colors[] = {
    "rgb:FF/FF/FF"    /* white         */
 };
 
+static Atom s_atomDelWin;
+static Atom s_atomString;
+static Atom s_atomUTF8String;
+static Atom s_atomPrimary;
+static Atom s_atomTargets;
+static Atom s_atomCutBuffer0;
+
+
 typedef struct tag_rect
 {
    int top;
@@ -405,11 +413,17 @@ typedef struct tag_x_wnddef
    BOOL fInvalidPts;
    RECT rInvalidPts;
 
-   // Key pointer
+   /* Keyboard buffer */
    int keyBuffPointer;
    int keyBuffNO;
    int KeyBuff[ XVT_CHAR_QUEUE_SIZE ];
    MODIFIERS keyModifiers;
+
+   /* Clipboard buffer */
+   unsigned char * ClipboardData;
+   ULONG ClipboardSize;
+   Atom ClipboardRequest;
+   BOOL ClipboardOwner;
 
 } XWND_DEF, *PXWND_DEF;
 
@@ -428,12 +442,12 @@ static PXWND_DEF s_wnd = NULL;
 
 static BOOL s_forceRefresh;
 static BOOL s_cursorState = TRUE;
-static int s_cursorColor1 = 0x08;
-static int s_cursorColor2 = 0x70;
-static int s_cursorBlinkRate = 100;
+static ULONG s_cursorBlinkRate = 250;
+static ULONG s_cursorStateTime = 0;
 
 static int s_updateMode = XVT_SYNC_UPDATE;
 //static int s_updateMode = XVT_ASYNC_UPDATE;
+static int s_iUpdateCounter;
 
 #define _GetScreenWidth()  (s_wnd->cols)
 #define _GetScreenHeight() (s_wnd->rows)
@@ -461,6 +475,8 @@ static void hb_xvt_sigHandler( int iSig )
 
    if ( s_updateMode == XVT_ASYNC_UPDATE && s_wnd && s_wnd->fInit )
    {
+      if( s_iUpdateCounter )
+         --s_iUpdateCounter;
       hb_xvt_gtProcessMessages( s_wnd );
    }
 }
@@ -1688,7 +1704,7 @@ static void hb_xvt_processKey( PXWND_DEF wnd, XKeyEvent *evt)
    int ikey = 0, n, i;
 
 #ifdef XVT_DEBUG
-   n = XLookupString( evt , buf, sizeof(buf), &outISO, NULL );
+   n = XLookupString( evt , ( char * ) buf, sizeof(buf), &outISO, NULL );
    buf[HB_MAX(n,0)] = '\0';
    printf( "KeySym=%lx, keySymISO=%lx, keystr=[%s]\r\n", out, outISO, buf); fflush(stdout);
 #endif
@@ -2049,6 +2065,125 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          wnd->newHeight = evt->xconfigure.height;
          wnd->fWinResize = TRUE;
          break;
+
+      case ClientMessage:
+#ifdef XVT_DEBUG
+         printf("Event: ClientMessage:%ld\r\n", evt->xclient.data.l[ 0 ]); fflush(stdout);
+#endif
+         if( ( Atom ) evt->xclient.data.l[ 0 ] == s_atomDelWin )
+         {
+            hb_vmRequestQuit();
+         }
+         break;
+
+      case SelectionNotify:
+#ifdef XVT_DEBUG
+         printf("Event: SelectionNotify\r\n"); fflush(stdout);
+#endif
+         if( evt->xselection.property != None && wnd->ClipboardRequest )
+         {
+            XTextProperty text;
+            unsigned long nItem;
+
+            if( XGetTextProperty( wnd->dpy, wnd->window, &text,
+                                  evt->xselection.property ) != 0 )
+            {
+               if( wnd->ClipboardRequest == s_atomUTF8String )
+               {
+                  nItem = hb_cdpUTF8StringLength( text.value, text.nitems );
+                  if( wnd->ClipboardData != NULL )
+                     hb_xfree( wnd->ClipboardData );
+                  wnd->ClipboardData = ( unsigned char * ) hb_xgrab( nItem + 1 );
+                  wnd->ClipboardSize = nItem;
+                  hb_cdpUTF8ToStrn( wnd->inCDP ? wnd->inCDP : wnd->hostCDP,
+                                    text.value, text.nitems,
+                                    wnd->ClipboardData, nItem + 1 );
+               }
+               else if( wnd->ClipboardRequest == s_atomString )
+               {
+                  unsigned char cData;
+
+                  if( wnd->ClipboardData != NULL )
+                     hb_xfree( wnd->ClipboardData );
+                  wnd->ClipboardData = ( unsigned char * ) hb_xgrab( text.nitems + 1 );
+                  for( nItem = 0; nItem < text.nitems; ++nItem )
+                  {
+                     switch( text.format )
+                     {
+                        case  8: cData = text.value[ nItem ]; break;
+                        case 16: cData = ( unsigned char ) ( ( unsigned short * ) text.value)[ nItem ]; break;
+                        case 32: cData = ( unsigned char ) ( ( unsigned int * ) text.value)[ nItem ]; break;
+                        default: cData = 0;
+                     }
+                     wnd->ClipboardData[ nItem ] = cData;
+                  }
+                  wnd->ClipboardData[ nItem ] = '\0';
+                  wnd->ClipboardSize = nItem;
+               }
+            }
+         }
+         wnd->ClipboardRequest = 0;
+         break;
+
+      case SelectionRequest:
+      {
+         XSelectionRequestEvent * req = &evt->xselectionrequest;
+         XEvent respond;
+
+#ifdef XVT_DEBUG
+         printf("Event: SelectionRequest\r\n"); fflush(stdout);
+#endif
+         respond.xselection.property = req->property;
+         if( req->target == s_atomString )
+         {
+            XChangeProperty( wnd->dpy, req->requestor, req->property,
+                             s_atomString, 8, PropModeReplace,
+                             wnd->ClipboardData, wnd->ClipboardSize );
+         }
+         else if( req->target == s_atomUTF8String )
+         {
+            PHB_CODEPAGE cdp = wnd->inCDP ? wnd->inCDP : wnd->hostCDP;
+            ULONG ulLen = hb_cdpStringInUTF8Length( cdp, wnd->ClipboardData, wnd->ClipboardSize );
+            BYTE * pBuffer = ( BYTE * ) hb_xgrab( ulLen + 1 );
+
+            hb_cdpStrnToUTF8( cdp, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );
+            XChangeProperty( wnd->dpy, req->requestor, req->property,
+                             s_atomString, 8, PropModeReplace,
+                             pBuffer, ulLen );
+            hb_xfree( pBuffer );
+         }
+         else if ( req->target == s_atomTargets )
+         {
+            Atom aProp[ 2 ];
+            aProp[ 0 ] = s_atomUTF8String;
+            aProp[ 1 ] = s_atomString;
+            XChangeProperty( wnd->dpy, req->requestor, req->property,
+                             s_atomTargets, 32, PropModeReplace,
+                             ( unsigned char * ) aProp, 2 );
+         }
+         else
+         {
+            respond.xselection.property = None;
+         }
+
+         respond.xselection.type = SelectionNotify;
+         respond.xselection.display = req->display;
+         respond.xselection.requestor = req->requestor;
+         respond.xselection.selection = req->selection;
+         respond.xselection.target = req->target;
+         respond.xselection.time = CurrentTime;
+
+         XSendEvent( wnd->dpy, req->requestor, 0, 0, &respond );
+         break;
+      }
+
+      case SelectionClear:
+#ifdef XVT_DEBUG
+         printf("Event: SelectionClear\r\n"); fflush(stdout);
+#endif
+         wnd->ClipboardOwner = FALSE;
+         break;
+
 #ifdef XVT_DEBUG
       default:
          printf("Event: #%d\r\n", evt->type); fflush(stdout);
@@ -2547,7 +2682,7 @@ static void hb_xvt_gtUpdateCursor( PXWND_DEF wnd )
    int cursorType = s_cursorState ? wnd->cursorType : SC_NONE;
 
    /* must the mouse cursor be positioned? */
-   if ( wnd->mouseGotoRow >= 0 && wnd->mouseGotoCol >= 0 )
+   if( wnd->mouseGotoRow >= 0 && wnd->mouseGotoCol >= 0 )
    {
       XWarpPointer( wnd->dpy, None, wnd->window, 0,0,0,0,
                     wnd->mouseGotoCol * wnd->fontWidth + (wnd->fontWidth>>1),
@@ -2556,38 +2691,51 @@ static void hb_xvt_gtUpdateCursor( PXWND_DEF wnd )
    }
 
    /* must the screen cursor be repainted? */
-   if ( cursorType != wnd->lastCursorType ||
-        wnd->lastCursorCol != wnd->col || wnd->lastCursorRow != wnd->row )
+   if( cursorType != wnd->lastCursorType ||
+       wnd->lastCursorCol != wnd->col || wnd->lastCursorRow != wnd->row )
    {
-      if ( wnd->lastCursorType != SC_NONE &&
-           ( wnd->lastCursorCol != wnd->col ||
-             wnd->lastCursorRow != wnd->row ) )
+      if( wnd->lastCursorType != SC_NONE )
       {
          /* restore character under previous cursor position */
-         hb_xvt_gtRepaintChar( wnd, wnd->lastCursorCol, wnd->lastCursorRow,
-                                    wnd->lastCursorCol, wnd->lastCursorRow );
-         wnd->lastCursorType = SC_NONE;
          hb_xvt_gtRestoreArea( wnd, wnd->lastCursorCol, wnd->lastCursorRow,
                                     wnd->lastCursorCol, wnd->lastCursorRow );
       }
-      if ( cursorType != SC_NONE )
+      if( cursorType != SC_NONE )
       {
-         BYTE color;
-         int index;
+         USHORT basex = wnd->col * wnd->fontWidth,
+                basey = wnd->row * wnd->fontHeight,
+                size;
 
-         /* display new cursor */
-         index = wnd->col +  wnd->row * wnd->cols;
-         color = wnd->pColors[ index ];
-         wnd->pColors[ index ] = (color & s_cursorColor2) != s_cursorColor2 ?
-                                 s_cursorColor2 | (color ^ 0x0f) : (color & 0x0f) | s_cursorColor1;
-         hb_xvt_gtRepaintChar( wnd, wnd->col, wnd->row, wnd->col, wnd->row );
-         wnd->pColors[ index ] = color;
+         switch( cursorType )
+         {
+            case SC_NORMAL:
+               size = 2;
+               basey += wnd->fontHeight - 3;
+               break;
+            case SC_INSERT:
+               size = ( wnd->fontHeight - 2 ) >> 1;
+               basey += wnd->fontHeight - size - 1;
+               break;
+            case SC_SPECIAL1:
+               size = wnd->fontHeight - 2;
+               basey += 1;
+               break;
+            case SC_SPECIAL2:
+               size = ( wnd->fontHeight - 2 ) >> 1;
+               basey += 1;
+               break;
+            default:
+               size = 0;
+               break;
+         }
+         if( size )
+         {
+            BYTE color = wnd->pColors[ wnd->col + wnd->row * wnd->cols ];
+            XSetForeground( wnd->dpy, wnd->gc, wnd->pixels[color & 0x0f] );
+            XFillRectangle( wnd->dpy, wnd->window, wnd->gc,
+                            basex, basey, wnd->fontWidth, size );
+         }
       }
-      else
-      {
-         hb_xvt_gtRepaintChar( wnd, wnd->col, wnd->row, wnd->col, wnd->row );
-      }
-      hb_xvt_gtRestoreArea( wnd, wnd->col, wnd->row, wnd->col, wnd->row );
       wnd->lastCursorType = cursorType;
       wnd->lastCursorCol = wnd->col;
       wnd->lastCursorRow = wnd->row;
@@ -2656,19 +2804,29 @@ static void hb_xvt_gtUpdateSize( PXWND_DEF wnd )
 
 /* *********************************************************************** */
 
+static ULONG hb_xvt_CurrentTime( void )
+{
+   struct timeval tv;
+   gettimeofday( &tv, NULL );
+   return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+/* *********************************************************************** */
+
 static void hb_xvt_gtProcessMessages( PXWND_DEF wnd )
 {
    XEvent evt;
-   static int count = 0;
+   ULONG ulCurrentTime = hb_xvt_CurrentTime();
 
-   if ( ++count == s_cursorBlinkRate )
-      {
-         s_cursorState = !s_cursorState;
-         count = 0;
-      }
-
-   while ( XCheckMaskEvent( wnd->dpy, XVT_STD_MASK, &evt) )
+   if( ulCurrentTime - s_cursorStateTime > s_cursorBlinkRate )
    {
+      s_cursorState = !s_cursorState;
+      s_cursorStateTime = ulCurrentTime;
+   }
+
+   while( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
+   {
+      XNextEvent( wnd->dpy, &evt );
       hb_xvt_gtWndProc( wnd, &evt );
    }
    hb_xvt_gtUpdateSize( wnd );
@@ -2686,16 +2844,88 @@ static void hb_xvt_gtProcessMessages( PXWND_DEF wnd )
     * The even checking is repeated intentionaly because some operation
     * can be bufferd by XLIB until incomming events are checked
     */
-   while ( XCheckMaskEvent( wnd->dpy, XVT_STD_MASK, &evt) )
+   while( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
    {
+      XNextEvent( wnd->dpy, &evt );
       hb_xvt_gtWndProc( wnd, &evt );
    }
    hb_xvt_gtUpdateSize( wnd );
    hb_xvt_gtUpdatePts( wnd );
+   hb_xvt_gtUpdateCursor( wnd );
 #endif
 
    XFlush( wnd->dpy );
 }
+
+/* *********************************************************************** */
+
+static void hb_xvt_gtSetSelection( PXWND_DEF wnd, char *szData, ULONG ulSize )
+{
+   if( wnd->ClipboardData != NULL )
+      hb_xfree( wnd->ClipboardData );
+   wnd->ClipboardData = ( unsigned char * ) hb_xgrab( ulSize + 1 );
+   memcpy( wnd->ClipboardData, szData, ulSize );
+   wnd->ClipboardData[ ulSize ] = '\0';
+   wnd->ClipboardSize = ulSize;
+
+   wnd->ClipboardOwner = TRUE;
+   XSetSelectionOwner( wnd->dpy, s_atomPrimary, wnd->window, CurrentTime );
+}
+
+/* *********************************************************************** */
+
+static void hb_xvt_gtRequestSelection( PXWND_DEF wnd )
+{
+   if( !wnd->ClipboardOwner )
+   {
+      BOOL fRepeat = TRUE;
+      wnd->ClipboardRequest = s_atomUTF8String;
+      while( wnd->ClipboardRequest )
+      {
+         XConvertSelection( wnd->dpy, s_atomPrimary, wnd->ClipboardRequest,
+                            s_atomCutBuffer0, wnd->window, CurrentTime );
+
+         if( s_updateMode == XVT_ASYNC_UPDATE )
+         {
+            s_iUpdateCounter = 100;
+            while( s_iUpdateCounter && wnd->ClipboardRequest )
+               sleep( 1 );
+         }
+         else
+         {
+            int iConnFD = ConnectionNumber( wnd->dpy );
+            struct timeval timeout;
+            fd_set readfds;
+
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 2500000;
+
+            for( ;; )
+            {
+               hb_xvt_gtProcessMessages( wnd );
+               if( !wnd->ClipboardRequest )
+                  break;
+
+               FD_ZERO( &readfds );
+               FD_SET( iConnFD, &readfds );
+               if( select( iConnFD + 1, &readfds, NULL, NULL, &timeout ) <= 0 )
+                  break;
+            }
+         }
+         if( wnd->ClipboardRequest )
+         {
+            wnd->ClipboardRequest = 0;
+         }
+         else if( fRepeat )
+         {
+            fRepeat = FALSE;
+            wnd->ClipboardRequest = s_atomString;
+         }
+      }
+   }
+}
+
+/* *********************************************************************** */
 
 /* *********************************************************************** */
 
@@ -2893,6 +3123,15 @@ static BOOL hb_xvt_gtConnectX( PXWND_DEF wnd, BOOL fExit )
    }
    XSetErrorHandler( s_errorHandler );
    hb_xvt_gtMouseInit( wnd );
+
+   /* set atom identifiers for atom names we will use */
+   s_atomDelWin     = XInternAtom( wnd->dpy, "WM_DELETE_WINDOW", True );
+   s_atomString     = XInternAtom( wnd->dpy, "STRING", False );
+   s_atomUTF8String = XInternAtom( wnd->dpy, "UTF8_STRING", False );
+   s_atomPrimary    = XInternAtom( wnd->dpy, "PRIMARY", False );
+   s_atomTargets    = XInternAtom( wnd->dpy, "TARGETS", False );
+   s_atomCutBuffer0 = XInternAtom( wnd->dpy, "CUT_BUFFER0", False );
+
    return TRUE;
 }
 
@@ -2946,6 +3185,9 @@ static void hb_xvt_gtDestroyWndDef( PXWND_DEF wnd )
 */
    if ( wnd->pCurr )
       hb_xfree( wnd->pCurr );
+   if( wnd->ClipboardData )
+      hb_xfree( wnd->ClipboardData );
+
    hb_xfree( wnd );
 }
 
@@ -3019,6 +3261,9 @@ static void hb_xvt_gtCreateWindow( PXWND_DEF wnd )
    xsize.base_width = wnd->width;
    xsize.base_height = wnd->height;
    XSetWMNormalHints( wnd->dpy, wnd->window, &xsize );
+
+   /* Request WM to deliver destroy event */
+   XSetWMProtocols( wnd->dpy, wnd->window, &s_atomDelWin, 1 );
 }
 
 /* *********************************************************************** */
@@ -3861,7 +4106,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
       milliseconds is * 1000.0 / 18.2. */
    dDuration /= 18.2;
 
-   if ( s_wnd->dpy != NULL )
+   if( s_wnd->dpy != NULL )
    {
       XkbCtrl.bell_pitch = (int) dFrequency;
       XkbCtrl.bell_duration = (int) (dDuration * 1000);
@@ -3869,6 +4114,7 @@ void HB_GT_FUNC(gt_Tone( double dFrequency, double dDuration ))
       XBell( s_wnd->dpy, 0 );
    }
    hb_idleSleep( dDuration );
+   hb_xvt_gtRefreshLate();
 }
 
 /* *********************************************************************** */
@@ -4143,19 +4389,48 @@ int HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam ) 
       case GTI_VIEWMAXHEIGHT:
          iRet = _GetScreenHeight();
          break;
-      case GTI_XCURSORCOLOR1:
-         s_cursorColor1 = iParam;
-         break;
-      case GTI_XCURSORCOLOR2:
-         s_cursorColor2 = iParam;
-         break;
-      case GTI_XCURSORBLINKRATE:
-         s_cursorBlinkRate = iParam;
-         break;
 
+      case GTI_CURSORBLINKRATE:
+         iRet = s_cursorBlinkRate;
+         if ( bUpdate )
+            s_cursorBlinkRate = iParam;
+         break;
    }
 
    return iRet;
+}
+
+/* *********************************************************************** */
+
+void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) )
+{
+   hb_xvt_gtRefresh();
+   hb_xvt_gtRequestSelection( s_wnd );
+
+   if( *pulMaxSize == 0 || s_wnd->ClipboardSize < *pulMaxSize )
+   {
+      *pulMaxSize = s_wnd->ClipboardSize;
+   }
+
+   if( *pulMaxSize != 0 )
+   {
+      memcpy( szData, s_wnd->ClipboardData, *pulMaxSize );
+   }
+}
+
+void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) )
+{
+   hb_xvt_gtRefresh();
+   hb_xvt_gtSetSelection( s_wnd, szData, ulSize );
+   hb_xvt_gtRefresh();
+}
+
+ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
+{
+   hb_xvt_gtRefresh();
+   hb_xvt_gtRequestSelection( s_wnd );
+
+   return s_wnd->ClipboardSize;
 }
 
 /* *********************************************************************** */
@@ -4297,11 +4572,11 @@ static void HB_GT_FUNC(gtFnInit( PHB_GT_FUNCS gt_funcs ))
     gt_funcs->info                  = HB_GT_FUNC( gt_info );
     gt_funcs->SetDispCP             = HB_GT_FUNC( gt_SetDispCP );
     gt_funcs->SetKeyCP              = HB_GT_FUNC( gt_SetKeyCP );
-/*
+
     gt_funcs->SetClipboard          = HB_GT_FUNC( gt_SetClipboard );
     gt_funcs->GetClipboard          = HB_GT_FUNC( gt_GetClipboard );
     gt_funcs->GetClipboardSize      = HB_GT_FUNC( gt_GetClipboardSize );
-*/
+
     gt_funcs->ProcessMessages       = HB_GT_FUNC( gt_ProcessMessages );
 
     /* Graphics API */

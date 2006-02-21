@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.31 2005/10/04 02:05:32 druzus Exp $
+ * $Id: hbver.c,v 1.32 2005/10/04 20:06:09 druzus Exp $
  */
 
 /*
@@ -87,9 +87,6 @@
    #include <sys/utsname.h>
 
 #endif
-
-char *hb_credits( void );
-static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut );
 
 #include <time.h>
 
@@ -659,6 +656,14 @@ char * hb_verPCode( void )
 
 }
 
+static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut )
+{
+   if( bOut )
+   {
+      hb_conOutErr( szText, ulLen );
+   }
+}
+
 char *hb_verBuildInfo( BOOL bOut )
 {
    char *szBuildInfo = (char*) hb_xgrab(1024);  // Should be enough IMO
@@ -892,19 +897,10 @@ char *hb_verBuildInfo( BOOL bOut )
    hb_conOutErr_( "Off", 0, bOut );
    hb_xstrcat( szBuildInfo, "no", "\t", NULL );
 #endif
-#if 0
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    hb_conOutErr_( "Memory tracing and statistics: ", 0, bOut );
    hb_conOutErr_( hb_xquery( HB_MEM_USEDMAX ) != 0 ? "On" : "Off", 0, bOut );
-#endif
-/*
-#if defined( HB_FM_STATISTICS )
-   hb_conOutErr_( "On", 0, bOut );
-#else
-   hb_conOutErr_( "Off", 0, bOut );
-#endif
-*/
    hb_conOutErr_( hb_conNewLine(), 0, bOut );
 
    {
@@ -931,14 +927,6 @@ char * hb_builddate()
    hb_xstrcat( sz_Date,  __DATE__," ", __TIME__, NULL );
 
    return  sz_Date;
-}
-
-static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut )
-{
-   if( bOut )
-   {
-      hb_conOutErr( szText, ulLen );
-   }
 }
 
 char *hb_credits()

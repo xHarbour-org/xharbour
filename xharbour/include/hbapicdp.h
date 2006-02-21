@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.18 2005/01/03 16:59:15 ronpinkas Exp $
+ * $Id: hbapicdp.h,v 1.19 2005/11/19 15:52:04 likewolf Exp $
  */
 
 /*
@@ -111,20 +111,23 @@ typedef struct _HB_CODEPAGE
    PHB_MULTICHAR  multi;
 } HB_CODEPAGE, * PHB_CODEPAGE;
 
-extern BOOL HB_EXPORT hb_cdpRegister( PHB_CODEPAGE );
-HB_EXPORT extern char * hb_cdpSelectID( char * );
-extern PHB_CODEPAGE HB_EXPORT hb_cdpSelect( PHB_CODEPAGE );
-extern PHB_CODEPAGE HB_EXPORT hb_cdpFind( char * );
-extern void HB_EXPORT hb_cdpTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE );
-extern void HB_EXPORT hb_cdpnTranslate( char*, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
-extern int HB_EXPORT hb_cdpcmp( char*, char*, ULONG, PHB_CODEPAGE, ULONG* );
-extern int HB_EXPORT hb_cdpchrcmp( char, char, PHB_CODEPAGE );
-extern void HB_EXPORT hb_cdpReleaseAll( void );
-
-extern USHORT HB_EXPORT hb_cdpGetU16( PHB_CODEPAGE, BYTE );
-extern BOOL HB_EXPORT hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * uc );
-extern ULONG HB_EXPORT hb_cdpStrnToUTF( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
-extern ULONG HB_EXPORT hb_cdpStrnToU16( PHB_CODEPAGE, BYTE*, ULONG, BYTE* );
+extern HB_EXPORT BOOL          hb_cdpRegister( PHB_CODEPAGE );
+extern HB_EXPORT char *        hb_cdpSelectID( char * );
+extern HB_EXPORT PHB_CODEPAGE  hb_cdpSelect( PHB_CODEPAGE );
+extern HB_EXPORT PHB_CODEPAGE  hb_cdpFind( char * );
+extern HB_EXPORT void          hb_cdpTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, unsigned int );
+extern HB_EXPORT int           hb_cdpcmp( char*, char *, ULONG, PHB_CODEPAGE, ULONG * );
+extern HB_EXPORT int           hb_cdpchrcmp( char, char, PHB_CODEPAGE );
+extern HB_EXPORT void          hb_cdpReleaseAll( void );
+       
+extern HB_EXPORT USHORT        hb_cdpGetU16( PHB_CODEPAGE, BYTE );
+extern HB_EXPORT BOOL          hb_cdpGetFromUTF8( PHB_CODEPAGE, BYTE ch, int *, USHORT * );
+extern HB_EXPORT ULONG         hb_cdpStrnToUTF8( PHB_CODEPAGE, BYTE *, ULONG, BYTE * );
+extern HB_EXPORT ULONG         hb_cdpStrnToU16( PHB_CODEPAGE, BYTE *, ULONG, BYTE * );
+extern HB_EXPORT ULONG         hb_cdpUTF8StringLength( BYTE *, ULONG );
+extern HB_EXPORT ULONG         hb_cdpStringInUTF8Length( PHB_CODEPAGE, BYTE *, ULONG );
+extern HB_EXPORT ULONG         hb_cdpUTF8ToStrn( PHB_CODEPAGE, BYTE *, ULONG, BYTE *, ULONG );
 
 extern PHB_CODEPAGE hb_cdp_page;
 

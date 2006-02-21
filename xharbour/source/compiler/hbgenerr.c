@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.21 2005/03/30 21:30:00 andijahja Exp $
+ * $Id: hbgenerr.c,v 1.22 2005/11/12 18:47:30 druzus Exp $
  */
 
 /*
@@ -96,7 +96,9 @@ char * hb_comp_szErrors[] =
    "Illegal character \'%s\'.",
    "Can't create preprocessed tracing file: \'%s\'",
    "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP",
-   "Unterminated /* */ comment"
+   "Unterminated /* */ comment",
+   "Memory buffer overflow",
+   "Memory corruption detected"   
 };
 
 /* Table with parse warnings */

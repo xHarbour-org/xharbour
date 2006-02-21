@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2005/02/18 21:20:04 druzus Exp $
+# $Id: Makefile,v 1.5 2005/10/04 02:05:32 druzus Exp $
 #
 
 ROOT = ../../
@@ -13,9 +13,6 @@ PRG_HEADERS=\
 	ads.ch \
 
 LIBNAME=rddads
-ifneq ($(HB_ARCHITECTURE),dos)
-MT_LIBNAME=rddadsmt
-endif
 
 ifeq ($(HB_ARCHITECTURE),w32)
   C_USR += -DWIN32
