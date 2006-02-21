@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4824 2006/02/17 01:56:26 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.4825 2006/02/17 18:52:02 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-21 17:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/harbour.sly
+    ! Don't suppress line number generation after RETURN statements.
+      This fixes code like:
+          CASE <expr>
+            RETURN
+          CASE 1 == NIL /* wrong lineno in error msg */
 
 2006-02-17 16:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * make_pc.bat

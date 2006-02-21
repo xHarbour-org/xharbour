@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.97 2006/02/13 23:10:23 druzus Exp $
+ * $Id: harbour.sly,v 1.98 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -426,7 +426,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_NO_RETURN_VALUE, NULL, NULL );
                         }
                         hb_comp_functions.pLast->bFlags |= FUN_WITH_RETURN;
-                        hb_comp_bDontGenLineNum = TRUE;
+                        hb_comp_bDontGenLineNum = FALSE;
                         hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE;
                      }
            | RETURN  {  hb_compLinePushIfInside(); hb_comp_cVarType = ' '; }
@@ -450,7 +450,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         }
 
                         hb_comp_functions.pLast->bFlags |= FUN_WITH_RETURN;
-                        hb_comp_bDontGenLineNum = TRUE;
+                        hb_comp_bDontGenLineNum = FALSE;
                         hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE;
                      }
            | PUBLIC { hb_compLinePushIfInside(); hb_comp_iVarScope = VS_PUBLIC; }
