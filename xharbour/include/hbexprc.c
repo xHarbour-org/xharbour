@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.16 2005/07/17 01:59:56 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.17 2005/11/03 06:54:58 ronpinkas Exp $
  */
 
 /*
@@ -216,22 +216,21 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       {
          int iIncrement, iLocal;
 
-         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
+             pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
          {
+            iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+            if( bOpEq == HB_P_MINUS )
+            {
+               iIncrement = -iIncrement;
+            }
+
             if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-                   pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
-                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
-                   pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+               if( pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                {
-                  iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-
-                  if( bOpEq == HB_P_MINUS )
-                  {
-                     iIncrement = -iIncrement;
-                  }
-
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
                   HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
@@ -249,6 +248,23 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
                   return;
                }
+            }
+            else
+            {
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement )
+               {
+                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
+
+               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
+
+               /* pop the new value into variable and leave the copy on the stack */
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+               return;
             }
          }
       }
@@ -366,23 +382,21 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       {
          int iIncrement, iLocal;
 
-         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
+             pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
          {
+            iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
+
+            if( bOpEq == HB_P_MINUS )
+            {
+               iIncrement = -iIncrement;
+            }
+
             if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
             {
-               if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-                   pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
-                   pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
-                   pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
-
+               if( pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                {
-                  iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
-
-                  if( bOpEq == HB_P_MINUS )
-                  {
-                     iIncrement = -iIncrement;
-                  }
-
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
                   return;
@@ -396,6 +410,21 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
                   return;
                }
+            }
+            else
+            {
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement )
+               {
+                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
+
+               /* pop the new value into variable and leave the copy on the stack */
+               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+               return;
             }
          }
       }

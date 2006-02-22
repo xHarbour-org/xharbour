@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.113 2006/02/13 23:10:23 druzus Exp $
+ * $Id: genc.c,v 1.114 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -3002,25 +3002,7 @@ static HB_GENC_FUNC( hb_p_addint )
 
    if( cargo->bVerbose )
    {
-      int iVar = (int) (signed char) pFunc->pCode[ lPCodePos + 2 ];
-
-      if( cargo->iNestedCodeblock )
-      {
-         /* we are accesing variables within a codeblock */
-         /* the names of codeblock variable are lost     */
-         if( iVar < 0 )
-         {
-            fprintf( cargo->yyc, "\t/* localvar%i */", -iVar );
-         }
-         else
-         {
-            fprintf( cargo->yyc, "\t/* codeblockvar%i */", iVar );
-         }
-      }
-      else
-      {
-         fprintf( cargo->yyc, "\t/* %i*/", iVar );
-      }
+      fprintf( cargo->yyc, "\t/* %i*/", HB_PCODE_MKSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
    }
 
    fprintf( cargo->yyc, "\n" );
