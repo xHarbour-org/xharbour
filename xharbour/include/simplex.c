@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.16 2005/03/02 05:03:01 ronpinkas Exp $
+ * $Id: simplex.c,v 1.17 2005/03/18 05:24:40 ronpinkas Exp $
  */
 
 /*
@@ -85,16 +85,16 @@
 #define STREAM_EXCEPTION( sPair, chrPair) \
         if( chrPair ) \
         { \
-           printf(  "Exception: %c for stream at: \"%s\"\n", chrPair, (char *) sPair ); \
+           printf(  "Exception: %c for stream at: \"%s\"\n", chrPair, sPair ); \
         } \
         else \
         { \
-           printf(  "Exception: <EOF> for stream at: \"%s\"\n", chrPair, (char *) sPair ); \
+           printf(  "Exception: <EOF> for stream at: \"%s\"\n", chrPair, sPair ); \
         } \
 
 /* Pairs. */
-#ifndef MAX_STREAM
-   #define MAX_STREAM 2048
+#ifndef STREAM_ALLOC_SIZE
+   #define STREAM_ALLOC_SIZE 2048
 #endif
 #ifndef MAX_STREAM_STARTER
    #define MAX_STREAM_STARTER 2
@@ -113,7 +113,7 @@
 static char sToken[TOKEN_SIZE];
 static char szLexBuffer[ YY_BUF_SIZE ];
 
-static char sPair[ MAX_STREAM ];
+static char * sPair = NULL;
 static char * sStart, * sTerm;
 static char * sExclude;
 
@@ -121,6 +121,7 @@ static BOOL bTestLeft;
 static BOOL bIgnoreWords = FALSE;
 
 static int iPairToken = 0;
+static int iPairAllocated = 0;
 
 /* Self Contained Words. */
 static char sSelf[ TOKEN_SIZE ];
@@ -662,7 +663,19 @@ int SimpLex_GetNextToken( void )
                   /* Look for the terminator. */
                   while( *szBuffer )
                   {
-                     if( iSize <= 0 || iPairLen >= MAX_STREAM )
+                     if( iPairLen + 1 == iPairAllocated )
+                     {
+                        if( iPairAllocated )
+                        {
+                           sPair = (char *) realloc( sPair, ( iPairAllocated += STREAM_ALLOC_SIZE ) );
+                        }
+                        else
+                        {
+                           sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
+                        }
+                     }
+
+                     if( iSize <= 0 )
                      {
                         int iRet = iPairToken;
 

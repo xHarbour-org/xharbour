@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.70 2005/06/01 02:09:27 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.71 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -659,10 +659,20 @@ LANGUAGE_RULES_ARE {
          \
          if( sClose ) \
          { \
+            int iLen; \
+            \
             szBuffer--; iSize++; \
             \
-            strncpy( sPair, szBuffer, sClose - szBuffer ); \
-            sPair[ sClose - szBuffer ] = '\0'; \
+            iLen = sClose - szBuffer; \
+            \
+            if( iLen > iPairAllocated )\
+            { \
+               sPair = (char *) realloc( sPair, iLen + 1 ); \
+               iPairAllocated = iLen + 1; \
+            } \
+            \
+            strncpy( sPair, szBuffer, iLen ); \
+            sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
             iSize -= s_szBuffer - szBuffer; \
             yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
