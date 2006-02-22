@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.163 2006/01/14 17:46:15 paultucker Exp $
+# $Id: makefile.vc,v 1.164 2006/02/14 00:38:54 ath1 Exp $
 #
 
 #
@@ -1650,7 +1650,9 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c \
-   $(COMPILER_DIR)\calconst.c
+   $(COMPILER_DIR)\calconst.c \
+   $(COMPILER_DIR)\hbdead.c \
+   $(COMPILER_DIR)\hbstripl.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
