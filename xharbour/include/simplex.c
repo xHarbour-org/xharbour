@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.17 2005/03/18 05:24:40 ronpinkas Exp $
+ * $Id: simplex.c,v 1.18 2006/02/22 03:30:11 ronpinkas Exp $
  */
 
 /*
@@ -663,7 +663,7 @@ int SimpLex_GetNextToken( void )
                   /* Look for the terminator. */
                   while( *szBuffer )
                   {
-                     if( iPairLen + 1 == iPairAllocated )
+                     if( iPairLen + 1 >= iPairAllocated )
                      {
                         if( iPairAllocated )
                         {
