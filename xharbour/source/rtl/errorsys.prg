@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.50 2005/10/31 07:46:20 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.51 2006/01/17 00:47:09 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,11 @@ STATIC FUNCTION DefError( oError )
         Neterr( .T. )
         Return .F.
      Endif
+
+     // Making sure we display the error info!
+     DO WHILE DispCount() > 0
+        DispEnd()
+     ENDDO
 
      cMessage := ErrorMessage( oError )
      If !Empty( oError:osCode )

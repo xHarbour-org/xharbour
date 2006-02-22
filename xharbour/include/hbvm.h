@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.35 2005/10/31 12:56:35 druzus Exp $
+ * $Id: hbvm.h,v 1.36 2006/01/18 23:44:03 likewolf Exp $
  */
 
 /*
@@ -101,6 +101,7 @@ extern void    HB_EXPORT hb_vmRequestEndProc( void );
 extern USHORT  HB_EXPORT hb_vmRequestQuery( void );
 extern void    HB_EXPORT hb_vmRequestQuit( void );
 extern void    HB_EXPORT hb_vmRequestReset( void );
+extern void    HB_EXPORT hb_vmRequest( USHORT );
 
 /* Return values of hb_vmRequestQuery() */
 #define HB_QUIT_REQUESTED       1   /* immediately quit the application */

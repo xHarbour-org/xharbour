@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.546 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: hvm.c,v 1.547 2006/02/12 00:11:07 ronpinkas Exp $
  */
 
 /*
@@ -9248,6 +9248,14 @@ void HB_EXPORT hb_vmRequestReset( void )
    s_uiActionRequest = 0;
 }
 
+void HB_EXPORT hb_vmRequest( USHORT uiRequest )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmRequest()"));
+
+   s_uiActionRequest = uiRequest;
+}
 
 /* ------------------------------ */
 /* The debugger support functions */

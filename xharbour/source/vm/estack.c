@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.80 2005/10/24 01:04:36 druzus Exp $
+ * $Id: estack.c,v 1.81 2005/10/24 01:23:16 ronpinkas Exp $
  */
 
 /*
@@ -306,8 +306,12 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
    int iLocal;
    PHB_ITEM pDetached;
+   USHORT uiRequest;
 
    HB_THREAD_STUB
+
+   uiRequest = hb_vmRequestQuery();
+   hb_vmRequestReset();
 
    while( HB_VM_STACK.pPos > HB_VM_STACK.pBase )
    {
@@ -345,6 +349,8 @@ void hb_stackOldFrame( HB_STACK_STATE * pStack )
 
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;
    HB_VM_STACK.iStatics = pStack->iStatics;
+
+   hb_vmRequest( uiRequest );
 }
 
 #undef hb_stackTopOffset
