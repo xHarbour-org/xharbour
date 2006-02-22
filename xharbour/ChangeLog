@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4834 2006/02/22 14:46:08 likewolf Exp $
+ * $Id: ChangeLog,v 1.4835 2006/02/22 14:55:24 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-22 13:06 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/compiler/genc.c
+    * Fixed minor bug in verbosity of HB_P_ADDINT
+
+  * include/hbexprc.c
+    + Optimized <NonLocalVar> += <Num> and <NonLocalVar> -= <Num> to use HB_P_ADDINT
+
+  * source/vm/hvm.c
+    * Revised HB_P_LOCALNEARADDINT, HB_P_ADDINT, HB_P_PLUS, and HB_P_MINUS
+      to return CHARACTER type if *left* argument is a CHAR
+
+  /*
+     Please review #if and comment/questions
+     in line 3981 of hvm.c (hb_vmPlus()
+   */
 
 2006-02-22 17:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/debugger.prg
