@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.81 2005/10/24 01:23:16 ronpinkas Exp $
+ * $Id: estack.c,v 1.82 2006/02/22 01:33:49 ronpinkas Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
 #include "hbapiitm.h"
 #include "hbfast.h"
 #include "hbapierr.h"
+#include "hbvm.h"
 
 HB_EXTERN_BEGIN
 
