@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.69 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: debugger.prg,v 1.70 2006/01/20 09:14:01 likewolf Exp $
  */
 
 /*
@@ -3200,53 +3200,26 @@ RETURN
 
 
 STATIC FUNCTION IsValidStopLine( cLine )
-  LOCAL i, c, c2
+  LOCAL i
+  STATIC aNonStop := { "ELSE", "ENDCASE", "ENDDO", "ENDIF", "FIELD", ;
+                       "FUNCTION", "LOCAL", "MEMVAR", "NEXT", "PROCEDURE", ;
+                       "STATIC" }
 
-  cLine := UPPER( ALLTRIM( cLine ) )
-  i := 1
-  DO WHILE i <= LEN(cLine)
-    c := SUBSTR( cLine, i, 1 )
-    c2 := SUBSTR( cLine, i, 2 )
-    DO CASE
-      CASE c == '"'
-        StripUntil( @cLine, i, c )
-
-      CASE c == "'"
-        StripUntil( @cLine, i, c )
-
-      CASE c == "["
-        StripUntil( @cLine, i, "]" )
-
-      CASE c2 == "//"
-        cLine := LEFT( cLine, i-1 )
-
-      CASE c2 == "/*"
-        StripUntil( @cLine, i, "*/" )
-
-      OTHERWISE
-        i++
-    ENDCASE
+  DO WHILE ( i := At( "/*", cLine ) ) > 0
+    StripUntil( @cLine, i, "*/" )
   ENDDO
-
   cLine := ALLTRIM( cLine )
-  IF EMPTY(cLine)
+  i := 1
+  DO WHILE i <= Len( cLine ) .AND. IsAlpha( cLine[ i ] )
+    i++
+  ENDDO
+  cLine := Upper( Left( cLine, i - 1 ) )
+  IF EMPTY(cLine) .OR. cLine == "END"
     RETURN .F.
+  ELSEIF Len( cLine ) < 4 .OR. Len( cLine ) > 9
+    RETURN .T.
   ENDIF
-
-  c := Left( cLine, 4 )
-  IF ( Left( c, 3 ) == 'END' .OR.;
-       c == 'FUNC' .OR.;
-       c == 'PROC' .OR.;
-       c == 'NEXT' .OR.;
-       c == 'ELSE' .OR.;
-       c == 'LOCA' .OR.;
-       c == 'STAT' .OR.;
-       c == 'MEMV' )
-
-    RETURN .F.
-  ENDIF
-
-RETURN .T.
+RETURN ( AScan( aNonStop, {|x| starts( x, cLine ) } ) == 0 )
 
 
 function __DbgColors()
