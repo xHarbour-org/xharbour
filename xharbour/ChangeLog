@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4829 2006/02/22 01:33:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4830 2006/02/22 03:30:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -13,12 +13,12 @@
     * Removed support for MAX_STREAM in favor of new STREAM_SIZE_ALLOC
     * Improved sPair to use malloc()/realloc() instead of fixed size stack memory
 
-  * source/macro/macro.slx
+  * source/compiler/hbslex.c
   * source/macro/macroslx.c
     - Removed no longer supported MAX_STREAM
 
   * source/compiler/harbour.slx
-  * source/compiler/hbslex.c
+  * source/macro/macro.slx
     * Fixed GPF trap in STREAM_APPEND()
 
 2006-02-21 17:33 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
