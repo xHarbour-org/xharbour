@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4831 2006/02/22 03:34:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4832 2006/02/22 04:08:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2006-02-21 20:08 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
-  * makefile.pc
+  * makefile.vc
     + Added hbdead.c and hbstripl.c to harbour.exe generation.
 
 2006-02-21 19:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
