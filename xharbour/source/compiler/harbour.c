@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.118 2006/02/15 19:33:04 druzus Exp $
+ * $Id: harbour.c,v 1.119 2006/02/21 19:37:07 druzus Exp $
  */
 
 /*
@@ -298,7 +298,7 @@ int main( int argc, char * argv[] )
    hb_comp_pOutPath = NULL;
 #if defined( HOST_OS_UNIX_COMPATIBLE )
    hb_comp_errFile = stderr;
-#else 
+#else
    hb_comp_errFile = stdout;
 #endif
 
@@ -393,7 +393,7 @@ int main( int argc, char * argv[] )
    hb_xfree( hb_Command_Line );
 
    hb_pp_Free();
-   
+
    hb_compIdentifierClose();
    if( hb_comp_pIncludePath )
    {
@@ -1338,7 +1338,7 @@ void hb_compGenGlobalName( char *szVarName )
       int iVarLen = strlen( szVarName );
 
       hb_compGlobalsDefStart();
-      
+
       iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
 
       pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
@@ -3869,7 +3869,14 @@ void hb_compGenPushAliasedVar( char * szVarName,
           */
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
          {  /* M->variable */
-            hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+            if( lWorkarea == -1 )
+            {
+               hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
+            }
+            else
+            {
+               hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+            }
          }
          else
          {
@@ -3882,7 +3889,14 @@ void hb_compGenPushAliasedVar( char * szVarName,
 
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+               if( lWorkarea == -1 )
+               {
+                  hb_compGenVarPCode( HB_P_PUSHMEMVARREF, szVarName );
+               }
+               else
+               {
+                  hb_compGenVarPCode( HB_P_PUSHMEMVAR, szVarName );
+               }
             }
             else
             {  /* field variable */

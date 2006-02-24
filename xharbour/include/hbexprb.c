@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.106 2005/11/03 06:54:57 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.107 2005/12/03 05:21:02 ronpinkas Exp $
  */
 
 /*
@@ -1156,6 +1156,8 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
       case HB_EA_PUSH_PCODE:
          {
+            BOOL bRemoveAlias = FALSE;
+
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
             {
                #if defined( HB_MACRO_SUPPORT )
@@ -1167,6 +1169,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   {
                      // Force MEMVAR context.
                      pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_strdup( "MEMVAR" ) ), pSelf->value.asList.pExprList );
+                     bRemoveAlias = TRUE;
                   }
                #else
                   if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
@@ -1191,11 +1194,23 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
                      // Force MEMVAR context.
                      pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_compIdentifierNew( "MEMVAR", TRUE ) ), pSelf->value.asList.pExprList );
+                     bRemoveAlias = TRUE;
                   }
                #endif
             }
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
+
+            if( bRemoveAlias )
+            {
+               HB_EXPR_PTR pDelete = pSelf->value.asList.pExprList;
+
+               pSelf->value.asList.pExprList = pSelf->value.asList.pExprList->value.asAlias.pVar;
+
+               pDelete->value.asAlias.pVar = NULL;
+
+               HB_EXPR_PCODE1( hb_compExprDelete, pDelete );
+            }
 
          #ifndef HB_C52_STRICT
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
@@ -1251,7 +1266,26 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             BOOL bRemoveRef = FALSE;
 
             /* Force to BYREF incase it's a STRING used as an Array - Real arrays are always BYREF anyway. */
-            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_ALIASVAR )
+            {
+               char *szAlias = pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol;
+               int iCmp = strncmp( szAlias, "MEMVAR", 4 );
+
+               if( iCmp == 0 )
+               {
+                  iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
+               }
+
+               if( iCmp == 0 || ( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' ) )
+               {
+                  if( pSelf->value.asList.pExprList->value.asAlias.pVar->ExprType == HB_ET_VARIABLE )
+                  {
+                     pSelf->value.asList.pExprList->value.asAlias.pVar->ExprType = HB_ET_VARREF;
+                     bRemoveRef = TRUE;
+                  }
+               }
+            }
+            else if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
             {
                pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
                bRemoveRef = TRUE;
@@ -1260,36 +1294,6 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             {
                pSelf->value.asList.pExprList->value.asMessage.bByRef = TRUE;
             }
-/***************** Removed (Henryk Olkowski 17.06.2005) **********************************
-       //   Compile: harbour test.prg /w4/A/GC0/M/N/W/Q0/ES2
-       //      procedure test()
-       //      m->alfa[1]:=1  //  Warning W0001  Ambiguous reference: 'ALFA'
-       //      return
-       //
-            else if( pSelf->value.asList.pExprList->ExprType == HB_ET_ALIASVAR )
-            {
-               int iCmpLen = strlen( pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol );
-
-               if( iCmpLen > 1 && iCmpLen < 4 )
-               {
-                 iCmpLen = 4;
-               }
-
-               if( strncmp( pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol, "MEMVAR", iCmpLen ) == 0 )
-               {
-                  HB_EXPR_PTR pDelete = pSelf->value.asList.pExprList;
-
-                  pSelf->value.asList.pExprList = pSelf->value.asList.pExprList->value.asAlias.pVar;
-
-                  pDelete->value.asAlias.pVar = NULL;
-
-                  HB_EXPR_PCODE1( hb_compExprDelete, pDelete );
-
-                  pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
-                  bRemoveRef = TRUE;
-               }
-            }
-*****************************************************************************/
          #endif
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
@@ -1335,7 +1339,14 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
          #ifndef HB_C52_STRICT
             if( bRemoveRef )
             {
-               pSelf->value.asList.pExprList->ExprType = HB_ET_VARIABLE;
+               if( pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF )
+               {
+                  pSelf->value.asList.pExprList->ExprType = HB_ET_VARIABLE;
+               }
+               else
+               {
+                  pSelf->value.asList.pExprList->value.asAlias.pVar->ExprType = HB_ET_VARIABLE;
+               }
             }
          #endif
          }
@@ -2311,8 +2322,16 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * MEMVAR->var
                 *
                 * NOTE: TRUE = push also alias
+                * NOTE: -1 is a special hack indicating a BYREF!
                 */
-                HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, 0 );
+                if( pSelf->value.asAlias.pVar->ExprType == HB_ET_VARREF )
+                {
+                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, -1 );
+                }
+                else
+                {
+                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, 0 );
+                }
             }
             else if( pAlias->ExprType == HB_ET_NUMERIC )
             {

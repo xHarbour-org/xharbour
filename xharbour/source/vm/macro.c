@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.61 2005/12/03 05:21:02 ronpinkas Exp $
+ * $Id: macro.c,v 1.62 2005/12/16 16:52:22 ronpinkas Exp $
  */
 
 /*
@@ -1662,24 +1662,48 @@ void hb_compGenPushAliasedVar( char * szVarName,
          */
          if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
          {  /* M->variable */
-            hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+            if( lWorkarea == -1 )
+            {
+               hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
+            }
+            else
+            {
+               hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+            }
+
             hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
          }
          else
          {
             int iCmp = strncmp( szAlias, "MEMVAR", 4 );
+
             if( iCmp == 0 )
-                  iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
+            {
+               iCmp = strncmp( szAlias, "MEMVAR", strlen( szAlias ) );
+            }
+
             if( iCmp == 0 )
             {  /* MEMVAR-> or MEMVA-> or MEMV-> */
-               hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+               if( lWorkarea == -1 )
+               {
+                  hb_compMemvarGenPCode( HB_P_MPUSHMEMVARREF, szVarName, HB_MACRO_PARAM );
+               }
+               else
+               {
+                  hb_compMemvarGenPCode( HB_P_MPUSHMEMVAR, szVarName, HB_MACRO_PARAM );
+               }
+
                hb_compMemvarCheck( szVarName, HB_MACRO_PARAM );
             }
             else
             {  /* field variable */
                iCmp = strncmp( szAlias, "FIELD", 4 );
+
                if( iCmp == 0 )
+               {
                   iCmp = strncmp( szAlias, "FIELD", strlen( szAlias ) );
+               }
+
                if( iCmp == 0 )
                {  /* FIELD-> */
                   hb_compMemvarGenPCode( HB_P_MPUSHFIELD, szVarName, HB_MACRO_PARAM );
