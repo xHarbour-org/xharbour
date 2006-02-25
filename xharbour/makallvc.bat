@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: makallvc.bat,v 1.18 2005/10/06 05:48:09 marcosgambeta Exp $
+rem $Id: makallvc.bat,v 1.19 2006/01/21 00:55:19 fsgiudice Exp $
 rem
 
 echo creating system files
@@ -17,6 +17,20 @@ rem cd contrib\firebird
 rem if exist make_vc.bat call make_vc.bat %1
 rem cd ..\..
 rem if errorlevel 1 goto end
+
+:gd
+echo gd
+cd contrib\gd
+call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
+
+:gtwvw
+echo gtwvw
+cd contrib\gtwvw
+call make_vc.bat %1
+cd ..\..
+if errorlevel 1 goto end
 
 :hbzlib
 echo hbzip
@@ -90,11 +104,5 @@ call make_vc.bat %1
 cd ..\..
 if errorlevel 1 goto end
 
-:gd
-echo gd
-cd contrib\gd
-call make_vc.bat %1
-cd ..\..
-if errorlevel 1 goto end
 
 :end

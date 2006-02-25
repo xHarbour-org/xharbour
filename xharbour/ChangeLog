@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4836 2006/02/22 21:07:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4837 2006/02/24 06:15:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-24 15:57 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/samples/bldwvw.bat
+    * Corrected for MSVC support
+
+  + contrib/gtwvw/makefile.vc
+  + contrib/gtwvw/make_vc.bat
+    + MSVC make support
+
+  * makallvc.bat
+    + Added gtwvw
+
+  * bin/bld.bat
+    + Added support for HB_FIRST_LIBS (msvc only at this time)
+      to allow user libs BEFORE xHarbour libs
+    * Minor improvements in default folders by means of an explicit ROOT (HB_INSTALL)
+      BTW, I believe we should stndardize our make procedures, to use consistent names
+      to avoid confusion HB_DIR/HB_INSTALL etc.
 
 2006-02-23 22:15 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/compiler/harbour.c

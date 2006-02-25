@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.59 2005/12/20 07:50:54 paultucker Exp $
+rem $Id: bld.bat,v 1.60 2006/01/14 17:46:15 paultucker Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -24,9 +24,11 @@ rem if "%HB_ARCHITECTURE%" == "" set HB_ARCHITECTURE=dos
 rem if "%HB_COMPILER%" == "" set HB_COMPILER=djgpp
 rem if "%HB_GT_LIB%" == "" set HB_GT_LIB=
 
-if "%HB_BIN_INSTALL%" == "" set HB_BIN_INSTALL=..\bin
-if "%HB_LIB_INSTALL%" == "" set HB_LIB_INSTALL=..\lib
-if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
+if "%HB_INSTALL%" == "" set HB_INSTALL=\xharbour
+
+if "%HB_BIN_INSTALL%" == "" set HB_BIN_INSTALL=%HB_INSTALL%\bin
+if "%HB_LIB_INSTALL%" == "" set HB_LIB_INSTALL=%HB_INSTALL%\lib
+if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
 
 :START
 
@@ -236,8 +238,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if "%HB_MT%" == "" SET BC_MT_FLAG=
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
-   if "%HB_COMPILER%" == "bcc32"   if     exist ..\lib\bcc640%HB_MT%.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640%HB_MT%.lib %HB_LIBLIST%
-   if "%HB_COMPILER%" == "bcc32"   if not exist ..\lib\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%
+   if "%HB_COMPILER%" == "bcc32"   if     exist %HB_LIB_INSTALL%\bcc640%HB_MT%.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% bcc640%HB_MT%.lib %HB_LIBLIST%
+   if "%HB_COMPILER%" == "bcc32"   if not exist %HB_LIB_INSTALL%\bcc640.lib bcc32 %BC_MT_FLAG% -O2 -d %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% %HB_LIBLIST%
    if "%HB_COMPILER%" == "gcc"     gcc %1.c -o%1.exe %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbfntx -ldbfcdx -lcommon -lct -ltip
 
 
@@ -255,8 +257,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    if not "%HB_COMPILER%" == "msvc"  goto C_WATCOM
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
-   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\hsx%HB_MT%.lib %HB_LIB_INSTALL%\hbsix%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct%HB_MT%.lib %HB_LIB_INSTALL%\tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
-   if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
+   if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\debug.lib %HB_LIB_INSTALL%\vm%HB_MT%.lib %HB_LIB_INSTALL%\rtl%HB_MT%.lib %HB_LIB_INSTALL%\pcrepos.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib %HB_LIB_INSTALL%\lang.lib %HB_LIB_INSTALL%\rdd%HB_MT%.lib %HB_LIB_INSTALL%\macro%HB_MT%.lib %HB_LIB_INSTALL%\pp%HB_MT%.lib %HB_LIB_INSTALL%\dbffpt%HB_MT%.lib %HB_LIB_INSTALL%\dbfntx%HB_MT%.lib %HB_LIB_INSTALL%\dbfcdx%HB_MT%.lib %HB_LIB_INSTALL%\hsx%HB_MT%.lib %HB_LIB_INSTALL%\hbsix%HB_MT%.lib %HB_LIB_INSTALL%\common.lib %HB_LIB_INSTALL%\ct%HB_MT%.lib %HB_LIB_INSTALL%\tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS%
+   if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% %HB_LIB_INSTALL%\harbour.lib %HB_LIB_INSTALL%\%_HB_GT_LIB%.lib msvcrt.lib %ADS_LIBS% %HB_USER_LIBS%
 
    if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% %HB_LIB_INSTALL%\hbzip.lib
 
@@ -269,8 +271,9 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
    set _main=std
    if "%HB_GT_LIB%"=="gtwvt" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtwvt" set _main=win
-   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% ..\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib> msvc.log
-        cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% ..\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib>>msvc.log
+   if "%HB_GT_LIB%"=="gtwvw" set _main=win
+   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib> msvc.log
+        cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib>>msvc.log
    set _cons=
    set _main=
    @type msvc.log
@@ -335,7 +338,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=..\include
 
    if "%HB_GT_LIB%" == "" set _HB_GT_LIB=gtstd
 
-   if "%HB_COMPILER%" == "gcc" gcc %1.c %CFLAGS% -I%HB_INC_INSTALL% -L../lib -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbffpt -ldbfntx -ldbfcdx -lcommon -lct -ltip
+   if "%HB_COMPILER%" == "gcc" gcc %1.c %CFLAGS% -I%HB_INC_INSTALL% -L%HB_LIB_INSTALL% -ldebug -lvm -lrtl -l%_HB_GT_LIB% -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbffpt -ldbffpt -ldbfntx -ldbfcdx -lcommon -lct -ltip
    goto END
 
 :CLEANUP

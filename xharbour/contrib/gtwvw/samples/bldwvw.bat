@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldwvw.bat
 rem *
-rem * $Id: bldwvw.bat,v 1.2 2004/01/07 20:30:47 fsgiudice Exp $
+rem * $Id: bldwvw.bat,v 1.1 2004/10/28 07:48:17 bdj Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -23,15 +23,17 @@ set OLDENVMT=%HB_MT%
 set OLDHB_GT_LIB=%HB_GT_LIB%
 set OLDCFLAGS=%CFLAGS%
 
-set HB_ARCHITECTURE=w32
-set HB_COMPILER=bcc32
-set HB_INSTALL=..\..\..
+REM set HB_ARCHITECTURE=w32
+REM set HB_COMPILER=bcc32
+
+if "%HB_INSTALL%" == "" set HB_INSTALL=..\..\..
 SET HB_BIN_INSTALL=%HB_INSTALL%\bin
 set HB_INC_INSTALL=%HB_INSTALL%\include
 set HB_LIB_INSTALL=%HB_INSTALL%\lib
 set HB_ZIP_LIB=
 set HB_GT_LIB=gtwvw
-set CFLAGS=-W
+
+REM set CFLAGS=-W
 
 rem Check help request
 IF %1.==/?. GOTO SHOWHELP

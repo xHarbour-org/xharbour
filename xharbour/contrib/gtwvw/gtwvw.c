@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.35 2006/01/19 16:24:39 bdj Exp $
+ * $Id: gtwvw.c,v 1.36 2006/02/03 01:33:58 andijahja Exp $
  */
 
 /*
@@ -87,6 +87,8 @@
 *         Cross-GT, multiplatform Graphics API
 *
 */
+
+#include <stdlib.h>
 
 #define HB_OS_WIN_32_USED
 
@@ -4536,10 +4538,11 @@ static DWORD hb_wvw_gtProcessMessages( WIN_DATA * pWindowData )
 
     if ( bProcessed == FALSE )
     {
-       TranslateMessage( &msg );
-       DispatchMessage( &msg );
+        TranslateMessage( &msg );
+        DispatchMessage( &msg );
     }
   }
+
   return( msg.wParam );
 
 }
@@ -7370,7 +7373,7 @@ HB_FUNC( WVW_SETDEFLINESPACING )
    BYTE byOldLineSpacing = s_byDefLineSpacing;
 
    if ( !ISNIL(1) && ISNUM( 1 ) && hb_parni(1) >= 0 && hb_parni(1) <= 40 &&  /*nobody is crazy enough to use > 40 */
-        fmod( hb_parni(1), 2 ) == 0 )
+        fmod( hb_parnd(1), 2 ) == 0 )
    {
      s_byDefLineSpacing = hb_parni( 1 );
    }
@@ -7394,7 +7397,7 @@ HB_FUNC( WVW_SETLINESPACING )
    BYTE     byOldLineSpacing = pWindowData->byLineSpacing;
 
    if ( !ISNIL(2) && ISNUM( 2 ) && hb_parni(2) >= 0 && hb_parni(2) <= 40 &&  /*nobody is crazy enough to use > 40 */
-        fmod( hb_parni(2), 2 ) == 0 )
+        fmod( hb_parnd(2), 2 ) == 0 )
    {
       USHORT     height, maxHeight;
       RECT       rcWorkArea = { 0 };
@@ -17152,4 +17155,3 @@ HB_FUNC( WIN_DRAWTEXT )
 
    hb_retl( DrawText( ( HDC ) hb_parnl( 1 ), hb_parc( 2 ), strlen( hb_parc( 2 ) ), &rc, hb_parni( 4 ) ) );
 }
-

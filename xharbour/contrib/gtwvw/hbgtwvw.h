@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.10 2005/10/19 10:58:46 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.11 2005/11/02 17:08:21 bdj Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
    #if defined(_MSC_VER) || defined( __DMC__ )
       #include <conio.h>
 
-      #if !defined( __POCC__ )
+      #if ! defined( _MSC_VER )
 
          #if !defined( LONG_PTR )
             typedef __int64 LONG_PTR ;
