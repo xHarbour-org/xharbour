@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.33 2005/12/08 19:06:12 oh1 Exp $
+ * $Id: tgetlist.prg,v 1.34 2005/12/10 00:33:40 oh1 Exp $
  */
 
 /*
@@ -487,7 +487,7 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
          oGet:DelWordLeft()
          exit
 
-   #ifdef HB_NEW_KCTRL
+   #ifdef HB_EXT_INKEY
 
       case K_CTRL_C
          oGet:Assign()

@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.ch,v 1.14 2004/09/21 02:40:39 paultucker Exp $
+ * $Id: inkey.ch,v 1.15 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -178,7 +178,36 @@
 #define K_CTRL_SH_TAB           423   /* * Ctrl-Shift-Tab                */
 #define K_SH_BS                 423   /* * Shift-Backspace               */
 
-#ifdef HB_EXT_SHIFT_KEYS_CODES
+#ifdef HB_EXT_INKEY
+
+/* New control keys that do not overlap with other codes */
+
+#define K_CTRL_A                513   /*   Ctrl-A                         */
+#define K_CTRL_B                514   /*   Ctrl-B                         */
+#define K_CTRL_C                515   /*   Ctrl-C                         */
+#define K_CTRL_D                516   /*   Ctrl-D                         */
+#define K_CTRL_E                517   /*   Ctrl-E                         */
+#define K_CTRL_F                518   /*   Ctrl-F                         */
+#define K_CTRL_G                519   /*   Ctrl-G                         */
+#define K_CTRL_H                520   /*   Ctrl-H                         */
+#define K_CTRL_I                521   /*   Ctrl-I                         */
+#define K_CTRL_J                522   /*   Ctrl-J                         */
+#define K_CTRL_K                523   /*   Ctrl-K                         */
+#define K_CTRL_L                524   /*   Ctrl-L                         */
+#define K_CTRL_M                525   /*   Ctrl-M                         */
+#define K_CTRL_N                526   /*   Ctrl-N                         */
+#define K_CTRL_O                527   /*   Ctrl-O                         */
+#define K_CTRL_P                528   /*   Ctrl-P                         */
+#define K_CTRL_Q                529   /*   Ctrl-Q                         */
+#define K_CTRL_R                530   /*   Ctrl-R                         */
+#define K_CTRL_S                531   /*   Ctrl-S                         */
+#define K_CTRL_T                532   /*   Ctrl-T                         */
+#define K_CTRL_U                533   /*   Ctrl-U                         */
+#define K_CTRL_V                534   /*   Ctrl-V                         */
+#define K_CTRL_W                535   /*   Ctrl-W                         */
+#define K_CTRL_X                536   /*   Ctrl-X                         */
+#define K_CTRL_Y                537   /*   Ctrl-Y                         */
+#define K_CTRL_Z                538   /*   Ctrl-Z                         */
 
 /* extended shift key codes, none in  Clipper */
 
@@ -198,27 +227,6 @@
 #define K_SH_ENTER              434   /* * Shift-Enter                   */
 
 #else
-
-/* Clipper compatible return values */
-
-#define K_SH_LEFT            K_LEFT   /* * Shift-Left  == Left           */
-#define K_SH_UP              K_UP     /* * Shift-Up    == Up             */
-#define K_SH_RIGHT           K_RIGHT  /* * Shift-Right == Right          */
-#define K_SH_DOWN            K_DOWN   /* * Shift-Down  == Down           */
-
-#define K_SH_INS             K_INS    /* * Shift-Ins   == Ins            */
-#define K_SH_DEL             K_DEL    /* * Shift-Del   == Del            */
-#define K_SH_HOME            K_HOME   /* * Shift-Home  == Home           */
-#define K_SH_END             K_END    /* * Shift-End   == End            */
-#define K_SH_PGUP            K_PGUP   /* * Shift-PgUp  == PgUp           */
-#define K_SH_PGDN            K_PGDN   /* * Shift-PgDn  == PgDn           */
-
-#define K_SH_RETURN          K_RETURN /* * Shift-Enter == Enter          */
-#define K_SH_ENTER           K_ENTER  /* * Shift-Enter == Enter          */
-
-#endif
-
-#ifndef HB_NEW_KCTRL
 
 /* Clipper compatible control keys */
 
@@ -249,36 +257,22 @@
 #define K_CTRL_Y                25    /*   Ctrl-Y                        */
 #define K_CTRL_Z                26    /*   Ctrl-Z, Ctrl-Left arrow       */
 
-#else
+/* Clipper compatible return values */
 
-/* New control keys that do not overlap with other codes */
+#define K_SH_LEFT            K_LEFT   /* * Shift-Left  == Left           */
+#define K_SH_UP              K_UP     /* * Shift-Up    == Up             */
+#define K_SH_RIGHT           K_RIGHT  /* * Shift-Right == Right          */
+#define K_SH_DOWN            K_DOWN   /* * Shift-Down  == Down           */
 
-#define K_CTRL_A                513   /*   Ctrl-A                         */
-#define K_CTRL_B                514   /*   Ctrl-B                         */
-#define K_CTRL_C                515   /*   Ctrl-C                         */
-#define K_CTRL_D                516   /*   Ctrl-D                         */
-#define K_CTRL_E                517   /*   Ctrl-E                         */
-#define K_CTRL_F                518   /*   Ctrl-F                         */
-#define K_CTRL_G                519   /*   Ctrl-G                         */
-#define K_CTRL_H                520   /*   Ctrl-H                         */
-#define K_CTRL_I                521   /*   Ctrl-I                         */
-#define K_CTRL_J                522   /*   Ctrl-J                         */
-#define K_CTRL_K                523   /*   Ctrl-K                         */
-#define K_CTRL_L                524   /*   Ctrl-L                         */
-#define K_CTRL_M                525   /*   Ctrl-M                         */
-#define K_CTRL_N                526   /*   Ctrl-N                         */
-#define K_CTRL_O                527   /*   Ctrl-O                         */
-#define K_CTRL_P                528   /*   Ctrl-P                         */
-#define K_CTRL_Q                529   /*   Ctrl-Q                         */
-#define K_CTRL_R                530   /*   Ctrl-R                         */
-#define K_CTRL_S                531   /*   Ctrl-S                         */
-#define K_CTRL_T                532   /*   Ctrl-T                         */
-#define K_CTRL_U                533   /*   Ctrl-U                         */
-#define K_CTRL_V                534   /*   Ctrl-V                         */
-#define K_CTRL_W                535   /*   Ctrl-W                         */
-#define K_CTRL_X                536   /*   Ctrl-X                         */
-#define K_CTRL_Y                537   /*   Ctrl-Y                         */
-#define K_CTRL_Z                538   /*   Ctrl-Z                         */
+#define K_SH_INS             K_INS    /* * Shift-Ins   == Ins            */
+#define K_SH_DEL             K_DEL    /* * Shift-Del   == Del            */
+#define K_SH_HOME            K_HOME   /* * Shift-Home  == Home           */
+#define K_SH_END             K_END    /* * Shift-End   == End            */
+#define K_SH_PGUP            K_PGUP   /* * Shift-PgUp  == PgUp           */
+#define K_SH_PGDN            K_PGDN   /* * Shift-PgDn  == PgDn           */
+
+#define K_SH_RETURN          K_RETURN /* * Shift-Enter == Enter          */
+#define K_SH_ENTER           K_ENTER  /* * Shift-Enter == Enter          */
 
 #endif
 

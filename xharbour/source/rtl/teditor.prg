@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.67 2005/12/10 00:33:37 oh1 Exp $
+/* $Id: teditor.prg,v 1.68 2005/12/28 04:21:14 peterrees Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.67 2005/12/10 00:33:37 oh1 Exp $
+/* $Id: teditor.prg,v 1.68 2005/12/28 04:21:14 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -143,6 +143,10 @@ CLASS HBEditor
 
    DATA  nCurrentCursor  INIT SetCursor()
 
+   DATA  lSelActive      INIT .F.
+   DATA  nSelStart       INIT 0                             // First row selected
+   DATA  nSelEnd         INIT 0                             // Last row selected
+
    // Class DATA can be faster, but since the user can change directly
    // READINSERT(), ::lInsert must check in it.
    // DATA  lInsert        INIT .F.              // Is editor in Insert mode or in Overstrike one? Default : Overstrike - Clipper
@@ -170,11 +174,16 @@ CLASS HBEditor
    METHOD  AddText( cString )                               // Add text at the cursor
    METHOD  GetTextIndex()                                   // Return current cursor position in text.
 
+   METHOD  SetTextSelection()                               // Start or modify the current selection.
+   METHOD  GetTextSelection()                               // Return the current selection.
+   METHOD  DelTextSelection()                               // Delete the current selection
+   METHOD  ClrTextSelection()                               // Clear the current selection.
+
    METHOD  RefreshWindow()                                  // Redraw a window
    METHOD  RefreshLine()                                    // Redraw a line
    METHOD  RefreshColumn()                                  // Redraw a column of text
 
-   METHOD  LineColor( nRow ) INLINE ::cColorSpec            // Returns color string to use to draw nRow ( current line if nRow is empty )
+   METHOD  LineColor( nRow )                                // Returns color string to use to draw nRow ( current line if nRow is empty )
 
    METHOD  MoveCursor( nKey )                               // Move cursor inside text / window ( needs a movement key )
    METHOD  InsertState( lInsState )                         // Changes lInsert value and insertion / overstrike mode of editor
@@ -421,6 +430,22 @@ return Self
 
 //-------------------------------------------------------------------//
 //
+// Return the color of the row
+//
+METHOD LineColor( nRow ) CLASS HBEditor
+
+   local cColor
+
+   if ::lSelActive .and. ( ( nRow >= ::nSelStart ) .and. ( nRow <= ::nSelEnd ) )
+      cColor := hb_ColorIndex( ::cColorSpec, CLR_ENHANCED )
+   else
+      cColor := hb_ColorIndex( ::cColorSpec, CLR_STANDARD )         
+   endif
+ 
+return cColor
+
+//-------------------------------------------------------------------//
+//
 // Redraws current screen line
 //
 METHOD RefreshLine() CLASS HBEditor
@@ -589,19 +614,35 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                ::K_Mouse( nKey )
                exit
 
-         #ifdef HB_NEW_KCTRL
+         #ifdef HB_EXT_INKEY
+
+            case K_SH_DOWN
+               if ::nRow <= ::naTextLen
+                  ::SetTextSelection( +1 )
+               endif
+               exit
+
+            case K_SH_UP
+               if ::nRow > 1
+                  ::SetTextSelection( -1 )
+               endif 
+               exit
 
             case K_CTRL_C
-               GTSETCLIPBOARD( ::GetText() )
+               GTSETCLIPBOARD( ::GetTextSelection() )
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_X
-               GTSETCLIPBOARD( ::GetText() )
-               ::DelText()
+            case K_SH_DEL
+               GTSETCLIPBOARD( ::GetTextSelection() )
+               ::DelTextSelection()
                exit
 
             case K_CTRL_V
-               ::AddText( GTGETCLIPBOARD() )
+            case K_SH_INS
+               ::AddText( GTGETCLIPBOARD(), .T. )
+               ::ClrTextSelection()
                exit
 
          #endif
@@ -643,6 +684,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_DOWN
                ::Down()
+               ::ClrTextSelection()
                exit
 
             case K_PGDN
@@ -655,6 +697,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_UP
                ::Up()
+               ::ClrTextSelection()
                exit
 
             case K_PGUP
@@ -1753,10 +1796,13 @@ METHOD GetText( lSoftCr ) CLASS HBEditor
 
    LOCAL cString := "", cSoft:= ""
    LOCAL cEOL := HB_OSNewLine()
+
    DEFAULT lSoftCr TO .F.
+
    if lSoftCr
       cSoft:= CHR( 141 ) + CHR( 10 )
    endif
+
    if ::lWordWrap
       AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )},,::naTextLen - 1)
    else
@@ -1767,6 +1813,75 @@ METHOD GetText( lSoftCr ) CLASS HBEditor
    cString += ::aText[ ::naTextLen ]:cText
 
 return cString
+
+
+//-------------------------------------------------------------------//
+//
+// Returns the text selection in a string
+//
+METHOD GetTextSelection() CLASS HBEditor
+
+   LOCAL cString := ""
+   LOCAL nSelStart
+   LOCAL nSelEnd
+   LOCAL nI
+
+   if ::lSelActive
+      if ::nSelStart > ::nSelEnd
+         nSelStart := ::nSelEnd
+         nSelEnd := ::nSelStart
+      else
+         nSelStart := ::nSelStart
+         nSelEnd := ::nSelEnd
+      endif
+
+      for nI := nSelStart to nSelEnd
+          cString += ::GetLine( nI )
+      next
+
+   endif
+
+return cString
+
+//-------------------------------------------------------------------//
+//
+// Set current selection
+//
+METHOD SetTextSelection( nAction ) CLASS HBEditor
+
+   if !::lSelActive
+      ::nSelStart := ::nRow
+      ::nSelEnd := ::nSelStart
+      ::lSelActive := .T.
+      ::RefreshLine()
+   elseif nAction > 0
+      ::nSelEnd += nAction
+      ::RefreshLine()
+      ::Down()
+   elseif nAction < 0
+      if ::nSelEnd > ::nSelStart
+         ::nSelEnd--
+      else
+         ::nSelStart--
+      endif
+      ::RefreshLine()
+      ::Up()
+   endif
+
+return nil
+
+//-------------------------------------------------------------------//
+//
+// Clear current selection
+//
+METHOD ClrTextSelection() CLASS HBEditor
+
+   if ::lSelActive
+      ::lSelActive := .F.
+      ::RefreshWindow()
+   endif
+
+return nil
 
 METHOD DelText() CLASS HBEditor
 
@@ -1784,17 +1899,55 @@ METHOD DelText() CLASS HBEditor
 
 return Self
 
-METHOD AddText( cString ) CLASS HBEditor
+METHOD DelTextSelection() CLASS HBEditor
+
+   LOCAL nSelStart
+   LOCAL nSelEnd
+   LOCAL nI
+
+   if ::lSelActive
+      if ::nSelStart > ::nSelEnd
+         nSelStart := ::nSelEnd
+         nSelEnd := ::nSelStart
+      else
+         nSelStart := ::nSelStart
+         nSelEnd := ::nSelEnd
+      endif
+
+      ::lDirty := .T.
+
+      for nI := nSelStart to nSelEnd
+         ::RemoveLine( nSelStart )
+      next
+
+      ::ClrTextSelection()
+
+      ::GotoLine( nSelStart )
+
+   endif
+
+return Self
+
+METHOD AddText( cString, lAtPos ) CLASS HBEditor
 
    LOCAL aTmpText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
    LOCAL nLines := Len( aTmpText )
    LOCAL i
    LOCAL nAtRow := ::nRow
 
-   for i := 1 to nLines
-      aadd( ::aText, aTmpText[ i ] )
-      ::naTextLen++
-   next
+   DEFAULT lAtPos TO .F.
+
+   if !lAtPos .or. ( nAtRow > ::naTextLen )
+      for i := 1 to nLines
+         aadd( ::aText, aTmpText[ i ] )
+         ::naTextLen++
+      next
+   else
+      for i := 1 to nLines 
+         AIns( ::aText, nAtRow + i, aTmpText[ i ], .T. )
+      next
+      ::naTextLen := LEN( ::aText )
+   endif
 
    ::lDirty := .T.
 

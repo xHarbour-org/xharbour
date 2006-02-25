@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.35 2005/09/20 06:23:10 vouchcac Exp $
+ * $Id: memoedit.prg,v 1.36 2005/10/25 11:15:28 mauriliolongo Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ METHOD Edit() CLASS TMemoEditor
    // NOTE: K_ALT_W is not compatible with clipper exit memo and save key, but I cannot discriminate
    //       K_CTRL_W and K_CTRL_END from harbour code.
    //
-   #ifdef HB_NEW_KCTRL
+   #ifdef HB_EXT_INKEY
       local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_ALT_W, K_ESC }
    #else
       local aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
@@ -263,8 +263,8 @@ return Self
 METHOD HandleUserKey( nKey, nUserKey ) CLASS TMemoEditor
 
    // HBEditor does not handle these keys and would call ::KeyboardHook() causing infinite loop
-   #ifdef HB_NEW_KCTRL
-      // I Have to add the values that K_CTRL_x keys have when HB_NEW_KCTRL is not defined since those values cause
+   #ifdef HB_EXT_INKEY
+      // I Have to add the values that K_CTRL_x keys have when HB_EXT_INKEY is not defined since those values cause
       // infinite loop
       static aUnHandledKeys := { 10,       11,       12,       14,       15,       16,       17,       20,       21 }
    #else
