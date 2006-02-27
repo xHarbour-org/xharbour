@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4839 2006/02/25 05:55:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4840 2006/02/25 17:32:14 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-27 14:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/dateshb.c
+    ! Fixed GPF trap f.e. ctod('0115.2005')
+    % Optimized to avoid redundant indirections ints -> string -> ints
 
 2006-02-25 18:30 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * include/inkey.ch
@@ -21,7 +26,7 @@
 	 * It selects only entire rows with K_SH_DOWN and K_SH_UP.
 	 * Copy/Cut/Paste changed to work with text selection.
 	 * Added support for K_SH_DEL and K_SH_INS as Cut and Paste.
-	 
+
 2006-02-24 21:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * bin/bld.bat
     + Added support for HB_FIRST_LIBS to all compilers

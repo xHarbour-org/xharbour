@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.12 2005/10/29 18:53:39 likewolf Exp $
+ * $Id: dateshb.c,v 1.13 2005/11/14 00:18:32 druzus Exp $
  */
 
 /*
@@ -88,7 +88,6 @@ HB_FUNC( CTOD )
    {
       char * szDate = hb_parcx( 1 );
       int d_value = 0, m_value = 0, y_value = 0;
-      char szDateFormat[ 9 ];
 
       if( szDate )
       {
@@ -108,6 +107,7 @@ HB_FUNC( CTOD )
                      else d_pos = 3;
                   }
                   break;
+
                case 'M':
                case 'm':
                   if( m_pos == 0 )
@@ -117,6 +117,7 @@ HB_FUNC( CTOD )
                      else m_pos = 3;
                   }
                   break;
+
                case 'Y':
                case 'y':
                   if( y_pos == 0 )
@@ -132,25 +133,36 @@ HB_FUNC( CTOD )
             they are not to be treated as date field separators */
          non_digit = 1;
          size = strlen( szDate );
+
          for( count = 0; count < size; count++ )
          {
             digit = szDate[ count ];
+
             if( isdigit( digit ) )
             {
                /* Process the digit for the current date field */
                if( d_pos == 1 )
+               {
                   d_value = ( d_value * 10 ) + digit - '0';
+               }
                else if( m_pos == 1 )
+               {
                   m_value = ( m_value * 10 ) + digit - '0';
+               }
                else if( y_pos == 1 )
+               {
                   y_value = ( y_value * 10 ) + digit - '0';
+               }
+
                /* Treat the next non-digit as a date field separator */
                non_digit = 0;
             }
             else if( digit != ' ' )
             {
                if( d_value > 0 && m_value > 0 && y_value > 0 )
+               {
                   break;
+               }
 
                /* Process the non-digit */
                if( non_digit++ == 0 )
@@ -163,8 +175,9 @@ HB_FUNC( CTOD )
                }
             }
             else if( d_value > 0 && m_value > 0 && y_value > 0 )
+            {
                break;
-
+            }
          }
 
          if( y_value >= 0 && y_value < 100 )
@@ -173,18 +186,27 @@ HB_FUNC( CTOD )
             digit = hb_set.HB_SET_EPOCH / 100;
 
             if( y_value >= count )
+            {
                y_value += ( digit * 100 );
+            }
             else
+            {
                y_value += ( ( digit * 100 ) + 100 );
+            }
+         }
+
+         if ( (unsigned int) y_value > 9999 || (unsigned int) m_value > 12 || (unsigned int) d_value > 31 )
+         {
+            m_value = 0; d_value = 0; m_value = 0;
          }
       }
 
-      sprintf( szDateFormat, "%04i%02i%02i", y_value, m_value, d_value );
-
-      hb_retds( szDateFormat );
+      hb_retdl( hb_dateEncode( y_value, m_value, d_value ) );
    }
    else
+   {
       hb_errRT_BASE_SubstR( EG_ARG, 1119, NULL, "CTOD", 1, hb_paramError( 1 ) );
+   }
 }
 
 HB_FUNC( DTOC )
