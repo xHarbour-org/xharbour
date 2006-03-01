@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4843 2006/03/01 13:06:17 druzus Exp $
+ * $Id: ChangeLog,v 1.4844 2006/03/01 15:40:23 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-01 20:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/rtl/cdpapi.c
+    * added optional BOOL parameter to functions which translate to UTF8
+      to not translate control code characters
+
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    * update for new parameter in UTF8 functions
 
 2006-03-01 16:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/source/rtl/cdpapi.c

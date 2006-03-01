@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.18 2006/03/01 13:06:30 druzus Exp $
+ * $Id: gtxwc.c,v 1.19 2006/03/01 15:45:34 druzus Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
-#define XVT_DEBUG
+/* #define XVT_DEBUG */
 #include "gtxwc.h"
 
 /* mouse button mapping into Clipper keycodes */
@@ -1570,7 +1570,7 @@ static void hb_xvt_gtBuildCharTrans( PXWND_DEF wnd )
    for ( i = 0; i < 256; i++ )
    {
 #ifndef HB_CDP_SUPPORT_OFF
-      usCh16 = hb_cdpGetU16( wnd->hostCDP, ( BYTE ) i );
+      usCh16 = hb_cdpGetU16( wnd->hostCDP, TRUE, ( BYTE ) i );
 #else
       int j;
       usCh16 = ( USHORT ) i;
@@ -2136,7 +2136,7 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
                if( evt->xselection.target == s_atomUTF8String && text.format == 8 )
                {
 #ifdef XVT_DEBUG
-                  printf("UTF8String='%s'\r\n", text.value); fflush(stdout);
+                  fprintf(stdout, "UTF8String='%s'\r\n", text.value); fflush(stdout);
 #endif
                   nItem = hb_cdpUTF8StringLength( text.value, text.nitems );
                   if( wnd->ClipboardData != NULL )
@@ -2243,10 +2243,10 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          }
          else if( req->target == s_atomUTF8String )
          {
-            ULONG ulLen = hb_cdpStringInUTF8Length( wnd->hostCDP, wnd->ClipboardData, wnd->ClipboardSize );
+            ULONG ulLen = hb_cdpStringInUTF8Length( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize );
             BYTE * pBuffer = ( BYTE * ) hb_xgrab( ulLen + 1 );
 
-            hb_cdpStrnToUTF8( wnd->hostCDP, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );
+            hb_cdpStrnToUTF8( wnd->hostCDP, FALSE, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );
 #ifdef XVT_DEBUG
             printf("SelectionRequest: (%s)->(%s) [%s]\r\n", wnd->ClipboardData, pBuffer, wnd->hostCDP->id); fflush(stdout);
 #endif
