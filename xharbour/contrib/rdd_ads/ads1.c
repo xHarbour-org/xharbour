@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.97 2006/01/30 02:51:23 druzus Exp $
+ * $Id: ads1.c,v 1.98 2006/02/21 19:37:06 druzus Exp $
  */
 
 /*
@@ -1647,16 +1647,19 @@ static ERRCODE adsFlush( ADSAREAP pArea )
    HB_TRACE(HB_TR_DEBUG, ("adsFlush(%p)", pArea ));
 
    /* This function should flush current record buffer if hot and
-      send to OS request to flush its file buffers to disk, so instead
-      of AdsWriteRecord(), AdsFlushFileBuffers() should be used */
-   /* AdsWriteRecord( pArea->hTable ); */
+      send to OS request to flush its file buffers to disk, so as well as
+      of AdsWriteRecord(), AdsFlushFileBuffers() should be used FOR LOCAL
+      TABLES (it's ignored by Remote Server).
+      AdsWriteRecord() "flushes to the Advantage server",
+      AdsFlushFileBuffers() tells the local server to flush to disk.
+      Without it, we are dependent on the adslocal.cfg Flush Frequency setting.
+   */
 
    if( !pArea->fReadonly )
    {
+      AdsWriteRecord( pArea->hTable );
 #if ADS_REQUIRE_VERSION >= 6
       AdsFlushFileBuffers( pArea->hTable );
-#else
-      AdsWriteRecord( pArea->hTable );
 #endif
    }
 

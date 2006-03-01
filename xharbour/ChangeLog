@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4840 2006/02/25 17:32:14 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4841 2006/02/27 22:49:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-02-28 23:30 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * Fixed adsFlush() to commit changes for both local and remote servers.
 
 2006-02-27 14:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/dateshb.c
