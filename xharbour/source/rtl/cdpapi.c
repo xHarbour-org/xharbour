@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.22 2005/02/27 11:56:05 andijahja Exp $
+ * $Id: cdpapi.c,v 1.23 2006/02/21 19:37:07 druzus Exp $
  */
 
 /*
@@ -631,6 +631,8 @@ HB_EXPORT ULONG hb_cdpStrnToUTF8( PHB_CODEPAGE cdp, BYTE* pSrc, ULONG ulLen, BYT
          u = uniCodes[ u ];
       n += u16toutf8( &pDst[n], u );
    }
+   pDst[ n ] = '\0';
+
    return n;
 }
 

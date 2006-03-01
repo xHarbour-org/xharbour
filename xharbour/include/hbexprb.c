@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.107 2005/12/03 05:21:02 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.108 2006/02/24 06:18:14 ronpinkas Exp $
  */
 
 /*
@@ -1339,7 +1339,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
          #ifndef HB_C52_STRICT
             if( bRemoveRef )
             {
-               if( pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF )
+               if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARREF )
                {
                   pSelf->value.asList.pExprList->ExprType = HB_ET_VARIABLE;
                }

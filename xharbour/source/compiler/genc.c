@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.114 2006/02/15 19:33:04 druzus Exp $
+ * $Id: genc.c,v 1.115 2006/02/22 21:14:54 ronpinkas Exp $
  */
 
 /*
@@ -252,12 +252,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it a STATIC$ */
          else if ( bIsStaticVariable )
          {
-            fprintf( yyc, "HB_FUNC_INITSTATIC();\n" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITSTATICS();\n" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it a GLOBAL$ */
          else if ( bIsGlobalVariable )
          {
-            fprintf( yyc, "HB_FUNC_INITGLOBAL();\n" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITGLOBALS();\n" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
@@ -581,12 +581,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          /* Is it STATICS$ */
          else if( bIsStaticVariable )
          {
-            fprintf( yyc, "HB_FUNC_INITSTATIC()" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITSTATICS()" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it GLOBALS$ */
          else if( bIsGlobalVariable )
          {
-            fprintf( yyc, "HB_FUNC_INITGLOBAL()" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "HB_FUNC_INITGLOBALS()" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.h,v 1.3 2005/02/06 20:35:43 druzus Exp $
+ * $Id: gtxwc.h,v 1.4 2006/02/21 19:37:07 druzus Exp $
  */
 
 /*
@@ -169,6 +169,7 @@ typedef USHORT HB_GT_CELLTYPE;
 
 
 #define XVT_STD_MASK    ( ExposureMask | StructureNotifyMask | FocusChangeMask | \
+                          PropertyChangeMask | \
                           ButtonPressMask | ButtonReleaseMask | PointerMotionMask | \
                           KeyPressMask | KeyReleaseMask )
 

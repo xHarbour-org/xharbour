@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.13 2005/11/14 00:18:32 druzus Exp $
+ * $Id: dateshb.c,v 1.14 2006/02/27 22:49:16 ronpinkas Exp $
  */
 
 /*
@@ -194,14 +194,9 @@ HB_FUNC( CTOD )
                y_value += ( ( digit * 100 ) + 100 );
             }
          }
-
-         if ( (unsigned int) y_value > 9999 || (unsigned int) m_value > 12 || (unsigned int) d_value > 31 )
-         {
-            m_value = 0; d_value = 0; m_value = 0;
-         }
       }
 
-      hb_retdl( hb_dateEncode( y_value, m_value, d_value ) );
+      hb_retd( y_value, m_value, d_value );
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.16 2006/02/21 19:37:07 druzus Exp $
+ * $Id: gtxwc.c,v 1.17 2006/02/25 17:32:15 lf_sfnet Exp $
  */
 
 /*
@@ -67,6 +67,7 @@
 
 /* NOTE: User programs should never call this layer directly! */
 
+/* #define XVT_DEBUG */
 #include "gtxwc.h"
 
 /* mouse button mapping into Clipper keycodes */
@@ -297,11 +298,18 @@ static char *rgb_colors[] = {
 };
 
 static Atom s_atomDelWin;
+static Atom s_atomTimestamp;
+static Atom s_atomAtom;
+static Atom s_atomInteger;
 static Atom s_atomString;
 static Atom s_atomUTF8String;
 static Atom s_atomPrimary;
+static Atom s_atomSecondary;
+static Atom s_atomClipboard;
 static Atom s_atomTargets;
 static Atom s_atomCutBuffer0;
+static Atom s_atomText;
+static Atom s_atomCompoundText;
 
 
 typedef struct tag_rect
@@ -423,7 +431,12 @@ typedef struct tag_x_wnddef
    unsigned char * ClipboardData;
    ULONG ClipboardSize;
    Atom ClipboardRequest;
+   Time ClipboardTime;
    BOOL ClipboardOwner;
+   BOOL ClipboardRcvd;
+
+   /* Keep last event time */
+   Time lastEventTime;
 
 } XWND_DEF, *PXWND_DEF;
 
@@ -442,7 +455,7 @@ static PXWND_DEF s_wnd = NULL;
 
 static BOOL s_forceRefresh;
 static BOOL s_cursorState = TRUE;
-static ULONG s_cursorBlinkRate = 250;
+static ULONG s_cursorBlinkRate = 350;
 static ULONG s_cursorStateTime = 0;
 
 static int s_updateMode = XVT_SYNC_UPDATE;
@@ -1951,10 +1964,18 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
                                  evt->xexpose.y + evt->xexpose.height );
          break;
 
+      case NoExpose:
+#ifdef XVT_DEBUG
+         printf("Event: NoExpose\r\n"); fflush(stdout);
+#endif
+         break;
+
       case KeyPress:
 #ifdef XVT_DEBUG
          printf("Event: KeyPress\r\n"); fflush(stdout);
 #endif
+         if( evt->xkey.time != CurrentTime )
+            wnd->lastEventTime = evt->xkey.time;
          hb_xvt_processKey( wnd, &evt->xkey );
          break;
 
@@ -1962,6 +1983,8 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 #ifdef XVT_DEBUG
          printf("Event: KeyRelease\r\n"); fflush(stdout);
 #endif
+         if( evt->xkey.time != CurrentTime )
+            wnd->lastEventTime = evt->xkey.time;
          out = XLookupKeysym( &evt->xkey, 0 );
          switch( out )
          {
@@ -1988,6 +2011,9 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 #ifdef XVT_DEBUG
          printf("Event: MotionNotify\r\n"); fflush(stdout);
 #endif
+         if( evt->xmotion.time != CurrentTime )
+            wnd->lastEventTime = evt->xmotion.time;
+
          wnd->mouseCol = evt->xmotion.x / wnd->fontWidth;
          wnd->mouseRow = evt->xmotion.y / wnd->fontHeight;
          if ( hb_xvt_gtLastCharInInputQueue( wnd ) != K_MOUSEMOVE )
@@ -2004,6 +2030,8 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 #ifdef XVT_DEBUG
          printf("Event: %s, button=%d\r\n", evt->type == ButtonPress ? "ButtonPress" : "ButtonRelease", button); fflush(stdout);
 #endif
+         if( evt->xbutton.time != CurrentTime )
+            wnd->lastEventTime = evt->xbutton.time;
          if ( button >= 0 && button < XVT_MAX_BUTTONS )
          {
             button = wnd->mouseButtonsMap[ button ] - 1;
@@ -2014,7 +2042,8 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 
             if ( evt->type == ButtonPress )
             {
-               Time evtTime = ((XButtonEvent *) evt)->time;
+               Time evtTime = evt->xbutton.time;
+
                if ( evtTime - wnd->mouseButtonsTime[ button ] < XVT_DBLCLK_DELAY )
                {
                   key = mouseDblPressKeys[ button ];
@@ -2057,6 +2086,12 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          wnd->keyModifiers.bShift = FALSE;
          break;
 
+      case FocusOut:
+#ifdef XVT_DEBUG
+         printf("Event: FocusOut\r\n"); fflush(stdout);
+#endif
+         break;
+
       case ConfigureNotify:
 #ifdef XVT_DEBUG
          printf("Event: ConfigureNotify\r\n"); fflush(stdout);
@@ -2068,7 +2103,7 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 
       case ClientMessage:
 #ifdef XVT_DEBUG
-         printf("Event: ClientMessage:%ld\r\n", evt->xclient.data.l[ 0 ]); fflush(stdout);
+         printf("Event: ClientMessage:%ld (%s)\r\n", evt->xclient.data.l[ 0 ], XGetAtomName(wnd->dpy, (Atom) evt->xclient.data.l[ 0 ])); fflush(stdout);
 #endif
          if( ( Atom ) evt->xclient.data.l[ 0 ] == s_atomDelWin )
          {
@@ -2077,10 +2112,20 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          break;
 
       case SelectionNotify:
+      {
+         Atom aNextRequest = None;
 #ifdef XVT_DEBUG
-         printf("Event: SelectionNotify\r\n"); fflush(stdout);
+         printf("Event: SelectionNotify: selection=%ld (%s), property=%ld (%s), target=%ld (%s) => %ld (%s)\r\n",
+                     evt->xselection.selection,
+                     evt->xselection.selection == None ? "None" : XGetAtomName(wnd->dpy, evt->xselection.selection),
+                     evt->xselection.property,
+                     evt->xselection.property == None ? "None" : XGetAtomName(wnd->dpy, evt->xselection.property),
+                     evt->xselection.target,
+                     evt->xselection.target == None ? "None" : XGetAtomName(wnd->dpy, evt->xselection.target),
+                     wnd->ClipboardRequest,
+                     wnd->ClipboardRequest == None ? "None" : XGetAtomName(wnd->dpy, wnd->ClipboardRequest)); fflush(stdout);
 #endif
-         if( evt->xselection.property != None && wnd->ClipboardRequest )
+         if( evt->xselection.property != None )
          {
             XTextProperty text;
             unsigned long nItem;
@@ -2088,42 +2133,62 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
             if( XGetTextProperty( wnd->dpy, wnd->window, &text,
                                   evt->xselection.property ) != 0 )
             {
-               if( wnd->ClipboardRequest == s_atomUTF8String )
+               if( evt->xselection.target == s_atomUTF8String && text.format == 8 )
                {
                   nItem = hb_cdpUTF8StringLength( text.value, text.nitems );
                   if( wnd->ClipboardData != NULL )
                      hb_xfree( wnd->ClipboardData );
                   wnd->ClipboardData = ( unsigned char * ) hb_xgrab( nItem + 1 );
                   wnd->ClipboardSize = nItem;
-                  hb_cdpUTF8ToStrn( wnd->inCDP ? wnd->inCDP : wnd->hostCDP,
-                                    text.value, text.nitems,
+                  hb_cdpUTF8ToStrn( wnd->hostCDP, text.value, text.nitems,
                                     wnd->ClipboardData, nItem + 1 );
+                  wnd->ClipboardTime = evt->xselection.time;
+                  wnd->ClipboardRcvd = TRUE;
                }
-               else if( wnd->ClipboardRequest == s_atomString )
+               else if( evt->xselection.target == s_atomString && text.format == 8 )
                {
-                  unsigned char cData;
-
                   if( wnd->ClipboardData != NULL )
                      hb_xfree( wnd->ClipboardData );
                   wnd->ClipboardData = ( unsigned char * ) hb_xgrab( text.nitems + 1 );
+                  memcpy( wnd->ClipboardData, text.value, text.nitems );
+                  if( wnd->inCDP && wnd->hostCDP && wnd->inCDP != wnd->hostCDP )
+                     hb_cdpnTranslate( ( char * ) wnd->ClipboardData, wnd->inCDP, wnd->hostCDP, text.nitems );
+                  wnd->ClipboardData[ text.nitems ] = '\0';
+                  wnd->ClipboardSize = text.nitems;
+                  wnd->ClipboardTime = evt->xselection.time;
+                  wnd->ClipboardRcvd = TRUE;
+               }
+               else if( evt->xselection.target == s_atomTargets && text.format == 32 )
+               {
+                  Atom aValue;
+#ifdef XVT_DEBUG
+                  printf("text.nitems=%ld, text.format=%d\r\n", text.nitems, text.format); fflush(stdout);
+#endif
                   for( nItem = 0; nItem < text.nitems; ++nItem )
                   {
-                     switch( text.format )
-                     {
-                        case  8: cData = text.value[ nItem ]; break;
-                        case 16: cData = ( unsigned char ) ( ( unsigned short * ) text.value)[ nItem ]; break;
-                        case 32: cData = ( unsigned char ) ( ( unsigned int * ) text.value)[ nItem ]; break;
-                        default: cData = 0;
-                     }
-                     wnd->ClipboardData[ nItem ] = cData;
+                     aValue = ( ( unsigned int * ) text.value )[ nItem ];
+                     if( aValue == s_atomUTF8String )
+                        aNextRequest = s_atomUTF8String;
+                     else if( aValue == s_atomString && aNextRequest == None )
+                        aNextRequest = s_atomString;
+#ifdef XVT_DEBUG
+                     printf("%ld, %8lx (%s)\r\n", nItem, aValue, XGetAtomName(wnd->dpy, aValue));fflush(stdout);
+#endif
                   }
-                  wnd->ClipboardData[ nItem ] = '\0';
-                  wnd->ClipboardSize = nItem;
                }
             }
          }
-         wnd->ClipboardRequest = 0;
+         else if( wnd->ClipboardRequest == s_atomTargets )
+         {
+            aNextRequest = s_atomUTF8String;
+         }
+         else if( wnd->ClipboardRequest == s_atomUTF8String )
+         {
+            aNextRequest = s_atomString;
+         }
+         wnd->ClipboardRequest = aNextRequest;
          break;
+      }
 
       case SelectionRequest:
       {
@@ -2131,14 +2196,44 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          XEvent respond;
 
 #ifdef XVT_DEBUG
-         printf("Event: SelectionRequest\r\n"); fflush(stdout);
+         printf("Event: SelectionRequest: %ld (%s)\r\n", req->target,
+                        XGetAtomName(wnd->dpy, req->target)); fflush(stdout);
 #endif
          respond.xselection.property = req->property;
-         if( req->target == s_atomString )
+
+         if ( req->target == s_atomTimestamp )
          {
             XChangeProperty( wnd->dpy, req->requestor, req->property,
-                             s_atomString, 8, PropModeReplace,
-                             wnd->ClipboardData, wnd->ClipboardSize );
+                             s_atomInteger, 8 * sizeof( Time ), PropModeReplace,
+                             ( unsigned char * ) &wnd->ClipboardTime, 1 );
+         }
+         else if ( req->target == s_atomTargets )
+         {
+            Atom aProp[] = { s_atomTimestamp, s_atomTargets,
+                             s_atomString, s_atomUTF8String,
+                             s_atomCompoundText, s_atomText };
+            XChangeProperty( wnd->dpy, req->requestor, req->property,
+                             s_atomAtom, 8 * sizeof( Atom ), PropModeReplace,
+                             ( unsigned char * ) aProp, sizeof( aProp ) / sizeof( Atom ) );
+         }
+         else if( req->target == s_atomString )
+         {
+            if( wnd->inCDP && wnd->hostCDP && wnd->inCDP != wnd->hostCDP )
+            {
+               BYTE * pBuffer = ( BYTE * ) hb_xgrab( wnd->ClipboardSize + 1 );
+               memcpy( pBuffer, wnd->ClipboardData, wnd->ClipboardSize + 1 );
+               hb_cdpnTranslate( ( char * ) pBuffer, wnd->inCDP, wnd->hostCDP, wnd->ClipboardSize );
+               XChangeProperty( wnd->dpy, req->requestor, req->property,
+                                s_atomString, 8, PropModeReplace,
+                                pBuffer, wnd->ClipboardSize );
+               hb_xfree( pBuffer );
+            }
+            else
+            {
+               XChangeProperty( wnd->dpy, req->requestor, req->property,
+                                s_atomString, 8, PropModeReplace,
+                                wnd->ClipboardData, wnd->ClipboardSize );
+            }
          }
          else if( req->target == s_atomUTF8String )
          {
@@ -2148,18 +2243,9 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
 
             hb_cdpStrnToUTF8( cdp, wnd->ClipboardData, wnd->ClipboardSize, pBuffer );
             XChangeProperty( wnd->dpy, req->requestor, req->property,
-                             s_atomString, 8, PropModeReplace,
+                             s_atomUTF8String, 8, PropModeReplace,
                              pBuffer, ulLen );
             hb_xfree( pBuffer );
-         }
-         else if ( req->target == s_atomTargets )
-         {
-            Atom aProp[ 2 ];
-            aProp[ 0 ] = s_atomUTF8String;
-            aProp[ 1 ] = s_atomString;
-            XChangeProperty( wnd->dpy, req->requestor, req->property,
-                             s_atomTargets, 32, PropModeReplace,
-                             ( unsigned char * ) aProp, 2 );
          }
          else
          {
@@ -2171,7 +2257,7 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          respond.xselection.requestor = req->requestor;
          respond.xselection.selection = req->selection;
          respond.xselection.target = req->target;
-         respond.xselection.time = CurrentTime;
+         respond.xselection.time = req->time;
 
          XSendEvent( wnd->dpy, req->requestor, 0, 0, &respond );
          break;
@@ -2182,6 +2268,14 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
          printf("Event: SelectionClear\r\n"); fflush(stdout);
 #endif
          wnd->ClipboardOwner = FALSE;
+         break;
+
+      case PropertyNotify:
+#ifdef XVT_DEBUG
+         printf("Event: PropertyNotify\r\n"); fflush(stdout);
+#endif
+         if( evt->xproperty.time != CurrentTime )
+            wnd->lastEventTime = evt->xproperty.time;
          break;
 
 #ifdef XVT_DEBUG
@@ -2816,60 +2910,76 @@ static ULONG hb_xvt_CurrentTime( void )
 static void hb_xvt_gtProcessMessages( PXWND_DEF wnd )
 {
    XEvent evt;
-   ULONG ulCurrentTime = hb_xvt_CurrentTime();
 
-   if( ulCurrentTime - s_cursorStateTime > s_cursorBlinkRate )
+   if( s_cursorBlinkRate == 0 )
    {
-      s_cursorState = !s_cursorState;
-      s_cursorStateTime = ulCurrentTime;
+      s_cursorState = TRUE;
+   }
+   else
+   {
+      ULONG ulCurrentTime = hb_xvt_CurrentTime();
+
+      if( ulCurrentTime - s_cursorStateTime > s_cursorBlinkRate )
+      {
+         s_cursorState = !s_cursorState;
+         s_cursorStateTime = ulCurrentTime;
+      }
    }
 
-   while( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
-   {
-      XNextEvent( wnd->dpy, &evt );
-      hb_xvt_gtWndProc( wnd, &evt );
-   }
-   hb_xvt_gtUpdateSize( wnd );
    hb_xvt_gtUpdateChr( wnd );
-   hb_xvt_gtUpdatePts( wnd );
-   hb_xvt_gtUpdateCursor( wnd );
-   if ( wnd->fDspTitle )
+   if( wnd->fDspTitle )
    {
       wnd->fDspTitle = FALSE;
       XStoreName( wnd->dpy, wnd->window, wnd->szTitle ? wnd->szTitle : "" );
    }
 
-#if 0
-   /*
-    * The even checking is repeated intentionaly because some operation
-    * can be bufferd by XLIB until incomming events are checked
-    */
-   while( XEventsQueued( wnd->dpy, QueuedAfterFlush) )
+   do
    {
-      XNextEvent( wnd->dpy, &evt );
-      hb_xvt_gtWndProc( wnd, &evt );
+      while( XEventsQueued( wnd->dpy, QueuedAfterFlush ) )
+      {
+         XNextEvent( wnd->dpy, &evt );
+         hb_xvt_gtWndProc( wnd, &evt );
+      }
+      hb_xvt_gtUpdateSize( wnd );
+      hb_xvt_gtUpdatePts( wnd );
+      hb_xvt_gtUpdateCursor( wnd );
    }
-   hb_xvt_gtUpdateSize( wnd );
-   hb_xvt_gtUpdatePts( wnd );
-   hb_xvt_gtUpdateCursor( wnd );
-#endif
-
-   XFlush( wnd->dpy );
+   while( XEventsQueued( wnd->dpy, QueuedAfterFlush ) );
 }
 
 /* *********************************************************************** */
 
 static void hb_xvt_gtSetSelection( PXWND_DEF wnd, char *szData, ULONG ulSize )
 {
+   if( wnd->ClipboardOwner && ulSize == 0 )
+   {
+      XSetSelectionOwner( wnd->dpy, s_atomPrimary, None, wnd->ClipboardTime );
+      XSetSelectionOwner( wnd->dpy, s_atomClipboard, None, wnd->ClipboardTime );
+   }
+
    if( wnd->ClipboardData != NULL )
       hb_xfree( wnd->ClipboardData );
    wnd->ClipboardData = ( unsigned char * ) hb_xgrab( ulSize + 1 );
    memcpy( wnd->ClipboardData, szData, ulSize );
    wnd->ClipboardData[ ulSize ] = '\0';
    wnd->ClipboardSize = ulSize;
+   wnd->ClipboardTime = wnd->lastEventTime;
+   wnd->ClipboardOwner = FALSE;
 
-   wnd->ClipboardOwner = TRUE;
-   XSetSelectionOwner( wnd->dpy, s_atomPrimary, wnd->window, CurrentTime );
+   if( ulSize > 0 )
+   {
+      XSetSelectionOwner( wnd->dpy, s_atomPrimary, wnd->window, wnd->ClipboardTime );
+      if( XGetSelectionOwner( wnd->dpy, s_atomPrimary ) == wnd->window )
+      {
+         wnd->ClipboardOwner = TRUE;
+         XSetSelectionOwner( wnd->dpy, s_atomClipboard, wnd->window, wnd->ClipboardTime );
+      }
+      else
+      {
+         char * cMsg = "Cannot set primary selection\r\n";
+         hb_gt_OutErr( ( BYTE * ) cMsg, strlen( cMsg ) );
+      }
+   }
 }
 
 /* *********************************************************************** */
@@ -2878,50 +2988,57 @@ static void hb_xvt_gtRequestSelection( PXWND_DEF wnd )
 {
    if( !wnd->ClipboardOwner )
    {
-      BOOL fRepeat = TRUE;
-      wnd->ClipboardRequest = s_atomUTF8String;
-      while( wnd->ClipboardRequest )
+      Atom aRequest;
+      int iConnFD = ConnectionNumber( wnd->dpy );
+      struct timeval timeout;
+      fd_set readfds;
+
+      timeout.tv_sec = 3;
+      timeout.tv_usec = 0;
+
+      wnd->ClipboardRcvd = FALSE;
+      wnd->ClipboardRequest = s_atomTargets;
+      aRequest = None;
+
+      if( s_updateMode == XVT_ASYNC_UPDATE )
+         s_iUpdateCounter = 150;
+
+      do
       {
-         XConvertSelection( wnd->dpy, s_atomPrimary, wnd->ClipboardRequest,
-                            s_atomCutBuffer0, wnd->window, CurrentTime );
+         if( aRequest != wnd->ClipboardRequest )
+         {
+            aRequest = wnd->ClipboardRequest;
+            if( aRequest == None )
+               break;
+#ifdef XVT_DEBUG
+            printf("XConvertSelection: %ld (%s)\r\n", aRequest,
+               XGetAtomName(wnd->dpy, aRequest)); fflush(stdout);
+#endif
+            XConvertSelection( wnd->dpy, s_atomPrimary, aRequest,
+                               s_atomCutBuffer0, wnd->window, wnd->lastEventTime );
+         }
 
          if( s_updateMode == XVT_ASYNC_UPDATE )
          {
-            s_iUpdateCounter = 100;
-            while( s_iUpdateCounter && wnd->ClipboardRequest )
-               sleep( 1 );
+            if( s_iUpdateCounter == 0 )
+               break;
+            sleep( 1 );
          }
          else
          {
-            int iConnFD = ConnectionNumber( wnd->dpy );
-            struct timeval timeout;
-            fd_set readfds;
-
-            timeout.tv_sec = 0;
-            timeout.tv_usec = 2500000;
-
-            for( ;; )
+            hb_xvt_gtProcessMessages( wnd );
+            if( !wnd->ClipboardRcvd && wnd->ClipboardRequest == aRequest )
             {
-               hb_xvt_gtProcessMessages( wnd );
-               if( !wnd->ClipboardRequest )
-                  break;
-
                FD_ZERO( &readfds );
                FD_SET( iConnFD, &readfds );
                if( select( iConnFD + 1, &readfds, NULL, NULL, &timeout ) <= 0 )
                   break;
             }
          }
-         if( wnd->ClipboardRequest )
-         {
-            wnd->ClipboardRequest = 0;
-         }
-         else if( fRepeat )
-         {
-            fRepeat = FALSE;
-            wnd->ClipboardRequest = s_atomString;
-         }
       }
+      while( !wnd->ClipboardRcvd && wnd->ClipboardRequest != None );
+
+      wnd->ClipboardRequest = None;
    }
 }
 
@@ -3095,6 +3212,8 @@ static PXWND_DEF hb_xvt_gtCreateWndDef( void )
    wnd->keyModifiers.bAltGr = FALSE;
    wnd->keyModifiers.bShift = FALSE;
 
+   wnd->lastEventTime = CurrentTime;
+
    return wnd;
 }
 
@@ -3125,12 +3244,19 @@ static BOOL hb_xvt_gtConnectX( PXWND_DEF wnd, BOOL fExit )
    hb_xvt_gtMouseInit( wnd );
 
    /* set atom identifiers for atom names we will use */
-   s_atomDelWin     = XInternAtom( wnd->dpy, "WM_DELETE_WINDOW", True );
-   s_atomString     = XInternAtom( wnd->dpy, "STRING", False );
-   s_atomUTF8String = XInternAtom( wnd->dpy, "UTF8_STRING", False );
-   s_atomPrimary    = XInternAtom( wnd->dpy, "PRIMARY", False );
-   s_atomTargets    = XInternAtom( wnd->dpy, "TARGETS", False );
-   s_atomCutBuffer0 = XInternAtom( wnd->dpy, "CUT_BUFFER0", False );
+   s_atomDelWin       = XInternAtom( wnd->dpy, "WM_DELETE_WINDOW", True );
+   s_atomTimestamp    = XInternAtom( wnd->dpy, "TIMESTAMP", False );
+   s_atomAtom         = XInternAtom( wnd->dpy, "ATOM", False );
+   s_atomInteger      = XInternAtom( wnd->dpy, "INTEGER", False );
+   s_atomString       = XInternAtom( wnd->dpy, "STRING", False );
+   s_atomUTF8String   = XInternAtom( wnd->dpy, "UTF8_STRING", False );
+   s_atomPrimary      = XInternAtom( wnd->dpy, "PRIMARY", False );
+   s_atomSecondary    = XInternAtom( wnd->dpy, "SECONDARY", False );
+   s_atomClipboard    = XInternAtom( wnd->dpy, "CLIPBOARD", False );
+   s_atomTargets      = XInternAtom( wnd->dpy, "TARGETS", False );
+   s_atomCutBuffer0   = XInternAtom( wnd->dpy, "CUT_BUFFER0", False );
+   s_atomText         = XInternAtom( wnd->dpy, "TEXT", False );
+   s_atomCompoundText = XInternAtom( wnd->dpy, "COMPOUND_TEXT", False );
 
    return TRUE;
 }

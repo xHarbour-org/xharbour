@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.98 2006/02/21 19:37:06 druzus Exp $
+ * $Id: ads1.c,v 1.99 2006/03/01 07:30:18 brianhays Exp $
  */
 
 /*
@@ -1659,7 +1659,10 @@ static ERRCODE adsFlush( ADSAREAP pArea )
    {
       AdsWriteRecord( pArea->hTable );
 #if ADS_REQUIRE_VERSION >= 6
-      AdsFlushFileBuffers( pArea->hTable );
+      if( hb_set.HB_SET_HARDCOMMIT )
+      {
+         AdsFlushFileBuffers( pArea->hTable );
+      }
 #endif
    }
 

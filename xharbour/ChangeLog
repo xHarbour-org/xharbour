@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4841 2006/02/27 22:49:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4842 2006/03/01 07:29:37 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-01 14:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/Makefile
+    * added missing gfxtrans.ch
+
+  * xharbour/include/hbdefs.h
+  * xharbour/source/compiler/genc.c
+    * minor modification in some harbour func name definitions
+
+  * xharbour/include/hbexprb.c
+    ! fixed typo
+
+  * xharbour/source/rtl/cdpapi.c
+    * set 0 at the end of destination string in hb_cdpStrnToUTF8()
+
+  * xharbour/source/rtl/dateshb.c
+    * removed date range checking with minor typo inside - it's not
+      necessary here and I strongly prefer to keep such things in one
+      place so we can easy change supported date range
+
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/rtl/gtxwc/gtxwc.h
+    * changed the selection code - now both PRIMARY and CLIPBOARD
+      selections are set by xHarbour. It should work with any programs
+      which uses any of them (Lorenzo I think it will make you happy)
+      but I'd like to remove one of this selections or give user a way
+      to chose the preferred one. I can also add support for automatic
+      setting/clearing/pasting PRIMARY selection by GTXWC with mouse
+      and shift key. I'm waiting for opinions.
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    * call AdsFlushFileBuffers() only when _SET_HARDCOMMIT is set (default)
 
 2006-02-28 23:30 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c

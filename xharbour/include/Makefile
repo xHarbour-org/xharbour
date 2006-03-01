@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.24 2005/09/15 12:55:35 druzus Exp $
+# $Id: Makefile,v 1.25 2005/10/24 04:01:52 druzus Exp $
 #
 
 ROOT = ../
@@ -84,6 +84,7 @@ PRG_HEADERS=\
 	getexit.ch   \
 	gtinfo.ch    \
 	gfx.ch       \
+	gfxtrans.ch  \
 	hbclass.ch   \
 	hbcommon.ch  \
 	hbcomprs.ch  \

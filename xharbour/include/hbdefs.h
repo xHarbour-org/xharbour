@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.78 2005/10/19 02:18:54 druzus Exp $
+ * $Id: hbdefs.h,v 1.79 2005/11/12 21:42:35 ronpinkas Exp $
  */
 
 /*
@@ -1128,13 +1128,13 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #endif
 
 #define HB_FUNC_EXEC( funcname )   HB_FUN_##funcname();
-#define HB_FUNC( funcname )        HB_EXTERN_C_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
-#define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC( funcname )        HB_EXTERN_C_ HB_EXPORT HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_EXTERN( funcname ) HB_EXTERN_C_ HB_EXTERN_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
+#define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_INIT( funcname )   static HARBOUR HB_FUN_init_##funcname ( void )
 #define HB_FUNC_EXIT( funcname )   static HARBOUR HB_FUN_exit_##funcname ( void )
-#define HB_FUNC_INITSTATIC( )      static HARBOUR hb_INITSTATICS( void )
-#define HB_FUNC_INITGLOBAL( )      static HARBOUR hb_INITGLOBALS( void )
+#define HB_FUNC_INITSTATICS( )     static HARBOUR hb_INITSTATICS( void )
+#define HB_FUNC_INITGLOBALS( )     static HARBOUR hb_INITGLOBALS( void )
 #define HB_FUNC_REGISTERGLOBAL( )  static HARBOUR hb_REGISTERGLOBALS( void )
 
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
