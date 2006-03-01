@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.23 2006/02/21 19:37:07 druzus Exp $
+ * $Id: cdpapi.c,v 1.24 2006/03/01 13:06:30 druzus Exp $
  */
 
 /*
@@ -547,14 +547,14 @@ HB_EXPORT ULONG hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp,
          {
             if( ulD < ulDst )
             {
-               if( cdp->uniTable && cdp->uniTable->uniCodes && uc >= 0x100 )
+               if( cdp->uniTable && cdp->uniTable->uniCodes )
                {
                   int i;
                   for ( i = 0; i < cdp->uniTable->nChars; i++ )
                   {
                      if ( cdp->uniTable->uniCodes[ i ] == uc )
                      {
-                        uc = i;
+                        uc = ( USHORT ) i;
                         break;
                      }
                   }
@@ -576,14 +576,14 @@ HB_EXPORT BOOL hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BYTE ch, int * n, USHORT * u
 {
    if ( utf8tou16nextchar( ch, n, uc ) )
    {
-      if ( *n == 0 && cdp && cdp->uniTable && cdp->uniTable->uniCodes && *uc >= 0x100 )
+      if ( *n == 0 && cdp && cdp->uniTable && cdp->uniTable->uniCodes )
       {
          int i;
          for ( i = 0; i < cdp->uniTable->nChars; i++ )
          {
             if ( cdp->uniTable->uniCodes[ i ] == *uc )
             {
-               *uc = i;
+               *uc = ( USHORT ) i;
                break;
             }
          }
