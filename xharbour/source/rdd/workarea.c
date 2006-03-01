@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.63 2006/01/30 02:51:24 druzus Exp $
+ * $Id: workarea.c,v 1.64 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -643,6 +643,27 @@ ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          hb_itemPutC( pItem, szAlias );
          break;
+      }
+
+      case DBI_SCOPEDRELATION:
+      {
+         int iRelNo = hb_itemGetNI( pItem );
+         BOOL fScoped = FALSE;
+
+         if( iRelNo > 0 )
+         {
+            LPDBRELINFO lpdbRelations = pArea->lpdbRelations;
+            while( lpdbRelations )
+            {
+               if( --iRelNo == 0 )
+               {
+                  fScoped = lpdbRelations->isScoped;
+                  break;
+               }
+               lpdbRelations = lpdbRelations->lpdbriNext;
+            }
+         }
+         hb_itemPutL( pItem, fScoped );
       }
 
       case DBI_RM_SUPPORTED:
