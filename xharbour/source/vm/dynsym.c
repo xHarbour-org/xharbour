@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.32 2006/01/17 00:47:09 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.33 2006/01/30 02:51:25 druzus Exp $
  */
 
 /*
@@ -639,6 +639,23 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( char * szName )
    hb_dynsymUnlock();
 
    return NULL;
+}
+
+HB_EXPORT PHB_SYMB hb_dynsymGetSymbol( char * szName )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetSymbol(%s)", szName));
+
+   return hb_dynsymGet( szName )->pSymbol;
+}
+
+HB_EXPORT PHB_SYMB hb_dynsymFindSymbol( char * szName )
+{
+   PHB_DYNS pDynSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFindSymbol(%s)", szName));
+
+   pDynSym = hb_dynsymFind( szName );
+   return pDynSym ? pDynSym->pSymbol : NULL;
 }
 
 HB_EXPORT PHB_SYMB hb_dynsymSymbol( PHB_DYNS pDynSym )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4848 2006/03/03 00:08:31 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4849 2006/03/03 06:31:53 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-03 15:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/dynsym.c
+    + added hb_dynsymFindSymbol() and hb_dynsymGetSymbol() functions
 
 2006-03-03 03:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/hbfind.c
