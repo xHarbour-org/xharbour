@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4847 2006/03/02 22:36:58 kaddath Exp $
+ * $Id: ChangeLog,v 1.4848 2006/03/03 00:08:31 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-03 03:30 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * source/rtl/hbfind.c
+    ! Fixed invalid handle error in Windows when file() fails
+      (detected by AQTime profiler)
 
 2006-03-02 18:06 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * contrib/libnf/mouse.c

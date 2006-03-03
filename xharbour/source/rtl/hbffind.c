@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.29 2005/01/10 18:45:35 druzus Exp $
+ * $Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.29 2005/01/10 18:45:35 druzus Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -952,7 +952,10 @@ void HB_EXPORT hb_fsFindClose( PHB_FFIND ffind )
          }
 #elif defined(HB_OS_WIN_32)
          {
-            FindClose( info->hFindFile );
+            if( info->hFindFile != INVALID_HANDLE_VALUE )
+            {
+               FindClose( info->hFindFile );
+            }
          }
 #elif defined(HB_OS_UNIX)
          {
