@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4849 2006/03/03 06:31:53 mlombardo Exp $
+ * $Id: ChangeLog,v 1.4850 2006/03/03 14:13:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-04 17:20 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * Fixed bug where skipping FROM eof would go to record 1
+      Somewhere we lost one of the special handling items for how ADS is
+      radically different from Clipper. The fact is, ACE32 will skip off of EOF
+      to record 1 !!!  We instead need to trap that condition and do nothing,
+      of course.
 
 2006-03-03 15:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbapi.h

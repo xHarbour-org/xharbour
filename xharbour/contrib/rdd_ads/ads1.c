@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.99 2006/03/01 07:30:18 brianhays Exp $
+ * $Id: ads1.c,v 1.100 2006/03/01 13:06:22 druzus Exp $
  */
 
 /*
@@ -995,6 +995,12 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
 static ERRCODE adsSkip( ADSAREAP pArea, LONG lToSkip )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSkip(%p, %ld)", pArea, lToSkip));
+
+   if( lToSkip > 0 && pArea->fEof )
+   {
+      // ACE32 will skip off of EOF to record 1 !!!  We should do nothing instead.
+      return SUCCESS;
+   }
 
    /* resolve any pending relations */
    if( pArea->lpdbPendingRel )
