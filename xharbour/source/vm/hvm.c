@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.548 2006/02/22 01:33:49 ronpinkas Exp $
+ * $Id: hvm.c,v 1.549 2006/02/22 21:14:55 ronpinkas Exp $
  */
 
 /*
@@ -4614,9 +4614,14 @@ static void hb_vmEqual( BOOL bExact )
       pItem2->type = HB_IT_NIL;
       hb_stackDec();
    }
-   else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_EQUAL )
+   else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_EQUAL && bExact == FALSE)
    {
-      hb_vmOperatorCall( pItem1, pItem2, ( char * ) ( bExact ? "__OPEXACTEQUAL" : "__OPEQUAL" ), NULL, 2, NULL );
+      hb_vmOperatorCall( pItem1, pItem2, "__OPEQUAL", NULL, 2, NULL );
+      hb_itemPushForward( &(HB_VM_STACK.Return ) );
+   }
+   else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_EXACTEQUAL && bExact )
+   {
+      hb_vmOperatorCall( pItem1, pItem2, "__OPEXACTEQUAL", NULL, 2, NULL );
       hb_itemPushForward( &(HB_VM_STACK.Return ) );
    }
    else if( bExact && HB_IS_ARRAY( pItem1 ) && HB_IS_ARRAY( pItem2 ) )
