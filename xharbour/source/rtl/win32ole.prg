@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.134 2006/02/03 01:33:58 andijahja Exp $
+ * $Id: win32ole.prg,v 1.135 2006/02/10 21:31:59 ronpinkas Exp $
  */
 
 /*
@@ -122,6 +122,8 @@ RETURN TOleAuto():GetActiveObject( cString )
    static PHB_DYNS s_pSym_hObj;
    static PHB_DYNS s_pSym_New;
    static PHB_DYNS s_pSym_cClassName;
+
+   static PHB_DYNS s_pSym_VTWrapper;
    static PHB_DYNS s_pSym_VTArrayWrapper;
    static PHB_DYNS s_pSym_vt;
    static PHB_DYNS s_pSym_Value;
@@ -145,6 +147,8 @@ INIT PROC HB_OLEINIT
       s_pSym_New            = hb_dynsymFind( "NEW" );
       s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
       s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
+
+      s_pSym_VTWrapper      = hb_dynsymFind( "VTWRAPPER" );
       s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
       s_pSym_vt             = hb_dynsymGetCase( "VT" );
       s_pSym_Value          = hb_dynsymFind( "VALUE" );
@@ -1022,6 +1026,11 @@ RETURN Self
           }
           break;
 
+        case HB_IT_POINTER:
+           pVariant->n1.n2.vt = VT_PTR;
+           pVariant->n1.n2.n3.byref = hb_itemGetPtr( pItem );
+           break;
+
         case HB_IT_ARRAY:
         {
            if( HB_IS_OBJECT( pItem ) )
@@ -1052,6 +1061,7 @@ RETURN Self
                     pVariant->n1.n2.n3.pdispVal = pDisp;
                  }
               }
+              // MUST be before "VTWRAPPER"
               else if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "VTARRAYWRAPPER" ) )
               {
                  // vt := oVTArray:vt
@@ -1108,6 +1118,38 @@ RETURN Self
 
                  goto ItemToVariant_ProcessArray;
               }
+              else if( hb_clsIsParent( pItem->item.asArray.value->uiClass , "VTWRAPPER" ) )
+              {
+                 // vt := oVT:vt
+                 hb_vmPushSymbol( s_pSym_vt->pSymbol );
+                 hb_vmPush( pItem );
+                 hb_vmSend( 0 );
+
+                 pVariant->n1.n2.vt = (VARTYPE) hb_parnl(-1);
+
+                 //value := oVT:value
+                 hb_vmPushSymbol( s_pSym_Value->pSymbol );
+                 hb_vmPush( pItem );
+                 hb_vmSend( 0 );
+
+                 switch( pVariant->n1.n2.vt )
+                 {
+                    case VT_UNKNOWN:
+                       pVariant->n1.n2.n3.punkVal = (IUnknown *) hb_parptr( -1 );
+                       break;
+
+                    case ( VT_UNKNOWN | VT_BYREF ):
+                       // Hack!!! Using high 4 bytes of the union (llVal)
+                       *( (IUnknown **) ( &pVariant->n1.n2.n3.lVal ) + 1 ) = (IUnknown *) hb_parptr( -1 );
+                       pVariant->n1.n2.n3.ppunkVal = (IUnknown **) (&pVariant->n1.n2.n3.lVal ) + 1;
+                       break;
+
+                    default:
+                       TraceLog( NULL, "Unexpected VT type %p in: %s(%i)!\n", pVariant->n1.n2.vt, __FILE__, __LINE__ );
+                 }
+
+                 break;
+              }
               else
               {
                  TraceLog( NULL, "Class: '%s' not suported!\n", hb_objGetClsName( pItem ) );
@@ -1153,6 +1195,11 @@ RETURN Self
            }
         }
         break;
+
+        default:
+        {
+           TraceLog( NULL, "Unexpected type %p in: %s(%i)!\n", pItem->type, __FILE__, __LINE__ );
+        }
      }
   }
 
@@ -1587,7 +1634,7 @@ RETURN Self
         case VT_UNKNOWN:
            if( pVariant->n1.n2.vt == VT_UNKNOWN )
            {
-              pUnk = *pVariant->n1.n2.n3.ppunkVal;
+              pUnk = pVariant->n1.n2.n3.punkVal;
            }
 
            if( pUnk )
@@ -1613,7 +1660,22 @@ RETURN Self
            {
               if( pUnk )
               {
-                 hb_itemPutPtr( pItem, pUnk );
+                 PHB_ITEM pVT = hb_itemPutNL( hb_itemNew( NULL ), (LONG) pVariant->n1.n2.vt );
+                 PHB_ITEM pUnknown = hb_itemPutPtr( hb_itemNew( NULL ), (void *) pUnk );
+
+                 hb_vmPushSymbol( s_pSym_VTWrapper->pSymbol );
+                 hb_vmPushNil();
+                 hb_itemPushForward( pVT );
+                 hb_itemPushForward( pUnknown );
+                 hb_vmDo( 2 );
+
+                 if( pItem != hb_stackReturnItem() )
+                 {
+                    hb_itemForwardValue( pItem, hb_stackReturnItem() );
+                 }
+
+                 hb_itemRelease( pVT );
+                 hb_itemRelease( pUnknown );
               }
 
               break;

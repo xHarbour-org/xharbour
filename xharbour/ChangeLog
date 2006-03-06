@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4850 2006/03/03 14:13:17 druzus Exp $
+ * $Id: ChangeLog,v 1.4851 2006/03/05 01:18:44 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-06 10:17 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    + Added support for VTWrraper() class - for now only VT_UNKNOWN and ( VT_UNKNOWN | VT_BYREF )
+  ! Fixed GPG trap for VT_UNKNOWN in hb_oleVariantToItem()
 
 2006-03-04 17:20 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c
