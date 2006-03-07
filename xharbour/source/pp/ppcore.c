@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.221 2005/10/24 19:07:59 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.222 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -6203,13 +6203,13 @@ int hb_pp_RdStr( FILE * handl_i, char * buffer, int maxlen, BOOL lDropSpaces, ch
             case '\"':
               if( s_ParseState != STATE_BRACKET )
               {
-                if ( toupper( s_prevchar ) != 'E' )
+                if( readed > 0 && buffer[readed-1] == 'E' )
                 {
-                  s_ParseState = STATE_QUOTE2;
+                  s_ParseState = STATE_QUOTE4;
                 }
                 else
                 {
-                  s_ParseState = STATE_QUOTE4;
+                  s_ParseState = STATE_QUOTE2;
                 }
               }
               break;
