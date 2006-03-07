@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.70 2006/01/20 09:14:01 likewolf Exp $
+ * $Id: debugger.prg,v 1.71 2006/02/22 14:46:10 likewolf Exp $
  */
 
 /*
@@ -3208,7 +3208,21 @@ STATIC FUNCTION IsValidStopLine( cLine )
   DO WHILE ( i := At( "/*", cLine ) ) > 0
     StripUntil( @cLine, i, "*/" )
   ENDDO
+  IF ( i := At( "//", cLine ) ) > 0
+    cLine := Left( cLine, i - 1 )
+  ENDIF
+  IF ( i := At( "&&", cLine ) ) > 0
+    cLine := Left( cLine, i - 1 )
+  ENDIF
+
   cLine := ALLTRIM( cLine )
+
+  IF cLine[ 1 ] == '*' .OR. cLine[ -1 ] == ';'
+    RETURN .F.
+  ELSEIF Len( cLine ) > 0 .AND. !IsAlpha( cLine[ 1 ] )
+    RETURN .T.
+  ENDIF
+  
   i := 1
   DO WHILE i <= Len( cLine ) .AND. IsAlpha( cLine[ i ] )
     i++
