@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.222 2006/02/15 19:33:05 druzus Exp $
+ * $Id: ppcore.c,v 1.223 2006/03/07 18:48:46 ronpinkas Exp $
  */
 
 /*
@@ -1094,29 +1094,48 @@ int hb_pp_ParseDirective( char * sLine )
            cDelimChar = '\'';
         }
 
-        sLine++; i = 0;
-        while( *(sLine+i) != '\0' && *(sLine+i) != cDelimChar ) i++;
-        if( *(sLine+i) != cDelimChar )
+        sLine++;
+        i = 0;
+
+        while( *( sLine + i ) != '\0' && *( sLine + i ) != cDelimChar )
+        {
+           i++;
+        }
+
+        if( *(sLine + i ) != cDelimChar )
         {
            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine - 1, NULL );
         }
-        *(sLine+i) = '\0';
+        else
+        {
+           char *pTmp = sLine + i + 1;
+
+           HB_SKIPTABSPACES( pTmp );
+
+           if( *pTmp )
+           {
+              printf( "Found: '%c' %i\n", *pTmp, *pTmp );
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine - 1, NULL );
+           }
+        }
+
+        *( sLine + i ) = '\0';
 
         if( ! OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
         {
-          if( errno == 0 || errno == EMFILE )
-          {
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
-          }
-          else
-          {
-          #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
-          #else
-            hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
-          #endif
-          }
-       }
+           if( errno == 0 || errno == EMFILE )
+           {
+              hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
+           }
+           else
+           {
+              #if defined(__CYGWIN__) || defined(__IBMCPP__) || defined(__LCC__)
+                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, "" );
+              #else
+                hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_CANNOT_OPEN, sLine, strerror( errno ) );
+              #endif
+           }
+        }
      }
      else if( i >= 4 && i <= 6 && memcmp( sDirective, "DEFINE", i ) == 0 )
      {
@@ -2457,6 +2476,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      BOOL bRule;
 
     Top:
+
      //printf( "  *** Line: >%s<\n", sLine );
 
      ptro = sOutLine;
@@ -2466,6 +2486,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      {
         ptri++;
      }
+
      if( ptri[0] == '#' && strchr( "xXcCtT", ptri[1] ) )
      {
         bRule = TRUE;
@@ -2474,6 +2495,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      {
         bRule = FALSE;
      }
+
      ptri = sLine + isdvig;
 
      ipos = md_strAt( ";", 1, ptri, FALSE, FALSE, bRule, FALSE );

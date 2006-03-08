@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4854 2006/03/07 10:00:39 likewolf Exp $
+ * $Id: ChangeLog,v 1.4855 2006/03/07 18:39:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-07 20:29 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source\pp\ppcore.c
+    + Added error reporting if #include directive has any non space characters after the file name.
 
 2006-03-07 10:39 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include\hbextern.ch
