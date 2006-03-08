@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.135 2006/02/10 21:31:59 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.136 2006/03/06 18:18:58 ronpinkas Exp $
  */
 
 /*
@@ -127,8 +127,6 @@ RETURN TOleAuto():GetActiveObject( cString )
    static PHB_DYNS s_pSym_VTArrayWrapper;
    static PHB_DYNS s_pSym_vt;
    static PHB_DYNS s_pSym_Value;
-
-   static BOOL *s_OleRefFlags = NULL;
 
    static DISPPARAMS s_EmptyDispParams;
 
@@ -751,8 +749,6 @@ RETURN Self
   // -----------------------------------------------------------------------
   static EXCEPINFO excep;
 
-  static PHB_ITEM *aPrgParams = NULL;
-
   static BSTR bstrMessage;
   static DISPID lPropPut = DISPID_PROPERTYPUT;
   static UINT uArgErr;
@@ -1204,12 +1200,12 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  static void GetParams( DISPPARAMS *pDispParams )
+  static PHB_ITEM * GetParams( DISPPARAMS *pDispParams )
   {
      VARIANTARG * pArgs = NULL;
-     PHB_ITEM pParam;
      int n, nArgs, nArg;
      BOOL bByRef;
+     PHB_ITEM *aPrgParams = NULL;
 
      nArgs = hb_pcount();
 
@@ -1217,9 +1213,6 @@ RETURN Self
      {
         pArgs = ( VARIANTARG * ) hb_xgrab( sizeof( VARIANTARG ) * nArgs );
         aPrgParams = ( PHB_ITEM * ) hb_xgrab( sizeof( PHB_ITEM ) * nArgs );
-
-        // 1 Based!!!
-        s_OleRefFlags = (BOOL *) hb_xgrab( ( nArgs + 1 ) * sizeof( BOOL ) );
 
         //printf( "Args: %i\n", nArgs );
 
@@ -1229,25 +1222,11 @@ RETURN Self
            nArg = nArgs - n;
            VariantInit( &( pArgs[ n ] ) );
 
-           pParam = hb_stackItemFromBase( nArg );
-
-           bByRef = HB_IS_BYREF( pParam );
-
-           // 1 Based!!!
-           s_OleRefFlags[ nArg ] = bByRef;
-
-           if( bByRef )
-           {
-              aPrgParams[ n ] = hb_itemUnRef( pParam );
-           }
-           else
-           {
-              aPrgParams[ n ] = pParam;
-           }
+           aPrgParams[ n ] = hb_stackItemFromBase( nArg );
 
            //TraceLog( NULL, "N: %i Arg: %i Type: %i %i ByRef: %i\n", n, nArg, pParam->type, aPrgParams[ n ]->type, bByRef );
 
-           hb_oleItemToVariant( &( pArgs[ n ] ), pParam );
+           hb_oleItemToVariant( &( pArgs[ n ] ), aPrgParams[ n ] );
         }
      }
 
@@ -1255,10 +1234,12 @@ RETURN Self
      pDispParams->cArgs             = nArgs;
      pDispParams->rgdispidNamedArgs = 0;
      pDispParams->cNamedArgs        = 0;
+
+     return aPrgParams;
   }
 
   //---------------------------------------------------------------------------//
-  static void FreeParams( DISPPARAMS *pDispParams )
+  static void FreeParams( DISPPARAMS *pDispParams, PHB_ITEM *aPrgParams )
   {
      if( pDispParams->cArgs > 0 )
      {
@@ -1267,17 +1248,28 @@ RETURN Self
         char *sString;
         VARIANT *pVariant;
         PHB_ITEM pItem;
+        BOOL bByRef;
 
         for( n = 0; n < ( int ) pDispParams->cArgs; n++ )
         {
            pVariant = &( pDispParams->rgvarg[ n ] );
            pItem = aPrgParams[ n ];
 
+           if( HB_IS_BYREF( pItem ) )
+           {
+              bByRef = TRUE;
+              pItem = hb_itemUnRef( pItem );
+           }
+           else
+           {
+              bByRef = FALSE;
+           }
+
            nParam = pDispParams->cArgs - n;
 
-           //TraceLog( NULL, "*** N: %i, Param: %i Type: %i, ByRef: %i\n", n, nParam, pVariant->n1.n2.vt, s_OleRefFlags[ nParam ] );
+           //TraceLog( NULL, "*** N: %i, Param: %i Type: %i\n", n, nParam, pVariant->n1.n2.vt);
 
-           if( s_OleRefFlags[ nParam ] )
+           if( bByRef )
            {
               switch( pVariant->n1.n2.vt )
               {
@@ -1442,12 +1434,7 @@ RETURN Self
         }
 
         hb_xfree( ( LPVOID ) pDispParams->rgvarg );
-
-        hb_xfree( (void *) s_OleRefFlags );
-        s_OleRefFlags = NULL;
-
         hb_xfree( ( LPVOID ) aPrgParams );
-        aPrgParams = NULL;
      }
   }
 
@@ -2163,7 +2150,7 @@ RETURN Self
   static HRESULT OleSetProperty( IDispatch *pDisp, DISPID DispID, DISPPARAMS *pDispParams )
   {
      // 1 Based!!!
-     if( ( s_OleRefFlags && s_OleRefFlags[ 1 ] ) || hb_param( 1, HB_IT_ARRAY ) )
+     if( ( ISBYREF( 1 ) ) || ISARRAY( 1 ) )
      {
         memset( (LPBYTE) &excep, 0, sizeof( excep ) );
 
@@ -2327,6 +2314,7 @@ RETURN Self
      {
         IDispatch *pDisp;
         DISPPARAMS DispParams;
+        PHB_ITEM *aPrgParams;
 
         hb_vmPushSymbol( s_pSym_hObj->pSymbol );
         hb_vmPush( hb_stackSelfItem() );
@@ -2336,7 +2324,7 @@ RETURN Self
 
         VariantClear( &RetVal );
 
-        GetParams( &DispParams );
+        aPrgParams = GetParams( &DispParams );
 
         DispParams.rgdispidNamedArgs = &lPropPut;
         DispParams.cNamedArgs = 1;
@@ -2344,7 +2332,7 @@ RETURN Self
         OleSetProperty( pDisp, DISPID_VALUE, &DispParams );
         //TraceLog( NULL, "SetDefault: %p\n", s_nOleError );
 
-        FreeParams( &DispParams );
+        FreeParams( &DispParams, aPrgParams );
 
         if( SUCCEEDED( s_nOleError ) )
         {
@@ -2466,7 +2454,7 @@ RETURN Self
 
      if( SUCCEEDED( s_nOleError ) )
      {
-        GetParams( &DispParams );
+        PHB_ITEM *aPrgParams = GetParams( &DispParams );
 
         VariantClear( &RetVal );
 
@@ -2526,7 +2514,7 @@ RETURN Self
            }
         }
 
-        FreeParams( &DispParams );
+        FreeParams( &DispParams, aPrgParams );
      }
 
      if( SUCCEEDED( s_nOleError ) )
