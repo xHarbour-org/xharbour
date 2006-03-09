@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.66 2006/02/15 19:33:04 druzus Exp $
+# $Id: hb-func.sh,v 1.67 2006/02/21 19:37:05 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -384,6 +384,7 @@ do
 done
 if [ "\${HB_XBGTK}" = "yes" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} -lxbgtk"
+    HB_PATHS="\${HB_PATHS} -I\`PKG_CONFIG_PATH=/usr/local/lib/pkgconfig pkg-config --variable=xbgtkincludedir xbgtk\`"
 fi
 if [ "\${HB_HWGUI}" = "yes" ]; then
     HARBOUR_LIBS="\${HARBOUR_LIBS} -lhwgui -lprocmisc -lhbxml"
