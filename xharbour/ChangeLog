@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4858 2006/03/09 12:34:40 likewolf Exp $
+ * $Id: ChangeLog,v 1.4859 2006/03/10 01:22:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-09 17:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/regex.c
+    ! Fixed GPF trap related to empty RegEx
 
 2006-03-09 17:19 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include\hbextern.ch

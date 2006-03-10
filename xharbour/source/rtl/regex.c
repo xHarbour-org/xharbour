@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.56 2005/12/17 15:11:04 fsgiudice Exp $
+ * $Id: regex.c,v 1.57 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -220,8 +220,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
       pString = hb_param( 2, HB_IT_STRING );
    }
 
-   if( pRegEx == NULL || pString == NULL ||
-       !HB_IS_STRING( pRegEx ) || !HB_IS_STRING( pString ) )
+   if( pRegEx == NULL || pString == NULL || ( ! HB_IS_STRING( pRegEx ) ) || ( ! HB_IS_STRING( pString ) ) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, "Wrong parameters", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ) );
       return FALSE;
@@ -231,6 +230,12 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                        pCaseSensitive != NULL && !pCaseSensitive->item.asLogical.value,
                        pNewLine != NULL && pNewLine->item.asLogical.value,
                        &fFree );
+
+   if( pReg == NULL )
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, "Invalid regular expression", "Regex subsystem", 4, pRegEx, pString, hb_paramError( 3 ), hb_paramError( 4 ) );
+      return FALSE;
+   }
 
    if( cRequest != 0 && cRequest != 4 && cRequest != 5 )
    {
