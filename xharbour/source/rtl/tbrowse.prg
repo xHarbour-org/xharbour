@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.141 2006/01/30 12:37:47 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.142 2006/02/09 14:20:56 gdrouillard Exp $
  */
 
 /*
@@ -338,7 +338,11 @@ RETURN nToTop
 METHOD FillRow( nRow ) CLASS TDataCache
 
    local aCol, oCell
-   local nRectPos
+   local nRectPos 
+
+   IF nRow > Len( ::aCache )
+      RETURN Self
+   ENDIF
 
    ::aCache[ nRow ] := Array( ::oCachedBrowse:colCount )
 
