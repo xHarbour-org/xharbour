@@ -1,5 +1,5 @@
 /*
- * $Id: strmatch.c,v 1.8 2004/11/21 21:44:20 druzus Exp $
+ * $Id: strmatch.c,v 1.9 2005/09/02 18:30:41 druzus Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ static BOOL hb_strMatchDOS( const char * pszString, const char * pszMask )
 }
 #endif
 
-BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
+HB_EXPORT BOOL hb_strMatchRegExp( const char * szString, const char * szMask )
 {
    BOOL fResult = FALSE;
    HB_REGEX RegEx;
@@ -131,10 +131,12 @@ BOOL HB_EXPORT hb_strMatchRegExp( const char * szString, const char * szMask )
 
 #define HB_MAX_WILDPATTERN     256
 
-BOOL HB_EXPORT hb_strMatchWild(const char *szString, const char *szPattern )
+HB_EXPORT BOOL hb_strMatchWild( const char *szString, const char *szPattern )
 {
    BOOL fMatch = TRUE, fAny = FALSE;
-   ULONG ulAnyPosP[HB_MAX_WILDPATTERN], ulAnyPosV[HB_MAX_WILDPATTERN],
+   ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
+         ulBufSize = HB_MAX_WILDPATTERN;
+   ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
          ulSize, ulLen, ulAny, i, j;
 
    i = j = ulAny = 0;
@@ -151,12 +153,24 @@ BOOL HB_EXPORT hb_strMatchWild(const char *szString, const char *szPattern )
       {
          if ( fAny )
          {
-            if ( ulAny < HB_MAX_WILDPATTERN )
+            if ( ulAny >= ulBufSize )
             {
-               ulAnyPosP[ulAny] = i;
-               ulAnyPosV[ulAny] = j;
-               ulAny++;
+               if( ( ulBufSize <<= 1 ) == ( HB_MAX_WILDPATTERN << 1 ) )
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+               }
+               else
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xrealloc( ulAnyPosP, ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xrealloc( ulAnyPosV, ulBufSize * sizeof( ULONG ) );
+               }
             }
+            ulAnyPosP[ulAny] = i;
+            ulAnyPosV[ulAny] = j;
+            ulAny++;
             fAny = FALSE;
          }
          j++;
@@ -179,15 +193,94 @@ BOOL HB_EXPORT hb_strMatchWild(const char *szString, const char *szPattern )
          break;
       }
    }
+   if( ulBufSize > HB_MAX_WILDPATTERN )
+   {
+      hb_xfree( ulAnyPosP );
+      hb_xfree( ulAnyPosV );
+   }
+   return fMatch;
+}
+
+HB_EXPORT BOOL hb_strMatchWildExact( const char *szString, const char *szPattern )
+{
+   BOOL fMatch = TRUE, fAny = FALSE;
+   ULONG pulBufPosP[ HB_MAX_WILDPATTERN ], pulBufPosV[ HB_MAX_WILDPATTERN ],
+         ulBufSize = HB_MAX_WILDPATTERN;
+   ULONG * ulAnyPosP = pulBufPosP, * ulAnyPosV = pulBufPosV,
+         ulSize, ulLen, ulAny, i, j;
+
+   i = j = ulAny = 0;
+   ulLen = strlen( szString );
+   ulSize = strlen( szPattern );
+   while ( i < ulSize || ( j < ulLen && !fAny ) )
+   {
+      if ( i < ulSize && szPattern[i] == '*' )
+      {
+         fAny = TRUE;
+         i++;
+      }
+      else if ( j < ulLen && i < ulSize &&
+                ( szPattern[i] == '?' || szPattern[i] == szString[j] ) )
+      {
+         if ( fAny )
+         {
+            if ( ulAny >= ulBufSize )
+            {
+               if( ( ulBufSize <<= 1 ) == ( HB_MAX_WILDPATTERN << 1 ) )
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xgrab( ulBufSize * sizeof( ULONG ) );
+                  memcpy( ulAnyPosP, pulBufPosP, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+                  memcpy( ulAnyPosV, pulBufPosV, HB_MAX_WILDPATTERN * sizeof( ULONG ) );
+               }
+               else
+               {
+                  ulAnyPosP = ( ULONG * ) hb_xrealloc( ulAnyPosP, ulBufSize * sizeof( ULONG ) );
+                  ulAnyPosV = ( ULONG * ) hb_xrealloc( ulAnyPosV, ulBufSize * sizeof( ULONG ) );
+               }
+            }
+            ulAnyPosP[ulAny] = i;
+            ulAnyPosV[ulAny] = j;
+            ulAny++;
+            fAny = FALSE;
+         }
+         j++;
+         i++;
+      }
+      else if ( fAny && j < ulLen )
+      {
+         j++;
+      }
+      else if ( ulAny > 0 )
+      {
+         ulAny--;
+         i = ulAnyPosP[ulAny];
+         j = ulAnyPosV[ulAny] + 1;
+         fAny = TRUE;
+      }
+      else
+      {
+         fMatch = FALSE;
+         break;
+      }
+   }
+   if( ulBufSize > HB_MAX_WILDPATTERN )
+   {
+      hb_xfree( ulAnyPosP );
+      hb_xfree( ulAnyPosV );
+   }
    return fMatch;
 }
 
 /*
- * WildMatch( cPattern, cValue ) compares cValue ith cPattern, cPattern
- * may contain wildcard characters (?*)
+ * WildMatch( cPattern, cValue [, lExact] ) compares
+ * cValue with cPattern, cPattern * may contain wildcard characters (?*)
+ * When lExact is TRUE then it will check if whole cValue is covered by
+ * cPattern else if will check if cPatern is a prefix of cValue
  */
 HB_FUNC( WILDMATCH )
 {
    hb_retl( ( ! ISCHAR( 1 ) || ! ISCHAR( 2 ) ) ? FALSE :
-            hb_strMatchWild( hb_parc( 2 ), hb_parc( 1 ) ) );
+            hb_parl( 3 ) ? hb_strMatchWildExact( hb_parc( 2 ), hb_parc( 1 ) ) :
+                           hb_strMatchWild( hb_parc( 2 ), hb_parc( 1 ) ) );
 }

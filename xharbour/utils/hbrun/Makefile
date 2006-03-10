@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
+# $Id: Makefile,v 1.2 2004/05/10 10:38:08 mauriliolongo Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -24,6 +24,7 @@ LIBS=\
 	debug \
 	vm \
 	rtl \
+	ct \
 	lang \
 	rdd \
 	rtl \

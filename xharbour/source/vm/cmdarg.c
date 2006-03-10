@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.18 2005/10/24 01:04:36 druzus Exp $
+ * $Id: cmdarg.c,v 1.19 2005/11/16 12:16:45 druzus Exp $
  */
 
 /*
@@ -50,40 +50,56 @@
  *
  */
 
+#define HB_OS_WIN_32_USED
+
 #include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbinit.h"
 #include "hbmemory.ch"
 
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-  #include <windows.h>
-#endif
-
 /* Command line argument management */
 static int     s_argc = 0;
 static char ** s_argv = NULL;
 
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
-  /*
-   To disable mouse in Windows Console Mode
-   This variable will be set to FALSE upon
-   initialization of gt -> hb_gt_Init()
-  */
-  BOOL b_MouseEnable = TRUE;
+#if defined( HB_OS_WIN_32 ) && defined( HB_OS_WIN_32_USED )
 
-  HB_EXTERN_BEGIN
-  HANDLE hb_hInstance = 0;
-  HANDLE hb_hPrevInstance = 0;
-  int    hb_iCmdShow;
-void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
+HB_EXTERN_BEGIN
+
+/*
+ * To disable mouse in Windows Console Mode
+ * This variable will be set to FALSE upon
+ * initialization of gt -> hb_gt_Init()
+ */
+BOOL b_MouseEnable = TRUE;
+
+HANDLE hb_hInstance     = 0;
+HANDLE hb_hPrevInstance = 0;
+int    hb_iCmdShow      = 0;
+BOOL   s_WinMainParam   = FALSE;
+
+HB_EXTERN_END
+
+HB_EXPORT void hb_winmainArgInit( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow )
 {
    hb_hInstance = hInstance;
    hb_hPrevInstance = hPrevInstance;
    hb_iCmdShow = iCmdShow;
-   return ;
+   s_WinMainParam = TRUE;
 }
-  HB_EXTERN_END
+
+HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInstance, int * piCmdShow )
+{
+   if( phInstance )
+      *phInstance = hb_hInstance;
+   if( phPrevInstance )
+      *phPrevInstance = hb_hPrevInstance;
+   if( piCmdShow )
+      *piCmdShow = hb_iCmdShow;
+
+   return s_WinMainParam;
+}
+
 #endif
 
 void HB_EXPORT hb_cmdargInit( int argc, char * argv[] )

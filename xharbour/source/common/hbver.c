@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.32 2005/10/04 20:06:09 druzus Exp $
+ * $Id: hbver.c,v 1.33 2006/02/21 19:37:06 druzus Exp $
  */
 
 /*
@@ -656,7 +656,7 @@ char * hb_verPCode( void )
 
 }
 
-static void hb_conOutErr_ ( char * szText, ULONG ulLen, BOOL bOut )
+static void hb_conOutErr_ ( const char * szText, ULONG ulLen, BOOL bOut )
 {
    if( bOut )
    {

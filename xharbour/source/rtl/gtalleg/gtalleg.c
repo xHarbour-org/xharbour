@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.38 2006/02/15 19:33:05 druzus Exp $
+ * $Id: gtalleg.c,v 1.39 2006/02/16 01:43:03 maurifull Exp $
  */
 
 /*
@@ -2306,4 +2306,4 @@ int _mangled_main( int argc, char * argv[] )
 
    return hb_vmQuit();
 }
-void *_mangled_main_address = _mangled_main;
+void *_mangled_main_address = ( void * ) _mangled_main;

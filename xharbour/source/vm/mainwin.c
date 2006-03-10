@@ -1,5 +1,5 @@
 /*
- * $Id: mainwin.c,v 1.20 2005/01/11 08:44:10 druzus Exp $
+ * $Id: mainwin.c,v 1.21 2005/02/24 10:44:15 andijahja Exp $
  */
 
 /*
@@ -54,17 +54,14 @@
 
 #include "hbapi.h"
 #include "hbvm.h"
-#include "hbsetup.h"
-
-#define MAX_ARGS 64
 
 #if defined(HB_OS_WIN_32)
-HB_EXTERN_BEGIN
 
-int argc = 0;
-char * argv[ MAX_ARGS ];  //23/12/2003 3:40p.m. change from 20 to 64
+#define MAX_ARGS 128
 
-void HB_EXPORT hb_SetWinMainParameters( HANDLE hInstance, HANDLE hPrevInstance, int iCmdShow );
+static int    s_argc = 0;
+static char * s_argv[ MAX_ARGS ];
+static char   s_szAppName[ 256 ];
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
@@ -77,19 +74,16 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    LPSTR pArgs = ( LPSTR ) malloc(strlen( lpCmdLine ) + 1 );
 #endif
    LPSTR pStart, pArg = pArgs;
-   char szAppName[ 250 ];
    BOOL bInQuotedParam;
    int iResult ;
    HB_TRACE(HB_TR_DEBUG, ("WinMain(%p, %p, %s, %d)", hInstance, hPrevInstance, lpCmdLine, iCmdShow));
 
    HB_SYMBOL_UNUSED( iCmdShow );
 
-   hb_SetWinMainParameters( hInstance, hPrevInstance, iCmdShow ) ;
+   GetModuleFileName( hInstance, s_szAppName, sizeof( s_szAppName ) - 1 );
+   s_argv[ s_argc++ ] = s_szAppName;
 
-   GetModuleFileName( hInstance, szAppName, 249 );
-   argv[ argc++ ] = szAppName;
-
-   while (*lpCmdLine && argc < MAX_ARGS )
+   while ( *lpCmdLine && s_argc < MAX_ARGS )
    {
       while (*lpCmdLine== ' ')  // Skip over any white space
       {
@@ -147,12 +141,13 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
          if (pStart)
          {
             *pArg++ = '\0';
-            argv[ argc++ ] = pStart ;
+            s_argv[ s_argc++ ] = pStart ;
          }
       }
    }
 
-   hb_cmdargInit( argc, argv );
+   hb_winmainArgInit( hInstance, hPrevInstance, iCmdShow );
+   hb_cmdargInit( s_argc, s_argv );
 
    hb_vmInit( TRUE );
 
@@ -166,9 +161,9 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 }
 
 #if ( defined(__DMC__) || defined(__WATCOMC__) || defined(__MINGW32__) ) && !defined(__EXPORT__)
-void HB_EXPORT hb_forceLinkMainWin( void ) {}
-#endif
-
+HB_EXTERN_BEGIN
+HB_EXPORT void hb_forceLinkMainWin( void ) {}
 HB_EXTERN_END
+#endif
 
 #endif

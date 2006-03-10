@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4859 2006/03/10 01:22:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4860 2006/03/10 01:24:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-10 15:05 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/utils/hbextern/Makefile
+  * xharbour/utils/hbrun/Makefile
+    * added CT library to linked library list
+
+  * xharbour/source/rtl/strmatch.c
+    + added hb_strMatchWildExact()
+    + added 3-rd parameter <lExact> to WildMatch() - when it's TRUE
+      WildMatch() will check if given pattern cover the whole string.
+      Without it it check if pattern is valid prefix only.
+
+  * xharbour/source/ct/like.prg
+    ! use WildMatch() with .T. 3-rd parameter - this is the CT3 LIKE()
+      behavior.
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/cmdarg.c
+  * xharbour/source/vm/mainwin.c
+    + added two new functions: hb_winmainArgInit() and hb_winmainArgGet()
+      to set/retrieve WinMain() parameters.
+
+  * xharbour/source/common/hbver.c
+  * xharbour/source/rtl/gtalleg/gtalleg.c
+    * casting for C++ compilation
 
 2006-03-09 17:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/regex.c

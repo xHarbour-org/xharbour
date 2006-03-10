@@ -1,5 +1,5 @@
 /*
- * $Id: like.prg,v 1.1 2004/11/29 23:30:00 ptsarenko Exp $
+ * $Id: like.prg,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
  */
 
 /*
@@ -51,5 +51,5 @@
  *
  */
 
-Function Like(cPattern, cString)
-Return WildMatch(cPattern, cString)
+Function Like( cPattern, cString )
+Return WildMatch( cPattern, cString, .T. )
