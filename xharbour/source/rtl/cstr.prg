@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.27 2005/11/15 18:45:21 druzus Exp $
+ * $Id: cstr.prg,v 1.28 2005/12/01 13:25:49 snaiperis Exp $
  */
 
 /*
@@ -166,19 +166,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    SWITCH cType
       CASE 'C'
-         IF ! '"' IN xVal
-            RETURN '"' + xVal + '"'
-         ELSEIF ! "'" IN xVal
-            RETURN "'" + xVal + "'"
-         ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
-            RETURN "[" + xVal + "]"
-         ELSE
-            RETURN '"' + StrTran( xVal, '"', '" + Chr( 34 ) + "' ) + '"'
-/*
-            Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
-            EXIT
-*/
-         ENDIF
+         RETURN ValToPrgExp( xVal )
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
@@ -282,22 +270,32 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
    LOCAL cType := ValType( xVal )
    LOCAL aVars, aVar, cRet, nObj
-   LOCAL cChar
+   LOCAL cChar, cDelim, aForbiddenChars := { 0, 10, 13 }, nChar
 
    //TraceLog( xVal, cName, nPad, aObjs )
 
    SWITCH cType
       CASE 'C'
          IF ! '"' IN xVal
-            RETURN '"' + xVal + '"'
+            cDelim := '""'
          ELSEIF ! "'" IN xVal
-            RETURN "'" + xVal + "'"
+            cDelim := "''"
          ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
-            RETURN "[" + xVal + "]"
+            cDelim := "[]"
          ELSE
-            Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
-            EXIT
+            cDelim := '""'
+            xVal := StrTran( xVal, '"', '" + Chr( 34 ) + "' )
+            /*Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
+            EXIT*/
          ENDIF
+         FOR EACH nChar IN aForbiddenChars
+            IF Chr( nChar ) $ xVal
+              xVal := StrTran( xVal, Chr( nChar ), ;
+                               cDelim[ 2 ] + " + Chr( " + ;
+                               LTrim( Str( nChar ) ) + " ) + " + cDelim[ 1 ] )
+            ENDIF
+         NEXT
+         RETURN cDelim[ 1 ] + xVal + cDelim[ 2 ]
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
