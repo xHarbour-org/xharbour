@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4862 2006/03/10 23:27:59 likewolf Exp $
+ * $Id: ChangeLog,v 1.4863 2006/03/11 12:34:12 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2006-03-11 05:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+2006-03-11 15:35 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/cstr.prg
     ! Fixed ValToPrg() and ValToPrgExp() to correctly convert strings
       with Chr( 0 / 10 / 13 ).
