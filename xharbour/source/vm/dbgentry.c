@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.12 2006/01/26 09:21:36 likewolf Exp $
+ * $Id: dbgentry.c,v 1.13 2006/02/15 00:02:32 likewolf Exp $
  */
 
 /*
@@ -713,6 +713,7 @@ hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace )
    pWatch = ARRAY_ADD( HB_WATCHPOINT, info->aWatch, info->nWatchPoints );
    pWatch->szExpr = STRDUP( szExpr );
    pWatch->pBlock = NULL;
+   pWatch->nVars = 0;
 
    if ( bTrace )
    {
