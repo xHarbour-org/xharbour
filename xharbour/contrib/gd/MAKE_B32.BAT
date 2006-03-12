@@ -2,6 +2,8 @@
 set OLDENVMT=%HB_MT%
 set OLDGTLIB=%HB_GT_LIB%
 set PRGNAME=gdlib
+if %BCCDIR%.==. set BCCDIR=C:\BCC55
+
 
 set HB_MT=
 set HB_GT_LIB=gtcgi
