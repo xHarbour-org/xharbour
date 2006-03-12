@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.13 2006/02/15 00:02:32 likewolf Exp $
+ * $Id: dbgentry.c,v 1.14 2006/03/11 20:42:52 likewolf Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "hbapirdd.h"
 #include "hbdebug.ch"
 #include "hbfast.h"
+#include "hbmacro.ch"
 #include "classes.h"
 
 
@@ -907,14 +908,14 @@ hb_dbgEvalMacro( char *szExpr, PHB_ITEM pItem )
    const char *type;
 
    pStr = hb_itemPutC( NULL, szExpr );
-   type = hb_macroGetType( pStr, 0 );
+   type = hb_macroGetType( pStr, HB_SM_RT_MACRO );
    hb_itemRelease( pStr );
    if ( ( !strcmp( type, "U" ) || !strcmp( type, "UE" ) ) )
    {
       return NULL;
    }
    hb_vmPushString( szExpr, strlen( szExpr ) );
-   hb_macroGetValue( hb_stackItemFromTop( -1 ), 0, 0 );
+   hb_macroGetValue( hb_stackItemFromTop( -1 ), 0, HB_SM_RT_MACRO );
    hb_itemForwardValue( pItem, hb_stackItemFromTop( -1 ) );
    hb_stackPop();
    return pItem;
