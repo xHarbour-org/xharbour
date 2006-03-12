@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.57 2006/02/15 19:33:05 druzus Exp $
+ * $Id: regex.c,v 1.58 2006/03/10 01:24:15 ronpinkas Exp $
  */
 
 /*
@@ -414,10 +414,13 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   if ( aMatches[i].rm_eo != -1 )
                   {
                      iMatches = i;
+                     //TraceLog( NULL, "iMatches = %i, Pos = %i\n\r", iMatches, aMatches[i].rm_eo );
                   }
                }
 
                iMatches++;
+
+               //TraceLog( NULL, "iMatches %i\n\r", iMatches );
 
                // If I want all matches
                if ( iGetMatch == 0 || // Check boundaries
@@ -517,7 +520,8 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                }
 
                str += aMatches[ 0 ].rm_eo;
-               ulOffSet += ( aMatches[0].rm_eo - aMatches[0].rm_so );
+               //TraceLog( NULL, "iCount, ulOffSet, aMatches[0].rm_so, aMatches[0].rm_eo: %i, %i, %i, %i \n\r", iCount, ulOffSet, aMatches[0].rm_so, aMatches[0].rm_eo );
+               ulOffSet += aMatches[0].rm_eo;
                iCount++;
             }
             while( *str && (iMax == 0 || iMax >= iCount) && regexec( pReg, str, iMaxMatch, aMatches, EFlags ) == 0 );
