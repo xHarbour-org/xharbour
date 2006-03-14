@@ -166,9 +166,9 @@ CLASS TDataCache
 
    // Retrieves the color (if any) of column n of current row, it can
    // be called ONLY after GetCell() for the same row,col has been called
-   METHOD   GetCellColor( nRow, nCol ) INLINE IIF( Empty( ::aCache[ nRow ][ nCol ]:aColorRect ),;
+   METHOD   GetCellColor( nRow, nCol ) INLINE IIF( CacheOK(::aCache,nRow,nCol), IIF( Empty( ::aCache[ nRow ][ nCol ]:aColorRect ),;
                                                    ::aCache[ nRow ][ nCol ]:aColor,;
-                                                   ::aCache[ nRow ][ nCol ]:aColorRect )
+                                                   ::aCache[ nRow ][ nCol ]:aColorRect), "" )
 
    // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
    METHOD   SetColorRect( aRect )
@@ -180,7 +180,7 @@ CLASS TDataCache
    */
    METHOD   Invalidate( nRow )         INLINE  iif( nRow == NIL,;
                                                     ::lInvalid := .T. ,;
-                                                    iif( nRow > 0 .AND. nRow <= Len( ::aCache ), ::aCache[ nRow ] := NIL, NIL ) ),;
+                                                    iif( CacheOK(::aCache,nRow ), ::aCache[ nRow ] := NIL, NIL ) ),;
                                                Self
 
    /* Needed for clipper compatibility, invalidation of cache must happen just before
@@ -290,8 +290,9 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
          else
             ::nCurRow += nRecsSkipped
-            ::aCache[ ::nCurRow ] := NIL
-
+            IF CacheOK(::aCache,::nCurRow)
+               ::aCache[ ::nCurRow ] := NIL
+            ENDIF
          endif
 
       endif
@@ -338,7 +339,7 @@ RETURN nToTop
 METHOD FillRow( nRow ) CLASS TDataCache
 
    local aCol, oCell
-   local nRectPos 
+   local nRectPos,i
 
    IF nRow > Len( ::aCache )
       RETURN Self
@@ -349,6 +350,8 @@ METHOD FillRow( nRow ) CLASS TDataCache
    for each aCol in ::oCachedBrowse:aColsInfo
 
       oCell := TDataCell():New()
+
+      i := hb_EnumIndex()
 
       with object oCell
          :xData := Eval( aCol[ o_Obj ]:block )
@@ -362,8 +365,9 @@ METHOD FillRow( nRow ) CLASS TDataCache
             endif
          endif
       end
-
-      ::aCache[ nRow ][ HB_EnumIndex() ] := oCell
+      IF CacheOK(::aCache,nRow,i)
+         ::aCache[ nRow ][ i ] := oCell
+      ENDIF
    next
 
    if ! Empty( ::aRect ) .AND. nRectPos > 0
@@ -377,6 +381,7 @@ Return Self
 METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    local nSkipped
+
 
    if Empty( ::aCache[ nRow ] )
 
@@ -397,7 +402,7 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    endif
 
-RETURN ::aCache[ nRow ][ nCol ]:xData
+RETURN IF( CacheOK(::aCache,nRow,nCol), ::aCache[ nRow ][ nCol ]:xData, NIL)
 
 
 
@@ -416,7 +421,9 @@ METHOD SetColorRect( aRect ) CLASS TDataCache
       else
 
          for nCol := aRect[ 2 ] to aRect[ 4 ]
-            ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
+             IF CacheOK(::aCache,nRow,nCol)
+                ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
+             ENDIF
          next
 
       endif
@@ -441,7 +448,9 @@ METHOD InitCache() CLASS TDataCache
       // in turn, forces a reload of row from datasource, this cannot be done now
       // since data has to be fetched from datasource only during stabilization
       // phase
-      ::aCache[ ::nCurRow ] := NIL
+      if CacheOK(::aCache,::nCurRow)
+         ::aCache[ ::nCurRow ] := NIL
+      endif
    endif
 
    ::nLastRow := Len( ::aCache )
@@ -651,7 +660,6 @@ CLASS TBrowse
 
    DATA nPrevDelColPos                    // Save previous colpos before delcolumn(). For clipper compatibility.
 
-
 ENDCLASS
 
 //-------------------------------------------------------------------//
@@ -774,10 +782,12 @@ Return Self
 METHOD RefreshAll() CLASS TBrowse
 
    AFill( ::aRedraw, .T. )
-   if ! ::lPaintBottomUp
+
+   IF ! ::lPaintBottomUp
       ::oDataCache:Invalidate()
-   endif
-   ::stable := .F.
+   ENDIF
+
+   ::Stable := .F.
 
 Return Self
 
@@ -2311,6 +2321,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       - if all rows have been redrawn we set ::stable state to .T.
    */
    if ! ::stable
+
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
       // Every time I enter stabilization loop I need to draw _at least_ one row.
@@ -2357,6 +2368,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       ::stable := .T.
       ::lPaintBottomUp := .F.
       DispEnd()
+
    endif
 
    // NOTE: DBU relies upon current cell being reHilited() even if already stable
@@ -2832,7 +2844,7 @@ Return nNotLeftCol
 */
 METHOD RefreshCurrent() CLASS TBrowse
 
-   local i
+   IF ::Stable
 
    if ! Empty( ::aRedraw )
 
@@ -2842,6 +2854,8 @@ METHOD RefreshCurrent() CLASS TBrowse
    endif
 
    ::Stable := .F.
+
+   ENDIF
 
 Return Self
 
@@ -3328,6 +3342,27 @@ switch aColInfo[ o_Type ]
 end
 Return xValue
 
+*----------------------------------
+Static Function CacheOK( a, n, n2 )
+*----------------------------------
+* 2006/MAR/13 - E.F.
+* Test the validity of the cache array before assess/assign value for it.
+* This test avoid error if array is empty or element is out of bound or nil.
+
+LOCAL lRet := .F.
+
+lRet := ( hb_IsArray(a) .AND.;
+         Len(a)>0 .AND.;
+         hb_IsNumeric(n) .AND. n>0 .AND.;
+         Len(a)>=n .AND. !hb_IsNil(a[n]) )
+
+
+If lRet .AND. !hb_IsNil(n2) .AND. hb_IsNumeric(n2) .AND. n2>0
+   lRet := ( Len( a[n] ) >= n2 ) 
+Endif
+
+Return lRet
+
 //-------------------------------------------------------------------//
 //
 //                   Function to Activate TBrowse
@@ -3341,3 +3376,4 @@ Return TBrowse():New( nTop, nLeft, nBottom, nRight )
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
+

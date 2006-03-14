@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4866 2006/03/12 15:55:00 likewolf Exp $
+ * $Id: ChangeLog,v 1.4867 2006/03/12 22:15:52 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-14 08:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed bound error access/assign to ::aCache array under some conditions.
+      Created static function ChaceOk() to verify ::aCache validity before
+      assign/access it. Changed RefreshCurrent() method to avoid multiple
+      trigger before stabilization, that generate tbrowse instability. See
+      sample supplied by Ron Pinkas, named tbrx.zip.
 
 2006-03-12 23:15 UTC+0100 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * xharbour/source/rtl/regex.c
