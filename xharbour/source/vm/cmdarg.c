@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.19 2005/11/16 12:16:45 druzus Exp $
+ * $Id: cmdarg.c,v 1.20 2006/03/10 15:32:20 druzus Exp $
  */
 
 /*
@@ -64,14 +64,14 @@ static char ** s_argv = NULL;
 
 #if defined( HB_OS_WIN_32 ) && defined( HB_OS_WIN_32_USED )
 
-HB_EXTERN_BEGIN
-
 /*
  * To disable mouse in Windows Console Mode
  * This variable will be set to FALSE upon
  * initialization of gt -> hb_gt_Init()
  */
 BOOL b_MouseEnable = TRUE;
+
+HB_EXTERN_BEGIN
 
 HANDLE hb_hInstance     = 0;
 HANDLE hb_hPrevInstance = 0;
