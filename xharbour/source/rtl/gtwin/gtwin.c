@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.103 2006/01/14 17:46:16 paultucker Exp $
+ * $Id: gtwin.c,v 1.104 2006/01/19 09:33:45 paultucker Exp $
  */
 
 /*
@@ -182,6 +182,9 @@ static BYTE         s_charTransRev[ 256 ];
 static BYTE         s_charTrans[ 256 ];
 static BYTE         s_keyTrans[ 256 ];
 static int          s_iRelCount;
+static int          s_altisdown = 0;
+static int          s_altnum = 0;
+
 int    s_mouseLast;               /* Last mouse button to be pressed                   */
 
 extern int hb_mouse_iCol;
@@ -1775,67 +1778,63 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
    /* Check for events only when the event buffer is exhausted. */
    else if( s_wRepeated == 0 && s_cNumRead <= s_cNumIndex )
    {
-      int altisdown = 0;
-      int altnum = 0;
-
       /* Check for keyboard input */
-      do
+
+      if( ++s_iRelCount > 100 )
       {
-         if( ++s_iRelCount > 100 )
+         s_iRelCount = 0;
+         hb_idleSleep( 0.01 );
+      }
+
+      s_cNumRead = 0;
+      GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
+
+      if( s_cNumRead )
+      {
+         /* Read keyboard input */
+         ReadConsoleInput( s_HInput,          /* input buffer handle   */
+                           s_irInBuf,         /* buffer to read into   */
+                           INPUT_BUFFER_LEN,  /* size of read buffer   */
+                           &s_cNumRead);      /* number of records read */
+         /* Set up to process the first input event */
+         s_cNumIndex = 0;
+
+         if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
          {
-            s_iRelCount = 0;
-            hb_idleSleep( 0.01 );
-         }
-
-         s_cNumRead = 0;
-         GetNumberOfConsoleInputEvents( s_HInput, &s_cNumRead );
-
-         if( s_cNumRead )
-         {
-            /* Read keyboard input */
-            ReadConsoleInput( s_HInput,          /* input buffer handle   */
-                              s_irInBuf,         /* buffer to read into   */
-                              INPUT_BUFFER_LEN,  /* size of read buffer   */
-                              &s_cNumRead);      /* number of records read */
-            /* Set up to process the first input event */
-            s_cNumIndex = 0;
-
-            if ( s_irInBuf[ s_cNumIndex ].EventType == KEY_EVENT )
-            {
-               unsigned short wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
+            unsigned short wKey = s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualScanCode;
 
 #if 0
-               if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
-               {
-                  printf("\n scan %ld key %ld char %ld state %ld alt %d %d %d %d %d",
-                         wKey, /* scan code */
-                         s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode,  /* key code */
-                         s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar,  /* char */
-                         s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState, /* state */
-                         altisdown, s_wRepeated, s_cNumRead, s_cNumIndex, (int) s_bAltKeyHandling);
-               }
+            if( s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
+            {
+               printf("\n scan %ld key %ld char %ld state %ld alt %d %d %d %d %d",
+                      wKey, /* scan code */
+                      s_irInBuf[ s_cNumIndex ].Event.KeyEvent.wVirtualKeyCode,  /* key code */
+                      s_irInBuf[ s_cNumIndex ].Event.KeyEvent.uChar.AsciiChar,  /* char */
+                      s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState, /* state */
+                      s_altisdown, s_wRepeated, s_cNumRead, s_cNumIndex, (int) s_bAltKeyHandling);
+            }
 #endif
-               if( s_bAltKeyHandling )
+            if( s_bAltKeyHandling )
+            {
+               if( s_altisdown )
                {
-                  if( altisdown )
+                  ch = Handle_Alt_Key( &s_altisdown, &s_altnum, wKey, ch );
+               }
+               else
+               {
+                  if ( wKey == 0x38 &&
+                       s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown &&
+                       (s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState 
+                         & NUMLOCK_ON )
+                         & ( (RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED ) | NUMLOCK_ON )
+                         & ~(LEFT_CTRL_PRESSED) )
                   {
-                     ch = Handle_Alt_Key( &altisdown, &altnum, wKey, ch );
-                  }
-                  else
-                  {
-//                   if ( wKey == 0x38 &&
-//                        s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown )
-                     if ( wKey == 0x38 &&
-                          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.bKeyDown &&
-                          s_irInBuf[ s_cNumIndex ].Event.KeyEvent.dwControlKeyState & ((RIGHT_ALT_PRESSED | LEFT_ALT_PRESSED) & ~(LEFT_CTRL_PRESSED) ))
-                     {
-                        altisdown = 1;
-                     }
+                     s_altisdown = 1;
                   }
                }
             }
          }
-      } while (altisdown);
+      }
    }
 
    /* Only process one keyboard event at a time. */
