@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.18 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: hrbdll.gc,v 1.19 2006/02/14 00:38:51 ath1 Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -241,6 +241,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/radiogrp.o \
    $(OBJ_DIR)/readkey.o \
    $(OBJ_DIR)/readvar.o \
+   $(OBJ_DIR)/regexrpl.o \
    $(OBJ_DIR)/scrollbr.o \
    $(OBJ_DIR)/setfunc.o \
    $(OBJ_DIR)/setta.o \
@@ -1124,6 +1125,12 @@ $(OBJ_DIR)/readvar.o : $(OBJ_DIR)/readvar.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/regex.o : $(RTL_DIR)/regex.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/regexrpl.c : $(RTL_DIR)/regexrpl.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/regexrpl.o : $(OBJ_DIR)/regexrpl.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/replic.o : $(RTL_DIR)/replic.c

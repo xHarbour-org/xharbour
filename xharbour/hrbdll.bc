@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.112 2005/12/25 13:09:40 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.113 2006/03/02 22:36:59 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -350,6 +350,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\readline.obj \
   $(OBJ_DIR)\readvar.obj \
   $(OBJ_DIR)\regex.obj \
+  $(OBJ_DIR)\regexrpl.obj \
   $(OBJ_DIR)\setfunc.obj \
   $(OBJ_DIR)\setta.obj \
   $(OBJ_DIR)\tbcolumn.obj \
@@ -1034,6 +1035,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\readkey.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\readline.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\readvar.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\regexrpl.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\setfunc.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\setta.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\tbcolumn.obj          + >> hdll.tmp
@@ -2106,6 +2108,12 @@ $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
    $(CC_CMD)
 
 $(OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\regexrpl.c : $(RTL_DIR)\regexrpl.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\regexrpl.obj : $(OBJ_DIR)\regexrpl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c

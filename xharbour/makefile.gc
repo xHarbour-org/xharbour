@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.20 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: makefile.gc,v 1.21 2006/02/14 00:38:51 ath1 Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2700,6 +2700,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/radiogrp.o \
    $(RTL_OBJ_DIR)/readkey.o \
    $(RTL_OBJ_DIR)/readvar.o \
+   $(RTL_OBJ_DIR)/regexrpl.o \
    $(RTL_OBJ_DIR)/scrollbr.o \
    $(RTL_OBJ_DIR)/setfunc.o \
    $(RTL_OBJ_DIR)/setta.o \
@@ -3256,6 +3257,12 @@ $(RTL_OBJ_DIR)/readvar.o : $(RTL_OBJ_DIR)/readvar.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/regex.o : $(RTL_DIR)/regex.c
+	$(CC_CMD)
+
+$(RTL_OBJ_DIR)/regexrpl.c : $(RTL_DIR)/regexrpl.prg
+	$(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)/regexrpl.o : $(RTL_OBJ_DIR)/regexrpl.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/replic.o : $(RTL_DIR)/replic.c

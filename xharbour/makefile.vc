@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.164 2006/02/14 00:38:54 ath1 Exp $
+# $Id: makefile.vc,v 1.165 2006/02/22 04:08:52 ronpinkas Exp $
 #
 
 #
@@ -560,6 +560,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\radiogrp.obj \
    $(OBJ_DIR)$(MT)\readkey.obj \
    $(OBJ_DIR)$(MT)\readvar.obj \
+   $(OBJ_DIR)$(MT)\regexrpl.obj \
    $(OBJ_DIR)$(MT)\scrollbr.obj \
    $(OBJ_DIR)$(MT)\setfunc.obj \
    $(OBJ_DIR)$(MT)\setta.obj \

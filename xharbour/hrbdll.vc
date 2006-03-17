@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.87 2006/01/20 23:47:34 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.88 2006/02/14 00:38:51 ath1 Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -346,6 +346,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\radiogrp.obj \
   $(OBJ_DIR)\readkey.obj \
   $(OBJ_DIR)\readvar.obj \
+  $(OBJ_DIR)\regexrpl.obj \
   $(OBJ_DIR)\scrollbr.obj \
   $(OBJ_DIR)\setfunc.obj \
   $(OBJ_DIR)\setta.obj \
@@ -1545,6 +1546,12 @@ $(OBJ_DIR)\readline.obj : $(RTL_DIR)\readline.c
    $(CC_CMD)
 
 $(OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\regexrpl.c : $(RTL_DIR)\regexrpl.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\regexrpl.obj : $(OBJ_DIR)\regexrpl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c

@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.21 2006/02/01 15:41:40 modalsist Exp $
+# $Id: hrbdll.pc,v 1.22 2006/02/14 00:38:51 ath1 Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -306,6 +306,7 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\radiogrp.obj \
    $(TARGET_OBJ_DIR)\readkey.obj \
    $(TARGET_OBJ_DIR)\readvar.obj \
+   $(TARGET_OBJ_DIR)\regexrpl.obj \
    $(TARGET_OBJ_DIR)\scrollbr.obj \
    $(TARGET_OBJ_DIR)\setfunc.obj \
    $(TARGET_OBJ_DIR)\setta.obj \
@@ -697,7 +698,7 @@ HRBDLL_OBJS = \
    \
    $(TARGET_OBJ_DIR)\dbgmenu.obj  \
    $(TARGET_OBJ_DIR)\dbghelp.obj  \
-   $(TARGET_OBJ_DIR)\dbgtmenu.obj \ 
+   $(TARGET_OBJ_DIR)\dbgtmenu.obj \
    $(TARGET_OBJ_DIR)\dbgtmitm.obj \
    $(TARGET_OBJ_DIR)\dbgtwin.obj  \
    $(TARGET_OBJ_DIR)\debugger.obj \
@@ -705,7 +706,7 @@ HRBDLL_OBJS = \
    $(TARGET_OBJ_DIR)\dbgtobj.obj  \
    $(TARGET_OBJ_DIR)\tbrwtext.obj \
    $(TARGET_OBJ_DIR)\dbgwa.obj    \
-   $(TARGET_OBJ_DIR)\dbgbrwsr.obj 
+   $(TARGET_OBJ_DIR)\dbgbrwsr.obj
 
 
 #
@@ -895,6 +896,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\radiogrp.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\readkey.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\readvar.obj    >> make_tmp
+   $(ECHO) $(TARGET_OBJ_DIR)\regexrpl.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\scrollbr.obj   >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\setfunc.obj    >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\setta.obj      >> make_tmp
@@ -1274,7 +1276,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(TARGET_OBJ_DIR)\wordtoch.obj   >> make_tmp
 #
 # CT prg
-# 
+#
    $(ECHO) $(TARGET_OBJ_DIR)\blank.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\color.obj      >> make_tmp
    $(ECHO) $(TARGET_OBJ_DIR)\ct.obj         >> make_tmp
@@ -1790,6 +1792,12 @@ $(TARGET_OBJ_DIR)\readvar.c : $(RTL_SRC_DIR)\readvar.prg
    $(HARBOUR_CMD)
 
 $(TARGET_OBJ_DIR)\readvar.obj : $(TARGET_OBJ_DIR)\readvar.c
+   $(POCC_CMD)
+
+$(TARGET_OBJ_DIR)\regexrpl.c : $(RTL_SRC_DIR)\regexrpl.prg
+   $(HARBOUR_CMD)
+
+$(TARGET_OBJ_DIR)\regexrpl.obj : $(TARGET_OBJ_DIR)\regexrpl.c
    $(POCC_CMD)
 
 $(TARGET_OBJ_DIR)\replic.obj : $(RTL_SRC_DIR)\replic.c

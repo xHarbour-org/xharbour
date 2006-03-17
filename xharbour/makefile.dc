@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.16 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: makefile.dc,v 1.17 2006/02/14 00:38:51 ath1 Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -1037,6 +1037,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\radiogrp.obj \
    $(RTL_OBJ_DIR)\readkey.obj \
    $(RTL_OBJ_DIR)\readvar.obj \
+   $(RTL_OBJ_DIR)\regexrpl.obj \
    $(RTL_OBJ_DIR)\scrollbr.obj \
    $(RTL_OBJ_DIR)\setfunc.obj \
    $(RTL_OBJ_DIR)\setta.obj \
@@ -1658,6 +1659,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\radiogrp.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\readkey.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\readvar.obj  >> dmcrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\regexrpl.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\scrollbr.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\setfunc.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\setta.obj    >> dmcrtl.rsp
@@ -2813,6 +2815,12 @@ $(RTL_OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\readvar.obj : $(RTL_OBJ_DIR)\readvar.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\regexrpl.c : $(RTL_DIR)\regexrpl.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\regexrpl.obj : $(RTL_OBJ_DIR)\regexrpl.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c

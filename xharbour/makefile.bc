@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.163 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: makefile.bc,v 1.165 2006/02/14 22:38:21 ath1 Exp $
 #
 
 #
@@ -474,6 +474,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\radiogrp.obj \
    $(RTL_OBJ_DIR)\readkey.obj \
    $(RTL_OBJ_DIR)\readvar.obj \
+   $(RTL_OBJ_DIR)\regexrpl.obj \
    $(RTL_OBJ_DIR)\scrollbr.obj \
    $(RTL_OBJ_DIR)\setfunc.obj \
    $(RTL_OBJ_DIR)\setta.obj \
@@ -2314,6 +2315,12 @@ $(RTL_OBJ_DIR)\readvar.obj : $(RTL_OBJ_DIR)\readvar.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\regex.obj : $(RTL_DIR)\regex.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\regexrpl.c : $(RTL_DIR)\regexrpl.prg
+   $(HB_CMD)
+
+$(RTL_OBJ_DIR)\regexrpl.obj : $(RTL_OBJ_DIR)\regexrpl.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c

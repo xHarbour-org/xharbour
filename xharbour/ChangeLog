@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4869 2006/03/15 06:35:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4870 2006/03/16 04:55:20 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-17 02:15 UTC+0100 Francesco Saverio Giudice <info/at/fsgiudice.com>
+  + xharbour/source/rtl/regexrpl.prg
+    + New function HB_REGEXREPLACE()
+      Syntax: hb_RegexReplace( cRegex, cString, cReplace,
+                               lCaseSensitive, lNewLine, nMaxMatches,
+                               nGetMatch ) --> cReturn
+  + xharbour/tests/regexrpl.prg
+    + Sample tests
+
+  + xharbour/source/rtl/Makefile
+  + xharbour/makefile.bc
+  + xharbour/makefile.dc
+  + xharbour/makefile.gc
+  + xharbour/makefile.wc
+  + xharbour/makefile.vc
+  + xharbour/makefile.pc
+  + xharbour/hrbdll.bc
+  + xharbour/hrbdll.dc
+  + xharbour/hrbdll.gc
+  + xharbour/hrbdll.wc
+  + xharbour/hrbdll.vc
+  + xharbour/hrbdll.pc
+    + added regexrpl.prg
+
+  + xharbour/include/hbextern.ch
+    + added HB_REGEXREPLACE, HB_CRYPT, HB_DECRYPT
 
 2006-03-15 23:55 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/gtwin/gtwin.c

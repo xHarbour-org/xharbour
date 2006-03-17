@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.65 2005/11/06 13:30:41 ptsarenko Exp $
+# $Id: Makefile,v 1.65 2005/11/06 10:59:16 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -188,6 +188,7 @@ PRG_SOURCES=\
         radiogrp.prg \
         readkey.prg  \
         readvar.prg  \
+        regexrpl.prg \
         scrollbr.prg \
         setfunc.prg  \
         setta.prg    \

@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.16 2005/12/19 19:13:50 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.17 2006/02/14 00:38:51 ath1 Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -293,6 +293,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\radiogrp.obj \
    $(OBJ_DIR)\readkey.obj \
    $(OBJ_DIR)\readvar.obj \
+   $(OBJ_DIR)\regexrpl.obj \
    $(OBJ_DIR)\scrollbr.obj \
    $(OBJ_DIR)\setfunc.obj \
    $(OBJ_DIR)\setta.obj \
@@ -830,6 +831,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\radiogrp.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\readkey.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\readvar.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\regexrpl.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\scrollbr.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\setfunc.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\setta.obj      + >> harbourdll.rsp
@@ -1672,6 +1674,12 @@ $(OBJ_DIR)\readvar.c : $(RTL_DIR)\readvar.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\readvar.obj : $(OBJ_DIR)\readvar.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\regexrpl.c : $(RTL_DIR)\regexrpl.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\regexrpl.obj : $(OBJ_DIR)\regexrpl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\replic.obj : $(RTL_DIR)\replic.c
