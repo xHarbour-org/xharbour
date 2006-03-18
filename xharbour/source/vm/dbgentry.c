@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.14 2006/03/11 20:42:52 likewolf Exp $
+ * $Id: dbgentry.c,v 1.15 2006/03/12 15:55:20 likewolf Exp $
  */
 
 /*
@@ -177,12 +177,12 @@ typedef struct
    HB_STATICMODULEINFO *aStaticModules;
    int nGlobals;
    HB_VARINFO *aGlobals;
-   int bCBTrace;
+   BOOL bCBTrace;
    BOOL ( *pFunInvoke )( void );
 } HB_DEBUGINFO;
 
 
-static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0 };
 static HB_DEBUGINFO *info = &s_Info;
 
 
