@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.47 2005/11/21 16:13:34 snaiperis Exp $
+ * $Id: hash.c,v 1.48 2005/11/22 02:33:47 walito Exp $
  */
 
 /*
@@ -269,7 +269,7 @@ static void hb_calcTotalLenght( PHB_BASEHASH pBase )
       PHB_ITEM pValues = pBase->pValues;
       ULONG ulTot = 0;
       ULONG ulPosLoop  = pBase->ulLen + 1;
-      
+
       for( ; --ulPosLoop; pValues++ )
       {
          ulTot += pValues->item.asHash.value->ulTotalLen;
@@ -667,9 +667,9 @@ BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM 
          {
             ULONG *pulPos;
             ULONG ulAccessLen;
-            
+
             ulAccessLen = pBaseHash->ulLen - 1;
-            
+
             *(pBaseHash->pAccessAA + ulAccessLen) = ulPos; // - 1;ulpos
 
             // to number the values grater or equal than a position.
@@ -853,7 +853,7 @@ BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PH
          {
             ULONG *pulPos;
             ULONG ulAccessLen;
-            
+
             ulAccessLen = pBaseHash->ulLen - 1;
 
             *(pBaseHash->pAccessAA + ulAccessLen) = ulPos; // - 1;ulpos
@@ -1011,7 +1011,7 @@ BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos )
                {
                   *pulPos = *( pulPos + 1 );
                }
-        
+
             // to number the values grater than a position.
                if( *pulPos > ulPos )
                {
@@ -1462,7 +1462,7 @@ PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDest )
    {
       pDestBase->pAccessAA = (ULONG *) hb_xgrab( sizeof( ULONG ) * pDestBase->ulAllocated );
    }
-   
+
    for( ulCount = 0; ulCount < ulLen; ulCount++, pKey++, pVal++ )
    {
       hb_itemCopy( pDestBase->pKeys + ulCount, pKey );
@@ -1685,7 +1685,7 @@ BOOL HB_EXPORT hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL b
    if( pHash && HB_IS_HASH( pHash ) && pHash->item.asHash.value->uiLevel == 0 && hb_hashLen( pHash ) == 0 )
    {
       PHB_BASEHASH pBaseHash = pHash->item.asHash.value;
-      
+
       if( bCompatAA )
       {
          if( ! pBaseHash->pAccessAA )
@@ -1770,7 +1770,7 @@ void hb_hashReleaseBase( PHB_BASEHASH pBaseHash )
       hb_xfree( pBaseHash->pValues );
       pBaseHash->pValues = NULL;
 
-      // Associative Array compatibility      
+      // Associative Array compatibility
       if( pBaseHash->pAccessAA )
       {
          hb_xfree( pBaseHash->pAccessAA );
@@ -2131,7 +2131,7 @@ HB_FUNC( HAAGETPOS )
    {
       ui = pHash->item.asHash.value->ulTotalLen - 1;
       pAccess = pHash->item.asHash.value->pAccessAA + ui;
-      
+
       do
       {
          if( *( pAccess ) == ulPos )
@@ -2141,7 +2141,7 @@ HB_FUNC( HAAGETPOS )
          pAccess--;
       }
       while( ui-- > 0 );
-      
+
       hb_retnl( ui + 1 );
    }
 }
@@ -2403,8 +2403,8 @@ HB_FUNC( HAASETVALUEAT )
    }
 
    pItem = hb_hashGetValueAt( pHash, *( pHash->item.asHash.value->pAccessAA + ulPos - 1 ) );
-   
-   
+
+
    hb_itemCopy( pItem, pValue );
 }
 
@@ -2545,7 +2545,7 @@ HB_FUNC( HGETVAAPOS )
    HB_ITEM Arr, Pos;
    PHB_BASEHASH pBaseHash;
    ULONG ulLen, ulPosLoop;
-   
+
    if( pHash == NULL  )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HGETVAAPOS", 1, hb_paramError(1) );
@@ -2554,9 +2554,9 @@ HB_FUNC( HGETVAAPOS )
 
    Arr.type = HB_IT_NIL;
    Pos.type = HB_IT_NIL;
-   
+
    pBaseHash = pHash->item.asHash.value;
-   
+
    ulLen = pBaseHash->ulLen;
    hb_arrayNew( &Arr, ulLen );
 
@@ -2686,7 +2686,7 @@ HB_FUNC( HCOPY )
    PHB_ITEM pDest = hb_param( 2, HB_IT_HASH );
    PHB_ITEM pStart = hb_param( 3, HB_IT_NUMERIC );
    PHB_ITEM pEnd = hb_param( 4, HB_IT_NUMERIC );
-   PHB_ITEM pBlock = hb_param( 5, HB_IT_BLOCK | HB_IT_LOGICAL );
+   PHB_ITEM pBlock = hb_param( 5, HB_IT_BLOCK | HB_IT_NUMERIC );
    ULONG ulStart, ulCount, ulLen;
 
    if ( pSource == NULL || pDest == NULL )
@@ -2958,7 +2958,7 @@ HB_FUNC( HSETAACOMPATIBILITY )
    {
       hb_retl( hb_hashSetAACompatibility( pHash, hb_itemGetL( pSet ), FALSE ) );
    }
-   else   
+   else
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HSETAACOMPATIBILITY", 2,
            hb_paramError( 1 ), hb_paramError( 2 ));
@@ -2973,7 +2973,7 @@ HB_FUNC( HGETAACOMPATIBILITY )
    {
       hb_retl( pHash->item.asHash.value->pAccessAA != NULL );
    }
-   else   
+   else
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HGETAACOMPATIBILITY", 1,
            hb_paramError( 1 ));
