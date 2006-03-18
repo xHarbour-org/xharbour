@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.4 2002/04/15 04:39:01 walito Exp $
+ * $Id: getenvrn.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -95,9 +95,16 @@
  *  $END$
  */
 
-#include <extend.api>
-#include <fm.api>
+//#include <extend.api>
+//#include <fm.api>
+#define HB_OS_WIN_32_USED
 
+#include "hbapi.h"
+#include "hbfast.h"
+
+#if defined(HB_OS_WIN_32)
+#include "windows.h"
+#endif
 #define NORETURN   0
 #define CHARTYPE   1
 #define ARRAYTYPE  2
@@ -112,7 +119,7 @@ HB_FUNC(FT_GETE)
     /* INTERNALS WARNING: All references to 'environ', strlen(), ;
        strcpy(), and strcat() are undocumented Clipper 5.0 internals.
     */
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
+#if defined(HB_OS_DOS) 
    {
    
     extern char **_environ;
@@ -175,5 +182,82 @@ HB_FUNC(FT_GETE)
     // return number of strings found
     hb_retni(x);
 }
+#elif defined(HB_OS_WIN_32)
+{
+   
+
+    char *buffer = NULL;
+    LPVOID lpEnviron=GetEnvironmentStrings();
+    char *sCurEnv;
+    int x;
+    int buffsize = 0;
+    int rettype  = NORETURN;
+
+    if (ISCHAR(1))
+        rettype = CHARTYPE;
+    if (ISARRAY(1))
+        rettype = ARRAYTYPE;
+
+    if (rettype == CHARTYPE)
+        // scan strings first and add up total size
+        {
+        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++) 
+        { 
+
+            {
+            if (! *sCurEnv)
+                // null string, we're done
+                break;
+            // add length of this string plus 2 for the crlf
+            buffsize += (strlen((char*)sCurEnv) + 2);
+            }
+        // add 1 more byte for final nul character
+        buffsize++;
+
+        //  now allocate that much memory and make sure 1st byte is a nul
+        buffer = ( char * ) hb_xalloc(buffsize);
+        strcpy(buffer,"\0");
+           while (*sCurEnv) 
+              *sCurEnv++;
+        }
+     }
+      x = 0;
+//    for (x = 0; ;x++)
+        for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++) 
+        { 
+
+        
+        if (! *sCurEnv)
+            // null string, we're done
+            break;
+
+        if (rettype == CHARTYPE)
+            {
+            // tack string onto end of buffer
+            strcat( buffer,(char*) sCurEnv );
+            // add crlf at end of each string
+            strcat( buffer, CRLF );
+            }
+
+        if (rettype == ARRAYTYPE)
+            // store string to next array element
+            hb_storc((char*)sCurEnv,1,x + 1);
+        x++;
+           while (*sCurEnv) 
+              *sCurEnv++;
+        }
+
+    if (rettype == CHARTYPE)
+        {
+        // return buffer to app and free memory
+        hb_storc(buffer,1);
+        hb_xfree(buffer);
+        }
+
+    // return number of strings found
+    hb_retni(x);
+FreeEnvironmentStrings(lpEnviron);
+}
+
 #endif
 }

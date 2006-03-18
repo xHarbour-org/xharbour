@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4872 2006/03/18 20:43:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4873 2006/03/18 22:37:28 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-18 20:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * contrib/libnf/getenvrn.c
+    ! Fixes to FT_GETE() to work under windows platform
+  * source/ct/screen2.prg
+    ! fixed SAYSCREEN() to work properly on linux, fixed Provided by Mario
 
 2006-03-19 01:38 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c

@@ -1,5 +1,5 @@
 /*
- * $Id: screen2.prg,v 1.4 2004/06/17 19:42:20 likewolf Exp $
+ * $Id: screen2.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
  */
 
 /*
@@ -73,11 +73,12 @@ FUNCTION SAYSCREEN( cStr, nRow, nCol )
    LOCAL cBuf
    LOCAL nRight
    LOCAL i
+   LOCAL nCellSize := len( Savescreen ( 0,0,0,0))
    
    DEFAULT cStr TO ""
    DEFAULT nRow TO Row()
    DEFAULT nCol TO Col()
-   
+#ifdef __PLATFORM__Windows   
    IF Len( cStr ) > 0
      nRight := Min( nCol + Len( cStr ) - 1, MaxCol() )
      cBuf := SaveScreen( nRow, nCol, nRow, nRight )
@@ -86,4 +87,15 @@ FUNCTION SAYSCREEN( cStr, nRow, nCol )
      NEXT
      RestScreen( nRow, nCol, nRow, nRight, cBuf )
    ENDIF
+#else
+   IF Len( cStr ) > 0
+     nRight := Min( nCol + Len( cStr ) - 1, MaxCol() )
+     cBuf := SaveScreen( nRow, nCol, nRow, nRight )
+     FOR i := 1 TO nRight - nCol + 1
+       cBuf[ i * nCellSize - nCellSize + 1 ] := cStr[ i ]
+     NEXT
+     RestScreen( nRow, nCol, nRow, nRight, cBuf )
+   ENDIF
+
+#endif
 RETURN ""
