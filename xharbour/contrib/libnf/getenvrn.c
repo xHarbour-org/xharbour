@@ -1,5 +1,5 @@
 /*
- * $Id: getenvrn.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: getenvrn.c,v 1.2 2006/03/18 23:31:28 lculik Exp $
  */
 
 /*
@@ -256,7 +256,8 @@ HB_FUNC(FT_GETE)
 
     // return number of strings found
     hb_retni(x);
-FreeEnvironmentStrings(lpEnviron);
+
+    FreeEnvironmentStrings( (LPCH) lpEnviron);
 }
 
 #endif
