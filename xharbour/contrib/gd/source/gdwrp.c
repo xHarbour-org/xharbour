@@ -1,5 +1,5 @@
 /*
- * $Id: gdwrp.c,v 1.11 2006/01/08 22:29:24 fsgiudice Exp $
+ * $Id: gdwrp.c,v 1.12 2006/01/14 17:46:16 paultucker Exp $
  */
 
 /*
@@ -436,9 +436,12 @@ static void GDImageSaveTo( int nType )
 
 HB_FUNC( GDVERSION ) // gdImagePtr gdImageCreate(sx, sy)
 {
+#if ( GD_VERS >= 2033 )
    hb_retc( "GD Version 2.0.33" );
+#else
+   hb_retc( "GD Version 2.0.28" );
+#endif   
 }
-
 
 /* ---------------------------------------------------------------------------*/
 
@@ -877,7 +880,8 @@ HB_FUNC( GDIMAGEOPENPOLYGON ) // original: void gdImageOpenPolygon(gdImagePtr im
       }
    }
 }
-#endif
+#endif // ( GD_VERS >= 2033 )
+
 /* ---------------------------------------------------------------------------*/
 
 HB_FUNC( GDIMAGERECTANGLE ) // void gdImageRectangle(gdImagePtr im, int x1, int y1, int x2, int y2, int color)
@@ -3770,6 +3774,7 @@ HB_FUNC( GDIMAGEINTERLACE ) // void gdImageInterlace(gdImagePtr im, int interlac
 
 /* ---------------------------------------------------------------------------*/
 
+#if ( GD_VERS >= 2033 )
 //BGD_DECLARE(void *) gdImageGifAnimBeginPtr(gdImagePtr im, int *size, int GlobalCM, int Loops);
 // implementation: (void *) gdImageGifAnimBegin( gdImagePtr im, cFile | nHandle, int GlobalCM, int Loops);
 HB_FUNC( GDIMAGEGIFANIMBEGIN )
@@ -3950,3 +3955,4 @@ HB_FUNC( GDIMAGEGIFANIMEND )
 
 
 /* ---------------------------------------------------------------------------*/
+#endif // ( GD_VERS >= 2033 )

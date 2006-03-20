@@ -1,5 +1,5 @@
 ##################################
-# $Id: Rules.make,v 1.1 2005/10/24 13:17:10 fsgiudice Exp $
+# $Id: Rules.make,v 1.3 2005/10/31 00:39:18 fsgiudice Exp $
 #
 # Rules for making simwin
 #
@@ -16,9 +16,27 @@
 # *.prg.
 #
 
+# set environment variables
+# export HB_ARCHITECTURE="linux"
+# export HB_COMPILER="gcc"
+ifeq ("${HB_BIN_INSTALL}","")
+  export HB_BIN_INSTALL="/usr/bin"
+endif
+ifeq ("${HB_INC_INSTALL}","")
+  export HB_INC_INSTALL="/usr/include/xharbour"
+endif
+ifeq ("${HB_LIB_INSTALL}","")
+  export HB_LIB_INSTALL="/usr/lib/xharbour"
+endif  
+
+ifeq (${HB_COMPILER},gpp)
+   HB_CC="g++"
+else
+   HB_CC="gcc"
+endif
+
 #Generic make options
 LINKER = ar
-CC = gcc
 ifeq ($(HB_COMPILER),mingw32)
    CFLAGS += -Wall -mno-cygwin -mms-bitfields -mwindows -I.
 else
@@ -29,9 +47,9 @@ GT_LIBS=-lgtcgi
 
 #libraries for binary building
 ifeq ($(HB_MT),MT)
-LIBFILES_ = -ldebug -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdx -ldbfdbt -lcommon -lm -lpthread
+LIBFILES_ = -ldebug -lvmmt -lrtlmt $(GT_LIBS) -lrddmt -lrtlmt -lvmmt -lmacro -lppmt -ldbfntxmt -ldbfcdx -ldbffpt -lhbsix -lcommon -lm -lpthread
 else
-LIBFILES_ = -ldebug -lvm -lrtl $(GT_LIBS)  -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbfdbt -lcommon -lm
+LIBFILES_ = -ldebug -lvm -lrtl $(GT_LIBS) -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhbsix -lcommon -lm
 endif
 
 ifeq ($(HB_COMPILER),mingw32)
@@ -69,10 +87,10 @@ all:$(TARGET) $(TARGETS)
 .PHONY: clean install
 
 %$(EXETYPE):%.o
-	$(CC) -o$@ $< $(LIBDIR_) $(LIBS_)
+	$(HB_CC) -o$@ $< $(LIBDIR_) $(LIBS_)
 
 %.o: %.c
-	$(CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
+	$(HB_CC) -c -o$@ $(CFLAGS) -I$(HB_INC_INSTALL) $<
 
 %.c: %.prg
 	$(HB_BIN_INSTALL)/harbour -q0 -gc0 -w2 -p -n $(PRGFLAGS) -I$(HB_INC_INSTALL)  -o$@ $<
@@ -82,7 +100,7 @@ ifeq ( lib , $(patsubst %.a, lib, $(TARGET)))
 	$(LINKER) -r $(TARGET) $(OBJECTS)
 	$(LIBRARIAN) $(TARGET)
 else
-	$(CC) -o $(TARGET) $(OBJECTS) $(LIBDIR_) $(LIBS_)
+	$(HB_CC) -o $(TARGET) $(OBJECTS) $(LIBDIR_) $(LIBS_)
 endif
 
 clean:
@@ -94,4 +112,5 @@ clean:
 	rm -f $(TARGETS)
 
 install: all
-	cp -f *.a $(TGD_INSTALL)
+	cp -f *.a $(HB_LIB_INSTALL)
+	cp -f ../include/gd.ch $(HB_INC_INSTALL)

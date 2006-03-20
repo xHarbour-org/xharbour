@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_vc.bat,v 1.1 2003/09/23 21:23:56 laverson Exp $
+rem $Id: make_vc.bat,v 1.1 2005/12/09 20:38:08 mlombardo Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -26,6 +26,9 @@ if "%1"=="/?" goto exit
 
 if not exist obj md obj
 if not exist obj\vc md obj\vc
+
+if not exist lib md lib
+if not exist lib\vc md lib\vc
 
 set MK_FILE=makefile.vc
 if "%OS%" == "Windows_NT" set MK_FILE=makefile.nt
