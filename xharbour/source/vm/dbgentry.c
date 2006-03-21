@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.16 2006/03/18 22:37:34 likewolf Exp $
+ * $Id: dbgentry.c,v 1.17 2006/03/21 20:46:19 likewolf Exp $
  */
 
 /*
@@ -154,6 +154,9 @@ typedef struct
    HB_VARINFO *aGlobals;
    int nExternGlobals;
    HB_VARINFO *aExternGlobals;
+   int nStopLines;
+   int nAllocStopLines;
+   int *aStopLines;
 } HB_MODULEINFO;
 
 typedef struct
@@ -183,10 +186,11 @@ typedef struct
    BOOL ( *pFunInvoke )( void );
    BOOL bInitGlobals;
    BOOL bInitStatics;
+   BOOL bInitLines;
 } HB_DEBUGINFO;
 
 
-static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0, 0, 0 };
+static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0, 0, 0, 0 };
 static HB_DEBUGINFO *info = &s_Info;
 
 
@@ -204,6 +208,8 @@ static void
 hb_dbgAddStack( HB_DEBUGINFO *info, char *szName, int nProcLevel );
 static void
 hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame );
+static void
+hb_dbgAddStopLine( HB_DEBUGINFO *info, int nLine );
 static void
 hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cType, int nIndex, int nFrame );
 static void
@@ -442,7 +448,9 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
              info->bInitStatics = TRUE;
          else if ( !strcmp( szProcName, "(_INITGLOBALS)" ) )
              info->bInitGlobals = TRUE;
-         if ( info->bInitStatics || info->bInitGlobals )
+         else if ( !strcmp( szProcName, "(_INITLINES)" ) )
+             info->bInitLines = TRUE;
+         if ( info->bInitStatics || info->bInitGlobals || info->bInitLines )
             hb_dbgAddModule( info, szName );
          else if ( !strncmp( szProcName, "(b)", 3 ) )
             info->bCodeBlock = TRUE;
@@ -478,6 +486,12 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          BOOL bOldClsScope;
          
          HB_TRACE( HB_TR_DEBUG, ( "SHOWLINE %d", nLine ) );
+
+         if ( info->bInitLines )
+         {
+            hb_dbgAddStopLine( info, nLine );
+            return;
+         }
 
          nProcLevel = hb_dbg_ProcLevel();
 
@@ -582,6 +596,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          info->bCodeBlock = FALSE;
          info->bInitStatics = FALSE;
          info->bInitGlobals = FALSE;
+         info->bInitLines = FALSE;
          hb_dbgEndProc( info );
          return;
 
@@ -626,6 +641,24 @@ hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
       HB_CALLSTACKINFO *top = &info->aCallStack[ info->nCallStackLen - 1 ];
 
       hb_dbgAddVar( &top->nLocals, &top->aLocals, szName, 'L', nIndex, nFrame );
+   }
+}
+
+
+static void
+hb_dbgAddModule( HB_DEBUGINFO *info, char *szName )
+{
+   if ( !info->nModules || strcmp( info->aModules[ info->nModules - 1 ].szModule, szName ) )
+   {
+      HB_MODULEINFO *pModule;
+
+      pModule = ARRAY_ADD( HB_MODULEINFO, info->aModules, info->nModules );
+      pModule->szModule = szName;
+      pModule->nStatics = 0;
+      pModule->nGlobals = 0;
+      pModule->nExternGlobals = 0;
+      pModule->nStopLines = 0;
+      pModule->nAllocStopLines = 0;
    }
 }
 
@@ -700,15 +733,22 @@ hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 
 
 static void
-hb_dbgAddModule( HB_DEBUGINFO *info, char *szName )
+hb_dbgAddStopLine( HB_DEBUGINFO *info, int nLine )
 {
-   HB_MODULEINFO *pModule;
+   HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
 
-   pModule = ARRAY_ADD( HB_MODULEINFO, info->aModules, info->nModules );
-   pModule->szModule = szName;
-   pModule->nStatics = 0;
-   pModule->nGlobals = 0;
-   pModule->nExternGlobals = 0;
+   module->nStopLines++;
+   if ( !module->nAllocStopLines )
+   {
+      module->nAllocStopLines = 128;
+      module->aStopLines = hb_xgrab( sizeof( int ) * module->nAllocStopLines );
+   }
+   else if ( module->nStopLines > module->nAllocStopLines )
+   {
+      module->nAllocStopLines *= 2;
+      module->aStopLines = hb_xrealloc( module->aStopLines, sizeof( int ) * module->nAllocStopLines );
+   }
+   module->aStopLines[ module->nStopLines - 1 ] = nLine;
 }
 
 
@@ -1307,6 +1347,32 @@ hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine )
       if ( point->nLine == nLine
            && FILENAME_EQUAL( szModule, point->szModule ) )
          return TRUE;
+   }
+   return FALSE;
+}
+
+
+HB_EXPORT BOOL
+hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine )
+{
+   int i, j;
+   HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
+
+   for ( i = 0; i < info->nModules; i++ )
+   {
+      HB_MODULEINFO *module = &info->aModules[ i ];
+      
+      if ( FILENAME_EQUAL( szModule, module->szModule ) )
+      {
+         for ( j = 0; j < module->nStopLines; j++ )
+         {
+            if ( module->aStopLines[ j ] == nLine )
+            {
+               return TRUE;
+            }
+         }
+         return FALSE;
+      }
    }
    return FALSE;
 }

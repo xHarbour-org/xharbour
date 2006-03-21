@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.120 2006/02/24 06:18:28 ronpinkas Exp $
+ * $Id: harbour.c,v 1.121 2006/03/21 20:46:16 likewolf Exp $
  */
 
 /*
@@ -137,6 +137,9 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc );
 
 static void hb_compDeclaredInit( void );
 
+static void hb_compLineNumberDefStart( void );
+static void hb_compLineNumberDefEnd( void );
+
 /* global variables */
 FILES          hb_comp_files;
 FUNCTIONS      hb_comp_functions;
@@ -157,11 +160,13 @@ PENUMDEF       hb_comp_pEnum;
 char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
+int            hb_comp_iLastLineAdded;                    /* last line added to (_INITLINES) */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
 char *         hb_comp_FileAsSymbol;                      /* File Name of last compiled line to be used in program body */
 char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
 PFUNCTION      hb_comp_pInitFunc;
 PFUNCTION      hb_comp_pGlobalsFunc;
+PFUNCTION      hb_comp_pLineNumberFunc;
 PHB_FNAME      hb_comp_pFileName = NULL;
 
 BOOL           hb_comp_bPPO = FALSE;                      /* flag indicating, is ppo output needed */
@@ -3202,6 +3207,18 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
       }
+
+      /* Add as a valid stop line */
+      if ( hb_comp_bDebugInfo )
+      {
+         if ( iLine != hb_comp_iLastLineAdded )
+         {
+            hb_comp_iLastLineAdded = iLine;
+            hb_compLineNumberDefStart();
+            hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), FALSE );
+            hb_compLineNumberDefEnd();
+         }
+      }
    }
 
    if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
@@ -5050,6 +5067,48 @@ void hb_compGlobalsDefEnd( void )
    hb_comp_pGlobalsFunc->pOwner = NULL;
 }
 
+/* 
+ * Start of stop line number info generation
+ */
+static void hb_compLineNumberDefStart( void )
+{
+   if( ! hb_comp_pLineNumberFunc )
+   {
+      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_strdup("<_INITLINES>"), HB_FS_INIT );
+      hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
+      hb_comp_pLineNumberFunc->bFlags = FUN_PROCEDURE;
+      hb_comp_pLineNumberFunc->cScope = HB_FS_INITEXIT;
+      hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
+      
+      if( hb_comp_bDebugInfo )
+      {
+         BYTE * pBuffer;
+         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
+
+         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
+         pBuffer[0] = HB_P_MODULENAME;
+         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
+         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
+         hb_xfree( pBuffer );
+      }
+   }
+   else
+   {
+      hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
+      hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
+   }
+}
+
+/*
+ * End of stop line number info generation
+ * Return to previously pcoded function.
+ */
+static void hb_compLineNumberDefEnd( void )
+{
+   hb_comp_functions.pLast = hb_comp_pLineNumberFunc->pOwner;
+   hb_comp_pLineNumberFunc->pOwner = NULL;
+}
+
 /*
  * Start a new fake-function that will hold pcodes for a codeblock
  */
@@ -5258,6 +5317,7 @@ static void hb_compInitVars( void )
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine           = 1;
+   hb_comp_iLastLineAdded  = 0;
    hb_comp_iBaseLine       = 0;
    hb_comp_iFunctionCnt    = 0;
    hb_comp_iErrorCount     = 0;
@@ -5330,6 +5390,19 @@ static void hb_compOutputFile( void )
       }
    }
 }
+
+
+static void hb_compAddInitFunc( PFUNCTION pFunc )
+{
+   PCOMSYMBOL pSym = hb_compSymbolAdd( pFunc->szName, NULL, TRUE );
+
+   pSym->cScope |= pFunc->cScope;
+   hb_comp_functions.pLast->pNext = pFunc;
+   hb_comp_functions.pLast = pFunc;
+   hb_compGenPCode1( HB_P_ENDPROC );
+   ++hb_comp_functions.iCount;
+}
+
 
 int hb_compCompile( char * szPrg, int argc, char * argv[] )
 {
@@ -5557,21 +5630,19 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             hb_compExternGen();       /* generates EXTERN symbols names */
 
+            if ( hb_comp_pLineNumberFunc )
+            {
+               hb_compAddInitFunc( hb_comp_pLineNumberFunc );
+            }
+            
             if( hb_comp_pInitFunc )
             {
-               PCOMSYMBOL pSym;
-
                /* Fix the number of static variables */
                hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
-
-               pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL, TRUE );
-               pSym->cScope |= hb_comp_pInitFunc->cScope;
-               hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
-               hb_comp_functions.pLast = hb_comp_pInitFunc;
-               hb_compGenPCode1( HB_P_ENDPROC );
-               ++hb_comp_functions.iCount;
+            
+               hb_compAddInitFunc( hb_comp_pInitFunc );
             }
 
             if( hb_comp_pGlobalsFunc )
@@ -5580,14 +5651,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
                if( hb_comp_pGlobalsFunc->pCode )
                {
-                  PCOMSYMBOL pSym;
-
-                  pSym = hb_compSymbolAdd( hb_comp_pGlobalsFunc->szName, NULL, TRUE );
-                  pSym->cScope |= hb_comp_pGlobalsFunc->cScope;
-                  hb_comp_functions.pLast->pNext = hb_comp_pGlobalsFunc;
-                  hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
-                  hb_compGenPCode1( HB_P_ENDPROC );
-                  ++hb_comp_functions.iCount;
+                  hb_compAddInitFunc( hb_comp_pGlobalsFunc );
                }
 
                // Any NON EXTERN Globals?
@@ -5849,7 +5913,8 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
       {
          /* Minimal Init. */
          hb_comp_files.iFiles = 0;
-         hb_comp_iLine= 1;
+         hb_comp_iLine = 1;
+         hb_comp_iLastLineAdded = 0;
 
          if( hb_compInclude( szFileName, NULL ) )
          {

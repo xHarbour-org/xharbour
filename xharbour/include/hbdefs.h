@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.79 2005/11/12 21:42:35 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.80 2006/03/01 13:06:22 druzus Exp $
  */
 
 /*
@@ -1133,6 +1133,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
 #define HB_FUNC_INIT( funcname )   static HARBOUR HB_FUN_init_##funcname ( void )
 #define HB_FUNC_EXIT( funcname )   static HARBOUR HB_FUN_exit_##funcname ( void )
+#define HB_FUNC_INITLINES( )       static HARBOUR hb_INITLINES( void )
 #define HB_FUNC_INITSTATICS( )     static HARBOUR hb_INITSTATICS( void )
 #define HB_FUNC_INITGLOBALS( )     static HARBOUR hb_INITGLOBALS( void )
 #define HB_FUNC_REGISTERGLOBAL( )  static HARBOUR hb_REGISTERGLOBALS( void )

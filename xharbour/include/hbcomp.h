@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.43 2006/02/15 19:33:04 druzus Exp $
+ * $Id: hbcomp.h,v 1.44 2006/03/21 20:46:11 likewolf Exp $
  */
 
 /*
@@ -500,6 +500,7 @@ extern char *         hb_comp_FileAsSymbol;
 extern char *         hb_comp_PrgFileName;
 extern PFUNCTION      hb_comp_pInitFunc;
 extern PFUNCTION      hb_comp_pGlobalsFunc;
+extern PFUNCTION      hb_comp_pLineNumberFunc;
 extern PHB_FNAME      hb_comp_pFileName;
 extern BOOL           hb_comp_bPPO;
 extern FILE *         hb_comp_yyppo;

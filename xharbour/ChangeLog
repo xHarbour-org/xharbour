@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4875 2006/03/19 00:21:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4876 2006/03/21 20:46:19 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-22 02:02 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbcomp.h
+  * include/hbdefs.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    + Generate valid stop lines information in debug mode.
+  * include/hbvm.h
+  * source/vm/dbgentry.c
+  * source/debug/debugger.prg
+    ! Use compiler-supplied information about valid stop lines.
+    ! Fixed an error from my previous commit.
 
 2006-03-21 23:46 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbcomp.h

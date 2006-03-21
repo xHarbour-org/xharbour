@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.72 2006/03/07 10:00:41 likewolf Exp $
+ * $Id: debugger.prg,v 1.73 2006/03/21 20:46:19 likewolf Exp $
  */
 
 /*
@@ -244,6 +244,7 @@ CLASS TDebugger
    METHOD HideVars()
    METHOD InputBox( cMsg, uValue, bValid, lEditable )
    METHOD Inspect( uValue, cValueName )
+   METHOD IsValidStopLine( cName, nLine )
    METHOD LoadColors()
    METHOD LoadSettings()
    METHOD LoadVars()
@@ -1561,6 +1562,13 @@ METHOD Inspect( uValue, cValueName ) CLASS TDebugger
 return nil
 
 
+METHOD IsValidStopLine( cName, nLine ) CLASS TDebugger
+RETURN HB_INLINE( ::pInfo, cName, nLine )
+       {
+          hb_retl( hb_dbgIsValidStopLine( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) ) );
+       }
+
+
 METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 
    If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
@@ -2633,13 +2641,9 @@ RETURN nil
 
 
 METHOD ToCursor() CLASS TDebugger
-  LOCAL cLine
+  LOCAL cName := strip_path( ::cPrgName ), nLine := ::oBrwText:nRow
 
-  cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
-  IF ::oBrwText:lLineNumbers
-    cLine := SUBSTR( cLine, AT(":",cLine)+1 )
-  ENDIF
-  IF IsValidStopLine( cLine )
+  IF ::IsValidStopLine( cName, nLine )
     HB_INLINE( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow )
     {
       hb_dbgSetToCursor( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) );
@@ -2663,16 +2667,12 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
   ENDIF
 
   IF nLine == NIL
-    cLine := ::oBrwText:GetLine( ::oBrwText:nRow )
-    IF ::oBrwText:lLineNumbers
-      cLine := SUBSTR( cLine, AT(":",cLine)+1 )
-    ENDIF
-    IF IsValidStopLine( cLine )
-      cFileName := strip_path( ::cPrgName )
-      nLine := ::oBrwText:nRow
-    ELSE
-      RETURN NIL
-    ENDIF
+    cFileName := strip_path( ::cPrgName )
+    nLine := ::oBrwText:nRow
+  ENDIF
+  
+  IF !::IsValidStopLine( cFileName, nLine )
+    RETURN NIL
   ENDIF
 
   nAt := AScan( ::aBreakPoints, { | aBreak | aBreak[ 1 ] == nLine ;
@@ -3227,43 +3227,6 @@ STATIC PROCEDURE StripUntil( pcLine, i, cChar )
   ENDIF
 
 RETURN
-
-
-STATIC FUNCTION IsValidStopLine( cLine )
-  LOCAL i
-  STATIC aNonStop := { "ELSE", "ENDCASE", "ENDDO", "ENDIF", "FIELD", ;
-                       "FUNCTION", "LOCAL", "MEMVAR", "NEXT", "PROCEDURE", ;
-                       "STATIC" }
-
-  DO WHILE ( i := At( "/*", cLine ) ) > 0
-    StripUntil( @cLine, i, "*/" )
-  ENDDO
-  IF ( i := At( "//", cLine ) ) > 0
-    cLine := Left( cLine, i - 1 )
-  ENDIF
-  IF ( i := At( "&&", cLine ) ) > 0
-    cLine := Left( cLine, i - 1 )
-  ENDIF
-
-  cLine := ALLTRIM( cLine )
-
-  IF cLine[ 1 ] == '*' .OR. cLine[ -1 ] == ';'
-    RETURN .F.
-  ELSEIF Len( cLine ) > 0 .AND. !IsAlpha( cLine[ 1 ] )
-    RETURN .T.
-  ENDIF
-  
-  i := 1
-  DO WHILE i <= Len( cLine ) .AND. IsAlpha( cLine[ i ] )
-    i++
-  ENDDO
-  cLine := Upper( Left( cLine, i - 1 ) )
-  IF EMPTY(cLine) .OR. cLine == "END"
-    RETURN .F.
-  ELSEIF Len( cLine ) < 4 .OR. Len( cLine ) > 9
-    RETURN .T.
-  ENDIF
-RETURN ( AScan( aNonStop, {|x| starts( x, cLine ) } ) == 0 )
 
 
 function __DbgColors()

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.115 2006/02/22 21:14:54 ronpinkas Exp $
+ * $Id: genc.c,v 1.116 2006/03/01 13:06:23 druzus Exp $
  */
 
 /*
@@ -109,6 +109,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    BOOL bIsExitFunction   ;
    BOOL bIsStaticVariable ;
    BOOL bIsGlobalVariable ;
+   BOOL bIsLineNumberInfo;
 
    BOOL bCritical = FALSE;
 
@@ -238,6 +239,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
+         bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
 
          if( pFunc->cScope & HB_FS_CRITICAL )
          {
@@ -258,6 +260,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          else if ( bIsGlobalVariable )
          {
             fprintf( yyc, "HB_FUNC_INITGLOBALS();\n" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         /* Is it an (_INITLINES) function */
+         else if ( bIsLineNumberInfo )
+         {
+            fprintf( yyc, "HB_FUNC_INITLINES();\n" );
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
@@ -387,6 +394,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * initialize global variables
             */
             fprintf( yyc, "{ \"(_INITGLOBALS)\", {HB_FS_INITEXIT}, {hb_INITGLOBALS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         else if( pSym->szName[ 0 ] == '<' )
+         {
+            /* Since the normal function cannot be INIT and EXIT at the same time
+            * we are using these two bits to mark the special function used to
+            * initialize debugging info about valid stop lines
+            */
+            fprintf( yyc, "{ \"(_INITLINES)\", {HB_FS_INITEXIT}, {hb_INITLINES}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '{' )
          {
@@ -572,6 +587,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
+         bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
 
          /* Is it a PUBLIC FUNCTION/PROCEDURE */
          if ( bIsStaticFunction )
@@ -587,6 +603,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          else if( bIsGlobalVariable )
          {
             fprintf( yyc, "HB_FUNC_INITGLOBALS()" ); /* NOTE: hb_ intentionally in lower case */
+         }
+         /* Is it (_INITLINES) */
+         else if( bIsLineNumberInfo )
+         {
+            fprintf( yyc, "HB_FUNC_INITLINES()" ); /* NOTE: hb_ intentionally in lower case */
          }
          /* Is it an INIT FUNCTION/PROCEDURE */
          else if ( bIsInitFunction )
