@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.17 2006/03/21 20:46:19 likewolf Exp $
+ * $Id: dbgentry.c,v 1.18 2006/03/21 23:02:53 likewolf Exp $
  */
 
 /*
@@ -648,6 +648,16 @@ hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 static void
 hb_dbgAddModule( HB_DEBUGINFO *info, char *szName )
 {
+   char *ptr;
+
+   if ( NULL != ( ptr = strrchr( szName, '/' ) ) )
+   {
+      szName = ptr + 1;
+   }
+   if ( NULL != ( ptr = strrchr( szName, '\\' ) ) )
+   {
+      szName = ptr + 1;
+   }
    if ( !info->nModules || strcmp( info->aModules[ info->nModules - 1 ].szModule, szName ) )
    {
       HB_MODULEINFO *pModule;

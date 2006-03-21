@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4876 2006/03/21 20:46:19 likewolf Exp $
+ * $Id: ChangeLog,v 1.4877 2006/03/21 23:02:40 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-22 02:53 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/dbgentry.c
+    ! Strip pathname from module filenames.
 
 2006-03-22 02:02 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbcomp.h
