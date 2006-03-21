@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.119 2006/02/21 19:37:07 druzus Exp $
+ * $Id: harbour.c,v 1.120 2006/02/24 06:18:28 ronpinkas Exp $
  */
 
 /*
@@ -1336,17 +1336,33 @@ void hb_compGenGlobalName( char *szVarName )
       BYTE * pBuffer;
       int iVar;
       int iVarLen = strlen( szVarName );
+      int i;
+      PVAR pVar;
 
       hb_compGlobalsDefStart();
 
       iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
-
-      pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
-      pBuffer[0] = HB_P_LOCALNAME;
-      pBuffer[1] = HB_LOBYTE( iVar );
-      pBuffer[2] = HB_HIBYTE( iVar );
-      memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, iVarLen + 1 );
-      hb_compGenPCodeN( pBuffer, iVarLen + 4 , 0 );
+      pVar = hb_compVariableFind( hb_comp_pGlobals, iVar );
+      
+      pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 5 );
+      i = 0;
+      if ( !pVar->szAlias )
+      {
+         /* GLOBAL defined in the current module */
+         pBuffer[i++] = HB_P_LOCALNAME;
+      }
+      else
+      {
+         /* GLOBAL EXTERNAL */
+         /* We don't set FUN_USES_STATICS here because HB_P_STATICNAME is
+          * used only as a convenience way to not create a new PCODE */
+         pBuffer[i++] = HB_P_STATICNAME;
+         pBuffer[i++] = FALSE; /* currently unused in HVM */
+      }
+      pBuffer[i++] = HB_LOBYTE( iVar );
+      pBuffer[i++] = HB_HIBYTE( iVar );
+      memcpy( ( BYTE * ) ( & ( pBuffer[ i ] ) ), szVarName, iVarLen + 1 );
+      hb_compGenPCodeN( pBuffer, i + iVarLen + 1, 0 );
       hb_xfree( pBuffer );
 
       hb_compGlobalsDefEnd();
@@ -1375,7 +1391,7 @@ void hb_compGenStaticName( char *szVarName )
       iVar = hb_compStaticGetPos( szVarName, pFunc );
 
       pBuffer[0] = HB_P_STATICNAME;
-      pBuffer[1] = bGlobal;
+      pBuffer[1] = bGlobal; /* currently unused in HVM */
       pBuffer[2] = HB_LOBYTE( iVar );
       pBuffer[3] = HB_HIBYTE( iVar );
 
@@ -5004,6 +5020,18 @@ void hb_compGlobalsDefStart( void )
       hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
       hb_comp_pGlobalsFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+      
+      if( hb_comp_bDebugInfo )
+      {
+         BYTE * pBuffer;
+         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
+
+         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
+         pBuffer[0] = HB_P_MODULENAME;
+         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
+         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
+         hb_xfree( pBuffer );
+      }
    }
    else
    {

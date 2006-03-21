@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.42 2006/02/13 23:10:23 druzus Exp $
+ * $Id: hbcomp.h,v 1.43 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ typedef struct _ENUMDEF
 typedef struct _VAR
 {
    char *    szName;               /* variable name */
-   char *    szAlias;              /* variable alias namespace */
+   char *    szAlias;              /* variable alias namespace (NULL for GLOBALS, "" for EXTERNGLOBALS) */
    int       iUsed;                /* number of times used */
    int       iDeclLine;            /* declaration line number */
    BYTE      cType;                /* optional strong typing */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4874 2006/03/18 23:31:26 lculik Exp $
+ * $Id: ChangeLog,v 1.4875 2006/03/19 00:21:46 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-21 23:46 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbcomp.h
+    * Clarified a comment.
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    + Generate debug info for GLOBAL EXTERNAL variables.
+  * source/vm/dbgentry.c
+    + Collect GLOBAL EXTERNAL variable info.
+    * A small speed optimization.
+  * source/debug/dbgmenu.prg
+  * source/debug/debugger.prg
+    + By default, display only GLOBAL and GLOBAL EXTERNAL variables declared
+      in the current module. Added an option to display all GLOBAL variables.
 
 2006-03-18 16:21 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * contrib/libnf/getenvrn.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.15 2006/03/12 15:55:20 likewolf Exp $
+ * $Id: dbgentry.c,v 1.16 2006/03/18 22:37:34 likewolf Exp $
  */
 
 /*
@@ -148,9 +148,13 @@ typedef struct
 typedef struct
 {
    char *szModule;
-   int nVars;
-   HB_VARINFO *aVars;
-} HB_STATICMODULEINFO;
+   int nStatics;
+   HB_VARINFO *aStatics;
+   int nGlobals;
+   HB_VARINFO *aGlobals;
+   int nExternGlobals;
+   HB_VARINFO *aExternGlobals;
+} HB_MODULEINFO;
 
 typedef struct
 {
@@ -173,33 +177,33 @@ typedef struct
    int nProcLevel;
    int nCallStackLen;
    HB_CALLSTACKINFO *aCallStack;
-   int nStaticModules;
-   HB_STATICMODULEINFO *aStaticModules;
-   int nGlobals;
-   HB_VARINFO *aGlobals;
+   int nModules;
+   HB_MODULEINFO *aModules;
    BOOL bCBTrace;
    BOOL ( *pFunInvoke )( void );
+   BOOL bInitGlobals;
+   BOOL bInitStatics;
 } HB_DEBUGINFO;
 
 
-static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0 };
+static HB_DEBUGINFO s_Info = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* bCBTrace */ TRUE, 0, 0, 0 };
 static HB_DEBUGINFO *info = &s_Info;
 
 
 static HB_ITEM *
 hb_dbgActivateBreakArray( HB_DEBUGINFO *info );
 static HB_ITEM *
-hb_dbgActivateStaticModuleArray( HB_DEBUGINFO *info );
+hb_dbgActivateModuleArray( HB_DEBUGINFO *info );
 static HB_ITEM *
 hb_dbgActivateVarArray( int nVars, HB_VARINFO *aVars );
 static void
 hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame );
 static void
+hb_dbgAddModule( HB_DEBUGINFO *info, char *szName );
+static void
 hb_dbgAddStack( HB_DEBUGINFO *info, char *szName, int nProcLevel );
 static void
 hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame );
-static void
-hb_dbgAddStaticModule( HB_DEBUGINFO *info, char *szName );
 static void
 hb_dbgAddVar( int *nVars, HB_VARINFO **aVars, char *szName, char cType, int nIndex, int nFrame );
 static void
@@ -216,10 +220,6 @@ static BOOL
 hb_dbgIsAltD( void );
 static BOOL
 hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine );
-static BOOL
-hb_dbgIsInitGlobals( void );
-static BOOL
-hb_dbgIsInitStatics( void );
 static BOOL
 hb_dbgEqual( HB_ITEM *pItem1, HB_ITEM *pItem2 );
 static void
@@ -258,9 +258,8 @@ hb_dbgActivate( HB_DEBUGINFO *info )
    {
       int i;
       PHB_ITEM aCallStack = hb_itemArrayNew( info->nCallStackLen );
-      PHB_ITEM aStaticModules;
+      PHB_ITEM aModules;
       PHB_ITEM aBreak;
-      PHB_ITEM aGlobals;
 
       for ( i = 0; i < info->nCallStackLen; i++ )
       {
@@ -296,9 +295,8 @@ hb_dbgActivate( HB_DEBUGINFO *info )
          hb_itemRelease( aEntry );
       }
 
-      aStaticModules = hb_dbgActivateStaticModuleArray( info );
+      aModules = hb_dbgActivateModuleArray( info );
       aBreak = hb_dbgActivateBreakArray( info );
-      aGlobals = hb_dbgActivateVarArray( info->nGlobals, info->aGlobals );
 
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
@@ -306,16 +304,14 @@ hb_dbgActivate( HB_DEBUGINFO *info )
       hb_vmPushPointer( info );
       hb_vmPushLong( info->nProcLevel );
       hb_vmPush( aCallStack );
-      hb_vmPush( aStaticModules );
+      hb_vmPush( aModules );
       hb_vmPush( aBreak );
-      hb_vmPush( aGlobals );
 
       hb_itemRelease( aCallStack );
-      hb_itemRelease( aStaticModules );
+      hb_itemRelease( aModules );
       hb_itemRelease( aBreak );
-      hb_itemRelease( aGlobals );
 
-      hb_vmDo( 7 );
+      hb_vmDo( 6 );
    }
 }
 
@@ -356,27 +352,37 @@ hb_dbgActivateBreakArray( HB_DEBUGINFO *info )
 
 
 static HB_ITEM *
-hb_dbgActivateStaticModuleArray( HB_DEBUGINFO *info )
+hb_dbgActivateModuleArray( HB_DEBUGINFO *info )
 {
    int i;
-   PHB_ITEM pArray = hb_itemArrayNew( info->nStaticModules );
+   PHB_ITEM pArray = hb_itemArrayNew( info->nModules );
 
-   for ( i = 0; i < info->nStaticModules; i++ )
+   for ( i = 0; i < info->nModules; i++ )
    {
-      PHB_ITEM pStaticModule = hb_itemArrayNew( 2 );
+      PHB_ITEM pModule = hb_itemArrayNew( 4 );
       PHB_ITEM item;
 
-      item = hb_itemPutC( NULL, info->aStaticModules[ i ].szModule );
-      hb_arraySet( pStaticModule, 1, item );
+      item = hb_itemPutC( NULL, info->aModules[ i ].szModule );
+      hb_arraySet( pModule, 1, item );
       hb_itemRelease( item );
 
-      item = hb_dbgActivateVarArray( info->aStaticModules[ i ].nVars,
-                                     info->aStaticModules[ i ].aVars );
-      hb_arraySet( pStaticModule, 2, item );
+      item = hb_dbgActivateVarArray( info->aModules[ i ].nStatics,
+                                     info->aModules[ i ].aStatics );
+      hb_arraySet( pModule, 2, item );
+      hb_itemRelease( item );
+      
+      item = hb_dbgActivateVarArray( info->aModules[ i ].nGlobals,
+                                     info->aModules[ i ].aGlobals );
+      hb_arraySet( pModule, 3, item );
       hb_itemRelease( item );
 
-      hb_arraySet( pArray, i + 1, pStaticModule );
-      hb_itemRelease( pStaticModule );
+      item = hb_dbgActivateVarArray( info->aModules[ i ].nExternGlobals,
+                                     info->aModules[ i ].aExternGlobals );
+      hb_arraySet( pModule, 4, item );
+      hb_itemRelease( item );
+
+      hb_arraySet( pArray, i + 1, pModule );
+      hb_itemRelease( pModule );
    }
    return pArray;
 }
@@ -433,9 +439,11 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          
          hb_procinfo( 0, szProcName, NULL, NULL );
          if ( !strcmp( szProcName, "(_INITSTATICS)" ) )
-         {
-            hb_dbgAddStaticModule( info, szName );
-         }
+             info->bInitStatics = TRUE;
+         else if ( !strcmp( szProcName, "(_INITGLOBALS)" ) )
+             info->bInitGlobals = TRUE;
+         if ( info->bInitStatics || info->bInitGlobals )
+            hb_dbgAddModule( info, szName );
          else if ( !strncmp( szProcName, "(b)", 3 ) )
             info->bCodeBlock = TRUE;
          else if ( info->bNextRoutine )
@@ -572,6 +580,8 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          HB_TRACE( HB_TR_DEBUG, ( "ENDPROC", nLine ) );
 
          info->bCodeBlock = FALSE;
+         info->bInitStatics = FALSE;
+         info->bInitGlobals = FALSE;
          hb_dbgEndProc( info );
          return;
 
@@ -605,9 +615,11 @@ hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction )
 static void
 hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 {
-   if ( hb_dbgIsInitGlobals() )
+   if ( info->bInitGlobals )
    {
-      hb_dbgAddVar( &info->nGlobals, &info->aGlobals, szName, 'G', nIndex, hb_dbg_vmVarGCount() );
+      HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
+      
+      hb_dbgAddVar( &module->nGlobals, &module->aGlobals, szName, 'G', nIndex, hb_dbg_vmVarGCount() );
    }
    else
    {
@@ -665,12 +677,18 @@ hb_dbgAddStack( HB_DEBUGINFO *info, char *szName, int nProcLevel )
 static void
 hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 {
-   HB_STATICMODULEINFO *st;
-
-   if ( hb_dbgIsInitStatics() )
+   if ( info->bInitGlobals )
    {
-      st = &info->aStaticModules[ info->nStaticModules - 1 ];
-      hb_dbgAddVar( &st->nVars, &st->aVars, szName, 'S', nIndex, nFrame );
+      HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
+      
+      hb_dbgAddVar( &module->nExternGlobals, &module->aExternGlobals, szName,
+                    'G', nIndex, hb_dbg_vmVarGCount() );
+   }
+   else if ( info->bInitStatics )
+   {
+      HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
+      
+      hb_dbgAddVar( &module->nStatics, &module->aStatics, szName, 'S', nIndex, nFrame );
    }
    else
    {
@@ -682,13 +700,15 @@ hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 
 
 static void
-hb_dbgAddStaticModule( HB_DEBUGINFO *info, char *szName )
+hb_dbgAddModule( HB_DEBUGINFO *info, char *szName )
 {
-   HB_STATICMODULEINFO *pStaticModule;
+   HB_MODULEINFO *pModule;
 
-   pStaticModule = ARRAY_ADD( HB_STATICMODULEINFO, info->aStaticModules, info->nStaticModules );
-   pStaticModule->szModule = szName;
-   pStaticModule->nVars = 0;
+   pModule = ARRAY_ADD( HB_MODULEINFO, info->aModules, info->nModules );
+   pModule->szModule = szName;
+   pModule->nStatics = 0;
+   pModule->nGlobals = 0;
+   pModule->nExternGlobals = 0;
 }
 
 
@@ -1115,7 +1135,7 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
    HB_CALLSTACKINFO *top = &info->aCallStack[ info->nCallStackLen - 1 ];
    HB_ITEM *aVars = hb_itemArrayNew( watch->nVars );
    HB_VARINFO *scopes;
-   HB_STATICMODULEINFO *static_module = NULL;
+   HB_MODULEINFO *module = NULL;
    int nProcLevel;
 
    if ( !watch->nVars )
@@ -1126,11 +1146,11 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
    scopes = (HB_VARINFO *) ALLOC( watch->nVars * sizeof( HB_VARINFO ) );
    nProcLevel = hb_dbg_ProcLevel();
    
-   for ( i = 0; i < info->nStaticModules; i++ )
+   for ( i = 0; i < info->nModules; i++ )
    {
-      if ( !strcmp( info->aStaticModules[ i ].szModule, top->szModule ) )
+      if ( !strcmp( info->aModules[ i ].szModule, top->szModule ) )
       {
-         static_module = &info->aStaticModules[ i ];
+         module = &info->aModules[ i ];
          break;
       }
    }
@@ -1172,11 +1192,11 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
       if ( j < top->nStatics )
          continue;
 
-      if ( static_module )
+      if ( module )
       {
-         for ( j = 0; j < static_module->nVars; j++ )
+         for ( j = 0; j < module->nStatics; j++ )
          {
-            var = &static_module->aVars[ j ];
+            var = &module->aStatics[ j ];
             if ( !strcmp( name, var->szName ) )
             {
                scopes[ i ].cType = 'S';
@@ -1186,24 +1206,39 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
                break;
             }
          }
-         if ( j < static_module->nVars )
+         if ( j < module->nStatics )
+            continue;
+         
+         for ( j = 0; j < module->nGlobals; j++ )
+         {
+            var = &module->aGlobals[ j ];
+            if ( !strcmp( name, var->szName ) )
+            {
+               scopes[ i ].cType = 'G';
+               scopes[ i ].nFrame = var->nFrame;
+               scopes[ i ].nIndex = var->nIndex;
+               hb_itemArrayPut( aVars, i + 1, hb_dbgVarGet( &scopes[ i ] ) );
+               break;
+            }
+         }
+         if ( j < module->nGlobals )
+            continue;
+
+         for ( j = 0; j < module->nExternGlobals; j++ )
+         {
+            var = &module->aExternGlobals[ j ];
+            if ( !strcmp( name, var->szName ) )
+            {
+               scopes[ i ].cType = 'G';
+               scopes[ i ].nFrame = var->nFrame;
+               scopes[ i ].nIndex = var->nIndex;
+               hb_itemArrayPut( aVars, i + 1, hb_dbgVarGet( &scopes[ i ] ) );
+               break;
+            }
+         }
+         if ( j < module->nExternGlobals )
             continue;
       }
-
-      for ( j = 0; j < info->nGlobals; j++ )
-      {
-         var = &info->aGlobals[ j ];
-         if ( !strcmp( name, var->szName ) )
-         {
-            scopes[ i ].cType = 'G';
-            scopes[ i ].nFrame = var->nFrame;
-            scopes[ i ].nIndex = var->nIndex;
-            hb_itemArrayPut( aVars, i + 1, hb_dbgVarGet( &scopes[ i ] ) );
-            break;
-         }
-      }
-      if ( j < info->nGlobals )
-         continue;
 
       scopes[ i ].cType = 'M';
       scopes[ i ].szName = STRDUP( name );
@@ -1277,26 +1312,6 @@ hb_dbgIsBreakPoint( HB_DEBUGINFO *info, char *szModule, int nLine )
 }
 
 
-static BOOL
-hb_dbgIsInitGlobals( void )
-{
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
-
-   hb_procinfo( 0, szName, NULL, NULL );
-   return !strcmp( szName, "(_INITGLOBALS)" );
-}
-
-
-static BOOL
-hb_dbgIsInitStatics( void )
-{
-   char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
-
-   hb_procinfo( 0, szName, NULL, NULL );
-   return !strcmp( szName, "(_INITSTATICS)" );
-}
-
-
 static void
 hb_dbgQuit( HB_DEBUGINFO *info )
 {
@@ -1311,11 +1326,6 @@ hb_dbgQuit( HB_DEBUGINFO *info )
    while ( info->nCallStackLen )
    {
       hb_dbgEndProc( info );
-   }
-   if ( info->nGlobals )
-   {
-      FREE( info->aGlobals );
-      info->nGlobals = 0;
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.71 2006/02/22 14:46:10 likewolf Exp $
+ * $Id: debugger.prg,v 1.72 2006/03/07 10:00:41 likewolf Exp $
  */
 
 /*
@@ -117,6 +117,12 @@
 #define WP_TYPE      1  //wp = watchpoint, tr = tracepoint
 #define WP_EXPR      2  //source of an expression
 
+/* Information structure stored in ::aModules */
+#define MODULE_NAME          1
+#define MODULE_STATICS       2
+#define MODULE_GLOBALS       3
+#define MODULE_EXTERNGLOBALS 4
+
 
 static s_oDebugger
 
@@ -130,7 +136,7 @@ procedure __dbgAltDEntry()
 return
 
 
-procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5, uParam6 )  // debugger entry point
+procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // debugger entry point
   LOCAL bStartup := .F.
   
   DO CASE
@@ -148,9 +154,8 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5, uParam
       ENDIF
       s_oDebugger:nProcLevel := uParam2
       s_oDebugger:aCallStack := uParam3
-      s_oDebugger:aStaticModules := uParam4
+      s_oDebugger:aModules := uParam4
       s_oDebugger:aBreakPoints := uParam5
-      s_oDebugger:aGlobals := uParam6
       IF bStartup
         IF s_oDebugger:lRunAtStartup
           HB_INLINE( uParam1 )
@@ -182,15 +187,15 @@ CLASS TDebugger
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
    DATA   nProcLevel    //procedure level where the debugger is currently
-   DATA   aStaticModules // array of modules with static variables
-   DATA   aGlobals // array of GLOBAL variables
+   DATA   aModules // array of modules with static and GLOBAL variables
    DATA   aColors
    DATA   aWatch
    DATA   aLastCommands, nCommand, oGetListCommand
    DATA   lAnimate, lEnd, lCaseSensitive, lMonoDisplay, lSortVars
    DATA   cSearchString, cPathForFiles, cSettingsFileName, aPathDirs
    DATA   nTabWidth, nSpeed
-   DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lShowGlobals, lAll
+   DATA   lShowPublics, lShowPrivates, lShowStatics, lShowLocals, lShowGlobals
+   DATA   lShowAllGlobals, lAll
    DATA   lShowCallStack
    DATA   lGo           //stores if GO was requested
    DATA   lActive INIT .F.
@@ -269,6 +274,7 @@ CLASS TDebugger
    METHOD SaveAppState()
    METHOD SaveSettings()
    METHOD Show()
+   METHOD ShowAllGlobals()
    METHOD ShowAppScreen()
    METHOD ShowCallStack()
    METHOD ShowCodeLine( nProc )
@@ -340,8 +346,7 @@ METHOD New() CLASS TDebugger
    ::aBreakPoints      := {}
    ::aWatch            := {}
    ::aCallStack        := {}
-   ::aStaticModules    := {}
-   ::aGlobals          := {}
+   ::aModules          := {}
    ::aProcStack        := {}
    ::aVars             := {}
    ::lCaseSensitive    := .f.
@@ -364,6 +369,7 @@ METHOD New() CLASS TDebugger
    ::lShowStatics      := .f.
    ::lShowLocals       := .f.
    ::lShowGlobals      := .F.
+   ::lShowAllGlobals   := .F.
    ::lAll              := .f.
    ::lSortVars         := .f.
    ::cSettingsFileName := "init.cld"
@@ -1639,18 +1645,33 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
       next
    endif
 
-   IF ::lShowGlobals
-      FOR n := 1 TO Len( ::aGlobals )
-        AAdd( aBVars, ::aGlobals[ n ] )
-      NEXT
-   ENDIF
-
    IF ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_LINE ] != nil
+      IF ::lShowGlobals
+         cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
+         FOR n := 1 TO Len( ::aModules )
+            IF !::lShowAllGlobals
+               IF !FILENAME_EQUAL( ::aModules[ n ][ MODULE_NAME ], cName )
+                  LOOP
+               ENDIF
+            ENDIF
+            aVars := ::aModules[ n ][ MODULE_GLOBALS ]
+            FOR m := 1 TO Len( aVars )
+               AAdd( aBVars, aVars[ m ] )
+            NEXT
+            IF !::lShowAllGlobals
+               aVars := ::aModules[ n ][ MODULE_EXTERNGLOBALS ]
+               FOR m := 1 TO Len( aVars )
+                  AAdd( aBVars, aVars[ m ] )
+               NEXT
+            ENDIF
+         NEXT
+      ENDIF
+      
       if ::lShowStatics
          cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
-         n := ASCAN( ::aStaticModules, {|a| FILENAME_EQUAL( a[1], cName ) } )
+         n := ASCAN( ::aModules, {|a| FILENAME_EQUAL( a[ MODULE_NAME ], cName ) } )
          IF ( n > 0 )
-            aVars := ::aStaticModules[ n ][ 2 ]
+            aVars := ::aModules[ n ][ MODULE_STATICS ]
             for m := 1 to Len( aVars )
                AAdd( aBVars, aVars[ m ] )
             next
@@ -1974,6 +1995,7 @@ METHOD RefreshVars() CLASS TDebugger
    ::oPulldown:GetItemByIdent( "PUBLIC" ):checked := ::lShowPublics
    ::oPulldown:GetItemByIdent( "STATIC" ):checked := ::lShowStatics
    ::oPulldown:GetItemByIdent( "ALL" ):checked := ::lAll
+   ::oPulldown:GetItemByIdent( "SHOWALLGLOBALS" ):checked := ::lShowAllGlobals
    IF ::lActive
       if ::lShowGlobals .OR. ::lShowPublics .or. ::lShowPrivates .or. ::lShowStatics .or. ::lShowLocals
          ::LoadVars()
@@ -2291,6 +2313,14 @@ METHOD Show() CLASS TDebugger
    ::BarDisplay()
 
 return nil
+
+
+METHOD ShowAllGlobals() CLASS TDebugger
+
+   ::lShowAllGlobals := ! ::lShowAllGlobals
+   ::RefreshVars()
+
+RETURN NIL
 
 
 METHOD ShowAppScreen() CLASS TDebugger
