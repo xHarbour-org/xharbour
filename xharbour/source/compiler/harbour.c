@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.121 2006/03/21 20:46:16 likewolf Exp $
+ * $Id: harbour.c,v 1.122 2006/03/21 23:03:06 likewolf Exp $
  */
 
 /*
@@ -5630,11 +5630,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             hb_compExternGen();       /* generates EXTERN symbols names */
 
-            if ( hb_comp_pLineNumberFunc )
-            {
-               hb_compAddInitFunc( hb_comp_pLineNumberFunc );
-            }
-            
             if( hb_comp_pInitFunc )
             {
                /* Fix the number of static variables */
@@ -5645,6 +5640,11 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_compAddInitFunc( hb_comp_pInitFunc );
             }
 
+            if ( hb_comp_pLineNumberFunc )
+            {
+               hb_compAddInitFunc( hb_comp_pLineNumberFunc );
+            }
+            
             if( hb_comp_pGlobalsFunc )
             {
                PVAR pGlobal = hb_comp_pGlobals;
