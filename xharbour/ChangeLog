@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4879 2006/03/22 18:13:01 likewolf Exp $
+ * $Id: ChangeLog,v 1.4880 2006/03/23 02:07:03 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-03-22 18:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/simplex.c
+    * GPF trap, and minor optimization
+  * source/compiler/harbour.slx
+    * Minor typo
+  * source/vm/dbgentry.c
+    * Missing type casts.
+
 2006-03-22 17:59 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/make_b32.bat
   * xharbour/makefile.bc
-    - Removed references to obsolete bcc640[mt].lib, optgui[mt].lib 
+    - Removed references to obsolete bcc640[mt].lib, optgui[mt].lib
       and optcon[mt].lib files.
     + Added references to fmstat[mt].lib to use when FM debugging is needed.
       If you need to do FM debugging, just make sure fmstat[mt].lib is linked
