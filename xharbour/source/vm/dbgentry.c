@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.18 2006/03/21 23:02:53 likewolf Exp $
+ * $Id: dbgentry.c,v 1.19 2006/03/21 23:52:34 likewolf Exp $
  */
 
 /*
@@ -376,7 +376,7 @@ hb_dbgActivateModuleArray( HB_DEBUGINFO *info )
                                      info->aModules[ i ].aStatics );
       hb_arraySet( pModule, 2, item );
       hb_itemRelease( item );
-      
+
       item = hb_dbgActivateVarArray( info->aModules[ i ].nGlobals,
                                      info->aModules[ i ].aGlobals );
       hb_arraySet( pModule, 3, item );
@@ -442,7 +442,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
    {
       case HB_DBG_MODULENAME:
          HB_TRACE( HB_TR_DEBUG, ( "MODULENAME %s", szName ) );
-         
+
          hb_procinfo( 0, szProcName, NULL, NULL );
          if ( !strcmp( szProcName, "(_INITSTATICS)" ) )
              info->bInitStatics = TRUE;
@@ -470,13 +470,13 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
 
       case HB_DBG_LOCALNAME:
          HB_TRACE( HB_TR_DEBUG, ( "LOCALNAME %s index %d", szName, nIndex ) );
-         
+
          hb_dbgAddLocal( info, szName, nIndex, hb_dbg_ProcLevel() );
          return;
 
       case HB_DBG_STATICNAME:
          HB_TRACE( HB_TR_DEBUG, ( "STATICNAME %s index %d frame %d", szName, nIndex, nFrame ) );
-         
+
          hb_dbgAddStatic( info, szName, nIndex, nFrame );
          return;
 
@@ -484,7 +484,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
       {
          HB_CALLSTACKINFO *pTop = &info->aCallStack[ info->nCallStackLen - 1 ];
          BOOL bOldClsScope;
-         
+
          HB_TRACE( HB_TR_DEBUG, ( "SHOWLINE %d", nLine ) );
 
          if ( info->bInitLines )
@@ -590,7 +590,7 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
       case HB_DBG_ENDPROC:
          if ( info->bQuit )
             return;
-         
+
          HB_TRACE( HB_TR_DEBUG, ( "ENDPROC", nLine ) );
 
          info->bCodeBlock = FALSE;
@@ -633,7 +633,7 @@ hb_dbgAddLocal( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
    if ( info->bInitGlobals )
    {
       HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
-      
+
       hb_dbgAddVar( &module->nGlobals, &module->aGlobals, szName, 'G', nIndex, hb_dbg_vmVarGCount() );
    }
    else
@@ -723,14 +723,14 @@ hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
    if ( info->bInitGlobals )
    {
       HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
-      
+
       hb_dbgAddVar( &module->nExternGlobals, &module->aExternGlobals, szName,
                     'G', nIndex, hb_dbg_vmVarGCount() );
    }
    else if ( info->bInitStatics )
    {
       HB_MODULEINFO *module = &info->aModules[ info->nModules - 1 ];
-      
+
       hb_dbgAddVar( &module->nStatics, &module->aStatics, szName, 'S', nIndex, nFrame );
    }
    else
@@ -751,12 +751,12 @@ hb_dbgAddStopLine( HB_DEBUGINFO *info, int nLine )
    if ( !module->nAllocStopLines )
    {
       module->nAllocStopLines = 128;
-      module->aStopLines = hb_xgrab( sizeof( int ) * module->nAllocStopLines );
+      module->aStopLines = (int *) hb_xgrab( sizeof( int ) * module->nAllocStopLines );
    }
    else if ( module->nStopLines > module->nAllocStopLines )
    {
       module->nAllocStopLines *= 2;
-      module->aStopLines = hb_xrealloc( module->aStopLines, sizeof( int ) * module->nAllocStopLines );
+      module->aStopLines = (int *) hb_xrealloc( module->aStopLines, sizeof( int ) * module->nAllocStopLines );
    }
    module->aStopLines[ module->nStopLines - 1 ] = nLine;
 }
@@ -921,7 +921,7 @@ hb_dbgEval( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
    HB_ITEM *xResult = NULL;
 
    HB_TRACE( HB_TR_DEBUG, ( "expr %s", watch->szExpr ) );
-   
+
    /* Check if we have a cached pBlock */
    if ( !watch->pBlock )
    {
@@ -1192,10 +1192,10 @@ hb_dbgEvalResolve( HB_DEBUGINFO *info, HB_WATCHPOINT *watch )
    {
       return aVars;
    }
-   
+
    scopes = (HB_VARINFO *) ALLOC( watch->nVars * sizeof( HB_VARINFO ) );
    nProcLevel = hb_dbg_ProcLevel();
-   
+
    for ( i = 0; i < info->nModules; i++ )
    {
       if ( !strcmp( info->aModules[ i ].szModule, top->szModule ) )
