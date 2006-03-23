@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.23 2005/03/31 19:51:25 andijahja Exp $
+rem $Id: make_b32.bat,v 1.24 2006/02/15 11:43:18 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -17,22 +17,14 @@ if "%1" == "CLEAN" goto CLEAN
 if not exist obj md obj
 if not exist obj\b32 md obj\b32
 if not exist obj\b32\mt md obj\b32\mt
-
-rem added optimize subdir for optimized library
-rem start in build 81
-if not exist obj\b32\opt md obj\b32\opt
-if not exist obj\b32\opt\console md obj\b32\opt\console
-if not exist obj\b32\opt\gui md obj\b32\opt\gui
-if not exist obj\b32\mt\opt md obj\b32\mt\opt
-if not exist obj\b32\mt\opt\console md obj\b32\mt\opt\console
-if not exist obj\b32\mt\opt\gui md obj\b32\mt\opt\gui
+if not exist obj\b32\fmstat md obj\b32\fmstat
+if not exist obj\b32\mt\fmstat md obj\b32\mt\fmstat
 
 if not exist lib md lib
 if not exist lib\b32 md lib\b32
 
 if not exist bin md bin
 if not exist bin\b32 md bin\b32
-
 
 :BUILD
    make -l EXE_OBJ_DIR=obj\b32\bin OBJ_DIR=obj\b32 -fmakefile.bc %1 %2 %3 > make_b32.log
@@ -47,7 +39,6 @@ if not exist bin\b32 md bin\b32
    if exist lib\b32\*.bak del lib\b32\*.bak
    if exist bin\b32\*.tds del bin\b32\*.tds
    if exist bin\b32\*.map del bin\b32\*.map
-   if exist make_b32.log  del make_b32.log >null
    goto EXIT
 
 :BUILD_ERR
@@ -84,6 +75,8 @@ if not exist bin\b32 md bin\b32
    if exist lib\dbfntxmt.lib   del lib\dbfntxmt.lib
    if exist lib\debug.lib      del lib\debug.lib
    if exist lib\dllmain.lib    del lib\dllmain.lib
+   if exist lib\fmstat.lib     del lib\fmstat.lib
+   if exist lib\fmstatmt.lib   del lib\fmstatmt.lib
    if exist lib\gtcgi.lib      del lib\gtcgi.lib
    if exist lib\gtnul.lib      del lib\gtnul.lib
    if exist lib\gtpca.lib      del lib\gtpca.lib
@@ -136,13 +129,12 @@ if not exist bin\b32 md bin\b32
    if exist bin\b32\*.tds del bin\b32\*.tds
    if exist bin\b32\*.map del bin\b32\*.map
    if exist bin\b32\*.dll del bin\b32\*.dll
-
-   if exist lib\b32\bcc640.lib copy lib\b32\bcc640.lib lib >nul
-   if exist lib\b32\*.lib      del lib\b32\*.lib
-   if exist lib\bcc640.lib     copy lib\bcc640.lib lib\b32 >nul
+   if exist bin\b32\*.lib del bin\b32\*.lib
 
    if exist lib\b32\*.bak    del lib\b32\*.bak
    if exist lib\b32\*.obj    del lib\b32\*.obj
+   if exist lib\b32\*.map    del lib\b32\*.map
+   if exist lib\b32\*.lib    del lib\b32\*.lib
 
    if exist obj\b32\*.bak    del obj\b32\*.bak
    if exist obj\b32\*.obj    del obj\b32\*.obj
@@ -156,12 +148,24 @@ if not exist bin\b32 md bin\b32
    if exist obj\b32\bin\*.c      del obj\b32\bin\*.c
    if exist obj\b32\bin\*.h      del obj\b32\bin\*.h
 
-   if exist obj\b32\mt\*.obj del obj\b32\mt\*.obj
-   if exist obj\b32\mt\*.c   del obj\b32\mt\*.c
+   if exist obj\b32\mt\*.obj     del obj\b32\mt\*.obj
+   if exist obj\b32\mt\*.output  del obj\b32\mt\*.output
+   if exist obj\b32\mt\*.c       del obj\b32\mt\*.c
+   if exist obj\b32\mt\*.h       del obj\b32\mt\*.h
 
+   if exist obj\b32\fmstat\*.obj    del obj\b32\fmstat\*.obj
+   if exist obj\b32\mt\fmstat\*.obj del obj\b32\mt\fmstat\*.obj
+
+   rem remove obsolete optgui and optcon directories
    if exist obj\b32\opt\console\*.obj    del obj\b32\opt\console\*.obj
    if exist obj\b32\opt\gui\*.obj        del obj\b32\opt\gui\*.obj
    if exist obj\b32\mt\opt\console\*.obj del obj\b32\mt\opt\console\*.obj
    if exist obj\b32\mt\opt\gui\*.obj     del obj\b32\mt\opt\gui\*.obj
+   if exist obj\b32\opt\console\nul      rd obj\b32\opt\console
+   if exist obj\b32\opt\gui\nul          rd obj\b32\opt\gui
+   if exist obj\b32\opt\nul              rd obj\b32\opt
+   if exist obj\b32\mt\opt\console\nul   rd obj\b32\mt\opt\console
+   if exist obj\b32\mt\opt\gui\nul       rd obj\b32\mt\opt\gui
+   if exist obj\b32\mt\opt\nul           rd obj\b32\mt\opt
 
 :EXIT

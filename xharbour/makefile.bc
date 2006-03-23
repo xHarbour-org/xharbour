@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.165 2006/02/14 22:38:21 ath1 Exp $
+# $Id: makefile.bc,v 1.166 2006/03/17 01:18:46 fsgiudice Exp $
 #
 
 #
@@ -97,8 +97,7 @@ HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
-OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
-OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
+FMSTAT_OBJ_DIR = $(OBJ_DIR)\fmstat
 
 # This is needed, otherwise the libs may overflow when
 # debug info is requested with -v -y
@@ -208,8 +207,7 @@ RTL_LIB        = $(LIB_DIR)\rtl$(HB_MT).lib
 PCREPOS_LIB    = $(LIB_DIR)\pcrepos.lib
 TIP_LIB        = $(LIB_DIR)\tip$(HB_MT).lib
 VM_LIB         = $(LIB_DIR)\vm$(HB_MT).lib
-VM_LIB_OPT_CON = $(LIB_DIR)\optcon$(HB_MT).lib
-VM_LIB_OPT_GUI = $(LIB_DIR)\optgui$(HB_MT).lib
+FMSTAT_LIB     = $(LIB_DIR)\fmstat$(HB_MT).lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 DLL_MAIN_LIB   = $(LIB_DIR)\dllmain.lib
 GTCGI_LIB      = $(LIB_DIR)\gtcgi.lib
@@ -294,7 +292,6 @@ HB_GT_LIBS = \
 #
 # RTL.LIB rules
 #
-
 
 RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\abs.obj \
@@ -597,6 +594,7 @@ LANG_LIB_OBJS = \
 #
 # MACRO.LIB rules
 #
+
 MACRO_LIB_OBJS = \
    $(MACRO_OBJ_DIR)\macroy.obj \
    $(MACRO_OBJ_DIR)\macroa.obj \
@@ -607,6 +605,7 @@ MACRO_LIB_OBJS = \
 #
 # RDD.LIB rules
 #
+
 RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\dbcmd.obj \
    $(RDD_OBJ_DIR)\workarea.obj \
@@ -682,6 +681,7 @@ DEBUG_LIB_OBJS = \
 #
 # COMMON.LIB rules
 #
+
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
    $(OBJ_DIR)\hbfsapi.obj \
@@ -697,6 +697,7 @@ COMMON_LIB_OBJS = \
 #
 # VM.LIB rules
 #
+
 VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\arrays.obj \
    $(VM_OBJ_DIR)\arrayshb.obj \
@@ -740,15 +741,12 @@ VM_LIB_OBJS = \
    \
    $(VM_OBJ_DIR)\harbinit.obj
 
-VM_LIB_OPT_CON_OBJS = \
-   $(OPT_CON_OBJ_DIR)\hvm.obj \
-   $(OPT_CON_OBJ_DIR)\classes.obj \
-   $(OPT_CON_OBJ_DIR)\fm.obj
+#
+# FMSTAT.LIB rules
+#
 
-VM_LIB_OPT_GUI_OBJS = \
-   $(OPT_GUI_OBJ_DIR)\hvm.obj \
-   $(OPT_GUI_OBJ_DIR)\classes.obj \
-   $(OPT_GUI_OBJ_DIR)\fm.obj
+FMSTAT_LIB_OBJS = \
+   $(FMSTAT_OBJ_DIR)\fm.obj
 
 #
 # GTCGI.LIB rules
@@ -1121,8 +1119,7 @@ DLL_MAIN_LIB_OBJS = \
 PROJECT = \
    $(PROJECT) \
    $(VM_LIB) \
-   $(VM_LIB_OPT_CON) \
-   $(VM_LIB_OPT_GUI) \
+   $(FMSTAT_LIB) \
    $(RTL_LIB) \
    $(PCREPOS_LIB) \
    $(MACRO_LIB) \
@@ -1307,17 +1304,9 @@ $(VM_LIB) : $(VM_LIB_OBJS)
 
 !
 
-$(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
-    IF EXIST "$(VM_LIB_OPT_CON)" $(DEL) "$(VM_LIB_OPT_CON)" > NUL
-    $(LINKER) "$(VM_LIB_OPT_CON)" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
-
-$(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
-    IF EXIST "$(VM_LIB_OPT_GUI)" $(DEL) "$(VM_LIB_OPT_GUI)" > NUL
-    $(LINKER) "$(VM_LIB_OPT_GUI)" $(ARFLAGS) @&&!
+$(FMSTAT_LIB) : $(FMSTAT_LIB_OBJS)
+    IF EXIST "$(FMSTAT_LIB)" $(DEL) "$(FMSTAT_LIB)" > NUL
+    $(LINKER) "$(FMSTAT_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -1395,7 +1384,6 @@ $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
 
 !
 
-
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
     IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
     $(LINKER) "$(ODBC_LIB)" $(ARFLAGS) @&&!
@@ -1411,32 +1399,6 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_LIB_OBJS)
 +)
 
 !
-
-#
-# OPTCON.LIB dependencies
-#
-
-$(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-
-$(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-
-$(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -o$@ $**
-
-#
-# OPTGUI.LIB dependencies
-#
-
-$(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
-
-$(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
-
-$(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CLIBFLAGS) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI -o$@ $**
 
 #
 # COMMON.LIB dependencies
@@ -1791,6 +1753,14 @@ $(VM_OBJ_DIR)\thread.obj : $(VM_DIR)\thread.c
 
 $(VM_OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
    $(CC_CMD)
+
+#
+# FMSTAT.LIB dependencies
+#
+
+$(FMSTAT_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
+   $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS -o$@ $**
+
 #
 # RTL.LIB dependencies
 #

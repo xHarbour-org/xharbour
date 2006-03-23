@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4878 2006/03/21 23:52:30 likewolf Exp $
+ * $Id: ChangeLog,v 1.4879 2006/03/22 18:13:01 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-22 17:59 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/make_b32.bat
+  * xharbour/makefile.bc
+    - Removed references to obsolete bcc640[mt].lib, optgui[mt].lib 
+      and optcon[mt].lib files.
+    + Added references to fmstat[mt].lib to use when FM debugging is needed.
+      If you need to do FM debugging, just make sure fmstat[mt].lib is linked
+      *before* vm[mt].lib.
+    These changes need to be made to the rest of the non-gnu makefiles.
+    If you use MSVC, Watcom, Pelles, DigitalMars please update those files.
+
+  - xharbour/lib/bcc640.lib
+  - xharbour/lib/bcc640mt.lib
+    - removed obsolete files from CVS.
 
 2006-03-22 21:13 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.c
