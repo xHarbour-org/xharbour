@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.71 2006/02/15 19:33:04 druzus Exp $
+ * $Id: harbour.slx,v 1.72 2006/02/22 03:30:17 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
                       x == EQ        || \
                       x == BITSHIFTL || \
                       x == LE        || \
-                      x == NE2       || \
+                      x == NE1       || \
                       x == GE        || \
                       x == BITSHIFTR || \
                       x == NE2       || \
