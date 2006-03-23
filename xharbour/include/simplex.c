@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.18 2006/02/22 03:30:11 ronpinkas Exp $
+ * $Id: simplex.c,v 1.19 2006/02/22 04:07:25 ronpinkas Exp $
  */
 
 /*
@@ -540,6 +540,7 @@ YY_DECL
        if( bStart )
        {
           bStart = FALSE;
+          sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
           GenTrees();
           INIT_ACTION();
        }
@@ -665,14 +666,7 @@ int SimpLex_GetNextToken( void )
                   {
                      if( iPairLen + 1 >= iPairAllocated )
                      {
-                        if( iPairAllocated )
-                        {
-                           sPair = (char *) realloc( sPair, ( iPairAllocated += STREAM_ALLOC_SIZE ) );
-                        }
-                        else
-                        {
-                           sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
-                        }
+                        sPair = (char *) realloc( sPair, ( iPairAllocated += STREAM_ALLOC_SIZE ) );
                      }
 
                      if( iSize <= 0 )
