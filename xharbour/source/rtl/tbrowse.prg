@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.142 2006/02/09 14:20:56 gdrouillard Exp $
+ * $Id: tbrowse.prg,v 1.144 2006/03/14 11:59:08 modalsist Exp $
  */
 
 /*
@@ -1417,6 +1417,7 @@ METHOD GoBottom() CLASS TBrowse
 
    // Skips back from last record as many records as TBrowse can hold
    nToTop := ::oDataCache:dbGoBottom()
+   ::nRecsToSkip := ::RowCount - 1
 
    //   From top of TBrowse new row position is nToTop + 1 records away
    ::nNewRowPos := nToTop + 1
