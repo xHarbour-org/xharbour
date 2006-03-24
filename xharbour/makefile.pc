@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.20 2006/02/14 11:08:14 modalsist Exp $
+# $Id: makefile.pc,v 1.21 2006/03/17 01:18:46 fsgiudice Exp $
 #
 # makefile for Pelles C compiler
 #
@@ -76,8 +76,6 @@ HSX_OBJ_DIR   = $(OBJ_DIR)\mt
 CT_OBJ_DIR    = $(OBJ_DIR)\mt\ct
 TIP_OBJ_DIR   = $(OBJ_DIR)\mt
 PP_OBJ_DIR    = $(OBJ_DIR)\mt
-OPT_CON_OBJ_DIR = $(OBJ_DIR)\mt\opt\console
-OPT_GUI_OBJ_DIR = $(OBJ_DIR)\mt\opt\gui
 !else
 EXE_OBJ_DIR   = $(OBJ_DIR)\bin
 VM_OBJ_DIR    = $(OBJ_DIR)
@@ -92,8 +90,6 @@ HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)\ct
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
-OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
-OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
 !endif
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -125,8 +121,6 @@ HSX_LIB      = $(LIB_DIR)\hsx$(HB_MT).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(HB_MT).lib
 PCREPOS_LIB  = $(LIB_DIR)\pcrepos$(HB_MT).lib
 VM_LIB       = $(LIB_DIR)\vm$(HB_MT).lib
-VM_LIB_OPT_CON = $(LIB_DIR)\optcon$(HB_MT).lib
-VM_LIB_OPT_GUI = $(LIB_DIR)\optgui$(HB_MT).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(HB_MT).lib
 CT_LIB       = $(LIB_DIR)\ct$(HB_MT).lib
 TIP_LIB      = $(LIB_DIR)\tip$(HB_MT).lib
@@ -213,8 +207,6 @@ PROJECT = \
 PROJECT = \
    $(PROJECT) \
    $(VM_LIB) \
-   $(VM_LIB_OPT_CON) \
-   $(VM_LIB_OPT_GUI) \
    $(RTL_LIB) \
    $(PCREPOS_LIB) \
    $(MACRO_LIB) \
@@ -731,18 +723,6 @@ VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\harbinit.obj
 
 
-VM_LIB_OPT_CON_OBJS = \
-   $(OPT_CON_OBJ_DIR)\hvm.obj \
-   $(OPT_CON_OBJ_DIR)\classes.obj \
-   $(OPT_CON_OBJ_DIR)\fm.obj
-
-
-VM_LIB_OPT_GUI_OBJS = \
-   $(OPT_GUI_OBJ_DIR)\hvm.obj \
-   $(OPT_GUI_OBJ_DIR)\classes.obj \
-   $(OPT_GUI_OBJ_DIR)\fm.obj
-
-
 RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\abs.obj \
    $(RTL_OBJ_DIR)\accept.obj \
@@ -1152,12 +1132,6 @@ $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
    $(LIB_CMD)
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-   $(LIB_CMD)
-
-$(VM_LIB_OPT_CON) : $(VM_LIB_OPT_CON_OBJS)
-   $(LIB_CMD)
-
-$(VM_LIB_OPT_GUI) : $(VM_LIB_OPT_GUI_OBJS)
    $(LIB_CMD)
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
@@ -3007,33 +2981,6 @@ $(PP_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
 $(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
    $(CC_CMD)
 
-#ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿
-#³ OPTCON.LIB ³Û
-#ÀÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-# ßßßßßßßßßßßßßß
-
-$(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /Fo$@ $**
-
-$(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /Fo$@ $**
-
-$(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /Fo$@ $**
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ OPTGUI.LIB ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-# ßßßßßßßßßßßßßßß
-
-$(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /DHB_GUI /Fo$@ $**
-
-$(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /DHB_GUI /Fo$@ $**
-
-$(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(POCC_EXE) $(CFLAGS) /DHB_NO_TRACE /DHB_NO_PROFILER /DHB_FM_STATISTICS_OFF /DHB_GUI /Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ NULSYS.LIB dependencies ³Û

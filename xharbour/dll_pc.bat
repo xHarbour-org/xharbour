@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.4 2005/11/02 18:00:13 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.5 2005/11/03 11:29:04 modalsist Exp $
 rem
 rem Batch File For Building xHarbour DLL with PellesC under MS-Windows
 rem
@@ -51,7 +51,7 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD_OK
 
-   copy %TARGET_LIB_DIR%\harbour.dll %HB_DIR%\bin > null
+   copy %TARGET_LIB_DIR%\harbour.dll %HB_DIR%\lib > null
    copy %TARGET_LIB_DIR%\harbour.lib %HB_DIR%\lib > null
    del  %TARGET_LIB_DIR%\harbour.dll > null
    del  %TARGET_LIB_DIR%\harbour.lib > null
@@ -86,6 +86,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\bin\harbour.def            del %HB_DIR%\bin\harbour.def
 
    if exist %HB_DIR%\lib\harbour.lib            del %HB_DIR%\lib\harbour.lib
+   if exist %HB_DIR%\lib\harbour.dll            del %HB_DIR%\lib\harbour.dll
 
    if exist %HB_DIR%\bin\hbdocdll.exe           del %HB_DIR%\bin\hbdocdll.exe
    if exist %HB_DIR%\bin\hbmakedll.exe          del %HB_DIR%\bin\hbmakedll.exe
@@ -125,6 +126,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %TARGET_OBJ_DIR%\*.obj              del %TARGET_OBJ_DIR%\*.obj
    if exist %TARGET_OBJ_DIR%\*.h                del %TARGET_OBJ_DIR%\*.h
    if exist %TARGET_OBJ_DIR%\*.output           del %TARGET_OBJ_DIR%\*.output
+
+   if exist tests\harbour.dll                   del tests\harbour.dll
    goto EXIT
 
 

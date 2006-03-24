@@ -1,11 +1,11 @@
 @echo off
-rem $Id: make_pc.bat,v 1.0 2005/11/02 00:00:00 modalsist Exp $
+rem $Id: make_pc.bat,v 1.1 2005/11/02 18:00:21 modalsist Exp $
 rem
 rem make file for build under Pelles C compiler.
 rem
 rem
 
-SET HB_DIR=C:\xMyCVS
+SET HB_DIR=C:\xHarbour
 SET POCC_DIR=C:\PellesC
 
 SET _PATH=%PATH%

@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.7 2006/02/15 11:43:18 modalsist Exp $
+rem $Id: make_pc.bat,v 1.8 2006/02/17 18:52:09 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -43,16 +43,12 @@ if "%1" == "CLEAN" goto CLEAN
   if not exist %OBJ_DIR%                 md %OBJ_DIR%
 
   if not exist %OBJ_DIR%\ct              md %OBJ_DIR%\ct
-  if not exist %OBJ_DIR%\opt             md %OBJ_DIR%\opt
-  if not exist %OBJ_DIR%\opt\console     md %OBJ_DIR%\opt\console
-  if not exist %OBJ_DIR%\opt\gui         md %OBJ_DIR%\opt\gui
 
   if not exist %OBJ_DIR%\mt              md %OBJ_DIR%\mt
   if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
-  if not exist %OBJ_DIR%\mt\opt          md %OBJ_DIR%\mt\opt
-  if not exist %OBJ_DIR%\mt\opt\console  md %OBJ_DIR%\mt\opt\console
-  if not exist %OBJ_DIR%\mt\opt\gui      md %OBJ_DIR%\mt\opt\gui
 
+  if not exist %OBJ_DIR%\fmstat          md %OBJ_DIR%\fmstat
+  if not exist %OBJ_DIR%\mt\fmstat       md %OBJ_DIR%\mt\fmstat
 
   echo Compiling binaries and core libs
 
@@ -103,6 +99,14 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\dbfntxmt.lib         del %HB_DIR%\lib\dbfntxmt.lib
    if exist %HB_DIR%\lib\debug.lib            del %HB_DIR%\lib\debug.lib
    if exist %HB_DIR%\lib\dllmain.lib          del %HB_DIR%\lib\dllmain.lib
+   if exist %HB_DIR%\lib\fmstat.lib           del %HB_DIR%\lib\fmstat.lib
+   if exist %HB_DIR%\lib\fmstatmt.lib         del %HB_DIR%\lib\fmstatmt.lib
+   if exist %HB_DIR%\lib\gtnul.lib            del %HB_DIR%\lib\gtnul.lib
+   if exist %HB_DIR%\lib\gtstd.lib            del %HB_DIR%\lib\gtstd.lib
+   if exist %HB_DIR%\lib\gtwin.lib            del %HB_DIR%\lib\gtwin.lib
+   if exist %HB_DIR%\lib\gtcgi.lib            del %HB_DIR%\lib\gtcgi.lib
+   if exist %HB_DIR%\lib\gtpca.lib            del %HB_DIR%\lib\gtpca.lib
+   if exist %HB_DIR%\lib\gtwvt.lib            del %HB_DIR%\lib\gtwvt.lib
    if exist %HB_DIR%\lib\harbour.lib          del %HB_DIR%\lib\harbour.lib
    if exist %HB_DIR%\lib\hbodbc.lib           del %HB_DIR%\lib\hbodbc.lib
    if exist %HB_DIR%\lib\hbodbcmt.lib         del %HB_DIR%\lib\hbodbcmt.lib
@@ -110,12 +114,6 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\hbsixmt.lib          del %HB_DIR%\lib\hbsixmt.lib
    if exist %HB_DIR%\lib\hsx.lib              del %HB_DIR%\lib\hsx.lib
    if exist %HB_DIR%\lib\hsxmt.lib            del %HB_DIR%\lib\hsxmt.lib
-   if exist %HB_DIR%\lib\gtnul.lib            del %HB_DIR%\lib\gtnul.lib
-   if exist %HB_DIR%\lib\gtstd.lib            del %HB_DIR%\lib\gtstd.lib
-   if exist %HB_DIR%\lib\gtwin.lib            del %HB_DIR%\lib\gtwin.lib
-   if exist %HB_DIR%\lib\gtcgi.lib            del %HB_DIR%\lib\gtcgi.lib
-   if exist %HB_DIR%\lib\gtpca.lib            del %HB_DIR%\lib\gtpca.lib
-   if exist %HB_DIR%\lib\gtwvt.lib            del %HB_DIR%\lib\gtwvt.lib
    if exist %HB_DIR%\lib\lang.lib             del %HB_DIR%\lib\lang.lib
    if exist %HB_DIR%\lib\macro.lib            del %HB_DIR%\lib\macro.lib
    if exist %HB_DIR%\lib\macromt.lib          del %HB_DIR%\lib\macromt.lib
@@ -253,6 +251,21 @@ if "%1" == "CLEAN" goto CLEAN
 
    if exist %OBJ_DIR%\mt\ct\*.c            del %OBJ_DIR%\mt\ct\*.c
    if exist %OBJ_DIR%\mt\ct\*.obj          del %OBJ_DIR%\mt\ct\*.obj
+
+   if exist %OBJ_DIR%\fmstat\*.obj         del %OBJ_DIR%\fmstat\*.obj
+   if exist %OBJ_DIR%\mt\fmstat\*.obj      del %OBJ_DIR%\mt\fmstat\*.obj
+
+   rem remove obsolete optgui and optcon directories
+   if exist %OBJ_DIR%\opt\console\*.obj    del %OBJ_DIR%\opt\console\*.obj
+   if exist %OBJ_DIR%\opt\gui\*.obj        del %OBJ_DIR%\opt\gui\*.obj
+   if exist %OBJ_DIR%\mt\opt\console\*.obj del %OBJ_DIR%\mt\opt\console\*.obj
+   if exist %OBJ_DIR%\mt\opt\gui\*.obj     del %OBJ_DIR%\mt\opt\gui\*.obj
+   if exist %OBJ_DIR%\opt\console\nul      rd %OBJ_DIR%\opt\console
+   if exist %OBJ_DIR%\opt\gui\nul          rd %OBJ_DIR%\opt\gui
+   if exist %OBJ_DIR%\opt\nul              rd %OBJ_DIR%\opt
+   if exist %OBJ_DIR%\mt\opt\console\nul   rd %OBJ_DIR%\mt\opt\console
+   if exist %OBJ_DIR%\mt\opt\gui\nul       rd %OBJ_DIR%\mt\opt\gui
+   if exist %OBJ_DIR%\mt\opt\nul           rd %OBJ_DIR%\mt\opt
 
    goto EXIT
 

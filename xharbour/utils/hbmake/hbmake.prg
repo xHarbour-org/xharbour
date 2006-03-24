@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.165 2006/02/03 07:21:42 lculik Exp $
+ * $Id: hbmake.prg,v 1.166 2006/02/15 00:42:39 lculik Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.155"
+STATIC s_cHbMakeVersion  := "1.167"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -2552,24 +2552,14 @@ FUNCTION CreateMakeFile( cFile )
       cExtraLibs += " -lrddads -ladsloc "
    ENDIF
 
-/*
-   This isn't necessary anymore since 0.99.4 release.
+   // remove obsolete bcc640xx.lib
+   //
+   IF "bcc640" IN cDefaultLibs 
+      cDefaultLibs   := StrTran( cDefaultLibs, "bcc640.lib", "")
+   ENDIF
 
-   if !file(cHarbourLibDir+"\ct.lib")
-      cDefaultLibs   := StrTran( cDefaultLibs  , "ct.lib","hbct.lib")
-      cDefaultLibsMt := StrTran( cDefaultLibsMt, "ctmt.lib","hbctmt.lib")
-   endif
-
-   if !file(cHarbourLibDir+"\tip.lib")
-      cDefaultLibs   := StrTran( cDefaultLibs  , "tip.lib","hbtip.lib")
-      cDefaultLibsMt := StrTran( cDefaultLibsMt, "tipmt.lib","hbtipmt.lib")
-   endif
-
-*/
-
-   IF s_lWin32 .AND. !s_lBcc // remove bcc640.lib from non Borland C compiler 
-      cDefaultLibs   := StrTran( cDefaultLibs, "bcc640.lib ", "")
-      cDefaultLibsMt := StrTran( cDefaultLibsMt, "bcc640mt.lib ", "")
+   IF "bcc640" IN cDefaultLibsMt 
+      cDefaultLibsMt := StrTran( cDefaultLibsMt, "bcc640mt.lib", "")
    ENDIF
 
    // if external libs was selected...
@@ -2705,12 +2695,12 @@ FUNCTION CreateMakeFile( cFile )
 
       IF lFwh
          IF s_lxFwh
-            FWrite( s_nMakeFileHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib optgui"+ IIF( ! s_lMt, "", "mt" ) +".lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+            FWrite( s_nMakeFileHandle, "LIBFILES = $(FWH)\lib\fivehx.lib $(FWH)\lib\fivehc.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
          ELSE
-            FWrite( s_nMakeFileHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib optgui"+ IIF( ! s_lMt, "", "mt" ) +".lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+            FWrite( s_nMakeFileHandle, "LIBFILES = $(FWH)\lib\fiveh.lib $(FWH)\lib\fivehc.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
          ENDIF
       ELSEIF lMiniGui
-         FWrite( s_nMakeFileHandle, "LIBFILES = minigui.lib optgui.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+         FWrite( s_nMakeFileHandle, "LIBFILES = minigui.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lWhoo
          FWrite( s_nMakeFileHandle, "LIBFILES = whoo.lib what32.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lWhat32
@@ -2718,7 +2708,7 @@ FUNCTION CreateMakeFile( cFile )
       ELSEIF lHwGui
          FWrite( s_nMakeFileHandle, "LIBFILES = hwgui.lib procmisc.lib hwg_qhtm.lib " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSEIF lC4W
-         FWrite( s_nMakeFileHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib optgui.lib "  + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+         FWrite( s_nMakeFileHandle, "LIBFILES = $(C4W)\c4wclass.lib $(C4W)\wbrowset.lib $(C4W)\otabt.lib $(C4W)\clip4win.lib "  + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ELSE
          if lGtwvt
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib wvtgui.lib")
@@ -2728,7 +2718,7 @@ FUNCTION CreateMakeFile( cFile )
             cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib wvtgui.lib")
          endif
 
-         FWrite( s_nMakeFileHandle, "LIBFILES = " + iif( lFWH .or. lMiniGui .or. lWhoo .or. lHwgui .or. lGtWvt .or. lGtWvw   ,"optgui",iif(!s_lasdll,"optcon","")) + iif( !s_lMt, "", "mt" )+".lib "  + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
+         FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
       ENDIF
 
    ELSEIF s_lGcc

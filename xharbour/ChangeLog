@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4881 2006/03/23 02:26:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4882 2006/03/23 14:26:15 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-24 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * dll_b32.bat
+    * few adjustment in clean session to del harbour.dll from tests folder. 
+  * dll_pc.bat
+    * few adjustment in clean session do del harbour.dll from tests folder.
+      The harbour.lib and harbour.dll files will be saved in lib folder
+      instead bin, to be compliant with dll_b32.bat.
+  * make_pc.bat
+    * few adjustment to del obj\pocc\opt and obj\pocc\mt\opt directories.
+  * makefile.pc
+    - removed optcon[mt].lib and optgui[mt].lib building.
+  * contrib\gtwvw\make_pc.bat
+  * contrib\wvtgui\make_pc.bat
+    * few adjustment in set HB_DIR.
+  * utils\hbmake\hbmake.prg
+    - removed references to bcc640[mt] libs.
+    - removed references to the optcon[mt] and optgui[mt] libs.
+      note: all yours script files must be edited with hbmake -e or -ex
+            before compile.
 
 2006-03-23 11:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
