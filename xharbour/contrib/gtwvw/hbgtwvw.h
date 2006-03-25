@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.11 2005/11/02 17:08:21 bdj Exp $
+ * $Id: hbgtwvw.h,v 1.12 2006/02/25 00:00:36 ronpinkas Exp $
  */
 
 /*
@@ -483,7 +483,7 @@ void   HB_EXPORT hb_wvw_gtDrawOutline( USHORT usWinNum, int iTop, int iLeft, int
 static BOOL   hb_wvw_gtGetCharFromInputQueue( int * c );
 void   HB_EXPORT hb_wvw_gtAddCharToInputQueue( int data );
 
-IPicture * HB_EXPORT hb_wvw_gtLoadPicture( char * image );
+HB_EXPORT IPicture * hb_wvw_gtLoadPicture( char * image );
 BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, int ht, IPicture * iPicture );
 BOOL HB_EXPORT hb_wvw_gtDestroyPicture( IPicture * iPicture );
 

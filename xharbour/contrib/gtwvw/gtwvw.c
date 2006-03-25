@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.36 2006/02/03 01:33:58 andijahja Exp $
+ * $Id: gtwvw.c,v 1.37 2006/02/25 00:00:35 ronpinkas Exp $
  */
 
 /*
@@ -7854,7 +7854,7 @@ BOOL HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int 
 
 /*-------------------------------------------------------------------*/
 
-IPicture * HB_EXPORT hb_wvw_gtLoadPicture( char * image )
+HB_EXPORT IPicture * hb_wvw_gtLoadPicture( char * image )
 {
   IStream  *iStream;
 

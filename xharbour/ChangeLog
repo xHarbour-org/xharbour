@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4883 2006/03/24 17:45:37 modalsist Exp $
+ * $Id: ChangeLog,v 1.4884 2006/03/25 02:22:28 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-26 01:10 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/gtwvt/gtwvt.c
+  * source/rtl/gtwvt/gtwvt.h
+    ! Replace
+      IPicture * HB_EXPORT hb_wvt_gtLoadPicture
+      with
+      HB_EXPORT IPicture * hb_wvt_gtLoadPicture
+      to satisfy MSVC 6.0 compiling in DLL mode, as tested by Marek Paliwoda.
+
+  * contrib/gtwvw/gtwvw.c
+  * contrib/gtwvw/hbgtwvw.h
+    ! Parallel with the above.
 
 2006-03-25 02:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c
@@ -84,7 +97,7 @@
 
 2006-03-24 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * dll_b32.bat
-    * few adjustment in clean session to del harbour.dll from tests folder. 
+    * few adjustment in clean session to del harbour.dll from tests folder.
   * dll_pc.bat
     * few adjustment in clean session do del harbour.dll from tests folder.
       The harbour.lib and harbour.dll files will be saved in lib folder
@@ -104,7 +117,7 @@
 
 2006-03-23 11:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! Fixed tbrowse:gobotom() method. Bug reported in the xharbour news. 
+    ! Fixed tbrowse:gobotom() method. Bug reported in the xharbour news.
 
 2006-03-22 18:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/simplex.c
@@ -413,9 +426,9 @@
     * added K_SH_xxx definitions in the extKeyTab table
   * source/rtl/teditor.prg
     * added basic text selection if HB_EXT_INKEY defined.
-	 * It selects only entire rows with K_SH_DOWN and K_SH_UP.
-	 * Copy/Cut/Paste changed to work with text selection.
-	 * Added support for K_SH_DEL and K_SH_INS as Cut and Paste.
+    * It selects only entire rows with K_SH_DOWN and K_SH_UP.
+    * Copy/Cut/Paste changed to work with text selection.
+    * Added support for K_SH_DEL and K_SH_INS as Cut and Paste.
 
 2006-02-24 21:55 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * bin/bld.bat

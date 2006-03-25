@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.166 2005/11/19 16:27:02 marceloanelli Exp $
+ * $Id: gtwvt.c,v 1.167 2005/11/20 18:11:47 marceloanelli Exp $
  */
 
 /*
@@ -3580,7 +3580,7 @@ BOOL HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable )
 //
 //               Courtesy - Augusto Infante - Thanks
 //
-IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection )
+HB_EXPORT IPicture * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection )
 {
    HRSRC    res;
    LPVOID   iPicture = NULL;
@@ -3611,7 +3611,7 @@ IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR 
 
 //--------------------------------------------------------------------//
 
-IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image )
+HB_EXPORT IPicture * hb_wvt_gtLoadPicture( char * image )
 {
   IStream   *iStream;
   LPVOID    iPicture = NULL;
