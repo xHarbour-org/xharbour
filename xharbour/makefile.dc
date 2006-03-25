@@ -3,7 +3,7 @@
 # юддддддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъъъъъ
 #
-# $Id: makefile.dc,v 1.17 2006/02/14 00:38:51 ath1 Exp $
+# $Id: makefile.dc,v 1.18 2006/03/17 01:18:46 fsgiudice Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -89,8 +89,6 @@ PCREPOS_LIB  = $(LIB_DIR)\pcrepos$(THREAD_MODE).lib
 VM_LIB       = $(LIB_DIR)\vm$(THREAD_MODE).lib
 SAMPLES_LIB  = $(LIB_DIR)\samples$(THREAD_MODE).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(THREAD_MODE).lib
-OPTCON_LIB   = $(LIB_DIR)\optcon$(THREAD_MODE).lib
-OPTGUI_LIB   = $(LIB_DIR)\optgui$(THREAD_MODE).lib
 CT_LIB       = $(LIB_DIR)\ct$(THREAD_MODE).lib
 TIP_LIB      = $(LIB_DIR)\tip$(THREAD_MODE).lib
 UNICODE_LIB  = $(LIB_DIR)\unicode$(THREAD_MODE).lib
@@ -181,8 +179,6 @@ PROJECT = \
    $(VM_LIB) \
    $(SAMPLES_LIB) \
    $(RDD_LIB) \
-   $(OPTCON_LIB) \
-   $(OPTGUI_LIB) \
    $(GTWVW_LIB) \
    $(GTWVT_LIB) \
    $(UNICODE_LIB) \
@@ -672,16 +668,6 @@ PCREPOS_LIB_OBJS = \
 
 NULSYS_LIB_OBJS = \
    $(OBJ_DIR)\nulsys.obj
-
-OPTCON_LIB_OBJS = \
-   $(OPT_CON_OBJ_DIR)\hvm.obj \
-   $(OPT_CON_OBJ_DIR)\classes.obj \
-   $(OPT_CON_OBJ_DIR)\fm.obj
-
-OPTGUI_LIB_OBJS = \
-   $(OPT_GUI_OBJ_DIR)\hvm.obj \
-   $(OPT_GUI_OBJ_DIR)\classes.obj \
-   $(OPT_GUI_OBJ_DIR)\fm.obj
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj
@@ -1494,12 +1480,6 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
    $(DMCLIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
-   $(DMCLIB_CMD)
-
-$(OPTCON_LIB) : $(OPTCON_LIB_OBJS)
-   $(DMCLIB_CMD)
-
-$(OPTGUI_LIB) : $(OPTGUI_LIB_OBJS)
    $(DMCLIB_CMD)
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
@@ -3467,34 +3447,6 @@ $(PP_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
 
 $(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
    $(CC_CMD)
-
-#здддддддддддд©
-#Ё OPTCON.LIB Ёш
-#юддддддддддддыш
-# ъъъъъъъъъъъъъъ
-
-$(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" /o$@ $**
-
-$(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" /o$@ $**
-
-$(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" /o$@ $**
-
-# здддддддддддд©
-# Ё OPTGUI.LIB Ёш
-# юддддддддддддыш
-# ъъъъъъъъъъъъъъъ
-
-$(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" -D"HB_GUI" /o$@ $**
-
-$(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" -D"HB_GUI" /o$@ $**
-
-$(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CFLAGS) -D"HB_NO_TRACE" -D"HB_NO_PROFILER" -D"HB_FM_STATISTICS_OFF" -D"HB_GUI" /o$@ $**
 
 # зддддддддддддддддддддддддд©
 # Ё NULSYS.LIB dependencies Ёш

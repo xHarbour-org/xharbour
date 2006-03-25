@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.54 2006/02/14 00:39:18 ath1 Exp $
+# $Id: makefile.wc,v 1.55 2006/03/17 01:18:47 fsgiudice Exp $
 #
 
 #
@@ -181,8 +181,6 @@ ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 SAMPLES_LIB    = $(LIB_DIR)\samples.lib
 
 VM_STLIB         = $(VM_LIB)
-VM_LIB_OPT_CON   = $(LIB_DIR)\optcon.lib
-VM_LIB_OPT_GUI   = $(LIB_DIR)\optgui.lib
 RTL_STLIB        = $(RTL_LIB)
 MACRO_STLIB      = $(MACRO_LIB)
 RDD_STLIB        = $(RDD_LIB)
@@ -199,8 +197,6 @@ ODBC_STLIB       = $(ODBC_LIB)
 
 !ifdef HB_THREAD_SUPPORT
 VM_LIB         = $(LIB_DIR)\vmmt.lib
-VM_LIB_OPT_CON = $(LIB_DIR)\optconmt.lib
-VM_LIB_OPT_GUI = $(LIB_DIR)\optguimt.lib
 RTL_LIB        = $(LIB_DIR)\rtlmt.lib
 MACRO_LIB      = $(LIB_DIR)\macromt.lib
 RDD_LIB        = $(LIB_DIR)\rddmt.lib
@@ -1221,32 +1217,6 @@ $(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
-
-#
-# OPTCON.LIB dependencies
-#
-
-$(OPT_CON_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -fo$@ $**
-
-$(OPT_CON_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -fo$@ $**
-
-$(OPT_CON_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -fo$@ $**
-
-#
-# OPTGUI.LIB dependencies
-#
-
-$(OPT_GUI_OBJ_DIR)\hvm.obj : $(VM_DIR)\hvm.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -dHB_GUI -fo$@ $**
-
-$(OPT_GUI_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -dHB_GUI -fo$@ $**
-
-$(OPT_GUI_OBJ_DIR)\fm.obj : $(VM_DIR)\fm.c
-   $(CC) $(CLIBFLAGS) -dHB_NO_PROFILER -dHB_FM_STATISTICS_OFF -dHB_GUI -fo$@ $**
 
 #
 # COMMON.LIB dependencies

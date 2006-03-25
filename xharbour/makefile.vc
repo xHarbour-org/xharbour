@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.165 2006/02/22 04:08:52 ronpinkas Exp $
+# $Id: makefile.vc,v 1.166 2006/03/17 01:18:47 fsgiudice Exp $
 #
 
 #
@@ -176,7 +176,7 @@ CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 SIXCDX_LIB       =$(LIB_DIR)\sixcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
-SIXCDXMT_LIB     =$(LIB_DIR)\SIXcdx$(MT).lib
+SIXCDXMT_LIB     =$(LIB_DIR)\sixcdx$(MT).lib
 DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
@@ -203,11 +203,7 @@ TIP_LIB          =$(LIB_DIR)\tip.lib
 TIPMT_LIB        =$(LIB_DIR)\tip$(MT).lib
 VM_LIB           =$(LIB_DIR)\vm.lib
 VMMT_LIB         =$(LIB_DIR)\vm$(MT).lib
-VM_LIB_OPT_CON   =$(LIB_DIR)\optcon.lib
-VM_LIB_OPT_GUI   =$(LIB_DIR)\optgui.lib
 DLL_MAIN_LIB     =$(LIB_DIR)\dllmain.lib
-VMMT_LIB_OPT_CON =$(LIB_DIR)\optcon$(MT).lib
-VMMT_LIB_OPT_GUI =$(LIB_DIR)\optgui$(MT).lib
 
 GTCGI_LIB        =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB        =$(LIB_DIR)\gtdos.lib
@@ -299,8 +295,6 @@ LIBS = \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
    $(VM_LIB) \
-   $(VM_LIB_OPT_CON) \
-   $(VM_LIB_OPT_GUI) \
    $(ODBC_LIB) \
    $(TIP_LIB) \
    $(CT_LIB) \
@@ -319,8 +313,6 @@ LIBSMT = \
    $(HBSIXMT_LIB) \
    $(HSXMT_LIB) \
    $(VMMT_LIB) \
-   $(VMMT_LIB_OPT_CON) \
-   $(VMMT_LIB_OPT_GUI) \
    $(ODBCMT_LIB) \
    $(TIPMT_LIB) \
    $(CTMT_LIB)
@@ -997,52 +989,6 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\reserved.obj
 
 #
-# OPTCON.LIB rules
-#
-
-{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
-   $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -Fo$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
-
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\CONSOLE}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\CONSOLE\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OPT_CON_OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_CON)2
-!endif
-
-VM_LIB_OPT_CON_OBJS = \
-   $(OBJ_DIR)$(MT)\OPT\CONSOLE\hvm.obj \
-   $(OBJ_DIR)$(MT)\OPT\CONSOLE\classes.obj \
-   $(OBJ_DIR)$(MT)\OPT\CONSOLE\fm.obj
-
-#
-# OPTGUI.LIB rules
-#
-
-{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
-   $(CC) $(CLIBFLAGS) -DHB_FM_STATISTICS_OFF -DHB_NO_PROFILER -DHB_GUI -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $< /link /SUBSYSTEM:WINDOWS
-
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(VM_DIR)}.prg{$(OBJ_DIR)$(MT)\OPT\GUI}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\OPT\GUI\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\OPT\GUI\ $*.c /link /SUBSYSTEM:WINDOWS
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(VM_LIB_OPT_GUI)2
-!endif
-
-VM_LIB_OPT_GUI_OBJS = \
-   $(OBJ_DIR)$(MT)\OPT\GUI\hvm.obj \
-   $(OBJ_DIR)$(MT)\OPT\GUI\classes.obj \
-   $(OBJ_DIR)$(MT)\OPT\GUI\fm.obj
-
-#
 # VM.LIB rules
 #
 
@@ -1433,10 +1379,6 @@ all: \
 !endif
 
 CLEAN:
-   -@if exist $(OBJ_DIR)\opt\console\*.obj $(DEL) $(OBJ_DIR)\opt\console\*.obj > nul
-   -@if exist $(OBJ_DIR)\opt\gui\*.obj $(DEL) $(OBJ_DIR)\opt\gui\*.obj > nul
-   -@if exist $(OBJ_DIR)mt\opt\console\*.obj $(DEL) $(OBJ_DIR)mt\opt\console\*.obj > nul
-   -@if exist $(OBJ_DIR)mt\opt\gui\*.obj $(DEL) $(OBJ_DIR)mt\opt\gui\*.obj > nul
    -@if exist $(OBJ_DIR)\*.obj $(DEL) $(OBJ_DIR)\*.obj > nul
    -@if exist $(OBJ_DIR)\*.c $(DEL) $(OBJ_DIR)\*.c > nul
    -@if exist $(OBJ_DIR)\*.h $(DEL) $(OBJ_DIR)\*.h > nul
@@ -1693,12 +1635,6 @@ $(HSXMT_LIB) : $(HSX_LIB_OBJS)
 $(VMMT_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
 
-$(VMMT_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
-   lib /out:$@ $**
-
-$(VMMT_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
-   lib /out:$@ /SUBSYSTEM:WINDOWS $**
-
 $(MACROMT_LIB) : $(MACRO_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1766,12 +1702,6 @@ $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
 
 $(VM_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
-
-$(VM_LIB_OPT_CON): $(VM_LIB_OPT_CON_OBJS)
-   lib /out:$@ $**
-
-$(VM_LIB_OPT_GUI): $(VM_LIB_OPT_GUI_OBJS)
-   lib /out:$@ /SUBSYSTEM:WINDOWS $**
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
    lib /out:$@ $**
@@ -1856,8 +1786,6 @@ $(HBSIX_LIB)2  : $(HBSIX_LIB_OBJS)
 $(HSX_LIB)2    : $(HSX_LIB_OBJS)
 $(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
 $(VM_LIB)2     : $(VM_LIB_OBJS)
-$(VM_LIB_OPT_CON)2 : $(VM_LIB_OPT_CON_OBJS)
-$(VM_LIB_OPT_GUI)2 : $(VM_LIB_OPT_GUI_OBJS)
 $(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
 $(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)
