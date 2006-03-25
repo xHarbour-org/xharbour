@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvt.h,v 1.4 2005/05/16 14:29:13 bdj Exp $
+ * $Id: hbgtwvt.h,v 1.5 2005/10/05 16:11:48 bdj Exp $
  */
 
 /*
@@ -304,8 +304,8 @@ void   HB_EXPORT hb_wvt_gtDoProcessMessages( void );
 BOOL   HB_EXPORT hb_wvt_gtSetMouseMove( BOOL bHandleEvent );
 BOOL   HB_EXPORT hb_wvt_gtEnableShortCuts( BOOL bEnable );
 void   HB_EXPORT hb_wvt_gtAddCharToInputQueue( int data );
-IPicture * HB_EXPORT hb_wvt_gtLoadPicture( char * image );
-IPicture * HB_EXPORT hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection );
+HB_EXPORT IPicture * hb_wvt_gtLoadPicture( char * image );
+HB_EXPORT IPicture * hb_wvt_gtLoadPictureFromResource( LPCSTR cResource, LPCSTR cSection );
 BOOL   HB_EXPORT hb_wvt_gtRenderPicture( int x1, int y1, int wd, int ht, IPicture * iPicture );
 BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
