@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.102 2005/12/27 21:06:41 jabrecer Exp $
+ * $Id: tget.prg,v 1.103 2006/02/03 03:51:47 guerra000 Exp $
  */
 
 /*
@@ -865,7 +865,8 @@ Added: lUntransform := ( "R" IN ::cPicFunc )
 
    case "D"
       if "E" IN ::cPicFunc
-         cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
+         //cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
+         cBuffer := InvertDwM( cBuffer )
       endif
       xValue := CToD( cBuffer )
       exit
@@ -1816,7 +1817,7 @@ STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
    local nFor, nLen
 
    if "E" IN cPicFunc
-      cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
+       cBuffer := InvertDwM( cBuffer )
    endif
 
    If !Empty( Ctod( cBuffer ) )
@@ -1832,6 +1833,22 @@ STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
    Next
 
  return .f.
+
+STATIC FUNCTION InvertDwM( cDate )
+/* 2003/03/25 - Eduardo Fernandes <modalsist@yahoo.com.br>
+   Invert day with month to date format if "@E" picture is used.*/
+
+  IF SubStr( SET(_SET_DATEFORMAT),1,2) == "yy" // set date ANSI and JAPAN
+     IF __SetCentury() 
+        cDate := SubStr( cDate, 1, 5 ) + SubStr( cDate, 9, 2 ) + SubStr( cDate, 8, 1 ) + SubStr( cDate, 6, 2 )
+     ELSE
+        cDate := SubStr( cDate, 1, 3 ) + SubStr( cDate, 7, 2 ) + SubStr( cDate, 6, 1 ) + SubStr( cDate, 4, 2 )
+     ENDIF
+  ELSE // all others set date
+     cDate := SubStr( cDate, 4, 3 ) + SubStr( cDate, 1, 3 ) + SubStr( cDate, 7 )
+  ENDIF
+
+RETURN cDate
 
 /*
 static procedure AnalyzePicture( cPicture )

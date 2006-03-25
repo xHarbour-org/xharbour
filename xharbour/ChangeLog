@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4886 2006/03/25 18:17:11 bdj Exp $
+ * $Id: ChangeLog,v 1.4887 2006/03/25 20:02:21 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-25 16:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+
+  * dll_pc.bat
+    * reverted to save harbour.dll in bin directory, instead lib dir.
+
+  * source\rtl\tbrowse.prg
+    * reverted my last change in RefreshCurrent() method to avoid error in
+      colorrect refresh. Bug reported by Dener N. da Rocha. 
+
+  * source\rtl\transfrm.c
+    ! fixed set date format to use with "@E" picture in date var.
+      Bug reported by David A. M. Corona.
+      See notes for diferent date format convertions between xHarbour and
+      Clipper for set date ANSI/JAPAN, at line 477 of transfrm.c file. 
+
+  * source\rtl\tget.prg
+    + created static function InvertDwM() to invert day with month in date
+      var type to use with "@E" picture.
+
+  * source\rtl\tgetlist.prg
+    * changed DateMsg() method to repos the cursor at home position of the get
+      after display the message "Invalid date" at scoreboard. Note that the
+      previous value of the get is not restored as Clipper does. 
 
 2006-03-25 15:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.gc

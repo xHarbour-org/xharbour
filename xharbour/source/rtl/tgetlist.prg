@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.34 2005/12/10 00:33:40 oh1 Exp $
+ * $Id: tgetlist.prg,v 1.35 2006/02/25 17:32:15 lf_sfnet Exp $
  */
 
 /*
@@ -899,9 +899,9 @@ METHOD ShowScoreboard() CLASS HBGetList
       nOldCursor := SetCursor( SC_NONE )
 
       DispOutAt( SCORE_ROW, SCORE_COL, iif( Set( _SET_INSERT ), NationMsg( _GET_INSERT_ON ), NationMsg( _GET_INSERT_OFF ) ) )
-      SetPos( nRow, nCol )
 
       SetCursor( nOldCursor )
+      SetPos( nRow, nCol )
 
    endif
 
@@ -909,22 +909,27 @@ return Self
 
 METHOD DateMsg() CLASS HBGetList
 
-   local nRow
-   local nCol
+   local nRow,nCol,nOldCursor
 
    if Set( _SET_SCOREBOARD )
 
-      nRow := Row()
-      nCol := Col()
+      nOldCursor := Max(1,SetCursor( SC_NONE ))
+      nRow := ::oGet:Row
+      nCol := ::oGet:Col
 
       DispOutAt( SCORE_ROW, SCORE_COL, NationMsg( _GET_INVD_DATE ) )
+
+      ::oGet:Home()
       SetPos( nRow, nCol )
+      SetCursor( nOldCursor )
 
       while NextKey() == 0
       end
 
       DispOutAt( SCORE_ROW, SCORE_COL, Space( Len( NationMsg( _GET_INVD_DATE ) ) ) )
+
       SetPos( nRow, nCol )
+      SetCursor( nOldCursor )
 
    endif
 

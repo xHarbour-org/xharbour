@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.41 2005/05/14 02:29:56 kaddath Exp $
+ * $Id: transfrm.c,v 1.42 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -468,27 +468,127 @@ HB_FUNC( TRANSFORM )
       {
          char szPicDate[ 11 ];
          char szDate[ 9 ];
+         char * cDtFormat =  hb_set.HB_SET_DATEFORMAT;
 
          ULONG nFor;
 
          szResult = ( char * ) hb_xgrab( 13 );
 
-         hb_dateFormat( hb_itemGetDS( pValue, szDate ), szResult,
-            ( uiPicFlags & PF_BRITISH ) ?
-              ( hb_set.hb_set_century ? "DD/MM/YYYY" : "DD/MM/YY" ) :
-              hb_set.HB_SET_DATEFORMAT );
+        /* 2006/03/25 - Eduardo Fernandes <modalsist@yahoo.com.br>
+         * "@E" picture invert day with month in date var type, independent
+         * of the current format date setting.
+         * NOTE: In CA-Clipper, set date ANSI and JAPAN inverts year with
+         * month, instead day with month, but if SET CENTURY is ON then the
+         * result is buggy. 
+         * Example: 2006/03/25 will return 6/02003/25 instead 03/2006/25
+         *
+         * Previous code:
+         *
+         * hb_dateFormat( hb_itemGetDS( pValue, szDate ), szResult,
+         *   ( uiPicFlags & PF_BRITISH ) ?
+         *     ( hb_set.hb_set_century ? "DD/MM/YYYY" : "DD/MM/YY" ) :
+         *     hb_set.HB_SET_DATEFORMAT );
+         */
 
+         if( uiPicFlags & PF_BRITISH )  // "@E"
+         {
+             if( hb_set.hb_set_century )
+             {
+               // set date American
+               if( strcmp( cDtFormat,"mm/dd/yyyy") == 0 )
+                  {
+                  cDtFormat = "DD/MM/YYYY" ;
+                  }
+               // set date Ansi
+               else if( strcmp( cDtFormat, "yyyy.mm.dd") == 0 )
+                  {
+                  cDtFormat = "YYYY.DD.MM" ;
+                  //cDtFormat = "MM.YYYY.DD" ; /* Same as Clipper */ 
+                  }
+               // set date British or French
+               else if( strcmp( cDtFormat, "dd/mm/yyyy") == 0 )
+                  {
+                  cDtFormat = "MM/DD/YYYY" ;
+                  }
+               // set date German
+               else if( strcmp( cDtFormat, "dd.mm.yyyy") == 0 )
+                  {
+                  cDtFormat = "MM.DD.YYYY" ;
+                  }
+               // set date Italian
+               else if( strcmp( cDtFormat, "dd-mm-yyyy") == 0 )
+                  {
+                  cDtFormat = "MM-DD-YYYY" ;
+                  }
+               // set date Japan
+               else if( strcmp( cDtFormat, "yyyy/mm/dd") == 0 )
+                  {
+                  cDtFormat = "YYYY/DD/MM" ;
+                  //cDtFormat = "MM/YYYY/DD" ; /* Same as Clipper */
+                  }
+               // set date Usa
+               else if( strcmp( cDtFormat, "mm-dd-yyyy") == 0 )
+                  {
+                  cDtFormat = "DD-MM-YYYY" ;
+                  }
+             }
+             else
+             {
+               // set date American
+               if( strcmp( cDtFormat,"mm/dd/yy") == 0 )
+                  {
+                  cDtFormat = "DD/MM/YY" ;
+                  }
+               // set date Ansi
+               else if( strcmp( cDtFormat, "yy.mm.dd") == 0 )
+                  {
+                  cDtFormat = "YY.DD.MM" ;
+                  //cDtFormat = "MM.YY.DD" ; /* Same as Clipper */
+                  }
+               // set date British or French
+               else if( strcmp( cDtFormat, "dd/mm/yy") == 0 )
+                  {
+                  cDtFormat = "MM/DD/YY" ;
+                  }
+               // set date German
+               else if( strcmp( cDtFormat, "dd.mm.yy") == 0 )
+                  {
+                  cDtFormat = "MM.DD.YY" ;
+                  }
+               // set date Italian
+               else if( strcmp( cDtFormat, "dd-mm-yy") == 0 )
+                  {
+                  cDtFormat = "MM-DD-YY" ;
+                  }
+               // set date Japan
+               else if( strcmp( cDtFormat, "yy/mm/dd") == 0 )
+                  {
+                  cDtFormat = "YY/DD/MM" ;
+                  //cDtFormat = "MM/YY/DD" ; /* Same as Clipper */
+                  }
+               // set date Usa
+               else if( strcmp( cDtFormat, "mm-dd-yy") == 0 )
+                  {
+                  cDtFormat = "DD-MM-YY" ;
+                  }
+             }
+         }
+         hb_dateFormat( hb_itemGetDS( pValue, szDate ), szResult, cDtFormat );
          ulResultPos = strlen( szResult );
 
-         if( uiPicFlags & PF_REMAIN )
+        /* 2006/03/25 - Eduardo Fernandes <modalsist@yahoo.com.br>
+           Since "@R" picture does not apply to date var, so I don't know
+           what the code below does. */
+
+         if( uiPicFlags & PF_REMAIN )   // "@R"
          {
             hb_dateFormat( "99999999", szPicDate,
                ( uiPicFlags & PF_BRITISH ) ?
                  ( hb_set.hb_set_century ? "DD/MM/YYYY" : "DD/MM/YY" ) :
                  hb_set.HB_SET_DATEFORMAT );
-
+       
             ulPicLen = strlen( szPicDate );
-
+       
             for( nFor = 0; nFor < ulPicLen; nFor++ )
             {
                if( szPicDate[ nFor ] != '9' )

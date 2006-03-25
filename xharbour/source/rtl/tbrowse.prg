@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.144 2006/03/14 11:59:08 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.145 2006/03/23 14:26:21 modalsist Exp $
  */
 
 /*
@@ -2845,8 +2845,6 @@ Return nNotLeftCol
 */
 METHOD RefreshCurrent() CLASS TBrowse
 
-   IF ::Stable
-
    if ! Empty( ::aRedraw )
 
       ::aRedraw[ ::nRowPos ] := .T.
@@ -2855,8 +2853,6 @@ METHOD RefreshCurrent() CLASS TBrowse
    endif
 
    ::Stable := .F.
-
-   ENDIF
 
 Return Self
 
