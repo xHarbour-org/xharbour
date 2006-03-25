@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.149 2006/01/30 02:51:23 druzus Exp $
+ * $Id: dbf1.c,v 1.150 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -1457,6 +1457,7 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       pError = hb_errNew();
       hb_errPutGenCode( pError, EG_DATATYPE );
       hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_DATATYPE ) );
+      hb_errPutOperation( pError, hb_dynsymName( ( PHB_DYNS ) pField->sym ) );
       hb_errPutSubCode( pError, EDBF_DATATYPE );
       SELF_ERROR( ( AREAP ) pArea, pError );
       hb_itemRelease( pError );
@@ -1816,6 +1817,7 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       pError = hb_errNew();
       hb_errPutGenCode( pError, hb_dbfGetEGcode( uiError ) );
       hb_errPutDescription( pError, hb_langDGetErrorDesc( hb_dbfGetEGcode( uiError ) ) );
+      hb_errPutOperation( pError, hb_dynsymName( ( PHB_DYNS ) pField->sym ) );
       hb_errPutSubCode( pError, uiError );
       hb_errPutFlags( pError, EF_CANDEFAULT );
       SELF_ERROR( ( AREAP ) pArea, pError );
@@ -2436,6 +2438,15 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case DBI_LOCKCOUNT:
          hb_itemPutNL( pItem, pArea->ulNumLocksPos );
          break;
+
+      case DBI_LOCKOFFSET:
+      {
+         HB_FOFFSET ulPos, ulPool;
+
+         hb_dbfLockIdxGetData( pArea->bLockType, &ulPos, &ulPool );
+         hb_itemPutNInt( pItem, ulPos );
+         break;
+      }
 
       case DBI_LOCKSCHEME:
       {

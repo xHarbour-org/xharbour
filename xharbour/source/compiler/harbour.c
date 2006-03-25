@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.122 2006/03/21 23:03:06 likewolf Exp $
+ * $Id: harbour.c,v 1.123 2006/03/22 18:13:12 likewolf Exp $
  */
 
 /*
@@ -670,7 +670,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       if( pMemBlock->Signature != HB_MEMINFO_SIGNATURE )
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMCORRUPT, NULL, NULL );
 
-      if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + ulMemSize ) != HB_MEMINFO_SIGNATURE )
+      if( HB_GET_LE_UINT32( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
          hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMOVERFLOW, NULL, NULL );
 
       s_ulMemoryConsumed -= pMemBlock->ulSize;
@@ -3453,20 +3453,13 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    {
       /* local variable
        */
-      if( HB_LIM_INT8( iVar ) )
+      /* local variables used in a coddeblock will not be adjusted
+       * if PARAMETERS statement will be used then it is safe to
+       * use 2 bytes for LOCALNEAR
+       */
+      if( HB_LIM_INT8( iVar ) && !hb_comp_functions.pLast->szName )
       {
-         /* local variables used in a coddeblock will not be adjusted
-          * if PARAMETERS statement will be used then it is safe to
-          * use 2 bytes for LOCALNEAR
-          */
-         if( hb_comp_functions.pLast->szName )
-         {
-            hb_compGenPCode3( HB_P_POPLOCALNEAR, ( BYTE ) iVar, 0, ( BOOL ) 1 );
-         }
-         else
-         {
-            hb_compGenPCode2( HB_P_POPLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
-         }
+         hb_compGenPCode2( HB_P_POPLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
       }
       else
       {
@@ -3651,20 +3644,13 @@ void hb_compGenPushVar( char * szVarName )
    {
       /* local variable
        */
-      if( HB_LIM_INT8( iVar ) )
+      /* local variables used in a coddeblock will not be adjusted
+       * if PARAMETERS statement will be used then it is safe to
+       * use 2 bytes for LOCALNEAR
+       */
+      if( HB_LIM_INT8( iVar ) && !hb_comp_functions.pLast->szName )
       {
-         /* local variables used in a coddeblock will not be adjusted
-          * if PARAMETERS statement will be used then it is safe to
-          * use 2 bytes for LOCALNEAR
-          */
-         if( hb_comp_functions.pLast->szName )
-         {
-            hb_compGenPCode3( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, 0, ( BOOL ) 1 );
-         }
-         else
-         {
-            hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
-         }
+         hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iVar, ( BOOL ) 1 );
       }
       else
       {

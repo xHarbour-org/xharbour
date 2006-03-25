@@ -1,5 +1,5 @@
 /*
- * $Id: strpeek.c,v 1.4 2005/09/22 01:11:59 druzus Exp $
+ * $Id: strpeek.c,v 1.5 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ HB_FUNC( STRPEEK )
    {
       ULONG ulPos = hb_parnl( 2 );
 
-      if( ulPos > 0 && ulPos < pText->item.asString.length )
+      if( ulPos > 0 && ulPos <= pText->item.asString.length )
          hb_retni( ( BYTE ) * ( pText->item.asString.value + ulPos - 1 ) );
       else
          hb_retni( 0 );
@@ -83,7 +83,7 @@ HB_FUNC( STRPOKE )
    {
       ULONG ulPos = hb_parnl( 2 );
 
-      if( ulPos > 0 && ulPos < pText->item.asString.length )
+      if( ulPos > 0 && ulPos <= pText->item.asString.length )
       {
          pText = hb_itemUnShare( pText );
          pText->item.asString.value[ ulPos - 1 ] = (char) ( hb_parni( 3 ) & 0xff );

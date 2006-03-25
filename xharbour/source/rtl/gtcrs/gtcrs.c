@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.58 2005/12/23 10:47:53 druzus Exp $
+ * $Id: gtcrs.c,v 1.59 2006/01/12 13:16:08 druzus Exp $
  */
 
 /*
@@ -1198,19 +1198,11 @@ static void mouse_init( InOutBase * ioBase )
       /* curses mouse buttons check */
       ioBase->mButtons = tigetnum( "btns" );
       if ( ioBase->mButtons < 1 )
-         ioBase->mButtons = 2;
+         ioBase->mButtons = 3;
    }
 #ifdef HAVE_GPM_H
    else if ( ioBase->terminal_type == TERM_LINUX )
    {
-#ifdef HB_GPM_NOICE_DISABLE
-      int iNull, iErr;
-
-      iErr = dup( 2 );
-      iNull = open( "/dev/null", O_RDWR );
-      dup2( iNull, 2 );
-      close( iNull );
-#endif
       ioBase->Conn.eventMask =
          GPM_MOVE | GPM_DRAG | GPM_UP | GPM_DOWN | GPM_DOUBLE;
       /* give me move events but handle them anyway */
@@ -1218,24 +1210,31 @@ static void mouse_init( InOutBase * ioBase )
       /* only pure mouse events, no Ctrl,Alt,Shft events */
       ioBase->Conn.minMod = ioBase->Conn.maxMod = 0;
       gpm_zerobased = 1;
-      gpm_visiblepointer = 1;
+      gpm_visiblepointer = 0;
       if ( Gpm_Open( &ioBase->Conn, 0 ) >= 0 && gpm_fd >= 0 )
       {
+         int flags;
+
+         if ( ( flags = fcntl( gpm_fd, F_GETFL, 0 ) ) != -1 )
+            fcntl( gpm_fd, F_SETFL, flags | O_NONBLOCK );
+
          ioBase->is_mouse = 1;
          memset( ( void * ) &ioBase->mLastEvt, 0, sizeof( ioBase->mLastEvt ) );
          ioBase->mLastEvt.click_delay = DBLCLK_DELAY;
          flush_gpmevt( &ioBase->mLastEvt );
          add_efds( ioBase, gpm_fd, O_RDONLY, set_gpmevt,
                    ( void * ) &ioBase->mLastEvt );
+
+         /*
+          * In recent GPM versions it produce unpleasure noice on the screen
+          * so I covered it with this macro, [druzus]
+          */         
+#ifdef HB_GPM_USE_XTRA
          ioBase->mButtons = Gpm_GetSnapshot( NULL );
-         if ( gpm_visiblepointer )
-            Gpm_DrawPointer( ioBase->mLastEvt.col, ioBase->mLastEvt.row,
-                             gpm_consolefd );
-      }
-#ifdef HB_GPM_NOICE_DISABLE
-      dup2( iErr, 2 );
-      close( iErr );
+#else
+         ioBase->mButtons = 3;
 #endif
+      }
    }
 #endif
 }

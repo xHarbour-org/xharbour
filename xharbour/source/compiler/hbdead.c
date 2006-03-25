@@ -1,5 +1,5 @@
 /*
- * $Id: hbdead.c,v 1.2 2006/02/11 15:10:24 druzus Exp $
+ * $Id: hbdead.c,v 1.1 2006/02/14 01:04:38 druzus Exp $
  */
 
 /*
@@ -584,24 +584,33 @@ void hb_compCodeTraceMarkDead( PFUNCTION pFunc )
    if( code_info.fFinished )
    {
       ULONG ulPos = 0, ulCount = 0;
+      BYTE bLastCode = HB_P_LAST_PCODE;
 
       do
       {
          if( code_info.pCodeMark[ ulPos ] == 0 )
             ++ulCount;
-         else if( ulCount )
+         else
          {
-            hb_compNOOPfill( pFunc, ulPos - ulCount, ulCount, FALSE, TRUE );
-            ulCount = 0;
+            bLastCode = pFunc->pCode[ ulPos ];
+            if( ulCount )
+            {
+               hb_compNOOPfill( pFunc, ulPos - ulCount, ulCount, FALSE, TRUE );
+               ulCount = 0;
+            }
          }
       }
       while( ++ulPos < code_info.ulPCodeSize );
 
-      if( ulCount > 1 )
+      /* do not strip the last HB_P_ENDBLOCK / HB_P_ENDPROC marker */
+      if( ulCount > 0 && bLastCode != ( pFunc->szName ? HB_P_ENDPROC : HB_P_ENDBLOCK ) )
       {
-         /* do not strip the last HB_P_ENDBLOCK / HB_P_ENDPROC marker */
-         --ulPos; --ulCount;
-
+         --ulPos;
+         --ulCount;
+      }
+ 
+      if( ulCount > 0 )
+      {
          /*
           * We cannot simply decrease size of the generated PCODE here
           * because jumps or noops tables may point to the this area

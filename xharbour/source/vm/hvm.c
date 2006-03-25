@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.549 2006/02/22 21:14:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.550 2006/03/06 18:28:17 ronpinkas Exp $
  */
 
 /*
@@ -213,8 +213,8 @@ static void    hb_vmDebuggerEndProc( void );     /* notifies the debugger for an
 static void    hb_vmPushAlias( void );            /* pushes the current workarea number */
 static void    hb_vmPushAliasedField( PHB_SYMB ); /* pushes an aliased field on the eval stack */
 static void    hb_vmPushAliasedVar( PHB_SYMB );   /* pushes an aliased variable on the eval stack */
-static void    hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
-static void    hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
+static void    hb_vmPushBlock( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
+static void    hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
 static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* Pushes a double constant (pcode) */
 static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* creates a macro-compiled codeblock */
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
@@ -2565,6 +2565,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
 
          case HB_P_PUSHBLOCK:
+         {
+            USHORT usSize = HB_PCODE_MKUSHORT( &pCode[ w + 1 ] );
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCK") );
             /* +0    -> _pushblock
              * +1 +2 -> size of codeblock
@@ -2572,18 +2575,23 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              * +5 +6 -> number of referenced local variables
              * +7    -> start of table with referenced local variables
              */
-            hb_vmPushBlock( ( BYTE * ) ( pCode + w ), pSymbols, pGlobals );
-            w += HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+            hb_vmPushBlock( pCode + w + 3, usSize - 3, pSymbols, pGlobals );
+            w += usSize;
             break;
+         }
 
          case HB_P_PUSHBLOCKSHORT:
+         {
+            USHORT usSize = pCode[ w + 1 ];
+
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCKSHORT") );
             /* +0    -> _pushblock
              * +1    -> size of codeblock
              */
-            hb_vmPushBlockShort( ( BYTE * ) ( pCode + w ), pSymbols, pGlobals );
-            w += pCode[ w + 1 ];
+            hb_vmPushBlockShort( pCode + w + 2, usSize - 2, pSymbols, pGlobals );
+            w += usSize;
             break;
+         }
 
          case HB_P_PUSHSELF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSELF") );
@@ -7962,15 +7970,15 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    hb_stackPush();
 }
 
-/* +0    -> HB_P_PUSHBLOCK
- * +1 +2 -> size of codeblock
- * +3 +4 -> number of expected parameters
- * +5 +6 -> number of referenced local variables
- * +7    -> start of table with referenced local variables
+/* -3    -> HB_P_PUSHBLOCK
+ * -2 -1 -> size of codeblock
+ *  0 +1 -> number of expected parameters
+ * +2 +3 -> number of referenced local variables
+ * +4    -> start of table with referenced local variables
  *
  * NOTE: pCode points to static memory
  */
-static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB
 
@@ -7980,12 +7988,12 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
 
-   uiLocals = HB_PCODE_MKUSHORT( &( pCode[ 5 ] ) );
+   uiLocals = HB_PCODE_MKUSHORT( &pCode[ 2 ] );
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
-         hb_codeblockNew( pCode + 7 + uiLocals * 2, /* pcode buffer         */
+         hb_codeblockNew( pCode + 4 + uiLocals * 2, /* pcode buffer         */
          uiLocals,                                  /* number of referenced local variables */
-         ( USHORT * ) ( pCode + 7 ),                /* table with referenced local variables */
+         pCode + 4,                                 /* table with referenced local variables */
          pSymbols, pGlobals );
 
    /* store the statics base of function where the codeblock was defined
@@ -7993,7 +8001,7 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
    ( * HB_VM_STACK.pPos )->item.asBlock.statics = HB_VM_STACK.iStatics;
    /* store the number of expected parameters
     */
-   ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( &( pCode[ 3 ] ) );
+   ( * HB_VM_STACK.pPos )->item.asBlock.paramcnt = HB_PCODE_MKUSHORT( pCode );
 
    /* store the line number where the codeblock was defined
     */
@@ -8013,18 +8021,18 @@ static void hb_vmPushBlock( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals
       ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = 0;
    }
 
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = HB_PCODE_MKUSHORT( &( pCode[ 1 ] ) ) - ( 7 + uiLocals * 2 );
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = usSize;
 
    hb_stackPush();
 }
 
-/* +0    -> HB_P_PUSHBLOCKSHORT
- * +1    -> size of codeblock
- * +2    -> start of table with referenced local variables
+/* -2    -> HB_P_PUSHBLOCKSHORT
+ * -1    -> size of codeblock
+ *  0    -> start of table with referenced local variables
  *
  * NOTE: pCode points to static memory
  */
-static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB
 
@@ -8033,7 +8041,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
    ( * HB_VM_STACK.pPos )->type = HB_IT_BLOCK;
 
    ( * HB_VM_STACK.pPos )->item.asBlock.value =
-         hb_codeblockNew( pCode + 2,                /* pcode buffer         */
+         hb_codeblockNew( pCode,                    /* pcode buffer         */
          0,                                         /* number of referenced local variables */
          NULL,                                      /* table with referenced local variables */
          pSymbols, pGlobals );
@@ -8063,7 +8071,7 @@ static void hb_vmPushBlockShort( BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGl
       ( * HB_VM_STACK.pPos )->item.asBlock.value->uiClass = 0;
    }
 
-   ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = pCode[ 1 ] - 2;
+   ( * HB_VM_STACK.pPos )->item.asBlock.value->uLen = usSize;
 
    hb_stackPush();
 }

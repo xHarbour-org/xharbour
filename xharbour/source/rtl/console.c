@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.60 2006/02/07 01:02:24 peterrees Exp $
+ * $Id: console.c,v 1.61 2006/02/07 01:22:49 peterrees Exp $
  */
 /*
  * Harbour Project source code:
@@ -112,12 +112,13 @@
 /* length of buffer for CR/LF characters */
 #define CRLF_BUFFER_LEN   OS_EOL_LEN + 1
 
-static BOOL   s_bInit = FALSE;
-static USHORT s_uiPRow;
-static USHORT s_uiPCol;
-static SHORT  s_originalMaxRow;
-static SHORT  s_originalMaxCol;
-static char   s_szCrLf[ CRLF_BUFFER_LEN ];
+static BOOL    s_bInit = FALSE;
+static USHORT  s_uiPRow;
+static USHORT  s_uiPCol;
+static SHORT   s_originalMaxRow;
+static SHORT   s_originalMaxCol;
+static char    s_szCrLf[ CRLF_BUFFER_LEN ] = { HB_CHAR_LF, 0 };
+static int     s_iCrLfLen = 1;
 #if defined( HB_WIN32_IO )
 static HANDLE    s_iFilenoStdin;
 static HANDLE    s_iFilenoStdout;
@@ -140,10 +141,12 @@ void hb_conInit( void )
 #if defined(OS_UNIX_COMPATIBLE) && !defined(HB_EOL_CRLF)
    s_szCrLf[ 0 ] = HB_CHAR_LF;
    s_szCrLf[ 1 ] = '\0';
+   s_iCrLfLen = 1;
 #else
    s_szCrLf[ 0 ] = HB_CHAR_CR;
    s_szCrLf[ 1 ] = HB_CHAR_LF;
    s_szCrLf[ 2 ] = '\0';
+   s_iCrLfLen = 2;
 #endif
 
    s_uiPRow = s_uiPCol = 0;
@@ -218,6 +221,7 @@ void hb_conRelease( void )
       /* The is done by the OS from now on */
       s_szCrLf[ 0 ] = HB_CHAR_LF;
       s_szCrLf[ 1 ] = '\0';
+      s_iCrLfLen = 1;
 
       hb_setkeyExit();  /* April White, May 6, 2000 */
       hb_conXSaveRestRelease();
@@ -461,7 +465,7 @@ HB_FUNC( QOUT )
    HB_THREAD_STUB
 #endif
 
-   hb_conOutAlt( s_szCrLf, CRLF_BUFFER_LEN - 1 );
+   hb_conOutAlt( s_szCrLf, s_iCrLfLen );
 
    HB_CONSOLE_SAFE_LOCK
 
@@ -532,25 +536,39 @@ static void hb_conDevPos( SHORT iRow, SHORT iCol )
         hb_stricmp( hb_set.HB_SET_DEVICE, "PRINTER" ) == 0 ))
    {
       USHORT uiErrorOld = hb_fsError(); /* Save current user file error code */
+      USHORT uiPRow = ( USHORT ) iRow;
+      USHORT uiPCol = ( USHORT ) iCol + hb_set.HB_SET_MARGIN;
 
-      iCol += ( SHORT ) hb_set.HB_SET_MARGIN;
+      if( s_uiPRow != uiPRow )
+      {
+         if( ++s_uiPRow > uiPRow )
+         {
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C\x0D", 2 );
+            s_uiPRow = 0;
+         }
+         else
+         {
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, s_iCrLfLen );
+         }
 
-      if ( iRow < s_uiPRow)
+         while( s_uiPRow < uiPRow )
+         {
+            hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, s_iCrLfLen );
+            ++s_uiPRow;
+         }
+         s_uiPCol = 0;
+      }
+      else if( s_uiPCol > uiPCol )
       {
-         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0C", 1 );
-         s_uiPRow = s_uiPCol = 0;
+         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
+         s_uiPCol = 0;
       }
-      for ( ; s_uiPRow < iRow ; s_uiPRow++ )
+
+      while( s_uiPCol < uiPCol )
       {
-        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) s_szCrLf, CRLF_BUFFER_LEN - 1 );
-        s_uiPCol = 0 ;
+         hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
+         ++s_uiPCol;
       }
-      if ( iCol < s_uiPCol) {
-        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) "\x0D", 1 );
-        s_uiPCol = 0 ;
-      }
-      for ( ; s_uiPCol < iCol ; s_uiPCol++)
-        hb_fsWrite( hb_set.hb_set_printhan, ( BYTE * ) " ", 1 );
 
       hb_fsSetError( uiErrorOld ); /* Restore last user file error code */
    }

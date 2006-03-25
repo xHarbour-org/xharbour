@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.42 2006/02/13 23:10:23 druzus Exp $
+ * $Id: hbpcode.c,v 1.43 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -493,20 +493,37 @@ void hb_compPCodeEval( PFUNCTION pFunc, HB_PCODE_FUNC_PTR * pFunctions, void * c
             }
          }
 
-         ulSkip = hb_comp_pcode_len[ opcode ];
          pCall = pFunctions[ opcode ];
 
          if( pCall )
          {
-            if( ulSkip )
+            ulSkip = pCall( pFunc, ulPos, cargo );
+            if( ulSkip == 0 )
             {
-               pCall( pFunc, ulPos, cargo );
-            }
-            else
-            {
-               ulSkip = pCall( pFunc, ulPos, cargo );
+               ulSkip = hb_comp_pcode_len[ opcode ];
             }
          }
+         else
+         {
+            ulSkip = hb_comp_pcode_len[ opcode ];
+         }
+         if( ulSkip == 0 )
+         {
+            fprintf( hb_comp_errFile, "--- Invalid (zero) opcode %i size in hb_compPCodeEval() ---\n", opcode );
+            ++ulPos;
+         }
+#if 1
+         /*
+          * Test code to validate return values by PCODE eval functions,
+          * in some cases the eval functions can return intentionally differ
+          * values so it's not enabled by default. [druzus]
+          */
+         if( hb_comp_pcode_len[ opcode ] != 0 && hb_comp_pcode_len[ opcode ] != ulSkip )
+         {
+            fprintf( stderr, "Wrong PCODE (%d) size (%ld!=%d)\n", opcode, ulSkip, hb_comp_pcode_len[ opcode ] );
+            fflush(stderr);
+         }
+#endif
          ulPos += ulSkip;
       }
       else

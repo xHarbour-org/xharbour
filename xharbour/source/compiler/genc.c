@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.116 2006/03/01 13:06:23 druzus Exp $
+ * $Id: genc.c,v 1.117 2006/03/21 23:03:04 likewolf Exp $
  */
 
 /*
@@ -1501,7 +1501,7 @@ static HB_GENC_FUNC( hb_p_functionshort )
    HB_SYMBOL_UNUSED( lPCodePos );
 
    fprintf( cargo->yyc, "\tHB_P_FUNCTIONSHORT, %i,\n", pFunc->pCode[ lPCodePos + 1 ] );
-   return 1;
+   return 2;
 }
 
 static HB_GENC_FUNC( hb_p_arraygen )

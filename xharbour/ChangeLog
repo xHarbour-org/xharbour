@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4882 2006/03/23 14:26:15 modalsist Exp $
+ * $Id: ChangeLog,v 1.4883 2006/03/24 17:45:37 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,80 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-25 02:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! fixed recent fixes ;-)
+      It broke skipping in child area - the pending relation was not
+      resolved. Brian please check current code.
+
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    ! fixed C++ compilation
+
+  * xharbour/include/hbapi.h
+    * small trick with HB_IS_* macros to give a compiler a chance to make
+      them faster on some machines
+    * declare BYTE * passed to hb_codeblockNew() as const
+
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/hbfix.c
+    ! fixed optimization for HB_P_PUSHLOCALNEAR and HB_P_POPLOCALNEAR.
+      It was a long existing bug not reported so far because 0, 1 and 2
+      PCODEs uses only one BYTE and bad PCODE tracing in hbfix.c didn't
+      caused bad side effects as long as number of locals in function
+      was smaller then 768. Now for functions HB_P_PUSHLOCAL and
+      HB_P_POPLOCAL is used and later changed to NEAR version in hbfix.c
+      if possible.
+
+  * xharbour/source/compiler/hbgenc.c
+    ! fixed the size of PCODE returned by hb_p_functionshort
+
+  * xharbour/source/compiler/hbpcode.c
+    * give higher priority to pcode size return by trace functions
+      then the static ones
+
+  * xharbour/source/compiler/hbdead.c
+    * remove HB_P_END PCODE also at the and of function if is repeated
+      just before
+
+  * xharbour/source/compiler/hbfix.c
+    * join sequential jumps to optimize constructions like:
+         while ...
+            ...
+            if ...
+               exit
+            endif
+         enddo
+
+  * xharbour/source/rdd/dbf1.c
+    * set Operation in error object to field name in field{put,get} methods.
+    + add DBI_LOCKOFFSET
+
+  * xharbour/source/rtl/console.c
+    ! fixed PROW() updating to be Clipper compatible when row number
+      exceed 16bit integer value
+
+  * xharbour/source/rtl/strpeek.c
+    ! fixed accessing the last character in STRPEEK() and STRPOKE()
+
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtsln/mousesln.c
+    * do not call Gpm_GetSnapshot() to avoid stupid message on stderr
+      generated from GPM library - I lost the the hope that it will be
+      fixed ;-)
+
+  * xharbour/source/vm/codebloc.c
+    * declare BYTE * passed to hb_codeblockNew() as const
+
+  * xharbour/source/vm/hvm.c
+    * pass code block size as parameter to hb_vmPushBlock() and moved
+      the offset of given PCODE - it's for generating real C code from
+      .prg files. BTW If I'll port my recent modification in Harbour
+      to generate real C code can someone update it for new xHarbour
+      PCODEs and modified BEGIN/SEQUENCE, TRY/CATCH syntax?
+
+  * xharbour/tests/rddtest/rddtst.prg
+    * updated old: REQUEST _ADS to REQUEST ADS
 
 2006-03-24 11:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * dll_b32.bat

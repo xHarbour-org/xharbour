@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.71 2005/12/11 12:38:26 druzus Exp $
+ * $Id: adsfunc.c,v 1.72 2006/02/21 19:37:06 druzus Exp $
  */
 
 /*
@@ -2414,7 +2414,10 @@ HB_FUNC( ADSCHECKEXISTENCE )
 }
 
 
-// Function is not documented, but exists in ace32.dll  version 6.x, 7.x
+/* Function is not documented, but exists in ace32.dll  version 6.x, 7.x */
+#ifdef __cplusplus
+   extern "C"
+#endif
 UNSIGNED32 ENTRYPOINT AdsDeleteFile( ADSHANDLE hConnection, UNSIGNED8* pucFileName );
 
 HB_FUNC( ADSDELETEFILE )

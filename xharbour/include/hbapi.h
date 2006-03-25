@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.192 2006/03/03 14:13:22 druzus Exp $
+ * $Id: hbapi.h,v 1.193 2006/03/10 15:32:19 druzus Exp $
  */
 
 /*
@@ -94,33 +94,84 @@ HB_EXTERN_BEGIN
 #define HB_ITEM_TYPE( p )   ( ( p )->type )
 #define HB_OBJ_CLASS( p )   ( ( p )->item.asArray.value->uiClass )
 
-#define HB_IS_OF_TYPE( p, t ) ( ( ( p )->type & ~HB_IT_BYREF ) == t )
+#if 0
 
-#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_BYREF ) != 0 )
-#define HB_IS_ARRAY( p )      ( HB_ITEM_TYPE( p ) == HB_IT_ARRAY )
+/*
+ * In Harbour VM HB_IT_BYREF is never ORed with item type. It can be used
+ * as stand alone type for locals and statics passed by reference or with 
+ * HB_IT_MEMVAR for memvars passed by reference so this macro is less usable.
+ * only the hb_parinfo() function can return HB_TYPE as HB_IT_BYREF ORed
+ * with real type but this value is never set as item type.
+ */
+
+#define HB_IS_OF_TYPE( p, t ) ( ( HB_ITEM_TYPE( p ) & ~HB_IT_BYREF ) == t )
+
+/*
+ * These macros are slower but can be usable in debugging some code.
+ * They are a little bit more safe in buggy code but they can
+ * also hide bugs which should be exploited as soon as possible to
+ * know that sth is wrong and has to be fixed. They also illustrates
+ * possible HB_TYPE bit combinations in HVM.
+ * The macros below which check only chosen bits allow compiler to
+ * use some optimizations if used CPU supports it. F.e. on standard
+ * x86 machines they can safe few CPU cycles. [druzus]
+ */
+
 #define HB_IS_NIL( p )        ( HB_ITEM_TYPE( p ) == HB_IT_NIL )
+#define HB_IS_ARRAY( p )      ( HB_ITEM_TYPE( p ) == HB_IT_ARRAY )
 #define HB_IS_BLOCK( p )      ( HB_ITEM_TYPE( p ) == HB_IT_BLOCK )
 #define HB_IS_DATE( p )       ( HB_ITEM_TYPE( p ) == HB_IT_DATE )
 #define HB_IS_DOUBLE( p )     ( HB_ITEM_TYPE( p ) == HB_IT_DOUBLE )
 #define HB_IS_INTEGER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_INTEGER )
 #define HB_IS_LOGICAL( p )    ( HB_ITEM_TYPE( p ) == HB_IT_LOGICAL )
 #define HB_IS_LONG( p )       ( HB_ITEM_TYPE( p ) == HB_IT_LONG )
-#define HB_IS_NUMERIC( p )    ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
-#define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
-#define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
-#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
-#define HB_IS_STRING( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_STRING ) != 0 )
-#define HB_IS_MEMO( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMO ) != 0 )
 #define HB_IS_SYMBOL( p )     ( HB_ITEM_TYPE( p ) == HB_IT_SYMBOL )
-#define HB_IS_MEMVAR( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMVAR ) != 0 )
 #define HB_IS_POINTER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_POINTER )
 #define HB_IS_HASH( p )       ( HB_ITEM_TYPE( p ) == HB_IT_HASH )
+#define HB_IS_MEMO( p )       ( HB_ITEM_TYPE( p ) == HB_IT_MEMO )
+#define HB_IS_MEMVAR( p )     ( HB_ITEM_TYPE( p ) == ( HB_IT_MEMVAR | HB_IT_BYREF ) )
+#define HB_IS_STRING( p )     ( ( HB_ITEM_TYPE( p ) & ~HB_IT_MEMOFLAG ) == HB_IT_STRING )
+#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & ~HB_IT_MEMVAR ) == HB_IT_BYREF )
+#define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
+#define HB_IS_NUMERIC( p )    ( HB_IS_NUMBER( p ) || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+#define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
 #define HB_IS_ORDERABLE( p )  ( ( HB_ITEM_TYPE( p ) & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) != 0 )
-#define HB_IS_STRINGWR( p )   ( HB_ITEM_TYPE( p ) & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
 #define HB_IS_COMPLEX( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 )
 #define HB_IS_SIMPLE( p )     ( ( HB_ITEM_TYPE( p ) & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) )
 #define HB_IS_GCITEM( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_GCITEM ) != 0 )
-#define HB_IS_BADITEM( p )    ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX && HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) )
+#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
+#define HB_IS_STRINGWR( p )   ( HB_ITEM_TYPE( p ) & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
+#define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) ) != 0 )
+
+#else
+
+#define HB_IS_NIL( p )        ( HB_ITEM_TYPE( p ) == HB_IT_NIL )
+#define HB_IS_ARRAY( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_ARRAY ) != 0 )
+#define HB_IS_BLOCK( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_BLOCK ) != 0 )
+#define HB_IS_DATE( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_DATE ) != 0 )
+#define HB_IS_DOUBLE( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_DOUBLE ) != 0 )
+#define HB_IS_INTEGER( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_INTEGER ) != 0 )
+#define HB_IS_LOGICAL( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_LOGICAL ) != 0 )
+#define HB_IS_LONG( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_LONG ) != 0 )
+#define HB_IS_SYMBOL( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_SYMBOL ) != 0 )
+#define HB_IS_POINTER( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_POINTER ) != 0 )
+#define HB_IS_HASH( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_HASH ) != 0 )
+#define HB_IS_MEMO( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMOFLAG ) != 0 )
+#define HB_IS_STRING( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_STRING ) != 0 )
+#define HB_IS_MEMVAR( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_MEMVAR ) != 0 )
+#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_BYREF ) != 0 )
+#define HB_IS_NUMERIC( p )    ( ( HB_ITEM_TYPE( p ) & ( HB_IT_NUMERIC | HB_IT_DATE ) ) != 0 || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
+#define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
+#define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
+#define HB_IS_ORDERABLE( p )  ( ( HB_ITEM_TYPE( p ) & ( HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE) ) != 0 )
+#define HB_IS_COMPLEX( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 )
+#define HB_IS_SIMPLE( p )     ( ( HB_ITEM_TYPE( p ) & ( HB_IT_NIL | HB_IT_NUMERIC | HB_IT_DATE | HB_IT_LOGICAL ) ) != 0 )
+#define HB_IS_GCITEM( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_GCITEM ) != 0 )
+#define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
+#define HB_IS_STRINGWR( p )   ( ( HB_ITEM_TYPE( p ) & HB_IT_STRING ) != 0 && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
+#define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) ) != 0 )
+
+#endif
 
 #define HB_IS_NUMBER_INT( p ) HB_IS_NUMINT( p )
 #define HB_IT_NUMERINT        HB_IT_NUMINT
@@ -637,7 +688,7 @@ extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInst
 extern PHB_SYMB HB_EXPORT hb_symbolNew( char * szName ); /* create a new symbol */
 
 /* Codeblock management */
-extern HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer, USHORT uiLocals, USHORT * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
+extern HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer, USHORT uiLocals, const BYTE * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
 extern HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
 extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */

@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.8 2005/10/13 12:49:36 druzus Exp $
+ * $Id: mousesln.c,v 1.9 2006/01/12 13:16:10 druzus Exp $
  */
 
 /*
@@ -282,15 +282,6 @@ void HB_GT_FUNC(mouse_Init( void ))
 #ifdef HAVE_GPM_H
     else if( hb_gt_UnderLinuxConsole )
     {
-#ifdef HB_GPM_NOICE_DISABLE
-        int iNull, iErr;
-
-        iErr = dup( 2 );
-        iNull = open( "/dev/null", O_RDWR );
-        dup2( iNull, 2 );
-        close( iNull );
-#endif
-
         Conn.eventMask = GPM_MOVE | GPM_UP | GPM_DOWN | GPM_DRAG | GPM_DOUBLE;
         /* give me move events but handle them anyway */
         Conn.defaultMask= GPM_MOVE | GPM_HARD; 
@@ -298,7 +289,7 @@ void HB_GT_FUNC(mouse_Init( void ))
         Conn.minMod = 0;    Conn.maxMod = 0;
         gpm_zerobased = 1;  gpm_visiblepointer = 1;
 
-        if( Gpm_Open( &Conn, 0 ) >= 0 )
+        if( Gpm_Open( &Conn, 0 ) >= 0 && gpm_fd >= 0 )
         {
             Gpm_Event Evt;
 
@@ -310,13 +301,17 @@ void HB_GT_FUNC(mouse_Init( void ))
                 s_LastMouseEvent.Row = Evt.y;
             }
 
+            /*
+             * In recent GPM versions it produce unpleasure noice on the screen
+             * so I covered it with this macro, [druzus]
+             */         
+#ifdef HB_GPM_USE_XTRA
             s_iMouseButtons = Gpm_GetSnapshot( NULL );
+#else
+            s_iMouseButtons = 3;
+#endif
             HB_GT_FUNC(mouse_FixTrash());
         }
-#ifdef HB_GPM_NOICE_DISABLE
-        dup2( iErr, 2 );
-        close( iErr );
-#endif
     }
 #endif
 }

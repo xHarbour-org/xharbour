@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.51 2005/09/27 02:26:06 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.52 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -90,10 +90,9 @@ extern short hb_vm_iGlobals;
  *       is used can give faster codes), Druzus
  *
  */
-HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
-            USHORT uiLocals,
-            USHORT * pLocalPosTable,
-            PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
+                                  USHORT uiLocals, const BYTE * pLocalPosTable,
+                                  PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_CODEBLOCK_PTR pCBlock;
 
@@ -132,7 +131,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
           * Swap the current value of local variable with the reference to this value.
           */
          pLocal = hb_stackItemFromBase( HB_PCODE_MKUSHORT( pLocalPosTable ) );
-         pLocalPosTable++;
+         pLocalPosTable += 2;
 
          pLocal = hb_memvarDetachLocal( pLocal );
          memcpy( pCBlock->pLocals + ui, pLocal, sizeof( HB_ITEM ) );
@@ -182,7 +181,7 @@ HB_CODEBLOCK_PTR hb_codeblockNew( BYTE * pBuffer,
     * The only allowed operation on a codeblock is evaluating it then
     * there is no need to duplicate its pcode - just store the pointer to it
     */
-   pCBlock->pCode     = pBuffer;
+   pCBlock->pCode     = ( BYTE * ) pBuffer;
    pCBlock->dynBuffer = FALSE;
 
    pCBlock->pSymbols  = pSymbols;
