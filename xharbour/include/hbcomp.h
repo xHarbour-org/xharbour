@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.44 2006/03/21 20:46:11 likewolf Exp $
+ * $Id: hbcomp.h,v 1.45 2006/03/21 23:02:48 likewolf Exp $
  */
 
 /*
@@ -252,6 +252,17 @@ typedef struct _AUTOOPEN
    struct _AUTOOPEN * pNext;
 } AUTOOPEN, * PAUTOOPEN;      /* support structure for extern symbols */
 
+typedef struct _LINEINFO
+{
+   char *szModule;
+   ULONG ulLineMin;
+   ULONG ulLineMax;
+   ULONG *pLines;
+   ULONG ulLineCount;
+   ULONG ulLineAlloc;
+   struct _LINEINFO *pNext;
+} LINEINFO, *PLINEINFO;       /* support structure for line number info */
+
 /* definitions for hb_compPCodeEval() support */
 typedef void * HB_VOID_PTR;
 #define HB_PCODE_FUNC( func, type ) ULONG func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
@@ -419,6 +430,8 @@ extern void hb_compGenStaticName( char * );
 extern void hb_compGlobalsDefStart( void );
 extern void hb_compGlobalsDefEnd( void );
 extern void hb_compGenGlobalName( char * );
+
+extern void hb_compGenModuleName( char *szFile, char *szFunc );
 
 extern HB_EXPR_PTR hb_compErrorStatic( char *, HB_EXPR_PTR );
 extern HB_EXPR_PTR hb_compErrorType( HB_EXPR_PTR );

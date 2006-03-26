@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.123 2006/03/22 18:13:12 likewolf Exp $
+ * $Id: harbour.c,v 1.124 2006/03/25 02:22:36 druzus Exp $
  */
 
 /*
@@ -125,6 +125,7 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ); /* returns the ord
 static void hb_compGenFieldPCode( BYTE , int, char *, PFUNCTION );      /* generates the pcode for database field */
 static void hb_compGenVariablePCode( BYTE , char * );    /* generates the pcode for undeclared variable */
 static void hb_compGenVarPCode( BYTE , char * );    /* generates the pcode for undeclared variable */
+static void hb_compGenLocalName( USHORT wLocal, char *szVarName ); /* generates the pcode for local variable name */
 
 static PFUNCTION hb_compFunctionNew( char *, HB_SYMBOLSCOPE );  /* creates and initialises the _FUNC structure */
 static PINLINE hb_compInlineNew( char * );  /* creates and initialises the _INLINE structure */
@@ -160,7 +161,7 @@ PENUMDEF       hb_comp_pEnum;
 char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
-int            hb_comp_iLastLineAdded;                    /* last line added to (_INITLINES) */
+PLINEINFO      hb_comp_pLineInfo;                         /* line number info */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
 char *         hb_comp_FileAsSymbol;                      /* File Name of last compiled line to be used in program body */
 char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
@@ -193,6 +194,8 @@ char           hb_comp_cDataListType;                     /* current declared va
 char           hb_comp_cCastType;                         /* current casting type */
 BOOL           hb_comp_bDontGenLineNum = FALSE;           /* suppress line number generation */
 ULONG          hb_comp_ulLastLinePos;                     /* position of last opcode with line number */
+ULONG          hb_comp_ulLastModuleNamePos;               /* position of last opcode with module name */
+ULONG          hb_comp_ulSavedModuleNamePos;              /* position of last opcode with module name saved inside a STATIC/GLOBAL definition */
 int            hb_comp_iStaticCnt;                        /* number of defined statics variables on the PRG */
 int            hb_comp_iVarScope;                         /* holds the scope for next variables to be defined */
 PHB_FNAME      hb_comp_pOutPath = NULL;
@@ -1256,19 +1259,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                if( hb_comp_bDebugInfo )
                {
-                  BYTE * pBuffer;
-
-                  pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 4 );
-
-                  pBuffer[0] = HB_P_LOCALNAME;
-                  pBuffer[1] = HB_LOBYTE( wLocal );
-                  pBuffer[2] = HB_HIBYTE( wLocal );
-
-                  memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, strlen( szVarName ) + 1 );
-
-                  hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 4 , 0 );
-
-                  hb_xfree( pBuffer );
+                  hb_compGenLocalName( wLocal, szVarName );
                }
             }
             break;
@@ -1372,6 +1363,23 @@ void hb_compGenGlobalName( char *szVarName )
 
       hb_compGlobalsDefEnd();
    }
+}
+
+static void hb_compGenLocalName( USHORT wLocal, char *szVarName )
+{
+   BYTE * pBuffer;
+
+   pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 4 );
+
+   pBuffer[0] = HB_P_LOCALNAME;
+   pBuffer[1] = HB_LOBYTE( wLocal );
+   pBuffer[2] = HB_HIBYTE( wLocal );
+
+   memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), szVarName, strlen( szVarName ) + 1 );
+
+   hb_compGenPCodeN( pBuffer, strlen( szVarName ) + 4 , 0 );
+
+   hb_xfree( pBuffer );
 }
 
 void hb_compGenStaticName( char *szVarName )
@@ -2335,21 +2343,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_bDebugInfo )
    {
-      BYTE * pBuffer;
-
-      pBuffer = ( BYTE * ) hb_xgrab( 3 + strlen( szFileName ) + strlen( szFunName ) );
-
-      pBuffer[0] = HB_P_MODULENAME;
-
-      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) szFileName, strlen( szFileName ) );
-
-      pBuffer[ strlen( szFileName ) + 1 ] = ':';
-
-      memcpy( ( BYTE * ) ( &( pBuffer[ strlen( szFileName ) + 2 ] ) ), ( BYTE * ) szFunName, strlen( szFunName ) + 1 );
-
-      hb_compGenPCodeN( pBuffer, 3 + strlen( szFileName ) + strlen( szFunName ), 0 );
-
-      hb_xfree( pBuffer );
+      hb_compGenModuleName( szFileName, szFunName );
    }
 
    hb_comp_bDontGenLineNum = FALSE; /* reset the flag */
@@ -3149,6 +3143,46 @@ void hb_compGenJumpHere( ULONG ulOffset )
    hb_compGenJumpThere( ulOffset, hb_comp_functions.pLast->lPCodePos );
 }
 
+void hb_compGenModuleName( char *szFile, char *szFunc )
+{
+   int iBufLen;
+   int iFileLen = strlen( szFile );
+   int iFuncLen;
+   BYTE *pBuffer;
+   
+   /* Use a special form "filename:" when the file changes within function */
+   if ( szFunc != NULL && *szFunc == '\0' )
+   {
+      char *szLast = (char *)hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
+      
+      if ( !strncmp( szFile, szLast, iFileLen )
+           && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
+      {
+         return;
+      }
+   }
+   if ( szFunc )
+   {
+      iFuncLen = strlen( szFunc );
+   }
+   iBufLen = 1 + iFileLen + ( szFunc ? 1 + iFuncLen : 0 ) + 1;
+   pBuffer = (BYTE *)hb_xgrab( iBufLen );
+   pBuffer[ 0 ] = HB_P_MODULENAME;
+   memcpy( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
+   if ( szFunc )
+   {
+      pBuffer[ 1 + iFileLen ] = ':';
+      memcpy( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen + 1 );
+   }
+   else
+   {
+      pBuffer[ 1 + iFileLen ] = '\0';
+   }
+   hb_comp_ulLastModuleNamePos = hb_comp_functions.pLast->lPCodePos;
+   hb_compGenPCodeN( pBuffer, iBufLen, 0 );
+   hb_xfree( pBuffer );
+}
+
 void hb_compLinePush( void ) /* generates the pcode with the currently compiled source code line */
 {
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
@@ -3159,6 +3193,11 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
+      if ( hb_comp_bDebugInfo )
+      {
+         hb_compGenModuleName( hb_comp_files.pLast->szFileName, "" );
+      }
+      
       if( !bCodeblock && hb_comp_iBaseLine == 0 )
       {
          hb_comp_iBaseLine = hb_comp_iLine;
@@ -3211,12 +3250,46 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       /* Add as a valid stop line */
       if ( hb_comp_bDebugInfo )
       {
-         if ( iLine != hb_comp_iLastLineAdded )
+         PLINEINFO pInfo = hb_comp_pLineInfo;
+
+         while ( pInfo )
          {
-            hb_comp_iLastLineAdded = iLine;
-            hb_compLineNumberDefStart();
-            hb_compGenPCode3( HB_P_LINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), FALSE );
-            hb_compLineNumberDefEnd();
+            if ( !strcmp( hb_comp_files.pLast->szFileName, pInfo->szModule ) )
+            {
+               break;
+            }
+            pInfo = pInfo->pNext;
+         }
+         if ( !pInfo )
+         {
+            pInfo = hb_xgrab( sizeof( LINEINFO ) );
+            pInfo->szModule = hb_strdup( hb_comp_files.pLast->szFileName );
+            pInfo->ulLineMin = (ULONG)-1;
+            pInfo->ulLineMax = 0;
+            pInfo->ulLineAlloc = 1024;
+            pInfo->pLines = hb_xgrab( pInfo->ulLineAlloc * sizeof( ULONG ) );
+            pInfo->ulLineCount = 0;
+            pInfo->pNext = hb_comp_pLineInfo;
+            hb_comp_pLineInfo = pInfo;
+         }
+         else if ( pInfo->ulLineAlloc == pInfo->ulLineCount )
+         {
+            pInfo->ulLineAlloc *= 2;
+            pInfo->pLines = hb_xrealloc( pInfo->pLines,
+                                         pInfo->ulLineAlloc * sizeof( ULONG ) );
+         }
+         if ( pInfo->ulLineCount == 0
+              || pInfo->pLines[ pInfo->ulLineCount - 1 ] != (ULONG)iLine )
+         {
+            pInfo->pLines[ pInfo->ulLineCount++ ] = iLine;
+            if ( (ULONG)iLine < pInfo->ulLineMin )
+            {
+               pInfo->ulLineMin = iLine;
+            }
+            if ( (ULONG)iLine > pInfo->ulLineMax )
+            {
+               pInfo->ulLineMax = iLine;
+            }
          }
       }
    }
@@ -4986,20 +5059,18 @@ void hb_compStaticDefStart( void )
 
       if( hb_comp_bDebugInfo )
       {
-         BYTE * pBuffer;
-         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
-
-         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
-         pBuffer[0] = HB_P_MODULENAME;
-         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
-         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
-         hb_xfree( pBuffer );
+         hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
+         hb_compGenModuleName( hb_comp_files.pLast->szFileName, NULL );
       }
    }
    else
    {
       hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_functions.pLast = hb_comp_pInitFunc;
+      if ( hb_comp_bDebugInfo )
+      {
+         hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
+      }
    }
 }
 
@@ -5012,6 +5083,10 @@ void hb_compStaticDefEnd( void )
    hb_comp_functions.pLast = hb_comp_pInitFunc->pOwner;
    hb_comp_pInitFunc->pOwner = NULL;
    ++hb_comp_iStaticCnt;
+   if ( hb_comp_bDebugInfo )
+   {
+      hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
+   }
 }
 
 void hb_compGlobalsDefStart( void )
@@ -5026,20 +5101,18 @@ void hb_compGlobalsDefStart( void )
       
       if( hb_comp_bDebugInfo )
       {
-         BYTE * pBuffer;
-         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
-
-         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
-         pBuffer[0] = HB_P_MODULENAME;
-         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
-         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
-         hb_xfree( pBuffer );
+         hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
+         hb_compGenModuleName( hb_comp_files.pLast->szFileName, NULL );
       }
    }
    else
    {
       hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+      if ( hb_comp_bDebugInfo )
+      {
+         hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
+      }
    }
 }
 
@@ -5051,6 +5124,10 @@ void hb_compGlobalsDefEnd( void )
 {
    hb_comp_functions.pLast = hb_comp_pGlobalsFunc->pOwner;
    hb_comp_pGlobalsFunc->pOwner = NULL;
+   if ( hb_comp_bDebugInfo )
+   {
+      hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
+   }
 }
 
 /* 
@@ -5062,20 +5139,12 @@ static void hb_compLineNumberDefStart( void )
    {
       hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_strdup("<_INITLINES>"), HB_FS_INIT );
       hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
-      hb_comp_pLineNumberFunc->bFlags = FUN_PROCEDURE;
+      hb_comp_pLineNumberFunc->bFlags = 0;
       hb_comp_pLineNumberFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
-      
-      if( hb_comp_bDebugInfo )
+      if ( hb_comp_bDebugInfo )
       {
-         BYTE * pBuffer;
-         int iFileLen = strlen( hb_comp_files.pLast->szFileName );
-
-         pBuffer = ( BYTE * ) hb_xgrab( 2 + iFileLen );
-         pBuffer[0] = HB_P_MODULENAME;
-         memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen+1 );
-         hb_compGenPCodeN( pBuffer, 2 + iFileLen, 0 );
-         hb_xfree( pBuffer );
+         hb_compGenModuleName( hb_comp_pFileName->szName, NULL );
       }
    }
    else
@@ -5195,40 +5264,18 @@ void hb_compCodeBlockEnd( void )
 
       pVar = pVar->pNext;
    }
-
+   
    if( hb_comp_bDebugInfo )
    {
-      BYTE * pBuffer;
-      int iFileLen = strlen( hb_comp_files.pLast->szFileName );
-      int iFuncLen = strlen( pFunc->szName );
-
-      pBuffer = ( BYTE * ) hb_xgrab( 3 + iFileLen + iFuncLen );
-      pBuffer[0] = HB_P_MODULENAME;
-      memcpy( ( BYTE * ) ( &( pBuffer[1] ) ), ( BYTE * ) hb_comp_files.pLast->szFileName, iFileLen );
-      pBuffer[ iFileLen + 1 ] = ':';
-      memcpy( ( BYTE * ) ( &( pBuffer[ iFileLen + 2 ] ) ), ( BYTE * ) pFunc->szName, iFuncLen + 1 );
-      hb_compGenPCodeN( pBuffer, 3 + iFileLen + iFuncLen, 0 );
-      hb_xfree( pBuffer );
+      hb_compGenModuleName( hb_comp_files.pLast->szFileName, pFunc->szName );
 
       /* generate the names of referenced local variables */
       pVar = pCodeblock->pStatics;
       iLocalPos = -1;
       while( wLocalsCnt-- )
       {
-         int iVarLen = strlen( pVar->szName );
-
-         pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 4 );
-
-         pBuffer[0] = HB_P_LOCALNAME;
-         pBuffer[1] = HB_LOBYTE( iLocalPos );
-         pBuffer[2] = HB_HIBYTE( iLocalPos );
+         hb_compGenLocalName( (USHORT)iLocalPos, pVar->szName );
          iLocalPos--;
-
-         memcpy( ( BYTE * ) ( & ( pBuffer[3] ) ), pVar->szName, iVarLen + 1 );
-
-         hb_compGenPCodeN( pBuffer, iVarLen + 4 , 0 );
-
-         hb_xfree( pBuffer );
 
          pFree = pVar;
 
@@ -5303,7 +5350,6 @@ static void hb_compInitVars( void )
    hb_comp_bAnyWarning      = FALSE;
 
    hb_comp_iLine           = 1;
-   hb_comp_iLastLineAdded  = 0;
    hb_comp_iBaseLine       = 0;
    hb_comp_iFunctionCnt    = 0;
    hb_comp_iErrorCount     = 0;
@@ -5322,6 +5368,8 @@ static void hb_compInitVars( void )
    hb_comp_iGlobals       = 0;
 
    hb_comp_pEnum          = NULL;
+
+   hb_comp_pLineInfo      = NULL;
 }
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
@@ -5626,8 +5674,45 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_compAddInitFunc( hb_comp_pInitFunc );
             }
 
-            if ( hb_comp_pLineNumberFunc )
+            if ( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
             {
+               PLINEINFO pInfo;
+               int iModules = 0;
+               
+               hb_compLineNumberDefStart();
+               while ( ( pInfo = hb_comp_pLineInfo ) != NULL )
+               {
+                  int iLen;
+                  ULONG i;
+                  BYTE *pBuffer;
+
+                  pInfo->ulLineMin -= pInfo->ulLineMin % 8;
+
+                  iLen = ( pInfo->ulLineMax + 1 - pInfo->ulLineMin + 7 ) / 8;
+                  pBuffer = hb_xgrab( iLen + 1 );
+                  hb_xmemset( pBuffer, 0, iLen + 1 );
+                  for ( i = 0; i < pInfo->ulLineCount; i++ )
+                  {
+                     ULONG ulLine = pInfo->pLines[ i ] - pInfo->ulLineMin;
+                     
+                     pBuffer[ ulLine / 8 ] |= 1 << ( ulLine % 8 );
+                  }
+                  
+                  hb_compGenPushString( pInfo->szModule, strlen( pInfo->szModule ) + 1 );
+                  hb_compGenPushLong( pInfo->ulLineMin );
+                  hb_compGenPushString( pBuffer, iLen + 1 );
+                  hb_xfree( pBuffer );
+                  hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
+                  iModules++;
+                  
+                  hb_comp_pLineInfo = pInfo->pNext;
+                  hb_xfree( pInfo->pLines );
+                  hb_xfree( pInfo->szModule );
+                  hb_xfree( pInfo );
+               }
+               hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), (BOOL)0 );
+               hb_compGenPCode1( HB_P_RETVALUE );
+               hb_compLineNumberDefEnd();
                hb_compAddInitFunc( hb_comp_pLineNumberFunc );
             }
             
@@ -5900,7 +5985,6 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
          /* Minimal Init. */
          hb_comp_files.iFiles = 0;
          hb_comp_iLine = 1;
-         hb_comp_iLastLineAdded = 0;
 
          if( hb_compInclude( szFileName, NULL ) )
          {

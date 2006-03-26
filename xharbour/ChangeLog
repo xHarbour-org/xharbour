@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4887 2006/03/25 20:02:21 paultucker Exp $
+ * $Id: ChangeLog,v 1.4888 2006/03/25 20:29:54 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-26 11:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    * Generate stop line number information in bitmap format together with
+      respective source file names.
+  * source/vm/dbgentry.c
+    * Use the stop line number information in new format.
 
 2006-03-25 16:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
 
