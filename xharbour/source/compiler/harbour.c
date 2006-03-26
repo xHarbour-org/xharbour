@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.124 2006/03/25 02:22:36 druzus Exp $
+ * $Id: harbour.c,v 1.125 2006/03/26 07:51:59 likewolf Exp $
  */
 
 /*
@@ -3262,12 +3262,12 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          }
          if ( !pInfo )
          {
-            pInfo = hb_xgrab( sizeof( LINEINFO ) );
+            pInfo = (PLINEINFO) hb_xgrab( sizeof( LINEINFO ) );
             pInfo->szModule = hb_strdup( hb_comp_files.pLast->szFileName );
             pInfo->ulLineMin = (ULONG)-1;
             pInfo->ulLineMax = 0;
             pInfo->ulLineAlloc = 1024;
-            pInfo->pLines = hb_xgrab( pInfo->ulLineAlloc * sizeof( ULONG ) );
+            pInfo->pLines = (ULONG *) hb_xgrab( pInfo->ulLineAlloc * sizeof( ULONG ) );
             pInfo->ulLineCount = 0;
             pInfo->pNext = hb_comp_pLineInfo;
             hb_comp_pLineInfo = pInfo;
@@ -3275,7 +3275,7 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          else if ( pInfo->ulLineAlloc == pInfo->ulLineCount )
          {
             pInfo->ulLineAlloc *= 2;
-            pInfo->pLines = hb_xrealloc( pInfo->pLines,
+            pInfo->pLines = (ULONG *) hb_xrealloc( pInfo->pLines,
                                          pInfo->ulLineAlloc * sizeof( ULONG ) );
          }
          if ( pInfo->ulLineCount == 0
@@ -5689,7 +5689,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   pInfo->ulLineMin -= pInfo->ulLineMin % 8;
 
                   iLen = ( pInfo->ulLineMax + 1 - pInfo->ulLineMin + 7 ) / 8;
-                  pBuffer = hb_xgrab( iLen + 1 );
+                  pBuffer = (BYTE *) hb_xgrab( iLen + 1 );
                   hb_xmemset( pBuffer, 0, iLen + 1 );
                   for ( i = 0; i < pInfo->ulLineCount; i++ )
                   {
@@ -5700,7 +5700,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   
                   hb_compGenPushString( pInfo->szModule, strlen( pInfo->szModule ) + 1 );
                   hb_compGenPushLong( pInfo->ulLineMin );
-                  hb_compGenPushString( pBuffer, iLen + 1 );
+                  hb_compGenPushString( (char *) pBuffer, iLen + 1 );
                   hb_xfree( pBuffer );
                   hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
                   iModules++;
