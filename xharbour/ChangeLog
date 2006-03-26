@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4890 2006/03/26 16:01:42 paultucker Exp $
+ * $Id: ChangeLog,v 1.4891 2006/03/26 16:02:18 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,6 +10,7 @@
 
 2006-03-26 11:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/compiler/harbour.c
+  * source/vm/dbgentry.c
      * casts for PLINENO xGrab Calls
 
 2006-03-26 11:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>

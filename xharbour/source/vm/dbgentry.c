@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.20 2006/03/23 02:12:19 ronpinkas Exp $
+ * $Id: dbgentry.c,v 1.21 2006/03/26 07:52:04 likewolf Exp $
  */
 
 /*
@@ -772,7 +772,7 @@ hb_dbgAddStopLines( HB_DEBUGINFO *info, PHB_ITEM pItem )
                char *pNewBuffer = hb_arrayGetCPtr( pEntry, 3 );
                int nLen = ( nMax + 1 - nMin + 7 ) / 8 + 1;
                int k;
-               char *pBuffer = hb_xgrab( nLen );
+               char *pBuffer = (char *) hb_xgrab( nLen );
 
                hb_xmemset( pBuffer, 0, nLen );
 
@@ -1412,7 +1412,7 @@ hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine )
          int nMin = hb_arrayGetNL( pEntry, 2 );
          int nOfs = nLine - nMin;
          
-         if ( nLine < nMin || nOfs / 8 > hb_arrayGetCLen( pEntry, 3 ) )
+         if ( nLine < nMin || (nOfs / 8) > hb_arrayGetCLen( pEntry, 3 ) )
          {
             return FALSE;
          }
