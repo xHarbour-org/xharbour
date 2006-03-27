@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.22 2006/03/26 16:04:11 paultucker Exp $
+ * $Id: dbgentry.c,v 1.23 2006/03/27 16:50:31 likewolf Exp $
  */
 
 /*
@@ -739,21 +739,30 @@ hb_dbgAddStatic( HB_DEBUGINFO *info, char *szName, int nIndex, int nFrame )
 static void
 hb_dbgAddStopLines( HB_DEBUGINFO *info, PHB_ITEM pItem )
 {
+   int i, nLinesLen;
+   
    if ( !info->pStopLines )
    {
       info->pStopLines = hb_itemNew( pItem );
    }
    else
    {
-      int i, j;
+      int j;
       int nItemLen = hb_itemSize( pItem );
-      int nLinesLen = hb_itemSize( info->pStopLines );
+      
+      nLinesLen = hb_itemSize( info->pStopLines );
 
       for ( i = 1; i <= nItemLen; i++ )
       {
          PHB_ITEM pEntry = hb_arrayGetItemPtr( pItem, i );
          char *szModule = hb_arrayGetCPtr( pEntry, 1 );
+         char *p;
          BOOL bFound = FALSE;
+
+         if ( ( p = strrchr( szModule, '/' ) ) || ( p = strrchr( szModule, '\\' ) ) )
+         {
+            szModule = p + 1;
+         }
          
          for ( j = 1; j <= nLinesLen; j++ )
          {
@@ -791,6 +800,21 @@ hb_dbgAddStopLines( HB_DEBUGINFO *info, PHB_ITEM pItem )
          {
             hb_arrayAddForward( info->pStopLines, pEntry );
          }
+      }
+   }
+   nLinesLen = hb_itemSize( info->pStopLines );
+   for ( i = 1; i <= nLinesLen; i++ )
+   {
+      PHB_ITEM pEntry = hb_arrayGetItemPtr( info->pStopLines, i );
+      char *szModule = hb_arrayGetCPtr( pEntry, 1 );
+      char *p;
+
+      if ( ( p = strrchr( szModule, '/' ) ) || ( p = strrchr( szModule, '\\' ) ) )
+      {
+         char *szName = hb_strdup( p + 1 );
+         
+         hb_itemPutC( hb_arrayGetItemPtr( pEntry, 1 ), szName );
+         hb_xfree( szName );
       }
    }
 }
@@ -1357,6 +1381,22 @@ hb_dbgGetExpressionValue( void *handle, char *expression )
    hb_dbgClearWatch( &point );
    
    return result;
+}
+
+
+HB_EXPORT PHB_ITEM
+hb_dbgGetSourceFiles( void *handle )
+{
+   HB_DEBUGINFO *info = (HB_DEBUGINFO *)handle;
+   int nModules = hb_itemSize( info->pStopLines );
+   PHB_ITEM ret = hb_itemArrayNew( nModules );
+   int i;
+   
+   for ( i = 1; i <= nModules; i++ )
+   {
+      hb_arraySet( ret, i, hb_arrayGetItemPtr( hb_arrayGetItemPtr( info->pStopLines, i ), 1 ) );
+   }
+   return ret;
 }
 
 

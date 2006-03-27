@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.37 2006/02/22 01:33:49 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.38 2006/03/21 23:02:48 likewolf Exp $
  */
 
 /*
@@ -160,6 +160,7 @@ HB_EXPORT extern void hb_dbgAddWatch( void *handle, char *szExpr, BOOL bTrace );
 HB_EXPORT extern void hb_dbgDelBreak( void *handle, int nBreak );
 HB_EXPORT extern void hb_dbgDelWatch( void *handle, int nWatch );
 HB_EXPORT extern PHB_ITEM hb_dbgGetExpressionValue( void *handle, char *expression );
+HB_EXPORT extern PHB_ITEM hb_dbgGetSourceFiles( void *handle );
 HB_EXPORT extern PHB_ITEM hb_dbgGetWatchValue( void *handle, int nWatch );
 HB_EXPORT extern BOOL hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine );
 HB_EXPORT extern void hb_dbgSetCBTrace( void *handle, BOOL bCBTrace );

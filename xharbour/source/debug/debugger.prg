@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.73 2006/03/21 20:46:19 likewolf Exp $
+ * $Id: debugger.prg,v 1.74 2006/03/21 23:02:58 likewolf Exp $
  */
 
 /*
@@ -233,6 +233,7 @@ CLASS TDebugger
    METHOD FindNext()
    METHOD FindPrevious()
    METHOD GetExprValue( xExpr, lValid )
+   METHOD GetSourceFiles()
 
    METHOD Global()
 
@@ -245,6 +246,7 @@ CLASS TDebugger
    METHOD InputBox( cMsg, uValue, bValid, lEditable )
    METHOD Inspect( uValue, cValueName )
    METHOD IsValidStopLine( cName, nLine )
+   METHOD ListBox( cCaption, aItems )
    METHOD LoadColors()
    METHOD LoadSettings()
    METHOD LoadVars()
@@ -1193,6 +1195,13 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
 RETURN xResult
 
 
+METHOD GetSourceFiles() CLASS TDebugger
+RETURN HB_INLINE( ::pInfo )
+       {
+          hb_itemRelease( hb_itemReturn( hb_dbgGetSourceFiles( hb_parptr( 1 ) ) ) );
+       }
+
+
 METHOD Global() CLASS TDebugger
 
    ::lShowGlobals := ! ::lShowGlobals
@@ -1582,6 +1591,34 @@ METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 return Self
 
 
+METHOD ListBox( cCaption, aItems ) CLASS TDebugger
+   LOCAL nItems, nMaxWid, nLeft, nTop, nBottom, nRight
+   LOCAL oWndList, cSelected := ""
+   LOCAL cColors
+   LOCAL GetList := {}, n
+
+   nItems := Len( aItems )
+   nMaxWid := Len( cCaption ) + 2
+   AEval( aItems, {|x| nMaxWid := Max( Len( x ), nMaxWid ) } )
+   nMaxWid += 2
+   
+   nTop    := ( ::nMaxRow / 2 ) - Min( nItems, ::nMaxRow - 5 ) / 2
+   nBottom := ( ::nMaxRow / 2 ) + Min( nItems, ::nMaxRow - 5 ) / 2 + 1
+   nLeft   := ( ::nMaxCol / 2 ) - Min( nMaxWid, ::nMaxCol * 3 / 2 ) / 2
+   nRight  := ( ::nMaxCol / 2 ) + Min( nMaxWid, ::nMaxCol * 3 / 2 ) / 2
+   oWndList := TDbWindow():new( nTop, nLeft, nBottom, nRight, cCaption, ;
+                                ::oPullDown:cClrPopup )
+   oWndList:lShadow := .T.
+   oWndList:Show()
+
+   cColors := SetColor( ::aColors[ 8 ] + "," + ::aColors[ 10 ] )
+   n := AChoice( nTop + 1, nLeft + 1, nBottom - 1, nRight - 1, aItems )
+   SetColor( cColors )
+
+   oWndList:Hide()
+RETURN n
+
+
 METHOD LoadCallStack() CLASS TDebugger
   LOCAL i
   LOCAL nDebugLevel
@@ -1814,19 +1851,35 @@ return nil
 
 
 METHOD Open() CLASS TDebugger
-   LOCAL cFileName := ::InputBox( "Please enter the filename", Space( 255 ) )
+   LOCAL nFileName
+   LOCAL cFileName
+   LOCAL cRealName
    LOCAL cPrgName
+   LOCAL aFiles := ::GetSourceFiles()
 
-   cFileName:= ALLTRIM( cFileName )
+   ASort( aFiles )
+   ASize( aFiles, Len( aFiles ) + 1 )
+   AIns( aFiles, 1, "(Another file)" )
+   
+   nFileName := ::ListBox( "Please choose a source file", aFiles )
+   IF nFileName == 0
+     RETURN NIL
+   ELSEIF nFileName == 1
+     cFileName := ::InputBox( "Please enter the filename", Space( 255 ) )
+     cFileName:= ALLTRIM( cFileName )
+   ELSE
+     cFileName := aFiles[ nFileName ]
+   ENDIF
 
    IF ( !Empty( cFileName ) ;
         .AND. ( ValType( ::cPrgName ) == 'U' .OR. !FILENAME_EQUAL( cFileName, ::cPrgName ) ) )
       if ! File( cFileName ) .and. ! Empty( ::cPathForFiles )
-         cFileName := ::LocatePrgPath( cFileName )
-         if Empty( cFileName )
-           Alert( "File not found!" )
+         cRealName := ::LocatePrgPath( cFileName )
+         if Empty( cRealName )
+           Alert( "File '" + cFileName + "' not found!" )
            return NIL
          endif
+         cFileName := cRealName
       endif
       ::cPrgName := cFileName
       ::lppo := RAT(".PPO", UPPER(cFileName)) > 0
