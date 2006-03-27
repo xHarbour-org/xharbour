@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.125 2006/03/26 07:51:59 likewolf Exp $
+ * $Id: harbour.c,v 1.126 2006/03/26 16:01:46 paultucker Exp $
  */
 
 /*
@@ -3151,7 +3151,7 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
    BYTE *pBuffer;
    
    /* Use a special form "filename:" when the file changes within function */
-   if ( szFunc != NULL && *szFunc == '\0' )
+   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
    {
       char *szLast = (char *)hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
       

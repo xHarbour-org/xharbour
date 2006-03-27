@@ -1,5 +1,5 @@
 /*
- * $Id: gtxvt.h,v 1.13 2004/08/30 08:40:59 jonnymind Exp $
+ * $Id: gtxvt.h,v 1.14 2004/10/21 14:26:42 jonnymind Exp $
  */
 
 /*
@@ -98,7 +98,7 @@ typedef USHORT HB_GT_CELLTYPE;
 #endif
 
 #ifdef HB_BIG_ENDIAN
-   #define XVT_SWAP_ENDIAN( value )
+   #define XVT_SWAP_ENDIAN( value ) ( value )
 #else
    #define XVT_SWAP_ENDIAN( value ) \
       (0xFFFF & ( (value << 8) | (value>>8) ))

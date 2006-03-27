@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.5 2004/05/30 20:37:17 likewolf Exp $
+# $Id: global.cf,v 1.6 2004/09/14 20:15:37 druzus Exp $
 #
 
 all : first
@@ -16,6 +16,10 @@ ifeq ($(HB_COMMERCE),yes)
 else
 ifneq ($(HB_WITHOUT_GTSLN),yes)
    HB_GT_LIBS += gtsln
+endif
+ifneq ($(HB_WITHOUT_X11),yes)
+   HB_GT_LIBS += gtxvt
+   HB_GT_LIBS += gtxwc
 endif
 endif
 
