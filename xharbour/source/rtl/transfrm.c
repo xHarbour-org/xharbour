@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.42 2005/09/22 01:11:59 druzus Exp $
+ * $Id: transfrm.c,v 1.43 2006/03/25 20:29:55 modalsist Exp $
  */
 
 /*
@@ -650,7 +650,7 @@ HB_FUNC( TRANSFORM )
                ulPicLen = iSize;
                if( iOrigDec != 0 )
                {
-                  szPicNew[ iSize - iOrigDec - 1 ] = '.';
+                 szPicNew[ iSize - iOrigDec - 1 ] = '.';
                }
             }
          }
@@ -744,74 +744,86 @@ HB_FUNC( TRANSFORM )
                   if( !bInit && ( cPic == '9' || cPic == '#' || cPic == '$' || cPic == '*' ) )
                      bInit = TRUE;
 
-                  if( cPic == '9' || cPic == '#' )
-                  {
-                     if( iCount < iWidth )
-                        szResult[ i ] = szStr[ iCount++ ];  /* Just copy                */
-                     else
-                        szResult[ i ] = ' ';
-                  }
-                  else if( cPic == '.' && bInit )
-                  {
-                     bPDec = TRUE;
-
-                     if( uiPicFlags & PF_EXCHANG )  /* Exchange . and ,         */
+                     if( cPic == '9' || cPic == '#' )
                      {
-                        szResult[ i ] = ',';
-                        iCount++;
+                       if( iCount < iWidth )
+                         szResult[ i ] = szStr[ iCount++ ];  /* Just copy                */
+                       else
+                         szResult[ i ] = ' ';
                      }
-                     else
+                     else if( cPic == '.' && bInit )
                      {
-                        if( uiPicFlags & PF_NUMDATE || bPDec )    /* Dot in date              */
-                        {
+                       bPDec = TRUE;
+
+                       if( uiPicFlags & PF_EXCHANG )  /* Exchange . and ,         */
+                       {
+                         szResult[ i ] = ',';
+                         iCount++;
+                       }
+                       else
+                       {
+                         if( uiPicFlags & PF_NUMDATE || bPDec )    /* Dot in date              */
+                         {
                            szResult[ i ] = cPic;
                            iCount++;
-                        }
-                        else                             /* Dot in number            */
-                        {
+                         }
+                         else                             /* Dot in number            */
+                         {
                            szResult[ i ] = szStr[ iCount++ ];
-                        }
+                         }
+                       }
                      }
-                  }
-                  else if( cPic == '$' || cPic == '*' )
-                  {
-                     if( szStr[ iCount ] == ' ' )
+                     else if( cPic == '$' || cPic == '*' )
                      {
-                        szResult[ i ] = cPic;
-                        iCount++;
-                     }
-                     else
-                        szResult[ i ] = szStr[ iCount++ ];
-                  }
-                  else if( cPic == ',' && bInit )    /* Comma                    */
-                  {
-                     if( iCount && isdigit( ( BYTE ) szStr[ iCount - 1 ] ) )
-                     {                                /* May we place it     */
-                        if( uiPicFlags & PF_EXCHANG )
-                           szResult[ i ] = '.';
-                        else
-                           szResult[ i ] = ',';
-                     }
-                     else
-                     {
-                        if( i && szResult[ i - 1 ] == '*' )
-                           szResult[ i ] = '*';
-                        else
-                           szResult[ i ] = ' ';
-
-                        if ( i && szResult[ i - 1 ] == '-' )
+                        if( szStr[ iCount ] == ' ' )
                         {
-                            szResult[ i -1 ] = ' ';
-                            szResult[ i ] = '-';
+                          szResult[ i ] = cPic;
+                          iCount++;
+                        }
+                        else
+                          szResult[ i ] = szStr[ iCount++ ];
+                     }
+                     else if( cPic == ',' && bInit )    /* Comma                    */
+                     {
+                        if( iCount && isdigit( ( BYTE ) szStr[ iCount - 1 ] ) )
+                        {                                /* May we place it     */
+                          if( uiPicFlags & PF_EXCHANG )
+                             szResult[ i ] = '.';
+                          else
+                             szResult[ i ] = ',';
+                        }
+                        else
+                        {
+                          if( i && szResult[ i - 1 ] == '*' )
+                            szResult[ i ] = '*';
+                          else
+                            szResult[ i ] = ' ';
+
+                            if ( i && szResult[ i - 1 ] == '-' )
+                            {
+                              szResult[ i -1 ] = ' ';
+                              szResult[ i ] = '-';
+                            }
                         }
                      }
-                  }
                   else
                      szResult[ i ] = cPic;
                }
             else
             {
                strcpy( szResult, szStr );
+
+               /* 2006/03/27 - Eduardo Fernandes <modalsist@yahoo.com.br>
+                  ulPicLen = 0 ( @E only, without 9,#,$,* in picture) */
+               if( uiPicFlags & PF_BRITISH )  // @E 
+               {
+                 for( i = 0; i < strlen(szResult); i++ )
+                 {
+                   if( szResult[ i ] == '.')
+                     szResult[ i ] = ',';
+                 }
+               }
+               else
                i = strlen( szStr );
             }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4892 2006/03/26 16:04:11 paultucker Exp $
+ * $Id: ChangeLog,v 1.4893 2006/03/27 14:34:58 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-27 11:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\transfrm.c
+    ! Fixed the @E in numeric value without any other symbol in
+      the picture. Example: transform( 123456.78, "@E").
+      Bug reported by "Stupar" in the xharbour news.
 
 2006-03-27 18:32 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/darwin/global.cf
@@ -20,14 +26,6 @@
   * source/compiler/harbour.c
   * source/vm/dbgentry.c
      * casts for PLINENO xGrab Calls
-
-2006-03-26 11:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
-  * include/hbcomp.h
-  * source/compiler/harbour.c
-    * Generate stop line number information in bitmap format together with
-      respective source file names.
-  * source/vm/dbgentry.c
-    * Use the stop line number information in new format.
 
 2006-03-25 16:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
 
