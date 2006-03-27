@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.21 2006/03/26 07:52:04 likewolf Exp $
+ * $Id: dbgentry.c,v 1.22 2006/03/26 16:04:11 paultucker Exp $
  */
 
 /*
@@ -1412,7 +1412,7 @@ hb_dbgIsValidStopLine( void *handle, char *szModule, int nLine )
          int nMin = hb_arrayGetNL( pEntry, 2 );
          int nOfs = nLine - nMin;
          
-         if ( nLine < nMin || (nOfs / 8) > hb_arrayGetCLen( pEntry, 3 ) )
+         if ( nLine < nMin || (ULONG)( nOfs / 8 ) > hb_arrayGetCLen( pEntry, 3 ) )
          {
             return FALSE;
          }
