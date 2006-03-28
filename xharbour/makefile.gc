@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.21 2006/02/14 00:38:51 ath1 Exp $
+# $Id: makefile.gc,v 1.22 2006/03/17 01:18:46 fsgiudice Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -124,8 +124,6 @@ PCREPOS_LIB  = $(LIB_DIR)/libpcrepos$(THREAD_MODE).a
 VM_LIB       = $(LIB_DIR)/libvm$(THREAD_MODE).a
 SAMPLES_LIB  = $(LIB_DIR)/libsamples$(THREAD_MODE).a
 RDD_LIB      = $(LIB_DIR)/librdd$(THREAD_MODE).a
-OPTCON_LIB   = $(LIB_DIR)/liboptcon$(THREAD_MODE).a
-OPTGUI_LIB   = $(LIB_DIR)/liboptgui$(THREAD_MODE).a
 CT_LIB       = $(LIB_DIR)/libct$(THREAD_MODE).a
 TIP_LIB      = $(LIB_DIR)/libtip$(THREAD_MODE).a
 UNICODE_LIB  = $(LIB_DIR)/libunicode$(THREAD_MODE).a
@@ -208,10 +206,8 @@ PROJECT += \
    $(VM_LIB) \
    $(SAMPLES_LIB) \
    $(RDD_LIB) \
-   $(OPTCON_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
-   $(OPTGUI_LIB) \
    $(GTWVW_LIB) \
    $(GTWVT_LIB) \
    $(UNICODE_LIB) \
@@ -4045,44 +4041,6 @@ $(OBJ_DIR)/nulsys.c : $(RDD_DIR)/nulsys\nulsys.prg
 
 $(OBJ_DIR)/nulsys.o : $(OBJ_DIR)/nulsys.c
 	$(CC_CMD)
-
-#-------------------------------------------------------------------------------
-# liboptcon.a
-#-------------------------------------------------------------------------------
-
-$(OPTCON_LIB) : \
-   $(OPT_CON_OBJ_DIR)/hvm.o \
-   $(OPT_CON_OBJ_DIR)/classes.o \
-   $(OPT_CON_OBJ_DIR)/fm.o
-	$(AR_CMD)
-
-$(OPT_CON_OBJ_DIR)/hvm.o : $(VM_DIR)/hvm.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF $(CFLAGS) -o $@ $^
-
-$(OPT_CON_OBJ_DIR)/classes.o : $(VM_DIR)/classes.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF $(CFLAGS) -o $@ $^
-
-$(OPT_CON_OBJ_DIR)/fm.o : $(VM_DIR)/fm.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF $(CFLAGS) -o $@ $^
-
-#-------------------------------------------------------------------------------
-# liboptgui.a
-#-------------------------------------------------------------------------------
-
-$(OPTGUI_LIB) : \
-   $(OPT_GUI_OBJ_DIR)/hvm.o \
-   $(OPT_GUI_OBJ_DIR)/classes.o \
-   $(OPT_GUI_OBJ_DIR)/fm.o
-	$(AR_CMD)
-
-$(OPT_GUI_OBJ_DIR)/hvm.o : $(VM_DIR)/hvm.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI $(CFLAGS) -o $@ $^
-
-$(OPT_GUI_OBJ_DIR)/classes.o : $(VM_DIR)/classes.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI $(CFLAGS) -o $@ $^
-
-$(OPT_GUI_OBJ_DIR)/fm.o : $(VM_DIR)/fm.c
-	$(CC) -DHB_NO_PROFILER -DHB_FM_STATISTICS_OFF -DHB_GUI $(CFLAGS) -o $@ $^
 
 #-------------------------------------------------------------------------------
 # harbour.exe
