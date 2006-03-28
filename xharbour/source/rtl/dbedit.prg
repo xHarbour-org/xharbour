@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.29 2006/03/28 02:22:39 modalsist Exp $
+ * $Id: dbedit.prg,v 1.30 2006/03/28 14:43:48 modalsist Exp $
  */
 
 /*
@@ -554,7 +554,12 @@ Return Nil
 STATIC FUNCTION _DoUserFunc(bFun, nMode, nColPos, oTBR)
 LOCAL nRet, nRec
 
-  oTBR:RefreshAll():ForceStable()
+  IF nMode == DE_IDLE
+     oTBR:RefreshAll()
+  ENDIF
+
+  oTBR:ForceStable()
+
   nRec := RecNo()
 
   nRet := Eval(bFun, nMode, nColPos, oTBR)
