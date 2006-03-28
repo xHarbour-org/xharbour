@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4897 2006/03/28 02:22:38 modalsist Exp $
+ * $Id: ChangeLog,v 1.4898 2006/03/28 08:14:16 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-28 11:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\dbedit.prg
+    !fixed to refresh all screen at initialization mode, when a movement
+     key is pressed before start dbedit.
 
 2006-03-28 03:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.gc

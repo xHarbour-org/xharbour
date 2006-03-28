@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.28 2005/09/08 23:41:36 lculik Exp $
+ * $Id: dbedit.prg,v 1.29 2006/03/28 02:22:39 modalsist Exp $
  */
 
 /*
@@ -118,6 +118,7 @@ LOCAL oTBR,;
   IF !Used()
      Throw( ErrorNew( "DBCMD", 0, 2001, ProcName(), "Workarea not in use" ) )
   END
+
 
   DEFAULT nTop TO 0
   DEFAULT nLeft TO 0
@@ -256,9 +257,9 @@ LOCAL oTBR,;
   oTBR:setKey(K_CTRL_DOWN, {|| _MoveCol(oTBR, K_CTRL_DOWN), 0})
 #endif
 
-  // Build columns
-  //
-  FOR EACH i IN axColumns
+ // Build columns
+ //
+ FOR EACH i IN axColumns
 
     IF !Empty( i )
 
@@ -340,50 +341,49 @@ LOCAL oTBR,;
 
     END
 
-  NEXT
+ NEXT
 
-  IF Len(axColumns) == 1
-     oTBR:setKey(K_LEFT, Nil)
-     oTBR:setKey(K_RIGHT, Nil)
-  END
+ IF Len(axColumns) == 1
+    oTBR:setKey(K_LEFT, Nil)
+    oTBR:setKey(K_RIGHT, Nil)
+ END
 
-  IF Empty(xUserFunc)
-    bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
-  ELSE
-    bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
-    oTBR:setKey( K_ESC, nil )
-  END
+ IF Empty(xUserFunc)
+   bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
+ ELSE
+   bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
+   oTBR:setKey( K_ESC, nil )
+ END
 
-  // xHarbour extension: Initialization call
-  //
-  _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
+ // xHarbour extension: Initialization call
+ //
+ _DoUserFunc(bFun, -1, oTBR:colPos, oTBR)
 
-  oTBR:refreshAll()
-  oTBR:invalidate()
-  oTBR:forceStable()
-  oTBR:deHilite()
+ oTBR:refreshAll()
+ oTBR:invalidate()
+ oTBR:forceStable()
+ oTBR:deHilite()
 
-  i := RecNo()
-  dbGoTop()
+ i := RecNo()
+ dbGoTop()
 
-  IF (Eof() .OR. RecNo() == LastRec() + 1) .AND. Bof()
-     nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
-  END
+ IF (Eof() .OR. RecNo() == LastRec() + 1) .AND. Bof()
+    nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+ END
 
-  dbGoto(i)
+ dbGoto(i)
 
+ IF nRet != DE_ABORT
+    nRet := DE_CONT
+ END
+
+
+ /* --------------------------- */
+ /* Go into the processing loop */
+ /* --------------------------- */
 
  WHILE nRet != DE_ABORT
 
-   IF nRet != DE_ABORT
-      nRet := DE_CONT
-   END
-
-   WHILE !oTBr:Stabilize() .AND. NextKey() == 0
-   END
-
-
-  While nRet != DE_ABORT
     Switch nRet
       Case DE_REFRESH
         oTBR:invalidate()
@@ -392,30 +392,30 @@ LOCAL oTBR,;
       Case DE_CONT
         oTBR:refreshCurrent()
         Exit
-  End
+    End
 
-  oTBR:forceStable()
-  oTBR:deHilite()
+    oTBR:forceStable()
+    oTBR:deHilite()
 
-  If oTBR:hitTop
-     nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
-  ElseIf oTBR:hitBottom
-     nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
-  End
+    If oTBR:hitTop
+       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+    ElseIf oTBR:hitBottom
+       nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+    End
 
-  If nRet == DE_ABORT
-     Exit
-  End
+    If nRet == DE_ABORT
+       Exit
+    End
 
-  nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
+    nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
 
-  If nRet == DE_ABORT
-     Exit
-  End
+    If nRet == DE_ABORT
+       Exit
+    End 
 
-  oTBR:hilite()
+    oTBR:hilite()
 
-  nKey := Inkey(0)
+    nKey := Inkey(0)
 
 #ifdef HB_COMPAT_C53
     // xHarbour with 5.3 extensions code
@@ -512,17 +512,19 @@ LOCAL oTBR,;
 
     // userfunc could delete recs...
     i := RecNo()
+
     dbGoTop()
+
     If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
        nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
     End
+
     dbGoto(i)
-  End
 
-END
+ END
 
-  SetCursor(nCursor)
-  SetPos(Row(),0)
+ SetCursor(nCursor)
+ SetPos(Row(),0)
 
 RETURN .T.
 
@@ -552,7 +554,7 @@ Return Nil
 STATIC FUNCTION _DoUserFunc(bFun, nMode, nColPos, oTBR)
 LOCAL nRet, nRec
 
-  oTBR:forceStable()
+  oTBR:RefreshAll():ForceStable()
   nRec := RecNo()
 
   nRet := Eval(bFun, nMode, nColPos, oTBR)
@@ -602,3 +604,4 @@ LOCAL nRet, nRec
   /******************************************/
 
 RETURN nRet
+
