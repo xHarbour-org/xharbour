@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4895 2006/03/27 16:50:23 likewolf Exp $
+ * $Id: ChangeLog,v 1.4896 2006/03/27 21:02:12 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-27 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\dbedit.prg
+    ! Fixed dbedit behaviour after append blank.
+    Bug reported by Robert Campsmith in the newsgroup.
+    Note: This dbedit is based in the last dbedit commit, with any changes:
+    Added parameter check validity, if any is wrong then show a message error.
+    The _douserfunc() was changed to handle dbedit if append blank occur.
+    This part of the code was borrowed from harbour dbedit code. Any vars
+    were renamed for better knowledge. The translates SetIfEmpty and SetIfNil
+    were replaced by DEFAULT TO command, to clean the code.
 
 2006-03-28 01:02 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbvm.h
