@@ -1,5 +1,5 @@
 /*
- * $Id: mousesln.c,v 1.9 2006/01/12 13:16:10 druzus Exp $
+ * $Id: mousesln.c,v 1.10 2006/03/25 02:22:45 druzus Exp $
  */
 
 /*
@@ -55,7 +55,6 @@
 #include "gtsln.h"
 #include <sys/time.h>
 #ifdef HAVE_GPM_H
-    #include <sys/types.h>
     #include <sys/stat.h>
     #include <fcntl.h>
     #include <gpm.h>

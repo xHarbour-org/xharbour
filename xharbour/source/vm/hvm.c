@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.552 2006/03/29 00:35:04 druzus Exp $
+ * $Id: hvm.c,v 1.553 2006/03/29 08:40:25 ronpinkas Exp $
  */
 
 /*
@@ -9891,7 +9891,7 @@ static BOOL hb_xvmActionRequest( void )
    if( s_uiActionRequest & ( HB_ENDPROC_REQUESTED | HB_BREAK_REQUESTED ) )
       return TRUE;
    else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-      hb_vmQuit();
+      exit( hb_vmQuit() );
 
    return FALSE;
 }
@@ -9962,7 +9962,7 @@ HB_EXPORT BOOL hb_xvmSeqEnd( void )
    else if( s_uiActionRequest & HB_BREAK_REQUESTED )
       s_uiActionRequest = 0;
    else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-      hb_vmQuit();
+      exit( hb_vmQuit() );
    return FALSE;
 }
 
@@ -9991,7 +9991,7 @@ HB_EXPORT BOOL hb_xvmSeqRecover( void )
    else if( s_uiActionRequest & HB_BREAK_REQUESTED )
       s_uiActionRequest = 0;
    else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-      hb_vmQuit();
+      exit( hb_vmQuit() );
    return FALSE;
 }
 
@@ -11488,7 +11488,7 @@ HB_EXPORT void hb_xvmLocalSetInt( USHORT usLocal, int iVal )
    }
 }
 
-HB_EXPORT void hb_xvmLocalSetStr( USHORT usLocal, const BYTE * pVal, ULONG ulLen )
+HB_EXPORT void hb_xvmLocalSetStr( USHORT usLocal, const char * pVal, ULONG ulLen )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -11765,7 +11765,7 @@ HB_EXPORT BOOL hb_xvmEndEnumerate( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize, const BYTE * pVal, ULONG ulBufferSize )
+HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
@@ -11779,7 +11779,7 @@ HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize,
       pLocal = hb_itemUnRef( pLocal );
    }
 
-   pBuffer = hb_vmUnhideString( bType, ulSize, pVal, ulBufferSize );
+   pBuffer = hb_vmUnhideString( bType, ulSize, ( const BYTE * ) pVal, ulBufferSize );
 
    if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
    {
@@ -11792,13 +11792,13 @@ HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize,
    }
 }
 
-HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const BYTE * pVal, ULONG ulBufferSize )
+HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pVal, ULONG ulBufferSize )
 {
    BYTE *pBuffer;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%lu,%p,%lu)", bType, ulLen, pVal, ulBufferSize));
 
-   pBuffer = hb_vmUnhideString( bType, ulSize, pVal, ulBufferSize );
+   pBuffer = hb_vmUnhideString( bType, ulSize, ( const BYTE * ) pVal, ulBufferSize );
 
    hb_vmPushString( ( char * ) pBuffer, ulSize - 1 );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: gtsln.h,v 1.11 2005/01/10 18:45:39 druzus Exp $
+ * $Id: gtsln.h,v 1.12 2005/12/11 12:37:50 druzus Exp $
  */
 
 /*
@@ -71,6 +71,9 @@
 #include <slang.h>
 
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/types.h>
+
 #include <signal.h>
 
 #ifndef HB_OS_DARWIN
