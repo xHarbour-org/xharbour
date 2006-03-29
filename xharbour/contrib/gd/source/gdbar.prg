@@ -61,17 +61,20 @@
 #define IMG_FORMAT_GIF   8
 #define IMG_QUALITY      95
 
+#define THICKNESS_I250   0
+#define THICKNESS_I251   0
 CLASS TBarCode  FROM GDImage
 
    // class attributes
-   DATA positionX AS NUMERIC
+   DATA positionX AS NUMERIC INIT  4
    DATA positionY AS NUMERIC
-   DATA maxHeight AS NUMERIC INIT 70
-   DATA maxHDefa  AS NUMERIC INIT 70
+   DATA maxHeight AS NUMERIC INIT 25
+   DATA maxHDefa  AS NUMERIC INIT 25
    DATA lastX     AS NUMERIC
    DATA lastY     AS NUMERIC
    DATA error     AS NUMERIC
-   DATA out_img   AS CHARACTER
+   DATA out_img   AS CHARACTER INIT "images_bar/"
+   DATA imWidth   AS NUMERIC
 
    // Barcode attributes
    DATA Parity
@@ -103,6 +106,7 @@ CLASS TBarCode  FROM GDImage
    METHOD Allocate()
    METHOD DrawError(ptext)
    METHOD DrawSingleBar(pcode )
+   METHOD DrawSingleI25( pcode )
    METHOD DrawText()
    METHOD nextX()
    METHOD Finish( image_style, quality )
@@ -122,6 +126,7 @@ METHOD CreateBar( sx, sy, filename, ccolor ) CLASS TBarCode
 
    ::error     := 0
    ::positionY := 0
+   ::imWidth   := sx
 
    ::filename  := filename
 
@@ -154,7 +159,7 @@ METHOD Configure( nmaxHeight, aFillColor, aBackColor, nres, ntextfont, lbook, lD
 
    DEFAULT lbook       TO .F.
    DEFAULT lDrawValue  TO .T.
-   DEFAULT nmaxHeight  TO 70
+   DEFAULT nmaxHeight  TO 25
    DEFAULT ntextfont   TO 2
    DEFAULT nres        TO 2
    DEFAULT aBackColor  TO {255,255,255}
@@ -202,7 +207,7 @@ METHOD DrawSingleBar( pcode ) CLASS TBarCode
 
        For i := 1  TO ::res
            ::Line( ::positionX + i  , ::positionY , ::positionX + i , (::positionY+::maxHeight) ,;
-                       If( SubStr(pcode,j,1) = "0", ::BackColor, ::FillColor  ) )
+                        If( SubStr(pcode,j,1) $ "0", ::BackColor, ::FillColor  ) )
        Next
 
       ::NextX()
@@ -210,6 +215,38 @@ METHOD DrawSingleBar( pcode ) CLASS TBarCode
     Next
 
 Return NIL
+
+METHOD DrawSingleI25( pcode ) CLASS TBarCode
+
+    LOCAL i      := 0
+    LOCAL j      := 0
+
+    LOCAL widthSlimBar  := 1
+    LOCAL widthFatBar   := 3
+
+    LOCAL imgBar
+    LOCAL imgWid
+    LOCAL end_y
+    LOCAL qw
+
+    ::positionX := 10
+
+    For j := 1 To Len( pcode )
+
+       imgBar := If( j % 2 == 0, ::FillColor, ::BackColor )
+       imgWid := If( SubStr(pcode,j,1) =="0" , widthSlimBar, widthFatBar )
+
+ 		 end_y := ::maxHeight
+
+		 For qw := 1 TO imgWid
+			::Line( ::positionX, 1, ::positionX, end_y, imgBar)
+			::nextX(.T.)
+		 Next
+
+    Next
+
+Return NIL
+
 
 METHOD DrawError(ptext) CLASS TBarCode
 
@@ -222,21 +259,37 @@ METHOD DrawError(ptext) CLASS TBarCode
 
 Return NIL
 
-METHOD nextX() CLASS TBarCode
+METHOD nextX(lI25) CLASS TBarCode
 
-   ::positionX += ::res
+    DEFAULT li25 TO .F.
+
+    If li25
+       ::positionX ++
+    Else
+       ::positionX += ::res
+    EndIf
 
 Return NIL
 
-METHOD DrawText() CLASS TBarCode
+METHOD DrawText(lIsI25) CLASS TBarCode
 
    LOCAL xPosition
    LOCAL text_color
 
-   If( ::textfont != 0 )
-		 xPosition  := ( ::positionX / 2) - ( Len( ::text ) /2 )*::GetFontWidth()
-	    ::say(  xPosition, ::maxHeight, ::text, ::FillColor )
-	  	 ::lastY    := ::maxHeight + ::GetFontHeight()
+   DEFAULT lIsI25 TO .F.
+
+   If lIsI25
+      If( ::textfont != 0 )
+          xPosition  := 10 * ::GetFontWidth()
+          ::say(  xPosition, ::maxHeight, "*" + ::text + "*" , ::FillColor )
+          ::lastY    := ::maxHeight + ::GetFontHeight()
+      EndIf
+   Else
+      If( ::textfont != 0 )
+          xPosition  := ( ::positionX / 2) - ( Len( ::text ) /2 ) * ::GetFontWidth()
+          ::say(  xPosition, ::maxHeight, ::text, ::FillColor )
+            ::lastY    := ::maxHeight + ::GetFontHeight()
+      EndIf
    EndIf
 
 Return .T.
@@ -248,7 +301,7 @@ METHOD CheckCode() CLASS TBarCode
 
    For i := 1 To Len( ::text )
        If( !IsInt( ::CheckValInArray( ::text[i] ) ) )
-           ::DrawError("Caracter "+::text[i]+" não permitido.")
+           ::DrawError("Character  "+::text[i]+" not allowed .")
            lRet := .F.
        EndIf
    Next
@@ -275,12 +328,13 @@ METHOD GetPathImageOut() CLASS TBarCode
 	Return ::out_img
 
 
-METHOD Finish( image_style, quality ) CLASS TBarCode
+METHOD Finish( image_style, quality, nFG  ) CLASS TBarCode
 
    LOCAL oImgResize
 
    DEFAULT image_style TO IMG_FORMAT_PNG
    DEFAULT quality     TO 95
+   DEFAULT nFG         TO {255,255,255}
 
    If Empty( ::filename ) .OR. ::filename = NIL
       ::filename := ::text
@@ -301,7 +355,7 @@ METHOD Finish( image_style, quality ) CLASS TBarCode
 
    ElseIf image_style == IMG_FORMAT_WBMP
 
-      ::SaveWBmp( ::out_img + ::filename+".bmp")
+      ::SaveWBmp(::out_img + ::filename+".bmp", nFG )
 
    ElseIf image_style == IMG_FORMAT_GIF
 

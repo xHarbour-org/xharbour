@@ -13,7 +13,9 @@ Function Main()
 
    local ccode13    := "789136043666"
    local ccode8     := "0421000"
-   local ccode128   := "34191750090000160123640000020004335850000000190"//"LAVERSON"
+   local ccode128   := "LAVERSON" //"LAVERSON"
+
+   local nlower := 1 , nhight := 50
 
    /* here is the list of arguments
    1- Barcode Type 13,8  and 128
@@ -28,7 +30,7 @@ Function Main()
    4 - Resolution
    5 - Text Font (0-5)
    */
-   bar:Configure( 70 , black, white, 2 , 2 )
+   bar:Configure( 70 , black, white, 2, 1 )
 
    /* Here is the list of the arguments
    1 - Width
@@ -41,25 +43,25 @@ Function Main()
    bar:Draw13(ccode13)
 
    // Build image
-   bar:Finish()
+   bar:Finish(2)
 
    // EAN8
    bar:= TCode():New(8)
 
-   bar:Configure( 70 , black, white, 2 , 2 )
+   bar:Configure( 70 , black, white, 2 , 1 )
 
    bar:CreateBar( 154, 100,,white)
 
    bar:Draw8(ccode8)
 
-   bar:Finish()
+   bar:Finish(8)
 
    bar:ResizeImage()
 
    // EAN128
    bar:= TCode():New(128)
 
-   bar:Configure( 50 , black, white, 1 , 1 )
+   bar:Configure( 50 , black, white, 2 , 1 )
 
    // output image
    bar:out_img := "image/"
@@ -73,6 +75,16 @@ Function Main()
    // C- Numeric pairs of integer
    bar:Draw128(cCode128,"B")
 
-   bar:Finish()
+   bar:Finish(8)
 
+   // BRAZIL-FEBRABAN
+   bar:= TCode():New(25)
+
+   bar:Configure( 25 , black, white, 1 , 1, , .T. )
+
+   // output image
+   bar:out_img := "febraban/"
+   bar:CreateBar( 560 ,60, "febraban", white )
+   bar:DrawI25("104995628545723070285700000008218000")
+   bar:Finish(8)
 RETURN NIL

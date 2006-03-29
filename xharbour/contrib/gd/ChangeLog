@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.20 2006/03/12 22:29:52 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.21 2006/03/20 23:39:29 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-28 14:06 UTC-0300 Laverson Espindola <laverson.espindola@newage-software.com.br>
+  * contrib/gd/source/gdbarcode.prg
+  * contrib/gd/source/gdbar.prg
+    + added method to create barcode of the type 2 of 5
+  * contrig/gd/samples/barcode/bartest.prg
+    + added sample to use barcode of the type 2 of 5
 
 2006-03-21 00:38 UTC+0100 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * contrib/gd/Rules.make

@@ -64,10 +64,8 @@
 
 CLASS TCode FROM TBarCode
 
-
-   METHOD New( nTypeCode,cpath_img ) CONSTRUCTOR
-
    // EAN-13 ISBN
+   METHOD New() CONSTRUCTOR
    METHOD draw13(cText)
    METHOD DrawText13()
 
@@ -77,8 +75,15 @@ CLASS TCode FROM TBarCode
 
    // EAN-128
    METHOD Draw128(cText,cModeCode)
-   //
+
+   // I25
+   METHOD DrawI25(cText)
+   METHOD GenCodei25()
+
+   // Utils
    METHOD FIndCharCode( cstring, cchar )
+   METHOD MixCode(bar_string)
+   METHOD Findcode( uval )
 
 ENDCLASS
 
@@ -97,7 +102,7 @@ METHOD New( nTypeCode,cpath_img ) CLASS TCode
       ::Parity        := {"OOEOEE",  "OOEEOE",  "OOEEEO",  "OEOOEE",  "OEEOOE",  "OEEEOO",  "OEOEOE",  "OEOEEO",  "OEEOEO","OOOOOO"  }
       ::keys          := {'1','2','3','4','5','6','7','8','9','0'}
 
-   Else  // 128
+   ElseIf nTypeCode == 128 // 128
 
       ::aCode :={     "212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",;
                       "221312","231212","112232","122132","122231","113222","123122","123221","223211","221132",;
@@ -120,6 +125,32 @@ METHOD New( nTypeCode,cpath_img ) CLASS TCode
       For ii := 1 TO 99
           ::KeysmodeC[ii] :=  StrZero(ii,2)
       Next
+
+   ElseIf nTypeCode == 25
+
+      ::keys          := {'1','2','3','4','5','6','7','8','9','0'}
+
+      ::aCode := Array(12)
+
+      ::aCode[1]  := "10001"          //1 digit
+      ::aCode[2]  := "01001"          //2 digit
+      ::aCode[3]  := "11000"          //3 digit
+      ::aCode[4]  := "00101"          //4 digit
+      ::aCode[5]  := "10100"          //5 digit
+      ::aCode[6]  := "01100"          //6 digit
+      ::aCode[7]  := "00011"          //7 digit
+      ::aCode[8]  := "10010"          //8 digit
+      ::aCode[9]  := "01010"          //9 digit
+      ::aCode[10] := "00110"          //0 digit
+      ::acode[11] := "10000"          //pre-amble
+      ::acode[12] := "100"            //post-amble
+
+   Else
+
+      Alert(" Invalid type to barcode !")
+
+      Return NIL
+
 
    EndIf
 
@@ -156,7 +187,7 @@ METHOD draw13(cText)  CLASS TCode
       EndIF
 
   	   //  contain only 12 characters ?
-      If ( Len( ::text) != 12 )
+      If Len( ::text ) != 12
 			::DrawError( "Must contains 12 chars, the 13th digit is automatically added.")
 			lerror = .t.
       EndIf
@@ -217,6 +248,10 @@ METHOD draw13(cText)  CLASS TCode
 
         If jj <> 0
            nChk = 10 - jj
+        EndIf
+
+        If nChk == 0
+           nChk := 10
         EndIf
 
         ::DrawSingleBar( ::Right_Hand[nChk] )
@@ -546,3 +581,105 @@ METHOD Draw128( cText, cModeCode ) CLASS TCode
    EndIf
 
 Return NIL
+
+METHOD DrawI25( cText ) CLASS TCode
+
+  ::settext( cText )
+
+  ::GenCodei25()
+
+Return NIL
+
+METHOD GenCodei25() CLASS TCode
+
+   LOCAL lError   := .F.
+   LOCAL bc_string := ::text
+   LOCAL new_string := ""
+   LOCAL lbc
+   LOCAL c
+   LOCAL xi,k,i,l,s
+
+   If ( Len(::text) % 2 )!= 0
+      ::DrawError("Invalid barcode lenght")
+      lError := .T.
+   Endif
+
+   If !lError
+
+      bc_string = upper( ::text )
+
+      // encode itemId to I25 barcode standard. //////////////////////////////////////
+
+      bc_string = ::MixCode( bc_string )
+
+      ///////////////////////////////////////////////////////////////////////////////////////////////
+      //Adding Start and Stop Pattern
+
+      ::DrawSingleI25( ::acode[11] + bc_string + ::acode[12]  )
+
+      ::lastY := ::maxHeight
+
+        // Draw Text
+       If ::lDrawValue
+          ::DrawText(.T.)
+       EndIf
+
+   EndIf
+
+Return NIL
+
+/*
+   It makes mixe of the value to be codified by the Bar code I25
+*/
+METHOD MixCode(value) CLASS TCode
+
+   LOCAL l,i,k ,t
+   LOCAL s
+   LOCAL echo
+   LOCAL bar_string := ""
+   LOCAL cfirst
+   LOCAL cnext
+
+   l := Len( value )
+
+   If ( l % 2 ) != 0
+      ::DrawError("Code cannot be intercalated:  Invalid length (mix)")
+   Else
+
+      i    := 1
+      s    := ""
+
+      While i < l
+
+        cFirst := ::Findcode( value[i] )
+        cnext  := ::Findcode( value[i+1] )
+
+        // Mix of the codes
+        // NNNNWNNWWW
+        //  N N N W W
+        For k := 1 TO 5
+            s += cFirst[k] + cnext[k]
+        Next
+
+        i += 2
+
+      EndDo
+
+      bar_string :=  s
+
+   EndIf
+
+Return bar_string
+
+METHOD Findcode( uval ) CLASS TCode
+
+   LOCAL npos
+   LOCAL cretc
+
+   npos  :=  AsCan( ::keys, { |x| x[1] == uval } )
+   cretc := ::acode[npos]
+
+Return cretc
+/*
+EOF
+*/
