@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.166 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: makefile.bc,v 1.167 2006/03/23 02:07:04 kaddath Exp $
 #
 
 #
@@ -1012,6 +1012,10 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
    $(OBJ_DIR)\calconst.obj \
+   $(OBJ_DIR)\gencc.obj \
+   $(OBJ_DIR)\hbpcstat.obj \
+   $(OBJ_DIR)\hbdbginf.obj \
+   $(OBJ_DIR)\hblbl.obj \
    $(PP_LIB) \
    $(OBJ_DIR)\hbslex.obj
 
@@ -1481,6 +1485,10 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\exproptc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfunchk.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\calconst.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gencc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbpcstat.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdbginf.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hblbl.obj >> make.tmp
    $(ECHO) $(COMMON_LIB) $(PP_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
@@ -1549,6 +1557,17 @@ $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
    $(CC_CMD)
 
 $(OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gencc.obj : $(COMPILER_DIR)\gencc.c
+   $(CC_CMD)
+$(OBJ_DIR)\hbpcstat.obj : $(COMPILER_DIR)\hbpcstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbdbginf.obj : $(COMPILER_DIR)\hbdbginf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hblbl.obj : $(COMPILER_DIR)\hblbl.c
    $(CC_CMD)
 
 #

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4900 2006/03/28 15:01:13 modalsist Exp $
+ * $Id: ChangeLog,v 1.4901 2006/03/29 00:33:17 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-28 19:41 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * makefile.bc
+    + Added new gencc.c, hbpcstat.c, hbdbginf.c and hblbl.c
 
 2006-03-29 01:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbcomp.h
@@ -173,13 +177,13 @@
 
   * source\rtl\tbrowse.prg
     * reverted my last change in RefreshCurrent() method to avoid error in
-      colorrect refresh. Bug reported by Dener N. da Rocha. 
+      colorrect refresh. Bug reported by Dener N. da Rocha.
 
   * source\rtl\transfrm.c
     ! fixed set date format to use with "@E" picture in date var.
       Bug reported by David A. M. Corona.
       See notes for diferent date format convertions between xHarbour and
-      Clipper for set date ANSI/JAPAN, at line 477 of transfrm.c file. 
+      Clipper for set date ANSI/JAPAN, at line 477 of transfrm.c file.
 
   * source\rtl\tget.prg
     + created static function InvertDwM() to invert day with month in date
@@ -188,7 +192,7 @@
   * source\rtl\tgetlist.prg
     * changed DateMsg() method to repos the cursor at home position of the get
       after display the message "Invalid date" at scoreboard. Note that the
-      previous value of the get is not restored as Clipper does. 
+      previous value of the get is not restored as Clipper does.
 
 2006-03-25 15:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.gc
