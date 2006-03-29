@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.118 2006/03/25 02:22:36 druzus Exp $
+ * $Id: genc.c,v 1.119 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -50,7 +50,7 @@ static void hb_compGenCCheckInLineStatic( char * str );
 static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption );
 static BOOL hb_compSymbFound( char* szSymbol );
 static void hb_compWriteGlobalFunc( FILE *yyc, short *iLocalGlobals, short * iGlobals, BOOL );
-static void hb_compWriteDeclareGlobal( FILE *yyc, BOOL );
+static void hb_compWriteDeclareGlobal( FILE *yyc );
 static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL, BOOL );
 /* struct to hold symbol names of c-in-line static functions */
 typedef struct _SSYMLIST
@@ -547,7 +547,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                        "#endif\n\n", hb_comp_FileAsSymbol );
       }
 
-      hb_compWriteDeclareGlobal( yyc, TRUE );
+      hb_compWriteDeclareGlobal( yyc );
 
       /* Generate functions data
        */
@@ -886,7 +886,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
    return ( bStartFunc );
 }
 
-static void hb_compWriteDeclareGlobal( FILE *yyc, BOOL bWriteVar )
+static void hb_compWriteDeclareGlobal( FILE *yyc )
 {
    if( hb_comp_pGlobals )
    {
@@ -904,24 +904,22 @@ static void hb_compWriteDeclareGlobal( FILE *yyc, BOOL bWriteVar )
          {
             fprintf( yyc, "extern HB_ITEM %s;\n", pGlobal->szName );
          }
+
          pGlobal = pGlobal->pNext;
       }
 
-      if( bWriteVar )
+      fprintf( yyc, "\nstatic const PHB_ITEM pConstantGlobals[] = {\n" );
+
+      pGlobal = hb_comp_pGlobals;
+
+      while( pGlobal )
       {
-         fprintf( yyc, "\nstatic const PHB_ITEM pConstantGlobals[] = {\n" );
-
-         pGlobal = hb_comp_pGlobals;
-
-         while( pGlobal )
-         {
-            fprintf( yyc, "                                             &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
-            pGlobal = pGlobal->pNext;
-         }
-
-         fprintf( yyc, "                                           };\n"
-                       "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n\n" );
+         fprintf( yyc, "                                             &%s%c\n", pGlobal->szName, pGlobal->pNext ? ',' : ' ' );
+         pGlobal = pGlobal->pNext;
       }
+
+      fprintf( yyc, "                                           };\n"
+                    "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n\n" );
    }
 }
 

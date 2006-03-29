@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4902 2006/03/29 03:42:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4903 2006/03/29 04:00:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-29 00:40 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbxvm.h
+  * source/vm/hvm.c
+    + Added missing
+      HB_EXPORT void   hb_xvmPushGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals );
+      HB_EXPORT void   hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals );
+      HB_EXPORT void   hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals );
+  * source/compiler/gencc.c
+    * Corrected generation for hb_p_(push|pop)global*
+
+  * source/compiler/genc.c
+    * Minor optimization
 
 2006-03-28 20:00 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * makefile.vc

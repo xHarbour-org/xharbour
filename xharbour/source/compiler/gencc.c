@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.2 2006/03/22 15:14:20 druzus Exp $
+ * $Id: gencc.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -428,7 +428,7 @@ static HB_GENC_FUNC( hb_p_line )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmSetLine( %d );\n", 
+   fprintf( cargo->yyc, "\thb_xvmSetLine( %d );\n",
             HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ) );
    return 3;
 }
@@ -551,7 +551,7 @@ static HB_GENC_FUNC( hb_p_message )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushSymbol( symbols + %hu );\n", 
+   fprintf( cargo->yyc, "\thb_xvmPushSymbol( symbols + %hu );\n",
             HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ) );
    return 3;
 }
@@ -1245,7 +1245,7 @@ static HB_GENC_FUNC( hb_p_lineoffset )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmLineOffset( %d );\n", 
+   fprintf( cargo->yyc, "\thb_xvmLineOffset( %d );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1254,7 +1254,7 @@ static HB_GENC_FUNC( hb_p_baseline )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmBaseLine( %d );\n", 
+   fprintf( cargo->yyc, "\thb_xvmBaseLine( %d );\n",
             HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ) );
    return 3;
 }
@@ -1329,7 +1329,7 @@ static HB_GENC_FUNC( hb_p_pushglobal )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushGlobal( %d );\n",
+   fprintf( cargo->yyc, "\thb_xvmPushGlobal( %d, &pGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1338,7 +1338,7 @@ static HB_GENC_FUNC( hb_p_pushglobalref )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushGlobalRef( %d );\n",
+   fprintf( cargo->yyc, "\thb_xvmPushGlobalByRef( %d, &pGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }
@@ -1347,7 +1347,7 @@ static HB_GENC_FUNC( hb_p_popglobal )
 {
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPopGlobal( %d );\n",
+   fprintf( cargo->yyc, "\thb_xvmPopGlobal( %d, &pGlobals );\n",
             pFunc->pCode[ lPCodePos + 1 ] );
    return 2;
 }

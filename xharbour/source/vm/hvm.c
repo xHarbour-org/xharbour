@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.551 2006/03/25 02:22:48 druzus Exp $
+ * $Id: hvm.c,v 1.552 2006/03/29 00:35:04 druzus Exp $
  */
 
 /*
@@ -10341,6 +10341,60 @@ HB_EXPORT void hb_xvmPopStatic( USHORT uiStatic )
    hb_vmPopStatic( uiStatic );
 }
 
+HB_EXPORT void hb_xvmPushGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushGlobal(%hu)", uiGlobal));
+
+   hb_vmPush( (*pGlobals)[ uiGlobal ] );
+}
+
+HB_EXPORT void hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals )
+{
+   HB_THREAD_STUB_STACK
+
+   PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushGlobalByRef(%hu)", uiGlobal));
+
+   pTop->type = HB_IT_BYREF;
+
+   pTop->item.asRefer.value = uiGlobal + 1; // To offset the -1 below.
+   pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
+   pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+
+   #ifdef HB_UNSHARE_REFERENCES
+     hb_itemUnShare( (*pGlobals)[ uiGlobal ] );
+   #endif
+
+   hb_stackPush();
+}
+
+HB_EXPORT void hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals )
+{
+   HB_THREAD_STUB_STACK
+
+   PHB_ITEM pTop = hb_stackItemFromTop( -1 );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPopGlobal(%hu)", uiGlobal));
+
+   if( ( HB_IS_NUMBER( (*pGlobals)[ uiGlobal ] ) && HB_IS_NUMBER( *( HB_VM_STACK.pPos - 1 ) ) ) ||
+       ( (*pGlobals)[ uiGlobal ] )->type == pTop->type )
+   {
+      hb_itemForwardValue( (*pGlobals)[ uiGlobal ], pTop );
+   }
+   else if( hb_objGetOpOver( (*pGlobals)[ uiGlobal ] ) & HB_CLASS_OP_ASSIGN )
+   {
+      hb_vmOperatorCall( (*pGlobals)[ uiGlobal ], pTop, "__OPASSIGN", NULL, 0, (*pGlobals)[ uiGlobal ] );
+      hb_itemClear( pTop );
+   }
+   else
+   {
+     hb_itemForwardValue( (*pGlobals)[ uiGlobal ], pTop );
+   }
+
+   hb_stackDec();
+}
+
 HB_EXPORT BOOL hb_xvmPushVariable( PHB_SYMB pSymbol )
 {
    HB_THREAD_STUB_STACK
@@ -11309,7 +11363,7 @@ HB_EXPORT BOOL hb_xvmMacroPushIndex( BYTE bFlags )
          hb_vmPush( aExtraItems + i );
          if( i < hb_vm_iExtraIndex - 1 )
             hb_vmArrayPush();
-         
+
       }
       hb_xfree( aExtraItems );
    }

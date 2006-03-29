@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.2 2006/03/22 15:14:20 druzus Exp $
+ * $Id: hbxvm.h,v 1.1 2006/03/29 00:34:18 druzus Exp $
  */
 
 /*
@@ -51,8 +51,8 @@
  */
 
 /* NOTE: The declaration of hb_gtSetPos(), hb_gtGetPos(), hb_gtWrite(),
-         hb_gtWriteAt(), hb_gtRepChar(), hb_gtBox(), hb_gtBoxS(), hb_gtBoxD() 
-         hb_gtInit() differs in parameter types from the original CA-Cl*pper 
+         hb_gtWriteAt(), hb_gtRepChar(), hb_gtBox(), hb_gtBoxS(), hb_gtBoxD()
+         hb_gtInit() differs in parameter types from the original CA-Cl*pper
          versions. [vszakats] */
 
 #ifndef HB_XVM_H_
@@ -94,6 +94,9 @@ extern HB_EXPORT BOOL   hb_xvmSend( USHORT uiParams );
 extern HB_EXPORT void   hb_xvmPushStatic( USHORT uiStatic );
 extern HB_EXPORT void   hb_xvmPushStaticByRef( USHORT uiStatic );
 extern HB_EXPORT void   hb_xvmPopStatic( USHORT uiStatic );
+extern HB_EXPORT void   hb_xvmPushGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals );
+extern HB_EXPORT void   hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlobals );
+extern HB_EXPORT void   hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals );
 extern HB_EXPORT BOOL   hb_xvmPushVariable( PHB_SYMB pSymbol );
 extern HB_EXPORT BOOL   hb_xvmPopVariable( PHB_SYMB pSymbol );
 extern HB_EXPORT void   hb_xvmPushBlock( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
