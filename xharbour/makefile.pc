@@ -1,6 +1,6 @@
-# $Id: makefile.pc,v 1.21 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: makefile.pc,v 1.22 2006/03/24 17:45:38 modalsist Exp $
 #
-# makefile for Pelles C compiler
+# Makefile for Pelles C compiler
 #
 
 !ifndef ECHO
@@ -289,7 +289,6 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgwa.obj \
    $(OBJ_DIR)\dbgbrwsr.obj
 
-
 HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\harbour.obj \
    $(OBJ_DIR)\harboury.obj \
@@ -310,10 +309,13 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptb.obj \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
-   $(PP_LIB) \
-   $(COMMON_LIB) \
    $(OBJ_DIR)\hbslex.obj \
-   $(OBJ_DIR)\calconst.obj
+   $(OBJ_DIR)\calconst.obj \
+   $(OBJ_DIR)\gencc.obj \
+   $(OBJ_DIR)\hbpcstat.obj \
+   $(OBJ_DIR)\hbdbginf.obj \
+   $(OBJ_DIR)\hblbl.obj \
+   $(PP_LIB)
 
 
 HBTEST_EXE_OBJS = \
@@ -988,9 +990,13 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\exproptc.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfunchk.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\calconst.obj  >> make.tmp
-   $(ECHO) $(PP_LIB)                       >> make.tmp
-   $(ECHO) $(COMMON_LIB)                   >> make.tmp
-   $(ECHO) $(POCC_LIBRARY)                 >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gencc.obj     >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbpcstat.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdbginf.obj  >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hblbl.obj     >> make.tmp
+   $(ECHO) $(PP_LIB)                >> make.tmp
+   $(ECHO) $(COMMON_LIB)            >> make.tmp
+   $(ECHO) $(POCC_LIBRARY)          >> make.tmp
    $(POLINK_EXE) /OUT:$(HARBOUR_EXE) $(LINKFLAGS) @make.tmp
    @IF EXIST make.tmp $(DEL) make.tmp > NUL
 
@@ -1021,10 +1027,22 @@ $(OBJ_DIR)\hbgenerr.obj : $(COMPILER_DIR)\hbgenerr.c
 $(OBJ_DIR)\hbpcode.obj : $(COMPILER_DIR)\hbpcode.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbpcstat.obj : $(COMPILER_DIR)\hbpcstat.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbdbginf.obj : $(COMPILER_DIR)\hbdbginf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hblbl.obj : $(COMPILER_DIR)\hblbl.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gencc.obj : $(COMPILER_DIR)\gencc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
