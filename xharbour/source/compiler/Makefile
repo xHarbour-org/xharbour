@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.4 2004/10/23 12:02:08 druzus Exp $
+# $Id: Makefile,v 1.5 2006/02/13 23:10:23 druzus Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -42,6 +42,7 @@ C_SOURCES=\
 	calconst.c \
 	cmdcheck.c \
 	genc.c \
+	gencc.c \
 	gencobj.c \
 	genhrb.c \
 	genjava.c \
@@ -51,9 +52,13 @@ C_SOURCES=\
 	hbpcode.c \
 	hbusage.c \
 	hbdead.c \
+	hblbl.c \
 	hbfix.c \
 	hbident.c \
 	hbstripl.c \
+	hbdbginf.c \
+	hbpcstat.c \
+	hbstrong.c \
 	expropta.c \
 	exproptb.c \
 	exproptc.c \

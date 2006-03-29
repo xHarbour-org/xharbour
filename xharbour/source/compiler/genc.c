@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.117 2006/03/21 23:03:04 likewolf Exp $
+ * $Id: genc.c,v 1.118 2006/03/25 02:22:36 druzus Exp $
  */
 
 /*
@@ -33,6 +33,8 @@
 #include "hbexemem.h"
 
 static int hb_comp_iBaseLine;
+
+extern void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc );
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc );
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc );
@@ -73,18 +75,6 @@ typedef struct HB_stru_genc_info
 typedef HB_GENC_FUNC( HB_GENC_FUNC_ );
 typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
-/*
- AJ: 2003-06-25
- Extended to generate pCode listing
- hb_comp_iGenVarList is first initialized in harbour.c as FALSE
- The value is TRUE when /gc3 is used
-*/
-
-/*
- hb_comp_pCodeList is the file handle on which pCode Listing will be written
-*/
-FILE *hb_comp_pCodeList = NULL;
-
 #define HB_PROTO_FUNC_STATIC  1
 #define HB_PROTO_FUNC_PUBLIC  2
 #define HB_PROTO_FUNC_INIT    3
@@ -93,7 +83,6 @@ FILE *hb_comp_pCodeList = NULL;
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
    char szFileName[ _POSIX_PATH_MAX ];
-   char szpCodeFileName[ _POSIX_PATH_MAX ] ;
    char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
@@ -134,8 +123,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       *pTmp = '/';
    }
 
-   hb_strupr( pFileName->szName );
-
    yyc = fopen( szFileName, "wb" );
 
    if( ! yyc )
@@ -145,18 +132,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    }
 
    /*
-    Create *.p when /gc3 is used
+    Create *.p when /gc4 is used
    */
-   if ( hb_comp_iGenVarList )
+   if( hb_comp_iGenVarList )
    {
-      pFileName->szExtension = ".p";
-      hb_fsFNameMerge( szpCodeFileName, pFileName );
-      hb_comp_pCodeList = fopen( szpCodeFileName,"wb" );
-
-      if( !hb_comp_pCodeList )
-      {
-         hb_comp_iGenVarList = FALSE;
-      }
+      hb_compPCodeStat( pFileName );
    }
 
    if( ! hb_comp_bQuiet )
@@ -217,7 +197,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    {
       fprintf( yyc, "#include \"hbvmpub.h\"\n" );
 
-      if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
+      if( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE )
+      {
+         fprintf( yyc, "#include \"hbxvm.h\"\n" );
+      }
+      else if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
       {
          fprintf( yyc, "#include \"hbpcode.h\"\n" );
       }
@@ -350,7 +334,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          }
 
          // Write init function for CRITICAL Functions Mutex initialization.
-         fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", pFileName->szName );
+         fprintf( yyc, "\nHB_CALL_ON_STARTUP_BEGIN( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
 
          pFunc = hb_comp_functions.pFirst;
          while( pFunc )
@@ -363,7 +347,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             pFunc = pFunc->pNext;
          }
 
-         fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", pFileName->szName );
+         fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
       }
 
       /* writes the symbol table */
@@ -576,12 +560,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       while( pFunc )
       {
-         // The pCode Table is Written Here
-         if ( hb_comp_iGenVarList )
-         {
-            fprintf( hb_comp_pCodeList, "[%s]\n", pFunc->szName );
-         }
-
          bIsStaticFunction = ( pFunc->cScope & HB_FS_STATIC ) ;
          bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
          bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
@@ -625,35 +603,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             fprintf( yyc, "HB_FUNC( %s )", pFunc->szName );
          }
 
-         fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
-
-         if( hb_comp_iGenCOutput == HB_COMPGENC_COMPACT )
+         fprintf( yyc, "\n" );
+         if( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE )
          {
-            hb_compGenCCompact( pFunc, yyc );
+            hb_compGenCRealCode( pFunc, yyc );
          }
          else
          {
-            hb_compGenCReadable( pFunc, yyc );
+            if( hb_comp_iGenCOutput == HB_COMPGENC_COMPACT )
+               hb_compGenCCompact( pFunc, yyc );
+            else
+               hb_compGenCReadable( pFunc, yyc );
          }
-
-         fprintf( yyc, "   };\n\n" );
-
-         // Finished Writting The pCode Table
-         // printf( "\n" );
-
-         if( pFunc->cScope & HB_FS_CRITICAL )
-         {
-            fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
-         }
-
-         fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
-
-         if( pFunc->cScope & HB_FS_CRITICAL )
-         {
-            fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
-         }
-
-         fprintf( yyc,  "}\n\n" );
+         fprintf( yyc, "\n" );
 
          pFunc = pFunc->pNext;
       }
@@ -818,14 +780,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          printf( "Done.\n" );
       }
-   }
-
-   /*
-    Close .p file
-   */
-   if ( hb_comp_iGenVarList )
-   {
-      fclose( hb_comp_pCodeList );
    }
 
    hb_xfree( hb_comp_PrgFileName );
@@ -2322,7 +2276,7 @@ static HB_GENC_FUNC( hb_p_pushdouble )
    if( cargo->bVerbose )
    {
       fprintf( cargo->yyc, "\t/* %.*f, %d, %d */",
-      *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) ] ) ),
+      *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ),
       HB_PCODE_MKDOUBLE( &( pFunc->pCode[ lPCodePos ] ) ),
       *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) ] ) ),
       *( ( BYTE * ) &( pFunc->pCode[ lPCodePos + sizeof( double ) + sizeof( BYTE ) ] ) ) );
@@ -3290,20 +3244,20 @@ static HB_GENC_FUNC( hb_p_popglobal )
    return 2;
 }
 
- static HB_GENC_FUNC( hb_p_pushglobalref )
- {
-    fprintf( cargo->yyc, "\tHB_P_PUSHGLOBALREF, %i,",
-             pFunc->pCode[ lPCodePos + 1 ] );
+static HB_GENC_FUNC( hb_p_pushglobalref )
+{
+   fprintf( cargo->yyc, "\tHB_P_PUSHGLOBALREF, %i,",
+            pFunc->pCode[ lPCodePos + 1 ] );
 
-    if( cargo->bVerbose )
-    {
-       fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
-    }
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %s */", hb_compVariableFind( hb_comp_pGlobals, (USHORT) pFunc->pCode[ lPCodePos + 1 ] + 1 )->szName );
+   }
 
-    fprintf( cargo->yyc, "\n" );
+   fprintf( cargo->yyc, "\n" );
 
-    return 2;
- }
+   return 2;
+}
 
 static HB_GENC_FUNC( hb_p_switchcase )
 {
@@ -3825,6 +3779,7 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_one,
    hb_p_macrolist,
    hb_p_macrolistend,
+
    hb_p_localnearaddint,
    hb_p_localnearsetint,
    hb_p_localnearsetstr,
@@ -3883,17 +3838,29 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    genc_info.bVerbose = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
    genc_info.yyc = yyc;
 
-   if( ! hb_comp_bQuiet && hb_comp_iGenVarList )
-   {
-      printf( "Generating pcode list for '%s'...\n", pFunc->szName );
-   }
+   fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info, hb_comp_iGenVarList );
-
+   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info );
    if( genc_info.bVerbose )
    {
       fprintf( yyc, "/* %05li */\n", pFunc->lPCodePos );
    }
+
+   fprintf( yyc, "   };\n\n" );
+
+   if( pFunc->cScope & HB_FS_CRITICAL )
+   {
+      fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+
+   if( pFunc->cScope & HB_FS_CRITICAL )
+   {
+      fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc,  "}\n" );
 }
 
 static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
@@ -3901,7 +3868,7 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
    ULONG lPCodePos = 0;
    int nChar;
 
-   fprintf( yyc, "\t" );
+   fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
 
    nChar = 0;
 
@@ -3929,4 +3896,20 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
    {
       fprintf( yyc, "\n" );
    }
+
+   fprintf( yyc, "   };\n\n" );
+
+   if( pFunc->cScope & HB_FS_CRITICAL )
+   {
+      fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+
+   if( pFunc->cScope & HB_FS_CRITICAL )
+   {
+      fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc,  "}\n" );
 }

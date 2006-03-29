@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.126 2006/03/26 16:01:46 paultucker Exp $
+ * $Id: harbour.c,v 1.127 2006/03/27 14:35:00 likewolf Exp $
  */
 
 /*
@@ -3161,18 +3161,15 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
          return;
       }
    }
-   if ( szFunc )
-   {
-      iFuncLen = strlen( szFunc );
-   }
-   iBufLen = 1 + iFileLen + ( szFunc ? 1 + iFuncLen : 0 ) + 1;
+   iFuncLen = szFunc ? strlen( szFunc ) + 1 : 0;
+   iBufLen = 1 + iFileLen + ( szFunc ? iFuncLen : 0 ) + 1;
    pBuffer = (BYTE *)hb_xgrab( iBufLen );
    pBuffer[ 0 ] = HB_P_MODULENAME;
    memcpy( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
    if ( szFunc )
    {
       pBuffer[ 1 + iFileLen ] = ':';
-      memcpy( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen + 1 );
+      memcpy( (BYTE *)( &( pBuffer[ 1 + iFileLen + 1 ] ) ), (BYTE *)szFunc, iFuncLen );
    }
    else
    {
@@ -3204,31 +3201,27 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          hb_comp_ulLastLinePos = hb_comp_functions.pLast->lPCodePos;
          hb_compGenPCode3( HB_P_BASELINE, HB_LOBYTE( iLine ), HB_HIBYTE( iLine ), ( BOOL ) 0 );
       }
-      else if( !bCodeblock && iOffset < 256 )
+      else if( !bCodeblock && iOffset >= 0 && iOffset < 256 )
       {
-         if( iOffset )
+         if( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) == 3 )
          {
-            if( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastLinePos ) == 3 )
+            if( hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos ] == HB_P_BASELINE )
             {
-               if( hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos ] == HB_P_BASELINE )
-               {
-                  hb_comp_iBaseLine = hb_comp_iLine;
-               }
-
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 1 ] = HB_LOBYTE( iLine );
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 2 ] = HB_HIBYTE( iLine );
+               hb_comp_iBaseLine = hb_comp_iLine;
             }
-            else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
-            {
-               //printf( "Offset: %i Line: %i\n", iOffset, iLine );
-               hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
-               hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
-            }
-            else
-            {
-               //printf( "Overwrite Offset: %i Line: %i\n", iOffset, iLine );
-               hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] = iOffset;
-            }
+            hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 1 ] = HB_LOBYTE( iLine );
+            hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos + 2 ] = HB_HIBYTE( iLine );
+         }
+         else if( ( ( hb_comp_functions.pLast->lPCodePos - hb_comp_ulLastOffsetPos ) > 2 ) || hb_comp_bDebugInfo )
+         {
+            //printf( "Offset: %i Line: %i\n", iOffset, iLine );
+            hb_comp_ulLastOffsetPos = hb_comp_functions.pLast->lPCodePos;
+            hb_compGenPCode2( HB_P_LINEOFFSET, (BYTE) iOffset, ( BOOL ) 0 );
+         }
+         else
+         {
+            //printf( "Overwrite Offset: %i Line: %i\n", iOffset, iLine );
+            hb_comp_functions.pLast->pCode[ hb_comp_ulLastOffsetPos + 1 ] = ( BYTE ) iOffset;
          }
       }
       else if( bCodeblock
@@ -5474,7 +5467,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       hb_pp_AddDefine( "__FILE__", szFileLiteral );
 
       /* Local Variable List (.var) File
-         hb_comp_iGenVarList is TRUE if /gc3 is used
+         hb_comp_iGenVarList is TRUE if /gcS is used
       */
       if ( hb_comp_iGenVarList )
       {
@@ -5676,6 +5669,40 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             if ( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
             {
+#if 1
+               PHB_DEBUGINFO pInfo = hb_compGetDebugInfo(), pNext;
+
+               if( pInfo )
+               {
+                  int iModules = 0;
+                  ULONG ulOffset, ulSize;
+
+                  hb_compLineNumberDefStart();
+                  do
+                  {
+                     ulOffset = pInfo->ulFirstLine >> 3;
+                     ulSize = ( pInfo->ulLastLine >> 3 ) - ulOffset + 2;
+
+                     hb_compGenPushString( pInfo->pszModuleName, strlen( pInfo->pszModuleName ) + 1 );
+                     hb_compGenPushLong( ulOffset << 3 );
+                     hb_compGenPushString( ( char * ) pInfo->pLineMap + ulOffset, ulSize );
+                     hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, FALSE );
+                     iModules++;
+                     
+                     pNext = pInfo->pNext;
+                     hb_xfree( pInfo->pszModuleName );
+                     hb_xfree( pInfo->pLineMap );
+                     hb_xfree( pInfo );
+                     pInfo = pNext;
+                  }
+                  while( pInfo );
+
+                  hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), FALSE );
+                  hb_compGenPCode1( HB_P_RETVALUE );
+                  hb_compLineNumberDefEnd();
+                  hb_compAddInitFunc( hb_comp_pLineNumberFunc );
+               }
+#else
                PLINEINFO pInfo;
                int iModules = 0;
                
@@ -5714,8 +5741,9 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_compGenPCode1( HB_P_RETVALUE );
                hb_compLineNumberDefEnd();
                hb_compAddInitFunc( hb_comp_pLineNumberFunc );
+#endif
             }
-            
+
             if( hb_comp_pGlobalsFunc )
             {
                PVAR pGlobal = hb_comp_pGlobals;

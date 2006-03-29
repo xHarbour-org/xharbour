@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4899 2006/03/28 14:43:47 modalsist Exp $
+ * $Id: ChangeLog,v 1.4900 2006/03/28 15:01:13 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,110 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-03-29 01:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbcomp.h
+  * xharbour/source/compiler/harbour.c
+  + xharbour/source/compiler/hbdbginf.c
+    * added hb_compGetDebugInfo() which generate line numer informations
+      for debugger from generated PCODE.
+      Phil I haven't removed your old code for collecting line number
+      information yet. Please do it yourself - I do not want to remove
+      unintentionally sth what may be important for you.
+    ! fixed generating line number information in HB_P_LINEOFFSET
+      - the line numbers does not need to be ascending - when code
+      is included from other files the offset can be negative or 0
+
+  * xharbour/include/hbcomp.h
+  * xharbour/source/compiler/hbpcstat.c
+    + added hb_compPCodeStat() function which generates PCODE statistics
+      (see below note about -gc3/-gc4 switches)
+
+  * harbour/source/compiler/Makefile
+  + harbour/source/compiler/hbstrong.c
+  * harbour/source/compiler/hbpcode.c
+    * moved strong typing code to separate file and cover it by
+      HB_COMP_STRONG_TYPES macro
+
+  * harbour/source/compiler/hbpcode.c
+    + added hb_compPCodeSize() function
+    + added support for automatic size checking of variable size PCODEs
+      in hb_compPCodeEval()
+    - removed PCODE statistic code
+
+  * harbour/source/compiler/hbdead.c
+  * harbour/source/compiler/hbfix.c
+  * harbour/source/compiler/hbstripl.c
+    * use hb_compPCodeSize() function
+    * removed not longer necessary functions for checking the real size
+      of variable size PCODEs
+
+  * xharbour/include/Makefile
+  * xharbour/include/hbcomp.h
+  + xharbour/include/hbxvm.h
+  * xharbour/source/compiler/Makefile
+  * xharbour/source/compiler/cmdcheck.c
+  * xharbour/source/compiler/genc.c
+  + xharbour/source/compiler/gencc.c
+  + xharbour/source/compiler/hblbl.c
+  * xharbour/source/vm/hvm.c
+    + added basic suppot for generating real .c code (-gc3 compiler switch)
+      This code is not fully functional yet. It does not support FINALLY
+      in TRY/CATCH - In general the whole TRY/CATCH has not been tested
+      at all. The BEGIN SEQUENCE [ / RECOVER ] / END is working so I hope
+      that simple TRY / CATCH works too.
+      Globals support has not been implemented yet two.
+      The old Andi -gc3 switch temporary changed to -gc4
+      Andi such statistics does not depend on -gc* output and can be used
+      with any outer output which uses PCODE. You only hacked -gc and
+      global function hb_compPCodeEval() to collect and generate PCODE
+      information. I removed all this code and created hb_compPCodeStat()
+      function in hbpcstat.c which make the same job and does not depend
+      on output type. I think that you should also add here the information
+      about used variables analyzing the final PCODE after optimizations
+      removing this code from compiler and generating one file with all
+      informations you will find and please think about other then -gcN
+      switch. Maybe -gs?
+      Here is a copy of ChangeLog note I put in Harbour. Because in
+      practice is also valid for xHarbour I copied it.
+      -----------
+      Now with  -gc3 Harbour will generate .c files with real .c code
+      which is later compiled to real machine code.
+      I left PCODE only for code block definitions though it's also
+      possible to have even code block compiled to machine code but
+      we will have to add a flag to codeblock structure which will
+      be checked at runtime and proper method of execution in EVAL
+      will be chosen. If you think it's worth of afford then I can
+      add it too in some spare time.
+      The final binaries are noticable longer then the one which has
+      only PCODE but they are faster. The speed improvement depends
+      on type of operations. The pure Clipper code which does not
+      execute any external time consuming C functions compiled with
+      -gc3 is from 10% to 50% faster.
+      The side effect of generating pure machine code is also harder
+      decompilation but it does not mean that is impossible. If sth
+      can be executed by some machines (virtual or hardware) then it
+      can always be decompiled by definition.
+      This modification opens door for farther optimization, f.e. when
+      we will have fully working strong type support then we can add
+      using native .c types.
+      In fact this module is PCODE to .c translater not part of compiler
+      and can be used as separate module to translate generated PCODE,
+      f.e. .hrb files.
+      Maybe in the future we will change the compiler to generate meta
+      code not directly PCODE and it will be possible to make optimizations
+      on this meta code which will depend on selected output type:
+      VHM PCODE, C code, .NET code, etc. but at this moment adding support
+      for .c compilation directly into compiler will make the compiler code
+      too much complicated for me - IMHO it's better to invest time into
+      clear separation to FRONT_END->REAL_COMPILER->BACK_END
+      Please make test with your code. I rebuild whole Harbour code with
+      -gc3 set in HB_FLAGS in harbour/config/rules.cf and all seems to
+      work correctly. hbtest returns exactly the same results.
+      I also made tests with my programs and they work correctly but
+      I had to define actions for all PCODEs and it's possible that made
+      some typos in some of them which are very seldom used so your tests
+      will be very important.
 
 2006-03-28 11:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\dbedit.prg

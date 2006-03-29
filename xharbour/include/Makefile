@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.25 2005/10/24 04:01:52 druzus Exp $
+# $Id: Makefile,v 1.26 2006/03/01 13:06:22 druzus Exp $
 #
 
 ROOT = ../
@@ -53,6 +53,7 @@ C_HEADERS=\
 	hbvm.h       \
 	hbvmopt.h    \
 	hbvmpub.h    \
+	hbxvm.h      \
 	hbxml.h      \
 	hb_io.h      \
 	hrbdll.h     \

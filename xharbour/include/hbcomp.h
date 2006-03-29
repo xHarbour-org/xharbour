@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.45 2006/03/21 23:02:48 likewolf Exp $
+ * $Id: hbcomp.h,v 1.46 2006/03/26 07:51:55 likewolf Exp $
  */
 
 /*
@@ -263,14 +263,41 @@ typedef struct _LINEINFO
    struct _LINEINFO *pNext;
 } LINEINFO, *PLINEINFO;       /* support structure for line number info */
 
+typedef struct _HB_DEBUGINFO
+{
+   char *   pszModuleName;
+   ULONG    ulFirstLine;
+   ULONG    ulLastLine;
+   ULONG    ulAllocated;
+   BYTE *   pLineMap;
+   struct _HB_DEBUGINFO * pNext;
+} HB_DEBUGINFO, * PHB_DEBUGINFO;
+
+typedef struct _HB_LABEL_INFO
+{
+   FILE   * yyc;
+   BOOL     fVerbose;
+   BOOL     fSetSeqBegin;
+   BOOL     fCondJump;
+   BOOL     fSequence;
+   BOOL     fEndProc;
+   ULONG *  pulLabels;
+} HB_LABEL_INFO, * PHB_LABEL_INFO;
+
 /* definitions for hb_compPCodeEval() support */
 typedef void * HB_VOID_PTR;
 #define HB_PCODE_FUNC( func, type ) ULONG func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
 typedef  HB_PCODE_FUNC( HB_PCODE_FUNC_, HB_VOID_PTR );
 typedef  HB_PCODE_FUNC_ * HB_PCODE_FUNC_PTR;
 
-extern void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void *, BOOL );
+extern LONG hb_compPCodeSize( PFUNCTION, ULONG );
+extern void hb_compPCodeEval( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
 extern void hb_compPCodeTrace( PFUNCTION, HB_PCODE_FUNC_PTR *, void * );
+
+extern void hb_compGenLabelTable( PFUNCTION pFunc, PHB_LABEL_INFO label_info );
+extern PHB_DEBUGINFO hb_compGetDebugInfo( void );
+
+extern void hb_compPCodeStat( PHB_FNAME pFileName );
 
 #define VS_NONE           0
 #define VS_LOCAL          1
@@ -412,6 +439,10 @@ extern void hb_compGenPCode3( BYTE, BYTE, BYTE, BOOL ); /* generates 3 bytes of 
 extern void hb_compGenPCode4( BYTE, BYTE, BYTE, BYTE, BOOL ); /* generates 4 bytes of pcode + flag for optional StrongType() */
 extern void hb_compGenPCodeN( BYTE * pBuffer, ULONG ulSize, BOOL );  /* copy bytes to a pcode buffer + flag for optional StrongType() */
 
+#if defined(HB_COMP_STRONG_TYPES)
+extern void hb_compStrongType( int iSize );
+#endif
+
 
 /* Codeblocks */
 extern void hb_compCodeBlockStart( void );        /* starts a codeblock creation */
@@ -549,9 +580,6 @@ extern BOOL           hb_comp_bBuildInfo;
 
 extern BOOL           hb_comp_iGenVarList;
 
-/* Andi Jahja */
-extern BOOL           hb_comp_bFileVersionInfo;
-
 /* Giancarlo Niccolai */
 extern BOOL           hb_comp_bI18n;
 extern char *         hb_comp_szHILout;
@@ -604,6 +632,7 @@ extern FILE           *hb_comp_errFile;
 #define HB_COMPGENC_COMPACT     0
 #define HB_COMPGENC_NORMAL      1
 #define HB_COMPGENC_VERBOSE     2
+#define HB_COMPGENC_REALCODE    3
 
 /* /ES command line setting types */
 #define HB_EXITLEVEL_DEFAULT    0

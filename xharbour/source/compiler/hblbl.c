@@ -1,11 +1,10 @@
 /*
- * $Id: hbstripl.c,v 1.1 2006/02/14 01:04:38 druzus Exp $
+ * $Id: hblbl.c,v 1.1 2006/03/21 01:25:32 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * Strip multiple HB_P_LINE PCODEs which can appear after dead code
- * and dummy jumps elimination
+ * generate table with jump labels
  *
  * Copyright 2006 Przemyslaw Czerpak < druzus /at/ priv.onet.pl >
  * www - http://www.harbour-project.org
@@ -54,51 +53,162 @@
 #include <assert.h>
 #include "hbcomp.h"
 
-typedef void HB_STRIP_INFO, * PHB_STRIP_INFO;
+#define HB_LABEL_FUNC( func ) HB_PCODE_FUNC( func, PHB_LABEL_INFO )
+typedef HB_LABEL_FUNC( HB_LABEL_FUNC_ );
+typedef HB_LABEL_FUNC_ * PHB_LABEL_FUNC;
 
-#define HB_STRIP_FUNC( func ) HB_PCODE_FUNC( func, PHB_STRIP_INFO )
-typedef HB_STRIP_FUNC( HB_STRIP_FUNC_ );
-typedef HB_STRIP_FUNC_ * PHB_STRIP_FUNC;
-
-static HB_STRIP_FUNC( hb_p_line )
+/*
+ * jump functions
+ */
+static HB_LABEL_FUNC( hb_p_jumpnear )
 {
-   HB_SYMBOL_UNUSED( cargo );
-   if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_LINE ||
-       pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
-   {
-      hb_compNOOPfill( pFunc, lPCodePos, 3, FALSE, FALSE );
-   }
+   ULONG ulNewPos = lPCodePos + ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
 
-   return 3;
-}
-
-static HB_STRIP_FUNC( hb_p_baseline )
-{
-   HB_SYMBOL_UNUSED( cargo );
-   if( pFunc->pCode[ lPCodePos + 3 ] == HB_P_BASELINE )
-   {
-      hb_compNOOPfill( pFunc, lPCodePos, 3, FALSE, FALSE );
-   }
-
-   return 3;
-}
-
-static HB_STRIP_FUNC( hb_p_lineoffset )
-{
-   HB_SYMBOL_UNUSED( cargo );
-   if( pFunc->pCode[ lPCodePos + 2 ] == HB_P_BASELINE ||
-       pFunc->pCode[ lPCodePos + 2 ] == HB_P_LINEOFFSET )
-   {
-      hb_compNOOPfill( pFunc, lPCodePos, 2, FALSE, FALSE );
-   }
-
+   cargo->pulLabels[ ulNewPos ]++;
    return 2;
+}
+
+static HB_LABEL_FUNC( hb_p_jump )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKSHORT( pAddr );
+
+   cargo->pulLabels[ ulNewPos ]++;
+   return 3;
+}
+
+static HB_LABEL_FUNC( hb_p_jumpfar )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   cargo->pulLabels[ ulNewPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_jumpfalsenear )
+{
+   ULONG ulNewPos = lPCodePos + ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 2;
+}
+
+static HB_LABEL_FUNC( hb_p_jumpfalse )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKSHORT( pAddr );
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 3;
+}
+
+static HB_LABEL_FUNC( hb_p_jumpfalsefar )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_jumptruenear )
+{
+   ULONG ulNewPos = lPCodePos + ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 2;
+}
+
+static HB_LABEL_FUNC( hb_p_jumptrue )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKSHORT( pAddr );
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 3;
+}
+
+static HB_LABEL_FUNC( hb_p_jumptruefar )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulNewPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   cargo->fCondJump = TRUE;
+   cargo->pulLabels[ ulNewPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_seqbegin )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulRecoverPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   cargo->fSequence = TRUE;
+   if( cargo->fSetSeqBegin )
+      cargo->pulLabels[ ulRecoverPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_seqend )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   LONG lOffset = HB_PCODE_MKINT24( pAddr );
+   ULONG ulNewPos = lPCodePos + lOffset;
+
+   if( cargo->fSetSeqBegin || lOffset != 4 )
+      cargo->pulLabels[ ulNewPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_trybegin )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   ULONG ulRecoverPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   cargo->fSequence = TRUE;
+   if( cargo->fSetSeqBegin )
+      cargo->pulLabels[ ulRecoverPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_tryend )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   LONG lOffset = HB_PCODE_MKINT24( pAddr );
+   ULONG ulNewPos = lPCodePos + lOffset;
+
+   if( cargo->fSetSeqBegin || lOffset != 4 )
+      cargo->pulLabels[ ulNewPos ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_tryrecover )
+{
+   BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
+   LONG lFinally = HB_PCODE_MKINT24( pAddr );
+
+   if( lFinally )
+      cargo->pulLabels[ lPCodePos + lFinally ]++;
+   return 4;
+}
+
+static HB_LABEL_FUNC( hb_p_endproc )
+{
+   if( lPCodePos < pFunc->lPCodePos - 1 )
+      cargo->fEndProc = TRUE;
+   return 1;
 }
 
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
-static PHB_STRIP_FUNC s_stripLines_table[] =
+static PHB_LABEL_FUNC s_GenLabelFuncTable[ HB_P_LAST_PCODE ] =
 {
    NULL,                       /* HB_P_AND,                  */
    NULL,                       /* HB_P_ARRAYPUSH,            */
@@ -107,7 +217,7 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_ARRAYGEN,             */
    NULL,                       /* HB_P_EQUAL,                */
    NULL,                       /* HB_P_ENDBLOCK,             */
-   NULL,                       /* HB_P_ENDPROC,              */
+   hb_p_endproc,               /* HB_P_ENDPROC,              */
    NULL,                       /* HB_P_EXACTLYEQUAL,         */
    NULL,                       /* HB_P_FALSE,                */
    NULL,                       /* HB_P_FORTEST,              */
@@ -125,18 +235,18 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_DUPLTWO,              */
    NULL,                       /* HB_P_INC,                  */
    NULL,                       /* HB_P_INSTRING,             */
-   NULL,                       /* HB_P_JUMPNEAR,             */
-   NULL,                       /* HB_P_JUMP,                 */
-   NULL,                       /* HB_P_JUMPFAR,              */
-   NULL,                       /* HB_P_JUMPFALSENEAR,        */
-   NULL,                       /* HB_P_JUMPFALSE,            */
-   NULL,                       /* HB_P_JUMPFALSEFAR,         */
-   NULL,                       /* HB_P_JUMPTRUENEAR,         */
-   NULL,                       /* HB_P_JUMPTRUE,             */
-   NULL,                       /* HB_P_JUMPTRUEFAR,          */
+   hb_p_jumpnear,              /* HB_P_JUMPNEAR,             */
+   hb_p_jump,                  /* HB_P_JUMP,                 */
+   hb_p_jumpfar,               /* HB_P_JUMPFAR,              */
+   hb_p_jumpfalsenear,         /* HB_P_JUMPFALSENEAR,        */
+   hb_p_jumpfalse,             /* HB_P_JUMPFALSE,            */
+   hb_p_jumpfalsefar,          /* HB_P_JUMPFALSEFAR,         */
+   hb_p_jumptruenear,          /* HB_P_JUMPTRUENEAR,         */
+   hb_p_jumptrue,              /* HB_P_JUMPTRUE,             */
+   hb_p_jumptruefar,           /* HB_P_JUMPTRUEFAR,          */
    NULL,                       /* HB_P_LESSEQUAL,            */
    NULL,                       /* HB_P_LESS,                 */
-   hb_p_line,                  /* HB_P_LINE,                 */
+   NULL,                       /* HB_P_LINE,                 */
    NULL,                       /* HB_P_LOCALNAME,            */
    NULL,                       /* HB_P_MACROPOP,             */
    NULL,                       /* HB_P_MACROPOPALIASED,      */
@@ -215,8 +325,8 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_RETVALUE,             */
    NULL,                       /* HB_P_SEND,                 */
    NULL,                       /* HB_P_SENDSHORT,            */
-   NULL,                       /* HB_P_SEQBEGIN,             */
-   NULL,                       /* HB_P_SEQEND,               */
+   hb_p_seqbegin,              /* HB_P_SEQBEGIN,             */
+   hb_p_seqend,                /* HB_P_SEQEND,               */
    NULL,                       /* HB_P_SEQRECOVER,           */
    NULL,                       /* HB_P_SFRAME,               */
    NULL,                       /* HB_P_STATICS,              */
@@ -235,8 +345,8 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_RIGHT,                */
    NULL,                       /* HB_P_SUBSTR,               */
    NULL,                       /* HB_P_MPUSHSTR,             */
-   hb_p_baseline,              /* HB_P_BASELINE,             */
-   hb_p_lineoffset,            /* HB_P_LINEOFFSET,           */
+   NULL,                       /* HB_P_BASELINE,             */
+   NULL,                       /* HB_P_LINEOFFSET,           */
    NULL,                       /* HB_P_WITHOBJECT,           */
    NULL,                       /* HB_P_SENDWITH,             */
    NULL,                       /* HB_P_SENDWITHSHORT,        */
@@ -264,9 +374,9 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_PUSHLONGLONG,         */
    NULL,                       /* HB_P_PUSHSTRHIDDEN,        */
    NULL,                       /* HB_P_LOCALNEARSETSTRHIDDEN,*/
-   NULL,                       /* HB_P_TRYBEGIN,             */
-   NULL,                       /* HB_P_TRYEND,               */
-   NULL,                       /* HB_P_TRYRECOVER,           */
+   hb_p_trybegin,              /* HB_P_TRYBEGIN,             */
+   hb_p_tryend,                /* HB_P_TRYEND,               */
+   hb_p_tryrecover,            /* HB_P_TRYRECOVER,           */
    NULL,                       /* HB_P_FINALLY,              */
    NULL,                       /* HB_P_ENDFINALLY,           */
    NULL,                       /* HB_P_LOCALNEARADD          */
@@ -274,9 +384,19 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL                        /* HB_P_ARRAYPOPPLUS          */
 };
 
-void hb_compStripFuncLines( PFUNCTION pFunc )
+void hb_compGenLabelTable( PFUNCTION pFunc, PHB_LABEL_INFO label_info )
 {
-   assert( HB_P_LAST_PCODE == sizeof( s_stripLines_table ) / sizeof( PHB_STRIP_FUNC ) );
+   ULONG ulLabel = 0, ul;
 
-   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_stripLines_table, NULL );
+   assert( HB_P_LAST_PCODE == sizeof( s_GenLabelFuncTable ) / sizeof( PHB_LABEL_FUNC ) );
+
+   hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_GenLabelFuncTable, ( void * ) label_info );
+
+   for( ul = 0; ul < pFunc->lPCodePos; ++ul )
+   {
+      if( label_info->pulLabels[ ul ] )
+      {
+         label_info->pulLabels[ ul ] = ++ulLabel;
+      }
+   }
 }

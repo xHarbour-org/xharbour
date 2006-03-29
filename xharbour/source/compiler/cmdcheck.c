@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.26 2006/02/13 23:10:23 druzus Exp $
+ * $Id: cmdcheck.c,v 1.27 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -611,25 +611,31 @@ void hb_compChkEnvironVar( char * szSwitch )
                    case 'C':
                       hb_comp_iLanguage = LANG_C;
 
+                      if( strchr( s + 2, 's' ) || strchr( s + 2, 'S' ) )
+                      {
+                         hb_comp_iGenVarList = TRUE;
+                      }
+
                       switch( *( s + 2 ) )
                       {
-                         case '\0':
-                           // Intentionally fall through to '2'.
-
-                         case '2':
-                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+                         case '0':
+                            hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
                             break;
 
                          case '1':
                             hb_comp_iGenCOutput = HB_COMPGENC_NORMAL;
                             break;
 
-                         case '0':
-                            hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
+                         case '2':
+                         case '\0': /* default */
+                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
                             break;
 
                          case '3':
-                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+                            hb_comp_iGenCOutput = HB_COMPGENC_REALCODE;
+                            break;
+
+                         case '4':
                             hb_comp_iGenVarList = TRUE;
                             break;
 
