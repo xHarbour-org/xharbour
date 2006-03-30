@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.554 2006/03/29 11:55:28 druzus Exp $
+ * $Id: hvm.c,v 1.555 2006/03/30 00:08:12 ronpinkas Exp $
  */
 
 /*
@@ -2701,7 +2701,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
                BYTE *pBuffer;
 
-               pBuffer = hb_vmUnhideString( pCode[ w + 3 ], ulSize, pCode + w + 6, ulBufferLen );
+               pBuffer = hb_vmUnhideString( pCode[ w + 4 ], ulSize, pCode + w + 7, ulBufferLen );
 
                if( HB_IS_BYREF( pLocal ) )
                {
@@ -9903,7 +9903,7 @@ static BOOL hb_xvmActionRequest( void )
    {
       exit( hb_vmQuit() );
    }
-   
+
    return FALSE;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.2 2006/03/29 08:40:25 ronpinkas Exp $
+ * $Id: gencc.c,v 1.3 2006/03/30 00:08:12 ronpinkas Exp $
  */
 
 /*
@@ -1482,7 +1482,7 @@ static HB_GENC_FUNC( hb_p_pushstrhidden )
    HB_GENC_LABEL();
 
    fprintf( cargo->yyc, "\thb_xvmPushStringHidden( %d, %hu, ", bType, usLen );
-   hb_gencc_string_put( cargo->yyc, &pFunc->pCode[ lPCodePos + 3 ], usBufferLen );
+   hb_gencc_string_put( cargo->yyc, &pFunc->pCode[ lPCodePos + 6 ], usBufferLen );
    fprintf( cargo->yyc, ", %hu );\n", usBufferLen );
 
    return 6 + usBufferLen;
@@ -1499,7 +1499,7 @@ static HB_GENC_FUNC( hb_p_localnearsetstrhidden )
 
    fprintf( cargo->yyc, "\thb_xvmLocalSetStringHidden( %d, %d, %hu, ",
             bLocal, bType, usLen );
-   hb_gencc_string_put( cargo->yyc, &pFunc->pCode[ lPCodePos + 3 ], usBufferLen );
+   hb_gencc_string_put( cargo->yyc, &pFunc->pCode[ lPCodePos + 7 ], usBufferLen );
    fprintf( cargo->yyc, ", %hu );\n", usBufferLen );
 
    return 7 + usBufferLen;
