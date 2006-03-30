@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.46 2006/03/26 07:51:55 likewolf Exp $
+ * $Id: hbcomp.h,v 1.47 2006/03/29 00:34:18 druzus Exp $
  */
 
 /*
@@ -273,15 +273,22 @@ typedef struct _HB_DEBUGINFO
    struct _HB_DEBUGINFO * pNext;
 } HB_DEBUGINFO, * PHB_DEBUGINFO;
 
+typedef struct _HB_COMP_FINALLY
+{
+   LONG                    lFinally;
+   struct _HB_COMP_FINALLY *pPrev;
+} HB_COMP_FINALLY, * PHB_COMP_FINALLY;
+
 typedef struct _HB_LABEL_INFO
 {
-   FILE   * yyc;
-   BOOL     fVerbose;
-   BOOL     fSetSeqBegin;
-   BOOL     fCondJump;
-   BOOL     fSequence;
-   BOOL     fEndProc;
-   ULONG *  pulLabels;
+   FILE             * yyc;
+   BOOL             fVerbose;
+   BOOL             fSetSeqBegin;
+   BOOL             fCondJump;
+   BOOL             fSequence;
+   BOOL             fEndProc;
+   PHB_COMP_FINALLY pFinally;
+   ULONG            * pulLabels;
 } HB_LABEL_INFO, * PHB_LABEL_INFO;
 
 /* definitions for hb_compPCodeEval() support */

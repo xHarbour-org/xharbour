@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.119 2006/03/29 00:34:40 druzus Exp $
+ * $Id: genc.c,v 1.120 2006/03/29 08:40:25 ronpinkas Exp $
  */
 
 /*
@@ -3580,7 +3580,6 @@ static HB_GENC_FUNC( hb_p_finally )
    HB_SYMBOL_UNUSED( pFunc );
    HB_SYMBOL_UNUSED( lPCodePos );
 
-   --cargo->iNestedCodeblock;
    fprintf( cargo->yyc, "\tHB_P_FINALLY,\n" );
    return 1;
 }
@@ -3590,7 +3589,6 @@ static HB_GENC_FUNC( hb_p_endfinally )
    HB_SYMBOL_UNUSED( pFunc );
    HB_SYMBOL_UNUSED( lPCodePos );
 
-   --cargo->iNestedCodeblock;
    fprintf( cargo->yyc, "\tHB_P_ENDFINALLY,\n" );
    return 1;
 }

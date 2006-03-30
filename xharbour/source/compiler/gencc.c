@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
+ * $Id: gencc.c,v 1.2 2006/03/29 08:40:25 ronpinkas Exp $
  */
 
 /*
@@ -46,6 +46,7 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 #define HB_GENC_ERROR(s)       do { \
                                  fprintf( cargo->yyc, "\t#error: \"" s "\"\n" ); \
                               } while( 0 )
+
 
 static void hb_gencc_string_put( FILE * yyc, BYTE * pText, USHORT usLen )
 {
@@ -207,12 +208,25 @@ static HB_GENC_FUNC( hb_p_endproc )
    HB_GENC_LABEL();
 
    fprintf( cargo->yyc, "\t/* *** END PROC *** */\n" );
+
    if( lPCodePos < pFunc->lPCodePos - 1 )
    {
       if( cargo->fEndProc && cargo->fSequence )
-         fprintf( cargo->yyc, "\tgoto labEND;\n" );
+      {
+         if( cargo->pFinally )
+         {
+            fprintf( cargo->yyc, "\thb_vmRequest( HB_ENDPROC_REQUESTED );\n" );
+            fprintf( cargo->yyc, "\tgoto lab%05ld;\n", HB_GENC_GETLABEL( cargo->pFinally->lFinally ) );
+         }
+         else
+         {
+            fprintf( cargo->yyc, "\tgoto labEND;\n" );
+         }
+      }
       else
+      {
          fprintf( cargo->yyc, "\tbreak;\n" );
+      }
    }
    return 1;
 }
@@ -1574,6 +1588,18 @@ static HB_GENC_FUNC( hb_p_tryrecover )
 
    fprintf( cargo->yyc, "\thb_xvmTryRecover( %ld );\n",
             HB_PCODE_MKINT24( &pFunc->pCode[ lPCodePos + 1 ] ) );
+
+   if( HB_PCODE_MKINT24( &pFunc->pCode[ lPCodePos + 1 ] ) )
+   {
+      PHB_COMP_FINALLY pFinally = (PHB_COMP_FINALLY) hb_xgrab( sizeof( HB_COMP_FINALLY ) );
+
+      pFinally->lFinally = lPCodePos + HB_PCODE_MKINT24( &pFunc->pCode[ lPCodePos + 1 ] );
+      pFinally->pPrev = cargo->pFinally;
+
+      cargo->pFinally = pFinally;
+      fprintf( cargo->yyc, "\tdo {\n" );
+   }
+
    return 4;
 }
 
@@ -1581,8 +1607,18 @@ static HB_GENC_FUNC( hb_p_finally )
 {
    HB_GENC_LABEL();
 
-   /* --cargo->iNestedCodeblock; ??? */
-   fprintf( cargo->yyc, "\thb_xvmFinaly();\n" );
+   if( cargo->pFinally )
+   {
+      PHB_COMP_FINALLY pFree = cargo->pFinally;
+
+      cargo->pFinally = pFree->pPrev;
+
+      hb_xfree( pFree );
+   }
+
+   fprintf( cargo->yyc, "\t} while(0);\n" );
+
+   //fprintf( cargo->yyc, "\thb_xvmFinally();\n" );
    return 1;
 }
 
@@ -1590,8 +1626,8 @@ static HB_GENC_FUNC( hb_p_endfinally )
 {
    HB_GENC_LABEL();
 
-   /* --cargo->iNestedCodeblock; ??? */
-   fprintf( cargo->yyc, "\thb_xvmEndFinaly();\n" );
+   fprintf( cargo->yyc, "\tif( hb_xvmEndFinally() ) break;\n" );
+
    return 1;
 }
 
@@ -1785,8 +1821,12 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
    label_info.fVerbose = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
    label_info.fSetSeqBegin = FALSE;
    label_info.fCondJump = label_info.fSequence = label_info.fEndProc = FALSE;
+   label_info.pFinally = NULL;
+
    if( pFunc->lPCodePos == 0 )
+   {
       label_info.pulLabels = NULL;
+   }
    else
    {
       label_info.pulLabels = ( ULONG * ) hb_xgrab( pFunc->lPCodePos * sizeof( ULONG ) );
@@ -1796,23 +1836,44 @@ void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "{\n" );
    fprintf( yyc, "   ULONG ulPrivateBase = hb_memvarGetPrivatesBase();\n" );
+   fprintf( yyc, "   extern PHB_FINALLY  hb_vm_pFinally;\n" );
+   fprintf( yyc, "   PHB_FINALLY pOuterFinally = hb_vm_pFinally;\n" );
+
    if( label_info.fCondJump )
+   {
       fprintf( yyc, "   BOOL fValue;\n\n" );
+   }
+
    if( pFunc->cScope & HB_FS_CRITICAL )
+   {
       fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc, "   hb_vm_pFinally = NULL;\n" );
+
    fprintf( yyc, "   do {\n" );
 
    hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &label_info );
 
    fprintf( yyc, "   } while ( 0 );\n" );
-   if( label_info.fEndProc && label_info.fSequence )
-      fprintf( yyc, "labEND:\n" );
-   if( pFunc->cScope & HB_FS_CRITICAL )
-      fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
 
+
+   if( label_info.fEndProc && label_info.fSequence )
+   {
+      fprintf( yyc, "labEND:\n" );
+   }
+
+   if( pFunc->cScope & HB_FS_CRITICAL )
+   {
+      fprintf( yyc, "   HB_CRITICAL_UNLOCK( s_Critical%s );\n", pFunc->szName );
+   }
+
+   fprintf( yyc, "   hb_vm_pFinally = pOuterFinally;\n" );
    fprintf( yyc, "   hb_xvmExitPorc( ulPrivateBase );\n" );
    fprintf( yyc, "}\n" );
 
    if( label_info.pulLabels )
+   {
       hb_xfree( label_info.pulLabels );
+   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.553 2006/03/29 08:40:25 ronpinkas Exp $
+ * $Id: hvm.c,v 1.554 2006/03/29 11:55:28 druzus Exp $
  */
 
 /*
@@ -9889,10 +9889,21 @@ static BOOL hb_xvmActionRequest( void )
    HB_THREAD_STUB_STACK
 
    if( s_uiActionRequest & ( HB_ENDPROC_REQUESTED | HB_BREAK_REQUESTED ) )
-      return TRUE;
-   else if( s_uiActionRequest & HB_QUIT_REQUESTED )
-      exit( hb_vmQuit() );
+   {
+      if( hb_vm_pFinally && hb_vm_pFinally->lFinally )
+      {
+         hb_vm_pFinally->bDeferred = TRUE;
+         hb_vm_pFinally->uiActionRequest = s_uiActionRequest;
+         s_uiActionRequest = 0;
+      }
 
+      return TRUE;
+   }
+   else if( s_uiActionRequest & HB_QUIT_REQUESTED )
+   {
+      exit( hb_vmQuit() );
+   }
+   
    return FALSE;
 }
 
@@ -10018,7 +10029,7 @@ HB_EXPORT BOOL hb_xvmTryEnd( void )
    return hb_xvmSeqEnd();
 }
 
-HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinaly )
+HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinally )
 {
    HB_THREAD_STUB_STACK
 
@@ -10028,18 +10039,37 @@ HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinaly )
    hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
    hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
-   if( lFinaly )
+   if( lFinally )
    {
-      /* TODO: this code has to be fixed - it will not work */
       PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
 
-      pFinally->lFinally = lFinaly;
+      pFinally->lFinally = lFinally;
       pFinally->bDeferred = FALSE;
       pFinally->pPrev = hb_vm_pFinally;
       hb_vm_pFinally = pFinally;
    }
 
    return hb_xvmSeqRecover();
+}
+
+HB_EXPORT BOOL hb_xvmEndFinally( void )
+{
+   HB_THREAD_STUB_STACK
+
+   if( hb_vm_pFinally )
+   {
+      PHB_FINALLY pFree = hb_vm_pFinally;
+
+      if( hb_vm_pFinally->bDeferred )
+      {
+         s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+      }
+
+      hb_vm_pFinally = hb_vm_pFinally->pPrev;
+      hb_xfree( (void *) pFree );
+
+      return hb_xvmActionRequest();
+   }
 }
 
 HB_EXPORT void hb_xvmSetLine( USHORT uiLine )

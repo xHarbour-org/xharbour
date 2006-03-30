@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.2 2006/03/29 08:40:24 ronpinkas Exp $
+ * $Id: hbxvm.h,v 1.3 2006/03/29 11:55:28 druzus Exp $
  */
 
 /*
@@ -223,6 +223,7 @@ extern HB_EXPORT void   hb_xvmEnumIndex( void );
 extern HB_EXPORT void   hb_xvmTryBegin( void );
 extern HB_EXPORT BOOL   hb_xvmTryEnd( void );
 extern HB_EXPORT BOOL   hb_xvmTryRecover( LONG lFinaly );
+extern HB_EXPORT BOOL   hb_xvmEndFinally( void );
 
 /* TODO: */
 #if 0
