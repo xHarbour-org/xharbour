@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.ch,v 1.3 2001/04/27 19:03:46 dholm Exp $
+ * $Id: dbedit.ch,v 1.1.1.1 2001/12/21 10:47:13 ronpinkas Exp $
  */
 
 /*
@@ -53,7 +53,9 @@
 #ifndef _DBEDIT_CH
 #define _DBEDIT_CH
 
-/* User function entry modes */
+
+/* Status return code */
+#define DE_INIT        -1       /* Initialization. (xHarbour extension)    */
 #define DE_IDLE         0       /* Idle                                    */
 #define DE_HITTOP       1       /* Attempt to cursor past top of file      */
 #define DE_HITBOTTOM    2       /* Attempt to cursor past bottom of file   */

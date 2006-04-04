@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4907 2006/03/30 00:07:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4908 2006/03/30 06:02:36 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-04 20:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * include\dbedit.ch
+    + added #define DE_INIT for Dbedit initialization. xHarbour extension.
+  * source\rtl\dbedit.prg
+    * fixed _douserfunc() to return DE_ABORT if eval() return zero.
+  * tests\dbedit.prg
+    * minor fix.
 
 2006-03-29 23:56 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/compiler/gencc.c
