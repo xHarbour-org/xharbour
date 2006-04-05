@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.23 2006/03/27 16:50:31 likewolf Exp $
+ * $Id: dbgentry.c,v 1.24 2006/03/27 21:02:15 likewolf Exp $
  */
 
 /*
@@ -441,6 +441,8 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
       case HB_DBG_MODULENAME:
          HB_TRACE( HB_TR_DEBUG, ( "MODULENAME %s", szName ) );
 
+         if ( szName[ strlen( szName ) - 1 ] == ':' )
+            return;
          hb_procinfo( 0, szProcName, NULL, NULL );
          if ( !strcmp( szProcName, "(_INITSTATICS)" ) )
              info->bInitStatics = TRUE;

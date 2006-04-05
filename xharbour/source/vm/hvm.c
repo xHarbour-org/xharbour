@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.555 2006/03/30 00:08:12 ronpinkas Exp $
+ * $Id: hvm.c,v 1.556 2006/03/30 06:02:43 guerra000 Exp $
  */
 
 /*
@@ -11801,7 +11801,7 @@ HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize,
    PHB_ITEM pLocal;
    BYTE *pBuffer;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%d,%lu,%p,%lu)", iLocal, bType, ulLen, pVal, ulBufferSize));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%d,%lu,%p,%lu)", iLocal, bType, ulSize, pVal, ulBufferSize));
 
    pLocal = hb_stackItemFromBase( iLocal );
    if( HB_IS_BYREF( pLocal ) )
@@ -11826,7 +11826,7 @@ HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pV
 {
    BYTE *pBuffer;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%lu,%p,%lu)", bType, ulLen, pVal, ulBufferSize));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%lu,%p,%lu)", bType, ulSize, pVal, ulBufferSize));
 
    pBuffer = hb_vmUnhideString( bType, ulSize, ( const BYTE * ) pVal, ulBufferSize );
 
