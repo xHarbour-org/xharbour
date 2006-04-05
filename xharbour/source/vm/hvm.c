@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.556 2006/03/30 06:02:43 guerra000 Exp $
+ * $Id: hvm.c,v 1.557 2006/04/05 15:58:26 likewolf Exp $
  */
 
 /*
@@ -2040,8 +2040,67 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
          case HB_P_TRYBEGIN:
+         {
+            BOOL bFinally = FALSE;
+            LONG pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+
+            // Incase recent FINALY hit a new TRY segment before the ENDFINALLY.
+            if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_EXECUTED ) )
+            {
+               PHB_FINALLY pFree = hb_vm_pFinally;
+
+               // Restore the deferred action overriding the new request.
+               if( s_uiActionRequest != HB_QUIT_REQUESTED && hb_vm_pFinally->uiActionRequest )
+               {
+                  s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+               }
+
+               hb_vm_pFinally = hb_vm_pFinally->pPrev;
+
+               #ifdef DEBUG_FINALLY
+                  printf( "Removed executed (TRYBEGIN)- Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+               #endif
+
+               hb_xfree( (void *) pFree );
+            }
+
             hb_vm_iTry++;
 
+            if( pCode[ pNextSection ] == HB_P_TRYRECOVER || pCode[ pNextSection ] == HB_P_TRYEND )
+            {
+               if( HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] ) > 4 )
+               {
+                  bFinally = TRUE;
+               }
+            }
+
+            if( bFinally )
+            {
+               PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
+
+               pFinally->lFinally        = pNextSection + HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] );
+               pFinally->uiStatus        = 0;
+               pFinally->uiActionRequest = 0;
+               pFinally->pPrev           = hb_vm_pFinally;
+
+               if( pCode[ pNextSection ] != HB_P_TRYRECOVER )
+               {
+                  pFinally->uiStatus |= HB_FINALLY_RECOVERED;
+               }
+
+               hb_vm_pFinally = pFinally;
+
+               #define DEBUG_FINALLY
+               #ifdef DEBUG_FINALLY
+                  printf( "Finally at: %li Prev: %p\n", pFinally->lFinally, pFinally->pPrev );
+
+                  if( pFinally->pPrev )
+                  {
+                     printf( "PREV Finally at: %li\n", pFinally->pPrev->lFinally );
+                  }
+               #endif
+            }
+         }
             // Intentionally FALL through.
 
          case HB_P_SEQBEGIN:
@@ -2109,6 +2168,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
+            if( hb_vm_pFinally && HB_PCODE_MKINT24( &pCode[ w + 1 ] ) > 4 )
+            {
+               LONG pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+
+               if( pCode[ pNextSection - 1 ] == HB_P_FINALLY )
+               {
+                  hb_vm_pFinally->uiStatus = ( HB_FINALLY_EXECUTED | HB_FINALLY_RECOVERED );
+               }
+            }
+
             // Intentionally FALL through.
 
          case HB_P_SEQEND:
@@ -2149,20 +2218,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
-            if( HB_PCODE_MKINT24( &pCode[ w + 1 ] ) )
+            if( hb_vm_pFinally )
             {
-               PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
-
-               pFinally->lFinally = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
-               pFinally->bDeferred = FALSE;
-               pFinally->pPrev = hb_vm_pFinally;
-
-               hb_vm_pFinally = pFinally;
-
-               //#define DEBUG_FINALLY
-               #ifdef DEBUG_FINALLY
-                  printf( "Finally at: %li\n", pFinally->lFinally );
-               #endif
+               hb_vm_pFinally->uiStatus |= HB_FINALLY_RECOVERED;
             }
 
             w += 3;
@@ -2198,15 +2256,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_FINALLY:
            if( hb_vm_pFinally )
            {
-              /*
-                 Probably a bug - can't remeber WHY flagged deffered, but if at all,
-                 should have saved the deferred action!
-
-                 if not found, than this PCode can be safely removed, and compiler
-                 fixed to generate Jump - 1 for TRYEND case (same as TRYRECOVER jump).
-
-                 hb_vm_pFinally->bDeferred = TRUE;
-               */
+              // To avoid duplicate execution if FINALLY block includes a RETURN statement
+              if(  hb_vm_pFinally )
+              {
+                 hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
+              }
 
               #ifdef DEBUG_FINALLY
                  printf( "Finally after CATCH:\n" );
@@ -2221,7 +2275,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
            {
               PHB_FINALLY pFree = hb_vm_pFinally;
 
-              if( hb_vm_pFinally->bDeferred )
+              if( hb_vm_pFinally->uiActionRequest )
               {
                  s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
 
@@ -2231,12 +2285,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
               }
 
               hb_vm_pFinally = hb_vm_pFinally->pPrev;
+
+              #ifdef DEBUG_FINALLY
+                 printf( "Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+              #endif
+
               hb_xfree( (void *) pFree );
            }
            else
            {
-              w++;
+              #ifdef DEBUG_FINALLY
+                 printf( "HB_P_ENDFINALLY but no hb_vm_pFinally in sight!\n" );
+              #endif
            }
+
+           w++;
            break;
 
          /* Jumps */
@@ -3439,6 +3502,26 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
       if( s_uiActionRequest )
       {
+         // Incase recent FINALY hit a RETURN or BREAK before the ENDFINALLY.
+         if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_EXECUTED ) )
+         {
+            PHB_FINALLY pFree = hb_vm_pFinally;
+
+            // Restore the deferred action overriding the new request.
+            if( s_uiActionRequest != HB_QUIT_REQUESTED && hb_vm_pFinally->uiActionRequest )
+            {
+               s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+            }
+
+            hb_vm_pFinally = hb_vm_pFinally->pPrev;
+
+            #ifdef DEBUG_FINALLY
+               printf( "Removed executed (s_uiActionRequest)- Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+            #endif
+
+            hb_xfree( (void *) pFree );
+         }
+
          if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
          {
             /* request to stop current procedure was issued
@@ -3450,7 +3533,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
                #endif
 
-               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
                hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
                w = hb_vm_pFinally->lFinally;
                s_uiActionRequest = 0;
@@ -3463,13 +3546,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
          else if( s_uiActionRequest & HB_BREAK_REQUESTED )
          {
-            if( hb_vm_pFinally )
+            if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_RECOVERED ) )
             {
                #ifdef DEBUG_FINALLY
                   printf( "DEFER BREAK - go to %i\n", hb_vm_pFinally->lFinally );
                #endif
 
-               hb_vm_pFinally->bDeferred = TRUE;
+               hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
                hb_vm_pFinally->uiActionRequest = HB_BREAK_REQUESTED;
                w = hb_vm_pFinally->lFinally;
                s_uiActionRequest = 0;
@@ -9892,7 +9975,6 @@ static BOOL hb_xvmActionRequest( void )
    {
       if( hb_vm_pFinally && hb_vm_pFinally->lFinally )
       {
-         hb_vm_pFinally->bDeferred = TRUE;
          hb_vm_pFinally->uiActionRequest = s_uiActionRequest;
          s_uiActionRequest = 0;
       }
@@ -10044,7 +10126,7 @@ HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinally )
       PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
 
       pFinally->lFinally = lFinally;
-      pFinally->bDeferred = FALSE;
+      pFinally->uiStatus = 0;
       pFinally->pPrev = hb_vm_pFinally;
       hb_vm_pFinally = pFinally;
    }
@@ -10060,7 +10142,7 @@ HB_EXPORT BOOL hb_xvmEndFinally( void )
    {
       PHB_FINALLY pFree = hb_vm_pFinally;
 
-      if( hb_vm_pFinally->bDeferred )
+      if( hb_vm_pFinally->uiActionRequest )
       {
          s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
       }

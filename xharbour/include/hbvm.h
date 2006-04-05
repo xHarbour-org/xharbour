@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.38 2006/03/21 23:02:48 likewolf Exp $
+ * $Id: hbvm.h,v 1.39 2006/03/27 21:02:15 likewolf Exp $
  */
 
 /*
@@ -66,12 +66,14 @@ typedef struct _HB_SEQUENCE
    struct _HB_SEQUENCE *pPrev;
 } HB_SEQUENCE, *PHB_SEQUENCE;
 
+#define HB_FINALLY_EXECUTED  1
+#define HB_FINALLY_RECOVERED 2
+
 typedef struct _HB_FINALLY
 {
    ULONG  lFinally;
    USHORT uiActionRequest;
-   BOOL   bDeferred;
-
+   USHORT uiStatus;
    struct _HB_FINALLY *pPrev;
 } HB_FINALLY, *PHB_FINALLY;
 
