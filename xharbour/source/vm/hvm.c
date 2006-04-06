@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.557 2006/04/05 15:58:26 likewolf Exp $
+ * $Id: hvm.c,v 1.558 2006/04/05 16:49:31 ronpinkas Exp $
  */
 
 /*
@@ -340,7 +340,6 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
    UINT     hb_vm_wEnumCollectionCounter = 0; // Initialized in hb_vmInit()
 
    PHB_SEQUENCE hb_vm_pSequence;
-   PHB_FINALLY  hb_vm_pFinally;
 
    /* Request for some action - stop processing of opcodes
    */
@@ -357,8 +356,6 @@ char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x
 
    #define hb_vm_pSequence (HB_VM_STACK.pSequence)
    #define s_uiActionRequest  (HB_VM_STACK.uiActionRequest)
-
-   #define hb_vm_pFinally (HB_VM_STACK.pFinally)
 
    /* static, for now */
    BOOL hb_vm_bQuitRequest = FALSE;
@@ -563,7 +560,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    /* In MT mode this is a part of stack initialization code */
    hb_vm_pSequence = NULL;
    s_uiActionRequest = 0;
-   hb_vm_pFinally = NULL;
+
    for( hb_vm_wWithObjectCounter = 0; hb_vm_wWithObjectCounter < HB_MAX_WITH_OBJECTS; hb_vm_wWithObjectCounter++  )
    {
       hb_vm_aWithObject[ hb_vm_wWithObjectCounter ].type = HB_IT_NIL;
@@ -1000,15 +997,6 @@ int HB_EXPORT hb_vmQuit( void )
       hb_xfree( (void *) pFree );
    }
 
-   while( hb_vm_pFinally )
-   {
-      PHB_FINALLY pFree = hb_vm_pFinally;
-
-      hb_vm_pFinally = hb_vm_pFinally->pPrev;
-
-      hb_xfree( (void *) pFree );
-   }
-
    hb_xexit();
    //printf("After xexit\n" );
 
@@ -1029,10 +1017,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    LONG w = 0;
    BOOL bCanRecover = FALSE;
+   BOOL bFinally = FALSE;
+   BOOL bCanFinalize = FALSE;
+   LONG pNextSection = 0;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
-   PHB_FINALLY pOuterFinally = hb_vm_pFinally;
 
 #ifndef HB_GUI
    static unsigned short uiPolls = 1;
@@ -1052,8 +1042,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
     * macro evaluation belong to a function/procedure where macro
     * compiler was called.
     */
-
-   hb_vm_pFinally = NULL;
 
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
    ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
@@ -2040,31 +2028,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
          case HB_P_TRYBEGIN:
-         {
-            BOOL bFinally = FALSE;
-            LONG pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+            pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
 
-            // Incase recent FINALY hit a new TRY segment before the ENDFINALLY.
-            if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_EXECUTED ) )
+            // Incase recent FINALLY hit a new TRY segment before the ENDFINALLY.
+            if( bCanFinalize && ( hb_vm_pSequence->uiStatus & HB_SEQ_FINALIZED ) )
             {
-               PHB_FINALLY pFree = hb_vm_pFinally;
-
-               // Restore the deferred action overriding the new request.
-               if( s_uiActionRequest != HB_QUIT_REQUESTED && hb_vm_pFinally->uiActionRequest )
-               {
-                  s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
-               }
-
-               hb_vm_pFinally = hb_vm_pFinally->pPrev;
-
+               //#define DEBUG_FINALLY
                #ifdef DEBUG_FINALLY
-                  printf( "Removed executed (TRYBEGIN)- Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+                  printf( "%s-> (TRYBEGIN)- Pending: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->uiActionRequest );
                #endif
-
-               hb_xfree( (void *) pFree );
             }
 
             hb_vm_iTry++;
+
+            bFinally = FALSE;
 
             if( pCode[ pNextSection ] == HB_P_TRYRECOVER || pCode[ pNextSection ] == HB_P_TRYEND )
             {
@@ -2073,34 +2050,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   bFinally = TRUE;
                }
             }
-
-            if( bFinally )
-            {
-               PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
-
-               pFinally->lFinally        = pNextSection + HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] );
-               pFinally->uiStatus        = 0;
-               pFinally->uiActionRequest = 0;
-               pFinally->pPrev           = hb_vm_pFinally;
-
-               if( pCode[ pNextSection ] != HB_P_TRYRECOVER )
-               {
-                  pFinally->uiStatus |= HB_FINALLY_RECOVERED;
-               }
-
-               hb_vm_pFinally = pFinally;
-
-               #define DEBUG_FINALLY
-               #ifdef DEBUG_FINALLY
-                  printf( "Finally at: %li Prev: %p\n", pFinally->lFinally, pFinally->pPrev );
-
-                  if( pFinally->pPrev )
-                  {
-                     printf( "PREV Finally at: %li\n", pFinally->pPrev->lFinally );
-                  }
-               #endif
-            }
-         }
             // Intentionally FALL through.
 
          case HB_P_SEQBEGIN:
@@ -2136,11 +2085,21 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
             pSequence->lBase = hb_stackTopOffset();
 
+            pSequence->uiStatus = 0;
+
             /*
              * 4) store current bCanRecover flag - in a case of nested sequences
              * in the same procedure/function
              */
-            pSequence->bCanRecover = bCanRecover;
+            if( bCanRecover )
+            {
+               pSequence->uiStatus |= HB_SEQ_CANRECOVER;
+            }
+
+            if( bCanFinalize )
+            {
+               pSequence->uiStatus |= HB_SEQ_CANFINALIZE;
+            }
 
             /*
              * we are now inside a valid SEQUENCE envelope
@@ -2150,13 +2109,41 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             pSequence->wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
             pSequence->wWithObjectCounter     = hb_vm_wWithObjectCounter;
 
-            if( pCode[ w ] == HB_P_TRYBEGIN )
-            {
-               pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
-            }
+            pSequence->lFinally        = 0;
+            pSequence->uiActionRequest = 0;
 
             pSequence->pPrev = hb_vm_pSequence;
             hb_vm_pSequence = pSequence;
+
+            if( pCode[ w ] == HB_P_TRYBEGIN )
+            {
+               hb_vm_pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
+
+               bCanFinalize = bFinally;
+
+               if( bFinally )
+               {
+                  hb_vm_pSequence->lFinally = pNextSection + HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] );
+
+                  if( pCode[ pNextSection ] != HB_P_TRYRECOVER )
+                  {
+                     hb_vm_pSequence->uiStatus |= HB_SEQ_RECOVERED;
+                  }
+
+                  #ifdef DEBUG_FINALLY
+                     printf( "%s->Finally %p at: %li bCanFinilize: %i Prev: %p\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE, hb_vm_pSequence->pPrev );
+
+                     if( hb_vm_pSequence->pPrev )
+                     {
+                        printf( "%s->PREV Finally at: %li\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->pPrev->lFinally );
+                     }
+                  #endif
+               }
+            }
+            else
+            {
+               bCanFinalize = FALSE;
+            }
 
             w += 4;
             break;
@@ -2168,49 +2155,57 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
-            if( hb_vm_pFinally && HB_PCODE_MKINT24( &pCode[ w + 1 ] ) > 4 )
+            if( bCanFinalize )
             {
-               LONG pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
-
-               if( pCode[ pNextSection - 1 ] == HB_P_FINALLY )
-               {
-                  hb_vm_pFinally->uiStatus = ( HB_FINALLY_EXECUTED | HB_FINALLY_RECOVERED );
-               }
+               hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
             }
+
+            #ifdef DEBUG_FINALLY
+               printf( "%s->TRYEND: %p Finally: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally );
+            #endif
 
             // Intentionally FALL through.
 
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQEND") );
 
-         {
-            PHB_SEQUENCE pFree = hb_vm_pSequence;
-
-            /*
-             * Remove the SEQUENCE envelope
-             * This is executed either at the end of sequence or as the
-             * response to the break statement if there is no RECOVER clause
-             */
-
             /*
              * Restore previous recovery state
              */
-            bCanRecover = hb_vm_pSequence->bCanRecover;
+
+            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
 
             /* Discard the value returned by BREAK statement - there
              * was no RECOVER clause or there was no BREAK statement
              */
             hb_stackPop();
 
+            if( hb_vm_pSequence->lFinally == 0 )
+            {
+               /*
+                * Remove the SEQUENCE envelope
+                * This is executed either at the end of sequence or as the
+                * response to the break statement if there is no RECOVER clause
+                * but ONLY if we don't also have a FINALLY section.
+                */
+               PHB_SEQUENCE pFree = hb_vm_pSequence;
+
+               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
+               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+
+               hb_vm_pSequence = hb_vm_pSequence->pPrev;
+               hb_xfree( (void *) pFree );
+            }
+            else
+            {
+               hb_vm_pSequence->uiStatus |= HB_SEQ_RECOVERED;
+            }
+
             /*
              * skip over RECOVER section, if any.
              */
-            hb_vm_pSequence = hb_vm_pSequence->pPrev;
-            hb_xfree( (void *) pFree );
-
             w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             break;
-         }
 
          case HB_P_TRYRECOVER:
             hb_vm_iTry--;
@@ -2218,19 +2213,18 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
-            if( hb_vm_pFinally )
-            {
-               hb_vm_pFinally->uiStatus |= HB_FINALLY_RECOVERED;
-            }
+            #ifdef DEBUG_FINALLY
+               printf( "%s->TRYRECOVER: %p Finally: %i bCanFinalize %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, bCanFinalize );
+            #endif
 
             w += 3;
             // Intentionally FALL through.
 
          case HB_P_SEQRECOVER:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQRECOVER") );
-
          {
             PHB_SEQUENCE pFree = hb_vm_pSequence;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQRECOVER") );
 
             /*
              * Execute the RECOVER code
@@ -2239,68 +2233,66 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * Restore previous recovery state
              */
-            bCanRecover = hb_vm_pSequence->bCanRecover;
+            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
 
             /*
              * Leave the value returned from BREAK  - it will be popped
              * in next executed opcode
              */
 
-            hb_vm_pSequence = hb_vm_pSequence->pPrev;
-            hb_xfree( pFree );
+            if( hb_vm_pSequence->lFinally == 0 )
+            {
+               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
+               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+
+               hb_vm_pSequence = hb_vm_pSequence->pPrev;
+               hb_xfree( pFree );
+            }
+            else
+            {
+               hb_vm_pSequence->uiStatus |= HB_SEQ_RECOVERED;
+            }
 
             w++;
             break;
          }
 
          case HB_P_FINALLY:
-           if( hb_vm_pFinally )
-           {
-              // To avoid duplicate execution if FINALLY block includes a RETURN statement
-              if(  hb_vm_pFinally )
-              {
-                 hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
-              }
+           hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
 
-              #ifdef DEBUG_FINALLY
-                 printf( "Finally after CATCH:\n" );
-              #endif
-           }
+           #ifdef DEBUG_FINALLY
+             printf( "%s->Finally after CATCH:\n", hb_stackBaseItem()->item.asSymbol.value->szName );
+           #endif
 
            w++;
            break;
 
          case HB_P_ENDFINALLY:
-           if( hb_vm_pFinally )
+         {
+           PHB_SEQUENCE pFree = hb_vm_pSequence;
+
+           if( hb_vm_pSequence->uiActionRequest )
            {
-              PHB_FINALLY pFree = hb_vm_pFinally;
-
-              if( hb_vm_pFinally->uiActionRequest )
-              {
-                 s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
-
-                 #ifdef DEBUG_FINALLY
-                    printf( "Restored Deferred Action %i:\n", s_uiActionRequest );
-                 #endif
-              }
-
-              hb_vm_pFinally = hb_vm_pFinally->pPrev;
+              s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
 
               #ifdef DEBUG_FINALLY
-                 printf( "Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+                 printf( "%s->Restored Deferred Action %i:\n", hb_stackBaseItem()->item.asSymbol.value->szName, s_uiActionRequest );
               #endif
+           }
 
-              hb_xfree( (void *) pFree );
-           }
-           else
-           {
-              #ifdef DEBUG_FINALLY
-                 printf( "HB_P_ENDFINALLY but no hb_vm_pFinally in sight!\n" );
-              #endif
-           }
+           bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
+           bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+
+           hb_vm_pSequence = hb_vm_pSequence->pPrev;
+           hb_xfree( (void *) pFree );
+
+           #ifdef DEBUG_FINALLY
+              printf( "%s->Completed execution: %p Restored: %p Finally: %i Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
+           #endif
 
            w++;
            break;
+         }
 
          /* Jumps */
 
@@ -3474,8 +3466,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * *** NOTE!!! Return!!!
              */
-            // Restore
-            hb_vm_pFinally = pOuterFinally;
             return;
 
          case HB_P_ENDPROC:
@@ -3502,24 +3492,26 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
       if( s_uiActionRequest )
       {
-         // Incase recent FINALY hit a RETURN or BREAK before the ENDFINALLY.
-         if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_EXECUTED ) )
+         // Incase recent FINALLY hit a RETURN or BREAK before the ENDFINALLY.
+         if( bCanFinalize && ( hb_vm_pSequence->uiStatus & HB_SEQ_FINALIZED ) )
          {
-            PHB_FINALLY pFree = hb_vm_pFinally;
+            PHB_SEQUENCE pFree = hb_vm_pSequence;
 
             // Restore the deferred action overriding the new request.
-            if( s_uiActionRequest != HB_QUIT_REQUESTED && hb_vm_pFinally->uiActionRequest )
+            if( s_uiActionRequest != HB_QUIT_REQUESTED && hb_vm_pSequence->uiActionRequest )
             {
-               s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+               s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
             }
 
-            hb_vm_pFinally = hb_vm_pFinally->pPrev;
+            bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
+            bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+
+            hb_vm_pSequence = hb_vm_pSequence->pPrev;
+            hb_xfree( (void *) pFree );
 
             #ifdef DEBUG_FINALLY
-               printf( "Removed executed (s_uiActionRequest)- Restored Previous Finalizer %p: Pending: %i\n", hb_vm_pFinally, s_uiActionRequest );
+            printf( "%s->Removed partially executed: %p Restored: %p Finally: %i Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
             #endif
-
-            hb_xfree( (void *) pFree );
          }
 
          if( s_uiActionRequest & HB_ENDPROC_REQUESTED )
@@ -3527,15 +3519,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /* request to stop current procedure was issued
              * (from macro evaluation)
              */
-            if( hb_vm_pFinally )
+            if( bCanFinalize && ( hb_vm_pSequence->uiStatus & HB_SEQ_FINALIZED ) == 0 )
             {
                #ifdef DEBUG_FINALLY
-                  printf( "DEFER RETURN - go to %i\n", hb_vm_pFinally->lFinally );
+                  printf( "%s->DEFER RETURN - go to %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->lFinally );
                #endif
 
-               hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
-               hb_vm_pFinally->uiActionRequest = HB_ENDPROC_REQUESTED;
-               w = hb_vm_pFinally->lFinally;
+               hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
+               hb_vm_pSequence->uiActionRequest = HB_ENDPROC_REQUESTED;
+
+               w = hb_vm_pSequence->lFinally;
                s_uiActionRequest = 0;
             }
             else
@@ -3546,15 +3539,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
          else if( s_uiActionRequest & HB_BREAK_REQUESTED )
          {
-            if( hb_vm_pFinally && ( hb_vm_pFinally->uiStatus & HB_FINALLY_RECOVERED ) )
+            if( bCanFinalize && ( hb_vm_pSequence->uiStatus & HB_SEQ_RECOVERED ) && ( hb_vm_pSequence->uiStatus & HB_SEQ_FINALIZED ) == 0 )
             {
                #ifdef DEBUG_FINALLY
-                  printf( "DEFER BREAK - go to %i\n", hb_vm_pFinally->lFinally );
+                  printf( "%s->DEFER BREAK - go to %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->lFinally );
                #endif
 
-               hb_vm_pFinally->uiStatus |= HB_FINALLY_EXECUTED;
-               hb_vm_pFinally->uiActionRequest = HB_BREAK_REQUESTED;
-               w = hb_vm_pFinally->lFinally;
+               hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
+               hb_vm_pSequence->uiActionRequest = HB_BREAK_REQUESTED;
+
+               w = hb_vm_pSequence->lFinally;
                s_uiActionRequest = 0;
             }
             else if( bCanRecover )
@@ -3661,9 +3655,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    // is under way, or another VM might return in control
 
    //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
-
-   // Restore
-   hb_vm_pFinally = pOuterFinally;
 }
 
 HB_FUNC( HB_VMEXECUTE )
@@ -9221,11 +9212,20 @@ void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestBreak(%p)", pItem));
 
-   //printf( "Recover %i\n", s_lRecoverBase );
-
-   if( pItem && hb_vm_pSequence && hb_vm_pSequence->lBase )
+   if( pItem && hb_vm_pSequence )
    {
-      hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->lBase - 1 ), pItem );
+      PHB_SEQUENCE pSequence = hb_vm_pSequence;
+
+      while( pSequence->uiStatus & HB_SEQ_RECOVERED )
+      {
+         pSequence = pSequence->pPrev;
+      }
+
+      if( pSequence && pSequence->lBase && hb_stackItem( pSequence->lBase - 1 )->type == HB_IT_NIL )
+      {
+         //printf( "Break Type %i for: %p \n", pItem->type, pSequence );
+         hb_itemForwardValue( hb_stackItem( pSequence->lBase - 1 ), pItem );
+      }
    }
 
    s_uiActionRequest = HB_BREAK_REQUESTED;
@@ -9973,9 +9973,9 @@ static BOOL hb_xvmActionRequest( void )
 
    if( s_uiActionRequest & ( HB_ENDPROC_REQUESTED | HB_BREAK_REQUESTED ) )
    {
-      if( hb_vm_pFinally && hb_vm_pFinally->lFinally )
+      if( hb_vm_pSequence && hb_vm_pSequence->lFinally )
       {
-         hb_vm_pFinally->uiActionRequest = s_uiActionRequest;
+         hb_vm_pSequence->uiActionRequest = s_uiActionRequest;
          s_uiActionRequest = 0;
       }
 
@@ -10019,7 +10019,7 @@ HB_EXPORT void hb_xvmSeqBegin( void )
    pSequence->lBase = hb_stackTopOffset();
 
    /* 4) current bCanRecover flag - not used in C code */
-   pSequence->bCanRecover = FALSE;
+   pSequence->uiStatus = 0;
 
    /* set new recover base */
    pSequence->lBase = hb_stackTopOffset();
@@ -10123,12 +10123,6 @@ HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinally )
 
    if( lFinally )
    {
-      PHB_FINALLY pFinally = (PHB_FINALLY) hb_xgrab( sizeof( HB_FINALLY ) );
-
-      pFinally->lFinally = lFinally;
-      pFinally->uiStatus = 0;
-      pFinally->pPrev = hb_vm_pFinally;
-      hb_vm_pFinally = pFinally;
    }
 
    return hb_xvmSeqRecover();
@@ -10138,17 +10132,12 @@ HB_EXPORT BOOL hb_xvmEndFinally( void )
 {
    HB_THREAD_STUB_STACK
 
-   if( hb_vm_pFinally )
+   if( hb_vm_pSequence->lFinally )
    {
-      PHB_FINALLY pFree = hb_vm_pFinally;
-
-      if( hb_vm_pFinally->uiActionRequest )
+      if( hb_vm_pSequence->uiActionRequest )
       {
-         s_uiActionRequest = hb_vm_pFinally->uiActionRequest;
+         s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
       }
-
-      hb_vm_pFinally = hb_vm_pFinally->pPrev;
-      hb_xfree( (void *) pFree );
 
       return hb_xvmActionRequest();
    }

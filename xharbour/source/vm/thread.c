@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.198 2005/10/29 06:45:02 druzus Exp $
+* $Id: thread.c,v 1.199 2005/11/04 02:20:11 druzus Exp $
 */
 
 /*
@@ -578,15 +578,6 @@ void hb_threadDestroyStack( HB_STACK *pStack )
          PHB_SEQUENCE pFree = pStack->pSequence;
 
          pStack->pSequence = pStack->pSequence->pPrev;
-
-         hb_xfree( (void *) pFree );
-      }
-
-      while( pStack->pFinally )
-      {
-         PHB_FINALLY pFree = pStack->pFinally;
-
-         pStack->pFinally = pStack->pFinally->pPrev;
 
          hb_xfree( (void *) pFree );
       }

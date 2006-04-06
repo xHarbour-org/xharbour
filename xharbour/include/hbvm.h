@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.39 2006/03/27 21:02:15 likewolf Exp $
+ * $Id: hbvm.h,v 1.40 2006/04/05 16:49:31 ronpinkas Exp $
  */
 
 /*
@@ -55,27 +55,29 @@
 
 #include "hbapi.h"
 
+#define HB_SEQ_CANRECOVER        1
+#define HB_SEQ_CANFINALIZE       2
+#define HB_SEQ_RECOVERED         4
+#define HB_SEQ_FINALIZED         8
+
 typedef struct _HB_SEQUENCE
 {
-   BOOL bCanRecover;
-   ULONG lBase;
-   ULONG lRecover;
-   UINT wEnumCollectionCounter;
-   UINT wWithObjectCounter;
+   USHORT   uiStatus;
+
+   USHORT   uiActionRequest;
+
+   ULONG    lBase;
+   ULONG    lRecover;
+   ULONG    lFinally;
+
+   UINT     wEnumCollectionCounter;
+   UINT     wWithObjectCounter;
+
    PHB_ITEM pPrevErrBlock;
+
    struct _HB_SEQUENCE *pPrev;
 } HB_SEQUENCE, *PHB_SEQUENCE;
 
-#define HB_FINALLY_EXECUTED  1
-#define HB_FINALLY_RECOVERED 2
-
-typedef struct _HB_FINALLY
-{
-   ULONG  lFinally;
-   USHORT uiActionRequest;
-   USHORT uiStatus;
-   struct _HB_FINALLY *pPrev;
-} HB_FINALLY, *PHB_FINALLY;
 
 HB_EXTERN_BEGIN
 

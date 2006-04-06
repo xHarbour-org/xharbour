@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4910 2006/04/05 15:58:31 likewolf Exp $
+ * $Id: ChangeLog,v 1.4911 2006/04/05 16:49:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-05 21:53 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbvm.h
+  * source/vm/hvm.c
+  * source/vm/thread.c
+    * Merged/unified FINALLY support using hb_vm_pSequence structure
+    - Removed no longer used hb_vm_pFinally
+
+  /*
+     NOTE: While I heaviliy tested this change it involved wide changes
+     in the code supporting BEGIN SEQUENCE/RECOVER/END and so extensive
+     testing might be needed.
+   */
 
 2006-04-05 09:48 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbvm.h
