@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.558 2006/04/05 16:49:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.559 2006/04/06 04:54:17 ronpinkas Exp $
  */
 
 /*
@@ -156,7 +156,7 @@ HB_FUNC_EXTERN( SYSINIT );
 
 /* Operators (mathematical / character / misc) */
 static void     hb_vmNegate( void );          /* negates (-) the latest value on the stack */
-static void     hb_vmAddInt( HB_ITEM_PTR pResult, int iAdd );      /* add integer to given item */
+static void     hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd );      /* add integer to given item */
 static void     hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult ); /* sums the latest two values on the stack, removes them and leaves the result */
 static void     hb_vmMinus( void );           /* substracts the latest two values on the stack, removes them and leaves the result */
 static void     hb_vmMult( void );            /* multiplies the latest two values on the stack, removes them and leaves the result */
@@ -3698,13 +3698,13 @@ HB_FUNC( HB_VMEXECUTE )
 /*             character / misc )  */
 /* ------------------------------- */
 
-static void hb_vmAddInt( HB_ITEM_PTR pResult, int iAdd )
+static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
 {
    HB_THREAD_STUB_STACK
 
    double dNewVal;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmAddInt(%p,%d)", pResult, iAdd));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmAddInt(%p,%ld)", pResult, lAdd));
 
    if( HB_IS_BYREF( pResult ) )
    {
@@ -3715,38 +3715,38 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, int iAdd )
    {
       HB_LONG lVal = HB_ITEM_GET_NUMINTRAW( pResult ), lNewVal;
 
-      lNewVal = lVal + iAdd;
+      lNewVal = lVal + lAdd;
 
-      if( iAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
+      if( lAdd >= 0 ? lNewVal >= lVal : lNewVal <  lVal )
       {
          HB_ITEM_PUT_NUMINTRAW( pResult, lNewVal );
          return;
       }
       else
       {
-         dNewVal = ( double ) lVal + ( double ) iAdd;
+         dNewVal = ( double ) lVal + ( double ) lAdd;
       }
    }
    else if( HB_IS_DATE( pResult ) )
    {
-      pResult->item.asDate.value += iAdd;
+      pResult->item.asDate.value += lAdd;
       return;
    }
    else if( HB_IS_STRING( pResult ) && pResult->item.asString.length == 1 )
    {
-      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pResult->item.asString.value[ 0 ] + iAdd ) ], 1 );
+      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pResult->item.asString.value[ 0 ] + lAdd ) ], 1 );
       return;
    }
    else if( pResult->type & HB_IT_DOUBLE )
    {
-      dNewVal = pResult->item.asDouble.value + iAdd;
+      dNewVal = pResult->item.asDouble.value + lAdd;
    }
-   else if( iAdd == 1 && ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_INC ) )
+   else if( lAdd == 1 && ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_INC ) )
    {
       hb_vmOperatorCallUnary( pResult, "__OPINC", pResult );
       return;
    }
-   else if( iAdd == -1 && ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_DEC ) )
+   else if( lAdd == -1 && ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_DEC ) )
    {
       hb_vmOperatorCallUnary( pResult, "__OPDEC", pResult );
       return;
@@ -3754,7 +3754,7 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, int iAdd )
    else if( ( hb_objGetOpOver( pResult ) & HB_CLASS_OP_PLUS ) )
    {
       PHB_ITEM pAdd = hb_stackTopItem();
-      hb_vmPushInteger( iAdd );
+      hb_vmPushInteger( lAdd );
       hb_vmOperatorCall( pResult, pAdd, "__OPPLUS", NULL, 1, pResult );
       return;
    }
@@ -3762,14 +3762,14 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, int iAdd )
    {
       PHB_ITEM pSubst, pAdd = hb_stackTopItem();
 
-      if( iAdd > 0 )
+      if( lAdd > 0 )
       {
-         hb_vmPushInteger( iAdd );
+         hb_vmPushInteger( lAdd );
          pSubst = hb_errRT_BASE_Subst( EG_ARG, 1081, NULL, "+", 2, pResult, pAdd );
       }
       else
       {
-         hb_vmPushInteger( -iAdd );
+         hb_vmPushInteger( -lAdd );
          pSubst = hb_errRT_BASE_Subst( EG_ARG, 1082, NULL, "-", 2, pResult, pAdd );
       }
 
@@ -9757,21 +9757,23 @@ HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
    consumed times { nTimes, nTime }, given the opcode index */
 HB_FUNC( __OPGETPRF )
 {
-   #ifndef HB_NO_PROFILER
-      HB_THREAD_STUB_API
+   HB_THREAD_STUB_API
 
-      ULONG ulOpcode = hb_parnl( 1 );
+   ULONG ulOpcode = hb_parnl( 1 );
 
-      hb_reta( 2 );
+   hb_reta( 2 );
+#ifndef HB_NO_PROFILER
+   if( ulOpcode < HB_P_LAST_PCODE )
+   {
+      hb_stornl( hb_ulOpcodesCalls[ ulOpcode ], -1, 1 );
+      hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
+   }
+   else
+#endif
+   {
       hb_stornl( 0, -1, 1 );
       hb_stornl( 0, -1, 2 );
-
-      if( ulOpcode < HB_P_LAST_PCODE )
-      {
-         hb_stornl( hb_ulOpcodesCalls[ ulOpcode ], -1, 1 );
-         hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
-      }
-   #endif
+   }
 }
 
 HB_FUNC( HB_SAVEBLOCK )
@@ -10138,9 +10140,9 @@ HB_EXPORT BOOL hb_xvmEndFinally( void )
       {
          s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
       }
-
-      return hb_xvmActionRequest();
    }
+
+   HB_XVM_RETURN
 }
 
 HB_EXPORT void hb_xvmSetLine( USHORT uiLine )
@@ -10694,13 +10696,13 @@ HB_EXPORT BOOL hb_xvmPopAliasedVar( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmLocalAddInt( int iLocal, int iAdd )
+HB_EXPORT BOOL hb_xvmLocalAddInt( int iLocal, LONG lAdd )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalAddInt(%d,%d)", iLocal, iAdd));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalAddInt(%d,%ld)", iLocal, lAdd));
 
-   hb_vmAddInt( hb_stackItemFromBase( iLocal ), iAdd );
+   hb_vmAddInt( hb_stackItemFromBase( iLocal ), lAdd );
 
    HB_XVM_RETURN
 }
@@ -10888,13 +10890,13 @@ HB_EXPORT BOOL hb_xvmInstring( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT BOOL hb_xvmAddInt( int iAdd )
+HB_EXPORT BOOL hb_xvmAddInt( LONG lAdd )
 {
    HB_THREAD_STUB_STACK
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalAddInt(%d)", iAdd));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalAddInt(%ld)", lAdd));
 
-   hb_vmAddInt( hb_stackItemFromTop( -1 ), iAdd );
+   hb_vmAddInt( hb_stackItemFromTop( -1 ), lAdd );
 
    HB_XVM_RETURN
 }
@@ -10926,7 +10928,6 @@ HB_EXPORT BOOL hb_xvmMinus( void )
 HB_EXPORT BOOL hb_xvmMultByInt( LONG lValue )
 {
    HB_THREAD_STUB_STACK
-
    PHB_ITEM pValue;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmMultByInt(%ld)", lValue));
@@ -10942,6 +10943,7 @@ HB_EXPORT BOOL hb_xvmMultByInt( LONG lValue )
    }
    else if( hb_objGetOpOver( pValue ) & HB_CLASS_OP_MULT )
    {
+      hb_vmPushLong( lValue );
       hb_vmOperatorCall( pValue, hb_stackItemFromTop( -1 ), "__OPMULT", NULL, 2, NULL );
       hb_itemPushForward( hb_stackReturnItem() );
    }
@@ -10963,7 +10965,6 @@ HB_EXPORT BOOL hb_xvmMultByInt( LONG lValue )
    HB_XVM_RETURN
 }
 
-
 HB_EXPORT BOOL hb_xvmMult( void )
 {
    HB_THREAD_STUB_STACK
@@ -10971,6 +10972,60 @@ HB_EXPORT BOOL hb_xvmMult( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmMult()"));
 
    hb_vmMult();
+
+   HB_XVM_RETURN
+}
+
+HB_EXPORT BOOL hb_xvmDivideByInt( LONG lDivisor )
+{
+   HB_THREAD_STUB_STACK
+   PHB_ITEM pValue;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmDivideByInt(%ld)", lDivisor));
+
+   pValue = hb_stackItemFromTop( -1 );
+
+   if( HB_IS_NUMERIC( pValue ) )
+   {
+      if( lDivisor == 0 )
+      {
+         PHB_ITEM pSubst;
+
+         hb_vmPushLong( lDivisor );
+         pSubst = hb_errRT_BASE_Subst( EG_ZERODIV, 1340, NULL, "/", 2, pValue, hb_stackItemFromTop( -1 ) );
+
+         if( pSubst )
+         {
+            hb_stackPop();
+            hb_itemForwardValue( pValue, pSubst );
+            hb_itemRelease( pSubst );
+         }
+      }
+      else
+      {
+         hb_itemPutNDDec( pValue, hb_itemGetND( pValue ) / lDivisor, hb_set.HB_SET_DECIMALS );
+      }
+   }
+   else if( hb_objGetOpOver( pValue ) & HB_CLASS_OP_DIVIDE )
+   {
+      hb_vmPushLong( lDivisor );
+      hb_vmOperatorCall( pValue, hb_stackItemFromTop( -1 ), "__OPDIVIDE", NULL, 2, NULL );
+      hb_itemPushForward( hb_stackReturnItem() );
+   }
+   else
+   {
+      PHB_ITEM pSubst;
+
+      hb_vmPushLong( lDivisor );
+      pSubst = hb_errRT_BASE_Subst( EG_ARG, 1084, NULL, "/", 2, pValue, hb_stackItemFromTop( -1 ) );
+
+      if( pSubst )
+      {
+         hb_stackPop();
+         hb_itemForwardValue( pValue, pSubst );
+         hb_itemRelease( pSubst );
+      }
+   }
 
    HB_XVM_RETURN
 }
@@ -11200,10 +11255,8 @@ static void hb_vmArrayItemPush( ULONG ulIndex )
       hb_vmPushNumInt( ulIndex );
       hb_vmOperatorCall( pArray, hb_stackItemFromTop( -1 ), "__OPARRAYINDEX", NULL, 2, NULL );
       hb_itemPushForward( hb_stackReturnItem() );
-      return;
    }
-
-   if( HB_IS_ARRAY( pArray ) )
+   else if( HB_IS_ARRAY( pArray ) )
    {
       if( ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
       {
@@ -11233,6 +11286,52 @@ static void hb_vmArrayItemPush( ULONG ulIndex )
          hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, hb_stackItemFromTop( -1 ) );
       }
    }
+#ifndef HB_C52_STRICT
+   else if( HB_IS_STRING( pArray ) )
+   {
+      if( pArray->item.asString.length > 0 )
+      {
+         if( ulIndex > 0 )
+         {
+            ulIndex--;
+         }
+         if( ulIndex < pArray->item.asString.length )
+         {
+            hb_itemPutCLStatic( pArray, hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[ ulIndex ] ) ], 1 );
+         }
+         else
+         {
+            hb_itemPutCL( pArray, NULL, 0 );
+         }
+      }
+   }
+#endif
+   else if( HB_IS_HASH( pArray ) )
+   {
+      hb_vmPushNumInt( ulIndex );
+      // Associative Array compatibility
+      if( hb_hashGetCompatibility( pArray ) )
+      {
+         ulIndex = hb_hashAAGetRealPos( pArray, ulIndex );
+         if( ulIndex == 0 )
+         {
+            hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, hb_stackItemFromTop( -1 ) );
+            return;
+         }
+      }
+      else
+      {
+         // Hash compatibility
+         if( ! hb_hashScan(pArray, hb_stackItemFromTop( -1 ), &ulIndex ) )
+         {
+            hb_errRT_BASE( EG_BOUND, 1132, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, hb_stackItemFromTop( -1 ) );
+            return;
+         }
+      }
+      hb_hashGet( pArray, ulIndex, hb_stackItemFromTop( -1 ) );
+      hb_itemForwardValue( pArray, hb_stackItemFromTop( -1 ) );
+      hb_stackDec();
+   }
    else
    {
       hb_vmPushNumInt( ulIndex );
@@ -11255,7 +11354,13 @@ static void hb_vmArrayItemPop( ULONG ulIndex )
    if( HB_IS_BYREF( pArray ) )
       pArray = hb_itemUnRef( pArray );
 
-   if( HB_IS_ARRAY( pArray ) )
+   if( hb_objGetOpOver( pArray ) & HB_CLASS_OP_ARRAYINDEX )
+   {
+      hb_vmPushNumInt( ulIndex );
+      hb_vmOperatorCall( pArray, hb_stackItemFromTop( -1 ), "__OPARRAYINDEX", pValue, 2, NULL );
+      hb_itemPushForward( hb_stackReturnItem() );
+   }
+   else if( HB_IS_ARRAY( pArray ) )
    {
       if( ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
       {
@@ -11270,10 +11375,60 @@ static void hb_vmArrayItemPop( ULONG ulIndex )
          hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, hb_stackItemFromTop( -1 ) );
       }
    }
+#ifndef HB_C52_STRICT
+   // Only allowing assignment of strings (char) and numerics into String as Array.
+   else if( HB_IS_STRING( pArray ) && ( HB_IS_STRING( pValue ) || HB_IS_NUMERIC( pValue ) ) )
+   {
+      if( ulIndex > 0 )
+      {
+         ulIndex--;
+      }
+      if( ulIndex < pArray->item.asString.length )
+      {
+         BYTE bNewChar;
+
+         //pArray = pArray->item.asString.pOrigin;
+         if( pValue->type & HB_IT_STRING )
+         {
+            bNewChar = pValue->item.asString.value[0];
+         }
+         else if( pValue->type == HB_IT_INTEGER )
+         {
+            bNewChar = (BYTE) pValue->item.asInteger.value;
+         }
+         else if( pValue->type == HB_IT_LONG )
+         {
+            bNewChar = (BYTE) pValue->item.asLong.value;
+         }
+         else
+         {
+            bNewChar = (BYTE) pValue->item.asDouble.value;
+         }
+
+         if( pArray->item.asString.length == 1 )
+         {
+            hb_itemPutCLStatic( pArray, hb_vm_acAscii[ bNewChar ], 1 );
+         }
+         else if( pArray->item.asString.allocated == 0 || *( pArray->item.asString.pulHolders ) > 1 )
+         {
+            hb_itemUnShare( pArray );
+         }
+
+         pArray->item.asString.value[ ulIndex ] = bNewChar;
+         hb_stackPop();
+         hb_stackPop();
+      }
+      else
+      {
+         hb_vmPushNumInt( ulIndex );
+         hb_errRT_BASE( EG_BOUND, 1133, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, hb_stackItemFromTop( -1 ), pValue );
+      }
+   }
+#endif
    else
    {
       hb_vmPushNumInt( ulIndex );
-      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 1, hb_stackItemFromTop( -1 ) );
+      hb_errRT_BASE( EG_ARG, 1069, NULL, hb_langDGetErrorDesc( EG_ARRASSIGN ), 3, pArray, hb_stackItemFromTop( -1 ), pValue );
    }
 }
 

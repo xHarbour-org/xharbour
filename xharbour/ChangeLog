@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4913 2006/04/07 01:20:07 lculik Exp $
+ * $Id: ChangeLog,v 1.4914 2006/04/07 06:07:58 maurifull Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-07 15:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * support for detecting startup function in C++ mode
+
+  * xharbour/include/hbxvm.h
+  * xharbour/source/compiler/gencc.c
+  * xharbour/source/vm/hvm.c
+    + added optimizations for add and div by integer value
+    * changed code generated for double values to avoid limitation in some
+      C compilers like MSC and possible differ conversion inside C RTL then
+      the one which uses Harbour RTL
+
+  * xharbour/source/compiler/hbfix.c
+    * optimize usage of HB_P_NOT PCODE - remove repeated NOT operations
+      or revert conditional jumps if they are just after NOT.
+
+  * xharbour/source/rdd/dbf1.c
+    * added support for NULL value set in memo fields by ACCESS
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * fixed ordKeyPos() - for records out of scope
 
 2006-04-0 3:10 UTC+0100 Mauricio Abre <mgabre@gmail.com>
   * source/rtl/gtapi.c

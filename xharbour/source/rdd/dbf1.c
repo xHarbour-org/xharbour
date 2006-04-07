@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.150 2006/02/13 23:10:24 druzus Exp $
+ * $Id: dbf1.c,v 1.151 2006/03/25 02:22:38 druzus Exp $
  */
 
 /*
@@ -679,7 +679,11 @@ HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
             *pulBlock = HB_GET_LE_UINT32( pSMTFiled->block );
          }
       }
-      else
+      /*
+       * check for NULL fields created by Access, they have chr(0) set
+       * in the whole memo block address, [druzus]
+       */
+      else if( pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] != 0 )
       {
          USHORT uiCount;
          BYTE bByte;
@@ -690,7 +694,7 @@ HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
             bByte = pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] + uiCount ];
             if( bByte >= '0' && bByte <= '9' )
                ulValue = ulValue * 10 + ( bByte - '0' );
-            else if( bByte != ' ' )
+            else if( bByte != ' ' || ulValue )
                return FAILURE;
          }
          *pulBlock = ulValue;

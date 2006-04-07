@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.3 2006/03/29 11:55:28 druzus Exp $
+ * $Id: hbxvm.h,v 1.4 2006/03/30 00:08:12 ronpinkas Exp $
  */
 
 /*
@@ -118,8 +118,8 @@ extern HB_EXPORT BOOL   hb_xvmPushAlias( void );
 extern HB_EXPORT BOOL   hb_xvmPopAlias( void );                   /* select the workarea using a given item or a substituted value */
 extern HB_EXPORT BOOL   hb_xvmPopLogical( BOOL * );               /* pops the stack latest value and returns its logical value */
 extern HB_EXPORT BOOL   hb_xvmSwapAlias( void );                  /* swaps items on the eval stack and pops the workarea number */
-extern HB_EXPORT BOOL   hb_xvmAddInt( int iAdd );                 /* add integer to given local variable */
-extern HB_EXPORT BOOL   hb_xvmLocalAddInt( int iLocal, int iAdd ); /* add integer to given local variable */
+extern HB_EXPORT BOOL   hb_xvmAddInt( LONG lAdd );                 /* add integer to top stack item */
+extern HB_EXPORT BOOL   hb_xvmLocalAddInt( int iLocal, LONG lAdd ); /* add integer to given local variable */
 extern HB_EXPORT BOOL   hb_xvmLocalAdd( int iLocal );
 
 extern HB_EXPORT BOOL   hb_xvmAnd( void );
@@ -225,23 +225,14 @@ extern HB_EXPORT BOOL   hb_xvmTryEnd( void );
 extern HB_EXPORT BOOL   hb_xvmTryRecover( LONG lFinaly );
 extern HB_EXPORT BOOL   hb_xvmEndFinally( void );
 
-/* TODO: */
-#if 0
-extern HB_EXPORT void   hb_xvmEndFinaly( void );
-extern HB_EXPORT void   hb_xvmFinaly( void );
-
-extern HB_EXPORT void   hb_xvmPushGlobal( int uiGLobal );
-extern HB_EXPORT void   hb_xvmPushGlobalRef( int uiGLobal );
-extern HB_EXPORT void   hb_xvmPopGlobal( int uiGLobal );
-
-#endif
-
 /*
  * additional multi PCODE operations
  */
 extern HB_EXPORT BOOL   hb_xvmArrayItemPush( ULONG ulIndex );
 extern HB_EXPORT BOOL   hb_xvmArrayItemPop( ULONG ulIndex );
 extern HB_EXPORT BOOL   hb_xvmMultByInt( LONG lValue );
+extern HB_EXPORT BOOL   hb_xvmDivideByInt( LONG lValue );
+extern HB_EXPORT BOOL   hb_xvmAddInt( LONG lValue );
 
 HB_EXTERN_END
 
