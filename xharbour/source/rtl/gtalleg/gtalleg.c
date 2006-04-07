@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.39 2006/02/16 01:43:03 maurifull Exp $
+ * $Id: gtalleg.c,v 1.40 2006/03/10 15:32:20 druzus Exp $
  */
 
 /*
@@ -1570,7 +1570,14 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
 
    if ( s_pbyScrBuffer == NULL )
    {
-      HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
+      return 0;
+/* 
+ * I had to remove the following line
+ * it was preventing gtAlleg delayed initialization
+ * Mauricio
+ *
+ *    HB_GT_FUNC(gt_SetMode(_GetScreenHeight(), _GetScreenWidth()));
+ */
    }
 
    if ( al_mouse_needs_poll() )

@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.62 2005/12/16 22:36:23 oh1 Exp $
+ * $Id: gtapi.c,v 1.63 2006/01/12 13:16:08 druzus Exp $
  */
 
 /*
@@ -2723,7 +2723,8 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
    if( iwnd != ct_NCur && iwnd >= 0 && iwnd < ct_WMax &&
        ct_Wind[ iwnd ] != NULL )
    {
-      hb_gtDispBegin();
+/* The following line breaks gt delayed initialization
+      hb_gtDispBegin(); */
 
       if( ct_WCur != NULL )
       {
@@ -2825,7 +2826,8 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
       hb_gt_gobjects_end = ct_WCur->hb_gt_gobjects_end;
 
       hb_gtSetPos( ct_WCur->iRow, ct_WCur->iCol );
-      hb_gtDispEnd();
+/* The following line breaks gt delayed initialization
+      hb_gtDispEnd(); */
    }
 
    return ct_NCur;

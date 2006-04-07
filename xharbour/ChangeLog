@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4912 2006/04/06 04:54:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4913 2006/04/07 01:20:07 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-0 3:10 UTC+0100 Mauricio Abre <mgabre@gmail.com>
+  * source/rtl/gtapi.c
+    ! Fixed bug preventing GT delayed initialization
+  * source/rtl/gtalleg/gtalleg.c
+    ! Fixed bug preventing gtAlleg delayed initialization
+      NOTE: INKEY() returns 0 until first GT output
 
 2006-04-06 22:20 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * contrib/libnf/caplock.c
