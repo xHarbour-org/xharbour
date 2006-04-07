@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: caplock.c,v 1.3 2005/04/26 04:12:41 andijahja Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #include <hbapi.h>
 
-#if defined(__WIN32__)
+#if defined(HB_OS_WIN_32)
    #include <windows.h>
 
    BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL bParam )

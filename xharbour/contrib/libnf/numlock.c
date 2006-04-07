@@ -1,5 +1,5 @@
 /*
- * $Id: numlock.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: numlock.c,v 1.3 2005/04/26 04:12:41 andijahja Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ HB_FUNC(FT_NUMLOCK)
    }
    return;
 
-#elif defined(__WIN32__)
+#elif defined(HB_OS_WIN_32)
    #define HB_VK_NUMLOCK        0x90
    BOOL bCurrentStatus;
    BOOL bParam = ISLOG(1);
