@@ -1,5 +1,5 @@
 /*
- * $Id: numlock.c,v 1.3 2005/04/26 04:12:41 andijahja Exp $
+ * $Id: numlock.c,v 1.4 2006/04/07 00:53:20 lculik Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
 
 #define status_byte ( *( char * ) ( 0x00400017 ) )
 
-#if defined(__WIN32__)
+#if defined(HB_OS_WIN_32)
    extern BOOL ft_SetKeyBoardState( USHORT uKey, BOOL bOn, BOOL *bCurrentStatus, BOOL );
 #endif
 

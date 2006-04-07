@@ -1,5 +1,5 @@
 /*
- * $Id: shift.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: shift.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 
 #include <hbapi.h>
 
-#if defined(__WIN32__)
+#if defined(HB_OS_WIN_32)
    #include <windows.h>
    #define HB_VK_SHIFT  0x10
 #endif
@@ -75,7 +75,7 @@ HB_FUNC(FT_SHIFT )
 
    return;
    }
-#elif defined(__WIN32__)
+#elif defined(HB_OS_WIN_32)
 
    BYTE kbBuffer[ 256 ];
 

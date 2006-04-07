@@ -1,5 +1,5 @@
 /*
- * $Id: alt.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: alt.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 
 #include <hbapi.h>
 
-#if defined(__WIN32__)
+#if defined(HB_OS_WIN_32)
    #include <windows.h>
    #define HB_VK_MENU           0x12
 #endif
@@ -77,7 +77,7 @@ HB_FUNC(FT_ALT)
 
       return;
    }
-#elif defined(__WIN32__)
+#elif defined(HB_OS_WIN_32)
 
    BYTE kbBuffer[ 256 ];
 

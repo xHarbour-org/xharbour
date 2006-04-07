@@ -1,5 +1,5 @@
 /*
- * $Id: caplock.c,v 1.3 2005/04/26 04:12:41 andijahja Exp $
+ * $Id: caplock.c,v 1.4 2006/04/07 00:53:20 lculik Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ HB_FUNC(FT_CAPLOCK)
    }
    return;
    }
-#elif defined(__WIN32__)
+#elif defined(HB_OS_WIN_32)
    #define HB_VK_CAPITAL        0x14
    BOOL bCurrentStatus;
    BOOL bParam = ISLOG(1);
