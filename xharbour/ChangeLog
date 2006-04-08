@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4914 2006/04/07 06:07:58 maurifull Exp $
+ * $Id: ChangeLog,v 1.4915 2006/04/07 13:37:40 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-08 02:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! update current order number after ordDestroy()
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed ordKeyGoto() - only the index file was repositioned
+      but I forgot to also change the record in DBF
 
 2006-04-07 15:40 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
