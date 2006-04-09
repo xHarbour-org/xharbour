@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4917 2006/04/09 18:21:03 druzus Exp $
+ * $Id: ChangeLog,v 1.4918 2006/04/09 22:51:49 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2006-04-10 00:50 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * harbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
     ! fixed skip back after updating last record
 
 2006-04-09 20:18 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
@@ -173,21 +173,21 @@
     + added hb_compPCodeStat() function which generates PCODE statistics
       (see below note about -gc3/-gc4 switches)
 
-  * harbour/source/compiler/Makefile
-  + harbour/source/compiler/hbstrong.c
-  * harbour/source/compiler/hbpcode.c
+  * xharbour/source/compiler/Makefile
+  + xharbour/source/compiler/hbstrong.c
+  * xharbour/source/compiler/hbpcode.c
     * moved strong typing code to separate file and cover it by
       HB_COMP_STRONG_TYPES macro
 
-  * harbour/source/compiler/hbpcode.c
+  * xharbour/source/compiler/hbpcode.c
     + added hb_compPCodeSize() function
     + added support for automatic size checking of variable size PCODEs
       in hb_compPCodeEval()
     - removed PCODE statistic code
 
-  * harbour/source/compiler/hbdead.c
-  * harbour/source/compiler/hbfix.c
-  * harbour/source/compiler/hbstripl.c
+  * xharbour/source/compiler/hbdead.c
+  * xharbour/source/compiler/hbfix.c
+  * xharbour/source/compiler/hbstripl.c
     * use hb_compPCodeSize() function
     * removed not longer necessary functions for checking the real size
       of variable size PCODEs
@@ -714,8 +714,8 @@
     * update for new parameter in UTF8 functions
 
 2006-03-01 16:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
-  * harbour/source/rtl/cdpapi.c
-  * harbour/source/rtl/gtxwc/gtxwc.c
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
     ! fixed UTF8 trnalsations
 
 2006-03-01 14:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
