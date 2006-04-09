@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4915 2006/04/07 13:37:40 druzus Exp $
+ * $Id: ChangeLog,v 1.4916 2006/04/08 00:44:04 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-09 20:18 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed scope checking when skip is done from the record which
+      dos not exist in index
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    * Added possibility to save memo fields > 64K
+      Modification done by Alexander Kresin and borrowed from Harbour
 
 2006-04-08 02:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
