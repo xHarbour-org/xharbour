@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.127 2006/03/27 14:35:00 likewolf Exp $
+ * $Id: harbour.c,v 1.128 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -5669,40 +5669,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             if ( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
             {
-#if 1
-               PHB_DEBUGINFO pInfo = hb_compGetDebugInfo(), pNext;
-
-               if( pInfo )
-               {
-                  int iModules = 0;
-                  ULONG ulOffset, ulSize;
-
-                  hb_compLineNumberDefStart();
-                  do
-                  {
-                     ulOffset = pInfo->ulFirstLine >> 3;
-                     ulSize = ( pInfo->ulLastLine >> 3 ) - ulOffset + 2;
-
-                     hb_compGenPushString( pInfo->pszModuleName, strlen( pInfo->pszModuleName ) + 1 );
-                     hb_compGenPushLong( ulOffset << 3 );
-                     hb_compGenPushString( ( char * ) pInfo->pLineMap + ulOffset, ulSize );
-                     hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, FALSE );
-                     iModules++;
-                     
-                     pNext = pInfo->pNext;
-                     hb_xfree( pInfo->pszModuleName );
-                     hb_xfree( pInfo->pLineMap );
-                     hb_xfree( pInfo );
-                     pInfo = pNext;
-                  }
-                  while( pInfo );
-
-                  hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), FALSE );
-                  hb_compGenPCode1( HB_P_RETVALUE );
-                  hb_compLineNumberDefEnd();
-                  hb_compAddInitFunc( hb_comp_pLineNumberFunc );
-               }
-#else
                PLINEINFO pInfo;
                int iModules = 0;
                
@@ -5741,7 +5707,6 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                hb_compGenPCode1( HB_P_RETVALUE );
                hb_compLineNumberDefEnd();
                hb_compAddInitFunc( hb_comp_pLineNumberFunc );
-#endif
             }
 
             if( hb_comp_pGlobalsFunc )

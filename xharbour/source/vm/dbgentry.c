@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.24 2006/03/27 21:02:15 likewolf Exp $
+ * $Id: dbgentry.c,v 1.25 2006/04/05 15:58:26 likewolf Exp $
  */
 
 /*
@@ -761,7 +761,8 @@ hb_dbgAddStopLines( HB_DEBUGINFO *info, PHB_ITEM pItem )
          char *p;
          BOOL bFound = FALSE;
 
-         if ( ( p = strrchr( szModule, '/' ) ) || ( p = strrchr( szModule, '\\' ) ) )
+         if ( ( p = strrchr( szModule, '/' ) ) != NULL
+              || ( p = strrchr( szModule, '\\' ) ) != NULL )
          {
             szModule = p + 1;
          }
@@ -811,7 +812,8 @@ hb_dbgAddStopLines( HB_DEBUGINFO *info, PHB_ITEM pItem )
       char *szModule = hb_arrayGetCPtr( pEntry, 1 );
       char *p;
 
-      if ( ( p = strrchr( szModule, '/' ) ) || ( p = strrchr( szModule, '\\' ) ) )
+      if ( ( p = strrchr( szModule, '/' ) ) != NULL
+           || ( p = strrchr( szModule, '\\' ) ) != NULL )
       {
          char *szName = hb_strdup( p + 1 );
          
