@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.3 2004/05/11 10:14:10 likewolf Exp $
+ * $Id: ctmisc.prg,v 1.2 2005/04/10 21:03:00 ptsarenko Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 MEMVAR GetList
 
 FUNCTION CENTER( c, n, p )
+   DEFAULT n TO MaxCol() + 1
    DEFAULT c TO ""
    RETURN PadC( AllTrim( c ), n, p )
 
