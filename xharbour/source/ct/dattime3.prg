@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.3 2005/05/17 12:30:00 modalsist Exp $
+ * $Id: dattime3.prg,v 1.4 2006/04/11 22:12:16 ptsarenko Exp $
  */
 
 /*
@@ -57,6 +57,13 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#pragma BEGINDUMP
+
+#include "hbapigt.h"
+
+#pragma ENDDUMP
+
 #include "common.ch"
 
 STATIC aH_Timers := {}
@@ -66,7 +73,7 @@ STATIC lHandle
 *--------------------------------------------------------------------------
 FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 *--------------------------------------------------------------------------
-   Local nColMax
+   Local nColMax, nWindow
 
    IF valtype(nRow)=="U" .and.;
       valtype(nCol)=="U" .and.;
@@ -81,7 +88,9 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
       
    ELSE
 
-      default nrow         TO row()
+      nWindow := SetMainWindow()
+
+      default nRow         TO Row()
       default nCol         TO Col()    
       default lHideSeconds TO .F.
       default cColor       TO setcolor()
@@ -101,6 +110,8 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 
       nCol := Min( ncol, nColMax )
       nRow := Min( nRow, maxrow() )
+
+      RestoreWindow( nWindow )
       
       hb_ShowTimeEvent( "ShowTime", .T., { || hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm ) }, 100 )
 
@@ -123,6 +134,7 @@ Local cTime := ""
 Local cShowTime := ""
 Local cHour := ""
 Local cAmPm
+Local nWindow
 
    IF cTime <> Time()
 
@@ -141,7 +153,10 @@ Local cAmPm
 
       ENDIF
 
+      nWindow := SetMainWindow()
       @ nRow, nCol say + cShowTime color cColor
+      RestoreWindow( nWindow )
+
       cTime := Time()
 
    ENDIF
@@ -316,3 +331,22 @@ FUNCTION TimeValid( cTime )
    ENDIF
 
 RETURN .F.
+
+
+#pragma BEGINDUMP
+
+HB_FUNC_STATIC( SETMAINWINDOW )
+{
+   hb_retni( hb_ctWSelect( -1 ) );
+   hb_ctWSelect( 0 );
+}
+
+HB_FUNC_STATIC( RESTOREWINDOW )
+{
+   int iWindow = hb_parni( 1 );
+
+   if( iWindow != 0 )
+      hb_ctWSelect( iWindow );
+}
+
+#pragma ENDDUMP
