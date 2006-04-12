@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.559 2006/04/06 04:54:17 ronpinkas Exp $
+ * $Id: hvm.c,v 1.560 2006/04/07 13:38:04 druzus Exp $
  */
 
 /*
@@ -3891,17 +3891,23 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
             {
                ULONG ulNewLen = ulLen1 + ulLen2;
 
-               if( ! ( pLeft == pResult && pLeft->item.asString.allocated && ( *( pLeft->item.asString.pulHolders ) == 1 ) ) )
+               if( pResult->item.asString.allocated && ( *( pResult->item.asString.pulHolders ) == 1 ) )
                {
+                  __HB_STRING_REALLOC( pResult, ulNewLen );
+
+                  if ( pLeft != pResult )
+                  {
+                     hb_xmemcpy( pResult, pLeft->item.asString.value, ulLen1 );
+                  }
+                  hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
+
+               } else {
                   char *sResult = (char *) hb_xgrab( ulNewLen + 1 );
 
                   hb_xmemcpy( sResult, pLeft->item.asString.value, ulLen1 );
-                  hb_itemPutCPtr( pResult, sResult, ulLen1 );
+                  hb_xmemcpy( sResult + ulLen1, pRight->item.asString.value, ulLen2 );
+                  hb_itemPutCPtr( pResult, sResult, ulNewLen );
                }
-
-               // At minimum sets length and terminator.
-               __HB_STRING_REALLOC( pResult, ulNewLen );
-               hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
             }
             else
             {
