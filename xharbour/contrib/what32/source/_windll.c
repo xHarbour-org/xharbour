@@ -33,13 +33,13 @@
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI HMODULE WINAPI LoadLibraryA( IN LPCSTR lpLibFileName );
-
+/*
 
 HB_FUNC( LOADLIBRARY )
 {
    hb_retnl( (LONG) LoadLibraryA( (LPCSTR) hb_parcx( 1 ) ) ) ;
 }
-
+*/
 //-----------------------------------------------------------------------------
 // WINBASEAPI HMODULE WINAPI LoadLibraryExA( IN LPCSTR lpLibFileName, IN HANDLE hFile, IN DWORD dwFlags );
 
@@ -55,13 +55,13 @@ HB_FUNC( LOADLIBRARYEX )
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI BOOL WINAPI FreeLibrary( IN OUT HMODULE hLibModule );
-
+/*
 
 HB_FUNC( FREELIBRARY )
 {
    hb_retl( FreeLibrary( (HMODULE) hb_parnl( 1 ) ) ) ;
 }
-
+*/
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI DECLSPEC_NORETURN VOID WINAPI FreeLibraryAndExitThread( IN HMODULE hLibModule, IN DWORD dwExitCode );
@@ -76,7 +76,7 @@ HB_FUNC( FREELIBRARYANDEXITTHREAD )
 
 //-----------------------------------------------------------------------------
 // WINBASEAPI FARPROC WINAPI GetProcAddress( IN HMODULE hModule, IN LPCSTR lpProcName );
-
+/*
 HB_FUNC( GETPROCADDRESS )
 {
   ULONG dwProcAddr;
@@ -98,7 +98,7 @@ HB_FUNC( GETPROCADDRESS )
     hb_retnl( dwProcAddr );
 
 }
-
+*/
 
 //------------------------------------------------------------------
 

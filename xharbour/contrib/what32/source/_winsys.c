@@ -1,6 +1,6 @@
 
 /*
- * $Id: _winsys.c,v 1.26 2004/08/29 09:56:37 lf_sfnet Exp $
+ * $Id: _winsys.c,v 1.27 2004/08/29 11:03:18 lf_sfnet Exp $
  */
 
 //-------------------------------------------------------------------//
@@ -411,12 +411,12 @@ HB_FUNC( MAKELONG )
 }
 
 //-------------------------------------------------------------------//
-
+/*
 HB_FUNC( GETLASTERROR )
 {
   hb_retnl( ( LONG ) GetLastError() ) ;
 }
-
+*/
 //-------------------------------------------------------------------//
 //
 // T.B.D.
@@ -439,11 +439,12 @@ HB_FUNC( FORMATMESSAGE)
 //
 // WINBASEAPI VOID WINAPI SetLastError( IN DWORD dwErrCode );
 //
+/*
 HB_FUNC( SETLASTERROR )
 {
    SetLastError( (DWORD) hb_parnl( 1 ) ) ;
 }
-
+*/
 //-------------------------------------------------------------------//
 //
 // WINBASEAPI UINT WINAPI SetErrorMode( IN UINT uMode );
