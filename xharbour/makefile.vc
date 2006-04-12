@@ -94,6 +94,17 @@ HB_MT        =-MT -DHB_THREAD_SUPPORT -D_MT
 !endif
 !endif
 
+# Wip - broken for now
+#!ifdef _NMAKE_VER
+#
+#!if ( "$(_NMAKE_VER)"=="7")
+_CFL=-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+#!else
+#_CFL=-Ox -FD -GA -GF -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX -D_CRT_SECURE_NO_DEPRECATE $(C_USR) $(CFLAGS)
+#!endif
+
+!endif
+
 # SimpLex is the only supported Scanner in xHarbour.
 HB_LEX       =SIMPLEX
 
@@ -140,18 +151,19 @@ HBPDF_DIR    =contrib\pdflib
 #
 
 AS           =ML
-C_FLAGSNMT   =-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+C_FLAGSNMT   =$(_CFL)
 C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
 LFLAGS       =/MACHINE:IX86 /SUBSYSTEM:CONSOLE $(LFLAGS)
-L_DFLAGSNMT  =$(LFLAGS) /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
+L_DFLAGSNMT  =$(LFLAGS) /NODEFAULTLIB:uuid.lib $(LDFLAGS)
 !ifdef HB_MT
 L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP /NODEFAULTLIB:LIBCPMT $(LDFLAGS)
 !else
 L_DFLAGS     =$(L_DFLAGSNMT)
 !endif
+# /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT 
 
 !ifdef HB_DOC_PDF
 HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
@@ -397,6 +409,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\direct.obj \
    $(OBJ_DIR)$(MT)\diskspac.obj \
    $(OBJ_DIR)$(MT)\disksphb.obj \
+   $(OBJ_DIR)$(MT)\dllcall.obj \
    $(OBJ_DIR)$(MT)\empty.obj \
    $(OBJ_DIR)$(MT)\file.obj \
    $(OBJ_DIR)$(MT)\filehb.obj \
