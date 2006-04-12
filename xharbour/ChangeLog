@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4924 2006/04/12 00:16:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4925 2006/04/12 01:05:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-12 01:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * makefile.vc
+    + source/rtl/dllcall.c
+    * other makefiles will need to be updated _after_
+    * determining if your compiler works with the ASM code
+    * at the bottom of dllcall.c
+
+  * source/rtl/dllcall.c
+    ! new - a few Xbase++ compatibile functions for dynamic calling
+      of dll routines. (not Xbase++ dlls!)
+  * contrib/libnf/origin.c
+    * changed to not access **__argv directly. 
 
 2006-04-11 18:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source\pp\ppcore.c

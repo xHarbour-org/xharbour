@@ -1,5 +1,5 @@
 /*
- * $Id: origin.c,v 1.1 2000/04/22 11:10:53 lculik Exp $
+ * $Id: origin.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -64,14 +64,13 @@
 
 HB_FUNC(FT_ORIGIN)
 {
+/* NOTE this directly accessed **__argv which leads to problems at link
+   time under certain conditions - the following is the preferred call - pt
+ */
+
 #if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
-   {
 
-   extern char **_argv;
+   hb_retc( hb_cmdargARGV()[0] );
 
-   hb_retc(  *_argv  );
-
-   return;
-}
 #endif
 }
