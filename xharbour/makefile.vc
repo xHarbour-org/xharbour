@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.167 2006/03/25 20:02:22 paultucker Exp $
+# $Id: makefile.vc,v 1.169 2006/04/12 05:29:33 paultucker Exp $
 #
 
 #
@@ -102,8 +102,8 @@ _CFL=-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32
 #!else
 #_CFL=-Ox -FD -GA -GF -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX -D_CRT_SECURE_NO_DEPRECATE $(C_USR) $(CFLAGS)
 #!endif
-
-!endif
+#
+#!endif
 
 # SimpLex is the only supported Scanner in xHarbour.
 HB_LEX       =SIMPLEX
