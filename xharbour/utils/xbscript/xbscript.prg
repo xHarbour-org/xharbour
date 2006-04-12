@@ -7464,10 +7464,10 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      ELSEIF nLen == 2
 
         // Odd, Clipper considers '->', '**', '!=', '<>', '>=', '<=' as valid startup tokens!!!
-        IF s2 $ '++\--\->\**\!=\<>\>=\<='
+        IF s2 $ '++;--;->;**;!=;<>;>=;<='
            sExp += sToken
            LOOP
-        ELSEIF s2 $ "==\:=\+=\-=\*=\^=\/=\%="
+        ELSEIF s2 $ "==;:=;+=;-=;*=;^=;/=;%="
            sLine := sToken + sLine
            EXIT
         ELSE
@@ -8292,7 +8292,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
    LOCAL nNext, sKey, sAnchor, nOptional := 0, cType, nId := 0, aRule, aMatch, aWords
    LOCAL nOptionalAt, nMarkerAt, aMarkers := {}, Counter, nType, aResult := {}, sTemp, aModifiers
-   LOCAL aRP, nAt, sResult, nCloseAt, sMarker, nCloseOptionalAt, sPad, nResults, nMarker, nMP, nMatches, nOffset
+   LOCAL aRP, nAt, sResult, nCloseAt, sMarker, nCloseOptionalAt, sPad, nResults, nMarker, nMP, nMatches
    LOCAL nWord, nWords, cChar
    LOCAL nLen, s1, s2, s3
    LOCAL sRuleCopy := sRule
@@ -8302,7 +8302,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    LOCAL nTempMP
    LOCAL nTokenLen
    LOCAL aMatchRule, cRuleExp
-
+   LOCAL sWord
    /*
    nMarkerID
    nOPTIONAL
@@ -8331,10 +8331,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
    nNext := 0
    DO WHILE ( nNext := AtInRules( "=", sRule, nNext + 1 ) ) > 0
-      IF SubStr( sRule, nNext - 1, 1 ) == '\'
-         sRule := Left( sRule, nNext - 2 ) + SubStr( sRule, nNext )
-         nNext++
-      ELSEIF Left( LTrim( SubStr( sRule, nNext + 1 ) ), 1 ) == '>'
+      IF Left( LTrim( SubStr( sRule, nNext + 1 ) ), 1 ) == '>'
          nTokenLen := 1
          WHILE SubStr( sRule, nNext + nTokenLen, 1 ) != '>'
             nTokenLen++
@@ -8358,6 +8355,10 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    ENDIF
 
    //TraceLog( sRule, sResult )
+
+   // Ugly hack 1. Need to skip strings 2. I prefer more elegant/generic approach
+   //sRule   := StrTran( sRule, "\<\>", "<>" )
+   //sResult := StrTran( sResult, "\<\>", "<>" )
 
    DO WHILE ! ( Left( sRule, 1 ) == '' )
       //? "Scaning: " + sRule
@@ -8391,13 +8392,13 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             BREAK
          ENDIF
 
-         IF nLen >= 3 .AND. s3 $ ".T.\.F."
+         IF nLen >= 3 .AND. s3 $ ".T.;.F."
             sTemp := s3
             BREAK
          ENDIF
 
          IF nLen >= 2
-            IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%="
+            IF s2 $ "++;--;->;:=;==;!=;<>;>=;<=;+=;-=;*=;^=;**;/=;%="
                sTemp := s2
                BREAK
             ENDIF
@@ -8405,8 +8406,8 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
          IF nLen >= 1
             IF s1 == '\'
-               sTemp := SubStr( sRule, 2, 1 )
                sRule := SubStr( sRule, 2 )
+               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
                BREAK
             ELSEIF s1 == '_' .OR. IsAlpha( s1 )
                sTemp := Upper( RTrim( NextToken( sRule ) ) ) // Not by refernce because of SubStr() below!!!
@@ -8470,7 +8471,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                sRule := SubStr( sRule, 2 )
                ExtractLeadingWS( @sRule )
 
-               nNext := At( '*', sRule )
+               nNext := AtInRules( '*', sRule )
 
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
@@ -8519,7 +8520,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                sRule := SubStr( sRule, 2 )
                ExtractLeadingWS( @sRule )
 
-               nNext := At( ')', sRule )
+               nNext := AtInRules( ')', sRule )
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
 
@@ -8568,7 +8569,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                sRule := SubStr( sRule, 2 )
                ExtractLeadingWS( @sRule )
 
-               nNext := At( '!', sRule )
+               nNext := AtInRules( '!', sRule )
                IF nNext > 1
                   sMarker := RTrim( Left( sRule, nNext - 1 ) )
 
@@ -8615,8 +8616,8 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                cType := NIL // Reset - not known yet.
          ENDCASE
 
-         nCloseAt := At( '>', sRule )
-         nNext    := At( ',', sRule )
+         nCloseAt := AtInRules( '>', sRule )
+         nNext    := AtInRules( ',', sRule )
 
          IF nNext > 1 .AND. nNext < nCloseAt
             sDots := LTrim( SubStr( sRule, nNext + 1 ) )
@@ -8662,7 +8663,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             nNext    := 0
             nCloseAt := 1
          ELSE
-            nNext := At( ':', sRule )
+            nNext := AtInRules( ':', sRule )
          ENDIF
 
          IF nNext > 0 .AND. nNext < nCloseAt
@@ -8687,15 +8688,23 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
             aWords := {}
             DO WHILE ! ( Left( sRule, 1 ) == '>' )
-               nNext := At( ',', sRule )
-               IF nNext > 0 .AND. nNext < At( '>', sRule )
-                  //? "Added: " + Left( sRule, nNext - 1 )
-                  aAdd( aWords, Upper( RTrim( Left( sRule, nNext - 1 ) ) ) )
+               nNext := AtInRules( ',', sRule )
+
+               IF nNext > 0 .AND. nNext < AtInRules( '>', sRule )
+                  sWord := Upper( RTrim( Left( sRule, nNext - 1 ) ) )
+
+                  sWord := StrTran( sWord, '\\', '' )
+                  sWord := StrTran( sWord, '\', '' )
+                  sWord := StrTran( sWord, '', '\' )
+
+                  //? "Added: " + sTemp
+                  aAdd( aWords, sWord )
+
                   sRule := SubStr( sRule, nNext + 1 )
                   ExtractLeadingWS( @sRule )
                   LOOP
                ELSE
-                  nCloseAt := At( '>', sRule )
+                  nCloseAt := AtInRules( '>', sRule )
                   IF nCloseAt > 0
                      //? "Last: " + Left( sRule, nCloseAt - 1 )
                      aAdd( aWords, Upper( RTrim( Left( sRule, nCloseAt - 1 ) ) ) )
@@ -8818,6 +8827,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
          ENDIF
 
          sAnchor := NextToken( @sRule )
+         //TraceLog( sAnchor )
       ENDIF
    ENDDO
 
@@ -8894,43 +8904,11 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    sPad          := ''
 
    DO WHILE ! ( sResult == '' )
-      nOffset := 0
-      nOptionalAt := AtSkipStrings( '[', sResult )
-      WHILE nOPtionalAt > 1 .AND. SubStr( sResult, nOptionalAt - 1, 1 ) == '\'
-         nOffset := nOptionalAt
-         nOptionalAt := AtSkipStrings( '[', sResult, nOffset + 1 )
-      ENDDO
+      nOptionalAt := AtInRules( '[', sResult )
 
-      nOffset := 0
-      IF nOptionalAt == 0
-         nMarkerAt := AtInRules( '<', sResult )
-         WHILE nMarkerAt > 0
-            IF nMarkerAt > 1 .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
-               nOffset   := nMarkerAt
-               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
-               //TraceLog( sResult, nOffset, nMarkerAt )
-            ELSEIF nMarkerAt > 0 .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
-               nOffset   := nMarkerAt + 1
-               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
-            ELSE
-               EXIT
-            ENDIF
-         ENDDO
-      ELSE
-         nMarkerAt := AtInRules( '<', sResult )
-         WHILE nMarkerAt > 0
-            IF nMarkerAt > 1 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt - 1, 1 ) == '\'
-               nOffset   := nMarkerAt
-               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
-               //TraceLog( sResult, nOffset, nMarkerAt )
-            ELSEIF nMarkerAt > 0 .AND. nMarkerAt < nOptionalAt .AND. SubStr( sResult, nMarkerAt + 1, 1 ) $ ">=" // ignore <= and <>
-               nOffset   := nMarkerAt + 1
-               nMarkerAt := AtInRules( '<', sResult, nOffset + 1 )
-            ELSE
-               EXIT
-            ENDIF
-         ENDDO
+      nMarkerAt := AtInRules( '<', sResult )
 
+      IF nOptionalAt != 0
          IF nMarkerAt > 0
             IF nMarkerAt > nOptionalAt
                nMarkerAt := 0
@@ -8941,9 +8919,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             TraceLog( "Warning, no markers in repeatable group: " + SubStr( sResult, nOptionalAt ) )
 
             nCloseOptionalAt := AtInRules( ']', sResult, nOptionalAt )
-            WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
-            ENDDO
 
             IF nCloseOptionalAt > 0
                //TraceLog( "Skipped: " + SubStr( sResult, nOptionalAt, nCloseOptionalAt - nOptionalAt + 1 ) )
@@ -8962,12 +8937,8 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
       IF nOptional == 0
          nCloseOptionalAt := 0
       ELSE
-         nOffset := 0
          IF nAt == 0
             nCloseOptionalAt := AtInRules( ']', sResult )
-            WHILE nCloseOptionalAt > 1 .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
-            ENDDO
 
             IF nCloseOptionalAt == 0
                //TraceLog( "RP Scan:", nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, sResult )
@@ -8977,9 +8948,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             ENDIF
          ELSE
             nCloseOptionalAt := AtInRules( ']', sResult )
-            WHILE nCloseOptionalAt > 1 .AND. nCloseOptionalAt <= nAt .AND. SubStr( sResult, nCloseOptionalAt - 1, 1 ) == '\'
-               nCloseOptionalAt := AtInRules( ']', sResult, nCloseOptionalAt + 1 )
-            ENDDO
 
             IF nCloseOptionalAt > 0
                IF nCloseOptionalAt > nAt
@@ -9089,7 +9057,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ">", sResult )
+            nNext := AtInRules( ">", sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<-'], { sResult } ) )
                // Safety
@@ -9123,7 +9091,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
          /* #<x> Dumb */
          ELSEIF nType == 2
 
-            nNext := At( '>', sResult )
+            nNext := AtInRules( '>', sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '#<'], { sResult } ) )
                // Safety
@@ -9194,7 +9162,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ">", sResult )
+            nNext := AtInRules( ">", sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<('], { sResult } ) )
                // Safety
@@ -9231,7 +9199,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ">", sResult )
+            nNext := AtInRules( ">", sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<{'], { sResult } ) )
                // Safety
@@ -9268,7 +9236,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             sResult := SubStr( sResult, 2 )
             ExtractLeadingWS( @sResult )
 
-            nNext := At( ">", sResult )
+            nNext := AtInRules( ">", sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<.'], { sResult } ) )
                // Safety
@@ -9301,7 +9269,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
          ELSE
 
-            nNext := At( '>', sResult )
+            nNext := AtInRules( '>', sResult )
             IF nNext == 0
                Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unbalanced RP '<'], { sResult } ) )
                // Safety
@@ -9556,7 +9524,9 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
       ENDIF
 
       IF aMatch[3] != NIL
+         aMatch[3] := StrTran( aMatch[3], '\\', '' )
          aMatch[3] := StrTran( aMatch[3], '\', '' )
+         aMatch[3] := StrTran( aMatch[3], '', '\' )
       ENDIF
 
       //? aRule[1], aRule[2][Counter][1], aRule[2][Counter][2], aRule[2][Counter][3], aRule[2][Counter][4], aRule[2][Counter][5]
@@ -9620,7 +9590,7 @@ STATIC FUNCTION CompileDefine( sRule )
       aAdd( aDefResults, aResult )
    ENDIF
 
-   IF sPad == "" .AND. Left( sRule, 1 ) == '(' .AND. ( nCloseAt := At( ')', sRule ) ) > 0
+   IF sPad == "" .AND. Left( sRule, 1 ) == '(' .AND. ( nCloseAt := AtInRules( ')', sRule ) ) > 0
 
       /*Pseudo Function. */
       sResult := SubStr( sRule, nCloseAt + 1 )
@@ -9651,7 +9621,7 @@ STATIC FUNCTION CompileDefine( sRule )
          nId      := 1
          sAnchor  := '('
 
-         WHILE ( nCommaAt := At( ',', sRule ) ) > 0
+         WHILE ( nCommaAt := AtInRules( ',', sRule ) ) > 0
             sMarker := Left( sRule, nCommaAt - 1 )
             sRule   := SubStr( sRule, nCommaAt + 1 )
             ExtractLeadingWS( @sRule )
@@ -9783,7 +9753,7 @@ RETURN Len( aDefRules )
 
             s2 := Left( sLine, 2 )
 
-            IF s2 $ "++\--\->\:=\==\!=\<>\>=\<=\+=\-=\*=\^=\**\/=\%=\=>\^^\<<\>>"
+            IF s2 $ "++;--;->;:=;==;!=;<>;>=;<=;+=;-=;*=;^=;**;/=;%=;=>;^^;<<;>>"
 
                sReturn := s2
 
@@ -11451,27 +11421,30 @@ RETURN s_oSelf
 //--------------------------------------------------------------//
 FUNCTION AtInRules( sFind, sLine, nStart )
 
-   LOCAL nAt, nLen := Len( sLine ), cChar, cLastChar := ' ', nLenFind := Len( sFind )
+   LOCAL nAt, nLen := Len( sLine ), cChar, nLenFind := Len( sFind )
 
    IF nStart == NIL
       nStart := 1
    ENDIF
 
    FOR nAt := nStart TO nLen
-       IF SubStr( sLine, nAt, nLenFind ) == sFind
-          RETURN nAt
-       ENDIF
+      IF SubStr( sLine, nAt, nLenFind ) == sFind
+         IF nAt == 1 .OR. SubStr( sLine, nAt - 1, 1 ) != '\' .OR. ( nAt > 2 .AND. SubStr( sLine, nAt - 2, 2 ) == "\\" )
+            IF sFind == "<" .AND. SubStr( sLine, nAt + 1, 1 ) $ "=>"
+               // Clipper sees it as a double char token "<=" or "<>" and does not accept it!
+            ELSE
+               RETURN nAt
+            ENDIF
+         ENDIF
+      ENDIF
 
-       cChar := SubStr( sLine, nAt, 1 )
+      cChar := SubStr( sLine, nAt, 1 )
 
-       IF cChar $ '"'+"'"
-          DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
-          ENDDO
-          LOOP // No need to record cLastChar
-       ENDIF
-
-       cLastChar := cChar
-    NEXT
+      IF cChar $ '"'+"'"
+         DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
+         ENDDO
+      ENDIF
+   NEXT
 
 RETURN 0
 
