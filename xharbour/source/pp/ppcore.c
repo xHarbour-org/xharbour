@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.223 2006/03/07 18:48:46 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.224 2006/03/08 04:30:23 ronpinkas Exp $
  */
 
 /*
@@ -1570,7 +1570,7 @@ static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL 
      {
         int i = ipos;
 
-        if( ipos && *(sLine - 1) == '\\' )
+        if( ipos && *(sLine - 1) == '\\' && ( ipos < 2 || *(sLine - 2) != '\\' ) )
         {
            ipos--;
            mpatt[ipos - 1] = '=';
@@ -1858,7 +1858,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
 
      if( mpatt[i] == '[' )
      {
-        if( i && mpatt[ i - 1 ] == '\\' )
+        if( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
            mlen--;
@@ -1877,7 +1877,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      }
      else if( mpatt[ i ] == ']' )
      {
-        if ( i && mpatt[ i - 1 ] == '\\' )
+        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
            mlen--;
@@ -1894,9 +1894,27 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            }
         }
      }
+     else if( mpatt[ i ] == '>' )
+     {
+        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
+        {
+           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
+           mlen--;
+           continue;
+        }
+     }
+     else if( mpatt[ i ] == '=' )
+     {
+        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
+        {
+           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
+           mlen--;
+           continue;
+        }
+     }
      else if( mpatt[ i ] == '<' )
      {
-        if( i && mpatt[ i - 1 ] == '\\' )
+        if( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
            mlen--;
@@ -2327,7 +2345,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      }
      else if( rpatt[i] == '[' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' )
+        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
            rlen--;
@@ -2343,7 +2361,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      }
      else if( rpatt[i] == ']' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' )
+        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
            rlen--;
@@ -2362,9 +2380,27 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            rpatt[i] = '\17';
         }
      }
+     else if( rpatt[i] == '>' )
+     {
+        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
+        {
+           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
+           rlen--;
+           continue;
+        }
+     }
+     else if( rpatt[i] == '=' )
+     {
+        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
+        {
+           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
+           rlen--;
+           continue;
+        }
+     }
      else if( rpatt[i] == '<' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' )
+        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
         {
            hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
            rlen--;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4923 2006/04/12 00:15:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4924 2006/04/12 00:16:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-11 18:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source\pp\ppcore.c
+    * Few fixes in handling of \ in ParseCommand() and ConvertPatterns()
+    + Added support for \\ in ParseCommand() and ConvertPatterns()
 
 2006-04-11 17:11 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
