@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.224 2006/03/08 04:30:23 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.225 2006/04/12 01:05:42 ronpinkas Exp $
  */
 
 /*
@@ -1840,50 +1840,37 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
         {
            i++;
         }
-
-        i++;
-        continue;
      }
-
-     if( mpatt[i] == '\'' )
+     else if( mpatt[i] == '\'' )
      {
-        while( mpatt[ ++i ] != '\'' )
-        {
-           //Skip.
-        }
-
         i++;
-        continue;
-     }
 
-     if( mpatt[i] == '[' )
-     {
-        if( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
+        while( mpatt[ i ] != '\'' )
         {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
-           mlen--;
-           continue;
+           i++;
         }
-        else
-        {
-           uiOpenBrackets++;
-           mpatt[i] = '\16';
+     }
+     else if( mpatt[i] == '\\' )
+     {
+        hb_pp_Stuff( "", mpatt + i, 0, 1, mlen - i );
+        mlen--;
 
-           if( pOpen == NULL )
-           {
-              pOpen = mpatt + i;
-           }
+        // Will skip the next char!
+        //printf( "Will skip: %c at '%s'\n", mpatt[i], mpatt + i );
+     }
+     else if( mpatt[i] == '[' )
+     {
+        uiOpenBrackets++;
+        mpatt[i] = '\16';
+
+        if( pOpen == NULL )
+        {
+           pOpen = mpatt + i;
         }
      }
      else if( mpatt[ i ] == ']' )
      {
-        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
-           mlen--;
-           continue;
-        }
-        else if( uiOpenBrackets )
+        if( uiOpenBrackets )
         {
            uiOpenBrackets--;
            mpatt[i] = '\17';
@@ -1894,33 +1881,9 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            }
         }
      }
-     else if( mpatt[ i ] == '>' )
-     {
-        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
-           mlen--;
-           continue;
-        }
-     }
-     else if( mpatt[ i ] == '=' )
-     {
-        if ( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
-           mlen--;
-           continue;
-        }
-     }
      else if( mpatt[ i ] == '<' )
      {
-        if( i && mpatt[ i - 1 ] == '\\' && ( i < 2 || mpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", mpatt + i - 1, 0, 1, mlen - i + 1 );
-           mlen--;
-           continue;
-        }
-        else if( mpatt[ i + 1 ] == '>' )
+        if( mpatt[ i + 1 ] == '>' )
         {
            i += 2;
            continue;
@@ -2314,60 +2277,40 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
   {
      if( rpatt[i] == '"' )
      {
-        while( rpatt[ ++i ] != '"' )
-        {
-           //Skip.
-        }
-
         i++;
-        continue;
-     }
 
-     if( rpatt[i] == '\'' )
-     {
-        while( rpatt[ ++i ] != '\'' )
+        while( rpatt[ i ] != '"' )
         {
-           //Skip.
+           i++;
         }
-
+     }
+     else if( rpatt[i] == '\'' )
+     {
         i++;
-        continue;
-     }
 
-     if( rpatt[i] == '\\' )
-     {
-        if( rpatt[ i + 1 ] != '[' && rpatt[ i + 1 ] != ']' && rpatt[ i + 1 ] != '<' && rpatt[ i + 1 ] != '\\' )
+        while( rpatt[ i ] != '\'' )
         {
-           hb_pp_Stuff( "", rpatt + i, 0, 1, rlen - i );
-           rlen--;
-           continue;
+           i++;
         }
+     }
+     else if( rpatt[i] == '\\' )
+     {
+        hb_pp_Stuff( "", rpatt + i, 0, 1, rlen - i );
+        rlen--;
+
+        // Will skip the next char!
+        //printf( "Will skip: %c at '%s'\n", rpatt[i], rpatt + i );
      }
      else if( rpatt[i] == '[' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
-           rlen--;
-           continue;
-        }
-        else
-        {
-           uiOpenBrackets++;
-           rpatt[i] = '\16';
-           pOpen = rpatt + i;
-           bMarkers = FALSE;
-        }
+        uiOpenBrackets++;
+        rpatt[i] = '\16';
+        pOpen = rpatt + i;
+        bMarkers = FALSE;
      }
      else if( rpatt[i] == ']' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
-           rlen--;
-           continue;
-        }
-        else if( uiOpenBrackets )
+        if( uiOpenBrackets )
         {
            uiOpenBrackets--;
 
@@ -2380,33 +2323,9 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
            rpatt[i] = '\17';
         }
      }
-     else if( rpatt[i] == '>' )
-     {
-        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
-           rlen--;
-           continue;
-        }
-     }
-     else if( rpatt[i] == '=' )
-     {
-        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
-           rlen--;
-           continue;
-        }
-     }
      else if( rpatt[i] == '<' )
      {
-        if( i && rpatt[ i - 1 ] == '\\' && ( i < 2 || rpatt[ i - 2 ] != '\\' ) )
-        {
-           hb_pp_Stuff( "", rpatt + i - 1, 0, 1, rlen - i + 1 );
-           rlen--;
-           continue;
-        }
-        else if( rpatt[ i + 1 ] != '>' && rpatt[ i + 1 ] != '=' )
+        if( rpatt[ i + 1 ] != '>' && rpatt[ i + 1 ] != '=' )
         {
            char *pClose = strchr( rpatt + i, '>' );
 
@@ -2458,6 +2377,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
      i++;
   }
 
+  //#define DEBUG_PATTERNS
   #ifdef DEBUG_PATTERNS
      printf( "   Match: >%s<\n", mpatt );
      printf( "   Result: >%s<\n", rpatt );
