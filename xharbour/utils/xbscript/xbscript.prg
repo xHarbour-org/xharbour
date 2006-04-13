@@ -8294,7 +8294,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    LOCAL nOptionalAt, nMarkerAt, aMarkers := {}, Counter, nType, aResult := {}, sTemp, aModifiers
    LOCAL aRP, nAt, sResult, nCloseAt, sMarker, nCloseOptionalAt, sPad, nResults, nMarker, nMP, nMatches
    LOCAL nWord, nWords, cChar
-   LOCAL nLen, s1, s2, s3
    LOCAL sRuleCopy := sRule
    LOCAL nLastOptional, nPending
    LOCAL sDots
@@ -8303,6 +8302,8 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    LOCAL nTokenLen
    LOCAL aMatchRule, cRuleExp
    LOCAL sWord
+   LOCAL nLen, sToken
+
    /*
    nMarkerID
    nOPTIONAL
@@ -8356,88 +8357,95 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
    //TraceLog( sRule, sResult )
 
-   // Ugly hack 1. Need to skip strings 2. I prefer more elegant/generic approach
-   //sRule   := StrTran( sRule, "\<\>", "<>" )
-   //sResult := StrTran( sResult, "\<\>", "<>" )
-
-   DO WHILE ! ( Left( sRule, 1 ) == '' )
+   DO WHILE ! Empty( sRule )
       //? "Scaning: " + sRule
+      nMarkerAt   := AtInRules( '<', sRule )
+      nOptionalAt := AtInRules( '[', sRule )
 
-      nLen := Len( sRule )
-
-      s1 := Left( sRule, 1 )
-      IF nLen >= 2
-         s2 := Left( sRule, 2 )
-      ENDIF
-      IF nLen >= 3
-         s3 := Upper( Left( sRule, 3 ) )
+      IF nOptional != 0
+         nCloseOptionalAt := AtInRules( ']', sRule )
+      ELSE
+         nCloseOptionalAt := 0
       ENDIF
 
-      BEGIN SEQUENCE
+      nAt := Max( Max( nMarkerAt, nOptionalAt ), nCloseOptionalAt )
 
-         IF nLen >= 5
-            IF s1 == '.' .AND. Upper( SubStr( sRule, 2, 3 ) ) == 'AND' .AND. SubStr( sRule, 5, 1 ) == '.'
-               sTemp := ".AND."
-               BREAK
-            ELSEIF s1 = '.' .AND. Upper( SubStr( sRule, 2, 3 ) ) == 'NOT' .AND. SubStr( sRule, 5, 1 ) == '.'
-               sTemp := "!"
-               /* Skip the unaccounted letters ( .NOT. <-> ! ) */
-               sRule := SubStr( sRule, 4 )
-               BREAK
+      IF nMarkerAt > 0
+         IF nMarkerAt <= nAt
+            nAt := nMarkerAt
+         ELSE
+            nMarkerAt := 0
+         ENDIF
+      ENDIF
+
+      IF nOptionalAt > 0
+         IF nOptionalAt <= nAt
+            nAt         := nOptionalAt
+            nMarkerAt   := 0
+         ELSE
+            nOptionalAt := 0
+         ENDIF
+      ENDIF
+
+      IF nCloseOptionalAt > 0
+         IF nCloseOptionalAt <= nAt
+            nAt         := nCloseOptionalAt
+            nMarkerAt   := 0
+            nOptionalAt := 0
+         ELSE
+            nCloseOptionalAt := 0
+         ENDIF
+      ENDIF
+
+      //TraceLog( sRule, nAt, nMarkerAt, nOptionalAt, nCloseOptionalAt, nOptional )
+
+      IF nAt == 0
+         sTemp := sRule
+         sRule := ""
+      ELSE
+         sTemp := Left( sRule, nAt - 1 )
+         sRule := SubStr( sRule, nAt + 1 )
+         /* Skip trailing spaces...*/
+         ExtractLeadingWS( @sRule )
+      ENDIF
+
+      IF Empty( sTemp )
+         sAnchor := NIL
+      ELSE
+         nLen := Len( sTemp )
+
+         // Remove redundant Escape characters.
+         FOR nAt := 1 TO nLen
+            cChar := SubStr( sTemp, nAt, 1 )
+
+            IF cChar $ ['"]
+               WHILE ( nAt < nLen ) .AND. SubStr( sTemp, ++nAt, 1 ) != cChar
+               END
+            ELSEIF cChar == '\'
+               sTemp := Left( sTemp, nAt - 1 ) + SubStr( sTemp, nAt + 1 )
+               nLen--
+
+               // Skip the next Escape if any, because we did not --nAt!
             ENDIF
-         ENDIF
+         NEXT
 
-         IF nLen >= 4 .AND. s1 == '.' .AND. Upper( SubStr( sRule, 2, 2 ) ) == 'OR' .AND. SubStr( sRule, 4, 1 ) == '.'
-            sTemp := ".OR."
-            BREAK
-         ENDIF
+         //TraceLog( sTemp )
 
-         IF nLen >= 3 .AND. s3 $ ".T.;.F."
-            sTemp := s3
-            BREAK
-         ENDIF
+         WHILE ( sToken := NextToken( @sTemp ), ! Empty( sTemp ) )
+            TraceLog( sToken )
+            aMatch := { 0, nOptional, RTrim( sToken ), NIL, NIL }
+            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
+            aAdd( aRule[2], aMatch )
 
-         IF nLen >= 2
-            IF s2 $ "++;--;->;:=;==;!=;<>;>=;<=;+=;-=;*=;^=;**;/=;%="
-               sTemp := s2
-               BREAK
+            /* Next dependant optional will be marked as trailing. */
+            IF nOptional > 0
+               nOptional := ( -nOptional )
             ENDIF
-         ENDIF
+         END
 
-         IF nLen >= 1
-            IF s1 == '\'
-               sRule := SubStr( sRule, 2 )
-               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
-               BREAK
-            ELSEIF s1 == '_' .OR. IsAlpha( s1 )
-               sTemp := Upper( RTrim( NextToken( sRule ) ) ) // Not by refernce because of SubStr() below!!!
-               BREAK
-            ELSEIF s1 == '.' // Might pull decimal numbers...
-               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
-               BREAK
-            ELSEIF IsDigit( s1 )
-               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
-               BREAK
-            ELSEIF s1 == ']' .AND. nOptional == 0
-               sTemp := ']'
-               BREAK
-            ELSEIF s1 $ "+-*/:=^!&(){}@,|>#%?$"
-               sTemp := s1
-               BREAK
-            ELSEIF s1 == '"' .OR. s1 == "'"
-               sTemp := RTrim( NextToken( sRule ) ) // Not by refernce because of SubStr() below!!!
-               BREAK
-            ENDIF
-         ENDIF
+         sAnchor := RTrim( sToken )
 
-      END SEQUENCE
-
-      //TraceLog( sTemp )
-
-      IF sTemp != NIL
-         IF ! ( sAnchor == NIL )
-            //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
-
+         IF nMarkerAt == 0
             aMatch := { 0, nOptional, sAnchor, NIL, NIL }
             //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
             aAdd( aRule[2], aMatch )
@@ -8447,22 +8455,22 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                nOptional := ( -nOptional )
             ENDIF
          ENDIF
-
-         sAnchor := sTemp // Next Anchor
-         sRule   := SubStr( sRule, Len( sAnchor ) + 1 )
-         ExtractLeadingWS( @sRule )
-
-         sTemp := NIL // Resetting.
-         LOOP
       ENDIF
 
-      IF s1 == '<'
+      IF nOptionalAt > 0
+         nOptional := Abs( nOptional )
+         nOptional++
+         //? "Optional:", nOptional
+      ELSEIF nCloseOptionalAt > 0
+         IF nOptional > 0
+            nOptional--
+            nOptional := (-nOptional)
+         ELSE
+            nOptional++
+         ENDIF
+      ELSEIF nMarkerAt > 0
          //nId++
          nId := Len( aMarkers ) + 1
-
-         /* Skip trailing spaces...*/
-         sRule := SubStr( sRule, 2 )
-         ExtractLeadingWS( @sRule )
 
          DO CASE
             CASE SubStr( sRule, 1, 1 ) == '*'
@@ -8506,7 +8514,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                      nOptional := ( -nOptional )
                   ENDIF
 
-                  sAnchor := NIL
                   LOOP
                ELSE
                   Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<*'], { sRule } ) )
@@ -8555,7 +8562,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                      nOptional := ( -nOptional )
                   ENDIF
 
-                  sAnchor := NIL
                   LOOP
                ELSE
                   Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<('], { sRule } ) )
@@ -8604,7 +8610,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
                      nOptional := ( -nOptional )
                   ENDIF
 
-                  sAnchor := NIL
                   LOOP
                ELSE
                   Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unblanced MP: '<!'], { sRule } ) )
@@ -8742,10 +8747,12 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             ExtractLeadingWS( @sRule )
 
             aMatch := { nId, nOptional, sAnchor, cType, aWords }
-            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
-            aAdd( aRule[2], aMatch )
+
 
             aWords := NIL // Reset.
+
+            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
+            aAdd( aRule[2], aMatch )
 
             /* Next dependant optional will be marked as trailing. */
             IF nOptional > 0
@@ -8756,88 +8763,11 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
             // Safety
             BREAK
          ENDIF
-
-         sAnchor := NIL
-         LOOP
-
-      ELSEIF s1 == '['
-
-         IF ! ( sAnchor == NIL )
-            //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
-
-            aMatch := { 0, nOptional, sAnchor, NIL, NIL }
-            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
-            aAdd( aRule[2], aMatch )
-
-            // No need to negate nOptional, because we start a new optional group below...
-         ENDIF
-
-         nOptional := Abs( nOptional )
-         nOptional++
-         //? "Optional:", nOptional
-
-         sRule := SubStr( sRule, 2 )
-         ExtractLeadingWS( @sRule )
-
-         sAnchor := NIL
-         LOOP
-
-      ELSEIF s1 == ']'
-
-         IF ! ( sAnchor == NIL )
-            //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
-
-            aMatch := { 0, nOptional, sAnchor, NIL, NIL }
-            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
-            aAdd( aRule[2], aMatch )
-
-            // No need to negate nOptional, because we close optional group below...
-         ENDIF
-
-         IF nOptional > 0
-            nOptional--
-            nOptional := (-nOptional)
-         ELSE
-            nOptional++
-         ENDIF
-
-         sRule := SubStr( sRule, 2 )
-         ExtractLeadingWS( @sRule )
-
-         sAnchor := NIL
-         LOOP
-
       ELSE
-
-         // Some token sneaked in ...
-         //TraceLog( "UnExpected Case: " + sRule + "[" + Str( ProcLine() ) + "]" )
-         Eval( ErrorBlock(), ErrorNew( [PP], 0, 2059, [Compile-Rule], [Unexpected case], { sRule } ) )
-
-         IF ! ( sAnchor == NIL )
-            //TraceLog( "ORPHAN ANCHOR: " + sAnchor )
-
-            aMatch := { 0, nOptional, sAnchor, NIL, NIL }
-            //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
-            aAdd( aRule[2], aMatch )
-
-            /* Next dependant optional will be marked as trailing. */
-            IF nOptional > 0
-               nOptional := ( -nOptional )
-            ENDIF
-         ENDIF
-
-         sAnchor := NextToken( @sRule )
-         //TraceLog( sAnchor )
+         //
       ENDIF
+
    ENDDO
-
-   IF sAnchor != NIL
-      aMatch := { 0, 0, sAnchor, NIL, NIL }
-      //? aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5]
-      aAdd( aRule[2], aMatch )
-
-      // No need to negate nOptional, because last token, and nOptional must equal 0 here!
-   ENDIF
 
    IF nOptional <> 0
       //TraceLog( "ERROR Unclose Optional group, nOptional = " + Str( nOptional, 3 ), aMatch[1], aMatch[2], aMatch[3], aMatch[4], aMatch[5] )
@@ -9523,12 +9453,6 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
 
       ENDIF
 
-      IF aMatch[3] != NIL
-         aMatch[3] := StrTran( aMatch[3], '\\', '' )
-         aMatch[3] := StrTran( aMatch[3], '\', '' )
-         aMatch[3] := StrTran( aMatch[3], '', '\' )
-      ENDIF
-
       //? aRule[1], aRule[2][Counter][1], aRule[2][Counter][2], aRule[2][Counter][3], aRule[2][Counter][4], aRule[2][Counter][5]
    NEXT
    //WAIT
@@ -9939,13 +9863,7 @@ RETURN Len( aDefRules )
 
             BREAK
 
-         ELSEIF s1 == "\"
-
-            sReturn := s2
-
-            BREAK
-
-         ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$~"
+         ELSEIF s1 $ "+-*/:=^!&()[]{}@,|<>#%?$~\"
 
             sReturn := s1
 
@@ -11419,30 +11337,29 @@ FUNCTION PP_QSelf( o )
 RETURN s_oSelf
 
 //--------------------------------------------------------------//
-FUNCTION AtInRules( sFind, sLine, nStart )
+FUNCTION AtInRules( cFind, sLine, nStart )
 
-   LOCAL nAt, nLen := Len( sLine ), cChar, nLenFind := Len( sFind )
+   LOCAL nAt, nLen := Len( sLine ), cChar
 
    IF nStart == NIL
       nStart := 1
    ENDIF
 
    FOR nAt := nStart TO nLen
-      IF SubStr( sLine, nAt, nLenFind ) == sFind
-         IF nAt == 1 .OR. SubStr( sLine, nAt - 1, 1 ) != '\' .OR. ( nAt > 2 .AND. SubStr( sLine, nAt - 2, 2 ) == "\\" )
-            IF sFind == "<" .AND. SubStr( sLine, nAt + 1, 1 ) $ "=>"
-               // Clipper sees it as a double char token "<=" or "<>" and does not accept it!
-            ELSE
-               RETURN nAt
-            ENDIF
-         ENDIF
-      ENDIF
-
       cChar := SubStr( sLine, nAt, 1 )
 
       IF cChar $ '"'+"'"
          DO WHILE ( nAt < nLen ) .AND. SubStr( sLine, ++nAt, 1 ) != cChar
          ENDDO
+      ELSEIF cChar == '\'
+         // Skip next [Escaped] char
+         nAt++
+      ELSEIF cChar == cFind
+         IF cFind == "<" .AND. SubStr( sLine, nAt + 1, 1 ) $ "=>"
+            // Clipper sees it as a double char token "<=" or "<>" and does not accept it!
+         ELSE
+            RETURN nAt
+         ENDIF
       ENDIF
    NEXT
 

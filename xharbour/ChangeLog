@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4927 2006/04/12 13:37:28 snaiperis Exp $
+ * $Id: ChangeLog,v 1.4928 2006/04/13 02:54:43 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-12 23:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * utils/xbscript/xbscript.prg
+  * utils/xbscript/xbs_harb.ch
+    * Corrected NextToken() to treat \ as a single char token
+  * utils/xbscript/xbscript.prg
+    * Fixed and optimized AtInRules() support of \
+    * Rewrote match rule compiler in CompileRule() to correctly implement \ support
 
 2006-04-12 23:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -36,7 +44,7 @@
     ! new - a few Xbase++ compatibile functions for dynamic calling
       of dll routines. (not Xbase++ dlls!)
   * contrib/libnf/origin.c
-    * changed to not access **__argv directly. 
+    * changed to not access **__argv directly.
 
 2006-04-11 18:04 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source\pp\ppcore.c
