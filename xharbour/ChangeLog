@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4926 2006/04/12 05:22:18 paultucker Exp $
+ * $Id: ChangeLog,v 1.4927 2006/04/12 13:37:28 snaiperis Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-12 23:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed some bugs in numeric gets:
+    - fixed to display negative numbers correctly in get with or without
+      decimal point.
+    - fixed to not display negative zero.
+    - fixed to not display cursor out of get area if we press dot key in
+      a numeric get without decimal point.
+    - fixed to return numeric value at same format than initial value format,
+      respecting amount of digits after decimal point.
+    - fixed to display and return zero if we press only dot key and not press
+      any digit in a numeric get
 
 2006-04-12 16:35 UTC+0200 Mindaugas Kavaliauskas (dbtopas/at/dbtopas.lt)
   * xharbour/source/vm/hvm.c
