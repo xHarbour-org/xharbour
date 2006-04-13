@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.104 2006/03/25 20:29:55 modalsist Exp $
+ * $Id: tget.prg,v 1.105 2006/04/13 02:54:44 modalsist Exp $
  */
 
 /*
@@ -482,10 +482,10 @@ METHOD Display( lForced ) CLASS Get
 
    IF ::Pos != NIL
       nCol := ::Col + ::Pos - ::nDispPos + if( ::cDelimit == NIL, 0, 1 )
-      // E.F. 2006/APRIL/12 - We need adjust cursor column position if user
+      // E.F. 2006/APRIL/13 - We need adjust cursor column position if user
       // has pressed a dot key in numeric var that haven't decimal part.
       //
-      IF ::Type=="N" .AND. ::hasfocus .AND.  (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. LastKey()=iif(::lDecRev .OR. "E" IN ::cPicFunc ,Asc(','),Asc('.')) 
+      IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') ) 
          nCol := ::Col + ::nMaxLen - 1
          ::Left(.F.)
       ENDIF

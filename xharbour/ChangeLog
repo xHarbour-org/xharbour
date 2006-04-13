@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4928 2006/04/13 02:54:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.4929 2006/04/13 06:45:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-13 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    - fixed to not display cursor out of get area if we press comma key in
+      a numeric get without decimal point. This is complementary fix of the
+      last tget commit
 
 2006-04-12 23:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
