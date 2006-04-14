@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.105 2006/04/13 02:54:44 modalsist Exp $
+ * $Id: tget.prg,v 1.106 2006/04/13 13:14:19 modalsist Exp $
  */
 
 /*
@@ -436,7 +436,7 @@ METHOD Display( lForced ) CLASS Get
    //
    //IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
    //     xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
-   IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::minus  
+   IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::minus
       xBuffer := PadL( StrTran(xBuffer,'-',''), Len(xBuffer) )
       IF Val(xBuffer) != 0
          IF ::DecPos > 0 .AND. ::DecPos < Len( xBuffer)
@@ -485,7 +485,7 @@ METHOD Display( lForced ) CLASS Get
       // E.F. 2006/APRIL/13 - We need adjust cursor column position if user
       // has pressed a dot key in numeric var that haven't decimal part.
       //
-      IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') ) 
+      IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') )
          nCol := ::Col + ::nMaxLen - 1
          ::Left(.F.)
       ENDIF
@@ -687,8 +687,8 @@ return xValue
 //---------------------------------------------------------------------------//
 
 METHOD VarGet() CLASS Get
-LOCAL cVarGet
 
+   LOCAL cVarGet
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
 
    IF ! HB_IsBlock( ::Block )
@@ -703,32 +703,37 @@ LOCAL cVarGet
       aIndex := ::SubScript
       nDim := Len( aIndex )
       aGetVar := Eval( ::Block )
+
       FOR nCounter := 1 TO nDim - 1
          aGetVar := aGetVar[ aIndex[ nCounter ] ]
       NEXT
+
       xVarGet := aGetVar[ aIndex[ nCounter ] ]
    ENDIF
 
    ::Type := ValType( xVarGet )
 
-   // E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies. 
-   //
-   IF ::Type=="N" .AND. ::DecPos != NIL
+   // E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies.
+   IF ::Type == "N" .AND. ::DecPos != NIL .AND. ::nMaxLen != NIL
       IF ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
          cVarGet := Str( xVarGet, ::nMaxLen, ::nMaxLen - ::DecPos )
+
          IF Empty( SubStr( cVarGet, 1, ::DecPos-1) )
             cVarGet := Stuff( cVarGet, ::DecPos-1, 1, "0")
          ENDIF
+
          IF Empty( SubStr( cVarGet, ::DecPos+1 ) )
-            cVarGet := Stuff( cVarGet, ::DecPos+1, ::nMaxLen - ::DecPos, replicate("0",::nMaxLen - ::DecPos) ) 
+            cVarGet := Stuff( cVarGet, ::DecPos+1, ::nMaxLen - ::DecPos, replicate("0",::nMaxLen - ::DecPos) )
          ENDIF
+
          xVarGet := Val( cVarGet )
       ENDIF
 
-//      IF Lastkey() == iif( ::lDecRev .OR. "E" IN ::cPicFunc, asc(','), asc('.') )
-//         xVarGet := 0
-//      ENDIF
-
+      /*
+      IF Lastkey() == IIF( ::lDecRev .OR. "E" IN ::cPicFunc, asc(','), asc('.') )
+         xVarGet := 0
+      ENDIF
+      */
    ENDIF
 
    ::xVarGet := xVarGet
