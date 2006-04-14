@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.ch,v 1.5 2004/11/25 17:07:20 maurifull Exp $
+ * $Id: gfxtrans.ch,v 1.1 2005/02/11 18:58:51 druzus Exp $
  *
  */
 
@@ -81,6 +81,8 @@
 #translate GFXGETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => <nTop> := gfxPrimitive(GFX_CLIPTOP); <nLeft> := gfxPrimitive(GFX_CLIPLEFT); <nBottom> := gfxPrimitive(GFX_CLIPBOTTOM); <nRight> := gfxPrimitive(GFX_CLIPRIGHT)
 #translate GFXSETCLIP(<nTop>, <nLeft>, <nBottom>, <nRight>) => gfxPrimitive(GFX_SETCLIP, <nTop>, <nLeft>, <nBottom>, <nRight>)
 #translate GFXDRAWINGMODE([<nMode>]) => gfxPrimitive(GFX_DRAWINGMODE[, <nMode>])
+#translate GFXMOUSEX() => gfxPrimitive(GFX_MOUSEX)
+#translate GFXMOUSEY() => gfxPrimitive(GFX_MOUSEY)
 #translate GFXGETPIXEL(<nY>, <nX>) => gfxPrimitive(GFX_GETPIXEL, <nY>, <nX>)
 #translate GFXPUTPIXEL(<nY>, <nX>, <nColor>) => gfxPrimitive(GFX_PUTPIXEL, <nY>, <nX>, <nColor>)
 #translate GFXLINE(<nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>) => gfxPrimitive(GFX_LINE, <nTop>, <nLeft>, <nBottom>, <nRight>, <nColor>)

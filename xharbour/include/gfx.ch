@@ -1,5 +1,5 @@
 /*
- * $Id: gfx.ch,v 1.5 2004/11/25 17:07:20 maurifull Exp $
+ * $Id: gfx.ch,v 1.6 2005/02/11 18:58:40 druzus Exp $
  *
  */
 
@@ -85,6 +85,8 @@
 #define GFX_CLIPBOTTOM     12
 #define GFX_CLIPRIGHT      13
 #define GFX_SETCLIP        14  // NOTE: set to 0, 0, 0, 0 to disable ;)
+#define GFX_MOUSEX         15
+#define GFX_MOUSEY         16
 /* Functions that affect drawing mode */
 #define GFX_DRAWINGMODE    20
 /* Drawing primitives */

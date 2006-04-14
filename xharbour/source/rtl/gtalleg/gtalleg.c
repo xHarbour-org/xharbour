@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.41 2006/04/07 06:08:01 maurifull Exp $
+ * $Id: gtalleg.c,v 1.42 2006/04/14 22:05:09 maurifull Exp $
  */
 
 /*
@@ -2054,6 +2054,18 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
             }
         }
         return iLeft;
+      case GFX_MOUSEX:
+        if ( al_mouse_needs_poll() )
+        {
+           al_poll_mouse();
+        }
+        return al_mouse_x;
+      case GFX_MOUSEY:
+        if ( al_mouse_needs_poll() )
+        {
+           al_poll_mouse();
+        }
+        return al_mouse_y;
       case GFX_GETPIXEL:
         return al_get_pixel(dst, iLeft, iTop);
       case GFX_PUTPIXEL:
