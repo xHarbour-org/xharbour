@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4931 2006/04/13 22:47:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4932 2006/04/14 01:35:59 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-14 19:15 UTC+0100 Mauricio Abre <mgabre@gmail.com>
+  * source/rtl/gtalleg/gtalleg.c
+    + Added drawing mode set capability for SOLID and XOR modes
 
 2006-04-13 18:35 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/tget.prg
@@ -130,7 +134,7 @@
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
     * fixed ordKeyPos() - for records out of scope
 
-2006-04-0 3:10 UTC+0100 Mauricio Abre <mgabre@gmail.com>
+2006-04-06 3:10 UTC+0100 Mauricio Abre <mgabre@gmail.com>
   * source/rtl/gtapi.c
     ! Fixed bug preventing GT delayed initialization
   * source/rtl/gtalleg/gtalleg.c

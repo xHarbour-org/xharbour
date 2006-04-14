@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.40 2006/03/10 15:32:20 druzus Exp $
+ * $Id: gtalleg.c,v 1.41 2006/04/07 06:08:01 maurifull Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ static USHORT s_usDispCount, s_usCursorStyle;
 static SHORT s_sCurCol, s_sCurRow;
 static BYTE * s_pbyScrBuffer = NULL;
 static int s_pClr[16];
-static BYTE s_byFontSize = 16, s_byFontWidth = 8;
+static BYTE s_byFontSize = 16, s_byFontWidth = 8, s_byDrawMode = GFX_MODE_SOLID;
 static AL_BITMAP *bmp;
 BOOL lClearInit = TRUE;
 
@@ -2039,7 +2039,21 @@ int HB_GT_FUNC( gt_gfxPrimitive( int iType, int iTop, int iLeft, int iBottom, in
         s_iCRight = iRight;
         return 1;
       case GFX_DRAWINGMODE:
-        return GFX_MODE_SOLID;
+        iLeft = (int) s_byDrawMode;
+        if (iTop > 0)
+        {
+            s_byDrawMode = iTop;
+            switch (iTop)
+            {
+                case GFX_MODE_SOLID:
+                    al_drawing_mode( DRAW_MODE_SOLID, NULL, 0, 0 );
+                    break;
+                case GFX_MODE_XOR:
+                    al_drawing_mode( DRAW_MODE_XOR, NULL, 0, 0 );
+                    break;
+            }
+        }
+        return iLeft;
       case GFX_GETPIXEL:
         return al_get_pixel(dst, iLeft, iTop);
       case GFX_PUTPIXEL:
