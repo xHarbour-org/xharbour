@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.25 2005/09/16 22:29:40 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.26 2005/10/30 14:45:48 druzus Exp $
  */
 
 /*
@@ -326,18 +326,18 @@ static ERRCODE hb_dbfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
 
 #endif /* HB_EXTERNAL_RDDDBF_USE */
 
-extern ULONG   HB_EXPORT hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
-extern void    HB_EXPORT hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex,
+extern HB_EXPORT ULONG   hb_dbfGetMemoBlock( DBFAREAP pArea, USHORT uiIndex );
+extern HB_EXPORT void    hb_dbfPutMemoBlock( DBFAREAP pArea, USHORT uiIndex,
                                              ULONG ulBlock );
-extern ERRCODE HB_EXPORT hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
+extern HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                             ULONG * pulBlock, ULONG * pulSize,
                                             ULONG * pulType );
-extern ERRCODE HB_EXPORT hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
+extern HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
                                             ULONG ulBlock, ULONG ulSize,
                                             ULONG ulType );
-extern ERRCODE HB_EXPORT hb_dbfGetEGcode( ERRCODE errCode );
-extern BOOL    HB_EXPORT hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
-extern BOOL    HB_EXPORT hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
+extern HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
+extern HB_EXPORT BOOL    hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
+extern HB_EXPORT BOOL    hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
 
 HB_EXTERN_END
 

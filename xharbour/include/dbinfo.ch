@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.21 2005/09/13 01:48:06 druzus Exp $
+ * $Id: dbinfo.ch,v 1.22 2006/03/01 20:15:28 druzus Exp $
  */
 
 /*
@@ -99,7 +99,7 @@
 #define RDDI_MEMOGCTYPE           34   /* type of garbage collector used by GC */
 #define RDDI_MEMOREADLOCK         35   /* use read lock in memo file access */
 #define RDDI_MEMOREUSE            36   /* reuse free space on write */
-
+#define RDDI_BLOB_SUPPORT         37   /* can support BLOB files directly */
 
 /*
    Constants for SELF_ORDINFO ()

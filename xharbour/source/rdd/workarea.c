@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.64 2006/02/15 19:33:05 druzus Exp $
+ * $Id: workarea.c,v 1.65 2006/03/01 20:15:28 druzus Exp $
  */
 
 /*
@@ -485,8 +485,11 @@ ERRCODE hb_waSetFieldExtent( AREAP pArea, USHORT uiFieldExtent )
    pArea->uiFieldExtent = uiFieldExtent;
 
    /* Alloc field array */
-   pArea->lpFields = ( LPFIELD ) hb_xgrab( uiFieldExtent * sizeof( FIELD ) );
-   memset( pArea->lpFields, 0, uiFieldExtent * sizeof( FIELD ) );
+   if( uiFieldExtent )
+   {
+      pArea->lpFields = ( LPFIELD ) hb_xgrab( uiFieldExtent * sizeof( FIELD ) );
+      memset( pArea->lpFields, 0, uiFieldExtent * sizeof( FIELD ) );
+   }
 
    return SUCCESS;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbferr.h,v 1.4 2005/06/22 15:29:54 druzus Exp $
+ * $Id: hbdbferr.h,v 1.5 2005/09/15 12:55:35 druzus Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 HB_EXTERN_BEGIN
 
 /* DBF errors */
+#define EDBF_UNSUPPORTED                           1000
 #define EDBF_OPEN_DBF                              1001
 #define EDBF_OPEN_MEMO                             1002
 #define EDBF_OPEN_INDEX                            1003
