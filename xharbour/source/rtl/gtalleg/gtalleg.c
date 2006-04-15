@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.42 2006/04/14 22:05:09 maurifull Exp $
+ * $Id: gtalleg.c,v 1.43 2006/04/14 22:31:02 maurifull Exp $
  */
 
 /*
@@ -1684,7 +1684,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
       }
       else if ( ( nKey != 0 ) && ( ( nKey & 255 ) < 32 ) && ( ( nKey & 255 ) == ( nKey >> 8 ) ) )  // K_CTRL_A .. Z
       {
-#ifdef HB_NEW_KCTRL
+#ifdef HB_EXT_INKEY
         nKey = 512 + ( nKey & 255 );
 #else
         nKey = nKey & 255;
