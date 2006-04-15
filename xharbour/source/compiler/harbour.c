@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.129 2006/04/10 20:51:49 likewolf Exp $
+ * $Id: harbour.c,v 1.130 2006/04/15 04:08:44 ronpinkas Exp $
  */
 
 /*
@@ -2225,8 +2225,6 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
    pFunc->iStackFunctions = 0;
    pFunc->iStackClasses   = 0;
 
-   hb_comp_ulLastModuleNamePos = 0;
-
    return pFunc;
 }
 
@@ -3154,7 +3152,7 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
    BYTE *pBuffer;
    
    /* Use a special form "filename:" when the file changes within function */
-   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode && hb_comp_ulLastModuleNamePos )
+   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
    {
       char *szLast = (char *) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
       
@@ -3196,7 +3194,7 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
 
       //printf( "Line: %i, Offset %i LastPos %i, Pos %i\n", hb_comp_iLine, iOffset, hb_comp_ulLastOffsetPos, hb_comp_functions.pLast->lPCodePos );
 
-      if ( hb_comp_bDebugInfo )
+      if ( !bCodeblock && hb_comp_bDebugInfo )
       {
          hb_compGenModuleName( hb_comp_files.pLast->szFileName, "" );
       }
