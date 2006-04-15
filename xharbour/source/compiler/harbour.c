@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.128 2006/03/29 00:34:40 druzus Exp $
+ * $Id: harbour.c,v 1.129 2006/04/10 20:51:49 likewolf Exp $
  */
 
 /*
@@ -841,6 +841,7 @@ PFUNCTION hb_compFunCallAdd( char * szFunctionName )
       ( ( PFUNCTION ) hb_comp_funcalls.pLast )->pNext = pFunc;
       hb_comp_funcalls.pLast = pFunc;
    }
+
    hb_comp_funcalls.iCount++;
 
    return pFunc;
@@ -2224,6 +2225,8 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
    pFunc->iStackFunctions = 0;
    pFunc->iStackClasses   = 0;
 
+   hb_comp_ulLastModuleNamePos = 0;
+
    return pFunc;
 }
 
@@ -3151,21 +3154,22 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
    BYTE *pBuffer;
    
    /* Use a special form "filename:" when the file changes within function */
-   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
+   if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode && hb_comp_ulLastModuleNamePos )
    {
-      char *szLast = (char *)hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
+      char *szLast = (char *) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
       
-      if ( !strncmp( szFile, szLast, iFileLen )
-           && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
+      if ( ( ! strncmp( szFile, szLast, iFileLen ) ) && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
       {
          return;
       }
    }
+
    iFuncLen = szFunc ? strlen( szFunc ) + 1 : 0;
    iBufLen = 1 + iFileLen + ( szFunc ? iFuncLen : 0 ) + 1;
    pBuffer = (BYTE *)hb_xgrab( iBufLen );
    pBuffer[ 0 ] = HB_P_MODULENAME;
    memcpy( (BYTE *)( &( pBuffer[ 1 ] ) ), (BYTE *)szFile, iFileLen );
+
    if ( szFunc )
    {
       pBuffer[ 1 + iFileLen ] = ':';
@@ -3175,7 +3179,9 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
    {
       pBuffer[ 1 + iFileLen ] = '\0';
    }
+
    hb_comp_ulLastModuleNamePos = hb_comp_functions.pLast->lPCodePos;
+
    hb_compGenPCodeN( pBuffer, iBufLen, 0 );
    hb_xfree( pBuffer );
 }
@@ -5076,6 +5082,7 @@ void hb_compStaticDefEnd( void )
    hb_comp_functions.pLast = hb_comp_pInitFunc->pOwner;
    hb_comp_pInitFunc->pOwner = NULL;
    ++hb_comp_iStaticCnt;
+
    if ( hb_comp_bDebugInfo )
    {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
@@ -5102,6 +5109,7 @@ void hb_compGlobalsDefStart( void )
    {
       hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
+
       if ( hb_comp_bDebugInfo )
       {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
@@ -5117,6 +5125,7 @@ void hb_compGlobalsDefEnd( void )
 {
    hb_comp_functions.pLast = hb_comp_pGlobalsFunc->pOwner;
    hb_comp_pGlobalsFunc->pOwner = NULL;
+
    if ( hb_comp_bDebugInfo )
    {
       hb_comp_ulLastModuleNamePos = hb_comp_ulSavedModuleNamePos;
