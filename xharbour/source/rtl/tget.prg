@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.106 2006/04/13 13:14:19 modalsist Exp $
+ * $Id: tget.prg,v 1.107 2006/04/14 01:36:01 ronpinkas Exp $
  */
 
 /*
@@ -174,6 +174,7 @@ CLASS Get
    DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit, nMaxEdit
    DATA lMinusPrinted, xVarGet
    DATA lDispLen INIT .F.
+   DATA lUndo INIT .F.
 
    METHOD ParsePict( cPicture )
    METHOD DeleteAll()
@@ -409,7 +410,7 @@ METHOD Display( lForced ) CLASS Get
    LOCAL cClrCap := hb_ColorIndex( ::ColorSpec, GET_CLR_CAPTION )
    LOCAL cClrAcc := hb_ColorIndex( ::ColorSpec, GET_CLR_ACCEL )
    LOCAL lIsIntense := SET( _SET_INTENSITY)
-   LOCAL nCol
+   LOCAL nCol,cDisplay
 
    DEFAULT lForced TO .t.
 
@@ -449,6 +450,7 @@ METHOD Display( lForced ) CLASS Get
       ENDIF
    ENDIF
 
+
    IF ::HasScroll() .AND. ::Pos != NIL
       IF ::nDispLen > 8
          ::nDispPos := Max( 1, Min( ::Pos - ::nDispLen + 4, ::nMaxLen - ::nDispLen + 1 ) )
@@ -459,8 +461,10 @@ METHOD Display( lForced ) CLASS Get
 
    IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
 
+      cDisplay := Substr( xBuffer, ::nDispPos, ::nDispLen )
+
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
-                 Substr( xBuffer, ::nDispPos, ::nDispLen ), ;
+                 cDisplay,;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
 
       IF ! ( ::cDelimit == NIL )
@@ -483,8 +487,8 @@ METHOD Display( lForced ) CLASS Get
    IF ::Pos != NIL
       nCol := ::Col + ::Pos - ::nDispPos + if( ::cDelimit == NIL, 0, 1 )
       // E.F. 2006/APRIL/13 - We need adjust cursor column position if user
-      // has pressed a dot key in numeric var that haven't decimal part.
-      //
+      // has pressed a dot or comma key in the numeric var that haven't
+      // decimal part.
       IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') )
          nCol := ::Col + ::nMaxLen - 1
          ::Left(.F.)
@@ -554,9 +558,15 @@ return Self
 METHOD Undo() CLASS Get
 
    if ::hasfocus
+      // E.F. 2006/APRIL/14 - reset ::minus flag if ::xVarGet was
+      // negative number but ::original value not.
+      IF ::Type=="N" .AND. ::Original != NIL .AND. ::Original >= 0
+         ::minus := .f.
+      ENDIF
       ::VarPut( ::Original, .t. )
       ::pos := ::FirstEditable()
       ::updateBuffer() // 7/01/2004 9:44a.m. was ::Display()
+      ::lUndo := .t.
    endif
 
 return Self
@@ -582,10 +592,8 @@ METHOD SetFocus() CLASS Get
       ::changed    := .f.
       ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
       //::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
-      ::pos        := 0
       ::lEdit      := .f.
-
-      ::pos := ::FirstEditable()
+      ::pos        := ::FirstEditable()
 
       if ::pos = 0
          ::TypeOut = .t.
@@ -829,7 +837,7 @@ METHOD Untransform( cBuffer ) CLASS Get
 2005/07/30 - Eduardo Fernandes <modalsist@yahoo.com.br>
 The two IFs below was disabled because cause wrong get value if we type
 a numeric var greater than 999 in the picture "@R 9,999.99".
-Added: lUntransform := ( "R" IN ::cPicFunc )
+Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
 
             if "R" IN ::cPicFunc
                lUntransform := Empty( ::buffer )
@@ -840,6 +848,7 @@ Added: lUntransform := ( "R" IN ::cPicFunc )
             endif
 */
             lUntransform := ( "R" IN ::cPicFunc )
+
 
             if lUntransform
                cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + ;
@@ -946,7 +955,8 @@ METHOD overstrike( cChar ) CLASS Get
       ::Rejected := .f.
    endif
 
-   if ::Clear .and. ::pos == ::FirstEditable()
+
+   if ::lUndo .OR. (::Clear .and. ::pos == ::FirstEditable())
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1015,7 +1025,7 @@ METHOD Insert( cChar ) CLASS Get
       ::Rejected := .f.
    endif
 
-   if ::Clear .and. ::pos == ::FirstEditable()
+   if ::lUndo .OR. (::Clear .and. ::pos == ::FirstEditable())
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1487,6 +1497,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
 
    if lEdit .and. ::type == "N" .and. ! Empty( cMask )
+
       if "E" IN cPicFunc
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", chr(1) ) + SubStr( cMask, ::LastEditable() + 1 )
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cMask, ::LastEditable() + 1 )
@@ -1505,6 +1516,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cBuffer, ::LastEditable() + 1 )
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), chr(1), "." ) + SubStr( cBuffer, ::LastEditable() + 1 )
       endif
+
    endif
 
    if ::type == "N"
@@ -1612,6 +1624,7 @@ METHOD DeleteAll() CLASS Get
    local xValue
 
    ::lEdit := .t.
+   ::lUndo := .f.
 
    Switch ::type
    case "C"
@@ -1632,6 +1645,22 @@ METHOD DeleteAll() CLASS Get
 
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable()
+
+   // E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E' and '@R'
+   // masks of numeric vars, into display edit buffer.
+   IF ::type=="N" .AND. ::buffer != NIL .AND. !empty(::cPicture) .AND.;
+      ("," IN ::cPicture .AND. "." IN ::cPicture)
+      IF "R" IN ::cPicFunc 
+         ::buffer := StrTran(::buffer, ".", "" )
+         ::buffer := StrTran(::buffer, ",", "" )
+         ::buffer := Transform( ::buffer, ::cPicture )
+      ELSEIF "E" IN ::cPicFunc
+         ::buffer := Transform( ::buffer, ::cPicture )
+         ::buffer := StrTran(::buffer, ".", chr(1) )
+         ::buffer := StrTran(::buffer, ",", "." )
+         ::buffer := StrTran(::buffer, chr(1), "," )
+      ENDIF
+   ENDIF
 
 return Self
 

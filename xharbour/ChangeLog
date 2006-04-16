@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4937 2006/04/15 18:52:21 druzus Exp $
+ * $Id: ChangeLog,v 1.4938 2006/04/15 21:07:37 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-15 22:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed undo method to reset ::minus flag if previous value was
+      negative but ::original not.
+    ! fixed to show all commas and dots when we use "@E 999,999.99" or
+      "@R 999,999.99" pictures to numeric get, until exit edit buffer,
+      as Clipper does.
+      Example:
+
+      set confirm on
+      nVar := 0
+      @0,0 Get nVar pict "@R 99,999,999.99"
+      read
+
+      Enter 1234567890. The previous get shows 12 345 678.90 until press
+      enter while Clipper shows 12,345,678.90.
 
 2006-04-16 01:06 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.c
