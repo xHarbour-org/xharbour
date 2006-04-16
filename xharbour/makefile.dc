@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.18 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: makefile.dc,v 1.19 2006/03/25 20:02:22 paultucker Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -894,6 +894,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\direct.obj \
    $(RTL_OBJ_DIR)\diskspac.obj \
    $(RTL_OBJ_DIR)\disksphb.obj \
+   $(RTL_OBJ_DIR)\dllcall.obj \
    $(RTL_OBJ_DIR)\empty.obj \
    $(RTL_OBJ_DIR)\error.obj \
    $(RTL_OBJ_DIR)\file.obj \
@@ -1509,6 +1510,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\direct.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\diskspac.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\disksphb.obj >> dmcrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dllcall.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\empty.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\error.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\file.obj     >> dmcrtl.rsp
@@ -2476,6 +2478,9 @@ $(RTL_OBJ_DIR)\dircmd.c : $(RTL_DIR)\dircmd.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\dircmd.obj : $(RTL_OBJ_DIR)\dircmd.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dllcall.obj : $(RTL_DIR)\dllcall.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg

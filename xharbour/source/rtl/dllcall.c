@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.20 2006/01/15 20:29:02 ptucker Exp $
+ * $Id: dllcall.c,v 1.1 2006/04/12 05:22:20 paultucker Exp $
  */
 
 /*
@@ -430,7 +430,7 @@ static void DllExec( int iFlags, DWORD lpFunction, int iParams, int iFirst, int 
          break;
 
       default:
-         MessageBox( GetActiveWindow(), "UNKNOW Return Type!", "DLLCall Parameter Error!", MB_OK | MB_ICONERROR );
+         MessageBox( GetActiveWindow(), "Unknown return type!", "DLLCall Parameter Error!", MB_OK | MB_ICONERROR );
          break;
    }
 }
@@ -547,6 +547,8 @@ HB_FUNC( DLLCALL )
 Copyright 2002 Vic McClung <vicmcclung@vicmcclung.com>
 www - http://www.vicmcclung.com
 
+Borland mods by ptucker@sympatico.ca
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -583,84 +585,146 @@ linking the VMGUI library code into it.
 RESULT DynaCall(int Flags,       DWORD lpFunction, int nArgs,
                 DYNAPARM Parm[], LPVOID pRet,      int nRetSiz)
 {
-    // Call the specified function with the given parameters. Build a
-    // proper stack and take care of correct return value processing.
-    RESULT  Res = { 0 };
-    int     i, nInd, nSize;
-    DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
-    BYTE   *pArg;
+   // Call the specified function with the given parameters. Build a
+   // proper stack and take care of correct return value processing.
+   RESULT  Res = { 0 };
+   int    i, nInd, nSize;
+   DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
+   BYTE   *pArg;
 
-    // Reserve 256 bytes of stack space for our arguments
-    _asm mov pStack, esp
-    _asm sub esp, 0x100
+   // Reserve 256 bytes of stack space for our arguments
+   #if defined( __BORLANDC__ ) || defined(__DMC__)
+      pStack = (DWORD *)_ESP;
+      _ESP -= 0x100;
+   #else
+      _asm mov pStack, esp
+      _asm sub esp, 0x100
+   #endif
 
-    // Push args onto the stack. Every argument is aligned on a
-    // 4-byte boundary. We start at the rightmost argument.
-    for (i = 0; i < nArgs; i++) {
-        nInd  = (nArgs - 1) - i;
-        // Start at the back of the arg ptr, aligned on a DWORD
-        nSize = (Parm[nInd].nWidth + 3) / 4 * 4;
-        pArg  = (BYTE *)Parm[nInd].pArg + nSize - 4;
-        dwStSize += (DWORD)nSize; // Count no of bytes on stack
-        while (nSize > 0) {
-            // Copy argument to the stack
-            if (Parm[nInd].dwFlags & DC_FLAG_ARGPTR) {
-                // Arg has a ptr to a variable that has the arg
-                dwVal = *(DWORD *)pArg; // Get first four bytes
-                pArg -= 4;              // Next part of argument
-            }
-            else {
-                // Arg has the real arg
-                dwVal = Parm[nInd].dwArg;
-            }
-            // Do push dwVal
-            pStack--;           // ESP = ESP - 4
-            *pStack = dwVal;    // SS:[ESP] = dwVal
-            nSize -= 4;
-        }
-    }
-    if ((pRet != NULL) && ((Flags & DC_BORLAND) || (nRetSiz > 8))) {
-        // Return value isn't passed through registers, memory copy
-        // is performed instead. Pass the pointer as hidden arg.
-        dwStSize += 4;          // Add stack size
-        pStack--;               // ESP = ESP - 4
-        *pStack = (DWORD)pRet;  // SS:[ESP] = pMem
-    }
+   // Push args onto the stack. Every argument is aligned on a
+   // 4-byte boundary. We start at the rightmost argument.
+   for (i = 0; i < nArgs; i++)
+   {
+      nInd  = (nArgs - 1) - i;
+      // Start at the back of the arg ptr, aligned on a DWORD
+      nSize = (Parm[nInd].nWidth + 3) / 4 * 4;
+      pArg  = (BYTE *)Parm[nInd].pArg + nSize - 4;
+      dwStSize += (DWORD)nSize; // Count no of bytes on stack
+      while (nSize > 0)
+      {
+         // Copy argument to the stack
+         if (Parm[nInd].dwFlags & DC_FLAG_ARGPTR)
+         {
+            // Arg has a ptr to a variable that has the arg
+            dwVal = *(DWORD *)pArg; // Get first four bytes
+            pArg -= 4;           // Next part of argument
+         }
+         else
+         {
+            // Arg has the real arg
+            dwVal = Parm[nInd].dwArg;
+         }
+         // Do push dwVal
+         pStack--;         // ESP = ESP - 4
+         *pStack = dwVal;   // SS:[ESP] = dwVal
+         nSize -= 4;
+      }
+   }
+   if ((pRet != NULL) && ((Flags & DC_BORLAND) || (nRetSiz > 8)))
+   {
+      // Return value isn't passed through registers, memory copy
+      // is performed instead. Pass the pointer as hidden arg.
+      dwStSize += 4;        // Add stack size
+      pStack--;            // ESP = ESP - 4
+      *pStack = (DWORD)pRet;  // SS:[ESP] = pMem
+   }
+   #if defined( __BORLANDC__ ) || defined(__DMC__)
+      _ESP += (0x100 - dwStSize);
+      _EDX = (DWORD) &lpFunction;
+      __emit__(0xff,0x12); // call [edx];
+      dwEAX = _EAX;
+      dwEDX = _EDX;
+      // Possibly adjust stack and read return values.
+      if (Flags & DC_CALL_CDECL)
+      {
+         _ESP += dwStSize;
+      }
 
-    _asm add esp, 0x100         // Restore to original position
-    _asm sub esp, dwStSize      // Adjust for our new parameters
+      if (Flags & DC_RETVAL_MATH4)
+      {
+         _EBX = (DWORD) &Res;
+         _EAX = dwEAX;
+         _EDX = dwEDX;
+         __emit__(0xd9,0x1b);   //     _asm fnstp float ptr [ebx]
+      }
+      else if (Flags & DC_RETVAL_MATH8)
+      {
+         _EBX = (DWORD) &Res;
+         _EAX = dwEAX;
+         _EDX = dwEDX;
+         __emit__(0xdd,0x1b);   //     _asm fnstp qword ptr [ebx]
+      }
+      else if (pRet == NULL)
+      {
+         _EBX = (DWORD) &Res;
+         _EAX = dwEAX;
+         _EDX = dwEDX;
+//         _asm mov DWORD PTR [ebx], eax
+//         _asm mov DWORD PTR [ebx + 4], edx
+         __emit__(0x89,0x03,0x89,0x53,0x04);
+      }
+      else if (((Flags & DC_BORLAND) == 0) && (nRetSiz <= 8))
+      {
+         _EBX = (DWORD) pRet;
+         _EAX = dwEAX;
+         _EDX = dwEDX;
+//         _asm mov DWORD PTR [ebx], eax
+//         _asm mov DWORD PTR [ebx + 4], edx
+         __emit__(0x89,0x03,0x89,0x53,0x04);
+      }
+   #else
+      _asm add esp, 0x100       // Restore to original position
+      _asm sub esp, dwStSize     // Adjust for our new parameters
 
-    // Stack is now properly built, we can call the function
-    _asm call [lpFunction]
+      // Stack is now properly built, we can call the function
+      _asm call [lpFunction]
 
-    _asm mov dwEAX, eax         // Save eax/edx registers
-    _asm mov dwEDX, edx         //
+      _asm mov dwEAX, eax       // Save eax/edx registers
+      _asm mov dwEDX, edx       //
 
-    // Possibly adjust stack and read return values.
-    if (Flags & DC_CALL_CDECL) {
-        _asm add esp, dwStSize
-    }
-    if (Flags & DC_RETVAL_MATH4) {
-        _asm fstp dword ptr [Res]
-    }
-    else if (Flags & DC_RETVAL_MATH8) {
-        _asm fstp qword ptr [Res]
-    }
-    else if (pRet == NULL) {
-        _asm mov eax, [dwEAX]
-        _asm mov DWORD PTR [Res], eax
-        _asm mov edx, [dwEDX]
-        _asm mov DWORD PTR [Res + 4], edx
-    }
-    else if (((Flags & DC_BORLAND) == 0) && (nRetSiz <= 8)) {
-        // Microsoft optimized less than 8-bytes structure passing
-        _asm mov ecx, DWORD PTR [pRet]
-        _asm mov eax, [dwEAX]
-        _asm mov DWORD PTR [ecx], eax
-        _asm mov edx, [dwEDX]
-        _asm mov DWORD PTR [ecx + 4], edx
-    }
-    return Res;
+      // Possibly adjust stack and read return values.
+      if (Flags & DC_CALL_CDECL)
+      {
+         _asm add esp, dwStSize
+      }
+
+      if (Flags & DC_RETVAL_MATH4)
+      {
+         _asm fstp dword ptr [Res]
+      }
+      else if (Flags & DC_RETVAL_MATH8)
+      {
+         _asm fstp qword ptr [Res]
+      }
+      else if (pRet == NULL)
+      {
+         _asm mov eax, [dwEAX]
+         _asm mov DWORD PTR [Res], eax
+         _asm mov edx, [dwEDX]
+         _asm mov DWORD PTR [Res + 4], edx
+      }
+      else if (((Flags & DC_BORLAND) == 0) && (nRetSiz <= 8))
+      {
+         // Microsoft optimized less than 8-bytes structure passing
+         _asm mov ecx, DWORD PTR [pRet]
+         _asm mov eax, [dwEAX]
+         _asm mov DWORD PTR [ecx], eax
+         _asm mov edx, [dwEDX]
+         _asm mov DWORD PTR [ecx + 4], edx
+      }
+   #endif
+
+   return Res;
 }
 
 #endif

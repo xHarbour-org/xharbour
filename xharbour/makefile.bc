@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.167 2006/03/23 02:07:04 kaddath Exp $
+# $Id: makefile.bc,v 1.168 2006/03/29 03:42:40 ronpinkas Exp $
 #
 
 #
@@ -316,6 +316,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\direct.obj \
    $(RTL_OBJ_DIR)\diskspac.obj \
    $(RTL_OBJ_DIR)\disksphb.obj \
+   $(RTL_OBJ_DIR)\dllcall.obj \
    $(RTL_OBJ_DIR)\empty.obj \
    $(RTL_OBJ_DIR)\file.obj \
    $(RTL_OBJ_DIR)\filehb.obj \
@@ -1953,6 +1954,9 @@ $(RTL_OBJ_DIR)\dircmd.c : $(RTL_DIR)\dircmd.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\dircmd.obj : $(RTL_OBJ_DIR)\dircmd.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dllcall.obj : $(RTL_DIR)\dllcall.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dummy.c : $(RTL_DIR)\dummy.prg
