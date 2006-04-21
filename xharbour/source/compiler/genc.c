@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.120 2006/03/29 08:40:25 ronpinkas Exp $
+ * $Id: genc.c,v 1.121 2006/03/30 00:08:12 ronpinkas Exp $
  */
 
 /*
@@ -3834,7 +3834,7 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
    genc_info.bVerbose = ( hb_comp_iGenCOutput == HB_COMPGENC_VERBOSE );
    genc_info.yyc = yyc;
 
-   fprintf( yyc, "\n{\n   static const BYTE pcode[] =\n   {\n" );
+   fprintf( yyc, "{\n   static const BYTE pcode[] =\n   {\n" );
 
    hb_compPCodeEval( pFunc, ( HB_PCODE_FUNC_PTR * ) s_verbose_table, ( void * ) &genc_info );
    if( genc_info.bVerbose )

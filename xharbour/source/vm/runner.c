@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.43 2005/10/24 01:04:38 druzus Exp $
+ * $Id: runner.c,v 1.44 2005/11/16 12:16:46 druzus Exp $
  */
 
 /*
@@ -70,8 +70,6 @@
 #include "hbpcode.h"
 #include "hb_io.h"
 
-// extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
-
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
 /* TOFIX: Fix the memory leak on error. */
 
@@ -91,7 +89,7 @@ typedef struct
    LONG ulSymStart;                             /* Startup Symbol           */
    PHB_SYMB pSymRead;                           /* Symbols read             */
    PHB_DYNF pDynFunc;                           /* Functions read           */
-   PSYMBOLS pPrevLastModule;
+   PSYMBOLS pModuleSymbols;
 } HRB_BODY, * PHRB_BODY;
 
 
@@ -108,8 +106,6 @@ HB_EXPORT void hb_hrbUnLoad( PHRB_BODY pHrbBody );
 HB_EXTERN_END
 
 static void hb_hrbInit( PHRB_BODY pHrbBody, int argc, char * argv[] );
-
-static ULONG     s_ulSymEntry = 0;              /* Link enhancement         */
 
 /*
    __HRBRUN( <cFile> [, xParam1 [, xParamN ] ] ) -> return value.
@@ -345,39 +341,19 @@ HB_FUNC( __HRBDOFU )
 
 static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded )
 {
-   ULONG ulRet;
+   ULONG ulRet = 0;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbFindSymbol(%s, %p, %lu)", szName, pDynFunc, ulLoaded));
 
-   if( ( s_ulSymEntry < ulLoaded ) &&  /* Is it a normal list ? */ ! strcmp( szName, pDynFunc[ s_ulSymEntry ].szName ) )
+   while( ulRet < ulLoaded )
    {
-      ulRet = s_ulSymEntry++;
-   }
-   else
-   {
-      BOOL bFound = FALSE;
-
-      ulRet = 0;
-
-      while( ! bFound && ulRet < ulLoaded )
+      if( ! strcmp( szName, pDynFunc[ ulRet ].szName ) )
       {
-         if( ! strcmp( szName, pDynFunc[ ulRet ].szName ) )
-         {
-            bFound = TRUE;
-         }
-         else
-         {
-            ulRet++;
-         }
+         return ulRet;
       }
-
-      if( !bFound )
-      {
-         ulRet = SYM_NOT_FOUND;
-      }
+      ulRet++;
    }
-
-   return ulRet;
+   return SYM_NOT_FOUND;
 }
 
 static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
@@ -403,12 +379,11 @@ static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset
 
 /* ReadId
    Read the next (zero terminated) identifier */
-static char * hb_hrbReadId( char * szBody, BOOL bUseFM, ULONG ulBodySize, ULONG * ulBodyOffset )
+static char * hb_hrbReadId( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
    char * szIdx;
-   char * szRet;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadId(%p,%i,%i,%i)", szBody, bUseFM, ulBodySize, *ulBodyOffset));
+   HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadId(%p,%lu,%p)", szBody, ulBodySize, ulBodyOffset));
 
    szIdx = &szBody[ *ulBodyOffset ];
 
@@ -417,28 +392,13 @@ static char * hb_hrbReadId( char * szBody, BOOL bUseFM, ULONG ulBodySize, ULONG 
       if ( *ulBodyOffset > ulBodySize )
       {
          hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
-         return "";
+         szIdx = "";
+         break;
       }
    }
    while( szBody[ ( *ulBodyOffset )++ ] );
 
-   if( bUseFM )
-   {
-      szRet = ( char * ) hb_xgrab( &szBody[ *ulBodyOffset ] - szIdx );
-   }
-   else
-   {
-      /*
-         Intentionally using malloc() instead of hb_xgrab() to "mask" unavoidable "leak" because:
-         1. Symbols MUST remain for the duration of the App, or Dynamic Symbol Table will become
-            a GPF trap when attrmpting to access such no longer existing Symbol.
-         2. It seems that it's not worth keeping track of each unloaded module symbols, since
-            release can only take place at app termination as per #1 above.
-      */
-      szRet = ( char * ) malloc( &szBody[ *ulBodyOffset ] - szIdx );
-   }
-
-   return strcpy( szRet, szIdx );
+   return hb_strdup( szIdx );
 }
 
 
@@ -471,7 +431,7 @@ static LONG hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffse
 
 static void hb_hrbInitStatic( PHRB_BODY pHrbBody )
 {
-   if ( ! pHrbBody->fInit && ! pHrbBody->fExit )
+   if( ! pHrbBody->fInit && ! pHrbBody->fExit )
    {
       ULONG ul;
 
@@ -518,7 +478,7 @@ static void hb_hrbInit( PHRB_BODY pHrbBody, int argc, char * argv[] )
             hb_vmPushSymbol( pHrbBody->pSymRead + ul );
             hb_vmPushNil();
             for( i = 0; i < argc; i++ ) /* Push other cmdline params*/
-               hb_vmPushString( argv[i],strlen(argv[i]) );
+               hb_vmPushString( argv[i], strlen( argv[i] ) );
 
             hb_vmDo( argc );            /* Run init function        */
          }
@@ -535,16 +495,13 @@ static void hb_hrbExit( PHRB_BODY pHrbBody )
       pHrbBody->fExit = FALSE;
       pHrbBody->fInit = TRUE;
 
-      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Check EXIT functions     */
+      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
       {
          if( ( pHrbBody->pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == HB_FS_EXIT )
          {
             hb_vmPushSymbol( pHrbBody->pSymRead + ul );
             hb_vmPushNil();
-            hb_vmDo( 0 );                   /* Run exit function        */
-            pHrbBody->pSymRead[ ul ].scope.value = pHrbBody->pSymRead[ ul ].scope.value & ( ~HB_FS_EXIT );
-                                            /* Exit function cannot be
-                                               handled by main in hvm.c */
+            hb_vmDo( 0 );
          }
       }
    }
@@ -556,15 +513,9 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 
    hb_hrbExit( pHrbBody );
 
-   if( pHrbBody->pPrevLastModule && pHrbBody->pPrevLastModule->pNext )
+   if( pHrbBody->pModuleSymbols )
    {
-      hb_xfree( pHrbBody->pPrevLastModule->pNext->szModuleName );
-
-      // Release PSYMBOLS of our module.
-      hb_xfree( pHrbBody->pPrevLastModule->pNext );
-
-      // Reset
-      pHrbBody->pPrevLastModule->pNext = NULL;
+      hb_vmFreeSymbols( pHrbBody->pModuleSymbols );
    }
 
    for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )
@@ -572,7 +523,6 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
       PHB_DYNS pDyn;
 
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
-
       if( pDyn && pDyn->pSymbol->value.pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
       {
          pDyn->pSymbol->value.pFunPtr = NULL;
@@ -582,22 +532,6 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCode );
       hb_xfree( pHrbBody->pDynFunc[ ul ].szName );
    }
-
-   //printf( "Done with Functions\n" );
-
-   /* We can NOT release the symbols or else the Dynamic-Symbols-Table will get corrupted!!!
-    * The list as whole is NOT a candidate for possible recycling because the future hrb may be modified!
-    * It is possible to recycle individual symbols but I'm not sure it's worth the efforts.
-    */
-   for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
-   {
-      //printf( "# %i/%i Freeing: >%s<\n", ul, pHrbBody->ulSymbols, pHrbBody->pSymRead[ ul ].szName );
-
-      //hb_xfree( pHrbBody->pSymRead[ ul ].szName );
-      pHrbBody->pSymRead[ ul ].value.pFunPtr = NULL;
-   }
-   //hb_xfree( pHrbBody->pSymRead );
-   
 
    hb_xfree( pHrbBody->pDynFunc );
    hb_xfree( pHrbBody );
@@ -629,33 +563,24 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
       pHrbBody->fInit = FALSE;
       pHrbBody->fExit = FALSE;
       pHrbBody->ulSymStart = -1;
+      pHrbBody->ulFuncs = 0;
+      pHrbBody->pSymRead = NULL;
+      pHrbBody->pDynFunc = NULL;
       pHrbBody->ulSymbols = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
-      pHrbBody->pPrevLastModule = NULL;
+      pHrbBody->pModuleSymbols = NULL;
 
-      /*
-         Intentionally using malloc() instead of hb_xgrab() to "mask" unavoidable "leak" because:
+      pSymRead = ( PHB_SYMB ) hb_xgrab( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
 
-         1. Symbols MUST remain for the duration of the App, or Dynamic Symbol Table will become
-            a GPF trap when attrmpting to access such no longer existing Symbol.
-
-         2. It seems that it's not worth keeping track of each unloaded module symbols, since
-            release can only take place at app termination as per #1 above.
-      */
-      pSymRead = ( PHB_SYMB ) malloc( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
-
-      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB     */
+      for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB */
       {
-         pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, FALSE, ulBodySize, &ulBodyOffset );
-         //printf( "at offset %i, found symbol %s, scope %i, type %i\n", ulBodyOffset, pSymRead[ ul ].szName, szHrbBody[ulBodyOffset], szHrbBody[ulBodyOffset+1] );
+         pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
          pSymRead[ ul ].scope.value  = szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].pDynSym = NULL;
 
-         /* temporary hack for old HRB modules I'll remove it in some time, Druzus */
-         if ( ( pSymRead[ ul ].scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == 0 )
-            pSymRead[ ul ].scope.value |= HB_FS_PUBLIC;
-
-         if ( pHrbBody->ulSymStart == -1 && pSymRead[ ul ].scope.value & HB_FS_FIRST && ! ( pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) )
+         if( pHrbBody->ulSymStart == -1 &&
+             ( pSymRead[ ul ].scope.value & HB_FS_FIRST ) != 0 &&
+             ( pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == 0 )
          {
             pHrbBody->ulSymStart = ul;
          }
@@ -665,36 +590,30 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       pDynFunc = ( PHB_DYNF ) hb_xgrab( pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
       memset( pDynFunc, 0, pHrbBody->ulFuncs * sizeof( HB_DYNF ) );
-      //printf( "\nWill read symbols\n" );
-      for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )         /* Read symbols in .HRB     */
-      {
-         pDynFunc[ ul ].szName = hb_hrbReadId( (char *) szHrbBody, TRUE, ulBodySize, &ulBodyOffset );
 
+      for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )
+      {
+         pDynFunc[ ul ].szName = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
          ulSize = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );      /* Read size of function    */
          pDynFunc[ ul ].pCode = ( BYTE * ) hb_xgrab( ulSize );
 
-         /* Read the block           */
+         /* Read the block */
          memcpy( ( char * ) pDynFunc[ ul ].pCode, (char *) (szHrbBody + ulBodyOffset), ulSize );
          ulBodyOffset += ulSize;
          pDynFunc[ ul ].pCodeFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
          pDynFunc[ ul ].pCodeFunc->pCode    = pDynFunc[ ul ].pCode;
          pDynFunc[ ul ].pCodeFunc->pSymbols = pSymRead;
          pDynFunc[ ul ].pCodeFunc->pGlobals = NULL;
-         //printf( "Reading function %s and storing in %p\n", pDynFunc[ ul ].szName, pDynFunc[ ul ].pCodeFunc );
       }
 
       pHrbBody->pSymRead = pSymRead;
       pHrbBody->pDynFunc = pDynFunc;
-      s_ulSymEntry = 0;
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker */
       {
-         //printf( "linking #%i/%i Sym: >%s<\n", ul, pHrbBody->ulSymbols, pSymRead[ ul ].szName );
          if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pDynFunc, pHrbBody->ulFuncs );
-
-            //printf( "Pos: %i\n", ulPos );
 
             if( ulPos == SYM_NOT_FOUND )
             {
@@ -702,32 +621,15 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             }
             else
             {
-               /* Exists and NOT static ?  */
-               /*
-               if( hb_dynsymFind( pSymRead[ ul ].szName ) && ! ( pSymRead[ ul ].scope.value & HB_FS_STATIC ) )
-               {
-                  hb_errRT_BASE( EG_ARG, 9999, "Duplicate symbol", pSymRead[ ul ].szName );
-                  hb_hrbUnLoad( pHrbBody );
-                  pHrbBody = NULL;
-                  break;
-               }
-               */
-
                pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) pDynFunc[ ulPos ].pCodeFunc;
                pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC; /* | HB_FS_LOCAL; */
-
-               //printf( "Function pointer is %p\n", pSymRead[ ul ].value.pFunPtr );
             }
          }
 
-         /* External function        */
+         /* External function */
          if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_EXTERN )
          {
-            //printf( "External\n" );
-
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
-
-            //printf( "Found: %p\n", pDynSym );
 
             if( pDynSym )
             {
@@ -744,59 +646,48 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
                strncpy( szName, pSymRead[ ul ].szName, 20 );
 
                hb_hrbUnLoad( pHrbBody );
-               pHrbBody = NULL;
                hb_errRT_BASE( EG_ARG, 9999, "Unknown or unregistered symbol", szName, 0 );
-               break;
+               return NULL;
             }
          }
       }
 
       if( pHrbBody )
       {
-         pHrbBody->pPrevLastModule = hb_vmLastModule();
+         /* hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER ); */
+         pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead,
+                  ( USHORT ) pHrbBody->ulSymbols, "PCODE_HRB_FILE.hrb", TRUE, FALSE );
 
-//         hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER );
-         hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, "PCODE_HRB_FILE.hrb", (int) HB_PCODE_VER );
+         if( pHrbBody->pModuleSymbols->pModuleSymbols != pSymRead )
+         {
+            /*
+             * Old unused symbol table has been recycled - free the one
+             * we allocated and disactivate static initialization [druzus]
+             */
+            pHrbBody->pSymRead = pHrbBody->pModuleSymbols->pModuleSymbols;
 
-         /*
-          * initialize static variables
-          * so far there is no method to deinitialize static vars and
-          * free the place in static variable array :-(
-          * so when program load and unloads modules with static vars
-          * each time the new area for statics is allocated and we are
-          * losing memory. It is exactly: number_of_statics * sizeof(HB_ITEM)
-          * To resolve this problem we have to find a way to free the statics
-          * when module is unloaded. We know the offset to the statics array
-          * (it is stored in pSymbol->value.iStaticsBase) but we do not know
-          * the number of static vars. We will have to retrieve it from VM
-          * after statics registration and store somewhere. Then when module
-          * is unloaded we should call VM function to mark n items from given
-          * offset as unused for future reuse.
-          * The second thing which have to be changed is the method of freeing
-          * symbol table - now we have next memory leak in repeated module
-          * load/unload process. It could be also eliminated.
-          * We should simply use existing symbols or if they not exist create
-          * new one by hb_symbolNew() and use our own function instead of
-          * hb_vmProcessSymbols() In fact it will be enough to calling the
-          * hb_dynsymGet() instead of hb_dynsymFind()/hb_dynsymNew(). It seems
-          * to be enough but I would like to know what bad will happen when
-          * we register hrb module without pModuleSymbols. Which functionality
-          * we will lose.
-          * And there will be a problem with codeblocks created in .hrb
-          * module and still active after unloading it - they may access
-          * pModuleSymbols when evaluated. This is much more serious
-          * problem :-( Here I do not see any easy solution. We have the
-          * following choices:
-          *   1. The pModuleSymbols will be freed by garbage collector
-          *   2. We will remember all allocated pModuleSymbols here
-          *      and will try to reuse it when the same module is loaded
-          *      again.
-          *   3. User will not create codeblocks in .hrb modules and then
-          *      try to use it when module is unloaded - I do not trust
-          *      them ;-)
-          * [Druzus]
-          */
-         hb_hrbInitStatic( pHrbBody );
+            for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )
+            {
+               pDynFunc[ ul ].pCodeFunc->pSymbols = pHrbBody->pSymRead;
+            }
+
+            for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
+            {
+               if( pSymRead[ ul ].szName )
+                  hb_xfree( pSymRead[ ul ].szName );
+            }
+            hb_xfree( pSymRead );
+
+            pHrbBody->fInit = TRUE;
+         }
+         else
+         {
+            /* mark symbol table as dynamically allocated so HVM will free it on exit */
+            pHrbBody->pModuleSymbols->fAllocated = TRUE;
+
+            /* initialize static variables */
+            hb_hrbInitStatic( pHrbBody );
+         }
       }
    }
 
@@ -835,7 +726,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
       }
    }
 
-   if (file)
+   if( file )
    {
       ULONG ulBodySize = hb_fsSeek( file, 0, FS_END );
 

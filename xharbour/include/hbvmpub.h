@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.47 2005/11/16 17:54:41 snaiperis Exp $
+ * $Id: hbvmpub.h,v 1.48 2005/11/22 02:33:46 walito Exp $
  */
 
 /*
@@ -98,15 +98,24 @@
 
    typedef struct _SYMBOLS
    {
-      PHB_SYMB pModuleSymbols;  /* pointer to a one module own symbol table */
-      USHORT   uiModuleSymbols; /* number of symbols on that table */
-      struct _SYMBOLS * pNext;  /* pointer to the next SYMBOLS structure */
-      HB_SYMBOLSCOPE hScope;    /* scope collected from all symbols in module used to speed initialization code */
-      char * szModuleName;
-   } SYMBOLS, * PSYMBOLS;       /* structure to keep track of all modules symbol tables */
+      PHB_SYMB pModuleSymbols;   /* pointer to a one module own symbol table */
+      USHORT   uiModuleSymbols;  /* number of symbols on that table */
+      struct _SYMBOLS * pNext;   /* pointer to the next SYMBOLS structure */
+      HB_SYMBOLSCOPE hScope;     /* scope collected from all symbols in module used to speed initialization code */
+      void *   hDynLib;          /* handler to dynamic library */
+      BOOL     fAllocated;       /* the symbol table is dynamically allocated and should be freed on HVM exit */
+      BOOL     fActive;          /* the symbol table is currently active */
+      BOOL     fInitStatics;     /* static initialization should be executed */
+      char *   szModuleName;     /* module name */
+   } SYMBOLS, * PSYMBOLS;        /* structure to keep track of all modules symbol tables */
 
    extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
    extern PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
+   extern void     hb_vmFreeSymbols( PSYMBOLS pSymbols );
+   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone );
+   extern void     hb_vmBeginSymbolGroup( void * hDynLib, BOOL fClone );
+   extern void     hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] );
+   extern void     hb_vmExitSymbolGroup( void * hDynLib );
 
 
    /* forward declarations */
@@ -340,6 +349,7 @@
    #define HB_FS_MEMVAR    ( ( HB_SYMBOLSCOPE ) 0x80 )
    #define HB_FS_PCODEFUNC ( ( HB_SYMBOLSCOPE ) 0x100 )
    #define HB_FS_LOCAL     ( ( HB_SYMBOLSCOPE ) 0x200 )
+   #define HB_FS_DYNCODE   ( ( HB_SYMBOLSCOPE ) 0x400 )
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
    #define HB_FS_ALLOCATED ( HB_FS_STATIC | HB_FS_INIT | HB_FS_EXIT )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.37 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hbfix.c,v 1.38 2006/04/07 13:38:01 druzus Exp $
  */
 
 /*
@@ -516,6 +516,24 @@ static HB_FIX_FUNC( hb_p_jumpfar )
          case HB_P_JUMPFAR:
             lOffset += HB_PCODE_MKINT24( &pFunc->pCode[ ulNewPos + 1 ] );
             HB_PUT_LE_UINT24( pAddr, lOffset );
+            break;
+
+         case HB_P_JUMPFALSEFAR:
+            ulNewPos += HB_PCODE_MKINT24( &pFunc->pCode[ ulNewPos + 1 ] );
+            if( ulNewPos == lPCodePos + 4 )
+            {
+               pFunc->pCode[ lPCodePos ] = HB_P_JUMPTRUEFAR;
+               HB_PUT_LE_UINT24( pAddr, lOffset + 4 );
+            }
+            break;
+
+         case HB_P_JUMPTRUEFAR:
+            ulNewPos += HB_PCODE_MKINT24( &pFunc->pCode[ ulNewPos + 1 ] );
+            if( ulNewPos == lPCodePos + 4 )
+            {
+               pFunc->pCode[ lPCodePos ] = HB_P_JUMPFALSEFAR;
+               HB_PUT_LE_UINT24( pAddr, lOffset + 4 );
+            }
             break;
       }
    }

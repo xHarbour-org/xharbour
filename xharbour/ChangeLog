@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4940 2006/04/16 19:07:46 paultucker Exp $
+ * $Id: ChangeLog,v 1.4941 2006/04/21 03:39:27 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-21 13:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbcomp.h
+  * xharbour/include/hbxvm.h
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/gencc.c
+  * xharbour/source/compiler/hblbl.c
+    + updated -gc3 output for TRY/CATCH/FINALLY/END to work with current HVM.
+      The semantic of this statement is unchanged - local to xHarbour.
+
+  * xharbour/source/compiler/hbfix.c
+    + added unconditional and conditional jump joining optimization
+
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * casting
+
+  * xharbour/include/hbvmpub.h
+  * xharbour/source/vm/dynsym.c
+  * xharbour/source/vm/hvm.c
+    + implemented symbol tables recycling for dynamic PCODE
+      loading/unloading
+    + added optional string and code block cloning if they are created
+      from dynamically loaded PCODE.
+
+  * xharbour/source/vm/runner.c
+    + updated .hrb files to use symbol tables recycling
+
+  * xharbour/source/vm/dynlibhb.c
+    + updated LIBLOAD() and LIBFREE() to use symbol tables recycling
+    + added support for static variables in DLLs
+    + added support for INIT/EXIT procedures executing
+    * changed the handler returned by LIBLOAD() from numeric to pointer.
+      Please update your programs to test returned handle with EMPTY()
+      function.
 
 2006-04-20 20:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.33 2006/01/30 02:51:25 druzus Exp $
+ * $Id: dynsym.c,v 1.34 2006/03/03 14:13:22 druzus Exp $
  */
 
 /*
@@ -141,23 +141,12 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
          {
             //TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
          }
-#endif
          else
+#endif
          {
-           /* The DynSym existed without function pointer */
-
-           /* free runtime allocated symbols */
-           if( ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
-           {
-              hb_xfree( pDynSym->pSymbol->szName );
-              hb_xfree( pDynSym->pSymbol );
-           }
-
-           pDynSym->pSymbol = pSymbol;
-           pDynSym->ulCalls = 0; /* profiler support */
-           pDynSym->ulTime  = 0; /* profiler support */
-           pDynSym->ulRecurse = 0;
-        }
+            /* The DynSym existed without function pointer */
+            pDynSym->pSymbol = pSymbol;
+         }
       }
 
       if( pDynSym->pModuleSymbols == NULL && ( pSymbol->scope.value & HB_FS_LOCAL ) )
@@ -725,7 +714,8 @@ void HB_EXPORT hb_dynsymRelease( void )
       pDynSym = ( s_pDynItems + uiPos )->pDynSym;
 
       /* it is a allocated symbol ? */
-      if( ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
+      if( pDynSym->pSymbol &&
+          ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
       {
          hb_xfree( pDynSym->pSymbol->szName );
          hb_xfree( pDynSym->pSymbol );

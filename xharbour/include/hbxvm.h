@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.4 2006/03/30 00:08:12 ronpinkas Exp $
+ * $Id: hbxvm.h,v 1.5 2006/04/07 13:37:46 druzus Exp $
  */
 
 /*
@@ -223,7 +223,8 @@ extern HB_EXPORT void   hb_xvmEnumIndex( void );
 extern HB_EXPORT void   hb_xvmTryBegin( void );
 extern HB_EXPORT BOOL   hb_xvmTryEnd( void );
 extern HB_EXPORT BOOL   hb_xvmTryRecover( LONG lFinaly );
-extern HB_EXPORT BOOL   hb_xvmEndFinally( void );
+extern HB_EXPORT USHORT hb_xvmBeginFinally( void );
+extern HB_EXPORT BOOL   hb_xvmEndFinally( USHORT uiAction );
 
 /*
  * additional multi PCODE operations

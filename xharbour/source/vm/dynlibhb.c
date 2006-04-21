@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.9 2005/05/24 21:05:56 ronpinkas Exp $
+ * $Id: dynlibhb.c,v 1.10 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -64,28 +64,53 @@
 
 HB_FUNC( LIBLOAD )
 {
+   void * hDynLib = NULL;
+
 #if defined(HB_OS_WIN_32)
+   if( ISCHAR( 1 ) )
    {
-      hb_retnl( ( LONG ) LoadLibrary( hb_parc( 1 ) ) );
-   }
-#else
-   {
-      hb_retnl( 0 );
+      int argc = hb_pcount() - 1, i;
+      char **argv = NULL;
+
+      if( argc > 0 )
+      {
+         argv = ( char** ) hb_xgrab( sizeof( char* ) * argc );
+         for( i = 0; i < argc; ++i )
+         {
+            argv[i] = hb_parcx( i + 2 );
+         }
+      }
+
+      /* use stack address as first level marker */
+      hb_vmBeginSymbolGroup( ( void * ) &HB_VM_STACK, TRUE );
+      hDynLib = ( void * ) LoadLibrary( hb_parc( 1 ) );
+      /* set real marker */
+      hb_vmInitSymbolGroup( hDynLib, argc, argv );
+      if( argv )
+      {
+         hb_xfree( argv );
+      }
    }
 #endif
+
+   hb_retptr( hDynLib );
 }
 
 HB_FUNC( LIBFREE )
 {
 #if defined(HB_OS_WIN_32)
+   void * hDynLib = hb_parptr( 1 );
+
+   if( hDynLib )
    {
-      hb_retl( FreeLibrary( ( HMODULE ) hb_parnl( 1 ) ) );
+      hb_vmExitSymbolGroup( hDynLib );
+      hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
    }
-#else
+   else
+#endif
    {
       hb_retl( FALSE );
    }
-#endif
 }
 
 /* Executes a Harbour pcode dynamically loaded DLL function or procedure
