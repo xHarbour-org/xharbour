@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.136 2006/03/06 18:18:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.137 2006/03/08 08:12:56 ronpinkas Exp $
  */
 
 /*
@@ -132,6 +132,8 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static VARIANTARG RetVal, OleVal;
 
+   BOOL   s_bUnInit = FALSE;
+
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
@@ -140,6 +142,8 @@ INIT PROC HB_OLEINIT
    HB_INLINE()
    {
       s_nOleError = OleInitialize( NULL );
+
+      s_bUnInit = s_nOleError == S_OK; // Do NOT use SUCCEEDED() due to S_FALSE!
 
       s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
       s_pSym_New            = hb_dynsymFind( "NEW" );
@@ -159,15 +163,21 @@ INIT PROC HB_OLEINIT
       VariantInit( &RetVal );
       VariantInit( &OleVal );
    }
-return
+
+RETURN
 
 //----------------------------------------------------------------------------//
 EXIT PROC HB_OLEEXIT
+
    HB_INLINE()
    {
-      OleUninitialize();
+      if( s_bUnInit )
+      {
+         OleUninitialize();
+      }
    }
-return
+
+RETURN
 
 //----------------------------------------------------------------------------//
 CLASS VTWrapper
@@ -413,6 +423,10 @@ METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
 
    IF PCount() == 1
       RETURN ::Item( xIndex )
+   ENDIF
+
+   IF xIndex < 0
+      xIndex += ( ::Count + 1 )
    ENDIF
 
    TRY

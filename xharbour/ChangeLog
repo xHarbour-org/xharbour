@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4939 2006/04/16 01:20:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.4940 2006/04/16 19:07:46 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-20 20:38 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    ! Fixed GPF trap related to OleUninitialize()
+    * Support for negative Index in [] Operator
 
 2006-04-16 15:05 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * makefile.bc
