@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4941 2006/04/21 03:39:27 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4942 2006/04/21 11:25:32 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-21 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed VarGet() method do return numeric values in accord with pictures.
+    ! fixed ParsePict() method to convert negative numeric values.
 
 2006-04-21 13:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbcomp.h

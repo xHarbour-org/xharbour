@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.107 2006/04/14 01:36:01 ronpinkas Exp $
+ * $Id: tget.prg,v 1.108 2006/04/16 01:20:32 modalsist Exp $
  */
 
 /*
@@ -245,6 +245,8 @@ METHOD ParsePict( cPicture ) CLASS Get
    local nFor
    local cNum
 
+   LOCAL nLen,nDec
+
    cNum := ""
 
    if Left( cPicture, 1 ) == "@"
@@ -332,9 +334,24 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
          exit
 
-      case "N"
+      case "N"                                                    
+         /* E.F. 2006/APRIL/19 - If ::xVarGet is negative and smaller than
+          *  -99999999.99, the Str(::xVarGet) will return a string width
+          * of 23, instead it's length, increasing the ::cPicMask length.
+          * cNum := Str( ::xVarGet ) is not better way to do it.
+          */
+         IF ::xVarGet < 0
+            cNum := Str( ::xVarGet )
+            nDec := Len( cNum) - Rat(".",cNum)
+            IF nDec >= Len( cNum )
+               nDec := 0
+            ENDIF
+            nLen := 10 + iif(nDec>0,1,0) + nDec
+            cNum := Str( ::xVarGet, nLen, nDec )
+         ELSE
+            cNum := Str( ::xVarGet )
+         ENDIF
 
-         cNum := Str( ::xVarGet )
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0
             ::cPicMask := Replicate( '9', nAt - 1 ) + iif( ::lDecRev, ",", "." )
             ::cPicMask += Replicate( '9', Len( cNum ) - Len( ::cPicMask ) )
@@ -433,10 +450,10 @@ METHOD Display( lForced ) CLASS Get
 
    HBConsoleLock()
 
-   // E.F. 2006/APRIL/12 - Display minus sign in the front of xBuffer value.
-   //
-   //IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
-   //     xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
+   /* E.F. 2006/APRIL/12 - Display minus sign in the front of xBuffer value.
+    * IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
+    *   xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
+    */
    IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::minus
       xBuffer := PadL( StrTran(xBuffer,'-',''), Len(xBuffer) )
       IF Val(xBuffer) != 0
@@ -485,10 +502,13 @@ METHOD Display( lForced ) CLASS Get
    ::nOldPos := ::nDispPos
 
    IF ::Pos != NIL
+
       nCol := ::Col + ::Pos - ::nDispPos + if( ::cDelimit == NIL, 0, 1 )
-      // E.F. 2006/APRIL/13 - We need adjust cursor column position if user
-      // has pressed a dot or comma key in the numeric var that haven't
-      // decimal part.
+
+      /* E.F. 2006/APRIL/13 - We need adjust cursor column position if user
+       * has pressed a dot or comma key in the numeric var that haven't
+       * decimal part.
+       */
       IF ::Type=="N" .AND. ::hasfocus .AND. (::DecPos=NIL .OR. ::DecPos > ::nMaxLen ) .AND. ( LastKey()=Asc(',') .OR. LastKey()=Asc('.') )
          nCol := ::Col + ::nMaxLen - 1
          ::Left(.F.)
@@ -558,8 +578,9 @@ return Self
 METHOD Undo() CLASS Get
 
    if ::hasfocus
-      // E.F. 2006/APRIL/14 - reset ::minus flag if ::xVarGet was
-      // negative number but ::original value not.
+      /* E.F. 2006/APRIL/14 - reset ::minus flag if ::xVarGet was
+       * negative number but ::original value not.
+       */
       IF ::Type=="N" .AND. ::Original != NIL .AND. ::Original >= 0
          ::minus := .f.
       ENDIF
@@ -696,8 +717,8 @@ return xValue
 
 METHOD VarGet() CLASS Get
 
-   LOCAL cVarGet
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
+   LOCAL cVarGet, nDecPos, nLen, nDec
 
    IF ! HB_IsBlock( ::Block )
       ::xVarGet := NIL
@@ -718,34 +739,59 @@ METHOD VarGet() CLASS Get
 
       xVarGet := aGetVar[ aIndex[ nCounter ] ]
    ENDIF
-
+   
    ::Type := ValType( xVarGet )
-
+   
    // E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies.
-   IF ::Type == "N" .AND. ::DecPos != NIL .AND. ::nMaxLen != NIL
-      IF ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
-         cVarGet := Str( xVarGet, ::nMaxLen, ::nMaxLen - ::DecPos )
+   IF ::Type == "N" .AND. ::nMaxLen != NIL .AND. ::DecPos != NIL .AND.;
+      ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
 
-         IF Empty( SubStr( cVarGet, 1, ::DecPos-1) )
-            cVarGet := Stuff( cVarGet, ::DecPos-1, 1, "0")
+      nDecPos := ::DecPos
+
+      IF !Empty(::cPicMask)
+         nLen := HowMuch("9",::cPicMask) + 1
+         nDec := Len( ::cPicMask) - Rat(".",::cPicMask)
+         IF nDec >= nLen
+            nDec := 0
          ENDIF
-
-         IF Empty( SubStr( cVarGet, ::DecPos+1 ) )
-            cVarGet := Stuff( cVarGet, ::DecPos+1, ::nMaxLen - ::DecPos, replicate("0",::nMaxLen - ::DecPos) )
+      ELSEIF !Empty( ::cPicture)
+         nLen := HowMuch("9",::cPicture) + 1
+         nDec := Len( ::cPicture) - Rat(".",::cPicture)
+         IF nDec >= nLen
+            nDec := 0
          ENDIF
-
-         xVarGet := Val( cVarGet )
+      ELSE
+         cVarGet := Str( xVarGet )
+         nDec := Len( cVarGet) - Rat(".",cVarGet)
+         IF nDec >= Len( cVarGet )
+            nDec := 0
+         ENDIF
+         nLen := 10 + iif(nDec>0,1,0) + nDec
       ENDIF
 
-      /*
-      IF Lastkey() == IIF( ::lDecRev .OR. "E" IN ::cPicFunc, asc(','), asc('.') )
-         xVarGet := 0
+      cVarGet := Str( xVarGet, nLen, nDec )
+
+      // We need recalc decimal pos if picture is left justified. 
+      IF "B" IN ::cPicFunc 
+         nDecPos := Rat( iif(::lDecRev .OR. "E" IN ::cPicFunc,",","."), ::cPicMask )
       ENDIF
-      */
+
+      // Insert "0" before decimal dot, if empty.
+      IF Empty( SubStr( cVarGet, 1, nDecPos-1) )
+         cVarGet := Stuff( cVarGet, nDecPos-1, 1, "0")
+      ENDIF
+      
+      // Fill with zeros after decimal dot, if empty.
+      IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) ) 
+         cVarGet := Stuff( cVarGet, nDecPos+1, ::nMaxLen - nDecPos, replicate("0",::nMaxLen - nDecPos) )
+      ENDIF
+      
+      xVarGet := Val( cVarGet )
+
    ENDIF
 
    ::xVarGet := xVarGet
-
+       
 RETURN xVarGet
 
 //---------------------------------------------------------------------------//
@@ -1248,12 +1294,12 @@ METHOD ToDecPos() CLASS Get
    ::lEdit  := .t.
    ::buffer := ::PutMask( ::UnTransform(), .f. )
    ::pos    := ::DecPos + 1
-
+   
    ::Display( .t. )
 
-   // E.F. 2006/APRIL/12 - Re-entry of buffer value to update ::xVarGet
-   // via VarGet()
-   //
+   /* E.F. 2006/APRIL/12 - Re-entry of buffer value to update ::xVarGet
+    * into VarGet()
+    */
    ::VarPut( Val(::buffer), .t. )
 
 return Self
@@ -1466,9 +1512,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cMask := StrTran( StrTran( cMask, "*", "9" ), "$", "9" )
       endif
    endif
-
+   
    cBuffer := Transform( xValue, if( Empty( cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + cMask )
-
+   
    if ::type == "N"
       if ( "(" IN cPicFunc .or. ")" IN cPicFunc ) .and. xValue >= 0
          cBuffer += " "
@@ -1531,7 +1577,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    If ::type == "D" .and. ::BadDate .and. ::Buffer != nil
       cBuffer := ::Buffer
    Endif
-
+   
 return cBuffer
 
 //---------------------------------------------------------------------------//
@@ -1646,8 +1692,9 @@ METHOD DeleteAll() CLASS Get
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable()
 
-   // E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E' and '@R'
-   // masks of numeric vars, into display edit buffer.
+   /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E' and '@R'
+    * masks of numeric vars, into display edit buffer.
+    */
    IF ::type=="N" .AND. ::buffer != NIL .AND. !empty(::cPicture) .AND.;
       ("," IN ::cPicture .AND. "." IN ::cPicture)
       IF "R" IN ::cPicFunc 
@@ -2000,3 +2047,15 @@ FUNCTION Isdefcolor()
 RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
 
 #endif
+
+STATIC FUNCTION HowMuch( cChar, cPict )
+LOCAL c := ""
+LOCAL r := 0
+
+ FOR EACH c IN cPict
+     IF c == cChar
+        r++
+     ENDIF
+ NEXT
+
+RETURN r
