@@ -1,5 +1,5 @@
 /*
- * $Id: zipcomp.cpp,v 1.16 2004/03/30 20:00:55 srobert Exp $
+ * $Id: zipcomp.cpp,v 1.17 2005/03/18 22:35:30 andijahja Exp $
  */
 
 /*
@@ -52,10 +52,10 @@
 #define HB_OS_WIN_32_USED
 #include "hbzip2.h"
 
-extern HB_ITEM ZipArray;
+//extern PHB_ITEM ZipArray;
 PHB_ITEM pDiskStatus = NULL;
 PHB_ITEM pProgressInfo = NULL;
-extern HB_ITEM ChangeDiskBlock;
+extern PHB_ITEM ChangeDiskBlock;
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,13 +69,10 @@ class SpanCallbackc : public CZipSpanCallback
 {
    bool Callback( int iProgress )
    {
-      HB_ITEM Disk;
-
-      Disk.type = HB_IT_NIL;
-      hb_itemPutNL( &Disk, m_uDiskNeeded );
-
-      hb_vmEvalBlockV( &ChangeDiskBlock, 1, &Disk  );
-      hb_itemClear( &Disk );
+      PHB_ITEM Disk=hb_itemPutNL( NULL, m_uDiskNeeded );
+        
+      hb_vmEvalBlockV( ChangeDiskBlock, 1, Disk  );
+      hb_itemRelease( Disk );
 
       return TRUE;
    }
@@ -85,15 +82,13 @@ class SpanActionCallbackc : public CZipActionCallback
 {
    bool Callback( int iProgress )
    {
-      HB_ITEM Disk, Total;
+      PHB_ITEM Disk =hb_itemPutNL(NULL, m_uTotalSoFar ),  Total=hb_itemPutNL( NULL, m_uTotalToDo );
 
-      Disk.type = HB_IT_NIL;
-      Total.type = HB_IT_NIL;
 
-      hb_vmEvalBlockV( pProgressInfo, 2, hb_itemPutNL( &Disk, m_uTotalSoFar ), hb_itemPutNL( &Total, m_uTotalToDo ) );
+      hb_vmEvalBlockV( pProgressInfo, 2, Disk,Total);
 
-      hb_itemClear( &Disk );
-      hb_itemClear( &Total );
+      hb_itemRelease( Disk );
+      hb_itemRelease( Total );
 
       return TRUE;
    }
@@ -178,15 +173,13 @@ int hb_CompressFile( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBl
             {
                if( pBlock != NULL )
                {
-                  HB_ITEM FileName, FilePos;
+                  PHB_ITEM FileName=hb_itemPutC(NULL,hb_arrayGetCPtr(pArray,ulCount)), FilePos = hb_itemPutNI(NULL,ulCount);
 
-                  FileName.type = HB_IT_NIL;
-                  FilePos.type = HB_IT_NIL;
 
-                  hb_vmEvalBlockV( pBlock, 2, hb_itemPutC(&FileName,hb_arrayGetCPtr(pArray,ulCount)), hb_itemPutNI(&FilePos,ulCount));
+                  hb_vmEvalBlockV( pBlock, 2, FileName,FilePos );
 
-                  hb_itemClear( &FileName );
-                  hb_itemClear( &FilePos );
+                  hb_itemRelease( FileName );
+                  hb_itemRelease( FilePos );
                }
 
                try
@@ -298,15 +291,12 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
          {
             if( pBlock != NULL )
             {
-               HB_ITEM FileName, FilePos;
+               PHB_ITEM FileName=hb_itemPutC(NULL,hb_arrayGetCPtr(pArray,ulCount)), FilePos = hb_itemPutNI(NULL,ulCount);
 
-               FileName.type = HB_IT_NIL;
-               FilePos.type = HB_IT_NIL;
+               hb_vmEvalBlockV( pBlock, 2, FileName,FilePos);
 
-               hb_vmEvalBlockV( pBlock, 2, hb_itemPutC( &FileName , hb_arrayGetCPtr( pArray, ulCount ) ), hb_itemPutNI( &FilePos  , ulCount ));
-
-               hb_itemClear( &FileName );
-               hb_itemClear( &FilePos );
+               hb_itemRelease( FileName );
+               hb_itemRelease( FilePos );
             }
 
             try
@@ -346,18 +336,15 @@ int hb_CmpTdSpan( char *szFile, PHB_ITEM pArray, int iCompLevel, PHB_ITEM pBlock
 
 bool hb_SetProgressofTdSpan( DWORD a, int iSoFar, void* pData ){
 
-   HB_ITEM Disk, Total;
+   PHB_ITEM Disk=hb_itemPutNL( NULL, iSoFar ), Total= hb_itemPutNL( NULL, a ) ;
 
-   Disk.type = HB_IT_NIL;
-   Total.type = HB_IT_NIL;
 
    HB_SYMBOL_UNUSED( pData );
 
-   hb_vmEvalBlockV( pProgressInfo, 2, hb_itemPutNL( &Disk, iSoFar ), hb_itemPutNL( &Total, a ) );
+   hb_vmEvalBlockV( pProgressInfo, 2, Disk, Total);
 
-   hb_itemClear( &Disk );
-   hb_itemClear( &Total );
-
+   hb_itemRelease( Disk );
+   hb_itemRelease( Total );  
    return TRUE;
 }
 
@@ -419,13 +406,12 @@ int hb_CompressFileStd( char *szFile, char *szFiletoCompress, int iCompLevel, PH
 
             if( pBlock  != NULL )
             {
-               HB_ITEM FileName;
+               PHB_ITEM FileName=hb_itemPutC( NULL, szFiletoCompress ) ;
 
-               FileName.type = HB_IT_NIL;
+               hb_vmEvalBlockV( pBlock, 1, FileName);
 
-               hb_vmEvalBlockV( pBlock, 1, hb_itemPutC( &FileName, szFiletoCompress ) );
-
-               hb_itemClear( &FileName );
+               hb_itemRelease( FileName );
+               
             }
 
             #if ( defined( __WIN32__ ) || defined( __MINGW32__ ) ) && defined( HB_USE_DRIVE_ADD )
@@ -548,13 +534,12 @@ int hb_CmpTdSpanStd( char *szFile, char * szFiletoCompress, int iCompLevel, PHB_
 
          if( pBlock  != NULL )
          {
-            HB_ITEM FileName;
+            PHB_ITEM FileName=hb_itemPutC( NULL, szFiletoCompress  ) ;
 
-            FileName.type = HB_IT_NIL;
+            hb_vmEvalBlockV(  pBlock, 1, FileName);
 
-            hb_vmEvalBlockV(  pBlock, 1, hb_itemPutC( &FileName, szFiletoCompress  ) );
-
-            hb_itemClear( &FileName );
+            hb_itemRelease( FileName );
+           
          }
 
          #if defined( __WIN32__ ) || defined( __MINGW32__ )

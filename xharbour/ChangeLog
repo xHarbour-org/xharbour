@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4942 2006/04/21 11:25:32 druzus Exp $
+ * $Id: ChangeLog,v 1.4943 2006/04/21 12:42:02 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-22 10:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+   * contrib/hbzlib/zip.c
+     contrib/hbzlib/zipnew.cpp
+     contrib/hbzlib/zipcomp.cpp
+     ! Fixed Possible memory leak.
+       Updated to use xharbour api insted of direct usage of HB_ITEM structure 
 
 2006-04-21 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
