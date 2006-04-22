@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.31 2006/03/28 15:01:16 modalsist Exp $
+ * $Id: dbedit.prg,v 1.32 2006/04/04 23:08:29 modalsist Exp $
  */
 
 /*
@@ -87,6 +87,23 @@
 #include "hbsetup.ch"
 #include "common.ch"
 
+/* E.F. 2006/04/22 - Added Append mode in dbEdit.
+  (undocumented Clipper's feature) */
+#ifndef DE_APPEND
+#define DE_APPEND  3
+#endif
+
+/* E.F. 2006/04/22
+*  These #defines use the browse's "cargo" slot to hold the
+*  "append mode" flag for the browse. The #defines make it
+*  easy to change this later (e.g. if you need to keep
+*  several items in the cargo slot).
+*  This code is based from "clipper\source\samples\tbdemo.prg"
+*/
+#define APP_ON( oTb )      ( oTb:cargo := .T.  )
+#define APP_OFF( oTb )     ( oTb:cargo := .F. )
+#define APP_STATUS( oTb )  ( oTb:cargo )
+
 
 FUNCTION DBEdit(nTop,;                //  1§
                 nLeft,;               //  2§
@@ -112,7 +129,8 @@ LOCAL oTBR,;
       nCursor,;
       cHdr,;
       nIndex
-
+      
+     
   // If no database in use we must call Errorsys() with error 2001
   //
   IF !Used()
@@ -235,7 +253,15 @@ LOCAL oTBR,;
 
   iif(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
 
+  /* Create Tbrowse object */
   oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
+
+  /* E.F. 2006/04/22 - Set append mode off by default */
+  APP_OFF( oTBR )
+
+  /* E.F. 2006/04/22 - Use a custom 'skipper' to handle append mode */
+  oTBR:SkipBlock := { |x| dbEdit_Skipper( x, oTBR ) }
+
 
   IF HB_ISSTRING(acHeadingSep)
      oTBR:headSep := acHeadingSep
@@ -355,6 +381,7 @@ LOCAL oTBR,;
    oTBR:setKey( K_ESC, nil )
  END
 
+
  // xHarbour extension: Initialization call
  //
  _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
@@ -382,6 +409,7 @@ LOCAL oTBR,;
  /* Go into the processing loop */
  /* --------------------------- */
 
+
  WHILE nRet != DE_ABORT
 
     Switch nRet
@@ -397,25 +425,39 @@ LOCAL oTBR,;
     oTBR:forceStable()
     oTBR:deHilite()
 
-    If oTBR:hitTop
-       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
-    ElseIf oTBR:hitBottom
-       nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
-    End
+    IF nRet == DE_CONT
+       If oTBR:hitTop
+          nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+       ElseIf oTBR:hitBottom
+          nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+       End
+    ENDIF
 
-    If nRet == DE_ABORT
+    If nRet == DE_ABORT 
        Exit
     End
 
-    nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
-
-    If nRet == DE_ABORT
-       Exit
-    End 
+    IF nRet != DE_APPEND
+       nRet := _DoUserFunc(bFun, DE_IDLE, oTBR:colPos, oTBR)
+       If nRet == DE_ABORT
+          Exit
+       End 
+    ENDIF
 
     oTBR:hilite()
 
-    nKey := Inkey(0)
+    IF ( nRet == DE_APPEND .AND. !APP_STATUS( oTBR ) )
+       APP_ON( oTBR )
+       nKey := K_DOWN
+       SetEditColor( oTBR, .T. )
+    ELSE
+       nKey := Inkey(0)
+    ENDIF
+
+    IF nKey == K_ESC 
+       EXIT
+    ENDIF
+
 
 #ifdef HB_COMPAT_C53
     // xHarbour with 5.3 extensions code
@@ -439,10 +481,6 @@ LOCAL oTBR,;
     oTBR:hilite()
 
     nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
-
-    IF nRet == DE_ABORT
-       EXIT
-    END
 
 #else
     // xHarbour without 5.3 extensions code
@@ -504,11 +542,20 @@ LOCAL oTBR,;
        nRet := _DoUserFunc(bFun, DE_EXCEPT, oTBR:colPos, oTBR)
     End
 
+#endif
+
+
+    IF APP_STATUS( oTBR )
+       APP_OFF( oTBR )
+       SetEditColor( oTBR,.F.)
+    ENDIF
+
     IF nRet == DE_ABORT
        EXIT
-    END
+    ELSEIF nRet == DE_APPEND
+       LOOP
+    ENDIF
 
-#endif
 
     // userfunc could delete recs...
     i := RecNo()
@@ -521,9 +568,10 @@ LOCAL oTBR,;
 
     dbGoto(i)
 
- END
 
- SetCursor(nCursor)
+ ENDDO
+
+ SetCursor( nCursor )
  SetPos(Row(),0)
 
 RETURN .T.
@@ -554,8 +602,13 @@ Return Nil
 STATIC FUNCTION _DoUserFunc(bFun, nMode, nColPos, oTBR)
 LOCAL nRet, nRec
 
+
   IF nMode == DE_IDLE
      oTBR:RefreshAll()
+  ENDIF
+
+  IF nMode == DE_EXCEPT
+     oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{2,1})
   ENDIF
 
   oTBR:ForceStable()
@@ -564,7 +617,7 @@ LOCAL nRet, nRec
 
   nRet := Eval(bFun, nMode, nColPos, oTBR)
 
-  IF HB_ISNUMERIC(nRet) .AND. nRet == DE_ABORT
+  IF HB_ISNUMERIC(nRet) .AND. ( nRet == DE_ABORT .OR. nRet == DE_APPEND )
      Return nRet
   ENDIF
 
@@ -572,9 +625,10 @@ LOCAL nRet, nRec
      nRet := DE_REFRESH
   END
 
-  IF !HB_ISNUMERIC(nRet) .Or. nRet < 0 .Or. nRet > 2
+  IF !HB_ISNUMERIC(nRet) .Or. nRet < DE_ABORT .Or. nRet > DE_APPEND
      nRet := DE_CONT
   END
+
 
   /*****************************************************************/
   /* This part of code was borrowed from old dbedit code (harbour) */
@@ -611,6 +665,83 @@ LOCAL nRet, nRec
   END
 
   /******************************************/
-
+  
 RETURN nRet
+
+/***
+*
+*  dbEdit_Skipper()
+*
+*  Handle record movement requests from the Tbrowse object.
+*
+*  This is a special "skipper" that handles append mode. It
+*  takes two parameters instead of the usual one. The second
+*  parameter is a reference to the Tbrowse object itself. The
+*  Tbrowse's "cargo" variable contains information on whether
+*  append mode is turned on. This function was extracted from
+*  clipper\source\samples\tbdemo.prg
+*/
+STATIC FUNCTION dbEdit_Skipper( nSkip, oTb )
+
+   LOCAL lAppend := APP_STATUS( oTb )
+   LOCAL i       := 0
+
+   do case
+   case ( nSkip == 0 .or. lastrec() == 0 )
+      // Skip 0 (significant on a network)
+      dbSkip( 0 )
+
+   case ( nSkip > 0 .and. !eof() )
+      while ( i < nSkip )           // Skip Foward
+
+         dbskip( 1 )
+
+         if eof()
+            iif( lAppend, i++, dbskip( -1 ) )
+            exit
+
+         endif
+
+         i++
+
+      enddo
+
+   case ( nSkip < 0 )
+      while ( i > nSkip )           // Skip backward
+
+         dbskip( -1 )
+
+         if bof()
+            exit
+
+         endif
+
+         i--
+
+      enddo
+
+   endcase
+
+RETURN i
+
+/***
+*
+*  SetEditColor()
+*  Configure columns color for append and edit mode.
+*/
+STATIC FUNCTION SetEditColor( oTb, lEdit )
+LOCAL i,oCol,aDefColor,aRect,aColor
+
+aRect    := {oTb:rowpos,oTb:leftvisible,oTb:rowpos,oTb:rightvisible}
+aColor   := iif(lEdit,{1,2},{2,1})
+aDefColor:= iif(lEdit,{2,1},{1,2})
+
+FOR i := 1 TO oTb:ColCount
+    oCol := oTb:GetColumn(i)
+    oCol:DefColor := aDefColor
+NEXT
+
+oTb:ColorRect(aRect,aColor)
+
+RETURN NIL
 
