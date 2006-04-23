@@ -1,5 +1,5 @@
 /*
- * $Id: typefile.prg,v 1.12 2002/01/15 21:37:49 andijahja Exp $
+ * $Id: typefile.prg,v 1.2 2002/01/19 14:15:45 ronpinkas Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ FUNCTION __TYPEFILE( cFile, lPrint )
    cbuffer := SPACE( BUFFER_LENGTH )
    ?                                                      // start in a new line
    DO WHILE fread( nHandle, @cbuffer, BUFFER_LENGTH ) > 0
-      ?? cBuffer
+      ?? Alltrim( cBuffer )
       cbuffer := SPACE( BUFFER_LENGTH )
    ENDDO
 
