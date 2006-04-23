@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.1 2006/04/12 05:22:20 paultucker Exp $
+ * $Id: dllcall.c,v 1.2 2006/04/16 19:07:51 paultucker Exp $
  */
 
 /*
@@ -85,8 +85,9 @@ typedef struct tag_ExecStruct
    char *    cDLL;         // DLL
    HINSTANCE hDLL;         // Handle
    char *    cProc;        // Ordinal or Name
+   DWORD     dwOrdinal;
    DWORD     dwFlags;      // Calling Flags
-   DWORD     lpFunc;
+   LPVOID    lpFunc;
 } EXECSTRUCT, *PEXECSTRUCT;
 
 
@@ -102,12 +103,12 @@ static HB_GARBAGE_FUNC( _DLLUnload )
          {
             FreeLibrary( xec->hDLL );
          }
-         hb_xfree( xec->cDLL );  // TODO
+         hb_xfree( xec->cDLL );
       }
 
       if ( xec->cProc != NULL )
       {
-         hb_xfree( xec->cProc );  // TODO
+         hb_xfree( xec->cProc );
       }
 
       xec->dwType = 0;
@@ -124,7 +125,8 @@ HB_FUNC( DLLPREPARECALL )
 
    if ( ISCHAR( 1 ) )
    {
-      xec->cDLL = hb_parcx( 1 );
+      xec->cDLL = (char *) hb_xgrab( hb_parclen( 1 ) );
+      strcpy( xec->cDLL, hb_parcx( 1 ) );
       xec->hDLL = LoadLibrary( (LPCSTR) hb_parcx( 1 ) );
    }
    else if (ISNUM( 1 ) )
@@ -145,16 +147,17 @@ HB_FUNC( DLLPREPARECALL )
    {
       if ( ISCHAR( 3 ) )
       {
-         xec->cProc = hb_parcx( 3 );
+         xec->cProc = (char *) hb_xgrab( hb_parclen( 1 ) );
+         strcpy( xec->cProc, hb_parcx( 3 ) );
       }
       else if (ISNUM( 3 ) )
       {
-         xec->cProc = (char *) hb_parnl( 3 );
+         xec->dwOrdinal = hb_parnl( 3 );
       }
    }
 
    xec->dwType = EXEC_DLL;
-   xec->lpFunc = (DWORD) GetProcAddress( xec->hDLL, xec->cProc );
+   xec->lpFunc = (LPVOID) GetProcAddress( xec->hDLL, xec->cProc != NULL ? (LPCSTR) xec->cProc : (LPCSTR) xec->dwOrdinal );
 
    hb_retptrGC( xec );
 }
@@ -195,23 +198,23 @@ HB_FUNC( SETLASTERROR )
 
 HB_FUNC( GETPROCADDRESS )
 {
-   ULONG dwProcAddr;
+   LPVOID lpProcAddr;
    char  cFuncName[MAX_PATH];
 
-   if ((dwProcAddr = (ULONG) GetProcAddress( (HMODULE) hb_parnl(1),
-                               ISCHAR( 2 ) ? (LPCSTR) hb_parcx(2) :
-                                             (LPCSTR) hb_parnl(2) )) == 0 )
+   if ((lpProcAddr = (LPVOID) GetProcAddress( (HMODULE) hb_parnl(1),
+                                ISCHAR( 2 ) ? (LPCSTR) hb_parcx(2) :
+                                              (LPCSTR) hb_parnl(2) )) == 0 )
    {
       if ( ISCHAR( 2 ) )
       {
          // try ANSI flavour ?
          strcpy(cFuncName, hb_parcx(2));
          strcat(cFuncName, "A");
-         dwProcAddr = (ULONG) GetProcAddress((HMODULE) hb_parnl(1), cFuncName);
+         lpProcAddr = (LPVOID) GetProcAddress((HMODULE) hb_parnl(1), cFuncName);
       }
    }
 
-   hb_retnl( dwProcAddr );
+   hb_retptr( lpProcAddr );
 }
 
 
@@ -282,13 +285,13 @@ typedef struct DYNAPARM {
 
 #pragma pack()
 
-RESULT DynaCall(int Flags, DWORD lpFunction, int nArgs, 
+RESULT DynaCall(int Flags, LPVOID lpFunction, int nArgs, 
                 DYNAPARM Parm[], LPVOID pRet, int nRetSiz);
 //
 //==================================================================
 
 // Based originally on CallDLL from What32
-static void DllExec( int iFlags, DWORD lpFunction, int iParams, int iFirst, int iArgCnt )
+static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int iArgCnt )
 {
    int iRtype;
    int iCnt = 0;
@@ -450,7 +453,7 @@ HB_FUNC( DLLEXECUTECALL )
       {
          if ( xec->hDLL != (HINSTANCE) NULL )
          {
-            if ( xec->lpFunc != 0 )
+            if ( xec->lpFunc != NULL )
             {
                DllExec( xec->dwFlags, xec->lpFunc, iParams, iFirst, iArgCnt );
             }
@@ -467,7 +470,7 @@ HB_FUNC( DLLCALL )
    int iFlags;
    BOOL lUnload = FALSE;
    HINSTANCE  hInst;
-   DWORD      lpFunction;
+   LPVOID     lpFunction;
    BYTE       cFuncName[MAX_PATH];
 
    if ( ISCHAR(1) )
@@ -488,20 +491,20 @@ HB_FUNC( DLLCALL )
 
    iFlags = hb_parni( 2 );
 
-   if ((lpFunction = (DWORD) GetProcAddress( (HMODULE) hInst,
-                                     ISCHAR( 3 ) ? (LPCSTR) hb_parcx(3) :
-                                                   (LPCSTR) hb_parnl(3) )) == 0 )
+   if ((lpFunction = (LPVOID) GetProcAddress( (HMODULE) hInst,
+                                ISCHAR( 3 ) ? (LPCSTR) hb_parcx(3) :
+                                              (LPCSTR) hb_parnl(3) )) == 0 )
    {
       if ( ISCHAR( 3 ) )
       {
          // try forced ANSI flavour ?
          strcpy((char *) cFuncName, hb_parcx(3));
          strcat((char *) cFuncName, "A");
-         lpFunction = (DWORD) GetProcAddress( (HMODULE) hInst, (const char *) cFuncName);
+         lpFunction = (LPVOID) GetProcAddress( (HMODULE) hInst, (const char *) cFuncName);
       }
    }
 
-   if ((LPVOID)lpFunction != NULL)
+   if (lpFunction != NULL)
    {
       DllExec( iFlags, lpFunction, iParams, iFirst, iArgCnt );
    }
@@ -582,7 +585,7 @@ linking the VMGUI library code into it.
 
 //------------------------------------------------------------------
 
-RESULT DynaCall(int Flags,       DWORD lpFunction, int nArgs,
+RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
                 DYNAPARM Parm[], LPVOID pRet,      int nRetSiz)
 {
    // Call the specified function with the given parameters. Build a
@@ -640,7 +643,7 @@ RESULT DynaCall(int Flags,       DWORD lpFunction, int nArgs,
    }
    #if defined( __BORLANDC__ ) || defined(__DMC__)
       _ESP += (0x100 - dwStSize);
-      _EDX = (DWORD) &lpFunction;
+      _EDX =  &lpFunction;
       __emit__(0xff,0x12); // call [edx];
       dwEAX = _EAX;
       dwEDX = _EDX;
