@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.2 2005/04/10 21:03:00 ptsarenko Exp $
+ * $Id: ctmisc.prg,v 1.3 2006/04/23 12:30:00 ptsarenko Exp $
  */
 
 /*
@@ -57,9 +57,9 @@
 MEMVAR GetList
 
 FUNCTION CENTER( c, n, p )
-   DEFAULT n TO MaxCol() + 1
+   DEFAULT n TO MaxCol() + 1 - Col()*2
    DEFAULT c TO ""
-   RETURN PadC( AllTrim( c ), n, p )
+   RETURN RTrim(PadC( AllTrim( c ), n, p ))
 
 FUNCTION CSETCURS( l )
 
