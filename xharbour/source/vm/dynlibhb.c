@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.10 2005/10/24 01:04:36 druzus Exp $
+ * $Id: dynlibhb.c,v 1.11 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -62,12 +62,16 @@
 #include "hbstack.h"
 #include "hbvm.h"
 
+#if defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+#  include <dlfcn.h>
+#endif
+
 HB_FUNC( LIBLOAD )
 {
    void * hDynLib = NULL;
 
 #if defined(HB_OS_WIN_32)
-   if( ISCHAR( 1 ) )
+   if( hb_parclen( 1 ) > 0 )
    {
       int argc = hb_pcount() - 1, i;
       char **argv = NULL;
@@ -91,6 +95,31 @@ HB_FUNC( LIBLOAD )
          hb_xfree( argv );
       }
    }
+#elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+   if( hb_parclen( 1 ) > 0 )
+   {
+      int argc = hb_pcount() - 1, i;
+      char **argv = NULL;
+
+      if( argc > 0 )
+      {
+         argv = ( char** ) hb_xgrab( sizeof( char* ) * argc );
+         for( i = 0; i < argc; ++i )
+         {
+            argv[i] = hb_parcx( i + 2 );
+         }
+      }
+
+      /* use stack address as first level marker */
+      hb_vmBeginSymbolGroup( ( void * ) &HB_VM_STACK, TRUE );
+      hDynLib = ( void * ) dlopen( hb_parc( 1 ), RTLD_LAZY | RTLD_GLOBAL );
+      /* set real marker */
+      hb_vmInitSymbolGroup( hDynLib, argc, argv );
+      if( argv )
+      {
+         hb_xfree( argv );
+      }
+   }
 #endif
 
    hb_retptr( hDynLib );
@@ -107,6 +136,15 @@ HB_FUNC( LIBFREE )
       hb_retl( FreeLibrary( ( HMODULE ) hDynLib ) );
    }
    else
+#elif defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+   void * hDynLib = hb_parptr( 1 );
+
+   if( hDynLib )
+   {
+      hb_vmExitSymbolGroup( hDynLib );
+      hb_retl( dlclose( hDynLib ) == 0 );
+   }
+   else
 #endif
    {
       hb_retl( FALSE );
@@ -119,27 +157,25 @@ HB_FUNC( LIBFREE )
 
 HB_FUNC( HB_LIBDO )
 {
-   char *szName = hb_strupr( hb_strdup( hb_parc( 1 ) ) );
-   PHB_DYNS pDynSym;
-
-   pDynSym = hb_dynsymFind( szName );
-
-   if( pDynSym )
+   if( hb_parclen( 1 ) > 0 )
    {
-      USHORT uiPCount = hb_pcount();
-      USHORT uiParam;
+      PHB_DYNS pDynSym = hb_dynsymFindName( hb_parc( 1 ) );
 
-      hb_vmPushSymbol( pDynSym->pSymbol );
-      hb_vmPushNil();
-
-      /* same logic here as from HB_FUNC( EVAL ) */
-      for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
+      if( pDynSym )
       {
-         hb_vmPush( hb_stackItemFromBase( uiParam ) );
+         USHORT uiPCount = hb_pcount();
+         USHORT uiParam;
+
+         hb_vmPushSymbol( pDynSym->pSymbol );
+         hb_vmPushNil();
+
+         /* same logic here as from HB_FUNC( EVAL ) */
+         for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
+         {
+            hb_vmPush( hb_stackItemFromBase( uiParam ) );
+         }
+
+         hb_vmDo( uiPCount - 1 );
       }
-
-      hb_vmDo( uiPCount - 1 );
    }
-
-   hb_xfree( szName );
 }

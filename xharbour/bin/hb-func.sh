@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.68 2006/03/09 12:34:41 likewolf Exp $
+# $Id: hb-func.sh,v 1.69 2006/04/07 13:37:46 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -220,7 +220,7 @@ HB_XBGTK=""
 HB_HWGUI=""
 HB_USRLIBS=""
 HB_USRLPATH=""
-HB_GENC=""
+HB_GEN=""
 [ -n "\$TMPDIR" ] || TMPDIR="\$TMP"
 [ -n "\$TMPDIR" ] || TMPDIR="\$TEMP"
 [ -n "\$TMPDIR" ] || TMPDIR="/tmp"
@@ -254,7 +254,8 @@ while [ \$n -lt \${#P[@]} ]; do
         -l[^-]*)     HB_USRLIBS="\${HB_USRLIBS} \${v}" ;;
         -L[^-]*)     HB_USRLPATH="\${HB_USRLPATH} \${v}" ;;
         -main=*)     HB_MAIN_FUNC="\${v#*=}" ;;
-        -gc|-gc[0-9]) HB_GENC="yes"; p="\${v}" ;;
+        -gc|-gc[0-9]) HB_GEN="C"; p="\${v}" ;;
+        -gh)         HB_GEN="H"; p="\${v}" ;;
         -*)          p="\${v}" ;;
         *)           [ -z \${FILEOUT} ] && FILEOUT="\${v##*/}"; p="\${v}" ;;
     esac
@@ -422,9 +423,11 @@ hb_cc()
 
 hb_cmp()
 {
-    ${hb_cmpname} "\$@" \${HB_OPT} \${HB_PATHS} && [ -f "\${FOUTC}" ] && \\
+    ${hb_cmpname} "\$@" \${HB_OPT} \${HB_PATHS} && \\
+    ( [ "\${HB_GEN}" = "H" ] || \\
+    ( [ -f "\${FOUTC}" ] && \\
     hb_cc -c "\${FOUTC}" -o "\${FOUTO}" && \\
-    ( [ "\${HB_GENC}" = "yes" ] || rm -f "\${FOUTC}" )
+    ( [ "\${HB_GEN}" = "C" ] || rm -f "\${FOUTC}" ) ) )
 }
 
 hb_link()

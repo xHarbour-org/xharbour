@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.561 2006/04/12 13:37:29 snaiperis Exp $
+ * $Id: hvm.c,v 1.562 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -297,6 +297,7 @@ static HB_ITEM  s_aStatics;         /* Harbour array to hold all application sta
 static USHORT   s_uiStatics;        /* Number of statics added after processing hb_vmStatics() */
 static PHB_SYMB s_pSymStart = NULL; /* start symbol of the application. MAIN() is not required */
 static PSYMBOLS s_pSymbols = NULL;  /* to hold a linked list of all different modules symbol tables */
+static ULONG    s_ulFreeSymbols = 0;/* number of free module symbols */
 static void *   s_hDynLibID = NULL; /* unique identifer to mark symbol tables loaded from dynamic libraries */
 static BOOL     s_fCloneSym = FALSE;/* clone registered symbol tables */
 
@@ -2522,9 +2523,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
             if( bDynCode )
+            {
                hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
+            }
             else
+            {
                hb_itemPushStaticString( ( char * ) pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
+            }
 
             w += ( 3 + uiSize );
             break;
@@ -2536,9 +2541,13 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             BYTE uiSize = pCode[ w + 1 ];
 
             if( bDynCode )
+            {
                hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
+            }
             else
+            {
                hb_itemPushStaticString( ( char * ) pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
+            }
 
             w += ( 2 + uiSize );
             break;
@@ -2757,14 +2766,25 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
                {
                   if( bDynCode )
+                  {
                      hb_vmPushString( ( char * ) pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                  }
                   else
+                  {
                      hb_itemPushStaticString( ( char * ) pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                  }
                   hb_vmOperatorCall( pLocal, hb_stackItemFromTop( -1 ), "__OPASSIGN", NULL, 1, pLocal );
                }
                else
                {
-                  hb_itemPutCRawStatic( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
+                  if( bDynCode )
+                  {
+                     hb_itemPutCL( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
+                  }
+                  else
+                  {
+                     hb_itemPutCRawStatic( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
+                  }
                }
                w += ( 4 + uiSize );
                break;
@@ -8872,31 +8892,35 @@ static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, USHORT uiSymbols, char *
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFindFreeModule(%p,%hu,%s)", pSymbols, uiSymbols, szModuleName));
 
-   while( pLastSymbols )
+   if( s_ulFreeSymbols )
    {
-      if( !pLastSymbols->fActive &&
-          pLastSymbols->uiModuleSymbols == uiSymbols &&
-          pLastSymbols->szModuleName != NULL &&
-          strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
+      while( pLastSymbols )
       {
-         PHB_SYMB pModuleSymbols = pLastSymbols->pModuleSymbols;
-         USHORT ui;
-
-         for( ui = 0; ui < uiSymbols; ++ui )
+         if( !pLastSymbols->fActive &&
+             pLastSymbols->uiModuleSymbols == uiSymbols &&
+             pLastSymbols->szModuleName != NULL &&
+             strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
          {
-            if( ( pSymbols[ ui ].scope.value & ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE ) ) != 
-                  pModuleSymbols[ ui ].scope.value ||
-                strcmp( pSymbols[ ui ].szName, pModuleSymbols[ ui ].szName ) != 0 )
+            PHB_SYMB pModuleSymbols = pLastSymbols->pModuleSymbols;
+            USHORT ui;
+
+            for( ui = 0; ui < uiSymbols; ++ui )
             {
-               break;
+               if( ( pSymbols[ ui ].scope.value & ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE ) ) != 
+                     pModuleSymbols[ ui ].scope.value ||
+                   strcmp( pSymbols[ ui ].szName, pModuleSymbols[ ui ].szName ) != 0 )
+               {
+                  break;
+               }
+            }
+            if( ui == uiSymbols )
+            {
+               --s_ulFreeSymbols;
+               return pLastSymbols;
             }
          }
-         if( ui == uiSymbols )
-         {
-            return pLastSymbols;
-         }
+         pLastSymbols = pLastSymbols->pNext;
       }
-      pLastSymbols = pLastSymbols->pNext;
    }
 
    return NULL;
@@ -8923,6 +8947,7 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
       }
       pSymbols->hDynLib = NULL;
       pSymbols->fActive = FALSE;
+      ++s_ulFreeSymbols;
    }
 }
 
@@ -9065,7 +9090,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRegisterSymbols(%p,%hu,%s,%d,%d)", pModuleSymbols, uiSymbols, szModuleName, (int)fDynLib, (int)fClone));
 
-   pNewSymbols = hb_vmFindFreeModule( pModuleSymbols, uiSymbols, szModuleName );
+   pNewSymbols = s_ulFreeSymbols == 0 ? NULL :
+               hb_vmFindFreeModule( pModuleSymbols, uiSymbols, szModuleName );
 
    if( pNewSymbols )
    {
@@ -9120,14 +9146,14 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
    {
       PHB_SYMB pSymbol = pNewSymbols->pModuleSymbols + ui;
       HB_SYMBOLSCOPE hSymScope;
-      BOOL fPublic;
+      BOOL fPublic, fStatics;
 
-      if( fRecycled && ( pSymbol->scope.value & HB_FS_INITEXIT ) != HB_FS_INITEXIT )
+      fStatics = ( pSymbol->scope.value & HB_FS_INITEXIT ) == HB_FS_INITEXIT;
+
+      if( fRecycled && !fStatics )
       {
          pSymbol->value.pFunPtr = ( pModuleSymbols + ui )->value.pFunPtr;
-         pSymbol->scope.value =
-               ( pSymbol->scope.value & ~HB_FS_PCODEFUNC ) |
-               ( ( pModuleSymbols + ui )->scope.value & HB_FS_PCODEFUNC );
+         pSymbol->scope.value = ( pModuleSymbols + ui )->scope.value;
       }
       if( fDynLib )
       {
@@ -9137,9 +9163,14 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
       hSymScope = pSymbol->scope.value;
       pNewSymbols->hScope |= hSymScope;
       fPublic = ( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) != 0;
-      if( ( hSymScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
+      if( fStatics )
       {
          fInitStatics = TRUE;
+      }
+
+      if( ( hSymScope & HB_FS_PCODEFUNC ) != 0 && ( fRecycled || fClone ) )
+      {
+         pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pModuleSymbols;
       }
 
       if( !s_pSymStart && !fDynLib &&
@@ -9196,12 +9227,12 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
    return pNewSymbols;
 }
 
-void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols initialization */
+HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols initialization */
 {
    va_list ap;
    USHORT uiModuleSymbols;
    int iPCodeVer = 0;
-   char *szModule = NULL;
+   char *szModule;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
@@ -9266,7 +9297,22 @@ void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols i
                       "Please recompile.\n", szModule, szPCode );
    }
 
-   hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_fCloneSym, s_fCloneSym );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,
+                                s_fCloneSym, s_fCloneSym )->pModuleSymbols;
+}
+
+/* hvm support for pcode DLLs */
+
+void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
+
+#ifdef HB_THREAD_SUPPORT
+   /* initialize internal mutex for MT mode */
+   hb_threadInit();
+#endif
+
+   hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, "uknown_pcode.dll", TRUE, s_fCloneSym );
 }
 
 HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
@@ -9889,20 +9935,6 @@ HB_FUNC( __TRACEPRGCALLS )
    #endif
 }
 
-/* hvm support for pcode DLLs */
-
-void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
-
-#ifdef HB_THREAD_SUPPORT
-   /* initialize internal mutex for MT mode */
-   hb_threadInit();
-#endif
-
-   hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, "uknown_pcode.dll", TRUE, s_fCloneSym );
-}
-
 HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
 {
    HB_THREAD_STUB
@@ -10007,17 +10039,19 @@ HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
 HB_FUNC( __OPGETPRF )
 {
    HB_THREAD_STUB_API
-
+#ifndef HB_NO_PROFILER
    ULONG ulOpcode = hb_parnl( 1 );
 
    hb_reta( 2 );
-#ifndef HB_NO_PROFILER
+
    if( ulOpcode < HB_P_LAST_PCODE )
    {
       hb_stornl( hb_ulOpcodesCalls[ ulOpcode ], -1, 1 );
       hb_stornl( hb_ulOpcodesTime[ ulOpcode ],  -1, 2 );
    }
    else
+#else
+   hb_reta( 2 );
 #endif
    {
       hb_stornl( 0, -1, 1 );

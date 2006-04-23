@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.34 2006/03/03 14:13:22 druzus Exp $
+ * $Id: dynsym.c,v 1.35 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -83,6 +83,15 @@ static USHORT      s_uiDynSymbols = 0;    /* Number of symbols present */
 
 #endif
 
+typedef struct _HB_SYM_HOLDER
+{
+   HB_SYMB  symbol;
+   struct _HB_SYM_HOLDER * pNext;
+   char     szName[ 1 ];
+}
+HB_SYM_HOLDER, * PHB_SYM_HOLDER;
+
+static PHB_SYM_HOLDER s_pAllocSyms = NULL;
 
 void HB_EXPORT hb_dynsymLog( void )
 {
@@ -104,18 +113,23 @@ void HB_EXPORT hb_dynsymLog( void )
 
 PHB_SYMB HB_EXPORT hb_symbolNew( char * szName )      /* Create a new symbol */
 {
-   PHB_SYMB pSymbol;
+   PHB_SYM_HOLDER pHolder;
+   int iLen;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_symbolNew(%s)", szName));
 
-   pSymbol = ( PHB_SYMB ) hb_xgrab( sizeof( HB_SYMB ) );
-   pSymbol->szName = ( char * ) hb_xgrab( strlen( szName ) + 1 );
-   strcpy( pSymbol->szName, szName );
-   pSymbol->scope.value = HB_FS_ALLOCATED; /* to know what symbols to release when exiting the app */
-   pSymbol->value.pFunPtr = NULL;
-   pSymbol->pDynSym = NULL;
+   iLen = strlen( szName );
+   pHolder = ( PHB_SYM_HOLDER ) hb_xgrab( sizeof( HB_SYM_HOLDER ) + iLen );
+   memcpy( pHolder->szName, szName, iLen + 1 );
+   pHolder->pNext = s_pAllocSyms;
+   s_pAllocSyms = pHolder;
 
-   return pSymbol;
+   pHolder->symbol.szName        = pHolder->szName;
+   pHolder->symbol.scope.value   = 0;
+   pHolder->symbol.value.pFunPtr = NULL;
+   pHolder->symbol.pDynSym       = NULL;
+
+   return &pHolder->symbol;
 }
 
 PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    /* creates a new dynamic symbol */
@@ -704,29 +718,25 @@ USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 /* JC1: this is called at VM termination, no need to lock */
 void HB_EXPORT hb_dynsymRelease( void )
 {
-   PHB_DYNS pDynSym;
+   PHB_SYM_HOLDER pHolder;
    USHORT uiPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymRelease()"));
 
    for( uiPos = 0; uiPos < s_uiDynSymbols; uiPos++ )
    {
-      pDynSym = ( s_pDynItems + uiPos )->pDynSym;
-
-      /* it is a allocated symbol ? */
-      if( pDynSym->pSymbol &&
-          ( pDynSym->pSymbol->scope.value & HB_FS_ALLOCATED ) == HB_FS_ALLOCATED )
-      {
-         hb_xfree( pDynSym->pSymbol->szName );
-         hb_xfree( pDynSym->pSymbol );
-      }
-
-      hb_xfree( pDynSym );
+      hb_xfree( ( s_pDynItems + uiPos )->pDynSym );
    }
-
    hb_xfree( s_pDynItems );
    s_pDynItems = NULL;
    s_uiDynSymbols = 0;
+
+   while( s_pAllocSyms )
+   {
+      pHolder = s_pAllocSyms;
+      s_pAllocSyms = s_pAllocSyms->pNext;
+      hb_xfree( pHolder );
+   }
 }
 
 

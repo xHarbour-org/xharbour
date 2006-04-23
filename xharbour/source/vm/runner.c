@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.44 2005/11/16 12:16:46 druzus Exp $
+ * $Id: runner.c,v 1.45 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -448,7 +448,7 @@ static void hb_hrbInitStatic( PHRB_BODY pHrbBody )
              */
 
             /* changed to call VM execution instead of direct function address call
-             * // pHrbBody->pSymRead[ ul ].value.pFunPtr();
+             * pHrbBody->pSymRead[ ul ].value.pFunPtr();
              * [MLombardo]
              */
 
@@ -523,9 +523,9 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
       PHB_DYNS pDyn;
 
       pDyn = hb_dynsymFind( pHrbBody->pDynFunc[ ul ].szName );
-      if( pDyn && pDyn->pSymbol->value.pFunPtr == ( PHB_FUNC ) pHrbBody->pDynFunc[ ul ].pCodeFunc )
+      if( pDyn && pDyn->pSymbol->value.pCodeFunc == pHrbBody->pDynFunc[ ul ].pCodeFunc )
       {
-         pDyn->pSymbol->value.pFunPtr = NULL;
+         pDyn->pSymbol->value.pCodeFunc = NULL;
       }
 
       hb_xfree( pHrbBody->pDynFunc[ ul ].pCodeFunc );
@@ -575,7 +575,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
       {
          pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
          pSymRead[ ul ].scope.value  = szHrbBody[ulBodyOffset++];
-         pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
+         pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].pDynSym = NULL;
 
          if( pHrbBody->ulSymStart == -1 &&
@@ -611,23 +611,23 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )    /* Linker */
       {
-         if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_FUNC )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_FUNC )
          {
             ulPos = hb_hrbFindSymbol( pSymRead[ ul ].szName, pDynFunc, pHrbBody->ulFuncs );
 
             if( ulPos == SYM_NOT_FOUND )
             {
-               pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) SYM_EXTERN;
+               pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) SYM_EXTERN;
             }
             else
             {
-               pSymRead[ ul ].value.pFunPtr = ( PHB_FUNC ) pDynFunc[ ulPos ].pCodeFunc;
+               pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) pDynFunc[ ulPos ].pCodeFunc;
                pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC; /* | HB_FS_LOCAL; */
             }
          }
 
          /* External function */
-         if( ( ( HB_PTRDIFF ) pSymRead[ ul ].value.pFunPtr ) == SYM_EXTERN )
+         if( pSymRead[ ul ].value.pCodeFunc == ( PHB_PCODEFUNC ) SYM_EXTERN )
          {
             pDynSym = hb_dynsymFind( pSymRead[ ul ].szName );
 
@@ -665,11 +665,6 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
              * we allocated and disactivate static initialization [druzus]
              */
             pHrbBody->pSymRead = pHrbBody->pModuleSymbols->pModuleSymbols;
-
-            for( ul = 0; ul < pHrbBody->ulFuncs; ul++ )
-            {
-               pDynFunc[ ul ].pCodeFunc->pSymbols = pHrbBody->pSymRead;
-            }
 
             for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
             {

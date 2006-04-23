@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.40 2006/04/05 16:49:31 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.41 2006/04/06 04:54:17 ronpinkas Exp $
  */
 
 /*
@@ -88,14 +88,15 @@ extern int  HB_EXPORT hb_vmQuit( void );            /* Immediately quits the vir
 /* registration AtInit and AtExit functions - they are executed
  * just before (after) .prg INIT (EXIT) procedures.
  */
-void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo );
-void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
+extern void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo );
+extern void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
-extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
-extern void HB_EXPORT hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
-extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );
-extern void    hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
+extern HB_EXPORT void     hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
+extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
+
+extern void hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
 
 /* Harbour virtual machine escaping API */
 extern void    HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem );
@@ -142,12 +143,12 @@ HB_EXPORT extern void    hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[]
 HB_EXPORT extern void    hb_vmPushState( void ); /* push current VM state on stack */
 HB_EXPORT extern void    hb_vmPopState( void ); /* pop current VM state from stack */
 
-HB_EXPORT extern void hb_vmDoExitFunctions( void );
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );
-HB_EXPORT extern void hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
-HB_EXPORT extern void hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
+HB_EXPORT extern PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
+HB_EXPORT extern void     hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
 HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
-HB_EXPORT extern void hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols );
+HB_EXPORT extern void     hb_vmDoExitFunctions( void );
+HB_EXPORT extern void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
 
 /* Debugger API */
 typedef void (*HB_DBGENTRY_FUNC) ( int , int , char *, int , int );

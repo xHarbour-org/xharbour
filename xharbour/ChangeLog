@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4944 2006/04/22 13:46:11 lculik Exp $
+ * $Id: ChangeLog,v 1.4945 2006/04/22 22:39:22 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-23 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * changed the exit code for .hrb file compilation in xhbcmp
+
+  * xharbour/include/hbinit.h
+    * changed the init code to update symbol table address after symbol
+      registration by HVM
+
+  * xharbour/include/hbvm.h
+  * xharbour/source/vm/hvm.c
+    * hb_vmProcessSymbols() returns symbol table adress
+    ! added missing dynamic memory allocation for string items
+      created by dynamically loaded PCODE in HB_P_LOCALNEARSETSTR
+    + added counter with number of free symbol tables to not scan
+      for free tables at program startup
+    * cleaned BCC warnings reported by Enrico.
+
+  * xharbour/include/hbvmpub.h
+    * removed HB_FS_ALLOCATED
+
+  * xharbour/source/vm/dynsym.c
+    * changed the code for hb_symbolNew() to avoid possible memory leak
+      alerts and keep the list of all dynamic symbols accessible.
+      It also reduced a little bit the size of memory allocated for
+      new symbols.
+
+  * xharbour/source/vm/dynlibhb.c
+    + added support for loading dynamic libraries (.so) in Linux.
+      dlopen()/dlclose() are POSIX standard functions so it should
+      work also in other *nixes but it may need additional library
+      on linking (dl in Linux) so I didn't enabled this code for
+      them yet.
+
+  * xharbour/source/vm/runner.c
+    * some minor cleanups
 
 2006-04-22 19:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg
