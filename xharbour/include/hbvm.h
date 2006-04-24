@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.41 2006/04/06 04:54:17 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.42 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -55,10 +55,13 @@
 
 #include "hbapi.h"
 
-#define HB_SEQ_CANRECOVER        1
-#define HB_SEQ_CANFINALIZE       2
-#define HB_SEQ_RECOVERED         4
-#define HB_SEQ_FINALIZED         8
+#define HB_SEQ_PRESET_CANRECOVER  0x0001
+#define HB_SEQ_PRESET_CANFINALIZE 0x0002
+
+#define HB_SEQ_RECOVERED          0x0004
+#define HB_SEQ_FINALIZED          0x0008
+
+#define HB_SEQ_RETHROW            0x8000
 
 typedef struct _HB_SEQUENCE
 {

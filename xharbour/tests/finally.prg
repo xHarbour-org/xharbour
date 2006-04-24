@@ -20,6 +20,15 @@ PROCEDURE Main()
       ?
    CATCH oErr
       ? "Outer Caught:", oErr:Operation
+      ?
+
+      TRY
+         ? "Test 5"
+         Test5()
+         ?
+      CATCH oErr
+         ? "Outer Caught:", oErr:Operation
+      END
    END
 
 RETURN
@@ -88,6 +97,20 @@ PROCEDURE Test4()
 
       ? "Throwing to outer, should be deffered"
       Throw( oErr )
+   FINALLY
+      ? "Finalized"
+   END
+
+   ? "Oops, should have Re-Throw, after the FINALLY."
+
+RETURN
+
+PROCEDURE Test5()
+
+   TRY
+      ? "Trying"
+      ? "Throwing to outer, should be deffered"
+      Throw( ErrorNew( "Finalize Test", 0, 0, "Forced Error" ) )
    FINALLY
       ? "Finalized"
    END

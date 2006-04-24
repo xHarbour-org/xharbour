@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.23 2005/10/24 05:26:12 brianhays Exp $
+ * $Id: persist.prg,v 1.24 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -169,6 +169,8 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
                IF lIgnoreBadIVars
                   TRY
                      &( cLine )
+                  CATCH
+                     // Ignore.
                   END
                ELSE
                   &( cLine )
@@ -198,6 +200,8 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
                // TraceLog( cLine )
          ENDCASE
       NEXT
+   //CATCH
+      // Ignore - was intentional?
    FINALLY
       WHILE nWith-- > 0
          HB_SetWith()

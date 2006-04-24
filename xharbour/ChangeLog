@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4948 2006/04/23 14:28:17 lculik Exp $
+ * $Id: ChangeLog,v 1.4949 2006/04/23 19:13:22 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-24 00:30 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hberrors.h
+    + Added HB_COMP_ERR_MISSING_HANDLER             67
+  * source/compiler/hbgenerr.c
+    + Added: "TRY section requires a CATCH or FINALLY handler"
+  * source/compiler/harbour.sly
+    + Added compile error on TRY...END with no CATCH and no FINALLY
+    + Modified generation of TRY/TRYEND/CATCH/FINALLY to always complete envelopes
+      when respective section exists.
+  * include/hbvm.h
+    * Renamed HB_SEQ_ members for better clarity.
+    + Added HB_SEQ_RETHROW flag
+
+  * source/vm/hvm.c
+    * Modified TRY/CATCH/FINALLY flow to comply with standard conventions
+
+  * source/rtl/persist.prg
+    + Added missing CATCH clauses.
+
+  * tests/finally.prg
+    + Added test for Rethrow from FINALLY, when no local CATCH specified.
+
+  /*
+    NOTE: I did not have enough time for normal testing, so extensive testing is needed
+   */
 
 2006-04-23 15:15 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/rtl/dllcall.c
@@ -70,7 +96,7 @@
      contrib/hbzlib/zipnew.cpp
      contrib/hbzlib/zipcomp.cpp
      ! Fixed Possible memory leak.
-       Updated to use xharbour api insted of direct usage of HB_ITEM structure 
+       Updated to use xharbour api insted of direct usage of HB_ITEM structure
 
 2006-04-21 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

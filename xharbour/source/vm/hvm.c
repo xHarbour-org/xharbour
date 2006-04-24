@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.562 2006/04/21 11:25:33 druzus Exp $
+ * $Id: hvm.c,v 1.563 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -78,6 +78,7 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
+#include <assert.h>
 
 #include "hbvmopt.h"
 #include "hbxvm.h"
@@ -1030,10 +1031,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
    LONG w = 0;
    BOOL bCanRecover = FALSE;
-   BOOL bFinally = FALSE;
    BOOL bCanFinalize = FALSE;
    BOOL bDynCode = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
-   LONG pNextSection = 0;
+   LONG lNextSection = 0, lCatchSection = 0, lFinallySection = 0;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;
@@ -2042,12 +2042,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
 
          case HB_P_TRYBEGIN:
-            pNextSection = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
-
             // Incase recent FINALLY hit a new TRY segment before the ENDFINALLY.
             if( bCanFinalize && ( hb_vm_pSequence->uiStatus & HB_SEQ_FINALIZED ) )
             {
                //#define DEBUG_FINALLY
+
                #ifdef DEBUG_FINALLY
                   printf( "%s-> (TRYBEGIN)- Pending: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->uiActionRequest );
                #endif
@@ -2055,13 +2054,40 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             hb_vm_iTry++;
 
-            bFinally = FALSE;
+            lFinallySection = 0;
+            lCatchSection   = 0;
+            lNextSection    = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
 
-            if( pCode[ pNextSection ] == HB_P_TRYRECOVER || pCode[ pNextSection ] == HB_P_TRYEND )
+            #ifdef DEBUG_FINALLY
+               printf( "Next: %i at %li\n", pCode[ lNextSection ], lNextSection );
+            #endif
+
+            if( pCode[ lNextSection ] == HB_P_FINALLY )
             {
-               if( HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] ) > 4 )
+               lFinallySection = lNextSection;
+
+               #ifdef DEBUG_FINALLY
+                  printf( "Has finally at: %li and no catcher!\n", lFinallySection );
+               #endif
+            }
+            else
+            {
+               lCatchSection = lNextSection;
+               lNextSection += HB_PCODE_MKINT24( &pCode[ lCatchSection + 1 ] );
+
+               if( pCode[ lNextSection ] == HB_P_FINALLY )
                {
-                  bFinally = TRUE;
+                  lFinallySection = lNextSection;
+
+                  #ifdef DEBUG_FINALLY
+                     printf( "Has finally at: %li after catch at: %li\n", lFinallySection, lCatchSection );
+                  #endif
+               }
+               else
+               {
+                  #ifdef DEBUG_FINALLY
+                     printf( "Has catch at: %li and no finally!\n", lCatchSection );
+                  #endif
                }
             }
             // Intentionally FALL through.
@@ -2099,6 +2125,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
             pSequence->lBase = hb_stackTopOffset();
 
+            // Make sure it's NIL
+            hb_itemClear( hb_stackItem( pSequence->lBase - 1 ) );
+
             pSequence->uiStatus = 0;
 
             /*
@@ -2107,12 +2136,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
             if( bCanRecover )
             {
-               pSequence->uiStatus |= HB_SEQ_CANRECOVER;
+               pSequence->uiStatus |= HB_SEQ_PRESET_CANRECOVER;
             }
 
             if( bCanFinalize )
             {
-               pSequence->uiStatus |= HB_SEQ_CANFINALIZE;
+               pSequence->uiStatus |= HB_SEQ_PRESET_CANFINALIZE;
             }
 
             /*
@@ -2133,19 +2162,19 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                hb_vm_pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
 
-               bCanFinalize = bFinally;
+               bCanFinalize = lFinallySection;
 
-               if( bFinally )
+               if( bCanFinalize )
                {
-                  hb_vm_pSequence->lFinally = pNextSection + HB_PCODE_MKINT24( &pCode[ pNextSection + 1 ] );
+                  hb_vm_pSequence->lFinally = lFinallySection;
 
-                  if( pCode[ pNextSection ] != HB_P_TRYRECOVER )
+                  if( lCatchSection == 0 )
                   {
-                     hb_vm_pSequence->uiStatus |= HB_SEQ_RECOVERED;
+                     hb_vm_pSequence->uiStatus |= ( HB_SEQ_RECOVERED | HB_SEQ_RETHROW );
                   }
 
                   #ifdef DEBUG_FINALLY
-                     printf( "%s->Finally %p at: %li bCanFinilize: %i Prev: %p\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE, hb_vm_pSequence->pPrev );
+                     printf( "%s->Finally %li at: %li bCanFinalize: %i Prev: %li\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE, hb_vm_pSequence->pPrev );
 
                      if( hb_vm_pSequence->pPrev )
                      {
@@ -2169,13 +2198,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
-            if( bCanFinalize )
-            {
-               hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
-            }
-
             #ifdef DEBUG_FINALLY
-               printf( "%s->TRYEND: %p Finally: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally );
+               printf( "%s->TRYEND: %li Finally: %li\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally );
             #endif
 
             // Intentionally FALL through.
@@ -2186,16 +2210,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * Restore previous recovery state
              */
-
-            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
-
-            /* Discard the value returned by BREAK statement - there
-             * was no RECOVER clause or there was no BREAK statement
-             */
-            hb_stackPop();
+            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
 
             if( hb_vm_pSequence->lFinally == 0 )
             {
+               /* Discard the value returned by BREAK statement - there
+                * was no RECOVER clause or there was no BREAK statement
+                */
+               hb_stackPop();
+
+
                /*
                 * Remove the SEQUENCE envelope
                 * This is executed either at the end of sequence or as the
@@ -2204,8 +2228,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 */
                PHB_SEQUENCE pFree = hb_vm_pSequence;
 
-               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
-               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
+               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
                hb_vm_pSequence = hb_vm_pSequence->pPrev;
                hb_xfree( (void *) pFree );
@@ -2228,8 +2252,12 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
 
             #ifdef DEBUG_FINALLY
-               printf( "%s->TRYRECOVER: %p Finally: %i bCanFinalize %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, bCanFinalize );
+               printf( "%s->TRYRECOVER: %li Finally: %i bCanFinalize %i got Type: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence, hb_vm_pSequence->lFinally, bCanFinalize, hb_stackItem( hb_vm_pSequence->lBase - 1 )->type );
             #endif
+
+            // The hb_vm_pSequence->lBase will now be poped as stack top, but it must be reserved for potential forwarding to outer!
+            hb_stackPush();
+            hb_itemForwardValue( hb_stackItemFromTop( -1 ), hb_stackItemFromTop(-2) );
 
             w += 3;
             // Intentionally FALL through.
@@ -2247,7 +2275,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /*
              * Restore previous recovery state
              */
-            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
+            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
 
             /*
              * Leave the value returned from BREAK  - it will be popped
@@ -2256,8 +2284,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vm_pSequence->lFinally == 0 )
             {
-               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
-               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+               bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
+               bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
                hb_vm_pSequence = hb_vm_pSequence->pPrev;
                hb_xfree( pFree );
@@ -2272,11 +2300,17 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          }
 
          case HB_P_FINALLY:
-           hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
-
            #ifdef DEBUG_FINALLY
-             printf( "%s->Finally after CATCH:\n", hb_stackBaseItem()->item.asSymbol.value->szName );
+             printf( "%s->Finally status %i: Top: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->uiStatus, hb_stackItemFromTop(-1)->type );
            #endif
+
+            // There was no CATCH section
+            if( hb_vm_pSequence->uiStatus & HB_SEQ_RETHROW )
+            {
+               bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
+            }
+
+            hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
 
            w++;
            break;
@@ -2289,19 +2323,41 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
            {
               s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
 
+              if( s_uiActionRequest & HB_BREAK_REQUESTED )
+              {
+                 if( hb_vm_pSequence->pPrev )
+                 {
+                    hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 ), hb_stackItem( hb_vm_pSequence->lBase - 1 ) );
+
+                    #ifdef DEBUG_FINALLY
+                       if( hb_vm_pSequence->uiStatus & HB_SEQ_RETHROW )
+                       {
+                          printf( "Rethrow type: %i after completed execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                       }
+                       else
+                       {
+                          printf( "Forwraded to outer type: %i after completed execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                       }
+                    #endif
+                 }
+              }
+
               #ifdef DEBUG_FINALLY
-                 printf( "%s->Restored Deferred Action %i:\n", hb_stackBaseItem()->item.asSymbol.value->szName, s_uiActionRequest );
+                 printf( "%s->Restored Deferred Action %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, s_uiActionRequest );
               #endif
            }
 
-           bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
-           bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+           // REVIEW: Needed?
+           //hb_stackPop();
+
+           bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
+           bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
            hb_vm_pSequence = hb_vm_pSequence->pPrev;
            hb_xfree( (void *) pFree );
 
            #ifdef DEBUG_FINALLY
-              printf( "%s->Completed execution: %p Restored: %p Finally: %i Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
+              printf( "%s->Completed execution: %p Restored: %p Finally: %li Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
            #endif
 
            w++;
@@ -3545,14 +3601,33 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                s_uiActionRequest = hb_vm_pSequence->uiActionRequest;
             }
 
-            bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_CANRECOVER;
-            bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_CANFINALIZE;
+            if( s_uiActionRequest & HB_BREAK_REQUESTED )
+            {
+               if( hb_vm_pSequence->pPrev )
+               {
+                  hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 ), hb_stackItem( hb_vm_pSequence->lBase - 1 ) );
+
+                  #ifdef DEBUG_FINALLY
+                     if( hb_vm_pSequence->uiStatus & HB_SEQ_RETHROW )
+                     {
+                        printf( "Rethrow type: %i after partial execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                     }
+                     else
+                     {
+                        printf( "Forwraded to outer type: %i after partial execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                     }
+                  #endif
+               }
+            }
+
+            bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
+            bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
             hb_vm_pSequence = hb_vm_pSequence->pPrev;
             hb_xfree( (void *) pFree );
 
             #ifdef DEBUG_FINALLY
-            printf( "%s->Removed partially executed: %p Restored: %p Finally: %i Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
+               printf( "%s->Removed partially executed: %p Restored: %p Finally: %i Pending: %i bCanFinalize: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, pFree, hb_vm_pSequence, hb_vm_pSequence ? hb_vm_pSequence->lFinally : 0, s_uiActionRequest, bCanFinalize );
             #endif
          }
 
@@ -3590,26 +3665,42 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
                hb_vm_pSequence->uiActionRequest = HB_BREAK_REQUESTED;
 
-               w = hb_vm_pSequence->lFinally;
-               s_uiActionRequest = 0;
+               // We didn't realy have a recover section, so do the bCanRecover too!
+               if( hb_vm_pSequence->uiStatus & HB_SEQ_RETHROW )
+               {
+                  assert( hb_vm_pSequence->lFinally == hb_vm_pSequence->lRecover );
+
+                  #ifdef DEBUG_FINALLY
+                     printf( "%s->Doing bCanRecover too\n", hb_stackBaseItem()->item.asSymbol.value->szName );
+                  #endif
+
+                  goto hb_vmExecute_CanRecover;
+               }
+               else
+               {
+                  w = hb_vm_pSequence->lFinally;
+                  s_uiActionRequest = 0;
+               }
             }
             else if( bCanRecover )
             {
-                // Reset FOR EACH.
-                while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
-                {
-                   hb_vm_wEnumCollectionCounter--;
-                   hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
-                   hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
-                   hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
-                }
+              hb_vmExecute_CanRecover:
 
-                // Reset WITH OBJECT.
-                while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
-                {
-                   --hb_vm_wWithObjectCounter;
-                   hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
-                }
+               // Reset FOR EACH.
+               while( hb_vm_wEnumCollectionCounter > hb_vm_pSequence->wEnumCollectionCounter )
+               {
+                  hb_vm_wEnumCollectionCounter--;
+                  hb_itemClear( &( hb_vm_aEnumCollection[ hb_vm_wEnumCollectionCounter ] ) );
+                  hb_itemClear( hb_vm_apEnumVar[ hb_vm_wEnumCollectionCounter ] );
+                  hb_vm_awEnumIndex[ hb_vm_wEnumCollectionCounter ] = 0;
+               }
+
+               // Reset WITH OBJECT.
+               while( hb_vm_wWithObjectCounter > hb_vm_pSequence->wWithObjectCounter )
+               {
+                  --hb_vm_wWithObjectCounter;
+                  hb_itemClear( &( hb_vm_aWithObject[ hb_vm_wWithObjectCounter ] ) );
+               }
 
                /*
                 * There is the BEGIN/END sequence deifined in current
@@ -3620,6 +3711,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 * remove all items placed on the stack after BEGIN code
                 */
                hb_stackRemove( hb_vm_pSequence->lBase );
+
                w = hb_vm_pSequence->lRecover;
 
                /*
@@ -8906,7 +8998,7 @@ static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, USHORT uiSymbols, char *
 
             for( ui = 0; ui < uiSymbols; ++ui )
             {
-               if( ( pSymbols[ ui ].scope.value & ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE ) ) != 
+               if( ( pSymbols[ ui ].scope.value & ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE ) ) !=
                      pModuleSymbols[ ui ].scope.value ||
                    strcmp( pSymbols[ ui ].szName, pModuleSymbols[ ui ].szName ) != 0 )
                {
@@ -9565,15 +9657,31 @@ void HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem )
    {
       PHB_SEQUENCE pSequence = hb_vm_pSequence;
 
-      while( pSequence->uiStatus & HB_SEQ_RECOVERED )
+      /*
+      while( pSequence && ( pSequence->uiStatus & HB_SEQ_RECOVERED ) && ( pSequence->uiStatus & HB_SEQ_RETHROW == 0 ) )
       {
          pSequence = pSequence->pPrev;
       }
+      */
 
-      if( pSequence && pSequence->lBase && hb_stackItem( pSequence->lBase - 1 )->type == HB_IT_NIL )
+      if( pSequence )
       {
-         //printf( "Break Type %i for: %p \n", pItem->type, pSequence );
-         hb_itemForwardValue( hb_stackItem( pSequence->lBase - 1 ), pItem );
+         assert( pSequence->lBase );
+
+         if( hb_stackItem( pSequence->lBase - 1 )->type == HB_IT_NIL )
+         {
+            #ifdef DEBUG_FINALLY
+               printf( "Break Type %i for: %p at: %li\n", pItem->type, pSequence, pSequence->lBase - 1 );
+            #endif
+
+            hb_itemForwardValue( hb_stackItem( pSequence->lBase - 1 ), pItem );
+         }
+         else
+         {
+            #ifdef DEBUG_FINALLY
+               printf( "Disregard Break Type %i for: %p at: %li\n", pItem->type, pSequence, pSequence->lBase - 1 );
+            #endif
+         }
       }
    }
 

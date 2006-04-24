@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.99 2006/02/21 14:52:27 likewolf Exp $
+ * $Id: harbour.sly,v 1.100 2006/03/21 20:46:16 likewolf Exp $
  */
 
 /*
@@ -2715,7 +2715,11 @@ Try          : TRY
                }
                Finally
                {
-                 //printf( "Value: %i\n", $<lNumber>8 );
+                  //printf( "Value: %i\n", $<lNumber>8 );
+                  if( $<lNumber>6 == 0 )
+                  {
+                     hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
+                  }
                }
                END
                {
@@ -2725,27 +2729,34 @@ Try          : TRY
                    */
                   if( $<lNumber>8 )
                   {
-                     //printf( "Finalized END to %li\n", $<lNumber>8 + 1 );
-                     hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 + 1 );
+                     //printf( "Finalized END to %li\n", $<lNumber>8 );
+                     hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 );
 
                      if( $<lNumber>6 )
                      {
                         //printf( "Recover to %li\n", $<lNumber>8 );
                         hb_compGenJumpThere( $<lNumber>6 + 1, $<lNumber>8 );
-
-                        hb_compGenPCode1( HB_P_ENDFINALLY );
                      }
+                     else
+                     {
+                        /* Only if there is no CATCH clause */
+                        --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
+                     }
+
+                     hb_compGenPCode1( HB_P_ENDFINALLY );
                   }
                   else
                   {
                      //printf( "END to %li\n", hb_comp_functions.pLast->lPCodePos );
                      hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
-                  }
 
-                  if( $<lNumber>6 == 0 )
-                  {
-                     /* Only if there is no CATCH clause */
-                     --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
+                     if( $<lNumber>6 == 0 )
+                     {
+                        /* Only if there is no CATCH clause */
+                        --hb_comp_wSeqCounter;  /* CATCH is also considered as end of sequence */
+
+                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MISSING_HANDLER, NULL, NULL );
+                     }
                   }
 
                   //hb_compTryFinish( $<lNumber>2, $<iNumber>4 );

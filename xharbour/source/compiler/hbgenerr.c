@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.22 2005/11/12 18:47:30 druzus Exp $
+ * $Id: hbgenerr.c,v 1.23 2006/02/21 19:37:07 druzus Exp $
  */
 
 /*
@@ -98,7 +98,8 @@ char * hb_comp_szErrors[] =
    "Unbalance PRAGMA BEGINDUMP and PRAGMA ENDDUMP",
    "Unterminated /* */ comment",
    "Memory buffer overflow",
-   "Memory corruption detected"   
+   "Memory corruption detected",
+   "TRY section requires a CATCH or FINALLY handler"
 };
 
 /* Table with parse warnings */
