@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.563 2006/04/23 00:36:00 druzus Exp $
+ * $Id: hvm.c,v 1.564 2006/04/24 07:30:16 ronpinkas Exp $
  */
 
 /*
@@ -2214,6 +2214,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
             if( hb_vm_pSequence->lFinally == 0 )
             {
+               PHB_SEQUENCE pFree;
+
                /* Discard the value returned by BREAK statement - there
                 * was no RECOVER clause or there was no BREAK statement
                 */
@@ -2226,7 +2228,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 * response to the break statement if there is no RECOVER clause
                 * but ONLY if we don't also have a FINALLY section.
                 */
-               PHB_SEQUENCE pFree = hb_vm_pSequence;
+               pFree = hb_vm_pSequence;
 
                bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
                bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
