@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.c,v 1.2 2003/09/03 01:17:43 andijahja Exp $
+ * $Id: reserved.c,v 1.3 2004/02/14 01:29:41 andijahja Exp $
  */
 
 /*
@@ -113,6 +113,7 @@ static const char * s_szReservedFun[] = {
    "SQRT"      ,
    "STR"       ,
    "SUBSTR"    ,
+   "THROW"     ,
    "TIME"      ,
    "TRANSFORM" ,
    "TRIM"      ,

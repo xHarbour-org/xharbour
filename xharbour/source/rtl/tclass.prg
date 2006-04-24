@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.17 2005/07/15 04:47:38 walito Exp $
+ * $Id: tclass.prg,v 1.18 2005/12/01 13:25:49 snaiperis Exp $
  */
 
 /*
@@ -61,7 +61,6 @@
  *    Use of __cls_param function to allow multiple superclass declaration
  *    Suppress of SetType and SetInit not more nedded
  *    Delegation and forwarding
- *    Preparing the InitClass class method (not working !! )
  *
  * Copyright 1999 Eddie Runia <eddie@runia.com>
  *    Support for inheritance
@@ -104,7 +103,6 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "Instance"       , @Instance()       , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetDestructor"  , @SetDestructor()  , HB_OO_MSG_METHOD )
-      __clsAddMsg( s_hClass, "InitClass"      , @InitClass()      , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
@@ -460,10 +458,6 @@ RETURN
 
 //----------------------------------------------------------------------------//
 
-STATIC FUNCTION InitClass()
-   RETURN QSelf()
-
-//----------------------------------------------------------------------------//
 
 /*
  * (C) 2002 - Francesco Saverio Giudice
