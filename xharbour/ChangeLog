@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4954 2006/04/25 05:33:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4955 2006/04/25 06:29:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-25 12:28 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * include/hbclass.ch
+    * Removed redundant older rule for DESTRUCTOR ... -> METHOD ...
+    * Refined rule for DESTRUCTOR ... to allow both variation of () or missing ()
 
 2006-04-24 23:28 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbclass.ch
