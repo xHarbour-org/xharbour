@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.37 2005/11/23 19:40:02 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.38 2006/04/24 22:24:38 ronpinkas Exp $
  */
 
 /*
@@ -881,10 +881,9 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        s_oClass:Create(MetaClass) ;;
                        __ClsSetModule( s_oClass:hClass ) ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
-                       TRY ;;
+                       IF __ObjHasMsg( oClassInstance, "InitClass" );;
                          oClassInstance:InitClass( hb_aParams() ) ;;
-                       CATCH ;;
-                       END ;;
+                       ENDIF ;;
                       ELSE ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                       ENDIF ;;
@@ -899,10 +898,9 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        s_oClass:Create() ;;
                        __ClsSetModule( s_oClass:hClass ) ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
-                       TRY ;;
+                       IF __ObjHasMsg( oClassInstance, "InitClass" );;
                          oClassInstance:InitClass( hb_aParams() ) ;;
-                       CATCH ;;
-                       END ;;
+                       ENDIF ;;
                       ELSE ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                       ENDIF ;;
