@@ -7172,7 +7172,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         WAIT
      ENDIF
 
-     //TraceLog( "Token: '" + sToken + "' Len: " + Str( nLen ) + " Next: '" + sNextToken + "'" )
+     //TraceLog( "Token: '" + sToken + "' Len: " + Str( nLen ) + " Next: '" + sNextToken + "'", sLine )
 
      IF nLen == 1
 
@@ -7181,7 +7181,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp += sToken
            LOOP
 
-        ELSEIF s1 == "&" .AND. s1 == sToken .OR. sNext1 == '(' // No white space, or paretesized.
+        ELSEIF s1 == "&" .AND. ( s1 == sToken .OR. sNext1 == '(' )// No white space, or parentesized.
            sExp += sToken
 
            IF sNext1 == '('
