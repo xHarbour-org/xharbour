@@ -10,7 +10,7 @@
 
 2006-04-24 22:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * utils/xbscript/xbscript.prg
-    * Silly typo in NExtExp() that caused bug in parsing ((...)) expressions
+    * Silly typo in NextExp() that caused bug in parsing ((...)) expressions
 
 2006-04-24 15:23 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbclass.ch
