@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.39 2006/04/25 06:29:33 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.40 2006/04/25 19:29:50 ronpinkas Exp $
  */
 
 /*
@@ -869,14 +869,14 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 #xcommand DESTRUCTOR <MethodName> => ;
   _HB_MEMBER <MethodName>();;
   s_oClass:SetDestructor( CLSMETH _CLASS_NAME_ <MethodName>() ) ;;
- #xcommand PROCEDURE <MethodName>\[()] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
- #xcommand PROCEDURE <MethodName>\[()] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
+ #xcommand PROCEDURE <MethodName>\[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
+ #xcommand PROCEDURE <MethodName>\[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
 
 #xcommand DESTRUCTOR <MethodName>() => ;
   _HB_MEMBER <MethodName>();;
   s_oClass:SetDestructor( CLSMETH _CLASS_NAME_ <MethodName>() ) ;;
- #xcommand PROCEDURE <MethodName> \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
- #xcommand PROCEDURE <MethodName> \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
+ #xcommand PROCEDURE <MethodName>\[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>;;
+ #xcommand PROCEDURE <MethodName>\[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE \<ClassName> <MethodName>
 
 #xtranslate END CLASS => ENDCLASS
 
