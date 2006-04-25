@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.564 2006/04/24 07:30:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.565 2006/04/24 19:22:17 ronpinkas Exp $
  */
 
 /*
@@ -1033,7 +1033,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
    BOOL bCanRecover = FALSE;
    BOOL bCanFinalize = FALSE;
    BOOL bDynCode = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
-   LONG lNextSection = 0, lCatchSection = 0, lFinallySection = 0;
+   LONG lNextSection /*= 0*/, lCatchSection = 0, lFinallySection = 0;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = hb_vm_wEnumCollectionCounter;
    ULONG wWithObjectCounter = hb_vm_wWithObjectCounter;

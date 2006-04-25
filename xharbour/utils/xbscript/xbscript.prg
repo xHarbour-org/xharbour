@@ -1348,8 +1348,11 @@ RETURN
         aSize( aProcedure[9], Len( aProcedure[5][VAR_LOCAL] ) )
 
         FOR EACH cVar IN aProcedure[5][VAR_STATIC]
-           // Save existing value
-           aProcedure[7][HB_EnumIndex()] := __MVGet( cVar )
+           // Might have been called in LOCAL declarations, before this STATIC was created.
+           IF __MVExist( cVar )
+              // Save existing value
+              aProcedure[7][HB_EnumIndex()] := __MVGet( cVar )
+           ENDIF
 
            // Hide it from the new procedure
            //__MVRelease( cVar )
@@ -1357,8 +1360,12 @@ RETURN
         NEXT
 
         FOR EACH cVar IN aProcedure[5][VAR_LOCAL]
-           // Save existing value
-           aProcedure[9][HB_EnumIndex()] := __MVGet( cVar )
+
+           // Might have been called in LOCAL declarations, before this LOCAL was created.
+           IF __MVExist( cVar )
+              // Save existing value
+              aProcedure[9][HB_EnumIndex()] := __MVGet( cVar )
+           ENDIF
 
            // Hide it from the new procedure
            //__MVRelease( cVar )
