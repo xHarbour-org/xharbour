@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4960 2006/04/26 13:38:32 guerra000 Exp $
+ * $Id: ChangeLog,v 1.4961 2006/04/26 17:32:13 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-26 15:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/dbedit.prg
+    ! fixed to clean keyboard buffer for each loop, to reset the lastkey
+      value access into user function.
 
 2006-04-26 10:31 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/vm/hvm.c

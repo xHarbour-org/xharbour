@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.33 2006/04/22 22:39:24 modalsist Exp $
+ * $Id: dbedit.prg,v 1.34 2006/04/24 19:59:55 modalsist Exp $
  */
 
 /*
@@ -87,13 +87,15 @@
 #include "hbsetup.ch"
 #include "common.ch"
 
-/* E.F. 2006/04/22 - The define DE_APPEND is for Append mode in dbEdit.
+/* E.F. 2006/04/22 - The #define DE_APPEND is for Append mode in dbEdit.
  * I have used tbrowse "cargo" to assign true/false for that.
  * (Append mode is undocumented Clipper's dbEdit feature)
  */
 #ifndef DE_APPEND
 #define DE_APPEND  3
 #endif
+
+STATIC dbe_nNextKey := 0
 
 FUNCTION DBEdit(nTop,;                //  1§
                 nLeft,;               //  2§
@@ -118,10 +120,9 @@ LOCAL oTBR,;
       bFun,;
       nCursor,;
       cHdr,;
-      nIndex,;
-      nNextKey
-            
-     
+      nIndex
+      
+
   // If no database in use we must call Errorsys() with error 2001
   //
   IF !Used()
@@ -380,41 +381,37 @@ LOCAL oTBR,;
  oTBR:refreshAll()
  oTBR:invalidate()
  oTBR:forceStable()
+
  oTBR:deHilite()
 
  i := RecNo()
  dbGoTop()
 
- IF (Eof() .OR. RecNo() == LastRec() + 1) .AND. Bof()
+ IF dbe_Empty()
     nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
  END
 
  dbGoto(i)
-
- IF nRet != DE_ABORT
-    nRet := DE_CONT
- END
 
 
  /* --------------------------- */
  /* Go into the processing loop */
  /* --------------------------- */
 
- nNextKey := 0
- 
  WHILE nRet != DE_ABORT
 
-    Switch nRet
-      Case DE_REFRESH
+    SWITCH nRet
+      CASE DE_REFRESH
         oTBR:invalidate()
         oTBR:refreshAll()
-        Exit
-      Case DE_CONT
+        EXIT
+      CASE DE_CONT
         oTBR:refreshCurrent()
-        Exit
-    End
+        EXIT
+    END
 
     oTBR:forceStable()
+
     oTBR:deHilite()
 
     If oTBR:hitTop .AND. nKey != K_CTRL_PGUP
@@ -442,10 +439,10 @@ LOCAL oTBR,;
        nKey := K_DOWN
        dbe_Setcolor( oTBR, .T. )
     ELSE
-       IF nNextKey != 0
-          nKey := nNextkey
-          nNextKey := 0
-       ELSE
+       IF dbe_nNextKey != 0
+          nKey := dbe_nNextkey
+          dbe_nNextKey := 0
+       ELSE 
           nKey := Inkey(0)
        ENDIF
     ENDIF
@@ -534,19 +531,18 @@ LOCAL oTBR,;
 
 #endif
 
-    /* E.F. 2006/04/24 - Userfunc can put keystrokes, so we need
-     * get the pending keys, after each DE_EXCEPT event.
-     */
-    IF nRet == DE_CONT
-       nNextKey := Nextkey()
-//       keyboard chr(0)
-    ENDIF
-
     IF oTBR:Cargo
        oTBR:Cargo := .F.
        dbe_Setcolor( oTBR,.F.)
     ENDIF
 
+    /* E.F. 2006/04/27 - Clean the keyboard buffer after each loop to
+     * reset lastkey() value.
+     */
+    IF nRet == DE_CONT
+       Keyboard chr(0)
+       Inkey()
+    ENDIF
 
     IF nRet == DE_ABORT
        EXIT
@@ -558,7 +554,7 @@ LOCAL oTBR,;
 
     dbGoTop()
 
-    If (Eof() .Or. RecNo() == LastRec() + 1) .And. Bof()
+    If dbe_Empty()
        nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
     End
 
@@ -573,20 +569,20 @@ RETURN .T.
 
 #ifdef HB_COMPAT_C53
 Static Function _MoveCol(oTBR, nKey)
-Local oTB1, oTB2
+Local oTBR1, oTBR2
 
   If nKey == K_CTRL_DOWN .And. oTBR:colPos < oTBR:colCount
-    oTB1 := oTBR:getColumn(oTBR:colPos)
-    oTB2 := oTBR:getColumn(oTBR:colPos + 1)
-    oTBR:setColumn(oTBR:colPos, oTB2)
-    oTBR:SetColumn(oTBR:colPos + 1, oTB1)
+    oTBR1 := oTBR:getColumn(oTBR:colPos)
+    oTBR2 := oTBR:getColumn(oTBR:colPos + 1)
+    oTBR:setColumn(oTBR:colPos, oTBR2)
+    oTBR:SetColumn(oTBR:colPos + 1, oTBR1)
     oTBR:colPos++
     oTBR:invalidate()
   ElseIf nKey == K_CTRL_UP .And. oTBR:colPos > 1
-    oTB1 := oTBR:getColumn(oTBR:colPos)
-    oTB2 := oTBR:getColumn(oTBR:colPos - 1)
-    oTBR:setColumn(oTBR:colPos, oTB2)
-    oTBR:SetColumn(oTBR:colPos - 1, oTB1)
+    oTBR1 := oTBR:getColumn(oTBR:colPos)
+    oTBR2 := oTBR:getColumn(oTBR:colPos - 1)
+    oTBR:setColumn(oTBR:colPos, oTBR2)
+    oTBR:SetColumn(oTBR:colPos - 1, oTBR1)
     oTBR:colPos--
     oTBR:invalidate()
   End
@@ -652,7 +648,6 @@ LOCAL nRet, nRec
         WHILE nRec != RecNo()
            oTBR:Up():forcestable()
         END
-
      END
 
   ELSE
@@ -660,6 +655,13 @@ LOCAL nRet, nRec
   END
 
   /******************************************/
+
+  /* E.F. 2006/04/27 - Userfunc can put keystrokes, so we need
+   * get the pending keys, after DE_EXCEPT event.
+   */ 
+  IF nMode == DE_EXCEPT .AND. nRet == DE_CONT
+     dbe_nNextKey := Nextkey()
+  ENDIF
 
 RETURN nRet
 
@@ -741,3 +743,21 @@ oTb:ColorRect(aRect,aColor)
 
 RETURN NIL
 
+/****
+ *
+ *  dbe_Empty()
+ *
+ *  Verify if the dbf in the current workarea is empty.
+ */
+STATIC FUNCTION dbe_Empty()
+Local lEmpty
+
+ IF !Empty( dbFilter() )
+    lEmpty := eof()
+ ELSEIF IndexOrd() == 0
+    lEmpty := ( ( Eof() .OR. RecNo() == LastRec() + 1) .AND. Bof() )
+ ELSE
+    lEmpty := ( OrdKeyCount() == 0  )
+ ENDIF
+
+RETURN lEmpty
