@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.108 2006/04/16 01:20:32 modalsist Exp $
+ * $Id: tget.prg,v 1.109 2006/04/21 12:42:02 modalsist Exp $
  */
 
 /*
@@ -749,13 +749,13 @@ METHOD VarGet() CLASS Get
       nDecPos := ::DecPos
 
       IF !Empty(::cPicMask)
-         nLen := HowMuch("9",::cPicMask) + 1
+         nLen := HowMuchNumeric(::cPicMask) + 1
          nDec := Len( ::cPicMask) - Rat(".",::cPicMask)
          IF nDec >= nLen
             nDec := 0
          ENDIF
       ELSEIF !Empty( ::cPicture)
-         nLen := HowMuch("9",::cPicture) + 1
+         nLen := HowMuchNumeric(::cPicture) + 1
          nDec := Len( ::cPicture) - Rat(".",::cPicture)
          IF nDec >= nLen
             nDec := 0
@@ -2048,12 +2048,12 @@ RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
 
 #endif
 
-STATIC FUNCTION HowMuch( cChar, cPict )
+STATIC FUNCTION HowMuchNumeric( cPict )
 LOCAL c := ""
 LOCAL r := 0
 
  FOR EACH c IN cPict
-     IF c == cChar
+     IF c $ "9#*$"
         r++
      ENDIF
  NEXT
