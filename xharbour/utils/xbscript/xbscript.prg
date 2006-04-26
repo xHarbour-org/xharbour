@@ -1216,7 +1216,7 @@ RETURN
               ELSEIF sLine = "PP__RETURN"
 
                  IF aScan( aFlow, {|_1| ( _1[1] == "B" .AND. _1[4] == 0 ) .OR. ( _1[1] == "T" .AND. _1[4] == 0 .AND. _1[6] == .F. )  } ) > 0
-                    Eval( s_bRTEBlock, ErrorNew( [PP], 0, 2086, [Parse], [RETURN violates enclosing SEQUENCE/TRY], { nLine, sLine } ) )
+                    Throw( ErrorNew( [PP], 0, 2086, [Parse], [RETURN violates enclosing SEQUENCE/TRY], { nLine, sLine } ) )
 
                     // Safety
                     BREAK
@@ -2289,20 +2289,21 @@ RETURN
 
         aFlow[4] := Len( cPCode )
 
-        cPCode += Chr(5) + Chr( 0 ) + Chr( 0 )
+        cPCode += Chr(4) + Chr( 0 ) + Chr( 0 )
+
+        cPCode += Chr( HB_P_FINALLY )
 
         // Patch HB_P_TRYBEGIN
-        nOffset := aFlow[4] - aFlow[3]
+        nOffset := Len( cPCode ) - aFlow[3]
 
         cPCode[ aFlow[3] + 1 ] := BYTE1( nOffset )
         cPCode[ aFlow[3] + 2 ] := BYTE2( nOffset )
 
-        cPCode += Chr( HB_P_FINALLY )
      ELSE
         cPCode += Chr( HB_P_FINALLY )
 
         // Patch TRYEND
-        nOffset := ( Len( cPCode ) + 1 ) - aFlow[4]
+        nOffset := Len( cPCode ) - aFlow[4]
 
         cPCode[ aFlow[4] + 1 ] := BYTE1( nOffset )
         cPCode[ aFlow[4] + 2 ] := BYTE2( nOffset )
@@ -2329,18 +2330,13 @@ RETURN
      LOCAL cPCode := aProcedure[2]
      LOCAL nOffset
 
+     //TraceLog( aFlow[6] )
+
      IF aFlow[6]
         cPCode += Chr( HB_P_ENDFINALLY )
      ELSEIF aFlow[4] == 0
-        cPCode += Chr( HB_P_TRYEND )
-
-        // Patch HB_P_TRYBEGIN
-        nOffset := Len( cPCode ) - aFlow[3]
-
-        cPCode[ aFlow[3] + 1 ] := BYTE1( nOffset )
-        cPCode[ aFlow[3] + 2 ] := BYTE2( nOffset )
-
-        cPCode += Chr(4) + Chr( 0 ) + Chr( 0 )
+        aSize( aProcedure[3], Len( aProcedure[3] ) - 1 )
+        Throw( ErrorNew( [PP], 0, 2027, [Parse], [TRY section requires a CATCH or FINALLY handler!], { nLine } ) )
      ELSE
         // Patch HB_P_TRYEND
         nOffset := ( Len( cPCode ) + 1 ) - aFlow[4]

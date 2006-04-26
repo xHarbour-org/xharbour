@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.565 2006/04/24 19:22:17 ronpinkas Exp $
+ * $Id: hvm.c,v 1.566 2006/04/25 19:35:42 ronpinkas Exp $
  */
 
 /*
@@ -2338,7 +2338,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                        }
                        else
                        {
-                          printf( "Forwraded to outer type: %i after completed execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                          printf( "Forwarded to outer type: %i after completed execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
                        }
                     #endif
                  }
@@ -3616,7 +3616,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      }
                      else
                      {
-                        printf( "Forwraded to outer type: %i after partial execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
+                        printf( "Forwarded to outer type: %i after partial execution\n", hb_stackItem( hb_vm_pSequence->pPrev->lBase - 1 )->type );
                      }
                   #endif
                }
@@ -3684,7 +3684,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   s_uiActionRequest = 0;
                }
             }
-            else if( bCanRecover )
+            else if( bCanRecover && ( hb_vm_pSequence->uiStatus & HB_SEQ_RECOVERED ) == 0 )
             {
               hb_vmExecute_CanRecover:
 
