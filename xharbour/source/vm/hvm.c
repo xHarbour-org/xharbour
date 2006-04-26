@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.566 2006/04/25 19:35:42 ronpinkas Exp $
+ * $Id: hvm.c,v 1.567 2006/04/26 02:19:58 ronpinkas Exp $
  */
 
 /*
@@ -2207,11 +2207,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          case HB_P_SEQEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEQEND") );
 
-            /*
-             * Restore previous recovery state
-             */
-            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
-
             if( hb_vm_pSequence->lFinally == 0 )
             {
                PHB_SEQUENCE pFree;
@@ -2230,6 +2225,9 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                 */
                pFree = hb_vm_pSequence;
 
+               /*
+                * Restore previous recovery state
+                */
                bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
                bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
@@ -2275,17 +2273,15 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              */
 
             /*
-             * Restore previous recovery state
-             */
-            bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
-
-            /*
              * Leave the value returned from BREAK  - it will be popped
              * in next executed opcode
              */
 
             if( hb_vm_pSequence->lFinally == 0 )
             {
+               /*
+                * Restore previous recovery state
+                */
                bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
                bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;
 
@@ -2306,13 +2302,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
              printf( "%s->Finally status %i: Top: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_vm_pSequence->uiStatus, hb_stackItemFromTop(-1)->type );
            #endif
 
-            // There was no CATCH section
-            if( hb_vm_pSequence->uiStatus & HB_SEQ_RETHROW )
-            {
-               bCanRecover = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
-            }
-
-            hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
+           hb_vm_pSequence->uiStatus |= HB_SEQ_FINALIZED;
 
            w++;
            break;
