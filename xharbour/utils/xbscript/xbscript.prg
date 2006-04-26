@@ -5178,7 +5178,11 @@ FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLine
       //? sSource, nPosition, nMaxPos, nLen, SubStr( sLine, nPosition, 40 )
       //WAIT
 
-      sLine += SubStr( sBuffer, nPosition, Max( 0, ( nMaxPos + 2 ) - nPosition ) )
+      IF nPosition == NIL
+         sLine := sBuffer
+      ELSE
+         sLine += SubStr( sBuffer, nPosition, Max( 0, ( nMaxPos + 2 ) - nPosition ) )
+      ENDIF
 
       sLine := StrTran( sLine, Chr(09), "   " )
       DropTrailingWS( @sLine )
