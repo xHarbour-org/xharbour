@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4963 2006/04/27 18:01:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4964 2006/04/27 18:07:41 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-04-27 15:35 UTC-0300 Walter Negro <anegroATovernet.com.ar>
+  * source/pp/ppcore.c
+    ! Fixed GPF trap related to #[x]uncommand with previous
+      #[x]command with empty value.
+
+      Ex. #xcommand TRACELOG( <x> ) =>
+          #xuncommand TRACELOG( <x> )
 
 2006-04-27 11:07 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.vc
