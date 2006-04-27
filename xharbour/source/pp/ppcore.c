@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.225 2006/04/12 01:05:42 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.226 2006/04/13 22:47:23 ronpinkas Exp $
  */
 
 /*
@@ -1349,57 +1349,57 @@ DEFINES * hb_pp_AddDefine( char * defname, char * value )
 
 static int ParseUndef( char * sLine )
 {
-  char defname[ MAX_NAME ];
-  DEFINES * stdef;
-  BOOL isNew;
+   char defname[ MAX_NAME ];
+   DEFINES * stdef;
+   BOOL isNew;
 
-  HB_TRACE(HB_TR_DEBUG, ("ParseUndef(%s)", sLine));
+   HB_TRACE(HB_TR_DEBUG, ("ParseUndef(%s)", sLine));
 
-  NextWord( &sLine, defname, FALSE );
+   NextWord( &sLine, defname, FALSE );
 
-  if( ( stdef = DefSearch(defname, &isNew ) ) != NULL )
-  {
-    if( isNew )
-    {
-       if( stdef->pars ) hb_xfree( stdef->pars );
-       if( stdef->value ) hb_xfree( stdef->value );
-       hb_xfree( stdef->name );
-    }
-    stdef->pars = NULL;
-    stdef->value = NULL;
-    stdef->name = NULL;
-  }
+   if( ( stdef = DefSearch(defname, &isNew ) ) != NULL )
+   {
+      if( isNew )
+      {
+         if( stdef->pars ) hb_xfree( stdef->pars );
+         if( stdef->value ) hb_xfree( stdef->value );
+         hb_xfree( stdef->name );
+      }
+      stdef->pars = NULL;
+      stdef->value = NULL;
+      stdef->name = NULL;
+   }
 
-  return 0;
+   return 0;
 }
 
 static int ParseIfdef( char * sLine, int usl )
 {
-  char defname[ MAX_NAME ];
-  DEFINES * stdef;
+   char defname[ MAX_NAME ];
+   DEFINES * stdef;
 
-  HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
+   HB_TRACE(HB_TR_DEBUG, ("ParseIfdef(%s, %d)", sLine, usl));
 
-  //printf( "%i %s(%i)->ParseIfdef(%s, %d)\n", hb_pp_nCondCompile, hb_comp_files.pLast->szFileName, hb_comp_iLine, sLine, usl );
+   //printf( "%i %s(%i)->ParseIfdef(%s, %d)\n", hb_pp_nCondCompile, hb_comp_files.pLast->szFileName, hb_comp_iLine, sLine, usl );
 
-  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
-  {
-     NextWord( &sLine, defname, FALSE );
+   if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
+   {
+      NextWord( &sLine, defname, FALSE );
 
-     if( *defname == '\0' )
-     {
-        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
-     }
-  }
+      if( *defname == '\0' )
+      {
+         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_DEFINE_ABSENT, NULL, NULL );
+      }
+   }
 
-  if( hb_pp_nCondCompile == s_maxCondCompile )
-  {
+   if( hb_pp_nCondCompile == s_maxCondCompile )
+   {
       s_maxCondCompile += 5;
       hb_pp_aCondCompile = (int*) hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
-  }
+   }
 
-  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
-  {
+   if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
+   {
       if( ( ( stdef = DefSearch(defname, NULL ) ) != NULL && usl ) || ( stdef == NULL && ! usl ) )
       {
          hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 1;
@@ -1408,45 +1408,45 @@ static int ParseIfdef( char * sLine, int usl )
       {
          hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
       }
-  }
-  else
-  {
-     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
-  }
+   }
+   else
+   {
+      hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+   }
 
-  hb_pp_nCondCompile++;
+   hb_pp_nCondCompile++;
 
-  return 0;
+   return 0;
 }
 
 static int ParseIf( char * sLine )
 {
-  HB_TRACE(HB_TR_DEBUG, ("ParseIf(%s)", sLine));
+   HB_TRACE(HB_TR_DEBUG, ("ParseIf(%s)", sLine));
 
-  if( hb_pp_nCondCompile == s_maxCondCompile )
-  {
+   if( hb_pp_nCondCompile == s_maxCondCompile )
+   {
       s_maxCondCompile += 5;
       hb_pp_aCondCompile = (int*) hb_xrealloc( hb_pp_aCondCompile, sizeof( int ) * s_maxCondCompile );
-  }
+   }
 
-  if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
-  {
-     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = CalcConstant( &sLine ) ? 1 : 0;
+   if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
+   {
+      hb_pp_aCondCompile[ hb_pp_nCondCompile ] = CalcConstant( &sLine ) ? 1 : 0;
 
      if( sLine[0] )
-     {
-        hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
-        hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, sLine, NULL );
-     }
-  }
-  else
-  {
-     hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
-  }
+      {
+         hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+         hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_INVALID_CONSTANT_EXPRESSION, sLine, NULL );
+      }
+   }
+   else
+   {
+      hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 0;
+   }
 
-  hb_pp_nCondCompile++;
+   hb_pp_nCondCompile++;
 
-  return 0;
+   return 0;
 }
 
 static DEFINES * DefSearch( char * defname, BOOL * isNew )
@@ -1499,231 +1499,231 @@ static COMMANDS * ComSearch( char * cmdname, COMMANDS * stcmdStart )
 
       stcmd = stcmd->last;
    }
-
    return stcmd;
 }
 
 static COMMANDS * TraSearch( char * cmdname, COMMANDS * sttraStart )
 {
-  int j;
-  COMMANDS *sttra = ( sttraStart ) ? sttraStart : hb_pp_topTranslate;
+   int j;
+   COMMANDS *sttra = ( sttraStart ) ? sttraStart : hb_pp_topTranslate;
 
-  HB_TRACE(HB_TR_DEBUG, ("TraSearch(%s, %p)", cmdname, sttraStart));
+   HB_TRACE(HB_TR_DEBUG, ("TraSearch(%s, %p)", cmdname, sttraStart));
 
-  while( sttra != NULL )
-  {
-     for( j=0; *(sttra->name+j)==toupper(*(cmdname+j)) &&
+   while( sttra != NULL )
+   {
+      for( j=0; *(sttra->name+j)==toupper(*(cmdname+j)) &&
              *(sttra->name+j)!='\0' &&
              ((sttra->com_or_xcom)? 1:(j<4 || ISNAME(*(cmdname+j+1)))); j++ ) {}
-     if( *(sttra->name+j)==toupper(*(cmdname+j)) ||
+
+      if( *(sttra->name+j)==toupper(*(cmdname+j)) ||
           ( !sttra->com_or_xcom && j >= 4 &&
             *(sttra->name+j)!='\0' && *(cmdname+j) == '\0' ) )
-     {
-        break;
-     }
-     sttra = sttra->last;
-  }
-  return sttra;
+      {
+         break;
+      }
+      sttra = sttra->last;
+   }
+   return sttra;
 }
 
 static void ParseCommand( char * sLine, BOOL com_or_xcom, BOOL com_or_tra, BOOL bRemove )
 {
-  static char mpatt[ PATTERN_SIZE ];
-  static char rpatt[ PATTERN_SIZE ];
+   static char mpatt[ PATTERN_SIZE ];
+   static char rpatt[ PATTERN_SIZE ];
 
-  char cmdname[ MAX_NAME ];
-  COMMANDS * stcmd;
-  int mlen,rlen;
-  int ipos;
+   char cmdname[ MAX_NAME ];
+   COMMANDS * stcmd;
+   int mlen,rlen;
+   int ipos;
 
-  /* Ron Pinkas added 2000-12-03 */
-  BOOL bOk = FALSE;
+   /* Ron Pinkas added 2000-12-03 */
+   BOOL bOk = FALSE;
 
-  /* Ron Pinkas added 2002-09-20 */
-  mpatt[0] = '\0';
+   /* Ron Pinkas added 2002-09-20 */
+   mpatt[0] = '\0';
 
-  HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
-  //printf( "%s\n", sLine );
+   HB_TRACE(HB_TR_DEBUG, ("ParseCommand(%s, %d, %d, %d)", sLine, com_or_xcom, com_or_tra, bRemove));
+   //printf( "%s\n", sLine );
 
-  HB_SKIPTABSPACES( sLine );
+   HB_SKIPTABSPACES( sLine );
 
-  ipos = hb_pp_NextToken( &sLine, s_sToken );
+   ipos = hb_pp_NextToken( &sLine, s_sToken );
 
-  if( ipos == 0 || ipos > MAX_NAME )
-  {
-     // Error???
-     return;
-  }
+   if( ipos == 0 || ipos > MAX_NAME )
+   {
+      // Error???
+      return;
+   }
 
-  strcpy( cmdname, s_sToken );
+   strcpy( cmdname, s_sToken );
 
-  hb_strupr( cmdname );
-  HB_SKIPTABSPACES(sLine);
+   hb_strupr( cmdname );
+   HB_SKIPTABSPACES(sLine);
 
-  /* Ron Pinkas added 2000-12-03 */
-  ipos = 0;
-  while( *sLine )
-  {
-     mpatt[ipos++] = *sLine;
+   /* Ron Pinkas added 2000-12-03 */
+   ipos = 0;
+   while( *sLine )
+   {
+      mpatt[ipos++] = *sLine;
 
-     if( *sLine == '=' )
-     {
-        int i = ipos;
+      if( *sLine == '=' )
+      {
+         int i = ipos;
 
-        if( ipos && *(sLine - 1) == '\\' && ( ipos < 2 || *(sLine - 2) != '\\' ) )
-        {
-           ipos--;
-           mpatt[ipos - 1] = '=';
-           sLine++;
-           continue;
-        }
+         if( ipos && *(sLine - 1) == '\\' && ( ipos < 2 || *(sLine - 2) != '\\' ) )
+         {
+            ipos--;
+            mpatt[ipos - 1] = '=';
+            sLine++;
+            continue;
+         }
 
-        sLine++;
-        mpatt[i++] = *sLine;
+         sLine++;
+         mpatt[i++] = *sLine;
 
-        while( *sLine && ( *sLine == ' ' || *sLine == '\t' ) )
-        {
-           sLine++;
-           mpatt[i++] = *sLine;
-        }
+         while( *sLine && ( *sLine == ' ' || *sLine == '\t' ) )
+         {
+            sLine++;
+            mpatt[i++] = *sLine;
+         }
 
-        if( *sLine == '>' )
-        {
-           ipos = ipos - 2;
-           while( mpatt[ipos] == ' ' || mpatt[ipos] == '\t' )
-           {
-              ipos--;
-           }
+         if( *sLine == '>' )
+         {
+            ipos = ipos - 2;
+            while( mpatt[ipos] == ' ' || mpatt[ipos] == '\t' )
+            {
+               ipos--;
+            }
 
-           mpatt[ipos + 1] = '\0';
-           sLine++;
-           bOk = TRUE;
-           break;
-        }
-        else
-        {
-           i--;
-           sLine--;
-        }
+            mpatt[ipos + 1] = '\0';
+            sLine++;
+            bOk = TRUE;
+            break;
+         }
+         else
+         {
+            i--;
+            sLine--;
+         }
 
         ipos = i;
-     }
+      }
 
-     sLine++;
-  }
-  /* End - Ron Pinkas added 2000-12-03 */
+      sLine++;
+   }
+   /* End - Ron Pinkas added 2000-12-03 */
 
-  if( ! bOk )
-  {
-     mpatt[ipos] = '\0';
-  }
+   if( ! bOk )
+   {
+      mpatt[ipos] = '\0';
+   }
 
-  /* Ron Pinkas modified 2000-12-03
-  if( (ipos = hb_strAt( "=>", 2, sLine, strlen(sLine) )) > 0 ) */
-  if( bOk || bRemove )
-  {
-    // Ron Pinkas commented 2002-09-23
-    //RemoveSlash( mpatt, FALSE );
-    mlen = strotrim( mpatt, 0 );
+   /* Ron Pinkas modified 2000-12-03
+   if( (ipos = hb_strAt( "=>", 2, sLine, strlen(sLine) )) > 0 ) */
+   if( bOk || bRemove )
+   {
+      // Ron Pinkas commented 2002-09-23
+      //RemoveSlash( mpatt, FALSE );
+      mlen = strotrim( mpatt, 0 );
 
-    /* Ron Pinkas removed 2000-12-03
-    sLine += ipos + 1; */
+      /* Ron Pinkas removed 2000-12-03
+      sLine += ipos + 1; */
 
-    HB_SKIPTABSPACES(sLine);
-    hb_pp_strocpy( rpatt, sLine );
-    rlen = strotrim( rpatt, 0 );
+      HB_SKIPTABSPACES(sLine);
+      hb_pp_strocpy( rpatt, sLine );
+      rlen = strotrim( rpatt, 0 );
 
-    ConvertPatterns( mpatt, mlen, rpatt, rlen );
+      ConvertPatterns( mpatt, mlen, rpatt, rlen );
 
-    if( bRemove )
-    {
-       COMMANDS *cmd, *cmdPrev = NULL;
-	   int i;
+      if( bRemove )
+      {
+         COMMANDS *cmd, *cmdPrev = NULL;
+         int i;
 
-       if( com_or_tra )
-       {
-          cmd = hb_pp_topCommand;
-		  i = s_kolAddComs;
-       }
-       else
-       {
-          cmd = hb_pp_topTranslate;
-		  i = s_kolAddTras;
-       }
+         if( com_or_tra )
+         {
+            cmd = hb_pp_topCommand;
+            i = s_kolAddComs;
+         }
+         else
+         {
+            cmd = hb_pp_topTranslate;
+            i = s_kolAddTras;
+         }
 
-       while( cmd && i-- )
-       {
-          //printf( "Searching Key X=%i '%s' Rule '%s' in Command: '%s' Rule: '%s'\n", com_or_xcom, cmdname, mpatt, cmd->name, cmd->mpatt );
+         while( cmd && i-- )
+         {
+            //printf( "Searching Key X=%i '%s' Rule '%s' in Command: '%s' Rule: '%s'\n", com_or_xcom, cmdname, mpatt, cmd->name, cmd->mpatt );
 
-          if( strcmp( cmd->name, cmdname ) == 0 )
-          {
-             if( com_or_xcom == FALSE || strcmp( cmd->mpatt, mpatt ) == 0 )
-             {
-                if( cmdPrev == NULL )
-                {
-                   if( com_or_tra )
-                   {
-                      hb_pp_topCommand = cmd->last;
-                   }
-                   else
-                   {
-                      hb_pp_topTranslate = cmd->last;
-                   }
-                }
-                else
-                {
-                   cmdPrev->last = cmd->last;
-                }
+            if( strcmp( cmd->name, cmdname ) == 0 )
+            {
+               if( com_or_xcom == FALSE || strcmp( cmd->mpatt, mpatt ) == 0 )
+               {
+                  if( cmdPrev == NULL )
+                  {
+                     if( com_or_tra )
+                     {
+                        hb_pp_topCommand = cmd->last;
+                     }
+                     else
+                     {
+                        hb_pp_topTranslate = cmd->last;
+                     }
+                  }
+                  else
+                  {
+                     cmdPrev->last = cmd->last;
+                  }
 
-                //printf( "Found: X:%i cmd->mpatt: '%s' mpatt: '%s'\n", com_or_xcom, cmd->mpatt, mpatt );
+                  //printf( "Found: X:%i cmd->mpatt: '%s' mpatt: '%s'\n", com_or_xcom, cmd->mpatt, mpatt );
 
-                hb_xfree( cmd->name );
-                hb_xfree( cmd->mpatt );
-                hb_xfree( cmd->value );
-                hb_xfree( cmd );
+                  hb_xfree( cmd->name );
+                  hb_xfree( cmd->mpatt );
+                  if( cmd->value ) hb_xfree( cmd->value );
+                  hb_xfree( cmd );
 
-                if( com_or_tra )
-                {
-				   s_kolAddComs--;
-                }
-                else
-                {
-				   s_kolAddTras--;
-                }
+                  if( com_or_tra )
+                  {
+                     s_kolAddComs--;
+                  }
+                  else
+                  {
+                     s_kolAddTras--;
+                  }
 
-                return;
-             }
-          }
+                  return;
+               }
+            }
 
-          cmdPrev = cmd;
-          cmd = cmd->last;
-       }
+            cmdPrev = cmd;
+            cmd = cmd->last;
+         }
 
-       return;
-    }
-    else
-    {
-       if( com_or_tra )
-       {
-          stcmd = AddCommand( cmdname );
-       }
-       else
-       {
-          stcmd = AddTranslate( cmdname );
-       }
-    }
+         return;
+      }
+      else
+      {
+         if( com_or_tra )
+         {
+            stcmd = AddCommand( cmdname );
+         }
+         else
+         {
+            stcmd = AddTranslate( cmdname );
+         }
+      }
 
-    stcmd->com_or_xcom = com_or_xcom;
-    stcmd->mpatt = hb_strdup( mpatt );
-    stcmd->value = ( rlen > 0 ) ? hb_strdup( rpatt ) : NULL;
+      stcmd->com_or_xcom = com_or_xcom;
+      stcmd->mpatt = hb_strdup( mpatt );
+      stcmd->value = ( rlen > 0 ) ? hb_strdup( rpatt ) : NULL;
 
-    //printf( "Parsecommand Name: %s Pat: %s Val: %s\n", stcmd->name, stcmd->mpatt, stcmd->value );
-  }
-  else
-  {
-     sLine -= ( ipos + 1 );
-     hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_COMMAND_DEFINITION, cmdname, sLine );
-  }
+      //printf( "Parsecommand Name: %s Pat: %s Val: %s\n", stcmd->name, stcmd->mpatt, stcmd->value );
+   }
+   else
+   {
+      sLine -= ( ipos + 1 );
+      hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_COMMAND_DEFINITION, cmdname, sLine );
+   }
 }
 
 static ULONG AtSkipStringsInRules( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
