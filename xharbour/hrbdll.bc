@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.113 2006/03/02 22:36:59 kaddath Exp $
+# $Id: hrbdll.bc,v 1.114 2006/03/17 01:18:46 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -194,6 +194,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dirdrive.obj \
   $(OBJ_DIR)\diskspac.obj \
   $(OBJ_DIR)\disksphb.obj \
+  $(OBJ_DIR)\dllcall.obj \
   $(OBJ_DIR)\do.obj \
   $(OBJ_DIR)\empty.obj \
   $(OBJ_DIR)\errorapi.obj \
@@ -874,6 +875,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dirdrive.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\diskspac.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\disksphb.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\dllcall.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\do.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\empty.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\errorapi.obj          + >> hdll.tmp
@@ -1748,6 +1750,9 @@ $(OBJ_DIR)\diskspac.obj : $(RTL_DIR)\diskspac.c
    $(CC_CMD)
 
 $(OBJ_DIR)\disksphb.obj : $(RTL_DIR)\disksphb.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dllcall.obj : $(RTL_DIR)\dllcall.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dircmd.c : $(RTL_DIR)\dircmd.prg
