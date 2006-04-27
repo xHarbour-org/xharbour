@@ -413,9 +413,9 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .3
+  #define REVISION .0
 #endif
-STATIC s_cVer := "2.0 RC2" + Stringify( REVISION )
+STATIC s_cVer := "2.0 RC4" + Stringify( REVISION )
 
 #ifdef __HARBOUR__
    STATIC s_sAppPath
