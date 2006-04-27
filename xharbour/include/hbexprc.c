@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.17 2005/11/03 06:54:58 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.18 2006/02/22 21:14:54 ronpinkas Exp $
  */
 
 /*
@@ -218,7 +218,9 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
              pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
+             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
@@ -384,7 +386,9 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
              pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
-             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
+             pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
+             pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
