@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.6 2006/03/24 17:45:38 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.7 2006/03/25 20:29:54 modalsist Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -15,22 +15,22 @@ SET HB_DIR=.\
 SET POCC_DIR=c:\pellesc
 SET BISON_DIR=c:\bison
 
-REM *****************************************
-REM *** DON'T CHANGE THE VARIABLES BELLOW ***
-REM *****************************************
+REM ****************************************
+REM *** DON'T CHANGE THE VARIABLES BELOW ***
+REM ****************************************
 
 SET _PATH=%PATH%
 SET _LIB=%LIB%
 SET _INCLUDE=%INCLUDE%
 
-SET LIB=%POCC_DIR\lib;%POCC_DIR\lib\win;%HB_DIR\lib;%LIB%
-SET INCLUDE=%POCC_DIR\include;%POCC_DIR\include\win;%HB_DIR%\include;%INCLUDE%
+SET LIB=%POCC_DIR%\lib;%POCC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
+SET INCLUDE=%POCC_DIR%\include;%POCC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
 SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
-SET TARGET_OBJ_DIR=%HB_DIR%\obj\pocc\dll
-SET TARGET_LIB_DIR=%HB_DIR%\lib\pocc
-SET TARGET_BIN_DIR=%HB_DIR%\bin\pocc
+SET OBJ_DIR=%HB_DIR%\obj\pocc\dll
+SET LIB_DIR=%HB_DIR%\lib\pocc
+SET BIN_DIR=%HB_DIR%\bin\pocc
 
 SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
@@ -43,31 +43,31 @@ if "%1" == "CLEAN" goto CLEAN
 
    if not exist lib md lib
    if not exist obj md obj
-   if not exist %TARGET_LIB_DIR%  md %TARGET_LIB_DIR%
-   if not exist %TARGET_OBJ_DIR%  md %TARGET_OBJ_DIR%
+   if not exist %LIB_DIR%  md %LIB_DIR%
+   if not exist %OBJ_DIR%  md %OBJ_DIR%
 
    pomake /f hrbdll.pc > dll_pc.log
    if errorlevel 1 goto BUILD_ERR
 
 :BUILD_OK
 
-   copy %TARGET_LIB_DIR%\harbour.dll %HB_DIR%\bin > null
-   copy %TARGET_LIB_DIR%\harbour.lib %HB_DIR%\lib > null
-   del  %TARGET_LIB_DIR%\harbour.dll > null
-   del  %TARGET_LIB_DIR%\harbour.lib > null
-   del  %TARGET_LIB_DIR%\*.exp  > null
+   copy %LIB_DIR%\harbour.dll %HB_DIR%\bin > null
+   copy %LIB_DIR%\harbour.lib %HB_DIR%\lib > null
+   del  %LIB_DIR%\harbour.dll > null
+   del  %LIB_DIR%\harbour.lib > null
+   del  %LIB_DIR%\*.exp  > null
 
-   copy %TARGET_BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > null
-   copy %TARGET_BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > null
-   copy %TARGET_BIN_DIR%\hbrundll.exe %HB_DIR%\bin > null
-   copy %TARGET_BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > null
-   copy %TARGET_BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > null
-   del  %TARGET_BIN_DIR%\hbdocdll.exe > null
-   del  %TARGET_BIN_DIR%\hbmakedll.exe > null
-   del  %TARGET_BIN_DIR%\hbrundll.exe > null
-   del  %TARGET_BIN_DIR%\hbtestdll.exe > null
-   del  %TARGET_BIN_DIR%\xbscriptdll.exe > null
-   del  %TARGET_BIN_DIR%\*.exp  > null
+   copy %BIN_DIR%\hbdocdll.exe %HB_DIR%\bin > null
+   copy %BIN_DIR%\hbmakedll.exe %HB_DIR%\bin > null
+   copy %BIN_DIR%\hbrundll.exe %HB_DIR%\bin > null
+   copy %BIN_DIR%\hbtestdll.exe %HB_DIR%\bin > null
+   copy %BIN_DIR%\xbscriptdll.exe %HB_DIR%\bin > null
+   del  %BIN_DIR%\hbdocdll.exe > null
+   del  %BIN_DIR%\hbmakedll.exe > null
+   del  %BIN_DIR%\hbrundll.exe > null
+   del  %BIN_DIR%\hbtestdll.exe > null
+   del  %BIN_DIR%\xbscriptdll.exe > null
+   del  %BIN_DIR%\*.exp  > null
 
    del dll_pc.log >null
    goto EXIT
@@ -97,36 +97,36 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\bin\xbscriptdll.exe        del %HB_DIR%\bin\xbscriptdll.exe
    if exist %HB_DIR%\bin\harbour.dll            del %HB_DIR%\bin\harbour.dll
 
-   if exist %TARGET_LIB_DIR%\harbour.exp        del %TARGET_LIB_DIR%\harbour.exp
-   if exist %TARGET_LIB_DIR%\harbour.lib        del %TARGET_LIB_DIR%\harbour.lib
-   if exist %TARGET_LIB_DIR%\harbour.dll        del %TARGET_LIB_DIR%\harbour.dll
-   if exist %TARGET_LIB_DIR%\harbour.def        del %TARGET_LIB_DIR%\harbour.def
+   if exist %LIB_DIR%\harbour.exp        del %LIB_DIR%\harbour.exp
+   if exist %LIB_DIR%\harbour.lib        del %LIB_DIR%\harbour.lib
+   if exist %LIB_DIR%\harbour.dll        del %LIB_DIR%\harbour.dll
+   if exist %LIB_DIR%\harbour.def        del %LIB_DIR%\harbour.def
 
-   if exist %TARGET_BIN_DIR%\hbdocdll.lib       del %TARGET_BIN_DIR%\hbdocdll.lib
-   if exist %TARGET_BIN_DIR%\hbmakedll.lib      del %TARGET_BIN_DIR%\hbmakedll.lib
-   if exist %TARGET_BIN_DIR%\hbrundll.lib       del %TARGET_BIN_DIR%\hbrundll.lib
-   if exist %TARGET_BIN_DIR%\hbtestdll.lib      del %TARGET_BIN_DIR%\hbtestdll.lib
-   if exist %TARGET_BIN_DIR%\xbscriptdll.lib    del %TARGET_BIN_DIR%\xbscriptdll.lib
-   if exist %TARGET_BIN_DIR%\xharbourdll.lib    del %TARGET_BIN_DIR%\xharbourdll.lib
+   if exist %BIN_DIR%\hbdocdll.lib       del %BIN_DIR%\hbdocdll.lib
+   if exist %BIN_DIR%\hbmakedll.lib      del %BIN_DIR%\hbmakedll.lib
+   if exist %BIN_DIR%\hbrundll.lib       del %BIN_DIR%\hbrundll.lib
+   if exist %BIN_DIR%\hbtestdll.lib      del %BIN_DIR%\hbtestdll.lib
+   if exist %BIN_DIR%\xbscriptdll.lib    del %BIN_DIR%\xbscriptdll.lib
+   if exist %BIN_DIR%\xharbourdll.lib    del %BIN_DIR%\xharbourdll.lib
 
-   if exist %TARGET_BIN_DIR%\hbdocdll.exe       del %TARGET_BIN_DIR%\hbdocdll.exe
-   if exist %TARGET_BIN_DIR%\hbmakedll.exe      del %TARGET_BIN_DIR%\hbmakedll.exe
-   if exist %TARGET_BIN_DIR%\hbrundll.exe       del %TARGET_BIN_DIR%\hbrundll.exe
-   if exist %TARGET_BIN_DIR%\hbtestdll.exe      del %TARGET_BIN_DIR%\hbtestdll.exe
-   if exist %TARGET_BIN_DIR%\xharbourdll.exe    del %TARGET_BIN_DIR%\xharbourdll.exe
-   if exist %TARGET_BIN_DIR%\xbscriptdll.exe    del %TARGET_BIN_DIR%\xbscriptdll.exe
+   if exist %BIN_DIR%\hbdocdll.exe       del %BIN_DIR%\hbdocdll.exe
+   if exist %BIN_DIR%\hbmakedll.exe      del %BIN_DIR%\hbmakedll.exe
+   if exist %BIN_DIR%\hbrundll.exe       del %BIN_DIR%\hbrundll.exe
+   if exist %BIN_DIR%\hbtestdll.exe      del %BIN_DIR%\hbtestdll.exe
+   if exist %BIN_DIR%\xharbourdll.exe    del %BIN_DIR%\xharbourdll.exe
+   if exist %BIN_DIR%\xbscriptdll.exe    del %BIN_DIR%\xbscriptdll.exe
 
-   if exist %TARGET_BIN_DIR%\hbdocdll.exp       del %TARGET_BIN_DIR%\hbdocdll.exp
-   if exist %TARGET_BIN_DIR%\hbmakedll.exp      del %TARGET_BIN_DIR%\hbmakedll.exp
-   if exist %TARGET_BIN_DIR%\hbrundll.exp       del %TARGET_BIN_DIR%\hbrundll.exp
-   if exist %TARGET_BIN_DIR%\hbtestdll.exp      del %TARGET_BIN_DIR%\hbtestdll.exp
-   if exist %TARGET_BIN_DIR%\xharbourdll.exp    del %TARGET_BIN_DIR%\xharbourdll.exp
-   if exist %TARGET_BIN_DIR%\xbscriptdll.exp    del %TARGET_BIN_DIR%\xbscriptdll.exp
+   if exist %BIN_DIR%\hbdocdll.exp       del %BIN_DIR%\hbdocdll.exp
+   if exist %BIN_DIR%\hbmakedll.exp      del %BIN_DIR%\hbmakedll.exp
+   if exist %BIN_DIR%\hbrundll.exp       del %BIN_DIR%\hbrundll.exp
+   if exist %BIN_DIR%\hbtestdll.exp      del %BIN_DIR%\hbtestdll.exp
+   if exist %BIN_DIR%\xharbourdll.exp    del %BIN_DIR%\xharbourdll.exp
+   if exist %BIN_DIR%\xbscriptdll.exp    del %BIN_DIR%\xbscriptdll.exp
 
-   if exist %TARGET_OBJ_DIR%\*.c                del %TARGET_OBJ_DIR%\*.c
-   if exist %TARGET_OBJ_DIR%\*.obj              del %TARGET_OBJ_DIR%\*.obj
-   if exist %TARGET_OBJ_DIR%\*.h                del %TARGET_OBJ_DIR%\*.h
-   if exist %TARGET_OBJ_DIR%\*.output           del %TARGET_OBJ_DIR%\*.output
+   if exist %OBJ_DIR%\*.c                del %OBJ_DIR%\*.c
+   if exist %OBJ_DIR%\*.obj              del %OBJ_DIR%\*.obj
+   if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h
+   if exist %OBJ_DIR%\*.output           del %OBJ_DIR%\*.output
 
    if exist tests\harbour.dll                   del tests\harbour.dll
    goto EXIT
@@ -139,9 +139,9 @@ SET HB_DIR=
 SET BISON_DIR=
 SET BISON_SIMPLE=
 
-SET TARGET_TARGET_OBJ_DIR=
-SET TARGET_TARGET_LIB_DIR=
-SET TARGET_TARGET_BIN_DIR=
+SET OBJ_DIR=
+SET TARGET_LIB_DIR=
+SET TARGET_BIN_DIR=
 SET HB_MT=
 
 SET PATH=%_PATH%

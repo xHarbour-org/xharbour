@@ -169,7 +169,7 @@ HB_FUNC( FTPOPENFILE )
    DWORD     dwFlags      = ISNIL( 4 ) ? FTP_TRANSFER_TYPE_BINARY : hb_parni( 4 ) ;
    DWORD_PTR dwContext    = ISNIL( 5 ) ? 0            : hb_parnl( 5 ) ;
 
-   hb_retl( FtpOpenFile( hFtp, lpszFileName, dwAccess, dwFlags, dwContext ) ) ;
+   hb_retl( FtpOpenFile( hFtp, lpszFileName, dwAccess, dwFlags, dwContext ) != NULL ) ;
 }
 
 //---------------------------------------------------------------------//

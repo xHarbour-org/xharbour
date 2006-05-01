@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.22 2006/03/24 17:45:38 modalsist Exp $
+# $Id: makefile.pc,v 1.23 2006/03/29 12:52:26 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -748,6 +748,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\direct.obj \
    $(RTL_OBJ_DIR)\diskspac.obj \
    $(RTL_OBJ_DIR)\disksphb.obj \
+   $(RTL_OBJ_DIR)\dllcall.obj \
    $(RTL_OBJ_DIR)\empty.obj \
    $(RTL_OBJ_DIR)\file.obj \
    $(RTL_OBJ_DIR)\filehb.obj \
@@ -1184,6 +1185,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\direct.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\diskspac.obj >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\disksphb.obj >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dllcall.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\empty.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\file.obj     >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\filehb.obj   >> poccrtl.rsp
@@ -1852,6 +1854,9 @@ $(RTL_OBJ_DIR)\diskspac.obj : $(RTL_DIR)\diskspac.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\disksphb.obj : $(RTL_DIR)\disksphb.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dllcall.obj : $(RTL_DIR)\dllcall.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c

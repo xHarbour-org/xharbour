@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.8 2006/02/17 18:52:09 modalsist Exp $
+rem $Id: make_pc.bat,v 1.9 2006/03/24 17:45:38 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -16,13 +16,16 @@ SET HB_DIR=.\
 SET POCC_DIR=C:\PellesC
 SET BISON_DIR=C:\Bison
 
+REM *******************************
+REM *** Don't change the sets below
+REM *******************************
 
 SET _PATH=%PATH%
 SET _LIB=%LIB%
 SET _INCLUDE=%INCLUDE%
 
-SET LIB=%POCC_DIR\lib;%POCC_DIR\lib\win;%HB_DIR\lib;%LIB%
-SET INCLUDE=%POCC_DIR\include;%POCC_DIR\include\win;%HB_DIR%\include;%INCLUDE%
+SET LIB=%POCC_DIR%\lib;%POCC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
+SET INCLUDE=%POCC_DIR%\include;%POCC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
 SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
@@ -61,8 +64,8 @@ if "%1" == "CLEAN" goto CLEAN
 
 :BUILD_OK
 
-   copy bin\pocc\*.exe bin\*.* > nul
-   copy lib\pocc\*.lib lib\*.* > nul
+   copy %BIN_DIR%\*.exe bin\*.* > nul
+   copy %LIB_DIR%\*.lib lib\*.* > nul
    if exist make_pc.log del make_pc.log
    goto EXIT
 

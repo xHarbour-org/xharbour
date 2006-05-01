@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4965 2006/04/27 18:36:38 walito Exp $
+ * $Id: ChangeLog,v 1.4966 2006/04/27 18:42:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-01 20:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * make_pc.bat
+  * dll_pc.bat
+    ! minor fix in sets.
+
+  * makefile.pc
+  * hrbdll.pc
+    + added source/rtl/dllcall.c
+
+  * contrib/gtwvw/make_pc.bat
+  * contrib/gtwvw/makefile.pc
+    ! minor fix in sets.
+
+  * contrib/wvtgui/make_pc.bat
+  * contrib/wvtgui/makefile.pc
+    ! minor fix in sets.
+
+  * contrib/libnf/make_pc.bat
+  * contrib/libnf/makefile.pc
+    + added makefile for Pelles C.
+
+  * contrib/what32/make_pc.bat
+  * contrib/what32/makefile.pc
+    + added makefile for Pelles C.
+
+  * contrib/what32/source/_wininet.c
+    ! fixed return value of FtpOpenFile() function for Pelles C.
 
 2006-04-27 11:42 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * hrbdll.bc
