@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4967 2006/05/01 23:37:56 modalsist Exp $
+ * $Id: ChangeLog,v 1.4968 2006/05/03 08:13:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-03 15:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/dbedit.prg
+    ! removed columns check before starts dbedit(). This is unneeded
+      because cause a bad behaviour, if we pass any empty element in
+      column array.
 
 2006-05-03 10:10 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * include/hbextern.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.34 2006/04/24 19:59:55 modalsist Exp $
+ * $Id: dbedit.prg,v 1.35 2006/04/26 18:23:21 modalsist Exp $
  */
 
 /*
@@ -160,71 +160,63 @@ LOCAL oTBR,;
 
   END
 
-  // Check parameter types. If any parameter is invalid xHarbour show a
-  // message error. This behaviour is xHarbour extension.
+  /* Check parameter types. If any parameter is invalid, then xHarbour will
+     show a message error. This is xHarbour's extension. */
 
-  // Check <axColumns>
-  //
-  FOR EACH k IN axColumns
-      IF !HB_IsString(k) .AND. !HB_IsBlock(k) .AND. !HB_IsArray(k)
-         Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumns>", "Argument error. String, array or codeblock required" ) )
-      ELSEIF Empty(k)
-         Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumns>", "Empty argument not allowed" ) )
-      ENDIF
-  NEXT
+  /* Note: The column's type doesn't need to verify. If any column type is
+           invalid or empty, then the dbEdit() will ignore it. */
 
-  // Check <cUserFunc>
-  // In Clipper the <cUserFunc> only can be a string.
-  // In xHarbour can be a codeblock also.
-  //
+  /* Check <cUserFunc>. In Clipper the <cUserFunc> paramenter only can be a
+     string or nil, but in xHarbour can be a codeblock also. */
+
   IF !HB_IsNil(xUserFunc) .AND. ( !HB_IsString( xUserFunc ) .AND. !HB_IsBlock(xUserFunc) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<cUserFunction>", "Argument error. String or codeblock required" ) )
   ENDIF
 
-  // Check <acColumnSayPictures|cColumnSayPicture>
-  //
+  /* Check <acColumnSayPictures|cColumnSayPicture> */
+  
   IF !HB_IsNil(acColumnSayPictures) .AND. ( !HB_IsString(acColumnSayPictures) .AND. !HB_IsArray(acColumnSayPictures) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnSayPictures|cColumnSayPicture>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <acColumnHeaders|cColumnHeader>
-  //
+  /* Check <acColumnHeaders|cColumnHeader> */
+  
   IF !HB_IsNil(acColumnHeaders) .AND. ( !HB_IsString(acColumnHeaders) .AND. !HB_IsArray(acColumnHeaders) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnHeaders|cColumnHeader>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <acHeadingSeparators|cHeadingSeparator>
-  //
+  /* Check <acHeadingSeparators|cHeadingSeparator> */
+  
   IF !HB_IsNil(acHeadingSep) .AND. ( !HB_IsString(acHeadingSep) .AND. !HB_IsArray(acHeadingSep) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acHeadingSeparators|cHeadingSeparator>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <acColumnSeparators|cColumnSeparator>
-  //
+  /* Check <acColumnSeparators|cColumnSeparator> */
+  
   IF !HB_IsNil(acColumnSep) .AND. ( !HB_IsString(acColumnSep) .AND. !HB_IsArray(acColumnSep) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnSeparators|cColumnSeparator>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <acFootingSeparators|cFootingSeparator>
-  //
+  /* Check <acFootingSeparators|cFootingSeparator> */
+  
   IF !HB_IsNil(acFootingSep) .AND. ( !HB_IsString(acFootingSep) .AND. !HB_IsArray(acFootingSep) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acFootingSeparators|cFootingSeparator>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <acColumnFootings|cColumnFooting>
-  //
+  /* Check <acColumnFootings|cColumnFooting> */
+  
   IF !HB_IsNil(acColumnFootings) .AND. ( !HB_IsString(acColumnFootings) .AND. !HB_IsArray(acColumnFootings) )
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnFootings|cColumnFooting>", "Argument error. Array or string required" ) )
   ENDIF
 
-  // Check <bPreBlock>.
-  //
+  /* Check <bPreBlock> */
+  
   IF !HB_IsNil(bPreBlock) .AND. !HB_IsBlock(bPreBlock)
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<bPreBlockBlock>", "Argument error. Codeblock required" ) )
   ENDIF
 
-  // Check <bPostBlock>.
-  //
+  /* Check <bPostBlock> */
+  
   IF !HB_IsNil(bPostBlock) .AND. !HB_IsBlock(bPostBlock)
      Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<bPostBlockBlock>", "Argument type error. Codeblock required" ) )
   ENDIF
