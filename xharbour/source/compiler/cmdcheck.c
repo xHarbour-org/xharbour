@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.27 2006/02/15 19:33:04 druzus Exp $
+ * $Id: cmdcheck.c,v 1.28 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -610,7 +610,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    case 'c':
                    case 'C':
                       hb_comp_iLanguage = LANG_C;
-
+                      
                       if( strchr( s + 2, 's' ) || strchr( s + 2, 'S' ) )
                       {
                          hb_comp_iGenVarList = TRUE;
@@ -643,7 +643,44 @@ void hb_compChkEnvironVar( char * szSwitch )
                             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                       }
                       break;
+                      
+                   case 'o':
+                   case 'O':
+                      hb_comp_iLanguage = LANG_OBJ_MODULE;
 
+                      if( strchr( s + 2, 's' ) || strchr( s + 2, 'S' ) )
+                      {
+                         hb_comp_iGenVarList = TRUE;
+                      }
+                      
+                      switch( *( s + 2 ) )
+                      {
+                         case '0':
+                         case '\0': /* default */
+                            hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
+                            break;
+
+                         case '1':
+                            hb_comp_iGenCOutput = HB_COMPGENC_NORMAL;
+                            break;
+
+                         case '2':
+                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
+                            break;
+
+                         case '3':
+                            hb_comp_iGenCOutput = HB_COMPGENC_REALCODE;
+                            break;
+
+                         case '4':
+                            hb_comp_iGenVarList = TRUE;
+                            break;
+
+                         default:
+                            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
+                      }
+                      break;                     
+                      
                    case 'j':
                    case 'J':
                       hb_comp_iLanguage = LANG_JAVA;
@@ -654,16 +691,10 @@ void hb_compChkEnvironVar( char * szSwitch )
                       hb_comp_iLanguage = LANG_PORT_OBJ;
                       break;
 
-
-                   case 'o':
-                   case 'O':
-                     hb_comp_iLanguage = LANG_OBJ_MODULE;
-                     break;
-
-                  case 'w':
-                  case 'W':
-                     hb_comp_iLanguage = LANG_OBJ32;
-                     break;
+                   case 'w':
+                   case 'W':
+                      hb_comp_iLanguage = LANG_OBJ32;
+                      break;
 
                    default:
                       printf( "\nUnsupported output language option\n" );

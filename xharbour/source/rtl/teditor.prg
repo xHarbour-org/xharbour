@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.68 2005/12/28 04:21:14 peterrees Exp $
+/* $Id: teditor.prg,v 1.69 2006/02/25 17:32:15 lf_sfnet Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.68 2005/12/28 04:21:14 peterrees Exp $
+/* $Id: teditor.prg,v 1.69 2006/02/25 17:32:15 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -618,14 +618,18 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_SH_DOWN
                if ::nRow <= ::naTextLen
-                  ::SetTextSelection( +1 )
+                  ::SetTextSelection( "LINE", +1 )
                endif
                exit
 
             case K_SH_UP
                if ::nRow > 1
-                  ::SetTextSelection( -1 )
+                  ::SetTextSelection( "LINE", -1 )
                endif 
+               exit
+
+            case K_CTRL_A
+               ::SetTextSelection( "ALL" )
                exit
 
             case K_CTRL_C
@@ -641,7 +645,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_CTRL_V
             case K_SH_INS
-               ::AddText( GTGETCLIPBOARD(), .T. )
+               ::AddText( strtran( GTGETCLIPBOARD(), chr(0), chr(32) ), .T. )
                ::ClrTextSelection()
                exit
 
@@ -1408,7 +1412,7 @@ METHOD GotoLine( nRow ) CLASS HBEditor
       // Clipper Reformats the paragraph if there is some unexpected movement
       //
       if ( ::lWordWrap )
-         if ::aText[ ::nRow ]:lSoftCR
+         if !empty( ::aText[ ::nRow ]:lSoftCR )
             ::SplitLine( ::nRow )
          endif
       endif
@@ -1780,9 +1784,9 @@ METHOD InsertState( lInsState ) CLASS HBEditor
       SET( _SET_INSERT, lInsState )
 
       if lInsState
-         Setcursor( 1 )
+         Setcursor( SC_INSERT )
       else
-         Setcursor( 2 )
+         Setcursor( SC_NORMAL )
       endif
    ENDIF
 
@@ -1819,12 +1823,20 @@ return cString
 //
 // Returns the text selection in a string
 //
-METHOD GetTextSelection() CLASS HBEditor
+METHOD GetTextSelection( lSoftCr ) CLASS HBEditor
 
    LOCAL cString := ""
+   LOCAL cSoft := ""
+   LOCAL cEOL := HB_OSNewLine()
    LOCAL nSelStart
    LOCAL nSelEnd
    LOCAL nI
+
+   DEFAULT lSoftCr TO .F.
+
+   if lSoftCr
+      cSoft:= CHR( 141 ) + CHR( 10 )
+   endif
 
    if ::lSelActive
       if ::nSelStart > ::nSelEnd
@@ -1835,10 +1847,12 @@ METHOD GetTextSelection() CLASS HBEditor
          nSelEnd := ::nSelEnd
       endif
 
-      for nI := nSelStart to nSelEnd
-          cString += ::GetLine( nI )
-      next
-
+      if ::lWordWrap
+         AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )}, nSelStart, nSelEnd )
+      else
+         AEval( ::aText, {| cItem | cString += cItem:cText + cEOL}, nSelStart, nSelEnd )
+      endif
+      
    endif
 
 return cString
@@ -1847,25 +1861,33 @@ return cString
 //
 // Set current selection
 //
-METHOD SetTextSelection( nAction ) CLASS HBEditor
+METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
    if !::lSelActive
-      ::nSelStart := ::nRow
-      ::nSelEnd := ::nSelStart
       ::lSelActive := .T.
-      ::RefreshLine()
-   elseif nAction > 0
-      ::nSelEnd += nAction
-      ::RefreshLine()
-      ::Down()
-   elseif nAction < 0
-      if ::nSelEnd > ::nSelStart
-         ::nSelEnd--
-      else
-         ::nSelStart--
+      if cAction == "ALL"
+         ::nSelStart := 1
+         ::nSelEnd := ::naTextLen
+         ::RefreshWindow()
+      elseif cAction == "LINE"
+         ::nSelStart := ::nRow
+         ::nSelEnd := ::nSelStart
+         ::RefreshLine()
       endif
-      ::RefreshLine()
-      ::Up()
+   elseif cAction == "LINE"
+      if nCount > 0
+         ::nSelEnd += nCount
+         ::RefreshLine()
+         ::Down()
+      elseif nCount < 0
+         if ::nSelEnd > ::nSelStart
+            ::nSelEnd += nCount
+         else
+            ::nSelStart += nCount
+         endif
+         ::RefreshLine()
+         ::Up()
+      endif
    endif
 
 return nil
@@ -1930,28 +1952,48 @@ return Self
 
 METHOD AddText( cString, lAtPos ) CLASS HBEditor
 
-   LOCAL aTmpText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
-   LOCAL nLines := Len( aTmpText )
+   LOCAL aTmpText
+   LOCAL nLines
    LOCAL i
-   LOCAL nAtRow := ::nRow
+   LOCAL nAtRow
+   LOCAL lSaveIns
 
-   DEFAULT lAtPos TO .F.
+   if !empty( cString )
 
-   if !lAtPos .or. ( nAtRow > ::naTextLen )
-      for i := 1 to nLines
-         aadd( ::aText, aTmpText[ i ] )
-         ::naTextLen++
-      next
-   else
-      for i := 1 to nLines 
-         AIns( ::aText, nAtRow + i, aTmpText[ i ], .T. )
-      next
-      ::naTextLen := LEN( ::aText )
+      aTmpText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
+      nLines := Len( aTmpText )
+      nAtRow := ::nRow
+      lSaveIns := ::lInsert
+
+      if !lSaveIns
+         ::InsertState( .T. )
+      endif
+
+      tracelog( nLines )
+
+      DEFAULT lAtPos TO .F.
+
+      if !lAtPos .or. ( nAtRow > ::naTextLen )
+         for i := 1 to nLines
+            aadd( ::aText, aTmpText[ i ] )
+            ::naTextLen++
+         next
+      else
+         for i := 1 to nLines 
+            AIns( ::aText, nAtRow + i, aTmpText[ i ], .T. )
+         next
+         ::naTextLen := LEN( ::aText )
+      endif
+
+      if !lSaveIns
+         ::InsertState( .F. )
+      endif
+
+      ::lDirty := .T.
+
+      ::RefreshWindow()
+
    endif
-
-   ::lDirty := .T.
-
-   ::RefreshWindow()
 
 return Self
 
