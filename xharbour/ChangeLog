@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4968 2006/05/03 08:13:54 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4969 2006/05/03 18:17:20 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-05 11:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! clear the logical key position buffer for pending relations
+      or hot record buffer updating
+
+  * xharbour/source/vm/hvm.c
+    * cleaned some comments
 
 2006-05-03 15:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg

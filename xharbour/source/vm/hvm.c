@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.567 2006/04/26 02:19:58 ronpinkas Exp $
+ * $Id: hvm.c,v 1.568 2006/04/26 17:32:13 ronpinkas Exp $
  */
 
 /*
@@ -9422,7 +9422,7 @@ HB_EXPORT PSYMBOLS hb_vmLastModule( void )
 HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol )
 {
    s_pSymStart = pSymbol;  /* first public defined symbol to start execution */
-   /* printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->pFunPtr ); */
+   /* printf( "Startup: '%s' Func: %p\n", pSymbol->szName, pSymbol->value.pFunPtr ); */
 }
 
 
@@ -9482,8 +9482,6 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
 
             if( scope == HB_FS_EXIT )
             {
-               //printf( "Exit: %p, Name: >%s<, Func: %p\n", pLastSymbols->pModuleSymbols + ui, ( pLastSymbols->pModuleSymbols + ui )->szName, ( pLastSymbols->pModuleSymbols + ui )->pFunPtr );
-
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
                hb_vmPushNil();
                hb_vmDo( 0 );
@@ -9526,8 +9524,6 @@ static void hb_vmDoInitFunctions( void )
 
                int i;
                int iArgCount;
-
-               //TraceLog( NULL, "Module: %s, INIT: %p, Name: >%s<, Func: %p\n", pLastSymbols->szModuleName, pLastSymbols->pModuleSymbols + ui, ( pLastSymbols->pModuleSymbols + ui )->szName, ( pLastSymbols->pModuleSymbols + ui )->pFunPtr );
 
                hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
                hb_vmPushNil();
