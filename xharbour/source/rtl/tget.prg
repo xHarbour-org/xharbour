@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.109 2006/04/21 12:42:02 modalsist Exp $
+ * $Id: tget.prg,v 1.110 2006/04/26 13:38:33 guerra000 Exp $
  */
 
 /*
@@ -258,7 +258,14 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := ""
       else
          ::cPicFunc := Upper( SubStr( cPicture, 1, nAt - 1 ) )
-         ::cPicMask := LTrim( SubStr( cPicture, nAt + 1 ) )
+         /* E.F. 2006/MAY/05 Clipper doesn't extract left spaces of the mask
+            in numeric var, if any. Example: "@E     999.99" */
+         IF ::type == "N"
+            ::cPicMask := SubStr( cPicture, nAt + 1 )
+         ELSE
+            ::cPicMask := LTrim( SubStr( cPicture, nAt + 1 ) )
+         ENDIF
+
       endif
 
 //      AnalyzePicture( @::cPicFunc )
@@ -742,20 +749,24 @@ METHOD VarGet() CLASS Get
    
    ::Type := ValType( xVarGet )
    
-   // E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies.
-   IF ::Type == "N" .AND. ::nMaxLen != NIL .AND. ::DecPos != NIL .AND.;
-      ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
+   /* E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies.
+      E.F. 2006/MAY/05 - Added ::hasfocus to maintain ::original value,if
+           we exit with ESC before start edit get. */
+   IF ::hasfocus .AND. ::Type == "N" .AND. ::nMaxLen != NIL .AND.;
+      ::DecPos != NIL .AND. ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
 
       nDecPos := ::DecPos
 
       IF !Empty(::cPicMask)
-         nLen := HowMuchNumeric(::cPicMask) + 1
+         nLen := HowMuchNumeric(::cPicMask) + 1 + iif(::minus,1,0)
+         nLen := Min(nLen,Len(::cPicMask))
          nDec := Len( ::cPicMask) - Rat(".",::cPicMask)
          IF nDec >= nLen
             nDec := 0
          ENDIF
       ELSEIF !Empty( ::cPicture)
-         nLen := HowMuchNumeric(::cPicture) + 1
+         nLen := HowMuchNumeric(::cPicture) + 1 + iif(::minus,1,0)
+         nLen := Min(nLen,Len(::cPicture))
          nDec := Len( ::cPicture) - Rat(".",::cPicture)
          IF nDec >= nLen
             nDec := 0
@@ -2052,8 +2063,9 @@ STATIC FUNCTION HowMuchNumeric( cPict )
 LOCAL c := ""
 LOCAL r := 0
 
+ /* E.F. 2006/MAY/05 - added space and % as part of picture also. */ 
  FOR EACH c IN cPict
-     IF c $ "9#*$"
+     IF c IN "9#*$ %"
         r++
      ENDIF
  NEXT

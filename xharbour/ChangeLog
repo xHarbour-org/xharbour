@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4969 2006/05/03 18:17:20 modalsist Exp $
+ * $Id: ChangeLog,v 1.4970 2006/05/05 09:37:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-05 21:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed HowMuchNumeric() function to show value in numeric var with
+      picture "@E 999.99 %", as reported by Enrico M. Giordano.
+    ! fixed ParsePict() method to not extract left spaces before "9" 
+      in picture of numeric var, example "@E  999.99".
+    ! fixed VarGet() method to maintain ::original value when exit
+      with ESC before start get edition.
 
 2006-05-05 11:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/dbfcdx/dbfcdx1.c
