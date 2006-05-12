@@ -63,6 +63,7 @@
 #include <windows.h>
 #endif // __MINGW32__
 
+
 #define DLL_CALLCONV __stdcall
 // The following ifdef block is the standard way of creating macros which make exporting 
 // from a DLL simpler. All files within this DLL are compiled with the FREEIMAGE_EXPORTS
@@ -128,7 +129,7 @@ FI_STRUCT (FIMULTIBITMAP) { void *data; };
 #define SEEK_END  2
 #endif
 
-#ifndef __MINGW32__		// prevents a bug in mingw32
+#ifndef __MINGW32__     // prevents a bug in mingw32
 
 typedef long BOOL;
 typedef unsigned char BYTE;
@@ -141,7 +142,7 @@ typedef long LONG;
 #else
 #pragma pack(1)
 #endif // WIN32
-
+#if !defined(__XCC__)
 typedef struct tagRGBQUAD {
 #ifdef FREEIMAGE_BIGENDIAN
   BYTE rgbRed;
@@ -191,7 +192,7 @@ typedef struct tagBITMAPINFO {
   BITMAPINFOHEADER bmiHeader; 
   RGBQUAD          bmiColors[1];
 } BITMAPINFO, *PBITMAPINFO;
-
+#endif
 #endif // __MINGW32__
 
 #endif // _WINDOWS_

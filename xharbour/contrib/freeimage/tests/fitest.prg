@@ -1,5 +1,5 @@
 /*
- * $Id: fitest.prg,v 1.1 2005/11/07 01:13:06 fsgiudice Exp $
+ * $Id: fitest.prg,v 1.2 2005/11/07 01:20:54 fsgiudice Exp $
  */
 
 /*
@@ -26,7 +26,7 @@ PROCEDURE Main()
    //? "Press Alt-D + Enter to activate debug"
    //AltD( .T. )
    //Inkey(0)
-
+ altd()
    // Check output directory
    IF !ISDirectory( IMAGES_OUT )
       DirMake( IMAGES_OUT )
@@ -164,17 +164,22 @@ PROCEDURE Main()
 
    bkcolor:rgbBlue := 205
    //? fi_SetBackgroundColor( im, hb_String2Pointer( bkcolor:Value() ) )
+   Tracelog("linha 168")
    ? fi_SetBackgroundColor( im, bkcolor:Value() )
+   Tracelog("linha 170")
    ? bkcolor:SayMembers(" ", .t., .t.)
-
-   ? bkcolor:Pointer( fi_GetBackgroundColor( im ) )
+Tracelog("linha 162")
+//   ? bkcolor:Pointer( fi_GetBackgroundColor( im ) )
    //? fi_GetBackgroundColor( im, @bkcolor:Value() )
    //bkcolor:Buffer( appo )
+Tracelog("linha 176")
    ? bkcolor:SayMembers(" ", .t., .t.)
 
-
+Tracelog("linha 179")
    iccprofile:Pointer( fi_GetICCProfile( im ) )
+   Tracelog("linha 181")
    ? "Header           :", ValToPrg( iccprofile )
+   Tracelog("linha 183")
    ? iccprofile:SayMembers(" ", .t., .t.)
 
    //bmpinfoheader:Reset()
