@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.167 2006/03/24 17:45:53 modalsist Exp $
+ * $Id: hbmake.prg,v 1.168 2006/05/06 10:43:58 lculik Exp $
  */
 
 /*
@@ -164,7 +164,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    ENDIF
    MHIDE()
-   DISMOUSE()
+   
    s_nLang := nLang
    s_cDefLang := IIF( s_nLang == 1, "PT", IIF( s_nLang == 2, "EN", "ES" ) )
    s_aLangMessages := BuildLangArray( s_cDefLang )
