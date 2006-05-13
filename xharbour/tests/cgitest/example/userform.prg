@@ -13,20 +13,27 @@ PROC Process( cCmd, cRecno )  // --> CMD line params. passed by server
 LOCAL oCgi, aCmd, cQuery
 
 SET DATE BRITISH
-
+rddsetdefault("DBFCDX")
 IF cCmd == NIL
    cCmd := ""
 ENDIF
 
-IF "%" $ cCmd
+//IF "%" $ cCmd
+TraceLog("chegou ",cCmd,cRecno)
+if "%" in cCmd  .or. " " in cCmd
    cCmd := HTMLDecodeURL( cCmd )
+   TraceLog(cCmd,valtoprg(aCmd))
    aCmd := HB_ATOKENS( cCmd, " ")
    cCmd := aCmd[1]
    IF LEN( aCmd ) > 1
       cRecno := aCmd[2]
    ENDIF
 ENDIF
-
+if valtype(crecno) != "U"
+TraceLog(cCmd,valtoprg(aCmd),"crecno ="+cRecno)
+else
+TraceLog(cCmd,valtoprg(aCmd))
+endif
 scCmd := cCmd
 
 
@@ -324,7 +331,7 @@ jWinTest()
 
 oHtm:HLine()
 oHtm:writeLN("<b>Inline Javascript</b>")
-JavaCMD(, "document.write('Hello There...')" )
+htmljscmd(, "document.write('Hello There...')" )
 
 END FONT OF oHtm
 
@@ -876,7 +883,7 @@ DEFINE CGI ;
 oHtm:write("<BR><BR>")
 oHtm:writeln("<u>IE4-5 <i>BUTTONS</i> - Not visible in Netscape Navigator</u>")
 oHtm:write("<BR><BR>")
-oHtm:write("<BUTTON> <IMG SRC='/jlist/bookslib.jpg'></BUTTON>")
+oHtm:write("<BUTTON> <IMG SRC='/JList/bookslib.jpg'></BUTTON>")
 oHtm:write(htmlSpace(5) )
 oHtm:write("<BUTTON> <IMG SRC='/images/buttons/ok_1.bmp'></BUTTON>")
 oHtm:write(htmlSpace(5) )
@@ -1019,7 +1026,8 @@ PROC ValidateUser( oCgi )
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 LOCAL cUserName, cPassword
 LOCAL lValid := .F.
-IF !EMPTY( oCgi:cgiField( "UserName" ) )
+tracelog(valtoprg(ocgi))
+IF !EMPTY( oCgi:Field( "UserName" ) )
    cUserName := oCgi:username
    cPassword := oCgi:UserPass
 ELSE
@@ -1032,14 +1040,10 @@ IF NETERR()
    NetError(oCgi)
    RETURN
 ENDIF
-
-IF !Users->(USED())
-   NetError(oCgi)
-   RETURN
-ENDIF
-
-INDEX ON UPPER(USERS->UserName) TAG UserName TO Users
-SET INDEX TO USERS
+tracelog( "Arquivo aberto")
+if !file("users.cdx")     
+INDEX ON UPPER(UserName) TAG UserName
+endif
 USERS->( ordSetFocus("UserName") )
 IF USERS->( dbSeek( UPPER(cUserName) ) )
    IF UPPER(USERS->PASSWORD) = UPPER( cPassword )
@@ -1186,7 +1190,7 @@ oHtm:endFont()
 oHtm:endFont()
 
 IF Valtype(oCgi) == "O"
-   oCgi:debug()
+//   oCgi:debug()
 ELSE
    oHtm:writeLn( Valtype(oCgi) )
 ENDIF
@@ -1299,7 +1303,7 @@ IF VALTYPE(cCur) == "C" .AND. ;
          oHtm:newTableCell("center",,,,,,,30)
 
          PUSH BUTTON ;
-              NAME "'B"+NTRIM(RECNO())+"'" ;
+              NAME ("'B"+NTRIM(RECNO())+"'") ;
               CAPTION "' ? '" ;
               CGIAPP "'/cgi-bin/userform.exe?GETREC ' + this.name" ;
               OF oHtm
@@ -1328,7 +1332,7 @@ RETURN
 PROCEDURE userGetRec( oCgi, cRecno )
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 LOCAL oHtm
-
+TRacelog(valtoprg(ocgi),crecno)
 DEFINE CGI ;
        TITLE "View a Record ("+cRecno+")";
        JAVASOURCE "/autorefr.js" ;
@@ -1339,6 +1343,7 @@ DEFINE CGI ;
        OF oHtm
 
 cRecno := SUBSTR( cRecno, 2 )
+TraceLog(cRecno)
 oHtm:SetTextColor("black")
 oHtm:Setcenter( .T. )
 
@@ -1349,9 +1354,9 @@ IF NETERR()
    RETURN
 ENDIF
 IF FILE( "hInv02.cdx" )
-   SET INDEX TO HINV02
+   set order to 1
 ELSE
-   INDEX ON DTOS( hInv02->DATE ) TAG D_DATE TO HInv02
+   INDEX ON DTOS( hInv02->DATE ) TAG D_DATE 
 ENDIF
 GOTO VAL( cRecno )
 
@@ -1637,4 +1642,16 @@ CLOSE SESSION
 RETURN lRet
 
 
+
+function iniget(c,a,x)
+Local xSect
+local cret
+
+xSect  := soini[c]
+cRet :=  xSect[a]
+if empty(cret)
+cret :=x
+endif
+tracelog(cret)
+return cret
 

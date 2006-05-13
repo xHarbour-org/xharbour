@@ -1,5 +1,5 @@
 /*
- * $Id: htmlform.ch,v 1.1 2005/10/13 16:29:46 lculik Exp $
+ * $Id: htmlform.ch,v 1.2 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -63,7 +63,7 @@
           [COLOR <clr>]                                            ;
           [WIDTH <w>]                                              ;
           =>                                                       ;
-          <oFrm> := TCgiForm():New( [<name>], [<action>], [<method>],  ;
+          <oFrm> := THtmlForm():New( [<name>], [<action>], [<method>],  ;
                                 <.frame.>, <cap> )                ;;
           [<oFrm>:setTarget( <(target)> ) ;]                       ;
           [<oFrm>:setEncType( <(enctype)> ) ;]                     ;

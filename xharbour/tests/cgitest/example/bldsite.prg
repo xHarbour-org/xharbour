@@ -33,8 +33,9 @@ IF "%" $ cCmd
       cSiteRoot := aCmd[2]
 
       IF EMPTY( cSiteRoot )
-         cSiteRoot := "c:\apache2\htdocs"
+         cSiteRoot := "g:\apache2.2\htdocs"
       ENDIF
+      TraceLog(cSiteroot)
 
    ENDIF
 
@@ -292,4 +293,17 @@ ELSE
    incCounter()
 ENDIF
 RETURN n
+
+
+function iniget(c,a,x)
+Local xSect
+local cret
+
+xSect  := soini[c]
+cRet :=  xSect[a]
+if empty(cret)
+cret :=x
+endif
+tracelog(cret)
+return cret
 

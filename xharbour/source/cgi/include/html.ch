@@ -1,5 +1,5 @@
 /*
- * $Id: html.ch,v 1.3 2005/10/13 19:22:30 lculik Exp $
+ * $Id: html.ch,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -48,7 +48,9 @@
 #include "simpleio.ch"
 #include "htmlform.ch"
 #include "htmlclrs.ch"
-
+#include "cgi.ch"
+#xtranslate CRLF(<str>) => ( <str> + chr(13) + chr(10) )
+#xtranslate CRLF() => chr(13) + chr(10)
 #xCommand DEFINE HTML                ;
           [FILE <file>]              ;
           [TITLE <title>]            ;
@@ -76,7 +78,7 @@
           [<lcache:NOCACHE>]           ;
           OF <oHtml>                 ;
           =>                         ;
-          <oHtml> := TCgiHTML():new( <file>,<title>,<linktitle>,<charset>,;
+          <oHtml> := THtml():new( <file>,<title>,<linktitle>,<charset>,;
                                  [{<(javasrc)>}], ;
                                  [<bgimg>], [<bgcolor>], [<txtcolor>],;
                                  [{<(javacode)>}],;
@@ -118,7 +120,7 @@
           [MARGINWIDTH <nMarginWidth>] ;
           OF <oHtml>                 ;
           =>                         ;
-          <oHtml> := TCgiHTML():CGInew(<title>, <linktitle>, <charset>,;
+          <oHtml> := THtml():CGInew(<title>, <linktitle>, <charset>,;
                                    [{<(javasrc)>}], ;
                                    [<bgimg>], [<bgcolor>], [<txtcolor>],;
                                    [{<(javacode)>}],;
@@ -423,7 +425,7 @@
           [FILE <file>]         ;
           OF <oFrm>             ;
           =>                    ;
-          <oFrm>:=frameSet():New( <file>, <title> )
+          <oFrm>:=THtmlFrameSet():New( <file>, <title> )
 
 
 #xCommand FRAMESET              ;

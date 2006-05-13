@@ -1,6 +1,6 @@
-#include "default.ch"
 #include "html.ch"
-#include "forms.ch"
+#include "htmlform.ch"
+#include "htmlclrs.ch"
 
 request dbfcdx
 
@@ -133,7 +133,7 @@ htmlBrowse( oHtm, ;
            "top.RightTop.FrAddbk2.location.href='/cgi-bin/addbook.exe?GET '+this.name;")
 
 
-JavaCMD( ,"top.RightTop.FrAddbk2.location.href='/cgi-bin/addbook.exe?GET B1';")
+htmljsCmd( ,"top.RightTop.FrAddbk2.location.href='/cgi-bin/addbook.exe?GET B1';")
 
 oHtm:cgiClose()
 
@@ -165,7 +165,9 @@ if cRecno == NIL
 oHtm:WriteLN( any2str( oCgi:Query_String ) )
 oHtm:WriteLN( scCmd )
 oHtm:WriteLN( "RECNO = "+any2str( cRecno ) )
-oCgi:debug()
+//oCgi:debug()
+cRecno := "1"
+GOTO VAL( cRecno )
 ELSE
 cRecno := SUBSTR( cRecno, 2 )
 GOTO VAL( cRecno )
@@ -371,4 +373,17 @@ ELSE
    incCounter()
 ENDIF
 RETURN n
+
+
+function iniget(c,a,x)
+Local xSect
+local cret
+
+xSect  := soini[c]
+cRet :=  xSect[a]
+if empty(cret)
+cret :=x
+endif
+tracelog(cret)
+return cret
 

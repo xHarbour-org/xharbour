@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: thtm.prg,v 1.5 2005/12/03 18:23:05 lculik Exp $
  */
 
 /*
@@ -1676,11 +1676,11 @@ METHOD FormEdit( cType, cName, xValue, nSize ) CLASS THtml
    ENDIF
 
    IF xValue != NIL
-      Fwrite( ::nH, ' Value="' + HTMLANY2STR( xValue ) + '"' )
+      Fwrite( ::nH, ' Value="' + ANY2STR( xValue ) + '"' )
    ENDIF
 
    IF nSize != NIL
-      Fwrite( ::nH, ' Size="' + HTMLANY2STR( nSize ) + '"' )
+      Fwrite( ::nH, ' Size="' + ANY2STR( nSize ) + '"' )
    ENDIF
 
    Fwrite( ::nH, ">" )
@@ -2335,7 +2335,7 @@ FUNCTION HtmlPadR( cStr, n )
 
    RETURN cRet
 
-STATIC FUNCTION HTMLANY2STR( xVal )
+FUNCTION ANY2STR( xVal )
 
    LOCAL xRet := NIL
 
@@ -2365,6 +2365,38 @@ STATIC FUNCTION HTMLANY2STR( xVal )
 
    ENDIF
 
-   RETURN ( xRet )
+RETURN ( xRet )
 
+//컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+FUNCTION HTMLANY2STR( xVal )
+
+   LOCAL xRet := NIL
+
+   IF Valtype( xVal ) == "C"
+      xRet := IIF( Empty( xVal ), ".", xVal )
+
+   ELSEIF Valtype( xVal ) == "N"
+      xRet := Alltrim( Str( xVal ) )
+
+   ELSEIF Valtype( xVal ) == "O"
+      xRet := "<" + xVal:CLASSNAME() + ">"
+
+   ELSEIF Valtype( xVal ) == "D"
+      xRet := Dtoc( xVal )
+
+   ELSEIF Valtype( xVal ) == "L"
+      xRet := LTOC( xVal )
+
+   ELSEIF Valtype( xVal ) == "B"
+      xRet := "{||...}"
+
+   ELSEIF Valtype( xVal ) == NIL
+      xRet := "NIL"
+
+   ELSEIF Valtype( xVal ) == "U"
+      xRet := "<Unknown Value>"
+
+   ENDIF
+
+RETURN ( xRet )
 

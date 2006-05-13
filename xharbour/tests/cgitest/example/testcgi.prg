@@ -1,6 +1,6 @@
 #include "webSite.ch"
 
-request _DBFCDX
+request DBFCDX,dbffpt
 
 STATIC soINI
 
@@ -28,14 +28,11 @@ SET DATE BRITISH
 
 IF "POST" $ UPPER(GETENV("REQUEST_METHOD"))
    lIsPost := .T.
-      oCgi := oCGI():New()
+      oCgi :=TCGI():New()
 ENDIF
 
 
-soIni := oIni():New("website.ini")
-soIni:read()
-soIni:close()
-
+soIni := hb_readini("website.ini")
 
 DEFINE CGI ;
        TITLE "Web Server variables & a DBF Browser" ;
@@ -63,10 +60,10 @@ oHtm:qqout( memoread("c:\config.sys") )
 oHtm:Paragraph(.F.)
 
 oHtm:qout( "" )
-aFirst := listAsArray( cBuffer, "&" )
+aFirst := hb_atokens( cBuffer, "&" )
 
 FOR i=1 TO LEN( aFirst )
-    AADD( aSecond, listasarray( aFirst[i], "=" ) )
+    AADD( aSecond, hb_atokens( aFirst[i], "=" ) )
 NEXT
 
 SAY "Web Server variables & a DBF Browser" ;
@@ -91,8 +88,8 @@ IF lIsPost
            oHtm:EndTableCell()
 
            oHtm:newTableCell()
-             oHTM:QOut( DecodeURL(oCgi:aQueryFields[i,2]) )
-             cText += DecodeURL(oCgi:aQueryFields[i,2])
+             oHTM:QOut( HTMLDecodeUrl(oCgi:aQueryFields[i,2]) )
+             cText += HTMLDecodeUrl(oCgi:aQueryFields[i,2])
            oHtm:EndTableCell()
 
        oHtm:EndTableRow()
@@ -272,7 +269,7 @@ SET DATE BRITISH
 //  Your database here...
 //
      
-rddSetDefault("_DBFCDX")
+rddSetDefault("DBFCDX")
 //USE "F:\X000\DATA\Fixing" SHARED NEW
 //USE _Fixing SHARED NEW
 USE Fixing SHARED NEW
@@ -328,4 +325,17 @@ oHtm:CGIclose()
 
 RETURN
 
+
+function greek2Html(c)
+return "@!"
+
+function iniget(c,a,x)
+Local xSect
+local xret
+xSect  := soini[c]
+cRet :=  xSect[a]
+if empty(xret)
+xret :=c
+endif
+return xret
 
