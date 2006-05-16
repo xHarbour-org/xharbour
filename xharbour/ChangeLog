@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4973 2006/05/12 22:56:50 lculik Exp $
+ * $Id: ChangeLog,v 1.4974 2006/05/13 16:59:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-16 07:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source/rtl/win32ole.prg
+    * Fix to recent negative index support in [] overloading
+  * include/hbextern.ch
+    * Protected DllCalls functions with #ifdef __PLATFORM__Windows
 
 2006-05-13 14:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   ! source/cgi/hjwindow.prg
@@ -19,15 +25,13 @@
     !updated to work correct with new lib
   ! utils/hbmake/hbmake.prg
     ! removes dismouse function call
-  
-    
 
 2006-05-12 20:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   ! contrib/freeimage/include/freeimage.h
     ! minor fix to work with xcc
   ! contrib/freeimage/tests/fitest.prg
     !minor fix
-  
+
 2006-05-06 07:40 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   ! utils/hbmake/hbmake.prg
     ! minor change
@@ -36,7 +40,7 @@
   * source/rtl/tget.prg
     ! fixed HowMuchNumeric() function to show value in numeric var with
       picture "@E 999.99 %", as reported by Enrico M. Giordano.
-    ! fixed ParsePict() method to not extract left spaces before "9" 
+    ! fixed ParsePict() method to not extract left spaces before "9"
       in picture of numeric var, example "@E  999.99".
     ! fixed VarGet() method to maintain ::original value when exit
       with ESC before start get edition.

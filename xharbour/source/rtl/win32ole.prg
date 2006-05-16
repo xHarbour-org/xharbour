@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.137 2006/03/08 08:12:56 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.139 2006/05/08 16:00:51 ronpinkas Exp $
  */
 
 /*
@@ -425,7 +425,7 @@ METHOD OleCollection( xIndex, xValue ) CLASS TOleAuto
       RETURN ::Item( xIndex )
    ENDIF
 
-   IF xIndex < 0
+   IF ValType( xIndex ) == 'N' .AND. xIndex < 0
       xIndex += ( ::Count + 1 )
    ENDIF
 
