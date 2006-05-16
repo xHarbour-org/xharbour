@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.12 2003/11/30 12:32:29 druzus Exp $
+ * $Id: hbfast.h,v 1.13 2004/04/03 01:51:02 ronpinkas Exp $
  */
 
 /*
@@ -71,6 +71,8 @@
    extern USHORT HB_EXPORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
    extern USHORT HB_EXPORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
    extern BYTE   HB_EXPORT hb_itemParamId( PHB_ITEM pItem );
+
+   #define hb_itemMove( dst, src )     hb_itemForwardValue( (dst), (src) )
 
    HB_EXTERN_END
 

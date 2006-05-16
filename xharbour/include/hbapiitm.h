@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.41 2005/11/04 02:20:10 druzus Exp $
+ * $Id: hbapiitm.h,v 1.42 2005/11/07 01:02:53 druzus Exp $
  */
 
 /*
@@ -65,37 +65,38 @@ typedef struct
    PHB_ITEM pItems[ HB_EVAL_PARAM_MAX_ + 1 ];
 } EVALINFO, * PEVALINFO, * EVALINFO_PTR;
 
-extern HB_EXPORT PHB_ITEM  hb_evalLaunch   ( PEVALINFO pEvalInfo );
-extern HB_EXPORT BOOL      hb_evalNew      ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern HB_EXPORT BOOL      hb_evalPutParam ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
-extern HB_EXPORT BOOL      hb_evalRelease  ( PEVALINFO pEvalInfo );
+extern HB_EXPORT PHB_ITEM  hb_evalLaunch     ( PEVALINFO pEvalInfo );
+extern HB_EXPORT BOOL      hb_evalNew        ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
+extern HB_EXPORT BOOL      hb_evalPutParam   ( PEVALINFO pEvalInfo, PHB_ITEM pItem );
+extern HB_EXPORT BOOL      hb_evalRelease    ( PEVALINFO pEvalInfo );
 
-extern HB_EXPORT PHB_ITEM  hb_itemDo       ( PHB_ITEM pItem, ULONG ulPCount, ... );
-extern HB_EXPORT PHB_ITEM  hb_itemDoC      ( char * szFunc, ULONG ulPCount, ... );
+extern HB_EXPORT PHB_ITEM  hb_itemDo         ( PHB_ITEM pItem, ULONG ulPCount, ... );
+extern HB_EXPORT PHB_ITEM  hb_itemDoC        ( char * szFunc, ULONG ulPCount, ... );
 
-extern HB_EXPORT PHB_ITEM  hb_itemArrayGet     ( PHB_ITEM pArray, ULONG ulIndex );
-extern HB_EXPORT PHB_ITEM  hb_itemArrayNew     ( ULONG ulLen );
-extern HB_EXPORT PHB_ITEM  hb_itemArrayPut     ( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem );
+extern HB_EXPORT PHB_ITEM  hb_itemArrayGet   ( PHB_ITEM pArray, ULONG ulIndex );
+extern HB_EXPORT PHB_ITEM  hb_itemArrayNew   ( ULONG ulLen );
+extern HB_EXPORT PHB_ITEM  hb_itemArrayPut   ( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem );
 
-extern HB_EXPORT ULONG     hb_itemCopyC        ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
-extern HB_EXPORT BOOL      hb_itemFreeC        ( char * szText );
+extern HB_EXPORT ULONG     hb_itemCopyC      ( PHB_ITEM pItem, char * szBuffer, ULONG ulLen );
+extern HB_EXPORT BOOL      hb_itemFreeC      ( char * szText );
 
 extern HB_EXPORT char *    hb_itemGetC       ( PHB_ITEM pItem );
 extern HB_EXPORT char *    hb_itemGetCPtr    ( PHB_ITEM pItem );
-extern HB_EXPORT ULONG     hb_itemGetCLen      ( PHB_ITEM pItem );
+extern HB_EXPORT ULONG     hb_itemGetCLen    ( PHB_ITEM pItem );
 extern HB_EXPORT char *    hb_itemGetDS      ( PHB_ITEM pItem, char * szDate );
-extern HB_EXPORT LONG      hb_itemGetDL        ( PHB_ITEM pItem );
-extern HB_EXPORT BOOL      hb_itemGetL         ( PHB_ITEM pItem );
-extern HB_EXPORT double    hb_itemGetND        ( PHB_ITEM pItem );
-extern HB_EXPORT int       hb_itemGetNI        ( PHB_ITEM pItem );
-extern HB_EXPORT LONG      hb_itemGetNL        ( PHB_ITEM pItem );
-extern HB_EXPORT HB_LONG   hb_itemGetNInt      ( PHB_ITEM pItem );
-extern HB_EXPORT void      hb_itemGetNLen      ( PHB_ITEM pItem, int * piWidth, int * piDec );
+extern HB_EXPORT LONG      hb_itemGetDL      ( PHB_ITEM pItem );
+extern HB_EXPORT BOOL      hb_itemGetL       ( PHB_ITEM pItem );
+extern HB_EXPORT double    hb_itemGetND      ( PHB_ITEM pItem );
+extern HB_EXPORT int       hb_itemGetNI      ( PHB_ITEM pItem );
+extern HB_EXPORT LONG      hb_itemGetNL      ( PHB_ITEM pItem );
+extern HB_EXPORT HB_LONG   hb_itemGetNInt    ( PHB_ITEM pItem );
+extern HB_EXPORT void      hb_itemGetNLen    ( PHB_ITEM pItem, int * piWidth, int * piDec );
 extern HB_EXPORT void *    hb_itemGetPtr     ( PHB_ITEM pItem );
+extern HB_EXPORT PHB_SYMB  hb_itemGetSymbol  ( PHB_ITEM pItem );
 
-extern HB_EXPORT PHB_ITEM  hb_itemNew          ( PHB_ITEM pNull );
-extern HB_EXPORT USHORT    hb_itemPCount       ( void );
-extern HB_EXPORT PHB_ITEM  hb_itemParam        ( USHORT uiParam );
+extern HB_EXPORT PHB_ITEM  hb_itemNew        ( PHB_ITEM pNull );
+extern HB_EXPORT USHORT    hb_itemPCount     ( void );
+extern HB_EXPORT PHB_ITEM  hb_itemParam      ( USHORT uiParam );
 
 #if 0
    extern HB_EXPORT HB_ITEM hb_itemParamStack   ( USHORT uiParam ) ;

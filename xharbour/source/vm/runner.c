@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.45 2006/04/21 11:25:33 druzus Exp $
+ * $Id: runner.c,v 1.46 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -654,7 +654,6 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       if( pHrbBody )
       {
-         /* hb_vmProcessSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szFileName, (int) HB_PCODE_VER ); */
          pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead,
                   ( USHORT ) pHrbBody->ulSymbols, "PCODE_HRB_FILE.hrb", TRUE, FALSE );
 

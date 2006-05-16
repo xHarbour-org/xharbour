@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.121 2006/03/30 00:08:12 ronpinkas Exp $
+ * $Id: genc.c,v 1.122 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, " | HB_FS_MEMVAR" );
             }
 
-            if( ( pSym->cScope != HB_FS_MESSAGE ) && ( pSym->cScope & HB_FS_MESSAGE ) ) /* only for non public symbols */
+            if( pSym->cScope & HB_FS_MESSAGE )
             {
                fprintf( yyc, " | HB_FS_MESSAGE" );
             }

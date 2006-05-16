@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4974 2006/05/13 16:59:15 lculik Exp $
+ * $Id: ChangeLog,v 1.4975 2006/05/16 14:45:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,65 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-17 00:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * added support -go[0-3] and other -g* switches to xhb* scripts
+
+  * xharbour/include/hbapiitm.h
+  * xharbour/source/vm/itemapi.c
+    + added hb_itemGetSymbol()
+
+  * xharbour/include/hbfast.h
+    + added hb_itemMove() macro mapped to hb_itemForwardValue()
+
+  * xharbour/include/hbapirdd.h
+    * changed definition of SUPERTABLE for optional dynamic overloading
+      this modification will not effect existing code
+
+  * xharbour/include/hbvm.h
+  * xharbour/include/hbtypes.h
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/maindllp.c
+    * updated hb_vmProcessDllSymbols()/VM_PROCESS_DLL_SYMBOLS to return
+      registered symbol table and use the same parameters as
+      hb_vmProcessSymbols()
+
+  * xharbour/source/compiler/gencc.c
+    ! fixed typo
+
+  * xharbour/source/compiler/genc.c
+  * xharbour/source/compiler/genjava.c
+  * xharbour/source/compiler/genobj32.c
+  * xharbour/source/compiler/harbour.c
+    ! message symbols are not function symbols - cleaned the HB_FS_MESSAGE
+      usage and fix the problem with registering static function in global
+      symbol table
+
+  * xharbour/source/rdd/dbcmd.c
+    * formatting and some minor clean-up
+
+  * xharbour/source/rdd/workarea.c
+    * added default SYSNAME method
+    ! fixed possible memory leak when APPEND failed in TRANSREC method
+
+  * xharbour/source/rdd/hsx/hsx.c
+    ! fixed using HS_ADD()/HS_REPLACE() without STRING/BLOCK expression
+
+  * xharbour/source/vm/do.c
+    * changed to keep parameter references in DO() function. Now it works
+      like IIF()/EVAL() and HB_LIBDO()
+
+  * xharbour/source/vm/dynlibhb.c
+    + added HB_LIBERROR() which returns string with information about
+      error which appeared in LIBLOAD()/LIBFREE().
+      Now it works only for Linux.
+
+  * xharbour/source/vm/hvm.c
+    ! fixed hb_rddGetFieldValue() to not operate on unallocated stack area
+
+  * xharbour/source/vm/runner.c
+    * removed commented code
 
 2006-05-16 07:45 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * source/rtl/win32ole.prg

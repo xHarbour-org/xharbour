@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.132 2005/11/22 02:01:44 druzus Exp $
+ * $Id: itemapi.c,v 1.133 2006/01/30 02:51:25 druzus Exp $
  */
 
 /*
@@ -525,7 +525,7 @@ LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
    return 0;
 }
 
-void HB_EXPORT * hb_itemGetPtr( PHB_ITEM pItem )
+HB_EXPORT void * hb_itemGetPtr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetPtr(%p)", pItem));
 
@@ -537,6 +537,16 @@ void HB_EXPORT * hb_itemGetPtr( PHB_ITEM pItem )
    {
       return NULL;
    }
+}
+
+HB_EXPORT PHB_SYMB hb_itemGetSymbol( PHB_ITEM pItem )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemGetSymbol(%p)", pItem));
+
+   if( pItem && HB_IS_SYMBOL( pItem ) )
+      return pItem->item.asSymbol.value;
+   else
+      return NULL;
 }
 
 /* Defed out - using FastApi Version in source/vm/fastitem.c. */

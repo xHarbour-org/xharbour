@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.11 2006/04/21 11:25:33 druzus Exp $
+ * $Id: dynlibhb.c,v 1.12 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -149,6 +149,15 @@ HB_FUNC( LIBFREE )
    {
       hb_retl( FALSE );
    }
+}
+
+HB_FUNC( HB_LIBERROR )
+{
+#if defined(HB_OS_LINUX) && !defined(__WATCOMC__)
+   hb_retc( dlerror() );
+#else
+   hb_retc( NULL );
+#endif
 }
 
 /* Executes a Harbour pcode dynamically loaded DLL function or procedure

@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.13 2005/10/19 02:18:54 druzus Exp $
+ * $Id: maindllp.c,v 1.14 2005/10/24 15:55:43 druzus Exp $
  */
 
 /*
@@ -90,15 +90,18 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 }
 
 /* module symbols initialization */
-void hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
+HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
 {
    va_list ap;
    USHORT uiModuleSymbols;
+   int iPCodeVer;
+   char *szModule;
    FARPROC pProcessSymbols;
 
    va_start( ap, pModuleSymbols );
       uiModuleSymbols = ( USHORT ) va_arg( ap, int );
-      //sModule = va_arg( ap, char * );
+      szModule = va_arg( ap, char * );
+      iPCodeVer = va_arg( ap, int );
    va_end( ap );
 
    /* notice hb_vmProcessDllSymbols() must be used, and not
@@ -109,11 +112,13 @@ void hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
                                              "_hb_vmProcessDllSymbols" );
    if( pProcessSymbols )
    {
-      ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pModuleSymbols,
-                                                       uiModuleSymbols );
+      pModuleSymbols = ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )
+                     ( pModuleSymbols, uiModuleSymbols, szModule, iPCodeVer );
    }
    /* else
     *    may we issue an error ? */
+
+   return pModuleSymbols;
 }
 
 void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **pGlobals )

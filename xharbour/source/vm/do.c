@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.4 2005/05/24 21:05:56 ronpinkas Exp $
+ * $Id: do.c,v 1.5 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -59,6 +59,11 @@
 
 /* NOTE: DO() as a function is a Harbour extension. [vszakats] */
 
+/* NOTE: use hb_stackItemFromBase( uiParam ) instead of
+ *       hb_param( uiParam, HB_IT_ANY ) to keep references to
+ *       parameters passed by refeence. [druzus]
+ */
+
 HB_FUNC( DO )
 {
    PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
@@ -81,7 +86,7 @@ HB_FUNC( DO )
          uiPCount = hb_pcount();
          for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
          {
-            hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+            hb_vmPush( hb_stackItemFromBase( uiParam ) );
          }
 
          hb_vmDo( uiPCount - 1 );
@@ -104,7 +109,7 @@ HB_FUNC( DO )
       hb_vmPushSymbol( &hb_symEval );
       hb_vmPush( pItem );
       for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
-         hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+         hb_vmPush( hb_stackItemFromBase( uiParam ) );
       hb_vmSend( uiPCount - 1 );
    }
    else if( HB_IS_SYMBOL( pItem ) )
@@ -117,7 +122,7 @@ HB_FUNC( DO )
 
       for( uiParam = 2; uiParam <= uiPCount; uiParam++ )
       {
-         hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
+         hb_vmPush( hb_stackItemFromBase( uiParam ) );
       }
 
       hb_vmDo( uiPCount - 1 );

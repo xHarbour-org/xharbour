@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.65 2006/03/01 20:15:28 druzus Exp $
+ * $Id: workarea.c,v 1.66 2006/04/15 18:52:24 druzus Exp $
  */
 
 /*
@@ -811,9 +811,10 @@ ERRCODE hb_waStructSize( AREAP pArea, USHORT * uiSize )
 ERRCODE hb_waSysName( AREAP pArea, BYTE * pBuffer )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_waSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
 
-   pBuffer[ 0 ] = 0;
+   hb_strncpy( ( char * ) pBuffer, SELF_RDDNODE( pArea )->szName,
+               HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
+
    return SUCCESS;
 }
 
@@ -1037,8 +1038,8 @@ ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
    }
    else
    {
-      PHB_ITEM pItem = hb_itemNew( NULL );
       LPDBTRANSITEM pTransItem;
+      PHB_ITEM pItem;
       USHORT uiCount;
 
       /* Append a new record */
@@ -1046,6 +1047,7 @@ ERRCODE hb_waTransRec( AREAP pArea, LPDBTRANSINFO pTransInfo )
       if( errCode != SUCCESS )
          return errCode;
 
+      pItem = hb_itemNew( NULL );
       pTransItem = pTransInfo->lpTransItems;
       for( uiCount = pTransInfo->uiItemCount; uiCount; --uiCount )
       {
@@ -1460,7 +1462,7 @@ ERRCODE hb_waSetLocate( AREAP pArea, LPDBSCOPEINFO pScopeInfo )
    pArea->dbsi.fIncludeDeleted   = pScopeInfo->fIncludeDeleted;
    pArea->dbsi.fLast             = pScopeInfo->fLast;
    pArea->dbsi.fIgnoreDuplicates = pScopeInfo->fIgnoreDuplicates;
-   pArea->dbsi.fBackword         = pScopeInfo->fBackword;
+   pArea->dbsi.fBackward         = pScopeInfo->fBackward;
    pArea->dbsi.fOptimized        = pScopeInfo->fOptimized;
 
    return SUCCESS;
@@ -1560,6 +1562,7 @@ ERRCODE hb_rddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection, PHB_ITEM
       case RDDI_MULTITAG:
       case RDDI_SORTRECNO:
       case RDDI_MULTIKEY:
+      case RDDI_BLOB_SUPPORT:
          hb_itemPutL( pItem, FALSE );
          break;
 

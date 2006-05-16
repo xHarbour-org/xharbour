@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.130 2006/04/15 04:08:44 ronpinkas Exp $
+ * $Id: harbour.c,v 1.131 2006/04/15 21:07:39 likewolf Exp $
  */
 
 /*
@@ -3481,11 +3481,11 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
 {
    USHORT wSym;
-   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym, TRUE );
+   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym, FALSE );
 
    if( ! pSym )
    {
-      pSym = hb_compSymbolAdd( szMsgName, &wSym, TRUE );
+      pSym = hb_compSymbolAdd( szMsgName, &wSym, FALSE );
    }
 
    pSym->cScope |= HB_FS_MESSAGE;

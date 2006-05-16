@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.568 2006/04/26 17:32:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.569 2006/05/05 09:37:19 druzus Exp $
  */
 
 /*
@@ -2705,8 +2705,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHFIELD") );
             /* It pushes the current value of the given field onto the eval stack
              */
-            hb_rddGetFieldValue( ( * HB_VM_STACK.pPos ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             hb_stackPush();
+            hb_rddGetFieldValue( hb_stackItemFromTop( -1 ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -3478,8 +3478,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             /* It pushes the current value of the given field onto the eval stack
             */
-            hb_rddGetFieldValue( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
+            hb_rddGetFieldValue( hb_stackItemFromTop( -1 ), pDynSym->pSymbol );
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushField)"));
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -9387,16 +9387,25 @@ HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbo
 
 /* hvm support for pcode DLLs */
 
-void HB_EXPORT hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols )
+HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, ... )
 {
+   va_list ap;
+   USHORT uiModuleSymbols;
+   char *szModule;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
    hb_threadInit();
 #endif
+   va_start( ap, pSymbols );
+      uiModuleSymbols = (USHORT) va_arg( ap, int );
+      szModule = va_arg( ap, char * );
+   va_end( ap );
 
-   hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, "uknown_pcode.dll", TRUE, s_fCloneSym );
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,
+                                TRUE, s_fCloneSym )->pModuleSymbols;
 }
 
 HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
@@ -10971,8 +10980,8 @@ HB_EXPORT BOOL hb_xvmPushField( PHB_SYMB pSymbol )
 
    HB_TRACE(HB_TR_INFO, ("hb_xvmPushField(%p)", pSymbol));
 
-   hb_rddGetFieldValue( hb_stackTopItem(), pSymbol );
    hb_stackPush();
+   hb_rddGetFieldValue( hb_stackItemFromTop( -1 ), pSymbol );
 
    HB_XVM_RETURN
 }
