@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4975 2006/05/16 14:45:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4976 2006/05/16 22:57:08 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-19 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrddfpt.h
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * added support for NIL value in SIX3 FPT files
+
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/rtl/console.c
+    * cleaned some GCC4 warnings
+
+  * xharbour/include/hbxvm.h
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/compiler/gencc.c
+    * updated TRY/{CATCH,FINALLY}/END in -gc4 mode to respect recent
+      modifications in generated PCODE and changed semantic for
+      TRY/FINALLY/END
 
 2006-05-17 00:35 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh

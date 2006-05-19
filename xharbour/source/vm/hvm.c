@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.569 2006/05/05 09:37:19 druzus Exp $
+ * $Id: hvm.c,v 1.570 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -10495,13 +10495,42 @@ HB_EXPORT BOOL hb_xvmTryEnd( void )
    return hb_xvmSeqEnd();
 }
 
-HB_EXPORT BOOL hb_xvmTryRecover( LONG lFinally )
+HB_EXPORT void hb_xvmTryEndFin( void )
+{
+   HB_THREAD_STUB_STACK
+   USHORT uiActionRequest;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmTryEndFin()"));
+
+   /* store requested action */
+   uiActionRequest = s_uiActionRequest;
+
+   hb_vm_iTry--;
+   hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );
+   hb_itemRelease( hb_vm_pSequence->pPrevErrBlock );
+
+   hb_xvmSeqRecover();
+
+   /* Do we have outer sequence block? */
+   if( hb_vm_pSequence )
+   {
+      /* move the value return by BREAK statement to outer sequence block */
+      hb_itemForwardValue( hb_stackItem( hb_vm_pSequence->lBase - 1 ),
+                           hb_stackItemFromTop( -1 ) );
+   }
+
+   /* Discard the value returned by BREAK statement */
+   hb_stackPop();
+
+   /* restore requested action */
+   s_uiActionRequest = uiActionRequest;
+}
+
+HB_EXPORT BOOL hb_xvmTryRecover( void )
 {
    HB_THREAD_STUB_STACK
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmTryRecover()"));
-
-   HB_SYMBOL_UNUSED( lFinally );
 
    hb_vm_iTry--;
    hb_itemRelease( hb_errorBlock( hb_vm_pSequence->pPrevErrBlock ) );

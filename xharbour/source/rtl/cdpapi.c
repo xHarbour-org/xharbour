@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.25 2006/03/01 15:45:34 druzus Exp $
+ * $Id: cdpapi.c,v 1.26 2006/03/01 19:41:46 druzus Exp $
  */
 
 /*
@@ -537,7 +537,7 @@ HB_EXPORT ULONG hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp,
                                   BYTE * pDst, ULONG ulDst )
 {
    ULONG ulS, ulD;
-   USHORT uc;
+   USHORT uc = 0;
    int n = 0;
 
    for( ulS = ulD = 0; ulS < ulSrc; ++ulS )

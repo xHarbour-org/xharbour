@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.5 2006/04/07 13:37:46 druzus Exp $
+ * $Id: hbxvm.h,v 1.6 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -222,7 +222,8 @@ extern HB_EXPORT void   hb_xvmEnumIndex( void );
 
 extern HB_EXPORT void   hb_xvmTryBegin( void );
 extern HB_EXPORT BOOL   hb_xvmTryEnd( void );
-extern HB_EXPORT BOOL   hb_xvmTryRecover( LONG lFinaly );
+extern HB_EXPORT void   hb_xvmTryEndFin( void );
+extern HB_EXPORT BOOL   hb_xvmTryRecover( void );
 extern HB_EXPORT USHORT hb_xvmBeginFinally( void );
 extern HB_EXPORT BOOL   hb_xvmEndFinally( USHORT uiAction );
 

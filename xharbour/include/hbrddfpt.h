@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.23 2006/02/04 10:01:53 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.24 2006/04/15 18:52:23 druzus Exp $
  */
 
 /*
@@ -108,6 +108,7 @@ HB_EXTERN_BEGIN
 #define FPTIT_TEXT         0x0001      /* Text    */
 #define FPTIT_OBJ          0x0002      /* Object  */
 
+#define FPTIT_SIX_NIL      0x0000      /* NIL VALUE (USED ONLY IN ARRAYS) */
 #define FPTIT_SIX_LNUM     0x0002      /* LONG LE */
 #define FPTIT_SIX_DNUM     0x0008      /* DOUBLE LE */
 #define FPTIT_SIX_LDATE    0x0020      /* DATE (LONG LE) */

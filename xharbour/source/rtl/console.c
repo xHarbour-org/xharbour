@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.61 2006/02/07 01:22:49 peterrees Exp $
+ * $Id: console.c,v 1.62 2006/03/25 02:22:40 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -690,12 +690,14 @@ HB_FUNC( DISPOUT ) /* writes a single value to the screen, but is not affected b
 HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position, but is not affected by SET ALTERNATE */
 {
    HB_THREAD_STUB_API
-   BOOL bSetPos = ISLOG( 5 ) ? hb_parl( 5 ) : s_DispOutAtSetPos ;
    char * pszString = NULL;
    ULONG ulLen;
-   BOOL bFreeReq = FALSE ;
+   BOOL bFreeReq = FALSE;
+   BOOL bSetPos;
 
    HB_CONSOLE_SAFE_LOCK
+
+   bSetPos = ISLOG( 5 ) ? hb_parl( 5 ) : s_DispOutAtSetPos;
 
    if( ISCHAR( 4 ) )
    {
@@ -715,7 +717,6 @@ HB_FUNC( DISPOUTAT ) /* writes a single value to the screen at speficic position
       pszString = hb_itemString( hb_param( 3, HB_IT_ANY ), &ulLen, &bFreeReq );
 
       hb_gtWriteAt( hb_parni( 1 ), hb_parni( 2 ), ( BYTE * ) pszString, ulLen, bSetPos );
-
    }
 
    HB_CONSOLE_SAFE_UNLOCK
