@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.69 2006/02/25 17:32:15 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.70 2006/05/03 08:13:55 lf_sfnet Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.69 2006/02/25 17:32:15 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.70 2006/05/03 08:13:55 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1380,7 +1380,6 @@ return Self
 METHOD GotoLine( nRow ) CLASS HBEditor
    LOCAL lRefresh := .f.
 
-
    IF nRow <= ::naTextLen .AND. nRow > 0
       // Clipper Reformats the paragraph if there is some unexpected movement
       //
@@ -1875,15 +1874,15 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
          ::RefreshLine()
       endif
    elseif cAction == "LINE"
-      if nCount > 0
+      if nCount > 0 .and. ::nRow < ::naTextLen
          ::nSelEnd += nCount
          ::RefreshLine()
          ::Down()
-      elseif nCount < 0
-         if ::nSelEnd > ::nSelStart
-            ::nSelEnd += nCount
-         else
+      elseif nCount < 0 .and. ::nRow > 1
+         if ::nSelStart > ::nSelEnd
             ::nSelStart += nCount
+         else
+            ::nSelEnd += nCount
          endif
          ::RefreshLine()
          ::Up()
@@ -1942,9 +1941,15 @@ METHOD DelTextSelection() CLASS HBEditor
          ::RemoveLine( nSelStart )
       next
 
+      ::nRow := nSelStart
+
+      if empty( ::aText )
+         ::DelText()
+      endif
+
       ::ClrTextSelection()
 
-      ::GotoLine( nSelStart )
+      ::GoToPos( max( nSelStart - 1, 1 ), 1 )
 
    endif
 
@@ -1968,8 +1973,6 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
       if !lSaveIns
          ::InsertState( .T. )
       endif
-
-      tracelog( nLines )
 
       DEFAULT lAtPos TO .F.
 

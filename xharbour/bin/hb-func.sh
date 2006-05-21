@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.70 2006/04/23 00:35:59 druzus Exp $
+# $Id: hb-func.sh,v 1.71 2006/05/16 22:57:08 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -63,7 +63,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct hbodbc debug profiler"
+        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct cgi hbodbc debug profiler"
     else
         echo -n "$@"
     fi
@@ -428,7 +428,7 @@ hb_cmp()
     ( [ "\${HB_GEN//c/}" != "" ] || \\
     ( [ -f "\${FOUTC}" ] && \\
     hb_cc -c "\${FOUTC}" -o "\${FOUTO}" && \\
-    ( [ "\${HB_GEN}" = "c" ] || rm -f "\${FOUTC}" ) ) )
+    ( [ "\${HB_GEN}" = "C" ] || rm -f "\${FOUTC}" ) ) )
 }
 
 hb_link()

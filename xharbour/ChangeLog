@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4976 2006/05/16 22:57:08 druzus Exp $
+ * $Id: ChangeLog,v 1.4977 2006/05/19 00:44:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,22 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-05-21 11:30 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * bin/hb-func.sh
+    * added cgi to the lib list
+  * source/cgi/include/Makefile
+    * added cgi.ch
+  - source/cgi/make_b32.bat
+  - source/cgi/make_vc.bat
+  - source/cgi/makefile.bc
+  - source/cgi/makefile.vc
+  - source/misc/make_b32.bat
+  - source/misc/make_vc.bat
+  - source/misc/makefile.bc
+  - source/misc/makefile.vc
+  * source/rtl/teditor.prg
+    * removed tracelog and fixed text selection
+	 
 2006-05-19 02:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddfpt.h
   * xharbour/source/rdd/dbffpt/dbffpt1.c
@@ -115,7 +131,7 @@
   * source/rtl/tget.prg
     ! fixed HowMuchNumeric() function to show value in numeric var with
       picture "@E 999.99 %", as reported by Enrico M. Giordano.
-    ! fixed ParsePict() method to not extract left spaces before "9"
+    ! fixed ParsePict() method to not extract left spaces before "9" 
       in picture of numeric var, example "@E  999.99".
     ! fixed VarGet() method to maintain ::original value when exit
       with ESC before start get edition.
