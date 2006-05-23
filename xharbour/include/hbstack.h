@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.35 2005/10/24 01:23:15 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.36 2005/10/31 12:56:35 druzus Exp $
  */
 
 /*
@@ -186,8 +186,8 @@ extern void    hb_stackInit( void );       /* initializes the stack */
 extern void    hb_stackIncrease( void );   /* increase the stack size */
 
 extern void hb_stackRemove( LONG lUntilPos );
-extern HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
-extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
+HB_EXPORT extern HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
+HB_EXPORT extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
 
 HB_EXTERN_END
 

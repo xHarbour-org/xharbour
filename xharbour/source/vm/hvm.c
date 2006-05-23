@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.570 2006/05/16 22:57:08 druzus Exp $
+ * $Id: hvm.c,v 1.571 2006/05/19 00:44:36 druzus Exp $
  */
 
 /*
@@ -2339,8 +2339,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
               #endif
            }
 
-           // REVIEW: Needed?
-           //hb_stackPop();
+           hb_stackPop();
 
            bCanRecover  = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANRECOVER;
            bCanFinalize = hb_vm_pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE;

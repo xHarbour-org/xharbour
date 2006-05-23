@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.82 2006/02/22 01:33:49 ronpinkas Exp $
+ * $Id: estack.c,v 1.83 2006/02/22 01:47:37 ronpinkas Exp $
  */
 
 /*
@@ -279,7 +279,7 @@ void hb_stackRemove( LONG lUntilPos )
    }
 }
 
-HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
+HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -303,7 +303,7 @@ HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams )
    return pItem;
 }
 
-void hb_stackOldFrame( HB_STACK_STATE * pStack )
+HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
    int iLocal;
    PHB_ITEM pDetached;
