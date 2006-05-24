@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4978 2006/05/21 09:22:07 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.4979 2006/05/23 19:21:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-23 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed get of negative number small than 1, as reported by 
+      Lorenzo Fiorini.
 
 2006-05-23 12:20 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
   * include/hbstack.h

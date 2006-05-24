@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.110 2006/04/26 13:38:33 guerra000 Exp $
+ * $Id: tget.prg,v 1.111 2006/05/06 00:14:06 modalsist Exp $
  */
 
 /*
@@ -457,21 +457,18 @@ METHOD Display( lForced ) CLASS Get
 
    HBConsoleLock()
 
-   /* E.F. 2006/APRIL/12 - Display minus sign in the front of xBuffer value.
+   /* E.F. 2006/MAY/23 - Display minus sign in the front of xBuffer value.
     * IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
     *   xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
     */
    IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::minus
       xBuffer := PadL( StrTran(xBuffer,'-',''), Len(xBuffer) )
-      IF Val(xBuffer) != 0
-         IF ::DecPos > 0 .AND. ::DecPos < Len( xBuffer)
-            xBuffer :=  PadL( '-'+Ltrim(SubStr( xBuffer, 1, ::DecPos - 1 )) + "." + SubStr( xBuffer, ::DecPos + 1 ) , Len(xBuffer) )
-         ELSE
-            xBuffer :=  PadL( '-'+Ltrim( xBuffer), Len(xBuffer) )
-         ENDIF
+      IF ::DecPos > 0 .AND. ::DecPos < Len( xBuffer)
+         xBuffer :=  PadL( '-'+Ltrim(SubStr( xBuffer, 1, ::DecPos - 1 )) + "." + SubStr( xBuffer, ::DecPos + 1 ) , Len(xBuffer) )
       ELSE
-         ::minus := .F.
+         xBuffer :=  PadL( '-'+Ltrim( xBuffer), Len(xBuffer) )
       ENDIF
+
    ENDIF
 
 
@@ -796,8 +793,13 @@ METHOD VarGet() CLASS Get
       IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) ) 
          cVarGet := Stuff( cVarGet, nDecPos+1, ::nMaxLen - nDecPos, replicate("0",::nMaxLen - nDecPos) )
       ENDIF
-      
+
       xVarGet := Val( cVarGet )
+
+      /* E.F. 2006/MAY/23 - Avoid minus flag if get value is zero. */
+      IF xVarGet == 0
+         ::minus := .F.
+      ENDIF
 
    ENDIF
 
