@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4981 2006/05/30 10:51:23 druzus Exp $
+ * $Id: ChangeLog,v 1.4982 2006/05/30 16:19:07 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-05-31 0:50 UTC-0100 Ath <Ath1 at sourceforge.net>
+  * xharbour/source/vm/hvm.c
+    * fixed typo in function name - should be hb_xvmExitProc() not
+      hb_xvmExitPorc()
+  * xharbour/utils/hbmake/hbmake.prg
+    + Added checkbox to generate C-source instead of PCode source
+      using -go3 compiler option
+  * xharbour/utils/hbmake/tmake.prg
+    + Added logic to detect -go3 compiler option
+  
 2005-10-30 18:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/sdf1.c
     * cleaned BCC warning

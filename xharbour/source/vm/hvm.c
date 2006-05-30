@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.571 2006/05/19 00:44:36 druzus Exp $
+ * $Id: hvm.c,v 1.572 2006/05/23 19:21:18 ronpinkas Exp $
  */
 
 /*
@@ -10372,7 +10372,7 @@ static BOOL hb_xvmActionRequest( void )
    return FALSE;
 }
 
-HB_EXPORT void hb_xvmExitPorc( ULONG ulPrivateBase )
+HB_EXPORT void hb_xvmExitProc( ULONG ulPrivateBase )
 {
    HB_THREAD_STUB_STACK
 

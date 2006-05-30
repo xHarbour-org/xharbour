@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.14 2005/10/31 00:00:00 modalsist Exp $
+ * $Id: tmake.prg,v 1.14 2005/11/05 15:01:52 modalsist Exp $
  */
 
 /*
@@ -126,6 +126,7 @@ DATA  cWarningLevel  init 0
 DATA  cTopModule     init ""
 DATA  cRes           init ""
 DATA  cMacro         init ""
+DATA  lGenCsource    init .f.      // Ath added 31-05-2006
 
 METHOD New()
 METHOD ReadMakefile()
@@ -174,6 +175,7 @@ METHOD ReadMakefile(cFile) CLASS THbMake
     Local cItem
     LOCAL lLinux      := At( 'linux', Lower( Os() ) ) > 0
     Local lExtended   := .T., szProject
+    LOCAL lPrgObjRule := .F.
 
     nHandle := FT_FUSE( cFile )
     IF nHandle < 0
@@ -482,6 +484,18 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
         ENDIF
 
+        IF lComSec        // Ath added 31-05-2006
+
+            IF lPrgObjRule
+                ::lGenCsource := "-go3" IN LOWER(cTemp)
+                lPrgObjRule := .F.
+            ENDIF
+            IF aTemp[ 1 ] == ".prg.obj:" .OR. aTemp[ 1 ] == ".prg.o:"
+                lPrgObjRule := .T.
+            ENDIF
+
+        ENDIF               // end Ath added 31-05-2006
+        
         IF cTemp = "#BUILD"
 
             cBuffer := cTemp
