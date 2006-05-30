@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.12 2006/01/15 03:37:18 lculik Exp $
+ * $Id: dbsdf.prg,v 1.13 2006/01/17 03:06:51 lculik Exp $
  */
 
 /*
@@ -9,6 +9,10 @@
  *
  * Copyright 2001-2002 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
+ *
+ * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *    function __dbSDF() replaced by the new one which uses
+ *    SDF RDD I've just created
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +54,19 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
+
+   IF lExport
+      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF", , cCdp )
+   ELSE
+      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF", , cCdp )
+   ENDIF
+
+RETURN
+
+
+#ifdef __DBSDF_OLD_CODE__
 
 #include "hbcommon.ch"
 #include "fileio.ch"
@@ -302,3 +319,5 @@ STATIC FUNCTION ImportFixed( cLine, index, lLineEnd )
    ENDIF
 
 Return cBuffer
+
+#endif /* __DBSDF_OLD_CODE__ */

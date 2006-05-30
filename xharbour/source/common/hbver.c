@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.33 2006/02/21 19:37:06 druzus Exp $
+ * $Id: hbver.c,v 1.34 2006/03/10 15:32:19 druzus Exp $
  */
 
 /*
@@ -994,7 +994,7 @@ char *hb_credits()
           "Phil Krylov <phil@newstar.rinet.ru>\n"
           "Philip Chee <philip@aleytys.pc.my>\n"
           "Pritpal Bedi <pritpal@vouchcac.com>\n"
-          "Przemyslaw Czerpak <druzus@polbox.com>\n"
+          "Przemyslaw Czerpak <druzus@priv.onet.pl>\n"
           "Rodrigo Moreno <rodrigo_moreno@users.sourceforge.net>\n"
           "Ron Pinkas <ron@profit-master.com>\n"
           "Ryszard Glab <rglab@imid.med.pl>\n"

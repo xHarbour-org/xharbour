@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.71 2006/05/16 22:57:08 druzus Exp $
+# $Id: hb-func.sh,v 1.72 2006/05/21 09:22:07 lf_sfnet Exp $
 #
 
 # ---------------------------------------------------------------
@@ -428,7 +428,7 @@ hb_cmp()
     ( [ "\${HB_GEN//c/}" != "" ] || \\
     ( [ -f "\${FOUTC}" ] && \\
     hb_cc -c "\${FOUTC}" -o "\${FOUTO}" && \\
-    ( [ "\${HB_GEN}" = "C" ] || rm -f "\${FOUTC}" ) ) )
+    ( [ "\${HB_GEN}" = "c" ] || rm -f "\${FOUTC}" ) ) )
 }
 
 hb_link()

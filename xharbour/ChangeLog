@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4979 2006/05/23 19:21:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4980 2006/05/24 01:07:08 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-30 12:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/libmisc/hb_f.c
+    ! fixed bug in record numbering after reaching EOF position and
+      backward skipping
+
+  * xharbour/include/hbrdddel.h
+  * xharbour/source/rdd/delim1.c
+    + implemented DELIM RDD. It should be fully Clipper compatible
+      in comma files parsing. If you will find any difference, please
+      inform me and I'll update it. Unlike in Clipper in [x]Harbour
+      these RDD can be used also in direct import operations with
+      APPEND FROM ... VIA "DELIM"
+      These RDD also support whole record transfering between RDDs
+      if they support the same record format and field representation
+      and can translate extended field types like "I", "B", "V3", "V4",
+      etc.
+
+  * xharbour/source/rtl/dbdelim.prg
+    * replaced old code of __dbDelim() function with simple calls to
+      __dbCopy()/__dbApp() - it should fix most of the reported
+      incompatibilities in DELIM import/export operations and
+      increase their speed many times
+
+  * xharbour/include/hbrddsdf.h
+  * xharbour/source/rdd/sdf1.c
+    + implemented SDF RDD. It should be fully Clipper compatible
+      in SDF files parsing. If you will find any difference, please
+      inform me and I'll update it. Unlike in Clipper in [x]Harbour
+      these RDD can be used also in direct import operations with
+      APPEND FROM ... VIA "SDF"
+      These RDD also support whole record transfering between RDDs
+      if they support the same record format and field representation
+      and can translate extended field types like "I", "B", "V3", "V4",
+      etc.
+
+  * xharbour/source/rtl/dbsdf.prg
+    * replaced old code of __dbSDF() function with simple calls to
+      __dbCopy()/__dbApp() - it should fix most of the reported
+      incompatibilities in SDF import/export operations and
+      increase their speed many times
+
+  * xharbour/source/rdd/dbcmd.c
+    + added support for table structure inheriting in transfer RDDs.
+    + added eleventh parameter with delimiter to __dbCopy()/__dbApp()
+
+  * xharbour/source/rdd/dbf1.c
+    * force 10 bytes size for memo fields in DBF and SMT memos.
+    * some minor clean-up.
+
+  * xharbour/source/rdd/workarea.c
+    * added some dummy DBI_* actions in base RDD level
+
+  * xharbour/bin/hb-func.sh
+    ! fixed case typo
+
+  * xharbour/include/hbxvm.h
+  * xharbour/source/compiler/gencc.c
+    * fixed typo in function name - should be hb_xvmExitProc() not
+      hb_xvmExitPorc()
+
+  * xharbour/source/common/hbver.c
+    * changed my email address
 
 2006-05-23 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

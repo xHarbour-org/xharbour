@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.20 2006/01/12 02:04:37 lculik Exp $
+ * $Id: dbdelim.prg,v 1.21 2006/02/14 01:47:07 druzus Exp $
  */
 
 /*
@@ -10,6 +10,10 @@
  * Copyright 2001-2002 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
  * APPEND FROM code submitted by Marco Braida <marcobra@elart.it>
+ *
+ * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
+ *    function __dbDelim() replaced by the new one which uses
+ *    DELIM RDD I've just created
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,11 +56,26 @@
  *
  */
 
+REQUEST DELIM
+
+PROCEDURE __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
+
+   IF lExport
+      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", , , cDelimArg )
+   ELSE
+      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", , , cDelimArg )
+   ENDIF
+
+RETURN
+
+
+#ifdef __DBDELIM_OLD_CODE__
+
 #include "hbcommon.ch"
 #include "fileio.ch"
 #include "error.ch"
 
-HB_FILE_VER( "$Id: dbdelim.prg,v 1.20 2006/01/12 02:04:37 lculik Exp $" )
+HB_FILE_VER( "$Id: dbdelim.prg,v 1.21 2006/02/14 01:47:07 druzus Exp $" )
 
 PROCEDURE __dbDelim( lExport, cFileName, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
 
@@ -230,3 +249,5 @@ PROCEDURE AppendToDb( cFile, cDelimiter, hFile, cCdpSrc )
    ENDIF
 
 RETURN
+
+#endif /* __DBDELIM_OLD_CODE__ */
