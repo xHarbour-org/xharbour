@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: sdf1.c,v 1.16 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -920,7 +920,7 @@ static ERRCODE hb_sdfClose( SDFAREAP pArea )
  */
 static ERRCODE hb_sdfCreate( SDFAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
-   ERRCODE errCode = SUCCESS;
+   ERRCODE errCode;
    PHB_FNAME pFileName;
    PHB_ITEM pError = NULL;
    BOOL fRetry;
