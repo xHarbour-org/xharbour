@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.111 2006/05/06 00:14:06 modalsist Exp $
+ * $Id: tget.prg,v 1.112 2006/05/24 01:07:08 modalsist Exp $
  */
 
 /*
@@ -244,12 +244,23 @@ METHOD ParsePict( cPicture ) CLASS Get
    local nAt
    local nFor
    local cNum
+   local nRat
 
    LOCAL nLen,nDec
 
    cNum := ""
 
-   if Left( cPicture, 1 ) == "@"
+   /* E.F. 2006/MAY/31 - Search by last occurrence of "@" into picture
+    * to verify if picture has a function and avoid any char before it.
+    */
+   //if Left( cPicture, 1 ) == "@"
+   nRat := RAT("@", cPicture )
+   if nRat > 0
+
+      if nRat > 1
+         cPicture := SubStr( cPicture, nRat )
+         ::cPicture := cPicture
+      endif
 
       nAt := At( " ", cPicture )
 
@@ -1705,22 +1716,30 @@ METHOD DeleteAll() CLASS Get
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable()
 
-   /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E' and '@R'
-    * masks of numeric vars, into display edit buffer.
+   /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E','@R' 
+    * masks of numeric vars, into display edit buffer after first key number
+    * is entered.
+    * E.F. 2006/MAY/31 - Idem for numeric mask without '@E' or '@R' as
+    * pict '999,999,999.99' also.
     */
    IF ::type=="N" .AND. ::buffer != NIL .AND. !empty(::cPicture) .AND.;
-      ("," IN ::cPicture .AND. "." IN ::cPicture)
-      IF "R" IN ::cPicFunc 
+      ("," IN ::cPicture .AND. "." IN ::cPicture) 
+      IF "R" IN ::cPicFunc .AND. !("E" IN ::cPicFunc) .OR. Empty( ::cPicFunc ) 
          ::buffer := StrTran(::buffer, ".", "" )
          ::buffer := StrTran(::buffer, ",", "" )
          ::buffer := Transform( ::buffer, ::cPicture )
       ELSEIF "E" IN ::cPicFunc
-         ::buffer := Transform( ::buffer, ::cPicture )
+         IF "R" IN ::cPicFunc
+            ::buffer := Transform( ::buffer, ::cPicMask )
+         ELSE
+            ::buffer := Transform( ::buffer, ::cPicture )
+         ENDIF
          ::buffer := StrTran(::buffer, ".", chr(1) )
          ::buffer := StrTran(::buffer, ",", "." )
          ::buffer := StrTran(::buffer, chr(1), "," )
       ENDIF
    ENDIF
+
 
 return Self
 

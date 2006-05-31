@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4985 2006/05/31 12:06:44 druzus Exp $
+ * $Id: ChangeLog,v 1.4986 2006/05/31 12:18:45 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-31 15:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed to show commas and dots in display while edit numeric vars
+      with pictures "999,999.99" , "@R 999,999.99" or "@E 999,999.99".
+      Bug reported by Ed Horbino.
+    ! fixed to avoid any char prior to "@" into picture.
 
 2006-05-31 14:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/ChangeLog
