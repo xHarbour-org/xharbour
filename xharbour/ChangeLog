@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4983 2006/05/30 23:22:11 ath1 Exp $
+ * $Id: ChangeLog,v 1.4984 2006/05/31 12:05:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,7 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2005-10-31 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2006-05-31 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/source/rdd/dbcmd.c
     ! fixed default RDD seting in APPEND FROM / COPY TO
 
