@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4984 2006/05/31 12:05:44 druzus Exp $
+ * $Id: ChangeLog,v 1.4985 2006/05/31 12:06:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-05-31 14:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/ChangeLog
+    * fixed dates I set in ChangeLog entries
 
 2006-05-31 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/source/rdd/dbcmd.c
@@ -22,7 +26,7 @@
   * xharbour/utils/hbmake/tmake.prg
     + Added logic to detect -go3 compiler option
   
-2005-10-30 18:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+2006-05-30 18:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/sdf1.c
     * cleaned BCC warning
   * xharbour/source/rdd/delim1.c
