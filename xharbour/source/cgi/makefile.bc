@@ -1,0 +1,206 @@
+#
+# $Id: makefile.bc,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
+#
+
+#
+# Makefile for Harbour Project for Borland C/C++ 3.x, 4.x, 5.x compilers
+#
+
+#
+# NOTE: You can use these envvars to configure the make process:
+#       (note that these are all optional)
+#
+#       CFLAGS       - Extra C compiler options for libraries and for 
+#                      executables
+#       C_USR        - Extra C compiler options for libraries and for 
+#                      executables (GNU make compatible envvar)
+#       CLIBFLAGS    - Extra C compiler options for the libraries
+#       HARBOURFLAGS - Extra Harbour compiler options
+#       PRG_USR      - Extra Harbour compiler options
+#                      (GNU make compatible envvar)
+#
+
+#
+# NOTE: "echo." intentionally used instead of "echo", to avoid conflicts
+#       with external commands named echo.
+#
+
+!if $d(B16)
+
+CC = bcc
+AS = tasm
+
+# Borland C/C++ (DOS 16 bits)
+CFLAGS = -mh $(CFLAGS)
+
+BIN_DIR = bin\b16
+LIB_DIR = lib\b16
+OBJ_DIR = obj\b16
+
+!else
+
+CC = bcc32
+AS = tasm32
+
+BIN_DIR = ..\..\bin
+LIB_DIR = ..\..\lib\b32
+OBJ_DIR = obj\b32
+
+# This is needed, otherwise the libs may overflow when 
+# debug info is requested with -v -y
+ARFLAGS = /P32 /0
+
+!endif
+
+!if !$d(BCC_NOOPTIM)
+CFLAGS = -O2 $(CFLAGS)
+!endif
+
+#
+# Directory macros. These should never have to change.
+#
+
+INCLUDE_DIR  = include;..\..\include
+TOOLS_DIR    = .
+
+#
+# C compiler definition and C flags. These should never have to change.
+#
+
+CFLAGS         = -I$(INCLUDE_DIR) -d $(C_USR) $(CFLAGS)
+CLIBFLAGS      = -c $(CFLAGS) $(CLIBFLAGS)
+CLIBFLAGSDEBUG = -v $(CLIBFLAGS)
+HARBOURFLAGS   = -i$(INCLUDE_DIR) -n -w0 -gc0 -q $(PRG_USR) $(HARBOURFLAGS)
+LDFLAGS        = $(LDFLAGS)
+
+#
+# Macros to access our library names
+#
+
+TOOLS_LIB    = $(LIB_DIR)\cgi.lib
+
+HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
+
+#
+# Rules
+#
+
+#
+# TOOLS.LIB rules
+#
+TOOLS_LIB_OBJS = \
+        $(OBJ_DIR)\thtm.obj \
+        $(OBJ_DIR)\tedit.obj \
+        $(OBJ_DIR)\tfile.obj \
+        $(OBJ_DIR)\htjlist.obj \
+        $(OBJ_DIR)\hjwindow.obj \
+        $(OBJ_DIR)\tcgi.obj \
+        $(OBJ_DIR)\tframe.obj \
+        $(OBJ_DIR)\hterrsys.obj \
+        $(OBJ_DIR)\htmutil.obj 
+
+#
+# Our default target
+#
+
+all: \
+   $(TOOLS_LIB) \
+
+CLEAN:
+   -@if exist $(TOOLS_LIB) erase $(TOOLS_LIB)
+   -@if exist $(OBJ_DIR)\*.obj erase $(OBJ_DIR)\*.obj
+   -@if exist $(OBJ_DIR)\*.c   erase $(OBJ_DIR)\*.c
+   -@if exist $(OBJ_DIR)\*.res erase $(OBJ_DIR)\*.res
+   -@if exist $(OBJ_DIR)\*.map erase $(OBJ_DIR)\*.map
+   -@if exist $(OBJ_DIR)\*.rws erase $(OBJ_DIR)\*.rws
+
+#
+# Library dependencies and build rules
+#
+
+$(TOOLS_LIB)  : $(TOOLS_LIB_OBJS)
+
+
+$(OBJ_DIR)\thtm.c : $(TOOLS_DIR)\thtm.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\thtm.obj : $(OBJ_DIR)\thtm.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htmbrows.c : $(TOOLS_DIR)\htmbrows.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htmbrows.obj : $(OBJ_DIR)\htmbrows.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tedit.c : $(TOOLS_DIR)\tedit.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tedit.obj : $(OBJ_DIR)\tedit.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tfile.c : $(TOOLS_DIR)\tfile.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tfile.obj : $(OBJ_DIR)\tfile.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htjlist.c : $(TOOLS_DIR)\htjlist.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htjlist.obj : $(OBJ_DIR)\htjlist.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tini.c : $(TOOLS_DIR)\tini.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tini.obj : $(OBJ_DIR)\tini.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\hjwindow.c : $(TOOLS_DIR)\hjwindow.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hjwindow.obj : $(OBJ_DIR)\hjwindow.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tcgi.c : $(TOOLS_DIR)\tcgi.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tcgi.obj : $(OBJ_DIR)\tcgi.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\tframe.c : $(TOOLS_DIR)\tframe.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\tframe.obj : $(OBJ_DIR)\tframe.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htcount.c : $(TOOLS_DIR)\htcount.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htcount.obj : $(OBJ_DIR)\htcount.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\hterrsys.c : $(TOOLS_DIR)\hterrsys.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\hterrsys.obj : $(OBJ_DIR)\hterrsys.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\htmutil.c : $(TOOLS_DIR)\htmutil.prg
+   $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
+
+$(OBJ_DIR)\htmutil.obj : $(OBJ_DIR)\htmutil.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
