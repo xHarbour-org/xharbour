@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4987 2006/05/31 19:03:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.4988 2006/06/02 12:34:08 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-02 09:17 UTC-0800 Ron Pinkas <Ron in xHarbour.com>
+  * source\pp\ppcore.c
+    * Corrected __DATE__ output to follow standard C
 
 2006-06-02 14:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh
@@ -101,7 +105,7 @@
       using -go3 compiler option
   * xharbour/utils/hbmake/tmake.prg
     + Added logic to detect -go3 compiler option
-  
+
 2006-05-30 18:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/sdf1.c
     * cleaned BCC warning
@@ -174,7 +178,7 @@
 
 2006-05-23 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
-    ! fixed get of negative number small than 1, as reported by 
+    ! fixed get of negative number small than 1, as reported by
       Lorenzo Fiorini.
 
 2006-05-23 12:20 UTC-0800 Ron Pinkas <Ron in xHarbour.com>

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.226 2006/04/13 22:47:23 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.227 2006/04/27 18:34:01 walito Exp $
  */
 
 /*
@@ -808,17 +808,23 @@ void hb_pp_Init( void )
    }
 
    {
-      char szResult[ 11 ];
-      time_t t;
-      struct tm * oTime;
+      char szResult[ 14 ], *curtime;
+      time_t tm;
 
-      time( &t );
-      oTime = localtime( &t );
+      tm = time(NULL);
+      curtime = ctime(&tm);
 
-      sprintf( szResult, "\"%04d%02d%02d\"", oTime->tm_year + 1900, oTime->tm_mon + 1, oTime->tm_mday );
+      strncpy( szResult, "\"", 1 );
+      strncpy( szResult + 1, curtime +  4, 7 );
+      strncpy( szResult + 8, curtime + 20, 4 );
+      strncpy( szResult + 12, "\"", 2 );
+
       hb_pp_AddDefine( "__DATE__", szResult );
 
-      sprintf( szResult, "\"%02d:%02d:%02d\"", oTime->tm_hour, oTime->tm_min, oTime->tm_sec );
+      strncpy( szResult, "\"", 1 );
+      strncpy( szResult + 1, curtime + 11, 8 );
+      strncpy( szResult + 9, "\"", 2 );
+
       hb_pp_AddDefine( "__TIME__", szResult );
    }
 
