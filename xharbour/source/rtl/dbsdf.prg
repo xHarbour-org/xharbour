@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.13 2006/01/17 03:06:51 lculik Exp $
+ * $Id: dbsdf.prg,v 1.14 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -54,6 +54,8 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+REQUEST SDF
 
 PROCEDURE __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
 

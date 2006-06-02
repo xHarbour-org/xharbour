@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.72 2006/05/21 09:22:07 lf_sfnet Exp $
+# $Id: hb-func.sh,v 1.73 2006/05/30 10:51:23 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -63,7 +63,7 @@ mk_hbgetlibs()
 {
     if [ -z "$@" ]
     then
-        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct cgi hbodbc debug profiler"
+        echo -n "vm pp rtl pcrepos rdd dbffpt dbfcdx dbfntx hsx hbsix usrrdd ${HB_DB_DRVEXT} macro common lang codepage gtnul gtcrs gtsln gtxvt gtxwc gtalleg gtcgi gtstd gtpca gtwin gtwvt gtdos gtos2 tip ct cgi hbodbc debug profiler"
     else
         echo -n "$@"
     fi
