@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.16 2006/05/30 10:51:23 druzus Exp $
+ * $Id: delim1.c,v 1.17 2006/05/30 16:19:08 druzus Exp $
  */
 
 /*
@@ -1149,9 +1149,9 @@ static ERRCODE hb_delimClose( DELIMAREAP pArea )
  */
 static ERRCODE hb_delimCreate( DELIMAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
-   ERRCODE errCode = SUCCESS;
-   PHB_FNAME pFileName;
    PHB_ITEM pError = NULL;
+   PHB_FNAME pFileName;
+   ERRCODE errCode;
    BOOL fRetry;
    BYTE szFileName[ _POSIX_PATH_MAX + 1 ];
 

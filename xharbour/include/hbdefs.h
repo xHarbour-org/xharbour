@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.80 2006/03/01 13:06:22 druzus Exp $
+ * $Id: hbdefs.h,v 1.81 2006/03/21 23:02:48 likewolf Exp $
  */
 
 /*
@@ -394,11 +394,13 @@
 #define HB_LIM_INT64(l)       ( INT64_MIN <= (l) && (l) <= INT64_MAX )
 
 /*
- * It's a hack for MSC which doesn't support LL suffix for LONGLONG
+ * It's a hack for compilers which don't support LL suffix for LONGLONG
  * numeric constant. This suffix is necessary for some compilers -
  * without it they cut the number to LONG
  */
-#if ( defined( _MSC_VER ) || defined( __BORLANDC__ ) ) && !defined(__DMC__)
+#if __BORLANDC__ -0 >= 1328
+#  define HB_LL( num )           num##i64
+#elif defined( _MSC_VER ) || defined( __BORLANDC__ )
 #  define HB_LL( num )           num
 #else
 #  define HB_LL( num )           num##LL

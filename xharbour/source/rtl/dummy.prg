@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.5 2005/11/06 13:31:04 ptsarenko Exp $
+ * $Id: dummy.prg,v 1.5 2005/11/06 10:59:16 ptsarenko Exp $
  */
 
 /*
@@ -61,5 +61,4 @@ FUNCTION ordCond()         ; RETURN NIL
 /* NOTE: Internal functions */
 FUNCTION __dbFList()       ; RETURN {}
 FUNCTION __dbOpenSDF()     ; RETURN NIL
-FUNCTION __dbTrans()       ; RETURN NIL
 FUNCTION __dbTransRec()    ; RETURN NIL
