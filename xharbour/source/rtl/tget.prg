@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.112 2006/05/24 01:07:08 modalsist Exp $
+ * $Id: tget.prg,v 1.113 2006/05/31 19:03:43 modalsist Exp $
  */
 
 /*
@@ -544,18 +544,50 @@ METHOD End() CLASS Get
    local nLastCharPos, nPos, nFor
 
    if ::HasFocus != nil .and. ::HasFocus
+
+      /* 2006/JUN/03 - E.F. if cursor is already in last get value entered
+       * position +1, then go to the end display position.
+       */
+      if ::Pos > ::FirstEditable() .and. ::IsEditable(::Pos) .and. ::Pos < ::nMaxEdit .and. empty( ::buffer[::Pos] )
+         ::Pos := ::nMaxEdit
+         ::TypeOut := .f.
+         ::Clear := .f.
+         ::Display( .f. )
+         return Self
+      endif
+      /**/
+
       nLastCharPos := Min( Len( RTrim( ::buffer ) ) + 1, ::nMaxEdit )
+
       if ::Pos != nLastCharPos
          nPos := nLastCharPos
       else
          nPos := ::nMaxEdit
       endif
+
       for nFor := nPos to ::FirstEditable() step -1
-         if ::IsEditable( nFor )
-            ::Pos := nFor
+
+         /* 2006/JUN/02 - E.F. Adjust cursor positon to valid end position */
+         if ::IsEditable( nFor ) .and. !empty( ::buffer[nFor] )
+            nFor++
+            while !::IsEditable(nFor) .and. nFor < ::nMaxEdit
+              nFor++
+            end
+            ::Pos := Min(nFor,::nMaxEdit)
             exit
          endif
+         /**/
+
       next
+
+      /* 2006/JUN/02 - E.F. if cursor reach first editable position, then go to
+       * the end display position
+       */
+      if ::Pos == ::FirstEditable()  
+         ::Pos := ::nMaxEdit
+      endif
+      /**/
+
       ::TypeOut := .f.
       ::Clear := .f.
       ::Display( .f. )
@@ -1309,7 +1341,10 @@ METHOD ToDecPos() CLASS Get
       return Self
    endif
 
-   if ::pos == ::FirstEditable()
+   /* 2006/JUN/05 - E.F. Deletall only if we press dot or comma in a numeric
+      var. */
+   if ::pos == ::FirstEditable() .and. ::Type == 'N' .and.;
+      ( Lastkey()=asc('.') .or. Lastkey()==asc(',') )
       ::DeleteAll()
    endif
 

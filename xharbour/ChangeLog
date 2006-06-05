@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4989 2006/06/02 16:19:19 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.4990 2006/06/04 18:30:06 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-05 08:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    !fixed end() method to repos cursor in a correct position when a non
+     numeric get has picture with dot and/or comma.
+    !fixed todecpos() method to not convert to zeros when in the initial value
+     of a numeric get is not zero and we press enter. The correct value must
+     be initial value instead zeros. Thanks to Ed Horbino for bug reports.
 
 2006-06-04 18:30 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/include/hbdefs.h
