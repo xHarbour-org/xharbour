@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4990 2006/06/04 18:30:06 druzus Exp $
+ * $Id: ChangeLog,v 1.4991 2006/06/05 11:33:13 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-06-06 09:58 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/filesys.c
+     + added HB_OS2_IO sections to work around a GCC 'feature' on OS/2
+       which makes it fail to open/create files on filesystems which do
+       not support extended attributes (EAs).
 
 2006-06-05 08:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.156 2005/11/04 12:06:00 druzus Exp $
+ * $Id: filesys.c,v 1.157 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -178,14 +178,26 @@
    extern int fdatasync(int fildes);
 #elif defined(HB_OS_DOS)
    #include <dos.h>
+
 #elif defined(HB_OS_OS2)
    #include <sys/signal.h>
    #include <sys/process.h>
    #include <sys/wait.h>
    #include <share.h>
+
    #ifndef SH_COMPAT
-      #define SH_COMPAT    0x0000
+      #define SH_COMPAT SH_DENYNO
    #endif
+
+   /* 15/12/2005 - <maurilio.longo@libero.it>
+                   Due to a 'feature' of latest GCC on OS/2 I have to use
+                   DosOpen() to open files instead of LIBC sopen() since
+                   sopen() now adds EAs to mew files and fails if filesystem
+                   does not handle them. Removing this #define puts back
+                   LIBC code.
+   */
+   #define  HB_OS2_IO
+
 #elif defined( HB_WIN32_IO )
    #include <windows.h>
 
@@ -389,6 +401,93 @@ static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
          *dwAttr |= FILE_ATTRIBUTE_SYSTEM;
    }
 }
+
+
+#elif defined( HB_OS2_IO )
+
+static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
+                                ULONG *ulAttribute,
+                                ULONG *fsOpenFlags,
+                                ULONG *fsOpenMode )
+{
+   if( fCreate )
+   {
+      *fsOpenFlags = OPEN_ACTION_CREATE_IF_NEW | OPEN_ACTION_REPLACE_IF_EXISTS;
+      *fsOpenMode = OPEN_ACCESS_READWRITE | OPEN_FLAGS_FAIL_ON_ERROR | OPEN_FLAGS_NOINHERIT;
+   }
+   else
+   {
+      if( uiFlags & FO_CREAT )
+      {
+         if( uiFlags & FO_EXCL )
+            *fsOpenFlags = OPEN_ACTION_CREATE_IF_NEW | OPEN_ACTION_FAIL_IF_EXISTS;
+         else if( uiFlags & FO_TRUNC )
+            *fsOpenFlags = OPEN_ACTION_CREATE_IF_NEW | OPEN_ACTION_REPLACE_IF_EXISTS;
+         else
+            *fsOpenFlags = OPEN_ACTION_CREATE_IF_NEW | OPEN_ACTION_OPEN_IF_EXISTS;
+      }
+      else if( uiFlags & FO_TRUNC )
+      {
+         *fsOpenFlags = OPEN_ACTION_FAIL_IF_NEW | OPEN_ACTION_REPLACE_IF_EXISTS;
+      }
+      else
+      {
+         *fsOpenFlags = OPEN_ACTION_FAIL_IF_NEW | OPEN_ACTION_OPEN_IF_EXISTS;
+      }
+
+      *fsOpenMode = 0 | OPEN_FLAGS_FAIL_ON_ERROR | OPEN_FLAGS_NOINHERIT;
+
+      switch( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) )
+      {
+         case FO_READWRITE:
+            *fsOpenMode |= OPEN_ACCESS_READWRITE;
+            break;
+         case FO_WRITE:
+            *fsOpenMode |= OPEN_ACCESS_WRITEONLY;
+            break;
+         case FO_READ:
+            *fsOpenMode |= OPEN_ACCESS_READONLY;
+            break;
+      }
+   }
+
+   /* shared flags */
+   switch( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE | FO_DENYNONE ) )
+   {
+      case FO_DENYREAD:
+         *fsOpenMode |= OPEN_SHARE_DENYREAD;
+         break;
+      case FO_DENYWRITE:
+         *fsOpenMode |= OPEN_SHARE_DENYWRITE;
+         break;
+      case FO_EXCLUSIVE:
+         *fsOpenMode |= OPEN_SHARE_DENYREADWRITE;
+         break;
+      default:
+         *fsOpenMode |= OPEN_SHARE_DENYNONE;
+         break;
+   }
+
+   /* file attributes flags */
+   if( uiAttr == FC_NORMAL )
+   {
+      *ulAttribute = FILE_NORMAL;
+   }
+   else
+   {
+      *ulAttribute = FILE_NORMAL | FILE_ARCHIVED;
+
+      if( uiAttr & FC_READONLY )
+         *ulAttribute |= FILE_READONLY;
+
+      if( uiAttr & FC_HIDDEN )
+         *ulAttribute |= FILE_HIDDEN;
+
+      if( uiAttr & FC_SYSTEM )
+         *ulAttribute |= FILE_SYSTEM;
+   }
+}
+
 
 #else
 
@@ -1500,6 +1599,39 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 
       hFileHandle = HandleToLong(hFile);
    }
+
+#elif defined( HB_OS2_IO )
+
+   {
+      ULONG ulAttribute, fsOpenFlags, fsOpenMode;
+      APIRET rc;
+      ULONG ulAction;
+      HFILE hFile = FS_ERROR;
+
+      /* On OS/2 it has only 6 parameters */
+      convert_open_flags( FALSE, FC_NORMAL, uiFlags, &ulAttribute, &fsOpenFlags, &fsOpenMode );
+
+      rc = DosOpen( (PSZ) pFilename,
+                    &hFile,
+                    &ulAction,
+                    0L,
+                    ulAttribute,
+                    fsOpenFlags,
+                    fsOpenMode,
+                    0L );
+
+      /* On OS/2 errors 0..99 have the same meaning they had on DOS */
+      hb_fsSetError( rc );
+
+      if ( rc == NO_ERROR ) {
+         hFileHandle = _imphandle( hFile );
+         // Defaults to O_TEXT inside LIBC
+         setmode( hFileHandle, O_BINARY );
+      } else  {
+         hFileHandle = FS_ERROR;
+      }
+   }
+
 #elif defined(HB_FS_FILE_IO)
    {
       int flags, share, attr;
@@ -1563,6 +1695,39 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 
       hFileHandle = HandleToLong(hFile);
    }
+
+#elif defined( HB_OS2_IO )
+
+   {
+      ULONG ulAttribute, fsOpenFlags, fsOpenMode;
+      APIRET rc;
+      ULONG ulAction;
+      HFILE hFile = FS_ERROR;
+
+      /* On OS/2 it has only 6 parameters */
+      convert_open_flags( TRUE, uiAttr, FO_EXCLUSIVE, &ulAttribute, &fsOpenFlags, &fsOpenMode );
+
+      rc = DosOpen( (PSZ) pFilename,
+                    &hFile,
+                    &ulAction,
+                    0L,
+                    ulAttribute,
+                    fsOpenFlags,
+                    fsOpenMode,
+                    0L );
+
+      /* On OS/2 errors 0..99 have the same meaning they had on DOS */
+      hb_fsSetError( rc );
+
+      if ( rc == NO_ERROR ) {
+         hFileHandle = _imphandle( hFile );
+         // Defaults to O_TEXT inside LIBC
+         setmode( hFileHandle, O_BINARY );
+      } else  {
+         hFileHandle = FS_ERROR;
+      }
+   }
+
 #elif defined(HB_FS_FILE_IO)
    {
       int flags, share, attr;
@@ -1626,6 +1791,39 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
 
       hFileHandle = HandleToLong(hFile);
    }
+
+#elif defined( HB_OS2_IO )
+
+   {
+      ULONG ulAttribute, fsOpenFlags, fsOpenMode;
+      APIRET rc;
+      ULONG ulAction;
+      HFILE hFile = FS_ERROR;
+
+      /* On OS/2 it has only 6 parameters */
+      convert_open_flags( TRUE, uiAttr, uiFlags, &ulAttribute, &fsOpenFlags, &fsOpenMode );
+
+      rc = DosOpen( (PSZ) pFilename,
+                    &hFile,
+                    &ulAction,
+                    0L,
+                    ulAttribute,
+                    fsOpenFlags,
+                    fsOpenMode,
+                    0L );
+
+      /* On OS/2 errors 0..99 have the same meaning they had on DOS */
+      hb_fsSetError( rc );
+
+      if ( rc == NO_ERROR ) {
+         hFileHandle = _imphandle( hFile );
+         // Defaults to O_TEXT inside LIBC
+         setmode( hFileHandle, O_BINARY );
+      } else  {
+         hFileHandle = FS_ERROR;
+      }
+   }
+
 #elif defined(HB_FS_FILE_IO)
    {
       int flags, share, attr;
