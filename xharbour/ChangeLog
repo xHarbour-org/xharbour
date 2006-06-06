@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4991 2006/06/05 11:33:13 modalsist Exp $
+ * $Id: ChangeLog,v 1.4992 2006/06/06 08:14:32 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2006-06-06 11:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * include/hbdefs.h
+     * an old change for OS/2 .EXEs starting point which I've never
+       commited up until now.
+   * source/vm/Makefile
+     * on OS/2 mainstd.c has to be built.
 
 2006-06-06 09:58 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/filesys.c

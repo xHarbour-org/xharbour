@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.22 2005/10/13 22:22:58 druzus Exp $
+# $Id: Makefile,v 1.23 2005/11/14 22:16:51 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -71,6 +71,10 @@ DIRS=\
 	fmstat \
 
 ifeq ($(HB_COMPILER),mingw32)
+   DIRS += mainstd
+endif
+
+ifeq ($(HB_ARCHITECTURE),os2)
    DIRS += mainstd
 endif
 

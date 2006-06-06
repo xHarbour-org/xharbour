@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.81 2006/03/21 23:02:48 likewolf Exp $
+ * $Id: hbdefs.h,v 1.82 2006/06/04 18:30:07 druzus Exp $
  */
 
 /*
@@ -1026,10 +1026,14 @@ typedef unsigned long HB_COUNTER;
  * The list of compilers that require it:
  * - Watcom C/C++ 10.0
  * - GCC on Linux
+ * - 06/nov/2004 - <maurilio.longo@libero.it>
+ *                 GCC on OS/2 needs this definition, I've found it playing with harbour.dll on OS/2
+ *                 Right now I've simply commented out && !defined(HARBOUR_GCC_OS2), to be removed
+ *                 if there are no problems in the near future.
  *
  * By default we are using automatic lookup (symbol not defined)
 */
-#if defined(__WATCOMC__) || ( defined(__GNUC__) && !defined(__DJGPP__) && !defined(HARBOUR_GCC_OS2) )
+#if defined(__WATCOMC__) || ( defined(__GNUC__) && !defined(__DJGPP__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
    #define HARBOUR_START_PROCEDURE "MAIN"
 #endif
 
