@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.168 2006/03/29 03:42:40 ronpinkas Exp $
+# $Id: makefile.bc,v 1.169 2006/04/16 19:07:48 paultucker Exp $
 #
 
 #
@@ -197,6 +197,8 @@ DBFFPT_LIB     = $(LIB_DIR)\dbffpt$(HB_MT).lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx$(HB_MT).lib
 HBSIX_LIB      = $(LIB_DIR)\hbsix$(HB_MT).lib
 HSX_LIB        = $(LIB_DIR)\hsx$(HB_MT).lib
+USRRDD_LIB     = $(LIB_DIR)\usrrdd$(HB_MT).lib
+RDDS_LIB       = $(LIB_DIR)\rdds$(HB_MT).lib
 DEBUG_LIB      = $(LIB_DIR)\debug.lib
 LANG_LIB       = $(LIB_DIR)\lang.lib
 MACRO_LIB      = $(LIB_DIR)\macro$(HB_MT).lib
@@ -649,6 +651,16 @@ HSX_LIB_OBJS = \
    $(HSX_OBJ_DIR)\hsx.obj \
    $(HSX_OBJ_DIR)\cftsfunc.obj
 
+USRRDD_LIB_OBJS = \
+   $(RDD_OBJ_DIR)\usrrdd.obj
+
+RDDS_LIB_OBJS = \
+   $(RDD_OBJ_DIR)\dbtcdx.obj \
+   $(RDD_OBJ_DIR)\fcomma.obj \
+   $(RDD_OBJ_DIR)\fptcdx.obj \
+   $(RDD_OBJ_DIR)\hscdx.obj \
+   $(RDD_OBJ_DIR)\rlcdx.obj \
+   $(RDD_OBJ_DIR)\smtcdx.obj
 
 #
 # PP.LIB rules
@@ -1136,6 +1148,8 @@ PROJECT = \
    $(SIXCDX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
+   $(USRRDD_LIB) \
+   $(RDDS_LIB) \
    $(CT_LIB)
 
 !if !$d(HB_THREAD_SUPPORT)
@@ -1207,6 +1221,22 @@ $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
 $(HSX_LIB) : $(HSX_LIB_OBJS)
     IF EXIST "$(HSX_LIB)" $(DEL) "$(HSX_LIB)" > NUL
     $(LINKER) "$(HSX_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
+    IF EXIST "$(USRRDD_LIB)" $(DEL) "$(USRRDD_LIB)" > NUL
+    $(LINKER) "$(USRRDD_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(RDDS_LIB) : $(RDDS_LIB_OBJS)
+    IF EXIST "$(RDDS_LIB)" $(DEL) "$(RDDS_LIB)" > NUL
+    $(LINKER) "$(RDDS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -2808,6 +2838,54 @@ $(HSX_OBJ_DIR)\cftsfunc.obj : $(RDD_DIR)\hsx\cftsfunc.c
    $(CC_CMD)
 
 #
+# USRRDD.LIB dependencies
+#
+
+
+$(RDD_OBJ_DIR)\usrrdd.obj : $(RDD_DIR)\usrrdd\usrrdd.c
+   $(CC_CMD)
+
+#
+# RDDS.LIB dependencies
+#
+
+$(RDD_OBJ_DIR)\dbtcdx.c : $(RDD_DIR)\usrrdd\rdds\dbtcdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbtcdx.obj : $(RDD_OBJ_DIR)\dbtcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\fcomma.c : $(RDD_DIR)\usrrdd\rdds\fcomma.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\fcomma.obj : $(RDD_OBJ_DIR)\fcomma.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\fptcdx.c : $(RDD_DIR)\usrrdd\rdds\fptcdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\fptcdx.obj : $(RDD_OBJ_DIR)\fptcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\hscdx.c : $(RDD_DIR)\usrrdd\rdds\hscdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\hscdx.obj : $(RDD_OBJ_DIR)\hscdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\rlcdx.c : $(RDD_DIR)\usrrdd\rdds\rlcdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\rlcdx.obj : $(RDD_OBJ_DIR)\rlcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\smtcdx.c : $(RDD_DIR)\usrrdd\rdds\smtcdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\smtcdx.obj : $(RDD_OBJ_DIR)\smtcdx.c
+   $(CC_CMD)
+
+#
 # DEBUG.LIB dependencies
 #
 
@@ -3469,6 +3547,8 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
+   $(ECHO) $(USRRDD_LIB) >> make.tmp
+   $(ECHO) $(RDDS_LIB) >> make.tmp
 
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(CC) @make.tmp
@@ -3523,6 +3603,8 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
+   $(ECHO) $(USRRDD_LIB) >> make.tmp
+   $(ECHO) $(RDDS_LIB) >> make.tmp
 
 !if $d(HB_THREAD_SUPPORT)
    $(ECHO) cw32mt.lib >> make.tmp
@@ -3645,6 +3727,8 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
+   $(ECHO) $(USRRDD_LIB) >> make.tmp
+   $(ECHO) $(RDDS_LIB) >> make.tmp
 !if $d(HB_DOC_PDF)
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\pdfhbdoc.obj >> make.tmp
@@ -3884,6 +3968,8 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
+   $(ECHO) $(USRRDD_LIB) >> make.tmp
+   $(ECHO) $(RDDS_LIB) >> make.tmp
 
    $(ECHO) $(CT_LIB) >> make.tmp
    $(CC) @make.tmp

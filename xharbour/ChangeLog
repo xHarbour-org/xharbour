@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4992 2006/06/06 08:14:32 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4993 2006/06/06 11:36:14 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-06-07 1:30 UTC+0100 Ath <Ath1 at sourceforge.net>
+   * makefile.bc
+     + added building usrrdd.lib and rdds.lib
+   * set right local timezone offset for current changelog
 
 2006-06-06 11:50 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * include/hbdefs.h
