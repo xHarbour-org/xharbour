@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.113 2006/05/31 19:03:43 modalsist Exp $
+ * $Id: tget.prg,v 1.114 2006/06/05 11:33:13 modalsist Exp $
  */
 
 /*
@@ -268,15 +268,15 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicFunc := Upper( cPicture )
          ::cPicMask := ""
       else
+         /* The first space after the function symbom is obligatory, but it's
+            ignored in the mask. */
          ::cPicFunc := Upper( SubStr( cPicture, 1, nAt - 1 ) )
-         /* E.F. 2006/MAY/05 Clipper doesn't extract left spaces of the mask
-            in numeric var, if any. Example: "@E     999.99" */
-         IF ::type == "N"
-            ::cPicMask := SubStr( cPicture, nAt + 1 )
-         ELSE
-            ::cPicMask := LTrim( SubStr( cPicture, nAt + 1 ) )
-         ENDIF
 
+         /* E.F. 2006/JUN/06 Clipper doesn't extract left spaces of the mask
+          * of any var type. For example: "@E     999.99", "@R   999.999"
+          * ::cPicMask := LTrim( SubStr( cPicture, nAt + 1 ) )
+          */
+         ::cPicMask := SubStr( cPicture, nAt + 1 )
       endif
 
 //      AnalyzePicture( @::cPicFunc )
@@ -429,7 +429,7 @@ return ::cPicFunc + ' ' + ::cPicMask
 METHOD Assign() CLASS Get
 
    if ::hasfocus
-   ::VarPut( ::unTransform(), .f.  )
+      ::VarPut( ::unTransform(), .f. )
    endif
 
 return Self
@@ -465,7 +465,6 @@ METHOD Display( lForced ) CLASS Get
       xBuffer   := ::Buffer
    ENDIF
 
-
    HBConsoleLock()
 
    /* E.F. 2006/MAY/23 - Display minus sign in the front of xBuffer value.
@@ -479,9 +478,7 @@ METHOD Display( lForced ) CLASS Get
       ELSE
          xBuffer :=  PadL( '-'+Ltrim( xBuffer), Len(xBuffer) )
       ENDIF
-
    ENDIF
-
 
    IF ::HasScroll() .AND. ::Pos != NIL
       IF ::nDispLen > 8
@@ -492,9 +489,9 @@ METHOD Display( lForced ) CLASS Get
    ENDIF
 
    IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
-
+      
       cDisplay := Substr( xBuffer, ::nDispPos, ::nDispLen )
-
+      
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  cDisplay,;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
@@ -786,10 +783,10 @@ METHOD VarGet() CLASS Get
 
       xVarGet := aGetVar[ aIndex[ nCounter ] ]
    ENDIF
-   
+
    ::Type := ValType( xVarGet )
-   
-   /* E.F. 2006/APRIL/12 - We need adjust get value in any circuntancies.
+
+   /* E.F. 2006/APR/12 - We need adjust get value in any circuntancies.
       E.F. 2006/MAY/05 - Added ::hasfocus to maintain ::original value,if
            we exit with ESC before start edit get. */
    IF ::hasfocus .AND. ::Type == "N" .AND. ::nMaxLen != NIL .AND.;
@@ -822,7 +819,7 @@ METHOD VarGet() CLASS Get
 
       cVarGet := Str( xVarGet, nLen, nDec )
 
-      // We need recalc decimal pos if picture is left justified. 
+      // We need recalc decimal pos if picture is left justified.
       IF "B" IN ::cPicFunc 
          nDecPos := Rat( iif(::lDecRev .OR. "E" IN ::cPicFunc,",","."), ::cPicMask )
       ENDIF
@@ -839,15 +836,15 @@ METHOD VarGet() CLASS Get
 
       xVarGet := Val( cVarGet )
 
-      /* E.F. 2006/MAY/23 - Avoid minus flag if get value is zero. */
+      // E.F. 2006/MAY/23 - Avoid minus flag if get value is zero.
       IF xVarGet == 0
-         ::minus := .F.
+         ::minus := .f.
       ENDIF
 
    ENDIF
 
    ::xVarGet := xVarGet
-       
+   
 RETURN xVarGet
 
 //---------------------------------------------------------------------------//
@@ -862,10 +859,10 @@ METHOD Untransform( cBuffer ) CLASS Get
    DEFAULT cBuffer TO ::buffer
 
    /*
-   if !::lEdit
-      return ::VarGet()
-   endif
-   */
+    *if !::lEdit
+    *  return ::VarGet()
+    * endif
+    */
    if cBuffer == NIL
       return NIL
    endif
@@ -905,10 +902,10 @@ METHOD Untransform( cBuffer ) CLASS Get
       endif
 
       /* 14/08/2004 - <maurilio.longo@libero.it>
-                      If there should be a decimal point (or comma) but this is missing
-                      re-add it. Clipper does it. A little sample is inside ChangeLog
-                      for this fix.
-      */
+       *              If there should be a decimal point (or comma) but this is missing
+       *              re-add it. Clipper does it. A little sample is inside ChangeLog
+       *              for this fix.
+       */
       if ::decPos < Len( cBuffer ) .and. Empty( cBuffer[ ::decPos ] ) .and. if( ::lDecRev, "," , "." ) IN ::cPicture
          cBuffer[ ::decPos ] := if( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
       endif
@@ -936,19 +933,20 @@ METHOD Untransform( cBuffer ) CLASS Get
 
          else
 /*
-2005/07/30 - Eduardo Fernandes <modalsist@yahoo.com.br>
-The two IFs below was disabled because cause wrong get value if we type
-a numeric var greater than 999 in the picture "@R 9,999.99".
-Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
-
-            if "R" IN ::cPicFunc
-               lUntransform := Empty( ::buffer )
-            endif
-
-            if ":" IN ::cPicture
-               lUntransform := .T.
-            endif
-*/
+ * 2005/07/30 - Eduardo Fernandes <modalsist@yahoo.com.br>
+ *              The two IFs below was disabled because cause wrong get value
+ *              if we type a numeric var greater than 999 in the picture
+ *              "@R 9,999.99".
+ *              Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
+ *
+ *            if "R" IN ::cPicFunc
+ *               lUntransform := Empty( ::buffer )
+ *            endif
+ *
+ *            if ":" IN ::cPicture
+ *               lUntransform := .T.
+ *            endif
+ */
             lUntransform := ( "R" IN ::cPicFunc )
 
 
@@ -962,11 +960,12 @@ Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
 
          endif
 
-         // Tony (ABC)   12/22/2005      3:53PM
-         // The mask to delete has to be created according to the whole buffer!!
-         // Because it is applied below as:   cBuffer := StrDel( cBuffer, cMaskDel )
+         /* Tony (ABC)   12/22/2005      3:53PM
+          * The mask to delete has to be created according to the whole buffer!!
+          * Because it is applied below as:   cBuffer := StrDel( cBuffer, cMaskDel )
+          */
          for nFor := 1 to len(cBuffer)
-//         for nFor := ::FirstEditable( ) to ::LastEditable( )
+         // for nFor := ::FirstEditable( ) to ::LastEditable( )
              cMaskDel += iif( ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == ".", " ", "X" )
              if ::IsEditable( nFor ) .or. SubStr( cBuffer, nFor, 1 ) == "."
                 nPad ++
@@ -974,8 +973,9 @@ Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
          next
       endif
 
-      // Tony (ABC)   12/22/2005      3:53PM
-      // I found that cMaskDel was shorter than cBuffer. Fixed bug.
+      /* Tony (ABC)   12/22/2005      3:53PM
+       * I found that cMaskDel was shorter than cBuffer. Fixed bug.
+       */
       cBuffer := StrDel( cBuffer, cMaskDel )
 
       cBuffer := StrTran( cBuffer, "$", " " )
@@ -986,35 +986,44 @@ Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
 
       cBuffer := PadL( StrTran( cBuffer, " ", "" ), nPad )
 
-      // cBuffer := PadL( StrTran( cBuffer, " ", "" ), Len( cBuffer ) )
-                 // It replace left, right and medium spaces.
-                 // Don't replace for Alltrim()
+      /* cBuffer := PadL( StrTran( cBuffer, " ", "" ), Len( cBuffer ) )
+       * It replace left, right and medium spaces.
+       * Don't replace for Alltrim()
+       * xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
+       */
 
-      //xValue  := 0 + Val( cBuffer )    // 0 + ... avoids setting the
+/*    13/08/2004 - <maurilio.longo@libero.it>
+*                  We're talking about a number and a few lines of code before this
+*                  point ::minus is set to .T. if there is a "-(" inside number and
+*                  a few lines after we make a Val(cBuffer), so, this buffer has to
+*                  contain only numbers (and a "-" or ".", at max);
+*                  that said, while there was this loop?
+*                  I've replaced it with the iif( ::minus... ) which is shorter and
+*                  evaluates correctly a buffer containing "  -.10"
+*       
+*     if ::minus
+*        For each cChar in cBuffer
+*           if IsDigit( cChar )
+*              nFor := HB_EnumIndex()
+*              exit
+*           endif
+*        Next
+*        nFor--
+*        if nFor > 0
+*           cBuffer := Left( cBuffer, nFor-1 ) + "-" + SubStr( cBuffer, nFor+1 )
+*        else
+*           cBuffer := "-" + cBuffer
+*        endif
+*     endif 
+*/
 
-      /* 13/08/2004 - <maurilio.longo@libero.it>
-                    We're talking about a number and a few lines of code before this
-                    point ::minus is set to .T. if there is a "-(" inside number and
-                    a few lines after we make a Val(cBuffer), so, this buffer has to
-                    contain only numbers (and a "-" or ".", at max);
-                    that said, while there was this loop?
-                    I've replaced it with the iif( ::minus... ) which is shorter and
-                    evaluates correctly a buffer containing "  -.10"
-
-      if ::minus
-         For each cChar in cBuffer
-            if IsDigit( cChar )
-               nFor := HB_EnumIndex()
-               exit
-            endif
-         Next
-         nFor--
-         if nFor > 0
-            cBuffer := Left( cBuffer, nFor-1 ) + "-" + SubStr( cBuffer, nFor+1 )
-         else
-            cBuffer := "-" + cBuffer
-         endif
-      endif */
+      /* 2006/JUN/07 - E.F. Adjust buffer string in case of var get without
+       *  picture and empty buffer. Without this adjust, xValue returned will be
+       *  0 instead 0.0, 0.00, 0.000 if decimal point exist.
+       */
+      if empty(::cPicture ) .and. empty( StrTran(cBuffer,".","" ) )
+         cBuffer := PadL( "0."+  replicate("0",::nMaxLen - ::Decpos), ::nMaxLen )
+      endif
 
       xValue := iif( ::minus, -Val( cBuffer ), Val( cBuffer ) )
       exit
@@ -1033,6 +1042,7 @@ Added: lUntransform := ( "R" IN ::cPicFunc ) instead.
       exit
 
    end
+
 return xValue
 
 //---------------------------------------------------------------------------//
@@ -1360,7 +1370,7 @@ METHOD ToDecPos() CLASS Get
     * into VarGet()
     */
    ::VarPut( Val(::buffer), .t. )
-
+   
 return Self
 
 //---------------------------------------------------------------------------//
@@ -1403,7 +1413,18 @@ METHOD Input( cChar ) CLASS Get
 
       Switch cChar
       case "-"
-         ::minus := .t.  /* The minus symbol can be write in any place */
+         /* 2006/JUN/07 - E.F. The minus sign can not be write in any place,
+          *               instead, can be write up to 1 position before
+          *               decimal point. Example: -.99 not -99 or 9.-9 or
+          *               9.9-
+          *               Clipper allow it, but it's wrong.
+          */
+         if ::decpos > 0 .and. ::pos > ::decpos
+            ::ToDecPos()
+            return ""
+         else
+            ::minus := .t. 
+         endif
          exit
 
       case "."
@@ -1545,6 +1566,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    DEFAULT xValue TO ::xVarGet
    DEFAULT xValue TO ::VarGet()
 
+
    IF ::Type == NIL
       ::Type := ValType( xValue )
       ::Picture := ::cPicture
@@ -1571,9 +1593,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cMask := StrTran( StrTran( cMask, "*", "9" ), "$", "9" )
       endif
    endif
-   
+
    cBuffer := Transform( xValue, if( Empty( cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + cMask )
-   
+
    if ::type == "N"
       if ( "(" IN cPicFunc .or. ")" IN cPicFunc ) .and. xValue >= 0
          cBuffer += " "
@@ -1636,7 +1658,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    If ::type == "D" .and. ::BadDate .and. ::Buffer != nil
       cBuffer := ::Buffer
    Endif
-   
+
 return cBuffer
 
 //---------------------------------------------------------------------------//

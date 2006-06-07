@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4993 2006/06/06 11:36:14 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4994 2006/06/06 23:43:19 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-07 09:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed ParsePict() method to not avoid spaces after function symbom and
+      before templates, in the mask. Thansks to Ed Horbino to report this bug.
+    ! fixed Untransform() method to adjust correct return value in numeric get
+      if var get is without picture and display buffer is empty.
+    ! fixed Input() method to not allow input of "-" (minus sign) in numeric
+      get after decimal dot, if any. Clipper allow it, but it's wrong.
 
 2006-06-07 1:30 UTC+0100 Ath <Ath1 at sourceforge.net>
    * makefile.bc
