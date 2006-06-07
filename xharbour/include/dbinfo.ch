@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.22 2006/03/01 20:15:28 druzus Exp $
+ * $Id: dbinfo.ch,v 1.23 2006/04/15 18:52:23 druzus Exp $
  */
 
 /*
@@ -316,8 +316,8 @@
 #define FILEPUT_ENCRYPT         BLOB_IMPORT_ENCRYPT
 
 /* DBF TYPES */
-#define DB_DBF_STD            0
-#define DB_DBF_VFP            1
+#define DB_DBF_STD            1
+#define DB_DBF_VFP            2
 
 /* MEMO TYPES */
 #define DB_MEMO_NONE          0
