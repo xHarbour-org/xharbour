@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.35 2005/09/02 18:27:03 druzus Exp $
+# $Id: gcc.cf,v 1.36 2006/01/17 02:18:15 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -166,7 +166,7 @@ LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
 LINKLIBS += -lpcrepos
 endif
 
-LINKLIBS += -lm -Wl,--end-group
+LINKLIBS += -lm -ldl -Wl,--end-group
 
 LDFLAGS = $(LINKPATHS)
 

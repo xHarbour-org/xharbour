@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.572 2006/05/23 19:21:18 ronpinkas Exp $
+ * $Id: hvm.c,v 1.573 2006/05/30 23:22:11 ath1 Exp $
  */
 
 /*
@@ -8139,6 +8139,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
 {
    HB_THREAD_STUB
    PHB_ITEM pTop;
+   BYTE * pBlockCode;
 
    USHORT uiLocals;
 
@@ -8147,17 +8148,21 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
    pTop = hb_stackTopItem();
    hb_stackPush();
 
-   if( bDynCode )
-   {
-      BYTE * pBuffer = ( BYTE * ) hb_xgrab( usSize );
-      memcpy( pBuffer, pCode, usSize );
-      pCode = pBuffer;
-   }
-
    uiLocals = HB_PCODE_MKUSHORT( &pCode[ 2 ] );
 
+   usSize -= 4 + ( uiLocals << 1 );
+   if( bDynCode )
+   {
+      pBlockCode = ( BYTE * ) hb_xgrab( usSize );
+      memcpy( pBlockCode, pCode + 4 + ( uiLocals << 1 ), usSize );
+   }
+   else
+   {
+      pBlockCode = ( BYTE * ) pCode + 4 + ( uiLocals << 1 );
+   }
+
    pTop->item.asBlock.value =
-         hb_codeblockNew( pCode + 4 + uiLocals * 2, /* pcode buffer         */
+         hb_codeblockNew( pBlockCode,               /* pcode buffer */
          uiLocals,                                  /* number of referenced local variables */
          pCode + 4,                                 /* table with referenced local variables */
          pSymbols, pGlobals );

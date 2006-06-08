@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.36 2005/10/31 12:56:35 druzus Exp $
+ * $Id: hbstack.h,v 1.37 2006/05/23 19:21:18 ronpinkas Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ typedef struct
    #define hb_stackTopItem( )          ( * HB_VM_STACK.pPos )
    #define hb_stackBaseItem( )         ( * HB_VM_STACK.pBase )
    #define hb_stackSelfItem( )         ( * ( HB_VM_STACK.pBase + 1 ) )
-   #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) iItemPos ) )
+   #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) ( iItemPos ) ) )
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
    #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
 
