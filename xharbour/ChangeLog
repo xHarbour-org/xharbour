@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4997 2006/06/08 09:57:12 druzus Exp $
+ * $Id: ChangeLog,v 1.4998 2006/06/08 13:03:02 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-06-08 23:30 UTC+0100 Ath <Ath1 at sourceforge.net>
+   * makefile.bc
+     + added building libmisc.lib, using all sources found in source/misc
+       please report if any (legal?) problems arise
 
 2006-06-08 15:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
    * source/rtl/persist.prg
