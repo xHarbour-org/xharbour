@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.24 2005/10/29 18:53:39 likewolf Exp $
+ * $Id: persist.prg,v 1.25 2006/04/24 07:30:16 ronpinkas Exp $
  */
 
 /*
@@ -186,7 +186,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
             CASE Left( cLine, 7 ) == "OBJECT "
                cLine = SubStr( cLine, 9 )
                cLine := "HB_QWith()" + cLine
-               cLine := StrTran( cLine, " AS ", " := " ) + "()"
+               cLine := StrTran( cLine, " AS ", " := " ) + "():New()"
 
                //TraceLog( cLine )
                HB_SetWith( &( cLine ) )

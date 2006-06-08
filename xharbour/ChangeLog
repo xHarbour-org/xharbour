@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4996 2006/06/07 15:57:29 druzus Exp $
+ * $Id: ChangeLog,v 1.4997 2006/06/08 09:57:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-06-08 15:05 UTC+0200 Maurilio Longo <maurilio.longo@libero.it>
+   * source/rtl/persist.prg
+     ! line 189, changed from
+       cLine := StrTran( cLine, " AS ", " := " ) + "()"
+       to
+       cLine := StrTran( cLine, " AS ", " := " ) + "():New()"
+       To make it possible to de-serialize objects which contain
+       collections (like arrays) of other objects. I sent a sample
+       on developers list last march.
 
 2006-06-08 11:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/linux/gcc.cf
