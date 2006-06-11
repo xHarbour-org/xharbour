@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.4998 2006/06/08 13:03:02 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.4999 2006/06/08 22:55:41 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-11 12:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/rtl/gtapi.c
+     * hb_gtResume
+       * a) Why does this exist?   (ie, that's what hb_gtPostExt was for)
+       * b) Updated the cursor position after an external write.
+     * hb_gtPostExt
+       * Updated the cursor position after an external write.
+         * (one main difference I see is that pre/postext are protected
+           against nested calls)
+
+   * source/rtl/gtwin/gtwin.c
+     * gt_Pre/PostExt
+       * call gt_Suspend/Resume
+     * gt_Resume
+       * Re-initialise the screen buffer
+       * Re-enable the console ctrl handler
+         * (Why was this commented out?)
 
 2006-06-08 23:30 UTC+0100 Ath <Ath1 at sourceforge.net>
    * makefile.bc

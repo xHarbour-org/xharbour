@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.104 2006/01/19 09:33:45 paultucker Exp $
+ * $Id: gtwin.c,v 1.105 2006/03/16 04:55:34 paultucker Exp $
  */
 
 /*
@@ -1497,9 +1497,13 @@ BOOL HB_GT_FUNC(gt_Resume())
    HB_GT_FUNC(gt_xSetCursorStyle());
 
 /*
-   TODO:
-   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
+   The next line was commented out and labelled TODO:
+   there is no explanation of why it wasn't done.
 */
+   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
+
+   HB_GT_FUNC(gt_xInitScreenParam());
+
    return TRUE;
 }
 
@@ -1507,14 +1511,17 @@ BOOL HB_GT_FUNC(gt_Resume())
 
 BOOL HB_GT_FUNC(gt_PreExt())
 {
-    return TRUE;
+    /* The Clipper compatible name of this func Means 'Code to execute
+       previous to External Write' -  Why were new funcs created above? [pt] */
+
+    return HB_GT_FUNC(gt_Suspend());
 }
 
 /* *********************************************************************** */
 
 BOOL HB_GT_FUNC(gt_PostExt())
 {
-    return TRUE;
+    return HB_GT_FUNC(gt_Resume());
 }
 
 /* *********************************************************************** */

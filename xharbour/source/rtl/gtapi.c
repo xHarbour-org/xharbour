@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.63 2006/01/12 13:16:08 druzus Exp $
+ * $Id: gtapi.c,v 1.64 2006/04/07 06:08:01 maurifull Exp $
  */
 
 /*
@@ -644,6 +644,8 @@ USHORT HB_EXPORT hb_gtPostExt( void )
    {
       /* call platform depend layer to restore all settings */
       hb_gt_PostExt();
+      s_iRow = hb_gt_Row();
+      s_iCol = hb_gt_Col();
 
       while( s_uiPreCount-- )
          hb_gt_DispBegin();
@@ -1662,11 +1664,15 @@ USHORT HB_EXPORT hb_gtResume( void )
    /* call platform depend layer to restore all settings */
    if( hb_gt_Resume() )
    {
+      s_iRow = hb_gt_Row();
+      s_iCol = hb_gt_Col();
       while( s_uiPreCount-- )
          hb_gt_DispBegin();
    }
    else
+   {
       return (USHORT) -1;
+   }
 
    return  0;
 }
