@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.170 2006/06/06 23:43:20 ath1 Exp $
+# $Id: makefile.bc,v 1.171 2006/06/08 22:55:41 ath1 Exp $
 #
 
 #
@@ -130,7 +130,7 @@ PP_DIR       = source\pp
 RDD_DIR      = source\rdd
 RTL_DIR      = source\rtl
 PCREPOS_DIR  = source\rtl\pcre
-TOOLS_DIR    = source\misc
+MISC_DIR     = source\misc
 TIP_DIR      = source\tip
 VM_DIR       = source\vm
 ODBC_DIR     = source\odbc
@@ -213,7 +213,7 @@ VM_LIB         = $(LIB_DIR)\vm$(HB_MT).lib
 FMSTAT_LIB     = $(LIB_DIR)\fmstat$(HB_MT).lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
 DLL_MAIN_LIB   = $(LIB_DIR)\dllmain.lib
-TOOLS_LIB      = $(LIB_DIR)\libmisc.lib
+MISC_LIB       = $(LIB_DIR)\libmisc.lib
 GTCGI_LIB      = $(LIB_DIR)\gtcgi.lib
 GTDOS_LIB      = $(LIB_DIR)\gtdos.lib
 GTPCA_LIB      = $(LIB_DIR)\gtpca.lib
@@ -1116,26 +1116,8 @@ ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
    $(OBJ_DIR)\todbc.obj
 
-TOOLS_LIB_OBJS = \
-   $(OBJ_DIR)\date.obj \
-   $(OBJ_DIR)\dates2.obj \
-   $(OBJ_DIR)\dbf.obj \
-   $(OBJ_DIR)\environ.obj \
-   $(OBJ_DIR)\gauge.obj \
-   $(OBJ_DIR)\hb_f.obj \
-   $(OBJ_DIR)\mathx.obj \
-   $(OBJ_DIR)\strfmt.obj \
-   $(OBJ_DIR)\stringsx.obj \
-   $(OBJ_DIR)\num.obj \
-   $(OBJ_DIR)\stack.obj \
-   $(OBJ_DIR)\status.obj \
-   $(OBJ_DIR)\time.obj \
-   $(OBJ_DIR)\fileread.obj \
-   $(OBJ_DIR)\nconvert.obj \
-   $(OBJ_DIR)\numtxten.obj \
-   $(OBJ_DIR)\numtxthu.obj \
-   $(OBJ_DIR)\stringp.obj \
-   $(OBJ_DIR)\twirler.obj
+MISC_LIB_OBJS = \
+   $(OBJ_DIR)\hb_f.obj
 
 DLL_MAIN_LIB_OBJS = \
    $(VM_OBJ_DIR)\mainstd.obj \
@@ -1185,7 +1167,7 @@ PROJECT = \
       $(CODEPAGE_LIB) \
       $(DLL_MAIN_LIB) \
       $(ODBC_LIB) \
-      $(TOOLS_LIB) \
+      $(MISC_LIB) \
       $(HBPP_EXE) \
       $(HBDOC_EXE) \
       $(HBMAKE_EXE) \
@@ -1451,9 +1433,9 @@ $(ODBC_LIB) : $(ODBC_LIB_OBJS)
 
 !
 
-$(TOOLS_LIB) : $(TOOLS_LIB_OBJS)
-    IF EXIST "$(TOOLS_LIB)" $(DEL) "$(TOOLS_LIB)" > NUL
-    $(LINKER) "$(TOOLS_LIB)" $(ARFLAGS) @&&!
+$(MISC_LIB) : $(MISC_LIB_OBJS)
+    IF EXIST "$(MISC_LIB)" $(DEL) "$(MISC_LIB)" > NUL
+    $(LINKER) "$(MISC_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -3097,82 +3079,10 @@ $(OBJ_DIR)\todbc.obj : $(OBJ_DIR)\todbc.c
    $(CC_CMD)
 
 #
-# TOOLS.LIB dependencies
+# LIBMISC.LIB dependencies
 #
 
-$(OBJ_DIR)\date.obj : $(TOOLS_DIR)\date.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dates2.obj : $(TOOLS_DIR)\dates2.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbf.obj : $(TOOLS_DIR)\dbf.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\environ.obj : $(TOOLS_DIR)\environ.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\fileread.c : $(TOOLS_DIR)\fileread.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\fileread.obj : $(OBJ_DIR)\fileread.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gauge.obj : $(TOOLS_DIR)\gauge.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\hb_f.obj : $(TOOLS_DIR)\hb_f.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\mathx.obj : $(TOOLS_DIR)\mathx.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\nconvert.c : $(TOOLS_DIR)\nconvert.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\nconvert.obj : $(OBJ_DIR)\nconvert.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\num.obj : $(TOOLS_DIR)\num.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\numtxten.c : $(TOOLS_DIR)\numtxten.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\numtxten.obj : $(OBJ_DIR)\numtxten.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\numtxthu.c : $(TOOLS_DIR)\numtxthu.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\numtxthu.obj : $(OBJ_DIR)\numtxthu.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\stack.obj : $(TOOLS_DIR)\stack.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\status.obj : $(TOOLS_DIR)\status.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\strfmt.obj : $(TOOLS_DIR)\strfmt.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\stringp.c : $(TOOLS_DIR)\stringp.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\stringp.obj : $(OBJ_DIR)\stringp.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\stringsx.obj : $(TOOLS_DIR)\stringsx.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\time.obj : $(TOOLS_DIR)\time.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\twirler.c : $(TOOLS_DIR)\twirler.prg
-   $(HB_CMD)
-
-$(OBJ_DIR)\twirler.obj : $(OBJ_DIR)\twirler.c
+$(OBJ_DIR)\hb_f.obj : $(MISC_DIR)\hb_f.c
    $(CC_CMD)
 
 #
