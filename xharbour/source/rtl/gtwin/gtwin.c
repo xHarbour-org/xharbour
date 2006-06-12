@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.107 2006/06/11 16:43:45 paultucker Exp $
+ * $Id: gtwin.c,v 1.108 2006/06/12 00:05:16 paultucker Exp $
  */
 
 /*
@@ -1513,14 +1513,14 @@ BOOL HB_GT_FUNC(gt_Resume())
 
 BOOL HB_GT_FUNC(gt_PreExt())
 {
-    return TRUE
+    return TRUE;
 }
 
 /* *********************************************************************** */
 
 BOOL HB_GT_FUNC(gt_PostExt())
 {
-    return TRUE
+    return TRUE;
 }
 
 /* *********************************************************************** */
