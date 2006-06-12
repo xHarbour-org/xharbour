@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.26 2006/06/08 13:03:03 mauriliolongo Exp $
+ * $Id: persist.prg,v 1.27 2006/06/12 06:55:03 mauriliolongo Exp $
  */
 
 /*
@@ -76,8 +76,8 @@ extern STOD
 CLASS HBPersistent
 
    METHOD CreateNew() INLINE Self
-   METHOD LoadFromFile( cFileName, lIgnoreBadIVars ) INLINE ::LoadFromText( MemoRead( cFileName ), lIgnoreBadIVars )
-   METHOD LoadFromText( cObjectText, lIgnoreBadIVars )
+   METHOD LoadFromFile( cFileName, lIgnoreBadIVars, lPropertiesOnly ) INLINE ::LoadFromText( MemoRead( cFileName ), lIgnoreBadIVars, lPropertiesOnly )
+   METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly )
    METHOD SaveToText( cObjectName )
    METHOD SaveToFile( cFileName ) INLINE MemoWrit( cFileName, ::SaveToText() )
 
@@ -93,6 +93,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
    LOCAL xProperty
    LOCAL lFix
    LOCAL nWith
+   LOCAL oError, cError
 
    #define HB_PERSIST_VER_2 "// HBPersistent Ver 2.0"
 
@@ -200,8 +201,14 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
                // TraceLog( cLine )
          ENDCASE
       NEXT
-   //CATCH
-      // Ignore - was intentional?
+   CATCH oError
+      cError := HB_OSNewLine() + ;
+         "Error:  " + oError:subSystem + "/" + AllTrim( Transform( oError:subCode, "99999999" ) ) + ;
+            If( oError:osCode # 0, " (DOS Error # " + AllTrim( Str( oError:osCode, 4 ) ) + ")", "" ) + HB_OSNewLine() + ;
+         "Description:  " + oError:description + ;
+         If( ! Empty( oError:operation ), HB_OSNewLine() + "Operation/Variable:  " + oError:operation, "" )
+      TraceLog( cError )
+
    FINALLY
       WHILE nWith-- > 0
          HB_SetWith()

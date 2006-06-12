@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5003 2006/06/12 06:55:02 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5004 2006/06/12 19:37:50 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-12 14:23 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+   * source/rtl/persist.prg
+     ! Added missing 3 param in method declaration seciton (CLASS...ENDCLASS)
+       for ::LoadFromFile() and ::LoadFromText() methods.
+     ! Added CATCH logic to avoid HB_SetWith( &( cLine ) ) [line 193] to leave
+       app hung up in memory with no kind of clue as of to what went wrong in
+       case of wrong class name stored while loading a persistent object.
 
 2006-06-12 12:36 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * makefile.bc
