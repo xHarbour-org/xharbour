@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5000 2006/06/11 16:25:22 paultucker Exp $
+ * $Id: ChangeLog,v 1.5001 2006/06/11 16:43:45 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-11 20:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+   * source/rtl/gtwin/gtwin.c
+     * corrected gt_preExt
+
+   * source/rtl/alert.prg
+     * this is an attempt to force alert to be on the screen.
+     * please report any problems.
 
 2006-06-11 12:45 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * source/rtl/gtwin/gtwin.c
@@ -16,16 +24,11 @@
 2006-06-11 12:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
    * source/rtl/gtapi.c
      * hb_gtResume
-       * a) Why does this exist?   (ie, that's what hb_gtPostExt was for)
-       * b) Updated the cursor position after an external write.
      * hb_gtPostExt
        * Updated the cursor position after an external write.
-         * (one main difference I see is that pre/postext are protected
-           against nested calls)
 
    * source/rtl/gtwin/gtwin.c
      * gt_Pre/PostExt
-       * call gt_Suspend/Resume
      * gt_Resume
        * Re-initialise the screen buffer
        * Re-enable the console ctrl handler

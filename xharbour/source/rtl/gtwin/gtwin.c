@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.106 2006/06/11 16:25:23 paultucker Exp $
+ * $Id: gtwin.c,v 1.107 2006/06/11 16:43:45 paultucker Exp $
  */
 
 /*
@@ -1513,17 +1513,14 @@ BOOL HB_GT_FUNC(gt_Resume())
 
 BOOL HB_GT_FUNC(gt_PreExt())
 {
-    /* The Clipper compatible name of this func Means 'Code to execute
-       previous to External Write' -  Why were new funcs created above? [pt] */
-
-    return HB_GT_FUNC(gt_Suspend());
+    return TRUE
 }
 
 /* *********************************************************************** */
 
 BOOL HB_GT_FUNC(gt_PostExt())
 {
-    return HB_GT_FUNC(gt_Resume());
+    return TRUE
 }
 
 /* *********************************************************************** */
