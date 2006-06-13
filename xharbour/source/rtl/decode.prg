@@ -1,5 +1,5 @@
 /*
- * $Id: decode.prg,v 1.1 2006/06/13 10:31:57 fsgiudice Exp $
+ * $Id: decode.prg,v 1.2 2006/06/13 10:38:37 fsgiudice Exp $
  */
 
 /*
@@ -138,7 +138,16 @@ FUNCTION HB_Decode(...)
                 // If it is an array I will restart this function creating a linear call
                 IF ValType( xDefault ) == "A"
 
-                   aParams := xDefault
+                   // If i have an array as default, this contains couples of key / value
+                   // so I have to convert in a linear array
+                   aParams := Array( Len( xDefault ) * 2 )
+
+                   n := 1
+                   FOR i := 1 TO Len( xDefault )
+                       aParams[ n++ ] := xDefault[ i ][ 1 ]
+                       aParams[ n++ ] := xDefault[ i ][ 2 ]
+                   NEXT
+
 
                 // If it is an hash, translate it in an array
                 ELSEIF ValType( xDefault ) == "H"
