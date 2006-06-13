@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.114 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.115 2006/04/27 18:42:53 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -43,6 +43,7 @@ TIP_DIR           = source\tip
 VM_DIR            = source\vm
 HBSIX_DIR         = source\rdd\hbsix
 HSX_DIR           = source\rdd\hsx
+USRRDD_DIR        = source\rdd\usrrdd
 XBSCRIPT_DIR      = utils\xbscript
 HBRUN_DIR         = utils\hbrun
 HBDOC_DIR         = utils\hbdoc
@@ -186,6 +187,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dates.obj \
   $(OBJ_DIR)\dateshb.obj \
   $(OBJ_DIR)\dbtotal.obj \
+  $(OBJ_DIR)\decode.obj \
   $(OBJ_DIR)\defpath.obj \
   $(OBJ_DIR)\dbjoin.obj \
   $(OBJ_DIR)\dbsdf.obj \
@@ -723,7 +725,11 @@ HARBOUR_DLL_OBJS = \
 #  HSX
 #
   $(OBJ_DIR)\hsx.obj \
-  $(OBJ_DIR)\cftsfunc.obj
+  $(OBJ_DIR)\cftsfunc.obj \
+#
+#  usrrdd
+#
+  $(OBJ_DIR)\usrrdd.obj
 
 #
 #  Gt
@@ -866,6 +872,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\datec.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dates.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dateshb.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\decode.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\defpath.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbtotal.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbjoin.obj            + >> hdll.tmp
@@ -1345,8 +1352,9 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\sxcompr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxdate.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\cftsfunc.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
+  echo. $(OBJ_DIR)\usrrdd.obj            + >> hdll.tmp
 !if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
@@ -1726,6 +1734,12 @@ $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\dbedit.obj : $(OBJ_DIR)\dbedit.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\decode.obj : $(OBJ_DIR)\decode.c
    $(CC_CMD)
 
 $(OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c
@@ -3411,11 +3425,18 @@ $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
 # HSX.LIB dependencies
 #
 
+$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cftsfunc.obj : $(HSX_DIR)\cftsfunc.c
-   $(CC_CMD)
+#
+# usrrdd dependencies
+#
+
+$(OBJ_DIR)\usrrdd.obj : $(USRRDD_DIR)\usrrdd.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
 
 #
 # ADS dependencies
