@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.23 2006/03/29 12:52:26 modalsist Exp $
+# $Id: makefile.pc,v 1.24 2006/05/01 23:37:57 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -876,6 +876,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbjoin.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
+   $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
    $(RTL_OBJ_DIR)\dummy.obj \
@@ -1312,6 +1313,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbjoin.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\decode.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dircmd.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dummy.obj    >> poccrtl.rsp
@@ -2288,6 +2290,12 @@ $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\decode.obj : $(RTL_OBJ_DIR)\decode.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\devoutp.c : $(RTL_DIR)\devoutp.prg

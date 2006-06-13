@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.19 2006/03/25 20:02:22 paultucker Exp $
+# $Id: makefile.dc,v 1.20 2006/04/16 19:07:49 paultucker Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -1002,6 +1002,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbjoin.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
+   $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
    $(RTL_OBJ_DIR)\dummy.obj \
@@ -1619,6 +1620,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbjoin.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> dmcrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\decode.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dircmd.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dummy.obj    >> dmcrtl.rsp
@@ -2448,6 +2450,12 @@ $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
+   $(HARBOUR_CMD)
+
+$(RTL_OBJ_DIR)\decode.obj : $(RTL_OBJ_DIR)\decode.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c

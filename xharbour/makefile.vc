@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.170 2006/04/12 05:33:28 paultucker Exp $
+# $Id: makefile.vc,v 1.171 2006/04/12 05:53:40 paultucker Exp $
 #
 
 #
@@ -163,7 +163,7 @@ L_DFLAGS     =$(LFLAGS) /NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP /NODEFAULTLIB:LIB
 !else
 L_DFLAGS     =$(L_DFLAGSNMT)
 !endif
-# /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT 
+# /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT
 
 !ifdef HB_DOC_PDF
 HARBOURFLAGS =$(HARBOURFLAGS) -dPDF
@@ -537,6 +537,8 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbjoin.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
+   $(OBJ_DIR)$(MT)\decode.obj \
+   $(OBJ_DIR)$(MT)\decode.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \
    $(OBJ_DIR)$(MT)\dummy.obj \

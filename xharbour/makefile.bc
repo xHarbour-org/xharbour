@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.171 2006/06/08 22:55:41 ath1 Exp $
+# $Id: makefile.bc,v 1.172 2006/06/12 19:37:50 kaddath Exp $
 #
 
 #
@@ -448,6 +448,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\dbedit.obj \
    $(RTL_OBJ_DIR)\dbjoin.obj \
    $(RTL_OBJ_DIR)\dbsdf.obj \
+   $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
    $(RTL_OBJ_DIR)\dummy.obj \
@@ -657,6 +658,7 @@ USRRDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\usrrdd.obj
 
 RDDS_LIB_OBJS = \
+   $(RDD_OBJ_DIR)\arrayrdd.obj \
    $(RDD_OBJ_DIR)\dbtcdx.obj \
    $(RDD_OBJ_DIR)\fcomma.obj \
    $(RDD_OBJ_DIR)\fptcdx.obj \
@@ -1970,6 +1972,12 @@ $(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
 $(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
+$(RTL_OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
+   $(HB_CMD)
+
+$(RTL_OBJ_DIR)\decode.obj : $(RTL_OBJ_DIR)\decode.c
+   $(CC_CMD)
+
 $(RTL_OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c
    $(CC_CMD)
 
@@ -2862,6 +2870,12 @@ $(RDD_OBJ_DIR)\usrrdd.obj : $(RDD_DIR)\usrrdd\usrrdd.c
 #
 # RDDS.LIB dependencies
 #
+
+$(RDD_OBJ_DIR)\arrayrdd.c : $(RDD_DIR)\usrrdd\rdds\arrayrdd.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\arrayrdd.obj : $(RDD_OBJ_DIR)\arrayrdd.c
+   $(CC_CMD)
 
 $(RDD_OBJ_DIR)\dbtcdx.c : $(RDD_DIR)\usrrdd\rdds\dbtcdx.prg
    $(HB_CMD)

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5004 2006/06/12 19:37:50 kaddath Exp $
+ * $Id: ChangeLog,v 1.5005 2006/06/12 21:25:51 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-13 12:30 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+   + source/rdd/usrrdd/rdds/arrayrdd.prg
+   + source/rdd/usrrdd/example/tstarr.prg
+   + source/rdd/usrrdd/example/tstarr1.prg
+   + source/rdd/usrrdd/example/tstarr2.prg
+     + Added ARRAYRDD RDD driver and samples.
+       It works actually without ORDER, RELATIONS and something else, but
+       it can be usefull to parse databases in memory.
+
+   * makefile.bc
+   * source/rdd/usrrdd/rdds/Makefile
+     Updated for arrayrdd.prg
+
+   + source/rtl/decode.prg
+     + added HB_Decode() function, that is mine old work used in ARRAYRDD.
+       Usefull function to decode a var using an inline command instead of a
+       sequence of IF, or CASE or SWITCH. Less efficient in speed comparison,
+       but very compact to write.
+       samples:
+       hb_Decode( cValType, "C", "test", "D", CToD( "01/03/2006" ), "L", .T., NIL )
+       hb_Decode( nVal, 1, "test1", 2, "test2", 3, "test3", "default" )
+       hb_Decode( cVal, "A", {|| a+1 }, "B", {|| b+1 } )
+
+   * makefile.bc
+   * makefile.dc
+   * makefile.gc
+   * makefile.pc
+   * makefile.vc
+   * makefile.wc
+   * source/rtl/Makefile
+     Updated for decode.prg
+
 
 2006-06-12 14:23 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * source/rtl/persist.prg
