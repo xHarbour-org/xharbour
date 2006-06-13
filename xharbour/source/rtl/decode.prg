@@ -1,5 +1,5 @@
 /*
- * $Id: fcomma.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
+ * $Id: decode.prg,v 1.1 2006/06/13 10:31:57 fsgiudice Exp $
  */
 
 /*
@@ -157,7 +157,7 @@ FUNCTION HB_Decode(...)
                 aIns( aParams, 1, xVal, TRUE )
 
                 // And run decode() again
-                xRet := hb_ExecFromArray( @Decode(), aParams )
+                xRet := hb_ExecFromArray( @hb_Decode(), aParams )
 
              ENDIF
 
