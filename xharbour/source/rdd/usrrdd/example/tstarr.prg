@@ -86,6 +86,8 @@ PROC MAIN()
 
 RETURN
 
+#include "hbexcept.ch"
+
 Function GpfHandler( Exception )
    LOCAL cMsg, nCode
    //TraceLog( "GPF:", Exception )
