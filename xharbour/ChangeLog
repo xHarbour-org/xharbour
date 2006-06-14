@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5010 2006/06/13 16:43:19 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5011 2006/06/14 01:02:54 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-14 15:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/compiler/genc.c
+    * keep function name set by compiler for static initstatics
+
+  * xharbour/source/compiler/harbour.c
+    * extend init statics name with the number of used static variables
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+    * generate RT error when someone tries to create DBF with memo fields
+      without MEMO RDD linked.
+
+  * xharbour/source/rtl/Makefile
+  * xharbour/source/rdd/dbcmd.c
+  + xharbour/source/rtl/dbf2txt.c
+    * moved DBF2TXT to separate file
 
 2006-06-14 03:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/usrrdd/usrrdd.c

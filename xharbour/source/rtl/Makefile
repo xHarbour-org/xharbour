@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.66 2006/03/17 01:18:51 fsgiudice Exp $
+# $Id: Makefile,v 1.67 2006/06/13 10:31:57 fsgiudice Exp $
 #
 
 ROOT = ../../
@@ -25,6 +25,7 @@ C_SOURCES=\
         datec.c      \
         dates.c      \
         dateshb.c    \
+        dbf2txt.c    \
         defpath.c    \
         descend.c    \
         dirdrive.c   \

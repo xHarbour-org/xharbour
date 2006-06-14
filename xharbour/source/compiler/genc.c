@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.122 2006/04/21 11:25:33 druzus Exp $
+ * $Id: genc.c,v 1.123 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -369,7 +369,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize static variables
             */
-            fprintf( yyc, "{ \"(_INITSTATICS)\", {HB_FS_INITEXIT}, {hb_INITSTATICS}, NULL }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"%s\", {HB_FS_INITEXIT}, {hb_INITSTATICS}, NULL }", pSym->szName ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '[' )
          {

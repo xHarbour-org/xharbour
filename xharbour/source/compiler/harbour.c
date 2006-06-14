@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.131 2006/04/15 21:07:39 likewolf Exp $
+ * $Id: harbour.c,v 1.132 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -5666,11 +5666,16 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
 
             if( hb_comp_pInitFunc )
             {
+               char szNewName[ 32 ];
+
                /* Fix the number of static variables */
                hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
-            
+               /* Update pseudo function name */
+               sprintf( szNewName, "(_INITSTATICS%05d)", hb_comp_iStaticCnt );
+               hb_comp_pInitFunc->szName = hb_compIdentifierNew( szNewName, TRUE );
+
                hb_compAddInitFunc( hb_comp_pInitFunc );
             }
 
