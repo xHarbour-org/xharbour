@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5009 2006/06/13 15:35:08 kaddath Exp $
+ * $Id: ChangeLog,v 1.5010 2006/06/13 16:43:19 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-14 03:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/rdd/usrrdd/usrrdd.c
+    + added functions to set WorkAre flags USRRDD_SETBOF, USRRDD_SETEOF,
+      USRRDD_SETFOUND, USRRDD_SETTOP, USRRDD_SETBOTTOM
 
 2006-06-13 18:41 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
    * source/rtl/decode.prg

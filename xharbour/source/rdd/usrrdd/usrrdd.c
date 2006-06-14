@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: usrrdd.c,v 1.1 2006/06/02 12:34:12 druzus Exp $
  */
 
 /*
@@ -2952,6 +2952,86 @@ HB_FUNC( USRRDD_AREARESULT )
       {
          hb_itemCopy( pArea->valResult, hb_param( 2, HB_IT_ANY ) );
       }
+   }
+}
+
+HB_FUNC( USRRDD_SETBOF )
+{
+   AREAP pArea;
+
+   if( ISLOG( 2 ) )
+   {
+      if( ISNUM( 1 ) )
+         pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
+      else
+         pArea = ( AREAP ) hb_parptr( 1 );
+
+      if( pArea && pArea->rddID < s_uiUsrNodes && SELF_USRNODE( pArea ) )
+         pArea->fBof = hb_parl( 2 );
+   }
+}
+
+HB_FUNC( USRRDD_SETEOF )
+{
+   AREAP pArea;
+
+   if( ISLOG( 2 ) )
+   {
+      if( ISNUM( 1 ) )
+         pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
+      else
+         pArea = ( AREAP ) hb_parptr( 1 );
+
+      if( pArea && pArea->rddID < s_uiUsrNodes && SELF_USRNODE( pArea ) )
+         pArea->fEof = hb_parl( 2 );
+   }
+}
+
+HB_FUNC( USRRDD_SETFOUND )
+{
+   AREAP pArea;
+
+   if( ISLOG( 2 ) )
+   {
+      if( ISNUM( 1 ) )
+         pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
+      else
+         pArea = ( AREAP ) hb_parptr( 1 );
+
+      if( pArea && pArea->rddID < s_uiUsrNodes && SELF_USRNODE( pArea ) )
+         pArea->fFound = hb_parl( 2 );
+   }
+}
+
+HB_FUNC( USRRDD_SETTOP )
+{
+   AREAP pArea;
+
+   if( ISLOG( 2 ) )
+   {
+      if( ISNUM( 1 ) )
+         pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
+      else
+         pArea = ( AREAP ) hb_parptr( 1 );
+
+      if( pArea && pArea->rddID < s_uiUsrNodes && SELF_USRNODE( pArea ) )
+         pArea->fTop = hb_parl( 2 );
+   }
+}
+
+HB_FUNC( USRRDD_SETBOTTOM )
+{
+   AREAP pArea;
+
+   if( ISLOG( 2 ) )
+   {
+      if( ISNUM( 1 ) )
+         pArea = hb_usrGetAreaPointer( hb_parni( 1 ) );
+      else
+         pArea = ( AREAP ) hb_parptr( 1 );
+
+      if( pArea && pArea->rddID < s_uiUsrNodes && SELF_USRNODE( pArea ) )
+         pArea->fBottom = hb_parl( 2 );
    }
 }
 
