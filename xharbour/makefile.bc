@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.172 2006/06/12 19:37:50 kaddath Exp $
+# $Id: makefile.bc,v 1.173 2006/06/13 10:31:56 fsgiudice Exp $
 #
 
 #
@@ -314,6 +314,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\datec.obj \
    $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
+   $(RTL_OBJ_DIR)\dbf2txt.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
    $(RTL_OBJ_DIR)\descend.obj \
    $(RTL_OBJ_DIR)\dirdrive.obj \
@@ -1958,6 +1959,9 @@ $(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbf2txt.obj : $(RTL_DIR)\dbf2txt.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
