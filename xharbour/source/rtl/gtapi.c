@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.64 2006/04/07 06:08:01 maurifull Exp $
+ * $Id: gtapi.c,v 1.65 2006/06/11 16:25:23 paultucker Exp $
  */
 
 /*
@@ -1770,7 +1770,7 @@ BOOL HB_EXPORT hb_gtSetCloseHandler( PHB_ITEM handler )
       s_pOnClose = hb_itemNew( handler );
       return TRUE;
    }
-   else if ( HB_IS_STRING( handler ) || HB_IS_NUMERIC( handler ) || HB_IS_BLOCK( handler ) )
+   else if ( HB_IS_STRING( handler ) || HB_IS_NUMERIC( handler ) || HB_IS_BLOCK( handler ) || HB_IS_POINTER( handler ) )
    {
       s_pOnClose = hb_itemNew( NULL );
       hb_arrayNew( s_pOnClose, 1 );

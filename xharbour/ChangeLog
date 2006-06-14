@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5012 2006/06/14 13:56:20 druzus Exp $
+ * $Id: ChangeLog,v 1.5013 2006/06/14 18:38:28 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-14 23:14 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+   * source/rtl/tbrowse.prg
+     * two fixes:
+       1) in ::configure() commented ::lNeverDisplay check
+          this not permit to check if a browse has limited rows to display
+          this happens when we have a browse with only one line.
+          Modified also ::RedrawHeaders() for same reason.
+       2) in ::configure() and in ::PerformStabilization() added a change
+          to modify position of current RowPos in browse and in oDataCache.
+          (Also in datacache class modified nCurRow var to be assignable)
+          This is needed when we have to change directly position of current
+          rowpos as in Array browsing.
+       Both tested with my clipper application and now I have same results
+       with xHarbour.
+
+   * source/rtl/gtapi.c
+     * added Pointer handler to hb_gtSetCloseHandler()
+       this permits to call SetGtCloseHandler() passing a function reference
+       like SetGtCloseHandler( @Check_Exit() ).
 
 2006-06-14 11:35 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * makefile.bc
