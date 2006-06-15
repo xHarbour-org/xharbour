@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5014 2006/06/14 21:15:48 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5015 2006/06/14 22:49:18 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-15 03:25 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+   * source/rtl/tbrowse.prg
+     * reverted changes in ::PerformStabilization()
+       there is a difference with Clipper about this due to different
+       logic. But I can live with this difference.
+     + added K_MWFORWARD and K_MWBACKWARD to ::InitKeys()
+     * expanded ::HitTest() to cover all HT* defines
+       now it is possible to cover all points inside browse with mouse
 
 2006-06-14 15:48 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
    * hrbdll.bc

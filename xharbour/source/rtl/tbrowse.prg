@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.146 2006/03/25 20:29:55 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.147 2006/06/14 21:15:48 fsgiudice Exp $
  */
 
 /*
@@ -2287,15 +2287,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    */
    ::nColPos := Max( Min( ::nColPos, ::nColumns ), 1)
 
-   // FSG - 14/06/2006 - added resetting of data positioning
-   //                    that I can get assigninng a value to directly ::RowPos using an array browse
-   //
-   IF lForceStable
-      ::nNewRowPos := ::nRowPos + ::nRecsToSkip
-      ::oDataCache:nCurRow := ::nNewRowPos
-      ::nRecsToSkip := 0
-   ENDIF
-
    // Configure the browse if not configured . Pritpal Bedi
    //
    if ! ::lConfigured .or. ::lNeverDisplayed
@@ -3103,6 +3094,8 @@ METHOD InitKeys( o ) CLASS TBrowse
               { K_RIGHT,       {| oB, nKey | oB:Right()   , 0 } } ,;
               { K_UP,          {| oB, nKey | oB:Up()      , 0 } } ,;
               { K_ESC,         {| oB, nKey | -1               } } ,;
+              { K_MWFORWARD,   {| oB, nKey | oB:Up()      , 0 } } ,;
+              { K_MWBACKWARD,  {| oB, nKey | oB:Down()    , 0 } } ,;
               { K_LBUTTONDOWN, {| oB, nKey | tbmouse( ob, MRow(), MCol() ) } } }
 Return o
 
@@ -3151,8 +3144,8 @@ METHOD TApplyKey( nKey, oBrowse ) CLASS TBrowse
 Return nReturn
 
 //-------------------------------------------------------------------//
-
-Method HitTest( mrow,mcol ) CLASS TBrowse
+/*
+METHOD HitTest( mrow,mcol ) CLASS TBrowse
    LOCAL i, nVisCol, lHitHeader := .f.
    LOCAL nColPos
 
@@ -3201,6 +3194,119 @@ Method HitTest( mrow,mcol ) CLASS TBrowse
    ::mColPos := nColPos
 
 Return if( lHitHeader, HTHEADING, HTCELL )
+*/
+
+// FSG - 14/06/2006 - expanded HitTest()
+METHOD HitTest( mrow,mcol ) CLASS TBrowse
+   Local i, nVisCol
+   LOCAL nRet
+
+   if ( mRow < ::nwTop  .or. mRow > ::nwBottom ) .or. ;
+      ( mCol < ::nwLeft .or. mCol > ::nwRight )
+      // if I'm outside browse
+      return HTNOWHERE
+   endif
+
+   // checking absolute position
+
+   nRet := HTNOWHERE
+
+   if !( ::cBorder == "" )
+
+      if     mRow == ::nTop    .AND. mCol == ::nLeft
+        nRet := HTTOPLEFT
+      elseif mRow == ::nTop    .AND. mCol == ::nRight
+        nRet := HTTOPRIGHT
+      elseif mRow == ::nBottom .AND. mCol == ::nLeft
+        nRet := HTBOTTOMLEFT
+      elseif mRow == ::nBottom .AND. mCol == ::nRight
+        nRet := HTBOTTOMRIGHT
+      elseif mRow == ::nTop
+        nRet := HTTOP
+      elseif mRow == ::nBottom
+        nRet := HTBOTTOM
+      elseif mCol == ::nwLeft
+        nRet := HTLEFT
+      elseif mCol == ::nwRight
+        nRet := HTRIGHT
+      endif
+
+   endif
+
+   if nRet == HTNOWHERE
+
+      if mCol >= ::nwLeft .AND. mCol <= ::nLeft + Len( ::cSpacePre ) - 1
+             // if i'm on left side (also consider spaces on left)
+        nRet := HTLEFT
+      elseif mCol >= ::nwRight - Len( ::cSpaceLast ) + 1 .AND. mCol <= ::nwRight
+             // if i'm on right side (also consider spaces on right)
+        nRet := HTRIGHT
+      elseif ::lHeadSep     .AND. mRow == ::nTop + ::nHeaderHeight + 1
+         // if i'm on header sep
+         nRet := HTHEADSEP
+      elseif mRow >= ::nTop .AND. mRow <= ::nTop + ::nHeaderHeight
+         // if i'm on header
+         nRet := HTHEADING
+      elseif ::lFootSep     .AND. mRow == ::nBottom - ::nFooterHeight - 1
+         // if i'm on footer sep
+         nRet := HTFOOTSEP
+      elseif mRow >= ::nBottom - ::nFooterHeight + 1 .AND. mRow <= ::nBottom
+         // if i'm on footer
+         nRet := HTFOOTING
+      elseif mCol IN ::aColumnsSep
+         nRet := HTCOLSEP
+      else
+         nRet := HTCELL
+      endif
+
+   endif
+
+   ::mRowPos := ::nRowPos
+   ::mColPos := ::nColPos
+
+   // move internal mouse pointer to correct position
+   IF nRet <> HTNOWHERE
+
+      ::mRowPos := mRow - ::rect[ 1 ] + 1
+
+      nVisCol := len( ::aColumnsSep )
+
+      if nVisCol == 0
+         ::mColPos := 1
+
+      elseif mcol >= ::aColumnsSep[ nVisCol ]
+         ::mColPos := nVisCol + ::leftVisible - ::nFrozenCols
+
+      else
+         for i := 1 to nVisCol
+            if mcol < ::aColumnsSep[ i ]
+               ::mColPos := i + ::leftVisible - ::nFrozenCols - 1
+               exit
+            endif
+         next
+      endif
+
+      // if browse has columns that fits exactly horizontally space and
+      // I have no border and I'm already on first visible col or on last visible col,
+      // then I assume that I want to move horizontally
+      IF ::mRowPos == ::nRowPos .AND. ;
+         ::mColPos == ::nColPos
+
+         IF ::mColPos == ::leftVisible .AND. ;
+            ::leftVisible - ::nFrozenCols > 1 .AND. ;
+            Len( ::cSpacePre ) == 0
+            ::mColPos--
+         ELSEIF ::mColPos == ::rightVisible .AND. ;
+            ::rightVisible < ::ColCount() .AND. ;
+            Len( ::cSpaceLast ) == 0
+            ::mColPos++
+         ENDIF
+
+      ENDIF
+
+   endif
+
+Return nRet
 
 //-------------------------------------------------------------------//
 
