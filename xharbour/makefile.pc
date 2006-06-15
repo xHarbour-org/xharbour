@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.24 2006/05/01 23:37:57 modalsist Exp $
+# $Id: makefile.pc,v 1.25 2006/06/13 10:31:57 fsgiudice Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -742,6 +742,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\datec.obj \
    $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
+   $(RTL_OBJ_DIR)\dbf2txt.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
    $(RTL_OBJ_DIR)\descend.obj \
    $(RTL_OBJ_DIR)\dirdrive.obj \
@@ -1180,6 +1181,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\datec.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dates.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dateshb.obj  >> poccrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\dbf2txt.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\defpath.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\descend.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dirdrive.obj >> poccrtl.rsp
@@ -1838,6 +1840,9 @@ $(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dbf2txt.obj : $(RTL_DIR)\dbf2txt.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\defpath.obj : $(RTL_DIR)\defpath.c

@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.23 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: hrbdll.pc,v 1.24 2006/05/01 23:37:56 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -168,6 +168,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\datec.obj \
    $(OBJ_DIR)\dates.obj \
    $(OBJ_DIR)\dateshb.obj \
+   $(OBJ_DIR)\dbf2txt.obj \
    $(OBJ_DIR)\defpath.obj \
    $(OBJ_DIR)\descend.obj \
    $(OBJ_DIR)\dirdrive.obj \
@@ -272,6 +273,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\word.obj \
    $(OBJ_DIR)\xhelp.obj \
    $(OBJ_DIR)\xsavescr.obj \
+   \
    $(OBJ_DIR)\achoice.obj \
    $(OBJ_DIR)\adir.obj \
    $(OBJ_DIR)\alert.obj \
@@ -734,6 +736,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\datec.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\dates.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\dateshb.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dbf2txt.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\defpath.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\descend.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\dirdrive.obj   >> make_tmp
@@ -1415,6 +1418,9 @@ $(OBJ_DIR)\dates.obj : $(RTL_SRC_DIR)\dates.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_SRC_DIR)\dateshb.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\dbf2txt.obj : $(RTL_SRC_DIR)\dbf2txt.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\dbdelim.c : $(RTL_SRC_DIR)\dbdelim.prg
