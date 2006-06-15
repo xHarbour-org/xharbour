@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5017 2006/06/15 01:47:25 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5018 2006/06/15 13:07:15 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-15 16:06 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+   * source/rtl/tbrowse.prg
+     ! changed ::DrawARow() method.
+       When it draws empty lines it have to use standard tbrowse colors
+       and not evaluates column colorblocks
 
 2006-06-15 10:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * makefile.pc

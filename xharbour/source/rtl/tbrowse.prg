@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.148 2006/06/15 01:26:52 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.149 2006/06/15 01:47:25 fsgiudice Exp $
  */
 
 /*
@@ -2603,13 +2603,16 @@ METHOD DrawARow( nRow ) CLASS TBrowse
 
          cColBlanks := Space( ::aColsInfo[ nCol, o_Width ] )
 
+         /* 15/06/2006 - FSG - Empty rows have only standard browser color */
+         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
+         /* 15/06/2006 - FSG - commented out as per above
          // Let's find column color once per column
          if ::aColsInfo[ nCol, o_Obj ]:ColorBlock == NIL
             cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
          else
             cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, BlankValue( ::aColsInfo[ nCol ] ) ), TBC_CLR_STANDARD ) - 1 )
          endif
-
+         */
 
          // Paint all remainig rows up to ::rowcount
          for nRow2Fill := nRow to ::rowCount
