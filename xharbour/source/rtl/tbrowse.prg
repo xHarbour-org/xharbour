@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.147 2006/06/14 21:15:48 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.148 2006/06/15 01:26:52 fsgiudice Exp $
  */
 
 /*
@@ -3235,22 +3235,22 @@ METHOD HitTest( mrow,mcol ) CLASS TBrowse
 
    if nRet == HTNOWHERE
 
-      if mCol >= ::nwLeft .AND. mCol <= ::nLeft + Len( ::cSpacePre ) - 1
+      if mCol >= ::nLeft    .AND. mCol <= ::nLeft + Len( ::cSpacePre ) - 1
              // if i'm on left side (also consider spaces on left)
         nRet := HTLEFT
-      elseif mCol >= ::nwRight - Len( ::cSpaceLast ) + 1 .AND. mCol <= ::nwRight
+      elseif mCol >= ::nRight - Len( ::cSpaceLast ) + 1 .AND. mCol <= ::nwRight
              // if i'm on right side (also consider spaces on right)
         nRet := HTRIGHT
-      elseif ::lHeadSep     .AND. mRow == ::nTop + ::nHeaderHeight + 1
+      elseif ::lHeadSep     .AND. mRow == ::nTop + ::nHeaderHeight
          // if i'm on header sep
          nRet := HTHEADSEP
       elseif mRow >= ::nTop .AND. mRow <= ::nTop + ::nHeaderHeight
          // if i'm on header
          nRet := HTHEADING
-      elseif ::lFootSep     .AND. mRow == ::nBottom - ::nFooterHeight - 1
+      elseif ::lFootSep     .AND. mRow == ::nBottom - ::nFooterHeight
          // if i'm on footer sep
          nRet := HTFOOTSEP
-      elseif mRow >= ::nBottom - ::nFooterHeight + 1 .AND. mRow <= ::nBottom
+      elseif mRow >= ::nBottom - ::nFooterHeight .AND. mRow <= ::nBottom
          // if i'm on footer
          nRet := HTFOOTING
       elseif mCol IN ::aColumnsSep
