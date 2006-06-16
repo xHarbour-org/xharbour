@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5019 2006/06/15 14:10:07 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5020 2006/06/16 07:16:17 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-16 23:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+  * contrib/doc/whatsnew.txt
+    * Added the long forgotten sixth parameter of WVW_DRAWBOXRAISED().
 
 2006-06-16 09:15 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
    * source/rtl/tbrowse.prg
@@ -611,7 +616,7 @@
     added #ifndef NODLL to fix mingw and openwatcom builds
   * source/compiler/cmdcheck.c
     added support for -go<n> to control C source generation
-	 note that now the default for -go is HB_COMPGENC_COMPACT
+    note that now the default for -go is HB_COMPGENC_COMPACT
   * source/rtl/teditor.prg
     added support for CTRL+A select all and some fixes to cut/copy/paste
 

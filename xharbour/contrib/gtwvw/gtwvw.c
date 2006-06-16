@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.37 2006/02/25 00:00:35 ronpinkas Exp $
+ * $Id: gtwvw.c,v 1.38 2006/03/25 18:06:48 bdj Exp $
  */
 
 /*
@@ -10532,13 +10532,16 @@ HB_FUNC( WVW_DRAWBOXGET )
 /*                                                                   */
 /*   Wvw_DrawBoxRaised( nWinNum,                                     */
 /*                   nTop, nLeft, nBottom, nRight,                   */
-/*                   lTight) <--none in gtwvt                        */
+/*                   lTight/aOffset)                                 */
 /*                                                                   */
 /*   if lTight, box is drawn inside the character region                               */
 /*   AND top and left lines are lower two pixel down to make room for above/left object*/
 /*   WARNING: gui object of this type subject to be overwritten by chars               */
 /*   NOTE that these lines are to be overwritten by displayed char,                    */
 /*        we are depending on the fact that gui object will be painted last            */
+/*                                                                                     */
+/*   lTight may be replaced with aOffset parm {top,left,bottom,right}                  */
+/*     ie. offset in pixel unit                                                        */
 /*                                                                                     */
 
 HB_FUNC( WVW_DRAWBOXRAISED )
@@ -10551,7 +10554,10 @@ HB_FUNC( WVW_DRAWBOXRAISED )
             usLeft   = hb_parni( 3 ),
             usBottom = hb_parni( 4 ),
             usRight  = hb_parni( 5 );
-   BOOL  bTight = ( ISNIL( 6 ) ? FALSE : hb_parl( 6 ) );
+   BOOL  bUseArray = ISARRAY(6);
+
+   BOOL  bTight = ( bUseArray || ISNIL( 6 ) ? FALSE : hb_parl( 6 ) );
+   int   iOLeft, iOTop, iORight, iOBottom;
 
    pWindowData = s_pWindows[ usWinNum ];
 
@@ -10560,22 +10566,49 @@ HB_FUNC( WVW_DRAWBOXRAISED )
      hb_wvw_HBFUNCPrologue(usWinNum, &usTop, &usLeft, &usBottom, &usRight);
    }
 
+   if (bTight)
+   {
+
+     iOTop   = 2;
+     iOLeft  = 2;
+     iOBottom= -1;
+     iORight = -1;
+   }
+   else if (bUseArray)
+   {
+
+     iOTop   = hb_parni( 6,1 )-1;
+     iOLeft  = hb_parni( 6,2 )-1;
+     iOBottom= hb_parni( 6,3 );
+     iORight = hb_parni( 6,4 );
+   }
+   else
+   {
+
+     iOTop = -1;
+     iOLeft= -1;
+     iOBottom = 0;
+     iORight  = 0;
+   }
+
    xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usLeft, usTop );
-   iTop    = bTight ? xy.y+2 : xy.y - 1;
-   iLeft   = bTight ? xy.x+2 : xy.x - 1;
+   iTop    = xy.y + iOTop;
+   iLeft   = xy.x + iOLeft;
 
    xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usRight+1, usBottom+1 );
 
    xy.y   -= pWindowData->byLineSpacing;
 
-   iBottom = bTight ? xy.y - 1 : xy.y;
-   iRight  = bTight ? xy.x - 1 : xy.x;
+   iBottom = xy.y + iOBottom;
+   iRight  = xy.x + iORight;
 
    hb_wvw_gtDrawBoxRaised( pWindowData->byWinId, iTop, iLeft, iBottom, iRight,
-                                    bTight );  /* <-- none in gtwvt */
+                                    bTight );
 
    hb_retl( TRUE );
 }
+
+
 
 /*-------------------------------------------------------------------*/
 /*                                                                                         */
