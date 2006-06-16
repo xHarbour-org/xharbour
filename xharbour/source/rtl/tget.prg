@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.114 2006/06/05 11:33:13 modalsist Exp $
+ * $Id: tget.prg,v 1.115 2006/06/07 12:33:49 modalsist Exp $
  */
 
 /*
@@ -649,6 +649,9 @@ METHOD SetFocus() CLASS Get
       ::hasfocus   := .t.
       ::rejected   := .f.
       ::typeout    := .f.
+
+      /* FSG - 16/06/2006 - reset ::lUndo to false to avoid clearing of get in case of reuse of it */
+      ::lUndo      := .f.
 
       ::Original   := xVarGet
       ::type       := ValType( xVarGet )

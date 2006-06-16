@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5018 2006/06/15 13:07:15 modalsist Exp $
+ * $Id: ChangeLog,v 1.5019 2006/06/15 14:10:07 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-16 09:15 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+   * source/rtl/tbrowse.prg
+     * minor fix to last addition to ::configure()
+
+   * source/rtl/tget.prg
+     * reset ::lUndo to .f. in ::SetFocus() to avoid clearing of get in case
+       of re-use after an ESC.
 
 2006-06-15 16:06 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
    * source/rtl/tbrowse.prg

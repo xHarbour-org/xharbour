@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.149 2006/06/15 01:47:25 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.150 2006/06/15 14:10:07 fsgiudice Exp $
  */
 
 /*
@@ -1030,9 +1030,12 @@ METHOD Configure( nMode ) CLASS TBrowse
    // FSG - 14/06/2006 - added resetting of data positioning
    //                    that I can get assigninng a value to directly ::RowPos using an array browse
    IF nMode == 0
-      ::nNewRowPos := ::nRowPos + ::nRecsToSkip
-      ::oDataCache:nCurRow := ::nNewRowPos
-      ::nRecsToSkip := 0
+      IF ::nRecsToSkip <> 0
+         ::nNewRowPos := ::nRowPos + ::nRecsToSkip
+         ::oDataCache:nCurRow := ::nNewRowPos
+         ::nRecsToSkip := 0
+      ENDIF
+      ::RefreshAll()
    ENDIF
 
    //   Flag that browser has been configured properly

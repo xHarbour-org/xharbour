@@ -1,5 +1,5 @@
 /*
- * $Id: videotst.prg,v 1.2 2004/01/28 16:42:19 jonnymind Exp $
+ * $Id: videotst.prg,v 1.3 2004/02/02 10:10:24 andijahja Exp $
  */
 * VIDEOTST.PRG
 *
@@ -11,6 +11,8 @@
 #define HB_VROW   1
 #define HB_VCOL   2
 #define HB_PROMPT 3
+
+#include "gtinfo.ch"
 
 FUNCTION MAIN()
  LOCAL nMode:= 1, nRow, lSuccess
@@ -27,7 +29,10 @@ FUNCTION MAIN()
              { 60, 80, " 60 x 80 " } }
 
  SET GTMODE TO INLINE
- 
+
+ GTInfo(GTI_FONTSIZE, 18)
+ setmode( 37, 102 )
+
  DO WHILE (nMode != 0)
 
     CLEAR SCREEN
