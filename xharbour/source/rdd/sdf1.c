@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.16 2006/05/30 10:51:23 druzus Exp $
+ * $Id: sdf1.c,v 1.17 2006/05/30 16:19:08 druzus Exp $
  */
 
 /*
@@ -1110,7 +1110,6 @@ static ERRCODE hb_sdfRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
    {
       case RDDI_CANPUTREC:
       case RDDI_LOCAL:
-      case RDDI_LARGEFILE:
          hb_itemPutL( pItem, TRUE );
          break;
 
@@ -1266,8 +1265,8 @@ static void hb_sdfRddInit( void * cargo )
 }
 
 HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
-{ "SDF",              {HB_FS_PUBLIC}, {HB_FUNCNAME( SDF )}, NULL },
-{ "SDF_GETFUNCTABLE", {HB_FS_PUBLIC}, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
+{ "SDF",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SDF )}, NULL },
+{ "SDF_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SDF_GETFUNCTABLE )}, NULL }
 HB_INIT_SYMBOLS_END( sdf1__InitSymbols )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_sdf_rdd_init_ )

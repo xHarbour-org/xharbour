@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.67 2006/05/16 22:57:08 druzus Exp $
+ * $Id: workarea.c,v 1.68 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO param )
    HB_SYMBOL_UNUSED( index );
    HB_SYMBOL_UNUSED( param );
 
-   hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "ORDERINFO" );
+   hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBORDERINFO" );
    return FAILURE;
 }
 #endif

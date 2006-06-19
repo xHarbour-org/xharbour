@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.18 2005/03/01 16:27:29 mauriliolongo Exp $
+ * $Id: math.c,v 1.19 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -220,8 +220,9 @@ int hb_mathErrSet( double dResult, double arg1, double arg2, char * szFunc, int 
       case ERANGE:
 #if defined(EOVERFLOW)
       case EOVERFLOW:
-         break;
 #endif
+         break;
+
       default:
          if ( isnan( dResult ) )
          {

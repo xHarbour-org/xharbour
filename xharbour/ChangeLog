@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5020 2006/06/16 07:16:17 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5021 2006/06/16 16:16:55 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-19 23:15 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfdbt/dbfdbt1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * added HB_FS_LOCAL to function symbols in registered symbol tables
+
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/delim1.c
+    - removed RDDI_LARGEFILE and return the default WA value (FALSE)
+
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    ! added missing break
+    + added DBOI_KEYCOUNTRAW, DBOI_KEYNORAW. They works like DBOI_KEYCOUNT
+      and DBOI_KEYNO in pure DBFNTX. Only with some upper level RDDs like
+      RMDBFNTX which supports bit map filters they can return differ results.
+
+  * xharbour/source/rdd/workarea.c
+    * changed ORDERINFO to DBORDERINFO in error message
+
+  * xharbour/source/rtl/math.c
+    ! fixed wrong break position
 
 2006-06-16 23:20 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
