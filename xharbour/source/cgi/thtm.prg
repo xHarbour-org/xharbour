@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.5 2005/12/03 18:23:05 lculik Exp $
+ * $Id: thtm.prg,v 1.6 2006/05/13 16:48:34 lculik Exp $
  */
 
 /*
@@ -71,33 +71,35 @@ CLASS THtml
    DATA FontSize INIT 1
    DATA FontColor INIT "black"
    DATA aImages
+   Data lCgi  INIT .F.
+   Data cStr    Init ""
    DATA BaseURL, BaseTarget
    DATA lFont INIT .F.
 
-   METHOD New( cFile, cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
-               BGIMAGE, BGCOLOR, txtColor, cJavaCode, ;
-               onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
-               cStyle, aimages, baseURL, baseTarget, ;
-               nRefresh, cRefreshURL, cStyleScr, lnocache )
-
-   METHOD CgiNew( cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
+   //METHOD New( cFile, cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
+               //BGIMAGE, BGCOLOR, txtColor, cJavaCode, ;
+               //onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
+               //cStyle, aimages, baseURL, baseTarget, ;
+               //nRefresh, cRefreshURL, cStyleScr, lnocache )
+   METHOD Newalt(cType)
+   METHOD New( cTitle, cLinkTitle, cCharSet, cScriptSRC, ;
                   bgImage, bgColor, txtColor, cJavaCode, ;
                   onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
                   cStyle, aImages, aServerSrc, baseURL, baseTarget, ;
                   nRefresh, cRefreshURL, cStyleScr, lnocache, ;
-                  nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft )
+                  nof, nMarginTop, nMarginHeight, nMarginWidth, nMarginLeft ,lcgi)
 
    METHOD CGIClose()
 
-   METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' ) )
+   METHOD SetPageColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),::cStr +=  IIF( lBody, '<BODY BGCOLOR="' + cColor + '">', ' BGCOLOR="' + cColor + '" ' ) 
 
-   METHOD SetTextColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' ) )
+   METHOD SetTextColor( cColor, lBody ) INLINE DEFAULT(lBody ,.T.),::cStr +=  IIF( lBody, '<BODY TEXT="' + cColor + '">', ' TEXT="' + cColor + '" ' ) 
 
-   METHOD SetBgImage( cImage, lBody ) INLINE DEFAULT(lBody ,.T.),Fwrite( ::nH, IIF( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' ) )
+   METHOD SetBgImage( cImage, lBody ) INLINE DEFAULT(lBody ,.T.),::cStr +=  IIF( lBody, '<BODY BACKGROUND="' + cImage + '">', ' BACKGROUND="' + cImage + '" ' ) 
 
    METHOD CLOSE()
 
-   METHOD SetCenter( lOn ) INLINE Fwrite( ::nH, IIF( lOn, "<CENTER>", "</CENTER>" ) )
+   METHOD SetCenter( lOn ) INLINE ::cStr +=  IIF( lOn, "<CENTER>", "</CENTER>" ) 
 
    METHOD SetFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet )
 
@@ -109,42 +111,42 @@ CLASS THtml
 
    METHOD SAY( str, font, size, type, color, style )
 
-   METHOD Qqout( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, c )
+   METHOD Qqout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c 
 
-   METHOD Qout( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
+   METHOD Qout( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() 
 
-   METHOD Write( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, c )
+   METHOD Write( c ) INLINE DEFAULT( c, "" ), ::cStr +=  c 
 
-   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), Fwrite( ::nH, CRLF() + c + '<BR>' + CRLF() )
+   METHOD WriteLN( c ) INLINE DEFAULT( c, "" ), ::cStr +=  CRLF() + c + '<BR>' + CRLF() 
 
    METHOD SayColor( t, c ) INLINE DEFAULT( t, "" ), DEFAULT( c, "black" ),;
-                    Fwrite( ::nH, '<FONT COLOR="' + c + '">' + t + '</FONT>' )
+                    ::cStr +=  '<FONT COLOR="' + c + '">' + t + '</FONT>' 
 
-   METHOD Space( n ) INLINE DEFAULT( n, 1 ), Fwrite( ::nH, Replicate( "&nbsp;", n ) )
+   METHOD Space( n ) INLINE DEFAULT( n, 1 ), ::cStr +=  Replicate( "&nbsp;", n  )
 
    METHOD PutImage( cImage, nBorder, nHeight, cOnclick, cOnMsOver, cOnMsOut, ;
                     cName, cAlt, cTarget, nWidth, lBreak, ID, MAP, ALING, HSPACE )
 
    METHOD TEXT( cText, nCols, lWrap ) INLINE DEFAULT( lWrap, .T. ), DEFAULT( nCols, 80 ),;
-              Fwrite( ::nH, "<PRE" + IIF( nCols != NIL, ' COLS="' + NTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() )
+              ::cStr +=  "<PRE" + IIF( nCols != NIL, ' COLS="' + NTRIM( nCols ) + "'", "" ) + IIF( lWrap, " WRAP>", ">" ) + CRLF() + cText + CRLF() + "</PRE>" + CRLF() 
 
    METHOD MultiCol( txt, cols, gutter, width ) INLINE DEFAULT( txt, "" ),;
                     DEFAULT( cols, 2 ),;
                     DEFAULT( gutter, 5 ),;
                     DEFAULT( width, 100 ),;
-                    Fwrite( ::nH, '<MULTICOL COLS="' + NTRIM( cols ) + '" GUTTER="' + NTRIM( gutter ) + '" WIDTH="' + NTRIM( width ) + '">' ),;
-                    Fwrite( ::nH, txt ),;
-                    Fwrite( ::nH, "</MULTICOL>" )
+                    ::cStr +=  '<MULTICOL COLS="' + NTRIM( cols ) + '" GUTTER="' + NTRIM( gutter ) + '" WIDTH="' + NTRIM( width ) + '">' ,;
+                    ::cStr +=  txt ,;
+                    ::cStr +=  "</MULTICOL>" 
 
    METHOD PutHeading( cText, nWeight, lCentered )
 
    METHOD HLine( nSize, nWidth, lShade, cColor )
 
-   METHOD PutParagraph() INLINE Fwrite( ::nH, "<P> </P>" + CRLF() )
+   METHOD PutParagraph() INLINE ::cStr +=  "<P> </P>" + CRLF() 
 
    METHOD Paragraph( l, c, style )
 
-   METHOD PutBreak() INLINE Fwrite( ::nH, "<BR>" + CRLF() )
+   METHOD PutBreak() INLINE ::cStr +=  "<BR>" + CRLF() 
 
    METHOD Marquee( cText, cFont, cFntColor, nFntSize, cAlign, nWidth, nHeight, cbgColor, ;
                    cBehavior, cDirection, nScrollAmt, nScrollDelay, LOOP, ;
@@ -177,11 +179,11 @@ CLASS THtml
 
    METHOD EndTable()
 
-   METHOD NewList() INLINE Fwrite( ::nH, "<UL>" + CRLF() )
+   METHOD NewList() INLINE ::cStr +=  "<UL>" + CRLF() 
 
-   METHOD ListItem() INLINE Fwrite( ::nH, "<LI> " )
+   METHOD ListItem() INLINE ::cStr +=  "<LI> " 
 
-   METHOD EndList() INLINE Fwrite( ::nH, "</UL> " )
+   METHOD EndList() INLINE ::cStr +=  "</UL> " 
 
    METHOD NewForm( cMethod, cAction, cName )
 
@@ -193,11 +195,11 @@ CLASS THtml
 
    METHOD FormSubmit( c )
 
-   METHOD FormQOut( c ) INLINE Fwrite( ::nH, c + '<BR>' + CRLF() )
+   METHOD FormQOut( c ) INLINE ::cStr +=  c + '<BR>' + CRLF() 
 
-   METHOD FormQQOut( c ) INLINE Fwrite( ::nH, c + CRLF() )
+   METHOD FormQQOut( c ) INLINE ::cStr +=  c + CRLF() 
 
-   METHOD EndForm() INLINE Fwrite( ::nH, CRLF() + "</FORM>" + CRLF() )
+   METHOD EndForm() INLINE ::cStr +=  CRLF() + "</FORM>" + CRLF() 
 
    METHOD Pushbutton( cName, cCaption, cCgiApp, cOnClick, cOnFocus, cOnBlur, cOnMsOver, cOnMsOut, style, ID )
 
@@ -207,15 +209,15 @@ CLASS THtml
 
    METHOD iFrame( name, src, border, marginwidth, marginheight, scrolling, allign, WIDTH, HEIGHT )
 
-   METHOD StartJava() INLINE Fwrite( ::nH, '<SCRIPT LANGUAGE="JavaScript">' + CRLF() + "<!--" + CRLF() )
+   METHOD StartJava() INLINE ::cStr +=  '<SCRIPT LANGUAGE="JavaScript">' + CRLF() + "<!--" + CRLF() 
 
-   METHOD PutJavaSource( c ) INLINE Fwrite( ::nH, Space( 5 ) + 'SRC="' + c + '"' + CRLF() )
+   METHOD PutJavaSource( c ) INLINE ::cStr +=  Space( 5 ) + 'SRC="' + c + '"' + CRLF() 
 
-   METHOD PutJava( c ) INLINE Fwrite( ::nH, Space( 5 ) + c + CRLF() )
+   METHOD PutJava( c ) INLINE ::cStr +=  Space( 5 ) + c + CRLF() 
 
-   METHOD EndJava() INLINE Fwrite( ::nH, "                  //-->" + CRLF() + "</SCRIPT>" + CRLF() )
+   METHOD EndJava() INLINE ::cStr +=  "                  //-->" + CRLF() + "</SCRIPT>" + CRLF() 
 
-   METHOD serverCode( c ) INLINE Fwrite( ::nH, "<SERVER>" + Space( 9 ) + c + CRLF() + "</SERVER>" + CRLF() )
+   METHOD serverCode( c ) INLINE ::cStr +=  "<SERVER>" + Space( 9 ) + c + CRLF() + "</SERVER>" + CRLF() 
 
    METHOD Fwrite( c ) INLINE Fwrite( ::nH, c )
 
@@ -237,168 +239,15 @@ CLASS THtml
 
    METHOD PutLinkName( cName )
 
-   METHOD NewMap( cName ) INLINE Fwrite( ::nH, "<MAP NAME=" + cName + ">" )
+   METHOD NewMap( cName ) INLINE ::cStr +=  "<MAP NAME=" + cName + ">" 
 
 
    METHOD MapArea( Shape, Alt, Coord, Url ) INLINE ;
-          Fwrite( ::nH, "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() )
+          ::cStr +=  "<AREA  shape=" + Shape + " alt=" + alt + " coords=" + Coord + " href=" + Url + ">" + CRLF() 
 
-   METHOD EndMap() INLINE Fwrite( ::nH, "</MAP>" )
+   METHOD EndMap() INLINE ::cStr +=  "</MAP>" 
 
 ENDCLASS
-
-/****
-*
-*     THtml():New()
-*
-*     Starts a new HTML disk file.
-*/
-
-METHOD New( cFile, cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
-               BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
-               onLoad, onUnload, cLinkClr, cVLinkClr, cALinkClr, ;
-               cStyle, aImages, cBaseURL, cBaseTarget, ;
-               nRefresh, cRefreshURL, cStyleScr, lnocache ) CLASS THtml
-
-   LOCAL i
-
-   DEFAULT cFile TO "file1.htm"
-   DEFAULT cTitle TO "New HTML page"
-   DEFAULT cLinkTitle TO cTitle
-   DEFAULT cRefreshURL TO ""
-   DEFAULT cCharset TO "windows-1253"
-   tracelog(cFile)
-   ::nH    := Fcreate( cFile )
-   tracelog(::nh)
-   ::Title := cTitle
-   ::FName := cFile
-
-   Fwrite( ::nH, '<HTML>' + CRLF() + ;
-           '<HEAD>' + CRLF() + ;
-           '   <TITLE>' + cTitle + ' </TITLE>' + CRLF() )
-
-   IF cBaseURL != NIL
-
-      Fwrite( ::nH, "<BASE HREF='" + cBaseURL + "'" )
-
-      IF cBaseTarget != NIL
-         Fwrite( ::nH, " TARGET='" + cBaseTarget + "'" )
-      ENDIF
-
-      Fwrite( ::nH, ">" + CRLF() )
-   ENDIF
-
-   IF cStyleScr != NIL
-      Fwrite( ::nH, '   <LINK HREF="' + cStyleScr + '"' + "  rel='STYLESHEET' type='text/css'>" + CRLF() )
-   ENDIF
-/* TOFIX: Luiz please review it
-   Fwrite( ::nH, '   <LINK TITLE="' + cLinkTitle + '"' + CRLF() + ;
-           '                HREF="mailto:culik@sl.conex.net" >' + CRLF() + ;
-           '   <META HTTP-EQUIV="Content-Type" content="text/html; charset=' + cCharset + '">' + CRLF() )
-*/
-   IF nRefresh != NIL
-      Fwrite( ::nH, [   <META HTTP-EQUIV="Refresh" CONTENT="] + NTRIM( nRefresh ) + [; URL=] + cRefreshURL + [">] )
-   ENDIF
-
-   IF lnocache
-      Fwrite( ::nH, [   <META HTTP-EQUIV="pragma" CONTENT="no-cache"> ] )
-   ENDIF
-
-   IF aJsCode != NIL
-      Aeval( aJsCode, { | e | HtmlJsCmd( ::nH, e ) } )
-   ENDIF
-
-   IF aScriptSrc != NIL
-
-      FOR i := 1 TO Len( aScriptSrc )
-         Fwrite( ::nH, ;
-                 '<SCRIPT LANGUAGE=JavaScript SRC="' + aScriptSrc[ i ] + '"></SCRIPT>' + CRLF() )
-      NEXT
-
-   ENDIF
-
-   // preload images...
-   IF aImages != NIL
-      ::aImages := aImages
-      Fwrite( ::nH, ;
-              '<SCRIPT LANGUAGE="JavaScript">' + CRLF() )
-      Fwrite( ::nH, '<!--' + CRLF() )
-      Fwrite( ::nH, "if(document.images)" + CRLF() )
-      Fwrite( ::nH, "{" + CRLF() )
-
-      FOR i := 1 TO Len( aImages )
-         Fwrite( ::nH, Space( 5 ) + aImages[ i, 1 ] + "=new Image(100,50);" + CRLF() )
-         Fwrite( ::nH, Space( 5 ) + aImages[ i, 1 ] + '.src="' + aImages[ i, 2 ] + '";' + CRLF() )
-      NEXT
-
-      Fwrite( ::nH, "}" + CRLF() )
-
-      Fwrite( ::nH, "" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + [// Function to 'activate' images.] + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imageOn(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgOn=eval(imgName + "on.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgOn;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "// Function to 'deactivate' images." + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imageOff(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgOff = eval(imgName + "off.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgOff;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "// Function for 'pressed' images." + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imagePress(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgPress = eval(imgName + "press.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgPress;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, '//-->' + CRLF() )
-      Fwrite( ::nH, '</SCRIPT>' + CRLF() )
-
-   ENDIF
-
-   IF cStyle != NIL
-      Fwrite( ::nH, "<STYLE> " + cStyle + " </STYLE>" + CRLF() )
-   ENDIF
-
-   Fwrite( ::nH, ;
-           CRLF() + '</HEAD>' + ;
-           CRLF() + '<BODY' )
-
-   IF onLoad != NIL
-      Fwrite( ::nH, '   onLoad="' + onLoad + '"' )
-   ENDIF
-
-   IF onUnLoad != NIL
-      Fwrite( ::nH, ' onUnload="' + onUnLoad + '"' )
-   ENDIF
-
-   Fwrite( ::nH, '>' )
-   Fwrite( ::nH, CRLF() )
-
-   IF BGIMAGE != NIL
-      ::SetBgImage( bgImage )
-   ENDIF
-
-   IF BGCOLOR != NIL
-      ::SetPageColor( bgColor )
-   ENDIF
-
-   IF txtColor != NIL
-      ::SetTextColor( txtColor )
-   ENDIF
-
-   snHtm := ::nH
-
-   soPage := Self
-
-   RETURN self
 
 /****
 *
@@ -407,7 +256,7 @@ METHOD New( cFile, cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
 *     Starts a new CGI-HTML stream file.
 */
 
-METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
+METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
                   BGIMAGE, BGCOLOR, txtColor, aJsCode, ;
                   onLoad, onUnload, ;
                   cLinkClr, cVLinkClr, cALinkClr, ;
@@ -415,50 +264,64 @@ METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
                   cBaseURL, cBaseTarget, ;
                   nRefresh, cRefreshURL, cStyleScr, ;
                   lNocache, NOF, nMarginTop, nMarginHeight, ;
-                  nMarginWidth, nMarginLeft ) CLASS THtml
+                  nMarginWidth, nMarginLeft ,lCgi,cFile) CLASS THtml
 
    LOCAL i
-
-   DEFAULT cTitle TO "New CGI-HTML page"
-   DEFAULT cLinkTitle TO cTitle
-   DEFAULT cRefreshURL TO ""
-   DEFAULT cCharset TO "windows-1253"
-   DEFAULT lNocache TO .f.
-
+   DEFAULT lCgi  to .F.
+   ::lCgi :=lCgi
+   if lCgi
+      DEFAULT cTitle TO "New CGI-HTML page"
+      DEFAULT cLinkTitle TO cTitle
+      DEFAULT cRefreshURL TO ""
+      DEFAULT cCharset TO "windows-1251"
+      DEFAULT lNocache TO .f.
+   else
+      DEFAULT cFile TO "file1.htm"
+      DEFAULT cTitle TO "New HTML page"
+      DEFAULT cLinkTitle TO cTitle
+      DEFAULT cRefreshURL TO ""
+      DEFAULT cCharset TO "windows-1251"
+   endif
+   
    ::nH    := STD_OUT 
    ::Title := cTitle
-   ::FName := "cgiout.htm"
+   if lCgi   
+      ::FName := "cgiout.htm"
+   else
+      ::FName := cFile      
+   endif
+   if lCgi   
+      ::cStr +=  'Content-Type: text/html' + CRLF() + CRLF() 
+   endif
 
-   Fwrite( ::nH, 'Content-Type: text/html' + CRLF() + CRLF() )
-
-   Fwrite( ::nH, '<HTML>' + CRLF() + ;
+   ::cStr +=  '<HTML>' + CRLF() + ;
            '<HEAD>' + CRLF() + ;
-           '   <TITLE>' + cTitle + ' </TITLE>' + CRLF() )
+           '   <TITLE>' + cTitle + ' </TITLE>' + CRLF() 
 
    IF cBaseURL != NIL
-      Fwrite( ::nH, "<BASE HREF='" + cBaseURL + "'" )
+      ::cStr +=  "<BASE HREF='" + cBaseURL + "'" 
 
       IF cBaseTarget != NIL
-         Fwrite( ::nH, " TARGET='" + cBaseTarget + "'" )
+         ::cStr +=  " TARGET='" + cBaseTarget + "'" 
       ENDIF
 
-      Fwrite( ::nH, ">" + CRLF() )
+      ::cStr +=  ">" + CRLF() 
    ENDIF
 /* TOFIX: Luiz please review it
-   Fwrite( ::nH, '   <LINK TITLE="' + cLinkTitle + '"' + CRLF() + ;
+   ::cStr +=  '   <LINK TITLE="' + cLinkTitle + '"' + CRLF() + ;
            '                HREF="mailto:culik@sl.conex.net" >' + CRLF() + ;
            '   <META HTTP-EQUIV="Content-Type" content="text/html; charset=' + cCharset + '">' + CRLF() )
 */
    IF cStyleScr != NIL
-      Fwrite( ::nH, '   <LINK HREF="' + cStyleScr + '"' + " rel='STYLESHEET' type='text/css'>" + CRLF() )
+      ::cStr +=  '   <LINK HREF="' + cStyleScr + '"' + " rel='STYLESHEET' type='text/css'>" + CRLF() 
    ENDIF
 
    IF nRefresh != NIL
-      Fwrite( ::nH, [   <META HTTP-EQUIV="Refresh" CONTENT="] + NTRIM( nRefresh ) + [; URL=] + cRefreshURL + [">] )
+      ::cStr +=  [   <META HTTP-EQUIV="Refresh" CONTENT="] + NTRIM( nRefresh ) + [; URL=] + cRefreshURL + [">] 
    ENDIF
 
    IF lnocache
-      Fwrite( ::nH, [   <META HTTP-EQUIV="pragma" CONTENT="no-cache"> ] )
+      ::cStr +=  [   <META HTTP-EQUIV="pragma" CONTENT="no-cache"> ] 
    ENDIF
 
    IF aJsCode != NIL
@@ -468,8 +331,8 @@ METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    IF aScriptSrc != NIL
 
       FOR i := 1 TO Len( aScriptSrc )
-         Fwrite( ::nH, ;                
-                 '<SCRIPT LANGUAGE=JavaScript SRC="' + aScriptSrc[ i ] + '"></SCRIPT>' + CRLF() )
+         ::cStr +=  ;                
+                 '<SCRIPT LANGUAGE=JavaScript SRC="' + aScriptSrc[ i ] + '"></SCRIPT>' + CRLF() 
       NEXT
 
    ENDIF
@@ -477,8 +340,8 @@ METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    IF aServerSrc != NIL
 
       FOR i := 1 TO Len( aServerSrc )
-         Fwrite( ::nH, ;                
-                 '<SCRIPT LANGUAGE=JavaScript SRC="' + aServerSrc[ i ] + '" RUNAT=SERVER></SCRIPT>' + CRLF() )
+         ::cStr +=  ;                
+                 '<SCRIPT LANGUAGE=JavaScript SRC="' + aServerSrc[ i ] + '" RUNAT=SERVER></SCRIPT>' + CRLF() 
       NEXT
 
    ENDIF
@@ -486,77 +349,77 @@ METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    // preload images...
    IF aImages != NIL
       ::aImages := aImages
-      Fwrite( ::nH, ;
-              '<SCRIPT LANGUAGE="JavaScript">' + CRLF() )
-      Fwrite( ::nH, '<!--' + CRLF() )
-      Fwrite( ::nH, "if(document.images)" + CRLF() )
-      Fwrite( ::nH, "{" + CRLF() )
+      ::cStr +=  ;
+              '<SCRIPT LANGUAGE="JavaScript">' + CRLF() 
+      ::cStr +=  '<!--' + CRLF() 
+      ::cStr +=  "if(document.images)" + CRLF() 
+      ::cStr +=  "{" + CRLF() 
       FOR i := 1 TO Len( aImages )
-         Fwrite( ::nH, Space( 5 ) + aImages[ i, 1 ] + "=new Image(100,50);" + CRLF() )
-         Fwrite( ::nH, Space( 5 ) + aImages[ i, 1 ] + '.src="' + aImages[ i, 2 ] + '";' + CRLF() )
+         ::cStr +=  Space( 5 ) + aImages[ i, 1 ] + "=new Image(100,50);" + CRLF() 
+         ::cStr +=  Space( 5 ) + aImages[ i, 1 ] + '.src="' + aImages[ i, 2 ] + '";' + CRLF() 
       NEXT
-      Fwrite( ::nH, "}" + CRLF() )
+      ::cStr +=  "}" + CRLF() 
 
-      Fwrite( ::nH, "" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + [// Function to 'activate' images.] + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imageOn(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgOn=eval(imgName + "on.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgOn;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "// Function to 'deactivate' images." + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imageOff(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgOff = eval(imgName + "off.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgOff;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "// Function for 'pressed' images." + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "function imagePress(imgName) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        if (document.images) {" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            imgPress = eval(imgName + "press.src");' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + '            document[imgName].src = imgPress;' + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "        }" + CRLF() )
-      Fwrite( ::nH, Space( 5 ) + "}" + CRLF() )
-      Fwrite( ::nH, CRLF() )
-      Fwrite( ::nH, '//-->' + CRLF() )
-      Fwrite( ::nH, '</SCRIPT>' + CRLF() )
+      ::cStr +=  "" + CRLF() 
+      ::cStr +=  Space( 5 ) + [// Function to 'activate' images.] + CRLF() 
+      ::cStr +=  Space( 5 ) + "function imageOn(imgName) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + "        if (document.images) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + '            imgOn=eval(imgName + "on.src");' + CRLF() 
+      ::cStr +=  Space( 5 ) + '            document[imgName].src = imgOn;' + CRLF() 
+      ::cStr +=  Space( 5 ) + "        }" + CRLF() 
+      ::cStr +=  Space( 5 ) + "}" + CRLF() 
+      ::cStr +=  CRLF() 
+      ::cStr +=  Space( 5 ) + "// Function to 'deactivate' images." + CRLF() 
+      ::cStr +=  Space( 5 ) + "function imageOff(imgName) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + "        if (document.images) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + '            imgOff = eval(imgName + "off.src");' + CRLF() 
+      ::cStr +=  Space( 5 ) + '            document[imgName].src = imgOff;' + CRLF() 
+      ::cStr +=  Space( 5 ) + "        }" + CRLF() 
+      ::cStr +=  Space( 5 ) + "}" + CRLF() 
+      ::cStr +=  CRLF() 
+      ::cStr +=  Space( 5 ) + "// Function for 'pressed' images." + CRLF() 
+      ::cStr +=  Space( 5 ) + "function imagePress(imgName) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + "        if (document.images) {" + CRLF() 
+      ::cStr +=  Space( 5 ) + '            imgPress = eval(imgName + "press.src");' + CRLF() 
+      ::cStr +=  Space( 5 ) + '            document[imgName].src = imgPress;' + CRLF() 
+      ::cStr +=  Space( 5 ) + "        }" + CRLF() 
+      ::cStr +=  Space( 5 ) + "}" + CRLF() 
+      ::cStr +=  CRLF() 
+      ::cStr +=  '//-->' + CRLF() 
+      ::cStr +=  '</SCRIPT>' + CRLF() 
 
    ENDIF
 
    IF cStyle != NIL
-      Fwrite( ::nH, "<STYLE> " + cStyle + " </STYLE>" + CRLF() )
+      ::cStr +=  "<STYLE> " + cStyle + " </STYLE>" + CRLF() 
    ENDIF
 
-   Fwrite( ::nH, ;
+   ::cStr +=  ;
            '</HEAD>' + CRLF() + ;
-           '<BODY' )
+           '<BODY' 
 
    IF onLoad != NIL
-      Fwrite( ::nH, '   onLoad="' + onLoad + '"' )
+      ::cStr +=  '   onLoad="' + onLoad + '"' 
    ENDIF
 
    IF NOF != NIL
-      Fwrite( ::nH, '   NOF="' + nof + '"' )
+      ::cStr +=  '   NOF="' + nof + '"' 
    ENDIF
 
    IF onUnLoad != NIL
-      Fwrite( ::nH, ' onUnload="' + onUnLoad + '"' )
+      ::cStr +=  ' onUnload="' + onUnLoad + '"' 
    ENDIF
 
    IF cLinkClr != NIL
-      Fwrite( ::nH, ' link="' + cLinkClr + '"' )
+      ::cStr +=  ' link="' + cLinkClr + '"' 
    ENDIF
 
    IF cVLinkClr != NIL
-      Fwrite( ::nH, ' vlnk="' + cVLinkClr + '"' )
+      ::cStr +=  ' vlnk="' + cVLinkClr + '"' 
    ENDIF
 
    IF cALinkClr != NIL
-      Fwrite( ::nH, ' alink="' + cALinkClr + '"' )
+      ::cStr +=  ' alink="' + cALinkClr + '"' 
    ENDIF
 
    IF BGIMAGE != NIL
@@ -572,30 +435,44 @@ METHOD CgiNew( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
    ENDIF
 
    IF nMarginTop != NIL
-      Fwrite( ::nH, ' topMargin=' + NTRIM( nMarginTop ) )
+      ::cStr +=  ' topMargin=' + NTRIM( nMarginTop ) 
    ENDIF
 
    IF nMarginLeft != NIL
-      Fwrite( ::nH, ' LeftMargin=' + NTRIM( nMarginLeft ) )
+      ::cStr +=  ' LeftMargin=' + NTRIM( nMarginLeft ) 
    ENDIF
 
    IF nMarginHeight != NIL
-      Fwrite( ::nH, ' MARGINHEIGHT=' + NTRIM( nMarginHeight ) )
+      ::cStr +=  ' MARGINHEIGHT=' + NTRIM( nMarginHeight ) 
    ENDIF
 
    IF nMarginWidth != NIL
-      Fwrite( ::nH, ' MARGINWIDTH=' + NTRIM( nMarginWidth ) )
+      ::cStr +=  ' MARGINWIDTH=' + NTRIM( nMarginWidth ) 
    ENDIF
 
-   Fwrite( ::nH, '>' )
+   ::cStr +=  '>' 
 
-   Fwrite( ::nH, CRLF() )
+   ::cStr +=  CRLF() 
 
    snHtm := ::nH
 
    soPage := Self
 
    RETURN self
+
+METHOD NewAlt(cType) CLASS THtml
+
+   LOCAL i
+   
+   ::nH    := STD_OUT 
+   ::cStr +=  'Content-Type: '+cType + CRLF() + CRLF() 
+
+   snHtm := ::nH
+
+   soPage := Self
+
+   RETURN self
+
 
 /****
 *
@@ -655,7 +532,7 @@ METHOD SetFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet ) CLASS THtml
    ENDIF
 
    cStr += '</FONT>'
-   Fwrite( ::nH, cStr + CRLF() )
+   ::cStr +=  cStr + CRLF() 
    RETURN Self
 
 /****
@@ -722,7 +599,7 @@ METHOD StartFont( cFont, lBold, lItalic, lULine, nSize, cColor, lSet, lPut ) CLA
       IIF( lULine, cStr += '<U>', cStr += '</U>' )
    ENDIF
 
-   Fwrite( ::nH, cStr + CRLF() )
+   ::cStr +=  cStr + CRLF() 
 
    RETURN Self
 
@@ -776,7 +653,7 @@ METHOD DefineFont( cFont, cType, nSize, cColor, lSet ) CLASS THtml
       cStr += cType
    ENDIF
 
-   Fwrite( ::nH, cStr + CRLF() )
+   ::cStr +=  cStr + CRLF() 
 
    RETURN Self
 
@@ -789,7 +666,7 @@ METHOD DefineFont( cFont, cType, nSize, cColor, lSet ) CLASS THtml
 
 METHOD ENDFONT() CLASS THtml
 
-   Fwrite( ::nH, '</font>' + CRLF() )
+   ::cStr +=  '</font>' + CRLF() 
 
    RETURN Self
 
@@ -885,7 +762,7 @@ METHOD SAY( str, font, size, type, color, style ) CLASS THtml
       cOut += "</FONT>"
    ENDIF
 
-   Fwrite( ::nH, cOut + CRLF() )
+   ::cStr +=  cOut + CRLF() 
 
    RETURN Self
 
@@ -917,7 +794,7 @@ METHOD Paragraph( lStart, cAlign, cStyle ) CLASS THtml
    ENDIF
 
    cStr += CRLF()
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
    RETURN Self
 
 /****
@@ -934,13 +811,13 @@ METHOD HLine( nSize, nWidth, lShade, cColor ) CLASS THtml
    DEFAULT lShade TO .T.
 
    IF lShade
-      Fwrite( ::nH, CRLF() + ;
+      ::cStr +=  CRLF() + ;
               '<HR SIZE = ' + NTRIM( nSize ) + IIF( cColor != NIL, " COLOR  " + cColor, "" ) + ' WIDTH = ' + NTRIM( nWidth ) + '%>' + ;
-              CRLF() )
+              CRLF() 
    ELSE
-      Fwrite( ::nH, CRLF() + ;
+      ::cStr +=  CRLF() + ;
               '<HR NOSHADE SIZE = ' + NTRIM( nSize ) + IIF( cColor != NIL, " COLOR  " + cColor, "" ) + ' WIDTH = ' + NTRIM( nWidth ) + '%>' + ;
-              CRLF() )
+              CRLF() 
    ENDIF
 
    RETURN Self
@@ -958,13 +835,13 @@ METHOD PutHeading( cText, nWeight, lCentered ) CLASS THtml
    DEFAULT lCentered TO .F.
 
    IF lCentered
-      Fwrite( ::nH, "<CENTER>" )
+      ::cStr +=  "<CENTER>" 
    ENDIF
 
-   Fwrite( ::nH, "<H" + NTRIM( nWeight ) + ">" + cText + "</H" + NTRIM( nWeight ) + ">" + CRLF() )
+   ::cStr +=  "<H" + NTRIM( nWeight ) + ">" + cText + "</H" + NTRIM( nWeight ) + ">" + CRLF() 
 
    IF lCentered
-      Fwrite( ::nH, "</CENTER>" )
+      ::cStr +=  "</CENTER>" 
    ENDIF
 
    RETURN Self
@@ -983,30 +860,30 @@ METHOD PutTextUrl( cText, cUrl, cOnClick, cOnMsOver, cOnMsout, cTarget, font, cl
    DEFAULT bld TO .F.
    DEFAULT lBreak TO .f.
 
-   Fwrite( ::nH, ;
-           '<A HREF="' + cUrl + '"' + crlf() )
+   ::cStr +=  ;
+           '<A HREF="' + cUrl + '"' + CRLF() 
 
    IF cOnClick != NIL
-      Fwrite( ::nH, ;
-              Space( 5 ) + 'onClick="' + cOnClick + '"' + CRLF() )
+      ::cStr +=  ;
+              Space( 5 ) + 'onClick="' + cOnClick + '"' + CRLF() 
    ENDIF
    IF cOnMsOver != NIL
-      Fwrite( ::nH, ;
-              Space( 5 ) + 'onMouseOver="' + cOnMsOver + '"' + CRLF() )
+      ::cStr +=  ;
+              Space( 5 ) + 'onMouseOver="' + cOnMsOver + '"' + CRLF() 
    ENDIF
    IF cOnMsOut != NIL
-      Fwrite( ::nH, ;
-              Space( 5 ) + 'onMouseOut="' + cOnMsOut + '"' + CRLF() )
+      ::cStr +=  ;
+              Space( 5 ) + 'onMouseOut="' + cOnMsOut + '"' + CRLF() 
    ENDIF
 
    IF cTarget != NIL
-      Fwrite( ::nH, ;
-              Space( 5 ) + 'TARGET=' + cTarget + CRLF() )
+      ::cStr +=  ;
+              Space( 5 ) + 'TARGET=' + cTarget + CRLF() 
    ENDIF
 
    IF cClass != NIL
-      Fwrite( ::nH, ;
-              Space( 5 ) + 'CLASS=' + cClass + CRLF() )
+      ::cStr +=  ;
+              Space( 5 ) + 'CLASS=' + cClass + CRLF() 
    ENDIF
 
    IF bld
@@ -1041,20 +918,20 @@ METHOD PutTextUrl( cText, cUrl, cOnClick, cOnMsOver, cOnMsout, cTarget, font, cl
       cStr += cText
    ENDIF
 
-   Fwrite( ::nH, ;
-           '>' + cStr )
+   ::cStr +=  ;
+           '>' + cStr 
    IF FONT != NIL .or. clr != NIL .or. size != NIL .or. style != NIL
-      Fwrite( ::nH, ;
-              '</font>' )
+      ::cStr +=  ;
+              '</font>' 
    ENDIF
 
    IF bld
-      Fwrite( ::nH, ;
-              '</B>' )
+      ::cStr +=  ;
+              '</B>' 
    ENDIF
 
-   Fwrite( ::nH, ;
-           '</A>' + IIF( lBreak, '<br>' + CRLF(), CRLF() ) )
+   ::cStr +=  ;
+           '</A>' + IIF( lBreak, '<br>' + CRLF(), CRLF() ) 
 
    RETURN Self
 
@@ -1123,9 +1000,9 @@ METHOD PutImageUrl( cImage, nBorder, nHeight, cUrl, ;
       cStr += " hSpace= " + NTRIM( hSpace ) + " "
    ENDIF
 
-   Fwrite( ::nH, ;
+   ::cStr +=  ;
            '<A HREF=' + cUrl + IIF( cClass != NIL, ' class="' + cClass + '"', "" ) + '><IMG SRC="' + cImage + '"' + ;
-           cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) )
+           cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) 
 
    RETURN Self
 
@@ -1173,9 +1050,9 @@ METHOD PutTextImageUrl( cImage, nBorder, nHeight, cUrl, ;
       cStr += ' TARGET=' + cTarget
    ENDIF
 
-   Fwrite( ::nH, ;
+   ::cStr +=  ;
            '<A HREF=' + cUrl + IIF( cClass != NIL, ' class="' + cClass + '"', "" ) + '>' + cText + '<IMG SRC="' + cImage + '"' + ;
-           cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) )
+           cStr + '></A>' + IIF( lBreak, '<br>' + CRLF(), "" ) 
 
    RETURN Self
 
@@ -1250,9 +1127,9 @@ METHOD PutImage( cImage, nBorder, nHeight, ;
       cStr += " hSpace= " + NTRIM( hSpace ) + " "
    ENDIF
 
-   Fwrite( ::nH, ;
+   ::cStr +=  ;
            '<IMG SRC="' + cImage + '"' + ;
-           cStr + '>' + IIF( lBreak, "<br>" + CRLF(), "" ) )
+           cStr + '>' + IIF( lBreak, "<br>" + CRLF(), "" ) 
 
    RETURN Self
 
@@ -1265,10 +1142,17 @@ METHOD PutImage( cImage, nBorder, nHeight, ;
 */
 
 METHOD CLOSE() CLASS THtml
+   //::cStr +=  ::cStr 
+   ::cStr +=  "</body>" + CRLF() 
+   ::cStr +=  "</html>" + CRLF() 
 
-   Fwrite( ::nH, "</body>" + CRLF() )
-   Fwrite( ::nH, "</html>" + CRLF() )
-   Fclose( ::nH )
+   FWrite(::nh,::cStr)
+
+   IF !::lCgi
+      FClose( ::nH )
+   ENDIF
+
+   ::cStr := ""
    RETURN Self
 
 /****
@@ -1280,10 +1164,12 @@ METHOD CLOSE() CLASS THtml
 
 METHOD cgiClose() CLASS THtml
 
-   Fwrite( ::nH, "</body>" + CRLF() )
-   Fwrite( ::nH, "</html>" + CRLF() )
-   Fwrite( ::nH, CRLF() )
-   RETURN Self
+   ::cStr += "</body>" + CRLF() 
+   ::cStr += "</html>" + CRLF() 
+   FWrite( ::nh, ::cStr )
+   FWrite( ::nH, CRLF() )
+
+RETURN Self
 
 /****
 *
@@ -1384,7 +1270,7 @@ METHOD DefineTable( nCols, nBorder, nWidth, nHeight, ColorFore, ColorBG, ;
 
    cStr += ">" + CRLF()
 
-   Fwrite( ::nH, cStr + CRLF() )
+   ::cStr +=  cStr + CRLF() 
 
    RETURN Self
 
@@ -1439,7 +1325,7 @@ METHOD TableHead( cHead, cColor, cAlign, ;
 
    cStr += cHead + IIF( cFont != NIL, '</font>', "" ) + "</th>" + CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
 
    RETURN Self
 
@@ -1468,7 +1354,7 @@ METHOD NewTableRow( cColor, vAling, aLing ) CLASS THtml
    ENDIF
 
    cStr += ">" + CRLF()
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
    RETURN Self
 
 /****
@@ -1481,7 +1367,7 @@ METHOD NewTableRow( cColor, vAling, aLing ) CLASS THtml
 
 METHOD EndTableRow() CLASS THtml
 
-   Fwrite( ::nH, Space( 5 ) + "</TR>" + CRLF() )
+   ::cStr +=  Space( 5 ) + "</TR>" + CRLF() 
    RETURN Self
 
 /****
@@ -1588,7 +1474,7 @@ METHOD NewTableCell( cAlign, cColor, ;
       ::lFont := .t.
    ENDIF
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
    RETURN Self
 
 /****
@@ -1602,9 +1488,9 @@ METHOD NewTableCell( cAlign, cColor, ;
 METHOD EndTableCell( lFont ) CLASS THtml
 
    IF ::lFont
-      Fwrite( ::nH, "</font></td>" + CRLF() )
+      ::cStr +=  "</font></td>" + CRLF() 
    ELSE
-      Fwrite( ::nH, "</td>" + CRLF() )
+      ::cStr +=  "</td>" + CRLF() 
    ENDIF
 
    ::lFont := .f.
@@ -1619,8 +1505,8 @@ METHOD EndTableCell( lFont ) CLASS THtml
 
 METHOD EndTable() CLASS THtml
 
-   Fwrite( ::nH, "</table>" + CRLF() )
-   Fwrite( ::nH, CRLF() + CRLF() + CRLF() )
+   ::cStr +=  "</table>" + CRLF() 
+   ::cStr +=  CRLF() + CRLF() + CRLF() 
    RETURN Self
 
 
@@ -1637,21 +1523,21 @@ METHOD NewForm( cMethod, cAction, cName ) CLASS THtml
    DEFAULT cMethod TO "POST"
    DEFAULT cName TO "newForm"
 
-   Fwrite( ::nH, CRLF() + "<FORM" )
+   ::cStr +=  CRLF() + "<FORM" 
 
    IF cMethod != NIL
-      Fwrite( ::nH, ' METHOD="' + cMethod + '"' )
+      ::cStr +=  ' METHOD="' + cMethod + '"' 
    ENDIF
 
    IF cName != NIL
-      Fwrite( ::nH, ' NAME="' + cName + '"' )
+      ::cStr +=  ' NAME="' + cName + '"' 
    ENDIF
 
    IF cAction != NIL
-      Fwrite( ::nH, ' ACTION="' + cAction + '"' )
+      ::cStr +=  ' ACTION="' + cAction + '"' 
    ENDIF
 
-   Fwrite( ::nH, '>' + CRLF() )
+   ::cStr +=  '>' + CRLF() 
 
    scForm := cName
 
@@ -1669,21 +1555,21 @@ METHOD FormEdit( cType, cName, xValue, nSize ) CLASS THtml
 
    DEFAULT cType TO "edit"
 
-   Fwrite( ::nH, '<INPUT Type="' + cType + '"' )
+   ::cStr +=  '<INPUT Type="' + cType + '"' 
 
    IF cName != NIL
-      Fwrite( ::nH, ' Name="' + cName + '"' )
+      ::cStr +=  ' Name="' + cName + '"' 
    ENDIF
 
    IF xValue != NIL
-      Fwrite( ::nH, ' Value="' + ANY2STR( xValue ) + '"' )
+      ::cStr +=  ' Value="' + htmlany2sTR( xValue ) + '"' 
    ENDIF
 
    IF nSize != NIL
-      Fwrite( ::nH, ' Size="' + ANY2STR( nSize ) + '"' )
+      ::cStr +=  ' Size="' + htmlany2sTR( nSize ) + '"' 
    ENDIF
 
-   Fwrite( ::nH, ">" )
+   ::cStr +=  ">" 
 
    RETURN Self
 
@@ -1697,7 +1583,7 @@ METHOD FormEdit( cType, cName, xValue, nSize ) CLASS THtml
 
 METHOD FormSubmit( cText ) CLASS THtml
 
-   Fwrite( ::nH, '<INPUT Type="submit" Value="' + cText + '">' + CRLF() )
+   ::cStr +=  '<INPUT Type="submit" Value="' + cText + '">' + CRLF() 
 
    RETURN Self
 
@@ -1711,7 +1597,7 @@ METHOD FormSubmit( cText ) CLASS THtml
 
 METHOD FormImage( cText, name, File ) CLASS THtml
 
-   Fwrite( ::nH, '<INPUT TYPE="IMAGE" NAME="' + name + '" SRC="' + file + '">' + CRLF() )
+   ::cStr +=  '<INPUT TYPE="IMAGE" NAME="' + name + '" SRC="' + file + '">' + CRLF() 
 
    RETURN Self
 
@@ -1725,7 +1611,7 @@ METHOD FormImage( cText, name, File ) CLASS THtml
 
 METHOD FormReset( cText ) CLASS THtml
 
-   Fwrite( ::nH, '<INPUT Type="Reset" Value="' + cText + '">' + CRLF() )
+   ::cStr +=  '<INPUT Type="Reset" Value="' + cText + '">' + CRLF() 
 
    RETURN Self
 
@@ -1789,7 +1675,7 @@ METHOD Pushbutton( cName, cCaption, ;
       cStr += '     onClick="location.href=' + cCgiApp + ';"'
    ENDIF
 
-   Fwrite( ::nH, cStr + ">" )
+   ::cStr +=  cStr + ">" 
 
    RETURN Self
 
@@ -1844,7 +1730,7 @@ METHOD Button( cName, cCaption, ;
       cStr += '     onClick="location.href=' + cCgiApp + ';"'
    ENDIF
 
-   Fwrite( ::nH, cStr + ">" + CRLF() )
+   ::cStr +=  cStr + ">" + CRLF() 
 
    RETURN Self
 
@@ -1858,7 +1744,7 @@ METHOD Button( cName, cCaption, ;
 
 METHOD EndButton() CLASS THtml
 
-   Fwrite( ::nH, CRLF() + CRLF() + "</BUTTON>" + CRLF() )
+   ::cStr +=  CRLF() + CRLF() + "</BUTTON>" + CRLF() 
    RETURN Self
 
 /****
@@ -1892,24 +1778,24 @@ METHOD Marquee( cText, cFont, cFntColor, nFntSize, ;
 
    ::StartFont( cFont,,,, nFntSize, cFntColor )
 
-   Fwrite( ::nH, '<MARQUEE align="' + cAlign + '" ' )
-   Fwrite( ::nH, 'behavior="' + cBehavior + '" ' )
-   Fwrite( ::nH, 'width="' + NTRIM( nWidth ) + '%" ' )
-   Fwrite( ::nH, IIF( nHeight != NIL, 'height=' + NTRIM( nHeight ) + " ", "" ) )
-   Fwrite( ::nH, 'bgColor="' + cBgColor + '" ' )
-   Fwrite( ::nH, 'scrollamount="' + NTRIM( nScrollAmt ) + '" ' )
-   Fwrite( ::nH, 'scrolldelay="' + NTRIM( nScrollDelay ) + '" ' )
-   Fwrite( ::nH, 'loop=' + IIF( Valtype( loop ) == "N", NTRIM( loop ), loop ) + ' ' )
-   Fwrite( ::nH, 'direction="' + cDirection + '" ' )
-   Fwrite( ::nH, IIF( onMsOver != NIL, 'onMouseOver="' + onMsOver + '" ', "" ) )
-   Fwrite( ::nH, IIF( onMsOut != NIL, 'onMouseOut="' + onMsOut + '" ', "" ) )
-   Fwrite( ::nH, IIF( onClick != NIL, 'onClick="' + onClick + '" ', "" ) )
-   Fwrite( ::nH, IIF( onStart != NIL, 'onStart="' + onStart + '" ', "" ) )
-   Fwrite( ::nH, IIF( onFinish != NIL, 'onFinish="' + onFinish + '" ', "" ) )
-   Fwrite( ::nH, '>' )
-   Fwrite( ::nH, cText )
+   ::cStr +=  '<MARQUEE align="' + cAlign + '" ' 
+   ::cStr +=  'behavior="' + cBehavior + '" ' 
+   ::cStr +=  'width="' + NTRIM( nWidth ) + '%" ' 
+   ::cStr +=  IIF( nHeight != NIL, 'height=' + NTRIM( nHeight ) + " ", "" ) 
+   ::cStr +=  'bgColor="' + cBgColor + '" ' 
+   ::cStr +=  'scrollamount="' + NTRIM( nScrollAmt ) + '" ' 
+   ::cStr +=  'scrolldelay="' + NTRIM( nScrollDelay ) + '" ' 
+   ::cStr +=  'loop=' + IIF( Valtype( loop ) == "N", NTRIM( loop ), loop ) + ' ' 
+   ::cStr +=  'direction="' + cDirection + '" ' 
+   ::cStr +=  IIF( onMsOver != NIL, 'onMouseOver="' + onMsOver + '" ', "" ) 
+   ::cStr +=  IIF( onMsOut != NIL, 'onMouseOut="' + onMsOut + '" ', "" ) 
+   ::cStr +=  IIF( onClick != NIL, 'onClick="' + onClick + '" ', "" ) 
+   ::cStr +=  IIF( onStart != NIL, 'onStart="' + onStart + '" ', "" ) 
+   ::cStr +=  IIF( onFinish != NIL, 'onFinish="' + onFinish + '" ', "" ) 
+   ::cStr +=  '>' 
+   ::cStr +=  cText 
 
-   Fwrite( ::nH, "</MARQUEE>" + CRLF() )
+   ::cStr +=  "</MARQUEE>" + CRLF() 
    ::EndFont()
 
    RETURN Self
@@ -1960,7 +1846,7 @@ METHOD StartMarquee( cFont, cFntColor, nFntSize, ;
       '>' + ;
       CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
    ::EndFont()
 
    RETURN Self
@@ -1973,7 +1859,7 @@ METHOD StartMarquee( cFont, cFntColor, nFntSize, ;
 
 METHOD EndMarquee() CLASS THtml
 
-   Fwrite( ::nH, "</MARQUEE>" + CRLF() )
+   ::cStr +=  "</MARQUEE>" + CRLF() 
    RETURN Self
 
 /****
@@ -2035,7 +1921,7 @@ METHOD iFrame( name, src, border, marginwidth, marginheight, ;
    cStr += ">" + CRLF()
    cStr += "</IFRAME>" + CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
 
    RETURN Self
 /*   New    Methods   */
@@ -2046,14 +1932,14 @@ METHOD Span( c, Style ) CLASS THtml
       cStr += ' style ="' + Style + '"'
    ENDIF
    cStr += ">" + c + '</span>'
-   Fwrite( ::nh, cStr )
+   ::cStr +=  cStr 
    RETURN Self
 
 METHOD Comment( cText ) CLASS THtml
 
    LOCAL cStr := CRLF() + "<!-- "
    cStr += cText + " -->"
-   Fwrite( ::nh, cStr )
+   ::cStr +=  cStr 
    RETURN Self
 
 METHOD AddObject( cType, cClassid, cAling, cCode, lDisable, cCodeBase, cName, nWidth, nHeight ) CLASS THtml
@@ -2101,19 +1987,19 @@ METHOD AddObject( cType, cClassid, cAling, cCode, lDisable, cCodeBase, cName, nW
    ENDIF
 
    cStr += " >"
-   Fwrite( ::nh, cStr + CRLF() )
+   ::cStr +=  cStr + CRLF() 
 
    RETURN Self
 
 METHOD EndObject() CLASS THtml
 
-   Fwrite( ::nh, "</OBJECT>" + CRLF() )
+   ::cStr +=  "</OBJECT>" + CRLF() 
 
    RETURN Self
 
 METHOD ADDPARAM( cType, cValue ) CLASS THtml
 
-   Fwrite( ::nh, '<param name="' + cType + '" value="' + cValue + '">' + CRLF() )
+   ::cStr +=  '<param name="' + cType + '" value="' + cValue + '">' + CRLF() 
 
    RETURN Self
 
@@ -2121,7 +2007,7 @@ METHOD PutLinkName( cName ) CLASS THtml
 
    LOCAL cStr := '<a name="' + cName + '"></a>'
 
-   Fwrite( ::nh, cStr )
+   ::cStr +=  cStr 
 
    RETURN Self
 
@@ -2247,16 +2133,16 @@ FUNCTION HtmlDecodeURL( cString )
 */
 
 PROCEDURE HtmlJsCmd( nH, cCmd )
-
+   Local cStr := ""
    DEFAULT nH TO HtmlPageHandle()
    DEFAULT cCmd TO ""
 
-   Fwrite( nH, '<SCRIPT LANGUAGE=JavaScript 1.2>' + CRLF() + ;
-           "<!--" + CRLF() )
-   Fwrite( nH, cCmd + CRLF() )
-   Fwrite( nH, "//-->" + CRLF() + ;
-           "</SCRIPT>" + CRLF() )
-
+   cStr += '<SCRIPT LANGUAGE=JavaScript 1.2>' + CRLF() + ;
+           "<!--" + CRLF() 
+   cStr += cCmd + CRLF() 
+   cStr += "//-->" + CRLF() + ;
+           "</SCRIPT>" + CRLF() 
+   FWrite( nH, cStr )   
    RETURN
 
 /****
@@ -2335,37 +2221,6 @@ FUNCTION HtmlPadR( cStr, n )
 
    RETURN cRet
 
-FUNCTION ANY2STR( xVal )
-
-   LOCAL xRet := NIL
-
-   IF Valtype( xVal ) == "C"
-      xRet := IIF( Empty( xVal ), htmlSpace( 2 ), xVal )
-
-   ELSEIF Valtype( xVal ) == "N"
-      xRet := Alltrim( Str( xVal ) )
-
-   ELSEIF Valtype( xVal ) == "O"
-      xRet := "<" + xVal:CLASSNAME() + ">"
-
-   ELSEIF Valtype( xVal ) == "D"
-      xRet := Dtoc( xVal )
-
-   ELSEIF Valtype( xVal ) == "L"
-      xRet := LTOC( xVal )
-
-   ELSEIF Valtype( xVal ) == "B"
-      xRet := "{||...}"
-
-   ELSEIF Valtype( xVal ) == NIL
-      xRet := "NIL"
-
-   ELSEIF Valtype( xVal ) == "U"
-      xRet := "<Unknown Value>"
-
-   ENDIF
-
-RETURN ( xRet )
 
 //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
 FUNCTION HTMLANY2STR( xVal )

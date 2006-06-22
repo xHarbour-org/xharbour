@@ -1,5 +1,5 @@
 /*
- * $Id: html.ch,v 1.4 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: html.ch,v 1.5 2006/05/13 16:46:08 lculik Exp $
  */
 
 /*
@@ -51,6 +51,7 @@
 #include "cgi.ch"
 #xtranslate CRLF(<str>) => ( <str> + chr(13) + chr(10) )
 #xtranslate CRLF() => chr(13) + chr(10)
+/*
 #xCommand DEFINE HTML                ;
           [FILE <file>]              ;
           [TITLE <title>]            ;
@@ -88,8 +89,9 @@
                                  [<baseurl>], [<basetarget>] ,;
                                  [<nRefresh>], [<cRefreshURL>],;
                                  <cStyleScr>,<.lcache.>)
-
-#xCommand DEFINE CGI                 ;
+*/
+#xCommand DEFINE HTML                 ;
+          [FILE <file>]              ;
           [TITLE <title>]            ;
           [LINKTITLE <linktitle>]    ;
           [CHARSET <charset>]        ;
@@ -120,7 +122,7 @@
           [MARGINWIDTH <nMarginWidth>] ;
           OF <oHtml>                 ;
           =>                         ;
-          <oHtml> := THtml():CGInew(<title>, <linktitle>, <charset>,;
+          <oHtml> := THtml():new(<title>, <linktitle>, <charset>,;
                                    [{<(javasrc)>}], ;
                                    [<bgimg>], [<bgcolor>], [<txtcolor>],;
                                    [{<(javacode)>}],;
@@ -129,7 +131,52 @@
                                    [<(cStyle)>], [<aImages>], [{<(srvr)>}],;
                                    [<baseurl>], [<basetarget>], ;
                                    <nrefr>, <refrURL>, <cStyleScr>, <.lcache.>, <nof>,;
-                                   <nMarginTop>, <nMarginHeight>, <nMarginWidth>, <nMarginLeft> )
+                                   <nMarginTop>, <nMarginHeight>, <nMarginWidth>, <nMarginLeft> ,;
+                                   .F.,<file>)
+
+#xCommand DEFINE CGI                 ;
+          [FILE <file>]              ;
+          [TITLE <title>]            ;
+          [LINKTITLE <linktitle>]    ;
+          [CHARSET <charset>]        ;
+          [JAVASOURCE <javasrc,...>] ;
+          [JAVACODE <javacode,...>]  ;
+          [BGIMAGE <bgimg>]          ;
+          [BGCOLOR <bgcolor>]        ;
+          [TEXTCOLOR <txtcolor>]     ;
+          [ONLOAD <onload>]          ;
+          [ONOPEN <onload>]          ;
+          [ONUNLOAD <onunload>]      ;
+          [ONCLOSE <onunload>]       ;
+          [LINKCOLOR <lcolor>]       ;
+          [VLINKCOLOR <vlcolor>]     ;
+          [ALINKCOLOR <alcolor>]     ;
+          [STYLE <cStyle>]           ;
+          [IMAGES <aImages>]         ;
+          [SERVERSOURCE <srvr,...>]  ;
+          [BASEURL <baseurl>]        ;
+          [BASETARGET <basetarget>]  ;
+          [REFRESH <nrefr> [REFRESHURL <refrURL>] ] ;
+          [STYLESHEET <cStyleScr>]   ;
+          [<lcache:NOCACHE>]           ;
+          [NOF <nof> ]               ;
+          [TOPMARGIN  <nMarginTop>];
+          [LEFTMARGIN  <nMarginLeft>] ;
+          [MARGINHEIGHT <nMarginHeight>];
+          [MARGINWIDTH <nMarginWidth>] ;
+          OF <oHtml>                 ;
+          =>                         ;
+          <oHtml> := THtml():new(<title>, <linktitle>, <charset>,;
+                                   [{<(javasrc)>}], ;
+                                   [<bgimg>], [<bgcolor>], [<txtcolor>],;
+                                   [{<(javacode)>}],;
+                                   [<(onload)>], [<(onunload)>], ;
+                                   [<(lcolor)>], [<(vlcolor)>], [<(alcolor)>],;
+                                   [<(cStyle)>], [<aImages>], [{<(srvr)>}],;
+                                   [<baseurl>], [<basetarget>], ;
+                                   <nrefr>, <refrURL>, <cStyleScr>, <.lcache.>, <nof>,;
+                                   <nMarginTop>, <nMarginHeight>, <nMarginWidth>, <nMarginLeft> ,;
+                                   .T., <file> )
 
           // [<auth:AUTHENTICATE>]      ;
           // [<.auth.>]

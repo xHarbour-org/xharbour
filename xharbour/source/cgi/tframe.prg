@@ -1,5 +1,5 @@
 /*
- * $Id: tframe.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
+ * $Id: tframe.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -52,6 +52,7 @@ CLASS THtmlFrameSet
 
    DATA nH
    DATA FName
+   Data cStr INIT ""
 
    DATA TITLE INIT "FrameSet01"
 
@@ -92,7 +93,7 @@ METHOD New( cFName, cTitle ) CLASS THtmlFrameSet
                              "  <TITLE>" + ::Title + "</TITLE>" + CRLF() + ;
                              " </HEAD>" + CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
 
 RETURN Self
 
@@ -147,23 +148,24 @@ METHOD StartSet( aRows, aCols, onLoad, onUnload ) CLASS THtmlFrameSet
 
    cStr += " >" + CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
 
 RETURN Self
 
 
 METHOD Endset() CLASS THtmlFrameSet
 
-   Fwrite( ::nH, " </FRAMESET>" + CRLF() )
+   ::cStr +=  " </FRAMESET>" + CRLF() 
 
 RETURN Self
 
 
 METHOD END () CLASS THtmlFrameSet
 
-   Fwrite( ::nH, "</HTML>" + CRLF() )
+   ::cStr +=  "</HTML>" + CRLF() 
 
    IF ::FName != NIL
+      FWrite( ::nH, ::cStr )
       Fclose( ::nH )
    ENDIF
 
@@ -227,6 +229,6 @@ METHOD Frame( cName, cURL, lBorder, lResize, lScrolling, ;
 
    cStr += ">" + CRLF()
 
-   Fwrite( ::nH, cStr )
+   ::cStr +=  cStr 
 
    RETURN Self

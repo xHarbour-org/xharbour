@@ -1,6 +1,6 @@
 
 /*
- * $Id: tcgi.prg,v 1.1 2005/10/13 16:29:45 lculik Exp $
+ * $Id: tcgi.prg,v 1.2 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -131,11 +131,11 @@ METHOD New( cInBuffer ) CLASS TCgi
 
       ::aQueryFields := {}
 
-      aTemp := ListAsArray( ::Query_String, "&" )           // separate fields
+      aTemp := hb_atokensy( ::Query_String, "&" )           // separate fields
 
       IF Len( aTemp ) != 0
          FOR i := 1 TO Len( aTemp )
-            aVar := ListAsArray( aTemp[ i ], "=" )
+            aVar := hb_atokensy( aTemp[ i ], "=" )
             IF Len( aVar ) == 2
                Aadd( ::aQueryFields, { aVar[ 1 ], HtmlDecodeUrl( aVar[ 2 ] ) } )
             ENDIF
@@ -275,21 +275,3 @@ FUNCTION CgiParseVar( cEnvVar )
 
 RETURN cEnvVar
 
-STATIC FUNCTION ListAsArray( cList, cDelimiter )
-
-   LOCAL nPos          // Position of cDelimiter in cList
-   LOCAL aList := {}   // Define an empty array
-
-   DEFAULT cDelimiter TO ","
-
-   // Loop while there are more items to extract
-   DO WHILE ( nPos := At( cDelimiter, cList ) ) != 0
-
-      // Add the item to aList and remove it from cList
-      Aadd( aList, Alltrim( Substr( cList, 1, nPos - 1 ) ) )
-      cList := Substr( cList, nPos + 1 )
-
-   ENDDO
-   Aadd( aList, cList )                 // Add final element
-
-   RETURN ( aList )    // Return the array
