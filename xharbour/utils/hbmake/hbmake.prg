@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.169 2006/05/13 16:59:15 lculik Exp $
+ * $Id: hbmake.prg,v 1.170 2006/05/30 23:22:11 ath1 Exp $
  */
 
 /*
@@ -2805,7 +2805,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" )  + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS =" + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lhwgui -lprocmisc -lhbxml ","") + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = -Wl,--noinhibit-exec " + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui, "`pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","") + CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
