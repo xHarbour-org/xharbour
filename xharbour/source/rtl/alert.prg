@@ -29,7 +29,6 @@
 #include "common.ch"
 #include "inkey.ch"
 #include "setcurs.ch"
-#include "gtinfo.ch"
 
 /* TOFIX: Clipper defines a clipped window for Alert() [vszakats] */
 
@@ -51,7 +50,7 @@ STATIC s_lNoAlert
 #endif
 
 FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
-   local nRow := Row(), nMaxRow, nMaxCol
+
    LOCAL nChoice
    LOCAL aSay, nPos, nWidth, nOpWidth, nInitRow, nInitCol, nEval
    LOCAL nKey, aPos, nCurrent, aHotkey, aOptionsOK, cEval
@@ -312,13 +311,8 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    nWidth := Max( nWidth + 2 + iif( Len( aSay ) == 1, 4, 0 ), nOpWidth + 2 )
 
    /* box coordinates */
-   nMaxRow = Min( MaxRow(), MaxRow(GTI_CLIENT))
-   if nRow > nMaxRow
-      nMaxRow += (nRow - MaxRow(GTI_CLIENT)) * 2
-   endif
-   nMaxCol = Min( MaxCol(), MaxCol(GTI_CLIENT))
-   nInitRow := Int( ( ( nMaxRow - ( Len( aSay ) + 4 ) ) / 2 ) + .5 )
-   nInitCol := Int( ( ( nMaxCol - ( nWidth + 2 ) ) / 2 ) + .5 )
+   nInitRow := Int( ( ( MaxRow() - ( Len( aSay ) + 4 ) ) / 2 ) + .5 )
+   nInitCol := Int( ( ( MaxCol() - ( nWidth + 2 ) ) / 2 ) + .5 )
 
    /* detect prompts positions */
    aPos := {}
