@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5025 2006/06/23 21:15:58 lculik Exp $
+ * $Id: ChangeLog,v 1.5026 2006/06/23 22:09:33 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2006-06-24 19:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  - debian/xharbour-libs.files 
+    debian/xharbour-libs.postinst 
+    debian/xharbour-pp.files 
+    debian/xharbour-static.files 
+    debian/xhbrules xhbrules1
+    ! removed
+  ! make_deb.sh
+    ! updated to not use the removed files
+  + debian/harb.sh
+    ! Defaults setting for xharbour
+  ! debian/README.debian
+    debian/changelog
+    debian/control
+    debian/copyright
+    debian/dirs
+    debian/rules
+    ! updated for use new rules to build .deb files        
+    
 2006-06-23 19:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/rtl/alert.prg
     ! Revert to previus version due problems on linux

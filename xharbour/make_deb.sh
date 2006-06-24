@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_deb.sh,v 1.1 2003/09/16 12:38:38 lculik Exp $
+# $Id: make_deb.sh,v 1.2 2005/04/30 15:14:08 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -35,9 +35,6 @@ then
 	exit 1
     elif [ -f ${hb_filename} ]
     then
-    install -m777 debian/xhbrules /usr/bin
-    install -m777 bin/hb-func.sh /usr/bin
-    install -m777 debian/xhbrules1 /usr/bin
     dpkg-buildpackage -b
     else
 	echo "Cannot find archive file: ${hb_filename}"
