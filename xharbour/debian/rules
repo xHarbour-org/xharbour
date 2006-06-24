@@ -14,7 +14,7 @@ export HB_BIN_INSTALL=$(INSTDIR)/bin
 export HB_LIB_INSTALL=$(INSTDIR)/lib/xharbour
 export HB_INC_INSTALL=$(INSTDIR)/include/xharbour
 export HB_ETC_DIR=$(CURDIR)/debian/tmp/etc
-export HB_DOC_INSTALL=$(CURDIR)/debian/tmp/usr/share/doc	
+export HB_DOC_INSTALL=$(CURDIR)/debian/tmp/usr/share/doc
 
 CFLAGS = -Wall -g
 
