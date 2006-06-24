@@ -34,6 +34,7 @@ build-stamp:
 	mkdir -p $(HB_BIN_INSTALL)
 	mkdir -p $(HB_LIB_INSTALL)
 	mkdir -p $(HB_INC_INSTALL)
+	mkdir -p $(HB_DOC_INSTALL)
 	mkdir -p $(HB_ETC_DIR)/default
 	mkdir -p $(HB_ETC_DIR)/harbour
 	dh_testdir
