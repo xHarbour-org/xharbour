@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.38 2006/03/25 18:06:48 bdj Exp $
+ * $Id: gtwvw.c,v 1.39 2006/06/16 16:16:55 bdj Exp $
  */
 
 /*
@@ -4217,13 +4217,21 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         return(0);
       }
 
+      TraceLog( NULL, "usWinNum = %i, s_usNumWindows = %i", usWinNum, s_usNumWindows );
+
+      /* FSG - 27/06/2006 - If I'm on base window */
       if (usWinNum == 0)
       {
-         if (s_usNumWindows==1)
+         /* FSG - 27/06/2006 - if I have more than 1 window opened, I have to simulate a ESC key */
+         if (s_usNumWindows > 1)
          {
-
-           hb_wvw_gtAddCharToInputQueue( HB_BREAK_FLAG );
+           /* hb_wvw_gtAddCharToInputQueue( HB_BREAK_FLAG ); */
            hb_wvw_gtAddCharToInputQueue( K_ESC );
+         }
+         else
+         {
+           /* FSG - 27/06/2006 - otherwise I can close handling close events */
+           hb_gtHandleClose();
          }
       }
       else
