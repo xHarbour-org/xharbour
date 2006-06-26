@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.65 2006/06/11 16:25:23 paultucker Exp $
+ * $Id: gtapi.c,v 1.66 2006/06/14 21:15:48 fsgiudice Exp $
  */
 
 /*

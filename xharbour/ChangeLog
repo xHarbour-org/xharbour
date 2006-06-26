@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5026 2006/06/23 22:09:33 lculik Exp $
+ * $Id: ChangeLog,v 1.5027 2006/06/24 21:52:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-26 13:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/w32/global.cf
+  * xharbour/include/hbapigt.h
+  + xharbour/source/rtl/gtgui/Makefile
+  + xharbour/source/rtl/gtgui/gtdef.c
+  + xharbour/source/rtl/gtgui/gtgui.c
+    + added GTGUI GT driver - it supports TONE and CLIPBOARD functionality
+      only and is hacked to overload the default GT driver in multi GT
+      compilation to make some Windows users happy ;-)
+      Such GT driver also exists in Harbour.
+
+  * xharbour/source/rtl/gtapi.c
+    * added EOL at EOF
+
+  * xharbour/source/rtl/gtnul/gtnul.c
+    + added hb_gtSetDefault() function
+
+  * xharbour/source/rtl/gtwin/gtwin.c
+    ! fixed GTWIN to work also in Windows GUI applications
+
+  * xharbour/source/rdd/dbupdat.prg
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * some code clean-up
+
 2006-06-24 19:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   - debian/xharbour-libs.files 
     debian/xharbour-libs.postinst 

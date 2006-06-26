@@ -1,12 +1,13 @@
 /*
- * $Id: dbupdat.prg,v 1.1.1.1 2001/12/21 10:42:46 ronpinkas Exp $
+ * $Id: gtgui.c,v 1.2 2006/06/23 01:00:15 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * __DBUPDATE() function
+ *    Mini GT for GUI programs.
+ *    Now it supports only low level TONE and CLIPBOARD code for W32
  *
- * Copyright 2000 Luiz Rafael Culik <culik@sl.conex.net>
+ * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,52 +51,42 @@
  *
  */
 
-#include "common.ch"
 
-FUNCTION __dbUpdate( cAlias, bKey, lRandom, bAssign )
-   LOCAL nOldArea := Select()
-   LOCAL xKey
+/* NOTE: User programs should never call this layer directly! */
 
-   LOCAL oError
 
-   DEFAULT lRandom TO .F.
+#define HB_OS_WIN_32_USED
+#include "hbapi.h"
 
-   dbGoTop()
 
-   BEGIN SEQUENCE
+/*
+ * This GT is called GUI but we introduce a hack to make
+ * Windows users happy ;-) and we will add aliased name equal
+ * to the default GT REQUESTed by our RTL library, [druzus]
+ */
 
-      dbSelectArea( cAlias )
-      dbGoTop()
-      DO WHILE !Eof()
+#if defined( HB_OS_WIN_32 )
 
-         xKey := Eval( bKey )
+#if defined(HB_DEFAULT_GT)
+#  define HB_GT_NAME HB_DEFAULT_GT
+#elif defined(HB_GT_LIB)
+#  define HB_GT_NAME HB_GT_LIB
+#else
+#  define HB_GT_NAME WIN
+#endif
 
-         dbSelectArea( nOldArea )
-         IF lRandom
-            IF dbSeek( xKey )
-               Eval( bAssign )
-            ENDIF
-         ELSE
-            DO WHILE Eval( bKey ) < xKey .AND. !Eof()
-               dbSkip()
-            ENDDO
+#define GUI 1
+#define gui 1
 
-            IF Eval( bKey ) == xKey .AND. !Eof()
-               Eval( bAssign )
-            ENDIF
-         ENDIF
+#if HB_GT_NAME + 1 == 1
 
-         dbSelectArea( cAlias )
-         dbSkip()
-      ENDDO
+#undef GUI
+#undef gui
 
-   RECOVER USING oError
-   END SEQUENCE
+#include "hbapigt.h"
 
-   dbSelectArea( nOldArea )
+HB_GT_REQUEST( GUI );
+HB_GT_ANNOUNCE( HB_GT_NAME );
+#endif
 
-   IF oError != NIL
-      Break( oError )
-   ENDIF
-
-   RETURN .T.
+#endif

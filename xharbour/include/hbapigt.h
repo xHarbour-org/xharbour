@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.44 2005/12/10 00:29:21 oh1 Exp $
+ * $Id: hbapigt.h,v 1.45 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -538,6 +538,8 @@ extern void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSiz
 
 #define HB_GT_DRVNAME( id )   HB_DEF2STR( id )
 
+#define HB_GT_NAME_MAX_ 8
+
 #ifdef HB_MULTI_GT
 
 #include "hbinit.h"
@@ -557,6 +559,7 @@ extern void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSiz
 #define HB_GT_QTc    HB_GT_QTC
 #define HB_GT_xvt    HB_GT_XVT
 #define HB_GT_xwc    HB_GT_XWC
+#define HB_GT_gui    HB_GT_GUI
 #define HB_GT_alleg  HB_GT_ALLEG
 
 /* These hacks are needed to force preprocessing if id/x is also a macro */

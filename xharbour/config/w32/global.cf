@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.16 2005/02/17 19:52:26 druzus Exp $
+# $Id: global.cf,v 1.17 2005/02/18 21:20:04 druzus Exp $
 #
 
 ifndef MK
@@ -12,6 +12,7 @@ HB_GT_LIBS=\
         gtstd \
         gtwin \
         gtwvt \
+        gtgui \
         gtnul \
 #       gtcrs \
 #       gtsln \

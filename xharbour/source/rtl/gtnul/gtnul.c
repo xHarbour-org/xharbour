@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.29 2005/02/27 11:56:05 andijahja Exp $
+ * $Id: gtnul.c,v 1.30 2005/10/15 02:37:08 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,8 @@
 static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
 static int hb_gtFindNoNul( void );
 
+static char s_gtNameBuf[ HB_GT_NAME_MAX_ + 1 ];
+
 #if defined(HB_DEFAULT_GT)
    char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
 #elif defined(HB_GT_LIB)
@@ -111,6 +113,12 @@ void hb_NUL_gt_ForceLink( void )
 }
 
 /* ********************************************************************** */
+
+HB_EXPORT void hb_gtSetDefault( const char * szGtName )
+{
+   hb_strncpy( s_gtNameBuf, szGtName, HB_GT_NAME_MAX_ );
+   s_defaultGT = s_gtNameBuf;
+}
 
 #ifdef HB_MULTI_GT
 

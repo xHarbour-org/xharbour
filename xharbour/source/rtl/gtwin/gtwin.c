@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.108 2006/06/12 00:05:16 paultucker Exp $
+ * $Id: gtwin.c,v 1.109 2006/06/12 00:07:44 paultucker Exp $
  */
 
 /*
@@ -572,108 +572,126 @@ static void HB_GT_FUNC(gt_xInitScreenParam( void ))
 
 void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr ))
 {
-    int i;
+   int i;
 
-    /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
-    s_osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
-    GetVersionEx( &s_osv );
-    if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
-    {
-        s_dwAltGrBits = RIGHT_ALT_PRESSED;
-    }
-    else
-    {
-        s_dwAltGrBits = LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED;
-    }
+   HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
 
-    HB_TRACE(HB_TR_DEBUG, ("hb_gt_Init()"));
+   /* If Windows 95 or 98, use w9xTone for BCC32, MSVC */
+   s_osv.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+   GetVersionEx( &s_osv );
+   if( s_osv.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
+   {
+      s_dwAltGrBits = RIGHT_ALT_PRESSED;
+   }
+   else
+   {
+      s_dwAltGrBits = LEFT_CTRL_PRESSED | RIGHT_ALT_PRESSED;
+   }
 
-    /* stdin && stdout && stderr */
-    s_iStdIn  = iFilenoStdin;
-    s_iStdOut = iFilenoStdout;
-    s_iStdErr = iFilenoStderr;
+   /* stdin && stdout && stderr */
+   s_iStdIn  = iFilenoStdin;
+   s_iStdOut = iFilenoStdout;
+   s_iStdErr = iFilenoStderr;
 
-    s_bBreak = FALSE;
-    s_cNumRead = 0;
-    s_cNumIndex = 0;
-    s_uiDispCount = 0;
-    s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
-    s_bSpecialKeyHandling = FALSE;
-    s_bAltKeyHandling = TRUE;
-    s_iRelCount = 0;
+   s_bBreak = FALSE;
+   s_cNumRead = 0;
+   s_cNumIndex = 0;
+   s_uiDispCount = 0;
+   s_usOldCurStyle = s_usCursorStyle = SC_NORMAL;
+   s_bSpecialKeyHandling = FALSE;
+   s_bAltKeyHandling = TRUE;
+   s_iRelCount = 0;
 
-    /* initialize code page translation */
-    for ( i = 0; i < 256; i++ )
-    {
-        s_charTransRev[ i ] = ( BYTE ) i;
-        s_charTrans[ i ] = ( BYTE ) i;
-        s_keyTrans[ i ] = ( BYTE ) i;
-    }
+   /* initialize code page translation */
+   for ( i = 0; i < 256; i++ )
+   {
+      s_charTransRev[ i ] = ( BYTE ) i;
+      s_charTrans[ i ] = ( BYTE ) i;
+      s_keyTrans[ i ] = ( BYTE ) i;
+   }
 
-    /* Add Ctrl+Break handler [vszakats] */
-    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
+   /* Add Ctrl+Break handler [vszakats] */
+   SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
 
-    if( ( s_HInput = GetStdHandle( STD_INPUT_HANDLE ) ) == INVALID_HANDLE_VALUE )
-    {
-#ifdef HB_MULTI_GT
-        AllocConsole(); /* It is a Windows app without a console, so we create one */
-        s_HInput = GetStdHandle( STD_INPUT_HANDLE );
-        if( s_HInput == INVALID_HANDLE_VALUE )
-        {
-            hb_errInternal( 10001, "Can't allocate console", "", "" );
-        }
-#else
-        if( hb_dynsymFindName( "__DBGENTRY" ) ) /* the debugger is linked */
-        {
-            AllocConsole(); /* It is a Windows app without a console, so we create one */
-            s_HInput = GetStdHandle( STD_INPUT_HANDLE );
-        }
+#ifndef HB_NO_ALLOC_CONSOLE
+   /*
+    * This is a hack for MSYS console. It does not support full screen output
+    * so nothing can be seen on the screen and we have to close the MSYS
+    * console to be able to allocate the MS-Windows one.
+    * Unfortunatelly I do not know any method to detect the MSYS console
+    * so I used this hack with checking OSTYPE environemnt variable. [druzus]
+    */
+   {
+      char * pszOsType;
+
+      pszOsType = hb_getenv( "OSTYPE" );
+      if( pszOsType )
+      {
+         if( strcmp( pszOsType, "msys" ) == 0 )
+            FreeConsole();
+         hb_xfree( pszOsType );
+      }
+   }
+
+   /* Try to allocate console if we haven't inherited any */
+   AllocConsole();
 #endif
-    }
 
-    s_HOutput = CreateFile( "CONOUT$",     /* filename    */
+   if( ( s_HInput = GetStdHandle( STD_INPUT_HANDLE ) ) == INVALID_HANDLE_VALUE )
+   {
+#ifdef HB_NO_ALLOC_CONSOLE
+      /* allocate console only when debugger is linked */
+      if( hb_dynsymFindName( "__DBGENTRY" ) )
+      {
+         AllocConsole(); /* It is a Windows app without a console, so we create one */
+         s_HInput = GetStdHandle( STD_INPUT_HANDLE );
+      }
+#else
+      if( s_HInput == INVALID_HANDLE_VALUE )
+      {
+         hb_errInternal( 10001, "Can't allocate console", "", "" );
+      }
+#endif
+   }
+
+   s_HOutput = CreateFile( "CONOUT$",                       /* filename    */
                      GENERIC_READ    | GENERIC_WRITE,       /* Access flag */
                      FILE_SHARE_READ | FILE_SHARE_WRITE,    /* share mode  */
                      NULL,                                  /* security attributes */
                      OPEN_EXISTING,                         /* create mode */
                      0, 0 );
 
-    if( s_HOutput != INVALID_HANDLE_VALUE )
-    {
-        GetConsoleScreenBufferInfo( s_HOutput, &s_csbi );
+   if( s_HOutput == INVALID_HANDLE_VALUE )
+      hb_errInternal( 10001, "Can't allocate console (output)", "", "" );
 
-        /* save screen info to restore on exit */
-        memcpy( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
+   s_HInput = CreateFile( "CONIN$",                         /* filename    */
+                     GENERIC_READ    | GENERIC_WRITE,       /* Access flag */
+                     FILE_SHARE_READ | FILE_SHARE_WRITE,    /* share mode  */
+                     NULL,                                  /* security attributes */
+                     OPEN_EXISTING,                         /* create mode */
+                     0, 0 );
 
-        s_csbi.srWindow.Top = s_csbi.srWindow.Left = 0;
-        s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth()-1 );
-        s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, _GetScreenHeight()-1 );
+   if( s_HInput == INVALID_HANDLE_VALUE )
+      hb_errInternal( 10001, "Can't allocate console (input)", "", "" );
 
-        SetConsoleWindowInfo( s_HOutput, TRUE,  &s_csbi.srWindow );
-        SetConsoleScreenBufferSize( s_HOutput, s_csbi.dwSize );
+   GetConsoleScreenBufferInfo( s_HOutput, &s_csbi );
 
-        HB_GT_FUNC(gt_xInitScreenParam());
-    }
+   /* save screen info to restore on exit */
+   memcpy( &s_origCsbi, &s_csbi, sizeof( s_csbi ) );
 
-    if( s_HInput != INVALID_HANDLE_VALUE )
-    {
-        
-        DWORD dwmode;
+   s_csbi.srWindow.Top = s_csbi.srWindow.Left = 0;
+   s_csbi.srWindow.Right = HB_MIN( s_csbi.srWindow.Right, _GetScreenWidth()-1 );
+   s_csbi.srWindow.Bottom = HB_MIN( s_csbi.srWindow.Bottom, _GetScreenHeight()-1 );
 
-        GetConsoleMode( s_HInput, &dwmode );
+   SetConsoleWindowInfo( s_HOutput, TRUE,  &s_csbi.srWindow );
+   SetConsoleScreenBufferSize( s_HOutput, s_csbi.dwSize );
 
-        if( b_MouseEnable )
-        {
-           /* With Mouse */
-           SetConsoleMode( s_HInput, dwmode & ENABLE_MOUSE_INPUT );
-           HB_GT_FUNC(mouse_Init());
-        }
-        else
-        {
-           /* NOMOUSE */
-           SetConsoleMode( s_HInput, dwmode & ~ENABLE_MOUSE_INPUT );
-        }
-    }
+   HB_GT_FUNC(gt_xInitScreenParam());
+
+   GetConsoleMode( s_HOutput, &s_dwomode );
+   GetConsoleMode( s_HInput, &s_dwimode );
+
+   SetConsoleMode( s_HInput, b_MouseEnable ? ENABLE_MOUSE_INPUT : 0x0000 );
 }
 
 /* *********************************************************************** */
@@ -1478,14 +1496,10 @@ USHORT HB_GT_FUNC(gt_VertLine( SHORT Col, SHORT Top, SHORT Bottom, BYTE byChar, 
 
 BOOL HB_GT_FUNC(gt_Suspend())
 {
-   GetConsoleMode( s_HInput, &s_dwimode );
-   GetConsoleMode( s_HOutput, &s_dwomode );
    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), FALSE );
    SetConsoleCtrlHandler( NULL, TRUE );
-   if( b_MouseEnable )
-   {
-      SetConsoleMode( s_HInput, s_dwimode & ~ENABLE_MOUSE_INPUT );
-   }
+   SetConsoleMode( s_HInput, s_dwimode );
+   SetConsoleMode( s_HOutput, s_dwomode );
    return TRUE;
 }
 
@@ -1494,16 +1508,15 @@ BOOL HB_GT_FUNC(gt_Suspend())
 BOOL HB_GT_FUNC(gt_Resume())
 {
    SetConsoleCtrlHandler( NULL, FALSE );
-   SetConsoleMode( s_HInput, s_dwimode );
-   SetConsoleMode( s_HOutput, s_dwomode );
-   HB_GT_FUNC(gt_xSetCursorStyle());
-
 /*
    The next line was commented out and labelled TODO:
    there is no explanation of why it wasn't done.
 */
    SetConsoleCtrlHandler( HB_GT_FUNC(gt_CtrlHandler), TRUE );
 
+   SetConsoleMode( s_HOutput, s_dwomode );
+   SetConsoleMode( s_HInput, b_MouseEnable ? ENABLE_MOUSE_INPUT : 0x0000 );
+   HB_GT_FUNC(gt_xSetCursorStyle());
    HB_GT_FUNC(gt_xInitScreenParam());
 
    return TRUE;
