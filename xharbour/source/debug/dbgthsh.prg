@@ -4,9 +4,10 @@
 
 /*
  * Harbour Project source code:
- * The Debugger Array Inspector
+ * The Debugger Hash Inspector
  *
- * Copyright 2001 Luiz Rafael Culik <culik@sl.conex.net>
+ * Copyright 2006 Francesco Saverio Giudice <info / at / fsgiudice / dot / com>
+ * www - http://www.xharbour.org
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,52 +51,59 @@
  *
  */
 
+ /*
+   26/06/2006 - FSG
+   Converted dbgtarr.prg to work with hashes.
+ */
+
 
 #include "setcurs.ch"
 #include "hbclass.ch"
 #include "inkey.ch"
 #include "common.ch"
 
-Class TDBGArray
+Class TDBGHash
 
-data aWindows
-data TheArray
-data arrayname
-data nCurWindow
-data lEditable
-Method new
-method addWindows
-method doget
-method SetsKeyPressed
+   data   aWindows
+   data   TheHash
+   data   hashName
+   data   nCurWindow
+   data   lEditable
+   Method new
+   method addWindows
+   method doget
+   method SetsKeyPressed
+
 end class
 
-method new(aArray,pArName,lEditable) Class TDBGArray
+method new(hHash,pArName,lEditable) Class TDBGHash
 
    DEFAULT lEditable TO .t.
 
-   ::aWindows:={}
-   ::arrayName:=parName
-   ::TheArray:=aArray
-   ::nCurWindow:=0
-   ::lEditable := lEditable
-   ::addWindows(::TheArray)
+   ::aWindows   := {}
+   ::hashName  := parName
+   ::TheHash    := hHash
+   ::nCurWindow := 0
+   ::lEditable  := lEditable
+   ::addWindows( ::TheHash )
 
 Return Self
 
-Method addWindows(aArray,nRow) Class TDBGArray
-local oBrwSets,nSize:=Len(AArray)
-local n:=1
-Local owndsets
+Method addWindows( hHash, nRow ) Class TDBGHash
+   local oBrwSets, nSize := Len( hHash )
+   local n := 1
+   Local owndsets
    local nWidth, nColWidth
-   local oCol
-   if (nsize<maxrow()-2)
+   local oCol, nKeyLen
+
+   if ( nsize < maxrow() - 2 )
       if nRow <> nil
-         owndsets:=TDbWindow():New( GetTopPos(nRow), 5, getBottomPos(nRow+nsize+1), maxcol()-5, ::arrayName+"[1.."+alltrim(str(nsize,6))+"]" ,"N/W" )
+         owndsets := TDbWindow():New( GetTopPos(nRow), 5, getBottomPos(nRow+nsize+1), maxcol()-5, ::hashName+"[1.."+alltrim(str(nsize,6))+"]" ,"N/W" )
       else
-         owndsets:=TDbWindow():New( 1, 5, 2+nsize, maxcol()-5, ::arrayName+"[1.."+alltrim(str(nsize,6))+"]"  ,"N/W")
+         owndsets := TDbWindow():New( 1, 5, 2+nsize, maxcol()-5, ::hashName+"[1.."+alltrim(str(nsize,6))+"]"  ,"N/W")
       endif
    else
-      owndsets:=TDbWindow():New( 1, 5, maxrow()-2, maxcol()-5, ::arrayName+"[1.."+alltrim(str(nsize,6))+"]"  ,"N/W")
+      owndsets:=TDbWindow():New( 1, 5, maxrow()-2, maxcol()-5, ::hashName+"[1.."+alltrim(str(nsize,6))+"]"  ,"N/W")
    endif
    ::nCurWindow++
    oWndSets:lFocused:=.t.
@@ -106,14 +114,21 @@ Local owndsets
    oBrwSets:autolite:=.f.
    oBrwSets:ColorSpec := __Dbg():ClrModal()
    oBrwSets:Cargo :={ 1,{}} // Actual highligthed row
-   aadd(oBrwSets:Cargo[2],aarray)
+   aadd(oBrwSets:Cargo[2],hHash)
 
-   oBrwSets:AddColumn( ocol:=     TBColumnNew("", { || ::arrayName+"["+alltrim(str(oBrwSets:cargo[ 1 ],6))+"]"} ) )
-   ocol:width:=len(::arrayName+"["+alltrim(str(len(aarray),6))+"]" )
+   //oBrwSets:AddColumn( ocol:=     TBColumnNew("", { || ::hashName+"["+alltrim(str(oBrwSets:cargo[ 1 ],6))+"]"} ) )
+   oBrwSets:AddColumn( ocol:=     TBColumnNew("", { || ::hashName+"[" + HashKeyString( hHash, oBrwSets:cargo[ 1 ] ) +"]" } ) )
+
+   // calculate max key length
+   nKeyLen := 0
+   hEval( hHash, {|k,v,p| nKeyLen := Max( nKeyLen, len( ::hashName+"["+ HashKeyString( hHash, p ) +"]" ) ) } )
+   oCol:width := nKeyLen
+   //ocol:width:=len(::arrayName+"["+alltrim(str(len(aarray),6))+"]" )
    oCol:DefColor:={1,2}
    nColWidth = oCol:Width
 
-   oBrwSets:AddColumn( ocol:=TBColumnNew( "" ,{ || PadR( ValToStr( aArray[oBrwSets:cargo[ 1 ] ] ), nWidth - nColWidth - 1 ) } ) )
+   //oBrwSets:AddColumn( ocol:=TBColumnNew( "" ,{ || PadR( ValToStr( hHash[ oBrwSets:cargo[ 1 ] ] ), nWidth - nColWidth - 1 ) } ) )
+   oBrwSets:AddColumn( ocol:=TBColumnNew( "" ,{ || PadR( ValToStr( HGetValueAt( hHash, oBrwSets:cargo[ 1 ] ) ), nWidth - nColWidth - 1 ) } ) )
 
    /* 09/08/2004 - <maurilio.longo@libero.it>
                    Setting a fixed width like it is done in the next line of code wich I've
@@ -134,23 +149,22 @@ Local owndsets
 
    oBrwSets:GOTOPBLOCK := { || oBrwSets:cargo[ 1 ]:= 1 }
    oBrwSets:GoBottomBlock := { || oBrwSets:cargo[ 1 ]:= Len(oBrwSets:cargo[ 2 ][ 1 ])}
-   oBrwSets:SKIPBLOCK := { |nPos| ( nPos:= ArrayBrowseSkip(nPos, oBrwSets), oBrwSets:cargo[ 1 ]:= ;
+   oBrwSets:SKIPBLOCK := { |nPos| ( nPos:= HashBrowseSkip(nPos, oBrwSets), oBrwSets:cargo[ 1 ]:= ;
                                     oBrwSets:cargo[ 1 ] + nPos,nPos ) }
 
    ::aWindows[::nCurWindow]:bPainted    := { || (oBrwSets:forcestable(),RefreshVarsS(oBrwSets))}
-   ::aWindows[::nCurWindow]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ),;
-                           ::aWindows[::nCurWindow],::arrayName ,Len(aArray),aArray)}
+   ::aWindows[::nCurWindow]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( hHash ),;
+                           ::aWindows[::nCurWindow],::hashName ,Len(hHash),hHash)}
 
    SetCursor( SC_NONE )
    ::aWindows[::nCurWindow]:ShowModal()
 
 return self
 
-method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class TDBGArray
+method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) Class TDBGHash
 
-   local nSet := oBrwSets:cargo[1]
-   local cTemp:=str(nSet,4)
-   local cOldname:= ::arrayName
+   local nSet     := oBrwSets:cargo[1]
+   local cOldname := ::hashName
    Local nPos
 
    local nRecsToSkip
@@ -174,15 +188,16 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
               OBrwSets:PageUp()
 
       Case nKey == K_ENTER
-         if valtype(aArray[nSet])=="A"
-            if Len( aArray[ nSet ] ) == 0
-               Alert( "Array is empty" )
+         if valtype( HGetValueAt( hHash, nSet ) ) == "H"
+            if Len( HGetValueAt( hHash, nSet ) ) == 0
+               Alert( "Hash is empty" )
             else
                SetPos(ownd:nBottom,ownd:nLeft)
                ::aWindows[::nCurwindow]:lFocused:=.f.
-               ::arrayname:= ::arrayname+"["+alltrim(cTemp)+"]"
-               ::AddWindows(aArray[nSet],oBrwSets:RowPos+oBrwSets:nTop)
-               ::arrayname:=coldname
+
+               ::hashName:= ::hashName + "[" + HashKeyString( hHash, nSet ) + "]"
+               ::AddWindows( HGetValueAt( hHash, nSet ), oBrwSets:RowPos+oBrwSets:nTop)
+               ::hashName:=coldname
 
                adel(::aWindows,::nCurWindow)
                asize(::awindows,len(::awindows)-1)
@@ -192,19 +207,21 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                   ::ncurwindow--
                endif
             endif
-         elseif valtype(aArray[nSet])=="B"
+         elseif valtype( HGetValueAt( hHash, nSet ) )=="B"
                   Alert("Value cannot be edited")
          else
               if ::lEditable
                  oBrwSets:RefreshCurrent()
-                 if ValType( aArray[ nSet ] ) == "O"
-                    __DbgObject( aArray[ nSet ], cName + ;
-                                 "[" + AllTrim( Str( nSet ) ) + "]" )
-                 elseif ValType( aArray[ nSet ] ) == "H"
-                    __DbgHashes( aArray[ nSet ], cName + ;
-                                 "[" + AllTrim( Str( nSet ) ) + "]" )
+                 if ValType( HGetValueAt( hHash, nSet ) ) == "O"
+
+                    __DbgObject( HGetValueAt( hHash, nSet ), cName + ;
+                                 "[" + HashKeyString( hHash, nSet ) + "]" )
+                 elseif ValType( HGetValueAt( hHash, nSet ) ) == "A"
+
+                    __DbgArrays( HGetValueAt( hHash, nSet ), cName + ;
+                                 "[" + HashKeyString( hHash, nSet ) + "]" )
                  else
-                    ::doget(oBrwsets,aarray,nSet)
+                    ::doget(oBrwsets,hHash,nSet)
                  endif
                  oBrwSets:RefreshCurrent()
                  oBrwSets:ForceStable()
@@ -237,9 +254,6 @@ static function ValToStr( uVal )
       case cType == "A"
            cResult := "{ ... }"
 
-      case cType == "H"
-           cResult := "Hash of " + AllTrim( Str( Len( uVal ) ) ) + " elements"
-
       case cType $ "CM"
            cResult := '"' + uVal + '"'
 
@@ -254,11 +268,14 @@ static function ValToStr( uVal )
 
       case cType == "O"
            cResult := "Class " + uVal:ClassName() + " object"
+
+      case cType == "H"
+           cResult := "Hash of " + AllTrim( Str( Len( uVal ) ) ) + " elements"
    endcase
 
 return cResult
 
-METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
+METHOD doGet( oBro, pItem, nSet ) Class TDBGHash
 
     LOCAL nKey
     local getlist := {}
@@ -266,7 +283,7 @@ METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
     LOCAL lScoreSave := Set( _SET_SCOREBOARD, .f. )
     LOCAL lExitSave  := Set( _SET_EXIT, .t. )
     LOCAL bInsSave   := SetKey( K_INS )
-    local cValue     := PadR( ValToStr( pItem[ nSet ] ),;
+    local cValue     := PadR( ValToStr( HGetValueAt( pItem, nSet ) ),;
                               oBro:nRight - oBro:nLeft - oBro:GetColumn( 1 ):width )
 
     // make sure browse is stable
@@ -287,7 +304,7 @@ METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
     READ
 
     if LastKey() == K_ENTER
-       pItem[ nSet ] = &cValue
+       HSetValueAt( pItem, nSet, &cValue )
     endif
 
     SetCursor( 0 )
@@ -303,9 +320,9 @@ METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
 
 RETURN  nil
 
-function __DbgArrays( aArray, cArrayName, lEditable )
+function __DbgHashes( hHash, chashName, lEditable )
 
-return TDBGArray():New( aArray, cArrayName, lEditable )
+return TDBGHash():New( hHash, chashName, lEditable )
 
 Static function GetTopPos(nPos)
 Local nReturn:=0
@@ -331,8 +348,25 @@ static procedure RefreshVarsS( oBrowse )
    oBrowse:hilite()
    return
 
-static function ArrayBrowseSkip( nPos, oBrwSets,n )
+static function HashBrowseSkip( nPos, oBrwSets,n )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
       iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;
       Len(oBrwSets:cargo[ 2 ][ 1 ]) - oBrwSets:cargo[ 1 ], nPos ) )
+
+static function HashKeyString( hHash, nAt )
+  LOCAL cString
+  LOCAL xVal  := HGetKeyAt( hHash, nAt )
+  LOCAL cType := ValType( xVal )
+  DO CASE
+     CASE cType == "C"
+          cString := '"' + xVal + '"'
+     CASE cType == "D"
+          cString := '"' + DToC( xVal ) + '"'
+     CASE cType == "N"
+          cString := AllTrim( Str( xVal ) )
+     OTHERWISE
+          cString := AllTrim( cStr( xVal ) )
+  ENDCASE
+
+RETURN cString

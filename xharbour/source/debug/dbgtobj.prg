@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.5 2003/07/31 12:51:01 druzus Exp $
+ * $Id: dbgtobj.prg,v 1.6 2004/07/22 17:51:01 likewolf Exp $
  */
 
 /*
@@ -226,6 +226,10 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) class t
                   if len(   aArray[nSet,2])>0
                      TDBGArray():New(aArray[nSet,2],::pitems[nSet,1])
                   endif
+               elseif valtype(aArray[nSet,2])=="H"
+                  if len(   aArray[nSet,2])>0
+                     TDBGHash():New(aArray[nSet,2],::pitems[nSet,1])
+                  endif
                elseif valtype(aArray[nSet,2])=="O"
                   tdbgObject():New(aArray[nSet,2],::pitems[nSet,1])
 	       ELSEIF ( ( ValType( aArray[ nSet, 2 ] ) == "C" ;
@@ -264,6 +268,10 @@ static function ValToStr( uVal )
 
       case "A"
            cResult := "{ ... }"
+           exit
+
+      case "H"
+           cResult := "Hash of " + AllTrim( Str( Len( uVal ) ) ) + " elements"
            exit
 
       case "C"

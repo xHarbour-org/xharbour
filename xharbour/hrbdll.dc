@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.17 2006/02/14 00:38:51 ath1 Exp $
+# $Id: hrbdll.dc,v 1.18 2006/03/17 01:18:46 fsgiudice Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -3144,6 +3144,12 @@ $(OBJ_DIR)/dbgtarr.c : $(DEBUG_DIR)/dbgtarr.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/dbgtarr.o : $(OBJ_DIR)/dbgtarr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgthsh.c : $(DEBUG_DIR)/dbgthsh.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgthsh.o : $(OBJ_DIR)/dbgthsh.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dbgtobj.c : $(DEBUG_DIR)/dbgtobj.prg

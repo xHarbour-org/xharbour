@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.19 2006/02/14 00:38:51 ath1 Exp $
+# $Id: hrbdll.gc,v 1.20 2006/03/17 01:18:46 fsgiudice Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -451,6 +451,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/dbgtwin.o \
    $(OBJ_DIR)/debugger.o \
    $(OBJ_DIR)/dbgtarr.o \
+   $(OBJ_DIR)/dbgthsh.o \
    $(OBJ_DIR)/dbgtobj.o \
    $(OBJ_DIR)/tbrwtext.o \
    $(OBJ_DIR)/dbgwa.o \
@@ -2058,6 +2059,12 @@ $(OBJ_DIR)/dbgtarr.c : $(DEBUG_DIR)/dbgtarr.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/dbgtarr.o : $(OBJ_DIR)/dbgtarr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgthsh.c : $(DEBUG_DIR)/dbgthsh.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgthsh.o : $(OBJ_DIR)/dbgthsh.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dbgtobj.c : $(DEBUG_DIR)/dbgtobj.prg

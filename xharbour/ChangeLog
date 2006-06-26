@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5027 2006/06/24 21:52:15 lculik Exp $
+ * $Id: ChangeLog,v 1.5028 2006/06/26 11:27:05 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-26 16:22 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+  + source/debug/dbgthsh.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/debugger.prg
+  * source/debug/Makefile.prg
+    + Added support for hash
+
+  * hrbdll.bc
+  * hrbdll.dc
+  * hrbdll.gc
+  * hrbdll.pc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+    * updated for new file
+
+  * source/rtl/decode.prg
+    + Added function hb_DecodeOrEmpty()
+      same as hb_decode() function, but returns a empty value of passed value
+      instead of NIL
 
 2006-06-26 13:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/config/w32/global.cf
@@ -33,10 +60,10 @@
     * some code clean-up
 
 2006-06-24 19:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
-  - debian/xharbour-libs.files 
-    debian/xharbour-libs.postinst 
-    debian/xharbour-pp.files 
-    debian/xharbour-static.files 
+  - debian/xharbour-libs.files
+    debian/xharbour-libs.postinst
+    debian/xharbour-pp.files
+    debian/xharbour-static.files
     debian/xhbrules xhbrules1
     ! removed
   ! make_deb.sh
@@ -49,16 +76,16 @@
     debian/copyright
     debian/dirs
     debian/rules
-    ! updated for use new rules to build .deb files        
-    
+    ! updated for use new rules to build .deb files
+
 2006-06-23 19:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/rtl/alert.prg
     ! Revert to previus version due problems on linux
 
 2006-06-23 18:20 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * utils/hbmake/hbmake.prg
-    ! minor change on linux hwgui support 
-    
+    ! minor change on linux hwgui support
+
 2006-06-22 01:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * ChangeLog
     ! Renamed to ChangeLog.025 and start an new one

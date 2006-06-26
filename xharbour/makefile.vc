@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.171 2006/04/12 05:53:40 paultucker Exp $
+# $Id: makefile.vc,v 1.172 2006/06/13 10:31:57 fsgiudice Exp $
 #
 
 #
@@ -976,6 +976,7 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\dbgmenu.obj \
    $(OBJ_DIR)\dbgtarr.obj \
+   $(OBJ_DIR)\dbgthsh.obj \
    $(OBJ_DIR)\dbgtmenu.obj \
    $(OBJ_DIR)\dbgtmitm.obj \
    $(OBJ_DIR)\dbgtobj.obj \

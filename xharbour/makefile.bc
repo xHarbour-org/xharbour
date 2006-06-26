@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.173 2006/06/13 10:31:56 fsgiudice Exp $
+# $Id: makefile.bc,v 1.174 2006/06/14 18:38:28 kaddath Exp $
 #
 
 #
@@ -690,6 +690,7 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\debugger.obj \
    $(OBJ_DIR)\dbghelp.obj \
    $(OBJ_DIR)\dbgtarr.obj \
+   $(OBJ_DIR)\dbgthsh.obj \
    $(OBJ_DIR)\dbgtobj.obj \
    $(OBJ_DIR)\tbrwtext.obj \
    $(OBJ_DIR)\dbgaltd.obj \
@@ -2967,6 +2968,12 @@ $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbgthsh.c : $(DEBUG_DIR)\dbgthsh.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\dbgthsh.obj : $(OBJ_DIR)\dbgthsh.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_DIR)\dbgtobj.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: decode.prg,v 1.2 2006/06/13 10:38:37 fsgiudice Exp $
+ * $Id: decode.prg,v 1.3 2006/06/13 16:43:19 fsgiudice Exp $
  */
 
 /*
@@ -206,6 +206,11 @@ FUNCTION HB_Decode(...)
 
 
 RETURN xRet
+
+FUNCTION HB_DecodeOrEmpty(...)
+  LOCAL aParams := hb_aParams()
+  LOCAL xVal    := hb_ExecFromArray( @hb_decode(), aParams )
+RETURN IIF( xVal == NIL, EmptyValue( aParams[ 1 ] ), xVal )
 
 STATIC FUNCTION EmptyValue( xVal )
   LOCAL xRet

@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.25 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: makefile.pc,v 1.26 2006/06/15 13:07:15 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -284,6 +284,7 @@ DEBUG_LIB_OBJS = \
    $(OBJ_DIR)\dbgtwin.obj \
    $(OBJ_DIR)\debugger.obj \
    $(OBJ_DIR)\dbgtarr.obj \
+   $(OBJ_DIR)\dbgthsh.obj \
    $(OBJ_DIR)\dbgtobj.obj \
    $(OBJ_DIR)\tbrwtext.obj \
    $(OBJ_DIR)\dbgwa.obj \
@@ -3560,6 +3561,12 @@ $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbgthsh.c : $(DEBUG_DIR)\dbgthsh.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbgthsh.obj : $(OBJ_DIR)\dbgthsh.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_DIR)\dbgtobj.prg

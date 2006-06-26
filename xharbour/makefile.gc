@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.23 2006/03/28 08:14:16 paultucker Exp $
+# $Id: makefile.gc,v 1.24 2006/06/13 10:31:57 fsgiudice Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -3956,6 +3956,7 @@ $(DEBUG_LIB) : \
    $(OBJ_DIR)/debugger.o \
    $(OBJ_DIR)/dbghelp.o \
    $(OBJ_DIR)/dbgtarr.o \
+   $(OBJ_DIR)/dbgthsh.o \
    $(OBJ_DIR)/dbgtobj.o \
    $(OBJ_DIR)/tbrwtext.o \
    $(OBJ_DIR)/dbgaltd.o \
@@ -4009,6 +4010,12 @@ $(OBJ_DIR)/dbgtarr.c : $(DEBUG_DIR)/dbgtarr.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/dbgtarr.o : $(OBJ_DIR)/dbgtarr.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/dbgthsh.c : $(DEBUG_DIR)/dbgthsh.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/dbgthsh.o : $(OBJ_DIR)/dbgthsh.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dbgtobj.c : $(DEBUG_DIR)/dbgtobj.prg

@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2003/07/31 12:51:01 druzus Exp $
+# $Id: Makefile,v 1.4 2004/02/20 02:29:14 likewolf Exp $
 #
 
 ROOT = ../../
@@ -13,10 +13,11 @@ PRG_SOURCES=\
 	debugger.prg \
 	dbgaltd.prg  \
 	dbgtarr.prg  \
+	dbgthsh.prg  \
 	dbgtobj.prg  \
 	tbrwtext.prg \
 	dbgwa.prg    \
-        dbgbrwsr.prg
+  dbgbrwsr.prg
 
 LIBNAME=debug
 

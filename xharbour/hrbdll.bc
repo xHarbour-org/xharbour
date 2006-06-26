@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.117 2006/06/14 18:38:28 kaddath Exp $
+# $Id: hrbdll.bc,v 1.118 2006/06/14 22:49:18 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -502,6 +502,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\debugger.obj \
   $(OBJ_DIR)\dbghelp.obj \
   $(OBJ_DIR)\dbgtarr.obj \
+  $(OBJ_DIR)\dbgthsh.obj \
   $(OBJ_DIR)\dbgtobj.obj \
   $(OBJ_DIR)\tbrwtext.obj \
   $(OBJ_DIR)\dbgwa.obj \
@@ -1210,6 +1211,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\debugger.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbghelp.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtarr.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbgthsh.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgtobj.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\tbrwtext.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgwa.obj             + >> hdll.tmp
@@ -2633,6 +2635,12 @@ $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbgthsh.c : $(DEBUG_DIR)\dbgthsh.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbgthsh.obj : $(OBJ_DIR)\dbgthsh.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_DIR)\dbgtobj.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.74 2006/03/21 23:02:58 likewolf Exp $
+ * $Id: debugger.prg,v 1.75 2006/03/27 21:02:15 likewolf Exp $
  */
 
 /*
@@ -138,7 +138,7 @@ return
 
 procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // debugger entry point
   LOCAL bStartup := .F.
-  
+
   DO CASE
     CASE nMode == HB_DBG_GETENTRY
       HB_INLINE()
@@ -610,7 +610,7 @@ METHOD CodeWindowProcessKey( nKey ) CLASS TDebugger
   IF ::oBrwText != NIL
     DO CASE
       case nKey == K_HOME
-         
+
            ::oBrwText:GoTop()
            if ::oWndCode:lFocused
               SetCursor( SC_SPECIAL1 )
@@ -800,11 +800,11 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
       CASE cCommand == "??" .OR. cCommand == "?"
          aCmnd[WP_TYPE] := cCommand
          aCmnd[WP_EXPR] := cParam
-         
+
          ::RestoreAppState()
          cResult := ::GetExprValue( cParam, @lValid )
          ::SaveAppState()
-         
+
          IF( aCmnd[WP_TYPE] == "??" )
             IF( lValid )
                ::Inspect( aCmnd[WP_EXPR], cResult )
@@ -1109,6 +1109,9 @@ METHOD EditVar( nVar ) CLASS TDebugger
       case ValType( uVarValue ) == "A"
            ::InputBox( cVarName, uVarValue,, .f. )
 
+      case ValType( uVarValue ) == "H"
+           ::InputBox( cVarName, uVarValue,, .f. )
+
       case ValType( uVarValue ) == "O"
            ::InputBox( cVarName, uVarValue,, .f. )
 
@@ -1158,7 +1161,7 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
     xResult := HB_INLINE( ::pInfo, xExpr, @lValid )
     {
       PHB_ITEM item;
-      
+
       if ( ISCHAR( 2 ) )
       {
         item = hb_dbgGetExpressionValue( hb_parptr( 1 ), hb_parc( 2 ) );
@@ -1525,6 +1528,13 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
                      __DbgArrays( uValue, cMsg )
                   endif
 
+               elseif cType == "H"
+                  if Len( uValue ) == 0
+                     Alert( "Hash is empty" )
+                  else
+                     __DbgHashes( uValue, cMsg )
+                  endif
+
                elseif cType == "O"
                   __DbgObject( uValue, cMsg )
 
@@ -1601,7 +1611,7 @@ METHOD ListBox( cCaption, aItems ) CLASS TDebugger
    nMaxWid := Len( cCaption ) + 2
    AEval( aItems, {|x| nMaxWid := Max( Len( x ), nMaxWid ) } )
    nMaxWid += 2
-   
+
    nTop    := ( ::nMaxRow / 2 ) - Min( nItems, ::nMaxRow - 5 ) / 2
    nBottom := ( ::nMaxRow / 2 ) + Min( nItems, ::nMaxRow - 5 ) / 2 + 1
    nLeft   := ( ::nMaxCol / 2 ) - Min( nMaxWid, ::nMaxCol * 3 / 2 ) / 2
@@ -1711,7 +1721,7 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
             ENDIF
          NEXT
       ENDIF
-      
+
       if ::lShowStatics
          cName := ::aProcStack[ ::oBrwStack:Cargo ][ CSTACK_MODULE ]
          n := ASCAN( ::aModules, {|a| FILENAME_EQUAL( a[ MODULE_NAME ], cName ) } )
@@ -1860,7 +1870,7 @@ METHOD Open() CLASS TDebugger
    ASort( aFiles )
    ASize( aFiles, Len( aFiles ) + 1 )
    AIns( aFiles, 1, "(Another file)" )
-   
+
    nFileName := ::ListBox( "Please choose a source file", aFiles )
    IF nFileName == 0
      RETURN NIL
@@ -2040,7 +2050,7 @@ return nil
 // check for breakpoints in the current file and display them
 METHOD RedisplayBreakPoints() CLASS TDebugger
   LOCAL n
-  
+
   FOR n := 1 TO Len( ::aBreakpoints )
     IF FILENAME_EQUAL( ::aBreakpoints[ n ][ 2 ], strip_path( ::cPrgName ) )
       ::oBrwText:ToggleBreakPoint(::aBreakpoints[ n ][ 1 ], .T.)
@@ -2135,7 +2145,7 @@ RETURN self
 
 METHOD RestoreAppScreen() CLASS TDebugger
   LOCAL i
-  
+
   ::cImage := SaveScreen()
   DispBegin()
   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
@@ -2184,7 +2194,7 @@ return nil
 
 METHOD SaveAppScreen( lRestore ) CLASS TDebugger
   LOCAL nRight, nTop, i
-  
+
   IF lRestore == NIL
     lRestore := .T.
   ENDIF
@@ -2193,9 +2203,9 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
   FOR i := 1 TO ::nAppDispCount
     DispEnd()
   NEXT
-  
+
   DispBegin()
- 
+
   /* Get cursor coordinates INSIDE ct window */
   ::nAppRow    := Row()
   ::nAppCol    := Col()
@@ -2207,7 +2217,7 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
      hb_retni( hb_ctWSelect( -1 ) );
      hb_ctWSelect( 0 );
   }
-  
+
   ::cAppImage  := SaveScreen()
   ::nAppCursor := SetCursor( SC_NONE )
   IF lRestore
@@ -2309,7 +2319,7 @@ METHOD SaveSettings() CLASS TDebugger
       if ::lShowPrivates
          cInfo += "Monitor Private" + HB_OsNewLine()
       endif
-      
+
       if ::lShowGlobals
          cInfo += "Monitor Global" + HB_OsNewLine()
       endif
@@ -2723,7 +2733,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
     cFileName := strip_path( ::cPrgName )
     nLine := ::oBrwText:nRow
   ENDIF
-  
+
   IF !::IsValidStopLine( cFileName, nLine )
     RETURN NIL
   ENDIF
@@ -2855,7 +2865,7 @@ METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
 
   IF cType == "G"
     hb_dbg_vmVarGSet( aVar[ VAR_LEVEL ], aVar[ VAR_POS ], uValue )
-  
+
   ELSEIF( cType == "L" )
     nProcLevel := hb_dbg_procLevel() - aVar[VAR_LEVEL]   //skip debugger stack
     hb_dbg_vmVarLSet( nProcLevel, aVar[ VAR_POS ], uValue )
@@ -3026,7 +3036,7 @@ METHOD WatchpointInspect( nPos ) CLASS TDebugger
   ::RestoreAppState()
   xValue := ::GetExprValue( ::aWatch[ nPos ][ WP_EXPR ], @lValid )
   ::SaveAppState()
-  
+
   ::InputBox( ::aWatch[ nPos ][ WP_EXPR ], xValue, , .F. )
 RETURN Self
 
@@ -3244,8 +3254,11 @@ static function ValToStr( uVal )
       case cType == "A"
            cResult := "{ ... }"
 
-      Case cType  =="B"
-         cResult:= "{ || ... }"
+      case cType == "H"
+           cResult := "Hash of " + AllTrim( Str( Len( uVal ) ) ) + " elements"
+
+      case cType  =="B"
+           cResult:= "{ || ... }"
 
       case cType $ "CM"
            cResult := '"' + uVal + '"'

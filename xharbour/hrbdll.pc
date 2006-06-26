@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.24 2006/05/01 23:37:56 modalsist Exp $
+# $Id: hrbdll.pc,v 1.25 2006/06/15 13:07:15 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -706,6 +706,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\dbgtwin.obj  \
    $(OBJ_DIR)\debugger.obj \
    $(OBJ_DIR)\dbgtarr.obj  \
+   $(OBJ_DIR)\dbgthsh.obj  \
    $(OBJ_DIR)\dbgtobj.obj  \
    $(OBJ_DIR)\tbrwtext.obj \
    $(OBJ_DIR)\dbgwa.obj    \
@@ -1133,6 +1134,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\dbgtwin.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\debugger.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbgtarr.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dbgthsh.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbgtobj.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\tbrwtext.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbgwa.obj      >> make_tmp
@@ -3362,6 +3364,12 @@ $(OBJ_DIR)\dbgtarr.c : $(DEBUG_SRC_DIR)\dbgtarr.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbgtarr.obj : $(OBJ_DIR)\dbgtarr.c
+        $(POCC_CMD)
+
+$(OBJ_DIR)\dbgthsh.c : $(DEBUG_SRC_DIR)\dbgthsh.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbgthsh.obj : $(OBJ_DIR)\dbgthsh.c
         $(POCC_CMD)
 
 $(OBJ_DIR)\dbgtobj.c : $(DEBUG_SRC_DIR)\dbgtobj.prg
