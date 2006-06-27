@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.5 2005/08/07 02:40:39 mlombardo Exp $
+ * $Id: txtline.c,v 1.8 2006/06/27 21:00:00 ptsarenko Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ HB_FUNC( MEMOLINE )
             {
                lSpAdded += uiTabLen - ( (lPos+lSpAdded) % uiTabLen ) - 1;
             }
-            else if ( pszString[ ulStartOffset + lPos ] == '\x8D' || pszString[ ulStartOffset + lPos ] == HB_CHAR_LF )
+            else if ( ( lPos < lEnd && pszString[ ulStartOffset + lPos ] == HB_CHAR_SOFT1 && pszString[ ulStartOffset + lPos + 1 ] == HB_CHAR_SOFT2 ) || pszString[ ulStartOffset + lPos ] == HB_CHAR_LF )
             {
                lSpAdded--;
             }

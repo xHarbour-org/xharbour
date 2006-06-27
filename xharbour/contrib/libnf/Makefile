@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2003/10/08 14:03:56 lculik Exp $
+# $Id: Makefile,v 1.3 2006/06/27 22:01:52 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -26,6 +26,7 @@ C_SOURCES = \
 	origin.c \
 	proper.c \
 	prtscr.c \
+	putkey.c \
 	rmdir.c \
 	shift.c \
 	stod.c \

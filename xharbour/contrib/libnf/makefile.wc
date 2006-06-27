@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.1 2004/12/26 12:26:08 ptsarenko Exp $
+# $Id: makefile.wc,v 1.3 2006/06/27 22:01:52 ptsarenko Exp $
 #
 
 #
@@ -90,6 +90,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\n2color.obj \
    $(OBJ_DIR)\origin.obj \
    $(OBJ_DIR)\prtscr.obj \
+   $(OBJ_DIR)\putkey.obj \
    $(OBJ_DIR)\stod.obj \
    $(OBJ_DIR)\kspeed.obj \
    $(OBJ_DIR)\mkdir.obj \
@@ -275,6 +276,10 @@ $(OBJ_DIR)\origin.obj : $(TOOLS_DIR)\origin.c
    lib386 /nologo /out:$(TOOLS_LIB) $@
 
 $(OBJ_DIR)\prtscr.obj : $(TOOLS_DIR)\prtscr.c
+   $(CC) $(CLIBFLAGS) -fo$@ $**
+   lib386 /nologo /out:$(TOOLS_LIB) $@
+
+$(OBJ_DIR)\putkey.obj : $(TOOLS_DIR)\putkey.c
    $(CC) $(CLIBFLAGS) -fo$@ $**
    lib386 /nologo /out:$(TOOLS_LIB) $@
 

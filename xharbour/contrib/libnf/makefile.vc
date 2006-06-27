@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.4 2005/03/06 19:22:09 paultucker Exp $
+# $Id: makefile.vc,v 1.6 2006/06/27 22:01:52 ptsarenko Exp $
 #
 
 #
@@ -147,6 +147,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\n2color.obj \
    $(OBJ_DIR)\origin.obj \
    $(OBJ_DIR)\prtscr.obj \
+   $(OBJ_DIR)\putkey.obj \
    $(OBJ_DIR)\stod.obj \
    $(OBJ_DIR)\kspeed.obj \
    $(OBJ_DIR)\mkdir.obj \

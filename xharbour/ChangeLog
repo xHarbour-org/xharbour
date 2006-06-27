@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5030 2006/06/26 23:16:06 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5032 2006/06/27 22:36:55 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-27 22:30 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * source/vm/memvars.c
+    * added SET PATH directories for file search in __MVRESTORE function
+  * source/rtl/txtline.c
+    ! fixed soft-CR using in MEMOLINE function
+  + contrib/libnf/putkey.c
+    + added FT_PUTKEY function
+  * contrib/libnf/Makefile
+  * contrib/libnf/makefile.bc
+  * contrib/libnf/makefile.pc
+  * contrib/libnf/makefile.vc
+  * contrib/libnf/makefile.wc
+    * updated for new file
 
 2006-06-27 09:35 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * contrib/gtwvw/gtwvw.c

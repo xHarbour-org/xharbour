@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.117 2005/11/26 22:18:08 ronpinkas Exp $
+ * $Id: memvars.c,v 1.119 2006/06/27 21:00:00 ptsarenko Exp $
  */
 
 /*
@@ -2087,8 +2087,7 @@ HB_FUNC( __MVRESTORE )
    */
    if( ISCHAR( 1 ) && ISLOG( 2 ) )
    {
-      PHB_FNAME pFileName;
-      char szFileName[ _POSIX_PATH_MAX + 1 ];
+      char * szFileName;
       FHANDLE fhnd;
 
       BOOL bAdditive = hb_parl( 2 );
@@ -2116,26 +2115,11 @@ HB_FUNC( __MVRESTORE )
          */
       }
 
-      /* Generate filename */
-
-      pFileName = hb_fsFNameSplit( hb_parcx( 1 ) );
-
-      if( pFileName->szExtension == NULL )
-      {
-         pFileName->szExtension = ".mem";
-      }
-
-      if( pFileName->szPath == NULL )
-      {
-         pFileName->szPath = hb_set.HB_SET_DEFAULT;
-      }
-
-      hb_fsFNameMerge( szFileName, pFileName );
-      hb_xfree( pFileName );
-
       /* Open .MEM file */
 
-      while( ( fhnd = hb_fsOpen( ( BYTE * ) szFileName, FO_READ | FO_DENYWRITE | FO_PRIVATE ) ) == FS_ERROR )
+      szFileName = hb_parc( 1 );
+
+      while( ( fhnd = hb_fsExtOpen( ( BYTE * ) szFileName, ".mem", FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2005, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 

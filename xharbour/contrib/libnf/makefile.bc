@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.2 2004/01/28 13:25:30 lculik Exp $
+# $Id: makefile.bc,v 1.4 2006/06/27 21:06:11 ptsarenko Exp $
 #
 
 #
@@ -113,6 +113,7 @@ TOOLS_LIB_OBJS = \
    $(OBJ_DIR)\ftattr.obj \
    $(OBJ_DIR)\dispc.obj \
    $(OBJ_DIR)\fttext.obj \
+   $(OBJ_DIR)\putkey.obj \
    \
    $(OBJ_DIR)\aading.obj \
    $(OBJ_DIR)\aavg.obj \
@@ -331,6 +332,10 @@ $(OBJ_DIR)\dispc.obj : $(TOOLS_DIR)\dispc.c
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
 $(OBJ_DIR)\fttext.obj : $(TOOLS_DIR)\fttext.c
+   $(CC) $(CLIBFLAGS) -o$@ $**
+   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+
+$(OBJ_DIR)\putkey.obj : $(TOOLS_DIR)\putkey.c
    $(CC) $(CLIBFLAGS) -o$@ $**
    tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
 
