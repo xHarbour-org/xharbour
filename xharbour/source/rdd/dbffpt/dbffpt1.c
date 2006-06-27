@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.76 2006/06/14 13:56:20 druzus Exp $
+ * $Id: dbffpt1.c,v 1.77 2006/06/19 21:16:44 druzus Exp $
  */
 
 /*
@@ -3675,19 +3675,6 @@ static ERRCODE hb_fptStructSize( FPTAREAP pArea, USHORT * uiSize )
    HB_SYMBOL_UNUSED( pArea );
 
    * uiSize = sizeof( FPTAREA );
-   return SUCCESS;
-}
-
-/*
- * Obtain the name of replaceable database driver (RDD) subsystem.
- * ( DBENTRYP_P )     hb_fptSysName
- */
-static ERRCODE hb_fptSysName( FPTAREAP pArea, BYTE * pBuffer )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_fptSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
-
-   strncpy( ( char * ) pBuffer, "DBFFPT", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
    return SUCCESS;
 }
 

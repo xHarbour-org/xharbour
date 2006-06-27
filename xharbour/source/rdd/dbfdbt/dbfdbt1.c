@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.32 2005/11/16 12:16:45 druzus Exp $
+ * $Id: dbfdbt1.c,v 1.33 2006/06/19 21:16:44 druzus Exp $
  */
 
 /*
@@ -518,19 +518,6 @@ static ERRCODE hb_dbtStructSize( DBTAREAP pArea, USHORT * uiSize )
    HB_SYMBOL_UNUSED( pArea );
 
    * uiSize = sizeof( DBTAREA );
-   return SUCCESS;
-}
-
-/*
- * Obtain the name of replaceable database driver (RDD) subsystem.
- * ( DBENTRYP_P )     hb_dbtSysName
- */
-static ERRCODE hb_dbtSysName( DBTAREAP pArea, BYTE * pBuffer )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbtSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
-
-   strncpy( ( char * ) pBuffer, "DBFDBT", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
    return SUCCESS;
 }
 

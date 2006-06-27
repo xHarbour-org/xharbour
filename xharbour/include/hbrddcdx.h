@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.51 2005/10/30 14:45:48 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.52 2006/06/07 15:57:29 druzus Exp $
  */
 
 /*
@@ -587,7 +587,7 @@ static ERRCODE hb_cdxClose( CDXAREAP pArea );
 static ERRCODE hb_cdxOpen( CDXAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define hb_cdxRelease                              NULL
 static ERRCODE hb_cdxStructSize( CDXAREAP pArea, USHORT * uiSize );
-static ERRCODE hb_cdxSysName( CDXAREAP pArea, BYTE * pBuffer );
+#define hb_cdxSysName                              NULL
 #define hb_cdxEval                                 NULL
 static ERRCODE hb_cdxPack ( CDXAREAP pArea );
 #define hb_cdxPackRec                              NULL

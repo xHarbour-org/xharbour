@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.573 2006/05/30 23:22:11 ath1 Exp $
+ * $Id: hvm.c,v 1.574 2006/06/08 09:57:13 druzus Exp $
  */
 
 /*
@@ -3302,7 +3302,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   /* Storing and removing the extra indexes. */
                   for ( i = hb_vm_iExtraIndex - 1; i >= 0; i-- )
                   {
-                     hb_itemCopy( aExtraItems + i, hb_stackItemFromTop(-1) );
+                     ( aExtraItems + i )->type = HB_IT_NIL;
+                     hb_itemMove( aExtraItems + i, hb_stackItemFromTop(-1) );
                      hb_stackPop();
                   }
 
@@ -3313,6 +3314,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   for ( i = 0; i < hb_vm_iExtraIndex; i++ )
                   {
                      hb_vmPush( aExtraItems + i );
+                     if( HB_IS_COMPLEX( aExtraItems + i ) )
+                        hb_itemClear( aExtraItems + i );
                      hb_vmArrayPush();
                   }
 
@@ -3329,7 +3332,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   /* Storing and removing the extra indexes. */
                   for ( i = HB_VM_STACK.iExtraIndex - 1; i >= 0; i-- )
                   {
-                     hb_itemCopy( aExtraItems + i, hb_stackItemFromTop(-1) );
+                     ( aExtraItems + i )->type = HB_IT_NIL;
+                     hb_itemMove( aExtraItems + i, hb_stackItemFromTop(-1) );
                      hb_stackPop();
                   }
 
@@ -3340,6 +3344,8 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   for ( i = 0; i < HB_VM_STACK.iExtraIndex; i++ )
                   {
                      hb_vmPush( aExtraItems + i );
+                     if( HB_IS_COMPLEX( aExtraItems + i ) )
+                        hb_itemClear( aExtraItems + i );
                      hb_vmArrayPush();
                   }
 
@@ -12029,8 +12035,9 @@ HB_EXPORT BOOL hb_xvmMacroPushIndex( BYTE bFlags )
       /* Storing and removing the extra indexes. */
       for ( i = hb_vm_iExtraIndex - 1; i >= 0; i-- )
       {
-         hb_itemCopy( aExtraItems + i, hb_stackItemFromTop(-1) );
-         hb_stackPop();
+         ( aExtraItems + i )->type = HB_IT_NIL;
+         hb_itemMove( aExtraItems + i, hb_stackItemFromTop(-1) );
+         hb_stackDec();
       }
 
       /* First index is still on stack.*/
@@ -12043,9 +12050,10 @@ HB_EXPORT BOOL hb_xvmMacroPushIndex( BYTE bFlags )
       for ( i = 0; i < hb_vm_iExtraIndex; i++ )
       {
          hb_vmPush( aExtraItems + i );
+         if( HB_IS_COMPLEX( aExtraItems + i ) )
+            hb_itemClear( aExtraItems + i );
          if( i < hb_vm_iExtraIndex - 1 )
             hb_vmArrayPush();
-
       }
       hb_xfree( aExtraItems );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.246 2006/06/04 18:30:07 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.247 2006/06/19 21:16:44 druzus Exp $
  */
 
 /*
@@ -7015,22 +7015,7 @@ static ERRCODE hb_cdxStructSize( CDXAREAP pArea, USHORT * uiSize )
    return SUCCESS;
 }
 
-/* ( DBENTRYP_P )     hb_cdxSysName */
-/*
- * Obtain the name of replaceable database driver (RDD) subsystem.
- */
-static ERRCODE hb_cdxSysName( CDXAREAP pArea, BYTE * pBuffer )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_cdxSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
-
-#if defined( HB_SIXCDX )
-   strncpy( ( char * ) pBuffer, "SIXCDX", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
-#else
-   strncpy( ( char * ) pBuffer, "DBFCDX", 7  /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
-#endif
-   return SUCCESS;
-}
+/* ( DBENTRYP_P )     hb_cdxSysName         : NULL */
 
 /* ( DBENTRYP_VEI )   hb_cdxEval            : NULL */
 

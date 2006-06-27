@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.160 2006/06/19 21:16:44 druzus Exp $
+ * $Id: dbfntx1.c,v 1.161 2006/06/26 11:27:06 druzus Exp $
  */
 
 /*
@@ -6030,15 +6030,6 @@ static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo )
    return errCode;
 }
 
-static ERRCODE ntxSysName( NTXAREAP pArea, BYTE * pBuffer )
-{
-   HB_TRACE(HB_TR_DEBUG, ("ntxSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
-
-   strncpy( ( char * ) pBuffer, "DBFNTX", 7 /* HARBOUR_MAX_RDD_DRIVERNAME_LENGTH */ );
-   return SUCCESS;
-}
-
 static ERRCODE ntxPack( NTXAREAP pArea )
 {
    ERRCODE errCode;
@@ -7541,7 +7532,7 @@ static RDDFUNCS ntxTable = { ntxBof,
                              ( DBENTRYP_VP ) ntxOpen,
                              ntxRelease,
                              ( DBENTRYP_SP ) ntxStructSize,
-                             ( DBENTRYP_P ) ntxSysName,
+                             ntxSysName,
                              ntxEval,
                              ( DBENTRYP_V ) ntxPack,
                              ntPackRec,

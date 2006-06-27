@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.157 2006/06/14 13:56:20 druzus Exp $
+ * $Id: dbf1.c,v 1.158 2006/06/19 21:16:44 druzus Exp $
  */
 
 /*
@@ -3183,18 +3183,6 @@ static ERRCODE hb_dbfStructSize( DBFAREAP pArea, USHORT * uiSize )
    HB_SYMBOL_UNUSED( pArea );
 
    * uiSize = sizeof( DBFAREA );
-   return SUCCESS;
-}
-
-/*
- * Obtain the name of replaceable database driver (RDD) subsystem.
- */
-static ERRCODE hb_dbfSysName( DBFAREAP pArea, BYTE * pBuffer )
-{
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfSysName(%p, %p)", pArea, pBuffer));
-   HB_SYMBOL_UNUSED( pArea );
-
-   strcpy( ( char * ) pBuffer, "DBF" );
    return SUCCESS;
 }
 

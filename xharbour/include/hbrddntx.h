@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.35 2005/09/19 23:21:28 druzus Exp $
+ * $Id: hbrddntx.h,v 1.36 2005/10/30 14:45:48 druzus Exp $
  */
 
 /*
@@ -485,7 +485,7 @@ static ERRCODE ntxClose( NTXAREAP pArea );
 static ERRCODE ntxOpen( NTXAREAP pArea, LPDBOPENINFO pOpenInfo );
 #define ntxRelease               NULL
 static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize );
-static ERRCODE ntxSysName( NTXAREAP pArea, BYTE * pBuffer );
+#define ntxSysName               NULL
 #define ntxEval                  NULL
 static ERRCODE ntxPack( NTXAREAP pArea );
 #define ntPackRec                NULL
