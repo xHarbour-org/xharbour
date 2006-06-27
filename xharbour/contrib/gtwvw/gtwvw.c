@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.39 2006/06/16 16:16:55 bdj Exp $
+ * $Id: gtwvw.c,v 1.40 2006/06/26 23:16:06 fsgiudice Exp $
  */
 
 /*
@@ -4216,8 +4216,6 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
 
         return(0);
       }
-
-      TraceLog( NULL, "usWinNum = %i, s_usNumWindows = %i", usWinNum, s_usNumWindows );
 
       /* FSG - 27/06/2006 - If I'm on base window */
       if (usWinNum == 0)
