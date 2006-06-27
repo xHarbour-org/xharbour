@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.150 2006/06/15 14:10:07 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.151 2006/06/16 07:16:17 fsgiudice Exp $
  */
 
 /*
@@ -2210,20 +2210,19 @@ METHOD CheckRowPos() CLASS TBrowse
    // to paiting relative to current cursor row.  If sufficient data is not
    // available then reset position to row 1.
 
-   If ::nRecsToSkip == 0  // Ensure that you do not reset the painting
+   If ::nRecsToSkip == 0  // Ensure that you do not reset/* the painting
                           // of a movement caused by TBrowse methods
 
       If ::nRowPos <> 1     // No repositioning is required if current
                            // cursor row is one
-
-         nAvail := ::EvalSkipBlock( 0 - ::nRowPos - 1 )
+         nAvail := ::EvalSkipBlock( 0 - ::nRowPos + 1 )
 
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
          // available.  If there are exact number of records leave it.
          //
-         lReset := Abs( nAvail ) + 1 <> ::nRowPos
-
+         lReset := Abs( nAvail )+1 <> ::nRowPos
+         //lReset := Abs( nAvail ) + 1 <> ::nRowPos
          // Place back the data source pointer to where it was
          //
          ::EvalSkipBlock( 0 - nAvail )
@@ -2231,13 +2230,13 @@ METHOD CheckRowPos() CLASS TBrowse
       EndIf
    EndIf
 
-   // TraceLog( 'Browser: nRowPos, nAvail, lReset, RecsToSkip', ::nRowPos, nAvail, lReset, ::nRecsToSkip )
+//   TraceLog( 'Browser: nRowPos, nAvail, lReset, RecsToSkip', ::nRowPos, nAvail, lReset, ::nRecsToSkip )
 
    If lReset   // So repositioning was required !
       // nNewRowPos has to be updated
       // as we will entering phase 2 of stabilization
       //
-      ::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) + 1 > ::nRowPos, ::nRowPos, Abs( nAvail ) + 1 )
+      ::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) > ::nRowPos, ::nRowPos, Abs( nAvail )  )
       ::Moved()
 
       // To ensure phase 1 is skipped
@@ -2248,7 +2247,6 @@ METHOD CheckRowPos() CLASS TBrowse
    EndIf
 
 Return Self
-
 //-------------------------------------------------------------------//
 
 METHOD ForceStable() CLASS TBrowse
@@ -3521,4 +3519,3 @@ Return TBrowse():New( nTop, nLeft, nBottom, nRight )
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
-
