@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.181 2005/12/13 13:33:38 walito Exp $
+ * $Id: classes.c,v 1.182 2006/06/28 16:54:47 druzus Exp $
  */
 
 /*
@@ -2851,8 +2851,6 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
 
 HB_EXPORT void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... )
 {
-   HB_THREAD_STUB_STACK
-
    hb_vmPushSymbol( pMsgSym->pSymbol );
    hb_vmPush( pObject );
 
