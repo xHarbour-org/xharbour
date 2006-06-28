@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.14 2006/01/16 17:44:42 enricomaria Exp $
+rem $Id: pack_src.bat,v 1.15 2006/02/13 23:10:23 druzus Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -126,6 +126,13 @@ rem SOURCE\RDD\HBSIX
 rem SOURCE\RDD\NULSYS
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/nulsys/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% source/rdd/nulsys/*.c
+
+rem SOURCE\RDD\USRRDD
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/usrrdd/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/usrrdd/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/usrrdd/example/*.prg
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/usrrdd/rdds/Makefile
+%hb_archbin% %hb_archopt%  %hb_filename% source/rdd/usrrdd/rdds/*.prg
 
 rem SOURCE\RTL
 %hb_archbin% %hb_archopt%  %hb_filename% source/rtl/Makefile
