@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.174 2006/06/14 18:38:28 kaddath Exp $
+# $Id: makefile.bc,v 1.175 2006/06/26 14:26:25 fsgiudice Exp $
 #
 
 #
@@ -219,6 +219,7 @@ GTDOS_LIB      = $(LIB_DIR)\gtdos.lib
 GTPCA_LIB      = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB      = $(LIB_DIR)\gtstd.lib
 GTWIN_LIB      = $(LIB_DIR)\gtwin.lib
+GTGUI_LIB      = $(LIB_DIR)\gtgui.lib
 GTWVT_LIB      = $(LIB_DIR)\gtwvt.lib
 GTALLEG_LIB    = $(LIB_DIR)\gtalleg.lib
 GTNUL_LIB      = $(LIB_DIR)\gtnul.lib
@@ -269,6 +270,7 @@ HB_GT_LIBS = \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
    $(GTWVT_LIB) \
+   $(GTGUI_LIB) \
    $(GTALLEG_LIB) \
    $(GTNUL_LIB)
 !else
@@ -278,6 +280,7 @@ HB_GT_LIBS = \
    $(GTSTD_LIB) \
    $(GTWIN_LIB) \
    $(GTWVT_LIB) \
+   $(GTGUI_LIB) \
    $(GTNUL_LIB)
 !endif
 
@@ -813,6 +816,14 @@ GTWIN_LIB_OBJS = \
 
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
+
+#
+# GTGUI.LIB rules
+#
+
+GTGUI_LIB_OBJS = \
+   $(OBJ_DIR)\gtgui.obj \
+   $(OBJ_DIR)\gtdef.obj
 
 #
 # GTALLEG.LIB rules
@@ -1400,6 +1411,14 @@ $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
     IF EXIST "$(GTWVT_LIB)" $(DEL) "$(GTWVT_LIB)" > NUL
     $(LINKER) "$(GTWVT_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
+$(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
+    IF EXIST "$(GTGUI_LIB)" $(DEL) "$(GTGUI_LIB)" > NUL
+    $(LINKER) "$(GTGUI_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 
@@ -3056,6 +3075,16 @@ $(OBJ_DIR)\mousewin.obj : $(RTL_DIR)\gtwin\mousewin.c
 #
 
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
+   $(CC_CMD)
+
+#
+# GTGUI.LIB dependencies
+#
+
+$(OBJ_DIR)\gtgui.obj : $(RTL_DIR)\gtgui\gtgui.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gtdef.obj : $(RTL_DIR)\gtgui\gtdef.c
    $(CC_CMD)
 
 #

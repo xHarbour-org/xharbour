@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.2 2003/05/16 19:52:12 druzus Exp $
+# $Id: Makefile,v 1.1 2006/06/26 11:27:06 druzus Exp $
 #
 
 ROOT = ../../../
@@ -8,7 +8,7 @@ C_SOURCES=\
 	gtgui.c \
 	gtdef.c \
 
-LIBNAME=gtwin
+LIBNAME=gtgui
 
 include $(TOP)$(ROOT)config/lib.cf
 
