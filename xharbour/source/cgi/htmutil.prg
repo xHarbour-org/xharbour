@@ -1,5 +1,5 @@
 /*
- * $Id: htmutil.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: htmutil.prg,v 1.4 2006/05/13 16:48:34 lculik Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ oHtm:endTable()
       FOR i := 1 TO Len( aFlds )
          cAlign := IF( aFlds[ i, 2 ] == "N", "RIGHT", "CENTER" )
          oHtm:newTableCell( cAlign,,,, "black" )
-         oHtm:Write( greek2Html( any2Str( Fieldget( i ) ) ) )
+         oHtm:Write( greek2Html( htmlany2Str( Fieldget( i ) ) ) )
          oHtm:EndTableCell()
       NEXT
       oHtm:endTableRow()
@@ -275,7 +275,7 @@ oHtm:endTable()
 
          cAlign := IF( oCurRow:FieldType( i ) == "N", "RIGHT", "CENTER" )
          oHtm:newTableCell( cAlign,,,, "black" )
-         oHtm:Write( greek2Html( any2Str( oCurRow:FieldGet( i ) ) ) )
+         oHtm:Write( greek2Html( htmlany2Str( oCurRow:FieldGet( i ) ) ) )
          oHtm:EndTableCell()
       END
       oHtm:endTableRow()

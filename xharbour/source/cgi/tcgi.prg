@@ -1,6 +1,6 @@
 
 /*
- * $Id: tcgi.prg,v 1.2 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: tcgi.prg,v 1.3 2006/06/22 03:50:13 lculik Exp $
  */
 
 /*
@@ -131,11 +131,11 @@ METHOD New( cInBuffer ) CLASS TCgi
 
       ::aQueryFields := {}
 
-      aTemp := hb_atokensy( ::Query_String, "&" )           // separate fields
+      aTemp := hb_atokens( ::Query_String, "&" )           // separate fields
 
       IF Len( aTemp ) != 0
          FOR i := 1 TO Len( aTemp )
-            aVar := hb_atokensy( aTemp[ i ], "=" )
+            aVar := hb_atokens( aTemp[ i ], "=" )
             IF Len( aVar ) == 2
                Aadd( ::aQueryFields, { aVar[ 1 ], HtmlDecodeUrl( aVar[ 2 ] ) } )
             ENDIF
