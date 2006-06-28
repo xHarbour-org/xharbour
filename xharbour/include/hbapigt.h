@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.45 2006/01/12 13:15:59 druzus Exp $
+ * $Id: hbapigt.h,v 1.46 2006/06/26 11:27:06 druzus Exp $
  */
 
 /*
@@ -749,6 +749,9 @@ extern int  HB_GT_FUNC( gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpP
 /* Graphics API */
 extern int HB_GT_FUNC( gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor ) );
 extern void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) );
+
+
+extern HB_EXPORT void hb_gtSetDefault( const char * szGtName );
 
 #else
 #  define HB_GT_FUNC(x)   HB_GT_FUNC_(x)

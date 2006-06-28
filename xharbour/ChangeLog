@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5033 2006/06/27 19:59:32 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.5034 2006/06/27 21:26:00 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-28 02:32 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/gtgui/gtdef.c
+    * register "GUI" GT as default one by executing
+      hb_gtSetDefault( "GUI" ) at startup
 
 2006-06-27 23:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrddcdx.h
