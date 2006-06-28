@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.180 2005/12/09 03:45:34 guerra000 Exp $
+ * $Id: classes.c,v 1.181 2005/12/13 13:33:38 walito Exp $
  */
 
 /*
@@ -222,7 +222,7 @@ static USHORT   hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos );
 static void     hb_clsSaveMethod( PHB_DYNS pMsg, int iPivot, PCLASS pClass, USHORT uiAt );
 static void     hb_clsDelMethod( PCLASS pClass, int iPos, USHORT uiAt );
 
-static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym );
+static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym );
 
 
 BOOL            hb_clsIsParent( USHORT uiClass, char * szParentName );
@@ -1297,10 +1297,15 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
  */
 HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 {
-   return hb_objHasMessage( pObject, szString, NULL );
+   return hb_objGetMessage( pObject, szString, NULL );
 }
 
-static PHB_FUNC hb_objHasMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
+HB_EXPORT BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
+{
+   return hb_objGetMethod( pObject, pMessage->pSymbol ) != NULL;
+}
+
+static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
 {
    PHB_DYNS pDynSym;
 
@@ -2844,6 +2849,31 @@ PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... )
    return hb_stackReturnItem();
 }
 
+HB_EXPORT void hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... )
+{
+   HB_THREAD_STUB_STACK
+
+   hb_vmPushSymbol( pMsgSym->pSymbol );
+   hb_vmPush( pObject );
+
+   if( ulArg )
+   {
+      ULONG i;
+      va_list ap;
+
+      va_start( ap, ulArg );
+
+      for( i = 0; i < ulArg; i++ )
+      {
+         hb_vmPush( va_arg( ap, PHB_ITEM ) );
+      }
+
+      va_end( ap );
+   }
+
+   hb_vmSend( (USHORT) ulArg );
+}
+
 /*
  * <xRet> = __objSendMsg( <oObj>, <cSymbol>, <xArg,..>
  *
@@ -4263,7 +4293,7 @@ HB_FUNC( HB_OBJMSGPTR )
    {
       PHB_DYNS pDynSym = NULL;
 
-      hb_objHasMessage( pObject, pString->item.asString.value, &pDynSym );
+      hb_objGetMessage( pObject, pString->item.asString.value, &pDynSym );
 
       hb_retptr( ( void * ) pDynSym->pSymbol );
    }

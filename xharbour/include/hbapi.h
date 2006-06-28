@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.193 2006/03/10 15:32:19 druzus Exp $
+ * $Id: hbapi.h,v 1.194 2006/03/25 02:22:34 druzus Exp $
  */
 
 /*
@@ -621,7 +621,9 @@ extern HB_EXPORT char *   hb_objGetRealClsName( PHB_ITEM pObject, char * szStrin
 extern HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pSymMsg ); /* returns the method pointer of a object class */
 extern HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAllowErrFunc, BOOL *bConstructor, int iOptimizedSend, BOOL *bSymbol );
 extern HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char * szString ); /* returns TRUE/FALSE whether szString is an existing message for object */
+extern HB_EXPORT BOOL     hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage );
 extern HB_EXPORT PHB_ITEM hb_objSendMsg( PHB_ITEM pObj, char *cMsg, ULONG ulArg, ... );
+extern HB_EXPORT void     hb_objSendMessage( PHB_ITEM pObject, PHB_DYNS pMsgSym, ULONG ulArg, ... );
 extern HB_EXPORT PHB_ITEM hb_objSendSymbol( PHB_ITEM pObj, PHB_SYMB pSymbol, ULONG ulArg, ... );
 extern HB_EXPORT USHORT   hb_objClassH( PHB_ITEM pObj );
 /*#define hb_objGetPropValue( pObj, szProp, pDestNullable ) \
