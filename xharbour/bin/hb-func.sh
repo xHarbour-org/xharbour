@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.73 2006/05/30 10:51:23 druzus Exp $
+# $Id: hb-func.sh,v 1.74 2006/06/02 12:34:09 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -452,12 +452,12 @@ hb_lnk_request()
     echo "#include \\"hbapi.h\\""
     if [ -n "\${HB_LNK_REQ}" ]; then
         for fn in \${HB_LNK_REQ}; do
-            echo "extern HB_FUNC( \${fn} );"
+            echo "HB_FUNC_EXTERN( \${fn} );"
         done
-        echo "void hb_lnk_ForceLink_build( void )"
+        echo "void _hb_lnk_ForceLink_build( void )"
         echo "{"
         for fn in \${HB_LNK_REQ}; do
-            echo "   HB_FUNCNAME( \${fn} )();"
+            echo "   HB_FUNC_EXEC( \${fn} );"
         done
         echo "}"
     fi

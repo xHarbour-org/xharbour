@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5038 2006/06/28 20:19:43 druzus Exp $
+ * $Id: ChangeLog,v 1.5039 2006/06/28 21:06:29 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-29 00:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * harbour/bin/hb-func.sh
+    * use HB_FUNC*() macros
+
+  * harbour/source/rdd/dbcmd.c
+    ! added fix for GPF in APPEND FROM when source file has repeated
+      fields with the same names.
 
 2006-06-28 18:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
    * xharbour.spec
