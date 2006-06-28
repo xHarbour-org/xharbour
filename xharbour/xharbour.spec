@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.91 2006/02/15 19:33:00 druzus Exp $
+# $Id: xharbour.spec,v 1.92 2006/02/21 19:37:04 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -571,6 +571,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libnulsys*.a
 %{_libdir}/%{name}/libpp*.a
 %{_libdir}/%{name}/librdd*.a
+%{_libdir}/%{name}/libusrrdd*.a
 %{_libdir}/%{name}/libhsx*.a
 %{_libdir}/%{name}/libhbsix*.a
 %{_libdir}/%{name}/librtl*.a
