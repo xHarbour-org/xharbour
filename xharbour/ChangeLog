@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5039 2006/06/28 21:06:29 lculik Exp $
+ * $Id: ChangeLog,v 1.5040 2006/06/28 22:30:03 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-06-29 22:40 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+  * xhbgtmk.sh
+    * updated with new CVS settings
 
 2006-06-29 00:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/bin/hb-func.sh
@@ -21,7 +25,7 @@
     !added libsqlrdd*.a
   * source/cgi/tcgi.prg
     source/cgi/htmutil.prg
-    ! minor fix    
+    ! minor fix
 
 2006-06-28 22:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/pack_src.bat
@@ -73,8 +77,8 @@
 
 2006-06-27 13:50 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
  * source/rtl/tbrowse.prg
-   * Change method CheckRowPos() to fix some issues with the redraw of the 
-      screen when not on the first row and the user "reconfigures" the tbrowse. 
+   * Change method CheckRowPos() to fix some issues with the redraw of the
+      screen when not on the first row and the user "reconfigures" the tbrowse.
 
 2006-06-27 22:30 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/vm/memvars.c
