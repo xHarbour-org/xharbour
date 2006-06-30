@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.119 2006/06/27 21:00:00 ptsarenko Exp $
+ * $Id: memvars.c,v 1.119 2006/06/27 19:23:23 ptsarenko Exp $
  */
 
 /*
@@ -2119,7 +2119,7 @@ HB_FUNC( __MVRESTORE )
 
       szFileName = hb_parc( 1 );
 
-      while( ( fhnd = hb_fsExtOpen( ( BYTE * ) szFileName, ".mem", FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
+      while( ( fhnd = hb_fsExtOpen( ( BYTE * ) szFileName, (BYTE *) ".mem", FO_READ | FO_DENYWRITE | FO_PRIVATE | FXO_DEFAULTS, NULL, NULL ) ) == FS_ERROR )
       {
          USHORT uiAction = hb_errRT_BASE_Ext1( EG_OPEN, 2005, NULL, szFileName, hb_fsError(), EF_CANDEFAULT | EF_CANRETRY, 2, hb_paramError( 1 ), hb_paramError( 2 ) );
 
