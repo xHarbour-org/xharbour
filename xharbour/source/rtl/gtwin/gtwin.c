@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.109 2006/06/12 00:07:44 paultucker Exp $
+ * $Id: gtwin.c,v 1.110 2006/06/26 11:27:06 druzus Exp $
  */
 
 /*
@@ -1120,7 +1120,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
    BOOL Ret = FALSE;
    SMALL_RECT srWin;
    COORD coBuf;
-   USHORT uiDispCount = s_uiDispCount; // , uR, uC;
+   USHORT uiDispCount = s_uiDispCount;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_gt_SetMode(%hu, %hu)", usRows, usCols));
 
@@ -1131,10 +1131,17 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
          HB_GT_FUNC(gt_DispEnd());
       }
 
-      coBuf = GetLargestConsoleWindowSize( s_HOutput );
+      /* Special case */
+      if ( usRows < _GetScreenHeight() && usCols > _GetScreenWidth() )
+      {
+         HB_GT_FUNC(gt_SetMode( usRows, _GetScreenWidth() ));
+      }
+      else if ( usRows > _GetScreenHeight() && usCols < _GetScreenWidth() )
+      {
+         HB_GT_FUNC(gt_SetMode( _GetScreenHeight(), usCols ));
+      }
 
-      // uR = usRows;
-      // uC = usCols;
+      coBuf = GetLargestConsoleWindowSize( s_HOutput );
 
       if ( usRows > coBuf.Y )
       {
@@ -1158,16 +1165,6 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
       srWin.Top   = srWin.Left = 0;
       srWin.Bottom = ( SHORT ) ( usRows - 1 );
       srWin.Right  = ( SHORT ) ( usCols - 1 );
-
-      if ( usRows < _GetScreenHeight() && usCols > _GetScreenWidth() )
-      {
-         // Special case
-         HB_GT_FUNC(gt_SetMode( _GetScreenHeight(), usCols ));
-      }
-      else if ( usRows > _GetScreenHeight() && usCols < _GetScreenWidth() )
-      {
-         HB_GT_FUNC(gt_SetMode( usRows, _GetScreenWidth() ));
-      }
 
       /* if the current buffer is larger than what we want, resize the */
       /* console window first, then the buffer */
