@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.62 2005/12/16 16:52:22 ronpinkas Exp $
+ * $Id: macro.c,v 1.63 2006/02/24 06:18:29 ronpinkas Exp $
  */
 
 /*
@@ -1030,7 +1030,7 @@ char HB_EXPORT * hb_macroGetType( PHB_ITEM pItem, BYTE flags )
 
       szString = hb_strdup( pItem->item.asString.value );
 
-      iStatus = hb_macroParse( &struMacro, pItem->item.asString.value, pItem->item.asString.length );
+      iStatus = hb_macroParse( &struMacro, szString, pItem->item.asString.length );
 
       hb_xfree( (void *) szString );
 

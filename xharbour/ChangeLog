@@ -8,9 +8,9 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2006-07-01 18:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
-  * source/rtl/gtwin/gtwin.c
-    * correct potential stack overflow in gt_setmode
+2006-07-02 10:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/macro.c
+    * Fixed silly typo.
 
 2006-06-30 00:18 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/memvars.c
@@ -199,6 +199,10 @@
     ! Renamed to ChangeLog.025 and start an new one
   * source/cgi/tcgi.prg
     source/cgi/tedit.prg
+    source/cgi/tframe.prg
+    source/cgi/thtm.prg
+    ! code cleanup, now all string is concatenated, and writed on close/closecgi method
+it.prg
     source/cgi/tframe.prg
     source/cgi/thtm.prg
     ! code cleanup, now all string is concatenated, and writed on close/closecgi method
