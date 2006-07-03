@@ -4243,7 +4243,7 @@ FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
    aProcedures := s_aProcedures
    s_aProcedures := NIL
 
-   PP_Exec( aProcedures, s_aInitExit, s_nProcId, aParams )
+   s_xRet := PP_Exec( aProcedures, s_aInitExit, s_nProcId, aParams )
 
    s_sModule := sPresetModule
 
