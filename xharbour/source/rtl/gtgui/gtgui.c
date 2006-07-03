@@ -1,5 +1,5 @@
 /*
- * $Id: gtgui.c,v 1.2 2006/06/23 01:00:15 druzus Exp $
+ * $Id: gtgui.c,v 1.1 2006/06/26 11:27:06 druzus Exp $
  */
 
 /*
@@ -49,6 +49,8 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Tone and Clipboard code are from gtwin.c
+ * 
  */
 
 
@@ -61,6 +63,10 @@
 #include "hbapigt.h"
 #include "hbapifs.h"
 #include "hbinit.h"
+
+#if defined( _MSC_VER ) || defined(__WATCOMC__)
+  #include <conio.h>
+#endif
 
 static OSVERSIONINFO s_osv;
 

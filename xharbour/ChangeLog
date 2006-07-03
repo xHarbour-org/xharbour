@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5046 2006/07/03 16:05:08 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5046 2006/07/03 19:21:02 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-03 15:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * hrbdll.vc
+    * simplified the rules list a bit for some .c files
+    * improves compilation speed
+    * enabled multi-gt (not tested yet)
+    + usrrdd
+    + other gt files
+  * source/rtl/gtgui/gtgui.c
+    * #include <conio.h> for msc and watcom
+  + include/hbole.h
+    * declare certain interfaces before Windows does to force C mode use
+    * solves issue with certain MS headers that no longer need to be modified
+    * This is only enabled for msvc since that is the only compiler with
+    * the reported problem.
+  * source/rtl/gtwvt/gtwvt.c
+    + #include "hbole.h"
+  * include/hbdefs.h
+    + #include "hbole.h"
+  * makefile.vc
+    + all usrrdds
+    + misc.lib
+    + gtgui.lib
+    * correct entries for dll_main.lib.
+    + source/vm/maindllh.c
+    * enabled multi-gt (not tested yet)
+  * source/ct/setclear.c
+    * casting.
 
 2006-07-03 22:30 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/debug/debugger.prg
@@ -20,6 +48,10 @@
 2006-07-02 10:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/macro.c
     * Fixed silly typo.
+
+2006-07-01 18:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * source/rtl/gtwin/gtwin.c
+    * correct potential stack overflow in gt_setmode
 
 2006-06-30 00:18 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/memvars.c

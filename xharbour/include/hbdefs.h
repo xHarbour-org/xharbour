@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.82 2006/06/04 18:30:07 druzus Exp $
+ * $Id: hbdefs.h,v 1.83 2006/06/06 11:36:14 mauriliolongo Exp $
  */
 
 /*
@@ -52,6 +52,8 @@
 
 #ifndef HB_DEFS_H_
 #define HB_DEFS_H_
+
+#include "hbole.h"
 
 #include <stdarg.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.172 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: makefile.vc,v 1.173 2006/06/26 14:26:25 fsgiudice Exp $
 #
 
 #
@@ -124,9 +124,11 @@ COMMON_DIR   =source\common
 COMPILER_DIR =source\compiler
 CODEPAGE_DIR =source\codepage
 CT_DIR       =source\ct
+CGI_DIR      =source\cgi
 DEBUG_DIR    =source\debug
 LANG_DIR     =source\lang
 MACRO_DIR    =source\macro
+MISC_DIR     =source\misc
 ODBC_DIR     =source\odbc
 PP_DIR       =source\pp
 RDD_DIR      =source\rdd
@@ -146,13 +148,17 @@ XBSCRIPT_DIR =utils\xbscript
 HBPDF_DIR    =contrib\pdflib
 !endif
 
+!ifdef HB_MULTI_GT
+HB_MULTI_GT =-DHB_MULTI_GT
+!endif
+
 #
 # C compiler definition and C flags. These should never have to change.
 #
 
 AS           =ML
 C_FLAGSNMT   =$(_CFL)
-C_FLAGS      =$(HB_MT) $(C_FLAGSNMT)
+C_FLAGS      =$(HB_MT) $(HB_MULTI_GT) $(C_FLAGSNMT)
 CLIBFLAGSNMT =-c $(C_FLAGSNMT) $(CLIBFLAGS)
 CLIBFLAGS    =-c $(C_FLAGS) $(CLIBFLAGS)
 HARBOURFLAGS =-i$(INCLUDE_DIR) -n -q0 -w -es2 -gc0 $(PRG_USR) $(HARBOURFLAGS)
@@ -185,6 +191,8 @@ CODEPAGE_LIB     =$(LIB_DIR)\codepage.lib
 COMMON_LIB       =$(LIB_DIR)\common.lib
 CT_LIB           =$(LIB_DIR)\ct.lib
 CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
+CGI_LIB          =$(LIB_DIR)\cgi.lib
+CGIMT_LIB        =$(LIB_DIR)\cgi$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 SIXCDX_LIB       =$(LIB_DIR)\sixcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
@@ -197,10 +205,13 @@ HBSIX_LIB        =$(LIB_DIR)\hbsix.lib
 HBSIXMT_LIB      =$(LIB_DIR)\hbsix$(MT).lib
 HSX_LIB          =$(LIB_DIR)\hsx.lib
 HSXMT_LIB        =$(LIB_DIR)\hsx$(MT).lib
+USRRDD_LIB       =$(LIB_DIR)\usrrdd.lib
+USRRDDMT_LIB     =$(LIB_DIR)\usrrdd$(MT).lib
 DEBUG_LIB        =$(LIB_DIR)\debug.lib
 LANG_LIB         =$(LIB_DIR)\lang.lib
 MACRO_LIB        =$(LIB_DIR)\macro.lib
 MACROMT_LIB      =$(LIB_DIR)\macro$(MT).lib
+MISC_LIB         =$(LIB_DIR)\misc.lib
 NULSYS_LIB       =$(LIB_DIR)\nulsys.lib
 ODBC_LIB         =$(LIB_DIR)\hbodbc.lib
 ODBCMT_LIB       =$(LIB_DIR)\hbodbc$(MT).lib
@@ -219,6 +230,7 @@ DLL_MAIN_LIB     =$(LIB_DIR)\dllmain.lib
 
 GTCGI_LIB        =$(LIB_DIR)\gtcgi.lib
 GTDOS_LIB        =$(LIB_DIR)\gtdos.lib
+GTGUI_LIB        =$(LIB_DIR)\gtgui.lib
 GTNUL_LIB        =$(LIB_DIR)\gtnul.lib
 GTPCA_LIB        =$(LIB_DIR)\gtpca.lib
 GTSTD_LIB        =$(LIB_DIR)\gtstd.lib
@@ -247,6 +259,7 @@ XBSCRIPT_EXE     =$(BIN_DIR)\xbscript.exe
 
 HB_GT_LIBS = \
    $(GTCGI_LIB) \
+   $(GTGUI_LIB) \
    $(GTNUL_LIB) \
    $(GTPCA_LIB) \
    $(GTSTD_LIB) \
@@ -289,10 +302,10 @@ LIBSNONMT = \
    $(CODEPAGE_LIB) \
    $(DEBUG_LIB) \
    $(LANG_LIB) \
+   $(MISC_LIB) \
    $(NULSYS_LIB) \
    $(DLL_MAIN_LIB) \
-   $(HB_GT_LIB) \
-   $(CGI_LIB)
+   $(HB_GT_LIB)
 
 # These have an MT equivalent.
 LIBS = \
@@ -306,10 +319,12 @@ LIBS = \
    $(DBFNTX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
+   $(USRRDD_LIB) \
    $(VM_LIB) \
    $(ODBC_LIB) \
    $(TIP_LIB) \
    $(CT_LIB) \
+   $(CGI_LIB) \
    $(LIBSNONMT)
 
 !ifdef HB_MT
@@ -324,10 +339,12 @@ LIBSMT = \
    $(DBFNTXMT_LIB) \
    $(HBSIXMT_LIB) \
    $(HSXMT_LIB) \
+   $(USRRDDMT_LIB) \
    $(VMMT_LIB) \
    $(ODBCMT_LIB) \
    $(TIPMT_LIB) \
-   $(CTMT_LIB)
+   $(CTMT_LIB) \
+   $(CGIMT_LIB)
 !endif
 
 
@@ -403,6 +420,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\datec.obj \
    $(OBJ_DIR)$(MT)\dates.obj \
    $(OBJ_DIR)$(MT)\dateshb.obj \
+   $(OBJ_DIR)$(MT)\dbf2txt.obj \
    $(OBJ_DIR)$(MT)\defpath.obj \
    $(OBJ_DIR)$(MT)\descend.obj \
    $(OBJ_DIR)$(MT)\dirdrive.obj \
@@ -537,7 +555,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbedit.obj \
    $(OBJ_DIR)$(MT)\dbjoin.obj \
    $(OBJ_DIR)$(MT)\dbsdf.obj \
-   $(OBJ_DIR)$(MT)\decode.obj \
    $(OBJ_DIR)$(MT)\decode.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \
@@ -816,17 +833,6 @@ NULSYS_LIB_OBJS = \
 {$(RDD_DIR)\dbfntx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbfntx}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFNTX_LIB)2
-!endif
-
 DBFNTX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfntx1.obj
 
@@ -836,17 +842,6 @@ DBFNTX_LIB_OBJS = \
 
 {$(RDD_DIR)\dbfcdx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbfcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFCDX_LIB)2
-!endif
 
 DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx1.obj
@@ -858,17 +853,6 @@ DBFCDX_LIB_OBJS = \
 {$(RDD_DIR)\sixcdx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\sixcdx}.prg{$(OBJ_DIR)$(MT)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\sixcdx}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(SIXCDX_LIB)2
-!endif
-
 SIXCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\sixcdx1.obj
 
@@ -879,17 +863,6 @@ SIXCDX_LIB_OBJS = \
 {$(RDD_DIR)\dbffpt}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\dbffpt}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(DBFFPT_LIB)2
-!endif
-
 DBFFPT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbffpt1.obj
 
@@ -899,17 +872,6 @@ DBFFPT_LIB_OBJS = \
 
 {$(RDD_DIR)\hbsix}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-
-{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HBSIX_LIB)2
-!endif
 
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
@@ -923,20 +885,51 @@ HBSIX_LIB_OBJS = \
 {$(RDD_DIR)\hsx}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.c::
+HSX_LIB_OBJS = \
+   $(OBJ_DIR)\hsx.obj \
+   $(OBJ_DIR)\cftsfunc.obj
+
+#
+# USRRDD.LIB rules
+#
+
+{$(RDD_DIR)\usrrdd\rdds}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\usrrdd}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\usrrdd}.prg{$(OBJ_DIR)$(MT)}.c::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(RDD_DIR)\hsx}.prg{$(OBJ_DIR)$(MT)}.obj::
+{$(RDD_DIR)\usrrdd\rdds}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\usrrdd}.prg{$(OBJ_DIR)$(MT)}.obj::
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 !if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
 !else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HSX_LIB)2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(USRRDD_LIB)2
 !endif
 
-HSX_LIB_OBJS = \
-   $(OBJ_DIR)\hsx.obj \
-   $(OBJ_DIR)\cftsfunc.obj
+{$(RDD_DIR)\usrrdd\rdds}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(USRRDD_LIB)2
+!endif
+
+USRRDD_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\usrrdd.obj \
+   $(OBJ_DIR)$(MT)\arrayrdd.obj \
+   $(OBJ_DIR)$(MT)\dbtcdx.obj \
+   $(OBJ_DIR)$(MT)\fcomma.obj \
+   $(OBJ_DIR)$(MT)\fptcdx.obj \
+   $(OBJ_DIR)$(MT)\hscdx.obj \
+   $(OBJ_DIR)$(MT)\rlcdx.obj \
+   $(OBJ_DIR)$(MT)\smtcdx.obj
 
 #
 # PP.LIB rules
@@ -1052,8 +1045,6 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\itemapi.obj \
    $(OBJ_DIR)$(MT)\macro.obj \
    $(OBJ_DIR)$(MT)\maindll.obj \
-   $(OBJ_DIR)$(MT)\mainstd.obj \
-   $(OBJ_DIR)$(MT)\mainwin.obj \
    $(OBJ_DIR)$(MT)\memvars.obj \
    $(OBJ_DIR)$(MT)\memvclip.obj \
    $(OBJ_DIR)$(MT)\pcount.obj \
@@ -1065,9 +1056,27 @@ VM_LIB_OBJS = \
    \
    $(OBJ_DIR)$(MT)\harbinit.obj
 
+#
+# VM.LIB rules
+#
+
+{$(VM_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
 DLL_MAIN_OBJS = \
    $(OBJ_DIR)$(MT)\mainstd.obj \
-   $(OBJ_DIR)$(MT)\mainwin.obj
+   $(OBJ_DIR)$(MT)\mainwin.obj \
+   $(OBJ_DIR)$(MT)\maindllh.obj
+
+#
+# MISC.LIB rules
+#
+
+{$(MISC_DIR)}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+MISC_LIB_OBJS = \
+   $(OBJ_DIR)\hb_f.obj
 
 #
 # GTCGI.LIB rules
@@ -1146,22 +1155,38 @@ GTWIN_LIB_OBJS = \
    $(OBJ_DIR)\mousewin.obj
 
 #
+# GTGUI.LIB rules
+#
+
+{$(RTL_DIR)\gtgui}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+GTGUI_LIB_OBJS = \
+   $(OBJ_DIR)\gtgui.obj \
+   $(OBJ_DIR)\gtdef.obj
+
+#
+# GTNUL.LIB rules
+#
+
+{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+
+GTNUL_LIB_OBJS = \
+   $(OBJ_DIR)\gtnul.obj \
+   $(OBJ_DIR)\gtext.obj
+
+!ifdef HB_MULTI_GT
+GTNUL_LIB_OBJS =  \
+   $(OBJ_DIR)\gtsys.obj
+!endif
+
+#
 # GTWVT.LIB rules
 #
 
 {$(RTL_DIR)\gtwvt}.c{$(OBJ_DIR)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.c::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-
-{$(RTL_DIR)\gtwvt}.prg{$(OBJ_DIR)}.obj::
-   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
-!if ( "$(MK_FLAGS:AF=)"=="Y" )
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
-!else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(RTL_LIB)\gtwvt2
-!endif
 
 GTWVT_LIB_OBJS = \
    $(OBJ_DIR)\gtwvt.obj
@@ -1171,19 +1196,30 @@ GTWVT_LIB_OBJS = \
 # CGI.LIB rules
 #
 
-{$(CGI_DIR)}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
+{$(CGI_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
-{$(CGI_DIR)}.prg{$(OBJ_DIR)}.c::
-   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+{$(CGI_DIR)}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 
-{$(CGI_DIR)}.prg{$(OBJ_DIR)}.obj::
-   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
+{$(CGI_DIR)}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) -i$(CGI_DIR)\include $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
 !if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $*.c
 !else
    $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(CGI_LIB)2
 !endif
+
+CGI_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\hjwindow.obj \
+   $(OBJ_DIR)$(MT)\hterrsys.obj \
+   $(OBJ_DIR)$(MT)\htjlist.obj \
+   $(OBJ_DIR)$(MT)\htmutil.obj \
+   $(OBJ_DIR)$(MT)\tcgi.obj \
+   $(OBJ_DIR)$(MT)\tedit.obj \
+   $(OBJ_DIR)$(MT)\tfile.obj \
+   $(OBJ_DIR)$(MT)\tframe.obj \
+   $(OBJ_DIR)$(MT)\thtm.obj
 
 #
 # TIP.LIB rules
@@ -1359,6 +1395,7 @@ CT_LIB_OBJS = \
 
 ODBC_LIB_OBJS =       \
       $(OBJ_DIR)$(MT)\odbc.obj \
+      \
       $(OBJ_DIR)$(MT)\todbc.obj
 
 #
@@ -1667,6 +1704,12 @@ $(TIPMT_LIB) : $(TIP_LIB_OBJS)
 $(CTMT_LIB) : $(CT_LIB_OBJS)
    lib /out:$@ $**
 
+$(CGIMT_LIB) : $(CGI_LIB_OBJS)
+   lib /out:$@ $**
+
+$(USRRDDMT_LIB) : $(USRRDD_LIB_OBJS)
+   lib /out:$@ $**
+
 !else
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
@@ -1720,13 +1763,22 @@ $(HSX_LIB) : $(HSX_LIB_OBJS)
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
    lib /out:$@ $**
 
+$(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
+   lib /out:$@ $**
+
 $(VM_LIB) : $(VM_LIB_OBJS)
    lib /out:$@ $**
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
    lib /out:$@ $**
 
+$(CGI_LIB) : $(CGI_LIB_OBJS)
+   lib /out:$@ $**
+
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
+   lib /out:$@ $**
+
+$(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
    lib /out:$@ $**
 
 $(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
@@ -1753,6 +1805,9 @@ $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
 !endif
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
+   lib /out:$@ $**
+
+$(MISC_LIB) : $(MISC_LIB_OBJS)
    lib /out:$@ $**
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_OBJS)
@@ -1798,15 +1853,13 @@ $(CT_LIB)2     : $(CT_LIB_OBJS)
 $(RDD_LIB)2    : $(RDD_LIB_OBJS)
 $(CGI_LIB)2    : $(CGI_LIB_OBJS)
 $(TIP_LIB)2    : $(TIP_LIB_OBJS)
-$(DBFCDX_LIB)2 : $(DBFCDX_LIB_OBJS)
-$(SIXCDX_LIB)2 : $(SIXCDX_LIB_OBJS)
-$(DBFFPT_LIB)2 : $(DBFFPT_LIB_OBJS)
 $(DBFNTX_LIB)2 : $(DBFNTX_LIB_OBJS)
-$(HBSIX_LIB)2  : $(HBSIX_LIB_OBJS)
-$(HSX_LIB)2    : $(HSX_LIB_OBJS)
+$(USRRDD_LIB)2 : $(USRRDD_LIB_OBJS)
 $(NULSYS_LIB)2 : $(NULSYS_LIB_OBJS)
 $(VM_LIB)2     : $(VM_LIB_OBJS)
 $(GTCGI_LIB)2  : $(GTCGI_LIB_OBJS)
+$(GTGUI_LIB)2  : $(GTGUI_LIB_OBJS)
+$(GTNUL_LIB)2  : $(GTNUL_LIB_OBJS)
 $(GTPCA_LIB)2  : $(GTPCA_LIB_OBJS)
 $(GTSTD_LIB)2  : $(GTSTD_LIB_OBJS)
 $(GTWIN_LIB)2  : $(GTWIN_LIB_OBJS)

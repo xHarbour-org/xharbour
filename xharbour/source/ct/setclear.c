@@ -1,5 +1,5 @@
 /*
- * $Id: SETCLEAR.C,v 1.1 2004/10/23 23:29:08 oh1 Exp $
+ * $Id: setclear.c,v 1.1 2004/10/24 17:59:27 druzus Exp $
  */
 
 /*
@@ -107,7 +107,8 @@ HB_FUNC( SETCLEARB )
 /* Clears a screen area */
 HB_FUNC( CLEARWIN )
 {
-   SHORT     FRow, FCol, LRow, LCol, nAttr, pAttr, nChar, np;
+   SHORT     FRow, FCol, LRow, LCol, nAttr, pAttr, np;
+   BYTE      nChar;
    HB_CT_WND * wnd;
 
    wnd = hb_ctWCurrent();
@@ -124,7 +125,7 @@ HB_FUNC( CLEARWIN )
 
    if( np >= 6 && ISCHAR( 6 ) )     nChar = hb_parcx( 6 )[ 0 ];
    else if( np >= 6 && ISNUM( 6 ) ) nChar = hb_parni( 6 );
-   else                             nChar = hb_ctGetClearB();
+   else                             nChar = (BYTE) hb_ctGetClearB();
 
    LRow = HB_MAX( 0, HB_MIN( LRow, wnd->ULRow - wnd->UFRow ) );
    LCol = HB_MAX( 0, HB_MIN( LCol, wnd->ULCol - wnd->UFCol ) );
