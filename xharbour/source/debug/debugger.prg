@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.75 2006/03/27 21:02:15 likewolf Exp $
+ * $Id: debugger.prg,v 1.77 2006/07/03 22:00:00 ptsarenko Exp $
  */
 
 /*
@@ -76,6 +76,7 @@
 #include "common.ch"
 #include "set.ch"
 #include "setcurs.ch"
+#include "getexit.ch"
 #include "hbdebug.ch"   // for "nMode" of __dbgEntry
 
 
@@ -1473,20 +1474,30 @@ return nil
 
 METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
 
-   local nTop    := ( ::nMaxRow / 2 ) - 5
-   local nLeft   := ( ::nMaxCol / 2 ) - 25
-   local nBottom := ( ::nMaxRow / 2 ) - 3
-   local nRight  := ( ::nMaxCol / 2 ) + 25
+   local nTop    := Int( ( ::nMaxRow / 2 ) - 5 )
+   local nLeft   := Int( ( ::nMaxCol / 2 ) - 25 )
+   local nBottom := nTop + 2
+   local nRight  := nLeft + 50
    local cType   := ValType( uValue )
-   local uTemp   := PadR( uValue, nRight - nLeft - 1 )
+   local nWidth  := nRight - nLeft - 1
+   local cPicture
+   local uTemp
    local GetList := {}
    local nOldCursor
    local lScoreBoard := Set( _SET_SCOREBOARD, .f. )
    local lExit
    local oWndInput := TDbWindow():New( nTop, nLeft, nBottom, nRight, cMsg,;
                                        ::oPullDown:cClrPopup )
+   local oGet, bMouseSave
 
    DEFAULT lEditable TO .t.
+
+   if cType = "C" .and. Len( uValue ) > nWidth
+      uTemp := uValue
+      cPicture := '@s' + LTrim(Str(nWidth))
+   else
+      uTemp := PadR( uValue, nWidth )
+   endif
 
    oWndInput:lShadow := .t.
    oWndInput:Show()
@@ -1494,14 +1505,18 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
    if lEditable
 #ifndef HB_NO_READDBG
       if bValid == nil
-         @ nTop + 1, nLeft + 1 GET uTemp COLOR "," + __DbgColors()[ 5 ]
+         @ nTop + 1, nLeft + 1 GET uTemp PICTURE cPicture COLOR "," + __DbgColors()[ 5 ]
       else
-          @ nTop + 1, nLeft + 1 GET uTemp VALID Eval( bValid, uTemp ) ;
+         @ nTop + 1, nLeft + 1 GET uTemp PICTURE cPicture VALID Eval( bValid, uTemp ) ;
            COLOR "," + __DbgColors()[ 5 ]
       endif
 
       nOldCursor := SetCursor( SC_NORMAL )
+      oGet := ATAIL( GetList )
+      bMouseSave := Setkey( K_LBUTTONDOWN, {|| if(MRow() == nTop .and. MCol() == nLeft + 2,;
+         (oGet:undo(), oGet:exitState := GE_ESCAPE, .T.), .F.)})
       READ
+      Setkey( K_LBUTTONDOWN, bMouseSave)
       SetCursor( nOldCursor )
 #else
       uTemp := getdbginput( nTop + 1, nLeft + 1, uTemp, bValid, __DbgColors()[ 5 ] )
@@ -1775,6 +1790,7 @@ METHOD Locate( nMode, cValue ) CLASS TDebugger
   DEFAULT nMode TO 0
 
   IF Empty( cValue )
+    ::cSearchString := Padr( ::cSearchString, 256 )
     cValue := ::InputBox( "Search string", ::cSearchString )
     IF Empty( cValue )
       RETURN NIL
@@ -3411,4 +3427,3 @@ STATIC FUNCTION getdbginput( nTop, nLeft, uValue, bValid, cColor )
 
 RETURN uTemp
 #endif
-

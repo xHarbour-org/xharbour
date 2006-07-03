@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5044 2006/07/02 14:30:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5046 2006/07/03 16:05:08 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-03 22:30 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * source/debug/debugger.prg
+    * added "@S" picture mask for ::InputBox() method
+    * implemented mouse click on "close" button for ::InputBox() method
 
 2006-07-03 12:01 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * utils/xbscript/xbscript.prg
