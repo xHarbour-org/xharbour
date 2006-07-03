@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.151 2006/06/16 07:16:17 fsgiudice Exp $
+ * $Id: tbrowse.prg,v 1.7 2006/07/03 19:59:32 gerry Exp $
  */
 
 /*
@@ -2215,6 +2215,7 @@ METHOD CheckRowPos() CLASS TBrowse
 
       If ::nRowPos <> 1     // No repositioning is required if current
                            // cursor row is one
+         //nAvail := ::EvalSkipBlock( 0 - ::nRowPos - 1 )
          nAvail := ::EvalSkipBlock( 0 - ::nRowPos + 1 )
 
          // You should reposition only if there are too few records
@@ -2237,6 +2238,7 @@ METHOD CheckRowPos() CLASS TBrowse
       // as we will entering phase 2 of stabilization
       //
       ::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) > ::nRowPos, ::nRowPos, Abs( nAvail )  )
+      //::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) + 1 > ::nRowPos, ::nRowPos, Abs( nAvail ) + 1 )
       ::Moved()
 
       // To ensure phase 1 is skipped
@@ -2247,6 +2249,7 @@ METHOD CheckRowPos() CLASS TBrowse
    EndIf
 
 Return Self
+
 //-------------------------------------------------------------------//
 
 METHOD ForceStable() CLASS TBrowse
@@ -3238,8 +3241,7 @@ METHOD HitTest( mrow,mcol ) CLASS TBrowse
    endif
 
    if nRet == HTNOWHERE
-
-      if mCol >= ::nLeft    .AND. mCol <= ::nLeft + Len( ::cSpacePre ) - 1
+      if mCol >= ::nLeft + ::nFrozenWidth .AND. mCol <= ::nLeft + ::nFrozenWidth + Len( ::cSpacePre ) - 1  //Changes per Zeljko Stupar
              // if i'm on left side (also consider spaces on left)
         nRet := HTLEFT
       elseif mCol >= ::nRight - Len( ::cSpaceLast ) + 1 .AND. mCol <= ::nwRight
