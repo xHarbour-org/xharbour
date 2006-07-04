@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.26 2006/03/01 13:06:22 druzus Exp $
+# $Id: Makefile,v 1.27 2006/03/29 00:34:17 druzus Exp $
 #
 
 ROOT = ../
@@ -8,6 +8,7 @@ C_HEADERS=\
 	clipdefs.h   \
 	extend.h     \
 	hbapi.h      \
+	hbole.h      \
 	hbapierr.h   \
 	hbapifs.h    \
 	hbapigt.h    \
