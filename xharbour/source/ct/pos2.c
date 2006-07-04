@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: pos2.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -173,10 +173,10 @@ HB_FUNC (POSCHAR)
 
 
 
-HB_FUNC (POSDEL)
+HB_FUNC( POSDEL )
 {
   
-  if (ISCHAR (1))
+  if( ISCHAR(1) )
   {  
 
     char *pcString = hb_parc (1);
@@ -184,7 +184,7 @@ HB_FUNC (POSDEL)
     size_t sStartPos, sDelLen;
     char *pcRet;
 
-    if (ISNUM (3))
+    if( ISNUM(3) )
     {
       sDelLen = hb_parnl (3);
     }
@@ -193,37 +193,41 @@ HB_FUNC (POSDEL)
       sDelLen = 1;  /* set new standard behavior */
     }
 
-    if (ISNUM (2))
+    if( ISNUM(2) )
     {
-      sStartPos = hb_parnl (2);
-      if (sStartPos == 0)
+      sStartPos = hb_parnl(2);
+
+      if( sStartPos == 0 )
       {
-        sStartPos = sStrLen-sDelLen+1;
+        sStartPos = sStrLen - sDelLen + 1;
       }
     }
     else
     {
-      sStartPos = sStrLen-sDelLen+1;
+      sStartPos = sStrLen - sDelLen + 1;
     }
     
-    pcRet = ( char * )hb_xgrab (sStrLen-sDelLen);
+    if( sStrLen - sDelLen <= 0 )
+    {
+		hb_retclen( "", 0 );
+		return;
+    }
+
+    pcRet = (char *) hb_xgrab( sStrLen - sDelLen );
 
     /* copy first part */
-    if (sStartPos > 1)
+    if( sStartPos > 1 )
     {
-      hb_xmemcpy (pcRet, pcString, sStartPos-1);
+      hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
     }
     
     /* copy second part */
-    if (sStrLen > (sStartPos-1+sDelLen))
+    if( sStrLen > ( sStartPos - 1 + sDelLen ) )
     {
-      hb_xmemcpy (pcRet+sStartPos-1, pcString+sStartPos-1+sDelLen,
-                  sStrLen-(sStartPos-1+sDelLen));
+      hb_xmemcpy( pcRet + sStartPos - 1, pcString + sStartPos - 1 + sDelLen, sStrLen - ( sStartPos - 1 + sDelLen ) );
     }
 
-    hb_retclen (pcRet, sStrLen-sDelLen);
-    hb_xfree (pcRet);
-
+    hb_retclenAdopt( pcRet, sStrLen - sDelLen );
   }
   else  /* ISCHAR (1) */
   {
@@ -245,7 +249,6 @@ HB_FUNC (POSDEL)
       hb_retc ("");
     }
   }
-
 }
 
 

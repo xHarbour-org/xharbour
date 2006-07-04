@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5047 2006/07/03 19:47:05 paultucker Exp $
+ * $Id: ChangeLog,v 1.5048 2006/07/03 20:08:36 gdrouillard Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-07-03 20:49 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/ct/pos2.c
+    * Fixed GPF trap in PosDel()
+
 2006-07-03 16:00 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
   * source/rtl/tbrowse.prg
     *changes per Zeljko Stupar to deal with frozen columns in tbrowse:hittest
-  
+
 2006-07-03 15:40 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * hrbdll.vc
     * simplified the rules list a bit for some .c files
