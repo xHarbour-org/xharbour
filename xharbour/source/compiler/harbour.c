@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.132 2006/05/16 22:57:08 druzus Exp $
+ * $Id: harbour.c,v 1.133 2006/06/14 13:56:20 druzus Exp $
  */
 
 /*
@@ -5185,6 +5185,7 @@ void hb_compCodeBlockEnd( void )
 {
    PFUNCTION pCodeblock;   /* pointer to the current codeblock */
    PFUNCTION pFunc;/* pointer to a function that owns a codeblock */
+   char *pFuncName; /* name (if one exists) of the function that owns a codeblock */
    USHORT wSize;
    USHORT wLocals = 0;   /* number of referenced local variables */
    USHORT wLocalsCnt, wLocalsLen;
@@ -5205,9 +5206,14 @@ void hb_compCodeBlockEnd( void )
 
    /* find the function that owns the codeblock */
    pFunc = pCodeblock->pOwner;
+   pFuncName = pFunc->szName;
    while( pFunc->pOwner )
    {
       pFunc = pFunc->pOwner;
+      if ( pFunc->szName && *pFunc->szName )
+      {
+         pFuncName = pFunc->szName;
+      }
    }
 
    pFunc->bFlags |= ( pCodeblock->bFlags & FUN_USES_STATICS );
@@ -5237,7 +5243,7 @@ void hb_compCodeBlockEnd( void )
    wSize = (USHORT)pCodeblock->lPCodePos + 2;
    if ( hb_comp_bDebugInfo )
    {
-      wSize += 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFunc->szName );
+      wSize += 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFuncName );
       wSize += wLocalsLen;
    }
 
@@ -5267,7 +5273,7 @@ void hb_compCodeBlockEnd( void )
    
    if( hb_comp_bDebugInfo )
    {
-      hb_compGenModuleName( hb_comp_files.pLast->szFileName, pFunc->szName );
+      hb_compGenModuleName( hb_comp_files.pLast->szFileName, pFuncName );
 
       /* generate the names of referenced local variables */
       pVar = pCodeblock->pStatics;
