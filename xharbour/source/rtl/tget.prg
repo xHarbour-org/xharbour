@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.115 2006/06/07 12:33:49 modalsist Exp $
+ * $Id: tget.prg,v 1.116 2006/06/16 07:16:17 fsgiudice Exp $
  */
 
 /*
@@ -199,25 +199,30 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    DEFAULT cPicture   TO ""
    DEFAULT cColorSpec TO BuildGetColor(cColorSpec) // SetColor()
 
-   ::HasFocus       := ;
-   ::lEdit          := ;
-   ::BadDate        := ;
-   ::Changed        := ;
-   ::Clear          := ;
-   ::lCleanZero     := ;
-   ::lMinusPrinted  := ;
-   ::Minus          := ;
-   ::Rejected       := ;
-   ::TypeOut        := .f.
-   ::DecPos         := ;
-   ::Pos            := ;
-   ::PostBlock      := ;
-   ::PreBlock       := ;
-   ::Reader         := ;
+   ::HasFocus       := .F.
+   ::lEdit          := .F.
+   ::BadDate        := .F.
+   ::Changed        := .F.
+   ::Clear          := .F.
+   ::lCleanZero     := .F.
+   ::lMinusPrinted  := .F.
+   ::Minus          := .F.
+   ::Rejected       := .F.
+   ::TypeOut        := .F.
+
+	 /*
+   ::DecPos         := NIL
+   ::Pos            := NIL
+   ::PostBlock      := NIL
+   ::PreBlock       := NIL
+   ::Reader         := NIL
    ::SubScript      := NIL
-   ::ExitState      := ;
-   ::nLastExitState := ;
+	 */
+
+   ::ExitState      := 0
+   ::nLastExitState := 0
    ::nOldPos        := 0
+
    ::nDispPos       := 1
    ::Block          := bVarBlock
    ::Col            := nCol
@@ -225,16 +230,19 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::ColorSpec      := cColorSpec
    ::Picture        := cPicture
    ::Name           := cVarName
-   //::Original     := ::VarGet()
-   ::Type           := ValType( ::VarGet() )   // Must know the type at creation
-   ::cDelimit       := if( SET(_SET_DELIMITERS), SET(_SET_DELIMCHARS), NIL )
+   ::cDelimit       := IIF( SET( _SET_DELIMITERS ), SET( _SET_DELIMCHARS ), NIL )
+
+   //::Original       := ::VarGet()
+   //::Type           := ValType( ::VarGet() )   // Must know the type at creation
+   ::VarGet()   // Must know the type at creation
 
    #ifdef HB_COMPAT_C53
-   ::CapCol         := ;
-   ::CapRow         := 0
-   ::Caption        := ""
+      //::CapCol         := ;
+      ::CapRow         := 0
+      ::Caption        := ""
    #endif
-return Self
+
+RETURN Self
 
 //---------------------------------------------------------------------------//
 
@@ -352,7 +360,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
          exit
 
-      case "N"                                                    
+      case "N"
          /* E.F. 2006/APRIL/19 - If ::xVarGet is negative and smaller than
           *  -99999999.99, the Str(::xVarGet) will return a string width
           * of 23, instead it's length, increasing the ::cPicMask length.
@@ -489,9 +497,9 @@ METHOD Display( lForced ) CLASS Get
    ENDIF
 
    IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
-      
+
       cDisplay := Substr( xBuffer, ::nDispPos, ::nDispLen )
-      
+
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  cDisplay,;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
@@ -580,7 +588,7 @@ METHOD End() CLASS Get
       /* 2006/JUN/02 - E.F. if cursor reach first editable position, then go to
        * the end display position
        */
-      if ::Pos == ::FirstEditable()  
+      if ::Pos == ::FirstEditable()
          ::Pos := ::nMaxEdit
       endif
       /**/

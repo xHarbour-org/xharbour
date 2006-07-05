@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.4 2004/02/18 08:55:41 ronpinkas Exp $
+ * $Id: tgetint.prg,v 1.5 2004/07/13 19:51:41 paultucker Exp $
  */
 
 /*
@@ -115,8 +115,9 @@ FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
       ENDIF
    ENDIF
 
-   oGet := Get():New(,, bGetArray, cVarName, cPicture )
+   oGet := Get()
    oGet:SubScript := aIndex
+	 oGet:New( , , bGetArray, cVarName, cPicture )
 
    oGet:PreBlock := bWhen
    oGet:PostBlock := bValid
