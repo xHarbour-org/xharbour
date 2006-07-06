@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.104 2006/06/19 21:16:44 druzus Exp $
+ * $Id: ads1.c,v 1.105 2006/06/21 01:49:58 kaddath Exp $
  */
 
 /*
@@ -1808,7 +1808,8 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          UNSIGNED16 pusType;
 
          AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
-         if( pusType == ADS_MEMO )
+
+         if( pusType != ADS_BINARY )
          {
             if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
             {

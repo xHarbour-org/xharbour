@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5052 2006/07/06 01:29:33 lculik Exp $
+ * $Id: ChangeLog,v 1.5053 2006/07/06 17:28:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-06 16:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! Inverted checking for memo data types, verifying binary first, to prevent freeze
+      in some empty ADT tabes.
 
 2006-07-06 13:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * utils/xbscript/xbscript.prg
