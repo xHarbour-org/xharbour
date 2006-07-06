@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.27 2006/03/29 00:34:17 druzus Exp $
+# $Id: Makefile,v 1.28 2006/07/04 15:12:51 lculik Exp $
 #
 
 ROOT = ../
@@ -34,6 +34,7 @@ C_HEADERS=\
 	hbmacro.h    \
 	hbmath.h     \
 	hbnxs.h      \
+	hbole.h      \
 	hbpcode.h    \
 	hbpp.h       \
 	hbrddcdx.h   \
@@ -120,10 +121,11 @@ PRG_HEADERS=\
 	math.ch      \
 	tbrowse.ch   \
 	tip.ch       \
+	usrrdd.ch    \
 	ct.ch        \
 	ctvideo.ch   \
 	ctwin.ch     \
-	cterror.ch
+	cterror.ch   \
 
 API_HEADERS=\
 	error.api    \

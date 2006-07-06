@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5053 2006/07/06 17:28:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5054 2006/07/06 19:35:54 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-06 23:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/Makefile
+    + added usrrdd.ch, hbole.h
+
+  * xharbour/source/rdd/usrrdd/usrrdd.c
+    * replaced hb_stackPush() with hb_vmPushNil()
+
+  * xharbour/source/vm/classes.c
+    * changed hb_objHasMessage() to not return TRUE when OnError message
+      is set
+
+  * xharbour/source/vm/hvm.c
+    ! fixed hb_vmPushVariable() to not work on not allocated stack item
+      We will have to clean the HVM code to never work on not allocated
+      stack items. In practice it means that we should make modifications
+      like the ones I've just finished in Harbour. It will be very nice if
+      we can replace all direct stack access by stack macros/functions
+      and finally remove hb_stackTopItem()
 
 2006-07-06 16:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * xharbour/contrib/rdd_ads/ads1.c

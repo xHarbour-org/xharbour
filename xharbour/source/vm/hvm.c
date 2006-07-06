@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.574 2006/06/08 09:57:13 druzus Exp $
+ * $Id: hvm.c,v 1.575 2006/06/27 21:26:04 druzus Exp $
  */
 
 /*
@@ -3054,7 +3054,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPALIASEDVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPALIASEDVAR") );
-            hb_vmPopAliasedVar( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPopAliasedVar( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
@@ -3063,15 +3063,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /* Pops a value from the eval stack and uses it to set
              * a new value of the given field
              */
-         {
-
-            hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
-
+            hb_rddPutFieldValue( hb_stackItemFromTop(-1), pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             hb_stackPop();
 
             w += 3;
             break;
-         }
 
          case HB_P_POPGLOBAL:
          {
@@ -3103,7 +3099,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCAL") );
-            hb_vmPopLocal( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPopLocal( HB_PCODE_MKSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
@@ -3115,32 +3111,20 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
          case HB_P_POPSTATIC:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPSTATIC") );
-            hb_vmPopStatic( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPopStatic( HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
          case HB_P_POPMEMVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPMEMVAR") );
-         {
-            PHB_ITEM pTop;
-
-            pTop = *( HB_VM_STACK.pPos - 1 );
-
-            hb_memvarSetValue( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), pTop );
-
+            hb_memvarSetValue( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ),
+                               hb_stackItemFromTop( -1 ) );
             hb_stackPop();
-
             w += 3;
             break;
-         }
 
          case HB_P_POPVARIABLE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPVARIABLE") );
-         {
-            USHORT uiParams;
-
-            uiParams = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-
             /*
                2004-03-19 Ron Pinkas
                Test with Clipper shows that for assignment, MEMVAR context is always used even if MEMVAR
@@ -3157,14 +3141,11 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                  RETURN
             */
-
-            hb_memvarSetValue( pSymbols + uiParams, ( hb_stackItemFromTop(-1) ) );
-
+            hb_memvarSetValue( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ),
+                               hb_stackItemFromTop(-1) );
             hb_stackPop();
-
             w += 3;
             break;
-         }
 
          /* macro creation */
 
@@ -3422,8 +3403,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             /* Pops a value from the eval stack and uses it to set
             * a new value of the given field
             */
-            hb_rddPutFieldValue( ( hb_stackItemFromTop(-1) ), pDynSym->pSymbol );
-
+            hb_rddPutFieldValue( hb_stackItemFromTop(-1), pDynSym->pSymbol );
             hb_stackPop();
 
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -8561,8 +8541,13 @@ static void hb_vmPushStaticByRef( USHORT uiStatic )
 static void hb_vmPushVariable( PHB_SYMB pVarSymb )
 {
    HB_THREAD_STUB
+   USHORT uiAction = E_DEFAULT;
+   PHB_ITEM pItem;
 
-   USHORT uiAction;
+   HB_TRACE(HB_TR_INFO, ("(hb_vmPushVariable)"));
+
+   pItem = hb_stackTopItem();
+   hb_stackPush();
 
    do
    {
@@ -8571,35 +8556,23 @@ static void hb_vmPushVariable( PHB_SYMB pVarSymb )
          * then try the memvar variable
          */
 
-      uiAction = hb_rddFieldGet( ( * HB_VM_STACK.pPos ), pVarSymb );
-
-      if( uiAction == SUCCESS )
+      if( hb_rddFieldGet( pItem, pVarSymb ) != SUCCESS )
       {
-         hb_stackPush();
-      }
-      else
-      {
-         uiAction = hb_memvarGet( ( * HB_VM_STACK.pPos ), pVarSymb );
-
-         if( uiAction == SUCCESS )
-         {
-            hb_stackPush();
-         }
-         else
+         if( hb_memvarGet( pItem, pVarSymb ) != SUCCESS )
          {
             HB_ITEM_PTR pError;
 
-            pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003, NULL, pVarSymb->szName, 0, EF_CANRETRY );
+            pError = hb_errRT_New( ES_ERROR, NULL, EG_NOVAR, 1003,
+                                    NULL, pVarSymb->szName,
+                                    0, EF_CANRETRY );
 
             uiAction = hb_errLaunch( pError );
-            hb_itemRelease( pError );
+            hb_errRelease( pError );
          }
       }
    }
    while( uiAction == E_RETRY );
-   HB_TRACE(HB_TR_INFO, ("(hb_vmPushVariable)"));
 }
-
 
 static void hb_vmDuplicate( void )
 {
@@ -10071,20 +10044,20 @@ HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
 HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[], int iPos )
 {
    HB_THREAD_STUB
+   PHB_ITEM pTop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushItemRef(%p, %p, %d)", pItem, pItemRef, iPos));
 
 #ifdef HB_UNSHARE_REFERENCES
    pItem = hb_itemUnShare( pItem );
 #endif
-
-   ( * pItemRef )[ iPos ] = pItem;
-   ( * HB_VM_STACK.pPos )->type = HB_IT_BYREF;
-   ( * HB_VM_STACK.pPos )->item.asRefer.offset = -1;
-   ( * HB_VM_STACK.pPos )->item.asRefer.BasePtr.itemsbasePtr = pItemRef;
-   ( * HB_VM_STACK.pPos )->item.asRefer.value = iPos + 1;
-
    hb_stackPush();
+   pTop = hb_stackItemFromTop( -1 );
+   ( * pItemRef )[ iPos ] = pItem;
+   pTop->type = HB_IT_BYREF;
+   pTop->item.asRefer.offset = -1;
+   pTop->item.asRefer.BasePtr.itemsbasePtr = pItemRef;
+   pTop->item.asRefer.value = iPos + 1;
 }
 
 HB_FUNC( HB_FUNCPTR )
@@ -10947,10 +10920,7 @@ HB_EXPORT BOOL hb_xvmPopVariable( PHB_SYMB pSymbol )
 
    HB_TRACE(HB_TR_INFO, ("hb_xvmPopVariable(%p)", pSymbol));
 
-   if( pSymbol->pDynSym && pSymbol->pDynSym->hMemvar )
-      hb_memvarSetValue( pSymbol, ( hb_stackItemFromTop(-1) ) );
-   else if( hb_rddFieldPut( ( hb_stackItemFromTop(-1) ), pSymbol ) == FAILURE )
-      hb_memvarSetValue( pSymbol, ( hb_stackItemFromTop(-1) ) );
+   hb_memvarSetValue( pSymbol, hb_stackItemFromTop(-1) );
    hb_stackPop();
 
    HB_XVM_RETURN
