@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.171 2006/06/23 21:13:47 lculik Exp $
+ * $Id: hbmake.prg,v 1.172 2006/06/30 03:45:23 lculik Exp $
  */
 
 /*
@@ -610,7 +610,14 @@ FUNCTION ParseMakeFile( cFile )
                            ENDIF
 
                         NEXT
-
+                     elseif  aTemp[ 1 ] == "SHELL"
+                             if !empty( Atemp[ 2 ] )
+                                __run( (Atemp[ 2 ]) + " > e.txt")
+                                Atemp[ 2 ] := alltrim( memoread( "e.txt" ) )
+                                aTemp[ 2 ] := strtran( aTemp[ 2 ],chr(13),"")
+                                aTemp[ 2 ] := strtran( aTemp[ 2 ],chr(10),"")
+                                ferase("e.txt")
+                             endif
                      ENDIF
                         AAdd( s_aMacros, { aTemp[ 1 ], aTemp[ 2 ] } )
                   ENDIF
@@ -623,6 +630,7 @@ FUNCTION ParseMakeFile( cFile )
             IF aTemp[ 1 ] == "COMPRESS"
                s_lCompress := "YES" IN aTemp[ 2 ]
             ENDIF
+
 
             IF aTemp[ 1 ] == "GUI"
                s_lGui := "YES" IN aTemp[ 2 ]
@@ -1310,6 +1318,9 @@ FUNCTION CompileFiles()
                      nFile ++
                      //Outstd( cComm )
                      setpos(9,0)
+                     if s_lMingw
+                     cComm := strtran(cComm ,"\","/")
+                     endif
                      __RUN( (cComm) )
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $   cErrText
@@ -2360,7 +2371,7 @@ FUNCTION CreateMakeFile( cFile )
 
    FWrite( s_nMakeFileHandle, "RECURSE=" + IIF( s_lRecursive, " YES ", " NO " ) + CRLF )
    FWrite( s_nMakeFileHandle, " " + CRLF )
-
+   FWrite( s_nMakeFileHandle, "SHELL = " + CRLF )
    FWrite( s_nMakeFileHandle, "COMPRESS = " + IIF( s_lCompress, "YES", "NO" ) + CRLF )
 
    FWrite( s_nMakeFileHandle, "EXTERNALLIB = " + IIF( s_lExternalLib, "YES", "NO" ) + CRLF )
@@ -2602,7 +2613,7 @@ FUNCTION CreateMakeFile( cFile )
             cLibs := strtran(cLibs,"hbpg","hbpg")
          ENDIF
 
-         IF ! s_lMt
+         IF ! s_lmt
             cDefaultLibs := cHtmlLib + " " + cOldLib + " " + cLibs
          ELSE
             cDefaultLibsMt := cHtmlLib + " " + cOldLib + " " + cLibs
@@ -2696,6 +2707,10 @@ FUNCTION CreateMakeFile( cFile )
 
 
    IF s_lBcc .OR. s_lMSVcc .OR. s_lPocc
+      if lFwh .or. lMiniGui .or. lC4W .or. lWhoo .or. lHwGui .or. lWhat32
+            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtgui.lib gtnul.lib")
+            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtgui.lib gtnul.lib")
+      endif
 
       IF lFwh
          IF s_lxFwh
@@ -2718,8 +2733,8 @@ FUNCTION CreateMakeFile( cFile )
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib wvtgui.lib")
             cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvt.lib wvtgui.lib")
          elseif lGtwvw
-            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvw.lib wvtgui.lib")
-            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib wvtgui.lib")
+            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvw.lib ")
+            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib ")
          endif
 
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )
@@ -2733,7 +2748,9 @@ FUNCTION CreateMakeFile( cFile )
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSEIF  "MINGW" IN cCompiler
          IF lHwGui
-            FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + "-lhwgui -lhbxml -lprocmisc -lhwg_qhtm " +  IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF)
+            cDefGccLibsw :=strtran( cDefGccLibsw,"-lgtwin" ,"-lgtgui")            
+            cDefGccLibsMtw :=strtran( cDefGccLibsMtw,"-lgtwin" ,"-lgtgui")
+            FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + "-lhwgui -lprocmisc -lhwg_qhtm " +  IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF)
          else
             FWrite( s_nMakeFileHandle, "LIBFILES = " + "-Wl,--allow-multiple-definition -Wl,--start-group " + IIF( ! s_lMt, cDefGccLibsw, cDefGccLibsMtw ) + " -Wl,--end-group " + CRLF )
          endif
@@ -2759,7 +2776,7 @@ FUNCTION CreateMakeFile( cFile )
 
    IF s_lBcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -c -L$(HB_DIR)\lib"+iif(lFwh,";$(FWH)\lib ","")+iif(!empty(s_cUserInclude)," -I" + alltrim( s_cUserInclude ),"") + " " +CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(SHELL)  $(CFLAGS) -d -c -L$(HB_DIR)\lib"+iif(lFwh,";$(FWH)\lib ","")+iif(!empty(s_cUserInclude)," -I" + alltrim( s_cUserInclude ),"") + " " +CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -I$(HB_DIR)\include;$(CC_DIR)\include" + iif( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
@@ -2775,7 +2792,7 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lMSVcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL)  $(CFLAGS)" +IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c" +" -I" + alltrim( s_cUserInclude ) + " " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\lib /LIBPATH1:$(HB_DIR)\lib /LIBPATH2:$(C4W)\lib"  +IIF(s_lMt, " /Nodefaultlib:LIBC "," /Nodefaultlib:LIBCMT " ) + CRLF )
@@ -2788,7 +2805,7 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lPocc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  /Ze /Go /Ot /Tx86-coff /I$(INCLUDE_DIR) $(C_USR) $(CFLAGS)" +IIF( s_lMt, ' /D"HB_THREAD_SUPPORT" /MT' , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL)  /Ze /Go /Ot /Tx86-coff /I$(INCLUDE_DIR) $(C_USR) $(CFLAGS)" +IIF( s_lMt, ' /D"HB_THREAD_SUPPORT" /MT' , "" ) + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /LIBPATH:$(CC_DIR)\LIB /LIBPATH:$(CC_DIR)\LIB\WIN /LIBPATH:$(HB_DIR)\LIB /MACHINE:IX86"+IIF(!s_lGui," /SUBSYSTEM:CONSOLE"," /SUBSYSTEM:WINDOWS") + CRLF )
@@ -2801,11 +2818,11 @@ FUNCTION CreateMakeFile( cFile )
 
    ELSEIF s_lGcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 = " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" ) + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" )  + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
 
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = -Wl,--noinhibit-exec " + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui, "`pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","") + CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = -Wl,--noinhibit-exec " + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui .and. !s_lMinGW, " `pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","")  + iif(lhwgui .and. s_lMinGW," -mwindows " ,"" )+  iif(s_lLinux .and. s_lmt ," -mt "," "  ) +CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
@@ -4117,7 +4134,7 @@ FUNCTION CreateLibMakeFile( cFile )
 
    IF s_lBcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(CFLAGS) -d -L$(HB_DIR)\lib;$(FWH)\lib -c" + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -OS $(SHELL)  $(CFLAGS) -d -L$(HB_DIR)\lib;$(FWH)\lib -c" + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -I$(HB_DIR)\include -I$(CC_DIR)\include -I" + Alltrim( s_cUserInclude ) + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = /P32 /0" + CRLF )
@@ -4131,7 +4148,7 @@ FUNCTION CreateLibMakeFile( cFile )
 
    ELSEIF s_lMSVcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(CFLAGS)" + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 =  -I$(INCLUDE_DIR) -TP -W3 -nologo $(C_USR) $(SHELL) $(CFLAGS)" + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 =  -c -I" + Alltrim( s_cUserInclude ) + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = " + CRLF )
@@ -4158,7 +4175,7 @@ FUNCTION CreateLibMakeFile( cFile )
 
    ELSEIF s_lGcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG1 = " + IIF( s_lLinux , "-I/usr/include/xharbour", " -I$(HB_DIR)/include " ) + " $(SHELL)  -c -Wall" + CRLF )
       FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF( s_lLinux , "-L /usr/lib/xharbour", " -L $(HB_DIR)/lib" ) + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LFLAGS = " + CRLF )
@@ -4628,7 +4645,7 @@ FUNCTION BuildGccCfgFile()
       endif
 
       FWrite( nCfg, "CC=gcc" + CRLF )
-      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + s_cHarbourDir + "/include $(C_USR)  -L" + s_cHarbourDir + "/lib" ) + CRLF )
+      FWrite( nCfg, "CFLAGS= -c -D__EXPORT__ " + ReplaceMacros( "-I" + s_cHarbourDir + "/include $(C_USR)  -L" + s_cHarbourDir + "/lib" )  + if(s_lmingw ," -mno-cygwin ","" )+ CRLF )
       FWrite( nCfg, "VERBOSE=YES" + CRLF )
       FWrite( nCfg, "DELTMP=YES" + CRLF )
       FClose( nCfg )

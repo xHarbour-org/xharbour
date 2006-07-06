@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.14 2005/11/05 15:01:52 modalsist Exp $
+ * $Id: tmake.prg,v 1.15 2006/05/30 23:22:11 ath1 Exp $
  */
 
 /*
@@ -127,6 +127,7 @@ DATA  cTopModule     init ""
 DATA  cRes           init ""
 DATA  cMacro         init ""
 DATA  lGenCsource    init .f.      // Ath added 31-05-2006
+DATA  cShell         init ""
 
 METHOD New()
 METHOD ReadMakefile()
@@ -315,6 +316,10 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
                 IF aTemp[ 1 ] == "COMPRESS"
                    ::lCompress := "YES" IN aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "SHELL"
+                   ::cShell := aTemp[ 2 ]
                 endif
 
                 IF aTemp[ 1 ] == "EXTERNALLIB"

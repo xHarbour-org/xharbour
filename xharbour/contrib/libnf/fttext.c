@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.11 2005/11/16 12:16:37 druzus Exp $
+ * $Id: fttext.c,v 1.12 2006/02/03 01:33:58 andijahja Exp $
  */
 
 /*
@@ -136,8 +136,8 @@ typedef struct _FT_FFILE
    BOOL     bChange     ;
    BOOL     bActive     ;
    BOOL     bWrite      ;
-   HB_ITEM pOrigin      ;
-   HB_ITEM pArray       ;
+   PHB_ITEM pOrigin      ;
+   PHB_ITEM pArray       ;
    struct _FT_FFILE * pNext;
 } FT_FFILE, * PFT_FFILE;
 
@@ -174,9 +174,9 @@ HB_FUNC( FT_FUSE )
    {
       PFT_FFILE pTemp;
       BOOL bNewFile = FALSE;
-      HB_ITEM_NEW( pArray );
+      PHB_ITEM  pArray = hb_itemNew( NULL );
       PFT_FFILE pLast;
-      HB_ITEM_NEW( pTmp );
+      PHB_ITEM  pTmp = hb_itemNew( NULL );
       BOOL bWriteEnable = FALSE;
       char szmode[3];
       int iMode = ISNUM(2) ? hb_parni(2) : 0 ;
@@ -217,41 +217,53 @@ HB_FUNC( FT_FUSE )
          ULONG ulCount = 0;
 
          fseek( inFile, 0, SEEK_SET );
-         hb_arrayNew( &pArray, ulLineCount );
+         hb_arrayNew( pArray, ulLineCount );
 #else
-         hb_arrayNew( &pArray, 0 );
+         hb_arrayNew( pArray, 0 );
 #endif
          while ( ft_fread ( inFile, string ) )
          {
 #ifdef __LINE_COUNT__
             ulCount ++;
-            hb_arraySetForward( &pArray, ulCount, hb_itemPutC( &pTmp, string ) );
+            hb_arraySetForward( pArray, ulCount, hb_itemPutC( pTmp, string ) );
 #else
-            hb_arrayAddForward( &pArray, hb_itemPutC( &pTmp, string ) );
+            hb_arrayAddForward( pArray, hb_itemPutC( pTmp, string ) );
 #endif
          }
 
-         hb_itemClear( &pTmp );
+         hb_itemRelease(pTmp );
          hb_xfree( string );
          fclose( inFile );
 
          ft_FileName = hb_fsFNameSplit( pInFile->item.asString.value );
 
-         nCurrent = hb_arrayLen( &pArray ) ? 1 : 0;
+         nCurrent = hb_arrayLen( pArray ) ? 1 : 0;
 
          if ( pTemp == NULL )
          {
             bNewFile = TRUE;
             pTemp = (PFT_FFILE) hb_xgrab( sizeof( FT_FFILE ) );
+            pTemp->pArray = hb_itemNew(NULL);
+            pTemp->pOrigin= hb_itemNew(NULL);
+
          }
          else
          {
-            hb_itemClear( &(pTemp->pArray) );
-            hb_itemClear( &(pTemp->pOrigin) );
+            if( pTemp->pArray )
+            {
+               hb_itemRelease( pTemp->pArray );
+               pTemp->pArray = NULL;
+               pTemp->pArray = hb_itemNew(NULL);
+
+            }
+            if( pTemp->pOrigin )
+            {
+               hb_itemRelease( pTemp->pOrigin );
+               pTemp->pOrigin = NULL;
+               pTemp->pOrigin= hb_itemNew(NULL);
+            }
          }
 
-         (&(pTemp->pArray))->type = HB_IT_NIL ;
-         (&(pTemp->pOrigin))->type = HB_IT_NIL ;
 
          *(pTemp->szFileName) = 0;
          *(pTemp->szAlias) = 0;
@@ -274,9 +286,9 @@ HB_FUNC( FT_FUSE )
          pTemp->fHandle = inFile;
          pTemp->iArea = iSelect;
 
-         pClone = hb_arrayClone( &pArray, NULL );
-         hb_itemCopy( &(pTemp->pArray) , &pArray );
-         hb_itemCopy( &(pTemp->pOrigin), pClone );
+         pClone = hb_arrayClone( pArray, NULL );
+         hb_itemCopy( pTemp->pArray , pArray );
+         hb_itemCopy( pTemp->pOrigin, pClone );
 
          hb_itemRelease( pClone );
 
@@ -305,7 +317,7 @@ HB_FUNC( FT_FUSE )
          }
 
          hb_xfree( ft_FileName );
-         hb_itemClear( &pArray );
+         hb_itemRelease( pArray );
          hb_retl( TRUE );
       }
       else
@@ -336,7 +348,7 @@ HB_FUNC( FT_FSEEK )
 
    if ( pCurFile && pSeek )
    {
-      PHB_ITEM pResult = hb_itemDoC( "ASCAN", 2, &(pCurFile->pArray), pSeek );
+      PHB_ITEM pResult = hb_itemDoC( "ASCAN", 2, pCurFile->pArray, pSeek );
 
       if( pResult )
       {
@@ -346,7 +358,7 @@ HB_FUNC( FT_FSEEK )
 
          if( !nCurrent )
          {
-            nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen + 1;
+            nCurrent = (pCurFile->pArray)->item.asArray.value->ulLen + 1;
          }
 
          pCurFile->nCurrent = nCurrent;
@@ -367,7 +379,7 @@ HB_FUNC( FT_FRSEEK )
 
    if ( pCurFile && pSeek )
    {
-      PHB_ITEM pResult = hb_itemDoC( "RASCAN", 2, &(pCurFile->pArray), pSeek );
+      PHB_ITEM pResult = hb_itemDoC( "RASCAN", 2, pCurFile->pArray, pSeek );
 
       if( pResult )
       {
@@ -377,7 +389,7 @@ HB_FUNC( FT_FRSEEK )
 
          if( !nCurrent )
          {
-            nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen + 1;
+            nCurrent = (pCurFile->pArray)->item.asArray.value->ulLen + 1;
          }
 
          pCurFile->nCurrent = nCurrent;
@@ -400,8 +412,8 @@ HB_FUNC( FT_FNEW )
    {
       FILE *inFile;
       PHB_ITEM pUse;
-      HB_ITEM_NEW( fTmp );
-      HB_ITEM_NEW( fMode );
+      PHB_ITEM  fTmp = hb_itemNew( NULL );
+      PHB_ITEM  fMode = hb_itemNew( NULL );
 
       inFile = fopen( hb_parcx(1), "wb" );
 
@@ -415,11 +427,11 @@ HB_FUNC( FT_FNEW )
 
       pUse = hb_itemDoC( "FT_FUSE",
          2,
-         hb_itemPutC( &fTmp, hb_parcx(1) ),
-         hb_itemPutNI( &fMode, FO_READWRITE ) );
+         hb_itemPutC( fTmp, hb_parcx(1) ),
+         hb_itemPutNI( fMode, FO_READWRITE ) );
 
-      hb_itemClear( &fTmp );
-      hb_itemClear( &fMode );
+      hb_itemRelease( fTmp );
+      hb_itemRelease( fMode );
 
       if( pUse )
       {
@@ -441,7 +453,7 @@ HB_FUNC ( FT_FARRAY )
 {
    if( pCurFile )
    {
-      hb_itemCopy( hb_stackReturnItem(), hb_parl(1) ? &(pCurFile->pOrigin) : &(pCurFile->pArray) );
+      hb_itemCopy( hb_stackReturnItem(), hb_parl(1) ? pCurFile->pOrigin : pCurFile->pArray );
    }
 }
 
@@ -554,10 +566,11 @@ HB_FUNC( FT_FFLUSH )
       if( inFile )
       {
          ULONG lEle;
+         ULONG ulSize = hb_arrayLen( pCurFile->pArray );
 
-         for ( lEle = 1; lEle <= (&(pCurFile->pArray))->item.asArray.value->ulLen ; lEle ++ )
+         for ( lEle = 1; lEle <= ulSize ; lEle ++ )
          {
-            char *szContent = hb_arrayGetC( &(pCurFile->pArray), lEle );
+            char *szContent = hb_arrayGetC( pCurFile->pArray, lEle );
             if ( strcmp( szContent, DELETION_MARK ) )
             {
                fprintf( inFile, "%s%s", szContent, szNewLine );
@@ -655,10 +668,11 @@ HB_FUNC( FT_FINSERT )
 
       for ( lAdd = 1; lAdd <= lInsert; lAdd ++ )
       {
-         HB_ITEM_NEW ( Tmp );
-         hb_arraySize( &(pCurFile->pArray), (&(pCurFile->pArray))->item.asArray.value->ulLen + 1 );
-         hb_arrayIns( &(pCurFile->pArray), nCurrent + lAdd );
-         hb_arraySetForward( &(pCurFile->pArray), nCurrent + lAdd, hb_itemPutC( &Tmp, "" ) );
+         PHB_ITEM  Tmp = hb_itemNew( NULL );
+         hb_arraySize( pCurFile->pArray, hb_arrayLen(pCurFile->pArray)+ 1 );
+         hb_arrayIns( pCurFile->pArray, nCurrent + lAdd );
+         hb_arraySetForward( pCurFile->pArray, nCurrent + lAdd, hb_itemPutC( Tmp, "" ) );
+         hb_itemRelease( Tmp);
       }
 
       pCurFile->bChange = TRUE;
@@ -674,12 +688,13 @@ HB_FUNC( FT_FINSERT )
 HB_FUNC( FT_FDELETE )
 {
    LONG lDelete = ISNUM( 1 ) ? hb_parnl( 1 ) : nCurrent;
-
-   if( pCurFile && pCurFile->bWrite && lDelete > 0 && (ULONG) lDelete <= (&(pCurFile->pArray))->item.asArray.value->ulLen )
+   ULONG ulSize = hb_arrayLen( pCurFile->pArray ) ;
+   if( pCurFile && pCurFile->bWrite && lDelete > 0 && (ULONG) lDelete <= ulSize)
    {
-      HB_ITEM_NEW ( Tmp );
-      hb_arraySetForward( &(pCurFile->pArray), lDelete, hb_itemPutC( &Tmp, DELETION_MARK ) );
+      PHB_ITEM  Tmp = hb_itemNew( NULL) ;
+      hb_arraySetForward( pCurFile->pArray, lDelete, hb_itemPutC( Tmp, DELETION_MARK ) );
       pCurFile->bChange = TRUE;
+      hb_itemRelease( Tmp );
       hb_retl( TRUE );
    }
    else
@@ -692,17 +707,17 @@ HB_FUNC( FT_FDELETE )
 HB_FUNC( FT_FRECALL )
 {
    LONG lRecall = ISNUM( 1 ) ? hb_parnl( 1 ) : nCurrent;
-
-   if( pCurFile && pCurFile->bWrite && lRecall > 0 && (ULONG) lRecall <= (&(pCurFile->pArray))->item.asArray.value->ulLen )
+   ULONG ulSize = hb_arrayLen( pCurFile->pArray ) ;
+   if( pCurFile && pCurFile->bWrite && lRecall > 0 && (ULONG) lRecall <=  ulSize )
    {
-      char *szReadLn = hb_arrayGetC( &(pCurFile->pArray), lRecall );
+      char *szReadLn = hb_arrayGetC( pCurFile->pArray, lRecall );
 
       if( strcmp( szReadLn, DELETION_MARK ) == 0 )
       {
-         HB_ITEM_NEW ( Tmp );
-         char *szOrigin = hb_arrayGetC( &(pCurFile->pOrigin), lRecall );
-         hb_arraySetForward( &(pCurFile->pArray), lRecall, hb_itemPutC( &Tmp, szOrigin ) );
-         hb_itemClear( &Tmp );
+         PHB_ITEM  Tmp = hb_itemNew(NULL);
+         char *szOrigin = hb_arrayGetC( pCurFile->pOrigin, lRecall );
+         hb_arraySetForward( pCurFile->pArray, lRecall, hb_itemPutC( Tmp, szOrigin ) );
+         hb_itemRelease( Tmp );
          if( szOrigin )
          {
             hb_xfree( szOrigin );
@@ -729,20 +744,20 @@ HB_FUNC( FT_FAPPEND )
 
    if( lAppend > 0 && pCurFile && pCurFile->bWrite )
    {
-      HB_ITEM_NEW( Tmp );
+      PHB_ITEM  Tmp = hb_itemNew( NULL );
       LONG lStart;
       char *szAppend = ISCHAR(2) ? hb_parcx(2) : (char*) "";
 
       for( lStart = 1; lStart <= lAppend ; lStart ++ )
       {
-         hb_arrayAddForward( &(pCurFile->pArray), hb_itemPutC(&Tmp, szAppend ) );
-         hb_arrayAddForward( &(pCurFile->pOrigin), hb_itemPutC(&Tmp, szAppend ) );
+         hb_arrayAddForward( pCurFile->pArray, hb_itemPutC(Tmp, szAppend ) );
+         hb_arrayAddForward( pCurFile->pOrigin, hb_itemPutC(Tmp, szAppend ) );
       }
-
-      nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen;
+                 
+      nCurrent = hb_arrayLen( pCurFile->pArray );
       pCurFile->nCurrent = nCurrent;
       pCurFile->bChange = TRUE;
-
+      hb_itemRelease(Tmp);
       hb_retl( TRUE );
    }
    else
@@ -757,8 +772,8 @@ HB_FUNC( FT_FLASTREC )
    ULONG uRet = -1;
 
    if( pCurFile )
-   {
-      uRet = hb_parl(1) ? (&(pCurFile->pOrigin))->item.asArray.value->ulLen : (&(pCurFile->pArray))->item.asArray.value->ulLen;
+   {                        
+      uRet = hb_parl(1) ? hb_arrayLen( pCurFile->pOrigin ) : hb_arrayLen( pCurFile->pArray );
    }
 
    hb_retnl( uRet );
@@ -815,8 +830,8 @@ HB_FUNC( FT_FBOF )
 
 //------------------------------------------------------------------------------
 HB_FUNC( FT_FEOF )
-{
-   hb_retl ( pCurFile ? (ULONG) nCurrent > (&(pCurFile->pArray))->item.asArray.value->ulLen : TRUE );
+{                                          
+   hb_retl ( pCurFile ? (ULONG) nCurrent > hb_arrayLen( pCurFile->pArray ) : TRUE );
 }
 
 //------------------------------------------------------------------------------
@@ -834,7 +849,7 @@ HB_FUNC( FT_FGOBOTTOM )
 {
    if( pCurFile )
    {
-      nCurrent = (&(pCurFile->pArray))->item.asArray.value->ulLen ;
+      nCurrent = hb_arrayLen( pCurFile->pArray ) ;
       pCurFile->nCurrent = nCurrent;
    }
 }
@@ -854,11 +869,12 @@ HB_FUNC( FT_FWRITELN )
       bChangeArea = TRUE;
    }
 
-   if( pCurFile && pCurFile->bWrite && pCurFile->bActive && pSz && lWriteLn > 0 && (ULONG) lWriteLn <= (&(pCurFile->pArray))->item.asArray.value->ulLen )
+   if( pCurFile && pCurFile->bWrite && pCurFile->bActive && pSz && lWriteLn > 0 && (ULONG) lWriteLn <= hb_arrayLen(pCurFile->pArray))
    {
-      HB_ITEM_NEW ( Tmp );
-      hb_arraySetForward( &(pCurFile->pArray),  lWriteLn, hb_itemPutC( &Tmp, pSz->item.asString.value ) );
-      hb_arraySetForward( &(pCurFile->pOrigin), lWriteLn, hb_itemPutC( &Tmp, pSz->item.asString.value ) );
+      PHB_ITEM  Tmp = hb_itemNew(NULL);
+      hb_arraySetForward( pCurFile->pArray,  lWriteLn, hb_itemPutC( Tmp, pSz->item.asString.value ) );
+      hb_arraySetForward( pCurFile->pOrigin, lWriteLn, hb_itemPutC( Tmp, pSz->item.asString.value ) );
+      hb_itemRelease(Tmp);
       pCurFile->bChange = TRUE;
       hb_retl( TRUE );
    }
@@ -878,10 +894,10 @@ HB_FUNC( FT_FWRITELN )
 HB_FUNC( FT_FREADLN )
 {
    LONG lReadLn = ISNUM(1) ? hb_parnl(1) : nCurrent;
-
-   if( pCurFile && lReadLn > 0 && (ULONG) lReadLn <= (&(pCurFile->pArray))->item.asArray.value->ulLen )
+   ULONG ulSize =hb_arrayLen( pCurFile->pArray );
+   if( pCurFile && lReadLn > 0 && (ULONG) lReadLn <= ulSize)
    {
-      char *szReadLn = hb_parl( 2 ) ? hb_arrayGetC( &(pCurFile->pOrigin), lReadLn ): hb_arrayGetC( &(pCurFile->pArray), lReadLn );
+      char *szReadLn = hb_parl( 2 ) ? hb_arrayGetC( pCurFile->pOrigin, lReadLn ): hb_arrayGetC( pCurFile->pArray, lReadLn );
       hb_retcAdopt( szReadLn );
    }
    else
@@ -893,9 +909,10 @@ HB_FUNC( FT_FREADLN )
 //------------------------------------------------------------------------------
 HB_FUNC( FT_FREADLN_EX )
 {
-   if( pCurFile && nCurrent > 0 && (ULONG) nCurrent <= (&(pCurFile->pArray))->item.asArray.value->ulLen )
+   ULONG ulSize =hb_arrayLen( pCurFile->pArray );
+   if( pCurFile && nCurrent > 0 && (ULONG) nCurrent <= ulSize)
    {
-      char *szReadLn = hb_arrayGetC( &(pCurFile->pArray), nCurrent );
+      char *szReadLn = hb_arrayGetC( pCurFile->pArray, nCurrent );
       hb_retcAdopt( szReadLn );
       nCurrent ++;
       pCurFile->nCurrent = nCurrent;
@@ -910,10 +927,10 @@ HB_FUNC( FT_FREADLN_EX )
 HB_FUNC( FT_FDELETED )
 {
    LONG lQuery = ISNUM(1) ? hb_parnl(1) : nCurrent;
-
-   if( pCurFile && lQuery > 0 && (ULONG) lQuery <= ((&(pCurFile->pArray)))->item.asArray.value->ulLen )
+   ULONG ulSize =hb_arrayLen( pCurFile->pArray ) ;
+   if( pCurFile && lQuery > 0 && (ULONG) lQuery <= ulSize )
    {
-      char *szReadLn = hb_arrayGetC( &(pCurFile->pArray), lQuery );
+      char *szReadLn = hb_arrayGetC( pCurFile->pArray, lQuery );
       hb_retl( strcmp( szReadLn, DELETION_MARK ) == 0 );
       hb_xfree( szReadLn );
    }
@@ -999,8 +1016,11 @@ HB_FUNC( FT_FCLOSEALL )
       iSelect = pTmp->iArea;
       pCurFile = pTmp;
       HB_FUNCNAME( FT_FFLUSH )();
-      hb_itemClear( &(pTmp->pArray) );
-      hb_itemClear( &(pTmp->pOrigin) );
+      hb_itemRelease( pTmp->pArray );
+      hb_itemRelease( pTmp->pOrigin );
+       pTmp->pArray =NULL;
+       pTmp->pOrigin =NULL;
+
       pTmp = pTmp->pNext;
       hb_xfree( pFT );
       pFT = pTmp;
