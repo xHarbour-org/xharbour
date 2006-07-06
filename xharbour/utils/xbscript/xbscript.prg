@@ -865,9 +865,9 @@ RETURN
 
         IF sLine = "PP_PROC_PRG"
         ELSEIF sLine = "PP_PROC_INIT"
-           aAdd( aInitExit[1], nProcId )
+           aAdd( aInitExit[1], nProcId + 1 )
         ELSEIF sLine = "PP_PROC_EXIT"
-           aAdd( aInitExit[2], nProcId )
+           aAdd( aInitExit[2], nProcId + 1 )
         ENDIF
 
         IF s_InlineMethodID == 0
@@ -12110,7 +12110,6 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       LOCAL c
    #endif
 
-
    IF ValType( aParams ) == 'A'
       s_aParams := aParams
    ELSE
@@ -12137,7 +12136,8 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
       FOR nProc := 1 TO nProcs
          #ifdef __CONCILE_PCODE__
-            &( aInitExit[1][nProc][1] )()
+            //TraceLog( aInitExit[1][nProc], aProcedures[ aInitExit[1][nProc] ][1] )
+            &( aProcedures[ aInitExit[1][nProc] ][1] )()
          #else
             PP_ExecProcedure( aProcedures, aInitExit[1][nProc] )
          #endif
@@ -12178,7 +12178,8 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
       nProcs := Len( aInitExit[2] )
       FOR nProc := 1 TO nProcs
          #ifdef __CONCILE_PCODE__
-            &( aInitExit[2][nProc][1] )()
+            //TraceLog( aInitExit[2][nProc], aProcedures[ aInitExit[1][nProc] ][1] )
+            &( aProcedures[ aInitExit[2][nProc] ][1] )()
          #else
             PP_ExecProcedure( aProcedures, aInitExit[2][nProc] )
          #endif
