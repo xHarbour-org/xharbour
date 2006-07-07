@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.7 2006/07/03 19:59:32 gerry Exp $
+ * $Id: tbrowse.prg,v 1.10 2006/07/07 13:58:45 gerry Exp $
  */
 
 /*
@@ -382,8 +382,9 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    local nSkipped
 
-
-   if Empty( ::aCache[ nRow ] )
+   IF empty(nRow).or.empty(nCol)
+      return(nil)
+   elseif Empty( ::aCache[ nRow ] )
 
       // No more rows contain data
       if nRow > ::nLastRow
@@ -2734,7 +2735,7 @@ METHOD DeHilite() CLASS TBrowse
    LOCAL xValue
 
 
-   if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
+   if ::nColPos > 0 .AND. ::nColPos <= ::nColumns .and. ::nRowPos>0
 
       nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
 
@@ -2767,7 +2768,7 @@ METHOD Hilite() CLASS TBrowse
    LOCAL nNotLeftCol    // Screen col position of first char of not left justified columns
    LOCAL xValue
 
-   if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
+   if ::nColPos > 0 .AND. ::nColPos <= ::nColumns .and. ::nRowPos>0
 
       nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
 
@@ -2879,7 +2880,7 @@ Return nNotLeftCol
 */
 METHOD RefreshCurrent() CLASS TBrowse
 
-   if ! Empty( ::aRedraw )
+   if ! Empty( ::aRedraw ).and.::nRowPos>0
 
       ::aRedraw[ ::nRowPos ] := .T.
       ::oDataCache:Invalidate( ::nRowPos )
@@ -3256,7 +3257,7 @@ METHOD HitTest( mrow,mcol ) CLASS TBrowse
       elseif ::lFootSep     .AND. mRow == ::nBottom - ::nFooterHeight
          // if i'm on footer sep
          nRet := HTFOOTSEP
-      elseif mRow >= ::nBottom - ::nFooterHeight .AND. mRow <= ::nBottom
+      elseif ::lFooters .AND. mRow >= ::nBottom - ::nFooterHeight .AND. mRow <= ::nBottom //Changes per Zeljko Stupar
          // if i'm on footer
          nRet := HTFOOTING
       elseif mCol IN ::aColumnsSep
