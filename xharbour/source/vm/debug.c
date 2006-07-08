@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.20 2005/10/31 03:51:36 ronpinkas Exp $
+ * $Id: debug.c,v 1.21 2005/11/02 19:46:38 ronpinkas Exp $
  */
 
 /*
@@ -251,6 +251,10 @@ hb_dbg_vmVarLGet( int iLevel, int iLocal )
 
    if( iLocal >= 0 )
    {
+      if ( ( *pBase )->item.asSymbol.paramcnt >= 255 )
+      {
+         iLocal += ( *pBase )->item.asSymbol.paramcnt - 256;
+      }
       return hb_itemUnRef( *(pBase + 1 + iLocal) );
    }
    if ( HB_IS_BLOCK( *(pBase+1) ) )
