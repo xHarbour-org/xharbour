@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.100 2006/03/21 20:46:16 likewolf Exp $
+ * $Id: harbour.sly,v 1.101 2006/04/24 07:30:16 ronpinkas Exp $
  */
 
 /*
@@ -1645,8 +1645,7 @@ CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMET
                  Source
              '>'
              {
-                hb_compCodeBlockEnd();
-                $$ = hb_compExprNewDummy();
+                $$ = hb_compCodeBlockEnd( TRUE );
              }
            ;
 

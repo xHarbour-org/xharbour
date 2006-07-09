@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.16 2005/10/01 18:33:02 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.17 2005/11/03 06:54:58 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ typedef enum
 typedef enum
 {
    HB_ET_NONE = 0,
-   HB_ET_DUMMY,
+   HB_ET_EXTBLOCK,
    HB_ET_NIL,
    HB_ET_NUMERIC,
    HB_ET_STRING,
@@ -240,6 +240,11 @@ typedef struct HB_EXPR_
          struct HB_EXPR_ *pLeft;       /* object */
          struct HB_EXPR_ *pRight;      /* object */
       } asOperator;
+      struct
+      {
+         BYTE *pCode;                  /* pre-generated code */
+         ULONG ulLen;                  /* length of pCode */
+      } asExtBlock;
    } value;
    ULONG ulLength;
    ULONG Counter;
@@ -308,7 +313,7 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
 
 
 HB_EXPR_PTR hb_compExprNew( int );
-HB_EXPR_PTR hb_compExprNewDummy( void );
+HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *, ULONG );
 HB_EXPR_PTR hb_compExprNewEmpty( void );
 HB_EXPR_PTR hb_compExprNewNil( void );
 HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5056 2006/07/07 15:23:43 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.5057 2006/07/08 11:58:03 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,24 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-07-06 13:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbcomp.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * source/common/expropt1.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    ! Fixed compilation of extended codeblocks in expression context
+
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+  * source/macro/macroa.c
+  * source/macro/macrob.c
+  * source/macro/macroc.c
+    * Touched.
+
 2006-07-08 16:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/debug.c
     ! Fixed reporting of local variables in variadic functions.
@@ -15,8 +33,8 @@
 2006-07-07 11:20 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
   * source/rtl/tbrowse.prg
     * Tbrowse:hittest - more changes per Zeljko Stupar: HTFOOTING only if ::lFooters
-    * TDataCache:GetCell - check for !empty nRow and nCol 
-    * Tbrowse:hilight and :dehilight check for :nRowPos>0 
+    * TDataCache:GetCell - check for !empty nRow and nCol
+    * Tbrowse:hilight and :dehilight check for :nRowPos>0
     * Tbrowse:refreshcurrent check that ::nRowPos>0
 
 2006-07-06 23:25 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.48 2006/03/30 00:08:12 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.49 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -447,7 +447,7 @@ extern void hb_compStrongType( int iSize );
 
 /* Codeblocks */
 extern void hb_compCodeBlockStart( void );        /* starts a codeblock creation */
-extern void hb_compCodeBlockEnd( void );          /* end of codeblock creation */
+extern HB_EXPR_PTR hb_compCodeBlockEnd( BOOL );          /* end of codeblock creation */
 
 /* support for FIELD declaration */
 extern void hb_compFieldSetAlias( char *, int );

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.133 2006/06/14 13:56:20 druzus Exp $
+ * $Id: harbour.c,v 1.134 2006/07/04 21:42:46 likewolf Exp $
  */
 
 /*
@@ -1340,7 +1340,7 @@ void hb_compGenGlobalName( char *szVarName )
 
       iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
       pVar = hb_compVariableFind( hb_comp_pGlobals, iVar );
-      
+
       pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 5 );
       i = 0;
       if ( !pVar->szAlias )
@@ -3150,12 +3150,12 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
    int iFileLen = strlen( szFile );
    int iFuncLen;
    BYTE *pBuffer;
-   
+
    /* Use a special form "filename:" when the file changes within function */
    if ( szFunc != NULL && *szFunc == '\0' && hb_comp_functions.pLast->pCode )
    {
       char *szLast = (char *) hb_comp_functions.pLast->pCode + hb_comp_ulLastModuleNamePos + 1;
-      
+
       if ( ( ! strncmp( szFile, szLast, iFileLen ) ) && ( szLast[ iFileLen ] == '\0' || szLast[ iFileLen ] == ':' ) )
       {
          return;
@@ -3198,7 +3198,7 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
       {
          hb_compGenModuleName( hb_comp_files.pLast->szFileName, "" );
       }
-      
+
       if( !bCodeblock && hb_comp_iBaseLine == 0 )
       {
          hb_comp_iBaseLine = hb_comp_iLine;
@@ -4259,7 +4259,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
    if( pFunc )
    {
-      if( (pFunc->bFlags & FUN_WITH_RETURN) == 0 )
+      if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 )
       {
          /* The last statement in a function/procedure was not a RETURN
           * Generate end-of-procedure pcode
@@ -4305,6 +4305,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
             if( pVar->szName && pFunc->szName && pFunc->szName[0] && (! ( pVar->iUsed & VU_USED )) )
             {
                char szFun[ 256 ];
+
                sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
             }
@@ -4313,11 +4314,13 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
          }
 
          pVar = pFunc->pStatics;
+
          while( pVar )
          {
             if( pVar->szName && pFunc->szName && pFunc->szName[0] && ! ( pVar->iUsed & VU_USED ) )
             {
                char szFun[ 256 ];
+
                sprintf( szFun, "%s(%i)", pFunc->szName, pVar->iDeclLine );
                hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_VAR_NOT_USED, pVar->szName, szFun );
             }
@@ -4327,11 +4330,9 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
          /* Check if the function returned some value
           */
-         if( (pFunc->bFlags & FUN_WITH_RETURN) == 0 &&
-             (pFunc->bFlags & FUN_PROCEDURE) == 0 )
+         if( ( pFunc->bFlags & FUN_WITH_RETURN ) == 0 && ( pFunc->bFlags & FUN_PROCEDURE ) == 0 )
          {
-            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_FUN_WITH_NO_RETURN,
-                               pFunc->szName, NULL );
+            hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_FUN_WITH_NO_RETURN, pFunc->szName, NULL );
          }
 
          /* Compile Time Strong Type Checking is not needed any more. */
@@ -5096,7 +5097,7 @@ void hb_compGlobalsDefStart( void )
       hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
       hb_comp_pGlobalsFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pGlobalsFunc;
-      
+
       if( hb_comp_bDebugInfo )
       {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
@@ -5130,7 +5131,7 @@ void hb_compGlobalsDefEnd( void )
    }
 }
 
-/* 
+/*
  * Start of stop line number info generation
  */
 static void hb_compLineNumberDefStart( void )
@@ -5181,7 +5182,7 @@ void hb_compCodeBlockStart()
    hb_comp_functions.pLast = pBlock;
 }
 
-void hb_compCodeBlockEnd( void )
+HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 {
    PFUNCTION pCodeblock;   /* pointer to the current codeblock */
    PFUNCTION pFunc;/* pointer to a function that owns a codeblock */
@@ -5193,23 +5194,43 @@ void hb_compCodeBlockEnd( void )
    int iLocalPos;
    PVAR pVar, pFree;
 
-   hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
+   HB_EXPR_PTR pExtBlock;
+   PFUNCTION pFunExtBlock;
 
+   hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
+   //hb_compFixFuncPCode( hb_comp_functions.pLast );
    hb_compOptimizeJumps();
 
    pCodeblock = hb_comp_functions.pLast;
 
-   /* return to pcode buffer of function/codeblock in which the current
-    * codeblock was defined
-    */
-   hb_comp_functions.pLast = pCodeblock->pOwner;
+   if( bExt )
+   {
+	  /*
+	   * Container for the complete HB_P_PUSHBLOCK and the block itslef.
+	   * The complete PCODE will later be used in hb_compExprUseExtBlock.
+	   */
+      pFunExtBlock = hb_compFunctionNew( NULL, HB_FS_STATIC );
+      hb_comp_functions.pLast = pFunExtBlock;
+   }
+   else
+   {
+	  pExtBlock = NULL;
+
+      /*
+	   * Return to pcode buffer of function/codeblock in which the current
+       * codeblock was defined
+       */
+      hb_comp_functions.pLast = pCodeblock->pOwner;
+   }
 
    /* find the function that owns the codeblock */
    pFunc = pCodeblock->pOwner;
    pFuncName = pFunc->szName;
+
    while( pFunc->pOwner )
    {
       pFunc = pFunc->pOwner;
+
       if ( pFunc->szName && *pFunc->szName )
       {
          pFuncName = pFunc->szName;
@@ -5228,19 +5249,23 @@ void hb_compCodeBlockEnd( void )
    /* Count the number of referenced local variables */
    wLocalsLen = 0;
    pVar = pCodeblock->pStatics;
+
    while( pVar )
    {
       if( hb_comp_bDebugInfo )
       {
         wLocalsLen += (4 + strlen(pVar->szName));
       }
+
       pVar = pVar->pNext;
       ++wLocals;
    }
+
    wLocalsCnt = wLocals;
 
    /* NOTE: 2 = HB_P_PUSHBLOCK | HB_P_PUSHBLOCKSHORT + BYTE( size ) + _ENDBLOCK */
    wSize = (USHORT)pCodeblock->lPCodePos + 2;
+
    if ( hb_comp_bDebugInfo )
    {
       wSize += 3 + strlen( hb_comp_files.pLast->szFileName ) + strlen( pFuncName );
@@ -5263,6 +5288,7 @@ void hb_compCodeBlockEnd( void )
 
    /* generate the table of referenced local variables */
    pVar = pCodeblock->pStatics;
+
    while( wLocals-- )
    {
       wPos = hb_compVariableGetPos( pFunc->pLocals, pVar->szName );
@@ -5270,7 +5296,7 @@ void hb_compCodeBlockEnd( void )
 
       pVar = pVar->pNext;
    }
-   
+
    if( hb_comp_bDebugInfo )
    {
       hb_compGenModuleName( hb_comp_files.pLast->szFileName, pFuncName );
@@ -5278,6 +5304,7 @@ void hb_compCodeBlockEnd( void )
       /* generate the names of referenced local variables */
       pVar = pCodeblock->pStatics;
       iLocalPos = -1;
+
       while( wLocalsCnt-- )
       {
          hb_compGenLocalName( (USHORT)iLocalPos, pVar->szName );
@@ -5291,9 +5318,24 @@ void hb_compCodeBlockEnd( void )
    }
 
    hb_compGenPCodeN( pCodeblock->pCode, pCodeblock->lPCodePos, ( BOOL ) 0 );
-
-   /* this fake-function is no longer needed */
    hb_xfree( ( void * ) pCodeblock->pCode );
+
+   if( bExt )
+   {
+      pExtBlock = hb_compExprNewExtBlock( pFunExtBlock->pCode, pFunExtBlock->lPCodePos );
+
+	  //pFunExtBlock->pCode = NULL;
+      hb_xfree( ( void * ) pFunExtBlock );
+
+      /* return to pcode buffer of function in which the extened
+       * codeblock was defined in.
+       */
+      hb_comp_functions.pLast = pCodeblock->pOwner;
+   }
+
+   // Cleanup the codeblock wrapper function.
+
+   /* Release Locals. */
    pVar = pCodeblock->pLocals;
    while( pVar )
    {
@@ -5327,12 +5369,16 @@ void hb_compCodeBlockEnd( void )
       hb_xfree( ( void * ) pCodeblock->pStack );
    }
 
+   /*
    pCodeblock->iStackSize      = 0;
    pCodeblock->iStackIndex     = 0;
    pCodeblock->iStackFunctions = 0;
    pCodeblock->iStackClasses   = 0;
+   */
 
    hb_xfree( ( void * ) pCodeblock );
+
+   return pExtBlock;
 }
 
 /* ************************************************************************* */
@@ -5689,7 +5735,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
             {
                PLINEINFO pInfo;
                int iModules = 0;
-               
+
                hb_compLineNumberDefStart();
                while ( ( pInfo = hb_comp_pLineInfo ) != NULL )
                {
@@ -5705,17 +5751,17 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
                   for ( i = 0; i < pInfo->ulLineCount; i++ )
                   {
                      ULONG ulLine = pInfo->pLines[ i ] - pInfo->ulLineMin;
-                     
+
                      pBuffer[ ulLine / 8 ] |= 1 << ( ulLine % 8 );
                   }
-                  
+
                   hb_compGenPushString( pInfo->szModule, strlen( pInfo->szModule ) + 1 );
                   hb_compGenPushLong( pInfo->ulLineMin );
                   hb_compGenPushString( (char *) pBuffer, iLen + 1 );
                   hb_xfree( pBuffer );
                   hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
                   iModules++;
-                  
+
                   hb_comp_pLineInfo = pInfo->pNext;
                   hb_xfree( pInfo->pLines );
                   hb_xfree( pInfo->szModule );

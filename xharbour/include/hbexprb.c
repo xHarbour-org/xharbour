@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.108 2006/02/24 06:18:14 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.109 2006/03/01 13:06:22 druzus Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ HB_EXPR_PTR hb_compExprReduceBitOp( HB_EXPR_PTR pSelf, char cOp, HB_MACRO_DECL )
 /* forward declaration of callback functions
  */
 static HB_EXPR_FUNC( hb_compExprUseEmpty );
-static HB_EXPR_FUNC( hb_compExprUseDummy );
+static HB_EXPR_FUNC( hb_compExprUseExtBlock );
 static HB_EXPR_FUNC( hb_compExprUseNil );
 static HB_EXPR_FUNC( hb_compExprUseNumeric );
 static HB_EXPR_FUNC( hb_compExprUseString );
@@ -197,7 +197,7 @@ static HB_EXPR_FUNC( hb_compExprUseNegate );
 
 HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseEmpty,
-   hb_compExprUseDummy,
+   hb_compExprUseExtBlock,
    hb_compExprUseNil,
    hb_compExprUseNumeric,
    hb_compExprUseString,
@@ -290,11 +290,12 @@ static HB_EXPR_FUNC( hb_compExprUseEmpty )
    return pSelf;
 }
 
-/* HB_ET_DUMMY is used by Extended Blocks,
- * it does NOT pushes anything in HB_EA_PUSH_PCODE
+/* HB_ET_EXTBLOCK is used by Extended Blocks,
+ * it pushes pregenerated pcode in HB_EA_PUSH_PCODE
  */
-static HB_EXPR_FUNC( hb_compExprUseDummy )
+static HB_EXPR_FUNC( hb_compExprUseExtBlock )
 {
+  #if ! defined( HB_MACRO_SUPPORT )
    switch( iMessage )
    {
       case HB_EA_REDUCE:
@@ -307,13 +308,20 @@ static HB_EXPR_FUNC( hb_compExprUseDummy )
          hb_compErrorLValue( pSelf );
          break;
       case HB_EA_PUSH_PCODE:
+         hb_compGenPCodeN( pSelf->value.asExtBlock.pCode, pSelf->value.asExtBlock.ulLen, ( BOOL ) 0 );
          break;
       case HB_EA_POP_PCODE:
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
       case HB_EA_DELETE:
+         if( pSelf->value.asExtBlock.pCode )
+		 {
+            HB_XFREE( pSelf->value.asExtBlock.pCode );
+		 }
          break;
    }
+  #endif
+
    return pSelf;
 }
 
@@ -504,14 +512,25 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
                 */
                *pPrev = pExpr;   /* store a new expression into the previous one */
                pExpr->pNext = pNext;  /* restore the link to next expression */
+
                if( pNext )
+			   {
                   HB_EXPR_USE( pExpr, HB_EA_PUSH_POP );
+			   }
                else
+			   {
                   HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
+			   }
+
                pPrev  = &pExpr->pNext;
                pExpr  = pNext;
             }
-            HB_EXPR_PCODE0( hb_compCodeBlockEnd );
+
+            #if defined( HB_MACRO_SUPPORT )
+               HB_EXPR_PCODE0( hb_compCodeBlockEnd );
+			#else
+               hb_compCodeBlockEnd( FALSE );
+			#endif
          }
          break;
       case HB_EA_POP_PCODE:
@@ -538,6 +557,7 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
          break;
       }
    }
+
    return pSelf;
 }
 

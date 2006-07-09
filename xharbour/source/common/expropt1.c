@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.17 2005/07/28 15:37:29 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.18 2005/11/03 06:55:29 ronpinkas Exp $
  */
 
 /*
@@ -76,7 +76,7 @@
 
 static char * s_OperTable[] = {
    "",             /* HB_ET_NONE      */
-   "Dummy",        /* HB_ET_DUMMY     */
+   "ExtCodeblock", /* HB_ET_EXTBLOCK  */
    "NIL",          /* HB_ET_NIL       */
    "Numeric",      /* HB_ET_NUMERIC   */
    "String",       /* HB_ET_STRING    */
@@ -189,9 +189,16 @@ int hb_compExprType( HB_EXPR_PTR pExpr )
 
 /* ************************************************************************* */
 
-HB_EXPR_PTR hb_compExprNewDummy( void )
+HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *pCode, ULONG ulLen )
 {
-   return hb_compExprNew( HB_ET_DUMMY );
+   HB_EXPR_PTR pExpr;
+
+   pExpr = hb_compExprNew( HB_ET_EXTBLOCK );
+
+   pExpr->value.asExtBlock.pCode = pCode;
+   pExpr->value.asExtBlock.ulLen = ulLen;
+
+   return pExpr;
 }
 
 HB_EXPR_PTR hb_compExprNewEmpty( void )
