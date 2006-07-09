@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.101 2006/04/24 07:30:16 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.102 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -233,12 +233,12 @@ static void hb_compDebugStart( void ) { };
 %type <valInteger>  NUM_INTEGER
 %type <valLong>     NUM_LONG
 %type <iNumber> FunScope
-%type <iNumber> Params ParamList
+%type <iNumber> Params ParamList ExtBlockParams
 %type <iNumber> IfBegin VarList ExtVarList
 %type <iNumber> FieldList
 %type <lNumber> WhileBegin
 %type <pVoid>   IfElseIf Cases
-%type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockNoVar SendId
+%type <asExpr>  Argument ArgList BlockExpList BlockVarList BlockParams SendId
 %type <asExpr>  DoName DoProc DoArgument DoArgList
 %type <asExpr>  PareExpList1 PareExpList2 PareExpList3 PareExpListN
 %type <asExpr>  ExpList ExpList1 ExpList2 ExpList3
@@ -1570,84 +1570,57 @@ GetAExt    : { /* Nothing*/ }
            | ',' GetArgList
            ;
 
-CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockNoVar CBMARKER BlockExpList '}'
-     {
-        if( s_bBlockMacro )
-        {
-           if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
-           {
-              HB_EXPR_PTR pMacroVar, pBlockString;
+CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockParams CBMARKER BlockExpList '}'
+     	       {
+     		  if( s_bBlockMacro )
+     		  {
+     		     if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
+     		     {
+     		        HB_EXPR_PTR pMacroVar, pBlockString;
 
-              pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
-              pBlockString = hb_compExprNewString( "{||" );
-              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
-              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
-              $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
-           }
-           else if( s_bBlockDeclared )
-           {
-              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
-              $<asExpr>$ = $<asExpr>3;
-           }
-           else
-           {
-              $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
-           }
-        }
-        else
-        {
-           $$ = $<asExpr>3;
-        }
+     		        pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
+     		        pBlockString = hb_compExprNewString( "{||" );
+     		        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
+     		        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
+     		        $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
+     		     }
+     		     else if( s_bBlockDeclared )
+     		     {
+     		        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+     		        $<asExpr>$ = $<asExpr>3;
+     		     }
+     		     else
+     		     {
+     		        $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
+     		     }
+     		  }
+     		  else
+     		  {
+     		     $$ = $<asExpr>3;
+     		  }
 
-        if( --s_iBlock == 0 )
-        {
-           hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-        }
-     }
-
-           | '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockVarList CBMARKER BlockExpList '}'
-     {
-        if( s_bBlockMacro )
-        {
-           if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
-           {
-              HB_EXPR_PTR pMacroVar, pBlockString;
-
-              pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
-              pBlockString = hb_compExprNewString( "{||" );
-              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
-              pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}" ) );
-              $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
-           }
-           else if( s_bBlockDeclared )
-           {
-              hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
-              $<asExpr>$ = $<asExpr>3;
-           }
-           else
-           {
-              $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( hb_comp_SLX_LastBlock( FALSE ) ), 0, NULL );
-           }
-        }
-        else
-        {
-           $$ = $<asExpr>3;
-        }
-
-        if( --s_iBlock == 0 )
-        {
-           hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-        }
-     }
+     		  if( --s_iBlock == 0 )
+     		  {
+     		     hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+     		  }
+     	       }
            ;
 
-CodeBlock2 : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; } ParamList BITOR Crlf
+BlockParams : /* empty list */    { $$ = NULL; }
+            | BlockVarList
+	    ;
+
+CodeBlock2  : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; } ExtBlockParams BITOR Crlf
                  Source
-             '>'
-             {
-                $$ = hb_compCodeBlockEnd( TRUE );
-             }
-           ;
+              '>'
+               {
+                  $$ = hb_compCodeBlockEnd( TRUE );
+               }
+            ;
+
+ExtBlockParams : /* empty list */    { $$ = 0; }
+               | ParamList
+	       ;
 
 /* NOTE: This uses $-2 then don't use BlockExpList in other context
  */
@@ -1658,12 +1631,10 @@ BlockExpList : Expression                  { pBlockSimple = $1;   $$ = hb_compEx
 /* NOTE: This is really not needed however it allows the use of $-2 item
  * in BlockExpList to refer the same rule defined in Codeblock
  */
-BlockNoVar : /* empty list */    { $$ = NULL; }
-;
 
-BlockVarList : IdentName AsType                 { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-           | BlockVarList ',' IdentName AsType  { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
-           ;
+BlockVarList : IdentName AsType                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             | BlockVarList ',' IdentName AsType  { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             ;
 
 /* There is a conflict between the use of IF( Expr1, Expr2, Expr3 )
  * and parenthesized expression ( Expr1, Expr2, Expr3 )
