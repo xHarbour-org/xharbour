@@ -2,7 +2,7 @@
 rem ***********************************************************
 rem * bldtest.bat
 rem *
-rem * $Id: bldtest.bat,v 1.7 2005/10/05 03:21:27 ronpinkas Exp $
+rem * $Id: bldtest.bat,v 1.8 2005/10/23 10:37:22 fsgiudice Exp $
 rem *
 rem * Batch file to build test programs in ST or MT environment
 rem *
@@ -22,6 +22,7 @@ rem Saving current HB_MT state
 set OLDENVMT=%HB_MT%
 set OLDENVGT=%HB_GT_LIB%
 set OLDENVC=%CFLAGS%
+set OLDENVHB=%HARBOURFLAGS%
 set OLD_HB_ARCHITECTURE=%HB_ARCHITECTURE%
 set OLD_HB_COMPILER=%HB_COMPILER%
 set OLD_HB_USER_LIBS=%HB_USER_LIBS%
@@ -50,6 +51,10 @@ IF %1.==/cgi. GOTO SETCGI
 IF %1.==/CGI. GOTO SETCGI
 IF %1.==/WVT. GOTO SETWVT
 IF %1.==/wvt. GOTO SETWVT
+IF %1.==/WVW. GOTO SETWVW
+IF %1.==/wvw. GOTO SETWVW
+IF %1.==/dbg. GOTO SETDBG
+IF %1.==/DBG. GOTO SETDBG
 
 IF %BLDDEFAULT%.==N. GOTO CALLBLD
 GOTO SETDEFAULT
@@ -71,6 +76,15 @@ SHIFT
 SET BLDDEFAULT=N
 GOTO ARGUMENTS
 
+:SETWVW
+echo.Setting Windows Virtual Windows (WVW) mode
+echo.
+SET HB_GT_LIB=gtwvw
+SET CFLAGS=-W
+SHIFT
+SET BLDDEFAULT=N
+GOTO ARGUMENTS
+
 :SETCGI
 echo.Setting CGI Terminal (CGI) mode
 echo.
@@ -78,6 +92,13 @@ SET HB_GT_LIB=gtcgi
 SET CFLAGS=
 SHIFT
 SET BLDDEFAULT=N
+GOTO ARGUMENTS
+
+:SETDBG
+echo.Setting DEBUG mode
+echo.
+set HARBOURFLAGS=-b -es2
+SHIFT
 GOTO ARGUMENTS
 
 :SETDEFAULT
@@ -144,10 +165,12 @@ rem Restore Old Settings
 set HB_MT=%OLDENVMT%
 set HB_GT_LIB=%OLDENVGT%
 set CFLAGS=%OLDENVC%
+set HARBOURFLAGS=%OLDENVHB%
 set HB_ARCHITECTURE=%OLD_HB_ARCHITECTURE%
 set HB_COMPILER=%OLD_HB_COMPILER%
 set HB_USER_LIBS=%OLD_HB_USER_LIBS%
 
+set OLDENVHB=
 set OLDENVGT=
 set OLDENVC=
 set OLDENVMT=

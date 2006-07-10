@@ -1,9 +1,31 @@
 * regexall.prg
-* $Id: regex.prg,v 1.4 2003/05/27 20:05:54 jonnymind Exp $
+* $Id: regexall.prg,v 1.1 2005/12/16 03:56:43 fsgiudice Exp $
 * Test for regular expression functions using hb_RegExAll() function
 *
 * (C) 2005 - Francesco Saverio Giudice
 *
+
+
+/*-------------------------------------------------------------------------
+  HB_RegexAll() Syntax:
+
+  2005-12-16 - Francesco Saverio Giudice
+  HB_RegExAll( cRegex, cString, lCaseSensitive, lNewLine, nMaxMatches, nGetMatch, lOnlyMatch ) -> aAllRegexMatches
+
+  This function return all matches from a Regex search.
+  It is a mix from hb_RegEx() and hb_RegExAtX()
+
+  PARAMETERS:
+    cRegex         - Regex pattern string or precompiled Regex
+    cString        - The string you want to search
+    lCaseSensitive - default = FALSE
+    lNewLine       - default = FALSE
+    nMaxMatches    - default = unlimited, this limit number of matches that have to return
+    nGetMatch      - default = unlimited, this returns only one from Match + Sub-Matches
+    lOnlyMatch     - default = TRUE, if TRUE returns Matches, otherwise it returns also start and end positions
+
+  -------------------------------------------------------------------------*/
+
 
 FUNCTION Main()
 

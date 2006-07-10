@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5059 2006/07/09 21:57:41 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5060 2006/07/10 12:42:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-07-10 16:25 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
+  * source/rtl/decode.prg
+    * fixed decoding a nested array
+    + Added hb_DecodeOrEmpty() function that returns an empty value of
+      checking value parameter instead of NIL
+      Usefull in case of use within a tbrowse, for example
+  + tests/tstdecode.prg
+    + samples of hb_decode() and hb_decodeorempty()
+
+  * tests/regexall.prg
+    + added regexall syntax as comment
+
+  * tests/bldtest.bat
+    + added support for WVW and DEBUG with /WVW and /DBG options
 
 2006-07-10 08:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexprb.c

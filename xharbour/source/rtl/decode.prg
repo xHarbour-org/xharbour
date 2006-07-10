@@ -1,5 +1,5 @@
 /*
- * $Id: decode.prg,v 1.3 2006/06/13 16:43:19 fsgiudice Exp $
+ * $Id: decode.prg,v 1.4 2006/06/26 14:26:25 fsgiudice Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ FUNCTION HB_Decode(...)
 
   LOCAL aParams, nParams, xDefault
   LOCAL xVal, cKey, xRet
-  LOCAL aValues, aResults, n, i, nPos
+  LOCAL aValues, aResults, n, i, nPos, nLen
 
   aParams  := hb_aParams()
   nParams  := PCount()
@@ -104,13 +104,7 @@ FUNCTION HB_Decode(...)
 
   DO CASE
 
-     CASE nParams == 0    // No parameters
-          xRet := NIL
-
-     CASE nParams == 1    // Only value to decode as parameter, return an empty value of itself
-          xRet := EmptyValue( aParams[ 1 ] )
-
-     OTHERWISE            // More parameters, real case
+     CASE nParams > 1     // More parameters, real case
 
           xVal := aParams[ 1 ]
 
@@ -125,50 +119,79 @@ FUNCTION HB_Decode(...)
              nParams := Len( aParams )
           ENDIF
 
-          // Now check how many parametes are left
-          IF nParams == 0
-             // No more
+          // Ok because I have no other value than default, I will check if it is a complex value
+          // like an array or an hash, so I can get it to decode values
+          IF xDefault <> NIL .AND. ;
+             ( ValType( xDefault ) == "A" .OR. ;
+               ValType( xDefault ) == "H" )
 
-             // Ok because I have no other value than default, I will check if it is a complex value
-             // like an array or an hash, so I can get it to decode values
-             IF xDefault <> NIL .AND. ;
-                ( ValType( xDefault ) == "A" .OR. ;
-                  ValType( xDefault ) == "H" )
+             // If it is an array I will restart this function creating a linear call
+             IF ValType( xDefault ) == "A" .AND. Len( xDefault ) > 0
 
-                // If it is an array I will restart this function creating a linear call
-                IF ValType( xDefault ) == "A"
+                // I can have a linear array like { 1, "A", 2, "B", 3, "C" }
+                // or an array of array couples like { { 1, "A" }, { 2, "B" }, { 3, "C" } }
+                // first element tell me what type is
 
-                   // If i have an array as default, this contains couples of key / value
-                   // so I have to convert in a linear array
-                   aParams := Array( Len( xDefault ) * 2 )
+                // couples of values
+                IF ValType( xDefault[ 1 ] ) == "A"
 
-                   n := 1
-                   FOR i := 1 TO Len( xDefault )
-                       aParams[ n++ ] := xDefault[ i ][ 1 ]
-                       aParams[ n++ ] := xDefault[ i ][ 2 ]
-                   NEXT
+                   //// If i have an array as default, this contains couples of key / value
+                   //// so I have to convert in a linear array
 
+                   nLen := Len( xDefault )
 
-                // If it is an hash, translate it in an array
-                ELSEIF ValType( xDefault ) == "H"
+                   // Check if array has a default value, this will be last value and has a value
+                   // different from an array
+                   IF !( ValType( xDefault[ nLen ] ) == "A" )
 
-                   aParams := Array( Len( xDefault ) * 2 )
+                      aParams := Array( ( nLen - 1 ) * 2 )
 
-                   i := 1
-                   FOR EACH cKey IN xDefault:Keys
-                       aParams[ i++ ] := cKey
-                       aParams[ i++ ] := xDefault[ cKey ]
-                   NEXT
+                      n := 1
+                      FOR i := 1 TO nLen - 1
+                          aParams[ n++ ] := xDefault[ i ][ 1 ]
+                          aParams[ n++ ] := xDefault[ i ][ 2 ]
+                      NEXT
 
+                      aAdd( aParams, xDefault[ nLen ] )
+
+                   ELSE
+
+                      // I haven't a default
+
+                      aParams := Array( Len( xDefault ) * 2 )
+
+                      n := 1
+                      FOR i := 1 TO Len( xDefault )
+                          aParams[ n++ ] := xDefault[ i ][ 1 ]
+                          aParams[ n++ ] := xDefault[ i ][ 2 ]
+                      NEXT
+
+                   ENDIF
+                ELSE
+                   // I have a linear array
+
+                   aParams := xDefault
                 ENDIF
 
-                // Then add Decoding value at beginning
-                aIns( aParams, 1, xVal, TRUE )
 
-                // And run decode() again
-                xRet := hb_ExecFromArray( @hb_Decode(), aParams )
+             // If it is an hash, translate it in an array
+             ELSEIF ValType( xDefault ) == "H"
+
+                aParams := Array( Len( xDefault ) * 2 )
+
+                i := 1
+                FOR EACH cKey IN xDefault:Keys
+                    aParams[ i++ ] := cKey
+                    aParams[ i++ ] := xDefault[ cKey ]
+                NEXT
 
              ENDIF
+
+             // Then add Decoding value at beginning
+             aIns( aParams, 1, xVal, TRUE )
+
+             // And run decode() again
+             xRet := hb_ExecFromArray( @hb_Decode(), aParams )
 
           ELSE
 
@@ -201,6 +224,12 @@ FUNCTION HB_Decode(...)
              ENDIF
 
           ENDIF
+
+     CASE nParams == 0    // No parameters
+          xRet := NIL
+
+     CASE nParams == 1    // Only value to decode as parameter, return an empty value of itself
+          xRet := EmptyValue( aParams[ 1 ] )
 
   ENDCASE
 
