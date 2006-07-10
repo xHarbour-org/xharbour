@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.109 2006/03/01 13:06:22 druzus Exp $
+ * $Id: hbexprb.c,v 1.110 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -295,7 +295,10 @@ static HB_EXPR_FUNC( hb_compExprUseEmpty )
  */
 static HB_EXPR_FUNC( hb_compExprUseExtBlock )
 {
-  #if ! defined( HB_MACRO_SUPPORT )
+  #if defined( HB_MACRO_SUPPORT )
+    HB_SYMBOL_UNUSED( pMacro );
+    HB_SYMBOL_UNUSED( iMessage );
+  #else
    switch( iMessage )
    {
       case HB_EA_REDUCE:
