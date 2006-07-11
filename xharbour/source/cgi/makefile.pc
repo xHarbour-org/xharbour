@@ -1,0 +1,101 @@
+# $Id: makefile.pc,v 1.0 2006/03/19 00:00:00 modalsist Exp $
+
+#
+# Makefile for Pelles C/C++ compiler.
+#
+
+HB_EXE       =$(HB_DIR)\bin\harbour.exe
+POCC_EXE     =$(POCC_DIR)\bin\pocc.exe
+POLIB_EXE    =$(POCC_DIR)\bin\polib.exe
+
+CGI_SRC_DIR  =$(HB_DIR)\source\cgi
+CGI_OBJ_DIR  =$(OBJ_DIR)
+CGI_LIB      =$(HB_DIR)\lib\cgi.lib
+
+HB_FLAGS    = -i$(CGI_SRC_DIR)\include -n -q -w0 -gc0
+
+C_FLAGS     = /Ze /Go /Ot /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"
+
+CC_CMD    = $(POCC_EXE) $(C_FLAGS) /Fo$@ $**
+LIB_CMD   = $(POLIB_EXE) /OUT:$@ $**
+HB_CMD    = $(HB_EXE) $(HB_FLAGS) $** -o$@
+
+PROJECT = \
+   $(CGI_LIB)
+
+#
+# rules
+#
+
+CGI_LIB_OBJS = \
+    $(CGI_OBJ_DIR)\thtm.obj \
+    $(CGI_OBJ_DIR)\tedit.obj \
+    $(CGI_OBJ_DIR)\tfile.obj \
+    $(CGI_OBJ_DIR)\htjlist.obj   \
+    $(CGI_OBJ_DIR)\hjwindow.obj \
+    $(CGI_OBJ_DIR)\tcgi.obj \
+    $(CGI_OBJ_DIR)\tframe.obj \
+    $(CGI_OBJ_DIR)\hterrsys.obj \
+    $(CGI_OBJ_DIR)\htmutil.obj 
+
+
+$(CGI_LIB) : $(CGI_LIB_OBJS)
+   $(LIB_CMD)
+
+# 
+# dependencies
+# 
+
+$(CGI_OBJ_DIR)\thtm.c : $(CGI_SRC_DIR)\thtm.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\thtm.obj : $(CGI_OBJ_DIR)\thtm.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tedit.c : $(CGI_SRC_DIR)\tedit.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\tedit.obj : $(CGI_OBJ_DIR)\tedit.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tfile.c : $(CGI_SRC_DIR)\tfile.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\tfile.obj : $(CGI_OBJ_DIR)\tfile.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\htjlist.c : $(CGI_SRC_DIR)\htjlist.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\htjlist.obj : $(CGI_OBJ_DIR)\htjlist.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\hjwindow.c : $(CGI_SRC_DIR)\hjwindow.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\hjwindow.obj : $(CGI_OBJ_DIR)\hjwindow.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tcgi.c : $(CGI_SRC_DIR)\tcgi.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\tcgi.obj : $(CGI_OBJ_DIR)\tcgi.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tframe.c : $(CGI_SRC_DIR)\tframe.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\tframe.obj : $(CGI_OBJ_DIR)\tframe.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\hterrsys.c : $(CGI_SRC_DIR)\hterrsys.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\hterrsys.obj : $(CGI_OBJ_DIR)\hterrsys.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\htmutil.c : $(CGI_SRC_DIR)\htmutil.prg
+   $(HB_CMD)
+
+$(CGI_OBJ_DIR)\htmutil.obj : $(CGI_OBJ_DIR)\htmutil.c
+   $(CC_CMD)

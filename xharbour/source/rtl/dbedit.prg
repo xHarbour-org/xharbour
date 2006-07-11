@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.35 2006/04/26 18:23:21 modalsist Exp $
+ * $Id: dbedit.prg,v 1.36 2006/05/03 18:17:20 modalsist Exp $
  */
 
 /*
@@ -135,6 +135,7 @@ LOCAL oTBR,;
   DEFAULT nRight TO MaxCol()
   DEFAULT nBottom TO MaxRow()
 
+
   // NOTE: Heading/footing separator is SINGLE line instead of DOUBLE line
   //       this is because most codepages (unicode too) don't have DOUBLE line chars
   //       so the output is ugly with them
@@ -142,12 +143,6 @@ LOCAL oTBR,;
   DEFAULT acHeadingSep TO Chr(196) + Chr(194) + Chr(196)
   DEFAULT acColumnSep  TO " " + Chr(179) + " "
   DEFAULT acColumnFootings TO ""
-
-
-  nTop    := Max(0,nTop)
-  nLeft   := Max(0,nLeft)
-  nBottom := Min(MaxRow(),nBottom)
-  nRight  := Min(MaxCol(),nRight)
 
 
   IF Empty(axColumns) .OR. !HB_ISARRAY( axColumns )
@@ -160,65 +155,82 @@ LOCAL oTBR,;
 
   END
 
-  /* Check parameter types. If any parameter is invalid, then xHarbour will
-     show a message error. This is xHarbour's extension. */
+  /* 17/05/2006 - E.F. - Check parameters type before continue.
+    * 1) Clipper avoid argument values if it is invalid.
+    *    xHarbour call a run time error. IMHO this is better solution to
+         avoid old errors in code and bad practices inherited from Clipper's days. 
+   * 2) There is no error base reserved to dbEdit function, then I have
+   *    assigned the 1127 for this.
+   */
 
   /* Note: The column's type doesn't need to verify. If any column type is
            invalid or empty, then the dbEdit() will ignore it. */
 
-  /* Check <cUserFunc>. In Clipper the <cUserFunc> paramenter only can be a
-     string or nil, but in xHarbour can be a codeblock also. */
+  If !HB_IsNil(nTop) .AND.  !HB_IsNumeric(nTop)
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(nTop)+">", Procname()+" <nTop>" ) )
+  Endif
+  If !HB_IsNil(nLeft) .AND.  !HB_IsNumeric(nLeft)
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(nLeft)+">", Procname()+" <nLeft>" ) )
+  Endif
+  If !HB_IsNil(nBottom) .AND.  !HB_IsNumeric(nBottom)
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(nBottom)+">", Procname()+" <nBottom>" ) )
+  Endif
+  If !HB_IsNil(nRight) .AND.  !HB_IsNumeric(nRight)
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(nRight)+">", Procname()+" <nRight>" ) )
+  Endif
 
+  nTop    := Max(0,nTop)
+  nLeft   := Max(0,nLeft)
+  nBottom := Min(MaxRow(),nBottom)
+  nRight  := Min(MaxCol(),nRight)
+
+  /* In Clipper the <cUserFunc> paramenter only can be a
+   * string or nil, but in xHarbour can be a codeblock also.
+   */
   IF !HB_IsNil(xUserFunc) .AND. ( !HB_IsString( xUserFunc ) .AND. !HB_IsBlock(xUserFunc) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<cUserFunction>", "Argument error. String or codeblock required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127,  "Argument type error <"+valtype(xUserFunc)+">", Procname()+" <xUserFunc>" ) )
+  ELSE
+      If HB_IsString(xUserFunc) .AND. !Empty(xUserFunc)
+         // Eval xUserFunc to verify if it exist.
+         Eval( &( "{|| "+xUserFunc+"() }" ) )
+      ElseIf HB_IsBlock(xUserFunc)
+         // Eval xUserFunc to verify if it exist.
+         Eval( xUserFunc )
+      Else
+         xUserFunc := NIL
+      Endif
   ENDIF
 
-  /* Check <acColumnSayPictures|cColumnSayPicture> */
-  
   IF !HB_IsNil(acColumnSayPictures) .AND. ( !HB_IsString(acColumnSayPictures) .AND. !HB_IsArray(acColumnSayPictures) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnSayPictures|cColumnSayPicture>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127,  "Argument type error <"+valtype(acColumnSayPictures)+">", Procname()+" <acColumnSayPictures|cColumnSayPicture>" ) )
   ENDIF
 
-  /* Check <acColumnHeaders|cColumnHeader> */
-  
   IF !HB_IsNil(acColumnHeaders) .AND. ( !HB_IsString(acColumnHeaders) .AND. !HB_IsArray(acColumnHeaders) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnHeaders|cColumnHeader>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(acColumnHeaders)+">" , Procname()+" <acColumnHeaders|cColumnHeader>" ) )
   ENDIF
 
-  /* Check <acHeadingSeparators|cHeadingSeparator> */
-  
   IF !HB_IsNil(acHeadingSep) .AND. ( !HB_IsString(acHeadingSep) .AND. !HB_IsArray(acHeadingSep) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acHeadingSeparators|cHeadingSeparator>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(acHeadingSep)+">", Procname()+" <acHeadingSeparators|cHeadingSeparator>" ) )
   ENDIF
 
-  /* Check <acColumnSeparators|cColumnSeparator> */
-  
   IF !HB_IsNil(acColumnSep) .AND. ( !HB_IsString(acColumnSep) .AND. !HB_IsArray(acColumnSep) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnSeparators|cColumnSeparator>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(acColumnSep)+">", Procname()+" <acColumnSeparators|cColumnSeparator>" ) )
   ENDIF
 
-  /* Check <acFootingSeparators|cFootingSeparator> */
-  
   IF !HB_IsNil(acFootingSep) .AND. ( !HB_IsString(acFootingSep) .AND. !HB_IsArray(acFootingSep) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acFootingSeparators|cFootingSeparator>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(acFootingSep)+">", Procname()+" <acFootingSeparators|cFootingSeparator>" ) )
   ENDIF
 
-  /* Check <acColumnFootings|cColumnFooting> */
-  
   IF !HB_IsNil(acColumnFootings) .AND. ( !HB_IsString(acColumnFootings) .AND. !HB_IsArray(acColumnFootings) )
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<acColumnFootings|cColumnFooting>", "Argument error. Array or string required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(acColumnFootings)+">" , Procname()+" <acColumnFootings|cColumnFooting>" ) )
   ENDIF
 
-  /* Check <bPreBlock> */
-  
   IF !HB_IsNil(bPreBlock) .AND. !HB_IsBlock(bPreBlock)
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<bPreBlockBlock>", "Argument error. Codeblock required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(bPreBlock)+">", Procname()+" <bPreBlockBlock>" ) )
   ENDIF
 
-  /* Check <bPostBlock> */
-  
   IF !HB_IsNil(bPostBlock) .AND. !HB_IsBlock(bPostBlock)
-     Throw( ErrorNew( "BASE", 0, 1003, Procname()+":<bPostBlockBlock>", "Argument type error. Codeblock required" ) )
+     Throw( ErrorNew( "BASE", 0, 1127, "Argument type error <"+valtype(bPostBlock)+">", Procname()+" <bPostBlockBlock>" ) )
   ENDIF
 
 
@@ -406,11 +418,16 @@ LOCAL oTBR,;
 
     oTBR:deHilite()
 
-    If oTBR:hitTop .AND. nKey != K_CTRL_PGUP
-       nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
-    ElseIf oTBR:hitBottom .AND. nKey != K_CTRL_PGDN
-       nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
-    EndIf
+    /* 2006/JUL/10 - E.F. Don't run this code if nRet is equal DE_APPEND or
+     *               DE_ABORT.
+     */
+    If nRet == DE_REFRESH .OR. nRet == DE_CONT
+       If oTBR:hitTop .AND. nKey != K_CTRL_PGUP
+          nRet := _DoUserFunc(bFun, DE_HITTOP, oTBR:colPos, oTBR)
+       ElseIf oTBR:hitBottom .AND. nKey != K_CTRL_PGDN
+          nRet := _DoUserFunc(bFun, DE_HITBOTTOM, oTBR:colPos, oTBR)
+       EndIf
+    Endif
 
     If nRet == DE_ABORT
        Exit

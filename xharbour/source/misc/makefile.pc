@@ -1,0 +1,39 @@
+# $Id: makefile.pc,v 1.0 2006/03/19 00:00:00 modalsist Exp $
+
+#
+# Makefile for Pelles C/C++ compiler.
+#
+
+
+POCC_EXE     =$(POCC_DIR)\bin\pocc.exe
+POLIB_EXE    =$(POCC_DIR)\bin\polib.exe
+
+MISC_SRC_DIR =$(HB_DIR)\source\misc
+MISC_OBJ_DIR =$(OBJ_DIR)
+MISC_LIB     =$(HB_DIR)\lib\libmisc.lib
+
+C_FLAGS     = /Ze /Go /Ot /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"
+
+CC_CMD    = $(POCC_EXE) $(C_FLAGS) /Fo$@ $**
+LIB_CMD   = $(POLIB_EXE) /OUT:$@ $**
+
+PROJECT = \
+   $(MISC_LIB)
+
+#
+# rules
+#
+
+MISC_LIB_OBJS = \
+   $(MISC_OBJ_DIR)\hb_f.obj
+
+$(MISC_LIB) : $(MISC_LIB_OBJS)
+   $(LIB_CMD)
+
+# 
+# dependencies
+# 
+
+$(MISC_OBJ_DIR)\hb_f.obj : $(MISC_SRC_DIR)\hb_f.c
+   $(CC_CMD)
+

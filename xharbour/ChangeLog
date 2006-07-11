@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5060 2006/07/10 12:42:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5061 2006/07/10 14:28:29 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-07-10 22:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/dbedit.prg
+    ! minor fix in append mode behaviour.
+  * makefile.pc
+    + added usrrdd.lib
+    + added rdds.lib
+    + added libmisc.lib
+    + added gtgui.lib.
+  + source\misc
+    + added make_pc.bat
+    + added makefile.pc
+  + source\cgi
+    + added make_pc.bat
+    + added makefile.pc
 
 2006-07-10 16:25 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * source/rtl/decode.prg
