@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5061 2006/07/10 14:28:29 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5062 2006/07/11 01:49:54 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-11 12:18 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
+  * source/tip/httpcln.prg
+     + METHOD Boundary(nType) - used for creating and boundary key when using a multipart form post.
+     + METHOD Attach(cInputName,cFileName,cMimeType) - used to include files when posting using ::postmultipart()
+     + METHOD PostMultiPart( cPostData, cQuery ) - used to submit a form via the multipart protocol which is mainly used when there is a file to upload.
 
 2006-07-10 22:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/dbedit.prg

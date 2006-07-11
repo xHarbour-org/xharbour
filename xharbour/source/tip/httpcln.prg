@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.4 2005/09/23 14:06:24 mlombardo Exp $
+ * $Id: httpcln.prg,v 1.5 2005/12/01 13:41:14 snaiperis Exp $
  */
 
 /*
@@ -70,6 +70,8 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA hFields      INIT  {=>}
    DATA cUserAgent   INIT  "Mozilla/3.0 (compatible XHarbour-Tip/1.0)"
    DATA cAuthMode    INIT ""
+   DATA cBoundary
+   DATA aAttachments init {}
 
    METHOD New()
    METHOD Get( cQuery )
@@ -80,6 +82,9 @@ CLASS tIPClientHTTP FROM tIPClient
    Method ReadAll()
    Method SetCookie
    Method GetCookies
+   Method Boundary
+   METHOD Attach(cName,cFileName,cType)
+   Method PostMultiPart
 
 HIDDEN:
    METHOD StandardFields()
@@ -167,7 +172,6 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
 
    ::InetSendall( ::SocketCon, "Content-Length: " + ;
          LTrim(Str( Len( cData ) ) ) + ::cCRLF )
-
    // End of header
    ::InetSendall( ::SocketCon, ::cCRLF )
 
@@ -179,6 +183,8 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
       alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
 RETURN .F.
+
+
 
 
 METHOD StandardFields() CLASS tIPClientHTTP
@@ -473,4 +479,135 @@ method getcookies(cHost,cPath)
          NEXT
       NEXT
    NEXT
-   return(cOut)
+return(cOut)
+
+*****************
+METHOD Boundary(nType)
+   /*
+   nType: 0=as found as the separator in the stdin stream
+         1=as found as the last one in the stdin stream
+         2=as found in the CGI enviroment
+   Examples:
+   -----------------------------41184676334  //in the body or stdin stream
+   -----------------------------41184676334--   //last one of the stdin stream
+---------------------------41184676334 //in the header or CGI envirnment
+   */
+
+   local cBound:=::cBoundary
+   LOCAL i
+   IF nType=nil
+      nType=0
+   ENDIF 
+   IF empty(cBound)
+      cBound:=replicate('-',27)+space(11)
+      FOR i := 28 TO 38
+         cBound[i] := str(int(HB_Random(0, 9 )),1,0)
+      NEXT
+      ::cBoundary:=cBound
+   endif
+   cBound:=if(nType<2,'--','')+cBound+if(nType=1,'--','')
+   RETURN(cBound)
+
+METHOD Attach(cName,cFileName,cType)
+   aadd(::aAttachments,{cName,cFileName,cType})
+return(nil)
+
+METHOD PostMultiPart( cPostData, cQuery )
+   LOCAL cData:="", nI, cTmp,y,cBound:=::boundary()
+   local cCrlf:=::cCRlf,oSub
+   local nPos
+   local cFilePath,cName,cFile,cType
+   local nFile,cBuf,nBuf,nRead
+
+   IF empty(cPostData)
+   elseif HB_IsHash( cPostData )
+      FOR nI := 1 TO Len( cPostData )
+         cTmp := HGetKeyAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cTmp +'"'+cCrlf+cCrLf
+         cTmp := HGetValueAt( cPostData, nI )
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp+cCrLf
+      NEXT
+   elseIF HB_IsArray( cPostData )
+      y:=Len(cPostData)
+      FOR nI := 1 TO y
+         cTmp := cPostData[ nI ,1]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cTmp +'"'+cCrlf+cCrLf
+         cTmp := cPostData[ nI,2]
+         cTmp := CStr( cTmp )
+         cTmp := AllTrim( cTmp )
+         cTmp := TipEncoderUrl_Encode( cTmp )
+         cData += cTmp+cCrLf
+      NEXT
+
+   ELSEIF HB_IsString( cPostData )
+      cData := cPostData
+   ENDIF
+   FOR each oSub in ::aAttachments
+      cName:=oSub[1]
+      cFile:=oSub[2]
+      cType:=oSub[3]
+      cTmp:=strtran(cFile,'/','\')
+      if ( nPos := rat( "\", cTmp ) ) != 0
+          cFilePath := substr( cTmp, 1, nPos )
+      elseif ( nPos := rat( ":", cTmp ) ) != 0
+          cFilePath := substr( cTmp, 1, nPos )
+      else
+          cFilePath := ""
+      endif
+      cTmp:=substr(cFile,Len(cFilePath)+1)
+      IF empty(cType)
+         cType:='text/html'
+      ENDIF 
+      cData += cBound+cCrlf+'Content-Disposition: form-data; name="'+cName +'"; filename="'+cTmp+'"'+cCrlf+'Content-Type: '+cType+cCrLf+cCrLf
+      //hope this is not a big file....
+      nFile:=fopen(cFile)
+      nbuf:=8192
+      nRead:=nBuf
+      cBuf:=space(nBuf)
+      while nRead=nBuf
+         //nRead=FRead( nFile,@cBuf,nBuf)
+         cBuf:=FReadstr( nFile,nBuf)
+         nRead:=len(cBuf)
+/*         IF nRead<nBuf
+            cBuf:=pad(cBuf,nRead)
+         ENDIF 
+*/
+         cData+=cBuf
+      end
+      fClose(nFile)
+      cData+=cCrlf
+   NEXT 
+   cData+=cBound+'--'+cCrlf
+   IF .not. HB_IsString( cQuery )
+      cQuery := ::oUrl:BuildQuery()
+   ENDIF
+
+   ::InetSendall( ::SocketCon, "POST " + cQuery + " HTTP/1.1" + ::cCRLF )
+   ::StandardFields()
+
+   IF .not. "Content-Type" IN ::hFields
+      ::InetSendall( ::SocketCon, e"Content-Type: multipart/form-data; boundary="+::boundary(2)+::cCrlf )
+   ENDIF
+
+   ::InetSendall( ::SocketCon, "Content-Length: " + ;
+         LTrim(Str( Len( cData ) ) ) + ::cCRLF )
+   // End of header
+   ::InetSendall( ::SocketCon, ::cCRLF )
+
+   IF ::InetErrorCode( ::SocketCon  ) ==  0
+      ::InetSendall( ::SocketCon, cData )
+      ::bInitialized := .T.
+      RETURN ::ReadHeaders()
+/*   else
+      alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
+   ENDIF
+RETURN .F.
