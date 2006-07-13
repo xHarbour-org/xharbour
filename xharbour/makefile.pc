@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.27 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: makefile.pc,v 1.28 2006/07/11 01:49:54 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -50,6 +50,7 @@ HSX_SRC_DIR      = $(HB_DIR)\source\rdd\hsx
 USRRDD_SRC_DIR   = $(HB_DIR)\source\rdd\usrrdd
 RDDS_SRC_DIR     = $(USRRDD_SRC_DIR)\rdds
 MISC_SRC_DIR     = $(HB_DIR)\source\misc
+CGI_SRC_DIR      = $(HB_DIR)\source\cgi
 
 HBTEST_SRC_DIR   = $(HB_DIR)\utils\hbtest
 HBRUN_SRC_DIR    = $(HB_DIR)\utils\hbrun
@@ -82,8 +83,8 @@ PP_OBJ_DIR    = $(OBJ_DIR)\mt
 USRRDD_OBJ_DIR = $(OBJ_DIR)\mt
 RDDS_OBJ_DIR   = $(OBJ_DIR)\mt
 MISC_OBJ_DIR   = $(OBJ_DIR)\mt
+CGI_OBJ_DIR    =$(OBJ_DIR)\mt
 !else
-EXE_OBJ_DIR   = $(OBJ_DIR)\bin
 VM_OBJ_DIR    = $(OBJ_DIR)
 RTL_OBJ_DIR   = $(OBJ_DIR)
 MACRO_OBJ_DIR = $(OBJ_DIR)
@@ -99,6 +100,7 @@ PP_OBJ_DIR    = $(OBJ_DIR)
 USRRDD_OBJ_DIR = $(OBJ_DIR)
 RDDS_OBJ_DIR   = $(OBJ_DIR)
 MISC_OBJ_DIR   = $(OBJ_DIR)
+CGI_OBJ_DIR    =$(OBJ_DIR)
 !endif
 
 # здддддддддддддддд©
@@ -150,6 +152,7 @@ GTGUI_LIB    = $(LIB_DIR)\gtgui.lib
 USRRDD_LIB   = $(LIB_DIR)\usrrdd$(HB_MT).lib
 RDDS_LIB     = $(LIB_DIR)\rdds$(HB_MT).lib
 MISC_LIB     = $(LIB_DIR)\libmisc.lib
+CGI_LIB      = $(LIB_DIR)\cgi$(HB_MT).lib
 
 # здддддддддддддддд©
 # Ё POCC Lib Names Ёш
@@ -189,9 +192,7 @@ HARBOUR_LIBRARY = \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
    $(PCREPOS_LIB) \
-   $(CT_LIB) \
-   $(USRRDD_LIB) \
-   $(RDDS_LIB)
+   $(CT_LIB)
 
 # здддддддддддддддддддд©
 # Ё Harbour and CC     Ёш
@@ -236,7 +237,8 @@ PROJECT = \
    $(CT_LIB) \
    $(USRRDD_LIB) \
    $(RDDS_LIB) \
-   $(MISC_LIB)
+   $(MISC_LIB) \
+   $(CGI_LIB) 
 
 !ifndef HB_MT
 PROJECT = \
@@ -1002,6 +1004,17 @@ PCREPOS_LIB_OBJS = \
    $(RTL_OBJ_DIR)\pcre_xclass.obj \
    $(RTL_OBJ_DIR)\ucp_findchar.obj
 
+CGI_LIB_OBJS = \
+    $(CGI_OBJ_DIR)\thtm.obj \
+    $(CGI_OBJ_DIR)\tedit.obj \
+    $(CGI_OBJ_DIR)\tfile.obj \
+    $(CGI_OBJ_DIR)\htjlist.obj   \
+    $(CGI_OBJ_DIR)\hjwindow.obj \
+    $(CGI_OBJ_DIR)\tcgi.obj \
+    $(CGI_OBJ_DIR)\tframe.obj \
+    $(CGI_OBJ_DIR)\hterrsys.obj \
+    $(CGI_OBJ_DIR)\htmutil.obj 
+
 
 # зддддддддддддд©
 # Ё HARBOUR.EXE Ёш
@@ -1211,6 +1224,9 @@ $(LANG_LIB) : $(LANG_LIB_OBJS)
    $(LIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
+   $(LIB_CMD)
+
+$(CGI_LIB) : $(CGI_LIB_OBJS)
    $(LIB_CMD)
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
@@ -3703,12 +3719,73 @@ $(OBJ_DIR)\dbgwa.c : $(DEBUG_SRC_DIR)\dbgwa.prg
 $(OBJ_DIR)\dbgwa.obj : $(OBJ_DIR)\dbgwa.c
    $(CC_CMD)
 
-#
-# LIBMISC.LIB dependencies
-#
+# здддддддддддддддддддддддддд©
+# Ё LIBMISC.LIB dependencies Ёш
+# юддддддддддддддддддддддддддыш
+#  ъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
 
 $(MISC_OBJ_DIR)\hb_f.obj : $(MISC_SRC_DIR)\hb_f.c
    $(CC_CMD)
+
+# здддддддддддддддддддддд©
+# Ё CGI.LIB dependencies Ёш
+# юддддддддддддддддддддддыш
+#  ъъъъъъъъъъъъъъъъъъъъъъъъ
+
+$(CGI_OBJ_DIR)\thtm.c : $(CGI_SRC_DIR)\thtm.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\thtm.obj : $(CGI_OBJ_DIR)\thtm.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tedit.c : $(CGI_SRC_DIR)\tedit.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\tedit.obj : $(CGI_OBJ_DIR)\tedit.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tfile.c : $(CGI_SRC_DIR)\tfile.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\tfile.obj : $(CGI_OBJ_DIR)\tfile.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\htjlist.c : $(CGI_SRC_DIR)\htjlist.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\htjlist.obj : $(CGI_OBJ_DIR)\htjlist.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\hjwindow.c : $(CGI_SRC_DIR)\hjwindow.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\hjwindow.obj : $(CGI_OBJ_DIR)\hjwindow.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tcgi.c : $(CGI_SRC_DIR)\tcgi.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\tcgi.obj : $(CGI_OBJ_DIR)\tcgi.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\tframe.c : $(CGI_SRC_DIR)\tframe.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\tframe.obj : $(CGI_OBJ_DIR)\tframe.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\hterrsys.c : $(CGI_SRC_DIR)\hterrsys.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\hterrsys.obj : $(CGI_OBJ_DIR)\hterrsys.c
+   $(CC_CMD)
+
+$(CGI_OBJ_DIR)\htmutil.c : $(CGI_SRC_DIR)\htmutil.prg
+   $(HARBOUR_EXE) -i$(CGI_SRC_DIR)\include $(HARBOURFLAGS) $** -o$@
+
+$(CGI_OBJ_DIR)\htmutil.obj : $(CGI_OBJ_DIR)\htmutil.c
+   $(CC_CMD)
+
 
 # зддддддддддддддддддддддддд©
 # Ё HBTEST.EXE dependencies Ёш

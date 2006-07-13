@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.9 2006/03/24 17:45:38 modalsist Exp $
+rem $Id: make_pc.bat,v 1.10 2006/05/01 23:37:57 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -88,6 +88,8 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\bin\hbpp.exe                 del %HB_DIR%\bin\hbpp.exe
    if exist %HB_DIR%\bin\xbscript.exe             del %HB_DIR%\bin\xbscript.exe
 
+   if exist %HB_DIR%\lib\cgi.lib              del %HB_DIR%\lib\cgi.lib
+   if exist %HB_DIR%\lib\cgimt.lib            del %HB_DIR%\lib\cgimt.lib
    if exist %HB_DIR%\lib\codepage.lib         del %HB_DIR%\lib\codepage.lib
    if exist %HB_DIR%\lib\common.lib           del %HB_DIR%\lib\common.lib
    if exist %HB_DIR%\lib\ct.lib               del %HB_DIR%\lib\ct.lib
@@ -104,11 +106,12 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\dllmain.lib          del %HB_DIR%\lib\dllmain.lib
    if exist %HB_DIR%\lib\fmstat.lib           del %HB_DIR%\lib\fmstat.lib
    if exist %HB_DIR%\lib\fmstatmt.lib         del %HB_DIR%\lib\fmstatmt.lib
+   if exist %HB_DIR%\lib\gtcgi.lib            del %HB_DIR%\lib\gtcgi.lib
+   if exist %HB_DIR%\lib\gtgui.lib            del %HB_DIR%\lib\gtgui.lib
    if exist %HB_DIR%\lib\gtnul.lib            del %HB_DIR%\lib\gtnul.lib
+   if exist %HB_DIR%\lib\gtpca.lib            del %HB_DIR%\lib\gtpca.lib
    if exist %HB_DIR%\lib\gtstd.lib            del %HB_DIR%\lib\gtstd.lib
    if exist %HB_DIR%\lib\gtwin.lib            del %HB_DIR%\lib\gtwin.lib
-   if exist %HB_DIR%\lib\gtcgi.lib            del %HB_DIR%\lib\gtcgi.lib
-   if exist %HB_DIR%\lib\gtpca.lib            del %HB_DIR%\lib\gtpca.lib
    if exist %HB_DIR%\lib\gtwvt.lib            del %HB_DIR%\lib\gtwvt.lib
    if exist %HB_DIR%\lib\harbour.lib          del %HB_DIR%\lib\harbour.lib
    if exist %HB_DIR%\lib\hbodbc.lib           del %HB_DIR%\lib\hbodbc.lib
@@ -118,6 +121,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\hsx.lib              del %HB_DIR%\lib\hsx.lib
    if exist %HB_DIR%\lib\hsxmt.lib            del %HB_DIR%\lib\hsxmt.lib
    if exist %HB_DIR%\lib\lang.lib             del %HB_DIR%\lib\lang.lib
+   if exist %HB_DIR%\lib\libmisc.lib          del %HB_DIR%\lib\libmisc.lib
    if exist %HB_DIR%\lib\macro.lib            del %HB_DIR%\lib\macro.lib
    if exist %HB_DIR%\lib\macromt.lib          del %HB_DIR%\lib\macromt.lib
    if exist %HB_DIR%\lib\nulsys.lib           del %HB_DIR%\lib\nulsys.lib
@@ -131,12 +135,16 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %HB_DIR%\lib\ppmt.lib             del %HB_DIR%\lib\ppmt.lib
    if exist %HB_DIR%\lib\rdd.lib              del %HB_DIR%\lib\rdd.lib
    if exist %HB_DIR%\lib\rddmt.lib            del %HB_DIR%\lib\rddmt.lib
+   if exist %HB_DIR%\lib\rdds.lib             del %HB_DIR%\lib\rdds.lib
+   if exist %HB_DIR%\lib\rddsmt.lib           del %HB_DIR%\lib\rddsmt.lib
    if exist %HB_DIR%\lib\rtl.lib              del %HB_DIR%\lib\rtl.lib
    if exist %HB_DIR%\lib\rtlmt.lib            del %HB_DIR%\lib\rtlmt.lib
    if exist %HB_DIR%\lib\sixcdx.lib           del %HB_DIR%\lib\sixcdx.lib
    if exist %HB_DIR%\lib\sixcdxmt.lib         del %HB_DIR%\lib\sixcdxmt.lib
    if exist %HB_DIR%\lib\tip.lib              del %HB_DIR%\lib\tip.lib
    if exist %HB_DIR%\lib\tipmt.lib            del %HB_DIR%\lib\tipmt.lib
+   if exist %HB_DIR%\lib\usrrdd.lib           del %HB_DIR%\lib\usrrdd.lib
+   if exist %HB_DIR%\lib\usrrddmt.lib         del %HB_DIR%\lib\usrrddmt.lib
    if exist %HB_DIR%\lib\vm.lib               del %HB_DIR%\lib\vm.lib
    if exist %HB_DIR%\lib\vmmt.lib             del %HB_DIR%\lib\vmmt.lib
 
@@ -170,6 +178,8 @@ if "%1" == "CLEAN" goto CLEAN
 
    REM Cleaning temp lib folder
 
+   if exist %LIB_DIR%\cgi.lib              del %LIB_DIR%\cgi.lib
+   if exist %LIB_DIR%\cgimt.lib            del %LIB_DIR%\cgimt.lib
    if exist %LIB_DIR%\codepage.lib         del %LIB_DIR%\codepage.lib
    if exist %LIB_DIR%\common.lib           del %LIB_DIR%\common.lib
    if exist %LIB_DIR%\ct.lib               del %LIB_DIR%\ct.lib
@@ -191,13 +201,15 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %LIB_DIR%\hbsixmt.lib          del %LIB_DIR%\hbsixmt.lib
    if exist %LIB_DIR%\hsx.lib              del %LIB_DIR%\hsx.lib
    if exist %LIB_DIR%\hsxmt.lib            del %LIB_DIR%\hsxmt.lib
+   if exist %LIB_DIR%\gtcgi.lib            del %LIB_DIR%\gtcgi.lib
+   if exist %LIB_DIR%\gtgui.lib            del %LIB_DIR%\gtgui.lib
    if exist %LIB_DIR%\gtnul.lib            del %LIB_DIR%\gtnul.lib
+   if exist %LIB_DIR%\gtpca.lib            del %LIB_DIR%\gtpca.lib
    if exist %LIB_DIR%\gtstd.lib            del %LIB_DIR%\gtstd.lib
    if exist %LIB_DIR%\gtwin.lib            del %LIB_DIR%\gtwin.lib
-   if exist %LIB_DIR%\gtcgi.lib            del %LIB_DIR%\gtcgi.lib
-   if exist %LIB_DIR%\gtpca.lib            del %LIB_DIR%\gtpca.lib
    if exist %LIB_DIR%\gtwvt.lib            del %LIB_DIR%\gtwvt.lib
    if exist %LIB_DIR%\lang.lib             del %LIB_DIR%\lang.lib
+   if exist %LIB_DIR%\libmisc.lib          del %LIB_DIR%\libmisc.lib
    if exist %LIB_DIR%\macro.lib            del %LIB_DIR%\macro.lib
    if exist %LIB_DIR%\macromt.lib          del %LIB_DIR%\macromt.lib
    if exist %LIB_DIR%\nulsys.lib           del %LIB_DIR%\nulsys.lib
@@ -211,12 +223,16 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %LIB_DIR%\ppmt.lib             del %LIB_DIR%\ppmt.lib
    if exist %LIB_DIR%\rdd.lib              del %LIB_DIR%\rdd.lib
    if exist %LIB_DIR%\rddmt.lib            del %LIB_DIR%\rddmt.lib
+   if exist %LIB_DIR%\rdds.lib             del %LIB_DIR%\rdds.lib
+   if exist %LIB_DIR%\rddsmt.lib           del %LIB_DIR%\rddsmt.lib
    if exist %LIB_DIR%\rtl.lib              del %LIB_DIR%\rtl.lib
    if exist %LIB_DIR%\rtlmt.lib            del %LIB_DIR%\rtlmt.lib
    if exist %LIB_DIR%\sixcdx.lib           del %LIB_DIR%\sixcdx.lib
    if exist %LIB_DIR%\sixcdxmt.lib         del %LIB_DIR%\sixcdxmt.lib
    if exist %LIB_DIR%\tip.lib              del %LIB_DIR%\tip.lib
    if exist %LIB_DIR%\tipmt.lib            del %LIB_DIR%\tipmt.lib
+   if exist %LIB_DIR%\usrrdd.lib           del %LIB_DIR%\usrrdd.lib
+   if exist %LIB_DIR%\usrrddmt.lib         del %LIB_DIR%\usrrddmt.lib
    if exist %LIB_DIR%\vm.lib               del %LIB_DIR%\vm.lib
    if exist %LIB_DIR%\vmmt.lib             del %LIB_DIR%\vmmt.lib
 
@@ -269,6 +285,7 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %OBJ_DIR%\mt\opt\console\nul   rd %OBJ_DIR%\mt\opt\console
    if exist %OBJ_DIR%\mt\opt\gui\nul       rd %OBJ_DIR%\mt\opt\gui
    if exist %OBJ_DIR%\mt\opt\nul           rd %OBJ_DIR%\mt\opt
+
 
    goto EXIT
 
