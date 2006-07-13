@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.3 2006/04/23 12:30:00 ptsarenko Exp $
+ * $Id: ctmisc.prg,v 1.3 2006/04/23 09:34:40 ptsarenko Exp $
  */
 
 /*
@@ -80,11 +80,6 @@ FUNCTION CSETCENT( nCentury )
    endif
    RETURN NIL
 
-
-FUNCTION EXENAME()
-   RETURN HB_ARGV( 0 )
-
-
 FUNCTION LTOC( l )
    RETURN iif( l, "T", "F" )
 
@@ -101,3 +96,24 @@ FUNCTION SAVEGETS()
 
    RETURN aGetList
 
+#ifndef __PLATFORM__Windows
+FUNCTION EXENAME()
+   RETURN HB_ARGV( 0 )
+#endif
+#ifdef __PLATFORM__Windows
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "windows.h"
+HB_FUNC(EXENAME)
+{
+   char szBuffer[ MAX_PATH + 1 ] = {0} ;
+
+   GetModuleFileName( ISNIL(1) ? GetModuleHandle( NULL ) : (HMODULE) hb_parnl( 1 ), szBuffer ,MAX_PATH );
+
+   hb_retc( szBuffer );
+}
+
+
+#pragma enddump
+#endif

@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: range.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -67,7 +67,8 @@ HB_FUNC (RANGEREM)
    
     char *pcString = (char *)hb_parc (3);
     size_t sStrLen = (size_t)hb_parclen (3);
-    char *pcRet, *pc;
+    char *pcRet ;
+    unsigned char *pc;
     unsigned char ucChar1, ucChar2;
     size_t sRetIndex;
     int iMode, iBool;
@@ -168,7 +169,8 @@ HB_FUNC (RANGEREPL)
  
     char *pcString = (char *)hb_parc (3);
     size_t sStrLen = (size_t)hb_parclen (3);
-    char *pcRet, *pc;
+    char *pcRet;
+    unsigned char *pc;
     unsigned char ucChar1, ucChar2, ucReplace;
     size_t sRetIndex;
     int iMode, iBool;
