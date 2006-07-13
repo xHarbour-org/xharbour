@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.196 2006/06/14 13:56:20 druzus Exp $
+ * $Id: dbcmd.c,v 1.197 2006/06/28 22:30:03 druzus Exp $
  */
 
 /*
@@ -1339,7 +1339,7 @@ HB_FUNC( AFIELDS )
 {
    HB_THREAD_STUB
    PHB_ITEM pName, pType, pLen, pDec;
-   USHORT uiFields, uiArrayLen, uiCount;
+   USHORT uiFields, uiCount;
    AREAP pArea = HB_CURRENT_WA;
 
    if( !pArea )
@@ -1358,54 +1358,63 @@ HB_FUNC( AFIELDS )
       return;
    }
 
-   uiArrayLen = 0;
    SELF_FIELDCOUNT( pArea, &uiFields );
+
    if( pName )
    {
-      uiArrayLen = ( USHORT ) hb_arrayLen( pName );
-      if( uiArrayLen > uiFields )
-         uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
+      USHORT uiArrayLen = ( USHORT ) hb_arrayLen( pName );
+      if( uiArrayLen < uiFields )
+         uiFields = uiArrayLen;
+   }
+   if( pType )
+   {
+      USHORT uiArrayLen = ( USHORT ) hb_arrayLen( pType );
+      if( uiArrayLen < uiFields )
+         uiFields = uiArrayLen;
+   }
+   if( pLen )
+   {
+      USHORT uiArrayLen = ( USHORT ) hb_arrayLen( pLen );
+      if( uiArrayLen < uiFields )
+         uiFields = uiArrayLen;
+   }
+   if( pDec )
+   {
+      USHORT uiArrayLen = ( USHORT ) hb_arrayLen( pDec );
+      if( uiArrayLen < uiFields )
+         uiFields = uiArrayLen;
+   }
+
+   if( pName )
+   {
+      for( uiCount = 1; uiCount <= uiFields; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_NAME,
-                         hb_arrayGetItemPtr( pName, uiCount ) );
+         SELF_FIELDINFO( pArea, uiCount, DBS_NAME, hb_arrayGetItemPtr( pName, uiCount ) );
       }
    }
    if( pType )
    {
-      uiArrayLen = ( USHORT ) hb_arrayLen( pType );
-      if( uiArrayLen > uiFields )
-         uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
+      for( uiCount = 1; uiCount <= uiFields; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_TYPE,
-                         hb_arrayGetItemPtr( pType, uiCount ) );
+         SELF_FIELDINFO( pArea, uiCount, DBS_TYPE, hb_arrayGetItemPtr( pType, uiCount ) );
       }
    }
    if( pLen )
    {
-      uiArrayLen = ( USHORT ) hb_arrayLen( pLen );
-      if( uiArrayLen > uiFields )
-         uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
+      for( uiCount = 1; uiCount <= uiFields; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_LEN,
-                         hb_arrayGetItemPtr( pLen, uiCount ) );
+         SELF_FIELDINFO( pArea, uiCount, DBS_LEN, hb_arrayGetItemPtr( pLen, uiCount ) );
       }
    }
    if( pDec )
    {
-      uiArrayLen = ( USHORT ) hb_arrayLen( pDec );
-      if( uiArrayLen > uiFields )
-         uiArrayLen = uiFields;
-      for( uiCount = 1; uiCount <= uiArrayLen; ++uiCount )
+      for( uiCount = 1; uiCount <= uiFields; ++uiCount )
       {
-         SELF_FIELDINFO( pArea, uiCount, DBS_DEC,
-                         hb_arrayGetItemPtr( pDec, uiCount ) );
+         SELF_FIELDINFO( pArea, uiCount, DBS_DEC, hb_arrayGetItemPtr( pDec, uiCount ) );
       }
    }
 
-   hb_retni( uiArrayLen );
+   hb_retni( uiFields );
 }
 
 HB_FUNC( ALIAS )
@@ -1591,7 +1600,7 @@ static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
                                 USHORT uiArea, char *szAlias,
                                 BOOL fShared, BOOL fReadonly,
                                 char * szCpId, ULONG ulConnection,
-                                PHB_ITEM pStruct )
+                                PHB_ITEM pStruct, PHB_ITEM pDelim )
 {
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
    DBOPENINFO pInfo;
@@ -1655,16 +1664,26 @@ static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
 
    if( errCode == SUCCESS )
    {
-      /* Open file */
-      errCode = SELF_OPEN( pArea, &pInfo );
+      if( pDelim && !HB_IS_NIL( pDelim ) )
+         errCode = SELF_INFO( pArea, DBI_SETDELIMITER, pDelim );
 
-      if( errCode != SUCCESS )
+      if( errCode == SUCCESS )
       {
-         hb_rddReleaseCurrentArea();
-         hb_rddSelectWorkAreaNumber( uiPrevArea );
+         /* Open file */
+         errCode = SELF_OPEN( pArea, &pInfo );
+
+         if( errCode != SUCCESS )
+         {
+            hb_rddReleaseCurrentArea();
+            hb_rddSelectWorkAreaNumber( uiPrevArea );
+         }
       }
    }
 
+   /*
+    * Warning: this is not Clipper compatible. NETERR() should be set by
+    * error handler not here
+    */
    s_bNetError = errCode != SUCCESS;
 
    return errCode;
@@ -1673,6 +1692,7 @@ static ERRCODE hb_rddOpenTable( char * szFileName,  char * szDriver,
 static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
                                   char * szDriver,
                                   BOOL fKeepOpen, USHORT uiArea, char *szAlias,
+                                  PHB_ITEM pDelim,
                                   char * szCpId, ULONG ulConnection )
 {
    char szDriverBuffer[ HARBOUR_MAX_RDD_DRIVERNAME_LENGTH + 1 ];
@@ -1724,9 +1744,17 @@ static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
    pInfo.ulConnection = ulConnection;
    pInfo.lpdbHeader = NULL;
 
-   errCode = SELF_CREATEFIELDS( pArea, pStruct );
+   if( pDelim && !HB_IS_NIL( pDelim ) )
+      errCode = SELF_INFO( pArea, DBI_SETDELIMITER, pDelim );
+   else
+      errCode = SUCCESS;
+
    if( errCode == SUCCESS )
-      errCode = SELF_CREATE( pArea, &pInfo );
+   {
+      errCode = SELF_CREATEFIELDS( pArea, pStruct );
+      if( errCode == SUCCESS )
+         errCode = SELF_CREATE( pArea, &pInfo );
+   }
 
    if( !fKeepOpen || errCode != SUCCESS )
    {
@@ -1734,28 +1762,45 @@ static ERRCODE hb_rddCreateTable( char * szFileName, PHB_ITEM pStruct,
       hb_rddSelectWorkAreaNumber( uiPrevArea );
    }
 
+   /*
+    * Warning: this is not Clipper compatible. NETERR() should be set by
+    * error handler not here
+    */
    s_bNetError = errCode != SUCCESS;
 
    return errCode;
 }
 
+/*
+ * In Clipper the arguments are:
+ *    dbCreate( cFile, aStruct, cRDD, lKeepOpen, cAlias, cDelimArg )
+ * In Harbour:
+ *    dbCreate( cFile, aStruct, cRDD, lKeepOpen, cAlias, cDelimArg, cCodePage, nConnection )
+ */
 HB_FUNC( DBCREATE )
 {
-   char * szFileName;
+   char * szFileName, * szAlias, * szDriver, * szCpId;
    USHORT uiSize, uiLen;
-   PHB_ITEM pStruct, pFieldDesc;
+   PHB_ITEM pStruct, pFieldDesc, pDelim;
    BOOL fKeepOpen, fCurrArea;
+   ULONG ulConnection;
 
    /*
-    * NOTE: 4-th and 5-th parameters are undocumented Clipper ones
-    * 4-th is boolean flag indicating if file should stay open and
+    * NOTE: 4-th, 5-th and 6-th parameters are undocumented Clipper ones
+    * 4-th is boolean flag indicating if file should stay open
     * 5-th is alias - if not given then WA is open without alias
+    * 6-th is optional DELIMITED value used by some RDDs like DELIM
     */
 
    szFileName = hb_parc( 1 );
-   pStruct = hb_param( 2 , HB_IT_ARRAY );
+   pStruct = hb_param( 2, HB_IT_ARRAY );
+   szDriver = hb_parc( 3 );
    fKeepOpen = ISLOG( 4 );
    fCurrArea = fKeepOpen && !hb_parl( 4 );
+   szAlias = hb_parc( 5 );
+   pDelim = hb_param( 6, HB_IT_ANY );
+   szCpId = hb_parc( 7 );
+   ulConnection = hb_parnl( 8 );
 
    /*
     * Clipper allows to use empty struct array for RDDs which does not
@@ -1791,10 +1836,79 @@ HB_FUNC( DBCREATE )
       }
    }
 
-   hb_rddCreateTable( szFileName, pStruct, hb_parc( 3 ), fKeepOpen,
+   hb_rddCreateTable( szFileName, pStruct, szDriver, fKeepOpen,
                       fCurrArea ? hb_rddGetCurrentWorkAreaNumber() : 0,
-                      hb_parc( 5 ), hb_parc( 6 ), hb_parnl( 7 ) );
+                      szAlias, pDelim, szCpId, ulConnection );
 }
+
+/*
+ * I'm not sure if lKeepOpen open works exactly like in DBCREATE, I haven't
+ * tested it with Clipper yet. If it doesn't then please inform me about it
+ * and I'll update the code. [druzus]
+ */
+/* __dbopensdf( cFile, aStruct, cRDD, lKeepOpen, cAlias, cDelimArg, cCodePage, nConnection ) */
+HB_FUNC( __DBOPENSDF )
+{
+   char * szFileName, * szAlias, * szDriver, * szCpId;
+   USHORT uiSize, uiLen;
+   PHB_ITEM pStruct, pFieldDesc, pDelim;
+   BOOL fKeepOpen, fCurrArea;
+   ULONG ulConnection;
+   ERRCODE errCode;
+
+   /*
+    * NOTE: 4-th and 5-th parameters are undocumented Clipper ones
+    * 4-th is boolean flag indicating if file should stay open and
+    * 5-th is alias - if not given then WA is open without alias
+    */
+
+   szFileName = hb_parc( 1 );
+   pStruct = hb_param( 2, HB_IT_ARRAY );
+   szDriver = hb_parc( 3 );
+   fKeepOpen = ISLOG( 4 );
+   fCurrArea = fKeepOpen && !hb_parl( 4 );
+   szAlias = hb_parc( 5 );
+   pDelim = hb_param( 6, HB_IT_ANY );
+   szCpId = hb_parc( 7 );
+   ulConnection = hb_parnl( 8 );
+
+   if( !pStruct ||
+       hb_arrayLen( pStruct ) == 0 ||
+       !szFileName || !szFileName[ 0 ] )
+   {
+      hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "__DBOPENSDF" );
+      return;
+   }
+   uiLen = ( USHORT ) hb_arrayLen( pStruct );
+
+   for( uiSize = 1; uiSize <= uiLen; ++uiSize )
+   {
+      pFieldDesc = hb_arrayGetItemPtr( pStruct, uiSize );
+
+      /* Validate items types of fields */
+      if( hb_arrayLen( pFieldDesc ) < 4 ||
+          !( hb_arrayGetType( pFieldDesc, 1 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 2 ) & HB_IT_STRING ) ||
+          !( hb_arrayGetType( pFieldDesc, 3 ) & HB_IT_NUMERIC ) ||
+          !( hb_arrayGetType( pFieldDesc, 4 ) & HB_IT_NUMERIC ) )
+      {
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "__DBOPENSDF" );
+         return;
+      }
+   }
+
+   errCode = hb_rddOpenTable( szFileName, szDriver,
+                              fCurrArea ? hb_rddGetCurrentWorkAreaNumber() : 0,
+                              szAlias, TRUE, TRUE,
+                              szCpId, ulConnection,
+                              pStruct, pDelim );
+
+   if( !fKeepOpen && errCode == SUCCESS )
+      hb_rddReleaseCurrentArea();
+
+   hb_retl( errCode == SUCCESS );
+}
+
 
 HB_FUNC( DBDELETE )
 {
@@ -2261,7 +2375,7 @@ HB_FUNC( DBUSEAREA )
                     hb_parl( 1 ) ? 0 : hb_rddGetCurrentWorkAreaNumber(),
                     hb_parc( 4 ),
                     ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE,
-                    hb_parl( 6 ), hb_parc( 7 ), hb_parnl( 8 ), NULL );
+                    hb_parl( 6 ), hb_parc( 7 ), hb_parnl( 8 ), NULL, NULL );
 }
 
 HB_FUNC( __DBZAP )
@@ -4350,15 +4464,12 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
       if( errCode == SUCCESS )
       {
          errCode = hb_rddCreateTable( szFileName, pStruct, szDriver,
-                                      TRUE, 0, "", szCpId, ulConnection );
+                                      TRUE, 0, "", pDelim, szCpId,
+                                      ulConnection );
          if( errCode == SUCCESS )
          {
             dbTransInfo.lpaDest = lpaClose =
                                  ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-            if( pDelim )
-            {
-               SELF_INFO( dbTransInfo.lpaDest, DBI_SETDELIMITER, pDelim );
-            }
          }
       }
    }
@@ -4390,22 +4501,18 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
          if( errCode == SUCCESS )
          {
             errCode = hb_rddOpenTable( szFileName, szDriver, 0, "", TRUE, TRUE,
-                                       szCpId, ulConnection, pStruct );
+                                       szCpId, ulConnection, pStruct, pDelim );
             if( errCode == SUCCESS )
             {
                lpaClose = dbTransInfo.lpaSource =
                                  ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-               if( pDelim )
-               {
-                  SELF_INFO( dbTransInfo.lpaSource, DBI_SETDELIMITER, pDelim );
-               }
             }
          }
       }
       else
       {
          errCode = hb_rddOpenTable( szFileName, szDriver, 0, "", TRUE, TRUE,
-                                    szCpId, ulConnection, NULL );
+                                    szCpId, ulConnection, NULL, pDelim );
          if( errCode == SUCCESS )
          {
             lpaClose = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -4610,20 +4717,26 @@ HB_FUNC( DBSKIPPER )
          nRecs = hb_parnl( 1 ) ;
       }
 
-      SELF_EOF( pArea, &bBEof );
+      if( SELF_EOF( pArea, &bBEof ) != SUCCESS )
+         return;
+
       if( nRecs == 0 )
       {
-         SELF_SKIP( pArea, 0 );
+         if( SELF_SKIP( pArea, 0 ) != SUCCESS )
+            return;
       }
       else if( nRecs > 0 && !bBEof  )
       {
          while( nSkipped < nRecs )
          {
-            SELF_SKIP( pArea, 1 );
-            SELF_EOF( pArea, &bBEof );
+            if( SELF_SKIP( pArea, 1 ) != SUCCESS )
+               return;
+            if( SELF_EOF( pArea, &bBEof ) != SUCCESS )
+               return;
             if( bBEof )
             {
-               SELF_SKIP( pArea, -1 );
+               if( SELF_SKIP( pArea, -1 ) != SUCCESS )
+                  return;
                nRecs = nSkipped ;
             }
             else
@@ -4636,8 +4749,10 @@ HB_FUNC( DBSKIPPER )
       {
          while( nSkipped > nRecs )
          {
-            SELF_SKIP( pArea, -1 );
-            SELF_BOF( pArea, &bBEof );
+            if( SELF_SKIP( pArea, -1 ) != SUCCESS )
+               return;
+            if( SELF_BOF( pArea, &bBEof ) != SUCCESS )
+               return;
             if( bBEof )
             {
                nRecs = nSkipped ;

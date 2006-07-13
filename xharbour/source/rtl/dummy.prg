@@ -1,5 +1,5 @@
 /*
- * $Id: dummy.prg,v 1.5 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dummy.prg,v 1.6 2006/06/04 18:30:07 druzus Exp $
  */
 
 /*
@@ -54,11 +54,5 @@
 
 /* TODO: Dummy functions, should be removed when implemented. */
 
-#ifdef HB_COMPAT_C53
-FUNCTION ordCond()         ; RETURN NIL
-#endif
-
 /* NOTE: Internal functions */
 FUNCTION __dbFList()       ; RETURN {}
-FUNCTION __dbOpenSDF()     ; RETURN NIL
-FUNCTION __dbTransRec()    ; RETURN NIL

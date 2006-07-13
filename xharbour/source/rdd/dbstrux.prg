@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.6 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dbstrux.prg,v 1.7 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -115,11 +115,11 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias, cdpId, nConne
 
       IF Empty( cFileFrom )
 
-         dbCreate( cFileName, {;
-            { "FIELD_NAME", "C", 10, 0 },;
-            { "FIELD_TYPE", "C",  1, 0 },;
-            { "FIELD_LEN" , "N",  3, 0 },;
-            { "FIELD_DEC" , "N",  3, 0 } }, cRDDName,,, cdpId, nConnection )
+         dbCreate( cFileName, { { "FIELD_NAME", "C", 10, 0 },;
+                                { "FIELD_TYPE", "C",  1, 0 },;
+                                { "FIELD_LEN" , "N",  3, 0 },;
+                                { "FIELD_DEC" , "N",  3, 0 } },;
+                   cRDDName,,,, cdpId, nConnection )
          dbUseArea( .F., cRDDName, cFileName, cAlias,,, cdpId, nConnection )
 
       ELSE
@@ -140,7 +140,7 @@ FUNCTION __dbCreate( cFileName, cFileFrom, cRDDName, lNew, cAlias, cdpId, nConne
             ( aField[ DBS_LEN ] += aField[ DBS_DEC ] * 256, ;
               aField[ DBS_DEC ] := 0 ), NIL ) } )
 
-         dbCreate( cFileName, aStruct, cRDDName,,, cdpId, nConnection )
+         dbCreate( cFileName, aStruct, cRDDName,,,, cdpId, nConnection )
          dbUseArea( lNew, cRDDName, cFileName, cAlias,,, cdpId, nConnection )
 
       ENDIF
@@ -175,10 +175,11 @@ FUNCTION __dbStructFilter( aStruct, aFieldList )
    /* Build a filtered list of the requested fields. */
 
    aStructFiltered := {}
-   bFindName := {| aField | aField[ DBS_NAME ] == RTrim( Upper(cName ) ) }
+   bFindName := {| aField | aField[ DBS_NAME ] == cName }
 
-   AEval( aFieldList, {| cFieldName, nIndex | cName := cFieldName, nIndex := aScan( aStruct, bFindName ),;
-      iif( nIndex == 0, NIL, AAdd( aStructFiltered, aStruct[ nIndex] ) ) } )
+   AEval( aFieldList, {| cFieldName, nIndex | ;
+         cName := RTrim( Upper( cFieldName ) ), ;
+         nIndex := aScan( aStruct, bFindName ),;
+         iif( nIndex == 0, NIL, AAdd( aStructFiltered, aStruct[ nIndex] ) ) } )
 
    RETURN aStructFiltered
-

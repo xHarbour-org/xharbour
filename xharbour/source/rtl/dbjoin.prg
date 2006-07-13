@@ -1,5 +1,5 @@
 /*
- * $Id: dbjoin.prg,v 1.1 2005/11/06 13:39:20 ptsarenko Exp $
+ * $Id: dbjoin.prg,v 1.1 2005/11/06 11:02:42 ptsarenko Exp $
  */
 
 /*
@@ -63,7 +63,7 @@ endif
 
 begin sequence
 
-   dbCreate(cFile, aStruct, cRdd, .T., "", cdpId, nConnection)
+   dbCreate(cFile, aStruct, cRdd, .T., "", , cdpId, nConnection)
    nResult := Select()
    aJoinList := __JoinList(nMaster, nDetail, nResult, aStruct)
 

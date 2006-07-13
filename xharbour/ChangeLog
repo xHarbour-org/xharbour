@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5064 2006/07/13 00:11:09 modalsist Exp $
+ * $Id: ChangeLog,v 1.5065 2006/07/13 02:51:00 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-13 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbextern.ch
+    - removed ORDCOND() - it's not normal function
+
+  * xharbour/include/std.ch
+  * xharbour/include/ord.ch
+    * moved pseudofunction ORDCOND() from std.ch to ord.ch
+
+  * xharbour/source/rdd/dbcmd.c
+    + added __dbOpenSDF() function
+    * keep strict Clipper compatibility in DBCREATE() parameters
+      The 6-th parameter is optional delimiter used by some RDDs like DELIM
+
+  * xharbour/source/rdd/dbtotal.prg
+    + added __dbTransRec() and updated to use it like in Clipper
+      Can someone tell me why we have Set( _SET_CANCEL, .f. ) in this
+      function?
+
+  * xharbour/source/rdd/dbsort.prg
+  * xharbour/source/rdd/dbstrux.prg
+  * xharbour/source/rtl/dbjoin.prg
+    * updated for strict Clipper DBCREATE() parameters
+
+  * xharbour/source/rtl/dummy.prg
+    - removed ORDCOND(), __dbTransRec() and __dbOpenSDF()
 
 2006-07-12 23:50 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/ctmisc.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbsort.prg,v 1.3 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: dbsort.prg,v 1.4 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
 
    BEGIN SEQUENCE
 
-      dbCreate( cToFileName, aStruct, cRddName, .T., "", cdpID, nConnection )
+      dbCreate( cToFileName, aStruct, cRddName, .T., "", , cdpID, nConnection )
       nToArea := Select()
       dbSelectArea( nArea )
       __dbArrange( nToArea, aStruct, bFor, bWhile, nNext, nRecord, lRest, aFields )
