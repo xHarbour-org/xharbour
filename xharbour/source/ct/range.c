@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id: range.c,v 1.3 2006/07/13 02:51:00 lculik Exp $
  */
 
 /*
@@ -95,7 +95,7 @@ HB_FUNC (RANGEREM)
 
     pcRet = (char *)hb_xgrab( sStrLen + 1 );
     sRetIndex = 0;
-    for (pc = pcString; pc < pcString+sStrLen; pc++)
+    for (pc = (unsigned char *)pcString; pc < (unsigned char *)pcString+sStrLen; pc++)
     {
       iBool = ((*pc) >= ucChar1);
       if (iMode)
@@ -206,7 +206,7 @@ HB_FUNC (RANGEREPL)
 
     pcRet = (char *)hb_xgrab( sStrLen + 1 );
     sRetIndex = 0;
-    for (pc = pcString; pc < pcString+sStrLen; pc++)
+    for (pc = (unsigned char *)pcString; pc < (unsigned char *)pcString+sStrLen; pc++)
     {
       iBool = ((*pc) >= ucChar1);
       if (iMode)
