@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.26 2004/11/25 05:11:57 guerra000 Exp $
+ * $Id: gtdos.c,v 1.27 2005/06/21 20:19:51 druzus Exp $
  */
 
 /*
@@ -2034,7 +2034,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );

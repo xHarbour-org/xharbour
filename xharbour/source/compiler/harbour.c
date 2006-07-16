@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.134 2006/07/04 21:42:46 likewolf Exp $
+ * $Id: harbour.c,v 1.135 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -5195,7 +5195,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    PVAR pVar, pFree;
 
    HB_EXPR_PTR pExtBlock;
-   PFUNCTION pFunExtBlock;
+   PFUNCTION pFunExtBlock = NULL;
 
    hb_compGenPCode1( HB_P_ENDBLOCK ); /* finish the codeblock */
    //hb_compFixFuncPCode( hb_comp_functions.pLast );
@@ -5205,19 +5205,17 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
 
    if( bExt )
    {
-	  /*
-	   * Container for the complete HB_P_PUSHBLOCK and the block itslef.
-	   * The complete PCODE will later be used in hb_compExprUseExtBlock.
-	   */
+      /*
+       * Container for the complete HB_P_PUSHBLOCK and the block itslef.
+       * The complete PCODE will later be used in hb_compExprUseExtBlock.
+       */
       pFunExtBlock = hb_compFunctionNew( NULL, HB_FS_STATIC );
       hb_comp_functions.pLast = pFunExtBlock;
    }
    else
    {
-	  pExtBlock = NULL;
-
       /*
-	   * Return to pcode buffer of function/codeblock in which the current
+       * Return to pcode buffer of function/codeblock in which the current
        * codeblock was defined
        */
       hb_comp_functions.pLast = pCodeblock->pOwner;
@@ -5324,13 +5322,17 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    {
       pExtBlock = hb_compExprNewExtBlock( pFunExtBlock->pCode, pFunExtBlock->lPCodePos );
 
-	  //pFunExtBlock->pCode = NULL;
+      //pFunExtBlock->pCode = NULL;
       hb_xfree( ( void * ) pFunExtBlock );
 
       /* return to pcode buffer of function in which the extened
        * codeblock was defined in.
        */
       hb_comp_functions.pLast = pCodeblock->pOwner;
+   }
+   else
+   {
+      pExtBlock = NULL;
    }
 
    // Cleanup the codeblock wrapper function.

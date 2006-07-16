@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5066 2006/07/13 12:27:17 druzus Exp $
+ * $Id: ChangeLog,v 1.5067 2006/07/14 09:28:30 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-16 21:46 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/config/dos/watcom.cf
+  * xharbour/config/linux/gcc.cf
+  * xharbour/config/w32/mingw32.cf
+  * xharbour/config/w32/watcom.cf
+  * xharbour/source/rtl/gtgui/Makefile
+  * xharbour/source/rtl/gtgui/gtdef.c
+  * xharbour/source/rtl/gtnul/Makefile
+  * xharbour/source/rtl/gtnul/gtsys.c
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * changed HB_DEFAULT_GT to HB_GT_DEFAULT
+
+  * xharbour/include/hbapigt.h
+  * xharbour/source/rtl/gtnul/gtnul.c
+    * added support setting default GT driver by REQUEST HB_GT_<name>_DEFAULT
+      Now you useer can add to their source code:
+         REQUEST HB_GT_WIN
+         REQUEST HB_GT_WVT_DEFAULT
+         REQUEST HB_GT_STD
+         REQUEST HB_GT_GUI
+      to force linking four GT drivers and setting WVT as default one in
+      MULTI GT builds.
+      If code is linked dynamically with harbour.dll which contain all GT
+      drivers then to set the default one it's enough to add to .prg code:
+         REQUEST HB_GT_<name>_DEFAULT
+      F.e.
+         REQUEST HB_GT_GUI_DEFAULT
+
+  * xharbour/source/rtl/gtQTc/mouseQTc.c
+  * xharbour/source/rtl/gt_tpl/gt_tpl.c
+  * xharbour/source/rtl/gtcgi/gtcgi.c
+  * xharbour/source/rtl/gtcrs/gtcrs.c
+  * xharbour/source/rtl/gtdos/gtdos.c
+  * xharbour/source/rtl/gtgui/gtdef.c
+  * xharbour/source/rtl/gtgui/gtgui.c
+  * xharbour/source/rtl/gtos2/gtos2.c
+  * xharbour/source/rtl/gtpca/gtpca.c
+  * xharbour/source/rtl/gtsln/gtsln.c
+  * xharbour/source/rtl/gtstd/gtstd.c
+  * xharbour/source/rtl/gtwin/gtwin.c
+  * xharbour/source/rtl/gtwvt/gtwvt.c
+  * xharbour/source/rtl/gtxvt/gtxvt.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    * removed redundant semicolon
+
+  * xharbour/source/compiler/harbour.c
+    * cleaned GCC warnings
+
+  * xharbour/source/rdd/dbtotal.prg
+    * updated recent Victor's fixes in Harbour
+
+  * xharbour/source/rtl/dbjoin.prg
+    * removed unused local variable
 
 2006-07-14 06:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * source/ct/range.c

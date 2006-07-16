@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.30 2005/10/15 02:37:08 ronpinkas Exp $
+ * $Id: gtnul.c,v 1.31 2006/06/26 11:27:06 druzus Exp $
  */
 
 /*
@@ -66,12 +66,11 @@
 
 #define HB_GT_MAX_ 16
 static char * s_initGT = HB_GT_DRVNAME( HB_GT_NAME );
-static int hb_gtFindNoNul( void );
 
 static char s_gtNameBuf[ HB_GT_NAME_MAX_ + 1 ];
 
-#if defined(HB_DEFAULT_GT)
-   char * s_defaultGT = HB_GT_DRVNAME( HB_DEFAULT_GT );
+#if defined(HB_GT_DEFAULT)
+   char * s_defaultGT = HB_GT_DRVNAME( HB_GT_DEFAULT );
 #elif defined(HB_GT_LIB)
    char * s_defaultGT = HB_GT_DRVNAME( HB_GT_LIB );
 #elif defined(HB_OS_LINUX)
@@ -140,7 +139,22 @@ static int hb_gtFindPos( char * pszID )
    return -1;
 }
 
-static int hb_gtFindNoNul()
+static int hb_gtFindDefault( void )
+{
+   char szFuncName[ 15 + HB_GT_NAME_MAX_ ];
+   int iPos;
+
+   for( iPos = 0; iPos < HB_GT_MAX_ && s_gtInit[ iPos ]; iPos++ )
+   {
+      sprintf( szFuncName, "HB_GT_%s_DEFAULT", s_gtInit[ iPos ]->id );
+      if( hb_dynsymFind( szFuncName ) )
+         return iPos;
+   }
+
+   return -1;
+}
+
+static int hb_gtFindNoNul( void )
 {
    int iPos;
 
@@ -748,6 +762,9 @@ void hb_gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr )
       iPos = hb_gtFindPosFree( hb_getenv( "HB_GT" ) );
 
    if ( iPos == -1 )
+      iPos = hb_gtFindDefault();
+
+   if ( iPos == -1 )
       iPos = hb_gtFindPos( s_defaultGT );
 
    if ( iPos == -1 )
@@ -1217,7 +1234,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );

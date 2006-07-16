@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.167 2005/11/20 18:11:47 marceloanelli Exp $
+ * $Id: gtwvt.c,v 1.168 2006/03/25 18:06:43 bdj Exp $
  */
 
 /*
@@ -4404,7 +4404,7 @@ static void HB_GT_FUNC( mouseFnInit( PHB_GT_FUNCS gt_funcs ) )
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC( gtFnInit ), HB_GT_FUNC( mouseFnInit ) };
 
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );

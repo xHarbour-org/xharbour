@@ -1,5 +1,5 @@
 /*
- * $Id: gtcrs.c,v 1.59 2006/01/12 13:16:08 druzus Exp $
+ * $Id: gtcrs.c,v 1.60 2006/03/25 02:22:43 druzus Exp $
  */
 
 /*
@@ -3769,7 +3769,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_Init_ )
    hb_gtRegister( &gtInit );

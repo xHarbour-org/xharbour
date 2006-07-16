@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.1 2006/06/26 11:27:06 druzus Exp $
+# $Id: Makefile,v 1.2 2006/06/28 14:30:22 guerra000 Exp $
 #
 
 ROOT = ../../../
@@ -16,8 +16,8 @@ ifeq ($(HB_MULTI_GT),yes)
 CFLAGS += -DHB_MULTI_GT
 endif
 
-ifneq ($(HB_DEFAULT_GT),)
-CFLAGS += -DHB_DEFAULT_GT=$(HB_DEFAULT_GT:gt%=%)
+ifneq ($(HB_GT_DEFAULT),)
+CFLAGS += -DHB_GT_DEFAULT=$(HB_GT_DEFAULT:gt%=%)
 endif
 ifneq ($(HB_GT_LIB),)
 CFLAGS += -DHB_GT_LIB=$(HB_GT_LIB:gt%=%)

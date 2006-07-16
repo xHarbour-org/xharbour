@@ -1,5 +1,5 @@
 /*
- * $Id: mouseQTc.c,v 1.3 2003/05/21 09:35:35 druzus Exp $
+ * $Id: mouseQTc.c,v 1.4 2003/08/25 23:56:45 druzus Exp $
  */
 
 /*
@@ -208,7 +208,7 @@ static void HB_GT_FUNC(mouseFnInit( PHB_GT_FUNCS gt_funcs ))
 static HB_GT_INIT gtInit = { HB_GT_DRVNAME( HB_GT_NAME ),
                              HB_GT_FUNC(gtFnInit), HB_GT_FUNC(mouseFnInit) };
 
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( HB_GT_FUNC(_gt_Init_) )
    hb_gtRegister( &gtInit );

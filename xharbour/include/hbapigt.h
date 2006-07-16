@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.46 2006/06/26 11:27:06 druzus Exp $
+ * $Id: hbapigt.h,v 1.47 2006/06/28 00:40:13 druzus Exp $
  */
 
 /*
@@ -580,7 +580,7 @@ extern void hb_gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSiz
 
 #define HB_GT_ANNOUNCE( id )    HB_GT_ANNOUNCE_( _HB_GT_PREF_( id ) )
 #define HB_GT_ANNOUNCE_( id )   HB_GT_ANNOUNCE__( id )
-#define HB_GT_ANNOUNCE__( id )  HB_FUNC( id ) {}
+#define HB_GT_ANNOUNCE__( id )  HB_FUNC( id ) {} HB_FUNC( id##_DEFAULT ) {}
 
 typedef struct _HB_GT_FUNCS
 {

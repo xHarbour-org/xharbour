@@ -1,5 +1,5 @@
 /*
- * $Id: gtsys.c,v 1.1 2004/04/02 12:26:39 druzus Exp $
+ * $Id: gtsys.c,v 1.2 2004/04/03 00:27:03 druzus Exp $
  */
 
 /*
@@ -62,8 +62,8 @@
 
 #include "hbapigt.h"
 
-#if defined(HB_DEFAULT_GT)
-   HB_GT_REQUEST( HB_DEFAULT_GT )
+#if defined(HB_GT_DEFAULT)
+   HB_GT_REQUEST( HB_GT_DEFAULT )
 #elif defined(HB_GT_LIB)
    HB_GT_REQUEST( HB_GT_LIB )
 #elif defined(HB_OS_LINUX)

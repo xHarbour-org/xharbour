@@ -1,5 +1,5 @@
 /*
- * $Id: gtdef.c,v 1.1 2006/06/26 11:27:06 druzus Exp $
+ * $Id: gtdef.c,v 1.2 2006/06/28 00:40:13 druzus Exp $
  */
 
 /*
@@ -65,8 +65,8 @@
 
 #if defined( HB_OS_WIN_32 ) && defined( HB_MULTI_GT )
 
-#if defined(HB_DEFAULT_GT)
-#  define HB_GT_NAME HB_DEFAULT_GT
+#if defined(HB_GT_DEFAULT)
+#  define HB_GT_NAME HB_GT_DEFAULT
 #elif defined(HB_GT_LIB)
 #  define HB_GT_NAME HB_GT_LIB
 #else
@@ -85,8 +85,8 @@
 #include "hbapigt.h"
 #include "hbinit.h"
 
-HB_GT_REQUEST( GUI );
-HB_GT_ANNOUNCE( HB_GT_NAME );
+HB_GT_REQUEST( GUI )
+HB_GT_ANNOUNCE( HB_GT_NAME )
 
 HB_CALL_ON_STARTUP_BEGIN( _hb_startup_gt_hack_ )
    hb_gtSetDefault( "GUI" );

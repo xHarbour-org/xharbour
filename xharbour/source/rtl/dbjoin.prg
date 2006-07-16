@@ -1,5 +1,5 @@
 /*
- * $Id: dbjoin.prg,v 1.1 2005/11/06 11:02:42 ptsarenko Exp $
+ * $Id: dbjoin.prg,v 1.2 2006/07/13 12:27:18 druzus Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ Return aList
 
 
 static function __doJoinList(aList)
-local i, aJoin
+local aJoin
 
 if len(aList) > 0
    ( aList[1][1] )->( dbAppend() )

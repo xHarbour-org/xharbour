@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.20 2004/10/31 13:15:46 druzus Exp $
+# $Id: watcom.cf,v 1.21 2005/09/02 18:26:02 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -100,12 +100,12 @@ ifeq ($(findstring rtl,$(LIBS)),rtl)
       GTLIBS += $(HB_LIB_COMPILE)/gtnul
     endif
   endif
-  ifneq ($(HB_DEFAULT_GT),$(HB_GT_LIB))
-    ifneq ($(HB_DEFAULT_GT),)
+  ifneq ($(HB_GT_DEFAULT),$(HB_GT_LIB))
+    ifneq ($(HB_GT_DEFAULT),)
       ifeq ($(HB_LIB_COMPILE),)
-        GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_DEFAULT_GT)/$(ARCH)/$(HB_DEFAULT_GT)
+        GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH)/$(HB_GT_DEFAULT)
       else
-        GTLIBS += $(HB_LIB_COMPILE)/$(HB_DEFAULT_GT)
+        GTLIBS += $(HB_LIB_COMPILE)/$(HB_GT_DEFAULT)
       endif
     endif
   endif
