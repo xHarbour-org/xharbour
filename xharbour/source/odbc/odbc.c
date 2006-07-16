@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.30 2005/04/06 05:46:14 andijahja Exp $
+ * $Id: odbc.c,v 1.31 2005/09/27 09:20:37 druzus Exp $
  */
 
 /*
@@ -479,7 +479,7 @@ HB_FUNC( SQLEXECUTESCALAR )
          wResult = SQLFetch( ( HSTMT ) hStmt );
          if( wResult != SQL_NO_DATA )
          {
-            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, lLen, &lLen );
+            wResult = SQLGetData( ( HSTMT ) hStmt, 1, SQL_C_CHAR, bBuffer, sizeof( bBuffer ), &lLen );
             hb_storc( (char *)bBuffer, 3 );
          }
       }

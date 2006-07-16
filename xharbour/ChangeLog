@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5068 2006/07/16 19:48:56 druzus Exp $
+ * $Id: ChangeLog,v 1.5069 2006/07/16 20:49:29 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-16 22:54 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\rdd\usrrdd\rdds\arrayrdd.prg
+    * Removed redefinition of #define RDT_FULL
+
+  * source\odbc\odbc.c
+    ! Fixed uncorrect use of lLen inside SQLEXECUTESCALAR function
 
 2006-07-16 22:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/dllcall.c

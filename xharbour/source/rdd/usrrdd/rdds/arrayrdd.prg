@@ -1,5 +1,5 @@
 /*
- * $Id: fcomma.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
+ * $Id: arrayrdd.prg,v 1.1 2006/06/13 10:31:57 fsgiudice Exp $
  */
 
 /*
@@ -828,8 +828,6 @@ RETURN
 /* -------------------------------------------------- */
 /*           UTILITY FUNCTIONS                        */
 /* -------------------------------------------------- */
-
-#define RDT_FULL       1       // Full RDD implementation
 
 /*
   EraseArrayRdd() function is equivalent of FErase() function, but works here in memory
