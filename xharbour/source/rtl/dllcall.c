@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.2 2006/04/16 19:07:51 paultucker Exp $
+ * $Id: dllcall.c,v 1.3 2006/04/23 19:13:22 paultucker Exp $
  */
 
 /*
@@ -643,7 +643,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    }
    #if defined( __BORLANDC__ ) || defined(__DMC__)
       _ESP += (0x100 - dwStSize);
-      _EDX =  &lpFunction;
+      _EDX =  (DWORD) &lpFunction;
       __emit__(0xff,0x12); // call [edx];
       dwEAX = _EAX;
       dwEDX = _EDX;
