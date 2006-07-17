@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5070 2006/07/16 21:12:41 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5071 2006/07/17 10:57:12 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,73 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-17 14:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  - xharbour/source/rtl/dbdelim_old.prg
+    - deleted
+
+  * xharbour/source/rdd/Makefile
+  * xharbour/source/rtl/Makefile
+  - xharbour/source/rtl/dbdelim.prg
+  - xharbour/source/rtl/dbjoin.prg
+  - xharbour/source/rtl/dbsdf.prg
+  + xharbour/source/rdd/dbdelim.prg
+  + xharbour/source/rdd/dbjoin.prg
+  + xharbour/source/rdd/dbsdf.prg
+    * moved RDD related .prg files from rtl to rdd directory (library)
+      Non GNU make files must be updated. I'd like to ask Marek or
+      other Windows developers to borrow non GNU make files from Harbour
+      to xHarbour. Now in Harbour there is only one list with dependences
+      common.mak which is common for all other make systems and header
+      files designed for given makes (currently two: makefile.bc, makefile.vc)
+      They can create static build and DLLs. For changing file location,
+      adding new ones or deleting some existing files needs only one file
+      to be updated - one entry for each file. I'd like to see the same in
+      xHarbour and only more header files if we want to support more non
+      GNU make systems.
+
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/dbfuncs.prg
+  * xharbour/source/rdd/dblist.prg
+  * xharbour/source/rdd/dbsort.prg
+  * xharbour/source/rdd/dbstrux.prg
+  * xharbour/source/rdd/dbtotal.prg
+  * xharbour/source/rdd/dbupdat.prg
+  * xharbour/source/rdd/rddord.prg
+  * xharbour/source/rdd/dbdelim.prg
+  * xharbour/source/rdd/dbjoin.prg
+  * xharbour/source/rdd/dbsdf.prg
+    * updated Victor's fixes from Harbour, here is his ChangeLog entry:
+
+     % Cleanups, minor optimizations.
+     ! __dbApp(), __dbCopy() to return LOGICAL.
+     ! Problem where error condition was not detected if BREAK didn't 
+       set the error object.
+     ! __dbTotal() lRest handling fixed.
+     ! __dbTotal() ErrorBlock overriding removed.
+     ! __dbCreate() now generating default alias.
+     % __dbCreate() using dbCreate() undoc param to open the tables.
+     ! __dbDelim() return value.
+     ! __dbSDF() return value.
+     + CA-Cl*pper undocumented call added: _dtxCondSet()
+     + XBase++ compatible calls implemented:
+       dbJoin(), dbList(), dbSort(), dbTotal(), dbUpdate(), _dbExport()
+       dbCopyStruct(), dbCopyExtStruct()
+     + Added some more 10 chars call stubs:
+       __dbCopySt(), __dbCopyXS(), __dbOpenSD(), __dbArrang()
+     + Comments.
+     + Formatting.
+     ; All high-level db functions seems to be compatible now.
+
+     Ron this is sth what I've not synced yet. Seems that Victor is right
+     and the translation is (should be) done by compiler not internally by
+     __dbList() function so we can safely remove HB_aExpressions() calls.
+        - Removed compiler+RTL __dbList() hack which 
+          made it incompatible with CA-Cl*pper. The 
+          hack targeted an XBase++ extension, but it's 
+          compatible even without the hack. Tested with 
+          XBase++ 1.82.294.
+     Can you confirm?
 
 2006-07-17 13:00 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/teditor.prg

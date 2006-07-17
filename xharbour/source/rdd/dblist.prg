@@ -1,5 +1,5 @@
 /*
- * $Id: dblist.prg,v 1.10 2001/08/09 09:48:59 ronpinkas Exp $
+ * $Id: dblist.prg,v 1.1.1.1 2001/12/21 10:42:45 ronpinkas Exp $
  */
 
 /*
@@ -56,12 +56,11 @@
  *
 */
 
-/* NOTE: lAll is basically a dummy parameter, nothing really depends on it.
-         [vszakats] */
+#include "hbsetup.ch"
 
-#include "set.ch"
+/* NOTE: lAll is a dummy parameter, nothing seems to depend on it. [vszakats] */
 
-FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
+PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
 
    LOCAL lOldPrinter
    LOCAL lOldExtra
@@ -71,11 +70,11 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
    LOCAL cExt
 
    LOCAL oError
+   LOCAL lError := .F.
 
    LOCAL bOutBlock
 
    LOCAL nLen := Len( abEval ), nIndex, asMacros, nMacros, nMacroIndex
-
    // Scan for strings instead of blocks - These are macros that need to be compiled into blocks.
    FOR nIndex := 1 TO nLen
      IF ValType( abEval[ nIndex ] ) == 'C'
@@ -83,20 +82,16 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
         // Macro may be a comma seperated list.
         asMacros := HB_aExpressions( abEval[ nIndex ] )
         nMacros  := Len( asMacros )
-
         // Array has to be sized to allow dor the extra blocks
         nLen += ( nMacros - 1 )
         aSize( abEval, nLen )
-
         // We will use the place holder of the string for the first new block.
         abEval[ nIndex ] := &( "{||" + asMacros[ 1 ] + "}" )
-
         // We will now push all subsequent blocks 1 at a time and insert the new block inplace.
         FOR nMacroIndex := 2 TO nMacros
            aIns( abEval, nIndex + nMacroIndex - 1 )
            abEval[ nIndex + nMacroIndex - 1 ] := &( "{||" + asMacros[ nMacroIndex ] + "}" )
         NEXT
-
         // The loop counter should skip the new elements.
         nIndex += ( nMacros - 1 )
      ENDIF
@@ -105,10 +100,10 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
    /* Choose the output style */
    IF lOff
       bOutBlock := {|| QOut( iif( Deleted(), "*", " " ) ),;
-                       aEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
+                       AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
    ELSE
       bOutBlock := {|| QOut( Str( RecNo(), 7 ), iif( Deleted(), "*", " " ) ),;
-                       aEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
+                       AEval( abEval, {| bEval | QQOut( Eval( bEval ), "" ) } ) }
    ENDIF
 
    /* Save SETs */
@@ -122,7 +117,7 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
          cExt := ".txt"
       ENDIF
       lOldExtra := Set( _SET_EXTRA, .T. )
-      cOldExtraFile := Set( _SET_EXTRAFILE, hb_FNameMerge( @cPath, @cName, @cExt ) )
+      cOldExtraFile := Set( _SET_EXTRAFILE, hb_FNameMerge( cPath, cName, cExt ) )
    ENDIF
 
    /* Do the job */
@@ -142,9 +137,10 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
       ENDIF
 
    RECOVER USING oError
+      lError := .T.
    END SEQUENCE
 
-   /* Restor SETs */
+   /* Restore SETs */
 
    IF !Empty( lToPrint )
       Set( _SET_PRINTER, lOldPrinter )
@@ -156,8 +152,15 @@ FUNCTION __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToP
 
    /* On error signal the error for the higher level error handler or quit */
 
-   IF oError != NIL
+   IF lError
       Break( oError )
    ENDIF
 
-RETURN NIL
+   RETURN
+
+#ifdef HB_COMPAT_XPP
+
+FUNCTION dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
+   RETURN __dbList( abEval, lOff, lAll, bFor, bWhile, nNext, nRecord, lRest, lToPrint, cToFileName )
+
+#endif
