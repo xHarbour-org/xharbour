@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5071 2006/07/17 10:57:12 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.5072 2006/07/17 12:56:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-17 16:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * source/tip/httpcln.prg
+    * added method WriteAll( cFile ) to save ::ReadAll() to a file
+	 * fixed garbage in Post: cData[-1] = "" leaves the last byte dirty
+	 * removed alltrim( cTmp ) in Post to fix send of hb_serialize()
+	 * added CLASS <x> to METHODs lines
 
 2006-07-17 14:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   - xharbour/source/rtl/dbdelim_old.prg
