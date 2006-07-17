@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.70 2006/05/03 08:13:55 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.71 2006/05/21 09:22:07 lf_sfnet Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.70 2006/05/03 08:13:55 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.71 2006/05/21 09:22:07 lf_sfnet Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -104,7 +104,6 @@ CLASS HBEditor
    DATA  cFile          INIT ""     // name of file being edited
 
    DATA  aText          INIT {}     // array with lines of text being edited
-   DATA  naTextLen      INIT 0      // number of lines of text inside aText.
 
    DATA  nTop                       // boundaries of editor window, without box around
    DATA  nLeft
@@ -164,7 +163,7 @@ CLASS HBEditor
    METHOD  InsertLine( cLine, lSoftCR, nRow )               // Insert a line of text at a defined row
    METHOD  RemoveLine( nRow )                               // Remove a line of text
    METHOD  GetLine( nRow )                                  // Return line n of text
-   METHOD  LineLen( nRow ) INLINE if( nRow <= ::naTextLen, Len( ::aText[ nRow ]:cText ), 0 )  // Return text length of line n
+   METHOD  LineLen( nRow ) INLINE if( nRow <= Len( ::aText ), Len( ::aText[ nRow ]:cText ), 0 )  // Return text length of line n
    METHOD  SplitLine( nRow )                                // If a line of text is longer than nWordWrapCol divides it into multiple lines
    METHOD  GotoLine( nRow )                                 // Put line nRow at cursor position
    METHOD  GotoCol( nCol )                                  // Put line nCol at cursor position
@@ -270,11 +269,8 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    endif
    ::aText := Text2Array( cString, nLineLength )
 
-   ::naTextLen := Len( ::aText )
-
-   if ::naTextLen == 0
+   if Len( ::aText ) == 0
       AAdd( ::aText, HBTextLine():New() )
-      ::naTextLen++
    endif
 
    // editor window boundaries
@@ -320,12 +316,12 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    ::nFirstRow := max( 1, nTextRow - nWndRow )
    ::nFirstCol := max( 1, nTextCol - nWndCol )
-   ::nRow      := max( 1, min( nTextRow, ::naTextLen ) )
+   ::nRow      := max( 1, min( nTextRow, Len( ::aText ) ) )
    ::nCol      := max( 1, min( Len( ::aText[ ::nRow ]:cText ) , nTextCol + 1 ) )
 
    // extra sanitization over max bounds
-   IF ::nFirstRow >  ::naTextLen
-      ::nFirstRow := ::naTextLen
+   IF ::nFirstRow >  Len( ::aText )
+      ::nFirstRow := Len( ::aText )
    ENDIF
 /*
    IF ::nFirstCol >  ::LineLen( ::nFirstRow ) + 1
@@ -413,7 +409,7 @@ METHOD RefreshWindow() CLASS HBEditor
    //
    //ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
 
-   for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
+   for i := 0 to Min( ::nNumRows - 1, Len( ::aText ) - 1 )
       DispOutAt( ::nTop + i, ::nLeft, ;
                  PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
                  ::LineColor( ::nFirstRow + i ) )
@@ -477,7 +473,7 @@ METHOD RefreshColumn() CLASS HBEditor
    nORow := ::Row()
    nOCur := SetCursor( SC_NONE )
 
-   for i := 0 to Min( ::nNumRows - 1, ::naTextLen - 1 )
+   for i := 0 to Min( ::nNumRows - 1, Len( ::aText ) - 1 )
       DispOutAt( ::nTop + i, nOCol, SubStr( ::GetLine( ::nFirstRow + i ), ::nCol, 1 ), ::LineColor( ::nFirstRow + i ) )
    next
 
@@ -617,7 +613,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
          #ifdef HB_EXT_INKEY
 
             case K_SH_DOWN
-               if ::nRow <= ::naTextLen
+               if ::nRow <= Len( ::aText )
                   ::SetTextSelection( "LINE", +1 )
                endif
                exit
@@ -672,7 +668,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             if ::lEditAllow  // Clipper compatibility
                ::lDirty := .T.
 
-               if ::naTextLen > 1 .AND. ::nRow < ::naTextLen
+               if Len( ::aText ) > 1 .AND. ::nRow < Len( ::aText )
                   ::RemoveLine( ::nRow )
                   ::RefreshWindow()
                   ::Home()
@@ -810,12 +806,12 @@ return Self
 
 METHOD Down() CLASS HBEditor
 
-   IF ::nRow < ::naTextLen
+   IF ::nRow < Len( ::aText )
       ::GotoLine( ::nRow + 1 )
    //ELSE
       // JC1: pressing down at the end of text will make
       // cursor to go to the end of line (temporarily disabled )
-      /*IF ::naTextLen > 0
+      /*IF Len( ::aText ) > 0
          ::End()
       ENDIF
       */
@@ -828,7 +824,7 @@ RETURN Self
 METHOD PageDown() CLASS HBEditor
    LOCAL nJump
 
-   nJump := min( ::nNumRows, ::naTextLen - ::nFirstRow - ( ::nPhysRow - ::nTop ) )
+   nJump := min( ::nNumRows, Len( ::aText ) - ::nFirstRow - ( ::nPhysRow - ::nTop ) )
 
    IF nJump < ::nNumRows
       ::Bottom()
@@ -837,14 +833,14 @@ METHOD PageDown() CLASS HBEditor
    ::nRow      += nJump
    ::RefreshWindow()
    ENDIF
-   // ::GotoLine( min( ::nRow + ::nNumRows - 1, ::naTextLen ) )
+   // ::GotoLine( min( ::nRow + ::nNumRows - 1, Len( ::aText ) ) )
 
 Return Self
 
 //-------------------------------------------------------------------//
 
 METHOD Bottom() CLASS HBEditor
-   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::naTextLen )
+   LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, Len( ::aText ) )
 
    ::GotoLine( nRowTo )  // , ::nLineLength( nRowTo ) + 1 )
 
@@ -854,7 +850,7 @@ RETURN Self
 
 METHOD GoBottom() CLASS HBEditor
 
-   ::GotoPos( ::naTextLen, ::LineLen( ::naTextLen ) + 1, .T. )
+   ::GotoPos( Len( ::aText ), ::LineLen( Len( ::aText ) ) + 1, .T. )
 
 Return Self
 
@@ -913,7 +909,7 @@ RETURN Self
 METHOD Right() CLASS HBEditor
 
    if ( ::lWordWrap )
-      IF ::nCol == ::LineLen( ::nRow ) + 1 .and. ::nRow < ::naTextLen
+      IF ::nCol == ::LineLen( ::nRow ) + 1 .and. ::nRow < Len( ::aText )
          ::GotoPos( ::nRow + 1, 1, .T. )
       ELSE
          /* ::GotoCol( ::nCol + 1 ) does not correctly redraw the screen
@@ -949,7 +945,7 @@ METHOD WordRight() CLASS HBEditor
    //
    If ::lRightScroll
       if ( ::lWordWrap )
-         if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
+         if ::nCol > ::LineLen( ::nRow ) .and. ::nRow < Len( ::aText )
             ::Down()
             ::Home()
          endif
@@ -1028,7 +1024,7 @@ METHOD K_Mouse( nKey ) CLASS HBEditor
 
       if ( nRow >= ::nTop .and. nRow <= ::nBottom )
          if nCol >= ::nLeft .and. nCol <= ::nRight
-            if ( ::nRow + ( nJump := nRow - ::nPhysRow ) ) <= ::naTextLen
+            if ( ::nRow + ( nJump := nRow - ::nPhysRow ) ) <= Len( ::aText )
                ::GotoPos( max( 1, ::nRow + nJump ), max( 1, ::nCol + ( nCol - ::nPhysCol ) ), .t. )
             endif
          endif
@@ -1154,7 +1150,7 @@ METHOD K_Del() CLASS HBEditor
    LOCAL lMerge := .F.
    LOCAL nCurRow, nCurCol
 
-   IF ::nCol > ::LineLen( ::nRow ) .and. ::nRow < ::naTextLen
+   IF ::nCol > ::LineLen( ::nRow ) .and. ::nRow < Len( ::aText )
       // eventually pad.
       //
       IF ::nCol > ::LineLen( ::nRow ) + 1
@@ -1233,7 +1229,7 @@ METHOD K_Tab() CLASS HBEditor
                lHardCR := .T.
             endif
 
-            if ::nRow = ::naTextLen-1      // if next to last line of array, last line MUST have HR
+            if ::nRow = Len( ::aText )-1      // if next to last line of array, last line MUST have HR
                lHardCR := .T.
             endif
 
@@ -1257,7 +1253,7 @@ METHOD K_Return() CLASS HBEditor
       ::lDirty := .T.
 
       IF ::lInsert
-         IF ::nRow == ::naTextLen
+         IF ::nRow == Len( ::aText )
             if ::nCol > ::LineLen( ::nRow )
                ::AddLine( "", .F. )
             else
@@ -1271,7 +1267,7 @@ METHOD K_Return() CLASS HBEditor
          ENDIF
          ::aText[ ::nRow ]:cText := Left( ::aText[ ::nRow ]:cText, ::nCol - 1 )
 
-      ELSEIF ::nRow == ::naTextLen
+      ELSEIF ::nRow == Len( ::aText )
          ::AddLine( "", .F. )
       ENDIF
 
@@ -1282,7 +1278,7 @@ METHOD K_Return() CLASS HBEditor
 
    // will also refresh
    //
-   IF ::nRow < ::naTextLen
+   IF ::nRow < Len( ::aText )
       ::GotoPos( ::nRow + 1, 1, .T. )
    ENDIF
 
@@ -1331,7 +1327,6 @@ Return Self
 METHOD AddLine( cLine, lSoftCR ) CLASS HBEditor
 
    AAdd( ::aText, HBTextLine():New( cLine, lSoftCR ) )
-   ::naTextLen++
 
 return Self
 
@@ -1341,13 +1336,11 @@ return Self
 //
 METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
 
-   IF nRow > ::naTextLen
+   IF nRow > Len( ::aText )
       AAdd( ::aText, HBTextLine():New( cLine, lSoftCR ) )
    ELSE
       AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
    ENDIF
-//   ::naTextLen++
-   ::naTextLen:= LEN( ::aText ) // AINS() does not change ::aText length
 return Self
 
 //-------------------------------------------------------------------//
@@ -1357,7 +1350,6 @@ return Self
 METHOD RemoveLine( nRow ) CLASS HBEditor
 
    ADel( ::aText, nRow, .T. )
-   ::naTextLen--
 
 return Self
 
@@ -1367,7 +1359,7 @@ return Self
 //
 METHOD GetLine( nRow ) CLASS HBEditor
 
-   if nRow <= ::naTextLen .AND. nRow > 0
+   if nRow <= Len( ::aText ) .AND. nRow > 0
       return ::aText[ nRow ]:cText
    else
       return ""
@@ -1380,7 +1372,7 @@ return Self
 METHOD GotoLine( nRow ) CLASS HBEditor
    LOCAL lRefresh := .f.
 
-   IF nRow <= ::naTextLen .AND. nRow > 0
+   IF nRow <= Len( ::aText ) .AND. nRow > 0
       // Clipper Reformats the paragraph if there is some unexpected movement
       //
       if ( ::lWordWrap )
@@ -1411,6 +1403,10 @@ METHOD GotoLine( nRow ) CLASS HBEditor
       // Clipper Reformats the paragraph if there is some unexpected movement
       //
       if ( ::lWordWrap )
+         if ::nRow > len(::aText)
+            ::nRow := len(::aText)
+         Endif
+
          if !empty( ::aText[ ::nRow ]:lSoftCR )
             ::SplitLine( ::nRow )
          endif
@@ -1478,7 +1474,7 @@ METHOD GotoPos( nRow, nCol, lRefresh ) CLASS HBEditor
 
    DEFAULT lRefresh TO .F.
 
-   if nRow <= ::naTextLen .AND. nRow > 0
+   if nRow <= Len( ::aText ) .AND. nRow > 0
       // I need to move cursor if is past requested line number and if requested line is
       // inside first screen of text otherwise ::nFirstRow would be wrong
       //
@@ -1550,7 +1546,7 @@ STATIC function GetParagraph( oSelf, nRow )
    while ValType( oSelf:aText[ nRow ]:lSoftCR ) == 'L' .and. oSelf:aText[ nRow ]:lSoftCR
       cLine += oSelf:aText[ nRow ]:cText
       oSelf:RemoveLine( nRow )
-      if oSelf:naTextLen <= 0 // V@
+      if Len( oSelf:aText) <= 0 // V@
          exit
       endif
       //GAD  This is not needed and will corrupt long lines that do not have any spaces with wordwrap on.
@@ -1562,7 +1558,7 @@ STATIC function GetParagraph( oSelf, nRow )
 
    // Last line, or only one line
    //
-   if oSelf:naTextLen > 0 // V@
+   if Len( oSelf:aText ) > 0 // V@
       cLine += oSelf:aText[ nRow ]:cText
       oSelf:RemoveLine( nRow )   // this is where array error occurs IF final line of text is allowed to have :lSoftCR
    endif
@@ -1807,13 +1803,13 @@ METHOD GetText( lSoftCr ) CLASS HBEditor
    endif
 
    if ::lWordWrap
-      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )},,::naTextLen - 1)
+      AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )},,Len( ::aText ) - 1)
    else
-      AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, ::naTextLen - 1)
+      AEval( ::aText, {| cItem | cString += cItem:cText + cEOL},, Len( ::aText ) - 1)
    endif
 
    // Last line does not need a cEOL delimiter
-   cString += ::aText[ ::naTextLen ]:cText
+   cString += ::aText[ Len( ::aText ) ]:cText
 
 return cString
 
@@ -1866,7 +1862,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
       ::lSelActive := .T.
       if cAction == "ALL"
          ::nSelStart := 1
-         ::nSelEnd := ::naTextLen
+         ::nSelEnd := Len( ::aText )
          ::RefreshWindow()
       elseif cAction == "LINE"
          ::nSelStart := ::nRow
@@ -1874,7 +1870,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
          ::RefreshLine()
       endif
    elseif cAction == "LINE"
-      if nCount > 0 .and. ::nRow < ::naTextLen
+      if nCount > 0 .and. ::nRow < Len( ::aText )
          ::nSelEnd += nCount
          ::RefreshLine()
          ::Down()
@@ -1909,10 +1905,8 @@ METHOD DelText() CLASS HBEditor
    ::Gotop()
 
    ::aText := {}
-   ::naTextLen := 0
 
    AAdd( ::aText, HBTextLine():New() )
-   ::naTextLen++
 
    ::lDirty := .T.
 
@@ -1976,16 +1970,14 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
 
       DEFAULT lAtPos TO .F.
 
-      if !lAtPos .or. ( nAtRow > ::naTextLen )
+      if !lAtPos .or. ( nAtRow > Len( ::aText ) )
          for i := 1 to nLines
             aadd( ::aText, aTmpText[ i ] )
-            ::naTextLen++
          next
       else
          for i := 1 to nLines 
             AIns( ::aText, nAtRow + i, aTmpText[ i ], .T. )
          next
-         ::naTextLen := LEN( ::aText )
       endif
 
       if !lSaveIns
@@ -2026,11 +2018,9 @@ RETURN nPos
 METHOD LoadText( cString ) CLASS HBEditor
 
    ::aText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
-   ::naTextLen := Len( ::aText )
 
-   if ::naTextLen == 0
+   if Len( ::aText ) == 0
       AAdd( ::aText, HBTextLine():New() )
-      ::naTextLen++
    endif
 
    ::lDirty := .F.
@@ -2050,11 +2040,9 @@ METHOD LoadFile( cFileName ) CLASS HBEditor
    endif
 
    ::aText := Text2Array( cString, iif( ::lWordWrap, ::nNumCols, nil ) )
-   ::naTextLen := Len( ::aText )
 
-   if ::naTextLen == 0
+   if Len( ::aText ) == 0
       AAdd( ::aText, HBTextLine():New() )
-      ::naTextLen++
    endif
 
    ::lDirty := .F.
