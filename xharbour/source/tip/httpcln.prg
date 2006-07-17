@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.5 2005/12/01 13:41:14 snaiperis Exp $
+ * $Id: httpcln.prg,v 1.6 2006/07/11 16:25:57 gdrouillard Exp $
  */
 
 /*
@@ -85,6 +85,7 @@ CLASS tIPClientHTTP FROM tIPClient
    Method Boundary
    METHOD Attach(cName,cFileName,cType)
    Method PostMultiPart
+   Method WriteAll( cFile )
 
 HIDDEN:
    METHOD StandardFields()
@@ -128,11 +129,10 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
          cData += cTmp +"="
          cTmp := HGetValueAt( cPostData, nI )
          cTmp := CStr( cTmp )
-         cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
          cData += cTmp + "&"
       NEXT
-      cData[-1] = ""
+      cData := left( cData, len( cData ) - 1 )
    elseIF HB_IsArray( cPostData )
       cData := ""
       y:=Len(cPostData)
@@ -144,7 +144,6 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
          cData += cTmp +"="
          cTmp := cPostData[ nI,2]
          cTmp := CStr( cTmp )
-         cTmp := AllTrim( cTmp )
          cTmp := TipEncoderUrl_Encode( cTmp )
          cData += cTmp
          IF nI!=y
@@ -172,6 +171,7 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
 
    ::InetSendall( ::SocketCon, "Content-Length: " + ;
          LTrim(Str( Len( cData ) ) ) + ::cCRLF )
+
    // End of header
    ::InetSendall( ::SocketCon, ::cCRLF )
 
@@ -183,9 +183,6 @@ METHOD Post( cPostData, cQuery ) CLASS tIPClientHTTP
       alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
 RETURN .F.
-
-
-
 
 METHOD StandardFields() CLASS tIPClientHTTP
    LOCAL iCount
@@ -355,7 +352,9 @@ METHOD Read( nLen ) CLASS tIPClientHTTP
    ENDIF
 
 RETURN cData
-Method ReadAll()
+
+METHOD ReadAll() CLASS tIPClientHTTP
+
    local cOut:='', cChunk
    IF .not. ::bInitialized
       ::bInitialized := .T.
@@ -375,7 +374,7 @@ Method ReadAll()
    endif
    return(cOut)
 
-method setCookie(cLine)
+METHOD setCookie(cLine) CLASS tIPClientHTTP
    //docs from http://www.ietf.org/rfc/rfc2109.txt
    local aParam,cParam
    local cCookie,aCookies
@@ -423,7 +422,7 @@ method setCookie(cLine)
    ENDIF
 return NIL
 
-method getcookies(cHost,cPath)
+METHOD getcookies(cHost,cPath) CLASS tIPClientHTTP
    local x,y,aDomKeys:={},aKeys,z,cKey,aPathKeys,nPath
    local a,b,cOut:='',cX,cY,c,d
    IF cHost=nil
@@ -481,8 +480,7 @@ method getcookies(cHost,cPath)
    NEXT
 return(cOut)
 
-*****************
-METHOD Boundary(nType)
+METHOD Boundary(nType) CLASS tIPClientHTTP
    /*
    nType: 0=as found as the separator in the stdin stream
          1=as found as the last one in the stdin stream
@@ -508,11 +506,11 @@ METHOD Boundary(nType)
    cBound:=if(nType<2,'--','')+cBound+if(nType=1,'--','')
    RETURN(cBound)
 
-METHOD Attach(cName,cFileName,cType)
+METHOD Attach(cName,cFileName,cType) CLASS tIPClientHTTP
    aadd(::aAttachments,{cName,cFileName,cType})
 return(nil)
 
-METHOD PostMultiPart( cPostData, cQuery )
+METHOD PostMultiPart( cPostData, cQuery ) CLASS tIPClientHTTP
    LOCAL cData:="", nI, cTmp,y,cBound:=::boundary()
    local cCrlf:=::cCRlf,oSub
    local nPos
@@ -611,3 +609,27 @@ METHOD PostMultiPart( cPostData, cQuery )
       alert("Post InetErrorCode:"+winsockerrorcode(::InetErrorCode( ::SocketCon  )))*/
    ENDIF
 RETURN .F.
+
+METHOD WriteAll( cFile ) CLASS tIPClientHTTP
+
+   local nFile
+   local lSuccess
+   local nLen
+   local cStream
+
+   cStream := ::ReadAll()
+
+   nLen := len( cStream )
+
+   nFile := fcreate( cFile )
+
+   if nFile != 0
+      lSuccess := ( fwrite( nFile, cStream, nLen ) == nLen )
+      fclose( nFile )
+   else
+      lSuccess := .f.
+   endif
+
+   RETURN lSuccess
+
+
