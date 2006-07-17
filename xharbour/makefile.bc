@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.175 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: makefile.bc,v 1.176 2006/06/28 14:30:22 guerra000 Exp $
 #
 
 #
@@ -448,10 +448,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\color53.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
    $(RTL_OBJ_DIR)\cstruct.obj \
-   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
-   $(RTL_OBJ_DIR)\dbjoin.obj \
-   $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
@@ -624,7 +621,10 @@ RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\delim1.obj \
    $(RDD_OBJ_DIR)\sdf1.obj \
    \
+   $(RDD_OBJ_DIR)\dbdelim.obj \
    $(RDD_OBJ_DIR)\dbfuncs.obj \
+   $(RDD_OBJ_DIR)\dbjoin.obj \
+   $(RDD_OBJ_DIR)\dbsdf.obj \
    $(RDD_OBJ_DIR)\dbtotal.obj \
    $(RDD_OBJ_DIR)\dblist.obj \
    $(RDD_OBJ_DIR)\dbsort.obj \
@@ -1975,25 +1975,7 @@ $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
-   $(CC_CMD)
-
 $(RTL_OBJ_DIR)\dbf2txt.obj : $(RTL_DIR)\dbf2txt.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.obj : $(RTL_OBJ_DIR)\dbjoin.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
@@ -2899,6 +2881,24 @@ $(RDD_OBJ_DIR)\arrayrdd.c : $(RDD_DIR)\usrrdd\rdds\arrayrdd.prg
    $(HB_CMD)
 
 $(RDD_OBJ_DIR)\arrayrdd.obj : $(RDD_OBJ_DIR)\arrayrdd.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.c : $(RDD_DIR)\dbdelim.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.obj : $(RDD_OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.c : $(RDD_DIR)\dbjoin.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.obj : $(RDD_OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.c : $(RDD_DIR)\dbsdf.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.obj : $(RDD_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(RDD_OBJ_DIR)\dbtcdx.c : $(RDD_DIR)\usrrdd\rdds\dbtcdx.prg

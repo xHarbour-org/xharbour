@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.173 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: makefile.vc,v 1.174 2006/07/03 19:47:05 paultucker Exp $
 #
 
 #
@@ -551,10 +551,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\color53.obj \
    $(OBJ_DIR)$(MT)\cstr.obj \
    $(OBJ_DIR)$(MT)\cstruct.obj \
-   $(OBJ_DIR)$(MT)\dbdelim.obj \
    $(OBJ_DIR)$(MT)\dbedit.obj \
-   $(OBJ_DIR)$(MT)\dbjoin.obj \
-   $(OBJ_DIR)$(MT)\dbsdf.obj \
    $(OBJ_DIR)$(MT)\decode.obj \
    $(OBJ_DIR)$(MT)\devoutp.obj \
    $(OBJ_DIR)$(MT)\dircmd.obj \
@@ -806,9 +803,12 @@ RDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\delim1.obj \
    $(OBJ_DIR)$(MT)\sdf1.obj \
    \
-   $(OBJ_DIR)$(MT)\dbtotal.obj \
+   $(OBJ_DIR)$(MT)\dbdelim.obj \
    $(OBJ_DIR)$(MT)\dbfuncs.obj \
+   $(OBJ_DIR)$(MT)\dbjoin.obj \
    $(OBJ_DIR)$(MT)\dblist.obj \
+   $(OBJ_DIR)$(MT)\dbsdf.obj \
+   $(OBJ_DIR)$(MT)\dbtotal.obj \
    $(OBJ_DIR)$(MT)\dbsort.obj \
    $(OBJ_DIR)$(MT)\hbdbsort.obj \
    $(OBJ_DIR)$(MT)\dbstrux.obj \

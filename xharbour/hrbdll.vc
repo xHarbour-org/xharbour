@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.91 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: hrbdll.vc,v 1.92 2006/07/03 19:47:05 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -322,10 +322,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\color53.obj \
   $(OBJ_DIR)\cstr.obj \
   $(OBJ_DIR)\cstruct.obj \
-  $(OBJ_DIR)\dbdelim.obj \
   $(OBJ_DIR)\dbedit.obj \
-  $(OBJ_DIR)\dbjoin.obj \
-  $(OBJ_DIR)\dbsdf.obj \
   $(OBJ_DIR)\decode.obj \
   $(OBJ_DIR)\devoutp.obj \
   $(OBJ_DIR)\dircmd.obj \
@@ -479,8 +476,11 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\sdf1.obj \
   $(OBJ_DIR)\workarea.obj \
 # rdd prg
+  $(OBJ_DIR)\dbdelim.obj \
   $(OBJ_DIR)\dbfuncs.obj \
+  $(OBJ_DIR)\dbjoin.obj \
   $(OBJ_DIR)\dblist.obj \
+  $(OBJ_DIR)\dbsdf.obj \
   $(OBJ_DIR)\dbsort.obj \
   $(OBJ_DIR)\dbstrux.obj \
   $(OBJ_DIR)\dbtotal.obj \
@@ -932,16 +932,34 @@ $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC_CMD)
 
+$(OBJ_DIR)\dbdelim.c : $(RDD_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbfuncs.obj : $(OBJ_DIR)\dbfuncs.c
    $(CC_CMD)
 
+$(OBJ_DIR)\dbjoin.c : $(RDD_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dblist.obj : $(OBJ_DIR)\dblist.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbsdf.c : $(RDD_DIR)\dbsdf.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbsort.c : $(RDD_DIR)\dbsort.prg
@@ -1296,28 +1314,10 @@ $(OBJ_DIR)\cstruct.c : $(RTL_DIR)\cstruct.prg
 $(OBJ_DIR)\cstruct.obj : $(OBJ_DIR)\cstruct.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbedit.obj : $(OBJ_DIR)\dbedit.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg

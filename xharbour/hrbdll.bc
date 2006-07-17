@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.118 2006/06/14 22:49:18 kaddath Exp $
+# $Id: hrbdll.bc,v 1.119 2006/06/26 14:26:24 fsgiudice Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1719,24 +1719,6 @@ $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
 $(OBJ_DIR)\dbf2txt.obj : $(RTL_DIR)\dbf2txt.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HRB_CMD)
 
@@ -2578,6 +2560,24 @@ $(OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbdelim.c : $(RDD_DIR)\dbdelim.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbjoin.c : $(RDD_DIR)\dbjoin.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\dbsdf.c : $(RDD_DIR)\dbsdf.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
