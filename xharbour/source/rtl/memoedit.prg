@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.36 2005/10/25 11:15:28 mauriliolongo Exp $
+ * $Id: memoedit.prg,v 1.37 2006/02/25 17:32:15 lf_sfnet Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ METHOD Edit() CLASS TMemoEditor
                   exit
 
                case K_DOWN
-                  if ::nFirstRow < ::naTextLen
+                  if ::nFirstRow < Len( ::aText )
                      ::nFirstRow++
                      ::nRow++
                      ::RefreshWindow()

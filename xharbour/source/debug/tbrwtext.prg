@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.17 2005/01/09 20:39:52 likewolf Exp $
+ * $Id: tbrwtext.prg,v 1.18 2005/10/25 15:18:33 mauriliolongo Exp $
  */
 
 /*
@@ -202,11 +202,11 @@ METHOD Search( cString, lCaseSensitive, nMode ) CLASS TBrwText
    do case
    case nMode == 0 // From Top
       nFrom := 1
-      nTo   := ::naTextLen
+      nTo   := Len( ::aText )
       nStep := 1
    case nMode == 1 // Forward
-      nFrom := Min( ::nRow + 1, ::naTextLen )
-      nTo   := ::naTextLen
+      nFrom := Min( ::nRow + 1, Len( ::aText ) )
+      nTo   := Len( ::aText )
       nStep := 1
    case nMode == 2 // Backward
       nFrom := Max( ::nRow - 1, 1 )

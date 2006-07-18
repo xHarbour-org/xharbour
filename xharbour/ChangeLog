@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5073 2006/07/17 14:34:40 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.5074 2006/07/17 21:26:33 fsgiudice Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-07-18 08:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
+  * source/rtl/memoedit.prg
+  * source/debug/tbrwtext.prg
+  * utils/hbdict/hbdict.prg
+    * replaced ::naTextLen with Len( ::aText )
+    
 2006-07-17 23:25 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * makefile.bc
   * hrbdll.bc

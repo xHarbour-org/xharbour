@@ -1,7 +1,7 @@
 *****************************************************
 * HB I18N dictionary editor
 *
-* $Id: hbdict.prg,v 1.12 2003/12/11 16:32:23 lf_sfnet Exp $
+* $Id: hbdict.prg,v 1.13 2004/08/19 00:51:48 druzus Exp $
 *
 * Usage: hbdict <infile> <outfile>
 *
@@ -396,7 +396,7 @@ METHOD KeyboardHook( nKey ) CLASS THBdictEdit
    ENDIF
 
    IF nKey == K_F2
-      IF ::naTextLen < Len( ::cOrigin )
+      IF Len( ::aText ) < Len( ::cOrigin )
          ::LoadText( padr( ::GetText(), Len( ::cOrigin) ) )
       ENDIF
       ::lSaved := .T.
