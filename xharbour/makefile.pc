@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.28 2006/07/11 01:49:54 modalsist Exp $
+# $Id: makefile.pc,v 1.29 2006/07/13 00:11:10 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -569,6 +569,9 @@ RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\workarea.obj \
    $(RDD_OBJ_DIR)\hbdbsort.obj \
    $(RDD_OBJ_DIR)\dbnubs.obj \
+   $(RDD_OBJ_DIR)\dbdelim.obj \
+   $(RDD_OBJ_DIR)\dbjoin.obj \
+   $(RDD_OBJ_DIR)\dbsdf.obj 
 
 
 USRRDD_LIB_OBJS = \
@@ -912,10 +915,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\color53.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
    $(RTL_OBJ_DIR)\cstruct.obj \
-   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
-   $(RTL_OBJ_DIR)\dbjoin.obj \
-   $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
@@ -1376,10 +1376,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\color53.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\cstr.obj     >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\cstruct.obj  >> poccrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbdelim.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> poccrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbjoin.obj   >> poccrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\decode.obj   >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> poccrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dircmd.obj   >> poccrtl.rsp
@@ -1577,6 +1574,25 @@ $(RDD_OBJ_DIR)\rddsys.c : $(RDD_SRC_DIR)\rddsys.prg
 
 $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
    $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.c : $(RDD_SRC_DIR)\dbdelim.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.obj : $(RDD_OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.c : $(RDD_SRC_DIR)\dbjoin.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.obj : $(RDD_OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.c : $(RDD_SRC_DIR)\dbsdf.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.obj : $(RDD_OBJ_DIR)\dbsdf.c
+   $(CC_CMD)
+
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
 # � HSX.LIB dependencies 넴
@@ -2403,28 +2419,10 @@ $(RTL_OBJ_DIR)\cstruct.c : $(RTL_SRC_DIR)\cstruct.prg
 $(RTL_OBJ_DIR)\cstruct.obj : $(RTL_OBJ_DIR)\cstruct.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_SRC_DIR)\dbdelim.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
-   $(CC_CMD)
-
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_SRC_DIR)\dbedit.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.c : $(RTL_SRC_DIR)\dbjoin.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.obj : $(RTL_OBJ_DIR)\dbjoin.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.c : $(RTL_SRC_DIR)\dbsdf.prg
-   $(HB_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\decode.c : $(RTL_SRC_DIR)\decode.prg

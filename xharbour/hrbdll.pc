@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.25 2006/06/15 13:07:15 modalsist Exp $
+# $Id: hrbdll.pc,v 1.26 2006/06/26 14:26:24 fsgiudice Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -1425,28 +1425,10 @@ $(OBJ_DIR)\dateshb.obj : $(RTL_SRC_DIR)\dateshb.c
 $(OBJ_DIR)\dbf2txt.obj : $(RTL_SRC_DIR)\dbf2txt.c
    $(POCC_CMD)
 
-$(OBJ_DIR)\dbdelim.c : $(RTL_SRC_DIR)\dbdelim.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
-   $(POCC_CMD)
-
 $(OBJ_DIR)\dbedit.c : $(RTL_SRC_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\dbedit.obj : $(OBJ_DIR)\dbedit.c
-   $(POCC_CMD)
-
-$(OBJ_DIR)\dbjoin.c : $(RTL_SRC_DIR)\dbjoin.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
-   $(POCC_CMD)
-
-$(OBJ_DIR)\dbsdf.c : $(RTL_SRC_DIR)\dbsdf.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\defpath.obj : $(RTL_SRC_DIR)\defpath.c
@@ -2456,6 +2438,25 @@ $(OBJ_DIR)\rddsys.c : $(RDD_SRC_DIR)\rddsys.prg
 
 $(OBJ_DIR)\rddsys.obj : $(OBJ_DIR)\rddsys.c
    $(POCC_CMD)
+
+$(OBJ_DIR)\dbdelim.c : $(RDD_SRC_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbdelim.obj : $(OBJ_DIR)\dbdelim.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\dbjoin.c : $(RDD_SRC_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbjoin.obj : $(OBJ_DIR)\dbjoin.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\dbsdf.c : $(RDD_SRC_DIR)\dbsdf.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
+   $(POCC_CMD)
+
 
 # CODEPAGE
 

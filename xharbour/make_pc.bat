@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.10 2006/05/01 23:37:57 modalsist Exp $
+rem $Id: make_pc.bat,v 1.11 2006/07/13 00:11:10 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -7,6 +7,39 @@ rem NOTE: Pelles C is a free C/C++ compliler for MS-Windows platform.
 rem       http://www.smorgasbordet.com/pellesc
 rem
 rem 
+
+if "%1" == "/?" goto HELP
+if "%1" == "?"  goto HELP
+if "%1" == "-?" goto HELP
+if "%1" == "-h" goto HELP
+if "%1" == "-H" goto HELP
+if "%1" == "/h" goto HELP
+if "%1" == "/H" goto HELP
+goto SETS
+
+:HELP
+cls
+echo.
+echo Make file for xHarbour with Pelles C compiler.
+echo.
+echo Syntax: make_pc [ /mt /clean /dll /? ] 
+echo.
+echo make_pc            - build binaries and libs for single thread (default).
+echo make_pc [/-]mt     - build binaries and libs for multi thread.
+echo make_pc [/-]clean  - delete binaries, lib and obj files for a new full build.
+echo make_pc [/-]dll    - build harbour.dll and harbour.lib
+echo make_pc [/-]?      - show this help.                      
+echo.
+goto EXIT2
+
+
+:SETS
+
+if "%1" == "/dll" goto DLL
+if "%1" == "/DLL" goto DLL
+if "%1" == "dll"  goto DLL
+if "%1" == "DLL"  goto DLL
+
 
 REM *****************************************
 REM *** If necessary, change only 3 next sets
@@ -36,8 +69,10 @@ SET BIN_DIR=%HB_DIR%\bin\pocc
 SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 
-if "%1" == "clean" goto CLEAN
-if "%1" == "CLEAN" goto CLEAN
+if "%1" == "clean"  goto CLEAN
+if "%1" == "CLEAN"  goto CLEAN
+if "%1" == "/clean" goto CLEAN
+if "%1" == "/CLEAN" goto CLEAN
 
 
   if not exist obj                       md obj
@@ -53,14 +88,33 @@ if "%1" == "CLEAN" goto CLEAN
   if not exist %OBJ_DIR%\fmstat          md %OBJ_DIR%\fmstat
   if not exist %OBJ_DIR%\mt\fmstat       md %OBJ_DIR%\mt\fmstat
 
-  echo Compiling binaries and core libs
+
+if "%1" == ""    goto ST
+
+if "%1" == "/mt" goto MT
+if "%1" == "/MT" goto MT
+if "%1" == "mt"  goto MT
+if "%1" == "MT"  goto MT
+
+
+:ST
+
+  echo Compiling binaries and core libs.
 
   SET HB_MT=
   pomake /f makefile.pc > make_pc.log
   if errorlevel 1 goto BUILD_ERR
+  goto BUILD_OK
+
+
+:MT
+  echo Compiling binaries and core libs (for multi thread).
+
   SET HB_MT=mt
   pomake /f makefile.pc >> make_pc.log
+  SET HB_MT=
   if errorlevel 1 goto BUILD_ERR
+  goto BUILD_OK
 
 :BUILD_OK
 
@@ -286,8 +340,13 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %OBJ_DIR%\mt\opt\gui\nul       rd %OBJ_DIR%\mt\opt\gui
    if exist %OBJ_DIR%\mt\opt\nul           rd %OBJ_DIR%\mt\opt
 
-
    goto EXIT
+
+
+:DLL
+
+ call dll_pc.bat
+ goto EXIT2
 
 
 :EXIT
@@ -300,7 +359,6 @@ SET BISON_SIMPLE=
 SET OBJ_DIR=
 SET LIB_DIR=
 SET BIN_DIR=
-SET HB_MT=
 
 SET PATH=%_PATH%
 SET LIB=%_LIB%
@@ -309,4 +367,6 @@ SET INCLUDE=%_INCLUDE%
 SET _PATH=
 SET _LIB=
 SET _INCLUDE=
+
+:EXIT2
 
