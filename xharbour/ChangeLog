@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5074 2006/07/17 21:26:33 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5075 2006/07/18 06:49:10 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-18 09:51 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * fixed time in previous updates
 
 2006-07-18 08:50 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/rtl/memoedit.prg
@@ -102,14 +105,14 @@
   * source/rtl/teditor.prg
     * changed ::naTextLen to Len( ::aText )
 
-2006-07-16 22:54 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2006-07-16 22:54 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rdd\usrrdd\rdds\arrayrdd.prg
     * Removed redefinition of #define RDT_FULL
 
   * source\odbc\odbc.c
     ! Fixed uncorrect use of lLen inside SQLEXECUTESCALAR function
 
-2006-07-16 22:42 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+2006-07-16 22:42 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/dllcall.c
     ! Added typecast to make BCC happy
 
