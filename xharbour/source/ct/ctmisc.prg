@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.3 2006/04/23 09:34:40 ptsarenko Exp $
+ * $Id: ctmisc.prg,v 1.5 2006/07/19 22:51:00 ptsarenko Exp $
  */
 
 /*
@@ -56,10 +56,13 @@
 
 MEMVAR GetList
 
-FUNCTION CENTER( c, n, p )
+FUNCTION CENTER( c, n, p, lMode )
+   LOCAL cRet
    DEFAULT n TO MaxCol() + 1 - Col()*2
    DEFAULT c TO ""
-   RETURN RTrim(PadC( AllTrim( c ), n, p ))
+   DEFAULT lMode TO .F.
+   cRet := PadC( AllTrim( c ), n, p )
+   RETURN if(lMode, cRet, RTrim( cRet ) )
 
 FUNCTION CSETCURS( l )
 
