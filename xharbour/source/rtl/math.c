@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.19 2005/09/22 01:11:59 druzus Exp $
+ * $Id: math.c,v 1.20 2006/06/19 21:16:44 druzus Exp $
  */
 
 /*
@@ -139,7 +139,11 @@ int hb_mathIsMathErr (void)
 /* route C math lib errors to Harbour error handling */
 #if defined(HB_MATH_HANDLER)
 
-int matherr (struct exception * err)
+int
+#ifdef __BORLANDC__
+HB_EXPORT
+#endif
+matherr (struct exception * err)
 {
    int retval;
    HB_MATH_HANDLERPROC mathHandler;

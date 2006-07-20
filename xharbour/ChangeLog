@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5078 2006/07/19 15:55:50 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5078 2006/07/19 19:00:21 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-20 22:15 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
+   * harbour/source/rtl/math.c
+     ! Fixed GPF when compiled under Bcc with -tWR switch
+
+   - harbour/make_b16.bat
+   - harbour/dll_b32.bat
+   - harbour/hrbdll.bc
+     - removed no more needed files
+
+   * harbour/makefile.bc
+   * harbour/make_b32.bat
+     * totaly rewritten to support sharing common file lists,
+       automatic DLL creation, implicit rules usqge as a
+       default approach
+   + harbour/common.mak
+     + common file lists and definitions shared between Bcc
+       and Msc makefiles
 
 2006-07-19 12:30 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/ctmisc.prg
@@ -30,7 +48,7 @@
   * source/debug/tbrwtext.prg
   * utils/hbdict/hbdict.prg
     * replaced ::naTextLen with Len( ::aText )
-    
+
 2006-07-17 23:25 UTC+0200 Francesco Saverio Giudice <info/at/fsgiudice.com>
   * makefile.bc
   * hrbdll.bc
@@ -44,9 +62,9 @@
 2006-07-17 16:35 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/tip/httpcln.prg
     * added method WriteAll( cFile ) to save ::ReadAll() to a file
-	 * fixed garbage in Post: cData[-1] = "" leaves the last byte dirty
-	 * removed alltrim( cTmp ) in Post to fix send of hb_serialize()
-	 * added CLASS <x> to METHODs lines
+     * fixed garbage in Post: cData[-1] = "" leaves the last byte dirty
+     * removed alltrim( cTmp ) in Post to fix send of hb_serialize()
+     * added CLASS <x> to METHODs lines
 
 2006-07-17 14:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   - xharbour/source/rtl/dbdelim_old.prg
