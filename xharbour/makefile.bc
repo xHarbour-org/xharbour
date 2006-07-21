@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.215 2006/07/05 18:31:07 vszakats Exp $
+# $Id: makefile.bc,v 1.178 2006/07/20 20:15:34 map Exp $
 #
 
 #
@@ -224,10 +224,10 @@ DLL_OBJS = $(TMP_DLL_OBJS:$(OBJ_DIR)=$(DLL_OBJ_DIR))
 
 all : $(HB_DEST_DIRS) $(HB_BUILD_TARGETS)
 !ifndef HB_MT
-    copy $(BIN_DIR)\*.exe bin\*.* > nul
-    copy $(BIN_DIR)\*.dll bin\*.* > nul
-    copy $(BIN_DIR)\*.lib lib\*.* > nul
-    copy $(LIB_DIR)\*.lib lib\*.* > nul
+    -if exist $(BIN_DIR)\*.exe copy $(BIN_DIR)\*.exe bin\*.* > nul
+    -if exist $(BIN_DIR)\*.dll copy $(BIN_DIR)\*.dll bin\*.* > nul
+    -if exist $(BIN_DIR)\*.lib copy $(BIN_DIR)\*.lib lib\*.* > nul
+    -if exist $(LIB_DIR)\*.lib copy $(LIB_DIR)\*.lib lib\*.* > nul
 !endif
 
 #
