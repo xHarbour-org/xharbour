@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5081 2006/07/21 06:39:13 map Exp $
+ * $Id: ChangeLog,v 1.5082 2006/07/21 07:20:34 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-21 10:30 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
+   - harbour/hrbdll.vc
+   - harbour/dll_vc.bat
+     - Removed no more needed files
+
+   * harbour/makefile.bc
+   * harbour/Common.mak
+     ! Fixed common dependencies sharing
+     * Changed DLL_MAIN to DLLMAIN
+
+   * harbour/makefile.vc
+   * harbour/make_vc.bat
+     * totaly rewritten to support sharing common file lists,
+       automatic DLL creation and using implicit rules as a
+       default approach
 
 2006-07-21 09:15 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
    * harbour/makallbc.bat

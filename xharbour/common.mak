@@ -1,5 +1,5 @@
 #
-# $Id: common.mak,v 1.3 2006/07/13 12:10:54 druzus Exp $
+# $Id: common.mak,v 1.1 2006/07/20 20:15:34 map Exp $
 #
 
 #**********************************************************
@@ -181,7 +181,7 @@ GTGUI_LIB    = $(LIB_DIR)\gtgui.lib
 GTALG_LIB    = $(LIB_DIR)\gtalleg.lib
 
 FMSTAT_LIB   = $(LIB_DIR)\fmstat$(HB_MT).lib
-DLL_MAIN_LIB = $(LIB_DIR)\dllmain.lib
+DLLMAIN_LIB  = $(LIB_DIR)\dllmain.lib
 
 PCREPOS_LIB  = $(LIB_DIR)\pcrepos.lib
 MISC_LIB     = $(LIB_DIR)\libmisc.lib
@@ -215,7 +215,7 @@ HB_GT_LIBS = \
     $(GTWVT_LIB) \
     $(GTGUI_LIB)
 
-!if $(HB_GTALLEG) == yes
+!if "$(HB_GTALLEG)" == "yes"
 HB_GT_LIBS = $(HB_GT_LIBS) $(GTALG_LIB)
 !endif
 
@@ -855,7 +855,7 @@ FMSTAT_LIB_OBJS = \
 
 #**********************************************************
 
-DLL_MAIN_LIB_OBJS = \
+DLLMAIN_LIB_OBJS = \
     $(OBJ_DIR)\mainstd.obj \
     $(OBJ_DIR)\mainwin.obj \
     $(OBJ_DIR)\maindll.obj \
@@ -1211,7 +1211,7 @@ HB_BUILD_TARGETS = $(HB_BUILD_TARGETS) \
 !if "$(HB_BUILD_DLL)" == "yes"
 !ifndef HB_MT
 HB_BUILD_TARGETS = $(HB_BUILD_TARGETS) \
-    $(DLL_MAIN_LIB) \
+    $(DLLMAIN_LIB)  \
     $(HARBOUR_DLL)  \
     $(HBTESTDLL_EXE)
 !endif

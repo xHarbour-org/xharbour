@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.178 2006/07/20 20:15:34 map Exp $
+# $Id: makefile.bc,v 1.179 2006/07/21 06:39:13 map Exp $
 #
 
 #
@@ -390,7 +390,7 @@ $(USRRDD_LIB)   : $(USRRDD_LIB_OBJS)
 +)
 !
 #**********************************************************
-$(RDDS_LIB)   : $(RDDS_LIB_OBJS)
+$(RDDS_LIB)     : $(RDDS_LIB_OBJS)
     IF EXIST "$(RDDS_LIB)" $(DEL) "$(RDDS_LIB)" > NUL
     $(MKLIB) "$(RDDS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
@@ -439,49 +439,49 @@ $(GTGUI_LIB)    : $(GTGUI_LIB_OBJS)
 +)
 !
 #**********************************************************
-$(FMSTAT_LIB)    : $(FMSTAT_LIB_OBJS)
+$(FMSTAT_LIB)   : $(FMSTAT_LIB_OBJS)
     IF EXIST "$(FMSTAT_LIB)" $(DEL) "$(FMSTAT_LIB)" > NUL
     $(MKLIB) "$(FMSTAT_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(DLL_MAIN_LIB)    : $(DLL_MAIN_LIB_OBJS)
-    IF EXIST "$(DLL_MAIN_LIB)" $(DEL) "$(DLL_MAIN_LIB)" > NUL
-    $(MKLIB) "$(DLL_MAIN_LIB)" $(ARFLAGS) @&&!
+$(DLLMAIN_LIB)  : $(DLLMAIN_LIB_OBJS)
+    IF EXIST "$(DLLMAIN_LIB)" $(DEL) "$(DLLMAIN_LIB)" > NUL
+    $(MKLIB) "$(DLLMAIN_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(PCREPOS_LIB)    : $(PCREPOS_LIB_OBJS)
+$(PCREPOS_LIB)  : $(PCREPOS_LIB_OBJS)
     IF EXIST "$(PCREPOS_LIB)" $(DEL) "$(PCREPOS_LIB)" > NUL
     $(MKLIB) "$(PCREPOS_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(MISC_LIB)    : $(MISC_LIB_OBJS)
+$(MISC_LIB)     : $(MISC_LIB_OBJS)
     IF EXIST "$(MISC_LIB)" $(DEL) "$(MISC_LIB)" > NUL
     $(MKLIB) "$(MISC_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(ODBC_LIB)    : $(ODBC_LIB_OBJS)
+$(ODBC_LIB)     : $(ODBC_LIB_OBJS)
     IF EXIST "$(ODBC_LIB)" $(DEL) "$(ODBC_LIB)" > NUL
     $(MKLIB) "$(ODBC_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(TIP_LIB)    : $(TIP_LIB_OBJS)
+$(TIP_LIB)      : $(TIP_LIB_OBJS)
     IF EXIST "$(TIP_LIB)" $(DEL) "$(TIP_LIB)" > NUL
     $(MKLIB) "$(TIP_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !
 #**********************************************************
-$(CT_LIB)    : $(CT_LIB_OBJS)
+$(CT_LIB)       : $(CT_LIB_OBJS)
     IF EXIST "$(CT_LIB)" $(DEL) "$(CT_LIB)" > NUL
     $(MKLIB) "$(CT_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
@@ -526,7 +526,7 @@ $(PP_LIB)
 # HBRUN build rule
 #
 #$(HBRUN_EXE)  :: BasicLibs BasicExes StdLibs
-$(HBRUN_EXE)  :: $(HBRUN_EXE_OBJS)
+$(HBRUN_EXE) :: $(HBRUN_EXE_OBJS)
     IF EXIST "$(HBRUN_EXE)" $(DEL) "$(HBRUN_EXE)" > NUL
     $(CC) @&&!
 $(CFLAGS)
@@ -555,7 +555,7 @@ $(STANDARD_STATIC_HBLIBS)
 #
 
 #$(HBDOC_EXE)  :: BasicLibs BasicExes StdLibs
-$(HBDOC_EXE)  :: $(HBDOC_EXE_OBJS)
+$(HBDOC_EXE) :: $(HBDOC_EXE_OBJS)
     IF EXIST "$(HBDOC_EXE)" $(DEL) "$(HBDOC_EXE)" > NUL
     $(CC) @&&!
 $(CFLAGS)
