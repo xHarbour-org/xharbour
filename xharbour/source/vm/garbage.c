@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.87 2005/10/24 01:04:37 druzus Exp $
+ * $Id: garbage.c,v 1.88 2005/11/14 00:18:32 druzus Exp $
  */
 
 /*
@@ -176,6 +176,7 @@ HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    if( pAlloc )
    {
       pAlloc->pFunc  = pCleanupFunc;
+      pAlloc->ulHolders = 1;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
 

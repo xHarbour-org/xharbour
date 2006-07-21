@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.194 2006/03/25 02:22:34 druzus Exp $
+ * $Id: hbapi.h,v 1.195 2006/06/28 16:54:47 druzus Exp $
  */
 
 /*
@@ -88,7 +88,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
 #define HB_IT_ANY       ( ( HB_TYPE ) 0xFFFFFFFF )
-#define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
+#define HB_IT_COMPLEX   ( ( HB_TYPE ) ( HB_IT_POINTER | HB_IT_STRING | HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_MEMVAR | HB_IT_HASH | HB_IT_BYREF ) )
 #define HB_IT_GCITEM    ( ( HB_TYPE ) ( HB_IT_BLOCK | HB_IT_ARRAY | HB_IT_HASH | HB_IT_POINTER | HB_IT_BYREF ) )
 
 #define HB_ITEM_TYPE( p )   ( ( p )->type )
@@ -98,7 +98,7 @@ HB_EXTERN_BEGIN
 
 /*
  * In Harbour VM HB_IT_BYREF is never ORed with item type. It can be used
- * as stand alone type for locals and statics passed by reference or with 
+ * as stand alone type for locals and statics passed by reference or with
  * HB_IT_MEMVAR for memvars passed by reference so this macro is less usable.
  * only the hb_parinfo() function can return HB_TYPE as HB_IT_BYREF ORed
  * with real type but this value is never set as item type.
@@ -303,6 +303,7 @@ typedef struct HB_GARBAGE_
    struct HB_GARBAGE_ *pNext;  /* next memory block */
    struct HB_GARBAGE_ *pPrev;  /* previous memory block */
    HB_GARBAGE_FUNC_PTR pFunc;  /* cleanup function called before memory releasing */
+   HB_COUNTER ulHolders;       /* ulHolders counter */
    USHORT locked;              /* locking counter */
    USHORT used;                /* used/unused block */
 } HB_GARBAGE, *HB_GARBAGE_PTR;

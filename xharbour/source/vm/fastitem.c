@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.95 2005/11/15 20:17:13 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.96 2005/11/16 17:54:41 snaiperis Exp $
  */
 
 /*
@@ -208,6 +208,28 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
            hb_arrayReleaseHolder( pItem->item.asArray.value, (void *) pItem );
          #endif
 
+         break;
+      }
+
+      case HB_IT_POINTER:
+      {
+         if ( pItem->item.asPointer.collect )
+         {
+            void *pBlock = pItem->item.asPointer.value;
+            HB_GARBAGE* pAlloc = (HB_GARBAGE*)pBlock-1;
+
+            pItem->item.asPointer.collect = 0;
+
+            if( --( pAlloc->ulHolders ) <= 0 )
+            {
+               //OutputDebugString("Calling GC Cleanup function...");
+               if( pAlloc->pFunc )
+                  ( pAlloc->pFunc )( ( void * )( pBlock ) );
+               //OutputDebugString("Attempting to free GC mem...");
+               hb_gcFree( pBlock );
+               //OutputDebugString("GC mem freed...");
+            }
+         }
          break;
       }
 
@@ -438,6 +460,13 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
             #else
                 hb_arrayRegisterHolder( pDest->item.asArray.value, (void *) pDest );
             #endif
+            break;
+         }
+
+         case HB_IT_POINTER:
+         {
+            if ( pSource->item.asPointer.collect )
+               ( ( HB_GARBAGE* )( pSource->item.asPointer.value ) - 1 )->ulHolders++;
             break;
          }
 

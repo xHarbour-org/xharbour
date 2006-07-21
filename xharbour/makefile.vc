@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.275 2006/07/20 20:07:11 map Exp $
+# $Id: makefile.vc,v 1.176 2006/07/21 09:25:28 map Exp $
 #
 
 #
@@ -724,11 +724,11 @@ DLL_OBJS = $(TMP_DLL_OBJS:obj\vc=obj\dll\vc)
 #
 #**********************************************************
 # General Library BUILD rule
-{$(OBJ_DIR)}.obj{$(COMMON_DIR)}.lib:
-    IF EXIST "$@" $(DEL) "$@" > NUL
-    $(MKLIB) /out:$@ <<
-$**
-<<
+#{$(OBJ_DIR)}.obj{$(COMMON_DIR)}.lib:
+#    IF EXIST "$@" $(DEL) "$@" > NUL
+#    $(MKLIB) /out:$@ <<
+#$**
+#<<
 #**********************************************************
 #**********************************************************
 #**********************************************************
@@ -756,6 +756,7 @@ all : $(HB_DEST_DIRS) $(HB_BUILD_TARGETS)
 #**********************************************************
 
 clean: doClean
+Clean: doClean
 CLEAN: doClean
 
 doClean:

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.179 2006/07/21 06:39:13 map Exp $
+# $Id: makefile.bc,v 1.180 2006/07/21 09:25:27 map Exp $
 #
 
 #
@@ -206,13 +206,12 @@ DLL_OBJS = $(TMP_DLL_OBJS:$(OBJ_DIR)=$(DLL_OBJ_DIR))
 #**********************************************************
 
 # General Library BUILD rule
-{$(OBJ_DIR)}.obj{$(LIB_DIR)}.lib:
-    IF EXIST "$@" $(DEL) "$@" > NUL
-    $(MKLIB) "$@" $(ARFLAGS) @&&!
-+$(**: = &^
-+)
-
-!
+#{$(OBJ_DIR)}.obj{$(LIB_DIR)}.lib:
+#    IF EXIST "$@" $(DEL) "$@" > NUL
+#    $(MKLIB) "$@" $(ARFLAGS) @&&!
+#+$(**: = &^
+#+)
+#!
 
 #**********************************************************
 #**********************************************************
@@ -241,6 +240,7 @@ all : $(HB_DEST_DIRS) $(HB_BUILD_TARGETS)
 #**********************************************************
 
 clean: doClean
+Clean: doClean
 CLEAN: doClean
 
 doClean:
@@ -393,6 +393,13 @@ $(USRRDD_LIB)   : $(USRRDD_LIB_OBJS)
 $(RDDS_LIB)     : $(RDDS_LIB_OBJS)
     IF EXIST "$(RDDS_LIB)" $(DEL) "$(RDDS_LIB)" > NUL
     $(MKLIB) "$(RDDS_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+!
+#**********************************************************
+$(GTNUL_LIB)    : $(GTNUL_LIB_OBJS)
+    IF EXIST "$(GTNUL_LIB)" $(DEL) "$(GTNUL_LIB)" > NUL
+    $(MKLIB) "$(GTNUL_LIB)" $(ARFLAGS) @&&!
 +$(**: = &^
 +)
 !

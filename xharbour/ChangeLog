@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5082 2006/07/21 07:20:34 map Exp $
+ * $Id: ChangeLog,v 1.5083 2006/07/21 09:25:27 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-21 22:30 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
+   * include/hbapi.h
+   * source/vm/fastitem.c
+   * source/vm/garbage.c
+     * Implemented Mindaugas Kavaliauskas idea
+       of refcounting HB_IT_POINTER items
+
+   * harbour/makefile.vc
+   * harbour/makefile.bc
+     ! Fixed generating of debug.lib and other libraries
+       consisting of ONE file
 
 2006-07-21 10:30 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
    - harbour/hrbdll.vc
