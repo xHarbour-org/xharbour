@@ -1,5 +1,5 @@
 /*
- * $Id: dbsort.prg,v 1.5 2006/07/13 12:27:18 druzus Exp $
+ * $Id: dbsort.prg,v 1.6 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -64,12 +64,11 @@ FUNCTION __dbSort( cToFileName, aFields, bFor, bWhile, nNext, nRecord, lRest,;
    LOCAL oError
    LOCAL lError := .F.
 
-   nOldArea := Select()
-
-   aStruct := dbStruct()
-   IF Empty( aStruct )
+   IF Empty( aStruct := dbStruct() )
       RETURN .F.
    ENDIF
+
+   nOldArea := Select()
 
    BEGIN SEQUENCE
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dblist.prg,v 1.1.1.1 2001/12/21 10:42:45 ronpinkas Exp $
+ * $Id: dblist.prg,v 1.2 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ PROCEDURE __dbList( lOff, abEval, lAll, bFor, bWhile, nNext, nRecord, lRest, lTo
    /* Save SETs */
 
    IF !Empty( lToPrint )
-      lOldPrinter := Set(_SET_PRINTER, .T. )
+      lOldPrinter := Set( _SET_PRINTER, .T. )
    ENDIF
    IF !Empty( cToFileName )
       hb_FNameSplit( cToFileName, @cPath, @cName, @cExt )

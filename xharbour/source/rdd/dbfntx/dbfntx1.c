@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.161 2006/06/26 11:27:06 druzus Exp $
+ * $Id: dbfntx1.c,v 1.162 2006/06/27 21:26:04 druzus Exp $
  */
 
 /*
@@ -5319,27 +5319,18 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
 
       ulRecNo = pArea->ulRecNo;
 
-      if( ulNextCount && ulRecCount >= ulRecNo + ulNextCount )
-         ulRecCount = ulRecNo + ulNextCount - 1;
-
-      while( errCode == SUCCESS )
+      while( errCode == SUCCESS && !pArea->fEof )
       {
-         if( ulRecNo > ulRecCount )
-            pArea->fEof = TRUE;
-
-         if( pArea->fEof )
-            break;
-
          if( fDirectRead )
          {
             if( iRecBuff == 0 || iRecBuff >= iRecBufSize )
             {
+               if( ulRecNo > ulRecCount )
+                  break;
                if( ulRecCount - ulRecNo >= (ULONG) iRecBufSize )
                   iRec = iRecBufSize;
                else
                   iRec = ulRecCount - ulRecNo + 1;
-               if( iRec <= 0 )
-                  break;
                hb_fsSeekLarge( pArea->hDataFile,
                                ( HB_FOFFSET ) pArea->uiHeaderLen +
                                ( HB_FOFFSET ) ( ulRecNo - 1 ) *
@@ -5366,7 +5357,8 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
          if( pWhileItem && !hb_ntxEvalCond( NULL, pWhileItem, FALSE ) )
             break;
 
-         if( pForItem == NULL || hb_ntxEvalCond( pArea, pForItem, FALSE ) )
+         if( ulRecNo <= ulRecCount &&
+             ( pForItem == NULL || hb_ntxEvalCond( pArea, pForItem, FALSE ) ) )
          {
             if( pTag->nField )
                errCode = SELF_GETVALUE( ( AREAP ) pArea, pTag->nField, pItem );

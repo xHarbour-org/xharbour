@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5078 2006/07/19 19:00:21 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5079 2006/07/20 20:15:34 map Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-21 02:47 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * harbour/source/rdd/dbcmd.c
+  * harbour/source/rdd/dbf1.c
+  * harbour/source/rdd/delim1.c
+  * harbour/source/rdd/sdf1.c
+  * harbour/source/rdd/workarea.c
+    * code cleanup
+
+  * harbour/source/rdd/dbfcdx/dbfcdx1.c
+  * harbour/source/rdd/dbfntx/dbfntx1.c
+    ! do not interrupt subindexing when new record is concurrently added by
+      other station
+
+  * xharbour/source/rdd/dblist.prg
+  * xharbour/source/rdd/dbsort.prg
+  * xharbour/source/rdd/dbstrux.prg
+    * synced with Victor fixes in Harbour
 
 2006-07-20 22:15 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
    * harbour/source/rtl/math.c
