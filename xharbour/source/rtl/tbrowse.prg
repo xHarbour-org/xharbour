@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.10 2006/07/07 13:58:45 gerry Exp $
+ * $Id: tbrowse.prg,v 1.154 2006/07/07 15:23:43 gdrouillard Exp $
  */
 
 /*
@@ -1768,8 +1768,7 @@ METHOD LeftDetermine() CLASS TBrowse
 
    // If ::nFrozenCols > 0 I don't need to test nCol > 0, if 0 it is the same test
    while nCol > ::nFrozenCols .AND.;
-         ( nWidth += ::aColsInfo[ nCol, o_Width ] + ::aColsInfo[ nCol , o_SepWidth ] ) < ::nVisWidth
-
+         ( nWidth += ::aColsInfo[ nCol, o_Width ] + iif( nCol == ::nFrozenCols + 1, 0, ::aColsInfo[ nCol,o_SepWidth ] ) )<= ::nVisWidth
       nCol--
    enddo
 
@@ -3367,7 +3366,9 @@ function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
       enddo
 
       n := oBrowse:mcolpos - oBrowse:colpos
-
+      if n < oBrowse:leftVisible - oBrowse:colPos .AND. oBrowse:freeze + 1 < oBrowse:leftVisible
+         n += ( oBrowse:freeze + 1 - oBrowse:leftVisible )  // hidden cols
+      end
       do while n < 0
          n++
          oBrowse:left()
