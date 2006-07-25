@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5086 2006/07/25 09:06:38 druzus Exp $
+ * $Id: ChangeLog,v 1.5087 2006/07/25 11:10:50 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-25 23:27 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapirdd.h
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/vm/hvm.c
+    * do not generate RT errors "Alias does not exist" in constructions
+      like: ("NOT_EXISTING_ALIAS")->(...)
+      Clipper compatible modifications. I do not like it but current
+      previous behavior made problems for people who have code like:
+         if ("NOT_EXISTING_ALIAS")->(used())
+            ...
+         else
+            ? "Table not open..."
+         endif
+    ! fixed some other RT errors to be Clipper compatible
 
 2006-07-25 18:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h

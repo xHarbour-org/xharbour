@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.575 2006/06/27 21:26:04 druzus Exp $
+ * $Id: hvm.c,v 1.576 2006/07/06 21:26:56 druzus Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ void    hb_vmOperatorCall( PHB_ITEM, PHB_ITEM, char *, PHB_ITEM, int, PHB_ITEM )
 void    hb_vmOperatorCallUnary( PHB_ITEM, char *, PHB_ITEM ); /* call an overloaded unary operator */
 
 /* Database */
-static ERRCODE hb_vmSelectWorkarea( PHB_ITEM );  /* select the workarea using a given item or a substituted value */
+static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workarea using a given item or a substituted value */
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
 
 /* Execution */
@@ -6609,109 +6609,118 @@ void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol, PHB_ITEM pResul
 /* Database                        */
 /* ------------------------------- */
 
-static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias )
+static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
 {
-   ERRCODE bSuccess = SUCCESS;
+   HB_THREAD_STUB
+   ERRCODE errCode = SUCCESS;
+   BOOL fRepeat;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmSelectWorkArea(%p)", pAlias));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmSelectWorkArea(%p,%p)", pAlias, pField));
 
    /* NOTE: Clipper doesn't generate an error if an workarea specified
     * as numeric value cannot be selected
     */
-   switch( pAlias->type )
+   do
    {
-      case HB_IT_INTEGER:
-         /* Alias was used as integer value, for example: 4->field
-          * or it was saved on the stack using hb_vmPushAlias()
-          * or was evaluated from an expression, (nWorkArea)->field
-          */
-         hb_rddSelectWorkAreaNumber( pAlias->item.asInteger.value );
-         pAlias->type = HB_IT_NIL;
-         break;
+      fRepeat = FALSE;
+      errCode = SUCCESS;
 
-      case HB_IT_LONG:
-         /* Alias was evaluated from an expression, (nWorkArea)->field
-          */
-         hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLong.value );
-         pAlias->type = HB_IT_NIL;
-         break;
-
-      case HB_IT_DOUBLE:
-         /* Alias was evaluated from an expression, (nWorkArea)->field
-          */
-         hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
-         pAlias->type = HB_IT_NIL;
-         break;
-
-      case HB_IT_SYMBOL:
-         /* Alias was specified using alias identifier, for example: al->field
-          */
-         bSuccess = hb_rddSelectWorkAreaSymbol( pAlias->item.asSymbol.value );
-         pAlias->type = HB_IT_NIL;
-         break;
-
-      case HB_IT_STRING:
-         /* Alias was evaluated from an expression, for example: (cVar)->field
-          */
+      switch( pAlias->type )
+      {
+         case HB_IT_INTEGER:
+            /* Alias was used as integer value, for example: 4->field
+             * or it was saved on the stack using hb_vmPushAlias()
+             * or was evaluated from an expression, (nWorkArea)->field
+             */
+            hb_rddSelectWorkAreaNumber( pAlias->item.asInteger.value );
+            pAlias->type = HB_IT_NIL;
+            break;
+   
+         case HB_IT_LONG:
+            /* Alias was evaluated from an expression, (nWorkArea)->field
+             */
+            hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLong.value );
+            pAlias->type = HB_IT_NIL;
+            break;
+   
+         case HB_IT_DOUBLE:
+            /* Alias was evaluated from an expression, (nWorkArea)->field
+             */
+            hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
+            pAlias->type = HB_IT_NIL;
+            break;
+   
+         case HB_IT_SYMBOL:
+            /* Alias was specified using alias identifier, for example: al->field
+             */
+            errCode = hb_rddSelectWorkAreaSymbol( pAlias->item.asSymbol.value );
+            pAlias->type = HB_IT_NIL;
+            break;
+   
+         case HB_IT_STRING:
          {
+            /* Alias was evaluated from an expression, for example: (cVar)->field
+             */
             /* expand '&' operator if exists */
-            char *cAlias;
+            char * szAlias;
             BOOL bNewString;
-
-            cAlias = hb_macroExpandString( pAlias->item.asString.value, pAlias->item.asString.length, &bNewString );
-            bSuccess = hb_rddSelectWorkAreaAlias( cAlias );
+   
+            szAlias = hb_macroExpandString( pAlias->item.asString.value, pAlias->item.asString.length, &bNewString );
+            if( pField )
+            {
+               errCode = hb_rddSelectWorkAreaAlias( szAlias );
+            }
+            else
+            {
+               int iArea;
+               hb_rddGetAliasNumber( szAlias, &iArea );
+               hb_rddSelectWorkAreaNumber( iArea );
+            }
 
             if( bNewString )
-            {
-               hb_xfree( cAlias );
-            }
-
+               hb_xfree( szAlias );
             hb_itemClear( pAlias );
+            break;
          }
-         break;
 
-      /*
-       These types were added for Clipper compatibility
-      */
-      case HB_IT_ARRAY:
-      case HB_IT_BLOCK:
-         hb_itemClear( pAlias );
-         /* Fall through. */
-      case HB_IT_NIL:
-      case HB_IT_LOGICAL:
-      case HB_IT_DATE:
-         hb_rddSelectWorkAreaNumber( -1 );
-         pAlias->type = HB_IT_NIL;
-         break;
-
-      default:
-         {
-            PHB_ITEM pSubstVal = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 1, pAlias );
-
-            if( pSubstVal )
+         default:
+            if( pField )
             {
-               bSuccess = hb_vmSelectWorkarea( pSubstVal );
-               hb_itemRelease( pSubstVal );
+               PHB_ITEM pSubstVal;
+
+               hb_vmPushString( pField->szName, strlen( pField->szName ) );
+               pSubstVal = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&",
+                                       2, pAlias, hb_stackItemFromTop( -1 ) );
+               hb_stackPop();
+               if( pSubstVal )
+               {
+                  hb_itemMove( pAlias, pSubstVal );
+                  hb_itemRelease( pSubstVal );
+                  fRepeat = TRUE;
+               }
+               else
+               {
+                  if( HB_IS_COMPLEX( pAlias ) )
+                     hb_itemClear( pAlias );
+                  else
+                     pAlias->type = HB_IT_NIL;
+                  errCode = FAILURE;
+               }
             }
             else
             {
-               bSuccess = FAILURE;
+               hb_rddSelectWorkAreaNumber( -1 );
+               if( HB_IS_COMPLEX( pAlias ) )
+                  hb_itemClear( pAlias );
+               else
+                  pAlias->type = HB_IT_NIL;
             }
-
-            if( HB_IS_COMPLEX( pAlias ) )
-            {
-               hb_itemClear( pAlias );
-            }
-            else
-            {
-               pAlias->type = HB_IT_NIL;
-            }
-         }
-
-         break;
+            break;
+      }
    }
+   while( fRepeat );
 
-   return bSuccess;
+   return errCode;
 }
 
 /* Swaps two last items on the eval stack - the last item after swaping
@@ -6729,19 +6738,9 @@ static void hb_vmSwapAlias( void )
    pItem = hb_stackItemFromTop( -1 );
    pWorkArea = hb_stackItemFromTop( -2 );
 
-   hb_vmSelectWorkarea( pWorkArea );
+   hb_vmSelectWorkarea( pWorkArea, NULL );
 
-   hb_itemSwap( pWorkArea, pItem );
-
-   if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem->type = HB_IT_NIL;
-   }
-
+   hb_itemMove( pWorkArea, pItem );
    hb_stackDec();
 }
 
@@ -8322,37 +8321,15 @@ static void hb_vmPushAliasedField( PHB_SYMB pSym )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushAliasedField(%p)", pSym));
 
-   pAlias = hb_stackItemFromTop( -1 );
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
+   pAlias = hb_stackItemFromTop( -1 );
 
-   /*
-    This was added for Clipper compatibility
-   */
-   if( ( pAlias->type == HB_IT_ARRAY ) || ( pAlias->type == HB_IT_HASH ) ||
-       ( pAlias->type == HB_IT_LOGICAL ) || ( pAlias->type == HB_IT_NIL ) ||
-       ( pAlias->type == HB_IT_BLOCK ) || ( pAlias->type == HB_IT_DATE ) )
-   {
-      PHB_ITEM pResult;
+   /* NOTE: hb_vmSelecWorkarea clears passed item
+    */
+   if( hb_vmSelectWorkarea( pAlias, pSym ) == SUCCESS )
+      hb_rddGetFieldValue( pAlias, pSym );
 
-      hb_vmPushString( pSym->szName, strlen( pSym->szName ) );
-      pResult = hb_errRT_BASE_Subst( EG_ARG, 1065, NULL, "&", 2, pAlias, hb_stackItemFromTop( -1 ) );
-      hb_stackPop();
-
-      if( pResult )
-      {
-         hb_itemForwardValue( pAlias, pResult );
-         hb_itemRelease( pResult );
-      }
-   }
-   else
-   {
-      /* NOTE: hb_vmSelecWorkarea clears passed item
-       */
-      if( hb_vmSelectWorkarea( pAlias ) == SUCCESS )
-         hb_rddGetFieldValue( pAlias, pSym );
-
-      hb_rddSelectWorkAreaNumber( iCurrArea );
-   }
+   hb_rddSelectWorkAreaNumber( iCurrArea );
 }
 
 /* It pops the last item from the stack to use it to select a workarea
@@ -8371,51 +8348,28 @@ static void hb_vmPushAliasedVar( PHB_SYMB pSym )
 
    if( HB_IS_STRING( pAlias ) )
    {
-      char *szAlias = hb_strUpperCopy( pAlias->item.asString.value, pAlias->item.asString.length );
+      char * szAlias = pAlias->item.asString.value;
 
-      if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-      {  /* M->variable */
-         hb_memvarGetValue( pAlias, pSym );
-      }
-      else
+      if( szAlias[ 0 ] == 'M' || szAlias[ 0 ] == 'm' )
       {
-         int iCmp = strncmp( szAlias, "MEMVAR", 4 );
-
-         if( iCmp == 0 )
-                 {
-            iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
-                 }
-
-         if( iCmp == 0 )
-         {  /* MEMVAR-> or MEMVA-> or MEMV-> */
+         if( szAlias[ 1 ] == '\0' || /* M->variable */
+             ( pAlias->item.asString.length >= 4 &&
+               hb_strnicmp( szAlias, "MEMVAR", /* MEMVAR-> or MEMVA-> or MEMV-> */
+                                     pAlias->item.asString.length ) == 0 ) )
+         {
             hb_memvarGetValue( pAlias, pSym );
-         }
-         else
-         {  /* field variable */
-            iCmp = strncmp( szAlias, "FIELD", 4 );
-
-                        if( iCmp == 0 )
-                        {
-               iCmp = strncmp( szAlias, "FIELD", pAlias->item.asString.length );
-                        }
-
-            if( iCmp == 0 )
-            {  /* FIELD-> */
-               hb_rddGetFieldValue( pAlias, pSym );
-            }
-            else
-            {  /* database alias */
-               hb_vmPushAliasedField( pSym );
-            }
+            return;
          }
       }
-
-          hb_xfree( szAlias );
+      else if( pAlias->item.asString.length >= 4 &&
+               hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
+                                     pAlias->item.asString.length ) == 0 )
+      {
+         hb_rddGetFieldValue( pAlias, pSym );
+         return;
+      }
    }
-   else
-   {
-      hb_vmPushAliasedField( pSym );
-   }
+   hb_vmPushAliasedField( pSym );
 }
 
 static void hb_vmPushLocal( SHORT iLocal )
@@ -8772,7 +8726,7 @@ static void hb_vmPopAlias( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopAlias()"));
 
-   hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ) ); /* it clears the passed item */
+   hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ), NULL ); /* it clears the passed item */
 
    hb_stackDec();
 }
@@ -8790,7 +8744,7 @@ static void hb_vmPopAliasedField( PHB_SYMB pSym )
 
    iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
-   if( hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ) ) == SUCCESS )
+   if( hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ), pSym ) == SUCCESS )
    {
       hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
    }
@@ -8819,53 +8773,30 @@ static void hb_vmPopAliasedVar( PHB_SYMB pSym )
    {
       char * szAlias = pAlias->item.asString.value;
 
-      if( szAlias[ 0 ] == 'M' && szAlias[ 1 ] == '\0' )
-      {  /* M->variable */
-         hb_memvarSetValue( pSym, hb_stackItemFromTop( -2 ) );
-         hb_stackPop();    /* alias */
-         hb_stackPop();    /* value */
-      }
-      else
+      if( szAlias[ 0 ] == 'M' || szAlias[ 0 ] == 'm' )
       {
-         int iCmp = strncmp( szAlias, "MEMVAR", 4 );
-
-         if( iCmp == 0 )
+         if( szAlias[ 1 ] == '\0' || /* M->variable */
+             ( pAlias->item.asString.length >= 4 &&
+               hb_strnicmp( szAlias, "MEMVAR", /* MEMVAR-> or MEMVA-> or MEMV-> */
+                                     pAlias->item.asString.length ) == 0 ) )
          {
-            iCmp = strncmp( szAlias, "MEMVAR", pAlias->item.asString.length );
-         }
-
-         if( iCmp == 0 )
-         {  /* MEMVAR-> or MEMVA-> or MEMV-> */
             hb_memvarSetValue( pSym, hb_stackItemFromTop( -2 ) );
             hb_stackPop();    /* alias */
             hb_stackPop();    /* value */
-         }
-         else
-         {  /* field variable */
-            iCmp = strncmp( szAlias, "FIELD", 4 );
-
-            if( iCmp == 0 )
-            {
-               iCmp = strncmp( szAlias, "FIELD", pAlias->item.asString.length );
-            }
-
-            if( iCmp == 0 )
-            {  /* FIELD-> */
-               hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
-               hb_stackPop();    /* alias */
-               hb_stackPop();    /* value */
-            }
-            else
-            {  /* database alias */
-               hb_vmPopAliasedField( pSym );
-            }
+            return;
          }
       }
+      else if( pAlias->item.asString.length >= 4 &&
+               hb_strnicmp( szAlias, "FIELD", /* FIELD-> or FIEL-> */
+                                     pAlias->item.asString.length ) == 0 )
+      {
+         hb_rddPutFieldValue( hb_stackItemFromTop( -2 ), pSym );
+         hb_stackPop();    /* alias */
+         hb_stackPop();    /* value */
+         return;
+      }
    }
-   else
-   {
-      hb_vmPopAliasedField( pSym );
-   }
+   hb_vmPopAliasedField( pSym );
 }
 
 static void hb_vmPopLocal( SHORT iLocal )
@@ -10966,7 +10897,7 @@ HB_EXPORT BOOL hb_xvmPopAlias( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmPopAlias()"));
 
-   hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ) ); /* it clears the passed item */
+   hb_vmSelectWorkarea( hb_stackItemFromTop( -1 ), NULL ); /* it clears the passed item */
    hb_stackDec();
 
    HB_XVM_RETURN

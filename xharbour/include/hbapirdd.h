@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.40 2005/10/30 14:45:48 druzus Exp $
+ * $Id: hbapirdd.h,v 1.41 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -84,6 +84,7 @@ extern HB_EXPORT USHORT  hb_rddGetCurrentFieldPos( char * szName );
 extern HB_EXPORT void *  hb_rddAllocWorkAreaAlias( char * szAlias, int iArea );
 extern HB_EXPORT int     hb_rddGetCurrentWorkAreaNumber( void );
 extern HB_EXPORT void *  hb_rddGetCurrentWorkAreaPointer( void );
+extern HB_EXPORT ERRCODE hb_rddGetAliasNumber( char * szAlias, int * iArea );
 extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaAlias( char * szAlias );
 extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea );
 extern HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias );
