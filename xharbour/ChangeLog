@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5084 2006/07/21 20:41:25 map Exp $
+ * $Id: ChangeLog,v 1.5085 2006/07/24 20:15:44 gdrouillard Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-25 11:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! make GOTOP() when new index is open and is set as control one
 
 2006-07-24 16:14 UTC-0400 Gerald Drouillard <gerald@drouillard.ca>
   * xharbour/source/rtl/tbrowse.prg

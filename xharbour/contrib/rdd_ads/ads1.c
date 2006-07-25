@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.105 2006/06/21 01:49:58 kaddath Exp $
+ * $Id: ads1.c,v 1.106 2006/07/06 19:35:54 toninhofwi Exp $
  */
 
 /*
@@ -3068,6 +3068,7 @@ static ERRCODE adsOrderListAdd( ADSAREAP pArea, LPDBORDERINFO pOrderInfo )
    if( !pArea->hOrdCurrent )
    {
       pArea->hOrdCurrent = ahIndex[0];
+      return SELF_GOTOP( ( AREAP ) pArea );
    }
 
    return SUCCESS;
