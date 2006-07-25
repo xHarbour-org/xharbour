@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.40 2006/06/26 23:16:06 fsgiudice Exp $
+ * $Id: gtwvw.c,v 1.41 2006/06/27 07:36:56 fsgiudice Exp $
  */
 
 /*
@@ -339,6 +339,10 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib);
 static HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight);
 static void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight);
 
+/* bitmap caching functions for user drawn bitmaps (wvw_drawimage) */
+static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHeight);
+static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight);
+
 /* control (eg. scrollbar) supporters: */
 static HWND FindControlHandle(USHORT usWinNum, BYTE byCtrlClass, UINT uiCtrlid, byte * pbStyle);
 static UINT FindControlId(USHORT usWinNum, BYTE byCtrlClass, HWND hWndCtrl, byte * pbStyle);
@@ -602,6 +606,15 @@ void HB_GT_FUNC( gt_Exit( void ) )
 
       hb_xfree( s_sApp.pbhBitmapList );
       s_sApp.pbhBitmapList = pbh;
+    }
+
+    while (s_sApp.pbhUserBitmap)
+    {
+      pbh     = s_sApp.pbhUserBitmap->pNext;
+      DeleteObject (s_sApp.pbhUserBitmap->hBitmap) ;
+
+      hb_xfree( s_sApp.pbhUserBitmap );
+      s_sApp.pbhUserBitmap = pbh;
     }
 
     if( b_MouseEnable )
@@ -4217,20 +4230,19 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         return(0);
       }
 
-      /* FSG - 27/06/2006 - If I'm on base window */
       if (usWinNum == 0)
       {
-         /* FSG - 27/06/2006 - if I have more than 1 window opened, I have to simulate a ESC key */
-         if (s_usNumWindows > 1)
-         {
-           /* hb_wvw_gtAddCharToInputQueue( HB_BREAK_FLAG ); */
-           hb_wvw_gtAddCharToInputQueue( K_ESC );
-         }
-         else
-         {
-           /* FSG - 27/06/2006 - otherwise I can close handling close events */
-           hb_gtHandleClose();
-         }
+
+         /* bdj note 20060724:
+            We should put this line here, as per FSG change on 20060626:
+              hb_gtHandleClose()
+            However, if there is no gtSetCloseHandler, ALT+C effect is not produced as it should.
+            So for now I put it back to the old behaviour with the following two lines, until hb_gtHandleClose() is fixed.
+          */
+
+         hb_wvw_gtAddCharToInputQueue( HB_BREAK_FLAG );
+         hb_wvw_gtAddCharToInputQueue( K_ESC );
+
       }
       else
       {
@@ -4544,8 +4556,8 @@ static DWORD hb_wvw_gtProcessMessages( WIN_DATA * pWindowData )
 
     if ( bProcessed == FALSE )
     {
-        TranslateMessage( &msg );
-        DispatchMessage( &msg );
+       TranslateMessage( &msg );
+       DispatchMessage( &msg );
     }
   }
 
@@ -5184,6 +5196,10 @@ static void gt_hbInitStatics( USHORT usWinNum, LPCTSTR lpszWinName, USHORT usRow
     }
 
     s_sApp.pbhBitmapList = NULL;
+
+    s_sApp.pbhUserBitmap = NULL;
+    s_sApp.uiBMcache = 0;
+    s_sApp.uiMaxBMcache = WVW_DEFAULT_MAX_BMCACHE;
 
   }
   else
@@ -7757,104 +7773,240 @@ BOOL HB_EXPORT hb_wvw_gtEnableShortCuts( USHORT usWinNum, BOOL bEnable )
   return( bWas );
 }
 
-/*-------------------------------------------------------------------*/
-/*                                                                   */
-/*            Function borrowed from HBPrint.lib                     */
-/*                                                                   */
-
-BOOL HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int ht, char * image )
+static BOOL GetIPictDimension(IPicture * pPic, int * pWidth, int * pHeight)
 {
-  IStream  *iStream;
-  IPicture *iPicture;
-  HGLOBAL  hGlobal;
-  HANDLE   hFile;
-  DWORD    nFileSize;
-  DWORD    nReadByte;
-  LONG     lWidth,lHeight;
-  int      x,y,xe,ye;
-  int      c   = x1 ;
-  int      r   = y1 ;
-  int      dc  = wd ;
-  int      dr  = ht ;
-  int      tor =  0 ;
-  int      toc =  0 ;
-  HRGN     hrgn1;
-  POINT    lpp = { 0 };
-  BOOL     bResult = FALSE;
+  OLE_HANDLE oHtemp;
+  BITMAP  bmTemp;
+
+  pPic->lpVtbl->get_Handle( pPic, &oHtemp );
+
+  GetObject((HBITMAP) oHtemp, sizeof(BITMAP), (LPSTR)&bmTemp);
+  *pWidth = bmTemp.bmWidth;
+  *pHeight = bmTemp.bmHeight;
+
+  return TRUE;
+}
+
+static BOOL GetImageDimension(char * image, int * pWidth, int * pHeight)
+{
+
+  HBITMAP hBitmap;
+  BOOL bResult = TRUE;
+
+  *pWidth = 0; *pHeight = 0;
+  hBitmap = FindUserBitmapHandle(image, pWidth, pHeight);
+
+  if (!hBitmap)
+  {
+     IPicture * pPic;
+
+     *pWidth = 0; *pHeight = 0;
+
+     pPic = hb_wvw_gtLoadPicture( image );
+     if (!pPic)
+     {
+        return FALSE;
+     }
+
+     bResult = GetIPictDimension(pPic, pWidth, pHeight);
+
+     hb_wvw_gtDestroyPicture( pPic );
+  }
+
+  return bResult;
+}
+
+static void DrawTransparentBitmap(HDC hdc, HBITMAP hBitmap, short xStart,
+                           short yStart,
+                           int iDestWidth, int iDestHeight)
+{
+   BITMAP     bm;
+   COLORREF   cColor;
+   HBITMAP    bmAndBack, bmAndObject, bmAndMem;
+   HBITMAP    bmBackOld, bmObjectOld, bmMemOld;
+   HDC        hdcMem, hdcBack, hdcObject, hdcTemp;
+   HDC        hdcCopy;
+   HBITMAP    bmStretch, bmStretchOld;
+   POINT      ptSize;
+   COLORREF   cTransparentColor;
+
+   hdcCopy = CreateCompatibleDC(hdc);
+   SelectObject(hdcCopy, hBitmap);
+
+     cTransparentColor = GetPixel(hdcCopy,
+                                  0,
+                                  0);
+
+   GetObject(hBitmap, sizeof(BITMAP), (LPSTR)&bm);
+   ptSize.x = bm.bmWidth;
+   ptSize.y = bm.bmHeight;
+   DPtoLP(hdcCopy, &ptSize, 1);
+
+   bmStretch = CreateCompatibleBitmap(hdc, iDestWidth, iDestHeight);
+   hdcTemp = CreateCompatibleDC(hdc);
+   bmStretchOld = SelectObject(hdcTemp, bmStretch);
+
+   StretchBlt(hdcTemp, 0, 0,
+          iDestWidth, iDestHeight,
+          hdcCopy, 0, 0,
+          ptSize.x, ptSize.y,
+          SRCCOPY);
+
+   hdcBack   = CreateCompatibleDC(hdc);
+   hdcObject = CreateCompatibleDC(hdc);
+   hdcMem    = CreateCompatibleDC(hdc);
+
+   bmAndBack   = CreateBitmap(iDestWidth, iDestHeight, 1, 1, NULL);
+
+   bmAndObject = CreateBitmap(iDestWidth, iDestHeight, 1, 1, NULL);
+
+   bmAndMem    = CreateCompatibleBitmap(hdc, iDestWidth, iDestHeight);
+
+   bmBackOld   = SelectObject(hdcBack, bmAndBack);
+   bmObjectOld = SelectObject(hdcObject, bmAndObject);
+   bmMemOld    = SelectObject(hdcMem, bmAndMem);
+
+   SetMapMode(hdcTemp, GetMapMode(hdc));
+
+   cColor = SetBkColor(hdcTemp, cTransparentColor);
+
+   BitBlt(hdcObject, 0, 0, iDestWidth, iDestHeight, hdcTemp, 0, 0,
+          SRCCOPY);
+
+   SetBkColor(hdcTemp, cColor);
+
+   BitBlt(hdcBack, 0, 0, iDestWidth, iDestHeight, hdcObject, 0, 0,
+          NOTSRCCOPY);
+
+   BitBlt(hdcMem, 0, 0, iDestWidth, iDestHeight, hdc, xStart, yStart,
+          SRCCOPY);
+
+   BitBlt(hdcMem, 0, 0, iDestWidth, iDestHeight, hdcObject, 0, 0, SRCAND);
+
+   BitBlt(hdcTemp, 0, 0, iDestWidth, iDestHeight, hdcBack, 0, 0, SRCAND);
+
+   BitBlt(hdcMem, 0, 0, iDestWidth, iDestHeight, hdcTemp, 0, 0, SRCPAINT);
+
+   BitBlt(hdc, xStart, yStart, iDestWidth, iDestHeight, hdcMem, 0, 0,
+          SRCCOPY);
+
+   DeleteObject(SelectObject(hdcBack, bmBackOld));
+   DeleteObject(SelectObject(hdcObject, bmObjectOld));
+   DeleteObject(SelectObject(hdcMem, bmMemOld));
+   DeleteObject(SelectObject(hdcTemp, bmStretchOld));
+
+   DeleteDC(hdcMem);
+   DeleteDC(hdcBack);
+   DeleteDC(hdcObject);
+   DeleteDC(hdcTemp);
+   DeleteDC(hdcCopy);
+}
+
+/* 20060724 Notes:
+   (1) Transparency
+   if bTransparent is .t., top-left pixel is used as the transparent color,
+
+   (2) Caching
+   WARNING this function will always CACHE the image.
+   Do not use it to draw large number of images, because image handle
+   is never closed.
+   TODO: make it an option.
+ */
+BOOL HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int ht, char * image,
+                                   BOOL bTransparent )
+{
+  HBITMAP hBitmap;
+  BOOL     bResult;
+  int      iWidth, iHeight;
+  HDC      hdc, hdcMem;
 
   WIN_DATA * pWindowData = s_pWindows[ usWinNum ];
 
-  hFile = CreateFile( image, GENERIC_READ, 0, NULL, OPEN_EXISTING,
-                                      FILE_ATTRIBUTE_NORMAL, NULL );
-  if ( hFile != INVALID_HANDLE_VALUE )
+  iWidth = 0;  iHeight = 0;
+
+  hBitmap = FindUserBitmapHandle(image, &iWidth, &iHeight);
+  if (!hBitmap)
   {
-    nFileSize = GetFileSize( hFile, NULL );
+     IPicture * pPic;
+     OLE_HANDLE oHtemp;
+     BITMAP  bmTemp;
 
-    if ( nFileSize != INVALID_FILE_SIZE )
-    {
-      hGlobal = GlobalAlloc( GPTR, nFileSize );
+     pPic = hb_wvw_gtLoadPicture( image );
+     if (!pPic)
+     {
+        return FALSE;
+     }
 
-      if ( hGlobal )
-      {
-        if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
-        {
-          CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
-          if ( iPicture )
-          {
-            iPicture->lpVtbl->get_Width( iPicture,&lWidth );
-            iPicture->lpVtbl->get_Height( iPicture,&lHeight );
+     /* 20060724 canNOT do it this way:
+     pPic->lpVtbl->get_Width( pPic,&lWidth );
+     pPic->lpVtbl->get_Height( pPic,&lHeight );
+     iWidth = (int) lWidth;
+     iHeight = (int) lHeight;
+     */
 
-            if ( dc  == 0 )
-            {
-              dc = ( int ) ( ( float ) dr * lWidth  / lHeight );
-            }
-            if ( dr  == 0 )
-            {
-              dr = ( int ) ( ( float ) dc * lHeight / lWidth  );
-            }
-            if ( tor == 0 )
-            {
-              tor = dr;
-            }
-            if ( toc == 0 )
-            {
-              toc = dc;
-            }
-            x  = c;
-            y  = r;
-            xe = c + toc - 1;
-            ye = r + tor - 1;
+     pPic->lpVtbl->get_Handle( pPic, &oHtemp );
 
-            GetViewportOrgEx( pWindowData->hdc, &lpp );
+     hBitmap = (HBITMAP) CopyImage((HBITMAP) oHtemp, IMAGE_BITMAP,0,0,
+                                           LR_COPYRETURNORG);
 
-            hrgn1 = CreateRectRgn( c+lpp.x, r+lpp.y, xe+lpp.x, ye+lpp.y );
-            SelectClipRgn( pWindowData->hdc, hrgn1 );
+     hb_wvw_gtDestroyPicture( pPic );
 
-            while ( x < xe )
-            {
-              while ( y < ye )
-              {
-                iPicture->lpVtbl->  Render( iPicture, pWindowData->hdc, x, y, dc, dr, 0,
-                                            lHeight, lWidth, -lHeight, NULL );
-                y += dr;
-              }
-              y =  r;
-              x += dc;
-            }
+     if (!hBitmap)
+     {
+        return FALSE;
+     }
 
-            SelectClipRgn( pWindowData->hdc, NULL );
-            DeleteObject( hrgn1 );
+     GetObject(hBitmap, sizeof(BITMAP), (LPSTR)&bmTemp);
+     iWidth = bmTemp.bmWidth;
+     iHeight = bmTemp.bmHeight;
 
-            iPicture->lpVtbl->Release( iPicture );
-            bResult = TRUE ;
-          }
-        }
-        GlobalFree( hGlobal );
-      }
-    }
-    CloseHandle( hFile );
+     AddUserBitmapHandle(image, hBitmap, iWidth, iHeight);
   }
+
+  hdc = GetDC (pWindowData->hWnd) ;
+
+  if (bTransparent)
+  {
+     DrawTransparentBitmap(hdc,
+                           hBitmap,
+                           x1,
+                           y1,
+                           wd,
+                           ht);
+     bResult = TRUE;
+  }
+  else
+  {
+     int      iOldMode;
+
+     hdcMem = CreateCompatibleDC(hdc);
+
+     SelectObject(hdcMem, hBitmap);
+
+     iOldMode = SetStretchBltMode( hdc, COLORONCOLOR );
+
+     bResult = StretchBlt(
+                           hdc,      /* handle to destination DC */
+                           x1,       /* x-coord of destination upper-left corner */
+                           y1,       /* y-coord of destination upper-left corner */
+                           wd,       /* width of destination rectangle */
+                           ht,       /* height of destination rectangle */
+                           hdcMem,   /* handle to source DC */
+                           0,        /* x-coord of source upper-left corner */
+                           0,        /* y-coord of source upper-left corner */
+                           iWidth,   /* width of source rectangle */
+                           iHeight,  /* height of source rectangle */
+                           SRCCOPY   /* raster operation code */
+                         );
+
+     SetStretchBltMode( hdc, iOldMode );
+
+     DeleteDC(hdcMem);
+
+  }
+
+  ReleaseDC(pWindowData->hWnd, hdc);
+
   return( bResult );
 }
 
@@ -7899,7 +8051,8 @@ HB_EXPORT IPicture * hb_wvw_gtLoadPicture( char * image )
 
 /*-------------------------------------------------------------------*/
 
-BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, int ht, IPicture * iPicture )
+BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, int ht, IPicture * iPicture,
+                                       BOOL bTransp )
 {
   LONG     lWidth,lHeight;
   int      x,y,xe,ye;
@@ -7916,6 +8069,35 @@ BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, 
 
   if ( iPicture )
   {
+    /* if bTransp, we use different method */
+    if ( bTransp )
+    {
+      OLE_HANDLE oHtemp;
+      HDC     hdc;
+
+      iPicture->lpVtbl->get_Handle( iPicture, &oHtemp );
+
+      if ( oHtemp )
+      {
+        hdc = GetDC (pWindowData->hWnd) ;
+        DrawTransparentBitmap(hdc,
+                              (HBITMAP) oHtemp,
+                              x1,
+                              y1,
+                              wd,
+                              ht);
+        ReleaseDC(pWindowData->hWnd, hdc);
+
+        bResult = TRUE;
+      }
+      else
+      {
+        bResult = FALSE;
+      }
+      return( bResult );
+    }
+    /* endif bTransp, we use different method */
+
     iPicture->lpVtbl->get_Width( iPicture,&lWidth );
     iPicture->lpVtbl->get_Height( iPicture,&lHeight );
 
@@ -9838,7 +10020,8 @@ HB_FUNC( WVW_DRAWPROGRESSBAR )
 
    if ( bImage )
    {
-      hb_wvw_gtDrawImage( usWinNum, rc.left, rc.top, rc.right-rc.left+1, rc.bottom-rc.top+1, hb_parc( 10 ) );
+      hb_wvw_gtDrawImage( usWinNum, rc.left, rc.top, rc.right-rc.left+1, rc.bottom-rc.top+1, hb_parc( 10 ),
+                          FALSE );
    }
    else
    {
@@ -10614,8 +10797,6 @@ HB_FUNC( WVW_DRAWBOXRAISED )
    hb_retl( TRUE );
 }
 
-
-
 /*-------------------------------------------------------------------*/
 /*                                                                                         */
 /*    Wvw_DrawBoxRecessed( nWinNum, ;                                                      */
@@ -10839,8 +11020,23 @@ HB_FUNC( WVW_DRAWBOXGROUPRAISED )
 /*                                                                        */
 /*    Wvw_DrawImage( nWinNum, ;                                           */
 /*                   nTop, nLeft, nBottom, nRight, cImage/nPictureSlot, ; */
-/*                   lTight/aOffset) <--none in gtwvt                     */
+/*                   lTight/aOffset,;                                     */
+/*                   lTransparent) <--none in gtwvt                     */
 /*                                                                        */
+/* 20060724 Notes:
+   (1) Image dimension
+   if nBottom is NIL, then image height will be proportional to image width.
+   if nRight  is NIL, then image width will be proportional to image height.
+   if nBottom and nRight are BOTH NIL then original image dimension is used
+
+   (2) Transparency
+   if lTransparent is .t., top-left pixel is used as the transparent color,
+
+   (3) Caching
+   Image will always be cached. See the WARNING in hb_wvw_gtDrawImage().
+   Do not use this function to draw a large number of images.
+   TODO: make it an option.
+ */
 
 HB_FUNC( WVW_DRAWIMAGE )
 {
@@ -10848,6 +11044,11 @@ HB_FUNC( WVW_DRAWIMAGE )
    POINT xy = { 0 };
    int   iLeft, iTop, iRight, iBottom;
    WIN_DATA * pWindowData;
+
+   BOOL     bActBottom = ISNIL( 4 ),
+            bActRight  = ISNIL( 5 );
+   int      iImgWidth, iImgHeight;
+
    USHORT   usTop    = hb_parni( 2 ),
             usLeft   = hb_parni( 3 ),
             usBottom = hb_parni( 4 ),
@@ -10855,6 +11056,7 @@ HB_FUNC( WVW_DRAWIMAGE )
 
    BOOL  bTight = ( ISARRAY(7) || ISNIL( 7 ) ? FALSE : hb_parl( 7 ) );
    BOOL  bUseArray = ISARRAY(7);
+   BOOL  bTransparent = ( ISNIL( 8 ) ? FALSE : hb_parl( 8 ) );
    int   iOLeft, iOTop, iORight, iOBottom;
    BOOL  bResult;
 
@@ -10888,22 +11090,77 @@ HB_FUNC( WVW_DRAWIMAGE )
    iTop    = xy.y + iOTop;
    iLeft   = xy.x + iOLeft;
 
+   if (bActRight || bActBottom)
+   {
+
+      if (( !ISNUM( 6 ) && !GetImageDimension(hb_parcx(6), &iImgWidth, &iImgHeight) )
+          ||
+          ( ISNUM( 6 ) && !GetIPictDimension(s_sApp.iPicture[ hb_parni( 6 )-1 ], &iImgWidth, &iImgHeight) )
+         )
+      {
+
+         bActRight = FALSE;
+         bActBottom = FALSE;
+      }
+      else
+      {
+
+         if ( bActRight && bActBottom )
+         {
+            iRight = iLeft + iImgWidth - 1;
+            iBottom = iTop + iImgHeight - 1;
+         }
+      }
+   }
+
    xy      = hb_wvw_gtGetXYFromColRow( pWindowData, usRight + 1, usBottom + 1 );
 
    xy.y   -= pWindowData->byLineSpacing;
 
-   iBottom = xy.y-1 + iOBottom;
-   iRight  = xy.x-1 + iORight;
+   if ( !bActBottom )
+   {
+
+      iBottom = xy.y-1 + iOBottom;
+   }
+
+   if ( !bActRight )
+   {
+
+      iRight  = xy.x-1 + iORight;
+   }
+
+   if (( bActBottom || bActRight ) && !( bActBottom && bActRight ))
+   {
+      int iDispWidth, iDispHeight;
+      if ( bActRight )
+      {
+         /* right corner (width) must be proportional to height */
+
+         iDispHeight = iBottom - iTop + 1;
+         iDispWidth  = (int) ( (float) iImgWidth / iImgHeight * iDispHeight);
+         iRight = iLeft + iDispWidth - 1;
+      }
+      else
+      {
+         /* bottom corner (height) must be proportional to width */
+
+         iDispWidth = iRight - iLeft + 1;
+         iDispHeight= (int) ( (float) iImgHeight / iImgWidth * iDispWidth);
+         iBottom = iTop + iDispHeight - 1;
+      }
+   }
 
    if ( ISNUM( 6 ) )
    {
 
-      bResult = hb_wvw_gtRenderPicture( usWinNum, iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, s_sApp.iPicture[ hb_parni( 6 )-1 ] ) ;
+      bResult = hb_wvw_gtRenderPicture( usWinNum, iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, s_sApp.iPicture[ hb_parni( 6 )-1 ],
+                                        bTransparent );
    }
    else
    {
 
-      bResult = hb_wvw_gtDrawImage( usWinNum, iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parcx( 6 ) ) ;
+      bResult = hb_wvw_gtDrawImage( usWinNum, iLeft, iTop, ( iRight - iLeft ) + 1, ( iBottom - iTop ) + 1, hb_parcx( 6 ),
+                                    bTransparent );
    }
 
    hb_retl( bResult );
@@ -11788,12 +12045,14 @@ HB_FUNC( WVW_DRAWBUTTON )
       {
          iPicture = s_sApp.iPicture[ hb_parni( 7 ) - 1 ];
 
-         hb_wvw_gtRenderPicture( usWinNum, iLeft+4, iTop+4, iImageWidth, iImageHeight, iPicture );
+         hb_wvw_gtRenderPicture( usWinNum, iLeft+4, iTop+4, iImageWidth, iImageHeight, iPicture,
+                                 FALSE );
       }
       else
       {
 
-         hb_wvw_gtDrawImage( usWinNum, iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parcx( 7 ) );
+         hb_wvw_gtDrawImage( usWinNum, iLeft+4, iTop+4, iImageWidth, iImageHeight, hb_parcx( 7 ),
+                             FALSE );
       }
    }
 
@@ -12326,7 +12585,9 @@ HB_FUNC( WVW_DRAWPICTURE )
          iBottom  = xy.y-1 + iOBottom;
          iRight   = xy.x-1 + iORight;
 
-         hb_retl( hb_wvw_gtRenderPicture( usWinNum, iLeft, iTop, iRight - iLeft + 1, iBottom - iTop + 1, s_sApp.iPicture[ iSlot ] ) );
+         hb_retl( hb_wvw_gtRenderPicture( usWinNum, iLeft, iTop, iRight - iLeft + 1, iBottom - iTop + 1, s_sApp.iPicture[ iSlot ],
+                                          FALSE )
+                 );
 
       }
    }
@@ -13269,6 +13530,8 @@ static BYTE * PackedDibGetBitsPtr (BITMAPINFO * pPackedDib)
                                     PackedDibGetColorTableSize (pPackedDib) ;
 }
 
+/* FindBitmapHandle and AddBitmapHandle are for bitmaps associated with
+   Windows controls such as toolbar, pushbutton, checkbox, etc */
 static HBITMAP FindBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
 {
   BITMAP_HANDLE * pbh = s_sApp.pbhBitmapList;
@@ -13308,6 +13571,124 @@ static void AddBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int 
   pbhNew->pNext = s_sApp.pbhBitmapList;
 
   s_sApp.pbhBitmapList = pbhNew;
+
+}
+
+/* FindUserBitmapHandle and AddUserBitmapHandle are for bitmaps NOT associated with
+   Windows controls such as toolbar, pushbutton, checkbox, etc
+   IOW, it is for user drawn images (wvw_drawimage)
+ */
+static HBITMAP FindUserBitmapHandle(char * szFileName, int * piWidth, int * piHeight)
+{
+  BITMAP_HANDLE * pbh = s_sApp.pbhUserBitmap;
+  BOOL bStrictDimension = !(*piWidth==0 && *piHeight==0);
+
+  while (pbh)
+  {
+
+    if (strcmp(szFileName, pbh->szFilename)==0 &&
+        (!bStrictDimension ||
+         (*piWidth == pbh->iWidth &&
+          *piHeight== pbh->iHeight
+         )
+        )
+       )
+    {
+      if (!bStrictDimension)
+      {
+        *piWidth = pbh->iWidth;
+        *piHeight= pbh->iHeight;
+      }
+
+      return pbh->hBitmap;
+    }
+    pbh = pbh->pNext;
+  }
+
+  return NULL;
+}
+
+static void AddUserBitmapHandle(char * szFileName, HBITMAP hBitmap, int iWidth, int iHeight)
+{
+  BITMAP_HANDLE * pbhNew = (BITMAP_HANDLE *) hb_xgrab( sizeof( BITMAP_HANDLE ) );
+
+  strcpy(pbhNew->szFilename, szFileName);
+  pbhNew->hBitmap = hBitmap;
+  pbhNew->iWidth = iWidth;
+  pbhNew->iHeight = iHeight;
+
+  if (s_sApp.uiBMcache >= s_sApp.uiMaxBMcache)
+  {
+    BITMAP_HANDLE *pbhTail, *pbhPrev;
+
+    pbhTail = s_sApp.pbhUserBitmap;
+    pbhPrev = NULL;
+    while (pbhTail && pbhTail->pNext)
+    {
+      pbhPrev = pbhTail;
+      pbhTail = pbhTail->pNext;
+    }
+
+    if (pbhTail)
+    {
+       DeleteObject( pbhTail->hBitmap ) ;
+       hb_xfree( pbhTail );
+       if (pbhPrev)
+       {
+         pbhPrev->pNext = NULL;
+       }
+       else
+       {
+         s_sApp.pbhUserBitmap = NULL;
+       }
+       s_sApp.uiBMcache--;
+    }
+  }
+
+  s_sApp.uiBMcache++;
+  pbhNew->pNext = s_sApp.pbhUserBitmap;
+  s_sApp.pbhUserBitmap = pbhNew;
+
+}
+
+/* wvw_SetMaxBMCache([nMax])
+   Get/Set maximum user-bitmap cache (default is 20, minimum is 1).
+   Returns old setting of maximum user-bitmap cache.
+
+   Description:
+   To minimize bitmap loading operation, wvw_drawimage caches bitmap once
+   it reads from disk.
+   Ie., subsequent wvw_drawimage will use the bitmap from the memory.
+   When the maximum number of cache is used, the least recently opened bitmap
+   will be discarded from the cache.
+
+   Remarks:
+   There is no way to discard a specific bitmap from the cache.
+   If you want to control bitmap caching manually, use wvw_loadpicture()
+   instead.
+
+   Example:
+   wvw_SetMaxBMCache(1)  :: this will cache one bitmap only
+   wvw_SetMaxBMCache(50) :: allows up to 50 bitmap stored in the cache
+ */
+HB_FUNC( WVW_SETMAXBMCACHE )
+{
+   UINT uiOldMaxBMcache = s_sApp.uiMaxBMcache;
+
+   if ( ! ISNIL( 1 ) )
+   {
+     s_sApp.uiMaxBMcache = (UINT) hb_parni( 1 );
+   }
+
+   hb_retni( uiOldMaxBMcache );
+}
+
+/* wvw_NumBMCache()
+   Returns current number of user-bitmap cache.
+ */
+HB_FUNC( WVW_NUMBMCACHE )
+{
+   hb_retni( s_sApp.uiBMcache );
 }
 
 static HBITMAP hPrepareBitmap(char * szBitmap, UINT uiBitmap,
@@ -14640,18 +15021,18 @@ HB_FUNC( WVW_XBCREATE)
    }
 
    hWndXB = CreateWindowEx(
-       0L,
-       "SCROLLBAR",
-       (LPSTR) NULL,
-       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,
-       iLeft,
-       iTop,
-       iRight-iLeft+1,
-       iBottom-iTop+1,
-       hWndParent,
-       (HMENU) uiXBid,
-       (HINSTANCE) hb_hInstance,
-       (LPVOID) NULL
+       0L,                          /* no extended styles */
+       "SCROLLBAR",                 /* scroll bar control class */
+       (LPSTR) NULL,                /* text for window title bar */
+       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,         /* scroll bar styles */
+       iLeft,                           /* horizontal position */
+       iTop,                           /* vertical position */
+       iRight-iLeft+1,                         /* width of the scroll bar */
+       iBottom-iTop+1,                         /* height */
+       hWndParent,                   /* handle to main window */
+       (HMENU) uiXBid,           /* id for this scroll bar control */
+       (HINSTANCE) hb_hInstance,                  /* instance owning this window */
+       (LPVOID) NULL           /* pointer not needed */
    );
 
    if(hWndXB)
@@ -14995,7 +15376,6 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
   return( CallWindowProc( (WNDPROC) OldProc, hWnd, message, wParam, lParam ) );
 }
 
-
 /************************
 * BEGIN button supporters
 * for pushbutton and checkbox
@@ -15058,18 +15438,18 @@ static UINT ButtonCreate( USHORT usWinNum, USHORT usTop, USHORT usLeft, USHORT u
    }
 
    hWndButton = CreateWindowEx(
-       0L,                          // no extended styles
-       "BUTTON",                 // pushbutton/checkbox control class
-       (LPSTR) lpszCaption,                // text for caption
-       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,         // button styles
-       iLeft,                           // horizontal position
-       iTop,                           // vertical position
-       iRight-iLeft+1,                         // width of the button
-       iBottom-iTop+1,                         // height
-       hWndParent,                   // handle to parent window
-       (HMENU) uiPBid,           // id for this button control
-       (HINSTANCE) hb_hInstance,                  // instance owning this window
-       (LPVOID) NULL           // pointer not needed
+       0L,                          /* no extended styles */
+       "BUTTON",                 /* pushbutton/checkbox control class */
+       (LPSTR) lpszCaption,                /* text for caption */
+       WS_CHILD | WS_VISIBLE | (DWORD) iStyle,         /* button styles */
+       iLeft,                           /* horizontal position */
+       iTop,                           /* vertical position */
+       iRight-iLeft+1,                         /* width of the button */
+       iBottom-iTop+1,                         /* height */
+       hWndParent,                   /* handle to parent window */
+       (HMENU) uiPBid,           /* id for this button control */
+       (HINSTANCE) hb_hInstance,                  /* instance owning this window */
+       (LPVOID) NULL           /* pointer not needed */
    );
 
    if(hWndButton)
@@ -15091,10 +15471,11 @@ static UINT ButtonCreate( USHORT usWinNum, USHORT usTop, USHORT usLeft, USHORT u
 
         if (hBitmap)
         {
-          SendMessage(hWndButton,              // handle to destination window
-                      BM_SETIMAGE,              // message to send
-                      (WPARAM) IMAGE_BITMAP,          // image type
-                      (LPARAM) hBitmap);          // handle to the image (HANDLE)
+
+          SendMessage(hWndButton,              /* handle to destination window */
+                      BM_SETIMAGE,              /* message to send */
+                      (WPARAM) IMAGE_BITMAP,          /* image type */
+                      (LPARAM) hBitmap);          /* handle to the image (HANDLE) */
         }
      }
 
@@ -15116,13 +15497,14 @@ static UINT ButtonCreate( USHORT usWinNum, USHORT usTop, USHORT usLeft, USHORT u
    }
    else
    {
+
      return 0;
    }
 
 }
 
 /*************************
-* END button supporters   //20051102
+* END button supporters
 * for pushbutton and checkbox
 *************************/
 
@@ -15181,8 +15563,8 @@ HB_FUNC( WVW_PBCREATE)
    LPCTSTR  lpszCaption = ISCHAR(6) ? hb_parcx(6) : NULL;
    char   * szBitmap = ISCHAR(7) ? (char*) hb_parcx(7) : NULL;
    UINT     uiBitmap = ISNUM(7) ? (UINT) hb_parni(7) : 0;
-   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1; //20051025
-   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE; //20051025
+   double   dStretch = !ISNIL(10) ? hb_parnd(10) : 1;
+   BOOL     bMap3Dcolors = ISLOG(11) ? (BOOL) hb_parl(11) : FALSE;
 
    if (!ISBLOCK(8))
    {
@@ -15216,15 +15598,12 @@ HB_FUNC( WVW_PBDESTROY)
 
    while (pcd)
    {
-
      if (pcd->byCtrlClass == WVW_CONTROL_PUSHBUTTON && pcd->uiCtrlid == uiPBid)
      {
        break;
      }
-
      pcdPrev = pcd;
      pcd = pcd->pNext;
-
    }
 
    if (pcd==NULL) { return; }
@@ -15247,7 +15626,6 @@ HB_FUNC( WVW_PBDESTROY)
    }
 
    hb_xfree( pcd );
-
 }
 
 /*WVW_PBsetFocus( [nWinNum], nButtonId )
@@ -15566,11 +15944,11 @@ HB_FUNC( WVW_CXDESTROY)
    if (pcd->phiCodeBlock)
    {
       hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    hb_xfree( pcd );
 }
-
 
 /*WVW_CXsetFocus( [nWinNum], nButtonId )
  *set the focus to checkbox nButtonId in window nWinNum
@@ -15579,11 +15957,12 @@ HB_FUNC( WVW_CXSETFOCUS )
 {
   USHORT usWinNum = WVW_WHICH_WINDOW;
   UINT   uiCtrlId = ISNIL(2) ? 0 : hb_parni(2);
-  byte   bStyle; //dummy
+  byte   bStyle;
   HWND   hWndCX = FindControlHandle(usWinNum, WVW_CONTROL_CHECKBOX, uiCtrlId, &bStyle);
 
   if (hWndCX)
   {
+
     hb_retl( SetFocus(hWndCX) != NULL );
   }
   else
@@ -15632,8 +16011,8 @@ HB_FUNC( WVW_CXSETCODEBLOCK )
 
    UINT uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_CHECKBOX, NULL, uiCXid);
-   PHB_ITEM phiCodeBlock = hb_param( 3, HB_IT_BLOCK ); //20051005
-   if (!phiCodeBlock || pcd==NULL || pcd->bBusy)  //20051005 was: (!ISBLOCK(3) || pcd==NULL || pcd->bBusy)
+   PHB_ITEM phiCodeBlock = hb_param( 3, HB_IT_BLOCK );
+   if (!phiCodeBlock || pcd==NULL || pcd->bBusy)
    {
      hb_retl( FALSE );
      return;
@@ -15644,6 +16023,7 @@ HB_FUNC( WVW_CXSETCODEBLOCK )
    if (pcd->phiCodeBlock)
    {
       hb_itemRelease( pcd->phiCodeBlock );
+
    }
 
    pcd->phiCodeBlock = hb_itemNew( phiCodeBlock );
@@ -16483,6 +16863,7 @@ HB_FUNC( WVW_CBSETFOCUS )
 
   if (hWndCB)
   {
+
     hb_retl( SetFocus(hWndCB) != NULL );
   }
   else
@@ -17194,3 +17575,4 @@ HB_FUNC( WIN_DRAWTEXT )
 
    hb_retl( DrawText( ( HDC ) hb_parnl( 1 ), hb_parc( 2 ), strlen( hb_parc( 2 ) ), &rc, hb_parni( 4 ) ) );
 }
+

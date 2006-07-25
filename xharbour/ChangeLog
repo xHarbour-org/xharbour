@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5085 2006/07/24 20:15:44 gdrouillard Exp $
+ * $Id: ChangeLog,v 1.5086 2006/07/25 09:06:38 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-25 18:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    * Revert Fransesco's last change, restore the old behaviour of ALT+C.
+      This is a temporary solution until hb_gtHandleClose() is fixed.
+      Fransesco, I hope you don't mind.
+    * hb_wvw_gtDrawImage()
+      Rewritten. Now supports displaying transparent image if
+      bTransp parameter is TRUE.
+    * hb_wvw_gtRenderPicture()
+      Modified to support displaying transparent image if
+      bTransp parameter is TRUE.
+    * HB_FUNC( WVW_DRAWIMAGE )
+      Added lTransp optional parameter.
+      Supports displaying images with proportional height/width ratio.
+    + .PRG callable wvw_SetMaxBMcache()
+      This is to get/set maximum number of bitmap cache for WVW_DRAWIMAGE.
+    + .PRG callable wvw_NumBMcache()
+      This is to get current number of bitmap cached by WVW_DRAWIMAGE.
+  * contrib/gtwvw/doc/whatsnew.txt
+    * notes about this change.
+  + contrib/gtwvw/samples/drawimg.prg
+  + contrib/gtwvw/samples/wutil.prg
+  + contrib/gtwvw/samples/wutil.ch
+  + contrib/gtwvw/samples/drawimg.bat
+    * A sample about this new feature.
+
+    Notes on WVW_DRAWIMAGE()
+    /*
+       (1) Transparency
+       if bTransparent is .t., top-left pixel is used as the transparent color,
+
+       (2) Image dimension
+       if nBottom is NIL, then image height will be proportional to original image.
+       if nRight  is NIL, then image width will be proportional to original image.
+       if nBottom and nRight are BOTH NIL then original image dimension is used
+
+       (3) Caching
+       This function will now CACHE the image.
+       See also wvw_SetMaxBMcache() and wvw_NumBMcache()
+     */
 
 2006-07-25 11:05 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

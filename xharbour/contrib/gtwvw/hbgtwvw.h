@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.12 2006/02/25 00:00:36 ronpinkas Exp $
+ * $Id: hbgtwvw.h,v 1.13 2006/03/25 18:06:48 bdj Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
    #if defined(_MSC_VER) || defined( __DMC__ )
       #include <conio.h>
 
-      #if ! defined( _MSC_VER )
+      #if !defined( _MSC_VER )
 
          #if !defined( LONG_PTR )
             typedef __int64 LONG_PTR ;
@@ -169,6 +169,12 @@
 #define WVW_PENS_MAX          20
 #define WVW_DLGML_MAX         20
 #define WVW_DLGMD_MAX         20
+
+/* default maximum number of user bitmap cache
+   One bitmap cache currently takes 280 bytes (see BITMAP_HANDLE).
+   See also wvw_setMaxBMCache().
+ */
+#define WVW_DEFAULT_MAX_BMCACHE 20
 
 #define WVW_TB_LABELMAXLENGTH 40
 
@@ -298,7 +304,7 @@ typedef struct control_data
   /* also used by combobox to store kbd type */
   byte    bStyle;
 
-  /* PUSHBUTTON specifics: */
+  /* PUSHBUTTON & CHECKBOX specifics: */
   WNDPROC   OldProc;
 
   struct control_data * pNext;
@@ -348,6 +354,10 @@ typedef struct app_data
 
   BITMAP_HANDLE * pbhBitmapList;
 
+  BITMAP_HANDLE * pbhUserBitmap;       /* User bitmap (wvw_drawimage) */
+  UINT      uiBMcache;                 /* number of bitmap cached */
+  UINT      uiMaxBMcache;              /* maximum number of bitmap cached */
+
   PHB_DYNS  pSymWVW_PAINT;             /* Stores pointer to WVW_PAINT function     */
   PHB_DYNS  pSymWVW_SETFOCUS;          /* Stores pointer to WVW_SETFOCUS function  */
   PHB_DYNS  pSymWVW_KILLFOCUS;         /* Stores pointer to WVW_KILLFOCUS function */
@@ -389,7 +399,7 @@ typedef struct win_data
 
   CONTROL_DATA * pcdCtrlList;          /* lists of created controls, eg. scrollbars */
 
-  HFONT     hPBfont;                   /* handle to font used by pushbuttons */
+  HFONT     hPBfont;                   /* handle to font used by pushbuttons & checkboxes */
 
   HFONT     hCBfont;                   /* handle to font used by comboboxes */
 
@@ -472,7 +482,8 @@ BOOL   HB_EXPORT hb_wvw_gtSetAltF4Close( BOOL bCanClose );
 void   HB_EXPORT hb_wvw_gtDoProcessMessages( USHORT usWinNum );
 BOOL   HB_EXPORT hb_wvw_gtSetMouseMove( USHORT usWinNum, BOOL bHandleEvent );
 BOOL   HB_EXPORT hb_wvw_gtEnableShortCuts( USHORT usWinNum, BOOL bEnable );
-BOOL   HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int ht, char * image );
+BOOL   HB_EXPORT hb_wvw_gtDrawImage( USHORT usWinNum, int x1, int y1, int wd, int ht, char * image,
+                                     BOOL bTransparent );
 
 void   HB_EXPORT hb_wvw_gtDrawBoxRaised( USHORT usWinNum, int iTop, int iLeft, int iBottom, int iRight,
                                          BOOL bTight);  /* <-- none in gtwvt */
@@ -484,7 +495,8 @@ static BOOL   hb_wvw_gtGetCharFromInputQueue( int * c );
 void   HB_EXPORT hb_wvw_gtAddCharToInputQueue( int data );
 
 HB_EXPORT IPicture * hb_wvw_gtLoadPicture( char * image );
-BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, int ht, IPicture * iPicture );
+BOOL HB_EXPORT hb_wvw_gtRenderPicture( USHORT usWinNum, int x1, int y1, int wd, int ht, IPicture * iPicture,
+                                       BOOL bTransp );
 BOOL HB_EXPORT hb_wvw_gtDestroyPicture( IPicture * iPicture );
 
 COLORREF HB_EXPORT hb_wvw_gtGetColorData( int iIndex );
