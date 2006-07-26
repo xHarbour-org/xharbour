@@ -239,6 +239,16 @@ all : $(HB_DEST_DIRS) $(HB_BUILD_TARGETS)
 
 #**********************************************************
 
+# Clean MACRO HELPERS and RULES
+# (NOTE: it's a little bit tricky)
+DELDEFINST=$(CC_DIRNAME)^\
+DELINSTDE1=$(HB_BUILD_TARGETS:$(DELDEFINST)=)
+DELINSTDEF=$(DELINSTDE1:  = )
+
+DELDLLHAR1=$(HARBOUR_DLL:.dll=.lib)
+DELDLLHAR2=$(DELDLLHAR1:bin=lib)
+DELHARBDLL=$(DELDLLHAR2:$(DELDEFINST)=)
+
 clean: doClean
 Clean: doClean
 CLEAN: doClean
@@ -259,9 +269,11 @@ doClean:
     -if exist $(DLL_OBJ_DIR)\*.c   $(DEL) $(DLL_OBJ_DIR)\*.c   > nul
     -if exist $(DLL_OBJ_DIR)\*.h   $(DEL) $(DLL_OBJ_DIR)\*.h   > nul
     -if exist $(FMSTAT_OBJ_DIR)\*.obj $(DEL) $(FMSTAT_OBJ_DIR)\*.obj > nul
-    -if exist bin\*.exe        $(DEL) bin\*.exe
-    -if exist bin\*.dll        $(DEL) bin\*.dll
-    -if exist lib\*.lib        $(DEL) lib\*.lib
+    -FOR %I IN ( $(DELINSTDEF) ) DO if exist %I $(DEL) %I > nul
+    -if exist $(DELHARBDLL) $(DEL) $(DELHARBDLL) > nul
+#    -if exist bin\*.exe        $(DEL) bin\*.exe
+#    -if exist bin\*.dll        $(DEL) bin\*.dll
+#    -if exist lib\*.lib        $(DEL) lib\*.lib
 
 #**********************************************************
 
