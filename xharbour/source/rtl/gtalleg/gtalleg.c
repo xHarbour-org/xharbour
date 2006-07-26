@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.44 2006/04/15 00:27:02 maurifull Exp $
+ * $Id: gtalleg.c,v 1.45 2006/07/26 13:22:45 lculik Exp $
  */
 
 /*
@@ -1170,14 +1170,7 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 #ifdef ALLEGRO_WINDOWS
 
       // GDI is slower, but it is more likely to bring a windowed mode than DirectX
-      if ( iRet != 0 )
-      {
-#ifdef DEBUG
-         HB_TRACE(HB_TR_DEBUG, ("trying Windows FullScreen"));
-#endif
-         iRet = al_set_gfx_mode( GFX_AUTODETECT_FULLSCREEN, iWidth, iHeight, 0, 0 );
-      }
-
+      iRet = al_set_gfx_mode( GFX_AUTODETECT_FULLSCREEN, iWidth, iHeight, 0, 0 );
 
       if ( iRet != 0 )
       {
