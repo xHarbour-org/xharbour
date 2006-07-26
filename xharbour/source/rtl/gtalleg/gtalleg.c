@@ -1,5 +1,5 @@
 /*
- * $Id: gtalleg.c,v 1.43 2006/04/14 22:31:02 maurifull Exp $
+ * $Id: gtalleg.c,v 1.44 2006/04/15 00:27:02 maurifull Exp $
  */
 
 /*
@@ -1114,7 +1114,17 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
 #ifdef DEBUG
       HB_TRACE(HB_TR_DEBUG, ("trying X DGA2 mode"));
 #endif
+
+      iRet = al_set_gfx_mode( GFX_AUTODETECT_FULLSCREEN, iWidth, iHeight, 0, 0 );      
+      if ( iRet != 0 )
+      {
+#ifdef DEBUG
+         HB_TRACE(HB_TR_DEBUG, ("trying Windows FullScreen"));
+#endif
+
       iRet = al_set_gfx_mode( AL_GFX_XDGA2, iWidth, iHeight, 0, 0 );
+      }
+
       if ( iRet != 0 )
       {
 #ifdef DEBUG
@@ -1158,7 +1168,17 @@ BOOL HB_GT_FUNC(gt_SetMode( USHORT usRows, USHORT usCols ))
          iRet = al_set_gfx_mode( AL_GFX_AUTODETECT_WINDOWED, iWidth, iHeight, 0, 0 );
       }
 #ifdef ALLEGRO_WINDOWS
+
       // GDI is slower, but it is more likely to bring a windowed mode than DirectX
+      if ( iRet != 0 )
+      {
+#ifdef DEBUG
+         HB_TRACE(HB_TR_DEBUG, ("trying Windows FullScreen"));
+#endif
+         iRet = al_set_gfx_mode( GFX_AUTODETECT_FULLSCREEN, iWidth, iHeight, 0, 0 );
+      }
+
+
       if ( iRet != 0 )
       {
 #ifdef DEBUG
