@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.41 2006/06/27 07:36:56 fsgiudice Exp $
+ * $Id: gtwvw.c,v 1.42 2006/07/25 11:09:47 bdj Exp $
  */
 
 /*
@@ -7844,7 +7844,7 @@ static void DrawTransparentBitmap(HDC hdc, HBITMAP hBitmap, short xStart,
 
    bmStretch = CreateCompatibleBitmap(hdc, iDestWidth, iDestHeight);
    hdcTemp = CreateCompatibleDC(hdc);
-   bmStretchOld = SelectObject(hdcTemp, bmStretch);
+   bmStretchOld = (HBITMAP) SelectObject(hdcTemp, bmStretch);
 
    StretchBlt(hdcTemp, 0, 0,
           iDestWidth, iDestHeight,
@@ -7862,9 +7862,9 @@ static void DrawTransparentBitmap(HDC hdc, HBITMAP hBitmap, short xStart,
 
    bmAndMem    = CreateCompatibleBitmap(hdc, iDestWidth, iDestHeight);
 
-   bmBackOld   = SelectObject(hdcBack, bmAndBack);
-   bmObjectOld = SelectObject(hdcObject, bmAndObject);
-   bmMemOld    = SelectObject(hdcMem, bmAndMem);
+   bmBackOld   = (HBITMAP) SelectObject(hdcBack, bmAndBack);
+   bmObjectOld = (HBITMAP) SelectObject(hdcObject, bmAndObject);
+   bmMemOld    = (HBITMAP) SelectObject(hdcMem, bmAndMem);
 
    SetMapMode(hdcTemp, GetMapMode(hdc));
 
