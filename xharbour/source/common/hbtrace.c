@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.7 2004/03/02 01:08:35 likewolf Exp $
+ * $Id: hbtrace.c,v 1.8 2005/01/12 16:36:22 druzus Exp $
  */
 
 /*
@@ -59,9 +59,9 @@
 #include "hb_io.h"
 #include "hbtrace.h"
 
-char * hb_tr_file_ = "";
-int    hb_tr_line_ = 0;
-int    hb_tr_level_ = 0;
+HB_EXPORT char * hb_tr_file_ = "";
+HB_EXPORT int    hb_tr_line_ = 0;
+HB_EXPORT int    hb_tr_level_ = 0;
 
 static int s_enabled = 1;
 static int s_flush   = 0;
@@ -100,7 +100,7 @@ int hb_tracelevel( int new_level )
    return old_level;
 }
 
-int hb_tr_level( void )
+HB_EXPORT int hb_tr_level( void )
 {
    static int s_level = -1;
 
@@ -163,7 +163,7 @@ int hb_tr_level( void )
    return s_level;
 }
 
-void hb_tr_trace( char * fmt, ... )
+HB_EXPORT void hb_tr_trace( char * fmt, ... )
 {
    /*
     * If tracing is disabled, do nothing.

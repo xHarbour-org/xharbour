@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.33 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbset.h,v 1.34 2005/10/10 22:45:55 druzus Exp $
  */
 
 /*
@@ -238,7 +238,7 @@ typedef struct
 #define HB_SET_TRACESTACK_ALL     2
 
 // extern HB_EXPORT HB_SET_STRUCT hb_set;
-extern HB_SET_STRUCT hb_set;
+extern HB_EXPORT HB_SET_STRUCT hb_set;
 extern HB_SET_STRUCT *hb_set_ptr;
 
 HB_EXPORT HB_SET_STRUCT *hb_GetSetStructPtr( void );
