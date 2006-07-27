@@ -4,8 +4,11 @@ rem $Id: makallbc.bat,v 1.19 2006/01/21 00:55:19 fsgiudice Exp $
 rem
 
 echo create system files
-set HB_BUILD_DLL=yes
 call make_b32 %1
+
+echo harbour.dll
+call dll_b32 %1
+if errorlevel 1 goto end
 
 :firebird
 echo firebird
