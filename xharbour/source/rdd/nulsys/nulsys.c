@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.1 2005/11/14 21:01:01 druzus Exp $
+ * $Id: nulsys.c,v 1.3 2006/01/30 02:51:25 druzus Exp $
  */
 
 /*
@@ -108,6 +108,14 @@ HB_EXPORT ERRCODE hb_rddPutFieldValue( HB_ITEM_PTR pItem, PHB_SYMB pFieldSymbol 
 {
    HB_SYMBOL_UNUSED( pItem );
    HB_SYMBOL_UNUSED( pFieldSymbol );
+
+   return FAILURE;
+}
+
+HB_EXPORT ERRCODE hb_rddGetAliasNumber( char * szAlias, int * iArea )
+{
+   HB_SYMBOL_UNUSED( szAlias );
+   HB_SYMBOL_UNUSED( iArea );
 
    return FAILURE;
 }
