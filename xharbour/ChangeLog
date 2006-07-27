@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5091 2006/07/27 12:21:30 lculik Exp $
+ * $Id: ChangeLog,v 1.5092 2006/07/27 15:49:05 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-27 18:45 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
+   * xharbour/bin/bld.bat
+   * xharbour/makefile.bc
+   * xharbour/makefile.bc
+   * xharbour/makefile.vc
+   * xharbour/dll_b32.bat
+   * xharbour/dll_vc.bat
+   * xharbour/hrbdll.bc
+   * xharbour/hrbdll.vc
+   * xharbour/make_b16.bat
+   * xharbour/make_b32.bat
+   * xharbour/make_vc.bat
+   * xharbour/makefile.bc
+   * xharbour/makefile.vc
+   * xharbour/common.mak
+     * Reverted makefile system to the old one
 
 2006-07-27 11:46 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * bin\bld.bat

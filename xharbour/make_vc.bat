@@ -1,76 +1,93 @@
 @echo off
-rem
-rem $Id: make_vc.bat,v 1.27 2006/07/20 20:07:11 map Exp $
-rem
+rem 
+rem $Id: make_vc.bat,v 1.13 2005/12/14 05:25:19 paultucker Exp $
+rem 
 
 rem ---------------------------------------------------------------
-rem This is a generic template file, if it doesn't fit your own needs
+rem This is a generic template file, if it doesn't fit your own needs 
 rem please DON'T MODIFY IT.
 rem
-rem Instead, make a local copy and modify that one, or make a call to
+rem Instead, make a local copy and modify that one, or make a call to 
 rem this batch file from your customized one. [vszakats]
-rem
-rem Set any of the below settings to customize your build process:
-rem    set HB_BUILD_MODE=C
-rem    set HB_BUILD_DLL=yes
-rem    set HB_BUILD_DEBUG=yes
-rem    set HB_BUILD_VERBOSE=yes
-rem    set HB_MAKE_PROGRAM=
-rem    set HB_MAKE_FLAGS=
 rem ---------------------------------------------------------------
 
-if "%HB_MAKE_PROGRAM%" == "" set HB_MAKE_PROGRAM=nmake.exe
+set rem=rem
+if "%1"=="/?" set rem=echo.
+%rem% ---------------------------------------------------------------
+%rem% Usage: make_vc [/y] [/a or CLEAN or other specific target]
+%rem% Call with nothing, /Y, /A, or CLEAN
+%rem% nothing - compiles what needs it.  If hb_mt is set, then multi-threaded
+%rem% versions of the harbour programs will be placed into the bin directory.
+%rem% CLEAN, delete targets.
+%rem% /A clean, then compile all - In addition, this will compile standard
+%rem%    libs as well as Multi-Threaded libs.  If you set HB_MT=MT
+%rem%    prior to executing this batch file, then the Multi-Threaded versions
+%rem%    of the programs will be active in the bin dir - otherwise, it will
+%rem%    be the standard versions.
+%rem% /Y non batch mode (for Win_98 build env for instance)
+%rem% ---------------------------------------------------------------
+set rem=
+if "%1"=="/?" goto exit
 
-rem ---------------------------------------------------------------
+if not exist obj md obj
+if not exist obj\vc md obj\vc
+if not exist obj\vcmt md obj\vcmt
+if not exist lib md lib
+if not exist lib\vc md lib\vc
+if not exist bin md bin
+if not exist bin\vc md bin\vc
 
+rem added subdir for optimized library
+rem start in build 81
+
+if not exist obj\vc\opt md obj\vc\opt
+if not exist obj\vc\opt\console md obj\vc\opt\console
+if not exist obj\vc\opt\gui md obj\vc\opt\gui
+
+if not exist obj\vcmt\opt md obj\vcmt\opt
+if not exist obj\vcmt\opt\console md obj\vcmt\opt\console
+if not exist obj\vcmt\opt\gui md obj\vcmt\opt\gui
+
+SET _HBMT=%HB_MT%
+SET HB_FL=
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
-
-rem ---------------------------------------------------------------
-
+if "%1" == "/y" set HB_FL=/y
+if "%1" == "/Y" set HB_FL=/y
+if "%HB_FL%" == "/y" shift
 :BUILD
 
-   rem ------------------------------------------------------------
-   set HB_MT=
-   %HB_MAKE_PROGRAM% %HB_MAKE_FLAGS% /r /f makefile.vc %1 %2 %3 > make_vc.log
+   SET HB_MT=
+echo.
+   nmake /f makefile.vc %HB_FL% %1 %2 %3 > make_vc.log
    if errorlevel 1 goto BUILD_ERR
-   rem ------------------------------------------------------------
-   set HB_MT=mt
-   %HB_MAKE_PROGRAM% %HB_MAKE_FLAGS% /r /f makefile.vc %1 %2 %3 > mkmt_vc.log
-   if errorlevel 1 goto BUILD_ERR_MT
-   rem ------------------------------------------------------------
-   goto EXIT
+   SET HB_MT=MT
+rem do not pass /a (if used) the second time!
+   nmake /f makefile.vc %HB_FL% %2 %3 >> make_vc.log
+   if errorlevel 1 goto BUILD_ERR
 
-rem ---------------------------------------------------------------
+:BUILD_OK
+
+   copy bin\vc\*.exe bin > nul
+   copy lib\vc\*.lib lib > nul
+   goto EXIT
 
 :BUILD_ERR
 
    notepad make_vc.log
    goto EXIT
 
-rem ---------------------------------------------------------------
-
-:BUILD_ERR_MT
-
-   notepad mkmt_vc.log
-   goto EXIT
-
-rem ---------------------------------------------------------------
-
 :CLEAN
 
-   set HB_MT=
-   %HB_MAKE_PROGRAM% %HB_MAKE_FLAGS% /r /f makefile.vc CLEAN > make_vc.log
-   set HB_MT=mt
-   %HB_MAKE_PROGRAM% %HB_MAKE_FLAGS% /r /f makefile.vc CLEAN > make_vc.log
-
-   rem In this case, the makefile handles most cleanup.
-
+   SET HB_MT=
+   nmake /f makefile.vc %1
+   SET HB_MT=MT
+   nmake /f makefile.vc %1
+   rem in this case, the makefile handles most cleanup. Add what you need here
    if exist make_vc.log del make_vc.log
-   if exist mkmt_vc.log del mkmt_vc.log
-   goto EXIT
-
-rem ---------------------------------------------------------------
+   rem etc.
 
 :EXIT
-set HB_MT=
+SET HB_FL=
+SET HB_MT=%_HBMT%
+SET _HBMT=
