@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5094 2006/07/27 16:53:16 map Exp $
+ * $Id: ChangeLog,v 1.5095 2006/07/27 21:58:33 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-07-28 09:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * ChangeLog
+    ! Fix wrong filename in Ron's last entry.
+    ! Fix typo in my last entry.
+
 2006-07-27 17:56 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
-  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
     * Missing type casts
 
 2006-07-27 18:45 UTC+0100 Marek Paliwoda (mpaliwoda at interia pl)
@@ -74,9 +79,9 @@
 2006-07-25 18:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h
   * contrib/gtwvw/gtwvw.c
-    * Revert Fransesco's last change, restore the old behaviour of ALT+C.
+    * Revert Francesco's last change, restore the old behaviour of ALT+C.
       This is a temporary solution until hb_gtHandleClose() is fixed.
-      Fransesco, I hope you don't mind.
+      Francesco, I hope you don't mind.
     * hb_wvw_gtDrawImage()
       Rewritten. Now supports displaying transparent image if
       bTransp parameter is TRUE.
@@ -95,7 +100,6 @@
   + contrib/gtwvw/samples/drawimg.prg
   + contrib/gtwvw/samples/wutil.prg
   + contrib/gtwvw/samples/wutil.ch
-  + contrib/gtwvw/samples/drawimg.bat
     * A sample about this new feature.
 
     Notes on WVW_DRAWIMAGE()
