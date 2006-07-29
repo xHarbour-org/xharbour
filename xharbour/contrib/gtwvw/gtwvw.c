@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.42 2006/07/25 11:09:47 bdj Exp $
+ * $Id: gtwvw.c,v 1.43 2006/07/27 21:58:33 ronpinkas Exp $
  */
 
 /*
@@ -88,6 +88,7 @@
 *
 */
 
+#include "hbole.h"
 #include <stdlib.h>
 
 #define HB_OS_WIN_32_USED
