@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5096 2006/07/28 01:56:25 bdj Exp $
+ * $Id: ChangeLog,v 1.5097 2006/07/29 15:00:04 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-07-30 13:20 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/classes.c
+    ! Prevents memory corruption when a subclass redefines
+      superclass' DATA.
 
 2006-07-29 11:00 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * contrib/gtwvw/gtwvw.c

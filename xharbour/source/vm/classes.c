@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.183 2006/06/28 16:57:51 druzus Exp $
+ * $Id: classes.c,v 1.184 2006/07/06 21:26:55 druzus Exp $
  */
 
 /*
@@ -1608,11 +1608,16 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                      memmove( pInit, pInit + 1, (uiLen - 1) * sizeof( CLSDINIT ) );
                   }
                   /* without realloc, only free if uiDataInitiated is 0 */
-                  if( --pClass->uiDataInitiated == 0 )
-                  {
-                     hb_xfree( pClass->pInitValues );
-                     pClass->pInitValues = NULL;
-                  }
+                  // Vicente Guerra: 2006/07/30
+                  //    Since pClass->pInitValues is allocated for ALL
+                  //    elements in __clsnew or __incdata, it can't be
+                  //    released.
+                  //    Re-used messages can occurs when defining a subclass.
+                  // if( --pClass->uiDataInitiated == 0 )
+                  // {
+                  //    hb_xfree( pClass->pInitValues );
+                  //    pClass->pInitValues = NULL;
+                  // }
                   break;
                }
             }
