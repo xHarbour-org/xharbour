@@ -12514,9 +12514,9 @@ RETURN oError
    //--------------------------------------------------------------//
    INIT PROCEDURE PPInit
 
-      LOCAL nScreenWidth, dDate := Stod( __DATE__ )
+      LOCAL nScreenWidth
 
-      s_cVer += " Compiled: " + cMonth( dDate ) + " " + LTrim( Str( Day( dDate ), 2 ) ) + ", " + Str( Year( dDate ), 4 )
+      s_cVer += " Compiled: " + __DATE__
       s_cVer += " " + __TIME__
 
       /*
