@@ -1,5 +1,5 @@
 /*
- * $Id: ttextlin.prg,v 1.3 2004/06/06 23:43:13 modalsist Exp $
+ * $Id: ttextlin.prg,v 1.3 2004/06/06 03:10:42 modalsist Exp $
  */
 
 /*
@@ -50,43 +50,26 @@
  *
  */
 
-/*
- * v.1.2 - 2004-05-11 Eduardo Fernandes <eduardo@modalsistemas.com.br>
- *
- *  - Revision to proper working with tab columns.
- *    See teditor.prg and memoedit.prg to more details.
- *
- * v.1.3 - 2004-06-03 Eduardo Fernandes <eduardo@modalsistemas.com.br>
- *
- *  - Added # include "common.ch" to better DATA vars initialization in
- *    New() Method.
- */
- 
 #include "common.ch"
 #include "hbclass.ch"
 
 CLASS HBTextLine
 
-   DATA cText       // Text line
-   DATA lSoftCR     // 3 State:  .T.   if text line end with SoftCR at Word Wrap Column (See HBEditor class in teditor.prg).
-                    //           .F.   if text line end with HardCR 
-                    //           .NIL. if text line end with null char
-   DATA aTabCol     // array to save/restore tab columns
+   DATA cText     
+   DATA lSoftCR   
 
-   METHOD New( cLine, lEOL , aTab )
+   METHOD New( cLine, lEOL )
 
 ENDCLASS
 
 // Create a new line of text
-METHOD New( cLine, lEOL, aTab ) CLASS HBTextLine
+METHOD New( cLine, lEOL ) CLASS HBTextLine
 
-   default cLine to ""
-   default lEOL to nil
-   default aTab to {}
+   DEFAULT cLine TO ""
+   DEFAULT lEOL TO .F.
    
    ::cText   := cLine
    ::lSoftCR := lEOL
-   ::aTabCol := aTab
 
 RETURN Self
 

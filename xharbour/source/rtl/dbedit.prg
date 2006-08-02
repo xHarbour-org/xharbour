@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.36 2006/05/03 18:17:20 modalsist Exp $
+ * $Id: dbedit.prg,v 1.37 2006/07/11 01:49:54 modalsist Exp $
  */
 
 /*
@@ -190,13 +190,7 @@ LOCAL oTBR,;
   IF !HB_IsNil(xUserFunc) .AND. ( !HB_IsString( xUserFunc ) .AND. !HB_IsBlock(xUserFunc) )
      Throw( ErrorNew( "BASE", 0, 1127,  "Argument type error <"+valtype(xUserFunc)+">", Procname()+" <xUserFunc>" ) )
   ELSE
-      If HB_IsString(xUserFunc) .AND. !Empty(xUserFunc)
-         // Eval xUserFunc to verify if it exist.
-         Eval( &( "{|| "+xUserFunc+"() }" ) )
-      ElseIf HB_IsBlock(xUserFunc)
-         // Eval xUserFunc to verify if it exist.
-         Eval( xUserFunc )
-      Else
+      If HB_IsString(xUserFunc) .AND. Empty(xUserFunc)
          xUserFunc := NIL
       Endif
   ENDIF
@@ -418,7 +412,7 @@ LOCAL oTBR,;
 
     oTBR:deHilite()
 
-    /* 2006/JUL/10 - E.F. Don't run this code if nRet is equal DE_APPEND or
+    /* 2006/JUL/10 - E.F. Don't run this code if nRet is DE_APPEND or
      *               DE_ABORT.
      */
     If nRet == DE_REFRESH .OR. nRet == DE_CONT

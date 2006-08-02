@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5098 2006/07/30 18:20:56 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5099 2006/08/01 01:45:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,67 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-02 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\dbedit.prg
+    ! fixed run time error at codeblock argument verification.
+
+  * source\rtl\ttxtlin.prg
+    ! cleaned the code from my old changes to treat tab key. This one is not
+      necessary anymore. Removed my old comments for that.
+
+  * source\rtl\memoedit.prg
+    + added full navigation of cursor into all lines and all columns into text
+      in any direction.
+    + added vertical scroll behaviour in reply to ME_TOGGLESCROLL from udf.
+    + added aConfigurablekeys, aUnhandledkeys, aEditkeys, aMouseKeys, aAsciiKeys datas
+    + created method ExistUdf.
+    ! changed name of method xDo to CallUdf to better knowledgement.
+    ! changed name of method HandleUserkey to HandleUdf.
+    ! fixed treatment of exit with ESC if scoreboard is on. Only exit if user
+      answer yes. Esc or No go back to edit text.
+    ! fixed treatment of udf call to prevent infinite loop in any circustancies.
+    ! fixed double call to Idlehook() method when ME_IDLE mode is detected.
+    ! fixed double call to udf when udf is present and an key exception occurs.
+    ! fixed old bug that was causing infinite loop when:
+      Edit() -> KeyboardHook() -> HandleUserKey() -> Edit()
+    ! fixed old bug in udf treatment that in any circunstancies cause infinite
+      loop.
+    ! clean code.
+    - removed Idlehook method.
+    
+
+  * source\rtl\teditor.prg
+    + added DelTextRight() method to delete from cursor to end of line.
+    + added DelWordRight() method in response from CTRL-T key.
+    + added DisplayInsert() method to diplay <insert> label at scoreboard
+      area when insert is on.
+    + added bKeyBlock data to treat setkey() in udf existence.
+    + added LastRow() method do replace ::naTexlen data.
+    + added GetCol() method to internal use.
+    + added IsEmptyLine() method to internal use.
+    ! changed lDirty data name to lChanged for better knowledge.
+    ! fixed worwrapcol point to allow edit same amount of chars per line as
+      Clipper memoedit.
+    ! fixed delete method to remove a line when this line is empty.
+    ! fixed wordright and wordleft to navigate from cursor upto begin/end of
+      memo and vice-versa when lWordWrap is on.
+    ! fixed backspace method to allow continue at end of previous line if
+      lWordWrap is on.
+    ! fixed return method in insert mode.
+    ! fixed K_AScii to respect ::lWordWrap if it is on.
+    ! fixed pagedown(), pageup(), down(), up(), left(), right(), wordright(),
+      wordleft() methods to cursor freedom of movement.
+    - removed code that call Setkey() in Edit() method to avoid double callÿ
+      from memoedit.
+    ! clean code.
+
+    Note: 1) CTRL-END still doesn't work in separate mode of CTRL-W.
+          2) At startup memoedit always will split text, even if lwordwrap
+             is set to .f. at initialization mode. This behaviour need adjusts.
+
+    I hope these changes fix some old bugs of memoedit. If no, I can revert
+    all.
 
 2006-07-31 21:44 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * utils/xbscript/xbscript.prg
