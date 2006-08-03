@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.72 2006/07/17 10:57:12 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.73 2006/08/02 13:50:46 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.72 2006/07/17 10:57:12 lf_sfnet Exp $
+/* $Id: teditor.prg,v 1.73 2006/08/02 13:50:46 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -285,6 +285,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    ::nBottom := Max( 0, Min( MaxRow(),nBottom ) )
    ::nRight  := Max( 0, Min( MaxCol(),nRight ) )
 
+
    // 2006/JUL/22 - E.F. To avoid run time error.
    IF nTop >= nBottom .OR.;
       nLeft >= nRight
@@ -457,14 +458,17 @@ METHOD RefreshWindow() CLASS HBEditor
    for i := 0 to Min( ::nNumRows - 1, ::LastRow() - 1 )
 
       // 2006/JUL/23 - E.F. Adjusted to avoid out of bound.
-      //
-      //DispOutAt( :nTop + i, ::nLeft, ;
-      //           PadR( SubStr( ::aText[ ::nFirstRow + i ]:cText, ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
-      //           ::LineColor( ::nFirstRow + i ) )
-      DispOutAt( Min(::nTop + i,::nBottom), ::nLeft, ;
-                 PadR( iif(::nFirstRow+i <= ::LastRow(), SubStr( ::aText[ ::nFirstRow + i ]:cText, ::nFirstCol, ::nNumCols ),Space(::nNumCols) ) , ::nNumCols ), ;
-                 ::LineColor( ::nFirstRow + i ) )
+      //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here,
+      //               because getline return line number in tbrwtext.prg (debug). 
 
+      //DispOutAt( ::nTop + i, ::nLeft, ;
+      //           PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
+      //           ::LineColor( ::nFirstRow + i ) )
+  
+      DispOutAt( Min(::nTop + i,::nBottom), ::nLeft, ;
+                 PadR( iif(::nFirstRow+i <= ::LastRow(), SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ),Space(::nNumCols) ) , ::nNumCols ), ;
+                 ::LineColor( ::nFirstRow + i ) )
+  
    next
 
    ScrollFixed( ::nTop + i, ::nLeft, ::nBottom, ::nRight )
@@ -509,7 +513,10 @@ METHOD RefreshLine() CLASS HBEditor
 
       Dispbegin()
 
-      DispOutAt( ::Row(), ::nLeft, PadR( SubStr( ::aText[ ::nRow ]:cText, ::nFirstCol, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nRow ) )
+      // 2006/AUG/02 - E.F.
+      //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here
+      //               because getline return line number in tbrwtext.prg (debug). 
+      DispOutAt( ::Row(), ::nLeft, PadR( SubStr( ::GetLine( ::nRow ), ::nFirstCol, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nRow ) )
 
       Dispend()
 
@@ -536,8 +543,11 @@ METHOD RefreshColumn() CLASS HBEditor
 
    Dispbegin()
 
+   // 2006/AUG/02 - E.F.
+   //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here
+   //               because getline return line number in tbrwtext.prg (debug). 
    for i := 0 to Min( ::nNumRows - 1, ::LastRow() - 1 )
-      DispOutAt( ::nTop + i, nOCol, SubStr( ::aText[::nFirstRow + i ]:cText, ::nCol, 1 ), ::LineColor( ::nFirstRow + i ) )
+      DispOutAt( ::nTop + i, nOCol, SubStr( ::GetLine(::nFirstRow + i ), ::nCol, 1 ), ::LineColor( ::nFirstRow + i ) )
    next
 
    Dispend()
@@ -871,8 +881,8 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             default      // many modifications were needed to avoid array errors with text entry and line wraps
 
-               if ::lEditAllow
-                  if nKey >= K_SPACE .AND. nKey < 256
+               if nKey >= K_SPACE .AND. nKey < 256
+                  if ::lEditAllow
                      ::K_Ascii( nKey )
                   endif
                else
@@ -1059,7 +1069,7 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
 
    if !::lWordWrap .and. ::IsEmptyLine( ::nRow ) .OR.;
       ::LastRow()==0 .OR.;
-      ( At(" ", ::aText[::nRow]:cText ) == 0 .AND. ::LineLen(::nRow) >= ::nWordWrapCol )
+      ( At(" ", ::aText[ ::nRow ]:cText ) == 0 .AND. ::LineLen(::nRow) >= ::nWordWrapCol )
       return self
    endif
 
@@ -1697,7 +1707,7 @@ METHOD GetLine( nRow ) CLASS HBEditor
       return ""
    endif
 
-return Self
+Return Self
 
 //-------------------------------------------------------------------//
 //

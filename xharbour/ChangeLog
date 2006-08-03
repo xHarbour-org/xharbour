@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5099 2006/08/01 01:45:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5100 2006/08/02 13:50:45 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-02 21:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\teditor.prg
+    ! fixed line number supression in debug, introduced in my last commit.
 
 2006-08-02 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\dbedit.prg
