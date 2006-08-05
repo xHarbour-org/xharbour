@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.172 2006/06/30 03:45:23 lculik Exp $
+ * $Id: hbmake.prg,v 1.173 2006/07/06 01:29:36 lculik Exp $
  */
 
 /*
@@ -329,15 +329,15 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    if !s_lForce .and. PCount() > 1
 
+      if Hb_IsNil(s_lGenppo) .OR. s_lGenppo == .F.
+         Delete_ppo()
+      endif
+
       IF s_lLibrary
          CreateLibMakeFile( cFile )
       ELSE
          CreateMakeFile( cFile )
       ENDIF
-
-      if !s_lGenppo
-         Delete_ppo()
-      endif
 
       RETURN NIL
 
@@ -376,6 +376,10 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       MakeDir( s_cObjDir )
    ENDIF
 
+   if Hb_IsNil(s_lGenppo) .OR. s_lGenppo == .F.
+      Delete_ppo()
+   endif
+
    IF s_lForce
       CompileFiles()
    ELSE
@@ -411,10 +415,6 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       */
       FErase( s_cMap ) 
       FErase( s_cTds ) 
-   endif
-
-   if !s_lGenppo
-      Delete_ppo()
    endif
 
    SET CURSOR ON
@@ -5482,17 +5482,9 @@ RETURN .T.
 *--------------------
 FUNCTION Delete_ppo()
 *--------------------
-LOCAL nPos,aFiles
+LOCAL cFile := alltrim(s_cAppName)+".ppo"
 
- if valtype(s_lGenppo)=="L" .AND. !s_lGenppo
-
-    aFiles := directory( "*.ppo" )
-
-    for nPos := 1 to Len( aFiles )
-        FErase( aFiles[nPos,1] )
-    next
-
- endif
+  FErase( cFile )
 
 RETURN NIL
 

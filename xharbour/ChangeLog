@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5104 2006/08/05 15:05:52 modalsist Exp $
+ * $Id: ChangeLog,v 1.5105 2006/08/05 16:35:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-05 17:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils\hbmake\hbmake.prg
+  * utils\hbmake\tmake.prg
+    ! fixed to generate/delete the .ppo file as configured.
 
 2006-08-05 12:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * xharbour/source/ct/misc2.c

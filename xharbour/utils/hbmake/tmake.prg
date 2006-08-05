@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.15 2006/05/30 23:22:11 ath1 Exp $
+ * $Id: tmake.prg,v 1.16 2006/07/06 01:29:36 lculik Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ DATA  lGenCsource    init .f.      // Ath added 31-05-2006
 DATA  cShell         init ""
 
 METHOD New()
-METHOD ReadMakefile()
+METHOD ReadMakefile(cFile)
 METHOD ReplaceMacros( cMacros )
 METHOD FindMacro( cMacro, cRead ) 
 
@@ -463,6 +463,7 @@ METHOD ReadMakefile(cFile) CLASS THbMake
                      aTemp[ 2 ] := strtran(aTemp[ 2 ],"-b","")
                      aTemp[ 2 ] := strtran(aTemp[ 2 ],"-l","")
                      aTemp[ 2 ] := Alltrim( aTemp[ 2 ] )
+
                 endif
                   
                 IF aTemp[ 1 ] == "USERDEFINE"
@@ -513,8 +514,8 @@ METHOD ReadMakefile(cFile) CLASS THbMake
 
     ENDDO
 
-qout( nhandle)
-            Fclose( nHandle )
+    qout( nhandle)
+    Fclose( nHandle )
 RETURN self
 
 *--------------------------------------------
