@@ -1,5 +1,5 @@
 /*
- *  $Id: misc2.c,v 1.1 2005/12/19 19:13:51 ptsarenko Exp $
+ *  $Id: misc2.c,v 1.2 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -50,10 +50,8 @@
  *
  */
 
-
 #include "hbapi.h"
 #include "hbapiitm.h"
-
 
 HB_FUNC( COMPLEMENT )
 {
@@ -67,23 +65,36 @@ HB_FUNC( COMPLEMENT )
 
          if( ulLen > 0 )
          {
-            char * szBuffer = hb_xgrab( ulLen + 1 ),
-                 * szSrc = hb_itemGetCPtr( pItem );
+            char *szBuffer = (char *) hb_xgrab( ulLen + 1 ), *szSrc = hb_itemGetCPtr( pItem );
+
             for( ulPos = 0; ulPos < ulLen; ulPos++ )
+			{
                szBuffer[ ulPos ] = ~szSrc[ulPos];
+			}
+
             hb_retclen_buffer( szBuffer, ulLen );
          }
          else
+		 {
             hb_retc( NULL );
+		 }
       }
       else if( HB_IS_DATE( pItem ) )
+	  {
          hb_retdl( 4537847 - hb_itemGetDL( pItem ) );
+	  }
       else if( HB_IS_NUMERIC( pItem ) )
+	  {
          hb_retnd( -1 * hb_itemGetND( pItem ) );
+	  }
       else if( HB_IS_LOGICAL( pItem ) )
+	  {
          hb_retl( ! hb_itemGetL( pItem ) );
+	  }
       else
+	  {
          hb_ret( );
+	  }
    }
    else
    {

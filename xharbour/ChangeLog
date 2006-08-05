@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5103 2006/08/05 11:58:25 druzus Exp $
+ * $Id: ChangeLog,v 1.5104 2006/08/05 15:05:52 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-05 12:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * xharbour/source/ct/misc2.c
+    * Missing type cast and brackets
 
 2006-08-05 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\teditor.prg
@@ -76,7 +80,7 @@
       loop.
     ! clean code.
     - removed Idlehook method.
-    
+
 
   * source\rtl\teditor.prg
     + added DelTextRight() method to delete from cursor to end of line.
@@ -99,7 +103,7 @@
     ! fixed K_AScii to respect ::lWordWrap if it is on.
     ! fixed pagedown(), pageup(), down(), up(), left(), right(), wordright(),
       wordleft() methods to cursor freedom of movement.
-    - removed code that call Setkey() in Edit() method to avoid double callÿ
+    - removed code that call Setkey() in Edit() method to avoid double call
       from memoedit.
     ! clean code.
 
