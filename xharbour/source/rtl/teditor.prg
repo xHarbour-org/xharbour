@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.73 2006/08/02 13:50:46 modalsist Exp $
+/* $Id: teditor.prg,v 1.74 2006/08/03 00:27:14 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.73 2006/08/02 13:50:46 modalsist Exp $
+/* $Id: teditor.prg,v 1.74 2006/08/03 00:27:14 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -266,10 +266,10 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    default  nWndRow     to 0 // 1   "
    default  nWndCol     to 0 // 1   "
 
+
    IF HB_IsNumeric( nLineLength ) .AND. nLineLength <= 0
       nLineLength := NIL
    ENDIF
-
 
    // fix setcolor() to value at New() call
    ::cColorSpec := setcolor()
@@ -355,9 +355,10 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
 
    // Load text to internal array.
-   // NOTE: if at ME_INIT mode (in udf declared), the ::lWordWrap is changed
-   //       to .F. (default is .t.), the cString will be wrapped in
-   //       accordance with nLineLength.
+   // TODO: if at ME_INIT mode (when udf is called), the ::lWordWrap is toggled
+   //       to .F. (default is .t.), the <cString> should be not splitted, but
+   //       here the <cString> will be splitted in accordance with nLineLength.
+   //
    ::aText := Text2Array( cString, nLineLength )
 
    if ::LastRow() == 0
@@ -736,8 +737,8 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 
             case K_CTRL_W
-               ::lSaved    := ( ::lEditAllow .AND. ::lChanged )
-               ::lExitEdit := .t.
+               ::lSaved := .T.
+               ::lExitEdit := .T.
                SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
                exit
 
@@ -874,12 +875,12 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                exit
 /*
             case K_CTRL_END        // Block - Code exits system at present!
-               ::Bottom()
-               ::End()
+               ::Bottom()          // TODO: In xHarbour this key combination works 
+               ::End()             //       as CTRL-W.
                exit
 */
 
-            default      // many modifications were needed to avoid array errors with text entry and line wraps
+            default  
 
                if nKey >= K_SPACE .AND. nKey < 256
                   if ::lEditAllow
@@ -897,7 +898,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
    ENDDO
 
-return Self
+Return Self
 
 //-------------------------------------------------------------------//
 //
@@ -1336,12 +1337,6 @@ METHOD K_Bs() CLASS HBEditor
       RETURN Self
    ENDIF
 
-   // Heavily modified, with line wrapping and respect of :SoftCR status
-   // added
-   // Handling this destructive key properly is quite complex, especially at
-   // line end
-
-
    // xHarbour extension: If backspace reach first column, move cursor to up
    //                     and go to last column. Allow to continue backspace in
    //                     previous line. Clipper memoedit backspace act only at
@@ -1376,17 +1371,19 @@ METHOD K_Bs() CLASS HBEditor
             ::RemoveLine( ::nRow + 1 )
 
             // resplit the line.
-            IF ::lWordWrap .and. ::LineLen( ::nRow ) >= ::nWordWrapCol
+            IF ::LineLen( ::nRow ) >= ::nWordWrapCol
                // will also refresh
                ::SplitLine( ::nRow )
             ENDIF
 
-            ::lChanged := .T.
-
             // 2006/JUL/21 - E.F. - Delete the rightmost char
             ::aText[ ::nRow ]:cText := SubStr( ::aText[ ::nRow ]:cText, 1, ::nNumCols - 1 ) + " "
 
-            ::GotoPos( ::nRow, ::nCol, .T. ) // also refresh
+            IF !Empty( ::aText[ ::nRow ]:cText )
+               ::GotoPos( ::nRow, ::nCol, .T. ) // also refresh
+            ELSE
+               ::GotoPos( ::nRow, 1, .T.)
+            ENDIF
 
          endif
       endif
@@ -1406,15 +1403,12 @@ METHOD K_Bs() CLASS HBEditor
    ELSEIF ::nCol >= ::nFirstCol
 
       // delete previous character
-      ::lChanged := .T.
-
       ::aText[ ::nRow ]:cText := Stuff( ::aText[ ::nRow ]:cText, ::nCol-1, 1, "" )
-
       ::GotoCol( ::nCol -1 )
-
       ::RefreshLine()
-
    ENDIF
+
+   ::lChanged := .T.
 
 RETURN Self
 
@@ -2272,7 +2266,10 @@ METHOD GetText( lSoftCr ) CLASS HBEditor
    LOCAL cString := "", cSoft:= ""
    LOCAL cEOL := HB_OSNewLine()
 
+
    DEFAULT lSoftCr TO .F.
+
+IF ::LastRow() > 0
 
    if lSoftCr
       cSoft:= CHR( 141 ) + CHR( 10 )
@@ -2286,6 +2283,8 @@ METHOD GetText( lSoftCr ) CLASS HBEditor
 
    // Last line does not need a cEOL delimiter
    cString += ::aText[ ::LastRow() ]:cText
+
+ENDIF
 
 return cString
 

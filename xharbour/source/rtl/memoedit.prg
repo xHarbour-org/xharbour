@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.37 2006/02/25 17:32:15 lf_sfnet Exp $
+ * $Id: memoedit.prg,v 1.39 2006/08/02 13:50:46 modalsist Exp $
  */
 
 /*
@@ -55,13 +55,14 @@
 #include "memoedit.ch"
 #include "inkey.ch"
 
+
 //-------------------------------------------------------------------//
 //
 // A specialized HBEditor which can simulate MemoEdit() behaviour
 //
 CLASS TMemoEditor FROM HBEditor
 
-   DATA  xUserFunction                    // User Function called to change default MemoEdit() behaviour
+   DATA  xUserFunction   // User Function called to change default MemoEdit() behaviour
 
    DATA  aEditKeys
    DATA  aAsciiKeys
@@ -69,24 +70,24 @@ CLASS TMemoEditor FROM HBEditor
    DATA  aMouseKeys
    DATA  aUnHandledKeys
 
-   METHOD MemoInit( cUserFunction )       // This method is called after ::New() returns to perform ME_INIT actions
-   METHOD Edit()                          // Calls ::Super:Edit(nKey) but is needed to handle configurable keys
-   METHOD KeyboardHook( nKey )            // Gets called every time there is a key not handled directly by HBEditor
+   METHOD  MemoInit( xUDF )                // This method is called after ::New() returns to perform ME_INIT actions
+   METHOD  Edit()                          // Calls ::Super:Edit(nKey) but is needed to handle configurable keys
+   METHOD  KeyboardHook( nKey )            // Gets called every time there is a key not handled directly by HBEditor
 
-   METHOD ExistUdf() INLINE ( HB_IsString( ::xUserFunction ) )
-   METHOD HandleUdf( nKey, nUdfRequest )  // Handles requests returned to MemoEdit() by udf
-   METHOD CallUdf( nMode )                // Call user function. ( old xDo )
+   METHOD  ExistUdf() INLINE ( HB_IsString( ::xUserFunction ) .AND. !Empty(::xUserFunction) )
+   METHOD  HandleUdf( nKey, nUdfReturn )  // Handles requests returned to MemoEdit() by udf
+   METHOD  CallUdf( nMode )                // Call user function. ( old xDo )
 
 
 ENDCLASS
 
 //-------------------------------------------------------------------//
 
-METHOD MemoInit( cUserFunction ) CLASS TMemoEditor
+METHOD MemoInit( xUDF ) CLASS TMemoEditor
 
-   local nUdfRequest,i
+   local nUdfReturn,i
 
-   DEFAULT cUserFunction TO NIL
+   DEFAULT xUDF TO NIL
 
    ::aEditKeys := { K_DOWN,;
                     K_CTRL_E,;
@@ -128,8 +129,8 @@ METHOD MemoInit( cUserFunction ) CLASS TMemoEditor
 
    // Save/Init object internal representation of user function
    //
-   IF HB_IsString( cUserFunction ) .AND. !Empty( cUserFunction )
-      ::xUserFunction := cUserFunction
+   IF HB_IsString( xUDF ) .AND. !Empty( xUDF )
+      ::xUserFunction := xUDF
    ENDIF
 /*
 *  // NOTE: K_ALT_W is not compatible with clipper exit memo and save key,
@@ -155,6 +156,7 @@ METHOD MemoInit( cUserFunction ) CLASS TMemoEditor
       ::aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_U }
    #endif
 
+
    ::aMouseKeys := { K_LBUTTONUP, K_MWFORWARD, K_MWBACKWARD }
 
    ::aConfigurableKeys := { K_F1,;
@@ -176,13 +178,13 @@ METHOD MemoInit( cUserFunction ) CLASS TMemoEditor
          05/08/2004 - <maurilio.longo@libero.it>
                       Clipper 5.2 memoedit() treats a NIL as ME_DEFAULT
       */
-      while ! ( nUdfRequest := ::CallUdf( ME_INIT ) ) IN { ME_DEFAULT, NIL }
+      while ! ( nUdfReturn := ::CallUdf( ME_INIT ) ) IN { ME_DEFAULT, NIL }
 
          // At this time there is no input from user of MemoEdit() only handling
          // of values returned by ::xUserFunction, so I pass these value on both
          // parameters of ::HandleUdf()
          //
-         ::HandleUdf( nUdfRequest, nUdfRequest, .T. )
+         ::HandleUdf( nUdfReturn, nUdfReturn, .F. )
 
       enddo
 
@@ -194,12 +196,11 @@ Return Self
 
 METHOD Edit() CLASS TMemoEditor
 
-   local nKey, nUdfRequest, lIdle
+   Local nKey, nUdfReturn, lIdle
    
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    //
-
 
    if NextKey()==0 .AND. ::ExistUdf()
       ::CallUdf( ME_IDLE )
@@ -247,40 +248,33 @@ METHOD Edit() CLASS TMemoEditor
                            process, the user function is called once again.
          */
 
-         IF ::bKeyBlock == NIL .AND. !(nKey IN ::aConfigurableKeys)
-            IF (nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys)
+         IF ::bKeyBlock == NIL 
+            IF !(nKey IN ::aConfigurableKeys) .AND. !(nKey IN ::aUnHandledKeys) .AND.;
+               ( (nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys) )
                ::Super:Edit( nKey )
+            ELSEIF (nKey IN ::aConfigurableKeys) .OR. (nKey IN ::aUnHandledKeys) .OR.;
+               nKey > 255 .OR. nKey < 0
+               ::KeyboardHook(nKey)
             ENDIF
          ENDIF
 
          IF ::ExistUdf()
 
-            IF !(nKey IN ::aConfigurableKeys) .AND.;
+            IF !(nKey IN ::aConfigurableKeys) .AND. !(nKey IN ::aUnhandledKeys) .AND.;
                ((nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys) )
 
-               nUdfRequest := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
-               ::HandleUdf( nKey, nUdfRequest, ::bKeyBlock==NIL )
-            ELSE
-
-               IF nKey IN ::aConfigurableKeys
-                  ::KeyboardHook( nKey )
+               IF NextKey()==0
+                  nUdfReturn := ::CallUdf( ME_IDLE )
                ELSE
-                  nUdfRequest := ::CallUdf( iif(::lChanged,ME_UNKEYX,ME_UNKEY) )
-                  ::HandleUdf( nKey, nUdfRequest, ::bKeyBlock==NIL )
+                  nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
                ENDIF
 
-            ENDIF
+               ::HandleUdf( nKey, nUdfReturn, ::bKeyBlock==NIL )
 
-            // 2006/AUG/02 - E.E. - Here we need call udf with ME_IDLE if
-            //                      there is no pending key to be processed,
-            //                      but this cause double call to udf. Clipper
-            //                      does one call for each key typed.
-            IF NextKey()==0
-               ::CallUdf( ME_IDLE )
             ENDIF
 
          ENDIF
-         
+
    ENDDO
 
 Return Self
@@ -293,31 +287,32 @@ Return Self
 //
 METHOD KeyboardHook( nKey ) CLASS TMemoEditor
 
-   Local nUdfRequest
+   Local nUdfReturn
 
    IF ::ExistUdf()
-      nUdfRequest := ::CallUdf( iif( ::lChanged, ME_UNKEYX, ME_UNKEY ) )
-      ::HandleUdf( nKey, nUdfRequest, .F. )
+      nUdfReturn := ::CallUdf( iif( ::lChanged, ME_UNKEYX, ME_UNKEY ) )
+      ::HandleUdf( nKey, nUdfReturn, .F. )
    ENDIF
 
 Return Self
 
 //-------------------------------------------------------------------//
 
-METHOD HandleUdf( nKey, nUdfRequest, lEdited ) CLASS TMemoEditor
+METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
 
 
    /* 05/08/2004 - <maurilio.longo@libero.it>
-                   A little trick to be able to handle a nUdfRequest with value of NIL
+                   A little trick to be able to handle a nUdfReturn with value of NIL
                    like it had a value of ME_DEFAULT
    */
-   DEFAULT nUdfRequest TO ME_DEFAULT
+   DEFAULT nUdfReturn TO ME_DEFAULT
    DEFAULT lEdited TO .F.
 
    // I won't reach this point during ME_INIT since ME_DEFAULT ends
    // initialization phase of MemoEdit()
    //
-   SWITCH nUdfRequest
+
+   SWITCH nUdfReturn
 
       CASE ME_DEFAULT
 
@@ -364,10 +359,11 @@ METHOD HandleUdf( nKey, nUdfRequest, lEdited ) CLASS TMemoEditor
         /* 2006/AUG/02 - E.F. - (NG) Process requested action corresponding to
          *                      key value.
          */
-        nKey := nUdfRequest
+        nKey := nUdfReturn
 
-        IF !lEdited .AND. ! ( nKey IN ::aUnHandledKeys ) .AND.;
-           nKey >=1 .AND. nKey <= 31
+        IF nKey >=1 .AND. nKey <= 31 .AND.;
+           ! ( nKey IN ::aUnHandledKeys ) 
+           
            ::Super:Edit( nKey )
         ENDIF
         exit
@@ -412,7 +408,7 @@ FUNCTION MemoEdit(cString,;
                   nTop, nLeft,;
                   nBottom, nRight,;
                   lEditMode,;
-                  cUserFunction,;
+                  xUDF,;
                   nLineLength,;
                   nTabSize,;
                   nTextBuffRow,;
@@ -458,7 +454,7 @@ FUNCTION MemoEdit(cString,;
    IF !HB_IsNil( lEditMode ) .AND. !HB_IsLogical( lEditMode )
       Throw( ErrorNew( "BASE", 0, 1127,  "<lEditMode> Argument type error" , Procname() ) )
    ENDIF
-   IF !HB_IsNil( cUserFunction ) .AND.  ( !HB_IsString( cUserFunction ) .AND. !HB_IsLogical( cUserFunction ) )
+   IF !HB_IsNil( xUDF ) .AND.  ( !HB_IsString( xUDF ) .AND. !HB_IsLogical( xUDF ) )
       Throw( ErrorNew( "BASE", 0, 1127,  "<cUserFunction> Argument type error" , Procname() ) )
    ENDIF
    IF !HB_IsNil( nLineLength ) .AND. !HB_IsNumeric( nLineLength )
@@ -490,15 +486,14 @@ FUNCTION MemoEdit(cString,;
    ENDIF
 
 
-   IF HB_IsString( cUserFunction ) .AND. Empty( cUserFunction )
-      cUserFunction := NIL
+   IF HB_IsString( xUDF ) .AND. Empty( xUDF )
+      xUDF := NIL
    ENDIF
 
    // 2006/JUL/21 - E.F. Line len is total editable columns into screen
    IF nLineLength == NIL
       nLineLength := nRight - nLeft + 1
    ENDIF
-
 
    /* 24/10/2005 - <maurilio.longo@libero.it>
                    Clipper MemoEdit() converts Tabs into spaces
@@ -513,27 +508,29 @@ FUNCTION MemoEdit(cString,;
                              nWindowRow,;
                              nWindowColumn )
 
-
    oEd:ProcName := ProcName( 1 )
    oEd:ProcLine := ProcLine( 1 )
 
-   oEd:MemoInit( cUserFunction )
+   oEd:MemoInit( xUDF )
    oEd:RefreshWindow()
 
+   oEd:Edit()
 
-   if ! HB_ISLOGICAL( cUserFunction ) .OR. cUserFunction == .T.
-      oEd:Edit()
-      if oEd:lSaved
-         cString := oEd:GetText( .T. )  // Clipper inserts Soft CR
-      endif
-   else
-      // 2006/JUL/24 - E.F. - cUserfunction in .F. only diplay memo content
-      //                      and exit, so we have to repos the cursor at
-      //                      bottom of memoedit screen after that.
+
+   IF !Hb_IsLogical( xUDF ) .OR.  xUDF == .T.
+
+      IF oEd:lSaved
+         cString := oEd:GetText( .T. )  // IF CTRL_W pressed, save text buffer content.
+      ENDIF
+
+   ELSE
+      // 2006/JUL/24 - E.F. - xUDF in .F. only diplay memo content and exit,
+      //                      so we have to repos the cursor at bottom of 
+      //                      memoedit screen after that.
       SetPos( Min(nBottom,MaxRow()),0)
-   endif
+   ENDIF
 
-RETURN cString
+RETURN ( cString )
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
