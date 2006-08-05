@@ -74,7 +74,7 @@ CLASS TMemoEditor FROM HBEditor
    METHOD  Edit()                          // Calls ::Super:Edit(nKey) but is needed to handle configurable keys
    METHOD  KeyboardHook( nKey )            // Gets called every time there is a key not handled directly by HBEditor
 
-   METHOD  ExistUdf() INLINE ( HB_IsString( ::xUserFunction ) .AND. !Empty(::xUserFunction) )
+   METHOD  ExistUdf() INLINE ( HB_IsString( ::xUserFunction ) )
    METHOD  HandleUdf( nKey, nUdfReturn )  // Handles requests returned to MemoEdit() by udf
    METHOD  CallUdf( nMode )                // Call user function. ( old xDo )
 
@@ -88,6 +88,7 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
    local nUdfReturn,i
 
    DEFAULT xUDF TO NIL
+
 
    ::aEditKeys := { K_DOWN,;
                     K_CTRL_E,;
@@ -111,6 +112,7 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
                     K_CTRL_PGDN,;
                     K_RETURN,;
                     K_ENTER,;
+                    K_CTRL_M,;
                     K_DEL,;
                     K_BS,;
                     K_TAB,;
@@ -121,6 +123,7 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
                     K_INS,;
                     K_CTRL_W,;
                     K_ESC         }
+                     
 
    ::aAsciiKeys := {}
    FOR i := 32 TO 255
@@ -129,9 +132,8 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
 
    // Save/Init object internal representation of user function
    //
-   IF HB_IsString( xUDF ) .AND. !Empty( xUDF )
-      ::xUserFunction := xUDF
-   ENDIF
+   ::xUserFunction := xUDF
+
 /*
 *  // NOTE: K_ALT_W is not compatible with clipper exit memo and save key,
 *  //       but I cannot discriminate K_CTRL_W and K_CTRL_END from harbour
@@ -155,6 +157,7 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
       // ::aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
       ::aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_U }
    #endif
+
 
 
    ::aMouseKeys := { K_LBUTTONUP, K_MWFORWARD, K_MWBACKWARD }
@@ -206,7 +209,7 @@ METHOD Edit() CLASS TMemoEditor
       ::CallUdf( ME_IDLE )
    endif
 
-   WHILE !::lExitEdit
+   WHILE !::lExitEdit 
 
          nKey := Inkey( 0 )
 
@@ -436,7 +439,7 @@ FUNCTION MemoEdit(cString,;
 
    // 2006/JUL/22 - E.F. Check argument types.
    //
-   IF !HB_IsNil( cString ) .AND. !HB_IsString( cString )
+   IF !HB_IsNil( cString ) .AND. !HB_IsString( cString ) .AND. !HB_IsMemo( cString )
       Throw( ErrorNew( "BASE", 0, 1127,  "<cString> Argument type error" , Procname() ) )
    ENDIF
    IF !HB_IsNil( nTop ) .AND. !HB_IsNumeric( nTop )
@@ -514,13 +517,13 @@ FUNCTION MemoEdit(cString,;
    oEd:MemoInit( xUDF )
    oEd:RefreshWindow()
 
-   oEd:Edit()
 
+   IF !Hb_IsLogical( xUDF )
 
-   IF !Hb_IsLogical( xUDF ) .OR.  xUDF == .T.
+      oEd:Edit()
 
       IF oEd:lSaved
-         cString := oEd:GetText( .T. )  // IF CTRL_W pressed, save text buffer content.
+         cString := oEd:GetText( .T. )  // If <CTRL-W> pressed, return memoedit text buffer.
       ENDIF
 
    ELSE

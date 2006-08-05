@@ -1541,6 +1541,10 @@ METHOD K_Tab() CLASS HBEditor
 
 METHOD K_Return() CLASS HBEditor
 
+   IF ::LastRow()==0 .AND. !::lInsert
+      Return Self
+   ENDIF
+
    IF ::lEditAllow
 
 // 2006/JUL/24 - E.F. - Fixed <Enter> at insert mode.
@@ -1565,6 +1569,10 @@ METHOD K_Return() CLASS HBEditor
 *     ENDIF
 */
       IF ::lInsert
+
+         IF ::LastRow()==0
+            ::AddLine( "", .F. )
+         ENDIF
 
          ::lChanged := .T.
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5102 2006/08/05 02:34:38 modalsist Exp $
+ * $Id: ChangeLog,v 1.5103 2006/08/05 11:58:25 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-05 11:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\teditor.prg
+    ! fixed bound error when ::LastRow() is zero and we press <Enter>
+      at insert mode.
+    ! fixed ::GetText() method to avoid bound error when ::LastRow()=0.
+  * source\rtl\memoedit.prg
+    ! fixed bug reported by Lorenzo Fiorini, userfunction = .f. wasn't
+      exiting.
+    ! fixed <cString> argument verification when it is a memo field.
 
 2006-08-05 13:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/ct/charlist.c
