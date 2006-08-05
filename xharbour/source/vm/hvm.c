@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.576 2006/07/06 21:26:56 druzus Exp $
+ * $Id: hvm.c,v 1.577 2006/07/25 21:34:12 druzus Exp $
  */
 
 /*
@@ -6612,7 +6612,7 @@ void hb_vmOperatorCallUnary( PHB_ITEM pObjItem, char * szSymbol, PHB_ITEM pResul
 static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
 {
    HB_THREAD_STUB
-   ERRCODE errCode = SUCCESS;
+   ERRCODE errCode;
    BOOL fRepeat;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSelectWorkArea(%p,%p)", pAlias, pField));

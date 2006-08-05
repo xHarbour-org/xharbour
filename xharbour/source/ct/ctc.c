@@ -1,5 +1,5 @@
 /*
- * $Id: ctc.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: ctc.c,v 1.2 2005/03/31 03:17:26 druzus Exp $
  */
 
 /*
@@ -95,10 +95,10 @@ USHORT ct_error (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                          uiOsCode, uiFlags);
 
   /* Assign the new array to the object data item. */
-  hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
+  hb_vmPushSymbol (hb_dynsymGetSymbol ("_ARGS"));
   hb_vmPush (pError);
   hb_vmPush (pArray);
-  hb_vmDo (1);
+  hb_vmSend (1);
 
   /* Release the Array. */
   if (bRelease)
@@ -151,10 +151,10 @@ PHB_ITEM ct_error_subst (USHORT uiSeverity, ULONG ulGenCode, ULONG ulSubCode,
                                uiOsCode, uiFlags);
 
   /* Assign the new array to the object data item. */
-  hb_vmPushSymbol (hb_dynsymGet ("_ARGS")->pSymbol);
+  hb_vmPushSymbol (hb_dynsymGetSymbol ("_ARGS"));
   hb_vmPush (pError);
   hb_vmPush (pArray);
-  hb_vmDo (1);
+  hb_vmSend (1);
 
   /* Release the Array. */
   hb_itemRelease (pArray);

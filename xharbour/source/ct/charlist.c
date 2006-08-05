@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: charlist.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -170,18 +170,13 @@ static void do_list (int iSwitch)
 
       case DO_LIST_CHARHIST:
       {
-        HB_ITEM Array, Count;
-
-        Array.type = HB_IT_NIL;
-        Count.type = HB_IT_NIL;
-
-        hb_arrayNew ( &Array, 256);
+        PHB_ITEM pArray = hb_itemArrayNew( 256 );
 
         for (sCnt = 0; sCnt < 256; sCnt++)
         {
-          hb_arraySetForward( &Array, sCnt+1, hb_itemPutNL (&Count, asCharCnt[sCnt]));
+          hb_itemPutNL( hb_arrayGetItemPtr( pArray, sCnt+1 ), asCharCnt[sCnt] );
         }
-        hb_itemReturnForward (&Array);
+        hb_itemRelease( hb_itemReturn( pArray ) );
       }; break;
 
     }

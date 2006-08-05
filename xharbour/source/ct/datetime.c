@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.c,v 1.2 2005/05/24 21:19:38 lculik Exp $
+ * $Id: datetime.c,v 1.3 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -71,13 +71,13 @@
 
 HB_FUNC( BOM )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       hb_retd( iYear, iMonth, 1);
    }
    else
@@ -88,20 +88,20 @@ HB_FUNC( BOM )
 
 HB_FUNC( EOM )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       iMonth ++;
       if( iMonth > 12)
       {
          iMonth = 1;
          iYear ++;
       }
-      hb_retdl( hb_dateEncode( iYear, iMonth, 1) - 1);
+      hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1);
    }
    else
    {
@@ -111,16 +111,16 @@ HB_FUNC( EOM )
 
 HB_FUNC( BOQ )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-      while ( (iMonth-1) % 3 ) iMonth --;
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      iMonth -= ( iMonth - 1 ) % 3;
 
-      hb_retd( iYear, iMonth, 1);
+      hb_retd( iYear, iMonth, 1 );
    }
    else
    {
@@ -130,21 +130,20 @@ HB_FUNC( BOQ )
 
 HB_FUNC( EOQ )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-      while ( iMonth % 3 ) iMonth ++;
-      iMonth ++;
-      if( iMonth > 12)
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      iMonth += 3 - ( ( iMonth - 1 ) % 3 );
+      if( iMonth > 12 )
       {
          iMonth = 1;
          iYear ++;
       }
-      hb_retdl( hb_dateEncode( iYear, iMonth, 1) - 1);
+      hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1 );
    }
    else
    {
@@ -154,14 +153,14 @@ HB_FUNC( EOQ )
 
 HB_FUNC( BOY )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-      hb_retd( iYear, 1, 1);
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      hb_retd( iYear, 1, 1 );
    }
    else
    {
@@ -171,14 +170,14 @@ HB_FUNC( BOY )
 
 HB_FUNC( EOY )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate && pDate->item.asDate.value)
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( pDate->item.asDate.value, &iYear, &iMonth, &iDay );
-      hb_retdl( hb_dateEncode( iYear + 1, 1, 1) - 1);
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+      hb_retdl( hb_dateEncode( iYear + 1, 1, 1 ) - 1 );
    }
    else
    {
@@ -202,13 +201,13 @@ static int hb_wom( int iYear, int iMonth, int iDay )
 
 HB_FUNC( WOM )
 {
-   PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+   LONG lDate = hb_pardl( 1 );
 
-   if( pDate )
+   if( lDate != 0 )
    {
       int iYear, iMonth, iDay;
 
-      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       hb_retni( hb_wom( iYear, iMonth, iDay ) );
    }
    else

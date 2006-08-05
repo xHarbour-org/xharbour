@@ -1,5 +1,5 @@
 /*
- * $Id: dbftools.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: dbftools.c,v 1.2 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -60,39 +60,45 @@ HB_FUNC_EXTERN( FIELDDEC );
 
 HB_FUNC( FIELDSIZE )
 {
-   HB_FUNCNAME( FIELDLEN )();
+   HB_FUNC_EXEC( FIELDLEN );
 }
 
 HB_FUNC( FIELDDECI )
 {
-   HB_FUNCNAME( FIELDDEC )();
+   HB_FUNC_EXEC( FIELDDEC );
 }
 
 HB_FUNC( FIELDNUM )
 {
-   HB_FUNCNAME( FIELDPOS )();
+   HB_FUNC_EXEC( FIELDPOS );
 }
 
 HB_FUNC( DBFSIZE )
 {
-   ULONG ulSize = 0;
+   HB_LONG llSize = 0;
    AREAP pArea;
 
    if( (pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer()) != NULL )
    {
-      HB_ITEM pSize ;
+      PHB_ITEM pSize = hb_itemNew( NULL );
       ULONG ulRecSize, ulRecCount;
 
-      pSize.type = HB_IT_NIL;
-      SELF_INFO( pArea, DBI_GETHEADERSIZE, &pSize );
-      ulSize = hb_itemGetNL( &pSize ) + 1;
-      SELF_INFO( pArea, DBI_GETRECSIZE, &pSize );
-      ulRecSize = hb_itemGetNL( &pSize );
-      SELF_RECCOUNT( pArea, &ulRecCount );
-      ulSize += ulRecCount * ulRecSize;
+      if( SELF_INFO( pArea, DBI_GETHEADERSIZE, pSize ) == SUCCESS )
+      {
+         llSize = hb_itemGetNL( pSize ) + 1;
+         if( SELF_INFO( pArea, DBI_GETRECSIZE, pSize ) == SUCCESS )
+         {
+            ulRecSize = hb_itemGetNL( pSize );
+            if( SELF_RECCOUNT( pArea, &ulRecCount ) == SUCCESS )
+            {
+               llSize += ( HB_LONG ) ulRecCount * ulRecSize;
+            }
+         }
+      }
+      hb_itemRelease( pSize );
    }
 
-   hb_retnl( ulSize );
+   hb_retnint( llSize );
 }
 
 /*

@@ -1,5 +1,5 @@
 /*
- *  $Id: misc2.c,v 1.1 2005/12/19 23:22:46 psarenko Exp $
+ *  $Id: misc2.c,v 1.1 2005/12/19 19:13:51 ptsarenko Exp $
  */
 
 /*
@@ -63,21 +63,21 @@ HB_FUNC( COMPLEMENT )
    {
       if( HB_IS_STRING( pItem ) )
       {
-         ULONG ulLen = pItem->item.asString.length, ulPos;
+         ULONG ulLen = hb_itemGetCLen( pItem ), ulPos;
 
          if( ulLen > 0 )
          {
-            char * szBuffer = hb_strndup( pItem->item.asString.value, ulLen );
-            for (ulPos = 0; ulPos < ulLen; ulPos++)
-               szBuffer[ulPos] = ~szBuffer[ulPos];
-            hb_retclen( szBuffer, ulLen );
-            hb_xfree( szBuffer );
+            char * szBuffer = hb_xgrab( ulLen + 1 ),
+                 * szSrc = hb_itemGetCPtr( pItem );
+            for( ulPos = 0; ulPos < ulLen; ulPos++ )
+               szBuffer[ ulPos ] = ~szSrc[ulPos];
+            hb_retclen_buffer( szBuffer, ulLen );
          }
          else
-            hb_retc( "" );
+            hb_retc( NULL );
       }
       else if( HB_IS_DATE( pItem ) )
-         hb_retdl( 4537847 - pItem->item.asDate.value );
+         hb_retdl( 4537847 - hb_itemGetDL( pItem ) );
       else if( HB_IS_NUMERIC( pItem ) )
          hb_retnd( -1 * hb_itemGetND( pItem ) );
       else if( HB_IS_LOGICAL( pItem ) )

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.162 2006/06/27 21:26:04 druzus Exp $
+ * $Id: dbfntx1.c,v 1.163 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -5323,14 +5323,16 @@ static ERRCODE hb_ntxTagCreate( LPTAGINFO pTag, BOOL fReindex )
       {
          if( fDirectRead )
          {
+            if( ulRecNo > ulRecCount )
+               break;
             if( iRecBuff == 0 || iRecBuff >= iRecBufSize )
             {
-               if( ulRecNo > ulRecCount )
-                  break;
-               if( ulRecCount - ulRecNo >= (ULONG) iRecBufSize )
+               if( ulRecCount - ulRecNo >= ( ULONG ) iRecBufSize )
                   iRec = iRecBufSize;
                else
                   iRec = ulRecCount - ulRecNo + 1;
+               if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
+                  iRec = ( int ) ulNextCount;
                hb_fsSeekLarge( pArea->hDataFile,
                                ( HB_FOFFSET ) pArea->uiHeaderLen +
                                ( HB_FOFFSET ) ( ulRecNo - 1 ) *

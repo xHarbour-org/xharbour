@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.5 2005/01/18 00:39:18 modalsist Exp $
+ * $Id: diskutil.prg,v 1.6 2005/01/19 10:36:59 likewolf Exp $
  */
 /*
  * xHarbour Project source code.
@@ -447,7 +447,7 @@ endif
 if lRet
 
    for i := 1 to Len(cName)
-       if SubStr(cName,i,1) IN cInvalid
+       if SubStr(cName,i,1) $ cInvalid
           lRet := .F.
           exit
        endif
@@ -455,7 +455,7 @@ if lRet
 
    if lRet .and. !empty(cExt)
       for i := 1 to Len(cExt)
-          if SubStr(cExt,i,1) IN cInvalid
+          if SubStr(cExt,i,1) $ cInvalid
              lRet := .F.
              exit
           endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5101 2006/08/03 00:27:14 modalsist Exp $
+ * $Id: ChangeLog,v 1.5102 2006/08/05 02:34:38 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-05 13:42 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/ct/charlist.c
+  * xharbour/source/ct/ctc.c
+  * xharbour/source/ct/datetime.c
+  * xharbour/source/ct/dbftools.c
+  * xharbour/source/ct/diskutil.prg
+  * xharbour/source/ct/misc2.c
+    * code cleanup
+
+  * xharbour/source/odbc/odbc.c
+    * code cleanup
+    * disabled SQLBINDOUTPARAM() - until it will be rewritten in
+      differ way. Now this function can corrupt HVM memory
+
+  * xharbour/source/vm/hvm.c
+    * clean BCC warning
+
+  * harbour/source/rdd/dbfcdx/dbfcdx1.c
+  * harbour/source/rdd/dbfntx/dbfntx1.c
+    ! fixed typo in my last commit - additional dummy evaluations of
+      EVAL block
 
 2006-08-04 23:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\teditor.prg
