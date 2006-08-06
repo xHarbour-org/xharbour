@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.74 2006/08/03 00:27:14 modalsist Exp $
+/* $Id: teditor.prg,v 1.76 2006/08/05 15:05:52 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.74 2006/08/03 00:27:14 modalsist Exp $
+/* $Id: teditor.prg,v 1.76 2006/08/05 15:05:52 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -734,8 +734,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
 
             case K_ALT_W
-               exit
-
             case K_CTRL_W
                ::lSaved := .T.
                ::lExitEdit := .T.
@@ -1371,7 +1369,7 @@ METHOD K_Bs() CLASS HBEditor
             ::RemoveLine( ::nRow + 1 )
 
             // resplit the line.
-            IF ::LineLen( ::nRow ) >= ::nWordWrapCol
+            IF ::LineLen( ::nRow ) > ::nWordWrapCol
                // will also refresh
                ::SplitLine( ::nRow )
             ENDIF
@@ -1607,7 +1605,7 @@ RETURN Self
 //-------------------------------------------------------------------//
 
 METHOD K_Esc() CLASS HBEditor
-   LOCAL cScreenMsg, nCurRow, nCurCol, nCursor
+   LOCAL cScreenMsg, nCurRow, nCurCol, nCursor,nKey
 
    // Added message "Abort Edit? Y/N" like Clipper.
    //
@@ -1615,30 +1613,22 @@ METHOD K_Esc() CLASS HBEditor
    //::lExitEdit := .T.
    ::lExitEdit := .F.
 
-   if ::lChanged .and. ::lEditAllow
-      if set( _SET_SCOREBOARD )
-         nCurCol    := ::Col()
-         nCurRow    := ::Row()
-         cScreenMsg := SaveScreen( 0,60,0,77 )
-         nCursor := SetCursor( SC_NORMAL )
-         @ 0,60 say '(Abort Edit? Y/N)'
-         inkey( 0 )
-         RestScreen( 0, 60, 0, 77, cScreenMsg )
-         SetCursor(nCursor)
-         SetPos( nCurRow,nCurCol )
+   if ::lEditAllow .AND. ::lChanged .AND. Set( _SET_SCOREBOARD )
+      nCurCol    := ::Col()
+      nCurRow    := ::Row()
+      cScreenMsg := SaveScreen( 0,60,0,77 )
+      nCursor := SetCursor( SC_NORMAL )
+      @ 0,60 say '(Abort Edit? Y/N)'
+      nKey := inkey( 0 )
+      inkey()
+      RestScreen( 0, 60, 0, 77, cScreenMsg )
+      SetCursor(nCursor)
+      SetPos( nCurRow,nCurCol )
 
-         // 2006/JUL/21 - E.F - Allow exit only on "Y".
-         //
-         //if lastkey() == asc( "n" ) .or. lastkey() == asc( "N" )
-         if lastkey() == asc( "y" ) .or. lastkey() == asc( "Y" )
-            ::lExitEdit := .T.
-         endif
-      else
-         ::lExitEdit := .T.
-      endif
+      // 2006/JUL/21 - E.F - Allow exit only on "Y".
+      //
+      ::lExitEdit := ( Upper( Chr(nKey) ) == "Y" ) 
    else
-      // 2006/JUL/22 - E.F - IF not changed nothing, exit.
-      ::lChanged := .F.
       ::lExitEdit := .T.
    endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.39 2006/08/02 13:50:46 modalsist Exp $
+ * $Id: memoedit.prg,v 1.41 2006/08/05 15:05:52 modalsist Exp $
  */
 
 /*
@@ -173,7 +173,7 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
                             K_F9,;
                             K_F10,;
                             K_F11,;
-                            K_F12 }
+                            K_F12  }
 
 
    if ::ExistUdf()
@@ -199,7 +199,7 @@ Return Self
 
 METHOD Edit() CLASS TMemoEditor
 
-   Local nKey, nUdfReturn, lIdle
+   Local nKey, nUdfReturn, lJump
    
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
@@ -209,10 +209,12 @@ METHOD Edit() CLASS TMemoEditor
       ::CallUdf( ME_IDLE )
    endif
 
+   lJump := .f.
+
    WHILE !::lExitEdit 
 
          nKey := Inkey( 0 )
-
+         
          if ( ::bKeyBlock := Setkey( nKey ) ) <> NIL
 
             Eval( ::bKeyBlock, ::ProcName, ::ProcLine, ReadVar() )
@@ -220,10 +222,12 @@ METHOD Edit() CLASS TMemoEditor
             // 2006/JUL/29 - E.F. - After set key is called, I need trap
             //                      nextkey, if any.
             if NextKey() != 0
-               inkey()
+               nKey := NextKey()
+               //inkey()
+               lJump := .t.
             endif
 
-            // 2006/JUL/29 - E.F.- The execution should be continue to allow
+            // 2006/JUL/29 - E.F.- The execution should to continue to 
             //                     memoedit process the nKey.
             // Loop
 
@@ -261,12 +265,12 @@ METHOD Edit() CLASS TMemoEditor
             ENDIF
          ENDIF
 
-         IF ::ExistUdf()
+         IF ::ExistUdf() .AND. !lJump
 
             IF !(nKey IN ::aConfigurableKeys) .AND. !(nKey IN ::aUnhandledKeys) .AND.;
                ((nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys) )
 
-               IF NextKey()==0
+               IF NextKey()==0 .AND. !( nKey IN { K_CTRL_W, K_ESC } )
                   nUdfReturn := ::CallUdf( ME_IDLE )
                ELSE
                   nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
@@ -278,7 +282,10 @@ METHOD Edit() CLASS TMemoEditor
 
          ENDIF
 
+         lJump := .f.
+
    ENDDO
+
 
 Return Self
 
@@ -511,25 +518,27 @@ FUNCTION MemoEdit(cString,;
                              nWindowRow,;
                              nWindowColumn )
 
+
    oEd:ProcName := ProcName( 1 )
-   oEd:ProcLine := ProcLine( 1 )
+   oEd:ProcLine := ProcLine( 1 )   
 
    oEd:MemoInit( xUDF )
    oEd:RefreshWindow()
 
-
-   IF !Hb_IsLogical( xUDF )
+   // 2006/AUG/06 - E.F. Clipper's  <cUserFunction> in .T. or. F. is samething.
+   //
+   IF !Hb_IsLogical( xUDF ) //.OR. cUserFunction == .T.
 
       oEd:Edit()
 
       IF oEd:lSaved
-         cString := oEd:GetText( .T. )  // If <CTRL-W> pressed, return memoedit text buffer.
+         cString := oEd:GetText( .T. )  // Clipper inserts Soft CR 
       ENDIF
 
    ELSE
-      // 2006/JUL/24 - E.F. - xUDF in .F. only diplay memo content and exit,
-      //                      so we have to repos the cursor at bottom of 
-      //                      memoedit screen after that.
+      // 2006/JUL/24 - E.F. - If xUDF is in .F. or .T. cause diplay memo content and exit,
+      //                      so we have to repos the cursor at bottom of memoedit
+      //                      screen after that.
       SetPos( Min(nBottom,MaxRow()),0)
    ENDIF
 
