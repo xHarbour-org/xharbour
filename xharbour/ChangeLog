@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5106 2006/08/05 20:15:16 modalsist Exp $
+ * $Id: ChangeLog,v 1.5107 2006/08/06 22:34:30 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-07 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbdefs.h
+    * use extern "C" as default for HB_FUNC() declaration in C++ mode.
+      I know that this modification will interact with binary compatibility
+      but current state is worser because we were not binary compatible
+      between C and C++ mode. Now the problem should go away with some
+      reasonable for me cost. If compiler uses the same ABI for C and C++
+      mode then the backward binary compatibility problem can be resolved
+      by small tools which can strip C++ decoration from binary libraries.
+      Sometimes also linkers have necessary switches to ignore them.
+      People who use MSVC with older FWH binaries can also build xHarbour
+      with -DHB_FUNC_USE_DECORATION to keep old HB_FUNC() declaration.
+      This modification should not effect XLINK and other linkers which
+      can ignore C++ decorations
+
+  * xharbour/include/usrrdd.ch
+   ! fixed RDD method order
 
 2006-08-06 19:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\teditor.prg
