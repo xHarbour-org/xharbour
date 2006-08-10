@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id: pos2.c,v 1.3 2006/07/04 00:50:00 ronpinkas Exp $
  */
 
 /*
@@ -104,7 +104,7 @@ HB_FUNC (POSCHAR)
       {
         hb_storclen (pcRet, sStrLen, 1);
       }
-      
+
       if (iNoRet)
       {
         hb_ret();
@@ -127,7 +127,7 @@ HB_FUNC (POSCHAR)
                                  NULL, "POSCHAR", 0, EF_CANSUBSTITUTE, 3,
                                  hb_paramError (1), hb_paramError (2), hb_paramError (3));
       }
-    
+
       if (pSubst != NULL)
       {
         hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -155,7 +155,7 @@ HB_FUNC (POSCHAR)
                                NULL, "POSCHAR", 0, EF_CANSUBSTITUTE, 3,
                                hb_paramError (1), hb_paramError (2), hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -175,9 +175,9 @@ HB_FUNC (POSCHAR)
 
 HB_FUNC( POSDEL )
 {
-  
+
   if( ISCHAR(1) )
-  {  
+  {
 
     char *pcString = hb_parc (1);
     size_t sStrLen = hb_parclen (1);
@@ -206,26 +206,28 @@ HB_FUNC( POSDEL )
     {
       sStartPos = sStrLen - sDelLen + 1;
     }
-    
+
     if( sStrLen - sDelLen <= 0 )
     {
 		hb_retclen( "", 0 );
 		return;
     }
 
-    pcRet = (char *) hb_xgrab( sStrLen - sDelLen );
+    pcRet = (char *) hb_xgrab( sStrLen - sDelLen + 1 );
 
     /* copy first part */
     if( sStartPos > 1 )
     {
       hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
     }
-    
+
     /* copy second part */
     if( sStrLen > ( sStartPos - 1 + sDelLen ) )
     {
       hb_xmemcpy( pcRet + sStartPos - 1, pcString + sStartPos - 1 + sDelLen, sStrLen - ( sStartPos - 1 + sDelLen ) );
     }
+
+	pcRet[ sStrLen - sDelLen ] = '\0';
 
     hb_retclenAdopt( pcRet, sStrLen - sDelLen );
   }
@@ -239,7 +241,7 @@ HB_FUNC( POSDEL )
                                NULL, "POSDEL", 0, EF_CANSUBSTITUTE, 3,
                                hb_paramError (1), hb_paramError (2), hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -255,26 +257,25 @@ HB_FUNC( POSDEL )
 
 HB_FUNC (POSINS)
 {
-  
+
   if (ISCHAR (1))
   {
-
     char *pcString = hb_parc (1);
     size_t sStrLen = hb_parclen (1);
     char *pcInsert;
     size_t sInsLen;
 
-    if ((sInsLen = hb_parclen (2)) > 0)
+    if( ( sInsLen = hb_parclen (2)) > 0 )
     {
-      
       size_t sStartPos;
       char *pcRet;
 
       pcInsert = hb_parc (2);
-      
+
       if (ISNUM (3))
       {
         sStartPos = hb_parnl (3);
+
         if (sStartPos == 0)
         {
           sStartPos = sStrLen;
@@ -289,6 +290,7 @@ HB_FUNC (POSINS)
       if (sStartPos > sStrLen+1)
       {
         int iArgErrorMode = ct_getargerrormode();
+
         if (iArgErrorMode != CT_ARGERR_IGNORE)
         {
           ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_POSINS,
@@ -301,31 +303,30 @@ HB_FUNC (POSINS)
         return;
       }
 
-      pcRet = ( char * )hb_xgrab (sStrLen+sInsLen);
+      pcRet = (char *) hb_xgrab( sStrLen + sInsLen + 1 );
 
       /* copy first part */
       if (sStartPos > 1)
       {
         hb_xmemcpy (pcRet, pcString, sStartPos-1);
       }
-    
+
       /* insert string */
       hb_xmemcpy (pcRet+sStartPos-1, pcInsert, sInsLen);
 
       /* copy second part */
-      if (sStrLen > (sStartPos-1))
+      if( sStrLen > (sStartPos-1) )
       {
-        hb_xmemcpy (pcRet+sStartPos-1+sInsLen, pcString+sStartPos-1,
-                    sStrLen-(sStartPos-1));
+        hb_xmemcpy( pcRet + sStartPos - 1 + sInsLen, pcString+sStartPos-1, sStrLen - ( sStartPos - 1 ) );
       }
 
-      hb_retclen (pcRet, sStrLen+sInsLen);
-      hb_xfree (pcRet);
+	  pcRet[ sStrLen + sInsLen ] = '\0';
 
+      hb_retclenAdopt( pcRet, sStrLen + sInsLen );
     }
     else   /* hb_parclen (2) > 0 */
     {
-      hb_retclen (pcString, sStrLen);
+      hb_retclen( pcString, sStrLen );
     }
 
   }
@@ -339,7 +340,7 @@ HB_FUNC (POSINS)
                                NULL, "POSINS", 0, EF_CANSUBSTITUTE, 3,
                                hb_paramError (1), hb_paramError (2), hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -349,10 +350,7 @@ HB_FUNC (POSINS)
       hb_retc ("");
     }
   }
-
 }
-
-  
 
 HB_FUNC (POSREPL)
 {
@@ -371,13 +369,13 @@ HB_FUNC (POSREPL)
 
     if ((sReplLen = hb_parclen (2)) > 0)
     {
-      
+
       size_t sStartPos;
       char *pcRet;
       size_t sRetLen;
 
       pcReplace = hb_parc (2);
-      
+
       if (ISNUM (3))
       {
         sStartPos = hb_parnl (3);
@@ -445,7 +443,7 @@ HB_FUNC (POSREPL)
       {
         hb_xmemcpy (pcRet, pcString, sStartPos-1);
       }
-    
+
       /* insert replacement string */
       hb_xmemcpy (pcRet+sStartPos-1, pcReplace, sReplLen);
 
@@ -483,7 +481,7 @@ HB_FUNC (POSREPL)
                                  NULL, "POSREPL", 0, EF_CANSUBSTITUTE, 3,
                                  hb_paramError (1), hb_paramError (2), hb_paramError (3));
       }
-    
+
       if (pSubst != NULL)
       {
         hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -512,7 +510,7 @@ HB_FUNC (POSREPL)
                                NULL, "POSREPL", 0, EF_CANSUBSTITUTE, 3,
                                hb_paramError (1), hb_paramError (2), hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

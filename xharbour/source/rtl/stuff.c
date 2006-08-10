@@ -1,5 +1,5 @@
 /*
- * $Id: stuff.c,v 1.3 2002/01/03 03:53:45 ronpinkas Exp $
+ * $Id: stuff.c,v 1.4 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -67,23 +67,41 @@ HB_FUNC( STUFF )
       ULONG ulTotalLen;
 
       if( ulPos > 0 )
+	  {
          ulPos--;
+	  }
 
       if( ulPos > ulText )
+	  {
          ulPos = ulText;
+	  }
 
       if( ulDel > ulText - ulPos )
+	  {
          ulDel = ulText - ulPos;
+	  }
 
       if( ( ulTotalLen = ulText + ulInsert - ulDel ) > 0 )
       {
          char * szResult = ( char * ) hb_xgrab( ulTotalLen + 1 );
 
-         hb_xmemcpy( szResult, szText, ulPos );
-         hb_xmemcpy( szResult + ulPos, hb_parcx( 4 ), ulInsert );
-         hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, ulText - ( ulPos + ulDel ) );
+		 if( ulPos )
+		 {
+            hb_xmemcpy( szResult, szText, ulPos );
+		 }
+
+		 if( ulInsert )
+		 {
+            hb_xmemcpy( szResult + ulPos, hb_parcx( 4 ), ulInsert );
+		 }
+
+		 if( ulText - ( ulPos + ulDel ) )
+		 {
+            hb_xmemcpy( szResult + ulPos + ulInsert, szText + ulPos + ulDel, ulText - ( ulPos + ulDel ) );
+		 }
 
          szResult[ ulTotalLen ] = '\0';
+
          hb_retclenAdopt( szResult, ulTotalLen );
       }
       else
