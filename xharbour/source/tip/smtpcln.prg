@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: smtpcln.prg,v 1.2 2005/04/30 15:14:29 lculik Exp $
  */
 
 /*
@@ -215,7 +215,8 @@ METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
 Local aTo,cRecpt
    IF .not. ::bInitialized
-      IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
+      //IF Empty( ::oUrl:cUserid ) .or. Empty( ::oUrl:cFile )
+      IF Empty( ::oUrl:cFile )  //GD user id not needed if we did not auth
          RETURN -1
       ENDIF
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: mail.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -90,6 +90,7 @@ CLASS TipMail
    METHOD MakeBoundary()
 HIDDEN:
    DATA cBody
+   Data lBodyEncoded init .f.
    DATA oEncoder
    DATA aAttachments
    DATA nAttachPos   INIT 1
@@ -139,10 +140,11 @@ RETURN .T.
 METHOD SetBody( cBody ) CLASS TipMail
    IF ::oEncoder != NIL
       ::cBody := ::oEncoder:Encode( cBody )
+      ::lBodyEncoded:=.t.  //GD needed to prevent an extra crlf from being appended
    ELSE
       ::cBody := cBody
    ENDIF
-   ::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )
+   //::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )  //GD -not needed
 RETURN .T.
 
 
@@ -273,7 +275,6 @@ METHOD ToString() CLASS TipMail
    LOCAL cBoundary, cElem, i
    LOCAL oSubPart
    LOCAL cRet := ""
-
    // this is a multipart message; we need a boundary
     IF Len( ::aAttachments ) > 0
       ::hHeaders["Mime-Version"] :="1.0"
@@ -338,14 +339,25 @@ METHOD ToString() CLASS TipMail
 
    //Body
    IF .not. Empty( ::cBody )
-      cRet += ::cBody + e"\r\n"
+      IF empty(::aAttachments)
+         //cRet += ::cBody +if(lAttachment,'', e"\r\n")
+         cRet += ::cBody + if(::lBodyEncoded,'', e"\r\n")
+      else
+         //GD - if there are attachements the body of the message has to be treated as an attachment.
+         cRet += "--" + cBoundary + e"\r\n"
+         cRet+= "Content-Type: text/plain; charset=ISO-8859-1; format=flowed"+ e"\r\n"
+         cRet+= "Content-Transfer-Encoding: 7bit"+ e"\r\n"
+         cRet+= "Content-Disposition: inline"+ e"\r\n"+ e"\r\n"
+         cRet += ::cBody+ e"\r\n"
+      ENDIF 
+      
    ENDIF
 
    IF .not. Empty( ::aAttachments )
       //Eventually go with mime multipart
       FOR i := 1 TO Len(::aAttachments )
          cRet += "--" + cBoundary + e"\r\n"
-         cRet += ::aAttachments[i]:ToString() + e"\r\n"
+         cRet += ::aAttachments[i]:ToString()   
       NEXT
       cRet += "--" + cBoundary + "--" + e"\r\n"
    ENDIF

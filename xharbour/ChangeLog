@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5111 2006/08/10 04:28:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5112 2006/08/10 12:07:56 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-10 10:53 UTC-0400 Gerald Drouillard (gerald@drouillard.ca)
+  * xharbour/source/tip/mail.prg
+    !  :setbody()
+      - removed ::hHeaders[ "Content-Length" ] := Ltrim( Str( Len( cBody ) ) )  //seemed to be a workaround for not using the "boundry" correctly
+      + added ::lBodyEncoded:=.t. to prevent an extra crlf being appended
+    !  :tostring()
+       - fixed: message body has to be encoded when there are attachments.
+       - fixed: attachments getting an extra crlf before the boundry
+  * xharbour/source/tip/SMTPCLN.prg
+    ! fixed :write() - no need to check for ::oUrl:cUserId as a prereq. as we may not have an Auth connection.
 
 2006-08-10 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrdddel.h
