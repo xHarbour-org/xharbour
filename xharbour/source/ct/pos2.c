@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.3 2006/07/04 00:50:00 ronpinkas Exp $
+ * $Id: pos2.c,v 1.4 2006/08/10 04:18:08 ronpinkas Exp $
  */
 
 /*
@@ -96,13 +96,14 @@ HB_FUNC (POSCHAR)
         sPosition = sStrLen;
       }
 
-      pcRet = ( char * )hb_xgrab (sStrLen);
-      hb_xmemcpy (pcRet, pcString, sStrLen);
+      pcRet = ( char * )hb_xgrab( sStrLen + 1 );
+      hb_xmemcpy( pcRet, pcString, sStrLen);
       *(pcRet+sPosition-1) = cReplace;
+	  pcRet[sStrLen] = '\0';
 
       if (ISBYREF (1))
       {
-        hb_storclen (pcRet, sStrLen, 1);
+        hb_storclen( pcRet, sStrLen, 1);
       }
 
       if (iNoRet)
@@ -407,6 +408,7 @@ HB_FUNC (POSREPL)
       if (sStartPos > sStrLen+1)
       {
         int iArgErrorMode = ct_getargerrormode();
+
         if (iArgErrorMode != CT_ARGERR_IGNORE)
         {
           ct_error ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_POSREPL,
@@ -436,31 +438,32 @@ HB_FUNC (POSREPL)
         sRetLen = sStartPos+sReplLen-1;
       }
 
-      pcRet = ( char * )hb_xgrab (sRetLen);
+      pcRet = (char *) hb_xgrab( sRetLen + 1 );
 
       /* copy first part */
       if (sStartPos > 1)
       {
-        hb_xmemcpy (pcRet, pcString, sStartPos-1);
+        hb_xmemcpy( pcRet, pcString, sStartPos - 1 );
       }
 
       /* insert replacement string */
-      hb_xmemcpy (pcRet+sStartPos-1, pcReplace, sReplLen);
+      hb_xmemcpy( pcRet + sStartPos - 1, pcReplace, sReplLen );
 
       /* copy second part */
-      if (sStrLen > (sStartPos-1+sReplLen))
+      if(sStrLen > ( sStartPos - 1 + sReplLen ) )
       {
-        hb_xmemcpy (pcRet+sStartPos-1+sReplLen, pcString+sStartPos-1+sReplLen,
-                    sStrLen-(sStartPos-1+sReplLen));
+        hb_xmemcpy( pcRet + sStartPos - 1 + sReplLen, pcString + sStartPos - 1 + sReplLen, sStrLen - ( sStartPos - 1 + sReplLen ) );
       }
 
-      if (iNoRet)
+	  pcRet[sRetLen] = '\0';
+
+      if( iNoRet )
       {
         hb_ret();
       }
       else
       {
-        hb_retclen (pcRet, sRetLen);
+        hb_retclen( pcRet, sRetLen );
       }
 
       if (ISBYREF (1))
@@ -468,8 +471,7 @@ HB_FUNC (POSREPL)
         hb_storclen (pcRet, sRetLen, 1);
       }
 
-      hb_xfree (pcRet);
-
+      hb_xfree( pcRet );
     }
     else   /* hb_parclen (2) > 0 */
     {
