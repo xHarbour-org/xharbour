@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5107 2006/08/06 22:34:30 modalsist Exp $
+ * $Id: ChangeLog,v 1.5108 2006/08/07 10:31:14 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-09 21:25 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/classes.c
+    ! Fixed (missing) counter decrement from my previous commit.
 
 2006-08-07 12:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbdefs.h
