@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.200 2006/07/21 00:56:40 druzus Exp $
+ * $Id: dbcmd.c,v 1.201 2006/07/25 21:34:12 druzus Exp $
  */
 
 /*
@@ -4618,7 +4618,7 @@ HB_FUNC( __DBAPP )
                ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
                hb_param( 7, HB_IT_LOGICAL ),     /* Rest */
                hb_parc( 10 ),                    /* Codepage */
-               hb_param( 11, HB_IT_STRING ) ) ); /* Delimiter */
+               hb_param( 11, HB_IT_ANY ) ) );    /* Delimiter */
       }
       else
       {
@@ -4652,7 +4652,7 @@ HB_FUNC( __DBCOPY )
                ISNIL( 6 ) ? NULL : hb_param( 6, HB_IT_ANY ),   /* RecID */
                hb_param( 7, HB_IT_LOGICAL ),     /* Rest */
                hb_parc( 10 ),                    /* Codepage */
-               hb_param( 11, HB_IT_STRING ) ) ); /* Delimiter */
+               hb_param( 11, HB_IT_ANY ) ) );    /* Delimiter */
       }
       else
       {

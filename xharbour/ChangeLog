@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5110 2006/08/10 04:18:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5111 2006/08/10 04:28:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-10 14:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrdddel.h
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/dbcmd.c
+    + extended COPY TO ... DELIMITED ... / APPEND FROM ... DELIMITED ...
+      to support some other common formats.
+          COPY TO ... DELIMITED WITH TAB
+          APPEND FROM ... DELIMITED WITH TAB
+      uses chr(9) as field separator and without string delimiters
+          COPY TO ... DELIMITED WITH PIPE
+          APPEND FROM ... DELIMITED WITH PIPE
+      uses '|' as field separator and without string delimiters
+          COPY TO ... DELIMITED WITH ( { cStrDelim, cFldSeparator } )
+          APPEND FROM ... DELIMITED WITH ( { cStrDelim, cFldSeparator } )
+      allows users to set and any character field delimiters and fields
+      separators
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+    * cleaned some BCC warnings
 
 2006-08-10 00:28 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/ct/pos2.c

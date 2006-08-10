@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.163 2006/07/21 00:56:40 druzus Exp $
+ * $Id: dbfntx1.c,v 1.164 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -2970,7 +2970,7 @@ static BOOL hb_ntxTagKeyAdd( LPTAGINFO pTag, LPKEYINFO pKey )
                   }
                   uiBaseKey = pFirst->uiKeys + iKey + 1;
                }
-               if( pFirst->uiKeys + pLast->uiKeys <= ( pTag->MaxKeys - 1 ) << 1 )
+               if( ( pFirst->uiKeys + pLast->uiKeys ) <= ( ( pTag->MaxKeys - 1 ) << 1 ) )
                {
                   hb_ntxBalancePages( pTag, pBasePage, uiFirst, pFirst, pLast );
                   if( pFirst->uiKeys >= uiBaseKey )
