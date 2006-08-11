@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.195 2006/06/28 16:54:47 druzus Exp $
+ * $Id: hbapi.h,v 1.196 2006/07/21 20:41:25 map Exp $
  */
 
 /*
@@ -312,6 +312,8 @@ extern HB_EXPORT HB_ITEM_PTR hb_gcGripGet( HB_ITEM_PTR pItem );
 extern HB_EXPORT void   hb_gcGripDrop( HB_ITEM_PTR pItem );
 
 extern HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pFunc ); /* allocates a memory controlled by the garbage collector */
+extern HB_EXPORT ULONG hb_gcIncRef( void *pBlock );
+extern HB_EXPORT ULONG hb_gcDecRef( void *pBlock );
 extern HB_EXPORT void   hb_gcFree( void *pAlloc ); /* deallocates a memory allocated by the garbage collector */
 extern HB_EXPORT void * hb_gcLock( void *pAlloc ); /* do not release passed memory block */
 extern HB_EXPORT void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */

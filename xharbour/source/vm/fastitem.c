@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.96 2005/11/16 17:54:41 snaiperis Exp $
+ * $Id: fastitem.c,v 1.97 2006/07/21 20:41:25 map Exp $
  */
 
 /*
@@ -215,20 +215,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
       {
          if ( pItem->item.asPointer.collect )
          {
-            void *pBlock = pItem->item.asPointer.value;
-            HB_GARBAGE* pAlloc = (HB_GARBAGE*)pBlock-1;
-
-            pItem->item.asPointer.collect = 0;
-
-            if( --( pAlloc->ulHolders ) <= 0 )
-            {
-               //OutputDebugString("Calling GC Cleanup function...");
-               if( pAlloc->pFunc )
-                  ( pAlloc->pFunc )( ( void * )( pBlock ) );
-               //OutputDebugString("Attempting to free GC mem...");
-               hb_gcFree( pBlock );
-               //OutputDebugString("GC mem freed...");
-            }
+            hb_gcDecRef( (void *) pItem->item.asPointer.value );
          }
          break;
       }
@@ -465,8 +452,10 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
 
          case HB_IT_POINTER:
          {
-            if ( pSource->item.asPointer.collect )
-               ( ( HB_GARBAGE* )( pSource->item.asPointer.value ) - 1 )->ulHolders++;
+            if( pSource->item.asPointer.collect )
+			{
+                hb_gcIncRef( (void *) pSource->item.asPointer.value );
+			}
             break;
          }
 

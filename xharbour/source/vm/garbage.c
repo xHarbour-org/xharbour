@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.88 2005/11/14 00:18:32 druzus Exp $
+ * $Id: garbage.c,v 1.89 2006/07/21 20:41:25 map Exp $
  */
 
 /*
@@ -193,6 +193,46 @@ HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    {
       return NULL;
    }
+}
+
+HB_EXPORT ULONG hb_gcIncRef( void *pBlock )
+{
+    HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
+
+	--pAlloc;
+
+	return ++pAlloc->ulHolders;
+}
+
+HB_EXPORT ULONG hb_gcDecRef( void *pBlock )
+{
+    HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
+
+	--pAlloc;
+
+	if( pAlloc->ulHolders == 0 )
+	{
+      	hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Pointer Release detected: '%p'", (char *) pBlock, NULL );
+	}
+
+    if( --( pAlloc->ulHolders ) == 0 )
+    {
+       //OutputDebugString("Calling GC Cleanup function...");
+       if( pAlloc->pFunc )
+	   {
+          ( pAlloc->pFunc )( ( void * )( pBlock ) );
+	   }
+
+       //OutputDebugString("Attempting to free GC mem...");
+       hb_gcFree( pBlock );
+       //OutputDebugString("GC mem freed...");
+
+	   return 0;
+    }
+	else
+	{
+	   return pAlloc->ulHolders;
+	}
 }
 
 /* release a memory block allocated with hb_gcAlloc() */

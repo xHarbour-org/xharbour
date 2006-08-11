@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5112 2006/08/10 12:07:56 druzus Exp $
+ * $Id: ChangeLog,v 1.5113 2006/08/10 15:02:03 gdrouillard Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-10 21:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * source/vm/garbage.c
+    + Added hb_gcIncRef() and hb_gcDecRef()
+  * source/vm/garbage.c
+    + Added detection of premature release of HB_IT_POINTER
+  * source/vm/fastitem.c
+    * Revised hb_itemClear() and hb_ityemCopy() to use new hb_gcIncRef() and hb_gcDecRef() for HB_IT_POINTER
+  * source/vm/inet.c
+    ! Fixed multiple GPF traps by adding calles to hb_gcIncRef() when pre-existing pointer is copied to new item.
 
 2006-08-10 10:53 UTC-0400 Gerald Drouillard (gerald@drouillard.ca)
   * xharbour/source/tip/mail.prg
