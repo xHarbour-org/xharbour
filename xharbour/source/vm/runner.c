@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.46 2006/04/23 00:36:00 druzus Exp $
+ * $Id: runner.c,v 1.47 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -574,7 +574,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB */
       {
          pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
-         pSymRead[ ul ].scope.value  = szHrbBody[ulBodyOffset++];
+         pSymRead[ ul ].scope.value  = ( BYTE ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
          pSymRead[ ul ].pDynSym = NULL;
 

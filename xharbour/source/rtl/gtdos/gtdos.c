@@ -1,5 +1,5 @@
 /*
- * $Id: gtdos.c,v 1.27 2005/06/21 20:19:51 druzus Exp $
+ * $Id: gtdos.c,v 1.28 2006/07/16 19:48:56 druzus Exp $
  */
 
 /*
@@ -964,7 +964,7 @@ void HB_GT_FUNC(gt_PutText( USHORT usTop, USHORT usLeft, USHORT usBottom, USHORT
         {
            ULONG usCount = ( usBottom - usTop + 1 ) * ( usRight - usLeft + 1 );
            BYTE * buf, * ptr;
-           ptr = buf = ( BYTE * ) hb_xgrab( usCount );
+           ptr = buf = ( BYTE * ) hb_xgrab( usCount << 1 );
            while( usCount-- )
            {
               *ptr++ = s_charTrans[ *srce++ ];
