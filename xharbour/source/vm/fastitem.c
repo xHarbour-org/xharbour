@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.97 2006/07/21 20:41:25 map Exp $
+ * $Id: fastitem.c,v 1.98 2006/08/11 01:31:29 ronpinkas Exp $
  */
 
 /*
@@ -559,7 +559,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
          pItem->item.asString.length          = ulLen;
          pItem->item.asString.allocated       = ulLen + 1;
 
-         hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
+/*       hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen ); */
 
          // Alocation above already set the 'length and the terminator!
          hb_xmemcpy( (void *) pItem->item.asString.value, (void *) szText, ulLen );
