@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.116 2006/06/16 07:16:17 fsgiudice Exp $
+ * $Id: tget.prg,v 1.117 2006/07/05 02:44:00 ronpinkas Exp $
  */
 
 /*
@@ -252,7 +252,7 @@ METHOD ParsePict( cPicture ) CLASS Get
    local nAt
    local nFor
    local cNum
-   local nRat
+   local nPos
 
    LOCAL nLen,nDec
 
@@ -260,13 +260,15 @@ METHOD ParsePict( cPicture ) CLASS Get
 
    /* E.F. 2006/MAY/31 - Search by last occurrence of "@" into picture
     * to verify if picture has a function and avoid any char before it.
+    * E.F. 2006/AUG/14 - Replaced RAT by AT to preserve others pictures, if any.
     */
    //if Left( cPicture, 1 ) == "@"
-   nRat := RAT("@", cPicture )
-   if nRat > 0
+   //nPos := RAT("@", cPicture )
+   nPos := AT("@", cPicture )
+   if nPos > 0
 
-      if nRat > 1
-         cPicture := SubStr( cPicture, nRat )
+      if nPos > 1
+         cPicture := SubStr( cPicture, nPos )
          ::cPicture := cPicture
       endif
 

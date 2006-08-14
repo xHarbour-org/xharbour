@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5117 2006/08/13 20:56:05 druzus Exp $
+ * $Id: ChangeLog,v 1.5118 2006/08/14 01:57:34 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-14 08:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tget.prg
+    * Method ParsePict(). Replaced RAT("@",cPicture) by AT("@",cPicture)
+      to preserve other pictures, if any. Suggested by Daniel S. de Almeida.
 
 2006-08-13 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\teditor.prg
