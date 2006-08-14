@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.41 2006/08/05 15:05:52 modalsist Exp $
+ * $Id: memoedit.prg,v 1.42 2006/08/06 22:34:30 modalsist Exp $
  */
 
 /*
@@ -68,14 +68,14 @@ CLASS TMemoEditor FROM HBEditor
    DATA  aAsciiKeys
    DATA  aConfigurableKeys
    DATA  aMouseKeys
-   DATA  aUnHandledKeys
+   DATA  aExtKeys                          // Extended keys. For HB_EXT_INKEY use only.
 
    METHOD  MemoInit( xUDF )                // This method is called after ::New() returns to perform ME_INIT actions
    METHOD  Edit()                          // Calls ::Super:Edit(nKey) but is needed to handle configurable keys
    METHOD  KeyboardHook( nKey )            // Gets called every time there is a key not handled directly by HBEditor
 
    METHOD  ExistUdf() INLINE ( HB_IsString( ::xUserFunction ) )
-   METHOD  HandleUdf( nKey, nUdfReturn )  // Handles requests returned to MemoEdit() by udf
+   METHOD  HandleUdf( nKey, nUdfReturn )   // Handles requests returned to MemoEdit() by udf
    METHOD  CallUdf( nMode )                // Call user function. ( old xDo )
 
 
@@ -85,23 +85,16 @@ ENDCLASS
 
 METHOD MemoInit( xUDF ) CLASS TMemoEditor
 
-   local nUdfReturn,i
+LOCAL nUdfReturn,i
 
    DEFAULT xUDF TO NIL
 
-
    ::aEditKeys := { K_DOWN,;
-                    K_CTRL_E,;
                     K_UP,;
-                    K_CTRL_X,;
                     K_LEFT,;
-                    K_CTRL_S,;
                     K_RIGHT,;
-                    K_CTRL_D,;
                     K_CTRL_LEFT,;
-                    K_CTRL_A,;
                     K_CTRL_RIGHT,;
-                    K_CTRL_F,;
                     K_HOME,;
                     K_END,;
                     K_CTRL_HOME,;
@@ -112,68 +105,36 @@ METHOD MemoInit( xUDF ) CLASS TMemoEditor
                     K_CTRL_PGDN,;
                     K_RETURN,;
                     K_ENTER,;
-                    K_CTRL_M,;
                     K_DEL,;
                     K_BS,;
+                    K_CTRL_BS,;
                     K_TAB,;
-                    K_CTRL_Y,;
-                    K_CTRL_T,;
-                    K_CTRL_B,;
-                    K_CTRL_V,;
-                    K_INS,;
-                    K_CTRL_W,;
-                    K_ESC         }
-                     
+                    K_SH_TAB }                                             
 
-   ::aAsciiKeys := {}
-   FOR i := 32 TO 255
-       AAdd( ::aAsciiKeys, i )
-   NEXT
+   ::aAsciiKeys := Array( 255-31 ) // asc codes greater than space.
+   AEval( ::aAsciiKeys, { |c,i| iif(empty(c),::aAsciiKeys[i] := i+31,) } )
+
 
    // Save/Init object internal representation of user function
    //
    ::xUserFunction := xUDF
 
-/*
-*  // NOTE: K_ALT_W is not compatible with clipper exit memo and save key,
-*  //       but I cannot discriminate K_CTRL_W and K_CTRL_END from harbour
-*  //       code.
-*  //
-*  #ifdef HB_EXT_INKEY
-*     ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_ALT_W, K_ESC }
-*  #else
-*     ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_V, K_ALT_W, K_ESC }
-*  #endif
-*/
-   // HBEditor does not handle these keys and would call ::KeyboardHook()
-   // causing infinite loop
-   #ifdef HB_EXT_INKEY
-      // I Have to add the values that K_CTRL_x keys have when HB_EXT_INKEY
-      // is not defined since those values cause infinite loop
-      ::aUnHandledKeys := { 10,       11,       12,       14,       15,       16,       17,       20,       21 }
-   #else
-      // 2006/JUL/24 - E.F. - <CTRL-T> is working now.
-      //
-      // ::aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_T, K_CTRL_U }
-      ::aUnHandledKeys := { K_CTRL_J, K_CTRL_K, K_CTRL_L, K_CTRL_N, K_CTRL_O, K_CTRL_P, K_CTRL_Q, K_CTRL_U }
-   #endif
 
+   // NOTE: K_ALT_W is not compatible with clipper exit memo and save key,
+   //       but I cannot discriminate K_CTRL_W and K_CTRL_END from harbour
+   //       code.
+   //
+
+#ifdef HB_EXT_INKEY
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_INS, K_ESC }
+   ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL }
+#else
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_V, K_ESC } 
+   ::aExtKeys := {}
+#endif
 
 
    ::aMouseKeys := { K_LBUTTONUP, K_MWFORWARD, K_MWBACKWARD }
-
-   ::aConfigurableKeys := { K_F1,;
-                            K_F2,;
-                            K_F3,;
-                            K_F4,;
-                            K_F5,;
-                            K_F6,;
-                            K_F7,;
-                            K_F8,;
-                            K_F9,;
-                            K_F10,;
-                            K_F11,;
-                            K_F12  }
 
 
    if ::ExistUdf()
@@ -200,7 +161,7 @@ Return Self
 METHOD Edit() CLASS TMemoEditor
 
    Local nKey, nUdfReturn, lJump
-   
+
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
    //
@@ -227,7 +188,7 @@ METHOD Edit() CLASS TMemoEditor
                lJump := .t.
             endif
 
-            // 2006/JUL/29 - E.F.- The execution should to continue to 
+            // 2006/JUL/29 - E.F.- The execution should continue to 
             //                     memoedit process the nKey.
             // Loop
 
@@ -256,24 +217,53 @@ METHOD Edit() CLASS TMemoEditor
          */
 
          IF ::bKeyBlock == NIL 
-            IF !(nKey IN ::aConfigurableKeys) .AND. !(nKey IN ::aUnHandledKeys) .AND.;
-               ( (nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys) )
+
+            IF ( ( nKey IN ::aEditKeys ) .OR.;
+                 ( nKey IN ::aAsciiKeys ) .OR.;
+                 ( nKey IN ::aConfigurableKeys ) .OR.;
+                 ( nKey == K_INS ) )
+
                ::Super:Edit( nKey )
-            ELSEIF (nKey IN ::aConfigurableKeys) .OR. (nKey IN ::aUnHandledKeys) .OR.;
-               nKey > 255 .OR. nKey < 0
-               ::KeyboardHook(nKey)
+
+            ELSEIF !( nKey IN ::aConfigurableKeys ) .AND.;
+                   !( nKey == K_INS ) .OR.;
+                    ( nKey > 255 .OR. nKey < 0 ) 
+
+               ::KeyboardHook( nKey )
+
             ENDIF
+
          ENDIF
 
          IF ::ExistUdf() .AND. !lJump
 
-            IF !(nKey IN ::aConfigurableKeys) .AND. !(nKey IN ::aUnhandledKeys) .AND.;
-               ((nKey IN ::aEditKeys) .OR. (nKey IN ::aAsciiKeys) )
+            IF ( ( nKey IN ::aEditKeys ) .OR.;
+                 ( nKey IN ::aAsciiKeys ) .OR.;
+                 ( nKey IN ::aConfigurableKeys ) .OR.;
+                 ( nKey == K_ESC ) .OR.;
+                 ( nKey == K_INS ) )
 
-               IF NextKey()==0 .AND. !( nKey IN { K_CTRL_W, K_ESC } )
+               IF NextKey()==0 .AND.;
+                  !( nKey == K_ESC ) .AND.;
+                  !( nKey IN ::aConfigurableKeys ) .AND.;
+                  !( nKey == K_INS )
+
                   nUdfReturn := ::CallUdf( ME_IDLE )
+
                ELSE
-                  nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
+
+                  IF !(nKey IN ::aConfigurableKeys ) .OR.;
+                     (nKey == K_INS .OR. nKey == K_ESC ) 
+
+                     nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
+
+                  ELSE
+
+                     nUdfReturn := ::CallUdf( ME_UNKEY )
+
+                  ENDIF
+
+
                ENDIF
 
                ::HandleUdf( nKey, nUdfReturn, ::bKeyBlock==NIL )
@@ -285,7 +275,6 @@ METHOD Edit() CLASS TMemoEditor
          lJump := .f.
 
    ENDDO
-
 
 Return Self
 
@@ -321,66 +310,73 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
    // I won't reach this point during ME_INIT since ME_DEFAULT ends
    // initialization phase of MemoEdit()
    //
-
    SWITCH nUdfReturn
 
-      CASE ME_DEFAULT
+      CASE ME_DEFAULT   // (0)
 
          // HBEditor is not able to handle keys with a value higher than 256 or lower than 1
          //
-         if !lEdited .AND. ( nKey IN ::aAsciiKeys .OR.;
-            nKey IN { K_ALT_W, K_CTRL_W } .OR.;
-            nKey IN ::aMouseKeys ) .AND.;
-            ! ( nKey IN ::aUnHandledKeys )
+         if !lEdited .AND. (nKey IN ::aAsciiKeys) .OR.;
+            ( ( nKey IN { K_ALT_W, K_CTRL_W }) .OR.;
+              ( nKey IN ::aExtKeys ) .OR.;
+              ( nKey IN ::aMouseKeys) ) .AND.;
+             !( nKey == K_INS) 
             ::Super:Edit( nKey )
          endif
          exit
 
-      CASE ME_IGNORE
+      CASE ME_IGNORE    // (32)
          // do nothing
 
-      CASE ME_DATA
+      CASE ME_DATA      // (33)
 
-         if !lEdited .AND. nKey IN ::aAsciiKeys .AND.;
-            ! ( nKey IN ::aUnHandledKeys )
+         if !lEdited .AND.;
+            ((nKey IN ::aAsciiKeys) .OR. (nKey IN ::aExtKeys)) .AND.;
+            !(nKey == K_INS) 
             ::Super:Edit( nKey )
          endif
          exit
 
-      CASE ME_TOGGLEWRAP
+      CASE ME_TOGGLEWRAP   // (34)
          ::lWordWrap := ! ::lWordWrap
          exit
 
-      CASE ME_TOGGLESCROLL
+      CASE ME_TOGGLESCROLL  // (35)
          ::lVerticalScroll := ! ::lVerticalScroll
          exit
 
-      CASE ME_WORDRIGHT
-         ::WordRight()
+      CASE ME_WORDRIGHT    // (100)
+         ::WordRight()      
          exit
 
-      CASE ME_BOTTOMRIGHT
+      CASE ME_BOTTOMRIGHT  // (101)
          ::Bottom()
          ::End()
          exit
 
-      DEFAULT   // ME_UNKEY 1-31
+      DEFAULT   // ME_UNKEY (1 TO 31)
 
         /* 2006/AUG/02 - E.F. - (NG) Process requested action corresponding to
          *                      key value.
          */
         nKey := nUdfReturn
 
-        IF nKey >=1 .AND. nKey <= 31 .AND.;
-           ! ( nKey IN ::aUnHandledKeys ) 
-           
+#ifdef HB_EXT_INKEY
+        IF !lEdited .AND. ( (nKey >=1 .AND. nKey <=31) .OR.;
+           (nKey>=513 .AND. nKey<=538) .OR. (nKey IN ::aExtKeys) )
            ::Super:Edit( nKey )
         ENDIF
         exit
+#else
+        IF !lEdited .AND. nKey >=1 .AND. nKey <=31 
+           ::Super:Edit( nKey )
+        ENDIF
+        exit
+#endif
 
    END
 
-return Self
+Return Self
 
 //-------------------------------------------------------------------//
 
@@ -428,6 +424,7 @@ FUNCTION MemoEdit(cString,;
 
    LOCAL oEd
 
+   DEFAULT cString         TO ""
    DEFAULT nTop            TO 0
    DEFAULT nLeft           TO 0
    DEFAULT nBottom         TO MaxRow()
@@ -442,7 +439,6 @@ FUNCTION MemoEdit(cString,;
    DEFAULT nTextBuffColumn TO 0
    DEFAULT nWindowRow      TO 0
    DEFAULT nWindowColumn   TO nTextBuffColumn
-   DEFAULT cString         TO ""
 
    // 2006/JUL/22 - E.F. Check argument types.
    //

@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.76 2006/08/05 15:05:52 modalsist Exp $
+/* $Id: teditor.prg,v 1.77 2006/08/06 22:34:30 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.76 2006/08/05 15:05:52 modalsist Exp $
+/* $Id: teditor.prg,v 1.77 2006/08/06 22:34:30 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -266,7 +266,6 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    default  nWndRow     to 0 // 1   "
    default  nWndCol     to 0 // 1   "
 
-
    IF HB_IsNumeric( nLineLength ) .AND. nLineLength <= 0
       nLineLength := NIL
    ENDIF
@@ -461,11 +460,6 @@ METHOD RefreshWindow() CLASS HBEditor
       // 2006/JUL/23 - E.F. Adjusted to avoid out of bound.
       //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here,
       //               because getline return line number in tbrwtext.prg (debug). 
-
-      //DispOutAt( ::nTop + i, ::nLeft, ;
-      //           PadR( SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ), ::nNumCols ), ;
-      //           ::LineColor( ::nFirstRow + i ) )
-  
       DispOutAt( Min(::nTop + i,::nBottom), ::nLeft, ;
                  PadR( iif(::nFirstRow+i <= ::LastRow(), SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ),Space(::nNumCols) ) , ::nNumCols ), ;
                  ::LineColor( ::nFirstRow + i ) )
@@ -522,7 +516,6 @@ METHOD RefreshLine() CLASS HBEditor
       Dispend()
 
       ::SetPos( nORow, nOCol )
-
    ENDIF
 
 return Self
@@ -647,7 +640,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
    LOCAL lOldInsert
    LOCAL lDelAppend
    LOCAL lSingleKeyProcess := .F. 
-   LOCAL lIdle := .T.
 
 
    // If user pressed an exiting key ( K_ESC or K_ALT_W ) or I've received
@@ -660,8 +652,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
          //
          if nPassedKey == NIL
 
-            //if NextKey() == 0
-            if lIdle
+            if NextKey() == 0
                ::IdleHook()
             endif
 
@@ -675,12 +666,14 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
          endif
 
          /*
-         * 2006/JUL/29 -E.F. There is same code in memoedit.
-         * if ( ::bKeyBlock := Setkey( nKey ) ) <> NIL
-         *   Eval( ::bKeyBlock, ::ProcName, ::ProcLine, "", Self )
-         *   Loop
-         * endif
-         */
+          * 2006/AUG/12 -E.F. Trap Set key only if nKey is nil.
+          */
+         IF nPassedKey == NIL
+           if ( ::bKeyBlock := Setkey( nKey ) ) <> NIL
+              Eval( ::bKeyBlock, ::ProcName, ::ProcLine, "", Self )
+              Loop
+           endif
+         ENDIF
 
          Switch nKey
             case K_LBUTTONUP
@@ -689,7 +682,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                ::K_Mouse( nKey )
                exit
 
-         #ifdef HB_EXT_INKEY
+#ifdef HB_EXT_INKEY
 
             case K_SH_DOWN
                if ::nRow <= ::LastRow()
@@ -703,42 +696,63 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                endif 
                exit
 
-            case K_CTRL_A
+            case K_CTRL_A      // Select all
                ::SetTextSelection( "ALL" )
                exit
+
+            case K_CTRL_C      // Copy
+               GTSETCLIPBOARD( ::GetTextSelection() )
+               //::ClrTextSelection()
+               exit
+
+            case K_CTRL_X      // Cut
+            case K_SH_DEL      // Cut
+               GTSETCLIPBOARD( ::GetTextSelection() )
+               if ::lEditAllow
+                  ::DelTextSelection()
+                  if ::nRow < ::LastRow()
+                     ::Down()
+                  endif
+               endif
+               exit
+
+            case K_CTRL_V      // Paste
+            case K_SH_INS      // Paste
+               if ::lEditAllow
+                  ::AddText( strtran( GTGETCLIPBOARD(), chr(0), chr(32) ), .T. )
+                  ::ClrTextSelection()
+               endif
+               exit
+
+            case K_ALT_W
+            case K_CTRL_W
+                 ::lSaved := .T.
+                 ::lExitEdit := .T.
+                  SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
+                 exit
+
+            case K_CTRL_END
+                 ::Bottom()
+                 ::End()
+                 ::ClrTextSelection()
+                 exit
 
             case K_CTRL_B // reformat paragraph
                if ::lEditAllow
                   ::ReformParagraph() // 2006/JUL/29 -E.F. Added.
                endif
                exit 
-
-            case K_CTRL_C
-               GTSETCLIPBOARD( ::GetTextSelection() )
-               ::ClrTextSelection()
-               exit
-
-            case K_CTRL_X
-            case K_SH_DEL
-               GTSETCLIPBOARD( ::GetTextSelection() )
-               ::DelTextSelection()
-               exit
-
-            case K_CTRL_V
-            case K_SH_INS
-               ::AddText( strtran( GTGETCLIPBOARD(), chr(0), chr(32) ), .T. )
-               ::ClrTextSelection()
-               exit
-
-         #endif
-
-
+#else
             case K_ALT_W
-            case K_CTRL_W
-               ::lSaved := .T.
-               ::lExitEdit := .T.
-               SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
-               exit
+                 exit
+
+            case K_CTRL_W  
+                 ::lSaved := .T.
+                 ::lExitEdit := .T.
+                  SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
+                 exit
+#endif
+
 
             case K_CTRL_N
                if ::lEditAllow  // Clipper compatibility
@@ -747,15 +761,16 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                   ::InsertLine( "", .F., ::nRow )
                   ::RefreshLine()
                   ::RefreshWindow()
+                  ::ClrTextSelection()
                endif
                exit
 
             case K_CTRL_T
-               // 2006/JUL/23 - E.F. Added CTRL-T feature.
                if ::lEditAllow
                   ::lChanged := .T.
                   ::DelWordRight()
                   ::RefreshLine()
+                  ::ClrTextSelection()
                endif
                exit
 
@@ -776,6 +791,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                      ::Home()
                      ::RefreshLine()
                   endif
+                  ::ClrTextSelection()
                endif
                exit
 
@@ -786,10 +802,12 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_PGDN
                ::PageDown()
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_PGDN
                ::GoBottom()
+               ::ClrTextSelection()
                exit
 
             case K_UP
@@ -799,38 +817,47 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_PGUP
                ::PageUp()
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_PGUP
                ::GoTop()
+               ::ClrTextSelection()
                exit
 
             case K_RIGHT
                ::Right()
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_RIGHT
                ::WordRight()
+               ::ClrTextSelection()
                exit
 
             case K_LEFT
                ::Left()
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_LEFT
                ::WordLeft()
+               ::ClrTextSelection()
                exit
 
             case K_HOME
                ::Home()
+               ::ClrTextSelection()
                exit
 
             case K_CTRL_HOME
                ::Top()
+               ::ClrTextSelection()
                exit
 
             case K_END
                ::End()
+               ::ClrTextSelection()
                exit
 
             case K_ESC
@@ -839,50 +866,62 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
 
             case K_RETURN
                ::K_Return()
+               ::ClrTextSelection()
                exit
 
             case K_INS
                // 2006/JUL/22 - E.F. -  Insert is allowed only in edit mode.
                if ::lEditAllow
                   ::InsertState( !::lInsert )
+                  ::ClrTextSelection()
                endif
                exit
 
+#ifdef HB_EXT_INKEY
+            case K_DEL
+               if ::lSelActive .and. ::lEditAllow
+                  ::DelTextSelection()
+                  if ::nRow < ::LastRow()
+                     ::Down()
+                  endif
+               elseif ::lEditAllow  // Clipper compatibility
+                  ::K_Del()
+               endif
+               exit
+#else
             case K_DEL
                if ::lEditAllow  // Clipper compatibility
                   ::K_Del()
                endif
                exit
-
+#endif
             case K_TAB
                if ::lEditAllow  // Clipper compatibility
                   ::K_Tab()
+                  ::ClrTextSelection()
                endif
                exit
 
             case K_BS
                if ::lEditAllow  // Clipper compatibility
                   ::K_Bs()
+                  ::ClrTextSelection()
                else
                   // 2006/JUL/22 - E.F. - Clipper backspace in read only is same as left movement.
                   ::Left()
+                  ::ClrTextSelection()
                endif
                exit
 
             case K_CTRL_BS         // block chr( 127 ), a printable character in windows
                exit
-/*
-            case K_CTRL_END        // Block - Code exits system at present!
-               ::Bottom()          // TODO: In xHarbour this key combination works 
-               ::End()             //       as CTRL-W.
-               exit
-*/
 
-            default  
+            default
 
                if nKey >= K_SPACE .AND. nKey < 256
                   if ::lEditAllow
                      ::K_Ascii( nKey )
+                     ::ClrTextSelection()
                   endif
                else
                   // NOTE: if you call ::Edit() with a key that is passed to ::KeyboardHook() and then
@@ -891,8 +930,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                endif
 
          end
-
-         lIdle := ( Nextkey()==0 )
 
    ENDDO
 
@@ -1280,7 +1317,6 @@ METHOD K_Ascii( nKey ) CLASS HBEditor
    // nKey := ASC( HB_ANSITOOEM( CHR( nKey ) ) )    // convert from windows
 
    IF !::lEditAllow .OR. ::nCol > ::nWordWrapCol+1
-      ::lChanged := .f.
       Return Self
    ENDIF
 
@@ -1326,11 +1362,8 @@ RETURN Self
 // Backspace
 //
 METHOD K_Bs() CLASS HBEditor
-   LOCAL lHardCR := .f.
-   LOCAL nRowPos
 
    IF !::lEditAllow
-      ::lChanged := .f.
       ::Left()
       RETURN Self
    ENDIF
@@ -1348,11 +1381,7 @@ METHOD K_Bs() CLASS HBEditor
 
             // 2006/JUL/21 - E.F. - Determine new ::nCol position.
             //
-            IF !Empty( SubStr( ::aText[ ::nRow ]:cText, ::nCol ) )
-               ::nCol := ::LineLen( ::nRow-1 ) + 1
-            ELSE
-               ::nCol := ::nNumCols
-            ENDIF
+            ::nCol := Min(::LineLen( ::nRow-1 ) + 1,::nWordWrapCol)
 
             ::nRow --
 
@@ -1374,8 +1403,11 @@ METHOD K_Bs() CLASS HBEditor
                ::SplitLine( ::nRow )
             ENDIF
 
-            // 2006/JUL/21 - E.F. - Delete the rightmost char
-            ::aText[ ::nRow ]:cText := SubStr( ::aText[ ::nRow ]:cText, 1, ::nNumCols - 1 ) + " "
+            // 2006/JUL/21 - E.F. - Delete the rightmost char and pos the cursor on it.
+            IF ::LineLen( ::nRow ) >= ::nWordWrapCol
+               ::aText[ ::nRow ]:cText := SubStr( ::aText[ ::nRow ]:cText, 1, ::LineLen(::nRow ) - 1 ) + " "
+               ::nCol := Min(::nCol+1,::nWordWrapCol+1)
+            ENDIF
 
             IF !Empty( ::aText[ ::nRow ]:cText )
                ::GotoPos( ::nRow, ::nCol, .T. ) // also refresh
@@ -1418,7 +1450,6 @@ METHOD K_Del() CLASS HBEditor
    LOCAL nCurRow, nCurCol
 
    IF !::lEditAllow
-      ::lChanged := .f.
       Return Self
    ENDIF
 
@@ -1489,7 +1520,6 @@ METHOD K_Tab() CLASS HBEditor
    LOCAL lHardCR := .f., i
 
    IF !::lEditAllow
-      ::lChanged := .f.
       Return Self
    ENDIF
 
@@ -1572,8 +1602,6 @@ METHOD K_Return() CLASS HBEditor
             ::AddLine( "", .F. )
          ENDIF
 
-         ::lChanged := .T.
-
          IF ::nRow == ::LastRow() .AND.;
             ::nCol > ::LineLen( ::nRow )
             ::AddLine( "", .F. )
@@ -1590,8 +1618,7 @@ METHOD K_Return() CLASS HBEditor
       // the current line should not have softcr.
       //
       ::aText[ ::nRow ]:lSoftCR := .F.
-   ELSE
-      ::lChanged := .f.
+
    ENDIF
 
    // will also refresh
@@ -1599,6 +1626,8 @@ METHOD K_Return() CLASS HBEditor
    IF ::nRow < ::LastRow()
       ::GotoPos( ::nRow + 1, 1, .T. )
    ENDIF
+
+   ::lChanged := .T.
 
 RETURN Self
 
@@ -1709,7 +1738,6 @@ METHOD DelTextRight( nRow ) CLASS HBEditor
    DEFAULT nRow TO ::nRow
 
    IF !::lEditAllow
-      ::lChanged := .f.
       Return Self
    ENDIF
 
@@ -1734,7 +1762,6 @@ LOCAL nSpacesPre,cText
  nCol := ::nCol
 
  IF !::lEditAllow
-    ::lChanged := .f.
     Return Self
  ENDIF
 
@@ -1789,10 +1816,9 @@ LOCAL nRow
 LOCAL cHardCR := HB_OsNewLine()
 LOCAL cSoftCR := chr(141) +chr(10)
 
-IF !::lEditAllow
-  ::lChanged := .f.
-  Return Self
-ENDIF
+ IF !::lEditAllow
+    Return Self
+ ENDIF
 
  IF ::LastRow() > 0
 
@@ -2205,7 +2231,8 @@ return ::nPhysRow
 METHOD InsertState( lInsState ) CLASS HBEditor
 
    // 2006/JUL/22 - E.F. - Insert only in edit mode.
-   IF ::lEditAllow .AND. ISLOGICAL( lInsState ) .and. ::lInsert != lInsState
+   IF ::lEditAllow .AND. ISLOGICAL( lInsState ) .AND. ::lInsert != lInsState
+
       ::lInsert := lInsState
 
       // Redundant, but useful if ::lInsert is used as class DATA
@@ -2315,12 +2342,18 @@ METHOD GetTextSelection( lSoftCr ) CLASS HBEditor
          nSelEnd := ::nSelEnd
       endif
 
+/*ÿ
+2006/AUG/12 - E.F. This code is adding rows that wasn't selected.
       if ::lWordWrap
          AEval( ::aText, {| cItem | cString += cItem:cText + iif( cItem:lSoftCR, cSoft, cEOL )}, nSelStart, nSelEnd )
       else
          AEval( ::aText, {| cItem | cString += cItem:cText + cEOL}, nSelStart, nSelEnd )
       endif
-      
+*/      
+   FOR nI := nSelStart TO nSelEnd
+       cString += ::aText[ nI ]:cText + iif(::lWordWrap .and. ::aText[ nI ]:lSoftCR, cSoft, cEOL )
+   NEXT
+
    endif
 
 return cString
@@ -2338,25 +2371,63 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
          ::nSelEnd := ::LastRow()
          ::RefreshWindow()
       elseif cAction == "LINE"
-         ::nSelStart := ::nRow
-         ::nSelEnd := ::nSelStart
-         ::RefreshLine()
-      endif
-   elseif cAction == "LINE"
-      if nCount > 0 .and. ::nRow < ::LastRow()
-         ::nSelEnd += nCount
-         ::RefreshLine()
-         ::Down()
-      elseif nCount < 0 .and. ::nRow > 1
-         if ::nSelStart > ::nSelEnd
-            ::nSelStart += nCount
-         else
-            ::nSelEnd += nCount
+         if nCount > 0   // Shift-Down
+            ::nSelStart := ::nRow
+            ::nSelEnd := ::nSelStart
+            ::RefreshLine()
+            IF ::nRow < ::LastRow()
+               ::Down()
+            ENDIF
+         elseif nCount < 0  // Shift-UP
+            IF ::nRow > 1
+               ::Up()
+            ENDIF
+            ::nSelStart := ::nRow
+            ::nSelEnd   := ::nSelStart
+            ::RefreshLine()
          endif
+      endif
+
+   else
+
+      if cAction == "ALL"
+         ::lSelActive := .F.
+         ::nSelStart := ::nSelEnd := 0
+         ::RefreshWindow()
+
+      elseif cAction == "LINE"
+
+       if nCount > 0     // Shift-Down
+         IF ::nRow >= ::nSelStart .AND. ::nRow <= ::nSelEnd
+            ::nSelStart := ::nRow+1
+         ELSE
+            ::nSelEnd := ::nRow
+         ENDIF
+         IF ::nSelEnd == ::LastRow()
+            ::nSelEnd := ::LastRow()-1
+         ENDIF
          ::RefreshLine()
-         ::Up()
+         IF ::nRow < ::LastRow()
+            ::Down()
+         ENDIF
+       elseif nCount < 0 // Shift-Up
+         IF ::nRow > 1
+            ::Up()
+         ENDIF
+         IF ::nRow >= ::nSelStart .AND. ::nRow <= ::nSelEnd
+            ::nSelEnd := ::nRow-1
+         ELSE
+            ::nSelStart := ::nRow
+         ENDIF
+         ::RefreshLine()
+       endif
       endif
    endif
+
+   IF ::nSelStart > ::nSelEnd
+      ::nSelStart := ::nSelEnd := 0
+      ::ClrTextSelection()
+   ENDIF
 
 return nil
 
@@ -2376,7 +2447,6 @@ return nil
 METHOD DelText() CLASS HBEditor
 
    IF !::lEditAllow
-      ::lChanged := .f.
       Return self
    ENDIF
 
@@ -2402,7 +2472,6 @@ METHOD DelTextSelection() CLASS HBEditor
    LOCAL nI
 
    if !::lEditAllow
-      ::lChanged := .f.
       Return Self
    endif
 
@@ -2444,7 +2513,6 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
    LOCAL lSaveIns
 
    if !::lEditAllow
-      ::lChanged := .f.
       Return Self
    endif
 
@@ -2467,9 +2535,13 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
             aadd( ::aText, aTmpText[ i ] )
          next
       else
+         nAtRow--
          for i := 1 to nLines 
-            AIns( ::aText, nAtRow + i, aTmpText[ i ], .T. )
+             AIns( ::aText, nAtRow+i, aTmpText[ i ], .T. )
          next
+         if nLines > 0
+            ::RemoveLine(nAtRow+nLines)
+         endif
       endif
 
       if !lSaveIns
@@ -2477,7 +2549,6 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
       endif
 
       ::lChanged := .T.
-
       ::RefreshWindow()
 
    endif

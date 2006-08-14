@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5116 2006/08/13 20:07:49 paultucker Exp $
+ * $Id: ChangeLog,v 1.5117 2006/08/13 20:56:05 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,39 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-13 22:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\teditor.prg
+    * fixed K_Bs() method (backspace) to repos the cursor at end of previous
+      line. Bug reported by Ed Horbino.
+
+    * changes for HB_EXT_INKEY use only:
+
+    ! fixed to exit and save with K_ALT_W if HB_EXT_INKEY is declared.
+    * changed: method K_Del() now has double function, if HB_EXT_INKEY is declared
+      and text selection is active, delete selected text, otherwise delete
+      char as usual.
+    * changed SetTexSelection() method to select and unselect text in any
+      direction ( shift-down/up and up/down).
+    * fixed the GetTextSelection() method to return only selected lines.
+    * fixed the AddText() method to insert lines accordly. This was inserting
+      an empty line before and after of the selected text.
+    * changed Ctrl-C to maintain selected text after copy.
+    * changed Ctrl-A (select all) to toggle between select/unselect all text
+      after first type.
+    * fixed Edit() method to call ::ClrTextSelection() after any movement or
+      edition key.
+
+     NOTE: if you build xHarbour with -DHB_EXT_INKEY flag, you must declare
+     #define HB_EXT_INKEY in your main prg to avoid unexpected results,
+     at same way, if you build xHarbour without -DHB_EXT_INKEY, you must
+     disable #define HB_EXT_INKEY in your main prg.
+
+  * source\rtl\memoedit.prg
+    - removed aUnhandledKeys DATA.
+    + added aExtKeys DATA for use with HB_EXT_INKEY only.
+    * review to manage return keys code from udf with and without the use of
+      HB_EXT_INKEY constant.
 
 2006-08-13 22:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/gtdos/gtdos.c
