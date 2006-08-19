@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.42 2006/08/06 22:34:30 modalsist Exp $
+ * $Id: memoedit.prg,v 1.43 2006/08/14 01:57:35 modalsist Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ LOCAL nUdfReturn,i
                     K_BS,;
                     K_CTRL_BS,;
                     K_TAB,;
-                    K_SH_TAB }                                             
+                    K_SH_TAB }
 
    ::aAsciiKeys := Array( 255-31 ) // asc codes greater than space.
    AEval( ::aAsciiKeys, { |c,i| iif(empty(c),::aAsciiKeys[i] := i+31,) } )
@@ -127,7 +127,7 @@ LOCAL nUdfReturn,i
 
 #ifdef HB_EXT_INKEY
    ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_INS, K_ESC }
-   ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL }
+   ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT }
 #else
    ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_V, K_ESC } 
    ::aExtKeys := {}
@@ -496,10 +496,6 @@ FUNCTION MemoEdit(cString,;
       xUDF := NIL
    ENDIF
 
-   // 2006/JUL/21 - E.F. Line len is total editable columns into screen
-   IF nLineLength == NIL
-      nLineLength := nRight - nLeft + 1
-   ENDIF
 
    /* 24/10/2005 - <maurilio.longo@libero.it>
                    Clipper MemoEdit() converts Tabs into spaces

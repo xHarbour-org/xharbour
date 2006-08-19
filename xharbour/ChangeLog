@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5119 2006/08/14 11:20:34 modalsist Exp $
+ * $Id: ChangeLog,v 1.5120 2006/08/19 11:22:28 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-19 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\memoedit.prg
+    + added K_SH_LEFT and K_SH_RIGHT in aExtKeys data to allow select
+      text at shift-right/shift-left keys.
+    - removed nLineLength argument treatment, transferred to HbEditor.
+
+  * source\rtl\teditor.prg
+    ! changed New() method to fix nLineLenght treatment in compliance with
+      Clipper. If nLineLengh is nil, lwordwrap will be true and nWordWrapCol
+      will be nRight-nLeft+1. If nLineLenght is < 0, nLineLenght will be 255
+      and lWordWrap will be .f., otherwise nLineLenght will be Max(6,nLineLength). 
+    + added text selection at shift-right and shift-left keys.
+    * changed nSelStart data to nRowSelStart, nSelEnd data to nRowSelEnd.
+    + added new nColSelStart and nColSelEnd datas.
+    + added nTextRow, nTextCol, nWndRow and nWndCol datas to future use.
+    * changed SetTextSelection() method to work properly wih shift-down,
+      shift-up, shift-right and shif-left keys if HB_EXT_INKEY define is used.
+    * changed to call Clttextselection() method if any movement/edit key is
+      typed by keyboard or mouse.
+    * reverted Ctrl-A behaviour. This always will select all text.
+      To unselect all, press any movement or edit key.
 
 2006-08-19 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbrdddbf.h
