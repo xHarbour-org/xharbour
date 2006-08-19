@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbsort.c,v 1.3 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: hbdbsort.c,v 1.4 2006/02/13 23:10:24 druzus Exp $
  */
 
 /*
@@ -51,13 +51,6 @@
  */
 
 #include "hbdbsort.h"
-
-#ifndef HB_CDP_SUPPORT_OFF
-#  include "hbapicdp.h"
-
-void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest );
-#endif
-
 
 BOOL hb_dbQSortInit( LPDBQUICKSORT pQuickSort, LPDBSORTINFO pSortInfo, USHORT uiRecordLen )
 {

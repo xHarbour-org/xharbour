@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.4 2005/10/18 12:14:33 druzus Exp $
+ * $Id: sxcompr.c,v 1.5 2005/10/24 01:04:34 druzus Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ typedef struct _HB_LZSSX_COMPR
 HB_LZSSX_COMPR;
 typedef HB_LZSSX_COMPR * PHB_LZSSX_COMPR;
 
-void hb_LZSSxExit( PHB_LZSSX_COMPR pCompr )
+static void hb_LZSSxExit( PHB_LZSSX_COMPR pCompr )
 {
    if( pCompr->fInFree )
       hb_xfree( pCompr->inBuffer );

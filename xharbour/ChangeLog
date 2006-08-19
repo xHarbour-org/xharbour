@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5118 2006/08/14 01:57:34 modalsist Exp $
+ * $Id: ChangeLog,v 1.5119 2006/08/14 11:20:34 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-19 13:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbrdddbf.h
+  * xharbour/include/hbsxfunc.h
+  * xharbour/source/compiler/harbour.c
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/hbdbsort.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/hbsix/sxcompr.c
+    * cleaned some functions declarations, added some missing static
 
 2006-08-14 08:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.28 2006/06/07 15:57:30 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.29 2006/06/27 21:26:00 druzus Exp $
  */
 
 /*
@@ -338,6 +338,10 @@ extern HB_EXPORT ERRCODE hb_dbfSetMemoData( DBFAREAP pArea, USHORT uiIndex,
 extern HB_EXPORT ERRCODE hb_dbfGetEGcode( ERRCODE errCode );
 extern HB_EXPORT BOOL    hb_dbfLockIdxFile( FHANDLE hFile, BYTE bScheme, USHORT usMode, HB_FOFFSET *pPoolPos );
 extern HB_EXPORT BOOL    hb_dbfLockIdxGetData( BYTE bScheme, HB_FOFFSET *ulPos, HB_FOFFSET *ulPool );
+
+#ifndef HB_CDP_SUPPORT_OFF
+extern void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest );
+#endif
 
 HB_EXTERN_END
 
