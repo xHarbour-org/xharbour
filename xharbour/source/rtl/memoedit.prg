@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.43 2006/08/14 01:57:35 modalsist Exp $
+ * $Id: memoedit.prg,v 1.44 2006/08/19 16:44:56 modalsist Exp $
  */
 
 /*
@@ -221,11 +221,13 @@ METHOD Edit() CLASS TMemoEditor
             IF ( ( nKey IN ::aEditKeys ) .OR.;
                  ( nKey IN ::aAsciiKeys ) .OR.;
                  ( nKey IN ::aConfigurableKeys ) .OR.;
+                 ( nKey IN ::aExtKeys ) .OR.;
                  ( nKey == K_INS ) )
 
                ::Super:Edit( nKey )
 
             ELSEIF !( nKey IN ::aConfigurableKeys ) .AND.;
+                   !( nKey IN ::aExtKeys ) .AND.;
                    !( nKey == K_INS ) .OR.;
                     ( nKey > 255 .OR. nKey < 0 ) 
 

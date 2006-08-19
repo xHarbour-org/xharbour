@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5120 2006/08/19 11:22:28 druzus Exp $
+ * $Id: ChangeLog,v 1.5121 2006/08/19 16:44:23 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-19 18:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\memoedit.prg
+    * fixed to process ::aExtKeys if memoedit is called without udf.
+
+  * makefile.pc
+    + added HB_EXT_INKEY define in HARBOURFLAGS and CFLAGS as default. 
 
 2006-08-19 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg

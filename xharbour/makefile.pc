@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.29 2006/07/13 00:11:10 modalsist Exp $
+# $Id: makefile.pc,v 1.30 2006/07/18 15:55:50 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -18,10 +18,12 @@ POLINK_EXE   = $(POCC_DIR)\BIN\POLINK.EXE
 POLIB_EXE    = $(POCC_DIR)\BIN\POLIB.EXE
 POLIB_DIR    = $(POCC_DIR)\LIB
 
-
-HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0
+# To go back to access standard inkey codes declared in inkey.ch remove
+# HB_EXT_INKEY flags in HARBOURFLAGS and CFLAGS.
+#
+HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -DHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w -es2 -gc0
-CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"
+CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"  /D"HB_EXT_INKEY"
 LINKFLAGS    = /LIBPATH:$(POLIB_DIR) /LIBPATH:$(POLIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 
 !ifdef HB_MT
