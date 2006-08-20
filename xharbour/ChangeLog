@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5121 2006/08/19 16:44:23 modalsist Exp $
+ * $Id: ChangeLog,v 1.5122 2006/08/19 21:21:43 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,12 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-08-20 19:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/fastitem.c
+    * Removed redundant commented line
+
 2006-08-19 18:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg
     * fixed to process ::aExtKeys if memoedit is called without udf.
 
   * makefile.pc
-    + added HB_EXT_INKEY define in HARBOURFLAGS and CFLAGS as default. 
+    + added HB_EXT_INKEY define in HARBOURFLAGS and CFLAGS as default.
 
 2006-08-19 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg
@@ -25,7 +29,7 @@
     ! changed New() method to fix nLineLenght treatment in compliance with
       Clipper. If nLineLengh is nil, lwordwrap will be true and nWordWrapCol
       will be nRight-nLeft+1. If nLineLenght is < 0, nLineLenght will be 255
-      and lWordWrap will be .f., otherwise nLineLenght will be Max(6,nLineLength). 
+      and lWordWrap will be .f., otherwise nLineLenght will be Max(6,nLineLength).
     + added text selection at shift-right and shift-left keys.
     * changed nSelStart data to nRowSelStart, nSelEnd data to nRowSelEnd.
     + added new nColSelStart and nColSelEnd datas.
