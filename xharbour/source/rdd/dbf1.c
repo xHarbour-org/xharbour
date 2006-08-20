@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.159 2006/06/27 20:40:40 druzus Exp $
+ * $Id: dbf1.c,v 1.160 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -3385,7 +3385,7 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
 }
 
 #ifndef HB_CDP_SUPPORT_OFF
-void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest )
+HB_EXPORT void hb_dbfTranslateRec( DBFAREAP pArea, BYTE * pBuffer, PHB_CODEPAGE cdp_src, PHB_CODEPAGE cdp_dest )
 {
    USHORT uiIndex;
    LPFIELD pField;
