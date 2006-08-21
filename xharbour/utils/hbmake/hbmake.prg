@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.173 2006/07/06 01:29:36 lculik Exp $
+ * $Id: hbmake.prg,v 1.174 2006/08/05 20:15:16 modalsist Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #define EOL Hb_OsNewLine()
 #define CRLF Hb_OsNewLine()
 #xtranslate TimeToSec(<x>) => ( ( Val( Substr( <x>, 1, 2 ) ) * 3600 ) +( Val( Substr( <x>, 4, 2 ) ) * 60 ) + ( Val( Substr( <x>, 7, 2 ) ) ) )
+
 REQUEST HB_NOMOUSE
 
 #translate DateDiff(<x>,<y>) => (<x>-<y>)
@@ -70,7 +71,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.167"
+STATIC s_cHbMakeVersion  := "1.17"
 STATIC s_lPrint          := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
@@ -131,6 +132,7 @@ STATIC s_lGui            := .F.
 STATIC s_cEditor         := "" 
 STATIC s_cHarbourDir     := ""
 STATIC s_lGenCsource     := .F.  // Generate PCode by default // Ath added 31-05-2006
+STATIC s_cInvalidExt     := {".prg",".c",".cpp",".ch",".h",".ppo",".bat",".doc",".txt",".dbf",".ntx",".cdx",".dbt",".fpt",".mem"}
 
 *---------------------------------------------
 FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
@@ -142,6 +144,14 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nLang       := GETUSERLANG()
    LOCAL nPos
    LOCAL aPpo
+   LOCAL cExt := ""
+
+   cExt := SubStr( cFile, At(".",cFile) )
+
+   IF !Empty(cExt) .AND. lower(cExt) IN s_cInvalidExt 
+      Alert("Invalid extension for hbmake script file <"+cFile+">.")
+      Return .F.
+   ENDIF
 
    CLS
 

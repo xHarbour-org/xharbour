@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5123 2006/08/20 23:39:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5124 2006/08/20 23:52:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-21 09:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils\hbmake\hbmake.prg
+    * created array of invalid extensions for hbmake scrip file, to avoid
+      overwrite an existent file accidentally, for example: hbmake test.prg -e
 
 2006-08-20 19:51 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbrdddbf.h
