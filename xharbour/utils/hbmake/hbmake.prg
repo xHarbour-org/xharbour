@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.174 2006/08/05 20:15:16 modalsist Exp $
+ * $Id: hbmake.prg,v 1.175 2006/08/21 12:00:58 modalsist Exp $
  */
 
 /*
@@ -3568,6 +3568,9 @@ FUNCTION CreateLibMakeFile( cFile )
       Alert( s_cAlertMsg )
       RETURN NIL
    ENDIF
+
+   s_cUserInclude  := space(200)
+   s_cUserDefine   := space(200)
 
 
    IF File( cFile )

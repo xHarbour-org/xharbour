@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5125 2006/08/21 12:00:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.5126 2006/08/21 15:16:45 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-21 15:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * utils\hbmake\hbmake.prg
+    * fixed to get user defines and user includes at lib creation (-elx).
+      bug reported in the news by Eric M.Magaldi.
 
 2006-08-21 12:00 UTC-0300 Walter Negro <anegro@overnet.com.ar>
 * include/hboo.ch
