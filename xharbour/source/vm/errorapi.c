@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.74 2006/02/14 01:47:07 druzus Exp $
+ * $Id: errorapi.c,v 1.75 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -361,6 +361,11 @@ USHORT HB_EXPORT hb_errLaunch( PHB_ITEM pError )
       {
          hb_vmRequestBreak( pError );
          s_iLaunchCount--;
+
+         /* Allow other threads to go */
+         #if defined( HB_THREAD_SUPPORT )
+            hb_threadIdleEnd();
+         #endif
          return E_BREAK;
       }
       else

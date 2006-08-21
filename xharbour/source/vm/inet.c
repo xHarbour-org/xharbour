@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.65 2005/11/04 22:04:09 ronpinkas Exp $
+* $Id: inet.c,v 1.66 2006/08/11 01:31:29 ronpinkas Exp $
 */
 
 /*
@@ -424,15 +424,16 @@ HB_FUNC( INETCLEANUP )
 
 HB_FUNC( INETCREATE )
 {
+   PHB_ITEM pSocket = NULL;
    HB_SOCKET_STRUCT *Socket;
-   HB_SOCKET_INIT( Socket );
+   HB_SOCKET_INIT( Socket, pSocket );
 
    if ( ISNUM( 1 ) )
    {
       Socket->timeout = hb_parni(1);
    }
 
-   hb_retptrGC( Socket );
+   hb_itemRelease( hb_itemReturnForward( pSocket ) );
 }
 
 HB_FUNC( INETCLOSE )
@@ -959,7 +960,7 @@ static void s_inetRecvPattern( char *szFuncName, char *szPattern )
          HB_STACK_LOCK;
       }
       else
-	  {
+      {
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
          iTimeElapsed += Socket->timeout;
@@ -1182,7 +1183,7 @@ HB_FUNC( INETRECVENDBLOCK )
 
       }
       else
-	  {
+      {
          HB_DISABLE_ASYN_CANC;
          HB_STACK_LOCK;
          iTimeElapsed += Socket->timeout;
@@ -1228,9 +1229,9 @@ HB_FUNC( INETRECVENDBLOCK )
          }
 
          if(bProtoFound)
-		 {
+         {
             break;
-		 }
+         }
 
          Buffer[ iPos++ ] = cChar;
       }
@@ -1540,10 +1541,12 @@ HB_FUNC( INETGETALIAS )
 
 HB_FUNC( INETSERVER )
 {
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(2);
+   PHB_ITEM pSocket = hb_param( 2, HB_IT_POINTER );
+   HB_SOCKET_STRUCT *Socket = (pSocket ? (HB_SOCKET_STRUCT *) hb_itemGetPtr(pSocket) : NULL ); //hb_parptr(2);
    int iPort;
    int iOpt = 1;
    int iListen;
+   BOOL bRelease = FALSE;
 
    /* Parameter error checking */
    if( ! ISNUM( 1 ) || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
@@ -1555,12 +1558,12 @@ HB_FUNC( INETSERVER )
 
    if ( Socket != NULL )
    {
-	  hb_gcIncRef( Socket );
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
    {
-      HB_SOCKET_INIT( Socket );
+      HB_SOCKET_INIT( Socket, pSocket );
+      bRelease = TRUE;
    }
 
    /* Creates comm socket */
@@ -1574,7 +1577,11 @@ HB_FUNC( INETSERVER )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptrGC( Socket );
+      hb_itemReturn( pSocket );
+      if (bRelease)
+      {
+         hb_itemRelease( pSocket );
+      }
       return;
    }
 
@@ -1618,7 +1625,11 @@ HB_FUNC( INETSERVER )
       HB_INET_CLOSE( Socket->com );
    }
 
-   hb_retptrGC( Socket );
+   hb_itemReturn( pSocket );
+   if (bRelease)
+   {
+      hb_itemRelease( pSocket );
+   }
 }
 
 HB_FUNC( INETACCEPT )
@@ -1649,8 +1660,6 @@ HB_FUNC( INETACCEPT )
    * calling program will be notivfied through the status of the
    * returned socket.
    */
-
-   hb_gcIncRef( Socket );
 
    HB_SOCKET_ZERO_ERROR( Socket );
 
@@ -1704,12 +1713,13 @@ HB_FUNC( INETACCEPT )
    }
    else
    {
+      PHB_ITEM pSocket = NULL;
       /* we'll be using only nonblocking sockets */
-      HB_SOCKET_INIT( NewSocket );
+      HB_SOCKET_INIT( NewSocket, pSocket );
       memcpy( &NewSocket->remote, &si_remote, Len );
       NewSocket->com = incoming;
       //hb_socketSetNonBlocking( NewSocket );
-      hb_retptrGC( NewSocket );
+      hb_itemRelease( hb_itemReturnForward( pSocket ) );
    }
 }
 
@@ -1721,7 +1731,9 @@ HB_FUNC( INETACCEPT )
 HB_FUNC( INETCONNECT )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr( 3 ) ;
+   PHB_ITEM pSocket = hb_param( 3, HB_IT_POINTER );
+   HB_SOCKET_STRUCT *Socket = (pSocket ? (HB_SOCKET_STRUCT *) hb_itemGetPtr(pSocket) : NULL ); //hb_parptr( 3 );
+   BOOL bRelease = FALSE;
 
    int iPort;
    struct hostent *Host;
@@ -1736,12 +1748,12 @@ HB_FUNC( INETCONNECT )
 
    if ( Socket != NULL )
    {
-	  hb_gcIncRef( Socket );
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
    {
-      HB_SOCKET_INIT( Socket );
+      HB_SOCKET_INIT( Socket, pSocket );
+      bRelease = TRUE;
    }
 
    HB_STACK_UNLOCK;
@@ -1787,15 +1799,21 @@ HB_FUNC( INETCONNECT )
    HB_STACK_LOCK;
 
 ret:
-   hb_retptrGC( Socket );
+   hb_itemReturn( pSocket );
+   if (bRelease)
+   {
+      hb_itemRelease( pSocket );
+   }
 }
 
 
 HB_FUNC( INETCONNECTIP )
 {
    PHB_ITEM pHost = hb_param( 1, HB_IT_STRING );
+   PHB_ITEM pSocket = hb_param( 3, HB_IT_POINTER );
+   HB_SOCKET_STRUCT *Socket = (pSocket ? (HB_SOCKET_STRUCT *) hb_itemGetPtr(pSocket) : NULL ); //hb_parptr(3);
+   BOOL bRelease = FALSE;
    int iPort = hb_parni( 2 );
-   HB_SOCKET_STRUCT *Socket = (HB_SOCKET_STRUCT *) hb_parptr(3);
 
    if( pHost == NULL || iPort == 0 || ( Socket != NULL && Socket->sign != HB_SOCKET_SIGN ) )
    {
@@ -1805,12 +1823,12 @@ HB_FUNC( INETCONNECTIP )
 
    if ( Socket != NULL )
    {
-	  hb_gcIncRef( Socket );
       HB_SOCKET_ZERO_ERROR( Socket );
    }
    else
    {
-      HB_SOCKET_INIT( Socket );
+      HB_SOCKET_INIT( Socket, pSocket );
+      bRelease = TRUE;
    }
 
    /* Creates comm socket */
@@ -1841,7 +1859,11 @@ HB_FUNC( INETCONNECTIP )
    HB_STACK_LOCK;
 
 ret:
-   hb_retptrGC( Socket );
+   hb_itemReturn( pSocket );
+   if (bRelease)
+   {
+      hb_itemRelease( pSocket );
+   }
 }
 
 /***********************************************************
@@ -1850,9 +1872,10 @@ ret:
 
 HB_FUNC( INETDGRAMBIND )
 {
+   HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = NULL;
    int iPort = hb_parni(1);
    int iOpt = 1;
-   HB_SOCKET_STRUCT *Socket;
 
    /* Parameter error checking */
    if( iPort == 0 || ( hb_pcount() == 4 && ! ISCHAR(4) ) )
@@ -1861,7 +1884,7 @@ HB_FUNC( INETDGRAMBIND )
       return;
    }
 
-   HB_SOCKET_INIT( Socket );
+   HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
    #if defined(HB_OS_WIN_32)
@@ -1874,7 +1897,7 @@ HB_FUNC( INETDGRAMBIND )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptrGC( Socket );
+      hb_itemRelease( hb_itemReturnForward( pSocket ) );
       return;
    }
 
@@ -1941,20 +1964,21 @@ HB_FUNC( INETDGRAMBIND )
       {
          HB_SOCKET_SET_ERROR( Socket );
          Socket->com = 0;
-         hb_retptrGC( Socket );
+         hb_itemRelease( hb_itemReturnForward( pSocket ) );
          return;
       }
    }
 
-   hb_retptrGC( Socket );
+   hb_itemRelease( hb_itemReturnForward( pSocket ) );
 }
 
 HB_FUNC( INETDGRAM )
 {
-   int iOpt = 1;
    HB_SOCKET_STRUCT *Socket;
+   PHB_ITEM pSocket = NULL;
+   int iOpt = 1;
 
-   HB_SOCKET_INIT( Socket );
+   HB_SOCKET_INIT( Socket, pSocket );
 
    /* Creates comm socket */
    #if defined(HB_OS_WIN_32)
@@ -1967,7 +1991,7 @@ HB_FUNC( INETDGRAM )
    {
       HB_SOCKET_SET_ERROR( Socket );
       Socket->com = 0;
-      hb_retptrGC( Socket );
+      hb_itemRelease( hb_itemReturnForward( pSocket ) );
       return;
    }
 
@@ -1979,7 +2003,7 @@ HB_FUNC( INETDGRAM )
    /* we'll be using non blocking sockets in all functions */
    //hb_socketSetNonBlocking( Socket );
 
-   hb_retptrGC( Socket );
+   hb_itemRelease( hb_itemReturnForward( pSocket ) );
 }
 
 HB_FUNC( INETDGRAMSEND )

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.199 2005/11/04 02:20:11 druzus Exp $
+* $Id: thread.c,v 1.200 2006/04/06 04:54:18 ronpinkas Exp $
 */
 
 /*
@@ -404,6 +404,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->hMemvarsAllocated = TABLE_INITHB_VALUE;
    tc->hMemvarsLastFree = 1;
    tc->hMemvars[0]= 0;*/
+
+   tc->pThreadID = NULL;
 }
 
 /*
@@ -972,6 +974,7 @@ void hb_threadCancelInternal( )
 void hb_threadTerminator( void *pData )
 {
    HB_MUTEX_STRUCT *pMtx;
+   PHB_THREAD_ID pThreadId;
 
 #if defined(HB_OS_WIN_32) || defined(HB_OS_OS2)
    HB_STACK *_pStack_ = (HB_STACK *) pData;
@@ -1017,6 +1020,13 @@ void hb_threadTerminator( void *pData )
 
    /* we are out of business */
    HB_SHARED_LOCK( hb_runningStacks );
+
+   pThreadId = _pStack_->pThreadID;
+   while( pThreadId )
+   {
+      pThreadId->pStack = NULL;
+      pThreadId = pThreadId->next;
+   }
 
    /* now we can detach this thread */
    hb_threadUnlinkStack( _pStack_ );
@@ -1072,6 +1082,7 @@ void HB_EXPORT hb_threadWaitAll()
 void HB_EXPORT hb_threadKillAll()
 {
    HB_STACK *pStack;
+   HB_STACK *pNext;
 
    hb_threadWaitForIdle();
 
@@ -1088,6 +1099,7 @@ void HB_EXPORT hb_threadKillAll()
       #if ! defined(HB_OS_WIN_32) && ! defined(HB_OS_OS2)
          // Allows the target thread to cleanup if and when needed.
          pthread_cancel( pStack->th_id );
+         pStack = pStack->next;
       #else
          if ( ! pStack->bCanCancel )
          {
@@ -1117,12 +1129,13 @@ void HB_EXPORT hb_threadKillAll()
                pMtx = pMtx->next;
             }
 
+            pNext = pStack->next;
             /* now we can detach this thread */
             hb_threadUnlinkStack( pStack );
             hb_threadDestroyStack( pStack );
+            pStack = pNext;
          }
       #endif
-      pStack = pStack->next;
    }
    hb_threadIdleEnd();
 }
@@ -1327,7 +1340,7 @@ BOOL hb_threadCondWait( HB_WINCOND_T *cond, CRITICAL_SECTION *mutex ,
    LeaveCriticalSection( mutex );
 
    HB_TEST_CANCEL_ENABLE_ASYN
-   if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) != WAIT_OBJECT_0 )
+   if ( WaitForSingleObject( cond->semBlockQueue, dwTimeout ) == WAIT_OBJECT_0 )
    {
       bTimeout = 1;
    }
@@ -1528,7 +1541,31 @@ HB_GARBAGE_FUNC( hb_threadThreadIdFinalize )
       return;
    }
 
-   hb_gcFree( ThreadID );
+   HB_SHARED_LOCK( hb_runningStacks );
+   if( ThreadID->pStack )
+   {
+      if( ThreadID == ThreadID->pStack->pThreadID )
+      {
+         ThreadID->pStack->pThreadID = ThreadID->next;
+      }
+      else
+      {
+         PHB_THREAD_ID pThread = ThreadID->pStack->pThreadID;
+
+         while( pThread && pThread->next != ThreadID )
+         {
+            pThread = pThread->next;
+         }
+
+         if( pThread )
+         {
+            pThread->next = ThreadID->next;
+         }
+      }
+   }
+   HB_SHARED_UNLOCK( hb_runningStacks );
+
+   /* hb_gcFree( ThreadID ); */
 }
 /*
    Starts a new thread;
@@ -1683,6 +1720,8 @@ HB_FUNC( STARTTHREAD )
       pThread->threadId = th_id;
       pThread->bReady = TRUE;
       pThread->pStack = pStack;
+      pThread->next   = NULL;
+      pStack->pThreadID = pThread;
       hb_retptrGC( pThread );
    }
    else
@@ -1718,28 +1757,31 @@ HB_FUNC( STOPTHREAD )
       return;
    }
 
-   HB_STACK_UNLOCK;
+   if( pThread->pStack )
+   {
+      HB_STACK_UNLOCK;
 
-   #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+      #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
 
-      pthread_cancel( pThread->threadId );
-      pthread_join( pThread->threadId, NULL );
+         pthread_cancel( pThread->threadId );
+         pthread_join( pThread->threadId, NULL );
 
-   #else
-      HB_CRITICAL_LOCK( hb_cancelMutex );
-      pThread->pStack->bCanceled = TRUE;
-      HB_CRITICAL_UNLOCK( hb_cancelMutex );
-
-      HB_TEST_CANCEL_ENABLE_ASYN;
-      #ifdef HB_OS_WIN_32
-      WaitForSingleObject( pThread->pStack->th_h, INFINITE );
       #else
-      DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+         HB_CRITICAL_LOCK( hb_cancelMutex );
+         pThread->pStack->bCanceled = TRUE;
+         HB_CRITICAL_UNLOCK( hb_cancelMutex );
+   
+         HB_TEST_CANCEL_ENABLE_ASYN;
+         #ifdef HB_OS_WIN_32
+         WaitForSingleObject( pThread->pStack->th_h, INFINITE );
+         #else
+         DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+         #endif
+         HB_DISABLE_ASYN_CANC;
       #endif
-      HB_DISABLE_ASYN_CANC;
-   #endif
 
-   HB_STACK_LOCK;
+      HB_STACK_LOCK;
+   }
 }
 
 /*
@@ -1769,25 +1811,28 @@ HB_FUNC( KILLTHREAD )
       return;
    }
 
-   #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
-      pthread_cancel( pThread->threadId );
-   #else
-      /* Shell locking the thread */
-      HB_STACK_UNLOCK;
+   if( pThread->pStack )
+   {
+      #if defined( HB_OS_UNIX ) || defined( OS_UNIX_COMPATIBLE )
+         pthread_cancel( pThread->threadId );
+      #else
+         /* Shell locking the thread */
+         HB_STACK_UNLOCK;
 
-      HB_CRITICAL_LOCK( hb_cancelMutex );
-      if ( ! pThread->pStack->bCanCancel )
-      {
-         pThread->pStack->bCanceled = TRUE;
-         HB_CRITICAL_UNLOCK( hb_cancelMutex );
-      }
-      else
-      {
-         hb_threadCancel( pThread->pStack ); //also unlocks the mutex
-      }
+         HB_CRITICAL_LOCK( hb_cancelMutex );
+         if ( ! pThread->pStack->bCanCancel )
+         {
+            pThread->pStack->bCanceled = TRUE;
+            HB_CRITICAL_UNLOCK( hb_cancelMutex );
+         }
+         else
+         {
+            hb_threadCancel( pThread->pStack ); //also unlocks the mutex
+         }
 
-      HB_STACK_LOCK;
-   #endif
+         HB_STACK_LOCK;
+      #endif
+   }
 }
 
 /*
@@ -1812,24 +1857,27 @@ HB_FUNC( JOINTHREAD )
       return;
    }
 
-   HB_STACK_UNLOCK;
+   if( pThread->pStack )
+   {
+      HB_STACK_UNLOCK;
 
-   #if ! defined( HB_OS_WIN_32 ) && ! defined(HB_OS_OS2)
-      if( pthread_join( pThread->threadId, NULL ) != 0 )
-      {
-         HB_STACK_LOCK;
-         hb_retl( FALSE );
-         return;
-      }
-   #else
-      #ifdef HB_OS_WIN_32
-      WaitForSingleObject( pThread->pStack->th_h, INFINITE );
+      #if ! defined( HB_OS_WIN_32 ) && ! defined(HB_OS_OS2)
+         if( pthread_join( pThread->threadId, NULL ) != 0 )
+         {
+            HB_STACK_LOCK;
+            hb_retl( FALSE );
+            return;
+         }
       #else
-      DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+         #ifdef HB_OS_WIN_32
+         WaitForSingleObject( pThread->pStack->th_h, INFINITE );
+         #else
+         DosWaitThread( &pThread->pStack->th_id, DCWW_WAIT );
+         #endif
       #endif
-   #endif
 
-   HB_STACK_LOCK;
+      HB_STACK_LOCK;
+   }
 
    hb_retl( TRUE );
 }
@@ -1855,11 +1903,12 @@ HB_FUNC( THREADGETCURRENTINTERNAL )
 }
 
 /*
-   Return an isnstance of current thread object
+   Return an instance of current thread object
 */
 HB_FUNC( GETCURRENTTHREAD )
 {
    HB_THREAD_STUB
+   PHB_THREAD_ID pThreadID;
    PHB_THREAD_ID pThread = (PHB_THREAD_ID)
          hb_gcAlloc( sizeof( HB_THREAD_ID ), hb_threadThreadIdFinalize );
 
@@ -1867,8 +1916,28 @@ HB_FUNC( GETCURRENTTHREAD )
    pThread->threadId = HB_CURRENT_THREAD();
    pThread->pStack = &HB_VM_STACK;
    pThread->bReady = TRUE;
+   pThread->next   = NULL;
 
    hb_retptrGC( pThread );
+
+   HB_SHARED_LOCK( hb_runningStacks );
+
+   if( (&HB_VM_STACK)->pThreadID )
+   {
+      pThreadID = (&HB_VM_STACK)->pThreadID;
+      while( pThreadID->next )
+      {
+         pThreadID = pThreadID->next;
+      }
+      pThreadID->next = pThread;
+   }
+   else
+   {
+      (&HB_VM_STACK)->pThreadID = pThread;
+   }
+   
+   HB_SHARED_UNLOCK( hb_runningStacks );
+   
 }
 
 /*
@@ -1893,7 +1962,14 @@ HB_FUNC( GETTHREADID )
             "GETTHREADID", 1, hb_paramError(1) );
          return;
       }
-      hb_retnl( (LONG) pThread->pStack->th_vm_id );
+      if( pThread->pStack )
+      {
+         hb_retnl( (LONG) pThread->pStack->th_vm_id );
+      }
+      else
+      {
+         hb_retnl( 0 );
+      }
    }
    else
    {
@@ -1984,7 +2060,7 @@ HB_FUNC( ISVALIDTHREAD )
    HB_THREAD_STUB_API
    PHB_THREAD_ID pThread = (PHB_THREAD_ID) hb_parptr( 1 );
 
-   if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN )
+   if( pThread == NULL || pThread->sign != HB_THREAD_ID_SIGN || pThread->pStack == NULL )
    {
       hb_retl( FALSE );
    }
@@ -2187,13 +2263,12 @@ HB_GARBAGE_FUNC( hb_threadMutexFinalize )
       return;
    }
 
-
    hb_threadUnlinkMutex( Mutex );
 
    HB_CRITICAL_DESTROY( Mutex->mutex );
    HB_COND_DESTROY( Mutex->cond );
    hb_itemRelease( Mutex->aEventObjects );
-   hb_gcFree( Mutex );
+   /* hb_gcFree( Mutex ); */
 }
 
 
@@ -2229,7 +2304,7 @@ PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
 HB_FUNC( HB_MUTEXCREATE )
 {
    HB_THREAD_STUB_STACK
-   hb_threadMutexCreate( hb_stackReturnItem() );
+   hb_itemRelease( hb_itemReturnForward( hb_threadMutexCreate( NULL ) ) );
 }
 
 /*

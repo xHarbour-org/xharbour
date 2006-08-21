@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.99 2006/08/13 20:07:49 paultucker Exp $
+ * $Id: fastitem.c,v 1.100 2006/08/20 23:39:21 ronpinkas Exp $
  */
 
 /*
@@ -316,6 +316,15 @@ void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack )
          break;
       }
 
+      case HB_IT_POINTER:
+      {
+         if ( pItem->item.asPointer.collect )
+         {
+            hb_gcDecRef( (void *) pItem->item.asPointer.value );
+         }
+         break;
+      }
+
       case HB_IT_BLOCK :
       {
          hb_codeblockDelete( pItem );
@@ -453,9 +462,9 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
          case HB_IT_POINTER:
          {
             if( pSource->item.asPointer.collect )
-			{
+            {
                 hb_gcIncRef( (void *) pSource->item.asPointer.value );
-			}
+            }
             break;
          }
 
@@ -721,7 +730,10 @@ PHB_ITEM HB_EXPORT hb_itemPutCRaw( PHB_ITEM pItem, char * szText, ULONG ulLen )
    }
    else
    {
-      hb_xfree( szText );
+      if( szText )
+      {
+         hb_xfree( szText );
+      }
       szText = hb_vm_sNull;
    }
 
@@ -848,6 +860,8 @@ PHB_ITEM HB_EXPORT hb_itemPutPtr( PHB_ITEM pItem, void * pValue )
 PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutPtr(%p, %p)", pItem, pValue));
+
+   hb_gcIncRef( pValue );
 
    if( pItem )
    {

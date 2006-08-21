@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.9 2005/09/05 05:37:26 walito Exp $
+ * $Id: hboo.ch,v 1.10 2005/11/08 21:24:04 ronpinkas Exp $
  */
 
 /*
@@ -92,6 +92,7 @@
 #define HB_OO_CLS_CLASSCTOR     512
 #define HB_OO_CLS_ONERROR_SYMB 2048
 #define HB_OO_CLS_DESTRUC_SYMB 4096
+#define HB_OO_CLS_REALLOCINIT  8192 /* Realloc pInitValues in AddMsg */
 
 
 /* Message types */

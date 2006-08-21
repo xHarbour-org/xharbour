@@ -1,5 +1,5 @@
 /*
-* $Id: inet.h,v 1.22 2003/11/28 16:10:50 jonnymind Exp $
+* $Id: inet.h,v 1.23 2004/12/20 16:48:42 mlombardo Exp $
 */
 
 /*
@@ -124,9 +124,10 @@
       #define HB_SOCKET_SET_ERROR1( s, code ) s->errorCode = code; s->errorDesc = strerror( code );
       #define HB_SOCKET_SET_ERROR2( s, code, desc ) s->errorCode = code; s->errorDesc = desc;
 
-      #define HB_SOCKET_INIT( s ) \
+      #define HB_SOCKET_INIT( s, p ) \
       {\
          s = ( HB_SOCKET_STRUCT *) hb_gcAlloc( sizeof( HB_SOCKET_STRUCT ), hb_inetSocketFinalize );\
+         p = hb_itemPutPtrGC( p, s );\
          HB_SOCKET_ZERO_ERROR( s );\
          s->sign = HB_SOCKET_SIGN;\
          s->com = 0;\

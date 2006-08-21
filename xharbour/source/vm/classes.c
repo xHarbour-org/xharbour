@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.185 2006/07/30 18:20:56 guerra000 Exp $
+ * $Id: classes.c,v 1.186 2006/08/10 02:24:59 guerra000 Exp $
  */
 
 /*
@@ -1528,12 +1528,13 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
              }
              break;
 
-          default:
+          case 8:
              if( strcmp( "FOR EACH", szMessage ) == 0 )
              {
                 pMessage = hb_dynsymGet( "__OpForEach" ) ;
                 fOpOver  = HB_CLASS_OP_FOREACH;
              }
+             break;
       }
 
       if( ! fOpOver )
@@ -1607,18 +1608,12 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                   {
                      memmove( pInit, pInit + 1, (uiLen - 1) * sizeof( CLSDINIT ) );
                   }
-                  --pClass->uiDataInitiated;
                   /* without realloc, only free if uiDataInitiated is 0 */
-                  // Vicente Guerra: 2006/07/30
-                  //    Since pClass->pInitValues is allocated for ALL
-                  //    elements in __clsnew or __incdata, it can't be
-                  //    released.
-                  //    Re-used messages can occurs when defining a subclass.
-                  // if( pClass->uiDataInitiated == 0 )
-                  // {
-                  //    hb_xfree( pClass->pInitValues );
-                  //    pClass->pInitValues = NULL;
-                  // }
+                  if( --pClass->uiDataInitiated == 0 )
+                  {
+                     hb_xfree( pClass->pInitValues );
+                     pClass->pInitValues = NULL;
+                  }
                   break;
                }
             }
@@ -1668,12 +1663,13 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                   {
                      pClass->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) );
                      pClass->uiDataInitiated = 1;
+                     pClass->uiScope |= HB_OO_CLS_REALLOCINIT;
                   }
                   else
                   {
                      pClass->uiDataInitiated++;
 
-                     if( pClass->uiScope & HB_OO_CLS_INSTANCED )
+                     if( pClass->uiScope & (HB_OO_CLS_INSTANCED | HB_OO_CLS_REALLOCINIT) )
                      {
                         pClass->pInitValues = ( PCLSDINIT ) hb_xrealloc( pClass->pInitValues, pClass->uiDataInitiated * sizeof( CLSDINIT ) );
                      }

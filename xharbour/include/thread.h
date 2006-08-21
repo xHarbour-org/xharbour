@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.111 2005/10/24 01:04:25 druzus Exp $
+* $Id: thread.h,v 1.112 2005/10/29 06:42:17 druzus Exp $
 */
 
 /*
@@ -422,6 +422,7 @@ extern PPVOID hb_dwCurrentStack;
 struct HB_ERROR_INFO_;
 struct _AREA;
 struct _HB_SEQUENCE;
+struct tag_HB_THREAD_ID;
 
 typedef struct tag_HB_STACK
 {
@@ -543,6 +544,7 @@ typedef struct tag_HB_STACK
    int iCleanCount;
 #endif
 
+   struct tag_HB_THREAD_ID *pThreadID;
    struct tag_HB_STACK *next;
 
 } HB_STACK;
@@ -577,6 +579,8 @@ typedef struct tag_HB_THREAD_ID
    BOOL bReady;
    /* Pointer to the thread stack. I can see a lot of uses for it */
    HB_STACK *pStack;
+   /* Next thread id */
+   struct tag_HB_THREAD_ID *next;
 }
 HB_THREAD_ID, *PHB_THREAD_ID;
 

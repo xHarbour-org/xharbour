@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.89 2006/07/21 20:41:25 map Exp $
+ * $Id: garbage.c,v 1.90 2006/08/11 01:31:29 ronpinkas Exp $
  */
 
 /*
@@ -176,7 +176,7 @@ HB_EXPORT void * hb_gcAlloc( ULONG ulSize, HB_GARBAGE_FUNC_PTR pCleanupFunc )
    if( pAlloc )
    {
       pAlloc->pFunc  = pCleanupFunc;
-      pAlloc->ulHolders = 1;
+      pAlloc->ulHolders = 0;
       pAlloc->locked = 0;
       pAlloc->used   = s_uUsedFlag;
 
@@ -206,33 +206,33 @@ HB_EXPORT ULONG hb_gcIncRef( void *pBlock )
 
 HB_EXPORT ULONG hb_gcDecRef( void *pBlock )
 {
-    HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
+   HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pBlock;
 
-	--pAlloc;
+   --pAlloc;
 
-	if( pAlloc->ulHolders == 0 )
-	{
-      	hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Pointer Release detected: '%p'", (char *) pBlock, NULL );
-	}
+   if( pAlloc->ulHolders == 0 )
+   {
+      hb_errInternal( HB_EI_PREMATURE_RELEASE, "Premature Pointer Release detected: '%p'", (char *) pBlock, NULL );
+   }
 
-    if( --( pAlloc->ulHolders ) == 0 )
-    {
-       //OutputDebugString("Calling GC Cleanup function...");
-       if( pAlloc->pFunc )
-	   {
-          ( pAlloc->pFunc )( ( void * )( pBlock ) );
-	   }
+   if( --( pAlloc->ulHolders ) == 0 && !pAlloc->locked )
+   {
+      //OutputDebugString("Calling GC Cleanup function...");
+      if( pAlloc->pFunc )
+      {
+         ( pAlloc->pFunc )( ( void * )( pBlock ) );
+      }
 
-       //OutputDebugString("Attempting to free GC mem...");
-       hb_gcFree( pBlock );
-       //OutputDebugString("GC mem freed...");
+      //OutputDebugString("Attempting to free GC mem...");
+      hb_gcFree( pBlock );
+      //OutputDebugString("GC mem freed...");
 
-	   return 0;
-    }
-	else
-	{
-	   return pAlloc->ulHolders;
-	}
+      return 0;
+   }
+   else
+   {
+      return pAlloc->ulHolders;
+   }
 }
 
 /* release a memory block allocated with hb_gcAlloc() */
