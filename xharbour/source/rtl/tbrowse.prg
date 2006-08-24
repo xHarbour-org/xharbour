@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.154 2006/07/07 15:23:43 gdrouillard Exp $
+ * $Id: tbrowse.prg,v 1.155 2006/07/24 20:15:44 gdrouillard Exp $
  */
 
 /*
@@ -1749,6 +1749,8 @@ METHOD Moved() CLASS TBrowse
          ::PosCursor()
       endif
       ::stable := .F.
+   elseif ::lNeverDisplayed
+      ::forcestable()   // 2006/08/24 - E.F. - Force stable if any movement key was called before stabilize.
    endif
 
 Return Self

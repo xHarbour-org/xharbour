@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5128 2006/08/24 15:40:00 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5128 2006/08/24 12:47:36 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-24 16:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\memoedit.prg
+    * fixed K_ESC key treatment if udf is present.
+
+  * source\rtl\tbrowse.prg
+    * changed moved() method to call forcestable() if any movement key
+      is pressed before stabilization.
 
 2006-08-24 15:40 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * hrbdll.bc

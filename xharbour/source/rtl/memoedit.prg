@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.44 2006/08/19 16:44:56 modalsist Exp $
+ * $Id: memoedit.prg,v 1.45 2006/08/19 21:22:33 modalsist Exp $
  */
 
 /*
@@ -126,10 +126,10 @@ LOCAL nUdfReturn,i
    //
 
 #ifdef HB_EXT_INKEY
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_INS, K_ESC }
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_INS} //, K_ESC }
    ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT }
 #else
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_V, K_ESC } 
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_V} //, K_ESC } 
    ::aExtKeys := {}
 #endif
 
@@ -222,14 +222,16 @@ METHOD Edit() CLASS TMemoEditor
                  ( nKey IN ::aAsciiKeys ) .OR.;
                  ( nKey IN ::aConfigurableKeys ) .OR.;
                  ( nKey IN ::aExtKeys ) .OR.;
-                 ( nKey == K_INS ) )
+                 ( nKey == K_INS ) .OR.;
+                 ( nKey == K_ESC .AND. (!::ExistUdf() .OR. !::lChanged) ) )
 
                ::Super:Edit( nKey )
 
             ELSEIF !( nKey IN ::aConfigurableKeys ) .AND.;
                    !( nKey IN ::aExtKeys ) .AND.;
                    !( nKey == K_INS ) .OR.;
-                    ( nKey > 255 .OR. nKey < 0 ) 
+                    ( nKey > 255 .OR. nKey < 0 ) .OR.;
+                    ( nKey == K_ESC .AND. ::ExistUdf() )
 
                ::KeyboardHook( nKey )
 
@@ -242,20 +244,18 @@ METHOD Edit() CLASS TMemoEditor
             IF ( ( nKey IN ::aEditKeys ) .OR.;
                  ( nKey IN ::aAsciiKeys ) .OR.;
                  ( nKey IN ::aConfigurableKeys ) .OR.;
-                 ( nKey == K_ESC ) .OR.;
                  ( nKey == K_INS ) )
 
                IF NextKey()==0 .AND.;
-                  !( nKey == K_ESC ) .AND.;
                   !( nKey IN ::aConfigurableKeys ) .AND.;
-                  !( nKey == K_INS )
+                  !( nKey == K_INS )  
 
                   nUdfReturn := ::CallUdf( ME_IDLE )
 
                ELSE
 
                   IF !(nKey IN ::aConfigurableKeys ) .OR.;
-                     (nKey == K_INS .OR. nKey == K_ESC ) 
+                     (nKey == K_INS )  
 
                      nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
 
@@ -321,6 +321,7 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
          if !lEdited .AND. (nKey IN ::aAsciiKeys) .OR.;
             ( ( nKey IN { K_ALT_W, K_CTRL_W }) .OR.;
               ( nKey IN ::aExtKeys ) .OR.;
+              ( nKey == K_ESC ) .OR.;
               ( nKey IN ::aMouseKeys) ) .AND.;
              !( nKey == K_INS) 
             ::Super:Edit( nKey )
@@ -333,7 +334,7 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
       CASE ME_DATA      // (33)
 
          if !lEdited .AND.;
-            ((nKey IN ::aAsciiKeys) .OR. (nKey IN ::aExtKeys)) .AND.;
+            ((nKey IN ::aAsciiKeys) .OR. (nKey IN ::aExtKeys) .OR. nKey == K_ESC) .AND.;
             !(nKey == K_INS) 
             ::Super:Edit( nKey )
          endif
