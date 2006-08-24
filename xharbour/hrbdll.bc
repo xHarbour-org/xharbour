@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.120 2006/07/17 21:26:33 fsgiudice Exp $
+# $Id: hrbdll.bc,v 1.123 2006/08/24 16:47:37 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -21,6 +21,8 @@ LIB_DIR	    = lib\b32
 #HB_MULTI_GT = yes
 # uncomment this line if you want to add rdd_ads into harbour.dll
 #HB_RDDADS = yes
+# uncomment this line if you want to add wvtgui into harbour.dll
+#HB_WVTGUI = yes
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ source directory ³Û
@@ -53,6 +55,9 @@ CONTRIB_DIR       = contrib
 
 !if $d(HB_RDDADS)
 RDDADS_DIR        = contrib\rdd_ads
+!endif
+!if $d(HB_WVTGUI)
+WVTGUI_DIR        = contrib\wvtgui
 !endif
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -507,6 +512,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\tbrwtext.obj \
   $(OBJ_DIR)\dbgwa.obj \
   $(OBJ_DIR)\dbgbrwsr.obj \
+  $(OBJ_DIR)\dbgaltd.obj \
   $(OBJ_DIR)\maindllh.obj \
   $(OBJ_DIR)\hvm.obj \
   $(OBJ_DIR)\tprinter.obj \
@@ -768,6 +774,17 @@ HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
   $(OBJ_DIR)\ads1.obj \
   $(OBJ_DIR)\adsfunc.obj \
   $(OBJ_DIR)\adsmgmnt.obj
+!endif
+
+#
+#  WVTGUI
+#
+!if $d(HB_WVTGUI)
+HARBOUR_DLL_OBJS = $(HARBOUR_DLL_OBJS) \
+  $(OBJ_DIR)\wvtcore.obj  \
+  $(OBJ_DIR)\wvtutils.obj \
+  $(OBJ_DIR)\wvtpaint.obj \
+  $(OBJ_DIR)\wvtclass.obj
 !endif
 
 # ÚÄÄÄÄÄÄÄÄÄ¿
@@ -1216,6 +1233,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\tbrwtext.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgwa.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dbgbrwsr.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbgaltd.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\maindllh.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\tprinter.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\win32ole.obj          + >> hdll.tmp
@@ -1363,6 +1381,12 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\adsmgmnt.obj          + >> hdll.tmp
+!endif
+!if $d(HB_WVTGUI)
+  echo. $(OBJ_DIR)\wvtcore.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\wvtutils.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\wvtpaint.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\wvtclass.obj          + >> hdll.tmp
 !endif
   echo. c0d32.obj,                       + >> hdll.tmp
   echo. $(HARBOUR_DLL),                  + >> hdll.tmp
@@ -2631,6 +2655,12 @@ $(OBJ_DIR)\dbgbrwsr.c : $(DEBUG_DIR)\dbgbrwsr.prg
 $(OBJ_DIR)\dbgbrwsr.obj : $(OBJ_DIR)\dbgbrwsr.c
    $(CC_CMD)
 
+$(OBJ_DIR)\dbgaltd.c : $(DEBUG_DIR)\dbgaltd.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\dbgaltd.obj : $(OBJ_DIR)\dbgaltd.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\dbgtarr.c : $(DEBUG_DIR)\dbgtarr.prg
    $(HRB_CMD)
 
@@ -3465,6 +3495,32 @@ $(OBJ_DIR)\adsfunc.obj : $(RDDADS_DIR)\adsfunc.c
 
 $(OBJ_DIR)\adsmgmnt.obj : $(RDDADS_DIR)\adsmgmnt.c
    $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+!endif
+
+#
+# WVTGUI dependencies
+#
+
+!if $d(HB_WVTGUI)
+
+$(OBJ_DIR)\wvtcore.obj : $(WVTGUI_DIR)\wvtcore.c
+   $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+$(OBJ_DIR)\wvtutils.obj : $(WVTGUI_DIR)\wvtutils.c
+   $(CC) $(CLIBFLAGS) -DWIN32 -o$@ $**
+
+$(OBJ_DIR)\wvtclass.c : $(WVTGUI_DIR)\wvtclass.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\wvtclass.obj : $(OBJ_DIR)\wvtclass.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wvtpaint.c : $(WVTGUI_DIR)\wvtpaint.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\wvtpaint.obj : $(OBJ_DIR)\wvtpaint.c
+   $(CC_CMD)
 
 !endif
 
