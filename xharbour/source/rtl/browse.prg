@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.5 2004/11/08 18:58:10 ronpinkas Exp $
+ * $Id: browse.prg,v 1.6 2005/02/22 07:20:16 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,8 @@ function Browse( nTop, nLeft, nBottom, nRight )
    @ nTop + 3, nRight SAY Chr( 181 )
    @ nTop + 1, nLeft + 1 SAY Space( nRight - nLeft - 1 )
 
+   lBottom := lRefresh := .F.
+
    oBrw := TBrowseDB( nTop + 2, nLeft + 1, nBottom - 1, nRight - 1 )
    oBrw:HeadSep := " " + Chr( 205 )
    oBrw:skipblock({ |_1| skipped(_1, lBottom) })
@@ -96,8 +98,6 @@ function Browse( nTop, nLeft, nBottom, nRight )
    if ( EOF() )
       goto top
    endif
-
-   lBottom := lRefresh := .F.
 
    oBrw:ForceStable()
 

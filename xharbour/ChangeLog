@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5128 2006/08/24 12:47:36 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5129 2006/08/24 20:19:06 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-26 15:04 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
+  * source/rtl/browse.prg
+    * Moved lBottom initialization for prevents browse crash with
+      empty databases.
 
 2006-08-24 16:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg
@@ -37,20 +42,20 @@
 * source/vm/inet.c
 * source/vm/thread.c
   * Change in pointers managed by GC.
-    I recommend to always use these pointers with a HB_ITEM, to avoid that 
+    I recommend to always use these pointers with a HB_ITEM, to avoid that
     the GC releases them.
-    The counter of references does not avoid that the pointer is freed when the GC 
+    The counter of references does not avoid that the pointer is freed when the GC
     is executed.
     Only hb_itemPutPtrGC() or hb_gcLock() can preserve the leader correctly.
     I recommend not to use gcLock.
     Changes:
      - garbage.c  - ulHolders start with 0.
      - fastitem.c - hb_itemPutPtrGC() increment reference calling to hb_gcIncRef().
-     - fastitem.c - hb_itemClear() decrement reference calling to hb_gcDecRef() and 
+     - fastitem.c - hb_itemClear() decrement reference calling to hb_gcDecRef() and
                     execute hb_gcFree() if not locked with hb_gcLock().
      - inet.c     - use of the pointers protected by a HB_ITEM.
      - thread.c   - delete hb_gcFree() to avoid double elimination.
-     - thread.c   - chained of pointers to the structure of thread to be updated when 
+     - thread.c   - chained of pointers to the structure of thread to be updated when
                     thread finalizes, avoiding errors of access to released memory.
                     This pointers are returned by StartThread() and GetCurrentThread().
 
