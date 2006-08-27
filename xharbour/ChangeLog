@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5130 2006/08/26 20:03:48 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5131 2006/08/27 21:38:51 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-27 20:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\memoedit.prg
+    * fixed K_INS key treatment if udf is present.
 
 2006-08-27 18:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg

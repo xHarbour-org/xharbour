@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.45 2006/08/19 21:22:33 modalsist Exp $
+ * $Id: memoedit.prg,v 1.46 2006/08/24 20:19:35 modalsist Exp $
  */
 
 /*
@@ -109,11 +109,10 @@ LOCAL nUdfReturn,i
                     K_BS,;
                     K_CTRL_BS,;
                     K_TAB,;
-                    K_SH_TAB }
+                    K_SH_TAB  }
 
    ::aAsciiKeys := Array( 255-31 ) // asc codes greater than space.
    AEval( ::aAsciiKeys, { |c,i| iif(empty(c),::aAsciiKeys[i] := i+31,) } )
-
 
    // Save/Init object internal representation of user function
    //
@@ -126,10 +125,12 @@ LOCAL nUdfReturn,i
    //
 
 #ifdef HB_EXT_INKEY
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_INS} //, K_ESC }
+   /* CTRL_V in not same as K_INS, this works as paste selected text to clipboard. */
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W } 
    ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT }
 #else
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_V} //, K_ESC } 
+   /* CTRL_V is same as K_INS, so it has special treatment in memoedit. */
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W }
    ::aExtKeys := {}
 #endif
 
@@ -222,15 +223,15 @@ METHOD Edit() CLASS TMemoEditor
                  ( nKey IN ::aAsciiKeys ) .OR.;
                  ( nKey IN ::aConfigurableKeys ) .OR.;
                  ( nKey IN ::aExtKeys ) .OR.;
-                 ( nKey == K_INS ) .OR.;
+                 ( nKey == K_INS .AND. !::ExistUdf() ) .OR.;
                  ( nKey == K_ESC .AND. (!::ExistUdf() .OR. !::lChanged) ) )
 
                ::Super:Edit( nKey )
 
             ELSEIF !( nKey IN ::aConfigurableKeys ) .AND.;
                    !( nKey IN ::aExtKeys ) .AND.;
-                   !( nKey == K_INS ) .OR.;
                     ( nKey > 255 .OR. nKey < 0 ) .OR.;
+                    ( nKey == K_INS .AND. ::lEditAllow .AND. ::ExistUdf() ) .OR.;
                     ( nKey == K_ESC .AND. ::ExistUdf() )
 
                ::KeyboardHook( nKey )
@@ -241,21 +242,19 @@ METHOD Edit() CLASS TMemoEditor
 
          IF ::ExistUdf() .AND. !lJump
 
-            IF ( ( nKey IN ::aEditKeys ) .OR.;
-                 ( nKey IN ::aAsciiKeys ) .OR.;
-                 ( nKey IN ::aConfigurableKeys ) .OR.;
-                 ( nKey == K_INS ) )
+            IF ( nKey IN ::aEditKeys ) .OR.;
+               ( nKey IN ::aAsciiKeys ) .OR.;
+               ( nKey IN ::aConfigurableKeys ) .OR.;
+               ( nKey == K_F1 )
 
                IF NextKey()==0 .AND.;
-                  !( nKey IN ::aConfigurableKeys ) .AND.;
-                  !( nKey == K_INS )  
+                  !( nKey IN ::aConfigurableKeys ) .AND. nKey != K_F1
 
                   nUdfReturn := ::CallUdf( ME_IDLE )
 
                ELSE
 
-                  IF !(nKey IN ::aConfigurableKeys ) .OR.;
-                     (nKey == K_INS )  
+                  IF !(nKey IN ::aConfigurableKeys )
 
                      nUdfReturn := ::CallUdf( iif(::lChanged, ME_UNKEYX,ME_UNKEY) )
 
@@ -318,25 +317,35 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
 
          // HBEditor is not able to handle keys with a value higher than 256 or lower than 1
          //
-         if !lEdited .AND. (nKey IN ::aAsciiKeys) .OR.;
-            ( ( nKey IN { K_ALT_W, K_CTRL_W }) .OR.;
+         if !lEdited .AND.;
+            ( ( nKey IN ::aAsciiKeys ) .OR.;
+              ( nKey IN { K_ALT_W, K_CTRL_W } ) .OR.;
               ( nKey IN ::aExtKeys ) .OR.;
               ( nKey == K_ESC ) .OR.;
-              ( nKey IN ::aMouseKeys) ) .AND.;
-             !( nKey == K_INS) 
+              ( nKey == K_INS ) .OR.;
+              ( nKey IN ::aMouseKeys ) )
+
             ::Super:Edit( nKey )
+
          endif
          exit
 
       CASE ME_IGNORE    // (32)
-         // do nothing
+
+         // Ignore unknow key, only check insert state.
+         ::DisplayInsert( ::lInsert() )
+         exit
 
       CASE ME_DATA      // (33)
 
          if !lEdited .AND.;
-            ((nKey IN ::aAsciiKeys) .OR. (nKey IN ::aExtKeys) .OR. nKey == K_ESC) .AND.;
-            !(nKey == K_INS) 
+            ( ( nKey IN ::aAsciiKeys ) .OR.;
+              ( nKey IN ::aExtKeys ) .OR.;
+              ( nKey == K_ESC ) .OR.;
+              ( nKey== K_INS ) )
+
             ::Super:Edit( nKey )
+
          endif
          exit
 
@@ -355,6 +364,10 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
       CASE ME_BOTTOMRIGHT  // (101)
          ::Bottom()
          ::End()
+         exit
+
+      CASE ME_PASTE        // (110)
+         // see inkey.ch
          exit
 
       DEFAULT   // ME_UNKEY (1 TO 31)
@@ -387,17 +400,14 @@ METHOD CallUdf( nMode ) CLASS TMemoEditor
 
    LOCAL nCurRow := ::Row()
    LOCAL nCurCol := ::Col()
-   LOCAL nCurCur := SetCursor()
    LOCAL xResult
 
    IF ::ExistUdf()
-
-      // Latest parameter, Self, is an xHarbour extension, maybe
+      // Latest parameter, <Self>, is an xHarbour extension, maybe
       // should be guarded as such with some ifdef
       xResult := Do( ::xUserFunction, nMode, ::nRow, ::nCol - 1, Self )
 
       ::SetPos( nCurRow, nCurCol )
-      SetCursor( nCurCur )
 
    ENDIF
 
