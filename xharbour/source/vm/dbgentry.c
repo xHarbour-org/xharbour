@@ -1,5 +1,5 @@
 /*
- * $Id: dbgentry.c,v 1.25 2006/04/05 15:58:26 likewolf Exp $
+ * $Id: dbgentry.c,v 1.26 2006/04/10 20:51:49 likewolf Exp $
  */
 
 /*
@@ -444,11 +444,11 @@ hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame )
          if ( szName[ strlen( szName ) - 1 ] == ':' )
             return;
          hb_procinfo( 0, szProcName, NULL, NULL );
-         if ( !strcmp( szProcName, "(_INITSTATICS)" ) )
+         if ( !strncmp( szProcName, "(_INITSTATICS", 13 ) )
              info->bInitStatics = TRUE;
-         else if ( !strcmp( szProcName, "(_INITGLOBALS)" ) )
+         else if ( !strncmp( szProcName, "(_INITGLOBALS", 13 ) )
              info->bInitGlobals = TRUE;
-         else if ( !strcmp( szProcName, "(_INITLINES)" ) )
+         else if ( !strncmp( szProcName, "(_INITLINES", 11 ) )
              info->bInitLines = TRUE;
          if ( info->bInitStatics || info->bInitGlobals )
             hb_dbgAddModule( info, szName );
@@ -690,7 +690,18 @@ hb_dbgAddStack( HB_DEBUGINFO *info, char *szName, int nProcLevel )
    }
    else
    {
-      top->szFunction = szFunction ? STRDUP( szFunction ) : STRDUP( "(_INITSTATICS)" );
+      if ( szFunction )
+      {
+         top->szFunction = STRDUP( szFunction );
+      }
+      else
+      {
+         /* We're in an (_INITSTATICSnnnnn) pseudo-function */
+         char szName[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 5];
+
+         hb_procinfo( 0, szName, NULL, NULL );
+         top->szFunction = STRDUP( szName );
+      }
    }
    tmp = strrchr( szName, '/' );
    if ( tmp )

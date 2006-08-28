@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5131 2006/08/27 21:38:51 modalsist Exp $
+ * $Id: ChangeLog,v 1.5132 2006/08/27 23:14:38 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-08-29 02:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/dbgentry.c
+    ! Adopt the new pseudo-function naming scheme recently introduced by
+      Przemek.
 
 2006-08-27 20:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg
