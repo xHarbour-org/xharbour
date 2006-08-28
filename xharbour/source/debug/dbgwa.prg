@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.4 2003/06/17 11:00:44 iananderson Exp $
+ * $Id: dbgwa.prg,v 1.5 2003/10/09 23:16:55 likewolf Exp $
  */
 
 /*
@@ -356,13 +356,13 @@ return aInfo
 
 static function UpdateInfo( oDlg, cAlias )
 
-   local cOldAlias
+   local nOldArea
 
    if empty(cAlias)
      return NIL
    endif
    
-   cOldAlias := Alias()
+   nOldArea := Select()
    
    SELECT (cAlias)
 
@@ -378,7 +378,7 @@ static function UpdateInfo( oDlg, cAlias )
    DispOutAt( oDlg:nTop + 4 , oDlg:nLeft + 21 , Padr( DbFilter(), 29 ), oDlg:cColor )
    DispOutAt( oDlg:nTop + 5, oDlg:nLeft + 21 , Padr( OrdKey(), 29 ), oDlg:cColor )
 
-   SELECT (cOldAlias)
+   SELECT (nOldArea)
 
 return nil
 
