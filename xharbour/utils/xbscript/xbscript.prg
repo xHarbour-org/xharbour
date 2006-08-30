@@ -204,6 +204,7 @@
 
       #ifdef ZIP
          EXTERN ZipCreate
+				 REQUEST RMDBFCDX
       #endif
    #endif
 
