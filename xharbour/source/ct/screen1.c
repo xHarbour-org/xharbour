@@ -1,5 +1,5 @@
 /*
- * $Id: screen1.c,v 1.1 2003/03/04 21:04:52 lculik Exp $
+ * $Id: screen1.c,v 1.2 2006/09/02 16:00:00 ptsarenko Exp $
  */
 
 /*
@@ -61,9 +61,16 @@ HB_FUNC( SCREENATTR )
   UINT   uiSize;
   int    iRow, iCol;
   char * pcPos;
+  SHORT i_Row;
+  SHORT i_Col;
 
-  iRow = hb_parni( 1 );
-  iCol = hb_parni( 2 );
+  if ( ! (ISNUM(1) && ISNUM(2)) )
+  {
+     hb_gtGetPos( &i_Row, &i_Col );
+  }
+
+  iRow = ( ISNUM(1) ? hb_parni( 1 ) : i_Row );
+  iCol = ( ISNUM(2) ? hb_parni( 2 ) : i_Col );
 
   hb_gtRectSize( iRow, iCol, iRow, iCol, &uiSize );
   pcPos = (char * ) hb_xalloc( uiSize + 1 );
@@ -71,7 +78,6 @@ HB_FUNC( SCREENATTR )
   if( pcPos != NULL )
   {
      hb_gtSave( iRow, iCol, iRow, iCol, pcPos );
-
 
      hb_retni( ( int ) pcPos[1] );
   }
@@ -81,6 +87,4 @@ HB_FUNC( SCREENATTR )
   hb_xfree( pcPos );
 
 }
-
-
 

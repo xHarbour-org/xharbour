@@ -1,5 +1,5 @@
 /*
- * $Id: untext.prg,v 1.1 2004/11/29 23:30:00 ptsarenko Exp $
+ * $Id: untext.prg,v 1.2 2006/09/02 16:00:00 ptsarenko Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 Function UnTextWin(nTop, nLeft, nBottom, nRight, xReplChar, xInitChar, xEndChar)
 Local cStr := SaveScreen(nTop, nLeft, nBottom, nRight)
+Local nCSize := Len(cStr) / ((nBottom-nTop+1) * (nRight-nLeft+1))
 Local cReplChar := iif(IsCharacter(xReplChar), xReplChar, Chr(xReplChar) )
 Local cInitChar, cEndChar, ser
 
@@ -74,7 +75,7 @@ else
    cEndChar := xEndChar
 endif
 
-for ser := 1 to len(cStr) step 2
+for ser := 1 to len(cStr) step nCSize
    if cInitChar == nil .or. cEndChar == nil .or. if(cInitChar <= cEndChar,;
          cInitChar > cStr[ser] .or. cEndChar < cStr[ser],;
          cInitChar < cStr[ser] .and. cEndChar > cStr[ser] )

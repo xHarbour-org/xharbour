@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.1 2004/11/29 22:11:31 ptsarenko Exp $
+ * $Id: screen3.prg,v 1.3 2006/09/02 16:00:10 ptsarenko Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
 
 Function CharWin(nTop, nLeft, nBottom, nRight, xNewChar, xOldChar)
 Local cScr, cNewChar, cOldChar, ser
+Local nCSize := GetCSize()
 
 DEFAULT nTop    TO 0
 DEFAULT nLeft   TO 0
@@ -79,9 +80,9 @@ if xOldChar # nil
    cOldChar := if(ValType(xOldChar)='N', Chr(xOldChar), xOldChar)
 endif
 cScr := SaveScreen(nTop, nLeft, nBottom, nRight)
-for ser := 1 to len(cScr) / 2
-   if cOldChar == nil .or. Substr(cScr, (ser-1)*2+1, 1) == cOldChar
-      cScr := Stuff(cScr, (ser-1)*2+1, 1, cNewChar)
+for ser := 1 to len(cScr) / nCSize
+   if cOldChar == nil .or. Substr(cScr, (ser-1)*nCSize+1, 1) == cOldChar
+      cScr := Stuff(cScr, (ser-1)*nCSize+1, 1, cNewChar)
    endif
 next
 RestScreen(nTop, nLeft, nBottom, nRight, cScr)
@@ -133,6 +134,7 @@ Return ''
 
 Function ColorWin(nTop, nLeft, nBottom, nRight, xAttr, xOld)
 Local cScr, nAttr, cAttr, nOld, ser, np
+Local nCSize := GetCSize()
 
 DEFAULT nTop    TO Row()
 DEFAULT nLeft   TO Col()
@@ -150,20 +152,25 @@ if xOld # nil
    nOld := if(ValType(xOld) = 'C', ColorToN(xOld), xOld)
 endif
 
+#ifdef __PLATFORM__Windows   
 cScr := SaveScreen(nTop, nLeft, nBottom, nRight)
-for ser := 1 to len(cScr) / 2
-   np := (ser-1)*2 + 2
+for ser := 1 to len(cScr) / nCSize
+   np := (ser-1)*nCSize + 2
    cAttr := Substr(cScr, np, 1)
    if nOld == nil .or. nOld == Asc(cAttr)
       cScr := Stuff(cScr, np, 1, Chr(nAttr))
    endif
 next
 RestScreen(nTop, nLeft, nBottom, nRight, cScr)
+#else
+SetAttribute(nTop, nLeft, nBottom, nRight, nAttr)
+#endif
 Return ''
 
 
 Function ColorRepl(xNewAttr, xOldAttr)
 Local cNewAttr, cOldAttr, cScr, ser, np
+Local nCSize := GetCSize()
 
 if xNewAttr == nil
    cNewAttr := GetClearA()
@@ -176,8 +183,8 @@ if xOldAttr # nil
    cOldAttr := if(ValType(xOldAttr)='N', Chr(xOldAttr), xOldAttr)
 endif
 cScr := SaveScreen(0, 0, MaxRow(), MaxCol())
-for ser := 1 to len(cScr) / 2
-   np := (ser - 1)*2 + 2
+for ser := 1 to len(cScr) / nCSize
+   np := (ser - 1)*nCSize + 2
    if cOldAttr == nil .or. Substr(cScr, np, 1) == cOldAttr
       cScr := Stuff(cScr, np, 1, cNewAttr)
    endif
@@ -255,19 +262,21 @@ Return ''
 
 Function ScreenStr(nRow, nCol, nCount)
 Local cStr
+Local nCSize := GetCSize()
 
 DEFAULT nRow TO Row()
 DEFAULT nCol TO Col()
 
 cStr := SaveScreen(nRow, nCol, MaxRow(), MaxCol())
-if ValType(nCount) == 'N' .and. nCount*2 < len(cStr)
-   cStr := Left(cStr, nCount*2)
+if ValType(nCount) == 'N' .and. nCount*nCSize < len(cStr)
+   cStr := Left(cStr, nCount*nCSize)
 endif
 Return cStr
 
 
 Function StrScreen(cStr, nRow, nCol)
 Local nCount
+Local nCSize := GetCSize()
 
 if IsCharacter(cStr)
 
@@ -275,9 +284,9 @@ if IsCharacter(cStr)
    DEFAULT nCol TO Col()
 
    while len(cStr) > 0 .and. nRow <= MaxRow()
-      nCount := Min( Int(len(cStr) / 2), MaxCol() - nCol + 1 )
+      nCount := Min( Int(len(cStr) / nCSize), MaxCol() - nCol + 1 )
       RestScreen(nRow, nCol, nRow, nCol+nCount-1, cStr)
-      cStr := Substr(cStr, nCount*2 + 1)
+      cStr := Substr(cStr, nCount*nCSize + 1)
       nRow ++
       nCol := 0
    enddo
@@ -330,3 +339,25 @@ FUNCTION RestCursor( nSavedCursor )
    SetPos( nSavedCursor >> 16, nSavedCursor & 0x0000FF )
    SetCursor( ( nSavedCursor & 0x00FF00 ) >> 8 )
 RETURN ""
+
+
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbapigt.h"
+
+HB_FUNC_STATIC( GETCSIZE )
+{
+   UINT uiSize;
+
+   hb_gtRectSize( 1, 1, 1, 1, &uiSize );
+
+   hb_retni( uiSize );
+}
+
+HB_FUNC_STATIC( SETATTRIBUTE )
+{
+   hb_gt_SetAttribute( hb_parni(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5) );
+}
+
+#pragma ENDDUMP
