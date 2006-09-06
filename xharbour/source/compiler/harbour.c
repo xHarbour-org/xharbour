@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.136 2006/07/16 19:48:56 druzus Exp $
+ * $Id: harbour.c,v 1.137 2006/08/19 11:22:28 druzus Exp $
  */
 
 /*
@@ -6160,7 +6160,7 @@ void hb_compAddI18nString( char *szString )
       so it can be read from xharbour without conversions, and is
       portable across architectures */
    fprintf( hb_comp_HILfile, "%8d", nLen + 1 );
-   fprintf( hb_comp_HILfile, szString );
+   fputs( szString, hb_comp_HILfile );
    // I want the trailing 0 to be in the file as a validity marker
    fputc( 0, hb_comp_HILfile );
    // hil file is an hit file without translations

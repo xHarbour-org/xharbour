@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.20 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbi18n.c,v 1.21 2005/10/24 01:04:37 druzus Exp $
  */
 
 /*
@@ -51,6 +51,10 @@
  */
 
 #define HB_THREAD_OPTIMIZE_STACK
+
+#ifdef __WIN32__
+   #include <windows.h>
+#endif
 
 #include "hbvmopt.h"
 #include "hbsetup.h"
@@ -331,6 +335,85 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
    return pTable;
 }
 
+
+PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
+{
+   char szStrLen[9];
+   int nStrLen, nRead;
+   int i,j;
+   PHB_ITEM pTable;
+
+
+// TODO: unknown size table not supported, since resource size is available only 
+//       aligned to 16 bytes.
+
+   if ( count < 0 )
+   {
+     TraceLog( NULL, "hb_i18n_read_memory_table unknown size request not supported\n" );
+     return NULL;
+   }
+
+   szStrLen[8] = '\0';
+   pTable = hb_itemNew( NULL );
+   if ( count > 0 ) 
+   {
+      hb_arrayNew( pTable, count );
+   }
+   else
+   {
+      hb_arrayNew( pTable, 0 ); // we'll add them
+   }
+
+   for ( i = 1; count == -1 || i <= count; i ++ )
+   {
+      HB_ITEM ArrRow;
+
+      ArrRow.type = HB_IT_NIL;
+      hb_arrayNew( &ArrRow, 2 );
+
+      for ( j = 1; j <= 2 ; j ++ )
+      {
+         memcpy( szStrLen, pData, 8 );
+         pData += 8;
+         nStrLen = atoi( szStrLen );
+
+         // zero is included
+         if ( nStrLen > 0 ) // sanitizing unwritten strings
+         {
+            char *str = ( char * ) hb_xgrab( nStrLen );
+            memcpy( str, pData, nStrLen );
+            pData += nStrLen;
+            // using trailing zero as memory integrity check
+            // (zero is the last character read, so we check nStrLen-1)
+            if ( str[nStrLen-1] != 0 )
+            {
+               hb_xfree( str );
+               hb_itemClear( &ArrRow );
+               hb_itemRelease( pTable );
+               return NULL;
+            }
+            else
+            {
+               hb_itemPutCRaw( hb_arrayGetItemPtr( &ArrRow, j ), str, nStrLen - 1 );
+            }
+         }
+      }
+
+      // saves our row here
+      if ( count > 0 )
+      {
+         hb_arraySetForward( pTable, i,  &ArrRow );
+      }
+      else
+      {
+         hb_arrayAddForward( pTable, &ArrRow);
+      }
+   }
+
+   return pTable;
+}
+
+
 /**
 * Saving table data to disk
 */
@@ -398,6 +481,47 @@ BOOL hb_i18n_load_language( char *language )
 
    if ( handle == FS_ERROR )
    {
+#ifdef __WIN32__
+      HRSRC     hRes;
+      HGLOBAL   hMem;
+      BYTE *    pRes;
+
+      hRes = FindResource( NULL, language, "I18N" );
+      if ( ! hRes ) 
+      {
+         return FALSE;
+      }
+
+      hMem = LoadResource( NULL, hRes );
+      if ( ! hMem ) 
+      {
+         return FALSE;
+      }
+
+      pRes = (BYTE*) LockResource( hMem );
+      memcpy( &header, pRes, sizeof( header ) );
+
+      // checking signature
+      if ( strcmp( header.signature, "\3HIL" ) != 0 &&
+         strcmp( header.signature, "\3HIT" ) != 0 )
+      {
+         return FALSE;
+      }
+
+      pTable = hb_i18n_read_memory_table( pRes + sizeof( header ), header.entries );
+
+      if( pTable != NULL )
+      {
+         strncpy( s_current_language, language , HB_I18N_CODELEN );
+         strncpy( s_current_language_name, header.language, HB_I18N_NAMELEN );
+         if ( s_i18n_table != NULL )
+         {
+            hb_itemRelease( s_i18n_table );
+         }
+         s_i18n_table = pTable;
+         return TRUE;
+      }
+#endif
       return FALSE;
    }
    if ( hb_fsRead( handle, (BYTE *) &header, sizeof( header ) ) != sizeof( header ) )

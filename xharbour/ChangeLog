@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5135 2006/09/02 17:41:43 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5135 2006/09/02 14:14:48 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-06 18:30 UTC+0300 Mindaugas Kavaliauskas <dbtopas /at/ dbtopas . lt>
+  * source/compiler/harbour.c
+    ! Fixed .hil creation. Compiler GPFed on code: i18n("%s%s%s%s")
+      The same fix allows to use formatting for string internationalization, 
+      ex. sprintf(i18n("Count: %d"), nCount)
+  * source/vm/hbi18n.c
+    + Implemented placement of I18N tables into .exe resource (for Win32).
+      To include I18N tables into resource just it add to your project .rc file:
+         en_UK     I18N    en_UK.hit
+         lt_LT     I18N    lt_LT.hit
+         ...
+      Languages tables will be linked into .exe file and separate .hit files 
+      will not be required. If language table is available in both resource 
+      and external .hit file, HB_I18NSETLANGUAGE gives priority to .hit file.
 
 2006-09-02 16:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/screen1.c
