@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5136 2006/09/06 15:30:26 snaiperis Exp $
+ * $Id: ChangeLog,v 1.5137 2006/09/06 22:26:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-07 01:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * harbour/source/rdd/dbcmd.c
+    ! always initialize all members in RDD structures to avoid GPF when
+      some RDD will try to access uninitialized data
+
+  * harbour/source/rdd/usrrdd/usrrdd.c
+    ! added some additional validation in RDD structures <-> item conversions
 
 2006-09-06 18:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/itemapi.c
