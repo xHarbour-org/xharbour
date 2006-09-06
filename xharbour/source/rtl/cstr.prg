@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.28 2005/12/01 13:25:49 snaiperis Exp $
+ * $Id: cstr.prg,v 1.29 2006/03/11 12:35:24 likewolf Exp $
  */
 
 /*
@@ -270,32 +270,18 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 
    LOCAL cType := ValType( xVal )
    LOCAL aVars, aVar, cRet, nObj
-   LOCAL cChar, cDelim, aForbiddenChars := { 0, 10, 13 }, nChar
+   LOCAL cChar
 
    //TraceLog( xVal, cName, nPad, aObjs )
 
    SWITCH cType
       CASE 'C'
-         IF ! '"' IN xVal
-            cDelim := '""'
-         ELSEIF ! "'" IN xVal
-            cDelim := "''"
-         ELSEIF ( ! "[" IN xVal ) .AND. ( ! "]" IN xVal )
-            cDelim := "[]"
-         ELSE
-            cDelim := '""'
-            xVal := StrTran( xVal, '"', '" + Chr( 34 ) + "' )
-            /*Throw( ErrorNew( "CSTR", 0, 3102, ProcName(), "Can't stringify", { xVal } ) )
-            EXIT*/
-         ENDIF
-         FOR EACH nChar IN aForbiddenChars
-            IF Chr( nChar ) $ xVal
-              xVal := StrTran( xVal, Chr( nChar ), ;
-                               cDelim[ 2 ] + " + Chr( " + ;
-                               LTrim( Str( nChar ) ) + " ) + " + cDelim[ 1 ] )
-            ENDIF
+				 cRet := ""
+				 FOR EACH cChar IN xVal
+            cRet += " + Chr(" + Str( Asc( cChar ), 3 ) + ")"
          NEXT
-         RETURN cDelim[ 1 ] + xVal + cDelim[ 2 ]
+
+         RETURN SubStr( cRet, 3 )
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
@@ -342,19 +328,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          ENDIF
 
       CASE 'B'
-         cRet := "HB_RestoreBlock( {"
-         xVal := HB_SaveBlock( xVal )
-
-         cRet += '"' + xVal[1] + [", ]
-
-         FOR EACH cChar in xVal[2]
-            cRet += 'Chr(' + Trim(Str( Asc( cChar ),3)) + ')+'
-         NEXT
-
-         cRet[-1] := ", "
-         cRet += Str( xVal[3], 3 ) + "}, HB_QSelf() )"
-
-         RETURN cRet
+         RETURN "HB_RestoreBlock( { "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " } )"
 
       CASE 'P'
          RETURN "HexToNum('" + NumToHex( xVal ) + "')"

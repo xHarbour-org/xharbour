@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.52 2005/10/24 01:04:36 druzus Exp $
+ * $Id: codebloc.c,v 1.53 2006/03/25 02:22:48 druzus Exp $
  */
 
 /*
@@ -57,6 +57,7 @@
 #include "hbapiitm.h"
 #include "hbvm.h"
 #include "hbstack.h"
+#include "hbapierr.h"
 
 /*
 JC1: they are not needed anymore, it seems: all their reference are
@@ -323,6 +324,11 @@ PHB_ITEM  hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos )
    HB_CODEBLOCK_PTR pCBlock = pItem->item.asBlock.value;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockGetVar(%p, %ld)", pItem, iItemPos));
+
+   if( pCBlock->uiLocals < -iItemPos )
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Codeblock %p does not export %li detached locals", (const char *) pCBlock, (const char *) -iItemPos );
+   }
 
    /* local variables accessed in a codeblock are always stored as reference */
    return hb_itemUnRef( pCBlock->pLocals - iItemPos );

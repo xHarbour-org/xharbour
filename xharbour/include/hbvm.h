@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.43 2006/04/24 07:30:16 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.44 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -160,7 +160,7 @@ HB_EXPORT extern BOOL hb_dbg_InvokeDebug( BOOL bInvoke );
 HB_EXPORT extern ULONG hb_dbg_ProcLevel( void );
 HB_EXPORT extern PHB_ITEM hb_dbg_vmVarSGet( int nStatic, int nOffset );
 HB_EXPORT extern PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal );
-HB_EXPORT extern USHORT hb_dbg_vmVarGCount( void );
+HB_EXPORT extern ULONG hb_dbg_vmVarGCount( void );
 HB_EXPORT extern PHB_ITEM hb_dbg_vmVarGGet( int nGlobal, int nOffset );
 HB_EXPORT extern void hb_dbgEntry( int nMode, int nLine, char *szName, int nIndex, int nFrame );
 HB_EXPORT extern void hb_dbgAddBreak( void *handle, char *cModule, int nLine, char *szFunction );

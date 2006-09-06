@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.577 2006/07/25 21:34:12 druzus Exp $
+ * $Id: hvm.c,v 1.578 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -6635,28 +6635,28 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
             hb_rddSelectWorkAreaNumber( pAlias->item.asInteger.value );
             pAlias->type = HB_IT_NIL;
             break;
-   
+
          case HB_IT_LONG:
             /* Alias was evaluated from an expression, (nWorkArea)->field
              */
             hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asLong.value );
             pAlias->type = HB_IT_NIL;
             break;
-   
+
          case HB_IT_DOUBLE:
             /* Alias was evaluated from an expression, (nWorkArea)->field
              */
             hb_rddSelectWorkAreaNumber( ( int ) pAlias->item.asDouble.value );
             pAlias->type = HB_IT_NIL;
             break;
-   
+
          case HB_IT_SYMBOL:
             /* Alias was specified using alias identifier, for example: al->field
              */
             errCode = hb_rddSelectWorkAreaSymbol( pAlias->item.asSymbol.value );
             pAlias->type = HB_IT_NIL;
             break;
-   
+
          case HB_IT_STRING:
          {
             /* Alias was evaluated from an expression, for example: (cVar)->field
@@ -6664,7 +6664,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
             /* expand '&' operator if exists */
             char * szAlias;
             BOOL bNewString;
-   
+
             szAlias = hb_macroExpandString( pAlias->item.asString.value, pAlias->item.asString.length, &bNewString );
             if( pField )
             {
@@ -9890,8 +9890,7 @@ HB_FUNC( __VMVARGLIST )
    hb_itemRelease( pGlobals );
 }
 
-HB_EXPORT USHORT
-hb_dbg_vmVarGCount( void )
+HB_EXPORT ULONG hb_dbg_vmVarGCount( void )
 {
    return s_aGlobals.item.asArray.value->ulLen;
 }
@@ -10084,16 +10083,20 @@ HB_FUNC( HB_SAVEBLOCK )
 
    PHB_ITEM pBlock = hb_param( 1, HB_IT_BLOCK );
 
-   if( pBlock )
+   if( pBlock && pBlock->item.asBlock.value->uiLocals == 0 )
    {
-      PSYMBOLS pModuleSymbols = pBlock->item.asBlock.value->pSymbols ?
-               hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
+      PSYMBOLS pModuleSymbols = pBlock->item.asBlock.value->pSymbols ? hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
 
-      hb_arrayNew( &( HB_VM_STACK.Return ), 3 );
+      hb_arrayNew( &( HB_VM_STACK.Return ), 4 );
 
       hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols ? pModuleSymbols->szModuleName : "" );
       hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
+      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 4 ), pBlock->item.asBlock.value->uiClass );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a Codeblock, or Codeblock exports detached locals!", 1, hb_paramError( 1 ) );
    }
 }
 
@@ -10103,18 +10106,20 @@ HB_FUNC( HB_RESTOREBLOCK )
 
    PHB_ITEM pBlockAsArray = hb_param( 1, HB_IT_ARRAY );
 
-   if ( pBlockAsArray )
+   if ( pBlockAsArray && hb_arrayLen( pBlockAsArray ) == 4 )
    {
       PSYMBOLS pModuleSymbols;
       HB_ITEM_NEW( ModuleName );
       HB_ITEM_NEW( PCode );
       HB_ITEM_NEW( ParamCount );
+      HB_ITEM_NEW( ClassH );
 
       hb_arrayGet( pBlockAsArray, 1, &ModuleName );
       hb_arrayGet( pBlockAsArray, 2, &PCode );
       hb_arrayGet( pBlockAsArray, 3, &ParamCount );
+      hb_arrayGet( pBlockAsArray, 4, &ClassH );
 
-      if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER )
+      if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER && ClassH.type == HB_IT_INTEGER )
       {
          PHB_ITEM * pBase = HB_VM_STACK.pBase;
          HB_ITEM Block;
@@ -10124,9 +10129,11 @@ HB_FUNC( HB_RESTOREBLOCK )
 
          Block.type = HB_IT_BLOCK;
          Block.item.asBlock.value = hb_codeblockMacroNew( (BYTE *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
-         Block.item.asBlock.value->uLen = (USHORT) PCode.item.asString.length;
+
+         Block.item.asBlock.value->uLen     = (USHORT) PCode.item.asString.length;
          Block.item.asBlock.value->pSymbols = pModuleSymbols ? pModuleSymbols->pModuleSymbols : NULL;
-         Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
+         Block.item.asBlock.paramcnt        = ParamCount.item.asInteger.value;
+         Block.item.asBlock.value->uiClass  = ClassH.item.asInteger.value;
 
          Block.item.asBlock.statics = HB_VM_STACK.iStatics;
 
@@ -10143,23 +10150,23 @@ HB_FUNC( HB_RESTOREBLOCK )
             Block.item.asBlock.value->lineno = ( *pBase )->item.asSymbol.lineno;
          }
 
-         if( pSelf && HB_IS_OBJECT( pSelf ) )
-         {
-            Block.item.asBlock.value->uiClass = pSelf->item.asArray.value->uiClass;
-         }
-         else
-         {
-            Block.item.asBlock.value->uiClass = 0;
-         }
-
          //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
 
          hb_itemForwardValue( &( HB_VM_STACK.Return ), &Block );
       }
+	  else
+	  {
+         hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
+	  }
 
       hb_itemClear( &ModuleName );
       hb_itemClear( &PCode );
       hb_itemClear( &ParamCount );
+      hb_itemClear( &ClassH );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.133 2006/01/30 02:51:25 druzus Exp $
+ * $Id: itemapi.c,v 1.134 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -446,7 +446,7 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
 
       default:
          dNumber = 0;  /* To avoid GCC -O2 warning */
-         hb_errInternal( HB_EI_VMPOPINVITEM, NULL, "hb_itemGetNDDec()", NULL );
+         hb_errInternal( HB_EI_VMPOPINVITEM, "hb_itemGetNDDec()", NULL, NULL );
          break;
    }
 
