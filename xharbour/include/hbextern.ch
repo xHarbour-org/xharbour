@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.32 2006/05/16 14:45:57 ronpinkas Exp $
+ * $Id: hbextern.ch,v 1.33 2006/07/13 12:27:17 druzus Exp $
  */
 
 /*
@@ -692,6 +692,10 @@ EXTERNAL HASH, HSETPARTITION, HGETPARTITION, HSETAUTOADD, HGETAUTOADD, ;
 EXTERNAL HB_RANDOM, HB_RANDOMINT, HB_RANDOMSEED
 
 EXTERNAL HB_DUMPVAR, HB_CRYPT, HB_DECRYPT
+
+EXTERNAL HBPersistent
+
+EXTERNAL _Array, _Block, _Character, _Date, _Logical, _Nil, _Numeric, _Pointer, _Hash
 
 #ifdef __PLATFORM__Windows
   #ifndef NODLL

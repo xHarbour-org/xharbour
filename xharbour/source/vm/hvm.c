@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.579 2006/09/06 22:26:32 ronpinkas Exp $
+ * $Id: hvm.c,v 1.580 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -10104,7 +10104,6 @@ HB_FUNC( HB_RESTOREBLOCK )
       {
          PHB_ITEM * pBase = HB_VM_STACK.pBase;
          HB_ITEM Block;
-         PHB_ITEM pSelf = hb_param( 2, HB_IT_ARRAY );
 
          pModuleSymbols = hb_vmFindModuleByName( ModuleName.item.asString.value );
 
