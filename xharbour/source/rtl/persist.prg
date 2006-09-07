@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.27 2006/06/12 06:55:03 mauriliolongo Exp $
+ * $Id: persist.prg,v 1.28 2006/06/12 21:25:51 kaddath Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
          lIgnoreBadIVars := .f.
       ENDIF
 
-      aLines := ArrayFromLFString( cObjectText )
+      aLines := HB_aTokens( StrTran( cObjectText, Chr(13), "" ), Chr(10) )
 
       IF Left( cObjectText, Len( HB_PERSIST_VER_2 ) ) == HB_PERSIST_VER_2
          lFix := .F.
@@ -202,12 +202,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
          ENDCASE
       NEXT
    CATCH oError
-      cError := HB_OSNewLine() + ;
-         "Error:  " + oError:subSystem + "/" + AllTrim( Transform( oError:subCode, "99999999" ) ) + ;
-            If( oError:osCode # 0, " (DOS Error # " + AllTrim( Str( oError:osCode, 4 ) ) + ")", "" ) + HB_OSNewLine() + ;
-         "Description:  " + oError:description + ;
-         If( ! Empty( oError:operation ), HB_OSNewLine() + "Operation/Variable:  " + oError:operation, "" )
-      TraceLog( cError )
+      TraceLog( ValToPrg( oError ) )
 
    FINALLY
       WHILE nWith-- > 0
@@ -274,7 +269,7 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
                EXIT
 
             DEFAULT
-               cObject += Space( nIndent ) + "   ::" + aPropertyAndVAlue[1] + " := " + ValToText( xValue)
+               cObject += Space( nIndent ) + "   ::" + aPropertyAndVAlue[1] + " := " + ValToPrg( xValue )
                cObject += HB_OsNewLine()
          END
       ENDIF
@@ -312,121 +307,10 @@ STATIC FUNCTION ArrayToText( aArray, cName, nIndent, Self )
             EXIT
 
          DEFAULT
-            cArray += Space( nIndent ) + "   ::" + cName + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + " ]" + " := " + ;
-                      ValToText( xValue ) + HB_OsNewLine()
+            cArray += Space( nIndent ) + "   ::" + cName + "[ " + AllTrim( Str( HB_EnumIndex() ) ) + " ]" + " := " + ValToPrg( xValue ) + HB_OsNewLine()
       END
    NEXT
 
    cArray += Space( nIndent ) + "ENDARRAY" + HB_OsNewLine()
 
 RETURN cArray
-
-STATIC FUNCTION ValToText( xValue )
-
-   LOCAL cType := ValType( xValue )
-   LOCAL cText, cQuote := '"'
-
-   SWITCH cType
-      CASE "C"
-         IF cQuote IN xValue
-            cQuote := "'"
-            IF cQuote IN xValue
-               xValue:= ReplaceBracketsInString(xValue)
-               cText := "["+ xValue + "]"
-            ELSE
-               cText := cQuote + xValue + cQuote
-            ENDIF
-         ELSE
-            cText := cQuote + xValue + cQuote
-         ENDIF
-         cText:= ReplaceCRLFInString(cText)
-         EXIT
-
-      CASE "N"
-         cText := AllTrim( Str( xValue ) )
-
-         EXIT
-
-      CASE "D"
-         cText := 'STOD( "' + DToS( xValue ) + '" )'
-
-      CASE "B"
-         cText := ValToPrgExp( xValue  )
-
-         EXIT
-      CASE "L"
-         cText := IIF(  xValue, ".T.", ".F."  )
-         EXIT
-
-      DEFAULT
-         cText := HB_ValToStr( xValue )
-   END
-
-RETURN cText
-
-
-STATIC FUNCTION ReplaceCRLFInString(cText)
-  LOCAL cCR:= CHR(13), cLF:= CHR(10), cQuoteOpen, cQuoteClose
-
-  cQuoteClose:= cQuoteOpen:= cText[1]
-
-  IF cQuoteOpen=='['
-    cQuoteClose:= ']'
-  ENDIF
-
-  IF cCR IN cText
-    cText:= STRTRAN(cText, cCR, cQuoteClose+"+CHR(13)+"+cQuoteOpen)
-  ENDIF
-
-  IF cLF IN cText
-    cText:= STRTRAN(cText, cLF, cQuoteClose+"+CHR(10)+"+cQuoteOpen)
-  ENDIF
-
-  RETURN(cText)
-
-STATIC FUNCTION ReplaceBracketsInString(cText)
-  LOCAL cTemp, nPos, nLen
-
-  IF '[' IN cText .OR. ']' IN cText
-    cTemp:= cText
-    cText:= ""
-    nLen:= LEN(cTemp)
-
-    FOR nPos:= 1 TO nLen
-
-      SWITCH cTemp[nPos]
-        CASE '['
-          cText+="]+CHR(91)+["
-          EXIT
-        CASE ']'
-          cText+="]+CHR(93)+["
-          EXIT
-        DEFAULT
-          cText+= cTemp[nPos]
-      END
-
-    NEXT nPos
-
-  ENDIF
-
-  RETURN(cText)
-
-FUNCTION ArrayFromLFString(cString)
-  LOCAL cDelim:= CHR(10), nStart:=1, nStop, aResult:= {}, nLen
-  LOCAL nCnt:= 0
-
-  cString:= STRTRAN(cString,CHR(13)) // Get rid of CR
-
-  IF RIGHT(cString,1) != cDelim
-    cString+= cDelim // Add a trailing LF if last character is not one
-  ENDIF
-
-  nLen:= LEN(cString)
-
-  DO WHILE !EMPTY(nStop:= AT(cDelim, cString, nStart)) .AND. nStart<= nLen
-    AADD(aResult, SUBSTR(cString, nStart, nStop- nStart))
-    nStart:= nStop+1
-  ENDDO
-
-  RETURN(aResult)
-

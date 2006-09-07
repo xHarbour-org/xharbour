@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.30 2006/09/06 22:26:32 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.31 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -157,6 +157,28 @@ FUNCTION CStrToVal( cExp, cType )
 RETURN NIL
 
 //--------------------------------------------------------------//
+FUNCTION StringToLiteral( cString )
+
+   LOCAL lDouble := .F., lSingle := .F.
+
+   IF cString HAS "\n|\r" .OR. ( ( lDouble := '"' IN cString ) .AND. ( lSingle := "'" IN cString ) .AND. cString HAS "\[|\]" )
+
+      cString := StrTran( cString, '"', '\"' )
+      cString := StrTran( cString, Chr(10), '\n' )
+      cString := StrTran( cString, Chr(13), '\r' )
+
+      TraceLog( cString )
+
+      RETURN 'E"' + cString + '"'
+   ELSEIF lDouble == .F.
+      RETURN '"' + cString + '"'
+   ELSEIF lSingle == .F.
+      RETURN "'" + cString + "'"
+   ENDIF
+
+RETURN "[" + cString + "]"
+
+//--------------------------------------------------------------//
 FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    LOCAL cType := ValType( xVal )
@@ -166,7 +188,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    SWITCH cType
       CASE 'C'
-         RETURN xVal
+         RETURN StringToLiteral( xVal )
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
@@ -178,7 +200,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN Str( xVal )
 
       CASE 'M'
-         RETURN xVal
+         RETURN StringToLiteral( xVal )
 
       CASE 'A'
          cRet := "{ "
@@ -201,8 +223,8 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             cRet := "{ "
 
             FOR EACH aVar IN xVal:Keys
-               cRet += ValToPrgExp( aVar ) + " => "
-               cRet += ValToPrgExp( xVal:Values[ HB_EnumIndex() ] ) + ", "
+               cRet += ValToPrg( aVar ) + " => "
+               cRet += ValToPrg( xVal:Values[ HB_EnumIndex() ] ) + ", "
             NEXT
 
             /* We know for sure xVal isn't empty, and a last ',' is here */
@@ -328,7 +350,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          ENDIF
 
       CASE 'B'
-         RETURN "HB_RestoreBlock( { "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " } )"
+         RETURN "HB_RestoreBlock( "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " )"
 
       CASE 'P'
          RETURN "HexToNum('" + NumToHex( xVal ) + "')"

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5138 2006/09/06 23:56:00 druzus Exp $
+ * $Id: ChangeLog,v 1.5139 2006/09/07 04:56:42 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-07 16:50 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/cstr.prg
+    + Added StringToLiteral() and calll it in ValToPrg()
+    * Use ValToPrg() instead of ValToPrgExp() in nested calls from ValToPrg()
+
+  * source/rtl/persist.prg
+    * Further optimization and simplifaction
+
+  * tests/testpers.prg
+    * Havier testing of persistance
 
 2006-09-07 00:52 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/cstr.prg
