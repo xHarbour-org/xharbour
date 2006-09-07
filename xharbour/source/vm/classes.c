@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.186 2006/08/10 02:24:59 guerra000 Exp $
+ * $Id: classes.c,v 1.187 2006/08/21 15:16:46 walito Exp $
  */
 
 /*
@@ -209,7 +209,8 @@ static BOOL     s_bClsAutoInit = TRUE;
 /* static PHB_DYNS s_msgClass     = NULL; */
 
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
-       hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0;
+       hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,
+	   hb_cls_uiHashClass = 0;
 
 HB_SYMB  hb_symDestructor = { "__Destructor", {HB_FS_PUBLIC}, {NULL}, NULL };
 
@@ -1306,9 +1307,13 @@ HB_EXPORT BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
    PHB_FUNC pFunc = hb_objGetMthd( pObject, pMessage->pSymbol, FALSE, NULL, FALSE, &bSymbol );
 
    if( bSymbol )
+   {
       return ((PHB_SYMB) pFunc)->value.pFunPtr != NULL;
+   }
    else
+   {
       return pFunc != NULL;
+   }
 }
 
 static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
@@ -2283,6 +2288,10 @@ HB_FUNC( __CLSNEW )
    {
       hb_cls_uiPointerClass = uiClass;
    }
+   else if( strcmp( pNewCls->szName, "HASH" ) == 0 )
+   {
+      hb_cls_uiHashClass = uiClass;
+   }
 
    hb_retni( uiClass );
 }
@@ -2696,13 +2705,13 @@ HB_FUNC( __OBJGETCLSNAME )
    {
       uiClass = ( USHORT ) hb_parni( 1 );
 
-      if( uiClass <= s_uiClasses )
+      if( uiClass && uiClass <= s_uiClasses )
       {
          hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
       }
       else
       {
-         hb_retc( "" );
+         hb_retc( hb_objGetClsName( hb_param( 1, HB_IT_ANY ) ) );
       }
    }
 }
@@ -3238,6 +3247,10 @@ HB_EXPORT USHORT hb_objClassH( PHB_ITEM pObject )
 
       case HB_IT_POINTER :
          uiClass = hb_cls_uiPointerClass;
+         break;
+
+      case HB_IT_HASH :
+         uiClass = hb_cls_uiHashClass;
          break;
 
       default:
@@ -4543,6 +4556,10 @@ HB_FUNC( __CLSASSOCTYPE )
    else if( strcmp( szType, "POINTER" ) == 0 )
    {
       hb_cls_uiPointerClass = uiClass;
+   }
+   else if( strcmp( szType, "HASH" ) == 0 )
+   {
+      hb_cls_uiHashClass = uiClass;
    }
    else
    {

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.18 2005/12/01 13:25:49 snaiperis Exp $
+ * $Id: tclass.prg,v 1.19 2006/04/24 22:24:38 ronpinkas Exp $
  */
 
 /*
@@ -126,12 +126,10 @@ FUNCTION HBClass()
 RETURN __clsInst( s_hClass )
 
 //----------------------------------------------------------------------------//
-
 // xSuper is used here as the new preprocessor file (HBCLASS.CH) send here
 // always an array (if no superclass, this will be an empty one)
 // In case of direct class creation (without the help of preprocessor) xSuper can be
 // either NIL or contain the name of the superclass.
-
 STATIC FUNCTION New( cClassName, xSuper )
 
    LOCAL Self := QSelf()
@@ -166,7 +164,6 @@ STATIC FUNCTION New( cClassName, xSuper )
 RETURN Self
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE Create( MetaClass )
 
    LOCAL Self := QSelf()
@@ -266,13 +263,11 @@ STATIC PROCEDURE Create( MetaClass )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC FUNCTION Instance( )
    LOCAL Self := QSelf()
 RETURN __clsInst( ::hClass )
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
 
    LOCAL Self := QSelf()
@@ -294,7 +289,6 @@ STATIC PROCEDURE AddData( cData, xInit, cType, nScope, lNoinit, lPersistent )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent )
 
    LOCAL Self := QSelf()
@@ -316,7 +310,6 @@ STATIC PROCEDURE AddMultiData( cType, xInit, nScope, aData, lNoInit, lPersistent
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
 
    LOCAL Self := QSelf()
@@ -337,7 +330,6 @@ STATIC PROCEDURE AddClassData( cData, xInit, cType, nScope, lNoInit )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
 
    LOCAL Self := QSelf()
@@ -359,7 +351,6 @@ STATIC PROCEDURE AddMultiClsData( cType, xInit, nScope, aData, lNoInit )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
@@ -374,7 +365,6 @@ STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
@@ -389,7 +379,6 @@ STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddClsMethod( cMethod, nFuncPtr, nScope )
 
    LOCAL Self := QSelf(), nAt
@@ -418,7 +407,6 @@ STATIC PROCEDURE AddVirtual( cMethod )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
@@ -436,7 +424,6 @@ STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
 RETURN
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE SetOnError( nFuncPtr )
 
    LOCAL Self := QSelf()
@@ -447,7 +434,6 @@ RETURN
 
 
 //----------------------------------------------------------------------------//
-
 STATIC PROCEDURE SetDestructor( nFuncPtr )
 
    LOCAL Self := QSelf()
@@ -457,8 +443,6 @@ STATIC PROCEDURE SetDestructor( nFuncPtr )
 RETURN
 
 //----------------------------------------------------------------------------//
-
-
 /*
  * (C) 2002 - Francesco Saverio Giudice
  *
@@ -509,7 +493,6 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
 RETURN Self
 
 //----------------------------------------------------------------------------//
-
 FUNCTION __ClassNew( cName, nDatas )
 
     LOCAL hClass := __ClsNew( cName, nDatas )
@@ -521,7 +504,6 @@ FUNCTION __ClassNew( cName, nDatas )
 RETURN hClass
 
 //----------------------------------------------------------------------------//
-
 FUNCTION __ClassAdd( hClass, cProperty, cFunction )
 
    cProperty := Upper( cProperty )
@@ -533,27 +515,25 @@ FUNCTION __ClassAdd( hClass, cProperty, cFunction )
 RETURN __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
 
 //----------------------------------------------------------------------------//
-
 FUNCTION __ClassIns( hClass )
 
 RETURN __ClsInst( hClass )
 
 //----------------------------------------------------------------------------//
-
 CLASS SCALAROBJECT
    METHOD IsScalar() INLINE .T.
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS ARRAY FROM SCALAROBJECT FUNCTION _ARRAY
+
    METHOD _Size( nLen )         INLINE aSize( Self, nLen ), nLen
    METHOD Add( xValue )         INLINE aAdd( Self, xValue ), Self
    METHOD AddAll( oCollection )
    METHOD AtIndex( nPos )       INLINE Self[nPos]
    METHOD AtPut( nPos, xValue ) INLINE Self[ nPos ] := xValue
    METHOD Append( xValue )      INLINE aAdd( Self, xValue ), Self
-   METHOD AsString()            INLINE ValToPrgExp( HB_QSelf() )
+   METHOD AsString()            INLINE ValToPrg( HB_QSelf() )
    METHOD Collect( bCollect )
    METHOD Copy()                INLINE aCopy( Self, Array( Len( Self ) ) )
    METHOD DeleteAt( nPos )
@@ -566,7 +546,7 @@ CLASS ARRAY FROM SCALAROBJECT FUNCTION _ARRAY
 
 ENDCLASS
 
-METHOD AddAll( oCollection )
+METHOD AddAll( oCollection ) CLASS ARRAY
    oCollection:Do( { |xValue| ::Add(xValue) } )
 RETURn Self
 
@@ -576,7 +556,7 @@ METHOD Collect( bCollect ) CLASS ARRAY
 
    FOR EACH xElement IN Self
       IF Eval( bCollect, UnRef( xElement ) )
-          aAdd( aResult, UnRef( xElement ) )
+         aAdd( aResult, UnRef( xElement ) )
       END
    NEXT
 
@@ -626,45 +606,109 @@ METHOD Remove( xValue ) CLASS ARRAY
 RETURN Self
 
 //----------------------------------------------------------------------------//
+CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
+
+   METHOD _Size( nLen )
+   METHOD Add( xKey, xValue )      INLINE Self[ xKey ] := xValue, Self
+   METHOD AddAll( oCollection )
+   METHOD AtIndex( nPos )          INLINE HGetValueAt( Self, nPos )
+   METHOD AtPut( nPos, xValue )    INLINE HsetValueAt( Self, nPos, xValue )
+   METHOD Append( xKey, xValue )   INLINE Self[ xKey ] := xValue, Self
+   METHOD AsString()               INLINE ValToPrg( HB_QSelf() )
+   METHOD Collect( bCollect )
+   METHOD Copy()                   INLINE hCopy( Self, Hash() )
+   METHOD DeleteAt( nPos )         INLINE hDelat( Self, nPos )
+   METHOD Do( bBlock )
+   METHOD IndexOf( xValue )        INLINE hScan( Self, xValue )
+   METHOD Init( nLen )             INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
+   METHOD Remove( xValue )         INLINE hDel( Self, xValue )
+   METHOD Scan( bScan )            INLINE hScan( Self, bScan )
+
+ENDCLASS
+
+METHOD _Size( nLen ) CLASS HASH
+
+	 LOCAL nOldLen := Len( Self ), Counter
+
+	 IF nLen == nOldLen
+			RETURN nLen
+	 ELSEIF nLen > nOldLen
+      hAllocate( Self, nLen )
+
+			FOR Counter := nOldLen + 1 TO nLen
+				 Self[ "_SIZED_" + LTrim( Str( Counter ) ) ] := NIL
+			NEXT
+	 ELSE
+			FOR Counter := nOldLen TO nLen + 1
+				 hDelAt( Self, nLen + 1 )
+			NEXT
+	 ENDIF
+
+RETURN nLen
+
+METHOD AddAll( oCollection ) CLASS HASH
+
+   oCollection:Do( { |xKey, xValue| Self[ xKey ] := xValue } )
+
+RETURN Self
+
+METHOD Collect( bCollect ) CLASS HASH
+
+   LOCAL xElement, aResult[0]
+
+   FOR EACH xElement IN Self:Values
+      IF Eval( bCollect, UnRef( xElement ) )
+         aAdd( aResult, UnRef( xElement ) )
+      END
+   NEXT
+
+RETURN aResult
+
+METHOD Do( bDo ) CLASS HASH
+
+   LOCAL xKey
+
+   FOR EACH xKey IN Self:Keys
+      Eval( bDo, xKey, Self[ xKey ] )
+   NEXT
+
+RETURN Self
+
+//----------------------------------------------------------------------------//
 CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
    METHOD AsString() INLINE "{||...}"
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS CHARACTER FROM SCALAROBJECT FUNCTION _CHARACTER
    METHOD AsString INLINE HB_QSelf()
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS DATE FROM SCALAROBJECT FUNCTION _DATE
    METHOD AsString INLINE DToc( HB_QSelf() )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
    METHOD AsString INLINE IIF( HB_QSelf(), ".T.", ".F." )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS NIL FROM SCALAROBJECT FUNCTION _NIL
    METHOD AsString INLINE "NIL"
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS NUMERIC FROM SCALAROBJECT FUNCTION _NUMERIC
    METHOD AsString INLINE LTrim( Str( ( HB_QSelf() ) ) )
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
 CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
    METHOD AsString INLINE "0x" + NumToHex( HB_QSelf() )
 ENDCLASS
 
+//----------------------------------------------------------------------------//
 FUNCTION UnRef( xValue )
 RETURN xValue

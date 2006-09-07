@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.29 2006/03/11 12:35:24 likewolf Exp $
+ * $Id: cstr.prg,v 1.30 2006/09/06 22:26:32 ronpinkas Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    SWITCH cType
       CASE 'C'
-         RETURN ValToPrgExp( xVal )
+         RETURN xVal
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"

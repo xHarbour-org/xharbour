@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5137 2006/09/06 22:26:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5138 2006/09/06 23:56:00 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-07 00:52 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/cstr.prg
+    * Reverted ValToPrg() to use the UNmodified original string
+      /* Use ValToPrgexp() to use binary encoding and ValToPrg() for normal display */
+
+  * include/hbclass.ch
+    + Added HASH overloading support to syntax:
+      OVERRIDE METHOD ...
+      EXTEND CLASS ...
+      EXTEND [TYPE] ...
+      ENABLE TYPE ...
+      ASSOCIATE CLASS ...
+
+  * source/rtl/tclass.prg
+    + Added HASH scalar class sample
+    * Modified AsString to use ValToPrg() instead of ValToPrgExp()
+
+  * include/classes.h
+  * source/vm/classes.c
+    * Fixed GPF trap in __OBJGETCLSNAME() and added support for overloaded types in __OBJGETCLSNAME
+    + Added support for overloading HB_IT_HASH
+
+  * source/vm/hvm.c
+    + Added support for overloading HB_IT_HASH
+
+  * tests/enbltype.prg
+    + Added demo of HASH overloading with scalar class
 
 2006-09-07 01:55 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/source/rdd/dbcmd.c

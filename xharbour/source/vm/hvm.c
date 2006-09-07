@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.578 2006/08/05 11:58:26 druzus Exp $
+ * $Id: hvm.c,v 1.579 2006/09/06 22:26:32 ronpinkas Exp $
  */
 
 /*
@@ -1880,42 +1880,6 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
 
                   w++;
                   break;
-               }
-            }
-            else if ( HB_IS_HASH( pSelf ) )
-            {
-               char * szIndex = pMsg->item.asSymbol.value->szName;
-               ULONG ulPos;
-
-               if( strcmp( szIndex, "CLASSNAME" ) == 0 )
-               {
-                  hb_itemPutC( pMsg, "HASH" );
-               }
-               else if( strcmp( szIndex, "CLASSH" ) == 0 )
-               {
-                  hb_itemPutNI( pMsg, 0 );
-               }
-               else if( strcmp( szIndex, "KEYS" ) == 0 )
-               {
-                  hb_hashGetKeys( pMsg, pSelf );
-               }
-               else if( strcmp( szIndex, "VALUES" ) == 0 )
-               {
-                  hb_hashGetValues( pMsg, pSelf );
-               }
-               else
-               {
-                  HB_ITEM_NEW( hbIndex );
-                  hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
-
-                  if( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
-                  {
-                     hb_hashGet( pSelf, ulPos, pMsg );
-                  }
-                  else
-                  {
-                     hb_vmClassError( 0, "HASH", szIndex );
-                  }
                }
             }
             else
@@ -7099,13 +7063,22 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
    else if ( HB_IS_HASH( pSelf ) )
    {
-      if ( uiParams == 1 )
+	  // Using FALSE for lAllowErrFunc because we must prefer (at this point) default messages below over OnError handler if any
+      if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, FALSE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
+	  {
+		 //goto DoFunc;
+	  }
+      else if( uiParams == 1 )
       {
          if ( pSym->szName[0] == '_' )
          {
             hb_hashAddChar( pSelf, pSym->szName + 1, hb_stackItemFromTop( -1 ) );
             hb_itemCopy( &(HB_VM_STACK.Return), hb_stackItemFromTop( -1 ) );
          }
+         else if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
+	     {
+		    //goto DoFunc;
+		 }
          else
          {
             hb_vmClassError( uiParams, "HASH", pSym->szName );
@@ -7131,6 +7104,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             hb_hashGetValues( &(HB_VM_STACK.Return), pSelf );
          }
+         else if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
+	     {
+		    //goto DoFunc;
+		 }
          else
          {
             HB_ITEM_NEW( hbIndex );
@@ -7147,6 +7124,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             }
          }
       }
+      else if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
+	  {
+		 //goto DoFunc;
+	  }
       else
       {
          hb_vmClassError( uiParams, "HASH", pSym->szName );
