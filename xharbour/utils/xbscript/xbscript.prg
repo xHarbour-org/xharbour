@@ -204,7 +204,7 @@
 
       #ifdef ZIP
          EXTERN ZipCreate
-         REQUEST RMDBFCDX
+				 REQUEST RMDBFCDX
       #endif
    #endif
 
@@ -5277,44 +5277,6 @@ RETURN .T.
 
 //--------------------------------------------------------------//
 
-PROCEDURE RegroupLine( sLine, aPendingLines, nPendingLines )
-
-   #ifdef __XHARBOUR__
-      LOCAL sTemp
-
-      FOR EACH sTemp IN aPendingLines
-         IF sTemp != NIL .AND. sTemp[1] != '#'
-            IF Len( sLine ) == 0
-               sLine := sTemp
-            ELSE
-               sLine += '; ' + sTemp
-            ENDIF
-            sTemp := NIL
-         ELSE
-            EXIT
-         ENDIF
-      NEXT
-   #else
-      LOCAL nPendingLine
-
-      FOR nPendLine := 1 TO nPendingLines
-         IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
-            IF Len( sLine ) == 0
-               sLine := aPendingLines[ nPendLine ]
-            ELSE
-               sLine += '; ' + aPendingLines[ nPendLine ]
-            ENDIF
-            aPendingLines[ nPendLine ] := NIL
-         ELSE
-            EXIT
-         ENDIF
-      NEXT
-   #endif
-
-RETURN
-
-//--------------------------------------------------------------//
-
 FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
    LOCAL nPendingLines := 0, aPendingLines  := {}
@@ -5331,13 +5293,18 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL bArrayPrefix
    LOCAL bPresetCompile
    LOCAL sRight, nAt, sConstant
-   LOCAL sTemp
+
+   #ifdef __XHARBOUR__
+      LOCAL sTemp
+   #else
+      LOCAL nPendLine
+   #endif
+
    //TraceLog( sLine, nLine )
 
    s_bRTEBlock := s_bDefRTEBlock
 
-   IF Left( sTemp := LTrim( sLine ), 1 ) != '#' .OR. aScan( { "COMMAND", "XCOMMAND", "TRANSLATE", "XTRANSLATE", "UNCOMMAND", "XUNCOMMAND", "UNTRANSLATE", "XUNTRANSLATE" }, RTrim( Upper( NextToken( SubStr( sTemp, 2  ) ) ) ) ) == 0
-
+   IF Left( LTrim( sLine ), 1 ) != '#'
       nPosition := 0
       WHILE ( nNewLineAt := AtSkipStrings( ';', sLine ) ) > 0
          nPendingLines++
@@ -5478,13 +5445,32 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
             ENDIF
 
             IF nIfDef > 0 .AND. ! abIfDef[nIfDef]
-               TraceLog( "Ignored: " + sLine )
+               //? "Ignored: " + sLine
                sLine := ''
                LOOP
             ENDIF
 
             ExtractLeadingWS( @sLine )
-            //TraceLog( sLine )
+
+            #ifdef __XHARBOUR__
+               FOR EACH sTemp IN aPendingLines
+                  IF sTemp != NIL .AND. sTemp[1] != '#'
+                     sLine += '; ' + sTemp
+                     sTemp := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #else
+               FOR nPendLine := 1 TO nPendingLines
+                  IF aPendingLines[ nPendLine ] != NIL .AND. Left( aPendingLines[ nPendLine ], 1 ) != '#'
+                     sLine += '; ' + aPendingLines[ nPendLine ]
+                     aPendingLines[ nPendLine ] := NIL
+                  ELSE
+                     EXIT
+                  ENDIF
+               NEXT
+            #endif
 
             #ifdef OUTPUT_DIRECTIVES
                aAdd( asOutLines, "/* #" + sDirective + " " + sLine + " */"  )
@@ -5494,7 +5480,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                CompileDefine( sLine )
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSEIF sDirective == Left( "ERROR", nLen )
@@ -5505,14 +5490,11 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                RemoveDefine( sLine )
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSEIF sDirective == "IF"
 
                sConstant := AllTrim( sLine )
-               TraceLog( sConstant )
-
                sConstant := StrTran( sConstant, ".T.", "1" )
                sConstant := StrTran( sConstant, ".F.", "0" )
 
@@ -5553,21 +5535,18 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
                ENDIF
 
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSEIF sDirective == Left( "IFDEF", nLen )
 
                SetIfDef( sLine, .T. )
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSEIF sDirective == Left( "IFNDEF", nLen )
 
                SetIfDef( sLine, .F. )
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSEIF sDirective == Left( "INCLUDE", nLen )
@@ -5651,12 +5630,9 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
                //TraceLog( sLine )
                sLine := ''
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
                LOOP
 
             ELSE
-
-               RegroupLine( @sLine, aPendingLines, nPendingLines )
 
                IF Left( sDirective, 1 ) == 'X'
                   bX := .T.
