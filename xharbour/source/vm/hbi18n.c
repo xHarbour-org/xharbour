@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.21 2005/10/24 01:04:37 druzus Exp $
+ * $Id: hbi18n.c,v 1.22 2006/09/06 15:30:31 snaiperis Exp $
  */
 
 /*
@@ -339,7 +339,7 @@ PHB_ITEM hb_i18n_read_table( FHANDLE handle, int count )
 PHB_ITEM hb_i18n_read_memory_table( BYTE* pData, int count )
 {
    char szStrLen[9];
-   int nStrLen, nRead;
+   int nStrLen;
    int i,j;
    PHB_ITEM pTable;
 
