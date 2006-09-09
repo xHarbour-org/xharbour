@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.31 2006/09/07 04:56:43 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.32 2006/09/07 20:51:31 ronpinkas Exp $
  */
 
 /*
@@ -167,7 +167,7 @@ FUNCTION StringToLiteral( cString )
       cString := StrTran( cString, Chr(10), '\n' )
       cString := StrTran( cString, Chr(13), '\r' )
 
-      TraceLog( cString )
+      //TraceLog( cString )
 
       RETURN 'E"' + cString + '"'
    ELSEIF lDouble == .F.
@@ -294,16 +294,21 @@ FUNCTION ValToPrgExp( xVal, aObjs )
    LOCAL aVars, aVar, cRet, nObj
    LOCAL cChar
 
-   //TraceLog( xVal, cName, nPad, aObjs )
+   //TraceLog( xVal )
 
    SWITCH cType
       CASE 'C'
-				 cRet := ""
-				 FOR EACH cChar IN xVal
-            cRet += " + Chr(" + Str( Asc( cChar ), 3 ) + ")"
-         NEXT
 
-         RETURN SubStr( cRet, 3 )
+         IF Len( xVal ) == 0
+            RETURN '""'
+         ELSE
+            cRet := ""
+            FOR EACH cChar IN xVal
+               cRet += " + Chr(" + Str( Asc( cChar ), 3 ) + ")"
+            NEXT
+
+            RETURN SubStr( cRet, 3 )
+         ENDIF
 
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
@@ -327,6 +332,7 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          IF cRet[ -2 ] == ','
             cRet[ -2 ] := ' '
          ENDIF
+
          cRet[ -1 ] := '}'
 
          RETURN cRet

@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.11 2004/06/23 18:14:08 paultucker Exp $
+ * $Id: hbserial.prg,v 1.12 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -68,6 +68,13 @@ FUNCTION HB_Serialize( xValue )
 
          EXIT
 
+      CASE "B"
+         xElement := HB_SaveBlock( xValue )
+         cSerial  := "B" + HB_Serialize( xElement )
+
+         EXIT
+
+
       CASE "H"
          cSerial := "H" + HB_CreateLen8( Len( xValue ) )
 
@@ -79,12 +86,12 @@ FUNCTION HB_Serialize( xValue )
          EXIT
 
       CASE "O"  
-      	 if __objDerivedFrom(xValue,"HBPersistent")
+          if __objDerivedFrom(xValue,"HBPersistent")
             cSerial:= HB_SerializeSimple( xValue:ClassName )
             cSerial+= xValue:SaveToText()
             cSerial:= "Q" + HB_CreateLen8( Len( cSerial ) )+ cSerial
-      	 
-      	 else
+          
+          else
             aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
             cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
             cSerial += HB_SerializeSimple( xValue:ClassName )
@@ -118,6 +125,7 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          oObject := Array(0)
          nLen := HB_GetLen8( Substr( cSerial, 2 ) )
          cSerial := Substr( cSerial, 10 )
+         
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
             Aadd( oObject, oElem )
@@ -125,6 +133,13 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             nLen --
          ENDDO
       EXIT
+
+      CASE "B"
+         cSerial := Substr( cSerial, 2 )
+         oElem   := HB_Deserialize( cSerial, nMaxLen )
+         oObject := HB_RestoreBlock( oElem )
+      EXIT
+
 
       CASE "H"
          oObject := Hash()

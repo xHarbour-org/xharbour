@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.187 2006/08/21 15:16:46 walito Exp $
+ * $Id: classes.c,v 1.188 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -2926,7 +2926,7 @@ HB_FUNC( __OBJSENDMSG )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSG", 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ) );
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSG", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -2969,7 +2969,7 @@ HB_FUNC( __OBJSENDMSGCASE )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSGCASE", 2, hb_param( 1, HB_IT_ANY ), hb_param( 2, HB_IT_ANY ) );
+      hb_errRT_BASE( EG_ARG, 3000, NULL, "__OBJSENDMSGCASE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -3012,12 +3012,12 @@ HB_FUNC( __CLSINSTSUPER )
          }
          else
          {
-            hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 1, hb_param(1, HB_IT_ANY ) );
+            hb_errRT_BASE( EG_ARG, 3002, "Super class does not return an object", "__CLSINSTSUPER", 1, hb_paramError( 1 ) );
          }
       }
       else
       {
-         hb_errRT_BASE( EG_ARG, 3003, "Cannot find super class", "__CLSINSTSUPER", 0 );
+         hb_errRT_BASE( EG_ARG, 3003, "Cannot find super class", "__CLSINSTSUPER", 1, hb_paramError( 1 ) );
       }
    }
 
