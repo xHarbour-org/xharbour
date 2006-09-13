@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.41 2006/04/25 20:17:38 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.42 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -940,7 +940,7 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
    //#xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                      _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>
    #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> CLASS <ClassName>    _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE <ClassName> <MethodName>
 #else
-   #xcommand METHOD [function] <MethodName> CLASS <ClassName> => METHOD <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
+   #xcommand METHOD [FUNCTION] <MethodName> CLASS <ClassName> => METHOD <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
 
    #ifdef STRICT_OO
       #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => __ERR(Method <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_) ; function <MethodName> ; local self := QSelf()
@@ -950,7 +950,7 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
       #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Method <"MethodName"> not declared in class: <ClassName> ; function <MethodName> ; local self := QSelf()
    #endif
 
-   #xcommand PROCEDURE [function] <MethodName> CLASS <ClassName> => PROCEDURE <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
+   #xcommand PROCEDURE [FUNCTION] <MethodName> CLASS <ClassName> => PROCEDURE <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
 
    #ifdef STRICT_OO
       #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_ ; function <MethodName> ; local self := QSelf()

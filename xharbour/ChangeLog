@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5143 2006/09/08 11:42:28 snaiperis Exp $
+ * $Id: ChangeLog,v 1.5144 2006/09/09 04:14:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-13 09:17 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbclass.ch
+    * Minor formatting
+
+  * include/hbextern.ch
+    + Added HB_Crypt and HB_Decrypt
+
+  * source/pp/ppcore.c
+    ! Fixed wild match markers to consume lines beyond ';' even when current line reached EOL
+    ! Fixed wild match markers to only consume ';' when pending line[s] are not empty.
+    ! Fixed wild match markers to pre-process text of pending lines.
+    + Added #define directive to list of directives which retain pending lines as 1 unit
+  * source/pp/pptable.c
+    * Fixed all END* rules to not use wild match markers, which is buggy for compunded rules such as hbclass.ch
 
 2006-09-09 00:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/cstr.prg

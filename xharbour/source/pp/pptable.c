@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.66 2005/11/06 10:59:16 ptsarenko Exp $
+ * $Id: pptable.c,v 1.67 2006/02/12 00:11:07 ronpinkas Exp $
  */
 
 /*
@@ -144,12 +144,39 @@ void hb_pp_Table( void )
 
    static COMMANDS sC___1 = {0,"NOTE","\1A30",NULL,NULL };
    static COMMANDS sC___2 = {0,"DO","WHILE \1A00","while \1A00",&sC___1 };
+
+/*
    static COMMANDS sC___3 = {0,"END","\1A00","end",&sC___2 };
    static COMMANDS sC___4 = {0,"END","SEQUENCE","end",&sC___3 };
    static COMMANDS sC___5 = {0,"ENDSEQUENCE","","end",&sC___4 };
    static COMMANDS sC___6 = {0,"ENDDO","\1A30","enddo",&sC___5 };
    static COMMANDS sC___7 = {0,"ENDIF","\1A30","endif",&sC___6 };
    static COMMANDS sC___8 = {0,"ENDCASE","\1A30","endcase",&sC___7 };
+
+  Clipper rules are buggy in that they will HIDE lines following END* in lines ':' seperated
+  multi-lins, such as:
+
+     IF x; y(); ENDIF; z() // z() will be sent to lalaland
+
+  This is extermly problematic with #directives generating multiple lines such as hbclass.ch
+
+  The corrected rules are:
+
+  // Using sTrangE cApitalizatioN to signify transformation when debugging PPO files.
+  #command END          <any> [<anymore>] => eNd
+  #command END SEQUENCE <any> [<anymore>] => eNd
+  #command ENDSEQUENCE  <any> [<anymore>] => eNd
+  #command ENDDO        <any> [<anymore>] => eNddO
+  #command ENDIF        <any> [<anymore>] => eNdiF
+  #command ENDCASE      <any> [<anymore>] => eNdcasE
+*/
+   static COMMANDS sC___3 = {0,"END","\1A00 \16\1B00\17","eNd",&sC___2 };
+   static COMMANDS sC___4 = {0,"END","SEQUENCE \1A00 \16\1B00\17","eNd",&sC___3};
+   static COMMANDS sC___5 = {0,"ENDSEQUENCE","\1A00 \16\1B00\17","eNd",&sC___4 };
+   static COMMANDS sC___6 = {0,"ENDDO","\1A00 \16\1B00\17","eNddO",&sC___5 };
+   static COMMANDS sC___7 = {0,"ENDIF","\1A00 \16\1B00\17","eNdiF",&sC___6 };
+   static COMMANDS sC___8 = {0,"ENDCASE","\1A00 \16\1B00\17","eNdcasE",&sC___7 };
+
    static COMMANDS sC___9 = {0,"ENDFOR","\16 \1A30 \17","next",&sC___8 };
    static COMMANDS sC___10 = {0,"NEXT","\1A00 \16TO \1B00\17 \16STEP \1C00\17","next",&sC___9 };
    static COMMANDS sC___11 = {0,"DO","\1A00.PRG \16WITH \1B10\17","do \1A00 \16 WITH \1B00\17",&sC___10 };

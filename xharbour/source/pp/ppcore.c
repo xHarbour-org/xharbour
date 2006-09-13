@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.227 2006/04/27 18:34:01 walito Exp $
+ * $Id: ppcore.c,v 1.228 2006/06/02 16:19:19 ronpinkas Exp $
  */
 
 /*
@@ -1120,7 +1120,7 @@ int hb_pp_ParseDirective( char * sLine )
 
            if( *pTmp )
            {
-              printf( "Found: '%c' %i\n", *pTmp, *pTmp );
+              //printf( "Found: '%c' %i\n", *pTmp, *pTmp );
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_WRONG_NAME, sLine - 1, NULL );
            }
         }
@@ -2433,23 +2433,25 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
   isdvig = 0;
 
+  //printf( "*** Line: >%s<\n", sLine );
+
   do
   {
      BOOL bRule;
 
     Top:
 
-     //printf( "  *** Line: >%s<\n", sLine );
-
      ptro = sOutLine;
      ptri = sLine + isdvig;
+
+     //printf( "   *** Line: >%s<\n      sLine: >%s<\n", ptri, sLine );
 
      while( ptri[0] == ' ' || ptri[0] == '\t' )
      {
         ptri++;
      }
 
-     if( ptri[0] == '#' && strchr( "xXcCtT", ptri[1] ) )
+     if( ptri[0] == '#' && strchr( "xXcCtTdD", ptri[1] ) )
      {
         bRule = TRUE;
      }
@@ -3125,7 +3127,8 @@ static int CommandStuff( char * ptrmp, char * inputLine, char * ptro, int * lenr
         ptr = Marker + 3;
      }
 
-     while( *ptri != '\0' && !endTranslation )
+     // Wild Match marker *does* consume even ';' and pending lines.
+     while( ( *ptri != '\0' || ( s_pTerminator && ptrmp[0] == '\1' && ptrmp[2] == '3' ) ) && ( ! endTranslation ) )
      {
         HB_SKIPTABSPACES( ptrmp );
 
@@ -3712,10 +3715,26 @@ static int WorkMarkers( char ** ptrmp, char ** ptri, char * ptro, int * lenres, 
   }
   else if( *(exppatt+2) == '3' )  /*  ----  wild match marker  */
   {
+     // Wild Match marker *does* consume even ';' and pending lines.
      if( s_pTerminator )
      {
-        *s_pTerminator = ';';
-        s_pTerminator = NULL;
+        char *pTmp = s_pTerminator + 1;
+
+        if( *pTmp )
+        {
+            HB_SKIPTABSPACES( pTmp );
+
+            if( *pTmp )
+            {
+                char szOutLine[ HB_PP_STR_SIZE ];
+
+                *s_pTerminator = ';';
+                s_pTerminator = NULL;
+
+                // Clipper preprocess even the wild matched text.
+                hb_pp_ParseExpression( pTmp, szOutLine );
+            }
+        }
      }
 
      lenreal = hb_pp_strocpy( expreal, *ptri );

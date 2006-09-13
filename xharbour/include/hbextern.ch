@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.33 2006/07/13 12:27:17 druzus Exp $
+ * $Id: hbextern.ch,v 1.34 2006/09/07 21:06:44 ronpinkas Exp $
  */
 
 /*
@@ -696,6 +696,8 @@ EXTERNAL HB_DUMPVAR, HB_CRYPT, HB_DECRYPT
 EXTERNAL HBPersistent
 
 EXTERNAL _Array, _Block, _Character, _Date, _Logical, _Nil, _Numeric, _Pointer, _Hash
+
+EXTERNAL HB_Crypt, HB_Decrypt
 
 #ifdef __PLATFORM__Windows
   #ifndef NODLL
