@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.580 2006/09/07 04:56:43 ronpinkas Exp $
+ * $Id: hvm.c,v 1.581 2006/09/07 21:06:44 ronpinkas Exp $
  */
 
 /*
@@ -1835,7 +1835,16 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
          {
             PHB_ITEM pSelf = hb_stackItemFromTop( -1 ), pMsg = hb_stackItemFromTop( -2 );
 
-            if( HB_IS_OBJECT( pSelf ) )
+            if( HB_IS_OBJECT( pSelf ) ||
+              ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||
+              ( HB_IS_BLOCK( pSelf )   && hb_cls_uiBlockClass )     ||
+              ( HB_IS_STRING( pSelf )  && hb_cls_uiCharacterClass ) ||
+              ( HB_IS_DATE( pSelf )    && hb_cls_uiDateClass )      ||
+              ( HB_IS_LOGICAL( pSelf ) && hb_cls_uiLogicalClass )   ||
+              ( HB_IS_NIL( pSelf )     && hb_cls_uiNilClass )       ||
+              ( HB_IS_NUMERIC( pSelf ) && hb_cls_uiNumericClass )   ||
+              ( HB_IS_POINTER( pSelf ) && hb_cls_uiPointerClass )   ||
+              ( HB_IS_HASH( pSelf )    && hb_cls_uiHashClass ) )
             {
                BOOL bConstructor;
                BOOL bSymbol;
@@ -1881,11 +1890,89 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   w++;
                   break;
                }
+               else if ( HB_IS_HASH( pSelf ) )
+               {
+                  char * szIndex = pMsg->item.asSymbol.value->szName;
+                  ULONG ulPos;
+
+                  /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
+                  if( strcmp( szIndex, "CLASSNAME" ) == 0 )
+                  {
+                     hb_itemPutC( pMsg, "HASH" );
+                  }
+                  else if( strcmp( szIndex, "CLASSH" ) == 0 )
+                  {
+                     hb_itemPutNI( pMsg, 0 );
+                  }
+                  else if( strcmp( szIndex, "KEYS" ) == 0 )
+                  {
+                     hb_hashGetKeys( pMsg, pSelf );
+                  }
+                  else if( strcmp( szIndex, "VALUES" ) == 0 )
+                  {
+                     hb_hashGetValues( pMsg, pSelf );
+                  }
+                  else
+                  */
+                  {
+                     HB_ITEM_NEW( hbIndex );
+
+                     hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
+
+                     if( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
+                     {
+                        hb_hashGet( pSelf, ulPos, pMsg );
+                     }
+                     else
+                     {
+                        hb_vmClassError( 0, "HASH", szIndex );
+                     }
+                  }
+               }
+            }
+            else if ( HB_IS_HASH( pSelf ) )
+            {
+               char * szIndex = pMsg->item.asSymbol.value->szName;
+               ULONG ulPos;
+
+               /* Following are NOT assignable, in an array form, and or byref - commented by Ron 2006-09-14
+               if( strcmp( szIndex, "CLASSNAME" ) == 0 )
+               {
+                  hb_itemPutC( pMsg, "HASH" );
+               }
+               else if( strcmp( szIndex, "CLASSH" ) == 0 )
+               {
+                  hb_itemPutNI( pMsg, 0 );
+               }
+               else if( strcmp( szIndex, "KEYS" ) == 0 )
+               {
+                  hb_hashGetKeys( pMsg, pSelf );
+               }
+               else if( strcmp( szIndex, "VALUES" ) == 0 )
+               {
+                  hb_hashGetValues( pMsg, pSelf );
+               }
+               else
+               */
+               {
+                  HB_ITEM_NEW( hbIndex );
+
+                  hb_itemPutCRawStatic( &hbIndex, szIndex, strlen( szIndex ) );
+
+                  if( hb_hashScan( pSelf, &hbIndex , &ulPos ) )
+                  {
+                     hb_hashGet( pSelf, ulPos, pMsg );
+                  }
+                  else
+                  {
+                     hb_vmClassError( 0, "HASH", szIndex );
+                  }
+               }
             }
             else
             {
                hb_errRT_BASE_SubstR( EG_NOOBJECT, 1004, "Not object", pMsg->item.asSymbol.value->szName, 1, pSelf );
-               hb_itemForwardValue( pMsg, &(HB_VM_STACK.Return) );
+               hb_itemForwardValue( pMsg, &(HB_VM_STACK.Return ) );
             }
 
             // Symbol was recycled.
