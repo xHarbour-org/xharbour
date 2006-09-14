@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.188 2006/09/07 04:56:43 ronpinkas Exp $
+ * $Id: classes.c,v 1.189 2006/09/09 04:14:35 ronpinkas Exp $
  */
 
 /*
@@ -4565,4 +4565,11 @@ HB_FUNC( __CLSASSOCTYPE )
    {
       hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
+}
+
+HB_FUNC( __CLSCNTCLASSES )
+{
+   HB_THREAD_STUB_API
+
+   hb_retni( (int) s_uiClasses );
 }
