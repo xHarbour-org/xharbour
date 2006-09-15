@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.189 2006/09/09 04:14:35 ronpinkas Exp $
+ * $Id: classes.c,v 1.190 2006/09/14 15:33:40 ronpinkas Exp $
  */
 
 /*
@@ -2685,35 +2685,17 @@ HB_FUNC( __CLSMSGASSIGNED )
 }
 
 /*
- * <cClassName> := ClassName( <hClass> )
+ * <cClassName> := ClassName( <xObj> )
  *
- * Returns class name of <hClass>
+ * Returns class name of any type
+ *
+ * See __ClsName() for HANDLE based argument
  */
 HB_FUNC( __OBJGETCLSNAME )
 {
    HB_THREAD_STUB_API
-   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
-   USHORT uiClass;
 
-   if( pObject && pObject->item.asArray.value->uiClass )
-   {
-      uiClass = pObject->item.asArray.value->uiClass;
-
-      hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
-   }
-   else
-   {
-      uiClass = ( USHORT ) hb_parni( 1 );
-
-      if( uiClass && uiClass <= s_uiClasses )
-      {
-         hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
-      }
-      else
-      {
-         hb_retc( hb_objGetClsName( hb_param( 1, HB_IT_ANY ) ) );
-      }
-   }
+   hb_retc( hb_objGetClsName( hb_param( 1, HB_IT_ANY ) ) );
 }
 
 
@@ -3130,7 +3112,18 @@ HB_FUNC( __CLASSADD )
 
 HB_FUNC( __CLASSNAME )
 {
-   HB_FUNCNAME( __OBJGETCLSNAME )();
+   HB_THREAD_STUB_API
+
+   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
+
+   if( pObject && pObject->item.asArray.value->uiClass && pObject->item.asArray.value->uiClass <= s_uiClasses )
+   {
+      hb_retcStatic( s_pClasses[ pObject->item.asArray.value->uiClass - 1 ].szName );
+   }
+   else
+   {
+      hb_retclen( NULL, 0 );
+   }
 }
 
 /* NOTE: Undocumented Clipper function */

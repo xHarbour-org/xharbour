@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.5 2003/01/27 03:40:53 walito Exp $
+ * $Id: profiler.prg,v 1.6 2004/06/10 06:39:40 brianhays Exp $
  */
 
 /*
@@ -404,12 +404,12 @@ Return( self )
 
 Method gatherMethods Class HBProfile
 Local lProfile  := __setProfiler( .F. )
-Local n         := 1
+Local n, nClasses := __ClsCntClasses()
 Local cClass
 Local xMember
 
    // For each class in the environment...
-   Do While !empty( cClass := __className( n ) )
+   FOR n := 1 TO nClasses
 
       // If we're not ignoring the class' methods...
       If !::ignoreSymbol( cClass )
@@ -428,9 +428,7 @@ Local xMember
 
       EndIf
 
-      ++n
-
-   EndDo
+   NEXT
 
    __setProfiler( lProfile )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5147 2006/09/14 15:33:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5148 2006/09/15 06:28:27 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-09-15 11:06 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/classes.c
+    * __CLASSNAME() reverted to return class name only based on numeric handle argument or "" for any invalid argument
+    * __OBJGETCLSNAME() revised to not treat numerics as handles but rather always return pure class name of any type argument.
+
+  * source/rtl/profiler.prg
+    * Minor optimization using __ClsCntClasses()
 
 2006-09-14 23:23 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * gd\MAKE_B32.BAT
