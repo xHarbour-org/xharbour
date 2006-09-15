@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5146 2006/09/14 15:04:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5147 2006/09/14 15:33:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-09-14 23:23 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * gd\MAKE_B32.BAT
+    *  fixed so if you use envvar BCDIR you don't have to also create
+       a BCCDIR to be able to build
+
+  * contrib/rdd_ads/ads1.c
+    * fixed bug where the Found flag set by AdsSeek() was incorrect.
+      This code is activated only when ADS cannot serve a filter itself
+      and filtering is done at the app level.  If the first "hit" from a
+      seek landed on a bad record, SKIPFILTER would move to the appropriate
+      following record but the Found() flag was wrong.
+      For those who might want to test carefully, here's my detailed note:
+
+
+      If a filter is set that is not valid for ADS, we need to skip
+      off of any invalid records (IOW, filter at the Harbour level if ADS can't
+      because the filter has UDFs or PUBLICVAR references).
+      To make sure the skipped-to record still matches the seeked key, we need to
+      be able to construct a comparable key for the subsequent record.
+      This is annoyingly complex with the various ads key types for various table types.
+      AdsExtractKey would seem to be the api of choice, but here on the starting end the
+      key we seek on does NOT match the format of what we get back from AdsExtractKey.
+      So I'm saving off the first found record's key, and passing that to our
+      adsIndexKeyCmp() to compare to the new record's key.
+      We're relying on testing to verify that partial key searches and binary
+      raw keys all end up working right.
 
 2006-09-14 11:31 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c
