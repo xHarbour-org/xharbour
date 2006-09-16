@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.78 2006/08/14 01:57:35 modalsist Exp $
+/* $Id: teditor.prg,v 1.79 2006/08/19 16:44:56 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.78 2006/08/14 01:57:35 modalsist Exp $
+/* $Id: teditor.prg,v 1.79 2006/08/19 16:44:56 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -150,6 +150,7 @@ CLASS HBEditor
    DATA  lSelActive      INIT .F.
    DATA  nRowSelStart    INIT 0                             // First row selected
    DATA  nRowSelEnd      INIT 0                             // Last row selected
+   DATA  nColSelRow      INIT 0                             // Row of col selected
    DATA  nColSelStart    INIT 0                             // First col selected
    DATA  nColSelEnd      INIT 0                             // Last col selected
 
@@ -756,9 +757,21 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                endif
                exit
 
+            case K_SH_END
+               if ::nCol < ::nWordWrapCol + 1
+                  ::SetTextSelection( "END" )
+               endif
+               exit
+
             case K_SH_LEFT
                if ::nCol > 1
                   ::SetTextSelection( "COL", -1 )
+               endif
+               exit
+
+            case K_SH_HOME
+               if ::nCol > 1
+                  ::SetTextSelection( "HOME" )
                endif
                exit
 
@@ -776,9 +789,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                GTSETCLIPBOARD( ::GetTextSelection() )
                if ::lEditAllow
                   ::DelTextSelection()
-                  if ::nRow < ::LastRow()
-                     ::Down()
-                  endif
                endif
                exit
 
@@ -948,9 +958,6 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             case K_DEL
                if ::lSelActive .and. ::lEditAllow
                   ::DelTextSelection()
-                  if ::nRow < ::LastRow()
-                     ::Down()
-                  endif
                elseif ::lEditAllow  // Clipper compatibility
                   ::K_Del()
                endif
@@ -1016,10 +1023,15 @@ METHOD Down() CLASS HBEditor
        ::GotoLine( ::nRow + 1 )
     ENDIF
  ELSE
-    IF ::nFirstRow < ::LastRow()
+    IF ::nFirstRow < ::LastRow() .AND. ::LastRow() > ::nNumRows
        ::nFirstRow++
        ::nRow++
+       if ::nRow > ::LastRow()
+          ::nRow--
+       endif
        ::RefreshWindow()
+    ELSEIF ::nRow < ::LastRow()
+       ::GotoLine( ::nRow + 1 )
     ENDIF
  ENDIF
 
@@ -1038,7 +1050,14 @@ IF ::lVerticalScroll
       ::Bottom()
    ELSE
       ::nFirstRow += nJump
+      if ::nFirstRow > ::LastRow()
+         ::nFirstRow := ::LastRow()
+      endif
+
       ::nRow      += nJump
+      if ::nRow > ::LastRow()
+         ::nRow := ::LastRow()
+      endif
       ::RefreshWindow()
    ENDIF
    // ::GotoLine( min( ::nRow + ::nNumRows - 1, ::LastRow() ) )
@@ -1082,7 +1101,12 @@ METHOD Up() CLASS HBEditor
     IF ::nFirstRow > 1
        ::nFirstRow--
        ::nRow--
+       if ::nRow < 1
+          ::nRow := 1
+       endif
        ::RefreshWindow()
+    ELSEIF ::nRow > 1
+       ::GotoLine( ::nRow - 1 )
     ENDIF
  ENDIF
 
@@ -1100,7 +1124,14 @@ IF ::lVerticalScroll
       ::GoToLine( 1 )
    else
       ::nFirstRow -= nJump
+      if ::nFirstRow < 1
+         ::nFirstRow := 1
+      endif
+
       ::nRow      -= nJump
+      if ::nRow < 1
+         ::nRow := 1
+      endif
       ::RefreshWindow()
    endif
 
@@ -1706,13 +1737,9 @@ RETURN Self
 METHOD K_Esc() CLASS HBEditor
    LOCAL cScreenMsg, nCurRow, nCurCol, nCursor,nKey
 
-   // Added message "Abort Edit? Y/N" like Clipper.
-   //
-   // 2006/JUL/21- E.F. - changed to .F. to force exit only if user press "Y".
-   //::lExitEdit := .T.
-   ::lExitEdit := .F.
+   ::lExitEdit := .T.
 
-   if ::lEditAllow .AND. ::lChanged .AND. Set( _SET_SCOREBOARD )
+   IF ::lEditAllow .AND. ::lChanged .AND. Set( _SET_SCOREBOARD )
       nCurCol    := ::Col()
       nCurRow    := ::Row()
       cScreenMsg := SaveScreen( 0,60,0,77 )
@@ -1724,16 +1751,14 @@ METHOD K_Esc() CLASS HBEditor
       SetCursor(nCursor)
       SetPos( nCurRow,nCurCol )
 
-      // 2006/JUL/21 - E.F - Allow exit only on "Y".
+      // 2006/JUL/21 - E.F - Exit only if "Y" is pressed.
       //
       ::lExitEdit := ( Upper( Chr(nKey) ) == "Y" ) 
-   else
-      ::lExitEdit := .T.
-   endif
+   ENDIF
 
-   if ::lExitEdit
+   IF ::lExitEdit
       SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
-   endif
+   ENDIF
 
 Return Self
 
@@ -2448,6 +2473,8 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
       elseif cAction == "ROW"
 
+         ::GotoCol( 1 )
+
          if nCount > 0   // Shift-Down
             ::nRowSelStart := ::nRow
             ::nRowSelEnd := ::nRowSelStart
@@ -2456,6 +2483,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
                //::Down()
                ::GotoLine( ::nRow + 1 )
             endif
+
          elseif nCount < 0  // Shift-UP
             if ::nRow > 1
                //::Up()
@@ -2473,6 +2501,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
                //::Right()
                ::GotoCol( ::nCol + 1)
                if ::nColSelStart==0
+                  ::nColSelRow := ::nRow
                   ::nColSelStart := Max(1,::nCol-1)
                endif
                ::nColSelEnd := Max(1,::nCol-1)
@@ -2483,6 +2512,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
                //::Left()
                ::GotoCol( ::nCol - 1 )
                ::nColSelEnd := Max(::nColSelEnd,::nCol)
+               ::nColSelRow := ::nRow
                ::nColSelStart := ::nCol
             else
                ::nColSelStart := ::nColSelEnd := 0
@@ -2490,6 +2520,25 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
             endif
             ::RefreshLine(.T.)
          endif
+
+      elseif cAction == "END"
+
+         ::nColSelEnd := ::nWordWrapCol
+         if ::nColSelStart==0
+             ::nColSelRow := ::nRow
+            ::nColSelStart := Max(1,::nCol-1)
+         endif
+         ::GotoCol( ::nWordWrapCol )
+         ::RefreshLine(.T.)
+
+      elseif cAction == "HOME"
+
+         ::nColSelRow := ::nRow
+         ::nColSelEnd := ::nCol
+         ::nColSelStart := 1
+         ::GotoCol( 1 )
+         ::RefreshLine(.T.)
+
       endif
 
    else
@@ -2608,6 +2657,22 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
          endif
 
+      elseif cAction == "END"
+
+         ::nColSelEnd := ::nWordWrapCol
+         if ::nColSelStart==0
+            ::nColSelStart := Max(1,::nCol-1)
+         endif
+         ::GotoCol( ::nWordWrapCol )
+         ::RefreshLine(.T.)
+
+      elseif cAction == "HOME"
+
+         ::nColSelEnd := ::nCol
+         ::nColSelStart := 1
+         ::GotoCol( 1 )
+         ::RefreshLine(.T.)
+
       endif
 
    endif
@@ -2623,6 +2688,7 @@ METHOD ClrTextSelection() CLASS HBEditor
    if ::lSelActive
       ::lSelActive := .F.
       ::nRowSelStart := ::nRowSelEnd := 0
+      ::nColSelRow := 0
       ::nColSelStart := ::nColSelEnd := 0
       ::RefreshWindow()
    endif
@@ -2655,35 +2721,60 @@ METHOD DelTextSelection() CLASS HBEditor
    LOCAL nRowSelStart
    LOCAL nRowSelEnd
    LOCAL nI
+   LOCAL cText
 
    if !::lEditAllow
       Return Self
    endif
 
    if ::lSelActive
-      if ::nRowSelStart > ::nRowSelEnd
-         nRowSelStart := ::nRowSelEnd
-         nRowSelEnd := ::nRowSelStart
-      else
-         nRowSelStart := ::nRowSelStart
-         nRowSelEnd := ::nRowSelEnd
+
+      // if only rows are selected
+      if ::nRowSelStart > 0 .and. ::nRowSelEnd > 0
+
+         if ::nRowSelStart > ::nRowSelEnd
+            nRowSelStart := ::nRowSelEnd
+            nRowSelEnd := ::nRowSelStart
+         else
+            nRowSelStart := ::nRowSelStart
+            nRowSelEnd := ::nRowSelEnd
+         endif
+
+         ::lChanged := .T.
+
+         for nI := nRowSelStart to nRowSelEnd
+             ::RemoveLine( nRowSelStart )
+         next
+
+         ::nRow := nRowSelStart
+
+         if empty( ::aText )
+            ::DelText()
+         endif
+
+         ::ClrTextSelection()
+
+         //::GoToPos( max( nRowSelStart - 1, 1 ), 1 )
+         ::GoToPos( max(1,nRowSelStart) , 1 )
+
+      else 
+
+         if ::nColSelStart > 0 .and. ::nColSelEnd > 0
+            if empty( nRowSelStart )         
+               nRowSelStart := ::nColSelRow
+            endif
+            cText := ::aText[::nRow]:cText
+            ::aText[::nRow]:cText := Stuff( cText, ::nColSelStart, ::nColSelEnd - ::nColSelStart + 1, "" )
+            ::RefreshLine()
+            ::GoToPos( ::nRow, max(1,::nColSelStart ) )
+            ::nColSelStart := ::nColSelEnd := 0
+            ::lChanged := .T.
+            if empty( ::aText )
+               ::DelText()
+            endif
+         endif
+
       endif
-
-      ::lChanged := .T.
-
-      for nI := nRowSelStart to nRowSelEnd
-         ::RemoveLine( nRowSelStart )
-      next
-
-      ::nRow := nRowSelStart
-
-      if empty( ::aText )
-         ::DelText()
-      endif
-
-      ::ClrTextSelection()
-
-      ::GoToPos( max( nRowSelStart - 1, 1 ), 1 )
 
    endif
 
@@ -2725,7 +2816,7 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
              AIns( ::aText, nAtRow+i, aTmpText[ i ], .T. )
          next
          if nLines > 0
-            ::RemoveLine(nAtRow+nLines)
+       //     ::RemoveLine(nAtRow+nLines)
          endif
       endif
 

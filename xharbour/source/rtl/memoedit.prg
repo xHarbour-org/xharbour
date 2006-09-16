@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.46 2006/08/24 20:19:35 modalsist Exp $
+ * $Id: memoedit.prg,v 1.47 2006/08/27 23:14:58 modalsist Exp $
  */
 
 /*
@@ -126,8 +126,8 @@ LOCAL nUdfReturn,i
 
 #ifdef HB_EXT_INKEY
    /* CTRL_V in not same as K_INS, this works as paste selected text to clipboard. */
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W } 
-   ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT }
+   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_RET } 
+   ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT, K_SH_END, K_SH_HOME }
 #else
    /* CTRL_V is same as K_INS, so it has special treatment in memoedit. */
    ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W }
@@ -161,7 +161,7 @@ Return Self
 
 METHOD Edit() CLASS TMemoEditor
 
-   Local nKey, nUdfReturn, lJump
+   Local nKey, nUdfReturn, nNextKey
 
    // If I have an user function I need to trap configurable keys and ask to
    // user function if handle them the standard way or not
@@ -171,27 +171,30 @@ METHOD Edit() CLASS TMemoEditor
       ::CallUdf( ME_IDLE )
    endif
 
-   lJump := .f.
+   nNextKey := 0
 
    WHILE !::lExitEdit 
 
-         nKey := Inkey( 0 )
-         
-         if ( ::bKeyBlock := Setkey( nKey ) ) <> NIL
+         if nNextKey == 0
+            nKey := Inkey( 0 )
+         else
+            nKey := nNextKey
+            nNextKey := 0
+         endif
+
+         if nNextKey ==0 .AND. ( ::bKeyBlock := Setkey( nKey ) ) <> NIL
 
             Eval( ::bKeyBlock, ::ProcName, ::ProcLine, ReadVar() )
 
-            // 2006/JUL/29 - E.F. - After set key is called, I need trap
-            //                      nextkey, if any.
-            if NextKey() != 0
-               nKey := NextKey()
-               //inkey()
-               lJump := .t.
-            endif
+            /* 2006/SEP/15 - E.F. - After Setkey() is executed, if exist nextkey,
+             *                      I need trap this nextkey to memoedit process
+             *                      <nKey> first and the <nNextKey> on the next loop.
+             */
+            nNextKey := NextKey()
 
-            // 2006/JUL/29 - E.F.- The execution should continue to 
-            //                     memoedit process the nKey.
-            // Loop
+            if nNextKey != 0
+               inkey()
+            endif
 
          endif
 
@@ -224,7 +227,7 @@ METHOD Edit() CLASS TMemoEditor
                  ( nKey IN ::aConfigurableKeys ) .OR.;
                  ( nKey IN ::aExtKeys ) .OR.;
                  ( nKey == K_INS .AND. !::ExistUdf() ) .OR.;
-                 ( nKey == K_ESC .AND. (!::ExistUdf() .OR. !::lChanged) ) )
+                 ( nKey == K_ESC .AND. !::ExistUdf() ) )
 
                ::Super:Edit( nKey )
 
@@ -240,7 +243,7 @@ METHOD Edit() CLASS TMemoEditor
 
          ENDIF
 
-         IF ::ExistUdf() .AND. !lJump
+         IF ::ExistUdf()
 
             IF ( nKey IN ::aEditKeys ) .OR.;
                ( nKey IN ::aAsciiKeys ) .OR.;
@@ -272,8 +275,6 @@ METHOD Edit() CLASS TMemoEditor
             ENDIF
 
          ENDIF
-
-         lJump := .f.
 
    ENDDO
 

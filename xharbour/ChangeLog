@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5148 2006/09/15 06:28:27 brianhays Exp $
+ * $Id: ChangeLog,v 1.5149 2006/09/15 15:07:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-16 18:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\memoedit.prg
+    ! fixed K_ESC behaviour that wasn't exit while buffer is not changed.  
+    ! fixed to trap nextkey when a key is inserted into buffer by setkey.
+
+  * source\rtl\teditor.prg
+    ! fixed bug related to ME_TOGGLESCROLL behaviour. Bug reported by
+      Ed. Horbino.
+    ! fixed bug related to selection text and paste behaviour.
+    + added support to K_SH_END and K_SH_HOME selection. keys. 
+    + added support to K_CTRL_RET key. 
+      * Thanks to Lorenzo Fiorini by fixes and adds.
 
 2006-09-15 11:06 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c
