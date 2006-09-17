@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.191 2006/09/15 15:07:01 ronpinkas Exp $
+ * $Id: classes.c,v 1.192 2006/09/17 15:57:07 ronpinkas Exp $
  */
 
 /*
@@ -1303,7 +1303,8 @@ HB_EXPORT PHB_FUNC hb_objHasMsg( PHB_ITEM pObject, char *szString )
 
 HB_EXPORT BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
 {
-   BOOL bSymbol;
+   BOOL bSymbol = FALSE;
+
    PHB_FUNC pFunc = hb_objGetMthd( pObject, pMessage->pSymbol, FALSE, NULL, FALSE, &bSymbol );
 
    if( bSymbol )
