@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5149 2006/09/15 15:07:01 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5150 2006/09/16 21:12:01 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,17 +8,25 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-09-17 11:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/pp/ppcore.c
+    + added #error to list of directives trigerring bRule in hb_pp_ParseExpression()
+    * Fixed getExpReal() to accept unmatched ( { and [ as valid expression (Clipper compatability
+
+  * source/vm/classes.c
+    * Fixed silly C&P error in last commit
+
 2006-09-16 18:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\memoedit.prg
-    ! fixed K_ESC behaviour that wasn't exit while buffer is not changed.  
+    ! fixed K_ESC behaviour that wasn't exit while buffer is not changed.
     ! fixed to trap nextkey when a key is inserted into buffer by setkey.
 
   * source\rtl\teditor.prg
     ! fixed bug related to ME_TOGGLESCROLL behaviour. Bug reported by
       Ed. Horbino.
     ! fixed bug related to selection text and paste behaviour.
-    + added support to K_SH_END and K_SH_HOME selection. keys. 
-    + added support to K_CTRL_RET key. 
+    + added support to K_SH_END and K_SH_HOME selection. keys.
+    + added support to K_CTRL_RET key.
       * Thanks to Lorenzo Fiorini by fixes and adds.
 
 2006-09-15 11:06 UTC-0500 Ron Pinkas <ron/at/xharbour.com>

@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.190 2006/09/14 15:33:40 ronpinkas Exp $
+ * $Id: classes.c,v 1.191 2006/09/15 15:07:01 ronpinkas Exp $
  */
 
 /*
@@ -3114,11 +3114,11 @@ HB_FUNC( __CLASSNAME )
 {
    HB_THREAD_STUB_API
 
-   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
 
-   if( pObject && pObject->item.asArray.value->uiClass && pObject->item.asArray.value->uiClass <= s_uiClasses )
+   if( uiClass && uiClass <= s_uiClasses )
    {
-      hb_retcStatic( s_pClasses[ pObject->item.asArray.value->uiClass - 1 ].szName );
+      hb_retcStatic( s_pClasses[ uiClass - 1 ].szName );
    }
    else
    {

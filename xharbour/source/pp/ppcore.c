@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.228 2006/06/02 16:19:19 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.229 2006/09/13 13:20:45 ronpinkas Exp $
  */
 
 /*
@@ -2451,7 +2451,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
         ptri++;
      }
 
-     if( ptri[0] == '#' && strchr( "xXcCtTdD", ptri[1] ) )
+     if( ptri[0] == '#' && strchr( "xXcCtTdDeE", ptri[1] ) )
      {
         bRule = TRUE;
      }
@@ -2521,7 +2521,7 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
      #if 0
         if( ipos > 0 )
         {
-           printf( "Holding: >%s<\n", sLine + isdvig + ipos );
+           printf( "Holding: >%s<\n", s_pTerminator + 1 );
         }
         printf( "Processing: >%s<\n", ptri );
      #endif
@@ -4944,8 +4944,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
    /* Ron Pinkas added 2000-06-21 */
    //if( iContext == 1 )
    {
-      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3 || State == STATE_QUOTE4 ||
-          State == STATE_BRACKET || StBr1 || StBr2 || StBr3  )
+      if( State == STATE_QUOTE1 || State == STATE_QUOTE2 || State == STATE_QUOTE3 || State == STATE_QUOTE4 )
       {
           lens = 0;
       }
