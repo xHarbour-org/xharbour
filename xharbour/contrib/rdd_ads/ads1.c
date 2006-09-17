@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.108 2006/08/19 11:22:28 druzus Exp $
+ * $Id: ads1.c,v 1.109 2006/09/15 06:28:27 brianhays Exp $
  */
 
 /*
@@ -223,23 +223,26 @@ static void DumpArea( ADSAREAP pArea )  /* For debugging: call this to dump ads 
 }
 #endif
 
-static BOOL adsIndexKeyCmp( ADSHANDLE hIndex, UNSIGNED8 * pszKey, UNSIGNED16 u16KeyLen, UNSIGNED16 u16KeyType )
+static BOOL adsIndexKeyCmp( ADSHANDLE hIndex, UNSIGNED8 * pszKey, UNSIGNED16 u16KeyLen )
 {
-   UNSIGNED16 u16Found = FALSE;
-   UNSIGNED16 *pusLen;         // return TRUE if get a key and keys match
    UNSIGNED32 u32RetVal;
-   UNSIGNED8  pucCurKey[ADS_MAX_KEY_LENGTH + 1];
+   UNSIGNED16 u16Found = FALSE;
    UNSIGNED16 u16CurKeyLen = ADS_MAX_KEY_LENGTH;
+   UNSIGNED8  pucCurKey[ADS_MAX_KEY_LENGTH + 1];
 
-   // test if current record has fields that match the given key expression.
-   // This is used to evaluate if a seek expression continues to eval to .t. when skipping through filtered records
+   /*
+    * test if current record has fields that match the given key expression.
+    * This is used to evaluate if a seek expression continues to eval to .t.
+    * when skipping through filtered records
+    */
 
-   u32RetVal = AdsExtractKey(hIndex, pucCurKey, &u16CurKeyLen);
+   u32RetVal = AdsExtractKey( hIndex, pucCurKey, &u16CurKeyLen );
    if( u32RetVal == AE_SUCCESS )
    {
-      if ( u16CurKeyLen )
+      if( u16CurKeyLen )
       {
-         if ( u16CurKeyLen >= u16KeyLen && memcmp( (UNSIGNED8*) pucCurKey, (UNSIGNED8*) pszKey, u16KeyLen ) == 0 )
+         if( u16CurKeyLen >= u16KeyLen &&
+             memcmp( (UNSIGNED8*) pucCurKey, (UNSIGNED8*) pszKey, u16KeyLen ) == 0 )
          {
             u16Found = TRUE;
          }
@@ -980,7 +983,6 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
       adsIndexKeyCmp() to compare to the new record's key.
       We're relying on testing to verify that partial key searches and binary
       raw keys all end up working right.
-
     --------------------------------------------------*/
    if( pArea->dbfi.itmCobExpr && !pArea->dbfi.fOptimized && !pArea->fEof )
    {
@@ -989,31 +991,46 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
 
       if( u16Found && u16KeyLen > 0 )
       {
-         /* remember the record number for faster checking if we should update
-            fFound after SKIPFILTER.   Also get its extracted key to simplify that comparison */
+         /*
+          * remember the record number for faster checking if we should update
+          * fFound after SKIPFILTER. Also get its extracted key to simplify
+          * that comparison
+          */
          UNSIGNED32 u32RetVal;
          pucSavedKey = (UNSIGNED8*) hb_xgrab( ADS_MAX_KEY_LENGTH + 1 );
 
          AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS, &u32RecNo );
-         u32RetVal = AdsExtractKey(pArea->hOrdCurrent, pucSavedKey, &u16SavedKeyLen);
+         u32RetVal = AdsExtractKey( pArea->hOrdCurrent, pucSavedKey, &u16SavedKeyLen );
 
          if( u32RetVal != AE_SUCCESS )
          {
             u16SavedKeyLen = 0;
          }
-         else if( u16SavedKeyLen > u16KeyLen )  // Initial found key from index is longer than Seek key: Did a partial search
+         else if( u16SavedKeyLen > u16KeyLen )
          {
+            /* Initial found key from index is longer than Seek key:
+               Did a partial search */
             if( AdsGetKeyType( pArea->hOrdCurrent, &u16KeyType ) == AE_SUCCESS &&
-                   u16KeyType == ADS_STRING || u16KeyType == ADS_RAW )
+                ( u16KeyType == ADS_STRING || u16KeyType == ADS_RAW ) )
             {
+               /*
+                * do partial comparison below on String and Raw indexes only.
+                * Note that we can search a different type index with a string
+                * expression, but ads does internal conversions and the length
+                * of our string may be drastically different than the real key
+                */
                u16SavedKeyLen = u16KeyLen;
-               // do partial comparison below on String and Raw indexes only.
-               // Note that we can search a different type index with a string expression,
-               // but ads does internal conversions and the length of our string may be drastically different than the real key
             }
          }
       }
 
+      /*
+       * TODO: Possible optimization: if !softseek, skipfilter should abort
+       * skipping once keys no longer match.
+       * Perhaps use temp replacement of scope for this -- but remember ads
+       * does scopes on client and if last good scoped record fails the filter,
+       * the server will skip to the end anyway
+       */
       if( SELF_SKIPFILTER( ( AREAP ) pArea, bFindLast ? -1 : 1 ) != SUCCESS )
       {
          if ( pucSavedKey )
@@ -1029,23 +1046,20 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
          {
             u16Found = FALSE;
          }
-         else if( u16KeyLen > 0 )       // seek empty string is synonymous with GoTop
+         /* seek empty string is synonymous with GoTop */
+         else if( u16KeyLen > 0 )
          {
             AdsGetRecordNum( pArea->hTable, ADS_IGNOREFILTERS, &u32NewRec );
-            // SkipFilter moved us?  see if index key is still a match.
-            /* TODO:  Possible optimization: if !softseek, skipfilter should abort skipping once keys no longer match.
-               Perhaps use temp replacement of scope for this -- but remember ads does scopes on client and
-               if last good scoped record fails the filter, the server will skip to the end anyway
-            */
+            /* SkipFilter moved us?  see if index key is still a match. */
             if( u32RecNo != u32NewRec )
             {
                if( u16SavedKeyLen == 0 )
                {
-               u16Found = FALSE;
-            }
+                  u16Found = FALSE;
+               }
                else
                {
-                  u16Found = adsIndexKeyCmp( pArea->hOrdCurrent, pucSavedKey, u16SavedKeyLen, u16KeyType );
+                  u16Found = adsIndexKeyCmp( pArea->hOrdCurrent, pucSavedKey, u16SavedKeyLen );
                }
             }
          }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5151 2006/09/17 15:57:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5152 2006/09/17 16:13:23 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-17 18:45 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    * removed unused variables and some minor cleanup.
+
+  * xharbour/include/hbvm.h
+  * xharbour/source/vm/hvm.c
+    + added hb_vmPushDynSym( PHB_DYNS )
+      It should allow most applications to not use [P]HB_SYMB at all.
+      Removing PHB_SYMB from 3-rd party .c code may allow us to add
+      freeing unused symbol tables from HVM in the future.
+
+  * xharbour/source/rdd/usrrdd/usrrdd.c
+    ! fixed typo in HB_TRACE message.
 
 2006-09-17 12:11 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/pp/pptable.c
