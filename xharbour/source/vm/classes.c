@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.192 2006/09/17 15:57:07 ronpinkas Exp $
+ * $Id: classes.c,v 1.193 2006/09/17 23:20:37 druzus Exp $
  */
 
 /*
@@ -374,7 +374,10 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
 
    // Checking scope. s_bClsScope is defined FALSE to retrieve values without scope violation
    // i.e. during debug or in designer mode
-   if ( !s_bClsScope ) return TRUE;
+   if ( ( ! s_bClsScope ) || pObject->type != HB_IT_ARRAY || pObject->item.asArray.value->uiClass == 0 )
+   {
+      return TRUE;
+   }
 
    uiScope = pMethod->uiScope;
 
@@ -1958,14 +1961,17 @@ HB_FUNC( __CLSADDMSG )
          if( pInit && HB_IS_STRING( pInit ) )
          {
             pMsg = hb_dynsymFindName( pInit->item.asString.value );
+
             if( pMsg )
             {
                pClass = s_pClasses + uiClass - 1;
                uiID = hb_clsFindMethod( pMsg, pClass, NULL );
+
                if( uiID )
                {
                   uiID = (pClass->pMethods + uiID - 1)->uiData;
                }
+
                pInit = pString;
             }
          }
@@ -1973,6 +1979,7 @@ HB_FUNC( __CLSADDMSG )
          if( pString && pInit && HB_IS_OBJECT( pInit ) )
          {
             pMsg = hb_dynsymFindName( pString->item.asString.value );
+
             if( pMsg )
             {
                pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
@@ -1988,6 +1995,23 @@ HB_FUNC( __CLSADDMSG )
 
    // Call worker function.
    hb_clsAddMsg( uiClass, szMessage, pFunc_or_BlockPointer, uiID, wType, uiSprClass, uiScope, bPersistent, pInit, TRUE, bCase );
+}
+
+USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
+{
+   PCLASS pClass = s_pClasses + ( uiClass - 1 );
+   USHORT uiMethods = pClass->uiMethods, uiRet = 0;
+   PMETHOD pMethod = pClass->pMethods;
+
+   for( ; --uiMethods; pMethod++ )
+   {
+      if( pMethod->pFunction == pFunction )
+      {
+         uiRet++;
+      }
+   }
+
+   return uiRet;
 }
 
 /*
@@ -2072,16 +2096,17 @@ HB_FUNC( __CLSNEW )
          pSprCls = s_pClasses + ( ( USHORT ) hb_arrayGetNI( pahSuper, i ) - 1 );
 
          ulSize += ( ULONG ) pSprCls->uiMethods;
-
-         nLenDatas    += pSprCls->uiDatas;
+         nLenDatas += pSprCls->uiDatas;
       }
 
       pNewCls->uiDatas     = ( USHORT ) nLenDatas;
+
       if( nLenDatas )
       {
          pNewCls->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) * nLenDatas );
          memset( pNewCls->pInitValues, 0, sizeof( CLSDINIT ) * nLenDatas );
       }
+
       pNewCls->uiScope    |= pSprCls->uiScope & ~((USHORT) HB_OO_CLS_INSTANCED);
       ulSize              += uiKnownMethods;
       pNewCls->uiReserved  = (USHORT) ulSize;
@@ -2223,9 +2248,9 @@ HB_FUNC( __CLSNEW )
          }
 
          pNewCls->fOpOver     |= pSprCls->fOpOver;
-
          pNewCls->uiDataFirst += pSprCls->uiDatas;
       }
+
       pNewCls->uiMethods       = ( USHORT ) ulSize;
       pNewCls->uiDataInitiated = uiInit;
       pNewCls->uiScope        &= ~((USHORT) HB_OO_CLS_INSTANCED);
@@ -2248,6 +2273,7 @@ HB_FUNC( __CLSNEW )
 
       pNewCls->pClassDatas = hb_itemArrayNew( 0 );
       pNewCls->pInlines    = hb_itemArrayNew( 0 );
+
       if( pNewCls->uiDatas )
       {
          pNewCls->pInitValues = ( PCLSDINIT ) hb_xgrab( sizeof( CLSDINIT ) * pNewCls->uiDatas );
@@ -2259,39 +2285,102 @@ HB_FUNC( __CLSNEW )
 
    if( strcmp( pNewCls->szName, "ARRAY" ) == 0 )
    {
-      hb_cls_uiArrayClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiArrayClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "BLOCK" ) == 0 )
    {
-      hb_cls_uiBlockClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiBlockClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "CHARACTER" ) == 0 )
    {
-      hb_cls_uiCharacterClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiCharacterClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "DATE" ) == 0 )
    {
-      hb_cls_uiDateClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiDateClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "LOGICAL" ) == 0 )
    {
-      hb_cls_uiLogicalClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiLogicalClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "NIL" ) == 0 )
    {
-      hb_cls_uiNilClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiNilClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "NUMERIC" ) == 0 )
    {
-      hb_cls_uiNumericClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiNumericClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "POINTER" ) == 0 )
    {
-      hb_cls_uiPointerClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiPointerClass = uiClass;
+      }
    }
    else if( strcmp( pNewCls->szName, "HASH" ) == 0 )
    {
-      hb_cls_uiHashClass = uiClass;
+      if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+      {
+         hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      }
+      else
+      {
+         hb_cls_uiHashClass = uiClass;
+      }
    }
 
    hb_retni( uiClass );
@@ -2376,7 +2465,7 @@ HB_FUNC( __CLSINST )
  */
 static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 {
-   if( uiClass <= s_uiClasses )
+   if( uiClass && uiClass <= s_uiClasses )
    {
       PCLASS   pClass = s_pClasses + ( uiClass - 1 );
       USHORT   uiAt;
@@ -2398,7 +2487,6 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
             for( uiAt = pClass->uiDataInitiated + 1; --uiAt; pDataInit++ )
             {
-
                if( HB_IS_ARRAY( pDataInit->pInitValue ) )
                {
                   pInitValue = hb_arrayClone( pDataInit->pInitValue, NULL );
@@ -2423,6 +2511,7 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
             }
          }
       }
+
       if( !( pClass->uiScope & HB_OO_CLS_INSTANCED ) )
       {
          if( pClass->uiDatasShared )
@@ -2525,7 +2614,15 @@ static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 
          hb_itemRelease( pArray );
       }
+
       pClass->uiScope |= HB_OO_CLS_INSTANCED;
+   }
+   else
+   {
+      HB_ITEM_NEW( Class );
+
+      hb_itemPutNI( &Class, (int) uiClass );
+      hb_errRT_BASE( EG_ARG, 3006, "Invalid class handle", "hb_clsInst()", 1, &Class );
    }
 }
 
@@ -2973,19 +3070,19 @@ HB_FUNC( __CLSINSTSUPER )
 
       pDynSym = hb_dynsymFind( szString );
 
-      if( pDynSym )                             /* Find function            */
+      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
       {
          USHORT uiClass;
 
-         hb_vmPushSymbol( pDynSym->pSymbol );        /* Push function name       */
+         hb_vmPushSymbol( pDynSym->pSymbol );            /* Push function name       */
 
          hb_vmPushNil();
-         hb_vmDo( 0 );                         /* Execute super class      */
+         hb_vmDo( 0 );                                   /* Execute super class      */
 
          if( HB_IS_OBJECT( hb_stackReturnItem() ) )
          {
             for( uiClass = 0; ! bFound && uiClass < s_uiClasses; uiClass++ )
-            {                                      /* Locate the entry         */
+            {                                            /* Locate the entry         */
                if( hb_stricmp( szString , s_pClasses[ uiClass ].szName ) == 0 )
                {
                   hb_retni( uiClass + 1 );               /* Entry + 1 = hb___msgClsH    */
@@ -4422,8 +4519,7 @@ HB_FUNC( __SETCLASSSCOPE )
 }
 
 
-HB_EXPORT BOOL
-hb_clsSetScope( BOOL bClsScope )
+HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope )
 {
    BOOL bOldClsScope = s_bClsScope;
 
@@ -4518,6 +4614,13 @@ HB_FUNC( __CLSASSOCTYPE )
 {
    USHORT uiClass = (USHORT) hb_parni( 1 );
    char *szType = hb_parcx(2);
+   PCLASS pClass = s_pClasses + ( uiClass - 1 );
+
+   if( __cls_CntMethods( uiClass, hb___msgGetData ) )
+   {
+      hb_errRT_BASE( EG_ARG, 3005, "Scalar class can not contain any datas", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      return;
+   }
 
    if( strcmp( szType, "ARRAY" ) == 0 )
    {
@@ -4557,7 +4660,7 @@ HB_FUNC( __CLSASSOCTYPE )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 3000, NULL, "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE( EG_ARG, 3005, "Unsupported scalar type", "__CLSASSOCTYPE", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -4566,4 +4669,46 @@ HB_FUNC( __CLSCNTCLASSES )
    HB_THREAD_STUB_API
 
    hb_retni( (int) s_uiClasses );
+}
+
+HB_FUNC( __CLSINSTNAME )
+{
+   HB_THREAD_STUB_STACK
+
+   char *szClassName = hb_parc( 1 );
+
+   if( szClassName )
+   {
+      USHORT uiClass;
+      PHB_DYNS pDynSym;
+
+      uiClass = hb_clsGetHandleFromName( szClassName );
+      TraceLog( NULL, "uiClass: %i\n", uiClass );
+
+      if( uiClass && uiClass <= s_uiClasses )
+      {
+         hb_clsInst( uiClass, hb_stackReturnItem() );
+         TraceLog( NULL, "INSTANCIATE uiClass: %i Return: %i\n", uiClass, hb_stackReturnItem()->type );
+         return;
+      }
+
+      pDynSym = hb_dynsymFind( szClassName );
+
+      if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+      {
+         TraceLog( NULL, "Class Function: %s\n", szClassName );
+         hb_vmPushSymbol( pDynSym->pSymbol );
+
+         hb_vmPushNil();
+         hb_vmDo( 0 );
+      }
+      else
+      {
+         hb_errRT_BASE( EG_ARG, 3008, "Class name is not defined and is not a public function", "__ClsInstName()", 1, hb_paramError( 1 ) );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 3007, "Invalid class name", "__ClsInstName()", 1, hb_paramError(1) );
+   }
 }

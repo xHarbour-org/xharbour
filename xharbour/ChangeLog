@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5153 2006/09/17 16:53:08 druzus Exp $
+ * $Id: ChangeLog,v 1.5154 2006/09/17 23:20:36 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-18 21:37 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/cstr.prg
+    * Improved support for nested objects in ValToPrg[Exp]()
+    * Revised persistance of codeblocks to generate informative alternate block instead of error when codeblock can not
+      be persisted.
+    + Added to ValToPeg[Exp](): /* TODO: Use HBPersistent() when avialable! */
+    + Added PrgExpToVal()
+
+  * source/vm/classes.c
+    ! Fixed GPF trap in hb_clsValidScope() related to scalar classes.
+    + Added: USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
+    + Added logic to detect and raise error when attempting to associate a class which has DATAs to scalar types.
+    ! Fixed GPF trap in hb_clsInst() and revised to raise error if class handle argument is invalid.
+    * Minor improvement to argument validation in __CLSINSTSUPER()
+    + Added __CLSINSTNAME( <cClassName> ) which whill instanciate if class definition is registered,
+      or else will attempt to call a class function with the specified name
+
+  * tests/associat.prg
+    + Added sample of using CLASSDATA in Scalar Class.
 
 2006-09-18 01:20 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/classes.c

@@ -14,6 +14,7 @@ PROCEDURE Main()
    ? cVar:Super:AsString
    ? cVar:Character:AsString
    ? cVar:Sub( 1, 3 )
+   ? cVar:Version
 
    cVar := "23"
    ? nVar + cVar
@@ -21,6 +22,9 @@ PROCEDURE Main()
 RETURN
 
 CLASS MyStringClass FROM CHARACTER
+
+   // CLASSDATA are allowed, but DATAs are not, as we don't have a real instance for storing such properties.
+   CLASSDATA Version INIT "1.0"
 
    METHOD AsString INLINE "MyString: >" + Self + "<"
 

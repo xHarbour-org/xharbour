@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.32 2006/09/07 20:51:31 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.33 2006/09/09 04:14:35 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,8 @@
  */
 #undef CRLF
 #define CRLF Chr(13) + Chr(10)
+
+REQUEST HB_SaveBlock, HB_RestoreBlock, __ClsInstName
 
 //--------------------------------------------------------------//
 FUNCTION CStr( xExp )
@@ -182,7 +184,7 @@ RETURN "[" + cString + "]"
 FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
    LOCAL cType := ValType( xVal )
-   LOCAL aVars, aVar, cRet, cPad, nObj
+   LOCAL aVar, cRet, cPad, nObj
 
    //TraceLog( xVal, cName, nPad, aObjs )
 
@@ -241,16 +243,17 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN "0x" + NumToHex( xVal )
 
       CASE 'O'
+         /* TODO: Use HBPersistent() when avialable! */
+
          IF nPad == NIL
             nPad := 3
          ENDIF
 
          IF cName == NIL
-            cName := "Unnamed: " + xVal:ClassName
+            cName := "ValToPrg_Object"
          ENDIF
 
          cPad  := sPace( nPad + 3 )
-         aVars := __objGetValueDiff( xVal )
          cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
 
          IF aObjs == NIL
@@ -259,17 +262,31 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             aAdd( aObjs, { xVal, cName } )
          ENDIF
 
-         FOR EACH aVar IN aVars
-            IF ValType( aVar[2] ) == 'O'
-               IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
-                  cRet += cPad + ":" + aVar[1] + " := " + "/* Cyclic into outer property: */ " + aObjs[ nObj ][2] + CRLF
-               ELSE
-                  cRet += ValToPrg( aVar[2], aVar[1], nPad + 3, aObjs ) + CRLF
-               ENDIF
-            ELSE
-               //TraceLog( aVar[1], aVar[2] )
-               cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
-            ENDIF
+         FOR EACH aVar IN __objGetValueDiff( xVal )
+            SWITCH ValType( aVar[2] )
+               CASE 'O'
+                  IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
+                     cRet += cPad + ":" + aVar[1] + " := " + "/* Cyclic Reference: */ " + aObjs[ nObj ][2] + CRLF
+                  ELSE
+                     aAdd( aObjs, { aVar[2], cName + ":" + aVar[1] } )
+                     cRet += ValToPrg( aVar[2], cName + ":" + aVar[1], nPad + 3, aObjs ) + CRLF
+                  ENDIF
+
+                  EXIT
+
+               CASE 'B'
+                  TRY
+                      cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
+                  CATCH
+                      cRet += cPad + ":" + aVar[1] + " := {|| Alert( 'Non Persistentable Block.' ) }" + CRLF
+                  END
+
+                  EXIT
+
+               DEFAULT
+                  //TraceLog( aVar[1], aVar[2] )
+                  cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
+            END
          NEXT
 
          RETURN cRet + sPace( nPad ) + "END OBJECT"
@@ -286,12 +303,12 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
    //TraceLog( cRet )
 
 RETURN cRet
-//--------------------------------------------------------------//
 
-FUNCTION ValToPrgExp( xVal, aObjs )
+//--------------------------------------------------------------//
+FUNCTION ValToPrgExp( xVal, cName, aObjs )
 
    LOCAL cType := ValType( xVal )
-   LOCAL aVars, aVar, cRet, nObj
+   LOCAL aVar, cRet, nObj
    LOCAL cChar
 
    //TraceLog( xVal )
@@ -362,29 +379,53 @@ FUNCTION ValToPrgExp( xVal, aObjs )
          RETURN "HexToNum('" + NumToHex( xVal ) + "')"
 
       CASE 'O'
-         aVars := __objGetValueDiff( xVal )
-         cRet  := "( M->_1 := " + xVal:ClassName + "(), "
+         /* TODO: Use HBPersistent() when avialable! */
 
-         IF aObjs == NIL
-            aObjs := { xVal }
-         ELSE
-            aAdd( aObjs, xVal )
+         IF cName == NIL
+            cName := "M->__ValToPrgExp_Object"
          ENDIF
 
-         FOR EACH aVar IN aVars
-            IF ValType( aVar[2] ) == 'O'
-               IF ( nObj := aScan( aObjs, xVal ) ) > 0
-                  cRet += "M->_1:" + aVar[1] + " := " + "/* Cyclic into outer property: */ " + aObjs[ nObj ][2] + ", "
-               ELSE
-                  cRet += ValToPrgExp( aVar[2], aObjs ) + ", "
-               ENDIF
-            ELSE
-               //TraceLog( aVar[1], aVar[2] )
-               cRet += "M->_1:" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
-            ENDIF
+         cRet  := "( " + cName + " := __ClsInstName( '" +  xVal:ClassName  + "' ), "
+
+         IF aObjs == NIL
+            aObjs := { { xVal, cName } }
+         ELSE
+            aAdd( aObjs, { xVal, cName } )
+         ENDIF
+
+         FOR EACH aVar IN __objGetValueDiff( xVal )
+            SWITCH ValType( aVar[2] )
+               CASE 'O'
+                  IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
+                     cRet += cName + ":" + aVar[1] + " := " + aObjs[ nObj ][2] + ", "
+                  ELSE
+                     aAdd( aObjs, { aVar[2], cName + ":" + aVar[1] } )
+                     /* Intentionally avoiding:
+                           Name + ":" + aVar[1] + " := " +
+                        which is redundant due to initiation assignment of the sub object.
+                      */
+                     cRet += ValToPrgExp( aVar[2], cName + ":" + aVar[1], aObjs ) + ", "
+                  ENDIF
+
+                  EXIT
+
+               CASE 'B'
+                  TRY
+                     cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
+                  CATCH
+                     cRet += cName + ":" + aVar[1] + " := {|| Alert( 'Non Persistentable Block.' ) }, "
+                  END
+
+                  EXIT
+
+               DEFAULT
+                  //TraceLog( aVar[1], aVar[2] )
+                  cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
+            END
          NEXT
 
-         RETURN cRet + "M->_1 )"
+
+         RETURN cRet + cName + ")"
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )
@@ -398,4 +439,20 @@ FUNCTION ValToPrgExp( xVal, aObjs )
 //   TraceLog( cRet )
 
 RETURN cRet
+
+//--------------------------------------------------------------//
+FUNCTION PrgExpToVal( cExp )
+
+   /*
+   LOCAL aExp := HB_aTokens( cExp, ';' ), cLine, xRet
+
+   FOR EACH cLine IN aExp
+      IF ! Empty( cLine )
+         xRet := &( cLine )
+      ENDIF
+   NEXT
+   */
+
+RETURN &( cExp )
+
 //--------------------------------------------------------------//
