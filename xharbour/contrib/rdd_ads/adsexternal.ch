@@ -1,0 +1,177 @@
+/*
+ * $Id: adsexternal.ch,v 1.0 2006/06/22 00:46:35 brianhays Exp $
+ */
+
+/*
+ * Harbour Project source code:
+ * Advantage Database Server exported functions header file.
+ *
+ * Copyright 2006 Brian Hays
+ * www - http://www.xharbour.org http://www.harbour-project.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this software; see the file COPYING.  If not, write to
+ * the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307 USA (or visit the web site http://www.gnu.org/).
+ *
+ * As a special exception, the Harbour Project gives permission for
+ * additional uses of the text contained in its release of Harbour.
+ *
+ * The exception is that, if you link the Harbour libraries with other
+ * files to produce an executable, this does not by itself cause the
+ * resulting executable to be covered by the GNU General Public License.
+ * Your use of that executable is in no way restricted on account of
+ * linking the Harbour library code into it.
+ *
+ * This exception does not however invalidate any other reasons why
+ * the executable file might be covered by the GNU General Public License.
+ *
+ * This exception applies only to the code released by the Harbour
+ * Project under the name Harbour.  If you copy code from other
+ * Harbour Project or Free Software Foundation releases into a copy of
+ * Harbour, as the General Public License permits, the exception does
+ * not apply to the code that you add in this way.  To avoid misleading
+ * anyone as to the status of such modified files, you must delete
+ * this exception notice from them.
+ *
+ * If you write modifications of your own for Harbour, it is your choice
+ * whether to permit this exception to apply to your modifications.
+ * If you do not wish that, delete this exception notice.
+ *
+ */
+
+/*
+ *
+ * See doc/license files for licensing terms.
+ *
+ */
+
+#ifndef ADSEXTERNAL_CH
+#define ADSEXTERNAL_CH
+
+// C  functions ?
+
+//hb_adsOemAnsiFree
+//hb_adsAnsiToOem
+//hb_adsOemToAnsi
+
+// PRG level functions
+
+EXTERNAL ADSTESTRECLOCKS
+EXTERNAL ADSSETFILETYPE
+EXTERNAL ADSSETSERVERTYPE
+EXTERNAL ADSSETDATEFORMAT
+EXTERNAL ADSSETEPOCH
+EXTERNAL ADSAPPLICATIONEXIT
+EXTERNAL ADSISSERVERLOADED
+EXTERNAL ADSGETCONNECTIONTYPE
+EXTERNAL ADSUNLOCKRECORD
+EXTERNAL ADSGETTABLECONTYPE
+EXTERNAL ADSGETSERVERTIME
+EXTERNAL ADSISTABLELOCKED
+EXTERNAL ADSISRECORDLOCKED
+EXTERNAL ADSLOCKING
+EXTERNAL ADSRIGHTSCHECK
+EXTERNAL ADSSETCHARTYPE
+EXTERNAL ADSGETTABLECHARTYPE
+EXTERNAL ADSSETDEFAULT
+EXTERNAL ADSSETSEARCHPATH
+EXTERNAL ADSSETDELETED
+EXTERNAL ADSSETEXACT
+EXTERNAL ADSBLOB2FILE
+EXTERNAL ADSFILE2BLOB
+EXTERNAL ADSKEYNO
+EXTERNAL ADSKEYCOUNT
+EXTERNAL ADSADDCUSTOMKEY
+EXTERNAL ADSDELETECUSTOMKEY
+EXTERNAL ADSCLEARAOF
+EXTERNAL ADSEVALAOF
+EXTERNAL ADSGETTABLEALIAS
+EXTERNAL ADSGETAOF
+EXTERNAL ADSGETAOFOPTLEVEL
+EXTERNAL ADSGETAOFNOOPT
+EXTERNAL ADSISRECORDINAOF
+EXTERNAL ADSISRECORDVALID
+EXTERNAL ADSREFRESHAOF
+EXTERNAL ADSSETAOF
+EXTERNAL ADSGETFILTER
+EXTERNAL ADSENABLEENCRYPTION
+EXTERNAL ADSDISABLEENCRYPTION
+EXTERNAL ADSENCRYPTTABLE
+EXTERNAL ADSDECRYPTTABLE
+EXTERNAL ADSENCRYPTRECORD
+EXTERNAL ADSDECRYPTRECORD
+EXTERNAL ADSISENCRYPTIONENABLED
+EXTERNAL ADSISRECORDENCRYPTED
+EXTERNAL ADSISTABLEENCRYPTED
+EXTERNAL ADSCONNECT
+EXTERNAL ADSDISCONNECT
+EXTERNAL ADSCREATESQLSTATEMENT
+EXTERNAL ADSEXECUTESQLDIRECT
+EXTERNAL ADSPREPARESQL
+EXTERNAL ADSEXECUTESQL
+EXTERNAL ADSCLOSEALLTABLES
+EXTERNAL ADSWRITEALLRECORDS
+EXTERNAL ADSREFRESHRECORD
+EXTERNAL ADSCOPYTABLE
+EXTERNAL ADSCONVERTTABLE
+EXTERNAL ADSREGCALLBACK
+EXTERNAL ADSCLRCALLBACK
+EXTERNAL ADSISINDEXED
+EXTERNAL ADSISEXPRVALID
+EXTERNAL ADSGETNUMINDEXES
+EXTERNAL ADSCONNECTION
+EXTERNAL ADSGETHANDLETYPE
+EXTERNAL ADSGETLASTERROR
+EXTERNAL ADSGETNUMOPENTABLES
+EXTERNAL ADSSHOWERROR
+EXTERNAL ADSBEGINTRANSACTION
+EXTERNAL ADSCOMMITTRANSACTION
+EXTERNAL ADSFAILEDTRANSACTIONRECOVERY
+EXTERNAL ADSINTRANSACTION
+EXTERNAL ADSROLLBACK
+EXTERNAL ADSCACHERECORDS
+EXTERNAL ADSREINDEX
+EXTERNAL ADSVERSION
+EXTERNAL ADSCACHEOPENTABLES
+EXTERNAL ADSCACHEOPENCURSORS
+
+#if ADS_REQUIRE_VERSION >= 6
+EXTERNAL ADSGETNUMACTIVELINKS
+EXTERNAL ADSDDADDTABLE
+EXTERNAL ADSDDADDUSERTOGROUP
+EXTERNAL ADSCONNECT60
+EXTERNAL ADSDDCREATE
+EXTERNAL ADSDDCREATEUSER
+EXTERNAL ADSDDGETDATABASEPROPERTY
+EXTERNAL ADSDDSETDATABASEPROPERTY
+EXTERNAL ADSDDSETTABLEPROPERTY
+EXTERNAL ADSDDGETUSERPROPERTY
+EXTERNAL ADSTESTLOGIN
+EXTERNAL ADSRESTRUCTURETABLE
+EXTERNAL ADSCOPYTABLECONTENTS
+EXTERNAL ADSDIRECTORY
+EXTERNAL ADSCHECKEXISTENCE
+EXTERNAL ADSDELETEFILE
+EXTERNAL ADSSTMTSETTABLEPASSWORD
+#endif   /* ADS_REQUIRE_VERSION >= 6  */
+
+#if ADS_REQUIRE_VERSION >= 7
+EXTERNAL ADSCLOSECACHEDTABLES
+#endif   /* ADS_REQUIRE_VERSION >= 7  */
+
+
+// CLASS functions
+
+
+#endif // ADSEXTERNAL_CH
