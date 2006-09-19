@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5155 2006/09/19 01:46:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5156 2006/09/19 17:09:43 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-19 13:48 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * fixed ADT creation bug with > 450 fields
+
+  * include/hbextern.ch
+    * added support for ifdef ADS to load adsexternal.ch (for xbscript)
+
+  + utils/xbscript/bld_ads.bat
+    * to build xbscript with ADS linked in
+
+  * utils/xbscript/xbscript.prg
+
+    * Changed HELP display to show XBSCRIPT instead of "PP"
+        also added -S description
+    * added support for ifdef ADS to load those rdds
+    ! added -S switch to stay in DOT prompt mode after executing code
+
+      This is a pretty cool feature. You can set up a batch file
+      to call xbscript MyStartupStuff.prg -S
+      and set default rdd to whatever, load lots of databases with
+      relations into different workareas, and have the entire
+      environment set up when you get the dot prompt.
+
 
 2006-09-19 19:10 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rdd/usrrdd/usrrdd.c

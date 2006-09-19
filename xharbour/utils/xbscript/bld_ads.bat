@@ -1,0 +1,8 @@
+if %ADS_LIBS%.==.  set ADS_LIBS=rddads.lib+ace32.lib
+
+set tmpHARBOURFLAGS=%HARBOURFLAGS%
+set HARBOURFLAGS=%HARBOURFLAGS% -DADS %1 %2
+call bld_b32 xbscript
+set HARBOURFLAGS=%tmpHARBOURFLAGS%
+set tmpHARBOURFLAGS=
+

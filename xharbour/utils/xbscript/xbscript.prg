@@ -25,7 +25,7 @@
  * any propriatary (non GPL) application, except if you purchase an alternate
  * Typical Retail License (TRL).
  *
- * For any Licensing questions please contact the autor at <ron@xharbour.com>
+ * For any Licensing questions please contact the author at <ron@xharbour.com>
  *
  */
 
@@ -182,9 +182,9 @@
 
       EXTERN SIN, COS
 
-      #ifdef ADS
-         REQUEST ADS
-      #endif
+//      #ifdef ADS
+//         moved all to hbextern.ch
+//      #endif
 
       #ifdef GD
          #include "gdexternal.ch"
@@ -204,7 +204,7 @@
 
       #ifdef ZIP
          EXTERN ZipCreate
-				 REQUEST RMDBFCDX
+         REQUEST RMDBFCDX
       #endif
    #endif
 
@@ -432,7 +432,7 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
 
    LOCAL sIncludePath, nNext, sPath, sSwitch := ""
    LOCAL nAt, sParams, sPPOExt, aParams := {}
-   LOCAL sDefine, sCH
+   LOCAL sDefine, sCH, lStayInDotPrompt := .f.
 
    IF p1 != NIL
       sSwitch += p1
@@ -463,8 +463,8 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
    ENDIF
 
    IF sSource != NIL .AND. ( Upper( sSource ) == "-H" .OR. Upper( sSource ) == "--HELP" )
-      sSwitch := "   PP filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-I<path>] [-P] [-R]" + CRLF
-      sSwitch += "                     [-FIX] [-U[ch-file]]" + CRLF + CRLF
+      sSwitch := "   XBSCRIPT filename[.ext] [-CCH] [-D<id>] [-D:E] [-D:M] [-D:P] [-I<path>] [-P] [-R]" + CRLF
+      sSwitch += "                     [-S] [-FIX] [-U[ch-file]]" + CRLF + CRLF
 
       sSwitch += [    -CCH     = Generate a .cch file (compiled command header).] + CRLF
       sSwitch += [    -D<id>   = #define <id>.] + CRLF
@@ -478,21 +478,22 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       sSwitch += [    -Q       = Quiet. ] + CRLF
       sSwitch += [    -P       = Generate .pp$ pre-processed output file.] + CRLF
       sSwitch += [    -R       = Run filename as a script.] + CRLF
+      sSwitch += [    -S       = Stay in dot prompt mode after running source file.] + CRLF
       sSwitch += [    -U       = Use command definitions set in <ch-file> (or none).] + CRLF
 
         ? sSwitch
       ?
       QUIT
-   endif
+   ENDIF
 
    #ifdef __PLATFORM__UNIX
-      if right( hb_argv( 0 ), 6 ) == "/pprun"
+      IF right( hb_argv( 0 ), 6 ) == "/pprun"
          bCount := .F.
          bCompile := .T.
          sSwitch := ""
          aParams := { p1, p2, p3, p4, p5, p6, p7, p8, p9 }
          aSize( aParams, PCount() - 1 )
-      endif
+      ENDIF
    #endif
 
    #ifdef _DEFAULT_INC_DIR
@@ -558,6 +559,11 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
       /* Quiet Mode. */
       IF "-Q" $ sSwitch
          bCount := .F.
+      ENDIF
+
+      /* Run Source but then run Dot prompt. Source can set up complex Views and relations. */
+      IF "-S" $ sSwitch
+         lStayInDotPrompt := .T.
       ENDIF
 
       /* Debug tracing options. */
@@ -656,7 +662,7 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
             hPP := NIL
          ENDIF
 
-         /* Don't load standard defintions. */
+         /* Don't load standard definitions. */
          bLoadRules := .F.
       ENDDO
 
@@ -727,6 +733,9 @@ PROCEDURE PP_Main( sSource, p1, p2, p3, p4, p5, p6, p7, p8, p9 )
          ENDIF
 
          PP_Run( sSource, aParams, sPPOExt )
+         IF lStayInDotPrompt
+            RP_Dot()
+         ENDIF
       ELSE
          PP_PreProFile( sSource, sPPOExt )
       ENDIF
@@ -7189,7 +7198,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp += sToken
            LOOP
 
-        ELSEIF s1 == "&" .AND. ( s1 == sToken .OR. sNext1 == '(' )// No white space, or parentesized.
+        ELSEIF s1 == "&" .AND. ( s1 == sToken .OR. sNext1 == '(' )// No white space, or parenthesized.
            sExp += sToken
 
            IF sNext1 == '('
@@ -12641,6 +12650,15 @@ RETURN oError
 
    //--------------------------------------------------------------//
 
+#endif
+
+//--------------------------------------------------------------//
+#ifdef ADS
+   ANNOUNCE RDDSYS
+   init procedure RddInit
+      rddRegister( "ADS", 1 )
+      //AdsSetFileType( ADS_ADT )
+   return
 #endif
 
 //--------------------------------------------------------------//
