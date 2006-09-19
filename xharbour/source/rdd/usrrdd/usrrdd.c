@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.4 2006/09/06 23:56:00 druzus Exp $
+ * $Id: usrrdd.c,v 1.5 2006/09/17 16:53:08 druzus Exp $
  */
 
 /*
@@ -2241,8 +2241,9 @@ static ERRCODE hb_usrOrderInfo( AREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
    pItem = hb_usrOrderInfoToItem( pOrderInfo );
 
    hb_vmPushInteger( pArea->uiArea );
+   hb_vmPushInteger( uiIndex );
    hb_vmPush( pItem );
-   hb_vmDo( 2 );
+   hb_vmDo( 3 );
 
    pResult = hb_arrayGetItemPtr( pItem, UR_ORI_RESULT );
    if( pResult && !HB_IS_NIL( pResult ) )
