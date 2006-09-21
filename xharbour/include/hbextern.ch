@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.35 2006/09/13 13:20:45 ronpinkas Exp $
+ * $Id: hbextern.ch,v 1.36 2006/09/19 21:06:47 brianhays Exp $
  */
 
 /*
@@ -722,9 +722,8 @@ EXTERNAL STRPOKE
 #endif /* HB_COMPAT_FLAGSHIP */
 
 #ifdef ADS
-
+   #include "../../contrib/rdd_ads/ads.ch"
+   #include "../../contrib/rdd_ads/adsexternal.ch"
 #endif /* ADS */
-   #include "..\..\contrib\rdd_ads\ads.ch"
-   #include "..\..\contrib\rdd_ads\adsexternal.ch"
 
 #endif /* HB_EXTERN_CH_ */
