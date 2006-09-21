@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.47 2006/08/27 23:14:58 modalsist Exp $
+ * $Id: memoedit.prg,v 1.48 2006/09/16 21:12:28 modalsist Exp $
  */
 
 /*
@@ -248,6 +248,7 @@ METHOD Edit() CLASS TMemoEditor
             IF ( nKey IN ::aEditKeys ) .OR.;
                ( nKey IN ::aAsciiKeys ) .OR.;
                ( nKey IN ::aConfigurableKeys ) .OR.;
+               ( nKey IN ::aExtKeys ) .OR.;
                ( nKey == K_F1 )
 
                IF NextKey()==0 .AND.;
@@ -498,11 +499,8 @@ FUNCTION MemoEdit(cString,;
 
 
    // 2006/JUL/22 - E.F. To avoid run time error.
-   IF nTop >= nBottom .OR.;
-      nLeft >= nRight
-
+   IF nTop > nBottom .OR. nLeft > nRight
       Throw( ErrorNew( "BASE", 0, 1127, "<nTop,nLeft,nRight,nBottom> Argument error" , Procname() ) )
-      
    ENDIF
 
 

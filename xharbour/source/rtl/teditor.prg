@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.79 2006/08/19 16:44:56 modalsist Exp $
+/* $Id: teditor.prg,v 1.80 2006/09/16 21:12:28 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.79 2006/08/19 16:44:56 modalsist Exp $
+/* $Id: teditor.prg,v 1.80 2006/09/16 21:12:28 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -276,11 +276,8 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
    default  nWndCol     to 0 // 1   "
 
    // 2006/JUL/22 - E.F. To avoid run time error.
-   IF nTop >= nBottom .OR.;
-      nLeft >= nRight
-
+   IF nTop > nBottom .OR. nLeft > nRight
       Throw( ErrorNew( "BASE", 0, 1127, "Argument error: <nTop,nRight,nLeft,nBottom>" , Procname() ) )
-      
    ENDIF
 
 
@@ -547,7 +544,9 @@ METHOD RefreshLine( lRefreshColSel ) CLASS HBEditor
          nFirstCol := Max(::nTextCol,::nWndCol)
          nFirstCol := Max(nFirstCol,::nLeft)
 
-         nCol := nFirstCol + ::nColSelStart - 1
+/* 2006/SEP/20 - E.F. - Fine cursor adjustment. */
+//       nCol := nFirstCol + ::nColSelStart - 1
+         nCol := Max( ::nLeft, nFirstCol + ::nColSelStart - 1 )
 
          DispOutAt( ::Row(), nCol, SubStr( ::GetLine( ::nRow ), Max(1,::nColSelStart), (::nColSelEnd - ::nColSelStart+1) ) , ::ColColor() )
 
@@ -2480,13 +2479,11 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
             ::nRowSelEnd := ::nRowSelStart
             ::RefreshLine()
             if ::nRow < ::LastRow()
-               //::Down()
                ::GotoLine( ::nRow + 1 )
             endif
 
          elseif nCount < 0  // Shift-UP
             if ::nRow > 1
-               //::Up()
                ::GotoLine( ::nRow - 1 )
             endif
             ::nRowSelStart := ::nRow
@@ -2496,9 +2493,8 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
       elseif cAction == "COL"
 
-         if nCount > 0   // Shift-Right
+         if nCount > 0   // Shift Right
             if ::nCol < ::nWordWrapCol+1
-               //::Right()
                ::GotoCol( ::nCol + 1)
                if ::nColSelStart==0
                   ::nColSelRow := ::nRow
@@ -2507,15 +2503,17 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
                ::nColSelEnd := Max(1,::nCol-1)
                ::RefreshLine(.T.)
             endif
-         elseif nCount < 0  // Shift-Left
+         elseif nCount < 0  // Shift Left
             if ::nCol > 1
-               //::Left()
+               if ::nColSelStart=0 .and. ::nColSelEnd=0
+                  ::nColSelEnd := ::nColSelStart := ::nCol
+               endif
                ::GotoCol( ::nCol - 1 )
                ::nColSelEnd := Max(::nColSelEnd,::nCol)
                ::nColSelRow := ::nRow
                ::nColSelStart := ::nCol
             else
-               ::nColSelStart := ::nColSelEnd := 0
+               ::nColSelRow := ::nColSelStart := ::nColSelEnd := 0
                ::lSelActive := .F.
             endif
             ::RefreshLine(.T.)
@@ -2523,12 +2521,12 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
       elseif cAction == "END"
 
-         ::nColSelEnd := ::nWordWrapCol
          if ::nColSelStart==0
              ::nColSelRow := ::nRow
             ::nColSelStart := Max(1,::nCol-1)
          endif
-         ::GotoCol( ::nWordWrapCol )
+         ::End()
+         ::nColSelEnd := Max(1,::nCol-1)
          ::RefreshLine(.T.)
 
       elseif cAction == "HOME"
@@ -2575,11 +2573,18 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
             ::nColSelStart := ::nColSelEnd := 0
 
             if ::nRowSelEnd == ::LastRow()
-               ::nRowSelEnd := ::LastRow()-1
+               //::nRowSelEnd := ::LastRow()-1
+               /* 2006/SEP/17 - E.F. - At this point we need add a new line
+                                       to be able to select the last row.
+               */
+               if !Empty( ::aText[::nRowSelEnd]:cText )
+                  ::AddLine()
+               else
+                  ::nRowSelEnd := ::LastRow()-1
+               endif
             endif
             ::RefreshLine()
             if ::nRow < ::LastRow()
-               //::Down()
                ::GotoLine( ::nRow + 1 )
             endif
 
@@ -2609,7 +2614,6 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
 
             if ::nRow > 1
-               //::Up()
                ::GotoLine( ::nRow - 1 )
             endif
             
@@ -2635,35 +2639,53 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
 
          if nCount > 0     // Shift-Right
             if ::nCol < ::nWordWrapCol+1
-               //::Right()
                ::GotoCol( ::nCol + 1)
                if ::nColSelStart==0
+                  ::nColSelRow := ::nRow
                   ::nColSelStart := Max(1,::nCol-1)
                endif
                ::nColSelEnd := Max(::nColSelStart,::nCol-1)
+               if ::nColSelStart = ::nColSelEnd
+                  ::nColSelStart := ::nColSelEnd := Max(1,::nCol-1)
+                  ::nColSelRow := 0
+               endif
                ::RefreshLine(.T.)
             endif
+
          elseif nCount < 0 // Shift-Left
+
             if ::nCol > 1
-               //::Left()
                ::GotoCol( ::nCol - 1 )
-               ::nColSelEnd := Max(::nColSelEnd,::nCol)
-               ::nColSelStart := ::nCol
+               if ::nColSelEnd==0
+                  ::nColSelRow := ::nRow
+                  ::nColSelEnd := Max(::nColSelEnd,::nCol)
+               endif
+               if ::nColSelStart <=::nCol-1
+                  ::nColSelEnd := Min(::nColSelEnd,::nCol-1)
+               else
+                  ::nColSelStart := Max(1,::nCol)
+               endif
+               if ::nCol=1 .and. ::nColSelStart = ::nColSelEnd
+                  ::lSelActive := .F.
+               endif
+               ::RefreshLine(.T.)
             else
-               ::nColSelStart := ::nColSelEnd := 0
+               if ::nColSelEnd == ::nColSelStart
+                  ::nColSelStart := ::nColSelEnd := 0
+                  ::nColSelRow := 0
+               endif
                ::lSelActive := .F.
             endif
-            ::RefreshLine(.T.)
 
          endif
 
       elseif cAction == "END"
 
-         ::nColSelEnd := ::nWordWrapCol
          if ::nColSelStart==0
             ::nColSelStart := Max(1,::nCol-1)
          endif
-         ::GotoCol( ::nWordWrapCol )
+         ::End()
+         ::nColSelEnd := Max(1,::nCol-1)
          ::RefreshLine(.T.)
 
       elseif cAction == "HOME"
@@ -2701,7 +2723,9 @@ METHOD DelText() CLASS HBEditor
       Return self
    ENDIF
 
-   ::Gotop()
+   // 2006/SEP/17 - E.F. - changed to ::top() to avoid cursor out of bound.
+   //::Gotop()
+   ::Top()
 
    ::aText := {}
 
@@ -2750,12 +2774,11 @@ METHOD DelTextSelection() CLASS HBEditor
 
          if empty( ::aText )
             ::DelText()
+         else
+            ::GoToPos( max(1,nRowSelStart) , 1 )
          endif
 
          ::ClrTextSelection()
-
-         //::GoToPos( max( nRowSelStart - 1, 1 ), 1 )
-         ::GoToPos( max(1,nRowSelStart) , 1 )
 
       else 
 
