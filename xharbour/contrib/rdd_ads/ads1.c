@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.110 2006/09/17 16:53:08 druzus Exp $
+ * $Id: ads1.c,v 1.111 2006/09/19 21:06:47 brianhays Exp $
  */
 
 /*
@@ -2510,7 +2510,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
       if ( uiFldLen == 0)
       {
-         uiFldLen = strlen( ucBuffer );  // should have been set by sprintf above.
+         uiFldLen = strlen( (const char *) ucBuffer );  // should have been set by sprintf above.
       }
       if( uiFldLen >= uiLen )
       {
@@ -2552,7 +2552,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
 
    AdsGetRecordLength( pArea->hTable, &u32Length );
-   pArea->uiRecordLen = u32Length;
+   pArea->uiRecordLen = (USHORT) u32Length;
    /* Alloc record buffer - because it's also used for some extended types
       conversion it has to be at least 25 bytes size */
    pArea->pRecord = ( BYTE * ) hb_xgrab( HB_MAX( pArea->uiRecordLen, 25 ) );
@@ -2940,7 +2940,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       pArea->maxFieldLen = 24;
    }
    AdsGetRecordLength( pArea->hTable, &u32Length );
-   pArea->uiRecordLen = u32Length;
+   pArea->uiRecordLen = (USHORT) u32Length;
    /* Alloc record buffer - because it's also used for some extended types
       conversion it has to be at least 25 bytes size */
    pArea->pRecord = ( BYTE * ) hb_xgrab( HB_MAX( pArea->uiRecordLen, 25 ) );
