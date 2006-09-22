@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.72 2006/02/21 19:37:06 druzus Exp $
+ * $Id: adsfunc.c,v 1.73 2006/03/25 02:22:31 druzus Exp $
  */
 
 /*
@@ -2144,6 +2144,7 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
    char sBuffer[ ADS_MAX_PARAMDEF_LEN ];
    UNSIGNED16 ulLength;
    UNSIGNED16 ulBuffer;
+   UNSIGNED32 ulRetVal;
    BOOL bChar = FALSE;
    ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 2 );
 
@@ -2153,11 +2154,20 @@ HB_FUNC( ADSDDGETDATABASEPROPERTY )
       case ADS_DD_DEFAULT_TABLE_PATH:
       case ADS_DD_USER_DEFINED_PROP:
       case ADS_DD_TEMP_TABLE_PATH:
+      /*case ADS_DD_ADMIN_PASSWORD:  not valid to retrieve */
       case ADS_DD_VERSION:
       {
          ulLength = ADS_MAX_PARAMDEF_LEN ;
-         AdsDDGetDatabaseProperty( hConnect, ulProperty, &sBuffer, &ulLength );
          bChar = TRUE ;
+         ulRetVal = AdsDDGetDatabaseProperty( hConnect, ulProperty, &sBuffer, &ulLength );
+         if( ulRetVal != AE_SUCCESS )
+         {
+            sBuffer[0] = 0;
+            ulLength = 0;    /* Current structure of this func doesn't give a good way to handle errors */
+         }
+         else
+         {
+         }
          break;
       }
       case ADS_DD_LOG_IN_REQUIRED:
@@ -2195,7 +2205,7 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
    UNSIGNED16 ulBuffer;
    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
    PHB_ITEM pParam = hb_param( 2, HB_IT_ANY ) ;
-   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 2 );
+   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 3 );
 
    switch( ulProperty )
    {
@@ -2206,7 +2216,8 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
       case ADS_DD_ADMIN_PASSWORD:
       case ADS_DD_ENCRYPT_TABLE_PASSWORD:
       {
-         ulRetVal = AdsDDSetDatabaseProperty( hConnect, ulProperty, hb_itemGetCPtr( pParam ), ( UNSIGNED16 ) hb_itemGetCLen( pParam ) );
+         ulRetVal = AdsDDSetDatabaseProperty( hConnect, ulProperty, hb_itemGetCPtr( pParam ), ( UNSIGNED16 ) hb_itemGetCLen( pParam )+1 );
+         TraceLog( NULL, "ulRetVal %d   %s  %d\n", ulRetVal, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
          break;
       }
       case ADS_DD_MAX_FAILED_ATTEMPTS:

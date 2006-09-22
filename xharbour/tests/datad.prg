@@ -16,7 +16,7 @@ FUNCTION MAIN
 
    CLS
 
-   RddSetDefault("AdsADT")
+   RddSetDefault("ADT")
    AdsSetServerType ( 7 )
    SET Filetype to ADT
 
@@ -61,8 +61,8 @@ FUNCTION MAIN
       // and this is now the default connection
 
       ? "Default connection is now this handle:", adsConnection()
-      ? "Is a Data Dict connection?  (ADS_DATABASE_CONNECTION=6, "
-      ? "  ADS_SYS_ADMIN_CONNECTION=7):", AdsGetHandleType()
+      ? "   Is it a Data Dict connection?  (ADS_DATABASE_CONNECTION=6, "
+      ? "      ADS_SYS_ADMIN_CONNECTION=7):", AdsGetHandleType()
 
       // Add one user
       AdsDDCreateUser(, "Luiz", "papael", "This is user Luiz")
@@ -74,6 +74,11 @@ FUNCTION MAIN
          // notice the "long table name" for file Table2.adt.  Later open it with "Customer Data" as the table name
           ? "Error adding table:", adsGetLastError(@cErr), cErr
       ENDIF
+      ? "Set new admin pword on default  connection:", AdsDDSetDatabaseProperty( ADS_DD_ADMIN_PASSWORD, "newPWord"  )
+      ? "Set new admin pword on explicit connection:", AdsDDSetDatabaseProperty( ADS_DD_ADMIN_PASSWORD, "newPWord", hConnection1  )
+      ? "Clear admin pword:", AdsDDSetDatabaseProperty( ADS_DD_ADMIN_PASSWORD, ""  )
+
+
    ELSE
       ? "Error connecting to xharbour.add!"
    ENDIF
