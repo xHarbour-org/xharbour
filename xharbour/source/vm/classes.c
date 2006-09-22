@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.193 2006/09/17 23:20:37 druzus Exp $
+ * $Id: classes.c,v 1.194 2006/09/19 01:46:17 ronpinkas Exp $
  */
 
 /*
@@ -2000,7 +2000,7 @@ HB_FUNC( __CLSADDMSG )
 USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
 {
    PCLASS pClass = s_pClasses + ( uiClass - 1 );
-   USHORT uiMethods = pClass->uiMethods, uiRet = 0;
+   USHORT uiMethods = pClass->uiMethods + 1, uiRet = 0;
    PMETHOD pMethod = pClass->pMethods;
 
    for( ; --uiMethods; pMethod++ )
