@@ -1,5 +1,5 @@
 /*
- * $Id: bit3.c,v 1.5 2004/05/12 02:25:08 druzus Exp $
+ * $Id: bit3.c,v 1.2 2006/09/23 21:02:59 ptsarenko Exp $
  */
 
 /*
@@ -63,7 +63,8 @@ typedef BOOL * BOOLP;
 typedef LONG * LONGP;
 typedef USHORT * USHORTP;
 
-static LONG __hex2long( char *cNum1, int iLenHex );
+extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
+
 static LONG __getparam( int iParam );
 static LONG __numand( LONG wNum1, LONG wNum2 );
 static LONG __numor ( LONG wNum1, LONG wNum2 );
@@ -225,38 +226,13 @@ HB_FUNC ( NUMMIRRX )
 }
 
 
-static LONG __hex2long( char *cNum1, int iLenHex )
-{
-  int  i;
-  int  iNum;
-  ULONG lHexNum = 0;
-
-
-  i = ( iLenHex - 1 );
-  while (( i >= 0 ) && ( iLenHex-i <= 8 ))
-  {
-     iNum = ((int) cNum1[i]) - 0x30;
-
-     if (iNum > 9)
-       iNum -= 7;
-
-     if ((iNum < 0) || (iNum > 0x0F))
-       break;
-
-     lHexNum += (ULONG) iNum * (1 << (4 * ( iLenHex - i - 1 )));
-     i--;
-  }
-  return lHexNum;
-}
-
-
 static LONG __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return  __hex2long( hb_parcx( iParam ), hb_parclen( iParam ) );
+     return (LONG) hb_hextonum( hb_parcx( iParam ) );
   else
-     return  hb_parnl( iParam );
+     return hb_parnl( iParam );
 
 }
 

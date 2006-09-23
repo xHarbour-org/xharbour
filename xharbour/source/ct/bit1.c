@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.5 2004/05/12 02:25:08 druzus Exp $
+ * $Id: bit1.c,v 1.2 2006/09/23 21:02:59 ptsarenko Exp $
  */
 
 /*
@@ -59,7 +59,8 @@
 #include "hbapi.h"
 #include "ct.h"
 
-static USHORT __hex2int( char *cNum1, int iLenHex );
+extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
+
 static USHORT __getparam( int iParam );
 static USHORT __numand( USHORT wNum1, USHORT wNum2 );
 static USHORT __numor ( USHORT wNum1, USHORT wNum2 );
@@ -206,46 +207,12 @@ HB_FUNC ( NUMMIRR )
 
 }
 
-/*
- * Function to test, transform Hexadecimal numbers to decimals numbers
- * It's more quicker than CTON() function
-
-HB_FUNC ( HEX2NUM )
-{
-  hb_retnl( __hex2int( hb_parcx( 1 ), hb_parclen( 1 ) ) );
-}
-*/
-
-static USHORT __hex2int( char *cNum1, int iLenHex )
-{
-  int  i;
-  int  iNum;
-  USHORT uiHexNum = 0;
-
-
-  i = ( iLenHex - 1 );
-  while (( i >= 0 ) && ( iLenHex-i <= 4 ))
-  {
-     iNum = ((int) cNum1[i]) - 0x30;
-
-     if (iNum > 9)
-       iNum -= 7;
-
-     if ((iNum < 0) || (iNum > 0x0F))
-       break;
-
-     uiHexNum += (USHORT) iNum * (1 << (4 * ( iLenHex - i - 1 )));
-     i--;
-  }
-  return uiHexNum;
-}
-
 
 static USHORT __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return  __hex2int( hb_parcx( iParam ), hb_parclen( iParam ) );
+     return (USHORT) hb_hextonum( hb_parcx( iParam ) );
   else
      return (USHORT) hb_parnl( iParam );
 

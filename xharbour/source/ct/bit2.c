@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.2 2005/12/25 17:02:59 ptsarenko Exp $
+ * $Id: bit2.c,v 1.3 2006/09/23 21:09:43 ptsarenko Exp $
  */
 
 /*
@@ -55,8 +55,8 @@
 
 #include "ct.h"
 
+extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
-static LONG __hex2long( char *cNum1, int iLenHex );
 static LONG __getparam( int iParam );
 
 
@@ -184,39 +184,12 @@ HB_FUNC ( ISBIT )
 }
 
 
-static LONG __hex2long( char *cNum1, int iLenHex )
-{
-  register int i;
-  register int iNum;
-  LONG         iHexNum = 0;
-
-
-  i = ( iLenHex - 1 );
-  while (( i >= 0 ) && ( iLenHex-i <= 4 ))
-  {
-     iNum = ((int) cNum1[i]) - 0x30;
-
-     if (iNum > 9)
-       iNum -= 7;
-
-     if ((iNum < 0) || (iNum > 0x0F))
-       break;
-
-     iHexNum += (LONG) iNum * (1 << (4 * ( iLenHex - i - 1 )));
-     i--;
-  }
-  return iHexNum;
-}
-
-
 static LONG __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return  __hex2long( hb_parcx( iParam ), hb_parclen( iParam ) );
+     return (LONG) hb_hextonum( hb_parcx( iParam ) );
   else
      return hb_parnl( iParam );
 
 }
-
-

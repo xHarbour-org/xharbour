@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.13 2004/11/21 21:44:19 druzus Exp $
+ * $Id: hbhex2n.c,v 1.15 2006/09/23 21:02:49 ptsarenko Exp $
  */
 
 /*
@@ -58,6 +58,40 @@
 #include "hbvm.h"
 #include "hbapierr.h"
 
+HB_ULONG HB_EXPORT hb_hextonum(char *cHex)
+{
+   HB_ULONG   ulNum = 0;
+   char       c;
+   int        iDigit;
+
+   while ( *cHex )
+   {
+      ulNum <<= 4;
+ 
+      c = *cHex;
+      if ( c >= '0' && c <= '9' )
+      {
+         iDigit = c - '0';
+      }
+      else if ( c >= 'A' && c <= 'F' )
+      {
+         iDigit = c - 'A' + 10;
+      }
+      else if ( c >= 'a' && c <= 'f' )
+      {
+         iDigit = c - 'a' + 10;
+      }
+      else
+      {
+         ulNum = 0;
+         break;
+      }
+      ulNum += iDigit;
+      cHex++;
+   }
+
+   return ulNum;
+}
 
 HB_FUNC( NUMTOHEX )
 {
@@ -105,43 +139,13 @@ HB_FUNC( NUMTOHEX )
 
 HB_FUNC( HEXTONUM )
 {
-   HB_ULONG   ulNum = 0;
-   char       *cHex, c;
-   int        iDigit;
-
    if( ! ISCHAR(1) )
    {
       hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, "HEXTONUM", 1, hb_paramError( 1 ) );
       return;
    }
-   cHex = hb_parc( 1 );
 
-   while ( *cHex )
-   {
-      ulNum <<= 4;
- 
-      c = *cHex;
-      if ( c >= '0' && c <= '9' )
-      {
-         iDigit = c - '0';
-      }
-      else if ( c >= 'A' && c <= 'F' )
-      {
-         iDigit = c - 'A' + 10;
-      }
-      else if ( c >= 'a' && c <= 'f' )
-      {
-         iDigit = c - 'a' + 10;
-      }
-      else
-      {
-         ulNum = 0;
-         break;
-      }
-      ulNum += iDigit;
-      cHex++;
-   }
-   hb_retnint( ulNum );
+   hb_retnint( hb_hextonum( hb_parc( 1 ) ) );
 }
 
 
