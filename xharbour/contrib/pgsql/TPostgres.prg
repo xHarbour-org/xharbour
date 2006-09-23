@@ -1,5 +1,5 @@
 /*
- * $Id: TPostgres.prg,v 1.37 2005/05/21 14:48:38 rodrigo_moreno Exp $
+ * $Id: TPostgres.prg,v 1.38 2005/07/06 00:04:17 rodrigo_moreno Exp $
  *
  * xHarbour Project source code:
  * PostgreSQL RDBMS low level (client api) interface code.
@@ -78,7 +78,7 @@ CLASS TPQServer
     METHOD   SetSchema( cSchema )
 
     METHOD   NetErr()             INLINE ::lError
-    METHOD   Error()              INLINE ::cError
+    METHOD   ErrorMsg()           INLINE ::cError
     
     METHOD   TableExists( cTable )
     METHOD   ListTables()
@@ -496,7 +496,7 @@ CLASS TPQQuery
     METHOD   Goto(nRecno)       
 
     METHOD   NetErr()           INLINE ::lError
-    METHOD   Error()            INLINE ::cError    
+    METHOD   ErrorMsg()         INLINE ::cError    
 
     METHOD   FCount()           INLINE ::nFields
     METHOD   FieldName( nField )
@@ -545,7 +545,7 @@ METHOD Destroy() CLASS TPQquery
 RETURN .T.
 
 
-METHOD Refresh(lQuery) CLASS TPQquery
+METHOD Refresh(lQuery,lMeta) CLASS TPQquery
     Local res
     Local cTableCodes := ''
     Local cFieldCodes := ''
@@ -558,6 +558,7 @@ METHOD Refresh(lQuery) CLASS TPQquery
     Local cType, nType, nDec, nSize
 
     Default lQuery To .T.
+    Default lMeta To .T.
     
     ::Destroy()
 
@@ -565,9 +566,7 @@ METHOD Refresh(lQuery) CLASS TPQquery
     ::lEof     := .F.
     ::lClosed  := .F.    
     ::nRecno   := 0
-    ::nFields  := 0
     ::nLastrec := 0    
-    ::aStruct  := {}
     ::Rows     := 0
 
     if lQuery
@@ -576,106 +575,111 @@ METHOD Refresh(lQuery) CLASS TPQquery
         res := ::pQuery
     endif                
 
-    if PQresultstatus(res) == PGRES_TUPLES_OK     
-        // Get some information about metadata
-        aTemp := PQmetadata(res)
+    if PQresultstatus(res) == PGRES_TUPLES_OK    
 
-        if ISARRAY(aTemp)                        
-            For i := 1 to Len(aTemp)
-                cType := aTemp[ i, 2 ]
-                nSize := aTemp[ i, 3 ]
-                nDec  := aTemp[ i, 4 ]
-  
-                if nSize == 0 .and. PQlastrec(res) >= 1
-                    nSize := PQgetLength(res, 1, i)                
-                endif                    
-                
-                if 'char' $ cType 
-                    cType := 'C'
-        
-                elseif 'text' $ cType                 
-                    cType := 'M'
-        
-                elseif 'boolean' $ cType
-                    cType := 'L'
-                    nSize := 1
-        
-                elseif 'smallint' $ cType 
-                    cType := 'N'
-                    nSize := 5
-                
-                elseif 'integer' $ cType .or. 'serial' $ cType 
-                    cType := 'N'
-                    nSize := 9
-                
-                elseif 'bigint' $ cType .or. 'bigserial' $ cType
-                    cType := 'N'
-                    nSize := 19
-                
-                elseif 'decimal' $ cType .or. 'numeric' $ cType
-                    cType := 'N'
-                    
-                    // Postgres don't store ".", but .dbf does, it can cause data width problem
-                    if ! Empty(nDec)
-                        nSize++
-                    endif                        
+       if lMeta 
+          ::aStruct  := {}
+          ::nFields  := 0
+          // Get some information about metadata
+           aTemp := PQmetadata(res)
+           if ISARRAY(aTemp)                        
+              For i := 1 to Len(aTemp)
+                   cType := aTemp[ i, 2 ]
+                   nSize := aTemp[ i, 3 ]
+                   nDec  := aTemp[ i, 4 ]
+     
+                   if nSize == 0 .and. PQlastrec(res) >= 1
+                       nSize := PQgetLength(res, 1, i)                
+                   endif                    
+                   
+                   if 'char' $ cType 
+                       cType := 'C'
+           
+                   elseif 'text' $ cType                 
+                       cType := 'M'
+           
+                   elseif 'boolean' $ cType
+                       cType := 'L'
+                       nSize := 1
+           
+                   elseif 'smallint' $ cType 
+                       cType := 'N'
+                       nSize := 5
+                   
+                   elseif 'integer' $ cType .or. 'serial' $ cType 
+                       cType := 'N'
+                       nSize := 9
+                   
+                   elseif 'bigint' $ cType .or. 'bigserial' $ cType
+                       cType := 'N'
+                       nSize := 19
+                   
+                   elseif 'decimal' $ cType .or. 'numeric' $ cType
+                       cType := 'N'
+                       
+                       // Postgres don't store ".", but .dbf does, it can cause data width problem
+                       if ! Empty(nDec)
+                           nSize++
+                       endif                        
 
-                    // Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5
-                    if nDec > 100
-                        nDec := 5
-                    endif
-                
-                    if nSize > 100
-                        nSize := 15
-                    endif        
-        
-                elseif 'real' $ cType .or. 'float4' $ cType 
-                    cType := 'N'
-                    nSize := 15
-                    nDec  :=  4
-                
-                elseif 'double precision' $ cType .or. 'float8' $ cType 
-                    cType := 'N'
-                    nSize := 19
-                    nDec  := 9
-                
-                elseif 'money' $ cType               
-                    cType := 'N'
-                    nSize := 10
-                    nDec  := 2
-                
-                elseif 'timestamp' $ cType               
-                    cType := 'C'
-                    nSize := 20
-        
-                elseif 'date' $ cType               
-                    cType := 'D'
-                    nSize := 8
-        
-                elseif 'time' $ cType               
-                    cType := 'C'
-                    nSize := 10
-        
-                else
-                    // Unsuported
-                    cType := 'K'
-                endif               
-                
-                aadd( aStruct, {aTemp[ i, 1 ], cType, nSize, nDec, aTemp[i, 5], aTemp[i, 6]} )
-            Next    
-            
-            ::nFields := PQfcount(res)
-            ::nLastrec := PQlastrec(res)
-            
-            if ::nLastrec <> 0
-                ::nRecno := 1
-            endif                
-                
-            ::aStruct := aStruct        
+                       // Numeric/Decimal without scale/precision can genarete big values, so, i limit this to 10,5
+                       if nDec > 100
+                           nDec := 5
+                       endif
+                   
+                       if nSize > 100
+                           nSize := 15
+                       endif        
+           
+                   elseif 'real' $ cType .or. 'float4' $ cType 
+                       cType := 'N'
+                       nSize := 15
+                       nDec  :=  4
+                   
+                   elseif 'double precision' $ cType .or. 'float8' $ cType 
+                       cType := 'N'
+                       nSize := 19
+                       nDec  := 9
+                   
+                   elseif 'money' $ cType               
+                       cType := 'N'
+                       nSize := 10
+                       nDec  := 2
+                   
+                   elseif 'timestamp' $ cType               
+                       cType := 'C'
+                       nSize := 20
+           
+                   elseif 'date' $ cType               
+                       cType := 'D'
+                       nSize := 8
+           
+                   elseif 'time' $ cType               
+                       cType := 'C'
+                       nSize := 10
+           
+                   else
+                       // Unsuported
+                       cType := 'K'
+                   endif               
+                   
+                   aadd( aStruct, {aTemp[ i, 1 ], cType, nSize, nDec, aTemp[i, 5], aTemp[i, 6]} )
+               Next    
+               
+               ::nFields := PQfcount(res)
+               
+               ::aStruct := aStruct       
+ 
+           endif
         endif
-    
+
+        ::nLastrec := PQlastrec(res)
         ::lError := .F.
-        ::cError := ''    
+        ::cError := ''  
+ 
+        if ::nLastrec != 0
+           ::nRecno := 1
+        endif                
     
     elseif PQresultstatus(res) == PGRES_COMMAND_OK
         ::lError := .F.
@@ -716,7 +720,7 @@ METHOD Skip( nrecno ) CLASS TPQquery
             ::lEof := .T.        
         end
     
-        if ::nRecno + nRecno < 0
+        if ::nRecno + nRecno < 1
             ::nRecno := 1
             ::lBof := .T.
         end
@@ -798,6 +802,7 @@ METHOD Delete(oRow) CLASS TPQquery
     Local i
     Local nField
     Local xField
+    Local cQuery
     Local cWhere := ''
     Local aParams := {}
     
@@ -818,7 +823,8 @@ METHOD Delete(oRow) CLASS TPQquery
         Next                        
 
         if ! (cWhere == '')
-            res := PQexecParams( ::pDB, 'DELETE FROM ' + ::Schema + '.' + ::Tablename + ' WHERE ' + cWhere, aParams)    
+            cQuery := 'DELETE FROM ' + ::Schema + '.' + ::Tablename + ' WHERE ' + cWhere
+            res := PQexecParams( ::pDB, cQuery, aParams)    
 
             if PQresultstatus(res) != PGRES_COMMAND_OK            
                 ::lError := .T.
@@ -1178,7 +1184,7 @@ CLASS TPQRow
    METHOD   FieldLen( nField )             
    METHOD   FieldDec( nField )             
    METHOD   FieldType( nField ) 
-   METHOD   Changed( nField )     INLINE ! (::aRow[nField] == ::aOld[nField])              
+   METHOD   Changed( nField )     INLINE !(::aRow[nField] == ::aOld[nField])              
    METHOD   FieldGetOld( nField ) INLINE ::aOld[nField]
 ENDCLASS
 
@@ -1206,7 +1212,7 @@ RETURN result
 
 METHOD FieldPut( nField, Value ) CLASS TPQrow
     Local result
-    
+   
     if ISCHARACTER(nField)
         nField := ::Fieldpos(nField)
     endif

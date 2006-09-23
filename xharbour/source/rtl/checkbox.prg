@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.7 2004/07/13 19:35:57 paultucker Exp $
+ * $Id: checkbox.prg,v 1.8 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -222,10 +222,14 @@ METHOD Display() CLASS HBCHECKBOX
          cCaption := Stuff( cCaption, nPos, 1, "" )
       ENDIF
 
+      IF ::HasFocus
+         SET COLOR TO (__GuiColor(::ColorSpec, 4))
+      ENDIF
+
       Setpos( ::CapRow, ::CapCol )
       ?? cCaption
 
-      IF nPos != 0
+      IF !::HasFocus .and. nPos != 0
          SET COLOR TO (__GuiColor(::ColorSpec, 4))
          Setpos( ::CapRow, ::CapCol + nPos - 1 )
          ?? Substr( cCaption, nPos, 1 )
