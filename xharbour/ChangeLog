@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5165 2006/09/23 22:08:23 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5165 2006/09/23 18:32:16 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-25 09:13 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\classes.c
+    * Removed definition of unused variable pClass in function __clsAssocType()
 
 2006-09-23 21:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/rtl/hbhex2n.c

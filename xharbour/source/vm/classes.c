@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.194 2006/09/19 01:46:17 ronpinkas Exp $
+ * $Id: classes.c,v 1.195 2006/09/22 18:53:25 ronpinkas Exp $
  */
 
 /*
@@ -4614,7 +4614,6 @@ HB_FUNC( __CLSASSOCTYPE )
 {
    USHORT uiClass = (USHORT) hb_parni( 1 );
    char *szType = hb_parcx(2);
-   PCLASS pClass = s_pClasses + ( uiClass - 1 );
 
    if( __cls_CntMethods( uiClass, hb___msgGetData ) )
    {
