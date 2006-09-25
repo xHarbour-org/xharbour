@@ -1,5 +1,5 @@
 /*
- * $Id: numconv.prg,v 1.2 2005/12/14 23:03:00 ptsarenko Exp $
+ * $Id: numconv.prg,v 1.3 2006/09/25 20:43:30 ptsarenko Exp $
  */
 
 /*
@@ -64,8 +64,7 @@ Default cPad to "0"
 Default nBase to 10
 
 IF VALTYPE( xNum ) == "C"
-   xNum = ALLTRIM( xNum )
-   xNum = UPPER( xNum )
+   xNum = UPPER( ALLTRIM( xNum ) )
    xNum = CTON( xNum, 16 )
 ENDIF
 IF nBase > 36 .OR. nBase < 2
@@ -90,17 +89,22 @@ RETURN cNum
 
 
 FUNCTION CTON( xNum, nBase, lMode )
-LOCAL i, nNum:=0
+LOCAL i, nNum := 0, nPos
 
 Default lMode TO .F.
 Default nBase TO 10
 
-xNum = ALLTRIM(xNum)
+IF ISCHARACTER(xNum) .and. nBase >= 2 .and. nBase <= 36
 
-IF nBase >= 2 .AND. nBase <= 36
+   xNum := UPPER( ALLTRIM( xNum) )
 
    FOR i=1 TO LEN( xNum )
-      nNum += (nBase ** (i-1)) * ( AT( SUBSTR( xNum, -i, 1 ), WORLD ) - 1 )
+      nPos := AT( xNum[i], WORLD )
+      if nPos == 0 .or. nPos > nBase
+         exit
+      else
+	 nNum := nNum * nBase + (nPos-1)
+      endif
    NEXT
 
    IF lMode

@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.4 2006/08/10 04:18:08 ronpinkas Exp $
+ * $Id: pos2.c,v 1.6 2006/08/10 21:28:52 ptsarenko Exp $
  */
 
 /*
@@ -208,10 +208,10 @@ HB_FUNC( POSDEL )
       sStartPos = sStrLen - sDelLen + 1;
     }
 
-    if( sStrLen - sDelLen <= 0 )
+    if( sStrLen <= sDelLen )
     {
-		hb_retclen( "", 0 );
-		return;
+      hb_retclen( "", 0 );
+      return;
     }
 
     pcRet = (char *) hb_xgrab( sStrLen - sDelLen + 1 );

@@ -1,5 +1,5 @@
 /*
- * $Id: pos1.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: pos1.c,v 1.3 2006/09/25 21:11:59 ptsarenko Exp $
  */
 
 /*
@@ -58,6 +58,15 @@
 
 #include "ct.h"
 #include <ctype.h>   
+
+#ifndef HB_CDP_SUPPORT_OFF
+  #include "hbapicdp.h"
+  #define ISUPPER(c)    ((hb_cdp_page->nChars) ? isupper(c) || (int) strchr( hb_cdp_page->CharsUpper, c&255 ) : isupper(c))
+  #define ISLOWER(c)    ((hb_cdp_page->nChars) ? islower(c) || (int) strchr( hb_cdp_page->CharsLower, c&255 ) : islower(c))
+#else
+  #define ISUPPER(c)    isupper(c)
+  #define ISLOWER(c)    islower(c)
+#endif
 
 
 /* defines */
@@ -142,7 +151,7 @@ static void do_pos1 (int iSwitch)
 
         case DO_POS1_POSLOWER:
         {
-          iDoRet = islower(*puc);
+          iDoRet = ISLOWER(*puc);
         }; break;
 
         case DO_POS1_POSRANGE:
@@ -152,7 +161,7 @@ static void do_pos1 (int iSwitch)
         
         case DO_POS1_POSUPPER:
         {
-          iDoRet = isupper(*puc);
+          iDoRet = ISUPPER(*puc);
         }; break;
       }
   

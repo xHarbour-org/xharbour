@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5166 2006/09/25 07:22:11 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5168 2006/09/25 21:43:44 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-25 21:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/numconv.prg
+    ! fixed cton() function with incorrect argument
+  * source/ct/pos1.c
+    + added codepage support for posupper/poslower functions
+  * source/ct/pos2.c
+    ! fixed PosDel() with empty first argument and not empty second argument
+  * source/ct/token1.c
+    + added codepage support for tokenupper/tokenlower functions
+    Thanks to Igor Kultyshev for bug report and proposal corrections
 
 2006-09-25 15:40 UTC+0200 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   + contrib/pgsql/pgrdd.prg

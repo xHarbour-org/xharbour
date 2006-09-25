@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
+ * $Id: token1.c,v 1.4 2005/09/22 21:11:59 ptsarenko Exp $
  */
 
 /*
@@ -61,6 +61,15 @@
 
 #include "ct.h"
 #include <ctype.h>
+
+#ifndef HB_CDP_SUPPORT_OFF
+  #include "hbapicdp.h"
+  #define TOUPPER(c)    ((hb_cdp_page->nChars) ? (char)hb_cdp_page->s_upper[c&255] : toupper(c))
+  #define TOLOWER(c)    ((hb_cdp_page->nChars) ? (char)hb_cdp_page->s_lower[c&255] : tolower(c))
+#else
+  #define TOUPPER(c)    toupper(c)
+  #define TOLOWER(c)    tolower(c)
+#endif
 
 
 /* static const data */
@@ -279,14 +288,14 @@ static void do_token1 (int iSwitch)
         {
           if (pcSubStr != pc)  /* letters can be tokenizers, too,
                                      but they should not be lowercase'd */
-            *(pcRet+(pcSubStr-pcString)) = tolower (*pcSubStr);
+            *(pcRet+(pcSubStr-pcString)) = TOLOWER (*pcSubStr);
         }; break;
 
         case DO_TOKEN1_TOKENUPPER:
         {
           if (pcSubStr != pc)  /* letters can be tokenizers, too, 
                                      but they should not be uppercase'd */
-            *(pcRet+(pcSubStr-pcString)) = toupper (*pcSubStr);
+            *(pcRet+(pcSubStr-pcString)) = TOUPPER (*pcSubStr);
         }; break;
 
         default:
