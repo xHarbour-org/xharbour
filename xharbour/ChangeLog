@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5169 2006/09/26 00:17:11 modalsist Exp $
+ * $Id: ChangeLog,v 1.5170 2006/09/26 08:16:18 brianhays Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-26 01:55 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/adsfunc.c
+    * fixed AdsDDCreate 2nd arg (Encryption flag) to accept logical
+      (it should be documented that way OR numeric (non-zero is true)
 
 
 2006-09-26 01:11 UTC-0800 Brian Hays <bhays at abacuslaw.com>
