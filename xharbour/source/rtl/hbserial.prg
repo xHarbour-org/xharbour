@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.12 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbserial.prg,v 1.13 2006/09/09 04:14:35 ronpinkas Exp $
  */
 
 /*
@@ -50,9 +50,9 @@
  * If you do not wish that, delete this exception notice.
  *
  */
- 
-#include "error.ch" 
- 
+
+#include "error.ch"
+
 FUNCTION HB_Serialize( xValue )
    LOCAL cSerial
    LOCAL xElement, aPropertiesAndValues, aPropertyAndValue
@@ -85,12 +85,12 @@ FUNCTION HB_Serialize( xValue )
 
          EXIT
 
-      CASE "O"  
+      CASE "O"
           if __objDerivedFrom(xValue,"HBPersistent")
             cSerial:= HB_SerializeSimple( xValue:ClassName )
             cSerial+= xValue:SaveToText()
             cSerial:= "Q" + HB_CreateLen8( Len( cSerial ) )+ cSerial
-          
+
           else
             aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
             cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
@@ -113,7 +113,7 @@ RETURN cSerial
 FUNCTION HB_Deserialize( cSerial, nMaxLen )
    LOCAL oObject
    LOCAL oElem, cClassName, aProperties, oVal
-   LOCAL nLen, nClassID  
+   LOCAL nLen, nClassID
    LOCAL nLenBytes,nClassNameLen,oErr
 
    IF Len( cSerial ) < 2 // note
@@ -125,7 +125,7 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          oObject := Array(0)
          nLen := HB_GetLen8( Substr( cSerial, 2 ) )
          cSerial := Substr( cSerial, 10 )
-         
+
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
             Aadd( oObject, oElem )
@@ -145,7 +145,10 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
          oObject := Hash()
          nLen := HB_GetLen8( Substr( cSerial, 2 ) )
          cSerial := Substr( cSerial, 10 )
-         HAllocate( oObject, nLen )
+
+         IF nLen > 0
+            HAllocate( oObject, nLen )
+         ENDIF
 
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
@@ -195,15 +198,15 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             nLen--
          ENDDO
       EXIT
-      
+
       CASE "Q"                               // Object inherited from HBPersistent
          nLenBytes := HB_GetLen8( Substr( cSerial, 2 ) )
          cSerial := Substr( cSerial, 10 )
-                  
+
          cClassName := HB_DeserializeSimple( cSerial, 128 )
          IF cClassName == NIL
             RETURN NIL
-         ENDIF                       
+         ENDIF
          nClassNameLen:=HB_SerialNext( cSerial )
          cSerial :=  Substr( cSerial, nClassNameLen+1 )
          nLenBytes:=nLenBytes-nClassNameLen
@@ -221,9 +224,9 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             oErr:SubCode       := 1
             oErr:SubSystem     := "Serialization"
             RETURN Eval( ErrorBlock(), oErr )
-         ENDIF           
-         
-         oObject := __ClsInst( nClassId )  
+         ENDIF
+
+         oObject := __ClsInst( nClassId )
          if ! __objDerivedFrom(oObject,"HBPersistent")
             oErr := ErrorNew()
             oErr:Args          := { cSerial, nMaxLen }
@@ -237,12 +240,12 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             oErr:SubSystem     := "Serialization"
             RETURN Eval( ErrorBlock(), oErr )
          end if
- 
+
        oObject:LoadFromText(substr(cSerial,1,nLenBytes))
        cSerial :=  Substr( cSerial,nLenBytes+1 )
-         
+
       EXIT
-      
+
       DEFAULT
          oObject := HB_DeserializeSimple( cSerial, nMaxLen )
    END
