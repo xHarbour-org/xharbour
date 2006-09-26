@@ -9,7 +9,7 @@ REQUEST ADS
 
 FUNCTION MAIN
    local n
-   local cErr
+   local cErr, cStr
    local aStru := {{ "ID", "A", 1, 0}, {"Name", "C", 50, 0}, {"address", "C", 50, 0}, {"city", "C", 30, 0}, {"Age", "n", 3, 0}}
    local hConnection1, hConnection2
    local lIsDict := .f.
@@ -66,6 +66,14 @@ FUNCTION MAIN
 
       // Add one user
       AdsDDCreateUser(, "Luiz", "papael", "This is user Luiz")
+
+
+      IF adsddGetUserProperty("Luiz", ADS_DD_COMMENT, @cStr, hConnection1)
+         ? "User comment:", cStr
+      ELSE
+         ? "Error retrieving User comment"
+      ENDIF
+
 
       ? "Add the tables"
       AdsDDaddTable("Table1", "table1.adt", "table1.adi")

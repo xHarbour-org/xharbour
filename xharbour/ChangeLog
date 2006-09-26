@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5168 2006/09/25 18:21:29 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5169 2006/09/26 00:17:11 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-09-26 01:11 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/adsfunc.c
+    * removed dead code from AdsConnect60
+    * fixed AdsDDGetUserProperty arg validation and buffer sizing
+      (thanks to Luiz Culik)
+
+    ! Notice change in parameters!!
+      adsddGetUserProperty("Username", nPropertyID, @cProperty, nConnectionHandle)
+      It's no longer necessary to allocate a buffer in prg code nor
+      pass the length of that buffer, BUT cProperty must be passed by reference.
+      nConnectionHandle was 5th arg before, now it's the 4th.
+
+  * tests/datad.prg
+    * added test for above
+
 
 2006-09-25 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbcolumn.prg
@@ -18,7 +35,7 @@
     - removed old o_Blank constant and 12nd element (NIL) of ::aColInfo array.
       It's unused.
     - removed ColorToDisp() function. It's useless now.
-    * renamed prefixes of tbcolumn info constants from "o_" to "TBCI_". 
+    * renamed prefixes of tbcolumn info constants from "o_" to "TBCI_".
     * assigned new values to TBC_CLR_ constants to allow change heading and
       footing color index.
     + added DefColorOK() function to avoid access to unknowable color index
@@ -67,7 +84,7 @@
     * now the caption is highlite when has focus like C5.3
   * source/tip/Makefile
   + source/tip/cgi.prg
-    * very basic cgi class with cookies and sessions 
+    * very basic cgi class with cookies and sessions
 	 ( thanks to Francesco Saverio Giudice for his contrib/cgilib )
 
 2006-09-22 15:02 UTC-0800 Brian Hays <bhays at abacuslaw.com>

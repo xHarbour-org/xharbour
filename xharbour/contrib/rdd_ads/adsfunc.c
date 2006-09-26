@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.73 2006/03/25 02:22:31 druzus Exp $
+ * $Id: adsfunc.c,v 1.74 2006/09/22 22:08:23 brianhays Exp $
  */
 
 /*
@@ -64,6 +64,7 @@
 
 #define HARBOUR_MAX_RDD_FILTER_LENGTH     256
 #define MAX_STR_LEN 255
+#define ADS_MAX_PARAMDEF_LEN  2048
 
 int adsFileType = ADS_CDX;
 int adsLockType = ADS_PROPRIETARY_LOCKING;
@@ -2073,15 +2074,8 @@ HB_FUNC( ADSCONNECT60 )
    {
       // determine if is a DataDict
       UNSIGNED16 usType;
-      BOOL fDictionary = FALSE;
       PHB_ITEM  piByRefHandle = hb_param( 6, HB_IT_BYREF );
 
-      ulRetVal = AdsGetHandleType( hConnect, &usType);
-      if( ulRetVal == AE_SUCCESS )
-      {
-         fDictionary = ( usType == ADS_DATABASE_CONNECTION
-                      || usType == ADS_SYS_ADMIN_CONNECTION );
-      }
       adsConnectHandle = hConnect;       // set new default
 
       if ( piByRefHandle )
@@ -2139,7 +2133,6 @@ HB_FUNC( ADSDDCREATEUSER )
 
 HB_FUNC( ADSDDGETDATABASEPROPERTY )
 {
-   #define ADS_MAX_PARAMDEF_LEN  2048
    UNSIGNED16 ulProperty = ( UNSIGNED16 ) hb_parni( 1 );
    char sBuffer[ ADS_MAX_PARAMDEF_LEN ];
    UNSIGNED16 ulLength;
@@ -2217,7 +2210,6 @@ HB_FUNC( ADSDDSETDATABASEPROPERTY )
       case ADS_DD_ENCRYPT_TABLE_PASSWORD:
       {
          ulRetVal = AdsDDSetDatabaseProperty( hConnect, ulProperty, hb_itemGetCPtr( pParam ), ( UNSIGNED16 ) hb_itemGetCLen( pParam )+1 );
-         TraceLog( NULL, "ulRetVal %d   %s  %d\n", ulRetVal, hb_itemGetCPtr( pParam ), hb_itemGetCLen( pParam ) );
          break;
       }
       case ADS_DD_MAX_FAILED_ATTEMPTS:
@@ -2256,17 +2248,36 @@ UNSIGNED32 ENTRYPOINT AdsDDGetUserProperty( ADSHANDLE  hObject,
 */
 HB_FUNC( ADSDDGETUSERPROPERTY )
 {
+
    UNSIGNED32 ulRetVal;
-   UNSIGNED8  *pucUserName      = (UNSIGNED8 *) hb_parcx( 1 );
-   UNSIGNED16 usPropertyID      = hb_parni( 2 );
-   UNSIGNED8  *pvProperty       = (UNSIGNED8 *) hb_parcx( 3 );
-   UNSIGNED16 usPropertyLen     = hb_parni( 4 );
-   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 5 );
+   UNSIGNED8  *pucUserName  = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED16 usPropertyID  = hb_parni( 2 );
+   PHB_ITEM pPropertyByRef  = hb_param( 3 , HB_IT_BYREF );
+   ADSHANDLE hConnect       = HB_ADS_PARCONNECTION( 4 );
+   UNSIGNED16 usPropertyLen = ADS_MAX_PARAMDEF_LEN  ;
+   UNSIGNED8  pvProperty[ ADS_MAX_PARAMDEF_LEN   ] = { 0 };
+
+   if (! pPropertyByRef )
+   {
+      hb_errRT_DBCMD( EG_ARG, 1014, NULL, "ADSDDGETUSERPROPERTY" );
+      return;
+   }
 
    ulRetVal = AdsDDGetUserProperty( hConnect, pucUserName, usPropertyID,
                                     pvProperty, &usPropertyLen );
+
+   if (ulRetVal == AE_SUCCESS )
+   {
+      hb_storc(pvProperty, 3 );
+   }
+   else
+   {
+      hb_storc( "", 3 );
+   }
    hb_retl( ulRetVal == AE_SUCCESS );
 }
+
+
 /*
    Verify if a username/password combination is valid for this database
    Call :    ADSTESTLOGIN(serverpath,servertypes,username,password,options,
