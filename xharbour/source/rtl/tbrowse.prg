@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.156 2006/08/24 20:19:35 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.157 2006/08/27 21:39:20 modalsist Exp $
  */
 
 /*
@@ -97,24 +97,24 @@
 //                         Pritpal Bedi
 //                 Constants to access ::aColsInfo
 //
-#define o_Obj             1   // Object Column
-#define o_Type            2   // Type of Data in Column
-#define o_Width           3   // Column Width
-#define o_Heading         4   // Column Headings
-#define o_Footing         5   // Column Footings
-#define o_Pict            6   // Column Picture
-#define o_WidthCell       7   // Width of the Cell
-#define o_ColSep          8   // Column Seperator
-#define o_SepWidth        9   // Width of the Separator
-#define o_DefColor       10   // Array with index of color
-#define o_SetWidth       11   // If True, only SetFrozen can change o_Width
+//#define o_Obj             1   // Object Column
+//#define o_Type            2   // Type of Data in Column
+//#define o_Width           3   // Column Width
+//#define o_Heading         4   // Column Headings
+//#define o_Footing         5   // Column Footings
+//#define o_Pict            6   // Column Picture
+//#define o_WidthCell       7   // Width of the Cell
+//#define o_ColSep          8   // Column Seperator
+//#define o_SepWidth        9   // Width of the Separator
+//#define o_DefColor       10   // Array with index of color
+//#define o_SetWidth       11   // If True, only SetFrozen can change o_Width
 /* 02/july/2005 - <maurilio.longo@libero.it>
                   removed, not really needed, but still present inside ::aColsInfo,
                   as a NIL value
 #define o_Blank          12   // Spaces corresponding to o_Width
 */
-#define o_lColSep        13   // Should column separator be drawn
-#define o_ScrColPos      14   // Temporary column position on screen
+//#define o_lColSep        13   // Should column separator be drawn
+//#define o_ScrColPos      14   // Temporary column position on screen
 
 
 /* 25/11/2004 - <maurilio.longo@libero.it>
@@ -122,16 +122,47 @@
    HEADING and FOOTING have to be colored like STANDARD colors, clipper does it, and could simply
    be removed
 */
-#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
-#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
-#define TBC_CLR_HEADING   TBC_CLR_STANDARD
-#define TBC_CLR_FOOTING   TBC_CLR_STANDARD
-
+//#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
+//#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
+//#define TBC_CLR_HEADING   TBC_CLR_STANDARD
+//#define TBC_CLR_FOOTING   TBC_CLR_STANDARD
 
 /* 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
    25/11/2004 - <maurilio.longo@libero.it> Since there are only two colors, this makes every day less sense to me...
 */
-#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2 }[ nColor ] )
+//#define  ColorToDisp( aColor, nColor )    iif( Len( aColor ) >= nColor, aColor[ nColor ], { 1, 2 }[ nColor ] )
+
+/* 2006/SEP/25- E.F. Renamed column info constants to access ::aColinfo array.
+ * These was "o_" old ones created by Pritbal Bedi.
+ * Removed o_Blank constant and 12nd element of ::aColInfo array.
+ * Removed ColorToDisp() function. This is not necessary anymore.
+ * Assign new values to column color constants to allow set heading and
+ * footing color indexes from defcolor.
+ * Created DefColorOK() function to avoid access to unknowable index of
+ * tbrowse colorspec.
+ */
+
+/* TBColumn info constants. */
+#define TBCI_OBJ             1   // Object TBColumn
+#define TBCI_TYPE            2   // Type of Data in Column
+#define TBCI_WIDTH           3   // Column Width
+#define TBCI_HEADING         4   // Column Headings
+#define TBCI_FOOTING         5   // Column Footings
+#define TBCI_PICT            6   // Column Picture
+#define TBCI_WIDTHCELL       7   // Width of the Cell
+#define TBCI_COLSEP          8   // Column Seperator
+#define TBCI_SEPWIDTH        9   // Width of the Separator
+#define TBCI_DEFCOLOR       10   // Array with index of color
+#define TBCI_SETWIDTH       11   // If True, only SetFrozen can change TBCI_WIDTH
+#define TBCI_LCOLSEP        12   // Should column separator be drawn
+#define TBCI_SCRCOLPOS      13   // Temporary column position on screen
+
+/* TBColumn color constants  */
+#define TBC_CLR_STANDARD  1  // first index value to display unselected data into column.
+#define TBC_CLR_ENHANCED  2  // second index value to display selected data into column. 
+#define TBC_CLR_HEADING   3  // third index value to display heading.
+#define TBC_CLR_FOOTING   4  // fourth index value to display footing.
+
 
 
 // ===================================================================================================
@@ -322,7 +353,7 @@ RETURN NIL
 
 METHOD dbGoBottom() CLASS TDataCache
 
-   local nToTop
+   local nToTop 
 
    Eval( ::oCachedBrowse:GoBottomBlock )
 
@@ -354,10 +385,10 @@ METHOD FillRow( nRow ) CLASS TDataCache
       i := hb_EnumIndex()
 
       with object oCell
-         :xData := Eval( aCol[ o_Obj ]:block )
-         :aColor := IIF( Empty( aCol[ o_Obj ]:colorBlock ),;
+         :xData := Eval( aCol[ TBCI_OBJ ]:block )
+         :aColor := IIF( Empty( aCol[ TBCI_OBJ ]:colorBlock ),;
                          NIL,;
-                         Eval( aCol[ o_Obj ]:colorBlock, :xData ) )
+                         DefColorOK(::oCachedBrowse:ColorSpec, Eval( aCol[ TBCI_OBJ ]:colorBlock,:xData ) ) )
 
          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
             if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
@@ -557,6 +588,9 @@ CLASS TBrowse
    METHOD RefreshCurrent()                // Same as RefreshAll(), but only for current row
 
    METHOD Stabilize()                     // Performs incremental stabilization
+
+   // 2006/AUG/28 - E.F. -  Call forcestable() to any attempt to move datasource recno before first stabilization process.
+   METHOD CheckStable() INLINE iif(!::stable .and. ::lNeverDisplayed, ::Forcestable(),)
 
 #ifdef HB_COMPAT_C53
    METHOD SetKey( nKey, bBlock )
@@ -824,56 +858,56 @@ METHOD Configure( nMode ) CLASS TBrowse
    FOR EACH aCol IN ::aColsInfo
 
       if ( nMode <= 1 .and. !::lNeverDisplayed ) .or. lInitializing
-         xVal := Eval( aCol[ o_Obj ]:block )
+         xVal := Eval( aCol[ TBCI_OBJ ]:block )
 
-         aCol[ o_Type      ] := valtype( xVal )
-         aCol[ o_Heading   ] := aCol[ o_Obj ]:heading
-         aCol[ o_Footing   ] := aCol[ o_Obj ]:footing
-         aCol[ o_Pict      ] := iif( Empty( aCol[ o_Obj ]:Picture ), "", aCol[ o_Obj ]:Picture )
-         if ! aCol[ o_SetWidth ]
-            aCol[ o_Width  ] := ::SetColumnWidth( aCol[ o_Obj ] )
+         aCol[ TBCI_TYPE      ] := valtype( xVal )
+         aCol[ TBCI_HEADING   ] := aCol[ TBCI_OBJ ]:heading
+         aCol[ TBCI_FOOTING   ] := aCol[ TBCI_OBJ ]:footing
+         aCol[ TBCI_PICT      ] := iif( Empty( aCol[ TBCI_OBJ ]:Picture ), "", aCol[ TBCI_OBJ ]:Picture )
+         if ! aCol[ TBCI_SETWIDTH ]
+            aCol[ TBCI_WIDTH  ] := ::SetColumnWidth( aCol[ TBCI_OBJ ] )
          endif
-         aCol[ o_WidthCell ] := Min( aCol[ o_Width ], LenVal( xVal, aCol[ o_Type ], aCol[ o_Pict ] ) )
-         aCol[ o_ColSep    ] := iif( aCol[ o_Obj ]:ColSep != NIL, aCol[ o_Obj ]:ColSep, ::ColSep )
-         aCol[ o_SepWidth  ] := len( aCol[ o_ColSep ] )
-         aCol[ o_DefColor  ] := aCol[ o_Obj ]:DefColor
+         aCol[ TBCI_WIDTHCELL ] := Min( aCol[ TBCI_WIDTH ], LenVal( xVal, aCol[ TBCI_TYPE ], aCol[ TBCI_PICT ] ) )
+         aCol[ TBCI_COLSEP    ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::ColSep )
+         aCol[ TBCI_SEPWIDTH  ] := len( aCol[ TBCI_COLSEP ] )
+         aCol[ TBCI_DEFCOLOR  ] := DefColorOK(::cColorSpec,aCol[ TBCI_OBJ ]:DefColor )
 
-         aSize( aCol[ o_DefColor ], 4 )
-         DEFAULT aCol[ o_DefColor,1 ] TO 1
-         DEFAULT aCol[ o_DefColor,2 ] TO 2
-         DEFAULT aCol[ o_DefColor,3 ] TO 1
-         DEFAULT aCol[ o_DefColor,4 ] TO 1
+         aSize( aCol[ TBCI_DEFCOLOR ], 4 )
+         DEFAULT aCol[ TBCI_DEFCOLOR,1 ] TO 1
+         DEFAULT aCol[ TBCI_DEFCOLOR,2 ] TO 2
+         DEFAULT aCol[ TBCI_DEFCOLOR,3 ] TO 1
+         DEFAULT aCol[ TBCI_DEFCOLOR,4 ] TO 1
 
-         if aCol[ o_Type ] == 'D' .and. empty( aCol[ o_Pict ] )
-            aCol[ o_Pict ] := '@D'
+         if aCol[ TBCI_TYPE ] == 'D' .and. empty( aCol[ TBCI_PICT ] )
+            aCol[ TBCI_PICT ] := '@D'
          endif
 
-         aCol[ o_lColSep ] := aCol[ o_Width ] > 0
+         aCol[ TBCI_LCOLSEP ] := aCol[ TBCI_WIDTH ] > 0
       endif
 
       if nMode = 0 .or. nMode = 2 .or. lInitializing
-         aCol[ o_ColSep    ] := iif( aCol[ o_Obj ]:ColSep != NIL, aCol[ o_Obj ]:ColSep, ::ColSep )
+         aCol[ TBCI_COLSEP    ] := iif( aCol[ TBCI_OBJ ]:ColSep != NIL, aCol[ TBCI_OBJ ]:ColSep, ::ColSep )
       endif
 
       if nMode < 2 .or. ::lNeverDisplayed
          // Are there column headers/footers/separators to paint ?
-         if ! Empty( aCol[ o_Heading ] )
+         if ! Empty( aCol[ TBCI_HEADING ] )
             ::lHeaders := .T.
          endif
-         if ! Empty( aCol[ o_Footing ] )
+         if ! Empty( aCol[ TBCI_FOOTING ] )
             ::lFooters := .T.
          endif
-         /* as soon as we find one, we stop testing aCol[o_Obj]:XX to speed things up */
-         if ! ::lColHeadSep .AND. ! Empty( aCol[ o_Obj ]:HeadSep )
+         /* as soon as we find one, we stop testing aCol[TBCI_OBJ]:XX to speed things up */
+         if ! ::lColHeadSep .AND. ! Empty( aCol[ TBCI_OBJ ]:HeadSep )
             ::lColHeadSep := .T.
          endif
-         if ! ::lColFootSep .AND. ! Empty( aCol[ o_Obj ]:FootSep )
+         if ! ::lColFootSep .AND. ! Empty( aCol[ TBCI_OBJ ]:FootSep )
             ::lColFootSep := .T.
          endif
       endif
 
-      if ::lHeaders .AND. !Empty( aCol[ o_Heading ] )
-         nHeight := Len( aCol[ o_Heading ] ) - Len( StrTran( aCol[ o_Heading ], ";" ) ) + 1
+      if ::lHeaders .AND. !Empty( aCol[ TBCI_HEADING ] )
+         nHeight := Len( aCol[ TBCI_HEADING ] ) - Len( StrTran( aCol[ TBCI_HEADING ], ";" ) ) + 1
 
          if nHeight > ::nHeaderHeight
             ::nHeaderHeight := nHeight
@@ -881,8 +915,8 @@ METHOD Configure( nMode ) CLASS TBrowse
 
       endif
 
-      if ::lFooters .AND. !Empty( aCol[ o_Footing ] )
-         nHeight := Len( aCol[ o_Footing ] ) - Len( StrTran( aCol[ o_Footing ], ";" ) ) + 1
+      if ::lFooters .AND. !Empty( aCol[ TBCI_FOOTING ] )
+         nHeight := Len( aCol[ TBCI_FOOTING ] ) - Len( StrTran( aCol[ TBCI_FOOTING ], ";" ) ) + 1
 
          if nHeight > ::nFooterHeight
             ::nFooterHeight := nHeight
@@ -1059,10 +1093,11 @@ METHOD AColInfo( oCol,lAdd ) CLASS Tbrowse
 
    if !lAdd  .and. HB_ISOBJECT( oCol ) .and. ( valtype( oCol:block ) == 'B' )
       aCol := { oCol, valtype( Eval( oCol:block )), ::SetColumnWidth( oCol ),;
-                '', '', '', 0, '', 0, oCol:defColor, .f., NIL, .t., 0 }
+                '', '', '', 0, '', 0, oCol:defColor, .f., .t., 0 }
    else
-      aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., NIL, .t., 0 }
+      aCol := { oCol, '', 0, '', '', '', 0, '', 0, {}, .f., .t., 0 }
    endif
+
 
 Return aCol
 
@@ -1126,7 +1161,7 @@ METHOD SetColumn( nColumn, oCol ) CLASS TBrowse
    if 0 < nColumn .AND. nColumn <= ::nColumns
       ::Moved()
 
-      oOldCol := ::aColsInfo[ nColumn, o_Obj ]
+      oOldCol := ::aColsInfo[ nColumn, TBCI_OBJ ]
 
       ::aColsInfo[ nColumn ] := ::AColInfo( oCol )
 
@@ -1144,7 +1179,7 @@ Return oOldCol
 //
 METHOD GetColumn( nColumn ) CLASS TBrowse
 
-Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, o_Obj ], NIL )
+Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, TBCI_OBJ ], NIL )
 
 //-------------------------------------------------------------------//
 //
@@ -1169,7 +1204,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    //
    ::Moved()
 
-   oCol := ::aColsInfo[ nPos, o_Obj ]
+   oCol := ::aColsInfo[ nPos, TBCI_OBJ ]
 
    if nPos == ::nColPos .or. nPos == ::nColumns .or.;
               ::nColPos == ::nColumns .or. ::rightVisible == ::nColumns
@@ -1187,6 +1222,7 @@ METHOD DelColumn( nPos ) CLASS TBrowse
    ::nColumns--
 
    aDel( ::aColsInfo, nPos, .t. )
+   ::nColumns := Len( ::aColsInfo )
 
    if ::nColumns < ::nFrozenCols
       ::nFrozenCols := 0
@@ -1210,7 +1246,7 @@ Return oCol
 //
 METHOD ColWidth( nColumn ) CLASS TBrowse
 
-Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, o_Width ], NIL )
+Return iif( 0 < nColumn .AND. nColumn <= ::nColumns, ::aColsInfo[ nColumn, TBCI_WIDTH ], NIL )
 
 //-------------------------------------------------------------------//
 
@@ -1236,9 +1272,9 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
          for each aCol in ::aColsInfo
             nCol := HB_EnumIndex()
             if nCol <= nHowMany
-               ::nFrozenWidth += aCol[ o_Width ]
-               if nCol < ::nColumns .and. aCol[ o_Width ] > 0
-                  ::nFrozenWidth += ::aColsInfo[ nCol + 1, o_SepWidth ]
+               ::nFrozenWidth += aCol[ TBCI_WIDTH ]
+               if nCol < ::nColumns .and. aCol[ TBCI_WIDTH ] > 0
+                  ::nFrozenWidth += ::aColsInfo[ nCol + 1, TBCI_SEPWIDTH ]
                endif
             else
                exit
@@ -1258,9 +1294,9 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
          FOR EACH aCol IN ::aColsInfo
             // Reset column widths
             //
-            aCol[ o_Width     ] := ::SetColumnWidth( aCol[ o_Obj ] )
-            aCol[ o_WidthCell ] := Min( aCol[ o_Width ], LenVal( Eval( aCol[ o_Obj ]:block ), aCol[ o_Type ], aCol[ o_Obj ]:Picture ) )
-            aCol[ o_SetWidth  ] := .f.
+            aCol[ TBCI_WIDTH     ] := ::SetColumnWidth( aCol[ TBCI_OBJ ] )
+            aCol[ TBCI_WIDTHCELL ] := Min( aCol[ TBCI_WIDTH ], LenVal( Eval( aCol[ TBCI_OBJ ]:block ), aCol[ TBCI_TYPE ], aCol[ TBCI_OBJ ]:Picture ) )
+            aCol[ TBCI_SETWIDTH  ] := .f.
          NEXT
       endif
 
@@ -1270,18 +1306,18 @@ METHOD SetFrozenCols( nHowMany, lLeft ) CLASS TBrowse
                // If there are columns which are larger than TBrowse display width minus
                // frozen columns reserved space, shrihnk them to fit
                //
-               if ::nFrozenWidth + aCol[ o_Width ] > ::nVisWidth
-                  aCol[ o_Width     ] := ::nVisWidth - ::nFrozenWidth
-                  aCol[ o_WidthCell ] := Min( aCol[ o_Width ], LenVal( Eval( aCol[ o_Obj ]:block ), aCol[ o_Type ], aCol[ o_Obj ]:Picture ) )
-                  aCol[ o_SetWidth  ] := .t.
+               if ::nFrozenWidth + aCol[ TBCI_WIDTH ] > ::nVisWidth
+                  aCol[ TBCI_WIDTH     ] := ::nVisWidth - ::nFrozenWidth
+                  aCol[ TBCI_WIDTHCELL ] := Min( aCol[ TBCI_WIDTH ], LenVal( Eval( aCol[ TBCI_OBJ ]:block ), aCol[ TBCI_TYPE ], aCol[ TBCI_OBJ ]:Picture ) )
+                  aCol[ TBCI_SETWIDTH  ] := .t.
                endif
 
             else
                // Reset column widths
                //
-               aCol[ o_Width     ] := ::SetColumnWidth( aCol[ o_Obj ] )
-               aCol[ o_WidthCell ] := Min( aCol[ o_Width ], LenVal( Eval( aCol[ o_Obj ]:block ), aCol[ o_Type ], aCol[ o_Obj ]:Picture ) )
-               aCol[ o_SetWidth  ] := .f.
+               aCol[ TBCI_WIDTH     ] := ::SetColumnWidth( aCol[ TBCI_OBJ ] )
+               aCol[ TBCI_WIDTHCELL ] := Min( aCol[ TBCI_WIDTH ], LenVal( Eval( aCol[ TBCI_OBJ ]:block ), aCol[ TBCI_TYPE ], aCol[ TBCI_OBJ ]:Picture ) )
+               aCol[ TBCI_SETWIDTH  ] := .f.
             endif
          endif
       NEXT
@@ -1389,6 +1425,7 @@ Return nWidth
 
 METHOD Down() CLASS TBrowse
 
+   ::CheckStable()
    ::Moved()
    ::nRecsToSkip++
 
@@ -1398,6 +1435,7 @@ Return Self
 
 METHOD Up() CLASS TBrowse
 
+   ::CheckStable()
    ::Moved()
    ::nRecsToSkip--
 
@@ -1407,6 +1445,7 @@ Return Self
 
 METHOD PageDown() CLASS TBrowse
 
+   ::CheckStable()
    ::Moved()
    ::nRecsToSkip := ( ::RowCount - ::nRowPos ) + ::RowCount
    ::lPaintBottomUp := .T.
@@ -1417,6 +1456,7 @@ Return Self
 
 METHOD PageUp() CLASS TBrowse
 
+   ::CheckStable()
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
 
@@ -1428,6 +1468,7 @@ METHOD GoBottom() CLASS TBrowse
 
    LOCAL nToTop
 
+   ::CheckStable()
    ::Moved()
 
    // Skips back from last record as many records as TBrowse can hold
@@ -1446,6 +1487,7 @@ Return Self
 
 METHOD GoTop() CLASS TBrowse
 
+   ::CheckStable()
    ::Moved()
 
    ::oDataCache:dbGoTop()
@@ -1768,13 +1810,13 @@ METHOD LeftDetermine() CLASS TBrowse
 
    // If ::nFrozenCols > 0 I don't need to test nCol > 0, if 0 it is the same test
    while nCol > ::nFrozenCols .AND.;
-         ( nWidth += ::aColsInfo[ nCol, o_Width ] + iif( nCol == ::nFrozenCols + 1, 0, ::aColsInfo[ nCol,o_SepWidth ] ) )<= ::nVisWidth
+         ( nWidth += ::aColsInfo[ nCol, TBCI_WIDTH ] + iif( nCol == ::nFrozenCols + 1, 0, ::aColsInfo[ nCol,TBCI_SEPWIDTH ] ) )<= ::nVisWidth
       nCol--
    enddo
 
    /* Clipper compatible: do not let nCol stop at empty column */
    nCol++
-   while nCol <= ::rightVisible .and. ::aColsInfo[ nCol, o_Width ] == 0
+   while nCol <= ::rightVisible .and. ::aColsInfo[ nCol, TBCI_WIDTH ] == 0
       nCol++
    enddo
 
@@ -1799,11 +1841,11 @@ METHOD HowManyCol() CLASS TBrowse
    if ::nFrozenCols > 0
       nColsVisible := 0
       while nColsVisible < ::nFrozenCols .and. nColsVisible < ::nColumns
-         nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
+         nToAdd := ::aColsInfo[ nColsVisible + 1, TBCI_WIDTH ]
 
          if nColsVisible >= 1 .and. nColsVisible < ::nColumns .and.;
-                                               ::aColsInfo[ nColsVisible,o_Width ] > 0
-            nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
+                                               ::aColsInfo[ nColsVisible,TBCI_WIDTH ] > 0
+            nToAdd += ::aColsInfo[ nColsVisible + 1, TBCI_SEPWIDTH ]
          endif
 
          if nColsWidth + nToAdd > ::nVisWidth
@@ -1860,14 +1902,14 @@ METHOD HowManyCol() CLASS TBrowse
             nLeftCol := nColsVisible
          endif
 
-         nToAdd := ::aColsInfo[ nColsVisible + 1, o_Width ]
+         nToAdd := ::aColsInfo[ nColsVisible + 1, TBCI_WIDTH ]
 
          // next, we must check against [nLeftCol], not [nColsVisible]:
          if ( nColsVisible >= tryLeftVisible .or. ::nFrozenCols > 0 ) .and.;
             (nLeftCol > 0) .and.;
-            ::aColsInfo[ nLeftCol,o_Width ] > 0
+            ::aColsInfo[ nLeftCol,TBCI_WIDTH ] > 0
 
-            nToAdd += ::aColsInfo[ nColsVisible + 1, o_SepWidth ]
+            nToAdd += ::aColsInfo[ nColsVisible + 1, TBCI_SEPWIDTH ]
          endif
 
          if nColsWidth + nToAdd > ::nVisWidth
@@ -1948,14 +1990,14 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    ::aColumnsSep := {}
 
    for n := nColFrom to ::rightVisible
-      ::aColsInfo[ n, o_ScrColPos ] := nCol
+      ::aColsInfo[ n, TBCI_SCRCOLPOS ] := nCol
 
-      nCol += ::aColsInfo[ n, o_Width ]
+      nCol += ::aColsInfo[ n, TBCI_WIDTH ]
 
       if n < ::rightVisible
-         if ::aColsInfo[ n,o_Width ] > 0
-            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n + 1, o_SepWidth ] / 2 ) )
-            nCol += ::aColsInfo[ n + 1, o_SepWidth ]
+         if ::aColsInfo[ n,TBCI_WIDTH ] > 0
+            aadd( ::aColumnsSep, nCol + int( ::aColsInfo[ n + 1, TBCI_SEPWIDTH ] / 2 ) )
+            nCol += ::aColsInfo[ n + 1, TBCI_SEPWIDTH ]
          endif
       endif
 
@@ -1974,11 +2016,11 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
             n := ::leftVisible
          endif
-         setPos( ::nwTop, ::aColsInfo[ n, o_ScrColPos ] )
+         setPos( ::nwTop, ::aColsInfo[ n, TBCI_SCRCOLPOS ] )
 
-         ::WriteMLineText( ::aColsInfo[ n, o_Heading ], ;
-                           ::aColsInfo[ n, o_Width ], .T., ;
-                           hb_ColorIndex( ::cColorSpec,  ColorToDisp( ::aColsInfo[ n,o_Obj ]:DefColor, TBC_CLR_HEADING ) - 1 ) )
+         ::WriteMLineText( ::aColsInfo[ n, TBCI_HEADING ], ;
+                           ::aColsInfo[ n, TBCI_WIDTH ], .T., ;
+                           hb_ColorIndex( ::cColorSpec,  (DefColorOK(::cColorSpec,::aColsInfo[ n,TBCI_OBJ ]:DefColor)[ TBC_CLR_HEADING ] - 1) ))
       next
    endif
 
@@ -1999,8 +2041,8 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
    for n := iif( ::nFrozenCols > 0, 1, ::leftVisible ) to ::rightVisible
 
       // colsep's width will be needed later
-      ccSep := if( ::aColsInfo[ n,o_Obj ]:ColSep == nil, ::ColSep, ;
-                              ::aColsInfo[ n,o_Obj ]:ColSep )
+      ccSep := if( ::aColsInfo[ n,TBCI_OBJ ]:ColSep == nil, ::ColSep, ;
+                              ::aColsInfo[ n,TBCI_OBJ ]:ColSep )
 
       ncSepWidth := if( ccSep == nil, 0, len(ccSep) )
 
@@ -2017,9 +2059,9 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
          IF lDrawHeadSep
             // we need to draw headSep for the nSpacePre gap
-            if ! Empty( chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                     ::aColsInfo[ n,o_Obj ]:HeadSep ) )
-               if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, o_Width ] > 0 .and.;
+            if ! Empty( chSep := if( ::aColsInfo[ n,TBCI_OBJ ]:HeadSep == nil, ::HeadSep, ;
+                                     ::aColsInfo[ n,TBCI_OBJ ]:HeadSep ) )
+               if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, TBCI_WIDTH ] > 0 .and.;
                   ::nFrozenCols > 0
                   DispOutAT( nScreenRowT, nTPos - min( len(chSep), ncSepWidth), chSep, ::cColorSpec )
                endif
@@ -2034,10 +2076,10 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
          // we need to draw footSep for the nSpacePre gap
          IF lDrawFootSep
-            if ! Empty ( cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
-                                      ::aColsInfo[ n,o_Obj ]:FootSep ) )
+            if ! Empty ( cfSep := if( ::aColsInfo[ n,TBCI_OBJ ]:FootSep == nil, ::FootSep, ;
+                                      ::aColsInfo[ n,TBCI_OBJ ]:FootSep ) )
 
-               if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, o_Width ] > 0 .and. ;
+               if nLeftCol > 0 .and. ::aColsInfo[ nLeftCol, TBCI_WIDTH ] > 0 .and. ;
                   ::nFrozenCols > 0
                   DispOutAT( nScreenRowB, nBPos - min( len(cfSep), ncSepWidth), cfSep, ::cColorSpec )
                endif
@@ -2054,51 +2096,51 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
 
       // we need to handle even n == ::rightVisible in the following block
 
-      if ::aColsInfo[ n, o_Width ] > 0 .and. n < ::rightVisible
-         nLCS := ::aColsInfo[ n + 1, o_SepWidth ]
+      if ::aColsInfo[ n, TBCI_WIDTH ] > 0 .and. n < ::rightVisible
+         nLCS := ::aColsInfo[ n + 1, TBCI_SEPWIDTH ]
       else
          nLCS := 0
       endif
 
       IF lDrawHeadSep
-         if ! Empty( chSep := if( ::aColsInfo[ n,o_Obj ]:HeadSep == nil, ::HeadSep, ;
-                                  ::aColsInfo[ n,o_Obj ]:HeadSep ) )
+         if ! Empty( chSep := if( ::aColsInfo[ n,TBCI_OBJ ]:HeadSep == nil, ::HeadSep, ;
+                                  ::aColsInfo[ n,TBCI_OBJ ]:HeadSep ) )
 
-            if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, o_Width ] > 0
+            if nLeftCol>0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, TBCI_WIDTH ] > 0
                DispOutAT( nScreenRowT, nTPos - min( len(chSep), ncSepWidth), chSep, ::cColorSpec )
             endif
-            DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
+            DispOutAT( nScreenRowT, nTPos, Replicate( Right( chSep, 1 ), ::aColsInfo[ n, TBCI_WIDTH ] ), ::cColorSpec )
 
-            nTPos += ::aColsInfo[ n, o_Width ] + nLCS
+            nTPos += ::aColsInfo[ n, TBCI_WIDTH ] + nLCS
 
          /* If I haven't got a default separator or a colsep for current column, there could
             be a colsep on a next column, so I have to fill the width of this column with spaces.
          */
          elseif ::lColHeadSep
-            DispOutAT( nScreenRowT, nTPos, Replicate( Space(1), ::aColsInfo[ n, o_Width ] + nLCS ), ::cColorSpec )
-            nTPos += ::aColsInfo[ n, o_Width ] + nLCS
+            DispOutAT( nScreenRowT, nTPos, Replicate( Space(1), ::aColsInfo[ n, TBCI_WIDTH ] + nLCS ), ::cColorSpec )
+            nTPos += ::aColsInfo[ n, TBCI_WIDTH ] + nLCS
 
          endif
       ENDIF
 
       IF lDrawFootSep
-         if ! Empty( cfSep := if( ::aColsInfo[ n,o_Obj ]:FootSep == nil, ::FootSep, ;
-                                  ::aColsInfo[ n,o_Obj ]:FootSep ) )
+         if ! Empty( cfSep := if( ::aColsInfo[ n,TBCI_OBJ ]:FootSep == nil, ::FootSep, ;
+                                  ::aColsInfo[ n,TBCI_OBJ ]:FootSep ) )
 
             if Valtype(chSep) <> "U" .and. len(chSep) > len(cfSep)
                cfSep += Replicate( Right( cfSep, 1 ), Len( chSep ) - Len( cfSep ) )
             endif
 
-            if nLeftCol > 0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, o_Width ] > 0
+            if nLeftCol > 0 .and. n <> ::leftVisible .and. ::aColsInfo[ nLeftCol, TBCI_WIDTH ] > 0
                DispOutAT( nScreenRowB, nBPos - min( len(cfSep), ncSepWidth), cfSep, ::cColorSpec )
             endif
-            DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), ::aColsInfo[ n, o_Width ] ), ::cColorSpec )
+            DispOutAT( nScreenRowB, nBPos, Replicate( Right( cfSep, 1 ), ::aColsInfo[ n, TBCI_WIDTH ] ), ::cColorSpec )
 
-            nBPos += ::aColsInfo[ n, o_Width ] + nLCS
+            nBPos += ::aColsInfo[ n, TBCI_WIDTH ] + nLCS
 
          elseif ::lColFootSep
-            DispOutAT( nScreenRowB, nBPos, Replicate( Space(1), ::aColsInfo[ n, o_Width ] + nLCS ), ::cColorSpec )
-            nBPos += ::aColsInfo[ n, o_Width ] + nLCS
+            DispOutAT( nScreenRowB, nBPos, Replicate( Space(1), ::aColsInfo[ n, TBCI_WIDTH ] + nLCS ), ::cColorSpec )
+            nBPos += ::aColsInfo[ n, TBCI_WIDTH ] + nLCS
 
          endif
       ENDIF
@@ -2139,11 +2181,11 @@ METHOD RedrawHeaders( nWidth ) CLASS TBrowse
          if ::nFrozenCols > 0 .and. n == ::nFrozenCols + 1
             n := ::leftVisible
          endif
-         setPos( ::nwBottom, ::aColsInfo[ n, o_ScrColPos ] )
+         setPos( ::nwBottom, ::aColsInfo[ n, TBCI_SCRCOLPOS ] )
 
-         ::WriteMLineText( ::aColsInfo[ n, o_Footing ], ;
-                           ::aColsInfo[ n, o_Width ], .F., ;
-                           hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ n, o_Obj ]:DefColor, TBC_CLR_FOOTING ) - 1 ) )
+         ::WriteMLineText( ::aColsInfo[ n, TBCI_FOOTING ], ;
+                           ::aColsInfo[ n, TBCI_WIDTH ], .F., ;
+                           hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,::aColsInfo[ n, TBCI_OBJ ]:DefColor)[ TBC_CLR_FOOTING ] - 1 ) ) )
       next
    endif
 
@@ -2268,6 +2310,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    LOCAL nOldCursor                    // Current shape of cursor (which I remove before stabilization)
    LOCAL colorSpec
    LOCAL nRowToDraw
+   LOCAL cCurColor
 
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
@@ -2334,6 +2377,11 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       if Len( ::cBorder ) == 8
          @::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::colorSpec
       endif
+
+      // 2006/AUG/28 - E.F. - Draw background area.
+      cCurColor := SetColor( ColorSpec )
+      @::nWTop,::nWLeft CLEAR TO ::nWBottom,::nWRight
+      SetColor( cCurColor )
 
       // How may columns fit on TBrowse width?
       //
@@ -2557,8 +2605,8 @@ METHOD DrawARow( nRow ) CLASS TBrowse
          for nCol:= nColFrom to ::rightVisible
             ::DispCell( nRow, nCol, ::oDataCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
 
-            if nCol < ::rightVisible .and. ::aColsInfo[ nCol, o_lColSep ]
-               DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
+            if nCol < ::rightVisible .and. ::aColsInfo[ nCol, TBCI_LCOLSEP ]
+               DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
             endif
          next
 
@@ -2573,8 +2621,8 @@ METHOD DrawARow( nRow ) CLASS TBrowse
 
             ::DispCell( nRow, nCol, ::oDataCache:GetCell( nRow, nCol ), TBC_CLR_STANDARD )
 
-            if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
-               DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
+            if nCol < ::rightVisible .and. ::aColsInfo[ nCol,TBCI_LCOLSEP ]
+               DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
             endif
          next
 
@@ -2605,18 +2653,18 @@ METHOD DrawARow( nRow ) CLASS TBrowse
             nCol := ::leftVisible
          endif
 
-         cColBlanks := Space( ::aColsInfo[ nCol, o_Width ] )
+         cColBlanks := Space( ::aColsInfo[ nCol, TBCI_WIDTH ] )
 
          /* 15/06/2006 - FSG - Empty rows have only standard browser color */
-         cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
+         cColor := hb_ColorIndex( ::cColorSpec, (( ::aColsInfo[ nCol, TBCI_DEFCOLOR ])[ TBC_CLR_STANDARD ]) - 1 )
          /* 15/06/2006 - FSG - commented out as per above
-         // Let's find column color once per column
-         if ::aColsInfo[ nCol, o_Obj ]:ColorBlock == NIL
-            cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( ::aColsInfo[ nCol, o_DefColor ], TBC_CLR_STANDARD ) - 1 )
-         else
-            cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( Eval( ::aColsInfo[ nCol, o_Obj ]:ColorBlock, BlankValue( ::aColsInfo[ nCol ] ) ), TBC_CLR_STANDARD ) - 1 )
-         endif
-         */
+          * // Let's find column color once per column
+          * if ::aColsInfo[ nCol, TBCI_OBJ ]:ColorBlock == NIL
+          *   cColor := hb_ColorIndex( ::cColorSpec, ((::aColsInfo[ nCol, TBCI_DEFCOLOR ])[ TBC_CLR_STANDARD ] - 1) )
+          * else
+          *  cColor := hb_ColorIndex( ::cColorSpec, (DefColorOK(::cColorSpec, Eval( ::aColsInfo[ nCol, TBCI_OBJ ]:ColorBlock, BlankValue( ::aColsInfo[ nCol ] )))[ TBC_CLR_STANDARD ] - 1) )
+          * endif
+          */
 
          // Paint all remainig rows up to ::rowcount
          for nRow2Fill := nRow to ::rowCount
@@ -2631,8 +2679,8 @@ METHOD DrawARow( nRow ) CLASS TBrowse
 
                DispOut( cColBlanks, cColor )
 
-               if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
-                  DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
+               if nCol < ::rightVisible .and. ::aColsInfo[ nCol,TBCI_LCOLSEP ]
+                  DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
                endif
 
             else
@@ -2644,8 +2692,8 @@ METHOD DrawARow( nRow ) CLASS TBrowse
 
                DispOut( cColBlanks, cColor )
 
-               if nCol < ::rightVisible .and. ::aColsInfo[ nCol,o_lColSep ]
-                  DispOut( ::aColsInfo[ nCol + 1, o_ColSep ], ColorSpec )
+               if nCol < ::rightVisible .and. ::aColsInfo[ nCol,TBCI_LCOLSEP ]
+                  DispOut( ::aColsInfo[ nCol + 1, TBCI_COLSEP ], ColorSpec )
                endif
             endif
 
@@ -2698,18 +2746,18 @@ METHOD PosCursor() CLASS TBrowse
    */
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns
 
-      nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
+      nCol := ::aColsInfo[ ::nColPos, TBCI_SCRCOLPOS ]
 
-      Switch ::aColsInfo[ ::nColPos, o_Type ]
+      Switch ::aColsInfo[ ::nColPos, TBCI_TYPE ]
       case "N"
-         if ::aColsInfo[ ::nColPos, o_Obj ]:Width == NIL
-            nCol += ::aColsInfo[ ::nColPos, o_Width ] - ::aColsInfo[ ::nColPos, o_WidthCell ]
+         if ::aColsInfo[ ::nColPos, TBCI_OBJ ]:Width == NIL
+            nCol += ::aColsInfo[ ::nColPos, TBCI_WIDTH ] - ::aColsInfo[ ::nColPos, TBCI_WIDTHCELL ]
          endif
          exit
 
       case "L"
          // Always centered inside column
-         nCol += Round( ( ::aColsInfo[ ::nColPos, o_Width ] - ::aColsInfo[ ::nColPos, o_WidthCell ] ) / 2, 0 )
+         nCol += Round( ( ::aColsInfo[ ::nColPos, TBCI_WIDTH ] - ::aColsInfo[ ::nColPos, TBCI_WIDTHCELL ] ) / 2, 0 )
          exit
       end
 
@@ -2736,7 +2784,7 @@ METHOD DeHilite() CLASS TBrowse
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns .and. ::nRowPos>0
 
-      nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
+      nCol := ::aColsInfo[ ::nColPos, TBCI_SCRCOLPOS ]
 
       SetPos( nRow, nCol )
 
@@ -2769,7 +2817,7 @@ METHOD Hilite() CLASS TBrowse
 
    if ::nColPos > 0 .AND. ::nColPos <= ::nColumns .and. ::nRowPos>0
 
-      nCol := ::aColsInfo[ ::nColPos, o_ScrColPos ]
+      nCol := ::aColsInfo[ ::nColPos, TBCI_SCRCOLPOS ]
 
       SetPos( nRow, nCol )
 
@@ -2801,39 +2849,39 @@ Return Self
 METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    LOCAL aColsInfo := ::aColsInfo[ nColumn ]
-   LOCAL oCol      := aColsInfo[ o_Obj ]
-   LOCAL nWidth    := aColsInfo[ o_Width ]
-   LOCAL nLen      := aColsInfo[ o_WidthCell ]
+   LOCAL oCol      := aColsInfo[ TBCI_OBJ ]
+   LOCAL nWidth    := aColsInfo[ TBCI_WIDTH ]
+   LOCAL nLen      := aColsInfo[ TBCI_WIDTHCELL ]
 
    // Screen col position of first char for not left justified columns
    LOCAL nNotLeftCol
    LOCAL cColor, cColorBKG, aCellColor
 
    // if called when the column type is not defined, then do nothing
-   if Empty( aColsInfo[ o_Type ] )
+   if Empty( aColsInfo[ TBCI_TYPE ] )
       Return nil
    endif
 
-   cColorBKG := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, TBC_CLR_STANDARD ) - 1 )
+   cColorBKG := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ TBC_CLR_STANDARD ] - 1 ) )
 
    aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
 
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
    if Empty( aCellColor )
-      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( oCol:DefColor, nColor ) - 1 )
+      cColor := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ nColor ] - 1) )
    else
-      cColor := hb_ColorIndex( ::cColorSpec, ColorToDisp( aCellColor, nColor ) - 1 )
+      cColor := hb_ColorIndex( ::cColorSpec, (aCellColor[ nColor ] - 1) )
    endif
 
-   Switch aColsInfo[ o_Type ]
+   Switch aColsInfo[ TBCI_TYPE ]
    case "C"
    case "M"
       // If there is not an explicit width use that of the first item
       if oCol:Width == NIL
-         DispOut( PadR( Transform( xValue, aColsInfo[ o_Pict ] ), nLen ), cColor )
+         DispOut( PadR( Transform( xValue, aColsInfo[ TBCI_PICT ] ), nLen ), cColor )
          DispOut( Space( nWidth - nLen ), cColorBKG )
       else
-         DispOut( PadR( Transform( xValue, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+         DispOut( PadR( Transform( xValue, aColsInfo[ TBCI_PICT ] ), nWidth ), cColor )
       endif
 
       exit
@@ -2842,15 +2890,15 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
       if oCol:Width == NIL
          DispOut( Space( nWidth - nLen ), cColorBKG )
          nNotLeftCol := Col()
-         DispOut( PadL( Transform( xValue, aColsInfo[ o_Pict ] ), nLen ), cColor )
+         DispOut( PadL( Transform( xValue, aColsInfo[ TBCI_PICT ] ), nLen ), cColor )
       else
-         DispOut( PadL( Transform( xValue, aColsInfo[ o_Pict ] ), nWidth ), cColor )
+         DispOut( PadL( Transform( xValue, aColsInfo[ TBCI_PICT ] ), nWidth ), cColor )
       endif
 
       exit
 
    case "D"
-      DispOut( PadR( Transform( xValue, aColsInfo[ o_Pict ] ), nLen ), cColor )
+      DispOut( PadR( Transform( xValue, aColsInfo[ TBCI_PICT ] ), nLen ), cColor )
       DispOut( Space( nWidth - nLen ), cColorBKG )
       exit
 
@@ -2935,9 +2983,9 @@ METHOD MGotoYX( nRow, nCol ) CLASS TBrowse
 
       while nColsLen < nCol .AND. nI < ::rightVisible
 
-         nColsLen += ::aColsInfo[ nI, o_Width ]
+         nColsLen += ::aColsInfo[ nI, TBCI_WIDTH ]
          if nI >= 1 .AND. nI < ::nColumns
-            nColsLen += ::aColsInfo[ nI+1, o_SepWidth ]
+            nColsLen += ::aColsInfo[ nI+1, TBCI_SEPWIDTH ]
          endif
 
          nI++
@@ -3474,7 +3522,7 @@ Return a_
 static function BlankValue( aColInfo )
 local xValue
 
-switch aColInfo[ o_Type ]
+switch aColInfo[ TBCI_TYPE ]
    case 'N'
       xValue := 0
       exit
@@ -3485,7 +3533,7 @@ switch aColInfo[ o_Type ]
       xValue := .F.
       exit
    default
-      xValue := Space( aColInfo[ o_WidthCell ] )
+      xValue := Space( aColInfo[ TBCI_WIDTHCELL ] )
 end
 Return xValue
 
@@ -3509,6 +3557,25 @@ If lRet .AND. !hb_IsNil(n2) .AND. hb_IsNumeric(n2) .AND. n2>0
 Endif
 
 Return lRet
+
+*--------------------------------------------------
+Static Function DefColorOK( cColorSpec, aDefColor )
+*--------------------------------------------------
+* Check validity of defcolor index array. If any value is
+* invalid return default index array.
+*--------------------------------------------------
+Local aColorSpec := Color2Array( cColorSpec )
+Local lOK := .T.
+Local nIndex := 0
+
+ FOR EACH nIndex IN aDefColor
+     lOK := ( nIndex > 0 .AND. nIndex <= Len(aColorSpec) )
+     IF !lOK
+        EXIT
+     ENDIF
+ NEXT
+
+Return iif( lOK, aDefColor, {1,2,1,1} )
 
 //-------------------------------------------------------------------//
 //

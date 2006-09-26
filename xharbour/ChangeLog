@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5168 2006/09/25 21:43:44 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5168 2006/09/25 18:21:29 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-25 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbcolumn.prg
+    + added accesses, assigns and methods for each property to allow verify
+      their values before assign it.
+    ! fixed width property assign: width := x or width(x).
+
+  * source\rtl\tbrowse.prg
+    - removed old o_Blank constant and 12nd element (NIL) of ::aColInfo array.
+      It's unused.
+    - removed ColorToDisp() function. It's useless now.
+    * renamed prefixes of tbcolumn info constants from "o_" to "TBCI_". 
+    * assigned new values to TBC_CLR_ constants to allow change heading and
+      footing color index.
+    + added DefColorOK() function to avoid access to unknowable color index
+      from colorspec.
 
 2006-09-25 21:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/numconv.prg
