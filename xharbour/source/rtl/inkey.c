@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.45 2006/01/12 13:16:08 druzus Exp $
+ * $Id: inkey.c,v 1.46 2006/01/12 17:09:55 druzus Exp $
  */
 
 /*
@@ -99,15 +99,25 @@ static int    s_inkeyHead = 0;
 static int    s_inkeyTail = 0;
 static int    s_iLastPut = 0;
 
-static BYTE * s_StrBuffer = NULL;
-static ULONG  s_StrBufferSize;
-static ULONG  s_StrBufferPos;
+static int * s_StrBuffer = NULL;
+static ULONG  s_StrBufferSize= 0;
+static ULONG  s_StrBufferPos= 0;
 
 static int    s_inkeyLast = 0;
 
 static PHB_ITEM s_inKeyBlockBefore = NULL;
 static PHB_ITEM s_inKeyBlockAfter  = NULL;
 
+static void ResetStrBuffer()
+{
+   if ( s_StrBuffer )
+   {
+      hb_xfree( s_StrBuffer );
+      s_StrBuffer = NULL;
+   }
+   s_StrBufferSize = 0;
+   s_StrBufferPos = 0;
+}
 
 int hb_inkeyTranslate( int iKey, HB_inkey_enum event_mask )
 {
@@ -207,8 +217,7 @@ static void hb_inkeyPop( void )
    {
       if( ++s_StrBufferPos >= s_StrBufferSize )
       {
-         hb_xfree( s_StrBuffer );
-         s_StrBuffer = NULL;
+         ResetStrBuffer() ;
       }
    }
    else if( s_inkeyHead != s_inkeyTail )
@@ -389,11 +398,7 @@ void hb_inkeyReset( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_inkeyReset()"));
 
-   if( s_StrBuffer )
-   {
-      hb_xfree( s_StrBuffer );
-      s_StrBuffer = NULL;
-   }
+   ResetStrBuffer() ;
 
    s_inkeyHead = 0;
    s_inkeyTail = 0;
@@ -430,11 +435,8 @@ void hb_inkeyExit( void )
       s_inKeyBlockAfter = NULL;
    }
 
-   if( s_StrBuffer )
-   {
-      hb_xfree( s_StrBuffer );
-      s_StrBuffer = NULL;
-   }
+   ResetStrBuffer() ;
+
    if( s_inkeyBufferSize > HB_DEFAULT_INKEY_BUFSIZE )
    {
       hb_xfree( s_inkeyBuffer );
@@ -538,30 +540,91 @@ HB_FUNC( SETINKEYAFTERBLOCK )
    }
 }
 
+static int *AllocateStrBuffer( ULONG ulSize ) // Returns address of where to add characters
+{
+   ULONG ulOldLength = s_StrBufferSize ;
+   int *pIReturn = NULL ;
+   if ( ulSize > 0 )
+   {
+      s_StrBufferSize += ulSize;
+      if ( s_StrBuffer == NULL )
+      {
+         s_StrBuffer = ( int * ) hb_xgrab( s_StrBufferSize * sizeof( int ) ) ;
+      }
+      else
+      {
+         s_StrBuffer = ( int * ) hb_xrealloc( s_StrBuffer, s_StrBufferSize * sizeof( int ) ) ;
+      }
+   }
+
+   if ( s_StrBuffer )
+   {
+      pIReturn = &s_StrBuffer[ ulOldLength ]  ; // return pointer to position where new characters are added
+   }
+   else
+   {
+       ResetStrBuffer() ;
+   }
+   return( pIReturn ) ;
+}
+
+static void PutItemInKeyBuffer( PHB_ITEM pItem )
+{
+   int *StrBuffer ;
+   if ( HB_IS_NUMBER( pItem ) )
+   {
+      StrBuffer = AllocateStrBuffer( 1 ) ;
+      if ( StrBuffer )
+      {
+         *StrBuffer = (  int ) HB_ITEM_GET_NUMINTRAW( pItem ) ;
+      }
+   }
+   else if ( HB_IS_STRING( pItem ) )
+   {
+      ULONG ulLen = hb_itemGetCLen( pItem ) ;
+      if ( ulLen )
+      {
+         BYTE * pString =  hb_itemGetC( pItem ) ;
+         StrBuffer = AllocateStrBuffer( ulLen );
+         if ( StrBuffer )
+         {
+            while ( ulLen-- )
+            {
+               *StrBuffer++ = ( int ) *pString++ ;
+            }
+         }
+      }
+   }
+   return ;
+}
+
+
 HB_FUNC( __KEYBOARD )
 {
    /* Clear the typeahead buffer without reallocating the keyboard buffer */
-   hb_inkeyReset();
+   if ( !ISLOG( 2 ) || !hb_parl( 2 ) )
+   {
+     hb_inkeyReset();
+   }
 
    if( ISCHAR( 1 ) )
    {
-      ULONG ulSize = hb_parclen( 1 );
-
-      /* It might be just a request to clear the buffer */
-      if( ulSize != 0 )
-      {
-         s_StrBuffer = ( BYTE * ) hb_xgrab( ulSize );
-         memcpy( s_StrBuffer, hb_parc( 1 ), ulSize );
-         s_StrBufferSize = ulSize;
-         s_StrBufferPos = 0;
-      }
+      PutItemInKeyBuffer( hb_param( 1, HB_IT_STRING ) ) ;
    }
-#if defined( HB_EXTENSION )
    else if( ISNUM( 1 ) )
    {
-      hb_inkeyPut( hb_parni(1) );
+      PutItemInKeyBuffer( hb_param( 1, HB_IT_NUMERIC ) ) ;
    }
-#endif
+   else if ( ISARRAY( 1 ) )
+   {
+      PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY ) ;
+      ULONG ulIndex ;
+      ULONG ulElements = hb_arrayLen( pArray ) ;
+      for ( ulIndex = 1 ; ulIndex <= ulElements ; ulIndex++ )
+      {
+         PutItemInKeyBuffer( hb_arrayGetItemPtr( pArray, ulIndex ) ) ;
+      }
+   }
 }
 
 #ifdef HB_EXTENSION

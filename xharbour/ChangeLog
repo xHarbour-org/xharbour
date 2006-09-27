@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5173 2006/09/27 11:01:43 druzus Exp $
+ * $Id: ChangeLog,v 1.5174 2006/09/27 13:07:46 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2006-09-28 08:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/inkey.c
+    + added support for KEYBOARD { nInteger, cString, cString2, nInteger2, ... }
+                        KEYBOARD nInteger
+                        KEYBOARD cString
+    + __KEYBOARD( xData, lAddToExistingBuffer ) ( Default = .F. ) Where
+                 the second parameter determines if we want xData added to the
+                 existing keyboard buffer contents ( .T. ) or replaced.
 
 2006-09-27 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbcolumn.prg
@@ -14,7 +22,7 @@
       method.
 
   * source\rtl\tbrowse.prg
-    * adjusted TBC_CLR_HEADING and TBC_CLR_FOOTING constant values in 
+    * adjusted TBC_CLR_HEADING and TBC_CLR_FOOTING constant values in
       conformity with HB_COMPAT_C53.
     * moved EvalSkipBlock() method source out from #ifdef HB_COMPAT_C53.
 
