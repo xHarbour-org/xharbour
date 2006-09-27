@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.157 2006/08/27 21:39:20 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.158 2006/09/26 00:17:38 modalsist Exp $
  */
 
 /*
@@ -117,16 +117,6 @@
 //#define o_ScrColPos      14   // Temporary column position on screen
 
 
-/* 25/11/2004 - <maurilio.longo@libero.it>
-   TBC_ are CLR_ constants increased by one to be used as indexes inside columns color arrays
-   HEADING and FOOTING have to be colored like STANDARD colors, clipper does it, and could simply
-   be removed
-*/
-//#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
-//#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
-//#define TBC_CLR_HEADING   TBC_CLR_STANDARD
-//#define TBC_CLR_FOOTING   TBC_CLR_STANDARD
-
 /* 23/11/2004 - <maurilio.longo@libero.it> Inlined to be somewhat faster
    25/11/2004 - <maurilio.longo@libero.it> Since there are only two colors, this makes every day less sense to me...
 */
@@ -157,12 +147,24 @@
 #define TBCI_LCOLSEP        12   // Should column separator be drawn
 #define TBCI_SCRCOLPOS      13   // Temporary column position on screen
 
-/* TBColumn color constants  */
-#define TBC_CLR_STANDARD  1  // first index value to display unselected data into column.
-#define TBC_CLR_ENHANCED  2  // second index value to display selected data into column. 
-#define TBC_CLR_HEADING   3  // third index value to display heading.
-#define TBC_CLR_FOOTING   4  // fourth index value to display footing.
+/* 25/11/2004 - <maurilio.longo@libero.it>
+   TBC_ are CLR_ constants increased by one to be used as indexes inside columns color arrays
+   HEADING and FOOTING have to be colored like STANDARD colors, clipper does it, and could simply
+   be removed
+*/
+//#define TBC_CLR_STANDARD  ( CLR_STANDARD + 1 )
+//#define TBC_CLR_ENHANCED  ( CLR_ENHANCED + 1 )
 
+/* TBColumn color constants  */
+#define TBC_CLR_STANDARD  1  // first index value to set unselected data color.
+#define TBC_CLR_ENHANCED  2  // second index value to set selected data color. 
+#ifdef HB_COMPAT_C53
+#define TBC_CLR_HEADING   3  // third index value to set heading color.
+#define TBC_CLR_FOOTING   4  // fourth index value to set footing color.
+#else
+#define TBC_CLR_HEADING   TBC_CLR_STANDARD
+#define TBC_CLR_FOOTING   TBC_CLR_STANDARD
+#endif
 
 
 // ===================================================================================================
@@ -3116,6 +3118,20 @@ METHOD PreConfigVertical( uValue ) CLASS TBrowse
 
 Return uValue
 
+//---------------------------------------------------------------------//
+
+METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
+   LOCAL lSign   := nSkip >= 0
+   LOCAL nSkipped := ::oDataCache:dbSkip( nSkip )
+
+   /* 19/10/2005 - <maurilio.longo@libero.it>
+                   Why do we do this?
+   */
+   if ( lSign .and. nSkipped < 0 ) .or. ( !lSign .and. nSkipped > 0 )
+      nSkipped := 0
+   endif
+
+Return nSkipped
 
 //---------------------------------------------------------------------//
 //
@@ -3200,55 +3216,55 @@ Return nReturn
 
 //-------------------------------------------------------------------//
 /*
-METHOD HitTest( mrow,mcol ) CLASS TBrowse
-   LOCAL i, nVisCol, lHitHeader := .f.
-   LOCAL nColPos
-
-   ::mRowPos := ::nRowPos
-   ::mColPos := ::colPos
-
-   if mRow < ::nTop .or. mRow > ::rect[ 3 ]
-      return HTNOWHERE
-   endif
-
-   if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
-      return HTNOWHERE
-   endif
-
-   ::mRowPos := mRow - ::rect[ 1 ] + 1
-   // Is the header separator part of the "header" when click?
-   if ::mRowPos < 1 - if( ::lHeadSep .OR. ::lColHeadSep , 1, 0 )
-      lHitHeader := .t.
-   endif
-
-   nVisCol := len( ::aColumnsSep )
-
-   if nVisCol == 0
-      nColPos := 1
-
-   elseif mcol >= ::aColumnsSep[ nVisCol ]
-      nColPos := nVisCol + 1
-
-   else
-      for i := 1 to nVisCol
-         if mcol < ::aColumnsSep[ i ]
-            nColPos := i
-            exit
-         endif
-      next
-   endif
-
-   if ::nFrozenCols > 0 .and. nColPos <= ::nFrozenCols
-      // Do Nothing
-   elseif ::nFrozenCols > 0 .and. nColPos > ::nFrozenCols
-      nColPos := ::LeftVisible + nColPos - ::nFrozenCols - 1
-   else
-      nColPos := ::LeftVisible + nColPos - 1
-   endif
-
-   ::mColPos := nColPos
-
-Return if( lHitHeader, HTHEADING, HTCELL )
+*METHOD HitTest( mrow,mcol ) CLASS TBrowse
+*   LOCAL i, nVisCol, lHitHeader := .f.
+*   LOCAL nColPos
+*
+*   ::mRowPos := ::nRowPos
+*   ::mColPos := ::colPos
+*
+*   if mRow < ::nTop .or. mRow > ::rect[ 3 ]
+*      return HTNOWHERE
+*   endif
+*
+*   if mCol < ::rect[ 2 ] .or. mCol > ::rect[ 4 ]
+*      return HTNOWHERE
+*   endif
+*
+*   ::mRowPos := mRow - ::rect[ 1 ] + 1
+*   // Is the header separator part of the "header" when click?
+*   if ::mRowPos < 1 - if( ::lHeadSep .OR. ::lColHeadSep , 1, 0 )
+*      lHitHeader := .t.
+*   endif
+*
+*   nVisCol := len( ::aColumnsSep )
+*
+*   if nVisCol == 0
+*      nColPos := 1
+*
+*   elseif mcol >= ::aColumnsSep[ nVisCol ]
+*      nColPos := nVisCol + 1
+*
+*   else
+*      for i := 1 to nVisCol
+*         if mcol < ::aColumnsSep[ i ]
+*            nColPos := i
+*            exit
+*         endif
+*      next
+*   endif
+*
+*   if ::nFrozenCols > 0 .and. nColPos <= ::nFrozenCols
+*      // Do Nothing
+*   elseif ::nFrozenCols > 0 .and. nColPos > ::nFrozenCols
+*      nColPos := ::LeftVisible + nColPos - ::nFrozenCols - 1
+*   else
+*      nColPos := ::LeftVisible + nColPos - 1
+*   endif
+*
+*   ::mColPos := nColPos
+*
+*Return if( lHitHeader, HTHEADING, HTCELL )
 */
 
 // FSG - 14/06/2006 - expanded HitTest()
@@ -3378,21 +3394,6 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBrowse
    ENDIF
 
 Return lRet
-
-//---------------------------------------------------------------------//
-
-METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
-   LOCAL lSign   := nSkip >= 0
-   LOCAL nSkipped := ::oDataCache:dbSkip( nSkip )
-
-   /* 19/10/2005 - <maurilio.longo@libero.it>
-                   Why do we do this?
-   */
-   if ( lSign .and. nSkipped < 0 ) .or. ( !lSign .and. nSkipped > 0 )
-      nSkipped := 0
-   endif
-
-Return nSkipped
 
 //-------------------------------------------------------------------//
 

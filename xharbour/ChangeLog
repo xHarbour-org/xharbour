@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5172 2006/09/26 20:58:31 mlombardo Exp $
+ * $Id: ChangeLog,v 1.5173 2006/09/27 11:01:43 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-27 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbcolumn.prg
+    * added directive #ifdef HB_COMPAT_C53 to defcolor array and setdefcolor()
+      method.
+
+  * source\rtl\tbrowse.prg
+    * adjusted TBC_CLR_HEADING and TBC_CLR_FOOTING constant values in 
+      conformity with HB_COMPAT_C53.
+    * moved EvalSkipBlock() method source out from #ifdef HB_COMPAT_C53.
 
 2006-09-27 13:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/contrib/rdd_ads/ads1.c

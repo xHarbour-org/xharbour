@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.16 2005/09/19 20:13:02 ronpinkas Exp $
+ * $Id: tbcolumn.prg,v 1.17 2006/09/26 00:17:38 modalsist Exp $
  */
 
 /*
@@ -130,7 +130,11 @@ CLASS TBColumn
    DATA   xCargo                         // User-definable variable
    DATA   bColorBlock                    // Code block that determines color of data items
    DATA   cColSep                        // Column separator character
+   #ifdef HB_COMPAT_C53
    DATA   aDefColor     INIT {1,2,1,1}   // Array of numeric indexes into the color table
+   #else
+   DATA   aDefColor     INIT {1,2} 
+   #endif
    DATA   cFooting                       // Column footing character
    DATA   cFootSep                       // Footing separator character
    DATA   cHeading                       // Column heading character
@@ -162,7 +166,11 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
 
    DEFAULT cHeading TO ""
 
+   #ifdef HB_COMPAT_C53
    ::DefColor := { 1, 2, 1, 1 }
+   #else
+   ::DefColor := { 1, 2 }
+   #endif
    ::ColSep   := nil
 
    ::nWidth   := nil
@@ -198,17 +206,26 @@ LOCAL i,a
      a := aDef
      if Len(a) == 1
         aadd( a, aDef[1])
+#ifdef HB_COMPAT_C53
         aadd( a, aDef[1] )
         aadd( a, aDef[1] )
      elseif Len(a) == 2 
         aadd( a, aDef[1] )
         aadd( a, aDef[2] )
-     elseif Len(a) == 3 
+     elseif Len(a) == 3
         aadd( a, aDef[1] )
+#endif
      endif
+
+#ifdef HB_COMPAT_C53
      if len(a) > 4
         ASize(a,4)
      endif
+#else
+     if len(a) > 2
+        ASize(a,2)
+     endif
+#endif
   endif
 
 RETURN a
