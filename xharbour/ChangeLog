@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5171 2006/09/26 09:03:26 brianhays Exp $
+ * $Id: ChangeLog,v 1.5172 2006/09/26 20:58:31 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-27 13:00 UTC+0200 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/ads1.c
+    * indenting
+
+  * xharbour/include/hbvm.h
+  * xharbour/source/vm/hvm.c
+    + added void hb_vmPushEvalSym( void ) for the code which do not
+      want to access any [P]HB_SYMB structures
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! disabled early retrieving from the cache key position and key count
 
 2006-09-26 17:55 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * source/rtl/hbserial.prg

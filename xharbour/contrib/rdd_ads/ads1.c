@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.111 2006/09/19 21:06:47 brianhays Exp $
+ * $Id: ads1.c,v 1.112 2006/09/22 19:02:22 ronpinkas Exp $
  */
 
 /*
@@ -2378,7 +2378,6 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 
    ucfieldDefs = (UNSIGNED8 *) hb_xgrab( uiLen );
    ucfieldDefs[0]='\0';
-   ucfieldDefs[uiLen - 1]='\0';
    ucfieldPtr = ucfieldDefs;
 
    pField = pArea->lpFields;
@@ -2389,7 +2388,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
         pArea->maxFieldLen = pField->uiLen;
       }
 
-      switch ( pField->uiType )
+      switch( pField->uiType )
       {
          case HB_IT_DATE:
             if( pField->uiTypeExtended == 0 )
@@ -2470,45 +2469,44 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
             break;
       }
 
-   uiFldLen = 0;
-   switch ( pField->uiType )
-   {
-      case HB_IT_DATE:
-      case HB_IT_LOGICAL:
-      case HB_IT_MEMO:
-          if( pField->uiTypeExtended != ADS_VARCHAR )
-          {
-             char * szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
-             if( strlen( szName ) > (unsigned int) pArea->uiMaxFieldNameLength )
-             {
-                 strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
-                 uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", ucField, cType );
-             }
-             else
-             {
-                 uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", szName, cType );
-             }
-             break;
-          }
+      switch( pField->uiType )
+      {
+         case HB_IT_DATE:
+         case HB_IT_LOGICAL:
+         case HB_IT_MEMO:
+            if( pField->uiTypeExtended != ADS_VARCHAR )
+            {
+               char * szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
+               if( strlen( szName ) > (unsigned int) pArea->uiMaxFieldNameLength )
+               {
+                  strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
+                  uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", ucField, cType );
+               }
+               else
+               {
+                  uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", szName, cType );
+               }
+               break;
+            }
 
-      default:
-          {
-             char * szName ;
-             szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
-             if( strlen( szName) > (unsigned int) pArea->uiMaxFieldNameLength )
-             {
-                 strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
-                 uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
-             }
-             else
-             {
-                 uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", szName, cType, pField->uiLen, pField->uiDec );
-             }
-             break;
-          }
+         default:
+         {
+            char * szName ;
+            szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
+            if( strlen( szName) > (unsigned int) pArea->uiMaxFieldNameLength )
+            {
+               strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
+               uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
+            }
+            else
+            {
+               uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", szName, cType, pField->uiLen, pField->uiDec );
+            }
+            break;
+         }
       }
 
-      if ( uiFldLen == 0)
+      if( uiFldLen == 0 )
       {
          uiFldLen = strlen( (const char *) ucBuffer );  // should have been set by sprintf above.
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.582 2006/09/14 15:04:03 ronpinkas Exp $
+ * $Id: hvm.c,v 1.583 2006/09/17 16:53:08 druzus Exp $
  */
 
 /*
@@ -8191,6 +8191,21 @@ HB_EXPORT void hb_vmPushDynSym( PHB_DYNS pDynSym )
    pItem = hb_stackItemFromTop( -1 );
    pItem->type = HB_IT_SYMBOL;
    pItem->item.asSymbol.value = pDynSym->pSymbol;
+   pItem->item.asSymbol.stackbase = hb_stackTopOffset();
+   pItem->item.asSymbol.uiSuperClass = 0;
+}
+
+HB_EXPORT void hb_vmPushEvalSym( void )
+{
+   HB_THREAD_STUB
+   PHB_ITEM pItem;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushEvalSym()"));
+
+   hb_stackPush();
+   pItem = hb_stackItemFromTop( -1 );
+   pItem->type = HB_IT_SYMBOL;
+   pItem->item.asSymbol.value = &hb_symEval;
    pItem->item.asSymbol.stackbase = hb_stackTopOffset();
    pItem->item.asSymbol.uiSuperClass = 0;
 }
