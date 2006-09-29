@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.229 2006/09/13 13:20:45 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.230 2006/09/17 15:57:07 ronpinkas Exp $
  */
 
 /*
@@ -4960,7 +4960,7 @@ static int getExpReal( char * expreal, char ** ptri, char cMarkerType, int maxre
 
          if( expreal )
          {
-            printf( "expreal: <%s>\n", expreal );
+            printf( "expreal: <%s>\n", expreal - lens );
          }
       }
       else
@@ -4984,10 +4984,6 @@ static BOOL isExpres( char * stroka, char cMarkerType )
   l2 = getExpReal( NULL, &stroka, cMarkerType, HB_PP_STR_SIZE, 1 );
 
   //printf( "Len1: %i Len2: %i RealExp: >%s< Last: %c\n", l1, l2, stroka - l2, ( stroka - l2 )[l1-1] );
-
-  /* Ron Pinkas modified 2000-06-17 Expression can't be valid if last charcter is one of these: ":/+*-%^=(<>"
-  return ( l1 <= l2 );
-  */
 
   return ( l1 <= l2 /*&& ! strchr( ":/+*-%^=(<>[{", ( stroka - l2 )[l1-1] ) */ );
 }
@@ -7075,7 +7071,7 @@ static int NextName( char ** sSource, char * sDest )
      s_bNewLine = FALSE;
   }
 
-  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ! isalpha( ( BYTE ) **sSource ) ) ) )
+  while( **sSource != '\0' && ( State != STATE_NORMAL || ( **sSource != '_' && ( ( ! isalpha( ( BYTE ) **sSource ) ) || IS_ESC_STRING( **sSource ) ) ) ) )
   {
      if( State == STATE_QUOTE1 )
      {
@@ -7132,7 +7128,7 @@ static int NextName( char ** sSource, char * sDest )
     /** Added by Giancarlo Niccolai 2003-06-20 */
      else if( State == STATE_QUOTE4 )
      {
-        if( **sSource == '\"' && ( (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) ) )
+        if( (*sSource)[0] == '\"' && ( (*sSource)[-1] != '\\' || ( (*sSource)[-2] == '\\' && (*sSource)[-1] == '\\' ) ) )
         {
            State = STATE_NORMAL;
         }
@@ -7199,10 +7195,11 @@ static int NextName( char ** sSource, char * sDest )
         State = STATE_QUOTE2;
      }
     /** Added by Giancarlo Niccolai 2003-06-20 */
-     else if( IS_ESC_STRING(**sSource ) )
+     else if( IS_ESC_STRING( **sSource ) )
      {
         pString = *sSource;
         State = STATE_QUOTE4;
+        (*sSource)++;
      }
      /* END */
      /* Ron Pinkas added 2000-11-08 */
@@ -7380,6 +7377,7 @@ static int NextParm( char ** sSource, char * sDest )
      else if( IS_ESC_STRING( **sSource ) )
      {
         State = STATE_QUOTE4;
+       (*sSource)++;
      }
      /* END */
      else if( **sSource == '\"' )
