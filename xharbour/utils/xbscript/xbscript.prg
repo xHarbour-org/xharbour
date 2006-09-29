@@ -7131,6 +7131,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
   LOCAL sMultiStopper, nSpaceAt, sNextStopper, cChar
   LOCAL aExp
   LOCAL nAt
+  LOCAL nOpen
 
   IF  cType == '*'
       IF Empty( s_sPending ) .OR. AllTrim( s_sPending ) == ';'
@@ -7277,6 +7278,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
      //TraceLog( sToken )
 
      sJustToken := RTrim( sToken )
+
      IF sNextAnchor != NIL  .AND. sJustToken == sNextAnchor
         // Clipper give preference to ',' in list expression.
         IF ! ( sNextAnchor $ ',' .AND. cType $ ",A" )
@@ -7342,22 +7344,27 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                  sExp           += sNextToken
                  sLastToken     := sJustNext
                  sLine          := sNextLine
+
                  #ifdef USE_C_BOOST
                     SetArrayPrefix( .T. )
                  #else
                     s_bArrayPrefix := .T.
                  #endif
+
                  sNextToken     := NextToken( @sNextLine, .T. )
+
                  IF sNextToken != NIL .AND. Left( sNextToken, 1 ) == '.'
                     // Get the macro terminator.
                     sExp           += sNextToken
                     sLastToken     := "."
                     sLine          := sNextLine
+
                     #ifdef USE_C_BOOST
                        SetArrayPrefix( .T. )
                     #else
                        s_bArrayPrefix := .T.
                     #endif
+
                     IF sNextToken == '.' //(Last Token) No space after Macro terminator, so get the suffix.
                        sNextToken := NextToken( @sNextLine, .T. )
                        IF sNextToken != NIL
@@ -7367,6 +7374,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
                              sExp           += sNextToken
                              sLastToken     := RTrim( sNextToken )
                              sLine          := sNextLine
+
                              #ifdef USE_C_BOOST
                                 SetArrayPrefix( .T. )
                              #else
@@ -7399,113 +7407,99 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
         ELSEIF s1 == '('
            sExp += sToken
-           IF Left( sNext1, 1 ) == ')'
-              sExp           += sNextToken
-              sLine          := sNextLine
-              #ifdef USE_C_BOOST
-                 SetArrayPrefix( .T. )
-              #else
-                 s_bArrayPrefix := .T.
-              #endif
-           ELSE
-              //TraceLog( "Content from: " + sLine )
-              sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
-              IF sTemp == NIL
-                 //TraceLog( "ERROR!(1) No content at: '" + sLine + "' After: " + sExp, sLine  )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp } ) )
-                 // Safety
-                 BREAK
-              ELSE
-                 sExp +=  sTemp
-                 //TraceLog( "Content: '" + sTemp + "'", sExp, sLine )
-              ENDIF
+           nOpen := 1
 
-              sToken := NextToken( @sLine ) // Close
+           WHILE .T.
+              sToken := NextToken( @sLine )
+
               IF sToken == NIL
-                 //TraceLog( "ERROR!(2) Unbalanced '(' at: " + sExp, sLine )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp } ) )
-                 // Safety
-                 BREAK
-              ELSEIF Left( sToken, 1 ) == ')'
-                 sExp += sToken
+                 EXIT
               ELSE
-                 //TraceLog( "ERROR!(3) Unbalanced '(' Found: '" +  sToken + "' at: " + sExp, sLine )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced (], { sExp, sToken } ) )
-                 // Safety
-                 BREAK
-              ENDIF
-           ENDIF
+                 sExp += sToken
+                 s1 := Left( sToken, 1 )
 
-           sLastToken := ")"
+                 IF s1 == ')'
+                    #ifdef USE_C_BOOST
+                       SetArrayPrefix( .T. )
+                    #else
+                       s_bArrayPrefix := .T.
+                    #endif
+
+                    IF --nOpen == 0
+                       EXIT
+                    ENDIF
+                 ELSEIF s1 == '('
+                    nOpen++
+                 ENDIF
+              ENDIF
+           ENDDO
+
+           sLastToken := RTrim( sToken )
+
            // Continue  2nd level checks below.
         ELSEIF s1 == '{'
-           sExp  += sToken
+           sExp += sToken
+           nOpen := 1
 
-           /* Literal array */
-           IF sNext1 == '}'
-              sExp           += sNextToken
-              sLine          := sNextLine
-              #ifdef USE_C_BOOST
-                 SetArrayPrefix( .T. )
-              #else
-                 s_bArrayPrefix := .T.
-              #endif
-           ELSE
-              sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
-              IF sTemp == NIL
-                 //TraceLog( "ERROR! Unbalanced '{...'", sLine )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {...], { sExp } ) )
-                 // Safety
-                 BREAK
-              ELSE
-                 sExp +=  sTemp
-              ENDIF
+           WHILE .T.
+              sToken := NextToken( @sLine )
 
-              sToken := NextToken( @sLine ) // Close
               IF sToken == NIL
-                 //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {], { sExp } ) )
-                 // Safety
-                 BREAK
-              ELSEIF Left( sToken, 1 ) == '}'
-                 sExp += sToken
+                 EXIT
               ELSE
-                 sLine := sToken + sLine
-                 //TraceLog( "ERROR! Unbalanced '{' at: " + sExp )
-                 Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced {], { sExp } ) )
-                 // Safety
-                 BREAK
-              ENDIF
-           ENDIF
+                 sExp += sToken
+                 s1 := Left( sToken, 1 )
 
-           sLastToken := "}"
+                 IF s1 == '}'
+                    #ifdef USE_C_BOOST
+                       SetArrayPrefix( .T. )
+                    #else
+                       s_bArrayPrefix := .T.
+                    #endif
+
+                    IF --nOpen == 0
+                       EXIT
+                    ENDIF
+                 ELSEIF s1 == '{'
+                    nOpen++
+                 ENDIF
+              ENDIF
+           ENDDO
+
+           sLastToken := RTrim( sToken )
+
            // Continue  2nd level checks below.
         ELSEIF s1 == "["
-           sExp  += sToken
-           sTemp := NextExp( @sLine, ',', NIL, NIL ) // Content - Ignoring sNextAnchor !!!
-           IF sTemp == NIL
-              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
-              // Safety
-              BREAK
-           ELSE
-              sExp += sTemp
-           ENDIF
+           sExp += sToken
+           nOpen := 1
 
-           sToken := NextToken( @sLine ) // Close
-           IF sToken == NIL
-              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
-              // Safety
-              BREAK
-           ELSEIF Left( sToken, 1 ) == ']'
-              sExp += sToken
-           ELSE
-              sLine := sToken + sLine
-              Eval( s_bRTEBlock, ErrorNew( [PP], 0, 3010, [Next-Token], [Unbalanced [], { sExp } ) )
-              // Safety
-              BREAK
-           ENDIF
+           WHILE .T.
+              sToken := NextToken( @sLine )
 
-           sLastToken := "]"
+              IF sToken == NIL
+                 EXIT
+              ELSE
+                 sExp += sToken
+                 s1 := Left( sToken, 1 )
+
+                 IF s1 == ']'
+                    #ifdef USE_C_BOOST
+                       SetArrayPrefix( .T. )
+                    #else
+                       s_bArrayPrefix := .T.
+                    #endif
+
+                    IF --nOpen == 0
+                       EXIT
+                    ENDIF
+                 ELSEIF s1 == '['
+                    nOpen++
+                 ENDIF
+              ENDIF
+           ENDDO
+
+           sLastToken := RTrim( sToken )
+
            // Continue  2nd level checks below.
         ELSEIF s1 $ "=)}]"
            sLine := sToken + sLine
@@ -7639,11 +7633,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         ELSEIF sNext1 $ "+-*/:=^!><!$%#|." // *** Very ODD Clipper consider '|' and '.' a continuation token !!!
            sExp           += sNextToken
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            LOOP
         ELSEIF sNext1 == "&" .AND. Len( sNextToken ) > 1 // & folowed bt white space.
            LOOP
@@ -7655,6 +7651,7 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            IF IsAlpha( cLastChar  ) .OR. IsDigit( cLastChar ) .OR. cLastChar $ "_.]"
               sExp           += sNextToken
               sLine          := sNextLine
+
               #ifdef USE_C_BOOST
                  SetArrayPrefix( .F. )
               #else
@@ -7664,11 +7661,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         ELSEIF sNext2 $ "->\:=\==\!=\<>\>=\<=\+=\-=\*=\/=\^=\**\%=\IN\=>\^^\>>\<<"
            sExp           += sNextToken
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .T. )
            #else
               s_bArrayPrefix := .T.
            #endif
+
            LOOP
         ENDIF
 
@@ -7677,11 +7676,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF sNext3 == "HAS"
            sExp           += sNextToken
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            LOOP
         ENDIF
 
@@ -7690,11 +7691,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF sNext4 == ".OR." .OR. sNext4 == "LIKE"
            sExp           += sNextToken
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            LOOP
         ENDIF
 
@@ -7704,11 +7707,13 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
            sExp           += sNextToken
            sLine          := sNextLine
            s_bArrayPrefix := .F.
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            LOOP
         /* .NOT. is being translated to ! at NextToken() !!!
         ELSEIF sNext5 == ".NOT."
@@ -7732,20 +7737,24 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
         IF cType == ","
            sList          += ( sExp + sNextToken )
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            sExp           := ""
         ELSEIF cType == "A"
            aAdd( aExp, sExp )
            sLine          := sNextLine
+
            #ifdef USE_C_BOOST
               SetArrayPrefix( .F. )
            #else
               s_bArrayPrefix := .F.
            #endif
+
            sExp           := ""
         ELSE
            //? "DONT CONTINUE: " + sLine
