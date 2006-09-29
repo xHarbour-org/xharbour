@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.251 2006/08/10 12:07:56 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.252 2006/09/27 11:01:44 druzus Exp $
  */
 
 /*
@@ -5789,8 +5789,9 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
                if ( hb_cdxBottomScope( pTag ) && hb_cdxTopScope( pTag ) &&
                     ( !fCheckFilter || hb_cdxCheckRecordFilter( pArea, ulRecNo ) ) )
                {
-               
                   LPCDXKEY pCurKey = hb_cdxKeyCopy( NULL, pTag->CurKey );
+                  if ( !hb_cdxCheckRecordScope( pArea, pTag->CurKey->rec ) )
+                     hb_cdxTagSkipPrev( pTag );
                   while ( !pTag->TagBOF )
                   {
                      if ( !fCheckFilter || hb_cdxCheckRecordFilter( pArea, pTag->CurKey->rec ) )

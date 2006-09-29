@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.69 2006/06/19 21:16:44 druzus Exp $
+ * $Id: workarea.c,v 1.70 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ ERRCODE hb_waSkip( AREAP pArea, LONG lToSkip )
       lSkip = -1;
       lToSkip *= -1;
    }
-   while( lToSkip-- > 0 )
+   while( --lToSkip >= 0 )
    {
       if( SELF_SKIPRAW( pArea, lSkip ) != SUCCESS )
          return FAILURE;
