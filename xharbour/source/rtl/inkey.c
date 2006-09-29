@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.46 2006/01/12 17:09:55 druzus Exp $
+ * $Id: inkey.c,v 1.47 2006/09/27 20:12:23 peterrees Exp $
  */
 
 /*
@@ -571,9 +571,11 @@ static int *AllocateStrBuffer( ULONG ulSize ) // Returns address of where to add
 static void PutItemInKeyBuffer( PHB_ITEM pItem )
 {
    int *StrBuffer ;
+
    if ( HB_IS_NUMBER( pItem ) )
    {
       StrBuffer = AllocateStrBuffer( 1 ) ;
+
       if ( StrBuffer )
       {
          *StrBuffer = (  int ) HB_ITEM_GET_NUMINTRAW( pItem ) ;
@@ -582,11 +584,14 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
    else if ( HB_IS_STRING( pItem ) )
    {
       ULONG ulLen = hb_itemGetCLen( pItem ) ;
+
       if ( ulLen )
       {
-         BYTE * pString =  hb_itemGetC( pItem ) ;
+         BYTE *pString =  (BYTE *) hb_itemGetC( pItem ) ;
+
          StrBuffer = AllocateStrBuffer( ulLen );
-         if ( StrBuffer )
+
+         if( StrBuffer )
          {
             while ( ulLen-- )
             {
@@ -595,6 +600,7 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
          }
       }
    }
+
    return ;
 }
 

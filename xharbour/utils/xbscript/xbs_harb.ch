@@ -1511,7 +1511,7 @@
          char sReturn[2048];
          char s2[3];
          BOOL lDontRecord;
-         size_t Counter, nLen, nStringLen;
+         size_t Counter, nLen, nStringLen = 0;
 
          //#define DEBUG_TOKEN
          #ifdef DEBUG_TOKEN
@@ -1597,58 +1597,15 @@
             }
             else if( s2[0] == 'E' && s2[1] == '"' )
             {
-               sReturn[0] = '"';
-               nStringLen = 1;
+               sReturn[0] = 'E';
+               sReturn[1] = '"';
+               nStringLen = 2;
 
                pTmp = sLine + 2;
 
-               while( pTmp[0] && pTmp[0] != '"'  )
+               while( pTmp[0] && ( pTmp[0] != '"' || pTmp[-1] == '\\' )  )
                {
-                  if( pTmp[0] == '\\' )
-                  {
-                     switch( pTmp[1] )
-                     {
-                        case '\\' :
-                        case '"'  :
-                        case '\'' :
-                           sReturn [ nStringLen++ ] = pTmp[1];
-                           pTmp++;
-                           sLine++;
-                           break;
-
-                        case 'n' :
-                           sReturn [ nStringLen++ ] = '\n';
-                           pTmp++;
-                           sLine++;
-                           break;
-
-                        case 't' :
-                           sReturn [ nStringLen++ ] = '\t';
-                           pTmp++;
-                           sLine++;
-                           break;
-
-                        case 'b' :
-                           sReturn [ nStringLen++ ] = '\b';
-                           pTmp++;
-                           sLine++;
-                           break;
-
-                        case 'r' :
-                           sReturn [ nStringLen++ ] = '\r';
-                           pTmp++;
-                           sLine++;
-                           break;
-
-                        default :
-                           sReturn[ nStringLen++ ] = '\\';
-                     }
-                  }
-                  else
-                  {
-                     sReturn[ nStringLen++ ] = pTmp[0];
-                  }
-
+                  sReturn [ nStringLen++ ] = pTmp[0];
                   pTmp++;
                }
 
@@ -1872,7 +1829,14 @@
 
        Done:
 
-         sLine += ( nLen = strlen( sReturn ) );
+         if( nStringLen )
+         {
+            sLine += ( nLen = nStringLen );
+         }
+         else
+         {
+            sLine += ( nLen = strlen( sReturn ) );
+         }
 
          if( ! lDontRecord )
          {
@@ -1882,10 +1846,9 @@
             }
             else
             {
-               s_bArrayPrefix = ( isalnum( (BYTE) sReturn[0] ) || strchr( "])}._", sReturn[0] ) );
+               s_bArrayPrefix = ( isalnum( (BYTE) sReturn[0] ) || strchr( "])}._'\"", sReturn[0] ) || ( sReturn[0] == 'E' && sReturn[1] == '"' ) );
 
-               if( nLen < 7 && toupper( sReturn[0] ) == 'R' && toupper( sReturn[1] ) == 'E' &&
-                   toupper( sReturn[2] ) == 'T' && toupper( sReturn[3] ) == 'U'  )
+               if( nLen < 7 && toupper( sReturn[0] ) == 'R' && toupper( sReturn[1] ) == 'E' && toupper( sReturn[2] ) == 'T' && toupper( sReturn[3] ) == 'U'  )
                {
                   if( sReturn[4] == '\0' )
                   {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5174 2006/09/27 13:07:46 modalsist Exp $
+ * $Id: ChangeLog,v 1.5175 2006/09/27 20:12:23 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-09-28 20:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/rdd_ads/adsfunc.c
+  * source/rtl/inkey.c
+    * Missing type casts
+
+  * source/rtl/setfunc.prg
+    * Updated __SetFunction() to support numerics and arrays argumnts now supported by __Keyboard()
+
+  * utils/xbscript/xbs_harb.ch
+    * Corrected support for Extended Strings (E"...")
+    + Added ' and " as valid array prefixes.
+
+  * utils/xbscript/xbsclass.ch
+    * Synched with hbclass.ch
+
+  * utils/xbscript/xbscript.prg
+    * Minor correction to white space management in line continuation
+    * Minor correction to handling of s_Pending in NextExp() for wild matchers <**>
+    * Minor correction in NextExp() for extended matchers <()>
+    - Removed defedout old code in NextExp() for #ifdef EXPLICIT_BLOCK
+    * Minro refinment to last fix of END* rules
+    * Updated burned-in rules as per updated xbsclass.ch
+
 2006-09-28 08:10 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/inkey.c
     + added support for KEYBOARD { nInteger, cString, cString2, nInteger2, ... }
@@ -47,7 +71,6 @@
     * fixed AdsDDCreate 2nd arg (Encryption flag) to accept logical
       (it should be documented that way OR numeric (non-zero is true)
 
-
 2006-09-26 01:11 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/adsfunc.c
     * removed dead code from AdsConnect60
@@ -62,7 +85,6 @@
 
   * tests/datad.prg
     * added test for above
-
 
 2006-09-25 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbcolumn.prg

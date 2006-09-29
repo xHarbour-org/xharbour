@@ -1,5 +1,5 @@
 /*
- * $Id: setfunc.prg,v 1.1.1.1 2001/12/21 10:42:03 ronpinkas Exp $
+ * $Id: setfunc.prg,v 1.2 2003/01/27 03:40:53 walito Exp $
  */
 
 /*
@@ -54,25 +54,35 @@
 #include "common.ch"
 #include "hbsetup.ch"
 
-PROCEDURE __SetFunction( nFunctionKey, cString )
+PROCEDURE __SetFunction( nFunctionKey, xString )
 
-   /* NOTE: CA-Cl*pper will not handle F11 and F12 here. 
+   /* NOTE: CA-Cl*pper will not handle F11 and F12 here.
             This is a Harbour extension. [vszakats] */
 
    SWITCH nFunctionKey
-   CASE 1  ; nFunctionKey := K_F1  ; exit
-#ifdef HB_EXTENSION
-   CASE 11 ; nFunctionKey := K_F11 ; exit
-   CASE 12 ; nFunctionKey := K_F12 ; exit
-#endif
-   DEFAULT                ; nFunctionKey := -nFunctionKey + 1
+      CASE 1
+         nFunctionKey := K_F1
+         EXIT
+
+     #ifdef HB_EXTENSION
+      CASE 11
+         nFunctionKey := K_F11
+         EXIT
+
+      CASE 12
+         nFunctionKey := K_F12
+         EXIT
+     #endif
+
+      DEFAULT
+         nFunctionKey := -nFunctionKey + 1
    END
 
-   IF ISCHARACTER( cString )
-      SetKey( nFunctionKey, {|| __Keyboard( cString ) } )
+   IF ISCHARACTER( xString ) .OR. ISNUMBER( xString ) .OR. ISARRAY( xString )
+      SetKey( nFunctionKey, {|| __Keyboard( xString ) } )
    ELSE
       SetKey( nFunctionKey, NIL )
    ENDIF
 
-   RETURN
+RETURN
 
