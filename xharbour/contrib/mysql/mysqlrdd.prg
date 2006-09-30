@@ -1,5 +1,5 @@
 /*
- * $Id: mysqlrdd.prg,v 1.1 2006/09/29 13:43:45 lf_sfnet Exp $
+ * $Id: mysqlrdd.prg,v 1.1 2006/09/30 17:47:20 areainformatica Exp $
  */
 
 /*
@@ -402,5 +402,3 @@ RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
 INIT PROC MYSQL_INIT()
    rddRegister( "MYSQLRDD", RDT_FULL )
 RETURN
-
-
