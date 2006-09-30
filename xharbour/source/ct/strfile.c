@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.2 2005/01/11 08:44:08 druzus Exp $
+ * $Id: strfile.c,v 1.4 2006/09/30 21:45:40 ptsarenko Exp $
  */
 
 /*
@@ -183,11 +183,14 @@ HB_FUNC (FILESTR)
          LONG lFileSize = hb_fsSeek(hFile, 0, FS_END);
          LONG lPos = hb_fsSeek(hFile, (ISNUM(3) ? hb_parnl(3) : 0), FS_SET);
          LONG lLength = ISNUM(2) ? HB_MIN(hb_parnl(2), lFileSize - lPos) : lFileSize - lPos;
-         char * pcResult = (char *) hb_xgrab(lLength);
+         char * pcResult = (char *) hb_xgrab(lLength + 1);
          BOOL bCtrlZ = (ISLOG(4) ? hb_parl(4) : 0 );
          char * pCtrlZ;
 
-         lLength = hb_fsRead(hFile, (BYTE *) pcResult, (USHORT) lLength);
+         if( lLength > 0)
+         {
+            lLength = hb_fsRead(hFile, (BYTE *) pcResult, (USHORT) lLength);
+         }
 
          if( bCtrlZ )
          {

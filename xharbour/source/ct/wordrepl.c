@@ -1,5 +1,5 @@
 /*
- * $Id: wordrepl.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: wordrepl.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ HB_FUNC (WORDREPL)
       iMode =0;
     }
 
-    pcRet = ( char * ) hb_xgrab (sStrLen);
+    pcRet = ( char * ) hb_xgrab (sStrLen + 1);
     hb_xmemcpy (pcRet, pcString, sStrLen);
 
     for (sIndex = 0; sIndex < (sSearchLen&0xFFFFFFFE); sIndex+=2)

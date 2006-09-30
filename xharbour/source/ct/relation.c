@@ -1,5 +1,5 @@
 /*
- * $Id: relation.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: relation.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
  */
 
 /*
@@ -197,7 +197,8 @@ HB_FUNC (CHARRELREP)
     /* check for empty strings */
     if ((sStrToMatchLen1 == 0) ||
         (sStrToMatchLen2 == 0) ||
-        (sReplaceLen == 0))
+        (sReplaceLen == 0) ||
+        (sStrLen2 == 0) )
     {
       if (iNoRet)
       {

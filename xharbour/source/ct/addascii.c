@@ -1,5 +1,5 @@
 /*
- * $Id: addascii.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: addascii.c,v 1.3 2006/09/30 01:11:59 ptsarenko Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ HB_FUNC (ADDASCII)
     else
       sPos = sLen;
 
-    if ((sPos > sLen) || !(ISNUM (2)))
+    if ((sPos > sLen) || !(ISNUM (2)) || (sLen == 0))
     {
       int iArgErrorMode = ct_getargerrormode();
       if (iArgErrorMode != CT_ARGERR_IGNORE)
