@@ -1,3 +1,4 @@
+
 /* The aim of this test is to check the same RDD functions and statements against a dbf file 
    and the same dbf imported into a MySQL database.
    Replace <...> with your data and configuration.
