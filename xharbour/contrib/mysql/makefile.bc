@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.0 2000/09/30 14:23:41 alkresin Exp $
+# $Id: makefile.bc,v 1.1 2003/02/03 05:19:18 walito Exp $
 #
 
 # makefile for Borland C/C++ 32 bits
@@ -12,10 +12,13 @@ OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
 
 $(LIB_DIR)\mysql.lib : \
+   $(OBJ_DIR)\mysqlrdd.obj \
    $(OBJ_DIR)\tmysql.obj \
    $(OBJ_DIR)\tsqlbrw.obj \
    $(OBJ_DIR)\mysql.obj
 
+$(OBJ_DIR)\mysqlrdd.c      : mysqlrdd.prg
+$(OBJ_DIR)\mysqlrdd.obj    : $(OBJ_DIR)\mysqlrdd.c
 $(OBJ_DIR)\tmysql.c      : tmysql.prg
 $(OBJ_DIR)\tmysql.obj    : $(OBJ_DIR)\tmysql.c
 $(OBJ_DIR)\tsqlbrw.c      : tsqlbrw.prg

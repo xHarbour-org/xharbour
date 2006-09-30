@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.0 2003/01/11 01:01:04 ronpinkas Exp $
+rem $Id: make_b32.bat,v 1.1 2003/02/03 05:19:18 walito Exp $
 rem
 
 if "%1" == "clean" goto CLEAN
@@ -23,13 +23,15 @@ if "%1" == "CLEAN" goto CLEAN
 
 :CLEAN
 
-   if exist ..\..\lib\b32\mysql.lib   del ..\..\lib\b32\mysql.lib
-   if exist ..\..\lib\b32\mysql.bak   del ..\..\lib\b32\mysql.bak
-   if exist ..\..\obj\b32\mysql.obj   del ..\..\obj\b32\mysql.obj
-   if exist ..\..\obj\b32\tsqlbrw.c   del ..\..\obj\b32\tsqlbrw.c
-   if exist ..\..\obj\b32\tmysql.c    del ..\..\obj\b32\tmysql.c
-   if exist ..\..\obj\b32\tsqlbrw.obj del ..\..\obj\b32\tsqlbrw.obj
-   if exist ..\..\obj\b32\tmysql.obj  del ..\..\obj\b32\tmysql.obj
+   if exist ..\..\lib\b32\mysql.lib    del ..\..\lib\b32\mysql.lib
+   if exist ..\..\lib\b32\mysql.bak    del ..\..\lib\b32\mysql.bak
+   if exist ..\..\obj\b32\mysql.obj    del ..\..\obj\b32\mysql.obj
+   if exist ..\..\obj\b32\tsqlbrw.c    del ..\..\obj\b32\tsqlbrw.c
+   if exist ..\..\obj\b32\tmysql.c     del ..\..\obj\b32\tmysql.c
+   if exist ..\..\obj\b32\tsqlbrw.obj  del ..\..\obj\b32\tsqlbrw.obj
+   if exist ..\..\obj\b32\tmysql.obj   del ..\..\obj\b32\tmysql.obj
+   if exist ..\..\obj\b32\mysqlrdd.obj del ..\..\obj\b32\mysqlrdd.obj
+   if exist ..\..\obj\b32\mysqlrdd.c   del ..\..\obj\b32\mysqlrdd.c
    goto EXIT
 
 :EXIT
