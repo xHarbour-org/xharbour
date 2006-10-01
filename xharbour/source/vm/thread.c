@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.200 2006/04/06 04:54:18 ronpinkas Exp $
+* $Id: thread.c,v 1.201 2006/08/21 15:16:46 walito Exp $
 */
 
 /*
@@ -2303,7 +2303,6 @@ PHB_ITEM hb_threadMutexCreate( PHB_ITEM pItem )
 
 HB_FUNC( HB_MUTEXCREATE )
 {
-   HB_THREAD_STUB_STACK
    hb_itemRelease( hb_itemReturnForward( hb_threadMutexCreate( NULL ) ) );
 }
 

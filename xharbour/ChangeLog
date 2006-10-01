@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5180 2006/09/30 18:40:15 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5181 2006/10/01 11:24:47 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-01 18:21 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source\vm\thread.c
+    * Removed unused HB_THREAD_STUB_STACK from function HB_FUNC( HB_MUTEXCREATE )
 
 2006-10-01 13:23 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\rtl\inkey.c
