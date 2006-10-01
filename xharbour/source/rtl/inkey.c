@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.47 2006/09/27 20:12:23 peterrees Exp $
+ * $Id: inkey.c,v 1.48 2006/09/29 00:38:57 ronpinkas Exp $
  */
 
 /*
@@ -108,7 +108,7 @@ static int    s_inkeyLast = 0;
 static PHB_ITEM s_inKeyBlockBefore = NULL;
 static PHB_ITEM s_inKeyBlockAfter  = NULL;
 
-static void ResetStrBuffer()
+static void ResetStrBuffer( void )
 {
    if ( s_StrBuffer )
    {

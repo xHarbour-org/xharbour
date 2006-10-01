@@ -305,7 +305,7 @@ HB_FUNC( GETPRINTERS )
    HANDLE hPrinter ;
    DWORD Flags = PRINTER_ENUM_LOCAL | PRINTER_ENUM_CONNECTIONS;
    BOOL bPrinterNamesOnly= TRUE ;
-   BOOL bLocalPrintersOnly= FALSE ;
+   BOOL bLocalPrintersOnly;
    PRINTER_INFO_4 *buffer4, *pPrinterEnum4;
    PRINTER_INFO_5 *buffer, *pPrinterEnum;
    PRINTER_INFO_2 *pPrinterInfo2 ;

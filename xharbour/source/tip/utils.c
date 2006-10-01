@@ -1,5 +1,5 @@
 /*
- * $Id: utils.c,v 1.6 2005/01/09 06:08:26 likewolf Exp $
+ * $Id: utils.c,v 1.7 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -673,7 +673,7 @@ HB_FUNC( TIP_FILEMIMETYPE )
 HB_FUNC( TIP_MIMETYPE )
 {
    PHB_ITEM pData = hb_param( 1, HB_IT_STRING );
-   char *magic_type = NULL;
+   char *magic_type;
    char *cData;
    ULONG ulLen;
 

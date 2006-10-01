@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.3 2006/09/02 16:00:10 ptsarenko Exp $
+ * $Id: screen3.prg,v 1.3 2006/09/02 14:14:48 ptsarenko Exp $
  */
 
 /*
@@ -355,9 +355,9 @@ HB_FUNC_STATIC( GETCSIZE )
    hb_retni( uiSize );
 }
 
-HB_FUNC_STATIC( SETATTRIBUTE )
-{
-   hb_gt_SetAttribute( hb_parni(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5) );
-}
+//HB_FUNC_STATIC( SETATTRIBUTE )
+//{
+//   hb_gt_SetAttribute( hb_parni(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5) );
+//}
 
 #pragma ENDDUMP

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.139 2006/05/08 16:00:51 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.139 2006/05/16 14:45:57 ronpinkas Exp $
  */
 
 /*
@@ -1218,7 +1218,7 @@ RETURN Self
   {
      VARIANTARG * pArgs = NULL;
      int n, nArgs, nArg;
-     BOOL bByRef;
+     //BOOL bByRef;
      PHB_ITEM *aPrgParams = NULL;
 
      nArgs = hb_pcount();
@@ -1258,7 +1258,7 @@ RETURN Self
      if( pDispParams->cArgs > 0 )
      {
         IDispatch *pDisp = NULL;
-        int n, nParam;
+        int n; //, nParam;
         char *sString;
         VARIANT *pVariant;
         PHB_ITEM pItem;
@@ -1279,7 +1279,7 @@ RETURN Self
               bByRef = FALSE;
            }
 
-           nParam = pDispParams->cArgs - n;
+           //nParam = pDispParams->cArgs - n;
 
            //TraceLog( NULL, "*** N: %i, Param: %i Type: %i\n", n, nParam, pVariant->n1.n2.vt);
 
