@@ -1,5 +1,5 @@
 /*
- * $Id: strfile.c,v 1.4 2006/09/30 21:45:40 ptsarenko Exp $
+ * $Id: strfile.c,v 1.5 2006/10/02 21:40:16 ptsarenko Exp $
  */
 
 /*
@@ -113,12 +113,12 @@ HB_FUNC (CSETSAFETY)
 
 }
 
-LONG ct_StrFile( BYTE *pFileName, BYTE *pcStr, LONG sLen, BOOL bOverwrite, LONG lOffset, BOOL bTrunc)
+LONG ct_StrFile( BYTE *pFileName, BYTE *pcStr, ULONG ulLen, BOOL bOverwrite, LONG lOffset, BOOL bTrunc)
 {
    FHANDLE hFile;
    BOOL bOpen = FALSE;
    BOOL bFile = hb_fsFile(pFileName);
-   LONG lWrite = 0;
+   ULONG ulWrite = 0;
 
    if( bFile && bOverwrite)
    {
@@ -145,15 +145,15 @@ LONG ct_StrFile( BYTE *pFileName, BYTE *pcStr, LONG sLen, BOOL bOverwrite, LONG 
          hb_fsSeek(hFile, 0, FS_END);
       }
 
-      lWrite = hb_fsWrite(hFile, pcStr, (USHORT) sLen);
-      if( (lWrite == sLen) && bOpen && bTrunc)
+      ulWrite = hb_fsWriteLarge(hFile, pcStr, ulLen);
+      if( (ulWrite == ulLen) && bOpen && bTrunc)
       {         
          hb_fsWrite(hFile, NULL, 0);
       }
 
       hb_fsClose( hFile );
    }
-   return( lWrite );
+   return( ulWrite );
 }
 
 HB_FUNC (STRFILE)
@@ -189,7 +189,7 @@ HB_FUNC (FILESTR)
 
          if( lLength > 0)
          {
-            lLength = hb_fsRead(hFile, (BYTE *) pcResult, (USHORT) lLength);
+            lLength = hb_fsReadLarge(hFile, (BYTE *) pcResult, (ULONG) lLength);
          }
 
          if( bCtrlZ )
@@ -229,7 +229,7 @@ HB_FUNC( SCREENFILE )
 
       hb_gtSave( 0, 0, hb_gtMaxRow(), hb_gtMaxCol(), pBuffer );
 
-      hb_retnl( ct_StrFile((BYTE *) hb_parc(1), (BYTE *) pBuffer, (LONG) uiSize, (ISLOG(2) ? hb_parl(2) : 0 ),
+      hb_retnl( ct_StrFile((BYTE *) hb_parc(1), (BYTE *) pBuffer, (ULONG) uiSize, (ISLOG(2) ? hb_parl(2) : 0 ),
          (ISNUM(3) ? hb_parnl(3) : 0), (ISLOG(4) ? hb_parl(4) : 0 ) ) );
       hb_xfree( pBuffer );
 
