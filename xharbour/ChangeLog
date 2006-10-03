@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5183 2006/10/02 21:22:24 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5184 2006/10/03 18:03:04 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-03 23:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * source/debug/dbgwa.prg
+    ! fixed stabilization in the dbinfo and structure window
+      when navigating through alias window.
 
 2006-10-02 21:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/strfile.c

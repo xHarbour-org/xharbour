@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.5 2003/10/09 23:16:55 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.7 2006/10/03 22:41:43 ptsarenko Exp $
  */
 
 /*
@@ -106,7 +106,8 @@ function __dbgShowWorkAreas( oDebugger )
    aBrw[1]:GoBottomBlock := { || n1 := Len( aAlias ) }
    aBrw[1]:SkipBlock     := { | nSkip, nPos | nPos := n1,;
                                  n1 := iif( nSkip > 0, Min( Len( aAlias ), n1 + nSkip ),;
-                                          Max( 1, n1 + nSkip ) ), n1 - nPos }
+                                          Max( 1, n1 + nSkip ) ),;
+                                 n1 - nPos }
 
    aBrw[1]:AddColumn( oCol := TBColumnNew( "", { || PadR( aAlias[n1][2], 11 ) } ) )
 
@@ -122,7 +123,7 @@ function __dbgShowWorkAreas( oDebugger )
 
    aBrw[2]:Cargo         := ( n2 := 1 )
    aBrw[2]:ColorSpec     := oDlg:cColor
-   aBrw[2]:GoTopBlock    := { || n2 := 1 }
+   aBrw[2]:GoTopBlock    := { || aBrw[2]:Cargo := n2 := 1 }
    aBrw[2]:GoBottomBlock := { || n2 := Len( aInfo ) }
    aBrw[2]:SkipBlock     := { | nSkip, nPos | nPos := n2,;
                                  n2 := iif( nSkip > 0, Min( Len( aInfo ), n2 + nSkip ),;
@@ -142,7 +143,7 @@ function __dbgShowWorkAreas( oDebugger )
 
    aBrw[3]:Cargo         := 1
    aBrw[3]:ColorSpec     := oDlg:cColor
-   aBrw[3]:GoTopBlock    := { || n3 := 1 }
+   aBrw[3]:GoTopBlock    := { || aBrw[3]:Cargo := n3 := 1 }
    aBrw[3]:GoBottomBlock := { || n3 := Len( aStruc ) }
    aBrw[3]:SkipBlock     := { | nSkip, nPos | nPos := n3,;
                                  n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
