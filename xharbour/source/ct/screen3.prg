@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.4 2006/10/01 11:24:47 enricomaria Exp $
+ * $Id: screen3.prg,v 1.5 2006/10/04 20:58:03 enricomaria Exp $
  */
 
 /*
@@ -355,11 +355,18 @@ HB_FUNC_STATIC( GETCSIZE )
    hb_retni( uiSize );
 }
 
+#pragma ENDDUMP
+
 #ifndef __PLATFORM__Windows
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbapigt.h"
+
 HB_FUNC_STATIC( SETATTRIBUTE )
 {
    hb_gt_SetAttribute( hb_parni(1), hb_parni(2), hb_parni(3), hb_parni(4), hb_parni(5) );
 }
-#endif
 
 #pragma ENDDUMP
+#endif
