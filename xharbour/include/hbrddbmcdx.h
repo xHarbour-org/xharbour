@@ -1,8 +1,13 @@
 /*
- * DBFCDX RDD (ver.2)
+ * $Id: hbrddbmcdx.h,v 1.01 2006/10/08 01:15:00 marchuet Exp $
+ */
+
+/*
+ * BMDBFCDX RDD (ver.2)
  *
  * Copyright 1999 Bruno Cantero <bruno@issnet.net>
  * Copyright 2003 Przemyslaw Czerpak <druzus@acn.waw.pl>
+ * Copyright 2006 Miguel Angel Marchuet <miguelangel@marchuet.net>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
