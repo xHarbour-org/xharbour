@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.57 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: makefile.wc,v 1.58 2006/06/26 14:26:25 fsgiudice Exp $
 #
 
 #
@@ -69,6 +69,7 @@ HSX_OBJ_DIR   = $(OBJ_DIR)\mt
 FPT_OBJ_DIR   = $(OBJ_DIR)\mt
 NTX_OBJ_DIR   = $(OBJ_DIR)\mt
 CDX_OBJ_DIR   = $(OBJ_DIR)\mt
+BMCDX_OBJ_DIR = $(OBJ_DIR)\mt
 TIP_OBJ_DIR   = $(OBJ_DIR)\mt
 CT_OBJ_DIR    = $(OBJ_DIR)\mt
 PP_OBJ_DIR    = $(OBJ_DIR)\mt
@@ -86,6 +87,7 @@ HSX_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
+BMCDX_OBJ_DIR = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
@@ -162,6 +164,7 @@ COMMON_LIB     = $(LIB_DIR)\common.lib
 CODEPAGE_LIB   = $(LIB_DIR)\codepage.lib
 CT_LIB         = $(LIB_DIR)\ct.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx.lib
+BMDBFCDX_LIB   = $(LIB_DIR)\bmdbfcdx.lib
 SIXCDX_LIB     = $(LIB_DIR)\sixcdx.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx.lib
@@ -187,6 +190,7 @@ RDD_STLIB        = $(RDD_LIB)
 DBFFPT_STLIB     = $(DBFFPT_LIB)
 DBFNTX_STLIB     = $(DBFNTX_LIB)
 DBFCDX_STLIB     = $(DBFCDX_LIB)
+BMDBFCDX_STLIB   = $(BMDBFCDX_LIB)
 SIXCDX_STLIB     = $(SIXCDX_LIB)
 HBSIX_STLIB      = $(HBSIX_LIB)
 HSX_STLIB        = $(HSX_LIB)
@@ -203,6 +207,7 @@ RDD_LIB        = $(LIB_DIR)\rddmt.lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffptmt.lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntxmt.lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdxmt.lib
+BMDBFCDX_LIB   = $(LIB_DIR)\bmdbfcdxmt.lib
 SIXCDX_LIB     = $(LIB_DIR)\sixcdxmt.lib
 HBSIX_LIB      = $(LIB_DIR)\hbsixmt.lib
 HSX_LIB        = $(LIB_DIR)\hsxmt.lib
@@ -620,6 +625,9 @@ DBFNTX_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj
+
+BMDBFCDX_LIB_OBJS = \
+   $(CDX_OBJ_DIR)\bmdbfcdx1.obj
 
 SIXCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\sixcdx1.obj
@@ -1115,6 +1123,7 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(HB_GT_LIBS) \
    $(CODEPAGE_LIB) \
@@ -1140,6 +1149,9 @@ $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+    LIB386 /nologo /out:$@ $**
+
+$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
@@ -2704,6 +2716,13 @@ $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
    $(CC_CMD)
 
 #
+# BMDBFCDX.LIB dependencies
+#
+
+$(BMCDX_OBJ_DIR)\bmdbfcdx1.obj : $(RDD_DIR)\bmdbfcdx\bmdbfcdx1.c
+   $(CC_CMD)
+
+#
 # SIXCDX.LIB dependencies
 #
 
@@ -3553,6 +3572,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(DBFFPT_LIB) >> make.tmp
    $(ECHO) $(DBFNTX_LIB) >> make.tmp
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
+   $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
@@ -3599,6 +3619,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(BMDBFCDX_STLIB) >> make.tmp
    $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HBTEST_EXE) /subsystem:console
@@ -3710,6 +3731,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(BMDBFCDX_STLIB) >> make.tmp
    $(ECHO) $(SIXCDX_STLIB) >> make.tmp
 !ifdef HB_DOC_PDF
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
@@ -3867,6 +3889,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(BMDBFCDX_STLIB) >> make.tmp
    $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    $(ECHO) uuid.lib >> make.tmp
    LINK386 @make.tmp /nologo /out:$(HBMAKE_EXE) /subsystem:console
@@ -3941,6 +3964,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(DBFFPT_STLIB) >> make.tmp
    $(ECHO) $(DBFNTX_STLIB) >> make.tmp
    $(ECHO) $(DBFCDX_STLIB) >> make.tmp
+   $(ECHO) $(BMDBFCDX_STLIB) >> make.tmp
    $(ECHO) $(SIXCDX_STLIB) >> make.tmp
    LINK386 @make.tmp /nologo /out:$(XBSCRIPT_EXE) /subsystem:console
    $(DEL) make.tmp

@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.24 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: makefile.gc,v 1.25 2006/06/26 14:26:25 fsgiudice Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -72,6 +72,7 @@ ifeq ($(THREAD_MODE),mt)
    FPT_OBJ_DIR   = $(OBJ_DIR)/mt
    NTX_OBJ_DIR   = $(OBJ_DIR)/mt
    CDX_OBJ_DIR   = $(OBJ_DIR)/mt
+   BMCDX_OBJ_DIR = $(OBJ_DIR)/mt
    CT_OBJ_DIR    = $(OBJ_DIR)/mt/ct
    TIP_OBJ_DIR   = $(OBJ_DIR)/mt
    PP_OBJ_DIR    = $(OBJ_DIR)/mt
@@ -96,6 +97,7 @@ else
    FPT_OBJ_DIR   = $(OBJ_DIR)
    NTX_OBJ_DIR   = $(OBJ_DIR)
    CDX_OBJ_DIR   = $(OBJ_DIR)
+   BMCDX_OBJ_DIR = $(OBJ_DIR)
    CT_OBJ_DIR    = $(OBJ_DIR)/ct
    TIP_OBJ_DIR   = $(OBJ_DIR)
    PP_OBJ_DIR    = $(OBJ_DIR)
@@ -114,6 +116,7 @@ ODBC_LIB     = $(LIB_DIR)/libhbodbc$(THREAD_MODE).a
 PP_LIB       = $(LIB_DIR)/libpp$(THREAD_MODE).a
 MACRO_LIB    = $(LIB_DIR)/libmacro$(THREAD_MODE).a
 DBFCDX_LIB   = $(LIB_DIR)/libdbfcdx$(THREAD_MODE).a
+BMDBFCDX_LIB = $(LIB_DIR)/libbmdbfcdx$(THREAD_MODE).a
 SIXCDX_LIB   = $(LIB_DIR)/libsixcdx$(THREAD_MODE).a
 DBFFPT_LIB   = $(LIB_DIR)/libdbffpt$(THREAD_MODE).a
 DBFNTX_LIB   = $(LIB_DIR)/libdbfntx$(THREAD_MODE).a
@@ -151,6 +154,7 @@ LIB_TO_LINK = \
    $(LANG_LIB) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
@@ -173,6 +177,7 @@ MINGW_LIBRARY = \
    -lgtwin \
    -lmacro$(THREAD_MODE) \
    -ldbfcdx$(THREAD_MODE) \
+   -lbmdbfcdx$(THREAD_MODE) \
    -lsixcdx$(THREAD_MODE) \
    -ldbfntx$(THREAD_MODE) \
    -ldbffpt$(THREAD_MODE) \
@@ -198,6 +203,7 @@ CC_CMD_DLL  = $(CC) $(CFLAGS) -DHB_EXEMEM_USED -mdll -o $@ $^
 PROJECT += \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
@@ -2479,6 +2485,17 @@ $(DBFCDX_LIB) : \
 	$(AR_CMD)
 
 $(CDX_OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
+	$(CC_CMD)
+
+#-------------------------------------------------------------------------------
+# libbmdbfcdx.a
+#-------------------------------------------------------------------------------
+
+$(BMDBFCDX_LIB) : \
+   $(CDX_OBJ_DIR)/bmdbfcdx1.o
+	$(AR_CMD)
+
+$(BMCDX_OBJ_DIR)/bmdbfcdx1.o : $(RDD_DIR)/bmdbfcdx/bmdbfcdx1.c
 	$(CC_CMD)
 
 #-------------------------------------------------------------------------------

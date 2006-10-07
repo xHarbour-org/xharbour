@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.21 2006/06/13 10:31:57 fsgiudice Exp $
+# $Id: makefile.dc,v 1.22 2006/06/26 14:26:25 fsgiudice Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -79,6 +79,7 @@ XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
 PP_LIB       = $(LIB_DIR)\pp$(THREAD_MODE).lib
 MACRO_LIB    = $(LIB_DIR)\macro$(THREAD_MODE).lib
 DBFCDX_LIB   = $(LIB_DIR)\dbfcdx$(THREAD_MODE).lib
+BMDBFCDX_LIB = $(LIB_DIR)\bmdbfcdx$(THREAD_MODE).lib
 SIXCDX_LIB   = $(LIB_DIR)\sixcdx$(THREAD_MODE).lib
 DBFFPT_LIB   = $(LIB_DIR)\dbffpt$(THREAD_MODE).lib
 DBFNTX_LIB   = $(LIB_DIR)\dbfntx$(THREAD_MODE).lib
@@ -128,6 +129,7 @@ HARBOUR_LIBRARY = \
    $(PP_LIB) + \
    $(GTWIN_LIB) + \
    $(DBFCDX_LIB) + \
+   $(BMDBFCDX_LIB) + \
    $(SIXCDX_LIB) + \
    $(DBFFPT_LIB) + \
    $(DBFNTX_LIB) + \
@@ -141,6 +143,7 @@ HBTEST_LIBRARY = \
    $(LIB_DIR)\pp.lib \
    $(LIB_DIR)\macro.lib \
    $(LIB_DIR)\dbfcdx.lib \
+   $(LIB_DIR)\bmdbfcdx.lib \
    $(LIB_DIR)\sixcdx.lib \
    $(LIB_DIR)\dbffpt.lib \
    $(LIB_DIR)\dbfntx.lib \
@@ -169,6 +172,7 @@ PROJECT = \
    $(HARBOUR_EXE) \
    $(MACRO_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
@@ -436,6 +440,7 @@ HBTEST_EXE_OBJS = \
    \
    $(GTWIN_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFNTX_LIB) \
    $(DBFFPT_LIB) \
@@ -672,6 +677,9 @@ NULSYS_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj
+
+BMDBFCDX_LIB_OBJS = \
+   $(BMCDX_OBJ_DIR)\bmdbfcdx1.obj
 
 SIXCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\sixcdx1.obj
@@ -1464,6 +1472,9 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
    $(DMCLIB_CMD)
 
+$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
+   $(DMCLIB_CMD)
+
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
    $(DMCLIB_CMD)
 
@@ -1832,6 +1843,14 @@ $(DESIGN_OBJ_DIR)\twindow.obj : $(DESIGN_OBJ_DIR)\twindow.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ BMDBFCDX.LIB Dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(BMCDX_OBJ_DIR)\bmdbfcdx1.obj : $(RDD_DIR)\bmdbfcdx\bmdbfcdx1.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿

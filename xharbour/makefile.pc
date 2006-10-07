@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.30 2006/07/18 15:55:50 modalsist Exp $
+# $Id: makefile.pc,v 1.31 2006/08/19 21:22:10 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -77,6 +77,7 @@ RDD_OBJ_DIR   = $(OBJ_DIR)\mt
 FPT_OBJ_DIR   = $(OBJ_DIR)\mt
 NTX_OBJ_DIR   = $(OBJ_DIR)\mt
 CDX_OBJ_DIR   = $(OBJ_DIR)\mt
+BMCDX_OBJ_DIR = $(OBJ_DIR)\mt
 HBSIX_OBJ_DIR = $(OBJ_DIR)\mt
 HSX_OBJ_DIR   = $(OBJ_DIR)\mt
 CT_OBJ_DIR    = $(OBJ_DIR)\mt\ct
@@ -94,6 +95,7 @@ RDD_OBJ_DIR   = $(OBJ_DIR)
 FPT_OBJ_DIR   = $(OBJ_DIR)
 NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
+BMCDX_OBJ_DIR = $(OBJ_DIR)
 HBSIX_OBJ_DIR = $(OBJ_DIR)
 HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)\ct
@@ -126,6 +128,7 @@ XBSCRIPT_EXE = $(BIN_DIR)\xbscript.exe
 PP_LIB       = $(LIB_DIR)\pp$(HB_MT).lib
 MACRO_LIB    = $(LIB_DIR)\macro$(HB_MT).lib
 DBFCDX_LIB   = $(LIB_DIR)\dbfcdx$(HB_MT).lib
+NMDBFCDX_LIB = $(LIB_DIR)\bmdbfcdx$(HB_MT).lib
 SIXCDX_LIB   = $(LIB_DIR)\sixcdx$(HB_MT).lib
 DBFFPT_LIB   = $(LIB_DIR)\dbffpt$(HB_MT).lib
 DBFNTX_LIB   = $(LIB_DIR)\dbfntx$(HB_MT).lib
@@ -183,6 +186,7 @@ HARBOUR_LIBRARY = \
    $(PP_LIB) \
    $(GTWIN_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
@@ -233,6 +237,7 @@ PROJECT = \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
@@ -531,6 +536,10 @@ NULSYS_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\dbfcdx1.obj
+
+
+BMDBFCDX_LIB_OBJS = \
+   $(BMCDX_OBJ_DIR)\bmdbfcdx1.obj
 
 
 SIXCDX_LIB_OBJS = \
@@ -1198,6 +1207,9 @@ $(CT_LIB) : $(CT_LIB_OBJS)
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
    $(LIB_CMD)
 
+$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
+   $(LIB_CMD)
+
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
    $(LIB_CMD)
 
@@ -1452,6 +1464,14 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(CDX_OBJ_DIR)\dbfcdx1.obj : $(RDD_SRC_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+# ³ BMDBFCDX.LIB Dependencies ³Û
+# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
+#  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(BMCDX_OBJ_DIR)\bmdbfcdx1.obj : $(RDD_SRC_DIR)\bmdbfcdx\bmdbfcdx1.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿

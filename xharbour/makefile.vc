@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.175 2006/07/17 21:26:34 fsgiudice Exp $
+# $Id: makefile.vc,v 1.178 2006/07/27 16:47:37 map Exp $
 #
 
 #
@@ -194,8 +194,10 @@ CTMT_LIB         =$(LIB_DIR)\ct$(MT).lib
 CGI_LIB          =$(LIB_DIR)\cgi.lib
 CGIMT_LIB        =$(LIB_DIR)\cgi$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
+BMDBFCDX_LIB     =$(LIB_DIR)\bmdbfcdx.lib
 SIXCDX_LIB       =$(LIB_DIR)\sixcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
+BMDBFCDXMT_LIB   =$(LIB_DIR)\bmdbfcdx$(MT).lib
 SIXCDXMT_LIB     =$(LIB_DIR)\sixcdx$(MT).lib
 DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
@@ -314,6 +316,7 @@ LIBS = \
    $(PP_LIB) \
    $(RDD_LIB) \
    $(DBFCDX_LIB) \
+   $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
@@ -334,6 +337,7 @@ LIBSMT = \
    $(PPMT_LIB) \
    $(RDDMT_LIB) \
    $(DBFCDXMT_LIB) \
+   $(BMDBFCDXMT_LIB) \
    $(SIXCDXMT_LIB) \
    $(DBFFPTMT_LIB) \
    $(DBFNTXMT_LIB) \
@@ -845,6 +849,16 @@ DBFNTX_LIB_OBJS = \
 
 DBFCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbfcdx1.obj
+
+#
+# BMDBFCDX.LIB rules
+#
+
+{$(RDD_DIR)\bmdbfcdx}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+BMDBFCDX_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\bmdbfcdx1.obj
 
 #
 # SIXCDX.LIB rules
@@ -1674,6 +1688,9 @@ $(RDDMT_LIB) : $(RDD_LIB_OBJS)
 $(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
+$(BMDBFCDXMT_LIB) : $(BMDBFCDX_LIB_OBJS)
+   lib /out:$@ $**
+
 $(SIXCDXMT_LIB) : $(SIXCDX_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1743,6 +1760,9 @@ $(RDD_LIB) : $(RDD_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
