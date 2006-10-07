@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5185 2006/10/04 20:58:03 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5186 2006/10/04 21:12:56 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-08 01:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  + source\rdd\bmdbfcdx\bmdbfcdx1.c
+  + source\rdd\bmdbfcdx\makefile
+  + source\include\hbbmdbfcdx.h
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * config\dir.cf
+   + First release of new rdd BMDBFCDX.
+     The intention of this new RDD is to implement command post native behavior of clipper respect to the optimization of filters. 
+     System of Static Bitmap Filters is implemented until the moment.
+     It is to implement a system of indexing in memory of filters and an optimization of the expressions of filters taking
+     advantage of multiscopes on index to partially solve the expressions of the filter.
+     Already implemented MULTIFILTER  Slope to implement MULTISCOPE
+
+     Especific RDD functions:
+      BM_DbSeekWild( cToSeekWithWildCard ) 
+      BM_DbSetFilterArray( aRegisters )
+      BM_Turbo( lOnOff )  (delicated function only recomended to create filters or local temporary index)
+      aRegisters := BM_DbGetFilterArray()
+      BM_DbSetFilterArrayAdd( aRegistersToAddToFilter )
+      BM_DbSetFilterArrayDel ( aRegistersToDelFromFilter )
 
 2006-10-04 23:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source\ct\screen3.prg
