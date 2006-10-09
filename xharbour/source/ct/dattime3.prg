@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.4 2006/04/11 22:12:16 ptsarenko Exp $
+ * $Id: dattime3.prg,v 1.4 2006/04/11 19:43:23 ptsarenko Exp $
  */
 
 /*
@@ -12,8 +12,8 @@
  * Author of ShowTime supplementary functions.
  *
  * Copyright 2005 Eduardo Fernandes <modalsist@yahoo.com.br>
- * Author of SetDate, SetTime, TimeValid and WaitPeriod.
- * Author, in conjointly with Carlos Eduardo Brock, of ShowTime.
+ * Author of SetDate, SetTime and TimeValid.
+ * Author, in conjoint with Carlos Eduardo Brock, of ShowTime.
  *
  * http://www.xhabour.org
  *
@@ -66,56 +66,49 @@
 
 #include "common.ch"
 
-STATIC aH_Timers := {}
-STATIC nHandle
-STATIC lHandle
+/* Showtime static vars */
+STATIC s_aSHT_Timer := {}   // array of timers created for each ShowTime call.
+STATIC s_nSHT_Handle        // handle returned by HB_IdleAdd() function.
+STATIC s_nSHT_Id    := 0    // Id for each showtime call, if any.
 
 *--------------------------------------------------------------------------
 FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 *--------------------------------------------------------------------------
-   Local nColMax, nWindow
+Local nColMax, nWindow
+Local cId
 
-   IF valtype(nRow)=="U" .and.;
-      valtype(nCol)=="U" .and.;
-      valtype(lHideSeconds)=="U" .and.;
-      valtype(cColor)=="U" .and.;
-      valtype(lTwelve)=="U" .and.;
-      valtype(lAmPm)=="U"
-
-      if nHandle != NIL
-         hb_ShowTimeOff()
-      endif
-      
-   ELSE
-
-      nWindow := SetMainWindow()
-
-      default nRow         TO Row()
-      default nCol         TO Col()    
-      default lHideSeconds TO .F.
-      default cColor       TO setcolor()
-      default lTwelve      TO .F.
-      default lAmPm        TO .F.
- 
-
-      IF nRow < 0
-         nRow := 0
-      ENDIF
-
-      IF nCol < 0
-         nCol := 0
-      ENDIF
-
-      nColMax := maxcol() - iif(lHideSeconds,4,7) - iif(lAmPm,1,0)
-
-      nCol := Min( ncol, nColMax )
-      nRow := Min( nRow, maxrow() )
-
-      RestoreWindow( nWindow )
-      
-      hb_ShowTimeEvent( "ShowTime", .T., { || hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm ) }, 100 )
-
+   IF PCount()==0 .AND. s_nSHT_Handle != NIL
+      hb_ShowTimeOff()
+      RETURN ""
    ENDIF
+
+   s_nSHT_Id ++
+   cId := "ShowTime_"+Ltrim(Str(s_nSHT_Id))
+
+   if s_nSHT_Id > 1 .AND. s_nSHT_Handle != NIL
+      hb_ShowTimeOff()
+   endif
+
+   nWindow := SetMainWindow()
+
+   DEFAULT nRow         TO Row()
+   DEFAULT nCol         TO Col()    
+   DEFAULT lHideSeconds TO .F.
+   DEFAULT cColor       TO setcolor()
+   DEFAULT lTwelve      TO .F.
+   DEFAULT lAmPm        TO .F.
+ 
+   nRow := Max(0,nRow)
+   nCol := Max(0,nCol)
+
+   nColMax := maxcol() - iif(lHideSeconds,4,7) - iif(lAmPm,1,0)
+
+   nCol := Min( nCol, nColMax )
+   nRow := Min( nRow, MaxRow() )
+
+   RestoreWindow( nWindow )
+
+   hb_ShowTimeEvent( cId, .T., { || hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm ) }, 100 )
 
 RETURN ""
 
@@ -123,9 +116,105 @@ RETURN ""
 STATIC FUNCTION hb_ShowTimeOff()
 *-------------------------------
 
-   hb_ShowTimeEvent( "*", .F. )
+   hb_ShowTimeEvent( "*" )
 
 RETURN NIL
+
+*----------------------------------------------------------------
+STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
+*----------------------------------------------------------------
+Local nHPos, cIdDel, nHDel
+
+   IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
+      RETURN NIL
+   ENDIF
+
+   IF valtype(cIdName)=="U"
+      cIdName := "*"
+   ENDIF
+
+   IF valtype(lActiv)=="U"
+      lActiv := .T.
+   ENDIF
+
+
+   IF cIDName == "*"
+
+      HB_IdleDel( s_nSHT_Handle )
+      s_nSHT_Handle := NIL
+
+      IF !Empty( s_aSHT_Timer )
+
+         IF s_nSHT_Id > 1
+            ADel( s_aSHT_Timer, s_nSHT_Id - 1, .T.)
+         ELSEIF s_nSHT_Id == 1
+            ADel( s_aSHT_Timer, 1, .T.)
+         ENDIF
+
+      ENDIF
+
+      RETURN NIL
+
+   ELSE
+
+      nHPos  := ASCan( s_aSHT_Timer, {|nI| nI[ 1 ] == cIDName } )
+
+      IF nHPos == 0
+         AAdd( s_aSHT_Timer, { cIDName, .T., bCode, nTime, lActiv, hb_ShowTimeProxExc(1)} )
+      ELSE
+         s_aSHT_Timer[ nHPos ][ 5 ] := lActiv
+      ENDIF
+
+      IF s_nSHT_Handle == NIL
+         s_nSHT_Handle := HB_IdleAdd( {|| hb_ShowTime_Eval_Event() } )
+      ENDIF
+
+   ENDIF
+
+RETURN NIL
+
+*---------------------------------------
+STATIC FUNCTION hb_ShowTime_Eval_Event()
+*---------------------------------------
+Local aTimer, nC := Col(), nR := Row()
+
+   For Each aTimer IN s_aSHT_Timer 
+
+       aTimer[ 2 ] := .F.   // will not re-excuted during the execution.
+
+       IF aTimer[ 5 ] .AND. aTimer[ 6 ] <= hb_ShowTimeProxExc()
+          Eval( aTimer[ 3 ] )
+          aTimer[ 6 ] := hb_ShowtimeProxExc( aTimer[ 4 ] )
+       ENDIF
+
+       aTimer[ 2 ] := .T.
+
+   Next
+
+   DevPos( nR, nC )
+
+RETURN NIL
+
+*------------------------------------------
+STATIC FUNCTION hb_ShowTimeProxExc( nTime )
+*------------------------------------------
+Local cNext, nSec, cDays, dData := Date()
+
+   IF valtype(nTime)=="U"
+      nTime := 0
+   ENDIF
+
+   nSec := Seconds() + ( nTime / 100 )
+
+   IF nSec > 86399    // seconds of one day
+      nSec := 86399 - nSec
+      dData ++
+   ENDIF
+
+   cDays := LTrim( Str( Int( dData - CToD("01/01/2000") ) ) )
+   cNext := cDays + "," + LTrim( Str( Int( nSec ) ) )
+
+RETURN cNext
 
 *---------------------------------------------------------------------------------------
 STATIC FUNCTION hb_ShowTimeClock( nRow, nCol , cColor , lHideSeconds , lTwelve , lAmPm )
@@ -162,105 +251,6 @@ Local nWindow
    ENDIF
 
 RETURN NIL
-
-*----------------------------------------------------------------
-STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
-*----------------------------------------------------------------
-Local nHPos
-
-   IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
-      RETURN lHandle
-   ENDIF
-
-   IF valtype(cIdName)=="U"
-      cIdName := "*"
-   ENDIF
-
-   IF valtype(lActiv)=="U"
-      lActiv := .T.
-   ENDIF
-
-
-   IF cIDName <> "*"
-      nHPos  := ASCan( aH_Timers, {|nI| nI[ 1 ] == cIDName } )
-   ELSE
-
-      nHPos := 0
-
-      IF !lActiv
-         HB_IdleDel( nHandle )
-         lHandle := .F.
-         nHandle := NIL
-      ELSE
-         nHandle := HB_IdleAdd( {|| hb_ShowTime_Eval_Event( ) } )
-         lHandle := .T.
-      ENDIF
-
-      RETURN lHandle
-   ENDIF
-
-   IF ( nHPos == 0 .AND. ValType( lActiv ) == "L" )
-      AAdd( aH_Timers, { cIDName, .T., bCode, nTime, lActiv, hb_ShowTimeProxExc(1)} )
-   ELSE
-
-      IF lActiv == .F.
-         aH_Timers[ nHPos ][ 5 ] := .F.
-       ELSE
-         aH_Timers[ nHPos ][ 5 ] := .T.
-      ENDIF
-
-   ENDIF
-
-   IF nHandle == NIL
-      nHandle := HB_IdleAdd( {|| hb_ShowTime_Eval_Event( ) } )
-      lHandle := .T.
-   ENDIF
-
-RETURN lHandle
-
-*---------------------------------------
-STATIC FUNCTION hb_ShowTime_Eval_Event()
-*---------------------------------------
-Local nI, nC := Col(), nR := Row()
-STATIC nCont := 0
-
-   nCont ++
-   For nI := 1 To Len( aH_Timers )
-      aH_Timers[ nI ][ 2 ] := .F.   // will not re-excuted during the execution.
-
-      IF aH_Timers[ nI ][ 5 ] .AND. aH_Timers[ nI ][ 6 ] <= hb_ShowTimeProxExc() .AND. aH_Timers[ nI ][ 5 ]
-         Eval( aH_Timers[ nI ][ 3 ] )
-         aH_Timers[ nI ][ 6 ] := hb_ShowtimeProxExc( aH_Timers[ nI ][ 4 ] )
-      ENDIF
-
-      aH_Timers[ nI ][ 2 ] := .T.
-   Next
-
-   DevPos( nR, nC )
-
-RETURN NIL
-
-*------------------------------------------
-STATIC FUNCTION hb_ShowTimeProxExc( nTime )
-*------------------------------------------
-Local cNext, nSec, cDays, dData := Date()
-
-   IF valtype(nTime)=="U"
-      nTime := 0
-   ENDIF
-
-   nSec := Seconds() + ( nTime / 100 )
-
-   IF nSec > 86399    // seconds of one day
-      nSec := 86399 - nSec
-      dData ++
-   ENDIF
-
-   cDays := LTrim( Str( Int( dData - CToD("01/01/2000") ) ) )
-   cNext := cDays + "," + LTrim( Str( Int( nSec ) ) )
-
-RETURN cNext
-
 
 *--------------------------------
 FUNCTION SetDate( dDate , lMode )
