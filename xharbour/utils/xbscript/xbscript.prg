@@ -11768,8 +11768,8 @@ STATIC FUNCTION InitDotRules()
    aAdd( aTransRules, { '_GET_' , { {    1,   0, '(', '<', NIL }, {    2,   0, ',', '<', NIL }, {    0,   0, ',', NIL, NIL }, {    3,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    4,   1, NIL, '<', { ',' } }, {    0,   0, ',', NIL, NIL }, {    5,   1, NIL, '<', { ')' } }, {    0,   0, ')', NIL, NIL } } , .F. } )
 
    #ifndef __HARBOUR__
-      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'DISPLAY', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
-      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GETLIST', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { '__GET' , { {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ':', NIL, NIL }, {    0,   0, 'Display', NIL, NIL }, {    0,   0, '(', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
+      aAdd( aTransRules, { 'AADD' , { {    0,   0, '(', NIL, NIL }, {    0,   0, 'GetList', NIL, NIL }, {    0,   0, ',', NIL, NIL }, {    0,   0, '__GET', NIL, NIL }, {    1,   0, '(', 'A', NIL }, {    0,   0, ')', NIL, NIL }, {    0,   0, ')', NIL, NIL } } , .F. } )
    #endif
 
    /* Commands */
@@ -11780,13 +11780,13 @@ STATIC FUNCTION InitDotRules()
    aAdd( aCommRules, { 'IF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'ELSEIF' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'ELSE' ,  , .F. } )
-   aAdd( aCommRules, { 'ENDIF' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'END' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDIF' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
+   aAdd( aCommRules, { 'END' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
    aAdd( aCommRules, { 'DO' , { {    0,   0, 'CASE', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'CASE' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { 'OTHERWISE' ,  , .F. } )
-   aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, '*', NIL } } , .F. } )
-   aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'PRG', NIL, NIL } } , .F. } )
+   aAdd( aCommRules, { 'ENDCASE' , { { 1001,   1, NIL, 'A', NIL } } , .F. } )
+   aAdd( aCommRules, { 'DO' , { {    1,   0, NIL, '<', NIL }, {    0,   0, '.', NIL, NIL }, {    0,   0, 'prg', NIL, NIL } } , .F. } )
    aAdd( aCommRules, { 'CD' , { {    1,   0, NIL, '(', NIL } } , .F. } )
 
 RETURN .T.
@@ -11800,24 +11800,24 @@ STATIC FUNCTION InitDotResults()
    aAdd( aTransResults, { { {   0, '__GET( MEMVARBLOCK(' }, {   0,   2 }, {   0, '), ' }, {   0,   2 }, {   0, ', ' }, {   0,   3 }, {   0, ', ' }, {   0,   4 }, {   0, ', ' }, {   0,   5 }, {   0, ' )' } }, { -1,  1, -1,  1, -1,  1, -1,  1, -1,  1, -1} , { NIL, NIL, NIL, NIL, NIL }  } )
 
    #ifndef __HARBOUR__
-      aAdd( aTransResults, { { {   0, '__GET(' }, {   0,   1 }, {   0, ')' } }, { -1,  1, -1} , { NIL }  } )
+      aAdd( aTransResults, { { {   0, '__GET( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
       aAdd( aTransResults, { { {   0, '__oGet := __GET(' }, {   0,   1 }, {   0, ') ; aAdd( GetList, __oGet ) ; __oGet:Display()' } }, { -1,  1, -1} , { NIL }  } )
    #endif
 
    /* Commands Results*/
-   aAdd( aCommResults, { { {   0, 'Scroll( 2, 0, MaxRow() - 1, MaxCol() ) ; SetPos( 2, 0 )' } }, { -1} ,  } )
+   aAdd( aCommResults, { { {   0, 'Scroll( 2, 0, MaxRow() - 1, MaxCol() )                          ; SetPos( 2, 0 )' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, 'Browse( 1, 0, MaxRow() - 1, MaxCol() )' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, '__QUIT()' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, '__QUIT()' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, '__SetIf( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, '__SetElseIf( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, '__SetElse()' } }, { -1} ,  } )
-   aAdd( aCommResults, { { {   0, '__SetEnd()' } }, { -1} , { NIL }  } )
-   aAdd( aCommResults, { { {   0, '__SetEnd()' } }, { -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetEnd() ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetEnd() ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, '__SetDoCase()' } }, { -1} ,  } )
    aAdd( aCommResults, { { {   0, '__SetCase( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  1, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, '__SetOtherwise()' } }, { -1} ,  } )
-   aAdd( aCommResults, { { {   0, '__SetEndCase()' } }, { -1} , { NIL }  } )
+   aAdd( aCommResults, { { {   0, '__SetEndCase() ' }, {   1, ' ' }, {   1,   1 } }, { -1, -1,  0} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'PP_Run( ' }, {   0,   1 }, {   0, ' + ".prg" )' } }, { -1,  2, -1} , { NIL }  } )
    aAdd( aCommResults, { { {   0, 'DirChange( ' }, {   0,   1 }, {   0, ' )' } }, { -1,  4, -1} , { NIL }  } )
 
