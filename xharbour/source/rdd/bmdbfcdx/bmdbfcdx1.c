@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.1 2006/10/07 22:55:03 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.2 2006/10/09 11:32:09 marchuet Exp $
  */
 
 /*
@@ -603,7 +603,7 @@ static int hb_cdxValCompare( LPCDXTAG pTag, BYTE * val1, BYTE len1,
  */
 static int hb_cdxValCompareWild( BYTE * val1, BYTE * val2, BOOL fExact )
 {
-   return ( ( fExact ) ? hb_strMatchWildExact( val2, val1 ) : hb_strMatchWild( val2, val1 ) ) ? 0: 1;
+   return ( ( fExact ) ? hb_strMatchWildExact( (const char *) val2, (const char *) val1 ) : hb_strMatchWild( (const char *) val2, (const char *) val1 ) ) ? 0: 1;
 }
 
 
@@ -6776,7 +6776,7 @@ HB_FUNC( BM_DBSETFILTERARRAY )
             memset( pArea->dbfi.lpvCargo, 0, sizeof( BM_FILTER ) );
 
             ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size = ulRecCount;
-            ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = hb_xgrab( sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1) );
+            ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = (ULONG *) hb_xgrab( sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1) );
             for ( ulPos = 1; ulPos <= ulRecCount; ulPos++ )
                 BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ulRecCount, ulPos );
             for ( ulPos = 1; ulPos <= hb_arrayLen( pArray ); ulPos++ )
@@ -8790,7 +8790,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
     {
         ulRecCount = hb_cdxDBOIKeyCount( pArea, pTag, FALSE );
         ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size = ulRecCount;
-        ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = hb_xgrab( sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1) );
+        ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = (ULONG *) hb_xgrab( sizeof(ULONG) * (((ulRecCount+1) >> 5) + 1) );
 
         hb_cdxIndexLockRead( pTag->pIndex );
         hb_cdxTagRefreshScope( pTag );
@@ -8816,7 +8816,7 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
     {
         SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
         ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size = ulRecCount;
-        ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = hb_xgrab( sizeof( ULONG ) * (((ulRecCount+1) >> 5) + 1) );
+        ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = (ULONG *) hb_xgrab( sizeof( ULONG ) * (((ulRecCount+1) >> 5) + 1) );
 
         SELF_GOTOP( ( AREAP ) pArea );
         while ( ! pArea->fEof )
