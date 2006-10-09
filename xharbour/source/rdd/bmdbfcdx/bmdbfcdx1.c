@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.0 2006/10/08 19:34:54 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.1 2006/10/07 22:55:03 marchuet Exp $
  */
 
 /*
@@ -3942,13 +3942,12 @@ static BOOL hb_cdxCheckRecordFilter( CDXAREAP pArea, ULONG ulRecNo )
 
    if ( pArea->dbfi.fFilter )
    {
-#ifndef _DSG_
       if( pArea->ulRecNo != ulRecNo || pArea->lpdbPendingRel )
          SELF_GOTO( ( AREAP ) pArea, ulRecNo );
 
       if( hb_set.HB_SET_DELETED )
          SUPER_DELETED( ( AREAP ) pArea, &lResult );
-#endif
+
       if( !lResult )
          lResult = !BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecNo );
    }
