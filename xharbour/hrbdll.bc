@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.123 2006/08/24 16:47:37 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.123 2006/08/24 12:47:36 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -439,6 +439,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\expropt2.obj \
   $(OBJ_DIR)\reserved.obj \
   $(OBJ_DIR)\dbfcdx1.obj \
+  $(OBJ_DIR)\bmdbfcdx1.obj \
   $(OBJ_DIR)\sixcdx1.obj \
   $(OBJ_DIR)\dbffpt1.obj \
   $(OBJ_DIR)\dbfntx1.obj \
@@ -1146,6 +1147,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\expropt2.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\reserved.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfcdx1.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\bmdbfcdx1.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\sixcdx1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbffpt1.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbfntx1.obj           + >> hdll.tmp
@@ -2605,6 +2607,9 @@ $(OBJ_DIR)\dbsdf.obj : $(OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbfcdx1.obj : $(RDD_DIR)\dbfcdx\dbfcdx1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\bmdbfcdx1.obj : $(RDD_DIR)\bmdbfcdx\bmdbfcdx1.c
    $(CC_CMD)
 
 $(OBJ_DIR)\sixcdx1.obj : $(RDD_DIR)\dbfcdx\sixcdx1.c

@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.20 2006/03/17 01:18:46 fsgiudice Exp $
+# $Id: hrbdll.gc,v 1.21 2006/06/26 14:26:24 fsgiudice Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -436,6 +436,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/rddsys.o \
    \
    $(OBJ_DIR)/dbfcdx1.o \
+   $(OBJ_DIR)/bmdbfcdx1.o \
    $(OBJ_DIR)/sixcdx1.o \
    $(OBJ_DIR)/dbffpt1.o \
    \
@@ -1986,6 +1987,11 @@ $(OBJ_DIR)/rddsys.o : $(OBJ_DIR)/rddsys.c
 # DBFCDX
 
 $(OBJ_DIR)/dbfcdx1.o : $(RDD_DIR)/dbfcdx/dbfcdx1.c
+	$(CC_CMD)
+
+# BMDBFCDX
+
+$(OBJ_DIR)/bmdbfcdx1.o : $(RDD_DIR)/bmdbfcdx/bmdbfcdx1.c
 	$(CC_CMD)
 
 # SIXCDX
