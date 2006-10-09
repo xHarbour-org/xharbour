@@ -1,5 +1,5 @@
 /*
- * $Id: cphr1250.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cphr1250.c,v 1.5 2006/04/06 19:22:02 paultucker Exp $
  */
 
 /*
@@ -10,6 +10,7 @@
  * www - http://www.harbour-project.org
  * 2003 Mitja Podgornik <Mitja.Podgornik@zgs.gov.si>
  * 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
+ * 2006 Alen Uzelac <alen@bbm.hr> Croatian codepage corrected
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,8 +88,8 @@
 
 static HB_CODEPAGE s_codepage = { "HR1250",
     CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
-    "ABCCCDÐEFGHIJKLMNOPQRSŠTUVWZŽXY",
-    "abcccddefghijklmnopqrsštuvwzžxy",
+    "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWXYZŽ",
+    "abcèædðefghijklmnopqrsštuvwxyzž",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( HR1250 );

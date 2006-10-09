@@ -1,5 +1,5 @@
 /*
- * $Id: cphr437.c,v 1.4 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cphr437.c,v 1.6 2006/04/06 19:22:02 paultucker Exp $
  */
 
 /*
@@ -8,6 +8,7 @@
  *
  * Copyright 2003 Vlado Miholic <Vladimir.Miholic@sk.hinet.hr>
  * www - http://www.harbour-project.org
+ * 2006 Alen Uzelac <alen@bbm.hr> Croatian codepage corrected
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,8 +86,8 @@
 
 static HB_CODEPAGE s_codepage = { "HR437",
     CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
-    "ABC]^D\\EFGHIJKLMNOPQRS[TUVWZ@XY",
-    "abc}~d|efghijklmnopqrs{tuvwz`xy",
+    "ABC^]D\\EFGHIJKLMNOPQRS[TUVWXYZ@",
+    "abc~}d|efghijklmnopqrs{tuvwxyz`",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
 HB_CODEPAGE_ANNOUNCE( HR437 );
