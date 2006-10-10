@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.139 2006/05/16 14:45:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.140 2006/10/01 11:24:47 enricomaria Exp $
  */
 
 /*
@@ -132,8 +132,6 @@ RETURN TOleAuto():GetActiveObject( cString )
 
    static VARIANTARG RetVal, OleVal;
 
-   BOOL   s_bUnInit = FALSE;
-
 #pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
@@ -141,10 +139,6 @@ INIT PROC HB_OLEINIT
 
    HB_INLINE()
    {
-      s_nOleError = OleInitialize( NULL );
-
-      s_bUnInit = s_nOleError == S_OK; // Do NOT use SUCCEEDED() due to S_FALSE!
-
       s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
       s_pSym_New            = hb_dynsymFind( "NEW" );
       s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
@@ -162,19 +156,6 @@ INIT PROC HB_OLEINIT
 
       VariantInit( &RetVal );
       VariantInit( &OleVal );
-   }
-
-RETURN
-
-//----------------------------------------------------------------------------//
-EXIT PROC HB_OLEEXIT
-
-   HB_INLINE()
-   {
-      if( s_bUnInit )
-      {
-         OleUninitialize();
-      }
    }
 
 RETURN
@@ -322,6 +303,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
 
       ::cClassName := uObj
    ELSEIF ValType( uObj ) = 'N'
+      OleAddRef( uObj )
       ::hObj := uObj
 
       IF ValType( cClass ) == 'C'
@@ -945,7 +927,8 @@ RETURN Self
           {
              pVariant->n1.n2.vt = VT_BYREF | VT_BOOL;
              pVariant->n1.n2.n3.pboolVal = (short *) &( pItem->item.asLogical.value ) ;
-             pItem->type = HB_IT_LONG;
+             *pVariant->n1.n2.n3.pboolVal = hb_itemGetL( pItem ) ? VARIANT_TRUE : VARIANT_FALSE;
+             //pItem->type = HB_IT_LONG;
           }
           else
           {
@@ -1298,13 +1281,12 @@ RETURN Self
                    break;
 
                  case VT_BYREF | VT_BOOL:
-                   ( pItem )->type = HB_IT_LOGICAL;
-                   ( pItem )->item.asLogical.value = *pVariant->n1.n2.n3.pboolVal ;
+                   //( pItem )->type = HB_IT_LOGICAL;
+                   hb_itemPutL( pItem, *pVariant->n1.n2.n3.pboolVal == VARIANT_FALSE ? FALSE : TRUE );
                    break;
 
                  case VT_BOOL:
-                   ( pItem )->type = HB_IT_LOGICAL;
-                   ( pItem )->item.asLogical.value = pVariant->n1.n2.n3.boolVal ;
+                   hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_FALSE ? FALSE : TRUE );
                    break;
 
                  case ( VT_BYREF | VT_DISPATCH ):
@@ -1621,11 +1603,11 @@ RETURN Self
         }
 
         case VT_BOOL | VT_BYREF:
-           hb_itemPutL( pItem, *pVariant->n1.n2.n3.pboolVal == VARIANT_TRUE ? TRUE : FALSE );
+           hb_itemPutL( pItem, *pVariant->n1.n2.n3.pboolVal == VARIANT_FALSE ? FALSE : TRUE );
            break;
 
         case VT_BOOL:
-           hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_TRUE ? TRUE : FALSE );
+           hb_itemPutL( pItem, pVariant->n1.n2.n3.boolVal == VARIANT_FALSE ? FALSE : TRUE );
            break;
 
         case ( VT_UNKNOWN | VT_BYREF ):
@@ -2151,6 +2133,18 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
+  HB_FUNC( OLEADDREF ) // (hOleObject, szMethodName, uParams...)
+  {
+     IDispatch *pDisp = ( IDispatch * ) hb_parnl( 1 );
+
+     //TraceLog( NULL, "OleAddRef( %p )\n", pDisp );
+
+     s_nOleError = pDisp->lpVtbl->AddRef( pDisp );
+
+     hb_retnl( s_nOleError );
+  }
+
+  //---------------------------------------------------------------------------//
   HB_FUNC( OLERELEASEOBJECT ) // (hOleObject, szMethodName, uParams...)
   {
      IDispatch *pDisp = ( IDispatch * ) hb_parnl( 1 );
@@ -2158,6 +2152,8 @@ RETURN Self
      //TraceLog( NULL, "OleReleaseObject( %p )\n", pDisp );
 
      s_nOleError = pDisp->lpVtbl->Release( pDisp );
+
+     hb_retnl( s_nOleError );
   }
 
   //---------------------------------------------------------------------------//

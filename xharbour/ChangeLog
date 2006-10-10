@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5192 2006/10/10 09:09:25 marchuet Exp $
+ * $Id: ChangeLog,v 1.5193 2006/10/10 17:47:46 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-10 16:37 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * xharbour/source/vm/hvm.c
+    * Minor consistency cleanup regarding #ifdef __WIN32__ (I hope I'm not missing something)
+
+  * source\rtl\win32ole.prg
+  * xharbour/source/vm/hvm.c
+    * Moved OleInitialize() and OleUnInitialize() from INIT/EXIT procedures in win32ole.prg into hb_vmInit()/hb_vmQuit()
+      /* This solves GPF trap related to TOleAuto DESTRUCTOR called after OleUnInitialize() was already called. */
+
+  * source\rtl\win32ole.prg
+    + Added OleAddRef() to increase the counter of an IDispatch interface.
+    * Modified New() to call OleAddref() when an IDispatch is passed.
+      /* This solved a GPF trap related to our DESTRUCTOR always calling OleReleaseObject() thus not being symetric. */
+    * Mofified VT_BOOL conversion logic to check for VARIANT_FALSE rather then VARIANT_TRUE because some servers don't
+      follow VARIANT_TRUE convention.
+    * Commented a line that was converting type of a BYREF HB_IT_LOGICAL to HB_IT_LONG (later restored) - I don't understand/recall it's origin.
 
 2006-10-09 22:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * makefile.wc

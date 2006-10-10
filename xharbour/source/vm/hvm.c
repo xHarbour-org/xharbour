@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.583 2006/09/17 16:53:08 druzus Exp $
+ * $Id: hvm.c,v 1.584 2006/09/27 11:01:45 druzus Exp $
  */
 
 /*
@@ -138,13 +138,14 @@
    HB_EXTERN_END
 #endif
 
-#if ( defined(HB_OS_WIN_32) || defined(__WIN32__) )
+#if defined(HB_OS_WIN_32)
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
 
-
-   /* DEBUG only*/
    #include <windows.h>
+   #include <ole2.h>
+
+   static BOOL s_bUnInitOle = FALSE;
 #endif
 
 PHB_FUNC pHVMFuncService = NULL;
@@ -579,7 +580,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_vm_wEnumCollectionCounter = 0;
 #endif
 
-#if ( defined(HB_OS_WIN_32_USED) || defined(__WIN32__) )
+#if defined(HB_OS_WIN_32)
    if( hb_dynsymFind( "HB_NOMOUSE" ) )
    {
       b_MouseEnable = FALSE;
@@ -651,6 +652,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("InitClip") );
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
+
+   #if defined(HB_OS_WIN_32)
+      if( hb_dynsymFind( "TOLEAUTO" ) && OleInitialize( NULL ) == S_OK ) // Do NOT use SUCCEEDED() due to S_FALSE!
+      {
+         s_bUnInitOle = TRUE;
+      }
+   #endif
 
    HB_TRACE( HB_TR_INFO, ("InitModuleFunctions") );
    hb_vmDoModuleInitFunctions();
@@ -952,6 +960,13 @@ int HB_EXPORT hb_vmQuit( void )
       HB_TRACE(HB_TR_DEBUG, ("   Released s_aStatics: %p\n", &s_aStatics) );
    }
    //printf("\nAfter Statics\n" );
+
+   #if defined(HB_OS_WIN_32)
+      if( s_bUnInitOle )
+      {
+         OleUninitialize();
+      }
+   #endif
 
    hb_errExit();
    //printf("After Err\n" );
