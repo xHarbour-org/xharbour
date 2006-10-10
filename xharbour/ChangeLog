@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5191 2006/10/09 14:04:13 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5191 2006/10/09 19:23:44 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-10 11:07 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   *bmdbfcdx1.c
+    ! fixed size of map filter when a pevious scope is set.
+   *dbcmd.c
+   *workarea.c
+    + Added capabilitie of SET OPTIMIZE ON |OFF over filters
+      In the RDD that admit optimization, p. ej. BMDBFCDX, SET OPTIMIZE
+      it determines if the filters will be optimized using the open order
+      formations in the area of present work. If this indicator is activated (ON),
+      controller RDD will optimize the search of registries that fulfill the
+      condition established by the filter, diminishing the reading of data of
+      the file of data base.
+      If the indicator is deactivated (OFF), it does not optimize itself.
 
 2006-10-09 22:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * makefile.wc
