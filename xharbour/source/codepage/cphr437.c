@@ -1,5 +1,5 @@
 /*
- * $Id: cphr437.c,v 1.6 2006/04/06 19:22:02 paultucker Exp $
+ * $Id: cphr437.c,v 1.6 2006/10/09 19:23:44 ptsarenko Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 
 static HB_CODEPAGE s_codepage = { "HR437",
     CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
-    "ABC^]D\\EFGHIJKLMNOPQRS[TUVWXYZ@",
+    "ABC^]D\EFGHIJKLMNOPQRS[TUVWXYZ@",
     "abc~}d|efghijklmnopqrs{tuvwxyz`",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
