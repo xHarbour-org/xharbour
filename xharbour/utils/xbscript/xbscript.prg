@@ -11601,6 +11601,10 @@ STATIC FUNCTION InitRunRules()
 
    aAdd( aTransRules, { 'IN' , { {    1,   0, NIL, '<', NIL } } , .T. } )
 
+   #ifdef AX
+      aAdd( aTransRules, { 'RESPONSE' , { {    0,   0, '.', NIL, NIL } } , .T. } )
+   #endif
+
    /* Commands */
    aAdd( aCommRules, { '_HB_CLASS' , { {    1,   0, NIL, '<', NIL } } , .F. } )
    aAdd( aCommRules, { '_HB_MEMBER' , { {    1,   0, NIL, '<', NIL } } , .F. } )
@@ -11697,6 +11701,10 @@ STATIC FUNCTION InitRunResults()
    #endif
 
    aAdd( aTransResults, { { {   0, '$ ' }, {   0,   1 } }, { -1,  1} , { NIL }  } )
+
+   #ifdef AX
+      aAdd( aTransResults, { { {   0, 'ReSpOnSe:' } }, { -1} ,  } )
+   #endif
 
    /* Commands Results*/
    aAdd( aCommResults, { , , { NIL }  } )

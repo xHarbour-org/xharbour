@@ -138,3 +138,7 @@
 #endif
 
 #XTRANSLATE IN <x> => $ <x>
+
+#ifdef AX
+   #xtranslate Response. => ReSpOnSe:
+#endif
