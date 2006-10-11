@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.4 2006/10/10 09:09:25 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.5 2006/10/11 08:56:22 marchuet Exp $
  */
 
 /*
@@ -3942,14 +3942,16 @@ static BOOL hb_cdxCheckRecordFilter( CDXAREAP pArea, ULONG ulRecNo )
 
    if ( pArea->dbfi.fFilter && pArea->dbfi.fOptimized )
    {
-      if( pArea->ulRecNo != ulRecNo || pArea->lpdbPendingRel )
-         SELF_GOTO( ( AREAP ) pArea, ulRecNo );
+      if ( BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecNo ) )
+      {
+         if( pArea->ulRecNo != ulRecNo || pArea->lpdbPendingRel )
+            SELF_GOTO( ( AREAP ) pArea, ulRecNo );
 
-      if( hb_set.HB_SET_DELETED )
-         SUPER_DELETED( ( AREAP ) pArea, &lResult );
-
-      if( !lResult )
-         lResult = !BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecNo );
+         if( hb_set.HB_SET_DELETED )
+            SUPER_DELETED( ( AREAP ) pArea, &lResult );
+      }
+      else
+         lResult = TRUE;
    }
    else if ( pArea->dbfi.itmCobExpr || hb_set.HB_SET_DELETED )
    {
