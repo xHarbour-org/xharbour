@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmcdx.h,v 1.01 2006/10/08 01:15:00 marchuet Exp $
+ * $Id: hbrddbmcdx.h,v 1.2 2006/10/07 23:17:33 marchuet Exp $
  */
 
 /*
@@ -558,9 +558,9 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip );
 static ERRCODE hb_cdxSkipFilter( CDXAREAP pArea, LONG lUpDown );
 static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip );
 #define hb_cdxAddField                             NULL
-#define hb_cdxAppend                               NULL
+static ERRCODE hb_cdxAppend( CDXAREAP pArea, BOOL bUnLockAll );
 #define hb_cdxCreateFields                         NULL
-#define hb_cdxDeleteRec                            NULL
+static ERRCODE hb_cdxDeleteRec( CDXAREAP pArea );
 #define hb_cdxDeleted                              NULL
 #define hb_cdxFieldCount                           NULL
 #define hb_cdxFieldDisplay                         NULL
@@ -573,8 +573,8 @@ static ERRCODE hb_cdxFlush( CDXAREAP pArea );
 static ERRCODE hb_cdxGoCold( CDXAREAP pArea );
 static ERRCODE hb_cdxGoHot( CDXAREAP pArea );
 #define hb_cdxPutRec                               NULL
-#define hb_cdxPutValue                             NULL
-#define hb_cdxRecall                               NULL
+static ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+static ERRCODE hb_cdxRecall( CDXAREAP pArea );
 #define hb_cdxRecCount                             NULL
 #define hb_cdxRecInfo                              NULL
 #define hb_cdxRecNo                                NULL

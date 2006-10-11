@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.3 2006/10/09 13:35:40 ronpinkas Exp $
+ * $Id: bmdbfcdx1.c,v 1.4 2006/10/10 09:09:25 marchuet Exp $
  */
 
 /*
@@ -7157,9 +7157,56 @@ static ERRCODE hb_cdxSkipRaw( CDXAREAP pArea, LONG lToSkip )
 }
 
 /* ( DBENTRYP_VF )    hb_cdxAddField        : NULL */
-/* ( DBENTRYP_B )     hb_cdxAppend          : NULL */
+/* ( DBENTRYP_B )     hb_cdxAppend */
+static ERRCODE hb_cdxAppend( CDXAREAP pArea, BOOL bUnLockAll )
+{
+    if ( SUPER_APPEND( (AREAP) pArea, bUnLockAll ) == SUCCESS )
+    {
+        if ( pArea->dbfi.fFilter && pArea->dbfi.fOptimized )
+        {
+            ULONG ulRecCount, bytes;
+
+            SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
+            bytes = ( (ulRecCount + 1) >> 5 ) + 1;
+
+            if ( ( (ulRecCount) >> 5 ) + 1 < bytes )
+            {
+                ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap = (ULONG *) hb_xrealloc( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, bytes << 2 );
+                ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size = ulRecCount;
+            }
+            pArea->dbfi.fFilter = FALSE;
+            if ( hb_cdxCheckRecordFilter( pArea, ulRecCount ) )
+                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecCount );
+            else
+                BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecCount );
+            pArea->dbfi.fFilter = TRUE;
+        }
+        return SUCCESS;
+    }
+    else
+        return FAILURE;
+}
 /* ( DBENTRYP_I )     hb_cdxCreateFields    : NULL */
-/* ( DBENTRYP_V )     hb_cdxDeleteRec       : NULL */
+/* ( DBENTRYP_V )     hb_cdxDeleteRec */
+static ERRCODE hb_cdxDeleteRec( CDXAREAP pArea )
+{
+    if ( SUPER_DELETE( (AREAP) pArea ) == SUCCESS )
+    {
+        if ( pArea->dbfi.fFilter && pArea->dbfi.fOptimized )
+        {
+            pArea->dbfi.fFilter = FALSE;
+            if ( hb_cdxCheckRecordFilter( pArea, pArea->ulRecNo ) )
+                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            else
+                BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            pArea->dbfi.fFilter = TRUE;
+        }
+        return SUCCESS;
+    }
+    else
+        return FAILURE;
+}
+
 /* ( DBENTRYP_BP )    hb_cdxDeleted         : NULL */
 /* ( DBENTRYP_SP )    hb_cdxFieldCount      : NULL */
 /* ( DBENTRYP_VF )    hb_cdxFieldDisplay    : NULL */
@@ -7369,8 +7416,46 @@ static ERRCODE hb_cdxGoHot( CDXAREAP pArea )
 }
 
 /* ( DBENTRYP_P )     hb_cdxPutRec          : NULL */
-/* ( DBENTRYP_SI )    hb_cdxPutValue        : NULL */
-/* ( DBENTRYP_V )     hb_cdxRecall          : NULL */
+/* ( DBENTRYP_SI )    hb_cdxPutValue */
+static ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
+{
+    if ( SUPER_PUTVALUE( (AREAP) pArea, uiIndex, pItem ) == SUCCESS )
+    {
+        if ( pArea->dbfi.fFilter && pArea->dbfi.fOptimized )
+        {
+            pArea->dbfi.fFilter = FALSE;
+            if ( hb_cdxCheckRecordFilter( pArea, pArea->ulRecNo ) )
+                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            else
+                BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            pArea->dbfi.fFilter = TRUE;
+        }
+        return SUCCESS;
+    }
+    else
+        return FAILURE;
+}
+
+/* ( DBENTRYP_V )     hb_cdxRecall */
+static ERRCODE hb_cdxRecall( CDXAREAP pArea )
+{
+    if ( SUPER_RECALL( (AREAP) pArea ) == SUCCESS )
+    {
+        if ( pArea->dbfi.fFilter && pArea->dbfi.fOptimized )
+        {
+            pArea->dbfi.fFilter = FALSE;
+            if ( hb_cdxCheckRecordFilter( pArea, pArea->ulRecNo ) )
+                BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            else
+                BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
+            pArea->dbfi.fFilter = TRUE;
+        }
+        return SUCCESS;
+    }
+    else
+        return FAILURE;
+}
+
 /* ( DBENTRYP_ULP )   hb_cdxRecCount        : NULL */
 /* ( DBENTRYP_ISI )   hb_cdxRecInfo         : NULL */
 /* ( DBENTRYP_ULP )   hb_cdxRecNo           : NULL */
