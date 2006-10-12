@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.11 2005/10/29 06:42:03 druzus Exp $
+ * $Id: rddads.h,v 1.12 2005/10/30 14:45:48 druzus Exp $
  */
 
 /*
@@ -51,11 +51,18 @@
  */
 
 #ifndef ADS_REQUIRE_VERSION
-#define ADS_REQUIRE_VERSION 6
+   #define ADS_REQUIRE_VERSION 8.1
 #endif
 
 #include "hbapirdd.h"
 #include "ace.h"
+
+#undef ADS_MAX_KEY_LENGTH
+#if ADS_REQUIRE_VERSION >= 8
+   #define ADS_MAX_KEY_LENGTH   4082   /* maximum key value length.  This is the max key length */
+#else                                  /* of ADI indexes.  Max CDX key length is 240.  Max */
+   #define ADS_MAX_KEY_LENGTH    256   /* NTX key length is 256 */
+#endif
 
 HB_EXTERN_BEGIN
 
@@ -164,6 +171,17 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
    extern char * hb_adsOemToAnsi( char * pcString, ULONG ulLen );
    extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
    void hb_adsOemAnsiFree( char * pcString );
+
+    UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
+                                          UNSIGNED8  *pucFldName,
+                                          UNSIGNED8  *pucBuf,
+                                          UNSIGNED32 ulLen );
+
+    UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
+                                          UNSIGNED8  *pucFldName,
+                                          UNSIGNED8  *pucBuf,
+                                          UNSIGNED32 *pulLen );
+
 #else
 #  define hb_adsOemToAnsi( s, l )     ( s )
 #  define hb_adsAnsiToOem( s, l )     ( s )
@@ -172,13 +190,3 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
 
 
 HB_EXTERN_END
-
-UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
-                                      UNSIGNED8  *pucFldName,
-                                      UNSIGNED8  *pucBuf,
-                                      UNSIGNED32 ulLen );
-
-UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
-                                      UNSIGNED8  *pucFldName,
-                                      UNSIGNED8  *pucBuf,
-                                      UNSIGNED32 *pulLen );

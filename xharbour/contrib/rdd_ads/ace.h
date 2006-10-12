@@ -1,4 +1,6 @@
-// Copyright (c) 2002-2005 Extended Systems, Inc.  ALL RIGHTS RESERVED.
+// Copyright (c) 2001-2005 Extended Systems, Inc.
+// Portions Copyright (c) 2005-2006, iAnywhere Solutions, Inc.
+// All rights reserved. All unpublished rights reserved.
 //
 // This source code can be used, modified, or copied by the licensee as long as
 // the modifications (or the new binary resulting from a copy or modification of
@@ -29,14 +31,8 @@
 #define __ACE_INCLUDED__
 
 
-#if defined( unix ) || defined(__LINUX__)
-   #ifndef ADS_LINUX
-      #define ADS_LINUX
-   #endif
-#endif
-
 #if defined( ADS_LINUX )
-   /* #include "unixutils.h" */
+   #include "unixutils.h"
 
    #define ADS_PATH_DELIMITER    '/'
 
@@ -45,6 +41,11 @@
    #endif
 #endif
 
+#if defined( unix )
+   #ifndef ADS_LINUX
+      #define ADS_LINUX
+   #endif
+#endif
 
 #if defined( ADS_LINUX ) && defined( ACE )
    /* This makes the callback functions compile in linux */
@@ -65,11 +66,9 @@
 #endif
 
 /* This forces a warning for single equals in if statements */
-#ifdef WIN32
-   /* 16-bit compiler doesn't seem to like this */
-   #ifndef __GNUC__
-      #pragma warning( error : 4706 )
-   #endif
+#ifdef ADS_WIN32
+   // 16-bit compiler doesn't seem to like this
+   #pragma warning( error : 4706 )
 
    #define ADS_PATH_DELIMITER    '\\'
 #endif
@@ -91,7 +90,7 @@
    typedef unsigned long  ADSHANDLE;
    typedef double         DOUBLE;
 
-#ifdef WIN32
+#ifdef ADS_WIN32
    typedef ULONGLONG        UNSIGNED64;
    typedef LONGLONG         SIGNED64;
 #elif defined( NLM ) && !defined( ADS_LINUX )
@@ -116,22 +115,15 @@
 #define EXTERN extern
 #define STATIC static
 
+
 #if defined( ASANT ) || defined( ADS_NT ) || defined( ADS_WIN9X )
    #define ENTRYPOINT WINAPI
 #elif defined( ASANLM ) || defined( ADS_LINUX ) || defined( NLM )
    #define ENTRYPOINT
-#elif defined( WIN32 ) && !defined( __BORLANDC__ )
-   #if defined( __WATCOMC__ ) || defined( __LCC__ )
-      #define ENTRYPOINT __declspec( dllexport ) WINAPI
-   #else
-      #define ENTRYPOINT _declspec( dllexport ) WINAPI
-   #endif
+#elif defined( ADS_WIN32 ) && !defined( __BORLANDC__ )
+   #define ENTRYPOINT _declspec( dllexport ) WINAPI
 #else
-   #if defined( __BORLANDC__ )
-      #define ENTRYPOINT _declspec( dllexport ) WINAPI
-   #else
-      #define ENTRYPOINT _export WINAPI
-   #endif
+   #define ENTRYPOINT _export WINAPI
 #endif
 
 
@@ -158,6 +150,11 @@
 #define ADS_COMPRESS_NEVER          0x00000008
 #define ADS_COMPRESS_INTERNET       0x0000000C
 #define ADS_REPLICATION_CONNECTION  0x00000010
+#define ADS_UDP_IP_CONNECTION       0x00000020
+#define ADS_IPX_CONNECTION          0x00000040
+#define ADS_TCP_IP_CONNECTION       0x00000080
+#define ADS_TCP_IP_V6_CONNECTION    0x00000100
+
 
 /* options for opening/create tables - can be ORed together */
 #define ADS_EXCLUSIVE                     0x00000001
@@ -500,6 +497,7 @@
 #define AE_BACKUP                       5198
 #define AE_FREETABLEFAILED              5199
 #define AE_BLURRY_SNAPSHOT              5200
+#define AE_INVALID_VERTICAL_FILTER      5201
 
 /* Supported file types */
 #define ADS_DATABASE_TABLE       ADS_DEFAULT
@@ -544,13 +542,9 @@
 #define ADS_MAX_DATEMASK         12
 #define ADS_MAX_ERROR_LEN        600
 #define ADS_MAX_INDEX_EXPR_LEN   510   /* this is only accurate for index expressions */
-
-#if ADS_REQUIRE_VERSION >= 8
-   #define ADS_MAX_KEY_LENGTH   4082   /* maximum key value length.  This is the max key length */
-#else                                  /* of ADI indexes.  Max CDX key length is 240.  Max */
-   #define ADS_MAX_KEY_LENGTH    256   /* NTX key length is 256 */
-#endif
-
+#define ADS_MAX_KEY_LENGTH       4082  /* maximum key value length.  This is the max key length
+                                        * of ADI indexes.  Max CDX key length is 240.  Max
+                                        * NTX key length is 256 */
 #define ADS_MAX_FIELD_NAME       128
 #define ADS_MAX_DBF_FIELD_NAME   10    /* maximum length of field name in a DBF */
 #define ADS_MAX_INDEXES          15    /* physical index files, NOT index orders */
@@ -695,9 +689,7 @@ typedef struct
    UNSIGNED16  usNumSendECBs;             /* number send ECBs (NLM only)   */
    UNSIGNED16  usNumBurstPackets;         /* number packets per burst      */
    UNSIGNED16  usNumWorkerThreads;        /* number worker threads         */
-   UNSIGNED16  usSortBuffSize;            /* index sort buffer size        */
-   UNSIGNED8   ucReserved1;               /* reserved                      */
-   UNSIGNED8   ucReserved2;               /* reserved                      */
+   UNSIGNED32  ulSortBuffSize;            /* index sort buffer size        */
    UNSIGNED8   aucErrorLog[ADS_MAX_CFG_PATH];    /* error log path         */
    UNSIGNED8   aucSemaphore[ADS_MAX_CFG_PATH];   /* semaphore file path    */
    UNSIGNED8   aucTransaction[ADS_MAX_CFG_PATH]; /* TPS log file path      */
@@ -797,6 +789,7 @@ typedef struct
    UNSIGNED8  aucAuthUserName[ADS_MAX_USER_NAME]; /* Dictionary user name  */
    UNSIGNED8  aucAddress[ADS_MAX_ADDRESS_SIZE]; /* Network address of user */
    UNSIGNED8  aucOSUserLoginName[ADS_MAX_USER_NAME]; /* OS user login name */
+   UNSIGNED8  aucTSAddress[ADS_MAX_ADDRESS_SIZE]; /* Terminal Services client IP Address */
    } ADS_MGMT_USER_INFO;
 
 typedef struct
@@ -860,6 +853,9 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_PUBLICATION_OBJECT        15
 #define ADS_DD_ARTICLE_OBJECT            16  /* the things (tables) that get published */
 #define ADS_DD_SUBSCRIPTION_OBJECT       17  /* indicates where a publication goes */
+#define ADS_DD_FUNCTION_OBJECT           18  /* User defined function */
+#define ADS_DD_PACKAGE_OBJECT            19  /* function and stored procedure packages */
+#define ADS_DD_QUALIFIED_TRIGGER_OBJ     20  /* Used in AdsDDFindFirst/NextObject */
 
 
 /* Common properties numbers < 100 */
@@ -868,6 +864,8 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_USER_DEFINED_PROP 3
 #define ADS_DD_OBJECT_NAME       4
 #define ADS_DD_TRIGGERS_DISABLED 5
+#define ADS_DD_OBJECT_ID         6
+#define ADS_DD_OPTIONS           7
 
 
 /* Database properties between 100 and 199 */
@@ -1021,6 +1019,9 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_ARTICLE_ID_COLUMNS         1601     // columns that identify the target row
 #define ADS_DD_ARTICLE_ID_COLUMN_NUMBERS  1602     // array of the field numbers
 #define ADS_DD_ARTICLE_FILTER_SHORT       1603     // short version of the expression
+#define ADS_DD_ARTICLE_INCLUDE_COLUMNS    1604     // Vertical filter (inclusion list)
+#define ADS_DD_ARTICLE_EXCLUDE_COLUMNS    1605     // Vertical filter (exclusion list)
+#define ADS_DD_ARTICLE_INC_COLUMN_NUMBERS 1606     // Retrieve column nums to replicate
 
 /* Subscription article properties 1700 - 1799 */
 #define ADS_DD_SUBSCR_PUBLICATION_NAME    1700    // Name of the publication (for reading)
@@ -1236,109 +1237,109 @@ typedef UNSIGNED32 (WINAPI *GET_INTERFACE_VERSION_PTR)();
 #endif
 
 UNSIGNED32 ENTRYPOINT AdsAddCustomKey( ADSHANDLE hIndex );
-
+typedef UNSIGNED32 (WINAPI *ADSADDCUSTOMKEY_PTR)( ADSHANDLE hIndex );
 
 
 UNSIGNED32 ENTRYPOINT AdsAppendRecord( ADSHANDLE hTable );
+typedef UNSIGNED32 (WINAPI *ADSAPPENDRECORD_PTR)( ADSHANDLE hTable );
 
 
-
-UNSIGNED32 ENTRYPOINT AdsApplicationExit( void );
-
+UNSIGNED32 ENTRYPOINT AdsApplicationExit();
+typedef UNSIGNED32 (WINAPI *ADSAPPLICATIONEXIT_PTR)();
 
 
 UNSIGNED32 ENTRYPOINT AdsAtBOF( ADSHANDLE    hTable,
                                 UNSIGNED16   *pbBof );
-
-
+typedef UNSIGNED32 (WINAPI *ADSATBOF_PTR)( ADSHANDLE    hTable,
+                                UNSIGNED16   *pbBof );
 
 UNSIGNED32 ENTRYPOINT AdsAtEOF( ADSHANDLE    hTable,
                                 UNSIGNED16   *pbEof );
-
-
+typedef UNSIGNED32 (WINAPI *ADSATEOF_PTR)( ADSHANDLE    hTable,
+                                UNSIGNED16   *pbEof );
 
 UNSIGNED32 ENTRYPOINT AdsBeginTransaction( ADSHANDLE hConnect );
-
+typedef UNSIGNED32 (WINAPI *ADSBEGINTRANSACTION_PTR)( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsBinaryToFile( ADSHANDLE   hTable,
                                        UNSIGNED8   *pucFldName,
                                        UNSIGNED8   *pucFileName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSBINARYTOFILE_PTR)( ADSHANDLE   hTable,
+                                       UNSIGNED8   *pucFldName,
+                                       UNSIGNED8   *pucFileName );
 
 UNSIGNED32 ENTRYPOINT AdsCacheOpenCursors( UNSIGNED16 usOpen );
-
+typedef UNSIGNED32 (WINAPI *ADSCACHEOPENCURSORS_PTR)( UNSIGNED16 usOpen );
 
 UNSIGNED32 ENTRYPOINT AdsCacheOpenTables( UNSIGNED16 usOpen );
-
+typedef UNSIGNED32 (WINAPI *ADSCACHEOPENTABLES_PTR)( UNSIGNED16 usOpen );
 
 UNSIGNED32 ENTRYPOINT AdsCacheRecords( ADSHANDLE hTable,
                                        UNSIGNED16 usNumRecords );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCACHERECORDS_PTR)( ADSHANDLE hTable,
+                                       UNSIGNED16 usNumRecords );
 
 UNSIGNED32 ENTRYPOINT AdsCancelUpdate( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCANCELUPDATE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsCheckExistence( ADSHANDLE    hConnect,
                                          UNSIGNED8    *pucFileName,
                                          UNSIGNED16   *pusOnDisk );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCHECKEXISTENCE_PTR)( ADSHANDLE    hConnect,
+                                         UNSIGNED8    *pucFileName,
+                                         UNSIGNED16   *pusOnDisk );
 
 UNSIGNED32 ENTRYPOINT AdsClearAllScopes( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARALLSCOPES_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsClearDefault( void );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARDEFAULT_PTR)( void );
 
 UNSIGNED32 ENTRYPOINT AdsClearFilter( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARFILTER_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsClearRelation( ADSHANDLE hTableParent );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARRELATION_PTR)( ADSHANDLE hTableParent );
 
 UNSIGNED32 ENTRYPOINT AdsClearScope( ADSHANDLE  hIndex,
                                      UNSIGNED16 usScopeOption );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARSCOPE_PTR)( ADSHANDLE  hIndex,
+                                     UNSIGNED16 usScopeOption );
 
 UNSIGNED32 ENTRYPOINT AdsCloneTable( ADSHANDLE  hTable,
                                      ADSHANDLE  *phClone );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCLONETABLE_PTR)( ADSHANDLE  hTable,
+                                     ADSHANDLE  *phClone );
 
 UNSIGNED32 ENTRYPOINT AdsCloseAllIndexes( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSEALLINDEXES_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsCloseAllTables( void );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSEALLTABLES_PTR)( void );
 
 UNSIGNED32 ENTRYPOINT AdsCloseIndex( ADSHANDLE hIndex );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSEINDEX_PTR)( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsCloseTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSETABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsCloseCachedTables( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSECACHEDTABLES_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsCommitTransaction( ADSHANDLE hConnect );
-
+typedef UNSIGNED32 (WINAPI *ADSCOMMITTRANSACTION_PTR)( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsConnect( UNSIGNED8  *pucServerName,
                                   ADSHANDLE  *phConnect );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCONNECT_PTR)( UNSIGNED8  *pucServerName,
+                                  ADSHANDLE  *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsConnect26( UNSIGNED8  *pucServerName,
                                     UNSIGNED16 usServerTypes,
                                     ADSHANDLE  *phConnect );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCONNECT26_PTR)( UNSIGNED8  *pucServerName,
+                                    UNSIGNED16 usServerTypes,
+                                    ADSHANDLE  *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsConnect60( UNSIGNED8  *pucServerPath,
                                     UNSIGNED16 usServerTypes,
@@ -1346,52 +1347,52 @@ UNSIGNED32 ENTRYPOINT AdsConnect60( UNSIGNED8  *pucServerPath,
                                     UNSIGNED8  *pucPassword,
                                     UNSIGNED32 ulOptions,
                                     ADSHANDLE  *phConnect );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCONNECT60_PTR)( UNSIGNED8  *pucServerPath,
+                                    UNSIGNED16 usServerTypes,
+                                    UNSIGNED8  *pucUserName,
+                                    UNSIGNED8  *pucPassword,
+                                    UNSIGNED32 ulOptions,
+                                    ADSHANDLE  *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsIsConnectionAlive(
                               ADSHANDLE        hConnect,
                               UNSIGNED16       *pbConnectionIsAlive );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISCONNECTIONALIVE_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED16       *pbConnectionIsAlive );
 
 UNSIGNED32 ENTRYPOINT AdsContinue( ADSHANDLE    hTable,
                                    UNSIGNED16   *pbFound );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCONTINUE_PTR)( ADSHANDLE    hTable,
+                                   UNSIGNED16   *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsConvertTable( ADSHANDLE   hObj,
                                        UNSIGNED16  usFilterOption,
                                        UNSIGNED8   *pucFile,
                                        UNSIGNED16  usTableType );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCONVERTTABLE_PTR)( ADSHANDLE   hObj,
+                                       UNSIGNED16  usFilterOption,
+                                       UNSIGNED8   *pucFile,
+                                       UNSIGNED16  usTableType );
 
 UNSIGNED32 ENTRYPOINT AdsCopyTable( ADSHANDLE   hObj,
                                     UNSIGNED16  usFilterOption,
                                     UNSIGNED8   *pucFile );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCOPYTABLE_PTR)( ADSHANDLE   hObj,
+                                    UNSIGNED16  usFilterOption,
+                                    UNSIGNED8   *pucFile );
 
 UNSIGNED32 ENTRYPOINT AdsCopyTableContents( ADSHANDLE    hObjFrom,
                                             ADSHANDLE    hTableTo,
                                             UNSIGNED16   usFilterOption );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCOPYTABLECONTENTS_PTR)( ADSHANDLE    hObjFrom,
+                                            ADSHANDLE    hTableTo,
+                                            UNSIGNED16   usFilterOption );
 
 UNSIGNED32 ENTRYPOINT AdsCopyTableStructure( ADSHANDLE   hTable,
                                              UNSIGNED8   *pucFile );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCOPYTABLESTRUCTURE_PTR)( ADSHANDLE   hTable,
+                                             UNSIGNED8   *pucFile );
 
 UNSIGNED32 ENTRYPOINT AdsCreateIndex( ADSHANDLE    hObj,
                                       UNSIGNED8    *pucFileName,
@@ -1401,14 +1402,14 @@ UNSIGNED32 ENTRYPOINT AdsCreateIndex( ADSHANDLE    hObj,
                                       UNSIGNED8    *pucWhile,
                                       UNSIGNED32   ulOptions,
                                       ADSHANDLE    *phIndex );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATEINDEX_PTR)( ADSHANDLE    hObj,
+                                      UNSIGNED8    *pucFileName,
+                                      UNSIGNED8    *pucTag,
+                                      UNSIGNED8    *pucExpr,
+                                      UNSIGNED8    *pucCondition,
+                                      UNSIGNED8    *pucWhile,
+                                      UNSIGNED32   ulOptions,
+                                      ADSHANDLE    *phIndex );
 
 UNSIGNED32 ENTRYPOINT AdsCreateIndex61( ADSHANDLE    hObj,
                                         UNSIGNED8    *pucFileName,
@@ -1419,15 +1420,15 @@ UNSIGNED32 ENTRYPOINT AdsCreateIndex61( ADSHANDLE    hObj,
                                         UNSIGNED32   ulOptions,
                                         UNSIGNED32   ulPageSize,
                                         ADSHANDLE    *phIndex );
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATEINDEX61_PTR)( ADSHANDLE    hObj,
+                                        UNSIGNED8    *pucFileName,
+                                        UNSIGNED8    *pucTag,
+                                        UNSIGNED8    *pucExpr,
+                                        UNSIGNED8    *pucCondition,
+                                        UNSIGNED8    *pucWhile,
+                                        UNSIGNED32   ulOptions,
+                                        UNSIGNED32   ulPageSize,
+                                        ADSHANDLE    *phIndex );
 
 UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE   hTable,
                                          UNSIGNED8   *pucFileName,
@@ -1447,24 +1448,24 @@ UNSIGNED32 ENTRYPOINT AdsCreateFTSIndex( ADSHANDLE   hTable,
                                          UNSIGNED8   *pucReserved1,
                                          UNSIGNED8   *pucReserved2,
                                          UNSIGNED32  ulOptions );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATEFTSINDEX_PTR)( ADSHANDLE   hTable,
+                                         UNSIGNED8   *pucFileName,
+                                         UNSIGNED8   *pucTag,
+                                         UNSIGNED8   *pucField,
+                                         UNSIGNED32  ulPageSize,
+                                         UNSIGNED32  ulMinWordLen,
+                                         UNSIGNED32  ulMaxWordLen,
+                                         UNSIGNED16  usUseDefaultDelim,
+                                         UNSIGNED8   *pucDelimiters,
+                                         UNSIGNED16  usUseDefaultNoise,
+                                         UNSIGNED8   *pucNoiseWords,
+                                         UNSIGNED16  usUseDefaultDrop,
+                                         UNSIGNED8   *pucDropChars,
+                                         UNSIGNED16  usUseDefaultConditionals,
+                                         UNSIGNED8   *pucConditionalChars,
+                                         UNSIGNED8   *pucReserved1,
+                                         UNSIGNED8   *pucReserved2,
+                                         UNSIGNED32  ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsCreateTable( ADSHANDLE    hConnection,
                                       UNSIGNED8    *pucName,
@@ -1476,16 +1477,16 @@ UNSIGNED32 ENTRYPOINT AdsCreateTable( ADSHANDLE    hConnection,
                                       UNSIGNED16   usMemoSize,
                                       UNSIGNED8    *pucFields,
                                       ADSHANDLE    *phTable );
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATETABLE_PTR)( ADSHANDLE    hConnection,
+                                      UNSIGNED8    *pucName,
+                                      UNSIGNED8    *pucAlias,
+                                      UNSIGNED16   usTableType,
+                                      UNSIGNED16   usCharType,
+                                      UNSIGNED16   usLockType,
+                                      UNSIGNED16   usCheckRights,
+                                      UNSIGNED16   usMemoSize,
+                                      UNSIGNED8    *pucFields,
+                                      ADSHANDLE    *phTable );
 
 UNSIGNED32 ENTRYPOINT AdsCreateTable71( ADSHANDLE    hConnection,
                                         UNSIGNED8    *pucName,
@@ -1498,26 +1499,26 @@ UNSIGNED32 ENTRYPOINT AdsCreateTable71( ADSHANDLE    hConnection,
                                         UNSIGNED8    *pucFields,
                                         UNSIGNED32   ulOptions,
                                         ADSHANDLE    *phTable );
-
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATETABLE71_PTR)( ADSHANDLE    hConnection,
+                                      UNSIGNED8    *pucName,
+                                      UNSIGNED8    *pucDBObjName,
+                                      UNSIGNED16   usTableType,
+                                      UNSIGNED16   usCharType,
+                                      UNSIGNED16   usLockType,
+                                      UNSIGNED16   usCheckRights,
+                                      UNSIGNED16   usMemoSize,
+                                      UNSIGNED8    *pucFields,
+                                      UNSIGNED32   ulOptions,
+                                      ADSHANDLE    *phTable );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreate( UNSIGNED8  *pucDictionaryPath,
                                    UNSIGNED16 usEncrypt,
                                    UNSIGNED8  *pucDescription,
                                    ADSHANDLE  *phDictionary );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATE_PTR)( UNSIGNED8  *pucDictionaryPath,
+                                   UNSIGNED16 usEncrypt,
+                                   UNSIGNED8  *pucDescription,
+                                   ADSHANDLE  *phDictionary );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucRIName,
@@ -1528,15 +1529,15 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucChildTagName,
                                                UNSIGNED16 usUpdateRule,
                                                UNSIGNED16 usDeleteRule );
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEREFINTEGRITY_PTR)( ADSHANDLE  hDictionary,
+                                               UNSIGNED8  *pucRIName,
+                                               UNSIGNED8  *pucFailTable,
+                                               UNSIGNED8  *pucParentTableName,
+                                               UNSIGNED8  *pucParentTagName,
+                                               UNSIGNED8  *pucChildTableName,
+                                               UNSIGNED8  *pucChildTagName,
+                                               UNSIGNED16 usUpdateRule,
+                                               UNSIGNED16 usDeleteRule );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity62( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucRIName,
@@ -1549,31 +1550,31 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateRefIntegrity62( ADSHANDLE  hDictionary,
                                                UNSIGNED16 usDeleteRule,
                                                UNSIGNED8  *pucNoPrimaryError,
                                                UNSIGNED8  *pucCascadeError );
-
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEREFINTEGRITY62_PTR)( ADSHANDLE  hDictionary,
+                                               UNSIGNED8  *pucRIName,
+                                               UNSIGNED8  *pucFailTable,
+                                               UNSIGNED8  *pucParentTableName,
+                                               UNSIGNED8  *pucParentTagName,
+                                               UNSIGNED8  *pucChildTableName,
+                                               UNSIGNED8  *pucChildTagName,
+                                               UNSIGNED16 usUpdateRule,
+                                               UNSIGNED16 usDeleteRule,
+                                               UNSIGNED8  *pucNoPrimaryError,
+                                               UNSIGNED8  *pucCascadeError );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveRefIntegrity( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucRIName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVEREFINTEGRITY_PTR)( ADSHANDLE  hDictionary,
+                                               UNSIGNED8  *pucRIName );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetDatabaseProperty( ADSHANDLE  hObject,
                                                 UNSIGNED16 usPropertyID,
                                                 VOID       *pvProperty,
                                                 UNSIGNED16 *pusPropertyLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETDATABASEPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                UNSIGNED16 usPropertyID,
+                                                VOID       *pvProperty,
+                                                UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetFieldProperty( ADSHANDLE  hObject,
                                              UNSIGNED8  *pucTableName,
@@ -1581,12 +1582,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGetFieldProperty( ADSHANDLE  hObject,
                                              UNSIGNED16 usPropertyID,
                                              VOID       *pvProperty,
                                              UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETFIELDPROPERTY_PTR)( ADSHANDLE  hObject,
+                                             UNSIGNED8  *pucTableName,
+                                             UNSIGNED8  *pucFieldName,
+                                             UNSIGNED16 usPropertyID,
+                                             VOID       *pvProperty,
+                                             UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetIndexFileProperty( ADSHANDLE  hObject,
                                                  UNSIGNED8  *pucTableName,
@@ -1594,12 +1595,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGetIndexFileProperty( ADSHANDLE  hObject,
                                                  UNSIGNED16 usPropertyID,
                                                  VOID       *pvProperty,
                                                  UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETINDEXFILEPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                 UNSIGNED8  *pucTableName,
+                                                 UNSIGNED8  *pucIndexFileName,
+                                                 UNSIGNED16 usPropertyID,
+                                                 VOID       *pvProperty,
+                                                 UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetIndexProperty( ADSHANDLE  hObject,
                                              UNSIGNED8  *pucTableName,
@@ -1607,100 +1608,100 @@ UNSIGNED32 ENTRYPOINT AdsDDGetIndexProperty( ADSHANDLE  hObject,
                                              UNSIGNED16 usPropertyID,
                                              VOID       *pvProperty,
                                              UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETINDEXPROPERTY_PTR)( ADSHANDLE  hObject,
+                                             UNSIGNED8  *pucTableName,
+                                             UNSIGNED8  *pucIndexName,
+                                             UNSIGNED16 usPropertyID,
+                                             VOID       *pvProperty,
+                                             UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetLinkProperty( ADSHANDLE  hConnect,
                                             UNSIGNED8  *pucLinkName,
                                             UNSIGNED16 usPropertyID,
                                             VOID       *pvProperty,
                                             UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETLINKPROPERTY_PTR)( ADSHANDLE  hConnect,
+                                            UNSIGNED8  *pucLinkName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetTableProperty( ADSHANDLE  hObject,
                                              UNSIGNED8  *pucTableName,
                                              UNSIGNED16 usPropertyID,
                                              VOID       *pvProperty,
                                              UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETTABLEPROPERTY_PTR)( ADSHANDLE  hObject,
+                                             UNSIGNED8  *pucTableName,
+                                             UNSIGNED16 usPropertyID,
+                                             VOID       *pvProperty,
+                                             UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetUserGroupProperty( ADSHANDLE  hObject,
                                                  UNSIGNED8  *pucUserGroupName,
                                                  UNSIGNED16 usPropertyID,
                                                  VOID       *pvProperty,
                                                  UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETUSERGROUPPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                 UNSIGNED8  *pucUserGroupName,
+                                                 UNSIGNED16 usPropertyID,
+                                                 VOID       *pvProperty,
+                                                 UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetUserProperty( ADSHANDLE  hObject,
                                             UNSIGNED8  *pucUserName,
                                             UNSIGNED16 usPropertyID,
                                             VOID       *pvProperty,
                                             UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETUSERPROPERTY_PTR)( ADSHANDLE  hObject,
+                                            UNSIGNED8  *pucUserName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetViewProperty( ADSHANDLE  hObject,
                                             UNSIGNED8  *pucViewName,
                                             UNSIGNED16 usPropertyID,
                                             VOID       *pvProperty,
                                             UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETVIEWPROPERTY_PTR)( ADSHANDLE  hObject,
+                                            UNSIGNED8  *pucViewName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetTriggerProperty( ADSHANDLE  hObject,
                                                UNSIGNED8  *pucTriggerName,
                                                UNSIGNED16 usPropertyID,
                                                VOID       *pvProperty,
                                                UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETTRIGGERPROPERTY_PTR)( ADSHANDLE  hObject,
+                                               UNSIGNED8  *pucTriggerName,
+                                               UNSIGNED16 usPropertyID,
+                                               VOID       *pvProperty,
+                                               UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetProcedureProperty( ADSHANDLE  hObject,
                                                  UNSIGNED8  *pucProcName,
                                                  UNSIGNED16 usPropertyID,
                                                  VOID       *pvProperty,
                                                  UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETPROCEDUREPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                 UNSIGNED8  *pucProcName,
+                                                 UNSIGNED16 usPropertyID,
+                                                 VOID       *pvProperty,
+                                                 UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetRefIntegrityProperty( ADSHANDLE  hObject,
                                                     UNSIGNED8  *pucRIName,
                                                     UNSIGNED16 usPropertyID,
                                                     UNSIGNED8  *pucProperty,
                                                     UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETREFINTEGRITYPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                    UNSIGNED8  *pucRIName,
+                                                    UNSIGNED16 usPropertyID,
+                                                    UNSIGNED8  *pucProperty,
+                                                    UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetPermissions( ADSHANDLE  hDBConn,
                                            UNSIGNED8  *pucGrantee,
@@ -1709,13 +1710,13 @@ UNSIGNED32 ENTRYPOINT AdsDDGetPermissions( ADSHANDLE  hDBConn,
                                            UNSIGNED8  *pucParentName,
                                            UNSIGNED16 usGetInherited,
                                            UNSIGNED32 *pulPermissions );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETPERMISSIONS_PTR)( ADSHANDLE  hDBConn,
+                                           UNSIGNED8  *pucGrantee,
+                                           UNSIGNED16 usObjectType,
+                                           UNSIGNED8  *pucObjectName,
+                                           UNSIGNED8  *pucParentName,
+                                           UNSIGNED16 usGetInherited,
+                                           UNSIGNED32 *pulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDGrantPermission( ADSHANDLE  hAdminConn,
                                             UNSIGNED16 usObjectType,
@@ -1723,12 +1724,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGrantPermission( ADSHANDLE  hAdminConn,
                                             UNSIGNED8  *pucParentName,
                                             UNSIGNED8  *pucGrantee,
                                             UNSIGNED32 ulPermissions );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGRANTPERMISSION_PTR)( ADSHANDLE  hAdminConn,
+                                            UNSIGNED16 usObjectType,
+                                            UNSIGNED8  *pucObjectName,
+                                            UNSIGNED8  *pucParentName,
+                                            UNSIGNED8  *pucGrantee,
+                                            UNSIGNED32 ulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDRevokePermission( ADSHANDLE  hAdminConn,
                                              UNSIGNED16 usObjectType,
@@ -1736,21 +1737,21 @@ UNSIGNED32 ENTRYPOINT AdsDDRevokePermission( ADSHANDLE  hAdminConn,
                                              UNSIGNED8  *pucParentName,
                                              UNSIGNED8  *pucGrantee,
                                              UNSIGNED32 ulPermissions );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREVOKEPERMISSION_PTR)( ADSHANDLE  hAdminConn,
+                                             UNSIGNED16 usObjectType,
+                                             UNSIGNED8  *pucObjectName,
+                                             UNSIGNED8  *pucParentName,
+                                             UNSIGNED8  *pucGrantee,
+                                             UNSIGNED32 ulPermissions );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetDatabaseProperty( ADSHANDLE  hDictionary,
                                         UNSIGNED16 usPropertyID,
                                         VOID       *pvProperty,
                                         UNSIGNED16 usPropertyLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETDATABASEPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                        UNSIGNED16 usPropertyID,
+                                        VOID       *pvProperty,
+                                        UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetFieldProperty( ADSHANDLE  hDictionary,
                                              UNSIGNED8  *pucTableName,
@@ -1760,25 +1761,25 @@ UNSIGNED32 ENTRYPOINT AdsDDSetFieldProperty( ADSHANDLE  hDictionary,
                                              UNSIGNED16 usPropertyLen,
                                              UNSIGNED16 usValidateOption,
                                              UNSIGNED8  *pucFailTable );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETFIELDPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                             UNSIGNED8  *pucTableName,
+                                             UNSIGNED8  *pucFieldName,
+                                             UNSIGNED16 usPropertyID,
+                                             VOID       *pvProperty,
+                                             UNSIGNED16 usPropertyLen,
+                                             UNSIGNED16 usValidateOption,
+                                             UNSIGNED8  *pucFailTable );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetProcedureProperty( ADSHANDLE  hDictionary,
                                                  UNSIGNED8  *pucProcedureName,
                                                  UNSIGNED16 usPropertyID,
                                                  VOID       *pvProperty,
                                                  UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETPROCEDUREPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                                 UNSIGNED8  *pucProcedureName,
+                                                 UNSIGNED16 usPropertyID,
+                                                 VOID       *pvProperty,
+                                                 UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetTableProperty( ADSHANDLE  hDictionary,
                                              UNSIGNED8  *pucTableName,
@@ -1787,55 +1788,55 @@ UNSIGNED32 ENTRYPOINT AdsDDSetTableProperty( ADSHANDLE  hDictionary,
                                              UNSIGNED16 usPropertyLen,
                                              UNSIGNED16 usValidateOption,
                                              UNSIGNED8  *pucFailTable );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETTABLEPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                             UNSIGNED8  *pucTableName,
+                                             UNSIGNED16 usPropertyID,
+                                             VOID       *pvProperty,
+                                             UNSIGNED16 usPropertyLen,
+                                             UNSIGNED16 usValidateOption,
+                                             UNSIGNED8  *pucFailTable );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetUserGroupProperty( ADSHANDLE  hDictionary,
                                                  UNSIGNED8  *pucUserGroupName,
                                                  UNSIGNED16 usPropertyID,
                                                  VOID       *pvProperty,
                                                  UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETUSERGROUPPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                                 UNSIGNED8  *pucUserGroupName,
+                                                 UNSIGNED16 usPropertyID,
+                                                 VOID       *pvProperty,
+                                                 UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetUserProperty( ADSHANDLE  hDictionary,
                                             UNSIGNED8  *pucUserName,
                                             UNSIGNED16 usPropertyID,
                                             VOID       *pvProperty,
                                             UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETUSERPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                            UNSIGNED8  *pucUserName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetViewProperty( ADSHANDLE  hDictionary,
                                             UNSIGNED8  *pucViewName,
                                             UNSIGNED16 usPropertyID,
                                             VOID       *pvProperty,
                                             UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETVIEWPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                            UNSIGNED8  *pucViewName,
+                                            UNSIGNED16 usPropertyID,
+                                            VOID       *pvProperty,
+                                            UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetObjectAccessRights( ADSHANDLE  hDictionary,
                                                   UNSIGNED8  *pucObjectName,
                                                   UNSIGNED8  *pucAccessorName,
                                                   UNSIGNED8  *pucAllowedAccess );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETOBJECTACCESSRIGHTS_PTR)( ADSHANDLE  hDictionary,
+                                                  UNSIGNED8  *pucObjectName,
+                                                  UNSIGNED8  *pucAccessorName,
+                                                  UNSIGNED8  *pucAllowedAccess );
 
 UNSIGNED32 ENTRYPOINT AdsDDAddProcedure( ADSHANDLE  hDictionary,
                                          UNSIGNED8  *pucName,
@@ -1845,14 +1846,14 @@ UNSIGNED32 ENTRYPOINT AdsDDAddProcedure( ADSHANDLE  hDictionary,
                                          UNSIGNED8  *pucInParams,
                                          UNSIGNED8  *pucOutParams,
                                          UNSIGNED8  *pucComments );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDADDPROCEDURE_PTR)( ADSHANDLE  hDictionary,
+                                         UNSIGNED8  *pucName,
+                                         UNSIGNED8  *pucDLL,
+                                         UNSIGNED8  *pucProcName,
+                                         UNSIGNED32 ulInvokeOption,
+                                         UNSIGNED8  *pucInParams,
+                                         UNSIGNED8  *pucOutParams,
+                                         UNSIGNED8  *pucComments );
 
 
 UNSIGNED32 ENTRYPOINT AdsDDAddTable( ADSHANDLE    hDictionary,
@@ -1862,22 +1863,22 @@ UNSIGNED32 ENTRYPOINT AdsDDAddTable( ADSHANDLE    hDictionary,
                                      UNSIGNED16   usCharType,
                                      UNSIGNED8    *pucIndexFiles,
                                      UNSIGNED8    *pucComments );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDADDTABLE_PTR)( ADSHANDLE    hDictionary,
+                                     UNSIGNED8    *pucTableName,
+                                     UNSIGNED8    *pucTablePath,
+                                     UNSIGNED16   usTableType,
+                                     UNSIGNED16   usCharType,
+                                     UNSIGNED8    *pucIndexFiles,
+                                     UNSIGNED8    *pucComments );
 
 UNSIGNED32 ENTRYPOINT AdsDDAddView( ADSHANDLE      hDictionary,
                                     UNSIGNED8      *pucName,
                                     UNSIGNED8      *pucComments,
                                     UNSIGNED8      *pucSQL );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDADDVIEW_PTR)( ADSHANDLE      hDictionary,
+                                    UNSIGNED8      *pucName,
+                                    UNSIGNED8      *pucComments,
+                                    UNSIGNED8      *pucSQL );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateTrigger( ADSHANDLE      hDictionary,
                                           UNSIGNED8      *pucName,
@@ -1890,120 +1891,120 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateTrigger( ADSHANDLE      hDictionary,
                                           UNSIGNED32     ulPriority,
                                           UNSIGNED8      *pucComments,
                                           UNSIGNED32     ulOptions );
-
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATETRIGGER_PTR)( ADSHANDLE      hDictionary,
+                                          UNSIGNED8      *pucName,
+                                          UNSIGNED8      *pucTableName,
+                                          UNSIGNED32     ulTriggerType,
+                                          UNSIGNED32     ulEventTypes,
+                                          UNSIGNED32     ulContainerType,
+                                          UNSIGNED8      *pucContainer,
+                                          UNSIGNED8      *pucFunctionName,
+                                          UNSIGNED32     ulPriority,
+                                          UNSIGNED8      *pucComments,
+                                          UNSIGNED32     ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveTrigger( ADSHANDLE      hDictionary,
                                           UNSIGNED8      *pucName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVETRIGGER_PTR)( ADSHANDLE      hDictionary,
+                                          UNSIGNED8      *pucName );
 
 UNSIGNED32 ENTRYPOINT AdsDDAddIndexFile( ADSHANDLE    hDictionary,
                                          UNSIGNED8    *pucTableName,
                                          UNSIGNED8    *pucIndexFilePath,
                                          UNSIGNED8    *pucComment );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDADDINDEXFILE_PTR)( ADSHANDLE    hDictionary,
+                                         UNSIGNED8    *pucTableName,
+                                         UNSIGNED8    *pucIndexFilePath,
+                                         UNSIGNED8    *pucComment );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateUser( ADSHANDLE    hDictionary,
                                        UNSIGNED8    *pucGroupName,
                                        UNSIGNED8    *pucUserName,
                                        UNSIGNED8    *pucPassword,
                                        UNSIGNED8    *pucDescription );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEUSER_PTR)( ADSHANDLE    hDictionary,
+                                       UNSIGNED8    *pucGroupName,
+                                       UNSIGNED8    *pucUserName,
+                                       UNSIGNED8    *pucPassword,
+                                       UNSIGNED8    *pucDescription );
 
 UNSIGNED32 ENTRYPOINT AdsDDAddUserToGroup( ADSHANDLE    hDictionary,
                                            UNSIGNED8    *pucGroupName,
                                            UNSIGNED8    *pucUserName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDADDUSERTOGROUP_PTR)( ADSHANDLE    hDictionary,
+                                           UNSIGNED8    *pucGroupName,
+                                           UNSIGNED8    *pucUserName );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveUserFromGroup( ADSHANDLE    hDictionary,
                                                 UNSIGNED8    *pucGroupName,
                                                 UNSIGNED8    *pucUserName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVEUSERFROMGROUP_PTR)( ADSHANDLE    hDictionary,
+                                                UNSIGNED8    *pucGroupName,
+                                                UNSIGNED8    *pucUserName );
 
 
 UNSIGNED32 ENTRYPOINT AdsDDDeleteUser( ADSHANDLE    hDictionary,
                                        UNSIGNED8    *pucUserName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETEUSER_PTR)( ADSHANDLE    hDictionary,
+                                       UNSIGNED8    *pucUserName );
 
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateUserGroup( ADSHANDLE    hDictionary,
                                             UNSIGNED8    *pucGroupName,
                                             UNSIGNED8    *pucDescription );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEUSERGROUP_PTR)( ADSHANDLE    hDictionary,
+                                            UNSIGNED8    *pucGroupName,
+                                            UNSIGNED8    *pucDescription );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeleteUserGroup( ADSHANDLE    hDictionary,
                                             UNSIGNED8    *pucGroupName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETEUSERGROUP_PTR)( ADSHANDLE    hDictionary,
+                                            UNSIGNED8    *pucGroupName );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeleteIndex( ADSHANDLE    hDictionary,
                                         UNSIGNED8    *pucTableName,
                                         UNSIGNED8    *pucIndexName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETEINDEX_PTR)( ADSHANDLE    hDictionary,
+                                        UNSIGNED8    *pucTableName,
+                                        UNSIGNED8    *pucIndexName );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveIndexFile( ADSHANDLE    hDictionary,
                                             UNSIGNED8    *pucTableName,
                                             UNSIGNED8    *pucIndexFileName,
                                             UNSIGNED16   usDeleteFile );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVEINDEXFILE_PTR)( ADSHANDLE    hDictionary,
+                                            UNSIGNED8    *pucTableName,
+                                            UNSIGNED8    *pucIndexFileName,
+                                            UNSIGNED16   usDeleteFile );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveProcedure( ADSHANDLE  hDictionary,
                                             UNSIGNED8  *pucName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVEPROCEDURE_PTR)( ADSHANDLE  hDictionary,
+                                            UNSIGNED8  *pucName );
 
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveTable( ADSHANDLE    hObject,
                                         UNSIGNED8    *pucTableName,
                                         UNSIGNED16   usDeleteFiles );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVETABLE_PTR)( ADSHANDLE    hObject,
+                                        UNSIGNED8    *pucTableName,
+                                        UNSIGNED16   usDeleteFiles );
 
 UNSIGNED32 ENTRYPOINT AdsDDRemoveView( ADSHANDLE   hDictionary,
                                        UNSIGNED8   *pucName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDREMOVEVIEW_PTR)( ADSHANDLE   hDictionary,
+                                       UNSIGNED8   *pucName );
 
 UNSIGNED32 ENTRYPOINT AdsDDRenameObject( ADSHANDLE    hDictionary,
                                          UNSIGNED8    *pucObjectName,
                                          UNSIGNED8    *pucNewObjectName,
                                          UNSIGNED16   usObjectType,
                                          UNSIGNED32   ulOptions );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDRENAMEOBJECT_PTR)( ADSHANDLE    hDictionary,
+                                                    UNSIGNED8    *pucObjectName,
+                                                    UNSIGNED8    *pucNewObjectName,
+                                                    UNSIGNED16   usObjectType,
+                                                    UNSIGNED32   ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDMoveObjectFile( ADSHANDLE    hDictionary,
                                            UNSIGNED16   usObjectType,
@@ -2012,13 +2013,13 @@ UNSIGNED32 ENTRYPOINT AdsDDMoveObjectFile( ADSHANDLE    hDictionary,
                                            UNSIGNED8    *pucIndexFiles,
                                            UNSIGNED8    *pucParent,
                                            UNSIGNED32   ulOptions );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDMOVEOBJECTFILE_PTR)( ADSHANDLE    hDictionary,
+                                                      UNSIGNED16   usObjectType,
+                                                      UNSIGNED8    *pucObjectName,
+                                                      UNSIGNED8    *pucNewPath,
+                                                      UNSIGNED8    *pucIndexFiles,
+                                                      UNSIGNED8    *pucParent,
+                                                      UNSIGNED32   ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDFindFirstObject( ADSHANDLE  hObject,
                                             UNSIGNED16 usFindObjectType,
@@ -2026,24 +2027,24 @@ UNSIGNED32 ENTRYPOINT AdsDDFindFirstObject( ADSHANDLE  hObject,
                                             UNSIGNED8  *pucObjectName,
                                             UNSIGNED16 *pusObjectNameLen,
                                             ADSHANDLE  *phFindHandle );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDFINDFIRSTOBJECT_PTR)( ADSHANDLE  hObject,
+                                            UNSIGNED16 usFindObjectType,
+                                            UNSIGNED8  *pucParentName,
+                                            UNSIGNED8  *pucObjectName,
+                                            UNSIGNED16 *pusObjectNameLen,
+                                            ADSHANDLE  *phFindHandle );
 
 UNSIGNED32 ENTRYPOINT AdsDDFindNextObject( ADSHANDLE  hObject,
                                            ADSHANDLE  hFindHandle,
                                            UNSIGNED8  *pucObjectName,
                                            UNSIGNED16 *pusObjectNameLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDFINDNEXTOBJECT_PTR)( ADSHANDLE  hObject,
+                                           ADSHANDLE  hFindHandle,
+                                           UNSIGNED8  *pucObjectName,
+                                           UNSIGNED16 *pusObjectNameLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDFindClose( ADSHANDLE hObject, ADSHANDLE hFindHandle );
-
+typedef UNSIGNED32 (WINAPI *ADSDDFINDCLOSE_PTR)( ADSHANDLE hObject, ADSHANDLE hFindHandle );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateLink( ADSHANDLE  hDBConn,
                                        UNSIGNED8  *pucLinkAlias,
@@ -2051,12 +2052,12 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateLink( ADSHANDLE  hDBConn,
                                        UNSIGNED8  *pucUserName,
                                        UNSIGNED8  *pucPassword,
                                        UNSIGNED32 ulOptions );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATELINK_PTR)( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDModifyLink( ADSHANDLE  hDBConn,
                                        UNSIGNED8  *pucLinkAlias,
@@ -2064,55 +2065,55 @@ UNSIGNED32 ENTRYPOINT AdsDDModifyLink( ADSHANDLE  hDBConn,
                                        UNSIGNED8  *pucUserName,
                                        UNSIGNED8  *pucPassword,
                                        UNSIGNED32 ulOptions );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDMODIFYLINK_PTR)( ADSHANDLE  hDBConn,
+                                       UNSIGNED8  *pucLinkAlias,
+                                       UNSIGNED8  *pucLinkedDDPath,
+                                       UNSIGNED8  *pucUserName,
+                                       UNSIGNED8  *pucPassword,
+                                       UNSIGNED32 ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDDropLink( ADSHANDLE  hDBConn,
                                      UNSIGNED8  *pucLinkedDD,
                                      UNSIGNED16 usDropGlobal );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDROPLINK_PTR)( ADSHANDLE  hDBConn,
+                                     UNSIGNED8  *pucLinkedDD,
+                                     UNSIGNED16 usDropGlobal );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreatePublication( ADSHANDLE      hDictionary,
                                               UNSIGNED8      *pucPublicationName,
                                               UNSIGNED8      *pucComments,
                                               UNSIGNED32     ulOptions );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEPUBLICATION_PTR)( ADSHANDLE      hDictionary,
+                                              UNSIGNED8      *pucPublicationName,
+                                              UNSIGNED8      *pucComments,
+                                              UNSIGNED32     ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetPublicationProperty( ADSHANDLE  hObject,
                                                    UNSIGNED8  *pucPublicationName,
                                                    UNSIGNED16 usPropertyID,
                                                    VOID       *pvProperty,
                                                    UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETPUBLICATIONPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                   UNSIGNED8  *pucPublicationName,
+                                                   UNSIGNED16 usPropertyID,
+                                                   VOID       *pvProperty,
+                                                   UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetPublicationProperty( ADSHANDLE  hDictionary,
                                                    UNSIGNED8  *pucPublicationName,
                                                    UNSIGNED16 usPropertyID,
                                                    VOID       *pvProperty,
                                                    UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETPUBLICATIONPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                                   UNSIGNED8  *pucPublicationName,
+                                                   UNSIGNED16 usPropertyID,
+                                                   VOID       *pvProperty,
+                                                   UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeletePublication( ADSHANDLE    hDictionary,
                                               UNSIGNED8    *pucPublicationName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETEPUBLICATION_PTR)( ADSHANDLE    hDictionary,
+                                              UNSIGNED8    *pucPublicationName );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateArticle( ADSHANDLE      hDictionary,
                                           UNSIGNED8      *pucPublicationName,
@@ -2120,12 +2121,12 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateArticle( ADSHANDLE      hDictionary,
                                           UNSIGNED8      *pucRowIdentColumns,
                                           UNSIGNED8      *pucFilter,
                                           UNSIGNED32     ulOptions );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATEARTICLE_PTR)( ADSHANDLE      hDictionary,
+                                          UNSIGNED8      *pucPublicationName,
+                                          UNSIGNED8      *pucObjectName,
+                                          UNSIGNED8      *pucRowIdentColumns,
+                                          UNSIGNED8      *pucFilter,
+                                          UNSIGNED32     ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetArticleProperty( ADSHANDLE  hObject,
                                                UNSIGNED8  *pucPublicationName,
@@ -2133,12 +2134,12 @@ UNSIGNED32 ENTRYPOINT AdsDDGetArticleProperty( ADSHANDLE  hObject,
                                                UNSIGNED16 usPropertyID,
                                                VOID       *pvProperty,
                                                UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETARTICLEPROPERTY_PTR)( ADSHANDLE  hObject,
+                                               UNSIGNED8  *pucPublicationName,
+                                               UNSIGNED8  *pucObjectName,
+                                               UNSIGNED16 usPropertyID,
+                                               VOID       *pvProperty,
+                                               UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetArticleProperty( ADSHANDLE  hDictionary,
                                                UNSIGNED8  *pucPublicationName,
@@ -2146,19 +2147,19 @@ UNSIGNED32 ENTRYPOINT AdsDDSetArticleProperty( ADSHANDLE  hDictionary,
                                                UNSIGNED16 usPropertyID,
                                                VOID       *pvProperty,
                                                UNSIGNED16 usPropertyLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETARTICLEPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                               UNSIGNED8  *pucPublicationName,
+                                               UNSIGNED8  *pucObjectName,
+                                               UNSIGNED16 usPropertyID,
+                                               VOID       *pvProperty,
+                                               UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeleteArticle( ADSHANDLE    hDictionary,
                                           UNSIGNED8    *pucPublicationName,
                                           UNSIGNED8    *pucObjectName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETEARTICLE_PTR)( ADSHANDLE    hDictionary,
+                                          UNSIGNED8    *pucPublicationName,
+                                          UNSIGNED8    *pucObjectName );
 
 UNSIGNED32 ENTRYPOINT AdsDDCreateSubscription( ADSHANDLE      hDictionary,
                                                UNSIGNED8      *pucSubscriptionName,
@@ -2170,184 +2171,184 @@ UNSIGNED32 ENTRYPOINT AdsDDCreateSubscription( ADSHANDLE      hDictionary,
                                                UNSIGNED16     usForward,
                                                UNSIGNED8      *pucComments,
                                                UNSIGNED32     ulOptions );
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDCREATESUBSCRIPTION_PTR)( ADSHANDLE      hDictionary,
+                                               UNSIGNED8      *pucSubscriptionName,
+                                               UNSIGNED8      *pucPublicationName,
+                                               UNSIGNED8      *pucTarget,
+                                               UNSIGNED8      *pucUser,
+                                               UNSIGNED8      *pucPassword,
+                                               UNSIGNED8      *pucReplicationQueue,
+                                               UNSIGNED16     usForward,
+                                               UNSIGNED8      *pucComments,
+                                               UNSIGNED32     ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDGetSubscriptionProperty( ADSHANDLE  hObject,
                                                     UNSIGNED8  *pucSubscriptionName,
                                                     UNSIGNED16 usPropertyID,
                                                     VOID       *pvProperty,
                                                     UNSIGNED16 *pusPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDGETSUBSCRIPTIONPROPERTY_PTR)( ADSHANDLE  hObject,
+                                                    UNSIGNED8  *pucSubscriptionName,
+                                                    UNSIGNED16 usPropertyID,
+                                                    VOID       *pvProperty,
+                                                    UNSIGNED16 *pusPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDSetSubscriptionProperty( ADSHANDLE  hDictionary,
                                                     UNSIGNED8  *pucSubscriptionName,
                                                     UNSIGNED16 usPropertyID,
                                                     VOID       *pvProperty,
                                                     UNSIGNED16 usPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDSETSUBSCRIPTIONPROPERTY_PTR)( ADSHANDLE  hDictionary,
+                                                    UNSIGNED8  *pucSubscriptionName,
+                                                    UNSIGNED16 usPropertyID,
+                                                    VOID       *pvProperty,
+                                                    UNSIGNED16 usPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeleteSubscription( ADSHANDLE    hDictionary,
                                                UNSIGNED8    *pucSubscriptionName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDELETESUBSCRIPTION_PTR)( ADSHANDLE    hDictionary,
+                                               UNSIGNED8    *pucSubscriptionName );
 
 
 UNSIGNED32 ENTRYPOINT AdsDecryptRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSDECRYPTRECORD_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsDecryptTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSDECRYPTTABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsDeleteCustomKey( ADSHANDLE hIndex );
-
+typedef UNSIGNED32 (WINAPI *ADSDELETECUSTOMKEY_PTR)( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsDeleteIndex( ADSHANDLE hIndex );
-
+typedef UNSIGNED32 (WINAPI *ADSDELETEINDEX_PTR)( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsDeleteRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSDELETERECORD_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsGetKeyColumn( ADSHANDLE  hCursor,
                                        UNSIGNED8  *pucKeyColumn,
                                        UNSIGNED16 *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETKEYCOLUMN_PTR)( ADSHANDLE  hCursor,
+                                                  UNSIGNED8  *pucKeyColumn,
+                                                  UNSIGNED16 *pusLen);
 
 UNSIGNED32 ENTRYPOINT AdsDisableEncryption( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSDISABLEENCRYPTION_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsDisableLocalConnections( void );
-
+typedef UNSIGNED32 (WINAPI *ADSDISABLELOCALCONNECTIONS_PTR)( void );
 
 UNSIGNED32 ENTRYPOINT AdsDisconnect( ADSHANDLE hConnect );
-
+typedef UNSIGNED32 (WINAPI *ADSDISCONNECT_PTR)( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsEnableEncryption( ADSHANDLE hTable,
                                            UNSIGNED8 *pucPassword );
-
-
+typedef UNSIGNED32 (WINAPI *ADSENABLEENCRYPTION_PTR)( ADSHANDLE hTable,
+                                           UNSIGNED8 *pucPassword );
 
 UNSIGNED32 ENTRYPOINT AdsEncryptRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSENCRYPTRECORD_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsEncryptTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSENCRYPTTABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsEvalLogicalExpr(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       *pbResult );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEVALLOGICALEXPR_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       *pbResult );
 
 UNSIGNED32 ENTRYPOINT AdsEvalNumericExpr(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               DOUBLE           *pdResult );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEVALNUMERICEXPR_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              DOUBLE           *pdResult );
 
 UNSIGNED32 ENTRYPOINT AdsEvalStringExpr(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED8        *pucResult,
                               UNSIGNED16       *pusLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEVALSTRINGEXPR_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED8        *pucResult,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsEvalTestExpr(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       *pusType );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEVALTESTEXPR_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       *pusType );
 
 UNSIGNED32 ENTRYPOINT AdsExtractKey(
                               ADSHANDLE        hIndex,
                               UNSIGNED8        *pucKey,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEXTRACTKEY_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED8        *pucKey,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsFailedTransactionRecovery( UNSIGNED8 *pucServer );
-
+typedef UNSIGNED32 (WINAPI *ADSFAILEDTRANSACTIONRECOVERY_PTR)( UNSIGNED8 *pucServer );
 
 UNSIGNED32 ENTRYPOINT AdsFileToBinary(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       usBinaryType,
                               UNSIGNED8        *pucFileName );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFILETOBINARY_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       usBinaryType,
+                              UNSIGNED8        *pucFileName );
 
 UNSIGNED32 ENTRYPOINT AdsFindConnection(
                               UNSIGNED8        *pucServerName,
                               ADSHANDLE        *phConnect );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDCONNECTION_PTR)(
+                              UNSIGNED8        *pucServerName,
+                              ADSHANDLE        *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsFindConnection25(
                               UNSIGNED8        *pucFullPath,
                               ADSHANDLE        *phConnect );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDCONNECTION25_PTR)(
+                              UNSIGNED8        *pucFullPath,
+                              ADSHANDLE        *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsFindClose( ADSHANDLE hConnect, SIGNED32 lHandle );
-
+typedef UNSIGNED32 (WINAPI *ADSFINDCLOSE_PTR)( ADSHANDLE hConnect, SIGNED32 lHandle );
 
 UNSIGNED32 ENTRYPOINT AdsFindFirstTable( ADSHANDLE  hConnect,
                                          UNSIGNED8  *pucFileMask,
                                          UNSIGNED8  *pucFirstFile,
                                          UNSIGNED16 *pusFileLen,
                                          SIGNED32   *plHandle );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDFIRSTTABLE_PTR)( ADSHANDLE  hConnect,
+                                         UNSIGNED8  *pucFileMask,
+                                         UNSIGNED8  *pucFirstFile,
+                                         UNSIGNED16 *pusFileLen,
+                                         SIGNED32   *plHandle );
 
 UNSIGNED32 ENTRYPOINT AdsFindNextTable( ADSHANDLE hConnect,
                                         SIGNED32 lHandle,
                                         UNSIGNED8 *pucFileName,
                                         UNSIGNED16 *pusFileLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDNEXTTABLE_PTR)( ADSHANDLE hConnect,
+                                        SIGNED32 lHandle,
+                                        UNSIGNED8 *pucFileName,
+                                        UNSIGNED16 *pusFileLen );
 
 UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE  hConnect,
                                            UNSIGNED8  *pucFileMask,
@@ -2356,13 +2357,13 @@ UNSIGNED32 ENTRYPOINT AdsFindFirstTable62( ADSHANDLE  hConnect,
                                            UNSIGNED8  *pucFirstFile,
                                            UNSIGNED16 *pusFileLen,
                                            SIGNED32   *plHandle );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDFIRSTTABLE62_PTR)( ADSHANDLE  hConnect,
+                                           UNSIGNED8  *pucFileMask,
+                                           UNSIGNED8  *pucFirstDD,
+                                           UNSIGNED16 *pusDDLen,
+                                           UNSIGNED8  *pucFirstFile,
+                                           UNSIGNED16 *pusFileLen,
+                                           SIGNED32   *plHandle );
 
 UNSIGNED32 ENTRYPOINT AdsFindNextTable62( ADSHANDLE hConnect,
                                           SIGNED32 lHandle,
@@ -2370,30 +2371,30 @@ UNSIGNED32 ENTRYPOINT AdsFindNextTable62( ADSHANDLE hConnect,
                                           UNSIGNED16 *pusDDLen,
                                           UNSIGNED8 *pucFileName,
                                           UNSIGNED16 *pusFileLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSFINDNEXTTABLE62_PTR)( ADSHANDLE hConnect,
+                                          SIGNED32 lHandle,
+                                          UNSIGNED8 *pucDDName,
+                                          UNSIGNED16 *pusDDLen,
+                                          UNSIGNED8 *pucFileName,
+                                          UNSIGNED16 *pusFileLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetAllIndexes(
                               ADSHANDLE        hTable,
                               ADSHANDLE        ahIndex[],
                               UNSIGNED16       *pusArrayLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETALLINDEXES_PTR)(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        ahIndex[],
+                              UNSIGNED16       *pusArrayLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetFTSIndexes(
                               ADSHANDLE        hTable,
                               ADSHANDLE        ahIndex[],
                               UNSIGNED16       *pusArrayLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFTSINDEXES_PTR)(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        ahIndex[],
+                              UNSIGNED16       *pusArrayLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetFTSIndexInfo(
                               ADSHANDLE   hIndex,
@@ -2410,36 +2411,36 @@ UNSIGNED32 ENTRYPOINT AdsGetFTSIndexInfo(
                               UNSIGNED8   **ppucReserved2,
                               UNSIGNED32  *pulOptions );
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFTSINDEXINFO_PTR)(
+                              ADSHANDLE   hIndex,
+                              UNSIGNED8   *pucOutput,
+                              UNSIGNED32  *pulBufLen,
+                              UNSIGNED8   **ppucField,
+                              UNSIGNED32  *pulMinWordLen,
+                              UNSIGNED32  *pulMaxWordLen,
+                              UNSIGNED8   **ppucDelimiters,
+                              UNSIGNED8   **ppucNoiseWords,
+                              UNSIGNED8   **ppucDropChars,
+                              UNSIGNED8   **ppucConditionalChars,
+                              UNSIGNED8   **ppucReserved1,
+                              UNSIGNED8   **ppucReserved2,
+                              UNSIGNED32  *pulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsGetAllLocks(
                               ADSHANDLE        hTable,
                               UNSIGNED32       aulLocks[],
                               UNSIGNED16       *pusArrayLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETALLLOCKS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       aulLocks[],
+                              UNSIGNED16       *pusArrayLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetAllTables(
                               ADSHANDLE        ahTable[],
                               UNSIGNED16       *pusArrayLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETALLTABLES_PTR)(
+                              ADSHANDLE        ahTable[],
+                              UNSIGNED16       *pusArrayLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetBinary(
                               ADSHANDLE        hTable,
@@ -2447,154 +2448,154 @@ UNSIGNED32 ENTRYPOINT AdsGetBinary(
                               UNSIGNED32       ulOffset,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED32       *pulLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETBINARY_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED32       ulOffset,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED32       *pulLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetBinaryLength(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED32       *pulLength );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETBINARYLENGTH_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetBookmark(
                               ADSHANDLE        hTable,
                               ADSHANDLE        *phBookmark );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETBOOKMARK_PTR)(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        *phBookmark );
 
 UNSIGNED32 ENTRYPOINT AdsGetBookmark60(
                               ADSHANDLE        hObj,
                               UNSIGNED8        *pucBookmark,
                               UNSIGNED32       *pulLength );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETBOOKMARK60_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED8        *pucBookmark,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetBookmarkLength(
                               ADSHANDLE        hObj,
                               UNSIGNED32       *pulLength );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETBOOKMARKLENGTH_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsCompareBookmarks(
                               UNSIGNED8        *pucBookmark1,
                               UNSIGNED8        *pucBookmark2,
                               SIGNED32         *plResult );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCOMPAREBOOKMARKS_PTR)(
+                              UNSIGNED8        *pucBookmark1,
+                              UNSIGNED8        *pucBookmark2,
+                              SIGNED32         *plResult );
 
 UNSIGNED32 ENTRYPOINT AdsGetCollationLang(
                               UNSIGNED8  *pucLang,
                               UNSIGNED16 *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETCOLLATIONLANG_PTR)(
+                              UNSIGNED8  *pucLang,
+                              UNSIGNED16 *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetConnectionType(
                               ADSHANDLE        hConnect,
                               UNSIGNED16       *pusConnectType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETCONNECTIONTYPE_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED16       *pusConnectType );
 
 UNSIGNED32 ENTRYPOINT AdsGetConnectionPath(
                               ADSHANDLE        hConnect,
                               UNSIGNED8        *pucConnectionPath,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETCONNECTIONPATH_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED8        *pucConnectionPath,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetConnectionProperty(
                               ADSHANDLE        hConnect,
                               UNSIGNED16       usPropertyID,
                               VOID             *pvProperty,
                               UNSIGNED32       *pulPropertyLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETCONNECTIONPROPERTY_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED16       usPropertyID,
+                              VOID             *pvProperty,
+                              UNSIGNED32       *pulPropertyLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDate(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED16       *pusLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETDATE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDateFormat( UNSIGNED8  *pucFormat,
                                         UNSIGNED16 *pusLen );
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETDATEFORMAT_PTR)( UNSIGNED8   *pucFormat,
+                                                   UNSIGNED16  *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDateFormat60( ADSHANDLE  hConnect,
                                           UNSIGNED8  *pucFormat,
                                           UNSIGNED16 *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETDATEFORMAT60_PTR)( ADSHANDLE  hConnect,
+                                                     UNSIGNED8  *pucFormat,
+                                                     UNSIGNED16 *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDecimals( UNSIGNED16 *pusDecimals );
-
+typedef UNSIGNED32 (WINAPI *ADSGETDECIMALS_PTR)( UNSIGNED16 *pusDecimals );
 
 UNSIGNED32 ENTRYPOINT AdsGetDefault(
                               UNSIGNED8        *pucDefault,
                               UNSIGNED16       *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETDEFAULT_PTR)(
+                              UNSIGNED8        *pucDefault,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetDeleted( UNSIGNED16 *pbUseDeleted );
-
+typedef UNSIGNED32 (WINAPI *ADSGETDELETED_PTR)( UNSIGNED16 *pbUseDeleted );
 
 UNSIGNED32 ENTRYPOINT AdsGetDouble(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               DOUBLE           *pdValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETDOUBLE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              DOUBLE           *pdValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetEpoch( UNSIGNED16 *pusCentury );
-
+typedef UNSIGNED32 (WINAPI *ADSGETEPOCH_PTR)( UNSIGNED16 *pusCentury );
 
 UNSIGNED32 ENTRYPOINT AdsGetErrorString(
                               UNSIGNED32       ulErrCode,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED16       *pusBufLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETERRORSTRING_PTR)(
+                              UNSIGNED32       ulErrCode,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED16       *pusBufLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetExact( UNSIGNED16 *pbExact );
-
+typedef UNSIGNED32 (WINAPI *ADSGETEXACT_PTR)( UNSIGNED16 *pbExact );
 
 UNSIGNED32 ENTRYPOINT AdsGetExact22(
                               ADSHANDLE        hObj,
                               UNSIGNED16       *pbExact );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETEXACT22_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED16       *pbExact );
 
 UNSIGNED32 ENTRYPOINT AdsGetField(
                               ADSHANDLE        hTable,
@@ -2602,138 +2603,138 @@ UNSIGNED32 ENTRYPOINT AdsGetField(
                               UNSIGNED8        *pucBuf,
                               UNSIGNED32       *pulLen,
                               UNSIGNED16       usOption );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELD_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED32       *pulLen,
+                              UNSIGNED16       usOption );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldDecimals(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pusDecimals );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDDECIMALS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pusDecimals );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldLength(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED32       *pulLength );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDLENGTH_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldName(
                               ADSHANDLE        hTable,
                               UNSIGNED16       usFld,
                               UNSIGNED8        *pucName,
                               UNSIGNED16       *pusBufLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDNAME_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       usFld,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED16       *pusBufLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldNum(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pusNum );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDNUM_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pusNum );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldOffset(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED32       *pulOffset );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDOFFSET_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED32       *pulOffset );
 
 UNSIGNED32 ENTRYPOINT AdsGetFieldType(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pusType );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFIELDTYPE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pusType );
 
 UNSIGNED32 ENTRYPOINT AdsGetFilter(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFilter,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETFILTER_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFilter,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetHandleLong(
                               ADSHANDLE        hObj,
                               UNSIGNED32       *pulVal );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETHANDLELONG_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED32       *pulVal );
 
 UNSIGNED32 ENTRYPOINT AdsGetHandleType(
                               ADSHANDLE        hObj,
                               UNSIGNED16       *pusType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETHANDLETYPE_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED16       *pusType );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexCondition(
                               ADSHANDLE        hIndex,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXCONDITION_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexExpr(
                               ADSHANDLE        hIndex,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXEXPR_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexFilename(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       usOption,
                               UNSIGNED8        *pucName,
                               UNSIGNED16       *pusLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXFILENAME_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       usOption,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexHandle(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucIndexOrder,
                               ADSHANDLE        *phIndex );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXHANDLE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucIndexOrder,
+                              ADSHANDLE        *phIndex );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexHandleByOrder(
                               ADSHANDLE        hTable,
                               UNSIGNED16       usOrderNum,
                               ADSHANDLE        *phIndex );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXHANDLEBYORDER_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       usOrderNum,
+                              ADSHANDLE        *phIndex );
 
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexHandleByExpr(
@@ -2741,281 +2742,281 @@ UNSIGNED32 ENTRYPOINT AdsGetIndexHandleByExpr(
                               UNSIGNED8        *pucExpr,
                               UNSIGNED32       ulDescending,
                               ADSHANDLE        *phIndex );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXHANDLEBYEXPR_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED32       ulDescending,
+                              ADSHANDLE        *phIndex );
 
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexName(
                               ADSHANDLE        hIndex,
                               UNSIGNED8        *pucName,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXNAME_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetIndexOrderByHandle( ADSHANDLE   hIndex,
                                                 UNSIGNED16  *pusIndexOrder );
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETINDEXORDERBYHANDLE_PTR)( ADSHANDLE   hIndex,
+                                                UNSIGNED16  *pusIndexOrder );
 
 UNSIGNED32 ENTRYPOINT AdsGetJulian(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plDate );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETJULIAN_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED32         *plDate );
 
 UNSIGNED32 ENTRYPOINT AdsGetKeyCount(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       usFilterOption,
                               UNSIGNED32       *pulCount );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETKEYCOUNT_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       usFilterOption,
+                              UNSIGNED32       *pulCount );
 
 UNSIGNED32 ENTRYPOINT AdsGetKeyNum(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       usFilterOption,
                               UNSIGNED32       *pulKey );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETKEYNUM_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       usFilterOption,
+                              UNSIGNED32       *pulKey );
 
 UNSIGNED32 ENTRYPOINT AdsGetKeyLength(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pusKeyLength );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETKEYLENGTH_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pusKeyLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetKeyType(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *usKeyType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETKEYTYPE_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *usKeyType );
 
 UNSIGNED32 ENTRYPOINT AdsGetLastError(
                               UNSIGNED32       *pulErrCode,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED16       *pusBufLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETLASTERROR_PTR)(
+                              UNSIGNED32       *pulErrCode,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED16       *pusBufLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetLastTableUpdate(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucDate,
                               UNSIGNED16       *pusDateLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETLASTTABLEUPDATE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucDate,
+                              UNSIGNED16       *pusDateLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetLogical(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pbValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETLOGICAL_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pbValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetLong(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETLONG_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED32         *plValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetLongLong(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED64         *pqValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETLONGLONG_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED64         *pqValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetMemoBlockSize(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusBlockSize );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETMEMOBLOCKSIZE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusBlockSize );
 
 UNSIGNED32 ENTRYPOINT AdsGetMemoLength(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED32       *pulLength );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETMEMOLENGTH_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetMemoDataType(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pusType );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETMEMODATATYPE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pusType );
 
 UNSIGNED32 ENTRYPOINT AdsGetMilliseconds(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED32         *plTime );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETMILLISECONDS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED32         *plTime );
 
 UNSIGNED32 ENTRYPOINT AdsGetMoney(
                               ADSHANDLE  hTbl,
                               UNSIGNED8  *pucFldName,
                               SIGNED64   *pqValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETMONEY_PTR)(
+                              ADSHANDLE  hTbl,
+                              UNSIGNED8  *pucFldName,
+                              SIGNED64   *pqValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetActiveLinkInfo(
                               ADSHANDLE         hDBConn,
                               UNSIGNED16        usLinkNum,
                               UNSIGNED8         *pucLinkInfo,
                               UNSIGNED16        *pusBufferLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETACTIVELINKINFO_PTR)(
+                              ADSHANDLE         hDBConn,
+                              UNSIGNED16        usLinkNum,
+                              UNSIGNED8         *pucLinkInfo,
+                              UNSIGNED16        *pusBufferLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumActiveLinks(
                               ADSHANDLE         hDBConn,
                               UNSIGNED16        *pusNumLinks );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMACTIVELINKS_PTR)(
+                              ADSHANDLE         hDBConn,
+                              UNSIGNED16        *pusNumLinks );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumFields(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusCount );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMFIELDS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusCount );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumIndexes(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusNum );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMINDEXES_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusNum );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumFTSIndexes(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusNum );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMFTSINDEXES_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusNum );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumLocks(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusNum );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMLOCKS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusNum );
 
 UNSIGNED32 ENTRYPOINT AdsGetNumOpenTables( UNSIGNED16 *pusNum );
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMOPENTABLES_PTR)( UNSIGNED16 *pusNum );
 
 UNSIGNED32 ENTRYPOINT AdsGetRecord(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucRec,
                               UNSIGNED32       *pulLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRECORD_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucRec,
+                              UNSIGNED32       *pulLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetRecordCount(
                               ADSHANDLE        hTable,
                               UNSIGNED16       usFilterOption,
                               UNSIGNED32       *pulCount );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRECORDCOUNT_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       usFilterOption,
+                              UNSIGNED32       *pulCount );
 
 UNSIGNED32 ENTRYPOINT AdsGetRecordNum(
                               ADSHANDLE        hTable,
                               UNSIGNED16       usFilterOption,
                               UNSIGNED32       *pulRec );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRECORDNUM_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       usFilterOption,
+                              UNSIGNED32       *pulRec );
 
 UNSIGNED32 ENTRYPOINT AdsGetRecordLength(
                               ADSHANDLE        hTable,
                               UNSIGNED32       *pulLength );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRECORDLENGTH_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       *pulLength );
 
 UNSIGNED32 ENTRYPOINT AdsGetRecordCRC(
                               ADSHANDLE        hTable,
                               UNSIGNED32       *pulCRC,
                               UNSIGNED32       ulOptions );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRECORDCRC_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       *pulCRC,
+                              UNSIGNED32       ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsGetRelKeyPos(
                               ADSHANDLE        hIndex,
                               DOUBLE           *pdPos );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETRELKEYPOS_PTR)(
+                              ADSHANDLE        hIndex,
+                              DOUBLE           *pdPos );
 
 UNSIGNED32 ENTRYPOINT AdsGetScope(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       usScopeOption,
                               UNSIGNED8        *pucScope,
                               UNSIGNED16       *pusBufLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSCOPE_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       usScopeOption,
+                              UNSIGNED8        *pucScope,
+                              UNSIGNED16       *pusBufLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetSearchPath(
                               UNSIGNED8        *pucPath,
                               UNSIGNED16       *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSEARCHPATH_PTR)(
+                              UNSIGNED8        *pucPath,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetServerName(
                               ADSHANDLE        hConnect,
                               UNSIGNED8        *pucName,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSERVERNAME_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetServerTime(
                               ADSHANDLE        hConnect,
@@ -3024,22 +3025,22 @@ UNSIGNED32 ENTRYPOINT AdsGetServerTime(
                               SIGNED32         *plTime,
                               UNSIGNED8        *pucTimeBuf,
                               UNSIGNED16       *pusTimeBufLen );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSERVERTIME_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED8        *pucDateBuf,
+                              UNSIGNED16       *pusDateBufLen,
+                              SIGNED32         *plTime,
+                              UNSIGNED8        *pucTimeBuf,
+                              UNSIGNED16       *pusTimeBufLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetShort(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               SIGNED16         *psValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSHORT_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              SIGNED16         *psValue );
 
 UNSIGNED32 ENTRYPOINT AdsGetString(
                               ADSHANDLE        hTable,
@@ -3047,108 +3048,108 @@ UNSIGNED32 ENTRYPOINT AdsGetString(
                               UNSIGNED8        *pucBuf,
                               UNSIGNED32       *pulLen,
                               UNSIGNED16       usOption );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSTRING_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED32       *pulLen,
+                              UNSIGNED16       usOption );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableAlias(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucAlias,
                               UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEALIAS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucAlias,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableCharType(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusCharType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLECHARTYPE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusCharType );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableConnection(
                               ADSHANDLE        hTable,
                               ADSHANDLE        *phConnect );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLECONNECTION_PTR)(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        *phConnect );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableFilename(
                               ADSHANDLE        hTable,
                               UNSIGNED16       usOption,
                               UNSIGNED8        *pucName,
                               UNSIGNED16       *pusLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEFILENAME_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       usOption,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableHandle(
                               UNSIGNED8        *pucName,
                               ADSHANDLE        *phTable );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEHANDLE_PTR)(
+                              UNSIGNED8        *pucName,
+                              ADSHANDLE        *phTable );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableHandle25(
                               ADSHANDLE   hConnect,
                               UNSIGNED8   *pucName,
                               ADSHANDLE   *phTable );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEHANDLE25_PTR)(
+                              ADSHANDLE   hConnect,
+                              UNSIGNED8   *pucName,
+                              ADSHANDLE   *phTable );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableLockType(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusLockType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLELOCKTYPE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusLockType );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableMemoSize(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusMemoSize );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEMEMOSIZE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusMemoSize );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableOpenOptions(
                               ADSHANDLE        hTable,
                               UNSIGNED32       *pulOptions );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLEOPENOPTIONS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       *pulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableRights(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusRights );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLERIGHTS_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusRights );
 
 UNSIGNED32 ENTRYPOINT AdsGetTableType(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pusType );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTABLETYPE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pusType );
 
 UNSIGNED32 ENTRYPOINT AdsGetTime(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED16       *pusLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETTIME_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetVersion(
                               UNSIGNED32       *pulMajor,
@@ -3156,227 +3157,227 @@ UNSIGNED32 ENTRYPOINT AdsGetVersion(
                               UNSIGNED8        *pucLetter,
                               UNSIGNED8        *pucDesc,
                               UNSIGNED16       *pusDescLen );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETVERSION_PTR)(
+                              UNSIGNED32       *pulMajor,
+                              UNSIGNED32       *pulMinor,
+                              UNSIGNED8        *pucLetter,
+                              UNSIGNED8        *pucDesc,
+                              UNSIGNED16       *pusDescLen );
 
 UNSIGNED32 ENTRYPOINT AdsGotoBookmark(
                               ADSHANDLE        hTable,
                               ADSHANDLE        hBookmark );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGOTOBOOKMARK_PTR)(
+                              ADSHANDLE        hTable,
+                              ADSHANDLE        hBookmark );
 
 UNSIGNED32 ENTRYPOINT AdsGotoBookmark60(
                               ADSHANDLE        hObj,
                               UNSIGNED8        *pucBookmark );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGOTOBOOKMARK60_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED8        *pucBookmark );
 
 UNSIGNED32 ENTRYPOINT AdsGotoBottom( ADSHANDLE hObj );
-
+typedef UNSIGNED32 (WINAPI *ADSGOTOBOTTOM_PTR)( ADSHANDLE hObj );
 
 UNSIGNED32 ENTRYPOINT AdsGotoRecord(
                               ADSHANDLE        hTable,
                               UNSIGNED32       ulRec );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGOTORECORD_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       ulRec );
 
 UNSIGNED32 ENTRYPOINT AdsGotoTop( ADSHANDLE hObj );
-
+typedef UNSIGNED32 (WINAPI *ADSGOTOTOP_PTR)( ADSHANDLE hObj );
 
 UNSIGNED32 ENTRYPOINT AdsImageToClipboard( ADSHANDLE hTable,
                                            UNSIGNED8 *pucFldName );
-
-
+typedef UNSIGNED32 (WINAPI *ADSIMAGETOCLIPBOARD_PTR)( ADSHANDLE hTable,
+                                           UNSIGNED8 *pucFldName );
 
 UNSIGNED32 ENTRYPOINT AdsInTransaction(
                               ADSHANDLE        hConnect,
                               UNSIGNED16       *pbInTrans );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSINTRANSACTION_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED16       *pbInTrans );
 
 UNSIGNED32 ENTRYPOINT AdsIsEmpty(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED16       *pbEmpty );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISEMPTY_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       *pbEmpty );
 
 UNSIGNED32 ENTRYPOINT AdsIsExprValid(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       *pbValid );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISEXPRVALID_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       *pbValid );
 
 UNSIGNED32 ENTRYPOINT AdsIsFound(
                               ADSHANDLE        hObj,
                               UNSIGNED16       *pbFound );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISFOUND_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED16       *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexCompound(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbCompound );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXCOMPOUND_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbCompound );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexCustom(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbCustom );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXCUSTOM_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbCustom );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexDescending(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbDescending );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXDESCENDING_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbDescending );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexPrimaryKey(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbPrimaryKey );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXPRIMARYKEY_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbPrimaryKey );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexFTS(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbFTS );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXFTS_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbFTS );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexUnique(
                               ADSHANDLE        hIndex,
                               UNSIGNED16       *pbUnique );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXUNIQUE_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED16       *pbUnique );
 
 UNSIGNED32 ENTRYPOINT AdsIsRecordDeleted(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pbDeleted );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISRECORDDELETED_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pbDeleted );
 
 UNSIGNED32 ENTRYPOINT AdsIsRecordEncrypted(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pbEncrypted );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISRECORDENCRYPTED_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pbEncrypted );
 
 UNSIGNED32 ENTRYPOINT AdsIsRecordLocked(
                               ADSHANDLE        hTable,
                               UNSIGNED32       ulRec,
                               UNSIGNED16       *pbLocked );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISRECORDLOCKED_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       ulRec,
+                              UNSIGNED16       *pbLocked );
 
 UNSIGNED32 ENTRYPOINT AdsIsRecordVisible(
                               ADSHANDLE        hObj,
                               UNSIGNED16       *pbVisible );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISRECORDVISIBLE_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED16       *pbVisible );
 
 UNSIGNED32 ENTRYPOINT AdsIsServerLoaded(
                               UNSIGNED8        *pucServer,
                               UNSIGNED16       *pbLoaded );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISSERVERLOADED_PTR)(
+                              UNSIGNED8        *pucServer,
+                              UNSIGNED16       *pbLoaded );
 
 UNSIGNED32 ENTRYPOINT AdsIsTableEncrypted(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pbEncrypted );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISTABLEENCRYPTED_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pbEncrypted );
 
 UNSIGNED32 ENTRYPOINT AdsIsTableLocked(
                               ADSHANDLE        hTable,
                               UNSIGNED16       *pbLocked );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISTABLELOCKED_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED16       *pbLocked );
 
 UNSIGNED32 ENTRYPOINT AdsLocate(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucExpr,
                               UNSIGNED16       bForward,
                               UNSIGNED16       *pbFound );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSLOCATE_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucExpr,
+                              UNSIGNED16       bForward,
+                              UNSIGNED16       *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsLockRecord(
                               ADSHANDLE        hTable,
                               UNSIGNED32       ulRec );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSLOCKRECORD_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED32       ulRec );
 
 UNSIGNED32 ENTRYPOINT AdsLockTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSLOCKTABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsLookupKey( ADSHANDLE  hIndex,
                                     UNSIGNED8 *pucKey,
                                     UNSIGNED16 usKeyLen,
                                     UNSIGNED16 usDataType,
                                     UNSIGNED16 *pbFound );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSLOOKUPKEY_PTR)( ADSHANDLE  hIndex,
+                                    UNSIGNED8 *pucKey,
+                                    UNSIGNED16 usKeyLen,
+                                    UNSIGNED16 usDataType,
+                                    UNSIGNED16 *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsMgConnect( UNSIGNED8   *pucServerName,
                                     UNSIGNED8   *pucUserName,
                                     UNSIGNED8   *pucPassword,
                                     ADSHANDLE   *phMgmtHandle );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGCONNECT_PTR)( UNSIGNED8   *pucServerName,
+                                    UNSIGNED8   *pucUserName,
+                                    UNSIGNED8   *pucPassword,
+                                    ADSHANDLE   *phMgmtHandle );
 
 UNSIGNED32 ENTRYPOINT AdsMgDisconnect( ADSHANDLE   hMgmtHandle );
-
+typedef UNSIGNED32 (WINAPI *ADSMGDISCONNECT_PTR)( ADSHANDLE   hMgmtHandle );
 
 
 UNSIGNED32 ENTRYPOINT AdsMgGetCommStats( ADSHANDLE           hMgmtHandle,
                                          ADS_MGMT_COMM_STATS *pstCommStats,
                                          UNSIGNED16          *pusStructSize );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETCOMMSTATS_PTR)( ADSHANDLE           hMgmtHandle,
+                                         ADS_MGMT_COMM_STATS *pstCommStats,
+                                         UNSIGNED16          *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgResetCommStats( ADSHANDLE hMgmtHandle );
-
+typedef UNSIGNED32 (WINAPI *ADSMGRESETCOMMSTATS_PTR)( ADSHANDLE hMgmtHandle );
 
 UNSIGNED32 ENTRYPOINT AdsMgDumpInternalTables( ADSHANDLE  hMgmtHandle );
-
+typedef UNSIGNED32 (WINAPI *ADSMGDUMPINTERNALTABLES_PTR)( ADSHANDLE  hMgmtHandle );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetConfigInfo(
                            ADSHANDLE               hMgmtHandle,
@@ -3384,41 +3385,41 @@ UNSIGNED32 ENTRYPOINT AdsMgGetConfigInfo(
                            UNSIGNED16              *pusConfigValuesStructSize,
                            ADS_MGMT_CONFIG_MEMORY  *pstConfigMemory,
                            UNSIGNED16              *pusConfigMemoryStructSize );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETCONFIGINFO_PTR)(
+                           ADSHANDLE               hMgmtHandle,
+                           ADS_MGMT_CONFIG_PARAMS  *pstConfigValues,
+                           UNSIGNED16              *pusConfigValuesStructSize,
+                           ADS_MGMT_CONFIG_MEMORY  *pstConfigMemory,
+                           UNSIGNED16              *pusConfigMemoryStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetInstallInfo(
                                  ADSHANDLE               hMgmtHandle,
                                  ADS_MGMT_INSTALL_INFO   *pstInstallInfo,
                                  UNSIGNED16              *pusStructSize );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETINSTALLINFO_PTR)(
+                                 ADSHANDLE               hMgmtHandle,
+                                 ADS_MGMT_INSTALL_INFO   *pstInstallInfo,
+                                 UNSIGNED16              *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetActivityInfo(
                                  ADSHANDLE               hMgmtHandle,
                                  ADS_MGMT_ACTIVITY_INFO  *pstActivityInfo,
                                  UNSIGNED16              *pusStructSize );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETACTIVITYINFO_PTR)(
+                                 ADSHANDLE               hMgmtHandle,
+                                 ADS_MGMT_ACTIVITY_INFO  *pstActivityInfo,
+                                 UNSIGNED16              *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetUserNames( ADSHANDLE           hMgmtHandle,
                                          UNSIGNED8           *pucFileName,
                                          ADS_MGMT_USER_INFO  astUserInfo[],
                                          UNSIGNED16          *pusArrayLen,
                                          UNSIGNED16          *pusStructSize );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETUSERNAMES_PTR)( ADSHANDLE           hMgmtHandle,
+                                         UNSIGNED8           *pucFileName,
+                                         ADS_MGMT_USER_INFO  astUserInfo[],
+                                         UNSIGNED16          *pusArrayLen,
+                                         UNSIGNED16          *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetOpenTables(
                                  ADSHANDLE           hMgmtHandle,
@@ -3427,13 +3428,13 @@ UNSIGNED32 ENTRYPOINT AdsMgGetOpenTables(
                                  ADS_MGMT_TABLE_INFO astOpenTableInfo[],
                                  UNSIGNED16          *pusArrayLen,
                                  UNSIGNED16          *pusStructSize );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETOPENTABLES_PTR)(
+                                 ADSHANDLE           hMgmtHandle,
+                                 UNSIGNED8           *pucUserName,
+                                 UNSIGNED16          usConnNumber,
+                                 ADS_MGMT_TABLE_INFO astOpenTableInfo[],
+                                 UNSIGNED16          *pusArrayLen,
+                                 UNSIGNED16          *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetOpenIndexes(
                                  ADSHANDLE           hMgmtHandle,
@@ -3443,14 +3444,14 @@ UNSIGNED32 ENTRYPOINT AdsMgGetOpenIndexes(
                                  ADS_MGMT_INDEX_INFO astOpenIndexInfo[],
                                  UNSIGNED16          *pusArrayLen,
                                  UNSIGNED16          *pusStructSize );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETOPENINDEXES_PTR)(
+                                 ADSHANDLE           hMgmtHandle,
+                                 UNSIGNED8           *pucTableName,
+                                 UNSIGNED8           *pucUserName,
+                                 UNSIGNED16          usConnNumber,
+                                 ADS_MGMT_INDEX_INFO astOpenIndexInfo[],
+                                 UNSIGNED16          *pusArrayLen,
+                                 UNSIGNED16          *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetLocks( ADSHANDLE            hMgmtHandle,
                                      UNSIGNED8            *pucTableName,
@@ -3459,36 +3460,36 @@ UNSIGNED32 ENTRYPOINT AdsMgGetLocks( ADSHANDLE            hMgmtHandle,
                                      ADS_MGMT_RECORD_INFO astRecordInfo[],
                                      UNSIGNED16           *pusArrayLen,
                                      UNSIGNED16           *pusStructSize );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETLOCKS_PTR)( ADSHANDLE            hMgmtHandle,
+                                     UNSIGNED8            *pucTableName,
+                                     UNSIGNED8            *pucUserName,
+                                     UNSIGNED16           usConnNumber,
+                                     ADS_MGMT_RECORD_INFO astRecordInfo[],
+                                     UNSIGNED16           *pusArrayLen,
+                                     UNSIGNED16           *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetServerType( ADSHANDLE   hMgmtHandle,
                                           UNSIGNED16  *pusServerType );
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETSERVERTYPE_PTR)( ADSHANDLE   hMgmtHandle,
+                                          UNSIGNED16  *pusServerType );
 
 UNSIGNED32 ENTRYPOINT AdsMgKillUser( ADSHANDLE  hMgmtHandle,
                                      UNSIGNED8  *pucUserName,
                                      UNSIGNED16 usConnNumber );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGKILLUSER_PTR)( ADSHANDLE  hMgmtHandle,
+                                     UNSIGNED8  *pucUserName,
+                                     UNSIGNED16 usConnNumber );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetWorkerThreadActivity(
                         ADSHANDLE                  hMgmtHandle,
                         ADS_MGMT_THREAD_ACTIVITY   astWorkerThreadActivity[],
                         UNSIGNED16                 *pusArrayLen,
                         UNSIGNED16                 *pusStructSize );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETWORKERTHREADACTIVITY_PTR)(
+                        ADSHANDLE                  hMgmtHandle,
+                        ADS_MGMT_THREAD_ACTIVITY   astWorkerThreadActivity[],
+                        UNSIGNED16                 *pusArrayLen,
+                        UNSIGNED16                 *pusStructSize );
 
 UNSIGNED32 ENTRYPOINT AdsMgGetLockOwner( ADSHANDLE          hMgmtHandle,
                                          UNSIGNED8          *pucTableName,
@@ -3496,26 +3497,26 @@ UNSIGNED32 ENTRYPOINT AdsMgGetLockOwner( ADSHANDLE          hMgmtHandle,
                                          ADS_MGMT_USER_INFO *pstUserInfo,
                                          UNSIGNED16         *pusStructSize,
                                          UNSIGNED16         *pusLockType );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSMGGETLOCKOWNER_PTR)( ADSHANDLE          hMgmtHandle,
+                                         UNSIGNED8          *pucTableName,
+                                         UNSIGNED32         ulRecordNumber,
+                                         ADS_MGMT_USER_INFO *pstUserInfo,
+                                         UNSIGNED16         *pusStructSize,
+                                         UNSIGNED16         *pusLockType );
 
 UNSIGNED32 ENTRYPOINT AdsNullTerminateStrings( UNSIGNED16 bNullTerminate );
-
+typedef UNSIGNED32 (WINAPI *ADSNULLTERMINATESTRINGS_PTR)( UNSIGNED16 bNullTerminate );
 
 UNSIGNED32 ENTRYPOINT AdsOpenIndex(
                               ADSHANDLE        hTable,
                               UNSIGNED8        *pucName,
                               ADSHANDLE        ahIndex[],
                               UNSIGNED16       *pusArrayLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSOPENINDEX_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucName,
+                              ADSHANDLE        ahIndex[],
+                              UNSIGNED16       *pusArrayLen );
 
 UNSIGNED32 ENTRYPOINT AdsOpenTable(
                               ADSHANDLE        hConnect,
@@ -3527,69 +3528,69 @@ UNSIGNED32 ENTRYPOINT AdsOpenTable(
                               UNSIGNED16       usCheckRights,
                               UNSIGNED32       ulOptions,
                               ADSHANDLE        *phTable );
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSOPENTABLE_PTR)(
+                              ADSHANDLE        hConnect,
+                              UNSIGNED8        *pucName,
+                              UNSIGNED8        *pucAlias,
+                              UNSIGNED16       usTableType,
+                              UNSIGNED16       usCharType,
+                              UNSIGNED16       usLockType,
+                              UNSIGNED16       usCheckRights,
+                              UNSIGNED32       ulOptions,
+                              ADSHANDLE        *phTable );
 
 UNSIGNED32 ENTRYPOINT AdsPackTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSPACKTABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsRecallRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSRECALLRECORD_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsRecallAllRecords( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSRECALLALLRECORDS_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsRefreshRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSREFRESHRECORD_PTR)( ADSHANDLE hTable );
 
 
 #if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
    UNSIGNED32 ENTRYPOINT AdsClearProgressCallback( void );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARPROGRESSCALLBACK_PTR)( void );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterProgressCallback(
          UNSIGNED32 (WINAPI *lpfnCallback)( UNSIGNED16 usPercent ) );
-
-
+typedef UNSIGNED32 (WINAPI *ADSREGISTERPROGRESSCALLBACK_PTR)(
+         UNSIGNED32 (WINAPI *lpfnCallback)( UNSIGNED16 usPercent ) );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterCallbackFunction(
          UNSIGNED32 (WINAPI *lpfnCallback)( UNSIGNED16 usPercent, UNSIGNED32 ulCallbackID ),
          UNSIGNED32 ulCallbackID );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSREGISTERCALLBACKFUNCTION_PTR)(
+         UNSIGNED32 (WINAPI *lpfnCallback)( UNSIGNED16 usPercent, UNSIGNED32 ulCallbackID ),
+         UNSIGNED32 ulCallbackID );
 
    UNSIGNED32 ENTRYPOINT AdsClearCallbackFunction( void );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARCALLBACKFUNCTION_PTR)( void );
 
 #endif
 
 UNSIGNED32 ENTRYPOINT AdsReindex( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSREINDEX_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsReindex61( ADSHANDLE  hTable,
                                     UNSIGNED32 ulPageSize );
-
-
+typedef UNSIGNED32 (WINAPI *ADSREINDEX61_PTR)( ADSHANDLE  hTable,
+                                    UNSIGNED32 ulPageSize );
 
 UNSIGNED32 ENTRYPOINT AdsReindexFTS( ADSHANDLE  hTable,
                                     UNSIGNED32 ulPageSize );
-
-
+typedef UNSIGNED32 (WINAPI *ADSREINDEXFTS_PTR)( ADSHANDLE  hTable,
+                                    UNSIGNED32 ulPageSize );
 
 UNSIGNED32 ENTRYPOINT AdsResetConnection( ADSHANDLE hConnect );
-
+typedef UNSIGNED32 (WINAPI *ADSRESETCONNECTION_PTR)( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsRollbackTransaction( ADSHANDLE hConnect );
-
+typedef UNSIGNED32 (WINAPI *ADSROLLBACKTRANSACTION_PTR)( ADSHANDLE hConnect );
 
 UNSIGNED32 ENTRYPOINT AdsSeek(
                               ADSHANDLE        hIndex,
@@ -3598,13 +3599,13 @@ UNSIGNED32 ENTRYPOINT AdsSeek(
                               UNSIGNED16       usDataType,
                               UNSIGNED16       usSeekType,
                               UNSIGNED16       *pbFound );
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSEEK_PTR)(
+                              ADSHANDLE        hIndex,
+                              UNSIGNED8        *pucKey,
+                              UNSIGNED16       usKeyLen,
+                              UNSIGNED16       usDataType,
+                              UNSIGNED16       usSeekType,
+                              UNSIGNED16       *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsSeekLast(
                                   ADSHANDLE        hIndex,
@@ -3612,12 +3613,12 @@ UNSIGNED32 ENTRYPOINT AdsSeekLast(
                                   UNSIGNED16       usKeyLen,
                                   UNSIGNED16       usDataType,
                                   UNSIGNED16       *pbFound );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSEEKLAST_PTR)(
+                                  ADSHANDLE        hIndex,
+                                  UNSIGNED8        *pucKey,
+                                  UNSIGNED16       usKeyLen,
+                                  UNSIGNED16       usDataType,
+                                  UNSIGNED16       *pbFound );
 
 UNSIGNED32 ENTRYPOINT AdsSetBinary(
                               ADSHANDLE        hTable,
@@ -3627,178 +3628,178 @@ UNSIGNED32 ENTRYPOINT AdsSetBinary(
                               UNSIGNED32       ulOffset,
                               UNSIGNED8        *pucBuf,
                               UNSIGNED32       ulLen );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETBINARY_PTR)(
+                              ADSHANDLE        hTable,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED16       usBinaryType,
+                              UNSIGNED32       ulTotalLength,
+                              UNSIGNED32       ulOffset,
+                              UNSIGNED8        *pucBuf,
+                              UNSIGNED32       ulLen );
 
 UNSIGNED32 ENTRYPOINT AdsSetCollationLang( UNSIGNED8 *pucLang );
-
+typedef UNSIGNED32 (WINAPI *ADSSETCOLLATIONLANG_PTR)( UNSIGNED8 *pucLang );
 
 UNSIGNED32 ENTRYPOINT AdsSetDate(
                               ADSHANDLE        hObj,
                               UNSIGNED8        *pucFldName,
                               UNSIGNED8        *pucValue,
                               UNSIGNED16       usLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETDATE_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED8        *pucFldName,
+                              UNSIGNED8        *pucValue,
+                              UNSIGNED16       usLen );
 
 UNSIGNED32 ENTRYPOINT AdsSetDateFormat( UNSIGNED8 *pucFormat );
-
+typedef UNSIGNED32 (WINAPI *ADSSETDATEFORMAT_PTR)( UNSIGNED8 *pucFormat );
 
 UNSIGNED32 ENTRYPOINT AdsSetDateFormat60( ADSHANDLE hConnect,
                                           UNSIGNED8 *pucFormat );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETDATEFORMAT60_PTR)( ADSHANDLE hConnect,
+                                                     UNSIGNED8 *pucFormat );
 
 UNSIGNED32 ENTRYPOINT AdsSetDecimals( UNSIGNED16 usDecimals );
-
+typedef UNSIGNED32 (WINAPI *ADSSETDECIMALS_PTR)( UNSIGNED16 usDecimals );
 
 UNSIGNED32 ENTRYPOINT AdsSetDefault( UNSIGNED8 *pucDefault );
-
+typedef UNSIGNED32 (WINAPI *ADSSETDEFAULT_PTR)( UNSIGNED8 *pucDefault );
 
 UNSIGNED32 ENTRYPOINT AdsShowDeleted( UNSIGNED16 bShowDeleted );
-
+typedef UNSIGNED32 (WINAPI *ADSSHOWDELETED_PTR)( UNSIGNED16 bShowDeleted );
 
 UNSIGNED32 ENTRYPOINT AdsSetDouble(
                               ADSHANDLE        hObj,
                               UNSIGNED8        *pucFldName,
                               DOUBLE           dValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETDOUBLE_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED8        *pucFldName,
+                              DOUBLE           dValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetEmpty(
                               ADSHANDLE        hObj,
                               UNSIGNED8        *pucFldName );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETEMPTY_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED8        *pucFldName );
 
 UNSIGNED32 ENTRYPOINT AdsSetEpoch( UNSIGNED16 usCentury );
-
+typedef UNSIGNED32 (WINAPI *ADSSETEPOCH_PTR)( UNSIGNED16 usCentury );
 
 UNSIGNED32 ENTRYPOINT AdsSetExact( UNSIGNED16 bExact );
-
+typedef UNSIGNED32 (WINAPI *ADSSETEXACT_PTR)( UNSIGNED16 bExact );
 
 UNSIGNED32 ENTRYPOINT AdsSetExact22(
                               ADSHANDLE        hObj,
                               UNSIGNED16       bExact );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETEXACT22_PTR)(
+                              ADSHANDLE        hObj,
+                              UNSIGNED16       bExact );
 
 UNSIGNED32 ENTRYPOINT AdsSetField(
                                  ADSHANDLE        hObj,
                                  UNSIGNED8        *pucFldName,
                                  UNSIGNED8        *pucBuf,
                                  UNSIGNED32       ulLen );
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETFIELD_PTR)(
+                                 ADSHANDLE        hObj,
+                                 UNSIGNED8        *pucFldName,
+                                 UNSIGNED8        *pucBuf,
+                                 UNSIGNED32       ulLen );
 
 UNSIGNED32 ENTRYPOINT AdsSetFilter(
                                   ADSHANDLE        hTable,
                                   UNSIGNED8        *pucFilter );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETFILTER_PTR)(
+                                  ADSHANDLE        hTable,
+                                  UNSIGNED8        *pucFilter );
 
 UNSIGNED32 ENTRYPOINT AdsSetHandleLong(
                                       ADSHANDLE        hObj,
                                       UNSIGNED32       ulVal );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETHANDLELONG_PTR)(
+                                      ADSHANDLE        hObj,
+                                      UNSIGNED32       ulVal );
 
 UNSIGNED32 ENTRYPOINT AdsSetJulian(
                                   ADSHANDLE        hObj,
                                   UNSIGNED8        *pucFldName,
                                   SIGNED32         lDate );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETJULIAN_PTR)(
+                                  ADSHANDLE        hObj,
+                                  UNSIGNED8        *pucFldName,
+                                  SIGNED32         lDate );
 
 UNSIGNED32 ENTRYPOINT AdsSetLogical(
                                    ADSHANDLE        hObj,
                                    UNSIGNED8        *pucFldName,
                                    UNSIGNED16       bValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETLOGICAL_PTR)(
+                                   ADSHANDLE        hObj,
+                                   UNSIGNED8        *pucFldName,
+                                   UNSIGNED16       bValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetLong(
                                 ADSHANDLE        hObj,
                                 UNSIGNED8        *pucFldName,
                                 SIGNED32         lValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETLONG_PTR)(
+                                ADSHANDLE        hObj,
+                                UNSIGNED8        *pucFldName,
+                                SIGNED32         lValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetLongLong(
                                 ADSHANDLE        hObj,
                                 UNSIGNED8        *pucFldName,
                                 SIGNED64         qValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETLONGLONG_PTR)(
+                                ADSHANDLE        hObj,
+                                UNSIGNED8        *pucFldName,
+                                SIGNED64         qValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetMilliseconds(
                                         ADSHANDLE        hObj,
                                         UNSIGNED8        *pucFldName,
                                         SIGNED32         lTime );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETMILLISECONDS_PTR)(
+                                        ADSHANDLE        hObj,
+                                        UNSIGNED8        *pucFldName,
+                                        SIGNED32         lTime );
 
 UNSIGNED32 ENTRYPOINT AdsSetMoney(
                                 ADSHANDLE  hObj,
                                 UNSIGNED8  *pucFldName,
                                 SIGNED64   qValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETMONEY_PTR)(
+                                ADSHANDLE  hObj,
+                                UNSIGNED8  *pucFldName,
+                                SIGNED64   qValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetRecord(
                                   ADSHANDLE        hObj,
                                   UNSIGNED8        *pucRec,
                                   UNSIGNED32       ulLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETRECORD_PTR)(
+                                  ADSHANDLE        hObj,
+                                  UNSIGNED8        *pucRec,
+                                  UNSIGNED32       ulLen );
 
 UNSIGNED32 ENTRYPOINT AdsSetRelation(
                                     ADSHANDLE        hTableParent,
                                     ADSHANDLE        hIndexChild,
                                     UNSIGNED8        *pucExpr );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETRELATION_PTR)(
+                                    ADSHANDLE        hTableParent,
+                                    ADSHANDLE        hIndexChild,
+                                    UNSIGNED8        *pucExpr );
 
 UNSIGNED32 ENTRYPOINT AdsSetRelKeyPos(
                                      ADSHANDLE        hIndex,
                                      DOUBLE           dPos );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETRELKEYPOS_PTR)(
+                                     ADSHANDLE        hIndex,
+                                     DOUBLE           dPos );
 
 UNSIGNED32 ENTRYPOINT AdsSetScope(
                                  ADSHANDLE        hIndex,
@@ -3806,274 +3807,274 @@ UNSIGNED32 ENTRYPOINT AdsSetScope(
                                  UNSIGNED8        *pucScope,
                                  UNSIGNED16       usScopeLen,
                                  UNSIGNED16       usDataType );
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETSCOPE_PTR)(
+                                 ADSHANDLE        hIndex,
+                                 UNSIGNED16       usScopeOption,
+                                 UNSIGNED8        *pucScope,
+                                 UNSIGNED16       usScopeLen,
+                                 UNSIGNED16       usDataType );
 
 UNSIGNED32 ENTRYPOINT AdsSetScopedRelation(
                                           ADSHANDLE        hTableParent,
                                           ADSHANDLE        hIndexChild,
                                           UNSIGNED8        *pucExpr );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETSCOPEDRELATION_PTR)(
+                                          ADSHANDLE        hTableParent,
+                                          ADSHANDLE        hIndexChild,
+                                          UNSIGNED8        *pucExpr );
 
 UNSIGNED32 ENTRYPOINT AdsSetSearchPath( UNSIGNED8 *pucPath );
-
+typedef UNSIGNED32 (WINAPI *ADSSETSEARCHPATH_PTR)( UNSIGNED8 *pucPath );
 
 UNSIGNED32 ENTRYPOINT AdsSetServerType( UNSIGNED16 usServerOptions );
-
+typedef UNSIGNED32 (WINAPI *ADSSETSERVERTYPE_PTR)( UNSIGNED16 usServerOptions );
 
 UNSIGNED32 ENTRYPOINT AdsSetShort(
                                  ADSHANDLE        hObj,
                                  UNSIGNED8        *pucFldName,
                                  SIGNED16         sValue );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETSHORT_PTR)(
+                                 ADSHANDLE        hObj,
+                                 UNSIGNED8        *pucFldName,
+                                 SIGNED16         sValue );
 
 UNSIGNED32 ENTRYPOINT AdsSetString( ADSHANDLE        hObj,
                                     UNSIGNED8        *pucFldName,
                                     UNSIGNED8        *pucBuf,
                                     UNSIGNED32       ulLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETSTRING_PTR)( ADSHANDLE        hObj,
+                                    UNSIGNED8        *pucFldName,
+                                    UNSIGNED8        *pucBuf,
+                                    UNSIGNED32       ulLen );
 
 UNSIGNED32 ENTRYPOINT AdsSetTime( ADSHANDLE        hObj,
                                   UNSIGNED8        *pucFldName,
                                   UNSIGNED8        *pucValue,
                                   UNSIGNED16       usLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETTIME_PTR)( ADSHANDLE        hObj,
+                                  UNSIGNED8        *pucFldName,
+                                  UNSIGNED8        *pucValue,
+                                  UNSIGNED16       usLen );
 
 UNSIGNED32 ENTRYPOINT AdsShowError( UNSIGNED8 *pucTitle );
-
+typedef UNSIGNED32 (WINAPI *ADSSHOWERROR_PTR)( UNSIGNED8 *pucTitle );
 
 UNSIGNED32 ENTRYPOINT AdsSkip( ADSHANDLE        hObj,
                                SIGNED32         lRecs );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSKIP_PTR)( ADSHANDLE        hObj,
+                               SIGNED32         lRecs );
 
 UNSIGNED32 ENTRYPOINT AdsThreadExit( void );
-
+typedef UNSIGNED32 (WINAPI *ADSTHREADEXIT_PTR)( void );
 
 UNSIGNED32 ENTRYPOINT AdsUnlockRecord( ADSHANDLE        hTable,
                                        UNSIGNED32       ulRec );
-
-
+typedef UNSIGNED32 (WINAPI *ADSUNLOCKRECORD_PTR)( ADSHANDLE        hTable,
+                                       UNSIGNED32       ulRec );
 
 UNSIGNED32 ENTRYPOINT AdsUnlockTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSUNLOCKTABLE_PTR)( ADSHANDLE hTable );
 
 /* AdsVerifyPassword is obsolete; retained for backward compatibility.
  * Use AdsIsEncryptionEnabled instead.
  */
 UNSIGNED32 ENTRYPOINT AdsVerifyPassword( ADSHANDLE       hTable,
                                          UNSIGNED16      *pusEnabled );
-
-
+typedef UNSIGNED32 (WINAPI *ADSVERIFYPASSWORD_PTR)( ADSHANDLE       hTable,
+                                         UNSIGNED16      *pusEnabled );
 
 UNSIGNED32 ENTRYPOINT AdsIsEncryptionEnabled( ADSHANDLE  hTable,
                                               UNSIGNED16 *pusEnabled );
-
-
+typedef UNSIGNED32 (WINAPI *ADSISENCRYPTIONENABLED_PTR)( ADSHANDLE  hTable,
+                                              UNSIGNED16 *pusEnabled );
 
 UNSIGNED32 ENTRYPOINT AdsWriteAllRecords( void );
-
+typedef UNSIGNED32 (WINAPI *ADSWRITEALLRECORDS_PTR)( void );
 
 UNSIGNED32 ENTRYPOINT AdsWriteRecord( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSWRITERECORD_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsZapTable( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSZAPTABLE_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsSetAOF( ADSHANDLE        hTable,
                                  UNSIGNED8        *pucFilter,
                                  UNSIGNED16       usOptions );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETAOF_PTR)( ADSHANDLE        hTable,
+                                 UNSIGNED8        *pucFilter,
+                                 UNSIGNED16       usOptions );
 
 UNSIGNED32 ENTRYPOINT AdsEvalAOF( ADSHANDLE        hTable,
                                   UNSIGNED8        *pucFilter,
                                   UNSIGNED16       *pusOptLevel );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEVALAOF_PTR)( ADSHANDLE        hTable,
+                                  UNSIGNED8        *pucFilter,
+                                  UNSIGNED16       *pusOptLevel );
 
 UNSIGNED32 ENTRYPOINT AdsClearAOF( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARAOF_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsRefreshAOF( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSREFRESHAOF_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsGetAOF( ADSHANDLE        hTable,
                                  UNSIGNED8        *pucFilter,
                                  UNSIGNED16       *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETAOF_PTR)( ADSHANDLE        hTable,
+                                 UNSIGNED8        *pucFilter,
+                                 UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsGetAOFOptLevel( ADSHANDLE        hTable,
                                          UNSIGNED16       *pusOptLevel,
                                          UNSIGNED8        *pucNonOpt,
                                          UNSIGNED16       *pusLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETAOFOPTLEVEL_PTR)( ADSHANDLE        hTable,
+                                         UNSIGNED16       *pusOptLevel,
+                                         UNSIGNED8        *pucNonOpt,
+                                         UNSIGNED16       *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsIsRecordInAOF( ADSHANDLE  hTable,
                                         UNSIGNED32 ulRecordNum,
                                         UNSIGNED16 *pusIsInAOF );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSISRECORDINAOF_PTR)( ADSHANDLE  hTable,
+                                        UNSIGNED32 ulRecordNum,
+                                        UNSIGNED16 *pusIsInAOF );
 
 UNSIGNED32 ENTRYPOINT AdsCustomizeAOF( ADSHANDLE  hTable,
                                        UNSIGNED32 ulNumRecords,
                                        UNSIGNED32 *pulRecords,
                                        UNSIGNED16 usOption );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCUSTOMIZEAOF_PTR)( ADSHANDLE  hTable,
+                                       UNSIGNED32 ulNumRecords,
+                                       UNSIGNED32 *pulRecords,
+                                       UNSIGNED16 usOption );
 
 UNSIGNED32 ENTRYPOINT AdsInitRawKey( ADSHANDLE hIndex );
-
+typedef UNSIGNED32 (WINAPI *ADSINITRAWKEY_PTR)( ADSHANDLE hIndex );
 
 UNSIGNED32 ENTRYPOINT AdsBuildRawKey( ADSHANDLE        hIndex,
                                       UNSIGNED8        *pucKey,
                                       UNSIGNED16       *pusKeyLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSBUILDRAWKEY_PTR)( ADSHANDLE        hIndex,
+                                      UNSIGNED8        *pucKey,
+                                      UNSIGNED16       *pusKeyLen );
 
 UNSIGNED32 ENTRYPOINT AdsCreateSQLStatement( ADSHANDLE hConnect,
                                              ADSHANDLE *phStatement );
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATESQLSTATEMENT_PTR)( ADSHANDLE hConnect,
+                                             ADSHANDLE *phStatement );
 
 UNSIGNED32 ENTRYPOINT AdsPrepareSQL( ADSHANDLE hStatement,
                                      UNSIGNED8 *pucSQL );
-
-
+typedef UNSIGNED32 (WINAPI *ADSPREPARESQL_PTR)( ADSHANDLE hStatement,
+                                     UNSIGNED8 *pucSQL );
 
 UNSIGNED32 ENTRYPOINT AdsExecuteSQL( ADSHANDLE hStatement,
                                      ADSHANDLE *phCursor );
-
-
+typedef UNSIGNED32 (WINAPI *ADSEXECUTESQL_PTR)( ADSHANDLE hStatement,
+                                     ADSHANDLE *phCursor );
 
 UNSIGNED32 ENTRYPOINT AdsExecuteSQLDirect( ADSHANDLE hStatement,
                                            UNSIGNED8 *pucSQL,
                                            ADSHANDLE *phCursor );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSEXECUTESQLDIRECT_PTR)( ADSHANDLE hStatement,
+                                           UNSIGNED8 *pucSQL,
+                                           ADSHANDLE *phCursor );
 
 UNSIGNED32 ENTRYPOINT AdsCloseSQLStatement( ADSHANDLE hStatement );
-
+typedef UNSIGNED32 (WINAPI *ADSCLOSESQLSTATEMENT_PTR)( ADSHANDLE hStatement );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTableRights( ADSHANDLE  hStatement,
                                              UNSIGNED16 usCheckRights );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLERIGHTS_PTR)( ADSHANDLE  hStatement,
+                                             UNSIGNED16 usCheckRights );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTableReadOnly( ADSHANDLE  hStatement,
                                                UNSIGNED16 usReadOnly );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLEREADONLY_PTR)( ADSHANDLE  hStatement,
+                                               UNSIGNED16 usReadOnly );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTableLockType( ADSHANDLE  hStatement,
                                                UNSIGNED16 usLockType );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLELOCKTYPE_PTR)( ADSHANDLE  hStatement,
+                                               UNSIGNED16 usLockType );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTableCharType( ADSHANDLE  hStatement,
                                                UNSIGNED16 usCharType );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLECHARTYPE_PTR)( ADSHANDLE  hStatement,
+                                               UNSIGNED16 usCharType );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTableType( ADSHANDLE  hStatement,
                                            UNSIGNED16 usTableType );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLETYPE_PTR)( ADSHANDLE  hStatement,
+                                           UNSIGNED16 usTableType );
 
 UNSIGNED32 ENTRYPOINT AdsStmtConstrainUpdates( ADSHANDLE  hStatement,
                                                UNSIGNED16 usConstrain );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTCONSTRAINUPDATES_PTR)( ADSHANDLE  hStatement,
+                                               UNSIGNED16 usConstrain );
 
 UNSIGNED32 ENTRYPOINT AdsStmtEnableEncryption( ADSHANDLE  hStatement,
                                                UNSIGNED8  *pucPassword );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTENABLEENCRYPTION_PTR)( ADSHANDLE  hStatement,
+                                               UNSIGNED8  *pucPassword );
 
 UNSIGNED32 ENTRYPOINT AdsStmtDisableEncryption( ADSHANDLE  hStatement );
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTDISABLEENCRYPTION_PTR)( ADSHANDLE  hStatement );
 
 UNSIGNED32 ENTRYPOINT AdsStmtSetTablePassword( ADSHANDLE hStatement,
                                                UNSIGNED8 *pucTableName,
                                                UNSIGNED8 *pucPassword );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTSETTABLEPASSWORD_PTR)( ADSHANDLE hStatement,
+                                               UNSIGNED8 *pucTableName,
+                                               UNSIGNED8 *pucPassword );
 
 UNSIGNED32 ENTRYPOINT AdsStmtClearTablePasswords( ADSHANDLE  hStatement );
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTCLEARTABLEPASSWORDS_PTR)( ADSHANDLE  hStatement );
 
 UNSIGNED32 ENTRYPOINT AdsStmtReadAllColumns( ADSHANDLE  hStatement,
                                              UNSIGNED16 usReadColumns );
-
-
+typedef UNSIGNED32 (WINAPI *ADSSTMTREADALLCOLUMNS_PTR)( ADSHANDLE  hStatement,
+                                             UNSIGNED16 usReadColumns );
 
 UNSIGNED32 ENTRYPOINT AdsClearSQLParams( ADSHANDLE  hStatement );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARSQLPARAMS_PTR)( ADSHANDLE  hStatement );
 
 UNSIGNED32 ENTRYPOINT AdsSetTimeStamp( ADSHANDLE        hObj,
                                        UNSIGNED8        *pucFldName,
                                        UNSIGNED8        *pucBuf,
                                        UNSIGNED32       ulLen );
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSSETTIMESTAMP_PTR)( ADSHANDLE        hObj,
+                                       UNSIGNED8        *pucFldName,
+                                       UNSIGNED8        *pucBuf,
+                                       UNSIGNED32       ulLen );
 
 
 #if !( defined( ASANLM ) || defined( ASANT ) || defined( NLM ) || defined( ADS_NT ) || defined( ADS_WIN9X ) || ( defined( ADS_LINUX ) && !defined( ACE ) ) )
    UNSIGNED32 ENTRYPOINT AdsClearSQLAbortFunc( void );
-
+typedef UNSIGNED32 (WINAPI *ADSCLEARSQLABORTFUNC_PTR)( void );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterSQLAbortFunc( UNSIGNED32 (WINAPI *lpfnCallback)(void) );
-
+typedef UNSIGNED32 (WINAPI *ADSREGISTERSQLABORTFUNC_PTR)( UNSIGNED32 (WINAPI *lpfnCallback)(void) );
 
    UNSIGNED32 ENTRYPOINT AdsRegisterUDF( ADSHANDLE  hObj,
                                          UNSIGNED16 usType,
                                          UNSIGNED32 (WINAPI *lpfnUDF)(void) );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSREGISTERUDF_PTR)( ADSHANDLE  hObj,
+                                         UNSIGNED16 usType,
+                                         UNSIGNED32 (WINAPI *lpfnUDF)(void) );
 #endif
 
 UNSIGNED32 ENTRYPOINT AdsGetNumParams( ADSHANDLE hStatement, UNSIGNED16 *pusNumParams );
-
+typedef UNSIGNED32 (WINAPI *ADSGETNUMPARAMS_PTR)( ADSHANDLE hStatement, UNSIGNED16 *pusNumParams );
 
 UNSIGNED32 ENTRYPOINT AdsGetLastAutoinc( ADSHANDLE hObj, UNSIGNED32 *pulAutoIncVal );
-
+typedef UNSIGNED32 (WINAPI *ADSGETLASTAUTOINC_PTR)( ADSHANDLE hObj, UNSIGNED32 *pulAutoIncVal );
 
 UNSIGNED32 ENTRYPOINT AdsIsIndexUserDefined( ADSHANDLE hIndex,
                                              UNSIGNED16 *pbUserDefined );
-
-
+typedef UNSIGNED32 (WINAPI *ADSISINDEXUSERDEFINED_PTR)( ADSHANDLE hIndex,
+                                             UNSIGNED16 *pbUserDefined );
 
 UNSIGNED32 ENTRYPOINT AdsRestructureTable( ADSHANDLE    hObj,
                                            UNSIGNED8    *pucName,
@@ -4085,31 +4086,31 @@ UNSIGNED32 ENTRYPOINT AdsRestructureTable( ADSHANDLE    hObj,
                                            UNSIGNED8    *pucAddFields,
                                            UNSIGNED8    *pucDeleteFields,
                                            UNSIGNED8    *pucChangeFields );
-
-
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSRESTRUCTURETABLE_PTR)( ADSHANDLE    hObj,
+                                           UNSIGNED8    *pucName,
+                                           UNSIGNED8    *pucPassword,
+                                           UNSIGNED16   usTableType,
+                                           UNSIGNED16   usCharType,
+                                           UNSIGNED16   usLockType,
+                                           UNSIGNED16   usCheckRights,
+                                           UNSIGNED8    *pucAddFields,
+                                           UNSIGNED8    *pucDeleteFields,
+                                           UNSIGNED8    *pucChangeFields );
 
 UNSIGNED32 ENTRYPOINT AdsGetSQLStatementHandle( ADSHANDLE  hCursor,
                                                 ADSHANDLE  *phStmt );
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSQLSTATEMENTHANDLE_PTR)( ADSHANDLE  hCursor,
+                                                ADSHANDLE  *phStmt );
 
 UNSIGNED32 ENTRYPOINT AdsGetSQLStatement( ADSHANDLE  hStmt,
                                           UNSIGNED8  *pucSQL,
                                           UNSIGNED16 *pusLen );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSGETSQLSTATEMENT_PTR)( ADSHANDLE  hStmt,
+                                          UNSIGNED8  *pucSQL,
+                                          UNSIGNED16 *pusLen );
 
 UNSIGNED32 ENTRYPOINT AdsFlushFileBuffers( ADSHANDLE hTable );
-
+typedef UNSIGNED32 (WINAPI *ADSFLUSHFILEBUFFERS_PTR)( ADSHANDLE hTable );
 
 UNSIGNED32 ENTRYPOINT AdsDDDeployDatabase( UNSIGNED8 *pucDestination,
                                            UNSIGNED8 *pucDestinationPassword,
@@ -4119,55 +4120,68 @@ UNSIGNED32 ENTRYPOINT AdsDDDeployDatabase( UNSIGNED8 *pucDestination,
                                            UNSIGNED16 usValidateOption,
                                            UNSIGNED16 usBackupFiles,
                                            UNSIGNED32 ulOptions );
-
-
-
-
-
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSDDDEPLOYDATABASE_PTR)( UNSIGNED8 *pucDestination,
+                                           UNSIGNED8 *pucDestinationPassword,
+                                           UNSIGNED8 *pucSource,
+                                           UNSIGNED8 *pucSourcePassword,
+                                           UNSIGNED16 usServerTypes,
+                                           UNSIGNED16 usValidateOption,
+                                           UNSIGNED16 usBackupFiles,
+                                           UNSIGNED32 ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsVerifySQL( ADSHANDLE hStatement,
                                     UNSIGNED8 *pucSQL );
-
-
+typedef UNSIGNED32 (WINAPI *ADSVERIFYSQL_PTR)( ADSHANDLE hStatement,
+                                    UNSIGNED8 *pucSQL );
 
 UNSIGNED32 ENTRYPOINT AdsDisableUniqueEnforcement( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSDISABLEUNIQUEENFORCEMENT_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsEnableUniqueEnforcement( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSENABLEUNIQUEENFORCEMENT_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsDisableRI( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSDISABLERI_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsEnableRI( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSENABLERI_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsDisableAutoIncEnforcement( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSDISABLEAUTOINCENFORCEMENT_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsEnableAutoIncEnforcement( ADSHANDLE hConnection );
-
+typedef UNSIGNED32 (WINAPI *ADSENABLEAUTOINCENFORCEMENT_PTR)( ADSHANDLE hConnection );
 
 UNSIGNED32 ENTRYPOINT AdsRollbackTransaction80( ADSHANDLE   hConnect,
                                                 UNSIGNED8   *pucSavepoint,
                                                 UNSIGNED32  ulOptions );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSROLLBACKTRANSACTION80_PTR)( ADSHANDLE   hConnect,
+                                                           UNSIGNED8   *pucSavepoint,
+                                                           UNSIGNED32  ulOptions );
 
 
 UNSIGNED32 ENTRYPOINT AdsCreateSavepoint( ADSHANDLE   hConnect,
                                           UNSIGNED8   *pucSavepoint,
                                           UNSIGNED32  ulOptions );
-
-
-
+typedef UNSIGNED32 (WINAPI *ADSCREATESAVEPOINT_PTR)( ADSHANDLE   hConnect,
+                                                     UNSIGNED8   *pucSavepoint,
+                                                     UNSIGNED32  ulOptions );
 
 UNSIGNED32 ENTRYPOINT AdsDDFreeTable( UNSIGNED8 *pucTableName, UNSIGNED8 *pucPassword );
+typedef UNSIGNED32 (WINAPI *ADSDDFREETABLE_PTR)( UNSIGNED8 *pucTableName, UNSIGNED8 *pucPassword );
 
+UNSIGNED32 ENTRYPOINT AdsDDSetIndexProperty( ADSHANDLE   hAdminConn,
+                                             UNSIGNED8   *pucTableName,
+                                             UNSIGNED8   *pucIndexName,
+                                             UNSIGNED16  usPropertyID,
+                                             VOID        *pvProperty,
+                                             UNSIGNED16  usPropertyLen );
+typedef UNSIGNED32 (WINAPI *ADSDDSETINDEXPROPERTY_PTR)( ADSHANDLE  hAdminConn,
+                                                        UNSIGNED8  *pucTableName,
+                                                        UNSIGNED8  *pucIndexName,
+                                                        UNSIGNED16 usPropertyID,
+                                                        VOID       *pvProperty,
+                                                        UNSIGNED16 usPropertyLen );
 
 #ifdef __cplusplus
    }  /* extern "C" */

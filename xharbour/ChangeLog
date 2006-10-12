@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5197 2006/10/11 17:02:41 marchuet Exp $
+ * $Id: ChangeLog,v 1.5198 2006/10/12 17:25:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-12 15:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/rdd_ads/ace.h
+    * New unmodified file from latest (8.1) ADS sdk
+    - Original file had 1 xHarbour modification which was moved to rddads.h
+      /* Please avoid modifying ace.h */
+  * contrib/rdd_ads/rddads.h
+    * Corrected 2 undocumented funs declaration to be guarded by the appropriate #ifdef and placed inside the HB_EXTERN section
+    * Updated default of ADS_REQUIRE_VERSION to 8.1 - users of ADS version 6, will need to add a -DADS_REQUIRE_VERSION=6 to their make file[s]
+  * contrib/rdd_ads/adsmgmnt.c
+    * Synched with some ADS structure modification in the 8.1 sdk - should not affect binary compatability with older client versions
 
 2006-10-12 13:25 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbsetup.ch

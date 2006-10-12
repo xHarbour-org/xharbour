@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.11 2005/12/06 18:26:19 ronpinkas Exp $
+ * $Id: adsmgmnt.c,v 1.12 2006/01/30 02:51:23 druzus Exp $
  */
 
 /*
@@ -331,14 +331,27 @@ HB_FUNC( ADSMGGETCONFIGINFO )
          hb_stornl( stConfigValues.usNumSendECBs          , -1, 13);  /* number send ECBs (NLM only)   */
          hb_stornd( stConfigValues.usNumBurstPackets      , -1, 14);  /* number packets per burst      */
          hb_stornl( stConfigValues.usNumWorkerThreads     , -1, 15);  /* number worker threads         */
-         hb_stornl( stConfigValues.usSortBuffSize         , -1, 16);  /* index sort buffer size        */
-         hb_storni( stConfigValues.ucReserved1            , -1, 17);  /* reserved                      */
-         hb_storni( stConfigValues.ucReserved2            , -1, 18);  /* reserved                      */
+
+         /*
+          * In sdk versions prior to 8.1 it used to be usSortBuffSize - we must use the newer name because
+          * we compile using the newer ace.h, but it shouls still work for those using
+          * ADS_REQUIRE_VERSION < 8.1 because the memeber ofset is still the same
+          */
+         hb_stornl( stConfigValues.ulSortBuffSize         , -1, 16);  /* index sort buffer size        */
+
+         /*
+          * These were removed by Advantage as of ver 8.1 when extending usSortBuffSize to ulSortBuffSize
+          * the structure should  still be binary compatible with older clients, although we use the new
+          * member name, as of current ace.h
+          */
+         //hb_storni( stConfigValues.ucReserved1            , -1, 17);  /* reserved                      */
+         //hb_storni( stConfigValues.ucReserved2            , -1, 18);  /* reserved                      */
+
          hb_storc ( (char *) stConfigValues.aucErrorLog   , -1, 19);  /* error log path         */
          hb_storc ( (char *) stConfigValues.aucSemaphore  , -1, 20);  /* semaphore file path    */
          hb_storc ( (char *) stConfigValues.aucTransaction, -1, 21);  /* TPS log file path      */
-         hb_storni( stConfigValues.ucReserved3            , -1, 22);  /* reserved                      */
-         hb_storni( stConfigValues.ucReserved4            , -1, 23);  /* reserved                      */
+         hb_storni( stConfigValues.usReserved5            , -1, 22);  /* reserved                      */
+         hb_storni( stConfigValues.ulReserved6            , -1, 23);  /* reserved                      */
          hb_stornl( stConfigValues.usSendIPPort           , -1, 24);  /* NT Service IP send port #     */
          hb_stornl( stConfigValues.usReceiveIPPort        , -1, 25);  /* NT Service IP rcv port #      */
       /* hb_stornl( stConfigValues.usReserved5            , -1, 26);   reserved                     */
