@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5198 2006/10/12 17:25:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5199 2006/10/12 19:44:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2006-10-12 15:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * contrib/rdd_ads/ace.h
-    * New unmodified file from latest (8.1) ADS sdk
+    * New unmodified file from latest (81) ADS sdk
     - Original file had 1 xHarbour modification which was moved to rddads.h
       /* Please avoid modifying ace.h */
   * contrib/rdd_ads/rddads.h

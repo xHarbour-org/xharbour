@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.12 2005/10/30 14:45:48 druzus Exp $
+ * $Id: rddads.h,v 1.13 2006/10/12 19:44:20 ronpinkas Exp $
  */
 
 /*
@@ -51,7 +51,7 @@
  */
 
 #ifndef ADS_REQUIRE_VERSION
-   #define ADS_REQUIRE_VERSION 8.1
+   #define ADS_REQUIRE_VERSION 81 // Must use 2 digits convention now!!!
 #endif
 
 #include "hbapirdd.h"
