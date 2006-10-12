@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.70 2005/10/10 22:45:55 druzus Exp $
+ * $Id: set.c,v 1.71 2006/07/27 12:21:30 lculik Exp $
  */
 
 /*
@@ -1262,7 +1262,7 @@ HB_FUNC( SET )
 
              if( bAppend )
              {
-                fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "wa" );
+                fpTrace = fopen( (char *) (hb_set.HB_SET_TRACEFILE), "a" );
              }
              else
              {
