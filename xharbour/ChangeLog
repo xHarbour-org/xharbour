@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5200 2006/10/12 19:48:25 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5201 2006/10/12 19:54:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-12 21:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/cstruct.prg
+  * source/vm/arrayshb.c
+    ! Fixed GPF trap related to user passed value being shorter than the structure size.
+      /* Typical scenario is passing a stricg value into a fixed size char array. */
 
 2006-10-12 15:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * contrib/rdd_ads/ace.h

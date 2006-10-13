@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.64 2005/11/19 19:12:23 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.65 2005/11/22 02:33:47 walito Exp $
  */
 
 /*
@@ -237,7 +237,7 @@ HB_FUNC( ASIZEALLOC )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
    PHB_ITEM pPreAlloc = hb_param( 2, HB_IT_NUMERIC );
-   
+
    if( pArray && pPreAlloc )
    {
       pArray->item.asArray.value->ulBlock = (ULONG) hb_itemGetNL( pPreAlloc );
@@ -257,7 +257,7 @@ HB_FUNC( ASIZEALLOC )
 HB_FUNC( ALENALLOC )
 {
    PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
-   
+
    if( pArray )
    {
       hb_retnl( (LONG) pArray->item.asArray.value->ulBlock );
@@ -1638,7 +1638,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
    }
 }
 
-PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
+PHB_ITEM StructureToArray( BYTE* Buffer, unsigned long ulBufferLen, PHB_ITEM aDef, unsigned int uiAlign, BOOL bAdoptNested, PHB_ITEM pRet )
 {
    PHB_BASEARRAY pBaseDef = aDef->item.asArray.value;
    unsigned long ulLen = pBaseDef->ulLen;
@@ -1767,6 +1767,11 @@ PHB_ITEM StructureToArray( BYTE* Buffer, PHB_ITEM aDef, unsigned int uiAlign, BO
       else
       {
          //TraceLog( NULL, "* Size: %i Offset: %i\n", uiMemberSize, uiOffset );
+      }
+
+      if( ( uiOffset + uiMemberSize ) > ulBufferLen )
+      {
+         break;
       }
 
       switch( ( pBaseDef->pItems + ulIndex )->item.asInteger.value )
@@ -1984,7 +1989,7 @@ HB_FUNC( HB_STRUCTURETOARRAY )
          bAdopt = FALSE;
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), StructureToArray( Buffer, aDef, uiAlign, bAdopt, pRet ) );
+      hb_itemForwardValue( &(HB_VM_STACK.Return), StructureToArray( Buffer, Structure->item.asString.length, aDef, uiAlign, bAdopt, pRet ) );
    }
    else
    {

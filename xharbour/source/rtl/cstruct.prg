@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.41 2005/11/07 01:35:12 fsgiudice Exp $
+ * $Id: cstruct.prg,v 1.42 2005/11/09 00:29:55 fsgiudice Exp $
  */
 
 /*
@@ -550,6 +550,11 @@ RETURN QSelf()
 STATIC Function Buffer( Buffer, lAdopt )
 
    IF ValType( Buffer ) == "C"
+      IF Len( Buffer ) < QSelf():SizeOf
+         //TraceLog( Buffer )
+         Buffer := PadR( Buffer, QSelf():SizeOf, Chr(0) )
+      ENDIF
+
       QSelf():InternalBuffer := Buffer
       QSelf():DeValue( lAdopt )
    ENDIF
@@ -562,7 +567,8 @@ RETURN QSelf()
 
 //---------------------------------------------------------------------------//
 STATIC Function GetPointer()
-QSelf():InternalBuffer := HB_ArrayToStructure( QSelf(), QSelf():aCTypes, QSelf():nAlign )
+
+   QSelf():InternalBuffer := HB_ArrayToStructure( QSelf(), QSelf():aCTypes, QSelf():nAlign )
 
 RETURN hb_String2Pointer( QSelf():InternalBuffer )
 
@@ -592,19 +598,12 @@ STATIC Function DeValue( lAdopt )
 
    IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
       TraceLog( "EMPTY Buffer passed to " + ProcName() )
+   ELSEIF Len( Buffer ) < QSelf():SizeOf
+      TraceLog( "Should have been caught at ::Buffer()!!!", Buffer )
+      Buffer := PadR( Buffer, QSelf():SizeOf, Chr(0) )
    ELSE
       HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt, QSelf()  )
    ENDIF
-
-   /*
-   FOR EACH xProperty IN QSelf()
-      IF HB_EnumIndex() > nLen
-         EXIT
-      ENDIF
-
-      xProperty := aValues[ HB_EnumIndex() ]
-   NEXT
-   */
 
 RETURN QSelf()
 
