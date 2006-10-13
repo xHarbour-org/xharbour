@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5202 2006/10/13 01:42:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5203 2006/10/13 08:39:19 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-13 20:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * contrib/hbzlib/zip.c
+    ! fixed memory leak
+  * contrib/hbzlib/zipnew.cpp
+    * changed file time format in HB_GETFILESINZIP for Time() and ct FileTime()
+      compatibility and fixed possible memory leak
+  * contrib/hbzlib/include/hbzip2.h
+    * removed hb_____GetTime declaration
+  + contrib/hbzlib/dll_b32.bat
+  + contrib/hbzlib/hrbdll.bc
+    + added makefile to build hbzipdll.dll for bcc
 
 2006-10-13 10:42 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    *source/rdd/bmdbfcdx/bmdbfcdx1.c

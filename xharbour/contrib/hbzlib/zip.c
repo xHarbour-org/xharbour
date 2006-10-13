@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.42 2005/11/19 17:24:14 lculik Exp $
+ * $Id: zip.c,v 1.43 2006/04/22 13:46:12 lculik Exp $
  */
 
 /*
@@ -374,7 +374,10 @@ static void ZipCreateArray( PHB_ITEM pParam, BYTE *pCurDir )
                   #endif
                }
 
-               hb_xfree( szEntry );
+               if ( szEntry )
+               {
+                  hb_xfree( szEntry );
+               }
             }
 
             hb_itemRelease( WildFile );
@@ -662,7 +665,7 @@ HB_FUNC( HB_UNZIPFILE )
 {
    BOOL bRet = FALSE;
 
-   if( ISCHAR( 1 ) )
+   if( ISCHAR( 1 ) && ( ISARRAY( 6 ) || ISCHAR( 6 ) ) )
    {
       char szFile[ _POSIX_PATH_MAX ];
       PHB_ITEM pProgress = hb_param( 7, HB_IT_BLOCK );
@@ -719,13 +722,6 @@ HB_FUNC( HB_UNZIPFILE )
                }
             }
          }
-         else
-         {
-            hb_xfree( szZipFileName );
-            hb_itemRelease( UnzipFiles );
-            hb_retl( bRet );
-            return;
-         }
       }
       else
       {
@@ -748,6 +744,8 @@ HB_FUNC( HB_UNZIPFILE )
       hb_itemRelease( UnzipFiles );
       hb_fsChDir( pCurDir ) ;
       hb_xfree( pCurDir ) ;
+      hb_itemClear( ZipArray );
+      hb_itemRelease( ZipArray );
     }
    }
 
@@ -785,7 +783,8 @@ HB_FUNC( HB_ZIPDELETEFILES )
          if ( !ulLen )
          {
             hb_xfree( szZipFileName );
-            hb_itemRelease( ZipArray);
+            hb_itemClear( ZipArray );
+            hb_itemRelease( ZipArray );
             hb_retl ( bRet );
             return;
          }
@@ -844,6 +843,8 @@ HB_FUNC( HB_ZIPDELETEFILES )
          }
 
          hb_xfree(szZipFileName);
+         hb_itemClear( ZipArray );
+         hb_itemRelease( ZipArray );
       }
 
       hb_itemRelease( DelZip );
@@ -955,6 +956,8 @@ HB_FUNC( HB_UNZIPFILEINDEX )
          hb_itemRelease( DelZip );
          hb_itemClear( &iProgress );
          hb_xfree( szZipFileName );
+         hb_itemClear( ZipArray );
+         hb_itemRelease( ZipArray );
 
       }
    }
@@ -1000,8 +1003,11 @@ HB_FUNC(HB_UNZIPALLFILE)
     if ( ! ISCHAR(6) && ! ISARRAY(6) )
     { 
         char szFile[_POSIX_PATH_MAX];
-        strcpy(szFile,hb_parc(1));
-        hb_retl(hb_UnzipAll(hb___CheckFile(szFile),hb_param( 2, HB_IT_BLOCK),ISLOG(3) ? hb_parl(3) : 0 ,hb_parc(4),ISCHAR(5) ? hb_parc(5) : NULL,hb_param( 6, HB_IT_BLOCK),&iProgress));
+        char *szZipFile;
+        strcpy(szFile, hb_parc(1));
+        szZipFile = hb___CheckFile(szFile);
+        hb_retl(hb_UnzipAll(szZipFile, hb_param( 2, HB_IT_BLOCK),ISLOG(3) ? hb_parl(3) : 0 ,hb_parc(4),ISCHAR(5) ? hb_parc(5) : NULL,hb_param( 6, HB_IT_BLOCK),&iProgress));
+        hb_xfree( szZipFile );
     }
 }
 

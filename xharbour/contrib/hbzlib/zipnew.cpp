@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.25 2005/11/19 17:24:14 lculik Exp $
+ * $Id: zipnew.cpp,v 1.26 2006/04/22 13:46:12 lculik Exp $
  */
 
 /*
@@ -53,7 +53,6 @@
 #include "hbzip2.h"
 #include "hbapifs.h"
 
-char szTempTime[ 80 ];
 PHB_ITEM ZipArray;
 
 extern PHB_ITEM ChangeDiskBlock;
@@ -268,13 +267,11 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
             CZipString szTempString;
             PHB_ITEM TempArray;
             char szAttr[ 5 ];
-            char szTime[ 5 ];
+            char szTime[ 9 ];
             char *szMethod;
             char szCRC[ 8 ];
             int iRatio;
             int iMeth = fh.m_uMethod;
-            int iCount;
-            int iiCount = 0;
             DWORD uAttr = fh.GetSystemAttr( );
 
             TempArray =hb_itemNew(NULL);           
@@ -373,18 +370,10 @@ PHB_ITEM hb___GetFileNamesFromZip( char *szFile, BOOL iMode )
 
             theTime = fh.GetTime( );
             SzTime =  localtime( &theTime );
-            hb_____GetTime( SzTime );
+            sprintf( szTime, "%02d:%02d:%02d", SzTime->tm_hour, SzTime->tm_min, SzTime->tm_sec );
 
-            for( iCount = 10 ; iCount < 16 ; iCount ++ )
-            {
-               if( ( iCount>10 ) && ( iCount<16 ) )
-               {
-                  szTime[ iiCount ] = szTempTime[ iCount ];
-                  iiCount++;
-               }
-            }
             Item  = hb_itemNew( NULL );
-            hb_arraySetForward( TempArray, Time, hb_itemPutCL( Item, szTime, 5 ) );
+            hb_arraySetForward( TempArray, Time, hb_itemPutCL( Item, szTime, 8 ) );
             hb_itemRelease( Item );
             Item  = hb_itemNew( NULL );
             hb_arraySetForward( TempArray, Attr, hb_itemPutCL( Item, szAttr, 5 ));
@@ -425,22 +414,6 @@ char *hb___CheckFile( char * szFile )
    hb_fsFNameMerge( szZipName, pFileName );
    hb_xfree( pFileName );
    return( szZipName );
-}
-
-void hb_____GetTime( struct tm *tz )
-{
-   struct tm t;
-   t.tm_sec    = tz->tm_sec;
-   t.tm_min    = tz->tm_min;
-   t.tm_hour   = tz->tm_hour;
-   t.tm_mday   = tz->tm_mday;
-   t.tm_mon    = tz->tm_mon;
-   t.tm_year   = tz->tm_year;
-   t.tm_wday   = 4;
-   t.tm_yday   = 0;
-   t.tm_isdst  = 0;
-
-   strcpy( szTempTime, asctime( &t ) );
 }
 
 BOOL hb_IsPassWord( char *szFile )
@@ -592,6 +565,7 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    int iCause;
    int iMode ;
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   BOOL bFreePath = TRUE;
 
    BOOL bChange = FALSE;
    LPCTSTR lpFiletoExtract;
@@ -676,11 +650,12 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
                pOut->szDrive = "";
                hb_fsFNameMerge( ( char* )szFileNameInZip, pOut );
                bChange = TRUE;
+               bFreePath = FALSE;
             }
             szZip.SetRootPath(szPath);
             hb_xfree( pOut );
 
-            if( pBlock  !=  NULL )
+            if( pBlock != NULL )
             {
                PHB_ITEM FileName=hb_itemPutC( NULL, ( char * )szFileNameInZip  ), Pos=hb_itemPutNI( NULL , iCause );
 
@@ -729,7 +704,10 @@ int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord
    if (szPath)
    {
       hb_fsChDir((BYTE*)szPath);
-      hb_xfree(szPath);
+      if ( bFreePath )
+      {
+         hb_xfree(szPath);
+      }
    }
 
    return ( int ) iReturn;
@@ -1033,6 +1011,7 @@ BOOL bChange=FALSE;
    SpanActionCallback spanac;
 
    char  * szPath = (char*) hb_xgrab( _POSIX_PATH_MAX + 1 );
+   BOOL bFreePath = TRUE;
 
 
    if ( HB_IS_BLOCK( pProgress ) )
@@ -1101,6 +1080,7 @@ BOOL bChange=FALSE;
                pOut->szDrive = "";
                hb_fsFNameMerge( ( char* )szFileNameInZip, pOut );
                bChange = TRUE;
+               bFreePath = FALSE;
             }
             szZip.SetRootPath(szPath);
             hb_xfree( pOut );
@@ -1138,8 +1118,9 @@ BOOL bChange=FALSE;
            szZip.CloseFile( NULL, true);
            iCause=e.m_iCause       ;
         }
-        if(bChange) {
-        bChange=FALSE;
+        if(bChange)
+        {
+           bChange=FALSE;
 //        szPath=NULL;
         }
 
@@ -1149,7 +1130,10 @@ BOOL bChange=FALSE;
    if (szPath)
    {
       hb_fsChDir((BYTE*)szPath);
-      hb_xfree(szPath);
+      if ( bFreePath )
+      {
+         hb_xfree(szPath);
+      }
    }
 
 return iReturn;

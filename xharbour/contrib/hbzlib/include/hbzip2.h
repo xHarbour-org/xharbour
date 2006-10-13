@@ -1,5 +1,5 @@
 /*
- * $Id: hbzip2.h,v 1.7 2004/02/28 23:05:11 andijahja Exp $
+ * $Id: hbzip2.h,v 1.8 2004/08/04 02:11:34 lculik Exp $
  */
 
 /*
@@ -101,7 +101,6 @@ typedef LPCSTR LPCTSTR;
 #endif
 
 extern char     *hb___CheckFile( char * szFile);
-extern void     hb_____GetTime(struct tm *tz);
 extern unsigned long   GetCurrentFileSize(   LPCTSTR szFile);
 
 extern PHB_ITEM hb___GetFileNamesFromZip(char *szFile,BOOL iMode);
