@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5201 2006/10/12 19:54:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5202 2006/10/13 01:42:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-13 10:42 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
+    * optimized hb_cdxsetfilter initializing bitmap filter.
 
 2006-10-12 21:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/cstruct.prg
@@ -34,12 +38,12 @@
     * Corrected file open attribute
 
 2006-10-11 10:58 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   *bmdbfcdx1.c
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
     * optimized hb_cdxCheckRecordFilter when optimized filter is bitmap filter.
 
 2006-10-11 10:58 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   *bmdbfcdx1.c
-   *hbrddbmcdx.h
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
+   *include/hbrddbmcdx.h
     + Added bitmap filter sincronitzation on APPEND, DELETE, RECALL and FIELDPUT.
 
 2006-10-10 21:04 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
@@ -70,10 +74,10 @@
     ! fixed 2 typos in my previos commit
 
 2006-10-10 11:07 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   *bmdbfcdx1.c
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
     ! fixed size of map filter when a pevious scope is set.
-   *dbcmd.c
-   *workarea.c
+   *source/rdd/dbcmd.c
+   *source/rdd/workarea.c
     + Added capabilitie of SET OPTIMIZE ON |OFF over filters
       In the RDD that admit optimization, p. ej. BMDBFCDX, SET OPTIMIZE
       it determines if the filters will be optimized using the open order
