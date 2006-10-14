@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.7 2006/10/03 22:41:43 ptsarenko Exp $
+ * $Id: dbgwa.prg,v 1.7 2006/10/03 20:26:38 ptsarenko Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ static function UpdateInfo( oDlg, cAlias )
 
    DispOutAt( oDlg:nTop + 2 , oDlg:nLeft + 21 , iif( Bof(),"Yes" , "No "), oDlg:cColor )
    DispOutAt( oDlg:nTop + 2 , oDlg:nLeft + 38 , iif( Deleted(),"Yes" , "No "), oDlg:cColor )
-   DispOutAt( oDlg:nTop + 3 , oDlg:nLeft + 21 , iif( Bof(),"Yes" , "No "), oDlg:cColor )
+   DispOutAt( oDlg:nTop + 3 , oDlg:nLeft + 21 , iif( Eof(),"Yes" , "No "), oDlg:cColor )
    DispOutAt( oDlg:nTop + 3 , oDlg:nLeft + 38 , iif( Found(),"Yes" , "No "), oDlg:cColor )
    DispOutAt( oDlg:nTop + 4 , oDlg:nLeft + 21 , Padr( DbFilter(), 29 ), oDlg:cColor )
    DispOutAt( oDlg:nTop + 5, oDlg:nLeft + 21 , Padr( OrdKey(), 29 ), oDlg:cColor )
