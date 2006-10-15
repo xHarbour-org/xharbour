@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.60 2006/10/09 19:23:44 ptsarenko Exp $
+# $Id: makefile.wc,v 1.61 2006/10/10 17:47:46 ptsarenko Exp $
 #
 
 #
@@ -3372,10 +3372,7 @@ $(CT_OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
 $(CT_OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
    $(CC_CMD)
 
-$(CT_OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
-   $(HRB_CMD)
-
-$(CT_OBJ_DIR)\dattime2.obj : $(CT_OBJ_DIR)\dattime2.c
+$(CT_OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

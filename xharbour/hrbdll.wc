@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.53 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: hrbdll.wc,v 1.54 2006/10/09 08:36:52 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -635,6 +635,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctset.obj \
   $(OBJ_DIR)\ctstr.obj \
   $(OBJ_DIR)\datetime.obj \
+  $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dbftools.obj \
   $(OBJ_DIR)\disk.obj \
   $(OBJ_DIR)\exponent.obj \
@@ -679,7 +680,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ctmisc.obj \
   $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
-  $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dattime3.obj \
   $(OBJ_DIR)\diskutil.obj \
   $(OBJ_DIR)\fcopy.obj \
@@ -2424,6 +2424,9 @@ $(OBJ_DIR)\ctstr.obj : $(CT_DIR)\ctstr.c
 $(OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
   $(CC_CMD)
 
+$(OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
+  $(CC_CMD)
+
 $(OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
   $(CC_CMD)
 
@@ -2569,12 +2572,6 @@ $(OBJ_DIR)\cttime.obj : $(OBJ_DIR)\cttime.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dattime2.obj : $(OBJ_DIR)\dattime2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.183 2006/07/27 16:47:37 map Exp $
+# $Id: makefile.bc,v 1.184 2006/10/07 22:55:02 marchuet Exp $
 #
 
 #
@@ -958,6 +958,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\ctstr.obj \
    $(CT_OBJ_DIR)\ctwin.obj \
    $(CT_OBJ_DIR)\datetime.obj \
+   $(CT_OBJ_DIR)\dattime2.obj \
    $(CT_OBJ_DIR)\dbftools.obj \
    $(CT_OBJ_DIR)\disk.obj \
    $(CT_OBJ_DIR)\exponent.obj \
@@ -1002,7 +1003,6 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\color.obj \
    $(CT_OBJ_DIR)\ct.obj \
    $(CT_OBJ_DIR)\ctmisc.obj \
-   $(CT_OBJ_DIR)\dattime2.obj \
    $(CT_OBJ_DIR)\dattime3.obj \
    $(CT_OBJ_DIR)\diskutil.obj \
    $(CT_OBJ_DIR)\fcopy.obj \
@@ -3333,6 +3333,9 @@ $(CT_OBJ_DIR)\ctstr.obj : $(CT_DIR)\ctstr.c
 $(CT_OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
   $(CC_CMD)
 
+$(CT_OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
+  $(CC_CMD)
+
 $(CT_OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
   $(CC_CMD)
 
@@ -3484,12 +3487,6 @@ $(CT_OBJ_DIR)\cttime.obj : $(CT_OBJ_DIR)\cttime.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\ctwin.obj : $(CT_DIR)\ctwin.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\dattime2.obj : $(CT_OBJ_DIR)\dattime2.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

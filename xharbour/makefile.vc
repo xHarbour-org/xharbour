@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.178 2006/07/27 16:47:37 map Exp $
+# $Id: makefile.vc,v 1.179 2006/10/07 22:55:02 marchuet Exp $
 #
 
 #
@@ -1326,6 +1326,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ctstr.obj \
    $(OBJ_DIR)$(MT)\ctwin.obj \
    $(OBJ_DIR)$(MT)\datetime.obj \
+   $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dbftools.obj \
    $(OBJ_DIR)$(MT)\disk.obj \
    $(OBJ_DIR)$(MT)\exponent.obj \
@@ -1371,7 +1372,6 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ct.obj \
    $(OBJ_DIR)$(MT)\ctmisc.obj \
    $(OBJ_DIR)$(MT)\cttime.obj \
-   $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dattime3.obj \
    $(OBJ_DIR)$(MT)\diskutil.obj \
    $(OBJ_DIR)$(MT)\fcopy.obj \

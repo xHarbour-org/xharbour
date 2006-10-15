@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.25 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: makefile.gc,v 1.26 2006/10/07 22:55:02 marchuet Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -1523,6 +1523,7 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/ctwin.o \
    $(CT_OBJ_DIR)/datetime.o \
    $(CT_OBJ_DIR)/dattime2.o \
+   $(CT_OBJ_DIR)/dattime3.o \
    $(CT_OBJ_DIR)/invrtwin.o \
    $(CT_OBJ_DIR)/numconv.o \
    $(CT_OBJ_DIR)/screen2.o \
@@ -1757,16 +1758,19 @@ $(CT_OBJ_DIR)/ctwin.o : $(LIBCT_DIR)/ctwin.c
 $(CT_OBJ_DIR)/datetime.o : $(LIBCT_DIR)/datetime.c
 	$(CC_CMD)
 
+$(CT_OBJ_DIR)/dattime2.o : $(LIBCT_DIR)/dattime2.c
+	$(CC_CMD)
+
 $(CT_OBJ_DIR)/getsecrt.c : $(LIBCT_DIR)/getsecrt.prg
 	$(HARBOUR_CMD)
 
 $(CT_OBJ_DIR)/getsecrt.o : $(CT_OBJ_DIR)/getsecrt.c
 	$(CC_CMD)
 
-$(CT_OBJ_DIR)/dattime2.c : $(LIBCT_DIR)/dattime2.prg
+$(CT_OBJ_DIR)/dattime3.c : $(LIBCT_DIR)/dattime3.prg
 	$(HARBOUR_CMD)
 
-$(CT_OBJ_DIR)/dattime2.o : $(CT_OBJ_DIR)/dattime2.c
+$(CT_OBJ_DIR)/dattime3.o : $(CT_OBJ_DIR)/dattime3.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/setlast.o : $(LIBCT_DIR)/setlast.c

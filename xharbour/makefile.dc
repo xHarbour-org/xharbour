@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.22 2006/06/26 14:26:25 fsgiudice Exp $
+# $Id: makefile.dc,v 1.23 2006/10/07 22:55:02 marchuet Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -3774,16 +3774,13 @@ $(CT_OBJ_DIR)\ctmisc.obj : $(CT_OBJ_DIR)\ctmisc.c
 $(CT_OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
    $(HARBOUR_CMD)
 
 $(CT_OBJ_DIR)\getsecrt.obj : $(CT_OBJ_DIR)\getsecrt.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
-   $(HARBOUR_CMD)
-
-$(CT_OBJ_DIR)\dattime2.obj : $(CT_OBJ_DIR)\dattime2.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

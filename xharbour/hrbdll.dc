@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.19 2006/06/26 14:26:24 fsgiudice Exp $
+# $Id: hrbdll.dc,v 1.20 2006/10/09 08:36:51 marchuet Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -2960,16 +2960,13 @@ $(OBJ_DIR)\ctmisc.obj : $(OBJ_DIR)\ctmisc.c
 $(OBJ_DIR)\datetime.obj : $(CT_DIR)\datetime.c
    $(CC_CMD)
 
+$(OBJ_DIR)\dattime2.obj : $(CT_DIR)\dattime2.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\getsecrt.obj : $(OBJ_DIR)\getsecrt.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dattime2.c : $(CT_DIR)\dattime2.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dattime2.obj : $(OBJ_DIR)\dattime2.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dattime3.c : $(CT_DIR)\dattime3.prg

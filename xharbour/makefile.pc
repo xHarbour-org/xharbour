@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.32 2006/10/07 22:55:02 marchuet Exp $
+# $Id: makefile.pc,v 1.33 2006/10/09 18:20:53 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -3399,16 +3399,13 @@ $(CT_OBJ_DIR)\ctmisc.obj : $(CT_OBJ_DIR)\ctmisc.c
 $(CT_OBJ_DIR)\datetime.obj : $(CT_SRC_DIR)\datetime.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\dattime2.obj : $(CT_SRC_DIR)\dattime2.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\getsecrt.c : $(CT_SRC_DIR)\getsecrt.prg
    $(HB_CMD)
 
 $(CT_OBJ_DIR)\getsecrt.obj : $(CT_OBJ_DIR)\getsecrt.c
-   $(CC_CMD)
-
-$(CT_OBJ_DIR)\dattime2.c : $(CT_SRC_DIR)\dattime2.prg
-   $(HB_CMD)
-
-$(CT_OBJ_DIR)\dattime2.obj : $(CT_OBJ_DIR)\dattime2.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\dattime3.c : $(CT_SRC_DIR)\dattime3.prg

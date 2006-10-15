@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.prg,v 1.4 2005/01/15 15:38:02 ptsarenko Exp $
+ * $Id: dattime2.c,v 1.1 2006/10/15 01:04:25 ptsarenko Exp $
  */
 
 /*
@@ -19,9 +19,7 @@
  *                                       - QUARTER() 
  *                                       - WEEK() 
  *
- * Copyright 2002 Alan Secker <alansecker@globalnet.co.uk>
- * Copyright 2003 Martin Vogel <vogel@inttec.de>: Enhancements, internationalization, documentation headers
- * Copyright 2005 Pavel Tsarenko <tpe2@mail.ru>: some functons rewritten in C
+ * Copyright 2006 Pavel Tsarenko <tpe2@mail.ru>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -65,139 +63,12 @@
  *
  */
 
-
-#include "set.ch"
-#include "hblang.ch"
-
-
-FUNCTION ctodow ( cDow )
-
-local nOrdinal := 0
-local bExact
-
-  if valtype (cDow) != "C"
-     return (0)
-  endif
-  
-  bExact = set (_SET_EXACT, .F.)
-  cDow = upper (alltrim (cDow))
-
-  do while nOrdinal < 7
-     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_DAY + nOrdinal))) = cDow
-        set (_SET_EXACT, bExact)
-        return (nOrdinal+1)
-     endif
-     nOrdinal++
-  enddo
-
-  set (_SET_EXACT, bExact)
-  return (0)
-
-
-
-FUNCTION ctomonth ( cDom )
-//local cMonth := "JANFEBMARAPRMAYJUNJULAUGSEPOCTNOVDEC "
-//local nMnth  := len (cMonth)
-//local cMatch := left (upper ( Alltrim (cDom)), 3)
-//local n 
-//local nDay   := 0
-
-local nOrdinal := 0
-local bExact
-
-//   for n = 1 to nMnth step 3
-//        if RTRIM (substr (cMonth, n, 3)) == cMatch
-//           nDay := INT (((n-1) / 3) + 1)
-//           exit
-//        endif
-//   next
-//
-//   return nDay
-
-  if valtype (cDom) != "C"
-     return (0)
-  endif
-  
-  bExact = set (_SET_EXACT, .F.)
-  cDom = upper (alltrim (cDom))
-
-  do while nOrdinal < 12
-     if upper (alltrim (hb_langmessage (HB_LANG_ITEM_BASE_MONTH + nOrdinal))) = cDom
-        set (_SET_EXACT, bExact)
-        return (nOrdinal+1)
-     endif
-     nOrdinal++
-  enddo
-
-  set (_SET_EXACT, bExact)
-  return (0)
-
-
-FUNCTION dmy ( ddate, lmode )
-
-local nMonth, nDay, nYear 
-
-local cPeriod := ""
-local cDate
-local cMonth 
-
-local cYear
-local lSetCentury := __SETCENTURY()
-
-   if valtype (ddate) != "D"
-      ddate := date ()
-   endif
-
-   nMonth  := month (ddate)
-   nDay    :=   day (ddate)
-   nYear   :=  year (ddate)
-
-   cMonth := ntocmonth ( nMonth )
-   cYear := str (nYear, iif (lSetCentury, 4, 2))
-
-   cPeriod := if (lmode == .T., ".", "")
-
-
-   cDate := ltrim ( str ( nDay )) + cPeriod + " " + cMonth + " " + ;
-            ltrim ( cYear )
-   return cDate
-
-
-   
-FUNCTION mdy ( dDate )
-
-local nMonth
-local nDay
-local nYear
-local cDate
-local cMonth 
-
-local lSetCentury := __SETCENTURY()
-local cYear
-
-//   default dDate to date()
-   if valtype (ddate) != "D"
-      ddate := date ()
-   endif
-
-   nMonth  := month (dDate)
-   nDay    :=   day (dDate)
-   nYear   :=  year (dDate)
-   cMonth  := ntocmonth ( nMonth )
-
-   cYear := str (nYear, iif (lSetCentury, 4, 2))
-
-   cDate := cMonth + " " + ;
-            ltrim ( str ( nDay )) + " " + ;
-            ltrim ( cYear )
-   
-   return cDate
-
-#pragma BEGINDUMP
-
 #include "hbapi.h"
 #include "hbapiitm.h"
+#include "hbapilng.h"
 #include "hbdate.h"
+#include "hbset.h"
+
 
 BOOL ct_isleap(int iYear)
 {
@@ -236,6 +107,224 @@ LONG ct_doy( LONG lDate )
    hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
    lFirst = hb_dateEncode(iYear, 1, 1);
    return( lDate - lFirst + 1 );
+}
+
+HB_FUNC( CTODOW )
+{
+   if ( ISCHAR( 1 ) )
+   {
+      char *szParam = hb_parc( 1 ), *szDow;
+      int iDow, iEqual;
+
+      hb_strupr( szParam );
+
+      for( iDow = 0; iDow < 7; iDow ++ )
+      {
+         szDow = hb_strdup( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + iDow ) );
+         hb_strupr( szDow );
+
+         if( hb_set.HB_SET_EXACT )
+         {
+            iEqual = (strlen(szDow) == strlen(szParam)) && ! memcmp(szDow, szParam, strlen(szParam) );
+         }
+         else
+         {
+            iEqual = ! memcmp(szDow, szParam, strlen(szParam) );
+         }
+
+         hb_xfree( szDow );
+         if( iEqual )
+         {
+            break;
+         }
+      }
+
+      if( iDow == 7)
+      {
+         hb_retnl( 0 );
+      }
+      else
+      {
+         hb_retnl( iDow + 1 );
+      }
+
+   }
+   else
+   {
+      hb_retnl( 0 );
+   }
+}
+
+HB_FUNC( CTOMONTH )
+{
+   if ( ISCHAR( 1 ) )
+   {
+      char *szParam = hb_parc( 1 ), *szMonth;
+      int iMonth, iEqual;
+
+      hb_strupr( szParam );
+
+      for( iMonth = 1; iMonth <= 12; iMonth ++ )
+      {
+         szMonth = hb_strdup( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 ) );
+         hb_strupr( szMonth );
+
+         if( hb_set.HB_SET_EXACT )
+         {
+            iEqual = (strlen(szMonth) == strlen(szParam)) && ! memcmp(szMonth, szParam, strlen(szParam) );
+         }
+         else
+         {
+            iEqual = ! memcmp(szMonth, szParam, strlen(szParam) );
+         }
+
+         hb_xfree( szMonth );
+         if( iEqual )
+         {
+            break;
+         }
+      }
+
+      if( iMonth > 12)
+      {
+         iMonth = 0;
+      }
+      hb_retnl( iMonth );
+
+   }
+   else
+   {
+      hb_retnl( 0 );
+   }
+}
+
+HB_FUNC( DMY )
+{
+   int iYear, iMonth, iDay;
+   BOOL bMode = FALSE;
+
+   if( ISDATE( 1 ) )
+   {
+      PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+
+   if ( ISLOG( 2 ) )
+   {
+      bMode = hb_parl( 2 );
+   }
+
+   if ( iMonth >= 1 && iMonth <= 12 ) 
+   {
+      char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
+      int iMonLen = strlen(szMonth);
+      int iLen = 0;
+      char *szMDY = hb_xgrab( iMonLen + 10 );
+
+      if (iDay < 10 )
+      {
+         szMDY[iLen] = iDay + 0x30;
+         iLen ++;
+      }
+      else
+      {
+         sprintf( szMDY+iLen, "%02d", iDay );
+         iLen += 2;
+      }
+
+      if( bMode )
+      {
+         szMDY[iLen] = '.';
+         iLen ++;
+      }
+      szMDY[iLen] = ' ';
+      iLen ++;
+
+      strcpy(szMDY + iLen, szMonth);
+      iLen += iMonLen;
+      szMDY[iLen] = ' ';
+      iLen ++;
+
+      if( hb_set.hb_set_century )
+      {
+         sprintf( szMDY+iLen, "%04d", iYear );
+         iLen += 4;
+      }
+      else
+      {
+         sprintf( szMDY+iLen, "%02d", iYear % 100 );
+         iLen += 2;
+      }
+
+      hb_retclen(szMDY, iLen);
+      hb_xfree(szMDY);
+   }
+   else
+   {
+      hb_retc( "");
+   }
+
+}
+
+HB_FUNC( MDY )
+{
+   int iYear, iMonth, iDay;
+
+   if( ISDATE( 1 ) )
+   {
+      PHB_ITEM pDate = hb_param( 1, HB_IT_DATE );
+      hb_dateDecode( hb_itemGetDL( pDate ), &iYear, &iMonth, &iDay );
+   }
+   else
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+   }
+
+   if ( iMonth >= 1 && iMonth <= 12 ) 
+   {
+      char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
+      int iLen = strlen(szMonth);
+      char *szMDY = hb_xgrab( iLen + 9 );
+
+      strcpy(szMDY, szMonth);
+      szMDY[iLen] = ' ';
+      iLen ++;
+      if (iDay < 10 )
+      {
+         szMDY[iLen] = iDay + 0x30;
+         iLen ++;
+      }
+      else
+      {
+         sprintf( szMDY+iLen, "%02d", iDay );
+         iLen += 2;
+      }
+      szMDY[iLen] = ' ';
+      iLen ++;
+
+      if( hb_set.hb_set_century )
+      {
+         sprintf( szMDY+iLen, "%04d", iYear );
+         iLen += 4;
+      }
+      else
+      {
+         sprintf( szMDY+iLen, "%02d", iYear % 100 );
+         iLen += 2;
+      }
+
+      hb_retclen(szMDY, iLen);
+      hb_xfree(szMDY);
+   }
+   else
+   {
+      hb_retc( "");
+   }
+
 }
 
 HB_FUNC( ADDMONTH )
@@ -445,5 +534,3 @@ HB_FUNC( WEEK )
 
    hb_retni( iWeek );
 }
-
-#pragma ENDDUMP

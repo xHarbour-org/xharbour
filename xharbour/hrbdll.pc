@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.27 2006/07/18 15:55:50 modalsist Exp $
+# $Id: hrbdll.pc,v 1.28 2006/10/09 08:36:52 marchuet Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -1244,6 +1244,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\ctset.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\ctstr.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\datetime.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\dattime2.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbftools.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\disk.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\exponent.obj   >> make_tmp
@@ -1292,7 +1293,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\ctmisc.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\cttime.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\ctwin.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dattime2.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\dattime3.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\diskutil.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\fcopy.obj      >> make_tmp
@@ -3096,16 +3096,13 @@ $(OBJ_DIR)\ctmisc.obj : $(OBJ_DIR)\ctmisc.c
 $(OBJ_DIR)\datetime.obj : $(CT_SRC_DIR)\datetime.c
    $(POCC_CMD)
 
+$(OBJ_DIR)\dattime2.obj : $(CT_SRC_DIR)\dattime2.c
+   $(POCC_CMD)
+
 $(OBJ_DIR)\getsecrt.c : $(CT_SRC_DIR)\getsecrt.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\getsecrt.obj : $(OBJ_DIR)\getsecrt.c
-   $(POCC_CMD)
-
-$(OBJ_DIR)\dattime2.c : $(CT_SRC_DIR)\dattime2.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\dattime2.obj : $(OBJ_DIR)\dattime2.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\dattime3.c : $(CT_SRC_DIR)\dattime3.prg

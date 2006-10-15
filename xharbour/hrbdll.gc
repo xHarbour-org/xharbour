@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.21 2006/06/26 14:26:24 fsgiudice Exp $
+# $Id: hrbdll.gc,v 1.22 2006/10/09 08:36:52 marchuet Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -525,6 +525,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/ctwin.o \
    $(OBJ_DIR)/datetime.o \
    $(OBJ_DIR)/dattime2.o \
+   $(OBJ_DIR)/dattime3.o \
    $(OBJ_DIR)/invrtwin.o \
    $(OBJ_DIR)/numconv.o \
    $(OBJ_DIR)/screen2.o \
@@ -2306,16 +2307,19 @@ $(OBJ_DIR)/ctwin.o : $(CT_DIR)/ctwin.c
 $(OBJ_DIR)/datetime.o : $(CT_DIR)/datetime.c
 	$(CC_CMD)
 
+$(OBJ_DIR)/dattime2.o : $(CT_DIR)/dattime2.c
+	$(CC_CMD)
+
 $(OBJ_DIR)/getsecrt.c : $(CT_DIR)/getsecrt.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/getsecrt.o : $(OBJ_DIR)/getsecrt.c
 	$(CC_CMD)
 
-$(OBJ_DIR)/dattime2.c : $(CT_DIR)/dattime2.prg
+$(OBJ_DIR)/dattime3.c : $(CT_DIR)/dattime3.prg
 	$(HARBOUR_CMD)
 
-$(OBJ_DIR)/dattime2.o : $(OBJ_DIR)/dattime2.c
+$(OBJ_DIR)/dattime3.o : $(OBJ_DIR)/dattime3.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/numconv.c : $(CT_DIR)/numconv.prg
