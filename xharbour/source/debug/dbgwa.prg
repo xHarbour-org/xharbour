@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.7 2006/10/03 20:26:38 ptsarenko Exp $
+ * $Id: dbgwa.prg,v 1.8 2006/10/14 09:52:42 likewolf Exp $
  */
 
 /*
@@ -59,6 +59,7 @@ function __dbgShowWorkAreas( oDebugger )
    local aAlias, aBrw, aStruc, aInfo
    local cColor
    local n1, n2, n3, cur_id
+   LOCAL nOldArea := Select()
 
    aAlias := {}
    aBrw   := Array(3)
@@ -74,7 +75,7 @@ function __dbgShowWorkAreas( oDebugger )
    for n1 := 1 to 512
      if ( n1 )->( Used() )
        AAdd(aAlias, { n1, Alias(n1) })
-       if n1 == Select()
+       if n1 == nOldArea
 	 cur_id = Len(aAlias)
        endif
      endif
@@ -84,6 +85,10 @@ function __dbgShowWorkAreas( oDebugger )
       Alert( "No workareas in use")
       return nil
    endif
+
+   IF !Used()
+      SELECT ( aAlias[1][1] )
+   ENDIF
 
    /*
    Window creation
@@ -159,7 +164,8 @@ function __dbgShowWorkAreas( oDebugger )
    */
 
    oDlg:ShowModal()
-
+   
+   SELECT ( nOldArea )
 return nil
 
 static function DlgWorkAreaPaint( oDlg, aBrw )
