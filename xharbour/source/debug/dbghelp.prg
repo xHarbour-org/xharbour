@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.2 2005/10/29 19:39:33 likewolf Exp $
+ * $Id: dbghelp.prg,v 1.3 2006/01/18 23:44:05 likewolf Exp $
  */
 
 /*
@@ -138,10 +138,10 @@ static procedure ProcessKey( nKey, oDlg, oBrw, aTopics, cColor )
               ShowTopic( oDlg, aTopics, oBrw:Cargo, 0 )  // Start on page 1
            endif
 
-      case nKey == K_PGUP
+      case nKey == K_PGUP .OR. nKey == K_CTRL_B
            ShowTopic( oDlg, aTopics, oBrw:Cargo, -1 ) // Skip to prev page
 
-      case nKey == K_PGDN
+      case nKey == K_PGDN .OR. nKey == K_CTRL_F .OR. nKey == K_SPACE
            ShowTopic( oDlg, aTopics, oBrw:Cargo, 1 )  // Skip to next page
 
       case nKey == K_LBUTTONDOWN
@@ -821,7 +821,7 @@ static function GetTopics()
         "    Toggle display of CallStack window",;
         "",;
         "DELETE ALL [WP|TP|BP]",;
-        "DELETE WB|TP|BP <nNumber>",;
+        "DELETE WP|TP|BP <nNumber>",;
         "    Delete all or particular Watchpoint, Tracepoint",;
         "    or Breakpoint.",;
         "",;

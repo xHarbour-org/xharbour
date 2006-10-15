@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.2 2004/05/08 16:26:18 likewolf Exp $
+ * $Id: dbgbrwsr.prg,v 1.3 2006/10/15 14:47:45 likewolf Exp $
  */
 
 /*
@@ -73,19 +73,19 @@ RETURN Self
 METHOD Resize( nTop, nLeft, nBottom, nRight )
 LOCAL lResize:=.F.
 
-   IF( nTop != ::nTop )
+   IF( nTop != NIL .AND. nTop != ::nTop )
       ::nTop := nTop
       lResize := .T.
    ENDIF
-   IF( nLeft != ::nLeft )
+   IF( nLeft != NIL .AND. nLeft != ::nLeft )
       ::nLeft := nLeft
       lResize := .T.
    ENDIF
-   IF( nBottom != ::nBottom )
+   IF( nBottom != NIL .AND. nBottom != ::nBottom )
       ::nBottom := nBottom
       lResize := .T.
    ENDIF
-   IF( nRight != ::nRight )
+   IF( nRight != NIL .AND. nRight != ::nRight )
       ::nRight := nRight
       lResize := .T.
    ENDIF

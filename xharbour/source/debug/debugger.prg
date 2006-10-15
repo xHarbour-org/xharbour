@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.77 2006/07/03 19:21:02 ptsarenko Exp $
+ * $Id: debugger.prg,v 1.78 2006/10/15 14:47:45 likewolf Exp $
  */
 
 /*
@@ -1456,12 +1456,21 @@ return nil
 
 
 METHOD HideVars() CLASS TDebugger
+   LOCAL nTop
+
    IF ::oWndVars == NIL
       RETURN NIL
    ENDIF
 
    ::oWndVars:Hide()
-   ::oWndCode:nTop := 1
+   IF ::oWndPnt == NIL
+     nTop := 1
+   ELSE
+     ::oWndPnt:Resize( 1, , ::oWndPnt:nBottom - ( ::oWndPnt:nTop - 1 ) )
+     ::oBrwPnt:Resize( 2, , ::oWndPnt:nBottom - 1 )
+     nTop := ::oWndPnt:nBottom + 1
+   ENDIF
+   ::oWndCode:Resize( nTop )
    ::oBrwText:Resize( ::oWndCode:nTop+1 )
    IF ::oWndCode:lFocused
       ::oWndCode:cargo[ 1 ] := Row()
@@ -2112,7 +2121,7 @@ return nil
 
 
 METHOD ResizeWindows( oWindow ) CLASS TDebugger
-  LOCAL oWindow2, nTop, i
+  LOCAL oWindow2, nTop, i, lVisible2 := .F.
 
   IF oWindow == ::oWndVars
     oWindow2 := ::oWndPnt
@@ -2124,6 +2133,7 @@ METHOD ResizeWindows( oWindow ) CLASS TDebugger
   IF oWindow2 == NIL
     nTop := oWindow:nBottom +1
   ELSE
+    lVisible2 := oWindow2:lVisible
     IF oWindow2:lVisible
       IF oWindow:nTop < oWindow2:nTop
         nTop := oWindow2:nBottom - oWindow2:nTop + 1
@@ -2153,7 +2163,7 @@ METHOD ResizeWindows( oWindow ) CLASS TDebugger
     ::oWndCode:cargo[ 2 ] := Col()
   ENDIF
 
-  IF oWindow2 != NIL
+  IF oWindow2 != NIL .AND. lVisible2
     oWindow2:show()
   ENDIF
   oWindow:show()

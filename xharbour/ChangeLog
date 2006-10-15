@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5209 2006/10/15 17:50:33 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5210 2006/10/15 18:01:51 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-15 23:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/debugger.prg
+  * source/debug/dbgbrwsr.prg
+    ! Correctly reposition windows after hiding the monitor window.
+  * source/debug/dbghelp.prg
+    ! Fixed a typo.
+    + Added Ctrl F and Space as equivalents for PgDn and Ctrl B as an
+      equivalent for PgUp in the help browser.
 
 2006-10-15 21:54 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/dbgwa.prg
