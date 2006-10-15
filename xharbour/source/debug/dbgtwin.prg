@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtwin.prg,v 1.8 2004/03/31 08:13:52 lf_sfnet Exp $
+ * $Id: dbgtwin.prg,v 1.9 2004/07/09 19:55:05 likewolf Exp $
  */
 
 /*
@@ -160,24 +160,7 @@ METHOD SetFocus( lOnOff ) CLASS TDbWindow
       Eval( ::bLostFocus, Self )
    endif
 
-   DispBegin()
-
    ::lFocused := lOnOff
-
-   @ ::nTop, ::nLeft, ::nBottom, ::nRight BOX iif( lOnOff, B_DOUBLE, B_SINGLE ) ;
-      COLOR ::cColor
-
-   DispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
-
-   if ! Empty( ::cCaption )
-      ::ShowCaption( ::cCaption )
-   endif
-
-   if ::bPainted != nil
-      Eval( ::bPainted, Self )
-   endif
-
-   DispEnd()
 
    if lOnOff .and. ::bGotFocus != nil
       Eval( ::bGotFocus, Self )
@@ -194,9 +177,7 @@ METHOD Refresh() CLASS TDbWindow
 
    DispOutAt( ::nTop, ::nLeft + 1, "[" + Chr( 254 ) + "]", ::cColor )
 
-   if ! Empty( ::cCaption )
-      ::ShowCaption( ::cCaption )
-   endif
+   ::ShowCaption( ::cCaption )
 
    if ::bPainted != nil
       Eval( ::bPainted, Self )
@@ -224,7 +205,7 @@ METHOD Show( lFocused ) CLASS TDbWindow
       hb_Shadow( ::nTop, ::nLeft, ::nBottom, ::nRight )
    endif
 
-   ::ShowCaption()
+   ::Refresh()
    ::lVisible := .t.
 
    SetPos( nRow, nCol )
@@ -356,6 +337,11 @@ RETURN nil
 
 METHOD Resize( nTop, nLeft, nBottom, nRight ) CLASS TDbWindow
   LOCAL lShow
+
+  IF ( nTop == NIL .OR. nTop == ::nTop ) .AND. ( nLeft == NIL .OR. nLeft == ::nLeft ) ;
+    .AND. ( nBottom == NIL .OR. nBottom == ::nBottom ) .AND. ( nRight == NIL .OR. nRight == ::nRight )
+    RETURN Self
+  ENDIF
 
   IF lShow:=::lVisible
     ::Hide()

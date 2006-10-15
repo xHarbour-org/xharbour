@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.77 2006/07/03 22:00:00 ptsarenko Exp $
+ * $Id: debugger.prg,v 1.77 2006/07/03 19:21:02 ptsarenko Exp $
  */
 
 /*
@@ -8,6 +8,9 @@
  *
  * Copyright 1999 Antonio Linares <alinares@fivetechsoft.com>
  * www - http://www.harbour-project.org
+ *
+ * Copyright 2003-2006 Phil Krylov <phil@newstar.rinet.ru>
+ * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -816,6 +819,7 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
                cResult := ValToStr( cResult )
             ENDIF
          ENDIF
+         ::RefreshVars()
 
      CASE starts( "ANIMATE", cCommand )
         IF ::lActive
@@ -1195,7 +1199,6 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
     lValid := .F.
   END SEQUENCE
   ErrorBlock( bOldErrorBlock )
-  ::RefreshVars()
 RETURN xResult
 
 
@@ -1295,7 +1298,7 @@ METHOD HandleEvent() CLASS TDebugger
          case ::oPullDown:IsOpen()
               ::oPullDown:ProcessKey( nKey )
               if ::oPullDown:nOpenPopup == 0 // Closed
-                 ::aWindows[ ::nCurrentWindow ]:SetFocus( .t. )
+                 ::aWindows[ ::nCurrentWindow ]:Show( .t. )
               endif
 
          case nKey == K_LDBLCLK
@@ -1309,9 +1312,9 @@ METHOD HandleEvent() CLASS TDebugger
                  for n := 1 to Len( ::aWindows )
                     if ::aWindows[ n ]:IsOver( nMRow, nMCol )
                        if ! ::aWindows[ n ]:lFocused
-                          ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
+                          ::aWindows[ ::nCurrentWindow ]:Show( .f. )
                           ::nCurrentWindow := n
-                          ::aWindows[ n ]:SetFocus( .t. )
+                          ::aWindows[ n ]:Show( .t. )
                        endif
                        ::aWindows[ n ]:LDblClick( nMRow, nMCol )
                        exit
@@ -1339,9 +1342,9 @@ METHOD HandleEvent() CLASS TDebugger
                  for n := 1 to Len( ::aWindows )
                     if ::aWindows[ n ]:IsOver( nMRow, nMCol )
                        if ! ::aWindows[ n ]:lFocused
-                          ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
+                          ::aWindows[ ::nCurrentWindow ]:Show( .f. )
                           ::nCurrentWindow := n
-                          ::aWindows[ n ]:SetFocus( .t. )
+                          ::aWindows[ n ]:Show( .t. )
                        endif
                        ::aWindows[ n ]:LButtonDown( nMRow, nMCol )
                        exit
@@ -1768,7 +1771,7 @@ METHOD LoadVars() CLASS TDebugger // updates monitored variables
    ENDIF
 
    IF( ::oBrwVars != NIL .AND. ::oBrwVars:cargo[1] > LEN(aBVars) )
-     ::oBrwVars:gotop()
+     ::oBrwVars:GoTop()
    ENDIF
    ::aVars := aBVars
    if ::lSortVars
@@ -1859,7 +1862,7 @@ METHOD NextWindow() CLASS TDebugger
 
    if Len( ::aWindows ) > 0
       oWnd := ::aWindows[ ::nCurrentWindow++ ]
-      oWnd:SetFocus( .f. )
+      oWnd:Show( .f. )
       if ::nCurrentWindow > Len( ::aWindows )
          ::nCurrentWindow := 1
       endif
@@ -1870,7 +1873,7 @@ METHOD NextWindow() CLASS TDebugger
          endif
       end
       oWnd := ::aWindows[ ::nCurrentWindow ]
-      oWnd:SetFocus( .t. )
+      oWnd:Show( .t. )
    endif
 
 return nil
@@ -2034,7 +2037,7 @@ METHOD PrevWindow() CLASS TDebugger
 
    if Len( ::aWindows ) > 0
       oWnd := ::aWindows[ ::nCurrentWindow-- ]
-      oWnd:SetFocus( .f. )
+      oWnd:Show( .f. )
       if ::nCurrentWindow < 1
          ::nCurrentWindow := Len( ::aWindows )
       endif
@@ -2045,7 +2048,7 @@ METHOD PrevWindow() CLASS TDebugger
          endif
       end
       oWnd := ::aWindows[ ::nCurrentWindow ]
-      oWnd:SetFocus( .t. )
+      oWnd:Show( .t. )
    endif
 
 return nil
@@ -2455,7 +2458,7 @@ METHOD ShowCallStack() CLASS TDebugger
       DispEnd()
 
       if ::aWindows[ ::nCurrentWindow ]:lFocused
-         ::aWindows[ ::nCurrentWindow ]:SetFocus( .f. )
+         ::aWindows[ ::nCurrentWindow ]:Show( .f. )
       endif
 
       ::oWndStack := TDbWindow():New( 1, ::nMaxCol - 15, ::nMaxRow - 6, ::nMaxCol,;
@@ -2570,12 +2573,15 @@ METHOD ShowHelp( nTopic ) CLASS TDebugger
 return nil
 
 
+#define MAX_VARS_HEIGHT 7
+
 METHOD ShowVars() CLASS TDebugger
 
    local nWidth, n := 1
    Local oCol
    local lRepaint := .f.
-   local nTop
+   local nTop, nBottom
+   LOCAL lWindowCreated := .F.
 
    if ::lGo
       return nil
@@ -2586,11 +2592,14 @@ METHOD ShowVars() CLASS TDebugger
       return nil
    endif
 
+   DispBegin()
+   
    if ::oWndVars == nil
 
       nTop := IIF(::oWndPnt!=NIL .AND. ::oWndPnt:lVisible,::oWndPnt:nBottom+1,1)
+      nBottom = nTop + Min( MAX_VARS_HEIGHT, Len( ::aVars ) + 1 )
 
-      ::oWndVars := TDbWindow():New( nTop, 0, nTop+Min( 5, Len( ::aVars )+1 ),;
+      ::oWndVars := TDbWindow():New( nTop, 0, nBottom,;
          ::nMaxCol - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ),;
          "Monitor:" + ;
          iif( ::lShowGlobals, " Global", "" ) + iif( ::lShowLocals, " Local", "" ) + ;
@@ -2599,52 +2608,23 @@ METHOD ShowVars() CLASS TDebugger
 
       ::oWndVars:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
       ::oWndVars:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwVars:Cargo[ 1 ] ) }
+      ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::oBrwVars:RefreshAll():ForceStable(),RefreshVarsS(::oBrwVars) ),) }
 
-      ::oBrwVars := TDbgBrowser():New( nTop+1, 1, ::oWndVars:nBottom - 1, ::nMaxCol - iif( ::oWndStack != nil,;
-                               ::oWndStack:nWidth(), 0 ) - 1 )
-
-      ::oWndVars:Browser := ::oBrwVars
-
-      ::oBrwVars:Cargo :={ 1,{}} // Actual highligthed row
-      ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
-      ::oBrwVars:GOTOPBLOCK := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
-      ::oBrwVars:GoBottomBlock := { || ::oBrwVars:cargo[ 1 ] := Max( 1, Len( ::aVars ) ) }
-      ::oBrwVars:SkipBlock = { | nSkip, nOld | nOld := ::oBrwVars:Cargo[ 1 ],;
-                               ::oBrwVars:Cargo[ 1 ] += nSkip,;
-                               ::oBrwVars:Cargo[ 1 ] := Min( Max( ::oBrwVars:Cargo[ 1 ], 1 ),;
-                                                             Len( ::aVars ) ),;
-                               If( Len( ::aVars ) > 0, ::oBrwVars:Cargo[ 1 ] - nOld, 0 ) }
-
-      nWidth := ::oWndVars:nWidth() - 1
-      oCol := TBColumnNew( "", ;
-        { || PadR( If( Len( ::aVars ) > 0, ;
-                       AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
-                         ::VarGetInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ), ;
-                       " " ), ;
-                   ::oWndVars:nWidth() - 2 ) } )
-      ::oBrwVars:AddColumn( oCol )
-      AAdd( ::oBrwVars:Cargo[2], ::aVars )
-      oCol:DefColor:={1,2}
-      if Len( ::aVars ) > 0
-         ::oBrwVars:ForceStable()
-      endif
-
-      ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::obrwVars:RefreshAll():ForceStable(),RefreshVarsS(::oBrwVars) ),) }
-
-      ::oWndVars:bKeyPressed := { | nKey | ( iif( nKey == K_DOWN ;
-      , ::oBrwVars:Down(), nil ), iif( nKey == K_UP, ::oBrwVars:Up(), nil ) ;
+      ::oWndVars:bKeyPressed := { | nKey | IIf( Len( ::aVars ) == 0, NIL, ( ;
+      iif( nKey == K_DOWN, ::oBrwVars:Down(), nil ) ;
+      , iif( nKey == K_UP, ::oBrwVars:Up(), nil ) ;
       , iif( nKey == K_PGDN, ::oBrwVars:PageDown(), nil ) ;
       , iif( nKey == K_PGUP, ::oBrwVars:PageUp(), nil ) ;
       , iif( nKey == K_HOME, ::oBrwVars:GoTop(), nil ) ;
       , iif( nKey == K_END, ::oBrwVars:GoBottom(), nil ) ;
-      , iif( nKey == K_ENTER, ::EditVar( ::oBrwVars:Cargo[1] ), nil ), IIF(LEN(::aVars)>0, ::oBrwVars:ForceStable(), nil) ) }
+      , iif( nKey == K_ENTER, ::EditVar( ::oBrwVars:Cargo[1] ), nil ), ;
+      IIF(LEN(::aVars)>0, ::oBrwVars:ForceStable(), nil) ) ) }
 
       AAdd( ::aWindows, ::oWndVars )
-      ::oWndVars:Show()
-      ::ResizeWindows( ::oWndVars )
+      lWindowCreated := .T.
+   ELSE
 
-   else
-
+      nTop := ::oWndVars:nTop
       ::oWndVars:cCaption := "Monitor:" + ;
       iif( ::lShowGlobals, " Global", "" ) + ;
       iif( ::lShowLocals, " Local", "" ) + ;
@@ -2652,34 +2632,83 @@ METHOD ShowVars() CLASS TDebugger
       iif( ::lShowPrivates, " Private", "" ) + ;
       iif( ::lShowPublics, " Public", "" )
 
-      DispBegin()
-      if ::oBrwVars:cargo[1] <= 0
-         ::oBrwVars:cargo[1] := 1
-      endif
-
+      nBottom := ::oWndVars:nBottom
       if Len( ::aVars ) == 0
          if ::oWndVars:nBottom - ::oWndVars:nTop > 1
-            ::oWndVars:Resize( ,, ::oWndVars:nTop + 1 )
-            lRepaint := .t.
-         else
+            nBottom := nTop + 1
+         endif
+      elseif Len( ::aVars ) > ::oWndVars:nBottom - ::oWndVars:nTop - 1
+         nBottom := nTop + Min( Len( ::aVars ) + 1, MAX_VARS_HEIGHT )
+      elseif Len( ::aVars ) < ::oWndVars:nBottom - ::oWndVars:nTop - 1
+         nBottom := nTop + Len( ::aVars ) + 1
+      else
+         nBottom := ::oWndVars:nBottom
+      endif
+   ENDIF
+
+   IF Len( ::aVars ) > 0 .AND. ::oBrwVars == NIL
+      ::oBrwVars := TDbgBrowser():New( nTop+1, 1, nBottom - 1, ;
+                                       ::nMaxCol - iif( ::oWndStack != nil, ::oWndStack:nWidth(), 0 ) - 1 )
+
+      ::oBrwVars:Cargo :={ 1,{}} // Actual highlighted row
+      ::oBrwVars:ColorSpec := ::aColors[ 2 ] + "," + ::aColors[ 5 ] + "," + ::aColors[ 3 ]
+      ::oBrwVars:GOTOPBLOCK := { || ::oBrwVars:cargo[ 1 ] := Min( 1, Len( ::aVars ) ) }
+      ::oBrwVars:GoBottomBlock := { || ::oBrwVars:cargo[ 1 ] := Max( 1, Len( ::aVars ) ) }
+      ::oBrwVars:SkipBlock = { | nSkip, nOld | ;
+                               nOld := ::oBrwVars:Cargo[ 1 ],;
+                               ::oBrwVars:Cargo[ 1 ] += nSkip,;
+                               ::oBrwVars:Cargo[ 1 ] := Min( Max( ::oBrwVars:Cargo[ 1 ], 1 ), Len( ::aVars ) ),;
+                               ::oBrwVars:Cargo[ 1 ] - nOld }
+
+      nWidth := ::oWndVars:nWidth() - 1
+      oCol := TBColumnNew( "", ;
+           { || PadR( AllTrim( Str( ::oBrwVars:Cargo[1] -1 ) ) + ") " + ;
+                      ::VarGetInfo( ::aVars[ Max( ::oBrwVars:Cargo[1], 1 ) ] ), ;
+                      ::oWndVars:nWidth() - 2 ) } )
+      ::oBrwVars:AddColumn( oCol )
+      AAdd( ::oBrwVars:Cargo[2], ::aVars )
+      oCol:DefColor:={1,2}
+      ::oBrwVars:ForceStable()
+   ELSEIF Len( ::aVars ) == 0
+      ::oBrwVars := NIL
+      ::oWndVars:Browser := NIL
+   ENDIF
+
+   ::oWndVars:Browser := ::oBrwVars
+
+   IF lWindowCreated
+      ::oWndVars:Show()
+      ::ResizeWindows( ::oWndVars )
+
+   else
+
+      IF ::oBrwVars != NIL
+         if ::oBrwVars:cargo[1] <= 0
+            ::oBrwVars:cargo[1] := 1
+         endif
+      ENDIF
+
+      if Len( ::aVars ) == 0 
+         IF nBottom == ::oWndVars:nBottom
             /* We still need to redraw window caption, it could have changed */
             ::oWndVars:Refresh()
          endif
-      elseif Len( ::aVars ) > ::oWndVars:nBottom - ::oWndVars:nTop - 1
-         ::oWndVars:Resize( ,, ::oWndVars:nTop + Min( Len( ::aVars ) + 1, 7 ) )
-         lRepaint := .t.
-      elseif Len( ::aVars ) < ::oWndVars:nBottom - ::oWndVars:nTop - 1
-         ::oWndVars:Resize( ,, ::oWndVars:nTop + Len( ::aVars ) + 1 )
+      ENDIF
+      IF nBottom != ::oWndVars:nBottom
+         ::oWndVars:Resize( ,, nBottom )
          lRepaint := .t.
       else
-         ::oBrwVars:RefreshAll():ForceStable()
+         IF ::oBrwVars != NIL
+           ::oBrwVars:RefreshAll():ForceStable()
+         ENDIF
          ::oWndVars:Refresh()
       endif
       if ! ::oWndVars:lVisible .OR. lRepaint
          ::ResizeWindows( ::oWndVars )
       endif
-      DispEnd()
    endif
+   
+   DispEnd()
 
 return nil
 
@@ -3054,6 +3083,7 @@ METHOD WatchpointInspect( nPos ) CLASS TDebugger
   ::SaveAppState()
 
   ::InputBox( ::aWatch[ nPos ][ WP_EXPR ], xValue, , .F. )
+  ::RefreshVars()
 RETURN Self
 
 
@@ -3128,7 +3158,7 @@ METHOD WatchpointsShow() CLASS TDebugger
       AAdd(::oBrwPnt:Cargo[2], ::aWatch)
       oCol:DefColor:={1,2}
 
-      ::oWndPnt:bPainted := { || if(Len(::aWatch) > 0, ( ::oBrwPnt:RefreshAll():ForceStable(),RefreshVarsS(::oBrwPnt) ),) }
+      ::oWndPnt:bPainted := { || if(Len(::aWatch) > 0, ( ::oBrwPnt:RefreshAll():ForceStable(),RefreshVarsS(::oBrwPnt)/*, ::RefreshVars()*/ ),) }
 
       ::oWndPnt:bKeyPressed := { | nKey | ;
       ( iif( nKey == K_DOWN, ::oBrwPnt:Down(), nil ) ;

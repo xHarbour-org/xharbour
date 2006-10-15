@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.1 2004/02/20 02:29:14 likewolf Exp $
+ * $Id: dbgbrwsr.prg,v 1.2 2004/05/08 16:26:18 likewolf Exp $
  */
 
 /*
@@ -58,6 +58,8 @@ CLASS TDbgBrowser FROM TBrowse  // Debugger browser
 
    METHOD New( nTop, nLeft, nBottom, nRight, oParentWindow )
    METHOD Resize( nTop, nLeft, nBottom, nRight )
+   METHOD ForceStable() INLINE IIf( ::RowCount > 0, ::Super:ForceStable(), )
+   METHOD RefreshAll() INLINE IIf( ::RowCount > 0, ::Super:RefreshAll(), )
 
 ENDCLASS
 
