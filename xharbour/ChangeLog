@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5206 2006/10/14 09:52:42 likewolf Exp $
+ * $Id: ChangeLog,v 1.5207 2006/10/15 14:47:44 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,8 +9,10 @@
 */
 
 2006-10-15 18:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
-  * source/debug/dbgwa.prg
-    ! Fixed displaying BOF() value for both BOF() and EOF().
+  * source/debug/dbgbrwsr.prg
+  * source/debug/dbgtwin.prg
+  * source/debug/debugger.prg
+    ! Avoid TBrowses with null height. Fixed recursive repaint issues.
 
 2006-10-14 13:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/dbgwa.prg
