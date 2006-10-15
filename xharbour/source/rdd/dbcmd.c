@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.203 2006/09/06 23:56:00 druzus Exp $
+ * $Id: dbcmd.c,v 1.204 2006/10/10 09:09:25 marchuet Exp $
  */
 
 /*
@@ -2230,7 +2230,7 @@ HB_FUNC( DBSETFILTER )
             pFilterInfo.abFilterText = hb_itemPutC( NULL, "" );
          pFilterInfo.fFilter = TRUE;
          pFilterInfo.lpvCargo = NULL;
-         pFilterInfo.fOptimized = hb_set.HB_SET_OPTIMIZE;
+         pFilterInfo.fOptimized = FALSE;
          SELF_SETFILTER( pArea, &pFilterInfo );
          if( !pText )
             hb_itemRelease( pFilterInfo.abFilterText );
