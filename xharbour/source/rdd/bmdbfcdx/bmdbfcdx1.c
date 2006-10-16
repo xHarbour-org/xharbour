@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.6 2006/10/11 17:02:42 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.7 2006/10/13 08:39:21 marchuet Exp $
  */
 
 /*
@@ -18,6 +18,7 @@
  *    BM_DbSetFilterArray( aFilterRec )
  *    BM_DbSetFilterArrayAdd( aFilterRec )
  *    BM_DbSetFilterArrayDel( aFilterRec )
+ *    hb_cdxAppend
  *    hb_cdxSetFilter
  *    hb_cdxClearFilter
  *    hb_cdxPutValue
@@ -687,10 +688,6 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
          break;
       default:
          ptr = NULL;
-#ifdef HB_CDX_DBGCODE
-         /* TODO: RTerror */
-         printf( "hb_cdxKeyPutItem( invalid item type: %i )", hb_itemType( pItem ) );
-#endif
          break;
    }
    pKey = hb_cdxKeyPut( pKey, ptr, ulLen, ulRec );
@@ -745,9 +742,6 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
                hb_itemClear( pItem );
             else
                pItem = hb_itemNew( NULL );
-#ifdef HB_CDX_DBGCODE
-            printf( "hb_cdxKeyGetItem() ??? (%x)\n", pTag->uiType );
-#endif
       }
    }
    else if ( pItem )
@@ -6996,7 +6990,6 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
 ERRCODE hb_cdxSkipFilter( CDXAREAP pArea, LONG lUpDown )
 {
    BOOL fBottom, fDeleted;
-   PHB_ITEM pResult;
    ERRCODE uiError;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxSkipFilter(%p, %ld)", pArea, lUpDown));
@@ -8873,6 +8866,8 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
     if ( SUPER_SETFILTER( ( AREAP ) pArea, pFilterInfo ) != SUCCESS )
         return FAILURE;
+
+    pArea->dbfi.fOptimized = hb_set.HB_SET_OPTIMIZE;
 
     if ( pArea->dbfi.fOptimized )
     {
