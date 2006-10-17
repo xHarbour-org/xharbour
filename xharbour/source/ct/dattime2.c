@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.1 2006/10/15 01:04:25 ptsarenko Exp $
+ * $Id: dattime2.c,v 1.1 2006/10/15 17:50:34 ptsarenko Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ HB_FUNC( DMY )
       char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
       int iMonLen = strlen(szMonth);
       int iLen = 0;
-      char *szMDY = hb_xgrab( iMonLen + 10 );
+      char *szMDY = (char *)hb_xgrab( iMonLen + 10 );
 
       if (iDay < 10 )
       {
@@ -288,7 +288,7 @@ HB_FUNC( MDY )
    {
       char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
       int iLen = strlen(szMonth);
-      char *szMDY = hb_xgrab( iLen + 9 );
+      char *szMDY = (char *) hb_xgrab( iLen + 9 );
 
       strcpy(szMDY, szMonth);
       szMDY[iLen] = ' ';
