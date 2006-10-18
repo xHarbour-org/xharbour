@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2004/11/28 15:29:31 ptsarenko Exp $
+# $Id: Makefile,v 1.4 2005/01/17 04:24:39 aleytys Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -39,6 +39,7 @@ PRG_SOURCES=\
 	atnum.prg \
 	atrepl.prg \
 	beforatn.prg \
+	bit1.prg \
 	charadd.prg \
 	charand.prg \
 	chareven.prg \

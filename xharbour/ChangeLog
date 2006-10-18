@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5214 2006/10/17 04:36:37 paultucker Exp $
+ * $Id: ChangeLog,v 1.5215 2006/10/18 08:14:44 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-10-18 20:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/bit1.c
+    * added support for 32-bit numbers in NumAnd(), NumOr() and NumXor() for
+      clipper compatibility. In fact the behavior of these functions is
+      different from NG documentation
+  + tests/cttest/bit1.prg
+    + added tests for ct bit functions
+  * tests/cttest/Makefile
+    * changed for bit1.prg
 
 2006-10-18 10:19 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    *source/rdd/bmdbfcdx/bmdbfcdx1.c

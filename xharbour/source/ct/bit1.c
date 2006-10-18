@@ -1,5 +1,5 @@
 /*
- * $Id: bit1.c,v 1.2 2006/09/23 21:02:59 ptsarenko Exp $
+ * $Id: bit1.c,v 1.2 2006/09/23 18:32:16 ptsarenko Exp $
  */
 
 /*
@@ -59,61 +59,123 @@
 #include "hbapi.h"
 #include "ct.h"
 
+typedef BOOL * BOOLP;
+
 extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
-static USHORT __getparam( int iParam );
-static USHORT __numand( USHORT wNum1, USHORT wNum2 );
-static USHORT __numor ( USHORT wNum1, USHORT wNum2 );
-static USHORT __numxor( USHORT wNum1, USHORT wNum2 );
-static USHORT __numnot( USHORT wNum1, USHORT wNum2 );
-static LONG __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2));
+static LONG __getparam( int iParam );
+static LONG __numand( LONG wNum1, LONG wNum2 );
+static LONG __numor ( LONG wNum1, LONG wNum2 );
+static LONG __numxor( LONG wNum1, LONG wNum2 );
+static LONG __numnot( LONG wNum1, LONG wNum2 );
+static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk);
 
 
 
 HB_FUNC( NUMAND )
 {
-  int iPCount;
+  int iPCount = hb_pcount();
+  LONG lResult;
+  BOOL bOk;
 
-  iPCount = hb_pcount();
-
-  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numand) ) );
+  if( iPCount >= 2 )
+  {
+     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numand), &bOk );
+     if( ! bOk)
+     {
+        hb_retnl( -1 );
+     }
+     else if( lResult > 0 )
+     {
+        hb_retnl( lResult );
+     }
+     else
+     {
+        hb_retnd( (ULONG) lResult );
+     }
+  }
+  else
+  {
+     hb_retnl( -1 );
+  }
 }
 
 
 
 HB_FUNC( NUMOR )
 {
-  int  iPCount;
+  int iPCount = hb_pcount();
+  LONG lResult;
+  BOOL bOk;
 
-  iPCount = hb_pcount();
-
-  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numor) ) );
+  if( iPCount >= 2 )
+  {
+     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numor), &bOk );
+     if( ! bOk)
+     {
+        hb_retnl( -1 );
+     }
+     else if( lResult > 0 )
+     {
+        hb_retnl( lResult );
+     }
+     else
+     {
+        hb_retnd( (ULONG) lResult );
+     }
+  }
+  else
+  {
+     hb_retnl( -1 );
+  }
 }
 
 
 
 HB_FUNC( NUMXOR )
 {
-  int  iPCount;
+  int  iPCount = hb_pcount();
+  LONG lResult;
+  BOOL bOk;
 
-/*  iPCount = hb_pcount(); */
-
-  iPCount = 2;
-
-  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numxor) ) );
+  if( iPCount >= 2 )
+  {
+     lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numxor), &bOk );
+     if( ! bOk)
+     {
+        hb_retnl( -1 );
+     }
+     else if( lResult > 0 )
+     {
+        hb_retnl( lResult );
+     }
+     else
+     {
+        hb_retnd( (ULONG) lResult );
+     }
+  }
+  else
+  {
+     hb_retnl( -1 );
+  }
 }
 
 
 
 HB_FUNC( NUMNOT )
 {
-  int  iPCount;
+  int  iPCount = 1;
+  BOOL bOk;
+  LONG lResult = __numfun( iPCount, (LONG (*)(LONG wNum1, LONG wNum2))(__numnot), &bOk );
 
-/*  iPCount = hb_pcount(); */
-
-  iPCount = 1;
-
-  hb_retnl( __numfun( iPCount, (USHORT (*)(USHORT wNum1, USHORT wNum2))(__numnot) ) );
+  if( ! bOk )
+  {
+     hb_retnl( -1 );
+  }
+  else
+  {
+     hb_retnl( (USHORT) lResult );
+  }
 }
 
 
@@ -208,56 +270,57 @@ HB_FUNC ( NUMMIRR )
 }
 
 
-static USHORT __getparam( int iParam )
+static LONG __getparam( int iParam )
 {
 
   if ( ISCHAR( iParam ) )
-     return (USHORT) hb_hextonum( hb_parcx( iParam ) );
+     return (LONG) hb_hextonum( hb_parcx( iParam ) );
   else
-     return (USHORT) hb_parnl( iParam );
+     return hb_parnl( iParam );
 
 }
 
 
-static USHORT __numand( USHORT uiNum1, USHORT uiNum2 )
+static LONG __numand( LONG lNum1, LONG lNum2 )
 {
-    return uiNum1 & uiNum2;
+    return lNum1 & lNum2;
 }
 
 
-static USHORT __numor( USHORT uiNum1, USHORT uiNum2 )
+static LONG __numor( LONG lNum1, LONG lNum2 )
 {
-    return uiNum1 | uiNum2;
+    return lNum1 | lNum2;
 }
 
 
-static USHORT __numxor( USHORT uiNum1, USHORT uiNum2 )
+static LONG __numxor( LONG lNum1, LONG lNum2 )
 {
-    return uiNum1 ^ uiNum2;
+    return lNum1 ^ lNum2;
 }
 
 
-static USHORT __numnot( USHORT uiNum1, USHORT uiNum2 )
+static LONG __numnot( LONG lNum1, LONG lNum2 )
 {
-    HB_SYMBOL_UNUSED (uiNum2);
-    return ~uiNum1;
+    HB_SYMBOL_UNUSED (lNum2);
+    return ~lNum1;
 }
 
 
-static LONG __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum2))
+static LONG __numfun( int iPCount, LONG (*operation)(LONG wNum1, LONG wNum2), BOOLP pbOk)
 {
-  USHORT uiNumOp = 0;
-  USHORT uiNum1, uiNum2;
+  LONG lNumOp = 0;
+  LONG lNum1, lNum2;
   int  iFor;
 
+  *pbOk = TRUE;
   if ( ISNUM(1) || ISCHAR(1) )
   {
-     uiNum1 = __getparam( 1 );
+     lNum1 = __getparam( 1 );
 
      if ( iPCount == 1 )
 
   /*  If unary operation: NOT                           */
-        uiNumOp = (*operation)( uiNum1, 0 );
+        lNumOp = (*operation)( lNum1, 0 );
 
      else
      {
@@ -266,32 +329,36 @@ static LONG __numfun( int iPCount, USHORT (*operation)(USHORT wNum1, USHORT wNum
         {
            if ( ISNUM( iFor ) || ISCHAR( iFor ) )
            {
-              uiNum2 = __getparam( iFor );
+              lNum2 = __getparam( iFor );
 
 
   /*  Call to operation: AND, OR, XOR                   */
-              uiNumOp = (*operation)( uiNum1, uiNum2 );
+              lNumOp = (*operation)( lNum1, lNum2 );
 
            }
            else
+           {
   /*  If error in parameter then return -1              */
+              *pbOk = FALSE;
               return (-1);
 
+           }
   /*  Copy result to first parameter if multi operation */
-           uiNum1 = uiNumOp;
+           lNum1 = lNumOp;
         }
 
      }
 
   }
   else
+  {
 
   /*  If error in parameter then return -1              */
+     *pbOk = FALSE;
      return (-1);
-
+  }
 
   /*  Return result of operation */
-  return uiNumOp;
+  return lNumOp;
 
 }
-
