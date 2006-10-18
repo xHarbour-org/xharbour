@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5213 2006/10/16 08:30:49 marchuet Exp $
+ * $Id: ChangeLog,v 1.5214 2006/10/17 04:36:37 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-10-18 10:19 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
+   *include/hbrddbmcdx.h
+    + Synchronous LogKeyCount for APPEND, DELETE, RECALL and PUTREC.
+    + The filter with its DBF is had synchronous when third they cause
+      that the registry leaves filter.
 
 2006-10-17 00:35 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
   * source/ct/dattime2.c

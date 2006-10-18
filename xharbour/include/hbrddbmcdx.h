@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddbmcdx.h,v 1.2 2006/10/07 23:17:33 marchuet Exp $
+ * $Id: hbrddbmcdx.h,v 1.3 2006/10/11 08:56:22 marchuet Exp $
  */
 
 /*
@@ -114,6 +114,8 @@ HB_EXTERN_BEGIN
 
 #define CURKEY_RAWCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_RAWCNT) != 0)
 #define CURKEY_LOGCNT(pTag)   (((pTag)->curKeyState & CDX_CURKEY_LOGCNT) != 0)
+#define CURKEY_SETLOGCNT(pTag, lKeyCount) { (pTag)->curKeyState |= CDX_CURKEY_LOGCNT; \
+                                            (pTag)->logKeyCount = (lKeyCount); }
 
 #define CURKEY_RAWPOS(pTag)   ( ((pTag)->curKeyState & CDX_CURKEY_RAWPOS) != 0 && \
                                  (pTag)->rawKeyRec == (pTag)->CurKey->rec )
@@ -539,6 +541,22 @@ typedef CDXAREA * LPCDXAREA;
 #define CDXAREAP LPCDXAREA
 #endif
 
+// m Bitmap, b Size, r RecNo
+#define BM_SetBit(m,b,r) ((r)<=(b))?((m)[((r)-1)>>5] = (m)[((r)-1)>>5] | (1<<(((r)-1)%32))):0
+#define BM_ClrBit(m,b,r) ((r)<=(b))?((m)[((r)-1)>>5] = (m)[((r)-1)>>5] & ~(1<<(((r)-1)%32))):0
+#define BM_GetBit(m,b,r) (((r)<=(b))?(((m)[((r)-1)>>5] & (1<<(((r)-1)%32)))):0)
+
+typedef struct _BM_FILTER_ {
+    PHB_ITEM itmCobExpr;       /* Block representation of the FILTER expression */
+    PHB_ITEM abFilterText;     /* String representation of FILTER expression */
+    BOOL     fFilter;          /* flag to indicate that filter is active */
+    BOOL     fOptimized;       /* Is (should be) filter optimized */
+    ULONG*   rmap;
+    ULONG    Size;
+} BM_FILTER;
+
+typedef BM_FILTER * LPBM_FILTER;
+
 
 /*
  * -- DBFCDX METHODS --
@@ -572,8 +590,8 @@ static ERRCODE hb_cdxFlush( CDXAREAP pArea );
 #define hb_cdxGetVarLen                            NULL
 static ERRCODE hb_cdxGoCold( CDXAREAP pArea );
 static ERRCODE hb_cdxGoHot( CDXAREAP pArea );
-#define hb_cdxPutRec                               NULL
-static ERRCODE hb_cdxPutValue( CDXAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
+static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer );
+#define hb_cdxPutValue                             NULL
 static ERRCODE hb_cdxRecall( CDXAREAP pArea );
 #define hb_cdxRecCount                             NULL
 #define hb_cdxRecInfo                              NULL
