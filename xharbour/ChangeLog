@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5215 2006/10/18 08:14:44 marchuet Exp $
+ * $Id: ChangeLog,v 1.5216 2006/10/18 16:39:48 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-20 08:30 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * source/rtl/fstemp.c
+    ! minor bug fixed on FHANDLE HB_EXPORT hb_fsCreateTemp() function
+      That was producing some errors on dbfcdx,since the last char of the filename generated
+      has an trash
+  * source/cgi/tframe.prg
+    ! minor fix
 
 2006-10-18 20:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/bit1.c

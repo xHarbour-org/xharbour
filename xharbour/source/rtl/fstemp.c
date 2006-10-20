@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.20 2005/03/31 03:58:51 druzus Exp $
+ * $Id: fstemp.c,v 1.21 2005/08/01 22:21:43 druzus Exp $
  */
 
 /*
@@ -231,6 +231,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
             d = modf( d, &x );
             pszName[ iLen++ ] = n + ( n > 9 ? 'a' - 10 : '0' );
          }
+         pszName[iLen++] = '\0';
          hb_fileNameConv( ( char * ) pszName );
          fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
       }

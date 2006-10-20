@@ -1,5 +1,5 @@
 /*
- * $Id: tframe.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
+ * $Id: tframe.prg,v 1.4 2006/06/22 03:50:13 lculik Exp $
  */
 
 /*
@@ -163,9 +163,9 @@ RETURN Self
 METHOD END () CLASS THtmlFrameSet
 
    ::cStr +=  "</HTML>" + CRLF() 
+   FWrite( ::nH, ::cStr )
 
    IF ::FName != NIL
-      FWrite( ::nH, ::cStr )
       Fclose( ::nH )
    ENDIF
 
