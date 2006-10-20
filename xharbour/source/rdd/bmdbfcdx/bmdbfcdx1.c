@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.8 2006/10/16 08:30:49 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.9 2006/10/18 08:14:44 marchuet Exp $
  */
 
 /*
@@ -7440,6 +7440,7 @@ static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer )
             pArea->dbfi.fFilter = FALSE;
 
             if ( hb_cdxCheckRecordFilter( pArea, pArea->ulRecNo ) )
+            {
                 if ( ! BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo ) )
                 {
                     LPCDXTAG pTag;
@@ -7448,7 +7449,9 @@ static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer )
                     if ( pTag )
                         CURKEY_SETLOGCNT( pTag, pTag->logKeyCount + 1 );
                 }
+            }
             else
+            {
                 if ( BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo ) )
                 {
                     LPCDXTAG pTag;
@@ -7457,6 +7460,7 @@ static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer )
                     if ( pTag )
                         CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - 1 );
                 }
+            }
             pArea->dbfi.fFilter = TRUE;
         }
         return SUCCESS;
