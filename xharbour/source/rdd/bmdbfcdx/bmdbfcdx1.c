@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.9 2006/10/18 08:14:44 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.10 2006/10/20 16:30:43 marchuet Exp $
  */
 
 /*
@@ -3954,7 +3954,7 @@ static BOOL hb_cdxCheckRecordFilter( CDXAREAP pArea, ULONG ulRecNo )
                 BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecNo );
                 pTag = hb_cdxGetActiveTag( pArea );
                 if ( pTag && CURKEY_LOGCNT(pTag)  )
-                    CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - 1 );
+                    CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - 1 )
             }
          }
       }
@@ -5871,7 +5871,7 @@ static LONG hb_cdxDBOIKeyCount( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
             pTag->curKeyState |= CDX_CURKEY_RAWCNT;
          }
          else if ( fLogOpt )
-            CURKEY_SETLOGCNT( pTag, ulKeyCount );
+            CURKEY_SETLOGCNT( pTag, ulKeyCount )
 
       }
       hb_cdxIndexUnLockRead( pTag->pIndex );
@@ -6790,7 +6790,7 @@ HB_FUNC( BM_DBSETFILTERARRAY )
                 BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ulRecCount, (ULONG) hb_arrayGetNL( pArray, ulPos ) );
             pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
             if ( pTag ) // Con índice activo
-                CURKEY_SETLOGCNT( pTag, (hb_arrayLen( pArray )) );
+                CURKEY_SETLOGCNT( pTag, (hb_arrayLen( pArray )) )
        }
        else
           hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "BM_DBSETFILTERARRAY" );
@@ -6820,7 +6820,7 @@ HB_FUNC( BM_DBSETFILTERARRAYADD )
                  }
              pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
              if ( pTag ) // Con índice activo
-                 CURKEY_SETLOGCNT( pTag, (pTag->logKeyCount + ulAdd) );
+                 CURKEY_SETLOGCNT( pTag, (pTag->logKeyCount + ulAdd) )
         }
         else
            hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "BM_DBSETFILTERARRAYADD" );
@@ -6850,7 +6850,7 @@ HB_FUNC( BM_DBSETFILTERARRAYDEL )
                 }
             pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
             if ( pTag ) // Con índice activo
-                CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - ulDel );
+                CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - ulDel )
        }
        else
           hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "BM_DBSETFILTERARRAYDEL" );
@@ -6951,7 +6951,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
          if ( pArea->fEof )
          {
             if ( lToSkip == 1 && ulPos && !CURKEY_LOGCNT( pTag ) )
-               CURKEY_SETLOGCNT( pTag, ulPos );
+               CURKEY_SETLOGCNT( pTag, ulPos )
          }
          else if ( ulPos )
          {
@@ -7176,7 +7176,7 @@ static ERRCODE hb_cdxAppend( CDXAREAP pArea, BOOL bUnLockAll )
                 BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecCount );
                 pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
                 if ( pTag && CURKEY_LOGCNT(pTag) ) // Con índice activo
-                    CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount + 1 );
+                    CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount + 1 )
             }
             else
                 BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, ulRecCount );
@@ -7197,23 +7197,27 @@ static ERRCODE hb_cdxDeleteRec( CDXAREAP pArea )
         {
             pArea->dbfi.fFilter = FALSE;
             if ( hb_cdxCheckRecordFilter( pArea, pArea->ulRecNo ) )
+            {
                 if ( ! BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo ) )
                 {
                     LPCDXTAG pTag;
                     BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
                     pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
                     if ( pTag && CURKEY_LOGCNT(pTag)  )
-                        CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount + 1 );
+                        CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount + 1 )
                 }
+            }
             else
+            {
                 if ( BM_GetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo ) )
                 {
                     LPCDXTAG pTag;
                     BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
                     pTag = hb_cdxGetActiveTag( (CDXAREAP) pArea );
                     if ( pTag && CURKEY_LOGCNT(pTag) )
-                        CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount - 1 );
+                        CURKEY_SETLOGCNT( pTag, (pTag)->logKeyCount - 1 )
                 }
+            }
             pArea->dbfi.fFilter = TRUE;
         }
         return SUCCESS;
@@ -7447,7 +7451,7 @@ static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer )
                     BM_SetBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
                     pTag = hb_cdxGetActiveTag( pArea );
                     if ( pTag )
-                        CURKEY_SETLOGCNT( pTag, pTag->logKeyCount + 1 );
+                        CURKEY_SETLOGCNT( pTag, pTag->logKeyCount + 1 )
                 }
             }
             else
@@ -7458,7 +7462,7 @@ static ERRCODE hb_cdxPutRec( CDXAREAP pArea, BYTE * pBuffer )
                     BM_ClrBit( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap, ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size, pArea->ulRecNo );
                     pTag = hb_cdxGetActiveTag( pArea );
                     if ( pTag )
-                        CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - 1 );
+                        CURKEY_SETLOGCNT( pTag, pTag->logKeyCount - 1 )
                 }
             }
             pArea->dbfi.fFilter = TRUE;
