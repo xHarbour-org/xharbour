@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.137 2006/08/19 11:22:28 druzus Exp $
+ * $Id: harbour.c,v 1.138 2006/09/06 15:30:27 snaiperis Exp $
  */
 
 /*
@@ -5419,6 +5419,7 @@ static void hb_compInitVars( void )
    hb_comp_pEnum          = NULL;
 
    hb_comp_pLineInfo      = NULL;
+   hb_comp_pLineNumberFunc = NULL;
 }
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
