@@ -414,7 +414,7 @@ STATIC s_anRecover := {}, s_acRecover := {}, s_aSequence := {}
 #xtranslate Stringify( [<x>] ) => #<x>
 
 #ifndef REVISION
-  #define REVISION .0
+  #define REVISION .1
 #endif
 STATIC s_cVer := "2.0 RC4" + Stringify( REVISION )
 
@@ -8380,6 +8380,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    LOCAL aMatchRule, cRuleExp
    LOCAL sWord
    LOCAL nLen, sToken
+   LOCAL nrule, nRules
 
    /*
    nMarkerID
@@ -8854,21 +8855,27 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    ENDIF
 
    IF bDelete
-      IF ! bX
-         cRuleExp := ValToPrgExp( aRule )
+      IF bX
+         // Discard the bX flag (should not be included in the match logic)
+         cRuleExp := ValToPrgExp( aSize( aClone( aRule ), Len( aRule ) - 1 ) )
       ENDIF
 
-      FOR EACH aMatchRule IN aRules
-          IF aMatchRule[1] == sKey
-             IF bX .OR. ValToPrgExp( aMatchRule ) == cRuleExp
-                aDel( aRules, HB_EnumIndex(), .T. )
-                aDel( aResults, HB_EnumIndex(), .T. )
-                RETURN
-             ENDIF
-          ENDIF
-       NEXT
+      nRules := Len( arules )
 
-       RETURN
+      FOR nRule := nRules TO 1 STEP -1
+         aMatchRule := aRules[ nRule ]
+
+         IF aMatchRule[1] == sKey
+                             // Discard the bX flag (should not be included in the match logic)
+            IF ( ! bX ) .OR. ValToPrgExp( aSize( aClone( aMatchRule ), Len( aMatchRule ) - 1 ) ) == cRuleExp
+               aDel( aRules, nRule, .T. )
+               aDel( aResults, nRule, .T. )
+               RETURN
+            ENDIF
+         ENDIF
+      NEXT
+
+      RETURN
    ELSE
       aAdd( aRules, aRule )
    ENDIF

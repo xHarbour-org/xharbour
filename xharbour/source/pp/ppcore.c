@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.230 2006/09/17 15:57:07 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.231 2006/09/29 13:15:55 ronpinkas Exp $
  */
 
 /*
@@ -2066,7 +2066,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
                  pTmp--;
               }
 
-              if( *pTmp != '<' )
+              if( *pTmp != '<' || *( pTmp - 1 ) == '\\' )
               {
                  ptr += ifou + explen;
                  continue;
@@ -2201,7 +2201,7 @@ static void ConvertPatterns( char * mpatt, int mlen, char * rpatt, int rlen )
               }
               while( ifou >= 0 && *ptr != '<' && *(ptr-1) != '\\' );
 
-              if( ifou >= 0 && *ptr == '<' )
+              if( ifou >= 0 && *ptr == '<' && *(ptr - 1) != '\\' )
               {
                  ptr += rmlen++;
 
