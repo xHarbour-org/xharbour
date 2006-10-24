@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.10 2006/10/20 16:30:43 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.11 2006/10/20 16:52:09 marchuet Exp $
  */
 
 /*
@@ -6744,14 +6744,27 @@ HB_FUNC( BM_DBGETFILTERARRAY )
 {
     CDXAREAP pArea = (CDXAREAP) hb_rddGetCurrentWorkAreaPointer();
     PHB_ITEM pList;
-    ULONG ulRec;
+    ULONG ulRec,ulRecOld;
 
     pList = hb_itemNew( NULL );
     hb_arrayNew( pList, 0 );
     if ( pArea->dbfi.fOptimized )
-       for ( ulRec = 1; ulRec <= ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size; ulRec++ )
-          if ( hb_cdxCheckRecordFilter( pArea, ulRec ) )
-             hb_arrayAdd( pList, hb_itemPutNL( NULL, ulRec ) );
+    {
+        ULONG ulSize = ( ( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size+1) >> 5 ) + 1;
+        ULONG ulLong, ulByte, ulBytes, ulRecno;
+
+        ulRecOld = pArea->ulRecNo;
+
+        for ( ulLong = 0; ulLong < ulSize; ulLong++ )
+            if ( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap[ulLong] )
+                for ( ulByte = (ulLong<<2), ulBytes = 0; ulBytes < 4; ulByte++, ulBytes++ )
+                    if ( ((char*)( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->rmap)[ulByte] )
+                        for ( ulRec=(ulByte<<3)+1, ulRecno=0; ulRecno < 8; ulRec++, ulRecno++ )
+                            if ( hb_cdxCheckRecordFilter( pArea, ulRec ) )
+                               hb_arrayAdd( pList, hb_itemPutNL( NULL, ulRec ) );
+
+        SELF_GOTO( (AREAP) pArea, ulRecOld );
+    }
     hb_itemReturn( pList );
     hb_itemRelease( pList );
     return;
@@ -8897,6 +8910,8 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
     ULONG ulRecCount = 0, ulLogKeyCount = 0;
     LPCDXTAG pTag;
     PHB_ITEM pResult;
+
+    HB_SYMBOL_UNUSED( ulLogKeyCount );
 
     hb_cdxClearLogPosInfo( pArea );
 
