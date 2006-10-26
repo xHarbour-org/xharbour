@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.3 2006/04/23 19:13:22 paultucker Exp $
+ * $Id: dllcall.c,v 1.4 2006/07/16 20:49:29 enricomaria Exp $
  */
 
 /*
@@ -103,6 +103,7 @@ static HB_GARBAGE_FUNC( _DLLUnload )
          {
             FreeLibrary( xec->hDLL );
          }
+
          hb_xfree( xec->cDLL );
       }
 
@@ -112,7 +113,6 @@ static HB_GARBAGE_FUNC( _DLLUnload )
       }
 
       xec->dwType = 0;
-      hb_gcFree( xec );
    }
 }
 
@@ -121,11 +121,11 @@ HB_FUNC( DLLPREPARECALL )
 {
    PEXECSTRUCT xec = (PEXECSTRUCT) hb_gcAlloc( sizeof( EXECSTRUCT ), _DLLUnload );
 
-   memset(xec, 0, sizeof(EXECSTRUCT));
+   memset( xec, 0, sizeof(EXECSTRUCT) );
 
    if ( ISCHAR( 1 ) )
    {
-      xec->cDLL = (char *) hb_xgrab( hb_parclen( 1 ) );
+      xec->cDLL = (char *) hb_xgrab( hb_parclen( 1 ) + 1 );
       strcpy( xec->cDLL, hb_parcx( 1 ) );
       xec->hDLL = LoadLibrary( (LPCSTR) hb_parcx( 1 ) );
    }
@@ -147,7 +147,7 @@ HB_FUNC( DLLPREPARECALL )
    {
       if ( ISCHAR( 3 ) )
       {
-         xec->cProc = (char *) hb_xgrab( hb_parclen( 1 ) );
+         xec->cProc = (char *) hb_xgrab( hb_parclen( 3 ) + 1 );
          strcpy( xec->cProc, hb_parcx( 3 ) );
       }
       else if (ISNUM( 3 ) )
@@ -285,7 +285,7 @@ typedef struct DYNAPARM {
 
 #pragma pack()
 
-RESULT DynaCall(int Flags, LPVOID lpFunction, int nArgs, 
+RESULT DynaCall(int Flags, LPVOID lpFunction, int nArgs,
                 DYNAPARM Parm[], LPVOID pRet, int nRetSiz);
 //
 //==================================================================

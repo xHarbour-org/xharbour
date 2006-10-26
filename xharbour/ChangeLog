@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5221 2006/10/24 16:04:39 marchuet Exp $
+ * $Id: ChangeLog,v 1.5222 2006/10/25 16:19:20 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-10-26 09:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/dllcall.c
+    ! Fixed few typos which resulted in GPF traps
+
 2006-10-25 12:16 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/txtline.c
     ! Added missing support for SOFT CR in hb_readLine()
     * Some cleanup, simplifications, and optimizations
 
 2006-10-24 18:06 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
-   *source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
     % Optimized BM_DbGetFilterArray() checking of long in long and byte in byte.
 
 2006-10-22 00:42 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
