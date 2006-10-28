@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.84 2006/07/03 19:47:05 paultucker Exp $
+ * $Id: hbdefs.h,v 1.85 2006/08/07 10:31:14 druzus Exp $
  */
 
 /*
@@ -1127,7 +1127,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_EXIT_FUNCNAME( funcname )   HB_FUN_exit_##funcname
 #define HB_INITSTATICS_FUNCNAME()      hb_INITSTATICS
 
-#if defined( __cplusplus ) && !defined( HB_FUNC_USE_DECORATION )
+#if defined( __cplusplus ) && !defined( HB_FUNC_USE_DECORATION ) && !defined( __WATCOMC__ )
    #define HB_EXTERN_C_ extern "C"
    #define HB_EXTERN_
 #else
