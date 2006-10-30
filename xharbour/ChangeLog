@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5223 2006/10/26 13:09:21 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5224 2006/10/28 14:41:53 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,34 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-30 10:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+
+  * source\rtl\tbrowse.prg
+    + added DataSource DATA to control if tbrowse was called via tbrowsedb() or
+      tbrowsenew(). This is necessary to control reseting positionning of datasource
+      row if datasource is not a database (array,etc). See configure() method.
+    ! fixed configure() method to positionning the row when we perform a row
+      movement before first stabilization process, for example: initialize
+      tbrowse at last row, instead first calling gobottom() before stable.
+    ! fixed ::RowCount and ::nNewRowPos values in configure() method.
+    ! fixed AddColumn() method to call configure() method at first column
+      addition, to avoid ::RowCount wrong value.
+    ! fixed bound access error in ::aRedraw array.
+    - moved CheckStable() method added by me in the last commit.
+
+  * source\rtl\browdb.prg
+    * changed TBrowseDB() call from TBrowseNew() to TBrowse() directly to
+      differ what way TBrowse was called. This is necessary for assign the
+      new DataSource property, used in Configure() method.
+
+  * source\rtl\tget.prg
+    ! fixed "@E" picture behaviour in date get if "SET DATE BRITISH" is used 
+      and "SET CENTURY ON" is called after that.
+    + created "@K+" extension picture behaviour in _delete() method that
+      will empty all the get buffer if the first key pressed is DEL key.
+      Note that "@K" pict behaviour is not affected by this change.
+    * changed IsBadDate() static function to best date verification.
 
 2006-10-28 18:00 UTC+0300 Pavel Tsarenko <tpe2@mail.ru>
   * include/hbdefs.h

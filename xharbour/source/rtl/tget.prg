@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.117 2006/07/05 02:44:00 ronpinkas Exp $
+ * $Id: tget.prg,v 1.118 2006/08/14 11:20:34 modalsist Exp $
  */
 
 /*
@@ -558,7 +558,7 @@ METHOD End() CLASS Get
       if ::Pos > ::FirstEditable() .and. ::IsEditable(::Pos) .and. ::Pos < ::nMaxEdit .and. empty( ::buffer[::Pos] )
          ::Pos := ::nMaxEdit
          ::TypeOut := .f.
-         ::Clear := .f.
+         ::Clear   := .f.
          ::Display( .f. )
          return Self
       endif
@@ -621,7 +621,7 @@ METHOD Reset() CLASS Get
 
    if ::hasfocus
       ::buffer := ::PutMask( ::VarGet(), .f. )
-      ::pos := ::FirstEditable()
+      ::Pos := ::FirstEditable()
       ::TypeOut := .f.
    endif
 
@@ -639,7 +639,7 @@ METHOD Undo() CLASS Get
          ::minus := .f.
       ENDIF
       ::VarPut( ::Original, .t. )
-      ::pos := ::FirstEditable()
+      ::Pos := ::FirstEditable()
       ::updateBuffer() // 7/01/2004 9:44a.m. was ::Display()
       ::lUndo := .t.
    endif
@@ -664,16 +664,16 @@ METHOD SetFocus() CLASS Get
       ::lUndo      := .f.
 
       ::Original   := xVarGet
-      ::type       := ValType( xVarGet )
+      ::Type       := ValType( xVarGet )
       ::Picture    := ::cPicture
-      ::buffer     := ::PutMask( xVarGet, .f. )
-      ::changed    := .f.
-      ::clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
+      ::Buffer     := ::PutMask( xVarGet, .f. )
+      ::Changed    := .f.
+      ::Clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
       //::nMaxLen    := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
       ::lEdit      := .f.
-      ::pos        := ::FirstEditable()
+      ::Pos        := ::FirstEditable()
 
-      if ::pos = 0
+      if ::Pos = 0
          ::TypeOut = .t.
       endif
 
@@ -726,7 +726,7 @@ METHOD KillFocus() CLASS Get
 //   ::buffer   := ::PutMask( )
    ::buffer   := NIL
    ::Original := NIL
-   ::pos      := NIL
+   ::Pos      := NIL
 
    ::Display()
    ::xVarGet  := NIL
@@ -1062,8 +1062,9 @@ return xValue
 
 METHOD overstrike( cChar ) CLASS Get
 
-   if ::type == "N" .and. ! ::lEdit .and. ::Clear
-      ::pos := ::FirstEditable()
+
+   if ::Type == "N" .and. ! ::lEdit .and. ::Clear
+      ::Pos := ::FirstEditable()
    endif
 
    if ::Pos > ::nMaxEdit
@@ -1081,7 +1082,7 @@ METHOD overstrike( cChar ) CLASS Get
    endif
 
 
-   if ::lUndo .OR. (::Clear .and. ::pos == ::FirstEditable())
+   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() )
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1092,16 +1093,16 @@ METHOD overstrike( cChar ) CLASS Get
       //::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
-   if ::pos == 0
-      ::pos = 1
+   if ::Pos == 0
+      ::Pos = 1
    endif
 
-   do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxEdit
-      ::pos++
+   do while ! ::IsEditable( ::Pos ) .and. ::Pos <= ::nMaxEdit
+      ::Pos++
    enddo
 
-   if ::pos > ::nMaxEdit
-      ::pos := ::FirstEditable()
+   if ::Pos > ::nMaxEdit
+      ::Pos := ::FirstEditable()
    endif
 
    ::buffer := SubStr( ::buffer, 1, ::Pos - 1 ) + cChar + SubStr( ::buffer, ::Pos + 1 )
@@ -1132,8 +1133,9 @@ METHOD Insert( cChar ) CLASS Get
    local n
    local nMaxEdit := ::nMaxEdit
 
-   if ::type == "N" .and. ! ::lEdit .and. ::Clear
-      ::pos := ::FirstEditable()
+
+   if ::Type == "N" .and. ! ::lEdit .and. ::Clear
+      ::Pos := ::FirstEditable()
    endif
 
    if ::Pos > ::nMaxEdit
@@ -1150,7 +1152,7 @@ METHOD Insert( cChar ) CLASS Get
       ::Rejected := .f.
    endif
 
-   if ::lUndo .OR. (::Clear .and. ::pos == ::FirstEditable())
+   if ::lUndo .OR. ( ::Clear .AND. ::Pos == ::FirstEditable() )
       ::DeleteAll()
       ::Clear := .f.
       ::lEdit := .f.
@@ -1161,16 +1163,16 @@ METHOD Insert( cChar ) CLASS Get
       //::buffer := ::PutMask( ::VarGet(), .t. )
    endif
 
-   if ::pos == 0
-      ::pos = 1
+   if ::Pos == 0
+      ::Pos = 1
    endif
 
-   do while ! ::IsEditable( ::pos ) .and. ::pos <= ::nMaxEdit
-      ::pos++
+   do while ! ::IsEditable( ::Pos ) .and. ::Pos <= ::nMaxEdit
+      ::Pos++
    enddo
 
-   if ::pos > ::nMaxEdit
-      ::pos := ::FirstEditable()
+   if ::Pos > ::nMaxEdit
+      ::Pos := ::FirstEditable()
    endif
 
    if ::lPicComplex
@@ -1223,7 +1225,7 @@ METHOD _Right( lDisplay ) CLASS Get
    ::TypeOut := .f.
    ::Clear   := .f.
 
-   if ::pos == ::nMaxEdit
+   if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
       return Self
    endif
@@ -1261,7 +1263,7 @@ METHOD _Left( lDisplay ) CLASS Get
    ::TypeOut := .f.
    ::Clear   := .f.
 
-   if ::pos == ::FirstEditable()
+   if ::Pos == ::FirstEditable()
       ::TypeOut := .t.
       return Self
    endif
@@ -1299,7 +1301,7 @@ METHOD WordLeft() CLASS Get
 
    nFirstEditable := ::FirstEditable()
 
-   if ::pos == nFirstEditable
+   if ::Pos == nFirstEditable
       ::TypeOut := .t.
       return Self
    endif
@@ -1335,7 +1337,7 @@ METHOD WordRight() CLASS Get
 
    nLastEditable := ::LastEditable()
 
-   if ::pos == nLastEditable
+   if ::Pos == nLastEditable
       ::TypeOut := .t.
       return Self
    endif
@@ -1366,7 +1368,7 @@ METHOD ToDecPos() CLASS Get
 
    /* 2006/JUN/05 - E.F. Deletall only if we press dot or comma in a numeric
       var. */
-   if ::pos == ::FirstEditable() .and. ::Type == 'N' .and.;
+   if ::Pos == ::FirstEditable() .and. ::Type == 'N' .and.;
       ( Lastkey()=asc('.') .or. Lastkey()==asc(',') )
       ::DeleteAll()
    endif
@@ -1374,8 +1376,8 @@ METHOD ToDecPos() CLASS Get
    ::TypeOut := .f.
    ::Clear  := .f.
    ::lEdit  := .t.
-   ::buffer := ::PutMask( ::UnTransform(), .f. )
-   ::pos    := ::DecPos + 1
+   ::Buffer := ::PutMask( ::UnTransform(), .f. )
+   ::Pos    := ::DecPos + 1
    
    ::Display( .t. )
 
@@ -1432,7 +1434,7 @@ METHOD Input( cChar ) CLASS Get
           *               9.9-
           *               Clipper allow it, but it's wrong.
           */
-         if ::decpos > 0 .and. ::pos > ::decpos
+         if ::decpos > 0 .and. ::Pos > ::decpos
             ::ToDecPos()
             return ""
          else
@@ -1495,7 +1497,7 @@ METHOD Input( cChar ) CLASS Get
    endif
 
    if ! Empty( ::cPicMask )
-      cPic  := Substr( ::cPicMask, ::pos, 1 )
+      cPic  := Substr( ::cPicMask, ::Pos, 1 )
 
       //      cChar := Transform( cChar, cPic )
       // Above line eliminated because some get picture template symbols for
@@ -1668,8 +1670,18 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       endif
    endif
 
-   If ::type == "D" .and. ::BadDate .and. ::Buffer != nil
-      cBuffer := ::Buffer
+   /* 2006/OCT/28 - E.F. - fixed a bug when we set century on after set date
+    *                      and use get with picture "@E" in date variable.
+    * If ::type == "D" .and. ::BadDate .and. ::Buffer != nil
+    *    cBuffer := ::Buffer
+    * Endif
+    */
+   If ::type == "D"
+      If ::BadDate .and. ::Buffer != nil
+         cBuffer := ::Buffer
+      Elseif ::Buffer == NIL .and. "E" IN ::cPicFunc
+         cBuffer := InvertDwM( DtoC( xValue ) )
+      Endif
    Endif
 
 return cBuffer
@@ -1723,6 +1735,7 @@ METHOD _Delete( lDisplay ) CLASS Get
 
    DEFAULT lDisplay TO .t.
 
+
    ::Clear := .f.
    ::lEdit := .t.
 
@@ -1740,16 +1753,25 @@ METHOD _Delete( lDisplay ) CLASS Get
       ::minus := .f.
    endif
 
-   ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1 ) + ;
-               SubStr( ::buffer, ::Pos + 1, nMaxLen - ::Pos ) + " " +;
-               SubStr( ::buffer, nMaxLen + 1 ), ::nMaxLen )
+   /* 2006/OCT/06 - E.F. Added new @K+ functionality to empty
+    *               get buffer if first key pressed is DEL key.
+    */
+   if "K+" IN ::cPicFunc .AND. ::Pos == ::FirstEditable()
+      ::DeleteAll()
+   else
+      ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1 ) + ;
+                  SubStr( ::buffer, ::Pos + 1, nMaxLen - ::Pos ) + " " +;
+                  SubStr( ::buffer, nMaxLen + 1 ), ::nMaxLen )
+   endif
+
 
    if ::type == "D"
       ::BadDate := IsBadDate( ::buffer, ::cPicFunc )
    else
       ::BadDate := .f.
    endif
-   ::Changed    := .T.
+
+   ::Changed := .T.
 
    if lDisplay
       ::Display()
@@ -1809,7 +1831,6 @@ METHOD DeleteAll() CLASS Get
          ::buffer := StrTran(::buffer, chr(1), "," )
       ENDIF
    ENDIF
-
 
 return Self
 
@@ -1880,7 +1901,7 @@ METHOD DelWordRight() CLASS Get
    ::TypeOut := .f.
    ::Clear   := .f.
 
-   if ::pos == ::nMaxEdit
+   if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
       return Self
    endif
@@ -2040,28 +2061,55 @@ METHOD LastEditable( ) CLASS GET
  Return 0
 
 //---------------------------------------------------------------------------//
+/*
+*STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
+*
+*   local nFor, nLen
+*
+*   if "E" IN cPicFunc
+*       cBuffer := InvertDwM( cBuffer )
+*   endif
+*
+*   If !Empty( Ctod( cBuffer ) )
+*      return .f.
+*   Endif
+*
+*   nLen := len( cBuffer )
+*
+*   For nFor := 1 to nLen
+*      If IsDigit( Substr( cBuffer, nFor, 1 ) )
+*         return .t.
+*      Endif
+*   Next
+*
+* return .f.
+*/
 
 STATIC FUNCTION IsBadDate( cBuffer, cPicFunc )
+LOCAL cBuffer2
 
-   local nFor, nLen
-
-   if "E" IN cPicFunc
-       cBuffer := InvertDwM( cBuffer )
-   endif
-
-   If !Empty( Ctod( cBuffer ) )
-      return .f.
+   If Empty( cBuffer )
+      return .F.
    Endif
 
-   nLen := len( cBuffer )
+   If "E" IN cPicFunc
+       cBuffer := InvertDwM( cBuffer )
+   Endif
 
-   For nFor := 1 to nLen
-      If IsDigit( Substr( cBuffer, nFor, 1 ) )
-         return .t.
-      Endif
-   Next
+   cBuffer2 := StrTran( cBuffer,"/","")
+   cBuffer2 := StrTran( cBuffer2,"-","")
+   cBuffer2 := StrTran( cBuffer2,".","")
 
- return .f.
+   If Empty( cBuffer2 )
+      return .F.
+   Endif
+
+   If Empty( CtoD( cBuffer ) )
+      return .T.
+   Endif
+
+RETURN .F.
+
 
 STATIC FUNCTION InvertDwM( cDate )
 /* 2003/03/25 - Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -2080,21 +2128,21 @@ STATIC FUNCTION InvertDwM( cDate )
 RETURN cDate
 
 /*
-static procedure AnalyzePicture( cPicture )
-   Local cChar, lS := .f.
-
-   For each cChar in Substr( cPicture, 2 )
-      do case
-      case cChar == "S"
-         lS := .t.
-      case cChar $ "!()L0ABCDEKRXZ"
-         lS := .f.
-      case cChar $ "0123456789" .and. lS
-      other
-         cPicture := Left( cPicture, HB_EnumIndex() )
-      endcase
-   Next
-Return
+*static procedure AnalyzePicture( cPicture )
+*   Local cChar, lS := .f.
+*
+*   For each cChar in Substr( cPicture, 2 )
+*      do case
+*      case cChar == "S"
+*         lS := .t.
+*      case cChar $ "!()L0ABCDEKRXZ"
+*         lS := .f.
+*      case cChar $ "0123456789" .and. lS
+*      other
+*         cPicture := Left( cPicture, HB_EnumIndex() )
+*      endcase
+*   Next
+*Return
 */
 
 STATIC FUNCTION BuildGetColor( cColorSpec )

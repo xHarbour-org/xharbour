@@ -1,5 +1,5 @@
 /*
- * $Id: browdb.prg,v 1.3 2003/05/15 01:52:30 andijahja Exp $
+ * $Id: browdb.prg,v 1.8 2005/09/19 20:13:02 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 
 FUNCTION TBrowseDB( nTop, nLeft, nBottom, nRight )
 
-   LOCAL oBrowse := TBrowseNew( nTop, nLeft, nBottom, nRight )
+   LOCAL oBrowse := TBrowse():New( nTop, nLeft, nBottom, nRight )
 
    oBrowse:SkipBlock     := { | nRecs | DBSkipper( nRecs ) }
    oBrowse:GoTopBlock    := { || dbGoTop() }

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.158 2006/09/26 00:17:38 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.159 2006/09/27 13:08:15 modalsist Exp $
  */
 
 /*
@@ -352,7 +352,6 @@ METHOD dbGoTop() CLASS TDataCache
 RETURN NIL
 
 
-
 METHOD dbGoBottom() CLASS TDataCache
 
    local nToTop 
@@ -591,8 +590,6 @@ CLASS TBrowse
 
    METHOD Stabilize()                     // Performs incremental stabilization
 
-   // 2006/AUG/28 - E.F. -  Call forcestable() to any attempt to move datasource recno before first stabilization process.
-   METHOD CheckStable() INLINE iif(!::stable .and. ::lNeverDisplayed, ::Forcestable(),)
 
 #ifdef HB_COMPAT_C53
    METHOD SetKey( nKey, bBlock )
@@ -603,10 +600,17 @@ CLASS TBrowse
    METHOD SetStyle( nMode,lSetting )
 #endif
 
+
+
    PROTECTED:     /* P R O T E C T E D */
 
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
                                           // _M_GotoXY because this method will mostly be called to handle mouse requests
+
+   DATA DataSource  INIT 0                // 0 indicates that data source is a database, when
+                                          // tbrowse was initialized from TBrowseDB()
+                                          // 1 indicates that data source can be a database or not,
+                                          // when tbrowse was initialized from TBrowseNew(). 
 
    HIDDEN:        /* H I D D E N */
 
@@ -841,22 +845,30 @@ METHOD Configure( nMode ) CLASS TBrowse
       lInitializing := .t.
    endif
 
+
    if ::nColPos > ::nColumns
       ::nColPos := ::nColumns
    endif
 
-   ::nHeaderHeight := 0
-   ::nFooterHeight := 0
 
    if nMode < 2 .or. ::lNeverDisplayed
-      ::lHeaders     := .F.
-      ::lFooters     := .F.
+      // 2006/OCT/27 - E.F. Assigned new values to ::lHeaders and ::lFooters
+      //                    baded in Tbrwose:HeadSep and TBrowse:FootSep, if any.
+      //::lHeaders     := .F.
+      //::lFooters     := .F.
+      ::lHeaders     := !Empty( ::cHeadSep )
+      ::lFooters     := !Empty( ::cFootSep )
       ::lColHeadSep  := .F.
       ::lColFootSep  := .F.
       ::lRedrawFrame := .T.
    endif
 
-   // Find out highest header and footer
+   // 2006/OCT/27 - E.F. Assigned new values to ::lHeaderHeight and ::lFooterHeight
+   //                    baded in Tbrwose:HeadSep and TBrowse:FootSep, if any.
+   ::nHeaderHeight := iif( ::lHeaders, 1, 0 )
+   ::nFooterHeight := iif( ::lFooters, 1, 0 )
+
+   // Find out highest column header and footer
    FOR EACH aCol IN ::aColsInfo
 
       if ( nMode <= 1 .and. !::lNeverDisplayed ) .or. lInitializing
@@ -934,10 +946,6 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    ::cSpaceWidth := space( ::nwRight - ::nLeft + 1 )
 
-   if nMode == 1
-      return Self
-   endif
-
    /* 19/10/2005 - <maurilio.longo@libero.it>
                    Are we sure that a real tbrowse raises these errors?
    */
@@ -951,10 +959,13 @@ METHOD Configure( nMode ) CLASS TBrowse
          If I add (or remove) header or footer (separator) I have to change number
          of available rows
       */
-      ::RowCount := ::nwBottom - ::nwTop + 1 - iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
+
+      ::RowCount := ::nwBottom - ::nwTop + 1 - ;
+                     iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
                      iif( ::lFooters, ::nFooterHeight, 0 ) - ;
                      iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - ;
                      iif( ::lFootSep .OR. ::lColFootSep, 1, 0 )
+
 
       // FSG - 14/06/2006 - commented out because otherwise it does not checks if there is space for
       //                    displaying headers and footers, needed for browse with a total height of
@@ -1027,6 +1038,13 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    enddo
 
+   // 2006/OCT/27 - E.F. Moved this part of code (if-endif) from before "do while .t."
+   //                    to after "do while .t." to allow calls to ::configure(1) calculate
+   //                    ::RowCount value considering hearders and footers, if any.
+   if nMode == 1
+      return Self
+   endif
+
    //   Starting position of data rows excluding headers . Pritpal Bedi
    //
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
@@ -1047,6 +1065,7 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    ::Invalidate()
 
+
    // Force re-evaluation of space occupied by frozen columns
    nFreeze := ::nFrozenCols
    if nFreeze > 0
@@ -1064,9 +1083,12 @@ METHOD Configure( nMode ) CLASS TBrowse
    next
    #endif
 
+
    // FSG - 14/06/2006 - added resetting of data positioning
-   //                    that I can get assigninng a value to directly ::RowPos using an array browse
-   IF nMode == 0
+   //                    that I can get assigninng a value directly to
+   //                    ::RowPos using an array browse
+
+   IF nMode == 0 .AND. ::DataSource == 1
       IF ::nRecsToSkip <> 0
          ::nNewRowPos := ::nRowPos + ::nRecsToSkip
          ::oDataCache:nCurRow := ::nNewRowPos
@@ -1074,6 +1096,7 @@ METHOD Configure( nMode ) CLASS TBrowse
       ENDIF
       ::RefreshAll()
    ENDIF
+  
 
    //   Flag that browser has been configured properly
    ::lConfigured := .t.
@@ -1120,9 +1143,14 @@ METHOD AddColumn( oCol ) CLASS TBrowse
       ::nColPos     := 1
    endif
 
-   if !::lNeverDisplayed
+   // 2006/OCT/27 - E.F. - Added ".or. ::nColumns == 1" to force configure
+   //                      the browse at first column addition. At this way
+   //                      we avoid ::RowCount wrong value, that is used to
+   //                      calculate datasource movements. 
+   if !::lNeverDisplayed .or. ::nColumns == 1
       ::Configure( 1 )
    endif
+
    ::lConfigured := .f.
 
 Return Self
@@ -1427,9 +1455,8 @@ Return nWidth
 
 METHOD Down() CLASS TBrowse
 
-   ::CheckStable()
    ::Moved()
-   ::nRecsToSkip++
+   ::nRecsToSkip ++
 
 Return Self
 
@@ -1437,9 +1464,8 @@ Return Self
 
 METHOD Up() CLASS TBrowse
 
-   ::CheckStable()
    ::Moved()
-   ::nRecsToSkip--
+   ::nRecsToSkip --
 
 Return Self
 
@@ -1447,7 +1473,6 @@ Return Self
 
 METHOD PageDown() CLASS TBrowse
 
-   ::CheckStable()
    ::Moved()
    ::nRecsToSkip := ( ::RowCount - ::nRowPos ) + ::RowCount
    ::lPaintBottomUp := .T.
@@ -1458,7 +1483,6 @@ Return Self
 
 METHOD PageUp() CLASS TBrowse
 
-   ::CheckStable()
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
 
@@ -1470,14 +1494,14 @@ METHOD GoBottom() CLASS TBrowse
 
    LOCAL nToTop
 
-   ::CheckStable()
    ::Moved()
 
    // Skips back from last record as many records as TBrowse can hold
    nToTop := ::oDataCache:dbGoBottom()
+
    ::nRecsToSkip := ::RowCount - 1
 
-   //   From top of TBrowse new row position is nToTop + 1 records away
+   //  From top of TBrowse new row position is nToTop + 1 records away
    ::nNewRowPos := nToTop + 1
 
    ::nRowPos := 1
@@ -1489,9 +1513,7 @@ Return Self
 
 METHOD GoTop() CLASS TBrowse
 
-   ::CheckStable()
    ::Moved()
-
    ::oDataCache:dbGoTop()
    // required for compatibility
    ::oDataCache:dbSkip( 0 )
@@ -2254,7 +2276,7 @@ METHOD CheckRowPos() CLASS TBrowse
    // to paiting relative to current cursor row.  If sufficient data is not
    // available then reset position to row 1.
 
-   If ::nRecsToSkip == 0  // Ensure that you do not reset/* the painting
+   If ::nRecsToSkip == 0  // Ensure that you do not reset the painting
                           // of a movement caused by TBrowse methods
 
       If ::nRowPos <> 1     // No repositioning is required if current
@@ -2345,12 +2367,14 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       ::configure( 2 )
    endif
 
+
    // Execute a pending invalidation of cache
    ::oDataCache:PerformInvalidation()
 
    // I need to set columns width If TBrowse was never displayed before
    //
    if ::lNeverDisplayed
+
       // NOTE: It must be before call to ::SetFrozenCols() since this call
       //       tests this iVar value, and I set it to .F. since I'm going to display TBrowse
       //       for first time
@@ -2465,6 +2489,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
    SetCursor( nOldCursor )
 
+
 Return .T.
 
 //-------------------------------------------------------------------//
@@ -2472,6 +2497,7 @@ Return .T.
 METHOD CheckRowsToBeRedrawn() CLASS TBrowse
    LOCAL nRecsSkipped                  // How many records do I really skipped?
    LOCAL nFirstRow                     // Where is on screen first row of TBrowse?
+
 
    // If I have a requested movement still to handle
    //
@@ -2507,8 +2533,9 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
             // rereading it from data source and to force rereading from data source I have to mark
             // row as invalid
             //
-            ::aRedraw[ ::nNewRowPos ] := .T.
-
+            if Len( ::aReDraw ) >= ::nNewRowPos
+               ::aRedraw[ ::nNewRowPos ] := .T.
+            endif
          else
             // It was K_PGDN or K_PGUP or K_UP or K_DN
             //
@@ -2550,8 +2577,9 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
                   AIns( ::aRedraw, 1, .F. )
 
                endif
-
-               ::aRedraw[ ::nNewRowPos ] := .T.
+               if Len( ::aRedraw ) >= ::nNewRowPos
+                  ::aRedraw[ ::nNewRowPos ] := .T.
+               endif
             endif
          endif
 
@@ -2567,8 +2595,9 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
 
          else
             ::nNewRowPos += nRecsSkipped
-            ::aRedraw[ ::nNewRowPos ] := .T.
-
+            if Len( ::aRedraw ) >= ::nNewRowPos
+               ::aRedraw[ ::nNewRowPos ] := .T.
+            endif
          endif
 
       endif
@@ -3111,10 +3140,11 @@ Return uValue
 METHOD PreConfigVertical( uValue ) CLASS TBrowse
 
    ::lConfigured := .f.
-   ::rowCount := ::nwBottom - ::nwTop + 1 - iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
-                  iif( ::lFooters, ::nFooterHeight, 0 ) - ;
-                  iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - ;
-                  iif( ::lFootSep .OR. ::lColFootSep, 1, 0 )
+   ::RowCount := ::nwBottom - ::nwTop + 1 - ;
+                 iif( ::lHeaders, ::nHeaderHeight, 0 ) - ;
+                 iif( ::lFooters, ::nFooterHeight, 0 ) - ;
+                 iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - ;
+                 iif( ::lFootSep .OR. ::lColFootSep, 1, 0 )
 
 Return uValue
 
@@ -3584,9 +3614,13 @@ Return iif( lOK, aDefColor, {1,2,1,1} )
 //
 //-------------------------------------------------------------------//
 
-function TBrowseNew( nTop, nLeft, nBottom, nRight )
+FUNCTION TBrowseNew( nTop, nLeft, nBottom, nRight )
 
-Return TBrowse():New( nTop, nLeft, nBottom, nRight )
+LOCAL oBrowse := TBrowse():New( nTop, nLeft, nBottom, nRight )
+
+      oBrowse:DataSource := 1
+
+RETURN oBrowse
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
