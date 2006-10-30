@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.62 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: makefile.wc,v 1.63 2006/10/28 14:41:53 ptsarenko Exp $
 #
 
 #
@@ -83,7 +83,6 @@ BMCDX_OBJ_DIR = $(OBJ_DIR)\mt
 TIP_OBJ_DIR   = $(OBJ_DIR)\mt
 CT_OBJ_DIR    = $(OBJ_DIR)\mt
 PP_OBJ_DIR    = $(OBJ_DIR)\mt
-SAM_OBJ_DIR   = $(OBJ_DIR)\mt
 OPT_CON_OBJ_DIR = $(OBJ_DIR)\mt\opt\console
 OPT_GUI_OBJ_DIR = $(OBJ_DIR)\mt\opt\gui
 !else
@@ -101,7 +100,6 @@ BMCDX_OBJ_DIR = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
-SAM_OBJ_DIR   = $(OBJ_DIR)
 OPT_CON_OBJ_DIR = $(OBJ_DIR)\opt\console
 OPT_GUI_OBJ_DIR = $(OBJ_DIR)\opt\gui
 !endif
@@ -195,7 +193,7 @@ PCREPOS_LIB    = $(LIB_DIR)\pcrepos.lib
 TIP_LIB        = $(LIB_DIR)\tip.lib
 VM_LIB         = $(LIB_DIR)\vm.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbc.lib
-SAMPLES_LIB    = $(LIB_DIR)\samples.lib
+MISC_LIB       = $(LIB_DIR)\libmisc.lib
 
 VM_STLIB         = $(VM_LIB)
 RTL_STLIB        = $(RTL_LIB)
@@ -229,7 +227,7 @@ PP_LIB         = $(LIB_DIR)\ppmt.lib
 TIP_LIB        = $(LIB_DIR)\tipmt.lib
 CT_LIB         = $(LIB_DIR)\ctmt.lib
 ODBC_LIB       = $(LIB_DIR)\hbodbcmt.lib
-SAMPLES_LIB    = $(LIB_DIR)\samplesmt.lib
+MISC_LIB       = $(LIB_DIR)\libmiscmt.lib
 !endif
 
 GTCGI_LIB    = $(LIB_DIR)\gtcgi.lib
@@ -349,6 +347,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\direct.obj \
    $(RTL_OBJ_DIR)\diskspac.obj \
    $(RTL_OBJ_DIR)\disksphb.obj \
+   $(RTL_OBJ_DIR)\dllcall.obj \
    $(RTL_OBJ_DIR)\empty.obj \
    $(RTL_OBJ_DIR)\file.obj \
    $(RTL_OBJ_DIR)\filehb.obj \
@@ -1133,15 +1132,8 @@ HBMAKE_EXE_OBJS = \
 XBSCRIPT_EXE_OBJS = \
    $(OBJ_DIR)\xbscript.obj
 
-SAMPLES_LIB_OBJS =  \
-   $(SAM_OBJ_DIR)\environ.obj \
-   $(SAM_OBJ_DIR)\date.obj   \
-   $(SAM_OBJ_DIR)\dbf.obj    \
-   $(SAM_OBJ_DIR)\gauge.obj  \
-   $(SAM_OBJ_DIR)\num.obj    \
-   $(SAM_OBJ_DIR)\stack.obj   \
-   $(SAM_OBJ_DIR)\status.obj \
-   $(SAM_OBJ_DIR)\time.obj
+MISC_LIB_OBJS =  \
+   $(OBJ_DIR)\hb_f.obj
 
 ODBC_LIB_OBJS =       \
    $(OBJ_DIR)\odbc.obj \
@@ -1177,7 +1169,7 @@ PROJECT = \
    $(HSX_LIB) \
    $(HB_GT_LIBS) \
    $(CODEPAGE_LIB) \
-   $(SAMPLES_LIB) \
+   $(MISC_LIB) \
    $(ODBC_LIB) \
    $(HBRUN_EXE) \
    $(HBPP_EXE) \
@@ -1279,7 +1271,7 @@ $(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
+$(MISC_LIB) : $(MISC_LIB_OBJS)
     LIB386 /nologo /out:$@ $**
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
@@ -1914,6 +1906,9 @@ $(RTL_OBJ_DIR)\dumpvar.c : $(RTL_DIR)\dumpvar.prg
    $(HRB_CMD)
 
 $(RTL_OBJ_DIR)\dumpvar.obj : $(RTL_OBJ_DIR)\dumpvar.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\dllcall.obj : $(RTL_DIR)\dllcall.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\empty.obj : $(RTL_DIR)\empty.c
@@ -2771,10 +2766,7 @@ $(MACRO_OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
 # NULSYS.LIB dependencies
 #
 
-$(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
-   $(HRB_CMD)
-
-$(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
+$(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
    $(CC_CMD)
 
 #
@@ -3146,31 +3138,10 @@ $(OBJ_DIR)\ucmaz.obj : $(CODEPAGE_DIR)\ucmaz.c
    $(CC_CMD)
 
 #
-# SAMPLES.LIB dependencies
+# LIBMISC.LIB dependencies
 #
 
-$(SAM_OBJ_DIR)\environ.obj : $(MISC_DIR)\environ.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\date.obj : $(MISC_DIR)\date.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\dbf.obj : $(MISC_DIR)\dbf.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\gauge.obj : $(MISC_DIR)\gauge.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\num.obj : $(MISC_DIR)\num.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\stack.obj : $(MISC_DIR)\stack.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\status.obj : $(MISC_DIR)\status.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\time.obj : $(MISC_DIR)\time.c
+$(OBJ_DIR)\hb_f.obj : $(MISC_DIR)\hb_f.c
    $(CC_CMD)
 
 #

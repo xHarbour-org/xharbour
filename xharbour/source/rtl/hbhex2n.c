@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.15 2006/09/23 21:02:49 ptsarenko Exp $
+ * $Id: hbhex2n.c,v 1.15 2006/09/23 18:32:16 ptsarenko Exp $
  */
 
 /*
@@ -63,6 +63,8 @@ HB_ULONG HB_EXPORT hb_hextonum(char *cHex)
    HB_ULONG   ulNum = 0;
    char       c;
    int        iDigit;
+
+   while ( *cHex && (*cHex == ' ') ) cHex++;
 
    while ( *cHex )
    {

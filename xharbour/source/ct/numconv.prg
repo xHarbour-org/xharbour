@@ -1,5 +1,5 @@
 /*
- * $Id: numconv.prg,v 1.3 2006/09/25 20:43:30 ptsarenko Exp $
+ * $Id: numconv.prg,v 1.3 2006/09/25 18:21:30 ptsarenko Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 FUNCTION NTOC( xNum, nBase, nLenght, cPad )
 LOCAL cNum
 
-Default cPad to "0"
+Default cPad to " "
 Default nBase to 10
 
 IF VALTYPE( xNum ) == "C"
