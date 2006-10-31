@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.4 2006/04/11 19:43:23 ptsarenko Exp $
+ * $Id: dattime3.prg,v 1.5 2006/10/09 18:21:13 modalsist Exp $
  */
 
 /*
@@ -191,7 +191,11 @@ Local aTimer, nC := Col(), nR := Row()
 
    Next
 
-   DevPos( nR, nC )
+   // 2006/OCT/30 - E.F. - Changed to setpos() to avoid move printer head to
+   //                      screen coordinates if "set device to printer" is seted
+   //                      under gtwin while showtime() is active.
+   //DevPos( nR, nC )
+   SetPos( nR, nC )
 
 RETURN NIL
 
@@ -243,7 +247,14 @@ Local nWindow
       ENDIF
 
       nWindow := SetMainWindow()
-      @ nRow, nCol say + cShowTime color cColor
+
+      // 2006/OCT/30 - E.F. - Changed to Dispoutat() to force show time value
+      //                      at display screen only. This avoid the printing
+      //                      show time value if "set device to printer" is seted
+      //                      under gtwin while showtime() is active.  
+      //@ nRow, nCol say + cShowTime color cColor
+      DispOutAt( nRow, nCol, cShowTime, cColor )
+
       RestoreWindow( nWindow )
 
       cTime := Time()

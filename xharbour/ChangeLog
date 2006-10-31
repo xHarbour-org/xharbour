@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5225 2006/10/30 13:45:16 modalsist Exp $
+ * $Id: ChangeLog,v 1.5226 2006/10/30 18:48:36 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-10-30 23:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\ct\dattime3.prg
+    ! fixed showtime() function to display time only in screen device
+      and avoid printing time if "set device to printer" is seted while
+      showtime is active, under gtwin.
 
 2006-10-30 21:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * makefile.wc
@@ -17,7 +23,6 @@
     * chanded default value of the cPad parameter in ntoc()
 
 2006-10-30 10:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
-
   * source\rtl\tbrowse.prg
     + added DataSource DATA to control if tbrowse was called via tbrowsedb() or
       tbrowsenew(). This is necessary to control reseting positionning of datasource
