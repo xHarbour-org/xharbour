@@ -8380,7 +8380,7 @@ STATIC PROCEDURE CompileRule( sRule, aRules, aResults, bX, bDelete )
    LOCAL aMatchRule, cRuleExp
    LOCAL sWord
    LOCAL nLen, sToken
-   LOCAL nrule, nRules
+   LOCAL nRule, nRules
 
    /*
    nMarkerID
