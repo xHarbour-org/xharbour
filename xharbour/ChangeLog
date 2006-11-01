@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5226 2006/10/30 18:48:36 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5227 2006/10/31 02:41:19 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-01 19:13 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.c
+    ! Fixed typo in hb_compOptimizeFrames() generation of HB_P_LARGEFRAME when static frame is ommited.
 
 2006-10-30 23:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\ct\dattime3.prg
@@ -42,7 +46,7 @@
       new DataSource property, used in Configure() method.
 
   * source\rtl\tget.prg
-    ! fixed "@E" picture behaviour in date get if "SET DATE BRITISH" is used 
+    ! fixed "@E" picture behaviour in date get if "SET DATE BRITISH" is used
       and "SET CENTURY ON" is called after that.
     + created "@K+" extension picture behaviour in _delete() method that
       will empty all the get buffer if the first key pressed is DEL key.

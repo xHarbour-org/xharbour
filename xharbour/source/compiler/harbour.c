@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.138 2006/09/06 15:30:27 snaiperis Exp $
+ * $Id: harbour.c,v 1.139 2006/10/21 21:17:55 likewolf Exp $
  */
 
 /*
@@ -4491,7 +4491,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
       else if( bSkipSFRAME )
       {
          pFunc->lPCodePos -= 3;
-         memmove( pFunc->pCode + 3, pFunc->pCode + 6, pFunc->lPCodePos - 3 );
+         memmove( pFunc->pCode + 3 + iOffset, pFunc->pCode + 6 + iOffset, pFunc->lPCodePos - 3 );
       }
 
       // hb_xfree( szFunctionName );
