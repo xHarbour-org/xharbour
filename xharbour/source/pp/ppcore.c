@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.231 2006/09/29 13:15:55 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.232 2006/10/22 04:43:10 ronpinkas Exp $
  */
 
 /*
@@ -167,7 +167,7 @@ int hb_pp_NextToken( char** pLine, char *sToken );
 #define MAX_NAME     255
 #define MAX_EXP      4096
 #define PATTERN_SIZE HB_PP_STR_SIZE
-#define MAX_CICLES   4096
+#define MAX_CICLES   256
 
 #define IT_EXPR       1
 #define IT_ID         2

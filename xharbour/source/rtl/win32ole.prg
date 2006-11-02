@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.140 2006/10/01 11:24:47 enricomaria Exp $
+ * $Id: win32ole.prg,v 1.141 2006/10/10 20:37:49 ronpinkas Exp $
  */
 
 /*
@@ -332,6 +332,8 @@ RETURN Self
 //--------------------------------------------------------------------
 // Destructor!
 PROCEDURE Release() CLASS TOleAuto
+
+   //TraceLog( ::cClassName, ::hObj )
 
    IF ! Empty( ::hObj )
       //TraceLog( ::cClassName, ::hObj )
@@ -1328,7 +1330,8 @@ RETURN Self
 
                    if( s_pSym_New && OleAuto.type )
                    {
-                      pDisp->lpVtbl->AddRef( pDisp );
+                      // Implemented in :New()
+                      //pDisp->lpVtbl->AddRef( pDisp );
 
                       //TOleAuto():New( nDispatch )
                       hb_vmPushSymbol( s_pSym_New->pSymbol );
@@ -1677,17 +1680,17 @@ RETURN Self
 
            if( pOleAuto->type )
            {
-              // If retrieved from IUnknown than allready added!
-              if( pVariant->n1.n2.vt == VT_DISPATCH || pVariant->n1.n2.vt == ( VT_DISPATCH | VT_BYREF ) )
-              {
-                 pDisp->lpVtbl->AddRef( pDisp );
-              }
-
               //TOleAuto():New( nDispatch )
               hb_vmPushSymbol( s_pSym_New->pSymbol );
               hb_itemPushForward( pOleAuto );
               hb_vmPushLong( ( LONG ) pDisp );
               hb_vmSend( 1 );
+
+              // If retrieved from IUnknown than doubly added!
+              if( pVariant->n1.n2.vt == VT_UNKNOWN || pVariant->n1.n2.vt == ( VT_UNKNOWN | VT_BYREF ) )
+              {
+                 pDisp->lpVtbl->Release( pDisp );
+              }
 
               hb_itemRelease( pOleAuto );
 

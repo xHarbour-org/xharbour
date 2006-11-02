@@ -7434,7 +7434,9 @@ STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
               ENDIF
            ENDDO
 
-           sLastToken := RTrim( sToken )
+           IF sToken != NIL
+              sLastToken := RTrim( sToken )
+           ENDIF
 
            // Continue  2nd level checks below.
         ELSEIF s1 == '{'
