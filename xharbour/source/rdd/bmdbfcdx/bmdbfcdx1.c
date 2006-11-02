@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.11 2006/10/20 16:52:09 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.12 2006/10/24 16:04:39 marchuet Exp $
  */
 
 /*
@@ -111,7 +111,6 @@
    #define hb_cdpcharcmp( c1, c2, cdpage )     ( (BYTE)(c1) - (BYTE)(c2) )
  */
 #endif
-
 
 /*
  * Tag->fRePos = TURE means that rootPage->...->childLeafPage path is
@@ -765,7 +764,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else
+   else 
    {
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
@@ -6129,7 +6128,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       if ( fLogOpt && fFilters && pArea->dbfi.itmCobExpr )
       {
          SELF_GOTOP( ( AREAP ) pArea );
-         retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt );
+         retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt - 1 );
       }
       else
       {

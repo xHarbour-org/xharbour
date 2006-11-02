@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.252 2006/09/27 11:01:44 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.253 2006/09/29 19:34:54 druzus Exp $
  */
 
 /*
@@ -4273,7 +4273,7 @@ static BOOL hb_cdxTagKeyDel( LPCDXTAG pTag, LPCDXKEY pKey )
 }
 
 /*
- * Go to the first visiable record in Tag
+ * Go to the first visible record in Tag
  */
 static void hb_cdxTagGoTop( LPCDXTAG pTag )
 {
@@ -5980,7 +5980,7 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
       if ( fLogOpt && fFilters && pArea->dbfi.itmCobExpr )
       {
          SELF_GOTOP( ( AREAP ) pArea );
-         retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt );
+         retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt - 1 );
       }
       else
       {

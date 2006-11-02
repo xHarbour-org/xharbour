@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5227 2006/10/31 02:41:19 modalsist Exp $
+ * $Id: ChangeLog,v 1.5228 2006/11/01 23:14:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-02 12:19 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   *source/rdd/bmdbfcdx/bmdbfcdx1.c
+   *source/rdd/dbfcdx/dbfcdx1.c
+    ! Corrected OrdKeyGoto( nKeyNo ) on a DBF without index and with filter,
+      it was positioned in nKeyNo + 1, when it had to do it in nKeyNo.
 
 2006-11-01 19:13 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.c
