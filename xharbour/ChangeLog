@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5230 2006/11/02 19:17:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5231 2006/11/06 10:20:14 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-11-06 08:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbrowse.prg
+    ! fixed ::nHeaderHeight and ::nFooterHeight initial value in configure()
+      method. 
 
 2006-11-06 11:20 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    *make_b32.bat

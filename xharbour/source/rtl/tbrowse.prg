@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.159 2006/09/27 13:08:15 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.160 2006/10/30 13:45:53 modalsist Exp $
  */
 
 /*
@@ -863,12 +863,11 @@ METHOD Configure( nMode ) CLASS TBrowse
       ::lRedrawFrame := .T.
    endif
 
-   // 2006/OCT/27 - E.F. Assigned new values to ::lHeaderHeight and ::lFooterHeight
-   //                    baded in Tbrwose:HeadSep and TBrowse:FootSep, if any.
-   ::nHeaderHeight := iif( ::lHeaders, 1, 0 )
-   ::nFooterHeight := iif( ::lFooters, 1, 0 )
+   ::nHeaderHeight := 0
+   ::nFooterHeight := 0
 
    // Find out highest column header and footer
+   //
    FOR EACH aCol IN ::aColsInfo
 
       if ( nMode <= 1 .and. !::lNeverDisplayed ) .or. lInitializing
