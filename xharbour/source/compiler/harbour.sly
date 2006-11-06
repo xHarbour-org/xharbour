@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.102 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.103 2006/07/09 21:57:41 ronpinkas Exp $
  */
 
 /*
@@ -2231,14 +2231,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
 
                   //$$ = hb_compElseIfGen( 0, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
 
-                  if( hb_comp_functions.pLast->pCode[ hb_comp_functions.pLast->lPCodePos - 4 ] == HB_P_JUMPFAR )
-                  {
-                     hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = 0;
-                  }
-                  else
-                  {
-                     hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
-                  }
+                  hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
 
                   hb_compGenJumpHere( $<iNumber>5 );
 
@@ -2263,14 +2256,7 @@ SwitchCases : CASE { hb_comp_bDontGenLineNum = FALSE; hb_compLinePush(); } Const
 
                   //$$ = hb_compElseIfGen( $1, hb_compGenJump( 0 ) ); // No default BREAK in SWITCH.
 
-                  if( hb_comp_functions.pLast->pCode[ hb_comp_functions.pLast->lPCodePos - 4 ] == HB_P_JUMPFAR )
-                  {
-                     hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = 0;
-                  }
-                  else
-                  {
-                     hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
-                  }
+                  hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter - 1 ] = hb_compGenJump( 0 ); // Skip over NEXT HB_P_SWITCHCASE
 
                   hb_compGenJumpHere( $<iNumber>6 );
 

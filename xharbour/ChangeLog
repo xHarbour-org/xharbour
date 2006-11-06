@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5231 2006/11/06 10:20:14 marchuet Exp $
+ * $Id: ChangeLog,v 1.5232 2006/11/06 11:00:45 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-11-06 18:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.sly
+    - Removed condition in SwitchCases which was ambigious but no longer needed due to deadcode elimination
+
+  * source/rtl/cstruct.prg
+    - Removed condition limiting :AsString method generation to arrays of [unsigned] char - now applicable to all arrays
+
 2006-11-06 08:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg
     ! fixed ::nHeaderHeight and ::nFooterHeight initial value in configure()
-      method. 
+      method.
 
 2006-11-06 11:20 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
    *make_b32.bat

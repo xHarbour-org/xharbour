@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.42 2005/11/09 00:29:55 fsgiudice Exp $
+ * $Id: cstruct.prg,v 1.43 2006/10/13 01:42:19 ronpinkas Exp $
  */
 
 /*
@@ -444,9 +444,9 @@ Function HB_CTypeArrayID( CType, nLen )
       __clsAddMsg( hClass,  "GetPointer", @GetPointer() , HB_OO_MSG_METHOD )
       __clsAddMsg( hClass,  "CopyTo"    , @CopyTo()     , HB_OO_MSG_METHOD )
 
-      IF Abs( CType ) == 1
+      //IF Abs( CType ) == 1
          __clsAddMsg( hClass, "AsString", @AsString()   , HB_OO_MSG_METHOD )
-      ENDIF
+      //ENDIF
 
       FOR Counter := 1 TO nLen
          cMember := LTrim( Str( Counter ) )
