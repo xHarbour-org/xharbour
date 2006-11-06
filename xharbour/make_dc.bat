@@ -1,6 +1,6 @@
 @ECHO OFF
 rem
-rem $Id: make_dc.bat,v 1.1 2005/02/24 10:43:55 andijahja Exp $
+rem $Id: make_dc.bat,v 1.2 2005/03/31 19:51:25 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with DigitalMars C/C++ Compiler
 rem
@@ -144,6 +144,8 @@ if not exist %OBJ_DIR%\mt\ct           md %OBJ_DIR%\mt\ct
    if exist %LIB_DIR%\codepage.lib         del %LIB_DIR%\codepage.lib
    if exist %LIB_DIR%\dbfcdx.lib           del %LIB_DIR%\dbfcdx.lib
    if exist %LIB_DIR%\dbfcdxmt.lib         del %LIB_DIR%\dbfcdxmt.lib
+   if exist %LIB_DIR%\bmdbfcdx.lib         del %LIB_DIR%\bmdbfcdx.lib
+   if exist %LIB_DIR%\bmdbfcdxmt.lib       del %LIB_DIR%\bmdbfcdxmt.lib
    if exist %LIB_DIR%\dbfdbt.lib           del %LIB_DIR%\dbfdbt.lib
    if exist %LIB_DIR%\dbfdbtmt.lib         del %LIB_DIR%\dbfdbtmt.lib
    if exist %LIB_DIR%\dbffpt.lib           del %LIB_DIR%\dbffpt.lib

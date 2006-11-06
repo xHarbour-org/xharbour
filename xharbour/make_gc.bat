@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_gc.bat,v 1.5 2005/02/19 11:22:29 andijahja Exp $
+rem $Id: make_gc.bat,v 1.6 2005/03/31 19:51:26 andijahja Exp $
 rem
 rem Batch File For Building xHarbour with MinGW32 under Windows
 rem
@@ -94,6 +94,8 @@ if exist %LIB_DIR%\libct.a            del %LIB_DIR%\libct.a
 if exist %LIB_DIR%\libctmt.a          del %LIB_DIR%\libctmt.a
 if exist %LIB_DIR%\libdbfcdx.a        del %LIB_DIR%\libdbfcdx.a
 if exist %LIB_DIR%\libdbfcdxmt.a      del %LIB_DIR%\libdbfcdxmt.a
+if exist %LIB_DIR%\libbmdbfcdx.a      del %LIB_DIR%\libbmdbfcdx.a
+if exist %LIB_DIR%\libbmdbfcdxmt.a    del %LIB_DIR%\libbmdbfcdxmt.a
 if exist %LIB_DIR%\libdbfdbt.a        del %LIB_DIR%\libdbfdbt.a
 if exist %LIB_DIR%\libdbfdbtmt.a      del %LIB_DIR%\libdbfdbtmt.a
 if exist %LIB_DIR%\libdbffpt.a        del %LIB_DIR%\libdbffpt.a

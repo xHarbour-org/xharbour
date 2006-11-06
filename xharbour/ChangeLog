@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5229 2006/11/02 11:24:52 marchuet Exp $
+ * $Id: ChangeLog,v 1.5230 2006/11/02 19:17:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-11-06 11:20 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+   *make_b32.bat
+   *make_dc.bat
+   *make_gc.bat
+   *make_pc.bat
+   *make_w32.bat
+    + Added deletion on CLEAN of libraries bmdbfcdx and mt.
 
 2006-11-02 15:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source\rtl\win32ole.prg

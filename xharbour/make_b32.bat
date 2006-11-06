@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.25 2006/03/23 02:07:04 kaddath Exp $
+rem $Id: make_b32.bat,v 1.27 2006/07/27 16:47:37 map Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -67,6 +67,8 @@ if not exist bin\b32 md bin\b32
    if exist lib\ctmt.lib       del lib\ctmt.lib
    if exist lib\dbfcdx.lib     del lib\dbfcdx.lib
    if exist lib\dbfcdxmt.lib   del lib\dbfcdxmt.lib
+   if exist lib\bmdbfcdx.lib   del lib\bmdbfcdx.lib
+   if exist lib\bmdbfcdxmt.lib del lib\bmdbfcdxmt.lib
    if exist lib\dbfdbt.lib     del lib\dbfdbt.lib
    if exist lib\dbfdbtmt.lib   del lib\dbfdbtmt.lib
    if exist lib\dbffpt.lib     del lib\dbffpt.lib
