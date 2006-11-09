@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5233 2006/11/06 22:31:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5234 2006/11/09 11:01:42 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-09 17:13 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+   + source\lang\msgsv.c
+   + source\lang\msgsvwin.c
+   + source\codepage\cpsv850.c
+   + source\codepage\cpsvclip.c
+   + source\codepage\cpsvwin.c
+   * hrbdll.bc  
+   * hrbdll.dc
+   * hrbdll.gc
+   * hrbdll.pc
+   * hrbdll.vc
+   * hrbdll.wc
+   * makefile.bc  
+   * makefile.dc
+   * makefile.gc
+   * makefile.pc
+   * makefile.vc
+   * makefile.wc
+   * source\codepage\makefile
+   * source\lang\makefile
+     + Added support for Swedish language and codepage.
 
 2006-11-09 09:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * bin/pack_src.sh

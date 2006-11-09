@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.dc,v 1.23 2006/10/07 22:55:02 marchuet Exp $
+# $Id: makefile.dc,v 1.24 2006/10/15 17:50:34 ptsarenko Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -740,6 +740,9 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpru866.obj \
    $(OBJ_DIR)\cpruwin.obj \
    $(OBJ_DIR)\cpsrwin.obj \
+   $(OBJ_DIR)\cpsv850.obj \
+   $(OBJ_DIR)\cpsvclip.obj \
+   $(OBJ_DIR)\cpsvwin.obj \
    $(OBJ_DIR)\cprukoi.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
@@ -2151,6 +2154,15 @@ $(OBJ_DIR)\cpruwin.obj : $(CODEPAGE_DIR)\cpruwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsv850.obj : $(CODEPAGE_DIR)\cpsv850.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsvclip.obj : $(CODEPAGE_DIR)\cpsvclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsvwin.obj : $(CODEPAGE_DIR)\cpsvwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cprukoi.obj : $(CODEPAGE_DIR)\cprukoi.c

@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.28 2006/10/09 08:36:52 marchuet Exp $
+# $Id: hrbdll.pc,v 1.29 2006/10/15 17:50:34 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -479,6 +479,9 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
    $(OBJ_DIR)\cpsrwin.obj \
+   $(OBJ_DIR)\cpsv850.obj \
+   $(OBJ_DIR)\cpsvclip.obj \
+   $(OBJ_DIR)\cpsvwin.obj \
    $(OBJ_DIR)\cpua866.obj \
    $(OBJ_DIR)\cpuakoi.obj \
    $(OBJ_DIR)\cpuawin.obj \
@@ -545,6 +548,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\msgsr852.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgsrwin.obj \
+   $(OBJ_DIR)\msgsv.obj \
+   $(OBJ_DIR)\msgsvwin.obj \
    $(OBJ_DIR)\msgua866.obj \
    $(OBJ_DIR)\msguakoi.obj \
    $(OBJ_DIR)\msguawin.obj \
@@ -1116,6 +1121,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\msgsr852.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\msgsriso.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\msgsrwin.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\msgsv.obj      >> make_tmp
+   $(ECHO) $(OBJ_DIR)\msgsvwin.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\msgua866.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\msguakoi.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\msguawin.obj   >> make_tmp
@@ -1176,6 +1183,9 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\cpsliso.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\cpslwin.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\cpsrwin.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\cpsv850.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\cpsvclip.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\cpsvwin.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\cpua866.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\cpuakoi.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\cpuawin.obj    >> make_tmp
@@ -2558,6 +2568,15 @@ $(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_SRC_DIR)\cpslwin.c
 $(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_SRC_DIR)\cpsrwin.c
    $(POCC_CMD)
 
+$(OBJ_DIR)\cpsv850.obj : $(CODEPAGE_SRC_DIR)\cpsv850.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\cpsvclip.obj : $(CODEPAGE_SRC_DIR)\cpsvclip.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\cpsvwin.obj : $(CODEPAGE_SRC_DIR)\cpsvwin.c
+   $(POCC_CMD)
+
 $(OBJ_DIR)\cpua866.obj : $(CODEPAGE_SRC_DIR)\cpua866.c
    $(POCC_CMD)
 
@@ -2753,6 +2772,12 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_SRC_DIR)\msgsriso.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_SRC_DIR)\msgsrwin.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\msgsv.obj : $(LANG_SRC_DIR)\msgsv.c
+   $(POCC_CMD)
+
+$(OBJ_DIR)\msgsvwin.obj : $(LANG_SRC_DIR)\msgsvwin.c
    $(POCC_CMD)
 
 $(OBJ_DIR)\msgua866.obj : $(LANG_SRC_DIR)\msgua866.c

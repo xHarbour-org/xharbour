@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.22 2006/10/09 08:36:52 marchuet Exp $
+# $Id: hrbdll.gc,v 1.23 2006/10/15 17:50:34 ptsarenko Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -348,6 +348,9 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/cpru866.o \
    $(OBJ_DIR)/cpruwin.o \
    $(OBJ_DIR)/cpsrwin.o \
+   $(OBJ_DIR)/cpsv850.o \
+   $(OBJ_DIR)/cpsvclip.o \
+   $(OBJ_DIR)/cpsvwin.o \
    $(OBJ_DIR)/cprukoi.o \
    $(OBJ_DIR)/cphr437.o \
    $(OBJ_DIR)/cphr852.o \
@@ -1668,6 +1671,15 @@ $(OBJ_DIR)/cpruwin.o : $(CODEPAGE_DIR)/cpruwin.c
 
 $(OBJ_DIR)/cpsrwin.o : $(CODEPAGE_DIR)/cpsrwin.c
 	$(CC_CMD)
+
+$(OBJ_DIR)/cpsv850.o : $(CODEPAGE_DIR)/cpsv850.c
+   $(CC_CMD)
+
+$(OBJ_DIR)/cpsvclip.o : $(CODEPAGE_DIR)/cpsvclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)/cpsvwin.o : $(CODEPAGE_DIR)/cpsvwin.c
+   $(CC_CMD)
 
 $(OBJ_DIR)/cprukoi.o : $(CODEPAGE_DIR)/cprukoi.c
 	$(CC_CMD)

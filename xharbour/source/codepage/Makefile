@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.17 2005/11/19 15:52:04 likewolf Exp $
+# $Id: Makefile,v 1.18 2005/12/11 12:36:58 druzus Exp $
 #
 
 ROOT = ../../
@@ -38,6 +38,9 @@ C_SOURCES=\
       cpsliso.c  \
       cpslwin.c  \
       cpsrwin.c  \
+      cpsv850.c  \
+      cpsvclip.c \
+      cpsvwin.c  \
       cpua866.c  \
       cpuakoi.c  \
       cpuawin.c  \

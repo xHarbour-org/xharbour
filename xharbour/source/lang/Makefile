@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.9 2005/01/23 12:14:43 ptsarenko Exp $
+# $Id: Makefile,v 1.10 2005/11/19 15:52:04 likewolf Exp $
 #
 
 ROOT = ../../
@@ -51,12 +51,14 @@ C_SOURCES=\
 	msgsr852.c   \
 	msgsriso.c   \
 	msgsrwin.c   \
+   msgsv.c      \
+   msgsvwin.c   \
 	msgua866.c   \
 	msguakoi.c   \
 	msguawin.c   \
 	msgzhb5.c    \
 	msgzhgb.c    \
-	
+
 LIBNAME=lang
 
 include $(TOP)$(ROOT)config/lib.cf

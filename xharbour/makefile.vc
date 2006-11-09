@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.179 2006/10/07 22:55:02 marchuet Exp $
+# $Id: makefile.vc,v 1.180 2006/10/15 17:50:34 ptsarenko Exp $
 #
 
 #
@@ -704,6 +704,8 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgsr852.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgsrwin.obj \
+   $(OBJ_DIR)\msgsv.obj \
+   $(OBJ_DIR)\msgsvwin.obj \
    $(OBJ_DIR)\msgua866.obj \
    $(OBJ_DIR)\msguakoi.obj \
    $(OBJ_DIR)\msguawin.obj \
@@ -748,6 +750,9 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
    $(OBJ_DIR)\cpsrwin.obj \
+   $(OBJ_DIR)\cpsv850.obj \
+   $(OBJ_DIR)\cpsvclip.obj \
+   $(OBJ_DIR)\cpsvwin.obj \
    $(OBJ_DIR)\cpua866.obj \
    $(OBJ_DIR)\cpuawin.obj \
    $(OBJ_DIR)\cpuakoi.obj \

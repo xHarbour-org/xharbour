@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.20 2006/10/09 08:36:51 marchuet Exp $
+# $Id: hrbdll.dc,v 1.21 2006/10/15 17:50:34 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -462,6 +462,9 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
    $(OBJ_DIR)\cpsrwin.obj \
+   $(OBJ_DIR)\cpsv850.obj \
+   $(OBJ_DIR)\cpsvclip.obj \
+   $(OBJ_DIR)\cpsvwin.obj \
    $(OBJ_DIR)\cpua866.obj \
    $(OBJ_DIR)\cpuakoi.obj \
    $(OBJ_DIR)\cpuawin.obj \
@@ -528,6 +531,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\msgsr852.obj \
    $(OBJ_DIR)\msgsriso.obj \
    $(OBJ_DIR)\msgsrwin.obj \
+   $(OBJ_DIR)\msgsv.obj \
+   $(OBJ_DIR)\msgsvwin.obj \
    $(OBJ_DIR)\msgua866.obj \
    $(OBJ_DIR)\msguakoi.obj \
    $(OBJ_DIR)\msguawin.obj \
@@ -995,6 +1000,9 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\cpsliso.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpslwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpsrwin.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsv850.obj    + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsvclip.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\cpsvwin.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpua866.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpuakoi.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cpuawin.obj    + >> harbourdll.rsp
@@ -1060,6 +1068,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\msgsr852.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgsriso.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgsrwin.obj   + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgsv.obj      + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\msgsvwin.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msgua866.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msguakoi.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\msguawin.obj   + >> harbourdll.rsp
@@ -2426,6 +2436,15 @@ $(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
 $(OBJ_DIR)\cpsrwin.obj : $(CODEPAGE_DIR)\cpsrwin.c
    $(CC_CMD)
 
+$(OBJ_DIR)\cpsv850.obj : $(CODEPAGE_DIR)\cpsv850.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsvclip.obj : $(CODEPAGE_DIR)\cpsvclip.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsvwin.obj : $(CODEPAGE_DIR)\cpsvwin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cpua866.obj : $(CODEPAGE_DIR)\cpua866.c
    $(CC_CMD)
 
@@ -2621,6 +2640,12 @@ $(OBJ_DIR)\msgsriso.obj : $(LANG_DIR)\msgsriso.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgsrwin.obj : $(LANG_DIR)\msgsrwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgsv.obj : $(LANG_DIR)\msgsv.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\msgsvwin.obj : $(LANG_DIR)\msgsvwin.c
    $(CC_CMD)
 
 $(OBJ_DIR)\msgua866.obj : $(LANG_DIR)\msgua866.c
