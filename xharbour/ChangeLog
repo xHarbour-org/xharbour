@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5232 2006/11/06 11:00:45 modalsist Exp $
+ * $Id: ChangeLog,v 1.5233 2006/11/06 22:31:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-09 09:10 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
+  * bin/pack_src.sh
+    * added bmdbfcdx directory to list of files to compress.
+      this should resolve the problem os missing -lbmdbfcdx
 
 2006-11-06 18:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.sly

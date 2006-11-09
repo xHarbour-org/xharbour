@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.21 2005/11/16 13:25:26 druzus Exp $
+# $Id: pack_src.sh,v 1.22 2006/06/28 20:19:44 druzus Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -119,6 +119,12 @@ $hb_collect source/rdd/dbffpt/*.prg
 $hb_collect source/rdd/dbfcdx/Makefile
 $hb_collect source/rdd/dbfcdx/*.[ch]
 $hb_collect source/rdd/dbfcdx/*.prg
+
+# SOURCE\RDD\BMDBFCDX
+$hb_collect source/rdd/bmdbfcdx/Makefile
+$hb_collect source/rdd/bmdbfcdx/*.[ch]
+$hb_collect source/rdd/bmdbfcdx/*.prg
+
 
 # SOURCE\RDD\DBFNTX
 $hb_collect source/rdd/dbfntx/Makefile
