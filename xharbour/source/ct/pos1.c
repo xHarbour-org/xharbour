@@ -1,5 +1,5 @@
 /*
- * $Id: pos1.c,v 1.3 2006/09/25 21:11:59 ptsarenko Exp $
+ * $Id: pos1.c,v 1.3 2006/09/25 18:21:30 ptsarenko Exp $
  */
 
 /*
@@ -63,9 +63,11 @@
   #include "hbapicdp.h"
   #define ISUPPER(c)    ((hb_cdp_page->nChars) ? isupper(c) || (int) strchr( hb_cdp_page->CharsUpper, c&255 ) : isupper(c))
   #define ISLOWER(c)    ((hb_cdp_page->nChars) ? islower(c) || (int) strchr( hb_cdp_page->CharsLower, c&255 ) : islower(c))
+  #define ISALPHA(c)    ((hb_cdp_page->nChars) ? isalpha(c) || (int) strchr( hb_cdp_page->CharsUpper, c&255 ) || (int) strchr( hb_cdp_page->CharsLower, c&255 ) : isalpha(c))
 #else
   #define ISUPPER(c)    isupper(c)
   #define ISLOWER(c)    islower(c)
+  #define ISALPHA(c)    isalpha(c)
 #endif
 
 
@@ -146,7 +148,7 @@ static void do_pos1 (int iSwitch)
       {
         case DO_POS1_POSALPHA:
         {
-          iDoRet = isalpha(*puc);
+          iDoRet = ISALPHA(*puc);
         }; break;
 
         case DO_POS1_POSLOWER:

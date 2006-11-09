@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5234 2006/11/09 11:01:42 lculik Exp $
+ * $Id: ChangeLog,v 1.5235 2006/11/09 16:44:18 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-09 21:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/pos1.c
+    + added codepage support for posalpha() function
 
 2006-11-09 17:13 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    + source\lang\msgsv.c
