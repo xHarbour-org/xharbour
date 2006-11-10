@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.160 2006/10/30 13:45:53 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.161 2006/11/06 11:01:24 modalsist Exp $
  */
 
 /*
@@ -629,7 +629,7 @@ CLASS TBrowse
    METHOD SetColumnWidth( oCol )          // Calcs width of given column
    METHOD SetBorder( cBorder )
    METHOD DrawARow()                      // Draws any row in stabilization
-   METHOD CheckRowsToBeRedrawn()
+   METHOD CheckRowsToBeRedrawn()          // Skip rows performed by requested movement.
    METHOD CheckRowPos()
    METHOD AColInfo()
    METHOD PerformStabilization()          // "Real" stabilization procedure
@@ -2400,12 +2400,14 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // Draw border
       //
       if Len( ::cBorder ) == 8
-         @::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::colorSpec
+         //@::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::colorSpec
+         DispBox(::nTop,::nLeft,::nBottom,::nRight,::cBorder,::colorSpec)
       endif
 
       // 2006/AUG/28 - E.F. - Draw background area.
       cCurColor := SetColor( ColorSpec )
-      @::nWTop,::nWLeft CLEAR TO ::nWBottom,::nWRight
+      //@::nWTop,::nWLeft CLEAR TO ::nWBottom,::nWRight
+      Scroll(::nWTop,::nWLeft,::nWBottom,::nWRight,0);SetPos(0,0)
       SetColor( cCurColor )
 
       // How may columns fit on TBrowse width?
@@ -2430,7 +2432,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
       // Every time I enter stabilization loop I need to draw _at least_ one row.
-      ::CheckRowsToBeRedrawn()
+      ::CheckRowsToBeRedrawn()  
 
       DispBegin()
 
@@ -2488,7 +2490,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
    SetCursor( nOldCursor )
 
-
 Return .T.
 
 //-------------------------------------------------------------------//
@@ -2496,7 +2497,7 @@ Return .T.
 METHOD CheckRowsToBeRedrawn() CLASS TBrowse
    LOCAL nRecsSkipped                  // How many records do I really skipped?
    LOCAL nFirstRow                     // Where is on screen first row of TBrowse?
-
+   LOCAL nRow
 
    // If I have a requested movement still to handle
    //
@@ -2506,7 +2507,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I have to set data source to cursor position
       //
       if ::oDataCache:nCurRow <> ::nNewRowPos
-         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
+         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )  
       endif
 
       nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip )
@@ -2539,7 +2540,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
             // It was K_PGDN or K_PGUP or K_UP or K_DN
             //
             if Abs( nRecsSkipped ) >= ::RowCount
-               // K_PGDN
+               // K_PGDN or K_PGUP
                //
                ::RefreshAll()
 
@@ -2548,36 +2549,47 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
                // Where does really start first TBrowse row?
                //
                nFirstRow := ::nRowData + 1
-
                // I'm at top or bottom of TBrowse so I can scroll
                //
                if ::nNewRowPos == ::RowCount
                   ScrollFixed( nFirstRow + nRecsSkipped - 1,;
                                ::nwLeft,;
-                               nFirstRow + ::RowCount - 1,;
+                               nFirstRow + ::RowCount - nRecsSkipped,;
                                ::nwRight,;
                                nRecsSkipped )
 
                else
                   ScrollFixed( nFirstRow,;
                                ::nwLeft,;
-                               nFirstRow + ::RowCount + nRecsSkipped,;
+                               Min(::nwBottom - ::nFooterHeight, nFirstRow + ::RowCount + nRecsSkipped),;
                                ::nwRight,;
                                nRecsSkipped )
+
                endif
 
-               // I've scrolled on screen rows, now I need to scroll ::aRedraw array as well!
-               //
-               if nRecsSkipped > 0
-                  ADel( ::aRedraw, 1 )
-                  ::aRedraw[ -1 ] := .F.
-
+               /* 2006/NOV/09 - E.F. If more than 1 row was skipped here, I need
+                * redraw all rows but these need be invalidated. Please don't call
+                * ::Refreshall() or ::RefreshCurrent() here.
+                */
+               if Abs( nRecsSkipped ) > 1
+                  For nRow := nFirstRow TO ::RowCount
+                     ::aRedraw[ nRow ] := .T.
+                     ::oDataCache:Invalidate( nRow )
+                  Next
                else
-                  AIns( ::aRedraw, 1, .F. )
 
-               endif
-               if Len( ::aRedraw ) >= ::nNewRowPos
-                  ::aRedraw[ ::nNewRowPos ] := .T.
+                   // I've scrolled on screen rows, now I need to scroll ::aRedraw array as well!
+                   //
+                   if nRecsSkipped > 0
+                      ADel( ::aRedraw, 1 )
+                      ::aRedraw[ -1 ] := .F.
+                   else
+                      AIns( ::aRedraw, 1, .F. )
+                   endif
+
+                   if Len( ::aRedraw ) >= ::nNewRowPos
+                      ::aRedraw[ ::nNewRowPos ] := .T.
+                   endif
                endif
             endif
          endif
@@ -2589,7 +2601,8 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
          if ( ::nNewRowPos + nRecsSkipped < 1 ) .OR. ( ::nNewRowPos + nRecsSkipped > ::RowCount )
             // don't go past boundaries
             //
-            ::nNewRowPos := iif( nRecsSkipped > 0, ::RowCount, 1 )
+            //::nNewRowPos := iif( nRecsSkipped > 0, ::RowCount, 1 )
+            ::nNewRowPos := Max(1, Min( ::nNewRowPos, ::RowCount ) )  // 2006/NOV/08 - E.F.   
             ::RefreshAll()
 
          else
@@ -2957,7 +2970,7 @@ Return nNotLeftCol
 */
 METHOD RefreshCurrent() CLASS TBrowse
 
-   if ! Empty( ::aRedraw ).and.::nRowPos>0
+   if ! Empty( ::aRedraw ) .and. ::nRowPos>0
 
       ::aRedraw[ ::nRowPos ] := .T.
       ::oDataCache:Invalidate( ::nRowPos )

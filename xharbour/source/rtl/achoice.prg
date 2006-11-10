@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.29 2005/11/30 03:45:39 guerra000 Exp $
+ * $Id: achoice.prg,v 1.30 2005/12/07 15:32:02 guerra000 Exp $
  */
 
 /*
@@ -86,6 +86,8 @@ CLASS TAChoice
 
    VAR    cProcName                      // Calling procedure name
    VAR    nProcLine                      // Calling procedure line
+   
+   VAR    nSize                          // Rows to skip, used to move cursor.
 
    METHOD New    CONSTRUCTOR             // Initializes TAChoice
    METHOD Loop                           // Main loop
@@ -108,6 +110,8 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
    ::nLeft   := Max( Min( ::nLeft,   MaxCol() ) , 0 )
    ::nBottom := Max( Min( ::nBottom, MaxRow() ) , ::nTop )
    ::nRight  := Max( Min( ::nRight,  MaxCol() ) , ::nLeft )
+
+   ::nSize   := ::nBottom - ::nTop 
 
    ::acItems := acItems
    ::uSelect := uSelect
@@ -138,11 +142,10 @@ RETURN Self
 
 METHOD Loop( nMode ) CLASS TAChoice
 LOCAL nRet, nUserMode, lNoItems
-LOCAL nKey, bAction, nSize, nAux
+LOCAL nKey, bAction, nAux
 LOCAL nSaveCsr := SetCursor( SC_NONE )
-local lFirstTime := .t.
-
-   nSize := ::nBottom - ::nTop
+LOCAL lFirstTime := .t.
+LOCAL nGotoItem
 
    lNoItems := ! ::ValidateArray()
 
@@ -154,7 +157,7 @@ local lFirstTime := .t.
 
       // Refresh?
       IF nMode == AC_REDRAW
-         ::DrawRows( 0, nSize, .F. )
+         ::DrawRows( 0, ::nSize, .F. )
       ENDIF
 
       // What will do?
@@ -212,21 +215,39 @@ local lFirstTime := .t.
             EXIT
 
          CASE K_CTRL_END       // Bottom of the window
-            ::MoveCursor( nSize - ( ::nOption - ::nFirstRow ), -1, 0 )
+            ::MoveCursor( ::nSize - ( ::nOption - ::nFirstRow ), -1, 0 )
             nUserMode := AC_NO_USER_FUNCTION
             EXIT
 
          CASE K_MWFORWARD
          CASE K_PGUP           // Previous screen
             nAux := ::nOption
-            ::MoveCursor( - MAX( nSize, 1 ), -1, - MAX( nSize, 1 ) )
+            // 2006/NOV/10 - E.F. Adjusted to which item skip backward.
+            nGotoItem := ::nSize
+            if (::nFirstRow - ::nSize)  < 1
+               nGotoItem := ::nSize - Abs( ::nFirstRow - ::nSize ) - 1
+               if nGotoItem <= 0
+                  nGotoItem := ::nSize
+               endif
+            endif
+            //::MoveCursor( - MAX( ::nSize, 1 ), -1, - MAX( ::nSize, 1 ) )
+            ::MoveCursor( - MAX( nGotoItem, 1 ), -1, - MAX( nGotoItem, 1 ) )
             nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
             EXIT
 
          CASE K_MWBACKWARD
          CASE K_PGDN           // Next screen
             nAux := ::nOption
-            ::MoveCursor( MAX( nSize, 1 ), 1, MAX( nSize, 1 ) )
+            // 2006/NOV/10 - E.F. Adjusted to which item skip forward.
+            nGotoItem := ::nSize
+            if (::nFirstRow + ::nSize + ::nSize) > ::nItems
+               nGotoItem := ::nSize - ( (::nFirstRow + ::nSize + ::nSize) - ::nItems )
+               if nGotoItem <= 0
+                  nGotoItem := ::nSize
+               endif
+            endif
+            //::MoveCursor( MAX( ::nSize, 1 ), 1, MAX( ::nSize, 1 ) )
+            ::MoveCursor( MAX( nGotoItem, 1 ), 1, MAX( nGotoItem, 1 ) )
             nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
             EXIT
 
@@ -234,6 +255,12 @@ local lFirstTime := .t.
             IF ::lUserFunc
                EXIT
             ENDIF
+            // 2006/NOV/10 - E.F. Added the 3 next lines of code below as
+            //               suggested by Ken Wants
+            nAux := ::nOption
+            ::MoveCursor(1, -1, 1)
+            nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
+
          CASE K_CTRL_PGUP      // First item
             ::MoveCursor( - ( ::nOption - 1 ), -1, ::nFirstRow - 1 )
             nUserMode := AC_NO_USER_FUNCTION
@@ -243,8 +270,14 @@ local lFirstTime := .t.
             IF ::lUserFunc
                EXIT
             ENDIF
+            // 2006/NOV/10 - E.F. Added the 3 next lines of code below as
+            //               suggested by Ken Wants
+            nAux := ::nOption
+            ::MoveCursor(::nItems - ::nOption, 1, ::nItems - ::nOption)
+            nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
+
          CASE K_CTRL_PGDN      // Last item
-            ::MoveCursor( ::nItems - ::nOption, 1, Max( ::nItems - nSize - ::nFirstRow, 0 ) )
+            ::MoveCursor( ::nItems - ::nOption, 1, Max( ::nItems - ::nSize - ::nFirstRow, 0 ) )
             nUserMode := AC_NO_USER_FUNCTION
             EXIT
 
@@ -358,16 +391,16 @@ RETURN lValid
 METHOD MoveCursor( nMove, nDirection, nMoveScreen ) CLASS TAChoice
 LOCAL nBounce := 0
 LOCAL nLastFirstRow := ::nFirstRow
-LOCAL nSize := ::nBottom - ::nTop
 LOCAL nBottom
+LOCAL nDiff := 0
 
    IF ::nItems == 0
       RETURN .F.
    ENDIF
    ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .f.)
-   ::nFirstRow := Max( Min( ::nFirstRow + nMoveScreen, ::nItems - nSize ), 1 )
+   ::nFirstRow := Max( Min( ::nFirstRow + nMoveScreen, ::nItems - ::nSize ), 1 )
    DO WHILE nBounce < 2
-      ::nOption += nMove
+      ::nOption += nMove                 
       IF ::nOption < 1
          ::nOption := 1
          nDirection := 1
@@ -379,7 +412,7 @@ LOCAL nBottom
          nDirection := -1
          nMove := 0
          nBounce++
-         ::nFirstRow := ::nItems - nSize
+         ::nFirstRow := ::nItems - ::nSize
       ELSE
          nMove := nDirection
          IF IsAvailableItem( ::nOption )
@@ -387,18 +420,18 @@ LOCAL nBottom
          ENDIF
       ENDIF
    ENDDO
-   ::nFirstRow := Max( Min( Max( Min( ::nFirstRow, ::nOption ), ::nOption - nSize ), ::nItems - nSize ), 1 )
+   ::nFirstRow := Max( Min( Max( Min( ::nFirstRow, ::nOption ), ::nOption - ::nSize ), ::nItems - ::nSize ), 1 )
    nBottom := Min( ::nTop + ::nItems - 1, ::nBottom )
    IF nBounce != 2
       IF ::nFirstRow != nLastFirstRow
-         IF ABS( ::nFirstRow - nLastFirstRow ) > nSize
-            ::DrawRows( 0, nSize, .F. )
+         IF ABS( ::nFirstRow - nLastFirstRow ) > ::nSize
+            ::DrawRows( 0, ::nSize, .F. )
          ELSEIF ::nFirstRow < nLastFirstRow
             ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
             ::DrawRows( 0, nLastFirstRow - ::nFirstRow - 1, .F. )
          ELSE
             ScrollFixed( ::nTop, ::nLeft, nBottom, ::nRight, ::nFirstRow - nLastFirstRow )
-            ::DrawRows( nSize - ( ::nFirstRow - nLastFirstRow ) + 1, nSize, .F. )
+            ::DrawRows( ::nSize - ( ::nFirstRow - nLastFirstRow ) + 1, ::nSize, .F. )
          ENDIF
       ENDIF
       ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .F. )
