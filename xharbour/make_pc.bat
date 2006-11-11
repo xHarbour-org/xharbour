@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.12 2006/07/18 15:55:50 modalsist Exp $
+rem $Id: make_pc.bat,v 1.13 2006/11/06 10:20:14 marchuet Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -242,6 +242,8 @@ if "%1" == "MT"  goto MT
    if exist %LIB_DIR%\ctmt.lib             del %LIB_DIR%\ctmt.lib
    if exist %LIB_DIR%\dbfcdx.lib           del %LIB_DIR%\dbfcdx.lib
    if exist %LIB_DIR%\dbfcdxmt.lib         del %LIB_DIR%\dbfcdxmt.lib
+   if exist %LIB_DIR%\bmdbfcdx.lib         del %LIB_DIR%\bmdbfcdx.lib
+   if exist %LIB_DIR%\bmdbfcdxmt.lib       del %LIB_DIR%\bmdbfcdxmt.lib
    if exist %LIB_DIR%\dbfdbt.lib           del %LIB_DIR%\dbfdbt.lib
    if exist %LIB_DIR%\dbfdbtmt.lib         del %LIB_DIR%\dbfdbtmt.lib
    if exist %LIB_DIR%\dbffpt.lib           del %LIB_DIR%\dbffpt.lib

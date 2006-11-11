@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.27 2006/07/27 16:47:37 map Exp $
+rem $Id: make_b32.bat,v 1.28 2006/11/06 10:20:14 marchuet Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -80,6 +80,7 @@ if not exist bin\b32 md bin\b32
    if exist lib\fmstat.lib     del lib\fmstat.lib
    if exist lib\fmstatmt.lib   del lib\fmstatmt.lib
    if exist lib\gtcgi.lib      del lib\gtcgi.lib
+   if exist lib\gtgui.lib      del lib\gtgui.lib
    if exist lib\gtnul.lib      del lib\gtnul.lib
    if exist lib\gtpca.lib      del lib\gtpca.lib
    if exist lib\gtstd.lib      del lib\gtstd.lib
@@ -92,6 +93,7 @@ if not exist bin\b32 md bin\b32
    if exist lib\hsx.lib        del lib\hsx.lib
    if exist lib\hsxmt.lib      del lib\hsxmt.lib
    if exist lib\lang.lib       del lib\lang.lib
+   if exist lib\libmisc.lib    del lib\libmisc.lib
    if exist lib\macro.lib      del lib\macro.lib
    if exist lib\macromt.lib    del lib\macromt.lib
    if exist lib\nulsys.lib     del lib\nulsys.lib
@@ -104,6 +106,8 @@ if not exist bin\b32 md bin\b32
    if exist lib\ppmt.lib       del lib\ppmt.lib
    if exist lib\rdd.lib        del lib\rdd.lib
    if exist lib\rddmt.lib      del lib\rddmt.lib
+   if exist lib\rdds.lib       del lib\rdds.lib
+   if exist lib\rddsmt.lib     del lib\rddsmt.lib
    if exist lib\rtl.lib        del lib\rtl.lib
    if exist lib\rtlmt.lib      del lib\rtlmt.lib
    if exist lib\samples.lib    del lib\samples.lib
@@ -112,6 +116,8 @@ if not exist bin\b32 md bin\b32
    if exist lib\sixcdxmt.lib   del lib\sixcdxmt.lib
    if exist lib\tip.lib        del lib\tip.lib
    if exist lib\tipmt.lib      del lib\tipmt.lib
+   if exist lib\usrrdd.lib     del lib\usrrdd.lib
+   if exist lib\usrrddmt.lib   del lib\usrrddmt.lib
    if exist lib\vm.lib         del lib\vm.lib
    if exist lib\vmmt.lib       del lib\vmmt.lib
 

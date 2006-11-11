@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.44 2006/03/27 14:58:22 modalsist Exp $
+ * $Id: transfrm.c,v 1.45 2006/11/11 00:41:04 modalsist Exp $
  */
 
 /*
@@ -745,13 +745,14 @@ HB_FUNC( TRANSFORM )
          //                    dot in the string.
          if( bAdjust && iWidth2 > 0 )
          {
-           char cStr[ iWidth2  ];
+           char * szStr2 = hb_xgrab( iWidth2 );
 
            for( i = 0; i <= iWidth2; i++ )
            {
-             cStr[ i ] = szStr[ i+1 ];
+             szStr2[ i ] = szStr[ i+1 ];
            }
-           szStr = (char *) cStr;
+           strcpy( szStr, szStr2 );
+           hb_xfree( szStr2 );
          }
 
          if( szStr )
