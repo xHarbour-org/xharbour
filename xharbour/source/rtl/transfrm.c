@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.43 2006/03/25 20:29:55 modalsist Exp $
+ * $Id: transfrm.c,v 1.44 2006/03/27 14:58:22 modalsist Exp $
  */
 
 /*
@@ -631,6 +631,9 @@ HB_FUNC( TRANSFORM )
          BOOL     bPDec  = FALSE;
          BOOL     bTrueDec = FALSE;
 
+         BOOL     bAdjust = FALSE;
+         int      iWidth2 = 0;
+
          dValue = hb_itemGetND( pValue );
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
@@ -680,6 +683,7 @@ HB_FUNC( TRANSFORM )
          }
          iWidth = iCount;
 
+
          if( bFound )                                 /* Did we find a dot        */
          {
             iDec = 0;
@@ -705,6 +709,7 @@ HB_FUNC( TRANSFORM )
          else
             iDec = 0;
 
+
          if( ( uiPicFlags & ( PF_DEBIT + PF_PARNEG + PF_PARNEGWOS ) ) && dValue < 0 )
             dPush = -dValue;                           /* Always push absolute val */
          else
@@ -720,14 +725,43 @@ HB_FUNC( TRANSFORM )
             iDec = iOrigDec;                           /* Push original decimals   */
          }
 
+         // 2006/NOV/10 - E.F. iWidth need be adjusted to avoid szStr null if 
+         //                    we have not a number before the decimal dot.
+         //                    For example: .9999 
+         if( iDec > 0 && (iWidth - iDec == 1) )
+         {
+             iWidth2 = iWidth;
+             iWidth++;
+             bAdjust = TRUE;
+         }
+
          szStr = hb_itemStr(
             hb_itemPutNDLen( &Number, dPush, -1, iDec ),
             hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
             hb_itemPutNI( &Dec, iDec ));
 
+
+         // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal 
+         //                    dot in the string.
+         if( bAdjust && iWidth2 > 0 )
+         {
+           char cStr[ iWidth2  ];
+
+           for( i = 0; i <= iWidth2; i++ )
+           {
+             cStr[ i ] = szStr[ i+1 ];
+           }
+           szStr = (char *) cStr;
+         }
+
          if( szStr )
          {
             iCount = 0;
+
+            // 2006/NOV/10 - E.F. iCount need be increased to avoid double 
+            //                    decimal dot in the picture.
+            if( bAdjust && iWidth2 > 0 )
+              iCount++;
 
             /* Pad with padding char */
             if( uiPicFlags & PF_PADL )
