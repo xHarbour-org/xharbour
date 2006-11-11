@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5237 2006/11/10 17:46:05 modalsist Exp $
+ * $Id: ChangeLog,v 1.5238 2006/11/11 00:40:35 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-11 04:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * harbour/source/rdd/workarea.c
+    * minor modification
+
+  * harbour/source/rdd/dbfcdx/dbfcdx1.c
+    * minor Clipper compatibility update
+
+  * xharbour/bin/hb-func.sh
+    + added linker parametrs to hbcc
+
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/rddads.h
+    + added #define WIN32 when HB_OS_WIN_32 is set to not force -DWIN32
+      compiler switch
+    * indenting
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/common/hbstr.c
+  * xharbour/source/rtl/strings.c
+   + added hb_strRemEscSeq()
+   * moved hb_strnicmp() from RTL to COMMON
+
+  * xharbour/include/hbapifs.h
+  * xharbour/source/common/hbfsapi.c
+    * changed first parameters of hb_fsAddSearchPath() to const char *
+
+  * xharbour/include/hbrddcdx.h
+    * indenting
+
+  * xharbour/source/compiler/harbour.slx
+    + added support for \q in extended strings (e"...")
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed minor race condition in ordKetGoto()
+
+  * xharbour/source/rtl/tclass.prg
+    + added commented out support for self class casting
 
 2006-11-10 22:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\transfrm.c

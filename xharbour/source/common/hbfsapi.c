@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.7 2005/08/01 22:18:27 druzus Exp $
+ * $Id: hbfsapi.c,v 1.8 2005/11/01 22:05:19 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ extern void hb_fhnd_ForceLink( void );
 /*
  * Function that adds zero or more paths to a list of pathnames to search
  */
-void hb_fsAddSearchPath( char * szPath, HB_PATHNAMES ** pSearchList )
+void hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList )
 {
    char * pPath;
    char * pDelim;

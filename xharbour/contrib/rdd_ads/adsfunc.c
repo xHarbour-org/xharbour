@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.76 2006/09/26 09:03:26 brianhays Exp $
+ * $Id: adsfunc.c,v 1.77 2006/09/29 00:38:57 ronpinkas Exp $
  */
 
 /*
@@ -2094,7 +2094,7 @@ HB_FUNC( ADSDDCREATE )
 {
    UNSIGNED32 ulRetVal;
    UNSIGNED8  *pucDictionaryPath = (UNSIGNED8 *) hb_parcx( 1 );
-   UNSIGNED16 usEncrypt          = (UNSIGNED16) ( ISNUM( 2 ) ? hb_parnl( 2 ) : (ISLOG( 2 ) ? hb_parl( 2 ) : 0 ) ) ;
+   UNSIGNED16 usEncrypt          = (UNSIGNED16) ( ISNUM( 2 ) ? hb_parnl( 2 ) : ( ISLOG( 2 ) ? hb_parl( 2 ) : 0 ) );
    UNSIGNED8  *pucDescription    = ISCHAR( 3 ) ? (UNSIGNED8 *) hb_parcx( 3 ) : NULL;
    ADSHANDLE hConnect = 0;
 

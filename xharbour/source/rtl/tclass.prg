@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.19 2006/04/24 22:24:38 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.20 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -210,6 +210,7 @@ STATIC PROCEDURE Create( MetaClass )
          __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), ++nDataBegin, HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
       NEXT
    ENDIF
+//   __clsAddMsg( hClass, Upper( ::cName ), 0, HB_OO_MSG_SUPER, hClass, 1 )
 
    ::hClass := hClass
 

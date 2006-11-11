@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.43 2005/11/01 22:00:43 druzus Exp $
+ * $Id: hbapifs.h,v 1.44 2005/11/22 02:01:43 druzus Exp $
  */
 
 /*
@@ -193,7 +193,7 @@ typedef struct _HB_PATHNAMES
    struct _HB_PATHNAMES * pNext;
 } HB_PATHNAMES;
 
-extern void    HB_EXPORT hb_fsAddSearchPath( char * szPath, HB_PATHNAMES ** pSearchList );
+extern void    HB_EXPORT hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList );
 extern void    HB_EXPORT hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList );
 
 extern BOOL    HB_EXPORT hb_spFile( BYTE * pFilename, BYTE * pRetPath );

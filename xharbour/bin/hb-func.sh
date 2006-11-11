@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-func.sh,v 1.74 2006/06/02 12:34:09 druzus Exp $
+# $Id: hb-func.sh,v 1.75 2006/06/28 22:30:03 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -300,6 +300,7 @@ GCC_PATHS="\${HB_PATHS} -L\${HB_LIB_INSTALL}"
 LN_OPT="${CC_L_USR}"
 CC_OPT="${CC_C_USR}"
 HB_OPT="${CC_PRG_USR}"
+[ "\${HB_GEN}" != "" ] || HB_OPT="\${HB_OPT} -gc0"
 
 HB_GPM_LIB=""
 if [ -f "\${HB_LIB_INSTALL}/libgtsln.a" ]; then
@@ -419,7 +420,7 @@ FOUTE="\${FOUTE%.[oc]}${hb_exesuf}"
 
 hb_cc()
 {
-    ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} \${GCC_PATHS}
+    ${CCPREFIX}\${HB_CC} "\$@" \${CC_OPT} \${GCC_PATHS} \${HB_USRLPATH} \${HB_USRLIBS}
 }
 
 hb_cmp()

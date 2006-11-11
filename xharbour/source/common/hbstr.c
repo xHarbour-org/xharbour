@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.20 2005/04/25 23:11:01 druzus Exp $
+ * $Id: hbstr.c,v 1.21 2005/06/22 15:30:16 druzus Exp $
  */
 
 /*
@@ -184,6 +184,31 @@ HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
 
    return rc;
 }
+
+HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
+{
+   ULONG ulCount;
+   int rc = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strnicmp(%s, %s, %lu)", s1, s2, count));
+
+   for( ulCount = 0; ulCount < count; ulCount++ )
+   {
+      unsigned char c1 = toupper( (unsigned char) s1[ ulCount ] );
+      unsigned char c2 = toupper( (unsigned char) s2[ ulCount ] );
+
+      if( c1 != c2 )
+      {
+         rc = ( c1 < c2 ? -1 : 1 );
+         break;
+      }
+      else if ( !c1 )
+         break;
+   }
+
+   return rc;
+}
+
 
 /*
 AJ: 2004-02-23
@@ -827,9 +852,64 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
    return pBuf;
 }
 
+char * hb_strRemEscSeq( char *str, ULONG *pLen )
+{
+   char *ptr, *dst, ch;
+   ULONG ul = *pLen, ulStripped = 0;
+
+   ptr = dst = str;
+   while( ul )
+   {
+      if( *ptr == '\\' )
+         break;
+      ++ptr; ++dst;
+      --ul;
+   }
+
+   while( ul-- )
+   {
+      ch = *ptr++;
+      if( ch == '\\' )
+      {
+         ++ulStripped;
+         ch = *ptr++;
+         switch( ch )
+         {
+            case 'r':
+               ch = '\r';
+               break;
+            case 'n':
+               ch = '\n';
+               break;
+            case 't':
+               ch = '\t';
+               break;
+            case 'b':
+               ch = '\b';
+               break;
+            case 'q':
+               ch = '"';
+               break;
+            case '\\':
+            default:
+               break;
+         }
+      }
+      *dst++ = ch;
+   }
+
+   if( ulStripped )
+   {
+      *dst = '\0';
+      *pLen -= ulStripped;
+   }
+
+   return str;
+}
+
 /*
-  Simple routine to extract uncommented part of (read) buffer
-*/
+ * Simple routine to extract uncommented part of (read) buffer
+ */
 HB_EXPORT char *hb_stripOutComments( char* buffer )
 {
    if( buffer && *buffer )

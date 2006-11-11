@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.14 2006/10/12 19:47:33 ronpinkas Exp $
+ * $Id: rddads.h,v 1.15 2006/10/13 22:48:21 ronpinkas Exp $
  */
 
 /*
@@ -55,6 +55,9 @@
 #endif
 
 #include "hbapirdd.h"
+#if defined( HB_OS_WIN_32 ) && !defined( WIN32 )
+   #define WIN32
+#endif
 #include "ace.h"
 
 #undef ADS_MAX_KEY_LENGTH
@@ -172,15 +175,15 @@ extern ADSAREAP hb_rddGetADSWorkAreaPointer( void );
    extern char * hb_adsAnsiToOem( char * pcString, ULONG ulLen );
    void hb_adsOemAnsiFree( char * pcString );
 
-    UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
-                                          UNSIGNED8  *pucFldName,
-                                          UNSIGNED8  *pucBuf,
-                                          UNSIGNED32 ulLen );
+   UNSIGNED32 ENTRYPOINT AdsSetFieldRaw( ADSHANDLE  hObj,
+                                         UNSIGNED8  *pucFldName,
+                                         UNSIGNED8  *pucBuf,
+                                         UNSIGNED32 ulLen );
 
-    UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
-                                          UNSIGNED8  *pucFldName,
-                                          UNSIGNED8  *pucBuf,
-                                          UNSIGNED32 *pulLen );
+   UNSIGNED32 ENTRYPOINT AdsGetFieldRaw( ADSHANDLE  hTbl,
+                                         UNSIGNED8  *pucFldName,
+                                         UNSIGNED8  *pucBuf,
+                                         UNSIGNED32 *pulLen );
 
 #else
 #  define hb_adsOemToAnsi( s, l )     ( s )

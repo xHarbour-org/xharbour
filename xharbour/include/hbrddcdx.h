@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddcdx.h,v 1.52 2006/06/07 15:57:29 druzus Exp $
+ * $Id: hbrddcdx.h,v 1.53 2006/06/27 21:26:00 druzus Exp $
  */
 
 /*
@@ -328,7 +328,7 @@ typedef struct _CDXTAG
 
    BOOL     UsrAscend;        /* user settable ascending/descending order flag */
    BOOL     UsrUnique;        /* user settable unique order flag */
-   
+
    BOOL     TagChanged;
    BOOL     TagBOF;
    BOOL     TagEOF;
