@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.45 2006/11/11 00:41:04 modalsist Exp $
+ * $Id: transfrm.c,v 1.46 2006/11/11 13:32:18 modalsist Exp $
  */
 
 /*
@@ -747,7 +747,7 @@ HB_FUNC( TRANSFORM )
          {
            char * szStr2 = hb_xgrab( iWidth2 );
 
-           for( i = 0; i <= iWidth2; i++ )
+           for( i = 0; i <= ( ULONG ) iWidth2; i++ )
            {
              szStr2[ i ] = szStr[ i+1 ];
            }
