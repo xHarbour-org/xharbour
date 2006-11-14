@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.254 2006/11/02 11:24:54 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.255 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -7467,7 +7467,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
       {
          if( fTemporary )
          {
-            hFile = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, ( BYTE * ) szTempFile );
+            hFile = hb_fsCreateTemp( NULL, NULL, FC_TEMPORARY, ( BYTE * ) szTempFile );
             fNewFile = TRUE;
          }
          else
@@ -8557,7 +8557,7 @@ static void hb_cdxSortWritePage( LPCDXSORTINFO pSort )
    if ( pSort->hTempFile == FS_ERROR )
    {
       BYTE szName[ _POSIX_PATH_MAX + 1 ];
-      pSort->hTempFile = hb_fsCreateTemp( NULL, NULL, FC_NORMAL, szName );
+      pSort->hTempFile = hb_fsCreateTemp( NULL, NULL, FC_TEMPORARY, szName );
       if ( pSort->hTempFile == FS_ERROR )
       {
          hb_errInternal( 9999, "hb_cdxSortWritePage: Can't create temporary file.", "", "" );
