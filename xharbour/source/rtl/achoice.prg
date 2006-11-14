@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.30 2005/12/07 15:32:02 guerra000 Exp $
+ * $Id: achoice.prg,v 1.31 2006/11/10 17:47:07 modalsist Exp $
  */
 
 /*
@@ -146,6 +146,7 @@ LOCAL nKey, bAction, nAux
 LOCAL nSaveCsr := SetCursor( SC_NONE )
 LOCAL lFirstTime := .t.
 LOCAL nGotoItem
+LOCAL nPage := ::nSize + 1
 
    lNoItems := ! ::ValidateArray()
 
@@ -223,14 +224,13 @@ LOCAL nGotoItem
          CASE K_PGUP           // Previous screen
             nAux := ::nOption
             // 2006/NOV/10 - E.F. Adjusted to which item skip backward.
-            nGotoItem := ::nSize
-            if (::nFirstRow - ::nSize)  < 1
-               nGotoItem := ::nSize - Abs( ::nFirstRow - ::nSize ) - 1
+            nGotoItem := nPage
+            if (::nFirstRow - nPage)  < 1
+               nGotoItem := nPage - Abs( ::nFirstRow - nPage ) - 1
                if nGotoItem <= 0
-                  nGotoItem := ::nSize
+                  nGotoItem := nPage
                endif
             endif
-            //::MoveCursor( - MAX( ::nSize, 1 ), -1, - MAX( ::nSize, 1 ) )
             ::MoveCursor( - MAX( nGotoItem, 1 ), -1, - MAX( nGotoItem, 1 ) )
             nUserMode := IF( nAux > ::nOption, AC_NO_USER_FUNCTION, AC_HITTOP )
             EXIT
@@ -239,14 +239,13 @@ LOCAL nGotoItem
          CASE K_PGDN           // Next screen
             nAux := ::nOption
             // 2006/NOV/10 - E.F. Adjusted to which item skip forward.
-            nGotoItem := ::nSize
-            if (::nFirstRow + ::nSize + ::nSize) > ::nItems
-               nGotoItem := ::nSize - ( (::nFirstRow + ::nSize + ::nSize) - ::nItems )
+            nGotoItem := nPage
+            if (::nFirstRow + nPage + nPage ) > ::nItems
+               nGotoItem := nPage - ( (::nFirstRow + nPage + nPage) - ::nItems ) + 1
                if nGotoItem <= 0
-                  nGotoItem := ::nSize
+                  nGotoItem := nPage
                endif
             endif
-            //::MoveCursor( MAX( ::nSize, 1 ), 1, MAX( ::nSize, 1 ) )
             ::MoveCursor( MAX( nGotoItem, 1 ), 1, MAX( nGotoItem, 1 ) )
             nUserMode := IF( nAux < ::nOption, AC_NO_USER_FUNCTION, AC_HITBOTTOM )
             EXIT

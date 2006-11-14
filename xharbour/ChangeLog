@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5242 2006/11/14 08:58:03 marchuet Exp $
+ * $Id: ChangeLog,v 1.5243 2006/11/14 09:46:32 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-14 09:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\achoice.prg
+    * minor fix for page-down and page-up movements, Clipper's achoice
+      is buggy. Suggested by Ken Wantz.
 
 2006-11-14 10:42 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/fileio.ch
