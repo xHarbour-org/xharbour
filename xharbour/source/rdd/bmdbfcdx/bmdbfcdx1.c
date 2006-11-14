@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.12 2006/10/24 16:04:39 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.13 2006/11/02 11:24:54 marchuet Exp $
  */
 
 /*
@@ -4457,7 +4457,7 @@ static void hb_cdxTagGoTop( LPCDXTAG pTag )
 }
 
 /*
- * Go to the last visiable record in Tag
+ * Go to the last visible record in Tag
  */
 static void hb_cdxTagGoBottom( LPCDXTAG pTag )
 {
@@ -6127,8 +6127,9 @@ static ERRCODE hb_cdxDBOIKeyGoto( CDXAREAP pArea, LPCDXTAG pTag, ULONG ulKeyNo, 
    {
       if ( fLogOpt && fFilters && pArea->dbfi.itmCobExpr )
       {
-         SELF_GOTOP( ( AREAP ) pArea );
-         retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt - 1 );
+         retval = SELF_GOTOP( ( AREAP ) pArea );
+         if( retval == SUCCESS && --ulKeyCnt )
+            retval = SELF_SKIP( ( AREAP ) pArea, ulKeyCnt );
       }
       else
       {
