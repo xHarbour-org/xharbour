@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.158 2006/06/06 08:14:32 mauriliolongo Exp $
+ * $Id: filesys.c,v 1.159 2006/11/14 09:46:32 marchuet Exp $
  */
 
 /*
@@ -390,15 +390,15 @@ static void convert_open_flags( BOOL fCreate, USHORT uiAttr, USHORT uiFlags,
    {
       *dwAttr = FILE_ATTRIBUTE_NORMAL;
    }
-#if !defined( HB_OS_UNIX )
-   else if( uiAttr & FC_TEMPORARY )
+#if defined( HB_OS_WIN_32 )
+   else if( uiAttr == FC_TEMPORARY )
    {
          *dwAttr = FILE_ATTRIBUTE_TEMPORARY;
    }
 #endif
    else
    {
-#if !defined( HB_OS_UNIX )
+#if defined( HB_OS_WIN_32 )
       if( uiAttr & FC_TEMPORARY )
          *dwAttr = FILE_ATTRIBUTE_TEMPORARY;
       else
