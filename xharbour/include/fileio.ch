@@ -1,5 +1,5 @@
 /*
- * $Id: fileio.ch,v 1.3 2004/05/17 02:40:06 guerra000 Exp $
+ * $Id: fileio.ch,v 1.4 2006/11/14 09:46:32 marchuet Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 #define FC_READONLY   1        /* Read-only file attribute is set */
 #define FC_HIDDEN     2        /* Hidden file attribute is set    */
 #define FC_SYSTEM     4        /* System file attribute is set    */
-#define FC_TEMPORARY  5        /* Temporary file attribute is set    */
+#define FC_TEMPORARY  8        /* Temporary file attribute is set */
 
 /* File access flags */
 #define FO_READ       0        /* File is opened for reading             */
