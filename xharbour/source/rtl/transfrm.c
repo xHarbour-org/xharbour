@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.46 2006/11/11 13:32:18 modalsist Exp $
+ * $Id: transfrm.c,v 1.47 2006/11/12 21:01:35 enricomaria Exp $
  */
 
 /*
@@ -479,7 +479,7 @@ HB_FUNC( TRANSFORM )
          * of the current format date setting.
          * NOTE: In CA-Clipper, set date ANSI and JAPAN inverts year with
          * month, instead day with month, but if SET CENTURY is ON then the
-         * result is buggy. 
+         * result is buggy.
          * Example: 2006/03/25 will return 6/02003/25 instead 03/2006/25
          *
          * Previous code:
@@ -503,7 +503,7 @@ HB_FUNC( TRANSFORM )
                else if( strcmp( cDtFormat, "yyyy.mm.dd") == 0 )
                   {
                   cDtFormat = "YYYY.DD.MM" ;
-                  //cDtFormat = "MM.YYYY.DD" ; /* Same as Clipper */ 
+                  //cDtFormat = "MM.YYYY.DD" ; /* Same as Clipper */
                   }
                // set date British or French
                else if( strcmp( cDtFormat, "dd/mm/yyyy") == 0 )
@@ -586,9 +586,9 @@ HB_FUNC( TRANSFORM )
                ( uiPicFlags & PF_BRITISH ) ?
                  ( hb_set.hb_set_century ? "DD/MM/YYYY" : "DD/MM/YY" ) :
                  hb_set.HB_SET_DATEFORMAT );
-       
+
             ulPicLen = strlen( szPicDate );
-       
+
             for( nFor = 0; nFor < ulPicLen; nFor++ )
             {
                if( szPicDate[ nFor ] != '9' )
@@ -725,9 +725,9 @@ HB_FUNC( TRANSFORM )
             iDec = iOrigDec;                           /* Push original decimals   */
          }
 
-         // 2006/NOV/10 - E.F. iWidth need be adjusted to avoid szStr null if 
+         // 2006/NOV/10 - E.F. iWidth need be adjusted to avoid szStr null if
          //                    we have not a number before the decimal dot.
-         //                    For example: .9999 
+         //                    For example: .9999
          if( iDec > 0 && (iWidth - iDec == 1) )
          {
              iWidth2 = iWidth;
@@ -741,11 +741,11 @@ HB_FUNC( TRANSFORM )
             hb_itemPutNI( &Dec, iDec ));
 
 
-         // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal 
+         // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal
          //                    dot in the string.
          if( bAdjust && iWidth2 > 0 )
          {
-           char * szStr2 = hb_xgrab( iWidth2 );
+           char * szStr2 = (char *) hb_xgrab( iWidth2 );
 
            for( i = 0; i <= ( ULONG ) iWidth2; i++ )
            {
@@ -759,7 +759,7 @@ HB_FUNC( TRANSFORM )
          {
             iCount = 0;
 
-            // 2006/NOV/10 - E.F. iCount need be increased to avoid double 
+            // 2006/NOV/10 - E.F. iCount need be increased to avoid double
             //                    decimal dot in the picture.
             if( bAdjust && iWidth2 > 0 )
               iCount++;
@@ -850,7 +850,7 @@ HB_FUNC( TRANSFORM )
 
                /* 2006/03/27 - Eduardo Fernandes <modalsist@yahoo.com.br>
                   ulPicLen = 0 ( @E only, without 9,#,$,* in picture) */
-               if( uiPicFlags & PF_BRITISH )  // @E 
+               if( uiPicFlags & PF_BRITISH )  // @E
                {
                  for( i = 0; i < strlen(szResult); i++ )
                  {

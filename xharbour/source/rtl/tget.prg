@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.118 2006/08/14 11:20:34 modalsist Exp $
+ * $Id: tget.prg,v 1.119 2006/10/30 13:45:53 modalsist Exp $
  */
 
 /*
@@ -219,7 +219,7 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::SubScript      := NIL
 	 */
 
-   ::ExitState      := 0
+   //::ExitState      := 0 // NIL in Clipper
    ::nLastExitState := 0
    ::nOldPos        := 0
 
@@ -833,7 +833,7 @@ METHOD VarGet() CLASS Get
       cVarGet := Str( xVarGet, nLen, nDec )
 
       // We need recalc decimal pos if picture is left justified.
-      IF "B" IN ::cPicFunc 
+      IF "B" IN ::cPicFunc
          nDecPos := Rat( iif(::lDecRev .OR. "E" IN ::cPicFunc,",","."), ::cPicMask )
       ENDIF
 
@@ -841,9 +841,9 @@ METHOD VarGet() CLASS Get
       IF Empty( SubStr( cVarGet, 1, nDecPos-1) )
          cVarGet := Stuff( cVarGet, nDecPos-1, 1, "0")
       ENDIF
-      
+
       // Fill with zeros after decimal dot, if empty.
-      IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) ) 
+      IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) )
          cVarGet := Stuff( cVarGet, nDecPos+1, ::nMaxLen - nDecPos, replicate("0",::nMaxLen - nDecPos) )
       ENDIF
 
@@ -857,7 +857,7 @@ METHOD VarGet() CLASS Get
    ENDIF
 
    ::xVarGet := xVarGet
-   
+
 RETURN xVarGet
 
 //---------------------------------------------------------------------------//
@@ -1013,7 +1013,7 @@ METHOD Untransform( cBuffer ) CLASS Get
 *                  that said, while there was this loop?
 *                  I've replaced it with the iif( ::minus... ) which is shorter and
 *                  evaluates correctly a buffer containing "  -.10"
-*       
+*
 *     if ::minus
 *        For each cChar in cBuffer
 *           if IsDigit( cChar )
@@ -1027,7 +1027,7 @@ METHOD Untransform( cBuffer ) CLASS Get
 *        else
 *           cBuffer := "-" + cBuffer
 *        endif
-*     endif 
+*     endif
 */
 
       /* 2006/JUN/07 - E.F. Adjust buffer string in case of var get without
@@ -1378,14 +1378,14 @@ METHOD ToDecPos() CLASS Get
    ::lEdit  := .t.
    ::Buffer := ::PutMask( ::UnTransform(), .f. )
    ::Pos    := ::DecPos + 1
-   
+
    ::Display( .t. )
 
    /* E.F. 2006/APRIL/12 - Re-entry of buffer value to update ::xVarGet
     * into VarGet()
     */
    ::VarPut( Val(::buffer), .t. )
-   
+
 return Self
 
 //---------------------------------------------------------------------------//
@@ -1438,7 +1438,7 @@ METHOD Input( cChar ) CLASS Get
             ::ToDecPos()
             return ""
          else
-            ::minus := .t. 
+            ::minus := .t.
          endif
          exit
 
@@ -1808,15 +1808,15 @@ METHOD DeleteAll() CLASS Get
    ::buffer := ::PutMask( xValue, .t. )
    ::Pos    := ::FirstEditable()
 
-   /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E','@R' 
+   /* E.F. 2006/APRIL/14 - Clipper show all commas and dots of '@E','@R'
     * masks of numeric vars, into display edit buffer after first key number
     * is entered.
     * E.F. 2006/MAY/31 - Idem for numeric mask without '@E' or '@R' as
     * pict '999,999,999.99' also.
     */
    IF ::type=="N" .AND. ::buffer != NIL .AND. !empty(::cPicture) .AND.;
-      ("," IN ::cPicture .AND. "." IN ::cPicture) 
-      IF "R" IN ::cPicFunc .AND. !("E" IN ::cPicFunc) .OR. Empty( ::cPicFunc ) 
+      ("," IN ::cPicture .AND. "." IN ::cPicture)
+      IF "R" IN ::cPicFunc .AND. !("E" IN ::cPicFunc) .OR. Empty( ::cPicFunc )
          ::buffer := StrTran(::buffer, ".", "" )
          ::buffer := StrTran(::buffer, ",", "" )
          ::buffer := Transform( ::buffer, ::cPicture )
@@ -2116,7 +2116,7 @@ STATIC FUNCTION InvertDwM( cDate )
    Invert day with month to date format if "@E" picture is used.*/
 
   IF SubStr( SET(_SET_DATEFORMAT),1,2) == "yy" // set date ANSI and JAPAN
-     IF __SetCentury() 
+     IF __SetCentury()
         cDate := SubStr( cDate, 1, 5 ) + SubStr( cDate, 9, 2 ) + SubStr( cDate, 8, 1 ) + SubStr( cDate, 6, 2 )
      ELSE
         cDate := SubStr( cDate, 1, 3 ) + SubStr( cDate, 7, 2 ) + SubStr( cDate, 6, 1 ) + SubStr( cDate, 4, 2 )
@@ -2202,7 +2202,7 @@ STATIC FUNCTION HowMuchNumeric( cPict )
 LOCAL c := ""
 LOCAL r := 0
 
- /* E.F. 2006/MAY/05 - added space and % as part of picture also. */ 
+ /* E.F. 2006/MAY/05 - added space and % as part of picture also. */
  FOR EACH c IN cPict
      IF c IN "9#*$ %"
         r++

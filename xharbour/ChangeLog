@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5244 2006/11/14 11:30:37 modalsist Exp $
+ * $Id: ChangeLog,v 1.5245 2006/11/15 08:56:32 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2006-11-17 08:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/tget.prg
+    - Commented initialization of :ExitState in :New() in Clipper it's NIL
+
+  * source/rtl/transfrm.c
+    * Missing type cast
 
 2006-11-15 10:55 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source\rtl\filesys.c
@@ -23,15 +30,15 @@
   * source\rdd\bmdbfcdx\bmdbfcdx.c
   * source\rdd\dbfcdx\dbfcdx.c
   * source\rtl\filesys.c
-    + Added flag FC_TEMPORARY to give to support to the creation of real 
-      temporary files under platform Windows. That whenever possible the 
+    + Added flag FC_TEMPORARY to give to support to the creation of real
+      temporary files under platform Windows. That whenever possible the
       system will maintain them in buffer. Other platforms are not proven.
 
       FILE_ATTRIBUTE_TEMPORARY:
 
-      A file is being used for temporary storage. File systems avoid writing data 
-      back to mass storage if sufficient cache memory is available, because an 
-      application deletes a temporary file after a handle is closed. In that case, the system 
+      A file is being used for temporary storage. File systems avoid writing data
+      back to mass storage if sufficient cache memory is available, because an
+      application deletes a temporary file after a handle is closed. In that case, the system
       can entirely avoid writing the data. Otherwise, the data is written after the handle is closed.
 
 2006-11-14 09:57 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
@@ -115,13 +122,13 @@
    + source\codepage\cpsv850.c
    + source\codepage\cpsvclip.c
    + source\codepage\cpsvwin.c
-   * hrbdll.bc  
+   * hrbdll.bc
    * hrbdll.dc
    * hrbdll.gc
    * hrbdll.pc
    * hrbdll.vc
    * hrbdll.wc
-   * makefile.bc  
+   * makefile.bc
    * makefile.dc
    * makefile.gc
    * makefile.pc
