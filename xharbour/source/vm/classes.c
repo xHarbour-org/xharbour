@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.195 2006/09/22 18:53:25 ronpinkas Exp $
+ * $Id: classes.c,v 1.196 2006/09/25 07:22:11 enricomaria Exp $
  */
 
 /*
@@ -3869,11 +3869,16 @@ static HARBOUR hb___msgDelegate( void )
          {
             pClass = s_pClasses + pObject->item.asArray.value->uiClass - 1;
             uiIndex = hb_clsFindMethod( pMsg, pClass, NULL );
+/*
+            Vicente Guerra 2006/11/18:
+            It's copying the "delegated" object to CLASS' area, instead of
+            current object's area.
             if( uiIndex )
             {
                (HB_VM_STACK.pMethod)->uiData = uiIndex;
                hb_itemCopy( (HB_VM_STACK.pMethod)->pInitValue, pObject );
             }
+*/
          }
       }
       pSelf = pObject;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5246 2006/11/17 12:33:46 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5247 2006/11/18 21:37:35 oh1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-18 16:39 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/classes.c
+    ! Fixed: All DELEGATE messages were sent to the first "delegated"
+      object.
 
 2006-11-18 22:40 UTC+0100 Henryk Olkowski <oh1@op.pl>
   * source/ct/getinfo.prg
