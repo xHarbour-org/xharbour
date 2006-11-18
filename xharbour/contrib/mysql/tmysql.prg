@@ -1,5 +1,5 @@
  /*
- * $Id: tmysql.prg,v 1.14 2004/02/26 04:16:38 peterrees Exp $
+ * $Id: tmysql.prg,v 1.15 2004/03/17 01:24:04 lculik Exp $
  */
 
  /*
@@ -666,7 +666,7 @@ METHOD FieldType( nNum ) CLASS TMySQLQuery
 
    local cType := "U"
 
-   if nNum >= 0 .AND. nNum <= ::nNumFields
+   if nNum >= 1 .AND. nNum <= ::nNumFields
 
       cType := SQL2ClipType( ::aFieldStruct[ nNum ][ MYSQL_FS_TYPE ] )
 
@@ -1657,4 +1657,3 @@ static function ARRAYBLOCK( nIndex )
    bBlock := {|Self, x | iif( PCount() == 1, ::aRow[ nIndex ], ::aRow[ nIndex ] := x ) }
 
 return bBlock
-

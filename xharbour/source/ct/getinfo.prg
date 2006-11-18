@@ -1,5 +1,5 @@
 /*
- * $Id: getinfo.prg,v 1.2 2004/12/02 13:25:53 aleytys Exp $
+ * $Id: getinfo.prg,v 1.3 2004/12/08 14:04:45 aleytys Exp $
  */
 /*
  * xHarbour Project source code:
@@ -82,7 +82,7 @@ RETURN nPos
 FUNCTION GetFldRow( nField )
   LOCAL nRow := -1
   DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 0 .AND. nField <= LEN( GetList ) )
+  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
     nRow := GetList[ nField ]:Row
   ENDIF
 RETURN nRow
@@ -90,7 +90,7 @@ RETURN nRow
 FUNCTION GetFldCol( nField )
   LOCAL nCol := -1
   DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 0 .AND. nField <= LEN( GetList ) )
+  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
     nCol := GetList[ nField ]:Col
   ENDIF
 RETURN nCol
@@ -98,8 +98,7 @@ RETURN nCol
 FUNCTION GetFldVar( nField )
   LOCAL nVar := -1
   DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 0 .AND. nField <= LEN( GetList ) )
+  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
     nVar := GetList[ nField ]:Name
   ENDIF
 RETURN nVar
-
