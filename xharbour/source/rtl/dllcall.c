@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.4 2006/07/16 20:49:29 enricomaria Exp $
+ * $Id: dllcall.c,v 1.5 2006/10/26 13:09:21 ronpinkas Exp $
  */
 
 /*
@@ -90,6 +90,72 @@ typedef struct tag_ExecStruct
    LPVOID    lpFunc;
 } EXECSTRUCT, *PEXECSTRUCT;
 
+
+static PHB_DYNS pHB_CSTRUCTURE = NULL, pPOINTER, pVALUE, pBUFFER, pDEVALUE;
+
+#include "hbapi.h"
+#include "hbstack.h"
+#include "hbvm.h"
+
+char HB_EXPORT * hb_parcstruct( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_parcstruct(%d, ...)", iParam));
+
+   if( pHB_CSTRUCTURE == NULL )
+   {
+       pHB_CSTRUCTURE = hb_dynsymFind( "HB_CSTRUCTURE" );
+
+       pPOINTER       = hb_dynsymGetCase( "POINTER" );
+       pVALUE         = hb_dynsymGetCase( "VALUE" );
+       pBUFFER        = hb_dynsymGetCase( "BUFFER" );
+       pDEVALUE       = hb_dynsymGetCase( "DEVALUE" );
+   }
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bRelease = FALSE;
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) && ! HB_IS_OBJECT( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+         PHB_ITEM pArray = pItem;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         pItem = hb_itemNew( NULL );
+         bRelease = TRUE;
+
+         hb_arrayGet( pArray, ulArrayIndex, pItem );
+      }
+
+      if( strncmp( hb_objGetClsName( pItem ), "C Structure", 11 ) == 0 )
+      {
+         hb_vmPushSymbol( pVALUE->pSymbol );
+         hb_vmPush( pItem );
+         hb_vmSend(0);
+
+         if( bRelease )
+         {
+            hb_itemRelease( pItem );
+         }
+
+         return hb_stackReturnItem()->item.asString.value;
+      }
+   }
+
+   return NULL;
+}
 
 static HB_GARBAGE_FUNC( _DLLUnload )
 {
@@ -322,13 +388,11 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
             case HB_IT_NIL               :
                Parm[iCnt].nWidth = sizeof( void * );
                Parm[iCnt].dwArg = ( DWORD ) NULL;
-               iCnt++;
                break;
 
             case HB_IT_POINTER           :
                Parm[iCnt].nWidth = sizeof( void * );
                Parm[iCnt].dwArg = ( DWORD ) hb_parptr ( i );
-               iCnt++;
                break;
 
             case HB_IT_INTEGER           :
@@ -337,7 +401,6 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
             case HB_IT_LOGICAL           :
                Parm[iCnt].nWidth = sizeof( DWORD );
                Parm[iCnt].dwArg = ( DWORD ) hb_parnl( i );
-               iCnt++;
                break;
 
             case HB_IT_DOUBLE            :
@@ -346,15 +409,21 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
                Parm[iCnt].pArg   = &DblParms[iCnt];
                Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
                iFlags |= DC_RETVAL_MATH8;
-               iCnt++;
                break;
 
             case HB_IT_STRING            :
             case HB_IT_MEMO              :
                Parm[iCnt].nWidth = sizeof(  char * );
                Parm[iCnt].dwArg = ( DWORD ) hb_parc ( i );
-               iCnt++;
                break;
+
+            case HB_IT_ARRAY             :
+               if( strncmp( hb_objGetClsName( hb_param(i, HB_IT_ANY ) ), "C Structure", 11 ) == 0 )
+               {
+                  Parm[iCnt].nWidth = sizeof(  void * );
+                  Parm[iCnt].dwArg = ( DWORD ) hb_parcstruct( i );
+                  break;
+               }
 
             case HB_IT_HASH              :
             case HB_IT_SYMBOL            :
@@ -362,16 +431,69 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
             case HB_IT_MEMOFLAG          :
             case HB_IT_BLOCK             :
             case HB_IT_MEMVAR            :
-            case HB_IT_ARRAY             :
 
             default:
                MessageBox( GetActiveWindow(), "UNKNOWN Parameter Type!", "DLLCall Parameter Error!", MB_OK | MB_ICONERROR );
                return;
          }
+
+         iCnt++;
       }
    }
 
    rc = DynaCall(iFlags, lpFunction, iArgCnt, Parm, NULL, 0);
+
+   if( iArgCnt > 0)
+   {
+      iCnt = 0;
+
+      for( i = iFirst; i <= iParams; i++)
+      {
+         if( hb_parinfo( i ) & HB_IT_BYREF )
+         {
+            switch ( hb_parinfo( i ) & ~HB_IT_BYREF )
+            {
+               case HB_IT_NIL               :
+                  hb_stornl( Parm[iCnt].dwArg, i );
+                  break;
+
+               case HB_IT_POINTER           :
+                  break;
+
+               case HB_IT_INTEGER           :
+               case HB_IT_LONG              :
+               case HB_IT_DATE              :
+               case HB_IT_LOGICAL           :
+                  hb_stornl( Parm[iCnt].dwArg, i );
+                  break;
+
+               case HB_IT_DOUBLE            :
+                  hb_stornd( DblParms[iCnt], i );
+                  break;
+
+               case HB_IT_STRING            :
+               case HB_IT_MEMO              :
+                  break;
+
+               case HB_IT_ARRAY             :
+                  if( strncmp( hb_objGetClsName( hb_param(i, HB_IT_ANY ) ), "C Structure", 11 ) == 0 )
+                  {
+                     hb_vmPushSymbol( pDEVALUE->pSymbol );
+                     hb_vmPush( hb_param( i, HB_IT_ANY ) );
+                     hb_vmSend(0);
+
+                     break;
+                  }
+
+               default:
+                  MessageBox( GetActiveWindow(), "UNKNOWN Parameter Type!", "DLLCall Parameter Error!", MB_OK | MB_ICONERROR );
+                  return;
+            }
+         }
+
+         iCnt++;
+      }
+   }
 
    // return the correct value
    switch ( iRtype )
