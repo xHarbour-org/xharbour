@@ -1,5 +1,5 @@
 /*
- * $Id: bit2.c,v 1.3 2006/09/23 21:09:43 ptsarenko Exp $
+ * $Id: bit2.c,v 1.3 2006/09/23 18:32:16 ptsarenko Exp $
  */
 
 /*
@@ -171,10 +171,10 @@ HB_FUNC ( ISBIT )
   LONG lNum1;
   int  iTestBit;
 
-  if (( ISNUM( 1 ) || ISCHAR( 1 ) ) && ( ISNUM( 2 ) ) )
+  if (( ISNUM( 1 ) || ISCHAR( 1 ) ) && ( ISNUM( 2 ) || ISNIL( 2 ) ) )
   {
      lNum1    = __getparam( 1 );
-     iTestBit = hb_parni( 2 );
+     iTestBit = ISNUM( 2 ) ? hb_parni( 2 ) : 1;
 
      hb_retl( lNum1 & ( 1L << (iTestBit - 1) ) );
   }
