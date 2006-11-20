@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.77 2006/09/29 00:38:57 ronpinkas Exp $
+ * $Id: adsfunc.c,v 1.78 2006/11/11 03:48:20 druzus Exp $
  */
 
 /*
@@ -2413,13 +2413,14 @@ HB_FUNC( ADSDIRECTORY )
    ulRetVal = AdsFindFirstTable( hConnect, ( UNSIGNED8* ) ( ISCHAR( 1 ) ? hb_parcx( 1 ) : "" ), ucFileName, &usFileNameLen, &sHandle );
    if ( ulRetVal == AE_SUCCESS || ulRetVal == AE_NO_FILE_FOUND )
    {
-      do {
+      while( ulRetVal == AE_SUCCESS )
+      {
          pitmFileName = hb_itemPutCL( NULL, (char *) ucFileName, usFileNameLen );
          hb_arrayAddForward( pitmDir, pitmFileName );
 
          usFileNameLen = ADS_MAX_TABLE_NAME;
          ulRetVal = AdsFindNextTable( hConnect, sHandle, ucFileName, &usFileNameLen );
-      } while( ulRetVal == AE_SUCCESS );
+      } 
 
       AdsFindClose( hConnect, sHandle );
    }
