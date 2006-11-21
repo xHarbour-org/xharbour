@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5250 2006/11/20 18:35:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5251 2006/11/20 19:00:49 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-21 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbrowse.prg
+    * changed configure() method to call IsDb() static function to
+      check what type of datasource is in use by TBrowse at first
+      configuration. This is needed to reset rows if the datasource
+      is an array.
+    * minor adjust in CheckRowsToBeRedrawn() method.
 
 2006-11-20 21:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/bit2.c

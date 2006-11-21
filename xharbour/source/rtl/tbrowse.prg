@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.161 2006/11/06 11:01:24 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.162 2006/11/10 17:47:08 modalsist Exp $
  */
 
 /*
@@ -607,11 +607,6 @@ CLASS TBrowse
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
                                           // _M_GotoXY because this method will mostly be called to handle mouse requests
 
-   DATA DataSource  INIT 0                // 0 indicates that data source is a database, when
-                                          // tbrowse was initialized from TBrowseDB()
-                                          // 1 indicates that data source can be a database or not,
-                                          // when tbrowse was initialized from TBrowseNew(). 
-
    HIDDEN:        /* H I D D E N */
 
    METHOD PosCursor()                     // Positions the cursor to the beginning of the call, used only when autolite==.F.
@@ -700,6 +695,9 @@ CLASS TBrowse
    DATA aColorSpec                        // Holds colors of Tbrowse:ColorSpec
 
    DATA nPrevDelColPos                    // Save previous colpos before delcolumn(). For clipper compatibility.
+
+   DATA DataSource  INIT 0                // 0 indicates that data source is a database.
+                                          // 1 indicates that data source can be a database or not (array or text file).
 
 ENDCLASS
 
@@ -845,6 +843,12 @@ METHOD Configure( nMode ) CLASS TBrowse
       lInitializing := .t.
    endif
 
+   // 2006/NOV/14 - E.F. - I need know if datasource is a database or not,
+   //                      to allow reset row position below.
+   //
+   IF lInitializing .AND. ::lNeverDisplayed
+      ::DataSource := IsDb( Self )
+   ENDIF
 
    if ::nColPos > ::nColumns
       ::nColPos := ::nColumns
@@ -1064,7 +1068,6 @@ METHOD Configure( nMode ) CLASS TBrowse
 
    ::Invalidate()
 
-
    // Force re-evaluation of space occupied by frozen columns
    nFreeze := ::nFrozenCols
    if nFreeze > 0
@@ -1083,11 +1086,11 @@ METHOD Configure( nMode ) CLASS TBrowse
    #endif
 
 
-   // FSG - 14/06/2006 - added resetting of data positioning
-   //                    that I can get assigninng a value directly to
-   //                    ::RowPos using an array browse
-
-   IF nMode == 0 .AND. ::DataSource == 1
+   // FSG - 14/06/2006 - added resetting of data positioning that I can get 
+   //                    assigninng a value directly to ::RowPos using an 
+   //                    array browse
+   //
+   IF nMode == 0 .AND. ::DataSource == 1 
       IF ::nRecsToSkip <> 0
          ::nNewRowPos := ::nRowPos + ::nRecsToSkip
          ::oDataCache:nCurRow := ::nNewRowPos
@@ -1095,7 +1098,6 @@ METHOD Configure( nMode ) CLASS TBrowse
       ENDIF
       ::RefreshAll()
    ENDIF
-  
 
    //   Flag that browser has been configured properly
    ::lConfigured := .t.
@@ -2340,7 +2342,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       return .t.
    endif
 
-
    // 2006/Jan/28 - E.F. - Clipper compatibility.
    // Restore ::nColPos after delcolumn(), because delcolumn() method
    // can be called more than one time before stabilization.
@@ -2365,7 +2366,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       endif
       ::configure( 2 )
    endif
-
 
    // Execute a pending invalidation of cache
    ::oDataCache:PerformInvalidation()
@@ -2392,6 +2392,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       */
       ::CheckRowPos()
    endif
+
 
    ColorSpec  := ::aColorSpec[ 1 ]
    nOldCursor := SetCursor( SC_NONE )
@@ -2432,7 +2433,8 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
       // Every time I enter stabilization loop I need to draw _at least_ one row.
-      ::CheckRowsToBeRedrawn()  
+
+      ::CheckRowsToBeRedrawn()
 
       DispBegin()
 
@@ -2567,12 +2569,12 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
 
                endif
 
-               /* 2006/NOV/09 - E.F. If more than 1 row was skipped here, I need
-                * redraw all rows but these need be invalidated. Please don't call
+               /* 2006/NOV/09 - E.F. If more than 1 row was skipped, I need redraw
+                * all rows but these need be invalidated first. Please don't call
                 * ::Refreshall() or ::RefreshCurrent() here.
                 */
                if Abs( nRecsSkipped ) > 1
-                  For nRow := nFirstRow TO ::RowCount
+                  For nRow := 1 TO ::RowCount
                      ::aRedraw[ nRow ] := .T.
                      ::oDataCache:Invalidate( nRow )
                   Next
@@ -2590,6 +2592,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
                    if Len( ::aRedraw ) >= ::nNewRowPos
                       ::aRedraw[ ::nNewRowPos ] := .T.
                    endif
+
                endif
             endif
          endif
@@ -3620,6 +3623,54 @@ Local nIndex := 0
 
 Return iif( lOK, aDefColor, {1,2,1,1} )
 
+*------------------------
+Static Function IsDb(oTb)
+*------------------------
+* Check if datasource is a database.
+*-------------------------------
+LOCAL nRec := 0
+LOCAL lIsDB := .F.
+
+IF Used()
+
+   IF HB_IsBlock( oTb:GoBottomBlock ) .AND.;
+      HB_IsBlock( oTb:GoTopBlock ) .AND.;
+      HB_IsBlock( oTb:SkipBlock )
+
+      IF LastRec() > 0 
+
+         nRec := Recno()
+
+         Eval( oTb:GoTopBlock )
+
+         Eval( oTb:SkipBlock, 1 )
+
+         lIsDB := !( nRec == Recno() )
+
+         Eval( oTb:GoTopBlock )
+
+         If !( nRec == Recno() )
+            dbGoto( nRec )
+         Endif
+
+      ELSE
+
+         Eval( oTb:GoTopBlock )
+
+         Eval( oTb:SkipBlock, 1 )
+
+         lIsDB := ( !Bof() .AND. Eof() )
+
+         Eval( oTb:GoTopBlock )
+
+      ENDIF
+
+   ENDIF
+
+ENDIF
+
+RETURN ( iif(lIsDB,0,1) )
+
 //-------------------------------------------------------------------//
 //
 //                   Function to Activate TBrowse
@@ -3628,11 +3679,7 @@ Return iif( lOK, aDefColor, {1,2,1,1} )
 
 FUNCTION TBrowseNew( nTop, nLeft, nBottom, nRight )
 
-LOCAL oBrowse := TBrowse():New( nTop, nLeft, nBottom, nRight )
-
-      oBrowse:DataSource := 1
-
-RETURN oBrowse
+RETURN ( TBrowse():New( nTop, nLeft, nBottom, nRight ) )
 
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
