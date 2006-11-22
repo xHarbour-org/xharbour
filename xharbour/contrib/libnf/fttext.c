@@ -1,5 +1,5 @@
 /*
- * $Id: fttext.c,v 1.12 2006/02/03 01:33:58 andijahja Exp $
+ * $Id: 20061122\040fttext.c,v 1.1 2006/11/22 15:17:30 sirep Exp $
  */
 
 /*
@@ -501,7 +501,29 @@ HB_FUNC( FT_FSELECT )
          int iNewSelect = hb_parnl( 1 );
          PFT_FFILE pTmp = ft_fseekAlias( iNewSelect );
 
-         if ( pTmp == NULL )
+         if ( iNewSelect == 0 )
+         {
+            BOOL bFoundActive = FALSE;
+
+            pTmp = pFT;
+
+            while ( pTmp )
+            {
+               if ( !pTmp->bActive )
+               {
+                  bFoundActive = TRUE;
+                  iSelect = pTmp->iArea;
+                  break;
+               }
+               pTmp = pTmp->pNext;
+            }
+
+            if( !bFoundActive )
+            {
+               iSelect ++;
+            }
+         }
+         else if ( pTmp == NULL )
          {
             iSelect = iNewSelect;
             pCurFile = NULL;
@@ -753,7 +775,7 @@ HB_FUNC( FT_FAPPEND )
          hb_arrayAddForward( pCurFile->pArray, hb_itemPutC(Tmp, szAppend ) );
          hb_arrayAddForward( pCurFile->pOrigin, hb_itemPutC(Tmp, szAppend ) );
       }
-                 
+
       nCurrent = hb_arrayLen( pCurFile->pArray );
       pCurFile->nCurrent = nCurrent;
       pCurFile->bChange = TRUE;
@@ -772,7 +794,7 @@ HB_FUNC( FT_FLASTREC )
    ULONG uRet = -1;
 
    if( pCurFile )
-   {                        
+   {
       uRet = hb_parl(1) ? hb_arrayLen( pCurFile->pOrigin ) : hb_arrayLen( pCurFile->pArray );
    }
 
@@ -830,7 +852,7 @@ HB_FUNC( FT_FBOF )
 
 //------------------------------------------------------------------------------
 HB_FUNC( FT_FEOF )
-{                                          
+{
    hb_retl ( pCurFile ? (ULONG) nCurrent > hb_arrayLen( pCurFile->pArray ) : TRUE );
 }
 

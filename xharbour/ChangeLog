@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5251 2006/11/20 19:00:49 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5252 2006/11/21 23:13:17 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-22 11:51 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/fttext.c
+    ! Fixed function FT_FUSE: FT_USE(0) now returns next unused textarea.
 
 2006-11-21 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg
