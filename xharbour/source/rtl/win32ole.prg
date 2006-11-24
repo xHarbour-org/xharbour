@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.141 2006/10/10 20:37:49 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.142 2006/11/02 19:17:31 ronpinkas Exp $
  */
 
 /*
@@ -2536,31 +2536,38 @@ RETURN Self
         if( HB_IS_OBJECT( hb_stackReturnItem() ) && hb_clsIsParent( hb_stackReturnItem()->item.asArray.value->uiClass , "TOLEAUTO" ) )
         {
            PHB_ITEM pReturn = hb_itemNew( NULL );
-           HB_ITEM OleClassName;
-           char sOleClassName[ 256 ];
-
+           PHB_ITEM pOleClassName = hb_itemNew( NULL );
+           char *sOleClassName;
+		   int iClassNameLen, iMsgNameLen;
+		   
            hb_itemForwardValue( pReturn, &HB_VM_STACK.Return );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
            hb_vmPush( hb_stackSelfItem() );
            hb_vmSend( 0 );
 
-           strncpy( sOleClassName, hb_parc( - 1 ), hb_parclen( -1 ) );
-           sOleClassName[ hb_parclen( -1 ) ] = ':';
-           strcpy( sOleClassName + hb_parclen( -1 ) + 1, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
+           iClassNameLen = hb_parclen( -1 );
+           iMsgNameLen = strlen( (*HB_VM_STACK.pBase)->item.asSymbol.value->szName );             
+		   
+		   sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
+		   
+           strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );           
+           sOleClassName[ iClassNameLen ] = ':';
+           strcpy( sOleClassName + iClassNameLen + 1, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
 
            //TraceLog( NULL, "Class: '%s'\n", sOleClassName );
 
-           OleClassName.type = HB_IT_NIL;
-           hb_itemPutC( &OleClassName, sOleClassName );
+           hb_itemPutCPtr( pOleClassName, sOleClassName, iClassNameLen + 1 + iMsgNameLen );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
            hb_vmPush( pReturn );
-           hb_itemPushForward( &OleClassName );
+           hb_itemPushForward( pOleClassName );
            hb_vmSend( 1 );
 
            hb_itemReturnForward( pReturn );
+           
            hb_itemRelease( pReturn );
+           hb_itemRelease( pOleClassName );
         }
      }
      else
