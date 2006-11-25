@@ -1,5 +1,5 @@
 /*
- * $Id: winreg.prg,v 1.2 2004/12/11 04:20:36 paultucker Exp $
+ * $Id: winreg.prg,v 1.3 2005/03/10 23:41:17 andijahja Exp $
  */
 
 /*
@@ -131,7 +131,7 @@ FUNCTION GetRegistry( nHKEYHandle, cKeyName, cEntryName )
         nValueType== REG_DWORD_LITTLE_ENDIAN .OR. ;
         nValueType== REG_DWORD_BIG_ENDIAN .OR. ;
         nValueType== REG_BINARY
-        cName:= BIN2L(cName)
+        cName:= BIN2U(cName)
       ELSE
         cName:= STRTRAN(cName,CHR(0))
       ENDIF

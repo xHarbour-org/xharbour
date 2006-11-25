@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5253 2006/11/22 16:07:40 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.5254 2006/11/24 23:15:37 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-25 18:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/rtl/winreg.prg
+    * changed Bin2L() to Bin2U() call in the GetRegistry() function.
+      The value of REG_DWORD should be unsigned
 
 2006-11-24 19:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source\rtl\win32ole.prg
