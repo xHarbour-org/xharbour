@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5255 2006/11/25 16:17:40 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5256 2006/11/26 05:52:04 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-26 09:40 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    + Added another missing Data Dictionary function: AdsDDDeleteUser().
 
 2006-11-25 21:42 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/contrib/rdd_ads/adsfunc.c

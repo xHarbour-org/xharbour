@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.79 2006/11/20 14:07:39 snaiperis Exp $
+ * $Id: adsfunc.c,v 1.80 2006/11/26 05:52:04 kaddath Exp $
  */
 
 /*
@@ -2151,7 +2151,6 @@ HB_FUNC( ADSDDCREATE )
    }
 }
 
-
 HB_FUNC( ADSDDCREATEUSER )
 {
    UNSIGNED32 ulRetVal;
@@ -2166,6 +2165,15 @@ HB_FUNC( ADSDDCREATEUSER )
    hb_retl( ulRetVal == AE_SUCCESS );
 }
 
+HB_FUNC( ADSDDDELETEUSER )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pucUserName      = ISCHAR( 1 ) ? (UNSIGNED8 *) hb_parcx( 1 ) : NULL;
+   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 5 );
+
+   ulRetVal = AdsDDDeleteUser( hConnect, pucUserName );
+   hb_retl( ulRetVal == AE_SUCCESS );
+}
 
 HB_FUNC( ADSDDGETDATABASEPROPERTY )
 {
