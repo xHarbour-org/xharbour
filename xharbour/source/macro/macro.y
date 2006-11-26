@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.26 2005/12/03 05:21:02 ronpinkas Exp $
+ * $Id: macro.y,v 1.27 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -432,22 +432,31 @@ MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                  if( hb_macroIsIdent( szVarName ) )
                                  {
                                     $$ = hb_compExprNewVar( szVarName );
-                                    hb_xfree( $1 );
+                                    // Should always be true since hb_compExprNewVar() returned TRUE.
+                                    if( $1 != szVarName )
+                                    {
+                                       hb_xfree( $1 );
+                                    }
                                     HB_MACRO_CHECK( $$ );
                                  }
                                  else
                                  {
                                     /* invalid variable name
                                      */
-                HB_TRACE(HB_TR_DEBUG, ("macro -> invalid variable name: %s", $1));
-
+                                    HB_TRACE(HB_TR_DEBUG, ("macro -> invalid variable name: %s", $1));
                                     hb_xfree( $1 );
                                     YYABORT;
                                  }
                               }
 ;
 
-MacroVarAlias  : MacroVar ALIASOP   { $$ = $1; }
+MacroVarAlias  : MacroVar ALIASOP   {
+                                      if( $1->ExprType == HB_ET_VARIABLE )
+                                      {
+                                         $1->ExprType = HB_ET_ALIAS;
+                                      }
+                                      $$ = $1;
+                                    }
 ;
 
 /* Macro expressions

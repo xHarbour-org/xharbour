@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5256 2006/11/26 05:52:04 kaddath Exp $
+ * $Id: ChangeLog,v 1.5257 2006/11/26 17:46:46 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-11-26 17:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/macro/macro.y
+    ! Fixed bug when MACROTEXT is converted to HB_ET_VARIABLE and later used as an HB_ET_ALIAS
+
 2006-11-26 09:40 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/contrib/rdd_ads/adsfunc.c
     + Added another missing Data Dictionary function: AdsDDDeleteUser().
 
 2006-11-25 21:42 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * xharbour/contrib/rdd_ads/adsfunc.c
-    + Added missing Data Dictionary functions adsDDRemoveTable() and 
+    + Added missing Data Dictionary functions adsDDRemoveTable() and
       adsDDRemoveUserFromGroup().
     ! Replace adsRights values with constants in ace.h (i.e. ADS_CHECKRIGHTS
       and ADS_IGNORERIGHTS instead of 1 and 2).
