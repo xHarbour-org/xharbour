@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5257 2006/11/26 17:46:46 kaddath Exp $
+ * $Id: ChangeLog,v 1.5258 2006/11/26 21:42:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-27 22:11 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbclass.ch
+  * utils/xbscript/xbsclass.ch
+    * Fixed typo: <.Persistent> -> <.Persistent>
+  * utils/xbscript/xbscript.prg
+    * Updated burned-in rules as per above.
+    * PP_PreProLine() factorized to use DeferPendingLines() and RecomposeRuleLine()
+    * Work in progress related to converting STATIC vars into a CONTEXT Array
+      to allow PP and Interpreter to be rentrants safe.
+      /*
+         #2 #3 above were already present in my local cvs, and I'd normally not commit
+         while in bug fix, but I didn't have the time to remove them when applying #1 fix
+       */
 
 2006-11-26 17:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/macro/macro.y
