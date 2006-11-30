@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.97 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.98 2006/11/09 16:41:08 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -1756,6 +1756,12 @@ $(OBJ_DIR)\getinfo.c : $(CT_DIR)\getinfo.prg
 $(OBJ_DIR)\getinfo.obj : $(OBJ_DIR)\getinfo.c
    $(CC_CMD)
 
+$(OBJ_DIR)\getsecrt.c : $(CT_DIR)\getsecrt.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\getsecrt.obj : $(OBJ_DIR)\getsecrt.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\invrtwin.c : $(CT_DIR)\invrtwin.prg
    $(HARBOUR_CMD)
 
@@ -1784,6 +1790,9 @@ $(OBJ_DIR)\numconv.c : $(CT_DIR)\numconv.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\numconv.obj : $(OBJ_DIR)\numconv.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pack.obj : $(CT_DIR)\pack.c
    $(CC_CMD)
 
 $(OBJ_DIR)\screen2.c : $(CT_DIR)\screen2.prg
@@ -2210,6 +2219,7 @@ $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS) $(HARBOUR_LIB)
    echo. $(OBJ_DIR)\mainstd.obj  > make.tmp
    echo. $(OBJ_DIR)\xbscript.obj >> make.tmp
    echo. $(HARBOUR_LIB) >> make.tmp
+   echo. $(LIB_DIR)\ct.lib >> make.tmp
    LINK @make.tmp /nologo /out:$(XBSCRIPTDLL_EXE) /subsystem:console /FORCE:MULTIPLE
 
 $(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg

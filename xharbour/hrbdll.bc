@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.125 2006/10/15 17:50:33 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.126 2006/11/09 16:41:08 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -667,6 +667,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\files.obj \
   $(OBJ_DIR)\finan.obj \
   $(OBJ_DIR)\ftoc.obj \
+  $(OBJ_DIR)\getsecrt.obj \
   $(OBJ_DIR)\justify.obj \
   $(OBJ_DIR)\keyset.obj \
   $(OBJ_DIR)\lton.obj \
@@ -679,6 +680,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\numcount.obj \
   $(OBJ_DIR)\numline.obj \
   $(OBJ_DIR)\numlohi.obj \
+  $(OBJ_DIR)\pack.obj \
   $(OBJ_DIR)\pos1.obj \
   $(OBJ_DIR)\pos2.obj \
   $(OBJ_DIR)\posdiff.obj \
@@ -1307,6 +1309,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\files.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\finan.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ftoc.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\getsecrt.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\justify.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\keyset.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\lton.obj              + >> hdll.tmp
@@ -1319,6 +1322,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\numcount.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\numline.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\numlohi.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\pack.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\pos1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\pos2.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\posdiff.obj           + >> hdll.tmp
@@ -3184,6 +3188,9 @@ $(OBJ_DIR)\finan.obj : $(CT_DIR)\finan.c
   $(CC_CMD)
 
 $(OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
+  $(CC_CMD)
+
+$(OBJ_DIR)\getsecrt.obj : $(CT_DIR)\getsecrt.c
   $(CC_CMD)
 
 $(OBJ_DIR)\justify.obj : $(CT_DIR)\justify.c

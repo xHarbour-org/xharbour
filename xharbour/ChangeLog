@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5258 2006/11/26 21:42:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5259 2006/11/28 02:13:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-11-30 19:31 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.bc
+  * hrbdll.vc
+  * makefile.vc
+    + Added missing ct sources (pack.c and getsecrt.prg)
+    + Added mpr.lib to list of C Win libs
+    + Added ct.lib when building xbscript
+
+  * include/hbextern.ch
+    + Added missing CT external protected by #ifdef CT and nested #ifdef CTNET
+      /* NOTE: we should decide if CT is a standard module like the rest of the RTL, and if so ... */
+
+  * utils/xbscript/xbscript.prg
+    + Added define CT and CTNET before #include "hbextern.ch"
 
 2006-11-27 22:11 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch

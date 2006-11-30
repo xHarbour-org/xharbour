@@ -212,6 +212,8 @@
       #define USE_C_BOOST
    #endif
 
+   #define CT3
+   #define CT3NET
    #INCLUDE "hbextern.ch"
    #DEFINE  CRLF HB_OsNewLine()
 

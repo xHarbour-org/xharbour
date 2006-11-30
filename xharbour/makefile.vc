@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.180 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: makefile.vc,v 1.181 2006/11/09 16:41:09 marchuet Exp $
 #
 
 #
@@ -362,7 +362,8 @@ LIBS2 = \
    winspool.lib \
    ole32.lib \
    oleaut32.lib \
-   advapi32.lib
+   advapi32.lib \
+   mpr.lib
 
 LIBSMT2 = \
    $(LIBSMT) \
@@ -371,8 +372,8 @@ LIBSMT2 = \
    winspool.lib \
    ole32.lib \
    oleaut32.lib \
-   advapi32.lib
-
+   advapi32.lib \
+   mpr.lib
 
 #
 # RTL.LIB rules
