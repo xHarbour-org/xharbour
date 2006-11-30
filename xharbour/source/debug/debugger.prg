@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.78 2006/10/15 14:47:45 likewolf Exp $
+ * $Id: debugger.prg,v 1.79 2006/10/15 19:25:13 likewolf Exp $
  */
 
 /*
@@ -128,6 +128,15 @@
 #define MODULE_EXTERNGLOBALS 4
 
 
+* The dimension of the debugger window
+//#IFDEF __GTWVW__
+#define DEBUGGER_MINROW  0
+#define DEBUGGER_MINCOL  0
+#define DEBUGGER_MAXROW 22
+#define DEBUGGER_MAXCOL 77
+
+//#ENDIF
+
 static s_oDebugger
 
 
@@ -187,6 +196,12 @@ CLASS TDebugger
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
    DATA   nAppCTWindow, nAppDirCase, nAppFileCase, oAppGetList, nAppTypeAhead
    DATA   nMaxRow, nMaxCol
+
+   DATA   nAppMaxRow, nAppMaxCol  //x new: app's maxrow/col
+   DATA   nAppWindow
+
+   DATA   nDebuggerWindow
+
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
    DATA   aProcStack    //stack of all procedures
@@ -208,6 +223,10 @@ CLASS TDebugger
    DATA   lPPO INIT .F.
    DATA   lRunAtStartup
    DATA   lLineNumbers INIT .T.
+
+   //x for gtwvw:
+   DATA   lDebuggerWindowIsOpen INIT .F.
+   DATA   cGTVersion INIT ' '
 
    METHOD New()
    METHOD Activate()
@@ -337,6 +356,10 @@ CLASS TDebugger
    METHOD ResizeWindows( oWindow )
    METHOD NotSupported() INLINE Alert( "Not implemented yet!" )
 
+   //x for gtwvw:
+   METHOD OpenDebuggerWindow()
+   METHOD CloseDebuggerWindow()
+
 ENDCLASS
 
 
@@ -384,8 +407,19 @@ METHOD New() CLASS TDebugger
    ::lGo               := ::lRunAtStartup
 
    /* Store the initial screen dimensions for now */
-   ::nMaxRow := MaxRow()
-   ::nMaxCol := MaxCol()
+   if hb_gt_Version() == 'WVW' .and. ;
+      !( type( 'WVW_NOPENWINDOW()' ) == 'U' .OR. Type( 'WVW_NSETCURWINDOW()' ) == 'U' )
+      ::cGTVersion := 'WVW'
+      ::nMaxRow := DEBUGGER_MAXROW
+      ::nMaxCol := DEBUGGER_MAXCOL
+   else
+      ::nMaxRow := MaxRow()
+      ::nMaxCol := MaxCol()
+   endif
+
+   /* Store the initial screen dimensions for now */
+   ::nAppMaxRow := MaxRow()
+   ::nAppMaxCol := MaxCol()
 
    ::oPullDown      := __dbgBuildMenu( Self )
 
@@ -407,6 +441,42 @@ METHOD New() CLASS TDebugger
    endif
    ::lGo := ::lRunAtStartup
 return Self
+
+//x new
+METHOD OpenDebuggerWindow() CLASS TDebugger
+  if ::cGTVersion == 'WVW'
+    IF !::lDebuggerWindowIsOpen
+      ::nAppMaxRow := maxrow()
+      ::nAppMaxCol := maxcol()
+      ::nAppWindow := hb_ExecFromArray( 'WVW_NSETCURWINDOW' )
+      ::nDebuggerWindow := hb_ExecFromArray( 'WVW_NOPENWINDOW', ;
+                      { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
+                        DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
+      ::lDebuggerWindowIsOpen := .t.
+    ENDIF
+    
+    hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nDebuggerWindow } )
+    return nil
+  endif
+return nil
+
+//x new
+METHOD CloseDebuggerWindow() CLASS Tdebugger
+
+  if ::cGTVersion == 'WVW'
+    //if !::lDebuggerWindowIsOpen
+      hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
+      return nil
+    //endif
+
+    /*hb_ExecFromArray( 'WVW_LCLOSEWINDOW' )
+    ::lDebuggerWindowIsOpen := .f.
+    if !( type( 'WVW_SHOWWINDOW()' ) == 'U' )
+      hb_ExecFromArray('WVW_SHOWWINDOW')
+    endif*/
+  endif
+
+return nil
 
 
 METHOD Activate() CLASS TDebugger
@@ -950,7 +1020,11 @@ METHOD DoCommand( cCommand ) CLASS TDebugger
          ::Resume()
 
       CASE starts( "SPEED", cCommand )
-         ::nSpeed := Val( cParam )
+         IF !Empty( cParam )
+            ::nSpeed := Val( cParam )
+         ELSE
+            ::nSpeed := 0
+         ENDIF
 
       CASE starts( "STEP", cCommand )
          ::Step()
@@ -1420,8 +1494,13 @@ METHOD HandleEvent() CLASS TDebugger
 return nil
 
 METHOD Hide() CLASS TDebugger
+   ::CloseDebuggerWindow() //x gtwvw
 
-   RestScreen( ,,,, ::cAppImage )
+   if !(::cGTVersion=='WVW') //#IFNDEF __GTWVW__
+      //x was: RestScreen( ,,,, ::cAppImage )
+      RestScreen( 0,0,::nAppMaxRow,::nAppMaxCol, ::cAppImage )
+   endif //#ENDIF
+
    ::cAppImage := nil
    SetColor( ::cAppColors )
    SetCursor( ::nAppCursor )
@@ -2174,21 +2253,31 @@ RETURN self
 
 METHOD RestoreAppScreen() CLASS TDebugger
   LOCAL i
+  local lWindowed := ::lDebuggerWindowIsOpen
 
   ::cImage := SaveScreen()
-  DispBegin()
-  RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
-  IF !Empty( ::nAppCTWindow )
-    /* Don't link libct automatically... */
-    HB_INLINE( ::nAppCTWindow )
-    {
-       hb_ctWSelect( hb_parni( 1 ) );
-    }
-  ENDIF
+
+  if !lWindowed //x
+    DispBegin()
+    RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
+    IF !Empty( ::nAppCTWindow )
+      /* Don't link libct automatically... */
+      HB_INLINE( ::nAppCTWindow )
+      {
+         hb_ctWSelect( hb_parni( 1 ) );
+      }
+    ENDIF
+  else                        //x
+    ::CloseDebuggerWindow()   //x
+  endif
+
   SetPos( ::nAppRow, ::nAppCol )
   SetColor( ::cAppColors )
   SetCursor( ::nAppCursor )
-  DispEnd()
+
+  if !lWindowed //x
+    DispEnd()
+  endif
   FOR i := 1 TO ::nAppDispCount
     DispBegin()
   NEXT
@@ -2233,7 +2322,9 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
     DispEnd()
   NEXT
 
-  DispBegin()
+  //x these two lines are moved to after SetCursor()
+  //x DispBegin()
+  //x ::cAppImage  := SaveScreen()
 
   /* Get cursor coordinates INSIDE ct window */
   ::nAppRow    := Row()
@@ -2247,10 +2338,23 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
      hb_ctWSelect( 0 );
   }
 
-  ::cAppImage  := SaveScreen()
   ::nAppCursor := SetCursor( SC_NONE )
+
+  //x more...
+  ::nAppMaxRow := maxrow()
+  ::nAppMaxCol := maxcol()
+
+  if !( ::cGTVersion == 'WVW' )
+    ::cAppImage  := SaveScreen()
+  endif
+
+  ::OpenDebuggerWindow() //x this will also assign ::nMaxRow/col
+
+  DispBegin()
+
   IF lRestore
-    RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
+    //x was: RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
+    RestScreen( , , , , ::cImage )
   ENDIF
   IF ::nMaxRow != MaxRow() .OR. ::nMaxCol != MaxCol()
     ::nMaxRow := MaxRow()
@@ -2426,7 +2530,12 @@ RETURN NIL
 METHOD ShowAppScreen() CLASS TDebugger
 
    ::cImage := SaveScreen()
-   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
+
+   ::CloseDebuggerWindow() //x gtwvw
+
+   if !( ::cGTVersion == 'WVW' )
+     RestScreen( 0, 0, ::nAppMaxRow, ::nAppMaxCol, ::cAppImage )
+   endif
 
    if LastKey() == K_LBUTTONDOWN
       InKey( 0, INKEY_ALL )
@@ -2438,7 +2547,11 @@ METHOD ShowAppScreen() CLASS TDebugger
    while LastKey() == K_MOUSEMOVE
       InKey( 0, INKEY_ALL )
    end
-   RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
+
+   ::OpenDebuggerWindow() //x
+
+   //x was: RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
+   RestScreen( , , , , ::cImage )
 
 return nil
 
@@ -2603,7 +2716,7 @@ METHOD ShowVars() CLASS TDebugger
    endif
 
    DispBegin()
-   
+
    if ::oWndVars == nil
 
       nTop := IIF(::oWndPnt!=NIL .AND. ::oWndPnt:lVisible,::oWndPnt:nBottom+1,1)
@@ -2698,7 +2811,7 @@ METHOD ShowVars() CLASS TDebugger
          endif
       ENDIF
 
-      if Len( ::aVars ) == 0 
+      if Len( ::aVars ) == 0
          IF nBottom == ::oWndVars:nBottom
             /* We still need to redraw window caption, it could have changed */
             ::oWndVars:Refresh()
@@ -2717,7 +2830,7 @@ METHOD ShowVars() CLASS TDebugger
          ::ResizeWindows( ::oWndVars )
       endif
    endif
-   
+
    DispEnd()
 
 return nil

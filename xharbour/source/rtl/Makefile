@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.68 2006/06/14 13:56:20 druzus Exp $
+# $Id: Makefile,v 1.69 2006/07/17 12:56:18 druzus Exp $
 #
 
 ROOT = ../../
@@ -32,6 +32,7 @@ C_SOURCES=\
         direct.c     \
         diskspac.c   \
         disksphb.c   \
+	dllcall.c    \
         empty.c      \
         error.c      \
         file.c       \

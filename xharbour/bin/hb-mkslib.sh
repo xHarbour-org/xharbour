@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: hb-mkslib.sh,v 1.12 2005/03/13 12:44:36 likewolf Exp $
+# $Id: hb-mkslib.sh,v 1.13 2005/08/12 02:44:26 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -123,6 +123,7 @@ elif [ "${SLIB_EXT}" = ".dll" ]; then
     SYSLIBS="${SYSLIBS} -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32"
     ${CCPREFIX}gcc -shared -o "${FULLNAME}" $OBJLST ${linker_options} ${SYSLIBS} ${HB_DLLIBS} && \
         cd "${dir}" && \
+        rm -f "${DSTDIR}${FULLNAME}" && \
         mv -f "${OTMPDIR}/${FULLNAME}" "${DSTDIR}${FULLNAME}"
 else
     #FULLNAME="${BASE}-${VERSION}${SLIB_EXT}"

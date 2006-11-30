@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.5 2006/10/26 13:09:21 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.6 2006/11/20 18:35:56 ronpinkas Exp $
  */
 
 /*
@@ -66,9 +66,10 @@
 #define  WIN32_LEAN_AND_MEAN
 
 #include "hbapiitm.h"
+
 #if defined( HB_OS_WIN_32 )
-   #include <windows.h>
-#endif
+
+#include <windows.h>
 
 #define DC_MICROSOFT           0x0000      // Default
 #define DC_BORLAND             0x0001      // Borland compat
@@ -673,6 +674,7 @@ Copyright 2002 Vic McClung <vicmcclung@vicmcclung.com>
 www - http://www.vicmcclung.com
 
 Borland mods by ptucker@sympatico.ca
+MinGW support by Phil Krylov <phil a t newstar.rinet.ru>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -703,8 +705,6 @@ linking the VMGUI library code into it.
 //------------------------------------------------------------------
 
 
-#ifndef __MINGW32__
-
 //------------------------------------------------------------------
 
 RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
@@ -718,7 +718,11 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    BYTE   *pArg;
 
    // Reserve 256 bytes of stack space for our arguments
-   #if defined( __BORLANDC__ ) || defined(__DMC__)
+   #if defined( __MINGW32__ )
+      asm volatile( "\tmovl %%esp, %0\n"
+                    "\tsubl $0x100, %%esp\n"
+                    : "=r" (pStack) );
+   #elif defined( __BORLANDC__ ) || defined(__DMC__)
       pStack = (DWORD *)_ESP;
       _ESP -= 0x100;
    #else
@@ -763,7 +767,41 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
       pStack--;            // ESP = ESP - 4
       *pStack = (DWORD)pRet;  // SS:[ESP] = pMem
    }
-   #if defined( __BORLANDC__ ) || defined(__DMC__)
+   #if defined( __MINGW32__ )
+      asm volatile( "\taddl $0x100, %%esp\n" /* Restore to original position */
+                    "\tsubl %2, %%esp\n"     /* Adjust for our new parameters */
+
+                    /* Stack is now properly built, we can call the function */
+                    "\tcall *%3\n"
+                    : "=a" (dwEAX), "=d" (dwEDX) /* Save eax/edx registers */
+                    : "r" (dwStSize), "r" (lpFunction) );
+    
+      /* Possibly adjust stack and read return values. */
+      if (Flags & DC_CALL_CDECL)
+      {
+         asm volatile( "\taddl %0, %%esp\n" : : "r" (dwStSize) );
+      }
+
+      if (Flags & DC_RETVAL_MATH4)
+      {
+         asm volatile( "\tfstps (%0)\n" : "=r" (Res) );
+      }
+      else if (Flags & DC_RETVAL_MATH8)
+      {
+         asm volatile( "\tfstpl (%0)\n" : "=r" (Res) );
+      }
+      else if (pRet == NULL)
+      {
+         Res.Int = dwEAX;
+         (&Res.Int)[1] = dwEDX;
+      }
+      else if (((Flags & DC_BORLAND) == 0) && (nRetSiz <= 8))
+      {
+         /* Microsoft optimized less than 8-bytes structure passing */
+         ((int *)pRet)[0] = dwEAX;
+         ((int *)pRet)[1] = dwEDX;
+      }
+   #elif defined( __BORLANDC__ ) || defined(__DMC__)
       _ESP += (0x100 - dwStSize);
       _EDX =  (DWORD) &lpFunction;
       __emit__(0xff,0x12); // call [edx];
@@ -852,4 +890,4 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    return Res;
 }
 
-#endif
+#endif /* HB_OS_WIN32 */
