@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5259 2006/11/28 02:13:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5260 2006/11/30 23:32:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-12-01 09:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+    + added mpr.lib to build xbscript.exe
+
+  * hrbdll.bc
+    ! fixed missing ct sources (pack.c and getsecrt.prg)
+
+  * dll_b32.bat
+    ! fixed to generate harbour.dll at bin folder instead lib.
+
+  * changelog
+    + added missing last entry from Phil Krylov.
 
 2006-11-30 19:31 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * hrbdll.bc
@@ -22,6 +35,20 @@
 
   * utils/xbscript/xbscript.prg
     + Added define CT and CTNET before #include "hbextern.ch"
+
+2006-11-30 04:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * bin/hb-mkslib.sh
+    ! Workaround for buggy 'mv -f' under MSYS.
+  * source/rtl/Makefile
+    ! Added dllcall.c.
+  * source/rtl/dllcall.c
+    ! Added DllCall() support for MinGW (AT&T assembler syntax).
+  + contrib/gtwvw/Makefile
+    ! Added GTWVW support for MinGW.
+  * source/debug/debugger.prg
+    + Added support for dedicated debugger window with GTWVW. Based on code
+      by Anatole Kolotovkin. You may need to REQUEST WVW_NOpenWindow and
+      WVW_NSetCurWindow to make it work.
 
 2006-11-27 22:11 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch
