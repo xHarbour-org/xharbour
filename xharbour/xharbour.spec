@@ -1,5 +1,5 @@
 #
-# $Id: xharbour.spec,v 1.92 2006/02/21 19:37:04 druzus Exp $
+# $Id: xharbour.spec,v 1.93 2006/06/28 21:06:30 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -560,6 +560,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/%{name}/libcodepage.a
 %{_libdir}/%{name}/libcommon.a
 %{_libdir}/%{name}/libdb*.a
+%{_libdir}/%{name}/libbmdbfcdx*.a
 %{_libdir}/%{name}/libdebug.a
 %{_libdir}/%{name}/libfm*.a
 %{_libdir}/%{name}/libgt*.a
