@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5261 2006/12/01 11:46:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.5262 2006/12/01 15:35:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-12-02 12:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/dattime3.prg
+    ! fixed showtime() function that was showing the time if we call
+      showtime(), whithout parameters, more than once.
 
 2006-12-01 11:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbextern.ch
@@ -17,13 +22,10 @@
 2006-12-01 09:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc
     + added mpr.lib to build xbscript.exe
-
   * hrbdll.bc
     ! fixed missing ct sources (pack.c and getsecrt.prg)
-
   * dll_b32.bat
     ! fixed to generate harbour.dll at bin folder instead lib.
-
   * changelog
     + added missing last entry from Phil Krylov.
 

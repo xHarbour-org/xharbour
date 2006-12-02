@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.5 2006/10/09 18:21:13 modalsist Exp $
+ * $Id: dattime3.prg,v 1.6 2006/10/31 02:41:42 modalsist Exp $
  */
 
 /*
@@ -77,8 +77,10 @@ FUNCTION ShowTime( nRow , nCol , lHideSeconds , cColor , lTwelve , lAmPm  )
 Local nColMax, nWindow
 Local cId
 
-   IF PCount()==0 .AND. s_nSHT_Handle != NIL
-      hb_ShowTimeOff()
+   IF PCount()==0 //.AND. s_nSHT_Handle != NIL
+      IF s_nSHT_Handle != NIL
+         hb_ShowTimeOff()
+      ENDIF
       RETURN ""
    ENDIF
 
@@ -101,7 +103,7 @@ Local cId
    nRow := Max(0,nRow)
    nCol := Max(0,nCol)
 
-   nColMax := maxcol() - iif(lHideSeconds,4,7) - iif(lAmPm,1,0)
+   nColMax := MaxCol() - iif(lHideSeconds,4,7) - iif(lAmPm,1,0)
 
    nCol := Min( nCol, nColMax )
    nRow := Min( nRow, MaxRow() )
