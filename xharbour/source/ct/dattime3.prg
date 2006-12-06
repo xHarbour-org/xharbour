@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.6 2006/10/31 02:41:42 modalsist Exp $
+ * $Id: dattime3.prg,v 1.7 2006/12/02 14:11:12 modalsist Exp $
  */
 
 /*
@@ -94,12 +94,12 @@ Local cId
    nWindow := SetMainWindow()
 
    DEFAULT nRow         TO Row()
-   DEFAULT nCol         TO Col()    
+   DEFAULT nCol         TO Col()
    DEFAULT lHideSeconds TO .F.
    DEFAULT cColor       TO setcolor()
    DEFAULT lTwelve      TO .F.
    DEFAULT lAmPm        TO .F.
- 
+
    nRow := Max(0,nRow)
    nCol := Max(0,nCol)
 
@@ -180,7 +180,7 @@ STATIC FUNCTION hb_ShowTime_Eval_Event()
 *---------------------------------------
 Local aTimer, nC := Col(), nR := Row()
 
-   For Each aTimer IN s_aSHT_Timer 
+   For Each aTimer IN s_aSHT_Timer
 
        aTimer[ 2 ] := .F.   // will not re-excuted during the execution.
 
@@ -230,6 +230,7 @@ Local cShowTime := ""
 Local cHour := ""
 Local cAmPm
 Local nWindow
+LOCAL nCursor
 
    IF cTime <> Time()
 
@@ -248,16 +249,18 @@ Local nWindow
 
       ENDIF
 
+      nCursor := SetCursor()
       nWindow := SetMainWindow()
 
       // 2006/OCT/30 - E.F. - Changed to Dispoutat() to force show time value
       //                      at display screen only. This avoid the printing
       //                      show time value if "set device to printer" is seted
-      //                      under gtwin while showtime() is active.  
+      //                      under gtwin while showtime() is active.
       //@ nRow, nCol say + cShowTime color cColor
       DispOutAt( nRow, nCol, cShowTime, cColor )
 
       RestoreWindow( nWindow )
+      SetCursor( nCursor )
 
       cTime := Time()
 

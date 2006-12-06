@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5264 2006/12/02 15:45:58 lculik Exp $
+ * $Id: ChangeLog,v 1.5265 2006/12/06 08:45:48 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2006-12-06 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/ct/datetime3.prg
+    * Added save/restore of SetCursor() settings to hb_ShowTimeClock()
 
 2006-12-06 09:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
   ! source/ct/ctmath2.c
