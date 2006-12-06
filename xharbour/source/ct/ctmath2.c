@@ -1,5 +1,5 @@
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *
  *   CT3 mathematical functions
  *     - FLOOR
@@ -11,8 +11,8 @@
  * NOTE: All these functions were builded using Borland C++ 5.5 (free version)
  *
  * Copyright 2001  Alejandro de Garate  <alex_degarate@hotmail.com>
- * 
- * Documentation and changes concerning error handling Copyright 2001 
+ *
+ * Documentation and changes concerning error handling Copyright 2001
  *   IntTec GmbH, Freiburg, Germany, Author: Martin Vogel <vogel@inttec.de>
  *
  * www - http://www.harbour-project.org
@@ -55,10 +55,10 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
- * 
+ *
  */
 
- 
+
 #include "ct.h"
 
 
@@ -69,11 +69,11 @@ HB_FUNC( FLOOR )
   {
     double dInput = hb_parnd(1);
     double dResult;
-    
+
     hb_mathResetError();
-    dResult = floor (dInput);  
-      
-    hb_retni( (int)dResult );
+    dResult = floor (dInput);
+
+    hb_retnlen( dResult, 0, 0 );
   }
   else
   {
@@ -84,7 +84,7 @@ HB_FUNC( FLOOR )
       pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_FLOOR,
                                NULL, "FLOOR", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -106,11 +106,11 @@ HB_FUNC( CEILING )
   {
     double dInput = hb_parnd(1);
     double dResult;
-    
+
     hb_mathResetError();
-    dResult = ceil (dInput);  
-     
-    hb_retni( (int)dResult );
+    dResult = ceil (dInput);
+
+    hb_retnlen( dResult, 0, 0 );
   }
   else
   {
@@ -121,7 +121,7 @@ HB_FUNC( CEILING )
       pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_CEILING,
                                NULL, "CEILING", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -141,12 +141,12 @@ HB_FUNC( SIGN )
 {
   if( ISNUM(1) )
   {
-    double dInput = hb_parnd(1);   
+    double dInput = hb_parnd(1);
     int iResult ;
 
     if( dInput == 0.00 )
         iResult = 0;
-    else 
+    else
     {
         if( dInput > 0.00 )
             iResult = 1;
@@ -164,7 +164,7 @@ HB_FUNC( SIGN )
       pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_SIGN,
                                NULL, "SIGN", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -183,16 +183,16 @@ HB_FUNC( SIGN )
 HB_FUNC( LOG10 )
 {
   if( ISNUM(1) )
-  { 
+  {
     double dInput = hb_parnd(1);
     double dResult;
 
     hb_mathResetError();
-    dResult = log10 (dInput);  
+    dResult = log10 (dInput);
 
     if (hb_mathIsMathErr())
     {
-      /* the C-RTL provides a kind of matherr() mechanism */ 
+      /* the C-RTL provides a kind of matherr() mechanism */
       HB_MATH_EXCEPTION hb_exc;
       int iLastError = hb_mathGetLastError (&hb_exc);
       if (iLastError != HB_MATH_ERR_NONE)
@@ -231,7 +231,7 @@ HB_FUNC( LOG10 )
       pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_LOG10,
                                NULL, "LOG10", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -251,7 +251,7 @@ HB_FUNC( FACT )
 {
   if( ISNUM(1) )
   {
-    int iInput = hb_parni(1); 
+    int iInput = hb_parni(1);
     int i;
     double dResult = 1.0;
 
@@ -277,7 +277,7 @@ HB_FUNC( FACT )
       pSubst = ct_error_subst ((USHORT)iArgErrorMode, EG_ARG, CT_ERROR_FACT,
                                NULL, "FACT", 0, EF_CANSUBSTITUTE, 1, hb_paramError (1));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

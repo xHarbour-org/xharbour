@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5263 2006/12/02 14:10:53 modalsist Exp $
+ * $Id: ChangeLog,v 1.5264 2006/12/02 15:45:58 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2006-12-06 09:45 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
+  ! source/ct/ctmath2.c
+    ! floor() and ceiling() were returning an int with a cast from a double
+      instead of using hb_retnlen(). Przemyslaw suggested the fix on
+      a newsgroup message.
+
 2006-12-02 14:00 UTC-0300 Luiz Rafael Culik<luiz at xharbour.com.br>
   * xharbour.spec
     +bmdbfcdx.a added to file list
