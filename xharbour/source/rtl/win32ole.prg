@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.143 2006/11/24 23:15:37 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.144 2006/12/07 13:02:28 ronpinkas Exp $
  */
 
 /*
@@ -118,21 +118,55 @@ RETURN TOleAuto():GetActiveObject( cString )
    static HRESULT  s_nOleError;
    static HB_ITEM  OleAuto;
 
-   static PHB_DYNS s_pSym_TOleAuto;
-   static PHB_DYNS s_pSym_hObj;
-   static PHB_DYNS s_pSym_New;
-   static PHB_DYNS s_pSym_cClassName;
+   static PHB_DYNS s_pSym_TOleAuto = NULL;
+   static PHB_DYNS s_pSym_hObj = NULL;
+   static PHB_DYNS s_pSym_New = NULL;
+   static PHB_DYNS s_pSym_cClassName = NULL;
 
-   static PHB_DYNS s_pSym_VTWrapper;
-   static PHB_DYNS s_pSym_VTArrayWrapper;
-   static PHB_DYNS s_pSym_vt;
-   static PHB_DYNS s_pSym_Value;
+   static PHB_DYNS s_pSym_VTWrapper = NULL;
+   static PHB_DYNS s_pSym_VTArrayWrapper = NULL;
+   static PHB_DYNS s_pSym_vt = NULL;
+   static PHB_DYNS s_pSym_Value = NULL;
 
    static DISPPARAMS s_EmptyDispParams;
 
    static VARIANTARG RetVal, OleVal;
 
 #pragma ENDDUMP
+
+//----------------------------------------------------------------------------//
+// Called by hb_vmInit() by means of hb_vmDoInitOle() ONLY if OLE is linked-in
+PROCEDURE HB_OleInit()
+
+   /*
+    Using HB_INLINE() instead of HB_FUNC() to force Symbol Table entry, because
+    we do NOT want to force static linking!
+   */
+   HB_INLINE()
+   {
+      if( s_pSym_TOleAuto == NULL )
+      {
+          s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
+          s_pSym_New            = hb_dynsymFind( "NEW" );
+          s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
+          s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
+
+          s_pSym_VTWrapper      = hb_dynsymFind( "VTWRAPPER" );
+          s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
+          s_pSym_vt             = hb_dynsymGetCase( "VT" );
+          s_pSym_Value          = hb_dynsymFind( "VALUE" );
+
+          s_EmptyDispParams.rgvarg            = NULL;
+          s_EmptyDispParams.cArgs             = 0;
+          s_EmptyDispParams.rgdispidNamedArgs = 0;
+          s_EmptyDispParams.cNamedArgs        = 0;
+
+          VariantInit( &RetVal );
+          VariantInit( &OleVal );
+      }
+   }
+
+RETURN
 
 //----------------------------------------------------------------------------//
 CLASS VTWrapper
@@ -727,27 +761,6 @@ RETURN Self
 
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt );
-
-  void hb_oleInit( void )
-  {
-     s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
-     s_pSym_New            = hb_dynsymFind( "NEW" );
-     s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
-     s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
-
-     s_pSym_VTWrapper      = hb_dynsymFind( "VTWRAPPER" );
-     s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
-     s_pSym_vt             = hb_dynsymGetCase( "VT" );
-     s_pSym_Value          = hb_dynsymFind( "VALUE" );
-
-     s_EmptyDispParams.rgvarg            = NULL;
-     s_EmptyDispParams.cArgs             = 0;
-     s_EmptyDispParams.rgdispidNamedArgs = 0;
-     s_EmptyDispParams.cNamedArgs        = 0;
-
-     VariantInit( &RetVal );
-     VariantInit( &OleVal );
-  }
 
   //---------------------------------------------------------------------------//
   HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )

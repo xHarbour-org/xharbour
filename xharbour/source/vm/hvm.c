@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.586 2006/12/07 13:02:28 ronpinkas Exp $
+ * $Id: hvm.c,v 1.587 2006/12/07 16:18:43 kaddath Exp $
  */
 
 /*
@@ -139,7 +139,6 @@
 #endif
 
 #if defined(HB_OS_WIN_32)
-   extern void hb_oleInit( void );
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
 
@@ -534,6 +533,19 @@ static void hb_vmDoInitClip( void )
    }
 }
 
+/* Initialize Ole System IF linked in. */
+static void hb_vmDoInitOle( void )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "HB_OLEINIT" );
+
+   if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
@@ -658,7 +670,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       if( hb_dynsymFind( "TOLEAUTO" ) && OleInitialize( NULL ) == S_OK ) // Do NOT use SUCCEEDED() due to S_FALSE!
       {
          s_bUnInitOle = TRUE;
-         hb_oleInit();
+         hb_vmDoInitOle();
       }
    #endif
 
