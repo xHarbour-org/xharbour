@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.584 2006/09/27 11:01:45 druzus Exp $
+ * $Id: hvm.c,v 1.585 2006/10/10 20:37:50 ronpinkas Exp $
  */
 
 /*
@@ -654,9 +654,12 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
    #if defined(HB_OS_WIN_32)
+      extern void hb_oleInit( void );
+
       if( hb_dynsymFind( "TOLEAUTO" ) && OleInitialize( NULL ) == S_OK ) // Do NOT use SUCCEEDED() due to S_FALSE!
       {
          s_bUnInitOle = TRUE;
+         hb_oleInit();
       }
    #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.142 2006/11/02 19:17:31 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.143 2006/11/24 23:15:37 ronpinkas Exp $
  */
 
 /*
@@ -133,32 +133,6 @@ RETURN TOleAuto():GetActiveObject( cString )
    static VARIANTARG RetVal, OleVal;
 
 #pragma ENDDUMP
-
-//----------------------------------------------------------------------------//
-INIT PROC HB_OLEINIT
-
-   HB_INLINE()
-   {
-      s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
-      s_pSym_New            = hb_dynsymFind( "NEW" );
-      s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
-      s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
-
-      s_pSym_VTWrapper      = hb_dynsymFind( "VTWRAPPER" );
-      s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
-      s_pSym_vt             = hb_dynsymGetCase( "VT" );
-      s_pSym_Value          = hb_dynsymFind( "VALUE" );
-
-      s_EmptyDispParams.rgvarg            = NULL;
-      s_EmptyDispParams.cArgs             = 0;
-      s_EmptyDispParams.rgdispidNamedArgs = 0;
-      s_EmptyDispParams.cNamedArgs        = 0;
-
-      VariantInit( &RetVal );
-      VariantInit( &OleVal );
-   }
-
-RETURN
 
 //----------------------------------------------------------------------------//
 CLASS VTWrapper
@@ -753,6 +727,27 @@ RETURN Self
 
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt );
+
+  void hb_oleInit( void )
+  {
+     s_pSym_TOleAuto       = hb_dynsymFind( "TOLEAUTO" );
+     s_pSym_New            = hb_dynsymFind( "NEW" );
+     s_pSym_hObj           = hb_dynsymFind( "HOBJ" );
+     s_pSym_cClassName     = hb_dynsymFind( "CCLASSNAME" );
+
+     s_pSym_VTWrapper      = hb_dynsymFind( "VTWRAPPER" );
+     s_pSym_VTArrayWrapper = hb_dynsymFind( "VTARRAYWRAPPER" );
+     s_pSym_vt             = hb_dynsymGetCase( "VT" );
+     s_pSym_Value          = hb_dynsymFind( "VALUE" );
+
+     s_EmptyDispParams.rgvarg            = NULL;
+     s_EmptyDispParams.cArgs             = 0;
+     s_EmptyDispParams.rgdispidNamedArgs = 0;
+     s_EmptyDispParams.cNamedArgs        = 0;
+
+     VariantInit( &RetVal );
+     VariantInit( &OleVal );
+  }
 
   //---------------------------------------------------------------------------//
   HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
@@ -2539,7 +2534,7 @@ RETURN Self
            PHB_ITEM pOleClassName = hb_itemNew( NULL );
            char *sOleClassName;
 		   int iClassNameLen, iMsgNameLen;
-		   
+
            hb_itemForwardValue( pReturn, &HB_VM_STACK.Return );
 
            hb_vmPushSymbol( s_pSym_cClassName->pSymbol );
@@ -2547,11 +2542,11 @@ RETURN Self
            hb_vmSend( 0 );
 
            iClassNameLen = hb_parclen( -1 );
-           iMsgNameLen = strlen( (*HB_VM_STACK.pBase)->item.asSymbol.value->szName );             
-		   
+           iMsgNameLen = strlen( (*HB_VM_STACK.pBase)->item.asSymbol.value->szName );
+
 		   sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
-		   
-           strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );           
+
+           strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );
            sOleClassName[ iClassNameLen ] = ':';
            strcpy( sOleClassName + iClassNameLen + 1, ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName );
 
@@ -2565,7 +2560,7 @@ RETURN Self
            hb_vmSend( 1 );
 
            hb_itemReturnForward( pReturn );
-           
+
            hb_itemRelease( pReturn );
            hb_itemRelease( pOleClassName );
         }
