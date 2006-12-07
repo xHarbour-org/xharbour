@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.585 2006/10/10 20:37:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.586 2006/12/07 13:02:28 ronpinkas Exp $
  */
 
 /*
@@ -139,6 +139,7 @@
 #endif
 
 #if defined(HB_OS_WIN_32)
+   extern void hb_oleInit( void );
    /* Mouse Disabling */
    extern BOOL b_MouseEnable;
 
@@ -654,8 +655,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    hb_vmDoInitClip(); // Initialize ErrorBlock() and __SetHelpK()
 
    #if defined(HB_OS_WIN_32)
-      extern void hb_oleInit( void );
-
       if( hb_dynsymFind( "TOLEAUTO" ) && OleInitialize( NULL ) == S_OK ) // Do NOT use SUCCEEDED() due to S_FALSE!
       {
          s_bUnInitOle = TRUE;
