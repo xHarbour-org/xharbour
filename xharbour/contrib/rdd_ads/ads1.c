@@ -2141,9 +2141,6 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             char * szRet;
             ULONG ulLen;
-            UNSIGNED16 pusType;
-
-            AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
 
             bTypeError = FALSE;
             ulLen = hb_itemGetCLen( pItem );
@@ -2157,9 +2154,8 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                is a little bit slower to save big image file in the fields, so I keep
                AdsSetString() only for commom memo fields and AdsSetBinary() for the others.
             */
-
 //          if( ulLen < 0xFFFF )
-            if( pusType != ADS_BINARY && pusType != ADS_IMAGE )
+            if( pField->uiTypeExtended != ADS_BINARY && pField->uiTypeExtended != ADS_IMAGE )
             {
                ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                   (UNSIGNED8*) szRet, ulLen );
@@ -2167,7 +2163,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             else
             {
                ulRetVal = AdsSetBinary( pArea->hTable, ADSFIELD( uiIndex ),
-                  pusType, ulLen, 0,
+                  pField->uiTypeExtended, ulLen, 0,
                   (UNSIGNED8*) szRet, ulLen );
             }
             hb_adsOemAnsiFree( szRet );
