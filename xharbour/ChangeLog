@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5268 2006/12/07 16:18:42 kaddath Exp $
+ * $Id: ChangeLog,v 1.5269 2006/12/07 17:26:57 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-13-09 10:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * contrib/rdd_ads/ads1.c
+    * Corrected ads for save memo/binary/image fields larger than 64Kb.
+      Tested in ADS 6.2 and 7.1 works fine, previous versions not tested.
 
 2006-12-07 13:26 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/win32ole.prg

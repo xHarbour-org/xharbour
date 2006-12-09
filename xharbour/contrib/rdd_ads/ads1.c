@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.112 2006/09/22 19:02:22 ronpinkas Exp $
+ * $Id: ads1.c,v 1.113 2006/09/27 11:01:44 druzus Exp $
  */
 
 /*
@@ -1787,7 +1787,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    pField = pArea->lpFields + uiIndex - 1;
 
    /* This code was optimized for use ADSFIELD() macro instead */
-   /* AdsGetFieldName() function for speed. Toninho@fwi, 22/07/2003 */
+   /* AdsGetFieldName() function for speed. ToninhoFwi, 22/07/2003 */
 
    switch( pField->uiType )
    {
@@ -1899,7 +1899,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
          AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
 
-         if( pusType != ADS_BINARY )
+         if( pusType != ADS_BINARY && pusType != ADS_IMAGE )
          {
             if( AdsGetMemoLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
             {
@@ -2080,7 +2080,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    szText = pArea->pRecord;
 
    /* This code was optimized for use ADSFIELD() macro instead */
-   /* AdsGetFieldName() function for speed. Toninho@fwi, 22/07/2003 */
+   /* AdsGetFieldName() function for speed. ToninhoFwi, 22/07/2003 */
 
    switch( pField->uiType )
    {
@@ -2141,12 +2141,25 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             char * szRet;
             ULONG ulLen;
+            UNSIGNED16 pusType;
+
+            AdsGetMemoDataType( pArea->hTable, ADSFIELD( uiIndex ), &pusType );
 
             bTypeError = FALSE;
             ulLen = hb_itemGetCLen( pItem );
 
             szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), ulLen );
-            if( ulLen < 0xFFFF )
+
+            /* ToninhoFwi - 09/12/2006 - In the previous code ulLen was limited to 0xFFFF
+               so, I comment it, because ADS support up to 4Gb in memo/binary/image fields.
+               Advantage documentations says that we need use AdsSetBinary in binary/image
+               fields. I tested these special fields with AdsSetString() and it works, but
+               is a little bit slower to save big image file in the fields, so I keep
+               AdsSetString() only for commom memo fields and AdsSetBinary() for the others.
+            */
+
+//          if( ulLen < 0xFFFF )
+            if( pusType != ADS_BINARY && pusType != ADS_IMAGE )
             {
                ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                   (UNSIGNED8*) szRet, ulLen );
@@ -2154,7 +2167,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             else
             {
                ulRetVal = AdsSetBinary( pArea->hTable, ADSFIELD( uiIndex ),
-                  ADS_BINARY, ulLen, 0,
+                  pusType, ulLen, 0,
                   (UNSIGNED8*) szRet, ulLen );
             }
             hb_adsOemAnsiFree( szRet );
