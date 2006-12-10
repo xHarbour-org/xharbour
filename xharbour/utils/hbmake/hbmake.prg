@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.175 2006/08/21 12:00:58 modalsist Exp $
+ * $Id: hbmake.prg,v 1.176 2006/08/21 18:35:32 modalsist Exp $
  */
 
 /*
@@ -145,6 +145,34 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nPos
    LOCAL aPpo
    LOCAL cExt := ""
+
+   IF Empty(cFile)
+      OutStd( "xHarbour Make" + HB_OSNewLine() +;
+              "Copyright 1999-2006, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              HB_OSNewLine() +;
+              "Syntax:  hbmake <makefile> [switches]" + HB_OSNewLine() +;
+              "Switches:" + HB_OSNewLine() +;
+              "  -b   Use Bcc as the C compiler.This options is default under Win32" + HB_OSNewLine() +;
+              "  -g   Use Gcc as the C compiler.This options is default under OS/2" + HB_OSNewLine() +;
+              "  -gl  Use Gcc as the C compiler on Linux" + HB_OSNewLine() +;
+              "  -v   Use MSVC as the C compiler" + HB_OSNewLine() +;
+              "  -D Define an macro. Multiple macros can be used in an single line" + HB_OSNewLine() +;
+              "       Ex:" + HB_OSNewLine() +;
+              "  -DOB=c.obj;d.obj" + HB_OSNewLine() +;
+              "       and also Multiple -D is also supported" + HB_OSNewLine() +;
+              "  -p   Print all command and defines" + HB_OSNewLine() +;
+              "  -f   Force all files to be rebuild" + HB_OSNewLine() +;
+              "  -e   Open the editor mode." + HB_OSNewLine() +;
+              "  -ex  Open the editor mode in extended mode" + HB_OSNewLine() +;
+              "  -el  Open the editor mode for creating libraries." + HB_OSNewLine() +;
+              "  -elx Open the editor mode for creating librariesin extented mode." + HB_OSNewLine() +;
+              "  -i Ignore errors returned by commands" + HB_OSNewLine() +;
+              "  -r Recurse directories for source code" + HB_OSNewLine() +;
+              HB_OSNewLine() +;
+              "Note:  Linked with " + Version() + HB_OSNewLine() )
+              Return .F.
+   endif
+
 
    cExt := SubStr( cFile, At(".",cFile) )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.79 2006/10/15 19:25:13 likewolf Exp $
+ * $Id: debugger.prg,v 1.80 2006/11/30 00:57:08 likewolf Exp $
  */
 
 /*
@@ -323,7 +323,8 @@ CLASS TDebugger
    METHOD Step()
 
    METHOD TabWidth() INLINE ;
-          ::nTabWidth := ::InputBox( "Tab width", ::nTabWidth )
+          ::nTabWidth := ::InputBox( "Tab width", ::nTabWidth ),;
+          ::oBrwText:nTabWidth := ::nTabWidth, ::oBrwText:RefreshAll()
 
    METHOD ToggleBreakPoint()
 
@@ -1185,13 +1186,11 @@ METHOD EditVar( nVar ) CLASS TDebugger
    uVarValue := ::VarGetValue( ::aVars[ nVar ] )
 
    do case
-      case ValType( uVarValue ) == "A"
-           ::InputBox( cVarName, uVarValue,, .f. )
+      case ValType( uVarValue ) == "A" .or. ;
+           ValType( uVarValue ) == "H" .or. ;
+           ValType( uVarValue ) == "O" .or. ;
+           ValType( uVarValue ) == "P"
 
-      case ValType( uVarValue ) == "H"
-           ::InputBox( cVarName, uVarValue,, .f. )
-
-      case ValType( uVarValue ) == "O"
            ::InputBox( cVarName, uVarValue,, .f. )
 
       otherwise
@@ -2006,7 +2005,7 @@ METHOD Open() CLASS TDebugger
                    ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cFileName,;
                    __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
                    __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
-                   ::lLineNumbers )
+                   ::lLineNumbers, ::nTabWidth )
       ::oWndCode:Browser := ::oBrwText
       ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
       ::oWndCode:SetCaption( ::cPrgName )
@@ -2044,7 +2043,7 @@ METHOD OpenPPO() CLASS TDebugger
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
         ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, ::cPrgName,;
         __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
-        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ::lLineNumbers )
+        __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ::lLineNumbers, ::nTabWidth )
       ::oWndCode:Browser := ::oBrwText
       ::RedisplayBreakpoints()               // check for breakpoints in this file and display them
       ::oWndCode:SetCaption( ::cPrgName )
@@ -2664,7 +2663,7 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
                                              ::oWndCode:nBottom - 1, ::oWndCode:nRight - 1, cPrgName,;
                                              __DbgColors()[ 2 ] + "," + __DbgColors()[ 5 ] + "," + ;
                                              __DbgColors()[ 3 ] + "," + __DbgColors()[ 6 ], ;
-                                             ::lLineNumbers )
+                                             ::lLineNumbers, ::nTabWidth )
 
                ::oWndCode:Browser := ::oBrwText
 
@@ -3443,6 +3442,10 @@ static function ValToStr( uVal )
 
       case cType == "O"
            cResult := "Class " + uVal:ClassName() + " object"
+
+      case cType == "P"
+           cResult := "Pointer"
+
    endcase
 
 return cResult

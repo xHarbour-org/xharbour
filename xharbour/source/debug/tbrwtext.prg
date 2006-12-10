@@ -1,5 +1,5 @@
 /*
- * $Id: tbrwtext.prg,v 1.18 2005/10/25 15:18:33 mauriliolongo Exp $
+ * $Id: tbrwtext.prg,v 1.19 2006/07/18 06:49:10 lf_sfnet Exp $
  */
 
 /*
@@ -76,7 +76,7 @@ CLASS TBrwText FROM HBEditor
    ACCESS colorSpec INLINE ::cColorSpec
    ASSIGN colorSpec(cClr) INLINE ::cColorSpec:=cClr
 
-   METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor)
+   METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers, nTabWidth)
 
    METHOD End() INLINE ::ScrollTo( Len( ::GetLine( ::nRow ) ) - ::nNumCols ) // Scroll window to show the end of line
    METHOD ForceStable() INLINE NIL         // TBrowse emulation for TDbgWindow
@@ -98,7 +98,7 @@ CLASS TBrwText FROM HBEditor
 ENDCLASS
 
 
-METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS TBrwText
+METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers, nTabWidth) CLASS TBrwText
 
    DEFAULT cColor TO SetColor()
    DEFAULT lLineNumbers TO .T.
@@ -113,7 +113,7 @@ METHOD New(nTop, nLeft, nBottom, nRight, cFileName, cColor, lLineNumbers) CLASS 
    /* A hack to enforce cursor setting in Giancarlo's HBEditor */
    SetCursor( SC_SPECIAL1 )
 
-   ::Super:New("", nTop, nLeft, nBottom, nRight, .F., -1)
+   ::Super:New("", nTop, nLeft, nBottom, nRight, .F., -1, nTabWidth)
    ::Super:SetColor(cColor)
 
    /* A hack to enforce cursor setting in Eduardo's HBEditor */

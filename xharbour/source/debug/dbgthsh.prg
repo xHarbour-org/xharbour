@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.8 2004/08/09 17:10:06 mauriliolongo Exp $
+ * $Id: dbgthsh.prg,v 1.1 2006/06/26 14:26:25 fsgiudice Exp $
  */
 
 /*
@@ -165,7 +165,7 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) Class
 
    local nSet     := oBrwSets:cargo[1]
    local cOldname := ::hashName
-   Local nPos
+   Local nPos, uValue
 
    local nRecsToSkip
    do case
@@ -188,8 +188,9 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) Class
               OBrwSets:PageUp()
 
       Case nKey == K_ENTER
-         if valtype( HGetValueAt( hHash, nSet ) ) == "H"
-            if Len( HGetValueAt( hHash, nSet ) ) == 0
+         uValue := HGetValueAt( hHash, nSet )
+         if valtype( uValue ) == "H"
+            if Len( uValue ) == 0
                Alert( "Hash is empty" )
             else
                SetPos(ownd:nBottom,ownd:nLeft)
@@ -202,26 +203,26 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) Class
                adel(::aWindows,::nCurWindow)
                asize(::awindows,len(::awindows)-1)
                if ::nCurwindow==0
-                  ::ncurwindow:=1
+                  ::nCurwindow:=1
                else
-                  ::ncurwindow--
+                  ::nCurwindow--
                endif
             endif
-         elseif valtype( HGetValueAt( hHash, nSet ) )=="B"
+         elseif valtype( uValue ) == "B" .or. valtype( uValue ) == "P"
                   Alert("Value cannot be edited")
          else
               if ::lEditable
                  oBrwSets:RefreshCurrent()
-                 if ValType( HGetValueAt( hHash, nSet ) ) == "O"
+                 if ValType( uValue ) == "O"
 
-                    __DbgObject( HGetValueAt( hHash, nSet ), cName + ;
+                    __DbgObject( uValue, cName + ;
                                  "[" + HashKeyString( hHash, nSet ) + "]" )
-                 elseif ValType( HGetValueAt( hHash, nSet ) ) == "A"
+                 elseif ValType( uValue ) == "A"
 
-                    __DbgArrays( HGetValueAt( hHash, nSet ), cName + ;
+                    __DbgArrays( uValue, cName + ;
                                  "[" + HashKeyString( hHash, nSet ) + "]" )
                  else
-                    ::doget(oBrwsets,hHash,nSet)
+                    ::doget(oBrwsets, hHash, nSet)
                  endif
                  oBrwSets:RefreshCurrent()
                  oBrwSets:ForceStable()
@@ -271,6 +272,10 @@ static function ValToStr( uVal )
 
       case cType == "H"
            cResult := "Hash of " + AllTrim( Str( Len( uVal ) ) ) + " elements"
+
+      case cType == "P"
+           cResult := "Pointer"
+
    endcase
 
 return cResult

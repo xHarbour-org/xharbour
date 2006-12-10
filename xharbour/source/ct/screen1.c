@@ -1,5 +1,5 @@
 /*
- * $Id: screen1.c,v 1.2 2006/09/02 16:00:00 ptsarenko Exp $
+ * $Id: screen1.c,v 1.2 2006/09/02 14:14:48 ptsarenko Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ HB_FUNC( SCREENATTR )
   {
      hb_gtSave( iRow, iCol, iRow, iCol, pcPos );
 
-     hb_retni( ( int ) pcPos[1] );
+     hb_retni( ( unsigned char ) pcPos[1] );
   }
   else
      hb_retni( 0 );

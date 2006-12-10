@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.19 2005/12/20 01:50:17 peterrees Exp $
+ * $Id: win32prn.prg,v 1.20 2006/01/15 20:29:02 peterrees Exp $
  */
 
 /*
@@ -185,6 +185,8 @@ CLASS WIN32PRN
                                                                     // after printing.
   METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
                                                                      // Set Background mode
+
+  METHOD GetDeviceCaps( nCaps ) INLINE GetDeviceCaps( ::hPrinterDC, nCaps)
 
   VAR PrinterName    INIT ""
   VAR Printing       INIT .F.

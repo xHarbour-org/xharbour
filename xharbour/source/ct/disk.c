@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.10 2005/03/18 13:39:37 modalsist Exp $
+ * $Id: disk.c,v 1.11 2005/12/01 13:41:14 snaiperis Exp $
  */
 /*
  * xHarbour Project source code:
@@ -19,6 +19,9 @@
  *
  * Copyright 2004 Phil Krylov <phil@newstar.rinet.ru>
  * NUMDISKL()
+ *
+ * Copyright 2006 Pavel Tsarenko <tpe2@mail.ru>
+ * TrueName()
  *
  * www - http://www.xharbour.org
  *
@@ -361,4 +364,31 @@ HB_FUNC( VOLSERIAL )
     else
        hb_retni(-1);
 #endif
+}
+
+HB_FUNC( TRUENAME )
+{
+
+   if( ISCHAR(1) )
+   {
+      char * szFile = hb_parc( 1 );
+#ifdef HB_OS_WIN_32
+      char *szBuffRet = NULL ;
+      char buffer[ MAX_PATH + 1 ] = {0};
+
+      GetFullPathName( (LPCSTR) szFile,
+                            MAX_PATH ,
+                            (LPSTR) buffer ,
+                            &szBuffRet
+                          )  ;
+      hb_retc( buffer );
+#else
+      hb_retc( szFile );
+#endif
+   }
+   else
+   {
+      hb_retc("");
+   }
+   
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: txtline.c,v 1.8 2006/06/27 19:23:23 ptsarenko Exp $
+ * $Id: txtline.c,v 1.9 2006/10/25 16:19:20 ronpinkas Exp $
  */
 
 /*
@@ -175,6 +175,61 @@ void hb_readLine( char * szText, ULONG ulTextLen, ULONG uiLineLen, USHORT uiTabL
       *ulEndOffset = ulTextLen - 1;
       *bEOF        = 1;
    }
+}
+
+LONG hb_tabexpand(char * szString, char * szRet, LONG lEnd, USHORT uiTabLen )
+{
+   LONG lPos, lSpAdded = 0;
+
+   for( lPos = 0; lPos <= lEnd; lPos++ )
+   {
+      if( szString[ lPos ] == HB_CHAR_HT )
+      {
+         lSpAdded += ( (uiTabLen > 0) ? uiTabLen - ( ( lPos + lSpAdded ) % uiTabLen ) - 1 : 0);
+      }
+      else if ( ( lPos < lEnd && szString[ lPos ] == HB_CHAR_SOFT1 && szString[ lPos + 1 ] == HB_CHAR_SOFT2 ) || szString[ lPos ] == HB_CHAR_LF )
+      {
+         lSpAdded--;
+      }
+      else
+      {
+         *( szRet + lPos + lSpAdded ) = *( szString + lPos );
+      }
+   }
+
+   return lSpAdded + lEnd;
+}
+
+HB_FUNC( HB_TABEXPAND )
+{
+   char * szText   = hb_parcx( 1 );
+   LONG lStrLen    = hb_parclen( 1 );
+   USHORT uiTabLen = (USHORT) hb_parni( 2 );
+   USHORT uiTabCount = 0;
+   LONG lPos, lSize;
+   char * szRet;
+
+   for (lPos = 0; lPos < lStrLen; lPos ++ )
+   {
+      if( szText[ lPos ] == HB_CHAR_HT )
+      {
+         uiTabCount ++;
+      }
+   }
+
+   if( (lStrLen == 0) || (uiTabCount == 0) || (uiTabLen == 0) )
+   {
+      hb_retc( szText );
+   }
+   else
+   {
+      lSize = lStrLen + uiTabCount*(uiTabLen - 1);
+      szRet = (char *) hb_xgrab( lSize + 1 );
+      memset( szRet, ' ', lSize );
+      lStrLen = hb_tabexpand( szText, szRet, lStrLen, uiTabLen );
+      hb_retclenAdopt( szRet, lStrLen);
+   }
+
 }
 
 // HB_READLINE( <cText>, [<aTerminators | cTerminator>], <nLineLen>, <nTabLen>, <lWrap>, [<nStartOffset>], @nOffSet, @nEnd, @lFound, @lEOF )
@@ -447,23 +502,7 @@ HB_FUNC( MEMOLINE )
 
       if( ulLines == ulLineNumber )
       {
-         LONG lPos, lSpAdded = 0;
-
-         for( lPos = 0; lPos <= lEnd; lPos++ )
-         {
-            if( pszString[ ulStartOffset + lPos ] == HB_CHAR_HT )
-            {
-               lSpAdded += uiTabLen - ( ( lPos + lSpAdded ) % uiTabLen ) - 1;
-            }
-            else if ( ( lPos < lEnd && pszString[ ulStartOffset + lPos ] == HB_CHAR_SOFT1 && pszString[ ulStartOffset + lPos + 1 ] == HB_CHAR_SOFT2 ) || pszString[ ulStartOffset + lPos ] == HB_CHAR_LF )
-            {
-               lSpAdded--;
-            }
-            else
-            {
-               *( szRet + lPos + lSpAdded ) = *( pszString + ulStartOffset + lPos );
-            }
-         }
+         hb_tabexpand(pszString + ulStartOffset, szRet, lEnd, uiTabLen);
 
          hb_retclenAdopt( szRet, ulLineSize );
          bLineFound = TRUE;

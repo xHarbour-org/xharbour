@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.80 2006/09/16 21:12:28 modalsist Exp $
+/* $Id: teditor.prg,v 1.81 2006/09/21 14:12:36 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.80 2006/09/16 21:12:28 modalsist Exp $
+/* $Id: teditor.prg,v 1.81 2006/09/21 14:12:36 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -1817,7 +1817,11 @@ METHOD GetLine( nRow ) CLASS HBEditor
    DEFAULT nRow TO ::nRow
 
    if nRow <= ::LastRow() .AND. nRow > 0
-      return ::aText[ nRow ]:cText
+      if ::lEditAllow .or. Empty(::nTabWidth)
+         return ::aText[ nRow ]:cText
+      else
+         return HB_TabExpand(::aText[ nRow ]:cText, ::nTabWidth)
+      endif
    else
       return ""
    endif

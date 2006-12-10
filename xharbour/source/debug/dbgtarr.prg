@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.8 2004/08/09 17:10:06 mauriliolongo Exp $
+ * $Id: dbgtarr.prg,v 1.9 2006/06/26 14:26:25 fsgiudice Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
                   ::ncurwindow--
                endif
             endif
-         elseif valtype(aArray[nSet])=="B"
+         elseif valtype(aArray[nSet])=="B" .or. valtype(aArray[nSet])=="P"
                   Alert("Value cannot be edited")
          else
               if ::lEditable
@@ -254,6 +254,10 @@ static function ValToStr( uVal )
 
       case cType == "O"
            cResult := "Class " + uVal:ClassName() + " object"
+
+      case cType == "P"
+           cResult := "Pointer"
+
    endcase
 
 return cResult

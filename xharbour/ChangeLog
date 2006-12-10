@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5270 2006/12/09 13:00:22 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5271 2006/12/09 18:55:54 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-12-10 15:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
+  * source/ct/disk.c
+    + added TrueName() function for win32
+  * source/ct/screen1.c
+    ! fixed ScreenAttr() for attribute value greater then 128
+  * source/rtl/txtline.c
+    + added HB_TABEXPAND() function
+  * source/rtl/teditor.prg
+    + added nTabWidth support for view mode
+  * source/rtl/win32prn.prg
+    + added GetDeviceCaps method
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dedugger.prg
+  * source/debug/tbrwtext.prg
+    * corrections for Pointer type
+    + added nTabWidth support
+  * utils/hbmake/hbmake.prg
+    ! fixed hbmake without parameters
 
 2006-13-09 15:48 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ads1.c
