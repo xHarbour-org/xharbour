@@ -1,5 +1,5 @@
 /*
- * $Id: color.prg,v 1.4 2004/07/30 09:54:16 likewolf Exp $
+ * $Id: color.prg,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
  */
 
 /*
@@ -67,7 +67,7 @@
 
 FUNCTION INVERTATTR( xAttr )
   LOCAL n := ColorToN( xAttr )
-RETURN ( n % 8 ) * 16 + Int( n / 16 )
+RETURN ( n & 0x0F ) << 4 + ( n >> 4 )
 
 
 
