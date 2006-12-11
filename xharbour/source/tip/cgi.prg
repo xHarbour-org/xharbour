@@ -263,15 +263,15 @@ METHOD ErrHandler( xError ) CLASS TIpCgi
 
    ::Print( '<table border="1">' )
 
-   ::Print( '<tr><td>SCRIPT NAME:</td><td>' + getenv( 'SCRIPT_NAME' ) + '</td>' )
+   ::Print( '<tr><td>SCRIPT NAME:</td><td>' + getenv( 'SCRIPT_NAME' ) + '</td></tr>' )
 
    if valtype( xError ) == "O"
-      ::Print( '<tr><td>CRITICAL ERROR:</td><td>' + xError:Description + '</td>' ) 
-      ::Print( '<tr><td>OPERATION:</td><td>' + xError:Operation + '</td>' ) 
-      ::Print( '<tr><td>OS ERROR:</td><td>' + alltrim( str( xError:OsCode ) ) + ' IN ' + xError:SubSystem + '/' + alltrim( str( xError:SubCode ) ) + '</td>' ) 
-      ::Print( '<tr><td>FILENAME:</td><td>' + right( xError:FileName, 40 ) + '</td>' )
+      ::Print( '<tr><td>CRITICAL ERROR:</td><td>' + xError:Description + '</td></tr>' ) 
+      ::Print( '<tr><td>OPERATION:</td><td>' + xError:Operation + '</td></tr>' ) 
+      ::Print( '<tr><td>OS ERROR:</td><td>' + alltrim( str( xError:OsCode ) ) + ' IN ' + xError:SubSystem + '/' + alltrim( str( xError:SubCode ) ) + '</td></tr>' ) 
+      ::Print( '<tr><td>FILENAME:</td><td>' + right( xError:FileName, 40 ) + '</td></tr>' )
    elseif valtype( xError ) == "C"
-      ::Print( '<tr><td>ERROR MESSAGE:</td><td>' + xError + '</td>' )
+      ::Print( '<tr><td>ERROR MESSAGE:</td><td>' + xError + '</td></tr>' )
    endif
 
    for nCalls := 2 to 6
@@ -506,27 +506,45 @@ STATIC FUNCTION HtmlValue( xVal, cKey, cDefault )
 STATIC FUNCTION HtmlScript( xVal, cKey )
 
    local cVal := ''
+   local nPos
+   local cTmp
 
    DEFAULT cKey TO 'script'
 
-   if hHasKey( xVal, cKey )
-      cVal := hGet( xVal, cKey )
+   if ( nPos := hGetPos( xVal, cKey ) ) != 0
+      cVal := hGetValueAt( xVal, nPos )
+      if valtype( cVal ) == "C"
+         cVal := '<script language="JavaScript" type="text/javascript">' + _CRLF +;
+                 '<!--' + _CRLF +;
+                 cVal + _CRLF +;
+                 '-->' + _CRLF +;
+                 '</script>'
+      elseif valtype( cVal ) == "H"
+         if ( nPos := hGetPos( cVal, 'src' ) ) != 0
+            cVal := hGetValueAt( cVal, nPos )
+            if valtype( cVal ) == "C"            
+               cVal := '<script language="JavaScript" src="' + cVal + '" type="text/javascript">' + _CRLF
+            elseif valtype( cVal ) == "A"
+               cTmp := ''
+               ascan( cVal, { |cFile| cTmp += '<script language="JavaScript" src="' + cFile + '" type="text/javascript">' + _CRLF } )
+               cVal := cTmp
+            endif   
+         endif
+      endif
       hDel( xVal, cKey )
-      cVal := '<script language="JavaScript" type="text/javascript">' + _CRLF +;
-              '<!--' + _CRLF +;
-              cVal + _CRLF +;
-              '-->' + _CRLF +;
-              '</script>'
    endif
    
    return cVal
 
-STATIC FUNCTION HtmlStyle( xVal )
+STATIC FUNCTION HtmlStyle( xVal, cKey )
 
    local cVal := ''
    local nPos
+   local cTmp
 
-   if ( nPos := hGetPos( xVal, 'style' ) ) != 0
+   DEFAULT cKey TO 'style'
+
+   if ( nPos := hGetPos( xVal, cKey ) ) != 0
       cVal := hGetValueAt( xVal, nPos )
       if valtype( cVal ) == "C"
          cVal := '<style type="text/css">' + _CRLF +;
@@ -535,10 +553,16 @@ STATIC FUNCTION HtmlStyle( xVal )
       elseif valtype( cVal ) == "H"
          if ( nPos := hGetPos( cVal, 'src' ) ) != 0
             cVal := hGetValueAt( cVal, nPos )
-            cVal := '<link rel="StyleSheet" href="' + cVal + '" type="text/css" />'
+            if valtype( cVal ) == "C"            
+               cVal := '<link rel="StyleSheet" href="' + cVal + '" type="text/css" />'
+            elseif valtype( cVal ) == "A"
+               cTmp := ''
+               ascan( cVal, { |cFile| cTmp += '<link rel="StyleSheet" href="' + cFile + '" type="text/css" />' + _CRLF } )
+               cVal := cTmp
+            endif   
          endif
       endif
-      hDel( xVal, 'style' )
+      hDel( xVal, cKey )
    endif
    
    return cVal
