@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5272 2006/12/10 12:33:34 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5273 2006/12/11 12:29:43 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-12-11 14:20 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/contrib/rdd_ads/adsfunc.c
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/source/rdd/dbcmd.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+  * xharbour/source/rdd/dbffpt/dbffpt1.c
+  * xharbour/source/rdd/hsx/hsx.c
+    * replaced all strcpy(), strcat(), sprintf() by corresponding hb_strn*()
+      functions and snprintf()
+
+  * xharbour/contrib/rdd_ads/ads1.c
+    ! removed ANSI/OEM translations for binary memos
+
+  * xharbour/source/rdd/dbfcdx/dbfcdx1.c
+    * reenabled some old code which should not be used yet (until all
+      hacks with filer emulating will not be removed form DBFCDX) but
+      because it gives serious speed improvement in bitmap filters which
+      uses RDD API calls (in the Mike's exmple speed of ordKeyNO()/
+      ordKeyCount() is increased about 2000%) I enabled it now though I do
+      not like it. Somewhere in the future it will be done in the way as
+      it should from beginning.
 
 2006-13-11 08:24 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/mysql/mysqlrdd.prg

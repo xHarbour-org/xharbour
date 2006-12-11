@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.78 2006/06/27 21:26:04 druzus Exp $
+ * $Id: dbffpt1.c,v 1.79 2006/08/19 11:22:28 druzus Exp $
  */
 
 /*
@@ -3891,15 +3891,15 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
    ulSize = 512;
    if ( pArea->uiMemoVersion == DB_MEMOVER_SIX )
    {
-      strcpy( ( char *) fptHeader.signature1, "SIxMemo" );
+      memcpy( fptHeader.signature1, "SIxMemo", 8 );
    }
    else
    {
-      strcpy( ( char *) fptHeader.signature1, "Harbour" );
+      memcpy( fptHeader.signature1, "Harbour", 8 );
       if( pArea->uiMemoVersion == DB_MEMOVER_FLEX ||
           pArea->uiMemoVersion == DB_MEMOVER_CLIP )
       {
-         strcpy( ( char *) fptHeader.signature2, "FlexFile3\003" );
+         memcpy( fptHeader.signature2, "FlexFile3\003", 11 );
          ulSize = sizeof( FPTHEADER );
          if( pArea->rddID == s_uiRddIdBLOB )
          {

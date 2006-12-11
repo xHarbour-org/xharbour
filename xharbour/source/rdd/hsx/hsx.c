@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.11 2005/10/24 01:04:34 druzus Exp $
+ * $Id: hsx.c,v 1.12 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -1956,12 +1956,9 @@ HB_FUNC( HS_VERSION )
 {
    static const char szVer[] = "HiPer-SEEK / FTS library emulation";
    char * pszHBVersion, * pszVersion;
-   int iLen;
 
    pszHBVersion = hb_verHarbour();
-   iLen = strlen( szVer ) + strlen( pszHBVersion ) + 2;
-   pszVersion = ( char * ) hb_xgrab( iLen + 1 );
-   sprintf( pszVersion, "%s: %s", szVer, pszHBVersion );
-   hb_retclen_buffer( pszVersion, iLen );
+   pszVersion = hb_xstrcat( NULL, szVer, ": ", pszHBVersion );
+   hb_retclen_buffer( pszVersion, strlen( pszVersion ) );
    hb_xfree( pszHBVersion );
 }

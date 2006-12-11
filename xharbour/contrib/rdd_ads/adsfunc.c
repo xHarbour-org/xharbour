@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.80 2006/11/26 05:52:04 kaddath Exp $
+ * $Id: adsfunc.c,v 1.81 2006/11/26 17:46:47 kaddath Exp $
  */
 
 /*
@@ -1962,10 +1962,10 @@ HB_FUNC( ADSVERSION )
    switch( iVersionType )
    {
    case 0:
-      sprintf( ucVersion, "%ld.%ld%c", ulMajor, ulMinor, ucLetter );
+      snprintf( ucVersion, sizeof( ucVersion ), "%ld.%ld%c", ulMajor, ulMinor, ucLetter );
       break;
    case 3:
-      sprintf( ucVersion, "%s, v%ld.%ld%c", (char *) ucDesc, ulMajor, ulMinor, ucLetter );
+      snprintf( ucVersion, sizeof( ucVersion ), "%s, v%ld.%ld%c", (char *) ucDesc, ulMajor, ulMinor, ucLetter );
       break;
    default:
       ucVersion[0] = 0;

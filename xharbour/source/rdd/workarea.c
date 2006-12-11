@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.71 2006/09/29 19:34:54 druzus Exp $
+ * $Id: workarea.c,v 1.72 2006/10/10 09:09:25 marchuet Exp $
  */
 
 /*
@@ -1527,7 +1527,7 @@ ERRCODE hb_waError( AREAP pArea, PHB_ITEM pError )
    if( pArea && pArea->lprfsHost->sysName )
       SELF_SYSNAME( pArea, ( BYTE * ) szRddName );
    else
-      strcpy( szRddName, "???DRIVER" );
+      hb_strncpy( szRddName, "???DRIVER", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
    hb_errPutSeverity( pError, ES_ERROR );
    hb_errPutSubSystem( pError, szRddName );
    hb_xfree( szRddName );

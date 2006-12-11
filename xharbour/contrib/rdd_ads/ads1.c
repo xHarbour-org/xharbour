@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.113 2006/09/27 11:01:44 druzus Exp $
+ * $Id: ads1.c,v 1.115 2006/12/09 18:55:55 toninhofwi Exp $
  */
 
 /*
@@ -1930,18 +1930,15 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          else
          {
             if( AdsGetBinaryLength( pArea->hTable, ADSFIELD( uiIndex ), &pulLen ) == AE_NO_CURRENT_RECORD )
-                hb_itemPutC( pItem, "" );
+            {
+               hb_itemPutC( pItem, "" );
+            }
             else
             {
-               char * szRet;
-
-               pulLen++;                 /* make room for NULL */
-               pucBuf = (UNSIGNED8*) hb_xgrab( pulLen );
+               pulLen++;                  /* make room for NULL */
+               pucBuf = ( UNSIGNED8 * ) hb_xgrab( pulLen );
                AdsGetBinary( pArea->hTable, ADSFIELD( uiIndex ), 0, pucBuf, &pulLen );
-               szRet = hb_adsAnsiToOem( ( char * ) pucBuf, pulLen );
-               hb_itemPutCL( pItem, szRet, pulLen );
-               hb_adsOemAnsiFree( szRet );
-               hb_xfree( pucBuf );
+               hb_itemPutCPtr( pItem, ( char * ) pucBuf, pulLen );
             }
          }
          hb_itemSetCMemo( pItem );
@@ -2139,13 +2136,10 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_IT_MEMO:
          if( HB_IS_STRING( pItem ) )
          {
-            char * szRet;
             ULONG ulLen;
 
             bTypeError = FALSE;
             ulLen = hb_itemGetCLen( pItem );
-
-            szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), ulLen );
 
             /* ToninhoFwi - 09/12/2006 - In the previous code ulLen was limited to 0xFFFF
                so, I comment it, because ADS support up to 4Gb in memo/binary/image fields.
@@ -2154,19 +2148,19 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                is a little bit slower to save big image file in the fields, so I keep
                AdsSetString() only for commom memo fields and AdsSetBinary() for the others.
             */
-//          if( ulLen < 0xFFFF )
             if( pField->uiTypeExtended != ADS_BINARY && pField->uiTypeExtended != ADS_IMAGE )
             {
+               char * szRet = hb_adsOemToAnsi( hb_itemGetCPtr( pItem ), ulLen );
                ulRetVal = AdsSetString( pArea->hTable, ADSFIELD( uiIndex ),
                   (UNSIGNED8*) szRet, ulLen );
+               hb_adsOemAnsiFree( szRet );
             }
             else
             {
                ulRetVal = AdsSetBinary( pArea->hTable, ADSFIELD( uiIndex ),
                   pField->uiTypeExtended, ulLen, 0,
-                  (UNSIGNED8*) szRet, ulLen );
+                  (UNSIGNED8*) hb_itemGetCPtr( pItem ), ulLen );
             }
-            hb_adsOemAnsiFree( szRet );
          }
          break;
    }
@@ -2351,11 +2345,11 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
 {
    ADSHANDLE hTable, hConnection;
    UNSIGNED32 uRetVal, u32Length, uiFldLen, uiLen;
-   UNSIGNED8 *ucfieldDefs, *ucfieldPtr ;
-   UNSIGNED8 ucBuffer[MAX_STR_LEN + 1], ucField[ADS_MAX_FIELD_NAME + 1];
+   UNSIGNED8 *ucfieldDefs, *ucfieldPtr;
+   UNSIGNED8 ucBuffer[MAX_STR_LEN + 1];
    USHORT uiCount;
    LPFIELD pField;
-   char cType[8];
+   char * cType;
 
    HB_TRACE(HB_TR_DEBUG, ("adsCreate(%p, %p)", pArea, pCreateInfo));
 
@@ -2397,47 +2391,48 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
         pArea->maxFieldLen = pField->uiLen;
       }
 
+      cType = NULL;
       switch( pField->uiType )
       {
          case HB_IT_DATE:
             if( pField->uiTypeExtended == 0 )
             {
-               strcpy( cType, "D" );
+               cType = "D";
             }
             else
             {
-               strcpy( cType, "ShortD" );
+               cType = "ShortD";
             }
             break;
          case HB_IT_LOGICAL:
-            strcpy( cType, "L" );
+            cType = "L";
             break;
          case HB_IT_MEMO:
             if( pField->uiTypeExtended == 0 )
             {
-               strcpy( cType, "M" );
+               cType = "M";
             }
             else if( pField->uiTypeExtended == ADS_VARCHAR )
             {
-               strcpy( cType, "VarC" );
+               cType = "VarC";
             }
             else if( pField->uiTypeExtended == ADS_BINARY )
             {
-               strcpy( cType, "Binary" );
+               cType = "Binary";
             }
             else if( pField->uiTypeExtended == ADS_IMAGE )
             {
-               strcpy( cType, "Image" );
+               cType = "Image";
             }
             break;
          case HB_IT_STRING:
             if( pField->uiTypeExtended == 0 )
             {
-               strcpy( cType, "C" );
+               cType = "C";
             }
             else if( pField->uiTypeExtended == ADS_RAW )
             {
-               strcpy( cType, "Raw" );
+               cType = "Raw";
             }
             break;
          case HB_IT_INTEGER:
@@ -2445,37 +2440,43 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
          case HB_IT_DOUBLE:
             if( pField->uiTypeExtended == 0 )
             {
-               strcpy( cType, "N" );
+               cType = "N";
             }
             else if( pField->uiTypeExtended == ADS_INTEGER )
             {
-               strcpy( cType, "Int" );
+               cType = "Int";
             }
             else if( pField->uiTypeExtended == ADS_SHORTINT )
             {
-               strcpy( cType, "ShortI" );
+               cType = "ShortI";
             }
             else if( pField->uiTypeExtended == ADS_DOUBLE )
             {
-               strcpy( cType, "Double" );
+               cType = "Double";
             }
             else if( pField->uiTypeExtended == ADS_TIME )
             {
-               strcpy( cType, "Time" );
+               cType = "Time";
             }
             else if( pField->uiTypeExtended == ADS_TIMESTAMP )
             {
-               strcpy( cType, "TimeSt" );
+               cType = "TimeSt";
             }
             else if( pField->uiTypeExtended == ADS_AUTOINC )
             {
-               strcpy( cType, "Auto" );
+               cType = "Auto";
             }
             else if( pField->uiTypeExtended == ADS_CURDOUBLE )
             {
-               strcpy( cType, "CurD" );
+               cType = "CurD";
             }
             break;
+      }
+
+      if( cType == NULL )
+      {
+         /* RT_ERROR */
+         return FAILURE;
       }
 
       switch( pField->uiType )
@@ -2485,39 +2486,23 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
          case HB_IT_MEMO:
             if( pField->uiTypeExtended != ADS_VARCHAR )
             {
-               char * szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
-               if( strlen( szName ) > (unsigned int) pArea->uiMaxFieldNameLength )
-               {
-                  strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
-                  uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", ucField, cType );
-               }
-               else
-               {
-                  uiFldLen = sprintf( (char*)ucBuffer, "%s,%s;", szName, cType );
-               }
+               uiFldLen = snprintf( ( char * ) ucBuffer, MAX_STR_LEN, "%.*s,%s;",
+                                    ( int ) pArea->uiMaxFieldNameLength,
+                                    hb_dynsymName( ( PHB_DYNS ) pField->sym ),
+                                    cType );
                break;
             }
-
          default:
-         {
-            char * szName ;
-            szName = hb_dynsymName( ( PHB_DYNS ) pField->sym );
-            if( strlen( szName) > (unsigned int) pArea->uiMaxFieldNameLength )
-            {
-               strncpy( (char*)ucField, szName, pArea->uiMaxFieldNameLength );
-               uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", ucField, cType, pField->uiLen, pField->uiDec );
-            }
-            else
-            {
-               uiFldLen = sprintf( (char*)ucBuffer, "%s,%s,%d,%d;", szName, cType, pField->uiLen, pField->uiDec );
-            }
+            uiFldLen = snprintf( ( char * ) ucBuffer, MAX_STR_LEN, "%.*s,%s,%d,%d;",
+                                 ( int ) pArea->uiMaxFieldNameLength,
+                                 hb_dynsymName( ( PHB_DYNS ) pField->sym ),
+                                 cType, pField->uiLen, pField->uiDec );
             break;
-         }
       }
 
       if( uiFldLen == 0 )
       {
-         uiFldLen = strlen( (const char *) ucBuffer );  // should have been set by sprintf above.
+         uiFldLen = strlen( ( char * ) ucBuffer );  /* should have been set by snprintf above. */
       }
       if( uiFldLen >= uiLen )
       {
@@ -2691,8 +2676,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
          AdsGetVersion( &ulMajor, &ulMinor, &ucLetter, ucDesc, &usDescLen);
 
-         sprintf( ( char *) ucVersion, "%s, v%ld.%ld%c", ucDesc, ulMajor, ulMinor, ucLetter );
-
+         snprintf( ( char *) ucVersion, sizeof( ucVersion ), "%s, v%ld.%ld%c", ucDesc, ulMajor, ulMinor, ucLetter );
          hb_itemPutC( pItem, ( char *) ucVersion );
          break;
       }
@@ -3009,13 +2993,13 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
    switch( u16TableType )
    {
       case ADS_NTX:
-         strcpy( (char *) pBuffer, "ADSNTX" );
+         hb_strncpy( ( char * ) pBuffer, "ADSNTX", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
          break;
       case ADS_CDX:
-         strcpy( (char *) pBuffer, "ADSCDX" );
+         hb_strncpy( ( char * ) pBuffer, "ADSCDX", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
          break;
       case ADS_ADT:
-         strcpy( (char *) pBuffer, "ADSADT" );
+         hb_strncpy( ( char * ) pBuffer, "ADSADT", HARBOUR_MAX_RDD_DRIVERNAME_LENGTH );
          break;
    }
 
@@ -3379,14 +3363,14 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
          pucWhile[ u16Len ] = 0;
          if( u16 == ADS_STRING )     /* add quotation marks around the key */
          {
-            strcat( (char * ) pucWhile, "<=\"");
-            strcat( (char * ) pucWhile, (char * ) pucScope );
-            strcat( (char * ) pucWhile, "\"" );
+            hb_strncat( ( char * ) pucWhile, "<=\"", sizeof( pucWhile ) - 1 );
+            hb_strncat( ( char * ) pucWhile, ( char * ) pucScope, sizeof( pucWhile ) - 1 );
+            hb_strncat( ( char * ) pucWhile, "\"", sizeof( pucWhile ) - 1 );
          }
          else
          {
-            strcat( (char * ) pucWhile, "<=");
-            strcat( (char * ) pucWhile, (char * ) pucScope );
+            hb_strncat( ( char * ) pucWhile, "<=", sizeof( pucWhile ) - 1 );
+            hb_strncat( ( char * ) pucWhile, ( char * ) pucScope, sizeof( pucWhile ) - 1 );
          }
       }
       hTableOrIndex = pArea->hOrdCurrent;
@@ -3399,13 +3383,13 @@ static ERRCODE adsOrderCreate( ADSAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
    {
       if( pucWhile[0] )
       {
-         strcat( (char * ) pucWhile, ".AND.(");
-         strcat( (char * ) pucWhile, (char * ) pArea->lpdbOrdCondInfo->abWhile );
-         strcat( (char * ) pucWhile, ")");
+         hb_strncat( ( char * ) pucWhile, ".AND.(", sizeof( pucWhile ) - 1 );
+         hb_strncat( ( char * ) pucWhile, ( char * ) pArea->lpdbOrdCondInfo->abWhile, sizeof( pucWhile ) - 1 );
+         hb_strncat( ( char * ) pucWhile, ")", sizeof( pucWhile ) - 1 );
       }
       else
       {
-         strcat( (char * ) pucWhile, (char * ) pArea->lpdbOrdCondInfo->abWhile );
+         hb_strncat( ( char * ) pucWhile, ( char * ) pArea->lpdbOrdCondInfo->abWhile, sizeof( pucWhile ) - 1 );
       }
       if( pArea->hOrdCurrent )
       {
