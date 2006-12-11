@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5275 2006/12/11 15:46:37 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.5276 2006/12/11 17:36:12 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-12-11 14:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed parsepict() method to transform ::cPicMask in uppercase if
+      get value is character type.
 
 2006-12-11 18:34 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * xharbour/source/rdd/bmdbfcdx/bmdbfcdx1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.119 2006/10/30 13:45:53 modalsist Exp $
+ * $Id: tget.prg,v 1.120 2006/11/17 12:33:46 ronpinkas Exp $
  */
 
 /*
@@ -426,7 +426,9 @@ METHOD ParsePict( cPicture ) CLASS Get
       else
          ::decpos := NIL
 
-         IF ::type == 'L'
+         // 2006/DEC/11 - EF - changed ::cPicMask to uppercase if ::type is character.
+         //IF ::type == 'L' 
+         IF ::type == 'L' .OR. ::type == 'C'
             ::cPicMask := Upper( ::cPicMask )
          ENDIF
       endif
@@ -471,6 +473,7 @@ METHOD Display( lForced ) CLASS Get
                               // ::Picture.
       ::Picture := ::cPicture
       xBuffer   := ::PutMask( xVar, .f. )
+
    ELSE
       xBuffer   := ::Buffer
    ENDIF
@@ -640,7 +643,7 @@ METHOD Undo() CLASS Get
       ENDIF
       ::VarPut( ::Original, .t. )
       ::Pos := ::FirstEditable()
-      ::updateBuffer() // 7/01/2004 9:44a.m. was ::Display()
+      ::UpdateBuffer() // 7/01/2004 9:44a.m. was ::Display()
       ::lUndo := .t.
    endif
 
@@ -892,7 +895,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       else
          cBuffer += SubStr( ::xVarGet, ::nMaxLen + 1 )
       endif
-
+     
       xValue := cBuffer
       exit
 
@@ -1683,7 +1686,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cBuffer := InvertDwM( DtoC( xValue ) )
       Endif
    Endif
-
+ 
 return cBuffer
 
 //---------------------------------------------------------------------------//
@@ -1696,7 +1699,7 @@ METHOD BackSpace( lDisplay ) CLASS Get
 
 
    if nPos > 1 .and. nPos == ::FirstEditable() .and. ::minus
-      /* For delete the parethesis (negative indicator) in a non editable position */
+      /* For delete the parenthesis (negative indicator) in a non editable position */
 
       nMinus := At( "(", SubStr( ::buffer, 1, nPos-1 ) )
 
