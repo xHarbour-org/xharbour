@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5274 2006/12/11 13:26:25 druzus Exp $
+ * $Id: ChangeLog,v 1.5275 2006/12/11 15:46:37 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2006-12-11 18:34 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * xharbour/source/rdd/bmdbfcdx/bmdbfcdx1.c
+    *   synchronizing with dbfcdx.
+    
 2006-12-11 16:43 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/tip/cgi.prg 
     * added support of more than one css

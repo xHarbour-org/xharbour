@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.14 2006/11/14 08:58:06 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.15 2006/11/14 09:46:32 marchuet Exp $
  */
 
 /*
@@ -764,7 +764,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else 
+   else
    {
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
@@ -3486,11 +3486,11 @@ static void hb_cdxTagHeaderStore( LPCDXTAG pTag )
    HB_PUT_LE_UINT16( tagHeader.forExpLen, uiForLen + 1 );
    if ( uiKeyLen > 0 )
    {
-      strcpy( ( char * ) tagHeader.keyExpPool, pTag->KeyExpr );
+      memcpy( tagHeader.keyExpPool, pTag->KeyExpr, uiKeyLen + 1 );
    }
    if ( uiForLen > 0 )
    {
-      strcpy( ( char * ) tagHeader.keyExpPool + uiKeyLen + 1, pTag->ForExpr );
+      memcpy( tagHeader.keyExpPool + uiKeyLen + 1, pTag->ForExpr, uiForLen + 1 );
    }
    hb_cdxIndexPageWrite( pTag->pIndex, pTag->TagBlock, (BYTE *) &tagHeader, sizeof( CDXTAGHEADER ) );
 }
@@ -4028,23 +4028,35 @@ static BOOL hb_cdxPageReadPrevKey( LPCDXPAGE pPage )
       pPage = pPage->Child;
    }
 
-   pPage->iCurKey--;
-   while ( pPage->iCurKey < 0 )
+   do
    {
-      if ( pPage->Left == CDX_DUMMYNODE || !pOwnerPage )
+      pPage->iCurKey--;
+      while ( pPage->iCurKey < 0 )
       {
-         pPage->iCurKey = 0;
-         if ( pPage->iKeys > 0 )
-            hb_cdxSetCurKey( pPage );
-         return FALSE;
+         if ( pPage->Left == CDX_DUMMYNODE || !pOwnerPage )
+         {
+            pPage->iCurKey = 0;
+            if ( pPage->iKeys > 0 )
+               hb_cdxSetCurKey( pPage );
+            return FALSE;
+         }
+         pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Left );
+         hb_cdxPageFree( pPage, !pPage->fChanged );
+         pPage = pOwnerPage->Child;
+         pPage->iCurKey = pPage->iKeys - 1;
       }
-      pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Left );
-      hb_cdxPageFree( pPage, !pPage->fChanged );
-      pPage = pOwnerPage->Child;
-      pPage->iCurKey = pPage->iKeys - 1;
+      if( pPage->iCurKey == 0 )
+      {
+         hb_cdxSetCurKey( pPage );
+         if( !hb_cdxTopScope( pPage->TagParent ) ||
+             !hb_cdxBottomScope( pPage->TagParent ) )
+            break;
+      }
    }
-
-   hb_cdxSetCurKey( pPage );
+   while( !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
+                                   hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ) ) );
+   if( pPage->iCurKey != 0 )
+      hb_cdxSetCurKey( pPage );
    return TRUE;
 }
 
@@ -4061,21 +4073,33 @@ static BOOL hb_cdxPageReadNextKey( LPCDXPAGE pPage )
       pPage = pPage->Child;
    }
 
-   pPage->iCurKey++;
-   while ( pPage->iCurKey >= pPage->iKeys )
+   do
    {
-      if ( pPage->Right == CDX_DUMMYNODE || !pOwnerPage )
+      pPage->iCurKey++;
+      while ( pPage->iCurKey >= pPage->iKeys )
       {
-         pPage->iCurKey = pPage->iKeys;
-         return FALSE;
+         if ( pPage->Right == CDX_DUMMYNODE || !pOwnerPage )
+         {
+            pPage->iCurKey = pPage->iKeys;
+            return FALSE;
+         }
+         pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Right );
+         hb_cdxPageFree( pPage, !pPage->fChanged );
+         pPage = pOwnerPage->Child;
+         pPage->iCurKey = 0;
       }
-      pOwnerPage->Child = hb_cdxPageNew( pPage->TagParent, pPage->Owner, pPage->Right );
-      hb_cdxPageFree( pPage, !pPage->fChanged );
-      pPage = pOwnerPage->Child;
-      pPage->iCurKey = 0;
+      if( pPage->iCurKey == 0 )
+      {
+         hb_cdxSetCurKey( pPage );
+         if( !hb_cdxTopScope( pPage->TagParent ) ||
+             !hb_cdxBottomScope( pPage->TagParent ) )
+            break;
+      }
    }
-
-   hb_cdxSetCurKey( pPage );
+   while( !hb_cdxCheckRecordScope( pPage->TagParent->pIndex->pArea,
+                                   hb_cdxPageGetKeyRec( pPage, pPage->iCurKey ) ) );
+   if( pPage->iCurKey != 0 )
+      hb_cdxSetCurKey( pPage );
    return TRUE;
 }
 
@@ -8058,7 +8082,7 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
    }
    else
    {
-      strcpy( szTagName, szCpndTagName );
+      hb_strncpy( szTagName, szCpndTagName, CDX_MAXTAGNAMELEN );
       fNewFile = TRUE;
    }
 
