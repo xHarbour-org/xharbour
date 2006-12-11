@@ -1,5 +1,5 @@
 /*
- * $Id: mysqlrdd.prg,v 1.1 2006/09/30 17:47:20 areainformatica Exp $
+ * $Id: mysqlrdd.prg,v 1.2 2006/09/30 20:37:29 areainformatica Exp $
  */
 
 /*
@@ -105,7 +105,7 @@ FUNCTION DBMYSQLCONNECTION( cConnString )
       aadd( s_aConnections, oServer )
       nConn := len( s_aConnections )
    ENDIF
-     
+
 RETURN nConn
 
 FUNCTION DBMYSQLCLEARCONNECTION( nConn )
@@ -119,7 +119,7 @@ FUNCTION DBMYSQLCLEARCONNECTION( nConn )
    s_aConnections[ nConn ] := nil
 
 RETURN SUCCESS
-   
+
 /*
  * non work area methods receive RDD ID as first parameter
  * Methods INIT and EXIT does not have to execute SUPER methods - these is
@@ -161,7 +161,7 @@ STATIC FUNCTION MYSQL_OPEN( nWA, aOpenInfo )
       lError := oQuery:NetErr()
       cError := oQuery:ErrorMsg()
    else
-      lError := .T. 
+      lError := .T.
       cError := "Invalid connection handle"
    endif
 
@@ -177,7 +177,7 @@ STATIC FUNCTION MYSQL_OPEN( nWA, aOpenInfo )
    ELSE
       aWAData[ AREA_QUERY ] := oQuery
    ENDIF
-   
+
    UR_SUPER_SETFIELDEXTENT( nWA, oQuery:nNumFields )
    aStruct := oQuery:aFieldStruct //Struct()
 
@@ -207,11 +207,11 @@ RETURN UR_SUPER_CLOSE( nWA )
 
 STATIC FUNCTION MYSQL_GETVALUE( nWA, nField, xValue )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
-  
+
    if !empty( aWAData[ AREA_ROW ] )
       xValue := aWAData[ AREA_ROW ]:FieldGet( nField )
    else
-      xValue := aWAData[ AREA_QUERY ]:FieldGet( nField )    
+      xValue := aWAData[ AREA_QUERY ]:FieldGet( nField )
    endif
 
 RETURN SUCCESS
@@ -249,6 +249,9 @@ RETURN MYSQL_GOTO( nWA, nRecord )
 
 STATIC FUNCTION MYSQL_GOTO( nWA, nRecord )
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
+   IF (VALTYPE( nRecord) != "N")          // IF added to prevent error
+     nRecord := 0
+   ENDIF
 
    if !empty( aWAData[ AREA_ROW ] )
       MYSQL_FLUSH( nWA )
@@ -313,13 +316,13 @@ STATIC FUNCTION MYSQL_FLUSH( nWA )
          oError := ErrorNew()
          oError:GenCode     := EG_DATATYPE
          oError:SubCode     := 3000
-         oError:Description := HB_LANGERRMSG( EG_DATATYPE ) + ", " + aWAData[ AREA_QUERY ]:ErrorMsg() 
+         oError:Description := HB_LANGERRMSG( EG_DATATYPE ) + ", " + aWAData[ AREA_QUERY ]:ErrorMsg()
          UR_SUPER_ERROR( nWA, oError )
          RETURN FAILURE
       ENDIF
 
 /*
- * The :Refresh() below costs a lot in term of performance. 
+ * The :Refresh() below costs a lot in term of performance.
  * It redo the select to include inserts and updates.
  * It is the only solution I've found so far to simulate dbf behaviour
  */
@@ -350,7 +353,7 @@ RETURN SUCCESS
 STATIC FUNCTION MYSQL_DELETE( nWA )
    LOCAL oError
    LOCAL aWAData   := USRRDD_AREADATA( nWA )
- 
+
    aWAData[ AREA_ROW ] := aWAData[ AREA_QUERY ]:GetRow()
 
    aWAData[ AREA_QUERY ]:Delete( aWAData[ AREA_ROW ] )
@@ -359,11 +362,11 @@ STATIC FUNCTION MYSQL_DELETE( nWA )
       oError := ErrorNew()
       oError:GenCode     := EG_DATATYPE
       oError:SubCode     := 2000
-      oError:Description := HB_LANGERRMSG( EG_DATATYPE ) + ", " + aWAData[ AREA_QUERY ]:ErrorMsg() 
+      oError:Description := HB_LANGERRMSG( EG_DATATYPE ) + ", " + aWAData[ AREA_QUERY ]:ErrorMsg()
       UR_SUPER_ERROR( nWA, oError )
       RETURN FAILURE
    ENDIF
-     
+
    aWAData[ AREA_ROW ] := nil
 
 RETURN SUCCESS

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5271 2006/12/09 18:55:54 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5272 2006/12/10 12:33:34 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2006-13-11 08:24 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/mysql/mysqlrdd.prg
+    ! Typecasting of parameters if not numeric force to 0
+  * contrib/mysql/Makefile
+    ! added mysqlrdd.prg for linux
 
 2006-12-10 15:00 UTC+0200 Pavel Tsarenko <tpe2@mail.ru>
   * source/ct/disk.c
@@ -156,7 +162,7 @@
 
 2006-11-22 11:51 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/fttext.c
-    ! Fixed function FT_FUSE: FT_USE(0) now returns next unused textarea.
+    ! Fixed function FT_FSELECT: FT_FSELECT(0) now returns next unused textarea.
 
 2006-11-21 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg

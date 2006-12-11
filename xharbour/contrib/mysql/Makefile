@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2003/12/07 19:36:18 druzus Exp $
+# $Id: Makefile,v 1.6 2003/12/24 19:07:49 lculik Exp $
 #
 
 ROOT = ../../
@@ -30,6 +30,7 @@ C_SOURCES=\
 PRG_SOURCES=\
         tmysql.prg  \
         tsqlbrw.prg \
+        mysqlrdd.prg \
 
 LIBNAME=mysql
 ifneq ($(HB_ARCHITECTURE),dos)
