@@ -77,6 +77,8 @@
 
 CLASS TIpCgi 
 
+   DATA HTTP_RAW_POST_DATA
+
    DATA cCgiHeader
    DATA cHtmlPage
    DATA hGets        INIT {=>}
@@ -128,9 +130,10 @@ METHOD New() CLASS TIpCgi
    if lPost
       nLen := val( getenv( 'CONTENT_LENGTH' ) )
       cTemp := space( nLen )
-      if ( fread( CGI_IN, @cTemp, nLen, 0 ) != nLen )
+      if ( ( nRead := fread( CGI_IN, @cTemp, nLen, 0 ) ) != nLen )
          ::ErrHandler( 'post error read ' + str( nRead ) + ' instead of ' + str( nLen ) )
       else
+         ::HTTP_RAW_POST_DATA := cTemp
          aTemp := HB_ATOKENS( cTemp, '&' )
          nLen := Len( aTemp )
          if nLen > 0
@@ -174,9 +177,13 @@ METHOD New() CLASS TIpCgi
 
    RETURN Self
 
-METHOD Header( hOptions ) CLASS TIpCgi
+METHOD Header( cValue ) CLASS TIpCgi
 
-   ::cCgiHeader += 'Content-Type: ' + HtmlValue( hOptions, 'type', 'text/html' ) + _CRLF 
+   if empty( cValue )
+     ::cCgiHeader += 'Content-Type: text/html' + _CRLF 
+   else
+      ::cCgiHeader += cValue + _CRLF
+   endif
 
    RETURN Self
 
@@ -251,6 +258,11 @@ METHOD DestroySession( cID ) CLASS TIpCgi
 
       if !( lRet := ( FErase( cFile ) == 0 ) ) 
          ::Print( "ERROR: On deleting session file : " + cFile + ", File error : " + cStr( FError() ) ) 
+      else
+        ::hCookies[ 'SESSIONID' ] := cSID + "; expires= " + DateToGMT( DATE() - 1 )
+        ::CreateSID()
+        cSID := ::cSID
+        ::hCookies[ 'SESSIONID' ] := cSID
       endif
 
    endif
@@ -276,7 +288,7 @@ METHOD ErrHandler( xError ) CLASS TIpCgi
 
    for nCalls := 2 to 6
       if !empty( procname( nCalls ) )
-         ::Print( '<tr><td>PROC/LINE:</td><td>' + procname( nCalls ) + "/" + alltrim( str( procline( nCalls ) ) ) + '</td>' )
+         ::Print( '<tr><td>PROC/LINE:</td><td>' + procname( nCalls ) + "/" + alltrim( str( procline( nCalls ) ) ) + '</td></tr>' )
       endif
    next
    
@@ -298,7 +310,7 @@ METHOD StartHtml( hOptions ) CLASS TIpCgi
                   HtmlStyle( hOptions ) + ;
                   '</head>' + ;
                   '<body ' + ;
-                     HtmlAll( hOptions ) + ;
+                     HtmlAllOption( hOptions ) + ;
                   '>'
 
    RETURN Self
@@ -448,41 +460,59 @@ STATIC FUNCTION HtmlTag( xVal, cKey )
 
    local cVal := ''
 
-   if empty( cKey )   
-      cVal := xVal
-   elseif hHasKey( xVal, cKey )
-      cVal := hGet( xVal, cKey )
-      cVal := '<' + cKey + '>' + cVal + '</' + cKey + '>' 
-      hDel( xVal, cKey )
+   if !empty( xVal )
+      if empty( cKey )   
+         cVal := xVal
+      elseif hHasKey( xVal, cKey )
+         cVal := hGet( xVal, cKey )
+         cVal := '<' + cKey + '>' + cVal + '</' + cKey + '>' 
+         hDel( xVal, cKey )
+      endif
    endif
    
+   return cVal
+
+STATIC FUNCTION HtmlAllTag( hTags, cSep )
+
+   local cVal := ''
+
+   DEFAULT cSep TO ' '
+
+   hEval( hTags, { |key,value,pos| cVal += HtmlTag( hTags, key ) + cSep } )
+
    return cVal
 
 STATIC FUNCTION HtmlOption( xVal, cKey, cPre, cPost, lScan )
 
    local cVal := ''
 
-   if empty( cKey )   
-      cVal := xVal
-   elseif hHasKey( xVal, cKey )
-      cVal := hGet( xVal, cKey )
-      if empty( lScan )
-         hDel( xVal, cKey )
-      endif
-      if !empty( cPre ) .and. !empty( cPost ) 
-         cVal := cPre + cKey + cPost + cVal
-      else
-         cVal := cKey + '="' + cVal + '"'
+   if !empty( xVal )
+      if empty( cKey )   
+         cVal := xVal
+      elseif hHasKey( xVal, cKey )
+         cVal := hGet( xVal, cKey )
+         if empty( lScan )
+            hDel( xVal, cKey )
+         endif
+         if !empty( cPre ) .and. !empty( cPost ) 
+            cVal := cPre + cKey + cPost + cVal
+         else
+            cVal := cKey + '="' + cVal + '"'
+         endif
       endif
    endif
-   
+ 
    return cVal
 
-STATIC FUNCTION HtmlAll( hOptions )
+STATIC FUNCTION HtmlAllOption( hOptions, cSep )
 
    local cVal := ''
 
-   hEval( hOptions, { |key,value,pos| cVal += HtmlOption( hOptions, key,,, .t. ) + ' ' } )
+   DEFAULT cSep TO ' '
+
+   if !empty( hOptions )
+      hEval( hOptions, { |key,value,pos| cVal += HtmlOption( hOptions, key,,, .t. ) + cSep } )
+   endif
 
    return cVal
 
@@ -503,6 +533,18 @@ STATIC FUNCTION HtmlValue( xVal, cKey, cDefault )
 
    return cVal
 
+STATIC FUNCTION HtmlAllValue( hValues, cSep )
+
+   local cVal := ''
+
+   DEFAULT cSep TO ' '
+
+   if !empty( hValues )
+      hEval( hValues, { |key,value,pos| cVal += HtmlValue( hValues, key ) + cSep } )
+   endif
+
+   return cVal
+
 STATIC FUNCTION HtmlScript( xVal, cKey )
 
    local cVal := ''
@@ -511,29 +553,31 @@ STATIC FUNCTION HtmlScript( xVal, cKey )
 
    DEFAULT cKey TO 'script'
 
-   if ( nPos := hGetPos( xVal, cKey ) ) != 0
-      cVal := hGetValueAt( xVal, nPos )
-      if valtype( cVal ) == "C"
-         cVal := '<script language="JavaScript" type="text/javascript">' + _CRLF +;
-                 '<!--' + _CRLF +;
-                 cVal + _CRLF +;
-                 '-->' + _CRLF +;
-                 '</script>'
-      elseif valtype( cVal ) == "H"
-         if ( nPos := hGetPos( cVal, 'src' ) ) != 0
-            cVal := hGetValueAt( cVal, nPos )
-            if valtype( cVal ) == "C"            
-               cVal := '<script language="JavaScript" src="' + cVal + '" type="text/javascript">' + _CRLF
-            elseif valtype( cVal ) == "A"
-               cTmp := ''
-               ascan( cVal, { |cFile| cTmp += '<script language="JavaScript" src="' + cFile + '" type="text/javascript">' + _CRLF } )
-               cVal := cTmp
-            endif   
+   if !empty( xVal )
+      if ( nPos := hGetPos( xVal, cKey ) ) != 0
+         cVal := hGetValueAt( xVal, nPos )
+         if valtype( cVal ) == "C"
+            cVal := '<script language="JavaScript" type="text/javascript">' + _CRLF +;
+                    '<!--' + _CRLF +;
+                    cVal + _CRLF +;
+                    '-->' + _CRLF +;
+                    '</script>'
+         elseif valtype( cVal ) == "H"
+            if ( nPos := hGetPos( cVal, 'src' ) ) != 0
+               cVal := hGetValueAt( cVal, nPos )
+               if valtype( cVal ) == "C"            
+                  cVal := '<script language="JavaScript" src="' + cVal + '" type="text/javascript">' + _CRLF
+               elseif valtype( cVal ) == "A"
+                  cTmp := ''
+                  ascan( cVal, { |cFile| cTmp += '<script language="JavaScript" src="' + cFile + '" type="text/javascript">' + _CRLF } )
+                  cVal := cTmp
+               endif   
+            endif
          endif
+         hDel( xVal, cKey )
       endif
-      hDel( xVal, cKey )
    endif
-   
+
    return cVal
 
 STATIC FUNCTION HtmlStyle( xVal, cKey )
@@ -544,27 +588,29 @@ STATIC FUNCTION HtmlStyle( xVal, cKey )
 
    DEFAULT cKey TO 'style'
 
-   if ( nPos := hGetPos( xVal, cKey ) ) != 0
-      cVal := hGetValueAt( xVal, nPos )
-      if valtype( cVal ) == "C"
-         cVal := '<style type="text/css">' + _CRLF +;
-                 cVal + _CRLF +;
-                 '</style>'
-      elseif valtype( cVal ) == "H"
-         if ( nPos := hGetPos( cVal, 'src' ) ) != 0
-            cVal := hGetValueAt( cVal, nPos )
-            if valtype( cVal ) == "C"            
-               cVal := '<link rel="StyleSheet" href="' + cVal + '" type="text/css" />'
-            elseif valtype( cVal ) == "A"
-               cTmp := ''
-               ascan( cVal, { |cFile| cTmp += '<link rel="StyleSheet" href="' + cFile + '" type="text/css" />' + _CRLF } )
-               cVal := cTmp
-            endif   
+   if !empty( xVal )
+      if ( nPos := hGetPos( xVal, cKey ) ) != 0
+         cVal := hGetValueAt( xVal, nPos )
+         if valtype( cVal ) == "C"
+            cVal := '<style type="text/css">' + _CRLF +;
+                    cVal + _CRLF +;
+                    '</style>'
+         elseif valtype( cVal ) == "H"
+            if ( nPos := hGetPos( cVal, 'src' ) ) != 0
+               cVal := hGetValueAt( cVal, nPos )
+               if valtype( cVal ) == "C"            
+                  cVal := '<link rel="StyleSheet" href="' + cVal + '" type="text/css" />'
+               elseif valtype( cVal ) == "A"
+                  cTmp := ''
+                  ascan( cVal, { |cFile| cTmp += '<link rel="StyleSheet" href="' + cFile + '" type="text/css" />' + _CRLF } )
+                  cVal := cTmp
+               endif   
+            endif
          endif
+         hDel( xVal, cKey )
       endif
-      hDel( xVal, cKey )
    endif
-   
+ 
    return cVal
 
 STATIC FUNCTION GenerateSID( cCRCKey )
@@ -626,4 +672,26 @@ STATIC FUNCTION CheckSID( cSID, cCRCKey )
    next
 
    RETURN ( Right( cSID, 5 ) == cSIDCRC )
+
+STATIC FUNCTION DateToGMT( dDate, cTime )
+  LOCAL cStr := ""
+  LOCAL cOldDateFormat := Set( _SET_DATEFORMAT, "dd-mm-yy" )
+  LOCAL nDay, nMonth, nYear, nDoW
+  LOCAL aDays   := { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" }
+  LOCAL aMonths := { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+
+  DEFAULT dDate      TO DATE()
+  DEFAULT cTime      TO TIME()
+
+  nDay   := Day( dDate )
+  nMonth := Month( dDate )
+  nYear  := Year( dDate)
+  nDoW   := Dow( dDate )
+
+  cStr := aDays[ nDow ] + ", " + StrZero( nDay, 2 ) + "-" + aMonths[ nMonth ] + "-" + ;
+          Right( StrZero( nYear, 4 ), 2 ) + " " + cTime + " GMT"
+
+  Set( _SET_DATEFORMAT, cOldDateFormat )
+
+RETURN cStr
 
