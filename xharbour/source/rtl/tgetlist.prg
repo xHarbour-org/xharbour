@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.35 2006/02/25 17:32:15 lf_sfnet Exp $
+ * $Id: tgetlist.prg,v 1.36 2006/03/25 20:29:55 modalsist Exp $
  */
 
 /*
@@ -519,6 +519,7 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
             endif
             cKey := Chr( nKey )
             if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," )
+               oGet:changed:=.t.  // 2006/DEC/22 - E.F. Fixed by Marco Bernardi. 
                oGet:ToDecPos()
             else
                if Set( _SET_INSERT )

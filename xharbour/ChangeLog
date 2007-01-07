@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5281 2007/01/07 08:12:15 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5282 2007/01/07 09:49:54 lf_sfnet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-07 16:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed parsepict() method to avoid replacing commas by spaces, in
+      pictures like @Z 99,999.99.
+      Adjusted get len for negative numbers, when not exist picture on get.
+
+  * source/rtl/tgetlist.prg
+    ! fixed GetApplyKey() method to set ::changed := .t. after press only the
+      dot followed by enter, in number get. Thanks to Marco Bernandi.
+
+  * source/rtl/tbrowse.prg
+    ! fixed hittest() method to return HTCELL from first row. Thanks to
+      aardvark.
 
 2007-01-07 10:45 UTC+0100 Lorenzo Fiorini <lorenzo_fiorini/at/teamwork.it>
   * source/tip/cgi.prg

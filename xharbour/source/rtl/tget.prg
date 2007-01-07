@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.120 2006/11/17 12:33:46 ronpinkas Exp $
+ * $Id: tget.prg,v 1.121 2006/12/11 17:56:58 modalsist Exp $
  */
 
 /*
@@ -248,13 +248,12 @@ RETURN Self
 
 METHOD ParsePict( cPicture ) CLASS Get
 
-   local cChar
-   local nAt
-   local nFor
-   local cNum
-   local nPos
-
-   LOCAL nLen,nDec
+   Local cChar
+   Local nAt
+   Local nFor
+   Local cNum
+   Local nPos
+   Local nLen,nDec
 
    cNum := ""
 
@@ -322,12 +321,23 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::lDispLen := .f.
       endif
 
-      ::lCleanZero := ( "Z" IN ::cPicFunc )
-      ::cPicFunc := StrTran(::cPicFunc, "Z", "")
+      ::lCleanZero := ( "Z" IN ::cPicFunc ) // Display zero as blanks.
+
+      // 2006/DEC/19 - E.F. - Extracted "Z" from ::cPicture
+      if ::lCleanZero
+         ::cPicFunc := StrTran(::cPicFunc, "Z", "")
+         ::cPicture := StrTran(::cPicture, "Z", "")
+      endif
 
       if ::cPicFunc == "@"
          ::cPicFunc := ""
       endif
+
+      // 2006/DEC/19 - E.F. - Extracted "@" from ::cPicture
+      if ::cPicture == "@"
+         ::cPicture := ""
+      endif
+
    else
       ::cPicFunc   := ""
       ::cPicMask   := cPicture
@@ -374,7 +384,9 @@ METHOD ParsePict( cPicture ) CLASS Get
             IF nDec >= Len( cNum )
                nDec := 0
             ENDIF
-            nLen := 10 + iif(nDec>0,1,0) + nDec
+            // 2006/DEC/24 - E.F. Fixed nLen value for negative numbers.
+            //nLen := 10 + iif(nDec>0,1,0) + nDec
+            nLen := iif( ::xVarGet < -99999999.99, 10+iif(nDec>0,1,0) + nDec, Len( cNum ) )
             cNum := Str( ::xVarGet, nLen, nDec )
          ELSE
             cNum := Str( ::xVarGet )
@@ -462,10 +474,11 @@ METHOD Display( lForced ) CLASS Get
    DEFAULT lForced TO .t.
 
    IF Empty( cClrCap )
-     cClrCap := hb_ColorIndex( SetColor(), CLR_STANDARD )
+      cClrCap := hb_ColorIndex( SetColor(), CLR_STANDARD )
    ENDIF
+
    IF Empty( cClrAcc )
-     cClrAcc := hb_ColorIndex( SetColor(), CLR_BACKGROUND )
+      cClrAcc := hb_ColorIndex( SetColor(), CLR_BACKGROUND )
    ENDIF
 
    IF ::Buffer == NIL
@@ -473,10 +486,10 @@ METHOD Display( lForced ) CLASS Get
                               // ::Picture.
       ::Picture := ::cPicture
       xBuffer   := ::PutMask( xVar, .f. )
-
    ELSE
       xBuffer   := ::Buffer
    ENDIF
+
 
    HBConsoleLock()
 
@@ -1648,14 +1661,17 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cMask, ::LastEditable() + 1 )
          cMask := Left( cMask, ::FirstEditable() - 1 ) + StrTran( SubStr( cMask, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), chr(1), "." ) + SubStr( cMask, ::LastEditable() + 1 )
       endif
+
       for each cChar in cMask
          if cChar IN ",." .and. SubStr( cBuffer, HB_EnumIndex(), 1 ) IN ",."
             cBuffer := Substr( cBuffer, 1, HB_EnumIndex() - 1 ) + cChar + Substr( cBuffer, HB_EnumIndex() + 1 )
          endif
       next
+      
       if ::lEdit .and. Empty(xValue)
          cBuffer := StrTran(cBuffer, "0", " ")
       endif
+
       if ::lDecRev
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ",", chr(1) ) + SubStr( cBuffer, ::LastEditable() + 1 )
          cBuffer := Left( cBuffer, ::FirstEditable() - 1 ) + StrTran( SubStr( cBuffer, ::FirstEditable( ), ::LastEditable( ) - ::FirstEditable( ) + 1 ), ".", ","    ) + SubStr( cBuffer, ::LastEditable() + 1 )
@@ -1686,7 +1702,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
          cBuffer := InvertDwM( DtoC( xValue ) )
       Endif
    Endif
- 
+
 return cBuffer
 
 //---------------------------------------------------------------------------//
@@ -1980,12 +1996,7 @@ METHOD SetPicture( cPicture ) CLASS Get
 
       ::cPicture := cPicture
 
-      // if ::xVarGet != NIL
-         ::ParsePict( cPicture )
-      // endif
-
-//      ::buffer  := ::PutMask( )
-//      ::nMaxLen := IIF( ::buffer == NIL, 0, Len( ::buffer ) )
+      ::ParsePict( cPicture )
 
       if ::nDispLen == NIL .or. !::lDispLen
          ::nDispLen := ::nMaxLen

@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.162 2006/11/10 17:47:08 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.163 2006/11/21 23:13:52 modalsist Exp $
  */
 
 /*
@@ -3359,7 +3359,8 @@ METHOD HitTest( mrow,mcol ) CLASS TBrowse
       elseif ::lHeadSep     .AND. mRow == ::nTop + ::nHeaderHeight
          // if i'm on header sep
          nRet := HTHEADSEP
-      elseif mRow >= ::nTop .AND. mRow <= ::nTop + ::nHeaderHeight
+//      elseif mRow >= ::nTop .AND. mRow <= ::nTop + ::nHeaderHeight
+      elseif mRow >= ::nTop .AND. mRow < ::nTop + ::nHeaderHeight
          // if i'm on header
          nRet := HTHEADING
       elseif ::lFootSep     .AND. mRow == ::nBottom - ::nFooterHeight
