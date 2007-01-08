@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5282 2007/01/07 09:49:54 lf_sfnet Exp $
+ * $Id: ChangeLog,v 1.5283 2007/01/07 18:47:58 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-01-08 16:04 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/kspeed.c     
+  * contrib/libnf/putkey.c     
+  * contrib/libnf/anomatch.prg 
+  * contrib/libnf/any2any.prg  
+  * contrib/libnf/aredit.prg   
+  * contrib/libnf/asum.prg     
+  * contrib/libnf/bytexor.prg  
+  * contrib/libnf/clrsel.prg   
+  * contrib/libnf/d2e.prg      
+  * contrib/libnf/datecnfg.prg 
+  * contrib/libnf/dfile.prg    
+  * contrib/libnf/e2d.prg      
+  * contrib/libnf/floptst.prg  
+  * contrib/libnf/hex2dec.prg  
+  * contrib/libnf/invclr.prg   
+  * contrib/libnf/min2dhm.prg  
+  * contrib/libnf/ntow.prg     
+  * contrib/libnf/ontick.c     
+  * contrib/libnf/pchr.prg     
+  * contrib/libnf/sleep.prg    
+  * contrib/libnf/sqzn.prg     
+  * contrib/libnf/sysmem.prg   
+  * contrib/libnf/tbwhile.prg  
+  * contrib/libnf/vertmenu.prg 
+    ! fixed hbdoc files problems
+  * contrib/libnf/rmdir.c
+    + Change to hb_fs*() API functions
+  * contrib/libnf/chdir.c
+    + Change to hb_fs*() API functions
+  * contrib/libnf/mkdir.c
+    + Change to hb_fs*() API functions
 
 2007-01-07 16:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

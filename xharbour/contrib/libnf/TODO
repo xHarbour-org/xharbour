@@ -1,5 +1,5 @@
 /*
- * $Id: TODO,v 1.1 2005/11/13 21:01:01 marceloanelli Exp $
+ * $Id: TODO,v 1.2 2006/12/14 16:13:36 sirep Exp $
  */
 
                   libnf To-Do list
@@ -8,21 +8,109 @@
 Tasks:
 _______________________________________________________________________
 
-          Topic                              Responsible developer(s)
-===================================          =========================
+          Topic                      Developer  Status
+===================================  =========  =======================
 
-Check all function and creating a            mac
+>
+Check all function and creating a    mac        on work
 sample test / demo program
 
+>
 Adding support for multi-language
-for:
-popadder.prg                                 mac (done)
+*popadder.prg                        mac        published
 
-Adding support for muti-platform
-blink.prg
-popadder.prg for CR/LF                       mac
+>
+Adding support for multi-platform
+*blink.prg
+*popadder.prg for CR/LF              mac
+
+> 2006/03
+Change to hb_fs*() API functions
+*rmdir.c:                            mac        tested
+*chdir.c:                            mac        tested
+*mkdir.c:                            mac        tested
+
+> 2006/11 (01)
+ft_fxxxx functions
+*ft_Fselect(0) to returns new        mac        published
+area as in original work.
+
+> 2006/11 (02)
+hbdoc files problems
+*kspeed.c                            mac        corrected
+*putkey.c                            mac        corrected
+*anomatch.prg                        mac        corrected
+*any2any.prg                         mac        corrected
+*aredit.prg                          mac        corrected
+*asum.prg                            mac        corrected
+*bytexor.prg                         mac        corrected
+*clrsel.prg                          mac        corrected
+*d2e.prg                             mac        corrected
+*datecnfg.prg                        mac        corrected
+*dfile.prg                           mac        corrected
+*e2d.prg                             mac        corrected
+*floptst.prg                         mac        corrected
+*hex2dec.prg                         mac        corrected
+*invclr.prg                          mac        corrected
+*min2dhm.prg                         mac        corrected
+*ntow.prg                            mac        corrected
+*ontick.c                            mac        corrected
+*pchr.prg                            mac        corrected
+*sleep.prg                           mac        corrected
+*sqzn.prg                            mac        corrected
+*sysmem.prg                          mac        corrected
+*tbwhile.prg                         mac        corrected
+*vertmenu.prg                        mac        corrected
 
 =======================================================================
 Detail descriptions for Tasks:
-_______________________________________________________________________
+=======================================================================
+(01)
+From:       Mike Evans <makis1970@hotmail.com>
+Subject:    Re: ft_fUse & other nanforum files
+Newsgroups: xHarbour
+Date:       Wed, 22 Nov 2006 16:45:24 +0200
 
+The ft_fxxxxx functions in xHarbour have the following problems or
+incompatibilities:
+
+Functions	Clipper		xHarbour
+Ft_Fuse		num		logical
+Ft_Fselect(0)	Newarea		nothing
+Ft_FSelect	non required	required
+Ft_Ferror	OK		Non exist
+-----------------------------------------------------------------------
+(2)
+I guess that since I'm on the subject of the libnf files, there are a 
+couple of other problems with the library. Some of the files have their 
+$DESCRIPTORS$ in column 3 instead of column 4 or 5 which locks up hbDoc. 
+Twenty-two of the files have lines that are 4098 bytes long in windows 
+(4097 in linux) which also locks up hbdoc. The long lines are the very 
+last line in the file and each has more than 4000 trailing spaces.
+
+The 2 files with $xxx$ wrong are kspeed.c and putkey.c
+
+The long line files are:
+anomatch.prg
+any2any.prg
+aredit.prg
+asum.prg
+bytexor.prg
+clrsel.prg
+d2e.prg
+datecnfg.prg
+dfile.prg
+e2d.prg
+floptst.prg
+hex2dec.prg
+invclr.prg
+min2dhm.prg
+ntow.prg
+ontick.c
+pchr.prg
+sleep.prg
+sqzn.prg
+sysmem.prg
+tbwhile.prg
+vertmenu.prg
+-----------------------------------------------------------------------

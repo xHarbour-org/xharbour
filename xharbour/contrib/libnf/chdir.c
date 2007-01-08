@@ -1,5 +1,5 @@
 /*
- * $Id: chdir.c,v 1.6 2005/04/26 10:07:40 andijahja Exp $
+ * $Id: chdir.c,v 1.1 2006/12/14 15:46:03 sirep Exp $
  */
 
 /* File......: CHDIR.ASM
@@ -137,6 +137,28 @@ HB_FUNC( FT_CHDIR )
    }
 
    hb_retni( iRet );
-
+#else
+  /*
+  hb_retl( ISCHAR( 1 ) && hb_fsChDir( ( BYTE * ) hb_parc(1) ) );
+  */
+   PHB_ITEM pDir = hb_param( 1, HB_IT_STRING );
+   BOOL bResult;
+   int iRet = 0;
+   if ( ISCHAR( 1 ) )
+   {
+     if ( pDir && strlen( pDir->item.asString.value ) > 0 )
+     {
+       bResult = hb_fsChDir( (BYTE *) pDir->item.asString.value );
+       if ( !bResult )
+       {
+         iRet = 3;
+       }
+     }
+   }
+   else
+   {
+     iRet = 99;
+   }
+   hb_retni( iRet );
 #endif
 }

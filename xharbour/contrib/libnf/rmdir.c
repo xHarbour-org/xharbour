@@ -1,5 +1,5 @@
 /*
- * $Id: rmdir.c,v 1.4 2005/04/25 01:17:15 andijahja Exp $
+ * $Id: rmdir.c,v 1.1 2006/12/14 15:46:03 sirep Exp $
  */
 
 /* File......: RMDIR.ASM
@@ -116,6 +116,22 @@ HB_FUNC(FT_RMDIR)
    }
 
    hb_retni( iResult );
+#else
+   BOOL bResult;
+   int iRet = 0;
+   if ( ISCHAR( 1 ) )
+   {
+       bResult = hb_fsRmDir( ( BYTE * ) hb_parcx(1) );
+       if ( !bResult )
+       {
+         iRet = 5;
+       }
+   }
+   else
+   {
+     iRet = 99;
+   }
+   hb_retni( iRet );
 #endif
 }
 

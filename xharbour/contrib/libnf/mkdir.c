@@ -1,5 +1,5 @@
 /*
- * $Id: mkdir.c,v 1.4 2005/01/09 06:08:24 likewolf Exp $
+ * $Id: mkdir.c,v 1.1 2006/12/14 15:46:03 sirep Exp $
  */
 
 /*; File......: MKDIR.ASM
@@ -137,5 +137,21 @@ HB_FUNC( FT_MKDIR )
    }
 
    hb_retni( iResult );
+#else
+   BOOL bResult;
+   int iRet = 0;
+   if ( ISCHAR( 1 ) )
+   {
+       bResult = hb_fsMkDir( ( BYTE * ) hb_parcx(1) );
+       if ( !bResult )
+       {
+         iRet = 5;
+       }
+   }
+   else
+   {
+     iRet = 99;
+   }
+   hb_retni( iRet );
 #endif
 }

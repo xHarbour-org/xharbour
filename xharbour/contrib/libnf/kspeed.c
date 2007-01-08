@@ -1,5 +1,5 @@
 /*
- * $Id: kspeed.c,v 1.3 2002/04/15 04:41:39 walito Exp $
+ * $Id: kspeed.c,v 1.1 2006/12/14 16:13:36 sirep Exp $
  */
 
 /* File......: KSPEED.ASM
@@ -24,19 +24,19 @@
 */
 
 
-/* $DOC$
-* $FUNCNAME$
-*     FT_SETRATE()
-* $CATEGORY$
-*     Keyboard/Mouse
-* $ONELINER$
-*     Set the keyboard delay and repeat rate on PC/AT & PS/2
-* $SYNTAX$
-*     FT_SETRATE( [ <nDelayTime> ] [, <nRepeatRate> ] ) -> NIL
-* $ARGUMENTS$
-*     <nDelayTime> is the keyboard delay time.
+/*  $DOC$
+*  $FUNCNAME$
+*      FT_SETRATE()
+*  $CATEGORY$
+*      Keyboard/Mouse
+*  $ONELINER$
+*      Set the keyboard delay and repeat rate on PC/AT & PS/2
+*  $SYNTAX$
+*      FT_SETRATE( [ <nDelayTime> ] [, <nRepeatRate> ] ) -> NIL
+*  $ARGUMENTS$
+*      <nDelayTime> is the keyboard delay time.
 *
-*     <nRepeatRate> is the keyboard repeat rate.
+*      <nRepeatRate> is the keyboard repeat rate.
 *
 *          ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿  ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 *          ³ nDelayTime      DELAY ³  ³ RepeatRate      SPEED  ³
@@ -74,19 +74,19 @@
 *                                     ³   30            2.1cps ³
 *                                     ³   31            2.0cps ³
 *                                     ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-* $RETURNS$
-*    NIL
-* $DESCRIPTION$
-*    This routine is used to adjust the IBM PC/AT and PS/2 "typematic"
-*    repeat and delay feature.  This is used to allow the users of your
-*    application to adjust these speeds to the most comfortable level.
+*  $RETURNS$
+*     NIL
+*  $DESCRIPTION$
+*     This routine is used to adjust the IBM PC/AT and PS/2 "typematic"
+*     repeat and delay feature.  This is used to allow the users of your
+*     application to adjust these speeds to the most comfortable level.
 *
-*    This source code is written for Microsoft Assembler v5.1.
-* $EXAMPLES$
-*    FT_SETRATE(0,0)    // Set keyboard to fastest possible settings
-*    FT_SETRATE()       // Set keyboard to AT defaults (10.9cps,500ms delay)
-*    FT_SETRATE(11,1)   // Set keyboard to PS/2 defaults (10cps,500ms delay)
-* $END$
+*     This source code is written for Microsoft Assembler v5.1.
+*  $EXAMPLES$
+*     FT_SETRATE(0,0)    // Set keyboard to fastest possible settings
+*     FT_SETRATE()       // Set keyboard to AT defaults (10.9cps,500ms delay)
+*     FT_SETRATE(11,1)   // Set keyboard to PS/2 defaults (10cps,500ms delay)
+*  $END$
 */
 /*This  is the Original FT_SETRATE() code
 PUBLIC     FT_SETRATE                   * MAKE ROUTINE VISIBLE
@@ -179,4 +179,4 @@ HB_FUNC( FT_SETRATE)
 }
 
 
-   
+
