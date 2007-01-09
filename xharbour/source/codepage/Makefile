@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.18 2005/12/11 12:36:58 druzus Exp $
+# $Id: Makefile,v 1.19 2006/11/09 16:41:09 marchuet Exp $
 #
 
 ROOT = ../../
@@ -7,6 +7,7 @@ ROOT = ../../
 C_SOURCES=\
       cpbgmik.c  \
       cpbgwin.c  \
+      cpcskam.c  \
       cpeldos.c  \
       cpelwin.c  \
       cpesdos.c  \
@@ -41,24 +42,31 @@ C_SOURCES=\
       cpsv850.c  \
       cpsvclip.c \
       cpsvwin.c  \
+      cptrdos.c  \
+      cptrwin.c  \
       cpua866.c  \
       cpuakoi.c  \
       cpuawin.c  \
       uc1250.c   \
       uc1251.c   \
       uc1253.c   \
+      uc1254.c   \
       uc1257.c   \
       uc737.c    \
       uc850.c    \
       uc852.c    \
+      uc857.c    \
       uc866.c    \
       uc8859_1.c \
       uc88591b.c \
       uc8859_2.c \
+      uc8859_5.c \
+      uckam.c    \
       uckoi8.c   \
       uckoi8u.c  \
       ucmaz.c    \
       ucmik.c    \
+
 
 LIBNAME=codepage
 

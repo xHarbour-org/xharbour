@@ -1,5 +1,5 @@
 /*
- * $Id: gtxwc.c,v 1.20 2006/03/01 19:41:47 druzus Exp $
+ * $Id: gtxwc.c,v 1.21 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -2143,7 +2143,7 @@ static void hb_xvt_gtWndProc( PXWND_DEF wnd, XEvent *evt )
                      hb_xfree( wnd->ClipboardData );
                   wnd->ClipboardData = ( unsigned char * ) hb_xgrab( nItem + 1 );
                   wnd->ClipboardSize = nItem;
-                  hb_cdpUTF8ToStrn( wnd->hostCDP, text.value, text.nitems,
+                  hb_cdpUTF8ToStrn( wnd->hostCDP, FALSE, text.value, text.nitems,
                                     wnd->ClipboardData, nItem + 1 );
                   wnd->ClipboardTime = evt->xselection.time;
                   wnd->ClipboardRcvd = TRUE;

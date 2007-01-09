@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.134 2006/05/16 22:57:08 druzus Exp $
+ * $Id: itemapi.c,v 1.135 2006/09/06 22:26:32 ronpinkas Exp $
  */
 
 /*
@@ -1249,7 +1249,6 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    ULONG ulLenFirst;
    ULONG ulLenSecond;
    ULONG ulMinLen;
-   ULONG ulCounter;
    int iRet = 0; /* Current status */
 
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemStrCmp(%p, %p, %d)", pFirst, pSecond, (int) bForceExact));
@@ -1276,30 +1275,29 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
    {
 #ifndef HB_CDP_SUPPORT_OFF
       if( hb_cdp_page->lSort )
-         iRet = hb_cdpcmp( szFirst, szSecond, ulMinLen, hb_cdp_page, &ulCounter );
+         iRet = hb_cdpcmp( szFirst, ulLenFirst, szSecond, ulLenSecond,
+                           hb_cdp_page, hb_set.HB_SET_EXACT || bForceExact );
       else
 #endif
-         for( ulCounter = 0; ulCounter < ulMinLen && !iRet; ulCounter++ )
+      {
+         do
          {
-            /* Difference found */
             if( *szFirst != *szSecond )
             {
                iRet = ( ( BYTE ) *szFirst < ( BYTE ) *szSecond ) ? -1 : 1;
+               break;
             }
-            else /* TODO : #define some constants */
-            {
-               szFirst++;
-               szSecond++;
-            }
+            szFirst++;
+            szSecond++;
          }
+         while( --ulMinLen );
 
-      if( hb_set.HB_SET_EXACT || bForceExact || ulLenSecond > ulCounter )
-      {
-         /* Force an exact comparison */
+         /* If equal and length is different ! */
          if( !iRet && ulLenFirst != ulLenSecond )
          {
-            /* If length is different ! */
-            iRet = ( ulLenFirst < ulLenSecond ) ? -1 : 1;
+            /* Force an exact comparison? */
+            if( hb_set.HB_SET_EXACT || bForceExact || ulLenSecond > ulLenFirst )
+               iRet = ( ulLenFirst < ulLenSecond ) ? -1 : 1;
          }
       }
    }

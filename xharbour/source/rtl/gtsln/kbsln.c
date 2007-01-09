@@ -1,5 +1,5 @@
 /*
- * $Id: kbsln.c,v 1.17 2005/03/31 04:00:57 druzus Exp $
+ * $Id: kbsln.c,v 1.18 2005/12/11 12:37:50 druzus Exp $
  */
 
 /*
@@ -417,7 +417,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
         int n = 0;
         USHORT uc = 0;
 
-        if ( hb_cdpGetFromUTF8( s_gtSln_cdpIN, (BYTE) ch, &n, &uc ) )
+        if ( hb_cdpGetFromUTF8( s_gtSln_cdpIN, FALSE, (BYTE) ch, &n, &uc ) )
         {
             unsigned int buf[ 10 ], i = 0;
 
@@ -427,7 +427,7 @@ int HB_GT_FUNC(gt_ReadKey( HB_inkey_enum eventmask ))
                                          - HB_MAX( s_gtSLN_escDelay, 0 ) ) == 0 )
                     break;
                 buf[ i++ ] = SLang_getkey();
-                if ( !hb_cdpGetFromUTF8( s_gtSln_cdpIN, (BYTE) buf[ i - 1 ], &n, &uc ) )
+                if ( !hb_cdpGetFromUTF8( s_gtSln_cdpIN, FALSE, (BYTE) buf[ i - 1 ], &n, &uc ) )
                     break;
             }
             if ( n > 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5284 2007/01/08 20:13:08 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.5285 2007/01/09 15:38:23 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-09 23:02 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbapicdp.h
+  * xharbour/source/codepage/Makefile
+  + xharbour/source/codepage/cpcskam.c
+  + xharbour/source/codepage/cptrdos.c
+  + xharbour/source/codepage/cptrwin.c
+  + xharbour/source/codepage/uc1254.c
+  + xharbour/source/codepage/uc857.c
+  + xharbour/source/codepage/uc8859_5.c
+  + xharbour/source/codepage/uckam.c
+  * xharbour/source/rdd/dbfntx/dbfntx1.c
+  * xharbour/source/rtl/cdpapi.c
+  * xharbour/source/vm/itemapi.c
+    + added BOOL parameter to hb_cdpGetFromUTF8() and hb_cdpUTF8ToStrn()
+      to disable control code translation
+    * synced with Harbour fixes in CDP API
+    + added Turkish and Czech CPs - borrowed from Harbour
+
+  * xharbour/source/rtl/gtsln/kbsln.c
+  * xharbour/source/rtl/gtxwc/gtxwc.c
+    ! use new parameter in hb_cdp*() functions to disable control code
+      translations - it fixes problem reported by Filip Sok³osa with
+      not working SPACE key in UTF8 version of slang.
+
 2007-01-09 11:32 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/at2.prg
     + added function FT_RAT2 for reversed multiple AT

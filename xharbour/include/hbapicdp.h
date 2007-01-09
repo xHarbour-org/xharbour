@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.20 2006/02/21 19:37:06 druzus Exp $
+ * $Id: hbapicdp.h,v 1.21 2006/03/01 19:41:45 druzus Exp $
  */
 
 /*
@@ -50,10 +50,10 @@
  *
  */
 
-#ifndef HB_CDP_SUPPORT_OFF
-
 #ifndef HB_APICDP_H_
 #define HB_APICDP_H_
+
+#ifndef HB_CDP_SUPPORT_OFF
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -70,17 +70,18 @@ HB_EXTERN_BEGIN
                                        }
 #define HB_CODEPAGE_ANNOUNCE( id )     HB_FUNC( HB_CODEPAGE_##id ) {}
 
-#define HB_CODEPAGE_INIT( id )         HB_CODEPAGE_ANNOUNCE( id ); \
+#define HB_CODEPAGE_INIT( id )         HB_CODEPAGE_ANNOUNCE( id ) \
                                        HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_##id ) \
                                        hb_cdpRegister( &s_codepage ); \
                                        HB_CALL_ON_STARTUP_END( hb_codepage_Init_##id )
 
+
 typedef struct _HB_UNITABLE
 {
-   char     *uniID;
+   char *   uniID;
    int      nChars;
    BOOL     lMulti;
-   USHORT   *uniCodes;
+   USHORT * uniCodes;
 } HB_UNITABLE, * PHB_UNITABLE;
 
 typedef struct _HB_MULTICHAR
@@ -111,56 +112,44 @@ typedef struct _HB_CODEPAGE
    PHB_MULTICHAR  multi;
 } HB_CODEPAGE, * PHB_CODEPAGE;
 
-extern HB_EXPORT BOOL          hb_cdpRegister( PHB_CODEPAGE );
-extern HB_EXPORT char *        hb_cdpSelectID( char * );
-extern HB_EXPORT PHB_CODEPAGE  hb_cdpSelect( PHB_CODEPAGE );
-extern HB_EXPORT PHB_CODEPAGE  hb_cdpFind( char * );
-extern HB_EXPORT void          hb_cdpTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE );
-extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, ULONG );
-extern HB_EXPORT int           hb_cdpcmp( char *, char *, ULONG, PHB_CODEPAGE, ULONG * );
-extern HB_EXPORT int           hb_cdpchrcmp( char, char, PHB_CODEPAGE );
-extern HB_EXPORT void          hb_cdpReleaseAll( void );
-       
-extern HB_EXPORT USHORT        hb_cdpGetU16( PHB_CODEPAGE, BOOL, BYTE );
-extern HB_EXPORT BOOL          hb_cdpGetFromUTF8( PHB_CODEPAGE, BYTE ch, int *, USHORT * );
-extern HB_EXPORT ULONG         hb_cdpStrnToUTF8( PHB_CODEPAGE, BOOL, BYTE *, ULONG, BYTE * );
-extern HB_EXPORT ULONG         hb_cdpStrnToU16( PHB_CODEPAGE, BOOL, BYTE *, ULONG, BYTE * );
-extern HB_EXPORT ULONG         hb_cdpUTF8StringLength( BYTE *, ULONG );
-extern HB_EXPORT ULONG         hb_cdpStringInUTF8Length( PHB_CODEPAGE, BOOL, BYTE *, ULONG );
-extern HB_EXPORT ULONG         hb_cdpUTF8ToStrn( PHB_CODEPAGE, BYTE *, ULONG, BYTE *, ULONG );
-
-extern PHB_CODEPAGE hb_cdp_page;
-
 #define CPID_437        "cp437"
 #define CPID_737        "cp737"
 #define CPID_850        "cp850"
 #define CPID_852        "cp852"
+#define CPID_857        "cp857"
 #define CPID_866        "cp866"
 #define CPID_1250       "cp1250"
 #define CPID_1251       "cp1251"
 #define CPID_1253       "cp1253"
+#define CPID_1254       "cp1254"
 #define CPID_1257       "cp1257"
 #define CPID_8859_1     "iso8859-1"
 #define CPID_8859_1B    "iso8859-1b"
 #define CPID_8859_2     "iso8859-2"
+#define CPID_8859_5     "iso8859-5"
 #define CPID_KOI_8      "koi-8"
 #define CPID_KOI_8U     "koi-8u"
 #define CPID_MAZ        "plmaz"
+#define CPID_KAM        "cskam"
 #define CPID_MIK        "bgmik"
 #define UNITB_437       &hb_uniTbl_437
 #define UNITB_737       &hb_uniTbl_737
 #define UNITB_850       &hb_uniTbl_850
 #define UNITB_852       &hb_uniTbl_852
+#define UNITB_857       &hb_uniTbl_857
 #define UNITB_866       &hb_uniTbl_866
 #define UNITB_1250      &hb_uniTbl_1250
 #define UNITB_1251      &hb_uniTbl_1251
 #define UNITB_1253      &hb_uniTbl_1253
+#define UNITB_1254      &hb_uniTbl_1254
 #define UNITB_1257      &hb_uniTbl_1257
 #define UNITB_8859_1    &hb_uniTbl_8859_1
 #define UNITB_8859_1B   &hb_uniTbl_8859_1b
 #define UNITB_8859_2    &hb_uniTbl_8859_2
+#define UNITB_8859_5    &hb_uniTbl_8859_5
 #define UNITB_KOI_8     &hb_uniTbl_KOI_8
 #define UNITB_KOI_8U    &hb_uniTbl_KOI_8U
+#define UNITB_KAM       &hb_uniTbl_kam
 #define UNITB_MAZ       &hb_uniTbl_mazovia
 #define UNITB_MIK       &hb_uniTbl_MIK
 #define UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
@@ -169,25 +158,49 @@ extern HB_UNITABLE hb_uniTbl_437;
 extern HB_UNITABLE hb_uniTbl_737;
 extern HB_UNITABLE hb_uniTbl_850;
 extern HB_UNITABLE hb_uniTbl_852;
+extern HB_UNITABLE hb_uniTbl_857;
 extern HB_UNITABLE hb_uniTbl_866;
 extern HB_UNITABLE hb_uniTbl_1250;
 extern HB_UNITABLE hb_uniTbl_1251;
 extern HB_UNITABLE hb_uniTbl_1253;
+extern HB_UNITABLE hb_uniTbl_1254;
 extern HB_UNITABLE hb_uniTbl_1257;
 extern HB_UNITABLE hb_uniTbl_8859_1;
 extern HB_UNITABLE hb_uniTbl_8859_1b;
 extern HB_UNITABLE hb_uniTbl_8859_2;
+extern HB_UNITABLE hb_uniTbl_8859_5;
 extern HB_UNITABLE hb_uniTbl_KOI_8;
 extern HB_UNITABLE hb_uniTbl_KOI_8U;
 extern HB_UNITABLE hb_uniTbl_mazovia;
+extern HB_UNITABLE hb_uniTbl_kam;
 extern HB_UNITABLE hb_uniTbl_MIK;
+
+extern HB_EXPORT BOOL          hb_cdpRegister( PHB_CODEPAGE );
+extern HB_EXPORT char *        hb_cdpSelectID( char * );
+extern HB_EXPORT PHB_CODEPAGE  hb_cdpSelect( PHB_CODEPAGE );
+extern HB_EXPORT PHB_CODEPAGE  hb_cdpFind( char * );
+extern HB_EXPORT void          hb_cdpTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE );
+extern HB_EXPORT void          hb_cdpnTranslate( char *, PHB_CODEPAGE, PHB_CODEPAGE, ULONG );
+extern HB_EXPORT int           hb_cdpcmp( char *, ULONG, char *, ULONG, PHB_CODEPAGE, BOOL );
+extern HB_EXPORT int           hb_cdpchrcmp( char, char, PHB_CODEPAGE );
+extern HB_EXPORT void          hb_cdpReleaseAll( void );
+       
+extern HB_EXPORT USHORT        hb_cdpGetU16( PHB_CODEPAGE, BOOL, BYTE );
+extern HB_EXPORT BOOL          hb_cdpGetFromUTF8( PHB_CODEPAGE, BOOL, BYTE, int *, USHORT * );
+extern HB_EXPORT ULONG         hb_cdpStrnToUTF8( PHB_CODEPAGE, BOOL, BYTE *, ULONG, BYTE * );
+extern HB_EXPORT ULONG         hb_cdpStrnToU16( PHB_CODEPAGE, BOOL, BYTE *, ULONG, BYTE * );
+extern HB_EXPORT ULONG         hb_cdpStringInUTF8Length( PHB_CODEPAGE, BOOL, BYTE *, ULONG );
+extern HB_EXPORT ULONG         hb_cdpUTF8ToStrn( PHB_CODEPAGE, BOOL, BYTE *, ULONG, BYTE *, ULONG );
+extern HB_EXPORT ULONG         hb_cdpUTF8StringLength( BYTE *, ULONG );
+
+extern PHB_CODEPAGE hb_cdp_page;
 
 HB_EXTERN_END
 
-#endif /* HB_APICDP_H_ */
-
 #else
 
-#define PHB_CODEPAGE void*
+typedef PHB_CODEPAGE void *
 
 #endif /* HB_CDP_SUPPORT_OFF */
+
+#endif /* HB_APICDP_H_ */
