@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5283 2007/01/07 18:47:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.5284 2007/01/08 20:13:08 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-01-09 11:32 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
+  * contrib/libnf/at2.prg
+    + added function FT_RAT2 for reversed multiple AT
+
 2007-01-08 16:04 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * contrib/libnf/kspeed.c     
   * contrib/libnf/putkey.c     
