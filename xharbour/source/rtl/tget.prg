@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.122 2007/01/07 18:48:40 modalsist Exp $
+ * $Id: tget.prg,v 1.123 2007/01/10 00:08:01 modalsist Exp $
  */
 
 /*
@@ -117,7 +117,8 @@ CLASS Get
 
    ACCESS ColorSpec                 INLINE ::cColorSpec
    ASSIGN ColorSpec( cColorSpec )   INLINE ::SetColorSpec( cColorSpec )
-   ACCESS Picture                   INLINE ::cPicture
+   //ACCESS Picture                   INLINE ::cPicture
+   ACCESS Picture                   INLINE ::cOrigPicture
    ASSIGN Picture( cPicture )       INLINE ::SetPicture( cPicture )
 
    METHOD Display( lForced )
@@ -163,6 +164,7 @@ CLASS Get
 
    DATA cColorSpec            // Used only for METHOD ColorSpec
    DATA cPicture              // Used only for METHOD Picture
+   DATA cOrigPicture          // Original picture supplied by user.
 
    METHOD SetColorSpec( cColorSpec )
    METHOD SetPicture( cPicture )
@@ -229,6 +231,8 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Row            := nRow
    ::ColorSpec      := cColorSpec
    ::Picture        := cPicture
+   ::cOrigPicture   := cPicture
+
    ::Name           := cVarName
    ::cDelimit       := IIF( SET( _SET_DELIMITERS ), SET( _SET_DELIMCHARS ), NIL )
 
@@ -487,7 +491,7 @@ METHOD Display( lForced ) CLASS Get
    IF ::Buffer == NIL
       xVar      := ::VarGet() // In VarGet() is setting ::xVarGet needed to
                               // ::Picture.
-      ::Picture := ::cPicture
+      ::Picture := ::cOrigPicture
       xBuffer   := ::PutMask( xVar, .f. )
    ELSE
       xBuffer   := ::Buffer
@@ -684,7 +688,7 @@ METHOD SetFocus() CLASS Get
 
       ::Original   := xVarGet
       ::Type       := ValType( xVarGet )
-      ::Picture    := ::cPicture
+      ::Picture    := ::cOrigPicture
       ::Buffer     := ::PutMask( xVarGet, .f. )
       ::Changed    := .f.
       ::Clear      := ( "K" IN ::cPicFunc .or. ::type == "N")
@@ -783,7 +787,7 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
          ::Type    := ValType( xValue )
          ::xVarGet := xValue
          ::lEdit   := .f.
-         ::Picture( ::cPicture )
+         ::Picture( ::cOrigPicture )
       endif
    endif
 
@@ -1603,7 +1607,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    IF ::Type == NIL
       ::Type := ValType( xValue )
-      ::Picture := ::cPicture
+      ::Picture := ::cOrigPicture
    ENDIF
 
    cPicFunc := ::cPicFunc
@@ -2003,6 +2007,10 @@ METHOD SetPicture( cPicture ) CLASS Get
 
       if ::nDispLen == NIL .or. !::lDispLen
          ::nDispLen := ::nMaxLen
+      endif
+
+      if empty( ::cOrigPicture )
+         ::cOrigPicture := cPicture
       endif
 
    endif
