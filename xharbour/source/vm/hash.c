@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.48 2005/11/22 02:33:47 walito Exp $
+ * $Id: hash.c,v 1.49 2006/03/18 20:43:46 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,8 @@
  *
  */
 
+#include "ctype.h"      // toupper()
+
 #include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
@@ -64,6 +66,60 @@
 /******************************************************
 * Utility functions
 *******************************************************/
+
+static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL fCase )
+{
+   ULONG          ul, ulLen;
+   unsigned char  c1, c2;
+   int            ret;
+
+
+   ulLen = ulLen1 < ulLen2 ? ulLen1 : ulLen2;
+
+   ret = 0;
+
+   if ( fCase )
+   {
+      for( ul = 0; ul < ulLen; ul++ )
+      {
+         c1 = (unsigned char) pStr1[ ul ];
+         c2 = (unsigned char) pStr2[ ul ];
+  
+         if( c1 != c2 )
+         {
+            ret = ( c1 < c2 ? -1 : 1 );
+            break;
+         }
+      }
+   }
+   else
+   {
+      for( ul = 0; ul < ulLen; ul++ )
+      {
+         c1 = toupper( (unsigned char) pStr1[ ul ] );
+         c2 = toupper( (unsigned char) pStr2[ ul ] );
+  
+         if( c1 != c2 )
+         {
+            ret = ( c1 < c2 ? -1 : 1 );
+            break;
+         }
+      }
+   }
+
+   if ( ret )
+   {
+      return ret;
+   }
+   else
+   {
+      if ( ulLen1 == ulLen2 )
+         return 0;
+      else
+         return ulLen1 < ulLen2 ? -1 : 1;
+   }
+}
+
 
 static int s_hashOrderComplex( PHB_ITEM pFirst,
             PHB_ITEM pSecond, BOOL bCase )
@@ -150,16 +206,9 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
       }
       else if ( pSecond->type == HB_IT_STRING )
       {
-         if ( bCase )
-         {
-            return strcmp( pFirst->item.asString.value,
-                     pSecond->item.asString.value);
-         }
-         else
-         {
-            return hb_stricmp( pFirst->item.asString.value,
-                     pSecond->item.asString.value );
-         }
+         return s_memicmp( pFirst->item.asString.value, pFirst->item.asString.length, 
+                           pSecond->item.asString.value, pSecond->item.asString.length, 
+                           bCase );
       }
       // nothing with higher priority
    }
