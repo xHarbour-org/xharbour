@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.19 2005/12/12 14:27:59 modalsist Exp $
+ * $Id: alert.prg,v 1.21 2006/06/23 22:08:15 lculik Exp $
  */
 
 /*
@@ -76,6 +76,11 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    /* TOFIX: Clipper decides at runtime, whether the GT is linked in,
              if it is not, the console mode is choosen here. [vszakats] */
    LOCAL lConsole := .F.
+
+   /* Variables to control CT Windows  */
+   LOCAL lCtWin   := ( WNum() != 0 )  // There is a CT Window active ?
+   LOCAL cCtColor
+   LOCAL nCol
 
 #ifdef HB_C52_UNDOC
 
@@ -308,16 +313,22 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    AEval( aOptionsOK, {| x | nOpWidth += Len( x ) + 4 } )
 
    /* what's wider ? */
-   nWidth := Max( nWidth + 2 + iif( Len( aSay ) == 1, 4, 0 ), nOpWidth + 2 )
+   //nWidth := Max( nWidth + 2 + iif( Len( aSay ) == 1, 4, 0 ), nOpWidth + 2 )
+   nWidth := Max( nWidth + iif( Len( aSay ) == 1, 4, 0 ), nOpWidth ) + iif(!lCtWin,2,iif(nWidth<5,1,2))
 
    /* box coordinates */
-   nInitRow := Int( ( ( MaxRow() - ( Len( aSay ) + 4 ) ) / 2 ) + .5 )
-   nInitCol := Int( ( ( MaxCol() - ( nWidth + 2 ) ) / 2 ) + .5 )
+   if !lCtWin
+      nInitRow := Int( ( ( MaxRow() - ( Len( aSay ) + 4 ) ) / 2 ) + .5 )
+      nInitCol := Int( ( ( MaxCol() - ( nWidth + 2 ) ) / 2 ) + .5 )
+   else
+      nInitRow := 0
+      nInitCol := 0
+   endif
 
    /* detect prompts positions */
    aPos := {}
    aHotkey := {}
-   nCurrent := nInitCol + Int( ( nWidth - nOpWidth ) / 2 ) + 2
+   nCurrent := nInitCol + Int( ( nWidth - nOpWidth ) / 2 ) + iif(!lCtWin,2,1)
    AEval( aOptionsOK, {| x | AAdd( aPos, nCurrent ), AAdd( aHotKey, Upper( Left( x, 1 ) ) ), nCurrent += Len( x ) + 4 } )
 
    nChoice := 1
@@ -384,24 +395,56 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       nOldRow := Row()
       nOldCol := Col()
       nOldCursor := SetCursor( SC_NONE )
-      cOldScreen := SaveScreen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1 )
+
 
       /* draw box */
-      DispBox( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, B_SINGLE + ' ', cColorNorm )
+      IF !lCTWin
+         cOldScreen := SaveScreen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1 )
+         DispBox( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, B_SINGLE + ' ', cColorNorm )
+      ELSE
+         cCtColor := SetColor( cColorNorm )
+         WOpen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1 , .T. )
+         WBox( B_SINGLE )
+      ENDIF
+
 
       FOR EACH cEval IN aSay
-         DispOutAt( nInitRow + HB_EnumIndex(), nInitCol + 1 + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 ), cEval, cColorNorm )
+
+          nCol := nInitCol + iif(!lCtWin,1,0) + Int( ( ( nWidth - Len( cEval ) ) / 2 ) + .5 )
+
+          if !lCtWin
+             DispOutAt( nInitRow + HB_EnumIndex(), nCol , cEval, cColorNorm )
+          else
+             SetPos( nInitRow + HB_EnumIndex() - 1 , nCol )
+             QQOut( cEval  )
+          endif
+
       NEXT
 
       /* choice loop */
       lWhile := .T.
+
       DO WHILE lWhile
 
          nCount := Len( aSay )
          FOR EACH cEval IN aOptionsOK
-            DispOutAt( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ], " " + cEval + " ", cColorNorm )
+            if !lCtWin
+               DispOutAt( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ], " " + cEval + " ", cColorNorm )
+            else
+               SetPos( nInitRow + nCount + 2, aPos[ HB_EnumIndex() ] )
+               QQOut( " " + cEval + " "  )
+            endif
          NEXT
-         DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh, TRUE )
+
+         if !lCtWin
+            DispOutAt( nInitRow + nCount + 2, aPos[ nChoice ], " " + aOptionsOK[ nChoice ] + " ", cColorHigh, TRUE )
+         else
+            SetColor( cColorHigh )
+            SetPos( nInitRow + nCount + 2, aPos[ nChoice ] )
+            QQOut( " " + aOptionsOK[ nChoice ] + " "  )
+            SetColor( cColorNorm )
+            WCenter(.t.)
+         endif
 
          nKey := Inkey( nDelay, INKEY_ALL )
 
@@ -480,8 +523,15 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
       ENDDO
 
+
       /* Restore status */
-      RestScreen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, cOldScreen )
+      IF !lCtWin
+         RestScreen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, cOldScreen )
+      ELSE
+         WClose()
+         SetColor( cCtColor )
+      ENDIF
+
       SetCursor( nOldCursor )
       SetPos( nOldRow, nOldCol )
 

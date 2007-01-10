@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.121 2006/12/11 17:56:58 modalsist Exp $
+ * $Id: tget.prg,v 1.122 2007/01/07 18:48:40 modalsist Exp $
  */
 
 /*
@@ -321,7 +321,10 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::lDispLen := .f.
       endif
 
-      ::lCleanZero := ( "Z" IN ::cPicFunc ) // Display zero as blanks.
+      // 2007/JAN/09 - E.F. - Protect ::lCleanzero value before extract "Z" from picture.
+      if !::lCleanZero
+         ::lCleanZero := ( "Z" IN ::cPicFunc ) // Display zero as blanks.
+      endif
 
       // 2006/DEC/19 - E.F. - Extracted "Z" from ::cPicture
       if ::lCleanZero
