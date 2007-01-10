@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5286 2007/01/09 22:05:20 druzus Exp $
+ * $Id: ChangeLog,v 1.5287 2007/01/10 00:07:31 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-10 09:35 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.bc
+    + added ct.lib to hbmake, hbtest, hbrun, hbdoc and xbscript rules,
+      by recent changes in alert.prg that are called by these utils.
+      By now alert() calls ct.lib internally, so others make files need
+      be changed also.
 
 2007-01-09 22:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
