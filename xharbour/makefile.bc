@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.186 2006/11/09 16:41:08 marchuet Exp $
+# $Id: makefile.bc,v 1.187 2007/01/10 11:35:38 modalsist Exp $
 #
 
 #
@@ -3648,7 +3648,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
-   $(ECHO) $(CT_LIB) >> make.tmp
+   
 
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp
    $(CC) @make.tmp
@@ -3706,7 +3706,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
-   $(ECHO) $(CT_LIB) >> make.tmp
+   
 
 !if $d(HB_THREAD_SUPPORT)
    $(ECHO) cw32mt.lib >> make.tmp
@@ -3832,7 +3832,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
-   $(ECHO) $(CT_LIB) >> make.tmp
+   
 !if $d(HB_DOC_PDF)
    $(ECHO) $(OBJ_DIR)\genpdf1.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\pdfhbdoc.obj >> make.tmp
@@ -3995,7 +3995,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
-   $(ECHO) $(CT_LIB) >> make.tmp
+   
 
    $(CC) @make.tmp
    $(DEL) make.tmp
@@ -4078,8 +4078,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
    $(ECHO) $(CT_LIB) >> make.tmp
-
-   $(ECHO) $(CT_LIB) >> make.tmp
+   
    $(CC) @make.tmp
    $(DEL) make.tmp
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5290 2007/01/10 19:03:29 modalsist Exp $
+ * $Id: ChangeLog,v 1.5291 2007/01/11 01:00:32 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-11 08:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.bc
+    - removed ct.lib from hbmake, hbtest, hbrun and hbdoc rules implemented
+      by me on last commit.
+
+  * source/rtl/alert.prg
+    + added call to hb_ctWxxx functions directly by alert() to avoid the
+      need of link ct.lib by users. This is a workaround for a while.
 
 2007-01-11 02:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/xharbour.spec

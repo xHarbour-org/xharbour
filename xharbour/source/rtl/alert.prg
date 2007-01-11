@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.21 2006/06/23 22:08:15 lculik Exp $
+ * $Id: alert.prg,v 1.22 2007/01/10 00:08:01 modalsist Exp $
  */
 
 /*
@@ -49,6 +49,7 @@
 STATIC s_lNoAlert
 #endif
 
+
 FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nChoice
@@ -78,9 +79,11 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
    LOCAL lConsole := .F.
 
    /* Variables to control CT Windows  */
-   LOCAL lCtWin   := ( WNum() != 0 )  // There is a CT Window active ?
+   LOCAL lCtWin   := ( Ct_WNum() != 0 )  // There is a CT Window active ?
+
    LOCAL cCtColor
    LOCAL nCol
+
 
 #ifdef HB_C52_UNDOC
 
@@ -403,8 +406,8 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
          DispBox( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, B_SINGLE + ' ', cColorNorm )
       ELSE
          cCtColor := SetColor( cColorNorm )
-         WOpen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1 , .T. )
-         WBox( B_SINGLE )
+         Ct_WOpen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1 , .T. )
+         Ct_WBox( B_SINGLE )
       ENDIF
 
 
@@ -443,7 +446,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
             SetPos( nInitRow + nCount + 2, aPos[ nChoice ] )
             QQOut( " " + aOptionsOK[ nChoice ] + " "  )
             SetColor( cColorNorm )
-            WCenter(.t.)
+            Ct_WCenter(.t.)
          endif
 
          nKey := Inkey( nDelay, INKEY_ALL )
@@ -528,7 +531,7 @@ FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
       IF !lCtWin
          RestScreen( nInitRow, nInitCol, nInitRow + Len( aSay ) + 3, nInitCol + nWidth + 1, cOldScreen )
       ELSE
-         WClose()
+         Ct_WClose()
          SetColor( cCtColor )
       ENDIF
 
@@ -571,3 +574,128 @@ cColor := Upper( cColor )
 
 Return cColor IN { "0","1","2","3","4","5","6","7","8","9","10","11","12",;
                    "13","14","15","B","BG","G","GR","N","R","RB","W"}
+
+/* 2007/JAN/10 - E.F. - The functions below were copied from source\ct\ctwin.c
+                        to avoid calling ct lib functions. At this way, the
+                        alert function is free of ct.lib linking by users if used
+                        only for default console mode, instead ct windows mode.
+                        Therefore, these functions can be obsolete if anyone 
+                        create other way to use these functions directly from a
+                        gt driver or anything else.
+*/
+
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbapigt.h"
+
+
+HB_FUNC_STATIC( CT_WNUM ) /* Get the highest windows handle */
+{
+   hb_retni( hb_ctWNum() );
+}
+
+HB_FUNC_STATIC( CT_WOPEN )
+{
+   SHORT iwnd = -1;
+
+   iwnd = hb_ctWOpen( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
+                      hb_parni( 4 ), hb_parl( 5 ) );
+
+   hb_retni( iwnd );
+
+}
+
+HB_FUNC_STATIC( CT_WBOX )     /* Places a frame around the active window */
+{
+   char        * cBox, cBox2[ 10 ], c;
+   HB_CT_WND   * wnd;
+   int         i, j;
+   static char * cWBOX[] = {
+            _B_DOUBLE,        // 0  WB_DOUBLE_CLEAR
+            _B_SINGLE,        // 1  WB_SINGLE_CLEAR
+            _B_DOUBLE_SINGLE, // 2  WB_DOUBLE_SINGLE_CLEAR
+            _B_SINGLE_DOUBLE, // 3  WB_SINGLE_DOUBLE_CLEAR
+
+            _B_DOUBLE,        // 4  WB_DOUBLE
+            _B_SINGLE,        // 5  WB_SINGLE
+            _B_DOUBLE_SINGLE, // 6  WB_DOUBLE_SINGLE
+            _B_SINGLE_DOUBLE, // 7  WB_SINGLE_DOUBLE
+
+            "лплллмлл",       // 8  WB_HALF_FULL_CLEAR
+            "опнннмоо",       // 9  WB_HALF_CLEAR
+            "олнннлоо",       // 10 WB_FULL_HALF_CLEAR
+            "лллллллл",       // 11 WB_FULL_CLEAR
+
+            "лплллмлл",       // 12 WB_HALF_FULL
+            "опнннмоо",       // 13 WB_HALF
+            "олнннлоо",       // 14 WB_FULL_HALF
+            "лллллллл" };     // 15 WB_FULL
+
+   wnd = hb_ctWCurrent();
+
+   if( ISCHAR( 1 ) )
+   {
+      i = 4;
+      cBox = hb_parcx( 1 );
+   }
+   else if( ISNUM( 1 ) )
+   {
+      i = hb_parni( 1 );
+      if( i < 0 || i > 15 ) i = 0;
+      cBox = cWBOX[ i ];
+   }
+   else
+   {
+      i = 0;
+      cBox = cWBOX[ i ];
+   }
+
+   c = ' ';
+   for( j = 0; j < 9; j++ )
+   {
+      c = cBox[ j ];
+      if( !c ) break;
+      cBox2[ j ] = c;
+   }
+   for( ; j < 8; j++ ) cBox2[ j ] = c;
+
+   if( ( i % 8 ) < 4 && j < 9 ) cBox2[ j++ ] = (char) hb_ctGetClearB();
+   cBox2[ j ] = '\0';
+
+   if( wnd->ULRow - wnd->UFRow <= 1 || wnd->ULCol - wnd->UFCol <= 1 )
+   {
+      hb_retni( wnd->NCur );
+      return;
+   }
+
+   hb_gtBox( 0, 0, wnd->ULRow - wnd->UFRow, wnd->ULCol - wnd->UFCol,
+             ( BYTE * ) cBox2 );
+
+   if( wnd->NCur == 0 )
+   {
+      if( wnd->iRow < 1 ) wnd->iRow = 1;
+      if( wnd->iCol < 1 ) wnd->iCol = 1;
+      hb_gtSetPos( wnd->iRow, wnd->iCol );
+   }
+   else
+   {
+      hb_ctWFormat( 1, 1, 1, 1 );
+      hb_gtSetPos( 0, 0 );
+   }
+
+   hb_retni( wnd->NCur );
+}
+/****************************************************************************/
+HB_FUNC_STATIC( CT_WCENTER )  /* Returns a window to the visible area, or centers it */
+{
+   hb_retni( hb_ctWCenter( hb_parl( 1 ) ) );
+}
+/****************************************************************************/
+HB_FUNC_STATIC( CT_WCLOSE ) /* Close the active window */
+{
+   hb_retni( hb_ctWClose() );
+}
+
+#pragma BEGINEND
+
