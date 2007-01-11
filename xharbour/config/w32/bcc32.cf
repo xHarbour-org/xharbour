@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.7 2005/02/18 21:20:04 druzus Exp $
+# $Id: bcc32.cf,v 1.8 2005/04/25 19:22:14 druzus Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -15,8 +15,8 @@ CC = bcc32
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CFLAGS = -O2 -d -4 -5 -6 -a4
 
-CFLAGS = -5 -6 -a8 -O2 -d
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
@@ -41,12 +41,13 @@ LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
 endif
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 LINKLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)$(LIB_EXT)
 ifeq ($(HB_MULTI_GT),yes)
 LINKLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul$(LIB_EXT)
 endif
+LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH)/pcrepos$(LIB_EXT)
 endif
 
 ifneq ($(HB_SCREEN_LIB),)

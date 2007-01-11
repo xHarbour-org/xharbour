@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.201 2006/08/21 15:16:46 walito Exp $
+* $Id: thread.c,v 1.202 2006/10/01 16:22:24 enricomaria Exp $
 */
 
 /*
@@ -1082,7 +1082,6 @@ void HB_EXPORT hb_threadWaitAll()
 void HB_EXPORT hb_threadKillAll()
 {
    HB_STACK *pStack;
-   HB_STACK *pNext;
 
    hb_threadWaitForIdle();
 
@@ -1108,6 +1107,7 @@ void HB_EXPORT hb_threadKillAll()
          else
          {
             HB_MUTEX_STRUCT *pMtx;
+            HB_STACK *pNext;
 
             /* This is a subset of terminateThread: as this routine is
                an idle inspector, many of the cares in terminateThread may

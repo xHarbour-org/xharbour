@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.34 2006/06/17 06:36:32 druzus Exp $
+ * $Id: sdf1.c,v 1.19 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -811,6 +811,11 @@ static ERRCODE hb_sdfAddField( SDFAREAP pArea, LPDBFIELDINFO pFieldInfo )
       case HB_IT_INTEGER:
          pFieldInfo->uiType = HB_IT_LONG;
          pFieldInfo->uiLen = s_uiNumLength[ pFieldInfo->uiLen ];
+         if( pFieldInfo->uiDec )
+         {
+            pFieldInfo->uiDec = 0;
+            pFieldInfo->uiLen++;
+         }
          pArea->fTransRec = FALSE;
          break;
 

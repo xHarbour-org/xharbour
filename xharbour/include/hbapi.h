@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.197 2006/08/11 01:31:28 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.198 2006/11/11 03:48:20 druzus Exp $
  */
 
 /*
@@ -600,6 +600,7 @@ extern HB_EXPORT char *   hb_strRemEscSeq( char * szText, ULONG * ulLen ); /* re
 
 extern HB_EXPORT double   hb_numRound( double dResult, int iDec ); /* round a number to a specific number of digits */
 extern HB_EXPORT double   hb_numInt( double dNum ); /* take the integer part of the number */
+extern HB_EXPORT double   hb_numDecConv( double dNum, int iDec );
 
 /* architecture dependent number conversions */
 extern HB_EXPORT void     hb_put_ieee754( BYTE * ptr, double d );

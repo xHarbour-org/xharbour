@@ -1,5 +1,5 @@
 #
-# $Id: xcc.cf,v 1.2 2005/02/17 19:52:42 druzus Exp $
+# $Id: xcc.cf,v 1.3 2005/03/16 16:01:35 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -48,24 +48,32 @@ endif
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
 endif
 
-# Add the specified GT driver library
+# Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
+
+ifeq ($(HB_LIB_COMPILE),)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+endif
+LINKLIBS += pcrepos$(LIB_EXT)
+
 ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 endif
 LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
+
 ifeq ($(HB_MULTI_GT),yes)
 ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
 endif
 LINKLIBS += gtnul$(LIB_EXT)
 endif
+
 endif
 
 LDFLAGS = $(LINKPATHS) kernel32.lib user32.lib \
           winspool.lib ole32.lib oleaut32.lib uuid.lib \
           comctl32.lib mapi32.lib advapi32.lib \
-          gdi32.lib
+          gdi32.lib mpr.lib
 
 ifeq ($(HB_GUI),yes)
 LDFLAGS += /SUBSYSTEM:WINDOWS

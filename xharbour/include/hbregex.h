@@ -1,5 +1,5 @@
 /*
- * $Id: hbregex.h,v 1.1 2005/09/02 18:29:21 druzus Exp $
+ * $Id: hbregex.h,v 1.2 2005/09/02 18:55:55 ronpinkas Exp $
  */
 
 /*
@@ -34,8 +34,8 @@
 
 
 #if ( defined(__XCC__) || defined(__LCC__) )
-   #include "..\source\rtl\pcre\pcre_internal.h"
-   #include "..\source\rtl\pcre\pcreposix.h"
+   #include "source\rtl\pcre\pcre_internal.h"
+   #include "source\rtl\pcre\pcreposix.h"
 #else
    #include "../source/rtl/pcre/pcre_internal.h"
    #include "../source/rtl/pcre/pcreposix.h"

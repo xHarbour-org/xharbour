@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.85 2006/08/07 10:31:14 druzus Exp $
+ * $Id: hbdefs.h,v 1.86 2006/10/28 14:41:54 ptsarenko Exp $
  */
 
 /*
@@ -59,13 +59,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "hbsetup.h"
+
 #if defined( __XCC__ ) || defined( __MINGW32__ ) || \
     ( defined( __GNUC__ ) && \
       ( defined( HB_OS_LINUX ) || defined( HB_OS_DARWIN ) ) )
 #  include <stdint.h>
 #endif
-
-#include "hbsetup.h"
 
 /*
 #define HB_CLIPPER_INT_ITEMS
@@ -169,6 +170,12 @@
    #undef UINT                            /* varies with platform */
    typedef unsigned int UINT;
 
+   #undef SCHAR                           /* 1 byte signed */
+   typedef signed char SCHAR;
+
+   #undef UCHAR                           /* 1 byte unsigned */
+   typedef unsigned char UCHAR;
+
    #undef BYTE                            /* 1 byte unsigned */
    typedef unsigned char BYTE;
 
@@ -196,7 +203,7 @@
          #if defined(__GNUC__)
             typedef long long LONGLONG;
          #else
-           typedef __int64 LONGLONG;
+            typedef __int64 LONGLONG;
          #endif
       #endif
       #if !defined(ULONGLONG)
@@ -311,6 +318,19 @@
 #  endif
 #endif
 
+#if !defined( UCHAR_MAX )
+#  define UCHAR_MAX     0x0FF
+#endif
+#if !defined( UINT24_MAX )
+#  define UINT24_MAX    0x0FFFFFFL
+#endif
+#if !defined( INT24_MAX )
+#  define INT24_MAX     8388607L
+#endif
+#if !defined( INT24_MIN )
+#  define INT24_MIN     -8388608L
+#endif
+
 #if defined( HB_ARCH_64BIT ) && !defined( _WIN64 )
 #   if !defined( UINT64 )
       typedef ULONG        UINT64;
@@ -386,12 +406,12 @@
 
 #define HB_DBL_LIM_INT8(d)    ( -128 <= (d) && (d) <= 127 )
 #define HB_DBL_LIM_INT16(d)   ( INT16_MIN <= (d) && (d) <= INT16_MAX )
-#define HB_DBL_LIM_INT24(d)   ( -8388608.0 <= (d) && (d) <= 8388607.0 )
+#define HB_DBL_LIM_INT24(d)   ( INT24_MIN <= (d) && (d) <= INT24_MAX )
 #define HB_DBL_LIM_INT32(d)   ( INT32_MIN <= (d) && (d) <= INT32_MAX )
 #define HB_DBL_LIM_INT64(d)   ( (HB_MAXDBL) INT64_MIN <= (HB_MAXDBL) (d) && (HB_MAXDBL) (d) <= (HB_MAXDBL) INT64_MAX )
 #define HB_LIM_INT8(l)        ( -128 <= (l) && (l) <= 127 )
 #define HB_LIM_INT16(l)       ( INT16_MIN <= (l) && (l) <= INT16_MAX )
-#define HB_LIM_INT24(l)       ( -8388608L <= (l) && (l) <= 8388607L )
+#define HB_LIM_INT24(l)       ( INT24_MIN <= (l) && (l) <= INT24_MAX )
 #define HB_LIM_INT32(l)       ( INT32_MIN <= (l) && (l) <= INT32_MAX )
 #define HB_LIM_INT64(l)       ( INT64_MIN <= (l) && (l) <= INT64_MAX )
 
@@ -400,24 +420,32 @@
  * numeric constant. This suffix is necessary for some compilers -
  * without it they cut the number to LONG
  */
-#if __BORLANDC__ -0 >= 1328
-#  define HB_LL( num )           num##i64
-#elif defined( _MSC_VER ) || defined( __BORLANDC__ )
+#if defined( __BORLANDC__ )
+#  if __BORLANDC__ >= 1328
+#     define HB_LL( num )           num##i64
+#  else
+#     define HB_LL( num )           num
+#  endif
+#elif defined( _MSC_VER )
 #  define HB_LL( num )           num
 #else
 #  define HB_LL( num )           num##LL
-#endif
-
-#if HB_LONG_MAX > HB_LL( 10000000000 )
-#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000 ) ) ? 20 : 10 )
-#else
-#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
 #endif
 
 #if HB_INT_MIN <= -1000000000
 #  define HB_INT_LENGTH( i )  ( ( (i) <= -1000000000 ) ? 20 : 10 )
 #else
 #  define HB_INT_LENGTH( i )  10
+#endif
+
+#if !defined( HB_LONG_LONG_OFF )
+#  if HB_LONG_MAX > HB_LL( 10000000000 )
+#     define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 || (l) >= HB_LL( 10000000000 ) ) ? 20 : 10 )
+#  endif
+#endif
+
+#if !defined HB_LONG_LENGTH
+#  define HB_LONG_LENGTH( l ) ( ( (l) <= -1000000000 ) ? 20 : 10 )
 #endif
 
 /* NOTE: Yes, -999999999.0 is right instead of -1000000000.0 [vszakats] */
@@ -437,6 +465,11 @@ typedef UINT32 HB_TYPE;
 
 /* type of reference counter */
 typedef unsigned long HB_COUNTER;
+#if ULONG_MAX <= UINT32_MAX
+#  define HB_COUNTER_SIZE     4
+#else
+#  define HB_COUNTER_SIZE     8
+#endif
 
 /* type for memory pointer diff */
 #if defined( _WIN64 )
@@ -452,6 +485,13 @@ typedef unsigned long HB_COUNTER;
 #else
    typedef LONGLONG HB_FOFFSET;
 #endif
+
+#if defined( HB_WIN32_IO )
+   typedef long   FHANDLE;
+#else
+   typedef int    FHANDLE;
+#endif
+
 
 /* maximum length of double number in decimal representation:
    log10(2^1024) ~ 308.25 */
@@ -521,7 +561,9 @@ typedef unsigned long HB_COUNTER;
 #define HB_MIN( a, b )          ( ( ( a ) < ( b ) ) ? ( a ) : ( b ) )
 
 #define HB_LOBYTE( w )          ( ( BYTE ) ( w ) )
-#define HB_HIBYTE( w )          ( ( BYTE ) ( ( ( w ) >> 8 ) & 0xFF ) )
+#define HB_HIBYTE( w )          ( ( BYTE ) ( ( ( w ) >>  8 ) & 0xFF ) )
+#define HB_ULBYTE( w )          ( ( BYTE ) ( ( ( w ) >> 16 ) & 0xFF ) )
+#define HB_UHBYTE( w )          ( ( BYTE ) ( ( ( w ) >> 24 ) & 0xFF ) )
 #define HB_LOWORD( l )          ( ( UINT16 ) ( l ) )
 #define HB_HIWORD( l )          ( ( UINT16 ) ( ( ( l ) >> 16 ) & 0xFFFF ) )
 #define HB_MKSHORT( lo, hi )    ( ( SHORT ) ( ( ( INT16 ) ( hi ) ) << 8 ) | ( lo ) )
@@ -581,10 +623,21 @@ typedef unsigned long HB_COUNTER;
 #  if !defined( HB_STRICT_ALIGNMENT )
 #     define HB_STRICT_ALIGNMENT
 #  endif
+#endif
+
+#if defined( HB_STRICT_ALIGNMENT )
 #  if !defined( HB_ALLOC_ALIGNMENT ) || ( HB_ALLOC_ALIGNMENT + 1 == 1 )
 #     define HB_ALLOC_ALIGNMENT     8
 #  endif
 #endif
+
+#if defined( HB_ALLOC_ALIGNMENT ) && HB_COUNTER_SIZE < HB_ALLOC_ALIGNMENT + 0
+#  define HB_COUNTER_OFFSET   HB_ALLOC_ALIGNMENT
+#else
+#  define HB_COUNTER_OFFSET   HB_COUNTER_SIZE
+#endif
+
+#define HB_COUNTER_PTR( p )         ((HB_COUNTER*) ((BYTE *) (p)-HB_COUNTER_OFFSET))
 
 /*
  * These macros are necessary for architectures which need
@@ -598,6 +651,8 @@ typedef unsigned long HB_COUNTER;
 #     define   HB_PUT_LONG( p, v )  HB_PUT_BE_UINT32( p, ( UINT32 ) ( v ) )
 #     define   HB_GET_LONG( p )     HB_GET_BE_UINT32( p )
 #  endif
+#  define   HB_PUT_UINT32( p, v )   HB_PUT_BE_UINT32( p, ( UINT32 ) ( v ) )
+#  define   HB_GET_UINT32( p )      HB_GET_BE_UINT32( p )
 #else
 #  if defined( HB_ARCH_64BIT )
 #     define   HB_PUT_LONG( p, v )  HB_PUT_LE_UINT64( p, ( UINT64 ) ( v ) )
@@ -606,6 +661,8 @@ typedef unsigned long HB_COUNTER;
 #     define   HB_PUT_LONG( p, v )  HB_PUT_LE_UINT32( p, ( UINT32 ) ( v ) )
 #     define   HB_GET_LONG( p )     HB_GET_LE_UINT32( p )
 #  endif
+#  define   HB_PUT_UINT32( p, v )   HB_PUT_LE_UINT32( p, ( UINT32 ) ( v ) )
+#  define   HB_GET_UINT32( p )      HB_GET_LE_UINT32( p )
 #endif
 
 #if !defined( HB_STRICT_ALIGNMENT )
@@ -861,7 +918,7 @@ typedef unsigned long HB_COUNTER;
 #  endif
 
    #define HB_USHORT_FROM_LE( w )   HB_MKUSHORT( HB_HIBYTE( w ), HB_LOBYTE( w ) )
-   #define HB_ULONG_FROM_LE( l )    HB_MKULONG( HB_HIBYTE( HB_HIWORD( l ) ), HB_LOBYTE( HB_HIWORD( l ) ), HB_HIBYTE( l ), HB_LOBYTE( l ) )
+   #define HB_ULONG_FROM_LE( l )    HB_MKULONG( HB_UHBYTE( l ), HB_ULBYTE( l ), HB_HIBYTE( l ), HB_LOBYTE( l ) )
    #define HB_USHORT_TO_LE( w )     HB_USHORT_FROM_LE( w )
    #define HB_ULONG_TO_LE( l )      HB_ULONG_FROM_LE( l )
 
@@ -1067,6 +1124,9 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #elif defined( __GNUC__ ) && defined( HB_OS_WIN_32 )
       #define HB_EXPORT __attribute__ (( dllexport ))
 
+   #elif defined( __GNUC__ ) && defined( HB_OS_LINUX )
+      #define HB_EXPORT __attribute__ ((visibility ("default")))
+
    #elif defined( __BORLANDC__ )
       #define HB_EXPORT _declspec( dllexport )
 
@@ -1127,7 +1187,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
 #define HB_EXIT_FUNCNAME( funcname )   HB_FUN_exit_##funcname
 #define HB_INITSTATICS_FUNCNAME()      hb_INITSTATICS
 
-#if defined( __cplusplus ) && !defined( HB_FUNC_USE_DECORATION ) && !defined( __WATCOMC__ )
+#if defined( __cplusplus ) && !defined( HB_FUNC_USE_DECORATION )
    #define HB_EXTERN_C_ extern "C"
    #define HB_EXTERN_
 #else

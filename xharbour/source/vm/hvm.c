@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.587 2006/12/07 16:18:43 kaddath Exp $
+ * $Id: hvm.c,v 1.588 2006/12/07 17:26:57 ronpinkas Exp $
  */
 
 /*
@@ -533,6 +533,7 @@ static void hb_vmDoInitClip( void )
    }
 }
 
+#if defined(HB_OS_WIN_32)
 /* Initialize Ole System IF linked in. */
 static void hb_vmDoInitOle( void )
 {
@@ -545,6 +546,7 @@ static void hb_vmDoInitOle( void )
       hb_vmDo(0);
    }
 }
+#endif
 
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )

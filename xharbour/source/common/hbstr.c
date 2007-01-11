@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.21 2005/06/22 15:30:16 druzus Exp $
+ * $Id: hbstr.c,v 1.22 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -457,6 +457,18 @@ double HB_EXPORT hb_numInt( double dNum )
    modf( dNum, &dInt );
 
    return dInt;
+}
+
+HB_EXPORT double hb_numDecConv( double dNum, int iDec )
+{
+   if( iDec > 0 )
+      return hb_numRound( dNum / hb_numPow10( iDec ), iDec );
+
+   else if( iDec < 0 )
+      return hb_numRound( dNum * hb_numPow10( -iDec ), 0 );
+
+   else
+      return hb_numRound( dNum, 0 );
 }
 
 static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG * lVal, double * dVal, int * piDec, int * piWidth )

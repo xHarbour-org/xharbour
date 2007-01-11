@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.103 2006/07/09 21:57:41 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.104 2006/11/06 22:31:40 ronpinkas Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ static void hb_compDebugStart( void ) { };
 %token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
 %token ANNOUNCE EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
 %token INC DEC ALIASOP DOCASE CASE OTHERWISE ENDCASE ENDDO MEMVAR
-%token WHILE LOOP END FOR NEXT TO STEP LE GE FIELD IN PARAMETERS
+%token WHILE LOOP FOR NEXT TO STEP LE GE FIELD IN PARAMETERS
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
 %token PRIVATE BEGINSEQ BREAK RECOVER RECOVERUSING DO WITH SELF LINE
 %token MACROVAR MACROTEXT
@@ -2614,8 +2614,8 @@ BeginSeq   : BEGINSEQ {
            ;
 
 RecoverSeq : /* no recover */  { $<lNumber>$ = 0; }
-           | RecoverEmpty Crlf { $<lNumber>$ = $<lNumber>1; } EmptyStats
-           | RecoverUsing Crlf { $<lNumber>$ = $<lNumber>1; } EmptyStats
+           | RecoverEmpty Crlf EmptyStats
+           | RecoverUsing Crlf EmptyStats
            ;
 
 RecoverEmpty : RECOVER
@@ -2723,11 +2723,7 @@ Try          : TRY
              ;
 
 Catch        : /* no recover */  { $<lNumber>$ = 0; }
-             | CatchError Crlf
-               {
-                 $<lNumber>$ = $<lNumber>1;
-               }
-               EmptyStats
+             | CatchError Crlf EmptyStats
              ;
 
 CatchError   : CATCH IdentName

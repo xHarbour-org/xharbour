@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5289 2007/01/10 17:38:22 snaiperis Exp $
+ * $Id: ChangeLog,v 1.5290 2007/01/10 19:03:29 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,59 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-11 02:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/xharbour.spec
+    * changed version number to 0.99.71
+
+  * xharbour/config/w32/bcc32.cf
+  * xharbour/config/w32/xcc.cf
+    + added pcrepos library
+
+  * xharbour/contrib/rdd_ads/adsfunc.c
+    * use ISBYREF() macro instead of hb_param( <i>, HB_IT_BYREF ) to
+      check if parameter is passed by reference
+
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbapifs.h
+  * xharbour/include/hbdefs.h
+  * xharbour/source/common/hbstr.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rdd/delim1.c
+  * xharbour/source/rdd/sdf1.c
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/rdd/dbcmd.c
+    + added support for "I" fields with fixed number of decimal places
+    * some other RDD modifications synced with Harbour like fixes for
+      xbase++ currency fields or allowing opening DBFs with varchar
+      or nullable fields
+
+  * xharbour/include/hbexprb.c
+    ! fixed a:={"ABC"}; a[1][2]:="x"; ? a[1]
+      It's only partial fix which does not resolve similar problem when
+      hashes or object items are used, f.e.:
+         a:={1=>"ABC"}; a[1][2]:="x"; ? a[1]
+      or
+         o:setget[1][2]:="x"; ? o:setget[1]
+
+  * xharbour/include/hbregex.h
+    * updated XCC file paths for compilation with GNU make - if it will
+      cause problems for other make systems then please revert it
+
+  * xharbour/source/compiler/harbour.sly
+    * removed some unused rules
+
+  * xharbour/source/rdd/dbffpt/Makefile
+    * workaround for XCC compilation with enabled optimization
+
+  * xharbour/source/vm/hvm.c
+    * cover hb_vmDoInitOle() function by #ifdef HB_OS_WIN_32
+
+  * xharbour/source/vm/thread.c
+    * cleaned warning
+
+  * xharbour/utils/Makefile
+    * added compilation for optional modules set in $(HB_UTILS) envvar
 
 2007-01-10 17:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

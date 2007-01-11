@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.110 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.111 2006/07/10 12:42:23 ronpinkas Exp $
  */
 
 /*
@@ -1313,6 +1313,14 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                pSelf->value.asList.pExprList->ExprType = HB_ET_VARREF;
                bRemoveRef = TRUE;
             }
+            else if( pSelf->value.asList.pExprList->ExprType == HB_ET_ARRAYAT )
+            {
+               if( !pSelf->value.asList.pExprList->value.asList.bByRef )
+               {
+                  pSelf->value.asList.pExprList->value.asList.bByRef =
+                  bRemoveRef = TRUE;
+               }
+            }
             else if( pSelf->value.asList.pExprList->ExprType == HB_ET_SEND )
             {
                pSelf->value.asList.pExprList->value.asMessage.bByRef = TRUE;
@@ -1362,7 +1370,11 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
          #ifndef HB_C52_STRICT
             if( bRemoveRef )
             {
-               if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARREF )
+               if( pSelf->value.asList.pExprList->ExprType == HB_ET_ARRAYAT )
+               {
+                  pSelf->value.asList.pExprList->value.asList.bByRef = FALSE;
+               }
+               else if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARREF )
                {
                   pSelf->value.asList.pExprList->ExprType = HB_ET_VARIABLE;
                }

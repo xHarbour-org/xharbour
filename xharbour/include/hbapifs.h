@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.44 2005/11/22 02:01:43 druzus Exp $
+ * $Id: hbapifs.h,v 1.45 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -59,12 +59,6 @@
 HB_EXTERN_BEGIN
 
 #define FS_ERROR F_ERROR
-
-#if defined( HB_WIN32_IO )
-typedef long    FHANDLE;
-#else
-typedef int    FHANDLE;
-#endif
 
 /* File locking flags */
 #define FL_LOCK       0x0000   /* Lock a region   */

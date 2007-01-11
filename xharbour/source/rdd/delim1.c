@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.21 2006/07/21 00:56:40 druzus Exp $
+ * $Id: delim1.c,v 1.22 2006/08/10 12:07:56 druzus Exp $
  */
 
 /*
@@ -1066,6 +1066,11 @@ static ERRCODE hb_delimAddField( DELIMAREAP pArea, LPDBFIELDINFO pFieldInfo )
       case HB_IT_INTEGER:
          pFieldInfo->uiType = HB_IT_LONG;
          pFieldInfo->uiLen = s_uiNumLength[ pFieldInfo->uiLen ];
+         if( pFieldInfo->uiDec )
+         {
+            pFieldInfo->uiDec = 0;
+            pFieldInfo->uiLen++;
+         }
          pArea->fTransRec = FALSE;
          break;
 
