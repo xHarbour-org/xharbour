@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // $Workfile: ZipPlatform.cpp $
 // $Archive: /ZipArchive/ZipPlatform.cpp $
-// $Date: 2003/09/14 15:01:28 $ $Author: paultucker $
+// $Date: 2005/10/06 18:24:47 $ $Author: lculik $
 ////////////////////////////////////////////////////////////////////////////////
 // This source file is part of the ZipArchive library source distribution and
 // is Copyright 2000-2003 by Tadeusz Dracz (http://www.artpol-software.com/)
@@ -180,7 +180,11 @@ bool ZipPlatform::ChangeDirectory(LPCTSTR lpDirectory)
 }
 int ZipPlatform::FileExists(LPCTSTR lpszName)
 {
-	if (_taccess(lpszName, 0) == 0)
+#if defined(__BORLANDC__)
+    if (_access(lpszName, 0) == 0)
+#else
+    if (_taccess(lpszName, 0) == 0)
+#endif
 	{
 		if (DirectoryExists(lpszName))
 			return -1;
