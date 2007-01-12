@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.588 2006/12/07 17:26:57 ronpinkas Exp $
+ * $Id: hvm.c,v 1.589 2007/01/11 01:00:35 druzus Exp $
  */
 
 /*
@@ -6156,6 +6156,12 @@ static void hb_vmArrayPushRef( void )
    pIndex = hb_stackItemFromTop( -1 );
    pArray = hb_stackItemFromTop( -2 );
 
+   if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
+   {
+      hb_vmArrayPush();
+      return;
+   }
+
    if( HB_IS_ARRAY( pArray ) )
    {
       if( HB_IS_INTEGER( pIndex ) )
@@ -6176,7 +6182,7 @@ static void hb_vmArrayPushRef( void )
       }
       else
       {
-         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+         PHB_ITEM pResult = hb_errRT_BASE_Subst( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
 
          if( pResult )
          {
@@ -6211,7 +6217,7 @@ static void hb_vmArrayPushRef( void )
          else
          {
             // Literal array - can not push by ref!
-            hb_errRT_BASE( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+            hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
          }
       }
       else
@@ -6221,7 +6227,7 @@ static void hb_vmArrayPushRef( void )
    }
    else
    {
-      hb_errRT_BASE( EG_ARRREF, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
+      hb_errRT_BASE( EG_ARG, 1068, NULL, hb_langDGetErrorDesc( EG_ARRACCESS ), 2, pArray, pIndex );
    }
 }
 

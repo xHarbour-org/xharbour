@@ -1,5 +1,5 @@
 /*
- * $Id: error.ch,v 1.8 2005/06/10 22:51:34 ronpinkas Exp $
+ * $Id: error.ch,v 1.9 2005/10/01 18:33:02 ronpinkas Exp $
  */
 
 /*
@@ -108,7 +108,6 @@
 #define EG_NOTARRAY     49      /* Harbour special */
 #define EG_CONDITION    50      /* Harbour special */
 #define EG_BADSELF      51      /* Harbour special */
-#define EG_ARRREF       52      /* Harbour special */
 
 #define EG_OLEEXECPTION 1001
 

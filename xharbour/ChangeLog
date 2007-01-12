@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5296 2007/01/12 15:36:35 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5297 2007/01/12 15:43:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-12 11:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/error.ch
+    - Removed invalid entry EG_ARRREF
+  * source/vm/hvm.c
+    - Replaced EG_ARRREF with EG_ARG
+    * Added redirection to hb_vmArrayPush() for HB_IT_HASH in hb_vmArrayPushRef()
 
 2007-01-12 11:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c
