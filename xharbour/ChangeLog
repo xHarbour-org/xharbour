@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5292 2007/01/11 11:07:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.5293 2007/01/11 21:06:51 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-12 10:09 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/win32ole.prg
+    * Corrected memory leak related to string argument passed BYREF
 
 2007-01-11 22:01 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/rtl/cdpapi.c
@@ -128,30 +132,30 @@
     + added function FT_RAT2 for reversed multiple AT
 
 2007-01-08 16:04 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
-  * contrib/libnf/kspeed.c     
-  * contrib/libnf/putkey.c     
-  * contrib/libnf/anomatch.prg 
-  * contrib/libnf/any2any.prg  
-  * contrib/libnf/aredit.prg   
-  * contrib/libnf/asum.prg     
-  * contrib/libnf/bytexor.prg  
-  * contrib/libnf/clrsel.prg   
-  * contrib/libnf/d2e.prg      
-  * contrib/libnf/datecnfg.prg 
-  * contrib/libnf/dfile.prg    
-  * contrib/libnf/e2d.prg      
-  * contrib/libnf/floptst.prg  
-  * contrib/libnf/hex2dec.prg  
-  * contrib/libnf/invclr.prg   
-  * contrib/libnf/min2dhm.prg  
-  * contrib/libnf/ntow.prg     
-  * contrib/libnf/ontick.c     
-  * contrib/libnf/pchr.prg     
-  * contrib/libnf/sleep.prg    
-  * contrib/libnf/sqzn.prg     
-  * contrib/libnf/sysmem.prg   
-  * contrib/libnf/tbwhile.prg  
-  * contrib/libnf/vertmenu.prg 
+  * contrib/libnf/kspeed.c
+  * contrib/libnf/putkey.c
+  * contrib/libnf/anomatch.prg
+  * contrib/libnf/any2any.prg
+  * contrib/libnf/aredit.prg
+  * contrib/libnf/asum.prg
+  * contrib/libnf/bytexor.prg
+  * contrib/libnf/clrsel.prg
+  * contrib/libnf/d2e.prg
+  * contrib/libnf/datecnfg.prg
+  * contrib/libnf/dfile.prg
+  * contrib/libnf/e2d.prg
+  * contrib/libnf/floptst.prg
+  * contrib/libnf/hex2dec.prg
+  * contrib/libnf/invclr.prg
+  * contrib/libnf/min2dhm.prg
+  * contrib/libnf/ntow.prg
+  * contrib/libnf/ontick.c
+  * contrib/libnf/pchr.prg
+  * contrib/libnf/sleep.prg
+  * contrib/libnf/sqzn.prg
+  * contrib/libnf/sysmem.prg
+  * contrib/libnf/tbwhile.prg
+  * contrib/libnf/vertmenu.prg
     ! fixed hbdoc files problems
   * contrib/libnf/rmdir.c
     + Change to hb_fs*() API functions
@@ -180,7 +184,7 @@
 	 process W3C xforms standard
 	 * changed ::header() to use simple string as parameter
 	 * better checking of parameters and defaults for tags and options processing
-	 * added DateToGMT static function and cookie expiration logic 
+	 * added DateToGMT static function and cookie expiration logic
 
 2007-01-07 03:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include\hbver.h

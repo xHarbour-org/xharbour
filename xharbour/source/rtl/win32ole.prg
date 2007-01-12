@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.144 2006/12/07 13:02:28 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.145 2006/12/07 17:26:57 ronpinkas Exp $
  */
 
 /*
@@ -1281,6 +1281,7 @@ RETURN Self
               switch( pVariant->n1.n2.vt )
               {
                  case VT_BYREF | VT_BSTR:
+                   SysFreeString( *pVariant->n1.n2.n3.pbstrVal );
                    sString = hb_oleWideToAnsi( *( pVariant->n1.n2.n3.pbstrVal ) );
                    hb_itemPutCPtr( pItem, sString, strlen( sString ) );
                    break;
