@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.196 2006/09/25 07:22:11 enricomaria Exp $
+ * $Id: classes.c,v 1.197 2006/11/18 22:44:06 guerra000 Exp $
  */
 
 /*
@@ -4687,12 +4687,12 @@ HB_FUNC( __CLSINSTNAME )
       PHB_DYNS pDynSym;
 
       uiClass = hb_clsGetHandleFromName( szClassName );
-      TraceLog( NULL, "uiClass: %i\n", uiClass );
+      // TraceLog( NULL, "uiClass: %i\n", uiClass );
 
       if( uiClass && uiClass <= s_uiClasses )
       {
          hb_clsInst( uiClass, hb_stackReturnItem() );
-         TraceLog( NULL, "INSTANCIATE uiClass: %i Return: %i\n", uiClass, hb_stackReturnItem()->type );
+         // TraceLog( NULL, "INSTANCIATE uiClass: %i Return: %i\n", uiClass, hb_stackReturnItem()->type );
          return;
       }
 
@@ -4700,7 +4700,7 @@ HB_FUNC( __CLSINSTNAME )
 
       if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
       {
-         TraceLog( NULL, "Class Function: %s\n", szClassName );
+         // TraceLog( NULL, "Class Function: %s\n", szClassName );
          hb_vmPushSymbol( pDynSym->pSymbol );
 
          hb_vmPushNil();
