@@ -1,5 +1,5 @@
 /*
- * $Id: profiler.prg,v 1.7 2006/09/15 15:07:01 ronpinkas Exp $
+ * $Id: profiler.prg,v 1.8 2006/12/30 10:26:17 brianhays Exp $
  */
 
 /*
@@ -410,7 +410,7 @@ Local xMember
 
    // For each class in the environment...
    FOR n := 1 TO nClasses
-      cClass := nClasses[ n ]
+      cClass := __ClassName( n )
       // If we're not ignoring the class' methods...
       If !::ignoreSymbol( cClass )
 
