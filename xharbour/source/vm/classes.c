@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.197 2006/11/18 22:44:06 guerra000 Exp $
+ * $Id: classes.c,v 1.198 2007/01/12 15:43:47 ronpinkas Exp $
  */
 
 /*
@@ -216,7 +216,7 @@ HB_SYMB  hb_symDestructor = { "__Destructor", {HB_FS_PUBLIC}, {NULL}, NULL };
 
 /* All functions contained in classes.c */
 
-static void     hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
+HB_EXPORT void     hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 static BOOL     hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedSend );
 
 static USHORT   hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos );
@@ -2463,7 +2463,7 @@ HB_FUNC( __CLSINST )
  *
  * Create a (super)object from class definition <hClass>
  */
-static void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
+HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -4426,7 +4426,7 @@ HB_FUNC( HB_OBJMSGPTR )
  * Param: the name of the class
  * output: the position of the class in the array of classes, or nothing.
  */
-UINT hb_clsGetHandleFromName( char *szClassName )
+HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName )
 {
    PCLASS start = s_pClasses;
    USHORT uPos = 0;

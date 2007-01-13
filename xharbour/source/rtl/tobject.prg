@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.17 2005/05/28 05:36:18 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.18 2005/11/12 22:49:31 walito Exp $
  */
 
 /*
@@ -433,3 +433,28 @@ procedure HashAddMember( aName, cType, uInit, oObj )
    next
 
 return
+
+FUNCTION HashEntry()
+
+   STATIC hClass
+
+   IF ValType( hClass ) == "N"
+      RETURN __clsInst( hClass )
+   ENDIF
+
+   hClass := __clsNew( "HASHENTRY", 3, 2 )
+
+   __clsAddMsg( hClass, "HPARENT",         1, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
+   __clsAddMsg( hClass, "KEY",             2, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
+   __clsAddMsg( hClass, "HASHENTRY_VALUE", 3, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_HIDDEN,  .T., .T. )
+
+   __clsAddMsg( hClass, "VALUE" , @HashEntry_GetValue(), HB_OO_MSG_METHOD )
+   __clsAddMsg( hClass, "_VALUE", @HashEntry_SetValue(), HB_OO_MSG_METHOD )
+
+RETURN __clsInst( hClass )
+
+STATIC FUNCTION HashEntry_GetValue()
+RETURN QSelf():HashEntry_Value
+
+STATIC FUNCTION HashEntry_SetValue( xVal )
+RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal

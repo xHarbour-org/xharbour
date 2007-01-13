@@ -4,13 +4,14 @@ Procedure Main()
    LOCAL oGet, xProperty
    LOCAL nGet, nGets, nProperty, nProperties
    LOCAL nStart
+   LOCAL oEntry
 
    CLS
 
    @ 10,10 GET cVar
    @ 12,10 GET cVar2
-
-#ifdef __XHARBOUR__
+   ?
+   
    nStart := Seconds()
 
    FOR Counter := 1 TO 10000
@@ -21,8 +22,8 @@ Procedure Main()
    NEXT
 
    ? Seconds() - nStart
-#endif
-
+   ?
+   
    nStart := Seconds()
 
    FOR Counter := 1 TO 10000
@@ -38,5 +39,13 @@ Procedure Main()
    NEXT
 
    ? Seconds() - nStart
-
+   ?
+   
+   FOR EACH oEntry IN { "First Name" => "John", "Last Name" => "Doe" }
+      ? oEntry:Key, "=>", oEntry:Value
+      oEntry:Value := { "Homer", "Simpson" }[ HB_EnumIndex() ]
+      ? oEntry:Key, "=>", oEntry:Value
+      ?
+   NEXT
+   
 RETURN

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.589 2007/01/11 01:00:35 druzus Exp $
+ * $Id: hvm.c,v 1.590 2007/01/12 22:42:00 ronpinkas Exp $
  */
 
 /*
@@ -548,6 +548,18 @@ static void hb_vmDoInitOle( void )
 }
 #endif
 
+static void hb_vmDoInitHashEntry( void )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "HASHENTRY" );
+
+   if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+   {
+      hb_vmPushSymbol( pDynSym->pSymbol );
+      hb_vmPushNil();
+      hb_vmDo(0);
+   }
+}
+
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
@@ -675,6 +687,8 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
          hb_vmDoInitOle();
       }
    #endif
+
+   hb_vmDoInitHashEntry();
 
    HB_TRACE( HB_TR_INFO, ("InitModuleFunctions") );
    hb_vmDoModuleInitFunctions();
@@ -1527,7 +1541,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
             {
                 // No prep needed.
             }
-            else if( HB_IS_HASH( pEnumeration ) && hb_hashGetCompatibility( pEnumeration ) )
+            else if( HB_IS_HASH( pEnumeration ) /* && hb_hashGetCompatibility( pEnumeration ) */ )
             {
                 // No prep needed.
             }
@@ -1590,18 +1604,42 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                {
                   hb_vmPushLogical( hb_arrayGetByRef( pEnumeration, ulEnumIndex, pEnumerator ) );
                }
-               else if( HB_IS_HASH( pEnumeration ) && hb_hashGetCompatibility( pEnumeration ) )
+               else if( HB_IS_HASH( pEnumeration ) )
                {
-                  ulEnumIndex = hb_hashAAGetRealPos( pEnumeration, ulEnumIndex );
-
-                  if( ulEnumIndex )
+                  if( hb_hashGetCompatibility( pEnumeration ) )
                   {
-                     hb_hashGet( pEnumeration, ulEnumIndex, pEnumerator );
-                     hb_vmPushLogical( TRUE );
+                     ulEnumIndex = hb_hashAAGetRealPos( pEnumeration, ulEnumIndex );
+
+                     if( ulEnumIndex )
+                     {
+                        hb_hashGet( pEnumeration, ulEnumIndex, pEnumerator );
+                        hb_vmPushLogical( TRUE );
+                     }
+                     else
+                     {
+                        hb_vmPushLogical( FALSE );
+                     }
                   }
                   else
                   {
-                     hb_vmPushLogical( FALSE );
+                     PHB_ITEM pKey = hb_hashGetKeyAt( pEnumeration, ulEnumIndex );
+
+                     if( pKey )
+                     {
+                        PHB_ITEM pValue = hb_hashGetValueAt( pEnumeration, ulEnumIndex );
+
+                        hb_clsInst( hb_clsGetHandleFromName( "HASHENTRY" ), pEnumerator );
+
+                        hb_arraySet( pEnumerator, pEnumerator->item.asArray.value->ulLen - 2 , pEnumeration );
+                        hb_arraySet( pEnumerator, pEnumerator->item.asArray.value->ulLen - 1 , pKey );
+                        hb_arraySet( pEnumerator, pEnumerator->item.asArray.value->ulLen     , pValue );
+
+                        hb_vmPushLogical( TRUE );
+                     }
+                     else
+                     {
+                        hb_vmPushLogical( FALSE );
+                     }
                   }
                }
                else

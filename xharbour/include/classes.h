@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.22 2005/12/13 13:33:38 walito Exp $
+ * $Id: classes.h,v 1.23 2006/09/07 04:56:43 ronpinkas Exp $
  */
 
 /*
@@ -163,9 +163,12 @@ extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 extern HB_EXPORT ULONG   hb_objGetOpOver( const PHB_ITEM pObject );
 extern HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
 
-void * hb_mthRequested( void );
+extern void * hb_mthRequested( void );
 
-void hb_clsFinalize( PHB_ITEM pObject );
+extern void hb_clsFinalize( PHB_ITEM pObject );
+
+extern HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName );
+extern HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 
 HB_EXTERN_END
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5297 2007/01/12 15:43:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5298 2007/01/12 22:42:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-12 21:33 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/classes.h
+    + Added: hb_clsGetHandleFromName() and hb_clsInst()
+  * source/vm/classes.c
+    * HB_EXPORT attribute to hb_clsGetHandleFromName() and hb_clsInst()
+
+  * source/rtl/tobject.prg
+    + Added class HashEntry() exporting :hParent (R/O), :Key (R/O) and :Value
+  * source/vm/hvm.c
+    + Added FOR EACH support to HB_IT_HASH. The Enumerator is an HashEntry() Object
+  * tests/foreach.prg
+    + Added sample of Hash iteration and manipulation
 
 2007-01-12 11:43 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/error.ch
