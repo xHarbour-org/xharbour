@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.232 2006/10/22 04:43:10 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.233 2006/11/02 19:17:28 ronpinkas Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ double CalcConstant( char **pExp );                       /* Parser for #if and 
 
 static COMMANDS * AddCommand( char * );                  /* Add new #command to an array  */
 static COMMANDS * AddTranslate( char * );                /* Add new #translate to an array  */
-static DEFINES *  DefSearch( char *, BOOL * );
+static DEFINES *  DefSearch( char *, BOOL *, DEFINES * );
 static COMMANDS * ComSearch( char *, COMMANDS * );
 static COMMANDS * TraSearch( char *, COMMANDS * );
 
@@ -270,7 +270,8 @@ char * hb_pp_szWarnings[] =
    "1Redefinition or duplicate definition of #define %s",
    "1No directives in command definitions file",
    "1No markers in repeatable group [%s] - group will never be used.",
-   "\'%s\'"
+   "\'%s\'",
+   "1Overloaded #define %s"
 };
 
 void hb_pp_SetRules( HB_INCLUDE_FUNC_PTR hb_compInclude, BOOL hb_comp_bQuiet )
@@ -783,10 +784,10 @@ void hb_pp_Init( void )
       *pDst++ = '"';
       *pDst = 0;
 
-      hb_pp_AddDefine( sOS, sVer );
+      hb_pp_AddDefine( sOS, sVer, FALSE );
 #ifdef HB_OS_UNIX
       strcpy( &sOS[12], "UNIX" );
-      hb_pp_AddDefine( sOS, sVer );
+      hb_pp_AddDefine( sOS, sVer, FALSE );
 #endif
       hb_xfree( szPlatform );
    }
@@ -803,8 +804,8 @@ void hb_pp_Init( void )
         value of 1 by default
       */
       sprintf( szResult, "%05d", ( usHarbour ? usHarbour : 1 ) );
-      hb_pp_AddDefine( "__HARBOUR__", szResult );
-      hb_pp_AddDefine( "__XHARBOUR__", szResult );
+      hb_pp_AddDefine( "__HARBOUR__", szResult, FALSE );
+      hb_pp_AddDefine( "__XHARBOUR__", szResult, FALSE );
    }
 
    {
@@ -819,13 +820,13 @@ void hb_pp_Init( void )
       strncpy( szResult + 8, curtime + 20, 4 );
       strncpy( szResult + 12, "\"", 2 );
 
-      hb_pp_AddDefine( "__DATE__", szResult );
+      hb_pp_AddDefine( "__DATE__", szResult, FALSE );
 
       strncpy( szResult, "\"", 1 );
       strncpy( szResult + 1, curtime + 11, 8 );
       strncpy( szResult + 9, "\"", 2 );
 
-      hb_pp_AddDefine( "__TIME__", szResult );
+      hb_pp_AddDefine( "__TIME__", szResult, FALSE );
    }
 
    {
@@ -833,24 +834,24 @@ void hb_pp_Init( void )
 
       sprintf( szResult, "%d", ( int ) sizeof( void * ) );
 #if defined( HB_ARCH_16BIT )
-      hb_pp_AddDefine( "__ARCH16BIT__", szResult );
+      hb_pp_AddDefine( "__ARCH16BIT__", szResult, FALSE );
 #elif defined( HB_ARCH_32BIT )
-      hb_pp_AddDefine( "__ARCH32BIT__", szResult );
+      hb_pp_AddDefine( "__ARCH32BIT__", szResult, FALSE );
 #elif defined( HB_ARCH_64BIT )
-      hb_pp_AddDefine( "__ARCH64BIT__", szResult );
+      hb_pp_AddDefine( "__ARCH64BIT__", szResult, FALSE );
 #endif
 
 #if defined( HB_LITTLE_ENDIAN )
-      hb_pp_AddDefine( "__LITTLE_ENDIAN__", szResult );
+      hb_pp_AddDefine( "__LITTLE_ENDIAN__", szResult, FALSE );
 #elif defined( HB_BIG_ENDIAN )
-      hb_pp_AddDefine( "__BIG_ENDIAN__", szResult );
+      hb_pp_AddDefine( "__BIG_ENDIAN__", szResult, FALSE );
 #elif defined( HB_PDP_ENDIAN )
-      hb_pp_AddDefine( "__PDP_ENDIAN__", szResult );
+      hb_pp_AddDefine( "__PDP_ENDIAN__", szResult, FALSE );
 #endif
    }
 
 #ifdef HARBOUR_START_PROCEDURE
-   hb_pp_AddDefine( "__HB_MAIN__", HARBOUR_START_PROCEDURE );
+   hb_pp_AddDefine( "__HB_MAIN__", HARBOUR_START_PROCEDURE, FALSE );
 #endif
 }
 
@@ -903,7 +904,7 @@ int hb_pp_ParseDirective( char * sLine )
 
         //printf( "Replace %.*s\n", pTemp - pDefined, pDefined );
 
-        if( DefSearch( sID, NULL ) )
+        if( DefSearch( sID, NULL, NULL ) )
         {
            hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
         }
@@ -973,7 +974,7 @@ int hb_pp_ParseDirective( char * sLine )
 
                //printf( "Replace %.*s\n", pTemp - pDefined, pDefined );
 
-               if( DefSearch( sID, NULL ) )
+               if( DefSearch( sID, NULL, NULL ) )
                {
                   hb_pp_Stuff( "1", pDefined, 1, pTemp - pDefined, strlen( pDefined ) );
                }
@@ -1278,7 +1279,7 @@ int hb_pp_ParseDefine( char * sLine )
 
      HB_SKIPTABSPACES( sLine );
 
-     lastdef = hb_pp_AddDefine( defname, ( *sLine == '\0' ) ? NULL : sLine );
+     lastdef = hb_pp_AddDefine( defname, ( *sLine == '\0' ) ? NULL : sLine, iParams >= 0 );
      lastdef->npars = iParams;
      lastdef->pars = ( iParams <= 0 ) ? NULL : hb_strdup( sParams );
   }
@@ -1290,16 +1291,21 @@ int hb_pp_ParseDefine( char * sLine )
   return 0;
 }
 
-DEFINES * hb_pp_AddDefine( char * defname, char * value )
+DEFINES * hb_pp_AddDefine( char * defname, char * value, BOOL bPseudoFunc )
 {
   BOOL isNew;
   DEFINES * stdef;
 
-  HB_TRACE(HB_TR_DEBUG, ("hb_pp_AddDefine(%s, %s)", defname, value));
+  HB_TRACE(HB_TR_DEBUG, ("hb_pp_AddDefine(%s, %s, %i)", defname, value, bPseudoFunc));
 
-  stdef = DefSearch( defname, &isNew );
+  stdef = DefSearch( defname, &isNew, NULL );
 
-  if( stdef != NULL )
+  if( stdef && bPseudoFunc )
+  {
+    hb_compGenWarning( hb_pp_szWarnings, 'I', HB_PP_WARN_OVERLOADED_REDEF, defname, NULL );
+  }
+
+  if( stdef && bPseudoFunc == FALSE )
   {
     hb_compGenWarning( hb_pp_szWarnings, 'I', HB_PP_WARN_DEFINE_REDEF, defname, NULL );
 
@@ -1363,7 +1369,7 @@ static int ParseUndef( char * sLine )
 
    NextWord( &sLine, defname, FALSE );
 
-   if( ( stdef = DefSearch(defname, &isNew ) ) != NULL )
+   if( ( stdef = DefSearch(defname, &isNew, NULL ) ) != NULL )
    {
       if( isNew )
       {
@@ -1406,7 +1412,7 @@ static int ParseIfdef( char * sLine, int usl )
 
    if( hb_pp_nCondCompile == 0 || hb_pp_aCondCompile[ hb_pp_nCondCompile - 1 ] > 0 )
    {
-      if( ( ( stdef = DefSearch(defname, NULL ) ) != NULL && usl ) || ( stdef == NULL && ! usl ) )
+      if( ( ( stdef = DefSearch(defname, NULL, NULL ) ) != NULL && usl ) || ( stdef == NULL && ! usl ) )
       {
          hb_pp_aCondCompile[ hb_pp_nCondCompile ] = 1;
       }
@@ -1455,10 +1461,10 @@ static int ParseIf( char * sLine )
    return 0;
 }
 
-static DEFINES * DefSearch( char * defname, BOOL * isNew )
+static DEFINES * DefSearch( char * defname, BOOL * isNew, DEFINES * stdefStart )
 {
   int kol = 0,j;
-  DEFINES * stdef = hb_pp_topDefine;
+  DEFINES * stdef = ( stdefStart ) ? stdefStart : hb_pp_topDefine;
 
   HB_TRACE(HB_TR_DEBUG, ("DefSearch(%s)", defname));
 
@@ -2562,16 +2568,25 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
 
         if( ( lenToken = NextName( &ptri, sToken ) ) > 0 )
         {
+           char *ptr;
+
+           stdef = NULL;
+
+          SearchDef:
+
            #if 0
               printf( "Define: >%s< Line: >%s<\n", sToken, ptri );
            #endif
 
-           if( ( stdef = DefSearch( sToken, NULL ) ) == NULL )
+           if( ( stdef = DefSearch( sToken, NULL, stdef ) ) == NULL )
            {
               goto NextName;
            }
            else
            {
+              // Save
+              ptr = ptri;
+
               ptrb = ptri - lenToken;
 
               if( ( i = WorkDefine( &ptri, ptro, stdef ) ) >= 0 )
@@ -2608,6 +2623,17 @@ int hb_pp_ParseExpression( char * sLine, char * sOutLine )
               }
               else
               {
+                 // We might also have a simple DEFINE constant.
+                 if( stdef->pars )
+                 {
+                    stdef = stdef->last;
+
+                    // Restore
+                    ptri = ptr;
+
+                    goto SearchDef;
+                 }
+
                  //printf( "Failed!\n" );
 
                  goto NextName;

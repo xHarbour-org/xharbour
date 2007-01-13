@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.12 2005/02/17 07:53:48 andijahja Exp $
+ * $Id: hbpp.c,v 1.13 2005/02/28 11:56:28 andijahja Exp $
  */
 
 /*
@@ -144,13 +144,13 @@ int main( int argc, char * argv[] )
                  {
                     if( ( pAssign = strchr( szDefText, '=' ) ) == NULL )
                     {
-                       hb_pp_AddDefine( szDefText, 0 );
+                       hb_pp_AddDefine( szDefText, 0, FALSE );
                     }
                     else
                     {
                        szDefText[ pAssign - szDefText ] = '\0';
 
-                       //hb_pp_AddDefine( szDefText,  pAssign + 1 );
+                       //hb_pp_AddDefine( szDefText,  pAssign + 1, FALSE );
                        sDefLine = (char*) hb_xgrab( strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1 );
                        sprintf( sDefLine, "%s %s", szDefText, pAssign + 1 );
                        hb_pp_ParseDefine( sDefLine );

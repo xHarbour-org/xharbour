@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.139 2006/10/21 21:17:55 likewolf Exp $
+ * $Id: harbour.c,v 1.140 2006/11/01 23:14:47 ronpinkas Exp $
  */
 
 /*
@@ -5521,7 +5521,7 @@ int hb_compCompile( char * szPrg, int argc, char * argv[] )
       hb_fsFNameMerge( szFileName, hb_comp_pFileName );
 
       sprintf( szFileLiteral, "\"%s\"", szFileName );
-      hb_pp_AddDefine( "__FILE__", szFileLiteral );
+      hb_pp_AddDefine( "__FILE__", szFileLiteral, FALSE );
 
       /* Local Variable List (.var) File
          hb_comp_iGenVarList is TRUE if /gcS is used

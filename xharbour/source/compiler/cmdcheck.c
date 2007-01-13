@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.28 2006/03/29 00:34:40 druzus Exp $
+ * $Id: cmdcheck.c,v 1.29 2006/05/03 08:13:55 lf_sfnet Exp $
  */
 
 /*
@@ -610,7 +610,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    case 'c':
                    case 'C':
                       hb_comp_iLanguage = LANG_C;
-                      
+
                       if( strchr( s + 2, 's' ) || strchr( s + 2, 'S' ) )
                       {
                          hb_comp_iGenVarList = TRUE;
@@ -643,7 +643,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                       }
                       break;
-                      
+
                    case 'o':
                    case 'O':
                       hb_comp_iLanguage = LANG_OBJ_MODULE;
@@ -652,7 +652,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                       {
                          hb_comp_iGenVarList = TRUE;
                       }
-                      
+
                       switch( *( s + 2 ) )
                       {
                          case '0':
@@ -679,8 +679,8 @@ void hb_compChkEnvironVar( char * szSwitch )
                          default:
                             hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
                       }
-                      break;                     
-                      
+                      break;
+
                    case 'j':
                    case 'J':
                       hb_comp_iLanguage = LANG_JAVA;
@@ -1065,13 +1065,13 @@ static void hb_compChkDefineSwitch( char * pszSwitch )
          {
             if( ( pAssign = strchr( szDefText, '=' ) ) == NULL )
             {
-               hb_pp_AddDefine( szDefText, 0 );
+               hb_pp_AddDefine( szDefText, 0, FALSE );
             }
             else
             {
                szDefText[ pAssign - szDefText ] = '\0';
 
-               /* hb_pp_AddDefine( szDefText,  pAssign + 1 ); */
+               /* hb_pp_AddDefine( szDefText,  pAssign + 1, FALSE ); */
                sDefLine = ( char* ) hb_xgrab( strlen( szDefText ) + 1 + strlen( pAssign + 1 ) + 1 );
                sprintf( sDefLine, "%s %s", szDefText, pAssign + 1 );
                hb_pp_ParseDefine( sDefLine );

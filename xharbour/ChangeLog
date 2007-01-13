@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5300 2007/01/13 09:13:47 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5301 2007/01/13 15:58:44 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,50 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-12 21:33 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbpp.h
+  * utils/hbpp/hbpp.c
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+    * Added bPseuudooFunc 3rd argument to hb_pp_AddDefine()
+
+  * include/hberrors.h
+    + Added: HB_PP_WARN_OVERLOADED_REDEF
+
+  * source/pp/ppcore.c
+    + Added support for overloading pseudo functions using #define
+
+  /*
+     This allows similiar functionality to #[x]translate or #[x]command
+     for case sensitive pseudo functions. Example:
+
+        #define int            3 // CTYPE_INT
+        #define int(x)    Int(x) // Fixes conflict with Int() function
+
+     Note that the overloaded pseudo function must be defined AFTER
+     the overloaded plain #define or it will never match.
+
+     WARNING: This modification may result in incompatable compilation
+              of some very rare code, like:
+
+              #define Func( p1 ) ...
+              ...
+              #define Func( p1, p2 ) ...
+
+              Clipper will keep only the last rule active while we now
+              have both rules active (only when the argument count is
+              different).
+
+              In order to detect and correct such (by adding an #undef)
+              xHarbour will produce a warning:
+
+                 Warning I0005  Overloaded #define ...
+
+              Duplicated constant will continue producing:
+
+                Warning I0001  Redefinition or duplicate definition of #define ...
+   */
 
 2007-01-13 16:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/source/vm/estack.c

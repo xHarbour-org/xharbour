@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.7 2004/11/03 21:20:05 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.8 2006/02/15 19:33:04 druzus Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ extern int    hb_pp_WrStr( FILE *, char * );
 extern int    hb_pp_RdStr( FILE *, char *, int, BOOL, char *, int *, int *, int );
 extern void   hb_pp_Stuff( char *, char *, int, int, int );
 extern int    hb_pp_strocpy( char *, char * );
-extern DEFINES * hb_pp_AddDefine( char *, char * );         /* Add new #define to a linked list */
+extern DEFINES * hb_pp_AddDefine( char *, char *, BOOL );         /* Add new #define to a linked list */
 
 extern int    hb_pp_lInclude;
 extern int *  hb_pp_aCondCompile;
