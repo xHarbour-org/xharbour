@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5299 2007/01/13 01:36:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5300 2007/01/13 09:13:47 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-13 16:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/source/vm/estack.c
+    * changed UnhandledExceptionFilter() to hb_UnhandledExceptionFilter()
+      modification requested by Antonio Lineares
+
+  * xharbour/source/vm/macro.c
+    * changed default hb_macroCompile() context to
+      HB_MACRO_GEN_LIST | HB_MACRO_GEN_PARE
 
 2007-01-13 10:13 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/compiler/hbusage.c

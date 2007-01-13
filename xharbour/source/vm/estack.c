@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.83 2006/02/22 01:47:37 ronpinkas Exp $
+ * $Id: estack.c,v 1.84 2006/05/23 19:21:18 ronpinkas Exp $
  */
 
 /*
@@ -593,7 +593,7 @@ void hb_stackDispCall( void )
 
 #if defined(HB_OS_WIN_32)
 
-WINBASEAPI LONG WINAPI UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionInfo )
+LONG WINAPI hb_UnhandledExceptionFilter( struct _EXCEPTION_POINTERS * ExceptionInfo )
 {
    PHB_ITEM *pBase = HB_VM_STACK.pBase;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.63 2006/02/24 06:18:29 ronpinkas Exp $
+ * $Id: macro.c,v 1.64 2006/07/02 14:30:48 ronpinkas Exp $
  */
 
 /*
@@ -845,10 +845,11 @@ HB_MACRO_PTR HB_EXPORT hb_macroCompile( char * szString )
    HB_TRACE(HB_TR_DEBUG, ("hb_macroCompile(%s)", szString));
 
    pMacro = ( HB_MACRO_PTR ) hb_xgrab( sizeof( HB_MACRO ) );
-   pMacro->Flags = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH;
-   pMacro->uiNameLen  = HB_SYMBOL_NAME_LEN;
-   pMacro->status     = HB_MACRO_CONT;
-   pMacro->supported  = s_macroFlags;
+   pMacro->Flags     = HB_MACRO_DEALLOCATE | HB_MACRO_GEN_PUSH |
+                       HB_MACRO_GEN_LIST | HB_MACRO_GEN_PARE;
+   pMacro->uiNameLen = HB_SYMBOL_NAME_LEN;
+   pMacro->status    = HB_MACRO_CONT;
+   pMacro->supported = s_macroFlags;
 
    szString = (char *) hb_strdup( szString );
 
