@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.176 2006/08/21 18:35:32 modalsist Exp $
+ * $Id: hbmake.prg,v 1.177 2006/12/10 12:33:36 ptsarenko Exp $
  */
 
 /*
@@ -148,7 +148,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    IF Empty(cFile)
       OutStd( "xHarbour Make" + HB_OSNewLine() +;
-              "Copyright 1999-2006, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
+              "Copyright 1999-2007, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
               HB_OSNewLine() +;
               "Syntax:  hbmake <makefile> [switches]" + HB_OSNewLine() +;
               "Switches:" + HB_OSNewLine() +;
