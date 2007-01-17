@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.123 2007/01/10 00:08:01 modalsist Exp $
+ * $Id: tget.prg,v 1.124 2007/01/10 19:03:56 modalsist Exp $
  */
 
 /*
@@ -787,7 +787,7 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
          ::Type    := ValType( xValue )
          ::xVarGet := xValue
          ::lEdit   := .f.
-         ::Picture( ::cOrigPicture )
+         ::Picture := ::cOrigPicture 
       endif
    endif
 
@@ -2009,7 +2009,8 @@ METHOD SetPicture( cPicture ) CLASS Get
          ::nDispLen := ::nMaxLen
       endif
 
-      if empty( ::cOrigPicture )
+      //if empty( ::cOrigPicture )
+      if !(::cOrigPicture == cPicture)
          ::cOrigPicture := cPicture
       endif
 
