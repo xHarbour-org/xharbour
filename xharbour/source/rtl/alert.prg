@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.22 2007/01/10 00:08:01 modalsist Exp $
+ * $Id: alert.prg,v 1.23 2007/01/11 11:08:34 modalsist Exp $
  */
 
 /*
@@ -597,7 +597,7 @@ HB_FUNC_STATIC( CT_WNUM ) /* Get the highest windows handle */
 
 HB_FUNC_STATIC( CT_WOPEN )
 {
-   SHORT iwnd = -1;
+   SHORT iwnd;
 
    iwnd = hb_ctWOpen( hb_parni( 1 ), hb_parni( 2 ), hb_parni( 3 ),
                       hb_parni( 4 ), hb_parl( 5 ) );
