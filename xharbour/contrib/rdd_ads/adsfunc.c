@@ -1,5 +1,5 @@
 /*
- * $Id: adsfunc.c,v 1.83 2006/12/30 10:26:17 brianhays Exp $
+ * $Id: adsfunc.c,v 1.84 2007/01/11 01:00:34 druzus Exp $
  */
 
 /*
@@ -2039,6 +2039,26 @@ HB_FUNC( ADSDDREMOVETABLE )
    ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
 
    ulRetVal = AdsDDRemoveTable( hConnect, pTableName, usDeleteFiles );
+
+   if( ulRetVal == AE_SUCCESS )
+   {
+      hb_retl( 1 );
+   }
+   else
+   {
+      hb_retl( 0 );
+   }
+}
+
+HB_FUNC( ADSDDREMOVEINDEXFILE )
+{
+   UNSIGNED32 ulRetVal;
+   UNSIGNED8 *pTableName     = (UNSIGNED8 *) hb_parcx( 1 );
+   UNSIGNED8 *pIndexName     = (UNSIGNED8 *) hb_parcx( 2 );
+   UNSIGNED16 usDeleteFiles  = (UNSIGNED16) ( ISNUM( 3 ) ? hb_parnl( 3 ) : ( ISLOG( 3 ) ? hb_parl( 3 ) : 0 ) );
+   ADSHANDLE hConnect = HB_ADS_PARCONNECTION( 4 );
+
+   ulRetVal = AdsDDRemoveIndexFile( hConnect, pTableName, pIndexName, usDeleteFiles );
 
    if( ulRetVal == AE_SUCCESS )
    {
