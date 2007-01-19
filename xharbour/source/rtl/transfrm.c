@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.47 2006/11/12 21:01:35 enricomaria Exp $
+ * $Id: transfrm.c,v 1.48 2006/11/17 12:33:46 ronpinkas Exp $
  */
 
 /*
@@ -72,9 +72,9 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
-  #define TOUPPER(c)    ((hb_cdp_page->nChars)? (char)hb_cdp_page->s_upper[c&255] : toupper(c))
+  #define TOUPPER(c)    ((hb_cdp_page->nChars)? (char)hb_cdp_page->s_upper[c&255] : toupper( (BYTE) c ) )
 #else
-  #define TOUPPER(c)    toupper(c)
+  #define TOUPPER(c)    toupper( (BYTE) c )
 #endif
 
 /* Picture function flags */

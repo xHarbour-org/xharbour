@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5305 2007/01/18 11:23:07 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5306 2007/01/18 11:32:32 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-19 19:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/transfrm.c
+    ! changed call of function toupper(c) to toupper( (BYTE) c ) in
+      #define TOUPPER(c) to fix upper chars above the chr(127).
+                 
 2006-01-18 08:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * xharbour/contrib/rdd_ads/adsfunc.c
     ! added missing ADSDDREMOVEINDEXFILE() function
