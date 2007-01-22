@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5306 2007/01/18 11:32:32 lculik Exp $
+ * $Id: ChangeLog,v 1.5307 2007/01/19 21:13:36 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-01-22 09:29 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  + xharbour/source/rdd/bmdbfcdx/bmsixcdx1.c
+  * xharbour/source/rdd/bmdbfcdx/makefile
+  * xharbour/makefile.bc
+    *   Added support bitmap filter at sixcdx as BMSIXCDX.
+    
 2007-01-19 19:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/transfrm.c
     ! changed call of function toupper(c) to toupper( (BYTE) c ) in

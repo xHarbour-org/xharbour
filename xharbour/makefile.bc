@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.187 2007/01/10 11:35:38 modalsist Exp $
+# $Id: makefile.bc,v 1.188 2007/01/11 11:08:11 modalsist Exp $
 #
 
 #
@@ -196,6 +196,7 @@ CT_LIB         = $(LIB_DIR)\ct$(HB_MT).lib
 DBFCDX_LIB     = $(LIB_DIR)\dbfcdx$(HB_MT).lib
 BMDBFCDX_LIB   = $(LIB_DIR)\bmdbfcdx$(HB_MT).lib
 SIXCDX_LIB     = $(LIB_DIR)\sixcdx$(HB_MT).lib
+BMSIXCDX_LIB   = $(LIB_DIR)\bmsixcdx$(HB_MT).lib
 DBFFPT_LIB     = $(LIB_DIR)\dbffpt$(HB_MT).lib
 DBFNTX_LIB     = $(LIB_DIR)\dbfntx$(HB_MT).lib
 HBSIX_LIB      = $(LIB_DIR)\hbsix$(HB_MT).lib
@@ -655,6 +656,9 @@ BMDBFCDX_LIB_OBJS = \
 
 SIXCDX_LIB_OBJS = \
    $(CDX_OBJ_DIR)\sixcdx1.obj
+
+BMSIXCDX_LIB_OBJS = \
+   $(CDX_OBJ_DIR)\bmsixcdx1.obj
 
 HBSIX_LIB_OBJS = \
    $(SIX_OBJ_DIR)\sxcompr.obj \
@@ -1177,6 +1181,7 @@ PROJECT = \
    $(DBFCDX_LIB) \
    $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
+   $(BMSIXCDX_LIB) \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
    $(USRRDD_LIB) \
@@ -1250,6 +1255,15 @@ $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
 +)
 
 !
+
+$(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
+    IF EXIST "$(BMSIXCDX_LIB)" $(DEL) "$(BMSIXCDX_LIB)" > NUL
+    $(LINKER) "$(BMSIXCDX_LIB)" $(ARFLAGS) @&&!
++$(**: = &^
++)
+
+!
+
 $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
     IF EXIST "$(HBSIX_LIB)" $(DEL) "$(HBSIX_LIB)" > NUL
     $(LINKER) "$(HBSIX_LIB)" $(ARFLAGS) @&&!
@@ -2867,6 +2881,13 @@ $(CDX_OBJ_DIR)\sixcdx1.obj : $(RDD_DIR)\dbfcdx\sixcdx1.c
    $(CC_CMD)
 
 #
+# BMSIXCDX.LIB dependencies
+#
+
+$(CDX_OBJ_DIR)\bmsixcdx1.obj : $(RDD_DIR)\bmdbfcdx\bmsixcdx1.c
+   $(CC_CMD)
+
+#
 # HBSIX.LIB dependencies
 #
 
@@ -3644,6 +3665,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
+   $(ECHO) $(BMSIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
@@ -3702,6 +3724,7 @@ $(HBTEST_EXE) : $(HBTEST_EXE_OBJS)
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
+   $(ECHO) $(BMSIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
@@ -3828,6 +3851,7 @@ $(HBDOC_EXE) : $(HBDOC_EXE_OBJS)
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
+   $(ECHO) $(BMSIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
@@ -3993,6 +4017,7 @@ $(HBMAKE_EXE) : $(HBMAKE_EXE_OBJS)
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
+   $(ECHO) $(BMSIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
    
@@ -4073,6 +4098,7 @@ $(XBSCRIPT_EXE) : $(XBSCRIPT_EXE_OBJS)
    $(ECHO) $(DBFCDX_LIB) >> make.tmp
    $(ECHO) $(BMDBFCDX_LIB) >> make.tmp
    $(ECHO) $(SIXCDX_LIB) >> make.tmp
+   $(ECHO) $(BMSIXCDX_LIB) >> make.tmp
    $(ECHO) $(HBSIX_LIB) >> make.tmp
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
