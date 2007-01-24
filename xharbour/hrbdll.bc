@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.128 2006/12/01 11:47:13 modalsist Exp $
+# $Id: hrbdll.bc,v 1.129 2007/01/23 22:41:57 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -3033,9 +3033,6 @@ $(OBJ_DIR)\hbcrc32.obj : $(RTL_DIR)\hbcrc32.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbcrypt.obj : $(RTL_DIR)\hbcrypt.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
    $(CC_CMD)
 
 # hbtip
