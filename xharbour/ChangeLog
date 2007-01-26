@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5309 2007/01/23 22:41:57 kaddath Exp $
+ * $Id: ChangeLog,v 1.5310 2007/01/24 17:34:02 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-26 09:03 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * bin/bld.bat
+    + Added missing advapi32.lib to MSVC libs
 
 2007-01-24 09:33 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc
@@ -21,12 +25,12 @@
   * xharbour/source/rdd/bmdbfcdx/makefile
   * xharbour/makefile.bc
     *   Added support bitmap filter at sixcdx as BMSIXCDX.
-    
+
 2007-01-19 19:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/transfrm.c
     ! changed call of function toupper(c) to toupper( (BYTE) c ) in
       #define TOUPPER(c) to fix upper chars above the chr(127).
-                 
+
 2006-01-18 08:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * xharbour/contrib/rdd_ads/adsfunc.c
     ! added missing ADSDDREMOVEINDEXFILE() function
@@ -43,7 +47,7 @@
 2007-01-16 11:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * xharbour/source/rdd/bmdbfcdx/bmdbfcdx1.c
     *   modified to admit DBOI_KEYDELETE and DBOI_KEYADD ignoring the FOR clause,
-        that does not have meaning in customer index in order to add or del KEYS. 
+        that does not have meaning in customer index in order to add or del KEYS.
 
 2007-01-12 21:33 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbpp.h

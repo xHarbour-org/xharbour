@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.63 2006/03/25 20:02:25 paultucker Exp $
+rem $Id: bld.bat,v 1.65 2006/07/27 16:47:37 map Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -272,8 +272,8 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    if "%HB_GT_LIB%"=="gtwvt" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtwvt" set _main=win
    if "%HB_GT_LIB%"=="gtwvw" set _main=win
-   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib> msvc.log
-        cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib>>msvc.log
+   echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
+        cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
    set _cons=
    set _main=
    @type msvc.log
