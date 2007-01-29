@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.2 2005/04/30 15:14:29 lculik Exp $
+ * $Id: smtpcln.prg,v 1.3 2006/08/10 15:02:04 gdrouillard Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ RETURN ::GetOk()
 METHOD GetOk() CLASS tIPClientSMTP
    LOCAL nLen
 
-   ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 128 )
+   ::cReply := ::InetRecvLine( ::SocketCon, @nLen, 512 )
    IF ::InetErrorCode( ::SocketCon ) != 0 .or. Substr( ::cReply, 1, 1 ) == '5'
       RETURN .F.
    ENDIF
@@ -193,7 +193,7 @@ METHOD AUTH( cUser, cPass) CLASS tIPClientSMTP
    cEncodedPAss :=alltrim(HB_BASE64(cPass,len(cpass)))
 
 
-   ::InetSendall( ::SocketCon, "AUTH LOGIN " +::ccrlf )
+   ::InetSendall( ::SocketCon, "AUTH LOGIN" +::ccrlf )
 
    if ::GetOk()
       ::InetSendall( ::SocketCon, cEncodedUser+::cCrlf  )
@@ -209,7 +209,7 @@ METHOD AuthPlain( cUser, cPass) CLASS tIPClientSMTP
    Local cBase := BUILDUSERPASSSTRING( cUser, cPass )
    Local cen   := HB_BASE64( cBase, 2 + Len( cUser ) + Len( cPass ) )
 
-   ::InetSendall( ::SocketCon, "AUTH PLAIN " + cen + ::cCrlf)
+   ::InetSendall( ::SocketCon, "AUTH PLAIN" + cen + ::cCrlf)
    return ::GetOk()
 
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClientSMTP
