@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.124 2007/01/10 19:03:56 modalsist Exp $
+ * $Id: tget.prg,v 1.125 2007/01/17 11:27:23 modalsist Exp $
  */
 
 /*
@@ -1385,11 +1385,13 @@ return Self
 
 METHOD ToDecPos() CLASS Get
 
+LOCAL xBuffer
+
    if ! ::HasFocus .or. ::DecPos == NIL
       return Self
    endif
 
-   /* 2006/JUN/05 - E.F. Deletall only if we press dot or comma in a numeric
+   /* 2006/JUN/05 - E.F. Delete all only if we press dot or comma in a numeric
       var. */
    if ::Pos == ::FirstEditable() .and. ::Type == 'N' .and.;
       ( Lastkey()=asc('.') .or. Lastkey()==asc(',') )
@@ -1397,17 +1399,18 @@ METHOD ToDecPos() CLASS Get
    endif
 
    ::TypeOut := .f.
-   ::Clear  := .f.
-   ::lEdit  := .t.
-   ::Buffer := ::PutMask( ::UnTransform(), .f. )
-   ::Pos    := ::DecPos + 1
+   ::Clear   := .f.
+   ::lEdit   := .t.
+   xBuffer   := ::UnTransform()
+   ::Buffer  := ::PutMask( xBuffer, .f. )
+   ::Pos     := ::DecPos + 1
 
    ::Display( .t. )
 
-   /* E.F. 2006/APRIL/12 - Re-entry of buffer value to update ::xVarGet
+   /* E.F. 2006/APRIL/12 - Re-entrance of buffer value to update ::xVarGet
     * into VarGet()
     */
-   ::VarPut( Val(::buffer), .t. )
+   ::VarPut( xBuffer, .t. )
 
 return Self
 

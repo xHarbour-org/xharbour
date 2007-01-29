@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5311 2007/01/26 13:03:59 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5312 2007/01/29 12:37:04 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-29 17:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed bug in re-entry of get value into todecpos() method, when
+      it has decimal point inverted by "E" picture. Bug reported by EMG.
 
 2007-01-29 09:40 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
   * source/tip/smtpcln.prg
