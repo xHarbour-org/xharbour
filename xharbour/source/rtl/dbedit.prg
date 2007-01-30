@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.37 2006/07/11 01:49:54 modalsist Exp $
+ * $Id: dbedit.prg,v 1.38 2006/08/02 13:50:46 modalsist Exp $
  */
 
 /*
@@ -240,8 +240,10 @@ LOCAL oTBR,;
      aFill(bPostBlock, i)
   END
 
-
   iif(HB_ISNIL(acFootingSep) .AND. !Empty(acColumnFootings), acFootingSep := Chr(196) + Chr(193) + Chr(196), .T.)
+
+  /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
+  DispBegin()
 
   /* Create Tbrowse object */
   oTBR := TBrowseDB(nTop, nLeft, nBottom, nRight)
@@ -371,7 +373,6 @@ LOCAL oTBR,;
    oTBR:setKey( K_ESC, nil )
  END
 
-
  // xHarbour extension: Initialization call
  //
  _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
@@ -391,12 +392,16 @@ LOCAL oTBR,;
 
  dbGoto(i)
 
+ dispend()
 
  /* --------------------------- */
  /* Go into the processing loop */
  /* --------------------------- */
 
  WHILE nRet != DE_ABORT
+
+    /* 2007/JAN/30 - EF - To avoid dbedit blinking. */
+    dispbegin()
 
     SWITCH nRet
       CASE DE_REFRESH
@@ -411,6 +416,8 @@ LOCAL oTBR,;
     oTBR:forceStable()
 
     oTBR:deHilite()
+
+    dispend()
 
     /* 2006/JUL/10 - E.F. Don't run this code if nRet is DE_APPEND or
      *               DE_ABORT.
@@ -446,6 +453,11 @@ LOCAL oTBR,;
           nKey := dbe_nNextkey
           dbe_nNextKey := 0
        ELSE 
+          /* 2007/JAN/30 - EF - Reset keyboard buffer to avoid keystrokes repetition into loop. */
+          if nextkey() != 0
+             Keyboard chr(0)
+             inkey()
+          endif
           nKey := Inkey(0)
        ENDIF
     ENDIF
