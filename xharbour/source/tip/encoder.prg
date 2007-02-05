@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: encoder.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -50,6 +50,10 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+                                                                      /*
+ Internet Messaging: http://www.ietf.org/rfc/rfc2045.txt
+
+ */
 
 #include "hbclass.ch"
 #include "fileio.ch"
@@ -58,7 +62,7 @@
 CLASS TIPEncoder
    DATA cName
 
-   METHOD New( cModel ) 
+   METHOD New( cModel )
    METHOD Encode( cData )
    METHOD Decode( cData )
 ENDCLASS
@@ -74,6 +78,10 @@ METHOD New( cModel ) class TIPEncoder
 
    ELSEIF cModel == "url" .or. cModel == "urlencoded"
       RETURN TIPEncoderURL():New()
+
+   ELSEIF  cModel == "7bit" .or. cModel == "8bit"
+      ::cName := cModel
+      RETURN Self
 
    ELSEIF cModel == "text" .or. cModel == "plain";
              .or. cModel == "text/plain" .or. cModel == "as-is";
