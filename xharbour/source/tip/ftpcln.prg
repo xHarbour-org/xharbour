@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.11 2005/09/08 23:41:36 lculik Exp $
+ * $Id: ftpcln.prg,v 1.12 2006/02/17 01:56:27 gdrouillard Exp $
  */
 
 /*
@@ -481,14 +481,16 @@ METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
 
 RETURN .F.
 
-METHOD MGET( cSpec ) CLASS tIPClientFTP
+METHOD MGET( cSpec,cLocalPath ) CLASS tIPClientFTP
 
-   LOCAL cStr,cfile,x,y
+   LOCAL cStr,cfile,aFiles
 
    IF cSpec == nil
       cSpec := ''
 	ENDIF
-
+   IF cLocalPath=nil
+      cLocalPath:=''
+   ENDIF
    IF ::bUsePasv
       IF .not. ::Pasv()
          //::bUsePasv := .F.
@@ -500,11 +502,9 @@ METHOD MGET( cSpec ) CLASS tIPClientFTP
    cStr := ::ReadAuxPort()
 
    IF !empty(cStr)
-      y:=mlcount(cStr,255)
-
-      FOR x := 1 TO y
-         cFile := Trim( MemoLine( cStr, 255, x ) )
-         ::downloadfile( cFile, cFile )
+      aFiles:=hb_atokens(strtran(cStr,chr(13),''),chr(10))
+      FOR each cFile in aFiles
+         ::downloadfile( cLocalPath+trim(cFile), trim(cFile) )
       NEXT
 
    ENDIF
