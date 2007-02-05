@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.181 2006/11/09 16:41:09 marchuet Exp $
+# $Id: makefile.vc,v 1.182 2006/11/30 23:32:34 ronpinkas Exp $
 #
 
 #
@@ -196,9 +196,11 @@ CGIMT_LIB        =$(LIB_DIR)\cgi$(MT).lib
 DBFCDX_LIB       =$(LIB_DIR)\dbfcdx.lib
 BMDBFCDX_LIB     =$(LIB_DIR)\bmdbfcdx.lib
 SIXCDX_LIB       =$(LIB_DIR)\sixcdx.lib
+BMSIXCDX_LIB     =$(LIB_DIR)\bmsixcdx.lib
 DBFCDXMT_LIB     =$(LIB_DIR)\dbfcdx$(MT).lib
 BMDBFCDXMT_LIB   =$(LIB_DIR)\bmdbfcdx$(MT).lib
 SIXCDXMT_LIB     =$(LIB_DIR)\sixcdx$(MT).lib
+BMSIXCDXMT_LIB   =$(LIB_DIR)\bmsixcdx$(MT).lib
 DBFFPT_LIB       =$(LIB_DIR)\dbffpt.lib
 DBFFPTMT_LIB     =$(LIB_DIR)\dbffpt$(MT).lib
 DBFNTX_LIB       =$(LIB_DIR)\dbfntx.lib
@@ -318,6 +320,7 @@ LIBS = \
    $(DBFCDX_LIB) \
    $(BMDBFCDX_LIB) \
    $(SIXCDX_LIB) \
+   $(BMSIXCDX_LIB) \
    $(DBFFPT_LIB) \
    $(DBFNTX_LIB) \
    $(HBSIX_LIB) \
@@ -339,6 +342,7 @@ LIBSMT = \
    $(DBFCDXMT_LIB) \
    $(BMDBFCDXMT_LIB) \
    $(SIXCDXMT_LIB) \
+   $(BMSIXCDXMT_LIB) \
    $(DBFFPTMT_LIB) \
    $(DBFNTXMT_LIB) \
    $(HBSIXMT_LIB) \
@@ -877,6 +881,16 @@ SIXCDX_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\sixcdx1.obj
 
 #
+# BMSIXCDX.LIB rules
+#
+
+{$(RDD_DIR)\bmsixcdx}.c{$(OBJ_DIR)$(MT)}.obj::
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+
+BMSIXCDX_LIB_OBJS = \
+   $(OBJ_DIR)$(MT)\bmsixcdx1.obj
+
+#
 # DBFFPT.LIB rules
 #
 
@@ -1065,6 +1079,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\itemapi.obj \
    $(OBJ_DIR)$(MT)\macro.obj \
    $(OBJ_DIR)$(MT)\maindll.obj \
+   $(OBJ_DIR)$(MT)\mainwin.obj \
    $(OBJ_DIR)$(MT)\memvars.obj \
    $(OBJ_DIR)$(MT)\memvclip.obj \
    $(OBJ_DIR)$(MT)\pcount.obj \
@@ -1700,6 +1715,9 @@ $(BMDBFCDXMT_LIB) : $(BMDBFCDX_LIB_OBJS)
 $(SIXCDXMT_LIB) : $(SIXCDX_LIB_OBJS)
    lib /out:$@ $**
 
+$(BMSIXCDXMT_LIB) : $(BMSIXCDX_LIB_OBJS)
+   lib /out:$@ $**
+
 $(DBFFPTMT_LIB) : $(DBFFPT_LIB_OBJS)
    lib /out:$@ $**
 
@@ -1772,6 +1790,9 @@ $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
    lib /out:$@ $**
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
+   lib /out:$@ $**
+
+$(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
    lib /out:$@ $**
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
