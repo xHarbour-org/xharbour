@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.125 2007/01/17 11:27:23 modalsist Exp $
+ * $Id: tget.prg,v 1.126 2007/01/29 19:09:00 modalsist Exp $
  */
 
 /*
@@ -380,13 +380,25 @@ METHOD ParsePict( cPicture ) CLASS Get
          exit
 
       case "N"
+
+         /* E.F. 2007/FEB/03 - Assign default mask format in accordance with
+                               buffer lenght and dec pos. */
+         if ::nMaxLen != NIL .and. ::DecPos != NIL
+            if ::DecPos < ::nMaxLen .and. ::DecPos > 0
+               cNum := Str( ::xVarGet, ::nMaxLen, ::nMaxLen - ::DecPos )
+            else
+               cNum := Str( ::xVarGet, ::nMaxLen, 0 )
+            endif
+         else
+            cNum := Str( ::xVarGet )
+         endif
+
          /* E.F. 2006/APRIL/19 - If ::xVarGet is negative and smaller than
           *  -99999999.99, the Str(::xVarGet) will return a string width
           * of 23, instead it's length, increasing the ::cPicMask length.
           * cNum := Str( ::xVarGet ) is not better way to do it.
           */
          IF ::xVarGet < 0
-            cNum := Str( ::xVarGet )
             nDec := Len( cNum) - Rat(".",cNum)
             IF nDec >= Len( cNum )
                nDec := 0
@@ -395,8 +407,6 @@ METHOD ParsePict( cPicture ) CLASS Get
             //nLen := 10 + iif(nDec>0,1,0) + nDec
             nLen := iif( ::xVarGet < -99999999.99, 10+iif(nDec>0,1,0) + nDec, Len( cNum ) )
             cNum := Str( ::xVarGet, nLen, nDec )
-         ELSE
-            cNum := Str( ::xVarGet )
          ENDIF
 
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0

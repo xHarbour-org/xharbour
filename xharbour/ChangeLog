@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5314 2007/01/30 20:00:49 modalsist Exp $
+ * $Id: ChangeLog,v 1.5315 2007/02/05 08:57:13 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-05 10:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed parsepict() method to assign default picture if not specified,
+      when get value is numeric type. Bug reported by EMG.
 
 2007-02-05 09:57 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * xharbour/makefile.vc
