@@ -1,4 +1,3 @@
-
 /*
 
 To run the test:
@@ -11,19 +10,18 @@ To run the test:
 
 */
 
+#include "hbextern.ch"
 
-function main( cFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
+PROCEDURE Main( cFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
 
-   local cBody, pHrb
+   LOCAL pHrb
 
-   if file( cFile )
-      cBody := memoread( cFile )
-
-      pHrb  := __hrbLoad( cBody )
+   IF File( cFile )
+      pHrb  := __hrbLoad( cFile )
       __hrbDo( pHrb, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
       __hrbUnload( pHrb )
-   else
+   ELSE
       ? "No .hrb file supplied" 
-   endif
-
-return
+   ENDIF
+   
+RETURN

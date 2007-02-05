@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.98 2006/11/09 16:41:08 marchuet Exp $
+# $Id: hrbdll.vc,v 1.99 2006/11/30 23:32:34 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -97,7 +97,7 @@ XBSCRIPTDLL_EXE = $(BIN_DIR)\xbscriptdll.exe
 # from DLL
 
 HARBOURFLAGS  = /D__EXPORT__ /i$(INCLUDE_DIR) /q0 /w /es2 /n1
-CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogt2yb1p /Gs /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__ $(HB_MULTI_GT)
+CLIBFLAGS     = /D__EXPORT__ /DHB_FM_STATISTICS_OFF /MT /FD /G6 /Ogt2yb1p /Gs /TP /W3 /nologo /c /I$(INCLUDE_DIR) /D__WINDOWS__ /DWIN32 /D__WIN32__ $(HB_MULTI_GT) $(CFLAGS)
 MAINFLAGS     = -i$(INCLUDE_DIR) -n  -q0 -w -es2 -gc0
 HARBOUR_CMD   = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 HARBOUR_BATCH_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $<
@@ -876,9 +876,10 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
         /DLL \
         /IMPLIB:LIB\vc\harbour.lib \
         /NOLOGO \
-        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib libcmt.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib mpr.lib\
+        /DEFAULTLIB:user32.lib advapi32.lib gdi32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib mpr.lib\
         /SUBSYSTEM:WINDOWS \
         /OPT:WIN98 \
+        $(LFLAGS) \
         $(HARBOUR_DLL_OBJS)
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
