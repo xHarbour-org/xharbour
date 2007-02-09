@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.49 2006/10/01 11:24:47 enricomaria Exp $
+ * $Id: inkey.c,v 1.50 2007/02/08 23:39:32 peterrees Exp $
  */
 
 /*
@@ -595,7 +595,9 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
          {
             while ( ulLen-- )
             {
-               *StrBuffer++ = *pString == ';' ? K_ENTER : ( int ) *pString++ ; /* Convert ";" to CR, like Clipper does */
+               *StrBuffer = *pString == ';' ? K_ENTER : ( int ) *pString ; /* Convert ";" to CR, like Clipper does */
+               StrBuffer++;
+               pString++;
             }
          }
       }
