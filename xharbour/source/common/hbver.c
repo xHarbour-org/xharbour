@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.34 2006/03/10 15:32:19 druzus Exp $
+ * $Id: hbver.c,v 1.35 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -983,6 +983,7 @@ char *hb_credits()
           "Mauricio Abre <maurifull@datafull.com>\n"
           "Maurilio Longo <maurilio.longo@libero.it>\n"
           "Mighty-Siil <siil@usa.net>\n"
+          "Miguel Angel Marchuet Frutos <miguelangel@marchuet.net>\n"
           "Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>\n"
           "Nicolas del Pozo <niko@geroa.com>\n"
           "Patrick Mast <patrick@xHarbour.com>\n"
