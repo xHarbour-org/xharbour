@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.h,v 1.9 2005/10/18 12:14:33 druzus Exp $
+ * $Id: gtwvt.h,v 1.10 2006/03/25 18:06:43 bdj Exp $
  */
 
 /*
@@ -73,28 +73,9 @@
    #define CINTERFACE 1
 #endif
 
+#define NONAMELESSUNION
+
 //-------------------------------------------------------------------//
-
-#include <windows.h>
-#include <winuser.h>
-#include <commctrl.h>
-#include <commdlg.h>
-
-#if defined(__MINGW32__) || defined(__WATCOMC__) || defined(_MSC_VER)
-   #include <unknwn.h>
-   #include <ole2.h>
-   #include <ocidl.h>
-   #include <olectl.h>
-
-   #if defined(_MSC_VER)
-      #include <conio.h>
-   #endif
-#else
-   #include <olectl.h>
-#endif
-
-#include <time.h>
-#include <ctype.h>
 
 #include "hbset.h"
 #include "hbapigt.h"
@@ -104,6 +85,24 @@
 #include "error.ch"
 #include "hbvm.h"
 #include "hbstack.h"
+
+#include <windows.h>
+#include <ole2.h>
+#include <oleauto.h>
+#include <olectl.h>
+
+#include <winuser.h>
+#include <commctrl.h>
+#include <commdlg.h>
+
+#include <shlobj.h>
+
+#if defined(_MSC_VER)
+    #include <conio.h>
+#endif
+
+#include <time.h>
+#include <ctype.h>
 
 //-------------------------------------------------------------------//
 
