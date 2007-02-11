@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.6 2005/08/02 21:06:43 peterrees Exp $
+ * $Id: winos.prg,v 1.7 2005/08/14 20:58:04 peterrees Exp $
  */
 
 /*
@@ -120,12 +120,17 @@ FUNCTION OS_VERSIONINFO()
 
 #include "directry.ch"
 
-FUNCTION OS_NETREGOK( lSetIt )
+FUNCTION OS_NETREGOK( lSetIt, lDoVista )
   LOCAL rVal:= .T., cKeySrv, cKeyWks
   IF lSetIt == NIL
     lSetIt:= .F.
   ENDIF
-  IF OS_ISWIN9X()
+  IF lDoVista == NIL
+    lDoVista:= .T.
+  ENDIF
+  IF !lDoVista .AND. OS_ISWINVISTA()
+    *
+  ELSEIF OS_ISWIN9X()
     rVal:= QueryRegistry( 0,"System\CurrentControlSet\Services\VxD\VREDIR","DiscardCacheOnOpen",1, lSetIt )
   ELSE
     cKeySrv:="System\CurrentControlSet\Services\LanmanServer\Parameters"
@@ -145,7 +150,7 @@ FUNCTION OS_NETREGOK( lSetIt )
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UtilizeNtCaching", 0, lSetIt)
     rVal:= rVal .AND. QueryRegistry( 0, cKeyWks, "UseLockReadUnlock", 0, lSetIt)
 
-    IF OS_ISWIN2000() .OR. OS_ISWINXP() .OR. OS_ISWIN2003()
+    IF OS_ISWIN2000_OR_LATER()
       rVal:= rVal .AND. QueryRegistry( 0, "System\CurrentControlSet\Services\MRXSmb\Parameters","OpLocksDisabled",1, lSetIt )
     ENDIF
   ENDIF

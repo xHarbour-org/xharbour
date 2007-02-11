@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5321 2007/02/09 01:42:14 peterrees Exp $
+ * $Id: ChangeLog,v 1.5322 2007/02/10 15:40:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,11 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-02-12 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/winos.prg
+    ! OS_NETREGOK( lSetIt[, lDoVista] )
+        Added option to include check/set for Vista
+        Default for lDoVista is .T.
+        ( Note: May not want to do Vista because of new security features in os )
 
 2007-02-10 11:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rt//gtwvt/gtwvt.h
     * Rearranged order of #include files to correct compliation with unmodified MSVC
-    
+
 2007-02-09 14:40 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/inkey.c
     ! HB_FUNC( __KEYBOARD )
