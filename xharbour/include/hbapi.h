@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.198 2006/11/11 03:48:20 druzus Exp $
+ * $Id: hbapi.h,v 1.199 2007/01/11 01:00:34 druzus Exp $
  */
 
 /*
@@ -545,6 +545,8 @@ extern HB_EXPORT PHB_ITEM  hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArr
 extern HB_EXPORT BOOL      hb_arraySort( PHB_ITEM pArray, ULONG * pulStart, ULONG * pulCount, PHB_ITEM pBlock ); /* sorts an array item */
 extern HB_EXPORT PHB_ITEM  hb_arrayFromStack( USHORT uiLen ); /* Creates and returns an Array of n Elements from the Eval Stack - Does NOT pop the items. */
 extern HB_EXPORT PHB_ITEM  hb_arrayFromParams( PHB_ITEM *pBase ); /* Creates and returns an Array of Generic Parameters for specified base symbol. */
+extern HB_EXPORT PHB_ITEM  hb_arrayBaseParams( void );
+extern HB_EXPORT PHB_ITEM  hb_arraySelfParams( void );
 #ifndef HB_LONG_LONG_OFF
    extern HB_EXPORT LONGLONG hb_arrayGetNLL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the long long int value contained on an array element */
 #endif

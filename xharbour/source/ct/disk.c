@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.11 2005/12/01 13:41:14 snaiperis Exp $
+ * $Id: disk.c,v 1.12 2006/12/10 12:33:34 ptsarenko Exp $
  */
 /*
  * xHarbour Project source code:
@@ -137,17 +137,19 @@ HB_FUNC ( DRIVETYPE )
 {
    #if defined(HB_OS_WIN_32)
       unsigned int uiType;
-      char * pDrive = (char *) hb_xgrab( hb_parclen( 1 )+3 ); // allow space for '\0' & ":\"
-      strcpy( pDrive, (char *) hb_parcx(1) );
+      ULONG ulSize = hb_parclen( 1 ) + 2;  /* allow space for '\0' & ":\" */
+      char * pDrive = (char *) hb_xgrab( ulSize + 1 );
+
+      hb_strncpy( pDrive, (char *) hb_parcx( 1 ), ulSize );
 
       if ( strstr( pDrive, ":" ) == NULL )
       {
-         strcat( pDrive, ":" ) ;
+         hb_strncat( pDrive, ":", ulSize ) ;
       }
 
       if ( strstr( pDrive, "\\" ) == NULL )
       {
-         strcat( pDrive, "\\" ) ;
+         hb_strncat( pDrive, "\\", ulSize ) ;
       }
 
       uiType = GetDriveType( pDrive );

@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.1 2006/10/15 17:50:34 ptsarenko Exp $
+ * $Id: dattime2.c,v 1.2 2006/10/17 04:36:38 paultucker Exp $
  */
 
 /*
@@ -222,8 +222,8 @@ HB_FUNC( DMY )
    {
       char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
       int iMonLen = strlen(szMonth);
-      int iLen = 0;
-      char *szMDY = (char *)hb_xgrab( iMonLen + 10 );
+      int iLen = 0, iBufLen = iMonLen + 10;
+      char *szMDY = ( char * ) hb_xgrab( iBufLen );
 
       if (iDay < 10 )
       {
@@ -232,7 +232,7 @@ HB_FUNC( DMY )
       }
       else
       {
-         sprintf( szMDY+iLen, "%02d", iDay );
+         snprintf( szMDY + iLen, 3, "%02d", iDay );
          iLen += 2;
       }
 
@@ -244,24 +244,24 @@ HB_FUNC( DMY )
       szMDY[iLen] = ' ';
       iLen ++;
 
-      strcpy(szMDY + iLen, szMonth);
+      hb_strncpy( szMDY + iLen, szMonth, iBufLen - iLen - 1 );
       iLen += iMonLen;
       szMDY[iLen] = ' ';
       iLen ++;
 
       if( hb_set.hb_set_century )
       {
-         sprintf( szMDY+iLen, "%04d", iYear );
+         snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;
       }
       else
       {
-         sprintf( szMDY+iLen, "%02d", iYear % 100 );
+         snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
          iLen += 2;
       }
 
-      hb_retclen(szMDY, iLen);
-      hb_xfree(szMDY);
+      hb_retclen( szMDY, iLen );
+      hb_xfree( szMDY );
    }
    else
    {
@@ -288,11 +288,11 @@ HB_FUNC( MDY )
    {
       char *szMonth = ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 );
       int iLen = strlen(szMonth);
-      char *szMDY = (char *) hb_xgrab( iLen + 9 );
+      int iBufLen = iLen + 9;
+      char *szMDY = (char *) hb_xgrab( iBufLen );
 
-      strcpy(szMDY, szMonth);
-      szMDY[iLen] = ' ';
-      iLen ++;
+      hb_strncpy( szMDY, szMonth, iBufLen - 1 );
+      szMDY[iLen++] = ' ';
       if (iDay < 10 )
       {
          szMDY[iLen] = iDay + 0x30;
@@ -300,20 +300,19 @@ HB_FUNC( MDY )
       }
       else
       {
-         sprintf( szMDY+iLen, "%02d", iDay );
+         snprintf( szMDY + iLen, 3, "%02d", iDay );
          iLen += 2;
       }
-      szMDY[iLen] = ' ';
-      iLen ++;
+      szMDY[iLen++] = ' ';
 
       if( hb_set.hb_set_century )
       {
-         sprintf( szMDY+iLen, "%04d", iYear );
+         snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;
       }
       else
       {
-         sprintf( szMDY+iLen, "%02d", iYear % 100 );
+         snprintf( szMDY + iLen, 3, "%02d", iYear % 100 );
          iLen += 2;
       }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.130 2005/11/26 22:18:07 ronpinkas Exp $
+ * $Id: arrays.c,v 1.131 2005/12/11 12:37:25 druzus Exp $
  */
 
 /*
@@ -1624,6 +1624,54 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
    {
       hb_arraySet( pArray, uiPos, *( pBase + uiPos + 1 ) );
+   }
+
+   return pArray;
+}
+
+HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
+{
+   PHB_ITEM pArray;
+   USHORT uiPos, uiPCount;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayBaseParams()"));
+
+   pArray = hb_itemNew( NULL );
+   uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
+   if( uiPCount > 255 )
+   {
+      uiPCount -= 256;
+   }
+
+   hb_arrayNew( pArray, uiPCount );
+
+   for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
+   {
+      hb_arraySet( pArray, uiPos, hb_stackItemFromBase( uiPos ) );
+   }
+
+   return pArray;
+}
+
+HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
+{
+   PHB_ITEM pArray;
+   USHORT uiPos, uiPCount;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_arraySelfParams()"));
+
+   pArray = hb_itemNew( NULL );
+   uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
+   if( uiPCount > 255 )
+   {
+      uiPCount -= 256;
+   }
+
+   hb_arrayNew( pArray, uiPCount + 1 );
+
+   for( uiPos = 0; uiPos <= uiPCount; uiPos++ )
+   {
+      hb_arraySet( pArray, uiPos + 1, hb_stackItemFromBase( uiPos ) );
    }
 
    return pArray;

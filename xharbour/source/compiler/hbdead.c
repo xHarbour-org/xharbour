@@ -1,5 +1,5 @@
 /*
- * $Id: hbdead.c,v 1.2 2006/03/25 02:22:36 druzus Exp $
+ * $Id: hbdead.c,v 1.3 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -220,6 +220,12 @@ static HB_CODETRACE_FUNC( hb_p_seqbegin )
 {
    BYTE * pAddr = &pFunc->pCode[ lPCodePos + 1 ];
    ULONG ulRecoverPos = lPCodePos + HB_PCODE_MKINT24( pAddr );
+
+   if( pFunc->pCode[ ulRecoverPos - 4 ] == HB_P_SEQEND &&
+       HB_PCODE_MKINT24( &pFunc->pCode[ ulRecoverPos - 3 ] ) != 4 )
+   {
+      hb_compCodeTraceMark( cargo, ulRecoverPos - 4, 4 );
+   }
 
    hb_compCodeTraceMark( cargo, lPCodePos, 4 );
    hb_compCodeTraceAddJump( cargo, ulRecoverPos );

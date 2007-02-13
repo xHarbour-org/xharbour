@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5322 2007/02/10 15:40:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5323 2007/02/11 20:00:49 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,65 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-13 20:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/bin/hb-func.sh
+    * do not pass linking parameters to GCC/G++ when is used for
+      compilation only
+  * xharbour/contrib/rdd_ads/Makefile
+  * xharbour/contrib/rdd_ads/ace.h
+  * xharbour/contrib/rdd_ads/ads1.c
+  * xharbour/contrib/rdd_ads/makefile.bc
+  * xharbour/contrib/rdd_ads/makefile.vc
+    ! do not release FLOCK() after DBAPPEND() - only RLOCKs should be
+      removed
+    ! fixed typo in DBI_GETHEADERSIZE
+    ! fixed compilation for Linux and OpenWatcom
+    * formatting
+
+  * xharbour/include/hbapi.h
+  * xharbour/source/vm/arrays.c
+    + hb_arrayBaseParams() and hb_arraySelfParams()
+      TOFIX: hb_arrayFromParams() has to be changed and should receive
+             int iLevel parameters instead of PHB_ITEM *pBase - using
+             PHB_ITEM *pBase is dangerous and may cause unexpected GPF
+             when HB_STACK is reallocated
+
+  * xharbour/include/hbapierr.h
+  * xharbour/source/vm/errorapi.c
+    + added HB_ERR_ARGS_BASEPARAMS and HB_ERR_ARGS_SELFPARAMS for easier
+      passing function parameters
+    + added pseudo function name hb_errFuncName to use when real name
+      of upper level function is not know - f.e. in RDD methods
+      NOTE: Now you can safely pass any parameter for 1001, 1004 and 1005
+            errors - arrays and object does not have to be encapsulated in
+            additional array
+
+  * xharbour/source/compiler/hbdead.c
+    * do not eliminate unaccessible HB_P_SEQEND PCODE - it's necessary for
+      proper -gc3 formatting in code like:
+         BEGIN SEQUENCE
+            while .t.
+            enddo
+         END SEQUENCE
+
+  * xharbour/source/ct/dattime2.c
+  * xharbour/source/ct/disk.c
+    * use snprintf() instead of sprintf() and hb_strncpy() instead of strcpy()
+  * xharbour/source/ct/ctmath2.c
+    + added missing file Id
+  * xharbour/source/ct/ctmisc.prg
+  * xharbour/source/ct/pos1.c
+  * xharbour/source/ct/token1.c
+    * formatting
+
+  * xharbour/source/rdd/workarea.c
+  * xharbour/source/vm/do.c
+  * xharbour/source/vm/evalhb.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/thread.c
+    * use HB_ERR_ARGS_BASEPARAMS, HB_ERR_ARGS_SELFPARAMS and hb_errFuncName
+
 2007-02-12 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/winos.prg
     ! OS_NETREGOK( lSetIt[, lDoVista] )

@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.202 2006/10/01 16:22:24 enricomaria Exp $
+* $Id: thread.c,v 1.203 2007/01/11 01:00:35 druzus Exp $
 */
 
 /*
@@ -1657,7 +1657,7 @@ HB_FUNC( STARTTHREAD )
 
       if( pExecSym == NULL )
       {
-         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pPointer->item.asString.value, 1, pArgs );
+         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pPointer->item.asString.value, HB_ERR_ARGS_BASEPARAMS );
          hb_itemRelease( pArgs );
          return;
       }

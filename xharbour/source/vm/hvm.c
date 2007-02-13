@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.591 2007/01/13 01:36:32 ronpinkas Exp $
+ * $Id: hvm.c,v 1.592 2007/02/05 20:39:36 ronpinkas Exp $
  */
 
 /*
@@ -150,7 +150,7 @@
 
 PHB_FUNC pHVMFuncService = NULL;
 
-static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg );
+static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf );
 
 HB_FUNC_EXTERN( SYSINIT );
 
@@ -1998,7 +1998,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                      }
                      else
                      {
-                        hb_vmClassError( 0, "HASH", szIndex );
+                        hb_vmClassError( 0, "HASH", szIndex, pSelf );
                      }
                   }
                }
@@ -2038,7 +2038,7 @@ void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **p
                   }
                   else
                   {
-                     hb_vmClassError( 0, "HASH", szIndex );
+                     hb_vmClassError( 0, "HASH", szIndex, pSelf );
                   }
                }
             }
@@ -6990,13 +6990,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       }
       else
       {
-         /* Attempt to call an undefined function
-          * - generate unrecoverable runtime error
-          */
-         PHB_ITEM pArgsArray = hb_arrayFromStack( uiParams );
-
-         hb_errRT_BASE_SubstR( EG_NOFUNC, 1001, NULL, pSym->szName, 1, pArgsArray );
-         hb_itemRelease( pArgsArray );
+         hb_errRT_BASE_SubstR( EG_NOFUNC, 1001, NULL, pSym->szName, HB_ERR_ARGS_BASEPARAMS );
       }
    }
    else
@@ -7025,9 +7019,8 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 /* JC1: I need this error display routine to be used also by hash pseudo class
    operators, so I put it here
 */
-static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
+static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg, PHB_ITEM pSelf )
 {
-   HB_THREAD_STUB
    char sDesc[128];
    PHB_ITEM pArgsArray;
 
@@ -7040,15 +7033,20 @@ static void hb_vmClassError( int uiParams, char *szClassName, char *szMsg )
    {
       //TraceLog( NULL, "Class: '%s' has no property: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no property", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, hb_stackItemFromTop( -1 ) );
+      if( pSelf )
+         hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, 1, pSelf );
+      else
+         hb_errRT_BASE_SubstR( EG_NOVARMETHOD, 1005, (char *) sDesc, szMsg + 1, HB_ERR_ARGS_SELFPARAMS );
    }
    else
    {
       //TraceLog( NULL, "Class: '%s' has no method: '%s'\n", sClass, pSym->szName );
       sprintf( (char *) sDesc, "Class: '%s' has no exported method", szClassName );
-      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, hb_stackItemFromTop( -1 ) );
+      if( pSelf )
+         hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, 1, pSelf );
+      else
+         hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, (char *) sDesc, szMsg, HB_ERR_ARGS_SELFPARAMS );
    }
-   hb_stackPop();
 }
 
 HB_EXPORT void hb_vmSend( USHORT uiParams )
@@ -7247,7 +7245,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 		 }
          else
          {
-            hb_vmClassError( uiParams, "HASH", pSym->szName );
+            hb_vmClassError( uiParams, "HASH", pSym->szName, NULL );
          }
       }
       else if ( uiParams == 0)
@@ -7286,17 +7284,17 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             }
             else
             {
-               hb_vmClassError( uiParams, "HASH", pSym->szName );
+               hb_vmClassError( uiParams, "HASH", pSym->szName, NULL );
             }
          }
       }
       else if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
-	  {
-		 //goto DoFunc;
-	  }
+      {
+         //goto DoFunc;
+      }
       else
       {
-         hb_vmClassError( uiParams, "HASH", pSym->szName );
+         hb_vmClassError( uiParams, "HASH", pSym->szName, NULL );
       }
    }
 
@@ -7341,7 +7339,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             char *sClass = hb_objGetClsName( pSelf );
             //TraceLog( NULL, "METHOD NOT FOUND!\n" );
-            hb_vmClassError( uiParams, sClass, pSym->szName );
+            hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
          }
       }
       else
@@ -7428,7 +7426,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       {
          char *sClass = hb_objGetClsName( pSelf );
          //TraceLog( NULL, "METHOD NOT FOUND!\n" );
-         hb_vmClassError( uiParams, sClass, pSym->szName );
+         hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
       }
    }
 
@@ -10799,7 +10797,7 @@ HB_EXPORT BOOL hb_xvmIVarRef( void )
          }
          else
          {
-            hb_vmClassError( 0, "HASH", szIndex );
+            hb_vmClassError( 0, "HASH", szIndex, pSelf );
          }
       }
    }

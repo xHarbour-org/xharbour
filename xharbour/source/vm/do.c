@@ -1,5 +1,5 @@
 /*
- * $Id: do.c,v 1.5 2005/10/24 01:04:36 druzus Exp $
+ * $Id: do.c,v 1.6 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -93,12 +93,7 @@ HB_FUNC( DO )
       }
       else
       {
-         PHB_ITEM pArgsArray;
-
-         pArgsArray = hb_arrayFromParams( HB_VM_STACK.pBase );
-
-         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pItem->item.asString.value, 1, pArgsArray );
-         hb_itemRelease( pArgsArray );
+         hb_errRT_BASE( EG_NOFUNC, 1001, NULL, pItem->item.asString.value, HB_ERR_ARGS_BASEPARAMS );
       }
    }
    else if( HB_IS_BLOCK( pItem ) )

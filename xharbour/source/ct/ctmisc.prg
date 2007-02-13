@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.5 2006/07/19 19:00:21 ptsarenko Exp $
+ * $Id: ctmisc.prg,v 1.6 2006/12/11 20:44:40 ptsarenko Exp $
  */
 
 /*
@@ -99,14 +99,14 @@ FUNCTION SAVEGETS()
 
    RETURN aGetList
 
-Function DosParam
-Local cRet := ""
-Local nCount := HB_ARGC(), i
+FUNCTION DOSPARAM
+   LOCAL cRet := ""
+   LOCAL nCount := HB_ARGC(), i
 
-for i := 1 to nCount
-  cRet += if(i==1, "", " ") + HB_ARGV( i )
-next
-Return cRet
+   FOR i := 1 TO nCount
+      cRet += if(i==1, "", " ") + HB_ARGV( i )
+   NEXT
+   RETURN cRet
 
 #ifndef __PLATFORM__Windows
 FUNCTION EXENAME()

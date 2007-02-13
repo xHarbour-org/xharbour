@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.74 2007/01/11 01:00:35 druzus Exp $
+ * $Id: workarea.c,v 1.75 2007/01/11 01:11:45 druzus Exp $
  */
 
 /*
@@ -374,7 +374,7 @@ ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
 
       if( errCode != SUCCESS )
       {
-         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
+         hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, &hb_errFuncName );
          return errCode;
       }
       /* Add field */

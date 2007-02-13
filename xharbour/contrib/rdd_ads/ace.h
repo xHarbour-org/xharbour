@@ -31,8 +31,14 @@
 #define __ACE_INCLUDED__
 
 
+#if defined( unix ) || defined(__LINUX__)
+   #ifndef ADS_LINUX
+      #define ADS_LINUX
+   #endif
+#endif
+
 #if defined( ADS_LINUX )
-   #include "unixutils.h"
+   /* #include "unixutils.h" */
 
    #define ADS_PATH_DELIMITER    '/'
 
@@ -41,11 +47,6 @@
    #endif
 #endif
 
-#if defined( unix )
-   #ifndef ADS_LINUX
-      #define ADS_LINUX
-   #endif
-#endif
 
 #if defined( ADS_LINUX ) && defined( ACE )
    /* This makes the callback functions compile in linux */

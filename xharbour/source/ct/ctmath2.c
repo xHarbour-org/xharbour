@@ -1,4 +1,8 @@
 /*
+ * $Id$
+ */
+
+/*
  * Harbour Project source code:
  *
  *   CT3 mathematical functions

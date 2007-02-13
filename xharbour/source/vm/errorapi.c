@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.75 2006/02/15 19:33:05 druzus Exp $
+ * $Id: errorapi.c,v 1.76 2006/08/21 15:16:46 walito Exp $
  */
 
 /*
@@ -96,6 +96,8 @@
    "Unrecoverable error 650: Processor stack fault" internal error, but
    better shows what is really the problem. [vszakats] */
 #define HB_ERROR_LAUNCH_MAX hb_set.HB_SET_ERRORLOOP
+
+char hb_errFuncName = 0;
 
 static PHB_DYNS s_pDynErrorNew;
 
@@ -726,9 +728,17 @@ char HB_EXPORT * hb_errGetOperation( PHB_ITEM pError )
 
 PHB_ITEM HB_EXPORT hb_errPutOperation( PHB_ITEM pError, const char * szOperation )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_errPutOperation(%p, %s)", pError, szOperation));
 
-   hb_vmPushSymbol( hb_dynsymGet( "_OPERATION" )->pSymbol );
+   if( szOperation == &hb_errFuncName )
+   {
+      PHB_SYMB pSym = hb_itemGetSymbol( hb_stackBaseItem() );
+      if( pSym )
+         szOperation = pSym->szName;
+   }
+   hb_vmPushSymbol( hb_dynsymGetSymbol( "_OPERATION" ) );
    hb_vmPush( pError );
    hb_vmPushString( szOperation, strlen( szOperation ) );
    hb_vmSend( 1 );
@@ -1220,64 +1230,58 @@ HB_FUNC( __ERRRT_SBASE )
 
 USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
+   HB_THREAD_STUB
+
    USHORT uiAction;
    PHB_ITEM pError;
 
-   PHB_ITEM pArray, pArg;
+   PHB_ITEM pArray;
    va_list va;
    ULONG ulArgPos;
-   BOOL bRelease = TRUE;
+
+   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
    /* Build the array from the passed arguments. */
-   va_start( va, ulArgCount );
-   if( ( ulSubCode == 1001 || ulSubCode == 1004 || ulSubCode == 1005 ) && ulArgCount == 1 )
+   if( ulArgCount == 0 )
    {
-      pArray = va_arg( va, PHB_ITEM );
-
-      if( HB_IS_ARRAY( pArray ) )
-      {
-         bRelease = FALSE;
-      }
+      pArray = NULL;
+   }
+   else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
+   {
+      if( hb_pcount() == 0 )
+         pArray = NULL;
       else
-      {
-         pArg = pArray;
-         pArray = hb_itemArrayNew( 1 );
-         hb_arraySet( pArray, 1, pArg );
-      }
+         pArray = hb_arrayBaseParams();
+   }
+   else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
+   {
+      pArray = hb_arraySelfParams();
    }
    else
    {
       pArray = hb_itemArrayNew( ulArgCount );
 
+      va_start( va, ulArgCount );
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
          PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
-
-         if ( pVaItem == NULL )
+         if( pVaItem )
          {
-            pVaItem = hb_itemNew( NULL );
+            hb_arraySet( pArray, ulArgPos, pVaItem );
          }
-         hb_arraySet( pArray, ulArgPos, pVaItem );
       }
+      va_end( va );
    }
-   va_end( va );
-
-   pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
-
-   /* Assign the new array to the object data item. */
-   hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
-   hb_vmPush( pError );
-   hb_vmPush( pArray );
-   hb_vmSend( 1 );
-
-   /* Release the Array. */
-   if( bRelease )
+   if ( pArray )
    {
+      /* Assign the new array to the object data item. */
+      hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+      hb_vmPush( pError );
+      hb_vmPush( pArray );
+      hb_vmSend( 1 );
+
+      /* Release the Array. */
       hb_itemRelease( pArray );
-   }
-   else
-   {
-      hb_itemClear( pArray );
    }
 
    /* Ok, launch... */
@@ -1291,6 +1295,8 @@ USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * s
 
 USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... )
 {
+   HB_THREAD_STUB
+
    USHORT uiAction;
    PHB_ITEM pError;
 
@@ -1298,33 +1304,50 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const cha
    va_list va;
    ULONG ulArgPos;
 
-   pArray = hb_itemArrayNew( ulArgCount );
-
-   /* Build the array from the passed arguments. */
-   va_start( va, ulArgCount );
-   for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
-   {
-      PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
-
-      if ( pVaItem == NULL )
-      {
-         pVaItem = hb_itemNew( NULL );
-      }
-      hb_arraySet( pArray, ulArgPos, pVaItem );
-   }
-
-   va_end( va );
-
    pError = hb_errRT_New( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, uiOsCode, uiFlags );
 
-   /* Assign the new array to the object data item. */
-   hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
-   hb_vmPush( pError );
-   hb_vmPush( pArray );
-   hb_vmSend( 1 );
+   /* Build the array from the passed arguments. */
+   if( ulArgCount == 0 )
+   {
+      pArray = NULL;
+   }
+   else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
+   {
+      if( hb_pcount() == 0 )
+         pArray = NULL;
+      else
+         pArray = hb_arrayBaseParams();
+   }
+   else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
+   {
+      pArray = hb_arraySelfParams();
+   }
+   else
+   {
+      pArray = hb_itemArrayNew( ulArgCount );
 
-   /* Release the Array. */
-   hb_itemRelease( pArray );
+      va_start( va, ulArgCount );
+      for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
+      {
+         PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+         if( pVaItem )
+         {
+            hb_arraySet( pArray, ulArgPos, pVaItem );
+         }
+      }
+      va_end( va );
+   }
+   if ( pArray )
+   {
+      /* Assign the new array to the object data item. */
+      hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+      hb_vmPush( pError );
+      hb_vmPush( pArray );
+      hb_vmSend( 1 );
+
+      /* Release the Array. */
+      hb_itemRelease( pArray );
+   }
 
    /* Ok, launch... */
    uiAction = hb_errLaunch( pError );
@@ -1336,6 +1359,8 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const cha
 
 PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
 
@@ -1345,32 +1370,50 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const 
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ( "hb_errRT_BASE_Subst()") );
 
-   pArray = hb_itemArrayNew( ulArgCount );
-
-   /* Build the array from the passed arguments. */
-   va_start( va, ulArgCount );
-   for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
-   {
-       PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
-
-      if ( pVaItem == NULL )
-      {
-         pVaItem = hb_itemNew( NULL );
-      }
-      hb_arraySet( pArray, ulArgPos, pVaItem );
-   }
-   va_end( va );
-
    pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
-   /* Assign the new array to the object data item. */
-   hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
-   hb_vmPush( pError );
-   hb_vmPush( pArray );
-   hb_vmSend( 1 );
+   /* Build the array from the passed arguments. */
+   if( ulArgCount == 0 )
+   {
+      pArray = NULL;
+   }
+   else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
+   {
+      if( hb_pcount() == 0 )
+         pArray = NULL;
+      else
+         pArray = hb_arrayBaseParams();
+   }
+   else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
+   {
+      pArray = hb_arraySelfParams();
+   }
+   else
+   {
+      pArray = hb_itemArrayNew( ulArgCount );
 
-   /* Release the Array. */
-   hb_itemRelease( pArray );
+      va_start( va, ulArgCount );
+      for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
+      {
+         PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+         if( pVaItem )
+         {
+            hb_arraySet( pArray, ulArgPos, pVaItem );
+         }
+      }
+      va_end( va );
+   }
+   if ( pArray )
+   {
+      /* Assign the new array to the object data item. */
+      hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+      hb_vmPush( pError );
+      hb_vmPush( pArray );
+      hb_vmSend( 1 );
+
+      /* Release the Array. */
+      hb_itemRelease( pArray );
+   }
 
    /* Ok, launch... */
    pRetVal = hb_errLaunchSubst( pError );
@@ -1382,8 +1425,6 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const 
 
 PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation )
 {
-   HB_THREAD_STUB
-
    PHB_ITEM pRetVal;
    PHB_ITEM pError;
    PHB_ITEM pArray;
@@ -1393,7 +1434,7 @@ PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCod
    pError = hb_errRT_New_Subst( ES_ERROR, szSubSystem ? szSubSystem : HB_ERR_SS_BASE,
                ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
-   pArray = hb_arrayFromParams( HB_VM_STACK.pBase );
+   pArray = hb_arrayBaseParams();
 
    /* Assign the new array to the object data item. */
    hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
@@ -1413,70 +1454,57 @@ PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCod
 
 void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... )
 {
+   HB_THREAD_STUB
+
    PHB_ITEM pError;
-   PHB_ITEM pArray, pArg;
+   PHB_ITEM pArray;
    PHB_ITEM pResult;
    va_list va;
    ULONG ulArgPos;
-   BOOL bRelease = TRUE;
+
+   pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
 
    /* Build the array from the passed arguments. */
-   va_start( va, ulArgCount );
-   if( ( ulSubCode == 1001 || ulSubCode == 1004 || ulSubCode == 1005 ) && ulArgCount == 1 )
+   if( ulArgCount == 0 )
    {
-      pArray = va_arg( va, PHB_ITEM );
-
-      if( HB_IS_ARRAY( pArray ) )
-      {
-         bRelease = FALSE;
-      }
+      pArray = NULL;
+   }
+   else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
+   {
+      if( hb_pcount() == 0 )
+         pArray = NULL;
       else
-      {
-         pArg = pArray;
-         pArray = hb_itemArrayNew( 1 );
-         hb_arraySet( pArray, 1, pArg );
-      }
+         pArray = hb_arrayBaseParams();
+   }
+   else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
+   {
+      pArray = hb_arraySelfParams();
    }
    else
    {
-      HB_ITEM NullItem;
-
-      NullItem.type = HB_IT_NIL;
-
       pArray = hb_itemArrayNew( ulArgCount );
 
+      va_start( va, ulArgCount );
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
          PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
-
-         if ( pVaItem == NULL )
-         {
-            hb_arraySet( pArray, ulArgPos, &NullItem );
-         }
-         else
+         if( pVaItem )
          {
             hb_arraySet( pArray, ulArgPos, pVaItem );
          }
       }
+      va_end( va );
    }
-   va_end( va );
-
-   pError = hb_errRT_New_Subst( ES_ERROR, HB_ERR_SS_BASE, ulGenCode, ulSubCode, szDescription, szOperation, 0, EF_NONE );
-
-   /* Assign the new array to the object data item. */
-   hb_vmPushSymbol( hb_dynsymGet( "_ARGS" )->pSymbol );
-   hb_vmPush( pError );
-   hb_vmPush( pArray );
-   hb_vmSend( 1 );
-
-   /* Release the Array. */
-   if( bRelease )
+   if ( pArray )
    {
+      /* Assign the new array to the object data item. */
+      hb_vmPushSymbol( hb_dynsymGetSymbol( "_ARGS" ) );
+      hb_vmPush( pError );
+      hb_vmPush( pArray );
+      hb_vmSend( 1 );
+
+      /* Release the Array. */
       hb_itemRelease( pArray );
-   }
-   else
-   {
-      hb_itemClear( pArray );
    }
 
    /* Ok, launch... */

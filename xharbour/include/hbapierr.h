@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.12 2005/03/31 03:15:16 druzus Exp $
+ * $Id: hbapierr.h,v 1.13 2005/04/26 05:38:04 ronpinkas Exp $
  */
 
 /*
@@ -92,6 +92,12 @@ HB_EXTERN_BEGIN
 #define HB_ERR_IE_ERR_RECOV_FAIL        1025
 #define HB_ERR_IE_UNREC_ERROR           1026
 #define HB_ERR_IE_GENERIC               1027
+
+#define HB_ERR_ARGS_BASEPARAMS          0xFFFFFFFF
+#define HB_ERR_ARGS_SELFPARAMS          0xFFFFFFFE
+
+/* pseudo function name in operation description */
+extern char hb_errFuncName;
 
 /* Standard API */
 

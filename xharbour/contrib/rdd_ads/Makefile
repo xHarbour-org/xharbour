@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2005/10/04 02:05:32 druzus Exp $
+# $Id: Makefile,v 1.6 2006/02/21 19:37:06 druzus Exp $
 #
 
 ROOT = ../../
@@ -24,4 +24,3 @@ include $(TOP)$(ROOT)config/lib.cf
 
 install::
 	$(INSTALL_RULE_HEADERS)
-

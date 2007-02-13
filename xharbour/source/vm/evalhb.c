@@ -1,5 +1,5 @@
 /*
- * $Id: evalhb.c,v 1.2 2002/01/22 00:23:28 ronpinkas Exp $
+ * $Id: evalhb.c,v 1.3 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ HB_FUNC( EVAL )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", 1, hb_paramError( 1 ) );
+      hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, NULL, "EVAL", HB_ERR_ARGS_BASEPARAMS );
    }
 }
 
