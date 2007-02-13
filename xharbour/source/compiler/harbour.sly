@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.104 2006/11/06 22:31:40 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.105 2007/01/11 01:00:35 druzus Exp $
  */
 
 /*
@@ -166,7 +166,7 @@ static void hb_compDebugStart( void ) { };
 
 %token FUNCTION PROCEDURE IDENTIFIER RETURN NIL NUM_DOUBLE INASSIGN NUM_INTEGER NUM_LONG
 %token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
-%token ANNOUNCE EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
+%token ANNOUNCE DYNAMIC EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
 %token INC DEC ALIASOP DOCASE CASE OTHERWISE ENDCASE ENDDO MEMVAR
 %token WHILE LOOP FOR NEXT TO STEP LE GE FIELD IN PARAMETERS
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
@@ -463,6 +463,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
            | EXIT      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopExit(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
            | LOOP      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopLoop(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
            | EXTERN ExtList Crlf
+           | DYNAMIC DynList Crlf
            | ANNOUNCE IdentName {
                if( hb_comp_szAnnounce == NULL )
                {
@@ -506,8 +507,12 @@ Statements : LineStat                  { $<lNumber>$ = $<lNumber>1; }
            | Statements LineStat       { $<lNumber>$ += $<lNumber>2; }
            ;
 
-ExtList    : IdentName                      { hb_compExternAdd( $1 ); }
-           | ExtList ',' IdentName          { hb_compExternAdd( $3 ); }
+ExtList    : IdentName                      { hb_compExternAdd( $1, (HB_SYMBOLSCOPE) 0 ); }
+           | ExtList ',' IdentName          { hb_compExternAdd( $3, (HB_SYMBOLSCOPE) 0 ); }
+           ;
+
+DynList    : IdentName                      { hb_compExternAdd( $1, HB_FS_DEFERRED ); }
+           | DynList ',' IdentName          { hb_compExternAdd( $3, HB_FS_DEFERRED ); }
            ;
 
 IdentName  : IDENTIFIER       { $$ = $1; }

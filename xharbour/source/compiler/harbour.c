@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.140 2006/11/01 23:14:47 ronpinkas Exp $
+ * $Id: harbour.c,v 1.141 2007/01/13 18:54:08 ronpinkas Exp $
  */
 
 /*
@@ -851,12 +851,15 @@ PFUNCTION hb_compFunCallAdd( char * szFunctionName )
  * as they have to be placed on the symbol table later than the first
  * public symbol
  */
-void hb_compExternAdd( char * szExternName ) /* defines a new extern name */
+void hb_compExternAdd( char * szExternName, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
 {
    PEXTERN pExtern, pLast;
 
    pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
+
    pExtern->szName = szExternName;
+   pExtern->cScope = cScope;
+
    pExtern->pNext  = NULL;
 
    if( hb_comp_pExterns == NULL )
@@ -866,12 +869,15 @@ void hb_compExternAdd( char * szExternName ) /* defines a new extern name */
    else
    {
       pLast = hb_comp_pExterns;
+
       while( pLast->pNext )
       {
          pLast = pLast->pNext;
       }
+
       pLast->pNext = pExtern;
    }
+
 /*
    hb_comp_bExternal = TRUE;
  */
@@ -2543,12 +2549,14 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
 
    if( hb_comp_bDebugInfo )
    {
-      hb_compExternAdd( hb_strdup( "__DBGENTRY" ) );
+      hb_compExternAdd( hb_strdup( "__DBGENTRY" ), (HB_SYMBOLSCOPE) 0 );
    }
 
    while( hb_comp_pExterns )
    {
-      if( hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) )
+      PCOMSYMBOL pSym;
+
+      if( ( pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) ) )
       {
          if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
          {
@@ -2557,8 +2565,13 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
       }
       else
       {
-         hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, TRUE );
+         pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, TRUE );
          hb_compFunCallAdd( hb_comp_pExterns->szName );
+      }
+
+      if( hb_comp_pExterns->cScope & HB_FS_DEFERRED )
+      {
+         pSym->cScope |= HB_FS_DEFERRED;
       }
 
       pDelete  = hb_comp_pExterns;
@@ -2973,27 +2986,23 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, BOOL bFunctio
 
    while( pSym )
    {
-      if( ! strcmp( pSym->szName, szSymbolName ) )
+      if( strcmp( pSym->szName, szSymbolName ) == 0 )
       {
-         if( bFunction ? pSym->bFunc : !pSym->bFunc )
+         if( bFunction ? pSym->bFunc : ! pSym->bFunc )
          {
             if( pwPos )
             {
                *pwPos = wCnt;
             }
+
             return pSym;
          }
       }
-      if( pSym->pNext )
-      {
-         pSym = pSym->pNext;
-         ++wCnt;
-      }
-      else
-      {
-         return NULL;
-      }
+
+      pSym = pSym->pNext;
+      ++wCnt;
    }
+
    return NULL;
 }
 

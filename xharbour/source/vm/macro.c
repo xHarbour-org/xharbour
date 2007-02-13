@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.64 2006/07/02 14:30:48 ronpinkas Exp $
+ * $Id: macro.c,v 1.65 2007/01/13 15:58:45 druzus Exp $
  */
 
 /*
@@ -584,11 +584,7 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       {
          hb_macroSyntaxError( &struMacro, szString );
       }
-#ifndef HB_THREAD_SUPPORT
-      else if( iContext && ( ( hb_vm_iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( hb_vm_iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
-#else
       else if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
-#endif
       {
          hb_macroSyntaxError( &struMacro, szString );
       }
@@ -611,24 +607,6 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 
          if( iContext && struMacro.iListElements > 0 )
          {
-            #ifndef HB_THREAD_SUPPORT
-
-            if( iContext == HB_P_MACROPUSHARG )
-            {
-               hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex] = struMacro.iListElements;
-               hb_vm_apExtraParamsSymbol[hb_vm_iExtraParamsIndex++] = NULL;
-            }
-            else if( iContext == HB_P_MACROPUSHLIST )
-            {
-               hb_vm_aiExtraElements[hb_vm_iExtraElementsIndex - 1] += struMacro.iListElements;
-            }
-            else if( iContext == HB_P_MACROPUSHINDEX )
-            {
-               hb_vm_iExtraIndex = struMacro.iListElements;
-            }
-
-            #else
-
             if( iContext == HB_P_MACROPUSHARG )
             {
                HB_VM_STACK.aiExtraParams[HB_VM_STACK.iExtraParamsIndex] = struMacro.iListElements;
@@ -642,8 +620,6 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
             {
                HB_VM_STACK.iExtraIndex = struMacro.iListElements;
             }
-
-            #endif
          }
       }
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.49 2006/04/21 11:25:33 druzus Exp $
+ * $Id: hbvmpub.h,v 1.50 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -350,6 +350,8 @@
    #define HB_FS_PCODEFUNC ( ( HB_SYMBOLSCOPE ) 0x0100 )
    #define HB_FS_LOCAL     ( ( HB_SYMBOLSCOPE ) 0x0200 )
    #define HB_FS_DYNCODE   ( ( HB_SYMBOLSCOPE ) 0x0400 )
+
+   #define HB_FS_DEFERRED  ( ( HB_SYMBOLSCOPE ) 0x0800 )
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
    /*

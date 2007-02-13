@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.74 2006/04/24 22:24:38 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.75 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -289,6 +289,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( DOCASE           ),
                          LEX_WORD( "DO{WS}WHILE"                     ) AS_TOKEN( DO_WHILE         ),
                          LEX_WORD( "DO{WS}WHILE{WS}WITH"             ) AS_TOKEN( DO_WHILE_WITH    ),
+                         LEX_WORD( "DYNAMIC"                         ) AS_TOKEN( HB_WANTS_ID  - DYNAMIC           ),
                          LEX_WORD( "ELSE"                            ) AS_TOKEN( HB_WANTS_EOL - ELSE             ),
                          LEX_WORD( "ELSEIF"                          ) AS_TOKEN( HB_WANTS_EXP - ELSEIF           ),
                          LEX_WORD( "END"                             ) AS_TOKEN( HB_WANTS_EOL - END              ),

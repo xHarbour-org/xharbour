@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.49 2006/04/21 11:25:33 druzus Exp $
+ * $Id: hbcomp.h,v 1.50 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -242,6 +242,7 @@ typedef struct
 typedef struct __EXTERN
 {
    char * szName;
+   HB_SYMBOLSCOPE cScope;
    struct __EXTERN * pNext;
 } _EXTERN, * PEXTERN;      /* support structure for extern symbols */
 /* as they have to be placed on the symbol table later than the first public symbol */
@@ -369,7 +370,7 @@ extern void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for W
 extern void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
 
 extern void hb_compExternGen( void ); /* generates the symbols for the EXTERN names */
-extern void hb_compExternAdd( char * szExternName ); /* defines a new extern name */
+extern void hb_compExternAdd( char * szExternName, HB_SYMBOLSCOPE cScope ); /* defines a new extern name */
 
 extern void hb_compAutoOpenAdd( char * szName );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5323 2007/02/11 20:00:49 peterrees Exp $
+ * $Id: ChangeLog,v 1.5324 2007/02/13 19:02:23 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-13 19:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbmacro.h
+  * include/hbstack.h
+  * source/vm/macro.c
+  * source/vm/hvm.c
+    * Eliminated #ifndef HB_THREAD_SUPPORT code redundancy
+    /* TODO: eliminate all remaining static variables. */
+
+  * include/hbcomp.h
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/harbour.slx
+    + Added support for DYNAMIC <Func1> [, <FuncN>] [...] syntax
+
+  * include/hbvmpub.h
+    + Added: #define HB_FS_DEFERRED  ( ( HB_SYMBOLSCOPE ) 0x0800 )
+  * source/vm/hvm.c
+    + Added support for dynamic resolution of HB_FS_DEFERRED in hb_vmRegisterSymbols()
+
+  * tests/dynamic.prg
+    + New sample of the DYNAMIC syntax and usage
 
 2007-02-13 20:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/bin/hb-func.sh

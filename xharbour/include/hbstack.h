@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.37 2006/05/23 19:21:18 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.38 2006/06/08 09:57:13 druzus Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #define HB_STACK_H_
 
 #include "hbvmpub.h"
+#include "hbapi.h"
 
 #if !defined( STACK_INITHB_ITEMS )
    #define STACK_INITHB_ITEMS      200
@@ -95,6 +96,28 @@ typedef struct
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
 
+   USHORT uiActionRequest;
+
+   HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
+   UINT    wWithObjectCounter;
+   BOOL    bWithObject;
+
+   HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
+   PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];
+   ULONG    awEnumIndex[ HB_MAX_ENUMERATIONS ];
+   UINT     wEnumCollectionCounter;
+
+   int aiExtraParams[HB_MAX_MACRO_ARGS];
+   int iExtraParamsIndex;
+   PHB_SYMB apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
+   int aiExtraElements[HB_MAX_MACRO_ARGS];
+   int iExtraElementsIndex;
+   int iExtraElements;
+   int iExtraIndex;
+
+   /* BEGIN SEQUENCE [RECOVER] END*/
+   struct _HB_SEQUENCE *pSequence;
+   
 } HB_STACK;
 
 extern HB_STACK hb_stackST;

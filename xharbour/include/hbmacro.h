@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.9 2004/11/21 21:43:38 druzus Exp $
+ * $Id: hbmacro.h,v 1.10 2005/11/19 19:12:23 ronpinkas Exp $
  */
 
 /*
@@ -154,14 +154,6 @@ extern void hb_compGenPushFunCall( char * szFunName, HB_BISON_PTR pMacro );
 extern void hb_compGenPushString( char * szText, ULONG ulStrLen, HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockStart( HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockEnd( HB_BISON_PTR pMacro );
-
-/* Notice: even if declared here, this variables are defined in hvm.c */
-#ifndef HB_THREAD_SUPPORT
-extern int hb_vm_aiExtraParams[HB_MAX_MACRO_ARGS], hb_vm_iExtraParamsIndex;
-extern int hb_vm_aiExtraElements[HB_MAX_MACRO_ARGS], hb_vm_iExtraElementsIndex;
-extern int hb_vm_iExtraIndex;
-extern PHB_SYMB hb_vm_apExtraParamsSymbol[HB_MAX_MACRO_ARGS];
-#endif
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.123 2006/05/16 22:57:08 druzus Exp $
+ * $Id: genc.c,v 1.124 2006/06/14 13:56:20 druzus Exp $
  */
 
 /*
@@ -287,6 +287,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       /* check c-in-line static functions */
       pInline = hb_comp_inlines.pFirst;
+
       if ( pInline && pInline->pCode )
       {
          hb_compGenCInLineSymbol();
@@ -294,17 +295,24 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       /* write functions prototypes for called functions outside this PRG */
       pFunc = hb_comp_funcalls.pFirst;
+
       while( pFunc )
       {
          if( hb_compFunctionFind( pFunc->szName ) == NULL && hb_compInlineFind( pFunc->szName ) == NULL )
          {
-            if( hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_STATIC ) )
+            PCOMSYMBOL pSym;
+
+            if( ( pSym = hb_compSymbolFind( pFunc->szName, NULL, TRUE ) ) && ( pSym->cScope & HB_FS_DEFERRED ) )
+            {
+                // Skip!
+            }
+            else if( hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_STATIC ) )
             {
                fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pFunc->szName );
             }
             else
             {
-               if( !hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_PUBLIC ) )
+               if( ! hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_PUBLIC ) )
                {
                   fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunc->szName );
                }
@@ -402,9 +410,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                if( ( pSym->cScope & HB_FS_LOCAL ) == 0 )
                {
                   /* is it a function defined in this module */
-                  if( hb_compFunctionFind( pSym->szName ) ||
-                      hb_compInlineFind( pSym->szName ) ||
-                      hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
+                  if( hb_compFunctionFind( pSym->szName ) || hb_compInlineFind( pSym->szName ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
                   {
                      pSym->cScope |= HB_FS_LOCAL;
                   }
@@ -459,6 +465,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                bSymFIRST = TRUE;
             }
 
+            if( pSym->cScope & HB_FS_DEFERRED )
+            {
+               fprintf( yyc, " | HB_FS_DEFERRED" );
+            }
+
             /* specify the function address if it is a defined function or an
                external called function */
             if( pSym->bFunc && ( pSym->cScope & HB_FS_LOCAL ) != 0 ) /* is it a function defined in this module */
@@ -478,7 +489,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else if( pSym->bFunc && hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
             {
-               fprintf( yyc, "}, {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
+               if( pSym->cScope & HB_FS_DEFERRED )
+               {
+                  fprintf( yyc, "}, {NULL}, NULL }" );
+               }
+               else
+               {
+                  fprintf( yyc, "}, {HB_FUNCNAME( %s )}, NULL }", pSym->szName );
+               }
             }
             else
             {
@@ -785,6 +803,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    hb_xfree( hb_comp_PrgFileName );
 
    pTemp = pStatSymb;
+
    while( pTemp )
    {
       // printf( "RELEASING : >>%s<<\n", pTemp->szName );
@@ -811,7 +830,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
 
    while( pTemp )
    {
-      if( !hb_compFunctionFind( pTemp->szName ) && !hb_compSymbFound( pTemp->szName ) && ( pTemp->Type & ( HB_PROTO_FUNC_PUBLIC | HB_PROTO_FUNC_EXIT | HB_PROTO_FUNC_INIT ) ) )
+      if( ! hb_compFunctionFind( pTemp->szName ) && ! hb_compSymbFound( pTemp->szName ) && ( pTemp->Type & ( HB_PROTO_FUNC_PUBLIC | HB_PROTO_FUNC_EXIT | HB_PROTO_FUNC_INIT ) ) )
       {
          if( bNewLine && !bBegin )
          {
@@ -848,7 +867,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
          }
          else
          {
-            if( !bSymFIRST && !hb_comp_bNoStartUp && !bStartFunc  )
+            if( ! bSymFIRST && ! hb_comp_bNoStartUp && !bStartFunc  )
             {
                bStartFunc = TRUE;
                hb_xstrcat( szEntries, "{ \"",pTemp->szName,"\", {HB_FS_PUBLIC | HB_FS_LOCAL", NULL );
@@ -872,6 +891,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
    }
 
    ul = strlen( szEntries );
+
    if ( szEntries[ul - 2 ] == ',' )
    {
       szEntries[ul - 2 ] = '\0';
@@ -883,6 +903,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
    }
 
    hb_xfree( szEntries );
+
    return ( bStartFunc );
 }
 
@@ -962,7 +983,7 @@ static void hb_compGenCAddProtos( FILE *yyc )
 
    while( pTemp )
    {
-      if( !hb_compFunctionFind( pTemp->szName ) )
+      if( ! hb_compFunctionFind( pTemp->szName ) )
       {
          if ( pTemp->Type == HB_PROTO_FUNC_EXIT )
          {
@@ -1082,10 +1103,12 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
    if( pStatSymb )
    {
       pLast = pStatSymb;
+
       while( pLast->pNext )
       {
          pLast = pLast->pNext;
       }
+
       pLast->pNext = pTemp;
       pStatSymb->uEntry ++;
    }
