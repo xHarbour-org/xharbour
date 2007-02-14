@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.50 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.51 2007/02/13 23:40:58 ronpinkas Exp $
  */
 
 /*
@@ -581,6 +581,9 @@ extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
 
 extern BOOL           hb_comp_iGenVarList;
+
+/* Miguel Angel Marchuet */
+extern BOOL           hb_comp_bReserved;
 
 /* Giancarlo Niccolai */
 extern BOOL           hb_comp_bI18n;

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.141 2007/01/13 18:54:08 ronpinkas Exp $
+ * $Id: harbour.c,v 1.142 2007/02/13 23:40:59 ronpinkas Exp $
  */
 
 /*
@@ -200,6 +200,7 @@ int            hb_comp_iVarScope;                         /* holds the scope for
 PHB_FNAME      hb_comp_pOutPath = NULL;
 BOOL           hb_comp_bCredits = FALSE;                  /* print credits */
 BOOL           hb_comp_bBuildInfo = FALSE;                /* print build info */
+BOOL           hb_comp_bReserved = TRUE;                  /* verify reserved words */
 BOOL           hb_comp_bI18n = FALSE;                     /* Output i18n file */
 char *         hb_comp_szHILout = NULL;                   /* Output file name */
 FILE *         hb_comp_HILfile = NULL;                    /* output .hil file */
@@ -2294,7 +2295,10 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       }
    }
 
-   szFunction = hb_compReservedName( szFunName );
+   if( hb_comp_bReserved )
+      szFunction = hb_compReservedName( szFunName );
+   else
+      szFunction = NULL;
 
    if( szFunction && !( hb_comp_functions.iCount==0 && !hb_comp_bStartProc ) )
    {
@@ -4060,7 +4064,10 @@ void hb_compGenPushFunCall( char * szFunName )
 {
    char * szFunction;
 
-   szFunction = hb_compReservedName( szFunName );
+   if( hb_comp_bReserved )
+      szFunction = hb_compReservedName( szFunName );
+   else
+      szFunction = NULL;
    if( szFunction )
    {
       /* Abbreviated function name was used - change it for whole name

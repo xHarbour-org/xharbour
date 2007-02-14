@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.105 2007/01/11 01:00:35 druzus Exp $
+ * $Id: harbour.sly,v 1.106 2007/02/13 23:40:59 ronpinkas Exp $
  */
 
 /*
@@ -470,7 +470,11 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                   /* check for reserved name
                   * NOTE: Clipper doesn't check for it
                   */
-                  char * szFunction = hb_compReservedName( $2 );
+                  char * szFunction;
+                  if( hb_comp_bReserved )
+                     szFunction = hb_compReservedName( $2 );
+                  else
+                     szFunction = NULL;
                   if( szFunction )
                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, $2 );
                   hb_comp_szAnnounce = $2;

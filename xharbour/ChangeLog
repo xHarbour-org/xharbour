@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5324 2007/02/13 19:02:23 druzus Exp $
+ * $Id: ChangeLog,v 1.5325 2007/02/13 23:40:58 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-14 11:36 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * include/hbcomp.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbusage.c
+    + Added support for -roff to compiler, dis parameter turns off detection off
+      reserved words, with the purpose of not needing two harbour compilers one to 
+      construct exes and other to construct dlls without the necessity of harbour.dll 
+      or to already include libraries included in exe main.
+
 
 2007-02-13 19:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbmacro.h
