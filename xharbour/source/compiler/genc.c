@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.125 2007/02/13 23:40:59 ronpinkas Exp $
+ * $Id: genc.c,v 1.126 2007/02/15 21:22:00 ronpinkas Exp $
  */
 
 /*
@@ -3867,7 +3867,19 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "   };\n\n" );
 
-   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { pcode, symbols, %s };\n\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { NULL, NULL, NULL };\n\n" );
+
+   fprintf( yyc, "   if( ExecutionData.pCode == NULL )\n" );
+   fprintf( yyc, "   {\n" );
+   fprintf( yyc, "      ExecutionData.pCode    = pcode;\n" );
+   fprintf( yyc, "      ExecutionData.pSymbols = symbols;\n" );
+
+   if( hb_comp_pGlobals )
+   {
+      fprintf( yyc, "   ExecutionData.pGlobals = &pGlobals;\n" );
+   }
+
+   fprintf( yyc, "   }\n\n" );
 
    if( pFunc->cScope & HB_FS_CRITICAL )
    {
@@ -3920,7 +3932,19 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "   };\n\n" );
 
-   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { pcode, symbols, %s };\n\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { NULL, NULL, NULL };\n\n" );
+
+   fprintf( yyc, "   if( ExecutionData.pCode == NULL )\n" );
+   fprintf( yyc, "   {\n" );
+   fprintf( yyc, "      ExecutionData.pCode    = pcode;\n" );
+   fprintf( yyc, "      ExecutionData.pSymbols = symbols;\n" );
+
+   if( hb_comp_pGlobals )
+   {
+      fprintf( yyc, "   ExecutionData.pGlobals = &pGlobals;\n" );
+   }
+
+   fprintf( yyc, "   }\n\n" );
 
    if( pFunc->cScope & HB_FS_CRITICAL )
    {
