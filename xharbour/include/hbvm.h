@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.46 2006/09/17 16:53:08 druzus Exp $
+ * $Id: hbvm.h,v 1.47 2006/09/27 11:01:44 druzus Exp $
  */
 
 /*
@@ -95,7 +95,6 @@ extern void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo );
 extern void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
-extern HB_EXPORT void     hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
 

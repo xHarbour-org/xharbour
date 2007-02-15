@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.50 2006/04/23 00:36:00 druzus Exp $
+ * $Id: hbvmpub.h,v 1.51 2007/02/13 23:40:59 ronpinkas Exp $
  */
 
 /*
@@ -360,7 +360,14 @@
     * ( ( cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
     */
 
-   extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+   typedef struct _HB_EXECUTION_DATA
+   {
+       const BYTE *pCode;
+       PHB_SYMB pSymbols;
+       PHB_ITEM **pGlobals;
+   } HB_EXECUTION_DATA, *PHB_EXECUTION_DATA;
+
+   extern void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData );  /* invokes the virtual machine */
 
    HB_EXTERN_END
 

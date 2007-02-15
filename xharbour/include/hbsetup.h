@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.42 2005/10/19 16:19:09 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.43 2005/11/14 22:16:51 lf_sfnet Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #ifndef HB_SETUP_H_
 #define HB_SETUP_H_
 
-#define HB_PCODE_VER 7
+#define HB_PCODE_VER 8
 
 /* Don't change - this is the default for older compiled prgs.!!! */
 #define HB_PRG_PCODE_VER 0

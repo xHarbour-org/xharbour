@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5325 2007/02/13 23:40:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5326 2007/02/14 10:36:34 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,26 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-02-15 17:19 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * include/hbvm.h
+    - Removed redundant declaration of hb_vmExecute()
+
+  * tests/dynamic.prg
+    * Platform independance (not tested)
+
+  * include/hbsetup.h
+    * Increased HB_PCODE_VER to 8
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    % Optimized VM function calls by modifying hb_vmExecute() to use a single argument of new structure HB_EXECUTION_DATA
+
+  /*
+     My tests show 10-20% speed improvement in PRG function calls (VC8 on Win XP SP2)
+   */
+
 2007-02-14 11:36 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/hbcomp.h
   * source/compiler/cmdcheck.c
@@ -15,8 +35,8 @@
   * source/compiler/harbour.sly
   * source/compiler/hbusage.c
     + Added support for -roff to compiler, dis parameter turns off detection off
-      reserved words, with the purpose of not needing two harbour compilers one to 
-      construct exes and other to construct dlls without the necessity of harbour.dll 
+      reserved words, with the purpose of not needing two harbour compilers one to
+      construct exes and other to construct dlls without the necessity of harbour.dll
       or to already include libraries included in exe main.
 
 

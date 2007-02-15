@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.124 2006/06/14 13:56:20 druzus Exp $
+ * $Id: genc.c,v 1.125 2007/02/13 23:40:59 ronpinkas Exp $
  */
 
 /*
@@ -3867,12 +3867,14 @@ static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "   };\n\n" );
 
+   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { pcode, symbols, %s };\n\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+
    if( pFunc->cScope & HB_FS_CRITICAL )
    {
       fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( yyc, "   hb_vmExecute( &ExecutionData );\n" );
 
    if( pFunc->cScope & HB_FS_CRITICAL )
    {
@@ -3918,12 +3920,14 @@ static void hb_compGenCCompact( PFUNCTION pFunc, FILE * yyc )
 
    fprintf( yyc, "   };\n\n" );
 
+   fprintf( yyc, "   static HB_EXECUTION_DATA ExecutionData = { pcode, symbols, %s };\n\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+
    if( pFunc->cScope & HB_FS_CRITICAL )
    {
       fprintf( yyc, "   HB_CRITICAL_LOCK( s_Critical%s );\n", pFunc->szName );
    }
 
-   fprintf( yyc, "   hb_vmExecute( pcode, symbols, %s );\n", hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( yyc, "   hb_vmExecute( &ExecutionData );\n" );
 
    if( pFunc->cScope & HB_FS_CRITICAL )
    {

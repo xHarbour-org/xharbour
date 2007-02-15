@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.199 2007/01/11 01:00:34 druzus Exp $
+ * $Id: hbapi.h,v 1.200 2007/02/13 19:02:23 druzus Exp $
  */
 
 /*
@@ -325,7 +325,6 @@ extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers
 extern void   hb_gcInit( void );
 extern BOOL   hb_gcSetCollecting( BOOL bCollecting );
 
-extern HB_EXPORT void   hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
 extern           void   hb_vmIsLocalRef( void ); /* hvm.c - mark all local variables as used */
 
 #ifdef HB_THREAD_SUPPORT

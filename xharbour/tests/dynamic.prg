@@ -13,7 +13,7 @@ PROCEDURE TestDyn()
 RETURN
 
 INIT PROCEDURE LoadDlls()
-   __Run( "harbour.exe db_brows -gh -n -w -i..\include" )
+   __Run( "harbour db_brows -gh -n -w -i../include" )
    aAdd( ahDlls, __hrbLoad( "db_brows.hrb" ) )
 RETURN
 
