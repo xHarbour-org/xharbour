@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.66 2007/02/13 23:41:00 ronpinkas Exp $
+ * $Id: macro.c,v 1.67 2007/02/15 21:22:00 ronpinkas Exp $
  */
 
 /*
@@ -205,9 +205,11 @@ static HB_ERROR_HANDLE( hb_macroErrorType )
  */
 void HB_EXPORT hb_macroRun( HB_MACRO_PTR pMacro )
 {
-   static HB_EXECUTION_DATA ExecutionData = { pMacro->pCodeInfo->pCode, NULL, NULL };
+   HB_EXECUTION_DATA ExecutionData = { NULL, NULL, NULL };
 
    HB_TRACE(HB_TR_DEBUG, ("hb_macroRun(%p)", pMacro));
+
+   ExecutionData.pCode = pMacro->pCodeInfo->pCode;
 
    hb_vmExecute( &ExecutionData );
 }

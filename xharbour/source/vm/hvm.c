@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.594 2007/02/13 23:40:59 ronpinkas Exp $
+ * $Id: hvm.c,v 1.595 2007/02/15 21:22:00 ronpinkas Exp $
  */
 
 /*
@@ -3789,7 +3789,11 @@ HB_FUNC( HB_VMEXECUTE )
    if( szString )
    {
       LONG lOffset = hb_stackTopOffset();
-      HB_EXECUTION_DATA ExecutionData = { szString, (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) };
+      HB_EXECUTION_DATA ExecutionData;
+
+      ExecutionData.pCode    = szString;
+      ExecutionData.pSymbols = (PHB_SYMB) hb_parptr(2);
+      ExecutionData.pGlobals = (PHB_ITEM **) hb_parptr(3);
 
       hb_vmExecute( &ExecutionData );
 
@@ -6844,7 +6848,11 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          //printf( "Doing: '%s'\n", pSym->szName );
          if ( pSym->scope.value & HB_FS_PCODEFUNC )
          {
-            HB_EXECUTION_DATA ExecutionData = { ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals };
+            HB_EXECUTION_DATA ExecutionData;
+
+            ExecutionData.pCode    = ( (PHB_PCODEFUNC) pFunc )->pCode;
+            ExecutionData.pSymbols = ( (PHB_PCODEFUNC) pFunc )->pSymbols;
+            ExecutionData.pGlobals = ( (PHB_PCODEFUNC) pFunc )->pGlobals;
 
             /* Running pCode dynamic function from .HRB */
             hb_vmExecute( &ExecutionData );
@@ -7204,7 +7212,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             if( pSymbol->scope.value & HB_FS_PCODEFUNC )
             {
-               HB_EXECUTION_DATA ExecutionData = { ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals };
+               HB_EXECUTION_DATA ExecutionData;
+
+               ExecutionData.pCode    = ( (PHB_PCODEFUNC) pFunc )->pCode;
+               ExecutionData.pSymbols = ( (PHB_PCODEFUNC) pFunc )->pSymbols;
+               ExecutionData.pGlobals = ( (PHB_PCODEFUNC) pFunc )->pGlobals;
 
                /* Running pCode dynamic function from .HRB */
                hb_vmExecute( &ExecutionData );
@@ -7334,6 +7346,7 @@ static HARBOUR hb_vmDoBlock( void )
    USHORT uiLine;
    int iParam;
    int iStatics;
+   HB_EXECUTION_DATA ExecutionData;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
 
@@ -7370,10 +7383,11 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.iStatics = pBlock->item.asBlock.statics;
 
-   {
-      HB_EXECUTION_DATA ExecutionData = { pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->pSymbols, pBlock->item.asBlock.value->pGlobals };
-      hb_vmExecute( &ExecutionData );
-   }
+   ExecutionData.pCode    = pBlock->item.asBlock.value->pCode;
+   ExecutionData.pSymbols = pBlock->item.asBlock.value->pSymbols;
+   ExecutionData.pGlobals = pBlock->item.asBlock.value->pGlobals;
+
+   hb_vmExecute( &ExecutionData );
 
    // Restore Statics context.
    HB_VM_STACK.iStatics = iStatics;
