@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.145 2006/12/07 17:26:57 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.146 2007/01/12 14:09:58 ronpinkas Exp $
  */
 
 /*
@@ -1014,7 +1014,11 @@ RETURN Self
            break;
 
         case HB_IT_DATE:
-          if( bByRef )
+          if( pItem->item.asDate.value == 0 )
+          {
+             pVariant->n1.n2.vt = VT_NULL;
+          }
+          else if( bByRef )
           {
              pItem->item.asDouble.value = (double) ( pItem->item.asDate.value - 2415019 );
              pItem->type = HB_IT_DOUBLE;
