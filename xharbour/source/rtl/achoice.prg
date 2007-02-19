@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.31 2006/11/10 17:47:07 modalsist Exp $
+ * $Id: achoice.prg,v 1.32 2006/11/14 11:31:00 modalsist Exp $
  */
 
 /*
@@ -55,12 +55,104 @@
 #include "setcurs.ch"
 #include "color.ch"
 #include "hbclass.ch"
+#include "common.ch"
 
-FUNCTION AChoice( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow )
+FUNCTION AChoice( nTop,;
+                  nLeft,;
+                  nBottom,;
+                  nRight,;
+                  acItems,;
+                  uSelect,;
+                  uUserFunc,;
+                  nOption,;
+                  nFirstRow )
 LOCAL oAChoice
-   oAChoice := TAChoice():New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow )
-   oAChoice:cProcName := ProcName( 1 )
-   oAChoice:nProcLine := ProcLine( 1 )
+LOCAL xItem
+
+/* Clipper compliant. */
+DEFAULT nTop    TO 0
+DEFAULT nLeft   TO 0
+DEFAULT nBottom TO 0 
+DEFAULT nRight  TO 0 
+
+  // Parameters check.
+
+  If !Hb_IsNumeric( nTop ) .or.;
+     !Hb_IsNumeric( nLeft ) .or.;
+     !Hb_IsNumeric( nBottom ) .or.;
+     !Hb_IsNumeric( nRight ) 
+
+     Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <nTop,nLeft,nBottom,nRight>", "Argument type error" ) )
+
+  Else
+
+     If nTop > nBottom
+        Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <nTop> greater than <nBottom>" ) )
+     Endif
+
+     If nLeft > nRight 
+        Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <nLeft> greater than <nRight>"  ) )
+     Endif
+
+  Endif
+
+
+  If !Hb_IsNil(acItems)
+     If !Hb_IsArray( acItems )
+        Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <acMenuItems>", "Argument type error"  ) )
+     Elseif Empty( acItems )
+        Throw( ErrorNew( "BASE", 0, 1127, Procname()+":<acMenuItems>", "Argument error. Empty Array" ) )
+     Else
+        For Each xItem In acItems
+            If !Hb_IsString( xItem )
+               Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
+            Elseif Empty( xItem )
+               Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> can not have an empty string" ) )
+            Endif
+        Next
+     Endif
+  Endif
+
+
+  IF !Hb_IsNil( uSelect )
+     If !Hb_IsArray( uSelect ) .AND. !Hb_IsLogical( uSelect ) 
+        Throw( ErrorNew( "BASE", 0, 1127,  Procname()+" <alSelectableItems | lSelectableItems>", "Argument type error: <"+valtype(uSelect)+">" ) )
+     ElseIf Hb_IsArray( uSelect )
+        If !Empty( uSelect )
+           For Each xItem In uSelect
+               IF !Hb_IsLogical( xItem )  
+                  Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> should contain logic values" ) )
+               ENDIF
+           Next
+           IF Len( uSelect ) != Len( acItems )
+             Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> should contain the same amount of elements than <acItems>" ) )
+           ENDIF
+        Else
+           Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> can not be an empty array" ) )
+        Endif
+     Endif
+  Endif
+
+  IF !Hb_IsNil( uUserFunc ) .AND. !Hb_IsString( uUserFunc )
+     Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <cUserFunc>", "Argument type error: <"+valtype(uUserFunc)+">" ) )
+  ELSE
+      If Hb_IsString( uUserFunc ) .AND. Empty( uUserFunc )
+         uUserFunc := NIL
+      Endif
+  ENDIF
+
+  If !Hb_IsNil( nOption ) .AND.  !Hb_IsNumeric( nOption )
+     Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <nInitialItem>", "Argument type error: <"+valtype(nOption)+">" ) )
+  Endif
+
+  If !Hb_IsNil( nFirstRow ) .AND.  !Hb_IsNumeric( nFirstRow )
+     Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <nWindowRow>", "Argument type error: <"+valtype(nFirstRow)+">" ) )
+  Endif
+
+  oAChoice := TAChoice():New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow )
+  oAChoice:cProcName := ProcName( 1 )
+  oAChoice:nProcLine := ProcLine( 1 )
+
 RETURN IF( oAChoice:nItems == 0, 0, oAChoice:Loop( AC_CONT ) )
 
 // I had made AChoice() as a class for avoid pass all memvars to each
@@ -70,6 +162,7 @@ RETURN IF( oAChoice:nItems == 0, 0, oAChoice:Loop( AC_CONT ) )
 #define AC_MAXVALUE         AC_REDRAW  // Highest user's return value
 
 CLASS TAChoice
+
    VAR    nTop, nLeft, nBottom, nRight   // Screen coords.
    VAR    acItems                        // Array of items
    VAR    uSelect                        // Determines if any item is selectable
@@ -96,34 +189,38 @@ CLASS TAChoice
    METHOD MoveCursor                     // Changes selected option, and validates if it's selectable
    METHOD DrawRows                       // "Paints" items on screen
    METHOD HitTest                        // Checks if the mouse is over the screen's area
+
 ENDCLASS
 
 // #define IsAvailableItem( nItem )     ( ::alSelect[ ( nItem ) ] )
 #define IsAvailableItem( nItem )     ( IsItemSelectable( ( nItem ), ::nItems, ::uSelect, ::acItems ) )
 
 METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, nFirstRow ) CLASS TAChoice
+
    ::nTop    := IF( HB_ISNUMERIC( nTop ),    nTop,    0 )
    ::nLeft   := IF( HB_ISNUMERIC( nLeft ),   nLeft,   0 )
    ::nBottom := IF( HB_ISNUMERIC( nBottom ), nBottom, MaxRow() )
    ::nRight  := IF( HB_ISNUMERIC( nRight ),  nRight,  MaxCol() )
+
    ::nTop    := Max( Min( ::nTop,    MaxRow() ) , 0 )
    ::nLeft   := Max( Min( ::nLeft,   MaxCol() ) , 0 )
    ::nBottom := Max( Min( ::nBottom, MaxRow() ) , ::nTop )
    ::nRight  := Max( Min( ::nRight,  MaxCol() ) , ::nLeft )
 
-   ::nSize   := ::nBottom - ::nTop 
+   ::nSize   := ::nBottom - ::nTop
 
    ::acItems := acItems
    ::uSelect := uSelect
-   ::nItems := 0
+   ::nItems  := 0
+
    IF HB_ISARRAY( acItems )
       DO WHILE ::nItems < LEN( acItems ) .AND. HB_ISSTRING( acItems[ ::nItems + 1 ] ) .AND. ! acItems[ ::nItems + 1 ] == ""
          ::nItems++
       ENDDO
    ENDIF
 
-   ::nOption := IF( HB_ISNUMERIC( nOption ), nOption, 1 )
-   ::nOption := Min( Max( ::nOption, 1 ), ::nItems )
+   ::nOption   := IF( HB_ISNUMERIC( nOption ), nOption, 1 )
+   ::nOption   := Min( Max( ::nOption, 1 ), ::nItems )
    ::nFirstRow := IF( HB_ISNUMERIC( nFirstRow ), nFirstRow, 0 )
    ::nFirstRow := Max( Min( ::nFirstRow, ::nBottom - ::nTop ), 0 )   // Inside range
    ::nFirstRow := Max( ::nOption - ::nFirstRow, 1 )                  // Initial row
@@ -138,9 +235,12 @@ METHOD New( nTop, nLeft, nBottom, nRight, acItems, uSelect, uUserFunc, nOption, 
       ::DrawRows( 0, ::nBottom - ::nTop, .F. )
       DispEnd()
    ENDIF
+
+
 RETURN Self
 
 METHOD Loop( nMode ) CLASS TAChoice
+
 LOCAL nRet, nUserMode, lNoItems
 LOCAL nKey, bAction, nAux
 LOCAL nSaveCsr := SetCursor( SC_NONE )
@@ -329,8 +429,10 @@ LOCAL nPage := ::nSize + 1
 
          Else
             nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
-
          Endif
+
+         // 2007/FEB/12 - E.F. To avoid nMode = NIL returned by UDF.
+         DEFAULT nMode TO 0
 
          IF nMode < 0 .OR. nMode > AC_MAXVALUE
             nMode := AC_CONT

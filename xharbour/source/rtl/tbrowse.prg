@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.163 2006/11/21 23:13:52 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.164 2007/01/07 18:48:40 modalsist Exp $
  */
 
 /*
@@ -372,12 +372,18 @@ METHOD FillRow( nRow ) CLASS TDataCache
 
    local aCol, oCell
    local nRectPos,i
+   local nVideoRow,nVideoCol
 
    IF nRow > Len( ::aCache )
       RETURN Self
    ENDIF
 
    ::aCache[ nRow ] := Array( ::oCachedBrowse:colCount )
+
+   // 2007/FEB/14 - E.F. - Save cursor position before column filling.
+   //
+   nVideoRow := Row()
+   nVideoCol := Col()
 
    for each aCol in ::oCachedBrowse:aColsInfo
 
@@ -386,6 +392,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
       i := hb_EnumIndex()
 
       with object oCell
+
          :xData := Eval( aCol[ TBCI_OBJ ]:block )
          :aColor := IIF( Empty( aCol[ TBCI_OBJ ]:colorBlock ),;
                          NIL,;
@@ -401,6 +408,10 @@ METHOD FillRow( nRow ) CLASS TDataCache
          ::aCache[ nRow ][ i ] := oCell
       ENDIF
    next
+
+   // 2007/FEB/14 - E.F. - Restore cursor position after column filling.
+   //
+   SetPos( nVideoRow , nVideoCol )
 
    if ! Empty( ::aRect ) .AND. nRectPos > 0
       ADel( ::aRect, nRectPos, .T. )
@@ -500,8 +511,6 @@ CLASS TBrowse
    ACCESS ColCount      INLINE ::nColumns    // Number of TBrowse columns
    DATA goBottomBlock         // Code block executed by TBrowse:goBottom()
    DATA goTopBlock            // Code block executed by TBrowse:goTop()
-   DATA hitBottom             // Indicates the end of available data
-   DATA hitTop                // Indicates the beginning of available data
    DATA leftVisible           // Indicates position of leftmost unfrozen column in display
    DATA rightVisible          // Indicates position of rightmost unfrozen column in display
    DATA rowCount              // Number of visible data rows in the TBrowse display
@@ -532,6 +541,11 @@ CLASS TBrowse
                                           ( ::Moved(), ::nRecsToSkip := nRowPos - ::nRowPos, nRowPos ),;
                                           ::nRowPos )
 
+   ACCESS HitBottom            INLINE ::lHitBottom              // Indicates the end of available data
+   ASSIGN HitBottom( lbottom ) INLINE ::lHitBottom := lbottom  
+
+   ACCESS HitTop               INLINE ::lHitTop          // Indicates the beginning of available data
+   ASSIGN HitTop( lTop )       INLINE ::lHitTop := lTop  
 
    ACCESS nBottom             INLINE ::nwBottom +  iif( ::cBorder == "", 0, 1 )
    ASSIGN nBottom( nBottom )  INLINE ::PreConfigVertical(   ::nwBottom := nBottom - iif( ::cBorder == "", 0, 1 ) )
@@ -721,8 +735,6 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::leftVisible     := 1
    ::rightVisible    := 1
    ::nColPos         := 1
-   ::HitBottom       := .F.
-   ::HitTop          := .F.
    ::lHitTop         := .F.
    ::lHitBottom      := .F.
    ::cColorSpec      := SetColor()
@@ -835,6 +847,7 @@ Return Self
 METHOD Configure( nMode ) CLASS TBrowse
 
    LOCAL n, nHeight, aCol, xVal, nFreeze, oErr, lInitializing := .f.
+   LOCAL nVideoRow,nVideoCol
 
    default nMode to 0
 
@@ -870,11 +883,17 @@ METHOD Configure( nMode ) CLASS TBrowse
    ::nHeaderHeight := 0
    ::nFooterHeight := 0
 
+   // 2007/FEB/14 - E.F. - Save cursor position before column evaluation.
+   //
+   nVideoRow := Row()
+   nVideoCol := Col()
+
    // Find out highest column header and footer
    //
    FOR EACH aCol IN ::aColsInfo
 
       if ( nMode <= 1 .and. !::lNeverDisplayed ) .or. lInitializing
+
          xVal := Eval( aCol[ TBCI_OBJ ]:block )
 
          aCol[ TBCI_TYPE      ] := valtype( xVal )
@@ -942,6 +961,10 @@ METHOD Configure( nMode ) CLASS TBrowse
       endif
 
    next
+
+   // 2007/FEB/14 - E.F. - Restore cursor position after column evaluation.
+   //
+   SetPos( nVideoRow, nVideoCol )
 
    if Empty( ::aColorSpec )
       ::aColorSpec := Color2Array( ::cColorSpec )
@@ -2337,6 +2360,12 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    LOCAL nRowToDraw
    LOCAL cCurColor
 
+   // Reset flags before stabilization.
+   //
+   ::lHitTop    := .F.
+   ::lHitBottom := .F.
+
+
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
       return .t.
@@ -2471,8 +2500,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // new cursor position
       //
       ::nRowPos    := ::nNewRowPos
-      ::HitTop    := ::lHitTop
-      ::HitBottom := ::lHitBottom
 
       ::stable := .T.
       ::lPaintBottomUp := .F.
@@ -2517,12 +2544,12 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I've tried to move past top or bottom margin
       //
       if nRecsSkipped == 0
-         if ::nRecsToSkip > 0
+         // 2007/FEB/19 - E.F. - GoBottom() should not activate lhitbottom
+         //if ::nRecsToSkip > 0
+         if ::nRecsToSkip > 0 .and. ::nRecsToSkip != ( ::RowCount - 1 )
             ::lHitBottom := .T.
-
          elseif ::nRecsToSkip < 0
             ::lHitTop := .T.
-
          endif
 
       elseif nRecsSkipped == ::nRecsToSkip
@@ -3611,9 +3638,14 @@ Static Function DefColorOK( cColorSpec, aDefColor )
 * Check validity of defcolor index array. If any value is
 * invalid return default index array.
 *--------------------------------------------------
-Local aColorSpec := Color2Array( cColorSpec )
+Local aColorSpec
 Local lOK := .T.
 Local nIndex := 0
+
+DEFAULT cColorSpec TO SetColor()
+DEFAULT aDefColor TO  {1,2,1,1}
+
+ aColorSpec := Color2Array( cColorSpec )
 
  FOR EACH nIndex IN aDefColor
      lOK := ( nIndex > 0 .AND. nIndex <= Len(aColorSpec) )

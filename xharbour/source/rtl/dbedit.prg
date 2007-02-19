@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.38 2006/08/02 13:50:46 modalsist Exp $
+ * $Id: dbedit.prg,v 1.39 2007/01/30 20:01:24 modalsist Exp $
  */
 
 /*
@@ -575,6 +575,7 @@ LOCAL oTBR,;
 
     dbGoto(i)
 
+
  ENDDO
 
  SetCursor( nCursor )
@@ -606,17 +607,19 @@ Return Nil
 
 *------------------------------------------------------
 STATIC FUNCTION _DoUserFunc(bFun, nMode, nColPos, oTBR)
-LOCAL nRet, nRec
-
-  IF nMode == DE_IDLE
-     oTBR:RefreshAll()
-  ENDIF
+LOCAL nRet, nRec, nKey
 
   IF nMode == DE_EXCEPT
      oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{2,1})
+  ELSEIF nMode == DE_INIT
+     oTBR:ForceStable()
+     nKey := NextKey()
+     while nKey != 0
+       oTbr:ApplyKey( nKey )
+       inkey()
+       nKey := NextKey()
+     enddo
   ENDIF
-
-  oTBR:ForceStable()
 
   nRec := RecNo()
 
@@ -679,6 +682,7 @@ LOCAL nRet, nRec
   ENDIF
 
 RETURN nRet
+
 
 /***
 *
