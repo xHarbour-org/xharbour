@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.595 2007/02/15 21:22:00 ronpinkas Exp $
+ * $Id: hvm.c,v 1.596 2007/02/16 00:47:08 ronpinkas Exp $
  */
 
 /*
@@ -1035,14 +1035,14 @@ int HB_EXPORT hb_vmQuit( void )
    return s_iErrorLevel;
 }
 
-void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
+void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB
 
    LONG w = 0;
    BOOL bCanRecover = FALSE;
    BOOL bCanFinalize = FALSE;
-   BOOL bDynCode = pExecutionData->pSymbols == NULL || ( pExecutionData->pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
+   BOOL bDynCode = pSymbols == NULL || ( pSymbols->scope.value & HB_FS_DYNCODE ) != 0;
    LONG lNextSection /*= 0*/, lCatchSection = 0, lFinallySection = 0;
    ULONG ulPrivateBase;
    ULONG wEnumCollectionCounter = HB_VM_STACK.wEnumCollectionCounter;
@@ -1057,18 +1057,18 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
    ULONG ulPastClock = 0;  /* opcodes profiler support */
 #endif
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pExecutionData->pCode, pExecutionData->pSymbols, pExecutionData->pGlobals));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
 
-   //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pExecutionData->pCode, pExecutionData->pSymbols, pExecutionData->pGlobals );
+   //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
 
-   /* NOTE: if pExecutionData->pSymbols == NULL then hb_vmExecute is called from macro
+   /* NOTE: if pSymbols == NULL then hb_vmExecute is called from macro
     * evaluation. In this case all PRIVATE variables created during
     * macro evaluation belong to a function/procedure where macro
     * compiler was called.
     */
 
    /* NOTE: Initialization with 0 is needed to avoid GCC -O2 warning */
-   ulPrivateBase = pExecutionData->pSymbols ? hb_memvarGetPrivatesBase() : 0;
+   ulPrivateBase = pSymbols ? hb_memvarGetPrivatesBase() : 0;
 
 #ifndef HB_NO_PROFILER
    if( hb_bProfiler )
@@ -1086,7 +1086,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          hb_ulOpcodesTime[ ulLastOpcode ] += ( ulActualClock - ulPastClock );
          ulPastClock = ulActualClock;
-         ulLastOpcode = pExecutionData->pCode[ w ];
+         ulLastOpcode = pCode[ w ];
          hb_ulOpcodesCalls[ ulLastOpcode ]++;
       }
 #endif
@@ -1112,7 +1112,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
       }
 #endif
 
-      switch( pExecutionData->pCode[ w ] )
+      switch( pCode[ w ] )
       {
          /* Operators ( mathematical / character / misc ) */
 
@@ -1352,13 +1352,13 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_ARRAYDIM:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYDIM") );
-            hb_vmArrayDim( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmArrayDim( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_ARRAYGEN:
-            HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYGEN %i + %i", HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ), HB_VM_STACK.iExtraElements ) );
-            hb_vmArrayGen( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) + HB_VM_STACK.iExtraElements );
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYGEN %i + %i", HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), HB_VM_STACK.iExtraElements ) );
+            hb_vmArrayGen( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) + HB_VM_STACK.iExtraElements );
             HB_VM_STACK.iExtraElements = 0;
 
             w += 3;
@@ -1368,8 +1368,8 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MESSAGE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MESSAGE") );
-            //TraceLog( NULL, "%s->HB_P_MESSAGE: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
-            hb_vmPushSymbol( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            //TraceLog( NULL, "%s->HB_P_MESSAGE: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
+            hb_vmPushSymbol( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -1385,23 +1385,23 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_DO:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_DO") );
-            hb_vmDo( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmDo( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_DOSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_DOSHORT") );
-            hb_vmDo( pExecutionData->pCode[ w + 1 ] );
+            hb_vmDo( pCode[ w + 1 ] );
             w += 2;
             break;
 
          case HB_P_FUNCTION:
          {
-            USHORT uiParams = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            USHORT uiParams = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTION") );
 
-            //hb_vmFunction( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            //hb_vmFunction( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
 
             if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
             {
@@ -1424,11 +1424,11 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_FUNCTIONSHORT:
          {
-            USHORT uiParams = pExecutionData->pCode[ w + 1 ];
+            USHORT uiParams = pCode[ w + 1 ];
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTIONSHORT") );
 
-            //hb_vmFunction( pExecutionData->pCode[ w + 1 ] );
+            //hb_vmFunction( pCode[ w + 1 ] );
 
             if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
             {
@@ -1669,11 +1669,11 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_SEND:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SEND") );
-            hb_vmSend( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmSend( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
 
             w += 3;
 
-            if( pExecutionData->pCode[w] == HB_P_POP )
+            if( pCode[w] == HB_P_POP )
             {
                HB_TRACE( HB_TR_DEBUG, ("skipped HB_P_POP") );
                w++;
@@ -1694,7 +1694,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_SENDSHORT:
          {
-            USHORT usParams =  pExecutionData->pCode[ w + 1 ];
+            USHORT usParams =  pCode[ w + 1 ];
             PHB_FUNC pFunc;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SENDSHORT") );
@@ -1822,7 +1822,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             w += 2;
 
-            if( pExecutionData->pCode[w] == HB_P_POP )
+            if( pCode[w] == HB_P_POP )
             {
                HB_TRACE( HB_TR_DEBUG, ("skipped HB_P_POP") );
                w++;
@@ -2007,7 +2007,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          }
 
          case HB_P_BASELINE:
-            s_iBaseLine = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            s_iBaseLine = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             hb_stackBaseItem()->item.asSymbol.lineno = s_iBaseLine;
 
             //printf( "BASE Proc: %s Line: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.lineno );
@@ -2024,7 +2024,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             break;
 
          case HB_P_LINE:
-            hb_stackBaseItem()->item.asSymbol.lineno = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            hb_stackBaseItem()->item.asSymbol.lineno = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
             //printf( "Proc: %s Line: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, hb_stackBaseItem()->item.asSymbol.lineno );
 
@@ -2040,7 +2040,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             break;
 
          case HB_P_LINEOFFSET:
-            hb_stackBaseItem()->item.asSymbol.lineno = s_iBaseLine + (BYTE) pExecutionData->pCode[ w + 1 ];
+            hb_stackBaseItem()->item.asSymbol.lineno = s_iBaseLine + (BYTE) pCode[ w + 1 ];
 
             if( s_bDebugging && s_bDebugShowLines )
             {
@@ -2054,31 +2054,31 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PARAMETER:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PARAMETER") );
-            hb_memvarNewParameter( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ), hb_stackItemFromBase( pExecutionData->pCode[ w + 3 ] ) );
+            hb_memvarNewParameter( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), hb_stackItemFromBase( pCode[ w + 3 ] ) );
             w += 4;
             break;
 
          case HB_P_FRAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FRAME") );
-            hb_vmFrame( (unsigned short) pExecutionData->pCode[ w + 1 ], pExecutionData->pCode[ w + 2 ] );
+            hb_vmFrame( (unsigned short) pCode[ w + 1 ], pCode[ w + 2 ] );
             w += 3;
             break;
 
          case HB_P_LARGEFRAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FRAME") );
-            hb_vmFrame( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ), pExecutionData->pCode[ w + 3 ] );
+            hb_vmFrame( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), pCode[ w + 3 ] );
             w += 4;
             break;
 
          case HB_P_SFRAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SFRAME") );
-            hb_vmSFrame( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmSFrame( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_STATICS:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_STATICS") );
-            hb_vmStatics( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ), HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 3 ] ) ) );
+            hb_vmStatics( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), HB_PCODE_MKUSHORT( &( pCode[ w + 3 ] ) ) );
             w += 5;
             break;
 
@@ -2090,28 +2090,28 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_LOCALNAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNAME") );
-            hb_vmLocalName( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ),
-                            ( char * ) pExecutionData->pCode + w + 3 );
+            hb_vmLocalName( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ),
+                            ( char * ) pCode + w + 3 );
             w += 3;
-            while( pExecutionData->pCode[ w++ ] ) {}
+            while( pCode[ w++ ] ) {}
             break;
 
          case HB_P_STATICNAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_STATICNAME") );
-            hb_vmStaticName( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 2 ] ) ),
-                             ( char * ) pExecutionData->pCode + w + 4 );
+            hb_vmStaticName( HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
+                             ( char * ) pCode + w + 4 );
 /*
-            hb_vmStaticName( pExecutionData->pCode[ w + 1 ], HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 2 ] ) ),
-                            ( char * ) pExecutionData->pCode + w + 4 );
+            hb_vmStaticName( pCode[ w + 1 ], HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) ),
+                            ( char * ) pCode + w + 4 );
 */
             w += 4;
-            while( pExecutionData->pCode[ w++ ] ) {}
+            while( pCode[ w++ ] ) {}
             break;
 
          case HB_P_MODULENAME:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MODULENAME") );
-            hb_vmModuleName( ( char * ) pExecutionData->pCode + w + 1 );
-            while( pExecutionData->pCode[ w++ ] ) {}
+            hb_vmModuleName( ( char * ) pCode + w + 1 );
+            while( pCode[ w++ ] ) {}
             break;
 
          /* BEGIN SEQUENCE/RECOVER/END SEQUENCE */
@@ -2131,13 +2131,13 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             lFinallySection = 0;
             lCatchSection   = 0;
-            lNextSection    = w + HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+            lNextSection    = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
 
             #ifdef DEBUG_FINALLY
-               printf( "Next: %i at %li\n", pExecutionData->pCode[ lNextSection ], lNextSection );
+               printf( "Next: %i at %li\n", pCode[ lNextSection ], lNextSection );
             #endif
 
-            if( pExecutionData->pCode[ lNextSection ] == HB_P_FINALLY )
+            if( pCode[ lNextSection ] == HB_P_FINALLY )
             {
                lFinallySection = lNextSection;
 
@@ -2148,9 +2148,9 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             else
             {
                lCatchSection = lNextSection;
-               lNextSection += HB_PCODE_MKINT24( &pExecutionData->pCode[ lCatchSection + 1 ] );
+               lNextSection += HB_PCODE_MKINT24( &pCode[ lCatchSection + 1 ] );
 
-               if( pExecutionData->pCode[ lNextSection ] == HB_P_FINALLY )
+               if( pCode[ lNextSection ] == HB_P_FINALLY )
                {
                   lFinallySection = lNextSection;
 
@@ -2193,7 +2193,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
              */
             ( * HB_VM_STACK.pPos )->type = HB_IT_LONG;
 
-            pSequence->lRecover = w + HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+            pSequence->lRecover = w + HB_PCODE_MKINT24( &pCode[ w + 1 ] );
 
             /*
              * 3) store current RECOVER base
@@ -2233,7 +2233,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             pSequence->pPrev = HB_VM_STACK.pSequence;
             HB_VM_STACK.pSequence = pSequence;
 
-            if( pExecutionData->pCode[ w ] == HB_P_TRYBEGIN )
+            if( pCode[ w ] == HB_P_TRYBEGIN )
             {
                HB_VM_STACK.pSequence->pPrevErrBlock = hb_errorBlock( hb_vm_BreakBlock );
 
@@ -2317,7 +2317,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /*
              * skip over RECOVER section, if any.
              */
-            w += HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             break;
 
          case HB_P_TRYRECOVER:
@@ -2434,17 +2434,17 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_JUMPNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPNEAR") );
-            w += (signed char) pExecutionData->pCode[ w + 1 ];
+            w += (signed char) pCode[ w + 1 ];
             break;
 
          case HB_P_JUMP:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMP") );
-            w += HB_PCODE_MKSHORT( &pExecutionData->pCode[ w + 1 ] );
+            w += HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
             break;
 
          case HB_P_JUMPFAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFAR") );
-            w += HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+            w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             break;
 
          case HB_P_JUMPFALSENEAR:
@@ -2452,7 +2452,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( ! hb_vmPopLogical() )
             {
-               w += (signed char) pExecutionData->pCode[ w + 1 ];
+               w += (signed char) pCode[ w + 1 ];
             }
             else
             {
@@ -2466,7 +2466,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( ! hb_vmPopLogical() )
             {
-               w += HB_PCODE_MKSHORT( &pExecutionData->pCode[ w + 1 ] );
+               w += HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2480,7 +2480,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( ! hb_vmPopLogical() )
             {
-               w += HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+               w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2494,7 +2494,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( hb_vmPopLogical() )
             {
-               w += (signed char) pExecutionData->pCode[ w + 1 ];
+               w += (signed char) pCode[ w + 1 ];
             }
             else
             {
@@ -2508,7 +2508,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( hb_vmPopLogical() )
             {
-               w += HB_PCODE_MKSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+               w += HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             }
             else
             {
@@ -2522,7 +2522,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
             if( hb_vmPopLogical() )
             {
-               w += HB_PCODE_MKINT24( &pExecutionData->pCode[ w + 1 ] );
+               w += HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             else
             {
@@ -2588,7 +2588,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBYTE") );
 
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
-            ( * HB_VM_STACK.pPos )->item.asInteger.value = ( signed char ) pExecutionData->pCode[ w + 1 ];
+            ( * HB_VM_STACK.pPos )->item.asInteger.value = ( signed char ) pCode[ w + 1 ];
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
 
@@ -2599,7 +2599,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHINT") );
 
             ( * HB_VM_STACK.pPos )->type = HB_IT_INTEGER;
-            ( * HB_VM_STACK.pPos )->item.asInteger.value = HB_PCODE_MKSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            ( * HB_VM_STACK.pPos )->item.asInteger.value = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             ( * HB_VM_STACK.pPos )->item.asInteger.length = 10;
             hb_stackPush();
 
@@ -2610,9 +2610,9 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONG") );
 
 #if HB_INT_MAX >= INT32_MAX
-            hb_vmPushIntegerConst( ( int ) HB_PCODE_MKLONG( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPushIntegerConst( ( int ) HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
 #else
-            hb_vmPushLongConst( ( LONG ) HB_PCODE_MKLONG( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPushLongConst( ( LONG ) HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
 #endif
             w += 5;
             break;
@@ -2620,9 +2620,9 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_PUSHLONGLONG:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLONGLONG") );
 #if !defined( HB_LONG_LONG_OFF )
-            hb_vmPushLongLongConst( HB_PCODE_MKLONGLONG( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPushLongLongConst( HB_PCODE_MKLONGLONG( &pCode[ w + 1 ] ) );
 #else
-            hb_vmPushDoubleConst( HB_PCODE_MKLONGLONG( &pExecutionData->pCode[ w + 1 ] ),
+            hb_vmPushDoubleConst( HB_PCODE_MKLONGLONG( &pCode[ w + 1 ] ),
                                   HB_DEFAULT_WIDTH, HB_DEFAULT_DECIMALS );
 #endif
             w += 9;
@@ -2632,9 +2632,9 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_PUSHDOUBLE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHDOUBLE") );
 
-            hb_vmPushDoubleConst( HB_PCODE_MKDOUBLE( &pExecutionData->pCode[ w + 1 ] ),
-                                  ( int ) * ( BYTE * ) &pExecutionData->pCode[ w + 1 + sizeof( double ) ],
-                                  ( int ) * ( BYTE * ) &pExecutionData->pCode[ w + 1 + sizeof( double ) + sizeof( BYTE ) ] );
+            hb_vmPushDoubleConst( HB_PCODE_MKDOUBLE( &pCode[ w + 1 ] ),
+                                  ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) ],
+                                  ( int ) * ( BYTE * ) &pCode[ w + 1 + sizeof( double ) + sizeof( BYTE ) ] );
 
             w += 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE );
             break;
@@ -2642,15 +2642,15 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_PUSHSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTR") );
          {
-            USHORT uiSize = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
             if( bDynCode )
             {
-               hb_vmPushString( ( char * ) pExecutionData->pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
+               hb_vmPushString( ( char * ) pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
             }
             else
             {
-               hb_itemPushStaticString( ( char * ) pExecutionData->pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
+               hb_itemPushStaticString( ( char * ) pCode + w + 3, ( ULONG ) ( uiSize - 1 ) );
             }
 
             w += ( 3 + uiSize );
@@ -2660,15 +2660,15 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_PUSHSTRSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTRSHORT") );
          {
-            BYTE uiSize = pExecutionData->pCode[ w + 1 ];
+            BYTE uiSize = pCode[ w + 1 ];
 
             if( bDynCode )
             {
-               hb_vmPushString( ( char * ) pExecutionData->pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
+               hb_vmPushString( ( char * ) pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
             }
             else
             {
-               hb_itemPushStaticString( ( char * ) pExecutionData->pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
+               hb_itemPushStaticString( ( char * ) pCode + w + 2, ( ULONG ) ( uiSize - 1 ) );
             }
 
             w += ( 2 + uiSize );
@@ -2678,11 +2678,11 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_PUSHSTRHIDDEN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTRHIDDEN") );
          {
-            ULONG ulSize = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
-            ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 4 ] ) );
+            ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
+            ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 4 ] ) );
             BYTE *pBuffer;
 
-            pBuffer = hb_vmUnhideString( pExecutionData->pCode[ w + 3 ], ulSize, pExecutionData->pCode + w + 6, ulBufferLen );
+            pBuffer = hb_vmUnhideString( pCode[ w + 3 ], ulSize, pCode + w + 6, ulBufferLen );
 
             hb_stackPush();
             hb_itemPutCPtr( *( HB_VM_STACK.pPos - 1 ), ( char * ) pBuffer, ulSize - 1 );
@@ -2693,7 +2693,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PUSHBLOCK:
          {
-            USHORT usSize = HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] );
+            USHORT usSize = HB_PCODE_MKUSHORT( &pCode[ w + 1 ] );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCK") );
             /* +0    -> _pushblock
@@ -2702,20 +2702,20 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
              * +5 +6 -> number of referenced local variables
              * +7    -> start of table with referenced local variables
              */
-            hb_vmPushBlock( pExecutionData->pCode + w + 3, usSize - 3, bDynCode, pExecutionData->pSymbols, pExecutionData->pGlobals );
+            hb_vmPushBlock( pCode + w + 3, usSize - 3, bDynCode, pSymbols, pGlobals );
             w += usSize;
             break;
          }
 
          case HB_P_PUSHBLOCKSHORT:
          {
-            USHORT usSize = pExecutionData->pCode[ w + 1 ];
+            USHORT usSize = pCode[ w + 1 ];
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCKSHORT") );
             /* +0    -> _pushblock
              * +1    -> size of codeblock
              */
-            hb_vmPushBlockShort( pExecutionData->pCode + w + 2, usSize - 2, bDynCode, pExecutionData->pSymbols, pExecutionData->pGlobals );
+            hb_vmPushBlockShort( pCode + w + 2, usSize - 2, bDynCode, pSymbols, pGlobals );
             w += usSize;
             break;
          }
@@ -2741,13 +2741,13 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PUSHSYM:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSYM") );
-            hb_vmPushSymbol( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushSymbol( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHSYMNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSYMNEAR") );
-            hb_vmPushSymbol( pExecutionData->pSymbols + ( USHORT ) pExecutionData->pCode[ w + 1 ] );
+            hb_vmPushSymbol( pSymbols + ( USHORT ) pCode[ w + 1 ] );
             w += 2;
             break;
 
@@ -2759,19 +2759,19 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PUSHALIASEDFIELD:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ALIASFIELD") );
-            hb_vmPushAliasedField( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushAliasedField( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHALIASEDFIELDNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ALIASFIELDNEAR") );
-            hb_vmPushAliasedField( pExecutionData->pSymbols + pExecutionData->pCode[ w + 1 ] );
+            hb_vmPushAliasedField( pSymbols + pCode[ w + 1 ] );
             w += 2;
             break;
 
          case HB_P_PUSHALIASEDVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ALIASEDVAR") );
-            hb_vmPushAliasedVar( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushAliasedVar( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -2780,33 +2780,33 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* It pushes the current value of the given field onto the eval stack
              */
             hb_stackPush();
-            hb_rddGetFieldValue( hb_stackItemFromTop( -1 ), pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_rddGetFieldValue( hb_stackItemFromTop( -1 ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHGLOBAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBAL") );
-            //JC1: Should be threadsafe: pExecutionData->pCodes are done at compile time, and
+            //JC1: Should be threadsafe: pCodes are done at compile time, and
             // a clash with another thread here should just bring to a race,
             // not a crash; a race that must be resolved at PRG level.
-            hb_vmPush( (*pExecutionData->pGlobals)[ pExecutionData->pCode[ w + 1 ] ] );
+            hb_vmPush( (*pGlobals)[ pCode[ w + 1 ] ] );
             w += 2;
             break;
 
          case HB_P_PUSHGLOBALREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHGLOBALREF") );
             {
-               short iGlobal    = pExecutionData->pCode[ w + 1 ];
+               short iGlobal    = pCode[ w + 1 ];
                PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
 
                pTop->type = HB_IT_BYREF;
 
                pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
                pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
-               pTop->item.asRefer.BasePtr.itemsbasePtr = pExecutionData->pGlobals;
+               pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
 
 #ifdef HB_UNSHARE_REFERENCES
-               hb_itemUnShare( (*pExecutionData->pGlobals)[ iGlobal ] );
+               hb_itemUnShare( (*pGlobals)[ iGlobal ] );
 #endif
                hb_stackPush();
             }
@@ -2816,19 +2816,19 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PUSHLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCAL") );
-            hb_vmPushLocal( HB_PCODE_MKSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushLocal( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALNEAR") );
-            hb_vmPushLocal( ( signed char ) pExecutionData->pCode[ w + 1 ] );
+            hb_vmPushLocal( ( signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 
          case HB_P_LOCALNEARADD:
          {
-            PHB_ITEM pLocal = hb_itemUnRef( hb_stackItemFromBase( ( unsigned char ) pExecutionData->pCode[ w + 1 ] ) );
+            PHB_ITEM pLocal = hb_itemUnRef( hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] ) );
 
             hb_vmPlus( pLocal, hb_stackItemFromTop( -1 ), pLocal );
 
@@ -2840,8 +2840,8 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_LOCALNEARADDINT:
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( pExecutionData->pCode[ w + 1 ] );
-            int iAdd = HB_PCODE_MKSHORT( &pExecutionData->pCode[ w + 2 ] );
+            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            int iAdd = HB_PCODE_MKSHORT( &pCode[ w + 2 ] );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
 
@@ -2853,8 +2853,8 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_LOCALNEARSETINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pExecutionData->pCode[ w + 1 ] );
-               int iNewVal = HB_PCODE_MKSHORT( &( pExecutionData->pCode[ w + 2 ] ) );
+               PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
+               int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
 
                if( HB_IS_BYREF( pLocal ) )
                {
@@ -2877,8 +2877,8 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_LOCALNEARSETSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pExecutionData->pCode[ w + 1 ] );
-               USHORT uiSize = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 2 ] ) );
+               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
 
                if( HB_IS_BYREF( pLocal ) )
                {
@@ -2889,11 +2889,11 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
                {
                   if( bDynCode )
                   {
-                     hb_vmPushString( ( char * ) pExecutionData->pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                     hb_vmPushString( ( char * ) pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
                   }
                   else
                   {
-                     hb_itemPushStaticString( ( char * ) pExecutionData->pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
+                     hb_itemPushStaticString( ( char * ) pCode + w + 4, ( ULONG ) ( uiSize - 1 ) );
                   }
                   hb_vmOperatorCall( pLocal, hb_stackItemFromTop( -1 ), "__OPASSIGN", NULL, 1, pLocal );
                }
@@ -2901,11 +2901,11 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
                {
                   if( bDynCode )
                   {
-                     hb_itemPutCL( pLocal, ( char * ) ( pExecutionData->pCode ) + w + 4, uiSize - 1 );
+                     hb_itemPutCL( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
                   }
                   else
                   {
-                     hb_itemPutCRawStatic( pLocal, ( char * ) ( pExecutionData->pCode ) + w + 4, uiSize - 1 );
+                     hb_itemPutCRawStatic( pLocal, ( char * ) ( pCode ) + w + 4, uiSize - 1 );
                   }
                }
                w += ( 4 + uiSize );
@@ -2915,12 +2915,12 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_LOCALNEARSETSTRHIDDEN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTRHIDDEN") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pExecutionData->pCode[ w + 1 ] );
-               ULONG ulSize = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 2 ] ) );
-               ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 5 ] ) );
+               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
+               ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
                BYTE *pBuffer;
 
-               pBuffer = hb_vmUnhideString( pExecutionData->pCode[ w + 4 ], ulSize, pExecutionData->pCode + w + 7, ulBufferLen );
+               pBuffer = hb_vmUnhideString( pCode[ w + 4 ], ulSize, pCode + w + 7, ulBufferLen );
 
                if( HB_IS_BYREF( pLocal ) )
                {
@@ -2945,7 +2945,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ADDINT") );
             {
                PHB_ITEM pItem = hb_stackItemFromTop( -1 );
-               int iAdd = HB_PCODE_MKSHORT( &pExecutionData->pCode[ w + 1 ] );
+               int iAdd = HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
 
                hb_vmAddInt( pItem, iAdd );
                w += 3;
@@ -2956,7 +2956,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_SWITCHCASE") );
             {
                PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-               LONG lCase = HB_PCODE_MKLONG( &( pExecutionData->pCode[ w + 1 ] ) );
+               LONG lCase = HB_PCODE_MKLONG( &( pCode[ w + 1 ] ) );
 
                if( pTop->type & HB_IT_INTEGER )
                {
@@ -2986,7 +2986,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_LEFT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LEFT") );
             {
-               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                PHB_ITEM pString = hb_stackItemFromTop( -1 );
 
                if( HB_IS_STRING( pString ) )
@@ -3017,7 +3017,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_RIGHT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_RIGHT") );
             {
-               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+               USHORT iNewLen = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                PHB_ITEM pString = hb_stackItemFromTop( -1 );
 
                if( HB_IS_STRING( pString ) )
@@ -3039,32 +3039,32 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_PUSHLOCALREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALREF") );
-            hb_vmPushLocalByRef( HB_PCODE_MKSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushLocalByRef( HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHSTATIC:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTATIC") );
-            hb_vmPushStatic( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushStatic( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHSTATICREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTATICREF") );
-            hb_vmPushStaticByRef( HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushStaticByRef( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_PUSHMEMVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHMEMVAR") );
-            hb_memvarGetValue( ( * HB_VM_STACK.pPos ), pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_memvarGetValue( ( * HB_VM_STACK.pPos ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             hb_stackPush();
             w += 3;
             break;
 
          case HB_P_PUSHMEMVARREF:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHMEMVARREF") );
-            hb_memvarGetRefer( ( * HB_VM_STACK.pPos ), pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_memvarGetRefer( ( * HB_VM_STACK.pPos ), pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             hb_stackPush();
             w += 3;
             break;
@@ -3085,7 +3085,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHVARIABLE") );
             /* Push a value of variable of unknown type onto the eval stack
              */
-            hb_vmPushVariable( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPushVariable( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
@@ -3117,19 +3117,19 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_POPALIASEDFIELD:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPALIASEDFIELD") );
-            hb_vmPopAliasedField( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) ) );
+            hb_vmPopAliasedField( pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             w += 3;
             break;
 
          case HB_P_POPALIASEDFIELDNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPALIASEDFIELDNEAR") );
-            hb_vmPopAliasedField( pExecutionData->pSymbols + pExecutionData->pCode[ w + 1 ] );
+            hb_vmPopAliasedField( pSymbols + pCode[ w + 1 ] );
             w += 2;
             break;
 
          case HB_P_POPALIASEDVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPALIASEDVAR") );
-            hb_vmPopAliasedVar( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPopAliasedVar( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
@@ -3138,7 +3138,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* Pops a value from the eval stack and uses it to set
              * a new value of the given field
              */
-            hb_rddPutFieldValue( hb_stackItemFromTop(-1), pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_rddPutFieldValue( hb_stackItemFromTop(-1), pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             hb_stackPop();
 
             w += 3;
@@ -3147,23 +3147,22 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_POPGLOBAL:
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            BYTE iGlobal = pExecutionData->pCode[ w + 1 ];
+            PHB_ITEM pGlobal = (*pGlobals)[ pCode[ w + 1 ] ]
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
-            if( ( HB_IS_NUMBER( (*pExecutionData->pGlobals)[ iGlobal ] ) && HB_IS_NUMBER( *( HB_VM_STACK.pPos - 1 ) ) ) ||
-                ( (*pExecutionData->pGlobals)[ iGlobal ] )->type == pTop->type )
+            if( ( HB_IS_NUMBER( pGlobal ) && HB_IS_NUMBER( *( HB_VM_STACK.pPos - 1 ) ) ) || pGlobal->type == pTop->type )
             {
-               hb_itemForwardValue( (*pExecutionData->pGlobals)[ iGlobal ], pTop );
+               hb_itemForwardValue( pGlobal, pTop );
             }
-            else if( hb_objGetOpOver( (*pExecutionData->pGlobals)[ iGlobal ] ) & HB_CLASS_OP_ASSIGN )
+            else if( hb_objGetOpOver( pGlobal ) & HB_CLASS_OP_ASSIGN )
             {
-               hb_vmOperatorCall( (*pExecutionData->pGlobals)[ iGlobal ], pTop, "__OPASSIGN", NULL, 0, (*pExecutionData->pGlobals)[ iGlobal ] );
+               hb_vmOperatorCall( pGlobal, pTop, "__OPASSIGN", NULL, 0, pGlobal );
                hb_itemClear( pTop );
             }
             else
             {
-              hb_itemForwardValue( (*pExecutionData->pGlobals)[ iGlobal ], pTop );
+              hb_itemForwardValue( pGlobal, pTop );
             }
 
             hb_stackDec();
@@ -3174,25 +3173,25 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_POPLOCAL:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCAL") );
-            hb_vmPopLocal( HB_PCODE_MKSHORT( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPopLocal( HB_PCODE_MKSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
          case HB_P_POPLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCALNEAR") );
-            hb_vmPopLocal( ( signed char ) pExecutionData->pCode[ w + 1 ] );
+            hb_vmPopLocal( ( signed char ) pCode[ w + 1 ] );
             w += 2;  /* only first two bytes are used */
             break;
 
          case HB_P_POPSTATIC:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPSTATIC") );
-            hb_vmPopStatic( HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPopStatic( HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ) );
             w += 3;
             break;
 
          case HB_P_POPMEMVAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPMEMVAR") );
-            hb_memvarSetValue( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] ),
+            hb_memvarSetValue( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ),
                                hb_stackItemFromTop( -1 ) );
             hb_stackPop();
             w += 3;
@@ -3216,7 +3215,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
                  RETURN
             */
-            hb_memvarSetValue( pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &pExecutionData->pCode[ w + 1 ] ),
+            hb_memvarSetValue( pSymbols + HB_PCODE_MKUSHORT( &pCode[ w + 1 ] ),
                                hb_stackItemFromTop(-1) );
             hb_stackPop();
             w += 3;
@@ -3226,13 +3225,13 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MACROPOP:
             /* compile and run - pop a value from the stack */
-            hb_macroSetValue( hb_stackItemFromTop( -1 ), pExecutionData->pCode[ ++w ] );
+            hb_macroSetValue( hb_stackItemFromTop( -1 ), pCode[ ++w ] );
             w++;
             break;
 
          case HB_P_MACROPOPALIASED:
             /* compile and run - pop an aliased variable from the stack */
-            hb_macroPopAliasedValue( hb_stackItemFromTop( - 2  ), hb_stackItemFromTop( -1 ), pExecutionData->pCode[ ++w ] );
+            hb_macroPopAliasedValue( hb_stackItemFromTop( - 2  ), hb_stackItemFromTop( -1 ), pCode[ ++w ] );
             w++;
             break;
 
@@ -3241,7 +3240,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* the topmost element on the stack contains a macro
              * string for compilation
              */
-            hb_macroGetValue( hb_stackItemFromTop( -1 ), 0, pExecutionData->pCode[ ++w ] );
+            hb_macroGetValue( hb_stackItemFromTop( -1 ), 0, pCode[ ++w ] );
             w++;
             break;
 
@@ -3250,36 +3249,36 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* the topmost element on the stack contains a macro
              * string for compilation
              */
-            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHARG, pExecutionData->pCode[ ++w ] );
+            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHARG, pCode[ ++w ] );
             w++;
 
             if( HB_VM_STACK.iExtraParamsIndex && HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] == NULL )
             {
-               if( pExecutionData->pCode[w] == HB_P_PUSHSYMNEAR )
+               if( pCode[w] == HB_P_PUSHSYMNEAR )
                {
-                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pExecutionData->pSymbols + ( USHORT ) ( pExecutionData->pCode[w + 1] );
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pSymbols + ( USHORT ) ( pCode[w + 1] );
                   w += 2;
                }
-               else if( pExecutionData->pCode[w] == HB_P_MPUSHSYM )
+               else if( pCode[w] == HB_P_MPUSHSYM )
                {
-                  HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+                  HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
                   HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pDynSym->pSymbol;
                   w += sizeof( HB_DYNS_PTR ) + 1;
                }
                else
                {
-                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pExecutionData->pSymbols + HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+                  HB_VM_STACK.apExtraParamsSymbol[HB_VM_STACK.iExtraParamsIndex - 1] = pSymbols + HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
                   w += 3;
                }
             }
             else
             {
-               if( pExecutionData->pCode[w] == HB_P_PUSHSYMNEAR )
+               if( pCode[w] == HB_P_PUSHSYMNEAR )
                {
                   w += 2;
                }
-               else if( pExecutionData->pCode[w] == HB_P_MPUSHSYM )
+               else if( pCode[w] == HB_P_MPUSHSYM )
                {
                   w += sizeof( HB_DYNS_PTR ) + 1;
                }
@@ -3301,7 +3300,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* the topmost element on the stack contains a macro
              * string for compilation
              */
-            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHLIST, pExecutionData->pCode[ ++w ] );
+            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHLIST, pCode[ ++w ] );
             w++;
             break;
 
@@ -3316,7 +3315,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* the topmost element on the stack contains a macro
              * string for compilation
              */
-            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHINDEX, pExecutionData->pCode[ ++w ] );
+            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHINDEX, pCode[ ++w ] );
 
             if( HB_VM_STACK.iExtraIndex )
             {
@@ -3356,13 +3355,13 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
             /* the topmost element on the stack contains a macro
              * string for compilation
              */
-            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHPARE, pExecutionData->pCode[ ++w ] );
+            hb_macroGetValue( hb_stackItemFromTop( -1 ), HB_P_MACROPUSHPARE, pCode[ ++w ] );
             w++;
             break;
 
          case HB_P_MACROPUSHALIASED:
             /* compile and run - leave an aliased variable on the stack */
-            hb_macroPushAliasedValue( hb_stackItemFromTop( -2 ), hb_stackItemFromTop( -1 ), pExecutionData->pCode[ ++w ] );
+            hb_macroPushAliasedValue( hb_stackItemFromTop( -2 ), hb_stackItemFromTop( -1 ), pCode[ ++w ] );
             w++;
             break;
 
@@ -3384,7 +3383,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MMESSAGE:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
             hb_vmPushSymbol( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -3393,7 +3392,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPOPALIASEDFIELD:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
             hb_vmPopAliasedField( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
@@ -3402,7 +3401,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPOPALIASEDVAR:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_vmPopAliasedVar( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -3410,7 +3409,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPOPFIELD:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
 
             /* Pops a value from the eval stack and uses it to set
             * a new value of the given field
@@ -3424,7 +3423,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPOPMEMVAR:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             PHB_ITEM pTop;
 
             pTop = *( HB_VM_STACK.pPos - 1 );
@@ -3440,7 +3439,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHALIASEDFIELD:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_vmPushAliasedField( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -3448,7 +3447,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHALIASEDVAR:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_vmPushAliasedVar( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -3465,14 +3464,14 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
              * +3 +4 -> number of expected parameters
              * +5    -> pcode bytes
              */
-            hb_vmPushMacroBlock( ( BYTE * ) ( pExecutionData->pCode + w ), pExecutionData->pSymbols );
-            w += HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            hb_vmPushMacroBlock( ( BYTE * ) ( pCode + w ), pSymbols );
+            w += HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             break;
          }
 
          case HB_P_MPUSHFIELD:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             /* It pushes the current value of the given field onto the eval stack
             */
             hb_stackPush();
@@ -3484,7 +3483,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHMEMVAR:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_memvarGetValue( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushMemvar)"));
@@ -3494,7 +3493,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHMEMVARREF:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_memvarGetRefer( ( * HB_VM_STACK.pPos ), pDynSym->pSymbol );
             hb_stackPush();
             HB_TRACE(HB_TR_INFO, ("(hb_vmMPushMemvarRef)"));
@@ -3504,7 +3503,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHSYM:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_vmPushSymbol( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -3512,7 +3511,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
 
          case HB_P_MPUSHVARIABLE:
          {
-            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pExecutionData->pCode + w + 1 );
+            HB_DYNS_PTR pDynSym = ( HB_DYNS_PTR ) HB_GET_PTR( pCode + w + 1 );
             hb_vmPushVariable( pDynSym->pSymbol );
             w += sizeof( HB_DYNS_PTR ) + 1;
             break;
@@ -3521,9 +3520,9 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
          case HB_P_MPUSHSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MPUSHSTR") );
          {
-            USHORT uiSize = HB_PCODE_MKUSHORT( &( pExecutionData->pCode[ w + 1 ] ) );
+            USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
 
-            hb_vmPushString( ( char * ) ( pExecutionData->pCode + w + 3 ), ( ULONG )( uiSize - 1 ) );
+            hb_vmPushString( ( char * ) ( pCode + w + 3 ), ( ULONG )( uiSize - 1 ) );
 
             w += ( 3 + uiSize );
             break;
@@ -3545,7 +3544,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
                as for HB_P_ENDPROC, instead of this direct return, Druzus */
 
             /* end of a codeblock - stop evaluation */
-            if( pExecutionData->pSymbols )
+            if( pSymbols )
             {
                hb_memvarSetPrivatesBase( ulPrivateBase );
             }
@@ -3749,14 +3748,14 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
    HB_DISABLE_ASYN_CANC;
    HB_STACK_LOCK;
 
-   HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pExecutionData->pCode, pExecutionData->pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("DONE hb_vmExecute(%p, %p)", pCode, pSymbols));
 
-   if( pExecutionData->pSymbols )
+   if( pSymbols )
    {
       hb_memvarSetPrivatesBase( ulPrivateBase );
    }
 
-   HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pExecutionData->pCode, pExecutionData->pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("RESET PrivateBase hb_vmExecute(%p, %p)", pCode, pSymbols));
 
    // Reset FOR EACH.
    while( HB_VM_STACK.wEnumCollectionCounter > wEnumCollectionCounter )
@@ -3777,7 +3776,7 @@ void HB_EXPORT hb_vmExecute( PHB_EXECUTION_DATA pExecutionData )
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
 
-   //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pExecutionData->pCode, pExecutionData->pSymbols, pExecutionData->pGlobals );
+   //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
 }
 
 HB_FUNC( HB_VMEXECUTE )
@@ -3789,13 +3788,8 @@ HB_FUNC( HB_VMEXECUTE )
    if( szString )
    {
       LONG lOffset = hb_stackTopOffset();
-      HB_EXECUTION_DATA ExecutionData;
 
-      ExecutionData.pCode    = szString;
-      ExecutionData.pSymbols = (PHB_SYMB) hb_parptr(2);
-      ExecutionData.pGlobals = (PHB_ITEM **) hb_parptr(3);
-
-      hb_vmExecute( &ExecutionData );
+      hb_vmExecute( szString, (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) );
 
       if( hb_stackTopOffset() > lOffset )
       {
@@ -6848,14 +6842,8 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          //printf( "Doing: '%s'\n", pSym->szName );
          if ( pSym->scope.value & HB_FS_PCODEFUNC )
          {
-            HB_EXECUTION_DATA ExecutionData;
-
-            ExecutionData.pCode    = ( (PHB_PCODEFUNC) pFunc )->pCode;
-            ExecutionData.pSymbols = ( (PHB_PCODEFUNC) pFunc )->pSymbols;
-            ExecutionData.pGlobals = ( (PHB_PCODEFUNC) pFunc )->pGlobals;
-
             /* Running pCode dynamic function from .HRB */
-            hb_vmExecute( &ExecutionData );
+            hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals );
          }
          else
          {
@@ -7212,14 +7200,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {
             if( pSymbol->scope.value & HB_FS_PCODEFUNC )
             {
-               HB_EXECUTION_DATA ExecutionData;
-
-               ExecutionData.pCode    = ( (PHB_PCODEFUNC) pFunc )->pCode;
-               ExecutionData.pSymbols = ( (PHB_PCODEFUNC) pFunc )->pSymbols;
-               ExecutionData.pGlobals = ( (PHB_PCODEFUNC) pFunc )->pGlobals;
-
                /* Running pCode dynamic function from .HRB */
-               hb_vmExecute( &ExecutionData );
+               hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals );
             }
             else
             {
@@ -7346,7 +7328,6 @@ static HARBOUR hb_vmDoBlock( void )
    USHORT uiLine;
    int iParam;
    int iStatics;
-   HB_EXECUTION_DATA ExecutionData;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
 
@@ -7383,11 +7364,7 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.iStatics = pBlock->item.asBlock.statics;
 
-   ExecutionData.pCode    = pBlock->item.asBlock.value->pCode;
-   ExecutionData.pSymbols = pBlock->item.asBlock.value->pSymbols;
-   ExecutionData.pGlobals = pBlock->item.asBlock.value->pGlobals;
-
-   hb_vmExecute( &ExecutionData );
+   hb_vmExecute( pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->pSymbols, pBlock->item.asBlock.value->pGlobals );
 
    // Restore Statics context.
    HB_VM_STACK.iStatics = iStatics;

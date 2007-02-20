@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5333 2007/02/20 05:20:58 peterrees Exp $
+ * $Id: ChangeLog,v 1.5334 2007/02/20 09:42:22 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2007-02-20 12:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbsetup.h
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+    -* reverted recent hb_vmExecute() change
 
 2007-02-20 09:50 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/rdd/dbf1.c
