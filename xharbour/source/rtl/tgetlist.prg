@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.36 2006/03/25 20:29:55 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.37 2007/01/07 18:48:40 modalsist Exp $
  */
 
 /*
@@ -737,7 +737,7 @@ METHOD Settle( nPos, lInit ) CLASS HBGetList
 #else
 METHOD Settle( nPos ) CLASS HBGetList
 #endif
-   local nExitState
+   local nExitState := 0
 
    if nPos == NIL
       nPos := ::nPos

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5334 2007/02/20 09:42:22 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5335 2007/02/20 16:16:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-02-20 17:10 UTC-0300 Luiz Rafael Culik <luiz at xharbour.com.br>
+  * xharbour/source/rtl/tgetlist.prg
+    Fix bug on Settle function bu defaulting the nexitstate variable to 0, this fix
+    problems with @get pushbutton. problem reported by Basso, Luis Fernando
+    on xharbour.spanish.portuguese news
 
 2007-02-20 12:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbsetup.h
