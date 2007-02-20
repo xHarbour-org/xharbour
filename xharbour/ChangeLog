@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5330 2007/02/17 14:48:02 jfgimenez Exp $
+ * $Id: ChangeLog,v 1.5331 2007/02/19 10:50:19 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-20 18:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rff\dbf1.c
+    ! Fixed GPF in hb_dbfRecInfo() where uiInfoType == DBRI_RAWDATA || DBRI_RAWMEMOS
 
 2007-02-19 08:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg
@@ -24,7 +28,7 @@
       before/after tbcolumns evaluation.
     ! fixed to reset ::lhittop/::lhitbottom values to false before stabilization
       process.
-    * changed ::hittop and ::hitbottom DATA to ACCESS/ASSIGN.  
+    * changed ::hittop and ::hitbottom DATA to ACCESS/ASSIGN.
 
 2007-02-17 15:45 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
   * source/rtl/win32ole.prg
