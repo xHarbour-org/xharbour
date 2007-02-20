@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.39 2007/01/30 20:01:24 modalsist Exp $
+ * $Id: dbedit.prg,v 1.40 2007/02/19 10:51:16 modalsist Exp $
  */
 
 /*
@@ -375,7 +375,7 @@ LOCAL oTBR,;
 
  // xHarbour extension: Initialization call
  //
- _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
+ nRet := _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
 
  oTBR:refreshAll()
  oTBR:invalidate()
@@ -612,12 +612,15 @@ LOCAL nRet, nRec, nKey
   IF nMode == DE_EXCEPT
      oTBR:ColorRect({oTBR:rowpos,oTBR:colpos,oTBR:rowpos,oTBR:colpos},{2,1})
   ELSEIF nMode == DE_INIT
-     oTBR:ForceStable()
      nKey := NextKey()
+     if nKey == K_ENTER .or. nKey == K_ESC
+        Return DE_ABORT
+     endif
+     oTBR:ForceStable()
      while nKey != 0
-       oTbr:ApplyKey( nKey )
-       inkey()
-       nKey := NextKey()
+        oTbr:ApplyKey( nKey )
+        inkey()
+        nKey := NextKey()
      enddo
   ENDIF
 
