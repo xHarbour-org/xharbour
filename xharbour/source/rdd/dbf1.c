@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.162 2007/01/11 01:00:35 druzus Exp $
+ * $Id: dbf1.c,v 1.163 2007/02/20 05:16:51 peterrees Exp $
  */
 
 /*
@@ -1483,7 +1483,11 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             switch( pField->uiLen )
             {
                case 1:
+                  #if defined( HB_DONT_DEFINE_BASIC_TYPES )
+                  dValue = ( signed char ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ];
+                  #else
                   dValue = ( SCHAR ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ];
+                  #endif
                   iLen = 4;
                   break;
                case 2:
@@ -1516,7 +1520,11 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
             switch( pField->uiLen )
             {
                case 1:
+                  #if defined( HB_DONT_DEFINE_BASIC_TYPES )
+                  hb_itemPutNILen( pItem, ( signed char ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ], 4 );
+                  #else
                   hb_itemPutNILen( pItem, ( SCHAR ) pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ], 4 );
+                  #endif
                   break;
                case 2:
                   hb_itemPutNILen( pItem, ( int ) HB_GET_LE_INT16( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ), 6 );
