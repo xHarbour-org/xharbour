@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.596 2007/02/16 00:47:08 ronpinkas Exp $
+ * $Id: hvm.c,v 1.597 2007/02/20 16:16:55 ronpinkas Exp $
  */
 
 /*
@@ -9245,13 +9245,13 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
 
       if( fPublic )
       {
-         if( fDynLib )
+         if( fDynLib && ( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) ) )
          {
             PHB_DYNS pDynSym;
 
             pDynSym = hb_dynsymFind( pSymbol->szName );
 
-             if( fDynLib && ( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) ) )
+            if( pDynSym )
             {
                pSymbol->pDynSym = pDynSym;
 
