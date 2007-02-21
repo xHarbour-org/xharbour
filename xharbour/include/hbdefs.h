@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.86 2006/10/28 14:41:54 ptsarenko Exp $
+ * $Id: hbdefs.h,v 1.87 2007/01/11 01:00:34 druzus Exp $
  */
 
 /*
@@ -249,6 +249,18 @@
       #endif
    #endif
 #endif /* HB_LONG_LONG_OFF */
+
+#else  /* HB_DONT_DEFINE_BASIC_TYPES */
+
+   /* 21/02/07 - <maurilio.longo@libero.it>
+                 Needed when HB_DONT_DEFINE_BASIC_TYPES is defined but
+                 some definition is missing from the include files which
+                 require the use of HB_DONT_DEFINE_BASIC_TYPES in the first place.
+                 Here SCHAR is needed using GCC on OS/2
+   */
+   #if ! defined( SCHAR )
+      typedef signed char SCHAR;          /* 1 byte signed */
+   #endif
 
 #endif /* HB_DONT_DEFINE_BASIC_TYPES */
 
