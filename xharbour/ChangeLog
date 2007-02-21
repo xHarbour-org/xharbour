@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5339 2007/02/21 14:29:09 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5340 2007/02/21 18:58:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-02-22 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    ! METHOD StartPage() - added lChangeDP to simplify logic
+    ! Set default values VAR fDuplexType & fPrintQuality INIT 0
+      * The document propertys should be left as printer default unless
+        expressly requested to be changed by the programmer
+        ( only some printers support duplex mode )
+    ! HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
+      * do not set properties where parameter is zero ( 0 )
+        WIN32 SDK does not show any properties as == 0
+        This change fixes weird results on some of our client
+        printers.
 
 2007-02-21 14:57 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexpra.c

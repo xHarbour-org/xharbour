@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.20 2006/01/15 20:29:02 peterrees Exp $
+ * $Id: win32prn.prg,v 1.21 2006/12/10 12:33:36 ptsarenko Exp $
  */
 
 /*
@@ -110,6 +110,35 @@
 #define PHYSICALOFFSETY 113 // Physical Printable Area y margin
 #define SCALINGFACTORX  114 // Scaling factor x
 #define SCALINGFACTORY  115 // Scaling factor y
+
+/* bin selections */
+#define DMBIN_FIRST         DMBIN_UPPER
+#define DMBIN_UPPER         1
+#define DMBIN_ONLYONE       1
+#define DMBIN_LOWER         2
+#define DMBIN_MIDDLE        3
+#define DMBIN_MANUAL        4
+#define DMBIN_ENVELOPE      5
+#define DMBIN_ENVMANUAL     6
+#define DMBIN_AUTO          7
+#define DMBIN_TRACTOR       8
+#define DMBIN_SMALLFMT      9
+#define DMBIN_LARGEFMT      10
+#define DMBIN_LARGECAPACITY 11
+#define DMBIN_CASSETTE      14
+#define DMBIN_FORMSOURCE    15
+#define DMBIN_LAST          DMBIN_FORMSOURCE
+
+/* print qualities */
+#define DMRES_DRAFT         (-1)
+#define DMRES_LOW           (-2)
+#define DMRES_MEDIUM        (-3)
+#define DMRES_HIGH          (-4)
+
+/* duplex enable */
+#define DMDUP_SIMPLEX    1
+#define DMDUP_VERTICAL   2
+#define DMDUP_HORIZONTAL 3
 
 #define MM_TO_INCH 25.4
 
@@ -224,10 +253,10 @@ CLASS WIN32PRN
   VAR fCharWidth     INIT 0      HIDDEN
   VAR BitmapsOk      INIT .F.
   VAR NumColors      INIT 1
-  VAR fDuplexType    INIT 1      HIDDEN              //DMDUP_SIMPLEX
-  VAR fPrintQuality  INIT -4     HIDDEN              //DMRES_HIGH
-  VAR fNewDuplexType INIT 1      HIDDEN
-  VAR fNewPrintQuality INIT -4   HIDDEN
+  VAR fDuplexType    INIT 0      HIDDEN              //DMDUP_SIMPLEX, 22/02/2007 change to 0 to use default printer settings
+  VAR fPrintQuality  INIT 0     HIDDEN              //DMRES_HIGH, 22/02/2007 change to 0 to use default printer settings
+  VAR fNewDuplexType INIT 0      HIDDEN
+  VAR fNewPrintQuality INIT 0   HIDDEN
   VAR fOldLandScape  INIT .F.    HIDDEN
   VAR fOldBinNumber  INIT 0      HIDDEN
   VAR fOldFormType   INIT 0      HIDDEN
@@ -330,22 +359,28 @@ METHOD EndDoc(lAbortDoc) CLASS WIN32PRN
 
 METHOD StartPage() CLASS WIN32PRN
   LOCAL lLLandScape, nLBinNumber, nLFormType, nLDuplexType, nLPrintQuality
+  LOCAL lChangeDP:= .F.
   IF ::LandScape <> ::fOldLandScape  // Direct-modify property
     lLLandScape:= ::fOldLandScape := ::LandScape
+    lChangeDP:= .T.
   ENDIF
   IF ::BinNumber <> ::fOldBinNumber  // Direct-modify property
     nLBinNumber:= ::fOldBinNumber := ::BinNumber
+    lChangeDP:= .T.
   ENDIF
   IF ::FormType <> ::fOldFormType  // Direct-modify property
     nLFormType:= ::fOldFormType := ::FormType
+    lChangeDP:= .T.
   ENDIF
   IF ::fDuplexType <> ::fNewDuplexType  // Get/Set property
     nLDuplexType:= ::fDuplexType:= ::fNewDuplexType
+    lChangeDP:= .T.
   ENDIF
   IF ::fPrintQuality <> ::fNewPrintQuality  // Get/Set property
     nLPrintQuality:= ::fPrintQuality:= ::fNewPrintQuality
+    lChangeDP:= .T.
   ENDIF
-  IF lLLandScape <> NIL .or. nLBinNumber <> NIL .or. nLFormType <> NIL .or. nLDuplexType <> NIL .or. nLPrintQuality <> NIL
+  IF lChangeDP
     SetDocumentProperties(::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality)
   ENDIF
   StartPage(::hPrinterDC)
@@ -952,35 +987,29 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
         if (pDevMode )
         {
           DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,DM_OUT_BUFFER) ;
-          if (ISNUM(3) ) //&& hb_parnl(3) > 0)
+          if ( ISNUM(3) && hb_parnl(3) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmPaperSize     = ( short ) hb_parnl(3) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_PAPERSIZE ;
           }
           if (ISLOG(4))
           {
             pDevMode->dmOrientation   = ( short ) (hb_parl(4) ? 2 : 1) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_ORIENTATION ;
           }
           if (ISNUM(5) && hb_parnl(5) > 0)
           {
             pDevMode->dmCopies        = ( short ) hb_parnl(5) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_COPIES ;
           }
-          if (ISNUM(6) ) //&& hb_parnl(6) > 0)
+          if ( ISNUM(6) && hb_parnl(6) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmDefaultSource = ( short ) hb_parnl(6) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_DEFAULTSOURCE ;
           }
-          if (ISNUM(7) ) //&& hb_parnl(7) > 0)
+          if (ISNUM(7)  && hb_parnl(7) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmDuplex = ( short ) hb_parnl(7) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_DUPLEX ;
           }
-          if (ISNUM(8) ) //&& hb_parnl(8) <> 0)
+          if (ISNUM(8) && hb_parnl(8) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmPrintQuality = ( short ) hb_parnl(8) ;
-//            pDevMode->dmFields = pDevMode->dmFields || DM_PRINTQUALITY ;
           }
           Result= (BOOL) ResetDC(hDC, pDevMode) ;
           hb_xfree(pDevMode) ;
