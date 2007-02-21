@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5340 2007/02/21 18:58:03 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5341 2007/02/21 19:50:52 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-02-22 12:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/gtwvt/gtwvt.c
+    * revert default font to "Terminal", height 12 width 8
+      640 X 480 display mode now works with default setmode( 25,80 ) - Clipper compatible
+
 2007-02-22 09:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     ! METHOD StartPage() - added lChangeDP to simplify logic

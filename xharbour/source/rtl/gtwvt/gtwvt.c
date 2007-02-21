@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.168 2006/03/25 18:06:43 bdj Exp $
+ * $Id: gtwvt.c,v 1.169 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -3033,11 +3033,11 @@ static void gt_hbInitStatics( void )
   // THEESE are the default font parameters, if not changed by user
   _s.PTEXTSIZE.x      = 8;
   _s.PTEXTSIZE.y      = 12;
-  _s.fontHeight       = 20;
-  _s.fontWidth        = 10;
+  _s.fontHeight       = 12;
+  _s.fontWidth        = 8;
   _s.fontWeight       = FW_NORMAL;
   _s.fontQuality      = DEFAULT_QUALITY;
-  strcpy( _s.fontFace,"Courier New" );
+  strcpy( _s.fontFace,"Terminal";
 
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
