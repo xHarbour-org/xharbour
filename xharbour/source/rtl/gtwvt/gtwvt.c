@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.169 2006/07/16 19:48:57 druzus Exp $
+ * $Id: gtwvt.c,v 1.170 2007/02/21 22:44:41 peterrees Exp $
  */
 
 /*
@@ -3037,7 +3037,7 @@ static void gt_hbInitStatics( void )
   _s.fontWidth        = 8;
   _s.fontWeight       = FW_NORMAL;
   _s.fontQuality      = DEFAULT_QUALITY;
-  strcpy( _s.fontFace,"Terminal";
+  strcpy( _s.fontFace,"Terminal" );
 
   _s.LastMenuEvent    = 0;
   _s.MenuKeyEvent     = 1024;
