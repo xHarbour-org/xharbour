@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5338 2007/02/21 09:26:34 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5339 2007/02/21 14:29:09 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-02-21 14:57 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbexpra.c
+  * source/compiler/expropta.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    + Added support for unnamed parameters in codeblock as per Mindaugas's proposal
+      to avoid warning of unused argument
+
+  * source/vm/hvm.c
+    * register qualifier tp pcode and symbols arguments of hb_vmExecute()
 
 2007-02-21 15:30 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * source/vm/hvm.c

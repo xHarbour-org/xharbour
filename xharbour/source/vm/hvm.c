@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.597 2007/02/20 16:16:55 ronpinkas Exp $
+ * $Id: hvm.c,v 1.598 2007/02/21 14:29:09 mauriliolongo Exp $
  */
 
 /*
@@ -1035,7 +1035,7 @@ int HB_EXPORT hb_vmQuit( void )
    return s_iErrorLevel;
 }
 
-void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
 {
    HB_THREAD_STUB
 

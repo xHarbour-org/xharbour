@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.106 2007/02/13 23:40:59 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.107 2007/02/14 10:36:34 marchuet Exp $
  */
 
 /*
@@ -1642,6 +1642,7 @@ BlockExpList : Expression                  { pBlockSimple = $1;   $$ = hb_compEx
  */
 
 BlockVarList : IdentName AsType                   { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $1, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
+             | /* Unnamed Arg*/ ',' { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, NULL, hb_comp_cVarType ); hb_comp_cVarType = ' '; } BlockVarList
              | BlockVarList ',' IdentName AsType  { hb_comp_iVarScope = VS_LOCAL; $$ = hb_compExprCBVarAdd( $<asExpr>0, $3, hb_comp_cVarType ); hb_comp_cVarType = ' '; }
              ;
 

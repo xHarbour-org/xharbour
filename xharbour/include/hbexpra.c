@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.20 2005/11/03 06:54:36 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.21 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -200,11 +200,15 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
       pVar = ( HB_CBVAR_PTR ) pCB->value.asList.pIndex;
       while( pVar )
       {
-         if( strcmp( szVarName, pVar->szName ) == 0 )
+         if( pVar->szName && strcmp( szVarName, pVar->szName ) == 0 )
+         {
             hb_compErrorDuplVar( szVarName );
+         }
 
          if( pVar->pNext )
+         {
             pVar = pVar->pNext;
+         }
          else
          {
 #ifdef HB_MACRO_SUPPORT

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.142 2007/02/13 23:40:59 ronpinkas Exp $
+ * $Id: harbour.c,v 1.143 2007/02/14 10:36:34 marchuet Exp $
  */
 
 /*
@@ -4256,7 +4256,7 @@ static void hb_compCheckDuplVars( PVAR pVar, char * szVarName )
 {
    while( pVar )
    {
-      if( ! strcmp( pVar->szName, szVarName ) )
+      if( pVar->szName && strcmp( pVar->szName, szVarName ) == 0 )
       {
          hb_compErrorDuplVar( szVarName );
          break;
