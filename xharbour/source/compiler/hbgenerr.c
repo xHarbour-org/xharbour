@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.23 2006/02/21 19:37:07 druzus Exp $
+ * $Id: hbgenerr.c,v 1.24 2006/04/24 07:30:16 ronpinkas Exp $
  */
 
 /*
@@ -99,7 +99,8 @@ char * hb_comp_szErrors[] =
    "Unterminated /* */ comment",
    "Memory buffer overflow",
    "Memory corruption detected",
-   "TRY section requires a CATCH or FINALLY handler"
+   "TRY section requires a CATCH or FINALLY handler",
+   "Invalid use of nameless parameter"
 };
 
 /* Table with parse warnings */

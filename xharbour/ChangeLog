@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5342 2007/02/21 22:44:40 peterrees Exp $
+ * $Id: ChangeLog,v 1.5343 2007/02/21 22:50:04 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-21 21:54 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hberrors.h
+    + Added: #define HB_COMP_ERR_NAMELESS_PARAM              68
+  * source/compiler/hbgenerr.c
+    + Added: "Invalid use of nameless parameter"
+  * source/compiler/expropta.c
+  * include/hbexpra.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    * Corrections to recent commit
+
 2007-02-22 12:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/gtwvt/gtwvt.c
     * fix typo in last commit
