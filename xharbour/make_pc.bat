@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.13 2006/11/06 10:20:14 marchuet Exp $
+rem $Id: make_pc.bat,v 1.14 2006/11/11 13:31:56 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -45,8 +45,8 @@ REM *****************************************
 REM *** If necessary, change only 3 next sets
 REM *****************************************
 
-SET HB_DIR=.\
-SET POCC_DIR=C:\PellesC
+IF %POCC_DIR%.==. SET HB_DIR=.\
+IF %POCC_DIR%.==. SET POCC_DIR=C:\PellesC
 SET BISON_DIR=C:\Bison
 
 REM *******************************
@@ -66,7 +66,7 @@ SET OBJ_DIR=%HB_DIR%\obj\pocc
 SET LIB_DIR=%HB_DIR%\lib\pocc
 SET BIN_DIR=%HB_DIR%\bin\pocc
 
-SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
+IF %BISON_SIMPLE%.==. SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 
 if "%1" == "clean"  goto CLEAN
@@ -355,8 +355,8 @@ if "%1" == "MT"  goto MT
 
 :EXIT
 
-SET POCC_DIR=
-SET HB_DIR=
+rem SET POCC_DIR=
+rem SET HB_DIR=
 SET BISON_DIR=
 SET BISON_SIMPLE=
 

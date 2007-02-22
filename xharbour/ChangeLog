@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5343 2007/02/21 22:50:04 peterrees Exp $
+ * $Id: ChangeLog,v 1.5344 2007/02/22 01:55:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-22 21:07 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * ./make_pc.bat
+    * POCC_DIR, HB_DIR and BISON_SIMPLE environment variables can now
+      be set prior to make_pc.bat call for custom directories.
 
 2007-02-21 21:54 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hberrors.h
