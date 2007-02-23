@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5344 2007/02/22 01:55:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5345 2007/02/22 15:16:46 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-24 00:55 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
+   * utils/hbmake/hbmake.prg
+     + added macro resolution to "#DEPENDS" file scan at edit time
 
 2007-02-22 21:07 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./make_pc.bat

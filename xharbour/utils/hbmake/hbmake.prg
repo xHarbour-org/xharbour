@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.177 2006/12/10 12:33:36 ptsarenko Exp $
+ * $Id: hbmake.prg,v 1.178 2007/01/13 09:13:47 enricomaria Exp $
  */
 
 /*
@@ -2881,7 +2881,7 @@ FUNCTION CreateMakeFile( cFile )
       IF Len( s_aPrgs ) = Len( s_aObjs )
          Attention("Scanning .PRG sources...",19)
          FOR nPos := 1 to Len(s_aPrgs)
-            cIncl := ScanInclude( s_aPrgs[ nPos ], lScanIncRecursive, cExcludeExts )
+            cIncl := ScanInclude( ReplaceMacros( s_aPrgs[ nPos ] ), lScanIncRecursive, cExcludeExts )
             // Only add in list if dependencies exist
             IF ! Empty(cIncl)
                FWrite( s_nMakeFileHandle, s_aObjs[ nPos ] + ': ' + Alltrim( cIncl ) + CRLF, "" )
