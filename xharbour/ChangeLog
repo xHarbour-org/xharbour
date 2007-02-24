@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5345 2007/02/22 15:16:46 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5346 2007/02/23 23:59:35 fperillo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-25 00:55 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
+   * utils/hbmake/hbmake.prg
+     * now opens edit mode only if a -e switch is passed, not based on
+       pcount()
 
 2007-02-24 00:55 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
    * utils/hbmake/hbmake.prg

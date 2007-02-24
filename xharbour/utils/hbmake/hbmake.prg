@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.178 2007/01/13 09:13:47 enricomaria Exp $
+ * $Id: hbmake.prg,v 1.179 2007/02/23 23:59:36 fperillo Exp $
  */
 
 /*
@@ -73,6 +73,7 @@ New Core vars should only be added on this section
 
 STATIC s_cHbMakeVersion  := "1.17"
 STATIC s_lPrint          := .F.
+STATIC s_lEdit           := .F.
 STATIC s_aDefines        := {}
 STATIC s_aBuildOrder     := {}
 STATIC s_aCommands       := {}
@@ -365,7 +366,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    // Edit/Create MakeFile...
 
-   if !s_lForce .and. PCount() > 1
+   if !s_lForce .and. s_lEdit  // PCount() > 1
 
       if Hb_IsNil(s_lGenppo) .OR. s_lGenppo == .F.
          Delete_ppo()
@@ -5065,6 +5066,7 @@ FUNCTION ProcessParameters( cParams )
          cParams := Strtran( cParams, "-EL", "" )
       ENDIF
 
+      s_lEdit     := .T.
       s_lExtended := .T.
       s_lLibrary  := .T.
       s_cMakeFileName := "makelib.lnk"
@@ -5080,6 +5082,7 @@ FUNCTION ProcessParameters( cParams )
          cParams := Strtran( cParams, "-E", "" )
       ENDIF
 
+      s_lEdit     := .T.
       s_lExtended := .T.
 
    ENDIF
@@ -5436,6 +5439,7 @@ FUNCTION ResetInternalVars()
 *---------------------------
 
    s_lPrint        := .F.
+   s_lEdit         := .F.
    s_aDefines      := {}
    s_aBuildOrder   := {}
    s_aCommands     := {}
