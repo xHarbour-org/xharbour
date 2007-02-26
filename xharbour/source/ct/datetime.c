@@ -1,5 +1,5 @@
 /*
- * $Id: datetime.c,v 1.3 2005/10/24 01:04:25 druzus Exp $
+ * $Id: datetime.c,v 1.4 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -7,6 +7,7 @@
  *   CT3 Date & Time functions: - BOM() / EOM()
  *                              - BOQ() / EOQ()
  *                              - BOY() / EOY()
+ *                              - WOM() 
  *
  * Copyright 2005 Pavel Tsarenko <tpe2@mail.ru>
  * www - http://www.harbour-project.org
@@ -71,37 +72,57 @@
 
 HB_FUNC( BOM )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
-      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
-      hb_retd( iYear, iMonth, 1);
+     hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+     hb_retd( iYear, iMonth, 1);
    }
    else
    {
       hb_retdl( 0 );
    }
+
 }
+
 
 HB_FUNC( EOM )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
-      hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
-      iMonth ++;
-      if( iMonth > 12)
-      {
-         iMonth = 1;
-         iYear ++;
-      }
-      hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1);
+     hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
+     iMonth ++;
+     if( iMonth > 12)
+     {
+       iMonth = 1;
+       iYear ++;
+     }
+     hb_retdl( hb_dateEncode( iYear, iMonth, 1 ) - 1);
    }
    else
    {
@@ -111,12 +132,21 @@ HB_FUNC( EOM )
 
 HB_FUNC( BOQ )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       iMonth -= ( iMonth - 1 ) % 3;
 
@@ -130,11 +160,21 @@ HB_FUNC( BOQ )
 
 HB_FUNC( EOQ )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
 
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       iMonth += 3 - ( ( iMonth - 1 ) % 3 );
@@ -153,12 +193,21 @@ HB_FUNC( EOQ )
 
 HB_FUNC( BOY )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       hb_retd( iYear, 1, 1 );
    }
@@ -170,12 +219,21 @@ HB_FUNC( BOY )
 
 HB_FUNC( EOY )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       hb_retdl( hb_dateEncode( iYear + 1, 1, 1 ) - 1 );
    }
@@ -201,15 +259,26 @@ static int hb_wom( int iYear, int iMonth, int iDay )
 
 HB_FUNC( WOM )
 {
-   LONG lDate = hb_pardl( 1 );
+   LONG lDate;
+   int iYear, iMonth, iDay;
+
+   if( ISNIL(1) )
+   {
+      hb_dateToday( &iYear, &iMonth, &iDay );
+      lDate = hb_dateEncode(iYear, iMonth, iDay);
+   }
+   else
+   {
+      lDate = hb_pardl( 1 );
+   }
 
    if( lDate != 0 )
    {
-      int iYear, iMonth, iDay;
-
       hb_dateDecode( lDate, &iYear, &iMonth, &iDay );
       hb_retni( hb_wom( iYear, iMonth, iDay ) );
    }
    else
+   {
       hb_retni( 0 );
+   }
 }

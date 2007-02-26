@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5347 2007/02/24 23:56:17 fperillo Exp $
+ * $Id: ChangeLog,v 1.5348 2007/02/26 03:18:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-26 10:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/achoice.prg
+    ! fixed <acMenuItems> parameter verification.
+  * source/ct/datetime.c
+    ! fixed to use system date if <dDate> parameter is omitted at
+      BOM()/EOM(), BOQ()/EOQ(), BOY()/EOY() and WOM() functions.
+      Bug reported by Saulius in the xharbour news.
 
 2007-02-25 23:17 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexpra.c

@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.32 2006/11/14 11:31:00 modalsist Exp $
+ * $Id: achoice.prg,v 1.33 2007/02/19 10:51:16 modalsist Exp $
  */
 
 /*
@@ -106,8 +106,6 @@ DEFAULT nRight  TO 0
         For Each xItem In acItems
             If !Hb_IsString( xItem )
                Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
-            Elseif Empty( xItem )
-               Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> can not have an empty string" ) )
             Endif
         Next
      Endif
