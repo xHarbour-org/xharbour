@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5349 2007/02/26 15:05:33 modalsist Exp $
+ * $Id: ChangeLog,v 1.5350 2007/02/26 22:04:05 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-26 18:25 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbexpra.c
+    * Maintain right association of .AND. and .OR. sequences only if logic shortcut is enabled.
+  * source/vm/errorapi.c
+    * Generate internal error when error object can not be generated due to pending hb_vmRequestQuery()
 
 2007-02-26 22:58 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/compiler/hbdead.c

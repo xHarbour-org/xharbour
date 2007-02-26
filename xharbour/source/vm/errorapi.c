@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.76 2006/08/21 15:16:46 walito Exp $
+ * $Id: errorapi.c,v 1.77 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -1131,6 +1131,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New(
 
    if( hb_vmRequestQuery() )
    {
+      TraceLog( "error.log", "hb_vmRequestQuery() %i for: %s/%i %s '%s'\n", hb_vmRequestQuery(), ( szSubSystem ? szSubSystem : HB_ERR_SS_BASE ), ulSubCode, ( szOperation ? szOperation : "" ), ( szDescription ? szDescription : ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRDESC + ulGenCode ) ) );
+      hb_errInternal( HB_EI_ERRUNRECOV, "hb_vmRequestQuery() is set - Couldn't create error %s '%s'", szOperation, szDescription );
       return NULL;
    }
 
@@ -1175,6 +1177,8 @@ PHB_ITEM HB_EXPORT hb_errRT_New_Subst(
 
    if( hb_vmRequestQuery() )
    {
+      TraceLog( "error.log", "hb_vmRequestQuery() %i for: %s/%i %s '%s'\n", hb_vmRequestQuery(), ( szSubSystem ? szSubSystem : HB_ERR_SS_BASE ), ulSubCode, ( szOperation ? szOperation : "" ), ( szDescription ? szDescription : ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_ERRDESC + ulGenCode ) ) );
+      hb_errInternal( HB_EI_ERRUNRECOV, "hb_vmRequestQuery() is set - Couldn't create error %s '%s'", szOperation, szDescription );
       return NULL;
    }
 

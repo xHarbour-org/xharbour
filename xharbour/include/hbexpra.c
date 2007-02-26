@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.23 2007/02/22 01:55:14 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.24 2007/02/26 03:18:27 ronpinkas Exp $
  */
 
 /*
@@ -476,7 +476,7 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
        */
       BYTE ucLeft = s_PrecedTable[ pExpr->ExprType ];
 
-      if( ucLeft == ucRight && ( ucLeft == HB_EO_OR || ucLeft == HB_EO_AND ) )
+      if( hb_comp_bShortCuts && ucLeft == ucRight && ( ucLeft == HB_EO_OR || ucLeft == HB_EO_AND ) )
       {
          pExpr->value.asOperator.pRight = pItem;
       }
