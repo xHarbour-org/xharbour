@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5346 2007/02/23 23:59:35 fperillo Exp $
+ * $Id: ChangeLog,v 1.5347 2007/02/24 23:56:17 fperillo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-25 23:17 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbexpra.c
+    * Maintain right association of .AND. and .OR. sequences
+  * include/hbexprb.c
+    * When logicals shortcus enabled do not use HB_P_OR to avoid double checking of first item and to be Clipper implementation compatible
+
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+    * Compiler warnings
+
+  * source/rtl/console.c
+    * Call hb_gtAdjustPos() _fileno( stdout ) instead of s_iFilenoStdout when #if defined( HB_WIN32_IO )
+      This fixes GPF due to file handle validation in MSVC (f.e. hbtest > hbtest.log  redirection)
+      /* GT developers please review. */
+
+  * include/hbvm.h
+  * source/vm/hvm.c
+    + HB_EXPORT to hb_vmRequestDebug()
 
 2007-02-25 00:55 UTC+0100 Francesco Perillo <mc8647/at/mclink.it>
    * utils/hbmake/hbmake.prg
@@ -266,6 +285,7 @@
   * source/rtl/inkey.c
     ! HB_FUNC( __KEYBOARD )
         Fix to previous change
+
 2007-02-09 12:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/inkey.c
     ! HB_FUNC( __KEYBOARD )

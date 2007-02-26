@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.127 2007/02/15 21:55:20 ronpinkas Exp $
+ * $Id: genc.c,v 1.128 2007/02/20 16:16:55 ronpinkas Exp $
  */
 
 /*
@@ -302,7 +302,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          {
             PCOMSYMBOL pSym;
 
-            if( ( pSym = hb_compSymbolFind( pFunc->szName, NULL, TRUE ) ) && ( pSym->cScope & HB_FS_DEFERRED ) )
+            if( ( ( pSym = hb_compSymbolFind( pFunc->szName, NULL, TRUE ) ) != NULL ) && ( pSym->cScope & HB_FS_DEFERRED ) )
             {
                 // Skip!
             }

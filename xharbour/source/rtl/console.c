@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.62 2006/03/25 02:22:40 druzus Exp $
+ * $Id: console.c,v 1.63 2006/05/19 00:44:36 druzus Exp $
  */
 /*
  * Harbour Project source code:
@@ -269,7 +269,11 @@ void hb_conOutStd( const char * pStr, ULONG ulLen )
 
    if( s_bInit )
    {
-      hb_gtAdjustPos( (int) s_iFilenoStdout, pStr, ulLen );
+      #if defined( HB_WIN32_IO )         
+         hb_gtAdjustPos( _fileno( stdout ), pStr, ulLen );
+      #else
+         hb_gtAdjustPos( (int) s_iFilenoStdout, pStr, ulLen );
+      #endif
       hb_gtPostExt();
    }
 }

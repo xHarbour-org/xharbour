@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.111 2006/07/10 12:42:23 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.112 2007/01/11 01:00:34 druzus Exp $
  */
 
 /*
@@ -3593,8 +3593,8 @@ static HB_EXPR_FUNC( hb_compExprUseOr )
             HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
             lEndPos = HB_EXPR_PCODE1( hb_compGenJumpTrue, 0 );
+            HB_EXPR_PCODE1( hb_compGenPCode1, HB_P_POP );
             HB_EXPR_USE( pSelf->value.asOperator.pRight, HB_EA_PUSH_PCODE );
-            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_OR );
             HB_EXPR_PCODE1( hb_compGenJumpHere, lEndPos );
          }
          else

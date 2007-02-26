@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.22 2007/02/21 18:58:03 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.23 2007/02/22 01:55:14 ronpinkas Exp $
  */
 
 /*
@@ -476,7 +476,11 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
        */
       BYTE ucLeft = s_PrecedTable[ pExpr->ExprType ];
 
-      if( ucLeft >= ucRight )
+      if( ucLeft == ucRight && ( ucLeft == HB_EO_OR || ucLeft == HB_EO_AND ) )
+      {
+         pExpr->value.asOperator.pRight = pItem;
+      }
+      else if( ucLeft >= ucRight )
       {
          /* Left operator has the same or lower precedence then the right one
           * e.g.  a * b + c
@@ -488,6 +492,7 @@ HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR pExpr, HB_EXPR_PTR pItem )
           *             Right := R
           *             Oper  := O
           */
+
 #ifdef HB_MACRO_SUPPORT
          pItem->value.asOperator.pLeft = hb_compExprSetOperand( pExpr, pItem->value.asOperator.pLeft, HB_MACRO_PARAM );
 #else

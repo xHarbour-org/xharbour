@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.144 2007/02/21 18:58:03 ronpinkas Exp $
+ * $Id: harbour.c,v 1.145 2007/02/22 01:55:14 ronpinkas Exp $
  */
 
 /*
@@ -2560,7 +2560,7 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
    {
       PCOMSYMBOL pSym;
 
-      if( ( pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) ) )
+      if( ( pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) ) != NULL )
       {
          if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
          {

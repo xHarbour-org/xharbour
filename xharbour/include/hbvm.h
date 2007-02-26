@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.47 2006/09/27 11:01:44 druzus Exp $
+ * $Id: hbvm.h,v 1.48 2007/02/15 21:22:00 ronpinkas Exp $
  */
 
 /*
@@ -103,7 +103,7 @@ extern void hb_vmSymbolInit_RT( void );   /* initialization of runtime support s
 /* Harbour virtual machine escaping API */
 extern void    HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem );
 extern void    HB_EXPORT hb_vmRequestCancel( void );
-extern void    hb_vmRequestDebug( void );
+extern void    HB_EXPORT hb_vmRequestDebug( void );
 extern void    HB_EXPORT hb_vmRequestEndProc( void );
 extern USHORT  HB_EXPORT hb_vmRequestQuery( void );
 extern void    HB_EXPORT hb_vmRequestQuit( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.598 2007/02/21 14:29:09 mauriliolongo Exp $
+ * $Id: hvm.c,v 1.599 2007/02/21 18:58:04 ronpinkas Exp $
  */
 
 /*
@@ -9754,7 +9754,7 @@ void HB_EXPORT hb_vmRequest( USHORT uiRequest )
 /* The debugger support functions */
 /* ------------------------------ */
 
-void hb_vmRequestDebug( void )
+void HB_EXPORT hb_vmRequestDebug( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestDebug()"));
 
