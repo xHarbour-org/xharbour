@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.33 2007/02/19 10:51:16 modalsist Exp $
+ * $Id: achoice.prg,v 1.34 2007/02/26 15:05:57 modalsist Exp $
  */
 
 /*
@@ -111,23 +111,15 @@ DEFAULT nRight  TO 0
      Endif
   Endif
 
-
   IF !Hb_IsNil( uSelect )
-     If !Hb_IsArray( uSelect ) .AND. !Hb_IsLogical( uSelect ) 
+     If !Hb_IsArray( uSelect ) .AND. !Hb_IsLogical( uSelect )
         Throw( ErrorNew( "BASE", 0, 1127,  Procname()+" <alSelectableItems | lSelectableItems>", "Argument type error: <"+valtype(uSelect)+">" ) )
-     ElseIf Hb_IsArray( uSelect )
-        If !Empty( uSelect )
-           For Each xItem In uSelect
-               IF !Hb_IsLogical( xItem )  
-                  Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> should contain logic values" ) )
-               ENDIF
-           Next
-           IF Len( uSelect ) != Len( acItems )
-             Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> should contain the same amount of elements than <acItems>" ) )
-           ENDIF
-        Else
-           Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems> can not be an empty array" ) )
-        Endif
+     Elseif Hb_IsArray( uSelect ) .and. !Empty( uSelect )
+        For Each xItem In uSelect
+            If !Hb_IsLogical( xItem ) .and. !Hb_IsString( xItem )
+               Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <alSelectableItems | lSelectableItems> should contain logical or string values" ) )
+            Endif
+        Next
      Endif
   Endif
 
