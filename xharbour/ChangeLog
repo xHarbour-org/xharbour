@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5356 2007/02/27 19:40:17 druzus Exp $
+ * $Id: ChangeLog,v 1.5357 2007/02/27 19:44:12 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-27 21:25 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/std.ch
+    + added to default preprocessor rules:
+         #command IF( <exp1>, [<exp2>], [<exp3>] ) => ;
+                  IIF( <exp1>, <exp2>, <exp3> )
+      It's necessary for xHarbour grammar parser which always recognize
+      IF(exp1,exp2,exp3) as IF statement not pseudo function IIF()
 
 2007-02-27 20:44 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   + xharbour/source/compiler/ppcomp.c

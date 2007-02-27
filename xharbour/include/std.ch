@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.6 2006/11/13 02:40:33 druzus Exp $
+ * $Id: std.ch,v 1.5 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -55,6 +55,7 @@
 
 #include "set.ch"
 
+#command IF( <exp1>, [<exp2>], [<exp3>] ) => IIF( <exp1>, <exp2>, <exp3> )
 #command DO WHILE <exp>    => while <exp>
 #command END <x>           => end
 #command END SEQUENCE      => end
