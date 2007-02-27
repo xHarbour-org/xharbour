@@ -1,5 +1,5 @@
 /*
- * $Id: tipmail.prg,v 1.26 2004/04/08 13:26:53 druzus Exp $
+ * $Id: encurl.prg,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #include "hbapi.h"
 #include "hbapierr.h"
 #include "hbstack.h"
-#enddump
+#pragma ENDDUMP
 
 CLASS TIPEncoderUrl FROM TIPEncoder
    METHOD New()   Constructor

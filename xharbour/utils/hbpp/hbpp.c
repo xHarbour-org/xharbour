@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.13 2005/02/28 11:56:28 andijahja Exp $
+ * $Id: hbpp.c,v 1.14 2007/01/13 18:54:08 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "hbpp.h"
+#include "hbppdef.h"
 #include "hbcomp.h"
 
 extern int hb_pp_ParseDefine( char * );

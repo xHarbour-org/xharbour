@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.11 2005/03/30 21:30:01 andijahja Exp $
+ * $Id: ppcomp.c,v 1.12 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -63,8 +63,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hbpp.h"
+#include "hbppdef.h"
 #include "hbcomp.h"
+
+extern FILES  hb_comp_files;
 
 static char s_szLine[ HB_PP_STR_SIZE ];
 static char s_szOutLine[ HB_PP_STR_SIZE ];

@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.23 2007/01/11 11:08:34 modalsist Exp $
+ * $Id: alert.prg,v 1.24 2007/01/18 11:23:07 enricomaria Exp $
  */
 
 /*
@@ -697,5 +697,5 @@ HB_FUNC_STATIC( CT_WCLOSE ) /* Close the active window */
    hb_retni( hb_ctWClose() );
 }
 
-#pragma BEGINEND
+#pragma ENDDUMP
 

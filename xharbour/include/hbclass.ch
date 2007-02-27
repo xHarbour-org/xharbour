@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.43 2006/09/13 13:20:45 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.44 2006/11/28 02:13:08 ronpinkas Exp $
  */
 
 /*
@@ -249,18 +249,18 @@ DECLARE HBClass ;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
          if ! <.metaClass.> ;;
           Metaclass := HBClass():new( <(ClassName)>+" class", __HB_CLS_PAR0 ( [ <SuperClass1>():class ] [ ,<SuperClassN>():class ] ) )  ;;
-         endif              ;;
+         end              ;;
      #undef  _CLASS_NAME_ ;;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
-     #untranslate CLSMETH ;;
-     #untranslate DECLCLASS ;;
+     #untranslate CLSMETH => ;;
+     #untranslate DECLCLASS => ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
+     ; #xuntranslate Super() : => ;
+     ; #xuntranslate Super : => ;
+     ; #xuntranslate : Super : => ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -280,16 +280,16 @@ DECLARE HBClass ;
          s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():new( <(ClassName)> , __HB_CLS_PAR ( [ <(SuperClass1)> ] [ ,<(SuperClassN)> ] ) ) ) ;;
          if ! <.metaClass.> ;;
           Metaclass := HBClass():new( <(ClassName)>+" class", __HB_CLS_PAR0 ( [ <SuperClass1>():class ] [ ,<SuperClassN>():class ] ) )  ;;
-         endif              ;;
+         end              ;;
      #undef  _CLASS_NAME_ ;;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
-     #untranslate CLSMETH ;;
+     #untranslate CLSMETH => ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
+     ; #xuntranslate Super() : => ;
+     ; #xuntranslate Super : => ;
+     ; #xuntranslate : Super : => ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -318,13 +318,13 @@ DECLARE HBClass ;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
-     #untranslate CLSMETH ;;
-     #untranslate DECLCLASS ;;
+     #untranslate CLSMETH => ;;
+     #untranslate DECLCLASS => ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
+     ; #xuntranslate Super() : => ;
+     ; #xuntranslate Super : => ;
+     ; #xuntranslate : Super : => ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -345,13 +345,13 @@ DECLARE HBClass ;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
-     #untranslate CLSMETH ;;
-     #untranslate DECLCLASS ;;
+     #untranslate CLSMETH => ;;
+     #untranslate DECLCLASS => ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
+     ; #xuntranslate Super() : => ;
+     ; #xuntranslate Super : => ;
+     ; #xuntranslate : Super : => ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -374,11 +374,11 @@ DECLARE HBClass ;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
-     #untranslate CLSMETH ;;
+     #untranslate CLSMETH => ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
+     ; #xuntranslate Super() : => ;
+     ; #xuntranslate Super : => ;
+     ; #xuntranslate : Super : => ;
      [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
@@ -887,13 +887,13 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                        IF __ObjHasMsg( oClassInstance, "InitClass" );;
                          oClassInstance:InitClass( hb_aParams() ) ;;
-                       ENDIF ;;
+                       END ;;
                       ELSE ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
-                      ENDIF ;;
+                      END ;;
                       IF PCount() > 0 ;;
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
-                      ENDIF ;;
+                      END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
                       #define _CLASS_MODE_ _CLASS_IMPLEMENTATION_
@@ -904,13 +904,13 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                        IF __ObjHasMsg( oClassInstance, "InitClass" );;
                          oClassInstance:InitClass( hb_aParams() ) ;;
-                       ENDIF ;;
+                       END ;;
                       ELSE ;;
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
-                      ENDIF ;;
+                      END ;;
                       IF PCount() > 0 ;;
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
-                      ENDIF ;;
+                      END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
                       #define _CLASS_MODE_ _CLASS_IMPLEMENTATION_
@@ -961,8 +961,8 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
    #endif
 #endif
 
-#xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for method: <MethodName> ; function <MethodName> ; local self := QSelf()
-#xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for procedure: <MethodName> ; function <MethodName> ; local self := QSelf()
+//#xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for method: <MethodName> ; function <MethodName> ; local self := QSelf()
+//#xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for procedure: <MethodName> ; function <MethodName> ; local self := QSelf()
 
 #xcommand DECLARED METHOD <ClassName> <MethodName> => ;
           static function DECLMETH <ClassName> <MethodName> ;;

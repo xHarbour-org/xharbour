@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.599 2007/02/21 18:58:04 ronpinkas Exp $
+ * $Id: hvm.c,v 1.600 2007/02/26 03:18:27 ronpinkas Exp $
  */
 
 /*
@@ -297,23 +297,6 @@ HB_EXPORT HB_DBGENTRY_FUNC hb_vm_pFunDbgEntry = NULL; /* C level debugger entry 
 static ULONG    s_ulProcLevel = 0;
 
 char *hb_vm_sNull = "";
-
-char *hb_vm_acAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05", "\x06", "\x07", "\x08", "\x09", "\x0A", "\x0B", "\x0C", "\x0D", "\x0E", "\x0F",
-                             "\x10", "\x11", "\x12", "\x13", "\x14", "\x15", "\x16", "\x17", "\x18", "\x19", "\x1A", "\x1B", "\x1C", "\x1D", "\x1E", "\x1F",
-                             "\x20", "\x21", "\x22", "\x23", "\x24", "\x25", "\x26", "\x27", "\x28", "\x29", "\x2A", "\x2B", "\x2C", "\x2D", "\x2E", "\x2F",
-                             "\x30", "\x31", "\x32", "\x33", "\x34", "\x35", "\x36", "\x37", "\x38", "\x39", "\x3A", "\x3B", "\x3C", "\x3D", "\x3E", "\x3F",
-                             "\x40", "\x41", "\x42", "\x43", "\x44", "\x45", "\x46", "\x47", "\x48", "\x49", "\x4A", "\x4B", "\x4C", "\x4D", "\x4E", "\x4F",
-                             "\x50", "\x51", "\x52", "\x53", "\x54", "\x55", "\x56", "\x57", "\x58", "\x59", "\x5A", "\x5B", "\x5C", "\x5D", "\x5E", "\x5F",
-                             "\x60", "\x61", "\x62", "\x63", "\x64", "\x65", "\x66", "\x67", "\x68", "\x69", "\x6A", "\x6B", "\x6C", "\x6D", "\x6E", "\x6F",
-                             "\x70", "\x71", "\x72", "\x73", "\x74", "\x75", "\x76", "\x77", "\x78", "\x79", "\x7A", "\x7B", "\x7C", "\x7D", "\x7E", "\x7F",
-                             "\x80", "\x81", "\x82", "\x83", "\x84", "\x85", "\x86", "\x87", "\x88", "\x89", "\x8A", "\x8B", "\x8C", "\x8D", "\x8E", "\x8F",
-                             "\x90", "\x91", "\x92", "\x93", "\x94", "\x95", "\x96", "\x97", "\x98", "\x99", "\x9A", "\x9B", "\x9C", "\x9D", "\x9E", "\x9F",
-                             "\xA0", "\xA1", "\xA2", "\xA3", "\xA4", "\xA5", "\xA6", "\xA7", "\xA8", "\xA9", "\xAA", "\xAB", "\xAC", "\xAD", "\xAE", "\xAF",
-                             "\xB0", "\xB1", "\xB2", "\xB3", "\xB4", "\xB5", "\xB6", "\xB7", "\xB8", "\xB9", "\xBA", "\xBB", "\xBC", "\xBD", "\xBE", "\xBF",
-                             "\xC0", "\xC1", "\xC2", "\xC3", "\xC4", "\xC5", "\xC6", "\xC7", "\xC8", "\xC9", "\xCA", "\xCB", "\xCC", "\xCD", "\xCE", "\xCF",
-                             "\xD0", "\xD1", "\xD2", "\xD3", "\xD4", "\xD5", "\xD6", "\xD7", "\xD8", "\xD9", "\xDA", "\xDB", "\xDC", "\xDD", "\xDE", "\xDF",
-                             "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
-                             "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
 
 /* static, for now */
 BOOL hb_vm_bQuitRequest = FALSE;
@@ -3856,7 +3839,7 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
    }
    else if( HB_IS_STRING( pResult ) && pResult->item.asString.length == 1 )
    {
-      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pResult->item.asString.value[ 0 ] + lAdd ) ], 1 );
+      hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pResult->item.asString.value[ 0 ] + lAdd ) ], 1 );
       return;
    }
    else if( pResult->type & HB_IT_DOUBLE )
@@ -4056,12 +4039,12 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    }
    else if( HB_IS_STRING( pLeft ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
-      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pLeft->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pRight ) ) ], 1 );
+      hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pLeft->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pRight ) ) ], 1 );
    }
    #if 1 // Shoud: 1 + "a" produce "b" like 1 + Date() produces Date() + 1?
    else if( HB_IS_STRING( pRight ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
-      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pRight->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pLeft ) ) ], 1 );
+      hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pRight->item.asString.value[ 0 ] + (LONG) hb_itemGetND( pLeft ) ) ], 1 );
    }
    #endif
    else if( HB_IS_NUMINT( pLeft ) && HB_IS_NUMINT( pRight ) )
@@ -4171,7 +4154,7 @@ static void hb_vmMinus( void )
       PHB_ITEM pResult = hb_stackTopItem();
 
       hb_stackPush();
-      hb_itemPutCLStatic( pResult, hb_vm_acAscii[ (BYTE) ( pItem1->item.asString.value[ 0 ] - (LONG) hb_itemGetND( pItem2 ) ) ], 1 );
+      hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pItem1->item.asString.value[ 0 ] - (LONG) hb_itemGetND( pItem2 ) ) ], 1 );
    }
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
    {
@@ -4504,7 +4487,7 @@ static void hb_vmInc( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      hb_itemPutCLStatic( pItem, hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[ 0 ] + 1 ) ], 1 );
+      hb_itemPutCLStatic( pItem, hb_szAscii[ ( UCHAR ) ( pItem->item.asString.value[ 0 ] + 1 ) ], 1 );
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -4563,7 +4546,7 @@ static void hb_vmDec( void )
 
    if( HB_IS_STRING( pItem ) && pItem->item.asString.length == 1 )
    {
-      hb_itemPutCLStatic( pItem, hb_vm_acAscii[ (BYTE) ( pItem->item.asString.value[ 0 ] - 1 ) ], 1 );
+      hb_itemPutCLStatic( pItem, hb_szAscii[ ( UCHAR ) ( pItem->item.asString.value[ 0 ] - 1 ) ], 1 );
    }
    else if( HB_IS_DATE( pItem ) )
    {
@@ -6049,7 +6032,7 @@ static void hb_vmArrayPush( void )
 
       if( (ULONG) lIndex < pArray->item.asString.length )
       {
-         hb_itemPutCLStatic( pArray, hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[ lIndex ] ) ], 1 );
+         hb_itemPutCLStatic( pArray, hb_szAscii[ ( UCHAR ) ( pArray->item.asString.value[ lIndex ] ) ], 1 );
       }
       else
       {
@@ -11730,7 +11713,7 @@ static void hb_vmArrayItemPush( ULONG ulIndex )
          }
          if( ulIndex < pArray->item.asString.length )
          {
-            hb_itemPutCLStatic( pArray, hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[ ulIndex ] ) ], 1 );
+            hb_itemPutCLStatic( pArray, hb_szAscii[ ( UCHAR ) ( pArray->item.asString.value[ ulIndex ] ) ], 1 );
          }
          else
          {
@@ -11840,7 +11823,7 @@ static void hb_vmArrayItemPop( ULONG ulIndex )
 
          if( pArray->item.asString.length == 1 )
          {
-            hb_itemPutCLStatic( pArray, hb_vm_acAscii[ bNewChar ], 1 );
+            hb_itemPutCLStatic( pArray, hb_szAscii[ ( UCHAR ) bNewChar ], 1 );
          }
          else if( pArray->item.asString.allocated == 0 || *( pArray->item.asString.pulHolders ) > 1 )
          {

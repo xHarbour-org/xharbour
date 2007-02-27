@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.51 2007/02/13 23:40:58 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.52 2007/02/14 10:36:34 marchuet Exp $
  */
 
 /*
@@ -487,7 +487,7 @@ extern void hb_compFileInfo( void );
 extern void hb_compPrintLogo( void );
 extern void hb_compPrintModes( void );
 
-extern int hb_compCompile( char * szPrg, int argc, char * argv[] );
+extern void hb_compInitPP( int argc, char * argv[] );
 
 #endif    /* HB_MACRO_SUPPORT */
 
@@ -526,6 +526,7 @@ extern void hb_compIdentifierClose( void ); /* release the table of identifiers 
 
 /* variable used by compiler
  */
+extern PHB_PP_STATE   hb_comp_PP;
 extern int            hb_comp_iLine;
 extern FUNCTIONS      hb_comp_functions;
 extern FUNCTIONS      hb_comp_funcalls;
@@ -570,7 +571,6 @@ extern char           hb_comp_cDataListType;
 extern char           hb_comp_cCastType;
 extern int            hb_comp_iVarScope;
 extern BOOL           hb_comp_bDontGenLineNum;
-extern FILES          hb_comp_files;
 extern int            hb_comp_iStaticCnt;
 extern int            hb_comp_iErrorCount;
 

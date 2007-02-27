@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.80 2006/11/30 00:57:08 likewolf Exp $
+ * $Id: debugger.prg,v 1.81 2006/12/10 12:33:35 ptsarenko Exp $
  */
 
 /*
@@ -154,7 +154,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
 
   DO CASE
     CASE nMode == HB_DBG_GETENTRY
-      HB_INLINE()
+      HB_INLINE() ;
       {
          hb_vm_pFunDbgEntry = hb_dbgEntry;
       }
@@ -171,7 +171,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
       s_oDebugger:aBreakPoints := uParam5
       IF bStartup
         IF s_oDebugger:lRunAtStartup
-          HB_INLINE( uParam1 )
+          HB_INLINE( uParam1 ) ;
           {
             hb_dbgSetGo( hb_parptr( 1 ) );
           }
@@ -674,7 +674,7 @@ return nil
 
 METHOD CodeblockTrace()
   ::oPullDown:GetItemByIdent( "CODEBLOCK" ):checked := ::lCBTrace := ! ::lCBTrace
-  HB_INLINE( ::pInfo, ::lCBTrace )
+  HB_INLINE( ::pInfo, ::lCBTrace ) ;
   {
     hb_dbgSetCBTrace( hb_parptr( 1 ), hb_parl( 2 ) );
   }
@@ -1236,7 +1236,7 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
   lValid := .F.
   bOldErrorBlock := ErrorBlock( {|oErr| Break( oErr ) } )
   BEGIN SEQUENCE
-    xResult := HB_INLINE( ::pInfo, xExpr, @lValid )
+    xResult := HB_INLINE( ::pInfo, xExpr, @lValid ) ;
     {
       PHB_ITEM item;
 
@@ -1276,7 +1276,7 @@ RETURN xResult
 
 
 METHOD GetSourceFiles() CLASS TDebugger
-RETURN HB_INLINE( ::pInfo )
+RETURN HB_INLINE( ::pInfo ) ;
        {
           hb_itemRelease( hb_itemReturn( hb_dbgGetSourceFiles( hb_parptr( 1 ) ) ) );
        }
@@ -1298,7 +1298,7 @@ METHOD Go() CLASS TDebugger
   ENDIF
   ::RestoreAppScreen()
   ::RestoreAppState()
-  HB_INLINE( ::pInfo )
+  HB_INLINE( ::pInfo ) ;
   {
     hb_dbgSetGo( hb_parptr( 1 ) );
   }
@@ -1687,7 +1687,7 @@ return nil
 
 
 METHOD IsValidStopLine( cName, nLine ) CLASS TDebugger
-RETURN HB_INLINE( ::pInfo, cName, nLine )
+RETURN HB_INLINE( ::pInfo, cName, nLine ) ;
        {
           hb_retl( hb_dbgIsValidStopLine( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) ) );
        }
@@ -1695,7 +1695,8 @@ RETURN HB_INLINE( ::pInfo, cName, nLine )
 
 METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 
-   If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
+   DEFAULT lLineNumbers TO !::lLineNumbers
+
    ::lLineNumbers := lLineNumbers
    ::oPulldown:GetItemByIdent( "LINE" ):checked := ::lLineNumbers
    IF ::oBrwText != NIL
@@ -1935,7 +1936,7 @@ return nil
 METHOD NextRoutine() CLASS TDebugger
   ::RestoreAppScreen()
   ::RestoreAppState()
-  HB_INLINE( ::pInfo )
+  HB_INLINE( ::pInfo ) ;
   {
     hb_dbgSetNextRoutine( hb_parptr( 1 ) );
   }
@@ -2097,7 +2098,7 @@ return nil
 METHOD Quit() CLASS TDebugger
   ::Exit()
   ::Hide()
-  HB_INLINE( ::pInfo )
+  HB_INLINE( ::pInfo ) ;
   {
     hb_dbgSetQuit( hb_parptr( 1 ) );
   }
@@ -2261,7 +2262,7 @@ METHOD RestoreAppScreen() CLASS TDebugger
     RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cAppImage )
     IF !Empty( ::nAppCTWindow )
       /* Don't link libct automatically... */
-      HB_INLINE( ::nAppCTWindow )
+      HB_INLINE( ::nAppCTWindow ) ;
       {
          hb_ctWSelect( hb_parni( 1 ) );
       }
@@ -2331,7 +2332,7 @@ METHOD SaveAppScreen( lRestore ) CLASS TDebugger
   ::cAppColors := SetColor()
 
   /* We don't want to auto-link libct... */
-  ::nAppCTWindow := HB_INLINE()
+  ::nAppCTWindow := HB_INLINE() ;
   {
      hb_retni( hb_ctWSelect( -1 ) );
      hb_ctWSelect( 0 );
@@ -2874,7 +2875,7 @@ METHOD ToCursor() CLASS TDebugger
   LOCAL cName := strip_path( ::cPrgName ), nLine := ::oBrwText:nRow
 
   IF ::IsValidStopLine( cName, nLine )
-    HB_INLINE( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow )
+    HB_INLINE( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow ) ;
     {
       hb_dbgSetToCursor( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) );
     }
@@ -2910,7 +2911,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
 
   if nAt == 0
     AAdd( ::aBreakPoints, { nLine, cFileName } )     // it was nLine
-    HB_INLINE( ::pInfo, cFileName, nLine )
+    HB_INLINE( ::pInfo, cFileName, nLine ) ;
     {
        hb_dbgAddBreak( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ), NULL );
     }
@@ -2920,7 +2921,7 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
   else
     ADel( ::aBreakPoints, nAt )
     ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
-    HB_INLINE( ::pInfo, nAt - 1 )
+    HB_INLINE( ::pInfo, nAt - 1 ) ;
     {
        hb_dbgDelBreak( hb_parptr( 1 ), hb_parni( 2 ) );
     }
@@ -2935,7 +2936,7 @@ return nil
 
 
 METHOD Trace() CLASS TDebugger
-  HB_INLINE( ::pInfo )
+  HB_INLINE( ::pInfo ) ;
   {
     hb_dbgSetTrace( hb_parptr( 1 ) );
   }
@@ -2962,7 +2963,7 @@ METHOD TracepointAdd( cExpr ) CLASS TDebugger
    ENDIF
    aWatch := {"tp", cExpr, NIL}
    ::RestoreAppState()
-   HB_INLINE( ::pInfo, cExpr )
+   HB_INLINE( ::pInfo, cExpr ) ;
    {
      hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), TRUE );
    }
@@ -3131,7 +3132,7 @@ METHOD WatchpointAdd( cExpr ) CLASS TDebugger
       RETURN self
    ENDIF
    aWatch := { "wp", cExpr }
-   HB_INLINE( ::pInfo, cExpr )
+   HB_INLINE( ::pInfo, cExpr ) ;
    {
       hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), FALSE );
    }
@@ -3154,7 +3155,7 @@ METHOD WatchpointDel( nPos ) CLASS TDebugger
       IF( LastKey() != K_ESC )
          IF( nPos >=0 .AND. nPos < LEN(::aWatch) )
             ::oBrwPnt:gotop()
-            HB_INLINE( ::pInfo, nPos )
+            HB_INLINE( ::pInfo, nPos ) ;
             {
                hb_dbgDelWatch( hb_parptr( 1 ), hb_parni( 2 ) );
             }
@@ -3187,7 +3188,7 @@ METHOD WatchpointEdit( nPos ) CLASS TDebugger
       RETURN self
    ENDIF
    aWatch := { "wp", cExpr }
-   HB_INLINE( ::pInfo, nPos - 1, cExpr )
+   HB_INLINE( ::pInfo, nPos - 1, cExpr ) ;
    {
       hb_dbgSetWatch( hb_parptr( 1 ), hb_parni( 2 ), hb_parc( 3 ), FALSE );
    }

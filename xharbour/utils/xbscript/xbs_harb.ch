@@ -56,7 +56,7 @@
 
      DATA nNextDynProc         INIT 1
 
-     #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+     #if defined( __CONCILE_PCODE__ ) || defined( DYN )
         DATA pDynList
      #endif
 
@@ -95,7 +95,7 @@
        METHOD LoadFiveWin()      INLINE PP_LoadFw()
      #endif
 
-     #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+     #if defined( __CONCILE_PCODE__ ) || defined( DYN )
         DESTRUCTOR Finalize()
      #endif
 
@@ -113,7 +113,7 @@
 
   //----------------------------------------------------------------------------//
   // Destructor!
-  #if defined( __CONCILE_PCODE__ ) || #defined( DYN )
+  #if defined( __CONCILE_PCODE__ ) || defined( DYN )
 
       PROCEDURE Finalize() CLASS TInterpreter
 

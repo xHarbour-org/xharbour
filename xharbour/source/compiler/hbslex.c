@@ -1,5 +1,5 @@
 /*
- * $Id: hbslex.c,v 1.12 2005/05/24 22:25:41 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.13 2006/02/22 03:30:17 ronpinkas Exp $
  */
 
 #include "hbcomp.h"
@@ -14,7 +14,7 @@
 
 #define TOKEN_SIZE             ( 65 > HB_SYMBOL_NAME_LEN + 1 ? 65 : HB_SYMBOL_NAME_LEN + 1 )
 
-#define YY_BUF_SIZE HB_PP_STR_SIZE
+#define YY_BUF_SIZE 16384
 
 #if ( defined(__XCC__) || defined(__LCC__) )
    #define SLX_RULES "source/compiler/harbour.slx"

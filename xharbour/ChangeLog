@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5351 2007/02/26 22:24:57 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5352 2007/02/27 00:01:04 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,69 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-27 16:50 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/makefile.bc
+  * xharbour/bin/pack_src.bat
+  * xharbour/config/global.cf
+  * xharbour/include/hbapi.h
+  * xharbour/include/hbclass.ch
+  * xharbour/include/hbcomp.h
+  * xharbour/include/hbfast.h
+  * xharbour/include/hbpp.h
+  * xharbour/include/std.ch
+  * xharbour/source/common/Makefile
+  * xharbour/source/common/hbstr.c
+  * xharbour/source/compiler/Makefile
+  * xharbour/source/compiler/cmdcheck.c
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/harbour.slx
+  * xharbour/source/compiler/harbour.sly
+  * xharbour/source/compiler/hbdead.c
+  * xharbour/source/compiler/hbgenerr.c
+  * xharbour/source/compiler/hbslex.c
+  * xharbour/source/debug/debugger.prg
+  * xharbour/source/pp/Makefile
+  - xharbour/source/pp/ppcomp.c
+  * xharbour/source/pp/ppcore.c
+  - xharbour/source/pp/pptable.c
+  - xharbour/source/pp/pragma.c
+  * xharbour/source/rdd/dbf1.c
+  * xharbour/source/rtl/Makefile
+  * xharbour/source/rtl/alert.prg
+  * xharbour/source/rtl/chrasc.c
+  * xharbour/source/rtl/dates.c
+  * xharbour/source/rtl/direct.c
+  * xharbour/source/rtl/transfrm.c
+  * xharbour/source/rtl/win32ole.prg
+  * xharbour/source/tip/encb64.prg
+  * xharbour/source/tip/encqp.prg
+  * xharbour/source/tip/encurl.prg
+  * xharbour/source/vm/arrays.c
+  * xharbour/source/vm/fastitem.c
+  * xharbour/source/vm/hvm.c
+  * xharbour/source/vm/memvars.c
+  + xharbour/tests/hbinline.prg
+  * xharbour/utils/hbpp/Makefile
+  * xharbour/utils/hbpp/hbpp.c
+  + xharbour/utils/hbpp/hbppcalc.c
+  + xharbour/utils/hbpp/hbppcomp.c
+  + xharbour/utils/hbpp/hbppcore.c
+  + xharbour/utils/hbpp/hbppdef.h
+  + xharbour/utils/hbpp/hbpptbl.c
+  + xharbour/utils/hbpp/pragma.c
+  * xharbour/utils/xbscript/xbs_harb.ch
+    + New preprocessor. The old one moved to xharbour/utils/hbpp.
+    * updated code for new HB_INLINE syntax and cleaned some problems
+      detected by new PP.
+    * non GNU make files will have to be updated, I made some modifications
+      in makefile.bc but I cannot say if they work. I'll have to ask BCC
+      developers to finished them if necessary.
+
+  * xharbour/utils/hbtest/rt_array.prg
+  * xharbour/utils/hbtest/rt_hvma.prg
+    * cleaned some RT errors by coping the original Clipper compatible
+      messages from Harbour code.
 
 2007-02-26 21:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg

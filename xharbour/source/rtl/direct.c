@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.56 2005/09/02 18:30:41 druzus Exp $
+ * $Id: direct.c,v 1.57 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -102,8 +102,6 @@
 #include "hbregex.h"
 #include "hbtrace.h"
 #include "directry.ch"
-
-extern char *hb_vm_acAscii[256];
 
 static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT uiMask, PHB_FNAME fDirSpec, BOOL bFullPath, BOOL bDirOnly )
 {
@@ -438,7 +436,7 @@ HB_FUNC( DIRECTORYRECURSE )
          {
             char szDrive[1];
             szDrive[ 0 ] = ( char ) ( hb_fsCurDrv() + 'A' );
-            fDirSpec->szDrive = hb_vm_acAscii[(int)(unsigned char)szDrive[0]];
+            fDirSpec->szDrive = ( char * ) hb_szAscii[(UCHAR)szDrive[0]];
          }
          else
          {

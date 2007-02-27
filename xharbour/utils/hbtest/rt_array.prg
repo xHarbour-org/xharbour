@@ -1,5 +1,5 @@
 /*
- * $Id: rt_array.prg,v 1.3 2003/07/16 02:07:28 andijahja Exp $
+ * $Id: rt_array.prg,v 1.4 2004/02/09 04:51:32 andijahja Exp $
  */
 
 /*
@@ -97,14 +97,14 @@ FUNCTION Main_ARRAY()
    TEST_LINE( aSort(ErrorNew())               , NIL                                        )
 #ifdef HB_C52_STRICT
 #ifndef __XPP__
-   TEST_LINE( aFill()                         , "E BASE 9999 Argument error AFILL A:4:U:NIL;U:NIL;U:NIL;U:NIL ")
+   TEST_LINE( aFill()                         , "E BASE 9999 Argument error AFILL ")
 #endif
-   TEST_LINE( aFill( NIL )                    , "E BASE 2017 Argument error AEVAL A:4:U:NIL;B:{||...};U:NIL;U:NIL " )
+   TEST_LINE( aFill( NIL )                    , "E BASE 2017 Argument error AEVAL A:1:U:NIL " )
 #else
 #ifndef __XPP__
-   TEST_LINE( aFill()                         , "E BASE 9999 Argument error AFILL A:4:U:NIL;U:NIL;U:NIL;U:NIL ")
+   TEST_LINE( aFill()                         , "E BASE 9999 Argument error AFILL ")
 #endif
-   TEST_LINE( aFill( NIL )                    , "E BASE 9999 Argument error AFILL A:4:U:NIL;U:NIL;U:NIL;U:NIL ")
+   TEST_LINE( aFill( NIL )                    , "E BASE 9999 Argument error AFILL A:1:U:NIL " )
 #endif
    TEST_LINE( aFill( {} )                     , "{.[0].}"                                  )
    TEST_LINE( aFill( {}, 1 )                  , "{.[0].}"                                  )
@@ -166,10 +166,10 @@ FUNCTION Main_ARRAY()
    TEST_LINE( aTail( ErrorNew() )             , NIL                                        )
 #endif
 #ifndef __XPP__
-   TEST_LINE( aSize()                         , "E BASE 2023 Argument error ASIZE A:2:U:NIL;U:NIL "         )
-   TEST_LINE( aSize( NIL )                    , "E BASE 2023 Argument error ASIZE A:2:U:NIL;U:NIL "         )
-   TEST_LINE( aSize( {} )                     , "E BASE 2023 Argument error ASIZE A:2:A:{.[0].};U:NIL "     )
-   TEST_LINE( aSize( ErrorNew() )             , "E BASE 2023 Argument error ASIZE A:2:O:ERROR Object;U:NIL ")
+   TEST_LINE( aSize()                         , "E BASE 2023 Argument error ASIZE "                         )
+   TEST_LINE( aSize( NIL )                    , "E BASE 2023 Argument error ASIZE A:1:U:NIL "               )
+   TEST_LINE( aSize( {} )                     , "E BASE 2023 Argument error ASIZE A:1:A:{.[0].} "           )
+   TEST_LINE( aSize( ErrorNew() )             , "E BASE 2023 Argument error ASIZE A:1:O:ERROR Object "      )
 #endif
    TEST_LINE( aSize( NIL, 0 )                 , "E BASE 2023 Argument error ASIZE A:2:U:NIL;N:0 ")
    TEST_LINE( aSize( {}, 0 )                  , "{.[0].}"                                  )

@@ -1,5 +1,5 @@
 /*
- * $Id: chrasc.c,v 1.16 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: chrasc.c,v 1.17 2005/11/15 20:17:13 ronpinkas Exp $
  */
 
 /*
@@ -58,8 +58,6 @@
 #include "hbapierr.h"
 #include "hbstack.h"
 
-extern char *hb_vm_acAscii[256];
-
 /* converts an ASCII code to a character value */
 HB_FUNC( CHR )
 {
@@ -70,7 +68,7 @@ HB_FUNC( CHR )
                can be divided by 256 but it's not zero, in this case it
                will return an empty string instead of a Chr(0). [vszakats] */
 
-      hb_retclenStatic( hb_vm_acAscii[ (BYTE) hb_parni( 1 ) ], 1 );
+      hb_retclenStatic( ( char * ) hb_szAscii[ (UCHAR) hb_parni( 1 ) ], 1 );
    }
    else
    {

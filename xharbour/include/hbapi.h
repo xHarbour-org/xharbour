@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.200 2007/02/13 19:02:23 druzus Exp $
+ * $Id: hbapi.h,v 1.201 2007/02/15 21:22:00 ronpinkas Exp $
  */
 
 /*
@@ -434,8 +434,8 @@ extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
     extern void  HB_EXPORT  hb_retclenAdopt( char * szText, ULONG ulLen );
     extern void  HB_EXPORT  hb_retclenAdoptRaw( char * szText, ULONG ulLen );
 
-    extern void  HB_EXPORT  hb_retcStatic( char * szText );
-    extern void  HB_EXPORT  hb_retclenStatic( char * szText, ULONG ulLen );
+    extern void  HB_EXPORT  hb_retcStatic( const char * szText );
+    extern void  HB_EXPORT  hb_retclenStatic( const char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retclenRaw( char * szText, ULONG ulLen );
 
@@ -565,6 +565,8 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject ); /* returns a duplicat
                           ( c ) == HB_CHAR_HT || \
                           ( c ) == HB_CHAR_LF || \
                           ( c ) == HB_CHAR_CR )
+
+extern const char * hb_szAscii[256];      /* array of 1 character length strings */
 
 extern HB_EXPORT int      hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
 extern HB_EXPORT int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */

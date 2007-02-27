@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.48 2006/11/17 12:33:46 ronpinkas Exp $
+ * $Id: transfrm.c,v 1.49 2007/01/19 21:13:59 modalsist Exp $
  */
 
 /*
@@ -93,8 +93,6 @@
 #define PF_WIDTH      0x0800   /* @S */
 #define PF_PARNEGWOS  0x1000   /* @) Similar to PF_PARNEG but without leading spaces */
 #define PF_NUMBERS    0x2000   /* @9 */
-
-extern char *hb_vm_acAscii[256];
 
 HB_FUNC( TRANSFORM )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.146 2007/01/12 14:09:58 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.147 2007/02/17 14:47:29 jfgimenez Exp $
  */
 
 /*
@@ -142,7 +142,7 @@ PROCEDURE HB_OleInit()
     Using HB_INLINE() instead of HB_FUNC() to force Symbol Table entry, because
     we do NOT want to force static linking!
    */
-   HB_INLINE()
+   HB_INLINE() ;
    {
       if( s_pSym_TOleAuto == NULL )
       {
@@ -718,7 +718,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
       CASE FOREACH_ENUMERATE
          //xRet := ::Item( nIndex )
          //xRet := ::pOleEnumerator:Next()
-         xRet := HB_Inline( ::pOleEnumerator )
+         xRet := HB_Inline( ::pOleEnumerator ) ;
          {
             IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
             ULONG *pcElementFetched = NULL;
@@ -737,7 +737,7 @@ METHOD OleEnumerate( nEnumOp, nIndex ) CLASS TOleAuto
          //EXIT
 
       CASE FOREACH_END
-         HB_Inline( ::pOleEnumerator )
+         HB_Inline( ::pOleEnumerator ) ;
          {
             IEnumVARIANT *pEnumVariant = (IEnumVARIANT *) hb_parptr(1);
 

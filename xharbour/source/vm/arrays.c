@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.131 2005/12/11 12:37:25 druzus Exp $
+ * $Id: arrays.c,v 1.132 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -82,7 +82,6 @@
    extern BOOL hb_gc_bReleaseAll;
 #endif
 
-extern char *hb_vm_acAscii[256];
 int hb_arrayMode( void );
 
 BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
@@ -590,7 +589,7 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    }
    else if( pArray->type == HB_IT_STRING && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
    {
-      hb_itemPutCLStatic( pItem, hb_vm_acAscii[ (BYTE) ( pArray->item.asString.value[ ulIndex - 1 ] ) ], 1 );
+      hb_itemPutCLStatic( pItem, hb_szAscii[ (UCHAR) ( pArray->item.asString.value[ ulIndex - 1 ] ) ], 1 );
 
       return TRUE;
    }

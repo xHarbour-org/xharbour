@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.164 2007/02/20 09:42:22 mauriliolongo Exp $
+ * $Id: dbf1.c,v 1.165 2007/02/21 09:26:34 mauriliolongo Exp $
  */
 
 /*
@@ -2891,7 +2891,7 @@ static ERRCODE hb_dbfRecInfo( DBFAREAP pArea, PHB_ITEM pRecID, USHORT uiInfoType
                   ulLen = hb_itemGetCLen( pInfo );
                   if( ulLen > 0 )
                   {
-                     pResult = ( BYTE * ) hb_xrealloc( pResult, ulLength + ulLen + 1 );  // 20/02/2007 added + 1 to fix GPF
+                     pResult = ( BYTE * ) hb_xrealloc( pResult, ulLength + ulLen + 1 );
                      memcpy( pResult + ulLength, hb_itemGetCPtr( pInfo ), ulLen );
                      ulLength += ulLen;
                   }

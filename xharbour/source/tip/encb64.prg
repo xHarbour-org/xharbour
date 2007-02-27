@@ -1,5 +1,5 @@
 /*
- * $Id: encb64.prg,v 1.2 2005/01/09 23:19:31 ronpinkas Exp $
+ * $Id: encb64.prg,v 1.3 2005/09/01 02:39:10 lculik Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hbstack.h"
 #include "hbapiitm.h"
 #define HB_THREAD_OPTIMIZE_STACK
-#enddump
+#pragma ENDDUMP
 
 CLASS TIPEncoderBase64 FROM TIPEncoder
    // Set this to .T. to enable RFC 2068 (HTTP/1.1) exception to

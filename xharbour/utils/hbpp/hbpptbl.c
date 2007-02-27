@@ -1,5 +1,5 @@
 /*
- * $Id: pptable.c,v 1.68 2006/09/13 13:20:45 ronpinkas Exp $
+ * $Id: pptable.c,v 1.69 2006/09/17 16:13:23 ronpinkas Exp $
  */
 
 /*
@@ -61,7 +61,7 @@
 
 #include <stdio.h>
 
-#include "hbpp.h"
+#include "hbppdef.h"
 
 COMMANDS * hb_pp_topCommand = NULL;
 COMMANDS * hb_pp_topTranslate = NULL;

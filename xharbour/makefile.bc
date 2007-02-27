@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.188 2007/01/11 11:08:11 modalsist Exp $
+# $Id: makefile.bc,v 1.189 2007/01/22 08:33:40 marchuet Exp $
 #
 
 #
@@ -229,6 +229,7 @@ GTNUL_LIB      = $(LIB_DIR)\gtnul.lib
 
 HARBOUR_EXE  = $(BIN_DIR)\harbour.exe
 HBPP_EXE     = $(BIN_DIR)\hbpp.exe
+PPGEN_EXE    = $(BIN_DIR)\ppgen.exe
 HBRUN_EXE    = $(BIN_DIR)\hbrun$(HB_MT).exe
 HBTEST_EXE   = $(BIN_DIR)\hbtest$(HB_MT).exe
 HBDOC_EXE    = $(BIN_DIR)\hbdoc.exe
@@ -687,10 +688,10 @@ RDDS_LIB_OBJS = \
 
 PP_LIB_OBJS = \
    $(PP_OBJ_DIR)\ppcore.obj \
-   $(PP_OBJ_DIR)\ppcomp.obj \
-   $(RTL_OBJ_DIR)\pplib.obj \
    $(PP_OBJ_DIR)\pptable.obj \
-   $(PP_OBJ_DIR)\pragma.obj
+   $(PP_OBJ_DIR)\pplib.obj \
+   $(PP_OBJ_DIR)\pplib2.obj \
+   $(PP_OBJ_DIR)\pplib3.obj
 
 #
 # DEBUG.LIB rules
@@ -1543,20 +1544,38 @@ $(OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
 # PP.LIB dependencies
 #
 
+$(PPGEN_EXE) : \
+   $(PP_OBJ_DIR)\ppgen.c \
+   $(INCLUDE_DIR)\hbstdgen.ch \
+   $(INCLUDE_DIR)\std.ch \
+   $(INCLUDE_DIR)\set.ch
+
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\ppgen.obj $(HBPP_DIR)\ppgen.c
+   $(ECHO) $(CFLAGS) > make.tmp
+   $(ECHO) -e$(PPGEN_EXE) >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ppgen.obj >> make.tmp
+   $(ECHO) $(COMMON_LIB) >> make.tmp
+   $(CC) @make.tmp
+   $(DEL) make.tmp
+
+pptable.c : $(PPGEN_EXE)
+   $(PPGEN_EXE) $(INCLUDE_DIR)\hbstdgen.ch -opptable.c -q
+
 $(PP_OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)
 
-$(PP_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
+$(PP_OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
+$(PP_OBJ_DIR)\pplib2.obj : $(PP_DIR)\pplib3.c
+   $(CC_CMD)
+
+$(PP_OBJ_DIR)\pplib3.obj : $(PP_DIR)\pplib3.c
    $(CC_CMD)
 
 $(PP_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC_CMD)
 
-$(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
-   $(CC_CMD)
 
 #
 # HARBOUR.EXE dependencies
@@ -3622,17 +3641,28 @@ $(CT_OBJ_DIR)\util.obj : $(CT_OBJ_DIR)\util.c
 #
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c \
-   $(COMPILER_DIR)\calconst.c \
-   $(PP_LIB_OBJS) \
+   $(HBPP_DIR)\hbppcalc.c \
+   $(HBPP_DIR)\hbppcomp.c \
+   $(HBPP_DIR)\hbppcore.c \
+   $(HBPP_DIR)\hbpptbl.c \
+   $(HBPP_DIR)\pragma.c \
    $(COMMON_LIB_OBJS)
 
    $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbpp.obj $(HBPP_DIR)\hbpp.c
-   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\calconst.obj $(COMPILER_DIR)\calconst.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbppcalc.obj $(HBPP_DIR)\hbppcalc.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbppcomp.obj $(HBPP_DIR)\hbppcomp.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbppcore.obj $(HBPP_DIR)\hbppcore.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\hbpptbl.obj $(HBPP_DIR)\hbpptbl.c
+   $(CC) $(CLIBFLAGS) -o$(OBJ_DIR)\pragma.obj $(HBPP_DIR)\pragma.c
    $(ECHO) $(CFLAGS) > make.tmp
    $(ECHO) -e$(HBPP_EXE) >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbpp.obj >> make.tmp
-   $(ECHO) $(OBJ_DIR)\calconst.obj >> make.tmp
-   $(ECHO) $(COMMON_LIB) $(PP_LIB) >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcalc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcomp.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcore.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbpptbl.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pragma.obj >> make.tmp
+   $(ECHO) $(COMMON_LIB) >> make.tmp
    $(CC) @make.tmp
    $(DEL) make.tmp
 

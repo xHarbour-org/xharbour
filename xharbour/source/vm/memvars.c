@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.119 2006/06/27 19:23:23 ptsarenko Exp $
+ * $Id: memvars.c,v 1.120 2006/06/30 04:22:33 ronpinkas Exp $
  */
 
 /*
@@ -734,7 +734,7 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
          // JC1: the variable we have now can't be destroyed in the meanwhile.
          // It could be changed, but this is a race condition that must be
          // prevented at prg level.
-         //if( HB_IS_BYREF( pSetItem ) )
+         if( HB_IS_BYREF( pSetItem ) )
          {
             pSetItem = hb_itemUnRef( pSetItem );
          }

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.100 2006/08/20 23:39:21 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.101 2006/08/21 15:16:46 walito Exp $
  */
 
 /*
@@ -66,7 +66,6 @@
 #include "hashapi.h"
 
 extern char *hb_vm_sNull;
-extern char *hb_vm_acAscii[256];
 
 HB_EXTERN_BEGIN
 
@@ -554,7 +553,7 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
    {
       if( ulLen == 1 )
       {
-         pItem->item.asString.value  = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
+         pItem->item.asString.value  = ( char * ) hb_szAscii[ ( UCHAR ) ( szText[0] ) ];
          pItem->item.asString.length = 1;
       }
       else
@@ -639,7 +638,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
    {
       if( ulLen == 1 )
       {
-         pItem->item.asString.value  = hb_vm_acAscii[ (BYTE) ( szText[0] ) ];
+         pItem->item.asString.value  = ( char * ) hb_szAscii[ ( UCHAR ) szText[0] ];
          pItem->item.asString.length = 1;
       }
       else
@@ -768,7 +767,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCRawStatic( PHB_ITEM pItem, char * szText, ULONG ul
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
+PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, const char * szText )
 {
    ULONG ulLen = ( szText ? strlen( szText ) : 0 );
 
@@ -792,7 +791,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
 
    if( ulLen )
    {
-      pItem->item.asString.value  = szText;
+      pItem->item.asString.value  = ( char * ) szText;
    }
    else
    {
@@ -802,7 +801,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, char * szText )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLen )
+PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutCLStatic(%p, %s, %lu)", pItem, szText, ulLen));
 
@@ -824,7 +823,7 @@ PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, char * szText, ULONG ulLe
 
    if( ulLen )
    {
-      pItem->item.asString.value  = szText;
+      pItem->item.asString.value  = ( char * ) szText;
    }
    else
    {
@@ -883,7 +882,7 @@ PHB_ITEM HB_EXPORT hb_itemPutPtrGC( PHB_ITEM pItem, void * pValue )
 }
 
 
-void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
+void HB_EXPORT hb_itemPushStaticString( const char * szText, ULONG length )
 {
    HB_THREAD_STUB_STACK
 
@@ -893,7 +892,7 @@ void HB_EXPORT hb_itemPushStaticString( char * szText, ULONG length )
 
    pTop->type = HB_IT_STRING;
    pTop->item.asString.length    = length;
-   pTop->item.asString.value     = szText;
+   pTop->item.asString.value     = ( char * ) szText;
    pTop->item.asString.allocated = 0;
 
    hb_stackPush();
@@ -997,7 +996,7 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
 }
 
 #undef hb_retcStatic
-void HB_EXPORT hb_retcStatic( char * szText )
+void HB_EXPORT hb_retcStatic( const char * szText )
 {
    HB_THREAD_STUB
 
@@ -1011,12 +1010,12 @@ void HB_EXPORT hb_retcStatic( char * szText )
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
    ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = ( char * ) szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length    = strlen( szText );
 }
 
 #undef hb_retclenStatic
-void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
+void HB_EXPORT hb_retclenStatic( const char * szText, ULONG ulLen )
 {
    HB_THREAD_STUB
 
@@ -1029,7 +1028,7 @@ void HB_EXPORT hb_retclenStatic( char * szText, ULONG ulLen )
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
    ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
-   ( &(HB_VM_STACK.Return) )->item.asString.value     = szText;
+   ( &(HB_VM_STACK.Return) )->item.asString.value     = ( char * ) szText;
    ( &(HB_VM_STACK.Return) )->item.asString.length    = ulLen;
 
 }

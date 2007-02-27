@@ -1,5 +1,5 @@
 /*
- * $Id: pragma.c,v 1.10 2005/03/31 14:34:07 andijahja Exp $
+ * $Id: pragma.c,v 1.11 2006/02/15 19:33:05 druzus Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
  * See doc/pragma.txt to learn more about Harbour pragmas.
  */
 
-#include "hbpp.h"
+#include "hbppdef.h"
 #include "hbcomp.h"
 #include "hbexemem.h"
 

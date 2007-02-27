@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.24 2006/04/24 07:30:16 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.25 2007/02/22 01:55:15 ronpinkas Exp $
  */
 
 /*
@@ -143,15 +143,16 @@ char * hb_comp_szWarnings[] =
 void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
 {
    int iLine = hb_comp_iLine - 1;
+   char * szFile = hb_pp_fileName( hb_comp_PP );
 
    if( cPrefix != 'F' && hb_comp_bError )
    {
       return;
    }
 
-   if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
+   if( szFile )
    {
-      fprintf( hb_comp_errFile, "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+      fprintf( hb_comp_errFile, "\r%s(%i) ", szFile, iLine );
    }
 
    fprintf( hb_comp_errFile, "Error %c%04i  ", cPrefix, iError );
@@ -182,12 +183,13 @@ void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const c
 {
    char * szText = szWarnings[ iWarning - 1 ];
    int iLine = hb_comp_iLine - 1;
+   char * szFile = hb_pp_fileName( hb_comp_PP );
 
    if( ( szText[ 0 ] - '0' ) <= hb_comp_iWarnings )
    {
-      if( hb_comp_files.pLast && hb_comp_files.pLast->szFileName )
+      if( szFile )
       {
-         fprintf( hb_comp_errFile, "\r%s(%i) ", hb_comp_files.pLast->szFileName, iLine );
+         fprintf( hb_comp_errFile, "\r%s(%i) ", szFile, iLine );
       }
 
       fprintf( hb_comp_errFile, "Warning %c%04i  ", cPrefix, iWarning );

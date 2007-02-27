@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_src.bat,v 1.16 2006/06/28 20:19:44 druzus Exp $
+rem $Id: pack_src.bat,v 1.17 2006/12/13 02:35:04 ronpinkas Exp $
 rem
 
 rem This batch requires "Free ZIP" and/or "TAR" utilities for compression.
@@ -275,6 +275,7 @@ rem UTILS\XPROMPT
 rem UTILS\HBPP
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbpp/Makefile
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbpp/*.c
+%hb_archbin% %hb_archopt%  %hb_filename% utils/hbpp/*.h
 
 rem UTILS\HBRUN
 %hb_archbin% %hb_archopt%  %hb_filename% utils/hbrun/Makefile
