@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.129 2007/01/23 22:41:57 kaddath Exp $
+# $Id: hrbdll.bc,v 1.130 2007/01/24 17:34:03 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -51,6 +51,7 @@ HBRUN_DIR         = utils\hbrun
 HBDOC_DIR         = utils\hbdoc
 HBMAKE_DIR        = utils\hbmake
 HBTEST_DIR        = utils\hbtest
+HBPP_DIR          = utils\hbpp
 CONTRIB_DIR       = contrib
 
 !if $d(HB_RDDADS)
@@ -427,6 +428,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbupdat.obj \
   $(OBJ_DIR)\rddord.obj \
   $(OBJ_DIR)\rddsys.obj \
+  $(OBJ_DIR)\hbdate.obj \
   $(OBJ_DIR)\hbfsapi.obj \
   $(OBJ_DIR)\hbgete.obj \
   $(OBJ_DIR)\hbini.obj \
@@ -737,6 +739,8 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\ppcomp.obj \
    $(OBJ_DIR)\ppcore.obj \
    $(OBJ_DIR)\pplib.obj \
+   $(OBJ_DIR)\pplib2.obj \
+   $(OBJ_DIR)\pplib3.obj \
    $(OBJ_DIR)\pptable.obj \
    $(OBJ_DIR)\pragma.obj \
 #
@@ -1008,6 +1012,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\ppcomp.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ppcore.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\pplib.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\pplib2.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\pplib3.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\pptable.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\pragma.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\profiler.obj          + >> hdll.tmp
@@ -1161,6 +1167,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\dbupdat.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\rddord.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\rddsys.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbdate.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbfsapi.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbgete.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbini.obj             + >> hdll.tmp
@@ -1436,6 +1443,9 @@ $(HARBOUR_DLL)  : \
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 
+$(OBJ_DIR)\hbdate.obj : $(COMMON_DIR)\hbdate.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
    $(CC_CMD)
 
@@ -1628,7 +1638,7 @@ $(OBJ_DIR)\memvclip.obj : $(VM_DIR)\memvclip.c
 $(OBJ_DIR)\pcount.obj : $(VM_DIR)\pcount.c
    $(CC_CMD)
 
-$(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
+$(OBJ_DIR)\ppcomp.obj : $(COMPILER_DIR)\ppcomp.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
@@ -1637,7 +1647,7 @@ $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
 $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC_CMD)
 
-$(OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
+$(OBJ_DIR)\pragma.obj : $(HBPP_DIR)\pragma.c
    $(CC_CMD)
 
 $(OBJ_DIR)\proc.obj : $(VM_DIR)\proc.c
@@ -2126,7 +2136,13 @@ $(OBJ_DIR)\philes53.obj : $(RTL_DIR)\philes53.c
 $(OBJ_DIR)\philesx.obj : $(RTL_DIR)\philesx.c
    $(CC_CMD)
 
-$(OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
+$(OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pplib2.obj : $(PP_DIR)\pplib2.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pplib3.obj : $(PP_DIR)\pplib3.c
    $(CC_CMD)
 
 $(OBJ_DIR)\profiler.c : $(RTL_DIR)\profiler.prg
@@ -3968,3 +3984,5 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
+
+

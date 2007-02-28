@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.28 2006/11/06 10:20:14 marchuet Exp $
+rem $Id: make_b32.bat,v 1.29 2006/11/11 13:31:37 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -59,6 +59,7 @@ if not exist bin\b32 md bin\b32
    if exist bin\hbtest.exe     del bin\hbtest.exe
    if exist bin\hbtestmt.exe   del bin\hbtestmt.exe
    if exist bin\xbscript.exe   del bin\xbscript.exe
+   if exist bin\ppgen.exe      del bin\ppgen.exe
 
    if exist lib\xharbour.lib   del lib\xharbour.lib
    if exist lib\codepage.lib   del lib\codepage.lib
@@ -69,6 +70,8 @@ if not exist bin\b32 md bin\b32
    if exist lib\dbfcdxmt.lib   del lib\dbfcdxmt.lib
    if exist lib\bmdbfcdx.lib   del lib\bmdbfcdx.lib
    if exist lib\bmdbfcdxmt.lib del lib\bmdbfcdxmt.lib
+   if exist lib\bmsixcdx.lib   del lib\bmsixcdx.lib
+   if exist lib\bmsixcdxmt.lib del lib\bmsixcdxmt.lib
    if exist lib\dbfdbt.lib     del lib\dbfdbt.lib
    if exist lib\dbfdbtmt.lib   del lib\dbfdbtmt.lib
    if exist lib\dbffpt.lib     del lib\dbffpt.lib
