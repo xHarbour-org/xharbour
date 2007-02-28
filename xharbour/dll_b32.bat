@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.11 2006/07/27 16:47:37 map Exp $
+REM $Id: dll_b32.bat,v 1.12 2006/12/01 11:46:49 modalsist Exp $
 REM
 REM 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
 REM � This is a batch file to create harbour.dll 넴
@@ -40,16 +40,29 @@ goto EXIT
   if exist dll_b32.log del dll_b32.log
 
   if exist bin\b32\harbour.lib del bin\b32\harbour.lib
-  if exist bin\b32\harbour.dll del bin\b32\harbour.dll
-  if exist bin\harbour.dll del bin\harbour.dll
-  if exist bin\harbour.lib del bin\harbour.lib
 
-  if exist lib\harbour.lib del lib\harbour.lib
-  if exist lib\harbour.dll del lib\harbour.dll
+  if exist bin\b32\harbour.dll del bin\b32\harbour.dll
+  if exist bin\harbour.dll     del bin\harbour.dll
+  if exist bin\harbour.lib     del bin\harbour.lib
+
+  if exist bin\b32\hbdocdll.exe    del bin\b32\hbdocdll.exe
+  if exist bin\b32\hbmakedll.exe   del bin\b32\hbmakedll.exe
+  if exist bin\b32\hbrundll.exe    del bin\b32\hbrundll.exe
+  if exist bin\b32\hbtestdll.exe   del bin\b32\hbtestdll.exe
+  if exist bin\b32\xbscriptdll.exe del bin\b32\xbscriptdll.exe
+
+  if exist bin\hbdocdll.exe    del bin\hbdocdll.exe
+  if exist bin\hbmakedll.exe   del bin\hbmakedll.exe
+  if exist bin\hbrundll.exe    del bin\hbrundll.exe
+  if exist bin\hbtestdll.exe   del bin\hbtestdll.exe
+  if exist bin\xbscriptdll.exe del bin\xbscriptdll.exe
+
+  if exist lib\harbour.lib     del lib\harbour.lib
+  if exist lib\harbour.dll     del lib\harbour.dll
   if exist lib\b32\harbour.lib del lib\b32\harbour.lib
   if exist lib\b32\harbour.dll del lib\b32\harbour.dll
 
-  if exist tests\harbour.dll del tests\harbour.dll
+  if exist tests\harbour.dll  del tests\harbour.dll
 
   if exist obj\dll\b32\*.obj del obj\dll\b32\*.obj
   if exist obj\dll\b32\*.c   del obj\dll\b32\*.c
