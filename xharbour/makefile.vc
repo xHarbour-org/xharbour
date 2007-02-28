@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.182 2006/11/30 23:32:34 ronpinkas Exp $
+# $Id: makefile.vc,v 1.183 2007/02/05 08:57:13 marchuet Exp $
 #
 
 #
@@ -254,6 +254,7 @@ HBTEST_EXE       =$(BIN_DIR)\hbtest.exe
 HBDOC_EXE        =$(BIN_DIR)\hbdoc.exe
 HBMAKE_EXE       =$(BIN_DIR)\hbmake.exe
 XBSCRIPT_EXE     =$(BIN_DIR)\xbscript.exe
+PPGEN_EXE        =$(BIN_DIR)\ppgen.exe
 
 #
 # GT driver list
@@ -974,10 +975,10 @@ USRRDD_LIB_OBJS = \
 
 PP_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ppcore.obj \
-   $(OBJ_DIR)$(MT)\ppcomp.obj \
-   $(OBJ_DIR)$(MT)\pplib.obj \
    $(OBJ_DIR)$(MT)\pptable.obj \
-   $(OBJ_DIR)$(MT)\pragma.obj
+   $(OBJ_DIR)$(MT)\pplib.obj \
+   $(OBJ_DIR)$(MT)\pplib2.obj \
+   $(OBJ_DIR)$(MT)\pplib3.obj
 
 #
 # DEBUG.LIB rules
@@ -1029,7 +1030,8 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbver.obj \
    $(OBJ_DIR)\expropt1.obj \
    $(OBJ_DIR)\expropt2.obj \
-   $(OBJ_DIR)\reserved.obj
+   $(OBJ_DIR)\reserved.obj \
+   $(OBJ_DIR)\hbdate.obj
 
 #
 # VM.LIB rules
@@ -1449,7 +1451,9 @@ TARGETS= \
    $(HBTESTMT_EXE) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
-   $(XBSCRIPT_EXE)
+   $(XBSCRIPT_EXE) \
+   $(PPGEN_EXE)
+
 
 !if ( "$(MK_FLAGS:Y=)"=="A" )
 
@@ -1475,18 +1479,23 @@ CLEAN:
    -@if exist $(OBJ_DIR)mt\*.c $(DEL) $(OBJ_DIR)mt\*.c > nul
    -@if exist $(OBJ_DIR)mt\*.h $(DEL) $(OBJ_DIR)mt\*.h > nul
    -@if exist $(OBJ_DIR)mt\*.pch $(DEL) $(OBJ_DIR)mt\*.pch > nul
-   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib > nul
+   -@if exist $(LIB_DIR)\*.lib $(DEL) $(LIB_DIR)\*.lib
    -@if exist $(BIN_DIR)\*.exe $(DEL) $(BIN_DIR)\*.exe > nul
    -@if exist $(BIN_DIR)\*.map $(DEL) $(BIN_DIR)\*.map > nul
    -@if exist $(BIN_DIR)\*.pdb $(DEL) $(BIN_DIR)\*.pdb > nul
    -@if exist $(BIN_DIR)\*.ilk $(DEL) $(BIN_DIR)\*.ilk > nul
    -@if exist vc60.idb $(DEL) vc60.idb > nul
    -@if exist vc70.idb $(DEL) vc70.idb > nul
+   -@if exist vc80.idb $(DEL) vc80.idb > nul
 
 $(HBPP_EXE) : \
    $(HBPP_DIR)\hbpp.c \
-   $(COMPILER_DIR)\calconst.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
+   $(HBPP_DIR)\hbppcalc.c \
+   $(HBPP_DIR)\hbppcomp.c \
+   $(HBPP_DIR)\hbppcore.c \
+   $(HBPP_DIR)\hbpptbl.c \
+   $(HBPP_DIR)\pragma.c
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
@@ -1657,7 +1666,6 @@ $(XBSCRIPT_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\XBSCRIPT.c \
                        -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
-
 #
 # HARBOUR.EXE rules
 #
@@ -1681,16 +1689,28 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c \
-   $(COMPILER_DIR)\calconst.c \
    $(COMPILER_DIR)\hbdead.c \
    $(COMPILER_DIR)\hbstripl.c \
    $(COMPILER_DIR)\gencc.c \
    $(COMPILER_DIR)\hbpcstat.c \
    $(COMPILER_DIR)\hbdbginf.c \
-   $(COMPILER_DIR)\hblbl.c
+   $(COMPILER_DIR)\hblbl.c \
+   $(COMPILER_DIR)\ppcomp.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
    $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
+
+#
+# PPGEN.EXE rules
+#
+
+$(PPGEN_EXE) : \
+   $(PP_DIR)\ppgen.c \
+   $(INCLUDE_DIR)\hbstdgen.ch \
+   $(INCLUDE_DIR)\std.ch \
+   $(INCLUDE_DIR)\set.ch \
+   $(COMMON_LIB)
+   $(CC) $(C_FLAGSNMT) $(PP_DIR)\ppgen.c -Fo$(OBJ_DIR)\ppgen.obj -o $(PPGEN_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # Library dependencies and build rules
@@ -1865,6 +1885,9 @@ $(DLL_MAIN_LIB) : $(DLL_MAIN_OBJS)
 #
 # HARBOUR.EXE dependencies
 #
+
+$(PP_DIR)\pptable.c : $(PPGEN_EXE)
+   $(PPGEN_EXE) $(INCLUDE_DIR)\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
 
 $(OBJ_DIR)\harboury.c : $(COMPILER_DIR)\harbour.sly
    bison -d --no-line -o$@ $**

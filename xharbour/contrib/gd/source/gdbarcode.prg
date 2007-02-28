@@ -117,8 +117,8 @@ METHOD New( nTypeCode,cpath_img ) CLASS TCode
                       "114131","311141","411131","211412","211214","211232","233111";
                  }
 
-      ::KeysmodeA := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"]
-      ::KeysmodeB := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_abcdefghijklmnopqrstuvwxyz{|}~"]
+      ::KeysmodeA := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\^_"] + ']'
+      ::KeysmodeB := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\^_abcdefghijklmnopqrstuvwxyz{|}~"] + ']'
 
       ::KeysModeC := Array(99)
 

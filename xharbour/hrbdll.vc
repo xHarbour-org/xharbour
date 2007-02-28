@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.99 2006/11/30 23:32:34 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.100 2007/02/05 20:39:35 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -500,6 +500,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\expropt1.obj \
   $(OBJ_DIR)\expropt2.obj \
   $(OBJ_DIR)\reserved.obj \
+  $(OBJ_DIR)\hbdate.obj \
 #
 # dbfcdx
 #
@@ -816,11 +817,11 @@ HARBOUR_DLL_OBJS = \
 #
 # pplib
 #
-  $(OBJ_DIR)\ppcomp.obj \
   $(OBJ_DIR)\ppcore.obj \
-  $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
-  $(OBJ_DIR)\pragma.obj
+  $(OBJ_DIR)\pplib.obj \
+  $(OBJ_DIR)\pplib2.obj \
+  $(OBJ_DIR)\pplib3.obj
 
 # ÚÄÄÄÄÄÄÄÄÄÄ¿
 # ³ project  ³Û
@@ -1165,16 +1166,19 @@ $(OBJ_DIR)\gtdef.obj : $(RTL_DIR)\gtgui\gtdef.c
 $(OBJ_DIR)\gtwvt.obj : $(RTL_DIR)\gtwvt\gtwvt.c
    $(CC_CMD)
 
-$(OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)
 
 $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC_CMD)
 
-$(OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
+$(OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pplib2.obj : $(PP_DIR)\pplib2.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pplib3.obj : $(PP_DIR)\pplib3.c
    $(CC_CMD)
 
 # hbtip
