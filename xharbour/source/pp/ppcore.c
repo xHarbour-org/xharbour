@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.203 2007/02/12 09:52:59 druzus Exp $
+ * $Id: ppcore.c,v 1.235 2007/02/27 15:59:39 druzus Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ static char * hb_pp_szErrors[] =
 };
 
 
-static const HB_PP_OPERATOR s_operators[] = 
+static const HB_PP_OPERATOR s_operators[] =
 {
    { ".NOT.", 5, "!"    , HB_PP_TOKEN_NOT       | HB_PP_TOKEN_STATIC },
    { ".AND.", 5, ".AND.", HB_PP_TOKEN_AND       | HB_PP_TOKEN_STATIC },
@@ -169,6 +169,9 @@ static const HB_PP_OPERATOR s_operators[] =
    { "!="   , 2, "<>"   , HB_PP_TOKEN_NE        | HB_PP_TOKEN_STATIC },
    { "<>"   , 2, "<>"   , HB_PP_TOKEN_NE        | HB_PP_TOKEN_STATIC },
    { "->"   , 2, "->"   , HB_PP_TOKEN_ALIAS     | HB_PP_TOKEN_STATIC },
+   { "<<"   , 2, "<<"   , HB_PP_TOKEN_SHIFTL    | HB_PP_TOKEN_STATIC },
+   { ">>"   , 2, ">>"   , HB_PP_TOKEN_SHIFTR    | HB_PP_TOKEN_STATIC },
+   { "^^"   , 2, "^^"   , HB_PP_TOKEN_BITXOR    | HB_PP_TOKEN_STATIC },
    { "@"    , 1, "@"    , HB_PP_TOKEN_REFERENCE | HB_PP_TOKEN_STATIC },
    { "("    , 1, "("    , HB_PP_TOKEN_LEFT_PB   | HB_PP_TOKEN_STATIC },
    { ")"    , 1, ")"    , HB_PP_TOKEN_RIGHT_PB  | HB_PP_TOKEN_STATIC },
@@ -884,7 +887,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
                         snprintf( szFunc, sizeof( szFunc ), "HB_INLINE_%03d", ++pState->iInLineCount );
                         if( pInLinePtr && * pInLinePtr )
                            hb_pp_tokenSetValue( *pInLinePtr, szFunc, strlen( szFunc ) );
-                        pState->pInLineFunc( pState->cargo, szFunc, 
+                        pState->pInLineFunc( pState->cargo, szFunc,
                                     hb_membufPtr( pState->pStreamBuffer ),
                                     hb_membufLen( pState->pStreamBuffer ),
                                     pState->iDumpLine );
@@ -1051,7 +1054,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
             while( ++ul < ulLen && HB_PP_ISNEXTIDCHAR( pBuffer[ ul ] ) );
 
             /*
-             * In Clipper note can be used only as 1-st token and after 
+             * In Clipper note can be used only as 1-st token and after
              * statement separator ';' it does not work like a single line
              * comment.
              */
@@ -1229,7 +1232,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
    }
    while( ( pState->pFile->pLineBuf ? pState->pFile->ulLineBufLen != 0 :
                                       !pState->pFile->fEof ) &&
-          ( pState->fCanNextLine || 
+          ( pState->fCanNextLine ||
             ( pState->iStreamDump && pState->iStreamDump != HB_PP_STREAM_CLIPPER ) ) );
 
    if( pState->iStreamDump )
@@ -1383,7 +1386,7 @@ static BOOL hb_pp_tokenEqual( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pMatch,
                               USHORT mode )
 {
    return pToken == pMatch ||
-         ( mode != HB_PP_CMP_ADDR && 
+         ( mode != HB_PP_CMP_ADDR &&
            HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_TYPE( pMatch->type ) &&
            ( pToken->len == pMatch->len ||
              ( mode == HB_PP_CMP_DBASE && pMatch->len > 4 &&
@@ -1868,7 +1871,7 @@ static BOOL hb_pp_pragmaOperatorNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
                      pState->pOperators,
                      sizeof( HB_PP_OPERATOR ) * ( pState->iOperators + 1 ) );
          else
-            pState->pOperators = ( PHB_PP_OPERATOR ) hb_xgrab( 
+            pState->pOperators = ( PHB_PP_OPERATOR ) hb_xgrab(
                      sizeof( HB_PP_OPERATOR ) * ( pState->iOperators + 1 ) );
          pOperator = &pState->pOperators[ pState->iOperators++ ];
          pOperator->name  = hb_strndup( pBuffer, ulLen );
@@ -3442,7 +3445,7 @@ static PHB_PP_TOKEN * hb_pp_matchResultLstAdd( PHB_PP_STATE pState,
          }
          else
          {
-            /* leading spaces calculation in Clipper is broken when 
+            /* leading spaces calculation in Clipper is broken when
                separate tokens are stringified, it can be quite
                easy checked that it will interact with translation
                done just before - spaces are partially inherited.
@@ -3900,6 +3903,12 @@ static PHB_PP_TOKEN hb_pp_calcPrecedence( PHB_PP_TOKEN pToken,
          }
          break;
       case HB_PP_TOKEN_POWER:
+         *piNextPrec = HB_PP_PREC_BIT;
+         break;
+
+      case HB_PP_TOKEN_BITXOR:
+      case HB_PP_TOKEN_SHIFTL:
+      case HB_PP_TOKEN_SHIFTR:
          *piNextPrec = HB_PP_PREC_BIT;
          break;
 
@@ -4878,7 +4887,7 @@ void hb_pp_addDefine( PHB_PP_STATE pState, char * szDefName, char * szDefValue )
    {
       hb_pp_tokenListFree( &pMatch );
       hb_pp_tokenListFree( &pResult );
-   }   
+   }
    else
    {
       hb_pp_defineAdd( pState, HB_PP_CMP_CASE, 0, NULL, pMatch, pResult );
