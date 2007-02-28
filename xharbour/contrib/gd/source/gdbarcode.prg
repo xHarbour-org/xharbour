@@ -114,11 +114,11 @@ METHOD New( nTypeCode,cpath_img ) CLASS TCode
                       "112412","122114","122411","142112","142211","241211","221114","213111","241112","134111",;
                       "111242","121142","121241","114212","124112","124211","411212","421112","421211","212141",;
                       "214121","412121","111143","111341","131141","114113","114311","411113","411311","113141",;
-                      "114131","311141","411131","211412","211214","211232","233111";
+                      "114131","311141","411131","211412","211214","211232","2331112";
                  }
 
-      ::KeysmodeA := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\^_"] + ']'
-      ::KeysmodeB := ["' '!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\^_abcdefghijklmnopqrstuvwxyz{|}~"] + ']'
+      ::KeysmodeA := " " + [!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ] + "[\]^_"
+      ::KeysmodeB := " " + [!"#$%&\()*+-.,/0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ] + "[\]^_abcdefghijklmnopqrstuvwxyz{|}~"
 
       ::KeysModeC := Array(99)
 
@@ -545,7 +545,7 @@ METHOD Draw128( cText, cModeCode ) CLASS TCode
 
            Else
 
-               If cchar <= ' '
+               If cchar < ' '
                    cconc += ::aCode[CODEA]
                    nvalchar := Asc(cchar)+64
                Else
