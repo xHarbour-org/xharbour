@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5362 2007/02/28 22:41:09 modalsist Exp $
+ * $Id: ChangeLog,v 1.5363 2007/02/28 22:58:31 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-02-28 19:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbclass.ch
+    * Converted scope declaration rules from #xtranslate to #xcommand, and moved them to bottom.
 
 2007-02-28 20:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * dll_b32.bat

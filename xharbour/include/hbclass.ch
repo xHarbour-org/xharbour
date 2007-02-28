@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.44 2006/11/28 02:13:08 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.45 2007/02/27 15:59:33 druzus Exp $
  */
 
 /*
@@ -428,17 +428,6 @@ DECLARE HBClass ;
 #xcommand VAR <DataName1> IS <DataName2> TO <oObject> => ;
    s_oClass:AddInline( <(DataName1)>, {|Self| Self:<oObject>:<DataName2> }, HB_OO_CLSTP_EXPORTED + HB_OO_CLSTP_READONLY ) ;;
    s_oClass:AddInline( "_" + <(DataName1)>, {|Self, param| Self:<oObject>:<DataName2> := param }, HB_OO_CLSTP_EXPORTED )
-
-#xtranslate    EXPORTED:       =>      nScope := HB_OO_CLSTP_EXPORTED
-#xtranslate    EXPORT:         =>      nScope := HB_OO_CLSTP_EXPORTED
-#xtranslate    VISIBLE:        =>      nScope := HB_OO_CLSTP_EXPORTED
-#xtranslate    PUBLIC:         =>      nScope := HB_OO_CLSTP_EXPORTED
-
-#xtranslate    HIDDEN:         =>      nScope := HB_OO_CLSTP_HIDDEN
-#xtranslate    PRIVATE:        =>      nScope := HB_OO_CLSTP_HIDDEN
-
-#xtranslate    PROTECTED:      =>      nScope := HB_OO_CLSTP_PROTECTED
-#xtranslate    PUBLISHED:      =>      nScope := HB_OO_CLSTP_PUBLISHED
 
 #xcommand CLASS VAR <*rest*> => CLASSVAR <rest>
 #xcommand CLASS METHOD <*rest*> => CLASSMETHOD <rest>
@@ -1000,5 +989,19 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
 #endif /* HB_SHORTNAMES */
 
 #xcommand METHOD <!ClassName!>:<MethodName> => METHOD <MethodName> CLASS <ClassName>
+
+
+#ifdef HB_CLS_CSY
+   #xcommand    EXPORTED:       =>      nScope := HB_OO_CLSTP_EXPORTED
+   #xcommand    EXPORT:         =>      nScope := HB_OO_CLSTP_EXPORTED
+   #xcommand    VISIBLE:        =>      nScope := HB_OO_CLSTP_EXPORTED
+   #xcommand    PUBLIC:         =>      nScope := HB_OO_CLSTP_EXPORTED
+
+   #xcommand    HIDDEN:         =>      nScope := HB_OO_CLSTP_HIDDEN
+   #xcommand    PRIVATE:        =>      nScope := HB_OO_CLSTP_HIDDEN
+
+   #xcommand    PROTECTED:      =>      nScope := HB_OO_CLSTP_PROTECTED
+   #xcommand    PUBLISHED:      =>      nScope := HB_OO_CLSTP_PUBLISHED
+#endif
 
 #endif /* HB_CLASS_CH_ */
