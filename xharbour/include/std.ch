@@ -1,10 +1,10 @@
 /*
- * $Id: std.ch,v 1.5 2007/02/27 15:59:34 druzus Exp $
+ * $Id: std.ch,v 1.6 2007/02/27 20:25:18 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * 
+ *
  *
  * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
@@ -60,10 +60,20 @@
 #command END <x>           => end
 #command END SEQUENCE      => end
 #command ENDSEQUENCE       => end
-#command ENDDO <*x*>       => enddo
-#command ENDIF <*x*>       => endif
-#command ENDCASE <*x*>     => endcase
-#command ENDFOR [<*x*>]    => next
+
+#ifdef HB_C52_STRICT
+   #command ENDDO <*x*>       => enddo
+   #command ENDIF <*x*>       => endif
+   #command ENDCASE <*x*>     => endcase
+   #command ENDFOR [<*x*>]    => next
+#else
+  // Using StRaNgE capitalization to signify the translation.
+  #command ENDDO   <any,...> [<anymore,...>] => eNddO
+  #command ENDIF   <any,...> [<anymore,...>] => eNdiF
+  #command ENDCASE <any,...> [<anymore,...>] => eNdcasE
+  #command ENDFOR [<any,...>]                => nExT
+#endif
+
 #command NEXT <v> [TO <x>] [STEP <s>]  => next
 #command DO <proc>.prg [WITH <p,...>]  => do <proc> [ WITH <p>]
 #command CALL <proc>() [WITH <p,...>]  => call <proc> [ WITH <p>]
