@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.45 2007/02/27 15:59:33 druzus Exp $
+ * $Id: hbclass.ch,v 1.46 2007/02/28 23:13:17 ronpinkas Exp $
  */
 
 /*
@@ -157,7 +157,8 @@ DECLARE HBClass ;
 #endif
 
 //#xtranslate HBCLSCHOICE( <publish> <export>, <protect>, <hidde> ) => iif( <export>, HB_OO_CLSTP_EXPORTED , iif( <export>, HB_OO_CLSTP_EXPORTED , iif( <protect>, HB_OO_CLSTP_PROTECTED, iif( <hidde>, HB_OO_CLSTP_HIDDEN, nScope) ) ) )
-#xtranslate HBCLSCHOICE( <x,...> ) => ;__ERR( Can not use multiple scope qualifiers! );;
+//#xtranslate HBCLSCHOICE( <x,...> ) => ;__ERR( Can not use multiple scope qualifiers! );;
+#xtranslate HBCLSCHOICE( <x,...> ) => ) ;__ERR( Can not use multiple scope qualifiers! );#line
 
 #xtranslate HBCLSCHOICE( .T., .F., .F., .F. ) => HB_OO_CLSTP_PUBLISHED
 #xtranslate HBCLSCHOICE( .F., .F., .T., .F. ) => HB_OO_CLSTP_PROTECTED
