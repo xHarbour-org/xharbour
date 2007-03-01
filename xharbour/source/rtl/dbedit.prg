@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.40 2007/02/19 10:51:16 modalsist Exp $
+ * $Id: dbedit.prg,v 1.41 2007/02/20 19:33:59 modalsist Exp $
  */
 
 /*
@@ -187,10 +187,13 @@ LOCAL oTBR,;
   /* In Clipper the <cUserFunc> paramenter only can be a
    * string or nil, but in xHarbour can be a codeblock also.
    */
-  IF !HB_IsNil(xUserFunc) .AND. ( !HB_IsString( xUserFunc ) .AND. !HB_IsBlock(xUserFunc) )
+  IF !HB_IsNil(xUserFunc) .AND. ( !HB_IsString( xUserFunc ) .AND. !HB_IsBlock(xUserFunc) .AND. !HB_IsLogical(xUserFunc) )
      Throw( ErrorNew( "BASE", 0, 1127,  "Argument type error <"+valtype(xUserFunc)+">", Procname()+" <xUserFunc>" ) )
   ELSE
       If HB_IsString(xUserFunc) .AND. Empty(xUserFunc)
+         xUserFunc := NIL
+      Endif
+      If HB_IsLogical(xUserFunc) .AND. xUserFunc
          xUserFunc := NIL
       Endif
   ENDIF
@@ -368,7 +371,7 @@ LOCAL oTBR,;
 
  IF Empty(xUserFunc)
    bFun := {|| IIf(HB_ISNUMERIC(nKey) .And. (Chr(LastKey()) $ Chr(K_ESC) + Chr(K_ENTER)), DE_ABORT, DE_CONT)}
- ELSE
+ ElseIf !HB_IsLogical(xUserFunc)
    bFun := IIf(HB_ISBLOCK(xUserFunc), xUserFunc, &("{|x, y, z|" + xUserFunc + "(x,y,z)}"))
    oTBR:setKey( K_ESC, nil )
  END
@@ -377,20 +380,28 @@ LOCAL oTBR,;
  //
  nRet := _DoUserFunc(bFun, DE_INIT, oTBR:colPos, oTBR)
 
+ If Hb_IsLogical( xUserFunc ) .AND. !xUserFunc
+    nRet := DE_ABORT
+ Endif
+
  oTBR:refreshAll()
  oTBR:invalidate()
  oTBR:forceStable()
 
  oTBR:deHilite()
 
- i := RecNo()
- dbGoTop()
+ If nRet != DE_ABORT
 
- IF dbe_Empty()
-    nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
- END
+    i := RecNo()
+    dbGoTop()
 
- dbGoto(i)
+    IF dbe_Empty()
+       nRet := _DoUserFunc(bFun, DE_EMPTY, oTBR:colPos, oTBR)
+    END
+
+    dbGoto(i)
+
+ Endif
 
  dispend()
 
@@ -614,6 +625,7 @@ LOCAL nRet, nRec, nKey
   ELSEIF nMode == DE_INIT
      nKey := NextKey()
      if nKey == K_ENTER .or. nKey == K_ESC
+        inkey()
         Return DE_ABORT
      endif
      oTBR:ForceStable()

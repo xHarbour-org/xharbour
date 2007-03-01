@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5366 2007/03/01 02:34:56 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5367 2007/03/01 03:22:29 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-01 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+    * updated for new preprocessor.
+
+  * source\rtl\dbedit.prg
+    ! fixed _dosuserfunc() to trap K_ENTER and K_ESC keys if they are in
+      keyboard buffer at dbedit initialization.
+    + added new feature to <cUserFunc>. Specifying false (.f.) for this
+      argument, dbedit display data and immediately terminate.
+      Same behaviour as MemoEdit userfunc.
+
+  * source\rtl\tgetlist.prg
+    ! fixed argument error reported by Patrick Mast on dev list.
 
 2007-03-01 04:22 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * xharbour/include/hbclass.ch

@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.37 2007/01/07 18:48:40 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.38 2007/02/20 19:04:18 lculik Exp $
  */
 
 /*
@@ -774,6 +774,8 @@ METHOD Settle( nPos ) CLASS HBGetList
       nExitState := ::nLastExitState
 #endif
    endif
+
+   DEFAULT nExitState TO 0
 
    Switch nExitState
       case GE_UP
