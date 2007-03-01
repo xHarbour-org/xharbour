@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.237 2007/03/01 01:01:58 druzus Exp $
+ * $Id: ppcore.c,v 1.238 2007/03/01 03:22:30 druzus Exp $
  */
 
 /*
@@ -819,7 +819,17 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
                      pState->iStreamDump = HB_PP_STREAM_OFF;
                      /* Clipper clear number of leading spaces when multiline
                         comment ends */
+#ifdef HB_C52_STRICT
                      pState->iSpaces = 0;
+#else
+                     /*
+                      * but we cannot make the same because we have automatic
+                      * word concatenation which is not Clipper compatible and
+                      * will break code like:
+                      */
+                      //   if /**/lVar; endif
+                     pState->iSpaces = 1;
+#endif
                      ++ul;
                   }
                }
@@ -1703,6 +1713,7 @@ static void hb_pp_InFileFree( PHB_PP_STATE pState )
       pState->pFile = pFile->pPrev;
       hb_pp_FileFree( pState, pFile, pState->pCloseFunc );
    }
+   pState->iFiles = 0;
 }
 
 static PHB_PP_STATE hb_pp_stateNew( void )

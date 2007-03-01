@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5367 2007/03/01 03:22:29 druzus Exp $
+ * $Id: ChangeLog,v 1.5368 2007/03/01 15:32:46 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-02 00:40 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * harbour/source/pp/ppcore.c
+    * clear included file counter in hb_pp_reset()
+    * insert space after stream comment /* */ - it's not Clipper
+      compatible but it's necessary as long as we have automatic
+      identifier concatenation
 
 2007-03-01 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc
