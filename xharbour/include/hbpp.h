@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.10 2007/02/27 15:59:34 druzus Exp $
+ * $Id: hbpp.h,v 1.11 2007/02/28 19:03:44 ronpinkas Exp $
  */
 
 /*
@@ -269,18 +269,23 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
                                    HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_RIGHT_SB || \
                                    HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_RIGHT_CB )
 
-#define HB_PP_TOKEN_NEEDLEFT(t)  ( HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_ASSIGN || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_PLUSEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_MINUSEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_MULTEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_DIVEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_MODEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_EXPEQ || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_EQUAL || \
-                                   HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_EQ )
-
 #define HB_PP_TOKEN_ISNEUTRAL(t) ( HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_DEC || \
                                    HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_INC )
+
+#define HB_PP_TOKEN_NEEDLEFT(t)  ( HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_ASSIGN || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_PLUSEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_MINUSEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_MULTEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_DIVEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_MODEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EXPEQ || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EQUAL || \
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EQ || \
+                                   ( HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_SEND && \
+                                     (t)->spaces == 0 && (t)->pNext && \
+                                     ( HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_KEYWORD || \
+                                       HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_MACROVAR || \
+                                       HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_MACROTEXT ) ) )
 
 /* I do not want to replicate exactly Clipper PP behavior and check if
    expression is valid.
@@ -652,6 +657,7 @@ extern char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, 
 extern PHB_PP_STATE hb_pp_lexNew( char * pString, ULONG ulLen );
 extern PHB_PP_TOKEN hb_pp_lexGet( PHB_PP_STATE pState );
 extern PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState );
+extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr );
 
 HB_EXTERN_END
 

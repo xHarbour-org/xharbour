@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5363 2007/02/28 22:58:31 modalsist Exp $
+ * $Id: ChangeLog,v 1.5364 2007/02/28 23:13:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-01 01:55 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbpp.h
+  * xharbour/source/pp/ppcore.c
+    * added hack for accepting expressions which start with ':' character
+      as regular/list match markers
+    * fixed warning messages reported by Maurilio
+    * add bit shift operations to #if calculations
 
 2007-02-28 19:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch

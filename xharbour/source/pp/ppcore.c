@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.235 2007/02/27 15:59:39 druzus Exp $
+ * $Id: ppcore.c,v 1.236 2007/02/28 19:03:44 ronpinkas Exp $
  */
 
 /*
@@ -169,9 +169,11 @@ static const HB_PP_OPERATOR s_operators[] =
    { "!="   , 2, "<>"   , HB_PP_TOKEN_NE        | HB_PP_TOKEN_STATIC },
    { "<>"   , 2, "<>"   , HB_PP_TOKEN_NE        | HB_PP_TOKEN_STATIC },
    { "->"   , 2, "->"   , HB_PP_TOKEN_ALIAS     | HB_PP_TOKEN_STATIC },
+#ifdef __XHARBOUR__
    { "<<"   , 2, "<<"   , HB_PP_TOKEN_SHIFTL    | HB_PP_TOKEN_STATIC },
    { ">>"   , 2, ">>"   , HB_PP_TOKEN_SHIFTR    | HB_PP_TOKEN_STATIC },
    { "^^"   , 2, "^^"   , HB_PP_TOKEN_BITXOR    | HB_PP_TOKEN_STATIC },
+#endif
    { "@"    , 1, "@"    , HB_PP_TOKEN_REFERENCE | HB_PP_TOKEN_STATIC },
    { "("    , 1, "("    , HB_PP_TOKEN_LEFT_PB   | HB_PP_TOKEN_STATIC },
    { ")"    , 1, ")"    , HB_PP_TOKEN_RIGHT_PB  | HB_PP_TOKEN_STATIC },
@@ -2096,7 +2098,7 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "EXITSEVERITY", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &iValue );
+         pValue = hb_pp_pragmaGetInt( pToken->pNext, &iValue );
          if( pValue )
             fError = hb_pp_setCompilerSwitch( pState, "es", iValue );
          else
@@ -2159,7 +2161,7 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "WARNINGLEVEL", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &iValue );
+         pValue = hb_pp_pragmaGetInt( pToken->pNext, &iValue );
          if( pValue )
             fError = hb_pp_setCompilerSwitch( pState, "w", iValue );
          else
@@ -3054,7 +3056,7 @@ static BOOL hb_pp_tokenSkipExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_TOKEN pStop,
 
 static BOOL hb_pp_tokenCanStartExp( PHB_PP_TOKEN pToken )
 {
-   if( !HB_PP_TOKEN_NEEDLEFT( pToken->type ) )
+   if( !HB_PP_TOKEN_NEEDLEFT( pToken ) )
    {
       if( HB_PP_TOKEN_TYPE( pToken->type ) != HB_PP_TOKEN_LEFT_SB )
          return TRUE;
@@ -3893,8 +3895,8 @@ static PHB_PP_TOKEN hb_pp_calcPrecedence( PHB_PP_TOKEN pToken,
          }
          break;
       case HB_PP_TOKEN_AMPERSAND:
-         /* It will not work because && will be stripped as comment */
          *piNextPrec = HB_PP_PREC_BIT;
+         /* It will not work because && will be stripped as comment */
          if( pNext && HB_PP_TOKEN_TYPE( pNext->type ) == HB_PP_TOKEN_AMPERSAND &&
              pNext->spaces == 0 )
          {
@@ -3972,7 +3974,14 @@ static HB_LONG hb_pp_calcOperation( HB_LONG lValueLeft, HB_LONG lValueRight,
          lValueLeft &= lValueRight;
          break;
       case HB_PP_TOKEN_POWER:
+      case HB_PP_TOKEN_BITXOR:
          lValueLeft ^= lValueRight;
+         break;
+      case HB_PP_TOKEN_SHIFTL:
+         lValueLeft <<= lValueRight;
+         break;
+      case HB_PP_TOKEN_SHIFTR:
+         lValueLeft >>= lValueRight;
          break;
 
       case HB_PP_TOKEN_PLUS:
@@ -4662,11 +4671,17 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
    hb_pp_addDefine( pState, szDefine, szResult );
 #endif
 
-   /* __HARBOUR__ */
+#if defined( __HARBOUR__ ) || defined( __XHARBOUR__ )
    snprintf( szResult, sizeof( szResult ), "%05d", HB_MAX( ( HB_VER_MAJOR << 8 ) | HB_VER_MINOR, 1 ) );
+#ifdef __HARBOUR__
+   /* __HARBOUR__ */
    hb_pp_addDefine( pState, "__HARBOUR__", szResult );
+#endif
+#ifdef __XHARBOUR__
    /* __XHARBOUR__ */
    hb_pp_addDefine( pState, "__XHARBOUR__", szResult );
+#endif
+#endif
 
    /* __DATE__ */
    hb_dateToday( &iYear, &iMonth, &iDay );
@@ -4968,7 +4983,7 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
          /* only single command in one call */
          if( !pState->pTokenOut->pNext )
             break;
-         ltype = pState->iLastType;
+         ltype = HB_PP_TOKEN_TYPE( pToken->type );
       }
       if( fError )
          pState->fError = TRUE;
@@ -5014,7 +5029,7 @@ char * hb_pp_parseLine( PHB_PP_STATE pState, char * pLine, ULONG * pulLen )
       if( pState->fError )
          fError = TRUE;
       hb_pp_tokenStr( pToken, pState->pOutputBuffer, TRUE, TRUE, ltype );
-      ltype = pState->iLastType;
+      ltype = HB_PP_TOKEN_TYPE( pToken->type );
    }
    if( fError )
       pState->fError = TRUE;
@@ -5074,6 +5089,18 @@ PHB_PP_TOKEN hb_pp_lexGet( PHB_PP_STATE pState )
       pState->pNextTokenPtr = &pToken->pNext;
 
    return pToken;
+}
+
+BOOL hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr )
+{
+   if( hb_pp_tokenCanStartExp( * pTokenPtr ) )
+   {
+      BOOL fStop = FALSE;
+      if( hb_pp_tokenSkipExp( pTokenPtr, NULL, HB_PP_CMP_STD, &fStop ) && !fStop )
+         return TRUE;
+   }
+
+   return FALSE;
 }
 
 /*
