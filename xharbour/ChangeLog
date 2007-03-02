@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5370 2007/03/02 01:26:00 modalsist Exp $
+ * $Id: ChangeLog,v 1.5371 2007/03/02 02:36:18 druzus Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-02 12:47 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/pp/ppcore.c
+    + Added to new PP pseudo function overloading support as per original changelog 2007-01-12 21:33 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
 
 2007-03-02 03:30 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * harbour/source/rdd/dbf1.c

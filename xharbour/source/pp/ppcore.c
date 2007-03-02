@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.238 2007/03/01 03:22:30 druzus Exp $
+ * $Id: ppcore.c,v 1.239 2007/03/01 23:45:17 druzus Exp $
  */
 
 /*
@@ -62,6 +62,9 @@
 
 
 #define HB_PP_WARN_DEFINE_REDEF                 1     /* C1005 */
+#ifndef HB_C52_STRICT
+   #define HB_PP_WARN_OVERLOADED_REDEF          2     /* Non Clipper */
+#endif
 
 #define HB_PP_ERR_ILLEGAL_CHAR                  1     /* C2004 */
 #define HB_PP_ERR_STRING_TERMINATOR             2     /* C2007 */
@@ -100,7 +103,8 @@
 /* warning messages */
 static char * hb_pp_szWarnings[] =
 {
-   "1Redefinition or duplicate definition of #define %s"                /* C1005 */
+   "1Redefinition or duplicate definition of #define %s",               /* C1005 */
+   "1Overloaded #define %s"                                             /* Non Clipper */
 };
 
 /* error messages */
@@ -1522,9 +1526,9 @@ static void hb_pp_ruleSetStd( PHB_PP_RULE pRule )
    }
 }
 
-static PHB_PP_RULE hb_pp_defineFind( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
+static PHB_PP_RULE hb_pp_defineFind( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, PHB_PP_RULE pFirstRule )
 {
-   PHB_PP_RULE pRule = pState->pDefinitions;
+   PHB_PP_RULE pRule = pFirstRule == NULL ? pState->pDefinitions : pFirstRule;
 
    /* TODO% create binary tree or hash table - the #define keyword token has
             to be unique so it's not necessary to keep the stack list,
@@ -1540,9 +1544,13 @@ static void hb_pp_defineAdd( PHB_PP_STATE pState, USHORT mode,
                              USHORT markers, PHB_PP_MARKER pMarkers,
                              PHB_PP_TOKEN pMatch, PHB_PP_TOKEN pResult )
 {
-   PHB_PP_RULE pRule = hb_pp_defineFind( pState, pMatch );
+   PHB_PP_RULE pRule = hb_pp_defineFind( pState, pMatch, NULL );
 
+#ifdef HB_C52_STRICT
    if( pRule )
+#else
+   if( pRule && pMarkers == NULL )
+#endif
    {
       hb_pp_tokenListFree( &pRule->pMatch );
       hb_pp_tokenListFree( &pRule->pResult );
@@ -1556,6 +1564,16 @@ static void hb_pp_defineAdd( PHB_PP_STATE pState, USHORT mode,
       pRule->mode = mode;
       hb_pp_error( pState, 'W', HB_PP_WARN_DEFINE_REDEF, pMatch->value );
    }
+#ifndef HB_C52_STRICT
+   else if( pRule )
+   {
+      pRule = hb_pp_ruleNew( pMatch, pResult, mode, markers, pMarkers );
+      pRule->pPrev = pState->pDefinitions;
+      pState->pDefinitions = pRule;
+      pState->iDefinitions++;
+      hb_pp_error( pState, 'W', HB_PP_WARN_OVERLOADED_REDEF, pMatch->value );
+   }
+#endif
    else
    {
       pRule = hb_pp_ruleNew( pMatch, pResult, mode, markers, pMarkers );
@@ -3680,7 +3698,7 @@ static void hb_pp_processCondDefined( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
           pNext->pNext && HB_PP_TOKEN_TYPE( pNext->pNext->type ) == HB_PP_TOKEN_KEYWORD &&
           pNext->pNext->pNext && HB_PP_TOKEN_TYPE( pNext->pNext->pNext->type ) == HB_PP_TOKEN_RIGHT_PB )
       {
-         BOOL fDefined = hb_pp_defineFind( pState, pNext->pNext ) != NULL;
+         BOOL fDefined = hb_pp_defineFind( pState, pNext->pNext, NULL ) != NULL;
 
          hb_pp_tokenSetValue( pToken, fDefined ? "1" : "0", 1 );
          HB_PP_TOKEN_SETTYPE( pToken, HB_PP_TOKEN_NUMBER );
@@ -3697,6 +3715,7 @@ static BOOL hb_pp_processDefine( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
    PHB_PP_TOKEN * pPrevPtr;
    BOOL fSubst = FALSE, fRepeat;
    int iCycle = 0;
+   PHB_PP_RULE pRule;
 
    do
    {
@@ -3706,7 +3725,14 @@ static BOOL hb_pp_processDefine( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
       {
          if( HB_PP_TOKEN_TYPE( ( * pFirstPtr )->type ) == HB_PP_TOKEN_KEYWORD )
          {
-            PHB_PP_RULE pRule = hb_pp_defineFind( pState, * pFirstPtr );
+           pRule = NULL;
+
+           #ifndef HB_C52_STRICT
+            overloadDefine :
+           #endif
+
+            pRule = hb_pp_defineFind( pState, * pFirstPtr, pRule );
+
             if( pRule )
             {
                if( hb_pp_patternCmp( pRule, * pFirstPtr, FALSE ) )
@@ -3722,6 +3748,13 @@ static BOOL hb_pp_processDefine( PHB_PP_STATE pState, PHB_PP_TOKEN * pFirstPtr )
                   }
                   continue;
                }
+
+               #ifndef HB_C52_STRICT
+                 pRule = pRule->pPrev;
+                 if( pRule )
+                    goto overloadDefine;
+               #endif
+
                if( !pPrevPtr )
                   pPrevPtr = pFirstPtr;
             }
@@ -4144,7 +4177,7 @@ static void hb_pp_condCompile( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
 
       if( pState->iCondCompile == 0 )
       {
-         fCond = hb_pp_defineFind( pState, pToken ) != NULL;
+         fCond = hb_pp_defineFind( pState, pToken, NULL ) != NULL;
          if( !fNot )
             fCond = !fCond;
       }
