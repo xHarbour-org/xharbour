@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.14 2006/11/11 13:31:56 modalsist Exp $
+rem $Id: make_pc.bat,v 1.15 2007/02/22 15:16:47 guerra000 Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -111,7 +111,7 @@ if "%1" == "MT"  goto MT
   echo Compiling binaries and core libs (for multi thread).
 
   SET HB_MT=mt
-  pomake /f makefile.pc >> make_pc.log
+  pomake /f makefile.pc > make_pc.log
   SET HB_MT=
   if errorlevel 1 goto BUILD_ERR
   goto BUILD_OK
@@ -132,6 +132,8 @@ if "%1" == "MT"  goto MT
 
    echo Cleaning binaries and core libs
 
+   if exist %HB_DIR%\source\pp\pptable.c         del %HB_DIR%\source\pp\pptable.c
+
    if exist %HB_DIR%\bin\harbour.exe              del %HB_DIR%\bin\harbour.exe
    if exist %HB_DIR%\bin\hbdoc.exe                del %HB_DIR%\bin\hbdoc.exe
    if exist %HB_DIR%\bin\hbmake.exe               del %HB_DIR%\bin\hbmake.exe
@@ -141,6 +143,7 @@ if "%1" == "MT"  goto MT
    if exist %HB_DIR%\bin\hbrunmt.exe              del %HB_DIR%\bin\hbrunmt.exe
    if exist %HB_DIR%\bin\hbpp.exe                 del %HB_DIR%\bin\hbpp.exe
    if exist %HB_DIR%\bin\xbscript.exe             del %HB_DIR%\bin\xbscript.exe
+   if exist %HB_DIR%\bin\ppgen.exe                del %HB_DIR%\bin\ppgen.exe
 
    if exist %HB_DIR%\lib\cgi.lib              del %HB_DIR%\lib\cgi.lib
    if exist %HB_DIR%\lib\cgimt.lib            del %HB_DIR%\lib\cgimt.lib
@@ -152,6 +155,8 @@ if "%1" == "MT"  goto MT
    if exist %HB_DIR%\lib\dbfcdxmt.lib         del %HB_DIR%\lib\dbfcdxmt.lib
    if exist %HB_DIR%\lib\bmdbfcdx.lib         del %HB_DIR%\lib\bmdbfcdx.lib
    if exist %HB_DIR%\lib\bmdbfcdxmt.lib       del %HB_DIR%\lib\bmdbfcdxmt.lib
+   if exist %HB_DIR%\lib\bmsixcdx.lib         del %HB_DIR%\lib\bmsixcdx.lib
+   if exist %HB_DIR%\lib\bmsixcdxmt.lib       del %HB_DIR%\lib\bmsixcdxmt.lib
    if exist %HB_DIR%\lib\dbfdbt.lib           del %HB_DIR%\lib\dbfdbt.lib
    if exist %HB_DIR%\lib\dbfdbtmt.lib         del %HB_DIR%\lib\dbfdbtmt.lib
    if exist %HB_DIR%\lib\dbffpt.lib           del %HB_DIR%\lib\dbffpt.lib
@@ -232,6 +237,8 @@ if "%1" == "MT"  goto MT
    if exist %BIN_DIR%\xbscript.exe         del %BIN_DIR%\xbscript.exe
    if exist %BIN_DIR%\xbscriptdll.exe      del %BIN_DIR%\xbscriptdll.exe
 
+   if exist %BIN_DIR%\ppgen.exe            del %BIN_DIR%\ppgen.exe
+
    REM Cleaning temp lib folder
 
    if exist %LIB_DIR%\cgi.lib              del %LIB_DIR%\cgi.lib
@@ -243,6 +250,8 @@ if "%1" == "MT"  goto MT
    if exist %LIB_DIR%\dbfcdx.lib           del %LIB_DIR%\dbfcdx.lib
    if exist %LIB_DIR%\dbfcdxmt.lib         del %LIB_DIR%\dbfcdxmt.lib
    if exist %LIB_DIR%\bmdbfcdx.lib         del %LIB_DIR%\bmdbfcdx.lib
+   if exist %LIB_DIR%\bmsixcdx.lib         del %LIB_DIR%\bmsixcdx.lib
+   if exist %LIB_DIR%\bmsixcdxmt.lib       del %LIB_DIR%\bmsixcdxmt.lib
    if exist %LIB_DIR%\bmdbfcdxmt.lib       del %LIB_DIR%\bmdbfcdxmt.lib
    if exist %LIB_DIR%\dbfdbt.lib           del %LIB_DIR%\dbfdbt.lib
    if exist %LIB_DIR%\dbfdbtmt.lib         del %LIB_DIR%\dbfdbtmt.lib
