@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.19 2006/07/21 00:56:40 druzus Exp $
+ * $Id: sdf1.c,v 1.20 2007/01/11 01:00:35 druzus Exp $
  */
 
 /*
@@ -121,8 +121,8 @@ static ERRCODE hb_sdfReadRecord( SDFAREAP pArea )
    {
       pArea->fEof = FALSE;
       pArea->fPositioned = TRUE;
-      uiEolPos = hb_strAt( pArea->szEol, pArea->uiEolLen,
-                           ( char * ) pArea->pRecord, uiRead );
+      uiEolPos = ( USHORT ) hb_strAt( pArea->szEol, pArea->uiEolLen,
+                                      ( char * ) pArea->pRecord, uiRead );
       if( uiEolPos )
       {
          --uiEolPos;
@@ -177,8 +177,8 @@ static ERRCODE hb_sdfNextRecord( SDFAREAP pArea )
                 pArea->pRecord[ uiRead - 1 ] == '\032' )
                --uiRead;
 
-            uiEolPos = hb_strAt( pArea->szEol, pArea->uiEolLen,
-                                 ( char * ) pArea->pRecord, uiRead );
+            uiEolPos = ( USHORT ) hb_strAt( pArea->szEol, pArea->uiEolLen,
+                                            ( char * ) pArea->pRecord, uiRead );
             if( uiEolPos )
             {
                --uiEolPos;

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.256 2006/11/14 09:46:32 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.257 2006/12/11 13:26:25 druzus Exp $
  */
 
 /*
@@ -652,7 +652,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
 #endif
          break;
    }
-   pKey = hb_cdxKeyPut( pKey, ptr, ulLen, ulRec );
+   pKey = hb_cdxKeyPut( pKey, ptr, ( USHORT ) ulLen, ulRec );
 #ifndef HB_CDP_SUPPORT_OFF
    if ( fTrans && pTag->uiType == 'C' )
       hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pKey->len );

@@ -1,5 +1,5 @@
 /*
- * $Id: hsx.c,v 1.12 2006/05/16 22:57:08 druzus Exp $
+ * $Id: hsx.c,v 1.13 2006/12/11 13:26:26 druzus Exp $
  */
 
 /*
@@ -600,8 +600,8 @@ static int hb_hsxEval( int iHandle, PHB_ITEM pExpr, BYTE *pKey, BOOL *fDeleted )
 
 static void hb_hsxGetRecCount( LPHSXINFO pHSX )
 {
-   pHSX->ulRecCount = ( hb_fsSeekLarge( pHSX->hFile, 0, FS_END ) - 
-                        HSXHEADER_LEN ) / pHSX->uiRecordSize;
+   pHSX->ulRecCount = ( ULONG ) ( ( hb_fsSeekLarge( pHSX->hFile, 0, FS_END ) - 
+                                    HSXHEADER_LEN ) / pHSX->uiRecordSize );
 }
 
 static int hb_hsxHdrFlush( int iHandle )
