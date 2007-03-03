@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.6 2007/02/27 20:25:18 druzus Exp $
+ * $Id: std.ch,v 1.7 2007/03/01 02:33:34 ronpinkas Exp $
  */
 
 /*
@@ -219,11 +219,15 @@
 #command ?  [<explist,...>]         => QOut( <explist> )
 #command ?? [<explist,...>]         => QQOut( <explist> )
 #command EJECT                      => __Eject()
+
 #command TEXT                       => text QOut, QQOut
 #command TEXT TO FILE <(f)>         => __TextSave( <(f)> ) ;;
                                        text QOut, __TextRestore
 #command TEXT TO PRINTER            => __TextSave( "PRINTER" ) ;;
                                        text QOut, __TextRestore
+#command TEXT INTO <lValue>         => <lValue> := "" ; hb_setwith( {|_1| <lValue> += _1 } );;
+                                       text __TextInto, hb_SetWith
+
 #ifdef HB_COMPAT_C53
    #xcommand TEXTBLOCK <*cText*>    =>
 #endif

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.76 2007/02/13 23:40:59 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.77 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -199,7 +199,7 @@ SELF_CONTAINED_WORDS_ARE {
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
 #define REJECT_OP        707
 
-#define HB_TEXT          708
+//#define HB_TEXT          708
 
 #define HB_WANTS_VAR     LEX_CUSTOM_ACTION - 512
 #define HB_WANTS_ID      LEX_CUSTOM_ACTION - 1024
@@ -241,11 +241,13 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* #define HB_INLINE        LEX_CUSTOM_ACTION - 25 */
 
+/*
 #define HB_TEXT_BLOCK    LEX_CUSTOM_ACTION - 26
 #define HB_TEXT_LINE     LEX_CUSTOM_ACTION - 27
 #define HB_NEXT_LINE     LEX_CUSTOM_ACTION - 28
 
 #define HB_TEXT_ID       LEX_CUSTOM_ACTION - 29
+*/
 
 #define HB_QSELF         LEX_CUSTOM_ACTION - 30
 
@@ -310,7 +312,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "STATIC{WS}FUNCTION"              ) AS_TOKEN( HB_STATIC_FUNC   ),
                          LEX_WORD( "STATIC{WS}PROCEDURE"             ) AS_TOKEN( HB_STATIC_PROC   ),
                          LEX_WORD( "SWITCH"                          ) AS_TOKEN( HB_WANTS_EXP - SWITCH           ),
-                         LEX_WORD( "TEXT"                            ) AS_TOKEN( HB_TEXT          ),
+                      /* LEX_WORD( "TEXT"                            ) AS_TOKEN( HB_TEXT          ),                 */
                          LEX_WORD( "TRY"                             ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
                          LEX_WORD( "WHILE"                           ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
                          LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( WITHOBJ          ),
@@ -519,10 +521,10 @@ LANGUAGE_RULES_ARE {
 
                     IF_SEQUENCE_IS( '&'         , '\''        , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
-                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
+                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ) // MIGHT NEED COMMA !!!
 
-                    IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             ),
-                    IF_SEQUENCE_IS( HB_TEXT     , 0           , 0      , 0          ) REDUCE_TO( HB_TEXT_ID        , 0             )
+                 /* IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             ),
+                    IF_SEQUENCE_IS( HB_TEXT     , 0           , 0      , 0          ) REDUCE_TO( HB_TEXT_ID        , 0             ) */
                    };
 
 /* -------------------------------------------------  End of Language Definitions. ------------------------------------------------ */
@@ -688,7 +690,7 @@ LANGUAGE_RULES_ARE {
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == SELF || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || \
                                    iLastToken == ')' || iLastToken == '}' || iLastToken == LITERAL || iLastToken == WANTS_EOL || iLastToken == WANTS_ID || \
                                    iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || \
-                                   iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL || iLastToken == HB_TEXT )
+                                   iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL /* || iLastToken == HB_TEXT */ )
 
 /* Support Functions. */
 static int hb_comp_SLX_InterceptAction( int iRet )
@@ -1507,6 +1509,7 @@ static int hb_comp_SLX_CustomAction( int x )
          yylval.string = hb_compIdentifierNew( "TEXT", TRUE );
          return IDENTIFIER + DONT_REDUCE;
 #endif
+
       case HB_QSELF :
          bIgnoreWords = FALSE;
          return SELF;
