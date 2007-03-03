@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.7 2007/03/01 02:33:34 ronpinkas Exp $
+ * $Id: std.ch,v 1.8 2007/03/03 01:24:58 ronpinkas Exp $
  */
 
 /*
@@ -255,8 +255,8 @@
          DevPos( <row>, <col> ) ; DevOutPict( <exp>, <pic> [, <clr>] )
 #command @ <row>, <col> SAY <exp> [COLOR <clr>] => ;
          DevPos( <row>, <col> ) ; DevOut( <exp> [, <clr>] )
-#command @ <row>, <col> PROMPT <prompt> [MESSAGE <msg>] => ;
-         __AtPrompt( <row>, <col>, <prompt> , <msg> )
+#command @ <row>, <col> PROMPT <prompt> [MESSAGE <msg>] [ COLOR <color> ]=> ;
+         __AtPrompt( <row>, <col>, <prompt> , <msg> , <color> )
 #command MENU TO <v> => ;
          <v> := __MenuTo( {|_1| if(PCount() == 0, <v>, <v> := _1)}, #<v> )
 
