@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.146 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: harbour.c,v 1.147 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -6142,7 +6142,7 @@ static int hb_compProcessRSPFile( char* szRspName )
    FILE *inFile;
    int ch;
    int i;
-   int iProcess = 1;
+//   int iProcess = 1;
    int iStatus = EXIT_SUCCESS;
    BOOL bFirstChar = FALSE;
 
@@ -6178,7 +6178,7 @@ static int hb_compProcessRSPFile( char* szRspName )
                break;
             }
 
-            iProcess ++;
+//            iProcess ++;
 
             i = 0;
             hb_xmemset( szFile, '\0', _POSIX_PATH_MAX );
