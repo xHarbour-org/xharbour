@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.9 2007/02/08 22:56:30 druzus Exp $
+ * $Id: ppcomp.c,v 1.1 2007/02/27 19:44:13 druzus Exp $
  */
 
 /*
@@ -153,6 +153,8 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
             iValue == HB_EXITLEVEL_SETEXIT ||
             iValue == HB_EXITLEVEL_DELTARGET ) )
          hb_comp_iExitLevel = iValue;
+      else if( hb_stricmp( szSwitch, "pt" ) == 0 )
+         hb_comp_bTracePP = iValue != 0;
       else
          fError = TRUE;
    }

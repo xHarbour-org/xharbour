@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5374 2007/03/03 20:13:30 lculik Exp $
+ * $Id: ChangeLog,v 1.5375 2007/03/03 23:31:40 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-04 14:35 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
+  * xharbour/include/hbpp.h
+  * xharbour/source/compiler/harbour.c
+  * xharbour/source/compiler/ppcomp.c
+  * xharbour/source/pp/ppcore.c
+    + added support for preprocessor tracing (.ppt files) with -pt switch
+
+  * xharbour/source/vm/hvm.c
+    ! fixed HVM stack corruption in code like: x:="abc"; ? x[3]-5
 
 2007-03-04 00:30 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/compiler/harbour.c

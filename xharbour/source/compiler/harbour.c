@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.147 2007/02/27 15:59:34 druzus Exp $
+ * $Id: harbour.c,v 1.148 2007/03/03 23:31:41 enricomaria Exp $
  */
 
 /*
@@ -273,7 +273,6 @@ FILE *hb_comp_VariableList = NULL;
 
 /* PreProcessor Tracing support. */
 BOOL hb_comp_bTracePP = FALSE;
-FILE *hb_comp_PPTrace = NULL;
 
 #define MAX_MEM_COMMAND_LINE 10240
 
@@ -5538,15 +5537,12 @@ static int hb_compCompile( char * szPrg )
             iStatus = EXIT_FAILURE;
          }
 
-         if( hb_comp_bTracePP )
+         if( hb_comp_bTracePP && iStatus == EXIT_SUCCESS )
          {
             hb_comp_pFileName->szExtension = ".ppt";
             hb_fsFNameMerge( szPptName, hb_comp_pFileName );
-            hb_comp_PPTrace = fopen( szPptName, "w" );
-
-            if( ! hb_comp_PPTrace )
+            if( !hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
             {
-               hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_CREATE_PPT, szPptName, NULL );
                iStatus = EXIT_FAILURE;
             }
          }
@@ -5653,12 +5649,6 @@ static int hb_compCompile( char * szPrg )
             {
                fclose( hb_comp_yyppo );
                hb_comp_yyppo = NULL;
-
-               if( hb_comp_PPTrace )
-               {
-                  fclose( hb_comp_PPTrace );
-                  hb_comp_PPTrace = NULL;
-               }
             }
 
 #if defined( HB_FORCE_CLOSE_DUMP_AREA )

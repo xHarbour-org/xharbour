@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.600 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: hvm.c,v 1.601 2007/02/27 15:59:41 druzus Exp $
  */
 
 /*
@@ -4151,10 +4151,8 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_STRING( pItem1 ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
-      PHB_ITEM pResult = hb_stackTopItem();
-
-      hb_stackPush();
-      hb_itemPutCLStatic( pResult, hb_szAscii[ ( UCHAR ) ( pItem1->item.asString.value[ 0 ] - (LONG) hb_itemGetND( pItem2 ) ) ], 1 );
+      hb_itemPutCLStatic( pItem1, hb_szAscii[ ( UCHAR ) ( pItem1->item.asString.value[ 0 ] - (LONG) hb_itemGetND( pItem2 ) ) ], 1 );
+      hb_stackPop();
    }
    else if( HB_IS_NUMINT( pItem1 ) && HB_IS_NUMINT( pItem2 ) )
    {
