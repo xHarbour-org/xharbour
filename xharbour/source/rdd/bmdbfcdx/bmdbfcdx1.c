@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.16 2006/12/11 17:36:12 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.17 2007/01/17 15:24:57 marchuet Exp $
  */
 
 /*
@@ -682,7 +682,7 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
          ptr = NULL;
          break;
    }
-   pKey = hb_cdxKeyPut( pKey, ptr, ulLen, ulRec );
+   pKey = hb_cdxKeyPut( pKey, ptr, ( USHORT ) ulLen, ulRec );
 #ifndef HB_CDP_SUPPORT_OFF
    if ( fTrans && pTag->uiType == 'C' )
       hb_cdpnTranslate( ( char * ) pKey->val, hb_cdp_page, pTag->pIndex->pArea->cdPage, pKey->len );
@@ -6758,6 +6758,7 @@ static ERRCODE hb_cdxSeekWild( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm,
    }
 }
 
+#if ! defined( HB_SIXCDX )
 HB_FUNC( BM_TURBO )
 {
     bTurbo = ISLOG( 1 ) ? hb_parl( 1 ) : FALSE;
@@ -6949,6 +6950,7 @@ HB_FUNC( BM_DBSEEKWILD )
 
 }
 
+#endif
 
 /* ( DBENTRYP_L )     hb_cdxSkip        : NULL */
 static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
