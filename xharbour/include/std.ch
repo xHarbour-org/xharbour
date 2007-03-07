@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.8 2007/03/03 01:24:58 ronpinkas Exp $
+ * $Id: std.ch,v 1.9 2007/03/03 20:13:31 lculik Exp $
  */
 
 /*
@@ -684,6 +684,8 @@
    #command SET HARDCOMMIT (<x>)          => Set( _SET_HARDCOMMIT, <x> )
    #command SET TRACE <x:ON,OFF,&>        => Set( _SET_TRACE, <(x)> )
    #command SET TRACE (<x>)               => Set( _SET_TRACE, <x> )
+   #command SET BACKGROUND TASKS <x:ON,OFF,&> => Set( _SET_BACKGROUNDTASKS, <(x)> )
+   #command SET BACKGROUND TASKS (<x>)    => Set( _SET_BACKGROUNDTASKS, <x> )
 #endif
 
 #endif /* HB_STD_CH_ */

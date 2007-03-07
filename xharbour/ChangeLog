@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5376 2007/03/04 13:37:50 druzus Exp $
+ * $Id: ChangeLog,v 1.5377 2007/03/07 10:30:05 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-08 00:03 UTC+0100 Ath <Ath1 at sourceforge.net>
+  * include/std.ch
+    + added SET BACKGROUND TASKS because it was still missing after PP-port  
 
 2007-03-07 11:36 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * harbour/source/rdd/bmdbfcdx/bmdbfcdx1.c
