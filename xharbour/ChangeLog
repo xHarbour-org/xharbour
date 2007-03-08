@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5377 2007/03/07 10:30:05 marchuet Exp $
+ * $Id: ChangeLog,v 1.5378 2007/03/07 23:03:29 ath1 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-03-08 11:00 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/unicode/makefile.vc
+    * Corrected to use bin\vc\harbour.exe instead of bin\harbour.exe
+  * source/rtl/binnumx.c
+    * Correction forwarded by Saulius for U2BIN
+  * source/vm/fastitem.c
+    * Correction forwarded by Jacek for reset HB_IT_MEMO in hb_itemPutC[L]()
+
 2007-03-08 00:03 UTC+0100 Ath <Ath1 at sourceforge.net>
   * include/std.ch
-    + added SET BACKGROUND TASKS because it was still missing after PP-port  
+    + added SET BACKGROUND TASKS because it was still missing after PP-port
 
 2007-03-07 11:36 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * harbour/source/rdd/bmdbfcdx/bmdbfcdx1.c

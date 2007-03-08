@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.5 2004/02/03 08:40:55 andijahja Exp $
+# $Id: makefile.vc,v 1.6 2005/03/06 19:22:09 paultucker Exp $
 #
 
 #
@@ -17,7 +17,7 @@ INCLUDE_DIR = ..\..\include;include
 #!endif
 #!endif
 
-BIN_DIR     = ..\..\bin
+BIN_DIR     = ..\..\bin\vc
 LIB_DIR     = ..\..\lib\vc
 OBJ_DIR     = ..\..\obj\vc
 #OBJ_DIR     = $(OBJ_DIR)$(MT)

@@ -1,5 +1,5 @@
 /*
- * $Id: binnumx.c,v 1.2 2004/02/23 08:31:56 andijahja Exp $
+ * $Id: binnumx.c,v 1.3 2005/05/26 20:37:30 likewolf Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ HB_FUNC( BIN2U )
                                 ( ulLen >= 3 ) ? ( BYTE ) pszString[ 2 ] : 0,
                                 ( ulLen >= 4 ) ? ( BYTE ) pszString[ 3 ] : 0 );
 
-#ifndef HB_LONG_LONG_OFF              
+#ifndef HB_LONG_LONG_OFF
       hb_retnll( value );
 #else
       hb_retnl( value );
@@ -109,9 +109,9 @@ HB_FUNC( U2BIN )
       ULONG ulValue = ( ULONG ) hb_parnl( 1 );
 
       szString[ 0 ] = ( char ) ( ulValue & 0x000000FF );
-      szString[ 1 ] = ( char ) ( ulValue & 0x0000FF00 ) >> 8;
-      szString[ 2 ] = ( char ) ( ulValue & 0x00FF0000 ) >> 16;
-      szString[ 3 ] = ( char ) ( ulValue & 0xFF000000 ) >> 24;
+      szString[ 1 ] = ( char ) ( ulValue & 0x0000FF00 >> 8 );
+      szString[ 2 ] = ( char ) ( ulValue & 0x00FF0000 >> 16 );
+      szString[ 3 ] = ( char ) ( ulValue & 0xFF000000 >> 24 );
    }
    else
    {

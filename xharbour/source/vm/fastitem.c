@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.101 2006/08/21 15:16:46 walito Exp $
+ * $Id: fastitem.c,v 1.102 2007/02/27 15:59:41 druzus Exp $
  */
 
 /*
@@ -509,6 +509,9 @@ PHB_ITEM HB_EXPORT hb_itemPutC( PHB_ITEM pItem, const char * szText )
       // Recycle!
       if( pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
       {
+         // Reset MEMO flag if any.
+         pItem->type = HB_IT_STRING;
+
          if( szText == pItem->item.asString.value )
          {
             pItem->item.asString.value[ ulLen ] = '\0';
@@ -594,6 +597,9 @@ PHB_ITEM HB_EXPORT hb_itemPutCL( PHB_ITEM pItem, const char * szText, ULONG ulLe
       // Recycle!
       if( pItem->item.asString.allocated &&  *( pItem->item.asString.pulHolders ) == 1 )
       {
+         // Reset MEMO flag if any.
+         pItem->type = HB_IT_STRING;
+
          if( szText == pItem->item.asString.value )
          {
             pItem->item.asString.value[ ulLen ] = '\0';
@@ -690,16 +696,17 @@ PHB_ITEM HB_EXPORT hb_itemPutCPtr( PHB_ITEM pItem, char * szText, ULONG ulLen )
       pItem->item.asString.pulHolders      = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
       *( pItem->item.asString.pulHolders ) = 1;
       pItem->item.asString.allocated       = ulLen + 1;
+      pItem->item.asString.value           = szText;
    }
    else
    {
       hb_xfree( szText );
-      szText = hb_vm_sNull;
-      pItem->item.asString.allocated = 0;
+
+      pItem->item.asString.allocated      = 0;
+      pItem->item.asString.value          = hb_vm_sNull;
    }
 
    pItem->item.asString.length    = ulLen;
-   pItem->item.asString.value     = szText;
 
    return pItem;
 }
