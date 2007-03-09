@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.10 2007/03/07 23:03:29 ath1 Exp $
+ * $Id: std.ch,v 1.11 2007/03/09 09:54:02 ptsarenko Exp $
  */
 
 /*
@@ -313,11 +313,12 @@
 #command SELECT <area>           => dbSelectArea( <(area)> )
 #command SELECT <f>([<p,...>])   => dbSelectArea( <f>(<p>) )
 #command USE                     => dbCloseArea()
+
 #command USE <(db)> [VIA <rdd>] [ALIAS <a>] [<nw: NEW>] ;
             [<ex: EXCLUSIVE>] [<sh: SHARED>] [<ro: READONLY>] ;
-            [CODEPAGE <cp>] [INDEX <(index1)> [, <(indexN)>]] => ;
+            [CODEPAGE <cp>] [CONNECTION <nConn>] [INDEX <(index1)> [, <(indexN)>]] => ;
          dbUseArea( <.nw.>, <rdd>, <(db)>, <(a)>, ;
-                    if(<.sh.> .or. <.ex.>, !<.ex.>, NIL), <.ro.> [, <cp>] ) ;
+                    if(<.sh.> .or. <.ex.>, !<.ex.>, NIL), <.ro.>,  [<cp>], [<nConn>] ) ;
          [; dbSetIndex( <(index1)> )] ;
          [; dbSetIndex( <(indexN)> )]
 
