@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5380 2007/03/08 16:06:44 marchuet Exp $
+ * $Id: ChangeLog,v 1.5381 2007/03/08 22:44:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-09 12:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
+  * include/std.ch
+  * source/rdd/dbdelim.prg
+  * source/rdd/dbsdf.prg
+    * restored CONNECTION and CODEPAGE clause in commands for new PP:
+      COPY TO ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      APPEND FROM ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      COPY TO DELIMITED ... [CODEPAGE <cCdp>]
+      COPY TO SDF ... [CODEPAGE <cCdp>]
+      APPEND FROM DELIMITED ... [CODEPAGE <cCdp>]
+      APPEND FROM SDF ... [CODEPAGE <cCdp>]
+      CREATE FROM ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      TOTAL ON ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+      SORT ON ... [CONNECTION <nConn>] [CODEPAGE <cCdp>]
+  * source/ct/color.prg
+    ! fixed bug with full color string in ColorToN() function
 
 2007-03-08 18:42 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/binnumx.c

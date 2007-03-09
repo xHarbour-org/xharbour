@@ -1,5 +1,5 @@
 /*
- * $Id: color.prg,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: color.prg,v 1.2 2006/12/11 20:44:40 ptsarenko Exp $
  */
 
 /*
@@ -156,6 +156,10 @@ FUNCTION COLORTON( cColor )
   endif
 
   if valtype( cColor ) == "C"
+
+     if ( nSep := at( ",", cColor ) ) <> 0
+        cColor := left(cColor, nSep - 1)
+     endif
 
      if ( nSep := at( "/", cColor ) ) == 0
 

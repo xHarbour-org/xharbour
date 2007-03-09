@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.9 2007/03/03 20:13:31 lculik Exp $
+ * $Id: std.ch,v 1.10 2007/03/07 23:03:29 ath1 Exp $
  */
 
 /*
@@ -383,8 +383,8 @@
 #command RECALL                  =>  dbRecall()
 
 #command CREATE <(db)> [FROM <(src)>] [VIA <rdd>] [ALIAS <a>] ;
-                [<new: NEW>] [CODEPAGE <cp>] => ;
-         __dbCreate( <(db)>, <(src)>, <rdd>, <.new.>, <(a)> [, <cp>] )
+                [<new: NEW>] [CODEPAGE <cp>] [CONNECTION <conn>] => ;
+         __dbCreate( <(db)>, <(src)>, <rdd>, <.new.>, <(a)>, <cp>, <conn>)
 
 #command COPY [STRUCTURE] [EXTENDED] [TO <(f)>] => __dbCopyXStruct( <(f)> )
 #command COPY [STRUCTURE] [TO <(f)>] [FIELDS <fields,...>] => ;
@@ -393,52 +393,56 @@
 #command COPY [TO <(f)>] [FIELDS <fields,...>] ;
               [FOR <for>] [WHILE <while>] [NEXT <next>] ;
               [RECORD <rec>] [<rest:REST>] [ALL] ;
-              [DELIMITED [WITH <*delim*>]] => ;
+              [DELIMITED [WITH <*delim*>]] [CODEPAGE <cp>] => ;
          __dbDelim( .T., <(f)>, <(delim)>, { <(fields)> }, ;
-                    <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                    <{for}>, <{while}>, <next>, <rec>, <.rest.>, <cp> )
 
 #command COPY [TO <(f)>] [SDF] [FIELDS <fields,...>] ;
               [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-              [RECORD <rec>] [<rest:REST>] [ALL] => ;
+              [RECORD <rec>] [<rest:REST>] [ALL] [CODEPAGE <cp>] => ;
          __dbSDF( .T., <(f)>, { <(fields)> }, ;
-                  <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                  <{for}>, <{while}>, <next>, <rec>, <.rest.>, <cp> )
 
 #command COPY [TO <(f)>] [FIELDS <fields,...>] ;
               [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-              [RECORD <rec>] [<rest:REST>] [ALL] [VIA <rdd>] => ;
+              [RECORD <rec>] [<rest:REST>] [ALL] [VIA <rdd>] ;
+              [CODEPAGE <cp>] [CONNECTION <conn>] => ;
          __dbCopy( <(f)>, { <(fields)> }, ;
-                   <{for}>, <{while}>, <next>, <rec>, <.rest.>, <rdd> )
+                   <{for}>, <{while}>, <next>, <rec>, <.rest.>, <rdd>, <conn>, <cp> )
 
 #command APPEND [FROM <(f)>] [FIELDS <fields,...>] ;
                 [FOR <for>] [WHILE <while>] [NEXT <next>] ;
                 [RECORD <rec>] [<rest:REST>] [ALL] ;
-                [DELIMITED [WITH <*delim*>]] => ;
+                [DELIMITED [WITH <*delim*>]] [CODEPAGE <cp>] => ;
          __dbDelim( .F., <(f)>, <(delim)>, { <(fields)> }, ;
-                    <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                    <{for}>, <{while}>, <next>, <rec>, <.rest.>, <cp> )
 
 #command APPEND [FROM <(f)>] [SDF] [FIELDS <fields,...>] ;
                 [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-                [RECORD <rec>] [<rest:REST>] [ALL] => ;
+                [RECORD <rec>] [<rest:REST>] [ALL] [CODEPAGE <cp>] => ;
          __dbSDF( .F., <(f)>, { <(fields)> }, ;
-                  <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                  <{for}>, <{while}>, <next>, <rec>, <.rest.>, <cp> )
 
 #command APPEND [FROM <(f)>] [FIELDS <fields,...>] ;
                 [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-                [RECORD <rec>] [<rest:REST>] [ALL] [VIA <rdd>] => ;
+                [RECORD <rec>] [<rest:REST>] [ALL] [VIA <rdd>] ;
+                [CODEPAGE <cp>] [CONNECTION <conn>] => ;
          __dbApp( <(f)>, { <(fields)> }, ;
-                  <{for}>, <{while}>, <next>, <rec>, <.rest.>, <rdd> )
+                  <{for}>, <{while}>, <next>, <rec>, <.rest.>, <rdd>, <conn>, <cp> )
 
 #command SORT [TO <(f)>] [ON <fields,...>] ;
               [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-              [RECORD <rec>] [<rest:REST>] [ALL] => ;
+              [RECORD <rec>] [<rest:REST>] [ALL] ;
+              [CODEPAGE <cp>] [CONNECTION <conn>] => ;
          __dbSort( <(f)>, { <(fields)> }, ;
-                   <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                   <{for}>, <{while}>, <next>, <rec>, <.rest.>, <conn>, <cp> )
 
 #command TOTAL [TO <(f)>] [ON <key>] [FIELDS <fields,...>] ;
                [FOR <for>] [WHILE <while>] [NEXT <next>] ;
-               [RECORD <rec>] [<rest:REST>] [ALL] => ;
+               [RECORD <rec>] [<rest:REST>] [ALL] ;
+               [CODEPAGE <cp>] [CONNECTION <conn>] => ;
          __dbTotal( <(f)>, <{key}>, { <(fields)> }, ;
-                    <{for}>, <{while}>, <next>, <rec>, <.rest.> )
+                    <{for}>, <{while}>, <next>, <rec>, <.rest.>, <conn>, <cp> )
 
 #command UPDATE [FROM <(alias)>] [ON <key>] [<rand:RANDOM>] ;
                 [REPLACE <f1> WITH <x1> [, <fN> WITH <xN>]] => ;

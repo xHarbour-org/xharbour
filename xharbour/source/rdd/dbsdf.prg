@@ -1,5 +1,5 @@
 /*
- * $Id: dbsdf.prg,v 1.15 2006/06/02 12:34:12 druzus Exp $
+ * $Id: dbsdf.prg,v 1.1 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 REQUEST SDF
 
-FUNCTION __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest )
+FUNCTION __dbSDF( lExport, cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
    RETURN iif( lExport,;
-      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF" ) ,;
-      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF" ) )
+      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF", cCdp ) ,;
+      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "SDF", cCdp ) )

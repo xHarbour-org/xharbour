@@ -1,5 +1,5 @@
 /*
- * $Id: dbdelim.prg,v 1.22 2006/05/30 10:51:23 druzus Exp $
+ * $Id: dbdelim.prg,v 1.1 2006/07/17 12:56:18 druzus Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 
 REQUEST DELIM
 
-FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest )
+FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRecord, lRest, cCdp )
 
 #ifdef HB_C52_STRICT
 
@@ -80,14 +80,14 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
    ENDIF
 
    IF lExport
-      dbCreate( cFile, aStruct, cRDD, .T., "", cDelimArg )
+      dbCreate( cFile, aStruct, cRDD, .T., "", cDelimArg, cCdp )
       nDstArea := Select()
       IF nDstArea == nSrcArea
          nDstArea := NIL
       ENDIF
       dbSelectArea( nSrcArea )
    ELSE
-      IF !__dbOpenSDF( cFile, aStruct, cRDD, .T., "", cDelimArg )
+      IF !__dbOpenSDF( cFile, aStruct, cRDD, .T., "", cDelimArg, cCdp )
          RETURN .F.
       ENDIF
       nSrcArea := Select()
@@ -114,7 +114,7 @@ FUNCTION __dbDelim( lExport, cFile, cDelimArg, aFields, bFor, bWhile, nNext, nRe
 #else
 
    RETURN iif( lExport,;
-      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", , , cDelimArg ) ,;
-      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", , , cDelimArg ) )
+      __dbCopy( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) ,;
+      __dbApp( cFile, aFields, bFor, bWhile, nNext, nRecord, lRest, "DELIM", cCdp, , cDelimArg ) )
 
 #endif
