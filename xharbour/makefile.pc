@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.36 2006/12/01 11:47:43 modalsist Exp $
+# $Id: makefile.pc,v 1.37 2007/03/02 01:27:16 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -13,17 +13,17 @@ ECHO = echo.
 DEL = del
 !endif
 
-CC_EXE     = $(POCC_DIR)\bin\pocc.exe
-LINK_EXE   = $(POCC_DIR)\bin\polink.exe
-LIB_EXE    = $(POCC_DIR)\bin\polib.exe
-CC_LIB_DIR = $(POCC_DIR)\lib
+CC_EXE     = $(CC_DIR)\bin\pocc.exe
+LINK_EXE   = $(CC_DIR)\bin\polink.exe
+LIB_EXE    = $(CC_DIR)\bin\polib.exe
+CC_LIB_DIR = $(CC_DIR)\lib
 
 # To go back to access standard inkey codes declared in inkey.ch remove
 # HB_EXT_INKEY flags in HARBOURFLAGS and CFLAGS.
 #
 HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -DHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w -es2 -gc0
-CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__WIN32__"  /D"HB_EXT_INKEY"
+CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__WIN32__"  /D"HB_EXT_INKEY"
 LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 
 !ifdef HB_MT
@@ -2054,7 +2054,7 @@ $(OBJ_DIR)\filestat.obj : $(RTL_DIR)\filestat.c
    $(CC_CMD)
 
 $(OBJ_DIR)\filesys.obj : $(RTL_DIR)\filesys.c
-   @IF NOT EXIST $(POCC_DIR)\include\share.h $(ECHO) > $(POCC_DIR)\include\share.h
+   @IF NOT EXIST $(CC_DIR)\include\share.h $(ECHO) > $(CC_DIR)\include\share.h
    $(CC_CMD)
 
 $(OBJ_DIR)\fkmax.obj : $(RTL_DIR)\fkmax.c

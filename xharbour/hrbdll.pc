@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.30 2006/11/09 16:41:08 marchuet Exp $
+# $Id: hrbdll.pc,v 1.31 2007/03/02 01:26:29 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -18,18 +18,18 @@ ECHO = echo.
 DEL = del
 !endif
 
-HARBOUR_EXE  = $(HB_DIR)\BIN\harbour.exe
-CC_EXE     = $(POCC_DIR)\BIN\POCC.EXE
-LINK_EXE   = $(POCC_DIR)\BIN\POLINK.EXE
-LIB_EXE    = $(POCC_DIR)\BIN\POLIB.EXE
-CC_LIB_DIR = $(POCC_DIR)\LIB
+HARBOUR_EXE  = $(HB_DIR)\bin\harbour.exe
+CC_EXE       = $(CC_DIR)\bin\pocc.exe
+LINK_EXE     = $(CC_DIR)\bin\polink.exe
+LIB_EXE      = $(CC_DIR)\bin\polib.exe
+CC_LIB_DIR   = $(CC_DIR)\lib
 
 # To go back to access standard inkey codes declared in inkey.ch remove
 # HB_EXT_INKEY flags in HARBOURFLAGS and CFLAGS.
 #
 HARBOURFLAGS = -i$(HB_DIR)\include -n1 -q0 -w -es2 -gc0 -D"__EXPORT__" -DHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\include -n -q0 -w -es2 -gc0
-CFLAGS       = /Ze /Go /Tx86-coff /I"$(HB_DIR)\include" /I"$(POCC_DIR)\INCLUDE" /I"$(POCC_DIR)\INCLUDE\WIN" /D"__EXPORT__" /D"__WIN32__" /D"WIN32" /D"__WINDOWS__" /D"HB_EXT_INKEY"
+CFLAGS       = /Ze /Go /Tx86-coff /I"$(HB_DIR)\include" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__EXPORT__" /D"__WIN32__" /D"WIN32" /D"__WINDOWS__" /D"HB_EXT_INKEY"
 DLLFLAGS     = /DLL /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:WINDOWS
 EXEFLAGS     = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 
@@ -1577,7 +1577,7 @@ $(OBJ_DIR)\filehb.obj : $(RTL_DIR)\filehb.c
    $(CC_CMD)
 
 $(OBJ_DIR)\filesys.obj : $(RTL_DIR)\filesys.c
-   @IF NOT EXIST $(POCC_DIR)\include\share.h $(ECHO) > $(POCC_DIR)\include\share.h
+   @IF NOT EXIST $(CC_DIR)\include\share.h $(ECHO) > $(CC_DIR)\include\share.h
    $(CC_CMD)
 
 $(OBJ_DIR)\fserror.obj : $(RTL_DIR)\fserror.c

@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.7 2006/03/25 20:29:54 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.8 2006/05/01 23:37:56 modalsist Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -11,22 +11,22 @@ REM *************************************
 REM *** CHANGE ONLY THE 3 SETS BELLOW ***
 REM *************************************
 
-SET HB_DIR=.\
-SET POCC_DIR=c:\pellesc
-SET BISON_DIR=c:\bison
+IF %HB_DIR%.==. SET HB_DIR=.\
+IF %CC_DIR%.==. SET CC_DIR=C:\PellesC
+SET BISON_DIR=C:\Bison
 
 REM ****************************************
 REM *** DON'T CHANGE THE VARIABLES BELOW ***
 REM ****************************************
 
-SET _PATH=%PATH%
-SET _LIB=%LIB%
-SET _INCLUDE=%INCLUDE%
+IF "%_PATH%" == ""    SET _PATH=%PATH%
+IF "%_LIB%" == ""     SET _LIB=%LIB%
+IF "%_INCLUDE%" == "" SET _INCLUDE=%INCLUDE%
 
-SET LIB=%POCC_DIR%\lib;%POCC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
-SET INCLUDE=%POCC_DIR%\include;%POCC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
+SET LIB=%CC_DIR%\lib;%CC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
+SET INCLUDE=%CC_DIR%\include;%CC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
-SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
+SET PATH=%CC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
 SET OBJ_DIR=%HB_DIR%\obj\pocc\dll
 SET LIB_DIR=%HB_DIR%\lib\pocc
@@ -36,6 +36,8 @@ SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
+if "%1" == "/clean" goto CLEAN
+if "%1" == "/CLEAN" goto CLEAN
 
 :BUILD
 
@@ -128,21 +130,21 @@ if "%1" == "CLEAN" goto CLEAN
    if exist %OBJ_DIR%\*.h                del %OBJ_DIR%\*.h
    if exist %OBJ_DIR%\*.output           del %OBJ_DIR%\*.output
 
-   if exist tests\harbour.dll                   del tests\harbour.dll
+   if exist tests\harbour.dll            del tests\harbour.dll
+
    goto EXIT
 
 
 :EXIT
 
-SET POCC_DIR=
-SET HB_DIR=
+rem SET CC_DIR=
+rem SET HB_DIR=
 SET BISON_DIR=
 SET BISON_SIMPLE=
 
 SET OBJ_DIR=
-SET TARGET_LIB_DIR=
-SET TARGET_BIN_DIR=
-SET HB_MT=
+SET LIB_DIR=
+SET BIN_DIR=
 
 SET PATH=%_PATH%
 SET LIB=%_LIB%
@@ -151,6 +153,4 @@ SET INCLUDE=%_INCLUDE%
 SET _PATH=
 SET _LIB=
 SET _INCLUDE=
-
-
 

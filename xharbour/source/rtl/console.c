@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.63 2006/05/19 00:44:36 druzus Exp $
+ * $Id: console.c,v 1.64 2007/02/26 03:18:27 ronpinkas Exp $
  */
 /*
  * Harbour Project source code:
@@ -209,6 +209,7 @@ void hb_conRelease( void )
 
    if( s_bInit )
    {
+      SHORT iRow = hb_gt_Row();
       if( s_originalMaxRow != hb_gtMaxRow() || s_originalMaxCol != hb_gtMaxCol() )
       {
          /* If the program changed the screen size, restore the original */
@@ -225,6 +226,17 @@ void hb_conRelease( void )
 
       hb_setkeyExit();  /* April White, May 6, 2000 */
       hb_conXSaveRestRelease();
+
+      /* 2007/MAR/10 - E.F. Restore console cursor position before exit. */
+      hb_gtSetCursor( SC_NORMAL );
+      if( iRow > s_originalMaxRow )
+      {
+          hb_gtSetPos( s_originalMaxRow, 0 );
+      }
+      else
+      {
+          hb_gtSetPos( iRow, 0 );
+      }
 
       hb_gtExit();
 

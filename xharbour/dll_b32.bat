@@ -1,6 +1,6 @@
 @echo off
 REM
-REM $Id: dll_b32.bat,v 1.12 2006/12/01 11:46:49 modalsist Exp $
+REM $Id: dll_b32.bat,v 1.13 2007/02/28 22:58:51 modalsist Exp $
 REM
 REM ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 REM ³ This is a batch file to create harbour.dll ³Û
@@ -10,6 +10,8 @@ REM  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
+if "%1" == "/clean" goto CLEAN
+if "%1" == "/CLEAN" goto CLEAN
 
 if not exist obj md obj
 if not exist obj\dll md obj\dll
@@ -26,6 +28,12 @@ if not exist lib\b32 md lib\b32
 if exist hdll.tmp del hdll.tmp
 if exist bin\b32\harbour.lib copy bin\b32\harbour.lib lib > nul
 if exist bin\b32\harbour.dll copy bin\b32\harbour.dll bin > nul
+if exist bin\b32\hbdocdll.exe copy bin\b32\hbdocdll.exe bin > nul
+if exist bin\b32\hbmakedll.exe copy bin\b32\hbmakedll.exe bin > nul
+if exist bin\b32\hbrundll.exe copy bin\b32\hbrundll.exe bin > nul
+if exist bin\b32\hbtestdll.exe copy bin\b32\hbtestdll.exe bin > nul
+if exist bin\b32\xbscriptdll.exe copy bin\b32\xbscriptdll.exe bin > nul
+
 REM if exist bin\b32\harbour.dll copy bin\b32\harbour.dll tests > nul
 REM if exist bin\b32\harbour.dll copy bin\b32\harbour.lib lib\b32 > nul
 

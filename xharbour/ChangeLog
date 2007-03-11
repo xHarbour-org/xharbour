@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5382 2007/03/09 09:54:02 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5383 2007/03/09 13:39:24 marceloanelli Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-10 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * hrbdll.bc
+  * dll_b32.bat
+    * adjusted variable names and clean session.
+
+  * make_pc.bat
+  * makefile.pc
+  * dll_pc.bat
+  * hrbdll.pc
+    * adjusted variable names and clean session.
+
+  * source/rtl/tbrowse.prg
+    ! fixed to init datasource properly when another workarea is selected
+      at tbrowse init. Bug reported by aardvark from comp.lang.xharbour news.
+
+  * source/rtl/console.c
+    * changed hb_conRelease() to restore the cursor shape and position before
+      exit. This avoid user applications hide or launch the cursor out of
+      screen area at quit.
 
 2007-03-09 09:36 UTC-0400 Marcelo Anelli <marceloanelli@users.sourceforge.net>
   * include/std.ch

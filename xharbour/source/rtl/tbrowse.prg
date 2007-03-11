@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.164 2007/01/07 18:48:40 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.165 2007/02/19 10:51:16 modalsist Exp $
  */
 
 /*
@@ -3659,44 +3659,40 @@ Return iif( lOK, aDefColor, {1,2,1,1} )
 *------------------------
 Static Function IsDb(oTb)
 *------------------------
-* Check if datasource is a database.
+* Check if datasource used by Tbrowse is a database or not.
 *-------------------------------
-LOCAL nRec := 0
-LOCAL lIsDB := .F.
+LOCAL lIsDb, aWA, nArea, aArea
 
-IF Used()
+lIsDb := .f.
 
-   IF HB_IsBlock( oTb:GoBottomBlock ) .AND.;
-      HB_IsBlock( oTb:GoTopBlock ) .AND.;
-      HB_IsBlock( oTb:SkipBlock )
+IF Used() 
 
-      IF LastRec() > 0 
+   // Get all workareas openned by user
+   //
+   aWA := {}
 
-         nRec := Recno()
+   FOR nArea := 1 TO 255
+       if !Empty( alias(nArea) )
+          AAdd( aWA, { alias(nArea), &( alias(nArea) )->(recno()) } )
+       endif
+   NEXT
 
-         Eval( oTb:GoTopBlock )
+   IF HB_IsBlock( oTb:SkipBlock ) .AND. !Empty( aWA )
 
-         Eval( oTb:SkipBlock, 1 )
+      // Get which work area is used by Tbrowse, if any.
+      //
+      Eval( oTb:SkipBlock, 1 )
 
-         lIsDB := !( nRec == Recno() )
+      FOR EACH aArea IN aWA
 
-         Eval( oTb:GoTopBlock )
+          IF &(aArea[1])->( recno() ) != aArea[2]
+             lIsDb := .T.
+             EXIT
+          ENDIF
 
-         If !( nRec == Recno() )
-            dbGoto( nRec )
-         Endif
+      NEXT
 
-      ELSE
-
-         Eval( oTb:GoTopBlock )
-
-         Eval( oTb:SkipBlock, 1 )
-
-         lIsDB := ( !Bof() .AND. Eof() )
-
-         Eval( oTb:GoTopBlock )
-
-      ENDIF
+      Eval( oTb:SkipBlock, -1 )
 
    ENDIF
 

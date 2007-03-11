@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.130 2007/01/24 17:34:03 kaddath Exp $
+# $Id: hrbdll.bc,v 1.131 2007/02/28 22:41:39 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -113,7 +113,7 @@ HRB_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 #  ßßßßßßßßßßßßßßßßßßßßß
 
 ALL: \
-  $(HARBOUR_DLL) \
+#  $(HARBOUR_DLL) \
   $(HBDOCDLL_EXE) \
   $(HBRUNDLL_EXE) \
   $(HBTESTDLL_EXE) \
@@ -503,7 +503,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\ppcore.obj \
   $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
-  $(OBJ_DIR)\pragma.obj \
   $(OBJ_DIR)\dbgentry.obj \
   $(OBJ_DIR)\dbgmenu.obj \
   $(OBJ_DIR)\dbgtmenu.obj \
@@ -742,7 +741,6 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\pplib2.obj \
    $(OBJ_DIR)\pplib3.obj \
    $(OBJ_DIR)\pptable.obj \
-   $(OBJ_DIR)\pragma.obj \
 #
 #  HBSIX
 #
@@ -1015,7 +1013,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\pplib2.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\pplib3.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\pptable.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\pragma.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\profiler.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\pushbtn.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\radiobtn.obj          + >> hdll.tmp
@@ -1645,9 +1642,6 @@ $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)
 
 $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\pragma.obj : $(HBPP_DIR)\pragma.c
    $(CC_CMD)
 
 $(OBJ_DIR)\proc.obj : $(VM_DIR)\proc.c
@@ -3828,7 +3822,7 @@ $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. ws2_32.lib + >> make.tmp
    echo. cw32.lib + >> make.tmp
    echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   ILINK32 -x -ap -Tpe -Gn @make.tmp 
 
 $(OBJ_DIR)\hbdoc.c : $(HBDOC_DIR)\hbdoc.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@

@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.15 2007/02/22 15:16:47 guerra000 Exp $
+rem $Id: make_pc.bat,v 1.16 2007/03/02 01:26:51 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -45,8 +45,8 @@ REM *****************************************
 REM *** If necessary, change only 3 next sets
 REM *****************************************
 
-IF %POCC_DIR%.==. SET HB_DIR=.\
-IF %POCC_DIR%.==. SET POCC_DIR=C:\PellesC
+IF %HB_DIR%.==. SET HB_DIR=.\
+IF %CC_DIR%.==. SET CC_DIR=C:\PellesC
 SET BISON_DIR=C:\Bison
 
 REM *******************************
@@ -57,10 +57,10 @@ SET _PATH=%PATH%
 SET _LIB=%LIB%
 SET _INCLUDE=%INCLUDE%
 
-SET LIB=%POCC_DIR%\lib;%POCC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
-SET INCLUDE=%POCC_DIR%\include;%POCC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
+SET LIB=%CC_DIR%\lib;%CC_DIR%\lib\win;%HB_DIR%\lib;%LIB%
+SET INCLUDE=%CC_DIR%\include;%CC_DIR%\include\win;%HB_DIR%\include;%INCLUDE%
 
-SET PATH=%POCC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
+SET PATH=%CC_DIR%\bin;%BISON_DIR%\bin;%HB_DIR%\bin;%PATH%
 
 SET OBJ_DIR=%HB_DIR%\obj\pocc
 SET LIB_DIR=%HB_DIR%\lib\pocc
@@ -353,7 +353,7 @@ if "%1" == "MT"  goto MT
    if exist %OBJ_DIR%\mt\opt\gui\nul       rd %OBJ_DIR%\mt\opt\gui
    if exist %OBJ_DIR%\mt\opt\nul           rd %OBJ_DIR%\mt\opt
 
-   goto EXIT
+   goto DLLCLEAN
 
 
 :DLL
@@ -361,10 +361,14 @@ if "%1" == "MT"  goto MT
  call dll_pc.bat
  goto EXIT2
 
+:DLLCLEAN
+
+ call dll_pc.bat clean
+ goto EXIT2
 
 :EXIT
 
-rem SET POCC_DIR=
+rem SET CC_DIR=
 rem SET HB_DIR=
 SET BISON_DIR=
 SET BISON_SIMPLE=
@@ -380,6 +384,7 @@ SET INCLUDE=%_INCLUDE%
 SET _PATH=
 SET _LIB=
 SET _INCLUDE=
+
 
 :EXIT2
 
