@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.131 2007/02/28 22:41:39 modalsist Exp $
+# $Id: hrbdll.bc,v 1.132 2007/03/11 00:16:44 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -113,7 +113,7 @@ HRB_CMD = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 #  ßßßßßßßßßßßßßßßßßßßßß
 
 ALL: \
-#  $(HARBOUR_DLL) \
+  $(HARBOUR_DLL) \
   $(HBDOCDLL_EXE) \
   $(HBRUNDLL_EXE) \
   $(HBTESTDLL_EXE) \
