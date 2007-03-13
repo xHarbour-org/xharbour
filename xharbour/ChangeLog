@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5384 2007/03/11 00:15:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.5385 2007/03/12 11:34:26 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-03-13 19:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/std.ch
+    + Added missing support for SET ERRORLOG TO ...
+    * Changed #idef HB_EXTESION to #ifndef HB_C52_STRICT
+
 2007-03-12 08:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * hrbdll.bc
-    ! fixed ft_funcs.c file error. 
+    ! fixed ft_funcs.c file error.
 
 2007-03-10 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * hrbdll.bc

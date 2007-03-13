@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.11 2007/03/09 09:54:02 ptsarenko Exp $
+ * $Id: std.ch,v 1.12 2007/03/09 13:39:25 marceloanelli Exp $
  */
 
 /*
@@ -676,8 +676,7 @@
 
 #endif /* HB_COMPAT_C53 */
 
-
-#ifdef HB_EXTENSION
+#ifndef HB_C52_STRICT
    #command SET FILECASE <(x)>            => Set( _SET_FILECASE, <(x)> )
    #command SET FILECASE (<x>)            => Set( _SET_FILECASE, <x> )
    #command SET DIRCASE <(x)>             => Set( _SET_DIRCASE, <(x)> )
@@ -691,6 +690,7 @@
    #command SET TRACE (<x>)               => Set( _SET_TRACE, <x> )
    #command SET BACKGROUND TASKS <x:ON,OFF,&> => Set( _SET_BACKGROUNDTASKS, <(x)> )
    #command SET BACKGROUND TASKS (<x>)    => Set( _SET_BACKGROUNDTASKS, <x> )
+   #command SET ERRORLOG TO [<filename>] [<additive: ADDITIVE>] => Set( _SET_ERRORLOG, <(filename)>, <.additive.> )
 #endif
 
 #endif /* HB_STD_CH_ */
