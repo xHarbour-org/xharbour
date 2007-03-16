@@ -1,5 +1,5 @@
 /*
- * $Id: wvtpaint.prg,v 1.1 2005/02/06 15:52:30 fsgiudice Exp $
+ * $Id: wvtpaint.prg,v 1.2 2005/05/09 18:34:26 vouchcac Exp $
  */
 
 /*
@@ -447,6 +447,111 @@ Function Wvt_DialogBox( acnDlg, cbDlgProc, hWndParent )
    nResult := Wvt_CreateDialogModal( xTemplate, .f., cbDlgProc, nDlgMode, hWndParent )
 
    Return nResult
+
+//-------------------------------------------------------------------//
+/*                       Borrowed from What32
+
+Wvt_GetOpenFileName( hWnd, @cPath, cTitle, aFilter, nFlags, cInitDir, cDefExt, nIndex )
+
+hWnd:     Handle to parent window
+cPath:    (optional) if OFN_ALLOWMULTISELECT the path is stored
+cTitle:   Window Title
+aFilter:  Array of Files Types i.e. { {'Data Bases','*.dbf'},{'Clipper','*.prg'} }
+nFlags:   OFN_* values default to OFN_EXPLORER
+cInitDir: Initial directory
+cDefExt:  Default Extension i.e. 'DBF'
+nIndex:   Index position of types
+
+Returns:  If OFN_ALLOWMULTISELECT
+              Array of files selected
+          else
+              FileName.
+          endif
+*/
+FUNCTION WVT_GetOpenFileName( hWnd, cPath, cTitle, aFilter, nFlags, cIniDir, cDefExt, nIndex )
+   local aFiles, cRet, cFile, n, x, c := ''
+
+   IF aFilter == nil
+      aFilter := {}
+   END
+   IF ValType( aFilter ) == "A"
+      FOR n := 1 TO LEN( aFilter )
+          c += aFilter[n][1] + chr(0) + aFilter[n][2] + chr(0)
+      NEXT
+   ENDIF
+   if WIN_AND( nFlags,OFN_ALLOWMULTISELECT ) > 0
+      cFile := space( 32000 )
+     ELSE
+      cFile := padr( trim( cPath ), 255, chr( 0 ) )
+   END
+
+   cRet := WVT__GetOpenFileName( hWnd, @cFile, cTitle, c, nFlags, cIniDir, cDefExt, @nIndex )
+
+   if WIN_AND( nFlags,OFN_ALLOWMULTISELECT ) > 0
+      n := AT( CHR(0)+ CHR(0), cFile )
+      cFile  := LEFT( cFile,n )
+      aFiles := {}
+      IF n == 0 // no double chr(0) user must have pressed cancel
+         RETURN( aFiles )
+      END
+      x := AT( CHR( 0 ),cFile ) // fist null
+      cPath := LEFT( cFile,x )
+
+      cFile := STRTRAN( cFile,cPath )
+      IF !EMPTY( cFile ) // user selected more than 1 file
+         c := ''
+         FOR n := 1 TO LEN( cFile )
+             IF SUBSTR( cFile,n,1 ) == CHR( 0 )
+                AADD( aFiles,STRTRAN( cPath, CHR( 0 ) ) +'\'+ c )
+                c:=''
+                LOOP
+             END
+             c += SUBSTR( cFile,n,1 )
+         NEXT
+        ELSE
+         /*
+         cFile:=cPath
+         x:=RAT('\',cFile)
+         cPath:=LEFT(cFile,x-1)
+         */
+         aFiles := { STRTRAN( cPath, CHR( 0 ) ) } //STRTRAN(STRTRAN(cFile,cPath),'\')}
+      END
+      Return( aFiles )
+   else
+     cRet := left( cRet, at( chr( 0 ), cRet ) -1 )
+   end
+
+   Return ( cRet )
+
+//-------------------------------------------------------------------//
+/*
+Wvt_GetSaveFileName( hWnd, cFile, cTitle, aFilter, nFlags, cInitDir, cDefExt, nIndex)
+
+hWnd:     Handle to parent window
+cFile:    (optional) Default FileName
+cTitle:   Window Title
+aFilter:  Array of Files Types i.e. { {'Data Bases','*.dbf'},{'Clipper','*.prg'} }
+nFlags:   OFN_* values default to OFN_EXPLORER
+cInitDir: Initial directory
+cDefExt:  Default Extension i.e. 'DBF'
+nIndex:   Index position of types
+
+Returns:  FileName.
+*/
+
+FUNCTION WVT_GetSaveFileName( hWnd, cFile, cTitle, aFilter, nFlags, cIniDir, cDefExt, nIndex )
+   local n,c:=''
+
+   IF aFilter == nil
+      aFilter := {}
+   END
+
+   FOR n := 1 TO LEN( aFilter )
+       c += aFilter[ n ][ 1 ]+chr( 0 )+aFilter[ n ][ 2 ]+chr( 0 )
+   NEXT
+   cFile := WVT__GetSaveFileName( hWnd, cFile, cTitle, c, nFlags, cIniDir, cDefExt, @nIndex )
+
+   Return ( cFile )
 
 //-------------------------------------------------------------------//
 

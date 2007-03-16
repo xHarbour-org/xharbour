@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.10 2006/02/03 23:19:18 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.11 2006/02/04 00:44:52 vouchcac Exp $
  */
 
 /*
@@ -89,6 +89,16 @@ static GLOBAL_DATA *_s = NULL;
 HB_EXTERN_BEGIN
 
 extern HANDLE  hb_hInstance;
+
+extern BOOL wvt_Array2Rect(PHB_ITEM aRect, RECT *rc );
+extern PHB_ITEM wvt_Rect2Array( RECT *rc  );
+extern BOOL wvt_Array2Point(PHB_ITEM aPoint, POINT *pt );
+extern PHB_ITEM wvt_Point2Array( POINT *pt  );
+extern BOOL wvt_Array2Size(PHB_ITEM aSize, SIZE *siz );
+extern PHB_ITEM wvt_Size2Array( SIZE *siz  );
+extern void  wvt_Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect );
+extern void wvt_Point2ArrayEx( POINT *pt  , PHB_ITEM aPoint);
+extern void wvt_Size2ArrayEx( SIZE *siz ,PHB_ITEM aSize );
 
 HB_EXTERN_END
 
@@ -501,20 +511,18 @@ HB_FUNC( WVT_SETMOUSEPOS )
 
 HB_FUNC( WVT_GETPAINTRECT )
 {
-   HB_ITEM  info;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 4 );
 
-   hb_arrayNew( &info, 4 );
+   hb_arraySetForward( info, 1, hb_itemPutNI( temp, _s->rowStart ) );
+   hb_arraySetForward( info, 2, hb_itemPutNI( temp, _s->colStart ) );
+   hb_arraySetForward( info, 3, hb_itemPutNI( temp, _s->rowStop  ) );
+   hb_arraySetForward( info, 4, hb_itemPutNI( temp, _s->colStop  ) );
 
-   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, _s->rowStart ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, _s->colStart ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, _s->rowStop  ) );
-   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, _s->colStop  ) );
-
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
@@ -681,65 +689,58 @@ HB_FUNC( WVT_SETMOUSEMOVE )
 
 HB_FUNC( WVT_GETXYFROMROWCOL )
 {
-   HB_ITEM  aXY;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
    POINT    xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
-   aXY.type  = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 2 );
 
-   hb_arrayNew( &aXY, 2 );
+   hb_arraySetForward( info, 1, hb_itemPutNL( temp, xy.x ) );
+   hb_arraySetForward( info, 2, hb_itemPutNL( temp, xy.y ) );
 
-   hb_arraySetForward( &aXY, 1, hb_itemPutNL( &temp, xy.x ) );
-   hb_arraySetForward( &aXY, 2, hb_itemPutNL( &temp, xy.y ) );
-
-   hb_itemReturn( &aXY );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETFONTINFO )
 {
-   HB_ITEM  info;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 7 );
 
-   hb_arrayNew( &info, 7 );
+   hb_arraySetForward( info, 1, hb_itemPutC(  temp, _s->fontFace    ) );
+   hb_arraySetForward( info, 2, hb_itemPutNL( temp, _s->fontHeight  ) );
+   hb_arraySetForward( info, 3, hb_itemPutNL( temp, _s->fontWidth   ) );
+   hb_arraySetForward( info, 4, hb_itemPutNL( temp, _s->fontWeight  ) );
+   hb_arraySetForward( info, 5, hb_itemPutNL( temp, _s->fontQuality ) );
+   hb_arraySetForward( info, 6, hb_itemPutNL( temp, _s->PTEXTSIZE.y ) );
+   hb_arraySetForward( info, 7, hb_itemPutNL( temp, _s->PTEXTSIZE.x ) );
 
-   hb_arraySetForward( &info, 1, hb_itemPutC(  &temp, _s->fontFace    ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNL( &temp, _s->fontHeight  ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, _s->fontWidth   ) );
-   hb_arraySetForward( &info, 4, hb_itemPutNL( &temp, _s->fontWeight  ) );
-   hb_arraySetForward( &info, 5, hb_itemPutNL( &temp, _s->fontQuality ) );
-   hb_arraySetForward( &info, 6, hb_itemPutNL( &temp, _s->PTEXTSIZE.y ) );
-   hb_arraySetForward( &info, 7, hb_itemPutNL( &temp, _s->PTEXTSIZE.x ) );
-
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETPALETTE )
 {
-   HB_ITEM  info;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
    int      i;
 
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
-
-   hb_arrayNew( &info, 16 );
+   hb_arrayNew( info, 16 );
 
    for ( i = 0; i < 16; i++ )
    {
-      hb_arraySetForward( &info, i+1, hb_itemPutNL( &temp, hb_wvt_gtGetColorData( i ) ) );
+      hb_arraySetForward( info, i+1, hb_itemPutNL( temp, hb_wvt_gtGetColorData( i ) ) );
    }
-
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
@@ -1137,44 +1138,40 @@ HB_FUNC( WVT_ISLBUTTONPRESSED )
 
 HB_FUNC( WVT_CLIENTTOSCREEN )
 {
-   HB_ITEM  aXY;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
    POINT    xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
    ClientToScreen( _s->hWnd, &xy );
 
-   aXY.type  = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 2 );
 
-   hb_arrayNew( &aXY, 2 );
+   hb_arraySetForward( info, 1, hb_itemPutNL( temp, xy.x ) );
+   hb_arraySetForward( info, 2, hb_itemPutNL( temp, xy.y ) );
 
-   hb_arraySetForward( &aXY, 1, hb_itemPutNL( &temp, xy.x ) );
-   hb_arraySetForward( &aXY, 2, hb_itemPutNL( &temp, xy.y ) );
-
-   hb_itemReturn( &aXY );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETCURSORPOS )
- {
-    POINT    xy = { 0 };
-    HB_ITEM  info;
-    HB_ITEM  temp;
+{
+   POINT    xy = { 0 };
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
-    GetCursorPos( &xy );
+   GetCursorPos( &xy );
 
-    info.type = HB_IT_NIL;
-    temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 2 );
 
-    hb_arrayNew( &info, 2 );
+   hb_arraySetForward( info, 1, hb_itemPutNI( temp, xy.x ) );
+   hb_arraySetForward( info, 2, hb_itemPutNI( temp, xy.y ) );
 
-    hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, xy.x ) );
-    hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, xy.y ) );
-
-    hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
  }
 
 //-------------------------------------------------------------------//
@@ -1260,7 +1257,8 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    else if( pFirst->type == HB_IT_STRING )
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      //pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      pExecSym = hb_dynsymFindName( hb_itemGetC( pFirst ) );
       hb_dynsymUnlock();
       if ( pExecSym )
       {
@@ -1387,7 +1385,7 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
    else if( pFirst->type == HB_IT_STRING )
    {
       hb_dynsymLock();
-      pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      pExecSym = hb_dynsymFindName( hb_itemGetC( pFirst ) );
       hb_dynsymUnlock();
       if ( pExecSym )
       {
@@ -1698,8 +1696,8 @@ HB_FUNC( WIN_SENDDLGITEMMESSAGE )
 
    if( pText )
    {
-      cText = ( char* ) hb_xgrab( pText->item.asString.length + 1 );
-      hb_xmemcpy( cText, pText->item.asString.value, pText->item.asString.length + 1 );
+      cText = ( char* ) hb_xgrab( hb_itemGetCLen( pText ) + 1 );
+      hb_xmemcpy( cText, hb_itemGetC( pText ), hb_itemGetCLen( pText ) + 1 );
    }
    else
    {
@@ -1716,7 +1714,7 @@ HB_FUNC( WIN_SENDDLGITEMMESSAGE )
 
   if( pText )
   {
-     hb_storclen( cText, pText->item.asString.length, 5 ) ;
+     hb_storclen( cText, hb_itemGetCLen( pText ), 5 ) ;
   }
 
   if( cText )
@@ -1950,22 +1948,20 @@ HB_FUNC( WIN_LOADIMAGE )
 HB_FUNC( WIN_GETCLIENTRECT )
 {
    RECT     rc = { 0 };
-   HB_ITEM  info;
-   HB_ITEM  temp;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
    GetClientRect( ( HWND ) hb_parnl( 1 ), &rc );
 
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 4 );
 
-   hb_arrayNew( &info, 4 );
+   hb_arraySetForward( info, 1, hb_itemPutNI( temp, rc.left   ) );
+   hb_arraySetForward( info, 2, hb_itemPutNI( temp, rc.top    ) );
+   hb_arraySetForward( info, 3, hb_itemPutNI( temp, rc.right  ) );
+   hb_arraySetForward( info, 4, hb_itemPutNI( temp, rc.bottom ) );
 
-   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, rc.left   ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, rc.top    ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, rc.right  ) );
-   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, rc.bottom ) );
-
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
@@ -2032,23 +2028,21 @@ HB_FUNC( WIN_DRAWTEXT )
 
 HB_FUNC( WIN_GETWINDOWRECT )
 {
-   RECT     rc = { 0 };
-   HB_ITEM  info;
-   HB_ITEM  temp;
+   RECT     rc   = { 0 };
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
    GetWindowRect( ( HWND ) hb_parnl( 1 ), &rc );
 
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   hb_arrayNew( info, 4 );
 
-   hb_arrayNew( &info, 4 );
+   hb_arraySetForward( info, 1, hb_itemPutNI( temp, rc.left   ) );
+   hb_arraySetForward( info, 2, hb_itemPutNI( temp, rc.top    ) );
+   hb_arraySetForward( info, 3, hb_itemPutNI( temp, rc.right  ) );
+   hb_arraySetForward( info, 4, hb_itemPutNI( temp, rc.bottom ) );
 
-   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, rc.left   ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, rc.top    ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNI( &temp, rc.right  ) );
-   hb_arraySetForward( &info, 4, hb_itemPutNI( &temp, rc.bottom ) );
-
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//
@@ -2079,8 +2073,7 @@ HB_FUNC( WIN_ISWINDOW )
    hb_retl( IsWindow( (HWND) hb_parnl( 1 ) ) );
 }
 
-//-------------------------------------------------------------------//
-//-------------------------------------------------------------------//
+//----------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETFONTHANDLE )
 {
@@ -2097,5 +2090,275 @@ HB_FUNC( WVT_GETFONTHANDLE )
 
 //----------------------------------------------------------------------//
 
+HB_FUNC( WIN_CLIENTTOSCREEN )
+{
+   POINT    Point ;
+   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY );
 
+   if ( wvt_Array2Point( pArray ,&Point ) )
+   {
+      if ( ClientToScreen( (HWND) hb_parnl( 1 ), &Point ) )
+      {
+          wvt_Point2ArrayEx( &Point, pArray );
+          hb_retl( TRUE ) ;
+      }
+      else
+      {
+         hb_retl( FALSE ) ;
+      }
+   }
+   else
+   {
+      hb_retl( FALSE ) ;
+   }
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WIN_SCREENTOCLIENT )
+{
+   POINT    Point ;
+   PHB_ITEM pArray = hb_param( 2 , HB_IT_ARRAY );
+
+   if ( wvt_Array2Point( pArray, &Point ) )
+   {
+      if( ScreenToClient( (HWND) hb_parnl( 1 ), &Point ) > 0 )
+      {
+          wvt_Point2ArrayEx( &Point, pArray );
+          hb_retl( TRUE ) ;
+      }
+      else
+      {
+         hb_retl( FALSE ) ;
+      }
+   }
+   else
+   {
+      hb_retl( FALSE ) ;
+   }
+}
+
+//----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+//
+//                     Utility Functions - Not API
+//
+//----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+//----------------------------------------------------------------------//
+
+BOOL wvt_Array2Rect(PHB_ITEM aRect, RECT *rc )
+{
+   if (HB_IS_ARRAY(aRect) && hb_arrayLen(aRect) == 4) {
+      rc->left   = hb_arrayGetNL(aRect,1);
+      rc->top    = hb_arrayGetNL(aRect,2);
+      rc->right  = hb_arrayGetNL(aRect,3);
+      rc->bottom = hb_arrayGetNL(aRect,4);
+      return TRUE ;
+   }
+   return FALSE;
+}
+
+//----------------------------------------------------------------------//
+
+PHB_ITEM wvt_Rect2Array( RECT *rc  )
+{
+   PHB_ITEM aRect   = hb_itemArrayNew( 4 );
+   PHB_ITEM element = hb_itemNew( NULL );
+
+   hb_arraySet(aRect, 1, hb_itemPutNL( element, rc->left   ));
+   hb_arraySet(aRect, 2, hb_itemPutNL( element, rc->top    ));
+   hb_arraySet(aRect, 3, hb_itemPutNL( element, rc->right  ));
+   hb_arraySet(aRect, 4, hb_itemPutNL( element, rc->bottom ));
+   hb_itemRelease(element);
+   return aRect;
+}
+
+
+//----------------------------------------------------------------------//
+
+BOOL wvt_Array2Point(PHB_ITEM aPoint, POINT *pt )
+{
+   if (HB_IS_ARRAY(aPoint) && hb_arrayLen(aPoint) == 2) {
+      pt->x = hb_arrayGetNL(aPoint,1);
+      pt->y = hb_arrayGetNL(aPoint,2);
+      return TRUE ;
+   }
+   return FALSE;
+}
+
+//----------------------------------------------------------------------//
+
+PHB_ITEM wvt_Point2Array( POINT *pt  )
+{
+   PHB_ITEM aPoint = hb_itemArrayNew(2);
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   hb_arraySet(aPoint, 1, hb_itemPutNL(element, pt->x));
+   hb_arraySet(aPoint, 2, hb_itemPutNL(element, pt->y));
+   hb_itemRelease(element);
+   return aPoint;
+}
+
+//----------------------------------------------------------------------//
+
+BOOL wvt_Array2Size(PHB_ITEM aSize, SIZE *siz )
+{
+   if (HB_IS_ARRAY(aSize) && hb_arrayLen(aSize) == 2) {
+      siz->cx = hb_arrayGetNL(aSize,1);
+      siz->cy = hb_arrayGetNL(aSize,2);
+      return TRUE ;
+   }
+   return FALSE;
+}
+
+//----------------------------------------------------------------------//
+
+PHB_ITEM wvt_Size2Array( SIZE *siz  )
+{
+   PHB_ITEM aSize   = hb_itemArrayNew(2);
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   hb_arraySet(aSize, 1, hb_itemPutNL(element, siz->cx));
+   hb_arraySet(aSize, 2, hb_itemPutNL(element, siz->cy));
+   hb_itemRelease(element);
+   return aSize;
+}
+
+//----------------------------------------------------------------------//
+
+void  wvt_Rect2ArrayEx( RECT *rc ,PHB_ITEM aRect )
+{
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   hb_arraySet(aRect, 1, hb_itemPutNL(element, rc->left));
+   hb_arraySet(aRect, 2, hb_itemPutNL(element, rc->top));
+   hb_arraySet(aRect, 3, hb_itemPutNL(element, rc->right));
+   hb_arraySet(aRect, 4, hb_itemPutNL(element, rc->bottom));
+   hb_itemRelease(element);
+}
+
+//----------------------------------------------------------------------//
+
+void wvt_Point2ArrayEx( POINT *pt, PHB_ITEM aPoint)
+{
+
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   hb_arraySet(aPoint, 1, hb_itemPutNL(element, pt->x));
+   hb_arraySet(aPoint, 2, hb_itemPutNL(element, pt->y));
+   hb_itemRelease(element);
+}
+
+//----------------------------------------------------------------------//
+
+void wvt_Size2ArrayEx( SIZE *siz, PHB_ITEM aSize )
+{
+   PHB_ITEM element = hb_itemNew(NULL);
+
+   hb_arraySet(aSize, 1, hb_itemPutNL(element, siz->cx));
+   hb_arraySet(aSize, 2, hb_itemPutNL(element, siz->cy));
+   hb_itemRelease(element);
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WVT__GETOPENFILENAME )
+{
+   HINSTANCE    hInstance;
+   OPENFILENAME ofn;
+   int          size = hb_parcsiz( 2 );
+   char *       szFileName = (char*) hb_xgrab( size );
+
+   hInstance = GetModuleHandle( NULL );
+
+   strcpy( szFileName, hb_parcx( 2 ) );
+   ZeroMemory( &ofn, sizeof( ofn ) );
+
+   ofn.hInstance       = hInstance  ;
+   ofn.lStructSize     = sizeof(ofn);
+   ofn.hwndOwner       = (ISNIL  (1) ? GetActiveWindow() : (HWND) hb_parnl(1));
+   ofn.lpstrTitle      = hb_parc (3);
+   ofn.lpstrFilter     = hb_parc (4);
+   ofn.Flags           = (ISNIL  (5) ? OFN_EXPLORER : hb_parnl(5) );
+   ofn.lpstrInitialDir = hb_parc (6);
+   ofn.lpstrDefExt     = hb_parc (7);
+   ofn.nFilterIndex    = hb_parni(8);
+   ofn.lpstrFile       = szFileName;
+   ofn.nMaxFile        = size;
+
+   if ( GetOpenFileName(&ofn ))
+   {
+      hb_stornl( ofn.nFilterIndex, 8 );
+      hb_storclen( szFileName, size, 2 ) ;
+      hb_xfree( szFileName );
+      hb_retclen(( char * ) ofn.lpstrFile, hb_parcsiz( 2 ) );
+   }
+   else
+   {
+      hb_xfree( szFileName );
+      hb_retc( "" );
+   }
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WVT__GETSAVEFILENAME )
+{
+   HINSTANCE hInstance;
+   OPENFILENAME ofn;
+   char szFileName[ MAX_PATH+1 ] ;
+
+   hInstance = GetModuleHandle( NULL );
+
+   strcpy( szFileName, hb_parcx( 2 ) );
+
+   ZeroMemory( &ofn, sizeof( ofn ) );
+
+   ofn.hInstance       = hInstance  ;
+   ofn.lStructSize     = sizeof( ofn );
+   ofn.hwndOwner       = ISNIL   (1) ? GetActiveWindow() : (HWND) hb_parnl( 1 );
+   ofn.lpstrTitle      = hb_parc (3);
+   ofn.lpstrFilter     = hb_parc (4);
+   ofn.Flags           = (ISNIL  (5) ? OFN_FILEMUSTEXIST|OFN_EXPLORER : hb_parnl( 4 ) );
+   ofn.lpstrInitialDir = hb_parc (6);
+   ofn.lpstrDefExt     = hb_parc (7);
+   ofn.nFilterIndex    = hb_parni(8);
+   ofn.lpstrFile       = szFileName;
+   ofn.nMaxFile        = MAX_PATH;
+
+   if( GetSaveFileName( &ofn ) )
+   {
+      hb_stornl( ofn.nFilterIndex, 8 );
+      hb_retc( ofn.lpstrFile );
+   }
+   else
+   {
+      hb_retc( "" );
+   }
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WIN_AND )
+{
+   hb_retnl( hb_parnl(1) & hb_parnl(2) ) ;
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WIN_OR )
+{
+   hb_retnl( hb_parnl(1) | hb_parnl(2) ) ;
+}
+
+//----------------------------------------------------------------------//
+
+HB_FUNC( WIN_NOT )
+{
+   hb_retnl( ~( hb_parnl(1) ) ) ;
+}
+
+//----------------------------------------------------------------------//
 

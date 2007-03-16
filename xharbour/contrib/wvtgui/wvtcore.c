@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.7 2006/02/03 01:33:58 andijahja Exp $
+ * $Id: wvtcore.c,v 1.8 2006/02/03 23:19:18 vouchcac Exp $
  */
 
 /*
@@ -1794,11 +1794,8 @@ HB_FUNC( WVT_SAVESCREEN )
    HBITMAP  hBmp, oldBmp;
    POINT    xy = { 0 };
    int      iTop, iLeft, iBottom, iRight, iWidth, iHeight;
-   HB_ITEM  info;
-   HB_ITEM  temp;
-
-   info.type = HB_IT_NIL;
-   temp.type = HB_IT_NIL;
+   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM temp = hb_itemNew( NULL );
 
    xy        = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
    iTop      = xy.y;
@@ -1817,13 +1814,14 @@ HB_FUNC( WVT_SAVESCREEN )
    BitBlt( _s->hCompDC, 0, 0, iWidth, iHeight, _s->hdc, iLeft, iTop, SRCCOPY );
    SelectObject( _s->hCompDC, oldBmp );
 
-   hb_arrayNew( &info, 3 );
+   hb_arrayNew( info, 3 );
 
-   hb_arraySetForward( &info, 1, hb_itemPutNI( &temp, iWidth ) );
-   hb_arraySetForward( &info, 2, hb_itemPutNI( &temp, iHeight ) );
-   hb_arraySetForward( &info, 3, hb_itemPutNL( &temp, ( ULONG ) hBmp ) );
+   hb_arraySetForward( info, 1, hb_itemPutNI( temp, iWidth ) );
+   hb_arraySetForward( info, 2, hb_itemPutNI( temp, iHeight ) );
+   hb_arraySetForward( info, 3, hb_itemPutNL( temp, ( ULONG ) hBmp ) );
 
-   hb_itemReturn( &info );
+   hb_itemRelease( temp );
+   hb_itemReturn( info );
 }
 
 //-------------------------------------------------------------------//

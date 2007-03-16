@@ -648,6 +648,48 @@
 #define EN_HSCROLL                    1537    // 0x0601
 #define EN_VSCROLL                    1538    // 0x0602
 
+//----------------------------------------------------------------------//
+/*
+ * Edit Control Messages
+ */
+#define EM_GETSEL                      176
+#define EM_SETSEL                      177
+#define EM_GETRECT                     178
+#define EM_SETRECT                     179
+#define EM_SETRECTNP                   180
+#define EM_SCROLL                      181
+#define EM_LINESCROLL                  182
+#define EM_SCROLLCARET                 183
+#define EM_GETMODIFY                   184
+#define EM_SETMODIFY                   185
+#define EM_GETLINECOUNT                186
+#define EM_LINEINDEX                   187
+#define EM_SETHANDLE                   188
+#define EM_GETHANDLE                   189
+#define EM_GETTHUMB                    190
+#define EM_LINELENGTH                  193
+#define EM_REPLACESEL                  194
+#define EM_GETLINE                     196
+#define EM_LIMITTEXT                   197
+#define EM_CANUNDO                     198
+#define EM_UNDO                        199
+#define EM_FMTLINES                    200
+#define EM_LINEFROMCHAR                201
+#define EM_SETTABSTOPS                 203
+#define EM_SETPASSWORDCHAR             204
+#define EM_EMPTYUNDOBUFFER             205
+#define EM_GETFIRSTVISIBLELINE         206
+#define EM_SETREADONLY                 207
+#define EM_SETWORDBREAKPROC            208
+#define EM_GETWORDBREAKPROC            209
+#define EM_GETPASSWORDCHAR             210
+#define EM_SETMARGINS                  211
+#define EM_GETMARGINS                  212
+#define EM_SETLIMITTEXT       EM_LIMITTEXT
+#define EM_GETLIMITTEXT                213
+#define EM_POSFROMCHAR                 214
+#define EM_CHARFROMPOS                 215
+
 //-------------------------------------------------------------------//
 //-------------------------------------------------------------------//
 /*
@@ -978,77 +1020,77 @@
 
 //-------------------------------------------------------------------//
 // Brush Styles
-#define BS_SOLID            0
-#define BS_NULL             1
-#define BS_HOLLOW           BS_NULL
-#define BS_HATCHED          2
-#define BS_PATTERN          3
-#define BS_INDEXED          4
-#define BS_DIBPATTERN       5
-#define BS_DIBPATTERNPT     6
-#define BS_PATTERN8X8       7
-#define BS_DIBPATTERN8X8    8
-#define BS_MONOPATTERN      9
+#define BS_SOLID                         0
+#define BS_NULL                          1
+#define BS_HOLLOW                  BS_NULL
+#define BS_HATCHED                       2
+#define BS_PATTERN                       3
+#define BS_INDEXED                       4
+#define BS_DIBPATTERN                    5
+#define BS_DIBPATTERNPT                  6
+#define BS_PATTERN8X8                    7
+#define BS_DIBPATTERN8X8                 8
+#define BS_MONOPATTERN                   9
 
 // Hatch Styles
-#define HS_HORIZONTAL       0       // -----
-#define HS_VERTICAL         1       // |||||
-#define HS_FDIAGONAL        2       // \\\\\
-#define HS_BDIAGONAL        3       // /////
-#define HS_CROSS            4       // +++++
-#define HS_DIAGCROSS        5       // xxxxx
+#define HS_HORIZONTAL                    0       // -----
+#define HS_VERTICAL                      1       // |||||
+#define HS_FDIAGONAL                     2       // \\\\\
+#define HS_BDIAGONAL                     3       // /////
+#define HS_CROSS                         4       // +++++
+#define HS_DIAGCROSS                     5       // xxxxx
 
 // Pen Styles
-#define PS_SOLID            0
-#define PS_DASH             1       // -------
-#define PS_DOT              2       // .......
-#define PS_DASHDOT          3       // _._._._
-#define PS_DASHDOTDOT       4       // _.._.._
-#define PS_NULL             5
-#define PS_INSIDEFRAME      6
-#define PS_USERSTYLE        7
-#define PS_ALTERNATE        8
-#define PS_STYLE_MASK               15
+#define PS_SOLID                         0
+#define PS_DASH                          1       // -------
+#define PS_DOT                           2       // .......
+#define PS_DASHDOT                       3       // _._._._
+#define PS_DASHDOTDOT                    4       // _.._.._
+#define PS_NULL                          5
+#define PS_INSIDEFRAME                   6
+#define PS_USERSTYLE                     7
+#define PS_ALTERNATE                     8
+#define PS_STYLE_MASK                   15
 
-#define PS_ENDCAP_ROUND              0
-#define PS_ENDCAP_SQUARE           256
-#define PS_ENDCAP_FLAT             512
-#define PS_ENDCAP_MASK            3840
+#define PS_ENDCAP_ROUND                  0
+#define PS_ENDCAP_SQUARE               256
+#define PS_ENDCAP_FLAT                 512
+#define PS_ENDCAP_MASK                3840
 
-#define PS_JOIN_ROUND                0
-#define PS_JOIN_BEVEL             4096
-#define PS_JOIN_MITER             8192
-#define PS_JOIN_MASK             61440
+#define PS_JOIN_ROUND                    0
+#define PS_JOIN_BEVEL                 4096
+#define PS_JOIN_MITER                 8192
+#define PS_JOIN_MASK                 61440
 
-#define PS_COSMETIC                  0
-#define PS_GEOMETRIC             65536
-#define PS_TYPE_MASK            983040
+#define PS_COSMETIC                      0
+#define PS_GEOMETRIC                 65536
+#define PS_TYPE_MASK                983040
 
 //-------------------------------------------------------------------//
 // font weight values
-#define FW_DONTCARE                  0
-#define FW_THIN                    100
-#define FW_EXTRALIGHT              200
-#define FW_ULTRALIGHT              200
-#define FW_LIGHT                   300
-#define FW_NORMAL                  400
-#define FW_REGULAR                 400
-#define FW_MEDIUM                  500
-#define FW_SEMIBOLD                600
-#define FW_DEMIBOLD                600
-#define FW_BOLD                    700
-#define FW_EXTRABOLD               800
-#define FW_ULTRABOLD               800
-#define FW_HEAVY                   900
-#define FW_BLACK                   900
+#define FW_DONTCARE                      0
+#define FW_THIN                        100
+#define FW_EXTRALIGHT                  200
+#define FW_ULTRALIGHT                  200
+#define FW_LIGHT                       300
+#define FW_NORMAL                      400
+#define FW_REGULAR                     400
+#define FW_MEDIUM                      500
+#define FW_SEMIBOLD                    600
+#define FW_DEMIBOLD                    600
+#define FW_BOLD                        700
+#define FW_EXTRABOLD                   800
+#define FW_ULTRABOLD                   800
+#define FW_HEAVY                       900
+#define FW_BLACK                       900
 
 //-------------------------------------------------------------------//
 // font quality values
-#define DEFAULT_QUALITY              0
-#define DRAFT_QUALITY                1
-#define PROOF_QUALITY                2
-#define NONANTIALIASED_QUALITY       3 // (WINVER >= 0x0400)
-#define ANTIALISED_QUALITY           4 // (WINVER >= 0x0400)
+#define DEFAULT_QUALITY                  0
+#define DRAFT_QUALITY                    1
+#define PROOF_QUALITY                    2
+#define NONANTIALIASED_QUALITY           3 // (WINVER >= 0x0400)
+#define ANTIALISED_QUALITY               4 // (WINVER >= 0x0400)
 
 //-------------------------------------------------------------------//
 // flags (CHOOSECOLOR structure)
@@ -1066,16 +1108,124 @@
 /*
  * Window field offsets for GetWindowLong()
  */
-#define GWL_WNDPROC               (-4)
-#define GWL_HINSTANCE             (-6)
-#define GWL_HWNDPARENT            (-8)
-#define GWL_STYLE                (-16)
-#define GWL_EXSTYLE              (-20)
-#define GWL_USERDATA             (-21)
-#define GWL_ID                   (-12)
+#define GWL_WNDPROC                    (-4)
+#define GWL_HINSTANCE                  (-6)
+#define GWL_HWNDPARENT                 (-8)
+#define GWL_STYLE                     (-16)
+#define GWL_EXSTYLE                   (-20)
+#define GWL_USERDATA                  (-21)
+#define GWL_ID                        (-12)
 
-#define DWL_MSGRESULT                0
-#define DWL_DLGPROC                  4
-#define DWL_USER                     8
+#define DWL_MSGRESULT                     0
+#define DWL_DLGPROC                       4
+#define DWL_USER                          8
 
 //--------------------------------------------------------------------//
+/*
+ *  Virtual Key Codes
+ */
+#define VK_LBUTTON                        1
+#define VK_RBUTTON                        2
+#define VK_CANCEL                         3
+#define VK_MBUTTON                        4
+#define VK_BACK                           8
+#define VK_TAB                            9
+#define VK_CLEAR                         12
+#define VK_RETURN                        13
+#define VK_SHIFT                         16
+#define VK_CONTROL                       17
+#define VK_MENU                          18
+#define VK_PAUSE                         19
+#define VK_CAPITAL                       20
+#define VK_ESCAPE                        27
+#define VK_SPACE                         32
+#define VK_PRIOR                         33
+#define VK_NEXT                          34
+#define VK_END                           35
+#define VK_HOME                          36
+#define VK_LEFT                          37
+#define VK_UP                            38
+#define VK_RIGHT                         39
+#define VK_DOWN                          40
+#define VK_SELECT                        41
+#define VK_PRINT                         42
+#define VK_EXECUTE                       43
+#define VK_SNAPSHOT                      44
+#define VK_INSERT                        45
+#define VK_DELETE                        46
+#define VK_HELP                          47
+#define VK_NUMPAD0                       96
+#define VK_NUMPAD1                       97
+#define VK_NUMPAD2                       98
+#define VK_NUMPAD3                       99
+#define VK_NUMPAD4                      100
+#define VK_NUMPAD5                      101
+#define VK_NUMPAD6                      102
+#define VK_NUMPAD7                      103
+#define VK_NUMPAD8                      104
+#define VK_NUMPAD9                      105
+#define VK_MULTIPLY                     106
+#define VK_ADD                          107
+#define VK_SEPARATOR                    108
+#define VK_SUBTRACT                     109
+#define VK_DECIMAL                      110
+#define VK_DIVIDE                       111
+#define VK_F1                           112
+#define VK_F2                           113
+#define VK_F3                           114
+#define VK_F4                           115
+#define VK_F5                           116
+#define VK_F6                           117
+#define VK_F7                           118
+#define VK_F8                           119
+#define VK_F9                           120
+#define VK_F10                          121
+#define VK_F11                          122
+#define VK_F12                          123
+#define VK_F13                          124
+#define VK_F14                          125
+#define VK_F15                          126
+#define VK_F16                          127
+#define VK_F17                          128
+#define VK_F18                          129
+#define VK_F19                          130
+#define VK_F20                          131
+#define VK_F21                          132
+#define VK_F22                          133
+#define VK_F23                          134
+#define VK_F24                          135
+#define VK_NUMLOCK                      144
+#define VK_SCROLL                       145
+
+//----------------------------------------------------------------------//
+/*
+ *  File Open/Save Dialog Constants
+ */
+#define OFN_READONLY                      1
+#define OFN_OVERWRITEPROMPT               2
+#define OFN_HIDEREADONLY                  4
+#define OFN_NOCHANGEDIR                   8
+#define OFN_SHOWHELP                     16
+#define OFN_ENABLEHOOK                   32
+#define OFN_ENABLETEMPLATE               64
+#define OFN_ENABLETEMPLATEHANDLE        128
+#define OFN_NOVALIDATE                  256
+#define OFN_ALLOWMULTISELECT            512
+#define OFN_EXTENSIONDIFFERENT         1024
+#define OFN_PATHMUSTEXIST              2048
+#define OFN_FILEMUSTEXIST              4096
+#define OFN_CREATEPROMPT               8192
+#define OFN_SHAREAWARE                16384
+#define OFN_NOREADONLYRETURN          32768
+#define OFN_NOTESTFILECREATE          65536
+#define OFN_NONETWORKBUTTON          131072
+#define OFN_NOLONGNAMES              262144  // force no long names for 4.x modules
+#define OFN_EXPLORER                 524288  // new look commdlg
+#define OFN_NODEREFERENCELINKS      1048576
+#define OFN_LONGNAMES               2097152  // force long names for 3.x modules
+#define OFN_ENABLEINCLUDENOTIFY     4194304  // send include message to callback
+#define OFN_ENABLESIZING            8388608
+#define OFN_DONTADDTORECENT        33554432
+#define OFN_FORCESHOWHIDDEN       268435456  // Show All files including System and hidden files
+
+//----------------------------------------------------------------------//
