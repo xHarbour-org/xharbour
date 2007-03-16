@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5385 2007/03/12 11:34:26 modalsist Exp $
+ * $Id: ChangeLog,v 1.5386 2007/03/13 23:05:51 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-15 23:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    * Corrected/simplified hb_vmPushEvalSym()
+
+  * xharbour/source/pp/ppcore.c
+    * Avoid auto concatenation of keywords across line continuation.
+    * Revert HB_PP_TOKEN_EOC to HB_PP_TOKEN_TEXT when inside [] which are reverted to literal string
+    - Deffed-out unused function
+
+  * source/vm/harbinit.prg
+    * Typo
 
 2007-03-13 19:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/std.ch

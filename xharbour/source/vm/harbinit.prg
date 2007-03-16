@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.6 2005/04/26 17:29:25 ronpinkas Exp $
+ * $Id: harbinit.prg,v 1.7 2005/04/26 17:30:36 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ RETURN
 FUNCTION __BreakBlock()
 RETURN {|e| Break(e) }
 
-FUNCTION __ErrorBlock( oError )
+FUNCTION __ErrorBlock( )
 RETURN {|e| __MinimalErrorHandler(e) }
 
 PROCEDURE __MinimalErrorHandler( oError )

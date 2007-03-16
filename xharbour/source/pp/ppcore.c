@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.240 2007/03/02 16:48:22 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.241 2007/03/04 13:37:51 druzus Exp $
  */
 
 /*
@@ -788,7 +788,17 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
       ulLen = hb_membufLen( pState->pBuffer );
       if( pState->fCanNextLine )
       {
-         pState->iSpaces = pState->iSpacesNL;
+         #ifdef HB_C52_STRICT
+            pState->iSpaces = pState->iSpacesNL;
+         #else
+            /* Clipper considers line concatenation (';' '/n') as white space (token delimiter)
+               but ppo output will be buggy, showing a false concatenation of the last token of
+               previous line and first token of new line.
+
+               This becomes a serious bug when the 2 tokens are keywords, due to automatic word concatenation  */
+
+            pState->iSpaces = pState->iSpacesNL ? pState->iSpacesNL : 1;
+         #endif
          pState->fCanNextLine = FALSE;
          /* Clipper left only last leading blank character from
             concatenated lines */
@@ -3138,8 +3148,11 @@ static BOOL hb_pp_tokenCanStartExp( PHB_PP_TOKEN pToken )
          return TRUE;
 
       pToken = pToken->pNext;
-      while( !HB_PP_TOKEN_ISEOC( pToken ) )
+      while( !HB_PP_TOKEN_ISEOL( pToken ) )
       {
+         if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EOC )
+            HB_PP_TOKEN_SETTYPE( pToken, HB_PP_TOKEN_TEXT );
+
          if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_RIGHT_SB )
             return TRUE;
          pToken = pToken->pNext;
@@ -5336,6 +5349,7 @@ void hb_pp_tokenUpper( PHB_PP_TOKEN pToken )
       hb_strupr( pToken->value );
 }
 
+#if 0 
 /*
  * convert tokens between '[' and ']' tokens into single string token
  * and replace the converted tokens with the new string
@@ -5380,6 +5394,7 @@ void hb_pp_tokenToString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
                    hb_membufPtr( pState->pBuffer ) );
    }
 }
+#endif
 
 char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                                int * piType, int * piLen )

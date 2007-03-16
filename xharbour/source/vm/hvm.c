@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.601 2007/02/27 15:59:41 druzus Exp $
+ * $Id: hvm.c,v 1.602 2007/03/04 13:37:52 druzus Exp $
  */
 
 /*
@@ -6995,7 +6995,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
    }
-   else if( HB_IS_BLOCK( pSelf ) && strncmp( pSym->szName, "EVAL", 4 ) == 0 )
+   else if( HB_IS_BLOCK( pSelf ) && strcmp( pSym->szName, "EVAL" ) == 0 )
    {
       pSym = &hb_symEval;
       pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
@@ -8129,17 +8129,7 @@ HB_EXPORT void hb_vmPushDynSym( PHB_DYNS pDynSym )
 
 HB_EXPORT void hb_vmPushEvalSym( void )
 {
-   HB_THREAD_STUB
-   PHB_ITEM pItem;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushEvalSym()"));
-
-   hb_stackPush();
-   pItem = hb_stackItemFromTop( -1 );
-   pItem->type = HB_IT_SYMBOL;
-   pItem->item.asSymbol.value = &hb_symEval;
-   pItem->item.asSymbol.stackbase = hb_stackTopOffset();
-   pItem->item.asSymbol.uiSuperClass = 0;
+   hb_vmPushSymbol( &hb_symEval );
 }
 
 
