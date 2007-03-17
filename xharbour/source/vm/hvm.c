@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.602 2007/03/04 13:37:52 druzus Exp $
+ * $Id: hvm.c,v 1.603 2007/03/16 03:37:16 ronpinkas Exp $
  */
 
 /*
@@ -939,13 +939,6 @@ int HB_EXPORT hb_vmQuit( void )
    }
    //printf("\nAfter Statics\n" );
 
-   #if defined(HB_OS_WIN_32)
-      if( s_bUnInitOle )
-      {
-         OleUninitialize();
-      }
-   #endif
-
    hb_errExit();
    //printf("After Err\n" );
 
@@ -1003,6 +996,13 @@ int HB_EXPORT hb_vmQuit( void )
 
       hb_xfree( (void *) pFree );
    }
+
+   #if defined(HB_OS_WIN_32)
+      if( s_bUnInitOle )
+      {
+         OleUninitialize();
+      }
+   #endif
 
    hb_xexit();
    //printf("After xexit\n" );

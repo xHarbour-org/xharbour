@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5387 2007/03/16 03:37:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5388 2007/03/16 21:34:51 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-16 23:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    * Corrected to call OleUninitialize() only after all vars are guarnteed to be released.
 
 2007-03-16 14:25 UTC-0700 Pritpal Bedi <pritpal/at/vouchcac.com>
   * contrib/wvtgui/wvtcore.c
@@ -28,7 +32,7 @@
     + HB_FUNC( WVT__GETOPENFILENAME ) . Basis for WVT_GetOpenFileName()
     + HB_FUNC( WVT__GETSAVEFILENAME ) . Basis for WVT_GetSaveFileName()
     + HB_FUNC( WIN_AND )
-    + HB_FUNC( WIN_OR )  
+    + HB_FUNC( WIN_OR )
     + HB_FUNC( WIN_NOT )
   * contrib/wvtgui/wvtpaint.prg
     + Adopted from What32:
@@ -36,7 +40,7 @@
       WVT_GetSaveFileName( hWnd, cFile, cTitle, aFilter, nFlags, cIniDir, cDefExt, nIndex )
   * contrib/wvtgui/wvtwin.ch
     + Added few more winapi constants.
- 
+
 2007-03-15 23:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/hvm.c
     * Corrected/simplified hb_vmPushEvalSym()
