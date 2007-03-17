@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.11 2006/02/04 00:44:52 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.12 2007/03/16 21:20:36 vouchcac Exp $
  */
 
 /*
@@ -511,18 +511,17 @@ HB_FUNC( WVT_SETMOUSEPOS )
 
 HB_FUNC( WVT_GETPAINTRECT )
 {
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 4 );
    PHB_ITEM temp = hb_itemNew( NULL );
 
-   hb_arrayNew( info, 4 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNI( temp, _s->rowStart ) );
-   hb_arraySetForward( info, 2, hb_itemPutNI( temp, _s->colStart ) );
-   hb_arraySetForward( info, 3, hb_itemPutNI( temp, _s->rowStop  ) );
-   hb_arraySetForward( info, 4, hb_itemPutNI( temp, _s->colStop  ) );
+   hb_arraySet( info, 1, hb_itemPutNI( temp, _s->rowStart ) );
+   hb_arraySet( info, 2, hb_itemPutNI( temp, _s->colStart ) );
+   hb_arraySet( info, 3, hb_itemPutNI( temp, _s->rowStop  ) );
+   hb_arraySet( info, 4, hb_itemPutNI( temp, _s->colStop  ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
@@ -689,58 +688,55 @@ HB_FUNC( WVT_SETMOUSEMOVE )
 
 HB_FUNC( WVT_GETXYFROMROWCOL )
 {
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 2 );
    PHB_ITEM temp = hb_itemNew( NULL );
    POINT    xy = { 0 };
 
    xy = hb_wvt_gtGetXYFromColRow( hb_parni( 2 ), hb_parni( 1 ) );
 
-   hb_arrayNew( info, 2 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNL( temp, xy.x ) );
-   hb_arraySetForward( info, 2, hb_itemPutNL( temp, xy.y ) );
+   hb_arraySet( info, 1, hb_itemPutNL( temp, xy.x ) );
+   hb_arraySet( info, 2, hb_itemPutNL( temp, xy.y ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETFONTINFO )
 {
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 7 );
    PHB_ITEM temp = hb_itemNew( NULL );
 
-   hb_arrayNew( info, 7 );
-
-   hb_arraySetForward( info, 1, hb_itemPutC(  temp, _s->fontFace    ) );
-   hb_arraySetForward( info, 2, hb_itemPutNL( temp, _s->fontHeight  ) );
-   hb_arraySetForward( info, 3, hb_itemPutNL( temp, _s->fontWidth   ) );
-   hb_arraySetForward( info, 4, hb_itemPutNL( temp, _s->fontWeight  ) );
-   hb_arraySetForward( info, 5, hb_itemPutNL( temp, _s->fontQuality ) );
-   hb_arraySetForward( info, 6, hb_itemPutNL( temp, _s->PTEXTSIZE.y ) );
-   hb_arraySetForward( info, 7, hb_itemPutNL( temp, _s->PTEXTSIZE.x ) );
+   hb_arraySet( info, 1, hb_itemPutC(  temp, _s->fontFace    ) );
+   hb_arraySet( info, 2, hb_itemPutNL( temp, _s->fontHeight  ) );
+   hb_arraySet( info, 3, hb_itemPutNL( temp, _s->fontWidth   ) );
+   hb_arraySet( info, 4, hb_itemPutNL( temp, _s->fontWeight  ) );
+   hb_arraySet( info, 5, hb_itemPutNL( temp, _s->fontQuality ) );
+   hb_arraySet( info, 6, hb_itemPutNL( temp, _s->PTEXTSIZE.y ) );
+   hb_arraySet( info, 7, hb_itemPutNL( temp, _s->PTEXTSIZE.x ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_GETPALETTE )
 {
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 16 );
    PHB_ITEM temp = hb_itemNew( NULL );
    int      i;
 
-   hb_arrayNew( info, 16 );
-
    for ( i = 0; i < 16; i++ )
    {
-      hb_arraySetForward( info, i+1, hb_itemPutNL( temp, hb_wvt_gtGetColorData( i ) ) );
+      hb_arraySet( info, i+1, hb_itemPutNL( temp, hb_wvt_gtGetColorData( i ) ) );
    }
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
@@ -1138,7 +1134,7 @@ HB_FUNC( WVT_ISLBUTTONPRESSED )
 
 HB_FUNC( WVT_CLIENTTOSCREEN )
 {
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 2 );
    PHB_ITEM temp = hb_itemNew( NULL );
    POINT    xy = { 0 };
 
@@ -1146,13 +1142,12 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
 
    ClientToScreen( _s->hWnd, &xy );
 
-   hb_arrayNew( info, 2 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNL( temp, xy.x ) );
-   hb_arraySetForward( info, 2, hb_itemPutNL( temp, xy.y ) );
+   hb_arraySet( info, 1, hb_itemPutNL( temp, xy.x ) );
+   hb_arraySet( info, 2, hb_itemPutNL( temp, xy.y ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
@@ -1160,18 +1155,17 @@ HB_FUNC( WVT_CLIENTTOSCREEN )
 HB_FUNC( WVT_GETCURSORPOS )
 {
    POINT    xy = { 0 };
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 2 );
    PHB_ITEM temp = hb_itemNew( NULL );
 
    GetCursorPos( &xy );
 
-   hb_arrayNew( info, 2 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNI( temp, xy.x ) );
-   hb_arraySetForward( info, 2, hb_itemPutNI( temp, xy.y ) );
+   hb_arraySet( info, 1, hb_itemPutNI( temp, xy.x ) );
+   hb_arraySet( info, 2, hb_itemPutNI( temp, xy.y ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
  }
 
 //-------------------------------------------------------------------//
@@ -1254,12 +1248,15 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
       pFunc = hb_itemNew( pFirst );
       iType = 2;
    }
-   else if( pFirst->type == HB_IT_STRING )
+   else if( hb_itemType( pFirst ) == HB_IT_STRING )
    {
+      #ifdef __XHARBOUR__
       hb_dynsymLock();
-      //pExecSym = hb_dynsymFindName( pFirst->item.asString.value );
+      #endif
       pExecSym = hb_dynsymFindName( hb_itemGetC( pFirst ) );
+      #ifdef __XHARBOUR__
       hb_dynsymUnlock();
+      #endif
       if ( pExecSym )
       {
          pFunc = ( PHB_ITEM ) pExecSym;
@@ -1382,11 +1379,15 @@ HB_FUNC( WVT_CREATEDIALOGMODAL )
       _s->pFuncModal[ iIndex ] = pFunc;
       _s->iTypeModal[ iIndex ] = 2;
    }
-   else if( pFirst->type == HB_IT_STRING )
+   else if( hb_itemType( pFirst ) == HB_IT_STRING )
    {
+      #ifdef __XHARBOUR__
       hb_dynsymLock();
+      #endif
       pExecSym = hb_dynsymFindName( hb_itemGetC( pFirst ) );
+      #ifdef __XHARBOUR__
       hb_dynsymUnlock();
+      #endif
       if ( pExecSym )
       {
          pFunc = ( PHB_ITEM ) pExecSym;
@@ -1948,20 +1949,19 @@ HB_FUNC( WIN_LOADIMAGE )
 HB_FUNC( WIN_GETCLIENTRECT )
 {
    RECT     rc = { 0 };
-   PHB_ITEM info = hb_itemNew( NULL );
+   PHB_ITEM info = hb_itemArrayNew( 4 );
    PHB_ITEM temp = hb_itemNew( NULL );
 
    GetClientRect( ( HWND ) hb_parnl( 1 ), &rc );
 
-   hb_arrayNew( info, 4 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNI( temp, rc.left   ) );
-   hb_arraySetForward( info, 2, hb_itemPutNI( temp, rc.top    ) );
-   hb_arraySetForward( info, 3, hb_itemPutNI( temp, rc.right  ) );
-   hb_arraySetForward( info, 4, hb_itemPutNI( temp, rc.bottom ) );
+   hb_arraySet( info, 1, hb_itemPutNI( temp, rc.left   ) );
+   hb_arraySet( info, 2, hb_itemPutNI( temp, rc.top    ) );
+   hb_arraySet( info, 3, hb_itemPutNI( temp, rc.right  ) );
+   hb_arraySet( info, 4, hb_itemPutNI( temp, rc.bottom ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
@@ -2028,21 +2028,20 @@ HB_FUNC( WIN_DRAWTEXT )
 
 HB_FUNC( WIN_GETWINDOWRECT )
 {
-   RECT     rc   = { 0 };
-   PHB_ITEM info = hb_itemNew( NULL );
+   RECT rc;
+   PHB_ITEM info = hb_itemArrayNew( 4 );
    PHB_ITEM temp = hb_itemNew( NULL );
 
    GetWindowRect( ( HWND ) hb_parnl( 1 ), &rc );
 
-   hb_arrayNew( info, 4 );
-
-   hb_arraySetForward( info, 1, hb_itemPutNI( temp, rc.left   ) );
-   hb_arraySetForward( info, 2, hb_itemPutNI( temp, rc.top    ) );
-   hb_arraySetForward( info, 3, hb_itemPutNI( temp, rc.right  ) );
-   hb_arraySetForward( info, 4, hb_itemPutNI( temp, rc.bottom ) );
+   hb_arraySet( info, 1, hb_itemPutNI( temp, rc.left   ) );
+   hb_arraySet( info, 2, hb_itemPutNI( temp, rc.top    ) );
+   hb_arraySet( info, 3, hb_itemPutNI( temp, rc.right  ) );
+   hb_arraySet( info, 4, hb_itemPutNI( temp, rc.bottom ) );
 
    hb_itemRelease( temp );
    hb_itemReturn( info );
+   hb_itemRelease( info );
 }
 
 //-------------------------------------------------------------------//
