@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5388 2007/03/16 21:34:51 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5389 2007/03/17 03:42:31 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-17 11:55 UTC-0700 Pritpal Bedi <pritpal/at/vouchcac.com>
+  * contrib/wvtgui/wvtcore.c
+  * contrib/wvtgui/wvtutil.c
+    ! Fixed big memory leaks present since begining. Now no more memory leak.
+
+    Budyanto - Check for WVW all those occurances using HB_ITEM. We need to use hb_itemRelease() for sure.
 
 2007-03-16 23:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/hvm.c
