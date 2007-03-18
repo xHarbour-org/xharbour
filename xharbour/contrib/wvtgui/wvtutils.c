@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.12 2007/03/16 21:20:36 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.13 2007/03/17 18:49:38 vouchcac Exp $
  */
 
 /*
@@ -2265,40 +2265,38 @@ void wvt_Size2ArrayEx( SIZE *siz, PHB_ITEM aSize )
 
 HB_FUNC( WVT__GETOPENFILENAME )
 {
-   HINSTANCE    hInstance;
-   OPENFILENAME ofn;
-   int          size = hb_parcsiz( 2 );
-   char *       szFileName = (char*) hb_xgrab( size );
+    int size = ( ISNIL( 2 ) ? 1024 : hb_parcsiz( 2 ) );
+    OPENFILENAME ofn ;
 
-   hInstance = GetModuleHandle( NULL );
+    char * szFileName = ( char* ) hb_xgrab( size );
 
-   strcpy( szFileName, hb_parcx( 2 ) );
-   ZeroMemory( &ofn, sizeof( ofn ) );
+    strcpy( szFileName, ( ISNIL( 2 ) ? "" : hb_parc( 2 ) ) );
 
-   ofn.hInstance       = hInstance  ;
-   ofn.lStructSize     = sizeof(ofn);
-   ofn.hwndOwner       = (ISNIL  (1) ? GetActiveWindow() : (HWND) hb_parnl(1));
-   ofn.lpstrTitle      = hb_parc (3);
-   ofn.lpstrFilter     = hb_parc (4);
-   ofn.Flags           = (ISNIL  (5) ? OFN_EXPLORER : hb_parnl(5) );
-   ofn.lpstrInitialDir = hb_parc (6);
-   ofn.lpstrDefExt     = hb_parc (7);
-   ofn.nFilterIndex    = hb_parni(8);
-   ofn.lpstrFile       = szFileName;
-   ofn.nMaxFile        = size;
+    ZeroMemory( &ofn, sizeof( ofn ) );
 
-   if ( GetOpenFileName(&ofn ))
-   {
+    ofn.hInstance       = GetModuleHandle( NULL )  ;
+    ofn.lStructSize     = sizeof( ofn );
+    ofn.hwndOwner       = ISNIL   (1) ? GetActiveWindow() : ( HWND ) hb_parnl( 1 ) ;
+    ofn.lpstrTitle      = ISNIL   (3) ? NULL : hb_parc ( 3 ) ;
+    ofn.lpstrFilter     = ISNIL   (4) ? NULL : hb_parc ( 4 );
+    ofn.Flags           = ISNIL   (5) ? OFN_SHOWHELP : hb_parnl( 5 ) ;
+    ofn.lpstrInitialDir = ISNIL   (6) ? NULL : hb_parc ( 6 );
+    ofn.lpstrDefExt     = ISNIL   (7) ? NULL : hb_parc ( 7 );
+    ofn.nFilterIndex    = ISNIL   (8) ? NULL : hb_parni( 8 );
+    ofn.lpstrFile       = szFileName;
+    ofn.nMaxFile        = size;
+
+    if( GetOpenFileName( &ofn ) )
+    {
       hb_stornl( ofn.nFilterIndex, 8 );
       hb_storclen( szFileName, size, 2 ) ;
-      hb_xfree( szFileName );
-      hb_retclen(( char * ) ofn.lpstrFile, hb_parcsiz( 2 ) );
-   }
-   else
-   {
-      hb_xfree( szFileName );
+      hb_retclen( ( char * ) ofn.lpstrFile, size );
+    }
+    else
+    {
       hb_retc( "" );
-   }
+    }
+    hb_xfree( szFileName );
 }
 
 //----------------------------------------------------------------------//
@@ -2337,7 +2335,6 @@ HB_FUNC( WVT__GETSAVEFILENAME )
       hb_retc( "" );
    }
 }
-
 //----------------------------------------------------------------------//
 
 HB_FUNC( WIN_AND )
