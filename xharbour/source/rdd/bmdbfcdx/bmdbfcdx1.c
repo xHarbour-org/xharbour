@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.18 2007/03/07 10:30:06 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.19 2007/03/08 16:06:45 marchuet Exp $
  */
 
 /*
@@ -3857,15 +3857,6 @@ static int hb_cdxPageSeekKey( LPCDXPAGE pPage, LPCDXKEY pKey, ULONG ulKeyRec, BO
    return k;
 }
 
-static BYTE * hb_cdxPageGetKeyValActual( LPCDXPAGE pPage )
-{
-    while ( pPage->Child )
-    {
-       pPage = pPage->Child;
-    }
-    return hb_cdxPageGetKeyVal( pPage, pPage->iCurKey );
-}
-
 /*
  * an interface for fast check record number in record filter
  */
@@ -6553,6 +6544,16 @@ static ERRCODE hb_cdxSeek( CDXAREAP pArea, BOOL fSoftSeek, PHB_ITEM pKeyItm, BOO
 }
 
 #if ! defined( HB_SIXCDX )
+
+static BYTE * hb_cdxPageGetKeyValActual( LPCDXPAGE pPage )
+{
+    while ( pPage->Child )
+    {
+       pPage = pPage->Child;
+    }
+    return hb_cdxPageGetKeyVal( pPage, pPage->iCurKey );
+}
+
 
 /*
  * compare two values using Tag conditions (len & type)
