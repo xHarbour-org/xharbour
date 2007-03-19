@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.51 2006/01/17 00:47:09 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.52 2006/02/22 01:33:49 ronpinkas Exp $
  */
 
 /*
@@ -233,8 +233,8 @@ STATIC FUNCTION LogError( oerr )
 
      LOCAL cScreen
      LOCAL aLogFile    := SET( _SET_ERRORLOG )
-     LOCAL cLogFile    := aLogFile[1]
-     LOCAL lAppendLog  := aLogFile[2]
+     LOCAL cLogFile    := aLogFile[1]  // error log file name
+     LOCAL lAppendLog  := aLogFile[2]  // .f. = create a new error.log .t. = append to a existing file.
      LOCAL nStart      := 1
      LOCAL nCellSize
      LOCAL nRange
@@ -258,6 +258,12 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nBytes
      LOCAL nMemCount
 
+     LOCAL nHandle2   := -1
+     LOCAL cLogFile2  := "_error.log"
+     LOCAL cBuff      := ""
+     LOCAL nRead      := 0
+
+     
      nCols := MaxCol()
      IF nCols > 0
         nRows := MaxRow()
@@ -265,16 +271,19 @@ STATIC FUNCTION LogError( oerr )
      ENDIF
      //Alert( 'An error occured, Information will be ;written to error.log' )
 
-     If !lAppendLog
-        nHandle := Fcreate( cLogFile, FC_NORMAL )
+     If !lAppendLog 
+        nHandle := FCreate( cLogFile, FC_NORMAL )
      Else
         If !File( cLogFile )
-           nHandle := Fcreate( cLogFile, FC_NORMAL )
+           nHandle := FCreate( cLogFile, FC_NORMAL )
         Else
-           nHandle := Fopen( cLogFile, FO_READWRITE )
-           FSeek( nHandle, 0, FS_END )
+           nHandle  := FCreate( cLogFile2, FC_NORMAL )
+           //nHandle2 := FOpen( cLogFile, FO_READWRITE )
+           nHandle2 := FOpen( cLogFile, FO_READ )
+           //FSeek( nHandle, 0, FS_END )
         Endif
      Endif
+
 
      If nHandle < 3 .and. lower( cLogFile ) != 'error.log'
         // Force creating error.log in case supplied log file cannot
@@ -285,66 +294,133 @@ STATIC FUNCTION LogError( oerr )
 
      If nHandle < 3
      Else
-        FWriteLine( nHandle, Padc( ' Error log file ', 79, '*' ) )
+
+        FWriteLine( nHandle, Padc( ' xHarbour Error Log ' , 79, '-' ) )
         FWriteLine( nHandle, '' )
-        // FWriteLine( nHandle, '' )
-        // FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, 'Date ............: ' + Dtoc( Date() ) )
-        FWriteLine( nHandle, 'Time ............: ' + Time() )
-        FWriteLine( nHandle, 'Available Memory : ' + strvalue( Memory( 0 ) ) )
-        FWriteLine( nHandle, 'Multi Threading  : ' + If( Hb_MultiThread(),"Yes","No" ) )
-        FWriteLine( nHandle, 'VM Optimization  : ' + strvalue( Hb_VmMode() ) )
-        FWriteLine( nHandle, 'Application      : ' + hb_cmdargargv() )
-        FWriteLine( nHandle, 'Operating System : ' + os() )
-        FWriteLine( nHandle, 'Compiler         : ' + hb_compiler() )
-        FWriteLine( nHandle, 'xHarbour Version : ' + version() )
-        FWriteLine( nHandle, 'Build Date       : ' + hb_builddate() )
+
+        FWriteLine( nHandle, 'Date...............: ' + dtoc( date() )  )
+        FWriteLine( nHandle, 'Time...............: ' + time()          )
+
+        FWriteLine( nHandle, '' )
+        FWriteLine( nHandle, 'Application name...: ' + hb_cmdargargv() )
+        FWriteLine( nHandle, 'Workstation name...: ' + netname() )
+        FWriteLine( nHandle, 'Available memory...: ' + strvalue( Memory(0) )  )
+        FWriteLine( nHandle, 'Total disk space...: ' + strvalue( DiskTotal() ) )
+        FWriteLine( nHandle, 'Free disk space....: ' + strvalue( DiskSpace() ) )
+        FWriteLine( nHandle, 'Current disk.......: ' + diskname() )
+        FWriteLine( nHandle, 'Current directory..: ' + dirname() )
+        FWriteLine( nHandle, '' )
+        FWriteLine( nHandle, 'Operating system...: ' + os() )
+        FWriteLine( nHandle, 'xHarbour version...: ' + version() )
+        FWriteLine( nHandle, 'xHarbour built on..: ' + hb_builddate() )
+        FWriteLine( nHandle, 'C/C++ compiler.....: ' + hb_compiler() )
+
+        FWriteLine( nHandle, 'Multi Threading....: ' + If( Hb_MultiThread(),"YES","NO" ) )
+        FWriteLine( nHandle, 'VM Optimization....: ' + strvalue( Hb_VmMode() ) )
 
         IF Type( "Select()" ) == "UI"
-           FWriteLine( nHandle, 'Current Area ....:' + strvalue( &("Select()") ) )
+        FWriteLine( nHandle, '' )
+        FWriteLine( nHandle, 'Current Area ......:' + strvalue( &("Select()") ) )
         ENDIF
 
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, Padc( ' Environmental Information ', 79, '-' ) )
         FWriteLine( nHandle, '' )
-        FWriteLine( nHandle, "Exact is ........: " + strvalue( Set( 1 ), .T. ) )
-        FWriteLine( nHandle, "Fixed is ........: " + strvalue( Set( 2 ), .T. ) )
-        FWriteLine( nHandle, "Decimals is at ..: " + strvalue( Set( 3 ) ) )
-        FWriteLine( nHandle, "Date Format is ..: " + strvalue( Set( 4 ) ) )
-        FWriteLine( nHandle, "Epoch is ........: " + strvalue( Set( 5 ) ) )
-        FWriteLine( nHandle, "Path is .........: " + strvalue( Set( 6 ) ) )
-        FWriteLine( nHandle, "Default is ......: " + strvalue( Set( 7 ) ) )
-        FWriteLine( nHandle, "Exclusive is ....: " + strvalue( Set( 8 ), .T. ) )
-        FWriteLine( nHandle, "SoftSeek is .....: " + strvalue( Set( 9 ), .T. ) )
-        FWriteLine( nHandle, "Unique is .......: " + strvalue( Set( 10 ), .T. ) )
-        FWriteLine( nHandle, "Deleted is ......: " + strvalue( Set( 11 ), .T. ) )
-        FWriteLine( nHandle, "Cancel is .......: " + strvalue( Set( 12 ), .T. ) )
-        FWriteLine( nHandle, "Debug is ........: " + strvalue( Set( 13 ) ) )
-        FWriteLine( nHandle, "Color is ........: " + strvalue( Set( 15 ) ) )
-        FWriteLine( nHandle, "Cursor is .......: " + strvalue( Set( 16 ) ) )
-        FWriteLine( nHandle, "Console is ......: " + strvalue( Set( 17 ), .T. ) )
-        FWriteLine( nHandle, "Alternate is ....: " + strvalue( Set( 18 ), .T. ) )
-        FWriteLine( nHandle, "AltFile is ......: " + strvalue( Set( 19 ) ) )
-        FWriteLine( nHandle, "Device is .......: " + strvalue( Set( 20 ) ) )
-        FWriteLine( nHandle, "Printer is ......: " + strvalue( Set( 23 ) ) )
-        FWriteLine( nHandle, "PrintFile is ....: " + strvalue( Set( 24 ) ) )
-        FWriteLine( nHandle, "Margin is .......: " + strvalue( Set( 25 ) ) )
-        FWriteLine( nHandle, "Bell is .........: " + strvalue( Set( 26 ), .T. ) )
-        FWriteLine( nHandle, "Confirm is ......: " + strvalue( Set( 27 ), .T. ) )
-        FWriteLine( nHandle, "Escape is .......: " + strvalue( Set( 28 ), .T. ) )
-        FWriteLine( nHandle, "Insert is .......: " + strvalue( Set( 29 ), .T. ) )
-        FWriteLine( nHandle, "Intensity is ....: " + strvalue( Set( 31 ), .T. ) )
-        FWriteLine( nHandle, "Scoreboard is ...: " + strvalue( Set( 32 ), .T. ) )
-        FWriteLine( nHandle, "Delimeters is ...: " + strvalue( Set( 33 ), .T. ) )
-        FWriteLine( nHandle, "Delimchars is ...: " + strvalue( Set( 34 ) ) )
-        FWriteLine( nHandle, "Wrap is .........: " + strvalue( Set( 35 ), .T. ) )
-        FWriteLine( nHandle, "Message is ......: " + strvalue( Set( 36 ) ) )
-        FWriteLine( nHandle, "MCenter is ......: " + strvalue( Set( 37 ), .T. ) )
-        //FWriteLine( nHandle, "" )
+
+        FWriteLine( nHandle, "SET ALTERNATE......: " + strvalue( Set( 18  ), .T. ) )
+        FWriteLine( nHandle, "SET ALTFILE........: " + strvalue( Set( 19  )      ) )
+        FWriteLine( nHandle, "SET AUTOPEN........: " + strvalue( Set( 45  ), .T. ) )
+        FWriteLine( nHandle, "SET AUTORDER.......: " + strvalue( Set( 46  )      ) )
+        FWriteLine( nHandle, "SET AUTOSHARE......: " + strvalue( Set( 47  )      ) )
+
+        FWriteLine( nHandle, "SET BACKGROUNDTASKS: " + strvalue( Set( 111 ), .T. ) )
+        FWriteLine( nHandle, "SET BACKGROUNDTICK.: " + strvalue( Set( 114 ), .T. ) )
+        FWriteLine( nHandle, "SET BELL...........: " + strvalue( Set( 26  ), .T. ) )
+        FWriteLine( nHandle, "SET BLINK..........: " + strvalue( SetBlink()      ) )
+
+        FWriteLine( nHandle, "SET CANCEL.........: " + strvalue( Set( 12  ), .T. ) )
+        FWriteLine( nHandle, "SET CENTURY........: " + strvalue( __SetCentury(), .T. ) )
+        FWriteLine( nHandle, "SET COLOR..........: " + strvalue( Set( 15  )      ) )
+        FWriteLine( nHandle, "SET CONFIRM........: " + strvalue( Set( 27  ), .T. ) )
+        FWriteLine( nHandle, "SET CONSOLE........: " + strvalue( Set( 17  ), .T. ) )
+        FWriteLine( nHandle, "SET COUNT..........: " + strvalue( Set( 47  )      ) )
+        FWriteLine( nHandle, "SET CURSOR.........: " + strvalue( Set( 16  )      ) )
+
+        FWriteLine( nHandle, "SET DATE FORMAT....: " + strvalue( Set( 4   )      ) )
+        FWriteLine( nHandle, "SET DBFLOCKSCHEME..: " + strvalue( Set( 110 )      ) )
+        FWriteLine( nHandle, "SET DEBUG..........: " + strvalue( Set( 13  ), .T. ) )
+        FWriteLine( nHandle, "SET DECIMALS.......: " + strvalue( Set( 3   )      ) )
+        FWriteLine( nHandle, "SET DEFAULT........: " + strvalue( Set( 7   )      ) )
+        FWriteLine( nHandle, "SET DELETED........: " + strvalue( Set( 11  ), .T. ) )
+        FWriteLine( nHandle, "SET DELIMCHARS.....: " + strvalue( Set( 34  )      ) )
+        FWriteLine( nHandle, "SET DELIMETERS.....: " + strvalue( Set( 33  ), .T. ) )
+        FWriteLine( nHandle, "SET DEVICE.........: " + strvalue( Set( 20  )      ) )
+        FWriteLine( nHandle, "SET DIRCASE........: " + strvalue( Set( 106 )      ) )
+        FWriteLine( nHandle, "SET DIRSEPARATOR...: " + strvalue( Set( 107 )      ) )
+
+        FWriteLine( nHandle, "SET EOL............: " + strvalue( Asc( Set( 118 ) ) )  )
+        FWriteLine( nHandle, "SET EPOCH..........: " + strvalue( Set( 5   )      ) )
+        FWriteLine( nHandle, "SET ERRORLOG.......: " + if(!Empty(aLogFile), strvalue( aLogFile[1] ), "") )
+        FWriteLine( nHandle, "SET ERRORLOOP......: " + strvalue( Set( 108 )      ) )
+        FWriteLine( nHandle, "SET ESCAPE.........: " + strvalue( Set( 28  ), .T. ) )
+        FWriteLine( nHandle, "SET EVENTMASK......: " + strvalue( Set( 39  )      ) )
+        FWriteLine( nHandle, "SET EXACT..........: " + strvalue( Set( 1   ), .T. ) )
+        FWriteLine( nHandle, "SET EXCLUSIVE......: " + strvalue( Set( 8   ), .T. ) )
+        FWriteLine( nHandle, "SET EXIT...........: " + strvalue( Set( 30  ), .T. ) )
+        FWriteLine( nHandle, "SET EXTRA..........: " + strvalue( Set( 21  ), .T. ) )
+        FWriteLine( nHandle, "SET EXTRAFILE......: " + strvalue( Set( 22  )      ) )
+
+        FWriteLine( nHandle, "SET FILECASE.......: " + strvalue( Set( 105 )      ) )
+        FWriteLine( nHandle, "SET FIXED..........: " + strvalue( Set( 2   ), .T. ) )
+        FWriteLine( nHandle, "SET FORCEOPT.......: " + strvalue( Set( 117 ), .T. ) )
+
+        FWriteLine( nHandle, "SET GTMODE.........: " + strvalue( Set( 113 )      ) )
+
+        FWriteLine( nHandle, "SET HARDCOMMIT.....: " + strvalue( Set( 116 ), .T. ) )
+
+        FWriteLine( nHandle, "SET IDLEREPEAT.....: " + strvalue( Set( 101 ), .T. ) )
+        FWriteLine( nHandle, "SET INSERT.........: " + strvalue( Set( 29  ), .T. ) )
+        FWriteLine( nHandle, "SET INTENSITY......: " + strvalue( Set( 31  ), .T. ) )
+                                                                          
+        FWriteLine( nHandle, "SET LANGUAGE.......: " + strvalue( Set( 100 )      ) )
+
+        FWriteLine( nHandle, "SET MARGIN.........: " + strvalue( Set( 25  )      ) )
+        FWriteLine( nHandle, "SET MBLOCKSIZE.....: " + strvalue( Set( 41  )      ) )
+        FWriteLine( nHandle, "SET MCENTER........: " + strvalue( Set( 37  ), .T. ) )
+        FWriteLine( nHandle, "SET MESSAGE........: " + strvalue( Set( 36  )      ) )
+        FWriteLine( nHandle, "SET MFILEEXT.......: " + strvalue( Set( 42  )      ) )
+
+        FWriteLine( nHandle, "SET OPTIMIZE.......: " + strvalue( Set( 44  ), .T. ) )
+        FWriteLine( nHandle, "SET OUTPUTSAFETY...: " + strvalue( Set( 109 ), .T. ) )
+
+        FWriteLine( nHandle, "SET PATH...........: " + strvalue( Set( 6   )      ) )
+        FWriteLine( nHandle, "SET PRINTER........: " + strvalue( Set( 23  ), .T. ) )
+        FWriteLine( nHandle, "SET PRINTERJOB.....: " + strvalue( Set( 115 )      ) )
+        FWriteLine( nHandle, "SET PRINTFILE......: " + strvalue( Set( 24  )      ) )
+
+        FWriteLine( nHandle, "SET SCOREBOARD.....: " + strvalue( Set( 32  ), .T. ) )
+        FWriteLine( nHandle, "SET SCROLLBREAK....: " + strvalue( Set( 38  ), .T. ) )
+        FWriteLine( nHandle, "SET SOFTSEEK.......: " + strvalue( Set( 9   ), .T. ) )
+        FWriteLine( nHandle, "SET STRICTREAD.....: " + strvalue( Set( 43  ), .T. ) )
+
+        FWriteLine( nHandle, "SET TRACE..........: " + strvalue( Set( 102 ), .T. ) )
+        FWriteLine( nHandle, "SET TRACEFILE......: " + strvalue( Set( 103 )      ) )
+        FWriteLine( nHandle, "SET TRACESTACK.....: " + strvalue( Set( 104 )      ) )
+        FWriteLine( nHandle, "SET TRIMFILENAME...: " + strvalue( Set( 112 )      ) )
+
+        FWriteLine( nHandle, "SET TYPEAHEAD......: " + strvalue( Set( 14  )      ) )
+
+        FWriteLine( nHandle, "SET UNIQUE.........: " + strvalue( Set( 10  ), .T. ) )
+
+        FWriteLine( nHandle, "SET VIDEOMODE......: " + strvalue( Set( 40  )      ) )
+
+        FWriteLine( nHandle, "SET WRAP...........: " + strvalue( Set( 35  ), .T. ) )
+
 
         FWriteLine( nHandle, "" )
+
         IF nCols > 0
-            FWriteLine( nHandle, Padc( 'Detailed Work Area Items', nCols, "=" ) )
+            FWriteLine( nHandle, Padc( 'Detailed Work Area Items', nCols, '-' ) )
         ELSE
             FWriteLine( nHandle, 'Detailed Work Area Items ' )
         ENDIF
@@ -353,13 +429,13 @@ STATIC FUNCTION LogError( oerr )
         IF Type( "Select()" ) == "UI"
            For nCount := 1 To 600
               If !Empty( ( nCount )->( &("Alias()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "Work Area No ....: " + strvalue( &("Select()") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "Alias ...........: " + &("Alias()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "Current Recno ...: " + strvalue( &("RecNo()") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "Current Filter ..: " + &("DbFilter()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "Relation Exp. ...: " + &("DbRelation()") ) )
-                 ( nCount )->( FWriteLine( nHandle, "Index Order .....: " + strvalue( &("IndexOrd(0)") ) ) )
-                 ( nCount )->( FWriteLine( nHandle, "Active Key ......: " + strvalue( &("IndexKey(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Work Area No ......: " + strvalue( &("Select()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Alias .............: " + &("Alias()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Current Recno .....: " + strvalue( &("RecNo()") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Current Filter ....: " + &("DbFilter()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Relation Exp. .....: " + &("DbRelation()") ) )
+                 ( nCount )->( FWriteLine( nHandle, "Index Order .......: " + strvalue( &("IndexOrd(0)") ) ) )
+                 ( nCount )->( FWriteLine( nHandle, "Active Key ........: " + strvalue( &("IndexKey(0)") ) ) )
                  ( nCount )->( FWriteLine( nHandle, "" ) )
               Endif
            Next
@@ -367,24 +443,24 @@ STATIC FUNCTION LogError( oerr )
 
         FWriteLine( nHandle, "" )
         IF nCols > 0
-            FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", nCols, "+" ) )
+            FWriteLine( nHandle, Padc( " Internal Error Handling Information  ", nCols, "-" ) )
         ELSE
             FWriteLine( nHandle, " Internal Error Handling Information  " )
         ENDIF
         FWriteLine( nHandle, "" )
-        FWriteLine( nHandle, "Subsystem Call ..: " + oErr:subsystem() )
-        FWriteLine( nHandle, "System Code .....: " + strvalue( oErr:suBcode() ) )
-        FWriteLine( nHandle, "Default Status ..: " + strvalue( oerr:candefault() ) )
-        FWriteLine( nHandle, "Description .....: " + oErr:description() )
-        FWriteLine( nHandle, "Operation .......: " + oErr:operation() )
-        FWriteLine( nHandle, "Arguments .......: " + Arguments( oErr ) )
-        FWriteLine( nHandle, "Involved File ...: " + oErr:filename() )
-        FWriteLine( nHandle, "Dos Error Code ..: " + strvalue( oErr:oscode() ) )
+        FWriteLine( nHandle, "Subsystem Call ....: " + oErr:subsystem() )
+        FWriteLine( nHandle, "System Code .......: " + strvalue( oErr:suBcode() ) )
+        FWriteLine( nHandle, "Default Status ....: " + strvalue( oerr:candefault() ) )
+        FWriteLine( nHandle, "Description .......: " + oErr:description() )
+        FWriteLine( nHandle, "Operation .........: " + oErr:operation() )
+        FWriteLine( nHandle, "Arguments .........: " + Arguments( oErr ) )
+        FWriteLine( nHandle, "Involved File .....: " + oErr:filename() )
+        FWriteLine( nHandle, "Dos Error Code ....: " + strvalue( oErr:oscode() ) )
 
         #ifdef HB_THREAD_SUPPORT
-        FWriteLine( nHandle, "Running threads .: " + strvalue( oErr:RunningThreads() ) )
-        FWriteLine( nHandle, "VM thread ID ....: " + strvalue( oErr:VmThreadId() ) )
-        FWriteLine( nHandle, "OS thread ID ....: " + strvalue( oErr:OsThreadId() ) )
+        FWriteLine( nHandle, "Running threads ...: " + strvalue( oErr:RunningThreads() ) )
+        FWriteLine( nHandle, "VM thread ID ......: " + strvalue( oErr:VmThreadId() ) )
+        FWriteLine( nHandle, "OS thread ID ......: " + strvalue( oErr:OsThreadId() ) )
         #endif
 
         FWriteLine( nHandle, "" )
@@ -425,47 +501,69 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
 
 
-        /*
-        FWriteLine( nHandle, padc(" Available Memory Variables ",nCols,'+') )
-        FWriteLine( nHandle, "" )
-        Save All Like * To errormem
-        nMemHandle := Fopen( 'errormem.mem', FO_READWRITE )
-        nMemLength := Fseek( nMemHandle, 0, 2 )
-        Fseek( nMemHandle, 0 )
-        nCount := 1
-        While Fseek( nMemHandle, 0, 1 ) + 1 < nMemLength
-          nMemWidth := Space( 18 )
-          Fread( nMemHandle, @nMemWidth, 18 )
-          cVarName  := Left( nMemWidth, At( Chr( 0 ), nMemWidth ) - 1 )
-          cVarType  := Substr( nMemWidth, 12, 1 )
-          cVarRec   := Bin2w( Right( nMemWidth, 2 ) )
-          nMemCount := If( cVarType IN Chr( 195 ) + Chr( 204 ), 14 + cVarRec, 22 )
-          Fseek( nMemHandle, nMemCount, 1 )
-          cTemp  := Left( cVarName + Space( 10 ), 10 )
-          cTemp  += " TYPE " + Type( cVarName )
-          cTemp  += " " + If( Type( cVarName ) == "C", '"' + &cVarName + '"', strvalue( &cVarName ) )
-          nBytes := 0
-          Switch ValType( cVarName )
-              Case "C"
-                  nBytes += ( nLenTemp := Len( &cVarName ) )
-                  exit
-              Case "N"
-                  nBytes += ( nLenTemp := 9 )
-                  exit
-              Case 'L'
-                  nBytes += ( nLenTemp := 2 )
-                  exit
-              Case "D"
-                  nBytes += ( nLenTemp := 9 )
-                  exit
-          End
-          Fwrite( nFhandle, "            " + Transform( nLenTemp, '999999' ) + 'bytes -> ' )
-          FWriteLine( nHandle, "      " + cTemp )
-        Enddo
-        Fclose( nMemHandle )
-        Ferase( 'errormem.mem' )
-        */
-        Fclose( nhandle )
+    /*
+     *  FWriteLine( nHandle, padc(" Available Memory Variables ",nCols,'+') )
+     *  FWriteLine( nHandle, "" )
+     *  Save All Like * To errormem
+     *  nMemHandle := Fopen( 'errormem.mem', FO_READWRITE )
+     *  nMemLength := Fseek( nMemHandle, 0, 2 )
+     *  Fseek( nMemHandle, 0 )
+     *  nCount := 1
+     *  While Fseek( nMemHandle, 0, 1 ) + 1 < nMemLength
+     *    nMemWidth := Space( 18 )
+     *    Fread( nMemHandle, @nMemWidth, 18 )
+     *    cVarName  := Left( nMemWidth, At( Chr( 0 ), nMemWidth ) - 1 )
+     *    cVarType  := Substr( nMemWidth, 12, 1 )
+     *    cVarRec   := Bin2w( Right( nMemWidth, 2 ) )
+     *    nMemCount := If( cVarType IN Chr( 195 ) + Chr( 204 ), 14 + cVarRec, 22 )
+     *    Fseek( nMemHandle, nMemCount, 1 )
+     *    cTemp  := Left( cVarName + Space( 10 ), 10 )
+     *    cTemp  += " TYPE " + Type( cVarName )
+     *    cTemp  += " " + If( Type( cVarName ) == "C", '"' + &cVarName + '"', strvalue( &cVarName ) )
+     *    nBytes := 0
+     *    Switch ValType( cVarName )
+     *        Case "C"
+     *            nBytes += ( nLenTemp := Len( &cVarName ) )
+     *            exit
+     *        Case "N"
+     *            nBytes += ( nLenTemp := 9 )
+     *            exit
+     *        Case 'L'
+     *            nBytes += ( nLenTemp := 2 )
+     *            exit
+     *        Case "D"
+     *            nBytes += ( nLenTemp := 9 )
+     *            exit
+     *    End
+     *    Fwrite( nFhandle, "            " + Transform( nLenTemp, '999999' ) + 'bytes -> ' )
+     *    FWriteLine( nHandle, "      " + cTemp )
+     *  Enddo
+     *  Fclose( nMemHandle )
+     *  Ferase( 'errormem.mem' )
+     */
+        if nHandle2 != -1
+
+           nBytes := FSeek( nHandle2, 0, FS_END )
+
+           cBuff := space(10)
+           FSeek( nHandle2, 0, FS_SET )
+
+           while nBytes > 0
+             nRead := FRead( nHandle2, @cBuff, 10 )
+             FWrite( nHandle, cBuff, nRead )
+             nBytes -= nRead
+             cBuff := space( 10 )
+           enddo
+
+           FClose( nHandle2 )
+           FClose( nHandle )
+
+           FErase( cLogFile )
+           FRename( cLogFile2, cLogFile )
+        else
+           FClose( nHandle )
+        endif
+
      Endif
 
 Return .f.
@@ -488,10 +586,11 @@ STATIC FUNCTION strvalue( c, l )
              cr := Dtoc( c )
              exit
          Case "L"
-             cr := If( l, If( c, "On", "Off" ), If( c, "True", "False" ) )
+//             cr := If( l, If( c, "On", "Off" ), If( c, "True", "False" ) )
+             cr := If( l, If( c, "On", "Off" ), If( c, ".t.", ".f." ) )
              exit
      End
-Return cr
+Return Upper( cr )
 
 STATIC FUNCTION FWriteLine( nh, c )
 

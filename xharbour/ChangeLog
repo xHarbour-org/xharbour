@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5390 2007/03/17 18:55:41 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5391 2007/03/18 05:43:28 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-18 00:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/set.c
+    * changed hb_set.HB_SET_APPENDERROR = TRUE by default to generate the
+      error.log in append mode instead create new one for each runtime error,
+      at this way we will have a historic of all errors. 
+
+  * source/rtl/errorsys.prg
+    * changes in LogError() function:
+    * changed title from "Error log file" to "xHarbour error log file"
+    + added more info to header session as netname(), disktotal(), diskfree(),
+      diskname() and curdir().
+    * minor change in lay-out for better viewing.
+    + added more SETs to environmental session and sorted them to alphabetic
+      order.
+    * changed texts for all SETs like "Exact is" to "SET EXACT".
+    * Now the logs are in decrescent order, the last error will be the first
+      on top of error.log file and so on.
+    * changed strvalue() function to return ".t."/".f." instead true/false
+      and return strings in uppercase.
 
 2007-03-17 22:45 UTC-0700 Pritpal Bedi <pritpal/at/vouchcac.com>
   * contrib/wvtgui/wvtutil.c

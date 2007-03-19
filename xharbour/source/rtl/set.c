@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.71 2006/07/27 12:21:30 lculik Exp $
+ * $Id: set.c,v 1.72 2006/10/12 17:25:28 ronpinkas Exp $
  */
 
 /*
@@ -1644,7 +1644,7 @@ void hb_setInitialize( void )
    strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
 
    strcpy( (char *) (hb_set.HB_SET_ERRORLOG), "error.log" );
-   hb_set.HB_SET_APPENDERROR = FALSE;
+   hb_set.HB_SET_APPENDERROR = TRUE;
 
    hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
    hb_set.HB_SET_TYPEAHEAD = HB_DEFAULT_INKEY_BUFSIZE;
