@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.52 2006/02/22 01:33:49 ronpinkas Exp $
+ * $Id: errorsys.prg,v 1.53 2007/03/19 03:13:40 modalsist Exp $
  */
 
 /*
@@ -305,10 +305,9 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, 'Application name...: ' + hb_cmdargargv() )
         FWriteLine( nHandle, 'Workstation name...: ' + netname() )
         FWriteLine( nHandle, 'Available memory...: ' + strvalue( Memory(0) )  )
-        FWriteLine( nHandle, 'Total disk space...: ' + strvalue( DiskTotal() ) )
-        FWriteLine( nHandle, 'Free disk space....: ' + strvalue( DiskSpace() ) )
         FWriteLine( nHandle, 'Current disk.......: ' + diskname() )
-        FWriteLine( nHandle, 'Current directory..: ' + dirname() )
+        FWriteLine( nHandle, 'Current directory..: ' + curdir() )
+        FWriteLine( nHandle, 'Free disk space....: ' + strvalue( DiskSpace() ) )
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Operating system...: ' + os() )
         FWriteLine( nHandle, 'xHarbour version...: ' + version() )
