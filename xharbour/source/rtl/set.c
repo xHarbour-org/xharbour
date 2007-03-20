@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.72 2006/10/12 17:25:28 ronpinkas Exp $
+ * $Id: set.c,v 1.73 2007/03/19 03:13:40 modalsist Exp $
  */
 
 /*
@@ -1535,12 +1535,25 @@ HB_FUNC( SET )
          hb_reta( 2 );
          hb_storc( (char *) ( hb_set.HB_SET_ERRORLOG ), -1, 1 );
          hb_storl( hb_set.HB_SET_APPENDERROR, -1, 2 );
-
+/*
          if( args > 1 && HB_IS_STRING( pArg2 ) )
          {
             strcpy( hb_set.HB_SET_ERRORLOG, pArg2->item.asString.value );
 
             if( args > 2 && HB_IS_LOGICAL( pArg3 ) )
+            {
+               hb_set.HB_SET_APPENDERROR = pArg3->item.asLogical.value;
+            }
+         }
+*/
+         if( args > 1 )
+         {
+            if( HB_IS_STRING( pArg2 ) )
+            {
+               strcpy( hb_set.HB_SET_ERRORLOG, pArg2->item.asString.value );
+            }
+
+            if( pArg3 && HB_IS_LOGICAL( pArg3 ) )
             {
                hb_set.HB_SET_APPENDERROR = pArg3->item.asLogical.value;
             }
@@ -1644,7 +1657,7 @@ void hb_setInitialize( void )
    strcpy( (char *) (hb_set.HB_SET_TRACEFILE), "trace.log" );
 
    strcpy( (char *) (hb_set.HB_SET_ERRORLOG), "error.log" );
-   hb_set.HB_SET_APPENDERROR = TRUE;
+   hb_set.HB_SET_APPENDERROR = FALSE;
 
    hb_set.HB_SET_TRACESTACK = HB_SET_TRACESTACK_ALL;
    hb_set.HB_SET_TYPEAHEAD = HB_DEFAULT_INKEY_BUFSIZE;

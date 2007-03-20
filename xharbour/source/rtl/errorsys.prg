@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.53 2007/03/19 03:13:40 modalsist Exp $
+ * $Id: errorsys.prg,v 1.54 2007/03/19 11:26:56 modalsist Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ STATIC FUNCTION LogError( oerr )
      LOCAL cScreen
      LOCAL aLogFile    := SET( _SET_ERRORLOG )
      LOCAL cLogFile    := aLogFile[1]  // error log file name
-     LOCAL lAppendLog  := aLogFile[2]  // .f. = create a new error.log .t. = append to a existing file.
+     LOCAL lAppendLog  := aLogFile[2]  // .f. = create a new error log (default) .t. = append to a existing one.
      LOCAL nStart      := 1
      LOCAL nCellSize
      LOCAL nRange
@@ -278,9 +278,7 @@ STATIC FUNCTION LogError( oerr )
            nHandle := FCreate( cLogFile, FC_NORMAL )
         Else
            nHandle  := FCreate( cLogFile2, FC_NORMAL )
-           //nHandle2 := FOpen( cLogFile, FO_READWRITE )
            nHandle2 := FOpen( cLogFile, FO_READ )
-           //FSeek( nHandle, 0, FS_END )
         Endif
      Endif
 
@@ -359,7 +357,7 @@ STATIC FUNCTION LogError( oerr )
 
         FWriteLine( nHandle, "SET EOL............: " + strvalue( Asc( Set( 118 ) ) )  )
         FWriteLine( nHandle, "SET EPOCH..........: " + strvalue( Set( 5   )      ) )
-        FWriteLine( nHandle, "SET ERRORLOG.......: " + if(!Empty(aLogFile), strvalue( aLogFile[1] ), "") )
+        FWriteLine( nHandle, "SET ERRORLOG.......: " + if(!Empty(aLogFile), strvalue( aLogFile[1] )+","+strvalue( aLogFile[2] ), "") )
         FWriteLine( nHandle, "SET ERRORLOOP......: " + strvalue( Set( 108 )      ) )
         FWriteLine( nHandle, "SET ESCAPE.........: " + strvalue( Set( 28  ), .T. ) )
         FWriteLine( nHandle, "SET EVENTMASK......: " + strvalue( Set( 39  )      ) )
@@ -540,7 +538,7 @@ STATIC FUNCTION LogError( oerr )
      *  Fclose( nMemHandle )
      *  Ferase( 'errormem.mem' )
      */
-        if nHandle2 != -1
+        if lAppendLog .and. nHandle2 != -1
 
            nBytes := FSeek( nHandle2, 0, FS_END )
 

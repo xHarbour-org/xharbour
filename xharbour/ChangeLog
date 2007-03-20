@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5393 2007/03/19 08:26:45 marchuet Exp $
+ * $Id: ChangeLog,v 1.5394 2007/03/19 11:26:55 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-20 07:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/set.c
+    * restored hb_set.HB_SET_APPENDERROR = FALSE to default behavior.
+    * fixed to allow use SET( _SET_ERRORLOG,,.T.), without second argument,
+      at this case the second argument will be "error.log" as before.
+  * source/rtl/errorsys.prg
+    * minor fix to show the two values of Set( _SET_ERRORLOG ) in
+      environmental session.
 
 2007-03-19 08:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/errorsys.prg
