@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.33 2007/01/13 09:13:47 enricomaria Exp $
+ * $Id: hbusage.c,v 1.34 2007/02/14 10:36:34 marchuet Exp $
  */
 
 /*
@@ -89,7 +89,6 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cq               quiet",
            "\n          %cq0              quiet and don't display program header",
 /* TODO:   "\n          %cr[<lib>]        request linker to search <lib> (or none)", */
-           "\n          %croff            reserved off",
            "\n          %cs               syntax check only",
 /* TODO:   "\n          %ct<path>         path for temp file creation", */
            "\n          %cu[[+]<file>]    use command def set in <file> (or none)",

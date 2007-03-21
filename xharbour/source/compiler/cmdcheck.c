@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.31 2007/02/14 10:36:34 marchuet Exp $
+ * $Id: cmdcheck.c,v 1.32 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -363,29 +363,6 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                        break;
 
-                     case 'r' :
-                     case 'R' :
-                       if( Args[i][j + 1] && toupper( Args[i][j + 1] ) == 'O' &&
-                           Args[i][j + 2] && toupper( Args[i][j + 2] ) == 'F' &&
-                           Args[i][j + 3] && toupper( Args[i][j + 3] ) == 'F' )
-                       {
-                          Switch[2] = 'o';
-                          Switch[3] = 'f';
-                          Switch[4] = 'f';
-                          Switch[5] = '\0';
-                          hb_compChkEnvironVar( (char*) Switch );
-
-                          j += 4;
-                          continue;
-                       }
-                       else if( !Args[i][j + 1] )
-                       {
-                          Switch[2] = '\0';
-                          hb_compChkEnvironVar( (char*) Switch );
-                          j += 1;
-                          continue;
-                       }
-                       break;
                      case 'u' :
                      case 'U' :
                        Args[i] += (j - 1);
@@ -923,26 +900,8 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'r':
              case 'R':
-                {
-                   unsigned int i = 0;
-                   char * szOption = hb_strupr( hb_strdup( s ) );
-                   while( i < strlen( szOption ) && !HB_ISOPTSEP( szOption[ i ] ) )
-                   {
-                      i++;
-                   }
-                   szOption[ i ] = '\0';
-
-                   if ( strcmp( s, "roff" ) == 0 )
-                      hb_comp_bReserved = FALSE;
-                   else
-                   {
-                      hb_comp_bReserved = TRUE;
-                      /* TODO: Implement this switch */
-                      printf( "Not yet supported command line option: %s\n", s );
-                   }
-
-                   hb_xfree( szOption );
-                }
+                /* TODO: Implement this switch */
+                printf( "Not yet supported command line option: %s\n", s );
                 break;
 
              case 's':

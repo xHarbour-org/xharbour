@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.52 2007/02/14 10:36:34 marchuet Exp $
+ * $Id: hbcomp.h,v 1.53 2007/02/27 15:59:33 druzus Exp $
  */
 
 /*
@@ -581,9 +581,6 @@ extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
 
 extern BOOL           hb_comp_iGenVarList;
-
-/* Miguel Angel Marchuet */
-extern BOOL           hb_comp_bReserved;
 
 /* Giancarlo Niccolai */
 extern BOOL           hb_comp_bI18n;

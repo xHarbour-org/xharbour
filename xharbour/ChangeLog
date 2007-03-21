@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5394 2007/03/19 11:26:55 modalsist Exp $
+ * $Id: ChangeLog,v 1.5395 2007/03/20 11:04:09 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-03-21 09:45 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * include/hbcomp.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbusage.c
+    - eliminate compiler flag -roff (reserved off).
+    
 2007-03-20 07:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/set.c
     * restored hb_set.HB_SET_APPENDERROR = FALSE to default behavior.
