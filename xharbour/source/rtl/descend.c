@@ -1,5 +1,5 @@
 /*
- * $Id: descend.c,v 1.5 2004/02/23 08:31:56 andijahja Exp $
+ * $Id: descend.c,v 1.6 2004/02/23 10:01:42 andijahja Exp $
  */
 
 /*
@@ -48,6 +48,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  */
 
 #include "hbapi.h"
@@ -86,6 +89,8 @@ HB_FUNC( DESCEND )
          else
             hb_retc( "" );
       }
+      else if( HB_IS_DATETIME( pItem ) )
+         hb_retnd( (double) 5231808 - hb_itemGetDTD( pItem )  );
       else if( HB_IS_DATE( pItem ) )
          hb_retnl( 5231808 - pItem->item.asDate.value );
       else if( HB_IS_NUMERIC( pItem ) )

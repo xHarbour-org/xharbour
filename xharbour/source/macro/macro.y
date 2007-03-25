@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.27 2006/02/15 19:33:04 druzus Exp $
+ * $Id: macro.y,v 1.28 2006/11/26 21:42:17 ronpinkas Exp $
  */
 
 /*
@@ -172,6 +172,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %token IIF IF LITERAL TRUEVALUE FALSEVALUE
 %token AND OR NOT EQ NE1 NE2 INC DEC ALIASOP SELF
 %token LE GE FIELD MACROVAR MACROTEXT
+%token H12AM H12PM
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
 %token HASHOP
 %token CBMARKER
@@ -230,6 +231,8 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <asExpr>  SelfValue
 %type <asExpr>  Array
 %type <asExpr>  ArrayAt
+%type <asExpr>  Date
+%type <asExpr>  DateTime
 %type <asExpr>  Variable VarAlias
 %type <asExpr>  MacroVar MacroVarAlias
 %type <asExpr>  MacroExpr MacroExprAlias
@@ -389,6 +392,102 @@ Logical    : TRUEVALUE       { $$ = hb_compExprNewLogical( TRUE ); }
 SelfValue  : SELF            { $$ = hb_compExprNewSelf(); }
 ;
 
+/* Literal date, time & datetime
+ */
+Date       : '{' POWER NumValue '/' NumValue '/' NumValue '}'
+                              { $$ = hb_compExprNewDate( $3, $5, $7 );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                              }
+           ;
+
+
+DateTime   : '{' POWER NumValue '/' NumValue '/' NumValue NumValue ':' NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 0, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $12, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 0, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 1, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $12, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 1, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 2, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $12, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 2, &iOk );
+                                     hb_compExprDelete( $3, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $5, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $7, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $8, HB_MACRO_PARAM );
+                                     hb_compExprDelete( $10, HB_MACRO_PARAM );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           ;
+
+
+
 /* Literal array
  */
 Array      : '{' ArgList '}'     {
@@ -516,6 +615,8 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             | LiteralValue  ArrayIndex    { $$ = $2; }
             | CodeBlock     ArrayIndex    { $$ = $2; }
             | Logical       ArrayIndex    { $$ = $2; }
+            | Date          ArrayIndex    { $$ = $2; }
+            | DateTime      ArrayIndex    { $$ = $2; }
             | SelfValue     ArrayIndex    { $$ = $2; }
             | Variable      ArrayIndex    { $$ = $2; }
             | AliasVar      ArrayIndex    { $$ = $2; }
@@ -661,6 +762,8 @@ ObjectData  : NumValue ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 );
             | LiteralValue ':' SendId    { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | CodeBlock ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Logical ':' SendId         { $$ = hb_compExprNewSendExp( $1, $3 ); }
+            | Date ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
+            | DateTime ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | SelfValue ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Array ':' SendId           { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Hash ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
@@ -707,6 +810,8 @@ SimpleExpression :
            | LiteralValue                     { $$ = $1; }
            | CodeBlock                        { $$ = $1; }
            | Logical                          { $$ = $1; }
+           | Date                             { $$ = $1; }
+           | DateTime                         { $$ = $1; }
            | SelfValue                        { $$ = $1; }
            | Array                            { $$ = $1; }
            | Hash                             { $$ = $1; }
@@ -775,6 +880,8 @@ ExprPostOp  : NumValue     PostOp %prec POST  { $$ = $2; }
             | LiteralValue PostOp %prec POST  { $$ = $2; }
             | CodeBlock    PostOp %prec POST  { $$ = $2; }
             | Logical      PostOp %prec POST  { $$ = $2; }
+            | Date         PostOp %prec POST  { $$ = $2; }
+            | DateTime     PostOp %prec POST  { $$ = $2; }
             | SelfValue    PostOp %prec POST  { $$ = $2; }
             | Array        PostOp %prec POST  { $$ = $2; }
             | Hash         PostOp %prec POST  { $$ = $2; }
@@ -808,6 +915,8 @@ ExprAssign  : NumValue     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $
             | LiteralValue INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | CodeBlock    INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Logical      INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | Date         INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | DateTime     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | SelfValue    INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Array        INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Hash         INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
@@ -832,6 +941,8 @@ ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | LiteralValue PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -856,6 +967,8 @@ ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb
             | LiteralValue MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -880,6 +993,8 @@ ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | LiteralValue MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -904,6 +1019,8 @@ ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -928,6 +1045,8 @@ ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3, HB_MACRO_PARAM ); }
@@ -952,6 +1071,8 @@ ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | CodeBlock    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Logical      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | Date         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
+            | DateTime     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | SelfValue    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Array        EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }
             | Hash         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3, HB_MACRO_PARAM ); }

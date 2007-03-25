@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.23 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: hrbdll.gc,v 1.24 2006/11/09 16:41:08 marchuet Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -78,7 +78,6 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/console.o \
    $(OBJ_DIR)/copyfile.o \
    $(OBJ_DIR)/datec.o \
-   $(OBJ_DIR)/dates.o \
    $(OBJ_DIR)/dateshb.o \
    $(OBJ_DIR)/defpath.o \
    $(OBJ_DIR)/descend.o \
@@ -717,9 +716,6 @@ $(OBJ_DIR)/datec.o : $(RTL_DIR)/datec.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/datehb.o : $(RTL_DIR)/datehb.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/dates.o : $(RTL_DIR)/dates.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/dateshb.o : $(RTL_DIR)/dateshb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.128 2007/02/20 16:16:55 ronpinkas Exp $
+ * $Id: genc.c,v 1.129 2007/02/26 03:18:27 ronpinkas Exp $
  */
 
 /*
@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "hbcomp.h"
+#include "hbdate.h"
 #include "hbexemem.h"
 
 static int hb_comp_iBaseLine;
@@ -2498,6 +2499,44 @@ static HB_GENC_FUNC( hb_p_pushlonglong )
    return 9;
 }
 
+static HB_GENC_FUNC( hb_p_pushdatetime )
+{
+   int i;
+   
+   fprintf( cargo->yyc, "\tHB_P_PUSHDATETIME, " );
+
+   for( i = 0; i < ( int ) ( sizeof( UINT32 ) + sizeof( UINT32 ) ); ++i )
+   {
+      fprintf( cargo->yyc, " %i,", ( ( BYTE * ) pFunc->pCode )[ lPCodePos + 1 + i ] );
+   }
+
+   if( cargo->bVerbose )
+   {
+      char szDateTime[24];
+      fprintf( cargo->yyc, "\t/* %s */",
+          hb_datetimeDecStr( szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) ) );
+//      printf("szDateTime=%s lDate=%d lTime=%d\n", szDateTime, HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 1 ) ), HB_PCODE_MKLONG( ( pFunc->pCode + lPCodePos + 5 ) ) );
+   }
+
+   fprintf( cargo->yyc, "\t/* HB_ET_DDATETIME */\n" );
+   
+   return sizeof(double) + 1;
+}
+
+static HB_GENC_FUNC( hb_p_pushdate )
+{
+   fprintf( cargo->yyc, "\tHB_P_PUSHDATE, " );
+
+   fprintf( cargo->yyc, "%i, %i, %i, %i, ",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ],
+            pFunc->pCode[ lPCodePos + 3 ],
+            pFunc->pCode[ lPCodePos + 4 ] );
+
+   fprintf( cargo->yyc, "\t/* HB_ET_DDATE */\n" );
+   return 5;
+}
+
 static HB_GENC_FUNC( hb_p_pushmemvar )
 {
    fprintf( cargo->yyc, "\tHB_P_PUSHMEMVAR, %i, %i,",
@@ -3843,7 +3882,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_endfinally,
    hb_p_localnearadd,
    hb_p_arraypushref,
-   hb_p_arraypopplus
+   hb_p_arraypopplus,
+   hb_p_pushdatetime,
+   hb_p_pushdate
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

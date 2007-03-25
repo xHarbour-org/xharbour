@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.201 2007/02/15 21:22:00 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.202 2007/02/27 15:59:33 druzus Exp $
  */
 
 /*
@@ -121,6 +121,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_ARRAY( p )      ( HB_ITEM_TYPE( p ) == HB_IT_ARRAY )
 #define HB_IS_BLOCK( p )      ( HB_ITEM_TYPE( p ) == HB_IT_BLOCK )
 #define HB_IS_DATE( p )       ( HB_ITEM_TYPE( p ) == HB_IT_DATE )
+#define HB_IS_DATETIME( p )   ( HB_ITEM_TYPE( p ) == HB_IT_DATE && (p)->item.asDate.time != 0 )
 #define HB_IS_DOUBLE( p )     ( HB_ITEM_TYPE( p ) == HB_IT_DOUBLE )
 #define HB_IS_INTEGER( p )    ( HB_ITEM_TYPE( p ) == HB_IT_INTEGER )
 #define HB_IS_LOGICAL( p )    ( HB_ITEM_TYPE( p ) == HB_IT_LOGICAL )
@@ -149,6 +150,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_ARRAY( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_ARRAY ) != 0 )
 #define HB_IS_BLOCK( p )      ( ( HB_ITEM_TYPE( p ) & HB_IT_BLOCK ) != 0 )
 #define HB_IS_DATE( p )       ( ( HB_ITEM_TYPE( p ) & HB_IT_DATE ) != 0 )
+#define HB_IS_DATETIME( p )   ( ( HB_ITEM_TYPE( p ) & HB_IT_DATE ) != 0 && (p)->item.asDate.time != 0 )
 #define HB_IS_DOUBLE( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_DOUBLE ) != 0 )
 #define HB_IS_INTEGER( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_INTEGER ) != 0 )
 #define HB_IS_LOGICAL( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_LOGICAL ) != 0 )
@@ -263,6 +265,15 @@ HB_EXTERN_BEGIN
 
 #define HB_ITEM_NEW(hb)  HB_ITEM hb = HB_ITEM_NIL
 
+/* additional definitions used to date values
+ */
+#define  HB_ET_DDATE     1
+#define  HB_ET_DDATETIME 2
+
+#define HB_MILLISECDAY      (86400 * HB_DATETIMEINSEC)
+#define HB_DATETIMEINSEC    1000
+#define HB_DATETIMEDECIMALS 3
+
 typedef struct _HB_VALUE
 {
    PHB_ITEM    pVarItem;
@@ -353,8 +364,13 @@ extern HB_EXPORT char *   hb_parcx( int iParam, ... );  /* retrieve a string par
 extern HB_EXPORT ULONG    hb_parclen( int iParam, ... ); /* retrieve a string parameter length */
 extern HB_EXPORT ULONG    hb_parcsiz( int iParam, ... ); /* retrieve a by-reference string parameter length, including terminator */
 extern HB_EXPORT char *   hb_pards( int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern HB_EXPORT char *   hb_pardts( int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
 extern HB_EXPORT char *   hb_pardsbuff( char * szDate, int iParam, ... ); /* retrieve a date as a string yyyymmdd */
+extern HB_EXPORT char *   hb_pardtsbuff( char * szDateTime, int iParam, ... ); /* retrieve a date as a string yyyymmddhhmmss.ccc */
 extern HB_EXPORT LONG     hb_pardl( int iParam, ... ); /* retrieve a date as long integer - number of days from Julian's day */
+extern HB_EXPORT LONG     hb_part( int iParam, ... ); /* retrieve a time part from a datetime as long in milliseconds */
+extern HB_EXPORT double   hb_pardtd( int iParam, ... ); /* retrieve a datetime as double - number of days from Julian's day plus time as decimal part of date */
+extern HB_EXPORT double   hb_pardtsec( int iParam, ... ); /* retrieve a datetime as double - number of seconds from Julian's day plus time */
 extern HB_EXPORT ULONG    hb_parinfa( int iParamNum, ULONG uiArrayIndex ); /* retrieve length or element type of an array parameter */
 extern HB_EXPORT ULONG    hb_parinfo( int iParam ); /* Determine the param count or data type */
 extern HB_EXPORT int      hb_parl( int iParam, ... ); /* retrieve a logical parameter as an int */
@@ -404,8 +420,12 @@ extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
     #define hb_retclenAdoptRaw( szText, ulLen )  hb_itemPutCRaw( hb_stackReturnItem(), (szText), (ulLen) )
 
     #define hb_retds( szDate )                   hb_itemPutDS( hb_stackReturnItem(), (szDate) )
+    #define hb_retdts( szDateTime )              hb_itemPutDTS( hb_stackReturnItem(), (szDateTime) )
     #define hb_retd( iYear, iMonth, iDay )       hb_itemPutD( hb_stackReturnItem(), (iYear), (iMonth), (iDay) )
     #define hb_retdl( lJulian )                  hb_itemPutDL( hb_stackReturnItem(), (lJulian) )
+    #define hb_retdt( iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm )   hb_itemPutDT( hb_stackReturnItem(), (iYear), (iMonth), (iDay), (iHour), (iMin), (dSec), (iAmPm) )
+    #define hb_retdtd( dDateTime )               hb_itemPutDTD( hb_stackReturnItem(), (dDateTime) )
+    #define hb_retdtl( lDate, lTime )            hb_itemPutDTL( hb_stackReturnItem(), (lDate), (lTime) )
     #define hb_retl( iLogical )                  hb_itemPutL( hb_stackReturnItem(), (iLogical) ? TRUE : FALSE )
     #define hb_retnd( dNumber )                  hb_itemPutND( hb_stackReturnItem(), (dNumber) )
     #define hb_retni( iNumber )                  hb_itemPutNI( hb_stackReturnItem(), (iNumber) )
@@ -440,8 +460,12 @@ extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
     extern void  HB_EXPORT  hb_retclenRaw( char * szText, ULONG ulLen );
 
     extern void  HB_EXPORT  hb_retds( const char * szDate );  /* returns a date, must use yyyymmdd format */
+    extern void  HB_EXPORT  hb_retdts( char * szDateTime );  /* returns a date, must use yyyymmdd hh:mm:ss.cc format */
     extern void  HB_EXPORT  hb_retd( int iYear, int iMonth, int iDay ); /* returns a date */
     extern void  HB_EXPORT  hb_retdl( LONG lJulian );   /* returns a LONG value as a julian date */
+    extern void  HB_EXPORT  hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm ); /* returns a datetime */
+    extern void  HB_EXPORT  hb_retdtd( double dDateTime ); /* returns a datetime as double */
+    extern void  HB_EXPORT  hb_retdtl( LONG lDate, LONG lTime ); /* returns a datetime as Julian›s date and seconds */
     extern void  HB_EXPORT  hb_retl( int iTrueFalse );  /* returns a logical integer */
     extern void  HB_EXPORT  hb_retnd( double dNumber ); /* returns a double */
     extern void  HB_EXPORT  hb_retni( int iNumber );    /* returns a integer number */
@@ -466,7 +490,12 @@ extern void  HB_EXPORT  hb_storc( char * szText, int iParam, ... ); /* stores a 
 extern void  HB_EXPORT  hb_storclen( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern void  HB_EXPORT  hb_storclenAdopt( char * szText, ULONG ulLength, int iParam, ... ); /* stores a fixed length string on a variable by reference */
 extern void  HB_EXPORT  hb_stords( char * szDate, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern void  HB_EXPORT  hb_stordts( char * szDateTime, int iParam, ... );   /* szDate must have yyyymmdd format */
+extern void  HB_EXPORT  hb_stord( int iYear, int iMonth, int iDay, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
+extern void  HB_EXPORT  hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
 extern void  HB_EXPORT  hb_stordl( LONG lJulian, int iParam, ... ); /* stores a Julian's date value on a variable by reference */
+extern void  HB_EXPORT  hb_stordtd( double dDateTime, int iParam, ... ); /* stores a date and time double on a variable by reference */
+extern void  HB_EXPORT  hb_stordtl( LONG lDate, LONG lTime, int iParam, ... ); /* stores a logical integer on a variable by reference */
 extern void  HB_EXPORT  hb_storl( int iLogical, int iParam, ... ); /* stores a logical integer on a variable by reference */
 extern void  HB_EXPORT  hb_storni( int iValue, int iParam, ... ); /* stores an integer on a variable by reference */
 extern void  HB_EXPORT  hb_stornl( LONG lValue, int iParam, ... ); /* stores a LONG on a variable by reference */
@@ -532,7 +561,11 @@ extern HB_EXPORT HB_LONG   hb_arrayGetNInt( PHB_ITEM pArray, ULONG ulIndex ); /*
 extern HB_EXPORT double    hb_arrayGetND( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the double value contained on an array element */
 extern HB_EXPORT double    hb_itemGetNDDec( PHB_ITEM pItem, int * piDec );
 extern HB_EXPORT char *    hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate ); /* retrieves the date value contained in an array element */
+extern HB_EXPORT char *    hb_arrayGetDTS( PHB_ITEM pArray, ULONG ulIndex, char * szDateTime ); /* retrieves the date value contained in an array element */
 extern HB_EXPORT LONG      hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date value contained in an array element, as a LONG integer */
+extern HB_EXPORT LONG      hb_arrayGetT( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the time value contained in an array element, as a LONG integer in milliseconds */
+extern HB_EXPORT double    hb_arrayGetDTsec( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
+extern HB_EXPORT double    hb_arrayGetDTD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
 extern HB_EXPORT HB_TYPE   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
 extern HB_EXPORT void      hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
 extern HB_EXPORT ULONG     hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar ); /* scan an array for a given item, or until code-block item returns TRUE */

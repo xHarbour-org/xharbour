@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.64 2006/10/30 18:48:36 ptsarenko Exp $
+# $Id: makefile.wc,v 1.65 2006/11/09 16:41:09 marchuet Exp $
 #
 
 #
@@ -339,7 +339,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\console.obj \
    $(RTL_OBJ_DIR)\copyfile.obj \
    $(RTL_OBJ_DIR)\datec.obj \
-   $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
    $(RTL_OBJ_DIR)\descend.obj \
@@ -1851,9 +1850,6 @@ $(RTL_OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

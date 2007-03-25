@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.12 2007/03/09 13:39:25 marceloanelli Exp $
+ * $Id: std.ch,v 1.13 2007/03/13 23:05:51 ronpinkas Exp $
  */
 
 /*
@@ -691,6 +691,7 @@
    #command SET BACKGROUND TASKS <x:ON,OFF,&> => Set( _SET_BACKGROUNDTASKS, <(x)> )
    #command SET BACKGROUND TASKS (<x>)    => Set( _SET_BACKGROUNDTASKS, <x> )
    #command SET ERRORLOG TO [<filename>] [<additive: ADDITIVE>] => Set( _SET_ERRORLOG, <(filename)>, <.additive.> )
+   #command SET TIME FORMAT [TO] <f>      => Set( _SET_TIMEFORMAT, <f> )
 #endif
 
 #endif /* HB_STD_CH_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.68 2007/02/16 00:47:09 ronpinkas Exp $
+ * $Id: macro.c,v 1.69 2007/02/20 16:16:55 ronpinkas Exp $
  */
 
 /*
@@ -48,6 +48,10 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *    hb_compGenPushDate()
+ *
  */
 
 /* this #define HAS TO be placed before all #include directives
@@ -61,6 +65,7 @@
 #include "hbmemvar.ch"   /* for values returned by hb_memvarScope() */
 #include "hbapirdd.h"
 #include "hbfast.h"
+#include "hbdate.h"
 
 #ifdef HB_MACRO_STATEMENTS
   #include "hbpp.h"
@@ -1441,6 +1446,33 @@ void hb_compGenPushLong( HB_LONG lNumber, HB_MACRO_DECL )
       pBuffer[ 0 ] = HB_P_PUSHLONGLONG;
       HB_PUT_LE_UINT64( pBuffer + 1, lNumber );
       hb_compGenPCodeN( pBuffer, sizeof( pBuffer ), HB_MACRO_PARAM );
+   }
+}
+
+/* generates the pcode to push a date on the virtual machine stack */
+void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType, HB_MACRO_DECL )
+{
+   switch ( uType )
+   {
+     case HB_ET_DDATE :
+     {
+        BYTE pBuffer[ 1 + sizeof( UINT32 ) ];
+        pBuffer[0] = HB_P_PUSHDATE;
+        HB_PUT_LE_UINT32( ( pBuffer + 1 ), lDate );
+        hb_compGenPCodeN( pBuffer, 1 + sizeof( UINT32 ), HB_MACRO_PARAM );
+        break;
+     }
+     case HB_ET_DDATETIME :
+     {
+        BYTE pBuffer[ sizeof( UINT32 ) + sizeof( UINT32 ) + 1 ];
+        pBuffer[0] = HB_P_PUSHDATETIME;
+        HB_PUT_LE_UINT32( ( pBuffer + 1 ), lDate );
+        HB_PUT_LE_UINT32( ( pBuffer + 5 ), lTime );
+        hb_compGenPCodeN( pBuffer, sizeof( UINT32 ) + sizeof( UINT32 ) + 1, HB_MACRO_PARAM );
+        break;
+     }
+     default:
+        hb_compGenPCode1( 0, HB_MACRO_PARAM );
    }
 }
 

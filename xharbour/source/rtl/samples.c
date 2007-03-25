@@ -1,5 +1,5 @@
 /*
- * $Id: samples.c,v 1.1.1.1 2001/12/21 10:42:01 ronpinkas Exp $
+ * $Id: samples.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ HB_FUNC( ELAPTIME )
    hb_retc( hb_SecToTimeStr( szTime, ( ulEnd < ulStart ? 86400 : 0 ) + ulEnd - ulStart ) );
 }
 
-HB_FUNC( SECS )
+HB_FUNC( TSSECS )
 {
    hb_retnl( hb_TimeStrToSec( hb_parcx( 1 ) ) );
 }

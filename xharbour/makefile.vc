@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.183 2007/02/05 08:57:13 marchuet Exp $
+# $Id: makefile.vc,v 1.184 2007/02/28 02:33:45 ronpinkas Exp $
 #
 
 #
@@ -428,7 +428,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\console.obj \
    $(OBJ_DIR)$(MT)\copyfile.obj \
    $(OBJ_DIR)$(MT)\datec.obj \
-   $(OBJ_DIR)$(MT)\dates.obj \
    $(OBJ_DIR)$(MT)\dateshb.obj \
    $(OBJ_DIR)$(MT)\dbf2txt.obj \
    $(OBJ_DIR)$(MT)\defpath.obj \

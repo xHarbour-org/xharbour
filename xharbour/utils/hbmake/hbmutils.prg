@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.43 2005/07/02 21:37:04 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.45 2005/11/05 15:01:52 modalsist Exp $
  */
 /*
  * xHarbour Project source code:
@@ -404,7 +404,7 @@ FUNCTION TD2JUL( CTIME, DDATE )
 RETURN DDATE - CTOD( '01/01/1900' ) + ( PRB_INT( TTOS( CTIME ) / 100000,, 5 ) )
 
 *---------------------
-FUNCTION TTOS( CTIME )
+STATIC FUNCTION TTOS( CTIME )
 *---------------------
 
 RETURN ( VAL( SUBSTR( CTIME, 7, 2 ) ) ) + ;

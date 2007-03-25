@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.26 2005/10/24 23:29:58 ronpinkas Exp $
+ * $Id: macro.slx,v 1.27 2006/02/22 03:30:17 ronpinkas Exp $
  */
 
 /*
@@ -231,7 +231,8 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
                                      LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
                                      LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
-                                     LEX_DELIMITER( '^'  ) AS_TOKEN( POWER + DONT_REDUCE ),
+/*				     LEX_DELIMITER( '^' )  AS_TOKEN( POWER + DONT_REDUCE ), */
+				     LEX_DELIMITER( '^' )  AS_TOKEN( POWER ),
                                      LEX_DELIMITER( '%'  ) AS_TOKEN( '%'   + DONT_REDUCE ),
                                      LEX_DELIMITER( '*'  ) AS_TOKEN( '*'   + DONT_REDUCE ),
                                      LEX_DELIMITER( '/'  ) AS_TOKEN( '/'   + DONT_REDUCE ),
@@ -295,6 +296,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( ".N."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
                      LEX_WORD( ".T."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
                      LEX_WORD( ".Y."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
+                     LEX_WORD( "AM"           ) AS_TOKEN( H12AM       ),
                   /* LEX_WORD( "FIELD"        ) AS_TOKEN( FIELD       ), */
                      LEX_WORD( "FIELD?WS?->"  ) AS_TOKEN( HB_FIELD_ALIAS     ),
                      LEX_WORD( "HAS"          ) AS_TOKEN( HB_AFTER_EXP - MATCH      ),
@@ -303,6 +305,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "IN"           ) AS_TOKEN( HB_AFTER_EXP - '$'        ),
                      LEX_WORD( "LIKE"         ) AS_TOKEN( HB_AFTER_EXP - LIKE       ),
                      LEX_WORD( "NIL"          ) AS_TOKEN( NIL        + DONT_REDUCE  ),
+                     LEX_WORD( "PM"           ) AS_TOKEN( H12PM       ),
                      LEX_WORD( "QSELF"        ) AS_TOKEN( QSELF       ),
                   /* LEX_WORD( "SELF"         ) AS_TOKEN( SELF        ), */
                   /* LEX_WORD( "_FIELD"       ) AS_TOKEN( FIELD       ),  */

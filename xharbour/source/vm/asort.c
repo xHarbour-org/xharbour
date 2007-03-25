@@ -1,5 +1,5 @@
 /*
- * $Id: asort.c,v 1.15 2005/10/16 19:32:45 druzus Exp $
+ * $Id: asort.c,v 1.16 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -49,6 +49,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  */
 
 /* TOFIX: The sorting engine requires signed indexes to work, this means
@@ -88,7 +91,9 @@ static BOOL hb_itemIsLess( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pBlock )
    else if( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) )
       return hb_itemGetND( pItem1 ) < hb_itemGetND( pItem2 );
    else if( HB_IS_DATE( pItem1 ) && HB_IS_DATE( pItem2 ) )
-      return pItem1->item.asDate.value < pItem2->item.asDate.value;
+      return ((hb_itemGetDL( pItem1 ) < hb_itemGetDL( pItem2 )) ||
+              (hb_itemGetDL( pItem1 ) == hb_itemGetDL( pItem2 ) &&
+               hb_itemGetT( pItem1 ) < hb_itemGetT( pItem2 )));
    else if( HB_IS_LOGICAL( pItem1 ) && HB_IS_LOGICAL( pItem2 ) )
       return hb_itemGetL( pItem1 ) < hb_itemGetL( pItem2 );
    else

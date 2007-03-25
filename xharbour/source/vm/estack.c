@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.84 2006/05/23 19:21:18 ronpinkas Exp $
+ * $Id: estack.c,v 1.85 2007/01/13 15:58:45 druzus Exp $
  */
 
 /*
@@ -47,6 +47,9 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
  *
  */
 
@@ -499,9 +502,15 @@ void hb_stackDispLocal( void )
             break;
 
          case HB_IT_DATE:
+            if( (*pBase)->item.asDate.time == 0 )
             {
                char szDate[ 9 ];
                printf( HB_I_("DATE = \"%s\" "), hb_itemGetDS( *pBase, szDate ) );
+            }
+            else
+            {
+               char szDate[ 19 ];
+               printf( HB_I_("DATETIME = \"%s\" "), hb_itemGetDTS( *pBase, szDate ) );
             }
             break;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.7 2006/05/19 00:44:36 druzus Exp $
+ * $Id: hbxvm.h,v 1.8 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -183,7 +183,8 @@ extern HB_EXPORT void   hb_xvmPushLongLong( LONGLONG llNumber );
 #define hb_xvmPushNil()                   hb_vmPushNil()
 #define hb_xvmPushStringConst( psz, ul )  hb_itemPushStaticString( psz, ul )
 #define hb_xvmPushSymbol( p )             hb_vmPushSymbol( p )
-#define hb_xvmPushDate( p )               hb_vmPushDate( p )
+#define hb_xvmPushDate( l )               hb_vmPushDate( l )
+#define hb_xvmPushDateTime( l1, l2 )      hb_vmPushDateTime( l1, (double)(l1) / HB_DATETIMEINSEC )
 
 extern HB_EXPORT void   hb_xvmLocalSetInt( USHORT usLocal, int iVal );
 extern HB_EXPORT void   hb_xvmLocalSetStr( USHORT usLocal, const char * pVal, ULONG ulLen );

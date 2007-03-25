@@ -1,5 +1,5 @@
 /*
- * $Id: empty.c,v 1.8 2004/11/21 21:44:17 druzus Exp $
+ * $Id: empty.c,v 1.9 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -48,6 +48,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  */
 
 #include "hbapi.h"
@@ -82,7 +85,7 @@ HB_FUNC( EMPTY )
          break;
 
       case HB_IT_DATE:
-         hb_retl( pItem->item.asDate.value == 0 );
+         hb_retl( pItem->item.asDate.value == 0 && pItem->item.asDate.time == 0 );
          break;
 
       case HB_IT_POINTER:

@@ -1,5 +1,5 @@
 /*
- * $Id: hblbl.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hblbl.c,v 1.2 2006/04/21 11:25:33 druzus Exp $
  */
 
 /*
@@ -376,7 +376,9 @@ static PHB_LABEL_FUNC s_GenLabelFuncTable[ HB_P_LAST_PCODE ] =
    NULL,                       /* HB_P_ENDFINALLY,           */
    NULL,                       /* HB_P_LOCALNEARADD          */
    NULL,                       /* HB_P_ARRAYPUSHREF          */
-   NULL                        /* HB_P_ARRAYPOPPLUS          */
+   NULL,                       /* HB_P_ARRAYPOPPLUS          */
+   NULL,                       /* HB_P_PUSHDATETIME          */
+   NULL                        /* HB_P_PUSHDATE              */
 };
 
 void hb_compGenLabelTable( PFUNCTION pFunc, PHB_LABEL_INFO label_info )

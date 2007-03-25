@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.603 2007/03/16 03:37:16 ronpinkas Exp $
+ * $Id: hvm.c,v 1.604 2007/03/17 03:42:31 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,11 @@
  * Copyright 2005 Vicente Guerra <vicente@guerra.com.mx>
  *    hb_vmUnhideString()
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *    hb_vmSumDate()
+ *    hb_vmSubDate()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -97,6 +102,7 @@
 #include "classes.h"
 #include "hboo.ch"
 #include "hbdebug.ch"
+#include "hbdate.h"
 
 #include "hbi18n.h"
 #include "hbserv.h"
@@ -228,6 +234,8 @@ static void    hb_vmPushStaticByRef( USHORT uiStatic ); /* pushes a static by re
 static void    hb_vmPushVariable( PHB_SYMB pVarSymb ); /* pushes undeclared variable */
 static void    hb_vmDuplicate( void );            /* duplicates the latest value on the stack */
 static void    hb_vmDuplTwo( void );              /* duplicates the latest two value on the stack */
+static void    hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult );
+static void    hb_vmSubDate( PHB_ITEM pItem1, PHB_ITEM pItem2 );
 
 /* Pop */
 static BOOL    hb_vmPopLogical( void );           /* pops the stack latest value and returns its logical value */
@@ -2622,6 +2630,21 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             w += 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE );
             break;
 
+         case HB_P_PUSHDATETIME:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHDATETIME") );
+
+            hb_vmPushDateTime( HB_PCODE_MKLONG( &pCode[ w + 1 ] ), HB_PCODE_MKLONG( &pCode[ w + 5 ] ) );
+            w += sizeof(UINT32) + sizeof(UINT32) + 1;
+
+            break;
+
+         case HB_P_PUSHDATE:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHDATE") );
+
+            hb_vmPushDate( HB_PCODE_MKLONG( &pCode[ w + 1 ] ) );
+            w += 5;
+            break;
+
          case HB_P_PUSHSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHSTR") );
          {
@@ -4035,7 +4058,7 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
    }
    else if( ( HB_IS_DATE( pLeft ) || HB_IS_DATE( pRight ) ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
-      hb_itemPutDL( pResult, (LONG) hb_itemGetND( pLeft ) + (LONG) hb_itemGetND( pRight ) );
+      hb_vmSumDate( pLeft, pRight, pResult );
    }
    else if( HB_IS_STRING( pLeft ) && ( HB_IS_NUMERIC( pLeft ) && HB_IS_NUMERIC( pRight ) ) )
    {
@@ -4144,10 +4167,7 @@ static void hb_vmMinus( void )
    }
    else if( HB_IS_DATE( pItem1 ) && HB_IS_NUMBER( pItem2 ) )
    {
-      double dNumber2 = hb_vmPopNumber();
-      double dNumber1 = hb_vmPopNumber();
-
-      hb_vmPushDate( (LONG) dNumber1 - (LONG) dNumber2 );
+      hb_vmSubDate( pItem1, pItem2 );
    }
    else if( HB_IS_STRING( pItem1 ) && ( HB_IS_NUMERIC( pItem1 ) && HB_IS_NUMERIC( pItem2 ) ) )
    {
@@ -6995,7 +7015,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
    }
-   else if( HB_IS_BLOCK( pSelf ) && strcmp( pSym->szName, "EVAL" ) == 0 )
+   else if( HB_IS_BLOCK( pSelf ) && strncmp( pSym->szName, "EVAL", 4 ) == 0 )
    {
       pSym = &hb_symEval;
       pFunc = pSym->value.pFunPtr;                 /* __EVAL method = function */
@@ -7782,6 +7802,126 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
    s_bDebugShowLines = TRUE;
 }
 
+static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
+{
+   PHB_ITEM pDate, pOther;
+   LONG lDate, lTime;
+
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmSumDate(%p,%p)", pItem1, pItem2));
+
+   if( HB_IS_DATE( pItem1 ) )
+   {
+      pDate  = pItem1;
+      pOther = pItem2;
+   }
+   else
+   {
+      pDate  = pItem2;
+      pOther = pItem1;
+   }
+
+   if( HB_IS_DATE( pOther ) )
+   {
+      if( pDate->item.asDate.time != 0 || pOther->item.asDate.time != 0 )
+      {
+         div_t result = div( pDate->item.asDate.time + pOther->item.asDate.time, (86400 * HB_DATETIMEINSEC) );
+         lTime = result.rem;
+         lDate = pDate->item.asDate.value + pOther->item.asDate.value + result.quot;
+      }
+      else
+      {
+         lTime = 0;
+         lDate = pDate->item.asDate.value + pOther->item.asDate.value;
+      }
+   }
+   else if( HB_IS_NUMINT( pOther ) )
+   {
+      lTime = pDate->item.asDate.time;
+      lDate = pDate->item.asDate.value + hb_itemGetNL( pOther ); 
+   }
+   else if( HB_IS_NUMERIC( pOther ) )
+   {
+      double dDate;
+      div_t result;
+
+      lTime = pDate->item.asDate.time + 
+              (LONG) (modf( hb_itemGetND( pOther ), &dDate ) * (double)(86400 * HB_DATETIMEINSEC));
+
+      if( lTime < 0 )
+      {
+         lTime += (86400 * HB_DATETIMEINSEC);
+         dDate -= 1;
+      }
+
+      result = div( lTime, (86400 * HB_DATETIMEINSEC) );
+      lTime  = result.rem;
+      lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
+   }
+   else
+   {
+      lTime = 0;
+      lDate = 0;
+   }
+
+   if( HB_IS_COMPLEX( pResult ) )
+   {
+      hb_itemClear( pResult );
+   }
+
+   pResult->type = HB_IT_DATE;
+   pResult->item.asDate.time  = lTime;
+   pResult->item.asDate.value = lDate;
+
+   return;
+}
+
+static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
+{
+   LONG lDate, lTime;
+
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmSubDate(%p,%p)", pDate, pOther));
+
+   if( HB_IS_NUMINT( pOther ) )
+   {
+      lDate = pDate->item.asDate.value - hb_itemGetNL( pOther );
+      lTime = pDate->item.asDate.time;
+   }
+   else
+   {
+      double dDate;
+      div_t result;
+      
+      lTime = pDate->item.asDate.time - 
+              (LONG) (modf( hb_itemGetND( pOther ), &dDate ) * (double)(86400 * HB_DATETIMEINSEC));
+
+      if( lTime < 0 )
+      {
+         lTime += (86400 * HB_DATETIMEINSEC);
+         dDate -= 1;
+      }
+
+      result = div( lTime, (86400 * HB_DATETIMEINSEC) );
+      lTime  = result.rem;
+      lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
+   }
+
+   hb_stackPop();
+
+   if( lDate < 0 )
+   {
+      lDate = 0;
+   }
+
+   pDate->type = HB_IT_DATE;
+   pDate->item.asDate.value = lDate;
+   pDate->item.asDate.time  = lTime;
+   return;
+}
+
 /* ------------------------------- */
 /* Push                            */
 /* ------------------------------- */
@@ -8050,6 +8190,19 @@ HB_EXPORT void hb_vmPushDate( LONG lDate )
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_DATE;
    ( * HB_VM_STACK.pPos )->item.asDate.value = lDate;
+   ( * HB_VM_STACK.pPos )->item.asDate.time  = 0;
+   hb_stackPush();
+}
+
+HB_EXPORT void hb_vmPushDateTime( LONG lDate, LONG lTime )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushDateTime(%ld,%ld)", lDate, lTime));
+
+   ( * HB_VM_STACK.pPos )->type = HB_IT_DATE;
+   ( * HB_VM_STACK.pPos )->item.asDate.value = lDate;
+   ( * HB_VM_STACK.pPos )->item.asDate.time  = lTime;
    hb_stackPush();
 }
 
@@ -8658,7 +8811,14 @@ static double hb_vmPopNumber( void )
          break;
 
       case HB_IT_DATE:
-         dNumber = (double) pItem->item.asDate.value;
+         if( pItem->item.asDate.time == 0 )
+         {
+            dNumber = (double) pItem->item.asDate.value;
+         }
+         else
+         {
+            dNumber = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+         }
          break;
 
       case HB_IT_STRING:

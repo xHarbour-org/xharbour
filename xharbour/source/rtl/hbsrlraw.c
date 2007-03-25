@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.28 2005/09/30 23:44:05 druzus Exp $
+ * $Id: hbsrlraw.c,v 1.29 2006/02/06 21:54:57 lculik Exp $
  */
 
 /*
@@ -48,6 +48,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  */
 
 #include "hbapi.h"
@@ -55,6 +58,7 @@
 #include "hbstack.h"
 #include "hbapierr.h"
 #include "inet.h"
+#include "hbdate.h"
 
 /* Returns a string containing 8 characters in network byte order
 * HB_CreateLen8( nLen ) --> returns the bytes containing the code
@@ -202,10 +206,21 @@ HB_FUNC( HB_SERIALIZESIMPLE )
       break;
 
       case HB_IT_DATE:
-         ulRet = 9;
-         cRet = (BYTE *)hb_xgrab( ulRet + 1 );
-         cRet[0] = (BYTE)'D';
-         hb_createlen8( cRet + 1, pItem->item.asDate.value );
+         if( pItem->item.asDate.time == 0 )
+         {
+            ulRet = 9;
+            cRet = (BYTE *)hb_xgrab( ulRet + 1 );
+            cRet[0] = (BYTE)'D';
+            hb_createlen8( cRet + 1, pItem->item.asDate.value );
+         }
+         else
+         {
+            double dDateTime = hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+            ulRet = 1 + sizeof( double );
+            cRet = (BYTE *)hb_xgrab( ulRet + 1 );
+            cRet[0] = (BYTE)'T';
+            memcpy( cRet + 1, &(dDateTime), sizeof( double ) );
+         }
       break;
 
       case HB_IT_NIL:
@@ -293,6 +308,10 @@ HB_FUNC( HB_DESERIALIZESIMPLE )
          ulData = (ULONG) hb_getlen8( (BYTE *)(cBuf + 1) );
          hb_retdl( ulData );
       break;
+            
+      case 'T' :
+         hb_retdtd( *((double *) (cBuf + 1) ) );
+      break;
 
       case 'Z':
          // ulData = 1;
@@ -326,6 +345,9 @@ ULONG hb_serialNextRaw( char *cBuf )
 
       case 'D':
       return 9;
+
+      case 'T':
+      return 1 + sizeof( double );
 
       case 'A':
          ulData = ulNext = 9;

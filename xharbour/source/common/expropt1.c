@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.18 2005/11/03 06:55:29 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.19 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -66,6 +66,7 @@
 #include <math.h>
 #include "hbmacro.h"
 #include "hbcomp.h"
+#include "hbdate.h"
 
 /* memory allocation
  */
@@ -79,6 +80,7 @@ static char * s_OperTable[] = {
    "ExtCodeblock", /* HB_ET_EXTBLOCK  */
    "NIL",          /* HB_ET_NIL       */
    "Numeric",      /* HB_ET_NUMERIC   */
+   "Date",         /* HB_ET_DATE      */
    "String",       /* HB_ET_STRING    */
    "Codeblock",    /* HB_ET_CODEBLOCK */
    "Logical",      /* HB_ET_LOGICAL   */
@@ -239,6 +241,99 @@ HB_EXPR_PTR hb_compExprNewLong( HB_LONG lValue )
    return pExpr;
 }
 
+HB_EXPR_PTR hb_compExprNewDate( HB_EXPR_PTR pYear, HB_EXPR_PTR pMonth, HB_EXPR_PTR pDate )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewDate()"));
+
+   pExpr = hb_compExprNew( HB_ET_DATE );
+
+   pExpr->value.asDate.date = hb_dateEncode( (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal );
+   pExpr->value.asDate.time = 0;
+   pExpr->value.asDate.type = HB_ET_DDATE;
+   pExpr->ValType = HB_EV_DATE;
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR pYear, HB_EXPR_PTR pMonth, HB_EXPR_PTR pDate ,HB_EXPR_PTR pHour, HB_EXPR_PTR pMinute, HB_EXPR_PTR pSeconds, int iAmPm, int * piOk )
+{
+   HB_EXPR_PTR pExpr;
+
+   pExpr = hb_compExprNew( HB_ET_DATE );
+   
+   if( pYear )
+   {
+      if( pSeconds )
+      {
+         if( pSeconds->value.asNum.NumType == HB_ET_DOUBLE )
+         {
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, pSeconds->value.asNum.dVal, iAmPm, piOk );
+         }
+         else
+         {
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) pSeconds->value.asNum.lVal, iAmPm, piOk );
+         }
+      }
+      else
+      {
+         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) 0, iAmPm, piOk );
+      }
+   }
+   else
+   {
+      if( pSeconds )
+      {
+         if( pSeconds->value.asNum.NumType == HB_ET_DOUBLE )
+         {
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           1899, 12, 30,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, pSeconds->value.asNum.dVal, iAmPm, piOk );
+         }
+         else
+         {
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           1899, 12, 30,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) pSeconds->value.asNum.lVal, iAmPm, piOk );
+         }
+      }
+      else
+      {
+         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+                           1899, 12, 30,
+                           (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) 0, iAmPm, piOk );
+      }
+   }
+   pExpr->value.asDate.type = HB_ET_DDATETIME;
+
+   pExpr->ValType = HB_EV_DATE;
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewDateTimeVal( LONG lDate, LONG lTime, USHORT uType )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewDateTimeVal(%d,%d,%hu)", lDate, lTime, uType ));
+
+   pExpr = hb_compExprNew( HB_ET_DATE );
+
+   pExpr->value.asDate.type = uType;
+   pExpr->value.asDate.date = lDate;
+   pExpr->value.asDate.time = lTime;
+
+   pExpr->ValType = HB_EV_DATE;
+
+   return pExpr;
+}
 
 HB_EXPR_PTR hb_compExprNewCodeBlock( void )
 {

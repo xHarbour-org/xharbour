@@ -1,5 +1,5 @@
 /*
- * $Id: hbstripl.c,v 1.1 2006/02/14 01:04:38 druzus Exp $
+ * $Id: hbpcstat.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -228,7 +228,9 @@ static const char * hb_comp_pcode_names[] =
     "HB_P_LOCALNEARADD",          /* 167 */
     "HB_P_ARRAYPUSHREF",          /* 168 */
     "HB_P_ARRAYPOPPLUS",          /* 169 */
-    "HB_P_LAST_PCODE"             /* 170 this defines the number of defined pcodes */
+    "HB_P_PUSHDATETIME",          /* 170 */
+    "HB_P_PUSHDATE",              /* 171 */
+    "HB_P_LAST_PCODE"             /* 172 this defines the number of defined pcodes */
 };
 
 

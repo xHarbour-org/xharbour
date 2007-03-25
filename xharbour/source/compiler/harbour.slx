@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.77 2007/02/27 15:59:34 druzus Exp $
+ * $Id: harbour.slx,v 1.78 2007/03/03 01:24:58 ronpinkas Exp $
  */
 
 /*
@@ -129,7 +129,8 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
                                      LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
                                      LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
-                                     LEX_DELIMITER( '^'  ) AS_TOKEN( POWER    + DONT_REDUCE ),
+/*                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ), */
+                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER ),
                                      LEX_DELIMITER( '%'  ) AS_TOKEN( '%'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '*'  ) AS_TOKEN( '*'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '/'  ) AS_TOKEN( '/'      + DONT_REDUCE ),
@@ -329,6 +330,7 @@ LANGUAGE_KEY_WORDS_ARE {
 LANGUAGE_WORDS_ARE {
                      LEX_WORD( "..."                              ) AS_TOKEN( EPSILON            + DONT_REDUCE ),
 
+                     LEX_WORD( "AM"                               ) AS_TOKEN( H12AM              ),
                      LEX_WORD( "AS{WS}ANYTYPE"                    ) AS_TOKEN( AS_VARIANT         + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY"                      ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ANYTYPE"     ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
@@ -372,6 +374,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),
                      LEX_WORD( "NIL"                              ) AS_TOKEN( NIL                + DONT_REDUCE ),
                      LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( OPTIONAL           ),
+                     LEX_WORD( "PM"                               ) AS_TOKEN( H12PM              ),
 
                   /* LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF              ), */
 

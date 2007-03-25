@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.49 2006/03/18 20:43:46 ronpinkas Exp $
+ * $Id: hash.c,v 1.50 2007/01/10 17:38:23 snaiperis Exp $
  */
 
 /*
@@ -47,6 +47,9 @@
  * If you write modifications of your own for Harbour, it is your choice
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
  *
  */
 
@@ -190,7 +193,18 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
          }
          else
          {
-            return 0;
+            if ( pFirst->item.asDate.time < pSecond->item.asDate.time )
+            {
+               return -1;
+            }
+            else if ( pFirst->item.asDate.time > pSecond->item.asDate.time )
+            {
+               return 1;
+            }
+            else
+            {
+               return 0;
+            }
          }
       }
       else if ( pSecond->type == HB_IT_STRING )

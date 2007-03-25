@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.191 2007/02/28 02:33:45 ronpinkas Exp $
+# $Id: makefile.bc,v 1.192 2007/02/28 22:42:31 modalsist Exp $
 #
 
 #
@@ -320,7 +320,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\console.obj \
    $(RTL_OBJ_DIR)\copyfile.obj \
    $(RTL_OBJ_DIR)\datec.obj \
-   $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
    $(RTL_OBJ_DIR)\dbf2txt.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
@@ -2022,9 +2021,6 @@ $(RTL_OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.132 2007/03/11 00:16:44 modalsist Exp $
+# $Id: hrbdll.bc,v 1.133 2007/03/12 11:35:16 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -190,7 +190,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\console.obj \
   $(OBJ_DIR)\copyfile.obj \
   $(OBJ_DIR)\datec.obj \
-  $(OBJ_DIR)\dates.obj \
   $(OBJ_DIR)\dateshb.obj \
   $(OBJ_DIR)\dbf2txt.obj \
   $(OBJ_DIR)\dbtotal.obj \
@@ -918,7 +917,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\copyfile.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cstruct.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\datec.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\dates.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\dateshb.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\dbf2txt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\decode.obj            + >> hdll.tmp
@@ -1768,9 +1766,6 @@ $(OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.65 2005/11/22 02:33:47 walito Exp $
+ * $Id: arrayshb.c,v 1.66 2006/10/13 01:42:22 ronpinkas Exp $
  */
 
 /*
@@ -54,6 +54,9 @@
  * Copyright 2001 Ron Pinkas <ron@profit-master.com>
  * HB_FUNC( HB_APARAMS )
  * HB_FUNC( HB_AEXPRESSIONS )
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
  *
  */
 
@@ -2117,7 +2120,8 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
          {
             PHB_ITEM pItem = pItems + ulStart;
 
-            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue )
+            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue &&
+               pValue->item.asDate.time == pItem->item.asDate.time )
             {
                hb_retnl( ulStart + 1 );             // arrays start from 1
                return;

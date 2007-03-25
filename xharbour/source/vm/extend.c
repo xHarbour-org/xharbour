@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.56 2005/11/12 18:47:30 druzus Exp $
+ * $Id: extend.c,v 1.57 2006/02/14 01:47:07 druzus Exp $
  */
 
 /*
@@ -70,6 +70,23 @@
  *
  * Copyright 2003 Giancarlo Niccolai <antispam (at) niccolai [dot] ws>
  *    hb_parpointer()
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *    hb_pardts()
+ *    hb_pardtsbuff()
+ *    hb_part()
+ *    hb_pardtsec()
+ *    hb_pardtd()
+ *    hb_retdts()
+ *    hb_retdt()
+ *    hb_retdtd()
+ *    hb_retdtl()
+ *    hb_stordts()
+ *    hb_stord()
+ *    hb_stordt()
+ *    hb_stordtl()
+ *    hb_stordtd()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -363,6 +380,44 @@ char  HB_EXPORT * hb_pards( int iParam, ... )
    return hb_dateDecStr( hb_stackDateBuffer(), 0 );
 }
 
+/* NOTE: Using HB_VM_STACK.szDate as a temporary date buffer guaranties
+         good behavior when multithreading. */
+
+char  HB_EXPORT * hb_pardts( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_pardts(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return hb_datetimeDecStr( hb_stackDateBuffer(), pItem->item.asDate.value, pItem->item.asDate.time );
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetDTS( pItem, ulArrayIndex, hb_stackDateBuffer() );
+      }
+   }
+
+   return hb_datetimeDecStr( hb_stackDateBuffer(), 0, 0 );
+}
+
 /* NOTE: szDate must be a 9 chars wide buffer. [vszakats] */
 
 char  HB_EXPORT * hb_pardsbuff( char * szDate, int iParam, ... )
@@ -435,6 +490,154 @@ LONG  HB_EXPORT hb_pardl( int iParam, ... )
    }
 
    return hb_itemGetDL( NULL );
+}
+
+/* NOTE: szDateTime must be a 26 chars wide buffer. [walter negro] */
+
+char  HB_EXPORT * hb_pardtsbuff( char * szDateTime, int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_pardtsbuff(%p, %d, ...)", szDateTime, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return hb_datetimeDecStr( szDateTime, pItem->item.asDate.value, pItem->item.asDate.time );
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetDTS( pItem, ulArrayIndex, szDateTime );
+      }
+   }
+
+   return hb_datetimeDecStr( szDateTime, 0, 0 );
+}
+
+/* retrieve a time as LONG - number of seconds in the time part */
+
+LONG HB_EXPORT hb_part( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_part(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return hb_itemGetT( pItem );
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetT( pItem, ulArrayIndex );
+      }
+   }
+
+   return hb_itemGetT( NULL );
+}
+
+/* retrieve a datetime as double - number of seconds from Julian's day plus time */
+
+double HB_EXPORT hb_pardtsec( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_pardtd(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return hb_itemGetDTsec( pItem );
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetDTsec( pItem, ulArrayIndex );
+      }
+   }
+
+   return hb_itemGetDTsec( NULL );
+}
+
+/* retrieve a datetime as double - number of days from Julian's day plus time in decimal part of day*/
+
+double HB_EXPORT hb_pardtd( int iParam, ... )
+{
+   HB_THREAD_STUB_ANY
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_pardtd(%d, ...)", iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+
+      if( HB_IS_BYREF( pItem ) )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_DATE( pItem ) )
+      {
+         return hb_itemGetDTD( pItem );
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         return hb_arrayGetDTD( pItem, ulArrayIndex );
+      }
+   }
+
+   return hb_itemGetDTD( NULL );
 }
 
 int  HB_EXPORT hb_parl( int iParam, ... )
@@ -891,6 +1094,16 @@ void HB_EXPORT hb_retds( const char * szDate )
    hb_itemPutDS( hb_stackReturnItem(), szDate );
 }
 
+/* szDate must have YYYYMMDDHHMMSS.CCC format */
+
+#undef hb_retdts
+void HB_EXPORT hb_retdts( const char * szDateTime )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retdts(%s)", szDateTime));
+
+   hb_itemPutDTS( hb_stackReturnItem(), szDateTime );
+}
+
 #undef hb_retd
 void HB_EXPORT hb_retd( int iYear, int iMonth, int iDay )
 {
@@ -899,12 +1112,36 @@ void HB_EXPORT hb_retd( int iYear, int iMonth, int iDay )
    hb_itemPutD( hb_stackReturnItem(), iYear, iMonth, iDay );
 }
 
+#undef hb_retdt
+void HB_EXPORT hb_retdt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retdt(%04i, %02i, %02i, %02i, %02i, %f, %d)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm));
+
+   hb_itemPutDT( hb_stackReturnItem(), iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm );
+}
+
 #undef hb_retdl
 void HB_EXPORT hb_retdl( LONG lJulian )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retdl(%ld)", lJulian));
 
    hb_itemPutDL( hb_stackReturnItem(), lJulian );
+}
+
+#undef hb_retdtd
+void HB_EXPORT hb_retdtd( double dDateTime )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retdtd(%f)", dDateTime));
+
+   hb_itemPutDTD( hb_stackReturnItem(), dDateTime );
+}
+
+#undef hb_retdtl
+void HB_EXPORT hb_retdtl( LONG lDate, LONG lTime )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_retdtl(%ld,%ld)", lDate, lTime));
+
+   hb_itemPutDTL( hb_stackReturnItem(), lDate, lTime );
 }
 
 #undef hb_retl
@@ -1138,6 +1375,41 @@ void HB_EXPORT hb_stords( char * szDate, int iParam, ... )
    }
 }
 
+/* szDate must have YYYYMMDDHHMMSS.CCC format */
+
+void HB_EXPORT hb_stordts( char * szDateTime, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stordts(%s, %d, ...)", szDateTime, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         PHB_ITEM pDstItem;
+         va_list va;
+         va_start( va, iParam );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDTS( pDstItem, szDateTime );
+         }
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutDTS( pItem, szDateTime );
+      }
+   }
+}
+
 void HB_EXPORT hb_stordl( LONG lJulian, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stordl(%ld, %d, ...)", lJulian, iParam));
@@ -1167,6 +1439,138 @@ void HB_EXPORT hb_stordl( LONG lJulian, int iParam, ... )
       else if( bByRef || iParam == -1 )
       {
          hb_itemPutDL( pItem, lJulian );
+      }
+   }
+}
+
+void HB_EXPORT hb_stordtd( double dDateTime, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stordtd(%f, %d, ...)", dDateTime, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         PHB_ITEM pDstItem;
+         va_list va;
+         va_start( va, iParam );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDTD( pDstItem, dDateTime );
+         }
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutDTD( pItem, dDateTime );
+      }
+   }
+}
+
+void HB_EXPORT hb_stordtl( LONG lDate, LONG lTime, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stordtl(%ld, %ld, %d, ...)", lDate, lTime, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         PHB_ITEM pDstItem;
+         va_list va;
+         va_start( va, iParam );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDTL( pDstItem, lDate, lTime );
+         }
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutDTL( pItem, lDate, lTime );
+      }
+   }
+}
+
+void HB_EXPORT hb_stord( int iYear, int iMonth, int iDay, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stord(%d, %d, %d, %d, ...)", iYear, iMonth, iDay, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         PHB_ITEM pDstItem;
+         va_list va;
+         va_start( va, iParam );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutD( pDstItem, iYear, iMonth, iDay );
+         }
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutD( pItem, iYear, iMonth, iDay );
+      }
+   }
+}
+
+void HB_EXPORT hb_stordt( int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm, int iParam, ... )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_stord(%d, %d, %d, %d, %d, %f, %d, %d, ...)", iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, iParam));
+
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
+   {
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
+      BOOL bByRef = HB_IS_BYREF( pItem );
+
+      if( bByRef  )
+      {
+         pItem = hb_itemUnRef( pItem );
+      }
+
+      if( HB_IS_ARRAY( pItem ) )
+      {
+         PHB_ITEM pDstItem;
+         va_list va;
+         va_start( va, iParam );
+         pDstItem = hb_arrayGetItemPtr( pItem, va_arg( va, ULONG ));
+         if( pDstItem )
+         {
+            hb_itemPutDT( pDstItem, iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm );
+         }
+         va_end( va );
+      }
+      else if( bByRef || iParam == -1 )
+      {
+         hb_itemPutDT( pItem, iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm );
       }
    }
 }

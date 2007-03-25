@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.132 2007/02/13 19:02:24 druzus Exp $
+ * $Id: arrays.c,v 1.133 2007/02/27 15:59:41 druzus Exp $
  */
 
 /*
@@ -64,6 +64,13 @@
  *    hb_arrayFromStack()
  *    hb_arrayFromParams()
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *    hb_arrayGetDTS()
+ *    hb_arrayGetT()
+ *    hb_arrayGetDTsec()
+ *    hb_arrayGetDTD()
+
  * See doc/license.txt for licensing terms.
  *
  */
@@ -77,6 +84,8 @@
 #include "hbvm.h"
 #include "hbstack.h"
 #include "classes.h"
+#include "hbdate.h"
+#include "hbset.h"
 
 #ifndef HB_ARRAY_USE_COUNTER
    extern BOOL hb_gc_bReleaseAll;
@@ -618,6 +627,25 @@ char HB_EXPORT * hb_arrayGetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate )
    return exData;
 }
 
+char HB_EXPORT * hb_arrayGetDTS( PHB_ITEM pArray, ULONG ulIndex, char * szDateTime )
+{
+   char *exData;
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDTS(%p, %lu, %s)", pArray, ulIndex, szDateTime));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      exData = hb_itemGetDTS( pArray->item.asArray.value->pItems + ulIndex - 1, szDateTime );
+   }
+   else
+   {
+      /* NOTE: Intentionally calling it with a bad parameter in order to get
+               the default value from hb_itemGetDTS(). */
+      exData = hb_itemGetDTS( NULL, szDateTime );
+   }
+
+   return exData;
+}
+
 LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDL(%p, %lu)", pArray, ulIndex ));
@@ -632,6 +660,48 @@ LONG HB_EXPORT hb_arrayGetDL( PHB_ITEM pArray, ULONG ulIndex )
                the default value from hb_itemGetDL(). [vszakats] */
       return hb_itemGetDL( NULL );
    }
+}
+
+LONG HB_EXPORT hb_arrayGetT( PHB_ITEM pArray, ULONG ulIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetT(%p, %lu)", pArray, ulIndex ));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      return hb_itemGetT( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+   
+   /* NOTE: Intentionally calling it with a bad parameter in order to get
+            the default value from hb_itemGetT(). */
+   return hb_itemGetT( NULL );
+}
+
+double HB_EXPORT hb_arrayGetDTsec( PHB_ITEM pArray, ULONG ulIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDTsec(%p, %lu)", pArray, ulIndex ));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      return hb_itemGetDTsec( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+   
+   /* NOTE: Intentionally calling it with a bad parameter in order to get
+            the default value from hb_itemGetDTsec().  */
+   return hb_itemGetDTsec( NULL );
+}
+
+double HB_EXPORT hb_arrayGetDTD( PHB_ITEM pArray, ULONG ulIndex )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_arrayGetDTD(%p, %lu)", pArray, ulIndex ));
+
+   if( pArray->type == HB_IT_ARRAY && ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
+   {
+      return hb_itemGetDTD( pArray->item.asArray.value->pItems + ulIndex - 1 );
+   }
+   
+   /* NOTE: Intentionally calling it with a bad parameter in order to get
+            the default value from hb_itemGetDTD(). */
+   return hb_itemGetDTD( NULL );
 }
 
 /*
@@ -1033,7 +1103,8 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          {
             PHB_ITEM pItem = pItems + ulStart;
 
-            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue )
+            if( pItem->type == HB_IT_DATE && pItem->item.asDate.value == lValue &&
+               pValue->item.asDate.time == pItem->item.asDate.time )
             {
                return ulStart + 1;
             }

@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.24 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: makefile.dc,v 1.25 2006/11/09 16:41:09 marchuet Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -898,7 +898,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\colorind.obj \
    $(RTL_OBJ_DIR)\copyfile.obj \
    $(RTL_OBJ_DIR)\datec.obj \
-   $(RTL_OBJ_DIR)\dates.obj \
    $(RTL_OBJ_DIR)\dateshb.obj \
    $(RTL_OBJ_DIR)\defpath.obj \
    $(RTL_OBJ_DIR)\descend.obj \
@@ -1518,7 +1517,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\colorind.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\copyfile.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\datec.obj    >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dates.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dateshb.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\defpath.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\descend.obj  >> dmcrtl.rsp
@@ -2452,9 +2450,6 @@ $(RTL_OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

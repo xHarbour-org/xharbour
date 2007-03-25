@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.21 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: hrbdll.dc,v 1.22 2006/11/09 16:41:08 marchuet Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -155,7 +155,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\colorind.obj \
    $(OBJ_DIR)\copyfile.obj \
    $(OBJ_DIR)\datec.obj \
-   $(OBJ_DIR)\dates.obj \
    $(OBJ_DIR)\dateshb.obj \
    $(OBJ_DIR)\defpath.obj \
    $(OBJ_DIR)\descend.obj \
@@ -699,7 +698,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\colorind.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\copyfile.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\datec.obj      + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\dates.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\dateshb.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\defpath.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\descend.obj    + >> harbourdll.rsp
@@ -1307,9 +1305,6 @@ $(OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

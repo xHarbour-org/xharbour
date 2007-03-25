@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.110 2007/02/27 15:59:34 druzus Exp $
+ * $Id: harbour.sly,v 1.111 2007/03/21 10:15:51 marchuet Exp $
  */
 
 /*
@@ -168,7 +168,7 @@ static void hb_compDebugStart( void ) { };
 %token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
 %token ANNOUNCE DYNAMIC EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
 %token INC DEC ALIASOP DOCASE CASE OTHERWISE ENDCASE ENDDO MEMVAR
-%token WHILE LOOP FOR NEXT TO STEP LE GE FIELD IN PARAMETERS
+%token WHILE LOOP FOR NEXT TO STEP LE GE FIELD IN PARAMETERS H12AM H12PM
 %token PLUSEQ MINUSEQ MULTEQ DIVEQ POWER EXPEQ MODEQ
 %token PRIVATE BEGINSEQ BREAK RECOVER RECOVERUSING DO WITH SELF LINE
 %token MACROVAR MACROTEXT
@@ -250,6 +250,8 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  SelfValue SelfAlias
 %type <asExpr>  Array ArrayAlias
 %type <asExpr>  ArrayAt ArrayAtAlias
+%type <asExpr>  Date DateAlias
+%type <asExpr>  DateTime DateTimeAlias
 %type <asExpr>  Variable VarAlias
 %type <asExpr>  MacroVar MacroVarAlias
 %type <asExpr>  MacroExpr MacroExprAlias
@@ -583,6 +585,169 @@ SelfValue  : SELF             { $$ = hb_compExprNewSelf(); }
 SelfAlias  : SelfValue ALIASOP         { $$ = $1; }
 ;
 
+/* Literal date, time & datetime
+ */
+Date       : '{' POWER NumValue '/' NumValue '/' NumValue '}'
+                              { $$ = hb_compExprNewDate( $3, $5, $7 );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                              }
+           ;
+
+DateAlias  : Date ALIASOP         { $$ = $1; }
+;
+
+DateTime   : '{' POWER NumValue '/' NumValue '/' NumValue NumValue ':' NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 0, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                     hb_compExprDelete( $12 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 0, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 1, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                     hb_compExprDelete( $12 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 1, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, $12, 2, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                     hb_compExprDelete( $12 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue '/' NumValue '/' NumValue  NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( $3, $5, $7, $8, $10, NULL, 2, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                     hb_compExprDelete( $8 );
+                                     hb_compExprDelete( $10 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, $7, 0, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, NULL, 0, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, $7, 1, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue H12AM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, NULL, 1, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, $7, 2, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                     hb_compExprDelete( $7 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+           | '{' POWER NumValue ':' NumValue H12PM '}'
+                              { int iOk = 0;
+                                $$ = hb_compExprNewDateTime( NULL, NULL, NULL, $3, $5, NULL, 2, &iOk );
+                                     hb_compExprDelete( $3 );
+                                     hb_compExprDelete( $5 );
+                                if( !iOk )
+                                {
+                                   $$ = NULL;
+                                }
+                              }
+;
+
+DateTimeAlias : DateTime ALIASOP         { $$ = $1; }
+;
+
+
 /* Literal array
  */
 Array      : '{' ArgList '}'          { $$ = hb_compExprNewArray( $2 ); }
@@ -777,6 +942,8 @@ FieldVarAlias  : FieldAlias VarAlias            { hb_compExprDelete( $1 ); $$ = 
                | FieldAlias NilAlias            { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
                | FieldAlias LiteralAlias        { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
                | FieldAlias LogicalAlias        { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
+               | FieldAlias DateAlias           { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
+               | FieldAlias DateTimeAlias       { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
                | FieldAlias CodeBlockAlias      { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
                | FieldAlias SelfAlias           { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
                | FieldAlias ArrayAlias          { hb_compExprDelete( $1 ); $$ = hb_compErrorAlias( $2 ); }
@@ -795,6 +962,8 @@ AliasVar   : NumAlias AliasId          { $$ = hb_compExprNewAliasVar( $1, $2 ); 
            | NilAlias AliasId          { $$ = hb_compErrorAlias( $1 ); }
            | LiteralAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }
            | LogicalAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }
+           | DateAlias AliasId         { $$ = hb_compErrorAlias( $1 ); }
+           | DateTimeAlias AliasId     { $$ = hb_compErrorAlias( $1 ); }
            | CodeBlockAlias AliasId    { $$ = hb_compErrorAlias( $1 ); }
            | SelfAlias AliasId         { $$ = hb_compErrorAlias( $1 ); }
            | ArrayAlias AliasId        { $$ = hb_compErrorAlias( $1 ); }
@@ -827,6 +996,8 @@ AliasExpr  : NumAlias PareExpList         { $$ = hb_compExprNewAliasExpr( $1, $2
 VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             | CodeBlock     ArrayIndex    { $$ = $2; }
             | Logical       ArrayIndex    { $$ = $2; }
+            | Date          ArrayIndex    { $$ = $2; }
+            | DateTime      ArrayIndex    { $$ = $2; }
             | SelfValue     ArrayIndex    { $$ = $2; }
             | Variable      ArrayIndex    { $$ = $2; }
             | AliasVar      ArrayIndex    { $$ = $2; }
@@ -948,6 +1119,8 @@ ObjectData  : NumValue ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 );
             | LiteralValue ':' SendId    { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | CodeBlock ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Logical ':' SendId         { $$ = hb_compExprNewSendExp( $1, $3 ); }
+            | Date ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
+            | DateTime ':' SendId        { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | SelfValue ':' SendId       { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Array ':' SendId           { $$ = hb_compExprNewSendExp( $1, $3 ); }
             | Hash ':' SendId            { $$ = hb_compExprNewSendExp( $1, $3 ); }
@@ -1014,6 +1187,8 @@ SimpleExpression :
            | CodeBlock                        { $$ = $1; }
            | CodeBlock2                       { $$ = $1; }
            | Logical                          { $$ = $1; }
+           | Date                             { $$ = $1; }
+           | DateTime                         { $$ = $1; }
            | SelfValue                        { $$ = $1; }
            | SelfValue    {hb_comp_cVarType = ' ';} StrongType { $$ = $1; }
            | Array                            { $$ = $1; }
@@ -1081,6 +1256,8 @@ ExprPostOp  : NumValue     PostOp %prec POST  { $$ = $2; }
             | LiteralValue PostOp %prec POST  { $$ = $2; }
             | CodeBlock    PostOp %prec POST  { $$ = $2; }
             | Logical      PostOp %prec POST  { $$ = $2; }
+            | Date         PostOp %prec POST  { $$ = $2; }
+            | DateTime     PostOp %prec POST  { $$ = $2; }
             | SelfValue    PostOp %prec POST  { $$ = $2; }
             | Array        PostOp %prec POST  { $$ = $2; }
             | Hash         PostOp %prec POST  { $$ = $2; }
@@ -1117,6 +1294,8 @@ ExprAssign  : NumValue     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $
             | LiteralValue INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | CodeBlock    INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Logical      INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | Date         INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
+            | DateTime     INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | SelfValue    INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Array        INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
             | Hash         INASSIGN Expression   { $$ = hb_compExprAssign( $1, $3 ); }
@@ -1140,6 +1319,8 @@ ExprEqual   : NumValue     '=' Expression %prec INASSIGN  { $$ = hb_compExprAssi
             | LiteralValue '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
             | CodeBlock    '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
             | Logical      '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
+            | Date         '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
+            | DateTime     '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
             | SelfValue    '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
             | Array        '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
             | Hash         '=' Expression %prec INASSIGN  { $$ = hb_compExprAssign( $1, $3 ); }
@@ -1163,6 +1344,8 @@ ExprPlusEq  : NumValue     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | LiteralValue PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
             | CodeBlock    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
             | Logical      PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
+            | Date         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
+            | DateTime     PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
             | SelfValue    PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
             | Array        PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
             | Hash         PLUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewPlusEq( $1 ), $3 ); }
@@ -1186,6 +1369,8 @@ ExprMinusEq : NumValue     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb
             | LiteralValue MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
             | CodeBlock    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
             | Logical      MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
+            | Date         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
+            | DateTime     MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
             | SelfValue    MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
             | Array        MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
             | Hash         MINUSEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMinusEq( $1 ), $3 ); }
@@ -1209,6 +1394,8 @@ ExprMultEq  : NumValue     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_
             | LiteralValue MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
             | CodeBlock    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
             | Logical      MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
+            | Date         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
+            | DateTime     MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
             | SelfValue    MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
             | Array        MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
             | Hash         MULTEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewMultEq( $1 ), $3 ); }
@@ -1232,6 +1419,8 @@ ExprDivEq   : NumValue     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
             | CodeBlock    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
             | Logical      DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
+            | Date         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
+            | DateTime     DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
             | SelfValue    DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
             | Array        DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
             | Hash         DIVEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewDivEq( $1 ), $3 ); }
@@ -1255,6 +1444,8 @@ ExprModEq   : NumValue     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
             | CodeBlock    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
             | Logical      MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
+            | Date         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
+            | DateTime     MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
             | SelfValue    MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
             | Array        MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
             | Hash         MODEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewModEq( $1 ), $3 ); }
@@ -1278,6 +1469,8 @@ ExprExpEq   : NumValue     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_c
             | LiteralValue EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
             | CodeBlock    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
             | Logical      EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
+            | Date         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
+            | DateTime     EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
             | SelfValue    EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
             | Array        EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }
             | Hash         EXPEQ Expression   { $$ = hb_compExprSetOperand( hb_compExprNewExpEq( $1 ), $3 ); }

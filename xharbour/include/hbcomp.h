@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.53 2007/02/27 15:59:33 druzus Exp $
+ * $Id: hbcomp.h,v 1.54 2007/03/21 10:15:50 marchuet Exp $
  */
 
 /*
@@ -420,6 +420,7 @@ extern void hb_compGenPushMemVarRef( char * szVarName ); /* generates the pcode 
 extern void hb_compGenPushInteger( int iNumber );        /* Pushes a integer number on the virtual machine stack */
 extern void hb_compGenPushLogical( int iTrueFalse );     /* pushes a logical value on the virtual machine stack */
 extern void hb_compGenPushLong( HB_LONG lNumber );       /* Pushes an integer number on the virtual machine stack */
+extern void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType );      /* Pushes a date on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
 extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
 extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias ); /* Pushes a symbol on to the Virtual machine stack */
@@ -660,6 +661,8 @@ extern FILE           *hb_comp_errFile;
 extern int            hb_comp_iHidden;
 extern BYTE *         hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBufferLen );
 
+/* Date and DateTime support */
+extern void           hb_comp_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
 HB_EXTERN_END
 
 #endif /* HB_COMP_H_ */

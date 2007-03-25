@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.73 2007/03/19 03:13:40 modalsist Exp $
+ * $Id: set.c,v 1.74 2007/03/20 11:04:14 modalsist Exp $
  */
 
 /*
@@ -1560,6 +1560,22 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_TIMEFORMAT :
+         if( hb_set.HB_SET_TIMEFORMAT )
+         {
+            hb_retc( hb_set.HB_SET_TIMEFORMAT );
+         }
+         else
+         {
+            hb_retc( NULL );
+         }
+
+         if( args > 1 )
+         {
+            hb_set.HB_SET_TIMEFORMAT = set_string( pArg2, hb_set.HB_SET_TIMEFORMAT );
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1690,6 +1706,10 @@ void hb_setInitialize( void )
    hb_set.hb_set_printerjob=NULL;
    hb_set.hb_set_winprinter=FALSE;
 
+   hb_set.HB_SET_TIMEFORMAT = ( char * ) hb_xgrab( 12 );
+
+   memcpy( hb_set.HB_SET_TIMEFORMAT, "hh:mm:ss.cc", 12 );
+   
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
 
@@ -1725,6 +1745,7 @@ void hb_setRelease( void )
    if( hb_set.HB_SET_PATH )       hb_xfree( hb_set.HB_SET_PATH );
    if( hb_set.HB_SET_PRINTFILE )  hb_xfree( hb_set.HB_SET_PRINTFILE );
    if( hb_set.hb_set_printerjob ) hb_xfree( hb_set.hb_set_printerjob );
+   if( hb_set.HB_SET_TIMEFORMAT ) hb_xfree( hb_set.HB_SET_TIMEFORMAT );
 
    hb_set.HB_SET_TYPEAHEAD = 0;   hb_inkeyReset(); /* reset keyboard buffer */
 

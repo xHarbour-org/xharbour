@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.112 2007/01/11 01:00:34 druzus Exp $
+ * $Id: hbexprb.c,v 1.113 2007/02/26 03:18:27 ronpinkas Exp $
  */
 
 /*
@@ -63,6 +63,7 @@
 #include <math.h>
 #include "hbcomp.h"
 #include "hbmacro.ch"
+#include "hbdate.h"
 
 extern int hb_compLocalGetPos( char * szVarName );
 extern int hb_compStaticGetPos( char *, PFUNCTION );
@@ -136,6 +137,7 @@ static HB_EXPR_FUNC( hb_compExprUseEmpty );
 static HB_EXPR_FUNC( hb_compExprUseExtBlock );
 static HB_EXPR_FUNC( hb_compExprUseNil );
 static HB_EXPR_FUNC( hb_compExprUseNumeric );
+static HB_EXPR_FUNC( hb_compExprUseDate );
 static HB_EXPR_FUNC( hb_compExprUseString );
 static HB_EXPR_FUNC( hb_compExprUseCodeblock );
 static HB_EXPR_FUNC( hb_compExprUseLogical );
@@ -200,6 +202,7 @@ HB_EXPR_FUNC_PTR hb_comp_ExprTable[] = {
    hb_compExprUseExtBlock,
    hb_compExprUseNil,
    hb_compExprUseNumeric,
+   hb_compExprUseDate,
    hb_compExprUseString,
    hb_compExprUseCodeblock,
    hb_compExprUseLogical,
@@ -381,6 +384,40 @@ static HB_EXPR_FUNC( hb_compExprUseNumeric )
             HB_EXPR_PCODE3( hb_compGenPushDouble, pSelf->value.asNum.dVal, pSelf->value.asNum.bWidth, pSelf->value.asNum.bDec );
          else
             HB_EXPR_PCODE1( hb_compGenPushLong, pSelf->value.asNum.lVal );
+         break;
+      case HB_EA_POP_PCODE:
+         break;
+      case HB_EA_PUSH_POP:
+      case HB_EA_STATEMENT:
+         hb_compWarnMeaningless( pSelf );
+      case HB_EA_DELETE:
+         break;
+   }
+   return pSelf;
+}
+
+/* actions for HB_ET_DATE expression
+ */
+static HB_EXPR_FUNC( hb_compExprUseDate )
+{
+   switch( iMessage )
+   {
+      case HB_EA_REDUCE:
+         break;
+      case HB_EA_ARRAY_AT:
+         hb_compErrorType( pSelf );
+         break;
+      case HB_EA_ARRAY_INDEX:
+         break;
+      case HB_EA_LVALUE:
+         hb_compErrorLValue( pSelf );
+         break;
+      case HB_EA_PUSH_PCODE:
+         #if defined( HB_MACRO_SUPPORT )
+            hb_compGenPushDate( pSelf->value.asDate.date, pSelf->value.asDate.time, pSelf->value.asDate.type, HB_MACRO_PARAM );
+         #else
+            hb_compGenPushDate( pSelf->value.asDate.date, pSelf->value.asDate.time, pSelf->value.asDate.type );
+         #endif
          break;
       case HB_EA_POP_PCODE:
          break;
@@ -1756,6 +1793,89 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_XFREE( pReduced );
                   }
                }
+#if 1
+               else if( strcmp( "STOD", pName->value.asSymbol ) == 0 &&
+                        usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
+               {
+                  /* try to change it into a date */
+                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+                  int iDate = 0;
+                  BOOL bEmpty = ( pArg->ulLength == 0 );
+
+                  //printf( "Optimizing STOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
+
+                  if( !bEmpty )
+                  {
+                     ULONG i;
+                     bEmpty = TRUE;
+                     for ( i=0;i<pArg->ulLength;i++)
+                     {
+                        if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
+                        {
+                           bEmpty = FALSE;
+                           break;
+                        }
+                     }
+                  }
+
+                  //printf( "Optimizing STOD: bEmpty=%d\n", bEmpty );
+                  if( !bEmpty )
+                  {
+                     //printf( "Optimizing STOD: using hb_dateEncStr( %s )\n",pArg->value.asString.string );
+                     iDate = (int) hb_dateEncStr( pArg->value.asString.string );
+                  }
+                  //printf( "Optimizing STOD: Optimized value=%d\n", iDate );
+
+                  pReduced = hb_compExprNewDateTimeVal( iDate, 0, HB_ET_DDATE );
+
+                  //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+
+                  //pSelf = pReduced;
+                  memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                  HB_XFREE( pReduced );
+                  break;
+               }
+               else if( strcmp( "CTOD", pName->value.asSymbol ) == 0 && 
+                       usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
+               {
+                  /* try to change it into a date */
+                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+                  BOOL bEmpty = ( pArg->ulLength == 0 );
+                  //printf( "Optimizing CTOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
+
+                  if( !bEmpty )
+                  {
+                     ULONG i;
+                     bEmpty = TRUE;
+                     for ( i=0;i<pArg->ulLength;i++)
+                     {
+                        if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
+                        {
+                           bEmpty = FALSE;
+                           break;
+                        }
+                     }
+                  }
+                  //printf( "Optimizing CTOD: bEmpty=%d\n", bEmpty );
+
+                  if( bEmpty )
+                  {
+                     //printf( "Optimizing CTOD: using 0\n" );
+                     pReduced = hb_compExprNewDateTimeVal( 0, 0, HB_ET_DDATE );
+
+                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
+
+                     //pSelf = pReduced;
+                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
+                     HB_XFREE( pReduced );
+                     break;
+                  }
+               }
+#endif
                else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && usCount )
                {
                   HB_EXPR_PTR pBlock = pParms->value.asList.pExprList;

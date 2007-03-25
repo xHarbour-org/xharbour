@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.149 2007/03/04 13:37:51 druzus Exp $
+ * $Id: harbour.c,v 1.150 2007/03/21 10:15:51 marchuet Exp $
  */
 
 /*
@@ -106,6 +106,7 @@
 #include "hbi18n.h"
 #include "hbexemem.h"
 #include "hbmemory.ch"
+#include "hbdate.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
    #include <limits.h>
@@ -4145,6 +4146,37 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
    }
 
    return pBuffer;
+}
+
+/* generates the pcode to push a date on the virtual machine stack */
+void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType )
+{
+   BYTE pBuffer[sizeof( UINT32 ) + sizeof( UINT32 ) + 1];
+   USHORT uLen;
+
+   switch ( uType )
+   {
+      case HB_ET_DDATE:
+      {
+        pBuffer[0] = HB_P_PUSHDATE;
+        HB_PUT_LE_UINT32( (pBuffer + 1), lDate );
+        uLen = 1 + sizeof( UINT32 );
+        break;
+      }
+      case HB_ET_DDATETIME:
+      {
+        pBuffer[0] = HB_P_PUSHDATETIME;
+        HB_PUT_LE_UINT32( (pBuffer + 1), lDate );
+        HB_PUT_LE_UINT32( (pBuffer + 5), lTime );
+        uLen = sizeof( UINT32 ) + sizeof( UINT32 ) + 1;
+        break;
+      }
+      default :
+        pBuffer[0] = 0;
+        uLen = 2;
+   }
+
+   hb_compGenPCodeN( pBuffer, uLen, 1 );
 }
 
 /* generates the pcode to push a string on the virtual machine stack */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbdead.c,v 1.5 2007/02/26 22:04:06 enricomaria Exp $
+ * $Id: hbdead.c,v 1.6 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -468,7 +468,9 @@ static PHB_CODETRACE_FUNC s_codeTraceFuncTable[ HB_P_LAST_PCODE ] =
    hb_p_default,               /* HB_P_ENDFINALLY,           */
    hb_p_default,               /* HB_P_LOCALNEARADD          */
    hb_p_default,               /* HB_P_ARRAYPUSHREF          */
-   hb_p_default                /* HB_P_ARRAYPOPPLUS          */
+   hb_p_default,               /* HB_P_ARRAYPOPPLUS          */
+   hb_p_default,               /* HB_P_PUSHDATETIME          */
+   hb_p_default                /* HB_P_PUSHDATE              */
 };
 
 void hb_compCodeTraceMarkDead( PFUNCTION pFunc )

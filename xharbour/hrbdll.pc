@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.31 2007/03/02 01:26:29 modalsist Exp $
+# $Id: hrbdll.pc,v 1.32 2007/03/11 00:17:26 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -172,7 +172,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\colorind.obj \
    $(OBJ_DIR)\copyfile.obj \
    $(OBJ_DIR)\datec.obj \
-   $(OBJ_DIR)\dates.obj \
    $(OBJ_DIR)\dateshb.obj \
    $(OBJ_DIR)\dbf2txt.obj \
    $(OBJ_DIR)\defpath.obj \
@@ -748,7 +747,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\console.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\copyfile.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\datec.obj      >> make_tmp
-   $(ECHO) $(OBJ_DIR)\dates.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\dateshb.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbf2txt.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\defpath.obj    >> make_tmp
@@ -1430,9 +1428,6 @@ $(OBJ_DIR)\datec.obj : $(RTL_DIR)\datec.c
    $(CC_CMD)
 
 $(OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\dates.obj : $(RTL_DIR)\dates.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c

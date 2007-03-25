@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.135 2006/09/06 22:26:32 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.136 2007/01/09 22:05:23 druzus Exp $
  */
 
 /*
@@ -76,6 +76,22 @@
  *
  * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
  *    hb_itemStr(), hb_itemString(), and hb_itemValToStr().
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *    hb_itemGetDTS()
+ *    hb_itemGetT()
+ *    hb_itemGetTsec()
+ *    hb_itemGetDTsec()
+ *    hb_itemGetDTD()
+ *    hb_itemGetDTL()
+ *    hb_itemGetD()
+ *    hb_itemGetDT()
+ *    hb_itemPutDTS()
+ *    hb_itemPutDT()
+ *    hb_itemPutDTL()
+ *    hb_itemPutDTD()
+ *    hb_itemPutDTsec()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -331,6 +347,23 @@ char HB_EXPORT * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
    }
 }
 
+/* NOTE: The correct buffer size is 19 bytes: char szDate[ 19 ]
+         [walter negro] */
+
+char HB_EXPORT * hb_itemGetDTS( PHB_ITEM pItem, char * szDateTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTS(%p, %s)", szDateTime));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      return hb_datetimeDecStr( szDateTime, pItem->item.asDate.value, pItem->item.asDate.time );
+   }
+   else
+   {
+      return hb_datetimeDecStr( szDateTime, 0, 0 );
+   }
+}
+
 LONG HB_EXPORT hb_itemGetDL( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDL(%p)", pItem));
@@ -342,6 +375,114 @@ LONG HB_EXPORT hb_itemGetDL( PHB_ITEM pItem )
    else
    {
       return 0;
+   }
+}
+
+LONG HB_EXPORT hb_itemGetT( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetT(%p)", pItem));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      return pItem->item.asDate.time;
+   }
+   else
+   {
+      return 0;
+   }
+}
+
+double HB_EXPORT hb_itemGetTsec( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetTsec(%p)", pItem));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      return hb_timeL2Sec( pItem->item.asDate.time );
+   }
+   else
+   {
+      return 0.0;
+   }
+}
+
+double HB_EXPORT hb_itemGetDTsec( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTsec(%p)", pItem));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      return hb_datetimePackInSec( pItem->item.asDate.value, pItem->item.asDate.time );
+   }
+   else
+   {
+      return 0;
+   }
+}
+
+double HB_EXPORT hb_itemGetDTD( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTD(%p)", pItem));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      return hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+   }
+   else
+   {
+      return 0;
+   }
+}
+
+void HB_EXPORT hb_itemGetDTL( PHB_ITEM pItem, LONG * plDate, LONG * plTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDT2L(%p,%p,%p)", pItem,plDate,plTime));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      if( plDate  ) *plDate = pItem->item.asDate.value;
+      if( plTime  ) *plTime = pItem->item.asDate.time;
+   }
+   else
+   {
+      if( plDate  ) *plDate = 0;
+      if( plTime  ) *plTime = 0;
+   }
+}
+
+void HB_EXPORT hb_itemGetD( PHB_ITEM pItem, int * piYear, int * piMonth, int * piDay )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetD(%p,%p,%p,%p)", pItem,piYear,piMonth,piDay));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      hb_dateDecode( pItem->item.asDate.value, piYear, piMonth, piDay );
+   }
+   else
+   {
+      if( piYear  ) *piYear  = 0;
+      if( piMonth ) *piMonth = 0;
+      if( piDay   ) *piDay   = 0;
+   }
+}
+
+void HB_EXPORT hb_itemGetDT( PHB_ITEM pItem, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMin, double * pdSec )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDT(%p,%p,%p,%p,%p,%p,%p)", pItem,piYear,piMonth,piDay,piHour,piMin,pdSec));
+
+   if( pItem && HB_IS_DATE( pItem ) )
+   {
+      hb_dateDecode( pItem->item.asDate.value, piYear, piMonth, piDay );
+      hb_timeDecode( pItem->item.asDate.time, piHour, piMin, pdSec );
+   }
+   else
+   {
+      if( piYear  ) *piYear  = 0;
+      if( piMonth ) *piMonth = 0;
+      if( piDay   ) *piDay   = 0;
+      if( piHour  ) *piHour  = 0;
+      if( piMin   ) *piMin   = 0;
+      if( pdSec   ) *pdSec   = 0;
    }
 }
 
@@ -394,7 +535,14 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
             return ( double ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-            return ( double ) pItem->item.asDate.value;
+            if( pItem->item.asDate.time == 0 )
+            {
+               return ( double ) pItem->item.asDate.value;
+            }
+            else
+            {
+               return ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+            }
 
          case HB_IT_LOGICAL:
             return ( double ) pItem->item.asLogical.value;
@@ -435,8 +583,16 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
          break;
 
       case HB_IT_DATE:
-         dNumber = (double) pItem->item.asDate.value;
-         *piDec = 0;
+         if( pItem->item.asDate.time == 0 )
+         {
+            dNumber = (double) pItem->item.asDate.value;
+            *piDec = 0;
+         }
+         else
+         {
+            dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
+            *piDec = 255;
+         }         
          break;
 
       case HB_IT_STRING:
@@ -583,7 +739,30 @@ PHB_ITEM HB_EXPORT hb_itemPutDS( PHB_ITEM pItem, const char * szDate )
    }
 
    pItem->type = HB_IT_DATE;
+   pItem->item.asDate.time  = 0;
    pItem->item.asDate.value = hb_dateEncStr( szDate );
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutDTS( PHB_ITEM pItem, const char * szDateTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDTS(%p, %s)", pItem, szDateTime));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DATE;
+   hb_datetimeEncStr( szDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
 
    return pItem;
 }
@@ -606,7 +785,31 @@ PHB_ITEM HB_EXPORT hb_itemPutD( PHB_ITEM pItem, int iYear, int iMonth, int iDay 
    }
 
    pItem->type = HB_IT_DATE;
+   pItem->item.asDate.time  = 0;
    pItem->item.asDate.value = hb_dateEncode( iYear, iMonth, iDay );
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutDT( PHB_ITEM pItem, int iYear, int iMonth, int iDay, int iHour, int iMin, double dSec, int iAmPm )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDT(%p, %04i, %02i, %02i, %02i, %02i, %f, %d)", pItem, iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DATE;
+   hb_datetimeEncode( &pItem->item.asDate.value, &pItem->item.asDate.time,
+                     iYear, iMonth, iDay, iHour, iMin, dSec, iAmPm, NULL );
 
    return pItem;
 }
@@ -629,8 +832,76 @@ PHB_ITEM HB_EXPORT hb_itemPutDL( PHB_ITEM pItem, LONG lJulian )
    }
 
    pItem->type = HB_IT_DATE;
+   pItem->item.asDate.time  = 0;
    pItem->item.asDate.value = lJulian;
 
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutDTL( PHB_ITEM pItem, LONG lDate, LONG lTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDTL(%p, %l, %l)", pItem, lDate, lTime));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DATE;
+   pItem->item.asDate.value = lDate;
+   pItem->item.asDate.time  = lTime%(86400*HB_DATETIMEINSEC);
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDTsec(%p, %f)", pItem, dDateTime));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DATE;
+   hb_datetimeUnpack( dDateTime / 86400, &pItem->item.asDate.value, &pItem->item.asDate.time );
+
+   return pItem;
+}
+
+PHB_ITEM HB_EXPORT hb_itemPutDTD( PHB_ITEM pItem, double dDateTime )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPutDTD(%p, %f)", pItem, dDateTime));
+
+   if( pItem )
+   {
+      if( HB_IS_COMPLEX( pItem ) )
+      {
+         hb_itemClear( pItem );
+      }
+   }
+   else
+   {
+      pItem = hb_itemNew( NULL );
+   }
+
+   pItem->type = HB_IT_DATE;
+   hb_datetimeUnpack( dDateTime, &pItem->item.asDate.value, &pItem->item.asDate.time );
 
    return pItem;
 }
@@ -1349,7 +1620,7 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       iDot = 0;
    }
 
-   if( HB_IS_DOUBLE( pNumber ) )
+   if( HB_IS_DOUBLE( pNumber ) || HB_IS_DATETIME( pNumber ) )
    {
       double dNumber = hb_itemGetND( pNumber );
 
@@ -1715,6 +1986,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          break;
 
       case HB_IT_DATE:
+         if( pItem->item.asDate.time == 0 )
          {
             char szDate[ 9 ];
 
@@ -1722,6 +1994,18 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
             buffer = ( char * ) hb_xgrab( 11 );
             hb_dateFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT );
+            * ulLen = strlen( buffer );
+            * bFreeReq = TRUE;
+         }
+         else
+         {
+            char digit, szDate[ 19 ];
+            USHORT n;
+            buffer = ( char * ) hb_xgrab( 26 );
+      
+            hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
+            hb_datetimeFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT );
+
             * ulLen = strlen( buffer );
             * bFreeReq = TRUE;
          }

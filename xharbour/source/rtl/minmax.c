@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.7 2004/11/21 21:44:19 druzus Exp $
+ * $Id: minmax.c,v 1.8 2005/03/31 03:58:52 druzus Exp $
  */
 
 /*
@@ -48,6 +48,9 @@
  * whether to permit this exception to apply to your modifications.
  * If you do not wish that, delete this exception notice.
  *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  */
 
 #include "hbapi.h"
@@ -63,7 +66,12 @@ HB_FUNC( MAX )
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      hb_retdl( p1->item.asDate.value >= p2->item.asDate.value ? p1->item.asDate.value : p2->item.asDate.value );
+      register LONG ld1 = p1->item.asDate.value;
+      register LONG ld2 = p1->item.asDate.value;
+      if( ld1 > ld2 || ( ld1 == ld2 && p1->item.asDate.time >= p2->item.asDate.time ) )
+         hb_itemReturn( p1 );
+      else
+         hb_itemReturn( p2 );
    }
    else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {
@@ -134,7 +142,12 @@ HB_FUNC( MIN )
    // Must precede HB_IS_NUMERIC() because DATE is also NUMERIC.
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
-      hb_retdl( p1->item.asDate.value <= p2->item.asDate.value ? p1->item.asDate.value : p2->item.asDate.value );
+      register LONG ld1 = p1->item.asDate.value;
+      register LONG ld2 = p1->item.asDate.value;
+      if( ld1 < ld2 || ( ld1 == ld2 && p1->item.asDate.time <= p2->item.asDate.time ) )
+         hb_itemReturn( p1 );
+      else
+         hb_itemReturn( p2 );
    }
    else if ( HB_IS_DATE( p1 ) || HB_IS_DATE( p2 ) )
    {

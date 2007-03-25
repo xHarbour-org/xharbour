@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.120 2006/06/30 04:22:33 ronpinkas Exp $
+ * $Id: memvars.c,v 1.121 2007/02/27 15:59:41 druzus Exp $
  */
 
 /*
@@ -69,6 +69,10 @@
  * Copyright 2004 Peter Rees <peter@rees.co.nz>
  *    HB_FUNC( __MVSYMBOLINFO )
  *    static HB_DYNS_FUNC( hb_GetSymbolInfo )
+ *
+ * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
+ *    Support DateTime
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -1934,6 +1938,19 @@ static HB_DYNS_FUNC( hb_memvarSave )
             hb_fsWrite( fhnd, buffer, uMLen );
             hb_fsWrite( fhnd, ( BYTE * ) pItem->item.asString.value, uiLength );
          }
+         else if( HB_IS_DATETIME( pItem ) )
+         {
+            BYTE byNum[ sizeof( double ) ];
+
+            buffer[ uMemLen + 1 ] = 'T' + 128;
+            buffer[ uMemLen + 6 ] = 1;
+            buffer[ uMemLen + 7 ] = 0;
+
+            HB_PUT_LE_DOUBLE( byNum, ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time ) );
+
+            hb_fsWrite( fhnd, buffer, uMLen );
+            hb_fsWrite( fhnd, byNum, sizeof( byNum ) );
+         }
          else if( HB_IS_DATE( pItem ) )
          {
             BYTE byNum[ sizeof( double ) ];
@@ -2214,6 +2231,22 @@ HB_FUNC( __MVRESTORE )
                   break;
                }
 
+               case 'T':
+               {
+                  BYTE pbyNumber[ HB_MEM_NUM_LEN ];
+
+                  if( hb_fsRead( fhnd, pbyNumber, HB_MEM_NUM_LEN ) == HB_MEM_NUM_LEN )
+                  {
+                     hb_itemPutDTD( &Item, HB_GET_LE_DOUBLE( pbyNumber ) );
+                  }
+                  else
+                  {
+                     hb_errInternal( 9100, "Restore failed for: '%s'\n", hb_itemGetCPtr( &Name ), NULL );
+                  }
+
+                  break;
+               }
+
                case 'L':
                {
                   BYTE pbyLogical[ 1 ];
@@ -2235,7 +2268,7 @@ HB_FUNC( __MVRESTORE )
                   char szType[6];
 
                   sprintf( szType, "%i", uiType );
-                  hb_errInternal( 9100, "Restore failed, unsupported type: %i for: '%s'\n", szType, hb_itemGetCPtr( &Name ) );
+                  hb_errInternal( 9100, "Restore failed, unsupported type: %s for: '%s'\n", szType, hb_itemGetCPtr( &Name ) );
                   hb_itemClear( &Item );
                }
             }

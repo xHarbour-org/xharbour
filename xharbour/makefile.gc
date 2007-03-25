@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.27 2006/10/15 17:50:34 ptsarenko Exp $
+# $Id: makefile.gc,v 1.28 2006/11/09 16:41:09 marchuet Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2566,7 +2566,6 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/console.o \
    $(RTL_OBJ_DIR)/copyfile.o \
    $(RTL_OBJ_DIR)/datec.o \
-   $(RTL_OBJ_DIR)/dates.o \
    $(RTL_OBJ_DIR)/dateshb.o \
    $(RTL_OBJ_DIR)/defpath.o \
    $(RTL_OBJ_DIR)/descend.o \
@@ -2873,9 +2872,6 @@ $(RTL_OBJ_DIR)/datec.o : $(RTL_DIR)/datec.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/datehb.o : $(RTL_DIR)/datehb.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/dates.o : $(RTL_DIR)/dates.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/dateshb.o : $(RTL_DIR)/dateshb.c

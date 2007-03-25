@@ -1,5 +1,5 @@
 /*
- * $Id: set.ch,v 1.17 2005/03/06 23:43:20 andijahja Exp $
+ * $Id: set.ch,v 1.18 2005/07/04 12:20:45 likewolf Exp $
  */
 
 /*
@@ -134,8 +134,9 @@
 #define _SET_FORCEOPT        117 /* Harbour extension */
 #define _SET_EOL             118 /* Harbour extension */
 #define _SET_ERRORLOG        119 /* Harbour extension */
+#define _SET_TIMEFORMAT      120 /* Harbour extension */
 
 #define HB_SET_BASE        100
-#define HB_SET_COUNT       20
+#define HB_SET_COUNT       21
 
 #endif /* _SET_CH */

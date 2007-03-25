@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.8 2006/05/19 00:44:36 druzus Exp $
+ * $Id: gencc.c,v 1.9 2006/05/30 10:51:23 druzus Exp $
  */
 
 /*
@@ -1727,6 +1727,27 @@ static HB_GENC_FUNC( hb_p_endblock )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_pushdatetime )
+{
+   LONG lVal1 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 1 ] );
+   LONG lVal2 = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 5 ] );
+
+   HB_GENC_LABEL();
+
+   fprintf( cargo->yyc, "\thb_xvmPushDateTime( %d, %d );\n", lVal1, lVal2 );
+   return 9;
+}
+
+static HB_GENC_FUNC( hb_p_pushdate )
+{
+   LONG lVal = HB_PCODE_MKLONG( &pFunc->pCode[ lPCodePos + 1 ] );
+
+   HB_GENC_LABEL();
+
+   fprintf( cargo->yyc, "\thb_xvmPushDate( %d );\n", ( long ) lVal );
+   return 5;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -1903,7 +1924,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_endfinally,
    hb_p_localnearadd,
    hb_p_arraypushref,
-   hb_p_arraypopplus
+   hb_p_arraypopplus,
+   hb_p_pushdatetime,
+   hb_p_pushdate
 };
 
 void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )

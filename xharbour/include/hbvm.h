@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.48 2007/02/15 21:22:00 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.49 2007/02/26 03:18:27 ronpinkas Exp $
  */
 
 /*
@@ -138,6 +138,7 @@ HB_EXPORT extern void    hb_vmPushDouble( double lNumber, int iDec ); /* pushes 
 HB_EXPORT extern void    hb_vmPushLogical( BOOL bValue );    /* pushes a logical value onto the stack */
 HB_EXPORT extern void    hb_vmPushString( const char * szText, ULONG length );  /* pushes a string on to the stack */
 HB_EXPORT extern void    hb_vmPushDate( LONG lDate );   /* pushes a LONG date onto the stack */
+HB_EXPORT extern void    hb_vmPushDateTime( LONG lDate, LONG lTime );   /* pushes a datetime onto the stack */
 HB_EXPORT extern void    hb_vmPushSymbol( PHB_SYMB pSym ); /* pushes a function pointer onto the stack */
 HB_EXPORT extern void    hb_vmPushDynSym( PHB_DYNS pDynSym ); /* pushes a function/method pointer onto the stack */
 HB_EXPORT extern void    hb_vmPushEvalSym( void ); /* pushes a codeblock eval symbol onto the stack */

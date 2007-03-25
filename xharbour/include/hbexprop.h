@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.17 2005/11/03 06:54:58 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.18 2006/07/09 18:11:31 ronpinkas Exp $
  */
 
 /*
@@ -63,14 +63,15 @@ HB_EXTERN_BEGIN
 #define  HB_EV_UNKNOWN     0
 #define  HB_EV_NIL         1
 #define  HB_EV_NUMERIC     2
-#define  HB_EV_STRING      4
-#define  HB_EV_CODEBLOCK   8
-#define  HB_EV_LOGICAL     16
-#define  HB_EV_OBJECT      32
-#define  HB_EV_ARRAY       64
-#define  HB_EV_SYMBOL      128
-#define  HB_EV_VARREF      256
-#define  HB_EV_FUNREF      512
+#define  HB_EV_DATE        4
+#define  HB_EV_STRING      8
+#define  HB_EV_CODEBLOCK   16
+#define  HB_EV_LOGICAL     32
+#define  HB_EV_OBJECT      64
+#define  HB_EV_ARRAY       128
+#define  HB_EV_SYMBOL      256
+#define  HB_EV_VARREF      512
+#define  HB_EV_FUNREF      1024
 
 /* messages sent to expressions
  */
@@ -116,6 +117,7 @@ typedef enum
    HB_ET_EXTBLOCK,
    HB_ET_NIL,
    HB_ET_NUMERIC,
+   HB_ET_DATE,
    HB_ET_STRING,
    HB_ET_CODEBLOCK,
    HB_ET_LOGICAL,
@@ -183,6 +185,12 @@ typedef struct HB_EXPR_
    {
       char *asSymbol;      /* variable name */
       BOOL asLogical;      /* logical value */
+      struct
+      {
+         USHORT type;     /* type of datetime */
+         LONG date;       /* date value */
+         LONG time;       /* time value */
+      } asDate;
       struct
       {
          char *string;      /* literal strings */
@@ -320,6 +328,9 @@ HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );
 HB_EXPR_PTR hb_compExprNewLong( HB_LONG );
 HB_EXPR_PTR hb_compExprNewString( char * );
 HB_EXPR_PTR hb_compExprNewLogical( int );
+HB_EXPR_PTR hb_compExprNewDate( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR );
+HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, int, int * );
+HB_EXPR_PTR hb_compExprNewDateTimeVal( LONG, LONG, USHORT );
 HB_EXPR_PTR hb_compExprNewSelf( void );
 HB_EXPR_PTR hb_compExprNewCodeBlock( void );
 HB_EXPR_PTR hb_compExprNewArray( HB_EXPR_PTR );

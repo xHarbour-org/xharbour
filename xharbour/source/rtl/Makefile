@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.70 2006/11/30 00:57:08 likewolf Exp $
+# $Id: Makefile,v 1.71 2007/02/27 15:59:40 druzus Exp $
 #
 
 ROOT = ../../
@@ -23,7 +23,6 @@ C_SOURCES=\
         console.c    \
         copyfile.c   \
         datec.c      \
-        dates.c      \
         dateshb.c    \
         dbf2txt.c    \
         defpath.c    \
