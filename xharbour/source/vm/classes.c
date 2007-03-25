@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.198 2007/01/12 15:43:47 ronpinkas Exp $
+ * $Id: classes.c,v 1.199 2007/01/13 01:36:32 ronpinkas Exp $
  */
 
 /*
@@ -3936,11 +3936,9 @@ USHORT hb_clsMaxClasses( void )
 HB_FUNC( __CLS_PARAM )
 {
    HB_THREAD_STUB_API
-   HB_ITEM Array;
+   HB_ITEM_NEW( Array );
    USHORT uiParam = ( USHORT ) hb_pcount();
    USHORT n;
-
-   Array.type = HB_IT_NIL;
 
    if( uiParam >= 1 )
    {

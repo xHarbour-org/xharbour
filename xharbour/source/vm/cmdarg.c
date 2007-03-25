@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.20 2006/03/10 15:32:20 druzus Exp $
+ * $Id: cmdarg.c,v 1.21 2006/03/15 06:40:45 ronpinkas Exp $
  */
 
 /*
@@ -59,8 +59,9 @@
 #include "hbmemory.ch"
 
 /* Command line argument management */
+static char *argv = "";
 static int     s_argc = 0;
-static char ** s_argv = NULL;
+static char ** s_argv = &argv;
 
 #if defined( HB_OS_WIN_32 ) && defined( HB_OS_WIN_32_USED )
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.241 2007/03/04 13:37:51 druzus Exp $
+ * $Id: ppcore.c,v 1.242 2007/03/16 03:37:16 ronpinkas Exp $
  */
 
 /*
@@ -3142,7 +3142,11 @@ static BOOL hb_pp_tokenSkipExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_TOKEN pStop,
 
 static BOOL hb_pp_tokenCanStartExp( PHB_PP_TOKEN pToken )
 {
-   if( !HB_PP_TOKEN_NEEDLEFT( pToken ) )
+   if( HB_PP_TOKEN_NEEDLEFT( pToken ) || HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EOC )
+   {
+      return FALSE;
+   }
+   else
    {
       if( HB_PP_TOKEN_TYPE( pToken->type ) != HB_PP_TOKEN_LEFT_SB )
          return TRUE;
@@ -5349,7 +5353,7 @@ void hb_pp_tokenUpper( PHB_PP_TOKEN pToken )
       hb_strupr( pToken->value );
 }
 
-#if 0 
+#if 0
 /*
  * convert tokens between '[' and ']' tokens into single string token
  * and replace the converted tokens with the new string

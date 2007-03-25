@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5396 2007/03/21 10:15:50 marchuet Exp $
+ * $Id: ChangeLog,v 1.5397 2007/03/21 11:26:21 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-24 19:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/pp/ppcore.c
+    * Corrected hb_pp_tokenCanStartExp() to return FALSE for inline seperator ';'
+  * source/vm/classes.c
+    * Minor cleanup
+  * source/vm/cmdarg.c
+    * Corrected possible GPF trap f.e. when VM is loaded as a stand alone DLL
 
 2007-03-21 12:00 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * config/global.cf
@@ -19,7 +27,7 @@
   * source/compiler/harbour.sly
   * source/compiler/hbusage.c
     - eliminate compiler flag -roff (reserved off).
-    
+
 2007-03-20 07:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/set.c
     * restored hb_set.HB_SET_APPENDERROR = FALSE to default behavior.
@@ -42,7 +50,7 @@
   * source/rtl/set.c
     * changed hb_set.HB_SET_APPENDERROR = TRUE by default to generate the
       error.log in append mode instead create new one for each runtime error,
-      at this way we will have a historic of all errors. 
+      at this way we will have a historic of all errors.
 
   * source/rtl/errorsys.prg
     * changes in LogError() function:
