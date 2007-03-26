@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.2 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbdate.c,v 1.3 2007/03/26 00:24:05 walito Exp $
  */
 
 /*
@@ -581,7 +581,7 @@ char HB_EXPORT * hb_timeFormat( const char * szTime, char * szFormattedTime, con
                szFormattedTime[ format_count ] = digit;
                pos_pm = format_count++;
                break;
-             
+
             default:
                while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
          }
@@ -783,10 +783,10 @@ void HB_EXPORT hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double *
 
    if( lTime > 0 )
    {
-      div_t result = div( lTime, ( 3600 * HB_DATETIMEINSEC ) );
+      div_t result = div( (int) lTime, (int) ( 3600 * HB_DATETIMEINSEC ) );
       iHour  = result.quot;
       lTime  = result.rem;
-      result = div( lTime, ( 60 * HB_DATETIMEINSEC ) );
+      result = div( (int) lTime, (int) ( 60 * HB_DATETIMEINSEC ) );
       iMin   = result.quot;
       lTime  = result.rem;
       dSec   = ( double ) lTime  / HB_DATETIMEINSEC;
@@ -999,9 +999,9 @@ void hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime )
 double hb_comp_datetimeEncStr( const char * szDateTime )
 {
    LONG lDate, lTime;
-   
+
    hb_datetimeEncStr( szDateTime, &lDate, &lTime );
-   
+
    return hb_datetimePack( lDate, lTime );
 }
 

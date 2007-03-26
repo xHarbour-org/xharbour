@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.605 2007/03/25 06:12:50 walito Exp $
+ * $Id: hvm.c,v 1.606 2007/03/26 00:24:05 walito Exp $
  */
 
 /*
@@ -7824,7 +7824,7 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
    {
       if( pDate->item.asDate.time != 0 || pOther->item.asDate.time != 0 )
       {
-         div_t result = div( pDate->item.asDate.time + pOther->item.asDate.time, (86400 * HB_DATETIMEINSEC) );
+         div_t result = div( (int) ( pDate->item.asDate.time + pOther->item.asDate.time ), (int) (86400 * HB_DATETIMEINSEC) );
          lTime = result.rem;
          lDate = pDate->item.asDate.value + pOther->item.asDate.value + result.quot;
       }
@@ -7837,14 +7837,14 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
    else if( HB_IS_NUMINT( pOther ) )
    {
       lTime = pDate->item.asDate.time;
-      lDate = pDate->item.asDate.value + hb_itemGetNL( pOther ); 
+      lDate = pDate->item.asDate.value + hb_itemGetNL( pOther );
    }
    else if( HB_IS_NUMERIC( pOther ) )
    {
       double dDate;
       div_t result;
 
-      lTime = pDate->item.asDate.time + 
+      lTime = pDate->item.asDate.time +
               (LONG) (modf( hb_itemGetND( pOther ), &dDate ) * (double)(86400 * HB_DATETIMEINSEC));
 
       if( lTime < 0 )
@@ -7853,7 +7853,7 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
          dDate -= 1;
       }
 
-      result = div( lTime, (86400 * HB_DATETIMEINSEC) );
+      result = div( (int) lTime, (int) (86400 * HB_DATETIMEINSEC) );
       lTime  = result.rem;
       lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
    }
@@ -7892,8 +7892,8 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
    {
       double dDate;
       div_t result;
-      
-      lTime = pDate->item.asDate.time - 
+
+      lTime = pDate->item.asDate.time -
               (LONG) (modf( hb_itemGetND( pOther ), &dDate ) * (double)(86400 * HB_DATETIMEINSEC));
 
       if( lTime < 0 )
@@ -7902,7 +7902,7 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
          dDate -= 1;
       }
 
-      result = div( lTime, (86400 * HB_DATETIMEINSEC) );
+      result = div( (int) lTime, (int) (86400 * HB_DATETIMEINSEC) );
       lTime  = result.rem;
       lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
    }
