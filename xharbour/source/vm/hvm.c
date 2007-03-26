@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.604 2007/03/17 03:42:31 ronpinkas Exp $
+ * $Id: hvm.c,v 1.605 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -7806,8 +7806,6 @@ static void hb_vmSumDate( PHB_ITEM pItem1, PHB_ITEM pItem2, PHB_ITEM pResult )
 {
    PHB_ITEM pDate, pOther;
    LONG lDate, lTime;
-
-   HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmSumDate(%p,%p)", pItem1, pItem2));
 

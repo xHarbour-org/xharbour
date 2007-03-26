@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.136 2007/01/09 22:05:23 druzus Exp $
+ * $Id: itemapi.c,v 1.137 2007/03/25 06:12:51 walito Exp $
  */
 
 /*
@@ -1999,8 +1999,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          }
          else
          {
-            char digit, szDate[ 19 ];
-            USHORT n;
+            char szDate[ 19 ];
             buffer = ( char * ) hb_xgrab( 26 );
       
             hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );

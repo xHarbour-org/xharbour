@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.1 2007/02/27 19:21:36 druzus Exp $
+ * $Id: hbdate.c,v 1.2 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -575,15 +575,14 @@ char HB_EXPORT * hb_timeFormat( const char * szTime, char * szFormattedTime, con
                }
                used_c = TRUE;
                break;
-             }
+            }
 
-             case 'P':
+            case 'P':
                szFormattedTime[ format_count ] = digit;
                pos_pm = format_count++;
-               digit_count--;
                break;
              
-           default:
+            default:
                while( digit_count-- > 0 && format_count < size ) szFormattedTime[ format_count++ ] = digit;
          }
       }
@@ -812,9 +811,6 @@ void HB_EXPORT hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double *
 
 void HB_EXPORT hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds )
 {
-   int iHour = 0, iMin = 0;
-   double dSec = 0.0;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_timeDecode(%d, %p, %p %p)", dTime, piHour, piMinute, pdSeconds));
 
    if( dTime > 0 )
