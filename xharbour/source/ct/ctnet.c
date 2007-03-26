@@ -1,10 +1,10 @@
 /*
- * $Id: ctnet.c,v 1.6 2005/10/10 15:17:48 modalsist Exp $
+ * $Id: ctnet.c,v 1.7 2005/10/24 01:04:25 druzus Exp $
  *
  * xHarbour Project source code:
- * CT3 NET functions to PC-LAN/MS-NET.
+ * NET..() functions to PC-LAN/MS-NET.
  *
- * Copyright 2004 Eduardo Fernandes <eduardo@modalsistemas.com.br>
+ * Copyright 2004-2007 Eduardo Fernandes <modalsist@yahoo.com.br>
  * www - http://www.xharbour.org
  *
  *******
@@ -21,8 +21,8 @@
  * Not implemented yet.
  *
  * NETPRINTER() -> lSuccess
- * Return true if a current local printer seted by SET PRINTER TO was connected to a
- * network printer.
+ * Return true if a current local printer seted by SET PRINTER TO is redirected
+ * to a network printer.
  *
  * NETREDIR( cLocalDevice, cSharedDevice, [ cPassword ], [ lShowError] ) -> lSuccess
  * Return true if <cLocalDevice> was connected to <cSharedDevice> with <cPassword>, if any.
@@ -180,7 +180,21 @@ HB_FUNC ( NETCANCEL )
 
 HB_FUNC ( NETPRINTER )
 {
-   char *cPrn = hb_set.HB_SET_PRINTFILE ;  // query default local printer port.
+
+/*
+  2007/MAR/26 - E.F.
+  In xHarbour the default printer port is "PRN". Because "PRN" can't be
+  redirected to a network printer, NetPrinter() always will return false,
+  so I need treat PRN as LPT1.
+*/
+
+   // Query default printer port setted by user.
+   char *cPrn = hb_set.HB_SET_PRINTFILE;
+
+   if ( strlen( cPrn ) == 0 || strstr( cPrn, "PRN" ) != NULL )
+   {
+      strcpy( cPrn, "LPT1" );
+   }
 
    hb_retl( hb_IsNetShared( cPrn ) );
 }
