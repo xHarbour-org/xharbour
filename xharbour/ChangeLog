@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5403 2007/03/27 06:32:50 walito Exp $
+ * $Id: ChangeLog,v 1.5404 2007/03/27 14:23:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -15,7 +15,7 @@
 
   * source/compiler/harbour.slx
   * source/macro/macro.slx
-    * Corrected processing of new AM and PM tokens.
+    * Simplified processing of new AM and PM tokens.
 
   * tests/dates5.prg
     * Minor formating
