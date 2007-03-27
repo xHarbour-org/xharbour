@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.3 2007/03/26 00:24:05 walito Exp $
+ * $Id: hbdate.c,v 1.4 2007/03/26 15:25:17 ronpinkas Exp $
  */
 
 /*
@@ -495,7 +495,6 @@ char HB_EXPORT * hb_timeFormat( const char * szTime, char * szFormattedTime, con
                if( pos_pm && format_count-1 == pos_pm )
                {
                   used_pm = TRUE;
-                  digit_count--;
                   szFormattedTime[ format_count++ ] = 'M';
                   break;
                }

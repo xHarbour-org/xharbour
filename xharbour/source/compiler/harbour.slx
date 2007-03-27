@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.78 2007/03/03 01:24:58 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.79 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -256,6 +256,9 @@ SELF_CONTAINED_WORDS_ARE {
 
 #define HB_IIF_OPEN      LEX_CUSTOM_ACTION - 32
 
+#define HB_H12AM         LEX_CUSTOM_ACTION - 33
+#define HB_H12PM         LEX_CUSTOM_ACTION - 34
+
 #define USE_KEYWORDS
 
 /* Key Words. */
@@ -330,7 +333,7 @@ LANGUAGE_KEY_WORDS_ARE {
 LANGUAGE_WORDS_ARE {
                      LEX_WORD( "..."                              ) AS_TOKEN( EPSILON            + DONT_REDUCE ),
 
-                     LEX_WORD( "AM"                               ) AS_TOKEN( H12AM              ),
+                     LEX_WORD( "AM"                               ) AS_TOKEN( HB_H12AM           ),
                      LEX_WORD( "AS{WS}ANYTYPE"                    ) AS_TOKEN( AS_VARIANT         + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY"                      ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
                      LEX_WORD( "AS{WS}ARRAY{WS}OF{WS}ANYTYPE"     ) AS_TOKEN( AS_ARRAY           + DONT_REDUCE ),
@@ -374,7 +377,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),
                      LEX_WORD( "NIL"                              ) AS_TOKEN( NIL                + DONT_REDUCE ),
                      LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( OPTIONAL           ),
-                     LEX_WORD( "PM"                               ) AS_TOKEN( H12PM              ),
+                     LEX_WORD( "PM"                               ) AS_TOKEN( HB_H12PM           ),
 
                   /* LEX_WORD( "QSELF"                            ) AS_TOKEN( QSELF              ), */
 
@@ -1206,6 +1209,42 @@ static int hb_comp_SLX_CustomAction( int x )
               iWantsEXP = '$';
               return REJECT_OP;
            }
+
+      case HB_H12AM :
+         bIgnoreWords = FALSE;
+         if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
+             iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == CBMARKER || iLastToken == ',' ||
+             iLastToken == WANTS_ID ||
+             iLastToken == WITH ||
+             iLastToken == REJECT_OP ||
+             iLastToken == GET ||
+             IS_OP( iLastToken )
+           )
+         {
+            yylval.string = hb_compIdentifierNew( "AM", TRUE );
+            iIdentifier++;
+            DEBUG_INFO( printf( "HB_H12AM, Primary Identifier %s Increased to: %i\n", "AM", iIdentifier ) );
+            return IDENTIFIER;
+         }
+         return H12AM;
+
+      case HB_H12PM :
+         bIgnoreWords = FALSE;
+         if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
+             iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == CBMARKER || iLastToken == ',' ||
+             iLastToken == WANTS_ID ||
+             iLastToken == WITH ||
+             iLastToken == REJECT_OP ||
+             iLastToken == GET ||
+             IS_OP( iLastToken )
+           )
+         {
+            yylval.string = hb_compIdentifierNew( "PM", TRUE );
+            iIdentifier++;
+            DEBUG_INFO( printf( "HB_H12PM, Primary Identifier %s Increased to: %i\n", "PM", iIdentifier ) );
+            return IDENTIFIER;
+         }
+         return H12PM;
 
       case HB_WITH :
          bIgnoreWords = FALSE;
