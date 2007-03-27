@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5402 2007/03/26 21:40:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.5403 2007/03/27 06:32:50 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-27 10:22 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbset.h
+  * source/rtl/set.c
+    + Added missing HB_EXPORTs
+
+  * source/compiler/harbour.slx
+  * source/macro/macro.slx
+    * Corrected processing of new AM and PM tokens.
+
+  * tests/dates5.prg
+    * Minor formating
 
 2007-03-27 03:29 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
    * source/common/hbdate.c
@@ -16,7 +28,7 @@
 
 2007-03-26 18:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/ctnet.c
-    * fixed NetPrinter() to treat "PRN" as "LPT1".  
+    * fixed NetPrinter() to treat "PRN" as "LPT1".
 
 2007-03-26 11:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/common/hbdate.c

@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.74 2007/03/20 11:04:14 modalsist Exp $
+ * $Id: set.c,v 1.75 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -1709,7 +1709,7 @@ void hb_setInitialize( void )
    hb_set.HB_SET_TIMEFORMAT = ( char * ) hb_xgrab( 12 );
 
    memcpy( hb_set.HB_SET_TIMEFORMAT, "hh:mm:ss.cc", 12 );
-   
+
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
 
@@ -1760,7 +1760,7 @@ void hb_setRelease( void )
    hb_setFreeSetPath();
 }
 
-int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
+HB_EXPORT int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
 {
    PHB_SET_LISTENER p_sl = (PHB_SET_LISTENER) hb_xgrab( sizeof( HB_SET_LISTENER ) );
    p_sl->callback = callback;
@@ -1772,7 +1772,7 @@ int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * callback )
    return p_sl->listener;
 }
 
-void hb_setListenerNotify( HB_set_enum set, HB_set_listener_enum when )
+HB_EXPORT void hb_setListenerNotify( HB_set_enum set, HB_set_listener_enum when )
 {
    PHB_SET_LISTENER p_sl = sp_sl_first;
    while( p_sl )
@@ -1782,7 +1782,7 @@ void hb_setListenerNotify( HB_set_enum set, HB_set_listener_enum when )
    }
 }
 
-int hb_setListenerRemove( int listener )
+HB_EXPORT int hb_setListenerRemove( int listener )
 {
    PHB_SET_LISTENER p_sl = sp_sl_first;
    PHB_SET_LISTENER p_sl_prev = NULL;

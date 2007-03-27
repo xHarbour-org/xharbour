@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.27 2006/02/22 03:30:17 ronpinkas Exp $
+ * $Id: macro.slx,v 1.28 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -198,6 +198,11 @@
    #define IF_BELONG_LEFT(chr) if( iLastToken == IDENTIFIER || iLastToken == ']' || iLastToken == MACROVAR || iLastToken == MACROTEXT || iLastToken == ')' || \
                                    iLastToken == '}' || iLastToken == LITERAL || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || iLastToken == IIF )
 
+#define IS_NUM( x ) (                     \
+                      x == NUM_LONG    || \
+                      x == NUM_DOUBLE     \
+                    )
+
 static HB_MACRO_PTR pMacro;
 static YYSTYPE *pYYLVAL;
 
@@ -231,8 +236,7 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
                                      LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
                                      LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
-/*				     LEX_DELIMITER( '^' )  AS_TOKEN( POWER + DONT_REDUCE ), */
-				     LEX_DELIMITER( '^' )  AS_TOKEN( POWER ),
+                                     LEX_DELIMITER( '^' )  AS_TOKEN( POWER + DONT_REDUCE ),
                                      LEX_DELIMITER( '%'  ) AS_TOKEN( '%'   + DONT_REDUCE ),
                                      LEX_DELIMITER( '*'  ) AS_TOKEN( '*'   + DONT_REDUCE ),
                                      LEX_DELIMITER( '/'  ) AS_TOKEN( '/'   + DONT_REDUCE ),
@@ -241,10 +245,10 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '$'  ) AS_TOKEN( '$'   + DONT_REDUCE )
 				   };
 
-#define HB_AFTER_EXP     LEX_CUSTOM_ACTION - 2560 /* IN, LIKE, MATCH */
+#define HB_AFTER_EXP    LEX_CUSTOM_ACTION - 2560 /* IN, LIKE, MATCH */
 
 /* Intermediate Token, needs CustomAction. */
-#define HB_LIT_ACT    LEX_CUSTOM_ACTION - 2
+#define HB_LIT_ACT      LEX_CUSTOM_ACTION - 2
 
 /* Stream Pairs. */
 DEFINE_STREAM_AS_ONE_OF_THESE {
@@ -290,13 +294,16 @@ SELF_CONTAINED_WORDS_ARE {
 
 #define HB_FIELD_ALIAS  LEX_CUSTOM_ACTION - 4
 
+#define HB_H12AM        LEX_CUSTOM_ACTION - 5
+#define HB_H12PM        LEX_CUSTOM_ACTION - 6
+
 /* Words. */
 LANGUAGE_WORDS_ARE {
                      LEX_WORD( ".F."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
                      LEX_WORD( ".N."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
                      LEX_WORD( ".T."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
                      LEX_WORD( ".Y."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
-                     LEX_WORD( "AM"           ) AS_TOKEN( H12AM       ),
+                     LEX_WORD( "AM"           ) AS_TOKEN( HB_H12AM    ),
                   /* LEX_WORD( "FIELD"        ) AS_TOKEN( FIELD       ), */
                      LEX_WORD( "FIELD?WS?->"  ) AS_TOKEN( HB_FIELD_ALIAS     ),
                      LEX_WORD( "HAS"          ) AS_TOKEN( HB_AFTER_EXP - MATCH      ),
@@ -305,7 +312,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "IN"           ) AS_TOKEN( HB_AFTER_EXP - '$'        ),
                      LEX_WORD( "LIKE"         ) AS_TOKEN( HB_AFTER_EXP - LIKE       ),
                      LEX_WORD( "NIL"          ) AS_TOKEN( NIL        + DONT_REDUCE  ),
-                     LEX_WORD( "PM"           ) AS_TOKEN( H12PM       ),
+                     LEX_WORD( "PM"           ) AS_TOKEN( HB_H12PM    ),
                      LEX_WORD( "QSELF"        ) AS_TOKEN( QSELF       ),
                   /* LEX_WORD( "SELF"         ) AS_TOKEN( SELF        ), */
                   /* LEX_WORD( "_FIELD"       ) AS_TOKEN( FIELD       ),  */
@@ -313,11 +320,10 @@ LANGUAGE_WORDS_ARE {
                    };
 
 /* When reservered words are used as Identifier. */
-#define HB_MACRO_ERR      LEX_CUSTOM_ACTION - 5
+#define HB_MACRO_ERR    LEX_CUSTOM_ACTION - 7
 
-#define HB_ID_QSELF     LEX_CUSTOM_ACTION - 6
-#define HB_ID_IIF       LEX_CUSTOM_ACTION - 7
-
+#define HB_ID_QSELF     LEX_CUSTOM_ACTION - 8
+#define HB_ID_IIF       LEX_CUSTOM_ACTION - 9
 
 LANGUAGE_RULES_ARE {
 		    /* This _FIELD_ is NOT at BOL wants only ->. */
@@ -400,7 +406,7 @@ static int hb_macro_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             /* Maybe just the Macro Operator. */
             if( yyleng == 1 )
             {
-               if( iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+               if( IS_NUM( iLastToken ) || iLastToken == LITERAL ||
                    iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
                    iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
                {
@@ -510,7 +516,7 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
    {
       bIgnoreWords = FALSE;
 
-      if( iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
+      if( IS_NUM( iLastToken ) || iLastToken == LITERAL ||
           iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
           iLastToken == ')' || iLastToken == ']' || iLastToken == '}' ||
           iLastToken == FIELD || iLastToken == QSELF || iLastToken == IIF )
@@ -576,6 +582,28 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          aiHold[ (*ptr_iHold)++ ] = ':' + DONT_REDUCE ;
          pYYLVAL->string = hb_strdup( "SELF" );
          return IDENTIFIER + DONT_REDUCE ;
+
+      case HB_H12AM :
+         if( IS_NUM( iLastToken ) )
+         {
+            return H12AM + DONT_REDUCE;
+         }
+         else
+         {
+            pYYLVAL->string = hb_strdup( "AM" );
+            return IDENTIFIER + DONT_REDUCE;
+         }
+
+      case HB_H12PM :
+         if( IS_NUM( iLastToken ) )
+         {
+            return H12PM + DONT_REDUCE;
+         }
+         else
+         {
+            pYYLVAL->string = hb_strdup( "PM" );
+            return IDENTIFIER + DONT_REDUCE;
+         }
 
       case HB_MACRO_ERR :
 	 hb_macroError( EG_SYNTAX, YYLEX_PARAM );

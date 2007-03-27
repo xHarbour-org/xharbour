@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.35 2006/07/27 12:21:30 lculik Exp $
+ * $Id: hbset.h,v 1.36 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -255,9 +255,9 @@ typedef enum
 } HB_set_listener_enum;
 typedef void HB_SET_LISTENER_CALLBACK( HB_set_enum, HB_set_listener_enum );
 
-extern int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
-extern void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
-extern int hb_setListenerRemove( int );
+extern HB_EXPORT int hb_setListenerAdd( HB_SET_LISTENER_CALLBACK * );
+extern HB_EXPORT void hb_setListenerNotify( HB_set_enum, HB_set_listener_enum );
+extern HB_EXPORT int hb_setListenerRemove( int );
 
 #ifndef HB_SET_STACK
    #define HB_SET_STACK (*hb_GetSetStructPtr())

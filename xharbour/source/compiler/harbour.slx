@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.79 2007/03/25 06:12:49 walito Exp $
+ * $Id: harbour.slx,v 1.80 2007/03/27 06:32:50 walito Exp $
  */
 
 /*
@@ -89,6 +89,12 @@
                       x == LIKE || x == MATCH || x == STEP || x == TO || x == IN \
                    )
 
+#define IS_NUM( x ) (                     \
+                      x == NUM_INTEGER || \
+                      x == NUM_LONG    || \
+                      x == NUM_DOUBLE     \
+                    )
+
 static int iWantsEOL, iWantsEXP, iWantsID, iWantsVAR;
 
 static unsigned char iIdentifier = 0;
@@ -129,8 +135,7 @@ ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
                                      LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
                                      LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
-/*                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER + DONT_REDUCE ), */
-                                     LEX_DELIMITER( '^' ) AS_TOKEN( POWER ),
+                                     LEX_DELIMITER( '^' )  AS_TOKEN( POWER    + DONT_REDUCE ),
                                      LEX_DELIMITER( '%'  ) AS_TOKEN( '%'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '*'  ) AS_TOKEN( '*'      + DONT_REDUCE ),
                                      LEX_DELIMITER( '/'  ) AS_TOKEN( '/'      + DONT_REDUCE ),
@@ -832,8 +837,7 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
             /* Maybe just the Macro Operator. */
             if( yyleng == 1 )
             {
-               if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
-                   iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+               if( IS_NUM( iLastToken ) || iLastToken == LITERAL || iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
                    iLastToken == ')' || iLastToken == ']' || iLastToken == '}' )
                {
                   iElement = BITAND + DONT_REDUCE;
@@ -970,8 +974,7 @@ static int hb_comp_SLX_CustomAction( int x )
    {
       bIgnoreWords = FALSE;
 
-      if( iLastToken == NUM_INTEGER || iLastToken == NUM_LONG || iLastToken == NUM_DOUBLE || iLastToken == LITERAL ||
-          iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
+      if( IS_NUM( iLastToken ) || iLastToken == LITERAL || iLastToken == IDENTIFIER ||  iLastToken == MACROVAR || iLastToken == MACROTEXT ||
           iLastToken == ')' || iLastToken == ']' || iLastToken == '}' ||
           iLastToken == FIELD || iLastToken == QSELF || iLastToken == IIF || iLastToken == GET )
       {
@@ -1211,40 +1214,30 @@ static int hb_comp_SLX_CustomAction( int x )
            }
 
       case HB_H12AM :
-         bIgnoreWords = FALSE;
-         if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
-             iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == CBMARKER || iLastToken == ',' ||
-             iLastToken == WANTS_ID ||
-             iLastToken == WITH ||
-             iLastToken == REJECT_OP ||
-             iLastToken == GET ||
-             IS_OP( iLastToken )
-           )
+         if( IS_NUM( iLastToken ) )
+         {
+            return H12AM + DONT_REDUCE;
+         }
+         else
          {
             yylval.string = hb_compIdentifierNew( "AM", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_H12AM, Primary Identifier %s Increased to: %i\n", "AM", iIdentifier ) );
             return IDENTIFIER;
          }
-         return H12AM;
 
       case HB_H12PM :
-         bIgnoreWords = FALSE;
-         if( iLastToken == 0 || iLastToken == '\n' || iLastToken == ';' ||
-             iLastToken == '(' || iLastToken == '[' || iLastToken == '{' || iLastToken == CBMARKER || iLastToken == ',' ||
-             iLastToken == WANTS_ID ||
-             iLastToken == WITH ||
-             iLastToken == REJECT_OP ||
-             iLastToken == GET ||
-             IS_OP( iLastToken )
-           )
+         if( IS_NUM( iLastToken ) )
+         {
+            return H12PM + DONT_REDUCE;
+         }
+         else
          {
             yylval.string = hb_compIdentifierNew( "PM", TRUE );
             iIdentifier++;
             DEBUG_INFO( printf( "HB_H12PM, Primary Identifier %s Increased to: %i\n", "PM", iIdentifier ) );
             return IDENTIFIER;
          }
-         return H12PM;
 
       case HB_WITH :
          bIgnoreWords = FALSE;
