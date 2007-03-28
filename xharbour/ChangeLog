@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5404 2007/03/27 14:23:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5405 2007/03/27 14:25:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-27 22:42 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/rdd_ads/ads1.c
+    * Change direct access of hb_set to use hb_GetSetStructPtr()
+    * Corrected few HB_TR_ALWAYS to HB_TR_DEBUG
+
+ /* Commited on behalf of Brian Hays */
 
 2007-03-27 10:22 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbset.h

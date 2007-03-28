@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.116 2006/12/11 13:26:25 druzus Exp $
+ * $Id: ads1.c,v 1.117 2007/02/13 19:02:23 druzus Exp $
  */
 
 /*
@@ -70,6 +70,7 @@
 #include <ctype.h>
 
 static int iSetListenerHandle = 0;
+static HB_SET_STRUCT * hb_setext = NULL;   // hb_set external reference since DLL builds cannot access hb_set itself
 
 static USHORT s_uiRddCount = 0;
 static USHORT s_uiRddIdADS = ( USHORT ) -1;
@@ -89,40 +90,45 @@ static void adsSetListener_callback( HB_set_enum setting, HB_set_listener_enum w
    HB_TRACE(HB_TR_DEBUG, ("adsSetListener_callback (%d  %d)", setting, when));
    if( when == HB_SET_LISTENER_AFTER )  /* we don't do anything with BEFORE calls */
    {
+      if( hb_setext == NULL )
+      {
+         hb_setext = hb_GetSetStructPtr();
+      }
+
       switch( setting )
       {
          case HB_SET_DATEFORMAT :
-            AdsSetDateFormat( (UNSIGNED8*) hb_set.HB_SET_DATEFORMAT );
+            AdsSetDateFormat( (UNSIGNED8*) hb_setext->HB_SET_DATEFORMAT );
             break;
          case HB_SET_DEFAULT    :
-            AdsSetDefault( (UNSIGNED8*) hb_set.HB_SET_DEFAULT );
+            AdsSetDefault( (UNSIGNED8*) hb_setext->HB_SET_DEFAULT );
             break;
          case HB_SET_DELETED    :
-            AdsShowDeleted( ! hb_set.HB_SET_DELETED );
+            AdsShowDeleted( ! hb_setext->HB_SET_DELETED );
             break;
          case HB_SET_EPOCH      :
-            AdsSetEpoch( hb_set.HB_SET_EPOCH );
+            AdsSetEpoch( hb_setext->HB_SET_EPOCH );
             break;
          case HB_SET_EXACT      :
-            AdsSetExact( hb_set.HB_SET_EXACT );
+            AdsSetExact( hb_setext->HB_SET_EXACT );
             break;
          case HB_SET_PATH       :
-            AdsSetSearchPath( (UNSIGNED8*) hb_set.HB_SET_PATH );
+            AdsSetSearchPath( (UNSIGNED8*) hb_setext->HB_SET_PATH );
             break;
 
          case HB_SET_DECIMALS   :
-            AdsSetDecimals( (UNSIGNED16) hb_set.HB_SET_DECIMALS );
+            AdsSetDecimals( (UNSIGNED16) hb_setext->HB_SET_DECIMALS );
             break;
 
 /* Possible TODO?
          case HB_SET_MFILEEXT   :
-            if( hb_set.HB_SET_MFILEEXT )
+            if( hb_setext->HB_SET_MFILEEXT )
             {
-               hb_retc( hb_set.HB_SET_MFILEEXT );
+               hb_retc( hb_setext->HB_SET_MFILEEXT );
             }
             break;
          case HB_SET_STRICTREAD :
-            hb_retl( hb_set.HB_SET_STRICTREAD );
+            hb_retl( hb_setext->HB_SET_STRICTREAD );
             break;
 */
          default:
@@ -135,13 +141,18 @@ static void adsSetSend( void )
 {
    HB_TRACE(HB_TR_DEBUG, ("adsSetSend()"));
 
-   AdsSetDateFormat( (UNSIGNED8*) hb_set.HB_SET_DATEFORMAT );
-   AdsSetDefault( (UNSIGNED8*) hb_set.HB_SET_DEFAULT );
-   AdsShowDeleted( ! hb_set.HB_SET_DELETED );
-   AdsSetEpoch( hb_set.HB_SET_EPOCH );
-   AdsSetExact( hb_set.HB_SET_EXACT );
-   AdsSetSearchPath( (UNSIGNED8*) hb_set.HB_SET_PATH );
-   AdsSetDecimals( (UNSIGNED16) hb_set.HB_SET_DECIMALS );
+   if( hb_setext == NULL )
+   {
+      hb_setext = hb_GetSetStructPtr();
+   }
+
+   AdsSetDateFormat( (UNSIGNED8*) hb_setext->HB_SET_DATEFORMAT );
+   AdsSetDefault( (UNSIGNED8*) hb_setext->HB_SET_DEFAULT );
+   AdsShowDeleted( ! hb_setext->HB_SET_DELETED );
+   AdsSetEpoch( hb_setext->HB_SET_EPOCH );
+   AdsSetExact( hb_setext->HB_SET_EXACT );
+   AdsSetSearchPath( (UNSIGNED8*) hb_setext->HB_SET_PATH );
+   AdsSetDecimals( (UNSIGNED16) hb_setext->HB_SET_DECIMALS );
 }
 
 static void commonError( ADSAREAP pArea, USHORT uiGenCode, USHORT uiSubCode, char * filename, USHORT uiFlags )
@@ -647,7 +658,7 @@ ERRCODE adsCloseCursor( ADSAREAP pArea )
 
       if( u32RetVal != AE_SUCCESS )
       {
-         HB_TRACE(HB_TR_ALWAYS, ("adsCloseTable failed (%lu, %s)", u32RetVal, pArea->szDataFileName));
+         HB_TRACE(HB_TR_DEBUG, ("adsCloseTable failed (%lu, %s)", u32RetVal, pArea->szDataFileName));
       }
       pArea->hTable = 0;
    }
@@ -1305,16 +1316,6 @@ static ERRCODE adsAppend( ADSAREAP pArea, BOOL fUnLockAll )
       if( pArea->fShared && !pArea->fFLocked )
       {
          ULONG ulRecNo;
-         /*
-          * Brian, please ask about it ExtSys guys.
-          * Does it create race condition (the implicit lock is removed
-          * and then the explicit one set) or just simply the flag indicating
-          * lock type is changed only. We have to know that.
-          * Without explicit locking the lock on appended record will be
-          * removed on any record movement or flushing. It may cause very
-          * serious synchronization problems in programs written for other
-          * RDDs and then ported to ADS. Druzus.
-          */
          if( SELF_RECNO( ( AREAP ) pArea, &ulRecNo ) == SUCCESS )
          {
             /* to avoid unnecessary record refreshing after locking */
@@ -1734,7 +1735,12 @@ static ERRCODE adsFlush( ADSAREAP pArea )
    {
       AdsWriteRecord( pArea->hTable );
 #if ADS_REQUIRE_VERSION >= 6
-      if( hb_set.HB_SET_HARDCOMMIT )
+      if( hb_setext == NULL )
+      {
+         hb_setext = hb_GetSetStructPtr();
+      }
+
+      if( hb_setext->HB_SET_HARDCOMMIT )
       {
          AdsFlushFileBuffers( pArea->hTable );
       }
@@ -2520,10 +2526,15 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    }
    *ucfieldPtr = '\0';
 
+   if( hb_setext == NULL )
+   {
+      hb_setext = hb_GetSetStructPtr();
+   }
+
    uRetVal = AdsCreateTable( hConnection, pCreateInfo->abName, pCreateInfo->atomAlias,
                              pArea->iFileType, adsCharType,
                              adsLockType, adsRights,
-                             hb_set.HB_SET_MBLOCKSIZE,
+                             hb_setext->HB_SET_MBLOCKSIZE,
                              ucfieldDefs, &hTable );
    hb_xfree( ucfieldDefs );
 
@@ -2946,12 +2957,17 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       return FAILURE;
    }
 
-   if( hb_set.HB_SET_AUTORDER )
+   if ( hb_setext == NULL )
+   {
+      hb_setext = hb_GetSetStructPtr();
+   }
+
+   if( hb_setext->HB_SET_AUTORDER )
    {
       DBORDERINFO pOrderInfo;
       pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
       pOrderInfo.itmNewVal = NULL;
-      pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
+      pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_setext->HB_SET_AUTORDER );
       pOrderInfo.atomBagName = NULL;
       SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
       hb_itemRelease( pOrderInfo.itmOrder );
@@ -2984,7 +3000,7 @@ static ERRCODE adsSysName( ADSAREAP pArea, BYTE * pBuffer )
       u32RetVal = AdsGetTableType( pArea->hTable, &u16TableType );
       if( u32RetVal != AE_SUCCESS )
       {
-         HB_TRACE(HB_TR_ALWAYS, ("Error in adsSysName: %d  pArea->hTable %d\n", u32RetVal, pArea->hTable));
+         HB_TRACE(HB_TR_DEBUG, ("Error in adsSysName: %d  pArea->hTable %d\n", u32RetVal, pArea->hTable));
          u16TableType = (UNSIGNED16) pArea->iFileType;
       }
    }
@@ -4068,7 +4084,12 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
          char * szFilter = hb_adsOemToAnsi( pucFilter,
                                  hb_itemGetCLen( pFilterInfo->abFilterText ) );
 
-         if( hb_set.HB_SET_OPTIMIZE )
+         if( hb_setext == NULL )
+         {
+            hb_setext = hb_GetSetStructPtr();
+         }
+
+         if( hb_setext->HB_SET_OPTIMIZE )
          {
             u32RetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) szFilter, usResolve );
          }
@@ -4436,6 +4457,9 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
             hb_setListenerRemove( iSetListenerHandle ) ;
             iSetListenerHandle = 0;
          }
+
+         hb_setext = NULL;
+
          AdsApplicationExit();
       }
    }
