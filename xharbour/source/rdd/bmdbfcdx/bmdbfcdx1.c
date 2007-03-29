@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.19 2007/03/08 16:06:45 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.20 2007/03/19 08:26:46 marchuet Exp $
  */
 
 /*
@@ -8570,6 +8570,10 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             /* TODO: RT error */
             ;
          }
+         break;
+
+      case DBOI_ISMULTITAG:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, TRUE );
          break;
 
       case DBOI_NAME:
