@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5406 2007/03/28 02:43:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5407 2007/03/28 14:02:03 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-28 21:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/minmax.c
+    ! fixed lines 70 and 146. Changed "p1->item.asDate.value" to
+      "p2->item.asDate.value" as reported by Serge Jakimoff from
+       comp.lang.xharbour news.
 
 2007-03-28 16:00 UTC+0200 Alex Strickland <sscc/at/mweb.co.za>
   * source/rtl/seconds.c

@@ -1,5 +1,5 @@
 /*
- * $Id: minmax.c,v 1.8 2005/03/31 03:58:52 druzus Exp $
+ * $Id: minmax.c,v 1.9 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_FUNC( MAX )
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
       register LONG ld1 = p1->item.asDate.value;
-      register LONG ld2 = p1->item.asDate.value;
+      register LONG ld2 = p2->item.asDate.value;
       if( ld1 > ld2 || ( ld1 == ld2 && p1->item.asDate.time >= p2->item.asDate.time ) )
          hb_itemReturn( p1 );
       else
@@ -143,7 +143,7 @@ HB_FUNC( MIN )
    if( HB_IS_DATE( p1 ) && HB_IS_DATE( p2 ) )
    {
       register LONG ld1 = p1->item.asDate.value;
-      register LONG ld2 = p1->item.asDate.value;
+      register LONG ld2 = p2->item.asDate.value;
       if( ld1 < ld2 || ( ld1 == ld2 && p1->item.asDate.time <= p2->item.asDate.time ) )
          hb_itemReturn( p1 );
       else
