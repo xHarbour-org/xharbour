@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.165 2006/08/10 12:07:56 druzus Exp $
+ * $Id: dbfntx1.c,v 1.166 2007/01/09 22:05:22 druzus Exp $
  */
 
 /*
@@ -143,9 +143,7 @@
 #include "hbmath.h"
 #include "hbrddntx.h"
 #include "rddsys.ch"
-#ifdef __XHARBOUR__
 #include "hbregex.h"
-#endif
 #ifndef HB_CDP_SUPPORT_OFF
    #include "hbapicdp.h"
 #endif
@@ -4281,8 +4279,6 @@ static BOOL hb_ntxOrdSkipWild( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pWildItm 
    return fFound;
 }
 
-#if defined(__XHARBOUR__)
-
 static BOOL hb_ntxRegexMatch( LPTAGINFO pTag, PHB_REGEX pRegEx, char * szKey )
 {
 #ifndef HB_CDP_SUPPORT_OFF
@@ -4382,7 +4378,6 @@ static BOOL hb_ntxOrdSkipRegEx( LPTAGINFO pTag, BOOL fForward, PHB_ITEM pRegExIt
 
    return fFound;
 }
-#endif
 
 /*
  * add key to custom tag (ordKeyAdd())
@@ -6537,6 +6532,21 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
 
    switch( uiIndex )
    {
+      case DBOI_STRICTREAD:
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_STRICTREAD, 0, pInfo->itmResult );
+      case DBOI_OPTIMIZE:
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_OPTIMIZE, 0, pInfo->itmResult );
+      case DBOI_AUTOOPEN:
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOOPEN, 0, pInfo->itmResult );
+      case DBOI_AUTOORDER:
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOORDER, 0, pInfo->itmResult );
+      case DBOI_AUTOSHARE:
+         hb_itemClear( pInfo->itmResult );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOSHARE, 0, pInfo->itmResult );
       case DBOI_BAGEXT:
          hb_itemClear( pInfo->itmResult );
          return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_ORDBAGEXT, 0, pInfo->itmResult );
@@ -6738,6 +6748,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             break;
          case DBOI_POSITION:
          case DBOI_KEYNORAW:
+         /* case DBOI_RECNO: */
             if( hb_itemType( pInfo->itmNewVal ) & HB_IT_NUMERIC )
                hb_itemPutL( pInfo->itmResult,
                   hb_ntxOrdKeyGoto( pTag, hb_itemGetNL( pInfo->itmNewVal ) ) );
@@ -6945,13 +6956,11 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipWild( pTag,
                               uiIndex == DBOI_SKIPWILD, pInfo->itmNewVal ) );
             break;
-#if defined(__XHARBOUR__)
          case DBOI_SKIPREGEX:
          case DBOI_SKIPREGEXBACK:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdSkipRegEx( pTag,
                               uiIndex == DBOI_SKIPREGEX, pInfo->itmNewVal ) );
             break;
-#endif
          case DBOI_FINDREC:
          case DBOI_FINDRECCONT:
             hb_itemPutL( pInfo->itmResult, hb_ntxOrdFindRec( pTag,
@@ -7035,6 +7044,7 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
       switch( uiIndex )
       {
          case DBOI_KEYCOUNT:
+         case DBOI_KEYCOUNTRAW:
          {
             ULONG ulRecCount = 0;
             SELF_RECCOUNT( ( AREAP ) pArea, &ulRecCount );
@@ -7042,6 +7052,8 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
             break;
          }
          case DBOI_POSITION:
+         case DBOI_KEYNORAW:
+         /* case DBOI_RECNO: */
             if( pInfo->itmNewVal && hb_itemType( pInfo->itmNewVal ) & HB_IT_NUMERIC )
                hb_itemPutL( pInfo->itmResult, SELF_GOTO( ( AREAP ) pArea,
                               hb_itemGetNL( pInfo->itmNewVal ) ) == SUCCESS );
@@ -7153,8 +7165,16 @@ static ERRCODE ntxOrderInfo( NTXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pInfo
          case DBOI_FILEHANDLE:
             hb_itemPutNInt( pInfo->itmResult, FS_ERROR );
             break;
-         default:
+         case DBOI_BAGNAME:
+         case DBOI_CONDITION:
+         case DBOI_EXPRESSION:
+         case DBOI_FULLPATH:
+         case DBOI_NAME:
+         case DBOI_KEYTYPE:
             hb_itemPutC( pInfo->itmResult, "" );
+            break;
+         default:
+            hb_itemClear( pInfo->itmResult );
       }
    }
    return SUCCESS;

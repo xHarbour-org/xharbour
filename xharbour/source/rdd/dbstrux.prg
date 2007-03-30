@@ -1,5 +1,5 @@
 /*
- * $Id: dbstrux.prg,v 1.9 2006/07/17 12:56:18 druzus Exp $
+ * $Id: dbstrux.prg,v 1.10 2006/07/21 00:56:40 druzus Exp $
  */
 
 /*
@@ -77,7 +77,7 @@ FUNCTION __dbCopyXStruct( cFileName )
       __dbCreate( cFileName, NIL, NIL, .F., NIL )
 
       AEval( aStruct, {| aField | iif( aField[ DBS_TYPE ] == "C" .AND. aField[ DBS_LEN ] > 255,;
-                                     ( aField[ DBS_DEC ] := Int( aField[ DBS_LEN ] / 256 ), aField[ DBS_LEN ] := aField[ DBS_LEN ] % 256 ), NIL ),;
+                                     ( aField[ DBS_DEC ] := Int( aField[ DBS_LEN ] / 256 ), aField[ DBS_LEN ] := aField[ DBS_LEN ] % 256 ), ),;
                                   dbAppend(),;
                                   FIELD->FIELD_NAME := aField[ DBS_NAME ],;
                                   FIELD->FIELD_TYPE := aField[ DBS_TYPE ],;

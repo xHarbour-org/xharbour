@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.20 2007/03/19 08:26:46 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.21 2007/03/29 09:11:17 marchuet Exp $
  */
 
 /*
@@ -96,9 +96,7 @@
 #include "hbrddbmcdx.h"
 #include "hbmath.h"
 #include "rddsys.ch"
-#ifdef __XHARBOUR__
 #include "hbregex.h"
-#endif
 
 #ifndef HB_CDP_SUPPORT_OFF
    /* for nation sorting support */
@@ -5525,8 +5523,6 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    return fFound;
 }
 
-#if defined(__XHARBOUR__)
-
 static BOOL hb_cdxRegexMatch( CDXAREAP pArea, PHB_REGEX pRegEx, LPCDXKEY pKey )
 {
    char * szKey = ( char * ) pKey->val;
@@ -5640,7 +5636,6 @@ static BOOL hb_cdxDBOISkipRegEx( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 
    return fFound;
 }
-#endif
 
 /*
  * evaluate given C function in given scope
@@ -8302,6 +8297,41 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
    switch( uiIndex )
    {
+      case DBOI_STRICTREAD:
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_STRICTREAD, 0, pOrderInfo->itmResult );
+
+      case DBOI_OPTIMIZE:
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_OPTIMIZE, 0, pOrderInfo->itmResult );
+
+      case DBOI_AUTOOPEN:
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOOPEN, 0, pOrderInfo->itmResult );
+
+      case DBOI_AUTOORDER:
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOORDER, 0, pOrderInfo->itmResult );
+
+      case DBOI_AUTOSHARE:
+         if( pOrderInfo->itmResult )
+            hb_itemClear( pOrderInfo->itmResult );
+         else
+            pOrderInfo->itmResult = hb_itemNew( NULL );
+         return SELF_RDDINFO( SELF_RDDNODE( pArea ), RDDI_AUTOSHARE, 0, pOrderInfo->itmResult );
+
       case DBOI_BAGEXT:
          if( pOrderInfo->itmResult )
             hb_itemClear( pOrderInfo->itmResult );
@@ -8364,6 +8394,45 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             pIndex = pszBag ? NULL : pIndex->pNext;
          }
          pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, uiTag );
+         return SUCCESS;
+      }
+
+      case DBOI_BAGCOUNT:
+      {
+         LPCDXINDEX pIndex = pArea->lpIndexes;
+         while ( pIndex )
+         {
+            ++uiTag;
+            pIndex = pIndex->pNext;
+         }
+         pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, uiTag );
+         return SUCCESS;
+      }
+
+      case DBOI_BAGNUMBER:
+      {
+         LPCDXINDEX pIndex = pArea->lpIndexes, pIndexSeek;
+
+         if( hb_itemGetCLen( pOrderInfo->atomBagName ) > 0 )
+            pIndexSeek = hb_cdxFindBag( pArea,
+                                  hb_itemGetCPtr( pOrderInfo->atomBagName ) );
+         else
+            pIndexSeek = pIndex;
+
+         if( pIndexSeek )
+         {
+            ++uiTag;
+            do
+            {
+               if( pIndex == pIndexSeek )
+                  break;
+               ++uiTag;
+               pIndex = pIndex->pNext;
+            }
+            while ( pIndex );
+         }
+         pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult,
+                                               pIndex ? uiTag : 0 );
          return SUCCESS;
       }
 
@@ -8496,7 +8565,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_RELKEYPOS:
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
-            hb_cdxDBOISetRelKeyPos( pArea, pTag,
+            hb_cdxDBOISetRelKeyPos( pArea, pTag, 
                                     hb_itemGetND( pOrderInfo->itmNewVal ) );
          else
             pOrderInfo->itmResult = hb_itemPutND( pOrderInfo->itmResult,
@@ -8511,7 +8580,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_FINDRECCONT:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                  hb_cdxDBOIFindRec( pArea, pTag,
+                  hb_cdxDBOIFindRec( pArea, pTag, 
                               hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) );
          break;
 
@@ -8541,7 +8610,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                hb_cdxDBOISkipWild( pArea, pTag, FALSE, pOrderInfo->itmNewVal ) );
          break;
 
-#if defined(__XHARBOUR__)
       case DBOI_SKIPREGEX:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
             hb_cdxDBOISkipRegEx( pArea, pTag, TRUE, pOrderInfo->itmNewVal ) );
@@ -8551,7 +8619,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
             hb_cdxDBOISkipRegEx( pArea, pTag, FALSE, pOrderInfo->itmNewVal ) );
          break;
-#endif
 
       case DBOI_SCOPEEVAL:
          if ( pTag && pOrderInfo->itmNewVal &&
@@ -8570,10 +8637,6 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             /* TODO: RT error */
             ;
          }
-         break;
-
-      case DBOI_ISMULTITAG:
-         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, TRUE );
          break;
 
       case DBOI_NAME:
@@ -8640,6 +8703,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_KEYSIZE:
          pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, pTag ? pTag->uiLen : 0 );
+         break;
+
+      case DBOI_KEYDEC:
+         /* there is no fixed number of decimal places for numeric keys
+            in CDX format */
+         pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, 0 );
          break;
 
       case DBOI_KEYVAL:
@@ -8737,6 +8806,14 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
             pTag->Custom = TRUE;
          }
          break;
+
+      /* TODO: */
+      /*
+      case DBOI_TEMPLATE:
+      case DBOI_MULTIKEY:
+      case DBOI_PARTIAL:
+      case DBOI_CHGONLY:
+      */
 
       case DBOI_KEYADD:
          if ( !pTag )
@@ -8840,6 +8917,38 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          }
          else
             pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+         break;
+
+      case DBOI_UPDATECOUNTER:
+         if( pTag )
+         {
+            /* refresh update counter */
+            if( hb_cdxIndexLockRead( pTag->pIndex ) )
+               hb_cdxIndexUnLockRead( pTag->pIndex );
+            pOrderInfo->itmResult = hb_itemPutNInt( pOrderInfo->itmResult,
+                                                    pTag->pIndex->ulVersion );
+         }
+         else
+            pOrderInfo->itmResult = hb_itemPutNI( pOrderInfo->itmResult, 0 );
+         break;
+
+      case DBOI_SHARED:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                                              pTag && pTag->pIndex->fShared );
+         break;
+
+      case DBOI_ISREADONLY:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
+                                              pTag && pTag->pIndex->fReadonly );
+         break;
+
+      case DBOI_ISMULTITAG:
+      case DBOI_ISSORTRECNO:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, pTag != NULL );
+         break;
+
+      case DBOI_LARGEFILE:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
          break;
 
       default:
@@ -9006,10 +9115,11 @@ static ERRCODE hb_cdxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, P
          break;
       }
 
+      case RDDI_MULTIKEY:
       case RDDI_MULTITAG:
       case RDDI_SORTRECNO:
       case RDDI_STRUCTORD:
-      case RDDI_MULTIKEY:
+      case RDDI_STRICTSTRUCT:
          hb_itemPutL( pItem, TRUE );
          break;
 
@@ -9797,8 +9907,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fsSeekLarge( pArea->hDataFile,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen +
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
+                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
                                ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
