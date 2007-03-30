@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5408 2007/03/29 00:03:48 modalsist Exp $
+ * $Id: ChangeLog,v 1.5409 2007/03/29 09:11:17 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-03-30 09:26 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/dbfcdx/dbfcdx.c
+    + added support for DBORDERINFO( DBOI_ISMULTITAG )
+    * modified to admit DBOI_KEYDELETE and DBOI_KEYADD ignoring the FOR clause,
+      that does not have meaning in customer index in order to add or del KEYS.
 
 2007-03-29 10:53 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/bmdbfcdx/bmdbfcdx.c

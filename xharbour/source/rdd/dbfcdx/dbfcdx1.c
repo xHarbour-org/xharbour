@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.257 2006/12/11 13:26:25 druzus Exp $
+ * $Id: dbfcdx1.c,v 1.258 2007/03/02 02:36:22 druzus Exp $
  */
 
 /*
@@ -7984,6 +7984,10 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
          }
          break;
 
+      case DBOI_ISMULTITAG:
+         pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, TRUE );
+         break;
+
       case DBOI_NAME:
          pOrderInfo->itmResult = hb_itemPutC( pOrderInfo->itmResult, pTag ? pTag->szName : "" );
          break;
@@ -8158,12 +8162,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
-                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
-               {
+               if( !pArea->fPositioned  )
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
-               }
                else
                {
                   LPCDXKEY pKey;
@@ -8197,12 +8197,8 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
-                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
-               {
+               if( !pArea->fPositioned  )
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
-               }
                else
                {
                   LPCDXKEY pKey;
