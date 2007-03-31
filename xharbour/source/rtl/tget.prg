@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.126 2007/01/29 19:09:00 modalsist Exp $
+ * $Id: tget.prg,v 1.127 2007/02/05 12:40:05 modalsist Exp $
  */
 
 /*
@@ -177,6 +177,7 @@ CLASS Get
    DATA lMinusPrinted, xVarGet
    DATA lDispLen INIT .F.
    DATA lUndo INIT .F.
+   DATA lLeftJust INIT .F.   // to "@B" mask
 
    METHOD ParsePict( cPicture )
    METHOD DeleteAll()
@@ -271,6 +272,7 @@ METHOD ParsePict( cPicture ) CLASS Get
    if nPos > 0
 
       if nPos > 1
+         // extracts any char before "@"
          cPicture := SubStr( cPicture, nPos )
          ::cPicture := cPicture
       endif
@@ -334,6 +336,16 @@ METHOD ParsePict( cPicture ) CLASS Get
       if ::lCleanZero
          ::cPicFunc := StrTran(::cPicFunc, "Z", "")
          ::cPicture := StrTran(::cPicture, "Z", "")
+      endif
+
+      // 2007/MAR/31 - E.F. - Set left-justified behaviour.
+      if !::lLeftJust
+         ::lLeftJust := ( "B" IN ::cPicFunc )
+      endif
+
+      if ::lLeftJust
+         ::cPicFunc := StrTran(::cPicFunc, "B", "")
+         ::cPicture := StrTran(::cPicture, "B", "")
       endif
 
       if ::cPicFunc == "@"
@@ -510,11 +522,12 @@ METHOD Display( lForced ) CLASS Get
 
    HBConsoleLock()
 
+
    /* E.F. 2006/MAY/23 - Display minus sign in the front of xBuffer value.
     * IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
     *   xBuffer := SubStr( xBuffer, 1, ::DecPos - 2 ) + "-." + SubStr( xBuffer, ::DecPos + 1 )
     */
-   IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::minus
+   IF ::Type=="N" .AND. ! ::lMinusPrinted .AND. ::DecPos != NIL .AND. ::Minus
       xBuffer := PadL( StrTran(xBuffer,'-',''), Len(xBuffer) )
       IF ::DecPos > 0 .AND. ::DecPos < Len( xBuffer)
          xBuffer :=  PadL( '-'+Ltrim(SubStr( xBuffer, 1, ::DecPos - 1 )) + "." + SubStr( xBuffer, ::DecPos + 1 ) , Len(xBuffer) )
@@ -533,7 +546,18 @@ METHOD Display( lForced ) CLASS Get
 
    IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
 
-      cDisplay := Substr( xBuffer, ::nDispPos, ::nDispLen )
+      cDisplay := SubStr( xBuffer, ::nDispPos, ::nDispLen )
+
+      IF Len( cDisplay ) < ::nDispLen
+         cDisplay := Padr( cDisplay, ::nDispLen ) 
+      ENDIF
+
+      // The get lost the focus. We need left-adjust the content buffer
+      // if "@B" was used.
+      //
+      IF ::Type=="N" .AND. ::lLeftJust .AND. !::HasFocus
+         cDisplay := Padr( Ltrim( cDisplay ), ::nDispLen )
+      ENDIF
 
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  cDisplay,;
@@ -810,6 +834,7 @@ METHOD VarGet() CLASS Get
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
    LOCAL cVarGet, nDecPos, nLen, nDec
 
+
    IF ! HB_IsBlock( ::Block )
       ::xVarGet := NIL
       ::Type    := 'U'
@@ -864,11 +889,6 @@ METHOD VarGet() CLASS Get
       ENDIF
 
       cVarGet := Str( xVarGet, nLen, nDec )
-
-      // We need recalc decimal pos if picture is left justified.
-      IF "B" IN ::cPicFunc
-         nDecPos := Rat( iif(::lDecRev .OR. "E" IN ::cPicFunc,",","."), ::cPicMask )
-      ENDIF
 
       // Insert "0" before decimal dot, if empty.
       IF Empty( SubStr( cVarGet, 1, nDecPos-1) )
@@ -1661,14 +1681,11 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       ::lMinusPrinted := ( xValue < 0 )
    endif
 
-   /*
-   if ::nMaxLen == NIL
-      ::nMaxLen := Len( cBuffer )
-   endif
-   */
 
    ::nMaxLen  := Len( cBuffer )
+
    ::nMaxEdit := ::nMaxLen
+
    if ::nDispLen == NIL .or. !::lDispLen
       ::nDispLen := ::nMaxLen
    endif
