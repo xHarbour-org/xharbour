@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.166 2007/02/27 15:59:40 druzus Exp $
+ * $Id: dbf1.c,v 1.167 2007/03/02 02:36:22 druzus Exp $
  */
 
 /*
@@ -1475,6 +1475,15 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          break;
 
+      case HB_IT_DATETIME:
+      case HB_IT_TIMESTAMP:
+         {
+            hb_itemPutDTL( pItem,
+                           HB_GET_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] ),
+                           HB_GET_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + 4 ) );
+         }
+         break;
+
       case HB_IT_INTEGER:
          if( pField->uiDec )
          {
@@ -1849,6 +1858,20 @@ static ERRCODE hb_dbfPutValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
                hb_itemGetDS( pItem, szBuffer );
                memcpy( pArea->pRecord + pArea->pFieldOffset[ uiIndex ], szBuffer, 8 );
             }
+         }
+         else if( pField->uiType == HB_IT_DATETIME )
+         {
+            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                              hb_itemGetDL( pItem ) );
+            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + 4,
+                              hb_itemGetT( pItem ) );
+         }
+         else if( pField->uiType == HB_IT_TIMESTAMP )
+         {
+            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ],
+                              hb_itemGetDL( pItem ) );
+            HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiIndex ] + 4,
+                              hb_itemGetT( pItem ) );
          }
          else if( pField->uiType == HB_IT_ANY && pField->uiLen == 3 )
          {
@@ -2409,6 +2432,28 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
 
          case HB_IT_DATE:
             pThisField->bType = 'D';
+            if( pField->uiLen != 3 && pField->uiLen != 4 )
+            {
+               pField->uiLen = pThisField->bLen = 8;
+            }
+            pThisField->bLen = ( BYTE ) pField->uiLen;
+            pThisField->bDec = 0;
+            pArea->uiRecordLen += pField->uiLen;
+            break;
+
+         case HB_IT_DATETIME:
+            pThisField->bType = 'T';
+            if( pField->uiLen != 3 && pField->uiLen != 4 )
+            {
+               pField->uiLen = pThisField->bLen = 8;
+            }
+            pThisField->bLen = ( BYTE ) pField->uiLen;
+            pThisField->bDec = 0;
+            pArea->uiRecordLen += pField->uiLen;
+            break;
+
+         case HB_IT_TIMESTAMP:
+            pThisField->bType = '@';
             if( pField->uiLen != 3 && pField->uiLen != 4 )
             {
                pField->uiLen = pThisField->bLen = 8;
@@ -3213,6 +3258,16 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
                pFieldInfo.uiLen = 8;
             break;
 
+         case 'T':
+            pFieldInfo.uiType = HB_IT_DATETIME;
+            pFieldInfo.uiLen = 8;
+            break;
+
+         case '@':
+            pFieldInfo.uiType = HB_IT_TIMESTAMP;
+            pFieldInfo.uiLen = 8;
+            break;
+
          case 'I':
          case 'Y':
             pFieldInfo.uiType = HB_IT_INTEGER;
@@ -3248,12 +3303,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             pFieldInfo.uiType = HB_IT_DOUBLE;
             pFieldInfo.uiLen = 8;
             pFieldInfo.uiDec = pField->bDec;
-            break;
-
-         /* types which are not supported by VM - mapped to different ones */
-         case 'T':
-         case '@':
-            pFieldInfo.uiType = HB_IT_INTEGER;
             break;
 
          default:

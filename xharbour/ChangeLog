@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5411 2007/03/30 16:10:25 marchuet Exp $
+ * $Id: ChangeLog,v 1.5412 2007/03/31 16:43:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-02 17:54 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * include/hbapi.h
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/workarea.c
+    + added support for field types TimeStamp and DateTime compatible with
+      Visual FoxPro. Can be created the fields with DbCreate using the next
+      fieldTypes:
+	DateTime	T
+	TimeStamp	@
 
 2007-03-31 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg

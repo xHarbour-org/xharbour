@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.259 2007/03/30 07:28:52 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.260 2007/03/30 16:10:27 marchuet Exp $
  */
 
 /*
@@ -588,6 +588,8 @@ static BYTE hb_cdxItemType( PHB_ITEM pItem )
          return 'N';
 
       case HB_IT_DATE:
+      case HB_IT_DATETIME:
+      case HB_IT_TIMESTAMP:
          return 'D';
 
       case HB_IT_LOGICAL:
