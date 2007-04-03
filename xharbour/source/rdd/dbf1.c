@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.167 2007/03/02 02:36:22 druzus Exp $
+ * $Id: dbf1.c,v 1.168 2007/04/02 16:00:22 marchuet Exp $
  */
 
 /*
@@ -190,6 +190,8 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea )
 
       if( ( pField->uiType == HB_IT_MEMO && uiLen == 4 ) ||
           ( pField->uiType == HB_IT_DATE && uiLen <= 4 ) ||
+          pField->uiType == HB_IT_DATETIME ||
+          pField->uiType == HB_IT_TIMESTAMP ||
           pField->uiType == HB_IT_ANY ||
           pField->uiType == HB_IT_INTEGER ||
           pField->uiType == HB_IT_DOUBLE )
@@ -218,6 +220,24 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea )
    ulSize = pArea->pRecord - pPtr - ulSize;
    if( ulSize < ( ULONG ) pArea->uiRecordLen )
       memset( pPtr, '\0', ( ULONG ) pArea->uiRecordLen - ulSize );
+
+   // Default values
+   for( uiCount = 0, pField = pArea->lpFields; uiCount < pArea->uiFieldCount; uiCount++, pField++ )
+   {
+      if ( pField->uiType == HB_IT_TIMESTAMP )
+      {
+         int iYear, iMonth, iDay, iHour, iMinute;
+         double dSeconds;
+         PHB_ITEM pItem;
+
+         hb_dateToday( &iYear, &iMonth, &iDay );
+         hb_dateTime( &iHour, &iMinute, &dSeconds );
+         pItem = hb_itemPutDT( NULL, iYear, iMonth, iDay, iHour, iMinute, dSeconds, 0 );
+         HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiCount ], hb_itemGetDL( pItem ) );
+         HB_PUT_LE_UINT32( pArea->pRecord + pArea->pFieldOffset[ uiCount ] + 4, hb_itemGetT( pItem ) );
+         hb_itemRelease( pItem );
+      }
+   }
 }
 
 /*

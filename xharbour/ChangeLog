@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5412 2007/03/31 16:43:24 modalsist Exp $
+ * $Id: ChangeLog,v 1.5413 2007/04/02 16:00:21 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-02 17:54 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/dbf1.c
+    + added default value to TimeStamp fields, automatically.
 
 2007-04-02 17:54 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/hbapi.h
