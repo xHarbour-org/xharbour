@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.606 2007/03/26 00:24:05 walito Exp $
+ * $Id: hvm.c,v 1.607 2007/03/26 15:25:17 ronpinkas Exp $
  */
 
 /*
@@ -1694,7 +1694,16 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             {
                if( usParams == 0 )
                {
-                  PHB_ITEM pSelf = hb_stackItemFromTop( -1 );
+                  PHB_ITEM pSelf;
+
+                  if( HB_VM_STACK.bWithObject )
+                  {
+                     pSelf = &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] );
+                  }
+                  else
+                  {
+                     pSelf = hb_stackItemFromTop( -1 );
+                  }
 
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
@@ -1710,6 +1719,10 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                            hb_arraySize( pSelf, (HB_VM_STACK.pMethod)->uiData ); /* Make large enough */
                         }
 
+                        // Before hb_arrayGet() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         hb_arrayGet( pSelf, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
 
                         hb_stackPop(); //pSelf.
@@ -1719,6 +1732,10 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                      }
                      else if( pFunc == hb___msgGetClsData )
                      {
+                        // Before hb_arrayGet() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         // Recycle the Symbol Item.
                         hb_arrayGet( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, &(HB_VM_STACK.Return) );
 
@@ -1729,6 +1746,10 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                      }
                      else if( pFunc == hb___msgGetShrData )
                      {
+                        // Before hb_arrayGet() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         if( (HB_VM_STACK.pMethod)->uiSprClass )
                         {
                            // Recycle the Symbol Item.
@@ -1744,7 +1765,16 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                }
                else if( usParams == 1 )
                {
-                  PHB_ITEM pSelf = hb_stackItemFromTop( -2 );
+                  PHB_ITEM pSelf;
+
+                  if( HB_VM_STACK.bWithObject )
+                  {
+                     pSelf = &( HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter - 1 ] );
+                  }
+                  else
+                  {
+                     pSelf = hb_stackItemFromTop( -2 );
+                  }
 
                   if( HB_IS_OBJECT( pSelf ) && pSelf->item.asArray.value->uiPrevCls == 0 )
                   {
@@ -1762,9 +1792,13 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
                         hb_arraySet( pSelf, (HB_VM_STACK.pMethod)->uiData, hb_stackItemFromTop( - 1 ) );
 
+                        // Before hb_itemForwardValue() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
 
-                        hb_stackPop(); //pNewValue.
+                        hb_stackDec(); //pNewValue.
                         hb_stackPop(); //pSelf.
                         hb_stackPop(); //Symbol.
 
@@ -1775,9 +1809,13 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                         // Recycle the Symbol Item.
                         hb_arraySet( hb_clsClassesArray()[ pSelf->item.asArray.value->uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, hb_stackItemFromTop( - 1 ) );
 
+                        // Before hb_itemForwardValue() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
 
-                        hb_stackPop(); //pNewValue.
+                        hb_stackDec(); //pNewValue.
                         hb_stackPop(); //pSelf.
                         hb_stackPop(); //Symbol.
 
@@ -1791,9 +1829,13 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                            hb_arraySet( hb_clsClassesArray()[ (HB_VM_STACK.pMethod)->uiSprClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiDataShared, hb_stackItemFromTop( - 1 ) );
                         }
 
+                        // Before hb_itemForwardValue() because to overwrite HB_VM_STACK.Return can
+                        // execute destructor of some object.
+                        HB_VM_STACK.bWithObject = FALSE;
+
                         hb_itemForwardValue( &(HB_VM_STACK.Return), hb_stackItemFromTop( - 1 ) );
 
-                        hb_stackPop(); //pNewValue.
+                        hb_stackDec(); //pNewValue.
                         hb_stackPop(); //pSelf.
                         hb_stackPop(); //Symbol.
 
@@ -4689,11 +4731,10 @@ static void hb_vmEqual( BOOL bExact )
    }
    else if( HB_IS_POINTER( pItem1 ) && HB_IS_POINTER( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asPointer.value ==
-                                       pItem2->item.asPointer.value );
-      pItem1->type = HB_IT_LOGICAL;
-      pItem2->type = HB_IT_NIL;
-      hb_stackDec();
+      BOOL bResult = ( pItem1->item.asPointer.value == pItem2->item.asPointer.value );
+      hb_stackPop();
+      hb_stackPop();
+      hb_vmPushLogical( bResult );
    }
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_EQUAL && bExact == FALSE)
    {
@@ -4805,11 +4846,10 @@ static void hb_vmNotEqual( void )
    }
    else if( HB_IS_POINTER( pItem1 ) && HB_IS_POINTER( pItem2 ) )
    {
-      pItem1->item.asLogical.value = ( pItem1->item.asPointer.value !=
-                                       pItem2->item.asPointer.value );
-      pItem1->type = HB_IT_LOGICAL;
-      pItem2->type = HB_IT_NIL;
-      hb_stackDec();
+      BOOL bResult = ( pItem1->item.asPointer.value != pItem2->item.asPointer.value );
+      hb_stackPop();
+      hb_stackPop();
+      hb_vmPushLogical( bResult );
    }
 
    else if( hb_objGetOpOver( pItem1 ) & HB_CLASS_OP_NOTEQUAL )
@@ -6961,7 +7001,12 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
    if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
    {
+      BOOL        bWithObject = HB_VM_STACK.bWithObject;
+      HB_VM_STACK.bWithObject = FALSE;
+       
       hb_itemClear( &(HB_VM_STACK.Return) );
+
+      HB_VM_STACK.bWithObject = bWithObject;
    }
    else
    {

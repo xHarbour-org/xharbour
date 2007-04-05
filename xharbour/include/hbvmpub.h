@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.53 2007/02/20 16:16:55 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.54 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -262,6 +262,7 @@
       USHORT *   puiClsTree;   /* remember array of super called ID Tree  */
       ULONG      ulAllocated;
       ULONG      ulBlock;
+      UINT       uiDestroyed;
 #ifndef HB_ARRAY_USE_COUNTER
       PHB_ARRAY_HOLDER pOwners;
 #endif

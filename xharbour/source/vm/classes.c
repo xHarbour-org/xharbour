@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.199 2007/01/13 01:36:32 ronpinkas Exp $
+ * $Id: classes.c,v 1.200 2007/03/25 02:41:33 ronpinkas Exp $
  */
 
 /*
@@ -1132,7 +1132,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
          *bSymbol  = (pMethod->uiScope & HB_OO_CLSTP_SYMBOL) > 0;
 
-         if( ! hb_clsValidScope( pObject, pMethod, iOptimizedSend ) )
+         if( HB_IS_OBJECTDESTROYED( pObject ) || ! hb_clsValidScope( pObject, pMethod, iOptimizedSend ) )
          {
             // Force NO execution incase error was bypassed.
             pFunction = hb___msgVirtual;
@@ -1177,6 +1177,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       /*s_msgClass     = hb_dynsymGet( "CLASS" );*/
    }
 
+   *bSymbol = FALSE;
    if( pMsg == s_msgClassName )
    {
       return hb___msgClsName;
@@ -1207,11 +1208,11 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 /* else if( pMsg == s_msgClass )
       return hb___msgClass;       */
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( lAllowErrFunc && uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
 
-      if( lAllowErrFunc && pClass->pFunError )
+      if( pClass->pFunError )
       {
          *bSymbol = (pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ? TRUE : FALSE);
          return pClass->pFunError;

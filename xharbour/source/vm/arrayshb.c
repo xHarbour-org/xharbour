@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.66 2006/10/13 01:42:22 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.67 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -679,7 +679,6 @@ HB_FUNC( HB_ATOKENS )
       BOOL bSkipStrings = hb_parl( 3 );
       BOOL bDoubleQuoteOnly = hb_parl( 4 );
 
-      HB_VM_STACK.Return.type = HB_IT_NIL;
       hb_arrayNew( &(HB_VM_STACK.Return), 0 );
 
       for( i = 0; i < pLine->item.asString.length; i++ )

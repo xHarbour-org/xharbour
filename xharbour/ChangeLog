@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5414 2007/04/03 14:25:18 marchuet Exp $
+ * $Id: ChangeLog,v 1.5415 2007/04/03 14:27:56 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-05 04:15 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
+  * include/hbapi.h
+    New macro HB_IS_OBJECTDESTROYED()
+
+  * include/hbvmpub.h
+    Modification HB_BASEARRAY structure, adding uiDestroyed member.
+
+  ! source/vm/arrays.c
+    Resolve several problems related with destructor of objects.
+    ! Double execution of destructor recursive (hb_arrayReleaseGarbage() and hb_arrayReleaseBase())
+    ! Double execution of destructor non-recursive, in the same execution of GC.
+    ! Execution methods of object destroyed in destructor.
+    % Minor optimization
+
+  ! source/vm/arrayshb.c
+    HB_ATOKENS() clean Return area incorrectly.
+
+  ! source/vm/classes.c
+    ! Avoid execution methods of object destroyed simulating virtual method.
+    ! Set bSymbol to FALSE when use pointer to function.
+    % Minor optimization
+
+  ! source/vm/hvm.c
+    % Optimization of With Object accessing to Datas.
+    ! Incorrect optimization in hb_vmEqual() and hb_vmNotEqual() with HB_IT_POINTER. Some pointers are COMPLEX values.
+    ! Save HB_VM_STACK.bWithObject state before clear Return in hb_vmSend(), to avoid to use the object of With Object in destructor of other object.
 
 2007-04-02 17:54 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/dbf1.c

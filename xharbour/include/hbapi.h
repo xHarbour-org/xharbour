@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.203 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbapi.h,v 1.204 2007/04/02 16:00:22 marchuet Exp $
  */
 
 /*
@@ -144,6 +144,9 @@ HB_EXTERN_BEGIN
 #define HB_IS_GCITEM( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_GCITEM ) != 0 )
 #define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
 #define HB_IS_STRINGWR( p )   ( HB_ITEM_TYPE( p ) & HB_IT_STRING && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
+
+#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && (( p )->item.asArray.value->uiDestroyed & 2) != 0 )
+
 #define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) ) != 0 )
 
 #else
@@ -174,6 +177,8 @@ HB_EXTERN_BEGIN
 #define HB_IS_OBJECT( p )     ( HB_IS_ARRAY( p ) && HB_OBJ_CLASS( p ) != 0 )
 #define HB_IS_STRINGWR( p )   ( ( HB_ITEM_TYPE( p ) & HB_IT_STRING ) != 0 && ( p )->item.asString.allocated && *( ( p )->item.asString.pulHolders ) == 1 )
 #define HB_IS_BADITEM( p )    ( ( HB_ITEM_TYPE( p ) & HB_IT_COMPLEX ) != 0 && ( HB_ITEM_TYPE( p ) & ~( HB_IT_COMPLEX | HB_IT_MEMOFLAG ) ) != 0 )
+
+#define HB_IS_OBJECTDESTROYED( p )  ( HB_IS_ARRAY( p ) && (( p )->item.asArray.value->uiDestroyed & 2) != 0 )
 
 #endif
 

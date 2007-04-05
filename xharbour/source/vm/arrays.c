@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.133 2007/02/27 15:59:41 druzus Exp $
+ * $Id: arrays.c,v 1.134 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -140,6 +140,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    pBaseArray->uiPrevCls   = 0;
    pBaseArray->puiClsTree  = NULL;
    pBaseArray->ulBlock     = 0;
+   pBaseArray->uiDestroyed = 0;
 
    if( ulLen )
    {
@@ -1277,10 +1278,11 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
    //TraceLog( NULL, "Releasing Basearray %p\n", pBaseArray );
 
    // Called recursively from hb_arrayReleaseGarbage!
-   if( pBaseArray->pItems == (PHB_ITEM) 1 )
+   if( pBaseArray->uiDestroyed )
    {
       return;
    }
+   pBaseArray->uiDestroyed = 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseGarbage()
 
    if( pBaseArray->uiClass )
    {
@@ -1308,6 +1310,8 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
       #endif
    }
 
+   pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
+
    /* Release object tree as needed */
    if( pBaseArray->puiClsTree )
    {
@@ -1322,8 +1326,6 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
       //TraceLog( NULL, "Releasing BaseArray %p\n", pBaseArray );
 
-      // HACK! Avoid possible recursion problem when one of the items in turn points to this Array.
-      pBaseArray->pItems = (PHB_ITEM) 1;
 
       pItem = pItems;
 
@@ -1343,21 +1345,24 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
          }
          */
 
-         /*-----------------12/21/2001 8:01PM----------------
-          * The item is not released because it was not
-          * allocated by the GC, its just a portion of the
-          * pItems chunk, which will be released as one piece.
-          * --------------------------------------------------*/
-         if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pBaseArray )
+         if( HB_IS_COMPLEX( pItem ) )
          {
-            HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pItem, pItem->item.asArray.value ) );
-            // TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
-         }
-         else if( HB_IS_COMPLEX( pItem ) )
-         {
-            //TraceLog( NULL, "Releasing Element: %i %p Type: %i\n", pBaseArray->ulLen - ulLen, pItem, pItem->type );
-            hb_itemClear( pItem );
-            //TraceLog( NULL, "DONE Releasing Element: %i %p\n", pBaseArray->ulLen - ulLen, pItem );
+            /*-----------------12/21/2001 8:01PM----------------
+             * The item is not released because it was not
+             * allocated by the GC, its just a portion of the
+             * pItems chunk, which will be released as one piece.
+             * --------------------------------------------------*/
+            if( pItem->type == HB_IT_ARRAY && pItem->item.asArray.value == pBaseArray )
+            {
+               HB_TRACE( HB_TR_DEBUG, ("Warning! Nested Release (Cyclic) %p %p", pItem, pItem->item.asArray.value ) );
+               // TraceLog( NULL, "Warning! Nested Release (Cyclic) %p %p\n", pItem, pItem->item.asArray.value );
+            }
+            else
+            {
+               //TraceLog( NULL, "Releasing Element: %i %p Type: %i\n", pBaseArray->ulLen - ulLen, pItem, pItem->type );
+               hb_itemClear( pItem );
+               //TraceLog( NULL, "DONE Releasing Element: %i %p\n", pBaseArray->ulLen - ulLen, pItem );
+            }
          }
 
          ++pItem;
@@ -1758,6 +1763,13 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
    HB_TRACE( HB_TR_INFO, ( "hb_arrayReleaseGarbage( %p )", pBaseArray ) );
 
+   // Can be called from GC post hb_arrayReleaseBase() execution.
+   if( pBaseArray->uiDestroyed )
+   {
+      return;
+   }
+   pBaseArray->uiDestroyed = 1;  // First step of Release, avoid second call to destructor, first call from hb_arrayReleaseBase()
+
    if( pBaseArray->uiClass )
    {
       HB_ITEM FakedObject;
@@ -1767,6 +1779,8 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
 
       hb_clsFinalize( &FakedObject );
    }
+
+   pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
 
    //TraceLog( NULL, "hb_arrayReleaseGarbage( %p )\n", pBaseArray );
 
@@ -1792,7 +1806,7 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
        // All other complex types will be released directly by the GC.
          if( pItem->type == HB_IT_STRING )
          {
-            hb_itemClear( pItem );
+            hb_itemReleaseString( pItem );
          }
 
          ++pItem;
