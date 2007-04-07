@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.67 2006/06/26 11:27:06 druzus Exp $
+ * $Id: gtapi.c,v 1.68 2006/08/13 00:11:38 oh1 Exp $
  */
 
 /*
@@ -1214,6 +1214,17 @@ USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
 }
 
 /****************************************************************************/
+USHORT HB_EXPORT hb_gtSaveAll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
+                            USHORT uiRight, void * pScrBuff )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_gtSaveAll(%hu, %hu, %hu, %hu, %p)", uiTop, uiLeft, uiBottom, uiRight, pScrBuff));
+
+   hb_gt_GetText( uiTop, uiLeft, uiBottom, uiRight, ( BYTE* ) pScrBuff );
+
+   return 0;
+}
+
+/****************************************************************************/
 USHORT HB_EXPORT hb_gtScrDim( USHORT * uipHeight, USHORT * uipWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_gtScrDim(%p, %p)", uipHeight, uipWidth));
@@ -2261,7 +2272,7 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
    if( iBottom <= ct_BLRow && iBottom >= ct_BFRow &&
        iLeft   <= ct_BLCol && iRight  >= ct_BFCol )
    {
-      hb_gt_SetAttribute( iBottom, HB_MAX( iLeft, ct_BFCol ),
+      hb_gt_SetAttributeCT( iBottom, HB_MAX( iLeft, ct_BFCol ),
                           iBottom, HB_MIN( iRight, ct_BLCol ),
                           byAttr );
    }
@@ -2274,7 +2285,7 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
    if( iTop   <= ct_BLRow && iBottom    >= ct_BFRow &&
        iRight <= ct_BLCol && iRight + 1 >= ct_BFCol )
    {
-      hb_gt_SetAttribute( HB_MAX( iTop, ct_BFRow ),
+      hb_gt_SetAttributeCT( HB_MAX( iTop, ct_BFRow ),
                           HB_MAX( iRight, ct_BFCol ),
                           HB_MIN( iBottom, ct_BLRow ),
                           HB_MIN( iRight + 1, ct_BLCol ),

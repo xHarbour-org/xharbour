@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.170 2007/02/21 22:44:41 peterrees Exp $
+ * $Id: gtwvt.c,v 1.171 2007/02/21 22:50:04 peterrees Exp $
  */
 
 /*
@@ -653,6 +653,37 @@ void HB_GT_FUNC( gt_SetAttribute( USHORT rowStart, USHORT colStart, USHORT rowSt
       else
       {
         _s.pAttributes[ index++ ] = attr;
+      }
+    }
+  }
+  hb_wvt_gtSetInvalidRect( colStart, rowStart, colStop, rowStop );
+}
+
+//-------------------------------------------------------------------//
+
+void HB_GT_FUNC( gt_SetAttributeCT( USHORT rowStart, USHORT colStart, USHORT rowStop, USHORT colStop, BYTE attr ) )
+{
+  USHORT irow, icol, index;
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetAttributeCT( %hu, %hu, %hu, %hu, %d", rowStart, colStart, rowStop, colStop, ( int ) attr ) );
+
+  for ( irow = rowStart; irow <=rowStop; irow++ )
+  {
+    index = hb_wvt_gtGetIndexForTextBuffer( colStart, irow );
+    for ( icol = colStart; icol <= colStop; icol++ )
+    {
+      if ( index >= _s.BUFFERSIZE )
+      {
+        break;
+      }
+      else
+      {
+         if ( _s.pAttributes[ index ] != attr &&  _s.pAttributes[ index ])
+            _s.pAttributes[ index++ ] = attr;
+
+         else
+            _s.pAttributes[ index++ ] = 0;
+
       }
     }
   }

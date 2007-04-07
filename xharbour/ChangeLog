@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5416 2007/04/05 07:18:45 walito Exp $
+ * $Id: ChangeLog,v 1.5417 2007/04/07 00:19:42 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-06 19:15 UTC-0800 Tony Bretado <tony@bretado.com>
+  * source/rtl/gtapi.c
+    + New function hb_gtSaveAll(). Needed to Save WHOLE Screen from inside a CT Window.
+    ! Fix hb_ctShadow(). In order to draw shadow attribute CA-Tools compatible.
+      Now it calls hb_gt_SetAttributeCT() defined in gtwvt.c
+         /* Please check other gt libraries! */
+  + source/rtl/gtwvt/gtwvt.c
+    + New function hb_gt_SetAttributeCT(). Needed to draw shadow attribs CA-Tools compatible.
 
 2007-04-06 17:53 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/tbrowse.prg
