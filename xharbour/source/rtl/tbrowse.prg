@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.165 2007/02/19 10:51:16 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.166 2007/03/11 00:18:44 modalsist Exp $
  */
 
 /*
@@ -157,7 +157,7 @@
 
 /* TBColumn color constants  */
 #define TBC_CLR_STANDARD  1  // first index value to set unselected data color.
-#define TBC_CLR_ENHANCED  2  // second index value to set selected data color. 
+#define TBC_CLR_ENHANCED  2  // second index value to set selected data color.
 #ifdef HB_COMPAT_C53
 #define TBC_CLR_HEADING   3  // third index value to set heading color.
 #define TBC_CLR_FOOTING   4  // fourth index value to set footing color.
@@ -392,7 +392,6 @@ METHOD FillRow( nRow ) CLASS TDataCache
       i := hb_EnumIndex()
 
       with object oCell
-
          :xData := Eval( aCol[ TBCI_OBJ ]:block )
          :aColor := IIF( Empty( aCol[ TBCI_OBJ ]:colorBlock ),;
                          NIL,;
@@ -662,6 +661,7 @@ CLASS TBrowse
    DATA nColsVisible                      // Number of columns that fit on the browse width
    DATA lHitTop                           // Internal Top/Bottom reached flag
    DATA lHitBottom
+   DATA lForceHitsFalse                   // Used when going Top/Bottom
    DATA nRecsToSkip                       // Recs to skip on next Stabilize()
    DATA nNewRowPos                        // Next position of data source (after first phase of stabilization)
    DATA nRowData                          // Row, first row of data
@@ -737,6 +737,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::nColPos         := 1
    ::lHitTop         := .F.
    ::lHitBottom      := .F.
+   ::lForceHitsFalse := .f.
    ::cColorSpec      := SetColor()
    ::cColSep         := " "
    ::cFootSep        := ""
@@ -893,7 +894,6 @@ METHOD Configure( nMode ) CLASS TBrowse
    FOR EACH aCol IN ::aColsInfo
 
       if ( nMode <= 1 .and. !::lNeverDisplayed ) .or. lInitializing
-
          xVal := Eval( aCol[ TBCI_OBJ ]:block )
 
          aCol[ TBCI_TYPE      ] := valtype( xVal )
@@ -1479,7 +1479,7 @@ Return nWidth
 
 METHOD Down() CLASS TBrowse
 
-   ::Moved()
+   ::Moved(.t.)
    ::nRecsToSkip ++
 
 Return Self
@@ -1488,7 +1488,7 @@ Return Self
 
 METHOD Up() CLASS TBrowse
 
-   ::Moved()
+   ::Moved(.t.)
    ::nRecsToSkip --
 
 Return Self
@@ -1497,7 +1497,7 @@ Return Self
 
 METHOD PageDown() CLASS TBrowse
 
-   ::Moved()
+   ::Moved(.t.)
    ::nRecsToSkip := ( ::RowCount - ::nRowPos ) + ::RowCount
    ::lPaintBottomUp := .T.
 
@@ -1507,7 +1507,7 @@ Return Self
 
 METHOD PageUp() CLASS TBrowse
 
-   ::Moved()
+   ::Moved(.t.)
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
 
 Return Self
@@ -1518,7 +1518,7 @@ METHOD GoBottom() CLASS TBrowse
 
    LOCAL nToTop
 
-   ::Moved()
+   ::Moved(.t., .t.)
 
    // Skips back from last record as many records as TBrowse can hold
    nToTop := ::oDataCache:dbGoBottom()
@@ -1537,7 +1537,7 @@ Return Self
 
 METHOD GoTop() CLASS TBrowse
 
-   ::Moved()
+   ::Moved(.t., .t.)
    ::oDataCache:dbGoTop()
    // required for compatibility
    ::oDataCache:dbSkip( 0 )
@@ -1822,16 +1822,21 @@ Return Self
 //
 //-------------------------------------------------------------------//
 
-METHOD Moved() CLASS TBrowse
+METHOD Moved(lResetHits, lForceHitsFalse) CLASS TBrowse
+   // Forcing Reset of ::HitTop/Bottom flags!  Clipper Compatible
+   default lResetHits      to .f.
+   default lForceHitsFalse to .f.
 
    // Internal flags used to set ::HitTop/Bottom during next stabilization
    //
-   ::lHitTop    := .F.
-   ::lHitBottom := .F.
+   If lResetHits
+      ::lHitTop    := .F.
+      ::lHitBottom := .F.
+      ::lForceHitsFalse := lForceHitsFalse
+   EndIf
 
    // No need to Dehilite() current cell more than once
    //
-
    if ::stable
       if ::AutoLite
          ::DeHilite()
@@ -2360,12 +2365,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    LOCAL nRowToDraw
    LOCAL cCurColor
 
-   // Reset flags before stabilization.
-   //
-   ::lHitTop    := .F.
-   ::lHitBottom := .F.
-
-
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
       return .t.
@@ -2499,7 +2498,8 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
       // new cursor position
       //
-      ::nRowPos    := ::nNewRowPos
+      ::nRowPos         := ::nNewRowPos
+      ::lForceHitsFalse := .f.
 
       ::stable := .T.
       ::lPaintBottomUp := .F.
@@ -2544,12 +2544,12 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I've tried to move past top or bottom margin
       //
       if nRecsSkipped == 0
-         // 2007/FEB/19 - E.F. - GoBottom() should not activate lhitbottom
-         //if ::nRecsToSkip > 0
-         if ::nRecsToSkip > 0 .and. ::nRecsToSkip != ( ::RowCount - 1 )
-            ::lHitBottom := .T.
+         if ::nRecsToSkip > 0
+            ::lHitBottom := .T. .and. !::lForceHitsFalse
+
          elseif ::nRecsToSkip < 0
-            ::lHitTop := .T.
+            ::lHitTop := .T. .and. !::lForceHitsFalse
+
          endif
 
       elseif nRecsSkipped == ::nRecsToSkip
