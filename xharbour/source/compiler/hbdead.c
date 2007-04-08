@@ -1,5 +1,5 @@
 /*
- * $Id: hbdead.c,v 1.6 2007/02/27 15:59:34 druzus Exp $
+ * $Id: hbdead.c,v 1.7 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -295,7 +295,7 @@ static HB_CODETRACE_FUNC( hb_p_endproc )
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
-static PHB_CODETRACE_FUNC s_codeTraceFuncTable[ HB_P_LAST_PCODE ] =
+static PHB_CODETRACE_FUNC s_codeTraceFuncTable[] =
 {
    hb_p_default,               /* HB_P_AND,                  */
    hb_p_default,               /* HB_P_ARRAYPUSH,            */
@@ -470,7 +470,8 @@ static PHB_CODETRACE_FUNC s_codeTraceFuncTable[ HB_P_LAST_PCODE ] =
    hb_p_default,               /* HB_P_ARRAYPUSHREF          */
    hb_p_default,               /* HB_P_ARRAYPOPPLUS          */
    hb_p_default,               /* HB_P_PUSHDATETIME          */
-   hb_p_default                /* HB_P_PUSHDATE              */
+   hb_p_default,               /* HB_P_PUSHDATE              */
+   hb_p_default                /* HB_P_HASHGEN               */
 };
 
 void hb_compCodeTraceMarkDead( PFUNCTION pFunc )
@@ -521,7 +522,7 @@ void hb_compCodeTraceMarkDead( PFUNCTION pFunc )
          --ulPos;
          --ulCount;
       }
- 
+
       if( ulCount > 0 )
       {
          /*

@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.9 2006/05/30 10:51:23 druzus Exp $
+ * $Id: gencc.c,v 1.10 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -271,6 +271,15 @@ static HB_GENC_FUNC( hb_p_arraygen )
    HB_GENC_LABEL();
 
    fprintf( cargo->yyc, "\thb_xvmArrayGen( %hu );\n",
+            HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ) );
+   return 3;
+}
+
+static HB_GENC_FUNC( hb_p_hashgen )
+{
+   HB_GENC_LABEL();
+
+   fprintf( cargo->yyc, "\thb_xvmHashGen( %hu );\n",
             HB_PCODE_MKUSHORT( &pFunc->pCode[ lPCodePos + 1 ] ) );
    return 3;
 }
@@ -1660,7 +1669,7 @@ static HB_GENC_FUNC( hb_p_finally )
 
    fprintf( cargo->yyc, "\t{\n\tUSHORT uiActionRequest%d = hb_xvmBeginFinally();\n\tdo {\n",
             cargo->iFinally );
-   
+
    return 1;
 }
 
@@ -1926,7 +1935,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_arraypushref,
    hb_p_arraypopplus,
    hb_p_pushdatetime,
-   hb_p_pushdate
+   hb_p_pushdate,
+   hb_p_hashgen
 };
 
 void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )

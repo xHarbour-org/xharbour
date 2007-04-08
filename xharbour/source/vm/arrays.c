@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.134 2007/03/25 06:12:50 walito Exp $
+ * $Id: arrays.c,v 1.135 2007/04/05 07:18:45 walito Exp $
  */
 
 /*
@@ -262,7 +262,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 
             pItems = pBaseArray->pItems + ulAllocated;
             ulPos = ulAllocated;
-            
+
             do
             {
                ( --pItems )->type = HB_IT_NIL;
@@ -312,7 +312,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             else if( pBaseArray->ulLen > ulLen )
             {
                PHB_ITEM pOldItems;
-               
+
                /* release old items */
                pOldItems = pBaseArray->pItems + pBaseArray->ulLen;
                ulPos = pBaseArray->ulLen - ulLen;
@@ -341,7 +341,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
                      PHB_ITEM pOldItems = pBaseArray->pItems;
                   #endif
                   register ULONG ulArrayPrealloc = pBaseArray->ulBlock;
-                  
+
                   if( ulLen + ulArrayPrealloc * 2 <= pBaseArray->ulAllocated )
                   {
                      ulAllocated = ulLen + ulArrayPrealloc;
@@ -671,7 +671,7 @@ LONG HB_EXPORT hb_arrayGetT( PHB_ITEM pArray, ULONG ulIndex )
    {
       return hb_itemGetT( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   
+
    /* NOTE: Intentionally calling it with a bad parameter in order to get
             the default value from hb_itemGetT(). */
    return hb_itemGetT( NULL );
@@ -685,7 +685,7 @@ double HB_EXPORT hb_arrayGetDTsec( PHB_ITEM pArray, ULONG ulIndex )
    {
       return hb_itemGetDTsec( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   
+
    /* NOTE: Intentionally calling it with a bad parameter in order to get
             the default value from hb_itemGetDTsec().  */
    return hb_itemGetDTsec( NULL );
@@ -699,7 +699,7 @@ double HB_EXPORT hb_arrayGetDTD( PHB_ITEM pArray, ULONG ulIndex )
    {
       return hb_itemGetDTD( pArray->item.asArray.value->pItems + ulIndex - 1 );
    }
-   
+
    /* NOTE: Intentionally calling it with a bad parameter in order to get
             the default value from hb_itemGetDTD(). */
    return hb_itemGetDTD( NULL );
@@ -1689,9 +1689,9 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
    // SomeFunc( ... ) Variable paramaters.
-   if( uiPCount > 255 )
+   if( uiPCount > HB_VAR_PARAM_FLAG )
    {
-      uiPCount -= 256;
+      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
    }
 
    hb_arrayNew( pArray, uiPCount );
@@ -1713,9 +1713,10 @@ HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
 
    pArray = hb_itemNew( NULL );
    uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
-   if( uiPCount > 255 )
+
+   if( uiPCount > HB_VAR_PARAM_FLAG )
    {
-      uiPCount -= 256;
+      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
    }
 
    hb_arrayNew( pArray, uiPCount );
@@ -1737,9 +1738,10 @@ HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
 
    pArray = hb_itemNew( NULL );
    uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
-   if( uiPCount > 255 )
+
+   if( uiPCount > HB_VAR_PARAM_FLAG )
    {
-      uiPCount -= 256;
+      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
    }
 
    hb_arrayNew( pArray, uiPCount + 1 );

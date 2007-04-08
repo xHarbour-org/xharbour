@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.39 2006/04/21 11:25:33 druzus Exp $
+ * $Id: hbfix.c,v 1.40 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -424,7 +424,7 @@ static HB_FIX_FUNC( hb_p_true )
             if( ! hb_compIsJump( pFunc, lPCodePos + 1 ) )
             {
                int iCount = 1;
-   
+
                switch( pFunc->pCode[ lPCodePos + 1 ] )
                {
                   case HB_P_JUMPTRUENEAR:
@@ -756,7 +756,8 @@ static HB_FIX_FUNC_PTR s_fixlocals_table[] =
    NULL,                       /* HB_P_ARRAYPUSHREF          */
    NULL,                       /* HB_P_ARRAYPOPPLUS          */
    NULL,                       /* HB_P_PUSHDATETIME          */
-   NULL                        /* HB_P_PUSHDATE              */
+   NULL,                       /* HB_P_PUSHDATE              */
+   NULL                        /* HB_P_HASHGEN               */
 };
 
 void hb_compFixFuncPCode( PFUNCTION pFunc )

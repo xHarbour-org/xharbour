@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.204 2007/04/02 16:00:22 marchuet Exp $
+ * $Id: hbapi.h,v 1.205 2007/04/05 07:18:45 walito Exp $
  */
 
 /*
@@ -404,15 +404,17 @@ extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
    #define HB_ARRAY_COUNTER_DEFAULT_HOLDERS 1
 #endif
 
+#define HB_VAR_PARAM_FLAG 255
+
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
    #ifndef HB_COMP_H_
       #include "hbstack.h"
    #endif
 
-   #define hb_pcount()                          ( ( int ) ( ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt < 255 ) ? \
+   #define hb_pcount()                          ( ( int ) ( ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt <= HB_VAR_PARAM_FLAG ) ? \
                                                               ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt : \
-                                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt - 256 ) )
+                                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 ) ) )
 
     #define hb_ret()                             hb_itemClear( hb_stackReturnItem() )
     #define hb_reta( ulLen )                     hb_arrayNew( hb_stackReturnItem(), (ulLen) )

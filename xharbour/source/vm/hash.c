@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.50 2007/01/10 17:38:23 snaiperis Exp $
+ * $Id: hash.c,v 1.51 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -87,7 +87,7 @@ static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL
       {
          c1 = (unsigned char) pStr1[ ul ];
          c2 = (unsigned char) pStr2[ ul ];
-  
+
          if( c1 != c2 )
          {
             ret = ( c1 < c2 ? -1 : 1 );
@@ -101,7 +101,7 @@ static int s_memicmp( char* pStr1, ULONG ulLen1, char* pStr2, ULONG ulLen2, BOOL
       {
          c1 = toupper( (unsigned char) pStr1[ ul ] );
          c2 = toupper( (unsigned char) pStr2[ ul ] );
-  
+
          if( c1 != c2 )
          {
             ret = ( c1 < c2 ? -1 : 1 );
@@ -220,8 +220,8 @@ static int s_hashOrderComplex( PHB_ITEM pFirst,
       }
       else if ( pSecond->type == HB_IT_STRING )
       {
-         return s_memicmp( pFirst->item.asString.value, pFirst->item.asString.length, 
-                           pSecond->item.asString.value, pSecond->item.asString.length, 
+         return s_memicmp( pFirst->item.asString.value, pFirst->item.asString.length,
+                           pSecond->item.asString.value, pSecond->item.asString.length,
                            bCase );
       }
       // nothing with higher priority
@@ -2122,26 +2122,23 @@ HB_FUNC( HASH )
 
       for( iParam = 1; iParam <= iPCount; iParam+=2 )
       {
-         /* For now only allows string keys */
+         /* For now only allows strings/numerics/dates keys */
          PHB_ITEM pKey = hb_param( iParam, HB_IT_STRING | HB_IT_NUMERIC | HB_IT_DATE );
          PHB_ITEM pValue = hb_param( iParam+1, HB_IT_ANY );
 
-         if ( pKey == NULL )
+         if( pKey == NULL )
          {
             hb_hashRelease( pHash );
-            hb_errRT_BASE( EG_BOUND, 1131,
-               "Hash keys must be strings, numbers or dates",
-               hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+            hb_errRT_BASE( EG_BOUND, 1131, "Hash keys must be strings, numbers or dates", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
             return;
          }
 
-         if (! hb_hashAdd( pHash, ULONG_MAX, pKey, pValue ) )
+         if( ! hb_hashAdd( pHash, ULONG_MAX, pKey, pValue ) )
          {
             hb_hashRelease( pHash );
             hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
             return;
          }
-
       }
    }
 
@@ -3051,7 +3048,7 @@ HB_FUNC( HAAGETREALPOS )
    {
       hb_retnl( hb_hashAAGetRealPos( pHash, (ULONG) hb_parnl( 2 ) ) );
    }
-   else   
+   else
    {
       hb_errRT_BASE( EG_ARG, 2017, NULL, "HAAGETREALPOS", 1,
            hb_paramError( 1 ));

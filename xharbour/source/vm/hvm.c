@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.607 2007/03/26 15:25:17 ronpinkas Exp $
+ * $Id: hvm.c,v 1.608 2007/04/05 07:18:45 walito Exp $
  */
 
 /*
@@ -194,6 +194,9 @@ void    hb_vmOperatorCallUnary( PHB_ITEM, char *, PHB_ITEM ); /* call an overloa
 /* Database */
 static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workarea using a given item or a substituted value */
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
+
+/* Hash */
+static void    hb_vmHashGen( ULONG ulPairs ); /* generates an ulElements Array and fills it from the stack values */
 
 /* Execution */
 static HARBOUR hb_vmDoBlock( void );             /* executes a codeblock */
@@ -1350,6 +1353,14 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_ARRAYGEN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ARRAYGEN %i + %i", HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), HB_VM_STACK.iExtraElements ) );
             hb_vmArrayGen( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) + HB_VM_STACK.iExtraElements );
+            HB_VM_STACK.iExtraElements = 0;
+
+            w += 3;
+            break;
+
+         case HB_P_HASHGEN:
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_HASHGEN %i + %i", HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ), HB_VM_STACK.iExtraElements ) );
+            hb_vmHashGen( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) + HB_VM_STACK.iExtraElements );
             HB_VM_STACK.iExtraElements = 0;
 
             w += 3;
@@ -6540,6 +6551,53 @@ static void hb_vmArrayGen( ULONG ulElements ) /* generates an ulElements Array a
    }
 }
 
+static void hb_vmHashGen( ULONG ulPairs ) /* generates an ulPairs Hash and fills it from the stack values */
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pHash;
+   ULONG ulPos, ulItems = ulPairs * 2;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmArrayGen(%lu)", ulPairs));
+
+   pHash = hb_hashNew( NULL );
+
+   if( ulPairs )
+   {
+      hb_hashPreallocate( pHash, ulPairs );
+   }
+
+   for( ulPos = 0; ulPos < ulItems; ulPos += 2 )
+   {
+      if( ! hb_hashAdd( pHash, ULONG_MAX, hb_stackItemFromTop( ulPos - ulItems ), hb_stackItemFromTop( ulPos - ulItems + 1 ) ) )
+      {
+         hb_hashRelease( pHash );
+         hb_itemRelease( pHash );
+         hb_errRT_BASE( EG_BOUND, 1131, "Hash value insertion failed", hb_langDGetErrorDesc( EG_ARRDIMENSION ), 0 );
+         return;
+      }
+   }
+
+   /* Poping 1 less than element,so we can override the 1st element with the new array */
+   for( ulPos = 1; ulPos < ulItems; ulPos++ )
+   {
+      hb_stackPop();
+   }
+
+   /* Override 1st element if there was one, or push... */
+   if( ulPairs )
+   {
+      hb_itemForwardValue( ( hb_stackItemFromTop( - 1 ) ), pHash );
+   }
+   else
+   {
+      hb_itemForwardValue( ( * HB_VM_STACK.pPos ), pHash );
+      hb_stackPush();
+   }
+
+   hb_itemRelease( pHash );
+}
+
 /* This function creates an array item using 'uiDimension' as an index
  * to retrieve the number of elements from the stack
  */
@@ -7003,7 +7061,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       BOOL        bWithObject = HB_VM_STACK.bWithObject;
       HB_VM_STACK.bWithObject = FALSE;
-       
+
       hb_itemClear( &(HB_VM_STACK.Return) );
 
       HB_VM_STACK.bWithObject = bWithObject;
@@ -7697,14 +7755,15 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", iLocals, (int) bParams));
 
-   if( bParams == 255 )
+   if( bParams == HB_VAR_PARAM_FLAG )
    {
-      hb_stackBaseItem()->item.asSymbol.paramcnt += 256;
+      hb_stackBaseItem()->item.asSymbol.paramcnt += ( HB_VAR_PARAM_FLAG + 1 );
 
       while( iLocals-- > 0 )
       {
          hb_vmPushNil();
       }
+
       return;
    }
 
@@ -8637,13 +8696,15 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
    if( iLocal >= 0 )
    {
       // SomeFunc( ... ) - Variable paramaters.
-      if( hb_stackBaseItem()->item.asSymbol.paramcnt > 255 )
+      if( hb_stackBaseItem()->item.asSymbol.paramcnt > HB_VAR_PARAM_FLAG )
       {
-         iLocal += hb_stackBaseItem()->item.asSymbol.paramcnt - 256;
+         iLocal += hb_stackBaseItem()->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 );
       }
-#ifdef HB_UNSHARE_REFERENCES
-      hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
-#endif
+
+      #ifdef HB_UNSHARE_REFERENCES
+        hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
+      #endif
+
       pTop->item.asRefer.BasePtr.itemsbasePtr = &HB_VM_STACK.pItems;
    }
    else
@@ -11844,6 +11905,16 @@ HB_EXPORT void hb_xvmArrayGen( ULONG ulElements )
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmArrayGen(%lu)", ulElements));
 
    hb_vmArrayGen( ulElements );
+   HB_VM_STACK.iExtraElements = 0;
+}
+
+HB_EXPORT void hb_xvmHashGen( ULONG ulPairs )
+{
+   HB_THREAD_STUB_STACK
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmHAshGen(%lu)", ulPairs));
+
+   hb_vmArrayGen( ulPairs );
    HB_VM_STACK.iExtraElements = 0;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.25 2007/02/22 01:55:15 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.26 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -100,7 +100,8 @@ char * hb_comp_szErrors[] =
    "Memory buffer overflow",
    "Memory corruption detected",
    "TRY section requires a CATCH or FINALLY handler",
-   "Invalid use of nameless parameter"
+   "Invalid use of nameless parameter",
+   "Too many arguments to function: \'%s\'"
 };
 
 /* Table with parse warnings */

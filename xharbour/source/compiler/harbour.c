@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.150 2007/03/21 10:15:51 marchuet Exp $
+ * $Id: harbour.c,v 1.151 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -4475,7 +4475,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
          }
 
          // SomeFunc( ... ) - Variable number paramaters.
-         if( pFunc->pCode[ 2 + iOffset ] < 255 )
+         if( pFunc->pCode[ 2 + iOffset ] < HB_VAR_PARAM_FLAG )
          {
             pFunc->pCode[ 2 + iOffset ] = ( BYTE )( pFunc->wParamCount );
          }

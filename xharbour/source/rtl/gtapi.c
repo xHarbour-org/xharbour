@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.68 2006/08/13 00:11:38 oh1 Exp $
+ * $Id: gtapi.c,v 1.69 2007/04/07 02:14:51 jabrecer Exp $
  */
 
 /*
@@ -2272,9 +2272,11 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
    if( iBottom <= ct_BLRow && iBottom >= ct_BFRow &&
        iLeft   <= ct_BLCol && iRight  >= ct_BFCol )
    {
+      /*
       hb_gt_SetAttributeCT( iBottom, HB_MAX( iLeft, ct_BFCol ),
                           iBottom, HB_MIN( iRight, ct_BLCol ),
                           byAttr );
+      */
    }
 
    ++iRight;
@@ -2285,11 +2287,13 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
    if( iTop   <= ct_BLRow && iBottom    >= ct_BFRow &&
        iRight <= ct_BLCol && iRight + 1 >= ct_BFCol )
    {
+      /*
       hb_gt_SetAttributeCT( HB_MAX( iTop, ct_BFRow ),
                           HB_MAX( iRight, ct_BFCol ),
                           HB_MIN( iBottom, ct_BLRow ),
                           HB_MIN( iRight + 1, ct_BLCol ),
                           byAttr );
+      */
    }
 
    return 0;

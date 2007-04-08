@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.45 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hbpcode.c,v 1.46 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -283,7 +283,8 @@ const BYTE hb_comp_pcode_len[] = {
    1,        /* HB_P_ARRAYPUSHREF,         */
    1,        /* HB_P_ARRAYPOPPLUS          */
    9,        /* HB_P_PUSHDATETIME,         */
-   5         /* HB_P_PUSHDATE,             */
+   5,        /* HB_P_PUSHDATE,             */
+   3         /* HB_P_HASHGEN               */
 };
 
 /*
@@ -465,7 +466,8 @@ static HB_PCODE_FUNC_PTR s_psize_table[] =
    NULL,                       /* HB_P_ARRAYPUSHREF          */
    NULL,                       /* HB_P_ARRAYPOPPLUS          */
    NULL,                       /* HB_P_PUSHDATETIME,         */
-   NULL                        /* HB_P_PUSHDATE,             */
+   NULL,                       /* HB_P_PUSHDATE,             */
+   NULL                        /* HB_P_HASHGEN               */
 };
 
 LONG hb_compPCodeSize( PFUNCTION pFunc, ULONG ulOffset )

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.25 2007/02/26 22:24:58 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.26 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -297,6 +297,22 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
    pExpr->value.asFunCall.pParms = pParms;
    pExpr->value.asFunCall.pFunName = pName;
 
+   if( hb_compExprListLen( pParms ) > HB_VAR_PARAM_FLAG )
+   {
+      #ifdef HB_MACRO_SUPPORT
+        hb_compErrorSyntax( pExpr );
+      #else
+        if( pName->ExprType == HB_ET_FUNNAME )
+        {
+           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol, NULL );
+        }
+        else
+        {
+           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, "&", NULL );
+        }
+      #endif
+   }
+
    return pExpr;
 }
 
@@ -359,7 +375,10 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
 /* ************************************************************************* */
 
 #ifndef HB_MACRO_SUPPORT
-static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pLeftExpr, HB_EXPR_PTR pRightExpr )
+
+BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pFunc, HB_EXPR_PTR pStaticVar );
+
+static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_PTR pRightExpr )
 {
    HB_EXPR_PTR pElem = pRightExpr->value.asList.pExprList;
    HB_EXPR_PTR pNext;
@@ -374,13 +393,43 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pLeftExpr, HB_EXPR_P
        */
       pNext = pElem->pNext; /* store next expression in case the current  will be reduced */
       pElem = hb_compExprListStrip( HB_EXPR_USE( pElem, HB_EA_REDUCE ), HB_MACRO_PARAM );
+
       if( pElem->ExprType > HB_ET_FUNREF )
-         hb_compErrorStatic( pLeftExpr->value.asSymbol, pElem );
+      {
+         if( ! hb_compCanUseAsConstant( pElem, pStaticVar ) )
+         {
+            hb_compErrorStatic( pStaticVar->value.asSymbol, pElem );
+         }
+      }
+
       *pPrev = pElem;   /* store a new expression into the previous one */
       pElem->pNext = pNext;  /* restore the link to next expression */
       pPrev  = &pElem->pNext;
       pElem  = pNext;
    }
+}
+
+/*
+ TODO: There are other valid initializers that are currently disallowed, f.e.:
+
+          STATIC x := {1}[1]
+ */
+BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pInit, HB_EXPR_PTR pStaticVar )
+{
+   if( pInit->ExprType != HB_ET_FUNCALL )
+   {
+      return FALSE;
+   }
+
+   if( strcmp( pInit->value.asFunCall.pFunName->value.asSymbol, "ARRAY" ) == 0 ||
+       strcmp( pInit->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
+   {
+      // We must validate the arguments!
+      hb_compExprCheckStaticInitializers( pStaticVar, pInit->value.asFunCall.pParms );
+      return TRUE;
+   }
+
+   return FALSE;
 }
 
 /* It initializes static variable.
@@ -413,9 +462,12 @@ HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR pLeftExpr, HB_EXPR_PTR pRightEx
    }
    else if( pRightExpr->ExprType > HB_ET_FUNREF )
    {
-      /* Illegal initializer for static variable (not a constant value)
-       */
-      hb_compErrorStatic( pLeftExpr->value.asSymbol, pRightExpr );
+      if( ! hb_compCanUseAsConstant( pRightExpr, pLeftExpr ) )
+      {
+         /* Illegal initializer for static variable (not a constant value)
+          */
+          hb_compErrorStatic( pLeftExpr->value.asSymbol, pRightExpr );
+      }
    }
    else if( pRightExpr->ExprType == HB_ET_ARRAY )
    {

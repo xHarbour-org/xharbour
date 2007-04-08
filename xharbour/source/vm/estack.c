@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.85 2007/01/13 15:58:45 druzus Exp $
+ * $Id: estack.c,v 1.86 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -418,14 +418,7 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 
    //printf( "Local %i Params: %i\n", nFromBase, hb_stackBaseItem()->item.asSymbol.paramcnt );
 
-   if( hb_stackBaseItem()->item.asSymbol.paramcnt < 255 )
-   {
-      return ( * ( HB_VM_STACK.pBase + nFromBase + 1 ) );
-   }
-   else
-   {
-      return ( * ( HB_VM_STACK.pBase + nFromBase + 1 + hb_stackBaseItem()->item.asSymbol.paramcnt - 256 ) );
-   }
+   return ( * ( HB_VM_STACK.pBase + nFromBase + 1 ) );
 }
 
 #undef hb_stackTopItem

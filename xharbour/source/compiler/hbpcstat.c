@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hbpcstat.c,v 1.2 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -230,7 +230,8 @@ static const char * hb_comp_pcode_names[] =
     "HB_P_ARRAYPOPPLUS",          /* 169 */
     "HB_P_PUSHDATETIME",          /* 170 */
     "HB_P_PUSHDATE",              /* 171 */
-    "HB_P_LAST_PCODE"             /* 172 this defines the number of defined pcodes */
+    "HB_P_HASHGEN",               /* 172 */
+    "HB_P_LAST_PCODE"             /* 173 this defines the number of defined pcodes */
 };
 
 

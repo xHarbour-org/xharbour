@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.8 2006/05/30 10:51:23 druzus Exp $
+ * $Id: hbxvm.h,v 1.9 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -151,6 +151,8 @@ extern HB_EXPORT void   hb_xvmArrayGen( ULONG ulElements );       /* generates a
 extern HB_EXPORT BOOL   hb_xvmArrayPush( void );                  /* pushes an array element to the stack, removing the array and the index from the stack */
 extern HB_EXPORT BOOL   hb_xvmArrayPushRef( void );
 extern HB_EXPORT BOOL   hb_xvmArrayPop( void );                   /* pops a value from the stack */
+
+extern HB_EXPORT void   hb_xvmHashGen( ULONG ulPairs );       /* generates an ulElements Array and fills it from the stack values */
 
 extern HB_EXPORT void   hb_xvmLocalName( USHORT uiLocal, char * szLocalName );
 extern HB_EXPORT void   hb_xvmStaticName( BYTE bIsGlobal, USHORT uiStatic, char * szStaticName );

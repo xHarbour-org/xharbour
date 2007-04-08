@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.129 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: genc.c,v 1.130 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -1495,6 +1495,21 @@ static HB_GENC_FUNC( hb_p_arraygen )
    return 3;
 }
 
+static HB_GENC_FUNC( hb_p_hashgen )
+{
+   fprintf( cargo->yyc, "\tHB_P_HASHGEN, %i, %i,",
+            pFunc->pCode[ lPCodePos + 1 ],
+            pFunc->pCode[ lPCodePos + 2 ] );
+
+   if( cargo->bVerbose )
+   {
+      fprintf( cargo->yyc, "\t/* %i */", HB_PCODE_MKUSHORT( &( pFunc->pCode[ lPCodePos + 1 ] ) ) );
+   }
+
+   fprintf( cargo->yyc, "\n" );
+   return 3;
+}
+
 static HB_GENC_FUNC( hb_p_greater )
 {
    HB_SYMBOL_UNUSED( pFunc );
@@ -2502,7 +2517,7 @@ static HB_GENC_FUNC( hb_p_pushlonglong )
 static HB_GENC_FUNC( hb_p_pushdatetime )
 {
    int i;
-   
+
    fprintf( cargo->yyc, "\tHB_P_PUSHDATETIME, " );
 
    for( i = 0; i < ( int ) ( sizeof( UINT32 ) + sizeof( UINT32 ) ); ++i )
@@ -2519,7 +2534,7 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
    }
 
    fprintf( cargo->yyc, "\t/* HB_ET_DDATETIME */\n" );
-   
+
    return sizeof(double) + 1;
 }
 
@@ -3884,7 +3899,8 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_arraypushref,
    hb_p_arraypopplus,
    hb_p_pushdatetime,
-   hb_p_pushdate
+   hb_p_pushdate,
+   hb_p_hashgen
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

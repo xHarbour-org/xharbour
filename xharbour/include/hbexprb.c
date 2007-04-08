@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.113 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.114 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -1837,7 +1837,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   HB_XFREE( pReduced );
                   break;
                }
-               else if( strcmp( "CTOD", pName->value.asSymbol ) == 0 && 
+               else if( strcmp( "CTOD", pName->value.asSymbol ) == 0 &&
                        usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
                {
                   /* try to change it into a date */
@@ -2254,6 +2254,28 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                    break;
                }
+               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
+               {
+                   if( usCount )
+                   {
+                      if( usCount % 2 )
+                      {
+                         hb_compErrorSyntax( pSelf->value.asFunCall.pParms->value.asList.pExprList );
+                      }
+                      else
+                      {
+                         HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_PUSH_PCODE );
+                      }
+
+                      HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_HASHGEN, HB_LOBYTE( usCount / 2 ), HB_HIBYTE( usCount / 2 ), ( BOOL ) 1 );
+                   }
+                   else
+                   {
+                      HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_HASHGEN, 0, 0, ( BOOL ) 1 );
+                   }
+
+                   break;
+               }
 
                if( bPcode )
                {
@@ -2361,7 +2383,9 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "AT" ) == 0 ||
                         strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 ||
                         strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 ||
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ARRAY" ) == 0 ||
+                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
                {
                   /* Functions with no side effect as statements! Nothing to do really!
                   */

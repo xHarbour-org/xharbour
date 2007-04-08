@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.29 2005/11/03 06:54:58 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.30 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -235,6 +235,7 @@ typedef enum
    HB_P_ARRAYPOPPLUS,          /* 169 */
    HB_P_PUSHDATETIME,          /* 170 places an date on the virtual machine stack */
    HB_P_PUSHDATE,              /* 171 */
+   HB_P_HASHGEN,               /* 172 */
 
 /* NOTE: This have to be the last definition */
    HB_P_LAST_PCODE             /* 170 this defines the number of defined pcodes */

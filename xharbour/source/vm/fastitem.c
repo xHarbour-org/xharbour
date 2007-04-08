@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.102 2007/02/27 15:59:41 druzus Exp $
+ * $Id: fastitem.c,v 1.103 2007/03/08 15:01:27 ronpinkas Exp $
  */
 
 /*
@@ -1049,13 +1049,13 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
    BYTE iId = 1;
 
 
-   if( hb_stackBaseItem()->item.asSymbol.paramcnt < 256 )
+   if( hb_stackBaseItem()->item.asSymbol.paramcnt <= HB_VAR_PARAM_FLAG )
    {
       pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1;
    }
    else
    {
-      pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1 - 256;
+      pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1 - ( HB_VAR_PARAM_FLAG + 1 );
    }
 
    while( pBase < pTop )
@@ -1065,6 +1065,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
         //printf( "\nId: %i", iId );
         return iId;
      }
+
      pBase++;iId++;
    }
 

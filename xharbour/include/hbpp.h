@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.13 2007/03/04 13:37:51 druzus Exp $
+ * $Id: hbpp.h,v 1.14 2007/03/30 16:10:26 marchuet Exp $
  */
 
 /*
@@ -280,12 +280,7 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
                                    HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_MODEQ || \
                                    HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EXPEQ || \
                                    HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EQUAL || \
-                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EQ || \
-                                   ( HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_SEND && \
-                                     (t)->spaces == 0 && (t)->pNext && \
-                                     ( HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_KEYWORD || \
-                                       HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_MACROVAR || \
-                                       HB_PP_TOKEN_TYPE((t)->pNext->type) == HB_PP_TOKEN_MACROTEXT ) ) )
+                                   HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_EQ )
 
 /* I do not want to replicate exactly Clipper PP behavior and check if
    expression is valid.

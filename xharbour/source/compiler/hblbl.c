@@ -1,5 +1,5 @@
 /*
- * $Id: hblbl.c,v 1.2 2006/04/21 11:25:33 druzus Exp $
+ * $Id: hblbl.c,v 1.3 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -203,7 +203,7 @@ static HB_LABEL_FUNC( hb_p_tryrecover )
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
-static PHB_LABEL_FUNC s_GenLabelFuncTable[ HB_P_LAST_PCODE ] =
+static PHB_LABEL_FUNC s_GenLabelFuncTable[] =
 {
    NULL,                       /* HB_P_AND,                  */
    NULL,                       /* HB_P_ARRAYPUSH,            */
@@ -378,7 +378,8 @@ static PHB_LABEL_FUNC s_GenLabelFuncTable[ HB_P_LAST_PCODE ] =
    NULL,                       /* HB_P_ARRAYPUSHREF          */
    NULL,                       /* HB_P_ARRAYPOPPLUS          */
    NULL,                       /* HB_P_PUSHDATETIME          */
-   NULL                        /* HB_P_PUSHDATE              */
+   NULL,                       /* HB_P_PUSHDATE              */
+   NULL                        /* HB_P_HASHGENE              */
 };
 
 void hb_compGenLabelTable( PFUNCTION pFunc, PHB_LABEL_INFO label_info )

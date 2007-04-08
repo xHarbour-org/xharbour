@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.21 2005/11/02 19:46:38 ronpinkas Exp $
+ * $Id: debug.c,v 1.22 2006/07/08 11:58:04 likewolf Exp $
  */
 
 /*
@@ -211,9 +211,10 @@ HB_FUNC( HB_DBG_VMPARLLIST )
    }
 
    uiLen = ( * pBase )->item.asSymbol.paramcnt;
-   if( uiLen > 255 )
+
+   if( uiLen > HB_VAR_PARAM_FLAG )
    {
-      uiLen -= 256;
+      uiLen -= ( HB_VAR_PARAM_FLAG + 1);
    }
 
    Return.type = HB_IT_NIL;
@@ -251,10 +252,11 @@ hb_dbg_vmVarLGet( int iLevel, int iLocal )
 
    if( iLocal >= 0 )
    {
-      if ( ( *pBase )->item.asSymbol.paramcnt >= 255 )
+      if ( ( *pBase )->item.asSymbol.paramcnt > HB_VAR_PARAM_FLAG )
       {
-         iLocal += ( *pBase )->item.asSymbol.paramcnt - 256;
+         iLocal += ( *pBase )->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 );
       }
+
       return hb_itemUnRef( *(pBase + 1 + iLocal) );
    }
    if ( HB_IS_BLOCK( *(pBase+1) ) )

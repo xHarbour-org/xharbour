@@ -1,5 +1,5 @@
 /*
- * $Id: hbstripl.c,v 1.2 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hbstripl.c,v 1.3 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -273,7 +273,8 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                       /* HB_P_ARRAYPUSHREF          */
    NULL,                       /* HB_P_ARRAYPOPPLUS          */
    NULL,                       /* HB_P_PUSHDATETIME          */
-   NULL                        /* HB_P_PUSHDATE              */
+   NULL,                       /* HB_P_PUSHDATE              */
+   NULL                        /* HB_P_HASHGEN               */
 };
 
 void hb_compStripFuncLines( PFUNCTION pFunc )

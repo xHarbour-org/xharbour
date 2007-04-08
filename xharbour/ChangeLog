@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5417 2007/04/07 00:19:42 jabrecer Exp $
+ * $Id: ChangeLog,v 1.5418 2007/04/07 02:14:49 jabrecer Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,60 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-08 03:18 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/gtapi.c
+    * Temporrarily commented calls to hb_gt_SetAttributeCT()
+
+  * include/common.ch
+    * Minor simplifications and corrections
+
+  * source/vm/hash.c
+    * Minor format
+
+  * source/compiler/harbour.sly
+    * Minor typo
+
+  * include/hbpp.h
+    * Removed HB_PP_TOKEN_SEND from HB_PP_TOKEN_NEEDLEFT() to allow unconditional support for send as starting exp
+
+  * include/hbapi.h
+    + Added #define HB_VAR_PARAM_FLAG 255
+
+  * source/compiler/harbour.c
+  * source/vm/arrays.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/pcount.c
+  * source/vm/pvalue.c
+  * source/vm/hvm.c
+    * Revised variable arguments support to use HB_COMP_ERR_TOOMANY_ARGS instead of hardcoded 255
+
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+    + Added #define HB_COMP_ERR_TOOMANY_ARGS -> "Too many arguments to function: \'%s\'"
+
+  * include/hbexpra.c
+    + Added error generation if argument count greater than HB_VAR_PARAM_FLAG
+    + Added support for Array(...) as valid static initializer
+    + Added support for Hash(...) as valid static initializer
+
+  * include/hbpcode.h
+  * include/hbxvm.h
+  * source/compiler/genc.c
+  * source/compiler/gencc.c
+  * source/compiler/hbdead.c
+  * source/compiler/hbfix.c
+  * source/compiler/hblbl.c
+  * source/compiler/hbpcode.c
+  * source/compiler/hbpcstat.c
+  * source/compiler/hbstripl.c
+  * source/vm/hvm.c
+  * source/compiler/exproptb.c
+  * include/hbexprb.c
+    + Added suport for creating Hashes using PCODE
 
 2007-04-06 19:15 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/gtapi.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.25 2007/01/13 18:54:08 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.26 2007/02/22 01:55:14 ronpinkas Exp $
  */
 
 /*
@@ -128,6 +128,7 @@ HB_EXTERN_BEGIN
 #define HB_COMP_ERR_MEMCORRUPT                  66
 #define HB_COMP_ERR_MISSING_HANDLER             67
 #define HB_COMP_ERR_NAMELESS_PARAM              68
+#define HB_COMP_ERR_TOOMANY_ARGS                69
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2
