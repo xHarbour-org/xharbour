@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.166 2007/03/11 00:18:44 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.167 2007/04/07 00:19:42 jabrecer Exp $
  */
 
 /*
@@ -1479,7 +1479,7 @@ Return nWidth
 
 METHOD Down() CLASS TBrowse
 
-   ::Moved(.t.)
+   ::Moved()
    ::nRecsToSkip ++
 
 Return Self
@@ -1488,7 +1488,7 @@ Return Self
 
 METHOD Up() CLASS TBrowse
 
-   ::Moved(.t.)
+   ::Moved()
    ::nRecsToSkip --
 
 Return Self
@@ -1497,7 +1497,7 @@ Return Self
 
 METHOD PageDown() CLASS TBrowse
 
-   ::Moved(.t.)
+   ::Moved()
    ::nRecsToSkip := ( ::RowCount - ::nRowPos ) + ::RowCount
    ::lPaintBottomUp := .T.
 
@@ -1507,7 +1507,7 @@ Return Self
 
 METHOD PageUp() CLASS TBrowse
 
-   ::Moved(.t.)
+   ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
 
 Return Self
@@ -1518,7 +1518,7 @@ METHOD GoBottom() CLASS TBrowse
 
    LOCAL nToTop
 
-   ::Moved(.t., .t.)
+   ::Moved(, .t.)
 
    // Skips back from last record as many records as TBrowse can hold
    nToTop := ::oDataCache:dbGoBottom()
@@ -1537,7 +1537,7 @@ Return Self
 
 METHOD GoTop() CLASS TBrowse
 
-   ::Moved(.t., .t.)
+   ::Moved(, .t.)
    ::oDataCache:dbGoTop()
    // required for compatibility
    ::oDataCache:dbSkip( 0 )
@@ -1824,7 +1824,7 @@ Return Self
 
 METHOD Moved(lResetHits, lForceHitsFalse) CLASS TBrowse
    // Forcing Reset of ::HitTop/Bottom flags!  Clipper Compatible
-   default lResetHits      to .f.
+   default lResetHits      to .t.
    default lForceHitsFalse to .f.
 
    // Internal flags used to set ::HitTop/Bottom during next stabilization
@@ -2334,7 +2334,7 @@ METHOD CheckRowPos() CLASS TBrowse
       //
       ::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) > ::nRowPos, ::nRowPos, Abs( nAvail )  )
       //::nRowPos := ::nNewRowPos := iif( Abs( nAvail ) + 1 > ::nRowPos, ::nRowPos, Abs( nAvail ) + 1 )
-      ::Moved()
+      ::Moved(.f.)
 
       // To ensure phase 1 is skipped
       ::nRecsToSkip := 0
