@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.1 2007/02/27 19:44:13 druzus Exp $
+ * $Id: ppcomp.c,v 1.2 2007/03/04 13:37:51 druzus Exp $
  */
 
 /*
@@ -181,16 +181,29 @@ void hb_compInitPP( int argc, char * argv[] )
                   hb_pp_hb_inLine : NULL, hb_pp_CompilerSwitch );
 
       if( ! hb_pp_STD_CH )
+      {
          hb_pp_setStdRules( hb_comp_PP );
+
+         hb_pp_initDynDefines( hb_comp_PP );
+      }
       else if( hb_pp_STD_CH[ 0 ] > ' ' )
+      {
+         if( hb_pp_STD_CH_ADDITIVE )
+         {
+            hb_pp_setStdRules( hb_comp_PP );
+         }
+
+         hb_pp_initDynDefines( hb_comp_PP );
+
          hb_pp_readRules( hb_comp_PP, hb_pp_STD_CH );
+      }
       else if( ! hb_comp_bQuiet )
       {
          printf( "Standard command definitions excluded.\n" );
          fflush( stdout );
-      }
 
-      hb_pp_initDynDefines( hb_comp_PP );
+         hb_pp_initDynDefines( hb_comp_PP );
+      }
 
       /* Add /D and /undef: command line or envvar defines */
       hb_compChkDefines( argc, argv );
