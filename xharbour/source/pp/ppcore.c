@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.243 2007/03/25 02:41:33 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.244 2007/04/09 21:06:28 ronpinkas Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 /* #define HB_PP_MULTILINE_STRING */
 /* #define HB_C52_STRICT */
-/* #define HB_PP_NO_LINEINFO_TOKEN */
+#define HB_PP_NO_LINEINFO_TOKEN
 
 #define _HB_PP_INTERNAL
 
