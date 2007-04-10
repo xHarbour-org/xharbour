@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.137 2007/03/25 06:12:51 walito Exp $
+ * $Id: itemapi.c,v 1.138 2007/03/26 00:24:06 walito Exp $
  */
 
 /*
@@ -592,7 +592,7 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
          {
             dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
             *piDec = 255;
-         }         
+         }
          break;
 
       case HB_IT_STRING:
@@ -686,6 +686,20 @@ HB_EXPORT void * hb_itemGetPtr( PHB_ITEM pItem )
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetPtr(%p)", pItem));
 
    if( pItem && HB_IS_POINTER( pItem ) )
+   {
+      return pItem->item.asPointer.value;
+   }
+   else
+   {
+      return NULL;
+   }
+}
+
+HB_EXPORT void * hb_itemGetPtrGC( PHB_ITEM pItem, HB_GARBAGE_FUNC_PTR pFunc )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_itemGetPtrGC(%p,%p)", pItem, pFunc));
+
+   if( pItem && HB_IS_POINTER( pItem ) && pItem->item.asPointer.collect && hb_gcFunc( pItem->item.asPointer.value ) == pFunc )
    {
       return pItem->item.asPointer.value;
    }
@@ -2001,7 +2015,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          {
             char szDate[ 19 ];
             buffer = ( char * ) hb_xgrab( 26 );
-      
+
             hb_datetimeDecStr( szDate, pItem->item.asDate.value, pItem->item.asDate.time );
             hb_datetimeFormat( szDate, buffer, hb_set.HB_SET_DATEFORMAT, hb_set.HB_SET_TIMEFORMAT );
 

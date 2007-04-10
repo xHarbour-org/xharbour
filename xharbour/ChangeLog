@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5422 2007/04/09 22:47:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5423 2007/04/10 08:08:31 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,39 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-04-10 14:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+    + Added Harbour compatible hb_gcFunc() and hb_parptrGC()
+  * include/hbapiitm.h
+  * source/vm/itemapi.c
+    + Added Harbour compatible hb_itemGetPtrGC()
+  * source/vm/garbage.c
+    + Added Harbour compatible hb_gcFunc()
+    * Minor simplifications
+  * source/pp/ppgen.c
+  * source/pp/pplib.c
+  * source/pp/pplib2.c
+    * Synched with Harbour
+
+  * source/vm/hvm.c
+    ! Fixed GPF trap in hb_vmPushDynSym()
+
+  * include/hbapi.h
+  * include/hbstack.h
+  * source/vm/arrays.c
+  * source/vm/debug.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/hvm.c
+  * source/vm/pcount.c
+  * source/vm/pvalue.c
+    * Simplified/optimized handling of variable parametes (...)
+     /* All xHarbour apps should be faster now because the optimized macros/functions were very frequently used */
+
 2007-04-10 10:06 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
     * fixed bug on BM_DbSeekWild( ... )
-      when all the keys were asked for, first never it was included. 
+      when all the keys were asked for, first never it was included.
 
 2007-04-09 18:47 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/pp/ppcore.c

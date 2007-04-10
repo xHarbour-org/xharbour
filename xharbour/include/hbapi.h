@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.205 2007/04/05 07:18:45 walito Exp $
+ * $Id: hbapi.h,v 1.206 2007/04/08 07:20:55 ronpinkas Exp $
  */
 
 /*
@@ -337,6 +337,7 @@ extern HB_EXPORT void * hb_gcLock( void *pAlloc ); /* do not release passed memo
 extern HB_EXPORT void * hb_gcUnlock( void *pAlloc ); /* passed block is allowed to be released */
 extern HB_EXPORT void   hb_gcCollect( void ); /* checks if a single memory block can be released */
 extern HB_EXPORT void   hb_gcCollectAll( BOOL bForce ); /* checks if all memory blocks can be released */
+extern HB_EXPORT HB_GARBAGE_FUNC_PTR hb_gcFunc( void *pBlock );
 
 extern void   hb_gcReleaseAll( void ); /* release all memory blocks unconditionally */
 extern void   hb_gcItemRef( HB_ITEM_PTR pItem ); /* checks if passed item refers passed memory block pointer */
@@ -386,7 +387,7 @@ extern HB_EXPORT int      hb_parni( int iParam, ... ); /* retrieve a numeric par
 extern HB_EXPORT LONG     hb_parnl( int iParam, ... ); /* retrieve a numeric parameter as a LONG */
 extern HB_EXPORT HB_LONG  hb_parnint( int iParam, ... ); /* retrieve a numeric parameter as a HB_LONG */
 extern HB_EXPORT void *   hb_parptr( int iParam, ... ); /* retrieve a parameter as a pointer */
-extern HB_EXPORT void *   hb_parpointer( int iParam ); /* retrieve ONLY a pointer from ONLY HB_IT_POINTER, or retunrs NULL */
+extern HB_EXPORT void *   hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... ); /* retrieve a parameter as a pointer if it's a pointer to GC allocated block */
 extern HB_EXPORT PHB_ITEM hb_param( int iParam, LONG lMask ); /* retrieve a generic parameter */
 extern HB_EXPORT PHB_ITEM hb_paramError( int iParam ); /* Returns either the generic parameter or a NIL item if param not provided */
 extern HB_EXPORT BOOL     hb_extIsArray( int iParam );
@@ -412,9 +413,7 @@ extern HB_EXPORT BOOL     hb_extIsObject( int iParam );
       #include "hbstack.h"
    #endif
 
-   #define hb_pcount()                          ( ( int ) ( ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt <= HB_VAR_PARAM_FLAG ) ? \
-                                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt : \
-                                                              ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 ) ) )
+   #define hb_pcount()                          ( ( int ) ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt ) )
 
     #define hb_ret()                             hb_itemClear( hb_stackReturnItem() )
     #define hb_reta( ulLen )                     hb_arrayNew( hb_stackReturnItem(), (ulLen) )

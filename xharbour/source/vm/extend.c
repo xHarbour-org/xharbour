@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.58 2007/03/25 06:12:50 walito Exp $
+ * $Id: extend.c,v 1.59 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -67,9 +67,6 @@
  * Copyright 2002 Marek Paliwoda <paliwoda@inetia.pl>
  *    hb_parptr()
  *    hb_retptr()
- *
- * Copyright 2003 Giancarlo Niccolai <antispam (at) niccolai [dot] ws>
- *    hb_parpointer()
  *
  * Copyright 2007 Walter Negro <anegro@overnet.com.ar>
  *    Support DateTime
@@ -947,15 +944,15 @@ void *hb_parptr( int iParam, ... )
    return ( void * )0;
 }
 
-void *hb_parpointer( int iParam )
+HB_EXPORT void * hb_parptrGC( HB_GARBAGE_FUNC_PTR pFunc, int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_parptr(%d, ...)", iParam));
+   HB_TRACE(HB_TR_DEBUG, ("hb_parptrGC(%p,%d, ...)", pFunc, iParam));
 
-   if( iParam >= 1 && iParam <= hb_pcount()  )
+   if( ( iParam >= 0 && iParam <= hb_pcount() ) || ( iParam == -1 ) )
    {
-      PHB_ITEM pItem = hb_stackItemFromBase( iParam );
+      PHB_ITEM pItem = ( iParam == -1 ) ? hb_stackReturnItem() : hb_stackItemFromBase( iParam );
 
       if( HB_IS_BYREF( pItem ) )
       {
@@ -964,7 +961,26 @@ void *hb_parpointer( int iParam )
 
       if( HB_IS_POINTER( pItem ) )
       {
-         return pItem->item.asPointer.value;
+         if( pItem->item.asPointer.collect && hb_gcFunc( pItem->item.asPointer.value ) == pFunc )
+         {
+            return pItem->item.asPointer.value;
+         }
+      }
+      else if( HB_IS_ARRAY( pItem ) )
+      {
+         va_list va;
+         ULONG ulArrayIndex;
+
+         va_start( va, iParam );
+         ulArrayIndex = va_arg( va, ULONG );
+         va_end( va );
+
+         pItem = hb_arrayGetItemPtr( pItem, ulArrayIndex );
+
+         if( pItem && HB_IS_POINTER( pItem ) && pItem->item.asPointer.collect && hb_gcFunc( pItem->item.asPointer.value ) == pFunc )
+         {
+            return pItem->item.asPointer.value;
+         }
       }
    }
 
@@ -1019,7 +1035,9 @@ ULONG  HB_EXPORT hb_parinfo( int iParam )
          return ( ULONG ) uiType;
       }
       else
+      {
          return 0;
+      }
    }
 }
 
@@ -1031,10 +1049,7 @@ int  HB_EXPORT hb_pcount( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 
-   pBase = hb_stackBaseItem();
-   return ( int )( pBase->item.asSymbol.paramcnt <= HB_VAR_PARAM_FLAG ?
-                   pBase->item.asSymbol.paramcnt :
-                   pBase->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 ) );
+   return (int)( hb_stackBaseItem()->item.asSymbol.paramcnt );
 }
 
 #undef hb_ret

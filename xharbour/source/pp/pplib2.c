@@ -1,5 +1,5 @@
 /*
- * $Id: pplib2.c,v 1.1 2006/11/17 12:29:24 druzus Exp $
+ * $Id: pplib2.c,v 1.1 2007/02/27 19:33:44 druzus Exp $
  */
 
 /*
@@ -56,12 +56,12 @@
 #include "hbpp.h"
 #include "hbapi.h"
 
+extern PHB_PP_STATE hb_pp_Param( int iParam );
+
 HB_FUNC( __PP_STDRULES )
 {
-   PHB_PP_STATE * pStatePtr = ( PHB_PP_STATE * ) hb_parptr( 1 );
+   PHB_PP_STATE pState = hb_pp_Param( 1 );
 
-   if( pStatePtr && * pStatePtr )
-   {
-      hb_pp_setStdRules( * pStatePtr );
-   }
+   if( pState )
+      hb_pp_setStdRules( pState );
 }

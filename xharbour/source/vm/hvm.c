@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.608 2007/04/05 07:18:45 walito Exp $
+ * $Id: hvm.c,v 1.609 2007/04/08 07:20:57 ronpinkas Exp $
  */
 
 /*
@@ -7757,7 +7757,7 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 
    if( bParams == HB_VAR_PARAM_FLAG )
    {
-      hb_stackBaseItem()->item.asSymbol.paramcnt += ( HB_VAR_PARAM_FLAG + 1 );
+      hb_stackBaseItem()->item.asSymbol.paramcnt = hb_pcount();
 
       while( iLocals-- > 0 )
       {
@@ -8369,17 +8369,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
 
 HB_EXPORT void hb_vmPushDynSym( PHB_DYNS pDynSym )
 {
-   HB_THREAD_STUB
-   PHB_ITEM pItem;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushDynSym(%p)", pDynSym));
-
-   hb_stackPush();
-   pItem = hb_stackItemFromTop( -1 );
-   pItem->type = HB_IT_SYMBOL;
-   pItem->item.asSymbol.value = pDynSym->pSymbol;
-   pItem->item.asSymbol.stackbase = hb_stackTopOffset();
-   pItem->item.asSymbol.uiSuperClass = 0;
+   hb_vmPushSymbol( pDynSym->pSymbol );
 }
 
 HB_EXPORT void hb_vmPushEvalSym( void )
@@ -8695,12 +8685,6 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 
    if( iLocal >= 0 )
    {
-      // SomeFunc( ... ) - Variable paramaters.
-      if( hb_stackBaseItem()->item.asSymbol.paramcnt > HB_VAR_PARAM_FLAG )
-      {
-         iLocal += hb_stackBaseItem()->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 );
-      }
-
       #ifdef HB_UNSHARE_REFERENCES
         hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
       #endif

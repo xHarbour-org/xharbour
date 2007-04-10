@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.90 2006/08/11 01:31:29 ronpinkas Exp $
+ * $Id: garbage.c,v 1.91 2006/08/21 15:16:46 walito Exp $
  */
 
 /*
@@ -116,6 +116,8 @@ static ULONG s_uAllocated = 0;
    #define HB_GARBAGE_FREE( pAlloc )    hb_xfree( (void *)(pAlloc) )
 #endif
 
+#define HB_GC_PTR( p )  ( ( (HB_GARBAGE_PTR) p ) - 1 )
+
 /* Forward declaration.*/
 static HB_GARBAGE_FUNC( hb_gcGripRelease );
 
@@ -143,11 +145,11 @@ static void hb_gcUnlink( HB_GARBAGE_PTR *pList, HB_GARBAGE_PTR pAlloc )
    if( *pList == pAlloc )
    {
       *pList = pAlloc->pNext;
-   }
 
-   if( ( pAlloc->pNext == pAlloc->pPrev ) && ( *pList == pAlloc ) )
-   {
-      *pList = NULL;    /* this was the last block */
+      if( *pList == pAlloc )
+      {
+         *pList = NULL;    /* this was the last block */
+      }
    }
 }
 
@@ -276,6 +278,12 @@ HB_EXPORT void hb_gcFree( void *pBlock )
    {
       hb_errInternal( HB_EI_XFREENULL, NULL, NULL, NULL );
    }
+}
+
+/* return cleanup function pointer */
+HB_EXPORT HB_GARBAGE_FUNC_PTR hb_gcFunc( void *pBlock )
+{
+   return HB_GC_PTR( pBlock )->pFunc;
 }
 
 static HB_GARBAGE_FUNC( hb_gcGripRelease )
@@ -455,24 +463,7 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       pItem = hb_itemUnRefOnce( pItem );
    }
 
-   if( HB_IS_POINTER( pItem ) )
-   {
-      /* check if this memory was allocated by a hb_gcAlloc() */
-      if ( pItem->item.asPointer.collect )
-      {
-         HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asPointer.value;
-         --pAlloc;
-         /* Check this memory only if it was not checked yet */
-         if( pAlloc->used == s_uUsedFlag )
-         {
-            /* mark this memory as used so it will be no re-checked from
-             * other references
-             */
-            pAlloc->used ^= HB_GC_USED_FLAG;
-         }
-      }
-   }
-   else if( HB_IS_ARRAY( pItem ) )
+   if( HB_IS_ARRAY( pItem ) )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asArray.value;
 
@@ -489,17 +480,14 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          pAlloc->used ^= HB_GC_USED_FLAG;
 
          /* mark also all array elements */
-         if( pItem->item.asArray.value->pItems )
-         {
-            pItem = pItem->item.asArray.value->pItems;
-            //printf( "Items %p\n", pItem );
+         pItem = pItem->item.asArray.value->pItems;
+         //printf( "Items %p\n", pItem );
 
-            while( ulSize )
-            {
-               //printf( "Item %p\n", pItem );
-               hb_gcItemRef( pItem++ );
-               --ulSize;
-            }
+         while( ulSize )
+         {
+            //printf( "Item %p\n", pItem );
+            hb_gcItemRef( pItem++ );
+            --ulSize;
          }
       }
 
@@ -507,11 +495,9 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
    else if( HB_IS_HASH( pItem ) )
    {
       HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asHash.value;
-
-      //printf( "Array %p\n", pItem->item.asArray.value );
       --pAlloc;
 
-      /* Check this array only if it was not checked yet */
+      /* Check this hash only if it was not checked yet */
       if( pAlloc->used == s_uUsedFlag )
       {
          ULONG ulSize = pItem->item.asHash.value->ulLen;
@@ -520,19 +506,16 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
           */
          pAlloc->used ^= HB_GC_USED_FLAG;
 
-         /* mark also all array elements */
-         if( ulSize > 0 )
-         {
-            PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
-            PHB_ITEM pValue = pItem->item.asHash.value->pValues;
+         /* mark also all hash elements */
+         PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
+         PHB_ITEM pValue = pItem->item.asHash.value->pValues;
 
-            while( ulSize )
-            {
-               //printf( "Item %p\n", pItem );
-               hb_gcItemRef( pKey++ );
-               hb_gcItemRef( pValue++ );
-               --ulSize;
-            }
+         while( ulSize )
+         {
+            //printf( "Kry %p Value: %p\n", pKey, pValue );
+            hb_gcItemRef( pKey++ );
+            hb_gcItemRef( pValue++ );
+            --ulSize;
          }
       }
    }
@@ -552,8 +535,25 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          /* mark as used all detached variables in a codeblock */
          while( ui <= pCBlock->uiLocals )
          {
-            hb_gcItemRef( &pCBlock->pLocals[ ui ] );
-            ++ui;
+            hb_gcItemRef( &pCBlock->pLocals[ ui++ ] );
+         }
+      }
+   }
+   else if( HB_IS_POINTER( pItem ) )
+   {
+      /* check if this memory was allocated by a hb_gcAlloc() */
+      if ( pItem->item.asPointer.collect )
+      {
+         HB_GARBAGE_PTR pAlloc = ( HB_GARBAGE_PTR ) pItem->item.asPointer.value;
+         --pAlloc;
+
+         /* Check this memory only if it was not checked yet */
+         if( pAlloc->used == s_uUsedFlag )
+         {
+            /* mark this memory as used so it will be no re-checked from
+             * other references
+             */
+            pAlloc->used ^= HB_GC_USED_FLAG;
          }
       }
    }
@@ -923,12 +923,6 @@ HB_FUNC( HB_GCSTEP )
 */
 HB_FUNC( HB_GCALL )
 {
-
-   if( hb_parl( 1 ) )
-   {
-      s_uAllocated = HB_GC_COLLECTION_JUSTIFIED;
-   }
-
-   hb_gcCollectAll( FALSE );
+   hb_gcCollectAll( hb_parl( 1 ) );
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.22 2006/07/08 11:58:04 likewolf Exp $
+ * $Id: debug.c,v 1.23 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -212,11 +212,6 @@ HB_FUNC( HB_DBG_VMPARLLIST )
 
    uiLen = ( * pBase )->item.asSymbol.paramcnt;
 
-   if( uiLen > HB_VAR_PARAM_FLAG )
-   {
-      uiLen -= ( HB_VAR_PARAM_FLAG + 1);
-   }
-
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */
 
@@ -252,11 +247,6 @@ hb_dbg_vmVarLGet( int iLevel, int iLocal )
 
    if( iLocal >= 0 )
    {
-      if ( ( *pBase )->item.asSymbol.paramcnt > HB_VAR_PARAM_FLAG )
-      {
-         iLocal += ( *pBase )->item.asSymbol.paramcnt - ( HB_VAR_PARAM_FLAG + 1 );
-      }
-
       return hb_itemUnRef( *(pBase + 1 + iLocal) );
    }
    if ( HB_IS_BLOCK( *(pBase+1) ) )

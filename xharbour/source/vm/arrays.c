@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.135 2007/04/05 07:18:45 walito Exp $
+ * $Id: arrays.c,v 1.136 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -1688,12 +1688,6 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
-   // SomeFunc( ... ) Variable paramaters.
-   if( uiPCount > HB_VAR_PARAM_FLAG )
-   {
-      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
-   }
-
    hb_arrayNew( pArray, uiPCount );
 
    for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
@@ -1714,11 +1708,6 @@ HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
    pArray = hb_itemNew( NULL );
    uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
 
-   if( uiPCount > HB_VAR_PARAM_FLAG )
-   {
-      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
-   }
-
    hb_arrayNew( pArray, uiPCount );
 
    for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
@@ -1738,11 +1727,6 @@ HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
 
    pArray = hb_itemNew( NULL );
    uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
-
-   if( uiPCount > HB_VAR_PARAM_FLAG )
-   {
-      uiPCount -= ( HB_VAR_PARAM_FLAG + 1 );
-   }
 
    hb_arrayNew( pArray, uiPCount + 1 );
 

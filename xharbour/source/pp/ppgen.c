@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.8 2006/12/08 05:03:54 druzus Exp $
+ * $Id: ppgen.c,v 1.1 2007/02/27 19:33:44 druzus Exp $
  */
 
 /*
@@ -59,13 +59,13 @@
  * library functions used by PP core code
  * necessary to create stand alone binries
  */
-void hb_xfree( void * pMem ) { free( pMem ); }
 void * hb_xgrab( ULONG ulSize ) { return malloc( ulSize ); }
 void * hb_xrealloc( void * pMem, ULONG ulSize ) { return realloc( pMem, ulSize ); }
+void hb_xfree( void * pMem ) { free( pMem ); }
+
 char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
 ULONG hb_xquery( USHORT uiMode ) { HB_SYMBOL_UNUSED( uiMode ); return 0; }
-
 
 
 /*
