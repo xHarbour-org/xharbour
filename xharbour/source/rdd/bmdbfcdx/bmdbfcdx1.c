@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.22 2007/03/30 16:10:27 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.23 2007/04/02 16:00:22 marchuet Exp $
  */
 
 /*
@@ -6872,11 +6872,17 @@ HB_FUNC( BM_DBSEEKWILD )
              pList = hb_itemNew( NULL );
              hb_arrayNew( pList, 0 );
              SELF_GOTOP( ( AREAP ) pArea );
-             while ( hb_cdxSeekWild( (CDXAREAP) pArea, bSoftSeek, pKey, bFindLast, TRUE, bAll ) == SUCCESS &&
+             if ( hb_cdxSeekWild( (CDXAREAP) pArea, bSoftSeek, pKey, bFindLast, FALSE, bAll ) == SUCCESS &&
                      pArea->fEof == FALSE &&
                      SELF_FOUND( pArea, &fFound ) == SUCCESS )
              {
                  hb_arrayAdd( pList, hb_itemPutNL( NULL, ((CDXAREAP) pArea)->ulRecNo ) );
+                 while ( hb_cdxSeekWild( (CDXAREAP) pArea, bSoftSeek, pKey, bFindLast, TRUE, bAll ) == SUCCESS &&
+                         pArea->fEof == FALSE &&
+                         SELF_FOUND( pArea, &fFound ) == SUCCESS )
+                 {
+                     hb_arrayAdd( pList, hb_itemPutNL( NULL, ((CDXAREAP) pArea)->ulRecNo ) );
+                 }
              }
              hb_itemReturn( pList );
              hb_itemRelease( pList );
