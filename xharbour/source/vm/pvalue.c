@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.7 2007/04/08 07:20:57 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.8 2007/04/10 18:21:13 ronpinkas Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC( PVALUE )
 
    if( uiParam && uiParam <= uiParams ) /* Valid number */
    {
-      PHB_ITEM pItem = *( pBase + 1 + uiParam );
+      PHB_ITEM pItem = *( pBase + 1 + uiParam + ( *pBase )->item.asSymbol.paramsoffset );
 
       hb_itemReturn( pItem );
 

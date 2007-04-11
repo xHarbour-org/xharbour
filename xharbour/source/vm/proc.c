@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.29 2005/10/29 06:45:02 druzus Exp $
+ * $Id: proc.c,v 1.30 2005/10/31 11:45:17 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ HB_FUNC( PROCFILE )
 
 HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szModuleName  )
 {
-   PHB_ITEM * pBase = HB_VM_STACK.pBase, pSelf;
+   PHB_ITEM * pBase, pSelf;
    USHORT uiSuperClass;
 
    // Default and safety to empty string.
@@ -147,15 +147,12 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
       return szName;
    }
 
-   while( iLevel-- > 0 && pBase != HB_VM_STACK.pItems )
-   {
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-   }
+   pBase = hb_stackGetBase( iLevel );
 
-   pSelf = *( pBase + 1 );
-
-   if( iLevel < 0 && HB_IS_SYMBOL( *pBase ) )
+   if( pBase )
    {
+      pSelf = *( pBase + 1 );
+
       if( szName )
       {
          if( HB_IS_OBJECT( pSelf ) )  /* it is a method name */

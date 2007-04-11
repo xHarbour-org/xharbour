@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.54 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbvmpub.h,v 1.55 2007/04/05 07:18:45 walito Exp $
  */
 
 /*
@@ -218,6 +218,7 @@
       LONG        stackbase;
       USHORT      lineno;
       USHORT      paramcnt;
+      USHORT      paramsoffset;
       PHB_SYMB    value;
       UINT        uiSuperClass;
    };

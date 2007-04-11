@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.609 2007/04/08 07:20:57 ronpinkas Exp $
+ * $Id: hvm.c,v 1.610 2007/04/10 18:21:13 ronpinkas Exp $
  */
 
 /*
@@ -1456,7 +1456,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
             {
-               hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+               hb_errInternal( HB_EI_ERRUNRECOV, "WITH OBJECT excessive nesting!", NULL, NULL );
 
                // Release ALL WITH OBJECT.
                while( HB_VM_STACK.wWithObjectCounter )
@@ -1517,7 +1517,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( HB_VM_STACK.wEnumCollectionCounter == HB_MAX_ENUMERATIONS )
             {
-               hb_errRT_BASE( EG_ARG, 9002, NULL, "FOR EACH excessive nesting!", 0 );
+               hb_errInternal( HB_EI_ERRUNRECOV, "FOR EACH excessive nesting!", NULL, NULL );
 
                // Release ALL FOR EACH.
                while( HB_VM_STACK.wEnumCollectionCounter )
@@ -6352,7 +6352,6 @@ static void hb_vmArrayPop( HB_PCODE pcode )
          // Recycle pValue as Message.
          pValue->type = HB_IT_SYMBOL;
          pValue->item.asSymbol.value = hb_dynsymGetCase( szMessage )->pSymbol;
-         pValue->item.asSymbol.stackbase = HB_VM_STACK.pPos - 3 - HB_VM_STACK.pItems;
          pValue->item.asSymbol.uiSuperClass = 0;
 
          if( HB_IS_BYREF( hb_stackItemFromTop( -2 ) ) )
@@ -7751,23 +7750,36 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 {
    HB_THREAD_STUB
 
-   int iTotal, iExtra;
+   int iParams = hb_pcount(), iTotal, iExtra;
+   PHB_ITEM pBase = *HB_VM_STACK.pBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", iLocals, (int) bParams));
 
+   /*
+      Variable arguments function is the exception, so it's more efficent
+      to rearrange the stack [once] for this exception, rather then force every local
+      and param read/write access to be calculating possible offset!
+    */
    if( bParams == HB_VAR_PARAM_FLAG )
    {
-      hb_stackBaseItem()->item.asSymbol.paramcnt = hb_pcount();
+      pBase->item.asSymbol.paramsoffset = iLocals;
 
       while( iLocals-- > 0 )
       {
          hb_vmPushNil();
       }
 
+      iLocals = pBase->item.asSymbol.paramsoffset;
+      while( iParams > 0 )
+      {
+         hb_itemSwap( *( HB_VM_STACK.pBase + 1 + iParams ), *( HB_VM_STACK.pBase + 1 + iParams + iLocals ) );
+         iParams--;
+      }
+
       return;
    }
 
-   iExtra = hb_pcount() - bParams;
+   iExtra = iParams - bParams;
 
    while( iExtra > 0 )
    {
@@ -7788,7 +7800,7 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
    iTotal = iLocals + bParams;
    if( iTotal )
    {
-      int i = iTotal - hb_pcount();
+      int i = iTotal - iParams;
 
       while( i-- > 0 )
       {
@@ -8360,9 +8372,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    }
 
    ( * HB_VM_STACK.pPos )->item.asSymbol.value = pSym;
-   ( * HB_VM_STACK.pPos )->item.asSymbol.stackbase = hb_stackTopOffset();
    ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
-
 
    hb_stackPush();
 }
@@ -10336,21 +10346,8 @@ HB_FUNC( HB_QSELF )
    HB_THREAD_STUB
 
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
-   LONG lLevel = hb_parnl( 1 );
 
-   // Outer function level.
-   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-
-   while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || lLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
-   {
-      //TraceLog( NULL, "Skipped: %s\n", ( *pBase )->item.asSymbol.value->szName );
-
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
-   }
-
-   //TraceLog( NULL, "Found: %s\n", ( *pBase )->item.asSymbol.value->szName );
-
-   hb_itemCopy( &(HB_VM_STACK.Return), *( pBase + 1 ) );
+   hb_itemCopy( &(HB_VM_STACK.Return), *( hb_stackGetBase( hb_parnl( 1 ) ) + 1 ) );
 }
 
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */
@@ -10429,7 +10426,7 @@ HB_FUNC( HB_RESTOREBLOCK )
 
       if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER && ClassH.type == HB_IT_INTEGER )
       {
-         PHB_ITEM * pBase = HB_VM_STACK.pBase;
+         PHB_ITEM * pBase = hb_stackGetBase(1);
          HB_ITEM Block;
 
          pModuleSymbols = hb_vmFindModuleByName( ModuleName.item.asString.value );
@@ -10443,8 +10440,6 @@ HB_FUNC( HB_RESTOREBLOCK )
          Block.item.asBlock.value->uiClass  = ClassH.item.asInteger.value;
 
          Block.item.asBlock.statics = HB_VM_STACK.iStatics;
-
-         pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
          if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )
          {
@@ -12500,7 +12495,7 @@ HB_EXPORT BOOL hb_xvmWithObject( void )
 
    if( HB_VM_STACK.wWithObjectCounter == HB_MAX_WITH_OBJECTS )
    {
-      hb_errRT_BASE( EG_ARG, 9002, NULL, "WITH OBJECT excessive nesting!", 0 );
+      hb_errInternal( HB_EI_ERRUNRECOV, "WITH OBJECT excessive nesting!", NULL, NULL );
 
       while( HB_VM_STACK.wWithObjectCounter )
       {
@@ -12588,7 +12583,7 @@ HB_EXPORT BOOL hb_xvmForEach( void )
 
    if( HB_VM_STACK.wEnumCollectionCounter == HB_MAX_ENUMERATIONS )
    {
-      hb_errRT_BASE( EG_ARG, 9002, NULL, "FOR EACH excessive nesting!", 0 );
+      hb_errInternal( HB_EI_ERRUNRECOV, "FOR EACH excessive nesting!", NULL, NULL );
 
       // Release ALL FOR EACH.
       while( HB_VM_STACK.wEnumCollectionCounter )

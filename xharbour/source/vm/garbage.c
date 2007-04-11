@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.91 2006/08/21 15:16:46 walito Exp $
+ * $Id: garbage.c,v 1.92 2007/04/10 18:21:13 ronpinkas Exp $
  */
 
 /*
@@ -501,15 +501,15 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
       if( pAlloc->used == s_uUsedFlag )
       {
          ULONG ulSize = pItem->item.asHash.value->ulLen;
+         PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
+         PHB_ITEM pValue = pItem->item.asHash.value->pValues;
+
          /* mark this block as used so it will be no re-checked from
           * other references
           */
          pAlloc->used ^= HB_GC_USED_FLAG;
 
          /* mark also all hash elements */
-         PHB_ITEM pKey = pItem->item.asHash.value->pKeys;
-         PHB_ITEM pValue = pItem->item.asHash.value->pValues;
-
          while( ulSize )
          {
             //printf( "Kry %p Value: %p\n", pKey, pValue );

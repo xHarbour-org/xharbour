@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.136 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: arrays.c,v 1.137 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /*
@@ -1681,18 +1681,20 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
    PHB_ITEM pArray;
-   USHORT uiPos, uiPCount;
+   USHORT uiPos, uiPCount, uiOffset;
 
    pArray = hb_itemNew( NULL );
    uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
+   uiOffset = (*pBase)->item.asSymbol.paramsoffset;
+
    hb_arrayNew( pArray, uiPCount );
 
    for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
    {
-      hb_arraySet( pArray, uiPos, *( pBase + uiPos + 1 ) );
+      hb_arraySet( pArray, uiPos, *( pBase + 1 + uiPos + uiOffset ) );
    }
 
    return pArray;
@@ -1701,7 +1703,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
 {
    PHB_ITEM pArray;
-   USHORT uiPos, uiPCount;
+   USHORT uiPos, uiPCount, uiOffset;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayBaseParams()"));
 
@@ -1710,9 +1712,11 @@ HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
 
    hb_arrayNew( pArray, uiPCount );
 
+   uiOffset = hb_stackBaseItem()->item.asSymbol.paramsoffset;
+
    for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
    {
-      hb_arraySet( pArray, uiPos, hb_stackItemFromBase( uiPos ) );
+      hb_arraySet( pArray, uiPos, hb_stackItemFromBase( uiPos + uiOffset ) );
    }
 
    return pArray;

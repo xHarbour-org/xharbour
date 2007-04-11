@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5423 2007/04/10 08:08:31 marchuet Exp $
+ * $Id: ChangeLog,v 1.5424 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-11 02:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbstack.h
+    * Removed redundant member lBaseItem from HB _STACK_STATE
+    + Added hb_stackgetBase()
+  * include/hbvmpub.h
+    + Added member paramsoffset to hb_struSymbol
+  * source/vm/arrays.c
+    * Use ->item.asSymbol.paramsoffset when building param arrays
+  * source/vm/arrayshb.c
+    * Sumplified HB_APARAMS to use new hb_stackGetBase()
+  * source/vm/estack.c
+    * Adjusted for changes in hb_struSymbol and HB_STACK_STATE
+    + Added hb_stackgetBase()
+    * Simplified hb_stackDispCall()
+  * source/vm/hvm.c
+    * Replaced few non recoverable hb_errRT_BASE() with hb_errInternal()
+    * Adjusted hb_vmFrame() to use new ->item.asSymbol.paramsoffset
+    * Simplified HB_QSELF() and HB_RESTOREBLOCK() to use new hb_stackGetBase()
+  * source/vm/proc.c
+    * simplified to use hb_stackGetBase()
+  * source/vm/pvalue.c
+    * Adjusted to use ->item.asSymbol.paramsoffset
+
+  * source/vm/garbage.c
+    * Corrected declaration to top of block
+
+  * source/vm/errorapi.c
+    * Minor format
 
 2007-04-10 14:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbapi.h

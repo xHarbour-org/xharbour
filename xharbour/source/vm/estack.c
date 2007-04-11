@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.86 2007/03/25 06:12:50 walito Exp $
+ * $Id: estack.c,v 1.87 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -286,7 +286,8 @@ HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams
 {
    HB_THREAD_STUB
 
-   HB_ITEM_PTR pItem = hb_stackItemFromTop( - uiParams - 2 );   /* procedure name */
+   PHB_ITEM *pBase = HB_VM_STACK.pPos - uiParams - 2;
+   PHB_ITEM pItem = *pBase;   /* procedure name */
 
    if( ! HB_IS_SYMBOL( pItem ) )
    {
@@ -295,24 +296,25 @@ HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams
       hb_errInternal( HB_EI_VMNOTSYMBOL, NULL, "hb_vmDo()", NULL );
    }
 
-   pStack->lBaseItem = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    pStack->iStatics = HB_VM_STACK.iStatics;
 
+   pItem->item.asSymbol.stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    pItem->item.asSymbol.lineno = 0;
    pItem->item.asSymbol.paramcnt = uiParams;
-   HB_VM_STACK.pBase = HB_VM_STACK.pItems + pItem->item.asSymbol.stackbase;
-   pItem->item.asSymbol.stackbase = pStack->lBaseItem;
+   pItem->item.asSymbol.paramsoffset = 0;
+
+   HB_VM_STACK.pBase = pBase;
 
    return pItem;
 }
 
 HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
 {
+   HB_THREAD_STUB
    int iLocal;
    PHB_ITEM pDetached;
    USHORT uiRequest;
-
-   HB_THREAD_STUB
+   LONG stackbase = (*HB_VM_STACK.pBase)->item.asSymbol.stackbase;
 
    uiRequest = hb_vmRequestQuery();
    hb_vmRequestReset();
@@ -351,7 +353,7 @@ HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
       --HB_VM_STACK.pPos;
    }
 
-   HB_VM_STACK.pBase = HB_VM_STACK.pItems + pStack->lBaseItem;
+   HB_VM_STACK.pBase = HB_VM_STACK.pItems + stackbase;
    HB_VM_STACK.iStatics = pStack->iStatics;
 
    hb_vmRequest( uiRequest );
@@ -388,9 +390,10 @@ HB_EXPORT LONG hb_stackBaseOffset( void )
 #undef hb_stackItem
 HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos )
 {
-
    if( iItemPos < 0 )
+   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+   }
 
    return ( * ( HB_VM_STACK.pItems + iItemPos ) );
 }
@@ -398,7 +401,6 @@ HB_EXPORT HB_ITEM_PTR hb_stackItem( LONG iItemPos )
 #undef hb_stackItemFromTop
 HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 {
-
    if( nFromTop > 0 )
    {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -410,7 +412,6 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop )
 #undef hb_stackItemFromBase
 HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
 {
-
    if( nFromBase <= 0 )
    {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
@@ -456,6 +457,33 @@ HB_EXPORT char * hb_stackDateBuffer( void )
 
    return HB_VM_STACK.szDate;
 }
+
+HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel )
+{
+   if( iLevel > 0 )
+   {
+      LONG lBase = (* HB_VM_STACK.pBase )->item.asSymbol.stackbase;
+
+      while( ( --iLevel > 0 ) && ( lBase > 0 ) && HB_IS_SYMBOL( *( HB_VM_STACK.pItems + lBase ) ) )
+      {
+         lBase = ( *( HB_VM_STACK.pItems + lBase ) )->item.asSymbol.stackbase;
+      }
+
+      if( iLevel == 0 && lBase >= 0 && HB_IS_SYMBOL( *( HB_VM_STACK.pItems + lBase ) ) )
+      {
+         return HB_VM_STACK.pItems + lBase;
+      }
+   }
+   else if( iLevel == 0 )
+   {
+      return HB_VM_STACK.pBase;
+   }
+
+   //hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+
+   return NULL;
+}
+
 
 /* NOTE: DEBUG function */
 void hb_stackDispLocal( void )
@@ -559,23 +587,9 @@ void hb_stackDispCall( void )
 
    pBase = HB_VM_STACK.pBase;
 
-   if( HB_IS_ARRAY( *( pBase + 1 ) ) )
-   {
-      sprintf( buffer, HB_I_("Called from %s:%s(%i)"), hb_objGetClsName( *(pBase + 1) ), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
-   }
-   else
-   {
-      sprintf( buffer, HB_I_("Called from %s(%i)"), ( *pBase )->item.asSymbol.value->szName, ( *pBase )->item.asSymbol.lineno );
-   }
-
-   hb_conOutErr( buffer, 0 );
-   hb_conOutErr( hb_conNewLine(), 0 );
-
-   while( pBase != HB_VM_STACK.pItems )
+   do
    {
       char buffer[ HB_SYMBOL_NAME_LEN + HB_SYMBOL_NAME_LEN + 32 ];
-
-      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
 
       if( HB_IS_ARRAY( *( pBase + 1 ) ) )
       {
@@ -588,7 +602,10 @@ void hb_stackDispCall( void )
 
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
+
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
+   while( pBase > HB_VM_STACK.pItems );
 }
 
 #ifdef HB_INCLUDE_WINEXCHANDLER

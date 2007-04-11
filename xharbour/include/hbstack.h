@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.40 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbstack.h,v 1.41 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /*
@@ -130,7 +130,6 @@ extern HB_EXPORT BOOL hb_stack_ready;
 
 typedef struct
 {
-   LONG lBaseItem;
    LONG iStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
@@ -211,6 +210,7 @@ extern void    hb_stackIncrease( void );   /* increase the stack size */
 extern void hb_stackRemove( LONG lUntilPos );
 HB_EXPORT extern HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
 HB_EXPORT extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
+HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.77 2007/02/13 19:02:24 druzus Exp $
+ * $Id: errorapi.c,v 1.78 2007/02/26 22:24:58 ronpinkas Exp $
  */
 
 /*
@@ -1253,9 +1253,13 @@ USHORT HB_EXPORT hb_errRT_BASE( ULONG ulGenCode, ULONG ulSubCode, const char * s
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
    {
       if( hb_pcount() == 0 )
+      {
          pArray = NULL;
+      }
       else
+      {
          pArray = hb_arrayBaseParams();
+      }
    }
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
    {
@@ -1318,9 +1322,13 @@ USHORT HB_EXPORT hb_errRT_BASE_Ext1( ULONG ulGenCode, ULONG ulSubCode, const cha
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
    {
       if( hb_pcount() == 0 )
+      {
          pArray = NULL;
+      }
       else
+      {
          pArray = hb_arrayBaseParams();
+      }
    }
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
    {
@@ -1384,9 +1392,13 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const 
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
    {
       if( hb_pcount() == 0 )
+      {
          pArray = NULL;
+      }
       else
+      {
          pArray = hb_arrayBaseParams();
+      }
    }
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
    {
@@ -1400,6 +1412,7 @@ PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst( ULONG ulGenCode, ULONG ulSubCode, const 
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
          PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
          if( pVaItem )
          {
             hb_arraySet( pArray, ulArgPos, pVaItem );
@@ -1476,9 +1489,13 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const cha
    else if( ulArgCount == HB_ERR_ARGS_BASEPARAMS )
    {
       if( hb_pcount() == 0 )
+      {
          pArray = NULL;
+      }
       else
+      {
          pArray = hb_arrayBaseParams();
+      }
    }
    else if( ulArgCount == HB_ERR_ARGS_SELFPARAMS )
    {
@@ -1492,6 +1509,7 @@ void HB_EXPORT hb_errRT_BASE_SubstR( ULONG ulGenCode, ULONG ulSubCode, const cha
       for( ulArgPos = 1; ulArgPos <= ulArgCount; ulArgPos++ )
       {
          PHB_ITEM pVaItem = va_arg( va, PHB_ITEM );
+
          if( pVaItem )
          {
             hb_arraySet( pArray, ulArgPos, pVaItem );
