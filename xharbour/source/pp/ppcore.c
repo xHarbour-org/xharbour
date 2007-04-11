@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.244 2007/04/09 21:06:28 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.245 2007/04/09 22:47:48 ronpinkas Exp $
  */
 
 /*
@@ -2624,6 +2624,42 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
 
    do
    {
+      /*
+         Here we test for escaped multichar tokens such as:
+           \<<
+         which should really be processed as:
+           \< <
+         so we break the multi-char into multiple tokens.
+       */
+      if( fQuoted )
+      {
+         if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
+         {
+            PHB_PP_TOKEN pLT = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+
+            pLT->pNext      = ( * pTokenPtr )->pNext;
+            pEscaped->pNext = pLT;
+
+            hb_pp_tokenFree( * pTokenPtr );
+            * pTokenPtr = pEscaped;
+         }
+         /* Should not be needed, even <list:> matcher does NOT support [ESCAPED] operators!
+         else if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTR )
+         {
+            PHB_PP_TOKEN pGT = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, 0, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+
+
+            pGT->pNext      = ( * pTokenPtr )->pNext;
+            pEscaped->pNext = pGT;
+
+            hb_pp_tokenFree( * pTokenPtr );
+            * pTokenPtr = pEscaped;
+         }
+         */
+      }
+
       if( !fQuoted )
       {
          if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_LT )
@@ -2795,7 +2831,7 @@ static BOOL hb_pp_resultMarkerNew( PHB_PP_STATE pState,
 
    if( type == HB_PP_TOKEN_NUL )
    {
-      hb_pp_error( pState, 'E', HB_PP_ERR_WRONG_LABEL, ( * pTokenPtr )->value );
+      hb_pp_error( pState, 'E', HB_PP_ERR_WRONG_LABEL, "" );
    }
    else
    {
@@ -2958,6 +2994,43 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
             pTokenPtr = &pResult;
             do
             {
+               /*
+                 Here we test for escaped multichar tokens such as:
+                   \<<
+                 which should really be processed as:
+                   \< <
+                 so we break the multi-char into multiple tokens.
+               */
+               if( fQuoted )
+               {
+                  if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
+                  {
+                     PHB_PP_TOKEN pLT = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+
+
+                     pLT->pNext      = ( * pTokenPtr )->pNext;
+                     pEscaped->pNext = pLT;
+
+                     hb_pp_tokenFree( * pTokenPtr );
+                     * pTokenPtr = pEscaped;
+                  }
+                  /* Should not be needed for RESULT END of Marker!
+                  else if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTR )
+                  {
+                     PHB_PP_TOKEN pGT = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, 0, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+
+
+                     pGT->pNext      = ( * pTokenPtr )->pNext;
+                     pEscaped->pNext = pGT;
+
+                     hb_pp_tokenFree( * pTokenPtr );
+                     * pTokenPtr = pEscaped;
+                  }
+                  */
+               }
+
                if( !fQuoted )
                {
                   if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_HASH )
