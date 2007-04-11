@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.59 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: extend.c,v 1.60 2007/04/10 18:21:13 ronpinkas Exp $
  */
 
 /*
@@ -1045,7 +1045,6 @@ ULONG  HB_EXPORT hb_parinfo( int iParam )
 int  HB_EXPORT hb_pcount( void )
 {
    HB_THREAD_STUB_ANY
-   PHB_ITEM pBase;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_pcount()"));
 

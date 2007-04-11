@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.610 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: hvm.c,v 1.611 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -10344,8 +10344,6 @@ HB_FUNC( HB_FUNCPTR )
 HB_FUNC( HB_QSELF )
 {
    HB_THREAD_STUB
-
-   PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
    hb_itemCopy( &(HB_VM_STACK.Return), *( hb_stackGetBase( hb_parnl( 1 ) ) + 1 ) );
 }
