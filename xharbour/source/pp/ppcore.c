@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.245 2007/04/09 22:47:48 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.246 2007/04/11 19:23:53 ronpinkas Exp $
  */
 
 /*
@@ -2635,11 +2635,11 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
       {
          if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
          {
-            PHB_PP_TOKEN pLT = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
-            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pLT      = hb_pp_tokenNew( "<", 1, 0,                       HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
 
-            pLT->pNext      = ( * pTokenPtr )->pNext;
             pEscaped->pNext = pLT;
+            pLT->pNext      = ( * pTokenPtr )->pNext;
 
             hb_pp_tokenFree( * pTokenPtr );
             * pTokenPtr = pEscaped;
@@ -2647,12 +2647,11 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
          /* Should not be needed, even <list:> matcher does NOT support [ESCAPED] operators!
          else if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTR )
          {
-            PHB_PP_TOKEN pGT = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
-            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, 0, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+            PHB_PP_TOKEN pGT      = hb_pp_tokenNew( ">", 1, 0,                       HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
 
-
-            pGT->pNext      = ( * pTokenPtr )->pNext;
             pEscaped->pNext = pGT;
+            pGT->pNext      = ( * pTokenPtr )->pNext;
 
             hb_pp_tokenFree( * pTokenPtr );
             * pTokenPtr = pEscaped;
@@ -3005,12 +3004,11 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                {
                   if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTL )
                   {
-                     PHB_PP_TOKEN pLT = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
-                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, 0, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( "<", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pLT      = hb_pp_tokenNew( "<", 1, 0,                       HB_PP_TOKEN_LT | HB_PP_TOKEN_STATIC );
 
-
-                     pLT->pNext      = ( * pTokenPtr )->pNext;
                      pEscaped->pNext = pLT;
+                     pLT->pNext      = ( * pTokenPtr )->pNext;
 
                      hb_pp_tokenFree( * pTokenPtr );
                      * pTokenPtr = pEscaped;
@@ -3018,12 +3016,11 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                   /* Should not be needed for RESULT END of Marker!
                   else if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_SHIFTR )
                   {
-                     PHB_PP_TOKEN pGT = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
-                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, 0, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pEscaped = hb_pp_tokenNew( ">", 1, ( * pTokenPtr )->spaces, HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
+                     PHB_PP_TOKEN pGT      = hb_pp_tokenNew( ">", 1, 0,                       HB_PP_TOKEN_GT | HB_PP_TOKEN_STATIC );
 
-
-                     pGT->pNext      = ( * pTokenPtr )->pNext;
                      pEscaped->pNext = pGT;
+                     pGT->pNext      = ( * pTokenPtr )->pNext;
 
                      hb_pp_tokenFree( * pTokenPtr );
                      * pTokenPtr = pEscaped;
