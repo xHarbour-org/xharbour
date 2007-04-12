@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5428 2007/04/12 01:27:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5429 2007/04/12 01:41:16 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-11 21:11 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * source/vm/classes.c
+    - Moved Functions __CLS_PARAM, __CLS_PAR00 to classesc.c
+  + source/vm/classesc.c
+    * This File is Only For Keep functions nedded for old versions
+      of the compiler, and this not will be linked in a exe file,
+      only if it's necesary.
+    + Keep Functions __CLS_PARAM, __CLS_PAR00
+  * source/vm/makefile
+    * Add classesc.c
 
 2007-04-11 18:39 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbextern.ch

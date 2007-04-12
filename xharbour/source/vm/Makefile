@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.23 2005/11/14 22:16:51 lf_sfnet Exp $
+# $Id: Makefile,v 1.24 2006/06/06 11:36:14 mauriliolongo Exp $
 #
 
 ROOT = ../../
@@ -25,6 +25,7 @@ C_SOURCES=\
 	asort.c      \
 	break.c      \
 	classes.c    \
+	classesc.c   \
 	cmdarg.c     \
 	dbgentry.c   \
 	debug.c      \

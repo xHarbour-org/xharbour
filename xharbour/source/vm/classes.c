@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.201 2007/04/05 07:18:45 walito Exp $
+ * $Id: classes.c,v 1.202 2007/04/12 01:41:18 andresreyesh Exp $
  */
 
 /*
@@ -3929,55 +3929,6 @@ USHORT hb_clsMaxClasses( void )
    return s_uiClasses;
 }
 
-/* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
-         Receive an variable number of param and return an array of it.
-         No param will return a NULL array */
-
-/*
-HB_FUNC( __CLS_PARAM )
-{
-   HB_THREAD_STUB_API
-   HB_ITEM_NEW( Array );
-   USHORT uiParam = ( USHORT ) hb_pcount();
-   USHORT n;
-
-   if( uiParam >= 1 )
-   {
-      hb_arrayNew( &Array, uiParam );
-
-      for( n = 1; n <= uiParam; n++ )
-      {
-         hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
-      }
-   }
-   else
-   {
-      hb_arrayNew( &Array, 1 );
-      hb_itemPutCStatic( hb_arrayGetItemPtr( &Array, 1), (char *) "HBObject" );
-   }
-
-   hb_itemReturnForward( &Array );
-}
-*/
-/* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH */
-/* it will avoid any default object to be inherited */
-/*
-HB_FUNC( __CLS_PAR00 )
-{
-   HB_THREAD_STUB_API
-   HB_ITEM Array;
-   USHORT uiParam = ( USHORT ) hb_pcount();
-   USHORT n;
-
-   Array.type = HB_IT_NIL;
-   hb_arrayNew( &Array, uiParam );
-
-   for( n = 1; n <= uiParam; n++ )
-   {
-      hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
-   }
-}
-*/
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {
