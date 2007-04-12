@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.19 2007/01/13 01:36:32 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.20 2007/04/12 01:41:18 andresreyesh Exp $
  */
 
 /*
@@ -68,7 +68,7 @@
  *
  */
 
-#if 0
+#if 1
 /* WARNING: Can not use the preprocessor      */
 /* otherwise it will auto inherit from itself */
 
