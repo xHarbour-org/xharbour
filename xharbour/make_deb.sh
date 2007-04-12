@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_deb.sh,v 1.2 2005/04/30 15:14:08 lculik Exp $
+# $Id: make_deb.sh,v 1.3 2006/06/24 21:52:15 lculik Exp $
 #
 
 # ---------------------------------------------------------------
@@ -16,7 +16,7 @@ test_reqrpm()
 }
 
 TOINST_LST=""
-for i in gcc binutils bash bison libncurses5 libncurses5-dev debmake libgpmg1-dev slang1-dev
+for i in gcc binutils bash bison libncurses5 libncurses5-dev debmake libgpmg1-dev slang1-dev libc6-dev
 do
     test_reqrpm "$i" || TOINST_LST="${TOINST_LST} $i"
 done
