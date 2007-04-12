@@ -1,5 +1,5 @@
 /*
- * $Id: hbextern.ch,v 1.38 2006/11/30 23:32:35 ronpinkas Exp $
+ * $Id: hbextern.ch,v 1.39 2006/12/01 15:35:31 ronpinkas Exp $
  */
 
 /*
@@ -428,7 +428,7 @@ EXTERNAL __CLS_CNTCLSDATA
 EXTERNAL __CLS_CNTDATA
 EXTERNAL __CLS_DECDATA
 EXTERNAL __CLS_INCDATA
-EXTERNAL __CLS_PARAM
+//EXTERNAL __CLS_PARAM   // Implemented in hbclass.ch using preprocesor
 EXTERNAL __CLSADDMSG
 EXTERNAL __CLSDELMSG
 EXTERNAL __CLSINST

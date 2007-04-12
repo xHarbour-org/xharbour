@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.46 2007/02/28 23:13:17 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.47 2007/03/01 03:22:30 druzus Exp $
  */
 
 /*
@@ -130,6 +130,12 @@ DECLARE HBClass ;
 #else
  #define __HB_CLS_PAR  __CLS_PARAM
 #endif
+
+#xtranslate __CLS_PAR00()  => nil
+#xtranslate __CLS_PAR00( <cSuperClasses,...> )   => {<cSuperClasses>}
+
+#xtranslate __CLS_PARAM()  => { "HBObject" }
+#xtranslate __CLS_PARAM( <cSuperClasses,...> )   => {<cSuperClasses>}
 
 #ifdef HB_CLS_NOAUTOINIT
  #define __HB_CLS_NOINI .T.

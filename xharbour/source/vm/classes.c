@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.200 2007/03/25 02:41:33 ronpinkas Exp $
+ * $Id: classes.c,v 1.201 2007/04/05 07:18:45 walito Exp $
  */
 
 /*
@@ -3933,7 +3933,7 @@ USHORT hb_clsMaxClasses( void )
          Receive an variable number of param and return an array of it.
          No param will return a NULL array */
 
-
+/*
 HB_FUNC( __CLS_PARAM )
 {
    HB_THREAD_STUB_API
@@ -3958,9 +3958,10 @@ HB_FUNC( __CLS_PARAM )
 
    hb_itemReturnForward( &Array );
 }
-
+*/
 /* This one is used when HB_NOTOBJECT is defined before HBCLASS.CH */
 /* it will avoid any default object to be inherited */
+/*
 HB_FUNC( __CLS_PAR00 )
 {
    HB_THREAD_STUB_API
@@ -3976,7 +3977,7 @@ HB_FUNC( __CLS_PAR00 )
       hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
    }
 }
-
+*/
 HB_FUNC( __GETMSGPRF ) /* profiler: returns a method called and consumed times */
                        /* ( nClass, cMsg ) --> aMethodInfo { nTimes, nTime } */
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5427 2007/04/11 19:23:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5428 2007/04/12 01:27:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-11 18:39 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * include/hbextern.ch
+    * Comment EXTERN __CLS_PARAM
+  * include/hbclass.ch
+    * Optimization for speed
+    + Added #xtranslate __CLS_PARAM
+    + Added #xtranslata __CLS_PAR00
+  * source/vm/classes.c
+    * Not Needed
+    * Comment __CLS_PARAM
+    * Comment __CLS_PAR00
+  * source rtl/tobject.prg
+    * More Class(y) compatibility
+    + Adding messages :Exec(), :Eval(), :basicSize(), :Copy(), :DeepCopy()
+    * :New() Calls :Init() no limited params
 
 2007-04-11 21:26 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/pp/ppcore.c

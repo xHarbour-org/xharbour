@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.18 2005/11/12 22:49:31 walito Exp $
+ * $Id: tobject.prg,v 1.19 2007/01/13 01:36:32 ronpinkas Exp $
  */
 
 /*
@@ -68,6 +68,7 @@
  *
  */
 
+#if 0
 /* WARNING: Can not use the preprocessor      */
 /* otherwise it will auto inherit from itself */
 
@@ -177,6 +178,149 @@ static function HBObject_Error( cDesc, cClass, cMsg, nCode, aArgs )
 
 //RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
 RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOMETHOD, nCode, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
+#else
+#define HB_CLS_NOTOBJECT
+
+#include "common.ch"
+#include "hbclass.ch"
+#include "error.ch"
+
+//----------------------------------------------------------------------------//
+/* Work Like Class(y)) */
+
+CLASS HBObject
+
+   METHOD New
+   METHOD Init          INLINE   Self
+
+   // methods to return string representation of object.  asExpStr is
+   // dynamically mapped to asString so subclasses don't need to define both
+   // unless asExpStr result differs from asString, as in the scalar classes.
+
+   METHOD asString      INLINE   ::ClassName + " Object"
+   METHOD asExpStr      INLINE   ::asString()
+
+   METHOD basicSize     INLINE   Len( Self )
+   
+   /* This Three Not Needed C version from classes.c are probably better in term of speed */
+   /*
+   METHOD ClassName     INLINE __ObjGetClsName( Self )
+   METHOD ClassH        INLINE __ClassH( Self )
+   METHOD ClassSel      INLINE __ClassSel( Self:ClassH )
+   */
+
+   METHOD Copy
+   METHOD deepCopy
+
+   METHOD isEqual( o )  INLINE Self == o
+
+   METHOD isKindOf
+
+   // ScalarObject class overrides this
+   METHOD isScalar      INLINE .F.
+
+   METHOD Eval          VIRTUAL
+   METHOD Exec          VIRTUAL
+
+   METHOD Error
+
+   ERROR HANDLER ErrorHandler
+
+   METHOD MsgNotFound
+
+   /* Begin xBase++ */
+   MESSAGE isDerivedFrom   METHOD isKindOf
+
+
+ENDCLASS
+
+//----------------------------------------------------------------------------//
+
+/* Currently limited to 20 param */
+/* Will be re-written in C later to avoid this */
+
+#pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbstack.h"
+#include "hbvm.h"
+
+HB_FUNC_STATIC( HBOBJECT_NEW )
+{
+   PHB_DYNS pDynSym  = hb_dynsymGet( "Init" );
+   USHORT   uiPCount = hb_pcount(), i;
+   
+   hb_vmPushSymbol( pDynSym->pSymbol );
+   hb_vmPush( hb_stackSelfItem() );
+   
+   for( i = 1; i <= uiPCount; i++ )
+   {
+      hb_vmPush( hb_stackItemFromBase( i ) );
+   }
+
+   hb_vmSend( uiPCount );
+}
+
+#pragma ENDDUMP
+//----------------------------------------------------------------------------//
+/*
+    copy()
+
+    RETURN a copy of the receiver which shares the receiver's instance
+    variables.
+*/
+
+METHOD copy
+   LOCAL NewSelf := __clsInst( ::ClassH )
+   LOCAL xItem
+   
+   FOR EACH xItem IN Self
+      NewSelf[ HB_EnumIndex() ] := Self[ HB_EnumIndex() ]
+   NEXT
+   
+RETURN NewSelf
+
+//----------------------------------------------------------------------------//
+/*
+    deepCopy()
+
+    RETURN a copy of the receiver with shallow copies of each instance
+*/
+
+METHOD deepCopy
+RETURN __objClone( self )
+
+//----------------------------------------------------------------------------//
+
+METHOD IsKindOf( o )
+   RETURN __ObjDerivedFrom( Self, o )
+
+//----------------------------------------------------------------------------//
+
+METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs )
+
+   LOCAL nGenCode   := EG_NOMETHOD
+
+   DEFAULT nSubCode TO 1004
+
+   IF nSubCode == 1005
+     nGenCode := EG_NOVARMETHOD
+   ENDIF
+
+   RETURN EVAL( ErrorBlock(), ErrorNew( "BASE", nGenCode, nSubCode, cClassName + ":" + cMsg, cDesc,;
+                   aArgs, ProcFile(3), ProcName(3), ProcLine(3) ) )
+
+//----------------------------------------------------------------------------//
+
+METHOD ErrorHandler()
+   RETURN ::MsgNotFound( __GetMessage() )
+
+//----------------------------------------------------------------------------//
+
+METHOD MsgNotFound( cMsg )
+   RETURN ::Error( "Message not found", __OBJGETCLSNAME( Self ), cMsg, if(substr(cMsg,1,1)=="_",1005,1004) )
+
+#endif
 
 FUNCTION TAssociativeArray( ... )
    LOCAL hHash
