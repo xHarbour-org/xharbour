@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.65 2006/11/09 16:41:09 marchuet Exp $
+# $Id: makefile.wc,v 1.66 2007/03/25 06:12:49 walito Exp $
 #
 
 #
@@ -736,6 +736,7 @@ VM_LIB_OBJS = \
    $(VM_OBJ_DIR)\asort.obj \
    $(VM_OBJ_DIR)\break.obj \
    $(VM_OBJ_DIR)\classes.obj \
+   $(VM_OBJ_DIR)\classesc.obj \
    $(VM_OBJ_DIR)\cmdarg.obj \
    $(VM_OBJ_DIR)\codebloc.obj \
    $(VM_OBJ_DIR)\dbgentry.obj \
@@ -1627,6 +1628,9 @@ $(VM_OBJ_DIR)\break.obj : $(VM_DIR)\break.c
    $(CC_CMD)
 
 $(VM_OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
+   $(CC_CMD)
+
+$(VM_OBJ_DIR)\classesc.obj : $(VM_DIR)\classesc.c
    $(CC_CMD)
 
 $(VM_OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c

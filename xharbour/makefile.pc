@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.38 2007/03/11 00:18:13 modalsist Exp $
+# $Id: makefile.pc,v 1.39 2007/03/25 06:12:49 walito Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -714,6 +714,7 @@ VM_LIB_OBJS = \
    $(OBJ_DIR)\asort.obj \
    $(OBJ_DIR)\break.obj \
    $(OBJ_DIR)\classes.obj \
+   $(OBJ_DIR)\classesc.obj \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
    $(OBJ_DIR)\dbgentry.obj \
@@ -2913,6 +2914,9 @@ $(OBJ_DIR)\break.obj : $(VM_DIR)\break.c
    $(CC_CMD)
 
 $(OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\classesc.obj : $(VM_DIR)\classesc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
