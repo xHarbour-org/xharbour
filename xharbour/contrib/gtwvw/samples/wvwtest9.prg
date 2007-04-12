@@ -1,5 +1,5 @@
 /*
- * $Id: wvwtest9.prg,v 1.2 2005/10/26 15:53:00 bdj Exp $
+ * $Id: wvwtest9.prg,v 1.3 2005/11/02 18:00:21 modalsist Exp $
  */
 //-------------------------------------------------------------------//
 //
@@ -1073,25 +1073,24 @@ return nNumber
 /* Note: width < 0 appears better, but mouse caption will look bad */
 FUNCTION SetDefaultWindowSize()
   //x was: LOCAL Result:= SetMode(32,98), ScreenWidth
-  LOCAL Result:= SetMode(32,98), ScreenWidth
+  LOCAL Result:= .t., ScreenWidth
+  SetMode(25,80)
   IF Result
      screenWidth := Wvw_GetScreenWidth()
      DO CASE
-        CASE lYesNo("I am preparing the 'best' font for you..." + CRLF+;
-                    "Sorry, is your screenWidth >= 1024 ?")
-          Result:= Wvw_SetFont(,'Terminal',20,10)
-        CASE lYesNo("I am preparing the 'best' font for you..." + CRLF+;
-                    "Sorry, is your screenWidth >= 800 ?")
+        CASE screenWidth >= 1024 
+          Result:= Wvt_SetFont('Terminal',20,10)
+        CASE screenWidth >= 800 
           IF OS_IsWinNt()
-             Result:= Wvw_SetFont(,'Lucida Console',16,-8)
+             Result:= Wvt_SetFont('Lucida Console',16,-8)
           ELSE
-             Result:= Wvw_SetFont(,'System',16,-8)
+             Result:= Wvt_SetFont('System',16,-8)
           ENDIF
         OTHERWISE
-           Result:= Wvw_SetFont(,'Terminal',12,6)
+           Result:= Wvt_SetFont('Terminal',12,6)
      ENDCASE
      IF Result
-        Wvw_SetCodePage(,255)  // #define OEM_CHARSET 255 - from wingdi.h
+        Wvt_SetCodePage(255)  // #define OEM_CHARSET 255 - from wingdi.h
         CLS
      ENDIF
   ENDIF
