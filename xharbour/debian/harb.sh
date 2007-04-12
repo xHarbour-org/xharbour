@@ -4,6 +4,7 @@ export HB_BIN_INSTALL=/usr/bin
 export HB_INC_INSTALL=/usr/include/xharbour
 export HB_LIB_INSTALL=/usr/lib/xharbour
 export HB_GT_LIB=gtcrs
+export HB_MT=MT
 export HB_LEX="SIMPLEX"
 export HB_MULTI_GT=yes
 export C_USR="-DHB_FM_STATISTICS_OFF -O3"
