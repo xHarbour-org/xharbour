@@ -1,5 +1,5 @@
 /*
- * $Id:$
+ * $Id: classesc.c,v 1.1 2007/04/12 03:17:17 andresreyesh Exp $
  */
 
 /*
@@ -118,7 +118,7 @@ HB_FUNC( __CLS_PAR00 )
       hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
    }
    
-   hb_itemReturnForward( &Array );
+   //hb_itemReturnForward( &Array );
 }
 
 
