@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.68 2007/04/05 07:18:45 walito Exp $
+ * $Id: arrayshb.c,v 1.69 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -565,7 +565,16 @@ HB_FUNC( ACLONE )
 
 HB_FUNC( HB_APARAMS )
 {
-   hb_itemRelease( hb_itemReturnForward( hb_arrayFromParams( hb_stackGetBase(1) ) ) );
+   PHB_ITEM *pBase = hb_stackGetBase( hb_parnl(1) + 1 );
+
+   if( pBase )
+   {
+      hb_itemRelease( hb_itemReturnForward( hb_arrayFromParams( pBase ) ) );
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 2017, NULL, "HB_APARAMS", 1, hb_paramError( 1 ) );
+   }
 }
 
 HB_FUNC( HB_AEXPRESSIONS )

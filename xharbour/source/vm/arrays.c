@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.137 2007/04/10 18:21:12 ronpinkas Exp $
+ * $Id: arrays.c,v 1.138 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -1683,18 +1683,25 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    PHB_ITEM pArray;
    USHORT uiPos, uiPCount, uiOffset;
 
-   pArray = hb_itemNew( NULL );
-   uiPCount = (*pBase)->item.asSymbol.paramcnt;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
-
-   uiOffset = (*pBase)->item.asSymbol.paramsoffset;
-
-   hb_arrayNew( pArray, uiPCount );
-
-   for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
+   if( pBase && HB_IS_SYMBOL( *pBase ) )
    {
-      hb_arraySet( pArray, uiPos, *( pBase + 1 + uiPos + uiOffset ) );
+      pArray = hb_itemNew( NULL );
+      uiPCount = (*pBase)->item.asSymbol.paramcnt;
+
+      HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
+
+      uiOffset = (*pBase)->item.asSymbol.paramsoffset;
+
+      hb_arrayNew( pArray, uiPCount );
+
+      for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
+      {
+         hb_arraySet( pArray, uiPos, *( pBase + 1 + uiPos + uiOffset ) );
+      }
+   }
+   else
+   {
+      hb_errInternal( HB_EI_ERRUNRECOV, "Invalid argument to hb_arrayFromParams().", NULL, NULL );
    }
 
    return pArray;
