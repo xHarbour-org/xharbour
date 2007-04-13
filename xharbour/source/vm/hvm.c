@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.611 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: hvm.c,v 1.612 2007/04/11 07:58:59 ronpinkas Exp $
  */
 
 /*
@@ -10345,7 +10345,22 @@ HB_FUNC( HB_QSELF )
 {
    HB_THREAD_STUB
 
-   hb_itemCopy( &(HB_VM_STACK.Return), *( hb_stackGetBase( hb_parnl( 1 ) ) + 1 ) );
+   PHB_ITEM * pBase = HB_VM_STACK.pBase;
+   LONG lLevel = hb_parnl( 1 );
+
+   // Outer function level.
+   pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+
+   while( ( HB_IS_BLOCK( *( pBase + 1 ) ) || lLevel-- > 0 ) && pBase != HB_VM_STACK.pItems )
+   {
+      //TraceLog( NULL, "Skipped: %s\n", ( *pBase )->item.asSymbol.value->szName );
+
+      pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
+   }
+
+   //TraceLog( NULL, "Found: %s\n", ( *pBase )->item.asSymbol.value->szName );
+
+   hb_itemCopy( &(HB_VM_STACK.Return), *( pBase + 1 ) );
 }
 
 HB_FUNC( __OPCOUNT ) /* it returns the total amount of opcodes */

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5432 2007/04/12 12:59:48 lculik Exp $
+ * $Id: ChangeLog,v 1.5433 2007/04/13 15:39:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-13 16:17 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    * Reverted silly factorization of HB_QSELF()
+  * source/rtl/win32ole.prg
+    * Do NOT inherit from HB_Object() to avoid OLE namespace pollution
 
 2007-04-13 11:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbpp.h

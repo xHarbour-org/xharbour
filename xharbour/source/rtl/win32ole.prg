@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.147 2007/02/17 14:47:29 jfgimenez Exp $
+ * $Id: win32ole.prg,v 1.148 2007/02/27 15:59:40 druzus Exp $
  */
 
 /*
@@ -56,6 +56,8 @@
   FUNCTION GetActiveObject( cString )
   Return NIL
 #else
+
+#define HB_CLS_NOTOBJECT
 
 #include "hbclass.ch"
 #include "error.ch"
