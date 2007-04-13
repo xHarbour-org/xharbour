@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.14 2007/03/30 16:10:26 marchuet Exp $
+ * $Id: hbpp.h,v 1.15 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -402,6 +402,9 @@ HB_PP_TOKEN, * PHB_PP_TOKEN;
 #define HB_PP_CMP_STD         1 /* standard comparison, ignore the case of the characters */
 #define HB_PP_CMP_DBASE       2 /* dbase keyword comparison (accepts at least four character shortcuts) ignore the case of the characters */
 #define HB_PP_CMP_CASE        3 /* case sensitive comparison */
+
+#define HB_PP_CMP_KEY        0x1000
+#define HB_PP_CMP_MATCHRULE  0x2000
 
 #define HB_PP_CMP_MODE(t)     ( (t) & 0xff )
 #define HB_PP_STD_RULE        0x8000

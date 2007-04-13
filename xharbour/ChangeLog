@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5431 2007/04/12 11:31:06 lculik Exp $
+ * $Id: ChangeLog,v 1.5432 2007/04/12 12:59:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-13 11:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbpp.h
+    + Added:
+       #define HB_PP_CMP_KEY        0x1000
+       #define HB_PP_CMP_MATCHRULE  0x2000
+  * source/pp/ppcore.c
+    * Corrected #[x]untranslate/[x]uncommand to work as documented
+  * include/hbclass.ch
+    * Corrected usage of #[x]untranslate
+
 2007-04-12 10:10 UTC-0300 Luiz Rafael Culik Guimaraes
   * makefile.bc
     makefile.vc
@@ -26,7 +37,7 @@
   * debian/substvars
   * make_deb.sh
     ! updated  now it generate an usable .deb
-    
+
 2007-04-11 21:11 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/vm/classes.c
     - Moved Functions __CLS_PARAM, __CLS_PAR00 to classesc.c

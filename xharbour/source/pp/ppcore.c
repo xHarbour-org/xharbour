@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.246 2007/04/11 19:23:53 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.247 2007/04/12 01:27:18 ronpinkas Exp $
  */
 
 /*
@@ -99,6 +99,7 @@
 #define HB_PP_ERR_NESTED_INCLUDES               30    /* C3009 */
 #define HB_PP_ERR_INVALID_DIRECTIVE             31    /* C3010 */
 #define HB_PP_ERR_CANNOT_OPEN_RULES             32    /* C3011 */
+#define HB_PP_ERR_DELETE_SYNTAX                 33    /* Non Clipper */
 
 
 /* warning messages */
@@ -145,7 +146,8 @@ static char * hb_pp_szErrors[] =
    "Bad filename in #include",                                          /* C3008 */
    "Too many nested #includes",                                         /* C3009 */
    "Invalid name follows #",                                            /* C3010 */
-   "Can't open standard rule file: '%s'"                                /* C3011 */
+   "Can't open standard rule file: '%s'",                               /* C3011 */
+   "Syntax error in #untranslate/#uncommand: '%s'"                     /* Non Clipper */
 };
 
 
@@ -1434,9 +1436,9 @@ static BOOL hb_pp_tokenValueCmp( PHB_PP_TOKEN pToken, char * szValue, USHORT mod
 {
    if( pToken->len )
    {
-      if( mode == HB_PP_CMP_CASE )
+      if( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_CASE )
          return memcmp( szValue, pToken->value, pToken->len ) == 0;
-      if( mode == HB_PP_CMP_DBASE && pToken->len >= 4 &&
+      if( HB_PP_CMP_MODE(mode) == HB_PP_CMP_DBASE && pToken->len >= 4 &&
           ( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD ||
             HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_STRING ||
             HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_TEXT ) )
@@ -1454,7 +1456,7 @@ static BOOL hb_pp_tokenEqual( PHB_PP_TOKEN pToken, PHB_PP_TOKEN pMatch,
          ( mode != HB_PP_CMP_ADDR &&
            HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_TYPE( pMatch->type ) &&
            ( pToken->len == pMatch->len ||
-             ( mode == HB_PP_CMP_DBASE && pMatch->len > 4 &&
+             ( HB_PP_CMP_MODE( mode ) == HB_PP_CMP_DBASE && pMatch->len > 4 &&
                pToken->len >= 4 && pMatch->len > pToken->len ) ) &&
            hb_pp_tokenValueCmp( pToken, pMatch->value, mode ) );
 }
@@ -2865,22 +2867,23 @@ static BOOL hb_pp_resultMarkerNew( PHB_PP_STATE pState,
    return FALSE;
 }
 
-static BOOL hb_pp_patternCompare( PHB_PP_TOKEN pToken1, PHB_PP_TOKEN pToken2 )
+static BOOL hb_pp_patternCompare( PHB_PP_TOKEN pToken1, PHB_PP_TOKEN pToken2, USHORT mode )
 {
    while( pToken1 && pToken2 )
    {
-      if( !hb_pp_tokenEqual( pToken1, pToken2, HB_PP_CMP_STD ) )
+      if( !hb_pp_tokenEqual( pToken1, pToken2, mode ) )
          break;
       if( HB_PP_TOKEN_TYPE( pToken1->type ) == HB_PP_MMARKER_RESTRICT ||
           HB_PP_TOKEN_TYPE( pToken1->type ) == HB_PP_MMARKER_OPTIONAL ||
           HB_PP_TOKEN_TYPE( pToken1->type ) == HB_PP_RMARKER_OPTIONAL )
       {
-         if( !hb_pp_patternCompare( pToken1->pMTokens, pToken2->pMTokens ) )
+         if( !hb_pp_patternCompare( pToken1->pMTokens, pToken2->pMTokens, mode ) )
             break;
       }
       pToken1 = pToken1->pNext;
       pToken2 = pToken2->pNext;
    }
+
    return !pToken1 && !pToken2;
 }
 
@@ -2893,26 +2896,36 @@ static void hb_pp_directiveDel( PHB_PP_STATE pState, PHB_PP_TOKEN pMatch,
    while( * pRulePtr )
    {
       pRule = * pRulePtr;
-      if( HB_PP_CMP_MODE( pRule->mode ) == mode && pRule->markers == markers )
+
+      if( mode & HB_PP_CMP_KEY )
+      {
+         if( hb_pp_tokenEqual( pRule->pMatch, pMatch, mode ) )
+            break;
+      }
+      else if( markers == 0 || pRule->markers == markers )
       {
          USHORT u;
+
          for( u = 0; u < markers; ++u )
          {
             if( pRule->pMarkers[ u ].canrepeat != pMarkers[ u ].canrepeat )
                break;
          }
-         if( u == markers && hb_pp_patternCompare( pRule->pMatch, pMatch ) )
-         {
-            * pRulePtr = pRule->pPrev;
-            hb_pp_ruleFree( pRule );
-            if( fCommand )
-               pState->iCommands--;
-            else
-               pState->iTranslations--;
-            return;
-         }
+         if( u == markers && hb_pp_patternCompare( pRule->pMatch, pMatch, mode ) )
+            break;
       }
       pRulePtr = &pRule->pPrev;
+   }
+
+   if( * pRulePtr )
+   {
+      * pRulePtr = pRule->pPrev;
+      hb_pp_ruleFree( pRule );
+      if( fCommand )
+         pState->iCommands--;
+      else
+         pState->iTranslations--;
+      return;
    }
 }
 
@@ -2944,7 +2957,11 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
                   HB_PP_TOKEN_TYPE( pStart->type ) == HB_PP_TOKEN_EQ &&
                   HB_PP_TOKEN_TYPE( pStart->pNext->type ) == HB_PP_TOKEN_GT )
          {
-            fValid = TRUE;
+            if( fDelete )
+               hb_pp_error( pState, 'E', HB_PP_ERR_DELETE_SYNTAX, pToken->pNext->value );
+            else
+               fValid = TRUE;
+
             if( !pLast )
                break;
 
@@ -2952,6 +2969,20 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
             pMatch = pToken->pNext;
             pToken->pNext = pStart;
             pToken = pStart = pStart->pNext;
+         }
+         else if( fDelete && HB_PP_TOKEN_ISEOP( pStart->pNext, fDirect ) )
+         {
+            fValid = TRUE;
+            pMatch = pToken->pNext;
+
+            if( pStart->pNext )
+               pToken->pNext = pStart->pNext->pNext;
+            else
+               pToken->pNext = NULL;
+
+            pStart->pNext = NULL;
+            pLast = pToken;
+            break;
          }
          pLast = pStart;
          pStart = pStart->pNext;
@@ -4641,19 +4672,19 @@ static void hb_pp_preprocesToken( PHB_PP_STATE pState )
          /* xHarbour PP extensions */
          else if( hb_pp_tokenValueCmp( pToken, "UNTRANSLATE", HB_PP_CMP_DBASE ) )
          {
-            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_DBASE, FALSE, fDirect, TRUE );
+            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_KEY | HB_PP_CMP_STD, FALSE, fDirect, TRUE );
          }
          else if( hb_pp_tokenValueCmp( pToken, "XUNTRANSLATE", HB_PP_CMP_DBASE ) )
          {
-            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_STD, FALSE, fDirect, TRUE );
+            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_MATCHRULE | HB_PP_CMP_STD, FALSE, fDirect, TRUE );
          }
          else if( hb_pp_tokenValueCmp( pToken, "UNCOMMAND", HB_PP_CMP_DBASE ) )
          {
-            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_DBASE, TRUE, fDirect, TRUE );
+            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_KEY | HB_PP_CMP_STD, TRUE, fDirect, TRUE );
          }
          else if( hb_pp_tokenValueCmp( pToken, "XUNCOMMAND", HB_PP_CMP_DBASE ) )
          {
-            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_STD, TRUE, fDirect, TRUE );
+            hb_pp_directiveNew( pState, pToken, HB_PP_CMP_MATCHRULE | HB_PP_CMP_STD, TRUE, fDirect, TRUE );
          }
          /* Clipper PP does not accept #line and generate error */
          else if( hb_pp_tokenValueCmp( pToken, "LINE", HB_PP_CMP_DBASE ) )
