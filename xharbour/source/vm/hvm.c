@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.613 2007/04/13 20:25:59 ronpinkas Exp $
+ * $Id: hvm.c,v 1.614 2007/04/14 16:14:11 andresreyesh Exp $
  */
 
 /*
@@ -7129,8 +7129,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
    else if( HB_IS_POINTER( pSelf ) && strcmp( pSym->szName, "EXEC") == 0 )
    {
-      pFunc = hb_itemGetPtr( pSelf );
+      pFunc = pSelf->item.asPointer.value;  //Symbol of POINTER
       bSymbol = TRUE;
+      
+      pItem->item.asSymbol.value = (PHB_SYMB)pFunc; // PROCNAME()
+      pSelf->type = HB_IT_NIL; // HB_QSELF()
    }
    else if( HB_IS_OBJECT( pSelf ) ||
             ( HB_IS_ARRAY( pSelf )   && hb_cls_uiArrayClass )     ||
