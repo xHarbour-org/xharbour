@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.151 2007/03/25 06:12:49 walito Exp $
+ * $Id: harbour.c,v 1.152 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -5863,8 +5863,7 @@ static int hb_compCompile( char * szPrg )
                      fprintf(hb_comp_VariableList,"\n");
                   }
 
-                  if( szFirstFunction == NULL && pFunc->szName[0] &&
-                      ( pFunc->cScope & HB_FS_INITEXIT ) == 0 )
+                  if( szFirstFunction == NULL && pFunc->szName[0] && ( pFunc->cScope & HB_FS_INITEXIT ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) == 0 )
                   {
                      szFirstFunction = pFunc->szName;
                   }

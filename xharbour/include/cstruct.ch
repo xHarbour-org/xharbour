@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.ch,v 1.13 2004/04/12 21:03:09 ronpinkas Exp $
+ * $Id: cstruct.ch,v 1.14 2004/07/14 06:54:47 ronpinkas Exp $
  */
 
 /*
@@ -50,6 +50,8 @@
  */
 
 #ifndef CTYPE_CHAR
+   #define CTYPE_VOID 0
+
    #define CTYPE_CHAR 1
    #define CTYPE_UNSIGNED_CHAR -1
    #define CTYPE_CHAR_PTR 10

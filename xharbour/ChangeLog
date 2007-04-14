@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5437 2007/04/14 16:14:10 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5438 2007/04/14 16:46:59 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,33 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-14 17:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  + include/wintypes.ch
+    + New header with common Windows types for use with C Structures and DllCalls.
+  * include/cstruct.ch
+    + Added CTYPE_VOID
+  * include/hbdll.ch
+    + Added support for new native syntax, which allow quick Cut & Paste from C headers.
+    + Added #include "cstruct.ch" and "wintypes.ch"
+  * include/hbvmpub.h
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for new UTILITY [STATIC] FUNCTION|PROCEDURE syntax.
+      /* The UTILITY attribute indicates that such Func/Proc should NOT be used as STARTUP code even if
+        it is the FIRST procedure in source. This means Utility Functions such as auto generated DLL wrappers
+        no longer have to be placed at BOTTOM of source, which is counter intuitive. */
+  * source/rtl/dllcall.c
+    * Fixed silly typo (&& HB_IT_BYREF)
+    * Fixed pushing pArg to not dereference (Paul is this correct?)
+    + Added validation of DynaCall() by means of getLastError()
+    * Preperation for additional work in progress
+  * tests/dllcall.prg
+    * Moved DLL declerations to TOP of file as it's now supported.
+    + Added samples of native syntax.
+  * source/vm/hvm.c
+    * Missing type cast
 
 2007-04-14 10:43 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/vm/hbvm.c

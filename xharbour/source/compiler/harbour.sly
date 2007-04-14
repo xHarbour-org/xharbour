@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.112 2007/03/25 06:12:49 walito Exp $
+ * $Id: harbour.sly,v 1.113 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -184,6 +184,7 @@ static void hb_compDebugStart( void ) { };
 %token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
 %token FINALLY
 %token HASHOP
+%token UTILITY
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -339,6 +340,8 @@ Function   : FunScope FUNCTION  IdentName { hb_comp_cVarType = ' '; hb_compFunct
 
 FunScope   :                  { $$ = HB_FS_PUBLIC; }
            | STATIC           { $$ = HB_FS_STATIC; }
+           | UTILITY          { $$ = HB_FS_UTILITY; }
+           | UTILITY STATIC   { $$ =  HB_FS_UTILITY | HB_FS_STATIC; }
            | INIT             { $$ = HB_FS_INIT | HB_FS_PUBLIC; }
            | EXIT             { $$ = HB_FS_EXIT | HB_FS_PUBLIC; }
            | CRITICAL         { $$ = HB_FS_CRITICAL | HB_FS_PUBLIC; }

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.80 2007/03/27 06:32:50 walito Exp $
+ * $Id: harbour.slx,v 1.81 2007/03/27 14:23:01 ronpinkas Exp $
  */
 
 /*
@@ -264,6 +264,11 @@ SELF_CONTAINED_WORDS_ARE {
 #define HB_H12AM         LEX_CUSTOM_ACTION - 33
 #define HB_H12PM         LEX_CUSTOM_ACTION - 34
 
+#define HB_UTIL_FUNC        LEX_CUSTOM_ACTION - 35
+#define HB_UTIL_PROC        LEX_CUSTOM_ACTION - 36
+#define HB_UTIL_STATIC_FUNC LEX_CUSTOM_ACTION - 37
+#define HB_UTIL_STATIC_PROC LEX_CUSTOM_ACTION - 38
+
 #define USE_KEYWORDS
 
 /* Key Words. */
@@ -323,6 +328,10 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "SWITCH"                          ) AS_TOKEN( HB_WANTS_EXP - SWITCH           ),
                       /* LEX_WORD( "TEXT"                            ) AS_TOKEN( HB_TEXT          ),                 */
                          LEX_WORD( "TRY"                             ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
+                         LEX_WORD( "UTILITY{WS}FUNCTION"             ) AS_TOKEN( HB_UTIL_FUNC     ),
+                         LEX_WORD( "UTILITY{WS}PROCEDURE"            ) AS_TOKEN( HB_UTIL_PROC     ),
+                         LEX_WORD( "UTILITY{WS}STATIC{WS}FUNCTION"   ) AS_TOKEN( HB_UTIL_STATIC_FUNC ),
+                         LEX_WORD( "UTILITY{WS}STATIC{WS}PROCEDURE"  ) AS_TOKEN( HB_UTIL_STATIC_PROC ),
                          LEX_WORD( "WHILE"                           ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
                          LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( WITHOBJ          ),
                          LEX_WORD( "_HB_CLASS"                       ) AS_TOKEN( DECLARE_CLASS    ),
@@ -1120,9 +1129,27 @@ static int hb_comp_SLX_CustomAction( int x )
          aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
          return STATIC + DONT_REDUCE;
 
+      case HB_UTIL_PROC :
+         aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
+         return UTILITY + DONT_REDUCE;
+
+      case HB_UTIL_STATIC_PROC :
+         aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;
+         aiHold[ iHold++ ] = STATIC + DONT_REDUCE;
+         return UTILITY + DONT_REDUCE;
+
       case HB_STATIC_FUNC :
          aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
          return STATIC + DONT_REDUCE;
+
+      case HB_UTIL_FUNC :
+         aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
+         return UTILITY + DONT_REDUCE;
+
+      case HB_UTIL_STATIC_FUNC :
+         aiHold[ iHold++ ] = FUNCTION + DONT_REDUCE;
+         aiHold[ iHold++ ] = STATIC + DONT_REDUCE;
+         return UTILITY + DONT_REDUCE;
 
       case HB_CRITICAL_PROC :
          aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;

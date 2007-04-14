@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.55 2007/04/05 07:18:45 walito Exp $
+ * $Id: hbvmpub.h,v 1.56 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -355,6 +355,8 @@
    #define HB_FS_DYNCODE   ( ( HB_SYMBOLSCOPE ) 0x0400 )
 
    #define HB_FS_DEFERRED  ( ( HB_SYMBOLSCOPE ) 0x0800 )
+
+   #define HB_FS_UTILITY   ( ( HB_SYMBOLSCOPE ) 0x1000 )
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
    /*
