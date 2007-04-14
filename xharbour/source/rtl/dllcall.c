@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.6 2006/11/20 18:35:56 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.7 2006/11/30 00:57:08 likewolf Exp $
  */
 
 /*
@@ -71,12 +71,7 @@
 
 #include <windows.h>
 
-#define DC_MICROSOFT           0x0000      // Default
-#define DC_BORLAND             0x0001      // Borland compat
-#define DC_CALL_CDECL          0x0010      // __cdecl
-#define DC_CALL_STD            0x0020      // __stdcall
-#define DC_RETVAL_MATH4        0x0100      // Return value in ST
-#define DC_RETVAL_MATH8        0x0200      // Return value in ST
+#include "hbdll.ch"
 
 #define EXEC_DLL               0x45584543
 
@@ -192,9 +187,8 @@ HB_FUNC( DLLPREPARECALL )
 
    if ( ISCHAR( 1 ) )
    {
-      xec->cDLL = (char *) hb_xgrab( hb_parclen( 1 ) + 1 );
-      strcpy( xec->cDLL, hb_parcx( 1 ) );
-      xec->hDLL = LoadLibrary( (LPCSTR) hb_parcx( 1 ) );
+      xec->cDLL = hb_strdup( hb_parc( 1 ) );
+      xec->hDLL = LoadLibrary( xec->cDLL );
    }
    else if (ISNUM( 1 ) )
    {
@@ -210,23 +204,70 @@ HB_FUNC( DLLPREPARECALL )
       xec->dwFlags = DC_CALL_STD;
    }
 
-   if ( xec->hDLL != NULL )
+   if ( xec->hDLL )
    {
       if ( ISCHAR( 3 ) )
       {
-         xec->cProc = (char *) hb_xgrab( hb_parclen( 3 ) + 1 );
-         strcpy( xec->cProc, hb_parcx( 3 ) );
+         // Not a typo - reserving space for possible Ansi 'A' suffix!
+         xec->cProc = (char *) hb_xgrab( hb_parclen(3) + 2 );
+         strncpy( xec->cProc, hb_parc(3), hb_parclen(3) + 1 );
       }
       else if (ISNUM( 3 ) )
       {
          xec->dwOrdinal = hb_parnl( 3 );
       }
    }
+   else
+   {
+      if( xec->cDLL )
+      {
+         MessageBox( GetActiveWindow(), "DllPrepareCall:LoadLibrary() failed!", xec->cDLL, MB_OK | MB_ICONERROR );
+      }
+      else
+      {
+         MessageBox( GetActiveWindow(), "DllPrepareCall() invalid handle argument!", "DllPrepareCall", MB_OK | MB_ICONERROR );
+      }
+   }
 
    xec->dwType = EXEC_DLL;
    xec->lpFunc = (LPVOID) GetProcAddress( xec->hDLL, xec->cProc != NULL ? (LPCSTR) xec->cProc : (LPCSTR) xec->dwOrdinal );
 
-   hb_retptrGC( xec );
+   if( xec->lpFunc == NULL && xec->cProc )
+   {
+      // try ANSI flavour ?
+      xec->cProc[ hb_parclen(3) ] = 'A';
+      xec->cProc[ hb_parclen(3) +1  ] = '\0';
+
+      xec->lpFunc = (LPVOID) GetProcAddress( xec->hDLL, xec->cProc != NULL ? (LPCSTR) xec->cProc : (LPCSTR) xec->dwOrdinal );
+   }
+
+   if( xec->hDLL && xec->lpFunc )
+   {
+       hb_retptrGC(  xec );
+   }
+   else if( xec->hDLL && xec->lpFunc == NULL )
+   {
+      if( xec->cProc )
+      {
+         LPVOID lpMsgBuf;
+
+         FormatMessage( FORMAT_MESSAGE_ALLOCATE_BUFFER |
+         FORMAT_MESSAGE_FROM_SYSTEM,
+         NULL,
+         GetLastError(),
+         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+         (LPTSTR) &lpMsgBuf,
+         0, NULL );
+
+         MessageBox( GetActiveWindow(), (LPCSTR) lpMsgBuf, "DllPrepareCall:GetProcAddress() failed!", MB_OK | MB_ICONERROR );
+
+         LocalFree(lpMsgBuf);
+      }
+      else
+      {
+         MessageBox( GetActiveWindow(), "DllPrepareCall:GetProcAddress() invalid oridnal argument!", "DllPrepareCall", MB_OK | MB_ICONERROR );
+      }
+   }
 }
 
 
@@ -275,7 +316,7 @@ HB_FUNC( GETPROCADDRESS )
       if ( ISCHAR( 2 ) )
       {
          // try ANSI flavour ?
-         strcpy(cFuncName, hb_parcx(2));
+         strcpy(cFuncName, hb_parc(2));
          strcat(cFuncName, "A");
          lpProcAddr = (LPVOID) GetProcAddress((HMODULE) hb_parnl(1), cFuncName);
       }
@@ -402,6 +443,12 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
             case HB_IT_LOGICAL           :
                Parm[iCnt].nWidth = sizeof( DWORD );
                Parm[iCnt].dwArg = ( DWORD ) hb_parnl( i );
+
+               if( hb_parinfo( i ) && HB_IT_BYREF )
+               {
+                  Parm[iCnt].pArg   = &Parm[iCnt].dwArg;
+                  Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
+               }
                break;
 
             case HB_IT_DOUBLE            :
@@ -621,7 +668,7 @@ HB_FUNC( DLLCALL )
       if ( ISCHAR( 3 ) )
       {
          // try forced ANSI flavour ?
-         strcpy((char *) cFuncName, hb_parcx(3));
+         strcpy((char *) cFuncName, hb_parc(3));
          strcat((char *) cFuncName, "A");
          lpFunction = (LPVOID) GetProcAddress( (HMODULE) hInst, (const char *) cFuncName);
       }
@@ -714,7 +761,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    // proper stack and take care of correct return value processing.
    RESULT  Res = { 0 };
    int    i, nInd, nSize;
-   DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
+   DWORD   dwEAX, dwEDX, dwVal, *pStack, *pESP, dwStSize = 0;
    BYTE   *pArg;
 
    // Reserve 256 bytes of stack space for our arguments
@@ -727,6 +774,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
       _ESP -= 0x100;
    #else
       _asm mov pStack, esp
+      _asm mov pESP, esp
       _asm sub esp, 0x100
    #endif
 
@@ -759,6 +807,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
          nSize -= 4;
       }
    }
+
    if ((pRet != NULL) && ((Flags & DC_BORLAND) || (nRetSiz > 8)))
    {
       // Return value isn't passed through registers, memory copy
@@ -775,7 +824,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
                     "\tcall *%3\n"
                     : "=a" (dwEAX), "=d" (dwEDX) /* Save eax/edx registers */
                     : "r" (dwStSize), "r" (lpFunction) );
-    
+
       /* Possibly adjust stack and read return values. */
       if (Flags & DC_CALL_CDECL)
       {
@@ -807,6 +856,7 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
       __emit__(0xff,0x12); // call [edx];
       dwEAX = _EAX;
       dwEDX = _EDX;
+
       // Possibly adjust stack and read return values.
       if (Flags & DC_CALL_CDECL)
       {
@@ -885,6 +935,8 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
          _asm mov edx, [dwEDX]
          _asm mov DWORD PTR [ecx + 4], edx
       }
+
+      _asm mov esp, pESP
    #endif
 
    return Res;

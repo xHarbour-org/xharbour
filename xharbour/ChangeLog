@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5434 2007/04/13 20:25:58 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5435 2007/04/13 22:09:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-14 03:03 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  + include/hbdll.ch
+    + New header file with DllCall constants and FoxPro and FWH compatible DLL Syntax support
+  * source/rtl/dllcall.c
+    * Moved constants shared with PRG code to hbdll.ch
+    + Added support for Long/Int/Bool by ref
+    + Added validation and error reporting to DLLPREPARECALL()
+    + Added save/restore of ESP in MSVC branch of DynaCall() to avoid GPF
+      /* Paul and assembler experts, please review - also I suspect Borland and MingW should also save/restore ESP */
+  + tests/dllcall.prg
+    * New sample to demonstrate WIN DLL support using FoxPro and FWH style declerations
 
 2007-04-13 18:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/arrays.c
