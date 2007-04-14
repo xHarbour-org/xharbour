@@ -5,7 +5,7 @@
 PROCEDURE Main()
 
   LOCAL cVolumeName := Space(VOLUME_BUFFER_SIZE)
-  LOCAL nSerial     := Int( 0 )
+  LOCAL nSerial     := 0
 
   GetVolumeInformation( "C:\", @cVolumeName, VOLUME_BUFFER_SIZE, @nSerial, 0, 0, 0, 0 )
   ? "Volume:", Trim( cVolumeName ), "Serial:", NumToHex( nSerial, 8 )
