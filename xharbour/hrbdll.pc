@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.32 2007/03/11 00:17:26 modalsist Exp $
+# $Id: hrbdll.pc,v 1.33 2007/03/25 06:12:45 walito Exp $
 #
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
 # � PELLES C DLL MAKEFILE 넴
@@ -323,6 +323,8 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\tbcolumn.obj \
    $(OBJ_DIR)\tbrowse.obj \
    $(OBJ_DIR)\tclass.obj \
+   $(OBJ_DIR)\tscalar.obj \
+   $(OBJ_DIR)\clpclass.obj \
    $(OBJ_DIR)\teditor.obj \
    $(OBJ_DIR)\terror.obj \
    $(OBJ_DIR)\text.obj \
@@ -1939,6 +1941,18 @@ $(OBJ_DIR)\tclass.c : $(RTL_DIR)\tclass.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\tclass.obj : $(OBJ_DIR)\tclass.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\tscalar.c : $(RTL_DIR)\tscalar.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\tscalar.obj : $(OBJ_DIR)\tscalar.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\clpclass.obj : $(OBJ_DIR)\clpclass.c
    $(CC_CMD)
 
 $(OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg

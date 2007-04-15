@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.101 2007/02/28 02:33:45 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.102 2007/03/25 06:12:46 walito Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -361,6 +361,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\tbcolumn.obj \
   $(OBJ_DIR)\tbrowse.obj \
   $(OBJ_DIR)\tclass.obj \
+  $(OBJ_DIR)\tscalar.obj \
+  $(OBJ_DIR)\clpclass.obj \
   $(OBJ_DIR)\teditor.obj \
   $(OBJ_DIR)\terror.obj \
   $(OBJ_DIR)\text.obj \
@@ -1555,6 +1557,18 @@ $(OBJ_DIR)\tclass.c : $(RTL_DIR)\tclass.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\tclass.obj : $(OBJ_DIR)\tclass.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\tscalar.c : $(RTL_DIR)\tscalar.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\tscalar.obj : $(OBJ_DIR)\tscalar.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\clpclass.obj : $(OBJ_DIR)\clpclass.c
    $(CC_CMD)
 
 $(OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg

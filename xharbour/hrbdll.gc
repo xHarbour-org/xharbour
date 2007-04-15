@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.24 2006/11/09 16:41:08 marchuet Exp $
+# $Id: hrbdll.gc,v 1.25 2007/03/25 06:12:45 walito Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -248,6 +248,8 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/tbcolumn.o \
    $(OBJ_DIR)/tbrowse.o \
    $(OBJ_DIR)/tclass.o \
+   $(OBJ_DIR)/tscalar.o \
+   $(OBJ_DIR)/clpclass.o \
    $(OBJ_DIR)/teditor.o \
    $(OBJ_DIR)/terror.o \
    $(OBJ_DIR)/text.o \
@@ -1269,6 +1271,18 @@ $(OBJ_DIR)/tclass.c : $(RTL_DIR)/tclass.prg
 
 $(OBJ_DIR)/tclass.o : $(OBJ_DIR)/tclass.c
 	$(CC_CMD)
+
+$(OBJ_DIR)/tscalar.c : $(RTL_DIR)/tscalar.prg
+        $(HARBOUR_CMD)
+
+$(OBJ_DIR)/tscalar.o : $(OBJ_DIR)/tscalar.c
+        $(CC_CMD)
+
+$(OBJ_DIR)/clpclass.c : $(RTL_DIR)/clpclass.prg
+        $(HARBOUR_CMD)
+
+$(OBJ_DIR)/clpclass.o : $(OBJ_DIR)/clpclass.c
+        $(CC_CMD)
 
 $(OBJ_DIR)/teditor.c : $(RTL_DIR)/teditor.prg
 	$(HARBOUR_CMD)
