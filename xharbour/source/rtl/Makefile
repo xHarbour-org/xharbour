@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.71 2007/02/27 15:59:40 druzus Exp $
+# $Id: Makefile,v 1.72 2007/03/25 06:12:50 walito Exp $
 #
 
 ROOT = ../../
@@ -155,6 +155,7 @@ PRG_SOURCES=\
         browse.prg   \
         checkbox.prg \
         color53.prg  \
+	clpclass.prg \
         cstr.prg     \
         cstruct.prg  \
         dbedit.prg   \
@@ -208,6 +209,7 @@ PRG_SOURCES=\
         treport.prg  \
         trpc.prg     \
         trpccli.prg  \
+	tscalar.prg \
         ttable.prg   \
         ttextlin.prg \
         ttopbar.prg  \

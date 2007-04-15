@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.21 2006/11/11 03:48:21 druzus Exp $
+ * $Id: tclass.prg,v 1.22 2007/04/15 05:56:33 andresreyesh Exp $
  */
 
 /*
@@ -74,10 +74,6 @@
 
 #include "common.ch"
 #include "hboo.ch"
-
-#include "hbclass.ch"
-
-STATIC s_nDataId
 
 REQUEST HBObject
 
@@ -155,7 +151,7 @@ STATIC FUNCTION New( cClassName, xSuper )
    ::lFirst      := .T.
 
    FOR EACH cSuper IN ::acSuper
-      IF ! ISCHARACTER( cSuper )
+      IF ! HB_ISSTRING( cSuper ) .And. ! HB_ISNUMERIC( cSuper )
          ASize( ::acSuper, HB_EnumIndex() - 1)
          EXIT
       ENDIF
@@ -185,13 +181,19 @@ STATIC PROCEDURE Create( MetaClass )
       nDataBegin := 1
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
-         hSuper := __ClsGetHandleFromName( cDato )
-         IF hSuper == 0
-            ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
+      
+         IF HB_ISNUMERIC( cDato )
+            ahSuper[ HB_EnumIndex() ]   := cDato
+            ::acSuper[ HB_EnumIndex() ] := __CLASSNAME( cDato )
          ELSE
-            ahSuper[ HB_EnumIndex() ] := hSuper
+            hSuper := __ClsGetHandleFromName( cDato )
+            IF hSuper == 0
+               ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
+            ELSE
+               ahSuper[ HB_EnumIndex() ] := hSuper
+            ENDIF
          ENDIF
-
+         
          IF ahSuper[ HB_EnumIndex() ] == 0
             Throw( ErrorNew( "TClass", 0, 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
          ENDIF
@@ -495,224 +497,3 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
    ENDIF
 
 RETURN Self
-
-//----------------------------------------------------------------------------//
-FUNCTION __ClassNew( cName, nDatas )
-
-    LOCAL hClass := __ClsNew( cName, nDatas )
-
-    __ClsSetModule( hClass )
-
-    s_nDataId := 0
-
-RETURN hClass
-
-//----------------------------------------------------------------------------//
-FUNCTION __ClassAdd( hClass, cProperty, cFunction )
-
-   cProperty := Upper( cProperty )
-
-   IF cProperty[1] == '_'
-      RETURN __ClsAddMsg( hClass, cProperty, ++s_nDataId, HB_OO_MSG_DATA )
-   ENDIF
-
-RETURN __ClsAddMsg( hClass, cProperty, HB_FuncPtr( cFunction ), HB_OO_MSG_METHOD )
-
-//----------------------------------------------------------------------------//
-FUNCTION __ClassIns( hClass )
-
-RETURN __ClsInst( hClass )
-
-//----------------------------------------------------------------------------//
-CLASS SCALAROBJECT
-   METHOD IsScalar() INLINE .T.
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS ARRAY FROM SCALAROBJECT FUNCTION _ARRAY
-
-   METHOD _Size( nLen )         INLINE aSize( Self, nLen ), nLen
-   METHOD Add( xValue )         INLINE aAdd( Self, xValue ), Self
-   METHOD AddAll( oCollection )
-   METHOD AtIndex( nPos )       INLINE Self[nPos]
-   METHOD AtPut( nPos, xValue ) INLINE Self[ nPos ] := xValue
-   METHOD Append( xValue )      INLINE aAdd( Self, xValue ), Self
-   METHOD AsString()            INLINE ValToPrg( HB_QSelf() )
-   METHOD Collect( bCollect )
-   METHOD Copy()                INLINE aCopy( Self, Array( Len( Self ) ) )
-   METHOD DeleteAt( nPos )
-   METHOD Do( bBlock )
-   METHOD IndexOf( xValue )
-   METHOD Init( nLen )          INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
-   METHOD InsertAt( nPos, xValue )
-   METHOD Remove( xValue )
-   METHOD Scan( bScan )         INLINE aScan( Self, bScan )
-
-ENDCLASS
-
-METHOD AddAll( oCollection ) CLASS ARRAY
-   oCollection:Do( { |xValue| ::Add(xValue) } )
-RETURn Self
-
-METHOD Collect( bCollect ) CLASS ARRAY
-
-   LOCAL xElement, aResult[0]
-
-   FOR EACH xElement IN Self
-      IF Eval( bCollect, UnRef( xElement ) )
-         aAdd( aResult, UnRef( xElement ) )
-      END
-   NEXT
-
-RETURN aResult
-
-METHOD DeleteAt( nPos ) CLASS ARRAY
-
-   IF nPos > 0 .AND. nPos <= Len( Self )
-      aDel( Self, nPos, .T. )
-   ENDIF
-
-RETURN Self
-
-METHOD Do( bEval ) CLASS ARRAY
-   LOCAL xElement
-
-   FOR EACH xElement IN Self
-      bEval:Eval( UnRef( xElement ), HB_EnumIndex() )
-   NEXT
-
-RETURN Self
-
-METHOD IndexOf( xValue ) CLASS ARRAY
-   LOCAL xElement, cType := ValType( xValue )
-
-   FOR EACH xElement IN Self
-      IF ValType( xElement ) == cType .AND. xElement == xValue
-         RETURN HB_EnumIndex()
-      END
-   NEXT
-
-RETURN 0
-
-METHOD InsertAt( nPos, xValue ) CLASS ARRAY
-
-   IF nPos > Len( self )
-      aSize( Self, nPos )
-      Self[ nPos ] := xValue
-   ELSEIF nPos > 0
-      aIns( Self, nPos, xValue, .T. )
-   ENDIF
-
-RETURN Self
-
-METHOD Remove( xValue ) CLASS ARRAY
-   ::DeleteAt( ::IndexOf( xValue ) )
-RETURN Self
-
-//----------------------------------------------------------------------------//
-CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
-
-   METHOD _Size( nLen )
-   METHOD Add( xKey, xValue )      INLINE Self[ xKey ] := xValue, Self
-   METHOD AddAll( oCollection )
-   METHOD AtIndex( nPos )          INLINE HGetValueAt( Self, nPos )
-   METHOD AtPut( nPos, xValue )    INLINE HsetValueAt( Self, nPos, xValue )
-   METHOD Append( xKey, xValue )   INLINE Self[ xKey ] := xValue, Self
-   METHOD AsString()               INLINE ValToPrg( HB_QSelf() )
-   METHOD Collect( bCollect )
-   METHOD Copy()                   INLINE hCopy( Self, Hash() )
-   METHOD DeleteAt( nPos )         INLINE hDelat( Self, nPos )
-   METHOD Do( bBlock )
-   METHOD IndexOf( xValue )        INLINE hScan( Self, xValue )
-   METHOD Init( nLen )             INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
-   METHOD Remove( xValue )         INLINE hDel( Self, xValue )
-   METHOD Scan( bScan )            INLINE hScan( Self, bScan )
-
-ENDCLASS
-
-METHOD _Size( nLen ) CLASS HASH
-
-	 LOCAL nOldLen := Len( Self ), Counter
-
-	 IF nLen == nOldLen
-			RETURN nLen
-	 ELSEIF nLen > nOldLen
-      hAllocate( Self, nLen )
-
-			FOR Counter := nOldLen + 1 TO nLen
-				 Self[ "_SIZED_" + LTrim( Str( Counter ) ) ] := NIL
-			NEXT
-	 ELSE
-			FOR Counter := nOldLen TO nLen + 1
-				 hDelAt( Self, nLen + 1 )
-			NEXT
-	 ENDIF
-
-RETURN nLen
-
-METHOD AddAll( oCollection ) CLASS HASH
-
-   oCollection:Do( { |xKey, xValue| Self[ xKey ] := xValue } )
-
-RETURN Self
-
-METHOD Collect( bCollect ) CLASS HASH
-
-   LOCAL xElement, aResult[0]
-
-   FOR EACH xElement IN Self:Values
-      IF Eval( bCollect, UnRef( xElement ) )
-         aAdd( aResult, UnRef( xElement ) )
-      END
-   NEXT
-
-RETURN aResult
-
-METHOD Do( bDo ) CLASS HASH
-
-   LOCAL xKey
-
-   FOR EACH xKey IN Self:Keys
-      Eval( bDo, xKey, Self[ xKey ] )
-   NEXT
-
-RETURN Self
-
-//----------------------------------------------------------------------------//
-CLASS BLOCK FROM SCALAROBJECT FUNCTION _BLOCK
-   METHOD AsString() INLINE "{||...}"
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS CHARACTER FROM SCALAROBJECT FUNCTION _CHARACTER
-   METHOD AsString INLINE HB_QSelf()
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS DATE FROM SCALAROBJECT FUNCTION _DATE
-   METHOD AsString INLINE DToc( HB_QSelf() )
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS LOGICAL FROM SCALAROBJECT FUNCTION _LOGICAL
-   METHOD AsString INLINE IIF( HB_QSelf(), ".T.", ".F." )
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS NIL FROM SCALAROBJECT FUNCTION _NIL
-   METHOD AsString INLINE "NIL"
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS NUMERIC FROM SCALAROBJECT FUNCTION _NUMERIC
-   METHOD AsString INLINE LTrim( Str( ( HB_QSelf() ) ) )
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-CLASS POINTER FROM SCALAROBJECT FUNCTION _POINTER
-   METHOD AsString INLINE "0x" + NumToHex( HB_QSelf() )
-ENDCLASS
-
-//----------------------------------------------------------------------------//
-FUNCTION UnRef( xValue )
-RETURN xValue

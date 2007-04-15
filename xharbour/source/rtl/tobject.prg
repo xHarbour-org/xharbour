@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.21 2007/04/12 05:10:18 andresreyesh Exp $
+ * $Id: tobject.prg,v 1.22 2007/04/12 05:50:41 andresreyesh Exp $
  */
 
 /*
@@ -312,8 +312,27 @@ METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs )
 
 //----------------------------------------------------------------------------//
 
-METHOD ErrorHandler()
-   RETURN ::MsgNotFound( __GetMessage() )
+#pragma BEGINDUMP
+
+static HB_FUNC( HBOBJECT_ERRORHANDLER )
+{
+   PHB_ITEM pBase    = hb_stackBaseItem();
+   PHB_DYNS pDynSym  = hb_dynsymGet( "MsgNotFound" );
+   USHORT   uiPCount = hb_pcount(), i;
+
+   hb_vmPushSymbol( pDynSym->pSymbol );
+   hb_vmPush( hb_stackSelfItem() );
+   hb_vmPushString( pBase->item.asSymbol.value->szName, strlen(pBase->item.asSymbol.value->szName) );
+
+   for( i = 1; i <= uiPCount; i++ )
+   {
+      hb_vmPush( hb_stackItemFromBase( i ) );
+   }
+
+   hb_vmSend( uiPCount + 1 );
+}
+
+#pragma ENDDUMP
 
 //----------------------------------------------------------------------------//
 
