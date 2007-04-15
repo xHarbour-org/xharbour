@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.202 2007/04/12 01:41:18 andresreyesh Exp $
+ * $Id: classes.c,v 1.203 2007/04/12 03:17:17 andresreyesh Exp $
  */
 
 /*
@@ -2210,8 +2210,7 @@ HB_FUNC( __CLSNEW )
                pNewMethod->uiData += ( USHORT ) nLenClsDatas;
             }
             else if( pNewMethod->pFunction == hb___msgSetData ||
-                     pNewMethod->pFunction == hb___msgGetData ||
-                     pNewMethod->pFunction == hb___msgSuper )
+                     pNewMethod->pFunction == hb___msgGetData )
             {
                pNewMethod->uiData += pNewCls->uiDataFirst;
             }

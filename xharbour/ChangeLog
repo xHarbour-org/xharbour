@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5438 2007/04/14 16:46:59 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5439 2007/04/14 21:47:21 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-04-14 23:46 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * source/rtl/tclass.prg
+  * source/vm/classes.c
+    /*
+      I reduced the size of the final object, when this it is inherited
+      At VM level OOPS Engine only use the first element of the object to
+      store a reference to real self, Really we only need to have free the
+      first element of Object.
+    */
+    
 2007-04-14 17:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   + include/wintypes.ch
     + New header with common Windows types for use with C Structures and DllCalls.

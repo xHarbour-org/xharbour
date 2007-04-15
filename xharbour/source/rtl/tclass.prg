@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.20 2006/09/07 04:56:43 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.21 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -179,7 +179,10 @@ STATIC PROCEDURE Create( MetaClass )
    LOCAL hSuper
 
    IF nLen == 0
-      hClass := __ClsNew( ::cName, nLenDatas, nExtraMsgs )
+      //Maybe this class is a super class, and the oop engine store
+      //in the first element a real self, when call a super method
+      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs )
+      nDataBegin := 1
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
          hSuper := __ClsGetHandleFromName( cDato )
@@ -194,20 +197,20 @@ STATIC PROCEDURE Create( MetaClass )
          ENDIF
       NEXT
 
-      hClass := __ClsNew( ::cName, nLenDatas + nlen, nExtraMsgs, ahSuper )
+      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper )
 
       FOR EACH cDato IN ahSuper
          nDataBegin   += __cls_CntData( cDato )        // Get offset for new Datas
          nClassBegin  += __cls_CntClsData( cDato )     // Get offset for new ClassData
       NEXT
 
-      __clsAddMsg( hClass, Upper( ::acSuper[ 1 ] ), ++nDataBegin, HB_OO_MSG_SUPER, ahSuper[ 1 ], HB_OO_CLSTP_CLASS + 1 )
+      __clsAddMsg( hClass, Upper( ::acSuper[ 1 ] ), 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], HB_OO_CLSTP_CLASS + 1 )
       // nData begin stay here the same so as, SUPER and __SUPER will share the same pointer to super object with the first one.
-      __clsAddMsg( hClass, "SUPER"                , nDataBegin, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
-      __clsAddMsg( hClass, "__SUPER"              , nDataBegin, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
+      __clsAddMsg( hClass, "SUPER"                , 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
+      __clsAddMsg( hClass, "__SUPER"              , 1, HB_OO_MSG_SUPER, ahSuper[ 1 ], 1 )
 
       FOR n := 2 TO nLen
-         __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), ++nDataBegin, HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
+         __clsAddMsg( hClass, Upper( ::acSuper[ n ] ), HB_EnumIndex(), HB_OO_MSG_SUPER, ahSuper[ n ], HB_OO_CLSTP_CLASS + 1 )
       NEXT
    ENDIF
 //   __clsAddMsg( hClass, Upper( ::cName ), 0, HB_OO_MSG_SUPER, hClass, 1 )
