@@ -1,7 +1,7 @@
 /*
- * $Id$
+ * $Id: tscalar.prg,v 1.1 2007/04/15 18:47:55 andresreyesh Exp $
  */
- 
+
 /*
  * Harbour Project source code:
  * Scalar Classes
@@ -58,9 +58,9 @@ CLASS ScalarObject
 
    METHOD  Copy
    MESSAGE DeepCopy     METHOD Copy
-   
+
    METHOD  IsScalar     INLINE .T.
-   
+
    METHOD  asString
    METHOD  asExpStr
 
@@ -76,7 +76,7 @@ METHOD Copy       CLASS ScalarObject
 METHOD asString   CLASS ScalarObject
 
    SWITCH Valtype( Self )
-   
+
       CASE 'A' ; RETURN '{ ... }'
       CASE 'H' ; RETURN '{ => }'
       CASE 'B' ; RETURN '{ || ... }'
@@ -85,9 +85,9 @@ METHOD asString   CLASS ScalarObject
       CASE 'L' ; RETURN If( Self, '.T.', '.F.' )
       CASE 'N' ; RETURN LTRIM( STR( Self ))
       CASE 'U' ; RETURN 'Nil'
-      
+
    END
-   
+
 RETURN 'Errror!!'
 
 //----------------------------------------------------------------------------//
@@ -96,7 +96,7 @@ METHOD asExpStr   CLASS ScalarObject
    LOCAL cTemp
 
    SWITCH Valtype( Self )
-   
+
       CASE 'A' ; RETURN '{ ... }'
       CASE 'H' ; RETURN '{ => }'
       CASE 'C' ; RETURN '"' + Self + '"'
@@ -106,7 +106,7 @@ METHOD asExpStr   CLASS ScalarObject
                       SubStr( cTemp, 5, 2 ) + '/' +;
                       SubStr( cTemp, 7, 2 ) + '}'
    END
-   
+
 RETURN ::asString
 
 //----------------------------------------------------------------------------//
@@ -129,7 +129,7 @@ CLASS Array FROM ScalarObject FUNCTION _Array
    METHOD  Remove
    METHOD  Scan( bScan )   INLINE aScan( Self, bScan )
    METHOD  _Size( nLen )   INLINE aSize( Self, nLen ), nLen
-   
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -215,7 +215,7 @@ RETURN Self
 
 CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
 
-   
+
    METHOD Add( xKey, xValue )      INLINE Self[ xKey ] := xValue, Self
    METHOD AddAll( oCollection )
    METHOD AtIndex( nPos )          INLINE HGetValueAt( Self, nPos )
@@ -231,7 +231,7 @@ CLASS HASH FROM SCALAROBJECT FUNCTION _HASH
    METHOD Remove( xValue )         INLINE hDel( Self, xValue )
    METHOD Scan( bScan )            INLINE hScan( Self, bScan )
    METHOD _Size( nLen )
-   
+
 ENDCLASS
 
 //----------------------------------------------------------------------------//
@@ -344,7 +344,7 @@ ENDCLASS
 
 //be careful maybe a pointer it's not (PHB_SYMB)
 
-static HB_FUNC( POINTER_FUNCNAME )
+HB_FUNC_STATIC( POINTER_FUNCNAME )
 {
    hb_retc( ((PHB_SYMB)hb_stackSelfItem()->item.asPointer.value)->szName );
 }
@@ -356,4 +356,4 @@ FUNCTION UnRef( xValue )
 RETURN xValue
 
 //----------------------------------------------------------------------------//
-   
+

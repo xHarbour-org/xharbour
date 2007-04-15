@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.22 2007/04/12 05:50:41 andresreyesh Exp $
+ * $Id: tobject.prg,v 1.23 2007/04/15 18:47:55 andresreyesh Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ CLASS HBObject
    METHOD asExpStr      INLINE   ::asString()
 
    METHOD basicSize     INLINE   Len( Self )
-   
+
    /* This Three Not Needed C version from classes.c are probably better in term of speed */
    /*
    METHOD ClassName     INLINE __ObjGetClsName( Self )
@@ -249,10 +249,10 @@ HB_FUNC_STATIC( HBOBJECT_NEW )
 {
    PHB_DYNS pDynSym  = hb_dynsymGet( "Init" );
    USHORT   uiPCount = hb_pcount(), i;
-   
+
    hb_vmPushSymbol( pDynSym->pSymbol );
    hb_vmPush( hb_stackSelfItem() );
-   
+
    for( i = 1; i <= uiPCount; i++ )
    {
       hb_vmPush( hb_stackItemFromBase( i ) );
@@ -273,11 +273,11 @@ HB_FUNC_STATIC( HBOBJECT_NEW )
 METHOD copy
    LOCAL NewSelf := __clsInst( ::ClassH )
    LOCAL xItem
-   
+
    FOR EACH xItem IN Self
       NewSelf[ HB_EnumIndex() ] := Self[ HB_EnumIndex() ]
    NEXT
-   
+
 RETURN NewSelf
 
 //----------------------------------------------------------------------------//
@@ -314,7 +314,7 @@ METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs )
 
 #pragma BEGINDUMP
 
-static HB_FUNC( HBOBJECT_ERRORHANDLER )
+HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 {
    PHB_ITEM pBase    = hb_stackBaseItem();
    PHB_DYNS pDynSym  = hb_dynsymGet( "MsgNotFound" );
