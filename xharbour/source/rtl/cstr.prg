@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.33 2006/09/09 04:14:35 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.34 2006/09/19 01:46:17 ronpinkas Exp $
  */
 
 /*
@@ -205,16 +205,29 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
          RETURN StringToLiteral( xVal )
 
       CASE 'A'
-         cRet := "{ "
+         IF cName == NIL
+            nPad := 0
+            cName := "M->__ValToPrg_Array"
+            aObjs := {}
+         ELSE
+            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+                RETURN aObjs[ nObj ][2] + " /* Cyclic */"
+            ENDIF
+         ENDIF
+
+         aAdd( aObjs, { xVal, cName } )
+
+         cPad  := sPace( nPad )
+         cRet  := cPad + cName + " := Array(" + LTrim( Str( Len( xVal ) ) ) + ")" + CRLF
+
+         nPad += 3
+         cPad  := sPace( nPad )
 
          FOR EACH aVar IN xVal
-            cRet += ( ValToPrg( aVar ) + ", " )
+            cRet += cPad + cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrg( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", nPad + 3, aObjs ) + CRLF
          NEXT
 
-         IF cRet[ -2 ] == ','
-            cRet[ -2 ] := ' '
-         ENDIF
-         cRet[ -1 ] := '}'
+         nPad -=3
 
          RETURN cRet
 
@@ -244,52 +257,30 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 
       CASE 'O'
          /* TODO: Use HBPersistent() when avialable! */
-
-         IF nPad == NIL
-            nPad := 3
-         ENDIF
-
          IF cName == NIL
-            cName := "ValToPrg_Object"
-         ENDIF
-
-         cPad  := sPace( nPad + 3 )
-         cRet  := Space( nPad ) + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
-
-         IF aObjs == NIL
-            aObjs := { { xVal, cName } }
+            cName := "M->__ValToPrgExp_Object"
+            nPad := 0
+            aObjs := {}
          ELSE
-            aAdd( aObjs, { xVal, cName } )
+            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+                RETURN aObjs[ nObj ][2] + " /* Cyclic */"
+            ENDIF
          ENDIF
+
+         aAdd( aObjs, { xVal, cName } )
+
+         cPad  := sPace( nPad )
+         cRet  := CRLF + cPad + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
+
+         nPad += 3
+         cPad  := sPace( nPad )
 
          FOR EACH aVar IN __objGetValueDiff( xVal )
-            SWITCH ValType( aVar[2] )
-               CASE 'O'
-                  IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
-                     cRet += cPad + ":" + aVar[1] + " := " + "/* Cyclic Reference: */ " + aObjs[ nObj ][2] + CRLF
-                  ELSE
-                     aAdd( aObjs, { aVar[2], cName + ":" + aVar[1] } )
-                     cRet += ValToPrg( aVar[2], cName + ":" + aVar[1], nPad + 3, aObjs ) + CRLF
-                  ENDIF
-
-                  EXIT
-
-               CASE 'B'
-                  TRY
-                      cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
-                  CATCH
-                      cRet += cPad + ":" + aVar[1] + " := {|| Alert( 'Non Persistentable Block.' ) }" + CRLF
-                  END
-
-                  EXIT
-
-               DEFAULT
-                  //TraceLog( aVar[1], aVar[2] )
-                  cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2] ) + CRLF
-            END
+             cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2], cName + ":" + aVar[1], nPad + 3, aObjs ) + CRLF
          NEXT
 
-         RETURN cRet + sPace( nPad ) + "END OBJECT"
+         nPad -=3
+         RETURN cRet + sPace( nPad ) + "END OBJECT" + CRLF
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )
@@ -315,7 +306,6 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
 
    SWITCH cType
       CASE 'C'
-
          IF Len( xVal ) == 0
             RETURN '""'
          ELSE
@@ -340,19 +330,24 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
          RETURN xVal
 
       CASE 'A'
-         cRet := "{ "
-
-         FOR EACH aVar IN xVal
-            cRet += ( ValToPrgExp( aVar ) + ", " )
-         NEXT
-
-         IF cRet[ -2 ] == ','
-            cRet[ -2 ] := ' '
+         IF cName == NIL
+            cName := "M->__ValToPrgExp_Array"
+            aObjs := {}
+         ELSE
+            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+                RETURN  aObjs[ nObj ][2]
+            ENDIF
          ENDIF
 
-         cRet[ -1 ] := '}'
+         aAdd( aObjs, { xVal, cName } )
 
-         RETURN cRet
+         cRet  := "( " + cName + " := Array(" + LTrim( Str( Len( xVal ) ) ) + "), "
+
+         FOR EACH aVar IN xVal
+            cRet += cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrgExp( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", aObjs ) + ", "
+         NEXT
+
+         RETURN cRet + cName + " )"
 
       CASE 'H'
          IF Len( xVal ) == 0
@@ -373,7 +368,13 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
          ENDIF
 
       CASE 'B'
-         RETURN "HB_RestoreBlock( "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " )"
+         TRY
+            cRet := "HB_RestoreBlock( "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " )"
+         CATCH
+            cRet := "{|| Alert( 'Non Persistentable Block.' ) }"
+         END
+
+         RETURN cRet
 
       CASE 'P'
          RETURN "HexToNum('" + NumToHex( xVal ) + "')"
@@ -383,49 +384,22 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
 
          IF cName == NIL
             cName := "M->__ValToPrgExp_Object"
+            aObjs := {}
+         ELSE
+            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+                RETURN aObjs[ nObj ][2]
+            ENDIF
          ENDIF
+
+         aAdd( aObjs, { xVal, cName } )
 
          cRet  := "( " + cName + " := __ClsInstName( '" +  xVal:ClassName  + "' ), "
 
-         IF aObjs == NIL
-            aObjs := { { xVal, cName } }
-         ELSE
-            aAdd( aObjs, { xVal, cName } )
-         ENDIF
-
          FOR EACH aVar IN __objGetValueDiff( xVal )
-            SWITCH ValType( aVar[2] )
-               CASE 'O'
-                  IF ( nObj := aScan( aObjs, {|a| a[1] == aVar[2] } ) ) > 0
-                     cRet += cName + ":" + aVar[1] + " := " + aObjs[ nObj ][2] + ", "
-                  ELSE
-                     aAdd( aObjs, { aVar[2], cName + ":" + aVar[1] } )
-                     /* Intentionally avoiding:
-                           Name + ":" + aVar[1] + " := " +
-                        which is redundant due to initiation assignment of the sub object.
-                      */
-                     cRet += ValToPrgExp( aVar[2], cName + ":" + aVar[1], aObjs ) + ", "
-                  ENDIF
-
-                  EXIT
-
-               CASE 'B'
-                  TRY
-                     cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
-                  CATCH
-                     cRet += cName + ":" + aVar[1] + " := {|| Alert( 'Non Persistentable Block.' ) }, "
-                  END
-
-                  EXIT
-
-               DEFAULT
-                  //TraceLog( aVar[1], aVar[2] )
-                  cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2] ) + ", "
-            END
+            cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2], cName + ":" + aVar[1], aObjs ) + ", "
          NEXT
 
-
-         RETURN cRet + cName + ")"
+         RETURN cRet + cName + " )"
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )

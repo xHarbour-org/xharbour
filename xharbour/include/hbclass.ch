@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.48 2007/04/12 01:41:17 andresreyesh Exp $
+ * $Id: hbclass.ch,v 1.49 2007/04/13 15:39:40 ronpinkas Exp $
  */
 
 /*
@@ -247,7 +247,7 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   <static> function <ClassName>(...) ;;
+   UTILITY <static> FUNCTION <ClassName>(...) ;;
       static s_oClass ;;
       local MetaClass,nScope ;;
       [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
@@ -278,7 +278,7 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   <static> function <ClassName>(...) ;;
+   UTILITY <static> FUNCTION <ClassName>(...) ;;
       static s_oClass  ;;
       local MetaClass,nScope ;;
       [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
@@ -313,7 +313,7 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
-   <static> function <ClassName>(...) ;;
+   UTILITY <static> FUNCTION <ClassName>(...) ;;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
@@ -340,7 +340,7 @@ DECLARE HBClass ;
 
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] FUNCTION <FuncName> => ;
    _HB_CLASS <ClassName> ;;
-   <static> function <FuncName>(...) ;;
+   UTILITY <static> FUNCTION <FuncName>(...) ;;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
@@ -370,7 +370,7 @@ DECLARE HBClass ;
 #xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] => ;
    _HB_CLASS <ClassName> ;;
    [ REQUEST <SuperClass1> ] [ ,<SuperClassN> ] ;;
-   <static> function <ClassName>(...) ;;
+   UTILITY <static> FUNCTION <ClassName>(...) ;;
       static s_oClass  ;;
       local oClassInstance ;;
       local nScope ;;
@@ -939,46 +939,46 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
    #xcommand METHOD [FUNCTION] <MethodName> CLASS <ClassName> => METHOD <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
 
    #ifdef STRICT_OO
-      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => __ERR(Method <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_) ; function <MethodName> ; local self := QSelf()
-      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Method <"MethodName"> not declared or declaration mismatch in class: <ClassName> ; function <MethodName> ; local self := QSelf()
+      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => __ERR(Method <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_) ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
+      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Method <"MethodName"> not declared or declaration mismatch in class: <ClassName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
    #else
-      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => __ERR(Method <"MethodName"> not declared in class: _CLASS_NAME_) ; function <MethodName> ; local self := QSelf()
-      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Method <"MethodName"> not declared in class: <ClassName> ; function <MethodName> ; local self := QSelf()
+      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => __ERR(Method <"MethodName"> not declared in class: _CLASS_NAME_) ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
+      #xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Method <"MethodName"> not declared in class: <ClassName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
    #endif
 
    #xcommand PROCEDURE [FUNCTION] <MethodName> CLASS <ClassName> => PROCEDURE <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_
 
    #ifdef STRICT_OO
-      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_ ; function <MethodName> ; local self := QSelf()
-      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared or declaration mismatch in class: <ClassName> ; function <MethodName> ; local self := QSelf()
+      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared or declaration mismatch in class: _CLASS_NAME_ ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
+      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared or declaration mismatch in class: <ClassName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
    #else
-      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared in class: _CLASS_NAME_ ; function <MethodName> ; local self := QSelf()
-      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared in class: <ClassName> ; function <MethodName> ; local self := QSelf()
+      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName>                   _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared in class: _CLASS_NAME_ ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
+      #xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> [CLASS] <ClassName> _CLASS_IMPLEMENTATION_ => #error Procedure <"MethodName"> not declared in class: <ClassName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
    #endif
 #endif
 
-//#xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for method: <MethodName> ; function <MethodName> ; local self := QSelf()
-//#xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for procedure: <MethodName> ; function <MethodName> ; local self := QSelf()
+//#xcommand METHOD [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for method: <MethodName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
+//#xcommand PROCEDURE [FUNCTION] [PROCEDURE] <MethodName> DECLCLASS <ClassName> _CLASS_IMPLEMENTATION_ => #error Class <"ClassName"> not declared for procedure: <MethodName> ; UTILITY FUNCTION <MethodName> ; local self := QSelf()
 
 #xcommand DECLARED METHOD <ClassName> <MethodName> => ;
-          static function DECLMETH <ClassName> <MethodName> ;;
+          UTILITY STATIC function DECLMETH <ClassName> <MethodName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand DECLARED PROCEDURE <ClassName> <MethodName> => ;
-          static procedure DECLMETH <ClassName> <MethodName> ;;
+          UTILITY STATIC PROCEDURE DECLMETH <ClassName> <MethodName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand ACCESS <AccessName> CLASS <ClassName> => ;
-          static function <ClassName>_<AccessName> ;;
+          UTILITY STATIC FUNCTION <ClassName>_<AccessName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand ASSIGN <AssignName> CLASS <ClassName> => ;
-          static function <ClassName>__<AssignName> ;;
+          UTILITY STATIC FUNCTION <ClassName>__<AssignName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 #else
 
 #xcommand DECLARED METHOD <ClassName> <MethodName>=> ;
-          static function <MethodName> ;;
+          UTILITY STATIC FUNCTION <MethodName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand DECLARED PROCEDURE <ClassName> <MethodName>=> ;
@@ -986,11 +986,11 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand ACCESS <AccessName> CLASS <ClassName> => ;
-          static function <AccessName> ;;
+          UTILITY STATIC FUNCTION <AccessName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand ASSIGN <AssignName> CLASS <ClassName> => ;
-          static function _<AssignName> ;;
+          UTILITY STATIC FUNCTION _<AssignName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #endif /* HB_SHORTNAMES */
