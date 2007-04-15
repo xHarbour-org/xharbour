@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.34 2006/09/19 01:46:17 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.35 2007/04/15 18:44:47 ronpinkas Exp $
  */
 
 /*
@@ -209,22 +209,24 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             nPad := 0
             cName := "M->__ValToPrg_Array"
             aObjs := {}
+            cRet  := cName + " := "
          ELSE
             IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
                 RETURN aObjs[ nObj ][2] + " /* Cyclic */"
             ENDIF
+
+            cRet := ""
          ENDIF
 
          aAdd( aObjs, { xVal, cName } )
 
-         cPad  := sPace( nPad )
-         cRet  := cPad + cName + " := Array(" + LTrim( Str( Len( xVal ) ) ) + ")" + CRLF
+         cRet  += "Array(" + LTrim( Str( Len( xVal ) ) ) + ")" + CRLF
 
          nPad += 3
          cPad  := sPace( nPad )
 
          FOR EACH aVar IN xVal
-            cRet += cPad + cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrg( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", nPad + 3, aObjs ) + CRLF
+            cRet += cPad + cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrg( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", nPad, aObjs ) + CRLF
          NEXT
 
          nPad -=3
@@ -258,29 +260,31 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
       CASE 'O'
          /* TODO: Use HBPersistent() when avialable! */
          IF cName == NIL
-            cName := "M->__ValToPrgExp_Object"
+            cName := "M->__ValToPrg_Object"
             nPad := 0
             aObjs := {}
+            cRet  := cName + " := "
          ELSE
             IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
                 RETURN aObjs[ nObj ][2] + " /* Cyclic */"
             ENDIF
+
+            cRet := ""
          ENDIF
 
          aAdd( aObjs, { xVal, cName } )
 
-         cPad  := sPace( nPad )
-         cRet  := CRLF + cPad + "OBJECT " + cName + " IS " + xVal:ClassName + CRLF
+         cRet += xVal:ClassName + "():New()" + CRLF
 
          nPad += 3
          cPad  := sPace( nPad )
 
          FOR EACH aVar IN __objGetValueDiff( xVal )
-             cRet += cPad + ":" + aVar[1] + " := " + ValToPrg( aVar[2], cName + ":" + aVar[1], nPad + 3, aObjs ) + CRLF
+            cRet += cPad + cName + ":" + aVar[1] + " := " + ValToPrg( aVar[2], cName + ":" + aVar[1], nPad, aObjs ) + CRLF
          NEXT
 
          nPad -=3
-         RETURN cRet + sPace( nPad ) + "END OBJECT" + CRLF
+         RETURN cRet
 
       DEFAULT
          //TraceLog( xVal, cName, nPad )
