@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.194 2007/04/12 12:59:48 lculik Exp $
+# $Id: makefile.bc,v 1.195 2007/04/15 18:55:39 andresreyesh Exp $
 #
 
 #
@@ -2002,8 +2002,8 @@ $(RTL_OBJ_DIR)\color53.obj : $(RTL_OBJ_DIR)\color53.c
 $(RTL_OBJ_DIR)\chrasc.obj : $(RTL_DIR)\chrasc.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.c
-   $(CC_CMD)
+$(RTL_OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.prg
+   $(HB_CMD)
 
 $(RTL_OBJ_DIR)\clpclass.obj : $(RTL_OBJ_DIR)\clpclass.c
    $(CC_CMD)
