@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.185 2007/03/25 06:12:49 walito Exp $
+# $Id: makefile.vc,v 1.186 2007/04/12 12:59:48 lculik Exp $
 #
 
 #
@@ -557,6 +557,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\browdbx.obj \
    $(OBJ_DIR)$(MT)\browse.obj \
    $(OBJ_DIR)$(MT)\checkbox.obj \
+   $(OBJ_DIR)$(MT)\clpclass.obj \
    $(OBJ_DIR)$(MT)\color53.obj \
    $(OBJ_DIR)$(MT)\cstr.obj \
    $(OBJ_DIR)$(MT)\cstruct.obj \
@@ -613,6 +614,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\treport.obj \
    $(OBJ_DIR)$(MT)\trpc.obj \
    $(OBJ_DIR)$(MT)\trpccli.obj \
+   $(OBJ_DIR)$(MT)\tscalar.obj \
    $(OBJ_DIR)$(MT)\ttable.obj \
    $(OBJ_DIR)$(MT)\ttextlin.obj \
    $(OBJ_DIR)$(MT)\ttopbar.obj \

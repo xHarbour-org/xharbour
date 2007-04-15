@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.39 2007/03/25 06:12:49 walito Exp $
+# $Id: makefile.pc,v 1.40 2007/04/12 13:03:48 lculik Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -896,6 +896,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\browdbx.obj \
    $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
+   $(OBJ_DIR)\clpclass.obj \
    $(OBJ_DIR)\color53.obj \
    $(OBJ_DIR)\cstr.obj \
    $(OBJ_DIR)\cstruct.obj \
@@ -952,6 +953,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\treport.obj \
    $(OBJ_DIR)\trpc.obj \
    $(OBJ_DIR)\trpccli.obj \
+   $(OBJ_DIR)\tscalar.obj \
    $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\ttextlin.obj \
    $(OBJ_DIR)\ttopbar.obj \
@@ -2423,6 +2425,12 @@ $(OBJ_DIR)\checkbox.c : $(RTL_DIR)\checkbox.prg
 $(OBJ_DIR)\checkbox.obj : $(OBJ_DIR)\checkbox.c
    $(CC_CMD)
 
+$(OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\clpclass.obj : $(OBJ_DIR)\clpclass.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\color53.c : $(RTL_DIR)\color53.prg
    $(HB_CMD)
 
@@ -2751,6 +2759,12 @@ $(OBJ_DIR)\trpccli.c : $(RTL_DIR)\trpccli.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\trpccli.obj : $(OBJ_DIR)\trpccli.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\tscalar.c : $(RTL_DIR)\tscalar.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\tscalar.obj : $(OBJ_DIR)\tscalar.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ttable.c : $(RTL_DIR)\ttable.prg

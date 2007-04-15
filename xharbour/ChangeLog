@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5440 2007/04/15 05:56:32 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5441 2007/04/15 18:44:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-15 12:36 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * source/rtl/tclass.prg
+     * minor change for future implementation
+     * move __CLASSNEW, __CLASSADD, __CLASSINS to clpclass.prg
+        * this file only be linked if it's necesary
+     * move Scalar Classes to tscalar.prg
+        * this file only be linked if it's necesary
+   + source/rtl/clpclass.prg
+   + source/rtl/tscalar.prg
+     + Add POINTER:FUNCNAME()
+        * retrieves the function name of pointer
+        ! be careful if pointer not point to a function maybe generating a GPF
+   * source/rtl/tobject.prg
+     * now :MSGNOTFOUND() works Like Class(y))
+   * source/rtl/makefile
+   * makefile.bc
+   * makefile.vc
+   * makefile.pc
+   * makefile.wc
+     * add clpclass.prg, tscalar.prg
 
 2007-04-15 14:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch

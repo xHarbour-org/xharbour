@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.193 2007/03/25 06:12:48 walito Exp $
+# $Id: makefile.bc,v 1.194 2007/04/12 12:59:48 lculik Exp $
 #
 
 #
@@ -449,6 +449,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\browdbx.obj \
    $(RTL_OBJ_DIR)\browse.obj \
    $(RTL_OBJ_DIR)\checkbox.obj \
+   $(RTL_OBJ_DIR)\clpclass.obj \
    $(RTL_OBJ_DIR)\color53.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
    $(RTL_OBJ_DIR)\cstruct.obj \
@@ -505,6 +506,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\treport.obj \
    $(RTL_OBJ_DIR)\trpc.obj \
    $(RTL_OBJ_DIR)\trpccli.obj \
+   $(RTL_OBJ_DIR)\tscalar.obj \
    $(RTL_OBJ_DIR)\ttable.obj \
    $(RTL_OBJ_DIR)\ttextlin.obj \
    $(RTL_OBJ_DIR)\ttopbar.obj \
@@ -2000,6 +2002,12 @@ $(RTL_OBJ_DIR)\color53.obj : $(RTL_OBJ_DIR)\color53.c
 $(RTL_OBJ_DIR)\chrasc.obj : $(RTL_DIR)\chrasc.c
    $(CC_CMD)
 
+$(RTL_OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\clpclass.obj : $(RTL_OBJ_DIR)\clpclass.c
+   $(CC_CMD)
+
 $(RTL_OBJ_DIR)\colorind.obj : $(RTL_DIR)\colorind.c
    $(CC_CMD)
 
@@ -2661,6 +2669,12 @@ $(RTL_OBJ_DIR)\treport.c : $(RTL_DIR)\treport.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\treport.obj : $(RTL_OBJ_DIR)\treport.c
+   $(CC_CMD)
+
+$(RTL_OBJ_DIR)\tscalar.c : $(RTL_DIR)\tscalar.prg
+   $(HB_CMD)
+
+$(RTL_OBJ_DIR)\tscalar.obj : $(RTL_OBJ_DIR)\tscalar.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\ttable.c : $(RTL_DIR)\ttable.prg
