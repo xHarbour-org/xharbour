@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.134 2007/03/25 06:12:45 walito Exp $
+# $Id: hrbdll.bc,v 1.135 2007/04/15 20:12:40 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1745,6 +1745,12 @@ $(OBJ_DIR)\checkbox.obj : $(OBJ_DIR)\checkbox.c
 $(OBJ_DIR)\chrasc.obj : $(RTL_DIR)\chrasc.c
    $(CC_CMD)
 
+$(OBJ_DIR)\clpclass.c : $(RTL_DIR)\clpclass.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\clpclass.obj : $(OBJ_DIR)\clpclass.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\color53.c : $(RTL_DIR)\color53.prg
    $(HRB_CMD)
 
@@ -2400,6 +2406,12 @@ $(OBJ_DIR)\treport.obj : $(OBJ_DIR)\treport.c
    $(CC_CMD)
 
 $(OBJ_DIR)\trim.obj : $(RTL_DIR)\trim.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\tscalar.c : $(RTL_DIR)\tscalar.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\tscalar.obj : $(OBJ_DIR)\tscalar.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ttextlin.c : $(RTL_DIR)\ttextlin.prg

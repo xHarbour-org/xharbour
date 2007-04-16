@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.6 2005/02/22 07:20:16 ronpinkas Exp $
+ * $Id: browse.prg,v 1.7 2006/08/26 20:03:48 guerra000 Exp $
  */
 
 /*
@@ -89,7 +89,8 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
    oBrw := TBrowseDB( nTop + 2, nLeft + 1, nBottom - 1, nRight - 1 )
    oBrw:HeadSep := " " + Chr( 205 )
-   oBrw:skipblock({ |_1| skipped(_1, lBottom) })
+//   oBrw:skipblock({ |_1| skipped(_1, lBottom) })
+   oBrw:skipblock({ |_1| skipped(_1, (recno() == lastrec()) ) })
 
    for n := 1 to FCount()
       oBrw:AddColumn( TBColumnNew( FieldName( n ), FieldBlock( FieldName( n ) ) ) )
