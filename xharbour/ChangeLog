@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5445 2007/04/15 21:14:09 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5446 2007/04/15 21:55:54 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-15 23:42 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbpp.h
+  * source/compiler/ppcomp.c
+  * source/pp/ppcore.c
+    + Added support for #pragma push ... and #pragma pop ...
+      /* This allows save, modify, and later restore of any compiler switch */
+
+  * include/wintypes.ch
+    + Added #pragma push -w0, #pragma pop -w around overloaded #define int and INT to supress overloaded warnings
 
 2007-04-15 17:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/cstr.prg

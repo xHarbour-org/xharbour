@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.2 2007/03/04 13:37:51 druzus Exp $
+ * $Id: ppcomp.c,v 1.3 2007/04/09 21:06:28 ronpinkas Exp $
  */
 
 /*
@@ -79,7 +79,7 @@ static void hb_pp_hb_inLine( void * cargo, char * szFunc,
 }
 
 static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
-                                  int iValue )
+                                  int iValue, int *piPrevious, char cIndex[1] )
 {
    BOOL fError = FALSE;
    int i = strlen( szSwitch );
@@ -95,46 +95,125 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
       {
          case 'a':
          case 'A':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bAutoMemvarAssume;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bAutoMemvarAssume = iValue != 0;
             break;
 
          case 'b':
          case 'B':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bDebugInfo;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bDebugInfo = iValue != 0;
+            break;
+
+         case 'e' :
+            // If adding such switch then MUST change hard coded cIndex[0] of "es" switch!!!
+            fError = TRUE;
+            break;
+
+         case 'g' :
+            // If adding such switch then MUST change hard coded cIndex[0] of "TRACEPRAGMAS" switch!!!
+            fError = TRUE;
+            break;
+
+         case 'h' :
+            // If adding such switch then MUST change hard coded cIndex[0] of "TEXHHIDDEN" switch!!!
+            fError = TRUE;
             break;
 
          case 'l':
          case 'L':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bLineNumbers;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bLineNumbers = iValue != 0;
             break;
 
          case 'n':
          case 'N':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bStartProc;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bStartProc = iValue != 0;
             break;
 
          case 'p':
          case 'P':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bPPO;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bPPO = iValue != 0;
             break;
 
          case 'q':
          case 'Q':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bQuiet;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bQuiet = iValue != 0;
+            break;
+
+         case 'r' :
+            // If adding such switch then MUST change hard coded cIndex[0] of "RECURSELEVEL" switch!!!
+            fError = TRUE;
+            break;
+
+         case 't' :
+            // If adding such switch then MUST change hard coded cIndex[0] of "pt" switch!!!
+            fError = TRUE;
             break;
 
          case 'v':
          case 'V':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bForceMemvars;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bForceMemvars = iValue != 0;
             break;
 
          case 'z':
          case 'Z':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_bShortCuts;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             hb_comp_bShortCuts = iValue == 0;
             break;
 
          case 'w':
          case 'W':
+            if( piPrevious )
+            {
+               *piPrevious = (int) hb_comp_iWarnings;
+               cIndex[0] = tolower( szSwitch[ 0 ] );
+            }
+
             if( iValue >= 0 && iValue <= 4 )
                hb_comp_iWarnings = iValue;
             else
@@ -152,17 +231,41 @@ static BOOL hb_pp_CompilerSwitch( void * cargo, const char * szSwitch,
           ( iValue == HB_EXITLEVEL_DEFAULT ||
             iValue == HB_EXITLEVEL_SETEXIT ||
             iValue == HB_EXITLEVEL_DELTARGET ) )
+      {
+         if( piPrevious )
+         {
+            *piPrevious = (int) hb_comp_iExitLevel;
+            cIndex[0] = 'e';
+         }
+
          hb_comp_iExitLevel = iValue;
+      }
       else if( hb_stricmp( szSwitch, "pt" ) == 0 )
+      {
+         if( piPrevious )
+         {
+            *piPrevious = (int) hb_comp_bTracePP;
+            cIndex[0] = 't';
+         }
+
          hb_comp_bTracePP = iValue != 0;
+      }
       else
          fError = TRUE;
    }
-   else if( i >= 4 && hb_strnicmp( szSwitch, "TEXTHIDDEN", i ) == 0 &&
-            iValue >= 0 && iValue <= 1 )
+   else if( i >= 4 && hb_strnicmp( szSwitch, "TEXTHIDDEN", i ) == 0 && iValue >= 0 && iValue <= 1 )
+   {
+      if( piPrevious )
+      {
+         *piPrevious = (int) hb_comp_iHidden;
+         cIndex[0] = 'h';
+      }
+
       hb_comp_iHidden = iValue;
+   }
    else
       fError = TRUE;
+
    return fError;
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.247 2007/04/12 01:27:18 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.248 2007/04/13 15:39:41 ronpinkas Exp $
  */
 
 /*
@@ -100,6 +100,7 @@
 #define HB_PP_ERR_INVALID_DIRECTIVE             31    /* C3010 */
 #define HB_PP_ERR_CANNOT_OPEN_RULES             32    /* C3011 */
 #define HB_PP_ERR_DELETE_SYNTAX                 33    /* Non Clipper */
+#define HB_PP_ERR_TOO_EXCESSIVE_PUSH            34    /* Non Clipper */
 
 
 /* warning messages */
@@ -147,7 +148,8 @@ static char * hb_pp_szErrors[] =
    "Too many nested #includes",                                         /* C3009 */
    "Invalid name follows #",                                            /* C3010 */
    "Can't open standard rule file: '%s'",                               /* C3011 */
-   "Syntax error in #untranslate/#uncommand: '%s'"                     /* Non Clipper */
+   "Syntax error in #untranslate/#uncommand: '%s'",                    /* Non Clipper */
+   "Too many nested #pragma push: '%s'"                                /* Non Clipper */
 };
 
 
@@ -1982,8 +1984,11 @@ static BOOL hb_pp_pragmaOperatorNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    return fError;
 }
 
+#define HB_PP_PRAGMA_PUSH 1
+#define HB_PP_PRAGMA_POP  2
+
 static BOOL hb_pp_setCompilerSwitch( PHB_PP_STATE pState, char * szSwitch,
-                                     int iValue )
+                                     int iValue, int iPushPop )
 {
    BOOL fError = TRUE;
 
@@ -2015,17 +2020,66 @@ static BOOL hb_pp_setCompilerSwitch( PHB_PP_STATE pState, char * szSwitch,
    }
 
    if( pState->pSwitchFunc )
-      fError = ( pState->pSwitchFunc )( pState->cargo, szSwitch, iValue );
+   {
+      if( iPushPop == HB_PP_PRAGMA_PUSH )
+      {
+         int iPrevious = 0;
+         char cIndex[1] = { '\0' };
+
+         if( ( fError = ( pState->pSwitchFunc )( pState->cargo, szSwitch, iValue, &iPrevious, cIndex ) ) == FALSE )
+         {
+            int iPushed = pState->aaSwitchState[ cIndex[0] ][0] + 1;
+
+            if( iPushed < HB_PP_MAX_SWITCH_STATES )
+            {
+               pState->aaSwitchState[ cIndex[0] ][ iPushed ] = iPrevious;
+               pState->aaSwitchState[ cIndex[0] ][0] = iPushed;
+            }
+            else
+            {
+               hb_pp_error( pState, 'E', HB_PP_ERR_TOO_EXCESSIVE_PUSH, szSwitch );
+            }
+         }
+      }
+      else
+      {
+         fError = ( pState->pSwitchFunc )( pState->cargo, szSwitch, iValue, NULL, NULL );
+      }
+   }
 
    return fError;
 }
 
-static PHB_PP_TOKEN hb_pp_pragmaGetLogical( PHB_PP_TOKEN pToken, BOOL * pfValue )
+static BOOL hb_pp_pragmaPop( PHB_PP_STATE pState, int * piValue, char cIndex[1] )
+{
+   int iPushed = pState->aaSwitchState[ cIndex[0] ][0];
+
+   if( iPushed > 0 && iPushed <= HB_PP_MAX_SWITCH_STATES )
+   {
+      *piValue = pState->aaSwitchState[ cIndex[0] ][ iPushed ];
+      pState->aaSwitchState[ cIndex[0] ][0] = --iPushed;
+
+      return TRUE;
+   }
+
+   return FALSE;
+}
+
+static PHB_PP_TOKEN hb_pp_pragmaGetLogical( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, BOOL * pfValue, int iPushPop, char cIndex[1] )
 {
    PHB_PP_TOKEN pValue = NULL;
 
-   if( pToken && pToken->pNext &&
-       HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_KEYWORD )
+   if( iPushPop == HB_PP_PRAGMA_POP )
+   {
+      if( HB_PP_TOKEN_ISEOC( pToken ) && hb_pp_pragmaPop( pState, (int *) pfValue, cIndex ) )
+      {
+         return pValue = pToken->pNext;
+      }
+
+      return NULL;
+   }
+
+   if( pToken && pToken->pNext && HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_KEYWORD )
    {
       if( ( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EQ &&
             HB_PP_TOKEN_ISEOC( pToken->pNext->pNext ) ) ||
@@ -2046,12 +2100,21 @@ static PHB_PP_TOKEN hb_pp_pragmaGetLogical( PHB_PP_TOKEN pToken, BOOL * pfValue 
    return pValue;
 }
 
-static PHB_PP_TOKEN hb_pp_pragmaGetInt( PHB_PP_TOKEN pToken, int * piValue )
+static PHB_PP_TOKEN hb_pp_pragmaGetInt( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, int * piValue, int iPushPop, char cIndex[1] )
 {
    PHB_PP_TOKEN pValue = NULL;
 
-   if( pToken && pToken->pNext &&
-       HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_NUMBER )
+   if ( iPushPop == HB_PP_PRAGMA_POP )
+   {
+      if( HB_PP_TOKEN_ISEOC( pToken ) && hb_pp_pragmaPop( pState, (int *) piValue, cIndex ) )
+      {
+         return pToken;
+      }
+
+      return NULL;
+   }
+
+   if( pToken && pToken->pNext && HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_NUMBER )
    {
       if( ( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EQ &&
             HB_PP_TOKEN_ISEOC( pToken->pNext->pNext ) ) ||
@@ -2067,11 +2130,23 @@ static PHB_PP_TOKEN hb_pp_pragmaGetInt( PHB_PP_TOKEN pToken, int * piValue )
    return pValue;
 }
 
-static PHB_PP_TOKEN hb_pp_pragmaGetSwitch( PHB_PP_TOKEN pToken, int * piValue )
+static PHB_PP_TOKEN hb_pp_pragmaGetSwitch( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, int * piValue, int iPushPop )
 {
    PHB_PP_TOKEN pValue = NULL;
 
-   if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD )
+   if ( iPushPop == HB_PP_PRAGMA_POP )
+   {
+      if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD && pToken->len == 1 && HB_PP_TOKEN_ISEOC( pToken->pNext ) )
+      {
+         if( hb_pp_pragmaPop( pState, piValue, pToken->value ) )
+         {
+            return pToken;
+         }
+      }
+
+      return NULL;
+   }
+   else if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD )
    {
       if( HB_PP_TOKEN_ISEOC( pToken->pNext ) )
       {
@@ -2108,6 +2183,21 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    PHB_PP_TOKEN pValue = NULL;
    BOOL fError = FALSE, fValue = FALSE;
    int iValue = 0;
+   int iPushPop = 0;
+
+   if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD )
+   {
+      if( hb_pp_tokenValueCmp( pToken, "push", HB_PP_CMP_DBASE ) )
+      {
+         iPushPop = HB_PP_PRAGMA_PUSH;
+         pToken = pToken->pNext;
+      }
+      else if( hb_pp_tokenValueCmp( pToken, "pop", HB_PP_CMP_DBASE ) )
+      {
+         iPushPop = HB_PP_PRAGMA_POP;
+         pToken = pToken->pNext;
+      }
+   }
 
    if( !pToken )
       fError = TRUE;
@@ -2115,9 +2205,9 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    {
       if( !pState->iCondCompile )
       {
-         pValue = hb_pp_pragmaGetSwitch( pToken->pNext, &iValue );
+         pValue = hb_pp_pragmaGetSwitch( pState, pToken->pNext, &iValue, iPushPop );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, pValue->value, iValue );
+            fError = hb_pp_setCompilerSwitch( pState, pValue->value, iValue, iPushPop );
          else
             fError = TRUE;
       }
@@ -2171,57 +2261,56 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "AUTOMEMVAR", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "a" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "a", ( int ) fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "a", ( int ) fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "DEBUGINFO", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "b" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "b", ( int ) fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "b", ( int ) fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "DYNAMICMEMVAR", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "v" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "v", ( int ) fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "v", ( int ) fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "ENABLEWARNINGS", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "w" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "w", fValue ? 1 : 0 );
+            fError = hb_pp_setCompilerSwitch( pState, "w", fValue ? 1 : 0, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "EXITSEVERITY", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetInt( pToken->pNext, &iValue );
-         if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "es", iValue );
+         if( hb_pp_pragmaGetInt( pState, pToken->pNext, &iValue, iPushPop, "e" ) )
+            fError = hb_pp_setCompilerSwitch( pState, "es", iValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "LINENUMBER", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "l" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "l", fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "l", fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "NOSTARTPROC", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "n" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "n", fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "n", fValue, iPushPop );
          else
             fError = TRUE;
       }
@@ -2231,52 +2320,50 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "PREPROCESSING", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "p" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "p", fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "p", fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "SHORTCUT", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "z" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "z", fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "z", fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "RECURSELEVEL", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetInt( pToken->pNext, &pState->iMaxCycles );
-         fError = pValue == NULL;
+         if( hb_pp_pragmaGetInt( pState, pToken->pNext, &pState->iMaxCycles, iPushPop, "r" ) == NULL )
+            fError = TRUE;
       }
       /* xHarbour extension */
       else if( hb_pp_tokenValueCmp( pToken, "TEXTHIDDEN", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetInt( pToken->pNext, &pState->iHideStrings );
-         if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, pToken->value, pState->iHideStrings );
+         if( hb_pp_pragmaGetInt( pState, pToken->pNext, &pState->iHideStrings, iPushPop, "h" ) )
+            fError = hb_pp_setCompilerSwitch( pState, pToken->value, pState->iHideStrings, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "TRACE", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &fValue );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &fValue, iPushPop, "t" );
          if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "pt", fValue );
+            fError = hb_pp_setCompilerSwitch( pState, "pt", fValue, iPushPop );
          else
             fError = TRUE;
       }
       else if( hb_pp_tokenValueCmp( pToken, "TRACEPRAGMAS", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetLogical( pToken->pNext, &pState->fTracePragmas );
+         pValue = hb_pp_pragmaGetLogical( pState, pToken->pNext, &pState->fTracePragmas, iPushPop, "g" );
          fError = pValue == NULL;
       }
       else if( hb_pp_tokenValueCmp( pToken, "WARNINGLEVEL", HB_PP_CMP_DBASE ) )
       {
-         pValue = hb_pp_pragmaGetInt( pToken->pNext, &iValue );
-         if( pValue )
-            fError = hb_pp_setCompilerSwitch( pState, "w", iValue );
+         if( ( pValue = hb_pp_pragmaGetInt( pState, pToken->pNext, &iValue, iPushPop, "w" ) ) )
+            fError = hb_pp_setCompilerSwitch( pState, "w", iValue, iPushPop );
          else
             fError = TRUE;
       }
@@ -2303,14 +2390,59 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       hb_membufAddCh( pState->pBuffer, '(' );
       hb_membufAddStr( pState->pBuffer, szLine );
       hb_membufAddStr( pState->pBuffer, ") #pragma " );
-      hb_membufAddStr( pState->pBuffer, pToken->value );
-      if( pValue && pValue != pToken )
+
+      if( iPushPop == 0 )
       {
-         hb_membufAddStr( pState->pBuffer, " set to '" );
-         hb_membufAddStr( pState->pBuffer, pValue->value );
-         hb_membufAddCh( pState->pBuffer, '\'' );
+         hb_membufAddStr( pState->pBuffer, pToken->value );
+
+         if( pValue && pValue != pToken )
+         {
+            hb_membufAddStr( pState->pBuffer, " set to '" );
+            hb_membufAddStr( pState->pBuffer, pValue->value );
+            hb_membufAddCh( pState->pBuffer, '\'' );
+         }
+         hb_membufAddCh( pState->pBuffer, '\n' );
       }
-      hb_membufAddCh( pState->pBuffer, '\n' );
+      else if( iPushPop == HB_PP_PRAGMA_PUSH )
+      {
+         if( pValue && pValue != pToken )
+         {
+            if( pToken->len == 1 || HB_ISOPTSEP( pToken->value[ 0 ] ) )
+            {
+               hb_membufAddStr( pState->pBuffer, pToken->value );
+               hb_membufAddStr( pState->pBuffer, " pushed '" );
+               hb_membufAddStr( pState->pBuffer, pToken->pNext->value );
+
+               if( ! HB_PP_TOKEN_ISEOC( pToken->pNext->pNext ) )
+               {
+                  hb_membufAddStr( pState->pBuffer, "' value '" );
+                  hb_membufAddStr( pState->pBuffer, pToken->pNext->pNext->value );
+               }
+            }
+            else
+            {
+               hb_membufAddStr( pState->pBuffer, pToken->value );
+               hb_membufAddStr( pState->pBuffer, "' pushed '" );
+               hb_membufAddStr( pState->pBuffer, pToken->pNext->pNext->value );
+            }
+
+            hb_membufAddCh( pState->pBuffer, '\'' );
+         }
+
+         hb_membufAddCh( pState->pBuffer, '\n' );
+      }
+      else if( iPushPop == HB_PP_PRAGMA_POP )
+      {
+         if( pValue && pValue != pToken )
+         {
+            hb_membufAddStr( pState->pBuffer, " poped '" );
+            hb_membufAddStr( pState->pBuffer, pToken->pNext->value );
+            hb_membufAddCh( pState->pBuffer, '\'' );
+         }
+
+         hb_membufAddCh( pState->pBuffer, '\n' );
+      }
+
       if( pState->fWriteTrace )
       {
          fwrite( hb_membufPtr( pState->pBuffer ), sizeof( char ),

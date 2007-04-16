@@ -7,7 +7,9 @@
    #define VOID                 CTYPE_VOID
    #define UINT                 CTYPE_UNSIGNED_INT
    #define int                  CTYPE_INT
+   #pragma push -w0
    #define int(x)    Int(x) // Fixes conflict with Int() function
+   #pragma pop -w
    #define HANDLE               CTYPE_UNSIGNED_LONG
    #define HICON                CTYPE_UNSIGNED_LONG
    #define HBITMAP              CTYPE_UNSIGNED_LONG
@@ -27,7 +29,9 @@
    #define HMENU                CTYPE_UNSIGNED_LONG
    #define HTREEITEM            CTYPE_UNSIGNED_LONG
    #define INT                  CTYPE_INT
+   #pragma push -w0
    #define INT(x)    Int(x) // Fixes conflict with Int() function
+   #pragma pop -w
    #define HWND                 CTYPE_UNSIGNED_LONG
    #define LPARAM               CTYPE_LONG
    #define HGLOBAL              CTYPE_UNSIGNED_LONG

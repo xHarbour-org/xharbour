@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.15 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.16 2007/04/13 15:39:41 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ typedef HB_PP_INLINE_FUNC_( HB_PP_INLINE_FUNC );
 typedef HB_PP_INLINE_FUNC * PHB_PP_INLINE_FUNC;
 
 /* function for catching #pragma dump data */
-#define HB_PP_SWITCH_FUNC_( func ) BOOL func( void *, const char *, int )
+#define HB_PP_SWITCH_FUNC_( func ) BOOL func( void *, const char *, int, int *, char[1] )
 typedef HB_PP_SWITCH_FUNC_( HB_PP_SWITCH_FUNC );
 typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 
@@ -540,6 +540,8 @@ typedef struct _HB_PP_FILE
 }
 HB_PP_FILE, * PHB_PP_FILE;
 
+#define HB_PP_MAX_SWITCH_STATES 15
+
 typedef struct
 {
    /* common for all included files */
@@ -608,6 +610,8 @@ typedef struct
    PHB_PP_DUMP_FUNC  pDumpFunc;  /* function for catching #pragma dump data */
    PHB_PP_INLINE_FUNC pInLineFunc; /* function for hb_inLine(...) {...} blocks */
    PHB_PP_SWITCH_FUNC pSwitchFunc; /* function for compiler switches with #pragma ... */
+
+   int aaSwitchState[ 'z' ][ HB_PP_MAX_SWITCH_STATES + 1 ];
 }
 HB_PP_STATE, * PHB_PP_STATE;
 
