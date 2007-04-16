@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.248 2007/04/13 15:39:41 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.249 2007/04/16 03:44:07 ronpinkas Exp $
  */
 
 /*
@@ -2362,7 +2362,8 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
       }
       else if( hb_pp_tokenValueCmp( pToken, "WARNINGLEVEL", HB_PP_CMP_DBASE ) )
       {
-         if( ( pValue = hb_pp_pragmaGetInt( pState, pToken->pNext, &iValue, iPushPop, "w" ) ) )
+         pValue = hb_pp_pragmaGetInt( pState, pToken->pNext, &iValue, iPushPop, "w" );
+         if( pValue )
             fError = hb_pp_setCompilerSwitch( pState, "w", iValue, iPushPop );
          else
             fError = TRUE;
