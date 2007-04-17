@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.40 2007/04/12 13:03:48 lculik Exp $
+# $Id: makefile.pc,v 1.41 2007/04/15 18:55:39 andresreyesh Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -1375,6 +1375,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(OBJ_DIR)\browdbx.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\browse.obj   >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\checkbox.obj >> poccrtl.rsp
+   $(ECHO) $(OBJ_DIR)\clpclass.obj >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\color53.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\cstr.obj     >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\cstruct.obj  >> poccrtl.rsp
@@ -1431,6 +1432,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(OBJ_DIR)\treport.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\trpc.obj     >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\trpccli.obj  >> poccrtl.rsp
+   $(ECHO) $(OBJ_DIR)\tscalar.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\ttable.obj   >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\ttextlin.obj >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\ttopbar.obj  >> poccrtl.rsp

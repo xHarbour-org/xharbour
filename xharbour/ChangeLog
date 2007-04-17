@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5448 2007/04/16 15:33:14 modalsist Exp $
+ * $Id: ChangeLog,v 1.5449 2007/04/16 17:03:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-16 21:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+  * hrbdll.pc
+    + added clpclass, tscalar and classesc.c into rsp script file.
 
 2007-04-16 13:02 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c

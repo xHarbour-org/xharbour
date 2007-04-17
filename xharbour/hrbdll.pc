@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.33 2007/03/25 06:12:45 walito Exp $
+# $Id: hrbdll.pc,v 1.34 2007/04/15 20:12:40 ronpinkas Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -287,6 +287,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\browdbx.obj \
    $(OBJ_DIR)\browse.obj \
    $(OBJ_DIR)\checkbox.obj \
+   $(OBJ_DIR)\clpclass.obj \
    $(OBJ_DIR)\cstr.obj \
    $(OBJ_DIR)\dbdelim.obj \
    $(OBJ_DIR)\dbedit.obj \
@@ -323,8 +324,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\tbcolumn.obj \
    $(OBJ_DIR)\tbrowse.obj \
    $(OBJ_DIR)\tclass.obj \
-   $(OBJ_DIR)\tscalar.obj \
-   $(OBJ_DIR)\clpclass.obj \
    $(OBJ_DIR)\teditor.obj \
    $(OBJ_DIR)\terror.obj \
    $(OBJ_DIR)\text.obj \
@@ -333,6 +332,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\tgetlist.obj \
    $(OBJ_DIR)\throw.obj \
    $(OBJ_DIR)\tlabel.obj \
+   $(OBJ_DIR)\tscalar.obj \
    $(OBJ_DIR)\ttable.obj \
    $(OBJ_DIR)\tmenuitm.obj \
    $(OBJ_DIR)\tobject.obj \
@@ -381,6 +381,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\asort.obj \
    $(OBJ_DIR)\break.obj \
    $(OBJ_DIR)\classes.obj \
+   $(OBJ_DIR)\classesc.obj \
    $(OBJ_DIR)\cmdarg.obj \
    $(OBJ_DIR)\codebloc.obj \
    $(OBJ_DIR)\dbgentry.obj \
@@ -880,6 +881,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\browdbx.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\browse.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\checkbox.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\clpclass.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\color53.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\cstr.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\cstruct.obj    >> make_tmp
@@ -939,6 +941,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\treport.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\trpc.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\trpccli.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\tscalar.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\ttable.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\ttextlin.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\ttopbar.obj    >> make_tmp
@@ -982,6 +985,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\asort.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\break.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\classes.obj    >> make_tmp
+   $(ECHO) $(OBJ_DIR)\classesc.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\cmdarg.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\codebloc.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbgentry.obj   >> make_tmp
@@ -2217,6 +2221,9 @@ $(OBJ_DIR)\break.obj : $(VM_DIR)\break.c
    $(CC_CMD)
 
 $(OBJ_DIR)\classes.obj : $(VM_DIR)\classes.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\classesc.obj : $(VM_DIR)\classesc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cmdarg.obj : $(VM_DIR)\cmdarg.c
