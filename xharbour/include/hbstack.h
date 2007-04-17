@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.41 2007/04/10 18:21:12 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.42 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -100,7 +100,6 @@ typedef struct
 
    HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
    UINT    wWithObjectCounter;
-   BOOL    bWithObject;
 
    HB_ITEM  aEnumCollection[ HB_MAX_ENUMERATIONS ];
    PHB_ITEM apEnumVar[ HB_MAX_ENUMERATIONS ];

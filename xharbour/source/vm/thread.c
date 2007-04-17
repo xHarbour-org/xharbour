@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.203 2007/01/11 01:00:35 druzus Exp $
+* $Id: thread.c,v 1.204 2007/02/13 19:02:25 druzus Exp $
 */
 
 /*
@@ -368,7 +368,6 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
       tc->aWithObject[ uCount ].type = HB_IT_NIL;
    }
    tc->wWithObjectCounter = 0;
-   tc->bWithObject = FALSE;
 
    for ( uCount = 0; uCount < HB_MAX_ENUMERATIONS; uCount++ )
    {
@@ -1770,7 +1769,7 @@ HB_FUNC( STOPTHREAD )
          HB_CRITICAL_LOCK( hb_cancelMutex );
          pThread->pStack->bCanceled = TRUE;
          HB_CRITICAL_UNLOCK( hb_cancelMutex );
-   
+
          HB_TEST_CANCEL_ENABLE_ASYN;
          #ifdef HB_OS_WIN_32
          WaitForSingleObject( pThread->pStack->th_h, INFINITE );
@@ -1935,9 +1934,9 @@ HB_FUNC( GETCURRENTTHREAD )
    {
       (&HB_VM_STACK)->pThreadID = pThread;
    }
-   
+
    HB_SHARED_UNLOCK( hb_runningStacks );
-   
+
 }
 
 /*
@@ -2543,7 +2542,7 @@ static void s_subscribeInternal( int mode )
          hb_paramError(1), hb_paramError(2), hb_paramError(3) );
       return;
    }
-   
+
    /* Unlock SYNC methods locked */
    hb_clsUnmutexSync();
 

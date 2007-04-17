@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.114 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbexprb.c,v 1.115 2007/04/08 07:20:55 ronpinkas Exp $
  */
 
 /*
@@ -3041,8 +3041,8 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
                HB_EXPR_PCODE1( hb_compGenMessage, pSelf->value.asMessage.szMessage );
             }
 
-            // Pushing NIL instead of pObject because the WITH Object will be the Self!
-            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+            // Pushing WITHOBJECT instead of pObject because the WITH Object will be the Self!
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
 
             if( pSelf->value.asMessage.pParms )  /* Is it a method call ? */
             {
@@ -3097,8 +3097,8 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
                HB_EXPR_PCODE1( hb_compGenMessageData, pSelf->value.asMessage.szMessage );
             }
 
-            // Pushing NIL instead of pObject because the WITH Object will be the Self!
-            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+            // Pushing WITHOBJECT instead of pObject because the WITH Object will be the Self!
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
             HB_EXPR_USE( pSelf->value.asMessage.pParms, HB_EA_PUSH_PCODE );
             HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_SENDWITHSHORT, 1, ( BOOL ) 1 );
          }

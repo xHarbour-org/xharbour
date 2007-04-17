@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5451 2007/04/17 02:57:52 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5452 2007/04/17 08:54:05 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-17 16:44 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbexprb.c
+  * include/hbexprc.c
+    * Revised compilation of HB_P_SENDWITH[SHORT] to use HB_P_PUSHWITH
+  * include/hbstack.h
+  * include/thread.h
+  * source/vm/thread.c
+  * source/vm/hvm.c
+    - Removed bWithObject memeber of HB_STACK
+  * source/vm/hvm.c
+    * Removed all bWithObject code
+
+  /* WARNING: All prg files MUST be recompiled!!! */
 
 2007-04-17 10:53 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
