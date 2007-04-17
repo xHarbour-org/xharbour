@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.20 2006/03/23 01:58:52 ronpinkas Exp $
+ * $Id: simplex.c,v 1.21 2007/04/16 17:03:17 ronpinkas Exp $
  */
 
 /*
@@ -1385,7 +1385,7 @@ void SimpLex_CheckWords( void )
                pNextSpacer = strstr( aCheck[i].sWord + iLenMatched, "{WS}" );
                if( pNextSpacer )
                {
-                  bOptionalSpacer = FALSE;
+                  //bOptionalSpacer = FALSE;
                }
                else
                {
