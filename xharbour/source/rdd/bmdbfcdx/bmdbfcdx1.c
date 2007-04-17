@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.23 2007/04/02 16:00:22 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.24 2007/04/10 08:08:33 marchuet Exp $
  */
 
 /*
@@ -9029,6 +9029,9 @@ static ERRCODE hb_cdxSetFilter( CDXAREAP pArea, LPDBFILTERINFO pFilterInfo )
 
         if ( pTag ) // with active index
         {
+            if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
+               return FAILURE;
+
             hb_cdxIndexLockRead( pTag->pIndex );
             hb_cdxTagRefreshScope( pTag );
             hb_cdxTagGoTop( pTag );

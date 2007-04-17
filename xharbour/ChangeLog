@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5450 2007/04/17 00:19:34 modalsist Exp $
+ * $Id: ChangeLog,v 1.5451 2007/04/17 02:57:52 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-17 10:53 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    * fixed bug on SET FILTER TO <expr> after REPLACE
+      Unrecoverable error 9105: hb_cdxIndexLockWrite: writeLock after readLock.
+      It occurs only with SET OPTIMIZE ON.
 
 2007-04-16 22:57 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c
