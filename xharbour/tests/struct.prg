@@ -19,6 +19,10 @@ procedure main()
 
       MEMBER d1             AS DATE INIT Date()
 
+      MEMBER t1             AS DATETIME INIT {^2004/01/01 01:59}
+
+      MEMBER h1             AS HASH
+
    ENDSTRUCTURE
 
    ? ValToPrg( oStru:c1 )
@@ -28,6 +32,7 @@ procedure main()
    ? ValToPrg( oStru:c5 )
    ? ValToPrg( oStru:b1 )
    ? ValToPrg( oStru:d1 )
+   ? ValToPrg( oStru:t1 )
 
    Eval( oStru:b1 )
    ?

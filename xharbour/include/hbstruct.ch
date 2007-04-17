@@ -1,5 +1,5 @@
 /*
- * $Id: hbstruct.ch,v 1.3 2003/12/18 16:19:16 jonnymind Exp $
+ * $Id: hbstruct.ch,v 1.4 2003/12/26 15:56:03 toninhofwi Exp $
  */
 
 /*
@@ -56,8 +56,7 @@
 #xcommand STRUC <hStruct> => <hStruct> := HSetCaseMatch( Hash(), .F.) ; #undef _TSTRUCT_ ; #define _TSTRUCT_ <hStruct>
 
 #xcommand MEMBER <cName, ...> ;
-             [ AS <type:LOGICAL,NUMERIC,STRING,DATE,CODEBLOCK,ARRAY,OBJECT> ] ;
-             [ LEN <nLen> ]          ;
+             [ AS <type:STRING,NUMERIC,LOGICAL,DATE,DATETIME,CODEBLOCK,ARRAY,OBJECT,HASH> ] ;
              [ INIT <uValue> ]          ;
           => ;
           HashAddMember( {<(cName)>}, <(type)>, <uValue>, _TSTRUCT_ )

@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.23 2007/04/15 18:47:55 andresreyesh Exp $
+ * $Id: tobject.prg,v 1.24 2007/04/15 19:58:28 ronpinkas Exp $
  */
 
 /*
@@ -522,6 +522,33 @@ RETURN lOld
 #endif
 
 
+FUNCTION HashEntry()
+
+   STATIC hClass
+
+   IF ValType( hClass ) == "N"
+      RETURN __clsInst( hClass )
+   ENDIF
+
+   hClass := __clsNew( "HASHENTRY", 3, 2 )
+
+   __clsAddMsg( hClass, "HPARENT",         1, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
+   __clsAddMsg( hClass, "KEY",             2, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
+   __clsAddMsg( hClass, "HASHENTRY_VALUE", 3, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_HIDDEN,  .T., .T. )
+
+   __clsAddMsg( hClass, "VALUE" , @HashEntry_GetValue(), HB_OO_MSG_METHOD )
+   __clsAddMsg( hClass, "_VALUE", @HashEntry_SetValue(), HB_OO_MSG_METHOD )
+
+RETURN __clsInst( hClass )
+
+STATIC FUNCTION HashEntry_GetValue()
+RETURN QSelf():HashEntry_Value
+
+STATIC FUNCTION HashEntry_SetValue( xVal )
+RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal
+
+
+
 /*
  * (C) 2003 - Antonio Carlos Pantaglione
  *            toninho@fwi.com.br
@@ -533,6 +560,7 @@ RETURN lOld
 */
 
 procedure HashAddMember( aName, cType, uInit, oObj )
+
    local cName
 
    if !( cType == nil )
@@ -563,10 +591,10 @@ procedure HashAddMember( aName, cType, uInit, oObj )
 
               exit
 
-         case "D" // DATE
+         case "D" // DATE or DATETIME
 
               if uInit == nil
-                 uInit := CtoD( "" )
+                 uInit := IIf( cType == "DATE", CtoD( "" ), {^0/0/0} )
               endif
 
               exit
@@ -587,6 +615,17 @@ procedure HashAddMember( aName, cType, uInit, oObj )
 
               exit
 
+         case "O" // OBJECT
+              exit
+
+         case "H" // HASH
+
+              if uInit == nil
+                 uInit := Hash()
+              endif
+
+              exit
+
       end switch
 
    endif
@@ -597,27 +636,4 @@ procedure HashAddMember( aName, cType, uInit, oObj )
 
 return
 
-FUNCTION HashEntry()
 
-   STATIC hClass
-
-   IF ValType( hClass ) == "N"
-      RETURN __clsInst( hClass )
-   ENDIF
-
-   hClass := __clsNew( "HASHENTRY", 3, 2 )
-
-   __clsAddMsg( hClass, "HPARENT",         1, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
-   __clsAddMsg( hClass, "KEY",             2, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_READONLY, .T., .T. )
-   __clsAddMsg( hClass, "HASHENTRY_VALUE", 3, HB_OO_MSG_PROPERTY, NIL, HB_OO_CLSTP_HIDDEN,  .T., .T. )
-
-   __clsAddMsg( hClass, "VALUE" , @HashEntry_GetValue(), HB_OO_MSG_METHOD )
-   __clsAddMsg( hClass, "_VALUE", @HashEntry_SetValue(), HB_OO_MSG_METHOD )
-
-RETURN __clsInst( hClass )
-
-STATIC FUNCTION HashEntry_GetValue()
-RETURN QSelf():HashEntry_Value
-
-STATIC FUNCTION HashEntry_SetValue( xVal )
-RETURN QSelf():HashEntry_Value := QSelf():hParent[ QSelf():Key ] := xVal

@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.206 2007/04/08 07:20:55 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.207 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /*
@@ -196,6 +196,7 @@ HB_EXTERN_BEGIN
 #define ISNUM( n )         ( hb_param( n, HB_IT_NUMERIC ) != NULL )
 #define ISLOG( n )         ( hb_param( n, HB_IT_LOGICAL ) != NULL )
 #define ISDATE( n )        ( hb_param( n, HB_IT_DATE ) != NULL )
+#define ISDATETIME( n )    ( hb_param( n, HB_IT_DATE ) != NULL && hb_param( n, HB_IT_DATE )->item.asDate.time != 0 )
 #define ISMEMO( n )        ( hb_param( n, HB_IT_MEMO ) != NULL )
 #define ISBYREF( n )       ( ( hb_parinfo( n ) & HB_IT_BYREF ) != 0 ) /* NOTE: Intentionally using a different method */
 #define ISARRAY( n )       ( hb_param( n, HB_IT_ARRAY ) != NULL )

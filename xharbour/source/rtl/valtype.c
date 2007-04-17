@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.9 2003/12/24 13:08:21 walito Exp $
+ * $Id: valtype.c,v 1.10 2004/07/19 21:11:17 guerra000 Exp $
  */
 
 /*
@@ -62,6 +62,7 @@
  *    HB_ISNUMERIC()
  *    HB_ISLOGICAL()
  *    HB_ISDATE()
+ *    HB_ISDATETIME() //toninho@fwi
  *    HB_ISARRAY()
  *    HB_ISOBJECT()
  *    HB_ISBLOCK()
@@ -137,6 +138,11 @@ HB_FUNC( HB_ISLOGICAL )
 HB_FUNC( HB_ISDATE )
 {
   hb_retl( ISDATE( 1 ) );
+}
+
+HB_FUNC( HB_ISDATETIME )
+{
+  hb_retl( ISDATETIME( 1 ) );
 }
 
 HB_FUNC( HB_ISARRAY )
