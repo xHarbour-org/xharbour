@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5452 2007/04/17 08:54:05 marchuet Exp $
+ * $Id: ChangeLog,v 1.5453 2007/04/17 20:46:34 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-18 08:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * harbour/source/rdd/dbcmd.c
+    ! Update NetErr() in ordListAdd(). Synched with Harbour.
+
 
 2007-04-17 16:44 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexprb.c
@@ -27,6 +32,18 @@
     * fixed bug on SET FILTER TO <expr> after REPLACE
       Unrecoverable error 9105: hb_cdxIndexLockWrite: writeLock after readLock.
       It occurs only with SET OPTIMIZE ON.
+
+2007-04-16 22:20 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * xharbour\include/hbapi.h
+  * xharbour\source\rtl\valtype.c
+    + support for HB_ISDATETIME() function
+
+  * xharbour\include/hbstruct.h
+  * xharbour\source\rtl\tobject.prg
+    + improved STRUCTURE/MEMBER/ENDSTRUCTURE to support DATETIME and HASHES
+
+  * xharbour\tests\struct.prg
+    ! updated with datetime and hash sample
 
 2007-04-16 22:57 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c

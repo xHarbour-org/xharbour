@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.207 2007/01/11 01:00:35 druzus Exp $
+ * $Id: dbcmd.c,v 1.208 2007/03/02 02:36:22 druzus Exp $
  */
 
 /*
@@ -3356,6 +3356,7 @@ HB_FUNC( ORDLISTADD )
    DBORDERINFO pOrderInfo;
    AREAP pArea = HB_CURRENT_WA;
 
+   s_bNetError = FALSE;
    if( pArea )
    {
       memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
@@ -3368,7 +3369,7 @@ HB_FUNC( ORDLISTADD )
          return;
       }
       pOrderInfo.itmResult = hb_itemNew( NULL );
-      SELF_ORDLSTADD( pArea, &pOrderInfo );
+      s_bNetError = SELF_ORDLSTADD( pArea, &pOrderInfo ) != SUCCESS;
       hb_itemReturn( pOrderInfo.itmResult );
       hb_itemRelease( pOrderInfo.itmResult );
    }
