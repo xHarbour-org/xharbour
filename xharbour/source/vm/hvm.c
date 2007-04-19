@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.616 2007/04/14 21:47:22 ronpinkas Exp $
+ * $Id: hvm.c,v 1.617 2007/04/17 20:46:35 ronpinkas Exp $
  */
 
 /*
@@ -7964,12 +7964,12 @@ static void hb_vmSubDate( PHB_ITEM pDate, PHB_ITEM pOther )
       if( lTime < 0 )
       {
          lTime += (86400 * HB_DATETIMEINSEC);
-         dDate -= 1;
+         dDate += 1;
       }
 
       result = div( (int) lTime, (int) (86400 * HB_DATETIMEINSEC) );
       lTime  = result.rem;
-      lDate  = pDate->item.asDate.value + (LONG)dDate + result.quot;
+      lDate  = pDate->item.asDate.value - (LONG)dDate - result.quot;
    }
 
    hb_stackPop();

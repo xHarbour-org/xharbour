@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5453 2007/04/17 20:46:34 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5454 2007/04/18 11:45:29 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,18 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-04-18 08:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
-  * harbour/source/rdd/dbcmd.c
-    ! Update NetErr() in ordListAdd(). Synched with Harbour.
+2007-04-19 10:10 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
+  * source/common/hbdate.c
+  * source/compiler/gencc.c
+  * source/rtl/dateshb.c
+  * source/vm/arrays.c
+    * Correct compiler warnings reported by Maurilio Longo
+  * source/vm/hvm.c
+    ! Fix bug in hb_vmSubDate() for operation as Date() - 1.0
 
+2007-04-18 08:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rdd/dbcmd.c
+    ! Update NetErr() in ordListAdd(). Synched with Harbour.
 
 2007-04-17 16:44 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbexprb.c

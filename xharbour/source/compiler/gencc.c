@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.10 2007/03/25 06:12:49 walito Exp $
+ * $Id: gencc.c,v 1.11 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -1743,7 +1743,7 @@ static HB_GENC_FUNC( hb_p_pushdatetime )
 
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushDateTime( %d, %d );\n", lVal1, lVal2 );
+   fprintf( cargo->yyc, "\thb_xvmPushDateTime( %d, %d );\n", (int) lVal1, (int) lVal2 );
    return 9;
 }
 
@@ -1753,7 +1753,7 @@ static HB_GENC_FUNC( hb_p_pushdate )
 
    HB_GENC_LABEL();
 
-   fprintf( cargo->yyc, "\thb_xvmPushDate( %d );\n", ( long ) lVal );
+   fprintf( cargo->yyc, "\thb_xvmPushDate( %d );\n", ( int ) lVal );
    return 5;
 }
 

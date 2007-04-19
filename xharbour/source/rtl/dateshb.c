@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.15 2006/03/01 13:06:30 druzus Exp $
+ * $Id: dateshb.c,v 1.16 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -223,7 +223,7 @@ int static hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
    double s_value = 0;
    int h_pos = 0, m_pos = 0, s_pos = 0, c_pos = 0, p_pos = 0;
    int count, digit, non_digit, size = strlen( hb_set.HB_SET_TIMEFORMAT );
-   int fin, pm = 0, divisor = 10;
+   int fin = 0, pm = 0, divisor = 10;
 
    if( szTime )
    {

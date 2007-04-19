@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.4 2007/03/26 15:25:17 ronpinkas Exp $
+ * $Id: hbdate.c,v 1.5 2007/03/27 06:32:50 walito Exp $
  */
 
 /*
@@ -896,8 +896,6 @@ void HB_EXPORT hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * pi
 
 LONG HB_EXPORT hb_timeEncStr( const char * szTime )
 {
-   LONG lTime;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_timeEncStr(%s)", szTime));
 
    if( szTime )
@@ -906,17 +904,13 @@ LONG HB_EXPORT hb_timeEncStr( const char * szTime )
 
       if( ulLen >= 4 )
       {
-         lTime  = (LONG) hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC +
-                  (LONG) hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC +
-                  (LONG)(hb_strVal( szTime + 4, ulLen - 4 ) * HB_DATETIMEINSEC);
+         return (LONG) hb_strVal( szTime, 2 ) * 3600 * HB_DATETIMEINSEC +
+                (LONG) hb_strVal( szTime + 2, 2 ) * 60 * HB_DATETIMEINSEC +
+                (LONG)(hb_strVal( szTime + 4, ulLen - 4 ) * HB_DATETIMEINSEC);
       }
    }
-   else
-   {
-      lTime = 0;
-   }
 
-   return lTime;
+   return 0;
 }
 
 char HB_EXPORT * hb_timeDecStr( char * szTime, LONG lSeconds )

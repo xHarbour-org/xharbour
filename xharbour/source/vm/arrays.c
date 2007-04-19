@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.138 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: arrays.c,v 1.139 2007/04/13 22:09:18 ronpinkas Exp $
  */
 
 /*
@@ -1702,6 +1702,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    else
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "Invalid argument to hb_arrayFromParams().", NULL, NULL );
+      pArray = NULL;  // To avoid compiler warnings.
    }
 
    return pArray;
