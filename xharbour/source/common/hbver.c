@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.35 2006/05/30 10:51:23 druzus Exp $
+ * $Id: hbver.c,v 1.36 2007/02/09 17:26:04 marchuet Exp $
  */
 
 /*
@@ -236,7 +236,11 @@ char * hb_verPlatform( void )
 
             case VER_PLATFORM_WIN32_NT:
 
-               if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
+               if( osVer.dwMajorVersion == 6 )
+               {
+                  strcat( szName, " Windows Vista" );
+               }
+               else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
                   strcat( szName, " Server 2003" );
                }
