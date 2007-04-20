@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.19 2006/04/27 18:01:26 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.20 2007/04/17 20:46:35 ronpinkas Exp $
  */
 
 /*
@@ -109,21 +109,19 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       /* Push _message for the later assignment.  */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
-      /* push object */
+      /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
-         /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
       }
       else
       {
-         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
       }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
-      /* push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
@@ -302,21 +300,19 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       /* Push _message for the later assignment.  */
       HB_EXPR_PCODE1( hb_compGenMessageData, pObj->value.asMessage.szMessage );
 
-      /* push object */
+      /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
-         /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
       }
       else
       {
-         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
       }
 
       /* Now push current value of variable */
       HB_EXPR_PCODE1( hb_compGenMessage, pObj->value.asMessage.szMessage );
 
-      /* push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
          /* Push object */
@@ -463,12 +459,11 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
-         /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
       }
       else
       {
-         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHNIL );
+         HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
       }
 
       /* Now push current value of variable */
@@ -477,7 +472,6 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
       /* Push object */
       if( pObj->ExprType == HB_ET_SEND )
       {
-         /* Push object */
          HB_EXPR_USE( pObj->value.asMessage.pObject, HB_EA_PUSH_PCODE );
       }
       else

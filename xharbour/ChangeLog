@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5455 2007/04/19 13:18:40 walito Exp $
+ * $Id: ChangeLog,v 1.5456 2007/04/19 19:49:29 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-19 23:39 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/exproptc.c
+  * source/macro/macroc.c
+  * include/hbexprc.c
+    ! Fixed silly but bnasty typos in last commit to HB_P_SENDWITH[SHORT] which broke few compunded operations like :n++ ++:n
 
 2007-04-19 16:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * harbour/source/common/hbver.c
