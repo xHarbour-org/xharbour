@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.7 2004/04/01 09:35:36 andijahja Exp $
+ * $Id: hbapilng.h,v 1.8 2005/03/31 03:15:16 druzus Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ HB_EXTERN_BEGIN
 #define HB_LANG_REQUEST_( id )          HB_FUNC_EXTERN( HB_LANG_##id ); \
                                         void hb_lang_ForceLink( void ) \
                                         { \
-                                           HB_FUNCNAME( HB_LANG_##id )(); \
+                                           HB_FUNC_EXEC( HB_LANG_##id ); \
                                         }
 
 /* Macro to publish a specific language module, for both C and Harbour level */

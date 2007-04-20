@@ -1,5 +1,5 @@
 /*
- * $Id: defpath.c,v 1.5 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: defpath.c,v 1.1.1.1 2001/12/21 10:41:27 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ HB_FUNC( DEFPATH )
 
 HB_FUNC( __DEFPATH )
 {
-   HB_FUNCNAME( DEFPATH )();
+   HB_FUNC_EXEC( DEFPATH );
 }
 
 #endif

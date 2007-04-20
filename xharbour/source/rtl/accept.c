@@ -1,5 +1,5 @@
 /*
- * $Id: accept.c,v 1.3 2004/03/28 22:26:40 peterrees Exp $
+ * $Id: accept.c,v 1.4 2004/04/01 09:35:37 andijahja Exp $
  */
 
 /*
@@ -89,7 +89,7 @@ HB_FUNC( __ACCEPT )
 
    /* cPrompt(s) passed ? */
    if( hb_pcount() >= 1 )
-      HB_FUNCNAME( QOUT )();
+      HB_FUNC_EXEC( QOUT );
 
    ulLen = 0;
    input = 0;

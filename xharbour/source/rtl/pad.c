@@ -1,5 +1,5 @@
 /*
- * $Id: pad.c,v 1.2 2004/04/01 09:35:37 andijahja Exp $
+ * $Id: pad.c,v 1.3 2004/11/21 21:44:19 druzus Exp $
  */
 
 /*
@@ -57,5 +57,5 @@ HB_FUNC_EXTERN( PADR );
 /* synonymn for PADR */
 HB_FUNC( PAD )
 {
-   HB_FUNCNAME( PADR )();
+   HB_FUNC_EXEC( PADR );
 }

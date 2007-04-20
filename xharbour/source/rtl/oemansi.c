@@ -1,5 +1,5 @@
 /*
- * $Id: oemansi.c,v 1.8 2004/02/23 08:31:57 andijahja Exp $
+ * $Id: oemansi.c,v 1.9 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -116,14 +116,14 @@ HB_FUNC( HB_OEMTOANSI )
 
 HB_FUNC( CONVTOOEMCP )
 {
-   HB_FUNCNAME( HB_ANSITOOEM )();
+   HB_FUNC_EXEC( HB_ANSITOOEM );
 }
 
 /* NOTE: Xbase++ compatible function */
 
 HB_FUNC( CONVTOANSICP )
 {
-   HB_FUNCNAME( HB_OEMTOANSI )();
+   HB_FUNC_EXEC( HB_OEMTOANSI );
 }
 
 #endif

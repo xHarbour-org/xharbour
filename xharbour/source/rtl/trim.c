@@ -1,5 +1,5 @@
 /*
- * $Id: trim.c,v 1.10 2004/04/14 10:32:13 druzus Exp $
+ * $Id: trim.c,v 1.11 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ HB_FUNC( RTRIM )
 /* synonymn for RTRIM */
 HB_FUNC( TRIM )
 {
-   HB_FUNCNAME( RTRIM )();
+   HB_FUNC_EXEC( RTRIM );
 }
 
 /* trims leading and trailing spaces from a string */

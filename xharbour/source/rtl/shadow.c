@@ -1,5 +1,5 @@
 /*
- * $Id: shadow.c,v 1.6 2001/12/05 18:44:47 vszakats Exp $
+ * $Id: shadow.c,v 1.1.1.1 2001/12/21 10:42:04 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ HB_FUNC( HB_CLRAREA )
 
 HB_FUNC( DBGSHADOW )
 {
-   HB_FUNCNAME( HB_SHADOW )();
+   HB_FUNC_EXEC( HB_SHADOW );
 }
 
 #endif
