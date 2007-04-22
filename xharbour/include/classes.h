@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.23 2006/09/07 04:56:43 ronpinkas Exp $
+ * $Id: classes.h,v 1.24 2007/01/13 01:36:32 ronpinkas Exp $
  */
 
 /*
@@ -99,6 +99,7 @@ typedef struct hb_class_method
    ULONG    ulRecurse;           /* profiler support */
    BOOL     bIsPersistent;       /* persistence support */
    USHORT   uiType;              /* Type value */
+   PSYMBOLS pModuleSymbols;      /* Container of the symbol table where the method was defined */
 } METHOD, * PMETHOD;
 
 typedef struct hb_class_sync
@@ -134,7 +135,7 @@ typedef struct
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
    PHB_FUNC pDestructor;    /* Destructor */
-   PSYMBOLS pModuleSymbols;
+   PHB_SYMB pClsSymbol;
    ULONG    fOpOver;        /* Flags for Operators overload */
    USHORT   uiDataInitiated;
    USHORT   uiFriends;
@@ -161,6 +162,7 @@ extern HB_EXPORT BOOL hb_clsSetScope( BOOL bClsScope );
 
 extern HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM, PHB_SYMB );
 extern HB_EXPORT ULONG   hb_objGetOpOver( const PHB_ITEM pObject );
+extern HB_EXPORT PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject );
 extern HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass );
 
 extern void * hb_mthRequested( void );

@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.35 2006/04/21 11:25:33 druzus Exp $
+ * $Id: dynsym.c,v 1.36 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -52,6 +52,11 @@
 
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
+
+#if ! ( defined( DEBUG ) || defined( _DEBUG ) )
+   #define NDEBUG
+#endif
+#include <assert.h>
 
 #include "hbvmopt.h"
 #include "hbapi.h"
@@ -145,28 +150,38 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
-      if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
+      if( ( pSymbol->scope.value & HB_FS_LOCAL ) != 0 )
       {
-#if 1
-         /* reenabled - it's still wrong, Druzus */
-         /* see note below */
-         /* register only non static functions */
-         if( ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
-         {
-            //TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
-         }
-         else
-#endif
-         {
-            /* The DynSym existed without function pointer */
-            pDynSym->pSymbol = pSymbol;
-         }
-      }
+         #if 0
+            assert( pModuleSymbols );
 
-      if( pDynSym->pModuleSymbols == NULL && ( pSymbol->scope.value & HB_FS_LOCAL ) )
-      {
+            if( pDynSym->pModuleSymbols )
+            {
+               TraceLog( NULL, "Symbol: '%s' was previously defined at Module: '%s'\n", pSymbol->szName, pDynSym->pModuleSymbols->szModuleName );
+            }
+         #endif
+
+         //if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
+         {
+            #if 0
+               /* reenabled - it's still wrong, Druzus */
+               /* see note below */
+               /* register only non static functions */
+               if( ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
+               {
+                  assert(0);
+                  TraceLog( NULL, "Rejecting: %s in %s\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+               }
+               else
+            #endif
+               {
+                  /* The DynSym existed without function pointer */
+                  pDynSym->pSymbol = pSymbol;
+               }
+         }
+
          pDynSym->pModuleSymbols = pModuleSymbols;
-         //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
+         //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
       }
 
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
@@ -207,14 +222,13 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    pDynSym->ulTime         = 0; /* profiler support */
    pDynSym->ulRecurse      = 0;
 
-#if 1
+#if 0
    /* now the compiler creates separate symbols for functions and
     * fields/memvars/aliases so we should not have any problem here
     * and this code is not necessary but I decide to left it here
     * disabled at least for debugging.
     */
-   if( pSymbol->value.pFunPtr &&
-       ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
+   if( pSymbol->value.pFunPtr && ( pSymbol->scope.value & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) == HB_FS_STATIC )
    {
       /*
        * This symbol points to static function - we cannot register
@@ -224,7 +238,8 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
        * accessible _ONLY_ from their modules.
        * So we will clone this symbol.
        */
-      //TraceLog( NULL, "Cloned: %s in %s\n", pSymbol->szName, pModuleSymbols->szModuleName);
+      assert(0);
+      TraceLog( NULL, "Cloned: %s in %s\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
 
       pSymbol->pDynSym = pDynSym;  /* place a pointer to DynSym in original symbol */
       pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
@@ -233,12 +248,14 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pSymbol->scope.value & HB_FS_LOCAL )
    {
+      assert( pModuleSymbols );
       pDynSym->pModuleSymbols = pModuleSymbols;
-      //printf( "Symbol: '%s' Module: '%s'\n", pSymbol->szName, pModuleSymbols->szModuleName );
+      //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
    }
    else
    {
       pDynSym->pModuleSymbols = NULL;
+      //TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
    }
 
    pDynSym->pSymbol = pSymbol;
@@ -298,17 +315,10 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( char * szName )  /* finds and creates a symbol 
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      PHB_ITEM pBase = hb_stackBaseItem();
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym )
-      {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
-      }
-      else
-      {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), NULL );   /* Make new symbol */
-      }
+      pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), HB_GETMODULESYM() );   /* Make new symbol */
+      pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
    hb_dynsymUnlock();
@@ -332,17 +342,9 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( char * szName )  /* finds and creates a sym
 
    if( ! pDynSym )       /* Does it exists ? */
    {
-      PHB_ITEM pBase = hb_stackBaseItem();
-
       //TraceLog( NULL, "Creating: %s\n", szName );
-      if( HB_IS_SYMBOL( pBase ) && pBase->item.asSymbol.value->pDynSym )
-      {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), pBase->item.asSymbol.value->pDynSym->pModuleSymbols );   /* Make new symbol */
-      }
-      else
-      {
-         pDynSym = hb_dynsymNew( hb_symbolNew( szName ), NULL );   /* Make new symbol */
-      }
+      pDynSym = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() );   /* Make new symbol */
+      pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
    hb_dynsymUnlock();
@@ -874,14 +876,14 @@ HB_FUNC( __DYNSGETPRF ) /* profiler: It returns an array with a function or proc
 /* JC1: Reentrant functions */
 #ifdef HB_THREAD_SUPPORT
 
-PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols,
-      PHB_DYNS pDest )
+PHB_DYNS HB_EXPORT hb_dynsymNew_r( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols, PHB_DYNS pDest )
 {
    PHB_DYNS pRet;
 
    hb_dynsymLock();
 
    pRet = hb_dynsymNew( pSymbol, pModuleSymbols );
+
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );
@@ -901,6 +903,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGet_r( char * szName, PHB_DYNS pDest )
    hb_dynsymLock();
 
    pRet = hb_dynsymGet( szName );
+
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );
@@ -919,6 +922,7 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase_r( char * szName, PHB_DYNS pDest )
    hb_dynsymLock();
 
    pRet = hb_dynsymGetCase( szName );
+
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );
@@ -937,6 +941,7 @@ PHB_DYNS pRet;
    hb_dynsymLock();
 
    pRet = hb_dynsymFind( szName );
+
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );
@@ -955,6 +960,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName_r( char * szName, PHB_DYNS pDest )
    hb_dynsymLock();
 
    pRet = hb_dynsymFindName( szName );
+
    if ( pRet )
    {
       memcpy( pDest, pRet, sizeof( HB_DYNS ) );

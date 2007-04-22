@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.30 2005/10/31 11:45:17 ronpinkas Exp $
+ * $Id: proc.c,v 1.31 2007/04/11 06:16:46 ronpinkas Exp $
  */
 
 /*
@@ -190,7 +190,7 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
                }
             }
 
-            strcat( szName, pSelf->item.asBlock.value->procname );
+            strcat( szName, ( *pBase )->item.asSymbol.value->szName );
          }
          else
          {
@@ -216,73 +216,83 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
 
       if( szModuleName )
       {
-         if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
-         {
-            // Find the real module where the Method is defined.
-            if( ( *pBase )->item.asSymbol.uiSuperClass )
+         #if 0
+            if( HB_IS_OBJECT( pSelf ) ) /* it is a method name */
             {
-               uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
-            }
-            else
-            {
-               if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[0] )
+               // Find the real module where the Method is defined.
+               if( ( *pBase )->item.asSymbol.uiSuperClass )
                {
-                  // Save.
-                  UINT uiPos = pSelf->item.asArray.value->puiClsTree[0];
-
-                  // Hide.
-                  pSelf->item.asArray.value->puiClsTree[0] = 0;
-
-                  uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
-
-                  // Restore.
-                  pSelf->item.asArray.value->puiClsTree[0] = uiPos;
+                  uiSuperClass = ( *pBase )->item.asSymbol.uiSuperClass;
                }
                else
                {
-                  uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+                  if( pSelf->item.asArray.value->puiClsTree && pSelf->item.asArray.value->puiClsTree[0] )
+                  {
+                     // Save.
+                     UINT uiPos = pSelf->item.asArray.value->puiClsTree[0];
+
+                     // Hide.
+                     pSelf->item.asArray.value->puiClsTree[0] = 0;
+
+                     uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+
+                     // Restore.
+                     pSelf->item.asArray.value->puiClsTree[0] = uiPos;
+                  }
+                  else
+                  {
+                     uiSuperClass = hb_objGetRealCls( pSelf, ( *pBase )->item.asSymbol.value->szName );
+                  }
+
+                  if( uiSuperClass == 0 )
+                  {
+                     uiSuperClass = pSelf->item.asArray.value->uiClass;
+                  }
                }
 
-               if( uiSuperClass == 0 )
+               if( uiSuperClass <= hb_clsMaxClasses() )
                {
-                  uiSuperClass = pSelf->item.asArray.value->uiClass;
+                  PCLASS pClass = hb_clsClassesArray() + uiSuperClass - 1;
+
+                  if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
+                  {
+                     strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+                  }
+               }
+               else
+               {
+                  TraceLog( "Error.log", "Corrupted object, points to invalid class id: %i of %i", pSelf->item.asArray.value->uiClass, hb_clsMaxClasses() );
+                  hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
                }
             }
-
-            if( uiSuperClass <= hb_clsMaxClasses() )
+            else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
             {
-               PCLASS pClass = hb_clsClassesArray() + uiSuperClass - 1;
+               PSYMBOLS pBlockModuleSymbols = pSelf->item.asBlock.value->pModuleSymbols;
 
-               if( pClass->pModuleSymbols && pClass->pModuleSymbols->szModuleName )
+               if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
                {
-                  strcpy( szModuleName, pClass->pModuleSymbols->szModuleName );
+                  strcpy( szModuleName, pBlockModuleSymbols->szModuleName );
                }
             }
             else
-            {
-               TraceLog( "Error.log", "Corrupted object, points to invalid class id: %i of %i", pSelf->item.asArray.value->uiClass, hb_clsMaxClasses() );
-               hb_errInternal( HB_EI_ERRUNRECOV, "Corrupted object, points to invalid class id!", NULL, NULL );
-            }
-         }
-         else if( HB_IS_BLOCK( pSelf ) )  /* it is a Block Evaluation. */
-         {
-            PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( pSelf->item.asBlock.value->pSymbols );
 
-            if( pBlockModuleSymbols && pBlockModuleSymbols->szModuleName )
+         #else
+
             {
-               strcpy( szModuleName, pBlockModuleSymbols->szModuleName );
+               if( pBase )
+               {
+                  PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
+
+                  //TraceLog( NULL, "Sym: %s Dyn: %p Module: %p\n", hb_itemGetSymbol( *pBase )->szName, hb_itemGetSymbol( *pBase )->pDynSym, pModuleSymbols );
+
+                  if( pModuleSymbols && pModuleSymbols->szModuleName )
+                  {
+                     strcpy( szModuleName, pModuleSymbols->szModuleName );
+                  }
+               }
             }
-         }
-         else
-         {
-            if( pBase && ( *pBase )->type == HB_IT_SYMBOL &&
-                ( *pBase )->item.asSymbol.value->pDynSym &&
-                ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols &&
-                ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName )
-            {
-               strcpy( szModuleName, ( *pBase )->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
-            }
-         }
+
+         #endif
       }
    }
 

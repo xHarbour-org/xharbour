@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.23 2005/05/09 12:11:12 druzus Exp $
+ * $Id: hbinit.h,v 1.24 2006/04/23 00:36:00 druzus Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 
 HB_EXTERN_BEGIN
 
-extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
+extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
 
 #if defined(_MSC_VER) && !defined(_WIN64) && \
     !defined(__LCC__) && !defined(__POCC__) && !defined(__XCC__) && \
@@ -87,6 +87,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -94,7 +95,8 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
       static PHB_SYMB symbols = symbols_table; \
       void func( void ) \
       { \
-         symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         symbols = pModuleSymbols->pSymbolTable; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -111,6 +113,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
    #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -118,7 +121,8 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
       static PHB_SYMB symbols = symbols_table; \
       static void __attribute__ ((constructor)) func( void ) \
       { \
-         symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         pModulesymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         symbols = pModuleSymbols->pSymbolTable; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -133,6 +137,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
    typedef int (* HB_$INITSYM)( void );
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -140,7 +145,8 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
       static PHB_SYMB symbols = symbols_table; \
       static int func( void ) \
       { \
-         symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         symbols = pModuleSymbols->pSymbolTable; \
          return 0; \
       }
 
@@ -163,11 +169,13 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
    #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PHB_SYMB symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER );
+      static PSYMBOLS pDummy = pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+      static PHB_SYMB symbols = pModulesymbols->pSymbolTable;
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) \
@@ -195,6 +203,7 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
    #endif
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
+      static PSYMBOLS pModuleSymbols; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -202,7 +211,8 @@ extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* stat
       static PHB_SYMB symbols = symbols_table; \
       static void func( void ) \
       { \
-         symbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         symbols = pModuleSymbols->pSymbolTable; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \

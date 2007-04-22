@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.24 2007/04/10 08:08:33 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.25 2007/04/17 08:54:07 marchuet Exp $
  */
 
 /*
@@ -8573,7 +8573,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_RELKEYPOS:
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
-            hb_cdxDBOISetRelKeyPos( pArea, pTag, 
+            hb_cdxDBOISetRelKeyPos( pArea, pTag,
                                     hb_itemGetND( pOrderInfo->itmNewVal ) );
          else
             pOrderInfo->itmResult = hb_itemPutND( pOrderInfo->itmResult,
@@ -8588,7 +8588,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_FINDRECCONT:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                  hb_cdxDBOIFindRec( pArea, pTag, 
+                  hb_cdxDBOIFindRec( pArea, pTag,
                               hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) );
          break;
 
@@ -9918,8 +9918,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fsSeekLarge( pArea->hDataFile,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
+                               ( HB_FOFFSET ) pArea->uiHeaderLen +
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                                ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
@@ -10140,6 +10140,8 @@ static void hb_bmdbfcdxRddInit( void * cargo )
    HB_FUNC_EXEC( _DBF );
 }
 
+static PHB_ITEM *pGlobals = NULL;
+
 HB_INIT_SYMBOLS_BEGIN( bmdbfcdx1__InitSymbols )
 { "SIXCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX )}, NULL },
 { "SIXCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
@@ -10203,6 +10205,8 @@ static void hb_bmdbfcdxRddInit( void * cargo )
    /* not executed, only to force DBF RDD linking */
    HB_FUNC_EXEC( _DBF );
 }
+
+static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( bmdbfcdx1__InitSymbols )
 { "BMDBFCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( BMDBFCDX )}, NULL },

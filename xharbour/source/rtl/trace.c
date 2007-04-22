@@ -1,5 +1,5 @@
 /*
- * $Id: trace.c,v 1.18 2005/11/12 20:27:12 ronpinkas Exp $
+ * $Id: trace.c,v 1.19 2005/11/12 20:50:43 ronpinkas Exp $
  */
 
 /*
@@ -60,16 +60,19 @@
    static HB_CRITICAL_T s_CriticalMutex;
 #endif
 
+// It is Thread Safe - It's manipulated only once at primary thread startup.
+static BOOL s_bEmpty = TRUE;
+
 void hb_traceInit( void )
 {
    FILE *fpTrace;
    PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
 
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_INIT( s_CriticalMutex );
+   #endif
 
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_INIT( s_CriticalMutex );
-#endif
-   if( pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( ( BYTE *) "trace.log" ) )
+   if( s_bEmpty && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( ( BYTE *) "trace.log" ) )
    {
       /* Empty the file if it exists. */
       fpTrace = fopen( "trace.log", "w" );
@@ -87,17 +90,16 @@ void hb_traceInit( void )
 
 void hb_traceExit( void )
 {
-#ifdef HB_THREAD_SUPPORT
-   HB_CRITICAL_DESTROY( s_CriticalMutex );
-#endif
-
+   #ifdef HB_THREAD_SUPPORT
+      HB_CRITICAL_DESTROY( s_CriticalMutex );
+   #endif
 }
 
 HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 {
    FILE *hFile;
 
-   if( !sTraceMsg )
+   if( ! sTraceMsg )
    {
       return;
    }
@@ -108,7 +110,17 @@ HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... )
 
    if( sFile == NULL )
    {
-      hFile = fopen( "trace.log", "a" );
+      if( s_bEmpty )
+      {
+         s_bEmpty = FALSE;
+
+         /* Empty the file if it exists. */
+         hFile = fopen( "trace.log", "w" );
+      }
+      else
+      {
+         hFile = fopen( "trace.log", "a" );
+      }
    }
    else
    {

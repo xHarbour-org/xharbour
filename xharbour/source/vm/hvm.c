@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.617 2007/04/17 20:46:35 ronpinkas Exp $
+ * $Id: hvm.c,v 1.618 2007/04/19 13:18:40 walito Exp $
  */
 
 /*
@@ -83,6 +83,10 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
+
+#if ! ( defined( DEBUG ) || defined( _DEBUG ) )
+   #define NDEBUG
+#endif
 #include <assert.h>
 
 #include "hbvmopt.h"
@@ -217,10 +221,10 @@ static void    hb_vmDebuggerEndProc( void );     /* notifies the debugger for an
 static void    hb_vmPushAlias( void );            /* pushes the current workarea number */
 static void    hb_vmPushAliasedField( PHB_SYMB ); /* pushes an aliased field on the eval stack */
 static void    hb_vmPushAliasedVar( PHB_SYMB );   /* pushes an aliased variable on the eval stack */
-static void    hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
-static void    hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
+static void    hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode ); /* creates a codeblock */
+static void    hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode ); /* creates a codeblock */
 static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* Pushes a double constant (pcode) */
-static void    hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols ); /* creates a macro-compiled codeblock */
+static void    hb_vmPushMacroBlock( BYTE * pCode ); /* creates a macro-compiled codeblock */
 static void    hb_vmPushLocal( SHORT iLocal );    /* pushes the containts of a local onto the stack */
 static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
 static void    hb_vmPushLongConst( LONG lNumber );  /* Pushes a LONG constant (pcode) */
@@ -761,20 +765,27 @@ void hb_vmReleaseLocalSymbols( void )
       {
          hb_xfree( pDestroy->szModuleName );
       }
+
       if( pDestroy->fAllocated )
       {
          USHORT ui;
+
          for( ui = 0; ui < pDestroy->uiModuleSymbols; ++ui )
          {
-            PHB_SYMB pSymbol = pDestroy->pModuleSymbols + ui;
-            if( pSymbol->pDynSym && pSymbol->pDynSym->pSymbol == pSymbol )
+            PHB_SYMB pSymbol = pDestroy->pSymbolTable + ui;
+            PHB_DYNS pDynSym = HB_SYM_GETDYNSYM( pSymbol );
+
+            if( pDynSym && pDynSym->pSymbol == pSymbol )
             {
-               pSymbol->pDynSym->pSymbol = NULL;
+               pDynSym->pSymbol = NULL;
             }
+
             hb_xfree( pSymbol->szName );
          }
-         hb_xfree( pDestroy->pModuleSymbols );
+
+         hb_xfree( pDestroy->pSymbolTable );
       }
+
       hb_xfree( pDestroy );
    }
 
@@ -928,6 +939,7 @@ int HB_EXPORT hb_vmQuit( void )
    if( s_aStatics.type == HB_IT_ARRAY )
    {
       HB_TRACE(HB_TR_DEBUG, ("Releasing s_aStatics: %p\n", &s_aStatics) );
+
      //#define DEBUG_STATICS
      #ifdef DEBUG_STATICS
      {
@@ -938,7 +950,12 @@ int HB_EXPORT hb_vmQuit( void )
        for( ulIndex = 0; ulIndex < ulLen; ulIndex++ )
        {
          sprintf( sBuffer, "# %i type: %i\n", ulIndex, (s_aStatics.item.asArray.value->pItems + ulIndex)->type );
-         OutputDebugString( sBuffer );
+
+         #if defined(HB_OS_WIN_32)
+            OutputDebugString( sBuffer );
+         #else
+            printf( sBuffer );
+         #endif
        }
      }
      #endif
@@ -1028,7 +1045,7 @@ int HB_EXPORT hb_vmQuit( void )
    return s_iErrorLevel;
 }
 
-void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSymbols )
 {
    HB_THREAD_STUB
 
@@ -1050,9 +1067,9 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
    ULONG ulPastClock = 0;  /* opcodes profiler support */
 #endif
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols, pGlobals));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmExecute(%p, %p, %p)", pCode, pSymbols));
 
-   //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
+   //TraceLog( NULL, "%s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols );
 
    /* NOTE: if pSymbols == NULL then hb_vmExecute is called from macro
     * evaluation. In this case all PRIVATE variables created during
@@ -2710,13 +2727,14 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             USHORT usSize = HB_PCODE_MKUSHORT( &pCode[ w + 1 ] );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHBLOCK") );
+
             /* +0    -> _pushblock
              * +1 +2 -> size of codeblock
              * +3 +4 -> number of expected parameters
              * +5 +6 -> number of referenced local variables
              * +7    -> start of table with referenced local variables
              */
-            hb_vmPushBlock( pCode + w + 3, usSize - 3, bDynCode, pSymbols, pGlobals );
+            hb_vmPushBlock( pCode + w + 3, usSize - 3, bDynCode );
             w += usSize;
             break;
          }
@@ -2729,7 +2747,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             /* +0    -> _pushblock
              * +1    -> size of codeblock
              */
-            hb_vmPushBlockShort( pCode + w + 2, usSize - 2, bDynCode, pSymbols, pGlobals );
+            hb_vmPushBlockShort( pCode + w + 2, usSize - 2, bDynCode );
             w += usSize;
             break;
          }
@@ -2803,7 +2821,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             //JC1: Should be threadsafe: pCodes are done at compile time, and
             // a clash with another thread here should just bring to a race,
             // not a crash; a race that must be resolved at PRG level.
-            hb_vmPush( (*pGlobals)[ pCode[ w + 1 ] ] );
+            hb_vmPush( HB_GETGLOBALS()[ pCode[ w + 1 ] ] );
             w += 2;
             break;
 
@@ -2817,10 +2835,10 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
                pTop->item.asRefer.value = iGlobal + 1; // To offset the -1 below.
                pTop->item.asRefer.offset = -1; // Because 0 will be translated as a STATIC in hb_itemUnref();
-               pTop->item.asRefer.BasePtr.itemsbasePtr = pGlobals;
+               pTop->item.asRefer.BasePtr.itemsbasePtr = HB_GETGLOBALSPTR();
 
 #ifdef HB_UNSHARE_REFERENCES
-               hb_itemUnShare( (*pGlobals)[ iGlobal ] );
+               hb_itemUnShare( HB_GETGLOBALS()[ iGlobal ] );
 #endif
                hb_stackPush();
             }
@@ -3161,7 +3179,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_POPGLOBAL:
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            PHB_ITEM pGlobal = (*pGlobals)[ pCode[ w + 1 ] ]
+            PHB_ITEM pGlobal = HB_GETGLOBALS()[ pCode[ w + 1 ] ]
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
@@ -3478,7 +3496,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
              * +3 +4 -> number of expected parameters
              * +5    -> pcode bytes
              */
-            hb_vmPushMacroBlock( ( BYTE * ) ( pCode + w ), pSymbols );
+            hb_vmPushMacroBlock( ( BYTE * ) ( pCode + w ) );
             w += HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
             break;
          }
@@ -3790,7 +3808,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
    //JC1: do not allow cancellation or idle MT func: thread cleanup procedure
    // is under way, or another VM might return in control
 
-   //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, pGlobals );
+   //TraceLog( NULL, "DONE! %s->hb_vmExecute(%p, %p, %p)\n", hb_stackBaseItem()->item.asSymbol.value->szName, pCode, pSymbols, HB_GETGLOBALS() );
 }
 
 HB_FUNC( HB_VMEXECUTE )
@@ -3803,7 +3821,7 @@ HB_FUNC( HB_VMEXECUTE )
    {
       LONG lOffset = hb_stackTopOffset();
 
-      hb_vmExecute( szString, (PHB_SYMB) hb_parptr(2), (PHB_ITEM **) hb_parptr(3) );
+      hb_vmExecute( szString, (PHB_SYMB) hb_parptr(2) );
 
       if( hb_stackTopOffset() > lOffset )
       {
@@ -3825,7 +3843,7 @@ HB_FUNC( HB_VMEXECUTE )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_vmExecute", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError(3) );
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_vmExecute", 3, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -6877,7 +6895,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym )
+            if( bProfiler && HB_SYM_GETDYNSYM( pSym ) )
             {
                pSym->pDynSym->ulRecurse++;
             }
@@ -6896,7 +6914,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          if ( pSym->scope.value & HB_FS_PCODEFUNC )
          {
             /* Running pCode dynamic function from .HRB */
-            hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals );
+            hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols );
          }
          else
          {
@@ -6907,7 +6925,7 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          #ifndef HB_NO_PROFILER
-            if( bProfiler && pSym->pDynSym )
+            if( bProfiler && HB_SYM_GETDYNSYM( pSym ) )
             {
                pSym->pDynSym->ulCalls++;                   /* profiler support */
 
@@ -6997,6 +7015,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    int            iPresetBase = s_iBaseLine;
    BOOL           bConstructor = FALSE;
    BOOL           bSymbol = FALSE;
+
 #ifdef HB_THREAD_SUPPORT
    USHORT         uiClass = 0;
 #endif
@@ -7094,7 +7113,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
 
 #ifdef HB_THREAD_SUPPORT
-         if( HB_VM_STACK.pMethod && (HB_VM_STACK.pMethod->uiScope & HB_OO_CLSTP_SYNC) )
+         if( HB_VM_STACK.pMethod && ( HB_VM_STACK.pMethod->uiScope & HB_OO_CLSTP_SYNC ) != 0 )
          {
             uiClass = hb_objClassH( pSelf );
             // Put uiClass in the SYNC methods list.
@@ -7245,20 +7264,34 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
       if( bSymbol )
       {
-         PHB_SYMB pSymbol = (PHB_SYMB) pFunc;
-         pFunc = ((PHB_SYMB) pFunc)->value.pFunPtr;
+         PHB_SYMB pFuncSym = (PHB_SYMB) pFunc;
+         pFunc = pFuncSym->value.pFunPtr;
 
          if( pFunc )
          {
-            if( pSymbol->scope.value & HB_FS_PCODEFUNC )
+            // Store original
+            char *szFuncName = pFuncSym->szName;
+
+            // Change to the Message Name
+            pFuncSym->szName = pSym->szName;
+
+            // Force correct context for the executing function
+            pItem->item.asSymbol.value = pFuncSym;
+
+            if( pFuncSym->scope.value & HB_FS_PCODEFUNC )
             {
                /* Running pCode dynamic function from .HRB */
-               hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols, ( (PHB_PCODEFUNC) pFunc )->pGlobals );
+               hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols );
             }
             else
             {
                pFunc();
             }
+
+            // Restoring it's real name!
+            pFuncSym->szName = szFuncName;
+
+            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be pooped.
          }
          else
          {
@@ -7269,7 +7302,26 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       }
       else
       {
-         pFunc();
+         if( hb_objClassH( pSelf ) )
+         {
+            // Store original
+            PHB_SYMB pFuncSym = pItem->item.asSymbol.value;
+            char *szFuncName = pFuncSym->szName;
+
+            // Force correct context for the CLASS function
+            pItem->item.asSymbol.value = hb_objGetClsSymbol( pSelf );
+
+            pFunc();
+
+            // Restoring it's real name!
+            pFuncSym->szName = szFuncName;
+
+            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be pooped.
+         }
+         else
+         {
+            pFunc();
+         }
       }
 
       //TraceLog( NULL, "Done\n" );
@@ -7380,6 +7432,8 @@ static HARBOUR hb_vmDoBlock( void )
    USHORT uiLine;
    int iParam;
    int iStatics;
+   PSYMBOLS pModuleSymbols;
+   PHB_ITEM pBaseSym = (*HB_VM_STACK.pBase);
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
 
@@ -7405,10 +7459,13 @@ static HARBOUR hb_vmDoBlock( void )
    }
 
    // Save the current line number.
-   uiLine = hb_stackBaseItem()->item.asSymbol.lineno;
+   uiLine = pBaseSym->item.asSymbol.lineno;
 
    // Change the line number to line where block was defined.
-   hb_stackBaseItem()->item.asSymbol.lineno = pBlock->item.asBlock.value->lineno;
+   pBaseSym->item.asSymbol.lineno = pBlock->item.asBlock.value->lineno;
+
+   // Set symbol context of codeblock execution to where it was defined
+   pBaseSym->item.asSymbol.value = pBlock->item.asBlock.value->symbol;
 
    // Save current Statics Context.
    iStatics = HB_VM_STACK.iStatics;
@@ -7416,7 +7473,10 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.iStatics = pBlock->item.asBlock.statics;
 
-   hb_vmExecute( pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->pSymbols, pBlock->item.asBlock.value->pGlobals );
+   pModuleSymbols = HB_SYM_GETMODULESYM( pBlock->item.asBlock.value->symbol );
+   //TraceLog( NULL, "Set Module: %s for Block: %s(%i)\n", pModuleSymbols ? pModuleSymbols->szModuleName : "", pBlock->item.asBlock.value->symbol->szName, pBlock->item.asBlock.value->lineno );
+
+   hb_vmExecute( pBlock->item.asBlock.value->pCode, pModuleSymbols ? pModuleSymbols->pSymbolTable : NULL );
 
    // Restore Statics context.
    HB_VM_STACK.iStatics = iStatics;
@@ -7424,7 +7484,7 @@ static HARBOUR hb_vmDoBlock( void )
    HB_TRACE(HB_TR_DEBUG, ("Done hb_vmDoBlock()"));
 
    // Restore line numer.
-   hb_stackBaseItem()->item.asSymbol.lineno = uiLine;
+   pBaseSym->item.asSymbol.lineno = uiLine;
 
    HB_TRACE(HB_TR_DEBUG, ("Restored Satck hb_vmDoBlock()"));
 }
@@ -8299,26 +8359,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
-   #if 0
-      printf( "Symbol: %s\n", pSym->szName );
-
-      if( pSym->pDynSym )
-      {
-         printf( "Module: %p\n", pSym->pDynSym->pModuleSymbols );
-
-         if( pSym->pDynSym->pModuleSymbols )
-         {
-            printf( "ModuleName: %s\n", pSym->pDynSym->pModuleSymbols->szModuleName );
-         }
-      }
-   #endif
-
    ( * HB_VM_STACK.pPos )->type = HB_IT_SYMBOL;
-
-   if( pSym == &( hb_symEval ) && HB_VM_STACK.pBase && (* HB_VM_STACK.pBase)->type == HB_IT_SYMBOL && ( * HB_VM_STACK.pBase )->item.asSymbol.value->pDynSym )
-   {
-      pSym->pDynSym->pModuleSymbols = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols;
-   }
 
    ( * HB_VM_STACK.pPos )->item.asSymbol.value = pSym;
    ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
@@ -8345,7 +8386,7 @@ HB_EXPORT void hb_vmPushEvalSym( void )
  *
  * NOTE: pCode points to static memory
  */
-static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
 {
    HB_THREAD_STUB
    PHB_ITEM pTop;
@@ -8353,7 +8394,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
 
    USHORT uiLocals;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlock(%p, %p)", pCode, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlock(%p, %p)", pCode));
 
    pTop = hb_stackTopItem();
    hb_stackPush();
@@ -8375,7 +8416,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
          hb_codeblockNew( pBlockCode,               /* pcode buffer */
          uiLocals,                                  /* number of referenced local variables */
          pCode + 4,                                 /* table with referenced local variables */
-         pSymbols, pGlobals );
+         (*HB_VM_STACK.pBase)->item.asSymbol.value );
 
    pTop->type = HB_IT_BLOCK;
 
@@ -8388,20 +8429,17 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
 
    /* store the line number where the codeblock was defined
     */
-   pTop->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
    pTop->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
       pTop->item.asBlock.value->uiClass = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value->uiClass;
-
-      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
+      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i Module: %s\n", pTop->item.asBlock.value->symbol->szName, pTop->item.asBlock.value->lineno, HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol ) ? HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol )->szModuleName : "" );
    }
    else
    {
-      //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );
-
       pTop->item.asBlock.value->uiClass = 0;
+      //TraceLog( NULL, "PROC Block: '%s' Line: %i Module: %s\n", pTop->item.asBlock.value->symbol->szName, pTop->item.asBlock.value->lineno, HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol ) ? HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol )->szModuleName : "" );
    }
 
    pTop->item.asBlock.value->uLen = usSize;
@@ -8414,12 +8452,12 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PH
  *
  * NOTE: pCode points to static memory
  */
-static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
 {
    HB_THREAD_STUB
    PHB_ITEM pTop;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlockShort(%p, %p)", pCode, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushBlockShort(%p, %p)", pCode));
 
    pTop = hb_stackTopItem();
    hb_stackPush();
@@ -8435,7 +8473,7 @@ static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCod
          hb_codeblockNew( pCode,                    /* pcode buffer         */
          0,                                         /* number of referenced local variables */
          NULL,                                      /* table with referenced local variables */
-         pSymbols, pGlobals );
+         (*HB_VM_STACK.pBase)->item.asSymbol.value );
 
    pTop->type = HB_IT_BLOCK;
 
@@ -8448,20 +8486,17 @@ static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCod
 
    /* store the line number where the codeblock was defined
     */
-   pTop->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
    pTop->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
    {
       pTop->item.asBlock.value->uiClass = ( *( HB_VM_STACK.pBase + 1 ) )->item.asArray.value->uiClass;
-
-      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno
+      //TraceLog( NULL, "OBJECT Block: '%s' Line: %i Module: %s\n", pTop->item.asBlock.value->symbol->szName, pTop->item.asBlock.value->lineno, HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol ) ? HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol )->szModuleName : "" );
    }
    else
    {
-      //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno
-
       pTop->item.asBlock.value->uiClass = 0;
+      //TraceLog( NULL, "PROC Block: '%s' Line: %i Module: %s\n", pTop->item.asBlock.value->symbol->szName, pTop->item.asBlock.value->lineno, HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol ) ? HB_SYM_GETMODULESYM( pTop->item.asBlock.value->symbol )->szModuleName : "" );
    }
 
    pTop->item.asBlock.value->uLen = usSize;
@@ -8475,14 +8510,12 @@ static void hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCod
  *
  * NOTE: pCode points to dynamically allocated memory
  */
-static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
+static void hb_vmPushMacroBlock( BYTE * pCode )
 {
    HB_THREAD_STUB
    PHB_ITEM pTop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushMacroBlock(%p, %p)", pCode, pSymbols));
-
-   HB_SYMBOL_UNUSED( pSymbols ); /* TODO: remove pSymbols */
 
    pTop = hb_stackTopItem();
    hb_stackPush();
@@ -8500,7 +8533,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode, PHB_SYMB pSymbols )
 
    /* store the line number where the codeblock was defined
     */
-   pTop->item.asBlock.value->procname = ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName;
+   pTop->item.asBlock.value->symbol = ( *HB_VM_STACK.pBase )->item.asSymbol.value;
    pTop->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
 
    if( HB_IS_ARRAY( *( HB_VM_STACK.pBase + 1 ) ) )  /* it is a method name */
@@ -9127,7 +9160,7 @@ static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, USHORT uiSymbols, char *
              pLastSymbols->szModuleName != NULL &&
              strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
          {
-            PHB_SYMB pModuleSymbols = pLastSymbols->pModuleSymbols;
+            PHB_SYMB pModuleSymbols = pLastSymbols->pSymbolTable;
             USHORT ui;
 
             for( ui = 0; ui < uiSymbols; ++ui )
@@ -9162,15 +9195,15 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
 
       for( ui = 0; ui < pSymbols->uiModuleSymbols; ++ui )
       {
-         HB_SYMBOLSCOPE scope = pSymbols->pModuleSymbols[ ui ].scope.value & HB_FS_INITEXIT;
+         HB_SYMBOLSCOPE scope = pSymbols->pSymbolTable[ ui ].scope.value & HB_FS_INITEXIT;
 
          /* do not overwrite already initialized statics' frame */
          if( scope != HB_FS_INITEXIT )
          {
-            pSymbols->pModuleSymbols[ ui ].value.pFunPtr = NULL;
+            pSymbols->pSymbolTable[ ui ].value.pFunPtr = NULL;
          }
 
-         pSymbols->pModuleSymbols[ ui ].scope.value &= ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE );
+         pSymbols->pSymbolTable[ ui ].scope.value &= ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE );
       }
 
       pSymbols->hDynLib = NULL;
@@ -9212,26 +9245,29 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
             {
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                {
-                  HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+                  HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
                   if( scope == HB_FS_INITEXIT )
                   {
-                     hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+                     hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
                      hb_vmDo( 0 );
                   }
                }
+
                pLastSymbols->fInitStatics = FALSE;
             }
 
             pLastSymbols->hDynLib = hNewDynLib;
          }
+
          pLastSymbols = pLastSymbols->pNext;
       }
 
       if( fFound )
       {
          pLastSymbols = s_pSymbols;
+
          while( pLastSymbols )
          {
             if( pLastSymbols->hDynLib == hNewDynLib )
@@ -9240,22 +9276,26 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
                {
                   for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                   {
-                     HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+                     HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
                      if( scope == HB_FS_INIT )
                      {
                         int i;
-                        hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+
+                        hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                         hb_vmPushNil();
+
                         for( i = 0; i < argc; ++i )
                         {
                            hb_vmPushString( argv[i], strlen( argv[i] ) );
                         }
+
                         hb_vmDo( argc );
                      }
                   }
                }
             }
+
             pLastSymbols = pLastSymbols->pNext;
          }
       }
@@ -9276,22 +9316,25 @@ void hb_vmExitSymbolGroup( void * hDynLib )
          if( pLastSymbols->hDynLib == hDynLib )
          {
             fFound = TRUE;
+
             if( pLastSymbols->fActive && ( pLastSymbols->hScope & HB_FS_EXIT ) != 0 )
             {
                USHORT ui;
+
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                {
-                  HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+                  HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
                   if( scope == HB_FS_EXIT )
                   {
-                     hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+                     hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
                      hb_vmDo( 0 );
                   }
                }
             }
          }
+
          pLastSymbols = pLastSymbols->pNext;
       }
 
@@ -9310,15 +9353,19 @@ void hb_vmExitSymbolGroup( void * hDynLib )
    }
 }
 
-PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone )
+PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM *pGlobals )
 {
    PSYMBOLS pNewSymbols;
    BOOL fRecycled, fInitStatics = FALSE;
    USHORT ui;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmRegisterSymbols(%p,%hu,%s,%d,%d)", pModuleSymbols, uiSymbols, szModuleName, (int)fDynLib, (int)fClone));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmRegisterSymbols(%p,%hu,%s,%d,%d,%p)", pSymbolTable, uiSymbols, szModuleName, (int)fDynLib, (int)fClone, pGlobals));
 
-   pNewSymbols = s_ulFreeSymbols == 0 ? NULL : hb_vmFindFreeModule( pModuleSymbols, uiSymbols, szModuleName );
+   #if 0
+      TraceLog( NULL, "Register: %s\n", szModuleName );
+   #endif
+
+   pNewSymbols = s_ulFreeSymbols == 0 ? NULL : hb_vmFindFreeModule( pSymbolTable, uiSymbols, szModuleName );
 
    if( pNewSymbols )
    {
@@ -9334,18 +9381,18 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
       {
          PHB_SYMB pSymbols = ( PHB_SYMB ) hb_xgrab( uiSymbols * sizeof( HB_SYMB ) );
 
-         memcpy( pSymbols, pModuleSymbols, uiSymbols * sizeof( HB_SYMB ) );
+         memcpy( pSymbols, pSymbolTable, uiSymbols * sizeof( HB_SYMB ) );
 
          for( ui = 0; ui < uiSymbols; ui++ )
          {
             pSymbols[ ui ].szName = hb_strdup( pSymbols[ ui ].szName );
          }
 
-         pModuleSymbols = pSymbols;
+         pSymbolTable = pSymbols;
       }
 
       pNewSymbols = ( PSYMBOLS ) hb_xgrab( sizeof( SYMBOLS ) );
-      pNewSymbols->pModuleSymbols = pModuleSymbols;
+      pNewSymbols->pSymbolTable = pSymbolTable;
       pNewSymbols->uiModuleSymbols = uiSymbols;
       pNewSymbols->szModuleName = hb_strdup( szModuleName );
       pNewSymbols->fAllocated = fClone;
@@ -9374,9 +9421,11 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
       }
    }
 
+   pNewSymbols->pGlobals = pGlobals;
+
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
-      PHB_SYMB pSymbol = pNewSymbols->pModuleSymbols + ui;
+      PHB_SYMB pSymbol = pNewSymbols->pSymbolTable + ui;
       HB_SYMBOLSCOPE hSymScope;
       BOOL fPublic, fStatics;
 
@@ -9384,8 +9433,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
 
       if( fRecycled && !fStatics )
       {
-         pSymbol->value.pFunPtr = ( pModuleSymbols + ui )->value.pFunPtr;
-         pSymbol->scope.value = ( pModuleSymbols + ui )->scope.value;
+         pSymbol->value.pFunPtr = ( pSymbolTable + ui )->value.pFunPtr;
+         pSymbol->scope.value = ( pSymbolTable + ui )->scope.value;
       }
 
       if( fDynLib )
@@ -9404,7 +9453,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
 
       if( ( hSymScope & HB_FS_PCODEFUNC ) != 0 && ( fRecycled || fClone ) )
       {
-         pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pModuleSymbols;
+         pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pSymbolTable;
       }
 
       if( !s_pSymStart && !fDynLib && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_INITEXIT ) == 0 )
@@ -9414,73 +9463,88 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
       }
 
       /* Enable this code to see static functions which are registered in global dynsym table */
-   #if 0
-      if( fPublic && ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) != 0 )
-      {
-         printf( "Registring: %s:%s scope %04x\r\n", szModuleName, pSymbol->szName, hSymScope ); fflush(stdout);
-      }
-   #endif
+      #if 0
+         if( fPublic && ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) != 0 )
+         {
+            TraceLog( NULL, "Registring STATIC!!!: %s:%s scope %04x\r\n", szModuleName, pSymbol->szName, hSymScope ); fflush(stdout);
+         }
+      #endif
 
       if( fPublic )
       {
-         if( fDynLib && ( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) ) )
+         PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
+
+         if( fDynLib )
          {
-            PHB_DYNS pDynSym;
+            if( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) )
+            {
+                if( pDynSym )
+                {
+                   pSymbol->pDynSym = pDynSym;
 
-            pDynSym = hb_dynsymFind( pSymbol->szName );
+                   // Should we support dynamic overloading of already resolved HB_FS_DEFERRED as per below?
+                   if( pDynSym->pSymbol->value.pFunPtr )
+                   {
+                      if( ( pSymbol->scope.value & HB_FS_DEFERRED ) /* && pSymbol->value.pFunPtr == NULL */ )
+                      {
+                         pSymbol->scope.value = ( pSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                         pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+                      }
+                   }
+                   else if( pSymbol->value.pFunPtr )
+                   {
+                      PSYMBOLS pModuleSymbols;
 
+                      pDynSym->pSymbol = pSymbol;
+
+                      pModuleSymbols = s_pSymbols;
+
+                      while( pModuleSymbols )
+                      {
+                         if( pModuleSymbols->hScope & HB_FS_DEFERRED )
+                         {
+                            USHORT ui;
+
+                            //TraceLog( NULL, "Module '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
+
+                            for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
+                            {
+                               PHB_SYMB pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
+
+                               if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->scope.value & HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
+                               {
+                                   //TraceLog( NULL, "Deferred: '%s'\n", pSymbol->szName );
+
+                                   pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
+                                   pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
+                               }
+                            }
+                         }
+
+                         pModuleSymbols = pModuleSymbols->pNext;
+                      }
+                   }
+
+                   continue;
+                }
+            }
+         }
+         else
+         {
             if( pDynSym )
             {
-               pSymbol->pDynSym = pDynSym;
-
-               // Should we support dynamic overloading of already resolved HB_FS_DEFERRED as per below?
-               if( pDynSym->pSymbol->value.pFunPtr )
+               if( ( pSymbol->scope.value & HB_FS_LOCAL ) && ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) )
                {
-                  if( ( pSymbol->scope.value & HB_FS_DEFERRED ) /* && pSymbol->value.pFunPtr == NULL */ )
-                  {
-                     pSymbol->scope.value = ( pSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
-                     pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
-                  }
+                  /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                  TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously registered Module: %s\n",
+                            pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+                  continue;
                }
-               else if( pSymbol->value.pFunPtr )
-               {
-                  PSYMBOLS pModuleSymbols;
-
-                  pDynSym->pSymbol = pSymbol;
-
-                  pModuleSymbols = s_pSymbols;
-
-                  while( pModuleSymbols )
-                  {
-                     if( pModuleSymbols->hScope & HB_FS_DEFERRED )
-                     {
-                        USHORT ui;
-
-                        //TraceLog( NULL, "Module '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
-
-                        for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
-                        {
-                           PHB_SYMB pModuleSymbol = pModuleSymbols->pModuleSymbols + ui;
-
-                           if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->scope.value & HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
-                           {
-                               //TraceLog( NULL, "Deferred: '%s'\n", pSymbol->szName );
-
-                               pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
-                               pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
-                           }
-                        }
-                     }
-
-                     pModuleSymbols = pModuleSymbols->pNext;
-                  }
-               }
-
-               continue;
             }
          }
 
          hb_dynsymNew( pSymbol, pNewSymbols );
+         //TraceLog( NULL, "Module: %s Sym: %s pModuleSymbols: %p pNewSymbols: %p\n", szModuleName, pSymbol->szName, pSymbol->pDynSym->pModuleSymbols, pNewSymbols );
       }
    }
 
@@ -9492,13 +9556,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char *
    return pNewSymbols;
 }
 
-HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbols initialization */
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   va_list ap;
-   USHORT uiModuleSymbols;
-   int iPCodeVer = 0;
-   char *szModule;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 
 #ifdef HB_THREAD_SUPPORT
@@ -9506,54 +9565,11 @@ HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbo
    hb_threadInit();
 #endif
 
-   va_start( ap, pSymbols );
-
-      uiModuleSymbols = (USHORT) va_arg( ap, int );
-      szModule = va_arg( ap, char * );
-
-      if( szModule )
-      {
-         int iLen = strlen( szModule );
-
-         if( ( iLen > 2 && szModule[ iLen - 2 ] == '.' ) ||
-             ( iLen > 3 && szModule[ iLen - 3 ] == '.' ) ||
-             ( iLen > 4 && szModule[ iLen - 4 ] == '.' ) )
-         {
-            iPCodeVer = va_arg( ap, int );
-         }
-         else
-         {
-            szModule = NULL;
-         }
-      }
-
-   va_end( ap );
-
    if( iPCodeVer != HB_PCODE_VER )
    {
       char szBuff[ 512 ];
       char szPCode[ 12 ];
 
-      if( !szModule )
-      {
-         USHORT ui;
-         for( ui = 0; ui < uiModuleSymbols; ui++ )
-         {
-            if( pSymbols[ui].value.pFunPtr )
-            {
-               break;
-            }
-         }
-         if( ui == uiModuleSymbols )
-         {
-            sprintf( szBuff, "Program with 1st sym: %s", pSymbols[0].szName );
-         }
-         else
-         {
-            sprintf( szBuff, "Program with 1st fun: %s", pSymbols[ui].szName );
-         }
-         szModule = szBuff;
-      }
       sprintf( szPCode, "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
@@ -9562,31 +9578,34 @@ HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ) /* module symbo
                       "Please recompile.\n", szModule, szPCode );
    }
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,
-                                s_fCloneSym, s_fCloneSym )->pModuleSymbols;
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_fCloneSym, s_fCloneSym, pGlobals );
 }
 
 /* hvm support for pcode DLLs */
 
-HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, ... )
+HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer )
 {
-   va_list ap;
-   USHORT uiModuleSymbols;
-   char *szModule;
-
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
 #ifdef HB_THREAD_SUPPORT
    /* initialize internal mutex for MT mode */
    hb_threadInit();
 #endif
-   va_start( ap, pSymbols );
-      uiModuleSymbols = (USHORT) va_arg( ap, int );
-      szModule = va_arg( ap, char * );
-   va_end( ap );
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule,
-                                TRUE, s_fCloneSym )->pModuleSymbols;
+   if( iPCodeVer != HB_PCODE_VER )
+   {
+      char szBuff[ 512 ];
+      char szPCode[ 12 ];
+
+      sprintf( szPCode, "%i", iPCodeVer );
+
+      hb_errInternal( HB_EI_ERRUNRECOV,
+                      "'%s' was compiled by older version, "
+                      "PCODE version %s is no longer supported - "
+                      "Please recompile.\n", szModule, szPCode );
+   }
+
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, NULL )->pSymbolTable;
 }
 
 HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
@@ -9635,11 +9654,11 @@ static void hb_vmDoInitStatics( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_INITEXIT )
             {
-               hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+               hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
                hb_vmDo( 0 );
             }
@@ -9668,11 +9687,11 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_EXIT )
             {
-               hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+               hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
                hb_vmDo( 0 );
 
@@ -9705,7 +9724,7 @@ static void hb_vmDoInitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            HB_SYMBOLSCOPE scope = ( pLastSymbols->pModuleSymbols + ui )->scope.value & HB_FS_INITEXIT;
+            HB_SYMBOLSCOPE scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
 
             if( scope == HB_FS_INIT )
             {
@@ -9715,7 +9734,7 @@ static void hb_vmDoInitFunctions( void )
                int i;
                int iArgCount;
 
-               hb_vmPushSymbol( pLastSymbols->pModuleSymbols + ui );
+               hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
 
                iArgCount = 0;
@@ -9746,7 +9765,7 @@ PSYMBOLS hb_vmFindModule( PHB_SYMB pSymbols )
 
    do
    {
-      if( pLastSymbols->pModuleSymbols == pSymbols )
+      if( pLastSymbols->pSymbolTable == pSymbols )
       {
          return pLastSymbols;
       }
@@ -9774,6 +9793,27 @@ PSYMBOLS hb_vmFindModuleByName( char *szModuleName )
       pLastSymbols = pLastSymbols->pNext;
 
    } while( pLastSymbols );
+
+   return NULL;
+}
+
+static PHB_SYMB hb_vmFindSymInModule( PSYMBOLS pModuleSymbols, const char *szName )
+{
+   if( pModuleSymbols )
+   {
+      PHB_SYMB pSymbolTable = pModuleSymbols->pSymbolTable;
+      USHORT ui;
+
+      for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ++ui )
+      {
+         PHB_SYMB pSymbol = pSymbolTable + ui;
+
+         if( strcmp( pSymbol->szName, szName ) == 0 )
+         {
+            return pSymbol;
+         }
+      }
+   }
 
    return NULL;
 }
@@ -10352,14 +10392,17 @@ HB_FUNC( HB_SAVEBLOCK )
 
    if( pBlock && pBlock->item.asBlock.value->uiLocals == 0 )
    {
-      PSYMBOLS pModuleSymbols = pBlock->item.asBlock.value->pSymbols ? hb_vmFindModule( pBlock->item.asBlock.value->pSymbols ) : NULL;
+      PSYMBOLS pModuleSymbols = HB_SYM_GETMODULESYM( pBlock->item.asBlock.value->symbol );
 
-      hb_arrayNew( &( HB_VM_STACK.Return ), 4 );
+      hb_arrayNew( &( HB_VM_STACK.Return ), 7 );
 
       hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols ? pModuleSymbols->szModuleName : "" );
       hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 4 ), pBlock->item.asBlock.value->uiClass );
+      hb_itemPutC( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 5 ), pBlock->item.asBlock.value->symbol->szName );
+      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 6 ), pBlock->item.asBlock.value->lineno );
+      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 7 ), pBlock->item.asBlock.statics );
    }
    else
    {
@@ -10373,45 +10416,57 @@ HB_FUNC( HB_RESTOREBLOCK )
 
    PHB_ITEM pBlockAsArray = hb_param( 1, HB_IT_ARRAY );
 
-   if ( pBlockAsArray && hb_arrayLen( pBlockAsArray ) == 4 )
+   if ( pBlockAsArray && ( hb_arrayLen( pBlockAsArray ) == 4 || hb_arrayLen( pBlockAsArray ) == 7 ) )
    {
-      PSYMBOLS pModuleSymbols;
       HB_ITEM_NEW( ModuleName );
       HB_ITEM_NEW( PCode );
       HB_ITEM_NEW( ParamCount );
       HB_ITEM_NEW( ClassH );
+      HB_ITEM_NEW( ProcName );
+      HB_ITEM_NEW( ProcLine );
+      HB_ITEM_NEW( iStatics );
 
       hb_arrayGet( pBlockAsArray, 1, &ModuleName );
       hb_arrayGet( pBlockAsArray, 2, &PCode );
       hb_arrayGet( pBlockAsArray, 3, &ParamCount );
       hb_arrayGet( pBlockAsArray, 4, &ClassH );
+      hb_arrayGet( pBlockAsArray, 5, &ProcName );
+      hb_arrayGet( pBlockAsArray, 6, &ProcLine );
+      hb_arrayGet( pBlockAsArray, 7, &iStatics );
 
-      if( ModuleName.type & HB_IT_STRING && PCode.type & HB_IT_STRING && ParamCount.type == HB_IT_INTEGER && ClassH.type == HB_IT_INTEGER )
+      if( HB_IS_STRING( &ModuleName ) && HB_IS_STRING( &PCode ) && HB_IS_INTEGER( &ParamCount ) && HB_IS_INTEGER( &ClassH ) )
       {
-         PHB_ITEM * pBase = hb_stackGetBase(1);
+         PHB_ITEM *pBase = hb_stackGetBase(1);
          HB_ITEM Block;
-
-         pModuleSymbols = hb_vmFindModuleByName( ModuleName.item.asString.value );
 
          Block.type = HB_IT_BLOCK;
          Block.item.asBlock.value = hb_codeblockMacroNew( (BYTE *) ( PCode.item.asString.value ), ( USHORT )PCode.item.asString.length );
 
-         Block.item.asBlock.value->uLen     = (USHORT) PCode.item.asString.length;
-         Block.item.asBlock.value->pSymbols = pModuleSymbols ? pModuleSymbols->pModuleSymbols : NULL;
-         Block.item.asBlock.paramcnt        = ParamCount.item.asInteger.value;
-         Block.item.asBlock.value->uiClass  = ClassH.item.asInteger.value;
+         Block.item.asBlock.value->uLen    = (USHORT) PCode.item.asString.length;
+         Block.item.asBlock.value->uiClass = ClassH.item.asInteger.value;
 
-         Block.item.asBlock.statics = HB_VM_STACK.iStatics;
+         Block.item.asBlock.paramcnt = ParamCount.item.asInteger.value;
 
-         if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )
+         if( HB_IS_STRING( &ProcName ) && HB_IS_INTEGER( &ProcLine ) && HB_IS_INTEGER( &iStatics ) )
          {
-            Block.item.asBlock.value->procname = ( *( pBase + 1 ) )->item.asBlock.value->procname;
+            Block.item.asBlock.value->symbol = hb_vmFindSymInModule( hb_vmFindModuleByName( ModuleName.item.asString.value ), ProcName.item.asString.value );
+            Block.item.asBlock.value->lineno = ProcLine.item.asInteger.value;
+
+            Block.item.asBlock.statics = iStatics.item.asInteger.value;
+         }
+         else if( ( *( pBase + 1 ) )->type == HB_IT_BLOCK )
+         {
+            Block.item.asBlock.value->symbol = ( *( pBase + 1 ) )->item.asBlock.value->symbol;
             Block.item.asBlock.value->lineno = ( *( pBase + 1 ) )->item.asBlock.value->lineno;
+
+            Block.item.asBlock.statics = HB_VM_STACK.iStatics;
          }
          else
          {
-            Block.item.asBlock.value->procname = ( *pBase )->item.asSymbol.value->szName;
+            Block.item.asBlock.value->symbol = ( *pBase )->item.asSymbol.value;
             Block.item.asBlock.value->lineno = ( *pBase )->item.asSymbol.lineno;
+
+            Block.item.asBlock.statics = HB_VM_STACK.iStatics;
          }
 
          //TraceLog( NULL, "Proc: %s Line %i Self: %p\n", Block.item.asBlock.value->procname, Block.item.asBlock.value->lineno, Block.item.asBlock.value->pSelfBase );
@@ -11131,18 +11186,18 @@ HB_EXPORT BOOL hb_xvmPopVariable( PHB_SYMB pSymbol )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+HB_EXPORT void hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlockShort(%p, %p)", pCode, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlockShort(%p, %p)", pCode));
 
-   hb_vmPushBlockShort( pCode, usSize, FALSE, pSymbols, pGlobals );
+   hb_vmPushBlockShort( pCode, usSize, FALSE );
 }
 
-HB_EXPORT void hb_xvmPushBlock( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+HB_EXPORT void hb_xvmPushBlock( const BYTE * pCode, USHORT usSize )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlock(%p, %p)", pCode, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmPushBlock(%p, %p)", pCode));
 
-   hb_vmPushBlock( pCode, usSize, FALSE, pSymbols, pGlobals );
+   hb_vmPushBlock( pCode, usSize, FALSE );
 }
 
 HB_EXPORT void hb_xvmPushSelf( void )

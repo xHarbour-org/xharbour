@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.203 2007/04/12 03:17:17 andresreyesh Exp $
+ * $Id: classes.c,v 1.204 2007/04/15 05:56:33 andresreyesh Exp $
  */
 
 /*
@@ -447,68 +447,69 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          if( HB_IS_OBJECT( pCaller ) )
          {
             PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
+            PSYMBOLS pCallerClassModuleSymbols = HB_SYM_GETMODULESYM( pCallerClass->pClsSymbol );
+            PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
 
-            if( pRealClass )
+            if( pRealClassModuleSymbols == NULL || pCallerClassModuleSymbols == NULL )
             {
-               if( pRealClass->pModuleSymbols == NULL || pCallerClass->pModuleSymbols == NULL )
-               {
-                  // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
-               }
-               else if( pRealClass->pModuleSymbols == pCallerClass->pModuleSymbols )
-               {
-                  // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
-                  return TRUE;
-               }
-               #ifdef DEBUG_SCOPE
-               else
-               {
-                  printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, pCallerClass->pModuleSymbols->szModuleName );
-               }
-               #endif
+               //TraceLog( NULL, "Oops! No Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
             }
+            else if( pRealClassModuleSymbols == pCallerClassModuleSymbols )
+            {
+               //TraceLog( NULL, "Same as Parent Module: %s\n", pRealClassModuleSymbols->szModuleName );
+               return TRUE;
+            }
+            #ifdef DEBUG_SCOPE
+              else
+              {
+                 printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClassModuleSymbols->szModuleName, pCallerClassModuleSymbols->szModuleName );
+              }
+            #endif
          }
          else if( HB_IS_BLOCK( pCaller ) )
          {
-            PSYMBOLS pBlockModuleSymbols = hb_vmFindModule( pCaller->item.asBlock.value->pSymbols );
+            PSYMBOLS pBlockModuleSymbols = HB_SYM_GETMODULESYM( pCaller->item.asBlock.value->symbol );
+            PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
 
-            if( pRealClass->pModuleSymbols == NULL || pBlockModuleSymbols == NULL )
+            if( pRealClassModuleSymbols == NULL || pBlockModuleSymbols == NULL )
             {
-               // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->procname );
+               //TraceLog( NULL, "Oops! NO Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->symbol->szName );
             }
             else
             {
                #ifdef DEBUG_SCOPE
-                  printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, pBlockModuleSymbols->szModuleName );
+                  printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClassModuleSymbols->szModuleName, pBlockModuleSymbols->szModuleName );
                #endif
 
                // Same module as the module where the Super Method is defined.
-               if( pRealClass->pModuleSymbols && pRealClass->pModuleSymbols == pBlockModuleSymbols )
+               if( pRealClassModuleSymbols && pRealClassModuleSymbols == pBlockModuleSymbols )
                {
-                  // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
+                  //TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClassModuleSymbols )->szModuleName );
                   return TRUE;
                }
             }
          }
          else
          {
-            if( pRealClass->pModuleSymbols != NULL &&
-                (*pBase)->item.asSymbol.value->pDynSym != NULL &&
-                (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols != NULL )
+            PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
+            PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
+
+            if( pRealClassModuleSymbols && pModuleSymbols )
             {
                #ifdef DEBUG_SCOPE
-                  printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClass->pModuleSymbols->szModuleName, (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName );
+                  printf( "SuperModule: '%s' CallerModule: '%s'\n", pRealClassModuleSymbols->szModuleName, pModuleSymbols->szModuleName );
                #endif
 
                // Same module as the module where the Super Method is defined.
-               if( pRealClass->pModuleSymbols == (*pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+               if( pRealClassModuleSymbols == pModuleSymbols )
                {
-                  // TraceLog( NULL, "Same as Parent Module: %s\n", hb_vmFindModule( pRealClass->pModuleSymbols )->szModuleName );
+                  //TraceLog( NULL, "Same as Parent Module: %s\n", pRealClassModuleSymbols->szModuleName );
                   return TRUE;
                }
             }
             else
             {
-               // TraceLog( NULL, "Oops! Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
+               //TraceLog( NULL, "Oops! NO Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, (*pBase)->item.asSymbol.value->szName );
             }
          }
 
@@ -532,7 +533,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
 
                if( pCaller->item.asBlock.value->uiClass == 0 )
                {
-                  szCaller = pCaller->item.asBlock.value->procname;
+                  szCaller = pCaller->item.asBlock.value->symbol->szName;
 
                   pAt = strchr( szCaller, ':' );
 
@@ -783,14 +784,6 @@ HB_EXPORT BOOL hb_clsIsParent(  USHORT uiClass, char * szParentName )
    return FALSE;
 }
 
-HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
-{
-   if ( pItem && HB_IS_ARRAY( pItem ) )
-      return pItem->item.asArray.value->uiClass;
-   else
-      return 0;
-}
-
 /* ================================================ */
 
 /*
@@ -802,11 +795,11 @@ HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
 HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
 {
    char * szClassName;
-   USHORT uiClass;
+   USHORT uiClass = hb_objClassH( pObject );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetClsName(%p)", pObject));
 
-   if( ( uiClass = hb_objClassH( pObject ) ) > 0 )
+   if( uiClass > 0 )
    {
       szClassName = ( s_pClasses + uiClass - 1 )->szName;
    }
@@ -990,12 +983,24 @@ HB_EXPORT ULONG hb_objGetOpOver( const PHB_ITEM pObject )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetOpOver(%p)", pObject ));
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       return ( s_pClasses + ( uiClass - 1 ) )->fOpOver;
    }
 
    return 0;
+}
+
+HB_EXPORT PHB_SYMB hb_objGetClsSymbol( const PHB_ITEM pObject )
+{
+   USHORT uiClass = hb_objClassH( pObject );
+
+   if( uiClass )
+   {
+      return ( s_pClasses + ( uiClass - 1 ) )->pClsSymbol;
+   }
+
+   return NULL;
 }
 
 static USHORT hb_clsFindMethod( PHB_DYNS pMsg, PCLASS pClass, int * piPos )
@@ -1122,7 +1127,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       pMethod = hb_objGetpMthd( pMsg, uiClass );
 
@@ -1138,6 +1143,13 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
             pFunction = hb___msgVirtual;
             *bSymbol  = FALSE;
          }
+
+         #if 0
+            else if( *bSymbol )
+            {
+               //TraceLog( NULL, "FOUND Method: [%s]%s:%s Defined in: %s\n", hb_objGetRealClsName( pObject, pMessage->szName ), s_pClasses[ uiClass - 1 ].szName, pMessage->szName, pMethod->pModuleSymbols ? pMethod->pModuleSymbols->szModuleName : "" );
+            }
+         #endif
 
          (HB_VM_STACK.pMethod) = pMethod ;
 
@@ -1284,7 +1296,7 @@ HB_EXPORT PMETHOD hb_objGetpMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       return hb_objGetpMthd( pMessage->pDynSym, uiClass );
    }
@@ -1638,6 +1650,9 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
             pNewMeth->uiData = 0;
+            pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
+            //TraceLog( NULL, "NEW Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
+
             pClass->uiScope |= ( uiScope & HB_OO_CLSTP_CLASSCTOR );
             break;
 
@@ -1775,6 +1790,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiData = ( USHORT ) pClass->pInlines->item.asArray.value->ulLen + 1 ;
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
+            pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( ( (PHB_ITEM ) pFunc_or_BlockPointer )->item.asBlock.value->symbol );
+            //TraceLog( NULL, "NEW INLINE Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
 
             ((PHB_ITEM) pFunc_or_BlockPointer)->item.asBlock.value->uiClass = uiClass;
 
@@ -1800,6 +1817,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          case HB_OO_MSG_ONERROR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
+            pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
+            //TraceLog( NULL, "NEW ERROR Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
             pClass->pFunError   = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pClass->uiScope    |= HB_OO_CLS_ONERROR_SYMB;
             break;
@@ -1807,6 +1826,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          case HB_OO_MSG_DESTRUCTOR:
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
+            pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
+            //TraceLog( NULL, "NEW DESTRUCTOR Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
             pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pClass->uiScope    |= HB_OO_CLS_DESTRUC_SYMB;
             break;
@@ -1824,15 +1845,20 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             hb_errInternal( HB_EI_CLSINVMETHOD, NULL, "__clsAddMsg", NULL );
             break;
       }
+
 #ifdef HB_THREAD_SUPPORT
-      if( ( uiScope & HB_OO_CLSTP_SYNC ) &&
-          ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE ||
-            wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
+      if( ( uiScope & HB_OO_CLSTP_SYNC ) && ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE || wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
       {
          // Create mutex.
          pClass->pMtxSync = hb_threadMutexCreate( NULL );
       }
 #endif
+
+      if( pNewMeth->pModuleSymbols == NULL )
+      {
+         pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( pClass->pClsSymbol );
+         //TraceLog( NULL, "NEW Method: %s:%s defaulted to CLASS Module: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
+      }
    }
 }
 
@@ -2016,7 +2042,7 @@ USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
 }
 
 /*
- * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [ahSuper] )
+ * <hClass> := __clsNew( <cClassName>, <nDatas>, <nMethods>, [ahSuper], [nBase] )
  *
  * Create a new class
  *
@@ -2024,16 +2050,17 @@ USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
  * <nDatas>     Number of DATAs in the class
  * <nMethods>   Number of additional Methods in the class
  * <ahSuper>    Optional handle(s) of superclass(es)
+ * <nBase>      Proc level of real class creator
  */
 HB_FUNC( __CLSNEW )
 {
    HB_THREAD_STUB_API
    PCLASS pNewCls;
    PHB_ITEM pahSuper = hb_param( 4, HB_IT_ARRAY );
+   PHB_ITEM *pBase = hb_stackGetBase( hb_parni( 5 ) + 1 );
    USHORT i, j, uiSuper = 0;
    USHORT uiKnownMethods = ( hb_parni(2) * 2 ) + hb_parni(3);
    USHORT uiClass;
-
 
    HB_TRACE( HB_TR_DEBUG, ( "__ClsNew( %s, %i, %i, %i )\n", hb_parcx(1), hb_parni(2), hb_parni(3), hb_itemSize( hb_param(4, HB_IT_ARRAY) ) ) );
 
@@ -2064,7 +2091,7 @@ HB_FUNC( __CLSNEW )
    pNewCls->uiDatas = 0;
    pNewCls->uiMethods = 0;
    pNewCls->uiDatasShared = 0;
-   pNewCls->pModuleSymbols = NULL;
+   pNewCls->pClsSymbol = NULL;
    pNewCls->fOpOver = 0;
    pNewCls->uiScope = 0;
    pNewCls->uiDataInitiated = 0;
@@ -2382,6 +2409,18 @@ HB_FUNC( __CLSNEW )
          hb_cls_uiHashClass = uiClass;
       }
    }
+
+   if( pBase )
+   {
+      pNewCls->pClsSymbol = (*pBase)->item.asSymbol.value;
+      //TraceLog( NULL, "NEW Class: '%s' defined in: %s->%s\n", pNewCls->szName, HB_SYM_GETMODULESYM( pNewCls->pClsSymbol ) ? HB_SYM_GETMODULESYM( pNewCls->pClsSymbol )->szModuleName : "", pNewCls->pClsSymbol->szName );
+   }
+   #if 0
+      else
+      {
+         //TraceLog( NULL, "NO MODULE!!! for NEW Class: '%s' defined in Function: %s\n", pNewCls->szName, pNewCls->pClsSymbol->szName );
+      }
+   #endif
 
    hb_retni( uiClass );
 }
@@ -3348,7 +3387,7 @@ HB_EXPORT USHORT hb_objClassH( PHB_ITEM pObject )
          uiClass = 0;
    }
 
-   return uiClass;
+   return uiClass && uiClass <= s_uiClasses ? uiClass : 0;
 }
 
 
@@ -3725,7 +3764,7 @@ HARBOUR hb___msgGetClsData( void )
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       hb_arrayGet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, hb_stackReturnItem() );
    }
@@ -3748,7 +3787,7 @@ HARBOUR hb___msgSetClsData( void )
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       hb_arraySet( s_pClasses[ uiClass - 1 ].pClassDatas, (HB_VM_STACK.pMethod)->uiData, pReturn );
    }
@@ -3888,7 +3927,7 @@ static HARBOUR hb___msgDelegate( void )
    {
       uiClass = hb_objClassH( pSelf );
 
-      if( uiClass && uiClass <= s_uiClasses )
+      if( uiClass )
       {
          pClass = s_pClasses + uiClass - 1;
 
@@ -4231,7 +4270,7 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
       USHORT uiAt = pClass->uiMethods;
@@ -4277,7 +4316,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       PCLASS pClass = s_pClasses + ( uiClass - 1 );
       USHORT uiAt = pClass->uiMethods;
@@ -4326,7 +4365,7 @@ HB_EXPORT PHB_DYNS hb_clsSymbolFromFunction( PHB_ITEM pObject, PHB_FUNC pFunctio
 
    uiClass = hb_objClassH( pObject );
 
-   if( uiClass && uiClass <= s_uiClasses )
+   if( uiClass )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
       USHORT ui = pClass->uiMethods;
@@ -4433,21 +4472,11 @@ HB_FUNC( __CLSGETHANDLEFROMNAME )
 
 void hb_clsSetModule( USHORT uiClass )
 {
-   if( uiClass )
+   HB_THREAD_STUB
+
+   if( uiClass && uiClass <= s_uiClasses )
    {
-      HB_THREAD_STUB_STACK
-      PHB_ITEM pBase = hb_stackBaseItem();
-
-      if( pBase->item.asSymbol.value->pDynSym )
-      {
-         ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols = pBase->item.asSymbol.value->pDynSym->pModuleSymbols;
-
-         #if 0
-            printf( "Class: '%s' Caller: '%s' Module: '%s'\n", ( s_pClasses + ( uiClass - 1 ) )->szName,
-                                                               pBase->item.asSymbol.value->szName,
-                                                               ( s_pClasses + ( uiClass - 1 ) )->pModuleSymbols->szModuleName );
-         #endif
-      }
+      ( s_pClasses + ( uiClass - 1 ) )->pClsSymbol = HB_GETSYM();
    }
 }
 
@@ -4637,12 +4666,12 @@ HB_FUNC( __CLSINSTNAME )
       PHB_DYNS pDynSym;
 
       uiClass = hb_clsGetHandleFromName( szClassName );
-      // TraceLog( NULL, "uiClass: %i\n", uiClass );
+      //TraceLog( NULL, "uiClass: %i\n", uiClass );
 
       if( uiClass && uiClass <= s_uiClasses )
       {
          hb_clsInst( uiClass, hb_stackReturnItem() );
-         // TraceLog( NULL, "INSTANCIATE uiClass: %i Return: %i\n", uiClass, hb_stackReturnItem()->type );
+         //TraceLog( NULL, "INSTANCIATE uiClass: %i Return: %i\n", uiClass, hb_stackReturnItem()->type );
          return;
       }
 
@@ -4650,7 +4679,7 @@ HB_FUNC( __CLSINSTNAME )
 
       if( pDynSym && pDynSym->pSymbol->value.pFunPtr )
       {
-         // TraceLog( NULL, "Class Function: %s\n", szClassName );
+         //TraceLog( NULL, "Class Function: %s\n", szClassName );
          hb_vmPushSymbol( pDynSym->pSymbol );
 
          hb_vmPushNil();

@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.69 2007/02/20 16:16:55 ronpinkas Exp $
+ * $Id: macro.c,v 1.70 2007/03/25 06:12:51 walito Exp $
  */
 
 /*
@@ -212,7 +212,7 @@ void HB_EXPORT hb_macroRun( HB_MACRO_PTR pMacro )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_macroRun(%p)", pMacro));
 
-   hb_vmExecute( pMacro->pCodeInfo->pCode, NULL, NULL );
+   hb_vmExecute( pMacro->pCodeInfo->pCode, NULL );
 }
 
 /* Evaluate a macro-compiled code and discard it

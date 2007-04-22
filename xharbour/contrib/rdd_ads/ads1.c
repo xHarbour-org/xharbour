@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.117 2007/02/13 19:02:23 druzus Exp $
+ * $Id: ads1.c,v 1.118 2007/03/28 02:43:42 ronpinkas Exp $
  */
 
 /*
@@ -4707,6 +4707,8 @@ static void hb_adsRddInit( void * cargo )
       hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
    }
 }
+
+static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( ads1__InitSymbols )
 { "ADS",                 {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( ADS )}, NULL },

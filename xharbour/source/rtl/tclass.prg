@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.22 2007/04/15 05:56:33 andresreyesh Exp $
+ * $Id: tclass.prg,v 1.23 2007/04/15 18:47:55 andresreyesh Exp $
  */
 
 /*
@@ -177,11 +177,11 @@ STATIC PROCEDURE Create( MetaClass )
    IF nLen == 0
       //Maybe this class is a super class, and the oop engine store
       //in the first element a real self, when call a super method
-      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs )
+      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs, , 1 )
       nDataBegin := 1
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
-      
+
          IF HB_ISNUMERIC( cDato )
             ahSuper[ HB_EnumIndex() ]   := cDato
             ::acSuper[ HB_EnumIndex() ] := __CLASSNAME( cDato )
@@ -193,13 +193,13 @@ STATIC PROCEDURE Create( MetaClass )
                ahSuper[ HB_EnumIndex() ] := hSuper
             ENDIF
          ENDIF
-         
+
          IF ahSuper[ HB_EnumIndex() ] == 0
             Throw( ErrorNew( "TClass", 0, 1003, ProcName(), "Could not locate super: " + cDato, HB_aParams() ) )
          ENDIF
       NEXT
 
-      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper )
+      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper, 1 )
 
       FOR EACH cDato IN ahSuper
          nDataBegin   += __cls_CntData( cDato )        // Get offset for new Datas
@@ -462,37 +462,37 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
    LOCAL lOldScope, nPos
 
    IF __SetClassAutoInit() .AND. Len( aParams ) > 0
-     // Set class scoping off
-     lOldScope := __SetClassScope( .F. )
+      // Set class scoping off
+      lOldScope := __SetClassScope( .F. )
 
-       // Get method full list but limited to those with class type as constructor
-       aConstrMethods  := __objGetMsgFullList( oClass, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
+      // Get method full list but limited to those with class type as constructor
+      aConstrMethods  := __objGetMsgFullList( oClass, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
 
-       // Search the constructor which is not derived from a parent class
-       //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
-       //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
-       nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
+      // Search the constructor which is not derived from a parent class
+      //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
+      //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
+      nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
 
-     // Revert class scoping
-     __SetClassScope( lOldScope )
+      // Revert class scoping
+      __SetClassScope( lOldScope )
 
-     IF nPos > 0
-        // Exec method - i have found the constructor in this class
-        //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
-        RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
-     ELSE
-        // Get LAST constructor from parent (NOTE: this can be a default and faster way,
-        // but i prefer check rightly before)
-        IF !Empty( aConstrMethods )
-           //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
-           RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
-        ELSE
-           //TraceLog( "Call new default constructor:", "NEW" )
-           // If i have no constructor i call NEW method that is defined is HBOBJECT class
-           //HB_ExecFromArray( oClass, "NEW", aParams )
-           Alert( "Warning! Class function '" + oClass:ClassName + "' called with arguments, but no constructor found." )
-        ENDIF
-     ENDIF
+      IF nPos > 0
+         // Exec method - i have found the constructor in this class
+         //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
+         RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
+      ELSE
+         // Get LAST constructor from parent (NOTE: this can be a default and faster way,
+         // but i prefer check rightly before)
+         IF !Empty( aConstrMethods )
+            //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
+            RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
+         ELSE
+            //TraceLog( "Call new default constructor:", "NEW" )
+            // If i have no constructor i call NEW method that is defined is HBOBJECT class
+            //HB_ExecFromArray( oClass, "NEW", aParams )
+            Alert( "Warning! Class function '" + oClass:ClassName + "' called with arguments, but no constructor found." )
+         ENDIF
+      ENDIF
 
    ENDIF
 

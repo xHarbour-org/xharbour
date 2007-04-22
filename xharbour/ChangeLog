@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5457 2007/04/20 03:41:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5458 2007/04/20 09:41:29 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,96 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-22 18:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbclass.ch
+  * include/classes.h
+  * include/hbapi.h
+  * include/hbinit.h
+  * include/hbsetup.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * include/hbxvm.h
+  * source/compiler/genc.c
+  * source/compiler/gencc.c
+  * source/vm/classes.c
+  * source/vm/codebloc.c
+  * source/vm/dynsym.c
+  * source/vm/errorapi.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/vm/maindllp.c
+  * source/vm/proc.c
+  * source/vm/runner.c
+  * Global change profile:
+    ! Optimized prg function call speed by avoiding pGlobals argument to hb_vmExecute()
+    ! Optimized memory usage by:
+      - Above reduces 4 bytes * deepest stack nesting
+      - Removed member pModuleSymbols fro  * METHOD structure (every DATA * 2 + every METHOD definition of every class defnition * 4 bytes)
+      - Removed pSymbols and pGlobals fro  * HB_CODEBLOCK (every codeblock definition + every inline method * 8 bytes)
+                /* also renamed procname to symbol */
+    * Changed HB_PCODE_VER to 8
+    * Converted pDynSy  * of HB_SYMB to a NAMELESS union of pDynSy  * and ppModuleSymbols
+      /*
+         Tested nameless union compilation under MSVC, BCC, and xCC (POCC)
+         please advise of compilation problem, if so we'll need to name the union,
+         which wiill force sadditional syntax changes in few source files.
+       */
+    * Renamed pModuleSymbols memeber of SYMBOLS to pSymbolTable to avoid confusion
+    + Added memeber pGlobals ro SYMBOLS (4 bytes * prg compiled module)
+    * hb_vmProcessSymbols() now returns the Symbole Table Container (PSYMBOLS)
+    * hb_[x]vmPushBlock[short] takes 2 less arguments pSymbols and pGlobals
+    * hb_[x]vmPushMacroBlock takes 1 less argument pSymbols
+    * hb_codeblockNew() takes 1 less argument pGlobals
+    * hb_vmExecute() takes 1 less argument pGlobals
+    * Default scope of new Dynamic Symbol to HB_FS_PUBLIC
+    * Corrected Symbol Table of loaded HRB files to have HB_FS_LOCAL scope for locallly defined functions
+    * Corrected loaded hrb files to have correct module name
+    * HB_P_PUSH|POPGLOBAL[REF] now has minor overhead to resolve pGlobals fro  * cuurent pModuleSymbols container
+    * Class creation and data/methods definition has minor overhead to resolve pModuleSymbols and store symbol which made the definition.
+      /*
+         Stack trace should now be completley accurate, showing correct source code location
+         of any Method/Inline even for complex inheritance
+       */
+    * hb_vmSend() has minor overhead to force correct module context for object methods.
+    * hb_vmPushSymbol() removed minor overhead of setting codeblock module context
+    * hb_vmDoBlock() has minor overhead to force correct module context of codeblock instead of more frequently executed hb_pushSymbol().
+    * hb_vmRegisterSymbols() will now detect and warn registed public function which was eliminated by linker due to same symbol in prior module
+    * Extended HB_SaveBlock()/HB_RestoreBlock() functionality to support save/restore in different compilation modulles.
+    + Added hb_objGetClassSymbol( PHB_ITE  * pObject )
+    + hb_vmFindSymInModule()
+    - Removed redundant hb_objGetClass() - see hb_objClassH()
+
+  * contrib/libnf/fttext.c
+  * contrib/rdd_ads/ads1.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/pp/pplib3.c
+  * source/rtl/version.c
+  * source/vm/cmdarg.c
+  * source/vm/initsymb.c
+    * Updated to compile after above changes
+
+  * source/rtl/trace.c
+    + Added static s_bEmpty to allow TraceLog() to be retain output sent before hb_vmInit()
+
+  * source/rtl/tclass.prg
+    + Added argument nBase as 1 to __ClsNew()
+
+  * source/rtl/tobject.prg
+    * Minor optimizations
+
+  * tests/savebloc.prg
+  + tests/restbloc.prg
+    * Updated to sample persistance of Codeblocks across different compilation modules
+
+  /* Sorry, if I may have missed some changes. */
 
 2007-04-20 11:24 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/hbapicdp.h
@@ -21,13 +111,13 @@
   * source/rtl/shadow.c
   * source/rtl/trim.c
   * source/vm/debug.c
-    * changed HB_FUNCNAME( <name> )() to HB_FUNC_EXEC( <name> ) 
+    * changed HB_FUNCNAME( <name> )() to HB_FUNC_EXEC( <name> )
 
 2007-04-19 23:39 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/exproptc.c
   * source/macro/macroc.c
   * include/hbexprc.c
-    ! Fixed silly but bnasty typos in last commit to HB_P_SENDWITH[SHORT] which broke few compunded operations like :n++ ++:n
+    ! Fixed silly but nasty typos in last commit to HB_P_SENDWITH[SHORT] which broke few compunded operations like :n++ ++:n
 
 2007-04-19 16:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * harbour/source/common/hbver.c

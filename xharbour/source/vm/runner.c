@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.47 2006/05/16 22:57:08 druzus Exp $
+ * $Id: runner.c,v 1.48 2006/08/13 20:56:06 druzus Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ typedef struct
 #define SYM_NOT_FOUND 0xFFFFFFFF                /* Symbol not found.        */
 
 HB_EXTERN_BEGIN
-HB_EXPORT PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize );
+HB_EXPORT PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb );
 HB_EXPORT PHRB_BODY hb_hrbLoadFromFile( char* szHrb );
 HB_EXPORT void hb_hrbDo( PHRB_BODY pHrbBody, int argc, char * argv[] );
 HB_EXPORT void hb_hrbUnLoad( PHRB_BODY pHrbBody );
@@ -175,7 +175,7 @@ HB_FUNC( __HRBLOAD )
       /* If parameter string */
       if ( fileOrBody && hb_parclen( 1 ) > 4 && strncmp( ( char * ) szHead, ( char * ) fileOrBody, 4 ) == 0  )
       {
-         pHrbBody = hb_hrbLoad( fileOrBody, hb_parclen( 1 ) );
+         pHrbBody = hb_hrbLoad( fileOrBody, hb_parclen( 1 ), NULL );
       }
       else
       {
@@ -537,7 +537,7 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    hb_xfree( pHrbBody );
 }
 
-PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
+PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
 {
    PHRB_BODY pHrbBody = NULL;
    ULONG ulBodyOffset = 0;
@@ -573,14 +573,22 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )  /* Read symbols in .HRB */
       {
-         pSymRead[ ul ].szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
-         pSymRead[ ul ].scope.value  = ( BYTE ) szHrbBody[ulBodyOffset++];
-         pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
-         pSymRead[ ul ].pDynSym = NULL;
+         PHB_SYMB pSymbol = pSymRead + ul;
 
-         if( pHrbBody->ulSymStart == -1 &&
-             ( pSymRead[ ul ].scope.value & HB_FS_FIRST ) != 0 &&
-             ( pSymRead[ ul ].scope.value & HB_FS_INITEXIT ) == 0 )
+         pSymbol->szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
+         pSymbol->scope.value  = ( BYTE ) szHrbBody[ulBodyOffset++];
+         pSymbol->value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
+
+         if( ( pSymbol->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) == 0 )
+         {
+            pSymbol->ppModuleSymbols = &pHrbBody->pModuleSymbols;
+         }
+         else
+         {
+            pSymbol->pDynSym = NULL;
+         }
+
+         if( pHrbBody->ulSymStart == -1 && ( pSymbol->scope.value & HB_FS_FIRST ) != 0 && ( pSymbol->scope.value & HB_FS_INITEXIT ) == 0 )
          {
             pHrbBody->ulSymStart = ul;
          }
@@ -622,7 +630,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             else
             {
                pSymRead[ ul ].value.pCodeFunc = ( PHB_PCODEFUNC ) pDynFunc[ ulPos ].pCodeFunc;
-               pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC; /* | HB_FS_LOCAL; */
+               pSymRead[ ul ].scope.value |= HB_FS_PCODEFUNC | HB_FS_LOCAL;
             }
          }
 
@@ -654,16 +662,15 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
 
       if( pHrbBody )
       {
-         pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead,
-                  ( USHORT ) pHrbBody->ulSymbols, "PCODE_HRB_FILE.hrb", TRUE, FALSE );
+         pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szHrb ? szHrb : "PCODE_HRB.hrb", TRUE, FALSE, NULL );
 
-         if( pHrbBody->pModuleSymbols->pModuleSymbols != pSymRead )
+         if( pHrbBody->pModuleSymbols->pSymbolTable != pSymRead )
          {
             /*
              * Old unused symbol table has been recycled - free the one
              * we allocated and disactivate static initialization [druzus]
              */
-            pHrbBody->pSymRead = pHrbBody->pModuleSymbols->pModuleSymbols;
+            pHrbBody->pSymRead = pHrbBody->pModuleSymbols->pSymbolTable;
 
             for( ul = 0; ul < pHrbBody->ulSymbols; ul++ )
             {
@@ -682,6 +689,8 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize )
             /* initialize static variables */
             hb_hrbInitStatic( pHrbBody );
          }
+
+         //TraceLog( NULL, "Runner registered module: %s\n", pHrbBody->pModuleSymbols->szModuleName );
       }
    }
 
@@ -733,7 +742,7 @@ PHRB_BODY hb_hrbLoadFromFile( char* szHrb )
          hb_fsReadLarge( file, pbyBuffer, ulBodySize );
          pbyBuffer[ ulBodySize ] = '\0';
 
-         pHrbBody = hb_hrbLoad( (char*) pbyBuffer, (ULONG) ulBodySize );
+         pHrbBody = hb_hrbLoad( (char*) pbyBuffer, (ULONG) ulBodySize, szFileName );
 
          hb_xfree( pbyBuffer );
       }

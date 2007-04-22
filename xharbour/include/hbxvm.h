@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.9 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbxvm.h,v 1.10 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -99,8 +99,8 @@ extern HB_EXPORT void   hb_xvmPushGlobalByRef( USHORT uiGlobal, PHB_ITEM** pGlob
 extern HB_EXPORT void   hb_xvmPopGlobal( USHORT uiGlobal, PHB_ITEM** pGlobals );
 extern HB_EXPORT BOOL   hb_xvmPushVariable( PHB_SYMB pSymbol );
 extern HB_EXPORT BOOL   hb_xvmPopVariable( PHB_SYMB pSymbol );
-extern HB_EXPORT void   hb_xvmPushBlock( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
-extern HB_EXPORT void   hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* creates a codeblock */
+extern HB_EXPORT void   hb_xvmPushBlock( const BYTE * pCode, USHORT usSize ); /* creates a codeblock */
+extern HB_EXPORT void   hb_xvmPushBlockShort( const BYTE * pCode, USHORT usSize ); /* creates a codeblock */
 extern HB_EXPORT void   hb_xvmPushSelf( void );
 extern HB_EXPORT void   hb_xvmPushLocal( SHORT iLocal );          /* pushes the containts of a local onto the stack */
 extern HB_EXPORT void   hb_xvmPushLocalByRef( SHORT iLocal );     /* pushes a local by refrence onto the stack */

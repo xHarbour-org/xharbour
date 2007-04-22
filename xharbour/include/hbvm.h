@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.49 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.50 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -95,7 +95,6 @@ extern void HB_EXPORT hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo );
 extern void HB_EXPORT hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo );
 
 /* Harbour virtual machine functions */
-extern HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... ); /* statics symbols initialization */
 extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
 
 extern void hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
@@ -149,8 +148,8 @@ HB_EXPORT extern void    hb_vmPushState( void ); /* push current VM state on sta
 HB_EXPORT extern void    hb_vmPopState( void ); /* pop current VM state from stack */
 
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );
-HB_EXPORT extern PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pSymbols, ... );
-HB_EXPORT extern PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, ... );
+HB_EXPORT extern PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
+HB_EXPORT extern PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
 HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
 HB_EXPORT extern void     hb_vmDoExitFunctions( void );
 HB_EXPORT extern void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );

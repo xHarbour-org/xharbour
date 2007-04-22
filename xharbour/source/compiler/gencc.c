@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.11 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: gencc.c,v 1.12 2007/04/19 13:18:40 walito Exp $
  */
 
 /*
@@ -809,8 +809,7 @@ static HB_GENC_FUNC( hb_p_pushblock )
       else
          fprintf( cargo->yyc, "%d, ", pFunc->pCode[ lPCodePos + 3 + us ] );
    }
-   fprintf( cargo->yyc, " };\n\t\thb_xvmPushBlock( codeblock, %hu, symbols, %s );\n\t}\n",
-            usSize, hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( cargo->yyc, " };\n\t\thb_xvmPushBlock( codeblock, %hu );\n\t}\n", usSize );
 
    return 3 + usSize;
 }
@@ -834,8 +833,7 @@ static HB_GENC_FUNC( hb_p_pushblockshort )
       else
          fprintf( cargo->yyc, "%d, ", pFunc->pCode[ lPCodePos + 2 + us ] );
    }
-   fprintf( cargo->yyc, " };\n\t\thb_xvmPushBlockShort( codeblock, %hu, symbols, %s );\n\t}\n",
-            usSize, hb_comp_pGlobals ? "&pGlobals" : "NULL" );
+   fprintf( cargo->yyc, " };\n\t\thb_xvmPushBlockShort( codeblock, %hu );\n\t}\n", usSize );
 
    return 2 + usSize;
 }

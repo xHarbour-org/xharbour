@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.80 2006/12/11 13:26:26 druzus Exp $
+ * $Id: dbffpt1.c,v 1.81 2007/03/02 02:36:23 druzus Exp $
  */
 
 /*
@@ -2632,7 +2632,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
       {
          pBuffer = ( BYTE * ) hb_xalloc( ulSize + 1 );
       }
-      
+
       if( !pBuffer )
       {
          /* in most cases this means that file is corrupted */
@@ -4735,6 +4735,8 @@ static void hb_dbffptRddInit( void * cargo )
       HB_FUNC_EXEC( _DBF );
    }
 }
+
+static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
 { "DBFFPT",               {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFFPT )},               NULL },

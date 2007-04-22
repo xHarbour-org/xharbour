@@ -1,5 +1,5 @@
 /*
- * $Id: pplib3.c,v 1.1 2006/11/17 12:29:24 druzus Exp $
+ * $Id: pplib3.c,v 1.1 2007/02/27 19:33:44 druzus Exp $
  */
 
 /*
@@ -65,6 +65,8 @@ HB_FUNC_EXTERN( __PP_INIT );
 HB_FUNC_EXTERN( __PP_ADDRULE );
 HB_FUNC_EXTERN( __PP_PROCESS );
 HB_FUNC_EXTERN( __PP_STDRULES );
+
+static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_PPLIB3 )
 { "__PP_INIT",     {HB_FS_PUBLIC}, {HB_FUNCNAME( __PP_INIT )},     NULL },
@@ -132,7 +134,7 @@ HB_FUNC( __PPADDRULE )
       }
    }
 }
-   
+
 HB_FUNC( __PREPROCESS )
 {
    static PHB_DYNS s_pDynSym = NULL;

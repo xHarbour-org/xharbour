@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.24 2007/04/15 19:58:28 ronpinkas Exp $
+ * $Id: tobject.prg,v 1.25 2007/04/17 01:17:42 toninhofwi Exp $
  */
 
 /*
@@ -247,7 +247,7 @@ ENDCLASS
 
 HB_FUNC_STATIC( HBOBJECT_NEW )
 {
-   PHB_DYNS pDynSym  = hb_dynsymGet( "Init" );
+   PHB_DYNS pDynSym  = hb_dynsymGetCase( "INIT" );
    USHORT   uiPCount = hb_pcount(), i;
 
    hb_vmPushSymbol( pDynSym->pSymbol );
@@ -270,7 +270,7 @@ HB_FUNC_STATIC( HBOBJECT_NEW )
     variables.
 */
 
-METHOD copy
+METHOD Copy() //CLASS HB_Object
    LOCAL NewSelf := __clsInst( ::ClassH )
    LOCAL xItem
 
@@ -287,17 +287,17 @@ RETURN NewSelf
     RETURN a copy of the receiver with shallow copies of each instance
 */
 
-METHOD deepCopy
+METHOD DeepCopy() //CLASS HB_Object
 RETURN __objClone( self )
 
 //----------------------------------------------------------------------------//
 
-METHOD IsKindOf( o )
+METHOD IsKindOf( o ) //CLASS HB_Object
    RETURN __ObjDerivedFrom( Self, o )
 
 //----------------------------------------------------------------------------//
 
-METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs )
+METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs ) //CLASS HB_Object
 
    LOCAL nGenCode   := EG_NOMETHOD
 
@@ -317,7 +317,7 @@ METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs )
 HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 {
    PHB_ITEM pBase    = hb_stackBaseItem();
-   PHB_DYNS pDynSym  = hb_dynsymGet( "MsgNotFound" );
+   PHB_DYNS pDynSym  = hb_dynsymGetCase( "MSGNOTFOUND" );
    USHORT   uiPCount = hb_pcount(), i;
 
    hb_vmPushSymbol( pDynSym->pSymbol );
@@ -336,7 +336,7 @@ HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 
 //----------------------------------------------------------------------------//
 
-METHOD MsgNotFound( cMsg )
+METHOD MsgNotFound( cMsg ) //CLASS HB_Object
    RETURN ::Error( "Message not found", __OBJGETCLSNAME( Self ), cMsg, if(substr(cMsg,1,1)=="_",1005,1004) )
 
 #endif

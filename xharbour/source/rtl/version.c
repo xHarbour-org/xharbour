@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.10 2005/10/24 01:04:35 druzus Exp $
+ * $Id: version.c,v 1.11 2005/11/16 12:16:45 druzus Exp $
  */
 
 /*
@@ -204,10 +204,15 @@ HB_FUNC( HB_BUILDINFO )
 }
 
 #define __PRG_SOURCE__ __FILE__
+
 HB_FUNC_EXTERN( HB_VMMODE );
 HB_FUNC_EXTERN( HB_MULTITHREAD );
+
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
+
+static PHB_ITEM *pGlobals = NULL;
+
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
 { "HB_VMMODE",      {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_VMMODE )},      NULL },
 { "HB_MULTITHREAD", {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_MULTITHREAD )}, NULL }

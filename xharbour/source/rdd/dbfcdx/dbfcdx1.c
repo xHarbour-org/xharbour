@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.260 2007/03/30 16:10:27 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.261 2007/04/02 16:00:23 marchuet Exp $
  */
 
 /*
@@ -737,7 +737,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else 
+   else
    {
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
@@ -971,13 +971,13 @@ static void hb_cdxTagRefreshScope( LPCDXTAG pTag )
    if ( hb_itemType( pTag->topScope ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->topScope );
-      pTag->topScopeKey = hb_cdxKeyPutItem( pTag->topScopeKey, pItem, 
+      pTag->topScopeKey = hb_cdxKeyPutItem( pTag->topScopeKey, pItem,
                                  pTag->topScopeKey->rec, pTag, TRUE, FALSE );
    }
    if ( hb_itemType( pTag->bottomScope ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->bottomScope );
-      pTag->bottomScopeKey = hb_cdxKeyPutItem( pTag->bottomScopeKey, pItem, 
+      pTag->bottomScopeKey = hb_cdxKeyPutItem( pTag->bottomScopeKey, pItem,
                                  pTag->bottomScopeKey->rec, pTag, TRUE, FALSE );
    }
 }
@@ -5416,7 +5416,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    {
       LPCDXKEY pKey;
 
-      pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed, 
+      pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed,
                      pTag->UsrAscend ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM );
       if( !hb_cdxTagKeyFind( pTag, pKey ) )
       {
@@ -5794,8 +5794,8 @@ static LONG hb_cdxDBOIKeyNo( CDXAREAP pArea, LPCDXTAG pTag, BOOL fFilters )
       hb_cdxIndexLockRead( pTag->pIndex );
       hb_cdxTagRefreshScope( pTag );
 
-      if ( fFilters ? ( fLogOpt && CURKEY_LOGPOS( pTag ) ) : 
-                      ( CURKEY_RAWPOS( pTag ) && 
+      if ( fFilters ? ( fLogOpt && CURKEY_LOGPOS( pTag ) ) :
+                      ( CURKEY_RAWPOS( pTag ) &&
                                           pTag->rawKeyRec == pArea->ulRecNo ) )
       {
          ulKeyNo = fFilters ? pTag->logKeyPos : pTag->rawKeyPos;
@@ -7979,7 +7979,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_RELKEYPOS:
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
-            hb_cdxDBOISetRelKeyPos( pArea, pTag, 
+            hb_cdxDBOISetRelKeyPos( pArea, pTag,
                                     hb_itemGetND( pOrderInfo->itmNewVal ) );
          else
             pOrderInfo->itmResult = hb_itemPutND( pOrderInfo->itmResult,
@@ -7994,7 +7994,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
 
       case DBOI_FINDRECCONT:
          pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult,
-                  hb_cdxDBOIFindRec( pArea, pTag, 
+                  hb_cdxDBOIFindRec( pArea, pTag,
                               hb_itemGetNL( pOrderInfo->itmNewVal ), TRUE ) );
          break;
 
@@ -9253,8 +9253,8 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
                if( ulNextCount > 0 && ulNextCount < ( ULONG ) iRec )
                   iRec = ( int ) ulNextCount;
                hb_fsSeekLarge( pArea->hDataFile,
-                               ( HB_FOFFSET ) pArea->uiHeaderLen + 
-                               ( HB_FOFFSET ) ( ulRecNo - 1 ) * 
+                               ( HB_FOFFSET ) pArea->uiHeaderLen +
+                               ( HB_FOFFSET ) ( ulRecNo - 1 ) *
                                ( HB_FOFFSET ) pArea->uiRecordLen, FS_SET );
                hb_fsReadLarge( pArea->hDataFile, pSort->pRecBuff, pArea->uiRecordLen * iRec );
                iRecBuff = 0;
@@ -9475,6 +9475,8 @@ static void hb_dbfcdxRddInit( void * cargo )
    HB_FUNC_EXEC( _DBF );
 }
 
+static PHB_ITEM *pGlobals = NULL;
+
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "SIXCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX )}, NULL },
 { "SIXCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
@@ -9538,6 +9540,8 @@ static void hb_dbfcdxRddInit( void * cargo )
    /* not executed, only to force DBF RDD linking */
    HB_FUNC_EXEC( _DBF );
 }
+
+static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "DBFCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFCDX )}, NULL },

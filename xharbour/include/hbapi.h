@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.207 2007/04/10 18:21:12 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.208 2007/04/17 01:17:42 toninhofwi Exp $
  */
 
 /*
@@ -681,7 +681,6 @@ extern HB_EXPORT USHORT   hb_objClassH( PHB_ITEM pObj );
    {\
 */
 extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
-extern HB_EXPORT USHORT   hb_objGetClass( PHB_ITEM pItem );
 
 /* dynamic symbol table management */
 
@@ -740,7 +739,7 @@ extern HB_EXPORT BOOL hb_winmainArgGet( HANDLE * phInstance, HANDLE * phPrevInst
 extern PHB_SYMB HB_EXPORT hb_symbolNew( char * szName ); /* create a new symbol */
 
 /* Codeblock management */
-extern HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer, USHORT uiLocals, const BYTE * pLocalPosTable, PHB_SYMB pSymbols, PHB_ITEM** pGlobals ); /* create a code-block */
+extern HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer, USHORT uiLocals, const BYTE * pLocalPosTable, PHB_SYMB pSymbol ); /* create a code-block */
 extern HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen );
 extern void     hb_codeblockDelete( HB_ITEM_PTR pItem ); /* delete a codeblock */
 extern PHB_ITEM hb_codeblockGetVar( PHB_ITEM pItem, LONG iItemPos ); /* get local variable referenced in a codeblock */

@@ -1,5 +1,5 @@
 /*
- * $Id: 20061122\040fttext.c,v 1.1 2006/11/22 15:17:30 sirep Exp $
+ * $Id: fttext.c,v 1.14 2006/11/22 16:07:40 marceloanelli Exp $
  */
 
 /*
@@ -63,8 +63,6 @@
 #include "hbinit.h"
 
 #define __PRG_SOURCE__ __FILE__
-#undef HB_PRG_PCODE_VER
-#define HB_PRG_PCODE_VER HB_PCODE_VER
 
 HB_FUNC( FT_FUSE );
 HB_FUNC( FT_FSEEK );
@@ -105,12 +103,17 @@ HB_FUNC_EXTERN( RASCAN );
 HB_FUNC_INIT( FT_FINIT );
 HB_FUNC_EXIT( FT_FEXIT );
 
+#undef HB_PRG_PCODE_VER
+#define HB_PRG_PCODE_VER HB_PCODE_VER
+
+static PHB_ITEM *pGlobals = NULL;
+
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_FTEXT )
-{ "FT_FUSE",   {HB_FS_PUBLIC}, {HB_FUNCNAME( FT_FUSE )}, (PHB_DYNS) 1 },
+{ "FT_FUSE",   {HB_FS_PUBLIC}, {HB_FUNCNAME( FT_FUSE )}, NULL },
 { "ASCAN",     {HB_FS_PUBLIC}, {HB_FUNCNAME( ASCAN )}, NULL },
 { "RASCAN",    {HB_FS_PUBLIC}, {HB_FUNCNAME( RASCAN )}, NULL },
-{ "FT_FINIT$", {HB_FS_INIT},   {HB_INIT_FUNCNAME( FT_FINIT )}, (PHB_DYNS) 1 },
-{ "FT_FEXIT$", {HB_FS_EXIT},   {HB_EXIT_FUNCNAME( FT_FEXIT )}, (PHB_DYNS) 1 }
+{ "FT_FINIT$", {HB_FS_INIT},   {HB_INIT_FUNCNAME( FT_FINIT )}, {&pModuleSymbols} },
+{ "FT_FEXIT$", {HB_FS_EXIT},   {HB_EXIT_FUNCNAME( FT_FEXIT )}, {&pModuleSymbols} }
 HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_FTEXT )
 
 #if defined(HB_PRAGMA_STARTUP)

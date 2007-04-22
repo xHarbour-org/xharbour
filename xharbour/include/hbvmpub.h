@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.56 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.57 2007/04/14 21:47:21 ronpinkas Exp $
  */
 
 /*
@@ -82,12 +82,37 @@
       } scope;
       union
       {
-         PHB_FUNC          pFunPtr;       /* function address for function symbol table entries */
+         PHB_FUNC               pFunPtr;       /* function address for function symbol table entries */
          struct _HB_PCODEFUNC * pCodeFunc;
-         int               iStaticsBase;  /* static array index for module */
+         int                    iStaticsBase;  /* static array index for module */
       } value;
-      struct _HB_DYNS * pDynSym;       /* pointer to its dynamic symbol if defined */
+      union
+      {
+         struct _SYMBOLS **ppModuleSymbols;  /* pointer to it's symbol table container when symbol is NON PUBLIC! */
+         struct _HB_DYNS * pDynSym;         /* pointer to its dynamic symbol if defined */
+      };
    } HB_SYMB, * PHB_SYMB;
+
+   #define HB_SYM_ISPUBLIC(pSym)                     ( (pSym)->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) )
+   #define HB_SYM_GETDYNSYM(pSym)                    ( HB_SYM_ISPUBLIC(pSym) ? (pSym)->pDynSym : NULL )
+   #define HB_SYM_GETMODULESYM(pSym)                 ( HB_SYM_ISPUBLIC(pSym) ? (pSym)->pDynSym->pModuleSymbols : \
+                                                        ( (pSym)->ppModuleSymbols ? ( *( (pSym)->ppModuleSymbols ) ) : NULL ) )
+   #define HB_SYM_GETMODULESYM_ISPUB(pSym, pbPublic) ( ( (*pbPublic) = HB_SYM_ISPUBLIC(pSym) ) != 0 ? (pSym)->pDynSym->pModuleSymbols : \
+                                                       ( (pSym)->ppModuleSymbols ? ( *( (pSym)->ppModuleSymbols ) ) : NULL ) )
+
+   #define HB_SYM_GETGLOBALS(pSym)     ( HB_SYM_GETMODULESYM(pSym)->pGlobals )
+   #define HB_SYM_GETGLOBALSPTR(pSym)  &( HB_SYM_GETMODULESYM(pSym)->pGlobals)
+
+   #define HB_GETSYM()                 ( ( *HB_VM_STACK.pBase )->item.asSymbol.value )
+
+   #define HB_GETMODULESYM()               HB_SYM_GETMODULESYM( HB_GETSYM() )
+   #define HB_GETMODULESYM_ISPUB(pbPublic) HB_SYM_GETMODULESYM_ISPUB( HB_GETSYM(), (pbPublic) )
+
+   #define HB_GETDYNSYM()              HB_SYM_GETDYNSYM( HB_GETSYM() )
+   #define HB_GETGLOBALS()             HB_SYM_GETGLOBALS( HB_GETSYM() )
+   #define HB_GETGLOBALSPTR()          HB_SYM_GETGLOBALSPTR( HB_GETSYM() )
+
+   #define HB_BASE_GETMODULESYM(pBase) HB_SYM_GETMODULESYM( hb_itemGetSymbol(*pBase) )
 
 /*
    // Now it should not be longer necessary
@@ -98,7 +123,7 @@
 
    typedef struct _SYMBOLS
    {
-      PHB_SYMB pModuleSymbols;   /* pointer to a one module own symbol table */
+      PHB_SYMB pSymbolTable;   /* pointer to a one module own symbol table */
       USHORT   uiModuleSymbols;  /* number of symbols on that table */
       struct _SYMBOLS * pNext;   /* pointer to the next SYMBOLS structure */
       HB_SYMBOLSCOPE hScope;     /* scope collected from all symbols in module used to speed initialization code */
@@ -107,12 +132,13 @@
       BOOL     fActive;          /* the symbol table is currently active */
       BOOL     fInitStatics;     /* static initialization should be executed */
       char *   szModuleName;     /* module name */
+      struct _HB_ITEM **pGlobals;/* pointer to the module &pConstantGlobals[0] */
    } SYMBOLS, * PSYMBOLS;        /* structure to keep track of all modules symbol tables */
 
    extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
    extern PSYMBOLS hb_vmFindModuleByName( char *szModuleName );
    extern void     hb_vmFreeSymbols( PSYMBOLS pSymbols );
-   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone );
+   extern PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pModuleSymbols, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, struct _HB_ITEM **pGlobals );
    extern void     hb_vmBeginSymbolGroup( void * hDynLib, BOOL fClone );
    extern void     hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] );
    extern void     hb_vmExitSymbolGroup( void * hDynLib );
@@ -294,15 +320,13 @@
    /* internal structure for codeblocks */
    typedef struct _HB_CODEBLOCK
    {
-      char *     procname;
-      USHORT     lineno;
-      USHORT     uiLocals;     /* number of referenced local variables */
-      PHB_ITEM   pLocals;      /* table with referenced local variables */
-      PHB_SYMB   pSymbols;     /* codeblocks symbols */
-      BYTE       *pCode;       /* codeblock pcode */
-      HB_COUNTER ulCounter;    /* numer of references to this codeblock */
-      BOOL       dynBuffer;    /* is pcode buffer allocated dynamically */
-      PHB_ITEM   **pGlobals;
+      PHB_SYMB   symbol;         /* pointer to symbol where block was defined */
+      USHORT     lineno;         /* line number where block was defined */
+      USHORT     uiLocals;       /* number of referenced local variables */
+      PHB_ITEM   pLocals;        /* table with referenced local variables */
+      BYTE       *pCode;         /* codeblock pcode */
+      HB_COUNTER ulCounter;      /* numer of references to this codeblock */
+      BOOL       dynBuffer;      /* is pcode buffer allocated dynamically */
       USHORT     uLen;
       USHORT     uiClass;
    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
@@ -365,7 +389,7 @@
     * ( ( cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
     */
 
-   extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM** pGlobals );  /* invokes the virtual machine */
+   extern void HB_EXPORT hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols );  /* invokes the virtual machine */
 
    HB_EXTERN_END
 

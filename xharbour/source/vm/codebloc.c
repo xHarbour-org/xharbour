@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.53 2006/03/25 02:22:48 druzus Exp $
+ * $Id: codebloc.c,v 1.54 2006/09/06 22:26:32 ronpinkas Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ extern short hb_vm_iGlobals;
  * pBuffer -> the buffer with pcodes (without HB_P_PUSHBLOCK)
  * uiLocals -> number of local variables referenced in a codeblock
  * pLocalPosTable -> a table with positions on eval stack for referenced variables
- * pSymbols    -> a pointer to the module symbol table
+ * pSymbol -> a pointer to the Symbol where block was defined
  *
  * Note: pLocalPosTable cannot be used if uiLocals is ZERO
  *
@@ -93,15 +93,15 @@ extern short hb_vm_iGlobals;
  */
 HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
                                   USHORT uiLocals, const BYTE * pLocalPosTable,
-                                  PHB_SYMB pSymbols, PHB_ITEM** pGlobals )
+                                  PHB_SYMB pSymbol )
 {
    HB_CODEBLOCK_PTR pCBlock;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbols, pGlobals));
+   HB_TRACE(HB_TR_DEBUG, ("hb_codeblockNew(%p, %hu, %p, %p)", pBuffer, uiLocals, pLocalPosTable, pSymbol));
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
-   pCBlock->procname = NULL;
+   pCBlock->symbol = NULL;
 
    /* Store the number of referenced local variables
     */
@@ -185,10 +185,8 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
    pCBlock->pCode     = ( BYTE * ) pBuffer;
    pCBlock->dynBuffer = FALSE;
 
-   pCBlock->pSymbols  = pSymbols;
+   pCBlock->symbol  = pSymbol;
    pCBlock->ulCounter = 1;
-
-   pCBlock->pGlobals  = pGlobals;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -203,7 +201,7 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
-   pCBlock->procname = NULL;
+   pCBlock->symbol = NULL;
 
    /* Store the number of referenced local variables
     */
@@ -218,10 +216,8 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    memcpy( pCBlock->pCode, pBuffer, usLen );
    pCBlock->dynBuffer = TRUE;
 
-   pCBlock->pSymbols  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
+   pCBlock->symbol  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
    pCBlock->ulCounter = 1;
-
-   pCBlock->pGlobals  = NULL;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 

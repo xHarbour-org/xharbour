@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.14 2005/10/24 15:55:43 druzus Exp $
+ * $Id: maindllp.c,v 1.15 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -121,13 +121,13 @@ HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
    return pModuleSymbols;
 }
 
-void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols, PHB_ITEM **pGlobals )
+void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 {
    FARPROC pExecute = GetProcAddress( GetModuleHandle( NULL ), "_hb_vmExecute" );
 
    if( pExecute )
    {
-      ( ( VM_DLL_EXECUTE ) pExecute )( pCode, pSymbols, pGlobals );
+      ( ( VM_DLL_EXECUTE ) pExecute )( pCode, pSymbols );
    }
 
    /* else

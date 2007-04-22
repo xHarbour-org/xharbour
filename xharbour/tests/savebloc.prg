@@ -1,3 +1,7 @@
+/*
+  NOTE: This sample must be linked with restbloc.prg
+*/
+
 #include "hbclass.ch"
 
 STATIC s_Name := ", Some Static"
@@ -11,7 +15,7 @@ PROCEDURE Main()
 
    CLS
 
-   TRY
+   TRY      
       ? "Evaluating native Block..."
       ? Eval( bBlock, ", and Local Param." )
 
@@ -27,32 +31,12 @@ PROCEDURE Main()
 
       ?
       ? "Evaluating Restored Block..."
-      ? Eval( bBlock, ", and Local Param." )
+      ? Eval( bBlock, ", and Local Param." )      
 
       ?
-      ? "Creating Object..."
-      oObj := MyClass()
-
-      ? "Setting value using native Object Data Block..."
-      Eval( oObj:Data, "Test" )
-
-      ? "Getting value using native Object Data Block..."
-      ? Eval( oObj:Data )
-
-      ?
-      ? "Saving Object Data Block..."
-      SavedBlock := HB_SaveBlock( oObj:Data )
-
-      ? "Releasing Object Data Block..."
-      bBlock := NIL
-
-      ? "Restoring Object Data Block..."
-      oObj:Data := HB_RestoreBlock( SavedBlock, oObj )
-  
-      ?
-      ? "Getting value using Restored Object Data Block..."
-      ? Eval( oObj:Data )
-
+      ? "Forward persisted block to foriegn module restblock.prg"
+      ? EvalSavedBlock( SavedBlock )
+      
       ?
       ? "Save/Restore Block completed successfuly."
       ?
@@ -66,10 +50,3 @@ RETURN
 FUNCTION TestFunction()
 
 RETURN "Local Function"
-
-CLASS MyClass
-
-   DATA cData PRIVATE
-   DATA Data INIT {|c| TraceLog( HB_QSelf() ), IIF( PCount() == 0, HB_QSelf():cData, HB_QSelf():cData := c ) }
-
-ENDCLASS

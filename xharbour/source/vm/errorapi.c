@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.78 2007/02/26 22:24:58 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.79 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -250,13 +250,13 @@ PHB_ITEM HB_EXPORT hb_errNew( void )
 
    PHB_ITEM pError;
    char *szModuleName;
+   PSYMBOLS pModuleSymbols = HB_GETMODULESYM();
 
    HB_TRACE(HB_TR_DEBUG, ("hb_errNew()"));
 
-   if( (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym &&
-       (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols )
+   if( pModuleSymbols )
    {
-      szModuleName = (* HB_VM_STACK.pBase)->item.asSymbol.value->pDynSym->pModuleSymbols->szModuleName;
+      szModuleName = pModuleSymbols->szModuleName;
    }
    else
    {
