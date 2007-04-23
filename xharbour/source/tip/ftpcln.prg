@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.12 2006/02/17 01:56:27 gdrouillard Exp $
+ * $Id: ftpcln.prg,v 1.13 2007/02/05 21:24:39 gdrouillard Exp $
  */
 
 /*
@@ -51,6 +51,15 @@
  *
  */
 
+/* 2007-04-19, Hannes Ziegler <hz AT knowlexbase.com>
+   Added method :RMD()
+   Added method :listFiles()
+   Added method :MPut()
+   Changed method :downloadFile() to enable display of progress
+   Changed method :uploadFile() to enable display of progress
+*/
+
+#include "directry.ch"
 #include "hbclass.ch"
 #include "tip.ch"
 #include "common.ch"
@@ -68,7 +77,7 @@ CLASS tIPClientFTP FROM tIPClient
    // Socket opened in response to a port command
    DATA SocketControl
 
-   METHOD New()
+   METHOD New( oUrl,lTrace, oCredentials)
    METHOD Open()
    METHOD Read( nLen )
    METHOD Write( nLen )
@@ -90,7 +99,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD Quit()
    METHOD ScanLength()
    METHOD ReadAuxPort()
-	method mget()
+   method mget()
 	// Method bellow contributed by  Rafa Carmona
 	
    METHOD LS( cSpec ) 
@@ -101,18 +110,23 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD DownLoadFile( cLocalFile, cRemoteFile ) 
    // new method to create an directory on ftp server
    METHOD MKD( cPath )
+
+   METHOD RMD( cPath )
+   METHOD listFiles( cList )
+   METHOD MPut
 ENDCLASS
 
 
-METHOD New(lTrace) CLASS tIPClientFTP
+METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientFTP
    local cFile :="ftp"
    local n := 0
 
+   ::super:new( oUrl, lTrace, oCredentials)
    ::nDefaultPort := 21
    ::nConnTimeout := 3000
    ::bUsePasv := .T.
    ::nAccessMode := TIP_RW  // a read-write protocol
-   ::lTrace :=lTrace
+
    if ::ltrace
       if !file("ftp.log")
          ::nHandle := fcreate("ftp.log")
@@ -131,7 +145,11 @@ METHOD New(lTrace) CLASS tIPClientFTP
 RETURN Self
 
 
-METHOD Open() CLASS tIPClientFTP
+METHOD Open( cUrl ) CLASS tIPClientFTP
+
+   IF HB_IsString( cUrl )
+      ::oUrl := tUrl():New( cUrl )
+   ENDIF
 
    IF Len( ::oUrl:cUserid ) == 0 .or. Len( ::oUrl:cPassword ) == 0
       RETURN .F.
@@ -281,7 +299,7 @@ METHOD Commit() CLASS tIPClientFTP
    IF ::GetReply() .and. ::cReply[1] != "5"
       RETURN .T.
    ENDIF*/
-RETURN .F.
+RETURN .T.
 
 
 METHOD List(cSpec) CLASS tIPClientFTP
@@ -463,6 +481,10 @@ METHOD Write( cData, nLen ) CLASS tIPClientFTP
 
 RETURN ::super:Write( cData, nLen, .F. )
 
+/*
+ * HZ: What's cLocalFile good for? It's unused
+ */
+
 METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
    LOCAL nTimeout,cRet
 
@@ -476,6 +498,7 @@ METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
    ::InetSendAll( ::SocketCon, "RETR " + cFile+ ::cCRLF )
 
    IF ::TransferStart()
+      ::ScanLength()
       RETURN .T.
    ENDIF
 
@@ -487,7 +510,7 @@ METHOD MGET( cSpec,cLocalPath ) CLASS tIPClientFTP
 
    IF cSpec == nil
       cSpec := ''
-	ENDIF
+   ENDIF
    IF cLocalPath=nil
       cLocalPath:=''
    ENDIF
@@ -509,7 +532,29 @@ METHOD MGET( cSpec,cLocalPath ) CLASS tIPClientFTP
 
    ENDIF
 
-	RETURN cStr
+RETURN cStr
+
+METHOD MPUT( cFileSpec, cAttr ) CLASS tIPClientFTP
+
+   LOCAL cPath,cFile, cExt, aFile, aFiles
+   LOCAL nCount := 0
+   LOCAL cStr := ""
+
+   IF Valtype( cFileSpec ) <> "C"
+      RETURN 0
+   ENDIF
+
+   HB_FNameSplit( cFileSpec, @cPath, @cFile, @cExt  ) 
+
+   aFiles := Directory( cPath + cFile + cExt, cAttr )
+
+   FOR each aFile in aFiles
+      IF ::uploadFile( cPath + aFile[F_NAME], aFile[F_NAME] )
+         cStr += INetCrlf() + aFile[F_NAME]
+      ENDIF
+   NEXT
+RETURN SubStr(cStr,3)
+
 
 METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
 
@@ -523,21 +568,35 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    
    DEFAULT cRemoteFile to cFile+cExt 
    
-   cFileData := MemoRead(cLocalFile)   
    ::bEof := .F.   
    ::oUrl:cFile := cRemoteFile
 
-   nRet := ::Write( cFileData )
-   
-   IF nRet == -1
-      lRet := .F.         
-   ELSE
-      lRet := .T.
+   IF .not. ::bInitialized
+
+      IF Empty( ::oUrl:cFile )
+
+         RETURN -1
+
+      ENDIF
+
+      IF .not. Empty( ::oUrl:cPath )
+
+         IF .not. ::CWD( ::oUrl:cPath )
+            RETURN -1
+         ENDIF
+
+      ENDIF
+
+      IF .not. ::Stor( ::oUrl:cFile )
+         RETURN -1
+      ENDIF
+
+      // now channel is open
+      ::bInitialized := .T.
    ENDIF
-     
-   ::Commit() // Close Passive conection of previus file
-   
-RETURN lRet   
+
+RETURN ::WriteFromFile( cLocalFile )
+
 
 METHOD LS( cSpec ) CLASS tIPClientFTP
 
@@ -596,38 +655,120 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    ::bEof := .F.   
    ::oUrl:cFile := cRemoteFile
 
-   xRet := ::Read()
+   IF .not. ::bInitialized
 
-   IF ISLOGICAL( xRet )
-
-      IF !xRet
-
-         lRet := .F.
-
+      IF .not. Empty( ::oUrl:cPath )
+         IF .not. ::CWD( ::oUrl:cPath )
+            ::bEof = .T.  // no data for this transaction
+            RETURN .F.
+         ENDIF
       ENDIF
 
-   ELSEIF ISCHARACTER( xRet )
-
-      IF EMPTY( XRET )
-
-         lRet := .F.
-
-      ELSE
-
-         nHandle := FCREATE( cLocalFile )
-         FWRITE( nHandle, xRet )
-         FCLOSE( nHandle )
-         lRet := .T.
-
+      IF .not. ::Retr( ::oUrl:cFile )
+         ::bEof = .T.  // no data for this transaction
+         RETURN .F.
       ENDIF
+
+      // now channel is open
+      ::bInitialized := .T.
 
    ENDIF
-     
-   ::Commit() // Close Passive conection of previus file
-   
-RETURN lRet   
+
+RETURN ::ReadToFile( cLocalFile, , ::nLength )
+
 
 // Create a new folder
 METHOD MKD( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "MKD " + cPath + ::cCRLF )
 RETURN ::GetReply()
+
+
+// Delete an existing folder
+METHOD RMD( cPath ) CLASS tIPClientFTP
+   ::InetSendall( ::SocketCon, "RMD " + cPath + ::cCRLF )
+RETURN ::GetReply()
+
+
+// Parse the :list() string into a Directory() compatible 2-dim array
+METHOD listFiles( cFileSpec ) CLASS tIPClientFTP
+   LOCAL aMonth:= { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" }
+   LOCAL cList, aList, aFile, cEntry, nStart, nEnd
+   LOCAL cYear, cMonth, cDay, cTime
+
+   cList := ::list( cFileSpec )
+   IF Empty( cList )
+      RETURN {}
+   ENDIf
+
+   aList := HB_ATokens( StrTran( cList, Chr(13),''), Chr(10) )
+
+   FOR EACH cEntry IN aList
+      aFile         := Array( F_LEN+3 )
+      nStart        := 1
+      nEnd          := At( Chr(32), cEntry, nStart )
+      
+      // file permissions (attributes)
+      aFile[F_ATTR] := SubStr( cEntry, nStart, nEnd-nStart )
+      nStart        := nEnd
+
+      // # of links
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      aFile[F_LEN+1]:= Val( SubStr( cEntry, nStart, nEnd-nStart ) )
+      nStart        := nEnd
+
+      // owner name
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      aFile[F_LEN+2]:= SubStr( cEntry, nStart, nEnd-nStart )
+      nStart        := nEnd
+
+      // group name
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      aFile[F_LEN+3]:= SubStr( cEntry, nStart, nEnd-nStart )
+      nStart        := nEnd
+
+      // file size
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      aFile[F_SIZE] := Val( SubStr( cEntry, nStart, nEnd-nStart ) )
+      nStart        := nEnd
+
+      // Month
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      cMonth        := SubStr( cEntry, nStart, nEnd-nStart )
+      cMonth        := PadL( AScan( aMonth, cMonth ), 2, "0" )
+      nStart        := nEnd
+
+      // Day
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      cDay          := SubStr( cEntry, nStart, nEnd-nStart )
+      nStart        := nEnd
+
+      // year
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      nEnd          := At( Chr(32), cEntry, nStart )
+      cYear         := SubStr( cEntry, nStart, nEnd-nStart )
+      nStart        := nEnd
+
+      IF ":" $ cYear
+         cTime := cYear
+         cYear := Str( Year(Date()), 4, 0 )
+      ELSE
+         cTime := ""
+      ENDIF
+
+      // file name
+      DO WHILE cEntry[++nStart] == " " ; ENDDO
+      
+      aFile[F_NAME] := SubStr( cEntry, nStart )
+      aFile[F_DATE] := StoD( cYear+cMonth+cDay )
+      aFile[F_TIME] := cTime
+
+      aList[ HB_EnumIndex() ] := aFile
+   NEXT
+
+RETURN aList

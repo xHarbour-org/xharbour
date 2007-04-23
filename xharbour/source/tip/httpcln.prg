@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.6 2006/07/11 16:25:57 gdrouillard Exp $
+ * $Id: httpcln.prg,v 1.7 2006/07/17 14:35:40 lf_sfnet Exp $
  */
 
 /*
@@ -68,12 +68,12 @@ CLASS tIPClientHTTP FROM tIPClient
    DATA hHeaders     INIT  {=>}
    DATA hCookies     INIT  {=>}
    DATA hFields      INIT  {=>}
-   DATA cUserAgent   INIT  "Mozilla/3.0 (compatible XHarbour-Tip/1.0)"
+   DATA cUserAgent   INIT  "Mozilla/3.0 compatible"
    DATA cAuthMode    INIT ""
    DATA cBoundary
    DATA aAttachments init {}
 
-   METHOD New()
+   METHOD New( oUrl,lTrace, oCredentials)
    METHOD Get( cQuery )
    METHOD Post( cPostData, cQuery )
    METHOD ReadHeaders()
@@ -92,11 +92,11 @@ HIDDEN:
 
 ENDCLASS
 
-METHOD New(lTrace) CLASS tIPClientHTTP
+METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientHTTP
+   ::super:new( oUrl, lTrace, oCredentials )
    ::nDefaultPort := 80
    ::nConnTimeout := 5000
-   ::bChunked := .F.
-   ::lTrace := .f.
+   ::bChunked     := .F.
 
    HSetCaseMatch( ::hHeaders, .F. )
 RETURN Self

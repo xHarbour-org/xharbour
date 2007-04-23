@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.1 2004/08/05 12:21:16 lf_sfnet Exp $
+ * $Id: Changelog,v 1.2 2005/04/30 15:14:29 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,62 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-20 18:15 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+
+    
+    * source\tip\Client.prg
+      * fixed bug in method :readToFile() resulting in corrupted file downloads
+
+
+2007-04-23 14:30 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+
+  * changed TIP classes to comply with OOP rules
+
+    * source\tip\client.prg
+        Adapted all :new() method(s) so that tIPClient becomes the
+        abstract super class for TIpClientFtp, TIpClientHttp, TIpClientPop and TIpClientSmtp
+
+        + Added Method :INetErrorDesc()
+        + Added Method :lastErrorCode()
+        + Added Method :lastErrorMessage()
+
+        - Removed method :data() since it calls an undeclared method :getOk()
+          :data() is used in TIpClientSmtp
+
+        * fixed bugs resulting in corrupted file downloads
+
+    * source\tip\ftpcln.prg
+        Added missing FTP functionalities
+        + Added method :rmd()
+        + Added method :listFiles()
+        + Added method :mput()
+
+        Supports progress bars
+        * Changed method :downloadFile() to enable display of download progress
+        * Changed method :uploadFile() to enable display of upload progress
+
+    * source\tip\encoder.prg
+        + Added FUNCTION TIp_GetEncoder( cModel )
+
+    * source\tip\mail.prg
+        Added "high level" methods to easily (de)compose an eMail (with file attachments)
+
+        + Added method :setHeader()
+        + Added method :attachFile()
+        + Added method :detachFile()
+        + Added method :getFileName()
+        + Added method :isMultiPart()
+        + Added method :getMultiParts()
+
+    * source\tip\popcln.prg
+        New methods for easy eMail retrieval
+        + Added method :countMail()
+        + Added method :retrieveAll()
+
+    * source\tip\smtpcln.prg
+        New method to work with TIpMail objects
+        + Added method :sendMail()
 
 2005-04-29 12:00 Luiz Rafael Culik <culikr@brturbo.com>
   * client.prg

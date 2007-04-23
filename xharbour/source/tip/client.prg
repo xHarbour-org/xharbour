@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.11 2006/01/17 03:06:51 lculik Exp $
+ * $Id: client.prg,v 1.12 2006/01/18 23:54:51 lculik Exp $
  */
 
 /*
@@ -55,7 +55,20 @@
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
 */
 
+/* 2007-03-29, Hannes Ziegler 
+   Adapted all :new() method(s) so that tIPClient becomes the
+   abstract super class for TIpClientFtp, TIpClientHttp, TIpClientPop and TIpClientSmtp
+
+   Added Methods :INetErrorDesc(), :lastErrorCode() and :lastErrorMessage()
+   Removed method :data() since it calls an undeclared method :getOk()
+   :data() is used in TIpClientSmtp
+
+   Fixed bug in :readToFile()
+
+*/
+
 #include "hbclass.ch"
+#include "error.ch"
 #include "fileio.ch"
 #include "tip.ch"
 #include "common.ch"
@@ -90,11 +103,12 @@ CLASS tIPClient
    DATA nLastWrite
 
    DATA bEof
+   DATA isOpen INIT .F.
 
    /** Gauge control; it can be a codeblock or a function pointer. */
    DATA exGauge
 
-   METHOD New( oUrl, oCredentials, lTrace )
+   METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
 
    METHOD Read( iLen )
@@ -104,9 +118,13 @@ CLASS tIPClient
    METHOD WriteFromFile( cFile )
    METHOD Reset()
    METHOD Close()
-   METHOD Data( cData )
+/*   METHOD Data( cData ) */                   // commented: calls undeclared METHOD :getOk
+
+   METHOD lastErrorCode() INLINE ::nLastError
+   METHOD lastErrorMessage(SocketCon) INLINE ::INetErrorDesc(SocketCon)
 
    PROTECTED:
+   DATA nLastError INIT 0
 
    /* Methods to log data if needed */
    METHOD InetRecv( SocketCon, cStr1, len)
@@ -115,6 +133,7 @@ CLASS tIPClient
    METHOD InetCount( SocketCon )
    METHOD InetSendAll( SocketCon,  cData, nLen )
    METHOD InetErrorCode(SocketCon)
+   METHOD InetErrorDesc(SocketCon)
    METHOD InetConnect( cServer, nPort, SocketCon )
 
    METHOD Log()
@@ -122,41 +141,47 @@ CLASS tIPClient
 ENDCLASS
 
 
-METHOD New( oUrl, oCredentials, lTrace ) CLASS tIPClient
-   LOCAL oRet
+METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
+   LOCAL oErr
+
    Default lTrace to .F.
+
    IF .not. ::bInitSocks
       InetInit()
       ::bInitSocks := .T.
    ENDIF
 
-   DO CASE
-      CASE oUrl:cProto == "http"
-         oRet := tIPClientHTTP():New( lTrace )
-      CASE oUrl:cProto == "pop"
-         oRet := tIPClientPOP():New( lTrace )
-      CASE oUrl:cProto == "smtp"
-         oRet := tIPClientSMTP():New( lTrace )
-      CASE oUrl:cProto == "ftp"
-         oRet := tIPClientFTP():New( lTrace )
-   ENDCASE
-
-   IF Empty( oRet )
-      RETURN NIL
+   IF HB_IsString( oUrl )
+      oUrl := tUrl():New( oUrl )
    ENDIF
 
-   oRet:oUrl := oUrl
-   oRet:oCredentials := oCredentials
-   oRet:nStatus := 0
-   oRet:bInitialized := .F.
-   oRet:nLastWrite := 0
-   oRet:nLength := -1
-   oRet:nRead := 0
-   oRet:nLastRead := 0
-   oRet:bEof := .F.
-   oRet:lTRace := lTRace
+   IF .NOT. oURL:cProto IN "ftp,http,pop,smtp"
+      oErr := ErrorNew()
+      oErr:Args          := { Self, oURL:cProto }
+      oErr:CanDefault    := .F.
+      oErr:CanRetry      := .F.
+      oErr:CanSubstitute := .T.
+      oErr:Description   := "unsupported protocol"
+      oErr:GenCode       := EG_UNSUPPORTED
+      oErr:Operation     := ::className()+":new()"
+      oErr:Severity      := ES_ERROR
+      oErr:SubCode       := 1081
+      oErr:SubSystem     := "BASE"
+      Eval( ErrorBlock(), oErr )
+   ENDIF
 
-RETURN oRet
+   ::oUrl         := oUrl
+   ::oCredentials := oCredentials
+   ::nStatus      := 0
+   ::bInitialized := .F.
+   ::nLastWrite   := 0
+   ::nLength      := -1
+   ::nRead        := 0
+   ::nLastRead    := 0
+   ::bEof         := .F.
+   ::lTrace       := lTrace
+
+RETURN self
 
 
 
@@ -183,6 +208,7 @@ METHOD Open( cUrl ) CLASS tIPClient
       RETURN .F.
    ENDIF
 
+   ::isOpen := .T.
 RETURN .T.
 
 
@@ -196,7 +222,7 @@ METHOD Close() CLASS tIPClient
       nRet := InetClose( ::SocketCon )
 
       ::SocketCon:=nil
-
+      ::isOpen := .F.
    ENDIF
 
 RETURN(nRet)
@@ -269,7 +295,7 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    LOCAL nSent 
 
    IF Empty ( nMode )
-      nMode := FO_CREAT
+      nMode := FC_NORMAL
    ENDIF
 
    nSent := 0
@@ -278,7 +304,9 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
       HB_ExecFromArray( ::exGauge, { nSent, nSize, Self } )
    ENDIF
 
+   ::nRead   := 0
    ::nStatus := 1
+
    DO WHILE ::InetErrorCode( ::SocketCon ) == 0 .and. .not. ::bEof
       cData := ::Read( 1024 )
       IF cData == NIL
@@ -368,6 +396,8 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
 RETURN .T.
 
 
+/*
+HZ: METHOD :getOk() is not declared in TIpClient
 
 METHOD Data( cData ) CLASS tIPClient
    ::InetSendall( ::SocketCon, "DATA" + ::cCRLF )
@@ -376,7 +406,7 @@ METHOD Data( cData ) CLASS tIPClient
    ENDIF
    ::InetSendall(::SocketCon, cData + ::cCRLF + "." + ::cCRLF )
 RETURN ::GetOk()
-
+*/
 
 
 METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
@@ -397,15 +427,19 @@ RETURN ::nLastWrite
 
 
 
-METHOD InetSendAll( SocketCon, nLen, size ) CLASS tIPClient
+METHOD InetSendAll( SocketCon, cData, nLen ) CLASS tIPClient
 
    Local nRet
 
-   nRet := InetSendAll( SocketCon, nLen, size )
+   IF Empty( nLen )
+      nLen := Len( cData )
+   ENDIF
+
+   nRet := InetSendAll( SocketCon, cData, nLen )
 
    if ::lTrace
 
-      ::Log( SocketCon, size, nlen, nRet )
+      ::Log( SocketCon, nlen, cData, nRet )
 
    endif
 
@@ -481,7 +515,7 @@ METHOD InetErrorCode( SocketCon ) CLASS tIPClient
 
    Local nRet
 
-   nRet := InetErrorCode( SocketCon )
+   ::nLastError := nRet := InetErrorCode( SocketCon )
 
    if ::lTrace
 
@@ -490,6 +524,19 @@ METHOD InetErrorCode( SocketCon ) CLASS tIPClient
    endif
 
 Return nRet
+
+
+METHOD InetErrorDesc( SocketCon ) CLASS tIPClient
+   LOCAL cMsg := ""
+
+   DEFAULT SocketCon TO ::SocketCon
+
+   IF .not. Empty( SocketCon )
+
+      cMsg := InetErrorDesc( SocketCon )
+
+   ENDIF
+RETURN cMsg
 
 
 /* BROKEN, should test number of parameters and act accordingly, see doc\inet.txt */
