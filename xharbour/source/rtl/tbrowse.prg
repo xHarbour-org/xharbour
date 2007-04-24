@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.167 2007/04/07 00:19:42 jabrecer Exp $
+ * $Id: tbrowse.prg,v 1.168 2007/04/09 21:52:18 jabrecer Exp $
  */
 
 /*
@@ -627,7 +627,7 @@ CLASS TBrowse
    METHOD DispCell( nRow, nCol, xValue, nColor )  // Displays a single cell and returns position of first char of displayed value if needed
    METHOD HowManyCol()                    // Counts how many cols can be displayed
    METHOD RedrawHeaders( nWidth )         // Repaints TBrowse Headers
-   METHOD Moved()                         // Every time a movement key is issued I need to reset certain properties
+   METHOD Moved(lResetHits, lForceHitsFalse) // Every time a movement key is issued I need to reset certain properties
                                           // of TBrowse, I do these settings inside this method
    METHOD EvalSkipBlock( nSkip )          // Eval skip block
 
@@ -2309,10 +2309,10 @@ METHOD CheckRowPos() CLASS TBrowse
                           // of a movement caused by TBrowse methods
 
       If ::nRowPos <> 1     // No repositioning is required if current
-                           // cursor row is one
+                            // cursor row is one
          //nAvail := ::EvalSkipBlock( 0 - ::nRowPos - 1 )
          nAvail := ::EvalSkipBlock( 0 - ::nRowPos + 1 )
-
+         
          // You should reposition only if there are too few records
          // available or there are more than sufficient records
          // available.  If there are exact number of records leave it.
@@ -2489,15 +2489,15 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       if ::oDataCache:nLastRow < ::nNewRowPos
          ::nNewRowPos := ::oDataCache:nCurRow
       endif
-
       // If I'm not already under cursor I have to set data source to cursor position
       //
       if ::oDataCache:nCurRow <> ::nNewRowPos
-         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
+         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) 
       endif
 
       // new cursor position
       //
+
       ::nRowPos         := ::nNewRowPos
       ::lForceHitsFalse := .f.
 
@@ -2544,7 +2544,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I've tried to move past top or bottom margin
       //
       if nRecsSkipped == 0
-         if ::nRecsToSkip > 0
+         if ::nRecsToSkip > 0 
             ::lHitBottom := .T. .and. !::lForceHitsFalse
 
          elseif ::nRecsToSkip < 0
@@ -3661,7 +3661,7 @@ Static Function IsDb(oTb)
 *------------------------
 * Check if datasource used by Tbrowse is a database or not.
 *-------------------------------
-LOCAL lIsDb, aWA, nArea, aArea
+LOCAL lIsDb, aWA, nArea, aArea, lBottom
 
 lIsDb := .f.
 
@@ -3674,6 +3674,8 @@ IF Used()
    FOR nArea := 1 TO 255
        if !Empty( alias(nArea) )
           AAdd( aWA, { alias(nArea), &( alias(nArea) )->(recno()) } )
+       else
+          EXIT
        endif
    NEXT
 
@@ -3681,7 +3683,13 @@ IF Used()
 
       // Get which work area is used by Tbrowse, if any.
       //
-      Eval( oTb:SkipBlock, 1 )
+      lBottom := IF( IndexOrd()=0, Recno() == LastRec(), OrdKeyNo() == OrdKeyCount() )
+
+      IF lBottom
+         Eval( oTb:SkipBlock, -1 )
+      ELSE
+         Eval( oTb:SkipBlock, 1 )
+      ENDIF
 
       FOR EACH aArea IN aWA
 
@@ -3692,7 +3700,11 @@ IF Used()
 
       NEXT
 
-      Eval( oTb:SkipBlock, -1 )
+      IF lBottom
+         Eval( oTb:SkipBlock, 1 )
+      ELSE
+         Eval( oTb:SkipBlock, -1 )
+      ENDIF
 
    ENDIF
 

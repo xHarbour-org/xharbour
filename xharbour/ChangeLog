@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5458 2007/04/20 09:41:29 marchuet Exp $
+ * $Id: ChangeLog,v 1.5459 2007/04/22 22:50:26 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-24 08:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browse.prg
+    ! fixed append mode when K_DOWN or K_PGDN key is pressed after last row.
+    ! fixed K_CTRL_PGDN to doesn't set append mode.
+    + added xHarbour extensions:
+      * open edit window for memo field. Also, save memo content with K_ALT_W
+        key, if HB_EXT_INKEY is defined.
+      * automatic edit field, by pressing K_ENTER of the first column of the
+        next row after the last column is edited in the current row.
+
+  * source/rtl/tbrowse.prg
+    ! fixed IsDb() static function to syncronize row position when tbrowse is
+      initialized over a database in bottom record.
 
 2007-04-22 18:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch
