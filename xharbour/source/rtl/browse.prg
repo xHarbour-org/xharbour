@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.8 2007/04/16 15:33:14 modalsist Exp $
+ * $Id: browse.prg,v 1.9 2007/04/24 12:20:03 modalsist Exp $
  */
 
 /*
@@ -165,15 +165,17 @@ function Browse( nTop, nLeft, nBottom, nRight )
          case K_UP
             if eof()
                lRefresh := .t.
-            endif
+            else
             oBrw:Up()
+            endif
             exit
 
          case K_PGUP
             if eof()
                lRefresh := .t.
-            endif
+            else
             oBrw:PageUp()
+            endif
             exit
 
          case K_PGDN
@@ -188,8 +190,9 @@ function Browse( nTop, nLeft, nBottom, nRight )
          case K_CTRL_PGUP
             if eof()
                lRefresh := .t.
+            else
+               oBrw:GoTop()
             endif
-            oBrw:GoTop()
             exit
 
          case K_CTRL_PGDN

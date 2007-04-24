@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5459 2007/04/22 22:50:26 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5460 2007/04/24 12:20:02 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-24 20:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browse.prg
+    * minor position adjust after press K_UP, K_PGUP or K_CTRL_PGUP to go
+      back from new row to last row.
 
 2007-04-24 08:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
