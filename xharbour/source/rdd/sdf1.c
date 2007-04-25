@@ -1,5 +1,5 @@
 /*
- * $Id: sdf1.c,v 1.21 2007/03/02 02:36:22 druzus Exp $
+ * $Id: sdf1.c,v 1.22 2007/04/22 22:50:28 ronpinkas Exp $
  */
 
 /*
@@ -1271,8 +1271,6 @@ static void hb_sdfRddInit( void * cargo )
       hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
    }
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( sdf1__InitSymbols )
 { "SDF",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SDF )}, NULL },

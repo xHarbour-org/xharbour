@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.22 2007/03/25 02:41:33 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.23 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -410,8 +410,6 @@ HB_FUNC_EXTERN( HB_MULTITHREAD );
 
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_CMDARG )
 { "HB_VMMODE",      {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_VMMODE )}, NULL },

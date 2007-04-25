@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.11 2005/11/16 12:16:45 druzus Exp $
+ * $Id: version.c,v 1.12 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -210,8 +210,6 @@ HB_FUNC_EXTERN( HB_MULTITHREAD );
 
 #undef HB_PRG_PCODE_VER
 #define HB_PRG_PCODE_VER HB_PCODE_VER
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( hb_vm_SymbolInit_HBVER )
 { "HB_VMMODE",      {HB_FS_PUBLIC}, {HB_FUNCNAME( HB_VMMODE )},      NULL },

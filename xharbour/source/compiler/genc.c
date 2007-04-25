@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.131 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: genc.c,v 1.132 2007/04/22 22:50:27 ronpinkas Exp $
  */
 
 /*
@@ -380,7 +380,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize static variables
             */
-            fprintf( yyc, "{ \"%s\", {HB_FS_INITEXIT}, {hb_INITSTATICS}, {&pModuleSymbols} }", pSym->szName ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"%s\", {HB_FS_INITEXIT}, {hb_INITSTATICS}, &ModuleFakeDyn }", pSym->szName ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '[' )
          {
@@ -388,7 +388,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"(_INITGLOBALS)\", {HB_FS_INITEXIT}, {hb_INITGLOBALS}, {&pModuleSymbols} }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITGLOBALS)\", {HB_FS_INITEXIT}, {hb_INITGLOBALS}, &ModuleFakeDyn }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '<' )
          {
@@ -396,7 +396,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize debugging info about valid stop lines
             */
-            fprintf( yyc, "{ \"(_INITLINES)\", {HB_FS_INITEXIT}, {hb_INITLINES}, {&pModuleSymbols} }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"(_INITLINES)\", {HB_FS_INITEXIT}, {hb_INITLINES}, &ModuleFakeDyn }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else if( pSym->szName[ 0 ] == '{' )
          {
@@ -404,7 +404,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             * we are using these two bits to mark the special function used to
             * initialize global variables
             */
-            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", {HB_FS_INITEXIT}, {hb_REGISTERGLOBALS}, {&pModuleSymbols} }" ); /* NOTE: hb_ intentionally in lower case */
+            fprintf( yyc, "{ \"hb_REGISTERGLOBALS\", {HB_FS_INITEXIT}, {hb_REGISTERGLOBALS}, &ModuleFakeDyn }" ); /* NOTE: hb_ intentionally in lower case */
          }
          else
          {
@@ -483,15 +483,15 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                if( pSym->cScope & HB_FS_INIT )
                {
-                  fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, %s }", (int) strlen( pSym->szName ) - 1, pSym->szName, "{&pModuleSymbols}" );
+                  fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, %s }", (int) strlen( pSym->szName ) - 1, pSym->szName, "&ModuleFakeDyn" );
                }
                else if( pSym->cScope & HB_FS_EXIT )
                {
-                  fprintf( yyc, "}, {HB_EXIT_FUNCNAME( %.*s )}, %s }", (int) strlen( pSym->szName ) - 1, pSym->szName, "{&pModuleSymbols}"  );
+                  fprintf( yyc, "}, {HB_EXIT_FUNCNAME( %.*s )}, %s }", (int) strlen( pSym->szName ) - 1, pSym->szName, "&ModuleFakeDyn"  );
                }
                else
                {
-                  fprintf( yyc, "}, {HB_FUNCNAME( %s )}, %s }", pSym->szName, ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) ? "NULL" : "{&pModuleSymbols}" );
+                  fprintf( yyc, "}, {HB_FUNCNAME( %s )}, %s }", pSym->szName, ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) ? "NULL" : "&ModuleFakeDyn" );
                }
             }
             else if( pSym->bFunc && hb_compFunCallFind( pSym->szName ) ) /* is it a function called from this module */
@@ -828,10 +828,10 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
    BOOL bBegin = FALSE;
    PSSYMLIST pTemp = pStatSymb;
    USHORT ulLen = pStatSymb->uEntry;
-   char *szEntries = (char*) hb_xgrab( ulLen * 256 );
+   char *szEntries = (char*) hb_xgrab( (ulLen + 1) * 256  );
    USHORT ul;
 
-   hb_xmemset( szEntries, '\0', ulLen * 256 );
+   hb_xmemset( szEntries, '\0', (ulLen + 1) * 256 );
 
    while( pTemp )
    {
@@ -883,11 +883,11 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
 
          if( pTemp->Type == HB_PROTO_FUNC_EXIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, {&pModuleSymbols} },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_EXIT | HB_FS_LOCAL}, {HB_EXIT_FUNCNAME( ",pTemp->szName," )}, &ModuleFakeDyn },\n", NULL );
          }
          else if( pTemp->Type == HB_PROTO_FUNC_INIT )
          {
-            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, {&pModulesymbols} },\n", NULL );
+            hb_xstrcat( szEntries, "{ \"",pTemp->szName,"$\", {HB_FS_INIT | HB_FS_LOCAL}, {HB_INIT_FUNCNAME( ",pTemp->szName," )}, &ModuleFakeDyn },\n", NULL );
          }
       }
 
@@ -945,11 +945,9 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
       }
 
       fprintf( yyc, "                                           };\n"
-                    "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n\n" );
-   }
-   else
-   {
-      fprintf( yyc, "static PHB_ITEM *pGlobals = NULL;\n\n" );
+                    "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n"
+                    "#undef HB_MODULE_GLOBALS\n"
+                    "#define HB_MODULE_GLOBALS pGlobals\n\n" );
    }
 }
 

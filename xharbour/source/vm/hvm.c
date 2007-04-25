@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.618 2007/04/19 13:18:40 walito Exp $
+ * $Id: hvm.c,v 1.619 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -83,11 +83,6 @@
 #include <math.h>
 #include <time.h>
 #include <ctype.h>
-
-#if ! ( defined( DEBUG ) || defined( _DEBUG ) )
-   #define NDEBUG
-#endif
-#include <assert.h>
 
 #include "hbvmopt.h"
 #include "hbxvm.h"
@@ -773,11 +768,15 @@ void hb_vmReleaseLocalSymbols( void )
          for( ui = 0; ui < pDestroy->uiModuleSymbols; ++ui )
          {
             PHB_SYMB pSymbol = pDestroy->pSymbolTable + ui;
-            PHB_DYNS pDynSym = HB_SYM_GETDYNSYM( pSymbol );
 
-            if( pDynSym && pDynSym->pSymbol == pSymbol )
+            if( ( pSymbol->scope.value & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )
             {
-               pDynSym->pSymbol = NULL;
+               PHB_DYNS pDynSym = HB_SYM_GETDYNSYM( pSymbol );
+
+               if( pDynSym && pDynSym->pSymbol == pSymbol )
+               {
+                  pDynSym->pSymbol = NULL;
+               }
             }
 
             hb_xfree( pSymbol->szName );
@@ -6895,9 +6894,9 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          #ifndef HB_NO_PROFILER
-            if( bProfiler && HB_SYM_GETDYNSYM( pSym ) )
+            if( bProfiler /*&& HB_SYM_GETDYNSYM( pSym )*/ )
             {
-               pSym->pDynSym->ulRecurse++;
+               HB_SYM_GETDYNSYM( pSym )->ulRecurse++;
             }
          #endif
 
@@ -6925,17 +6924,17 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          #ifndef HB_NO_PROFILER
-            if( bProfiler && HB_SYM_GETDYNSYM( pSym ) )
+            if( bProfiler /*&& HB_SYM_GETDYNSYM( pSym )*/ )
             {
-               pSym->pDynSym->ulCalls++;                   /* profiler support */
+               HB_SYM_GETDYNSYM( pSym )->ulCalls++;                   /* profiler support */
 
                /* Time spent has to be added only inside topmost call of a recursive function */
-               if( pSym->pDynSym->ulRecurse == 1 )
+               if( HB_SYM_GETDYNSYM( pSym )->ulRecurse == 1 )
                {
-                  pSym->pDynSym->ulTime += clock() - ulClock; /* profiler support */
+                  HB_SYM_GETDYNSYM( pSym )->ulTime += clock() - ulClock; /* profiler support */
                }
 
-               pSym->pDynSym->ulRecurse--;
+               HB_SYM_GETDYNSYM( pSym )->ulRecurse--;
             }
          #endif
       }
@@ -7103,68 +7102,60 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    {
       //TraceLog( NULL, "Object: '%s' Message: '%s'\n", hb_objGetClsName( pSelf ), pSym->szName );
 
-      if( pSym == &hb_symDestructor )
-      {
-         pFunc = (PHB_FUNC) pSym;
-         bSymbol = TRUE;
-      }
-      else
-      {
-         pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
+      pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
 
-#ifdef HB_THREAD_SUPPORT
+      #ifdef HB_THREAD_SUPPORT
          if( HB_VM_STACK.pMethod && ( HB_VM_STACK.pMethod->uiScope & HB_OO_CLSTP_SYNC ) != 0 )
          {
             uiClass = hb_objClassH( pSelf );
             // Put uiClass in the SYNC methods list.
             hb_clsPutSyncID( uiClass );
          }
-#endif
+      #endif
 
-         if( uiParams == 1 && pFunc == hb___msgGetData )
+      if( uiParams == 1 && pFunc == hb___msgGetData )
+      {
+         pFunc = hb___msgSetData;
+      }
+
+      if( HB_IS_OBJECT( pSelf ) )
+      {
+         pSelfBase = pSelf->item.asArray.value;
+
+         if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
-            pFunc = hb___msgSetData;
-         }
+            HB_ITEM_NEW( RealSelf );
+            USHORT nPos;
+            USHORT uiClass;
 
-         if( HB_IS_OBJECT( pSelf ) )
-         {
-            pSelfBase = pSelf->item.asArray.value;
+            //printf( "\n VmSend Method: %s \n", pSym->szName );
+            uiClass = pSelfBase->uiClass;
+            pItem->item.asSymbol.uiSuperClass = uiClass;
 
-            if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
+            //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
+
+            /* Replace the current stacked value with real self */
+            hb_itemCopy( &RealSelf, pSelfBase->pItems );
+            hb_itemForwardValue( pSelf, &RealSelf );
+
+            if( HB_IS_OBJECT( pSelf ) )
             {
-               HB_ITEM_NEW( RealSelf );
-               USHORT nPos;
-               USHORT uiClass;
+               /* Take back the good pSelfBase */
+               pSelfBase = pSelf->item.asArray.value;
 
-               //printf( "\n VmSend Method: %s \n", pSym->szName );
-               uiClass = pSelfBase->uiClass;
-               pItem->item.asSymbol.uiSuperClass = uiClass;
+               /* Push current SuperClass handle */
+               lPopSuper = TRUE ;
 
-               //TraceLog( NULL, "pRealSelf %p pItems %p\n", pRealSelf, pSelfBase->pItems );
-
-               /* Replace the current stacked value with real self */
-               hb_itemCopy( &RealSelf, pSelfBase->pItems );
-               hb_itemForwardValue( pSelf, &RealSelf );
-
-               if( HB_IS_OBJECT( pSelf ) )
+               if( ! pSelf->item.asArray.value->puiClsTree )
                {
-                  /* Take back the good pSelfBase */
-                  pSelfBase = pSelf->item.asArray.value;
-
-                  /* Push current SuperClass handle */
-                  lPopSuper = TRUE ;
-
-                  if( ! pSelf->item.asArray.value->puiClsTree )
-                  {
-                     pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                     pSelf->item.asArray.value->puiClsTree[0] = 0;
-                  }
-
-                  nPos = pSelfBase->puiClsTree[0] + 1;
-                  pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-                  pSelfBase->puiClsTree[0] = nPos ;
-                  pSelfBase->puiClsTree[ nPos ] = uiClass;
+                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+                  pSelf->item.asArray.value->puiClsTree[0] = 0;
                }
+
+               nPos = pSelfBase->puiClsTree[0] + 1;
+               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+               pSelfBase->puiClsTree[0] = nPos ;
+               pSelfBase->puiClsTree[ nPos ] = uiClass;
             }
          }
       }
@@ -7473,7 +7464,7 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.iStatics = pBlock->item.asBlock.statics;
 
-   pModuleSymbols = HB_SYM_GETMODULESYM( pBlock->item.asBlock.value->symbol );
+   pModuleSymbols = HB_SYM_GETMODULESYM( pBaseSym->item.asSymbol.value );
    //TraceLog( NULL, "Set Module: %s for Block: %s(%i)\n", pModuleSymbols ? pModuleSymbols->szModuleName : "", pBlock->item.asBlock.value->symbol->szName, pBlock->item.asBlock.value->lineno );
 
    hb_vmExecute( pBlock->item.asBlock.value->pCode, pModuleSymbols ? pModuleSymbols->pSymbolTable : NULL );
@@ -9544,7 +9535,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, USHORT uiSymbols, char * s
          }
 
          hb_dynsymNew( pSymbol, pNewSymbols );
-         //TraceLog( NULL, "Module: %s Sym: %s pModuleSymbols: %p pNewSymbols: %p\n", szModuleName, pSymbol->szName, pSymbol->pDynSym->pModuleSymbols, pNewSymbols );
+         //TraceLog( NULL, "Module: %s Sym: %s pModuleSymbols: %p pNewSymbols: %p\n", szModuleName, pSymbol->szName, HB_SYM_GETMODULESYM( pSymbol ), pNewSymbols );
       }
    }
 
@@ -9567,7 +9558,6 @@ HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 
    if( iPCodeVer != HB_PCODE_VER )
    {
-      char szBuff[ 512 ];
       char szPCode[ 12 ];
 
       sprintf( szPCode, "%i", iPCodeVer );
@@ -9594,7 +9584,6 @@ HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSym
 
    if( iPCodeVer != HB_PCODE_VER )
    {
-      char szBuff[ 512 ];
       char szPCode[ 12 ];
 
       sprintf( szPCode, "%i", iPCodeVer );
@@ -10400,7 +10389,7 @@ HB_FUNC( HB_SAVEBLOCK )
       hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 4 ), pBlock->item.asBlock.value->uiClass );
-      hb_itemPutC( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 5 ), pBlock->item.asBlock.value->symbol->szName );
+      hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 5 ), pBlock->item.asBlock.value->symbol->szName );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 6 ), pBlock->item.asBlock.value->lineno );
       hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 7 ), pBlock->item.asBlock.statics );
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.28 2006/06/12 21:25:51 kaddath Exp $
+ * $Id: persist.prg,v 1.29 2006/09/07 20:51:31 ronpinkas Exp $
  */
 
 /*
@@ -266,6 +266,11 @@ METHOD SaveToText( cObjectName ) CLASS HBPersistent
                   cObject += HB_OsNewLine()
                ENDIF
 
+               EXIT
+
+            CASE "B"
+               cObject += Space( nIndent ) + "   ::" + aPropertyAndVAlue[1] + " := " + ValToPrgExp( xValue, , , .T. )
+               cObject += HB_OsNewLine()
                EXIT
 
             DEFAULT

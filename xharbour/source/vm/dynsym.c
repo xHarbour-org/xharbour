@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.36 2006/04/23 00:36:00 druzus Exp $
+ * $Id: dynsym.c,v 1.37 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -52,11 +52,6 @@
 
 /*JC1: say we are going to optimze MT stack */
 #define HB_THREAD_OPTIMIZE_STACK
-
-#if ! ( defined( DEBUG ) || defined( _DEBUG ) )
-   #define NDEBUG
-#endif
-#include <assert.h>
 
 #include "hbvmopt.h"
 #include "hbapi.h"

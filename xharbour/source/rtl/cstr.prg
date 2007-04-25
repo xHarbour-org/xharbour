@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.35 2007/04/15 18:44:47 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.36 2007/04/15 21:55:55 ronpinkas Exp $
  */
 
 /*
@@ -300,27 +300,29 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
 RETURN cRet
 
 //--------------------------------------------------------------//
-FUNCTION ValToPrgExp( xVal, cName, aObjs )
+FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
 
    LOCAL cType := ValType( xVal )
    LOCAL aVar, cRet, nObj
    LOCAL cChar
 
-   //TraceLog( xVal )
+   //TraceLog( xVal, cName, aObjs, lBin )
 
    SWITCH cType
       CASE 'C'
          IF Len( xVal ) == 0
             RETURN '""'
-         ELSE
+         ELSEIF lBin == .T.
             cRet := ""
+
             FOR EACH cChar IN xVal
                cRet += " + Chr(" + Str( Asc( cChar ), 3 ) + ")"
             NEXT
 
             RETURN SubStr( cRet, 3 )
+         ELSE
+            RETURN StringToLiteral( xVal )
          ENDIF
-
       CASE 'D'
          RETURN "sToD( '" + dToS( xVal ) + "' )"
 
@@ -348,7 +350,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
          cRet  := "( " + cName + " := Array(" + LTrim( Str( Len( xVal ) ) ) + "), "
 
          FOR EACH aVar IN xVal
-            cRet += cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrgExp( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", aObjs ) + ", "
+            cRet += cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "] := " + ValToPrgExp( aVar, cName + "[" + LTrim( Str( HB_EnumIndex() ) ) + "]", aObjs, lBin ) + ", "
          NEXT
 
          RETURN cRet + cName + " )"
@@ -360,8 +362,8 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
             cRet := "{ "
 
             FOR EACH aVar IN xVal:Keys
-               cRet += ValToPrgExp( aVar ) + " => "
-               cRet += ValToPrgExp( xVal:Values[ HB_EnumIndex() ] ) + ", "
+               cRet += ValToPrgExp( aVar, cName, aObjs, lBin ) + " => "
+               cRet += ValToPrgExp( xVal:Values[ HB_EnumIndex() ], cName, aObjs, lBin ) + ", "
             NEXT
 
             /* We know for sure xVal isn't empty, and a last ',' is here */
@@ -373,7 +375,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
 
       CASE 'B'
          TRY
-            cRet := "HB_RestoreBlock( "  + ValToPrgExp( HB_SaveBlock( xVal ) ) + " )"
+            cRet := "HB_RestoreBlock( "  + ValToPrgExp( HB_SaveBlock( xVal ), cName, aObjs, .T. ) + " )"
          CATCH
             cRet := "{|| Alert( 'Non Persistentable Block.' ) }"
          END
@@ -400,7 +402,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs )
          cRet  := "( " + cName + " := __ClsInstName( '" +  xVal:ClassName  + "' ), "
 
          FOR EACH aVar IN __objGetValueDiff( xVal )
-            cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2], cName + ":" + aVar[1], aObjs ) + ", "
+            cRet += cName + ":" + aVar[1] + " := " + ValToPrgExp( aVar[2], cName + ":" + aVar[1], aObjs, lBin ) + ", "
          NEXT
 
          RETURN cRet + cName + " )"
@@ -420,17 +422,6 @@ RETURN cRet
 
 //--------------------------------------------------------------//
 FUNCTION PrgExpToVal( cExp )
-
-   /*
-   LOCAL aExp := HB_aTokens( cExp, ';' ), cLine, xRet
-
-   FOR EACH cLine IN aExp
-      IF ! Empty( cLine )
-         xRet := &( cLine )
-      ENDIF
-   NEXT
-   */
-
 RETURN &( cExp )
 
 //--------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.48 2006/08/13 20:56:06 druzus Exp $
+ * $Id: runner.c,v 1.49 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -90,6 +90,7 @@ typedef struct
    PHB_SYMB pSymRead;                           /* Symbols read             */
    PHB_DYNF pDynFunc;                           /* Functions read           */
    PSYMBOLS pModuleSymbols;
+   HB_DYNS  ModuleFakeDyn;
 } HRB_BODY, * PHRB_BODY;
 
 
@@ -568,6 +569,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       pHrbBody->pDynFunc = NULL;
       pHrbBody->ulSymbols = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
       pHrbBody->pModuleSymbols = NULL;
+      memset( &( pHrbBody->ModuleFakeDyn ), 0, sizeof( HB_DYNS ) );
 
       pSymRead = ( PHB_SYMB ) hb_xgrab( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
 
@@ -581,7 +583,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
 
          if( ( pSymbol->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) == 0 )
          {
-            pSymbol->ppModuleSymbols = &pHrbBody->pModuleSymbols;
+            pSymbol->pDynSym = &( pHrbBody->ModuleFakeDyn );
          }
          else
          {
@@ -663,6 +665,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       if( pHrbBody )
       {
          pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szHrb ? szHrb : "PCODE_HRB.hrb", TRUE, FALSE, NULL );
+         pHrbBody->ModuleFakeDyn.pModuleSymbols = pHrbBody->pModuleSymbols;
 
          if( pHrbBody->pModuleSymbols->pSymbolTable != pSymRead )
          {

@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.57 2007/04/14 21:47:21 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.58 2007/04/22 22:50:27 ronpinkas Exp $
  */
 
 /*
@@ -57,6 +57,11 @@
 #ifndef HB_VMPUB_H_
 #define HB_VMPUB_H_
 
+#if ! ( defined( DEBUG ) || defined( _DEBUG ) )
+   #define NDEBUG
+#endif
+#include <assert.h>
+
 #include "hbdefs.h"
 
    HB_EXTERN_BEGIN
@@ -86,33 +91,25 @@
          struct _HB_PCODEFUNC * pCodeFunc;
          int                    iStaticsBase;  /* static array index for module */
       } value;
-      union
-      {
-         struct _SYMBOLS **ppModuleSymbols;  /* pointer to it's symbol table container when symbol is NON PUBLIC! */
-         struct _HB_DYNS * pDynSym;         /* pointer to its dynamic symbol if defined */
-      };
+      struct _HB_DYNS * pDynSym;         /* pointer to its dynamic symbol if defined */
    } HB_SYMB, * PHB_SYMB;
 
-   #define HB_SYM_ISPUBLIC(pSym)                     ( (pSym)->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) )
-   #define HB_SYM_GETDYNSYM(pSym)                    ( HB_SYM_ISPUBLIC(pSym) ? (pSym)->pDynSym : NULL )
-   #define HB_SYM_GETMODULESYM(pSym)                 ( HB_SYM_ISPUBLIC(pSym) ? (pSym)->pDynSym->pModuleSymbols : \
-                                                        ( (pSym)->ppModuleSymbols ? ( *( (pSym)->ppModuleSymbols ) ) : NULL ) )
-   #define HB_SYM_GETMODULESYM_ISPUB(pSym, pbPublic) ( ( (*pbPublic) = HB_SYM_ISPUBLIC(pSym) ) != 0 ? (pSym)->pDynSym->pModuleSymbols : \
-                                                       ( (pSym)->ppModuleSymbols ? ( *( (pSym)->ppModuleSymbols ) ) : NULL ) )
+   #define HB_SYM_GETDYNSYM(pSym)      ( assert( (pSym)->pDynSym ), (pSym)->pDynSym )
+   #define HB_SYM_GETMODULESYM(pSym)   ( HB_SYM_GETDYNSYM(pSym)->pModuleSymbols )
 
    #define HB_SYM_GETGLOBALS(pSym)     ( HB_SYM_GETMODULESYM(pSym)->pGlobals )
    #define HB_SYM_GETGLOBALSPTR(pSym)  &( HB_SYM_GETMODULESYM(pSym)->pGlobals)
 
    #define HB_GETSYM()                 ( ( *HB_VM_STACK.pBase )->item.asSymbol.value )
 
-   #define HB_GETMODULESYM()               HB_SYM_GETMODULESYM( HB_GETSYM() )
-   #define HB_GETMODULESYM_ISPUB(pbPublic) HB_SYM_GETMODULESYM_ISPUB( HB_GETSYM(), (pbPublic) )
+   #define HB_GETMODULESYM()           HB_SYM_GETMODULESYM( HB_GETSYM() )
 
    #define HB_GETDYNSYM()              HB_SYM_GETDYNSYM( HB_GETSYM() )
    #define HB_GETGLOBALS()             HB_SYM_GETGLOBALS( HB_GETSYM() )
    #define HB_GETGLOBALSPTR()          HB_SYM_GETGLOBALSPTR( HB_GETSYM() )
 
-   #define HB_BASE_GETMODULESYM(pBase) HB_SYM_GETMODULESYM( hb_itemGetSymbol(*pBase) )
+   #define HB_BASE_GETSYM(pBase)       ( (*pBase)->item.asSymbol.value )
+   #define HB_BASE_GETMODULESYM(pBase) HB_SYM_GETMODULESYM( HB_BASE_GETSYM( pBase ) )
 
 /*
    // Now it should not be longer necessary

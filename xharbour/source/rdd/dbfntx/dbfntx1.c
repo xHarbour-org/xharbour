@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.167 2007/03/30 16:10:27 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.168 2007/04/22 22:50:29 ronpinkas Exp $
  */
 
 /*
@@ -7680,8 +7680,6 @@ static void hb_dbfntxRddInit( void * cargo )
    /* not executed, only to force DBF RDD linking */
    HB_FUNC_EXEC( _DBF );
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbfntx1__InitSymbols )
 { "DBFNTX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFNTX )}, NULL },

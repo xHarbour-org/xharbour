@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.24 2007/01/13 01:36:32 ronpinkas Exp $
+ * $Id: classes.h,v 1.25 2007/04/22 22:50:26 ronpinkas Exp $
  */
 
 /*
@@ -134,7 +134,7 @@ typedef struct
    PHB_ITEM pClassDatas;    /* Harbour Array for ClassDatas and shared */
    PHB_ITEM pInlines;       /* Array for inline codeblocks */
    PHB_FUNC pFunError;      /* error handler for not defined messages */
-   PHB_FUNC pDestructor;    /* Destructor */
+   PMETHOD  pDestructor;    /* Destructor */
    PHB_SYMB pClsSymbol;
    ULONG    fOpOver;        /* Flags for Operators overload */
    USHORT   uiDataInitiated;

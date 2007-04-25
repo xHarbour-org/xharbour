@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.204 2007/04/15 05:56:33 andresreyesh Exp $
+ * $Id: classes.c,v 1.205 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -211,8 +211,6 @@ static BOOL     s_bClsAutoInit = TRUE;
 USHORT hb_cls_uiArrayClass = 0, hb_cls_uiBlockClass = 0, hb_cls_uiCharacterClass = 0, hb_cls_uiDateClass = 0,
        hb_cls_uiLogicalClass = 0, hb_cls_uiNilClass = 0, hb_cls_uiNumericClass = 0, hb_cls_uiPointerClass = 0,
 	   hb_cls_uiHashClass = 0;
-
-HB_SYMB  hb_symDestructor = { "__Destructor", {HB_FS_PUBLIC}, {NULL}, NULL };
 
 /* All functions contained in classes.c */
 
@@ -1615,8 +1613,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
       /* in case of re-used message */
       if ( pNewMeth->pInitValue )
       {
-         if( pNewMeth->pFunction == hb___msgSetData ||
-             pNewMeth->pFunction == hb___msgGetData )
+         if( pNewMeth->pFunction == hb___msgSetData || pNewMeth->pFunction == hb___msgGetData )
          {
             UINT uiLen      = pClass->uiDataInitiated + 1;
             PCLSDINIT pInit = pClass->pInitValues;
@@ -1640,6 +1637,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
                }
             }
          }
+
          hb_itemRelease(pNewMeth->pInitValue) ;
          pNewMeth->pInitValue = NULL;
       }
@@ -1651,7 +1649,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
             pNewMeth->uiData = 0;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
-            //TraceLog( NULL, "NEW Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
+            //TraceLog( NULL, "NEW Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
 
             pClass->uiScope |= ( uiScope & HB_OO_CLSTP_CLASSCTOR );
             break;
@@ -1791,7 +1789,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( ( (PHB_ITEM ) pFunc_or_BlockPointer )->item.asBlock.value->symbol );
-            //TraceLog( NULL, "NEW INLINE Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
+            //TraceLog( NULL, "NEW INLINE Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
 
             ((PHB_ITEM) pFunc_or_BlockPointer)->item.asBlock.value->uiClass = uiClass;
 
@@ -1818,7 +1816,8 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
-            //TraceLog( NULL, "NEW ERROR Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
+            //TraceLog( NULL, "NEW ERROR Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
+
             pClass->pFunError   = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pClass->uiScope    |= HB_OO_CLS_ONERROR_SYMB;
             break;
@@ -1827,8 +1826,9 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
-            //TraceLog( NULL, "NEW DESTRUCTOR Method: %s:%s defined in: %s\n", pClass->szName, szMessage, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "" );
-            pClass->pDestructor = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            //TraceLog( NULL, "NEW DESTRUCTOR Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
+
+            pClass->pDestructor = pNewMeth;
             pClass->uiScope    |= HB_OO_CLS_DESTRUC_SYMB;
             break;
 
@@ -4178,52 +4178,43 @@ void hb_clsFinalize( PHB_ITEM pObject )
 
       if( pClass->pDestructor && hb_stackBaseItem()->item.asSymbol.uiSuperClass == 0 && strcmp( hb_stackBaseItem()->item.asSymbol.value->szName, "__CLSINSTSUPER" ) )
       {
-         // To DISABLE GC here where no refernce to this object will cause GPF for double release!
-         BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
-         PHB_FUNC pDestructor = pClass->pDestructor;
-
-         /* TODO: This code is not MT safe so MT programs cannot use
-            destructors */
          if( pClass->uiScope & HB_OO_CLS_DESTRUC_SYMB )
          {
-            hb_symDestructor.value.pFunPtr = ((PHB_SYMB) pDestructor)->value.pFunPtr;
-            hb_symDestructor.scope.value = ((PHB_SYMB) pDestructor)->scope.value;
-         }
-         else
-         {
-            hb_symDestructor.value.pFunPtr = pDestructor;
-         }
+            // To DISABLE GC here where no refernce to this object will cause GPF for double release!
+            BOOL bCollecting = hb_gcSetCollecting( TRUE ), bPop = TRUE;
+            PHB_SYMB pDestructor = pClass->pDestructor->pMessage->pSymbol;
 
-         // Save the existing Return Value and Top Item if any.
-         if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
-         {
-            // Don't process HB_VM_STACK.Return!
-            bPop = FALSE;
+            // Save the existing Return Value and Top Item if any.
+            if( HB_IS_ARRAY( &HB_VM_STACK.Return ) && HB_VM_STACK.Return.item.asArray.value == pObject->item.asArray.value )
+            {
+               // Don't process HB_VM_STACK.Return!
+               bPop = FALSE;
 
-            /* Save top item which can be processed at this moment */
-            hb_stackPush();
-         }
-         else
-         {
-            hb_vmPushState();
-         }
+               /* Save top item which can be processed at this moment */
+               hb_stackPush();
+            }
+            else
+            {
+               hb_vmPushState();
+            }
 
-         hb_vmPushSymbol( &hb_symDestructor );
-         hb_vmPush( pObject ); // Do NOT Forward!!!
-         hb_vmSend( 0 );
+            hb_vmPushSymbol( pDestructor );
+            hb_vmPush( pObject ); // Do NOT Forward!!!
+            hb_vmSend( 0 );
 
-         // Restore the existing Return Value and Top Item if any.
-         if( bPop )
-         {
-            hb_vmPopState();
-         }
-         else
-         {
-            /* Restore top item */
-            hb_stackDec();
-         }
+            // Restore the existing Return Value and Top Item if any.
+            if( bPop )
+            {
+               hb_vmPopState();
+            }
+            else
+            {
+               /* Restore top item */
+               hb_stackDec();
+            }
 
-         hb_gcSetCollecting( bCollecting );
+            hb_gcSetCollecting( bCollecting );
+         }
       }
    }
 }

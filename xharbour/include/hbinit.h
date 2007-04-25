@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.24 2006/04/23 00:36:00 druzus Exp $
+ * $Id: hbinit.h,v 1.25 2007/04/22 22:50:27 ronpinkas Exp $
  */
 
 /*
@@ -84,19 +84,23 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 #endif
 
 
+#define HB_MODULE_GLOBALS NULL
+
 #if defined(HARBOUR_STRICT_ANSI_C)
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn = {0}; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PHB_SYMB symbols = symbols_table; \
+      static PHB_SYMB symbols; \
       void func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModulesymbols = pModuleSymbols; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -114,15 +118,17 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn = {0}; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PHB_SYMB symbols = symbols_table; \
+      static PHB_SYMB symbols; \
       static void __attribute__ ((constructor)) func( void ) \
       { \
-         pModulesymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         pModulesymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -138,15 +144,17 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn = {0}; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PHB_SYMB symbols = symbols_table; \
+      static PHB_SYMB symbols; \
       static int func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
          return 0; \
       }
 
@@ -170,12 +178,25 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn = {0}; \
       static HB_SYMB symbols_table[] = {
 
+   /* this allows any macros to be preprocessed first
+      so that token pasting is handled correctly */
    #define HB_INIT_SYMBOLS_END( func ) \
+          _HB_INIT_SYMBOLS_END( func )
+
+   #define _HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PSYMBOLS pDummy = pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
-      static PHB_SYMB symbols = pModulesymbols->pSymbolTable;
+      static PHB_SYMB symbols; \
+      static int func( void ) \
+      { \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
+         return 0; \
+      } \
+      static int DUMMY_RegisterSymbols_##func = func();
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
       static int func( void ) \
@@ -189,7 +210,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
    #define _HB_CALL_ON_STARTUP_END( func ) \
          return 0; \
       } \
-      static int static_int_##func = func();
+      static int DUMMY_CallOnStart_##func = func();
 
 #elif defined(HB_PRAGMA_STARTUP) || \
       defined(__BORLANDC__) || defined(__LCC__) || defined(__POCC__) || defined(__XCC__)
@@ -204,15 +225,17 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
+      static HB_DYNS ModuleFakeDyn = {0}; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
       }; \
-      static PHB_SYMB symbols = symbols_table; \
+      static PHB_SYMB symbols; \
       static void func( void ) \
       { \
-         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, pGlobals ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \

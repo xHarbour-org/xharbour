@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5460 2007/04/24 12:20:02 modalsist Exp $
+ * $Id: ChangeLog,v 1.5461 2007/04/24 23:12:54 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-24 21:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/classes.h
+    * Modified pDestructor member of CLASS to PMETHOD
+  * source/vm/classes.c
+    * Resolved thread safety problem of ->pDestructor using a static symbol
+
+  * include/hbinit.h
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/vm/dynsym.c
+  * source/vm/hvm.c
+  * source/vm/runner.c
+    * Simplified/optimized recent modification by avoiding ppModuleSymbols union member, in favor of having a [fake] ->pDynSym
+      (1 per compiled modulle) also for static symbols.
+
+  * contrib/libnf/fttext.c
+  * contrib/rdd_ads/ads1.c
+  * source/pp/pplib3.c
+  * source/rdd/dbf1.c
+  * source/rdd/delim1.c
+  * source/rdd/sdf1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rtl/version.c
+  * source/vm/cmdarg.c
+    - Reverted recent compliance change which is no longer needed
+
+  * source/vm/codebloc.c
+    - Removed old commented code
+
+  * include/hbsetup.h
+    * Changed HB_PCODE_VER to 9
+      (Altough we never released previous change, as I'd like to avoid bogus GPF reports
+
+  * source/rtl/cstr.prg
+    + Added optional 4th argument <lBin> to ValToPrgExp() [default is .F.] to request binary representation for strings
+  * source/rtl/persist.prg
+    * Use ValToPrgExp() with lBin set to .T. for Codeblocks.
 
 2007-04-24 20:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.81 2007/03/02 02:36:23 druzus Exp $
+ * $Id: dbffpt1.c,v 1.82 2007/04/22 22:50:28 ronpinkas Exp $
  */
 
 /*
@@ -4735,8 +4735,6 @@ static void hb_dbffptRddInit( void * cargo )
       HB_FUNC_EXEC( _DBF );
    }
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbffpt1__InitSymbols )
 { "DBFFPT",               {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFFPT )},               NULL },

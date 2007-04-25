@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.169 2007/04/03 14:25:20 marchuet Exp $
+ * $Id: dbf1.c,v 1.170 2007/04/22 22:50:28 ronpinkas Exp $
  */
 
 /*
@@ -4713,8 +4713,6 @@ static void hb_dbfRddInit( void * cargo )
       hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
    }
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbf1__InitSymbols )
 { "_DBF",             {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( _DBF )}, NULL },

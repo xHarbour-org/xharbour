@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.24 2007/03/02 02:36:22 druzus Exp $
+ * $Id: delim1.c,v 1.25 2007/04/22 22:50:28 ronpinkas Exp $
  */
 
 /*
@@ -1545,8 +1545,6 @@ static void hb_delimRddInit( void * cargo )
       hb_errInternal( HB_EI_RDDINVALID, NULL, NULL, NULL );
    }
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( delim1__InitSymbols )
 { "DELIM",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DELIM )}, NULL },

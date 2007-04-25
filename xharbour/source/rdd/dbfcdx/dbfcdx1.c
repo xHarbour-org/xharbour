@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.261 2007/04/02 16:00:23 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.262 2007/04/22 22:50:28 ronpinkas Exp $
  */
 
 /*
@@ -9475,8 +9475,6 @@ static void hb_dbfcdxRddInit( void * cargo )
    HB_FUNC_EXEC( _DBF );
 }
 
-static PHB_ITEM *pGlobals = NULL;
-
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "SIXCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX )}, NULL },
 { "SIXCDX_GETFUNCTABLE", {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( SIXCDX_GETFUNCTABLE )}, NULL }
@@ -9540,8 +9538,6 @@ static void hb_dbfcdxRddInit( void * cargo )
    /* not executed, only to force DBF RDD linking */
    HB_FUNC_EXEC( _DBF );
 }
-
-static PHB_ITEM *pGlobals = NULL;
 
 HB_INIT_SYMBOLS_BEGIN( dbfcdx1__InitSymbols )
 { "DBFCDX",              {HB_FS_PUBLIC|HB_FS_LOCAL}, {HB_FUNCNAME( DBFCDX )}, NULL },
