@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5461 2007/04/24 23:12:54 modalsist Exp $
+ * $Id: ChangeLog,v 1.5462 2007/04/25 01:37:09 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-25 11:13 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+   * source/rtl/inkey.c
+     ! Fixed a memory leak.
 
 2007-04-24 21:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/classes.h
@@ -181,7 +185,7 @@
     ! Fixed silly but nasty typos in last commit to HB_P_SENDWITH[SHORT] which broke few compunded operations like :n++ ++:n
 
 2007-04-19 16:50 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
-   * harbour/source/common/hbver.c
+   * source/common/hbver.c
      + Added Windows Vista version.
 
 2007-04-19 10:10 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
@@ -218,15 +222,15 @@
       It occurs only with SET OPTIMIZE ON.
 
 2007-04-16 22:20 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
-  * xharbour\include/hbapi.h
-  * xharbour\source\rtl\valtype.c
+  * include/hbapi.h
+  * source/rtl/valtype.c
     + support for HB_ISDATETIME() function
 
-  * xharbour\include/hbstruct.h
-  * xharbour\source\rtl\tobject.prg
+  * include/hbstruct.h
+  * source/rtl/tobject.prg
     + improved STRUCTURE/MEMBER/ENDSTRUCTURE to support DATETIME and HASHES
 
-  * xharbour\tests\struct.prg
+  * tests/struct.prg
     ! updated with datetime and hash sample
 
 2007-04-16 22:57 UTC-0500 Ron Pinkas <ron/at/xharbour.com>

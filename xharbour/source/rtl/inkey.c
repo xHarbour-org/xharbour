@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.50 2007/02/08 23:39:32 peterrees Exp $
+ * $Id: inkey.c,v 1.51 2007/02/09 01:42:15 peterrees Exp $
  */
 
 /*
@@ -600,6 +600,8 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
                pString++;
             }
          }
+
+         hb_itemFreeC( pString );
       }
    }
 
