@@ -1,5 +1,5 @@
 /*
- * $Id: classesc.c,v 1.2 2007/04/12 05:09:10 andresreyesh Exp $
+ * $Id: classesc.c,v 1.3 2007/04/12 05:50:41 andresreyesh Exp $
  */
 
 /*
@@ -121,4 +121,11 @@ HB_FUNC( __CLS_PAR00 )
    hb_itemReturnForward( &Array );
 }
 
+HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem )
+{
+   if ( pItem && HB_IS_ARRAY( pItem ) )
+      return pItem->item.asArray.value->uiClass;
+   else
+      return 0;
+}
 
