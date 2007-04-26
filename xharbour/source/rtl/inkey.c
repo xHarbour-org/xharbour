@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.51 2007/02/09 01:42:15 peterrees Exp $
+ * $Id: inkey.c,v 1.52 2007/04/25 14:14:49 toninhofwi Exp $
  */
 
 /*
@@ -587,7 +587,7 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
 
       if ( ulLen )
       {
-         BYTE *pString =  (BYTE *) hb_itemGetC( pItem ) ;
+         BYTE *pString =  (BYTE *) hb_itemGetCPtr( pItem ) ;
 
          StrBuffer = AllocateStrBuffer( ulLen );
 
@@ -600,8 +600,6 @@ static void PutItemInKeyBuffer( PHB_ITEM pItem )
                pString++;
             }
          }
-
-         hb_itemFreeC( pString );
       }
    }
 
