@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.209 2007/04/18 11:45:29 toninhofwi Exp $
+ * $Id: dbcmd.c,v 1.210 2007/04/20 09:41:30 marchuet Exp $
  */
 
 /*
@@ -4447,7 +4447,8 @@ static ERRCODE hb_rddTransRecords( AREAP pArea,
    uiPrevArea = hb_rddGetCurrentWorkAreaNumber();
 
    if( szDriver == NULL )
-      szDriver = SELF_RDDNODE( pArea )->szName;
+      /* szDriver = SELF_RDDNODE( pArea )->szName; */
+      szDriver = hb_rddDefaultDrv( NULL );
 
    if( fExport )
    {
