@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.25 2007/04/22 22:50:27 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.26 2007/04/25 01:37:10 ronpinkas Exp $
  */
 
 /*
@@ -100,7 +100,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
-         ModuleFakeDyn.pModulesymbols = pModuleSymbols; \
+         ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
 
    #define HB_CALL_ON_STARTUP_BEGIN( func ) \
@@ -126,7 +126,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
       static PHB_SYMB symbols; \
       static void __attribute__ ((constructor)) func( void ) \
       { \
-         pModulesymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
