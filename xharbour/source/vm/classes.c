@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.205 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: classes.c,v 1.206 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -441,13 +441,13 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          }
 
          // ----------------- Compare Modules -----------------
-
+         
          if( HB_IS_OBJECT( pCaller ) )
          {
             PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
             PSYMBOLS pCallerClassModuleSymbols = HB_SYM_GETMODULESYM( pCallerClass->pClsSymbol );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-
+            
             if( pRealClassModuleSymbols == NULL || pCallerClassModuleSymbols == NULL )
             {
                //TraceLog( NULL, "Oops! No Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
@@ -468,7 +468,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          {
             PSYMBOLS pBlockModuleSymbols = HB_SYM_GETMODULESYM( pCaller->item.asBlock.value->symbol );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-
+            
             if( pRealClassModuleSymbols == NULL || pBlockModuleSymbols == NULL )
             {
                //TraceLog( NULL, "Oops! NO Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->symbol->szName );
@@ -491,7 +491,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          {
             PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-
+            
             if( pRealClassModuleSymbols && pModuleSymbols )
             {
                #ifdef DEBUG_SCOPE
@@ -1370,7 +1370,7 @@ static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *pp
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
-void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer, USHORT uiID, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
+void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer, USHORT uiID, USHORT wType, USHORT uiSprClass, USHORT uiScope, BOOL bPersistent, PHB_ITEM pMsgIs, PHB_ITEM pInit, BOOL bCheckPrefix, BOOL bCase )
 {
    if( uiClass && uiClass <= s_uiClasses )
    {
@@ -1833,8 +1833,29 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
 
          case HB_OO_MSG_DELEGATE:
-            pNewMeth->uiData = uiID;  /* store the delegate uiAt */
-            pNewMeth->pInitValue = hb_itemNew( pInit ); /* store the delegate handle */
+            if( pMsgIs && HB_IS_STRING( pMsgIs ) )
+            {
+               pNewMeth->pMsgIs =  hb_dynsymGet( pMsgIs->item.asString.value )->pSymbol;
+            }
+            else
+            {
+               pNewMeth->pMsgIs = NULL;
+            }
+            
+            if( pInit && HB_IS_STRING( pInit ) )
+            {
+               pNewMeth->pMsgTo =  hb_dynsymGet( pInit->item.asString.value )->pSymbol;
+            }
+            else
+            {
+               pNewMeth->pMsgTo = NULL;
+            }
+            
+            if( pInit && HB_IS_OBJECT( pInit ) )
+            {
+               pNewMeth->pInitValue = hb_itemNew( pInit );
+            }
+            
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pFunction = hb___msgDelegate;
@@ -1903,6 +1924,7 @@ HB_FUNC( __CLSADDMSG )
    char     *szMessage, szAssign[ HB_SYMBOL_NAME_LEN + 1 ];
    void *   pFunc_or_BlockPointer;
    PHB_ITEM pInit = NULL;
+   PHB_ITEM pMsgIs = NULL;
    BOOL     bPersistent, bCase;
 
    // 1
@@ -1966,7 +1988,7 @@ HB_FUNC( __CLSADDMSG )
       case HB_OO_MSG_CLASSPROPERTY:
          wType -= HB_OO_PROPERTY;
 
-         hb_clsAddMsg( uiClass, szMessage, NULL, uiID, wType, 0, uiScope, bPersistent, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
+         hb_clsAddMsg( uiClass, szMessage, NULL, uiID, wType, 0, uiScope, bPersistent, NULL, hb_param( 5, HB_IT_ANY ), FALSE, bCase );
 
          // Remove HB_OO_CLSTP_PUBLISHED flag if present.
          uiScope &= ~HB_OO_CLSTP_PUBLISHED;
@@ -1980,39 +2002,8 @@ HB_FUNC( __CLSADDMSG )
 
       case HB_OO_MSG_DELEGATE:
       {
-         PHB_ITEM pString = hb_param( 3, HB_IT_STRING );
-         PHB_DYNS pMsg;
-         PCLASS pClass;
-         pInit = hb_param( 5, HB_IT_STRING | HB_IT_OBJECT );
-
-         if( pInit && HB_IS_STRING( pInit ) )
-         {
-            pMsg = hb_dynsymFindName( pInit->item.asString.value );
-
-            if( pMsg )
-            {
-               pClass = s_pClasses + uiClass - 1;
-               uiID = hb_clsFindMethod( pMsg, pClass, NULL );
-
-               if( uiID )
-               {
-                  uiID = (pClass->pMethods + uiID - 1)->uiData;
-               }
-
-               pInit = pString;
-            }
-         }
-
-         if( pString && pInit && HB_IS_OBJECT( pInit ) )
-         {
-            pMsg = hb_dynsymFindName( pString->item.asString.value );
-
-            if( pMsg )
-            {
-               pClass = s_pClasses + pInit->item.asArray.value->uiClass - 1;
-               uiID = hb_clsFindMethod( pMsg, pClass, NULL );
-            }
-         }
+         pMsgIs = hb_param( 3, HB_IT_STRING );
+         pInit  = hb_param( 5, HB_IT_STRING | HB_IT_OBJECT );
       }
          break;
 
@@ -2021,7 +2012,7 @@ HB_FUNC( __CLSADDMSG )
    }
 
    // Call worker function.
-   hb_clsAddMsg( uiClass, szMessage, pFunc_or_BlockPointer, uiID, wType, uiSprClass, uiScope, bPersistent, pInit, TRUE, bCase );
+   hb_clsAddMsg( uiClass, szMessage, pFunc_or_BlockPointer, uiID, wType, uiSprClass, uiScope, bPersistent, pMsgIs, pInit, TRUE, bCase );
 }
 
 USHORT __cls_CntMethods( USHORT uiClass, PHB_FUNC pFunction )
@@ -3889,73 +3880,42 @@ static HARBOUR hb___msgVirtual( void )
 static HARBOUR hb___msgDelegate( void )
 {
    HB_THREAD_STUB
+   
+   PHB_SYMB pMsgIs   = (HB_VM_STACK.pMethod)->pMsgIs;
+   PHB_SYMB pMsgTo   = (HB_VM_STACK.pMethod)->pMsgTo;
+   PHB_ITEM pSelf    = hb_stackSelfItem();
+   USHORT   uiPCount = hb_pcount(), i;
 
-   HB_ITEM_PTR pSelf = (HB_VM_STACK.pMethod)->pInitValue;
-   USHORT uiIndex = (HB_VM_STACK.pMethod)->uiData;
-   USHORT uiPCount=hb_pcount();
-   USHORT uiParam, uiClass;
-   PCLASS pClass;
-   PMETHOD pMethod;
-
-   if( pSelf && HB_IS_STRING( pSelf ) )
+   if( !pMsgIs )
    {
-      PHB_ITEM pObject = hb_arrayGetItemPtr( hb_stackSelfItem(), uiIndex );
-
-      if( pObject && HB_IS_OBJECT( pObject ) )
-      {
-         PHB_DYNS pMsg = hb_dynsymFindName( pSelf->item.asString.value );
-         if( pMsg )
-         {
-            pClass = s_pClasses + pObject->item.asArray.value->uiClass - 1;
-            uiIndex = hb_clsFindMethod( pMsg, pClass, NULL );
-/*
-            Vicente Guerra 2006/11/18:
-            It's copying the "delegated" object to CLASS' area, instead of
-            current object's area.
-            if( uiIndex )
-            {
-               (HB_VM_STACK.pMethod)->uiData = uiIndex;
-               hb_itemCopy( (HB_VM_STACK.pMethod)->pInitValue, pObject );
-            }
-*/
-         }
-      }
-      pSelf = pObject;
+      pMsgIs = (HB_VM_STACK.pMethod)->pMessage->pSymbol;
    }
 
-   if( pSelf )
+   if( pMsgTo )
    {
-      uiClass = hb_objClassH( pSelf );
-
-      if( uiClass )
-      {
-         pClass = s_pClasses + uiClass - 1;
-
-         if( uiIndex && pClass->uiMethods >= uiIndex )
-         {
-            pMethod = pClass->pMethods + uiIndex - 1;
-
-            hb_vmPushSymbol( pMethod->pMessage->pSymbol );
-            hb_vmPush( pSelf );                     /* Push block               */
-            for( uiParam = 1; uiParam <= uiPCount; uiParam++ )
-            {
-               hb_vmPush( hb_param( uiParam, HB_IT_ANY ) );
-            }
-
-            hb_vmSend( ( USHORT ) uiPCount );                       /* Self is also an argument */
-         }
-         else
-         {
-            hb_errRT_BASE_SubstR( EG_NOMETHOD, 1004, "Not method delegate", (HB_VM_STACK.pMethod)->pMessage->pSymbol->szName, 0 );
-         }
-      }
+      hb_vmPushSymbol( pMsgTo );
+      hb_vmPush( pSelf );
+      hb_vmSend( 0 );
+      
+      pSelf = &(HB_VM_STACK.Return);
    }
-   else
+   else if( (HB_VM_STACK.pMethod)->pInitValue )
    {
-      hb_errRT_BASE_SubstR( EG_NOOBJECT, 1004, "Not object delegate", (HB_VM_STACK.pMethod)->pMessage->pSymbol->szName, 0 );
+      pSelf = (HB_VM_STACK.pMethod)->pInitValue;
+   }
+
+   if( pSelf  )
+   {
+      hb_vmPushSymbol( pMsgIs );
+      hb_vmPush( pSelf );
+
+      for( i = 1; i <= uiPCount; i++ )
+      {
+         hb_vmPush( hb_stackItemFromBase( i ) );
+      }
+      hb_vmSend( ( USHORT ) uiPCount );
    }
 }
-
 
 PCLASS hb_clsClassesArray( void )
 {

@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.23 2007/04/15 18:47:55 andresreyesh Exp $
+ * $Id: tclass.prg,v 1.24 2007/04/22 22:50:38 ronpinkas Exp $
  */
 
 /*
@@ -361,11 +361,6 @@ STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
 
-   /* Remove possible ( <x,...> )*/
-   IF ( nAt := At( "(", cMethod ) ) > 0
-      cMethod := RTrim( Left( cMethod, nAt - 1 ) )
-   ENDIF
-
    AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
 
 RETURN
@@ -374,11 +369,6 @@ RETURN
 STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
    LOCAL Self := QSelf(), nAt
-
-   /* Remove possible ( <x,...> )*/
-   IF ( nAt := At( "(", cMethod ) ) > 0
-      cMethod := RTrim( Left( cMethod, nAt - 1 ) )
-   ENDIF
 
    AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
 
@@ -389,11 +379,6 @@ STATIC PROCEDURE AddClsMethod( cMethod, nFuncPtr, nScope )
 
    LOCAL Self := QSelf(), nAt
 
-   /* Remove possible ( <x,...> )*/
-   IF ( nAt := At( "(", cMethod ) ) > 0
-      cMethod := RTrim( Left( cMethod, nAt - 1 ) )
-   ENDIF
-
    AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
 
 RETURN
@@ -403,11 +388,6 @@ STATIC PROCEDURE AddVirtual( cMethod )
 
    LOCAL Self := QSelf(), nAt
 
-   /* Remove possible ( <x,...> )*/
-   IF ( nAt := At( "(", cMethod ) ) > 0
-      cMethod := RTrim( Left( cMethod, nAt - 1 ) )
-   ENDIF
-
    AAdd( ::aVirtuals, cMethod )
 
 RETURN
@@ -415,15 +395,7 @@ RETURN
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
 
-   LOCAL Self := QSelf(), nAt
-
-   /* Remove possible ( <x,...> )*/
-   IF ( nAt := At( "(", cMethod ) ) > 0
-      cMethod := RTrim( Left( cMethod, nAt - 1 ) )
-   ENDIF
-   IF ( nAt := At( "(", cDelegate ) ) > 0
-      cDelegate := RTrim( Left( cDelegate, nAt - 1 ) )
-   ENDIF
+   LOCAL Self := QSelf()
 
    AAdd( ::aDelegates, { cMethod, cDelegate, nScope, lPersistent, cObject } )
 

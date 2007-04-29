@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5466 2007/04/27 09:24:49 marchuet Exp $
+ * $Id: ChangeLog,v 1.5467 2007/04/27 23:46:02 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-29 12:06 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * include/hbclass.ch
+    * Several Changues
+      - Removed __CLS_PARAM, __CLS_PAR00, __HB_CLS_PAR
+      - Removed .. Not loger nedded
+	#xcommand _HB_MEMBER <MethodName>([<params,...>])() [<*x*>] => _HB_MEMBER <MethodName>(<params>) <x>
+	#xtranslate @<!funcname!>([<params,...>])() => @<funcname>(<params>)
+      + Add _InheritFrom_, _AsFunc_, _AsName_, _AsStr_, _AsStrLst_, __OPT__
+      * Now Works with Delegate Message
+	MESSAGE ... IS
+	MESSAGE ... IS ... TO ...
+	MESSAGE ... IS ... IN ...
+	MESSAGE ... TO ...
+	MESSAGE ... IN ...
+	VAR ... IS ...
+	VAR ... IS ... TO ...
+	VAR ... IS ... IN ...
+	VAR ... TO ...
+	VAR ... IN ...
+      
+  * include/classes.h
+    + Add to METHOD
+   	PHB_SYMB pMsgIs;
+	PHB_SYMB pMsgTo;
+
+  * source/vm/classes.c
+    * Change hb___msgDelegate
+      + Now work full delegate at Run Time
+
+  * source/rtl/tclass.prg
+    - Remove Code
+       /* Remove possible ( <x,...> )*/
+      IF ( nAt := At( "(", cMethod ) ) > 0
+        cMethod := RTrim( Left( cMethod, nAt - 1 ) )
+      ENDIF
+    * Now Resolved with preprocesor
+
+  * utils/xbscript/xbs_harb.ch
+    * changue FROM CHARACTER to FROM _CHARACTER
+
+  /* Please make a clean copy */
 
 2007-04-27 18:45 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * include/hbinit.h

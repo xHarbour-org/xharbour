@@ -364,7 +364,7 @@
 
   //--------------------------------------------------------------//
 
-  CLASS StringOle FROM Character
+  CLASS StringOle FROM _Character
 
      METHOD OleValuePlus( xArg )            OPERATOR "+"
      METHOD OleValueMinus( xArg )           OPERATOR "-"

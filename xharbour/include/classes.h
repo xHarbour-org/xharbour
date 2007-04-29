@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.25 2007/04/22 22:50:26 ronpinkas Exp $
+ * $Id: classes.h,v 1.26 2007/04/25 01:37:10 ronpinkas Exp $
  */
 
 /*
@@ -93,6 +93,8 @@ typedef struct hb_class_method
    USHORT   uiSprClass;          /* Originalclass'handel (super or current class'handel if not herited). */ /*Added by RAC&JF*/
    USHORT   uiScope;             /* Scoping value */
    PHB_ITEM pInitValue;          /* Init Value for data */
+   PHB_SYMB pMsgIs;
+   PHB_SYMB pMsgTo;
    BYTE     bClsDataInitiated;   /* There is one value assigned at init time */
    ULONG    ulCalls;             /* profiler support */
    ULONG    ulTime;              /* profiler support */
