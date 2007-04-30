@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5469 2007/04/30 01:16:28 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5470 2007/04/30 10:18:14 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,23 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-04-30 17:41 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/makefile.vc
+    + Add option -Ox
+    - Removed options -Og -Op -GB, declared deprecated by msvc 8
+
+2007-04-30 17:12 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/hvm.c
+    + Add hb_vmDoInitFunc()
+    * Changed hb_vmDoInitClip() to hb_vmDoInitFunc( "CLIPINI" )
+    * Changed hb_vmDoInitOle() to hb_vmDoInitFunc( "HB_OLEINIT" )
+    * Changed hb_vmDoInitHashEntry() to hb_vmDoInitFunc( "HASHENTRY" )
+    + Add hb_vmDoModuleFunctions()
+    * Changed hb_vmDoModuleInitFunctions() to hb_vmDoModuleFunctions( s_InitFunctions )
+    * Changed hb_vmDoModuleExitFunctions() to hb_vmDoModuleFunctions( s_ExitFunctions )
+    * Many changes in code, touching small performance
+    * Please, test and report errors.
+    
 2007-04-30 12:15 UTC+0200 Alex Strickland <sscc/at/mweb.co.za>
   * source/rtl/dllcall.c
   *  Add CALLDLL()
