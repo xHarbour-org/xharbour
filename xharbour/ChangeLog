@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5470 2007/04/30 10:18:14 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.5471 2007/04/30 20:45:01 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,6 +12,8 @@
   * source/makefile.vc
     + Add option -Ox
     - Removed options -Og -Op -GB, declared deprecated by msvc 8
+    - Removed option -Ow, ignored by msvc 8
+    * Changed option -o to -Fe, new option for output executable file
 
 2007-04-30 17:12 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/hvm.c
