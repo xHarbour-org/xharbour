@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.8 2007/04/14 07:03:47 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.9 2007/04/14 21:47:22 ronpinkas Exp $
  */
 
 /*
@@ -415,7 +415,7 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
    {
       iFlags     = xec->dwFlags;
       lpFunction = xec->lpFunc;
-      
+
       //TODO Params maybe explictly specified in xec!
    }
 
@@ -970,5 +970,27 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
 
    return Res;
 }
+
+
+//
+// Call a DLL function from (x)Harbour, the first parameter is a pointer returned from
+// GetProcAddress above. Note that it is hardcoded to use PASCAL calling convention.
+//
+
+HB_FUNC( CALLDLL )
+{
+   int iParams = hb_pcount();
+   int iFirst = 2;
+   int iArgCnt = iParams - 1;
+   LPVOID     lpFunction;
+
+   lpFunction = (LPVOID) hb_parptr( 1 );
+   if (lpFunction != NULL)
+   {
+      DllExec( DC_CALL_STD, lpFunction, iParams, iFirst, iArgCnt, NULL );
+   }
+
+}
+
 
 #endif /* HB_OS_WIN32 */

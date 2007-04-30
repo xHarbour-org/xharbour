@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5468 2007/04/29 18:07:24 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5469 2007/04/30 01:16:28 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-30 12:15 UTC+0200 Alex Strickland <sscc/at/mweb.co.za>
+  * source/rtl/dllcall.c
+  *  Add CALLDLL()
+  *   Call a DLL function from (x)Harbour, the first parameter is a pointer returned from
+  *   GetProcAddress above. Note that it is hardcoded to use PASCAL calling convention.
 
 2007-04-29 21:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbpcode.h
