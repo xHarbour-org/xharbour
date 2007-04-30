@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.15 2006/05/16 22:57:08 druzus Exp $
+ * $Id: maindllp.c,v 1.16 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 }
 
 /* module symbols initialization */
-HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
+HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    va_list ap;
    USHORT uiModuleSymbols;
@@ -98,27 +98,20 @@ HB_EXPORT PHB_SYMB hb_vmProcessSymbols( PHB_SYMB pModuleSymbols, ... )
    char *szModule;
    FARPROC pProcessSymbols;
 
-   va_start( ap, pModuleSymbols );
-      uiModuleSymbols = ( USHORT ) va_arg( ap, int );
-      szModule = va_arg( ap, char * );
-      iPCodeVer = va_arg( ap, int );
-   va_end( ap );
-
    /* notice hb_vmProcessDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
     * adjustments are required
     */
-   pProcessSymbols = GetProcAddress( GetModuleHandle( NULL ),
-                                             "_hb_vmProcessDllSymbols" );
+   pProcessSymbols = GetProcAddress( GetModuleHandle( NULL ), "_hb_vmProcessDllSymbols" );
+
    if( pProcessSymbols )
    {
-      pModuleSymbols = ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )
-                     ( pModuleSymbols, uiModuleSymbols, szModule, iPCodeVer );
+      return ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pModuleSymbols, uiModuleSymbols, szModule, iPCodeVer );
    }
    /* else
     *    may we issue an error ? */
 
-   return pModuleSymbols;
+   return NULL;
 }
 
 void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )

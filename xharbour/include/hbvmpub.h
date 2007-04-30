@@ -111,6 +111,22 @@
    #define HB_BASE_GETSYM(pBase)       ( (*pBase)->item.asSymbol.value )
    #define HB_BASE_GETMODULESYM(pBase) HB_SYM_GETMODULESYM( HB_BASE_GETSYM( pBase ) )
 
+   #define HB_STACK_OR_BLOCK_LOCAL( p, n ) do{ \
+                                                if( (n) >= 0 ) \
+                                                { \
+                                                   p = hb_stackItemFromBase(n); \
+                                                   \
+                                                   if( HB_IS_BYREF( p ) ) \
+                                                   { \
+                                                      p = hb_itemUnRef( p ); \
+                                                   } \
+                                                } \
+                                                else \
+                                                { \
+                                                   p = hb_codeblockGetVar( hb_stackSelfItem(), (LONG)( n ) ); \
+                                                } \
+                                             }while(0);
+
 /*
    // Now it should not be longer necessary
    #if defined(_MSC_VER) && _MSC_VER < 1000

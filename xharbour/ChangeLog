@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5467 2007/04/27 23:46:02 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5468 2007/04/29 18:07:24 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-04-29 21:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbpcode.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * include/hbxvm.h
+  * source/compiler/genc.c
+  * source/compiler/gencc.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbdead.c
+  * source/compiler/hbfix.c
+  * source/compiler/hblbl.c
+  * source/compiler/hbpcode.c
+  * source/compiler/hbpcstat.c
+  * source/compiler/hbstripl.c
+  * source/vm/hvm.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * source/compiler/exproptb.c
+  * source/compiler/exproptc.c
+    * Standardized and improved HB_P_[SET]LOCANEAR* support
+    + Added HB_P_[PUSH]LOCALNEARINC and HB_P_[PUSH]LOCALNEARDEC to poptimize <local> += 1 and <local> -= 1
+
+  * source/vm/maindllp.c
+    * Updated hb_vmProcessSymbols() as per recent change
 
 2007-04-29 12:06 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbclass.ch
@@ -27,7 +52,7 @@
 	VAR ... IS ... IN ...
 	VAR ... TO ...
 	VAR ... IN ...
-      
+
   * include/classes.h
     + Add to METHOD
    	PHB_SYMB pMsgIs;
@@ -57,7 +82,7 @@
 2007-04-27 11:24 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/dbcmd.c
     ! use default RDD instead of current one in COPY TO and APPEND FROM
-    
+
 2007-04-26 11:01 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * source/rtl/inkey.c
      ! Changed call to hb_itemGetC() by hb_itemGetCPtr()
@@ -65,7 +90,7 @@
 
 2007-04-25 10:02 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
    * source/vm/classesc.c
-      + Add redundant hb_objGetClass()       
+      + Add redundant hb_objGetClass()
 
 2007-04-25 11:13 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * source/rtl/inkey.c

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.619 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: hvm.c,v 1.620 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -2853,16 +2853,44 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_PUSHLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_PUSHLOCALNEAR") );
-            hb_vmPushLocal( ( signed char ) pCode[ w + 1 ] );
+            hb_vmPushLocal( (int)(signed char) ( pCode[ w + 1 ] ) );
             w += 2;  /* only first two bytes are used */
             break;
 
+         case HB_P_PUSHLOCALNEARINC:
+         {
+            PHB_ITEM pLocal;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
+
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
+            hb_vmAddInt( pLocal, 1 );
+            hb_vmPush( pLocal );
+            w += 2;
+            break;
+         }
+
+         case HB_P_PUSHLOCALNEARDEC:
+         {
+            PHB_ITEM pLocal;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
+
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
+            hb_vmAddInt( pLocal, -1 );
+            hb_vmPush( pLocal );
+            w += 2;
+            break;
+         }
+
          case HB_P_LOCALNEARADD:
          {
-            PHB_ITEM pLocal = hb_itemUnRef( hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] ) );
+            PHB_ITEM pLocal;
 
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADD") );
+
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) pCode[ w + 1 ] );
             hb_vmPlus( pLocal, hb_stackItemFromTop( -1 ), pLocal );
-
             hb_stackPop();
 
             w += 2;
@@ -2871,26 +2899,48 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_LOCALNEARADDINT:
          {
-            PHB_ITEM pLocal = hb_stackItemFromBase( pCode[ w + 1 ] );
+            PHB_ITEM pLocal;
             int iAdd = HB_PCODE_MKSHORT( &pCode[ w + 2 ] );
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARADDINT") );
 
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
             hb_vmAddInt( pLocal, iAdd );
             w += 4;
+            break;
+         }
+
+         case HB_P_LOCALNEARINC:
+         {
+            PHB_ITEM pLocal;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARINC") );
+
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
+            hb_vmAddInt( pLocal, 1 );
+            w += 2;
+            break;
+         }
+
+         case HB_P_LOCALNEARDEC:
+         {
+            PHB_ITEM pLocal;
+
+            HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARDEC") );
+
+            HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
+            hb_vmAddInt( pLocal, -1 );
+            w += 2;
             break;
          }
 
          case HB_P_LOCALNEARSETINT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETINT") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( (unsigned char) pCode[ w + 1 ] );
+               PHB_ITEM pLocal;
                int iNewVal = HB_PCODE_MKSHORT( &( pCode[ w + 2 ] ) );
 
-               if( HB_IS_BYREF( pLocal ) )
-               {
-                  pLocal = hb_itemUnRef( pLocal );
-               }
+               HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
 
                if( ( ! HB_IS_NUMBER( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
                {
@@ -2908,13 +2958,10 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_LOCALNEARSETSTR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTR") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               PHB_ITEM pLocal;
                USHORT uiSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
 
-               if( HB_IS_BYREF( pLocal ) )
-               {
-                  pLocal = hb_itemUnRef( pLocal );
-               }
+               HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
 
                if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
                {
@@ -2946,17 +2993,14 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_LOCALNEARSETSTRHIDDEN:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_LOCALNEARSETSTRHIDDEN") );
             {
-               PHB_ITEM pLocal = hb_stackItemFromBase( ( unsigned char ) pCode[ w + 1 ] );
+               PHB_ITEM pLocal;
                ULONG ulSize = HB_PCODE_MKUSHORT( &( pCode[ w + 2 ] ) );
                ULONG ulBufferLen = HB_PCODE_MKUSHORT( &( pCode[ w + 5 ] ) );
                BYTE *pBuffer;
 
                pBuffer = hb_vmUnhideString( pCode[ w + 4 ], ulSize, pCode + w + 7, ulBufferLen );
 
-               if( HB_IS_BYREF( pLocal ) )
-               {
-                  pLocal = hb_itemUnRef( pLocal );
-               }
+               HB_STACK_OR_BLOCK_LOCAL( pLocal, (int)(signed char) ( pCode[ w + 1 ] ) );
 
                if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
                {
@@ -3210,7 +3254,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_POPLOCALNEAR:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPLOCALNEAR") );
-            hb_vmPopLocal( ( signed char ) pCode[ w + 1 ] );
+            hb_vmPopLocal( (int)(signed char) ( pCode[ w + 1 ] ) );
             w += 2;  /* only first two bytes are used */
             break;
 
@@ -6887,6 +6931,8 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    //TraceLog( NULL, "Symbol: '%s'\n", pSym->szName );
 
+   assert( HB_SYM_GETDYNSYM(pSym) );
+
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
       pFunc = pSym->value.pFunPtr;
@@ -6894,9 +6940,9 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
       if( pFunc )
       {
          #ifndef HB_NO_PROFILER
-            if( bProfiler /*&& HB_SYM_GETDYNSYM( pSym )*/ )
+            if( bProfiler /*&& HB_SYM_GETDYNSYM(pSym)*/ )
             {
-               HB_SYM_GETDYNSYM( pSym )->ulRecurse++;
+               HB_SYM_GETDYNSYM(pSym)->ulRecurse++;
             }
          #endif
 
@@ -6924,17 +6970,17 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
          HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
 
          #ifndef HB_NO_PROFILER
-            if( bProfiler /*&& HB_SYM_GETDYNSYM( pSym )*/ )
+            if( bProfiler /*&& HB_SYM_GETDYNSYM(pSym)*/ )
             {
-               HB_SYM_GETDYNSYM( pSym )->ulCalls++;                   /* profiler support */
+               HB_SYM_GETDYNSYM(pSym)->ulCalls++;                   /* profiler support */
 
                /* Time spent has to be added only inside topmost call of a recursive function */
-               if( HB_SYM_GETDYNSYM( pSym )->ulRecurse == 1 )
+               if( HB_SYM_GETDYNSYM(pSym)->ulRecurse == 1 )
                {
-                  HB_SYM_GETDYNSYM( pSym )->ulTime += clock() - ulClock; /* profiler support */
+                  HB_SYM_GETDYNSYM(pSym)->ulTime += clock() - ulClock; /* profiler support */
                }
 
-               HB_SYM_GETDYNSYM( pSym )->ulRecurse--;
+               HB_SYM_GETDYNSYM(pSym)->ulRecurse--;
             }
          #endif
       }
@@ -7282,7 +7328,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             // Restoring it's real name!
             pFuncSym->szName = szFuncName;
 
-            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be pooped.
+            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
          }
          else
          {
@@ -7307,7 +7353,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             // Restoring it's real name!
             pFuncSym->szName = szFuncName;
 
-            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be pooped.
+            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
          }
          else
          {
@@ -8629,28 +8675,9 @@ static void hb_vmPushLocal( SHORT iLocal )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocal(%hd)", iLocal));
 
-   if( iLocal >= 0 )
-   {
-      /* local variable or local parameter */
-      pLocal = hb_stackItemFromBase( iLocal );
-   }
-   else
-   {
-      /* local variable referenced in a codeblock
-       * hb_stackSelfItem() points to a codeblock that is currently evaluated
-       */
-      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), ( LONG ) iLocal );
-   }
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
-   if( HB_IS_BYREF( pLocal ) )
-   {
-      hb_itemCopy( ( * HB_VM_STACK.pPos ), hb_itemUnRef( pLocal ) );
-   }
-   else
-   {
-      hb_itemCopy( ( * HB_VM_STACK.pPos ), pLocal );
-   }
-
+   hb_itemCopy( ( * HB_VM_STACK.pPos ), pLocal );
    hb_stackPush();
 }
 
@@ -9064,24 +9091,7 @@ static void hb_vmPopLocal( SHORT iLocal )
    /* Remove MEMOFLAG if exists (assignment from field). */
    pVal->type &= ~HB_IT_MEMOFLAG;
 
-   if( iLocal >= 0 )
-   {
-      /* local variable or local parameter */
-      pLocal = hb_stackItemFromBase( iLocal );
-
-      /* Assigned to a parameter by refrence. */
-      if( HB_IS_BYREF( pLocal ) )
-      {
-         pLocal = hb_itemUnRef( pLocal );
-      }
-   }
-   else
-   {
-      /* local variable referenced in a codeblock
-       * hb_stackSelfItem() points to a codeblock that is currently evaluated
-       */
-      pLocal = hb_codeblockGetVar( hb_stackSelfItem(), iLocal ) ;
-   }
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
    if( ( HB_IS_NUMBER( pLocal ) && HB_IS_NUMBER( pVal ) ) || pLocal->type == pVal->type )
    {
@@ -9529,6 +9539,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, USHORT uiSymbols, char * s
                   /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
                   TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously registered Module: %s\n",
                             pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+
+                  pSymbol->pDynSym = pDynSym;
                   continue;
                }
             }
@@ -9573,7 +9585,7 @@ HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 
 /* hvm support for pcode DLLs */
 
-HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer )
+HB_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessDllSymbols(%p, %hu)", pSymbols, uiModuleSymbols));
 
@@ -9594,7 +9606,7 @@ HB_EXPORT PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSym
                       "Please recompile.\n", szModule, szPCode );
    }
 
-   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, NULL )->pSymbolTable;
+   return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, NULL );
 }
 
 HB_EXPORT PSYMBOLS * hb_vmSymbols( void )
@@ -11365,12 +11377,8 @@ HB_EXPORT BOOL hb_xvmLocalAdd( int iLocal )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalAdd(%d)", iLocal));
 
-   pLocal = hb_stackItemFromBase( iLocal );
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
-   if( HB_IS_BYREF( pLocal ) )
-   {
-      pLocal = hb_itemUnRef( pLocal );
-   }
    hb_vmPlus( pLocal, hb_stackItemFromTop( -1 ), pLocal );
    hb_stackPop();
 
@@ -12390,19 +12398,15 @@ HB_EXPORT BOOL hb_xvmMacroText( void )
    HB_XVM_RETURN
 }
 
-HB_EXPORT void hb_xvmLocalSetInt( USHORT usLocal, int iVal )
+HB_EXPORT void hb_xvmLocalSetInt( int iLocal, int iVal )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%hu, %d)", usLocal, iVal));
 
-   pLocal = hb_stackItemFromBase( usLocal );
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
-   if( HB_IS_BYREF( pLocal ) )
-   {
-      pLocal = hb_itemUnRef( pLocal );
-   }
    if( ( ! HB_IS_NUMBER( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
    {
       hb_vmPushInteger( iVal );
@@ -12414,19 +12418,14 @@ HB_EXPORT void hb_xvmLocalSetInt( USHORT usLocal, int iVal )
    }
 }
 
-HB_EXPORT void hb_xvmLocalSetStr( USHORT usLocal, const char * pVal, ULONG ulLen )
+HB_EXPORT void hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
 {
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%hu,%p,%lu)", usLocal, pVal, ulLen));
 
-   pLocal = hb_stackItemFromBase( usLocal );
-
-   if( HB_IS_BYREF( pLocal ) )
-   {
-      pLocal = hb_itemUnRef( pLocal );
-   }
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
    if( ( ! HB_IS_STRING( pLocal ) ) && hb_objGetOpOver( pLocal ) & HB_CLASS_OP_ASSIGN )
    {
@@ -12702,11 +12701,7 @@ HB_EXPORT void hb_xvmLocalSetStringHidden( int iLocal, BYTE bType, ULONG ulSize,
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetStringHidden(%d,%d,%lu,%p,%lu)", iLocal, bType, ulSize, pVal, ulBufferSize));
 
-   pLocal = hb_stackItemFromBase( iLocal );
-   if( HB_IS_BYREF( pLocal ) )
-   {
-      pLocal = hb_itemUnRef( pLocal );
-   }
+   HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
    pBuffer = hb_vmUnhideString( bType, ulSize, ( const BYTE * ) pVal, ulBufferSize );
 

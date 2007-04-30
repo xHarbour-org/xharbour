@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.50 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbvm.h,v 1.51 2007/04/22 22:50:27 ronpinkas Exp $
  */
 
 /*
@@ -149,7 +149,7 @@ HB_EXPORT extern void    hb_vmPopState( void ); /* pop current VM state from sta
 
 HB_EXPORT extern PSYMBOLS hb_vmLastModule( void );
 HB_EXPORT extern PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-HB_EXPORT extern PHB_SYMB hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
+HB_EXPORT extern PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
 HB_EXPORT extern PSYMBOLS * hb_vmSymbols( void );
 HB_EXPORT extern void     hb_vmDoExitFunctions( void );
 HB_EXPORT extern void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );

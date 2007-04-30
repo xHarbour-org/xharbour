@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.2 2007/03/25 06:12:50 walito Exp $
+ * $Id: hbpcstat.c,v 1.3 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -231,7 +231,12 @@ static const char * hb_comp_pcode_names[] =
     "HB_P_PUSHDATETIME",          /* 170 */
     "HB_P_PUSHDATE",              /* 171 */
     "HB_P_HASHGEN",               /* 172 */
-    "HB_P_LAST_PCODE"             /* 173 this defines the number of defined pcodes */
+    "HB_P_LOCALNEARINC",          /* 173 */
+    "HB_P_LOCALNEARDEC",          /* 174 */
+    "HB_P_PUSHLOCALNEARINC",      /* 175 */
+    "HB_P_PUSHLOCALNEARDEC",      /* 176 */
+
+    "HB_P_LAST_PCODE"             /* 177 this defines the number of defined pcodes */
 };
 
 

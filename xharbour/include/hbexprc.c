@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.20 2007/04/17 20:46:35 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.21 2007/04/20 03:39:57 ronpinkas Exp $
  */
 
 /*
@@ -210,29 +210,71 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
          int iIncrement, iLocal;
+         BOOL bShort;
 
-         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
-             pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+         }
+         else
+         {
+            iLocal = 0;
+         }
+
+         if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
              pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
              pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
+            bShort = TRUE;
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
             {
                iIncrement = -iIncrement;
             }
+         }
+         else
+         {
+            bShort = FALSE;
+         }
 
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+         if( iLocal && HB_LIM_INT8( iLocal ) )
+         {
+            if( bShort )
             {
-               if( pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement == 0 )
+               {
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
+               else if( iIncrement == 1 )
+               {
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
+               else if( iIncrement == -1 )
+               {
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
+               else
                {
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
-                  HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                  //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
 
-                  return;
+               return;
+            }
+            else
+            {
+               if( bOpEq == HB_P_MINUS )
+               {
+                  if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
+                  {
+                     pSelf->value.asOperator.pRight->value.asNum.lVal = -pSelf->value.asOperator.pRight->value.asNum.lVal;
+                     bOpEq = HB_P_PLUS;
+                  }
                }
 
                if( bOpEq == HB_P_PLUS )
@@ -241,30 +283,32 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
                   HB_EXPR_GENPCODE2( hb_compGenPCode2, HB_P_LOCALNEARADD, ( BYTE ) iLocal, ( BOOL ) 0 );
 
-                  HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                  //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
 
                   return;
                }
             }
-            else
+         }
+         else if( bShort )
+         {
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+            /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+            if( iIncrement )
             {
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-
-               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
-               if( iIncrement )
-               {
-                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
-               }
-
-               HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
-
-               /* pop the new value into variable and leave the copy on the stack */
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
-
-               return;
+               hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
             }
+
+            HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_DUPLICATE );
+
+            /* pop the new value into variable and leave the copy on the stack */
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+            return;
          }
       }
+
     #endif
 
       /* push old value */
@@ -373,27 +417,67 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
          int iIncrement, iLocal;
+         BOOL bShort;
 
-         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
-             pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
+         if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
+         {
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+         }
+         else
+         {
+            iLocal = 0;
+         }
+
+         if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC &&
              pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG &&
              pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
              pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
          {
+            bShort = TRUE;
             iIncrement = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
             if( bOpEq == HB_P_MINUS )
             {
                iIncrement = -iIncrement;
             }
+         }
+         else
+         {
+            bShort = FALSE;
+         }
 
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+         if( iLocal && HB_LIM_INT8( iLocal ) )
+         {
+            if( bShort )
             {
-               if( pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 && pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
+               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+               if( iIncrement == 0 )
+               {
+               }
+               else if( iIncrement == 1 )
+               {
+                  hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
+               else if( iIncrement == -1 )
+               {
+                  hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+               }
+               else
                {
                   hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
+               }
 
-                  return;
+               return;
+            }
+            else
+            {
+               if( bOpEq == HB_P_MINUS )
+               {
+                  if( pSelf->value.asOperator.pRight->ExprType == HB_ET_NUMERIC && pSelf->value.asOperator.pRight->value.asNum.NumType == HB_ET_LONG )
+                  {
+                     pSelf->value.asOperator.pRight->value.asNum.lVal = -pSelf->value.asOperator.pRight->value.asNum.lVal;
+                     bOpEq = HB_P_PLUS;
+                  }
                }
 
                if( bOpEq == HB_P_PLUS )
@@ -405,21 +489,21 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
                   return;
                }
             }
-            else
+         }
+         else if( bShort )
+         {
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+
+            /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
+            if( iIncrement )
             {
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-
-               /* No need to generate ( X + 0 ) but *** Danger! *** of not being Error Compatible! */
-               if( iIncrement )
-               {
-                  hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
-               }
-
-               /* pop the new value into variable and leave the copy on the stack */
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
-
-               return;
+               hb_compGenPCode3( HB_P_ADDINT, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
             }
+
+            /* pop the new value into variable and leave the copy on the stack */
+            HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_POP_PCODE );
+
+            return;
          }
       }
 
@@ -512,23 +596,22 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
-         int iIncrement, iLocal;
+         int iLocal;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+            if( iLocal && HB_LIM_INT8( iLocal ) )
             {
-               if( bOper == HB_P_DEC )
+               if( bOper == HB_P_INC )
                {
-                  iIncrement = -1;
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
                else
                {
-                  iIncrement = 1;
+                  hb_compGenPCode2( HB_P_PUSHLOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
-
-               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
 
                return;
             }
@@ -580,23 +663,27 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
-         int iIncrement, iLocal;
+         int iLocal;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+            if( iLocal && HB_LIM_INT8( iLocal ) )
             {
-               if( bOper == HB_P_DEC )
+               // First push the original value.
+               //HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
+               hb_compGenPCode2( HB_P_PUSHLOCALNEAR, ( BYTE ) iLocal, ( BOOL ) 0 );
+
+               // Inc/Dec without leaving value on stack.
+               if( bOper == HB_P_INC )
                {
-                  iIncrement = -1;
+                  hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
                else
                {
-                  iIncrement = 1;
+                  hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
-
-               HB_EXPR_USE( pSelf->value.asOperator.pLeft, HB_EA_PUSH_PCODE );
-               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
                return;
             }
@@ -645,22 +732,22 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
       if( bOper == HB_P_INC || bOper == HB_P_DEC )
       {
-         int iIncrement, iLocal;
+         int iLocal;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+            if( iLocal && HB_LIM_INT8( iLocal ) )
             {
-               if( bOper == HB_P_DEC )
+               if( bOper == HB_P_INC )
                {
-                  iIncrement = -1;
+                  hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
                else
                {
-                  iIncrement = 1;
+                  hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
                }
-
-               hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iIncrement ), HB_HIBYTE( iIncrement ), ( BOOL ) 0 );
 
                return;
             }

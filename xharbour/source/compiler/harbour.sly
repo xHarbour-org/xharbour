@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.113 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.114 2007/04/14 21:47:22 ronpinkas Exp $
  */
 
 /*
@@ -2692,9 +2692,20 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                      iStep = 1;
                   }
 
-                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol ) ) > 0 && iLocal < 256 )
+                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol ) ) != 0 && HB_LIM_INT8( iLocal ) )
                   {
-                     hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iStep ), HB_HIBYTE( iStep ), ( BOOL ) 0 );
+                     if( iStep == 1 )
+                     {
+                        hb_compGenPCode2( HB_P_LOCALNEARINC, ( BYTE ) iLocal, ( BOOL ) 0 );
+                     }
+                     else if( iStep == -1  )
+                     {
+                        hb_compGenPCode2( HB_P_LOCALNEARDEC, ( BYTE ) iLocal, ( BOOL ) 0 );
+                     }
+                     else
+                     {
+                        hb_compGenPCode4( HB_P_LOCALNEARADDINT, ( BYTE ) iLocal, HB_LOBYTE( iStep ), HB_HIBYTE( iStep ), ( BOOL ) 0 );
+                     }
                   }
                   else if( $<asExpr>8 )
                   {
@@ -2713,6 +2724,7 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                   hb_compExprDelete( $2 );
                   hb_compExprDelete( $7 );
                   hb_compExprDelete( $<asExpr>5 ); /* deletes $5, hb_compExprClone( $2 ), $4 */
+
                   if( $<asExpr>8 )
                   {
                      hb_compExprDelete( $<asExpr>8 );

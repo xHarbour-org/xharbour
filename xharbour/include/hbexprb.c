@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.115 2007/04/08 07:20:55 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.116 2007/04/17 20:46:35 ronpinkas Exp $
  */
 
 /*
@@ -3319,7 +3319,9 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                       pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
                       pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                   {
-                     if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+                     if( iLocal && HB_LIM_INT8( iLocal ) )
                      {
                         short iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
@@ -3333,7 +3335,9 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+                        if( iLocal && HB_LIM_INT8( iLocal ) )
                         {
                            unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 ) ;
 
@@ -3405,7 +3409,9 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      short iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
-                     if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+                     if( iLocal && HB_LIM_INT8( iLocal ) )
                      {
                         hb_compGenPCode4( HB_P_LOCALNEARSETINT, ( BYTE ) iLocal, HB_LOBYTE( iNewVal ), HB_HIBYTE( iNewVal ), FALSE );
 
@@ -3416,7 +3422,9 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        if( ( iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol ) ) > 0 && iLocal < 256 )
+                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+
+                        if( iLocal && HB_LIM_INT8( iLocal ) )
                         {
                            unsigned short iLen = ( unsigned short ) ( pSelf->value.asOperator.pRight->ulLength + 1 );
 
