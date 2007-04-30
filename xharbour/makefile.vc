@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.186 2007/04/12 12:59:48 lculik Exp $
+# $Id: makefile.vc,v 1.187 2007/04/15 18:55:39 andresreyesh Exp $
 #
 
 #
@@ -98,7 +98,7 @@ HB_MT        =-MT -DHB_THREAD_SUPPORT -D_MT
 #!ifdef _NMAKE_VER
 #
 #!if ( "$(_NMAKE_VER)"=="7")
-_CFL=-Ogt2yb1p -FD -GA -GB -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX $(C_USR) $(CFLAGS)
+_CFL=-Oxt2yb1 -FD -GA -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX -D_CRT_SECURE_NO_DEPRECATE $(C_USR) $(CFLAGS)
 #!else
 #_CFL=-Ox -FD -GA -GF -Gs -TP -W3 -nologo -I$(INCLUDE_DIR) -DWIN32 -D_WIN32 -D__WIN32__ -DHB_OS_WIN_32 -DSIMPLEX -D_CRT_SECURE_NO_DEPRECATE $(C_USR) $(CFLAGS)
 #!endif
@@ -972,7 +972,7 @@ USRRDD_LIB_OBJS = \
 #
 
 {$(PP_DIR)}.c{$(OBJ_DIR)$(MT)}.obj::
-   $(CC) -Ow $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
 
 PP_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\ppcore.obj \
@@ -1497,7 +1497,7 @@ $(HBPP_EXE) : \
    $(HBPP_DIR)\hbppcore.c \
    $(HBPP_DIR)\hbpptbl.c \
    $(HBPP_DIR)\pragma.c
-   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -o $(HBPP_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
+   $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $** -Fe$(HBPP_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # HBRUN.EXE rules
@@ -1509,7 +1509,7 @@ $(HBRUN_EXE) : \
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $**
    $(CC) $(C_FLAGS) -Fo$(OBJ_DIR)$(MT)\ $(OBJ_DIR)$(MT)\hbrun.c \
                                         $(OBJ_DIR)$(MT)\external.c \
-                       -o $(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT) $(LIBS2) $(EXTRALIB)
+                       -Fe$(HBRUN_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT) $(LIBS2) $(EXTRALIB)
 
 #
 # HBTEST.EXE rules
@@ -1541,7 +1541,7 @@ $(HBTEST_EXE) : \
                                       $(OBJ_DIR)\rt_str.c \
                                       $(OBJ_DIR)\rt_stra.c \
                                       $(OBJ_DIR)\rt_trans.c \
-                       -o $(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB)
+                       -Fe$(HBTEST_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) $(EXTRALIB)
 
 #
 # HBTESTMT.EXE rules
@@ -1574,7 +1574,7 @@ $(HBTESTMT_EXE) : \
                                       $(OBJ_DIR)$(MT)\rt_str.c \
                                       $(OBJ_DIR)$(MT)\rt_stra.c \
                                       $(OBJ_DIR)$(MT)\rt_trans.c \
-                       -o $(HBTESTMT_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT2) $(EXTRALIB)
+                       -Fe$(HBTESTMT_EXE) /link $(L_DFLAGS) /FORCE:MULTIPLE $(LIBSMT2) $(EXTRALIB)
 
 !endif
 
@@ -1626,7 +1626,7 @@ $(HBDOC_EXE) : \
                                       $(OBJ_DIR)\fclass1.c \
                                       $(OBJ_DIR)\ffile1.c \
                                       $(OBJ_DIR)\ft_funcs.c \
-                      -o $(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB) $(PDFHBDOC) $(GENPDF1)
+                      -Fe$(HBDOC_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB) $(PDFHBDOC) $(GENPDF1)
 
 #
 # HBMAKE.EXE rules
@@ -1657,7 +1657,7 @@ $(HBMAKE_EXE) : \
                                       $(OBJ_DIR)\pickfile.c \
                                       $(OBJ_DIR)\prb_stak.c \
                                       $(HBMAKE_DIR)\hbmlang.c \
-                      -o $(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+                      -Fe$(HBMAKE_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 
 #
 # XBSCRIPT.EXE rules
@@ -1667,7 +1667,7 @@ $(XBSCRIPT_EXE) : \
    $(XBSCRIPT_DIR)\XBSCRIPT.prg
    $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)\ $**
    $(CC) $(C_FLAGSNMT) -Fo$(OBJ_DIR)\ $(OBJ_DIR)\XBSCRIPT.c \
-                       -o $(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
+                       -Fe$(XBSCRIPT_EXE) /link $(L_DFLAGSNMT) /FORCE:MULTIPLE $(LIBS2) /INCLUDE:__matherr $(EXTRALIB)
 #
 # HARBOUR.EXE rules
 #
@@ -1699,7 +1699,7 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\hblbl.c \
    $(COMPILER_DIR)\ppcomp.c
    -$(ECHO) > $(OBJ_DIR)\unistd.h
-   $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ $** -o $(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
+   $(CC) $(C_FLAGSNMT) -I$(OBJ_DIR) -Fo$(OBJ_DIR)\ $** -Fe$(HARBOUR_EXE) /link $(L_DFLAGSNMT) $(PP_LIB) $(COMMON_LIB) $(EXTRALIB)
    -$(DEL) $(OBJ_DIR)\unistd.h
 
 #
@@ -1712,7 +1712,7 @@ $(PPGEN_EXE) : \
    $(INCLUDE_DIR)\std.ch \
    $(INCLUDE_DIR)\set.ch \
    $(COMMON_LIB)
-   $(CC) $(C_FLAGSNMT) $(PP_DIR)\ppgen.c -Fo$(OBJ_DIR)\ppgen.obj -o $(PPGEN_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
+   $(CC) $(C_FLAGSNMT) $(PP_DIR)\ppgen.c -Fo$(OBJ_DIR)\ppgen.obj -Fe$(PPGEN_EXE) /link $(L_DFLAGSNMT) $(COMMON_LIB) $(EXTRALIB)
 
 #
 # Library dependencies and build rules
