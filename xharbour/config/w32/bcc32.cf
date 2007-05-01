@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.8 2005/04/25 19:22:14 druzus Exp $
+# $Id: bcc32.cf,v 1.9 2007/01/11 01:00:34 druzus Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -15,7 +15,7 @@ CC = bcc32
 CC_IN = -c
 CC_OUT = -o
 CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
-CFLAGS = -O2 -d -4 -5 -6 -a4
+CFLAGS = -O2 -d -5 -6 -a8
 
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
