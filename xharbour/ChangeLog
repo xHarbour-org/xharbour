@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5473 2007/04/30 22:50:37 ran_go Exp $
+ * $Id: ChangeLog,v 1.5474 2007/05/01 00:48:40 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-01 10:19 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/hvm.c
+    * Fix warnings and errors reported by bcc 5.8.2
+    * Thanks Toninho <toninho@fwi.com.br>
 
 2007-04-30 21:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * config/w32/bcc32.cf
@@ -26,7 +31,7 @@
 2007-04-30 17:12 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/hvm.c
     + Add hb_vmDoInitFunc()
-    * Changed hb_vmDoInitClip() to hb_vmDoInitFunc( "CLIPINI" )
+    * Changed hb_vmDoInitClip() to hb_vmDoInitFunc( "CLIPINIT" )
     * Changed hb_vmDoInitOle() to hb_vmDoInitFunc( "HB_OLEINIT" )
     * Changed hb_vmDoInitHashEntry() to hb_vmDoInitFunc( "HASHENTRY" )
     + Add hb_vmDoModuleFunctions()

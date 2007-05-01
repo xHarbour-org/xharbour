@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.621 2007/04/30 01:16:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.622 2007/04/30 20:23:56 ran_go Exp $
  */
 
 /*
@@ -452,7 +452,7 @@ static void hb_vmDoInitError( void )
 /* HASHENTRY  Initialize */
 static BOOL hb_vmDoInitFunc( char *pFuncSym )
 {
-   PHB_DYNS pDynSym = NULL;
+   PHB_DYNS pDynSym;
 
    assert( pFuncSym != NULL );
 
@@ -681,13 +681,13 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    if( bStartMainProc && s_pSymStart )
    {
-      register int i = 0;
-      register int iArgCount = 0;
+      register int i;
+      register int iArgCount;
 
       hb_vmPushSymbol( s_pSymStart ); /* pushes first HB_FS_PUBLIC defined symbol to the stack */
       hb_vmPushNil();                 /* places NIL at self */
 
-      iArgCount = 0;
+	  iArgCount = 0;
       for( i = 1; i < hb_cmdargARGC(); i++ )     /* places application parameters on the stack */
       {
          char ** argv = hb_cmdargARGV();
@@ -712,7 +712,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
 void hb_vmReleaseLocalSymbols( void )
 {
-   PSYMBOLS pDestroy = NULL;
+   PSYMBOLS pDestroy;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmReleaseLocalSymbols()"));
 
@@ -728,9 +728,9 @@ void hb_vmReleaseLocalSymbols( void )
 
       if( pDestroy->fAllocated )
       {
-         register UINT ui = 0;
-         PHB_SYMB pSymbol = NULL;
-         PHB_DYNS pDynSym = NULL;
+         register UINT ui;
+         PHB_SYMB pSymbol;
+         PHB_DYNS pDynSym;
 
          for( ui = pDestroy->uiModuleSymbols; ui--; )
          {
@@ -756,7 +756,7 @@ void hb_vmReleaseLocalSymbols( void )
 int HB_EXPORT hb_vmQuit( void )
 {
    static BOOL bQuitting = FALSE;
-   register UINT i = 0;
+   register UINT i;
 
    HB_THREAD_STUB
 
@@ -1497,6 +1497,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          }
 
          case HB_P_ENUMERATE:
+		 {
             BOOL bPushLogical;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
@@ -1574,6 +1575,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             hb_vmPushLogical( bPushLogical );
             w++;
             break;
+		 }
 
          case HB_P_ENDENUMERATE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENDENUMERATE") );
