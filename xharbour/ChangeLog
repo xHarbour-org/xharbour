@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5474 2007/05/01 00:48:40 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5475 2007/05/01 13:23:59 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-05-01 10:19 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+2007-05-01 11:17 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/hvm.c
     * Fix warnings and errors reported by bcc 5.8.2
-    * Thanks Toninho <toninho@fwi.com.br>
+    * Fix error reported by Mindaugas (loops at lines 509,515)
+    * Thanks Toninho 
+    * Thanks Mindaugas
 
 2007-04-30 21:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * config/w32/bcc32.cf

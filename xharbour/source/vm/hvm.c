@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.622 2007/04/30 20:23:56 ran_go Exp $
+ * $Id: hvm.c,v 1.623 2007/05/01 13:22:57 ran_go Exp $
  */
 
 /*
@@ -473,6 +473,9 @@ static BOOL hb_vmDoInitFunc( char *pFuncSym )
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
+#ifndef HB_THREAD_SUPPORT
+   register ULONG ulCounter;
+#endif
 #if defined(HB_OS_OS2)
    EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
    APIRET rc = NO_ERROR;                           /* Return code                   */
@@ -503,16 +506,16 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_VM_STACK.pSequence = NULL;
    HB_VM_STACK.uiActionRequest = 0;
 
-   for( HB_VM_STACK.wWithObjectCounter = HB_VM_STACK.wWithObjectCounter; HB_VM_STACK.wWithObjectCounter--; )
+   for( ulCounter = HB_VM_STACK.wWithObjectCounter; ulCounter != 0; ulCounter-- )
    {
-      HB_VM_STACK.aWithObject[ HB_VM_STACK.wWithObjectCounter ].type = HB_IT_NIL;
+      HB_VM_STACK.aWithObject[ ulCounter ].type = HB_IT_NIL;
    }
    HB_VM_STACK.wWithObjectCounter = 0;
 
-   for( HB_VM_STACK.wEnumCollectionCounter = HB_VM_STACK.wEnumCollectionCounter; HB_VM_STACK.wEnumCollectionCounter--; )
+   for( ulCounter = HB_VM_STACK.wEnumCollectionCounter; ulCounter != 0; ulCounter-- )
    {
-      HB_VM_STACK.aEnumCollection[ HB_VM_STACK.wEnumCollectionCounter ].type = HB_IT_NIL;
-      HB_VM_STACK.awEnumIndex[ HB_VM_STACK.wEnumCollectionCounter ] = 0;
+      HB_VM_STACK.aEnumCollection[ ulCounter ].type = HB_IT_NIL;
+      HB_VM_STACK.awEnumIndex[ ulCounter ] = 0;
    }
    HB_VM_STACK.wEnumCollectionCounter = 0;
 
