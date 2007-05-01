@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5475 2007/05/01 13:23:59 ran_go Exp $
+ * $Id: ChangeLog,v 1.5476 2007/05/01 14:16:20 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-01 20:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/browse.prg
+    ! fixed to add picture "@Sn" if char field width is larger than column.
+    ! fixed browse performance under index operation.
+    ! fixed memo edit window minimum coordinates.
+    ! fixed to call rlock()/dbUnlock() if database is in shared mode.
 
 2007-05-01 11:17 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/hvm.c

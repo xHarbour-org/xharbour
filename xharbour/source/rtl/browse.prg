@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.9 2007/04/24 12:20:03 modalsist Exp $
+ * $Id: browse.prg,v 1.10 2007/04/24 23:12:54 modalsist Exp $
  */
 
 /*
@@ -52,8 +52,12 @@
 
 #include "inkey.ch"
 #include "setcurs.ch"
+#include "dbinfo.ch"
 
 static bBlock := { || setcursor( iif( readinsert(!readinsert()), SC_NORMAL, SC_INSERT )) }
+static s_ldbEmpty
+static s_ldbBottom
+static s_ldbAppend
 
 function Browse( nTop, nLeft, nBottom, nRight )
 
@@ -66,11 +70,17 @@ function Browse( nTop, nLeft, nBottom, nRight )
    Local lRefresh
    Local bAction
    Local lKeyPressed
-   Local aRect, cField, oCol
+   Local aRect, cField, oCol, lShared
 
    if ! Used()
       return .f.
    end
+
+   lShared := dbInfo( DBI_SHARED )
+
+   s_ldbBottom := dbBottom()
+   s_ldbEmpty  := dbEmpty()
+   s_ldbAppend  := .f.
 
    if PCount() < 4
       nTop    := 1
@@ -79,21 +89,23 @@ function Browse( nTop, nLeft, nBottom, nRight )
       nRight  := MaxCol()
    endif
 
-   nOldCursor := SetCursor( SC_NONE )
+   nOldCursor := CursorOff()
    cOldScreen := SaveScreen( nTop, nLeft, nBottom, nRight )
 
-   @ nTop, nLeft TO nBottom, nRight
-   @ nTop + 3, nLeft SAY Chr( 198 )
-   @ nTop + 3, nRight SAY Chr( 181 )
-   @ nTop + 1, nLeft + 1 SAY Space( nRight - nLeft - 1 )
+   dispbegin()
 
-   lRefresh := .F.
+   DispBox( nTop, nLeft, nBottom, nRight )
+
+   DispOutAt( nTop+3, nLeft, chr(198))
+   DispOutAt( nTop+3, nRight, chr(181))
+   DispOutAt( nTop+1, nLeft+1, Space( nRight - nLeft - 1 ) )
+
+   lRefresh := .f.
 
    oBrw := TBrowseDB( nTop + 2, nLeft + 1, nBottom - 1, nRight - 1 )
    oBrw:HeadSep := " " + Chr( 205 )
-   oBrw:Cargo := .f. // to assign append mode
 
-   oBrw:skipblock := { |_1| Skipped(_1, oBrw ) }
+   oBrw:skipblock := { |_1| Skipped(_1, s_ldbAppend ) }
 
    for n := 1 to FCount()
       cField := FieldName( n )
@@ -110,12 +122,15 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
    oBrw:ForceStable()
 
-   if IsEmpty()
+   dispend()
+
+   if s_ldbEmpty
       nKey := K_DOWN
       lKeyPressed := .T.
    else
       lKeyPressed := .F.
    endif
+
 
    while ! lExit
 
@@ -148,17 +163,19 @@ function Browse( nTop, nLeft, nBottom, nRight )
             Eval( bAction, ProcName( 1 ), ProcLine( 1 ), "" )
             loop
          endif
+
       else
          lKeyPressed := .f.
 
       endif
 
+      s_ldbBottom := dbBottom()
+      s_ldbEmpty  := dbEmpty()
+
       switch nKey
 
          case K_DOWN
-            if IsBottom() .or. IsEmpty()
-               oBrw:Cargo := .t.
-            endif
+            s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
             oBrw:Down()
             exit
 
@@ -166,7 +183,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
             if eof()
                lRefresh := .t.
             else
-            oBrw:Up()
+               oBrw:Up()
             endif
             exit
 
@@ -174,13 +191,13 @@ function Browse( nTop, nLeft, nBottom, nRight )
             if eof()
                lRefresh := .t.
             else
-            oBrw:PageUp()
+               oBrw:PageUp()
             endif
             exit
 
          case K_PGDN
-            if IsBottom() .or. IsEmpty()
-               oBrw:Cargo := .t.
+            s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
+            if s_ldbAppend
                oBrw:Down()
             else
                oBrw:PageDown()
@@ -197,9 +214,9 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
          case K_CTRL_PGDN
             if eof()
-               lRefresh := .T.
+               lRefresh := .t.
             endif
-            oBrw:GoBottom()
+               oBrw:GoBottom()
             exit
 
          case K_ESC
@@ -220,7 +237,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
 
          case K_RIGHT
             oBrw:Right()
-           exit
+            exit
 
          case K_CTRL_LEFT
             oBrw:panLeft()
@@ -243,26 +260,29 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
         case K_DEL
-            if ! eof()
+            if ! eof() .and. if( lShared, RLock(), .t. )
                if ( Deleted() )
-                  dbrecall()
+                  dbRecall()
                else
-                  dbdelete()
+                  dbDelete()
                endif
+               if(lShared, dbUnlock(), .t. )
+               lRefresh := .t.
             endif
             exit
 
         case K_ENTER
-            nKey := doget( oBrw )
+            nKey := doget( oBrw, lShared )
             lKeyPressed := (nKey != 0)
             exit
         default
-            keyboard Chr(13) + Chr(nKey)
+            keyboard Chr(K_ENTER) + Chr(nKey)
             exit
       end
 
       if ( lRefresh )
-         lRefresh := .F.
+         lRefresh := .f.
+         s_ldbAppend := .f.
          freshorder(oBrw)
          CursorOff()
       endif
@@ -280,29 +300,33 @@ static procedure Statline( oBrw )
    local nTop   := oBrw:nTop - 1
    local nRight := oBrw:nRight
 
-   @ nTop, nRight - 27 SAY "Record "
+   dispbegin()
 
-   if IsEmpty()
-      @ nTop, nRight - 20 SAY "<none>               "
+   DispOutAt( nTop, nRight - 27, "Record " )
+
+   if s_ldbEmpty
+      DispOutAt( nTop, nRight - 20 , "<none>               " )
    elseif eof()
-      @ nTop, nRight - 40 SAY "         "
-      @ nTop, nRight - 20 SAY "                <new>"
+      DispOutAt( nTop, nRight - 40 , "         " )
+      DispOutAt( nTop, nRight - 20 , "                <new>" )
    else
-      @ nTop, nRight - 40 SAY iif( Deleted(), "<Deleted>", "         " )
-      @ nTop, nRight - 20 SAY PadR( LTrim( Str( RecNo() ) ) + "/" +;
+      DispOutAt( nTop, nRight - 40 , iif( Deleted(), "<Deleted>", "         " ) )
+      DispOutAt( nTop, nRight - 20 , Padr( LTrim( Str( RecNo() ) ) + "/" +;
                                     Ltrim( Str( LastRec() ) ), 16 ) +;
-                              iif( oBrw:hitTop, "<bof>", "     " )
+                              iif( oBrw:hitTop, "<bof>", "     " )  )
    endif
+
+   dispend()
 
 return
 
-*-------------------------------
-static function DOGET( oBrowse )
+*----------------------------------------
+static function DOGET( oBrowse, lShared )
 
    local bIns, lScore, lExit, oCol, oGet, nExitState, nIndexKey, ;
       xKeyValue, lSuccess, nCursor, xData, cForExp, lSave, ;
       cMemoColor, nTop, nLeft, nBottom, nRight, cMemoScreen, ;
-      cMemoField, lMemo
+      cMemoField, lMemo, lOK, cPict
 
    oBrowse:hittop := .F.
    oBrowse:hitbottom := .F.
@@ -326,6 +350,7 @@ static function DOGET( oBrowse )
    oCol := oBrowse:getcolumn(oBrowse:colpos())
 
    lMemo := ( ValType( FieldGet( FieldPos( oCol:Heading ) ) ) == 'M' )
+
    IF lMemo
       cMemoField := oCol:Heading 
       xData := FieldGet( FieldPos( cMemoField ) )
@@ -343,9 +368,11 @@ static function DOGET( oBrowse )
       endif
       cMemoScreen := SaveScreen( nTop, nLeft, nBottom, nRight )
       cMemoColor := SetColor( SubStr(oBrowse:ColorSpec, At(",",oBrowse:ColorSpec)+1 ) )
+      DispBegin()
       @ nTop, nLeft CLEAR TO nBottom, nRight
-      @ nTop, nLeft TO nBottom, nRight
-      @ nTop, nLeft+1 Say Padc( "[ "+oCol:heading+" ]" , nRight - nLeft - 2, chr(196) )
+      DispBox( nTop, nLeft, nBottom, nRight )
+      DispOutAt( nTop, nLeft+1 , Padc( "[ "+oCol:heading+" ]" , nRight - nLeft - 2, chr(196) ) )
+      DispEnd()
       xData := MemoEdit( xData , nTop+1, nLeft+1, nBottom-1, nRight-1, .T. )
       SetColor( cMemoColor )
       RestScreen( nTop, nLeft, nBottom, nRight, cMemoScreen )
@@ -357,28 +384,50 @@ static function DOGET( oBrowse )
       oBrowse:RefreshAll()
    ELSE
       xData := eval(oCol:block())
-      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", Nil, oBrowse:colorspec )
+      if valtype( xData ) == "C"
+         if Len(xData) > ( oBrowse:nRight - oBrowse:nLeft - 2 )
+            cPict := "@S"+ Ltrim(Str( oBrowse:nRight - oBrowse:nLeft - 2 ))
+         else
+            cPict := NIL
+         endif
+      else
+         cPict := NIL
+      endif
+      oGet  := getnew(Row(), Col(), { |_1| iif( PCount() == 0, xData, xData := _1 ) }, "mGetVar", cPict, oBrowse:colorspec )
       lSave := ReadModal({oGet})
    ENDIF
 
    lSuccess := .F.
 
-   if lSave
-      if eof() 
-         dbappend()
-      endif
-      if !lMemo
-         eval(oCol:block(), xData)
+   if lSave  
+
+      if eof()
+         dbAppend()
+         lOK := !NetErr()
+         s_ldbAppend := .f.
       else
-         FieldPut( FieldPos(cMemoField), xData )
+         lOK := if( lShared, RLock(), .t. )
       endif
-      if ( !eof() .AND. !Empty(cForExp := ordfor(indexord())) .AND. ;
+
+      if lOK
+
+         if !lMemo
+            eval(oCol:block(), xData)
+         else
+            FieldPut( FieldPos(cMemoField), xData )
+         endif
+         if ( !eof() .AND. !Empty(cForExp := ordfor(indexord())) .AND. ;
             !&cForExp )
-         dbgotop()
+            dbgotop()
+         endif
+         if ( !eof() .AND. !Empty(nIndexKey) .AND. xKeyValue != &nIndexKey )
+            lSuccess := .T.
+         endif
+
+         if( lShared, dbUnlock(), .t. )
+
       endif
-      if ( !eof() .AND. !Empty(nIndexKey) .AND. xKeyValue != &nIndexKey )
-         lSuccess := .T.
-      endif
+
    endif
 
    if ( lSuccess )
@@ -416,10 +465,10 @@ static function EXITKEY( lExit, oBrw )
       endif
    case nReturn == K_ENTER .OR. ( nReturn >= K_SPACE .AND. nReturn <= 255 )
       // xHarbour extension: After reach last column the browse jump to the
-      // first column of the next row.
+      // first column of the next row, if is not the last.
       //
       if oBrw:ColPos == oBrw:ColCount
-         if !IsBottom() .and. !IsEmpty() 
+         if !s_ldbBottom .and. !s_ldbEmpty 
             oBrw:PanHome()
             nReturn := K_DOWN
          else
@@ -437,10 +486,13 @@ return nReturn
 *------------------------------------
 static function FRESHORDER( oBrowse )
 
-   local nRec := RecNo()
+local nRec := RecNo()
+
    oBrowse:refreshall()
+
    do while ( !oBrowse:stabilize() )
    enddo
+
    if eof()
       do while ( RecNo() != nRec .AND. !BOF() )
          oBrowse:up()
@@ -451,65 +503,64 @@ static function FRESHORDER( oBrowse )
 
 return Nil
 
-*--------------------------------------
-static function SKIPPED( nSkip, oBrw )
+*----------------------------------------
+static function SKIPPED( nSkip, lAppend )
 
 local nSkipped := 0
-local lAppend := oBrw:Cargo
 
-   if !IsEmpty()
+ if !( s_ldbEmpty )
 
-       if ( nSkip == 0 )
-         dbskip( 0 )
+   if ( nSkip == 0 )
+      dbskip( 0 )
 
-      elseif ( nSkip > 0 .AND. !eof() )
+   elseif ( nSkip > 0 .AND. !eof() )
 
-         do while ( nSkipped < nSkip )
+      do while ( nSkipped < nSkip )
 
-            dbskip()
+         dbskip()
 
-            if ( eof() )
+         if ( eof() )
 
-               if ( lAppend )
-                  nSkipped ++
-                  oBrw:Cargo := .f.
-               else
-                  dbskip( -1 )
-               endif
-
-               exit
-
+            if ( lAppend )
+               nSkipped ++
+            else
+               dbskip( -1 )
             endif
 
-            nSkipped ++
+            exit
 
-         enddo
+         endif
 
-      elseif ( nSkip < 0 )
+         nSkipped ++
 
-         do while ( nSkipped > nSkip )
+      enddo
 
-            dbskip( -1 )
+   elseif ( nSkip < 0 )
 
-            if ( BOF() )
-               exit
-            endif
+      do while ( nSkipped > nSkip )
 
-            nSkipped --
+         dbskip( -1 )
 
-         enddo
+         if ( BOF() )
+            exit
+         endif
 
-      endif
+         nSkipped --
+
+      enddo
+
    endif
+
+ endif
 
 return nSkipped
 
 *-------------------------
-STATIC FUNCTION IsBottom()
+STATIC FUNCTION dbBottom()
 RETURN ( if( IndexOrd() == 0 , Recno() == LastRec() , OrdKeyNo() == OrdKeyCount() ) )
 
 *------------------------
-STATIC FUNCTION IsEmpty()
+STATIC FUNCTION dbEmpty()
 RETURN ( if( IndexOrd() == 0 , LastRec() == 0 , OrdKeyCount() == 0 ) )
 
 *-------------------------
