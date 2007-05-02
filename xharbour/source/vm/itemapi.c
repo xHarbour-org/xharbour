@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.139 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: itemapi.c,v 1.140 2007/05/02 17:24:51 ran_go Exp $
  */
 
 /*
@@ -499,26 +499,21 @@ BOOL HB_EXPORT hb_itemGetL( PHB_ITEM pItem )
       {
          case HB_IT_LOGICAL:
             return pItem->item.asLogical.value;
-			break;
 
          case HB_IT_INTEGER:
             return pItem->item.asInteger.value != 0;
-			break;
 
          case HB_IT_LONG:
             return pItem->item.asLong.value != 0;
-			break;
 
          case HB_IT_DOUBLE:
             return pItem->item.asDouble.value != 0.0;
-			break;
 
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
                return ( BYTE ) pItem->item.asString.value[0];
             }
-			break;
       }
    }
 
@@ -535,34 +530,30 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
       {
          case HB_IT_DOUBLE:
             return pItem->item.asDouble.value;
-			break;
 
          case HB_IT_INTEGER:
             return ( double ) pItem->item.asInteger.value;
-			break;
 
          case HB_IT_LONG:
             return ( double ) pItem->item.asLong.value;
-			break;
 
          case HB_IT_DATE:
+		 {
             if( pItem->item.asDate.time == 0 )
             {
               return ( double ) pItem->item.asDate.value;
             }
             return ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-			break;
+		 }
 
          case HB_IT_LOGICAL:
             return ( double ) pItem->item.asLogical.value;
-			break;
 
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
                return ( double ) ( BYTE ) pItem->item.asString.value[0];
             }
-			break;
       }
    }
 
@@ -579,19 +570,26 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
    switch( pItem->type )
    {
       case HB_IT_INTEGER:
+	  {
          dNumber = ( double ) pItem->item.asInteger.value;
          break;
+	  }
 
       case HB_IT_LONG:
+	  {
          dNumber = ( double ) pItem->item.asLong.value;
          break;
+	  }
 
       case HB_IT_DOUBLE:
+	  {
          *piDec = pItem->item.asDouble.decimal;
          dNumber = pItem->item.asDouble.value;
          break;
+	  }
 
       case HB_IT_DATE:
+	  {
          dNumber = (double) pItem->item.asDate.value;
          if( pItem->item.asDate.time )
          {
@@ -599,15 +597,20 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
             dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          }
          break;
+	  }
 
       case HB_IT_STRING:
+	  {
          dNumber = (double) ( BYTE ) pItem->item.asString.value[0];
          break;
+	  }
 
       default:
+	  {
          dNumber = 0.0;  /* To avoid GCC -O2 warning */
          hb_errInternal( HB_EI_VMPOPINVITEM, "hb_itemGetNDDec()", NULL, NULL );
          break;
+	  }
    }
 
    return dNumber;
@@ -623,30 +626,24 @@ int HB_EXPORT hb_itemGetNI( PHB_ITEM pItem )
       {
          case HB_IT_INTEGER:
             return pItem->item.asInteger.value;
-			break;
 
          case HB_IT_LONG:
             return ( int ) pItem->item.asLong.value;
-			break;
 
          case HB_IT_DOUBLE:
             return ( int ) pItem->item.asDouble.value;
-			break;
 
          case HB_IT_DATE:
             return ( int ) pItem->item.asDate.value;
-			break;
 
          case HB_IT_LOGICAL:
             return ( int ) pItem->item.asLogical.value;
-			break;
 
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
                return ( int ) ( BYTE ) pItem->item.asString.value[0];
             }
-			break;
       }
    }
 
@@ -663,11 +660,9 @@ LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
       {
          case HB_IT_LONG:
             return ( LONG ) pItem->item.asLong.value;
-			break;
 
          case HB_IT_INTEGER:
             return ( LONG ) pItem->item.asInteger.value;
-			break;
 
          case HB_IT_DOUBLE:
 #ifdef __GNUC__
@@ -675,22 +670,18 @@ LONG HB_EXPORT hb_itemGetNL( PHB_ITEM pItem )
 #else
             return ( LONG ) pItem->item.asDouble.value;
 #endif
-            break;
 
          case HB_IT_DATE:
             return ( LONG ) pItem->item.asDate.value;
-			break;
 
          case HB_IT_LOGICAL:
             return ( LONG ) pItem->item.asLogical.value;
-			break;
 
          case  HB_IT_STRING:
             if( pItem->item.asString.length == 1 )
             {
                return ( LONG ) ( BYTE ) pItem->item.asString.value[0];
             }
-			break;
       }
    }
 
@@ -1289,6 +1280,7 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
       switch( pItem->type )
       {
          case HB_IT_DOUBLE:
+		 {
             if( piWidth )
             {
                *piWidth = ( int ) pItem->item.asDouble.length;
@@ -1298,18 +1290,25 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
                *piDecimal = ( int ) pItem->item.asDouble.decimal;
             }
             break;
+		 }
 
          case HB_IT_LONG:
+		 {
             *piWidth = ( int ) pItem->item.asLong.length;
             break;
+		 }
 
          case HB_IT_INTEGER:
+		 {
             *piWidth = ( int ) pItem->item.asInteger.length;
             break;
+		 }
 
-         default:
+		 default:
+		 {
             *piWidth = 0;
 			break;
+		 }
       }
    }
 }
@@ -1324,15 +1323,12 @@ ULONG HB_EXPORT hb_itemSize( PHB_ITEM pItem )
       {
          case HB_IT_ARRAY:
             return hb_arrayLen( pItem );
-			break;
 
          case HB_IT_HASH:
             return hb_hashLen( pItem );
-		    break;
 
          case HB_IT_STRING:
             return pItem->item.asString.length;
-		    break;
       }
    }
 
@@ -1359,41 +1355,32 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
    {
       case HB_IT_ARRAY:
          return ( ( char * ) ( hb_arrayIsObject( pItem ) ? "O" : "A" ) );
-		 break;
 
       case HB_IT_BLOCK:
          return "B";
-		 break;
 
       case HB_IT_DATE:
          return "D";
-		 break;
 
       case HB_IT_LOGICAL:
          return "L";
-		 break;
 
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
          return "N";
-		 break;
 
       case HB_IT_STRING:
          return "C";
-		 break;
 
       case HB_IT_MEMO:
          return "M";
-		 break;
 
       case HB_IT_POINTER:
          return "P";
-		 break;
 
       case HB_IT_HASH:
          return "H";
-		 break;
    }
 
    return "U";
@@ -1923,25 +1910,35 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       switch( pNumber->type )
       {
          case HB_IT_INTEGER:
+		 {
             lNumber = pNumber->item.asInteger.value;
             break;
+		 }
 
          case HB_IT_LONG:
+		 {
             lNumber = pNumber->item.asLong.value;
             break;
+		 }
 
          case HB_IT_DATE:
+		 {
             lNumber = pNumber->item.asDate.value;
             break;
+		 }
 
          case HB_IT_STRING:
+		 {
             lNumber = ( BYTE ) pNumber->item.asString.value[0];
             break;
+		 }
 
          default:
+		 {
             lNumber = 0;
             iPos = -1;
             break;
+		 }
       }
 
       fNeg = ( lNumber < 0 );
@@ -2083,12 +2080,15 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
    {
       case HB_IT_STRING:
       case HB_IT_MEMO:
+	  {
          buffer = pItem->item.asString.value;
          * ulLen = pItem->item.asString.length;
          * bFreeReq = FALSE;
          break;
+	  }
 
       case HB_IT_DATE:
+	  {
          if( pItem->item.asDate.time == 0 )
          {
             char szDate[ 9 ];
@@ -2112,10 +2112,12 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             * bFreeReq = TRUE;
          }
          break;
+	  }
 
       case HB_IT_DOUBLE:
       case HB_IT_INTEGER:
       case HB_IT_LONG:
+	  {
          buffer = hb_itemStr( pItem, NULL, NULL );
          if( buffer )
          {
@@ -2129,14 +2131,18 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             * bFreeReq = FALSE;
          }
          break;
+	  }
 
       case HB_IT_NIL:
+	  {
          buffer = "NIL";
          * ulLen = 3;
          * bFreeReq = FALSE;
          break;
+	  }
 
       case HB_IT_LOGICAL:
+	  {
 		 buffer = "F";
 	     if( ( char * ) hb_itemGetL( pItem ) )
 		 {
@@ -2145,47 +2151,51 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
          * ulLen = 1;
          * bFreeReq = FALSE;
          break;
+	  }
 
       case HB_IT_POINTER:
+      {
+         int size = ( sizeof( void * ) << 1 ) + 3; /* n bytes for address + 0x + \0 */
+         int n;
+         BOOL bFail = TRUE;
+
+         buffer = ( char * ) hb_xgrab( size );
+         do
          {
-            int size = ( sizeof( void * ) << 1 ) + 3; /* n bytes for address + 0x + \0 */
-            int n;
-            BOOL bFail = TRUE;
+            n =  snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
 
-            buffer = ( char * ) hb_xgrab( size );
-            do
+            if( (n > -1) && (n < size) )
             {
-               n =  snprintf( buffer, size, "%p", hb_itemGetPtr( pItem ) );
-
-               if( (n > -1) && (n < size) )
+               bFail = FALSE;
+            }
+            else
+            {
+               if( n > -1 )
                {
-                  bFail = FALSE;
+                  size = n + 1;
                }
                else
                {
-                  if( n > -1 )
-                  {
-                     size = n + 1;
-                  }
-                  else
-                  {
-                     size *= 2;
-                  }
-
-                  buffer = ( char * ) hb_xrealloc( buffer, size );
+                  size *= 2;
                }
-            }
-            while( bFail );
 
-            * ulLen = strlen( buffer );
-            * bFreeReq = TRUE;
+               buffer = ( char * ) hb_xrealloc( buffer, size );
+            }
          }
-         break;
+         while( bFail );
+
+         * ulLen = strlen( buffer );
+         * bFreeReq = TRUE;
+		 break;
+      }
 
       default:
+	  {
          buffer = "";
          * ulLen = 0;
          * bFreeReq = FALSE;
+		 break;
+	  }
    }
 
    return buffer;
@@ -2208,7 +2218,6 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeRe
          case HB_IT_MEMO:
          case HB_IT_DATE:
             return hb_itemString( pItem, pulSize, bFreeReq );
-			break;
 
          case HB_IT_DOUBLE:
          case HB_IT_INTEGER:
@@ -2234,7 +2243,6 @@ char HB_EXPORT * hb_itemPadConv( PHB_ITEM pItem, ULONG * pulSize, BOOL * bFreeRe
                while( buffer[i++] );
             }
             return buffer;
-			break;
          }
          default:
             break;
@@ -2278,27 +2286,21 @@ LONGLONG HB_EXPORT hb_itemGetNLL( PHB_ITEM pItem )
 #else
             return ( LONGLONG ) pItem->item.asDouble.value;
 #endif
-			break;
 
          case HB_IT_INTEGER:
             return ( LONGLONG ) pItem->item.asInteger.value;
-			break;
 
          case HB_IT_LONG:
             return ( LONGLONG ) pItem->item.asLong.value;
-			break;
 
          case HB_IT_DATE:
             return ( LONGLONG ) pItem->item.asDate.value;
-			break;
 
          case HB_IT_LOGICAL:
             return ( LONGLONG ) pItem->item.asLogical.value;
-			break;
 
          case HB_IT_STRING:
             return ( LONGLONG ) ( BYTE ) pItem->item.asString.value[0];
-			break;
       }
    }
 
@@ -2414,27 +2416,21 @@ HB_LONG HB_EXPORT hb_itemGetNInt( PHB_ITEM pItem )
 #else
             return ( HB_LONG ) pItem->item.asDouble.value;
 #endif
-			break;
 
          case HB_IT_INTEGER:
             return ( HB_LONG ) pItem->item.asInteger.value;
-			break;
 
          case HB_IT_LONG:
             return ( HB_LONG ) pItem->item.asLong.value;
-			break;
 
          case HB_IT_DATE:
             return ( HB_LONG ) pItem->item.asDate.value;
-			break;
 
          case HB_IT_LOGICAL:
             return ( HB_LONG ) pItem->item.asLogical.value;
-			break;
 
          case HB_IT_STRING:
             return ( HB_LONG ) ( BYTE ) pItem->item.asString.value[0];
-			break;
       }
    }
 
