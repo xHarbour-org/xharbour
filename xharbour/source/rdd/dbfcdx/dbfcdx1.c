@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.262 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.263 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -646,10 +646,6 @@ static LPCDXKEY hb_cdxKeyPutItem( LPCDXKEY pKey, PHB_ITEM pItem, ULONG ulRec, LP
          break;
       default:
          ptr = NULL;
-#ifdef HB_CDX_DBGCODE
-         /* TODO: RTerror */
-         printf( "hb_cdxKeyPutItem( invalid item type: %i )", hb_itemType( pItem ) );
-#endif
          break;
    }
    pKey = hb_cdxKeyPut( pKey, ptr, ( USHORT ) ulLen, ulRec );
@@ -704,9 +700,6 @@ static PHB_ITEM hb_cdxKeyGetItem( LPCDXKEY pKey, PHB_ITEM pItem, LPCDXTAG pTag, 
                hb_itemClear( pItem );
             else
                pItem = hb_itemNew( NULL );
-#ifdef HB_CDX_DBGCODE
-            printf( "hb_cdxKeyGetItem() ??? (%x)\n", pTag->uiType );
-#endif
       }
    }
    else if ( pItem )
@@ -4210,54 +4203,6 @@ static ULONG hb_cdxTagKeyFind( LPCDXTAG pTag, LPCDXKEY pKey )
    }
    return 0;
 }
-
-#if 0
-/*
- * find pKey in pTag return 0 or record number, respect descend/unique flags
- */
-static ULONG hb_cdxTagKeySeek( LPCDXTAG pTag, LPCDXKEY pKey )
-{
-   int K;
-   ULONG ulKeyRec = pKey->rec;
-
-   if ( pTag->UsrUnique )
-   {
-      if ( pTag->UsrAscend )
-      {
-         if ( ulKeyRec == CDX_MAX_REC_NUM )
-            ulKeyRec = CDX_IGNORE_REC_NUM;
-      }
-      else if ( ulKeyRec == CDX_IGNORE_REC_NUM )
-         ulKeyRec = CDX_MAX_REC_NUM;
-   }
-   else if ( ! pTag->UsrAscend )
-   {
-      if ( ulKeyRec == CDX_MAX_REC_NUM )
-         ulKeyRec = CDX_IGNORE_REC_NUM;
-      else if ( ulKeyRec == CDX_IGNORE_REC_NUM )
-         ulKeyRec = CDX_MAX_REC_NUM;
-   }
-
-   pTag->CurKey->rec = 0;
-   pTag->fRePos = FALSE;
-   hb_cdxTagOpen( pTag );
-
-   pTag->TagBOF = pTag->TagEOF = FALSE;
-   K = hb_cdxPageSeekKey( pTag->RootPage, pKey, ulKeyRec, FALSE );
-   if ( ulKeyRec == CDX_MAX_REC_NUM )
-      K = - K;
-
-   if ( K > 0 )
-      pTag->TagEOF = TRUE;
-   else
-   {
-      hb_cdxSetCurKey( pTag->RootPage );
-      if ( K == 0 )
-         return pTag->CurKey->rec;
-   }
-   return 0;
-}
-#endif
 
 /*
  * add the Key into the Tag
@@ -8241,8 +8186,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned  )
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
                {
                   LPCDXKEY pKey;
@@ -8276,8 +8225,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned  )
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
                {
                   LPCDXKEY pKey;

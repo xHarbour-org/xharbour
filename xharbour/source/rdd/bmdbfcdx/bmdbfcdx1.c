@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.26 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: bmdbfcdx1.c,v 1.27 2007/04/25 01:37:10 ronpinkas Exp $
  */
 
 /*
@@ -8835,8 +8835,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned  )
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
                {
                   LPCDXKEY pKey;
@@ -8870,8 +8874,12 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                if( pArea->lpdbPendingRel )
                   SELF_FORCEREL( ( AREAP ) pArea );
 
-               if( !pArea->fPositioned  )
+               if( !pArea->fPositioned ||
+                   ( pTag->pForItem && 
+                     !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
+               {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
+               }
                else
                {
                   LPCDXKEY pKey;
