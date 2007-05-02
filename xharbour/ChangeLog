@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5478 2007/05/02 06:19:55 walito Exp $
+ * $Id: ChangeLog,v 1.5479 2007/05/02 08:43:07 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-02 10:35 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/makefile.vc
+    - Its revert all changes below:
+    * Add option -Ox
+    * Removed options -Og -Op -GB, declared deprecated by msvc 8
+    * Removed option -Ow, ignored by msvc 8
+    * Changed option -o to -Fe, new option for output executable file
+    * Thanks Paul Tucker
+    * Thanks Alex Strickland
+
+2007-05-02 10:28 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/fastitem.c
+    * Fix warning reported by Enrico Maria Giordano
+  * source/vm/hvm.c
+    * Fix warnings reported by Enrico Maria Giordano
+    * Fix incorrect code reported by Walter Negro (line 8107)
+    * Thanks Enrico Maria Giordano
+    * Thanks Walter Negro
 
 2007-05-2 10:40 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/dbfcdx/dbfcdx.c
