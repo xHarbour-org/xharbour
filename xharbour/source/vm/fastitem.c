@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.105 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: fastitem.c,v 1.106 2007/04/30 22:49:18 ran_go Exp $
  */
 
 /*
@@ -1069,7 +1069,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
    HB_THREAD_STUB
 
    PHB_ITEM *pBase = HB_VM_STACK.pBase + 1;
-   PHB_ITEM *pTop = NULL;
+   PHB_ITEM *pTop;
    BYTE iId = 1;
 
    pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1;
