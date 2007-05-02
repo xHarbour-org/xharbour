@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.51 2007/04/22 22:50:27 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.52 2007/04/29 18:07:49 andresreyesh Exp $
  */
 
 /*
@@ -135,6 +135,12 @@ DECLARE HBClass ;
 #xtranslate _AsStr_( <itm>( [<prm,...>] ) )     => #<itm>
 #xtranslate _AsStrLst_( <Typ> [, <TypN> ] )     =>;
                             _AsStr_( <Typ> )[ , _AsStr_( <TypN> ) ]
+
+#xtranslate _AsNameFrom_( <itm> ) => _AsName_( <itm> )
+#xtranslate _AsNameFrom_( <type: ARRAY, BLOCK, CHARACTER, DATE, LOGICAL, NIL, NUMERIC, POINTER, HASH> ) ;
+            =>;
+            _<type>
+
 
 //----------------------------------------------------------------------------//
 
@@ -325,7 +331,7 @@ DECLARE HBClass ;
       local nScope ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
-         s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsName_( <SuperClass1> )():classh ] [ , _AsName_( <SuperClassN> )():classh ] ) ) ) ;;
+         s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsNameFrom_( <SuperClass1> )():classh ] [ , _AsNameFrom_( <SuperClassN> )():classh ] ) ) ) ;;
      #undef  _CLASS_NAME_ ;;
      #define _CLASS_NAME_ <ClassName>;;
      #undef  _CLASS_MODE_ ;;
@@ -353,7 +359,7 @@ DECLARE HBClass ;
       local nScope ;;
       nScope := HB_OO_CLSTP_EXPORTED ;;
       if s_oClass == NIL ;;
-         s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsName_( <SuperClass1> )():classh ] [ , _AsName_( <SuperClassN> )():classh ] ) ) ) ;;
+         s_oClass  := IIF(<.metaClass.>, <(metaClass)>, HBClass():New( _AsStr_( <ClassName> ) , _InheritFrom_( [ _AsNameFrom_( <SuperClass1> )():classh ] [ , _AsNameFrom_( <SuperClassN> )():classh ] ) ) ) ;;
      #undef  _CLASS_NAME_ ;;
      #define _CLASS_NAME_ <ClassName> ;;
      #undef  _CLASS_MODE_ ;;
