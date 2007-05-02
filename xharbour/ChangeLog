@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5476 2007/05/01 14:16:20 ran_go Exp $
+ * $Id: ChangeLog,v 1.5477 2007/05/01 23:42:57 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-02 03:00 UTC-0300 Walter Negro <anegro/at/overnet.com.ar>
+  * source/rtl/hbserial.prg
+  * source/rtl/hbsrlraw.c
+  * source/vm/hvm.c
+    * support for serialize ande deserialize of array, hash with 
+      multireference or autoreference
+    ! Fix typo error in hb_xvmHashGen()
+  * source/rtl/win32ole.prg
+    * support for datetime in VT_DATE values.
 
 2007-05-01 20:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg

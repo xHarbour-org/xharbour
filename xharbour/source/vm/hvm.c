@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.623 2007/05/01 13:22:57 ran_go Exp $
+ * $Id: hvm.c,v 1.624 2007/05/01 14:15:28 ran_go Exp $
  */
 
 /*
@@ -11777,7 +11777,7 @@ HB_EXPORT void hb_xvmHashGen( ULONG ulPairs )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmHAshGen(%lu)", ulPairs));
 
-   hb_vmArrayGen( ulPairs );
+   hb_vmHashGen( ulPairs );
    HB_VM_STACK.iExtraElements = 0;
 }
 

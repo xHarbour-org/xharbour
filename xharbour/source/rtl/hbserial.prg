@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.13 2006/09/09 04:14:35 ronpinkas Exp $
+ * $Id: hbserial.prg,v 1.14 2006/09/26 20:58:31 mlombardo Exp $
  */
 
 /*
@@ -50,25 +50,73 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+ 
+#include "error.ch" 
+#include "common.ch"
 
-#include "error.ch"
-
-FUNCTION HB_Serialize( xValue )
+FUNCTION HB_Serialize( xValue, lRecursive, aObj, aHash, aArray, aBlock )
    LOCAL cSerial
    LOCAL xElement, aPropertiesAndValues, aPropertyAndValue
    LOCAL nPos
+   LOCAL cType := Valtype( xValue )
+   
+   DEFAULT lRecursive TO .F.
+   Default aObj TO {}
+   Default aHash TO {}
+   Default aArray TO {}
+   Default aBlock TO {}
 
-   SWITCH ValType( xValue )
+   If lRecursive
+   
+      SWITCH cType
+         CASE "A"
+            If (nPos := AScan( aArray, {|a| a == xValue} )) > 0
+               cType := "R"
+               xValue := "RA" + HB_CreateLen8( nPos )
+            Endif
+            EXIT
+            
+         CASE "H"
+            If (nPos := AScan( aHash, {|h| h == xValue} )) > 0
+               cType := "R"
+               xValue := "RH" + HB_CreateLen8( nPos )
+            Endif
+            EXIT
+            
+         CASE "O"
+            If (nPos := AScan( aObj, {|o| o == xValue} )) > 0
+               cType := "R"
+               xValue := "RO" + HB_CreateLen8( nPos )
+            Endif
+            EXIT
+
+         CASE "B"
+            If (nPos := AScan( aBlock, {|b| b == xValue} )) > 0
+               cType := "R"
+               xValue := "RB" + HB_CreateLen8( nPos )
+            Endif
+            EXIT
+      END
+      
+   Endif
+
+   SWITCH cType
       CASE "A"
+      
+         Aadd( aArray, xValue )
+      
          cSerial :="A" + HB_CreateLen8( Len( xValue ) )
 
          FOR EACH xElement IN xValue
-            cSerial += HB_Serialize( xElement )
+            cSerial += HB_Serialize( xElement, .T., aObj, aHash, aArray, aBlock )
          NEXT
 
          EXIT
 
       CASE "B"
+
+         Aadd( aBlock, xValue )
+
          xElement := HB_SaveBlock( xValue )
          cSerial  := "B" + HB_Serialize( xElement )
 
@@ -76,32 +124,42 @@ FUNCTION HB_Serialize( xValue )
 
 
       CASE "H"
+      
+         Aadd( aHash, xValue )
+         
          cSerial := "H" + HB_CreateLen8( Len( xValue ) )
 
          FOR nPos := 1 TO Len( xValue )
             cSerial += HB_Serialize( HGetKeyAt( xValue, nPos ) )
-            cSerial += HB_Serialize( HGetValueAt( xValue, nPos ) )
+            cSerial += HB_Serialize( HGetValueAt( xValue, nPos ), .T., aObj, aHash, aArray, aBlock )
          NEXT
 
          EXIT
 
       CASE "O"
-          if __objDerivedFrom(xValue,"HBPersistent")
+      
+         Aadd( aObj, xValue )
+         
+      	 if __objDerivedFrom(xValue,"HBPersistent")
             cSerial:= HB_SerializeSimple( xValue:ClassName )
             cSerial+= xValue:SaveToText()
             cSerial:= "Q" + HB_CreateLen8( Len( cSerial ) )+ cSerial
 
-          else
+      	 else
             aPropertiesAndValues := __ClsGetPropertiesAndValues( xValue )
             cSerial := "O" + HB_CreateLen8( Len( aPropertiesAndValues ) )
             cSerial += HB_SerializeSimple( xValue:ClassName )
 
             FOR EACH aPropertyAndValue in aPropertiesAndValues
                // saves name and content
-               cSerial += HB_Serialize( aPropertyAndValue[1] )
-               cSerial += HB_Serialize( aPropertyAndValue[2] )
+               cSerial += HB_Serialize( aPropertyAndValue[1], .T. )
+               cSerial += HB_Serialize( aPropertyAndValue[2], .T., aObj, aHash, aArray, aBlock )
             NEXT
          end if
+         EXIT
+         
+      CASE "R"
+         cSerial := xValue
          EXIT
 
       DEFAULT
@@ -110,11 +168,18 @@ FUNCTION HB_Serialize( xValue )
 
 RETURN cSerial
 
-FUNCTION HB_Deserialize( cSerial, nMaxLen )
+
+FUNCTION HB_Deserialize( cSerial, nMaxLen, lRecursive, aObj, aHash, aArray, aBlock )
    LOCAL oObject
-   LOCAL oElem, cClassName, aProperties, oVal
+   LOCAL oElem, cClassName, aProperties, oVal, lScope
    LOCAL nLen, nClassID
    LOCAL nLenBytes,nClassNameLen,oErr
+   
+   Default lRecursive TO .F.
+   Default aObj TO {}
+   Default aHash TO {}
+   Default aArray TO {}
+   Default aBlock TO {}
 
    IF Len( cSerial ) < 2 // note
       RETURN NIL
@@ -122,22 +187,19 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
 
    SWITCH cSerial[1]
       CASE "A"
-         oObject := Array(0)
          nLen := HB_GetLen8( Substr( cSerial, 2 ) )
+         oObject := Array( nLen )
          cSerial := Substr( cSerial, 10 )
-
-         DO WHILE nLen > 0
-            oElem := HB_Deserialize( cSerial, nMaxLen )
-            Aadd( oObject, oElem )
-            cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
-            nLen --
-         ENDDO
+         Aadd( aArray, oObject )
+         nLen := HB_DeserializeArray( oObject, cSerial, nMaxLen, aObj, aHash, aArray, aBlock )
+         cSerial := Substr( cSerial, nLen+1 )
       EXIT
 
       CASE "B"
          cSerial := Substr( cSerial, 2 )
          oElem   := HB_Deserialize( cSerial, nMaxLen )
          oObject := HB_RestoreBlock( oElem )
+         Aadd( aBlock, oObject )
       EXIT
 
 
@@ -150,10 +212,11 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             HAllocate( oObject, nLen )
          ENDIF
 
+         Aadd( aHash, oObject )
          DO WHILE nLen > 0
             oElem := HB_Deserialize( cSerial, nMaxLen )
             cSerial :=  Substr( cSerial, HB_SerialNext( cSerial )+1 )
-            oVal := HB_Deserialize( cSerial, nMaxLen )
+            oVal := HB_Deserialize( cSerial, nMaxLen, .T., aObj, aHash, aArray, aBlock )
             HSet( oObject, oElem, oVal )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
             nLen --
@@ -184,19 +247,22 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             RETURN Eval( ErrorBlock(), oErr )
          ENDIF
          oObject := __ClsInst( nClassId )
+         lScope  := __SetClassScope( .f. )
 
+         Aadd( aObj, oObject )
          DO WHILE nLen > 0
             // retreives name
             oElem := HB_DeserializeSimple( cSerial, 128 )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
             // then the value
-            oVal := HB_Deserialize( cSerial, nMaxLen )
+            oVal := HB_Deserialize( cSerial, nMaxLen, .T., aObj, aHash, aArray, aBlock )
 
             __objSendMsgCase( oObject, "_" + oElem, oVal )
             cSerial := Substr( cSerial, HB_SerialNext( cSerial )+1 )
 
             nLen--
          ENDDO
+         __SetClassScope( lScope )
       EXIT
 
       CASE "Q"                               // Object inherited from HBPersistent
@@ -239,11 +305,32 @@ FUNCTION HB_Deserialize( cSerial, nMaxLen )
             oErr:SubCode       := 2
             oErr:SubSystem     := "Serialization"
             RETURN Eval( ErrorBlock(), oErr )
-         end if
+         endif
 
-       oObject:LoadFromText(substr(cSerial,1,nLenBytes))
-       cSerial :=  Substr( cSerial,nLenBytes+1 )
+         oObject:LoadFromText(substr(cSerial,1,nLenBytes))
+         cSerial :=  Substr( cSerial,nLenBytes+1 )
+         Aadd( aObj, oObject )
+      EXIT
+      
+      CASE "R"
+         SWITCH cSerial[2]
+         CASE "A"
+            oObject := aArray[ HB_GetLen8( Substr( cSerial, 3, 8 ) ) ]
+         EXIT
+         
+         CASE "H"
+            oObject := aHash[ HB_GetLen8( Substr( cSerial, 3, 8 ) ) ]
+         EXIT
+         
+         CASE "O"
+            oObject := aObj[ HB_GetLen8( Substr( cSerial, 3, 8 ) ) ]
+         EXIT
 
+         CASE "B"
+            oObject := aBlock[ HB_GetLen8( Substr( cSerial, 3, 8 ) ) ]
+         EXIT
+         
+         END
       EXIT
 
       DEFAULT

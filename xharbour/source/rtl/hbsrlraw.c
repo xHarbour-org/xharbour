@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.29 2006/02/06 21:54:57 lculik Exp $
+ * $Id: hbsrlraw.c,v 1.30 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -59,6 +59,7 @@
 #include "hbapierr.h"
 #include "inet.h"
 #include "hbdate.h"
+#include "hbfast.h"
 
 /* Returns a string containing 8 characters in network byte order
 * HB_CreateLen8( nLen ) --> returns the bytes containing the code
@@ -399,7 +400,13 @@ ULONG hb_serialNextRaw( char *cBuf )
          }
       return ulData;
 
-       case 'Q':
+      case 'B':
+         ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 2) );
+         return ulCount+10;
+
+      case 'R': return 10;
+
+      case 'Q':
          /* ulNext = 9; */
          ulCount = (ULONG) hb_getlen8( ( BYTE *) (cBuf + 1) );
          return ulCount+9;
@@ -444,3 +451,71 @@ HB_FUNC( HB_DESERIALBEGIN )
    memcpy( cBuf+8, pItem->item.asString.value, pItem->item.asString.length );
    hb_retclenAdopt( ( char *) cBuf, 8 + pItem->item.asString.length );
 }
+
+
+HB_FUNC( HB_DESERIALIZEARRAY )
+{
+   char *cBuf;
+   PHB_ITEM pArray, pMaxLen, pRObj, pRHash, pRArray, pRBlock;
+   PHB_DYNS pHB_Deserialize;
+   LONG lLen, i, lArrayLen, lNext;
+
+   pArray  = hb_param( 1, HB_IT_ARRAY );
+   cBuf    = hb_parc( 2 );
+   lLen    = hb_parclen( 2 );
+   pMaxLen = hb_param( 3, HB_IT_ANY );
+   pRObj   = hb_param( 4, HB_IT_ANY );
+   pRHash  = hb_param( 5, HB_IT_ANY );
+   pRArray = hb_param( 6, HB_IT_ANY );
+   pRBlock = hb_param( 7, HB_IT_ANY );
+
+   pHB_Deserialize = hb_dynsymFindName( "HB_DESERIALIZE" );
+
+   if( pArray && cBuf && pHB_Deserialize )
+   {
+      lArrayLen  = hb_arrayLen( pArray );
+
+      for( i = 1 ; i <= lArrayLen ; i++ )
+      {
+         hb_vmPushDynSym( pHB_Deserialize );    // HB_Deserialize(
+         hb_vmPushNil();
+         hb_itemPushStaticString( cBuf, lLen ); //    cSerial,
+         hb_vmPush( pMaxLen );                  //    nMaxLen,
+         hb_vmPushLogical( TRUE );              //    .T.,
+
+         if( pRObj )
+            hb_vmPush( pRObj );                 //    aObj,
+         else
+            hb_vmPushNil();
+
+         if( pRHash )
+            hb_vmPush( pRHash );                //    aHash,
+         else
+            hb_vmPushNil();
+
+         if( pRArray )
+            hb_vmPush( pRArray );               //    aArray,
+         else
+            hb_vmPushNil();
+
+         if( pRBlock )
+            hb_vmPush( pRBlock );               //    aBlock
+         else
+            hb_vmPushNil();
+
+         hb_vmDo( 7 );                          //    )
+
+         hb_arraySetForward( pArray, i, hb_stackReturnItem() );
+
+         lNext = hb_serialNextRaw( cBuf );
+         cBuf += lNext;
+         lLen -= lNext;
+         if( lLen < 0 )
+         {
+            lLen = 0;
+         }
+      }
+   }
+   hb_retnl( hb_parclen( 2 ) - lLen );
+}
+

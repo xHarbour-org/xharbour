@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.148 2007/02/27 15:59:40 druzus Exp $
+ * $Id: win32ole.prg,v 1.149 2007/04/13 20:25:59 ronpinkas Exp $
  */
 
 /*
@@ -1022,7 +1022,7 @@ RETURN Self
           }
           else if( bByRef )
           {
-             pItem->item.asDouble.value = (double) ( pItem->item.asDate.value - 2415019 );
+             pItem->item.asDouble.value = hb_itemGetDTD( pItem ) - (double) 2415019;
              pItem->type = HB_IT_DOUBLE;
 
              pVariant->n1.n2.vt = VT_BYREF | VT_DATE;
@@ -1031,7 +1031,7 @@ RETURN Self
           else
           {
              pVariant->n1.n2.vt = VT_DATE;
-             pVariant->n1.n2.n3.dblVal = (double) ( pItem->item.asDate.value - 2415019 );
+             pVariant->n1.n2.n3.dblVal = hb_itemGetDTD( pItem ) - (double) 2415019;
           }
           break;
 
@@ -1395,11 +1395,11 @@ RETURN Self
                    break;
 
                  case VT_BYREF | VT_DATE:
-                   hb_itemPutDL( pItem, (long) ( *( pVariant->n1.n2.n3.pdblVal ) ) + 2415019 );
+                   hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
                    break;
 
                  case VT_DATE:
-                   hb_itemPutDL( pItem, (long) (pVariant->n1.n2.n3.dblVal) + 2415019 );
+                   hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
                    break;
 
                  case VT_BYREF | VT_EMPTY:
@@ -1808,11 +1808,11 @@ RETURN Self
         }
 
         case VT_DATE | VT_BYREF:
-           hb_itemPutDL( pItem, (long) ( *pVariant->n1.n2.n3.pdblVal ) + 2415019 );
+           hb_itemPutDTD( pItem, *pVariant->n1.n2.n3.pdblVal + (double) 2415019 );
            break;
 
         case VT_DATE:
-           hb_itemPutDL( pItem, (long) ( pVariant->n1.n2.n3.dblVal ) + 2415019 );
+           hb_itemPutDTD( pItem,  pVariant->n1.n2.n3.dblVal + (double) 2415019 );
            break;
 
         case VT_EMPTY | VT_BYREF:
