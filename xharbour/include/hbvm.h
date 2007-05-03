@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.51 2007/04/22 22:50:27 ronpinkas Exp $
+ * $Id: hbvm.h,v 1.52 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -117,7 +117,7 @@ extern void    HB_EXPORT hb_vmRequest( USHORT );
 /* Public PCode functions */
 
 /* Execution */
-HB_EXPORT extern void     hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
+HB_EXPORT extern void     hb_vmDo( UINT uiParams );      /* invoke the virtual machine */
 HB_EXPORT extern void     hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
 HB_EXPORT extern void     hb_vmSend( USHORT uiParams ); /* sends a message to an object */
 HB_EXPORT extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
