@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5484 2007/05/03 01:08:16 modalsist Exp $
+ * $Id: ChangeLog,v 1.5485 2007/05/03 03:02:02 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-03 18:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * include/hbvm.h
+    * switch hb_vmDo( USHORT uiParams ) to hb_vmDo( UINT uiParams )
+  * include/hbvmpub.h
+    * switch USHORT to UINT in
+    *   struct SYMBOLS (line 140)
+    *   struct hb_struDouble (lines 201, 202)
+    *   struct hb_struInteger (line 207)
+    *   struct hb_struLong (line 219)
+  * source/vm/hvm.c
+    * switch hb_vmDo( USHORT uiParams ) to hb_vmDo( UINT uiParams )
+    * Fix several warnings (-Wall)
+
+  /* Please recompile all */
+
 
 2007-05-02 20:51 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbclass.ch
