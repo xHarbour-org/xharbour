@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5482 2007/05/02 17:29:45 ran_go Exp $
+ * $Id: ChangeLog,v 1.5483 2007/05/02 22:00:29 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-02 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+    ! fix to avoid warnings and errors at hvm.c compiling.
 
 2007-05-02 18:58 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/itemapi.c
@@ -56,6 +60,7 @@
 
 2007-05-01 20:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
+    * replaced @..SAY to DispOut() functions to speed up browse initialization.
     ! fixed to add picture "@Sn" if char field width is larger than column.
     ! fixed browse performance under index operation.
     ! fixed memo edit window minimum coordinates.
