@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5483 2007/05/02 22:00:29 ran_go Exp $
+ * $Id: ChangeLog,v 1.5484 2007/05/03 01:08:16 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-02 20:51 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * include/hbclass.ch
+    ! Fixed "Super" translate
+    * CLASS <classname> FROM <FromFunc>( <FromClass> )
+      /* 
+         If you declare a class with the clause FUNCTION, 
+
+         Example:
+
+             CLASS MyClass FUNCTION MyNewClass
+                ...
+
+         if this must be inherit from other class you need to do
+
+             CLASS MyClass2 FROM MyNewClass( MyClass )
+                   ^ClassName    ^Function   ^From ClassName
+
+	 **Only in these cases**
+      */
 
 2007-05-02 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc

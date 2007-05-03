@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.52 2007/04/29 18:07:49 andresreyesh Exp $
+ * $Id: hbclass.ch,v 1.53 2007/05/02 15:20:06 andresreyesh Exp $
  */
 
 /*
@@ -323,7 +323,7 @@ DECLARE HBClass ;
 
 #xtranslate DECLMETH <ClassName> <MethodName> => <ClassName>_<MethodName>
 
-#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] [ FUNCTION <FuncName> ] => ;
+#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN> ] ] [<static: STATIC>] [ FUNCTION <FuncName> ] => ;
    _HB_CLASS <ClassName> ;;
    UTILITY <static> FUNCTION __OPT__( [ _AsName_( <FuncName> ), ] _AsName_( <ClassName> ))(...) ;;
       static s_oClass ;;
@@ -340,14 +340,8 @@ DECLARE HBClass ;
      #untranslate DECLCLASS ;;
      #xtranslate CLSMETH <ClassName> \<MethodName> => @<ClassName>_\<MethodName> ;;
      #xtranslate DECLCLASS <ClassName> => <ClassName> ;
-     ; #xuntranslate Super() : ;
-     ; #xuntranslate Super : ;
-     ; #xuntranslate : Super : ;
-     [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
-     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
-     ; #translate Super() : => ::<SuperClass1>: ;
-     ; #translate Super : => ::<SuperClass1>: ;
-     ; #translate : Super : => :<SuperClass1>:
+     ;DECLSUPER <SuperClass1> [, <SuperClassN> ]
+
 
 #else
 
@@ -366,6 +360,14 @@ DECLARE HBClass ;
      #define _CLASS_MODE_ _CLASS_DECLARATION_ ;;
      #untranslate CLSMETH ;;
      #translate CLSMETH <ClassName> \<MethodName>() => @\<MethodName> ;
+     ;DECLSUPER <SuperClass1> [, <SuperClassN> ]
+
+#endif /* HB_SHORTNAMES */
+
+#xcommand  DECLSUPER =>
+
+#xcommand  DECLSUPER <SuperClass1> [, <SuperClassN> ] ;
+      =>;
      ; #xuntranslate Super() : ;
      ; #xuntranslate Super : ;
      ; #xuntranslate : Super : ;
@@ -375,7 +377,16 @@ DECLARE HBClass ;
      ; #translate Super : => ::<SuperClass1>: ;
      ; #translate : Super : => :<SuperClass1>:
 
-#endif /* HB_SHORTNAMES */
+#xcommand  DECLSUPER <Func>( <SuperClass1> ) [, <FuncN>( <SuperClassN> ) ] ;
+      =>;
+     ; #xuntranslate Super() : ;
+     ; #xuntranslate Super : ;
+     ; #xuntranslate : Super : ;
+     [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
+     ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
+     ; #translate Super() : => ::<SuperClass1>: ;
+     ; #translate Super : => ::<SuperClass1>: ;
+     ; #translate : Super : => :<SuperClass1>:
 
 /* Disable the message :Class */
 /* CLASSY SYNTAX */
