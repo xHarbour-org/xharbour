@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.58 2007/04/22 22:50:27 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.60 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -137,7 +137,7 @@
    typedef struct _SYMBOLS
    {
       PHB_SYMB pSymbolTable;   /* pointer to a one module own symbol table */
-      USHORT   uiModuleSymbols;  /* number of symbols on that table */
+      UINT     uiModuleSymbols;  /* number of symbols on that table */
       struct _SYMBOLS * pNext;   /* pointer to the next SYMBOLS structure */
       HB_SYMBOLSCOPE hScope;     /* scope collected from all symbols in module used to speed initialization code */
       void *   hDynLib;          /* handler to dynamic library */
@@ -197,15 +197,15 @@
 
    struct hb_struDouble
    {
-      USHORT length;
-      USHORT decimal;
       double value;
+      UINT   length;
+      UINT   decimal;
    };
 
    struct hb_struInteger
    {
-      USHORT length;
-      int value;
+      UINT  length;
+      int   value;
    };
 
    struct hb_struLogical
@@ -215,8 +215,8 @@
 
    struct hb_struLong
    {
-      USHORT length;
       HB_LONG value;
+      UINT    length;
    };
 
    struct hb_struMemvar
