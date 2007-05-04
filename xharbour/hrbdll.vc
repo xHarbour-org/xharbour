@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.103 2007/04/15 20:12:40 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.104 2007/05/04 11:29:00 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -424,6 +424,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\asort.obj \
   $(OBJ_DIR)\break.obj \
   $(OBJ_DIR)\classes.obj \
+  $(OBJ_DIR)\classesc.obj \
   $(OBJ_DIR)\cmdarg.obj \
   $(OBJ_DIR)\codebloc.obj \
   $(OBJ_DIR)\dbgentry.obj \

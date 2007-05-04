@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.6 2005/04/22 18:41:29 ptsarenko Exp $
+ * $Id: ttable.prg,v 1.7 2005/09/24 01:29:31 jabrecer Exp $
  */
 
 /*
@@ -905,7 +905,7 @@ METHOD FldInit() CLASS HBTable
 
    // --> create new oObject class from this one...
 
-   adb := hbclass():new( ::alias, __CLS_PARAM( "hbtable" ) )
+   adb := hbclass():new( ::alias, { "hbtable" } )
 
    FOR i := 1 TO FCOUNT()
       adb:AddData( ( ::Alias )->( FIELDNAME( i ) ),,, nScope )

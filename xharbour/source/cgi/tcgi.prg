@@ -1,6 +1,6 @@
 
 /*
- * $Id: tcgi.prg,v 1.3 2006/06/22 03:50:13 lculik Exp $
+ * $Id: tcgi.prg,v 1.4 2006/06/28 20:56:31 lculik Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ METHOD ToObject() CLASS TCgi
 
    // --> create new oObject class from this one...
    sn ++
-   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), __CLS_PARAM( "TCgi" ) )
+   aDb := hbClass():New( "NewCgi" + Strzero( sn, 3 ), { "TCgi" } )
 
    FOR i := 1 TO Len( ::aQueryFields )
 
