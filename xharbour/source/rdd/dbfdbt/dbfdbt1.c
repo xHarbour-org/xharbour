@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.35 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: dbfdbt1.c,v 1.36 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
 #endif
 
 static RDDFUNCS dbtSuper;
-static RDDFUNCS dbtTable =
+static const RDDFUNCS dbtTable =
 {
 
    /* Movement and positioning methods */

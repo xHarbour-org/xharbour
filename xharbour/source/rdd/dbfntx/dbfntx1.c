@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.168 2007/04/22 22:50:29 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.169 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -3350,7 +3350,7 @@ static ULONG hb_ntxPageCountKeys( LPTAGINFO pTag, ULONG ulPage )
 }
 
 /*
- * count relative position of current location in page stack
+ * count relative position of current location in page stack 
  */
 static double hb_ntxTagCountRelKeyPos( LPTAGINFO pTag )
 {
@@ -7504,7 +7504,8 @@ static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
    return SUCCESS;
 }
 
-static RDDFUNCS ntxTable = { ntxBof,
+static const RDDFUNCS ntxTable = {
+                             ntxBof,
                              ntxEof,
                              ntxFound,
                              ( DBENTRYP_V ) ntxGoBottom,

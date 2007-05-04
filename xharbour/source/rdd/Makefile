@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2005/10/04 02:05:33 druzus Exp $
+# $Id: Makefile,v 1.9 2006/07/17 12:56:18 druzus Exp $
 #
 
 ROOT = ../../
@@ -7,10 +7,12 @@ ROOT = ../../
 C_SOURCES=\
 	dbcmd.c \
 	workarea.c \
+	wacore.c \
+	wafunc.c \
 	dbf1.c \
 	dbnubs.c \
-	sdf1.c \
 	delim1.c \
+	sdf1.c \
 	hbdbsort.c \
 
 PRG_SOURCES=\

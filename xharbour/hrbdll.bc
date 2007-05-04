@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.135 2007/04/15 20:12:40 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.136 2007/04/16 15:33:14 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -417,6 +417,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\macroc.obj \
   $(OBJ_DIR)\dbcmd.obj \
   $(OBJ_DIR)\workarea.obj \
+  $(OBJ_DIR)\wacore.obj \
+  $(OBJ_DIR)\wafunc.obj \
   $(OBJ_DIR)\dbf1.obj \
   $(OBJ_DIR)\dbnubs.obj \
   $(OBJ_DIR)\delim1.obj \
@@ -1154,6 +1156,8 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\macroc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dbcmd.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\workarea.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\wacore.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\wafunc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\dbf1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\dbnubs.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\delim1.obj            + >> hdll.tmp
@@ -1479,6 +1483,12 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wacore.obj : $(RDD_DIR)\wacore.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wafunc.obj : $(RDD_DIR)\wafunc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c

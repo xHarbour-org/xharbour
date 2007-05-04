@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.188 2007/04/30 20:44:30 ran_go Exp $
+# $Id: makefile.vc,v 1.189 2007/05/02 13:41:57 ran_go Exp $
 #
 
 #
@@ -814,6 +814,8 @@ MACRO_LIB_OBJS = \
 RDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dbcmd.obj \
    $(OBJ_DIR)$(MT)\workarea.obj \
+   $(OBJ_DIR)$(MT)\wacore.obj \
+   $(OBJ_DIR)$(MT)\wafunc.obj \
    $(OBJ_DIR)$(MT)\dbf1.obj \
    $(OBJ_DIR)$(MT)\dbnubs.obj \
    $(OBJ_DIR)$(MT)\delim1.obj \

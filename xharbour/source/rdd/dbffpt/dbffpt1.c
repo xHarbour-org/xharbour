@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.82 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: dbffpt1.c,v 1.83 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -81,7 +81,7 @@ static USHORT s_uiRddIdBLOB = ( USHORT ) -1;
 static USHORT s_uiRddIdFPT  = ( USHORT ) -1;
 
 static RDDFUNCS fptSuper;
-static RDDFUNCS fptTable =
+static const RDDFUNCS fptTable =
 {
 
    /* Movement and positioning methods */
@@ -2632,7 +2632,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
       {
          pBuffer = ( BYTE * ) hb_xalloc( ulSize + 1 );
       }
-
+      
       if( !pBuffer )
       {
          /* in most cases this means that file is corrupted */

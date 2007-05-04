@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.263 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: dbfcdx1.c,v 1.264 2007/05/02 08:43:08 marchuet Exp $
  */
 
 /*
@@ -133,7 +133,7 @@ static void hb_cdxSortFree( LPCDXSORTINFO pSort );
 static USHORT s_uiRddId = ( USHORT ) -1;
 
 static RDDFUNCS cdxSuper;
-static RDDFUNCS cdxTable =
+static const RDDFUNCS cdxTable =
 {
 
    /* Movement and positioning methods */
@@ -4895,7 +4895,7 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
    if ( szBasePath )
       hb_xfree( szBasePath );
    if ( szBaseExt )
-       hb_xfree( szBaseExt );
+      hb_xfree( szBaseExt );
    return pIndex;
 }
 

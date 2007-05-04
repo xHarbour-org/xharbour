@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.54 2007/03/19 11:26:56 modalsist Exp $
+ * $Id: errorsys.prg,v 1.55 2007/03/20 11:04:10 modalsist Exp $
  */
 
 /*
@@ -72,124 +72,130 @@ PROCEDURE ErrorSys
 Return
 
 STATIC FUNCTION DefError( oError )
+   LOCAL cMessage
+   LOCAL cDOSError
 
-     LOCAL cMessage
-     LOCAL cDOSError
+   LOCAL aOptions
+   LOCAL nChoice
 
-     LOCAL aOptions
-     LOCAL nChoice
+   LOCAL n
 
-     LOCAL n
+   // By default, division by zero results in zero
+   IF oError:genCode == EG_ZERODIV
+      RETURN 0
+   ENDIF
 
-     // By default, division by zero results in zero
-     If oError:genCode == EG_ZERODIV
-        Return 0
-     Endif
+   // By default, retry on RDD lock error failure */
+   IF oError:genCode == EG_LOCK .AND. ;
+      oError:canRetry
+      // oError:tries++
+      RETURN .T.
+   ENDIF
 
-     // Set NetErr() of there was a database open error
-     If oError:genCode == EG_OPEN .and. ;
-                oError:osCode == 32 .and. ;
-                oError:canDefault
-        Neterr( .T. )
-        Return .F.
-     Endif
+   // Set NetErr() of there was a database open error
+   IF oError:genCode == EG_OPEN .AND. ;
+      oError:osCode == 32 .AND. ;
+      oError:canDefault
+      NetErr( .T. )
+      RETURN .F.
+   ENDIF
 
-     // Set NetErr() if there was a lock error on dbAppend()
-     If oError:genCode == EG_APPENDLOCK .and. ;
-                oError:canDefault
-        Neterr( .T. )
-        Return .F.
-     Endif
+   // Set NetErr() if there was a lock error on dbAppend()
+   IF oError:genCode == EG_APPENDLOCK .AND. ;
+      oError:canDefault
+      NetErr( .T. )
+      RETURN .F.
+   ENDIF
 
-     // Making sure we display the error info!
-     DO WHILE DispCount() > 0
-        DispEnd()
-     ENDDO
+   // Making sure we display the error info!
+   DO WHILE DispCount() > 0
+      DispEnd()
+   ENDDO
 
-     cMessage := ErrorMessage( oError )
-     If !Empty( oError:osCode )
-        cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
-     Endif
+   cMessage := ErrorMessage( oError )
+   If !Empty( oError:osCode )
+      cDOSError := "(DOS Error " + Ltrim( Str( oError:osCode ) ) + ")"
+   Endif
 
 
-     If ValType( oError:Args ) == "A"
-       cMessage += " Arguments: (" + Arguments( oError ) + ")"
-     Endif
+   If ValType( oError:Args ) == "A"
+     cMessage += " Arguments: (" + Arguments( oError ) + ")"
+   Endif
 
-     // Build buttons
+   // Build buttons
 
-     IF MaxCol() > 0
-         aOptions := {}
+   IF MaxCol() > 0
+       aOptions := {}
 
-         // AAdd( aOptions, "Break" )
-         Aadd( aOptions, "Quit" )
+       // AAdd( aOptions, "Break" )
+       Aadd( aOptions, "Quit" )
 
-         If oError:canRetry
-            Aadd( aOptions, "Retry" )
-         Endif
+       If oError:canRetry
+          Aadd( aOptions, "Retry" )
+       Endif
 
-         If oError:canDefault
-            Aadd( aOptions, "Default" )
-         Endif
+       If oError:canDefault
+          Aadd( aOptions, "Default" )
+       Endif
 
-         // Show alert box
-         //TraceLog( cMessage )
+       // Show alert box
+       //TraceLog( cMessage )
 
-         nChoice := 0
-         While nChoice == 0
+       nChoice := 0
+       While nChoice == 0
 
-            If Empty( oError:osCode )
-               nChoice := Alert( cMessage, aOptions )
-            Else
-               nChoice := Alert( cMessage + ";" + cDOSError, aOptions )
-            Endif
+          If Empty( oError:osCode )
+             nChoice := Alert( cMessage, aOptions )
+          Else
+             nChoice := Alert( cMessage + ";" + cDOSError, aOptions )
+          Endif
 
-         Enddo
+       Enddo
 
-         If !Empty( nChoice )
-            Do Case
-                  Case aOptions[ nChoice ] == "Break"
-                     Break( oError )
-                  Case aOptions[ nChoice ] == "Retry"
-                     Return .T.
-                  Case aOptions[ nChoice ] == "Default"
-                     Return .F.
-            Endcase
-         Endif
-     Else
-        If Empty( oError:osCode )
-           nChoice := Alert( cMessage + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
-        Else
-           nChoice := Alert( cMessage + ";" + cDOSError + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
-        Endif
-     ENDIF
+       IF ! Empty( nChoice )
+          DO CASE
+          CASE aOptions[ nChoice ] == "Break"
+             Break( oError )
+          CASE aOptions[ nChoice ] == "Retry"
+             RETURN .T.
+          CASE aOptions[ nChoice ] == "Default"
+             RETURN .F.
+          ENDCASE
+       ENDIF
+   ELSE
+      IF Empty( oError:osCode )
+         nChoice := Alert( cMessage + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
+      ELSE
+         nChoice := Alert( cMessage + ";" + cDOSError + ";" + oError:ProcName + "(" + LTrim( Str( oError:ProcLine() ) ) +  ") in module: " + oError:ModuleName )
+      ENDIF
+   ENDIF
 
-     // "Quit" selected
+   // "Quit" selected
 
-     If !Empty( oError:osCode )
-        cMessage += " " + cDOSError
-     Endif
+   IF ! Empty( oError:osCode )
+      cMessage += " " + cDOSError
+   ENDIF
 
-     ? cMessage
+   ? cMessage
 
-     ?
-     ? "Error at ...:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
-     n := 3
-     WHILE ( ! Empty(ProcName( n ) ) )
-       ? "Called from :", ProcName( n ) + "(" + LTrim( Str( ProcLine( n ) ) ) + ") in Module:", ProcFile( n )
-       n++
-     END
+   ?
+   ? "Error at ...:", oError:ProcName + "(" + LTrim( Str( oError:ProcLine ) ) + ") in Module:", oError:ModuleName
+   n := 2
+   WHILE ! Empty( ProcName( ++n ) )
+      ? "Called from :", ProcName( n ) + ;
+      "(" + LTrim( Str( ProcLine( n ) ) ) + ") in Module:", ProcFile( n )
+   ENDDO
 
-     /// For some strange reason, the DOS prompt gets written on the first line
-     /// *of* the message instead of on the first line *after* the message after
-     /// the program quits, unless the screen has scrolled. - dgh
-     LogError( oError )
+/// For some strange reason, the DOS prompt gets written on the first line
+/// *of* the message instead of on the first line *after* the message after
+/// the program quits, unless the screen has scrolled. - dgh
+   LogError( oError )
 
-     ErrorLevel(1)
-     ?
-     Quit
+   ErrorLevel( 1 )
+   ?
+   QUIT
 
-Return .F.
+RETURN .F.
 
 // [vszakats]
 

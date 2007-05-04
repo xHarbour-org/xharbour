@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.102 2007/03/25 06:12:46 walito Exp $
+# $Id: hrbdll.vc,v 1.103 2007/04/15 20:12:40 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -476,6 +476,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\hbdbsort.obj \
   $(OBJ_DIR)\sdf1.obj \
   $(OBJ_DIR)\workarea.obj \
+  $(OBJ_DIR)\wacore.obj \
+  $(OBJ_DIR)\wafunc.obj \
 # rdd prg
   $(OBJ_DIR)\dbdelim.obj \
   $(OBJ_DIR)\dbfuncs.obj \
@@ -938,6 +940,12 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wacore.obj : $(RDD_DIR)\wacore.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wafunc.obj : $(RDD_DIR)\wafunc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c

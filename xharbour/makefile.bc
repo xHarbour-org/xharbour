@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.195 2007/04/15 18:55:39 andresreyesh Exp $
+# $Id: makefile.bc,v 1.196 2007/04/15 21:10:33 andresreyesh Exp $
 #
 
 #
@@ -624,6 +624,8 @@ MACRO_LIB_OBJS = \
 RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\dbcmd.obj \
    $(RDD_OBJ_DIR)\workarea.obj \
+   $(RDD_OBJ_DIR)\wacore.obj \
+   $(RDD_OBJ_DIR)\wafunc.obj \
    $(RDD_OBJ_DIR)\dbf1.obj \
    $(RDD_OBJ_DIR)\dbnubs.obj \
    $(RDD_OBJ_DIR)\delim1.obj \
@@ -1709,6 +1711,12 @@ $(RDD_OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC_CMD)
 
 $(RDD_OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\wacore.obj : $(RDD_DIR)\wacore.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\wafunc.obj : $(RDD_DIR)\wafunc.c
    $(CC_CMD)
 
 $(RDD_OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
