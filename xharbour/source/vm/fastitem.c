@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.106 2007/04/30 22:49:18 ran_go Exp $
+ * $Id: fastitem.c,v 1.107 2007/05/02 13:36:45 ran_go Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ void HB_EXPORT hb_itemClear( PHB_ITEM pItem )
    }
    else if( pItem->type & HB_IT_MEMVAR )
    {
-      hb_memvarValueDecRef( pItem->item.asMemvar.value );
+      hb_memvarValueDecRef( (HB_HANDLE) pItem->item.asMemvar.value );
       pItem->type = HB_IT_NIL;
       return;
    }
@@ -442,7 +442,7 @@ void HB_EXPORT hb_itemCopy( PHB_ITEM pDest, PHB_ITEM pSource )
       }
       else if( pSource->type & HB_IT_MEMVAR ) // intentionally & instead of ==
       {
-         hb_memvarValueIncRef( pSource->item.asMemvar.value );
+         hb_memvarValueIncRef( (HB_HANDLE) pSource->item.asMemvar.value );
          return;
       }
 
