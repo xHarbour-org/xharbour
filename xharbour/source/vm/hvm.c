@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.626 2007/05/02 13:35:54 ran_go Exp $
+ * $Id: hvm.c,v 1.627 2007/05/03 21:45:24 ran_go Exp $
  */
 
 /*
@@ -1504,7 +1504,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_ENUMERATE:
 		 {
-            BOOL bPushLogical;
+            BOOL bPushLogical = FALSE;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_ENUMERATE") );
 
@@ -9043,7 +9043,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
 
 /* ----------------------------------------------- */
 
-static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, USHORT uiSymbols, char * szModuleName )
+static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, char * szModuleName )
 {
    PSYMBOLS pLastSymbols = s_pSymbols;
    PHB_SYMB pModuleSymbols;
@@ -9244,7 +9244,7 @@ void hb_vmExitSymbolGroup( void * hDynLib )
    }
 }
 
-PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, USHORT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM *pGlobals )
+PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szModuleName, BOOL fDynLib, BOOL fClone, PHB_ITEM *pGlobals )
 {
    PSYMBOLS pNewSymbols = NULL;
    PHB_SYMB pSymbol;
