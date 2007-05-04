@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.6 2006/09/19 17:09:44 druzus Exp $
+ * $Id: usrrdd.c,v 1.7 2007/03/02 02:36:23 druzus Exp $
  */
 
 /*
@@ -2963,7 +2963,7 @@ HB_FUNC( USRRDD_GETFUNCTABLE )
          ++pRddFunction;
          ++pFunction;
       }
-      uiResult = hb_rddInherit( pSelfTable, &funcTable, pSuperTable, ( BYTE * ) szSuperRDD );
+      uiResult = hb_rddInherit( pSelfTable, &funcTable, pSuperTable, ( const char * ) szSuperRDD );
       if( uiResult == SUCCESS )
       {
          pSelfTable->whoCares = ( DBENTRYP_SVP ) hb_itemNew( pMethods );

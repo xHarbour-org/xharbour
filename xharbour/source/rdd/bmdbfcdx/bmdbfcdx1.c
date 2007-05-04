@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.27 2007/04/25 01:37:10 ronpinkas Exp $
+ * $Id: bmdbfcdx1.c,v 1.28 2007/05/02 08:43:08 marchuet Exp $
  */
 
 /*
@@ -10110,11 +10110,11 @@ HB_FUNC( SIXCDX_GETFUNCTABLE )
 
       if ( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFFPT" );
       if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFDBT" );
       if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBF" );
       hb_retni( errCode );
       if ( errCode == SUCCESS )
       {
@@ -10174,11 +10174,11 @@ HB_FUNC( BMDBFCDX_GETFUNCTABLE )
 
       if ( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFFPT" );
+      errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFFPT" );
       if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBFDBT" );
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBFDBT" );
       if ( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( BYTE * ) "DBF" );
+         errCode = hb_rddInherit( pTable, &cdxTable, &cdxSuper, ( const char * ) "DBF" );
       if ( errCode == SUCCESS )
       {
          /*

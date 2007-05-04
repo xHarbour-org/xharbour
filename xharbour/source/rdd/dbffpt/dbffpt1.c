@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.83 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: dbffpt1.c,v 1.84 2007/05/04 11:29:02 marchuet Exp $
  */
 
 /*
@@ -4689,7 +4689,7 @@ static void hb_dbffptRegisterRDD( USHORT * pusRddId )
       if ( uiCount )
          * uiCount = RDDFUNCSCOUNT;
 
-      errCode = hb_rddInherit( pTable, &fptTable, &fptSuper, ( BYTE * ) "DBF" );
+      errCode = hb_rddInherit( pTable, &fptTable, &fptSuper, ( const char * ) "DBF" );
       if ( errCode == SUCCESS )
          *pusRddId = uiRddId;
       hb_retni( errCode );

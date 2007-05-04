@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.169 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: dbfntx1.c,v 1.170 2007/05/04 11:29:02 marchuet Exp $
  */
 
 /*
@@ -7623,11 +7623,11 @@ HB_FUNC( DBFNTX_GETFUNCTABLE )
 
       if( uiCount )
          * uiCount = RDDFUNCSCOUNT;
-      errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFFPT" );
+      errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( const char * ) "DBFFPT" );
       if( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBFDBT" );
+         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( const char * ) "DBFDBT" );
       if( errCode != SUCCESS )
-         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( BYTE * ) "DBF" );
+         errCode = hb_rddInherit( pTable, &ntxTable, &ntxSuper, ( const char * ) "DBF" );
       if( errCode == SUCCESS )
       {
          /*
