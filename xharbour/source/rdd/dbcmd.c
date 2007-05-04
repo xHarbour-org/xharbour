@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.211 2007/04/27 09:24:49 marchuet Exp $
+ * $Id: dbcmd.c,v 1.212 2007/05/04 11:29:01 marchuet Exp $
  */
 
 /*
@@ -280,17 +280,10 @@ HB_FUNC( DBAPPEND )
       BOOL bUnLockAll = ISLOG( 1 ) ? hb_parl( 1 ) : TRUE;
       ERRCODE errCode;
 
-      /* Clipper clears NETERR flag when table is open */
+      /* Clipper clears NETERR flag before APPEND */
       hb_rddSetNetErr( FALSE );
       errCode = SELF_APPEND( pArea, bUnLockAll );
       hb_retl( errCode == SUCCESS );
-
-      /*
-       * Warning: this is not Clipper compatible. NETERR() should be set by
-       * error handler not here
-       */
-      if( errCode != SUCCESS )
-         hb_rddSetNetErr( TRUE );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "DBAPPEND" );
@@ -376,7 +369,7 @@ HB_FUNC( DBCREATE )
 #ifdef HB_C52_STRICT
        hb_arrayLen( pStruct ) == 0 ||
 #endif
-       !szFileName || !szFileName[ 0 ] )
+       !szFileName )
    {
       hb_errRT_DBCMD( EG_ARG, EDBCMD_DBCMDBADPARAMETER, NULL, "DBCREATE" );
       return;
@@ -1843,7 +1836,7 @@ HB_FUNC( ORDLISTADD )
       DBORDERINFO pOrderInfo;
       ERRCODE errCode;
 
-      /* Clipper clears NETERR flag when table is open */
+      /* Clipper clears NETERR flag when index is open */
       hb_rddSetNetErr( FALSE );
 
       memset( &pOrderInfo, 0, sizeof( DBORDERINFO ) );
@@ -1861,14 +1854,12 @@ HB_FUNC( ORDLISTADD )
 
       errCode = SELF_ORDLSTADD( pArea, &pOrderInfo );
 
-      /*
-       * Warning: this is not Clipper compatible. NETERR() should be set by
-       * error handler not here
-       */
-      if( errCode != SUCCESS )
-         hb_rddSetNetErr( TRUE );
+      if( HB_IS_NIL( pOrderInfo.itmResult ) )
+         hb_retl( errCode == SUCCESS );
+      else
+         hb_itemReturn( pOrderInfo.itmResult );
 
-      hb_itemRelease( hb_itemReturn( pOrderInfo.itmResult ) );
+      hb_itemRelease( pOrderInfo.itmResult );
    }
    else
       hb_errRT_DBCMD( EG_NOTABLE, EDBCMD_NOTABLE, NULL, "ORDLISTADD" );

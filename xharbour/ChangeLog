@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5487 2007/05/04 11:28:59 marchuet Exp $
+ * $Id: ChangeLog,v 1.5488 2007/05/04 12:45:11 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-04 18:32 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * harbour/source/rdd/dbcmd.c
+    * removed all explicit NETERR setting - now it can be set only
+      by NETERR() function (executed by default errorsys)
+    * changed ordListAdd()/dbSetIndex() - now they return logical value
+      with information about success
+    Synched with Harbour.
+
+  * harbour/source/rdd/wafunc.c
+    * changed hb_rddOpenTable()/hb_rddCreateTable() to make dbUseArea()/
+      dbCreate() more Clipper compatible - it's not exact Clipper behavior
+      but I intentionally do not want to replicate some strange for me
+      things, f.e. I do not know why Clipper ignores RDDNAME when it has
+      only one character
+    Synched with Harbour.
+
+  + harbour/tests/tstuse.prg
+    + test code for dbUseArea()
+    Synched with Harbour.
 
 2007-05-04 06:40 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/cgi/tcgi.prg
