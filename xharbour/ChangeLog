@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5488 2007/05/04 12:45:11 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5489 2007/05/04 16:36:21 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,42 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2007-05-03 16:48 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/rdd/usrrdd/usrrdd.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+    * Fix hb_rddInherit call ( BYTE * ) to ( const char * )
+  * include/hbvmpub.h
+    * switch "USHORT uiSymbols" to "UINT uiSymbols" in
+    *    hb_vmRegisterSymbols() at line 154
+  * include/hbvapi.h
+    * switch "char * szName" to "const char * szName" in
+      hb_dynsymGet(), hb_dynsymGetCase(), hb_dynsymFind(), hb_dynsymGetSymbol(),
+      hb_dynsymFindSymbol() and
+      hb_dynsymGet_r(), hb_dynsymGetCase_r(), hb_dynsymFind_r(), hb_dynsymFindName_r()
+  * source/vm/hvm.c
+    * switch "USHORT uiParams" to "UINT uiParams" in
+      hb_vmRegisterSymbols() at line 9247
+    * Fix warnings (-Wall)
+  * source/vm/itemapi.c
+    * Fix warnings (-Wall)
+  * source/vm/fastitem.c
+    * Fix warnings (-Wall)
+  * source/vm/dynsym.c
+    * switch "char * szName" to "const char * szName" in
+      hb_dynsymGet(), hb_dynsymGetCase(), hb_dynsymFind(), hb_dynsymGetSymbol(),
+      hb_dynsymFindSymbol() and
+      hb_dynsymGet_r(), hb_dynsymGetCase_r(), hb_dynsymFind_r(), hb_dynsymFindName_r()
+    * Fix warnings (-Wall)
+
+
+  /* Please recompile all "c" sources */
+
 
 2007-05-04 18:32 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * harbour/source/rdd/dbcmd.c
