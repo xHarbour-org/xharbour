@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.127 2007/02/05 12:40:05 modalsist Exp $
+ * $Id: tget.prg,v 1.128 2007/03/31 16:43:24 modalsist Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ CLASS Get
 
    HIDDEN:              /*  H I D D E N  */
 
-   DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
+   DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex 
    DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit, nMaxEdit
    DATA lMinusPrinted, xVarGet
    DATA lDispLen INIT .F.
@@ -519,7 +519,7 @@ METHOD Display( lForced ) CLASS Get
       xBuffer   := ::Buffer
    ENDIF
 
-
+  
    HBConsoleLock()
 
 
@@ -824,7 +824,7 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
          ::Picture := ::cOrigPicture 
       endif
    endif
-
+   
 return xValue
 
 //---------------------------------------------------------------------------//
@@ -864,7 +864,7 @@ METHOD VarGet() CLASS Get
       ::DecPos != NIL .AND. ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
 
       nDecPos := ::DecPos
-
+    
       IF !Empty(::cPicMask)
          nLen := HowMuchNumeric(::cPicMask) + 1 + iif(::minus,1,0)
          nLen := Min(nLen,Len(::cPicMask))
@@ -899,7 +899,7 @@ METHOD VarGet() CLASS Get
       IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) )
          cVarGet := Stuff( cVarGet, nDecPos+1, ::nMaxLen - nDecPos, replicate("0",::nMaxLen - nDecPos) )
       ENDIF
-
+     
       xVarGet := Val( cVarGet )
 
       // E.F. 2006/MAY/23 - Avoid minus flag if get value is zero.
@@ -910,7 +910,7 @@ METHOD VarGet() CLASS Get
    ENDIF
 
    ::xVarGet := xVarGet
-
+   
 RETURN xVarGet
 
 //---------------------------------------------------------------------------//
@@ -923,7 +923,7 @@ METHOD Untransform( cBuffer ) CLASS Get
    local cMaskDel := ""
 
    DEFAULT cBuffer TO ::buffer
-
+  
    /*
     *if !::lEdit
     *  return ::VarGet()
@@ -966,7 +966,7 @@ METHOD Untransform( cBuffer ) CLASS Get
             endif
          next
       endif
-
+     
       /* 14/08/2004 - <maurilio.longo@libero.it>
        *              If there should be a decimal point (or comma) but this is missing
        *              re-add it. Clipper does it. A little sample is inside ChangeLog
@@ -975,7 +975,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       if ::decPos < Len( cBuffer ) .and. Empty( cBuffer[ ::decPos ] ) .and. if( ::lDecRev, "," , "." ) IN ::cPicture
          cBuffer[ ::decPos ] := if( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
       endif
-
+      
       cBuffer := Space( ::FirstEditable() - 1 ) + ;
                  SubStr( cBuffer, ::FirstEditable(), ::LastEditable() - ::FirstEditable() + 1 )
 
@@ -1090,7 +1090,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       if empty(::cPicture ) .and. empty( StrTran(cBuffer,".","" ) )
          cBuffer := PadL( "0."+  replicate("0",::nMaxLen - ::Decpos), ::nMaxLen )
       endif
-
+      
       xValue := iif( ::minus, -Val( cBuffer ), Val( cBuffer ) )
       exit
 
@@ -1637,7 +1637,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    DEFAULT xValue TO ::xVarGet
    DEFAULT xValue TO ::VarGet()
 
-
+   
    IF ::Type == NIL
       ::Type := ValType( xValue )
       ::Picture := ::cOrigPicture
@@ -1669,18 +1669,21 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    if ::type == "N"
       if ( "(" IN cPicFunc .or. ")" IN cPicFunc ) .and. xValue >= 0
-         cBuffer += " "
+/* 2007/MAY/04 - E.F. */
+//         cBuffer += " "
+         cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
       endif
 
       if ( ( "C" IN cPicFunc .and. xValue <  0 ) .or.;
            ( "X" IN cPicFunc .and. xValue >= 0 ) ) .and.;
-           !( "X" IN cPicFunc .and. "C" IN cPicFunc )
-         cBuffer += "   "
+           !( "X" IN cPicFunc .and. "C" IN cPicFunc ) 
+/* 2007/MAY/04 - E.F. */
+//         cBuffer += "   "
+         cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
       endif
 
       ::lMinusPrinted := ( xValue < 0 )
    endif
-
 
    ::nMaxLen  := Len( cBuffer )
 
@@ -1718,11 +1721,15 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    endif
 
    if ::type == "N"
-      if "(" IN ::cPicFunc .or. ")" IN ::cPicFunc
-         ::nMaxEdit--
+      if "(" IN ::cPicFunc .or. ")" IN ::cPicFunc 
+// 2007/MAY/04 - E.F.
+//         ::nMaxEdit --
+           ::nMaxEdit := ::nMaxLen - 1
       endif
-      if "C" IN ::cPicFunc .or. "X" IN ::cPicFunc
-         ::nMaxEdit -= 3
+      if "C" IN ::cPicFunc .or. "X" IN ::cPicFunc 
+// 2007/MAY/04 - E.F.
+//         ::nMaxEdit -= 3
+           ::nMaxEdit := ::nMaxLen - 3
       endif
    endif
 

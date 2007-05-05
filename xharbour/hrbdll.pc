@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.34 2007/04/15 20:12:40 ronpinkas Exp $
+# $Id: hrbdll.pc,v 1.35 2007/04/17 00:19:35 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -440,21 +440,26 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\pptable.obj \
    $(OBJ_DIR)\ppcore.obj \
    \
-   $(OBJ_DIR)\dbstrux.obj \
-   $(OBJ_DIR)\dbtotal.obj \
-   $(OBJ_DIR)\rddsys.obj \
-   $(OBJ_DIR)\rddord.obj \
-   $(OBJ_DIR)\dbupdat.obj \
-   $(OBJ_DIR)\dbsort.obj \
-   $(OBJ_DIR)\dblist.obj \
-   $(OBJ_DIR)\dbfuncs.obj \
-   $(OBJ_DIR)\dbf1.obj \
-   $(OBJ_DIR)\sdf1.obj \
-   $(OBJ_DIR)\delim1.obj \
    $(OBJ_DIR)\dbcmd.obj \
    $(OBJ_DIR)\workarea.obj \
-   $(OBJ_DIR)\hbdbsort.obj \
+   $(OBJ_DIR)\wacore.obj \
+   $(OBJ_DIR)\wafunc.obj \
+   $(OBJ_DIR)\dbf1.obj \
    $(OBJ_DIR)\dbnubs.obj \
+   $(OBJ_DIR)\delim1.obj \
+   $(OBJ_DIR)\sdf1.obj \
+   $(OBJ_DIR)\dbdelim.obj \
+   $(OBJ_DIR)\dbfuncs.obj \
+   $(OBJ_DIR)\dbjoin.obj \
+   $(OBJ_DIR)\dbsdf.obj \
+   $(OBJ_DIR)\dbtotal.obj \
+   $(OBJ_DIR)\dblist.obj \
+   $(OBJ_DIR)\dbsort.obj \
+   $(OBJ_DIR)\hbdbsort.obj \
+   $(OBJ_DIR)\dbstrux.obj \
+   $(OBJ_DIR)\dbupdat.obj \
+   $(OBJ_DIR)\rddord.obj \
+   $(OBJ_DIR)\rddsys.obj \
    \
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
@@ -1039,6 +1044,8 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\delim1.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\sdf1.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\workarea.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\wacore.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\wafunc.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbfuncs.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\dblist.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\dbsort.obj     >> make_tmp
@@ -2410,6 +2417,12 @@ $(OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wacore.obj : $(RDD_DIR)\wacore.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\wafunc.obj : $(RDD_DIR)\wafunc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c

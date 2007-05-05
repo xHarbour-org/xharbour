@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5489 2007/05/04 16:36:21 marchuet Exp $
+ * $Id: ChangeLog,v 1.5490 2007/05/04 20:57:30 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-04 19:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+  * hrbdll.pc
+    + added wacore.c and wafunc.c files
+  * source/rtl/tget.prg
+    ! fixed bug reported in "@X" and "@C" pictures. 
 
 2007-05-03 16:48 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rdd/usrrdd/usrrdd.c
