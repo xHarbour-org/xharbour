@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.627 2007/05/03 21:45:24 ran_go Exp $
+ * $Id: hvm.c,v 1.628 2007/05/04 20:48:55 ran_go Exp $
  */
 
 /*
@@ -2410,7 +2410,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( !hb_vmPopLogical() )
             {
-              iJump = (UINT) pCode[ w + 1 ];
+              iJump = (signed char) pCode[ w + 1 ];
             }
             w += iJump;
             break;
@@ -2424,7 +2424,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( !hb_vmPopLogical() )
             {
-              iJump = (UINT) HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
+              iJump = HB_PCODE_MKSHORT( &pCode[ w + 1 ] );
             }
 			w += iJump;
             break;
@@ -2438,7 +2438,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( !hb_vmPopLogical() )
             {
-              iJump = (UINT) HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+              iJump = HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             w += iJump;
             break;
@@ -2452,7 +2452,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( hb_vmPopLogical() )
             {
-              iJump = (UINT) (signed char) pCode[ w + 1 ];
+              iJump = (signed char) pCode[ w + 1 ];
             }
             w += iJump;
             break;
@@ -2466,7 +2466,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( hb_vmPopLogical() )
             {
-              iJump = (UINT) HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
+              iJump = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             }
             w += iJump;  
             break;
@@ -2480,7 +2480,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             if( hb_vmPopLogical() )
             {
-              iJump = (UINT) HB_PCODE_MKINT24( &pCode[ w + 1 ] );
+              iJump = HB_PCODE_MKINT24( &pCode[ w + 1 ] );
             }
             w += iJump;
             break;
