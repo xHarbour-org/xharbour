@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.141 2007/05/02 21:59:46 ran_go Exp $
+ * $Id: itemapi.c,v 1.142 2007/05/04 20:50:35 ran_go Exp $
  */
 
 /*
@@ -2049,7 +2049,7 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
       if( iWidth )
       {
          /* We at least have a width value */
-         ULONG iSize = (ULONG) iWidth;
+         int iSize = iWidth;
 
 		 if( iDec > 0 )
 		 {
@@ -2155,7 +2155,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
       case HB_IT_POINTER:
       {
-         ULONG size = ( sizeof( void * ) << 1 ) + 3; /* n bytes for address + 0x + \0 */
+         int size = ( sizeof( void * ) << 1 ) + 3; /* n bytes for address + 0x + \0 */
          int n;
          BOOL bFail = TRUE;
 
