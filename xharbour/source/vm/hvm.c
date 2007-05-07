@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.629 2007/05/06 05:59:39 guerra000 Exp $
+ * $Id: hvm.c,v 1.630 2007/05/07 13:47:47 ran_go Exp $
  */
 
 /*
@@ -8112,7 +8112,7 @@ static int hb_vmCalcIntWidth( HB_LONG lNumber )
 {
    int iWidth = 20;
 
-   if( lNumber >= -1000000000L )
+   if( lNumber > -1000000000L )
    {
       iWidth = 10;
       while( lNumber >= 1000000000L )
