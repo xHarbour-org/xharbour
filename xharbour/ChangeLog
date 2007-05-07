@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5493 2007/05/07 10:19:51 marchuet Exp $
+ * $Id: ChangeLog,v 1.5494 2007/05/07 13:53:41 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-05-07 10:56 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
-  * source/vm/hbvm.c
+2007-05-07 12:00 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/hvm.c
     * Revert, switch hb_vmDo( UINT uiParams ) to hb_vmDo( USHORT uiParams )
     * Changes UINT to short, int and LONG for iJump when negative in JUMPS
+    * Fix error in hb_vmCalcIntWidth, hbtest.exe now with 34 failed calls
+  * source/vm/itemapi.c
+    * Fix warning at line 2167
   * include/hbvm.h
     * Revert, switch hb_vmDo( UINT uiParams ) to hb_vmDo( USHORT uiParams )
 
