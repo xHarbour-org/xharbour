@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.7 2007/03/02 02:36:23 druzus Exp $
+ * $Id: usrrdd.c,v 1.8 2007/05/04 20:56:11 ran_go Exp $
  */
 
 /*
@@ -166,16 +166,9 @@ static ERRCODE hb_usrEvalAreaFunc( PHB_ITEM pMethods, USHORT uiMethod, AREAP pAr
 static AREAP hb_usrGetAreaPointer( int iArea )
 {
    if( iArea != 0 )
-   {
-      int iOldArea = hb_rddGetCurrentWorkAreaNumber();
-      AREAP pArea;
-
-      hb_rddSelectWorkAreaNumber( iArea );
-      pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
-      hb_rddSelectWorkAreaNumber( iOldArea );
-      return pArea;
-   }
-   return NULL;
+      return ( AREAP ) hb_rddGetWorkAreaPointer( iArea );
+   else
+      return NULL;
 }
 
 
@@ -312,8 +305,8 @@ static PHB_ITEM hb_usrRelInfoToItem( LPDBRELINFO pRelInfo )
       hb_itemCopy( hb_arrayGetItemPtr( pItem, UR_RI_CEXPR ), pRelInfo->abKey );
    hb_itemPutL( hb_arrayGetItemPtr( pItem, UR_RI_SCOPED ), pRelInfo->isScoped );
    hb_itemPutL( hb_arrayGetItemPtr( pItem, UR_RI_OPTIMIZED ), pRelInfo->isOptimized );
-   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_RI_PARENT ), pRelInfo->lpaParent->uiArea );
-   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_RI_CHILD ), pRelInfo->lpaChild->uiArea );
+   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_RI_PARENT ), pRelInfo->lpaParent ? pRelInfo->lpaParent->uiArea : 0 );
+   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_RI_CHILD ), pRelInfo->lpaChild ? pRelInfo->lpaChild->uiArea : 0 );
    hb_itemPutPtr( hb_arrayGetItemPtr( pItem, UR_RI_NEXT ), pRelInfo->lpdbriNext );
 
    return pItem;

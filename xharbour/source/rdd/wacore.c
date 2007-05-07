@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.1 2007/05/03 14:11:21 druzus Exp $
+ * $Id: wacore.c,v 1.1 2007/05/04 11:41:36 marchuet Exp $
  */
 
 /*
@@ -313,7 +313,7 @@ HB_EXPORT ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
    ERRCODE errCode = SUCCESS;
    USHORT uiIndex;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p)", pCallBack));
+   HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p,%p)", pCallBack, cargo));
 
    for( uiIndex = 1; uiIndex < s_uiWaMax; uiIndex++ )
    {

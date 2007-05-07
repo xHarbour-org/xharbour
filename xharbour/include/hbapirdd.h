@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.42 2006/07/25 21:34:12 druzus Exp $
+ * $Id: hbapirdd.h,v 1.43 2007/05/04 11:29:00 marchuet Exp $
  */
 
 /*
@@ -1178,7 +1178,7 @@ extern HB_EXPORT ERRCODE   hb_rddTransRecords(
 extern HB_EXPORT void      hb_tblStructure( AREAP pArea, PHB_ITEM pStruct );
 
 #if 0
-extern HB_EXPORT ERRCODE   hb_rddDisinherit( char * drvName );
+extern HB_EXPORT ERRCODE   hb_rddDisinherit( const char * drvName );
 extern HB_EXPORT USHORT    hb_rddGetCurrentFieldPos( const char * szName );
 extern HB_EXPORT USHORT    hb_rddExtendType( HB_TYPE fieldType );
 extern HB_EXPORT HB_TYPE   hb_rddFieldType( USHORT extendType );

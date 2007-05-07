@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.212 2007/05/04 11:29:01 marchuet Exp $
+ * $Id: dbcmd.c,v 1.213 2007/05/04 16:36:21 marchuet Exp $
  */
 
 /*
@@ -1854,7 +1854,7 @@ HB_FUNC( ORDLISTADD )
 
       errCode = SELF_ORDLSTADD( pArea, &pOrderInfo );
 
-      if( HB_IS_NIL( pOrderInfo.itmResult ) )
+      if( !pOrderInfo.itmResult || HB_IS_NIL( pOrderInfo.itmResult ) )
          hb_retl( errCode == SUCCESS );
       else
          hb_itemReturn( pOrderInfo.itmResult );
@@ -2245,11 +2245,12 @@ HB_FUNC( DBSETRELATION )
          return;
       }
 
-      dbRelations.lpaChild = pChildArea;
       dbRelations.itmCobExpr = hb_itemNew( hb_param( 2, HB_IT_BLOCK ) );
       dbRelations.abKey = hb_itemNew( hb_param( 3, HB_IT_STRING ) );
       dbRelations.isScoped = hb_parl( 4 );
       dbRelations.isOptimized = FALSE;
+      dbRelations.lpaChild = pChildArea;
+      dbRelations.lpaParent = pArea;
       dbRelations.lpdbriNext = NULL;
 
       SELF_SETREL( pArea, &dbRelations );

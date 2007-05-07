@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5491 2007/05/05 22:26:43 modalsist Exp $
+ * $Id: ChangeLog,v 1.5492 2007/05/06 05:59:39 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,40 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-07 12:05 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * harbour/source/rdd/dbcmd.c
+    * initialize lpaParent in DBRELINFO structure to pArea - please
+      note that this initialization is ignored by default SETREL()
+      RDD method
+    Synched with Harbour.
+
+  * harbour/source/rdd/usrrdd/usrrdd.c
+    ! fixed GPF when NULL lpaParent or lpaChild was used in DBRELINFO
+      structure
+    Synched with Harbour.
+
+  + include/adordd.ch
+  * makefile.bc
+  + source\rdd\usrrdd\rdds\adordd.prg
+  + source\rdd\usrrdd\rdds\adordd\access1.prg
+  + source\rdd\usrrdd\rdds\adordd\make_b32.bat
+  + source\rdd\usrrdd\rdds\adordd\makefile.bc
+  + source\rdd\usrrdd\rdds\adordd\mysql1.prg
+     +added user rdd ADORDD borrowed from harbour with few changes.
+      will be changed in next releases SET FILTER TO to be compatible
+      with other workareas which can be using another formats.
+     
+  * harbour/source/rdd/wacore.c
+  * harbour/include/hbapirdd.h
+    * updated HB_TRACE messages and some minor cleanups
+    Synched with Harbour.
+
+  * harbour/source/rdd/dbcmd.c
+    ! fixed initialisation of DBRELINFO dbSetRelation() - thanks to Antonio
+      for locating the problem
+    Synched with Harbour.
+
 
 2007-05-06 00:46 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source\vm\hvm.c

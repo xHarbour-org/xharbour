@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.15 2007/05/01 20:51:22 antoniolinares Exp $
+ * $Id: adordd.prg,v 1.1 2007/05/07 10:03:11 marchuet Exp $
  */
 
 /*
@@ -116,7 +116,10 @@ STATIC FUNCTION ADO_CREATE( nWA, aOpenInfo )
 
 
    local oConnection := TOleAuto():New( "ADODB.Connection" )
-   local oCatalog := TOleAuto():New( "ADOX.Catalog" )
+   local oCatalog    := TOleAuto():New( "ADOX.Catalog" )
+   local cDataBase   := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 1, ";" )
+   local cTableName  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 2, ";" )
+
 
    do case
       case Upper( Right( cDataBase, 4 ) ) == ".MDB"
@@ -179,7 +182,7 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
 
    LOCAL cName, nMode, nSlot, nHandle, aRData, aWData, aField, oError, nResult
-   LOCAL oADO, nTotalFields := 0, i := 1
+   LOCAL oADO, nTotalFields := 0, n := 1
 
    // When there is no ALIAS we will create new one using file name
    IF aOpenInfo[ UR_OI_ALIAS ] == NIL
@@ -473,9 +476,9 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_APPEND( nWA, lUnLockAll )
 
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
-   
+
 	oADO:AddNew()
-   
+
 	TRY
 	   oADO:Update() // keep it here, or there is an ADO error
 	CATCH
