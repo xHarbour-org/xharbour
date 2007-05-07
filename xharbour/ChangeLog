@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5492 2007/05/06 05:59:39 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5493 2007/05/07 10:19:51 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-07 10:56 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/hbvm.c
+    * Revert, switch hb_vmDo( UINT uiParams ) to hb_vmDo( USHORT uiParams )
+    * Changes UINT to short, int and LONG for iJump when negative in JUMPS
+  * include/hbvm.h
+    * Revert, switch hb_vmDo( UINT uiParams ) to hb_vmDo( USHORT uiParams )
 
 2007-05-07 12:05 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * harbour/source/rdd/dbcmd.c
