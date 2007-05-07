@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.1 2007/05/07 10:03:11 marchuet Exp $
+ * $Id: adordd.prg,v 1.2 2007/05/07 10:22:55 marchuet Exp $
  */
 
 /*
@@ -115,11 +115,14 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_CREATE( nWA, aOpenInfo )
 
 
+   local cDataBase  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 1, ";" )
+   local cTableName := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 2, ";" )
+   local cDbEngine  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 3, ";" )
+   local cServer    := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 4, ";" )
+   local cUserName  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 5, ";" )
+   local cPassword  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 6, ";" )
    local oConnection := TOleAuto():New( "ADODB.Connection" )
-   local oCatalog    := TOleAuto():New( "ADOX.Catalog" )
-   local cDataBase   := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 1, ";" )
-   local cTableName  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 2, ";" )
-
+   local oCatalog   := TOleAuto():New( "ADOX.Catalog" )
 
    do case
       case Upper( Right( cDataBase, 4 ) ) == ".MDB"
@@ -127,6 +130,13 @@ STATIC FUNCTION ADO_CREATE( nWA, aOpenInfo )
               oCatalog:Create( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" +  + cDataBase )
            endif
            oConnection:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + cDataBase )
+
+      case Upper( cDbEngine ) == "MYSQL"     
+           oConnection:Open( "DRIVER={MySQL ODBC 3.51 Driver};" + ;
+                             "server=" + cServer + ;
+                             ";database=" + cDataBase + ;
+                             ";uid=" + cUserName + ;
+                             ";pwd=" + cPassword )
 
    endcase
 
@@ -182,7 +192,7 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
 
    LOCAL cName, nMode, nSlot, nHandle, aRData, aWData, aField, oError, nResult
-   LOCAL oADO, nTotalFields := 0, n := 1
+   LOCAL oADO, nTotalFields, n
 
    // When there is no ALIAS we will create new one using file name
    IF aOpenInfo[ UR_OI_ALIAS ] == NIL
@@ -619,7 +629,7 @@ static function ADO_CLEARREL( nWA )
       endif   
    endif   
 
-return SUCCESS
+RETURN SUCCESS
 
 STATIC FUNCTION ADO_SETREL( nWA, aRelInfo )
 
@@ -630,7 +640,44 @@ STATIC FUNCTION ADO_SETREL( nWA, aRelInfo )
 	s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Append( cKeyName, adKeyForeign,;
 	                           aRelInfo[ UR_RI_CEXPR ], cChild, aRelInfo[ UR_RI_CEXPR ] )  
 
+RETURN SUCCESS
+
+STATIC FUNCTION ADO_ORDLSTADD( nWA, aOrderInfo )
+
+	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	
+  TRY 
+	   oADO:Index = aOrderInfo[ UR_ORI_BAG ]
+	CATCH
+	END   
+	
+RETURN SUCCESS
+
+STATIC FUNCTION ADO_ORDLSTCLEAR( nWA )
+
+	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+
+  TRY 
+	   oADO:Index = ""
+	CATCH
+	END   
+	
 return SUCCESS
+
+STATIC FUNCTION ADO_ORDCREATE( nWA, aOrderCreateInfo )
+
+   local oIndex
+   
+   if s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes( aOrderCreateInfo[ UR_ORCR_BAGNAME ] ) == nil
+      oIndex = TOleAuto():New( "ADOX.Index" )
+      oIndex:Name = aOrderCreateInfo[ UR_ORCR_BAGNAME ]
+      oIndex:PrimaryKey = .F.
+      oIndex:Unique = aOrderCreateInfo[ UR_ORCR_UNIQUE ]
+      oIndex:Columns:Append( aOrderCreateInfo[ UR_ORCR_CKEY ] )
+      s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes:Append( oIndex )
+   endif   
+
+RETURN SUCCESS
 
 FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
@@ -671,6 +718,9 @@ FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_LOCATE ]  	:= ( @ADO_LOCATE() )
    aMyFunc[ UR_CLEARREL ]  := ( @ADO_CLEARREL() )
    aMyFunc[ UR_SETREL ]    := ( @ADO_SETREL() )
+   aMyFunc[ UR_ORDCREATE ] := ( @ADO_ORDCREATE() )
+   aMyFunc[ UR_ORDLSTADD ] := ( @ADO_ORDLSTADD() )
+   aMyFunc[ UR_ORDLSTCLEAR ] := ( @ADO_ORDLSTCLEAR() )
 
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
                                                     cSuperRDD, aMyFunc )
