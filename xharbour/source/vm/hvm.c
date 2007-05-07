@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.628 2007/05/04 20:48:55 ran_go Exp $
+ * $Id: hvm.c,v 1.629 2007/05/06 05:59:39 guerra000 Exp $
  */
 
 /*
@@ -464,7 +464,7 @@ static BOOL hb_vmDoInitFunc( char *pFuncSym )
    {
       hb_vmPushSymbol( pDynSym->pSymbol );
       hb_vmPushNil();
-      hb_vmDo( (UINT) 0);
+      hb_vmDo( 0 );
 
       return TRUE;
    }
@@ -707,7 +707,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
       }
 
       //printf( "Before Startup\n" );
-      hb_vmDo( (UINT) iArgCount ); /* invoke it with number of supplied parameters */
+      hb_vmDo( (USHORT) iArgCount ); /* invoke it with number of supplied parameters */
    }
 
    #if defined(HB_OS_OS2)
@@ -2404,7 +2404,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPFALSENEAR:
 		 {
-            UINT iJump = 2;
+            int iJump = 2;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSENEAR") );
 
@@ -2418,7 +2418,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPFALSE:
 		 {
-            UINT iJump = 3;
+            short iJump = 3;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSE") );
 
@@ -2432,7 +2432,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPFALSEFAR:
 		 {
-            UINT iJump = 4;
+            LONG iJump = 4;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPFALSEFAR") );
 
@@ -2446,7 +2446,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPTRUENEAR:
 		 {
-            UINT iJump = 2;
+            int iJump = 2;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUENEAR") );
 
@@ -2460,7 +2460,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPTRUE:
 		 {
-            UINT iJump = 3;
+            short iJump = 3;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUE") );
 
@@ -2474,7 +2474,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_JUMPTRUEFAR:
 		 {
-            UINT iJump = 4;
+            LONG iJump = 4;
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_JUMPTRUEFAR") );
 
@@ -6832,7 +6832,7 @@ static void hb_vmSwapAlias( void )
 /* Execution                       */
 /* ------------------------------- */
 
-HB_EXPORT void hb_vmDo( UINT uiParams )
+HB_EXPORT void hb_vmDo( USHORT uiParams )
 {
    HB_THREAD_STUB
 
@@ -6863,7 +6863,7 @@ HB_EXPORT void hb_vmDo( UINT uiParams )
    if( hb_stackItemFromTop( - ( uiParams + 1 ) )->type )
    {
       //TraceLog( NULL, "DIVERTED hb_vmDo() to hb_vmSend()\n" );
-      hb_vmSend( (USHORT) uiParams );
+      hb_vmSend( uiParams );
       return;
    }
 
@@ -6876,7 +6876,7 @@ HB_EXPORT void hb_vmDo( UINT uiParams )
 
    //TraceLog( NULL, "StackNewFrame %hu\n", uiParams );
 
-   pItem = hb_stackNewFrame( &sStackState, (USHORT) uiParams );
+   pItem = hb_stackNewFrame( &sStackState, uiParams );
    pSym = pItem->item.asSymbol.value;
    pSelf = hb_stackSelfItem();   /* NIL, OBJECT or BLOCK */
    bDebugPrevState = s_bDebugging;
@@ -7637,7 +7637,7 @@ static void hb_vmDebuggerExit( void )
          hb_vmPushSymbol( s_pSymDbgEntry );
          hb_vmPushNil();
          hb_vmPushLongConst( HB_DBG_VMQUIT );
-         hb_vmDo( (UINT) 1 );
+         hb_vmDo( 1 );
       }
    }
    /* set dummy debugger function to avoid debugger activation in .prg
@@ -7656,7 +7656,7 @@ static void hb_vmCacheDbgEntry( void )
       hb_vmPushSymbol( s_pSymDbgEntry );
       hb_vmPushNil();
       hb_vmPushLongConst( HB_DBG_GETENTRY );
-      hb_vmDo( (UINT) 1 );
+      hb_vmDo( 1 );
    }
 }
 
@@ -7682,7 +7682,7 @@ static void hb_vmLocalName( USHORT uiLocal, char * szLocalName ) /* locals and p
       hb_vmPushLongConst( HB_DBG_LOCALNAME );
       hb_vmPushLongConst( uiLocal );
       hb_vmPushString( szLocalName, strlen( szLocalName ) );
-      hb_vmDo( (UINT) 3 );
+      hb_vmDo( 3 );
    }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
@@ -7710,7 +7710,7 @@ static void hb_vmStaticName( USHORT uiStatic, char * szStaticName ) /* statics v
       hb_vmPushLongConst( HB_VM_STACK.iStatics );  /* current static frame */
       hb_vmPushLongConst( uiStatic );  /* variable index */
       hb_vmPushString( szStaticName, strlen( szStaticName ) );
-      hb_vmDo( (UINT) 4 );
+      hb_vmDo( 4 );
    }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
@@ -7737,7 +7737,7 @@ static void hb_vmModuleName( char * szModuleName ) /* PRG and function name info
       hb_vmPushNil();
       hb_vmPushLongConst( HB_DBG_MODULENAME );
       hb_vmPushString( szModuleName, strlen( szModuleName ) );
-      hb_vmDo( (UINT) 2 );
+      hb_vmDo( 2 );
    }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
@@ -7884,7 +7884,7 @@ static void hb_vmDebuggerEndProc( void )
       hb_vmPushSymbol( s_pSymDbgEntry );
       hb_vmPushNil();
       hb_vmPushLongConst( HB_DBG_ENDPROC );
-      hb_vmDo( (UINT) 1 );
+      hb_vmDo( 1 );
 
       hb_itemForwardValue( &(HB_VM_STACK.Return), pReturn ); /* restores the previous returned value */
       hb_stackDec();
@@ -7910,7 +7910,7 @@ static void hb_vmDebuggerShowLine( USHORT uiLine ) /* makes the debugger shows a
       hb_vmPushNil();
       hb_vmPushLongConst( HB_DBG_SHOWLINE );
       hb_vmPushInteger( uiLine );
-      hb_vmDo( (UINT) 2 );
+      hb_vmDo( 2 );
    }
    s_bDebuggerIsWorking = FALSE;
    s_bDebugShowLines = TRUE;
@@ -9149,7 +9149,7 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
                   {
                      hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
-                     hb_vmDo( (UINT) 0 );
+                     hb_vmDo( 0 );
                   }
                }
                pLastSymbols->fInitStatics = FALSE;
@@ -9183,7 +9183,7 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
                         {
                            hb_vmPushString( argv[i], strlen( argv[i] ) );
                         }
-                        hb_vmDo( (UINT) argc );
+                        hb_vmDo( (USHORT) argc );
                      }
                   }
                }
@@ -9221,7 +9221,7 @@ void hb_vmExitSymbolGroup( void * hDynLib )
                   {
                      hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
-                     hb_vmDo( (UINT) 0 );
+                     hb_vmDo( 0 );
                   }
                }
             }
@@ -9546,7 +9546,7 @@ static void hb_vmDoInitStatics( void )
             {
                hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
-               hb_vmDo( (UINT) 0 );
+               hb_vmDo( 0 );
             }
          }
          pLastSymbols->fInitStatics = FALSE;
@@ -9579,7 +9579,7 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
             {
                hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
-               hb_vmDo( (UINT) 0 );
+               hb_vmDo( 0 );
 
                if( HB_VM_STACK.uiActionRequest )
                {
@@ -9630,7 +9630,7 @@ static void hb_vmDoInitFunctions( void )
                      iArgCount++;
                   }
                }
-               hb_vmDo( (UINT) iArgCount );
+               hb_vmDo( (USHORT) iArgCount );
             }
          }
       }
