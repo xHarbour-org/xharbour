@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.43 2007/05/03 01:08:17 modalsist Exp $
+# $Id: makefile.pc,v 1.44 2007/05/05 22:26:43 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -575,7 +575,8 @@ RDDS_LIB_OBJS = \
    $(OBJ_DIR)\fptcdx.obj \
    $(OBJ_DIR)\hscdx.obj \
    $(OBJ_DIR)\rlcdx.obj \
-   $(OBJ_DIR)\smtcdx.obj
+   $(OBJ_DIR)\smtcdx.obj \
+   $(OBJ_DIR)\adordd.obj
 
 MISC_LIB_OBJS = \
    $(OBJ_DIR)\hb_f.obj
@@ -1688,6 +1689,12 @@ $(OBJ_DIR)\smtcdx.c : $(RDDS_DIR)\smtcdx.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\smtcdx.obj : $(OBJ_DIR)\smtcdx.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\adordd.c : $(RDDS_DIR)\adordd.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\adordd.obj : $(OBJ_DIR)\adordd.c
    $(CC_CMD)
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴컴컴�
