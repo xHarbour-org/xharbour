@@ -1,5 +1,5 @@
 /*
- * $Id: tscalar.prg,v 1.1 2007/04/15 18:47:55 andresreyesh Exp $
+ * $Id: tscalar.prg,v 1.2 2007/04/15 19:58:28 ronpinkas Exp $
  */
 
 /*
@@ -113,7 +113,7 @@ RETURN ::asString
 
 CLASS Array FROM ScalarObject FUNCTION _Array
 
-   MESSAGE Add       METHOD Append
+   MESSAGE Add             METHOD Append
    METHOD  AddAll
    METHOD  Append
    METHOD  asString        INLINE ValtoPrg( HB_QSelf() )
@@ -125,6 +125,7 @@ CLASS Array FROM ScalarObject FUNCTION _Array
    METHOD  DeleteAt
    METHOD  Do
    METHOD  IndexOf
+   METHOD  Init( nLen )    INLINE ::Size := IIF( nLen == NIL, 0, nLen ), Self
    METHOD  InsertAt
    METHOD  Remove
    METHOD  Scan( bScan )   INLINE aScan( Self, bScan )

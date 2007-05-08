@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5496 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: ChangeLog,v 1.5497 2007/05/08 11:13:20 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-08 07:35 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
+  * source/rtl/tscalar.prg
+    ! Fixed Missing Method ARRAY:Init() Lost in the move :)
+  * source/rtl/tobject.prg
+    - Removed Old Code for HBObject class definition
+    - Removed Method New Code
+      * Optimized Using   MESSAGE New Is Init
+   
 
 2007-05-08 08:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc

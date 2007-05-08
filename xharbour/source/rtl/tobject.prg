@@ -1,5 +1,5 @@
 /*
- * $Id: tobject.prg,v 1.25 2007/04/17 01:17:42 toninhofwi Exp $
+ * $Id: tobject.prg,v 1.26 2007/04/22 22:50:38 ronpinkas Exp $
  */
 
 /*
@@ -68,117 +68,6 @@
  *
  */
 
-#if 0
-/* WARNING: Can not use the preprocessor      */
-/* otherwise it will auto inherit from itself */
-
-#include "common.ch"
-#include "hboo.ch"
-#include "error.ch"
-
-FUNCTION HBObject()
-   STATIC s_oClass
-   LOCAL nScope := HB_OO_CLSTP_EXPORTED
-   Local oInstance
-
-   IF s_oClass == NIL
-
-      s_oClass := HBClass():New( "HBObject",  )
-
-      /* Those Five worked fine but their C version from classes.c are probably better in term of speed */
-      /*s_oClass:AddInline( "CLASSNAME"      , {| Self | __OBJGETCLSNAME( Self )     }, nScope ) */
-      /*s_oClass:AddInline( "CLASSH"         , {| Self | __CLASSH( Self )            }, nScope ) */
-      /*s_oClass:AddInline( "CLASSSEL"       , {| Self | __CLASSSEL( Self:CLASSH() ) }, nScope ) */
-      /*s_oClass:AddInline( "EVAL"           , {| Self | __EVAL( Self )             }, nScope ) */
-
-      /* xBase++ */
-      s_oClass:AddInline( "ISDERIVEDFROM"  , {| Self, xPar1 | __ObjDerivedFrom( Self, xPar1 ) }, nScope )
-      /* Class(y) */
-      s_oClass:AddInline( "ISKINDOF"       , {| Self, xPar1 | __ObjDerivedFrom( Self, xPar1 ) }, nScope )
-
-      s_oClass:AddMethod( "NEW"  , @HBObject_New()  , nScope )
-      s_oClass:AddMethod( "INIT" , @HBObject_Init() , nScope )
-
-      s_oClass:AddMethod( "ERROR", @HBObject_Error() , nScope )
-
-      s_oClass:SetOnError( @HBObject_DftonError() )
-
-      s_oClass:AddInline( "MSGNOTFOUND" , {| Self, cMsg | ::Error( "Message not found", __OBJGETCLSNAME( Self ), cMsg, iif(substr(cMsg,1,1)=="_",1005,1004) ) }, nScope )
-
-      /*s_oClass:AddMultiData(,,nScope,{"CLASS"}, .F. )*/
-
-      /*s_oClass:AddInline( "ADDMETHOD" , { | Self, cMeth, pFunc, nScopeMeth                 |  __clsAddMsg( __CLASSH( Self ) , cMeth , pFunc ,HB_OO_MSG_METHOD , NIL, iif(nScopeMeth==NIL,1,nScopeMeth) ) }, nScope )                                */
-      /*s_oClass:AddInline( "ADDVAR"    , { | Self, cVAR, nScopeMeth, uiData , hClass  |  __clsAddMsg( hClass:=__CLASSH( Self ) ,     cVar , uidata := __CLS_INCDATA(hClass) , HB_OO_MSG_DATA, NIL  , iif(nScopeMeth==NIL,1,nScopeMeth) )  , ;        */
-      /*                                                                               __clsAddMsg( hClass                   , "_"+cVar , uiData                          , HB_OO_MSG_DATA, NIL  , iif(nScopeMeth==NIL,1,nScopeMeth) ) }, nScope )    */
-
-      /* Those one exist within Class(y), so we will probably try to implement it               */
-
-      /*s_oClass:AddInline( "asString"       , {| Self | ::class:name + " object"   }, nScope ) */
-      /*s_oClass:AddInline( "asExpStr"       , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "basicSize"      , {| Self | Len( Self )                }, nScope ) */
-      /*s_oClass:AddInline( "become"         , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "isEqual"        , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "isScalar"       , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "copy"           , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "deepCopy"       , {| Self |                            }, nScope ) */
-
-      /*s_oClass:AddInline( "deferred"       , {| Self |                            }, nScope ) */
-
-      /*s_oClass:AddInline( "exec"           , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "error           , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "hash"           , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "null"           , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "size"           , {| Self | Len( Self )                }, nScope ) */
-
-      /* Those three are already treated within Classes.c */
-      /*s_oClass:AddInline( "protectErr"     , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "hiddenErr"      , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "readOnlyErr"    , {| Self |                            }, nScope ) */
-
-      /* No idea when those two could occur !!? */
-      /*s_oClass:AddInline( "wrongClass"     , {| Self |                            }, nScope ) */
-      /*s_oClass:AddInline( "badMethod"      , {| Self |                            }, nScope ) */
-
-      /* this one exist within VO and seem to be Auto Called when object ran out of scope */
-      /*s_oClass:AddInline( "Axit"           , {| Self |  }, nScope ) */
-
-      s_oClass:Create()
-
-   ENDIF
-
-   oInstance := s_oClass:Instance()
-   /*oInstance:class := s_oClass*/
-
-   RETURN oInstance
-
-
-/* Currently limited to 20 param */
-/* Will be re-written in C later to avoid this */
-
-static function HBObject_New(xPar0, xPar1, xPar2, xPar3, xPar4, xPar5, xPar6, xPar7, xPar8, xPar9, ;
-                            xPar10,xPar11,xPar12,xPar13,xPar14,xPar15,xPar16,xPar17,xPar18,xPar19 )
-
-return QSelf():Init(xPar0, xPar1, xPar2, xPar3, xPar4, xPar5, xPar6, xPar7, xPar8, xPar9, ;
-                 xPar10,xPar11,xPar12,xPar13,xPar14,xPar15,xPar16,xPar17,xPar18,xPar19 )
-
-static function HBObject_Init()
-return QSelf()
-
-static function HBObject_Dftonerror()
-return QSelf():MSGNOTFOUND( __GetMessage() )
-
-static function HBObject_Error( cDesc, cClass, cMsg, nCode, aArgs )
-
-   DEFAULT nCode TO 1004
-
-   IF nCode == 1005
-      //RETURN __errRT_SBASE( EG_NOVARMETHOD, 1005, cDesc, cClass + ":" + cMsg )
-      RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOVARMETHOD, 1005, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
-   ENDIF
-
-//RETURN __errRT_SBASE( EG_NOMETHOD, nCode, cDesc, cClass + ":" + cMsg )
-RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOMETHOD, nCode, cClass + ":" + cMsg, cDesc, aArgs, ProcFile(4), ProcName(4), ProcLine(4) ) )
-#else
 #define HB_CLS_NOTOBJECT
 
 #include "common.ch"
@@ -190,7 +79,7 @@ RETURN Eval( ErrorBlock(), ErrorNew( "BASE", EG_NOMETHOD, nCode, cClass + ":" + 
 
 CLASS HBObject
 
-   METHOD New
+   MESSAGE New          IS Init
    METHOD Init          INLINE   Self
 
    // methods to return string representation of object.  asExpStr is
@@ -235,34 +124,6 @@ CLASS HBObject
 ENDCLASS
 
 //----------------------------------------------------------------------------//
-
-/* Currently limited to 20 param */
-/* Will be re-written in C later to avoid this */
-
-#pragma BEGINDUMP
-
-#include "hbapi.h"
-#include "hbstack.h"
-#include "hbvm.h"
-
-HB_FUNC_STATIC( HBOBJECT_NEW )
-{
-   PHB_DYNS pDynSym  = hb_dynsymGetCase( "INIT" );
-   USHORT   uiPCount = hb_pcount(), i;
-
-   hb_vmPushSymbol( pDynSym->pSymbol );
-   hb_vmPush( hb_stackSelfItem() );
-
-   for( i = 1; i <= uiPCount; i++ )
-   {
-      hb_vmPush( hb_stackItemFromBase( i ) );
-   }
-
-   hb_vmSend( uiPCount );
-}
-
-#pragma ENDDUMP
-//----------------------------------------------------------------------------//
 /*
     copy()
 
@@ -270,7 +131,7 @@ HB_FUNC_STATIC( HBOBJECT_NEW )
     variables.
 */
 
-METHOD Copy() //CLASS HB_Object
+METHOD Copy() CLASS HBObject
    LOCAL NewSelf := __clsInst( ::ClassH )
    LOCAL xItem
 
@@ -287,17 +148,17 @@ RETURN NewSelf
     RETURN a copy of the receiver with shallow copies of each instance
 */
 
-METHOD DeepCopy() //CLASS HB_Object
+METHOD DeepCopy() CLASS HBObject
 RETURN __objClone( self )
 
 //----------------------------------------------------------------------------//
 
-METHOD IsKindOf( o ) //CLASS HB_Object
+METHOD IsKindOf( o ) CLASS HBObject
    RETURN __ObjDerivedFrom( Self, o )
 
 //----------------------------------------------------------------------------//
 
-METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs ) //CLASS HB_Object
+METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs ) CLASS HBObject
 
    LOCAL nGenCode   := EG_NOMETHOD
 
@@ -313,6 +174,10 @@ METHOD Error( cDesc, cClassName, cMsg, nSubCode, aArgs ) //CLASS HB_Object
 //----------------------------------------------------------------------------//
 
 #pragma BEGINDUMP
+
+#include "hbapi.h"
+#include "hbstack.h"
+#include "hbvm.h"
 
 HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 {
@@ -336,10 +201,9 @@ HB_FUNC_STATIC( HBOBJECT_ERRORHANDLER )
 
 //----------------------------------------------------------------------------//
 
-METHOD MsgNotFound( cMsg ) //CLASS HB_Object
+METHOD MsgNotFound( cMsg ) CLASS HBObject
    RETURN ::Error( "Message not found", __OBJGETCLSNAME( Self ), cMsg, if(substr(cMsg,1,1)=="_",1005,1004) )
 
-#endif
 
 FUNCTION TAssociativeArray( ... )
    LOCAL hHash
