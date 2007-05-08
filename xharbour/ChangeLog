@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5494 2007/05/07 13:53:41 ran_go Exp $
+ * $Id: ChangeLog,v 1.5495 2007/05/07 15:01:57 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-08 12:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * include/hbapi.h
+  * source/rdd/dbf1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/workarea.c
+    + added support to fieldtype G (OLE)
+      G  	OLE/General   10 digits (bytes) representing a .DBT block number.
+      The number is stored as a string, right justified and padded with blanks.
+
+      (dBASE V: like Memo) OLE Objects in MS Windows versions 
+      
+      Are pendding to implement FieldGet to autocreate tOleAuto object when is
+      required.
+
+  * source/rdd/userrdd/rdds/adordd.prg
+    * minor sintax corrections.
 
 2007-05-07 12:00 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/hvm.c

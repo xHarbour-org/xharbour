@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.77 2007/04/02 16:00:22 marchuet Exp $
+ * $Id: workarea.c,v 1.78 2007/05/04 11:29:01 marchuet Exp $
  */
 
 /*
@@ -324,6 +324,11 @@ static ERRCODE hb_waCreateFields( AREAP pArea, PHB_ITEM pStruct )
             pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
             break;
 
+         case 'G':
+            pFieldInfo.uiType = HB_IT_OLE;
+            pFieldInfo.uiLen = ( uiLen == 4 ) ? 4 : 10;
+            break;
+
          case 'V':
             pFieldInfo.uiType = HB_IT_ANY;
             pFieldInfo.uiLen = ( uiLen < 3 || uiLen == 5 ) ? 6 : uiLen;
@@ -437,6 +442,10 @@ static ERRCODE hb_waFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiType, PHB_I
 
             case HB_IT_MEMO:
                hb_itemPutC( pItem, "M" );
+               break;
+
+            case HB_IT_OLE:
+               hb_itemPutC( pItem, "G" );
                break;
 
             case HB_IT_ANY:

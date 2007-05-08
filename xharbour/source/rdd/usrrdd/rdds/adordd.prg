@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.2 2007/05/07 10:22:55 marchuet Exp $
+ * $Id: adordd.prg,v 1.3 2007/05/07 10:39:08 marchuet Exp $
  */
 
 /*
@@ -14,6 +14,9 @@
  *  ADO_GOTOID( nWA, nRecord )
  *  ADO_GOTO( nWA, nRecord )
  *  ADO_OPEN( nWA, aOpenInfo ) some modifications
+ *     Open: Excel files
+ *           Paradox files
+ *           Access with password
  *
  * www - http://www.xharbour.org
  *
@@ -106,14 +109,13 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_NEW( pWA )
 
-   LOCAL aWData := { -1, .F., .F. }
+   LOCAL aWData := { -1, .F., .F. } 
 
    USRRDD_AREADATA( pWA, aWData )
-
+   
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_CREATE( nWA, aOpenInfo )
-
 
    local cDataBase  := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 1, ";" )
    local cTableName := HB_TokenGet( aOpenInfo[ UR_OI_NAME ], 2, ";" )
@@ -142,15 +144,13 @@ STATIC FUNCTION ADO_CREATE( nWA, aOpenInfo )
 
    TRY
       oConnection:Execute( "DROP TABLE " + cTableName )
-   CATCH
-   FINALLY
-
-      oConnection:Execute( "CREATE TABLE [" + cTableName + "] (" + s_aSQLStruct[ nWA ] + ")" )
-      oConnection:Close()
-
+   CATCH   
    END TRY
 
-	/*
+   oConnection:Execute( "CREATE TABLE [" + cTableName + "] (" + s_aSQLStruct[ nWA ] + ")" )
+   oConnection:Close()
+   
+   /*
    LOCAL oError := ErrorNew()
 
    oError:GenCode     := EG_CREATE
@@ -170,22 +170,22 @@ STATIC FUNCTION ADO_CREATEFIELDS( nWA, aStruct )
 
   s_aSQLStruct[ nWA ] = ""
 
-  for n = 1 to Len( aStruct )
-     if n > 1
+  FOR n = 1 to Len( aStruct )
+     IF n > 1
         s_aSQLStruct[ nWA ] += ", "
-     endif
+     ENDIF
      s_aSQLStruct[ nWA ] += "[" + aStruct[ n ][ DBS_NAME ] + "]"
-     do case
-        case aStruct[ n ][ DBS_TYPE ] $ "C,Character"
+     DO CASE
+        CASE aStruct[ n ][ DBS_TYPE ] $ "C,Character"
              s_aSQLStruct[ nWA ] += " CHAR(" + AllTrim( Str( aStruct[ n ][ DBS_LEN ] ) ) + ") NULL"
 
-        case aStruct[ n ][ DBS_TYPE ] == "N"
+        CASE aStruct[ n ][ DBS_TYPE ] == "N"
              s_aSQLStruct[ nWA ] += " NUMERIC(" + AllTrim( Str( aStruct[ n ][ DBS_LEN ] ) ) + ")"
 
-        case aStruct[ n ][ DBS_TYPE ] == "L"
+        CASE aStruct[ n ][ DBS_TYPE ] == "L"
              s_aSQLStruct[ nWA ] += " LOGICAL"
-     endcase
-  next
+     ENDCASE
+  NEXT
 
 RETURN SUCCESS
 
@@ -199,7 +199,7 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
       HB_FNAMESPLIT( aOpenInfo[ UR_OI_NAME ], , @cName )
       aOpenInfo[ UR_OI_ALIAS ] := cName
    ENDIF
-
+   
    nMode := If( aOpenInfo[ UR_OI_SHARED ], FO_SHARED , FO_EXCLUSIVE ) + ;
             If( aOpenInfo[ UR_OI_READONLY ], FO_READ, FO_READWRITE )
 
@@ -219,45 +219,45 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
    ENDIF
 
    IF Empty( aOpenInfo[ UR_OI_CONNECT ] )
-      s_aConnections[ nWA ] = TOleAuto():New( "ADODB.Connection" )
+       s_aConnections[ nWA ] = TOleAuto():New( "ADODB.Connection" )
 
-      do case
-          case Lower( Right( aOpenInfo[ UR_OI_NAME ], 4 ) ) == ".mdb"
-               IF Empty( s_cPassword )
-                  s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] )
-               ELSE
-                  s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Jet OLEDB:Database Password=" + AllTrim( s_cPassword ) )
-               ENDIF
+       DO CASE
+       CASE Lower( Right( aOpenInfo[ UR_OI_NAME ], 4 ) ) == ".mdb"
+            IF Empty( s_cPassword )
+               s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] )
+            ELSE
+               s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Jet OLEDB:Database Password=" + AllTrim( s_cPassword ) )
+            ENDIF
 
-          case Lower( Right( aOpenInfo[ UR_OI_NAME ], 4 ) ) == ".xls"
-               s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Extended Properties='Excel 8.0;HDR=YES';Persist Security Info=False" )
+       CASE Lower( Right( aOpenInfo[ UR_OI_NAME ], 4 ) ) == ".xls"
+            s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Extended Properties='Excel 8.0;HDR=YES';Persist Security Info=False" )
 
-          case Lower( Right( aOpenInfo[ UR_OI_NAME ], 3 ) ) == ".db"
-               s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Extended Properties='Paradox 3.x';" )
+       CASE Lower( Right( aOpenInfo[ UR_OI_NAME ], 3 ) ) == ".db"
+            s_aConnections[ nWA ]:Open( "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + aOpenInfo[ UR_OI_NAME ] + ";Extended Properties='Paradox 3.x';" )
 
-          case s_cEngine == "MYSQL"
-               s_aConnections[ nWA ]:Open( "DRIVER={MySQL ODBC 3.51 Driver};" + ;
-                                           "server=" + s_cServer + ;
-                                           ";database=" + aOpenInfo[ UR_OI_NAME ] + ;
-                                           ";uid=" + s_cUserName + ;
-                                           ";pwd=" + s_cPassword )
+       CASE s_cEngine == "MYSQL"
+            s_aConnections[ nWA ]:Open( "DRIVER={MySQL ODBC 3.51 Driver};" + ;
+                                        "server=" + s_cServer + ;
+                                        ";database=" + aOpenInfo[ UR_OI_NAME ] + ;
+                                        ";uid=" + s_cUserName + ;
+                                        ";pwd=" + s_cPassword )
 
-          case s_cEngine == "SQL"
-               s_aConnections[ nWA ]:Open( "Provider=SQLOLEDB;" + ;
-                                           "server=" + s_cServer + ;
-                                           ";database=" + aOpenInfo[ UR_OI_NAME ] + ;
-                                           ";uid=" + s_cUserName + ;
-                                           ";pwd=" + s_cPassword )
+       CASE s_cEngine == "SQL" 
+            s_aConnections[ nWA ]:Open( "Provider=SQLOLEDB;" + ; 
+                                        "server=" + s_cServer + ; 
+                                        ";database=" + aOpenInfo[ UR_OI_NAME ] + ; 
+                                        ";uid=" + s_cUserName + ; 
+                                        ";pwd=" + s_cPassword )
 
-          case s_cEngine == "ORACLE"
-               s_aConnections[ nWA ]:Open( "Provider=MSDAORA.1;" + ;
-                                           "Persist Security Info=False" + ;
-                                           If( s_cServer == NIL .OR. s_cServer == "",;
-                                               "", ";Data source=" + s_cServer ) + ;
-                                           ";User ID=" + s_cUserName + ;
-                                           + ";Password=" + s_cPassword )
+       CASE s_cEngine == "ORACLE"
+            s_aConnections[ nWA ]:Open( "Provider=MSDAORA.1;" + ;
+                                        "Persist Security Info=False" + ;
+                                        If( s_cServer == NIL .OR. s_cServer == "",; 
+                                            "", ";Data source=" + s_cServer ) + ;
+                                        ";User ID=" + s_cUserName + ;
+                                        + ";Password=" + s_cPassword )
 
-      endcase
+      ENDCASE
    ELSE
       s_aConnections[ nWA ] = TOleAuto():New( aOpenInfo[ UR_OI_CONNECT ], "ADODB.Connection" )
    ENDIF
@@ -345,11 +345,9 @@ STATIC FUNCTION ADO_GOTO( nWA, nRecord )
          :Move( nRecord - 1, 0 )
       ENDIF
       ADO_RECID( nWA, @nRecNo )
-      RETURN If( nRecord == nRecNo, SUCCESS, FAILURE )
    END WITH
 
-
-RETURN SUCCESS
+RETURN If( nRecord == nRecNo, SUCCESS, FAILURE )
 
 STATIC FUNCTION ADO_GOTOID( nWA, nRecord )
    LOCAL nRecNo
@@ -361,18 +359,17 @@ STATIC FUNCTION ADO_GOTOID( nWA, nRecord )
          :Move( nRecord - 1, 0 )
       ENDIF
       ADO_RECID( nWA, @nRecNo )
-      RETURN If( nRecord == nRecNo, SUCCESS, FAILURE )
    END WITH
 
-RETURN FAILURE
+RETURN If( nRecord == nRecNo, SUCCESS, FAILURE )
 
 STATIC FUNCTION ADO_GOTOP( nWA )
 
    local oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-   if oADO:RecordCount != 0
+   IF oADO:RecordCount != 0
       oADO:MoveFirst()
-   endif
+   ENDIF   
    USRRDD_AREADATA( nWA )[ 2 ] = .f.
    USRRDD_AREADATA( nWA )[ 3 ] = .f.
 
@@ -385,7 +382,7 @@ STATIC FUNCTION ADO_GOBOTTOM( nWA )
    oADO:MoveLast()
    USRRDD_AREADATA( nWA )[ 2 ] = .f.
    USRRDD_AREADATA( nWA )[ 3 ] = .f.
-
+ 
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_SKIPRAW( nWA, nRecords )
@@ -457,7 +454,7 @@ STATIC FUNCTION ADO_RECID( nWA, nRecNo )
 
    local oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-	 nRecno := If( oADO:AbsolutePosition == -3, oAdo:RecordCount + 1, oAdo:AbsolutePosition )
+	nRecno := If( oADO:AbsolutePosition == -3, oAdo:RecordCount + 1, oAdo:AbsolutePosition )
 
 RETURN SUCCESS
 
@@ -486,9 +483,9 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_APPEND( nWA, lUnLockAll )
 
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
-
+	
 	oADO:AddNew()
-
+	
 	TRY
 	   oADO:Update() // keep it here, or there is an ADO error
 	CATCH
@@ -499,23 +496,23 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_FLUSH( nWA )
 
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
-
+	
 	oADO:Update()
 
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_ORDINFO( nWA, nIndex, aOrderInfo )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-	do case
-	   case nIndex == UR_ORI_TAG
-	        if aOrderInfo[ UR_ORI_TAG ] < s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes:Count
-             aOrderInfo[ UR_ORI_RESULT ] = s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes( aOrderInfo[ UR_ORI_TAG ] ):Name
-          else
-             aOrderInfo[ UR_ORI_RESULT ] = ""
-          endif
-	endcase
+	DO CASE
+	CASE nIndex == UR_ORI_TAG
+	   IF aOrderInfo[ UR_ORI_TAG ] < s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes:Count
+         aOrderInfo[ UR_ORI_RESULT ] = s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Indexes( aOrderInfo[ UR_ORI_TAG ] ):Name
+      ELSE
+         aOrderInfo[ UR_ORI_RESULT ] = ""
+      ENDIF
+	ENDCASE
 
 RETURN SUCCESS
 
@@ -552,7 +549,7 @@ RETURN SUCCESS
 STATIC FUNCTION ADO_RAWLOCK( nWA, nAction, nRecNo )
 
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
-
+   
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_LOCK( nWA, aLockInfo  )
@@ -592,12 +589,12 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_ZAP( nWA )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+  LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-  if s_aConnections[ nWA ] != NIL .and. s_aTableNames[ nWA ] != nil
+  IF s_aConnections[ nWA ] != NIL .and. s_aTableNames[ nWA ] != nil
      s_aConnections[ nWA ]:Execute( "DELETE * FROM " + s_aTableNames[ nWA ] )
      oADO:Requery()
-  endif
+  ENDIF
 
 RETURN SUCCESS
 
@@ -614,7 +611,7 @@ STATIC FUNCTION ADO_LOCATE( nWA, lContinue )
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
   oADO:Find( s_aScopeInfo[ nWA ][ UR_SI_CFOR ], If( lContinue, 1, 0 ) )
-
+  
 return SUCCESS
 
 static function ADO_CLEARREL( nWA )
@@ -631,6 +628,22 @@ static function ADO_CLEARREL( nWA )
 
 RETURN SUCCESS
 
+static function ADO_RELAREA( nWA, nRelNo, nRelArea )
+
+   if nRelNo <= s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Count() 
+      nRelArea = Select( s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys( nRelNo - 1 ):RelatedTable )
+   endif  
+
+return SUCCESS
+
+static function ADO_RELTEXT( nWA, nRelNo, cExpr )
+
+   if nRelNo <= s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Count() 
+      cExpr = s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys( nRelNo - 1 ):Columns( 0 ):RelatedColumn
+   endif  
+
+return SUCCESS
+
 STATIC FUNCTION ADO_SETREL( nWA, aRelInfo )
 
   local cParent := Alias( aRelInfo[ UR_RI_PARENT ] )
@@ -638,7 +651,7 @@ STATIC FUNCTION ADO_SETREL( nWA, aRelInfo )
   local cKeyName := cParent + "_" + cChild
 
 	s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Append( cKeyName, adKeyForeign,;
-	                           aRelInfo[ UR_RI_CEXPR ], cChild, aRelInfo[ UR_RI_CEXPR ] )  
+	                           aRelInfo[ UR_RI_CEXPR ], cChild, aRelInfo[ UR_RI_CEXPR ] )
 
 RETURN SUCCESS
 
@@ -717,6 +730,8 @@ FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_SETLOCATE ] := ( @ADO_SETLOCATE() )
    aMyFunc[ UR_LOCATE ]  	:= ( @ADO_LOCATE() )
    aMyFunc[ UR_CLEARREL ]  := ( @ADO_CLEARREL() )
+   aMyFunc[ UR_RELAREA ]   := ( @ADO_RELAREA() )
+   aMyFunc[ UR_RELTEXT ]   := ( @ADO_RELTEXT() )
    aMyFunc[ UR_SETREL ]    := ( @ADO_SETREL() )
    aMyFunc[ UR_ORDCREATE ] := ( @ADO_ORDCREATE() )
    aMyFunc[ UR_ORDLSTADD ] := ( @ADO_ORDLSTADD() )
@@ -732,23 +747,23 @@ RETURN
 STATIC FUNCTION ADO_GETFIELDSIZE( nDBFTypeField, nADOFielSize )
 
 	LOCAL nDBFFieldSize := 0
-
+	
    DO CASE
-
+	
 			CASE nDBFTypeField == HB_FT_STRING
            nDBFFieldSize := nADOFielSize
 
 			CASE nDBFTypeField == HB_FT_INTEGER
            nDBFFieldSize := nADOFielSize
-
+				
 			CASE nDBFTypeField == HB_FT_DATE
            nDBFFieldSize := 8
-
+			
 			CASE nDBFTypeField == HB_FT_LOGICAL
            nDBFFieldSize := 1
-
+			
    ENDCASE
-
+	
 RETURN nDBFFieldSize
 
 STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
@@ -762,7 +777,7 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
 		CASE nADOFielfType == adSmallInt 					// 2
 		CASE nADOFielfType == adInteger 					// 3
          nDBFTypeField := HB_FT_INTEGER
-
+		
 		CASE nADOFielfType == adBigInt 						// 20
 		CASE nADOFielfType == adUnsignedTinyInt 	    // 17
 		CASE nADOFielfType == adUnsignedSmallInt 	// 18
@@ -775,7 +790,7 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
 		CASE nADOFielfType == adNumeric 					// 131
 		CASE nADOFielfType == adBoolean 					// 11
          nDBFTypeField := HB_FT_LOGICAL
-
+		
 		CASE nADOFielfType == adError 						// 10
 		CASE nADOFielfType == adUserDefined 			    // 132
 		CASE nADOFielfType == adVariant 					// 12
@@ -784,7 +799,7 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
 		CASE nADOFielfType == adGUID 						// 72
 		CASE nADOFielfType == adDate 						// 7
          nDBFTypeField := HB_FT_DATE
-
+		
 		CASE nADOFielfType == adDBDate 					// 133
 		CASE nADOFielfType == adDBTime 					// 134
 		CASE nADOFielfType == adDBTimeStamp 			// 135
@@ -829,47 +844,47 @@ return nil
 function HB_AdoSetEngine( cEngine )
 
    s_cEngine = cEngine
-
-return nil
+   
+return nil   
 
 function HB_AdoSetServer( cServer )
 
    s_cServer = cServer
-
+  
 return nil
 
 function HB_AdoSetUser( cUser )
 
    s_cUserName = cUser
-
+   
 return nil
 
 function HB_AdoSetPassword( cPassword )
 
    s_cPassword = cPassword
+   
+return nil      
 
-return nil
+function HB_AdoSetQuery( cQuery ) 
 
-function HB_AdoSetQuery( cQuery )
+   DEFAULT cQuery TO "SELECT * FROM " 
 
-   DEFAULT cQuery TO "SELECT * FROM "
-
-   s_cQuery = cQuery
+   s_cQuery = cQuery 
 
 return nil
 
 function HB_AdoSetLocateFor( cLocateFor )
 
    s_cLocateFor = cLocateFor
-
-return nil
+   
+return nil   
 
 static function SQLTranslate( cExpr )
 
   if Left( cExpr, 1 ) == '"' .and. Right( cExpr, 1 ) == '"'
      cExpr = SubStr( cExpr, 2, Len( cExpr ) - 2 )
-  endif
-
+  endif      
+     
   cExpr = StrTran( cExpr, '""', "" )
   cExpr = StrTran( cExpr, '"', "'" )
   cExpr = StrTran( cExpr, "''", "'" )
@@ -879,4 +894,4 @@ static function SQLTranslate( cExpr )
   cExpr = StrTran( cExpr, ".AND.", "AND" )
   cExpr = StrTran( cExpr, ".OR.", "OR" )
 
-return cExpr
+return cExpr   

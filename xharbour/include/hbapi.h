@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.209 2007/04/22 22:50:26 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.210 2007/05/04 20:53:22 ran_go Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_ARRAY     ( ( HB_TYPE ) 0x8000 )
 #define HB_IT_DATETIME  ( ( HB_TYPE ) 0x10000 )
 #define HB_IT_TIMESTAMP ( ( HB_TYPE ) 0x20000 )
+#define HB_IT_OLE       ( ( HB_TYPE ) 0x40000 )
 #define HB_IT_OBJECT    HB_IT_ARRAY
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
