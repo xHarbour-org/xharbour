@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5501 2007/05/09 09:03:45 marchuet Exp $
+ * $Id: ChangeLog,v 1.5502 2007/05/09 15:05:56 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-09 15:51 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbclass.ch
+    * Corrected missing space to avoid unintentional concatanation of AS TYPE ...
+
+* include/hbmemory.ch
+  * source/vm/fm.c
+    + Added HB_MEM_BLOCKS (tottal numbers of allocated blocks
+
+  * source/vm/memvars.c
+    * Fixed memory leak
+    * Minor simplifications
 
 2007-05-09 17:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
    * contrib/adordd/adordd.prg
@@ -60,7 +72,7 @@
   * source/rtl/tobject.prg
     - Removed Old Code for HBObject class definition
     - Removed Method New Code
-      * Optimized Using   MESSAGE New Is Init  
+      * Optimized Using   MESSAGE New Is Init
 
 2007-05-08 08:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc
@@ -76,8 +88,8 @@
       G  	OLE/General   10 digits (bytes) representing a .DBT block number.
       The number is stored as a string, right justified and padded with blanks.
 
-      (dBASE V: like Memo) OLE Objects in MS Windows versions 
-      
+      (dBASE V: like Memo) OLE Objects in MS Windows versions
+
       Are pendding to implement FieldGet to autocreate tOleAuto object when is
       required.
 
@@ -116,7 +128,7 @@
      +added user rdd ADORDD borrowed from harbour with few changes.
       will be changed in next releases SET FILTER TO to be compatible
       with other workareas which can be using another formats.
-     
+
   * harbour/source/rdd/wacore.c
   * harbour/include/hbapirdd.h
     * updated HB_TRACE messages and some minor cleanups
@@ -138,7 +150,7 @@
   * hrbdll.pc
     + added wacore.c and wafunc.c files
   * source/rtl/tget.prg
-    ! fixed bug reported in "@X" and "@C" pictures. 
+    ! fixed bug reported in "@X" and "@C" pictures.
 
 2007-05-03 16:48 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rdd/usrrdd/usrrdd.c
@@ -206,7 +218,7 @@
 2007-05-04 13:04 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/wafunc.c
     * change of the behavior of DbUseArea opening, so that one behaves like made Clipper, when it fails the
-      opening of a table, does not recover the previous area. 
+      opening of a table, does not recover the previous area.
 
 2007-05-04 13:04 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * hrbdll.bc
@@ -288,8 +300,8 @@
   * include/hbclass.ch
     ! Fixed "Super" translate
     * CLASS <classname> FROM <FromFunc>( <FromClass> )
-      /* 
-         If you declare a class with the clause FUNCTION, 
+      /*
+         If you declare a class with the clause FUNCTION,
 
          Example:
 
@@ -348,7 +360,7 @@
   * source/rtl/hbserial.prg
   * source/rtl/hbsrlraw.c
   * source/vm/hvm.c
-    * support for serialize ande deserialize of array, hash with 
+    * support for serialize ande deserialize of array, hash with
       multireference or autoreference
     ! Fix typo error in hb_xvmHashGen()
   * source/rtl/win32ole.prg
@@ -366,7 +378,7 @@
   * source/vm/hvm.c
     * Fix warnings and errors reported by bcc 5.8.2
     * Fix error reported by Mindaugas (loops at lines 509,515)
-    * Thanks Toninho 
+    * Thanks Toninho
     * Thanks Mindaugas
 
 2007-04-30 21:45 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
@@ -395,7 +407,7 @@
     * Changed hb_vmDoModuleExitFunctions() to hb_vmDoModuleFunctions( s_ExitFunctions )
     * Many changes in code, touching small performance
     * Please, test and report errors.
-    
+
 2007-04-30 12:15 UTC+0200 Alex Strickland <sscc/at/mweb.co.za>
   * source/rtl/dllcall.c
   *  Add CALLDLL()

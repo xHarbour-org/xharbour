@@ -1,5 +1,5 @@
 /*
- * $Id: hbmemory.ch,v 1.1.1.1 2001/12/21 10:47:20 ronpinkas Exp $
+ * $Id: hbmemory.ch,v 1.2 2003/08/25 22:25:03 ronpinkas Exp $
  */
 
 /*
@@ -53,6 +53,7 @@
 /* NOTE: This file is also used by C code. */
 
 #ifndef HB_MEMORY_CH_
+
 #define HB_MEMORY_CH_
 
 /* Parameters for Memory() function */
@@ -78,6 +79,7 @@
 #define HB_MEM_STACK         1004   /* Total memory size used by the stack (bytes) */
 #define HB_MEM_STACK_TOP     1005   /* Total items currently on the stack */
 #define HB_MEM_LIST_BLOCKS   1006   /* List all allocated blocks */
+#define HB_MEM_BLOCKS        1007   /* Total number of memory blcoks allocated */
 
 #endif /* HB_MEMORY_CH_ */
 

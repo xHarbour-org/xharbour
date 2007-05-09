@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.121 2007/02/27 15:59:41 druzus Exp $
+ * $Id: memvars.c,v 1.122 2007/03/25 06:12:51 walito Exp $
  */
 
 /*
@@ -178,7 +178,7 @@ void hb_memvarsInit( void )
    s_privateStackCnt  = s_privateStackBase = 0;
 }
 
-/* clear all variables except the detached ones
+/* Releases all variable containers - the value will be cleared by subsequent GC scan
  * Should be called at application exit only
 */
 void hb_memvarsRelease( void )
@@ -192,34 +192,11 @@ void hb_memvarsRelease( void )
    {
       while( --ulCnt )
       {
-         #if 0
-            if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
-            {
-               TraceLog( NULL, "Detached type: %i Counter: %i\n", s_globalTable[ ulCnt ].item.type, s_globalTable[ ulCnt ].counter );
-            }
-         #endif
-
-         if( --( s_globalTable[ ulCnt ].counter ) == 0 )
+         if( s_globalTable[ ulCnt ].counter > 0 )
          {
-            if( s_globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
-            {
-               if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
-               {
-                  hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
-                  s_globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
-               }
-            }
-            else if( HB_IS_COMPLEX( s_globalTable[ ulCnt ].pVarItem ) )
-            {
-               hb_itemClear( s_globalTable[ ulCnt ].pVarItem );
-            }
-            else
-            {
-               s_globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
-            }
-
             hb_xfree( s_globalTable[ ulCnt ].pVarItem );
-            s_globalTable[ ulCnt ].counter = 0;
+            //s_globalTable[ ulCnt ].pVarItem = NULL;
+            //s_globalTable[ ulCnt ].counter = 0;
          }
       }
 
@@ -250,7 +227,7 @@ void hb_memvarsInit( HB_STACK *pStack )
    pStack->privateStackCnt  = pStack->privateStackBase = 0;
 }
 
-/* clear all variables except the detached ones
+/* Releases all variable containers - the value will be cleared by subsequent GC scan
  * Should be called at application exit only
 */
 void hb_memvarsRelease( HB_STACK *pStack )
@@ -265,26 +242,10 @@ void hb_memvarsRelease( HB_STACK *pStack )
    {
       while( --ulCnt )
       {
-         if( --( pStack->globalTable[ ulCnt ].counter ) == 0 )
+         if( pStack->globalTable[ ulCnt ].counter > 0 )
          {
-            if( pStack->globalTable[ ulCnt ].hPrevMemvar == ( HB_HANDLE ) -1 )
-            {
-               if( HB_IS_STRING( pStack->globalTable[ ulCnt ].pVarItem ) )
-               {
-                  hb_itemReleaseString( pStack->globalTable[ ulCnt ].pVarItem );
-                  pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
-               }
-            }
-            else if( HB_IS_COMPLEX( pStack->globalTable[ ulCnt ].pVarItem ) )
-            {
-               hb_itemClearMT( pStack->globalTable[ ulCnt ].pVarItem, pStack );
-            }
-            else
-            {
-               pStack->globalTable[ ulCnt ].pVarItem->type = HB_IT_NIL;
-            }
-
             hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
+            //pStack->globalTable[ ulCnt ].pVarItem = NULL;
             pStack->globalTable[ ulCnt ].counter = 0;
          }
       }
@@ -370,37 +331,32 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
    pValue->counter = 1;
    pValue->pVarItem->type = HB_IT_NIL;
 
-   if( pSource )
-   {
-      if( bTrueMemvar )
-      {
-         hb_itemCopy( pValue->pVarItem, pSource );
-      }
-      else
-      {
-         memcpy( pValue->pVarItem, pSource, sizeof(HB_ITEM) );
-
-         #ifndef HB_ARRAY_USE_COUNTER
-            if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
-            {
-               //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, pValue->pVarItem );
-               hb_arrayResetHolder( pSource->item.asArray.value, pSource, pValue->pVarItem );
-            }
-            else if( pSource->type == HB_IT_BYREF && pSource->item.asRefer.offset == 0 )
-            {
-               hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, pSource, pValue->pVarItem );
-            }
-         #endif
-      }
-   }
-
    if( bTrueMemvar )
    {
       pValue->hPrevMemvar = 0;
+
+      if( pSource )
+      {
+         hb_itemCopy( pValue->pVarItem, pSource );
+      }
    }
    else
    {
       pValue->hPrevMemvar = ( HB_HANDLE ) - 1;    /* detached variable */
+
+      memcpy( pValue->pVarItem, pSource, sizeof(HB_ITEM) );
+
+      #ifndef HB_ARRAY_USE_COUNTER
+         if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )
+         {
+            //TraceLog( NULL, "Detached %p array: %p to %p\n", pSource, pSource->item.asArray.value, pValue->pVarItem );
+            hb_arrayResetHolder( pSource->item.asArray.value, pSource, pValue->pVarItem );
+         }
+         else if( pSource->type == HB_IT_BYREF && pSource->item.asRefer.offset == 0 )
+         {
+            hb_arrayResetHolder( pSource->item.asRefer.BasePtr.pBaseArray, pSource, pValue->pVarItem );
+         }
+      #endif
    }
 
    HB_TRACE(HB_TR_INFO, ("hb_memvarValueNew: memvar item created with handle %i", hValue));
@@ -505,10 +461,17 @@ void hb_memvarSetPrivatesBase( ULONG ulBase )
    {
       --s_privateStackCnt;
       hVar = s_privateStack[ s_privateStackCnt ]->hMemvar;
+
       if( hVar )
       {
           hOldValue = s_globalTable[ hVar ].hPrevMemvar;
           hb_memvarValueDecRef( hVar );
+
+          if( s_globalTable[ hVar ].counter )
+          {
+             s_globalTable[ hVar ].hPrevMemvar = ( HB_HANDLE ) -1;
+          }
+
           /*
           * Restore previous value for variables that were overridden
           */
@@ -607,7 +570,9 @@ void hb_memvarValueDecRef( HB_HANDLE hValue )
          {
             hb_itemClear( pValue->pVarItem );
          }
+
          hb_xfree( pValue->pVarItem );
+         //pValue->pVarItem = NULL;
 
          #ifndef HB_THREAD_SUPPORT
             hb_memvarRecycle( hValue );
@@ -639,7 +604,10 @@ void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack )
          {
             hb_itemClearMT( pValue->pVarItem, pStack );
          }
+
          hb_xfree( pValue->pVarItem );
+         //pValue->pVarItem = NULL;
+
          hb_memvarRecycleMT( hValue, pStack );
 
          HB_TRACE(HB_TR_INFO, ("Memvar item (%i) deleted", hValue));
@@ -693,6 +661,8 @@ void hb_memvarValueDecGarbageRef( HB_HANDLE hValue )
          }
 
          hb_xfree( pValue->pVarItem );
+         //pValue->pVarItem = NULL;
+
    	   #ifndef HB_THREAD_SUPPORT
    	      hb_memvarRecycle( hValue );
    	   #else
@@ -1191,6 +1161,7 @@ static void hb_memvarReleaseWithMask( char *szRegEx, BOOL bInclude )
          pRef = s_globalTable[ pDynVar->hMemvar ].pVarItem;
 
          bMatch = hb_regexMatch( &RegEx, pDynVar->pSymbol->szName, FALSE );
+
          if ( bInclude ? bMatch : !bMatch )
          {
             /* Wrong to reset - private may be used again in this procedure and counter maybecome negative!
@@ -1530,19 +1501,10 @@ HB_FUNC( __MVPRIVATE )
                /* we are accepting an one-dimensional array of strings only
                 */
                ULONG j, ulLen = pMemvar->item.asArray.value->ulLen;
-               HB_ITEM VarItem;
-
-               ( &VarItem )->type = HB_IT_NIL;
 
                for( j = 1; j <= ulLen; j++ )
                {
-                  hb_arrayGet( pMemvar, j, &VarItem );
-                  hb_memvarCreateFromItem( &VarItem, VS_PRIVATE, NULL );
-
-                  if( HB_IS_COMPLEX( &VarItem ) )
-                  {
-                     hb_itemClear( &VarItem );
-                  }
+                  hb_memvarCreateFromItem( hb_arrayGetItemPtr( pMemvar, j ), VS_PRIVATE, NULL );
                }
             }
             else
@@ -2315,8 +2277,10 @@ HB_FUNC( __MVRESTORE )
 
          hb_fsClose( fhnd );
 
-	 if( buffer )
+         if( buffer )
+         {
            hb_xfree( buffer );
+         }
       }
       else
       {
@@ -2426,6 +2390,7 @@ HB_EXPORT PHB_ITEM hb_memvarGetValueByHandle( HB_HANDLE hMemvar )
 static HB_DYNS_FUNC( hb_GetSymbolInfo )
 {
   HB_THREAD_STUB
+
   if( pDynSymbol->hMemvar )
   {
     PHB_ITEM pArray = ( ( PHB_ITEM ) Cargo );

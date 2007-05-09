@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.73 2005/10/24 01:04:36 druzus Exp $
+ * $Id: fm.c,v 1.74 2006/02/13 23:11:00 druzus Exp $
  */
 
 /*
@@ -1030,6 +1030,14 @@ ULONG hb_xquery( USHORT uiMode )
    case HB_MEM_USED:       /* Harbour extension (Memory used [bytes])           */
 #ifdef HB_FM_STATISTICS
       ulResult = s_lMemoryConsumed;
+#else
+      ulResult = 0;
+#endif
+      break;
+
+   case HB_MEM_BLOCKS:       /* Harbour extension (Memory blocks used)           */
+#ifdef HB_FM_STATISTICS
+      ulResult = s_lMemoryBlocks;
 #else
       ulResult = 0;
 #endif
