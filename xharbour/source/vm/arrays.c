@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.140 2007/04/19 13:18:40 walito Exp $
+ * $Id: arrays.c,v 1.141 2007/05/08 19:59:22 ran_go Exp $
  */
 
 /*
@@ -914,7 +914,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
    {
       ULONG ulLen;
       ULONG ulStart = 1;
-      register ULONG ulCount;
+      ULONG ulCount;
       register PHB_ITEM pItems;
 
       /* Select array type */
