@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5499 2007/05/08 19:59:52 ran_go Exp $
+ * $Id: ChangeLog,v 1.5500 2007/05/09 03:34:14 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,36 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2007-05-09 11:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/rdd/userrdd/rdds/adordd.prg
+    + added support to all dbf fieldtypes supported in dbf format from xharbour.
+      and added support to autoconection for create files .xls and .db
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "V"
+             s_aSQLStruct[ nWA ] += " VARCHAR(" + AllTrim( Str( aStruct[ n ][ DBS_LEN ] ) ) + ") NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "B"
+             s_aSQLStruct[ nWA ] += " DOUBLE NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "Y"
+             s_aSQLStruct[ nWA ] += " SMALLINT NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "I"
+             s_aSQLStruct[ nWA ] += " MEDIUMINT NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "D"
+             s_aSQLStruct[ nWA ] += " DATE NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "T"
+             s_aSQLStruct[ nWA ] += " DATETIME NULL"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "@"
+             s_aSQLStruct[ nWA ] += " TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP"
+
+        CASE aStruct[ n ][ DBS_TYPE ] == "M"
+             s_aSQLStruct[ nWA ] += " TEXT NULL"
 
 2007-05-08 22:30 UTC-0500 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/arrays.c
