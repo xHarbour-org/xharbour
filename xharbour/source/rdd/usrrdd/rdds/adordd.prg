@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.4 2007/05/08 10:08:30 marchuet Exp $
+ * $Id: adordd.prg,v 1.5 2007/05/09 09:03:46 marchuet Exp $
  */
 
 /*
@@ -332,13 +332,13 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
    UR_SUPER_SETFIELDEXTENT( nWA, oADO:Fields:Count )
 
    FOR n = 1 TO nTotalFields
-   		aField := ARRAY( UR_FI_SIZE )
-   		aField[ UR_FI_NAME ]    := oADO:Fields( n - 1 ):Name
-   		aField[ UR_FI_TYPE ]    := ADO_GETFIELDTYPE( oADO:Fields( n - 1 ):Type )
-   		aField[ UR_FI_TYPEEXT ] := 0
-   		aField[ UR_FI_LEN ]     := ADO_GETFIELDSIZE( aField[ UR_FI_TYPE ], oADO:Fields( n - 1 ):DefinedSize )
-   		aField[ UR_FI_DEC ]     := 0
-   		UR_SUPER_ADDFIELD( nWA, aField )
+ 		aField := ARRAY( UR_FI_SIZE )
+  		aField[ UR_FI_NAME ]    := oADO:Fields( n - 1 ):Name
+  		aField[ UR_FI_TYPE ]    := ADO_GETFIELDTYPE( oADO:Fields( n - 1 ):Type )
+  		aField[ UR_FI_TYPEEXT ] := 0
+  		aField[ UR_FI_LEN ]     := ADO_GETFIELDSIZE( aField[ UR_FI_TYPE ], oADO:Fields( n - 1 ):DefinedSize )
+  		aField[ UR_FI_DEC ]     := 0
+  		UR_SUPER_ADDFIELD( nWA, aField )
    NEXT
 
    nResult := UR_SUPER_OPEN( nWA, aOpenInfo )
@@ -466,19 +466,23 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_DELETED( nWA, lDeleted )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-	IF oADO:Status == adRecDeleted // To be checked, ACCESS does not uses it
-	   lDeleted := .T.
-	ELSE
-	   lDeleted := .F.
-	ENDIF
+   TRY
+	   IF oADO:Status == adRecDeleted
+	      lDeleted := .T.
+	   ELSE
+	      lDeleted := .F.
+	   ENDIF
+   CATCH
+      lDeleted := .F.
+   END TRY
 
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_DELETE( nWA )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
    oADO:Delete()
 
@@ -488,7 +492,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_RECID( nWA, nRecNo )
 
-   local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+   LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
 	nRecno := If( oADO:AbsolutePosition == -3, oAdo:RecordCount + 1, oAdo:AbsolutePosition )
 
@@ -496,7 +500,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_RECCOUNT( nWA, nRecords )
 
-   local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+   LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
    nRecords := oADO:RecordCount
 
@@ -518,7 +522,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_APPEND( nWA, lUnLockAll )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
 	oADO:AddNew()
 
@@ -531,7 +535,7 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_FLUSH( nWA )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
 	oADO:Update()
 
@@ -578,13 +582,13 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_PACK( nWA )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
 RETURN SUCCESS
 
 STATIC FUNCTION ADO_RAWLOCK( nWA, nAction, nRecNo )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
    
 RETURN SUCCESS
 
@@ -644,23 +648,26 @@ return SUCCESS
 
 STATIC FUNCTION ADO_LOCATE( nWA, lContinue )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+	LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-  oADO:Find( s_aScopeInfo[ nWA ][ UR_SI_CFOR ], If( lContinue, 1, 0 ) )
+   oADO:Find( s_aScopeInfo[ nWA ][ UR_SI_CFOR ], If( lContinue, 1, 0 ) )
   
-return SUCCESS
+RETURN SUCCESS
 
-static function ADO_CLEARREL( nWA )
+STATIC FUNCTION ADO_CLEARREL( nWA )
 
-   local nKeys := s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Count
-   local cKeyName
+   LOCAL nKeys := 0, cKeyName
+   
+   IF s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys != nil
+      nKeys = s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Count
+   ENDIF
 
-   if nKeys > 0 
+   IF nKeys > 0 
       cKeyName = s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys( nKeys - 1 ):Name
-      if Upper( cKeyName ) != "PRIMARYKEY"
+      IF Upper( cKeyName ) != "PRIMARYKEY"
          s_aCatalogs[ nWA ]:Tables( s_aTableNames[ nWA ] ):Keys:Delete( cKeyName )
-      endif   
-   endif   
+      ENDIF
+   ENDIF
 
 RETURN SUCCESS
 
@@ -695,7 +702,7 @@ STATIC FUNCTION ADO_ORDLSTADD( nWA, aOrderInfo )
 
 	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
 	
-  TRY 
+   TRY 
 	   oADO:Index = aOrderInfo[ UR_ORI_BAG ]
 	CATCH
 	END   
@@ -704,14 +711,14 @@ RETURN SUCCESS
 
 STATIC FUNCTION ADO_ORDLSTCLEAR( nWA )
 
-	local oADO := USRRDD_AREADATA( nWA )[ 1 ]
+   LOCAL oADO := USRRDD_AREADATA( nWA )[ 1 ]
 
-  TRY 
+   TRY 
 	   oADO:Index = ""
-	CATCH
-	END   
+   CATCH
+   END   
 	
-return SUCCESS
+RETURN SUCCESS
 
 STATIC FUNCTION ADO_ORDCREATE( nWA, aOrderCreateInfo )
 
@@ -780,17 +787,17 @@ INIT PROC ADORDD_INIT()
    rddRegister( "ADORDD", RDT_FULL )
 RETURN
 
-STATIC FUNCTION ADO_GETFIELDSIZE( nDBFTypeField, nADOFielSize )
+STATIC FUNCTION ADO_GETFIELDSIZE( nDBFTypeField, nADOFieldSize )
 
 	LOCAL nDBFFieldSize := 0
 	
    DO CASE
 	
 			CASE nDBFTypeField == HB_FT_STRING
-           nDBFFieldSize := nADOFielSize
+           nDBFFieldSize := nADOFieldSize
 
 			CASE nDBFTypeField == HB_FT_INTEGER
-           nDBFFieldSize := nADOFielSize
+           nDBFFieldSize := nADOFieldSize
 				
 			CASE nDBFTypeField == HB_FT_DATE
            nDBFFieldSize := 8
@@ -819,18 +826,18 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
 		CASE nADOFielfType == adUnsignedSmallInt 	// 18
 		CASE nADOFielfType == adUnsignedInt 			// 19
 		CASE nADOFielfType == adUnsignedBigInt 		// 21
-		CASE nADOFielfType == adSingle 						// 4
-		CASE nADOFielfType == adDouble 						// 5
-		CASE nADOFielfType == adCurrency 					// 6
+		CASE nADOFielfType == adSingle 					// 4
+		CASE nADOFielfType == adDouble 					// 5
+		CASE nADOFielfType == adCurrency 				// 6
 		CASE nADOFielfType == adDecimal 					// 14
 		CASE nADOFielfType == adNumeric 					// 131
 		CASE nADOFielfType == adBoolean 					// 11
          nDBFTypeField := HB_FT_LOGICAL
 		
-		CASE nADOFielfType == adError 						// 10
-		CASE nADOFielfType == adUserDefined 			    // 132
+		CASE nADOFielfType == adError 					// 10
+		CASE nADOFielfType == adUserDefined 			// 132
 		CASE nADOFielfType == adVariant 					// 12
-		CASE nADOFielfType == adIDispatch 				    // 9
+		CASE nADOFielfType == adIDispatch 				// 9
 		CASE nADOFielfType == adIUnknown 				// 13
 		CASE nADOFielfType == adGUID 						// 72
 		CASE nADOFielfType == adDate 						// 7
@@ -858,12 +865,12 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFielfType )
 		CASE nADOFielfType == adLongVarWChar 			// 203
          nDBFTypeField := HB_FT_STRING
 
-		CASE nADOFielfType == adBinary 						// 128
+		CASE nADOFielfType == adBinary 					// 128
 		CASE nADOFielfType == adVarBinary 				// 204
-		CASE nADOFielfType == adLongVarBinary 		    // 205
+		CASE nADOFielfType == adLongVarBinary 		   // 205
 		CASE nADOFielfType == adChapter 					// 136
-		CASE nADOFielfType == adFileTime 					// 64
-		CASE nADOFielfType == adPropVariant 			    // 138
+		CASE nADOFielfType == adFileTime 				// 64
+		CASE nADOFielfType == adPropVariant 			// 138
 		CASE nADOFielfType == adVarNumeric 				// 139
 		// CASE nADOFielfType == adArray &H2000
 
@@ -931,3 +938,25 @@ static function SQLTranslate( cExpr )
   cExpr = StrTran( cExpr, ".OR.", "OR" )
 
 return cExpr   
+
+function HB_AdoRddGetConnection( nWA )
+
+   DEFAULT nWA TO Select()
+   
+return s_aConnections[ nWA ]   
+
+function HB_AdoRddGetCatalog( nWA )
+
+   DEFAULT nWA TO Select()
+   
+return s_aCatalogs[ nWA ]   
+
+function HB_AdoRddGetRecordSet( nWA )
+
+   local oAreaData
+
+   DEFAULT nWA TO Select()
+   
+   oAreaData = USRRDD_AREADATA( nWA )
+   
+return If( oAreaData != nil, oAreaData[ 1 ], nil )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5500 2007/05/09 03:34:14 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5501 2007/05/09 09:03:45 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-09 17:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+   * contrib/adordd/adordd.prg
+     * Improved ADO_CLEARREL()
+     * Improved Deleted()
+     + Added function HB_AdoRddGetRecordSet( [<nWorkArea>] ) --> oAdoRecordset
+     + New functions HB_AdoRddGetConnection( [<nWorkArea>] ) --> oAdoConnection
+       and HB_AdoRddGetCatalog( [<nWorkArea>] ) --> oAdoCatalog
+     Borrowed from harbour
 
 2007-05-09 11:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/userrdd/rdds/adordd.prg
