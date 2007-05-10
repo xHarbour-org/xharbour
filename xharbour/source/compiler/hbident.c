@@ -1,5 +1,5 @@
 /*
- * $Id: hbident.c,v 1.1.1.1 2001/12/21 10:43:52 ronpinkas Exp $
+ * $Id: hbident.c,v 1.2 2005/03/31 14:34:06 andijahja Exp $
  */
 
 /*
@@ -36,14 +36,23 @@
 
 static HB_HASH_TABLE_PTR s_comp_Identifiers;    /* table of identifiers for reuse */
 
-/* create a new identifier or return the existing one 
+/* create a new identifier or return the existing one
 */
 char * hb_compIdentifierNew( char * szName, BOOL bCopy )
 {
    char * szIdent;
 
    szIdent = ( char * )hb_hashTableFind( s_comp_Identifiers, (void *) szName );
-   if( !szIdent )
+
+   if( szIdent )
+   {
+      if( bCopy == FALSE )
+      {
+         // WARNING: We must never call hb_compIdentifierNew( "Static Text", FALSE )!!!
+         hb_xfree( szName );
+      }
+   }
+   else
    {
       if( bCopy )
          szIdent = hb_strdup( szName );
@@ -61,12 +70,12 @@ HB_HASH_FUNC( hb_comp_IdentKey )    /* ULONG func (void *Value, void *Cargo) */
 {
    ULONG ulSum = 0;
    char *szName = ( char * )Value;
-   
+
    while( *szName )
      ulSum += *szName++;
 
    HB_SYMBOL_UNUSED( Cargo );
-     
+
    return ulSum % HB_IDENT_TABLE_SIZE;
 }
 
@@ -87,8 +96,8 @@ HB_HASH_FUNC( hb_comp_IdentComp )
 /* initialize the hash table for identifiers */
 void hb_compIdentifierOpen( )
 {
-   s_comp_Identifiers = hb_hashTableCreate( HB_IDENT_TABLE_SIZE, hb_comp_IdentKey, 
-                           hb_comp_IdentDel, hb_comp_IdentComp );   
+   s_comp_Identifiers = hb_hashTableCreate( HB_IDENT_TABLE_SIZE, hb_comp_IdentKey,
+                           hb_comp_IdentDel, hb_comp_IdentComp );
 }
 
 /* release identifiers table */

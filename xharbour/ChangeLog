@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5502 2007/05/09 15:05:56 marchuet Exp $
+ * $Id: ChangeLog,v 1.5503 2007/05/09 19:56:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,19 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-10 01:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbident.c
+    * Work in progress - started cleanup of memory leaks in compiler
+      /* Any help will be greatly appreciated. */
+
 2007-05-09 15:51 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch
     * Corrected missing space to avoid unintentional concatanation of AS TYPE ...
 
-* include/hbmemory.ch
+  * include/hbmemory.ch
   * source/vm/fm.c
     + Added HB_MEM_BLOCKS (tottal numbers of allocated blocks
 

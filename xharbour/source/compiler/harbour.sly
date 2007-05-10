@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.114 2007/04/14 21:47:22 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.115 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -85,6 +85,7 @@ typedef struct __ELSEIF
 {
    ULONG ulOffset;
    struct __ELSEIF * pNext;
+   struct __ELSEIF * pPrevGroup;
 } _ELSEIF, * PELSEIF;      /* support structure for else if pcode fixups */
 
 typedef struct _LOOPEXIT
@@ -117,8 +118,9 @@ USHORT hb_comp_wSwitchCounter   = 0;
 
 char * hb_comp_buffer; /* yacc input buffer */
 
-static PTR_LOOPEXIT hb_comp_pLoops = NULL;
-static HB_RTVAR_PTR hb_comp_rtvars = NULL;
+static HB_RTVAR_PTR hb_comp_rtvars   = NULL;
+static PTR_LOOPEXIT hb_comp_pLoops   = NULL;
+static PELSEIF      hb_comp_pElseIfs = NULL;
 
 static BOOL bTrancuateBaseArray = FALSE;
 static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray;
@@ -3445,6 +3447,7 @@ static void hb_compLoopEnd( void )
       }
 
       pExit = pLoop->pExitList;
+
       while( pExit )
       {
          hb_compGenJumpHere( pExit->ulOffset + 1 );
@@ -3464,25 +3467,60 @@ static void hb_compLoopEnd( void )
    }
 }
 
+void hb_compReleaseLoops( void )
+{
+   PTR_LOOPEXIT pLoop;
+   PTR_LOOPEXIT pExit;
+
+   while( hb_comp_pLoops )
+   {
+      pLoop = hb_comp_pLoops;
+
+      while( pLoop->pExitList )
+      {
+         pExit = pLoop->pExitList;
+         pLoop->pExitList = pExit->pExitList;
+         hb_xfree( ( void * ) pExit );
+      }
+
+      hb_comp_pLoops = pLoop->pNext;
+      hb_xfree( ( void * ) pLoop );
+   }
+}
+
 static void * hb_compElseIfGen( void * pFirst, ULONG ulOffset )
 {
    PELSEIF pElseIf = ( PELSEIF ) hb_xgrab( sizeof( _ELSEIF ) ), pLast;
 
    pElseIf->ulOffset = ulOffset;
-   pElseIf->pNext   = 0;
+   pElseIf->pNext = NULL;
+   pElseIf->pPrevGroup = NULL;
 
-   if( ! pFirst )
-      pFirst = pElseIf;
-   else
+   if( pFirst )
    {
       pLast = ( PELSEIF ) pFirst;
+
       while( pLast->pNext )
+      {
          pLast = pLast->pNext;
+      }
+
       pLast->pNext = pElseIf;
    }
+   else
+   {
+      if( hb_comp_pElseIfs )
+      {
+         pElseIf->pPrevGroup = hb_comp_pElseIfs;
+      }
+
+      hb_comp_pElseIfs = pElseIf;
+
+      pFirst = pElseIf;
+   }
+
    return pFirst;
 }
-
 
 static void hb_compElseIfFix( void * pFixElseIfs )
 {
@@ -3492,6 +3530,25 @@ static void hb_compElseIfFix( void * pFixElseIfs )
    {
       hb_compGenJumpHere( pFix->ulOffset );
       pFix = pFix->pNext;
+   }
+}
+
+void hb_compReleaseElseIfs( void )
+{
+   PELSEIF pElseIf;
+   PELSEIF pDel;
+
+   while( hb_comp_pElseIfs )
+   {
+      pElseIf = hb_comp_pElseIfs;
+      hb_comp_pElseIfs = pElseIf->pPrevGroup;
+
+      while( pElseIf )
+      {
+         pDel = pElseIf;
+         pElseIf = pElseIf->pNext;
+         hb_xfree( pDel );
+      }
    }
 }
 
@@ -3619,4 +3676,17 @@ static void hb_compVariableDim( char * szName, HB_EXPR_PTR pInitValue )
      hb_compGenPCode3( HB_P_ARRAYDIM, HB_LOBYTE( uCount ), HB_HIBYTE( uCount ), ( BOOL ) 1 );
      hb_compExprDelete( hb_compExprGenPop( hb_compExprNewVar( szName ) ) );
   }
+}
+
+void hb_compReleaseRTVars( void )
+{
+   HB_RTVAR_PTR pVar;
+
+   while( hb_comp_rtvars )
+   {
+      pVar = hb_comp_rtvars;
+      hb_compExprDelete( pVar->pVar );
+      hb_comp_rtvars = pVar->pPrev;
+      hb_xfree( pVar );
+   }
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.152 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: harbour.c,v 1.153 2007/04/14 21:47:21 ronpinkas Exp $
  */
 
 /*
@@ -263,6 +263,10 @@ static int hb_compAutoOpen( char * szPrg, BOOL * bSkipGen );
 static BOOL hb_compAutoOpenFind( char * szName );
 
 extern int yyparse( void );    /* main yacc parsing function */
+
+extern void hb_compReleaseRTVars( void );
+extern void hb_compReleaseLoops( void );
+extern void hb_compReleaseElseIfs( void );
 
 /*
  The following two variables are for the purpose of
@@ -3491,7 +3495,7 @@ void hb_compGenMessageData( char * szMsg ) /* generates an underscore-symbol nam
    strcpy( szResult, "_" );
    strcat( szResult, szMsg );
 
-   hb_compGenMessage( szResult );
+   hb_compGenMessage( hb_compIdentifierNew( szResult, FALSE ) );
 }
 
 /* Check variable in the following order:
@@ -5508,7 +5512,6 @@ static void hb_compAddInitFunc( PFUNCTION pFunc )
    ++hb_comp_functions.iCount;
 }
 
-
 static int hb_compCompile( char * szPrg )
 {
    int iStatus = EXIT_SUCCESS;
@@ -5657,7 +5660,7 @@ static int hb_compCompile( char * szPrg )
             /* Generate the starting procedure frame */
             if( hb_comp_bStartProc )
             {
-               hb_compFunctionAdd( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), HB_FS_PUBLIC, FUN_PROCEDURE );
+               hb_compFunctionAdd( hb_compIdentifierNew( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), FALSE ), HB_FS_PUBLIC, FUN_PROCEDURE );
             }
             else
             {
@@ -5899,21 +5902,19 @@ static int hb_compCompile( char * szPrg )
             iStatus = EXIT_FAILURE;
          }
 
-/*
-  while( hb_comp_pExterns )
-  {
-  PEXTERN pExtern = hb_comp_pExterns;
+         /*
+         while( hb_comp_pExterns )
+         {
+            PEXTERN pExtern = hb_comp_pExterns;
 
-  hb_comp_pExterns = hb_comp_pExterns->pNext;
+            hb_comp_pExterns = hb_comp_pExterns->pNext;
 
-  hb_xfree( pExtern->szName );
-  hb_xfree( pExtern );
-  }
-*/
-/*
+            hb_xfree( pExtern->szName );
+            hb_xfree( pExtern );
+         }
+
          hb_comp_bExternal = FALSE;
- */
-
+         */
       }
    }
    else
@@ -5922,6 +5923,113 @@ static int hb_compCompile( char * szPrg )
       iStatus = EXIT_FAILURE;
    }
 
+   hb_compReleaseRTVars();
+   hb_compReleaseLoops();
+   hb_compReleaseElseIfs();
+
+   if( hb_comp_functions.pFirst )
+   {
+      PFUNCTION pFunc = hb_comp_functions.pFirst;
+
+      do
+      {
+         pFunc = hb_compFunctionKill( pFunc );
+      }
+      while( pFunc );
+   }
+
+   if( hb_comp_funcalls.pFirst )
+   {
+      PFUNCTION pFunc = hb_comp_funcalls.pFirst;
+
+      do
+      {
+         hb_comp_funcalls.pFirst = pFunc->pNext;
+         hb_xfree( ( void * ) pFunc );  /* NOTE: szName will be released by hb_compSymbolKill() */
+         pFunc = hb_comp_funcalls.pFirst;
+      }
+      while( pFunc );
+   }
+
+   if( hb_comp_inlines.pFirst )
+   {
+      PINLINE pInline = hb_comp_inlines.pFirst;
+
+      do
+      {
+         hb_comp_inlines.pFirst = pInline->pNext;
+
+         if( pInline->pCode )
+         {
+            hb_xfree( ( void * ) pInline->pCode );
+         }
+
+         hb_xfree( ( void * ) pInline->szFileName );
+         hb_xfree( ( void * ) pInline );  /* NOTE: szName will be released by hb_compSymbolKill() */
+
+         pInline = hb_comp_inlines.pFirst;
+      }
+      while( pInline );
+   }
+
+   if ( hb_comp_iWarnings >= 3 && hb_comp_pReleaseDeclared )
+   {
+      PCOMDECLARED pDeclared = hb_comp_pReleaseDeclared;
+      PCOMCLASS    pClass = hb_comp_pReleaseClass;
+
+      pDeclared = hb_comp_pReleaseDeclared;
+
+      do
+      {
+         hb_comp_pReleaseDeclared = pDeclared->pNext;
+         hb_xfree( ( void * ) pDeclared );
+         pDeclared = hb_comp_pReleaseDeclared;
+      }
+      while( pDeclared );
+
+      pClass = hb_comp_pReleaseClass;
+
+      while( pClass )
+      {
+         hb_comp_pReleaseClass = pClass->pNext;
+
+         pDeclared = pClass->pMethod;
+
+         while ( pDeclared )
+         {
+            hb_comp_pReleaseDeclared = pDeclared->pNext;
+            hb_xfree( ( void * ) pDeclared );
+            pDeclared = hb_comp_pReleaseDeclared;
+         }
+
+         hb_xfree( ( void * ) pClass );
+         pClass = hb_comp_pReleaseClass;
+      }
+   }
+
+   if( hb_comp_symbols.pFirst )
+   {
+      PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
+
+      do
+      {
+         pSym = hb_compSymbolKill( pSym );
+      }
+      while( pSym );
+   }
+
+   if( hb_comp_pGlobals )
+   {
+      PVAR pGlobal = hb_comp_pGlobals, pDelete;
+
+      do
+      {
+         pDelete = pGlobal;
+         pGlobal = pGlobal->pNext;
+         hb_xfree( pDelete );
+      }
+      while( pGlobal );
+   }
 
    /* have we got i18n file ? */
    if ( hb_comp_HILfile != NULL )
@@ -5929,6 +6037,7 @@ static int hb_compCompile( char * szPrg )
       fclose( hb_comp_HILfile );
       hb_comp_HILfile = NULL;
    }
+
    if ( hb_comp_szHILout != NULL )
    {
       hb_xfree( hb_comp_szHILout );
@@ -6046,7 +6155,9 @@ static int hb_compAutoOpen( char * szPrg, BOOL * pbSkipGen )
 
             /* Generate the starting procedure frame */
             if( hb_comp_bStartProc )
-               hb_compFunctionAdd( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), HB_FS_PUBLIC, FUN_PROCEDURE );
+            {
+               hb_compFunctionAdd( hb_compIdentifierNew( hb_strupr( hb_strdup( hb_comp_pFileName->szName ) ), FALSE ), HB_FS_PUBLIC, FUN_PROCEDURE );
+            }
 
             {
                int i = hb_comp_iExitLevel ;
