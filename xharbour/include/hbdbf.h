@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.8 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbdbf.h,v 1.9 2005/09/11 19:39:32 druzus Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ typedef struct _DBFFIELD
    BYTE bReserved1[ 4 ];      /* offset from record begin in FP */
    BYTE bLen;
    BYTE bDec;
-   BYTE bFieldFlags;          /* 1-system column, 2-nullable, 4-binary */
+   BYTE bFieldFlags;          /* 0x01-system column, 0x02-nullable, 0x04-binary, 0x0c-autoincrement */
    BYTE bCounter[4];          /* autoincrement counter */
    BYTE bStep;                /* autoincrement step */
    BYTE bReserved2[ 7 ];

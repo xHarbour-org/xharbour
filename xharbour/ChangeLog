@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5505 2007/05/10 17:40:33 ran_go Exp $
+ * $Id: ChangeLog,v 1.5506 2007/05/11 02:05:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-09 17:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * include/adordd.ch
+  * include/usrrdd.ch
+  * source/rdd/usrrdd/rdds/adordd.prg
+    + Added FireBird support
+    + ADO_CLOSE( nWA )
+    + ADO_ZAP( nWA )
+    * ADO_ORDINFO( nWA, nIndex, aOrderInfo ) 
+    + ADO_RECINFO( nWA, nRecord, nInfoType, uInfo )
+    + Added support to new FieldTypes DateTime, TimeStamp, Ole.
+   
+  * include/hbdbf.h
+    + some comments.
+
+  * include/hbtypes.h
+    * corrected definition function. VM_PROCESS_DLL_SYMBOLS
+      but is not enougth to execute correctly PCODE in DLL.   
 
 2007-05-10 22:00 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbpp.h

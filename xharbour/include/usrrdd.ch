@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.ch,v 1.1 2006/06/02 12:34:11 druzus Exp $
+ * $Id: usrrdd.ch,v 1.2 2006/08/07 10:31:14 druzus Exp $
  */
 
 /*
@@ -186,6 +186,9 @@
 #define HB_FT_INTEGER         0x0002
 #define HB_FT_LONG            0x0008
 #define HB_FT_DOUBLE          0x0010
+#define HB_FT_DATETIME        0x10000
+#define HB_FT_TIMESTAMP       0x20000
+#define HB_FT_OLE             0x40000
 
 /* Flags for DBTRANSINFO */
 #define DBTF_MATCH         0x0001
@@ -340,6 +343,16 @@
 #define UR_ORCR_CKEY          7
 #define UR_ORCR_SIZE          7
 
+/* DBRECORDINFO */
+#define UR_DBRI_DELETED              1
+#define UR_DBRI_LOCKED               2
+#define UR_DBRI_RECSIZE              3
+#define UR_DBRI_RECNO                4
+#define UR_DBRI_UPDATED              5
+#define UR_DBRI_ENCRYPTED            6
+#define UR_DBRI_RAWRECORD            7
+#define UR_DBRI_RAWMEMOS             8
+#define UR_DBRI_RAWDATA              9
 
 #define SUCCESS   0
 #define FAILURE   1

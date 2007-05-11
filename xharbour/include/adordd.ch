@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.ch,v 1.3 2007/04/29 15:35:26 antoniolinares Exp $
+ * $Id: adordd.ch,v 1.1 2007/05/07 10:02:09 marchuet Exp $
  */
 
 /*
@@ -117,11 +117,19 @@
 
 #define adKeyForeign          2
 
+// Constant Group: ObjectStateEnum
+#define adStateClosed 0
+#define adStateOpen 1
+#define adStateConnecting 2
+#define adStateExecuting 4
+#define adStateFetching 8
+
+
 #command USE <(db)> [VIA <rdd>] [ALIAS <a>] [<nw: NEW>] ;
             [<ex: EXCLUSIVE>] [<sh: SHARED>] [<ro: READONLY>] ;
             [CODEPAGE <cp>] [INDEX <(index1)> [, <(indexN)>]] ;
             [ TABLE <cTable> ] ;
-            [ <dbEngine: ACCESS, MYSQL, ORACLE, INFORMIX, SQL> ];
+            [ <dbEngine: ACCESS, MYSQL, ORACLE, INFORMIX, SQL, FIREBIRD> ];
             [ FROM <cServer> ] ;
             [ QUERY <cQuery> ] ;
             [ USER <cUser> PASSWORD <cPassword> ]=> ;
