@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.25 2005/09/30 23:44:05 druzus Exp $
+ * $Id: eval.c,v 1.26 2005/10/24 01:04:36 druzus Exp $
  */
 
 /*
@@ -91,8 +91,8 @@ BOOL HB_EXPORT hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 
       return TRUE;
    }
-   else
-      return FALSE;
+ 
+   return FALSE;
 }
 
 /* NOTE: CA-Cl*pper is buggy and will not check if more parameters are
@@ -118,25 +118,25 @@ BOOL HB_EXPORT hb_evalPutParam( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 
       return TRUE;
    }
-   else
-      return FALSE;
+
+   return FALSE;
 }
 
 PHB_ITEM HB_EXPORT hb_evalLaunch( PEVALINFO pEvalInfo )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pResult;
+   PHB_ITEM pResult = NULL;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_evalLaunch(%p)", pEvalInfo));
 
    if( pEvalInfo )
    {
-      USHORT uiParam = 1;
+      register USHORT uiParam = 1;
 
       if( HB_IS_STRING( pEvalInfo->pItems[ 0 ] ) )
       {
-         char *ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
+         const char *ptr = pEvalInfo->pItems[ 0 ]->item.asString.value;
 
          hb_vmPushSymbol( hb_dynsymFindName( ptr )->pSymbol );
 
@@ -167,14 +167,6 @@ PHB_ITEM HB_EXPORT hb_evalLaunch( PEVALINFO pEvalInfo )
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
       }
-      else
-      {
-         pResult = NULL;
-      }
-   }
-   else
-   {
-      pResult = NULL;
    }
 
    return pResult;
@@ -190,9 +182,9 @@ BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
 
    if( pEvalInfo )
    {
-      USHORT uiParam;
+      register USHORT uiParam;
 
-      for( uiParam = 0; uiParam <= pEvalInfo->paramCount; uiParam++ )
+      for( uiParam = pEvalInfo->paramCount; uiParam != 0; uiParam-- )
       {
          hb_itemRelease( pEvalInfo->pItems[ uiParam ] );
          pEvalInfo->pItems[ uiParam ] = NULL;
@@ -202,8 +194,8 @@ BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
 
       return TRUE;
    }
-   else
-      return FALSE;
+
+   return FALSE;
 }
 
 /* NOTE: Same purpose as hb_evalLaunch(), but simpler, faster and more flexible.
@@ -245,8 +237,6 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 
       if( pSymbol )
       {
-         ULONG ulParam;
-
          hb_vmPushState();
 
          hb_vmPushSymbol( pSymbol );
@@ -254,6 +244,7 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 
          if( ulPCount )
          {
+            register ULONG ulParam;
             va_list va;
 
             va_start( va, ulPCount );
@@ -273,8 +264,6 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
       }
       else if( HB_IS_BLOCK( pItem ) )
       {
-         ULONG ulParam;
-
          hb_vmPushState();
 
          hb_vmPushSymbol( &hb_symEval );
@@ -282,6 +271,7 @@ PHB_ITEM HB_EXPORT hb_itemDo( PHB_ITEM pItem, ULONG ulPCount, ... )
 
          if( ulPCount )
          {
+            register ULONG ulParam;
             va_list va;
 
             va_start( va, ulPCount );
@@ -333,8 +323,6 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 
       if( pDynSym )
       {
-         ULONG ulParam;
-
          hb_vmPushState();
 
          hb_vmPushSymbol( pDynSym->pSymbol );
@@ -342,6 +330,7 @@ PHB_ITEM HB_EXPORT hb_itemDoC( char * szFunc, ULONG ulPCount, ... )
 
          if( ulPCount )
          {
+            register ULONG ulParam;
             va_list va;
 
             va_start( va, ulPCount );
@@ -383,46 +372,46 @@ PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount
 
       if( pDynSym )
       {
-         PHB_ITEM pParam, pItemRefBuf[ sizeof(ULONG) * 8 ], *pRefBase;
-         HB_ITEM itmRef;
-         ULONG ulParam, ulRef;
-         va_list va;
-
-         pRefBase = pItemRefBuf;
-         /* initialize the reference item */
-         itmRef.type = HB_IT_BYREF;
-         itmRef.item.asRefer.offset = -1;
-         itmRef.item.asRefer.BasePtr.itemsbasePtr = &pRefBase;
-
          hb_vmPushState();
-
          hb_vmPushSymbol( pDynSym->pSymbol );
          hb_vmPushNil();
 
          if( ulPCount )
          {
-            ulRef = 0;
+  		    PHB_ITEM pItemRefBuf[ sizeof(ULONG) * 8 ];
+            HB_ITEM itmRef;
+            register ULONG ulParam;
+  		    ULONG ulRef = 0;
+            va_list va;
+		    PHB_ITEM *pRefBase;
+            PHB_ITEM pParam;
+
+            pRefBase = pItemRefBuf;
+            /* initialize the reference item */
+            itmRef.type = HB_IT_BYREF;
+            itmRef.item.asRefer.offset = -1;
+            itmRef.item.asRefer.BasePtr.itemsbasePtr = &pRefBase;
+
             va_start( va, ulPCount );
             for( ulParam = 0; ulParam < ulPCount; ulParam++ )
             {
                pParam = va_arg( va, PHB_ITEM );
-               if ( ulRefMask & ( 1L << ulParam ) )
+               if( ulRefMask & ( 1L << ulParam ) )
                {
                   /* when item is passed by reference then we have to put
                      the reference on the stack instead of the item itself */
                   pItemRefBuf[ ulRef++ ] = pParam;
-                  itmRef.item.asRefer.value = ulRef;
-                  hb_vmPush( &itmRef );
+                  itmRef.item.asRefer.value = (LONG) ulRef;
+//                  hb_vmPush( &itmRef );
+                  pParam = &itmRef;
                }
-               else
-               {
-                  hb_vmPush( pParam );
-               }
+               hb_vmPush( pParam );
             }
             va_end( va );
          }
 
          hb_vmDo( ( USHORT ) ulPCount );
+
          pResult = hb_itemNew( NULL );
          hb_itemForwardValue( pResult, &(HB_VM_STACK.Return) );
 
@@ -469,11 +458,11 @@ void hb_evalBlock( PHB_ITEM pCodeBlock, ... )
    while( ( pParam = va_arg( args, PHB_ITEM ) ) != NULL )
    {
       hb_vmPush( pParam );
-      uiParams++;
+      ++uiParams;
    }
    va_end( args );
 
-   hb_vmFunction( uiParams );
+   hb_vmFunction( ( USHORT ) uiParams );
 }
 
 /**********************************************************
@@ -507,12 +496,15 @@ HB_FUNC( HB_EXECFROMARRAY )
 {
    HB_THREAD_STUB_API
 
+   register ULONG i;
+   ULONG ulLen = 0;
+   ULONG ulStart = 1;
+   UINT uiPcount = (UINT) hb_pcount();
    PHB_ITEM pFirst = hb_param( 1, HB_IT_ANY );
-   PHB_ITEM pArgs = NULL, pSelf = NULL, pString;
+   PHB_ITEM pArgs = NULL;
+   PHB_ITEM pSelf = NULL;
+   PHB_ITEM pString;
    PHB_DYNS pExecSym = NULL;
-   ULONG i;
-   ULONG ulLen, ulStart = 1;
-   UINT uiPcount = hb_pcount();
    PHB_SYMB pSymbol = NULL;
 
    if( HB_IS_OBJECT( pFirst ) && uiPcount == 2)  /* hb_ExecFromArray( oObject, cMessage | pMessage )  */
@@ -639,13 +631,9 @@ HB_FUNC( HB_EXECFROMARRAY )
    {
       ulLen = hb_arrayLen( pArgs );
    }
-   else
-   {
-      ulLen = 0;
-   }
 
    // pushing the contents of the array
-   for( i = ulStart; i <= ulLen; i ++ )
+   for( i = ulStart; i <= ulLen; i++ )
    {
       hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
    }
@@ -673,10 +661,13 @@ HB_FUNC( HB_EXECFROMARRAY )
 
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
-   PHB_ITEM pArgs, pSelf = NULL, pString;
+   register ULONG i;
+   ULONG ulLen = 0;
+   ULONG ulStart = 1;
+   PHB_ITEM pArgs;
+   PHB_ITEM pString;
+   PHB_ITEM pSelf = NULL;
    PHB_DYNS pExecSym = NULL;
-   ULONG i;
-   ULONG ulLen, ulStart = 1;
    PHB_SYMB pSymbol = NULL;
 
    if( pFirst == NULL || pFirst->type != HB_IT_ARRAY )
@@ -723,7 +714,8 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    {
       pSymbol = pExecSym->pSymbol;
    }
-   else if( pSymbol == NULL )
+   
+   if( pSymbol == NULL )
    {
       return FALSE;
    }
@@ -742,7 +734,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    ulLen = hb_arrayLen( pArgs );
 
    // pushing the contents of the array
-   for( i = ulStart; i <= ulLen; i ++ )
+   for( i = ulStart; i <= ulLen; i++ )
    {
       hb_vmPush( hb_arrayGetItemPtr( pArgs, i ) );
    }
@@ -768,34 +760,27 @@ HB_FUNC( HB_EXEC )
 
    PHB_ITEM pPointer = *( HB_VM_STACK.pBase + 1 + 1 );
 
-   if ( pPointer->type == HB_IT_POINTER )
+   if( pPointer->type == HB_IT_POINTER )
    {
-      PHB_ITEM pSelf;
+      PHB_ITEM pSelf = NULL;
       PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
-      int iParams;
+      int iParams = 0;
 
       if( pSymbol )
       {
-         if( hb_pcount() >= 2 )
+         iParams = hb_pcount();
+         if( iParams >= 2 )
          {
             if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
             {
                pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
-            }
-            else
-            {
-               pSelf = NULL;
-            }
-   
-            iParams = hb_pcount() - 2;
+            }  
+            iParams -= 2;
          }
          else
          {
-            pSelf = NULL;
-            iParams = 0;
             hb_vmPushNil();
          }
-
       }
       else
       {
@@ -813,16 +798,15 @@ HB_FUNC( HB_EXEC )
 
       if( pSelf )
       {
-         hb_vmSend( iParams );
+         hb_vmSend( (USHORT) iParams );
       }
       else
       {
-         hb_vmDo( iParams );
+         hb_vmDo( (USHORT) iParams );
       }
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
-   }
-}
 
+	  return;
+   }
+
+   hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_Exec", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+}
