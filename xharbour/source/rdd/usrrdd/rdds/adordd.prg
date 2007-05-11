@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.6 2007/05/09 15:05:56 marchuet Exp $
+ * $Id: adordd.prg,v 1.7 2007/05/11 10:22:07 marchuet Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 #include "adordd.ch"
 #include "common.ch"
 #include "dbstruct.ch"
+#include "dbinfo.ch"
 
 #ifndef __XHARBOUR__
    #include "hbusrrdd.ch"
@@ -581,21 +582,55 @@ STATIC FUNCTION ADO_ORDINFO( nWA, nIndex, aOrderInfo )
    LOCAL nResult := SUCCESS
 
 	DO CASE
-	CASE nIndex == UR_ORI_TAG
+   CASE nIndex == DBOI_EXPRESSION
 	   IF aOrderInfo[ UR_ORI_TAG ] < aWAData[ WA_CATALOG ]:Tables( aWAData[ WA_TABLENAME ] ):Indexes:Count
          aOrderInfo[ UR_ORI_RESULT ] = aWAData[ WA_CATALOG ]:Tables( aWAData[ WA_TABLENAME ] ):Indexes( aOrderInfo[ UR_ORI_TAG ] ):Name
       ELSE
          aOrderInfo[ UR_ORI_RESULT ] = ""
       ENDIF
-   CASE nIndex == 26 // #define DBOI_KEYCOUNT             26  /* The count of keys in scope and filter */
+   CASE nIndex == DBOI_NAME
+      IF aOrderInfo[ UR_ORI_TAG ] < aWAData[ WA_CATALOG ]:Tables( aWAData[ WA_TABLENAME ] ):Indexes:Count
+         aOrderInfo[ UR_ORI_RESULT ] = aWAData[ WA_CATALOG ]:Tables( aWAData[ WA_TABLENAME ] ):Indexes( aOrderInfo[ UR_ORI_TAG ] ):Name
+      ELSE
+         aOrderInfo[ UR_ORI_RESULT ] = ""
+      ENDIF
+   CASE nIndex == DBOI_NUMBER
+      aOrderInfo[ UR_ORI_RESULT ] = aOrderInfo[ UR_ORI_TAG ]
+   CASE nIndex == DBOI_BAGNAME
+      aOrderInfo[ UR_ORI_RESULT ] := ""
+   CASE nIndex == DBOI_BAGEXT
+      aOrderInfo[ UR_ORI_RESULT ] := ""
+   CASE nIndex == DBOI_ORDERCOUNT
+      aOrderInfo[ UR_ORI_RESULT ] := aWAData[ WA_CATALOG ]:Tables( aWAData[ WA_TABLENAME ] ):Indexes:Count
+   CASE nIndex == DBOI_FILEHANDLE
+      aOrderInfo[ UR_ORI_RESULT ] := 0
+   CASE nIndex == DBOI_ISCOND
+      aOrderInfo[ UR_ORI_RESULT ] := .F.
+   CASE nIndex == DBOI_ISDESC
+      aOrderInfo[ UR_ORI_RESULT ] := .F.
+   CASE nIndex == DBOI_UNIQUE
+      aOrderInfo[ UR_ORI_RESULT ] := .F.
+   CASE nIndex == DBOI_POSITION
+      IF aWAData[ WA_CONNECTION ]:State != adStateClosed
+         ADO_RECID( nWA, @aOrderInfo[ UR_ORI_RESULT ] )
+      ELSE
+         aOrderInfo[ UR_ORI_RESULT ] := 0
+         nResult := FAILURE
+      ENDIF
+   CASE nIndex == DBOI_RECNO
+      IF aWAData[ WA_CONNECTION ]:State != adStateClosed
+         ADO_RECID( nWA, @aOrderInfo[ UR_ORI_RESULT ] )
+      ELSE
+         aOrderInfo[ UR_ORI_RESULT ] := 0
+         nResult := FAILURE
+      ENDIF
+   CASE nIndex == DBOI_KEYCOUNT
       IF aWAData[ WA_CONNECTION ]:State != adStateClosed
          aOrderInfo[ UR_ORI_RESULT ] := oRecordSet:RecordCount
       ELSE
          aOrderInfo[ UR_ORI_RESULT ] := 0
          nResult := FAILURE
       ENDIF
-   CASE nIndex == UR_ORC_DESCEND
-      aOrderInfo[ UR_ORI_RESULT ] := .F.
 	ENDCASE
 
 RETURN nResult
