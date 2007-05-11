@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5511 2007/05/11 16:30:45 hazi01 Exp $
+ * $Id: ChangeLog,v 1.5512 2007/05/11 16:50:18 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-11 18:50 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/pp/ppcore.c
+    * Minor correction to Extended Codeblock support
+
 2007-05-11 18:15 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
     + added HTML classes and functions
       see source\tip\changelog
-   
+
     + tests\tiptest\loadhtml.prg
     + tests\tiptest\dbtohtml.prg
 

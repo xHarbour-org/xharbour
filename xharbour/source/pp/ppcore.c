@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.250 2007/04/16 17:03:17 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.251 2007/05/11 02:05:32 ronpinkas Exp $
  */
 
 /*
@@ -1311,7 +1311,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
          ul = 0;
       }
 
-      if( pState->iExtBlock )
+      if( pState->fCanNextLine == FALSE && pState->iExtBlock )
       {
          hb_pp_tokenAddCmdSep( pState );
          pState->fCanNextLine = TRUE;
