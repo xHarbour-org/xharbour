@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.122 2007/03/25 06:12:51 walito Exp $
+ * $Id: memvars.c,v 1.123 2007/05/09 19:56:23 ronpinkas Exp $
  */
 
 /*
@@ -194,6 +194,11 @@ void hb_memvarsRelease( void )
       {
          if( s_globalTable[ ulCnt ].counter > 0 )
          {
+            if( HB_IS_STRING( s_globalTable[ ulCnt ].pVarItem ) )
+            {
+               hb_itemReleaseString( s_globalTable[ ulCnt ].pVarItem );
+            }
+
             hb_xfree( s_globalTable[ ulCnt ].pVarItem );
             //s_globalTable[ ulCnt ].pVarItem = NULL;
             //s_globalTable[ ulCnt ].counter = 0;
@@ -244,6 +249,11 @@ void hb_memvarsRelease( HB_STACK *pStack )
       {
          if( pStack->globalTable[ ulCnt ].counter > 0 )
          {
+            if( HB_IS_STRING( pStack->globalTable[ ulCnt ].pVarItem ) )
+            {
+               hb_itemReleaseString( pStack->globalTable[ ulCnt ].pVarItem );
+            }
+
             hb_xfree( pStack->globalTable[ ulCnt ].pVarItem );
             //pStack->globalTable[ ulCnt ].pVarItem = NULL;
             pStack->globalTable[ ulCnt ].counter = 0;

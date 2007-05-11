@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.16 2007/04/13 15:39:41 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.17 2007/04/16 03:44:07 ronpinkas Exp $
  */
 
 /*
@@ -342,6 +342,9 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
                                       ( (t)->pNext && HB_PP_TOKEN_ISUNARY( (t)->type ) && \
                                         HB_PP_TOKEN_ISEXPVAL( (t)->pNext->type ) ) )
 
+#define HB_PP_TOKEN_ISEXTBLOCK(t)   ( HB_PP_TOKEN_TYPE( (t)->type ) == HB_PP_TOKEN_LT && \
+                                      (t)->pNext && HB_PP_TOKEN_TYPE( (t)->pNext->type ) == HB_PP_TOKEN_PIPE )
+
 #ifdef HB_C52_STRICT
 /* Clipper supports quoting by [] for 1-st token in the line so we
    are checking for HB_PP_TOKEN_NUL in this macro */
@@ -598,6 +601,7 @@ typedef struct
    int      iInLineCount;        /* number of hb_inLine() functions */
    int      iInLineState;        /* hb_inLine() state */
    int      iInLineBraces;       /* braces counter for hb_inLine() */
+   int      iExtBlock;
 
    PHB_PP_FILE pFile;            /* currently preprocessed file structure */
    int      iFiles;              /* number of open files */
@@ -663,7 +667,7 @@ extern char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, 
 extern PHB_PP_STATE hb_pp_lexNew( char * pString, ULONG ulLen );
 extern PHB_PP_TOKEN hb_pp_lexGet( PHB_PP_STATE pState );
 extern PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState );
-extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr );
+extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_STATE pState );
 
 HB_EXTERN_END
 

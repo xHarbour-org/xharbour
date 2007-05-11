@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.153 2007/04/14 21:47:21 ronpinkas Exp $
+ * $Id: harbour.c,v 1.154 2007/05/10 05:39:53 ronpinkas Exp $
  */
 
 /*
@@ -5292,6 +5292,11 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       wSize += wLocalsLen;
    }
 
+   if( bExt )
+   {
+      wSize += 3; // HB_P_FRAME l, p
+   }
+
    if( wSize <= 255 && pCodeblock->wParamCount == 0 && wLocals == 0 )
    {
       hb_compGenPCode2( HB_P_PUSHBLOCKSHORT, ( BYTE ) wSize, ( BOOL ) 0 );
@@ -5315,6 +5320,24 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       hb_compGenPCode2( HB_LOBYTE( wPos ), HB_HIBYTE( wPos ), ( BOOL ) 0 );
 
       pVar = pVar->pNext;
+   }
+
+   if( bExt )
+   {
+      wLocals = 0;
+      pVar = pCodeblock->pLocals;
+      while( pVar )
+      {
+         wLocals++;
+         pVar = pVar->pNext;
+      }
+
+      if( wLocals )
+      {
+         wLocals -= pCodeblock->wParamCount;
+      }
+
+      hb_compGenPCode3( HB_P_FRAME, wLocals, pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
    }
 
    if( hb_comp_bDebugInfo )
