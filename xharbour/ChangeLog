@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5509 2007/05/11 13:14:40 ran_go Exp $
+ * $Id: ChangeLog,v 1.5510 2007/05/11 15:35:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-11 18:15 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+    + added HTML classes and functions
+      see source\tip\changelog
+   
+    + tests\tiptest\loadhtml.prg
+    + tests\tiptest\dbtohtml.prg
 
 2007-05-11 11:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/classex.ch

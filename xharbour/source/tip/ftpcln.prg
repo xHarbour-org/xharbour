@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.13 2007/02/05 21:24:39 gdrouillard Exp $
+ * $Id: ftpcln.prg,v 1.14 2007/04/23 14:58:01 hazi01 Exp $
  */
 
 /*
@@ -90,6 +90,7 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD TypeI()
    METHOD TypeA()
    METHOD List()
+   METHOD pwd()
    METHOD Cwd()
    METHOD Dele()
    //METHOD Port()
@@ -243,6 +244,16 @@ RETURN ::GetReply()
 METHOD CWD( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "CWD " + cPath + ::cCRLF )
 RETURN ::GetReply()
+
+METHOD PWD() CLASS tIPClientFTP
+   LOCAL aDir
+   ::InetSendall( ::SocketCon, "PWD"  + ::cCRLF )
+   IF .not. ::GetReply()
+      RETURN .F.
+   ENDIF
+   ::cReply := SubStr( ::cReply, At('"', ::cReply) + 1, ;
+                                Rat('"', ::cReply) - At('"', ::cReply) - 1 )
+RETURN .T.
 
 METHOD DELE( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "DELE " + cPath + ::cCRLF )

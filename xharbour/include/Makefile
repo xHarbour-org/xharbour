@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.28 2006/07/04 15:12:51 lculik Exp $
+# $Id: Makefile,v 1.29 2006/07/06 21:26:55 druzus Exp $
 #
 
 ROOT = ../
@@ -112,6 +112,7 @@ PRG_HEADERS=\
 	setcurs.ch   \
 	simpleio.ch  \
 	std.ch       \
+        thtml.ch     \
 	ttable.ch    \
 	classex.ch   \
 	cstruct.ch   \
@@ -121,6 +122,7 @@ PRG_HEADERS=\
 	math.ch      \
 	tbrowse.ch   \
 	tip.ch       \
+        thtml.ch     \
 	usrrdd.ch    \
 	ct.ch        \
 	ctvideo.ch   \

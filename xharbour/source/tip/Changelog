@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.3 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: Changelog,v 1.4 2007/04/23 15:05:42 hazi01 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-11 18:30 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+
+    + tests\tiptest\loadhtml.prg
+    + tests\tiptest\dbtohtml.prg
+
+    + source\tip\thtml.prg
+      New HTML classes
+      + THtmlDocument()
+      + THtmlIterator()
+      + THtmlIteratorScan()
+      + THtmlIteratorRegEx()
+      + THtmlNode()
+
+      New HTML functions
+      + AnsiToHtml()
+      + HtmlToAnsi()
+      + HtmlToOem()
+      + OemToHtml()
+      + THtmlCleanup()
+      + THtmlInit()
+      + THtmlIsValid()
+
+    + include\thtml.ch
+
+    * source\tip\ftpcln.prg
+      + added method :pwd()
+
+    As a short introduction:
+
+    1) THtmlDocument() objects read/write HTML files and streams
+
+    2) THtmlNode() objects know HTML and raise errors upon illegal HTML code
+
+    3) THtmlNode() objects know the "+" and "-" operator for opening/closing an HTML tag
+
+    4) THtmlNode() objects know the ":" operator for querying/creating a HTML node .OR. attribute
+      (sending an unknown message results in a query of lookup tables. If that query is successful,
+      a HTML node .OR. the value of an attribute is returned. Otherwise, a runtime error is raised)
+
+
+
 
 2007-04-23 14:30 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
 

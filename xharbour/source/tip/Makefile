@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2005/11/01 22:05:50 druzus Exp $
+# $Id: Makefile,v 1.6 2006/09/23 18:03:05 lf_sfnet Exp $
 #
 
 ROOT = ../../
@@ -21,7 +21,8 @@ PRG_SOURCES= \
 	client.prg \
 	ftpcln.prg \
 	smtpcln.prg	\
-	cgi.prg
+	cgi.prg \
+        thtml.prg
 
 LIBNAME=tip
 
