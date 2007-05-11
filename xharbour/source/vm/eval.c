@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.26 2005/10/24 01:04:36 druzus Exp $
+ * $Id: eval.c,v 1.27 2007/05/11 13:14:18 ran_go Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
    {
       register USHORT uiParam;
 
-      for( uiParam = pEvalInfo->paramCount; uiParam != 0; uiParam-- )
+      for( uiParam = pEvalInfo->paramCount; uiParam--; )
       {
          hb_itemRelease( pEvalInfo->pItems[ uiParam ] );
          pEvalInfo->pItems[ uiParam ] = NULL;
