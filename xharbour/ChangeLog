@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5510 2007/05/11 15:35:53 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5511 2007/05/11 16:30:45 hazi01 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -22,6 +22,7 @@
 2007-05-11 10:00 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/eval.c
     * Minor optimizations
+    * Fix my mistake at line 187, uiParam count LEN to 0 (Thanks Toninho!)
 
 2007-05-11 13:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/adordd.ch
