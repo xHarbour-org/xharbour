@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.251 2007/05/11 02:05:32 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.252 2007/05/11 22:51:08 ronpinkas Exp $
  */
 
 /*
@@ -3804,6 +3804,14 @@ static PHB_PP_TOKEN * hb_pp_matchResultLstAdd( PHB_PP_STATE pState,
                           pToken->pNext &&
                           ( fStop ? pToken->pNext : pToken->pNext->pNext ) != pNext &&
                           HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_PIPE;
+
+            if( !fBlock )
+            {
+               fBlock = HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_LT &&
+                        pToken->pNext &&
+                        ( fStop ? pToken->pNext : pToken->pNext->pNext ) != pNext &&
+                        HB_PP_TOKEN_TYPE( pToken->pNext->type ) == HB_PP_TOKEN_PIPE;
+            }
 
             if( !fBlock )
             {
