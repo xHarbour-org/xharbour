@@ -1,5 +1,5 @@
 /*
- * $Id: hbfix.c,v 1.41 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: hbfix.c,v 1.42 2007/04/30 01:16:30 ronpinkas Exp $
  */
 
 /*
@@ -331,16 +331,17 @@ static HB_FIX_FUNC( hb_p_localneardec )
 
 static HB_FIX_FUNC( hb_p_localnearaddint )
 {
-   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
-   USHORT wNewId;
-
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( pFunc->wParamCount )
+   /* only local variables used outside of a codeblock need fixing
+    */
+   if( cargo->iNestedCodeblock == 0 && pFunc->wParamCount != 0 )
    {
-      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+      iVar += pFunc->wParamCount;
+
+      if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
       }
       else
       {
@@ -357,16 +358,17 @@ static HB_FIX_FUNC( hb_p_localnearaddint )
 
 static HB_FIX_FUNC( hb_p_localnearsetint )
 {
-   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
-   USHORT wNewId;
-
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( pFunc->wParamCount )
+   /* only local variables used outside of a codeblock need fixing
+    */
+   if( cargo->iNestedCodeblock == 0 && pFunc->wParamCount != 0 )
    {
-      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+      iVar += pFunc->wParamCount;
+
+      if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
       }
       else
       {
@@ -383,16 +385,17 @@ static HB_FIX_FUNC( hb_p_localnearsetint )
 
 static HB_FIX_FUNC( hb_p_localnearsetstr )
 {
-   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
-   USHORT wNewId;
-
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( pFunc->wParamCount )
+   /* only local variables used outside of a codeblock need fixing
+    */
+   if( cargo->iNestedCodeblock == 0 && pFunc->wParamCount != 0 )
    {
-      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+      iVar += pFunc->wParamCount;
+
+      if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
       }
       else
       {
@@ -409,16 +412,17 @@ static HB_FIX_FUNC( hb_p_localnearsetstr )
 
 static HB_FIX_FUNC( hb_p_localnearsetstrhidden )
 {
-   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
-   USHORT wNewId;
-
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( pFunc->wParamCount )
+   /* only local variables used outside of a codeblock need fixing
+    */
+   if( cargo->iNestedCodeblock == 0 && pFunc->wParamCount != 0 )
    {
-      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+      iVar += pFunc->wParamCount;
+
+      if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
       }
       else
       {
@@ -435,16 +439,17 @@ static HB_FIX_FUNC( hb_p_localnearsetstrhidden )
 
 static HB_FIX_FUNC( hb_p_localnearadd )
 {
-   BYTE cVarId = pFunc->pCode[ lPCodePos + 1 ];
-   USHORT wNewId;
-
-   HB_SYMBOL_UNUSED( cargo );
-
-   if( pFunc->wParamCount )
+   /* only local variables used outside of a codeblock need fixing
+    */
+   if( cargo->iNestedCodeblock == 0 && pFunc->wParamCount != 0 )
    {
-      if( ( wNewId = cVarId + pFunc->wParamCount ) < 256 )
+      SHORT iVar = ( signed char ) pFunc->pCode[ lPCodePos + 1 ];
+
+      iVar += pFunc->wParamCount;
+
+      if( HB_LIM_INT8( iVar ) )
       {
-         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) wNewId;
+         pFunc->pCode[ lPCodePos + 1 ] = (BYTE) iVar;
       }
       else
       {

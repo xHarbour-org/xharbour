@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5513 2007/05/11 22:51:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5514 2007/05/11 23:48:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-12 15:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/hbfix.c
+    ! Corrected some local near optimizations which were not excluding detached locals, and were not using HB_LIM_INT8()
+    /* All prg sources must be recompiled to correct compilation of detached locals operations in codeblocks */
+
+  * source/pp/ppcore.c
+    ! Fixed wild match marker support of literal ';'
 
 2007-05-11 19:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/pp/ppcore.c

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.252 2007/05/11 22:51:08 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.253 2007/05/11 23:48:15 ronpinkas Exp $
  */
 
 /*
@@ -3616,7 +3616,14 @@ static BOOL hb_pp_tokenMatch( PHB_PP_TOKEN pMatch, PHB_PP_TOKEN * pTokenPtr,
       {
          fMatch = TRUE;
          do
+         {
             * pTokenPtr = ( * pTokenPtr )->pNext;
+
+            if( HB_PP_TOKEN_TYPE( ( * pTokenPtr )->type ) == HB_PP_TOKEN_EOC )
+            {
+               HB_PP_TOKEN_SETTYPE( * pTokenPtr, HB_PP_TOKEN_TEXT );
+            }
+         }
          while( !HB_PP_TOKEN_ISEOS( * pTokenPtr ) );
       }
    }
