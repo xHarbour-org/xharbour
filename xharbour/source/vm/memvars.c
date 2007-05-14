@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.123 2007/05/09 19:56:23 ronpinkas Exp $
+ * $Id: memvars.c,v 1.124 2007/05/11 02:05:32 ronpinkas Exp $
  */
 
 /*
@@ -705,6 +705,8 @@ void hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR pItem )
    #else
       pDyn = ( PHB_DYNS ) pMemvarSymb->pDynSym;
    #endif
+
+   pItem->type &= ~HB_IT_MEMOFLAG;
 
    if( pDyn )
    {

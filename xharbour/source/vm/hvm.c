@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.630 2007/05/07 13:47:47 ran_go Exp $
+ * $Id: hvm.c,v 1.631 2007/05/07 14:58:56 ran_go Exp $
  */
 
 /*
@@ -1014,7 +1014,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
    HB_THREAD_STUB
 
    ULONG w = 0;
-   ULONG lNextSection /*= 0*/; 
+   ULONG lNextSection /*= 0*/;
    ULONG lCatchSection = 0;
    ULONG lFinallySection = 0;
    ULONG ulPrivateBase = 0;
@@ -2468,7 +2468,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             {
               iJump = HB_PCODE_MKSHORT( &( pCode[ w + 1 ] ) );
             }
-            w += iJump;  
+            w += iJump;
             break;
 		 }
 
@@ -3250,7 +3250,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MACROPUSHARG") );
 
-            /* compile and run - leave the result on the stack 
+            /* compile and run - leave the result on the stack
              * the topmost element on the stack contains a macro
              * string for compilation
              */
@@ -3309,7 +3309,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_MACROPUSHLIST:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MACROPUSHLIST") );
-            /* compile and run - leave the result on the stack 
+            /* compile and run - leave the result on the stack
              * the topmost element on the stack contains a macro
              * string for compilation
              */
@@ -3369,7 +3369,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_MACROPUSHPARE:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_MACROPUSHPARE") );
 
-            /* compile and run - leave the result on the stack 
+            /* compile and run - leave the result on the stack
              * the topmost element on the stack contains a macro
              * string for compilation
              */
@@ -3908,7 +3908,7 @@ static void hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd )
    else
    {
 	  PHB_ITEM pAdd = hb_stackTopItem();
-      PHB_ITEM pSubst; 
+      PHB_ITEM pSubst;
 
       if( lAdd > 0 )
       {
@@ -6499,7 +6499,10 @@ static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements A
 
    for( ulPos = 0; ulPos < ulElements; ulPos++ )
    {
-      hb_itemForwardValue( itArray.item.asArray.value->pItems + ulPos, hb_stackItemFromTop( ulPos - ulElements ) );
+      PHB_ITEM pItem = hb_stackItemFromTop( ulPos - ulElements );
+
+      pItem->type &= ~HB_IT_MEMOFLAG;
+      hb_itemForwardValue( itArray.item.asArray.value->pItems + ulPos, pItem );
    }
 
    /* Poping 1 less than element,so we can override the 1st element with the new array */
@@ -7423,7 +7426,7 @@ static HARBOUR hb_vmDoBlock( void )
    int iParam;
    int iStatics;
    USHORT uiLine;
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmDoBlock()"));
 
    pBlock = hb_stackSelfItem();
