@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.253 2007/05/11 23:48:15 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.254 2007/05/12 19:30:59 ronpinkas Exp $
  */
 
 /*
@@ -1313,13 +1313,16 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
 
       if( pState->fCanNextLine == FALSE && pState->iExtBlock )
       {
-         hb_pp_tokenAddCmdSep( pState );
-         pState->fCanNextLine = TRUE;
+         pState->pFile->iCurrentLine--;
+         hb_pp_tokenAdd( &pState->pNextTokenPtr, "\n", 1, 0, HB_PP_TOKEN_EOL | HB_PP_TOKEN_STATIC );
+         pState->pFile->iTokens++;
+         pState->fNewStatement = TRUE;
+
       }
    }
    while( ( pState->pFile->pLineBuf ? pState->pFile->ulLineBufLen != 0 :
                                       !pState->pFile->fEof ) &&
-          ( pState->fCanNextLine ||
+          ( pState->fCanNextLine || pState->iExtBlock ||
             ( pState->iStreamDump && pState->iStreamDump != HB_PP_STREAM_CLIPPER ) ) );
 
    if( pState->iStreamDump )
