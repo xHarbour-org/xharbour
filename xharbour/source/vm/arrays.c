@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.141 2007/05/08 19:59:22 ran_go Exp $
+ * $Id: arrays.c,v 1.142 2007/05/09 03:34:14 guerra000 Exp $
  */
 
 /*
@@ -174,7 +174,9 @@ BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
          {
             hb_arraySize( pArray, pBaseArray->ulLen + 1 );
          }
+
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+         pValue->type &= ~HB_IT_MEMOFLAG;
          hb_itemCopy( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
          return TRUE;
@@ -202,7 +204,9 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
          {
             hb_arraySize( pArray, pBaseArray->ulLen + 1 );
          }
+
          pBaseArray = ( PHB_BASEARRAY ) pArray->item.asArray.value;
+         pValue->type &= ~HB_IT_MEMOFLAG;
          hb_itemForwardValue( pBaseArray->pItems + ( pBaseArray->ulLen - 1 ), pValue );
 
          return TRUE;
@@ -433,6 +437,7 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
             ( pBaseArray->pItems + ulLen )->type = HB_IT_NIL;
          }
       }
+
       return TRUE;
    }
 
@@ -449,9 +454,11 @@ BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 
       if( HB_IS_BYREF( pElement ) )
       {
-//         hb_itemCopy( hb_itemUnRef( pElement ), pItem );
+         //hb_itemCopy( hb_itemUnRef( pElement ), pItem );
          pElement = hb_itemUnRef( pElement );
       }
+
+      pItem->type &= ~HB_IT_MEMOFLAG;
       hb_itemCopy( pElement, pItem );
 
 	  return TRUE;
@@ -472,9 +479,11 @@ BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
 
       if( HB_IS_BYREF( pElement ) )
       {
-//       hb_itemForwardValue( hb_itemUnRef( pElement ), pItem );
+         //hb_itemForwardValue( hb_itemUnRef( pElement ), pItem );
          pElement = hb_itemUnRef( pElement );
 	  }
+
+      pItem->type &= ~HB_IT_MEMOFLAG;
       hb_itemForwardValue( pElement, pItem );
 
       return TRUE;
@@ -496,8 +505,8 @@ BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 //         hb_itemCopy( pItem, hb_itemUnRef( pElement ) );
          pElement = hb_itemUnRef( pElement );
       }
-      hb_itemCopy( pItem, pElement );
 
+      hb_itemCopy( pItem, pElement );
       return TRUE;
    }
    else
@@ -528,8 +537,8 @@ BOOL HB_EXPORT hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
 //       hb_itemForwardValue( pItem, hb_itemUnRef( pElement ) );
          pElement = hb_itemUnRef( pElement );
       }
-      hb_itemForwardValue( pItem, pElement );
 
+      hb_itemForwardValue( pItem, pElement );
       return TRUE;
    }
 
@@ -577,7 +586,6 @@ BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem 
    else if( pArray->type == HB_IT_STRING && ulIndex > 0 && ulIndex <= pArray->item.asString.length )
    {
       hb_itemPutCLStatic( pItem, hb_szAscii[ (UCHAR) ( pArray->item.asString.value[ ulIndex - 1 ] ) ], 1 );
-
       return TRUE;
    }
 
@@ -898,9 +906,11 @@ void HB_EXPORT hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, UL
 
          if( HB_IS_BYREF( pElement ) )
          {
-//            hb_itemCopy( hb_itemUnRef( pElement ), pValue );
+            //hb_itemCopy( hb_itemUnRef( pElement ), pValue );
             pElement = hb_itemUnRef( pElement );
          }
+
+         pValue->type &= ~HB_IT_MEMOFLAG;
          hb_itemCopy( pElement, pValue );
       }
    }
@@ -990,7 +1000,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       if( HB_IS_BLOCK( pValue ) )
       {
          ULONG ulParams = 2;
-		 
+
 		 if( HB_IS_HASH( pArray ) )
 		 {
 			ulParams = 3;
