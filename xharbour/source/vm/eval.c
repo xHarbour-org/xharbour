@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.27 2007/05/11 13:14:18 ran_go Exp $
+ * $Id: eval.c,v 1.28 2007/05/11 16:45:32 ran_go Exp $
  */
 
 /*
@@ -183,13 +183,14 @@ BOOL HB_EXPORT hb_evalRelease( PEVALINFO pEvalInfo )
    if( pEvalInfo )
    {
       register USHORT uiParam;
+      register USHORT uiParamCount;
 
-      for( uiParam = pEvalInfo->paramCount; uiParam--; )
+      uiParamCount = pEvalInfo->paramCount;
+      for( uiParam = 0; uiParam <= uiParamCount; uiParam++ )
       {
          hb_itemRelease( pEvalInfo->pItems[ uiParam ] );
          pEvalInfo->pItems[ uiParam ] = NULL;
       }
-
       pEvalInfo->paramCount = 0;
 
       return TRUE;
@@ -662,7 +663,7 @@ HB_FUNC( HB_EXECFROMARRAY )
 BOOL hb_execFromArray( PHB_ITEM pFirst )
 {
    register ULONG i;
-   ULONG ulLen = 0;
+   ULONG ulLen;
    ULONG ulStart = 1;
    PHB_ITEM pArgs;
    PHB_ITEM pString;
