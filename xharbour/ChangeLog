@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5521 2007/05/15 15:31:06 modalsist Exp $
+ * $Id: ChangeLog,v 1.5522 2007/05/15 15:46:07 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -20,6 +20,9 @@
   * source/vm/hvm.c
     * Fixed loop "optimisations" that cause bugs, reported by Mindaugas
   * source/vm/dynsym.c
+    * Change USHORT to UINT in return functions
+    * hb_dynsymEval() and hb_dynsymCount()
+  * include/hbapi.h
     * Change USHORT to UINT in return functions
     * hb_dynsymEval() and hb_dynsymCount()
 
