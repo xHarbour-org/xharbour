@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.210 2007/05/04 20:53:22 ran_go Exp $
+ * $Id: hbapi.h,v 1.211 2007/05/08 10:08:29 marchuet Exp $
  */
 
 /*
@@ -692,7 +692,7 @@ extern HB_EXPORT PHB_DYNS    hb_dynsymFind( const char * szName );   /* finds a 
 extern HB_EXPORT PHB_DYNS    hb_dynsymFindName( const char * szName ); /* converts to uppercase and finds a dynamic symbol */
 extern HB_EXPORT void        hb_dynsymLog( void );             /* displays all dynamic symbols */
 extern HB_EXPORT void        hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */
-extern HB_EXPORT USHORT      hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
+extern HB_EXPORT UINT        hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo ); /* enumerates all dynamic symbols */
 extern HB_EXPORT PHB_SYMB    hb_dynsymGetSymbol( const char * szName ); /* finds and creates a dynamic symbol if not found and return pointer to its HB_SYMB structure */
 extern HB_EXPORT PHB_SYMB    hb_dynsymFindSymbol( const char * szName ); /* finds a dynamic symbol and return pointer to its HB_SYMB structure */
 extern HB_EXPORT PHB_SYMB    hb_dynsymSymbol( PHB_DYNS pDynSym );
@@ -703,7 +703,7 @@ extern HB_EXPORT void        hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, const int
 extern HB_EXPORT PHB_DYNS    hb_dynsymFindFromFunction( PHB_FUNC pFunc ); /* returns a dynamic symbol for a given function pointer. */
 extern HB_EXPORT PHB_DYNS    hb_dynsymPos( USHORT uiPos ); /* returns a dynamic symbol from a position index. */
 extern HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void );
-extern HB_EXPORT USHORT    * hb_dynsymCount( void );
+extern HB_EXPORT UINT        * hb_dynsymCount( void );
 
 /* JC1: reentrant function support for dynsym where locking is unapplicable. */
 #ifdef HB_THREAD_SUPPORT
