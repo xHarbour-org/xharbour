@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.142 2007/05/09 03:34:14 guerra000 Exp $
+ * $Id: arrays.c,v 1.143 2007/05/14 21:05:51 ronpinkas Exp $
  */
 
 /*
@@ -927,10 +927,14 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
       ULONG ulCount;
       register PHB_ITEM pItems;
 
+      //TODO: Create hb_hashScan()
       /* Select array type */
-      pItems = pArray->item.asArray.value->pItems;
-      ulLen = pArray->item.asArray.value->ulLen;
       if( pArray->type == HB_IT_HASH )
+      {
+         pItems = pArray->item.asHash.value->pValues;
+         ulLen = pArray->item.asHash.value->ulLen;
+      }
+      else
       {
          pItems = pArray->item.asArray.value->pItems;
          ulLen = pArray->item.asArray.value->ulLen;
@@ -978,6 +982,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
          while( ulCount > pItems->item.asHash.value->ulTotalLen && ulPos == 0 )
          {
             ulPos = hb_arrayScan( pItems, pValue, NULL, &ulCount, bExact, bAllowChar );
+
             if( ulPos == 0 )
             {
                ulCount -= pItems->item.asHash.value->ulTotalLen;
@@ -1011,7 +1016,7 @@ ULONG HB_EXPORT hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart
             hb_vmPushSymbol( &hb_symEval );
             hb_vmPush( pValue );
 
-            if( ulParams == 3)
+            if( ulParams == 3 )
             {
                hb_vmPush( pArray->item.asHash.value->pKeys + ulStart );
             }
