@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.631 2007/05/07 14:58:56 ran_go Exp $
+ * $Id: hvm.c,v 1.632 2007/05/14 01:27:50 ronpinkas Exp $
  */
 
 /*
@@ -477,7 +477,7 @@ static BOOL hb_vmDoInitFunc( char *pFuncSym )
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 {
 #ifndef HB_THREAD_SUPPORT
-   register ULONG ulCounter;
+   register UINT uiCounter;
 #endif
 #if defined(HB_OS_OS2)
    EXCEPTIONREGISTRATIONRECORD RegRec = {0};       /* Exception Registration Record */
@@ -509,16 +509,16 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    HB_VM_STACK.pSequence = NULL;
    HB_VM_STACK.uiActionRequest = 0;
 
-   for( ulCounter = HB_VM_STACK.wWithObjectCounter; ulCounter != 0; ulCounter-- )
+   for( uiCounter = 0; uiCounter < HB_MAX_WITH_OBJECTS; uiCounter++ )
    {
-      HB_VM_STACK.aWithObject[ ulCounter ].type = HB_IT_NIL;
+      HB_VM_STACK.aWithObject[ uiCounter ].type = HB_IT_NIL;
    }
    HB_VM_STACK.wWithObjectCounter = 0;
 
-   for( ulCounter = HB_VM_STACK.wEnumCollectionCounter; ulCounter != 0; ulCounter-- )
+   for( uiCounter = 0; uiCounter < HB_MAX_ENUMERATIONS; uiCounter++ )
    {
-      HB_VM_STACK.aEnumCollection[ ulCounter ].type = HB_IT_NIL;
-      HB_VM_STACK.awEnumIndex[ ulCounter ] = 0;
+      HB_VM_STACK.aEnumCollection[ uiCounter ].type = HB_IT_NIL;
+      HB_VM_STACK.awEnumIndex[ uiCounter ] = 0;
    }
    HB_VM_STACK.wEnumCollectionCounter = 0;
 
@@ -738,7 +738,7 @@ void hb_vmReleaseLocalSymbols( void )
          PHB_SYMB pSymbol;
          PHB_DYNS pDynSym;
 
-         for( ui = pDestroy->uiModuleSymbols; ui--; )
+         for( ui = 0; ui < pDestroy->uiModuleSymbols; ui++ )
          {
             pSymbol = pDestroy->pSymbolTable + ui;
             if( ( pSymbol->scope.value & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )
@@ -763,6 +763,7 @@ int HB_EXPORT hb_vmQuit( void )
 {
    static BOOL bQuitting = FALSE;
    register UINT i;
+   register UINT uiCounter;
 
    HB_THREAD_STUB
 
@@ -843,7 +844,8 @@ int HB_EXPORT hb_vmQuit( void )
    }
 
    // FOR EACH Enumerations.
-   for( i = HB_VM_STACK.wEnumCollectionCounter; i--; )
+   uiCounter = HB_VM_STACK.wEnumCollectionCounter;
+   for( i = 0; i < uiCounter; i++ )
    {
       if( HB_IS_COMPLEX( &( HB_VM_STACK.aEnumCollection[ i ] ) ) )
       {
@@ -852,7 +854,8 @@ int HB_EXPORT hb_vmQuit( void )
    }
 
    // WITH OBJECT
-   for( i = HB_VM_STACK.wWithObjectCounter; i--; )
+   uiCounter = HB_VM_STACK.wWithObjectCounter;
+   for( i = 0; i < uiCounter; i++ )
    {
       if( HB_IS_COMPLEX( &( HB_VM_STACK.aWithObject[ i ] ) ) )
       {
@@ -5513,7 +5516,7 @@ static void hb_vmBitAnd( void )
             hb_itemPutCPtr( pItem1, pString1, ulLen1 );
          }
 
-         for( ulPos1 = ulPos2 = 0; ulPos1 < ulLen1;  ulPos1++ )
+         for( ulPos1 = ulPos2 = 0; ulPos1 < ulLen1; ulPos1++ )
          {
             pString1[ulPos1] &= pString2[ulPos2];
             if( ++ulPos2 == ulLen2 )
@@ -6489,6 +6492,7 @@ static void hb_vmArrayDim( USHORT uiDimensions ) /* generates an uiDimensions Ar
 static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements Array and fills it from the stack values */
 {
    HB_THREAD_STUB
+   PHB_ITEM pItem;
 
    HB_ITEM_NEW( itArray );
    register ULONG ulPos;
@@ -6499,7 +6503,7 @@ static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements A
 
    for( ulPos = 0; ulPos < ulElements; ulPos++ )
    {
-      PHB_ITEM pItem = hb_stackItemFromTop( ulPos - ulElements );
+      pItem = hb_stackItemFromTop( ulPos - ulElements );
 
       pItem->type &= ~HB_IT_MEMOFLAG;
       hb_itemForwardValue( itArray.item.asArray.value->pItems + ulPos, pItem );
@@ -6542,7 +6546,7 @@ static void hb_vmHashGen( const ULONG ulPairs ) /* generates an ulPairs Hash and
 
    for( ulPos = 0; ulPos < ulItems; ulPos += 2 )
    {
-      if( ! hb_hashAdd( pHash, ULONG_MAX, hb_stackItemFromTop( ulPos - ulItems ), hb_stackItemFromTop( ulPos - ulItems + 1 ) ) )
+      if( !hb_hashAdd( pHash, ULONG_MAX, hb_stackItemFromTop( ulPos - ulItems ), hb_stackItemFromTop( ulPos - ulItems + 1 ) ) )
       {
          hb_hashRelease( pHash );
          hb_itemRelease( pHash );
@@ -9095,7 +9099,7 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
       HB_SYMBOLSCOPE scope;
       register UINT ui;
 
-      for( ui = 0; ui < pSymbols->uiModuleSymbols; ui++ )
+      for( ui = 0; ui < pSymbols->uiModuleSymbols; ++ui )
       {
          scope = pSymbols->pSymbolTable[ ui ].scope.value & HB_FS_INITEXIT;
 
@@ -9399,7 +9403,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                             //TraceLog( NULL, "Module '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
 
-                            for( ui = pModuleSymbols->uiModuleSymbols; ui--; )
+                            for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
                             {
                                pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
                                if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->scope.value & HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
@@ -9973,6 +9977,7 @@ HB_FUNC( HB_DBG_PROCLEVEL )
     void hb_vmIsLocalRef( void )
     {
        UINT i;
+	   UINT iCounter;
 
        HB_TRACE(HB_TR_DEBUG, ("hb_vmIsLocalRef()"));
 
@@ -9999,7 +10004,8 @@ HB_FUNC( HB_DBG_PROCLEVEL )
        }
 
        // FOR EACH Enumerations.
-       for( i = 0; i < HB_VM_STACK.wEnumCollectionCounter; i++ )
+	   iCounter = HB_VM_STACK.wEnumCollectionCounter;
+       for( i = 0; i < iCounter; i++ )
        {
           if( HB_IS_GCITEM( &( HB_VM_STACK.aEnumCollection[ i ] ) ) )
           {
@@ -10008,7 +10014,8 @@ HB_FUNC( HB_DBG_PROCLEVEL )
        }
 
        // WITH OBJECT
-       for( i = 0; i < HB_VM_STACK.wWithObjectCounter; i++ )
+	   iCounter = HB_VM_STACK.wWithObjectCounter;
+       for( i = 0; i < iCounter; i++ )
        {
           if( HB_IS_GCITEM( &( HB_VM_STACK.aWithObject[ i ] ) ) )
           {
