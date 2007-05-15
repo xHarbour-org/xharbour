@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5520 2007/05/15 15:19:52 ran_go Exp $
+ * $Id: ChangeLog,v 1.5521 2007/05/15 15:31:06 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -14,11 +14,14 @@
     ! fixed to improve performance under index operation.
       Thanks to Mario H.Sabado and Eduardo Horbino by help.
 
-2007-05-15 10:00 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+2007-05-15 12:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/eval.c
     * Fixed loop "optimisations" that cause bugs, reported by Mindaugas
   * source/vm/hvm.c
     * Fixed loop "optimisations" that cause bugs, reported by Mindaugas
+  * source/vm/dynsym.c
+    * Change USHORT to UINT in return functions
+    * hb_dynsymEval() and hb_dynsymCount()
 
 2007-05-14 21:25 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/arrays.c
