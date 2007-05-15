@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.10 2007/04/24 23:12:54 modalsist Exp $
+ * $Id: browse.prg,v 1.11 2007/05/01 23:42:57 modalsist Exp $
  */
 
 /*
@@ -557,11 +557,32 @@ return nSkipped
 
 *-------------------------
 STATIC FUNCTION dbBottom()
-RETURN ( if( IndexOrd() == 0 , Recno() == LastRec() , OrdKeyNo() == OrdKeyCount() ) )
+*-------------------------
+Local lBot, nRec
+
+// 2007/MAY/15 - E.F. - Don't use OrdKey..() functions because decrease performance.
+//RETURN ( if( IndexOrd() == 0 , Recno() == LastRec() , OrdKeyNo() == OrdKeyCount() ) )
+
+nRec := recno()
+
+if IndexOrd() == 0
+   lBot := ( Recno() == LastRec() )
+else
+   lBot := ( eof() .or. bof() )
+   if !lBot 
+      dbskip()
+      lBot := eof()
+      dbGoto( nRec )
+   endif
+endif
+
+RETURN ( lBot )
 
 *------------------------
 STATIC FUNCTION dbEmpty()
-RETURN ( if( IndexOrd() == 0 , LastRec() == 0 , OrdKeyCount() == 0 ) )
+// 2007/MAY/15 - E.F. - Don't use OrdKey..() functions because decrease performance.
+//RETURN ( if( IndexOrd() == 0 , LastRec() == 0 , OrdKeyCount() == 0 ) )
+RETURN ( if( IndexOrd() == 0 , LastRec() == 0 , ( bof() .and. eof() ) ) )
 
 *-------------------------
 STATIC FUNCTION CursorOn()

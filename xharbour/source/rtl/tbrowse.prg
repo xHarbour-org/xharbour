@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.168 2007/04/09 21:52:18 jabrecer Exp $
+ * $Id: tbrowse.prg,v 1.169 2007/04/24 12:20:03 modalsist Exp $
  */
 
 /*
@@ -3683,7 +3683,7 @@ IF Used()
 
       // Get which work area is used by Tbrowse, if any.
       //
-      lBottom := IF( IndexOrd()=0, Recno() == LastRec(), OrdKeyNo() == OrdKeyCount() )
+      lBottom := IsBottom()
 
       IF lBottom
          Eval( oTb:SkipBlock, -1 )
@@ -3701,7 +3701,9 @@ IF Used()
       NEXT
 
       IF lBottom
-         Eval( oTb:SkipBlock, 1 )
+         IF !oTb:HitTop
+            Eval( oTb:SkipBlock, 1 )
+         ENDIF
       ELSE
          Eval( oTb:SkipBlock, -1 )
       ENDIF
@@ -3711,6 +3713,29 @@ IF Used()
 ENDIF
 
 RETURN ( iif(lIsDB,0,1) )
+
+*-------------------------
+Static Function IsBottom()
+*-------------------------
+* Check if database is positioned at last record.
+* Don't use OrdKeyNo() == OrdKeyCount() because decrease performance.
+*-------------------------------
+LOCAL lBottom, nRec
+
+nRec := Recno()
+
+IF IndexOrd() == 0
+   lBottom := ( nRec == LastRec() )
+ELSE
+   lBottom := ( eof() .or. bof() )
+   if !lBottom
+      dbSkip()
+      lBottom := EOF()
+      dbGoto( nRec )
+   endif
+ENDIF
+
+RETURN ( lBottom )
 
 //-------------------------------------------------------------------//
 //
