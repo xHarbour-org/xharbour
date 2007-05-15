@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.81 2007/03/27 14:23:01 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.82 2007/04/14 21:47:22 ronpinkas Exp $
  */
 
 /*
@@ -929,8 +929,9 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       double dNumber;
       int iDec, iWidth;
 
-      yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
-      yylval.string[0] = 0;
+      //yylval.string = (char*) hb_xgrab( TOKEN_SIZE );
+      //yylval.string[0] = 0;
+      yylval.string = NULL;
 
       iElement = hb_comp_SLX_Str2Num( yytext, &lNumber, &dNumber, &iDec, &iWidth );
 

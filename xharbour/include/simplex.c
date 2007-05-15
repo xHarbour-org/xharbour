@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.21 2007/04/16 17:03:17 ronpinkas Exp $
+ * $Id: simplex.c,v 1.22 2007/04/17 02:57:52 ronpinkas Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ static BOOL bNewLine = TRUE, bStart = TRUE;
 char * yytext = (char *) sToken;
 int yyleng;
 
-#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; iLastToken = 0; }
+#define RESET_LEX() { iLen = 0; iHold = 0; iReturn = 0; bNewLine = TRUE; bIgnoreWords = FALSE; iPairToken = 0; iLastToken = 0; free( sPair ); sPair = NULL; }
 
 /* Above are NOT overidable !!! Need to precede the Language Definitions. */
 
@@ -904,7 +904,7 @@ int SimpLex_GetNextToken( void )
     }
 
 #ifdef NEED_DUMMY_RETURN
-    return 0;  /* Some dumb compilers complain without this */
+    return 0;  /* Some compilers complain without this */
 #endif
 }
 

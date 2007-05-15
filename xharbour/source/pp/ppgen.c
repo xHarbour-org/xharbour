@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.1 2007/02/27 19:33:44 druzus Exp $
+ * $Id: ppgen.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /*
@@ -59,9 +59,16 @@
  * library functions used by PP core code
  * necessary to create stand alone binries
  */
-void * hb_xgrab( ULONG ulSize ) { return malloc( ulSize ); }
-void * hb_xrealloc( void * pMem, ULONG ulSize ) { return realloc( pMem, ulSize ); }
-void hb_xfree( void * pMem ) { free( pMem ); }
+
+#ifndef hb_xgrab
+   void * hb_xgrab( ULONG ulSize ) { return malloc( ulSize ); }
+#endif
+#ifndef hb_xrealloc
+   void * hb_xrealloc( void * pMem, ULONG ulSize ) { return realloc( pMem, ulSize ); }
+#endif
+#ifndef hb_xfree
+   void hb_xfree( void * pMem ) { free( pMem ); }
+#endif
 
 char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
@@ -205,7 +212,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.8 2006/12/08 05:03:54 druzus Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"

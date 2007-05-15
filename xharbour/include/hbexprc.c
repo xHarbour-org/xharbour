@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.21 2007/04/20 03:39:57 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.22 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -959,8 +959,15 @@ HB_EXPR_PTR hb_compExprReducePlusStrings( HB_EXPR_PTR pLeft, HB_EXPR_PTR pRight,
    memcpy( szString + pLeft->ulLength, pRight->value.asString.string, pRight->ulLength );
    pLeft->ulLength += pRight->ulLength;
    szString[ pLeft->ulLength ] = '\0';
+
+   if( pLeft->value.asString.dealloc )
+   {
+      hb_xfree( pLeft->value.asString.string );
+   }
+
    pLeft->value.asString.string = szString;
    pLeft->value.asString.dealloc = TRUE;
+
    hb_compExprFree( pRight, HB_MACRO_PARAM );
 
 #endif

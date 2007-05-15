@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.211 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: hbapi.h,v 1.212 2007/05/15 15:47:51 ran_go Exp $
  */
 
 /*
@@ -519,10 +519,20 @@ extern void  HB_EXPORT  hb_storptr( void * pointer, int iParam, ... ); /* stores
 
 extern HB_EXPORT void    hb_xinit( void );                         /* Initialize fixed memory subsystem */
 extern HB_EXPORT void    hb_xexit( void );                         /* Deinitialize fixed memory subsystem */
-extern HB_EXPORT void *  hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
-extern HB_EXPORT void *  hb_xgrab( ULONG ulSize );                 /* allocates memory, exits on failure */
-extern HB_EXPORT void    hb_xfree( void * pMem );                  /* frees memory */
-extern HB_EXPORT void *  hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
+
+#ifndef hb_xalloc
+   extern HB_EXPORT void *  hb_xalloc( ULONG ulSize );                /* allocates memory, returns NULL on failure */
+#endif
+#ifndef hb_xgrab
+   extern HB_EXPORT void *  hb_xgrab( ULONG ulSize );                 /* allocates memory, exits on failure */
+#endif
+#ifndef hb_xfree
+   extern HB_EXPORT void    hb_xfree( void * pMem );                  /* frees memory */
+#endif
+#ifndef hb_xrealloc
+   extern HB_EXPORT void *  hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
+#endif
+
 extern HB_EXPORT ULONG   hb_xsize( void * pMem );                  /* returns the size of an allocated memory block */
 extern HB_EXPORT ULONG   hb_xquery( USHORT uiMode );               /* Query different types of memory information */
 

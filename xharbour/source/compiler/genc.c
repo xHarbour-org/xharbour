@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.134 2007/04/30 01:16:29 ronpinkas Exp $
+ * $Id: genc.c,v 1.135 2007/05/10 05:39:50 ronpinkas Exp $
  */
 
 /*
@@ -825,7 +825,7 @@ static BOOL hb_compWriteExternEntries( FILE *yyc, BOOL bSymFIRST, BOOL bNewLine,
 
    ul = strlen( szEntries );
 
-   if ( szEntries[ul - 2 ] == ',' )
+   if( ul && szEntries[ul - 2 ] == ',' )
    {
       szEntries[ul - 2 ] = '\0';
    }

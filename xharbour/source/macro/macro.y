@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.28 2006/11/26 21:42:17 ronpinkas Exp $
+ * $Id: macro.y,v 1.29 2007/03/25 06:12:50 walito Exp $
  */
 
 /*
@@ -72,12 +72,16 @@
 
 /* NOTE: these symbols are used internally in bison.simple
  */
-#undef alloca
-#define alloca  hb_xgrab
-#undef malloc
-#define malloc  hb_xgrab
-#undef free
-#define free hb_xfree
+#ifndef hb_xgrab
+   #undef alloca
+   #define alloca  hb_xgrab
+   #undef malloc
+   #define malloc  hb_xgrab
+#endif
+#ifndef hb_xfree
+   #undef free
+   #define free hb_xfree
+#endif
 
 #define HB_MAX_PENDING_MACRO_EXP 16
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.14 2007/01/13 18:54:08 ronpinkas Exp $
+ * $Id: hbpp.c,v 1.15 2007/02/27 15:59:42 druzus Exp $
  */
 
 /*
@@ -623,6 +623,7 @@ void hb_compGenWarning( char* _szWarnings[], char cPrefix, int iWarning, const c
     }
 }
 
+#ifndef hb_xgrab
 void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on failure */
 {
   void * pMem = malloc( ulSize );
@@ -634,7 +635,9 @@ void * hb_xgrab( ULONG ulSize )         /* allocates fixed memory, exits on fail
 
   return pMem;
 }
+#endif
 
+#ifndef hb_xrealloc
 void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
   void * pResult = realloc( pMem, ulSize );
@@ -646,7 +649,9 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 
   return pResult;
 }
+#endif
 
+#ifndef hb_xfree
 void hb_xfree( void * pMem )            /* frees fixed memory */
 {
   HB_TRACE(HB_TR_DEBUG, ("hb_xfree(%p)", pMem));
@@ -656,6 +661,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
   else
     hb_compGenError( hb_pp_szErrors, 'P', HB_PP_ERR_MEMFREE, NULL, NULL );
 }
+#endif
 
 static BOOL hb_pp_fopen( char * szFileName )
 {

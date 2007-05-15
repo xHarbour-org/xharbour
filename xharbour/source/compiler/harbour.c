@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.154 2007/05/10 05:39:53 ronpinkas Exp $
+ * $Id: harbour.c,v 1.155 2007/05/11 02:05:32 ronpinkas Exp $
  */
 
 /*
@@ -532,6 +532,7 @@ static LONG s_ulMemoryConsumed = 0;    /* memory max size consumed */
 
 #endif /* HB_FM_STATISTICS */
 
+#ifndef hb_xgrab
 void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failure */
 {
 #ifdef HB_FM_STATISTICS
@@ -578,7 +579,9 @@ void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failu
 
    return pMem;
 }
+#endif
 
+#ifndef hb_xrealloc
 void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
@@ -648,7 +651,9 @@ void * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 
    return pResult;
 }
+#endif
 
+#ifndef hb_xfree
 void hb_xfree( void * pMem )            /* frees fixed memory */
 {
    if( pMem )
@@ -687,6 +692,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
       hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_MEMFREE, NULL, NULL );
    }
 }
+#endif
 
 ULONG hb_xquery( USHORT uiMode )
 {

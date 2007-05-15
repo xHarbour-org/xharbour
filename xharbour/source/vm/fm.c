@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.74 2006/02/13 23:11:00 druzus Exp $
+ * $Id: fm.c,v 1.75 2007/05/09 19:56:23 ronpinkas Exp $
  */
 
 /*
@@ -163,6 +163,7 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 #endif
 
 /* allocates fixed memory, do *not* exits on failure */
+#ifndef hb_xalloc
 void HB_EXPORT * hb_xalloc( ULONG ulSize )
 {
    void * pMem;
@@ -275,7 +276,9 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 
 #endif
 }
+#endif
 
+#ifndef hb_xgrab
 /* allocates fixed memory, exits on failure */
 void HB_EXPORT * hb_xgrab( ULONG ulSize )
 {
@@ -394,7 +397,9 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 
 #endif
 }
+#endif
 
+#ifndef hb_xrealloc
 void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
@@ -522,7 +527,9 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
 #endif
 }
+#endif
 
+#ifndef hb_xfree
 void hb_xfree( void * pMem )            /* frees fixed memory */
 {
 
@@ -609,6 +616,7 @@ void hb_xfree( void * pMem )            /* frees fixed memory */
 
 #endif
 }
+#endif
 
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is
          not defined, don't use it for final code [vszakats] */

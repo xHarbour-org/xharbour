@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5522 2007/05/15 15:46:07 ran_go Exp $
+ * $Id: ChangeLog,v 1.5523 2007/05/15 15:49:02 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-15 17:31 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * source/pp/ppgen.c
+  * source/vm/fm.c
+  * utils/hbpp/hbpp.c
+  * include/hbexprc.c
+  * source/macro/macro.y
+  * source/compiler/harbour.c
+    + Allow to redirect hb_xgrab(), hb_xalloc(), hb_xrealloc(), hb_xfree(0
+
+  * include/simplex.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    ! Fixed some memory leaks - work in progress
+
+  * source/compiler/genc.c
+    ! Fixed GPF trap
 
 2007-05-15 12:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
