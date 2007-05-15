@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.38 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.39 2007/05/04 20:52:27 ran_go Exp $
  */
 
 /*
@@ -697,7 +697,7 @@ void HB_EXPORT hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, const int iArea )
    pDynSym->hArea = (HB_HANDLE) iArea;
 }
 
-USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
+UINT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 {
    register UINT uiPos;
    BOOL bCont = TRUE;
@@ -713,7 +713,7 @@ USHORT HB_EXPORT hb_dynsymEval( PHB_DYNS_FUNC pFunction, void * Cargo )
 
    hb_dynsymUnlock();
 
-   return (USHORT) uiPos;
+   return uiPos;
 }
 
 /* JC1: this is called at VM termination, no need to lock */
@@ -763,9 +763,9 @@ HB_EXPORT PDYNHB_ITEM hb_dynsymItems( void )
    return s_pDynItems;
 }
 
-HB_EXPORT USHORT *hb_dynsymCount( void )
+HB_EXPORT UINT *hb_dynsymCount( void )
 {
-   return (USHORT *) &s_uiDynSymbols;
+   return &s_uiDynSymbols;
 }
 
 #ifdef HB_EXTENSION
