@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.117 2007/05/11 02:05:32 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.118 2007/05/15 21:34:12 ronpinkas Exp $
  */
 
 /*
@@ -3564,13 +3564,19 @@ static void hb_compRTVariableAdd( HB_EXPR_PTR pVar, BOOL bPopInitValue )
    if( hb_comp_rtvars )
    {
       HB_RTVAR_PTR pLast = hb_comp_rtvars;
+
       while( pLast->pNext )
+      {
          pLast = pLast->pNext;
+      }
+
       pLast->pNext = pRTvar;
       pRTvar->pPrev = pLast;
    }
    else
+   {
       hb_comp_rtvars = pRTvar;
+   }
 }
 
 static void hb_compRTVariableGen( char * szCreateFun )
@@ -3580,7 +3586,7 @@ static void hb_compRTVariableGen( char * szCreateFun )
    HB_RTVAR_PTR pDel;
 
    /* generate the function call frame */
-   hb_compGenPushSymbol( hb_strdup( szCreateFun ), TRUE, FALSE );
+   hb_compGenPushSymbol( hb_compIdentifierNew( szCreateFun, TRUE ), TRUE, FALSE );
    hb_compGenPushNil();
 
    /* push variable names to create */
@@ -3590,26 +3596,38 @@ static void hb_compRTVariableGen( char * szCreateFun )
       pVar = pVar->pNext;
       ++usCount;
    }
+
    hb_compExprGenPush( pVar->pVar );
    ++usCount;
 
    /* call function that will create either PUBLIC or PRIVATE variables */
    if( usCount > 255 )
+   {
       hb_compGenPCode3( HB_P_DO, HB_LOBYTE( usCount ), HB_HIBYTE( usCount ), ( BOOL ) 1 );
+   }
    else
+   {
       hb_compGenPCode2( HB_P_DOSHORT, ( BYTE ) usCount, ( BOOL ) 1 );
+   }
 
    /* pop initial values */
    while( pVar )
    {
       if( pVar->bPopValue )
+      {
          hb_compExprDelete( hb_compExprGenPop( pVar->pVar ) );
+      }
       else
+      {
          hb_compExprDelete( pVar->pVar );
+      }
+
       pDel = pVar;
       pVar = pVar->pPrev;
+
       hb_xfree( pDel );
    }
+
    hb_comp_rtvars = NULL;
 }
 

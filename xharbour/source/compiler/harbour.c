@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.156 2007/05/15 21:34:12 ronpinkas Exp $
+ * $Id: harbour.c,v 1.157 2007/05/16 15:01:06 ronpinkas Exp $
  */
 
 /*
@@ -1102,7 +1102,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1159,7 +1159,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1214,7 +1214,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_strdup( szVarName ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -2253,7 +2253,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
-	
+
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INITEXIT )
@@ -2325,7 +2325,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       hb_comp_functions.pLast->pNext = pFunc;
       hb_comp_functions.pLast = pFunc;
    }
-   
+
    hb_comp_functions.iCount++;
 
    hb_comp_ulLastLinePos = 0;   /* optimization of line numbers opcode generation */
@@ -2340,7 +2340,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    {
       char szFileName[ _POSIX_PATH_MAX ];
       PHB_FNAME hb_FileName;
-	   
+
       hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
       hb_FileName->szPath = NULL;
       hb_fsFNameMerge( szFileName, hb_FileName );
@@ -2522,7 +2522,7 @@ PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL pSym )
 
 void hb_compGenBreak( void )
 {
-   hb_compGenPushSymbol( hb_strdup("BREAK"), TRUE, FALSE );
+   hb_compGenPushSymbol( hb_compIdentifierNew( "BREAK", TRUE ), TRUE, FALSE );
    hb_compGenPushNil();
 }
 
@@ -2545,7 +2545,7 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
 
    if( hb_comp_bDebugInfo )
    {
-      hb_compExternAdd( hb_strdup( "__DBGENTRY" ), (HB_SYMBOLSCOPE) 0 );
+      hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), (HB_SYMBOLSCOPE) 0 );
    }
 
    while( hb_comp_pExterns )
@@ -3442,7 +3442,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
          bPCode = HB_P_PUSHALIASEDFIELD;
       }
 
-      hb_compGenPushSymbol( hb_strdup( pField->szAlias ), FALSE, TRUE );
+      hb_compGenPushSymbol( hb_compIdentifierNew(  pField->szAlias, TRUE ), FALSE, TRUE );
    }
 
    hb_compGenVarPCode( bPCode, szVarName );
@@ -3686,7 +3686,7 @@ void hb_compGenPopAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_strdup( szAlias ), FALSE, TRUE );
+                  hb_compGenPushSymbol( hb_compIdentifierNew(  szAlias, TRUE ), FALSE, TRUE );
                   hb_compGenVarPCode( HB_P_POPALIASEDFIELD, szVarName );
                }
             }
@@ -4006,7 +4006,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_strdup( szAlias ), FALSE, TRUE );
+                  hb_compGenPushSymbol( hb_compIdentifierNew( szAlias, TRUE ), FALSE, TRUE );
                   hb_compGenVarPCode( HB_P_PUSHALIASEDFIELD, szVarName );
                }
             }
@@ -4057,6 +4057,7 @@ void hb_compGenPushFunCall( char * szFunName )
    char * szFunction;
 
    szFunction = hb_compReservedName( szFunName );
+
    if( szFunction )
    {
       /* Abbreviated function name was used - change it for whole name
@@ -5070,7 +5071,7 @@ void hb_compStaticDefStart( void )
    {
       BYTE pBuffer[ 5 ];
 
-      hb_comp_pInitFunc = hb_compFunctionNew( hb_strdup("(_INITSTATICS)"), HB_FS_INIT );
+      hb_comp_pInitFunc = hb_compFunctionNew( hb_compIdentifierNew( "(_INITSTATICS)", TRUE ), HB_FS_INIT );
       hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pInitFunc->bFlags = FUN_USES_STATICS | FUN_PROCEDURE;
       hb_comp_pInitFunc->cScope = HB_FS_INITEXIT;
@@ -5123,7 +5124,7 @@ void hb_compGlobalsDefStart( void )
 {
    if( ! hb_comp_pGlobalsFunc )
    {
-      hb_comp_pGlobalsFunc = hb_compFunctionNew( hb_strdup("[_INITGLOBALS]"), HB_FS_INIT );
+      hb_comp_pGlobalsFunc = hb_compFunctionNew( hb_compIdentifierNew( "[_INITGLOBALS]", TRUE ), HB_FS_INIT );
       hb_comp_pGlobalsFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pGlobalsFunc->bFlags = FUN_PROCEDURE;
       hb_comp_pGlobalsFunc->cScope = HB_FS_INITEXIT;
@@ -5169,7 +5170,7 @@ static void hb_compLineNumberDefStart( void )
 {
    if( ! hb_comp_pLineNumberFunc )
    {
-      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_strdup("<_INITLINES>"), HB_FS_INIT );
+      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_compIdentifierNew( "<_INITLINES>", TRUE ), HB_FS_INIT );
       hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pLineNumberFunc->bFlags = 0;
       hb_comp_pLineNumberFunc->cScope = HB_FS_INITEXIT;
@@ -5831,7 +5832,7 @@ static int hb_compCompile( char * szPrg )
                {
                   PCOMSYMBOL pSym;
 
-                  pSym = hb_compSymbolAdd( hb_strdup( "{_REGISTERGLOBALS}" ), NULL, TRUE );
+                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( "{_REGISTERGLOBALS}", TRUE ), NULL, TRUE );
                   pSym->cScope = HB_FS_INITEXIT;
                }
             }
