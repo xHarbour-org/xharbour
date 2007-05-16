@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.ch,v 1.1 2007/05/07 10:02:09 marchuet Exp $
+ * $Id: adordd.ch,v 1.2 2007/05/11 10:22:07 marchuet Exp $
  */
 
 /*
@@ -123,6 +123,55 @@
 #define adStateConnecting 2
 #define adStateExecuting 4
 #define adStateFetching 8
+
+// Constant Group: SchemaEnum
+#define adSchemaProviderSpecific -1
+#define adSchemaAsserts 0
+#define adSchemaCatalogs 1
+#define adSchemaCharacterSets 2
+#define adSchemaCollations 3
+#define adSchemaColumns 4
+#define adSchemaCheckConstraints 5
+#define adSchemaConstraintColumnUsage 6
+#define adSchemaConstraintTableUsage 7
+#define adSchemaKeyColumnUsage 8
+#define adSchemaReferentialContraints 9
+#define adSchemaReferentialConstraints 9
+#define adSchemaTableConstraints 10
+#define adSchemaColumnsDomainUsage 11
+#define adSchemaIndexes 12
+#define adSchemaColumnPrivileges 13
+#define adSchemaTablePrivileges 14
+#define adSchemaUsagePrivileges 15
+#define adSchemaProcedures 16
+#define adSchemaSchemata 17
+#define adSchemaSQLLanguages 18
+#define adSchemaStatistics 19
+#define adSchemaTables 20
+#define adSchemaTranslations 21
+#define adSchemaProviderTypes 22
+#define adSchemaViews 23
+#define adSchemaViewColumnUsage 24
+#define adSchemaViewTableUsage 25
+#define adSchemaProcedureParameters 26
+#define adSchemaForeignKeys 27
+#define adSchemaPrimaryKeys 28
+#define adSchemaProcedureColumns 29
+#define adSchemaDBInfoKeywords 30
+#define adSchemaDBInfoLiterals 31
+#define adSchemaCubes 32
+#define adSchemaDimensions 33
+#define adSchemaHierarchies 34
+#define adSchemaLevels 35
+#define adSchemaMeasures 36
+#define adSchemaProperties 37
+#define adSchemaMembers 38
+#define adSchemaTrustees 39
+#define adSchemaFunctions 40
+#define adSchemaActions 41
+#define adSchemaCommands 42
+#define adSchemaSets 43
+
 
 
 #command USE <(db)> [VIA <rdd>] [ALIAS <a>] [<nw: NEW>] ;
