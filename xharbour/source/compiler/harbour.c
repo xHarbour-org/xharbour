@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.155 2007/05/11 02:05:32 ronpinkas Exp $
+ * $Id: harbour.c,v 1.156 2007/05/15 21:34:12 ronpinkas Exp $
  */
 
 /*
@@ -2253,12 +2253,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
-   char szFileName[ _POSIX_PATH_MAX ];
-   PHB_FNAME hb_FileName;
-
-   hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
-   hb_FileName->szPath = NULL;
-   hb_fsFNameMerge( szFileName, hb_FileName );
+	
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
    if( cScope & HB_FS_INITEXIT )
@@ -2330,6 +2325,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       hb_comp_functions.pLast->pNext = pFunc;
       hb_comp_functions.pLast = pFunc;
    }
+   
    hb_comp_functions.iCount++;
 
    hb_comp_ulLastLinePos = 0;   /* optimization of line numbers opcode generation */
@@ -2342,6 +2338,13 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( hb_comp_bDebugInfo )
    {
+      char szFileName[ _POSIX_PATH_MAX ];
+      PHB_FNAME hb_FileName;
+	   
+      hb_FileName = hb_fsFNameSplit( hb_pp_fileName( hb_comp_PP ) );
+      hb_FileName->szPath = NULL;
+      hb_fsFNameMerge( szFileName, hb_FileName );
+      hb_xfree( (void *) hb_FileName );
       hb_compGenModuleName( szFileName, szFunName );
    }
 
