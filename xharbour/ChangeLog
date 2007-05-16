@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5525 2007/05/16 05:16:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5526 2007/05/16 10:36:51 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-17 10:29 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/simplex.c
+    * Minor trap
+
 2007-05-11 13:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/adordd.ch
   * source/rdd/usrrdd/rdds/adordd.prg
      * Syntax corrections.
-
 
 2007-05-16 01:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c

@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.23 2007/05/15 21:34:11 ronpinkas Exp $
+ * $Id: simplex.c,v 1.24 2007/05/16 05:16:50 ronpinkas Exp $
  */
 
 /*
@@ -480,7 +480,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
             DEBUG_INFO( printf(  "Released %i Now Holding %i Tokens: %i %i %i %i\n", iRet, iHold, aiHold[0], aiHold[1], aiHold[2], aiHold[3] ) ); \
             bIgnoreWords = FALSE;\
             \
-            if( iRet < 256 ) \
+            if( iRet > 0 && iRet < 256 ) \
             { \
                if( acNewLine[iRet] ) bNewLine = TRUE; \
             } \
