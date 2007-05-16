@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.22 2007/04/17 02:57:52 ronpinkas Exp $
+ * $Id: simplex.c,v 1.23 2007/05/15 21:34:11 ronpinkas Exp $
  */
 
 /*
@@ -522,6 +522,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
 
 YY_DECL
 {
+    sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
     LEX_USER_SETUP();
 
  Start :
@@ -540,7 +541,6 @@ YY_DECL
        if( bStart )
        {
           bStart = FALSE;
-          sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
           GenTrees();
           INIT_ACTION();
        }
