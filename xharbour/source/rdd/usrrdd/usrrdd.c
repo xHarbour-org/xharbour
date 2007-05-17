@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.8 2007/05/04 20:56:11 ran_go Exp $
+ * $Id: usrrdd.c,v 1.9 2007/05/07 10:19:54 marchuet Exp $
  */
 
 /*
@@ -2429,7 +2429,7 @@ static ERRCODE hb_usrEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 /*
  * Network operations
  */
- 
+
 static ERRCODE hb_usrRawLock( AREAP pArea, USHORT uiAction, ULONG ulRecNo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrRawLock(%p,%hu,%lu)", pArea, uiAction, ulRecNo));

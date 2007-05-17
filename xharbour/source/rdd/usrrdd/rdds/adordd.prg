@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.8 2007/05/11 11:00:23 marchuet Exp $
+ * $Id: adordd.prg,v 1.9 2007/05/16 10:36:52 marchuet Exp $
  */
 
 /*
@@ -22,6 +22,7 @@
  *  ADO_ZAP( nWA )
  *  ADO_ORDINFO( nWA, nIndex, aOrderInfo ) some modifications
  *  ADO_RECINFO( nWA, nRecord, nInfoType, uInfo )
+ *  ADO_FIELDINFO( nWA, nField, nInfoType, uInfo )
  *
  * www - http://www.xharbour.org
  *
@@ -328,6 +329,13 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
       aWAData[ WA_CONNOPEN ] = .F.
    ENDIF
 
+   // will be initilized
+   s_cQuery := ""
+
+   IF Empty( aWAData[ WA_QUERY ] )
+      aWAData[ WA_QUERY ] := "SELECT * FROM "
+   ENDIF
+
    oRecordSet := TOleAuto():New( "ADODB.Recordset" )
 
    IF oRecordSet == NIL
@@ -345,7 +353,12 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
    oRecordSet:CursorType     = adOpenDynamic
    oRecordSet:CursorLocation = adUseClient
    oRecordSet:LockType       = adLockPessimistic
-   oRecordSet:Open( aWAData[ WA_QUERY ] + aWAData[ WA_TABLENAME ], aWAData[ WA_CONNECTION ] )
+   IF aWAData[ WA_QUERY ] == "SELECT * FROM "
+      oRecordSet:Open( aWAData[ WA_QUERY ] + aWAData[ WA_TABLENAME ], aWAData[ WA_CONNECTION ] )
+   ELSE
+      oRecordSet:Open( aWAData[ WA_QUERY ], aWAData[ WA_CONNECTION ] )
+   ENDIF
+
    aWAData[ WA_RECORDSET ] := oRecordSet
    aWAData[ WA_BOF ] := aWAData[ WA_EOF ] := .F.
 
@@ -399,6 +412,13 @@ STATIC FUNCTION ADO_GETVALUE( nWA, nField, xValue )
          xValue := nil
       ELSE
          xValue := :Fields( nField - 1 ):Value
+         IF ADO_GETFIELDTYPE( :Fields( nField - 1 ):Type ) == HB_FT_STRING
+            IF ValType( xValue ) == "U"
+                xValue := Space( :Fields( nField - 1 ):DefinedSize )
+            ELSE
+                xValue := PadR( xValue, :Fields( nField - 1 ):DefinedSize )
+            ENDIF
+         ENDIF
       ENDIF
    END WITH
 
@@ -693,6 +713,71 @@ STATIC FUNCTION ADO_RECINFO( nWA, nRecord, nInfoType, uInfo )
 
 RETURN nResult
 
+STATIC FUNCTION ADO_FIELDINFO( nWA, nField, nInfoType, uInfo )
+
+   LOCAL nType, nLen
+   LOCAL nResult := SUCCESS
+   LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
+
+   DO CASE
+   CASE nInfoType == DBS_NAME
+       uInfo := oRecordSet:Fields( nField - 1 ):Name
+
+   CASE nInfoType == DBS_TYPE
+       nType := ADO_GETFIELDTYPE( oRecordSet:Fields( nField - 1 ):Type )
+       DO CASE
+       CASE nType == HB_FT_STRING
+           uInfo := "C"
+       CASE nType == HB_FT_LOGICAL
+           uInfo := "L"
+       CASE nType == HB_FT_MEMO
+           uInfo := "M"
+       CASE nType == HB_FT_OLE
+           uInfo := "G"
+       CASE nType == HB_FT_ANY
+           uInfo := "V"
+       CASE nType == HB_FT_DATE
+           uInfo := "D"
+       CASE nType == HB_FT_DATETIME
+           uInfo := "T"
+       CASE nType == HB_FT_TIMESTAMP
+           uInfo := "@"
+       CASE nType == HB_FT_LONG
+           uInfo := "N"
+       CASE nType == HB_FT_INTEGER
+           uInfo := "I"
+       CASE nType == HB_FT_DOUBLE
+           uInfo := "B"
+       OTHERWISE
+           uInfo := "U"
+       ENDCASE
+
+   CASE nInfoType == DBS_LEN
+        ADO_FIELDINFO( nWA, nField, DBS_TYPE, @nType )
+        IF nType == 'N'
+            nLen := oRecordSet:Fields( nField - 1 ):Precision
+        ELSE
+            nLen := oRecordSet:Fields( nField - 1 ):DefinedSize
+        ENDIF
+        // Un campo mayor de 1024 lo consideramos un campo memo
+        uInfo := If( nLen > 1024, 10, nLen )
+
+   CASE nInfoType == DBS_DEC
+        ADO_FIELDINFO( nWA, nField, DBS_LEN, @nLen )
+        ADO_FIELDINFO( nWA, nField, DBS_TYPE, @nType )
+        IF oRecordSet:Fields( nField - 1 ):Type == adInteger
+            uInfo := 0
+        ELSEIF nType == 'N'
+            uInfo := Min( Max( 0, nLen - 1 - oRecordSet:Fields( nField - 1 ):DefinedSize ), 15 )
+        ELSE
+            uInfo := 0
+        ENDIF
+   OTHERWISE
+       RETURN FAILURE
+   ENDCASE
+
+RETURN SUCCESS
+
 STATIC FUNCTION ADO_ORDLSTFOCUS( nWA, aOrderInfo )
 /*
    LOCAL nRecNo
@@ -958,6 +1043,7 @@ FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_FLUSH ]        := ( @ADO_FLUSH() )
    aMyFunc[ UR_ORDINFO ]      := ( @ADO_ORDINFO() )
    aMyFunc[ UR_RECINFO ]      := ( @ADO_RECINFO() )
+   aMyFunc[ UR_FIELDINFO ]    := ( @ADO_FIELDINFO() )
    aMyFunc[ UR_ORDLSTFOCUS ]  := ( @ADO_ORDLSTFOCUS() )
    aMyFunc[ UR_PACK ]         := ( @ADO_PACK() )
    aMyFunc[ UR_RAWLOCK ]      := ( @ADO_RAWLOCK() )
@@ -1133,7 +1219,7 @@ function HB_AdoSetPassword( cPassword )
 
 RETURN NIL
 
-function HB_AdoSetQuery( cQuery )
+FUNCTION HB_AdoSetQuery( cQuery )
 
    DEFAULT cQuery TO "SELECT * FROM "
 
