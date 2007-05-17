@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.157 2007/05/16 15:01:06 ronpinkas Exp $
+ * $Id: harbour.c,v 1.158 2007/05/16 17:51:27 ronpinkas Exp $
  */
 
 /*
@@ -956,6 +956,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 {
    PVAR pVar, pLastVar;
    PFUNCTION pFunc = hb_comp_functions.pLast;
+   BOOL bUsed = FALSE;
 
    HB_SYMBOL_UNUSED( cValueType );
 
@@ -1078,6 +1079,8 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
             pLastVar->pNext = pVar;
          }
+		 
+		 bUsed = TRUE;
       }
 
       switch( hb_comp_iVarScope )
@@ -1147,6 +1150,8 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                      pLastVar->pNext = pVar;
                   }
+				  
+				  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
             }
@@ -1202,6 +1207,8 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                      pLastVar->pNext = pVar;
                   }
+				  
+				  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
             }
@@ -1222,6 +1229,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
             break;
       }
+	  
+	  if( ! bUsed )
+	  {
+	     hb_xfree( pVar );
+	  }
    }
    else
    {
