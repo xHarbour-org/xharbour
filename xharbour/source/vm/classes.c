@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.206 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: classes.c,v 1.207 2007/04/29 18:08:41 andresreyesh Exp $
  */
 
 /*
@@ -441,13 +441,13 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          }
 
          // ----------------- Compare Modules -----------------
-         
+
          if( HB_IS_OBJECT( pCaller ) )
          {
             PCLASS pCallerClass = s_pClasses + ( pCaller->item.asArray.value->uiClass - 1 );
             PSYMBOLS pCallerClassModuleSymbols = HB_SYM_GETMODULESYM( pCallerClass->pClsSymbol );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-            
+
             if( pRealClassModuleSymbols == NULL || pCallerClassModuleSymbols == NULL )
             {
                //TraceLog( NULL, "Oops! No Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCallerClass->szName );
@@ -468,7 +468,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          {
             PSYMBOLS pBlockModuleSymbols = HB_SYM_GETMODULESYM( pCaller->item.asBlock.value->symbol );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-            
+
             if( pRealClassModuleSymbols == NULL || pBlockModuleSymbols == NULL )
             {
                //TraceLog( NULL, "Oops! NO Module for Method: '%s' Class: '%s' Caller: '%s'\n", pMethod->pMessage->pSymbol->szName, pRealClass->szName, pCaller->item.asBlock.value->symbol->szName );
@@ -491,7 +491,7 @@ static BOOL hb_clsValidScope( PHB_ITEM pObject, PMETHOD pMethod, int iOptimizedS
          {
             PSYMBOLS pModuleSymbols = HB_BASE_GETMODULESYM( pBase );
             PSYMBOLS pRealClassModuleSymbols = HB_SYM_GETMODULESYM( pRealClass->pClsSymbol );
-            
+
             if( pRealClassModuleSymbols && pModuleSymbols )
             {
                #ifdef DEBUG_SCOPE
@@ -1055,12 +1055,11 @@ static void hb_clsSaveMethod( PHB_DYNS pMsg, int iPivot, PCLASS pClass, USHORT u
    int iLen;
    PMETHDYN pDict;
 
-      iLen = ( int ) uiAt;
-
+   iLen = ( int ) uiAt;
 
    pDict = pClass->pMethDyn;
 
-   if( iPivot+1 < iLen )
+   if( iPivot + 1 < iLen )
    {
       memmove( pDict + iPivot + 1, pDict + iPivot, (iLen - (iPivot + 1)) * sizeof( METHDYN ) );
    }
@@ -1789,7 +1788,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( ( (PHB_ITEM ) pFunc_or_BlockPointer )->item.asBlock.value->symbol );
-            //TraceLog( NULL, "NEW INLINE Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
+            //TraceLog( NULL, "NEW INLINE Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_ITEM ) pFunc_or_BlockPointer )->item.asBlock.value->symbol->szName );
 
             ((PHB_ITEM) pFunc_or_BlockPointer)->item.asBlock.value->uiClass = uiClass;
 
@@ -1841,7 +1840,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             {
                pNewMeth->pMsgIs = NULL;
             }
-            
+
             if( pInit && HB_IS_STRING( pInit ) )
             {
                pNewMeth->pMsgTo =  hb_dynsymGet( pInit->item.asString.value )->pSymbol;
@@ -1850,12 +1849,12 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             {
                pNewMeth->pMsgTo = NULL;
             }
-            
+
             if( pInit && HB_IS_OBJECT( pInit ) )
             {
                pNewMeth->pInitValue = hb_itemNew( pInit );
             }
-            
+
             pNewMeth->uiScope = uiScope;
             pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_SYMBOL);
             pNewMeth->pFunction = hb___msgDelegate;
@@ -2222,6 +2221,8 @@ HB_FUNC( __CLSNEW )
                hb_clsSaveMethod( pNewMethod->pMessage, iPos, pNewCls, (USHORT) ulSize );
             }
 
+            //TraceLog( NULL, "NEW INHERITED Method: %s:%s from CLASS %s Module: %s Pos: %i %i\n", pNewCls->szName, pNewMethod->pMessage->pSymbol->szName, pSprCls->szName, pNewMethod->pModuleSymbols->szModuleName, iPos, ulSize );
+
             if( pNewMethod->pFunction == hb___msgSetClsData ||
                 pNewMethod->pFunction == hb___msgGetClsData )
             {
@@ -2268,6 +2269,15 @@ HB_FUNC( __CLSNEW )
          pNewCls->fOpOver     |= pSprCls->fOpOver;
          pNewCls->uiDataFirst += pSprCls->uiDatas;
       }
+
+     #if 0
+        TraceLog( NULL, "    *** Size: %i\n", ulSize );
+
+        for( i = 0;  i < ulSize; i++ )
+        {
+           TraceLog( NULL, "Saved: %s:%s pivot: %i #: %i\n", pNewCls->szName, pNewCls->pMethDyn[i].pMessage->pSymbol->szName, i, pNewCls->pMethDyn[i].uiAt );
+        }
+     #endif
 
       pNewCls->uiMethods       = ( USHORT ) ulSize;
       pNewCls->uiDataInitiated = uiInit;
@@ -3880,7 +3890,7 @@ static HARBOUR hb___msgVirtual( void )
 static HARBOUR hb___msgDelegate( void )
 {
    HB_THREAD_STUB
-   
+
    PHB_SYMB pMsgIs   = (HB_VM_STACK.pMethod)->pMsgIs;
    PHB_SYMB pMsgTo   = (HB_VM_STACK.pMethod)->pMsgTo;
    PHB_ITEM pSelf    = hb_stackSelfItem();
@@ -3896,7 +3906,7 @@ static HARBOUR hb___msgDelegate( void )
       hb_vmPushSymbol( pMsgTo );
       hb_vmPush( pSelf );
       hb_vmSend( 0 );
-      
+
       pSelf = &(HB_VM_STACK.Return);
    }
    else if( (HB_VM_STACK.pMethod)->pInitValue )
