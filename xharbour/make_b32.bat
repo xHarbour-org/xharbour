@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.29 2006/11/11 13:31:37 modalsist Exp $
+rem $Id: make_b32.bat,v 1.30 2007/02/28 22:42:06 modalsist Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -37,8 +37,8 @@ if not exist bin\b32 md bin\b32
    copy bin\b32\*.exe bin\*.* > nul
    copy lib\b32\*.lib lib\*.* > nul
    if exist lib\b32\*.bak del lib\b32\*.bak
-   if exist bin\b32\*.tds del bin\b32\*.tds
-   if exist bin\b32\*.map del bin\b32\*.map
+   REM if exist bin\b32\*.tds del bin\b32\*.tds
+   REM if exist bin\b32\*.map del bin\b32\*.map
    goto EXIT
 
 :BUILD_ERR
