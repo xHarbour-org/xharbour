@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.119 2007/05/16 17:51:27 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.120 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /*
@@ -1105,8 +1105,8 @@ DummyArgList : DummyArgument                  {}
              ;
 
 DummyArgument : EmptyExpression                    { hb_compExprDelete($1); }
-              | '@' IdentName                      { hb_compExprDelete( $2 ); }
-              | '@' IdentName '(' DummyArgList ')' { hb_compExprDelete( $2 ); }
+              | '@' IdentName                      {}
+              | '@' IdentName '(' DummyArgList ')' {}
               ;
 
 FunCallAlias : FunCall ALIASOP        { $$ = $1; }

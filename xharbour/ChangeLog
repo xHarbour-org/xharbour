@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5536 2007/05/18 13:28:31 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5537 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.sly
+    * Typo in last commit
+    
 2007-05-17 00:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * make_b32.bat
     * Allow cgl and map files
