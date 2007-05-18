@@ -96,6 +96,11 @@ STATIC  shTagTypes                  // data for HTML tags
 STATIC  saHtmlAnsiEntities          // HTML character entities (ANSI character set)
 STATIC  slInit      := .F.          // initilization flag for HTML data
 
+* #define _DEBUG_
+#ifdef _DEBUG_
+   #xtrans HIDDEN:  =>  EXPORTED:   // debugger can't see HIDDEN iVars
+#endif
+
 /*
  * Class for handling an entire HTML document
  */
@@ -230,6 +235,7 @@ METHOD readFile( cFileName ) CLASS THtmlDocument
    IF ! File( cFileName )
       RETURN .F.
    ENDIF
+   ::changed := .T.
    ::new( Memoread( cFileName ) )
 RETURN .T.
 
@@ -528,11 +534,11 @@ CLASS THtmlNode
    METHOD new( oParent, cTagName, cAttrib, cContent )
 
    METHOD isType( nCM_TYPE )
-   METHOD isEmpty()
-   METHOD isInline()
-   METHOD isOptional()
-   METHOD isNode()
-   METHOD isBlock()
+   ACCESS isEmpty()
+   ACCESS isInline()
+   ACCESS isOptional()
+   ACCESS isNode()
+   ACCESS isBlock()
 
    METHOD addNode( oTHtmlNode )
    METHOD insertAfter( oTHtmlNode )
@@ -552,7 +558,7 @@ CLASS THtmlNode
    ACCESS siblingNodes()  INLINE IIf( ::parent==NIL, NIL, ::parent:htmlContent )
    ACCESS childNodes()    INLINE IIf( ::isNode(), ::htmlContent, NIL )
    ACCESS parentNode()    INLINE ::parent
-   ACCESS document()      INLINE IIf( ::root==NIL, NIL, IIf( ::root:_document==NIL, NIL, ::root:_document) )
+   ACCESS document()      INLINE IIf( ::root==NIL, NIL, ::root:_document )
 
    METHOD toString( nIndent )
    METHOD attrToString()
@@ -595,6 +601,9 @@ METHOD new( oParent, cTagName, cAttrib, cContent ) CLASS THtmlNode
 
    IF Valtype( oParent ) == "C"
       // a HTML string is passed -> build new tree of objects
+      IF Chr(9) $ oParent
+         oParent := StrTran( oParent, Chr(9), Chr(32) )
+      ENDIF
       ::root           := self
       ::htmlTagName    := "_root_"
       ::htmlTagType    := THtmlTagType( "_root_" )
@@ -604,7 +613,17 @@ METHOD new( oParent, cTagName, cAttrib, cContent ) CLASS THtmlNode
       // a HTML object is passed -> we are in the course of building an object tree
       ::root           := oParent:root
       ::parent         := oParent
-      ::htmlAttributes := cAttrib
+      IF Valtype( cAttrib ) == "C"
+         IF cAttrib[-1] == "/"
+            cAttrib[-1] := " "
+            ::htmlEndTagName := "/"
+            ::htmlAttributes := Trim( cAttrib )
+         ELSE
+            ::htmlAttributes := cAttrib
+         ENDIF
+      ELSE
+         ::htmlAttributes := cAttrib
+      ENDIF
       ::htmlTagName    := cTagName
       ::htmlTagType    := THtmlTagType( cTagName )
       ::htmlContent    := IIF( cContent == NIL, {}, cContent )
@@ -661,7 +680,8 @@ RETURN "<" + Lower( ::htmlTagName ) + ">" $ ("<pre>,<script>,<textarea>")
 METHOD parseHtml( parser ) CLASS THtmlNode
    LOCAL nLastPos := parser:p_pos
    LOCAL lRewind  := .F.
-   LOCAL oThisTag, oNextTag, cTagName, cAttr, nStart, nEnd, nPos, cText
+   LOCAL oThisTag, oNextTag, oLastTag
+   LOCAL cTagName, cAttr, nStart, nEnd, nPos, cText
 
    IF .NOT. "<" $ parser:p_Str
       // Plain text
@@ -680,7 +700,18 @@ METHOD parseHtml( parser ) CLASS THtmlNode
       cTagName := CutStr( " ", @cAttr )
 
       IF .NOT. cText == ""
-         IF Chr(10) $ cText
+         IF Left( cText, 2 ) == "</"
+            // ending tag of previous node
+            cText := Lower( Alltrim( SubStr( CutStr( ">", @cText ), 3 ) ) )
+            oLastTag := oThisTag:parent
+            DO WHILE oLastTag <> NIL .AND. Lower( oLastTag:htmlTagName ) <> cText
+               oLastTag := oLastTag:parent
+            ENDDO
+            IF oLastTag <> NIL
+               oLastTag:htmlEndTagName := "/" + oLastTag:htmlTagName
+            ENDIF
+
+         ELSEIF Chr(10) $ cText
             cText := Trim(cText)
             nPos := Len(cText) + 1
             DO WHILE nPos > 0 .AND. cText[--nPos] $ Chr(9)+Chr(10)+Chr(13) ; ENDDO
@@ -708,9 +739,25 @@ METHOD parseHtml( parser ) CLASS THtmlNode
          // end tag
          IF Lower("/"+ oThisTag:htmlTagName) == Lower(cTagName)
             oThisTag:htmlEndTagName := cTagName
+
          ELSE
-            parser:p_pos := nStart - 1
+
+            oNextTag := oThisTag:parent
+            DO WHILE oNextTag <> NIL .AND. Lower( oNextTag:htmlTagName ) <> Lower( SubStr(cTagName,2) )
+               oNextTag := oNextTag:parent
+            ENDDO
+
+            IF oNextTag == NIL
+               // orphaned end tag with no opening tag
+               LOOP
+            ELSE
+               // node that opened the end tag
+               oNextTag:htmlEndTagName := cTagName
+               oThisTag := oNextTag
+            ENDIF
+
          ENDIF
+
          lRewind := .T.
          EXIT
 
@@ -743,7 +790,6 @@ METHOD parseHtml( parser ) CLASS THtmlNode
          ENDIF
 
          IF .NOT. lRewind
-            // a new tag is found that must parse the subsequent Html string
             IF cAttr == ""
                // tag has no attributes
                oNextTag := THtmlNode():new( oThisTag, cTagName )
@@ -753,6 +799,10 @@ METHOD parseHtml( parser ) CLASS THtmlNode
             ENDIF
 
             oThisTag:addNode( oNextTag )
+
+            IF .NOT. oThisTag:isOptional() .AND. Lower( oThisTag:htmlTagName ) == Lower( ctagName )
+                oThisTag:htmlEndTagName := "/" + oThisTag:htmlTagName
+            ENDIF
 
             IF oNextTag:keepFormatting()
                // do not spoil formatting of Html text
@@ -820,6 +870,10 @@ RETURN self
 
 // adds a new CHILD node to the current one
 METHOD addNode( oTHtmlNode ) CLASS THtmlNode
+   IF oTHtmlNode:parent <> NIL .AND. .NOT. oTHtmlNode:parent == self
+      oTHtmlNode:delete()
+   ENDIF
+
    oTHtmlNode:parent := self
    oTHtmlNode:root   := ::root
 
@@ -838,6 +892,10 @@ METHOD insertBefore( oTHtmlNode ) CLASS THtmlNode
       RETURN ::error( "Cannot insert before root node", ::className(), ":insertBefore()", EG_ARG, HB_AParams() )
    ENDIF
 
+   IF oTHtmlNode:parent <> NIL .AND. .NOT. oTHtmlNode:parent == self
+      oTHtmlNode:delete()
+   ENDIF
+
    oTHtmlNode:parent := ::parent
    oTHtmlNode:root   := ::root
 
@@ -854,6 +912,10 @@ RETURN oTHtmlNode
 // inserts a SIBLING node after the current one
 METHOD insertAfter( oTHtmlNode ) CLASS THtmlNode
    LOCAL nPos
+
+   IF oTHtmlNode:parent <> NIL .AND. .NOT. oTHtmlNode:parent == self
+      oTHtmlNode:delete()
+   ENDIF
 
    oTHtmlNode:parent := ::parent
    oTHtmlNode:root   := ::root
@@ -980,8 +1042,11 @@ METHOD toString( nIndent ) CLASS THtmlNode
       ELSEIF ::keepFormatting()
          cHtml += Chr(13)+Chr(10)
       ENDIF
-      cHtml += "<" + ::htmlTagName + ;
-                     ::attrToString() + ">"
+      cHtml += "<" + ::htmlTagName + ::attrToString()
+
+      IF .NOT. ::htmlEndTagName == "/"
+         cHtml += ">"
+      ENDIF
    ENDIF
 
    IF Valtype( ::htmlContent ) == "A"
@@ -1010,11 +1075,14 @@ METHOD toString( nIndent ) CLASS THtmlNode
 
    IF ::htmlEndTagName <> NIL
       IF ::isInline() .OR. ::keepFormatting() .OR. ::isType( CM_HEADING ) .OR. ::isType( CM_HEAD )
-         RETURN cHtml+= "<" + ::htmlEndTagName + ">"
+         RETURN cHtml += IIf( ::htmlEndTagName == "/", " />", "<" + ::htmlEndTagName + ">" )
       ENDIF
-      RETURN cHtml += chr(13)+Chr(10)+ cIndent + "<" + ::htmlEndTagName + ">"
+      IF cHtml[-1] <> Chr(10)
+         cHtml += Chr(13)+Chr(10)
+      ENDIF
+      RETURN cHtml += cIndent + IIf( ::htmlEndTagName == "/", " />", "<" + ::htmlEndTagName + ">" )
    ELSEIF ::htmlTagName $ "!--,br"
-      RETURN cHtml += chr(13)+Chr(10) + cIndent
+      RETURN cHtml += Chr(13)+Chr(10) + cIndent
    ENDIF
 RETURN cHtml
 
@@ -1045,7 +1113,7 @@ RETURN cAttr
 
 
 STATIC FUNCTION __AttrToStr( cName, cValue, aAttr, oTHtmlNode )
-   LOCAL nPos, cAttr := ""
+   LOCAL nPos
 
    IF ( nPos := AScan( aAttr, {|a| a[1] == Lower( cName ) } ) ) == 0
       // Tag doesn't have this attribute
@@ -1193,7 +1261,7 @@ RETURN ::htmlAttributes
 
 // HTML attribute parser
 STATIC FUNCTION __ParseAttr( parser )
-   LOCAL cChr, nMode := 1
+   LOCAL cChr, nMode := 1 // 1=name, 2=value
    LOCAL aAttr := { "", "" }
    LOCAL hHash := Hash()
    LOCAL nStart, nEnd
@@ -1245,16 +1313,24 @@ STATIC FUNCTION __ParseAttr( parser )
          P_NEXT( parser )
 
          nStart := parser:p_pos
-         P_SEEK( parser, cChr )
-         nEnd := parser:p_pos
 
-         IF nEnd > 0
-            aAttr[2] := SubStr( parser:p_str, nStart, nEnd-nStart )
+         IF parser:p_str[nStart] == cChr
+            // empty value ""
+            hHash[ aAttr[1] ] := ""
+            P_NEXT( parser )
          ELSE
-            aAttr[2] := SubStr( parser:p_str, nStart )
+            P_SEEK( parser, cChr )
+            nEnd := parser:p_pos
+
+            IF nEnd > 0
+               aAttr[2] := SubStr( parser:p_str, nStart, nEnd-nStart )
+            ELSE
+               aAttr[2] := SubStr( parser:p_str, nStart )
+            ENDIF
+
+            hHash[ aAttr[1] ] := aAttr[2]
          ENDIF
 
-         hHash[ aAttr[1] ] := aAttr[2]
          aAttr[1] := ""
          aAttr[2] := ""
          nMode := 1
@@ -1319,7 +1395,7 @@ RETURN ::getAttributes()
 // Removes one attribute
 METHOD delAttribute( cName ) CLASS THtmlNode
    LOCAL xVal := ::getAttribute( cName )
-   LOCAL lRet
+   LOCAL lRet := .F.
    LOCAL nPos
    IF xVal <> NIL
       TRY
@@ -1470,7 +1546,7 @@ METHOD pushNode( cTagName ) CLASS THtmlNode
          ENDIF
          RETURN self:parent
       ENDIF
-      RETURN ::error( "Invalid HTML tag", ::className(), "+", EG_ARG, {cHtml} )
+      RETURN ::error( "Invalid HTML tag", ::className(), "+", EG_ARG, {cName} )
    ENDIF
 
    IF lTrim(cAttr) == ""
@@ -1577,6 +1653,7 @@ STATIC PROCEDURE _Init_Html_TagTypes
 
    shTagTypes[ "_root_"     ] := { NIL                         , (CM_INLINE)                                   }
    shTagTypes[ "_text_"     ] := { NIL                         , (CM_INLINE)                                   }
+   shTagTypes[ "!--"        ] := { NIL                         , (CM_INLINE|CM_EMPTY)                          }
    shTagTypes[ "a"          ] := { ( @THtmlAttr_A() )          , (CM_INLINE)                                   }
    shTagTypes[ "abbr"       ] := { ( @THtmlAttr_ABBR() )       , (CM_INLINE)                                   }
    shTagTypes[ "acronym"    ] := { ( @THtmlAttr_ACRONYM() )    , (CM_INLINE)                                   }
