@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.21 2005/08/01 22:21:43 druzus Exp $
+ * $Id: fstemp.c,v 1.22 2006/10/20 11:25:02 lculik Exp $
  */
 
 /*
@@ -75,9 +75,6 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
 
    char cTempDir[ _POSIX_PATH_MAX + 1 ];
 
-   /* TODO: Implement this: */
-   HB_SYMBOL_UNUSED( pszPrefix );
-
    if ( pszDir != NULL && pszDir[0] != '\0' )
    {
       strncpy( (char *) cTempDir, (const char *) pszDir, _POSIX_PATH_MAX );
@@ -92,7 +89,12 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
    }
    cTempDir[ _POSIX_PATH_MAX ] = '\0';
 
-   fResult = GetTempFileName( cTempDir, "xht", 0, (char *) pszBuffer );
+   if( pszPrefix == NULL )
+   {
+       pszPrefix = "xht";
+   }
+
+   fResult = GetTempFileName( cTempDir, pszPrefix, 0, (char *) pszBuffer );
 
 #else
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5534 2007/05/18 09:36:56 marchuet Exp $
+ * $Id: ChangeLog,v 1.5535 2007/05/18 10:08:35 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-18 10:26 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/fstemp.c
+    + fixed pending TODO, to use pszPrefix in HB_WIN32_IO
 
 2007-05-18 12:06 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   + source/rdd/usrrdd/rdds/ansirdd.prg
@@ -88,7 +92,7 @@
   * include/hbexprc.c
   * source/macro/macro.y
   * source/compiler/harbour.c
-    + Allow to redirect hb_xgrab(), hb_xalloc(), hb_xrealloc(), hb_xfree(0
+    + Allow to redirect hb_xgrab(), hb_xalloc(), hb_xrealloc(), hb_xfree()
 
   * include/simplex.c
   * source/compiler/harbour.slx
