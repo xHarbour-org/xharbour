@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.44 2007/05/05 22:26:43 modalsist Exp $
+# $Id: makefile.pc,v 1.45 2007/05/08 11:13:22 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -321,13 +321,13 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbdbginf.obj \
    $(OBJ_DIR)\hblbl.obj \
    $(PP_LIB) \
-   $(OBJ_DIR)\ppcomp.obj 
+   $(OBJ_DIR)\ppcomp.obj
 
 PPGEN_EXE_OBJS = \
    $(OBJ_DIR)\ppgen.obj \
    $(HB_DIR)\include\hbstdgen.ch \
    $(HB_DIR)\include\std.ch \
-   $(HB_DIR)\include\set.ch 
+   $(HB_DIR)\include\set.ch
 
 HBTEST_EXE_OBJS = \
    $(OBJ_DIR)\hbtest.obj \
@@ -563,7 +563,7 @@ RDD_LIB_OBJS = \
    $(OBJ_DIR)\dbstrux.obj \
    $(OBJ_DIR)\dbupdat.obj \
    $(OBJ_DIR)\rddord.obj \
-   $(OBJ_DIR)\rddsys.obj 
+   $(OBJ_DIR)\rddsys.obj
 
 USRRDD_LIB_OBJS = \
    $(OBJ_DIR)\usrrdd.obj
@@ -576,7 +576,8 @@ RDDS_LIB_OBJS = \
    $(OBJ_DIR)\hscdx.obj \
    $(OBJ_DIR)\rlcdx.obj \
    $(OBJ_DIR)\smtcdx.obj \
-   $(OBJ_DIR)\adordd.obj
+   $(OBJ_DIR)\adordd.obj \
+   $(OBJ_DIR)\ansirdd.obj
 
 MISC_LIB_OBJS = \
    $(OBJ_DIR)\hb_f.obj
@@ -1696,6 +1697,13 @@ $(OBJ_DIR)\adordd.c : $(RDDS_DIR)\adordd.prg
 
 $(OBJ_DIR)\adordd.obj : $(OBJ_DIR)\adordd.c
    $(CC_CMD)
+
+$(OBJ_DIR)\ansirdd.c : $(RDDS_DIR)\ansirdd.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\ansirdd.obj : $(OBJ_DIR)\ansirdd.c
+   $(CC_CMD)
+
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴컴컴�
 # � CODEPAGE.LIB dependencies 넴
