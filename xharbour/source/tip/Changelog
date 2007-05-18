@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.5 2007/05/11 16:30:46 hazi01 Exp $
+ * $Id: Changelog,v 1.6 2007/05/18 15:40:30 hazi01 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-19 00:15 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+    * source\tip\thtml.prg
+
+      Changed code to avoid warnings
+      -> Warning W0001  Ambiguous reference
+      -> Warning w0027  Meaningless use of expression
+
 
 2007-05-18 17:45 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
     * source\tip\thtml.prg

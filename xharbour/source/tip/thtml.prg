@@ -50,6 +50,7 @@
 #include "Hbclass.ch"
 #include "THtml.ch"
 
+
 // A Html document can have more than 16 nesting levels.
 // The current implementation of FOR EACH is not suitable for the HTML classes
 
@@ -1304,20 +1305,23 @@ STATIC FUNCTION __ParseAttr( parser )
             RETURN hHash
          ENDIF
 
-         P_PREV( parser )
+         parser:p_end := parser:p_pos
+         parser:p_pos --
          EXIT
 
       CASE '"'
       CASE "'"
          lIsQuoted := .T.
-         P_NEXT( parser )
+         parser:p_end := parser:p_pos
+         parser:p_pos ++
 
          nStart := parser:p_pos
 
          IF parser:p_str[nStart] == cChr
             // empty value ""
             hHash[ aAttr[1] ] := ""
-            P_NEXT( parser )
+            parser:p_end := parser:p_pos
+            parser:p_pos --
          ELSE
             P_SEEK( parser, cChr )
             nEnd := parser:p_pos
@@ -1433,7 +1437,7 @@ RETURN ::noAttribute( __GetMessage(), aParams )
 
 // Non existent message -> returns and/or creates Tag or Attribute
 METHOD noAttribute( cName, aValue ) CLASS THtmlNode
-   LOCAL aNodes
+   LOCAL aNodes, oNode
 
    cName := lower(cName)
 
@@ -1626,7 +1630,7 @@ RETURN aType
 
 
 FUNCTION THtmlIsValid( cTagName, cAttrName )
-   LOCAL lRet := .T.
+   LOCAL lRet := .T., aValue
 
    IF shTagTypes == NIL
       THtmlInit()
@@ -4355,7 +4359,7 @@ FUNCTION AnsiToHtml( cAnsiText )
    LOCAL cHtmlText := ""
    LOCAL parser    := P_PARSER( cAnsiText )
    LOCAL nStart    := 1
-   LOCAL aEntity, cEntity, cText, cChr
+   LOCAL aEntity, cEntity, cText, cChr, nEnd
 
    IF saHtmlAnsiEntities == NIL
       _Init_Html_AnsiCharacterEntities()
@@ -4374,7 +4378,8 @@ FUNCTION AnsiToHtml( cAnsiText )
          nStart  := nEnd
          nEnd    := parser:p_pos+1
          cEntity := SubStr( parser:p_str, nStart, nEnd-nStart )
-         P_NEXT(parser)
+         parser:p_end := parser:p_pos
+         parser:p_pos ++
          EXIT
       CASE " "
          // "&" character found
