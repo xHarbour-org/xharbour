@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.118 2007/05/15 21:34:12 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.119 2007/05/16 17:51:27 ronpinkas Exp $
  */
 
 /*
@@ -964,19 +964,19 @@ AliasVar   : NumAlias AliasId          { $$ = hb_compExprNewAliasVar( $1, $2 ); 
            | MacroVarAlias AliasId     { $$ = hb_compExprNewAliasVar( $1, $2 ); }
            | MacroExprAlias AliasId    { $$ = hb_compExprNewAliasVar( $1, $2 ); }
            | PareExpListAlias AliasId  { $$ = hb_compExprNewAliasVar( $1, $2 ); }
-           | NilAlias AliasId          { $$ = hb_compErrorAlias( $1 ); }
-           | LiteralAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }
-           | LogicalAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }
-           | DateAlias AliasId         { $$ = hb_compErrorAlias( $1 ); }
-           | DateTimeAlias AliasId     { $$ = hb_compErrorAlias( $1 ); }
-           | CodeBlockAlias AliasId    { $$ = hb_compErrorAlias( $1 ); }
-           | SelfAlias AliasId         { $$ = hb_compErrorAlias( $1 ); }
-           | ArrayAlias AliasId        { $$ = hb_compErrorAlias( $1 ); }
-           | ArrayAtAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }  /* QUESTION: Clipper reports error here - we can handle this */
-           | VariableAtAlias AliasId   { $$ = hb_compErrorAlias( $1 ); }  /* QUESTION: Clipper reports error here - we can handle this */
-           | FunCallAlias AliasId      { $$ = hb_compErrorAlias( $1 ); }  /* QUESTION: Clipper reports error here - we can handle this */
-           | ObjectDataAlias AliasId   { $$ = hb_compErrorAlias( $1 ); }  /* QUESTION: Clipper reports error here - we can handle this */
-           | ObjectMethodAlias AliasId { $$ = hb_compErrorAlias( $1 ); }  /* QUESTION: Clipper reports error here - we can handle this */
+           | NilAlias AliasId          { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | LiteralAlias AliasId      { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | LogicalAlias AliasId      { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | DateAlias AliasId         { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | DateTimeAlias AliasId     { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | CodeBlockAlias AliasId    { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | SelfAlias AliasId         { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | ArrayAlias AliasId        { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }
+           | ArrayAtAlias AliasId      { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }  /* QUESTION: Clipper reports error here - we can handle this */
+           | VariableAtAlias AliasId   { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }  /* QUESTION: Clipper reports error here - we can handle this */
+           | FunCallAlias AliasId      { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }  /* QUESTION: Clipper reports error here - we can handle this */
+           | ObjectDataAlias AliasId   { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }  /* QUESTION: Clipper reports error here - we can handle this */
+           | ObjectMethodAlias AliasId { $$ = hb_compErrorAlias( $1 ); hb_compExprDelete($2); }  /* QUESTION: Clipper reports error here - we can handle this */
            | VarAlias AliasId          { $$ = hb_compExprNewAliasVar( $1, $2 ); }
            | FieldAlias AliasId        { $$ = hb_compExprNewAliasVar( $1, $2 ); }
            | FieldVarAlias AliasId     { $$ = hb_compExprNewAliasVar( $1, $2 ); }
@@ -1095,7 +1095,7 @@ Argument   :  EmptyExpression          { $$ = $1; }
 
                                              default:
                                                hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_INVALID_REFER, hb_compExprDescription( $2 ), NULL );
-                                               $$ = $2;
+                                               $$ = NULL;
                                           }
                                        }
            ;
@@ -1104,9 +1104,9 @@ DummyArgList : DummyArgument                  {}
              | DummyArgList ',' DummyArgument {}
              ;
 
-DummyArgument : EmptyExpression                    {}
-              | '@' IdentName                      {}
-              | '@' IdentName '(' DummyArgList ')' {}
+DummyArgument : EmptyExpression                    { hb_compExprDelete($1); }
+              | '@' IdentName                      { hb_compExprDelete( $2 ); }
+              | '@' IdentName '(' DummyArgList ')' { hb_compExprDelete( $2 ); }
               ;
 
 FunCallAlias : FunCall ALIASOP        { $$ = $1; }
@@ -1659,7 +1659,7 @@ Get        : _Get_ LValue ','
 
              EmptyExpression
                { /* $6 */
-                  HB_EXPR_PTR pVarName;
+                  HB_EXPR_PTR pVarName = NULL;
 
                   switch( $2->ExprType )
                   {
@@ -1668,7 +1668,6 @@ Get        : _Get_ LValue ','
                      case HB_ET_SEND:
                      case HB_ET_WITHSEND:
                         pVarName = $5;
-
                         break;
 
                      case HB_ET_MACRO:
@@ -1676,10 +1675,12 @@ Get        : _Get_ LValue ','
                         if( $2->value.asMacro.cMacroOp == '&' )
                         {
                            pVarName = hb_compExprNewVar( $2->value.asMacro.szMacro );
+                           hb_compExprDelete( $5 );
                         }
                         else if( $2->value.asMacro.szMacro )
                         {
                            pVarName = $2->value.asMacro.pExprList;
+                           hb_compExprDelete( $5 );
                         }
                         else
                         {
@@ -1689,7 +1690,6 @@ Get        : _Get_ LValue ','
                             */
                            pVarName = $5;
                         }
-
                         break;
                      }
 
@@ -1697,13 +1697,22 @@ Get        : _Get_ LValue ','
                      case HB_ET_CODEBLOCK:
                      case HB_ET_NIL:
                      {
-                        pVarName = pBaseArrayName ? pBaseArrayName : $5;
+                        if( pBaseArrayName )
+                        {
+                           pVarName = pBaseArrayName;
+                           hb_compExprDelete( $5 );                           
+                        }
+                        else
+                        {                        
+                           pVarName = $5;
+                        }
+                        
                         bTrancuateBaseArray = FALSE;
-
                         break;
                      }
 
                      default:
+                        hb_compExprDelete( $5 );
                         hb_compErrorLValue( $2 );
                         return 0;
                   }

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5535 2007/05/18 10:08:35 marchuet Exp $
+ * $Id: ChangeLog,v 1.5536 2007/05/18 13:28:31 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,17 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-17 00:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * make_b32.bat
+    * Allow cgl and map files
+  * include/hbexprb.c
+  * source/common/expropt1.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+    * Memory leaks
+  * source/compiler/genc.c
+    * GPF trap
+    
 2007-05-18 10:26 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/fstemp.c
     + fixed pending TODO, to use pszPrefix in HB_WIN32_IO

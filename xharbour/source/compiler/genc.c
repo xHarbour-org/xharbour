@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.135 2007/05/10 05:39:50 ronpinkas Exp $
+ * $Id: genc.c,v 1.136 2007/05/15 21:34:11 ronpinkas Exp $
  */
 
 /*
@@ -1062,14 +1062,15 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
    char *szTmp, *szTmp2;
    int iLen = strlen( sInline );
    int iOption;
-
+   char *sBase = sInline;
+   
    while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
       sInline += 7;
       iOption = HB_PROTO_FUNC_PUBLIC;
 
       /* If it is a PHB_FUNC then skip it */
-      if ( iLen > 8 && *(sInline - 8 ) == 'P' )
+      if ( sInline - sBase >= 8 && *(sInline - 8 ) == 'P' )
       {
          continue;
       }

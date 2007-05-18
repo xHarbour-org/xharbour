@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.19 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.20 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -610,6 +610,7 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
       pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
       pExpr->value.asMessage.pMacroMessage = NULL;
 
+	  pMessage->value.asSymbol = NULL;
       HB_XFREE( pMessage );
    }
    else
@@ -651,6 +652,7 @@ HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR pMessage )
       pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
       pExpr->value.asMessage.pMacroMessage = NULL;
 
+	  pMessage->value.asSymbol = NULL;
       HB_XFREE( pMessage );
    }
    else

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.158 2007/05/16 17:51:27 ronpinkas Exp $
+ * $Id: harbour.c,v 1.159 2007/05/17 04:49:02 ronpinkas Exp $
  */
 
 /*
@@ -5413,6 +5413,16 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_BLOCKVAR_NOT_USED, pVar->szName, pFunc->szName );
       }
 
+      /* free used variables */
+      pFree = pVar;
+
+      pVar = pVar->pNext;
+      hb_xfree( ( void * ) pFree );
+   }
+
+   pVar = pCodeblock->pStatics;
+   while( pVar )
+   {
       /* free used variables */
       pFree = pVar;
 

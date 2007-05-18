@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: make_b32.bat,v 1.30 2007/02/28 22:42:06 modalsist Exp $
+rem $Id: make_b32.bat,v 1.31 2007/05/17 03:48:14 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -35,10 +35,9 @@ if not exist bin\b32 md bin\b32
 :BUILD_OK
 
    copy bin\b32\*.exe bin\*.* > nul
+   copy bin\b32\*.tds bin\*.* > nul
    copy lib\b32\*.lib lib\*.* > nul
    if exist lib\b32\*.bak del lib\b32\*.bak
-   REM if exist bin\b32\*.tds del bin\b32\*.tds
-   REM if exist bin\b32\*.map del bin\b32\*.map
    goto EXIT
 
 :BUILD_ERR
@@ -50,16 +49,56 @@ if not exist bin\b32 md bin\b32
 
    if exist bin\xharbour.exe   del bin\xharbour.exe
    if exist bin\xharbour.dll   del bin\xharbour.dll
+   
    if exist bin\harbour.exe    del bin\harbour.exe
+   if exist bin\harbour.tds    del bin\harbour.tds
+   if exist bin\harbour.map    del bin\harbour.map
+   if exist bin\harbour.cgl    del bin\harbour.cgl
+   
    if exist bin\hbdoc.exe      del bin\hbdoc.exe
+   if exist bin\hbdoc.tds      del bin\hbdoc.tds
+   if exist bin\hbdoc.map      del bin\hbdoc.map
+   if exist bin\hbdoc.cgl      del bin\hbdoc.cgl
+   
    if exist bin\hbmake.exe     del bin\hbmake.exe
+   if exist bin\hbmake.tds     del bin\hbmake.tds
+   if exist bin\hbmake.map     del bin\hbmake.map
+   if exist bin\hbmake.cgl     del bin\hbmake.cgl
+   
    if exist bin\hbpp.exe       del bin\hbpp.exe
+   if exist bin\hbpp.tds       del bin\hbpp.tds
+   if exist bin\hbpp.map       del bin\hbpp.map
+   if exist bin\hbpp.cgl       del bin\hbpp.cgl
+   
    if exist bin\hbrun.exe      del bin\hbrun.exe
+   if exist bin\hbrun.tds      del bin\hbrun.tds
+   if exist bin\hbrun.map      del bin\hbrun.map
+   if exist bin\hbrun.cgl      del bin\hbrun.cgl
+   
    if exist bin\hbrunmt.exe    del bin\hbrunmt.exe
+   if exist bin\hbrunmt.tds    del bin\hbrunmt.tds
+   if exist bin\hbrunmt.map    del bin\hbrunmt.map
+   if exist bin\hbrunmt.cgl    del bin\hbrunmt.cgl
+   
    if exist bin\hbtest.exe     del bin\hbtest.exe
+   if exist bin\hbtest.tds     del bin\hbtest.tds
+   if exist bin\hbtest.map     del bin\hbtest.map
+   if exist bin\hbtest.cgl     del bin\hbtest.cgl
+   
    if exist bin\hbtestmt.exe   del bin\hbtestmt.exe
+   if exist bin\hbtestmt.tds   del bin\hbtestmt.tds
+   if exist bin\hbtestmt.map   del bin\hbtestmt.map
+   if exist bin\hbtestmt.cgl   del bin\hbtestmt.cgl
+   
    if exist bin\xbscript.exe   del bin\xbscript.exe
+   if exist bin\xbscript.tds   del bin\xbscript.tds
+   if exist bin\xbscript.map   del bin\xbscript.map
+   if exist bin\xbscript.cgl   del bin\xbscript.cgl
+   
    if exist bin\ppgen.exe      del bin\ppgen.exe
+   if exist bin\ppgen.tds      del bin\ppgen.tds
+   if exist bin\ppgen.map      del bin\ppgen.map
+   if exist bin\ppgen.cgl      del bin\ppgen.cgl
 
    if exist lib\xharbour.lib   del lib\xharbour.lib
    if exist lib\codepage.lib   del lib\codepage.lib
@@ -139,6 +178,7 @@ if not exist bin\b32 md bin\b32
    if exist bin\b32\*.exe del bin\b32\*.exe
    if exist bin\b32\*.tds del bin\b32\*.tds
    if exist bin\b32\*.map del bin\b32\*.map
+   if exist bin\b32\*.cgl del bin\b32\*.cgl
    if exist bin\b32\*.dll del bin\b32\*.dll
    if exist bin\b32\*.lib del bin\b32\*.lib
 

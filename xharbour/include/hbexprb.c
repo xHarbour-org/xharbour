@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.116 2007/04/17 20:46:35 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.117 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -2617,13 +2617,10 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pAlias );
          }
 
-         /* NOTE: variable name is released only during macro compilation */
-#if defined( HB_MACRO_SUPPORT )
          if( pSelf->value.asAlias.pVar )
          {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pVar );
          }
-#endif
          break;
    }
    return pSelf;
@@ -2792,6 +2789,17 @@ static HB_EXPR_FUNC( hb_compExprUseRTVariable )
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
       case HB_EA_DELETE:
+         if( pSelf->value.asRTVar.pMacro )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asRTVar.pMacro );
+         }
+         
+#if defined( HB_MACRO_SUPPORT )
+         if( pSelf->value.asRTVar.szName ) 
+         {
+             HB_XFREE( pSelf->value.asRTVar.szName );
+         }
+#endif
          break;
    }
    return pSelf;
@@ -2864,8 +2872,6 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
       case HB_EA_REDUCE:
          {
             #ifdef HB_MACRO_SUPPORT
-
-
                if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE )
                {
                   USHORT usVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol, HB_MACRO_PARAM );
@@ -2986,7 +2992,6 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
          break;
 
       case HB_EA_DELETE:
-#if defined( HB_MACRO_SUPPORT )
          {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pObject );
 
@@ -2995,16 +3000,20 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
             }
 
+         #if defined( HB_MACRO_SUPPORT )
             if( pSelf->value.asMessage.szMessage )
             {
                HB_XFREE( pSelf->value.asMessage.szMessage );
             }
-            else if( pSelf->value.asMessage.pMacroMessage )
+            else
+         #endif   
             {
-               HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
+               if( pSelf->value.asMessage.pMacroMessage )
+               {
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
+               }
             }
          }
-#endif
          break;
    }
    return pSelf;
@@ -3119,25 +3128,26 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
          break;
 
       case HB_EA_DELETE:
-#if defined( HB_MACRO_SUPPORT )
          {
-            //HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pObject );
-
             if( pSelf->value.asMessage.pParms )
             {
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
             }
-
-            if( pSelf->value.asMessage.pMacroMessage )
-            {
-               HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
-            }
-            else if( pSelf->value.asMessage.szMessage )
+			
+         #if defined( HB_MACRO_SUPPORT )
+            if( pSelf->value.asMessage.szMessage )
             {
                HB_XFREE( pSelf->value.asMessage.szMessage );
             }
+            else
+         #endif
+ 		    {
+               if( pSelf->value.asMessage.pMacroMessage )
+               {
+                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pMacroMessage );
+               }
+            }
          }
-#endif
          break;
    }
    return pSelf;
