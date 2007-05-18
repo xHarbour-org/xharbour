@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5532 2007/05/17 05:01:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5533 2007/05/17 22:08:31 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-18 11:32 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * include/hbapi.h
+  * include/usrrdd.ch
+  * source/rdd/dbf1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/usrrdd/rdds/adordd.prg
+  * source/rdd/workarea.c
+    + added support to fieldtype P (Picture)
+      P  	Picture   10 digits (bytes) representing a .DBT block number.
+      The number is stored as a string, right justified and padded with blanks.
+
+      (foxpro compatible) 
+
+  * source/rdd/userrdd/rdds/adordd.prg
+    + Added support to MEMO fields
 
 2007-05-18 00:07 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/adordd.ch

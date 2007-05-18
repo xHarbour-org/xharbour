@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.9 2007/05/16 10:36:52 marchuet Exp $
+ * $Id: adordd.prg,v 1.10 2007/05/17 22:08:34 marchuet Exp $
  */
 
 /*
@@ -734,6 +734,8 @@ STATIC FUNCTION ADO_FIELDINFO( nWA, nField, nInfoType, uInfo )
            uInfo := "M"
        CASE nType == HB_FT_OLE
            uInfo := "G"
+       CASE nType == HB_FT_PICTURE
+           uInfo := "P"
        CASE nType == HB_FT_ANY
            uInfo := "V"
        CASE nType == HB_FT_DATE
@@ -818,7 +820,7 @@ STATIC FUNCTION ADO_LOCK( nWA, aLockInfo  )
 
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
 
-	aLockInfo[ UR_LI_METHOD ] := DBLM_MULTIPLE
+   aLockInfo[ UR_LI_METHOD ] := DBLM_MULTIPLE
    aLockInfo[ UR_LI_RECORD ] := RECNO()
    aLockInfo[ UR_LI_RESULT ] := .T.
 
@@ -844,7 +846,7 @@ STATIC FUNCTION ADO_CLEARFILTER( nWA )
 
    TRY
       oRecordSet:Filter = ""
-	CATCH
+   CATCH
    END
 
 RETURN SUCCESS
@@ -948,7 +950,7 @@ STATIC FUNCTION ADO_ORDLSTADD( nWA, aOrderInfo )
    TRY
       oRecordSet:Index = aOrderInfo[ UR_ORI_BAG ]
    CATCH
-	END
+   END
 
 RETURN SUCCESS
 
@@ -1018,53 +1020,53 @@ RETURN SUCCESS
 FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
    LOCAL cSuperRDD   /* NO SUPER RDD */
-   LOCAL aMyFunc[ UR_METHODCOUNT ]
+   LOCAL aADOFunc[ UR_METHODCOUNT ]
 
-   aMyFunc[ UR_INIT ]         := ( @ADO_INIT() )
-   aMyFunc[ UR_NEW ]          := ( @ADO_NEW() )
-   aMyFunc[ UR_CREATE ]       := ( @ADO_CREATE() )
-   aMyFunc[ UR_CREATEFIELDS ] := ( @ADO_CREATEFIELDS() )
-   aMyFunc[ UR_OPEN ]         := ( @ADO_OPEN() )
-   aMyFunc[ UR_CLOSE ]        := ( @ADO_CLOSE() )
-   aMyFunc[ UR_BOF  ]         := ( @ADO_BOF() )
-   aMyFunc[ UR_EOF  ]         := ( @ADO_EOF() )
-   aMyFunc[ UR_DELETED ]      := ( @ADO_DELETED() )
-   aMyFunc[ UR_SKIPRAW ]      := ( @ADO_SKIPRAW() )
-   aMyFunc[ UR_GOTO ]         := ( @ADO_GOTO() )
-   aMyFunc[ UR_GOTOID ]       := ( @ADO_GOTOID() )
-   aMyFunc[ UR_GOTOP ]        := ( @ADO_GOTOP() )
-   aMyFunc[ UR_GOBOTTOM ]     := ( @ADO_GOBOTTOM() )
-   aMyFunc[ UR_RECID ]        := ( @ADO_RECID() )
-   aMyFunc[ UR_RECCOUNT ]     := ( @ADO_RECCOUNT() )
-   aMyFunc[ UR_GETVALUE ]     := ( @ADO_GETVALUE() )
-   aMyFunc[ UR_PUTVALUE ]     := ( @ADO_PUTVALUE() )
-   aMyFunc[ UR_DELETE ]       := ( @ADO_DELETE() )
-   aMyFunc[ UR_APPEND ]       := ( @ADO_APPEND() )
-   aMyFunc[ UR_FLUSH ]        := ( @ADO_FLUSH() )
-   aMyFunc[ UR_ORDINFO ]      := ( @ADO_ORDINFO() )
-   aMyFunc[ UR_RECINFO ]      := ( @ADO_RECINFO() )
-   aMyFunc[ UR_FIELDINFO ]    := ( @ADO_FIELDINFO() )
-   aMyFunc[ UR_ORDLSTFOCUS ]  := ( @ADO_ORDLSTFOCUS() )
-   aMyFunc[ UR_PACK ]         := ( @ADO_PACK() )
-   aMyFunc[ UR_RAWLOCK ]      := ( @ADO_RAWLOCK() )
-   aMyFunc[ UR_LOCK ]         := ( @ADO_LOCK() )
-   aMyFunc[ UR_UNLOCK ]       := ( @ADO_UNLOCK() )
-   aMyFunc[ UR_SETFILTER ]    := ( @ADO_SETFILTER() )
-   aMyFunc[ UR_CLEARFILTER ]  := ( @ADO_CLEARFILTER() )
-   aMyFunc[ UR_ZAP ]          := ( @ADO_ZAP() )
-   aMyFunc[ UR_SETLOCATE ]    := ( @ADO_SETLOCATE() )
-   aMyFunc[ UR_LOCATE ]       := ( @ADO_LOCATE() )
-   aMyFunc[ UR_CLEARREL ]     := ( @ADO_CLEARREL() )
-   aMyFunc[ UR_RELAREA ]      := ( @ADO_RELAREA() )
-   aMyFunc[ UR_RELTEXT ]      := ( @ADO_RELTEXT() )
-   aMyFunc[ UR_SETREL ]       := ( @ADO_SETREL() )
-   aMyFunc[ UR_ORDCREATE ]    := ( @ADO_ORDCREATE() )
-   aMyFunc[ UR_ORDDESTROY ]   := ( @ADO_ORDDESTROY() )
-   aMyFunc[ UR_ORDLSTADD ]    := ( @ADO_ORDLSTADD() )
-   aMyFunc[ UR_ORDLSTCLEAR ]  := ( @ADO_ORDLSTCLEAR() )
+   aADOFunc[ UR_INIT ]         := ( @ADO_INIT() )
+   aADOFunc[ UR_NEW ]          := ( @ADO_NEW() )
+   aADOFunc[ UR_CREATE ]       := ( @ADO_CREATE() )
+   aADOFunc[ UR_CREATEFIELDS ] := ( @ADO_CREATEFIELDS() )
+   aADOFunc[ UR_OPEN ]         := ( @ADO_OPEN() )
+   aADOFunc[ UR_CLOSE ]        := ( @ADO_CLOSE() )
+   aADOFunc[ UR_BOF  ]         := ( @ADO_BOF() )
+   aADOFunc[ UR_EOF  ]         := ( @ADO_EOF() )
+   aADOFunc[ UR_DELETED ]      := ( @ADO_DELETED() )
+   aADOFunc[ UR_SKIPRAW ]      := ( @ADO_SKIPRAW() )
+   aADOFunc[ UR_GOTO ]         := ( @ADO_GOTO() )
+   aADOFunc[ UR_GOTOID ]       := ( @ADO_GOTOID() )
+   aADOFunc[ UR_GOTOP ]        := ( @ADO_GOTOP() )
+   aADOFunc[ UR_GOBOTTOM ]     := ( @ADO_GOBOTTOM() )
+   aADOFunc[ UR_RECID ]        := ( @ADO_RECID() )
+   aADOFunc[ UR_RECCOUNT ]     := ( @ADO_RECCOUNT() )
+   aADOFunc[ UR_GETVALUE ]     := ( @ADO_GETVALUE() )
+   aADOFunc[ UR_PUTVALUE ]     := ( @ADO_PUTVALUE() )
+   aADOFunc[ UR_DELETE ]       := ( @ADO_DELETE() )
+   aADOFunc[ UR_APPEND ]       := ( @ADO_APPEND() )
+   aADOFunc[ UR_FLUSH ]        := ( @ADO_FLUSH() )
+   aADOFunc[ UR_ORDINFO ]      := ( @ADO_ORDINFO() )
+   aADOFunc[ UR_RECINFO ]      := ( @ADO_RECINFO() )
+   aADOFunc[ UR_FIELDINFO ]    := ( @ADO_FIELDINFO() )
+   aADOFunc[ UR_ORDLSTFOCUS ]  := ( @ADO_ORDLSTFOCUS() )
+   aADOFunc[ UR_PACK ]         := ( @ADO_PACK() )
+   aADOFunc[ UR_RAWLOCK ]      := ( @ADO_RAWLOCK() )
+   aADOFunc[ UR_LOCK ]         := ( @ADO_LOCK() )
+   aADOFunc[ UR_UNLOCK ]       := ( @ADO_UNLOCK() )
+   aADOFunc[ UR_SETFILTER ]    := ( @ADO_SETFILTER() )
+   aADOFunc[ UR_CLEARFILTER ]  := ( @ADO_CLEARFILTER() )
+   aADOFunc[ UR_ZAP ]          := ( @ADO_ZAP() )
+   aADOFunc[ UR_SETLOCATE ]    := ( @ADO_SETLOCATE() )
+   aADOFunc[ UR_LOCATE ]       := ( @ADO_LOCATE() )
+   aADOFunc[ UR_CLEARREL ]     := ( @ADO_CLEARREL() )
+   aADOFunc[ UR_RELAREA ]      := ( @ADO_RELAREA() )
+   aADOFunc[ UR_RELTEXT ]      := ( @ADO_RELTEXT() )
+   aADOFunc[ UR_SETREL ]       := ( @ADO_SETREL() )
+   aADOFunc[ UR_ORDCREATE ]    := ( @ADO_ORDCREATE() )
+   aADOFunc[ UR_ORDDESTROY ]   := ( @ADO_ORDDESTROY() )
+   aADOFunc[ UR_ORDLSTADD ]    := ( @ADO_ORDLSTADD() )
+   aADOFunc[ UR_ORDLSTCLEAR ]  := ( @ADO_ORDLSTCLEAR() )
 
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, cSuperRDD,;
-                            aMyFunc )
+                            aADOFunc )
 
 INIT PROCEDURE ADORDD_INIT()
    rddRegister( "ADORDD", RDT_FULL )
@@ -1076,16 +1078,16 @@ STATIC FUNCTION ADO_GETFIELDSIZE( nDBFFieldType, nADOFieldSize )
 
    DO CASE
 
-      case nDBFFieldType == HB_FT_STRING
+      CASE nDBFFieldType == HB_FT_STRING
            nDBFFieldSize := nADOFieldSize
 
-      case nDBFFieldType == HB_FT_INTEGER
+      CASE nDBFFieldType == HB_FT_INTEGER
            nDBFFieldSize := nADOFieldSize
 
       CASE nDBFFieldType == HB_FT_DATE
            nDBFFieldSize := 8
 
-      case nDBFFieldType == HB_FT_DOUBLE
+      CASE nDBFFieldType == HB_FT_DOUBLE
            nDBFFieldSize := nADOFieldSize
 
       CASE nDBFFieldType == HB_FT_DATETIME
@@ -1097,8 +1099,14 @@ STATIC FUNCTION ADO_GETFIELDSIZE( nDBFFieldType, nADOFieldSize )
       CASE nDBFFieldType == HB_FT_OLE
            nDBFFieldSize := 10
 
+      CASE nDBFFieldType == HB_FT_PICTURE
+           nDBFFieldSize := 10
+
       CASE nDBFFieldType == HB_FT_LOGICAL
            nDBFFieldSize := 1
+
+      CASE nDBFFieldType == HB_FT_MEMO
+           nDBFFieldSize := 10
 
    ENDCASE
 
@@ -1126,64 +1134,87 @@ STATIC FUNCTION ADO_GETFIELDTYPE( nADOFieldType )
       CASE nADOFieldType == adUnsignedTinyInt
       CASE nADOFieldType == adUnsignedSmallInt
       CASE nADOFieldType == adUnsignedInt
-		CASE nADOFieldType == adUnsignedBigInt
-		CASE nADOFieldType == adSingle
-		CASE nADOFieldType == adDouble
+      CASE nADOFieldType == adUnsignedBigInt
+      CASE nADOFieldType == adSingle
+
+      CASE nADOFieldType == adDouble
 		   nDBFFieldType := HB_FT_DOUBLE
-		CASE nADOFieldType == adCurrency
+
+      CASE nADOFieldType == adCurrency
          nDBFFieldType := HB_FT_INTEGER
-		CASE nADOFieldType == adDecimal
-         nDBFFieldType := HB_FT_LONG
-		CASE nADOFieldType == adNumeric
-         nDBFFieldType := HB_FT_LONG
-		CASE nADOFieldType == adBoolean
-         nDBFFieldType := HB_FT_LOGICAL
 
-		CASE nADOFieldType == adError
-		CASE nADOFieldType == adUserDefined
-		CASE nADOFieldType == adVariant
+      CASE nADOFieldType == adDecimal
+         nDBFFieldType := HB_FT_LONG
+
+      CASE nADOFieldType == adNumeric
+         nDBFFieldType := HB_FT_LONG
+
+
+      CASE nADOFieldType == adError
+      CASE nADOFieldType == adUserDefined
+      CASE nADOFieldType == adVariant
 		   nDBFFieldType := HB_FT_ANY
-		CASE nADOFieldType == adIDispatch
-		CASE nADOFieldType == adIUnknown
-		CASE nADOFieldType == adGUID
-		CASE nADOFieldType == adDate
+
+      CASE nADOFieldType == adIDispatch
+
+      CASE nADOFieldType == adIUnknown
+
+      CASE nADOFieldType == adGUID
+		   nDBFFieldType := HB_FT_STRING
+
+      CASE nADOFieldType == adDate
          nDBFFieldType := HB_FT_DATETIME
 
-		CASE nADOFieldType == adDBDate
+      CASE nADOFieldType == adDBDate
          nDBFFieldType := HB_FT_DATETIME
-		CASE nADOFieldType == adDBTime
-		CASE nADOFieldType == adDBTimeStamp
+
+      CASE nADOFieldType == adDBTime
+
+      CASE nADOFieldType == adDBTimeStamp
          nDBFFieldType := HB_FT_TIMESTAMP
-		CASE nADOFieldType == adBSTR
-		CASE nADOFieldType == adChar
+
+      CASE nADOFieldType == adFileTime
+         nDBFFieldType := HB_FT_DATETIME
+      CASE nADOFieldType == adBSTR
+		   nDBFFieldType := HB_FT_STRING
+
+      CASE nADOFieldType == adChar
          nDBFFieldType := HB_FT_STRING
 
       CASE nADOFieldType == adVarChar
          nDBFFieldType := HB_FT_STRING
 
-		CASE nADOFieldType == adLongVarChar
+      CASE nADOFieldType == adLongVarChar
          nDBFFieldType := HB_FT_STRING
 
-		CASE nADOFieldType == adWChar
+      CASE nADOFieldType == adWChar
          nDBFFieldType := HB_FT_STRING
 
-		CASE nADOFieldType == adVarWChar
+      CASE nADOFieldType == adVarWChar
          nDBFFieldType := HB_FT_STRING
 
-		CASE nADOFieldType == adLongVarWChar
-         nDBFFieldType := HB_FT_STRING
-
-		CASE nADOFieldType == adBinary
+      CASE nADOFieldType == adBinary
          nDBFFieldType := HB_FT_OLE
-		CASE nADOFieldType == adVarBinary
+
+      CASE nADOFieldType == adVarBinary
          nDBFFieldType := HB_FT_OLE
-		CASE nADOFieldType == adLongVarBinary
+
+      CASE nADOFieldType == adLongVarBinary
          nDBFFieldType := HB_FT_OLE
-		CASE nADOFieldType == adChapter
-		CASE nADOFieldType == adFileTime
-		CASE nADOFieldType == adPropVariant
-		CASE nADOFieldType == adVarNumeric
+
+      CASE nADOFieldType == adChapter
+
+      CASE nADOFieldType == adVarNumeric
       // case nADOFieldType == adArray
+
+      CASE nADOFieldType == adBoolean
+         nDBFFieldType := HB_FT_LOGICAL
+
+      CASE nADOFieldType == adLongVarWChar
+         nDBFFieldType := HB_FT_MEMO
+
+      CASE nADOFieldType == adPropVariant
+         nDBFFieldType := HB_FT_MEMO
 
    ENDCASE
 
@@ -1233,7 +1264,7 @@ FUNCTION HB_AdoSetLocateFor( cLocateFor )
 
 RETURN NIL
 
-static function SQLTranslate( cExpr )
+STATIC FUNCTION SQLTranslate( cExpr )
 
   if Left( cExpr, 1 ) == '"' .and. Right( cExpr, 1 ) == '"'
      cExpr = SubStr( cExpr, 2, Len( cExpr ) - 2 )
@@ -1250,19 +1281,19 @@ static function SQLTranslate( cExpr )
 
 RETURN cExpr
 
-function HB_AdoRddGetConnection( nWA )
+FUNCTION HB_AdoRddGetConnection( nWA )
 
    DEFAULT nWA TO Select()
 
 RETURN USRRDD_AREADATA( nWA )[ WA_CONNECTION ]
 
-function HB_AdoRddGetCatalog( nWA )
+FUNCTION HB_AdoRddGetCatalog( nWA )
 
    DEFAULT nWA TO Select()
 
 RETURN USRRDD_AREADATA( nWA )[ WA_CATALOG ]
 
-function HB_AdoRddGetRecordSet( nWA )
+FUNCTION HB_AdoRddGetRecordSet( nWA )
 
    local aWAData
 

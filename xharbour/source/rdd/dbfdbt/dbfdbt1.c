@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.37 2007/05/04 11:29:02 marchuet Exp $
+ * $Id: dbfdbt1.c,v 1.38 2007/05/08 10:08:29 marchuet Exp $
  */
 
 /*
@@ -441,7 +441,7 @@ static ERRCODE hb_dbtGetVarLen( DBTAREAP pArea, USHORT uiIndex, ULONG * pLength 
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 
-      if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE )
+      if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE )
       {
          if( hb_dbtFileLockSh( pArea ) )
          {
@@ -532,7 +532,7 @@ static ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
    {
       /* Force read record */
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
@@ -574,7 +574,7 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
       {

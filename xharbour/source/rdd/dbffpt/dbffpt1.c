@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.85 2007/05/04 20:56:11 ran_go Exp $
+ * $Id: dbffpt1.c,v 1.86 2007/05/08 10:08:29 marchuet Exp $
  */
 
 /*
@@ -1234,6 +1234,7 @@ static ULONG hb_fptCountSMTItemLength( FPTAREAP pArea, PHB_ITEM pItem,
          break;
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          ulLen = hb_itemGetCLen( pItem );
          if( ulLen > 0xFFFF )
@@ -1357,6 +1358,7 @@ static ULONG hb_fptStoreSMTItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          *(*bBufPtr)++ = SMT_IT_CHAR;
          ulLen = hb_itemGetCLen( pItem );
@@ -1645,6 +1647,7 @@ static ULONG hb_fptCountSixItemLength( FPTAREAP pArea, PHB_ITEM pItem,
          break;
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          ulSize = SIX_ITEM_BUFSIZE;
          ulLen = hb_itemGetCLen( pItem );
@@ -1746,6 +1749,7 @@ static ULONG hb_fptStoreSixItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
 
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          HB_PUT_LE_UINT16( &(*bBufPtr)[0], FPTIT_SIX_CHAR );
          ulLen = hb_itemGetCLen( pItem );
@@ -1891,6 +1895,7 @@ static ULONG hb_fptCountFlexItemLength( FPTAREAP pArea, PHB_ITEM pItem,
          break;
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          ulLen = hb_itemGetCLen( pItem );
          if( ulLen > 0xFFFF )
@@ -1940,6 +1945,7 @@ static void hb_fptStoreFlexItem( FPTAREAP pArea, PHB_ITEM pItem, BYTE ** bBufPtr
          break;
       case HB_IT_MEMO:
       case HB_IT_OLE:
+      case HB_IT_PICTURE:
       case HB_IT_STRING:
          ulLen = hb_itemGetCLen( pItem );
          if( ulLen > 0xFFFF )
@@ -3122,7 +3128,7 @@ static BOOL hb_fptHasMemoData( FPTAREAP pArea, USHORT uiIndex )
             }
          }
       }
-      else if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE )
+      else if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE || pField->uiType == HB_IT_PICTURE )
       {
          BYTE * pFieldBuf = pArea->pRecord + pArea->pFieldOffset[ uiIndex ];
          USHORT uiLen = pField->uiLen;
@@ -3334,7 +3340,7 @@ static ERRCODE hb_fptGetVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             uiError = EDBF_DATATYPE;
       }
    }
-   else if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE )
+   else if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE || pField->uiType == HB_IT_PICTURE )
    {
       uiError = hb_fptLockForRead( pArea, uiIndex, &fUnLock );
       if( uiError != SUCCESS )
@@ -3451,7 +3457,7 @@ static ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
 
    pField = pArea->lpFields + uiIndex - 1;
 
-   if( pField->uiType == HB_IT_ANY || pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE )
+   if( pField->uiType == HB_IT_ANY || pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE || pField->uiType == HB_IT_PICTURE )
    {
       BYTE * pFieldBuf = pArea->pRecord + pArea->pFieldOffset[ uiIndex - 1 ];
       ERRCODE uiError;
@@ -3473,7 +3479,7 @@ static ERRCODE hb_fptPutVarField( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem
             return uiError;
       }
 
-      if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE )
+      if( pField->uiType == HB_IT_MEMO || pField->uiType == HB_IT_OLE || pField->uiType == HB_IT_PICTURE )
       {
          if( !hb_fptFileLockEx( pArea, TRUE ) )
             return EDBF_LOCK;
@@ -3696,7 +3702,7 @@ static ERRCODE hb_fptGetVarLen( FPTAREAP pArea, USHORT uiIndex, ULONG * pLength 
    HB_TRACE(HB_TR_DEBUG, ("hb_fptGetVarLen(%p, %hu, %p)", pArea, uiIndex, pLength));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
    {
       ERRCODE uiError;
       BOOL fUnLock;
@@ -3957,6 +3963,7 @@ static ERRCODE hb_fptGetValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE ||
+         pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ||
          pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_ANY ) )
    {
       USHORT uiError;
@@ -4149,6 +4156,7 @@ static ERRCODE hb_fptPutValueFile( FPTAREAP pArea, USHORT uiIndex, BYTE * szFile
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
        ( pField->uiType == HB_IT_MEMO ||
          pField->uiType == HB_IT_OLE ||
+         pField->uiType == HB_IT_PICTURE ||
          ( pField->uiType == HB_IT_ANY && pField->uiLen >= 6 ) ) )
    {
       USHORT uiError;
@@ -4495,7 +4503,7 @@ static ERRCODE hb_fptFieldInfo( FPTAREAP pArea, USHORT uiIndex, USHORT uiType, P
       return FAILURE;
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
    {
       ULONG ulBlock, ulSize, ulType;
       BOOL bDeleted;

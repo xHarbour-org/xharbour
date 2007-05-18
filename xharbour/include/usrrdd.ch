@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.ch,v 1.2 2006/08/07 10:31:14 druzus Exp $
+ * $Id: usrrdd.ch,v 1.3 2007/05/11 10:22:07 marchuet Exp $
  */
 
 /*
@@ -189,6 +189,7 @@
 #define HB_FT_DATETIME        0x10000
 #define HB_FT_TIMESTAMP       0x20000
 #define HB_FT_OLE             0x40000
+#define HB_FT_PICTURE         0x80000
 
 /* Flags for DBTRANSINFO */
 #define DBTF_MATCH         0x0001
