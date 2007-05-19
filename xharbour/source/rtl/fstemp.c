@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.22 2006/10/20 11:25:02 lculik Exp $
+ * $Id: fstemp.c,v 1.23 2007/05/18 13:28:31 toninhofwi Exp $
  */
 
 /*
@@ -91,10 +91,10 @@ static BOOL hb_fsTempName( BYTE * pszBuffer, const BYTE * pszDir, const BYTE * p
 
    if( pszPrefix == NULL )
    {
-       pszPrefix = "xht";
+       pszPrefix = (const BYTE *) "xht";
    }
 
-   fResult = GetTempFileName( cTempDir, pszPrefix, 0, (char *) pszBuffer );
+   fResult = GetTempFileName( cTempDir, (const LPCSTR) pszPrefix, 0, (char *) pszBuffer );
 
 #else
 
