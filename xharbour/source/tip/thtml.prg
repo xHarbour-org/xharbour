@@ -4508,6 +4508,7 @@ saHtmlAnsiEntities := ;
 
 
 #pragma BEGINDUMP
+#include <ctype.h>
 #include "hbapi.h"
 #include "hbapiitm.h"
 #include "hbapierr.h"
@@ -4530,7 +4531,7 @@ HB_FUNC( PSTRCOMPI )
 
    if( (pPointer && pStart && pSubstr) )
    {
-      char * pcBase = hb_itemGetPtr( pPointer ) ;
+      char * pcBase = (char*) hb_itemGetPtr( pPointer ) ;
       char * pcSub  = pSubstr->item.asString.value ;
       ULONG uSublen = pSubstr->item.asString.length ;
       ULONG uStart  = hb_itemGetNL( pStart ) ;

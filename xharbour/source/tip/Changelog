@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.6 2007/05/18 15:40:30 hazi01 Exp $
+ * $Id: Changelog,v 1.7 2007/05/18 22:22:44 hazi01 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-20 01:00 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+    * source\tip\thtml.prg
+
+      Changed code to avoid errors with VC8
+      --> error C2440: 'initializing' : cannot convert from 'void *' to 'char *'
+      --> error C3861: 'tolower': identifier not found
+
 
 2007-05-19 00:15 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
     * source\tip\thtml.prg
