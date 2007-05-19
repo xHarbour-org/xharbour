@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.198 2007/05/07 10:19:53 marchuet Exp $
+# $Id: makefile.bc,v 1.199 2007/05/18 10:08:36 marchuet Exp $
 #
 
 #
@@ -884,6 +884,7 @@ TIP_LIB_OBJS = \
    $(TIP_OBJ_DIR)\mail.obj \
    $(TIP_OBJ_DIR)\popcln.obj \
    $(TIP_OBJ_DIR)\smtpcln.obj \
+   $(TIP_OBJ_DIR)\thtml.obj \
    $(TIP_OBJ_DIR)\url.obj
 
 #
@@ -3325,6 +3326,12 @@ $(TIP_OBJ_DIR)\smtpcln.c : $(TIP_DIR)\smtpcln.prg
    $(HB_CMD)
 
 $(TIP_OBJ_DIR)\smtpcln.obj : $(TIP_OBJ_DIR)\smtpcln.c
+   $(CC_CMD)
+
+$(TIP_OBJ_DIR)\thtml.c : $(TIP_DIR)\thtml.prg
+   $(HB_CMD)
+
+$(TIP_OBJ_DIR)\thtml.obj : $(TIP_OBJ_DIR)\thtml.c
    $(CC_CMD)
 
 $(TIP_OBJ_DIR)\url.c : $(TIP_DIR)\url.prg
