@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.2 2005/09/27 09:20:37 druzus Exp $
+ * $Id: ChangeLog,v 1.3 2006/01/31 21:38:19 druzus Exp $
  */
 
 /*
@@ -17,6 +17,68 @@
  *
  */
 
+2007-05-19 23:17 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  - source/rtl/pcre/chartables.c
+  - source/rtl/pcre/dftables.c
+  - source/rtl/pcre/pcre_printint.c
+  - source/rtl/pcre/ucp_findchar.c
+  - source/rtl/pcre/ucptable.c
+    - Removed no longer needed sources
+    
+  - source/rtl/pcre/pcre_ucp_findchar.c
+  + source/rtl/pcre/pcre_ucp_searchfuncs.c
+    * Renamed PCRE source [?]
+    
+  + source/rtl/pcre/pcre_chartables.c.dist
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper pcre_chartables.c
+  + source/rtl/pcre/pcre_chartables.c
+    * New simple wrapper to just #include pcre_chartables.c.generic
+  
+  + source/rtl/pcre/config.h.generic
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper config.h
+  * source/rtl/pcre/config.h
+    * Now a simple wrapper to just #include config.h.generic
+      
+  + source/rtl/pcre/pcre.h.generic
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper pcre.h
+  * source/rtl/pcre/pcre.h
+    * Now a simple wrapper to just #include pcre.h.generic
+      
+  + source/rtl/pcre/pcre_newline.c
+    + New PCRE source
+  + source/rtl/pcre/ucptable.h
+    + New PCRE source
+    
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_xclass.c
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/ucp.h
+  * source/rtl/pcre/ucpinternal.h
+  * source/rtl/pcre/ChangeLog
+  * source/rtl/pcre/Makefile
+    * Upgraded to latest available PCRE 7.1
+ 
 2006-01-31 22:00 UTC+0100 Przemyslaw Czerpak (druzus/at/priv.onet.pl)
   * Makefile
   * config.h
@@ -36,3 +98,13 @@
   * dftables.c
     * add extern declaration for _pcre_default_tables - some C++ compilers
       may need it
+
+2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * Updated to PCRE 7.1
+  * Generalized so we should be able to copy PCRE sources as-is
+    without having to manually create header files, etc.
+    -D defines for PCRE should now be removed from make files
+  
+  NOTE: We need only MANUALLY SYNCH  support for REG_STARTEND
+        into pcreposix.h and pcreposix.c
+       

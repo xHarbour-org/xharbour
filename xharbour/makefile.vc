@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.189 2007/05/02 13:41:57 ran_go Exp $
+# $Id: makefile.vc,v 1.190 2007/05/04 11:29:00 marchuet Exp $
 #
 
 #
@@ -634,8 +634,7 @@ RTL_LIB_OBJS = \
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -Fo$(OBJ_DIR)\ $<
 
 PCREPOS_LIB_OBJS = \
-   $(OBJ_DIR)\chartables.obj \
-   $(OBJ_DIR)\pcreposix.obj \
+   $(OBJ_DIR)\pcre_chartables.obj \
    $(OBJ_DIR)\pcre_compile.obj \
    $(OBJ_DIR)\pcre_config.obj \
    $(OBJ_DIR)\pcre_dfa_exec.obj \
@@ -645,17 +644,17 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)\pcre_globals.obj \
    $(OBJ_DIR)\pcre_info.obj \
    $(OBJ_DIR)\pcre_maketables.obj \
+   $(OBJ_DIR)\pcre_newline.obj \
    $(OBJ_DIR)\pcre_ord2utf8.obj \
-   $(OBJ_DIR)\pcre_printint.obj \
    $(OBJ_DIR)\pcre_refcount.obj \
    $(OBJ_DIR)\pcre_study.obj \
    $(OBJ_DIR)\pcre_tables.obj \
    $(OBJ_DIR)\pcre_try_flipped.obj \
-   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_ucp_searchfuncs.obj \
    $(OBJ_DIR)\pcre_valid_utf8.obj \
    $(OBJ_DIR)\pcre_version.obj \
    $(OBJ_DIR)\pcre_xclass.obj \
-   $(OBJ_DIR)\ucp_findchar.obj
+   $(OBJ_DIR)\pcreposix.obj
 
 #
 # LANG.LIB rules

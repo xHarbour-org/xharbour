@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.58 2006/03/10 01:24:15 ronpinkas Exp $
+ * $Id: regex.c,v 1.59 2006/03/12 22:21:04 fsgiudice Exp $
  */
 
 /*
@@ -376,7 +376,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
                }
 
-               hb_itemArrayPut( pRetArray, i + 1, &aSingleMatch );
+               hb_arraySetForward( pRetArray, i + 1, &aSingleMatch );
             }
 
             if ( fFree )
@@ -468,7 +468,8 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                             hb_itemPutCL( &aSingleMatch, "", 0 );
                          }
                       }
-                      hb_itemArrayPut( pAtxArray, i + 1, &aSingleMatch );
+                      
+                      hb_arraySetForward( pAtxArray, i + 1, &aSingleMatch );
                   }
 
                   hb_arrayAddForward( pRetArray, pAtxArray );

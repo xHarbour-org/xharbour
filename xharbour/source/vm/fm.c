@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.75 2007/05/09 19:56:23 ronpinkas Exp $
+ * $Id: fm.c,v 1.76 2007/05/15 21:34:15 ronpinkas Exp $
  */
 
 /*
@@ -163,8 +163,14 @@ static PHB_MEMINFO s_pLastBlock = NULL;
 #endif
 
 /* allocates fixed memory, do *not* exits on failure */
-#ifndef hb_xalloc
-void HB_EXPORT * hb_xalloc( ULONG ulSize )
+#ifdef hb_xalloc
+   #undef hb_xalloc
+   HB_EXPORT void * hb_xalloc( ULONG ulSize )
+   {
+      return malloc( ulSize);
+   }   
+#else
+HB_EXPORT void * hb_xalloc( ULONG ulSize )
 {
    void * pMem;
 
@@ -278,7 +284,13 @@ void HB_EXPORT * hb_xalloc( ULONG ulSize )
 }
 #endif
 
-#ifndef hb_xgrab
+#ifdef hb_xgrab
+   #undef hb_xgrab
+   HB_EXPORT void * hb_xgrab( ULONG ulSize )
+   {
+      return malloc( ulSize);
+   }   
+#else
 /* allocates fixed memory, exits on failure */
 void HB_EXPORT * hb_xgrab( ULONG ulSize )
 {
@@ -399,7 +411,13 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
 }
 #endif
 
-#ifndef hb_xrealloc
+#ifdef hb_xrealloc
+   #undef hb_xrealloc
+   HB_EXPORT void * hb_xrealloc( void *pMem, ULONG ulSize )
+   {
+      return realloc( pMem, ulSize );
+   }   
+#else
 void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
 #ifdef HB_FM_STATISTICS
@@ -529,8 +547,14 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 }
 #endif
 
-#ifndef hb_xfree
-void hb_xfree( void * pMem )            /* frees fixed memory */
+#ifdef hb_xfree
+   #undef hb_xfree
+   HB_EXPORT void hb_xfree( void *pMem )
+   {
+      return free( pMem );
+   }   
+#else
+HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 {
 
 #ifdef HB_FM_STATISTICS

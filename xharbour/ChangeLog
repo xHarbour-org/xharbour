@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5539 2007/05/19 10:14:11 patrickmast Exp $
+ * $Id: ChangeLog,v 1.5540 2007/05/19 13:06:14 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,79 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  - source/rtl/pcre/chartables.c
+  - source/rtl/pcre/dftables.c
+  - source/rtl/pcre/pcre_printint.c
+  - source/rtl/pcre/ucp_findchar.c
+  - source/rtl/pcre/ucptable.c
+    - Removed no longer needed sources
+    
+  - source/rtl/pcre/pcre_ucp_findchar.c
+  + source/rtl/pcre/pcre_ucp_searchfuncs.c
+    * Renamed PCRE source [?]
+    
+  + source/rtl/pcre/pcre_chartables.c.dist
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper pcre_chartables.c
+  + source/rtl/pcre/pcre_chartables.c
+    * New simple wrapper to just #include pcre_chartables.c.generic
+  
+  + source/rtl/pcre/config.h.generic
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper config.h
+  * source/rtl/pcre/config.h
+    * Now a simple wrapper to just #include config.h.generic
+      
+  + source/rtl/pcre/pcre.h.generic
+    + This is the Native file from PCRE distribution
+      it is now #included as-is by a simple wrapper pcre.h
+  * source/rtl/pcre/pcre.h
+    * Now a simple wrapper to just #include pcre.h.generic
+      
+  + source/rtl/pcre/pcre_newline.c
+    + New PCRE source
+  + source/rtl/pcre/ucptable.h
+    + New PCRE source
+    
+  * source/rtl/pcre/pcre_compile.c
+  * source/rtl/pcre/pcre_config.c
+  * source/rtl/pcre/pcre_dfa_exec.c
+  * source/rtl/pcre/pcre_exec.c
+  * source/rtl/pcre/pcre_fullinfo.c
+  * source/rtl/pcre/pcre_get.c
+  * source/rtl/pcre/pcre_globals.c
+  * source/rtl/pcre/pcre_info.c
+  * source/rtl/pcre/pcre_internal.h
+  * source/rtl/pcre/pcre_maketables.c
+  * source/rtl/pcre/pcre_ord2utf8.c
+  * source/rtl/pcre/pcre_refcount.c
+  * source/rtl/pcre/pcre_scanner.h
+  * source/rtl/pcre/pcre_study.c
+  * source/rtl/pcre/pcre_tables.c
+  * source/rtl/pcre/pcre_try_flipped.c
+  * source/rtl/pcre/pcre_valid_utf8.c
+  * source/rtl/pcre/pcre_version.c
+  * source/rtl/pcre/pcre_xclass.c
+  * source/rtl/pcre/pcreposix.c
+  * source/rtl/pcre/pcreposix.h
+  * source/rtl/pcre/ucp.h
+  * source/rtl/pcre/ucpinternal.h
+  * source/rtl/pcre/ChangeLog
+  * source/rtl/pcre/Makefile
+    * Upgraded to latest available PCRE 7.1
+  
+  * include/hbregex.h
+    + Added #include config.h of PCRE
+    
+  * source/rtl/regex.c
+    ! Fixed memory leak
+    
+  * source/vm/fm.c
+
+  * makefile.bc
+  * makefile.vc
 
 2007-05-19 10:06 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/fstemp.c

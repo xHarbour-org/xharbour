@@ -6,7 +6,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2005 University of Cambridge
+           Copyright (c) 1997-2007 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -77,8 +77,8 @@ static const int eint[] = {
   REG_ASSERT,  /* internal error: code overflow */
   REG_BADPAT,  /* unrecognized character after (?< */
   REG_BADPAT,  /* lookbehind assertion is not fixed length */
-  REG_BADPAT,  /* malformed number after (?( */
-  REG_BADPAT,  /* conditional group containe more than two branches */
+  REG_BADPAT,  /* malformed number or name after (?( */
+  REG_BADPAT,  /* conditional group contains more than two branches */
   REG_BADPAT,  /* assertion expected after (?( */
   REG_BADPAT,  /* (?R or (?digits must be followed by ) */
   REG_ECTYPE,  /* unknown POSIX class name */
@@ -93,12 +93,22 @@ static const int eint[] = {
   REG_BADPAT,  /* closing ) for (?C expected */
   REG_BADPAT,  /* recursive call could loop indefinitely */
   REG_BADPAT,  /* unrecognized character after (?P */
-  REG_BADPAT,  /* syntax error after (?P */
-  REG_BADPAT,  /* two named groups have the same name */
+  REG_BADPAT,  /* syntax error in subpattern name (missing terminator) */
+  REG_BADPAT,  /* two named subpatterns have the same name */
   REG_BADPAT,  /* invalid UTF-8 string */
   REG_BADPAT,  /* support for \P, \p, and \X has not been compiled */
   REG_BADPAT,  /* malformed \P or \p sequence */
-  REG_BADPAT   /* unknown property name after \P or \p */
+  REG_BADPAT,  /* unknown property name after \P or \p */
+  REG_BADPAT,  /* subpattern name is too long (maximum 32 characters) */
+  REG_BADPAT,  /* too many named subpatterns (maximum 10,000) */
+  REG_BADPAT,  /* repeated subpattern is too long */
+  REG_BADPAT,  /* octal value is greater than \377 (not in UTF-8 mode) */
+  REG_BADPAT,  /* internal error: overran compiling workspace */
+  REG_BADPAT,  /* internal error: previously-checked referenced subpattern not found */
+  REG_BADPAT,  /* DEFINE group contains more than one branch */
+  REG_BADPAT,  /* repeating a DEFINE group is not allowed */
+  REG_INVARG,  /* inconsistent NEWLINE options */
+  REG_BADPAT   /* \g is not followed followed by an (optionally braced) non-zero number */
 };
 
 /* Table of texts corresponding to POSIX error codes */
@@ -131,7 +141,7 @@ static const char *const pstring[] = {
 *          Translate error code to string        *
 *************************************************/
 
-EXPORT size_t
+PCREPOSIX_EXP_DEFN size_t
 regerror(int errcode, const regex_t *preg, char *errbuf, size_t errbuf_size)
 {
 const char *message, *addmessage;
@@ -166,7 +176,7 @@ return length + addlength;
 *           Free store held by a regex           *
 *************************************************/
 
-EXPORT void
+PCREPOSIX_EXP_DEFN void
 regfree(regex_t *preg)
 {
 (pcre_free)(preg->re_pcre);
@@ -189,7 +199,7 @@ Returns:      0 on success
               various non-zero codes on failure
 */
 
-EXPORT int
+PCREPOSIX_EXP_DEFN int
 regcomp(regex_t *preg, const char *pattern, int cflags)
 {
 const char *errorptr;
@@ -197,9 +207,11 @@ int erroffset;
 int errorcode;
 int options = 0;
 
-if ((cflags & REG_ICASE) != 0) options |= PCRE_CASELESS;
+if ((cflags & REG_ICASE) != 0)   options |= PCRE_CASELESS;
 if ((cflags & REG_NEWLINE) != 0) options |= PCRE_MULTILINE;
-if ((cflags & REG_DOTALL) != 0) options |= PCRE_DOTALL;
+if ((cflags & REG_DOTALL) != 0)  options |= PCRE_DOTALL;
+if ((cflags & REG_NOSUB) != 0)   options |= PCRE_NO_AUTO_CAPTURE;
+if ((cflags & REG_UTF8) != 0)    options |= PCRE_UTF8;
 
 preg->re_pcre = pcre_compile2(pattern, options, &errorcode, &errorptr,
   &erroffset, NULL);
@@ -223,9 +235,13 @@ substring, so we have to get and release working store instead of just using
 the POSIX structures as was done in earlier releases when PCRE needed only 2
 ints. However, if the number of possible capturing brackets is small, use a
 block of store on the stack, to reduce the use of malloc/free. The threshold is
-in a macro that can be changed at configure time. */
+in a macro that can be changed at configure time.
 
-EXPORT int
+If REG_NOSUB was specified at compile time, the PCRE_NO_AUTO_CAPTURE flag will
+be set. When this is the case, the nmatch and pmatch arguments are ignored, and
+the only result is yes/no/error. */
+
+PCREPOSIX_EXP_DEFN int
 regexec(const regex_t *preg, const char *string, size_t nmatch,
   regmatch_t pmatch[], int eflags)
 {
@@ -233,15 +249,22 @@ int rc;
 int options = 0;
 int *ovector = NULL;
 int small_ovector[POSIX_MALLOC_THRESHOLD * 3];
-int iStartOffset; // Ron Pinkas - added to support REG_STARTEND
 BOOL allocated_ovector = FALSE;
+BOOL nosub =
+  (((const pcre *)preg->re_pcre)->options & PCRE_NO_AUTO_CAPTURE) != 0;
+int iStartOffset; /* Ron Pinkas - added to support REG_STARTEND */
 
 if ((eflags & REG_NOTBOL) != 0) options |= PCRE_NOTBOL;
 if ((eflags & REG_NOTEOL) != 0) options |= PCRE_NOTEOL;
 
 ((regex_t *)preg)->re_erroffset = (size_t)(-1);  /* Only has meaning after compile */
 
-if (nmatch > 0)
+/* When no string data is being returned, ensure that nmatch is zero.
+Otherwise, ensure the vector for holding the return data is large enough. */
+
+if (nosub) nmatch = 0;
+
+else if (nmatch > 0)
   {
   if (nmatch <= POSIX_MALLOC_THRESHOLD)
     {
@@ -249,6 +272,7 @@ if (nmatch > 0)
     }
   else
     {
+    if (nmatch > INT_MAX/(sizeof(int) * 3)) return REG_ESPACE;
     ovector = (int *)malloc(sizeof(int) * nmatch * 3);
     if (ovector == NULL) return REG_ESPACE;
     allocated_ovector = TRUE;
@@ -256,36 +280,22 @@ if (nmatch > 0)
   }
 
 /* Ron Pinkas added POSIX REG_STARTEND support.
-rc = pcre_exec(preg->re_pcre, NULL, string, (int)strlen(string), 0, options,
-  ovector, nmatch * 3);
-* /
-if ((eflags & REG_STARTEND) && pmatch && pmatch[0].rm_so >= 0 && pmatch[0].rm_eo > pmatch[0].rm_so && pmatch[0].rm_eo <= (int)strlen(string) )
- {
- iStartOffset = pmatch[0].rm_so;
- rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
- }
- else
- {
- iStartOffset = 0;
- rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
- }
-*/
-
-
-/* Ron Pinkas added POSIX REG_STARTEND support.
 rc = pcre_exec((const pcre *)preg->re_pcre, NULL, string, (int)strlen(string),
   0, options, ovector, nmatch * 3);
 */
-if ((eflags & REG_STARTEND) && pmatch && pmatch[0].rm_so >= 0 && pmatch[0].rm_eo > pmatch[0].rm_so && pmatch[0].rm_eo <= (int)strlen(string) ) {
+if ((eflags & REG_STARTEND) && pmatch && pmatch[0].rm_so >= 0 && pmatch[0].rm_eo > pmatch[0].rm_so && pmatch[0].rm_eo <= (int)strlen(string) )
+  {
 
-   iStartOffset = pmatch[0].rm_so;
-   rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
+  iStartOffset = pmatch[0].rm_so;
+  rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string + pmatch[0].rm_so, (int)( pmatch[0].rm_eo - pmatch[0].rm_so ), 0, options, ovector, nmatch * 3);
 
-} else {
+  }
 
-   iStartOffset = 0;
-   rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
-}
+else
+  {
+  iStartOffset = 0;
+  rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
+  }
 
 
 if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
@@ -293,19 +303,23 @@ if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
 if (rc >= 0)
   {
   size_t i;
-  for (i = 0; i < (size_t)rc; i++)
+  if (!nosub)
     {
-    pmatch[i].rm_so = ovector[i*2];
-    pmatch[i].rm_eo = ovector[i*2+1];
+    for (i = 0; i < (size_t)rc; i++)
+      {
+      pmatch[i].rm_so = ovector[i*2];
+      pmatch[i].rm_eo = ovector[i*2+1];
 
-    // Ron Pinkas - added to support REG_STARTEND
-    if( pmatch[i].rm_so >= 0 ) {
-      pmatch[i].rm_so += iStartOffset;
-      pmatch[i].rm_eo += iStartOffset;
+      /* Ron Pinkas - added to support REG_STARTEND */
+      if ( pmatch[i].rm_so >= 0 )
+        {
+        pmatch[i].rm_so += iStartOffset;
+        pmatch[i].rm_eo += iStartOffset;
+        }
+      }
+    if (allocated_ovector) free(ovector);
+    for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
     }
-    }
-  if (allocated_ovector) free(ovector);
-  for (; i < nmatch; i++) pmatch[i].rm_so = pmatch[i].rm_eo = -1;
   return 0;
   }
 
