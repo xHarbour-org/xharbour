@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5542 2007/05/21 15:28:44 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5543 2007/05/21 17:18:03 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-21 20:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed "@Sn" pict behaviour when "n" is larger than get width.
+      Thanks to Ed Horbino by help.
+    ! fixed "@X", "@C", "@(" and "@)" pictures behaviour as reported
+      in dev-list by Toninho.
 
 2007-05-21 14:20 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/eval.c

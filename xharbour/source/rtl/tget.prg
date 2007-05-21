@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.128 2007/03/31 16:43:24 modalsist Exp $
+ * $Id: tget.prg,v 1.129 2007/05/05 22:26:43 modalsist Exp $
  */
 
 /*
@@ -179,6 +179,9 @@ CLASS Get
    DATA lUndo INIT .F.
    DATA lLeftJust INIT .F.   // to "@B" mask
 
+   DATA lDispLenChanged  INIT .F.  // to "@X", "@C", "(" and ")" pictures.
+   DATA nDispLenReduce   INIT 0    // idem.
+
    METHOD ParsePict( cPicture )
    METHOD DeleteAll()
    METHOD IsEditable( nPos )
@@ -259,9 +262,11 @@ METHOD ParsePict( cPicture ) CLASS Get
    Local cNum
    Local nPos
    Local nLen,nDec
+   Local nMaxLen
 
    cNum := ""
-
+   
+   
    /* E.F. 2006/MAY/31 - Search by last occurrence of "@" into picture
     * to verify if picture has a function and avoid any char before it.
     * E.F. 2006/AUG/14 - Replaced RAT by AT to preserve others pictures, if any.
@@ -395,12 +400,18 @@ METHOD ParsePict( cPicture ) CLASS Get
 
          /* E.F. 2007/FEB/03 - Assign default mask format in accordance with
                                buffer lenght and dec pos. */
+
          if ::nMaxLen != NIL .and. ::DecPos != NIL
-            if ::DecPos < ::nMaxLen .and. ::DecPos > 0
-               cNum := Str( ::xVarGet, ::nMaxLen, ::nMaxLen - ::DecPos )
+
+            /* 2007/MAY/20 - E.F. */
+            nMaxLen := ::nMaxLen - iif(::lDispLenChanged,::nDispLenReduce,0)
+
+            if ::DecPos < nMaxLen .and. ::DecPos > 0
+               cNum := Str( ::xVarGet, nMaxLen, nMaxLen - ::DecPos )
             else
-               cNum := Str( ::xVarGet, ::nMaxLen, 0 )
+               cNum := Str( ::xVarGet, nMaxLen, 0 )
             endif
+            
          else
             cNum := Str( ::xVarGet )
          endif
@@ -420,13 +431,14 @@ METHOD ParsePict( cPicture ) CLASS Get
             nLen := iif( ::xVarGet < -99999999.99, 10+iif(nDec>0,1,0) + nDec, Len( cNum ) )
             cNum := Str( ::xVarGet, nLen, nDec )
          ENDIF
-
+         
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0
             ::cPicMask := Replicate( '9', nAt - 1 ) + iif( ::lDecRev, ",", "." )
             ::cPicMask += Replicate( '9', Len( cNum ) - Len( ::cPicMask ) )
          else
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
+
          exit
 
        case "C"
@@ -499,6 +511,7 @@ METHOD Display( lForced ) CLASS Get
    LOCAL cClrAcc := hb_ColorIndex( ::ColorSpec, GET_CLR_ACCEL )
    LOCAL lIsIntense := SET( _SET_INTENSITY)
    LOCAL nCol,cDisplay
+   LOCAL nDispReduce := 0
 
    DEFAULT lForced TO .t.
 
@@ -519,7 +532,6 @@ METHOD Display( lForced ) CLASS Get
       xBuffer   := ::Buffer
    ENDIF
 
-  
    HBConsoleLock()
 
 
@@ -549,7 +561,9 @@ METHOD Display( lForced ) CLASS Get
       cDisplay := SubStr( xBuffer, ::nDispPos, ::nDispLen )
 
       IF Len( cDisplay ) < ::nDispLen
-         cDisplay := Padr( cDisplay, ::nDispLen ) 
+/* 2007/MAY/18 - E.F. - Adjust display length
+         cDisplay := Padr( cDisplay, ::nDispLen ) */
+         cDisplay := Padr( cDisplay, Min(::nDispLen,::nMaxLen) ) 
       ENDIF
 
       // The get lost the focus. We need left-adjust the content buffer
@@ -559,9 +573,43 @@ METHOD Display( lForced ) CLASS Get
          cDisplay := Padr( Ltrim( cDisplay ), ::nDispLen )
       ENDIF
 
+      /* 2007/MAY/19 - E.F. - Reduce display length at "@X","@C","@(" or "@)" picture and final value conditions */
+      IF ::Type=="N" .AND. !::lDispLenChanged .AND. !::HasFocus .and.;
+         ::Changed .AND. !::Rejected .AND.;
+         ::ExitState != NIL .AND. xBuffer != NIL .AND.;
+         ::ExitState > GE_NOEXIT .AND. ::ExitState != GE_ESCAPE
+
+         if ( "X" IN ::cPicFunc .and. ::Untransform( xBuffer ) >= 0 ) .or.;
+            ( "C" IN ::cPicFunc .and. ::Untransform( xBuffer ) < 0 )
+
+            nDispReduce := 3
+
+         endif
+
+         if ( "(" IN ::cPicFunc .OR. ")" IN ::cPicFunc .AND. ::Untransform( xBuffer ) >= 0 )
+
+            if ")" IN ::cPicFunc
+               cDisplay := StrTran( cDisplay, "("," ")
+               cDisplay := StrTran( cDisplay, ")"," ")
+            endif
+
+            nDispReduce := 1
+
+         endif
+
+      ENDIF
+
+
       DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
                  cDisplay,;
                  hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
+
+
+      IF nDispReduce > 0
+
+         DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ) + ::nDispLen,;
+                    space(nDispReduce), hb_ColorIndex( ::ColorSpec, 4 ), .T. )
+      ENDIF
 
       IF ! ( ::cDelimit == NIL )
          DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
@@ -910,7 +958,7 @@ METHOD VarGet() CLASS Get
    ENDIF
 
    ::xVarGet := xVarGet
-   
+
 RETURN xVarGet
 
 //---------------------------------------------------------------------------//
@@ -1631,13 +1679,11 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    local nAt
    local nNoEditable := 0
 
-
    DEFAULT lEdit  TO ::HasFocus
    DEFAULT xValue TO ::UnTransform()
    DEFAULT xValue TO ::xVarGet
    DEFAULT xValue TO ::VarGet()
 
-   
    IF ::Type == NIL
       ::Type := ValType( xValue )
       ::Picture := ::cOrigPicture
@@ -1645,9 +1691,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    cPicFunc := ::cPicFunc
    cMask    := ::cPicMask
-
+   
    DEFAULT cMask  TO ""
-
+  
    if xValue == NIL .OR. ValType( xValue ) IN "AB"
       ::nMaxLen := 0
       return NIL
@@ -1667,32 +1713,51 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    cBuffer := Transform( xValue, if( Empty( cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + cMask )
 
+   /* 2007/MAY/20 - E.F. */
+   ::lDispLenChanged := ( ::Type=="N" .AND. ("DB" IN cBuffer .OR. "CR" IN cBuffer .OR. "(" IN cBuffer .OR. ")" IN cBuffer ) )
+
    if ::type == "N"
-      if ( "(" IN cPicFunc .or. ")" IN cPicFunc ) .and. xValue >= 0
-/* 2007/MAY/04 - E.F. */
-//         cBuffer += " "
-         cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
-      endif
 
-      if ( ( "C" IN cPicFunc .and. xValue <  0 ) .or.;
-           ( "X" IN cPicFunc .and. xValue >= 0 ) ) .and.;
-           !( "X" IN cPicFunc .and. "C" IN cPicFunc ) 
-/* 2007/MAY/04 - E.F. */
-//         cBuffer += "   "
-         cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
-      endif
+     if  ::lDispLenChanged 
 
-      ::lMinusPrinted := ( xValue < 0 )
+     if "(" IN cPicFunc .or. ")" IN cPicFunc
+
+        ::nDispLenReduce := 1
+
+        if xValue >= 0
+           cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
+        endif
+
+      elseif "C" IN cPicFunc  
+
+        ::nDispLenReduce := 3
+
+        if xValue < 0
+           cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
+        endif
+
+      elseif "X" IN cPicFunc 
+
+        ::nDispLenReduce := 3
+
+        if xValue >= 0
+           cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
+        endif
+
+     endif
+
+     endif
+
+     ::lMinusPrinted := ( xValue < 0 )
+
    endif
 
-   ::nMaxLen  := Len( cBuffer )
-
+   ::nMaxLen  := Len( cBuffer ) 
    ::nMaxEdit := ::nMaxLen
-
+   
    if ::nDispLen == NIL .or. !::lDispLen
       ::nDispLen := ::nMaxLen
    endif
-
 
    if lEdit .and. ::type == "N" .and. ! Empty( cMask )
 
@@ -1720,18 +1785,18 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    endif
 
-   if ::type == "N"
-      if "(" IN ::cPicFunc .or. ")" IN ::cPicFunc 
-// 2007/MAY/04 - E.F.
-//         ::nMaxEdit --
-           ::nMaxEdit := ::nMaxLen - 1
+   /* 2007/MAY/20 - E.F. */
+   if ::type == "N" .and. ::lDispLenChanged
+
+      if ( "(" IN ::cPicFunc .OR. ")" IN ::cPicFunc .OR.;
+           "C" IN ::cPicFunc .OR. "X" IN ::cPicFunc )
+
+      ::nMaxEdit := ::nMaxLen - ::nDispLenReduce
+
       endif
-      if "C" IN ::cPicFunc .or. "X" IN ::cPicFunc 
-// 2007/MAY/04 - E.F.
-//         ::nMaxEdit -= 3
-           ::nMaxEdit := ::nMaxLen - 3
-      endif
+
    endif
+
 
    /* 2006/OCT/28 - E.F. - fixed a bug when we set century on after set date
     *                      and use get with picture "@E" in date variable.
