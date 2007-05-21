@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5540 2007/05/19 13:06:14 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5541 2007/05/20 03:26:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,47 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-21 11:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.bc
+    * Updated for PCRE 7.1
+    - Removed unneeded ppcomp    
+    * Minor adjustments
+  * hrbdll.vc
+    * Updated for PCRE 7.1
+    
+  * contrib/freeimage/MAKEFILE.BC
+  * contrib/freeimage/env/bccWin32.Mak
+  * contrib/freeimage/env/makelib.b32
+  * contrib/gd/MAKEFILE.BC
+  * contrib/gd/MAKE_B32.BAT
+  * contrib/gd/env/bccWin32.Mak
+  * contrib/gd/env/makelib.b32
+  * contrib/gtwvw/samples/wvwtest9.bc
+  * contrib/libnf/makefile.bc
+    - Removed all instances of BCCDIR and BCC_DIR
+      /* Please avoid this practice, instead make sure you have
+         correct bcc32.cfg and ilink32.cfg in your BCC installation */     
+
+2007-05-20 23:27 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/eval.c
+    ! Fixed HB_Exec() building wrong execution stack for hb_vmDo()/hb_vmSend()
+    
+    /* 
+       NOTE: This fix forces requires the docs to specify that HB_Exec() syntax is:
+       
+       HB_Exec( pFunction_or_Method_Pointer [, <NIL_or_SelfObject> [, ...] ] )
+       
+       // If calling a function, passed arguments MUST be preceded by a NIL!
+       HB_Exc( pSomeFunctionPinter [, NIL, Arg1 [, ArgN] ] ) 
+       
+       // If calling a Method, passed arguments MUST be preceded by the Self object!
+       HB_Exc( pSomeFunctionPinter [, Self, Arg1 [, ArgN] ] ) 
+       
+    */    
+    
+  * source/vm/inet.c
+    + Added apparent missing break statement to eliminate infinit loop on "Timeout" error
+    
 2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   - source/rtl/pcre/chartables.c
   - source/rtl/pcre/dftables.c
@@ -72,15 +113,17 @@
   
   * include/hbregex.h
     + Added #include config.h of PCRE
+
+  * makefile.bc
+  * makefile.vc
+    * Updated for PCRE 7.1
     
   * source/rtl/regex.c
     ! Fixed memory leak
     
   * source/vm/fm.c
-
-  * makefile.bc
-  * makefile.vc
-
+    * Define minimal hb_xgrag|free when hb_xgrab|free defined for compiled 3rd party libs   
+  
 2007-05-19 10:06 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/fstemp.c
     + Changes in my last commit to make MSVC 8 happy. Thanks Ranier.

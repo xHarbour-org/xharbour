@@ -8,7 +8,7 @@
 # Include file for libraries. Set LIBTARGET and OBJECTS
 # before including this file.
 
-# WXWIN and BCCDIR are set by parent make
+# WXWIN is set by parent make
 
 !include $(APP_DIR)\env\makeb32.env
 

@@ -10,7 +10,6 @@
 # Global paths
 #
 HBR_DIR=..\..
-BCC_DIR=$(BCCDIR)
 APP_DIR=.
 APP_NAME=gdlib
 

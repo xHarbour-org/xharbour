@@ -12,10 +12,9 @@ HARBOURDIR=..\..\..
 HARBOURLIB=$(HARBOURDIR)\lib
 HARBOUREXE=$(HARBOURDIR)\bin\harbour.exe
 CTLIBDIR=$(HARBOURDIR)\contrib\libct
-BCCDIR=c:\software\borland\bcc55
 HRBFLAGS = /n /w /m /p /i$(HARBOURDIR)\include;$(HARBOURDIR)\contrib\what32\include
-CFLAGS = -W -DHB_STATISTICS_OFF -DHB_OS_WIN_32 -O2 -OS -d -L$(BCCDIR)\lib;$(HARBOURLIB) -c -I$(HARBOURDIR)\include;$(CTLIBDIR)\include;$(BCCDIR)\include
-LFLAGS = -L$(HARBOURLIB);$(BCCDIR)\lib -Gn -M -m -s -Tpe -aa
+CFLAGS = -W -DHB_STATISTICS_OFF -DHB_OS_WIN_32 -O2 -OS -d -L$(HARBOURLIB) -c -I$(HARBOURDIR)\include;$(CTLIBDIR)\include
+LFLAGS = -L$(HARBOURLIB) -Gn -M -m -s -Tpe -aa
 
 #
 # Response file (from MAKELNK2.PRG)

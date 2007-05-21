@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.104 2007/05/04 11:29:00 marchuet Exp $
+# $Id: hrbdll.vc,v 1.105 2007/05/04 12:48:55 andresreyesh Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -394,8 +394,7 @@ HARBOUR_DLL_OBJS = \
 #
 # pcre c
 #
-  $(OBJ_DIR)\chartables.obj \
-  $(OBJ_DIR)\pcreposix.obj \
+  $(OBJ_DIR)\pcre_chartables.obj \
   $(OBJ_DIR)\pcre_compile.obj \
   $(OBJ_DIR)\pcre_config.obj \
   $(OBJ_DIR)\pcre_dfa_exec.obj \
@@ -405,17 +404,17 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pcre_globals.obj \
   $(OBJ_DIR)\pcre_info.obj \
   $(OBJ_DIR)\pcre_maketables.obj \
+  $(OBJ_DIR)\pcre_newline.obj \
   $(OBJ_DIR)\pcre_ord2utf8.obj \
-  $(OBJ_DIR)\pcre_printint.obj \
   $(OBJ_DIR)\pcre_refcount.obj \
   $(OBJ_DIR)\pcre_study.obj \
   $(OBJ_DIR)\pcre_tables.obj \
   $(OBJ_DIR)\pcre_try_flipped.obj \
-  $(OBJ_DIR)\pcre_ucp_findchar.obj \
+  $(OBJ_DIR)\pcre_ucp_searchfuncs.obj \
   $(OBJ_DIR)\pcre_valid_utf8.obj \
   $(OBJ_DIR)\pcre_version.obj \
   $(OBJ_DIR)\pcre_xclass.obj \
-  $(OBJ_DIR)\ucp_findchar.obj \
+  $(OBJ_DIR)\pcreposix.obj \
 #
 # Vm c
 #

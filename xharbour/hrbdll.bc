@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.136 2007/04/16 15:33:14 modalsist Exp $
+# $Id: hrbdll.bc,v 1.137 2007/05/04 11:29:00 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -502,7 +502,6 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\msguawin.obj \
   $(OBJ_DIR)\msgzhb5.obj \
   $(OBJ_DIR)\msgzhgb.obj \
-  $(OBJ_DIR)\ppcomp.obj \
   $(OBJ_DIR)\ppcore.obj \
   $(OBJ_DIR)\pplib.obj \
   $(OBJ_DIR)\pptable.obj \
@@ -536,8 +535,7 @@ HARBOUR_DLL_OBJS = \
 #
 # pcre c
 #
-  $(OBJ_DIR)\chartables.obj \
-  $(OBJ_DIR)\pcreposix.obj \
+  $(OBJ_DIR)\pcre_chartables.obj \
   $(OBJ_DIR)\pcre_compile.obj \
   $(OBJ_DIR)\pcre_config.obj \
   $(OBJ_DIR)\pcre_dfa_exec.obj \
@@ -547,17 +545,17 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pcre_globals.obj \
   $(OBJ_DIR)\pcre_info.obj \
   $(OBJ_DIR)\pcre_maketables.obj \
+  $(OBJ_DIR)\pcre_newline.obj \  
   $(OBJ_DIR)\pcre_ord2utf8.obj \
-  $(OBJ_DIR)\pcre_printint.obj \
   $(OBJ_DIR)\pcre_refcount.obj \
   $(OBJ_DIR)\pcre_study.obj \
   $(OBJ_DIR)\pcre_tables.obj \
   $(OBJ_DIR)\pcre_try_flipped.obj \
-  $(OBJ_DIR)\pcre_ucp_findchar.obj \
+  $(OBJ_DIR)\pcre_ucp_searchfuncs.obj \
   $(OBJ_DIR)\pcre_valid_utf8.obj \
   $(OBJ_DIR)\pcre_version.obj \
   $(OBJ_DIR)\pcre_xclass.obj \
-  $(OBJ_DIR)\ucp_findchar.obj \
+  $(OBJ_DIR)\pcreposix.obj \
 #
 # Codepage
 #
@@ -738,7 +736,6 @@ HARBOUR_DLL_OBJS = \
 #
 #  Pp
 #
-   $(OBJ_DIR)\ppcomp.obj \
    $(OBJ_DIR)\ppcore.obj \
    $(OBJ_DIR)\pplib.obj \
    $(OBJ_DIR)\pplib2.obj \
@@ -759,7 +756,7 @@ HARBOUR_DLL_OBJS = \
 #  usrrdd
 #
   $(OBJ_DIR)\usrrdd.obj
-
+  
 #
 #  Gt
 #
@@ -1009,7 +1006,6 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\philes.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\philes53.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\philesx.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\ppcomp.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ppcore.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\pplib.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\pplib2.obj            + >> hdll.tmp
@@ -1391,8 +1387,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\spread.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\untext.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\util.obj              + >> hdll.tmp
-  echo. $(OBJ_DIR)\chartables.obj        + >> hdll.tmp
-  echo. $(OBJ_DIR)\pcreposix.obj         + >> hdll.tmp
+  echo. $(OBJ_DIR)\pcre_chartables.obj   + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_compile.obj      + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_config.obj       + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_dfa_exec.obj     + >> hdll.tmp
@@ -1402,17 +1397,17 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\pcre_globals.obj      + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_info.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_maketables.obj   + >> hdll.tmp
+  echo. $(OBJ_DIR)\pcre_newline.obj      + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_ord2utf8.obj     + >> hdll.tmp
-  echo. $(OBJ_DIR)\pcre_printint.obj     + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_refcount.obj     + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_study.obj        + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_tables.obj       + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_try_flipped.obj  + >> hdll.tmp
-  echo. $(OBJ_DIR)\pcre_ucp_findchar.obj + >> hdll.tmp
+  echo. $(OBJ_DIR)\pcre_ucp_searchfuncs.obj + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_valid_utf8.obj   + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_version.obj      + >> hdll.tmp
   echo. $(OBJ_DIR)\pcre_xclass.obj       + >> hdll.tmp
-  echo. $(OBJ_DIR)\ucp_findchar.obj      + >> hdll.tmp
+  echo. $(OBJ_DIR)\pcreposix.obj         + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcompr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxdate.obj            + >> hdll.tmp
@@ -1437,9 +1432,13 @@ $(HARBOUR_DLL)  : \
 !if $d(HB_RDDADS)
   echo. ace32.lib                        + >> hdll.tmp
 !endif
+!if $d(HB_CG32)
+  echo. cg32.lib                         + >> hdll.tmp
+!endif
   echo. import32.lib                     + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
-  ILINK32 -aa -Tpd -Gn -Gi @hdll.tmp
+  
+  ILINK32 -aa -Tpd -Gn -Gi $(LFLAGS) @hdll.tmp
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ object file creation ³Û
@@ -1645,9 +1644,6 @@ $(OBJ_DIR)\memvclip.obj : $(VM_DIR)\memvclip.c
    $(CC_CMD)
 
 $(OBJ_DIR)\pcount.obj : $(VM_DIR)\pcount.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\ppcomp.obj : $(COMPILER_DIR)\ppcomp.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
@@ -3495,72 +3491,69 @@ $(OBJ_DIR)\util.c : $(CT_DIR)\util.prg
 $(OBJ_DIR)\util.obj : $(OBJ_DIR)\util.c
    $(CC_CMD)
 
-$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
-
-$(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+$(OBJ_DIR)\pcre_chartables.obj : $(PCREPOS_DIR)\pcre_chartables.c
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_compile.obj : $(PCREPOS_DIR)\pcre_compile.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_config.obj : $(PCREPOS_DIR)\pcre_config.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_dfa_exec.obj : $(PCREPOS_DIR)\pcre_dfa_exec.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_exec.obj : $(PCREPOS_DIR)\pcre_exec.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_fullinfo.obj : $(PCREPOS_DIR)\pcre_fullinfo.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_get.obj : $(PCREPOS_DIR)\pcre_get.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_globals.obj : $(PCREPOS_DIR)\pcre_globals.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_info.obj : $(PCREPOS_DIR)\pcre_info.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
+$(OBJ_DIR)\pcre_newline.obj : $(PCREPOS_DIR)\pcre_newline.c
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
+   
 $(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
-
-$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_study.obj : $(PCREPOS_DIR)\pcre_study.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+$(OBJ_DIR)\pcre_ucp_searchfuncs.obj : $(PCREPOS_DIR)\pcre_ucp_searchfuncs.c
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
 $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
-$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
-   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -DSUPPORT_UTF8 -DSUPPORT_UCP -DPOSIX_MALLOC_THRESHOLD=10 -o$@ $**
-
+$(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
+   $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
+  
 
 #
 # HBSIX.LIB dependencies
@@ -3641,26 +3634,29 @@ $(OBJ_DIR)\wvtpaint.obj : $(OBJ_DIR)\wvtpaint.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(HBTESTDLL_EXE) : $(HBTESTDLL_EXE_OBJS) $(HRBDLL_LIB)
-   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
-   echo. $(OBJ_DIR)\hbtest.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_hvm.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_hvma.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_math.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_date.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_str.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_stra.obj + >> make.tmp
+   echo. $(OBJ_DIR)\mainwin.obj +  >  make.tmp
+   echo. $(OBJ_DIR)\hbtest.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\rt_hvm.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\rt_hvma.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\rt_math.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\rt_date.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\rt_str.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\rt_stra.obj +  >> make.tmp
    echo. $(OBJ_DIR)\rt_trans.obj + >> make.tmp
    echo. $(OBJ_DIR)\rt_array.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_file.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rt_misc.obj + >> make.tmp
+   echo. $(OBJ_DIR)\rt_file.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\rt_misc.obj +  >> make.tmp
    echo. $(OBJ_DIR)\rt_ccall.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(HBTESTDLL_EXE),, + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   echo. c0w32.obj, +              >> make.tmp
+   echo. $(HBTESTDLL_EXE),, +      >> make.tmp
+   echo. $(HRBDLL_LIB) +           >> make.tmp
+!if $d(HB_CG32)
+  echo. cg32.lib +                 >> make.tmp
+!endif
+   echo. ws2_32.lib +              >> make.tmp
+   echo. cw32.lib +                >> make.tmp
+   echo. import32.lib,             >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn $(LFLAGS) @make.tmp
 
 $(OBJ_DIR)\hbtest.c : $(HBTEST_DIR)\hbtest.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3740,26 +3736,29 @@ $(OBJ_DIR)\rt_ccall.obj : $(OBJ_DIR)\rt_ccall.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(HBMAKEDLL_EXE) : $(HBMAKEDLL_EXE_OBJS) $(HRBDLL_LIB)
-   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
-   echo. $(OBJ_DIR)\hbmake.obj + >> make.tmp
-   echo. $(OBJ_DIR)\tmake.obj + >> make.tmp
+   echo. $(OBJ_DIR)\mainwin.obj +  >  make.tmp
+   echo. $(OBJ_DIR)\hbmake.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\tmake.obj +    >> make.tmp
    echo. $(OBJ_DIR)\hbmutils.obj + >> make.tmp
-   echo. $(OBJ_DIR)\radios.obj + >> make.tmp
-   echo. $(OBJ_DIR)\checks.obj + >> make.tmp
-   echo. $(OBJ_DIR)\fclass1.obj + >> make.tmp
-   echo. $(OBJ_DIR)\ffile1.obj + >> make.tmp
+   echo. $(OBJ_DIR)\radios.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\checks.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\fclass1.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\ffile1.obj +   >> make.tmp
    echo. $(OBJ_DIR)\ft_funcs.obj + >> make.tmp
    echo. $(OBJ_DIR)\pickarry.obj + >> make.tmp
    echo. $(OBJ_DIR)\pickfile.obj + >> make.tmp
    echo. $(OBJ_DIR)\prb_stak.obj + >> make.tmp
-   echo. $(OBJ_DIR)\hbmlang.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(HBMAKEDLL_EXE),, + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   echo. $(OBJ_DIR)\hbmlang.obj +  >> make.tmp
+   echo. c0w32.obj, +              >> make.tmp
+   echo. $(HBMAKEDLL_EXE),, +      >> make.tmp
+   echo. $(HRBDLL_LIB) +           >> make.tmp
+!if $d(HB_CG32)
+  echo. cg32.lib +                 >> make.tmp
+!endif
+   echo. ws2_32.lib +              >> make.tmp
+   echo. cw32.lib +                >> make.tmp
+   echo. import32.lib,             >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn $(LFLAGS) @make.tmp
 
 $(OBJ_DIR)\hbmake.c : $(HBMAKE_DIR)\hbmake.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3818,32 +3817,35 @@ $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(HBDOCDLL_EXE) : $(HBDOCDLL_EXE_OBJS) $(HRBDLL_LIB)
-   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
-   echo. $(OBJ_DIR)\hbdoc.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genasc.obj + >> make.tmp
-   echo. $(OBJ_DIR)\teeasc.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genhpc.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genhtm.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genchm.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genng.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genos2.obj + >> make.tmp
-   echo. $(OBJ_DIR)\genrtf.obj + >> make.tmp
-   echo. $(OBJ_DIR)\gentrf.obj + >> make.tmp
-   echo. $(OBJ_DIR)\html.obj + >> make.tmp
-   echo. $(OBJ_DIR)\ng.obj + >> make.tmp
-   echo. $(OBJ_DIR)\os2.obj + >> make.tmp
-   echo. $(OBJ_DIR)\rtf.obj + >> make.tmp
-   echo. $(OBJ_DIR)\troff.obj + >> make.tmp
-   echo. $(OBJ_DIR)\fclass1.obj + >> make.tmp
-   echo. $(OBJ_DIR)\ffile1.obj + >> make.tmp
+   echo. $(OBJ_DIR)\mainwin.obj +  >  make.tmp
+   echo. $(OBJ_DIR)\hbdoc.obj +    >> make.tmp
+   echo. $(OBJ_DIR)\genasc.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\teeasc.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\genhpc.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\genhtm.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\genchm.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\genng.obj +    >> make.tmp
+   echo. $(OBJ_DIR)\genos2.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\genrtf.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\gentrf.obj +   >> make.tmp
+   echo. $(OBJ_DIR)\html.obj +     >> make.tmp
+   echo. $(OBJ_DIR)\ng.obj +       >> make.tmp
+   echo. $(OBJ_DIR)\os2.obj +      >> make.tmp
+   echo. $(OBJ_DIR)\rtf.obj +      >> make.tmp
+   echo. $(OBJ_DIR)\troff.obj +    >> make.tmp
+   echo. $(OBJ_DIR)\fclass1.obj +  >> make.tmp
+   echo. $(OBJ_DIR)\ffile1.obj +   >> make.tmp
    echo. $(OBJ_DIR)\ft_funcs.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(HBDOCDLL_EXE),, + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   echo. c0w32.obj, +              >> make.tmp
+   echo. $(HBDOCDLL_EXE),, +       >> make.tmp
+   echo. $(HRBDLL_LIB) +           >> make.tmp
+!if $d(HB_CG32)
+  echo. cg32.lib +                 >> make.tmp
+!endif
+   echo. ws2_32.lib +              >> make.tmp
+   echo. cw32.lib +                >> make.tmp
+   echo. import32.lib,             >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn $(LFLAGS) @make.tmp
 
 $(OBJ_DIR)\hbdoc.c : $(HBDOC_DIR)\hbdoc.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3964,13 +3966,16 @@ $(OBJ_DIR)\ft_funcs.obj : $(OBJ_DIR)\ft_funcs.c
 $(XBSCRIPTDLL_EXE) : $(XBSCRIPTDLL_EXE_OBJS) $(HRBDLL_LIB)
    echo. $(OBJ_DIR)\mainwin.obj  + > make.tmp
    echo. $(OBJ_DIR)\xbscript.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(XBSCRIPTDLL_EXE),, + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   echo. c0w32.obj, +              >> make.tmp
+   echo. $(XBSCRIPTDLL_EXE),, +    >> make.tmp
+   echo. $(HRBDLL_LIB) +           >> make.tmp
+!if $d(HB_CG32)
+  echo. cg32.lib +                 >> make.tmp
+!endif
+   echo. ws2_32.lib +              >> make.tmp
+   echo. cw32.lib +                >> make.tmp
+   echo. import32.lib,             >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn $(LFLAGS) @make.tmp
 
 $(OBJ_DIR)\xbscript.c : $(XBSCRIPT_DIR)\xbscript.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@
@@ -3984,15 +3989,18 @@ $(OBJ_DIR)\xbscript.obj : $(OBJ_DIR)\xbscript.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(HBRUNDLL_EXE) : $(HBRUNDLL_EXE_OBJS) $(HRBDLL_LIB)
-   echo. $(OBJ_DIR)\mainwin.obj + > make.tmp
-   echo. $(OBJ_DIR)\hbrun.obj + >> make.tmp
-   echo. c0w32.obj, + >> make.tmp
-   echo. $(HBRUNDLL_EXE),, + >> make.tmp
-   echo. $(HRBDLL_LIB) + >> make.tmp
-   echo. ws2_32.lib + >> make.tmp
-   echo. cw32.lib + >> make.tmp
-   echo. import32.lib, >> make.tmp
-   ILINK32 -x -ap -Tpe -Gn @make.tmp
+   echo. $(OBJ_DIR)\mainwin.obj + >  make.tmp
+   echo. $(OBJ_DIR)\hbrun.obj +   >> make.tmp
+   echo. c0w32.obj, +             >> make.tmp
+   echo. $(HBRUNDLL_EXE),, +      >> make.tmp
+   echo. $(HRBDLL_LIB) +          >> make.tmp
+!if $d(HB_CG32)
+  echo. cg32.lib +                >> make.tmp
+!endif
+   echo. ws2_32.lib +             >> make.tmp
+   echo. cw32.lib +               >> make.tmp
+   echo. import32.lib,            >> make.tmp
+   ILINK32 -x -ap -Tpe -Gn $(LFLAGS) @make.tmp
 
 $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
    $(HARBOUR_EXE) $(MAINFLAGS) $** -o$@

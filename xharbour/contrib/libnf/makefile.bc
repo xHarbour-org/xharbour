@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.4 2006/06/27 21:06:11 ptsarenko Exp $
+# $Id: makefile.bc,v 1.4 2006/06/27 19:23:23 ptsarenko Exp $
 #
 
 #
@@ -48,7 +48,7 @@ OBJ_DIR = obj\b32
 
 # This is needed, otherwise the libs may overflow when 
 # debug info is requested with -v -y
-ARFLAGS = /0
+#ARFLAGS = /0
 
 !endif
 
@@ -245,7 +245,7 @@ $(TOOLS_LIB)  : $(TOOLS_LIB_OBJS)
 
 $(OBJ_DIR)\caplock.obj : $(TOOLS_DIR)\caplock.c
    $(CC) $(CLIBFLAGS) -o$@ $**
-   tlib $(TOOLS_LIB) $(ARFLAGS) -+$@,,
+   tlib $(TOOLS_LIB) $(ARFLAGS) -P16 -+$@,,
 
 $(OBJ_DIR)\color2n.obj : $(TOOLS_DIR)\color2n.c
    $(CC) $(CLIBFLAGS) -o$@ $**
