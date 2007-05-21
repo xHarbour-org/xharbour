@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.28 2007/05/11 16:45:32 ran_go Exp $
+ * $Id: eval.c,v 1.29 2007/05/15 15:19:27 ran_go Exp $
  */
 
 /*
@@ -759,9 +759,9 @@ HB_FUNC( HB_EXEC )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pPointer = *( HB_VM_STACK.pBase + 1 + 1 );
+   PHB_ITEM pPointer = hb_parptr(1);
 
-   if( pPointer->type == HB_IT_POINTER )
+   if( pPointer )
    {
       PHB_ITEM pSelf = NULL;
       PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
@@ -769,14 +769,11 @@ HB_FUNC( HB_EXEC )
 
       if( pSymbol )
       {
-         iParams = hb_pcount();
-         if( iParams >= 2 )
+         iParams = hb_pcount() - 1;
+         
+         if( iParams >= 1 )
          {
-            if( HB_IS_OBJECT( *( HB_VM_STACK.pBase + 1 + 2 ) ) )
-            {
-               pSelf = *( HB_VM_STACK.pBase + 1 + 2 );
-            }  
-            iParams -= 2;
+            iParams--;
          }
          else
          {
@@ -789,7 +786,7 @@ HB_FUNC( HB_EXEC )
          return;
       }
 
-      //printf( "Sym: %p Name: %s\n", pExecSym, pExecSym->pSymbol->szName );
+      //printf( "Sym: '%s' Params: %i\n", pSymbol->szName, iParams );
 
       // Changing the Pointer item to a Symbol Item, so that we don't have to re-push paramters.
       pPointer->type = HB_IT_SYMBOL;
@@ -797,7 +794,7 @@ HB_FUNC( HB_EXEC )
       pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
       pPointer->item.asSymbol.uiSuperClass = 0;
 
-      if( pSelf )
+      if( HB_IS_OBJECT( hb_param( 2, HB_IT_ANY ) ) )
       {
          hb_vmSend( (USHORT) iParams );
       }

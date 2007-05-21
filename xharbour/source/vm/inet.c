@@ -1,5 +1,5 @@
 /*
-* $Id: inet.c,v 1.67 2006/08/21 15:16:46 walito Exp $
+* $Id: inet.c,v 1.68 2007/05/10 17:36:53 ran_go Exp $
 */
 
 /*
@@ -1325,6 +1325,7 @@ static void s_inetSendInternal( const char *szFuncName, const int iMode )
       else if( iLen == 0 )
       {
          HB_SOCKET_SET_ERROR2( Socket, -1 , "Timeout" );
+         break;
       }
       else
       {
