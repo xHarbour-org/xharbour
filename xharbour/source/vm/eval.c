@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.29 2007/05/15 15:19:27 ran_go Exp $
+ * $Id: eval.c,v 1.30 2007/05/21 03:35:07 ronpinkas Exp $
  */
 
 /*
@@ -759,7 +759,7 @@ HB_FUNC( HB_EXEC )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pPointer = hb_parptr(1);
+   PHB_ITEM pPointer = (PHB_ITEM) hb_parptr(1);
 
    if( pPointer )
    {
