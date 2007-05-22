@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.633 2007/05/15 15:17:58 ran_go Exp $
+ * $Id: hvm.c,v 1.634 2007/05/22 05:18:20 ronpinkas Exp $
  */
 
 /*
@@ -6109,6 +6109,13 @@ static void hb_vmArrayPushRef( void )
 
    pIndex = hb_stackItemFromTop( -1 );
    pArray = hb_stackItemFromTop( -2 );
+
+   if( hb_objGetOpOver( pArray ) & HB_CLASS_OP_ARRAYINDEX )
+   {
+      hb_vmOperatorCall( pArray, pIndex, "__OPARRAYINDEX", NULL, 2, NULL );
+      hb_itemPushForward( &(HB_VM_STACK.Return ) );
+      return;
+   }
 
    if( HB_IS_HASH( pArray ) && HB_IS_ORDERABLE( pIndex ) )
    {

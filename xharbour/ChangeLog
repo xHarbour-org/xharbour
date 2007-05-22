@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5544 2007/05/21 23:39:42 modalsist Exp $
+ * $Id: ChangeLog,v 1.5545 2007/05/22 05:18:19 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-22 10:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/classes.c
+    * Minor correction to HB_OO_MSG_ONERROR 
+  * source/vm/hvm.c
+    + Added missing operator overloading support in hb_vmArrayPushRef()
+    
 2007-05-22 01:10 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/dynsym.c
     * Minor simplification of toupper logic    

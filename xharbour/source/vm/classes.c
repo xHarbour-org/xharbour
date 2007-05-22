@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.208 2007/05/17 05:01:45 ronpinkas Exp $
+ * $Id: classes.c,v 1.209 2007/05/22 05:18:20 ronpinkas Exp $
  */
 
 /*
@@ -291,6 +291,11 @@ static void hb_clsRelease( PCLASS pClass )
    hb_xfree( pClass->szName );
    hb_xfree( pClass->pMethods );
    hb_xfree( pClass->pMethDyn );
+   
+   if( pClass->pFunError )
+   {
+      hb_xfree( pClass->pFunError );
+   }
 }
 
 
@@ -1225,6 +1230,12 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       if( pClass->pFunError )
       {
          *bSymbol = (pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ? TRUE : FALSE);
+         
+         if( bSymbol )
+         {
+            ( (PHB_SYMB) pClass->pFunError)->szName = pMessage->szName;
+         }
+         
          return pClass->pFunError;
       }
    }
@@ -1872,7 +1883,15 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          Clone the execution symbol, into a new symbol with the correct Message Name.
          This way we'll have the correct execution context as well as correct symbolic name.
        */
-      if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
+      if( wType == HB_OO_MSG_ONERROR )
+      {
+         PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
+         PHB_SYMB pMsg = (PHB_SYMB) hb_xgrab( sizeof(HB_SYMB) );
+                  
+         memcpy( pMsg, pFunc, sizeof(HB_SYMB) );         
+         pClass->pFunError = (PHB_FUNC) pMsg;         
+      }
+      else if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
       {
          PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
          PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
