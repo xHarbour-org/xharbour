@@ -1754,6 +1754,8 @@ RETURN
         cPureVar := Upper( cVar )
      ENDIF
 
+     cPureVar := RTrim( cPureVar )     
+     
      IF nKind < VAR_PRIVATE .AND. aProcedure[6]
         Throw( ErrorNew( [PP], 0, 2051, cPureVar, [Declaration follows executable code], { cPureVar } ) )
         // Safety
@@ -1819,7 +1821,7 @@ RETURN
      ENDIF
 
      aProcedure[2] := cPCode
-
+     
   RETURN
 
   //--------------------------------------------------------------//

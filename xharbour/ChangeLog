@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5546 2007/05/22 14:42:50 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5547 2007/05/22 18:12:53 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-22 16:07 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * utils/xbscript/xbs_harb.ch
+    * Minor bug in SetVar() previously hidden by uppercasing logic in hb_dynsymGet()
+    
 2007-05-22 14:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hboo.ch    
   * source/vm/classes.c
@@ -851,7 +855,7 @@
     * Now Resolved with preprocesor
 
   * utils/xbscript/xbs_harb.ch
-    * changue FROM CHARACTER to FROM _CHARACTER
+    * change FROM CHARACTER to FROM _CHARACTER
 
   /* Please make a clean copy */
 
