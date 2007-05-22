@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.632 2007/05/14 01:27:50 ronpinkas Exp $
+ * $Id: hvm.c,v 1.633 2007/05/15 15:17:58 ran_go Exp $
  */
 
 /*
@@ -7208,9 +7208,9 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             hb_hashGetValues( &(HB_VM_STACK.Return), pSelf );
          }
          else if( hb_cls_uiHashClass && ( pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol ) ) != NULL )
-	     {
-		    //goto DoFunc;
-		 }
+	      {
+            //goto DoFunc;
+		   }
          else
          {
             ULONG ulPos = 0;
@@ -7239,7 +7239,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
 
    if( pFunc )
-   {
+   {      
       #ifndef HB_NO_PROFILER
          if( bProfiler )
          {
@@ -7264,16 +7264,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          pFunc = pFuncSym->value.pFunPtr;
 
          if( pFunc )
-         {
-            // Store original
-            char *szFuncName = pFuncSym->szName;
-
-            // Change to the Message Name
-            pFuncSym->szName = pSym->szName;
-
+         {            
             // Force correct context for the executing function
             pItem->item.asSymbol.value = pFuncSym;
-
+         
             if( pFuncSym->scope.value & HB_FS_PCODEFUNC )
             {
                /* Running pCode dynamic function from .HRB */
@@ -7283,10 +7277,6 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             {
                pFunc();
             }
-
-            // Restoring it's real name!
-            pFuncSym->szName = szFuncName;
-
             // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
          }
          else
@@ -7294,32 +7284,13 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             char *sClass = hb_objGetClsName( pSelf );
             //TraceLog( NULL, "METHOD NOT FOUND!\n" );
             hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
-         }
+         }         
       }
       else
       {
-         if( hb_objClassH( pSelf ) )
-         {
-            // Store original
-            PHB_SYMB pFuncSym = pItem->item.asSymbol.value;
-            char *szFuncName = pFuncSym->szName;
-
-            // Force correct context for the CLASS function
-            pItem->item.asSymbol.value = hb_objGetClsSymbol( pSelf );
-
-            pFunc();
-
-            // Restoring it's real name!
-            pFuncSym->szName = szFuncName;
-
-            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
-         }
-         else
-         {
-            pFunc();
-         }
+         pFunc();
       }
-
+      
       //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
@@ -8372,6 +8343,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
    uiLocals = HB_PCODE_MKUSHORT( &pCode[ 2 ] );
    usSize -= 4 + ( uiLocals << 1 );
    pBlockCode = ( BYTE * ) pCode + 4 + ( uiLocals << 1 );
+   
    if( bDynCode )
    {
       pBlockTemp = pBlockCode;

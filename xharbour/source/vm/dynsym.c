@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.39 2007/05/04 20:52:27 ran_go Exp $
+ * $Id: dynsym.c,v 1.40 2007/05/15 15:40:29 ran_go Exp $
  */
 
 /*
@@ -261,39 +261,33 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a symbol if not found */
 {
    HB_THREAD_STUB_STACK
-   char szUprName[ HB_SYMBOL_NAME_LEN + 1 ] = { '\0' };
+   char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
    PHB_DYNS pDynSym;
+   register char cChar;
+   register char *pDest = szUprName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGet(%s)", szName));
 
    /* make a copy as we may get a const string, then turn it to uppercase */
-   /* NOTE: This block is optimized for speed [vszakats] */
+   do
    {
-      register int iLen = HB_SYMBOL_NAME_LEN;
-      char * pDest = szUprName;
-      char cChar;
+	  cChar = *szName;
 
-      do
-      {
-         cChar = *szName++;
+	  if( cChar >= 'a' && cChar <= 'z' )
+	  {
+		*pDest = (char) ( cChar - ( 'a' - 'A' ) );
+	  }
+	  else
+	  {
+		*pDest = cChar;
+	  }
 
-         if( !cChar || cChar == ' ' || cChar == '\t' )
-         {
-            break;
-         }
-         else if( cChar >= 'a' && cChar <= 'z' )
-         {
-            *pDest++ = cChar - ( 'a' - 'A' );
-         }
-         else
-         {
-            *pDest++ = cChar;
-         }
-      }
-      while( --iLen );
-
-      *pDest = '\0';
+	  pDest++;
+	  szName++;
    }
+   while( *szName );
+   *pDest = '\0';
+   pDest = szUprName;
 
    /* JC1: Notice, locking this function MAY seem useless but it is not.
    Suppose two threads calling this functon with the same szUprName: both
@@ -301,10 +295,9 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a s
    Although this operation would suceed, one of the threas would get an
    invalid reference, and we would have a memory leak, as one of the
    two dynsymNew() would be overriden */
-
    hb_dynsymLock();
 
-   pDynSym = hb_dynsymFind( szUprName );
+   pDynSym = hb_dynsymFind( pDest );
 
    if( !pDynSym )       /* Does it exists ? */
    {
@@ -350,39 +343,33 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( const char * szName )  /* finds and creates
 PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol */
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
+   register char cChar;
+   register char *pDest = szUprName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFindName(%s)", szName));
 
    /* make a copy as we may get a const string, then turn it to uppercase */
-   /* NOTE: This block is optimized for speed [vszakats] */
+   do
    {
-      register int iLen = HB_SYMBOL_NAME_LEN;
-      char * pDest = szUprName;
-      char cChar;
+	  cChar = *szName;
 
-      do
-      {
-         cChar = *szName++;
+	  if( cChar >= 'a' && cChar <= 'z' )
+	  {
+		*pDest = (char) ( cChar - ( 'a' - 'A' ) );
+	  }
+	  else
+	  {
+		*pDest = cChar;
+	  }
 
-         if( !cChar || cChar == ' ' || cChar == '\t' )
-         {
-            break;
-         }
-         else if( cChar >= 'a' && cChar <= 'z' )
-         {
-            *pDest++ = cChar - ( 'a' - 'A' );
-         }
-         else
-         {
-            *pDest++ = cChar;
-         }
-      }
-      while( --iLen );
-
-      *pDest = '\0';
+	  pDest++;
+	  szName++;
    }
-
-   return hb_dynsymFind( szUprName );
+   while( *szName );
+   *pDest = '\0';
+   pDest = szUprName;
+   
+   return hb_dynsymFind( pDest );
 }
 
 PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
@@ -452,7 +439,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
          uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
       }
    }
-
+   
    #ifdef HB_SYMLIMIT_10_WORKAROUND
 
    /*

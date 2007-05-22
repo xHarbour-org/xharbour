@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.207 2007/04/29 18:08:41 andresreyesh Exp $
+ * $Id: classes.c,v 1.208 2007/05/17 05:01:45 ronpinkas Exp $
  */
 
 /*
@@ -1174,16 +1174,15 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    }
 
    /* Default message here */
-
    if( s_msgClassName == NULL )
    {
-      s_msgClassName = hb_dynsymGet( "CLASSNAME" );  /* Standard messages        */
-      s_msgClassH    = hb_dynsymGet( "CLASSH" );     /* Not present in classdef. */
-      s_msgClassSel  = hb_dynsymGet( "CLASSSEL" );
+      s_msgClassName    = hb_dynsymGet( "CLASSNAME" );  /* Standard messages        */
+      s_msgClassH       = hb_dynsymGet( "CLASSH" );     /* Not present in classdef. */
+      s_msgClassSel     = hb_dynsymGet( "CLASSSEL" );
       s_msgClassFullSel = hb_dynsymGet( "CLASSFULLSEL" );
-      s_msgEval      = hb_dynsymGet( "EVAL" );
-      s_msgClsParent = hb_dynsymGet( "ISDERIVEDFROM" );
-      /*s_msgClass     = hb_dynsymGet( "CLASS" );*/
+      s_msgEval         = hb_dynsymGet( "EVAL" );
+      s_msgClsParent    = hb_dynsymGet( "ISDERIVEDFROM" );
+      /*s_msgClass     = hb_dynsymGet( "CLASS" );*/      
    }
 
    *bSymbol = FALSE;
@@ -1204,19 +1203,21 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       return hb___msgClsFullSel;
    }
    /* Eval message for blocks is handled at VM level.
-   else if( pMsg == s_msgEval )
-   {
-      return hb___msgEval;
-   }
-   */
+        else if( pMsg == s_msgEval )
+        {
+            return hb___msgEval;
+        }
+        */
    else if( pMsg == s_msgClsParent )
    {
       return hb___msgClsParent;
    }
-
-/* else if( pMsg == s_msgClass )
-      return hb___msgClass;       */
-
+   /* else if( pMsg == s_msgClass )
+   {
+       return hb___msgClass;
+   } 
+   */
+   
    if( lAllowErrFunc && uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
@@ -1282,6 +1283,7 @@ HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
    {
       return ( pClass->pMethods + uiAt - 1 );
    }
+   
    return NULL;
 }
 
@@ -1644,7 +1646,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
       switch( wType )
       {
          case HB_OO_MSG_METHOD:
-            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pNewMeth->pFunction = (PHB_FUNC) pFunc_or_BlockPointer;
             pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
             pNewMeth->uiData = 0;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
@@ -1812,17 +1814,17 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
 
          case HB_OO_MSG_ONERROR:
-            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pNewMeth->pFunction = (PHB_FUNC) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
             //TraceLog( NULL, "NEW ERROR Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
 
-            pClass->pFunError   = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pClass->pFunError   = (PHB_FUNC) pFunc_or_BlockPointer;
             pClass->uiScope    |= HB_OO_CLS_ONERROR_SYMB;
             break;
 
          case HB_OO_MSG_DESTRUCTOR:
-            pNewMeth->pFunction = ( PHB_FUNC ) pFunc_or_BlockPointer;
+            pNewMeth->pFunction = (PHB_FUNC) pFunc_or_BlockPointer;
             pNewMeth->uiScope  |= HB_OO_CLSTP_SYMBOL;
             pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
             //TraceLog( NULL, "NEW DESTRUCTOR Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
@@ -1866,6 +1868,22 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
       }
 
+      /* 
+         Clone the execution symbol, into a new symbol with the correct Message Name.
+         This way we'll have the correct execution context as well as correct symbolic name.
+       */
+      if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
+      {
+         PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
+         PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
+         char *szMsg = pMsg->szName;
+                  
+         memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
+         pMsg->szName = szMsg;
+         
+         pNewMeth->pFunction = (PHB_FUNC) pMsg;
+      }
+      
 #ifdef HB_THREAD_SUPPORT
       if( ( uiScope & HB_OO_CLSTP_SYNC ) && ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE || wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
       {
@@ -2275,7 +2293,7 @@ HB_FUNC( __CLSNEW )
 
         for( i = 0;  i < ulSize; i++ )
         {
-           TraceLog( NULL, "Saved: %s:%s pivot: %i #: %i\n", pNewCls->szName, pNewCls->pMethDyn[i].pMessage->pSymbol->szName, i, pNewCls->pMethDyn[i].uiAt );
+           TraceLog( NULL, "Saved: %p %s:%s pivot: %i #: %i\n", pNewCls->pMethDyn[i].pMessage, pNewCls->szName, pNewCls->pMethDyn[i].pMessage->pSymbol->szName, i, pNewCls->pMethDyn[i].uiAt );
         }
      #endif
 

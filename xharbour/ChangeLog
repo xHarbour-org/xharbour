@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5543 2007/05/21 17:18:03 ran_go Exp $
+ * $Id: ChangeLog,v 1.5544 2007/05/21 23:39:42 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-22 01:10 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/dynsym.c
+    * Minor simplification of toupper logic    
+  * source/vm/classes.c
+    * Store clone symbol of execution function with szName modified to Message Name 
+  * source/vm/hvm.c
+    * Simplified execution context in hb_vmSend() by using cloned symbol of the Method
 
 2007-05-21 20:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
