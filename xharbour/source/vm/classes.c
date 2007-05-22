@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.209 2007/05/22 05:18:20 ronpinkas Exp $
+ * $Id: classes.c,v 1.210 2007/05/22 14:42:51 ronpinkas Exp $
  */
 
 /*
@@ -284,18 +284,24 @@ static void hb_clsRelease( PCLASS pClass )
    {
       hb_itemRelease( pClass->pMtxSync );
    }
+   
+   if( pClass->pFunError )
+   {
+      if( ( pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ) == HB_OO_CLS_ONERROR_SYMB )
+      {      
+         if( ( pClass->uiScope & HB_OO_CLS_ONERROR_SUPER ) != HB_OO_CLS_ONERROR_SUPER )
+         {
+            hb_xfree( pClass->pFunError );
+         }
+      }
+   }
 
    hb_itemRelease( pClass->pClassDatas );
    hb_itemRelease( pClass->pInlines );
 
    hb_xfree( pClass->szName );
    hb_xfree( pClass->pMethods );
-   hb_xfree( pClass->pMethDyn );
-   
-   if( pClass->pFunError )
-   {
-      hb_xfree( pClass->pFunError );
-   }
+   hb_xfree( pClass->pMethDyn );   
 }
 
 
@@ -1883,24 +1889,27 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
          Clone the execution symbol, into a new symbol with the correct Message Name.
          This way we'll have the correct execution context as well as correct symbolic name.
        */
-      if( wType == HB_OO_MSG_ONERROR )
-      {
-         PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
-         PHB_SYMB pMsg = (PHB_SYMB) hb_xgrab( sizeof(HB_SYMB) );
+      if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
+      {        
+         if( wType == HB_OO_MSG_ONERROR )
+         {
+            PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
+            PHB_SYMB pMsg = (PHB_SYMB) hb_xgrab( sizeof(HB_SYMB) );
                   
-         memcpy( pMsg, pFunc, sizeof(HB_SYMB) );         
-         pClass->pFunError = (PHB_FUNC) pMsg;         
-      }
-      else if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
-      {
-         PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
-         PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
-         char *szMsg = pMsg->szName;
+            memcpy( pMsg, pFunc, sizeof(HB_SYMB) );         
+            pClass->pFunError = (PHB_FUNC) pMsg;         
+         }
+         else
+         {         
+            PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
+            PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
+            char *szMsg = pMsg->szName;
                   
-         memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
-         pMsg->szName = szMsg;
+            memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
+            pMsg->szName = szMsg;
          
-         pNewMeth->pFunction = (PHB_FUNC) pMsg;
+            pNewMeth->pFunction = (PHB_FUNC) pMsg;
+         }
       }
       
 #ifdef HB_THREAD_SUPPORT
@@ -2182,7 +2191,12 @@ HB_FUNC( __CLSNEW )
 
          if( i == 1 )
          {
-            pNewCls->pFunError   = pSprCls->pFunError;
+            if( pSprCls->pFunError )
+            {
+               pNewCls->pFunError = pSprCls->pFunError;
+               pNewCls->uiScope |= HB_OO_CLS_ONERROR_SUPER;
+            }
+            
             pNewCls->pDestructor = pSprCls->pDestructor;
 
             /* CLASS DATA Not Shared ( new array, new value ) */

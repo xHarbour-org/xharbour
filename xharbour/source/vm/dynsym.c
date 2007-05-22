@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.40 2007/05/15 15:40:29 ran_go Exp $
+ * $Id: dynsym.c,v 1.41 2007/05/22 05:18:20 ronpinkas Exp $
  */
 
 /*
@@ -169,7 +169,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
                else
             #endif
                {
-                  /* The DynSym existed without function pointer */
+                  // This is the symbol of the function definition module.
                   pDynSym->pSymbol = pSymbol;
                }
          }
@@ -177,7 +177,15 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
          pDynSym->pModuleSymbols = pModuleSymbols;
          //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
       }
-
+      else
+      {
+         if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
+         {
+            //The DynSym existed without function pointer
+            pDynSym->pSymbol = pSymbol;
+         }
+      }
+      
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
 
       hb_dynsymUnlock();
