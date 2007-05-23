@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5549 2007/05/23 05:21:33 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5550 2007/05/23 11:11:26 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-23 19:12 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/pcre/config.h
+    - Removed no longer needed #defines
+  * source/rtl/pcre/pcreposix.h
+    - Reverted last change
+    * Corrected apparent typo *dllimport -> dllexport
 
 2007-05-23 08:10 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * include/std.ch
@@ -22,25 +28,25 @@
 2007-05-22 16:07 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * utils/xbscript/xbs_harb.ch
     * Minor bug in SetVar() previously hidden by uppercasing logic in hb_dynsymGet()
-    
+
 2007-05-22 14:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
-  * include/hboo.ch    
+  * include/hboo.ch
   * source/vm/classes.c
     * Minor refinment to HB_OO_MSG_ONERROR
   * source/vm/dynsym.c
     * Update pSymbol when we don't yet have pFunPtr and recorded pSymbol has it
-    
+
 2007-05-22 10:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/classes.c
-    * Minor correction to HB_OO_MSG_ONERROR 
+    * Minor correction to HB_OO_MSG_ONERROR
   * source/vm/hvm.c
     + Added missing operator overloading support in hb_vmArrayPushRef()
-    
+
 2007-05-22 01:10 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/dynsym.c
-    * Minor simplification of toupper logic    
+    * Minor simplification of toupper logic
   * source/vm/classes.c
-    * Store clone symbol of execution function with szName modified to Message Name 
+    * Store clone symbol of execution function with szName modified to Message Name
   * source/vm/hvm.c
     * Simplified execution context in hb_vmSend() by using cloned symbol of the Method
 
@@ -58,11 +64,11 @@
 2007-05-21 11:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * hrbdll.bc
     * Updated for PCRE 7.1
-    - Removed unneeded ppcomp    
+    - Removed unneeded ppcomp
     * Minor adjustments
   * hrbdll.vc
     * Updated for PCRE 7.1
-    
+
   * contrib/freeimage/MAKEFILE.BC
   * contrib/freeimage/env/bccWin32.Mak
   * contrib/freeimage/env/makelib.b32
@@ -74,28 +80,28 @@
   * contrib/libnf/makefile.bc
     - Removed all instances of BCCDIR and BCC_DIR
       /* Please avoid this practice, instead make sure you have
-         correct bcc32.cfg and ilink32.cfg in your BCC installation */     
+         correct bcc32.cfg and ilink32.cfg in your BCC installation */
 
 2007-05-20 23:27 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/eval.c
     ! Fixed HB_Exec() building wrong execution stack for hb_vmDo()/hb_vmSend()
-    
-    /* 
+
+    /*
        NOTE: This fix forces requires the docs to specify that HB_Exec() syntax is:
-       
+
        HB_Exec( pFunction_or_Method_Pointer [, <NIL_or_SelfObject> [, ...] ] )
-       
+
        // If calling a function, passed arguments MUST be preceded by a NIL!
-       HB_Exc( pSomeFunctionPinter [, NIL, Arg1 [, ArgN] ] ) 
-       
+       HB_Exc( pSomeFunctionPinter [, NIL, Arg1 [, ArgN] ] )
+
        // If calling a Method, passed arguments MUST be preceded by the Self object!
-       HB_Exc( pSomeFunctionPinter [, Self, Arg1 [, ArgN] ] ) 
-       
-    */    
-    
+       HB_Exc( pSomeFunctionPinter [, Self, Arg1 [, ArgN] ] )
+
+    */
+
   * source/vm/inet.c
     + Added apparent missing break statement to eliminate infinit loop on "Timeout" error
-    
+
 2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   - source/rtl/pcre/chartables.c
   - source/rtl/pcre/dftables.c
@@ -103,34 +109,34 @@
   - source/rtl/pcre/ucp_findchar.c
   - source/rtl/pcre/ucptable.c
     - Removed no longer needed sources
-    
+
   - source/rtl/pcre/pcre_ucp_findchar.c
   + source/rtl/pcre/pcre_ucp_searchfuncs.c
     * Renamed PCRE source [?]
-    
+
   + source/rtl/pcre/pcre_chartables.c.dist
     + This is the Native file from PCRE distribution
       it is now #included as-is by a simple wrapper pcre_chartables.c
   + source/rtl/pcre/pcre_chartables.c
     * New simple wrapper to just #include pcre_chartables.c.generic
-  
+
   + source/rtl/pcre/config.h.generic
     + This is the Native file from PCRE distribution
       it is now #included as-is by a simple wrapper config.h
   * source/rtl/pcre/config.h
     * Now a simple wrapper to just #include config.h.generic
-      
+
   + source/rtl/pcre/pcre.h.generic
     + This is the Native file from PCRE distribution
       it is now #included as-is by a simple wrapper pcre.h
   * source/rtl/pcre/pcre.h
     * Now a simple wrapper to just #include pcre.h.generic
-      
+
   + source/rtl/pcre/pcre_newline.c
     + New PCRE source
   + source/rtl/pcre/ucptable.h
     + New PCRE source
-    
+
   * source/rtl/pcre/pcre_compile.c
   * source/rtl/pcre/pcre_config.c
   * source/rtl/pcre/pcre_dfa_exec.c
@@ -157,20 +163,20 @@
   * source/rtl/pcre/ChangeLog
   * source/rtl/pcre/Makefile
     * Upgraded to latest available PCRE 7.1
-  
+
   * include/hbregex.h
     + Added #include config.h of PCRE
 
   * makefile.bc
   * makefile.vc
     * Updated for PCRE 7.1
-    
+
   * source/rtl/regex.c
     ! Fixed memory leak
-    
+
   * source/vm/fm.c
-    * Define minimal hb_xgrag|free when hb_xgrab|free defined for compiled 3rd party libs   
-  
+    * Define minimal hb_xgrag|free when hb_xgrab|free defined for compiled 3rd party libs
+
 2007-05-19 10:06 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/fstemp.c
     + Changes in my last commit to make MSVC 8 happy. Thanks Ranier.
@@ -182,7 +188,7 @@
 2007-05-17 13:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.sly
     * Typo in last commit
-    
+
 2007-05-17 00:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * make_b32.bat
     * Allow cgl and map files
@@ -193,7 +199,7 @@
     * Memory leaks
   * source/compiler/genc.c
     * GPF trap
-    
+
 2007-05-18 10:26 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/fstemp.c
     + fixed pending TODO, to use pszPrefix in HB_WIN32_IO
@@ -203,8 +209,8 @@
   * source/rdd/usrrdd/rdds/makefile
   * makefile.bc
   * makefile.pc
-    + RDD that inhiretes from BMDBFCDX manage OEM data at DBF field and 
-      automatically convert to ANSI 
+    + RDD that inhiretes from BMDBFCDX manage OEM data at DBF field and
+      automatically convert to ANSI
 
 2007-05-18 11:32 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/hbapi.h
@@ -218,7 +224,7 @@
       P  	Picture   10 digits (bytes) representing a .DBT block number.
       The number is stored as a string, right justified and padded with blanks.
 
-      (foxpro compatible) 
+      (foxpro compatible)
 
   * source/rdd/userrdd/rdds/adordd.prg
     + Added support to MEMO fields

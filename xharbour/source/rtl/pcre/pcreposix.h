@@ -112,8 +112,8 @@ export settings are needed. */
 
 #ifdef _WIN32
 #  ifndef PCREPOSIX_STATIC
-#    define PCREPOSIX_EXP_DECL extern __declspec(dllimport)
-#    define PCREPOSIX_EXP_DEFN  __declspec(dllimport)
+#    define PCREPOSIX_EXP_DECL extern __declspec(dllexport)
+#    define PCREPOSIX_EXP_DEFN  __declspec(dllexport)
 #  endif
 #endif
 
@@ -136,11 +136,6 @@ PCREPOSIX_EXP_DECL int regexec(const regex_t *, const char *, size_t,
                      regmatch_t *, int);
 PCREPOSIX_EXP_DECL size_t regerror(int, const regex_t *, char *, size_t);
 PCREPOSIX_EXP_DECL void regfree(regex_t *);
-
-#ifdef __POCC__
-#  undef PCREPOSIX_EXP_DEFN
-#  define PCREPOSIX_EXP_DEFN
-#endif
 
 #ifdef __cplusplus
 }   /* extern "C" */
