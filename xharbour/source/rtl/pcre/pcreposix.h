@@ -137,6 +137,11 @@ PCREPOSIX_EXP_DECL int regexec(const regex_t *, const char *, size_t,
 PCREPOSIX_EXP_DECL size_t regerror(int, const regex_t *, char *, size_t);
 PCREPOSIX_EXP_DECL void regfree(regex_t *);
 
+#ifdef __POCC__
+#  undef PCREPOSIX_EXP_DEFN
+#  define PCREPOSIX_EXP_DEFN
+#endif
+
 #ifdef __cplusplus
 }   /* extern "C" */
 #endif

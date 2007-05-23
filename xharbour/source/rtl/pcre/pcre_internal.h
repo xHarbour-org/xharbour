@@ -118,8 +118,12 @@ PCRE_EXP_DATA_DEFN only if they are not already set. */
 #      define PCRE_EXP_DATA_DEFN  __declspec(dllexport)
 #    else
 #      define PCRE_EXP_DECL       extern
-#      define PCRE_EXP_DEFN
-#      define PCRE_EXP_DATA_DEFN
+#      ifndef PCRE_EXP_DEFN
+#        define PCRE_EXP_DEFN       PCRE_EXP_DECL
+#      endif
+#      ifndef PCRE_EXP_DATA_DEFN
+#        define PCRE_EXP_DATA_DEFN
+#      endif
 #    endif
 #
 #  else
@@ -234,7 +238,7 @@ must begin with PCRE_. */
 /* Include the public PCRE header and the definitions of UCP character property
 values. */
 
-#include <pcre.h>
+#include "pcre.h"
 #include "ucp.h"
 
 /* When compiling for use with the Virtual Pascal compiler, these functions
@@ -547,7 +551,9 @@ variable-length repeat, or a anything other than literal characters. */
 typedef int BOOL;
 
 #define FALSE   0
-#define TRUE    1
+#ifndef TRUE
+   #define TRUE    1
+#endif
 
 /* Escape items that are just an encoding of a particular data value. */
 

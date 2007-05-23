@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.45 2007/05/08 11:13:22 modalsist Exp $
+# $Id: makefile.pc,v 1.46 2007/05/18 10:08:36 marchuet Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -972,7 +972,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\winreg.obj
 
 PCREPOS_LIB_OBJS = \
-   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcre_chartables.obj \
    $(OBJ_DIR)\pcreposix.obj \
    $(OBJ_DIR)\pcre_compile.obj \
    $(OBJ_DIR)\pcre_config.obj \
@@ -984,16 +984,15 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)\pcre_info.obj \
    $(OBJ_DIR)\pcre_maketables.obj \
    $(OBJ_DIR)\pcre_ord2utf8.obj \
-   $(OBJ_DIR)\pcre_printint.obj \
    $(OBJ_DIR)\pcre_refcount.obj \
    $(OBJ_DIR)\pcre_study.obj \
    $(OBJ_DIR)\pcre_tables.obj \
    $(OBJ_DIR)\pcre_try_flipped.obj \
-   $(OBJ_DIR)\pcre_ucp_findchar.obj \
    $(OBJ_DIR)\pcre_valid_utf8.obj \
    $(OBJ_DIR)\pcre_version.obj \
    $(OBJ_DIR)\pcre_xclass.obj \
-   $(OBJ_DIR)\ucp_findchar.obj
+   $(OBJ_DIR)\pcre_newline.obj \
+   $(OBJ_DIR)\pcre_ucp_searchfuncs.obj
 
 CGI_LIB_OBJS = \
     $(OBJ_DIR)\thtm.obj \
@@ -2861,10 +2860,10 @@ $(OBJ_DIR)\winreg.obj : $(OBJ_DIR)\winreg.c
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 
-$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
+$(OBJ_DIR)\pcre_chartables.obj : $(PCREPOS_DIR)\pcre_chartables.c
    $(CC_CMD)
 
-$(OBJ_DIR)\dftables.obj : $(PCREPOS_DIR)\dftables.c
+$(OBJ_DIR)\pcre_dftables.obj : $(PCREPOS_DIR)\pcre_dftables.c
    $(CC_CMD)
 
 $(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
@@ -2900,9 +2899,6 @@ $(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
 $(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
    $(CC_CMD)
 
-$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
    $(CC_CMD)
 
@@ -2915,9 +2911,6 @@ $(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
 $(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
    $(CC_CMD)
 
-$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c
-   $(CC_CMD)
-
 $(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
    $(CC_CMD)
 
@@ -2927,7 +2920,10 @@ $(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
 $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
    $(CC_CMD)
 
-$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
+$(OBJ_DIR)\pcre_newline.obj : $(PCREPOS_DIR)\pcre_newline.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pcre_ucp_searchfuncs.obj : $(PCREPOS_DIR)\pcre_ucp_searchfuncs.c
    $(CC_CMD)
 
 
