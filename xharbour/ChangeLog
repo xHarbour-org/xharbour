@@ -10,6 +10,7 @@
 
 2007-05-23 19:12 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/pcre/config.h
+    * Disable warning guarded by defined( _MSC_VER )
 
  /* Please add equivalent for your C compiler */
 
