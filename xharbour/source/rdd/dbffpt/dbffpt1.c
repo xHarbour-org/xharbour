@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.86 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.87 2007/05/18 09:36:57 marchuet Exp $
  */
 
 /*
@@ -3928,7 +3928,7 @@ static ERRCODE hb_fptCreateMemFile( FPTAREAP pArea, LPDBOPENINFO pCreateInfo )
    else
    {
       HB_PUT_BE_UINT32( fptHeader.nextBlock, ulNextBlock );
-      HB_PUT_BE_UINT32( fptHeader.blockSize, pArea->uiMemoBlockSize );
+      HB_PUT_BE_UINT32( fptHeader.blockSize, (UINT32) pArea->uiMemoBlockSize );
    }
    if( hb_fsWrite( pArea->hMemoFile, ( BYTE * ) &fptHeader, ( USHORT) ulSize ) != ( USHORT ) ulSize )
       return FAILURE;

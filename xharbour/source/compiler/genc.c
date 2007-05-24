@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.136 2007/05/15 21:34:11 ronpinkas Exp $
+ * $Id: genc.c,v 1.137 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /*
@@ -89,7 +89,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    FILE * yyc; /* file handle for C output */
    PINLINE pInline = hb_comp_inlines.pFirst;
-   PVAR pGlobal, pDelete;
    short iLocalGlobals = 0, iGlobals = 0;
 
    BOOL bIsStaticFunction ;
@@ -1063,7 +1062,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
    int iLen = strlen( sInline );
    int iOption;
    char *sBase = sInline;
-   
+
    while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
       sInline += 7;

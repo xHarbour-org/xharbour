@@ -1,5 +1,5 @@
 /*
- * $Id: replace.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
+ * $Id: replace.c,v 1.3 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -84,7 +84,7 @@ static void do_replace (int iSwitch)
     size_t sStrLen = (size_t)hb_parclen( 1 );
     char *pcRet, *pc;
     char cSearch, cReplace;
-    
+
     if ( sStrLen == 0 )
     {
        if (iNoRet)
@@ -100,7 +100,7 @@ static void do_replace (int iSwitch)
 
     if (ISNUM (2))
     {
-      cReplace = hb_parnl (2) % 256;
+      cReplace = (char)( hb_parnl(2) % 256 );
     }
     else
     {
@@ -113,7 +113,7 @@ static void do_replace (int iSwitch)
     }
     else if (ISNUM (3))
     {
-      cSearch = hb_parnl (3) % 256;
+      cSearch = (char)( hb_parnl(3) % 256 );
     }
     else
     {
@@ -166,7 +166,7 @@ static void do_replace (int iSwitch)
                                hb_paramError (1), hb_paramError (2),
                                hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

@@ -1,5 +1,5 @@
 /*
- * $Id: remove.c,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: remove.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -81,11 +81,11 @@ static void do_remove (int iSwitch)
     char *pcRet, *pc;
     size_t sRetLen;
     char cSearch;
-    
+
     if (hb_parclen (2) > 0)
       cSearch = *(hb_parc (2));
     else if (ISNUM (2))
-      cSearch = hb_parnl (2) % 256;
+      cSearch = (char)( hb_parnl(2) % 256 );
     else
       cSearch = 0x20;
 
@@ -127,7 +127,7 @@ static void do_remove (int iSwitch)
                                NULL, (char *)spcErrorOperation[iSwitch], 0, EF_CANSUBSTITUTE, 2,
                                hb_paramError (1), hb_paramError (2));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

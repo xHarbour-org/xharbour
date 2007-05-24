@@ -1,5 +1,5 @@
 /*
- * $Id: ctpad.c,v 1.1 2004/08/27 05:46:07 paultucker Exp $
+ * $Id: ctpad.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -96,7 +96,7 @@ static void do_pad (int iSwitch)
     if (hb_parclen (3) > 0)
       cFill = *(hb_parc (3));
     else if (ISNUM (3))
-      cFill = hb_parnl (3) % 256;
+      cFill = (char)( hb_parnl (3) % 256 );
     else
       cFill = 0x20;
 
@@ -145,7 +145,7 @@ static void do_pad (int iSwitch)
                                hb_paramError (1), hb_paramError (2),
                                hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

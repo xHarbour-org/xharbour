@@ -1,5 +1,5 @@
 /*
- * $Id: range.c,v 1.3 2006/07/13 02:51:00 lculik Exp $
+ * $Id: range.c,v 1.4 2006/07/14 09:28:30 lculik Exp $
  */
 
 /*
@@ -64,7 +64,7 @@ HB_FUNC (RANGEREM)
       ((hb_parclen (2) > 0) || ISNUM (2)) &&
       ISCHAR (3))
   {
-   
+
     char *pcString = (char *)hb_parc (3);
     size_t sStrLen = (size_t)hb_parclen (3);
     char *pcRet ;
@@ -75,7 +75,7 @@ HB_FUNC (RANGEREM)
 
     if (ISNUM (1))
     {
-      ucChar1 = hb_parnl (1)%256;
+      ucChar1 = (unsigned char)( hb_parnl(1) % 256 );
     }
     else
     {
@@ -84,7 +84,7 @@ HB_FUNC (RANGEREM)
 
     if (ISNUM (2))
     {
-      ucChar2 = hb_parnl (2)%256;
+      ucChar2 = (unsigned char)( hb_parnl(2) % 256 );
     }
     else
     {
@@ -131,7 +131,7 @@ HB_FUNC (RANGEREM)
                                hb_paramError (1), hb_paramError (2),
                                hb_paramError (3));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -166,7 +166,7 @@ HB_FUNC (RANGEREPL)
       ISCHAR (3) &&
       ((hb_parclen (4) > 0) || ISNUM (4)))
   {
- 
+
     char *pcString = (char *)hb_parc (3);
     size_t sStrLen = (size_t)hb_parclen (3);
     char *pcRet;
@@ -177,7 +177,7 @@ HB_FUNC (RANGEREPL)
 
     if (ISNUM (1))
     {
-      ucChar1 = hb_parnl (1)%256;
+      ucChar1 = (unsigned char)( hb_parnl(1) % 256 );
     }
     else
     {
@@ -186,7 +186,7 @@ HB_FUNC (RANGEREPL)
 
     if (ISNUM (2))
     {
-      ucChar2 = hb_parnl (2)%256;
+      ucChar2 = (unsigned char)( hb_parnl(2) % 256 );
     }
     else
     {
@@ -195,7 +195,7 @@ HB_FUNC (RANGEREPL)
 
     if (ISNUM (4))
     {
-      ucReplace = hb_parnl (4)%256;
+      ucReplace = (unsigned char)( hb_parnl(4) % 256 );
     }
     else
     {
@@ -246,7 +246,7 @@ HB_FUNC (RANGEREPL)
     {
       hb_retclen (pcRet, sStrLen);
     }
-    
+
     hb_xfree (pcRet);
 
   }
@@ -264,7 +264,7 @@ HB_FUNC (RANGEREPL)
                                hb_paramError (1), hb_paramError (2),
                                hb_paramError (3), hb_paramError (4));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );
@@ -288,7 +288,7 @@ HB_FUNC (RANGEREPL)
       }
     }
     return;
-  
+
   }
 
   return;

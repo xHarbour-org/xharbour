@@ -1,5 +1,5 @@
 /*
- * $Id: justify.c,v 1.2 2005/03/09 21:08:59 ptsarenko Exp $
+ * $Id: justify.c,v 1.3 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ static void do_justify (int iSwitch)
     if (hb_parclen (2) > 0)
       cJustChar = *(hb_parc (2));
     else if (ISNUM (2))
-      cJustChar = hb_parnl (2) % 256;
+      cJustChar = (char)( hb_parnl (2) % 256 );
     else
       cJustChar = 0x20;
 
@@ -128,7 +128,7 @@ static void do_justify (int iSwitch)
           sJustOffset++;
           pc--;
         }
-      
+
         for (pc = pcRet; pc < pcRet+sJustOffset; pc++)
         {
           *pc = cJustChar;
@@ -163,7 +163,7 @@ static void do_justify (int iSwitch)
                                0, EF_CANSUBSTITUTE, 2,
                                hb_paramError (1), hb_paramError (2));
     }
-    
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

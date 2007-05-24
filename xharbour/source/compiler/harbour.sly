@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.120 2007/05/18 13:44:30 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.121 2007/05/18 17:27:41 ronpinkas Exp $
  */
 
 /*
@@ -1700,13 +1700,13 @@ Get        : _Get_ LValue ','
                         if( pBaseArrayName )
                         {
                            pVarName = pBaseArrayName;
-                           hb_compExprDelete( $5 );                           
+                           hb_compExprDelete( $5 );
                         }
                         else
-                        {                        
+                        {
                            pVarName = $5;
                         }
-                        
+
                         bTrancuateBaseArray = FALSE;
                         break;
                      }
@@ -2850,7 +2850,7 @@ BeginSeq   : BEGINSEQ {
                    --hb_comp_wSeqCounter;  /* RECOVER is also considered as end of sequence */
                 }
 
-                hb_compSequenceFinish( $<lNumber>2, $<lNumber>4 );
+                hb_compSequenceFinish( (ULONG)$<lNumber>2, (int)$<lNumber>4 );
                 hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                 s_iControlLevel--;
              }

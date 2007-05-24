@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.4 2005/03/31 14:34:04 andijahja Exp $
+ * $Id: genobj32.c,v 1.5 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -521,7 +521,7 @@ static void DataSegment( FILE * hObjFile, BYTE * symbol, ULONG wSymLen, ULONG wS
       else
         * ( ( ULONG * ) &symbol[ 8 ] ) = 0; /* 8 offset of function pointer into symbol */
 
-      symbol[ 4 ] = pSymbol->cScope;
+      symbol[ 4 ] = (BYTE) pSymbol->cScope;
 
       for( w = 0; w < wSymLen; w++ )
          putbyte( * ( symbol + w ), hObjFile, &bChk );

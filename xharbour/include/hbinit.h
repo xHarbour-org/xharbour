@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.26 2007/04/25 01:37:10 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.27 2007/04/27 23:46:02 guerra000 Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn = {0}; \
+      static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -118,7 +118,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn = {0}; \
+      static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -144,7 +144,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn = {0}; \
+      static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \
@@ -178,7 +178,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn = {0}; \
+      static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
    /* this allows any macros to be preprocessed first
@@ -225,7 +225,7 @@ extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModul
 
    #define HB_INIT_SYMBOLS_BEGIN( func ) \
       static PSYMBOLS pModuleSymbols; \
-      static HB_DYNS ModuleFakeDyn = {0}; \
+      static HB_DYNS ModuleFakeDyn; \
       static HB_SYMB symbols_table[] = {
 
    #define HB_INIT_SYMBOLS_END( func ) \

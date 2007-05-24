@@ -1,5 +1,5 @@
 /*
- * $Id: genjava.c,v 1.3 2002/01/27 22:30:07 ronpinkas Exp $
+ * $Id: genjava.c,v 1.4 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -94,7 +94,7 @@ void hb_compGenJava( PHB_FNAME pFileName )
    {
       hb_fputs( pSym->szName );
       hb_fputc( 0 );
-      hb_fputc( pSym->cScope );
+      hb_fputc( (BYTE) pSym->cScope );
 
       /* specify the function address if it is a defined function or a
          external called function */

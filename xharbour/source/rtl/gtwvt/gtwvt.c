@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.171 2007/02/21 22:50:04 peterrees Exp $
+ * $Id: gtwvt.c,v 1.172 2007/04/07 02:14:51 jabrecer Exp $
  */
 
 /*
@@ -1581,14 +1581,14 @@ static void hb_wvt_gtCreateObjects( void )
 
 static USHORT hb_wvt_gtCalcPixelHeight( void )
 {
-  return( _s.PTEXTSIZE.y*_GetScreenHeight() );
+  return( (USHORT)( _s.PTEXTSIZE.y *_GetScreenHeight() ) );
 }
 
 //-------------------------------------------------------------------//
 
 static USHORT hb_wvt_gtCalcPixelWidth( void )
 {
-  return( _s.PTEXTSIZE.x*_GetScreenWidth() );
+  return( (USHORT)( _s.PTEXTSIZE.x * _GetScreenWidth() ) );
 }
 
 //-------------------------------------------------------------------//
@@ -1640,8 +1640,8 @@ static BOOL hb_wvt_gtValidWindowSize( int rows, int cols, HFONT hFont, int iWidt
   SelectObject( hdc, hOldFont ); // Put old font back
   ReleaseDC( _s.hWnd, hdc );
 
-  width     = iWidth < 0 ? -iWidth : tm.tmAveCharWidth * cols ;  // Total pixel width this setting would take
-  height    = tm.tmHeight * rows;         // Total pixel height this setting would take
+  width     = iWidth < 0 ? -iWidth : (USHORT)( tm.tmAveCharWidth * cols ) ;  // Total pixel width this setting would take
+  height    = (USHORT)( tm.tmHeight * rows );         // Total pixel height this setting would take
 
   return( ( width <= maxWidth ) && ( height <= maxHeight ) );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.54 2007/03/21 10:15:50 marchuet Exp $
+ * $Id: hbcomp.h,v 1.55 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -398,11 +398,11 @@ extern void hb_compPrepareOptimize( void );
 
 extern BOOL hb_compVariableMacroCheck( char * ); /* checks if passed variable can be used in macro */
 
-extern ULONG hb_compGenJump( LONG );                /* generates the pcode to jump to a specific offset */
-extern ULONG hb_compGenJumpFalse( LONG );           /* generates the pcode to jump if false */
-extern ULONG hb_compGenJumpTrue( LONG );            /* generates the pcode to jump if true */
-extern void hb_compGenJumpHere( ULONG  );             /* returns the pcode pos where to set a jump offset */
-extern void hb_compGenJumpThere( ULONG, ULONG ); /* sets a jump offset */
+extern ULONG hb_compGenJump( HB_LONG );                /* generates the pcode to jump to a specific offset */
+extern ULONG hb_compGenJumpFalse( HB_LONG );           /* generates the pcode to jump if false */
+extern ULONG hb_compGenJumpTrue( HB_LONG );            /* generates the pcode to jump if true */
+extern void hb_compGenJumpHere( HB_ULONG  );             /* returns the pcode pos where to set a jump offset */
+extern void hb_compGenJumpThere( HB_ULONG, HB_ULONG ); /* sets a jump offset */
 
 
 extern void hb_compLinePush( void ); /* generates the pcode with the currently compiled source code line */

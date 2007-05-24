@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.159 2007/05/17 04:49:02 ronpinkas Exp $
+ * $Id: harbour.c,v 1.160 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /*
@@ -1079,7 +1079,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
             pLastVar->pNext = pVar;
          }
-		 
+
 		 bUsed = TRUE;
       }
 
@@ -1150,7 +1150,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                      pLastVar->pNext = pVar;
                   }
-				  
+
 				  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
@@ -1207,7 +1207,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                      pLastVar->pNext = pVar;
                   }
-				  
+
 				  bUsed = TRUE;
                   /*printf( "\nAdded Private: %s Type %c\n", pVar->szName, pVar->cType );*/
                }
@@ -1229,7 +1229,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
             break;
       }
-	  
+
 	  if( ! bUsed )
 	  {
 	     hb_xfree( pVar );
@@ -3092,7 +3092,7 @@ void hb_compPrepareOptimize()
    }
 }
 
-ULONG hb_compGenJump( LONG lOffset )
+ULONG hb_compGenJump( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -3108,7 +3108,7 @@ ULONG hb_compGenJump( LONG lOffset )
    return hb_comp_functions.pLast->lPCodePos - 3;
 }
 
-ULONG hb_compGenJumpFalse( LONG lOffset )
+ULONG hb_compGenJumpFalse( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -3124,7 +3124,7 @@ ULONG hb_compGenJumpFalse( LONG lOffset )
    return hb_comp_functions.pLast->lPCodePos - 3;
 }
 
-ULONG hb_compGenJumpTrue( LONG lOffset )
+ULONG hb_compGenJumpTrue( HB_LONG lOffset )
 {
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -3140,10 +3140,10 @@ ULONG hb_compGenJumpTrue( LONG lOffset )
    return hb_comp_functions.pLast->lPCodePos - 3;
 }
 
-void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
+void hb_compGenJumpThere( HB_ULONG ulFrom, HB_ULONG ulTo )
 {
    BYTE * pCode = hb_comp_functions.pLast->pCode;
-   LONG lOffset = ulTo - ulFrom + 1;
+   HB_LONG lOffset = ulTo - ulFrom + 1;
 
    if( HB_LIM_INT24( lOffset ) )
    {
@@ -3155,7 +3155,7 @@ void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo )
    }
 }
 
-void hb_compGenJumpHere( ULONG ulOffset )
+void hb_compGenJumpHere( HB_ULONG ulOffset )
 {
    hb_compGenJumpThere( ulOffset, hb_comp_functions.pLast->lPCodePos );
 }
@@ -5359,7 +5359,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
          wLocals -= pCodeblock->wParamCount;
       }
 
-      hb_compGenPCode3( HB_P_FRAME, wLocals, pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
+      hb_compGenPCode3( HB_P_FRAME, (BYTE) wLocals, (BYTE) pCodeblock->wParamCount, ( BOOL ) 0 );   /* frame for locals and parameters */
    }
 
    if( hb_comp_bDebugInfo )

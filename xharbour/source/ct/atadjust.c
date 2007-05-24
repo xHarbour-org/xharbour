@@ -1,9 +1,9 @@
 /*
- * $Id: atadjust.c,v 1.1 2004/08/25 17:02:59 lf_sfnet Exp $
+ * $Id: atadjust.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
  */
 
 /*
- * Harbour Project source code: 
+ * Harbour Project source code:
  *   ATADJUST() CT3 string function
  *
  * Copyright 2001 IntTec GmbH, Neunlindenstr 32, 79106 Freiburg, Germany
@@ -63,7 +63,7 @@ HB_FUNC (ATADJUST)
   if ((ISCHAR (1)) && (ISCHAR (2)) &&
       (ISNUM (3)))
   {
-    
+
     char *pcStringToMatch = hb_parc (1);
     size_t sStrToMatchLen = (size_t)hb_parclen (1);
     char *pcString = hb_parc (2);
@@ -124,7 +124,7 @@ HB_FUNC (ATADJUST)
     }
     else
       sAdjustPosition--; /* makes live easier since C indices start at zero ! */
-  
+
     /* nth match or last match ? */
     if (ISNUM (4) && ((ulCounter = hb_parnl (4)) != 0))
     {
@@ -137,7 +137,7 @@ HB_FUNC (ATADJUST)
       pcSubStr = pcString;
       sSubStrLen = sStrLen;
 
-      while (ulMatchCounter < ulCounter) 
+      while (ulMatchCounter < ulCounter)
       {
         switch (iAtLike)
         {
@@ -181,7 +181,7 @@ HB_FUNC (ATADJUST)
     }
     else /* (ISNUM (4) && ((ulCounter = hb_parnl (4)) != 0) */
     {
-        
+
       /* we have to find the last match */
       switch (iAtLike)
       {
@@ -222,10 +222,10 @@ HB_FUNC (ATADJUST)
         cFillChar = 0x20;
     else
       if (ISNUM (6))
-        cFillChar = hb_parnl (6)%256;
+        cFillChar = (char)( hb_parnl(6) % 256 );
       else
         cFillChar = 0x20;
-  
+
     /* position of pc == adjust position ? */
     if (pc == pcString+sAdjustPosition)
     {
@@ -237,7 +237,7 @@ HB_FUNC (ATADJUST)
       if (pc > pcString+sAdjustPosition)
       {
         /* adjust to left */
-        /* check if we only delete cFillChar characters */  
+        /* check if we only delete cFillChar characters */
         for (pcCheckFill = pcString+sAdjustPosition; pcCheckFill < pc; pcCheckFill++)
           if (*pcCheckFill != cFillChar)
           {
@@ -245,7 +245,7 @@ HB_FUNC (ATADJUST)
             hb_retclen (pcString, sStrLen);
             return;
           }
-      
+
         /* ok -> calculate new string size */
         sRetStrLen = sStrLen-(pc-(pcString+sAdjustPosition));
         pcRetStr = ( char *) hb_xgrab (sRetStrLen);
@@ -297,7 +297,7 @@ HB_FUNC (ATADJUST)
                                hb_paramError (3), hb_paramError (4),
                                hb_paramError (5), hb_paramError (6));
     }
-     
+
     if (pSubst != NULL)
     {
       hb_itemRelease( hb_itemReturnForward( pSubst ) );

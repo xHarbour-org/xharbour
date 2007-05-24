@@ -1,5 +1,5 @@
 /*
- * $Id: odbc.c,v 1.32 2006/07/16 21:12:41 enricomaria Exp $
+ * $Id: odbc.c,v 1.33 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -148,7 +148,7 @@ HB_FUNC( SQLDRIVERC ) /* HB_SQLDRIVERCONNECT( hDbc, @ cConnectString ) --> nRetC
 #if defined(HB_OS_WIN_32)
    ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
                             GetDesktopWindow(),
-                            (unsigned char *) hb_parcx( 2 ), hb_parclen( 2 ),
+                            (unsigned char *) hb_parcx( 2 ), (SQLSMALLINT)hb_parclen( 2 ),
                             bBuffer1, 1024, &wLen, SQL_DRIVER_COMPLETE ) ;
 #else
    ret =  SQLDriverConnect( ( HDBC ) hb_parnl( 1 ),
@@ -164,11 +164,11 @@ HB_FUNC( SQLCONNECT ) /* HB_SQLCONNECT( hDbc, cDSN, cUseName, cPassword ) --> nR
 {
    RETCODE ret =  SQLConnect( ( HDBC ) hb_parnl( 1 ),
                               (unsigned char*) hb_parcx( 2 ),
-                              hb_parclen( 2 ),
+                              (SQLSMALLINT)hb_parclen( 2 ),
                               (unsigned char*) hb_parcx( 3 ),
-                              hb_parclen( 3 ),
+                              (SQLSMALLINT)hb_parclen( 3 ),
                               (unsigned char*) hb_parcx( 4 ),
-                              hb_parclen( 4 ) );
+                              (SQLSMALLINT)hb_parclen( 4 ) );
    hb_retni( ret );
 }
 

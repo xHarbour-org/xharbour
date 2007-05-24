@@ -1,5 +1,5 @@
 /*
- * $Id: pos2.c,v 1.6 2006/08/10 21:28:52 ptsarenko Exp $
+ * $Id: pos2.c,v 1.6 2006/09/25 18:21:30 ptsarenko Exp $
  */
 
 /*
@@ -80,7 +80,7 @@ HB_FUNC (POSCHAR)
       }
       else
       {
-        cReplace = hb_parnl (2)%256;
+        cReplace = (char)( hb_parnl(2) % 256 );
       }
 
       if (ISNUM (3))
