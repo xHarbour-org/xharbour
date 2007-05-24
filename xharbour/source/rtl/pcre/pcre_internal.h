@@ -547,8 +547,9 @@ variable-length repeat, or a anything other than literal characters. */
 #define REQ_VARY     0x0200    /* reqbyte followed non-literal item */
 
 /* Miscellaneous definitions */
-
+#ifndef HB_APIEXT_H_
 typedef int BOOL;
+#endif
 
 #define FALSE   0
 #ifndef TRUE
