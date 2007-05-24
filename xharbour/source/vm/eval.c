@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.30 2007/05/21 03:35:07 ronpinkas Exp $
+ * $Id: eval.c,v 1.31 2007/05/21 17:17:38 ran_go Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ BOOL HB_EXPORT hb_evalNew( PEVALINFO pEvalInfo, PHB_ITEM pItem )
 
       return TRUE;
    }
- 
+
    return FALSE;
 }
 
@@ -715,7 +715,7 @@ BOOL hb_execFromArray( PHB_ITEM pFirst )
    {
       pSymbol = pExecSym->pSymbol;
    }
-   
+
    if( pSymbol == NULL )
    {
       return FALSE;
@@ -759,7 +759,7 @@ HB_FUNC( HB_EXEC )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pPointer = (PHB_ITEM) hb_parptr(1);
+   PHB_ITEM pPointer = hb_param( 1, HB_IT_POINTER );
 
    if( pPointer )
    {
@@ -770,7 +770,7 @@ HB_FUNC( HB_EXEC )
       if( pSymbol )
       {
          iParams = hb_pcount() - 1;
-         
+
          if( iParams >= 1 )
          {
             iParams--;
