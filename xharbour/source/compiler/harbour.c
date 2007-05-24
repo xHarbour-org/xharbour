@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.161 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id: harbour.c,v 1.162 2007/05/24 20:15:02 ronpinkas Exp $
  */
 
 /*
@@ -6034,8 +6034,6 @@ static int hb_compCompile( char * szPrg )
       PCOMDECLARED pDeclared = hb_comp_pReleaseDeclared;
       PCOMCLASS    pClass = hb_comp_pReleaseClass;
 
-      pDeclared = hb_comp_pReleaseDeclared;
-
       do
       {
          hb_comp_pReleaseDeclared = pDeclared->pNext;
@@ -6043,8 +6041,6 @@ static int hb_compCompile( char * szPrg )
          pDeclared = hb_comp_pReleaseDeclared;
       }
       while( pDeclared );
-
-      pClass = hb_comp_pReleaseClass;
 
       while( pClass )
       {
