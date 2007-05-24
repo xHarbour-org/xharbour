@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.28 2007/05/02 08:43:08 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.29 2007/05/04 20:56:10 ran_go Exp $
  */
 
 /*
@@ -4967,7 +4967,7 @@ static LPCDXINDEX hb_cdxFindBag( CDXAREAP pArea, char * szBagName )
    if ( szBasePath )
       hb_xfree( szBasePath );
    if ( szBaseExt )
-       hb_xfree( szBaseExt );
+      hb_xfree( szBaseExt );
    return pIndex;
 }
 
@@ -6952,7 +6952,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
          }
          else if ( ulPos )
          {
-            pTag->logKeyPos += lToSkip - ( ulPos ? 0 : 1 );
+            pTag->logKeyPos += lToSkip;
             pTag->logKeyRec = pArea->ulRecNo;
          }
       }
@@ -6966,7 +6966,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
       }
       else if ( ulPos )
       {
-         pTag->logKeyPos += lToSkip + ( ulPos ? 0 : 1 );
+         pTag->logKeyPos += lToSkip;
          pTag->logKeyRec = pArea->ulRecNo;
       }
    }
@@ -7002,12 +7002,16 @@ ERRCODE hb_cdxSkipFilter( CDXAREAP pArea, LONG lUpDown )
       /* SET DELETED */
       if( hb_set.HB_SET_DELETED )
       {
+         LPCDXTAG pTag = hb_cdxGetActiveTag( pArea );
+
          if( SELF_DELETED( (AREAP) pArea, &fDeleted ) != SUCCESS )
             return FAILURE;
          if( fDeleted )
          {
             if( SELF_SKIPRAW( (AREAP) pArea, lUpDown ) != SUCCESS )
                return FAILURE;
+            else if ( pTag )
+               pTag->logKeyPos += lUpDown;
             continue;
          }
       }
@@ -8836,7 +8840,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                   SELF_FORCEREL( ( AREAP ) pArea );
 
                if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
+                   ( pTag->pForItem &&
                      !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
                {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );
@@ -8875,7 +8879,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pO
                   SELF_FORCEREL( ( AREAP ) pArea );
 
                if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
+                   ( pTag->pForItem &&
                      !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
                {
                   pOrderInfo->itmResult = hb_itemPutL( pOrderInfo->itmResult, FALSE );

@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.1 2007/05/04 11:41:36 marchuet Exp $
+ * $Id: wafunc.c,v 1.2 2007/05/04 16:36:21 marchuet Exp $
  */
 
 /*
@@ -344,7 +344,7 @@ HB_EXPORT ERRCODE hb_rddSelectWorkAreaSymbol( PHB_SYMB pSymAlias )
 {
    HB_ITEM_PTR pError;
    ERRCODE errCode;
-   char * szName;
+   const char * szName;
    int iArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaSymbol(%p)", pSymAlias));

@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.265 2007/05/04 11:29:01 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.266 2007/05/04 20:56:10 ran_go Exp $
  */
 
 /*
@@ -6515,7 +6515,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
          }
          else if ( ulPos )
          {
-            pTag->logKeyPos += lToSkip - ( ulPos ? 0 : 1 );
+            pTag->logKeyPos += lToSkip;
             pTag->logKeyRec = pArea->ulRecNo;
          }
       }
@@ -6529,7 +6529,7 @@ static ERRCODE hb_cdxSkip( CDXAREAP pArea, LONG lToSkip )
       }
       else if ( ulPos )
       {
-         pTag->logKeyPos += lToSkip + ( ulPos ? 0 : 1 );
+         pTag->logKeyPos += lToSkip;
          pTag->logKeyRec = pArea->ulRecNo;
       }
    }
