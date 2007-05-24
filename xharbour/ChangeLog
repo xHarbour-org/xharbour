@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5555 2007/05/24 16:03:13 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5556 2007/05/24 16:24:07 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,10 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+c
 2007-05-24 18:23 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
     * removed unnecesary code
-    ! fixed bug on SKIP with SET DELETED ON when skips a deleted recno, OrdKeyNo was wrong. 
+    ! fixed bug on SKIP with SET DELETED ON when skips a deleted recno, OrdKeyNo was wrong.
   * source/rdd/dbfcdx/dbfcdx1.c
     * removed unnecesary code
   * source/rdd/wafunc.c
