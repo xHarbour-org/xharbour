@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.17 2006/06/16 16:16:55 bdj Exp $
+ * $Id: whatsnew.txt,v 1.18 2006/07/25 11:09:48 bdj Exp $
  */
 
 /*
@@ -15,6 +15,60 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+2007-05-24 10:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+    + uiBusy in control_data to keep track on how many times a codeblock
+      is executed recursively.
+    + some constants for EDITBOX
+
+  * contrib/gtwvw/gtwvw.c
+    ! Fix wrong handling of HB_ITEM causing memory leak, for the following functions:
+      HB_FUNC( WVW_CLIENTTOSCREEN )
+      HB_FUNC( WVW_GETXYFROMROWCOL )
+      HB_FUNC( WVW_GETROWCOLFROMXY )
+      HB_FUNC( WVW_GETFONTINFO )
+      HB_FUNC( WVW_GETPALETTE )
+      HB_FUNC( WVW_SAVESCREEN )
+      HB_FUNC( WVW_GETCURSORPOS )
+      HB_FUNC( WVW_GETPAINTRECT )
+      HB_FUNC( WVW_XBINFO )
+      HB_FUNC( WIN_GETCLIENTRECT )
+      Thanks to Pritpal Bedi for noticing these errors.
+
+    + support native EDITBOX
+      wvw_EBcreate()
+      wvw_EBdestroy()
+      wvw_EBsetfocus()
+      wvw_EBisfocused()
+      wvw_EBenable()
+      wvw_EBeditable()
+      wvw_EBsetcodeblock()
+      wvw_EBsetfont()
+      wvw_EBismultiline()
+      wvw_EBgettext()
+      wvw_EBsettext()
+      wvw_EBgetsel()
+      wvw_EBsetsel()
+      Note that SETKEY is still in effect during editbox editing,
+      thus this editbox is expected to be able to replace standard @..GET
+      (or memoline() if it is multiline editbox).
+      I have also tested that a proper editbox callback can be written to
+      handle masked input as in @...GET..PICTURE..
+
+    + wvw_pbisfocused()
+
+    + wvw_allowNonTopEvent()
+      To set whether control's codeblock is allowed to be executed from
+      non topmost window.
+      (default is FALSE, the old behaviour)
+
+    + wvw_recursecBlock()
+      To set whether control's codeblock is allowed to do recursive action.
+      (default is FALSE, the old behaviour)
+
+  * contrib/gtwvw/doc/whatsnew.txt
+    * notes on changes applied.
 
 
 2006-07-25 18:15 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>

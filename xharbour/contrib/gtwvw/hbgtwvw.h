@@ -1,5 +1,5 @@
 /*
- * $Id: hbgtwvw.h,v 1.13 2006/03/25 18:06:48 bdj Exp $
+ * $Id: hbgtwvw.h $
  */
 
 /*
@@ -90,7 +90,7 @@
    #if defined(_MSC_VER) || defined( __DMC__ )
       #include <conio.h>
 
-      #if !defined( _MSC_VER )
+      #if ! defined( _MSC_VER )
 
          #if !defined( LONG_PTR )
             typedef __int64 LONG_PTR ;
@@ -155,6 +155,14 @@
 #define WVW_CB_KBD_CLIPPER   1
 
 #define WVW_COMBOBOX_MAXLEN  255  /* maximum length of combobox string */
+
+#define WVW_ID_MAX_COMBOBOX  WVW_ID_BASE_COMBOBOX+200-1
+
+#define WVW_ID_BASE_EDITBOX  WVW_ID_MAX_COMBOBOX+1
+#define WVW_ID_MAX_EDITBOX   WVW_ID_BASE_EDITBOX+200-1
+
+#define WVW_EB_SINGLELINE    1
+#define WVW_EB_MULTILINE     2
 
 #define WVW_CHAR_QUEUE_SIZE  128
 #define WVW_CHAR_BUFFER     1024
@@ -288,6 +296,7 @@ typedef struct bitmap_handle
 #define WVW_CONTROL_CHECKBOX   2
 #define WVW_CONTROL_PROGRESSBAR  3
 #define WVW_CONTROL_COMBOBOX   4
+#define WVW_CONTROL_EDITBOX   5
 
 #define WVW_MAXCAPTIONLENGTH  80
 
@@ -298,10 +307,12 @@ typedef struct control_data
   UINT    uiCtrlid;
   PHB_ITEM phiCodeBlock;
   BOOL    bBusy;
+  UINT    uiBusy;
   RECT    rCtrl, rOffCtrl;
 
   /* SCROLLBAR specifics: */
   /* also used by combobox to store kbd type */
+  /* also used by editbox to store editbox type */
   byte    bStyle;
 
   /* PUSHBUTTON & CHECKBOX specifics: */
@@ -402,6 +413,8 @@ typedef struct win_data
   HFONT     hPBfont;                   /* handle to font used by pushbuttons & checkboxes */
 
   HFONT     hCBfont;                   /* handle to font used by comboboxes */
+
+  HFONT     hEBfont;                   /* handle to font used by editboxes */
 
   BOOL      bIgnoreWM_SYSCHAR;
   BOOL      bPaint;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5551 2007/05/23 23:13:16 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5552 2007/05/24 02:22:13 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-24 10:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/hbgtwvw.h
+  * contrib/gtwvw/gtwvw.c
+    ! Fix wrong handling of HB_ITEM causing memory leak, for the following functions:
+      HB_FUNC( WVW_CLIENTTOSCREEN )
+      HB_FUNC( WVW_GETXYFROMROWCOL )
+      HB_FUNC( WVW_GETROWCOLFROMXY )
+      HB_FUNC( WVW_GETFONTINFO )
+      HB_FUNC( WVW_GETPALETTE )
+      HB_FUNC( WVW_SAVESCREEN )
+      HB_FUNC( WVW_GETCURSORPOS )
+      HB_FUNC( WVW_GETPAINTRECT )
+      HB_FUNC( WVW_XBINFO )
+      HB_FUNC( WIN_GETCLIENTRECT )
+      Thanks to Pritpal Bedi for noticing these errors.
+
+    + support native EDITBOX
+      wvw_EBcreate(), wvw_EBdestroy(), ... (13 new functions)
+      Note that SETKEY is still in effect during editbox editing,
+      thus this editbox is expected to be able to replace standard @..GET
+      (or memoline() if it is multiline editbox).
+      I have also tested that a proper editbox callback can be written to
+      handle masked input as in @...GET..PICTURE..
+
+    + wvw_pbisfocused()
+
+    + wvw_allowNonTopEvent()
+      To set whether control's codeblock is allowed to be executed from
+      non topmost window.
+      (default is FALSE, the old behaviour)
+
+    + wvw_recursecBlock()
+      To set whether control's codeblock is allowed to do recursive action.
+      (default is FALSE, the old behaviour)
+
+  * contrib/gtwvw/doc/whatsnew.txt
+    * notes on changes applied.
 
 2007-05-23 23:30 UTC-0300 Luiz Rafael Culik Guimaraes
   * source/rtl/pcre/pcre_internal.h
@@ -225,7 +263,7 @@
   * source/rdd/usrrdd/rdds/adordd.prg
   * source/rdd/workarea.c
     + added support to fieldtype P (Picture)
-      P  	Picture   10 digits (bytes) representing a .DBT block number.
+      P     Picture   10 digits (bytes) representing a .DBT block number.
       The number is stored as a string, right justified and padded with blanks.
 
       (foxpro compatible)
@@ -484,7 +522,7 @@
   * source/rdd/dbffpt/dbffpt1.c
   * source/rdd/workarea.c
     + added support to fieldtype G (OLE)
-      G  	OLE/General   10 digits (bytes) representing a .DBT block number.
+      G     OLE/General   10 digits (bytes) representing a .DBT block number.
       The number is stored as a string, right justified and padded with blanks.
 
       (dBASE V: like Memo) OLE Objects in MS Windows versions
@@ -712,7 +750,7 @@
              CLASS MyClass2 FROM MyNewClass( MyClass )
                    ^ClassName    ^Function   ^From ClassName
 
-	 **Only in these cases**
+    **Only in these cases**
       */
 
 2007-05-02 22:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -843,25 +881,25 @@
     * Several Changues
       - Removed __CLS_PARAM, __CLS_PAR00, __HB_CLS_PAR
       - Removed .. Not loger nedded
-	#xcommand _HB_MEMBER <MethodName>([<params,...>])() [<*x*>] => _HB_MEMBER <MethodName>(<params>) <x>
-	#xtranslate @<!funcname!>([<params,...>])() => @<funcname>(<params>)
+   #xcommand _HB_MEMBER <MethodName>([<params,...>])() [<*x*>] => _HB_MEMBER <MethodName>(<params>) <x>
+   #xtranslate @<!funcname!>([<params,...>])() => @<funcname>(<params>)
       + Add _InheritFrom_, _AsFunc_, _AsName_, _AsStr_, _AsStrLst_, __OPT__
       * Now Works with Delegate Message
-	MESSAGE ... IS
-	MESSAGE ... IS ... TO ...
-	MESSAGE ... IS ... IN ...
-	MESSAGE ... TO ...
-	MESSAGE ... IN ...
-	VAR ... IS ...
-	VAR ... IS ... TO ...
-	VAR ... IS ... IN ...
-	VAR ... TO ...
-	VAR ... IN ...
+   MESSAGE ... IS
+   MESSAGE ... IS ... TO ...
+   MESSAGE ... IS ... IN ...
+   MESSAGE ... TO ...
+   MESSAGE ... IN ...
+   VAR ... IS ...
+   VAR ... IS ... TO ...
+   VAR ... IS ... IN ...
+   VAR ... TO ...
+   VAR ... IN ...
 
   * include/classes.h
     + Add to METHOD
-   	PHB_SYMB pMsgIs;
-	PHB_SYMB pMsgTo;
+      PHB_SYMB pMsgIs;
+   PHB_SYMB pMsgTo;
 
   * source/vm/classes.c
     * Change hb___msgDelegate
@@ -1533,8 +1571,8 @@
     + added support for field types TimeStamp and DateTime compatible with
       Visual FoxPro. Can be created the fields with DbCreate using the next
       fieldTypes:
-	DateTime	T
-	TimeStamp	@
+   DateTime T
+   TimeStamp   @
 
 2007-03-31 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
