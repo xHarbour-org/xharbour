@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.137 2007/05/18 13:44:30 ronpinkas Exp $
+ * $Id: genc.c,v 1.138 2007/05/24 16:03:14 ronpinkas Exp $
  */
 
 /*
@@ -1059,7 +1059,6 @@ static void hb_compCStatSymList( char* statSymName, int iOption )
 static void hb_compGenCCheckInLineStatic( char *sInline )
 {
    char *szTmp, *szTmp2;
-   int iLen = strlen( sInline );
    int iOption;
    char *sBase = sInline;
 
