@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5557 2007/05/24 16:54:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5559 2007/05/24 17:01:00 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-05-23 19:12 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+2007-05-24 16:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/fm.c
+  * source/compiler/harbour.c
+    * Compiler warnings
+    
+2007-05-24 13:00 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/pcre/config.h
     * Disable warning guarded by defined( _MSC_VER )
 

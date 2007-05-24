@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.76 2007/05/15 21:34:15 ronpinkas Exp $
+ * $Id: fm.c,v 1.77 2007/05/20 03:26:24 ronpinkas Exp $
  */
 
 /*
@@ -551,7 +551,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    #undef hb_xfree
    HB_EXPORT void hb_xfree( void *pMem )
    {
-      return free( pMem );
+      free( pMem );
    }   
 #else
 HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */

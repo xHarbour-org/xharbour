@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.160 2007/05/18 13:44:30 ronpinkas Exp $
+ * $Id: harbour.c,v 1.161 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -1349,7 +1349,7 @@ void hb_compGenGlobalName( char *szVarName )
       hb_compGlobalsDefStart();
 
       iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
-      pVar = hb_compVariableFind( hb_comp_pGlobals, iVar );
+      pVar = hb_compVariableFind( hb_comp_pGlobals, (USHORT)iVar );
 
       pBuffer = ( BYTE * ) hb_xgrab( iVarLen + 5 );
       i = 0;
@@ -2187,7 +2187,7 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction
 
       if( pwPos )
       {
-         *pwPos = hb_comp_symbols.iCount -1; /* position number starts form 0 */
+         *pwPos = (USHORT)( hb_comp_symbols.iCount -1 ); /* position number starts form 0 */
       }
    }
    else
@@ -2325,7 +2325,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    }
 
    pFunc = hb_compFunctionNew( szFunName, cScope );
-   pFunc->bFlags |= iType;
+   pFunc->bFlags |= (BYTE)iType;
 
    if( hb_comp_functions.iCount == 0 )
    {
@@ -3033,7 +3033,7 @@ PCOMSYMBOL hb_compSymbolGetPos( USHORT wSymbol )
 USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found or order + 1 */
 {
    PFUNCTION pFunc = hb_comp_functions.pFirst;
-   USHORT wFunction = hb_comp_bStartProc;
+   USHORT wFunction = (USHORT) hb_comp_bStartProc;
 
    while( pFunc )
    {
@@ -3143,11 +3143,11 @@ ULONG hb_compGenJumpTrue( HB_LONG lOffset )
 void hb_compGenJumpThere( HB_ULONG ulFrom, HB_ULONG ulTo )
 {
    BYTE * pCode = hb_comp_functions.pLast->pCode;
-   HB_LONG lOffset = ulTo - ulFrom + 1;
+   LONG lOffset = (LONG)( ulTo - ulFrom + 1 );
 
    if( HB_LIM_INT24( lOffset ) )
    {
-      HB_PUT_LE_UINT24( &pCode[ ulFrom ], lOffset );
+      HB_PUT_LE_UINT24( &pCode[ (ULONG)ulFrom ], lOffset );
    }
    else
    {
@@ -3439,7 +3439,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
       }
    }
 
-   pField = hb_compVariableFind( pFunc->pFields, wVar );
+   pField = hb_compVariableFind( pFunc->pFields, (USHORT)wVar );
 
    if( pField->szAlias )
    {  /* the alias was specified in FIELD declaration
@@ -3582,7 +3582,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE) iVar - 1, ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -3760,7 +3760,7 @@ void hb_compGenPushVar( char * szVarName )
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_PUSHGLOBAL, (BYTE) iVar - 1, ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_PUSHGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -3860,7 +3860,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
    if( iVar )
    {
-      hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE) iVar - 1, ( BOOL ) 1 );
+      hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
 
       return;
    }
@@ -4156,10 +4156,12 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
    {
       case 1:              // Simple XOR 0xf3 mask
          pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
+         
          for( ulCount = 0; ulCount < ulStrLen; ulCount++ )
          {
-            pBuffer[ ulCount ] = szText[ ulCount ] ^ 0xf3;
+            pBuffer[ ulCount ] = (BYTE)( szText[ ulCount ] ^ 0xf3 );
          }
+         
          *ulBufferLen = ulStrLen;
          break;
 
@@ -4217,7 +4219,7 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
       pBuffer = hb_compHideString( hb_comp_iHidden, szText, ulStrLen, &ulBufferLen );
 
       hb_compGenPCode3( HB_P_PUSHSTRHIDDEN, HB_LOBYTE( ulStrLen ), HB_HIBYTE( ulStrLen ), TRUE );
-      hb_compGenPCode3( hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), TRUE );
+      hb_compGenPCode3( (BYTE)hb_comp_iHidden, HB_LOBYTE( ulBufferLen ), HB_HIBYTE( ulBufferLen ), TRUE );
       hb_compGenPCodeN( pBuffer, ulBufferLen, 1 );
    }
    else if( ulStrLen > 255 )
@@ -4317,7 +4319,7 @@ void hb_compFinalizeFunction( void ) /* fixes all last defined function returns 
 
       if( pFunc->bFlags & FUN_USES_LOCAL_PARAMS )
       {
-         int PCount = pFunc->wParamCount;
+         USHORT PCount = pFunc->wParamCount;
 
          /* do not adjust if local parameters are used -remove NOOPs only */
          pFunc->wParamCount = 0;
@@ -5279,7 +5281,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
       }
    }
 
-   pFunc->bFlags |= ( pCodeblock->bFlags & FUN_USES_STATICS );
+   pFunc->bFlags |= (BYTE)( pCodeblock->bFlags & FUN_USES_STATICS );
 
    /* generate a proper codeblock frame with a codeblock size and with
     * a number of expected parameters
@@ -5296,7 +5298,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    {
       if( hb_comp_bDebugInfo )
       {
-        wLocalsLen += (4 + strlen(pVar->szName));
+        wLocalsLen += (USHORT)( 4 + strlen(pVar->szName) );
       }
 
       pVar = pVar->pNext;
@@ -5306,17 +5308,17 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    wLocalsCnt = wLocals;
 
    /* NOTE: 2 = HB_P_PUSHBLOCK | HB_P_PUSHBLOCKSHORT + BYTE( size ) + _ENDBLOCK */
-   wSize = (USHORT)pCodeblock->lPCodePos + 2;
+   wSize = (USHORT)( pCodeblock->lPCodePos + 2 );
 
    if ( hb_comp_bDebugInfo )
    {
-      wSize += 3 + strlen( hb_pp_fileName( hb_comp_PP ) ) + strlen( pFuncName );
+      wSize += (USHORT)( 3 + strlen( hb_pp_fileName( hb_comp_PP ) ) + strlen( pFuncName ) );
       wSize += wLocalsLen;
    }
 
    if( bExt )
    {
-      wSize += 3; // HB_P_FRAME l, p
+      wSize += (USHORT)3; // HB_P_FRAME l, p
    }
 
    if( wSize <= 255 && pCodeblock->wParamCount == 0 && wLocals == 0 )
@@ -5326,7 +5328,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    else
    {
       /* NOTE: 5 = BYTE( size ) + USHORT( wParams ) + USHORT( wLocals ) */
-      wSize += 5 + wLocals * 2;
+      wSize += (USHORT)( 5 + wLocals * 2 );
 
       hb_compGenPCode3( HB_P_PUSHBLOCK, HB_LOBYTE( wSize ), HB_HIBYTE( wSize ), ( BOOL ) 0 );
       hb_compGenPCode2( HB_LOBYTE( pCodeblock->wParamCount ), HB_HIBYTE( pCodeblock->wParamCount ), ( BOOL ) 0 );
@@ -5808,12 +5810,12 @@ static int hb_compCompile( char * szPrg )
                   {
                      ULONG ulLine = pInfo->pLines[ i ] - pInfo->ulLineMin;
 
-                     pBuffer[ ulLine / 8 ] |= 1 << ( ulLine % 8 );
+                     pBuffer[ ulLine / 8 ] |= (BYTE)( 1 << ( ulLine % 8 ) );
                   }
 
                   hb_compGenPushString( pInfo->szModule, strlen( pInfo->szModule ) + 1 );
                   hb_compGenPushLong( pInfo->ulLineMin );
-                  hb_compGenPushString( (char *) pBuffer, iLen + 1 );
+                  hb_compGenPushString( (char *) pBuffer, (size_t)( iLen + 1 ) );
                   hb_xfree( pBuffer );
                   hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
                   iModules++;
