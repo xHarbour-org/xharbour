@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.129 2007/05/05 22:26:43 modalsist Exp $
+ * $Id: tget.prg,v 1.130 2007/05/21 23:39:45 modalsist Exp $
  */
 
 /*
@@ -138,14 +138,14 @@ CLASS Get
    #endif
 
    METHOD Home()
-   MESSAGE Left() METHOD _Left()
-   MESSAGE Right() METHOD _Right()
+   MESSAGE Left( lDisplay ) METHOD _Left( lDisplay )
+   MESSAGE Right( lDisplay ) METHOD _Right( lDisplay )
    METHOD ToDecPos()
    METHOD WordLeft()
    METHOD WordRight()
 
    METHOD BackSpace( lDisplay )
-   MESSAGE Delete() METHOD _Delete()
+   MESSAGE Delete( lDisplay ) METHOD _Delete( lDisplay )
    METHOD DelEnd()
    METHOD DelLeft()
    METHOD DelRight()
@@ -172,7 +172,7 @@ CLASS Get
 
    HIDDEN:              /*  H I D D E N  */
 
-   DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex 
+   DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
    DATA nDispLen, nDispPos, nOldPos, lCleanZero, cDelimit, nMaxEdit
    DATA lMinusPrinted, xVarGet
    DATA lDispLen INIT .F.
@@ -216,14 +216,14 @@ METHOD New( nRow, nCol, bVarBlock, cVarName, cPicture, cColorSpec ) CLASS Get
    ::Rejected       := .F.
    ::TypeOut        := .F.
 
-	 /*
+    /*
    ::DecPos         := NIL
    ::Pos            := NIL
    ::PostBlock      := NIL
    ::PreBlock       := NIL
    ::Reader         := NIL
    ::SubScript      := NIL
-	 */
+    */
 
    //::ExitState      := 0 // NIL in Clipper
    ::nLastExitState := 0
@@ -259,21 +259,18 @@ METHOD ParsePict( cPicture ) CLASS Get
    Local cChar
    Local nAt
    Local nFor
-   Local cNum
-   Local nPos
+   Local cNum := ""
+   Local nPos := AT("@", cPicture )
    Local nLen,nDec
    Local nMaxLen
 
-   cNum := ""
-   
-   
    /* E.F. 2006/MAY/31 - Search by last occurrence of "@" into picture
     * to verify if picture has a function and avoid any char before it.
     * E.F. 2006/AUG/14 - Replaced RAT by AT to preserve others pictures, if any.
     */
    //if Left( cPicture, 1 ) == "@"
    //nPos := RAT("@", cPicture )
-   nPos := AT("@", cPicture )
+   //nPos := AT("@", cPicture )
    if nPos > 0
 
       if nPos > 1
@@ -411,7 +408,7 @@ METHOD ParsePict( cPicture ) CLASS Get
             else
                cNum := Str( ::xVarGet, nMaxLen, 0 )
             endif
-            
+
          else
             cNum := Str( ::xVarGet )
          endif
@@ -431,7 +428,7 @@ METHOD ParsePict( cPicture ) CLASS Get
             nLen := iif( ::xVarGet < -99999999.99, 10+iif(nDec>0,1,0) + nDec, Len( cNum ) )
             cNum := Str( ::xVarGet, nLen, nDec )
          ENDIF
-         
+
          if ( nAt := At( iif( ::lDecRev, ",", "." ), cNum ) ) > 0
             ::cPicMask := Replicate( '9', nAt - 1 ) + iif( ::lDecRev, ",", "." )
             ::cPicMask += Replicate( '9', Len( cNum ) - Len( ::cPicMask ) )
@@ -480,7 +477,7 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::decpos := NIL
 
          // 2006/DEC/11 - EF - changed ::cPicMask to uppercase if ::type is character.
-         //IF ::type == 'L' 
+         //IF ::type == 'L'
          IF ::type == 'L' .OR. ::type == 'C'
             ::cPicMask := Upper( ::cPicMask )
          ENDIF
@@ -491,17 +488,17 @@ return ::cPicFunc + ' ' + ::cPicMask
 
 //---------------------------------------------------------------------------//
 
-METHOD Assign() CLASS Get
+PROCEDURE Assign() CLASS Get
 
    if ::hasfocus
       ::VarPut( ::unTransform(), .f. )
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD Display( lForced ) CLASS Get
+PROCEDURE Display( lForced ) CLASS Get
 
    LOCAL nOldCursor := SetCursor( SC_NONE )
    LOCAL xBuffer
@@ -563,7 +560,7 @@ METHOD Display( lForced ) CLASS Get
       IF Len( cDisplay ) < ::nDispLen
 /* 2007/MAY/18 - E.F. - Adjust display length
          cDisplay := Padr( cDisplay, ::nDispLen ) */
-         cDisplay := Padr( cDisplay, Min(::nDispLen,::nMaxLen) ) 
+         cDisplay := Padr( cDisplay, Min(::nDispLen,::nMaxLen) )
       ENDIF
 
       // The get lost the focus. We need left-adjust the content buffer
@@ -647,11 +644,11 @@ METHOD Display( lForced ) CLASS Get
 
    HBConsoleUnlock()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD End() CLASS Get
+PROCEDURE End() CLASS Get
 
    local nLastCharPos, nPos, nFor
 
@@ -665,7 +662,7 @@ METHOD End() CLASS Get
          ::TypeOut := .f.
          ::Clear   := .f.
          ::Display( .f. )
-         return Self
+         return
       endif
       /**/
 
@@ -705,11 +702,11 @@ METHOD End() CLASS Get
       ::Display( .f. )
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD Home() CLASS Get
+PROCEDURE Home() CLASS Get
 
    if ::HasFocus
       ::Pos := ::FirstEditable()
@@ -718,11 +715,11 @@ METHOD Home() CLASS Get
       ::Display( .f. )
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD Reset() CLASS Get
+PROCEDURE Reset() CLASS Get
 
    if ::hasfocus
       ::buffer := ::PutMask( ::VarGet(), .f. )
@@ -730,11 +727,11 @@ METHOD Reset() CLASS Get
       ::TypeOut := .f.
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD Undo() CLASS Get
+PROCEDURE Undo() CLASS Get
 
    if ::hasfocus
       /* E.F. 2006/APRIL/14 - reset ::minus flag if ::xVarGet was
@@ -749,11 +746,11 @@ METHOD Undo() CLASS Get
       ::lUndo := .t.
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD SetFocus() CLASS Get
+PROCEDURE SetFocus() CLASS Get
 
    local xVarGet
 
@@ -817,11 +814,11 @@ METHOD SetFocus() CLASS Get
       ::Display()
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD KillFocus() CLASS Get
+PROCEDURE KillFocus() CLASS Get
 
    if ::lEdit
       ::Assign()
@@ -838,7 +835,7 @@ METHOD KillFocus() CLASS Get
 
    ::typeout := .f.  /* Clipper compatible */
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
@@ -869,10 +866,10 @@ METHOD VarPut( xValue, lReFormat ) CLASS Get
          ::Type    := ValType( xValue )
          ::xVarGet := xValue
          ::lEdit   := .f.
-         ::Picture := ::cOrigPicture 
+         ::Picture := ::cOrigPicture
       endif
    endif
-   
+
 return xValue
 
 //---------------------------------------------------------------------------//
@@ -881,7 +878,6 @@ METHOD VarGet() CLASS Get
 
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
    LOCAL cVarGet, nDecPos, nLen, nDec
-
 
    IF ! HB_IsBlock( ::Block )
       ::xVarGet := NIL
@@ -912,7 +908,7 @@ METHOD VarGet() CLASS Get
       ::DecPos != NIL .AND. ::DecPos > 0 .AND. ::DecPos < ::nMaxLen
 
       nDecPos := ::DecPos
-    
+
       IF !Empty(::cPicMask)
          nLen := HowMuchNumeric(::cPicMask) + 1 + iif(::minus,1,0)
          nLen := Min(nLen,Len(::cPicMask))
@@ -947,7 +943,7 @@ METHOD VarGet() CLASS Get
       IF Len(cVarGet) > nDecPos .AND. Empty( SubStr( cVarGet, nDecPos+1 ) )
          cVarGet := Stuff( cVarGet, nDecPos+1, ::nMaxLen - nDecPos, replicate("0",::nMaxLen - nDecPos) )
       ENDIF
-     
+
       xVarGet := Val( cVarGet )
 
       // E.F. 2006/MAY/23 - Avoid minus flag if get value is zero.
@@ -971,7 +967,7 @@ METHOD Untransform( cBuffer ) CLASS Get
    local cMaskDel := ""
 
    DEFAULT cBuffer TO ::buffer
-  
+
    /*
     *if !::lEdit
     *  return ::VarGet()
@@ -993,7 +989,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       else
          cBuffer += SubStr( ::xVarGet, ::nMaxLen + 1 )
       endif
-     
+
       xValue := cBuffer
       exit
 
@@ -1014,7 +1010,7 @@ METHOD Untransform( cBuffer ) CLASS Get
             endif
          next
       endif
-     
+
       /* 14/08/2004 - <maurilio.longo@libero.it>
        *              If there should be a decimal point (or comma) but this is missing
        *              re-add it. Clipper does it. A little sample is inside ChangeLog
@@ -1023,7 +1019,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       if ::decPos < Len( cBuffer ) .and. Empty( cBuffer[ ::decPos ] ) .and. if( ::lDecRev, "," , "." ) IN ::cPicture
          cBuffer[ ::decPos ] := if( "E" IN ::cPicFunc .or. ::lDecRev, ",", "." )
       endif
-      
+
       cBuffer := Space( ::FirstEditable() - 1 ) + ;
                  SubStr( cBuffer, ::FirstEditable(), ::LastEditable() - ::FirstEditable() + 1 )
 
@@ -1138,7 +1134,7 @@ METHOD Untransform( cBuffer ) CLASS Get
       if empty(::cPicture ) .and. empty( StrTran(cBuffer,".","" ) )
          cBuffer := PadL( "0."+  replicate("0",::nMaxLen - ::Decpos), ::nMaxLen )
       endif
-      
+
       xValue := iif( ::minus, -Val( cBuffer ), Val( cBuffer ) )
       exit
 
@@ -1161,8 +1157,7 @@ return xValue
 
 //---------------------------------------------------------------------------//
 
-METHOD overstrike( cChar ) CLASS Get
-
+PROCEDURE overstrike( cChar ) CLASS Get
 
    if ::Type == "N" .and. ! ::lEdit .and. ::Clear
       ::Pos := ::FirstEditable()
@@ -1170,14 +1165,14 @@ METHOD overstrike( cChar ) CLASS Get
 
    if ::Pos > ::nMaxEdit
       ::Rejected := .t.
-      return Self
+      return
    endif
 
    cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
-      return Self
+      return
    else
       ::Rejected := .f.
    endif
@@ -1225,15 +1220,14 @@ METHOD overstrike( cChar ) CLASS Get
 
    ::Display()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD Insert( cChar ) CLASS Get
+PROCEDURE Insert( cChar ) CLASS Get
 
    local n
    local nMaxEdit := ::nMaxEdit
-
 
    if ::Type == "N" .and. ! ::lEdit .and. ::Clear
       ::Pos := ::FirstEditable()
@@ -1241,14 +1235,14 @@ METHOD Insert( cChar ) CLASS Get
 
    if ::Pos > ::nMaxEdit
       ::Rejected := .t.
-      return Self
+      return
    endif
 
    cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
-      return Self
+      return
    else
       ::Rejected := .f.
    endif
@@ -1309,7 +1303,7 @@ METHOD Insert( cChar ) CLASS Get
 
    ::Display()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
@@ -1320,7 +1314,7 @@ METHOD _Right( lDisplay ) CLASS Get
    DEFAULT lDisplay TO .t.
 
    if ! ::hasfocus
-      return Self
+      return nil
    endif
 
    ::TypeOut := .f.
@@ -1328,7 +1322,7 @@ METHOD _Right( lDisplay ) CLASS Get
 
    if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
-      return Self
+      return nil
    endif
 
    nPos := ::Pos + 1
@@ -1347,7 +1341,7 @@ METHOD _Right( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
-return Self
+return nil
 
 //---------------------------------------------------------------------------//
 
@@ -1358,7 +1352,7 @@ METHOD _Left( lDisplay ) CLASS Get
    DEFAULT lDisplay TO .t.
 
    if ! ::hasfocus
-      return Self
+      return nil
    endif
 
    ::TypeOut := .f.
@@ -1366,7 +1360,7 @@ METHOD _Left( lDisplay ) CLASS Get
 
    if ::Pos == ::FirstEditable()
       ::TypeOut := .t.
-      return Self
+      return nil
    endif
 
    nPos := ::Pos - 1
@@ -1385,16 +1379,16 @@ METHOD _Left( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
-return Self
+return nil
 
 //---------------------------------------------------------------------------//
 
-METHOD WordLeft() CLASS Get
+PROCEDURE WordLeft() CLASS Get
 
    local nPos, nFirstEditable
 
    if ! ::hasfocus
-      return Self
+      return
    endif
 
    ::TypeOut := .f.
@@ -1404,7 +1398,7 @@ METHOD WordLeft() CLASS Get
 
    if ::Pos == nFirstEditable
       ::TypeOut := .t.
-      return Self
+      return
    endif
 
    nPos := ::Pos
@@ -1421,16 +1415,16 @@ METHOD WordLeft() CLASS Get
 
    ::Display( .f. )
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD WordRight() CLASS Get
+PROCEDURE WordRight() CLASS Get
 
    local nPos, nLastEditable
 
    if ! ::hasfocus
-      return Self
+      return
    endif
 
    ::TypeOut := .f.
@@ -1440,7 +1434,7 @@ METHOD WordRight() CLASS Get
 
    if ::Pos == nLastEditable
       ::TypeOut := .t.
-      return Self
+      return
    endif
 
    nPos := ::Pos
@@ -1457,16 +1451,16 @@ METHOD WordRight() CLASS Get
 
    ::Display( .f. )
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD ToDecPos() CLASS Get
+PROCEDURE ToDecPos() CLASS Get
 
 LOCAL xBuffer
 
    if ! ::HasFocus .or. ::DecPos == NIL
-      return Self
+      return
    endif
 
    /* 2006/JUN/05 - E.F. Delete all only if we press dot or comma in a numeric
@@ -1490,7 +1484,7 @@ LOCAL xBuffer
     */
    ::VarPut( xBuffer, .t. )
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
@@ -1691,9 +1685,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    cPicFunc := ::cPicFunc
    cMask    := ::cPicMask
-   
+
    DEFAULT cMask  TO ""
-  
+
    if xValue == NIL .OR. ValType( xValue ) IN "AB"
       ::nMaxLen := 0
       return NIL
@@ -1718,7 +1712,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    if ::type == "N"
 
-     if  ::lDispLenChanged 
+     if  ::lDispLenChanged
 
      if "(" IN cPicFunc .or. ")" IN cPicFunc
 
@@ -1728,7 +1722,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
            cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
         endif
 
-      elseif "C" IN cPicFunc  
+      elseif "C" IN cPicFunc
 
         ::nDispLenReduce := 3
 
@@ -1736,7 +1730,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
            cBuffer := Padr( cBuffer, iif(::nMaxLen != NIL, ::nMaxLen, iif(cMask!=NIL,Len(cMask),10) ) )
         endif
 
-      elseif "X" IN cPicFunc 
+      elseif "X" IN cPicFunc
 
         ::nDispLenReduce := 3
 
@@ -1752,9 +1746,9 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
 
    endif
 
-   ::nMaxLen  := Len( cBuffer ) 
+   ::nMaxLen  := Len( cBuffer )
    ::nMaxEdit := ::nMaxLen
-   
+
    if ::nDispLen == NIL .or. !::lDispLen
       ::nDispLen := ::nMaxLen
    endif
@@ -1772,7 +1766,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
             cBuffer := Substr( cBuffer, 1, HB_EnumIndex() - 1 ) + cChar + Substr( cBuffer, HB_EnumIndex() + 1 )
          endif
       next
-      
+
       if ::lEdit .and. Empty(xValue)
          cBuffer := StrTran(cBuffer, "0", " ")
       endif
@@ -1786,17 +1780,18 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    endif
 
    /* 2007/MAY/20 - E.F. */
-   if ::type == "N" .and. ::lDispLenChanged
+   if ::type == "N"
 
-      if ( "(" IN ::cPicFunc .OR. ")" IN ::cPicFunc .OR.;
-           "C" IN ::cPicFunc .OR. "X" IN ::cPicFunc )
+      if ::lDispLenChanged
 
-      ::nMaxEdit := ::nMaxLen - ::nDispLenReduce
+         if ( "(" IN ::cPicFunc .OR. ")" IN ::cPicFunc .OR.;
+              "C" IN ::cPicFunc .OR. "X" IN ::cPicFunc )
+
+            ::nMaxEdit := ::nMaxLen - ::nDispLenReduce
+
+         endif
 
       endif
-
-   endif
-
 
    /* 2006/OCT/28 - E.F. - fixed a bug when we set century on after set date
     *                      and use get with picture "@E" in date variable.
@@ -1804,7 +1799,7 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
     *    cBuffer := ::Buffer
     * Endif
     */
-   If ::type == "D"
+   elseif ::type == "D"
       If ::BadDate .and. ::Buffer != nil
          cBuffer := ::Buffer
       Elseif ::Buffer == NIL .and. "E" IN ::cPicFunc
@@ -1816,12 +1811,11 @@ return cBuffer
 
 //---------------------------------------------------------------------------//
 
-METHOD BackSpace( lDisplay ) CLASS Get
+PROCEDURE BackSpace( lDisplay ) CLASS Get
 
    local nPos := ::Pos, nMinus
 
    DEFAULT lDisplay TO .t.
-
 
    if nPos > 1 .and. nPos == ::FirstEditable() .and. ::minus
       /* For delete the parenthesis (negative indicator) in a non editable position */
@@ -1841,7 +1835,7 @@ METHOD BackSpace( lDisplay ) CLASS Get
             ::Display()
          endif
 
-         return Self
+         return
 
       endif
 
@@ -1853,7 +1847,7 @@ METHOD BackSpace( lDisplay ) CLASS Get
       ::Delete( lDisplay )
    endif
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
@@ -1862,7 +1856,6 @@ METHOD _Delete( lDisplay ) CLASS Get
    LOCAL nMaxLen := ::nMaxLen, n
 
    DEFAULT lDisplay TO .t.
-
 
    ::Clear := .f.
    ::lEdit := .t.
@@ -1905,11 +1898,11 @@ METHOD _Delete( lDisplay ) CLASS Get
       ::Display()
    endif
 
-return Self
+return nil
 
 //---------------------------------------------------------------------------//
 
-METHOD DeleteAll() CLASS Get
+PROCEDURE DeleteAll() CLASS Get
 
    local xValue
 
@@ -1960,16 +1953,16 @@ METHOD DeleteAll() CLASS Get
       ENDIF
    ENDIF
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD DelEnd() CLASS Get
+PROCEDURE DelEnd() CLASS Get
 
    local nPos := ::Pos
 
    if ! ::hasfocus
-      return Self
+      return
    endif
 
    ::Pos := ::nMaxEdit
@@ -1981,49 +1974,49 @@ METHOD DelEnd() CLASS Get
 
    ::Display()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD DelLeft() CLASS Get
+PROCEDURE DelLeft() CLASS Get
 
    ::Left( .f. )
    ::Delete( .f. )
    ::Right()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD DelRight() CLASS Get
+PROCEDURE DelRight() CLASS Get
 
    ::Right( .f. )
    ::Delete( .f. )
    ::Left()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD DelWordLeft() CLASS Get
+PROCEDURE DelWordLeft() CLASS Get
 
    if ! ::hasfocus
-      return Self
+      return
    endif
 
    ::WordLeft()
    ::DelWordRight()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
-METHOD DelWordRight() CLASS Get
+PROCEDURE DelWordRight() CLASS Get
 
    local nCount, nPos
 
    if ! ::hasfocus
-      return Self
+      return
    endif
 
    ::TypeOut := .f.
@@ -2031,7 +2024,7 @@ METHOD DelWordRight() CLASS Get
 
    if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
-      return Self
+      return
    endif
 
    // Counts how many characters must be deleted
@@ -2053,7 +2046,7 @@ METHOD DelWordRight() CLASS Get
 
    ::Display()
 
-return Self
+return
 
 //---------------------------------------------------------------------------//
 
@@ -2327,7 +2320,7 @@ RETURN Upper( SetColor() ) == "W/N,N/W,N/N,N/N,N/W"
 #endif
 
 STATIC FUNCTION HowMuchNumeric( cPict )
-LOCAL c := ""
+LOCAL c
 LOCAL r := 0
 
  /* E.F. 2006/MAY/05 - added space and % as part of picture also. */
