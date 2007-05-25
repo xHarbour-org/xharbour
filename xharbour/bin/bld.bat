@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.65 2006/07/27 16:47:37 map Exp $
+rem $Id: bld.bat,v 1.66 2007/01/26 13:04:02 ronpinkas Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -226,8 +226,9 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    if "%HB_COMPILER%" == "msvc"    goto C_MSVC
    if "%HB_COMPILER%" == "watcom"  goto C_WATCOM
    if "%HB_COMPILER%" == "mingw32"  goto C_MINGW32
-
    if "%HB_GTALLEG%" == "yes" set HB_ALGLIB=alleg.lib
+
+   if "%_HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin
 
    if "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% common.lib debug.lib vm%HB_MT%.lib rtl%HB_MT%.lib pcrepos.lib %_HB_GT_LIB%.lib lang.lib rdd%HB_MT%.lib macro%HB_MT%.lib pp%HB_MT%.lib dbffpt%HB_MT%.lib dbfntx%HB_MT%.lib dbfcdx%HB_MT%.lib hsx%HB_MT%.lib hbsix%HB_MT%.lib ct%HB_MT%.lib tip%HB_MT%.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
    if not "%HB_DLL%" == "" set HB_LIBLIST=%HB_FIRST_LIBS% harbour.lib %_HB_GT_LIB%.lib vm.lib %ADS_LIBS% %HB_USER_LIBS% %HB_ALGLIB%
