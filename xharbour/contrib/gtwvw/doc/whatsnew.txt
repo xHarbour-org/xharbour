@@ -1,5 +1,5 @@
 /*
- * $Id: whatsnew.txt,v 1.18 2006/07/25 11:09:48 bdj Exp $
+ * $Id: whatsnew.txt,v 1.19 2007/05/24 03:05:51 bdj Exp $
  */
 
 /*
@@ -15,6 +15,13 @@
  *
  * Budyanto Dj. <budyanto@centrin.net.id>
  */
+
+2007-05-25 23:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  + contrib/gtwvw/samples/ebtest7.prg
+    * sample on how to organize editboxes in commands similar to @..GET
+      This sample uses some code from Minigui for masking input in editbox.
+  * contrib/gtwvw/doc/whatsnew.txt
+    * note this change
 
 2007-05-24 10:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h

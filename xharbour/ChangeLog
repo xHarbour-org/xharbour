@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5566 2007/05/25 11:10:03 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5567 2007/05/25 12:52:31 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-25 23:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  + contrib/gtwvw/samples/ebtest7.prg
+    * sample on how to organize editboxes in commands similar to @..GET
+      This sample uses some code from Minigui for masking input in editbox.
+  * contrib/gtwvw/doc/whatsnew.txt
+    * note this change
 
 2007-05-25 09:48 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/tget.prg
@@ -56,7 +63,7 @@
   * source/vm/fm.c
   * source/compiler/harbour.c
     * Compiler warnings
-    
+
 2007-05-24 13:00 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/pcre/config.h
     * Disable warning guarded by defined( _MSC_VER )
