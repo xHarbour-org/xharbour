@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5563 2007/05/25 07:18:29 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5564 2007/05/25 08:39:58 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2007-05-18 12:12 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+   * bin\bld.bat
+     + Added if "%_HB_GT_LIB%" == "" set _HB_GT_LIB=gtwin for BCC
 
 2007-05-25 10:25 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/dbcmd.c
