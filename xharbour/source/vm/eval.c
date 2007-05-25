@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.31 2007/05/21 17:17:38 ran_go Exp $
+ * $Id: eval.c,v 1.32 2007/05/24 12:37:59 ronpinkas Exp $
  */
 
 /*
@@ -763,9 +763,8 @@ HB_FUNC( HB_EXEC )
 
    if( pPointer )
    {
-      PHB_ITEM pSelf = NULL;
       PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
-      int iParams = 0;
+      int iParams;
 
       if( pSymbol )
       {
