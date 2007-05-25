@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.9 2007/04/14 21:47:22 ronpinkas Exp $
+ * $Id: dllcall.c,v 1.10 2007/04/30 10:18:34 alexstrickland Exp $
  */
 
 /*
@@ -790,8 +790,14 @@ RESULT DynaCall(int Flags,       LPVOID lpFunction, int nArgs,
    // proper stack and take care of correct return value processing.
    RESULT  Res = { 0 };
    int    i, nInd, nSize;
-   DWORD   dwEAX, dwEDX, dwVal, *pStack, *pESP, dwStSize = 0;
+   DWORD   dwEAX, dwEDX, dwVal, *pStack, dwStSize = 0;
    BYTE   *pArg;
+
+   #if defined( __MINGW32__ )
+   #elif defined( __BORLANDC__ ) || defined(__DMC__)
+   #else
+      DWORD *pESP;
+   #endif
 
    // Reserve 256 bytes of stack space for our arguments
    #if defined( __MINGW32__ )
