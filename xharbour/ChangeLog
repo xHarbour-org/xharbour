@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5564 2007/05/25 08:39:58 marchuet Exp $
+ * $Id: ChangeLog,v 1.5565 2007/05/25 09:45:42 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-05-25 08:08 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/rtl/hbsrlraw.c
+  * source/rtl/hbxml.c
+  * source/rtl/gtwin/gtwin.c
+  * contrib/xwt/src/xwt_api.c
+  * contrib/xwt2/src/xwt_api.c
+    % changed some hb_dynsymFindName() by hb_dynsymFind()
 
 2007-05-18 12:12 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
    * bin\bld.bat

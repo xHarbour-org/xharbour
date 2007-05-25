@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.111 2006/07/01 22:37:32 paultucker Exp $
+ * $Id: gtwin.c,v 1.112 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -641,7 +641,7 @@ void HB_GT_FUNC(gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr 
    {
 #ifdef HB_NO_ALLOC_CONSOLE
       /* allocate console only when debugger is linked */
-      if( hb_dynsymFindName( "__DBGENTRY" ) )
+      if( hb_dynsymFind( "__DBGENTRY" ) )
       {
          AllocConsole(); /* It is a Windows app without a console, so we create one */
          s_HInput = GetStdHandle( STD_INPUT_HANDLE );

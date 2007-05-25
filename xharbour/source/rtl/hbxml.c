@@ -1,5 +1,5 @@
 /*
- * $Id: hbxml.c,v 1.29 2005/09/08 13:35:50 alexstrickland Exp $
+ * $Id: hbxml.c,v 1.30 2005/09/22 10:51:57 jonnymind Exp $
  */
 
 /*
@@ -467,7 +467,7 @@ static PHB_ITEM mxml_node_new( PHB_ITEM pDoc )
 
    pNode = hb_itemNew( NULL );
 
-   pExecSym = hb_dynsymFindName( "TXMLNODE" );
+   pExecSym = hb_dynsymFind( "TXMLNODE" );
    hb_vmPushSymbol( pExecSym->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );

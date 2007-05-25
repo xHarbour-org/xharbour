@@ -3,7 +3,7 @@
 
    (C) 2003 Giancarlo Niccolai
 
-   $Id: xwt_api.c,v 1.20 2004/03/18 04:12:31 ronpinkas Exp $
+   $Id: xwt_api.c,v 1.1 2004/05/11 14:57:50 jonnymind Exp $
 
    XWT DRIVER PROGRAMMING INTERFACE
 */
@@ -53,7 +53,7 @@ int xwt_rise_event( PHB_ITEM pObject, char *szEventType, int argc, ... )
    va_end( ap );
 
    /* Create the event */
-   pExecSym = hb_dynsymFindName( "XWTEVENT" );
+   pExecSym = hb_dynsymFind( "XWTEVENT" );
    hb_vmPushSymbol( pExecSym->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );
@@ -126,7 +126,7 @@ HB_FUNC( XWT_FASTRISEEVENT )
    }
 
    /* Create the event */
-   pExecSym = hb_dynsymFindName( "XWTEVENT" );
+   pExecSym = hb_dynsymFind( "XWTEVENT" );
    hb_vmPushSymbol( pExecSym->pSymbol );
    hb_vmPushNil();
    hb_vmDo( 0 );

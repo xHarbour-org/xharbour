@@ -1,5 +1,5 @@
 /*
- * $Id: hbsrlraw.c,v 1.30 2007/03/25 06:12:50 walito Exp $
+ * $Id: hbsrlraw.c,v 1.31 2007/05/02 06:19:56 walito Exp $
  */
 
 /*
@@ -469,7 +469,7 @@ HB_FUNC( HB_DESERIALIZEARRAY )
    pRArray = hb_param( 6, HB_IT_ANY );
    pRBlock = hb_param( 7, HB_IT_ANY );
 
-   pHB_Deserialize = hb_dynsymFindName( "HB_DESERIALIZE" );
+   pHB_Deserialize = hb_dynsymFind( "HB_DESERIALIZE" );
 
    if( pArray && cBuf && pHB_Deserialize )
    {
