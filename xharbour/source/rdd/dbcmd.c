@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.213 2007/05/04 16:36:21 marchuet Exp $
+ * $Id: dbcmd.c,v 1.214 2007/05/07 10:19:53 marchuet Exp $
  */
 
 /*
@@ -721,6 +721,8 @@ HB_FUNC( DBSELECTAREA )
    if( ISCHAR( 1 ) )
    {
       hb_rddSelectWorkAreaAlias( hb_parc( 1 ) );
+      if( hb_rddGetCurrentWorkAreaNumber() == HARBOUR_MAX_RDD_AREA_NUM )
+         hb_rddSelectFirstAvailable();
    }
    else
    {

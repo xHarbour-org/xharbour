@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5562 2007/05/24 21:41:36 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5563 2007/05/25 07:18:29 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-25 10:25 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/rdd/dbcmd.c
+  * source/rdd/wafunc.c
+    * reenabled by default strict clipper compatible behavior for
+      code select(), dbSelectArea() and alias allocating
+    synced with harbour
+
+  * source/rdd/dbf1.c
+    + added DBI_ISENCRYPTED for tables encrypted by SIX3
+    synced with harbour
+
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    * some syntax corrections.
 
 2007-05-25 09:15 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/vm/eval.c

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.173 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: dbf1.c,v 1.174 2007/05/18 09:36:57 marchuet Exp $
  */
 
 /*
@@ -2734,6 +2734,10 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case DBI_VALIDBUFFER:
          hb_itemPutL( pItem, pArea->fValidBuffer );
+         break;
+
+      case DBI_ISENCRYPTED:
+         hb_itemPutL( pItem, pArea->fTableEncrypted );
          break;
 
       case DBI_LOCKCOUNT:

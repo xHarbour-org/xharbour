@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.2 2007/05/04 16:36:21 marchuet Exp $
+ * $Id: wafunc.c,v 1.3 2007/05/24 16:24:09 marchuet Exp $
  */
 
 /*
@@ -67,23 +67,27 @@ HB_EXPORT ERRCODE hb_rddVerifyAliasName( const char * szAlias )
 
    if( szAlias )
    {
+      /* Clipper ignores only trailing spaces */
+#if 0
       while( *szAlias == ' ' )
-      {
          szAlias++;
-      }
+#endif
+
       c = *szAlias;
-      if( c >= 'a' && c <= 'z' )
-      {
-         c -= 'a' - 'A';
-      }
-      if( ( c >= 'A' && c <= 'Z' ) || c == '_' )
+      if( ( c >= 'A' && c <= 'Z' ) || ( c >= 'a' && c <= 'z' ) || c == '_' )
       {
          c = *(++szAlias);
-         while( c != 0 && c != ' ' )
+         while( c != 0 )
          {
             if( c != '_' && ! ( c >= '0' && c <= '9' ) &&
                 ! ( c >= 'A' && c <= 'Z' ) && ! ( c >= 'a' && c <= 'z' ) )
             {
+               if( c == ' ' )
+               {
+                  while( *(++szAlias) == ' ' ) { ; }
+                  if( ! *szAlias )
+                     break;
+               }
                return FAILURE;
             }
             c = *(++szAlias);

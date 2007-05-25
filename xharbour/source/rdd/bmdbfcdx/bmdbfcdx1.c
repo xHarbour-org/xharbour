@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.29 2007/05/04 20:56:10 ran_go Exp $
+ * $Id: bmdbfcdx1.c,v 1.30 2007/05/24 16:24:08 marchuet Exp $
  */
 
 /*
@@ -158,7 +158,7 @@ static USHORT s_uiRddId = ( USHORT ) -1;
 
 static BOOL     bTurbo = FALSE;
 static RDDFUNCS cdxSuper;
-static RDDFUNCS cdxTable =
+static const RDDFUNCS cdxTable =
 {
 
    /* Movement and positioning methods */
@@ -6720,11 +6720,9 @@ HB_FUNC( BM_TURBO )
 HB_FUNC( BM_DBGETFILTERARRAY )
 {
     CDXAREAP pArea = (CDXAREAP) hb_rddGetCurrentWorkAreaPointer();
-    PHB_ITEM pList;
+    PHB_ITEM pList = hb_itemArrayNew( 0 );
     ULONG ulRec,ulRecOld;
 
-    pList = hb_itemNew( NULL );
-    hb_arrayNew( pList, 0 );
     if ( pArea->dbfi.fOptimized )
     {
         ULONG ulSize = ( ( ( ( LPBM_FILTER ) pArea->dbfi.lpvCargo)->Size+1) >> 5 ) + 1;
@@ -6742,9 +6740,7 @@ HB_FUNC( BM_DBGETFILTERARRAY )
 
         SELF_GOTO( (AREAP) pArea, ulRecOld );
     }
-    hb_itemReturn( pList );
-    hb_itemRelease( pList );
-    return;
+    hb_itemRelease( hb_itemReturnForward( pList ) );
 }
 
 HB_FUNC( BM_DBSETFILTERARRAY )
@@ -6862,7 +6858,7 @@ HB_FUNC( BM_DBSEEKWILD )
        if( !ISNIL( 1 ) )
        {
           pKey = hb_param( 1, HB_IT_ANY );
-          bSoftSeek = ISLOG( 2 ) ? hb_parl( 2 ) : hb_set.HB_SET_SOFTSEEK;
+          bSoftSeek = ISLOG( 2 ) ? (BOOL) hb_parl( 2 ) : hb_set.HB_SET_SOFTSEEK;
           bFindLast = ISLOG( 3 ) ? hb_parl( 3 ) : FALSE;
           bNext     = ISLOG( 4 ) ? hb_parl( 4 ) : FALSE;
           bAll      = ISLOG( 5 ) ? hb_parl( 5 ) : FALSE;
