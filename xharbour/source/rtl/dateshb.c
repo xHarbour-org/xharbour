@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.16 2007/03/25 06:12:50 walito Exp $
+ * $Id: dateshb.c,v 1.17 2007/04/19 13:18:40 walito Exp $
  */
 
 /*
@@ -97,7 +97,7 @@
 
 HB_FUNC_EXTERN( TSSECS );
 
-int static hb_datectod( char const * szDate, int * pd_value, int * pm_value, int * py_value )
+static int hb_datectod( char const * szDate, int * pd_value, int * pm_value, int * py_value )
 {
    int d_value = 0, m_value = 0, y_value = 0;
    int fin = 0;
@@ -217,7 +217,7 @@ int static hb_datectod( char const * szDate, int * pd_value, int * pm_value, int
    return fin;
 }
 
-int static hb_timectot( char const * szTime, int * ph_value, int * pm_value, double * ps_value )
+static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, double * ps_value )
 {
    int h_value = 0, m_value = 0;
    double s_value = 0;
