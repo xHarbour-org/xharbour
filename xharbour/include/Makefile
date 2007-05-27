@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.29 2006/07/06 21:26:55 druzus Exp $
+# $Id: Makefile,v 1.30 2007/05/11 16:30:45 hazi01 Exp $
 #
 
 ROOT = ../
@@ -44,7 +44,6 @@ C_HEADERS=\
 	hbrddfpt.h   \
 	hbrddntx.h   \
 	hbrddsdf.h   \
-	hbrddwrk.h   \
 	hbset.h      \
 	hbsetup.h    \
 	hbstack.h    \
