@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5573 2007/05/27 13:33:49 likewolf Exp $
+ * $Id: ChangeLog,v 1.5574 2007/05/27 14:07:26 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-27 11:25 UTC-0500 Paul Tucker <ptucker@sympatico.ca>
+  * bin\bld.bat
+   * commented out line that removed any default libcmt.lib references from
+   * included libs for msvc non-mt builds.
+   * Suddenly, this is now a problem as MS Windows update is deleting
+   * libc.lib from VC 8 builds!
+   * We are now forced to use libcmt even though we may not be doing an MT
+   * build.  (Which I suppose we should consider making the default...)
 
 2007-05-27 18:13 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_xmingw.sh

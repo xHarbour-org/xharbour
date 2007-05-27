@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.66 2007/01/26 13:04:02 ronpinkas Exp $
+rem $Id: bld.bat,v 1.67 2007/05/25 09:42:58 patrickmast Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -263,7 +263,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
 
    if exist %HB_LIB_INSTALL%\hbzip.lib set HB_LIBLIST=%HB_LIBLIST% %HB_LIB_INSTALL%\hbzip.lib
 
-   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
+rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    if not "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBC /NODEFAULTLIB:LIBCP
 
    if not "%HB_DLL%" == "" if "%HB_MT%" == "" set LDFLAGS=%LDFLAGS% /NODEFAULTLIB:LIBC 
@@ -278,7 +278,7 @@ if "%HB_INC_INSTALL%" == "" set HB_INC_INSTALL=%HB_INSTALL%\include
    set _cons=
    set _main=
    @type msvc.log
-   @echo Ignore LNK4033 warning
+   @echo Ignore LNK4033 and LNK4254 warnings
    set LDFLAGS=
    goto end
 
