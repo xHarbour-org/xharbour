@@ -45,10 +45,10 @@
  *
  */
 
-#include "Common.ch"
-#include "Error.ch"
-#include "Hbclass.ch"
-#include "THtml.ch"
+#include "common.ch"
+#include "error.ch"
+#include "hbclass.ch"
+#include "thtml.ch"
 
 
 // A Html document can have more than 16 nesting levels.
