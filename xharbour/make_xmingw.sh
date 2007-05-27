@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.5 2005/02/19 20:48:07 likewolf Exp $
+# $Id: make_xmingw.sh,v 1.6 2005/02/19 21:07:30 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -19,7 +19,7 @@ export C_USR="$CC_C_USR $C_USR"
 export CC_PRG_USR="-D__PLATFORM__Windows -undef:__PLATFORM__UNIX -undef:__PLATFORM__$UNAME"
 export PRG_USR="$CC_PRG_USR $PRG_USR"
 
-if [ -f /etc/debian-version ]; then
+if [ -f /etc/debian_version ]; then
     MINGW_PREFIX=/usr
     TARGET=i586-mingw32msvc
     CCPREFIX="$TARGET-"
@@ -51,6 +51,10 @@ else
     echo "You must have a working xHarbour executable for your platform on your PATH."
     exit 1
 fi
+
+rm -f -r /tmp/ppgen.exe
+(cd `dirname $0`; ln -s `pwd`/source/pp/*/*/ppgen /tmp/ppgen.exe)
+export HB_PPGEN_PATH=/tmp/
 
 export PATH CCPATH CCPREFIX
 

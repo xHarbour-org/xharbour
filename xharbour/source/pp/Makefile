@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2006/11/17 12:29:24 druzus Exp $
+# $Id: Makefile,v 1.4 2007/02/27 15:59:37 druzus Exp $
 #
 
 ROOT = ../../
@@ -19,4 +19,4 @@ LIBS=\
 include $(TOP)$(ROOT)config/lib.cf
 
 pptable.c : ppgen$(EXE_EXT)
-	./ppgen$(EXE_EXT) $(TOP)$(ROOT)include/hbstdgen.ch -opptable.c -q
+	$(HB_PPGEN_PATH)./ppgen$(EXE_EXT) $(TOP)$(ROOT)include/hbstdgen.ch -opptable.c -q
