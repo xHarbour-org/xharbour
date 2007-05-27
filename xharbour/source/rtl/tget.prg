@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.130 2007/05/21 23:39:45 modalsist Exp $
+ * $Id: tget.prg,v 1.131 2007/05/25 12:52:31 toninhofwi Exp $
  */
 
 /*
@@ -719,7 +719,7 @@ return
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Reset() CLASS Get
+METHOD Reset() CLASS Get
 
    if ::hasfocus
       ::buffer := ::PutMask( ::VarGet(), .f. )
@@ -727,7 +727,7 @@ PROCEDURE Reset() CLASS Get
       ::TypeOut := .f.
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
