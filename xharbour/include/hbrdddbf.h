@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.30 2006/08/19 11:22:28 druzus Exp $
+ * $Id: hbrdddbf.h,v 1.31 2006/08/20 23:52:09 ronpinkas Exp $
  */
 
 /*
@@ -119,6 +119,12 @@ typedef struct _DBFDATA
    BYTE     bMemoType;        /* DB_MEMO_FPT */
    BYTE     bMemoExtType;     /* DB_MEMOVER_FLEX */
    USHORT   uiMemoBlockSize;  /* 0 */
+
+   BOOL     fSortRecNo;
+   BOOL     fMultiKey;
+   BOOL     fStruct;
+   BOOL     fStrictStruct;
+   BOOL     fMultiTag;
 } DBFDATA;
 
 typedef DBFDATA * LPDBFDATA;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5575 2007/05/27 15:32:23 paultucker Exp $
+ * $Id: ChangeLog,v 1.5576 2007/05/27 21:16:22 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 09:48 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * include/hbrdddbf.h
+  * include/hbrddntx.h
+  * source/rdd/dbfntx/dbfntx1.c
+    * moved static variables holding RDDI_* settings to RDDNODE data so
+      they can be set separately for each RDD which inherits from DBFNTX
+    synced with harbour
 
 2007-05-27 18:18 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/tget.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddntx.h,v 1.36 2005/10/30 14:45:48 druzus Exp $
+ * $Id: hbrddntx.h,v 1.37 2006/06/27 21:26:00 druzus Exp $
  */
 
 /*
@@ -536,7 +536,7 @@ static ERRCODE ntxCountScope( NTXAREAP pArea, void * pPtr, LONG * plRecNo );
 #define ntxPutValueFile          NULL
 #define ntxReadDBHeader          NULL
 #define ntxWriteDBHeader         NULL
-#define ntxInit                  NULL
+static ERRCODE ntxInit( LPRDDNODE pRDD );
 #define ntxExit                  NULL
 #define ntxDrop                  NULL
 #define ntxExists                NULL
