@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.41 2007/05/22 05:18:20 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.42 2007/05/22 18:12:54 ronpinkas Exp $
  */
 
 /*
@@ -743,7 +743,7 @@ PHB_DYNS HB_EXPORT hb_dynsymPos( USHORT uiPos )
 
    hb_dynsymLock();
 
-   if( uiPos < s_uiDynSymbols )
+   if( ( UINT ) uiPos < s_uiDynSymbols )
    {
       ret = s_pDynItems[ uiPos ].pDynSym;
    }

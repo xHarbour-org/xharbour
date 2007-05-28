@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5578 2007/05/28 16:11:03 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5579 2007/05/28 17:22:53 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 19:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/vm/dynsym.c
+    * Added a type cast ( UINT ) uiPos in function hb_dynsymPos() to remove a
+      compiler warning
 
 2007-05-28 19:10 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/pp/ppcore.c
