@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5576 2007/05/27 21:16:22 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5577 2007/05/28 07:48:25 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 18:05 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/rtl/pcre/config.h
+    * Disable warning guarded by defined( __BORLANDC__ )
 
 2007-05-28 09:48 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/hbrdddbf.h
@@ -52,7 +56,7 @@
     * missed from prev commit.
 
 2007-05-25 18:35 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
-  * source\rtl\dllcall.c
+  * source/rtl/dllcall.c
     * Defined pESP variable only when needed in function DynaCall()
 
 2007-05-25 23:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
