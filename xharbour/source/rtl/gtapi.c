@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.69 2007/04/07 02:14:51 jabrecer Exp $
+ * $Id: gtapi.c,v 1.70 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -2261,6 +2261,8 @@ SHORT HB_EXPORT hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom,
                                   SHORT iRight, BYTE byAttr )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_ctShadow(%d, %d, %d, %d, %d)", iTop, iLeft, iBottom, iRight, (int) byAttr));
+
+   HB_SYMBOL_UNUSED( byAttr );
 
    if( iBottom < ct_BFRow || iRight < ct_BFCol || ct_CSize < 2 ) return 0;
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.254 2007/05/12 19:30:59 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.255 2007/05/14 22:16:43 ronpinkas Exp $
  */
 
 /*
@@ -3386,6 +3386,7 @@ static BOOL hb_pp_tokenSkipExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_TOKEN pStop,
                 if( pToken->pNext )
                 {
                    /* REVIEW: Is it needed for correct expansion order? */
+                   HB_SYMBOL_UNUSED( pState );
                    #if 0
                       pState->iLastType = HB_PP_TOKEN_NUL;
                       pState->pFile->pTokenList = pToken->pNext;
