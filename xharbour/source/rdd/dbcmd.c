@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.214 2007/05/07 10:19:53 marchuet Exp $
+ * $Id: dbcmd.c,v 1.215 2007/05/25 08:40:02 marchuet Exp $
  */
 
 /*
@@ -2087,7 +2087,7 @@ HB_FUNC( SELECT )
 
       if( szAlias )
       {
-#ifdef HB_C52_STRICT
+#if defined( HB_C52_STRICT ) || 1
          /*
           * I do not like this Clipper behavior, in some constructions
           * programmer may use "<aliasNum>" in some others not. [Druzus]

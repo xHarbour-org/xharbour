@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5584 2007/05/29 02:30:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5585 2007/05/29 02:37:50 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-29 12:53 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/rdd/dbcmd.c
+    ! fixed SELECT( "" ) causes GPF for incorrect alias.
+
 
 2007-05-29 09:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/samples/wvwtest9.prg
