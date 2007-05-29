@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.132 2007/05/27 21:16:22 toninhofwi Exp $
+ * $Id: tget.prg,v 1.133 2007/05/29 00:13:08 toninhofwi Exp $
  */
 
 /*
@@ -1162,12 +1162,6 @@ METHOD overstrike( cChar ) CLASS Get
    if ::Type == "N" .and. ! ::lEdit .and. ::Clear
       ::Pos := ::FirstEditable()
    endif
-
-cls
-?
-? ::pos
-? ::nmaxedit
-inkey(0)
 
    if ::Pos > ::nMaxEdit
       ::Rejected := .t.

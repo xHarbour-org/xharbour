@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5581 2007/05/29 00:13:07 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5582 2007/05/29 01:52:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 22:27 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/tget.prg
+    - Removed the following debug code:
+cls
+?
+? ::pos
+? ::nmaxedit
+inkey(0)
+  /*
+    Tonho you must be more careful, and also please provide more details in ChangeLog. F.e.:
+       "! Some changes to be more Clipper compatible"
+    does not really tell us anything of value.
+   */
 
 2007-05-28 21:51 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbapi.h
