@@ -48,7 +48,7 @@ STATIC FUNCTION TRP20FTPEnv( cCarpeta )
    IF Len( aFiles ) > 0
 
       oUrl              := tUrl():New( cUrl )
-      oFTP              := tIPClient():New( oUrl,, .T. )
+      oFTP              := tIPClientFtp():New( oUrl, .T. )
       oFTP:nConnTimeout := 20000
       oFTP:bUsePasv     := .T.
 

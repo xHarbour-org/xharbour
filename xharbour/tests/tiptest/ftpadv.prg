@@ -2,7 +2,7 @@
 * TIP test
 * FTP Advanced operations Test
 *
-* $Id: ftpadvtest.prg,v 1.2 2003/11/20 17:10:43 jonnymind Exp $
+* $Id: ftpadv.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
 *****/
 
 PROCEDURE MAIN( cUrl )
@@ -22,7 +22,7 @@ PROCEDURE MAIN( cUrl )
       QUIT
    END
 
-   oCon := TipClient():New( oUrl )
+   oCon := TipClientFtp():New( oUrl )
    oCon:nConnTimeout := 20000
    ? "Connecting with", oUrl:cServer
    IF oCon:Open( cUrl )

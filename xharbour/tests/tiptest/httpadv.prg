@@ -2,7 +2,7 @@
 * TIP test
 * HTTP Advanced operations Test
 *
-* $Id: httpadvtest.prg,v 1.2 2004/06/28 14:16:33 jonnymind Exp $
+* $Id: httpadv.prg,v 1.1 2004/08/05 12:21:17 lf_sfnet Exp $
 *****/
 
 PROCEDURE MAIN( cUrl )
@@ -22,7 +22,7 @@ PROCEDURE MAIN( cUrl )
       QUIT
    END
 
-   oCon := TipClient():New( oUrl )
+   oCon := TipClientHttp():New( oUrl )
    oCon:nConnTimeout := 20000
    ? "Connecting with", oUrl:cServer
    IF oCon:Open( cUrl )

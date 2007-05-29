@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5586 2007/05/29 10:53:45 marchuet Exp $
+ * $Id: ChangeLog,v 1.5587 2007/05/29 11:02:00 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+
+2007-05-29 20:00 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
+  * tests/tiptest/dnldftp.prg
+  * tests/tiptest/uploadftp.prg
+  * tests/tiptest/ftpadv.prg
+  * tests/tiptest/httpadv.prg
+  * tests/tiptest/tiptest.prg
+    * changed tests to work with changed TIP classes
+
+   /*
+      NOTE: TIP classes are currently out of order due to broken Sockets functions
+    */ 
 
 2007-05-29 12:53 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   - include/hbrddbmcdx.h

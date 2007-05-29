@@ -1,7 +1,7 @@
 *****************************************************
 * TEST of TIP libs (for higher level URI interface)
 *
-* $Id: tiptest.prg,v 1.4 2005/02/22 11:06:48 jonnymind Exp $
+* $Id: tiptest.prg,v 1.5 2006/01/17 03:07:56 lculik Exp $
 *
 * Usage: This file is similar to a wget command
 *
@@ -58,7 +58,7 @@ PROCEDURE MAIN( cUrl, cFile )
 
 
    IF Empty( cUrl )
-      @4,5 SAY "USAGE: tipclient <URI> [dumpToOrFromFileName]"
+      @4,5 SAY "USAGE: tipTest <URI> [dumpToOrFromFileName]"
       Terminate()
    ENDIF
 
@@ -68,19 +68,32 @@ PROCEDURE MAIN( cUrl, cFile )
       Terminate()
    ENDIF
 
-   oClient := tIPClient():New( oUrl )
-   oClient:nConnTimeout := 20000
+   DO CASE
+   CASE Lower( oUrl:cProto ) == "ftp"
+      oClient := TIpClientFtp():new( oUrl )
 
+   CASE Lower( oUrl:cProto ) == "http"
+      oClient := TIpClientHttp():new( oUrl )
+
+   CASE Lower( oUrl:cProto ) == "pop"
+      oClient := TIpClientPop():new( oUrl )
+
+   CASE Lower( oUrl:cProto ) == "smtp"
+      oClient := TIpClientSmtp():new( oUrl )
+
+   ENDCASE
 
    IF Empty( oClient )
       @4,5 SAY "Invalid url " + cUrl
       Terminate()
    ENDIF
+   oClient:nConnTimeout := 2000 //:= 20000
+
 
    oUrl:cUserid := STRTRAN(oUrl:cUserid, "&at;", "@") 
 
    @4,5 SAY "Connecting to " + oUrl:cProto + "://" + oUrl:cServer
-   IF oClient:Open( oUrl )
+   IF oClient:Open()
       IF Empty( oClient:cReply )
          @5,5 SAY "Connection status: <connected>"
       ELSE
@@ -100,7 +113,7 @@ PROCEDURE MAIN( cUrl, cFile )
          IF oClient:WriteFromFile( cFile )
             @7,5 SAY "Data sucessfully sent"
          ELSE
-            @7,5 SAY "ERROR: Data not sent"
+            @7,5 SAY "ERROR: Data not sent", oClient:lastErrorMessage()
          ENDIF
       ELSE
          IF Empty( cFile )
@@ -109,7 +122,7 @@ PROCEDURE MAIN( cUrl, cFile )
                @7,5 SAY "First 80 characters:"
                ? Trim(SubStr( cData, 1, 80 ))
             ELSE
-               @7,5 SAY "ERROR - file can't be retreived"
+               @7,5 SAY "ERROR - file can't be retreived", oClient:lastErrorMessage()
             ENDIF
          ELSE
             IF oClient:ReadToFile( cFile )
