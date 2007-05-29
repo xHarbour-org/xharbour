@@ -1,5 +1,5 @@
 /*
- * $Id: wvwtest9.prg,v 1.3 2005/11/02 18:00:21 modalsist Exp $
+ * $Id: wvwtest9.prg,v 1.4 2007/04/12 12:59:48 lculik Exp $
  */
 //-------------------------------------------------------------------//
 //
@@ -191,6 +191,9 @@ local ch
      oMouse := WVWMouseButton():New("Tight",   maxrow()-2,67-11-11-11-11-11, , , {|| lboxmessage("tight") } )
      oMouse:lTight := .t.
      wvwm_AddMouseObjects( nCurWindow, oMouse )
+
+   * 20070525 the real pushbutton, easier and better looking. Nothing to do with wvwmouse.prg.
+   WVW_PBcreate( nCurWindow, maxrow()-4,67-11-11-11-11-11, maxrow()-4, 67+9-11-11-11-11-11, "native", NIL, {||lboxmessage("native pushbutton")}, NIL)
 
    SetColor( 'N/W,N/GR*,,,N/W*' )
    CLS
@@ -1078,19 +1081,19 @@ FUNCTION SetDefaultWindowSize()
   IF Result
      screenWidth := Wvw_GetScreenWidth()
      DO CASE
-        CASE screenWidth >= 1024 
-          Result:= Wvt_SetFont('Terminal',20,10)
-        CASE screenWidth >= 800 
+        CASE screenWidth >= 1024
+          Result:= Wvw_SetFont(,'Terminal',20,10)
+        CASE screenWidth >= 800
           IF OS_IsWinNt()
-             Result:= Wvt_SetFont('Lucida Console',16,-8)
+             Result:= Wvw_SetFont(,'Lucida Console',16,-8)
           ELSE
-             Result:= Wvt_SetFont('System',16,-8)
+             Result:= Wvw_SetFont(,'System',16,-8)
           ENDIF
         OTHERWISE
-           Result:= Wvt_SetFont('Terminal',12,6)
+           Result:= Wvw_SetFont(,'Terminal',12,6)
      ENDCASE
      IF Result
-        Wvt_SetCodePage(255)  // #define OEM_CHARSET 255 - from wingdi.h
+        Wvw_SetCodePage(,255)  // #define OEM_CHARSET 255 - from wingdi.h
         CLS
      ENDIF
   ENDIF
