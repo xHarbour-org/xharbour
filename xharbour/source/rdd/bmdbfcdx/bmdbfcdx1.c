@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.30 2007/05/24 16:24:08 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.31 2007/05/25 08:40:02 marchuet Exp $
  */
 
 /*
@@ -93,7 +93,7 @@
 #include "hbapilng.h"
 #include "hbvm.h"
 #include "hbset.h"
-#include "hbrddbmcdx.h"
+#include "hbrddbmc.h"
 #include "hbmath.h"
 #include "rddsys.ch"
 #include "hbregex.h"
