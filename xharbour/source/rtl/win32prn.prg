@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.21 2006/12/10 12:33:36 ptsarenko Exp $
+ * $Id: win32prn.prg,v 1.22 2007/02/21 19:50:52 peterrees Exp $
  */
 
 /*
@@ -1093,8 +1093,8 @@ static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD Fon
 
     hb_arrayNew( &SubItems, 4 );
     hb_itemPutC(  hb_arrayGetItemPtr( &SubItems, 1 ), lplf->lfFaceName                      );
-    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 2 ), lplf->lfPitchAndFamily && FIXED_PITCH );
-    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType && TRUETYPE_FONTTYPE         );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 2 ), lplf->lfPitchAndFamily & FIXED_PITCH );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType & TRUETYPE_FONTTYPE         );
     hb_itemPutNL( hb_arrayGetItemPtr( &SubItems, 4 ), lpntm->tmCharSet                      );
     hb_arrayAddForward( (PHB_ITEM) pArray, &SubItems);
 

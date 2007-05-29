@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5587 2007/05/29 11:02:00 marchuet Exp $
+ * $Id: ChangeLog,v 1.5588 2007/05/29 18:11:14 hazi01 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,7 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
-
+2007-05-30 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    * changed && => & for FIXED_PITCH and TRUETYPE_FONTTYPE in FontEnumCallBack()
+      ( reported on Google newsgroup )
 
 2007-05-29 20:00 UTC+0100 Hannes Ziegler <hz@knowleXbase.com>
   * tests/tiptest/dnldftp.prg
@@ -19,7 +22,7 @@
 
    /*
       NOTE: TIP classes are currently out of order due to broken Sockets functions
-    */ 
+    */
 
 2007-05-29 12:53 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   - include/hbrddbmcdx.h
