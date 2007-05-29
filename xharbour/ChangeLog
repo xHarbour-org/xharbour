@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5582 2007/05/29 01:52:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5583 2007/05/29 02:29:01 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -17,7 +17,7 @@ cls
 ? ::nmaxedit
 inkey(0)
   /*
-    Tonho you must be more careful, and also please provide more details in ChangeLog. F.e.:
+    Toninho you must be more careful, and also please provide more details in ChangeLog. F.e.:
        "! Some changes to be more Clipper compatible"
     does not really tell us anything of value.
    */
