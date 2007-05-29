@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.131 2007/05/25 12:52:31 toninhofwi Exp $
+ * $Id: tget.prg,v 1.132 2007/05/27 21:16:22 toninhofwi Exp $
  */
 
 /*
@@ -488,17 +488,17 @@ return ::cPicFunc + ' ' + ::cPicMask
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Assign() CLASS Get
+METHOD Assign() CLASS Get
 
    if ::hasfocus
       ::VarPut( ::unTransform(), .f. )
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Display( lForced ) CLASS Get
+METHOD Display( lForced ) CLASS Get
 
    LOCAL nOldCursor := SetCursor( SC_NONE )
    LOCAL xBuffer
@@ -644,11 +644,11 @@ PROCEDURE Display( lForced ) CLASS Get
 
    HBConsoleUnlock()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE End() CLASS Get
+METHOD End() CLASS Get
 
    local nLastCharPos, nPos, nFor
 
@@ -662,7 +662,7 @@ PROCEDURE End() CLASS Get
          ::TypeOut := .f.
          ::Clear   := .f.
          ::Display( .f. )
-         return
+         return Self
       endif
       /**/
 
@@ -702,11 +702,11 @@ PROCEDURE End() CLASS Get
       ::Display( .f. )
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Home() CLASS Get
+METHOD Home() CLASS Get
 
    if ::HasFocus
       ::Pos := ::FirstEditable()
@@ -715,7 +715,7 @@ PROCEDURE Home() CLASS Get
       ::Display( .f. )
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -731,7 +731,7 @@ return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Undo() CLASS Get
+METHOD Undo() CLASS Get
 
    if ::hasfocus
       /* E.F. 2006/APRIL/14 - reset ::minus flag if ::xVarGet was
@@ -746,11 +746,11 @@ PROCEDURE Undo() CLASS Get
       ::lUndo := .t.
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE SetFocus() CLASS Get
+METHOD SetFocus() CLASS Get
 
    local xVarGet
 
@@ -814,11 +814,11 @@ PROCEDURE SetFocus() CLASS Get
       ::Display()
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE KillFocus() CLASS Get
+METHOD KillFocus() CLASS Get
 
    if ::lEdit
       ::Assign()
@@ -835,7 +835,7 @@ PROCEDURE KillFocus() CLASS Get
 
    ::typeout := .f.  /* Clipper compatible */
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1157,22 +1157,28 @@ return xValue
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE overstrike( cChar ) CLASS Get
+METHOD overstrike( cChar ) CLASS Get
 
    if ::Type == "N" .and. ! ::lEdit .and. ::Clear
       ::Pos := ::FirstEditable()
    endif
 
+cls
+?
+? ::pos
+? ::nmaxedit
+inkey(0)
+
    if ::Pos > ::nMaxEdit
       ::Rejected := .t.
-      return
+      return Self
    endif
 
    cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
-      return
+      return Self
    else
       ::Rejected := .f.
    endif
@@ -1220,11 +1226,11 @@ PROCEDURE overstrike( cChar ) CLASS Get
 
    ::Display()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE Insert( cChar ) CLASS Get
+METHOD Insert( cChar ) CLASS Get
 
    local n
    local nMaxEdit := ::nMaxEdit
@@ -1235,14 +1241,14 @@ PROCEDURE Insert( cChar ) CLASS Get
 
    if ::Pos > ::nMaxEdit
       ::Rejected := .t.
-      return
+      return Self
    endif
 
    cChar := ::Input( cChar )
 
    if cChar == ""
       ::Rejected := .t.
-      return
+      return Self
    else
       ::Rejected := .f.
    endif
@@ -1303,7 +1309,7 @@ PROCEDURE Insert( cChar ) CLASS Get
 
    ::Display()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1314,7 +1320,7 @@ METHOD _Right( lDisplay ) CLASS Get
    DEFAULT lDisplay TO .t.
 
    if ! ::hasfocus
-      return nil
+      return Self
    endif
 
    ::TypeOut := .f.
@@ -1322,7 +1328,7 @@ METHOD _Right( lDisplay ) CLASS Get
 
    if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
-      return nil
+      return Self
    endif
 
    nPos := ::Pos + 1
@@ -1341,7 +1347,7 @@ METHOD _Right( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
-return nil
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1352,7 +1358,7 @@ METHOD _Left( lDisplay ) CLASS Get
    DEFAULT lDisplay TO .t.
 
    if ! ::hasfocus
-      return nil
+      return Self
    endif
 
    ::TypeOut := .f.
@@ -1360,7 +1366,7 @@ METHOD _Left( lDisplay ) CLASS Get
 
    if ::Pos == ::FirstEditable()
       ::TypeOut := .t.
-      return nil
+      return Self
    endif
 
    nPos := ::Pos - 1
@@ -1379,16 +1385,16 @@ METHOD _Left( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
-return nil
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE WordLeft() CLASS Get
+METHOD WordLeft() CLASS Get
 
    local nPos, nFirstEditable
 
    if ! ::hasfocus
-      return
+      return Self
    endif
 
    ::TypeOut := .f.
@@ -1398,7 +1404,7 @@ PROCEDURE WordLeft() CLASS Get
 
    if ::Pos == nFirstEditable
       ::TypeOut := .t.
-      return
+      return Self
    endif
 
    nPos := ::Pos
@@ -1415,16 +1421,16 @@ PROCEDURE WordLeft() CLASS Get
 
    ::Display( .f. )
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE WordRight() CLASS Get
+METHOD WordRight() CLASS Get
 
    local nPos, nLastEditable
 
    if ! ::hasfocus
-      return
+      return Self
    endif
 
    ::TypeOut := .f.
@@ -1434,7 +1440,7 @@ PROCEDURE WordRight() CLASS Get
 
    if ::Pos == nLastEditable
       ::TypeOut := .t.
-      return
+      return Self
    endif
 
    nPos := ::Pos
@@ -1451,16 +1457,16 @@ PROCEDURE WordRight() CLASS Get
 
    ::Display( .f. )
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE ToDecPos() CLASS Get
+METHOD ToDecPos() CLASS Get
 
 LOCAL xBuffer
 
    if ! ::HasFocus .or. ::DecPos == NIL
-      return
+      return Self
    endif
 
    /* 2006/JUN/05 - E.F. Delete all only if we press dot or comma in a numeric
@@ -1484,7 +1490,7 @@ LOCAL xBuffer
     */
    ::VarPut( xBuffer, .t. )
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1811,7 +1817,7 @@ return cBuffer
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE BackSpace( lDisplay ) CLASS Get
+METHOD BackSpace( lDisplay ) CLASS Get
 
    local nPos := ::Pos, nMinus
 
@@ -1835,7 +1841,7 @@ PROCEDURE BackSpace( lDisplay ) CLASS Get
             ::Display()
          endif
 
-         return
+         return Self
 
       endif
 
@@ -1847,7 +1853,7 @@ PROCEDURE BackSpace( lDisplay ) CLASS Get
       ::Delete( lDisplay )
    endif
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1898,7 +1904,7 @@ METHOD _Delete( lDisplay ) CLASS Get
       ::Display()
    endif
 
-return nil
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -1957,12 +1963,12 @@ return
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DelEnd() CLASS Get
+METHOD DelEnd() CLASS Get
 
    local nPos := ::Pos
 
    if ! ::hasfocus
-      return
+      return Self
    endif
 
    ::Pos := ::nMaxEdit
@@ -1974,49 +1980,49 @@ PROCEDURE DelEnd() CLASS Get
 
    ::Display()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DelLeft() CLASS Get
+METHOD DelLeft() CLASS Get
 
    ::Left( .f. )
    ::Delete( .f. )
    ::Right()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DelRight() CLASS Get
+METHOD DelRight() CLASS Get
 
    ::Right( .f. )
    ::Delete( .f. )
    ::Left()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DelWordLeft() CLASS Get
+METHOD DelWordLeft() CLASS Get
 
    if ! ::hasfocus
-      return
+      return Self
    endif
 
    ::WordLeft()
    ::DelWordRight()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
-PROCEDURE DelWordRight() CLASS Get
+METHOD DelWordRight() CLASS Get
 
    local nCount, nPos
 
    if ! ::hasfocus
-      return
+      return Self
    endif
 
    ::TypeOut := .f.
@@ -2024,7 +2030,7 @@ PROCEDURE DelWordRight() CLASS Get
 
    if ::Pos == ::nMaxEdit
       ::TypeOut := .t.
-      return
+      return Self
    endif
 
    // Counts how many characters must be deleted
@@ -2046,7 +2052,7 @@ PROCEDURE DelWordRight() CLASS Get
 
    ::Display()
 
-return
+return Self
 
 //---------------------------------------------------------------------------//
 
@@ -2179,7 +2185,7 @@ METHOD LastEditable( ) CLASS GET
 
    ::TypeOut := .t.
 
- Return 0
+Return 0
 
 //---------------------------------------------------------------------------//
 /*
