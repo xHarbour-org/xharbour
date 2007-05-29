@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.23 2007/01/11 01:00:34 druzus Exp $
+ * $Id: hbstr.c,v 1.24 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -188,16 +188,53 @@ HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
       c1 = toupper( (unsigned char) *s1 );
       c2 = toupper( (unsigned char) *s2 );
 
+      if( c1 != c2 )
+      {
+         rc = ( c1 < c2 ? -1 : 1 );
+         break;
+      }
+
       s1++;
       s2++;
+   }
+   while( c1 );
+
+   return rc;
+}
+
+/*
+ NOTE: The symbol MUST be the LEFT argument as we assume it already is UPPERCASED!
+ */
+HB_EXPORT int hb_symcmp( const char * s1, const char * s2 )
+{
+   int rc = 0, c1, c2;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stricmp(%s, %s)", s1, s2));
+
+   do
+   {
+      c1 = (unsigned char) *s1;
+      c2 = (unsigned char) *s2;
+
+      if( c2 == ' ' || c2 == '\t' )
+      {
+         c2 = '\0';
+      }
+      else
+      {
+         c2 = toupper( (unsigned char) c2 );
+      }
 
       if( c1 != c2 )
       {
          rc = ( c1 < c2 ? -1 : 1 );
          break;
       }
+
+      s1++;
+      s2++;
    }
-   while ( c1 );
+   while( c1 );
 
    return rc;
 }

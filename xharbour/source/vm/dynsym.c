@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.42 2007/05/22 18:12:54 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.43 2007/05/28 17:44:38 enricomaria Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
             pDynSym->pSymbol = pSymbol;
          }
       }
-      
+
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
 
       hb_dynsymUnlock();
@@ -269,33 +269,47 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a symbol if not found */
 {
    HB_THREAD_STUB_STACK
+
+   /* make a copy as we may get a const string, then turn it to uppercase */
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
    PHB_DYNS pDynSym;
    register char cChar;
-   register char *pDest = szUprName;
+   register int iLen = strlen( szName );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGet(%s)", szName));
 
-   /* make a copy as we may get a const string, then turn it to uppercase */
+   if( iLen > HB_SYMBOL_NAME_LEN )
+   {
+      iLen = HB_SYMBOL_NAME_LEN;
+   }
+   szUprName[ iLen-- ] = '\0';
+
    do
    {
-	  cChar = *szName;
+      cChar = szName[ iLen ];
 
 	  if( cChar >= 'a' && cChar <= 'z' )
 	  {
-		*pDest = (char) ( cChar - ( 'a' - 'A' ) );
+         szUprName[ iLen ] = (char) ( cChar - ( 'a' - 'A' ) );
 	  }
+      /*
+       Do we have a case where Clipper compatability requires this?
+       Clipper __MXRelease( "Private1 1" ) comes to mind, but is there
+       any eqivalent case which requires a DYNAMIC symbol?
+      */
+      #if 0
+         else if( cChar == ' ' || cChar == '\t' )
+         {
+            szUprName[ iLen ] = '\0';
+            break;
+         }
+      #endif
 	  else
 	  {
-		*pDest = cChar;
+         szUprName[ iLen ] = cChar;
 	  }
-
-	  pDest++;
-	  szName++;
    }
-   while( *szName );
-   *pDest = '\0';
-   pDest = szUprName;
+   while( iLen-- );
 
    /* JC1: Notice, locking this function MAY seem useless but it is not.
    Suppose two threads calling this functon with the same szUprName: both
@@ -305,13 +319,13 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a s
    two dynsymNew() would be overriden */
    hb_dynsymLock();
 
-   pDynSym = hb_dynsymFind( pDest );
+   pDynSym = hb_dynsymFind( (char *) szUprName );
 
    if( !pDynSym )       /* Does it exists ? */
    {
       //TraceLog( NULL, "*** Did NOT find >%s< - CREATED New!\n", szUprName );
 
-      pDynSym = hb_dynsymNew( hb_symbolNew( szUprName ), HB_GETMODULESYM() );   /* Make new symbol */
+      pDynSym = hb_dynsymNew( hb_symbolNew( (char *)szUprName ), HB_GETMODULESYM() );   /* Make new symbol */
       pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
    }
 
@@ -352,32 +366,44 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol *
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
    register char cChar;
-   register char *pDest = szUprName;
+   register int iLen = strlen( szName );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFindName(%s)", szName));
 
-   /* make a copy as we may get a const string, then turn it to uppercase */
+   if( iLen > HB_SYMBOL_NAME_LEN )
+   {
+      iLen = HB_SYMBOL_NAME_LEN;
+   }
+   szUprName[ iLen-- ] = '\0';
+
    do
    {
-	  cChar = *szName;
+      cChar = szName[ iLen ];
 
-	  if( cChar >= 'a' && cChar <= 'z' )
-	  {
-		*pDest = (char) ( cChar - ( 'a' - 'A' ) );
-	  }
-	  else
-	  {
-		*pDest = cChar;
-	  }
-
-	  pDest++;
-	  szName++;
+      if( cChar >= 'a' && cChar <= 'z' )
+      {
+         szUprName[ iLen ] = (char) ( cChar - ( 'a' - 'A' ) );
+      }
+      /*
+       Do we have a case where Clipper compatability requires this?
+       Clipper __MXRelease( "Private1 1" ) comes to mind, but is there
+       any eqivalent case which requires a DYNAMIC symbol?
+      */
+      #if 0
+         else if( cChar == ' ' || cChar == '\t' )
+         {
+            szUprName[ iLen ] = '\0';
+            break;
+         }
+      #endif
+      else
+      {
+         szUprName[ iLen ] = cChar;
+      }
    }
-   while( *szName );
-   *pDest = '\0';
-   pDest = szUprName;
-   
-   return hb_dynsymFind( pDest );
+   while( iLen-- );
+
+   return hb_dynsymFind( (char *)szUprName );
 }
 
 PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
@@ -447,7 +473,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
          uiMiddle = uiFirst + ( ( uiLast - uiFirst ) / 2 );
       }
    }
-   
+
    #ifdef HB_SYMLIMIT_10_WORKAROUND
 
    /*
@@ -653,7 +679,7 @@ HB_EXPORT PHB_SYMB hb_dynsymFindSymbol( const char * szName )
    {
 	 return pDynSym->pSymbol;
    }
-   
+
    return NULL;
 }
 

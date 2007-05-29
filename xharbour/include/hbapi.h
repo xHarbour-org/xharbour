@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.213 2007/05/15 21:34:11 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.214 2007/05/18 09:36:57 marchuet Exp $
  */
 
 /*
@@ -623,6 +623,7 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject); /* returns a duplicate
 extern const char * hb_szAscii[256];      /* array of 1 character length strings */
 
 extern HB_EXPORT int      hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
+extern HB_EXPORT int      hb_symcmp( const char * s1, const char * s2 ); /* compare a SYMBOL value (LEFT) with unknown case RIGHT agument */
 extern HB_EXPORT int      hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
 extern HB_EXPORT char *   hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
 extern HB_EXPORT char *   hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */

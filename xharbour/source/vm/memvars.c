@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.124 2007/05/11 02:05:32 ronpinkas Exp $
+ * $Id: memvars.c,v 1.125 2007/05/14 01:27:50 ronpinkas Exp $
  */
 
 /*
@@ -1102,7 +1102,7 @@ static void hb_memvarRelease( HB_ITEM_PTR pMemvar )
           */
          if( pDynVar->hMemvar )
          {
-            if( hb_stricmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
+            if( hb_symcmp( pDynVar->pSymbol->szName, pMemvar->item.asString.value ) == 0 )
             {
                PHB_ITEM pRef;
 
@@ -1303,7 +1303,7 @@ static HB_DYNS_FUNC( hb_memvarReleasePublicWorker )
 
    if( hb_memvarScopeGet( pDynSymbol ) == HB_MV_PUBLIC )
    {
-      if( hb_stricmp( pDynSymbol->pSymbol->szName, (char *) Cargo ) == 0 )
+      if( hb_symcmp( pDynSymbol->pSymbol->szName, (char *) Cargo ) == 0 )
       {
          s_globalTable[ pDynSymbol->hMemvar ].counter = 1;
          hb_memvarValueDecRef( pDynSymbol->hMemvar );

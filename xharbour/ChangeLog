@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5580 2007/05/28 17:44:38 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5581 2007/05/29 00:13:07 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 21:51 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * source/common/hbstr.c
+    + Added int hb_symcmp( const char * s1, const char * s2 )
+  * source/vm/memvars.c
+    * Corrected hb_memvarRelease*() to use new hb_symcmp()
+      /* This fixes Clipper compatability for: __MXRelease( "Private1 1" ) */
+
+  * source/vm/dynsym.c
+    ! GPF trap I introduced in 2007-05-22 01:10 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+    + Clipper compatability question/comment
 
 2007-05-28 21:15 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/rtl/tget.prg
