@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.12 2006/01/18 23:54:51 lculik Exp $
+ * $Id: client.prg,v 1.13 2007/04/23 14:58:01 hazi01 Exp $
  */
 
 /*
@@ -104,6 +104,8 @@ CLASS tIPClient
 
    DATA bEof
    DATA isOpen INIT .F.
+
+   DATA Cargo
 
    /** Gauge control; it can be a codeblock or a function pointer. */
    DATA exGauge

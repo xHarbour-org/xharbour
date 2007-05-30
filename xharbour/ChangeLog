@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5589 2007/05/29 21:20:03 peterrees Exp $
+ * $Id: ChangeLog,v 1.5590 2007/05/30 11:47:48 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-30 16:01 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/tip/client.prg
+    + Added support for Cargo variable
+
 2007-05-30 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     * changed && => & for FIXED_PITCH and TRUETYPE_FONTTYPE in FontEnumCallBack()
