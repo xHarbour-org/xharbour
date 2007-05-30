@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5588 2007/05/29 18:11:14 hazi01 Exp $
+ * $Id: ChangeLog,v 1.5589 2007/05/29 21:20:03 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -23,6 +23,15 @@
    /*
       NOTE: TIP classes are currently out of order due to broken Sockets functions
     */
+
+2007-05-30 13:46 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/vm/dynsym.c
+    % Optimized, and added compatibility with some other functions as SELECT that needs
+      ignore spaces after name in hb_dynsymFindName( const char * szName )
+  * source/vm/inet.c
+    * Undo changes of
+    ; 2007-05-10 14:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>    
+    because are the cause of don't works correctly TIP.LIB
 
 2007-05-29 12:53 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   - include/hbrddbmcdx.h
