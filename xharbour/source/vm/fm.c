@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.79 2007/05/31 05:18:11 walito Exp $
+ * $Id: fm.c,v 1.80 2007/05/31 13:06:42 walito Exp $
  */
 
 /*
@@ -668,6 +668,8 @@ HB_EXPORT void hb_xautorelease( void * pMem )            /* set memory to autore
 
       pMemBlock->uiAutoRelease = 1;
    }
+#else
+   HB_SYMBOL_UNUSED( pMem );
 #endif
 }
 
