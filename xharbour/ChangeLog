@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5596 2007/05/31 15:03:52 ran_go Exp $
+ * $Id: ChangeLog,v 1.5597 2007/05/31 16:41:07 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-31 16:22 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/rdd/wafunc.c
+    * Simplifies logic of hb_rddNewAreaNode to need one call to hb_xgrab
+    * Add asserts to NULL pointer and uiSize
 
 2007-05-31 18:40 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/vm/dynsym.c

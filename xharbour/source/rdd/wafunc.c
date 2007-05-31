@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.3 2007/05/24 16:24:09 marchuet Exp $
+ * $Id: wafunc.c,v 1.4 2007/05/25 08:40:02 marchuet Exp $
  */
 
 /*
@@ -107,37 +107,30 @@ HB_EXPORT void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddNewAreaNode(%p,%hu)", pRddNode, uiRddID));
 
+   assert( pRddNode != NULL );
+
    if( pRddNode->uiAreaSize == 0 ) /* Calculate the size of WorkArea */
    {
+      AREA Area;
       USHORT uiSize;
 
-      pArea = ( AREAP ) hb_xgrab( sizeof( AREA ) );
-      memset( pArea, 0, sizeof( AREA ) );
-      pArea->lprfsHost = &pRddNode->pTable;
-      pArea->rddID = uiRddID;
-
-      if( SELF_STRUCTSIZE( pArea, &uiSize ) != SUCCESS )
+	  Area.lprfsHost = &pRddNode->pTable;
+      Area.rddID = uiRddID;
+      if( SELF_STRUCTSIZE( &Area, &uiSize ) != SUCCESS )
+	  {
          return NULL;
-
-      /* Need more space? */
-      if( uiSize > sizeof( AREA ) )   /* Size of Area changed */
-      {
-         pArea = ( AREAP ) hb_xrealloc( pArea, uiSize );
-         memset( pArea, 0, uiSize );
-         pArea->lprfsHost = &pRddNode->pTable;
-         pArea->rddID = uiRddID;
-      }
+	  }	   
+	  assert( uiSize > 0 ); /* Size of WorkArea valid? */
 
       pRddNode->uiAreaSize = uiSize;  /* Update the size of WorkArea */
    }
-   else
-   {
-      pArea = ( AREAP ) hb_xgrab( pRddNode->uiAreaSize );
-      memset( pArea, 0, pRddNode->uiAreaSize );
-      pArea->lprfsHost = &pRddNode->pTable;
-      pArea->rddID = uiRddID;
-   }
-
+   pArea = ( AREAP ) hb_xgrab( pRddNode->uiAreaSize );
+#ifndef DEBUG
+   /* Prevent bug of field not initialized */
+   memset( pArea, 0, pRddNode->uiAreaSize );
+#endif
+   pArea->lprfsHost = &pRddNode->pTable;
+   pArea->rddID = uiRddID;
    if( SELF_NEW( pArea ) != SUCCESS )
    {
       SELF_RELEASE( pArea );
