@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.78 2007/05/24 20:15:02 ronpinkas Exp $
+ * $Id: fm.c,v 1.79 2007/05/31 05:18:11 walito Exp $
  */
 
 /*
@@ -645,7 +645,7 @@ HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 }
 #endif
 
-
+#undef hb_xautorelease
 HB_EXPORT void hb_xautorelease( void * pMem )            /* set memory to autorelease */
 {
 #ifdef HB_FM_STATISTICS
