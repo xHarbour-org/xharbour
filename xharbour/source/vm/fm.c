@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.80 2007/05/31 13:06:42 walito Exp $
+ * $Id: fm.c,v 1.81 2007/05/31 14:00:24 walito Exp $
  */
 
 /*
@@ -106,7 +106,10 @@
 #ifdef HB_FM_STATISTICS
 
 #ifndef HB_MEMFILER
-#  define HB_MEMFILER  0xff
+#  define HB_MEMFILER        0xff
+#endif
+#ifndef HB_MEMFILER_FREED
+#  define HB_MEMFILER_FREED  0xee
 #endif
 #define HB_MEMINFO_SIGNATURE 0x19730403
 
@@ -473,7 +476,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
       else
          memcpy( pMem, pMemBlock, ulSize + HB_MEMINFO_SIZE );
    }
-   memset( pMemBlock, HB_MEMFILER, ulMemSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+   memset( pMemBlock, HB_MEMFILER_FREED, ulMemSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
    free( pMemBlock );
 #else
    pMem = realloc( pMemBlock, ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
@@ -610,7 +613,7 @@ HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
       HB_PUT_LONG( ( ( BYTE * ) pMem ) + pMemBlock->ulSize, 0 );
 
 #ifdef HB_PARANOID_MEM_CHECK
-      memset( pMemBlock, HB_MEMFILER, pMemBlock->ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
+      memset( pMemBlock, HB_MEMFILER_FREED, pMemBlock->ulSize + HB_MEMINFO_SIZE + sizeof( ULONG ) );
 #endif
       free( ( void * ) pMemBlock );
       HB_MEM_THUNLOCK();
@@ -880,6 +883,11 @@ void * hb_xmemcpy( void * pDestArg, void * pSourceArg, ULONG ulLen )
    ULONG  ulRemaining;
    int    iCopySize;
 
+   assert( pDestArg != NULL && pSourceArg != NULL );
+   assert( ulLen > 0 );
+   /* blocks overlapped? use memmove. */
+   assert( pDestArg >= pSourceArg + ulLen || pSourceArg >= pDestArg + ulLen );
+
    HB_TRACE(HB_TR_DEBUG, ("hb_xmemcpy(%p, %p, %lu)", pDestArg, pSourceArg, ulLen));
 
    pDest = ( BYTE * ) pDestArg;
@@ -914,6 +922,9 @@ void * hb_xmemset( void * pDestArg, int iFill, ULONG ulLen )
    BYTE * pDest;
    ULONG  ulRemaining;
    int    iSetSize;
+
+   assert( pDestArg != NULL );
+   assert( ulLen > 0 );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xmemset(%p, %d, %lu)", pDestArg, iFill, ulLen));
 

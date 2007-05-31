@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5594 2007/05/31 13:06:42 walito Exp $
+ * $Id: ChangeLog,v 1.5595 2007/05/31 14:00:21 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-31 12:0 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
+  * source/vm/fm.c
+    * Create constant HB_MEMFILER_FREED 0xee
+    * Setting free memory with HB_MEMFILER_FREED to mark when memory was destroyed
+    * Add asserts to NULL pointer, ulLen and blocks overlapped to hb_xmemcpy
+    * Add asserts to NULL pointer and ulLen to hb_xmemset
 
 2007-05-31 11:00 UTC-0300 Walter Negro <anegro at overnet.com.ar>
   * source/vm/fm.c
