@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.44 2007/05/29 01:52:31 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.45 2007/05/30 11:47:48 marchuet Exp $
  */
 
 /*
@@ -278,38 +278,23 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a s
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGet(%s)", szName));
 
-   if( iLen > HB_SYMBOL_NAME_LEN )
    {
-      iLen = HB_SYMBOL_NAME_LEN;
-   }
-   szUprName[ iLen-- ] = '\0';
+      int iLen = HB_SYMBOL_NAME_LEN;
+      char * pDest = szUprName;
 
-   do
-   {
-      cChar = szName[ iLen ];
-
-	  if( cChar >= 'a' && cChar <= 'z' )
-	  {
-         szUprName[ iLen ] = (char) ( cChar - ( 'a' - 'A' ) );
-	  }
-      /*
-       Do we have a case where Clipper compatability requires this?
-       Clipper __MXRelease( "Private1 1" ) comes to mind, but is there
-       any eqivalent case which requires a DYNAMIC symbol?
-      */
-      #if 0
-         else if( cChar == ' ' || cChar == '\t' )
-         {
-            szUprName[ iLen ] = '\0';
+      do
+      {
+         char cChar = *szName++;
+         if( cChar == 0 || cChar == ' ' || cChar == '\t' )
             break;
-         }
-      #endif
-	  else
-	  {
-         szUprName[ iLen ] = cChar;
-	  }
+         else if( cChar >= 'a' && cChar <= 'z' )
+            *pDest++ = cChar - ( 'a' - 'A' );
+         else
+            *pDest++ = cChar;
+      }
+      while( --iLen );
+      *pDest = '\0';
    }
-   while( iLen-- );
 
    /* JC1: Notice, locking this function MAY seem useless but it is not.
    Suppose two threads calling this functon with the same szUprName: both
@@ -385,6 +370,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol *
       while( --iLen );
       *pDest = '\0';
    }
+   OutputDebugString( szName );
 
    return hb_dynsymFind( (char *)szUprName );
 }
@@ -396,6 +382,7 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
 
    hb_dynsymLock();
+   OutputDebugString( szName );
 
    if( s_pDynItems == NULL )
    {

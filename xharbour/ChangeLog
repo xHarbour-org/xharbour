@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5595 2007/05/31 14:00:21 walito Exp $
+ * $Id: ChangeLog,v 1.5596 2007/05/31 15:03:52 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-31 18:40 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/vm/dynsym.c
+    % Optimized, and added compatibility with some other functions as SELECT that needs
+      ignore spaces after name in hb_dynsymGet( const char * szName )
 
 2007-05-31 12:0 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/fm.c
@@ -44,6 +49,15 @@
   * source/tip/client.prg
     + Added support for Cargo variable
 
+2007-05-30 13:46 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/vm/dynsym.c
+    % Optimized, and added compatibility with some other functions as SELECT that needs
+      ignore spaces after name in hb_dynsymFindName( const char * szName )
+  * source/vm/inet.c
+    * Undo changes of
+    ; 2007-05-10 14:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>    
+    because are the cause of don't works correctly TIP.LIB
+
 2007-05-30 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     * changed && => & for FIXED_PITCH and TRUETYPE_FONTTYPE in FontEnumCallBack()
@@ -60,15 +74,6 @@
    /*
       NOTE: TIP classes are currently out of order due to broken Sockets functions
     */
-
-2007-05-30 13:46 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
-  * source/vm/dynsym.c
-    % Optimized, and added compatibility with some other functions as SELECT that needs
-      ignore spaces after name in hb_dynsymFindName( const char * szName )
-  * source/vm/inet.c
-    * Undo changes of
-    ; 2007-05-10 14:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>    
-    because are the cause of don't works correctly TIP.LIB
 
 2007-05-29 12:53 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   - include/hbrddbmcdx.h
