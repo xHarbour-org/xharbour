@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.210 2007/05/22 14:42:51 ronpinkas Exp $
+ * $Id: classes.c,v 1.211 2007/05/22 18:12:54 ronpinkas Exp $
  */
 
 /*
@@ -284,7 +284,7 @@ static void hb_clsRelease( PCLASS pClass )
    {
       hb_itemRelease( pClass->pMtxSync );
    }
-   
+/*
    if( pClass->pFunError )
    {
       if( ( pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ) == HB_OO_CLS_ONERROR_SYMB )
@@ -295,7 +295,7 @@ static void hb_clsRelease( PCLASS pClass )
          }
       }
    }
-
+*/
    hb_itemRelease( pClass->pClassDatas );
    hb_itemRelease( pClass->pInlines );
 
@@ -1115,7 +1115,12 @@ HB_EXPORT PHB_FUNC hb_objGetMethod( PHB_ITEM pObject, PHB_SYMB pMessage )
 
    if( bSymbol )
    {
-      return ((PHB_SYMB) pFunc)->value.pFunPtr;
+      PHB_SYMB pSym = (PHB_SYMB) pFunc;
+      pFunc = pSym->value.pFunPtr;
+      if ( pSym->scope.value & HB_FS_CLSERROR )
+      {
+         hb_xfree( (void *) pSym );
+      }
    }
    return pFunc;
 }
@@ -1237,9 +1242,17 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       {
          *bSymbol = (pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ? TRUE : FALSE);
          
-         if( bSymbol )
+         if( *bSymbol )
          {
-            ( (PHB_SYMB) pClass->pFunError)->szName = pMessage->szName;
+            PHB_SYMB pSymCloned = (PHB_SYMB) hb_xgrab( sizeof( HB_SYMB ) );
+
+            memcpy( pSymCloned, pClass->pFunError, sizeof( HB_SYMB ) );
+
+            pSymCloned->szName = pMessage->szName;
+            pSymCloned->scope.value |= HB_FS_CLSERROR;
+
+            return (PHB_FUNC) pSymCloned;
+//            ( (PHB_SYMB) pClass->pFunError)->szName = pMessage->szName;
          }
          
          return pClass->pFunError;
@@ -1341,19 +1354,17 @@ HB_EXPORT BOOL hb_objHasMessage( PHB_ITEM pObject, PHB_DYNS pMessage )
 
    if( bSymbol )
    {
+      // Without hb_xfree() because lAllowErrFunc == FALSE
       return ((PHB_SYMB) pFunc)->value.pFunPtr != NULL;
    }
-   else
-   {
-      return pFunc != NULL;
-   }
+   return pFunc != NULL;
 }
 
 static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *ppDynSym )
 {
    PHB_DYNS pDynSym;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_objHasMsg(%p, %s)", pObject, szString));
+   HB_TRACE(HB_TR_DEBUG, ("hb_objGetMessage(%p, %s, %p)", pObject, szString, ppDynSym));
 
    pDynSym = hb_dynsymFindName( szString );
 
@@ -1367,24 +1378,14 @@ static PHB_FUNC hb_objGetMessage( PHB_ITEM pObject, char *szString, PHB_DYNS *pp
       BOOL bSymbol;
       PHB_FUNC pFunc = hb_objGetMthd( pObject, pDynSym->pSymbol, FALSE, NULL, FALSE, &bSymbol );
 
-      if( pFunc == NULL )
-      {
-         return NULL;
-      }
-
       if( bSymbol )
       {
+         // Without hb_xfree() because lAllowErrFunc == FALSE
          return ((PHB_SYMB) pFunc)->value.pFunPtr;
       }
-      else
-      {
-         return pFunc;
-      }
+      return pFunc;
    }
-   else
-   {
-      return NULL;
-   }
+   return NULL;
 }
 
 // Worker function for HB_FUNC( __CLSADDMSG ).
@@ -1891,15 +1892,7 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
        */
       if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
       {        
-         if( wType == HB_OO_MSG_ONERROR )
-         {
-            PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
-            PHB_SYMB pMsg = (PHB_SYMB) hb_xgrab( sizeof(HB_SYMB) );
-                  
-            memcpy( pMsg, pFunc, sizeof(HB_SYMB) );         
-            pClass->pFunError = (PHB_FUNC) pMsg;         
-         }
-         else
+         if( wType != HB_OO_MSG_ONERROR )
          {         
             PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
             PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );

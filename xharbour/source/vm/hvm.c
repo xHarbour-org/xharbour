@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.634 2007/05/22 05:18:20 ronpinkas Exp $
+ * $Id: hvm.c,v 1.635 2007/05/22 14:42:51 ronpinkas Exp $
  */
 
 /*
@@ -7274,7 +7274,15 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          {            
             // Force correct context for the executing function
             pItem->item.asSymbol.value = pFuncSym;
-         
+
+            if( pFuncSym->scope.value & HB_FS_CLSERROR )
+            {
+               // Mark the memory as AutoRelease because the function can
+               // call to QUIT and not return, not free the memory and report
+               // memory leak.
+               hb_xautorelease( pFuncSym );
+            }
+
             if( pFuncSym->scope.value & HB_FS_PCODEFUNC )
             {
                /* Running pCode dynamic function from .HRB */
@@ -7283,6 +7291,11 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             else
             {
                pFunc();
+            }
+            
+            if( pFuncSym->scope.value & HB_FS_CLSERROR )
+            {
+               hb_xfree( pFuncSym );
             }
             // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
          }

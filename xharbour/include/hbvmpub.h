@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.61 2007/05/03 21:44:01 ran_go Exp $
+ * $Id: hbvmpub.h,v 1.62 2007/05/04 20:54:01 ran_go Exp $
  */
 
 /*
@@ -394,6 +394,7 @@
    #define HB_FS_DEFERRED  ( ( HB_SYMBOLSCOPE ) 0x0800 )
 
    #define HB_FS_UTILITY   ( ( HB_SYMBOLSCOPE ) 0x1000 )
+   #define HB_FS_CLSERROR  ( ( HB_SYMBOLSCOPE ) 0x2000 )
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
    /*

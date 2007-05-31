@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.77 2007/05/20 03:26:24 ronpinkas Exp $
+ * $Id: fm.c,v 1.78 2007/05/24 20:15:02 ronpinkas Exp $
  */
 
 /*
@@ -115,6 +115,7 @@ typedef struct _HB_MEMINFO
    ULONG  ulSignature;
    ULONG  ulSize;
    USHORT uiProcLine;
+   USHORT uiAutoRelease;
    char   szProcName[ HB_SYMBOL_NAME_LEN + 1 ];
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
@@ -215,6 +216,7 @@ HB_EXPORT void * hb_xalloc( ULONG ulSize )
    ( ( PHB_MEMINFO ) pMem )->ulSignature = HB_MEMINFO_SIGNATURE;
    HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
    ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
+   ( ( PHB_MEMINFO ) pMem )->uiAutoRelease = 0;
 
    if( hb_tr_level() >= HB_TR_DEBUG )
    {
@@ -337,6 +339,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    ( ( PHB_MEMINFO ) pMem )->ulSignature = HB_MEMINFO_SIGNATURE;
    HB_PUT_LONG( ( ( BYTE * ) pMem ) + ulSize + HB_MEMINFO_SIZE, HB_MEMINFO_SIGNATURE );
    ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;  /* size of the memory block */
+   ( ( PHB_MEMINFO ) pMem )->uiAutoRelease = 0;
 
    if( hb_tr_level() >= HB_TR_DEBUG )
    {
@@ -642,6 +645,33 @@ HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 }
 #endif
 
+
+HB_EXPORT void hb_xautorelease( void * pMem )            /* set memory to autorelease */
+{
+#ifdef HB_FM_STATISTICS
+
+   HB_TRACE_STEALTH( HB_TR_INFO, ( "hb_xautorelease(%p)", pMem ) );
+
+   if( pMem )
+   {
+      PHB_MEMINFO pMemBlock = ( PHB_MEMINFO ) ( ( char * ) pMem - HB_MEMINFO_SIZE );
+
+      if( pMemBlock->ulSignature != HB_MEMINFO_SIGNATURE )
+      {
+         hb_errInternal( HB_EI_XFREEINV, "hb_xautorelease() Invalid Pointer %p %s", (char *) pMem, (char *) pMem );
+      }
+
+      if ( HB_GET_LONG( ( ( BYTE * ) pMem ) + pMemBlock->ulSize ) != HB_MEMINFO_SIGNATURE )
+      {
+         hb_errInternal( HB_EI_XMEMOVERFLOW, "hb_xautorelease(%p) Pointer Overflow '%s'", (char *) pMem, (char *) pMem );
+      }
+
+      pMemBlock->uiAutoRelease = 1;
+   }
+#endif
+}
+
+
 /* NOTE: Debug function, it will always return 0 when HB_FM_STATISTICS is
          not defined, don't use it for final code [vszakats] */
 
@@ -725,6 +755,19 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 // apps in the future. We must de-tangle the initialization and closing
 // sequence
 
+   {
+      register PHB_MEMINFO pMemBlock = s_pFirstBlock;
+      register PHB_MEMINFO pMemTemp = pMemBlock;
+      while( pMemBlock )
+      {
+         pMemBlock = pMemBlock->pNextBlock;
+         if( pMemTemp->uiAutoRelease )
+         {
+            hb_xfree( (void *) ( ( char * ) pMemTemp + HB_MEMINFO_SIZE ) );
+         }
+      }
+   }
+
    if( s_lMemoryBlocks || hb_cmdargCheck( "INFO" ) )
    {
       PHB_MEMINFO pMemBlock;
@@ -760,7 +803,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          hb_xfree( szPlatform );
          hb_xfree( szCompiler );
          hb_xfree( szHarbour  );
-	 hb_xfree( szTime );
+         hb_xfree( szTime );
       }
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
