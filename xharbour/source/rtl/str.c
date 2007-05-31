@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.16 2005/05/16 21:45:40 andijahja Exp $
+ * $Id: str.c,v 1.17 2005/08/04 23:54:13 druzus Exp $
  */
 
 /*
@@ -58,10 +58,11 @@
 
 HB_FUNC( STR )
 {
-   BOOL bValid, bLtrim = FALSE;
    PHB_ITEM pNumber = hb_param( 1, HB_IT_NUMERIC );
    PHB_ITEM pWidth  = NULL;
    PHB_ITEM pDec    = NULL;
+   BOOL bValid = FALSE;
+   BOOL bLtrim = FALSE;
 
    if( pNumber )
    {
@@ -103,18 +104,15 @@ HB_FUNC( STR )
          }
       }
    }
-   else
-   {
-      bValid = FALSE;
-   }
 
    if( bValid )
    {
+      char * szResult;
       BOOL bLogical = hb_set.HB_SET_FIXED;
-      char * szResult ;
-      hb_set.HB_SET_FIXED = FALSE ;
+
+      hb_set.HB_SET_FIXED = FALSE;
       szResult = hb_itemStr( pNumber, pWidth, pDec );
-      hb_set.HB_SET_FIXED = bLogical ;
+      hb_set.HB_SET_FIXED = bLogical;
 
       if( szResult )
       {
@@ -124,7 +122,7 @@ HB_FUNC( STR )
 
             while( szResult[ iLen ] == ' ' )
             {
-               iLen++;
+               ++iLen;
             }
             if( iLen )
             {
@@ -138,8 +136,10 @@ HB_FUNC( STR )
       {
         int iLen = hb_itemGetNI( pWidth ) ;
         char *szTemp = (char *) hb_xgrab( iLen + 1  ) ;
-        hb_xmemset( szTemp, 0 , iLen + 1 );
+
         hb_xmemset( szTemp, '*', iLen );
+		szTemp[ iLen + 1 ] = '\0';
+
         hb_retcAdopt( szTemp ) ;
       }
       else
