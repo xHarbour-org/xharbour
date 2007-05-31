@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.45 2007/05/30 11:47:48 marchuet Exp $
+ * $Id: dynsym.c,v 1.46 2007/05/31 16:41:07 marchuet Exp $
  */
 
 /*
@@ -370,7 +370,6 @@ PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol *
       while( --iLen );
       *pDest = '\0';
    }
-   OutputDebugString( szName );
 
    return hb_dynsymFind( (char *)szUprName );
 }
@@ -382,7 +381,6 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymFind(%s)", szName));
 
    hb_dynsymLock();
-   OutputDebugString( szName );
 
    if( s_pDynItems == NULL )
    {
