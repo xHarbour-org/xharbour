@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.46 2007/05/31 16:41:07 marchuet Exp $
+ * $Id: dynsym.c,v 1.47 2007/05/31 16:56:37 marchuet Exp $
  */
 
 /*
@@ -273,18 +273,16 @@ HB_EXPORT PHB_DYNS hb_dynsymGet( const char * szName )  /* finds and creates a s
    /* make a copy as we may get a const string, then turn it to uppercase */
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
    PHB_DYNS pDynSym;
-   register char cChar;
-   register int iLen = strlen( szName );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGet(%s)", szName));
 
    {
-      int iLen = HB_SYMBOL_NAME_LEN;
+      register int iLen = HB_SYMBOL_NAME_LEN;
       char * pDest = szUprName;
 
       do
       {
-         char cChar = *szName++;
+         register char cChar = *szName++;
          if( cChar == 0 || cChar == ' ' || cChar == '\t' )
             break;
          else if( cChar >= 'a' && cChar <= 'z' )
