@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.13 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: client.prg,v 1.14 2007/05/30 19:02:25 toninhofwi Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
   Enhaced tip cliente to conenct to secure smtp servers by Luiz Rafael Culik
 */
 
-/* 2007-03-29, Hannes Ziegler 
+/* 2007-03-29, Hannes Ziegler
    Adapted all :new() method(s) so that tIPClient becomes the
    abstract super class for TIpClientFtp, TIpClientHttp, TIpClientPop and TIpClientSmtp
 
@@ -65,6 +65,10 @@
 
    Fixed bug in :readToFile()
 
+*/
+
+/* 2007-06-01, Toninho@fwi
+   Added data ::nWrite to work like ::nRead
 */
 
 #include "hbclass.ch"
@@ -100,15 +104,16 @@ CLASS tIPClient
 
    DATA cReply
    DATA nAccessMode
+   DATA nWrite
    DATA nLastWrite
 
    DATA bEof
    DATA isOpen INIT .F.
 
-   DATA Cargo
-
    /** Gauge control; it can be a codeblock or a function pointer. */
    DATA exGauge
+
+   DATA Cargo
 
    METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
@@ -176,6 +181,7 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClient
    ::oCredentials := oCredentials
    ::nStatus      := 0
    ::bInitialized := .F.
+   ::nWrite       := 0
    ::nLastWrite   := 0
    ::nLength      := -1
    ::nRead        := 0
@@ -294,7 +300,7 @@ RETURN cStr0
 METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
    LOCAL nFout
    LOCAL cData
-   LOCAL nSent 
+   LOCAL nSent
 
    IF Empty ( nMode )
       nMode := FC_NORMAL
@@ -357,6 +363,7 @@ METHOD WriteFromFile( cFile ) CLASS tIPClient
    LOCAL nLen
    LOCAL nSize, nSent
 
+   ::nWrite  := 0
    ::nStatus := 0
    nFin := Fopen( cFile, FO_READ )
    IF nFin < 0
@@ -424,6 +431,8 @@ METHOD Write( cData, nLen, bCommit ) CLASS tIPClient
       ::Commit()
 
    ENDIF
+
+   ::nWrite += ::nLastWrite
 
 RETURN ::nLastWrite
 

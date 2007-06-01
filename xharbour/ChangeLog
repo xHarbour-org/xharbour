@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5597 2007/05/31 16:41:07 marchuet Exp $
+ * $Id: ChangeLog,v 1.5598 2007/05/31 19:22:19 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-06-01 16:34 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+  * source/tip/client.prg
+    + Added data ::nWrite to work like ::nRead for upload stream
+  * source/tip/ftpcln.prg
+    + Added method ::UserCommand() that permit users sent custom commands
 
 2007-05-31 16:22 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rdd/wafunc.c
