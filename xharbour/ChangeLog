@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5599 2007/06/01 19:39:05 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5600 2007/06/02 10:44:21 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-06-03 16:58 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/harbour.c
+    ! Fixed a segfault (double free) when compiling debug info for codeblocks
+      with detached locals.
+  * source/compiler/hbdbginf.c
+    * Fixed a comment.
 
 2007-06-02 12:41 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
   * Makfile.vc

@@ -1,10 +1,10 @@
 /*
- * $Id: hblbl.c,v 1.1 2006/03/21 01:25:32 druzus Exp $
+ * $Id: hbdbginf.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
- * generate table with jump labels
+ * generate line information for debugger
  *
  * Copyright 2006 Przemyslaw Czerpak < druzus /at/ priv.onet.pl >
  * www - http://www.harbour-project.org

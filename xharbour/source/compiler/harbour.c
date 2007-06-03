@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.162 2007/05/24 20:15:02 ronpinkas Exp $
+ * $Id: harbour.c,v 1.163 2007/05/24 21:15:25 enricomaria Exp $
  */
 
 /*
@@ -5377,10 +5377,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
          hb_compGenLocalName( (USHORT)iLocalPos, pVar->szName );
          iLocalPos--;
 
-         pFree = pVar;
-
          pVar = pVar->pNext;
-         hb_xfree( ( void * ) pFree );
       }
    }
 
