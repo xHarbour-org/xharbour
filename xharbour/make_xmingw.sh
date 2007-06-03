@@ -1,12 +1,17 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.6 2005/02/19 21:07:30 likewolf Exp $
+# $Id: make_xmingw.sh,v 1.7 2007/05/27 14:07:27 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
 # Copyright 2003-2005 by Phil Krylov <phil a t newstar.rinet.ru>
 #
+
+cleanup()
+{
+    rm -fR "${HB_BIN_COMPILE}"
+}
 
 UNAME=`uname`
 
@@ -43,18 +48,20 @@ fi
 CCPATH="$MINGW_PREFIX/bin:$MINGW_PREFIX/$TARGET/bin:"
 PATH="$CCPATH$PATH"
 
+export HB_BIN_COMPILE=/tmp/hb-xmingw-$$
+rm -fR "${HB_BIN_COMPILE}"
+trap cleanup EXIT &>/dev/null
+mkdir ${HB_BIN_COMPILE}
+
 if which harbour &> /dev/null; then
-    rm -f -r /tmp/harbour.exe
-    ln -s `which harbour` /tmp/harbour.exe
-    export HB_BIN_COMPILE=/tmp
+    ln -s `which harbour` ${HB_BIN_COMPILE}/harbour.exe
 else
     echo "You must have a working xHarbour executable for your platform on your PATH."
     exit 1
 fi
 
-rm -f -r /tmp/ppgen.exe
-(cd `dirname $0`; ln -s `pwd`/source/pp/*/*/ppgen /tmp/ppgen.exe)
-export HB_PPGEN_PATH=/tmp/
+(cd `dirname $0`; ln -s `pwd`/source/pp/linux/gcc/ppgen ${HB_BIN_COMPILE}/ppgen.exe)
+export HB_PPGEN_PATH=${HB_BIN_COMPILE}
 
 export PATH CCPATH CCPREFIX
 
@@ -68,3 +75,7 @@ case "$1" in
         . `dirname $0`/make_gnu.sh "$@"
         ;;
 esac
+
+stat="$?"
+cleanup
+exit "${stat}"
