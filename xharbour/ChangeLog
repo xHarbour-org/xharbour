@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5602 2007/06/03 13:01:01 likewolf Exp $
+ * $Id: ChangeLog,v 1.5603 2007/06/04 20:10:13 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-06-04 16:54 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/eval.c
+    * GPF trap (found by Ranier)
+
 2007-06-04 17:10 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
-  * source/rtl/pcre/pcre_printint.src
-    * Add pcre_printint.src to compile with DEBUG enabled
+  + source/rtl/pcre/pcre_printint.src
+    + Added pcre_printint.src to compile with DEBUG enabled
 
 2007-06-03 17:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_xmingw.sh
@@ -75,7 +79,7 @@
   * include/hbapi.h
   * source/vm/fm.c
     + Add funcion hb_xautorelease( void *) to set a memory block to auto release
-      at the end of program and avoid memory leak report.  
+      at the end of program and avoid memory leak report.
 
 2007-05-30 16:01 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/tip/client.prg
@@ -87,7 +91,7 @@
       ignore spaces after name in hb_dynsymFindName( const char * szName )
   * source/vm/inet.c
     * Undo changes of
-    ; 2007-05-10 14:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>    
+    ; 2007-05-10 14:40 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
     because are the cause of don't works correctly TIP.LIB
 
 2007-05-30 09:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>

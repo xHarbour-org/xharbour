@@ -1,5 +1,5 @@
 /*
- * $Id: eval.c,v 1.32 2007/05/24 12:37:59 ronpinkas Exp $
+ * $Id: eval.c,v 1.33 2007/05/25 07:18:34 enricomaria Exp $
  */
 
 /*
@@ -765,6 +765,7 @@ HB_FUNC( HB_EXEC )
    {
       PHB_SYMB pSymbol = (PHB_SYMB) hb_itemGetPtr( pPointer );
       int iParams;
+      BOOL bSend = FALSE;
 
       if( pSymbol )
       {
@@ -772,6 +773,11 @@ HB_FUNC( HB_EXEC )
 
          if( iParams >= 1 )
          {
+            if( hb_param( 2, HB_IT_ANY )->type )
+            {
+               bSend = TRUE;
+            }
+
             iParams--;
          }
          else
@@ -793,7 +799,7 @@ HB_FUNC( HB_EXEC )
       pPointer->item.asSymbol.stackbase = hb_stackTopOffset() - 2 - iParams;
       pPointer->item.asSymbol.uiSuperClass = 0;
 
-      if( HB_IS_OBJECT( hb_param( 2, HB_IT_ANY ) ) )
+      if( bSend )
       {
          hb_vmSend( (USHORT) iParams );
       }
