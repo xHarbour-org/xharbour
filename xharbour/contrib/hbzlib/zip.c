@@ -1,5 +1,5 @@
 /*
- * $Id: zip.c,v 1.43 2006/04/22 13:46:12 lculik Exp $
+ * $Id: zip.c,v 1.44 2006/10/13 16:41:24 ptsarenko Exp $
  */
 
 /*
@@ -75,6 +75,7 @@ PHB_ITEM ChangeDiskBlock;
 #define FA_NORMAL         128
 
 extern int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
+extern void hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 
 #if defined(HB_OS_LINUX)
 

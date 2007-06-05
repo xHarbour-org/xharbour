@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5603 2007/06/04 20:10:13 ran_go Exp $
+ * $Id: ChangeLog,v 1.5604 2007/06/04 20:55:02 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-06-05 20:19 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * contrib/hbzlib/include/zipexception.h
+    * removed wrong CZipException:: qualificator in CZipException copy constructor
+
+  * contrib/hbzlib/zip.c
+    + added extern void hb_fsDirectory() declaration
+
+  * contrib/hbzlib/include/hbzip2.h
+  * contrib/hbzlib/zipnew.cpp
+    * changed fifth parameter to const char *pbyBuffer in hb_UnzipSel() function
+
+    /* Now hbzlib should build file in *nix (although with warnings).
+       Please test. */
 
 2007-06-04 16:54 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/eval.c

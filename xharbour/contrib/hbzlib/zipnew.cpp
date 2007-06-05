@@ -1,5 +1,5 @@
 /*
- * $Id: zipnew.cpp,v 1.26 2006/04/22 13:46:12 lculik Exp $
+ * $Id: zipnew.cpp,v 1.27 2006/10/13 16:41:24 ptsarenko Exp $
  */
 
 /*
@@ -557,7 +557,7 @@ int hb_DeleteSel( char *szFile, PHB_ITEM pArray, BOOL bCase )
    return ( int ) iReturn;
 }
 
-int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, char *pbyBuffer, PHB_ITEM pSelArray, PHB_ITEM pProgress )
+int hb_UnzipSel( char *szFile, PHB_ITEM pBlock, BOOL lWithPath, char *szPassWord, const char *pbyBuffer, PHB_ITEM pSelArray, PHB_ITEM pProgress )
 {
    bool bWithPath = lWithPath?true:false;
    bool iReturn = true;
