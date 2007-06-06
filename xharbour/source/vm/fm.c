@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.81 2007/05/31 14:00:24 walito Exp $
+ * $Id: fm.c,v 1.82 2007/05/31 15:03:24 ran_go Exp $
  */
 
 /*
@@ -172,7 +172,7 @@ static PHB_MEMINFO s_pLastBlock = NULL;
    HB_EXPORT void * hb_xalloc( ULONG ulSize )
    {
       return malloc( ulSize);
-   }   
+   }
 #else
 HB_EXPORT void * hb_xalloc( ULONG ulSize )
 {
@@ -294,7 +294,7 @@ HB_EXPORT void * hb_xalloc( ULONG ulSize )
    HB_EXPORT void * hb_xgrab( ULONG ulSize )
    {
       return malloc( ulSize);
-   }   
+   }
 #else
 /* allocates fixed memory, exits on failure */
 void HB_EXPORT * hb_xgrab( ULONG ulSize )
@@ -422,7 +422,7 @@ void HB_EXPORT * hb_xgrab( ULONG ulSize )
    HB_EXPORT void * hb_xrealloc( void *pMem, ULONG ulSize )
    {
       return realloc( pMem, ulSize );
-   }   
+   }
 #else
 void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates memory */
 {
@@ -558,7 +558,7 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
    HB_EXPORT void hb_xfree( void *pMem )
    {
       free( pMem );
-   }   
+   }
 #else
 HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 {
@@ -712,21 +712,35 @@ char * hb_mem2str( void * pMem, UINT uiSize )
    UINT uiIndex, uiPrintable;
 
    if( uiSize > HB_MAX_MEM2STR_BLOCK )
+   {
       uiSize = HB_MAX_MEM2STR_BLOCK;
+   }
 
    uiPrintable = 0;
+
    for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
+   {
       if( cMem[uiIndex] >= ' ' )
+      {
          uiPrintable++;
+      }
+   }
 
    if( (uiPrintable*100)/uiSize > 70 ) /* more then 70% printable chars */
    {
       /* format as string of original chars */
       for( uiIndex=0; uiIndex < uiSize; uiIndex++ )
+      {
          if( cMem[uiIndex] >= ' ' )
+         {
             cBuffer[uiIndex] = cMem[uiIndex];
+         }
          else
+         {
             cBuffer[uiIndex] = '.';
+         }
+      }
+
       cBuffer[uiIndex] = '\0';
    }
    else
@@ -740,6 +754,7 @@ char * hb_mem2str( void * pMem, UINT uiSize )
          cBuffer[uiIndex*2] = (hinibble <= 9) ?  ('0'+hinibble) : ('A'+hinibble-10);
          cBuffer[uiIndex*2+1] = (lownibble <= 9) ? ('0'+lownibble) : ('A'+lownibble-10);
       }
+
       cBuffer[uiIndex*2] = '\0';
    }
 
@@ -763,9 +778,12 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
    {
       register PHB_MEMINFO pMemBlock = s_pFirstBlock;
       register PHB_MEMINFO pMemTemp = pMemBlock;
+
       while( pMemBlock )
       {
+         pMemTemp = pMemBlock;
          pMemBlock = pMemBlock->pNextBlock;
+
          if( pMemTemp->uiAutoRelease )
          {
             hb_xfree( (void *) ( ( char * ) pMemTemp + HB_MEMINFO_SIZE ) );
@@ -789,6 +807,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
       sprintf( buffer, "Total %li allocations (%li reallocation), of which %li freed.", s_lAllocations, s_lReAllocations, s_lFreed );
+
       if ( hLog )
       {
          char *szPlatform = hb_verPlatform();
@@ -796,8 +815,10 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          char *szHarbour  = hb_verHarbour();
          char *szTime     = (char *) hb_xgrab(9);
          int iYear, iMonth, iDay;
+
          hb_dateToday( &iYear, &iMonth, &iDay );
          hb_dateTimeStr( szTime );
+
          fprintf( hLog, "Memory Allocation Report\n");
          fprintf( hLog, "Application: %s\n", hb_cmdargARGV()[0] );
          fprintf( hLog, "xHarbour Version: %s\n", szHarbour );
@@ -805,28 +826,34 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          fprintf( hLog, "Platform: %s\n", szPlatform );
          fprintf( hLog, "Time Occured: %04d.%02d.%02d %s\n", iYear, iMonth, iDay, szTime );
          fprintf( hLog, "%s\n", buffer );
+
          hb_xfree( szPlatform );
          hb_xfree( szCompiler );
          hb_xfree( szHarbour  );
          hb_xfree( szTime );
       }
+
       hb_conOutErr( buffer, 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
       sprintf( buffer, "Highest total allocated %li bytes in %li blocks.", s_lMemoryMaxConsumed, s_lMemoryMaxBlocks );
+
       if ( hLog )
       {
          fprintf( hLog, "%s\n", buffer );
       }
+
       hb_conOutErr( buffer, 0 );
 
       if( s_lMemoryBlocks )
       {
          hb_conOutErr( hb_conNewLine(), 0 );
          sprintf( buffer, "WARNING! Memory allocated but not released: %li bytes (%li blocks)", s_lMemoryConsumed, s_lMemoryBlocks );
+
          if ( hLog )
          {
             fprintf( hLog, "%s\n", buffer );
          }
+
          hb_conOutErr( buffer, 0 );
       }
 
@@ -842,7 +869,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
             pMemBlock->uiProcLine,
             hb_mem2str( ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize ) ) );
 
-         if ( hLog )
+         if( hLog )
          {
             fprintf( hLog, "Block %i %p (size %lu) %s(%i), \"%s\"\n",
                ui-1,
@@ -856,7 +883,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       if( hLog )
       {
-         fprintf( hLog, "--------------------------------------------------------------------------------\n");
+         fprintf( hLog, "--------------------------------------------------------------------------------\n" );
          fclose( hLog );
       }
    }
