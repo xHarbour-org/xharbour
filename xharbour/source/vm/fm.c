@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.82 2007/05/31 15:03:24 ran_go Exp $
+ * $Id: fm.c,v 1.83 2007/06/06 22:20:06 ronpinkas Exp $
  */
 
 /*
@@ -777,7 +777,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
    {
       register PHB_MEMINFO pMemBlock = s_pFirstBlock;
-      register PHB_MEMINFO pMemTemp = pMemBlock;
+      register PHB_MEMINFO pMemTemp;
 
       while( pMemBlock )
       {
