@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5605 2007/06/05 18:21:31 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5606 2007/06/06 00:46:33 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-06-06 09:58 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    ! Fixed GPF trap (accessing freed memory in Destructor)
+    
 2007-06-05 21:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * makefile.pc
   * hrbdll.pc

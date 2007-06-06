@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.635 2007/05/22 14:42:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.636 2007/05/31 05:18:11 walito Exp $
  */
 
 /*
@@ -7296,8 +7296,10 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             if( pFuncSym->scope.value & HB_FS_CLSERROR )
             {
                hb_xfree( pFuncSym );
-            }
-            // No need to restore pSym into (*HB_VM_STACK.pBase)->item.asSymbol.value - item will now be poped.
+               
+               // NEEDed because Destructor will inspect the symbol value, which was just FREEd
+               pItem->item.asSymbol.value = pSym;
+            }            
          }
          else
          {
