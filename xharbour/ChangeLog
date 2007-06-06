@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5604 2007/06/04 20:55:02 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5605 2007/06/05 18:21:31 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-06-05 21:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+  * hrbdll.pc
+    + added pcre_ files.
+    + added thtml.prg
+
+  * source/rtl/tbrowse.prg
+    ! fixed bug in static function IsDb() to work properly when an array is used
+      as datasource and exist workareas in use. Bug reported by Gilberto
+      Silverio.
 
 2007-06-05 20:19 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * contrib/hbzlib/include/zipexception.h

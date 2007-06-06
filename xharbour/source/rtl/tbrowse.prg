@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.169 2007/04/24 12:20:03 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.170 2007/05/15 15:31:07 modalsist Exp $
  */
 
 /*
@@ -3661,7 +3661,7 @@ Static Function IsDb(oTb)
 *------------------------
 * Check if datasource used by Tbrowse is a database or not.
 *-------------------------------
-LOCAL lIsDb, aWA, nArea, aArea, lBottom
+LOCAL lIsDb, aWA, nArea, aArea, lBottom, nSkip, nSkipped
 
 lIsDb := .f.
 
@@ -3670,6 +3670,8 @@ IF Used()
    // Get all workareas openned by user
    //
    aWA := {}
+   nSkip := 0
+   nSkipped := 0
 
    FOR nArea := 1 TO 255
        if !Empty( alias(nArea) )
@@ -3685,27 +3687,24 @@ IF Used()
       //
       lBottom := IsBottom()
 
-      IF lBottom
-         Eval( oTb:SkipBlock, -1 )
-      ELSE
-         Eval( oTb:SkipBlock, 1 )
-      ENDIF
+      nSkip := if(lBottom,-1,1)
+      nSkipped := Eval( oTb:SkipBlock, nSkip )
 
       FOR EACH aArea IN aWA
-
           IF &(aArea[1])->( recno() ) != aArea[2]
-             lIsDb := .T.
-             EXIT
+              lIsDb := .T.
+              EXIT
           ENDIF
-
       NEXT
 
       IF lBottom
-         IF !oTb:HitTop
+         IF !oTb:HitTop .and. ( nSkip = -1  .and. nSkipped = -1 )
             Eval( oTb:SkipBlock, 1 )
          ENDIF
       ELSE
-         Eval( oTb:SkipBlock, -1 )
+         if nSkip = 1 .and. nSkipped = 1
+            Eval( oTb:SkipBlock, -1 )
+         endif
       ENDIF
 
    ENDIF

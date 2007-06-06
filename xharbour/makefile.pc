@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.46 2007/05/18 10:08:36 marchuet Exp $
+# $Id: makefile.pc,v 1.47 2007/05/23 05:21:33 guerra000 Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -25,7 +25,7 @@ HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -DHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w -es2 -gc0
 CUSERFLAGS   = /D"HB_EXT_INKEY"
 CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__WIN32__" /D"NULL=0" $(CUSERFLAGS)
-LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
+LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE /NOEXPOBJ
 
 !ifdef HB_MT
 CFLAGS = $(CFLAGS) /D"HB_THREAD_SUPPORT" /MT
@@ -184,6 +184,7 @@ HB_CMD       = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD       = $(CC_EXE) $(CFLAGS) /Fo$@ $**
 #CC_CMD_DLL  = $(CC_EXE) $(CFLAGS) /D"HB_EXEMEM_USED" /Fo$@ $**
 LIB_CMD      = $(LIB_EXE) /OUT:$@ $**
+CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ The Project ³Û
@@ -239,17 +240,16 @@ PROJECT = \
    $(GTPCA_LIB) \
    $(GTWVT_LIB) \
    $(GTGUI_LIB) \
-   $(HBTEST_EXE) \
-   $(HBDOC_EXE) \
-   $(HBMAKE_EXE) \
-   $(HBPP_EXE) \
-   $(XBSCRIPT_EXE)
 !endif
 
 PROJECT = \
-    $(PROJECT) \
-    $(HBTEST_EXE) \
-    $(HBRUN_EXE)
+   $(PROJECT) \
+   $(HBDOC_EXE) \
+   $(HBMAKE_EXE) \
+   $(HBPP_EXE) \
+   $(HBRUN_EXE) \
+   $(HBTEST_EXE) \
+   $(XBSCRIPT_EXE)
 
 ALL: $(PROJECT)
 
@@ -379,6 +379,10 @@ HBMAKE_EXE_OBJS = \
    $(OBJ_DIR)\pickfile.obj \
    $(OBJ_DIR)\prb_stak.obj \
    $(OBJ_DIR)\radios.obj \
+   $(OBJ_DIR)\fclass1.obj \
+   $(OBJ_DIR)\ffile1.obj \
+   $(OBJ_DIR)\ft_funcs.obj \
+   \
    $(OBJ_DIR)\hbmlang.obj
 
 
@@ -412,6 +416,7 @@ HBTIP_LIB_OBJS = \
    $(OBJ_DIR)\mail.obj \
    $(OBJ_DIR)\popcln.obj \
    $(OBJ_DIR)\smtpcln.obj \
+   $(OBJ_DIR)\thtml.obj \
    $(OBJ_DIR)\url.obj
 
 
@@ -2861,70 +2866,70 @@ $(OBJ_DIR)\winreg.obj : $(OBJ_DIR)\winreg.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(OBJ_DIR)\pcre_chartables.obj : $(PCREPOS_DIR)\pcre_chartables.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_dftables.obj : $(PCREPOS_DIR)\pcre_dftables.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_compile.obj : $(PCREPOS_DIR)\pcre_compile.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_config.obj : $(PCREPOS_DIR)\pcre_config.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_dfa_exec.obj : $(PCREPOS_DIR)\pcre_dfa_exec.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_exec.obj : $(PCREPOS_DIR)\pcre_exec.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_fullinfo.obj : $(PCREPOS_DIR)\pcre_fullinfo.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_get.obj : $(PCREPOS_DIR)\pcre_get.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_globals.obj : $(PCREPOS_DIR)\pcre_globals.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_info.obj : $(PCREPOS_DIR)\pcre_info.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_study.obj : $(PCREPOS_DIR)\pcre_study.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_newline.obj : $(PCREPOS_DIR)\pcre_newline.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 $(OBJ_DIR)\pcre_ucp_searchfuncs.obj : $(PCREPOS_DIR)\pcre_ucp_searchfuncs.c
-   $(CC_CMD)
+   $(CC_PCREPOS_CMD)
 
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -3667,6 +3672,12 @@ $(OBJ_DIR)\smtpcln.c : $(TIP_DIR)\smtpcln.prg
 $(OBJ_DIR)\smtpcln.obj : $(OBJ_DIR)\smtpcln.c
    $(CC_CMD)
 
+$(OBJ_DIR)\thtml.c : $(TIP_DIR)\thtml.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\thtml.obj : $(OBJ_DIR)\thtml.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\url.c : $(TIP_DIR)\url.prg
    $(HB_CMD)
 
@@ -4180,6 +4191,24 @@ $(OBJ_DIR)\prb_stak.obj : $(OBJ_DIR)\prb_stak.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbmlang.obj : $(HBMAKE_DIR)\hbmlang.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\fclass1.c : $(HBMAKE_DIR)\fclass1.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\fclass1.obj : $(OBJ_DIR)\fclass1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ffile1.c : $(HBMAKE_DIR)\ffile1.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\ffile1.obj : $(OBJ_DIR)\ffile1.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ft_funcs.c : $(HBMAKE_DIR)\ft_funcs.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\ft_funcs.obj : $(OBJ_DIR)\ft_funcs.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
