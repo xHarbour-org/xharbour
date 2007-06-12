@@ -134,6 +134,8 @@ HB_FUNC( PRINTEREXISTS )
 
 BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
+
+/*
    BOOL Result= FALSE ;
    TCHAR cBuffer[ MAXBUFFERSIZE ];
    DWORD nSize ;
@@ -144,16 +146,97 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
    {
      strtok( cBuffer, "," ) ;
      lstrcpy( pPrinterName, cBuffer ) ;
-     /* Set buffer size parameter to min required buffer size... */
+      Set buffer size parameter to min required buffer size... 
      *pdwBufferSize = ( DWORD ) lstrlen( cBuffer )+1;
      Result = TRUE ;
    }
    else
    {
-     /* If given buffer too small, set required size and fail... */
+      If given buffer too small, set required size and fail... 
      *pdwBufferSize = nSize+1 ;
    }
    return Result ;
+*/
+  OSVERSIONINFO osvi;
+  DWORD Needed, Returned, rc, BuffSize;
+  DWORD nSize;
+  LPPRINTER_INFO_5 PrinterInfo;
+  char* p;
+
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+  GetVersionEx(&osvi);
+
+  if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+  {
+    if (!EnumPrinters(PRINTER_ENUM_DEFAULT,NULL,5,NULL,0,&Needed,&Returned))
+    {
+      if ((rc = GetLastError()) != ERROR_INSUFFICIENT_BUFFER)
+        *BufferSize = Needed+1;
+        return FALSE;
+    }
+
+    if ((PrinterInfo = LocalAlloc(LPTR,Needed)) == NULL)
+      rc = GetLastError();
+    else
+    {
+      if (!EnumPrinters(PRINTER_ENUM_DEFAULT,NULL,5,(LPBYTE) PrinterInfo,Needed,&Needed,&Returned))
+        rc = GetLastError();
+      else
+      {
+        if (Returned > 0)
+        {
+          if ((DWORD) lstrlen(PrinterInfo->pPrinterName) > *BufferSize-1)
+          {       
+            rc = ERROR_INSUFFICIENT_BUFFER;
+          }
+          else
+          {
+            lstrcpy(PrinterName,PrinterInfo->pPrinterName);      
+            rc = ERROR_SUCCESS;
+          }
+          *BufferSize = (DWORD) lstrlen(PrinterInfo->pPrinterName);
+        }
+        else
+        {
+          *PrinterName = '0';
+          rc = ERROR_SUCCESS;
+        }
+      }
+
+      LocalFree(PrinterInfo);
+    }
+  }
+  else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
+  {
+    if (osvi.dwMajorVersion >= 5) /* Windows 2000 or later */
+    {
+      BuffSize = *BufferSize;
+      if (!GetDefaultPrinter(PrinterName,&BuffSize))
+        rc = GetLastError();
+      else
+        rc = ERROR_SUCCESS;
+      *BufferSize =BuffSize;
+    }
+    else /* Windows NT 4.0 or earlier */
+    {
+      nSize =GetProfileString("windows","device","",PrinterName,*BufferSize);
+      if (nSize == *BufferSize-1)
+      {
+        *BufferSize = nSize ;
+        return FALSE;
+      }
+
+      p = PrinterName;
+      while (*p != '0' && *p != ',')
+        ++p;
+      *p = '0';
+
+      rc = ERROR_SUCCESS;
+    }
+  }
+
+  return rc == ERROR_SUCCESS ? TRUE :FALSE ;
+
 }
 
 
