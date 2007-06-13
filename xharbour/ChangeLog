@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5607 2007/06/06 14:06:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5608 2007/06/06 22:20:04 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-06-12 09:00 UTC-0300 Luiz Rafael Culik Guimaraes
+  * source/rtl/tprinter.c
+    ! fixes hb_getDefaultPrinter to return correctly on windows xp/2003
+    
 2007-06-06 18:19 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/fm.c
     ! Fixed GPF trap due to typo in hb_xexit() related to uiAutoRelease
