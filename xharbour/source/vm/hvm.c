@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.636 2007/05/31 05:18:11 walito Exp $
+ * $Id: hvm.c,v 1.637 2007/06/06 14:06:24 ronpinkas Exp $
  */
 
 /*
@@ -7246,7 +7246,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    }
 
    if( pFunc )
-   {      
+   {
       #ifndef HB_NO_PROFILER
          if( bProfiler )
          {
@@ -7271,7 +7271,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          pFunc = pFuncSym->value.pFunPtr;
 
          if( pFunc )
-         {            
+         {
             // Force correct context for the executing function
             pItem->item.asSymbol.value = pFuncSym;
 
@@ -7292,27 +7292,27 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             {
                pFunc();
             }
-            
+
             if( pFuncSym->scope.value & HB_FS_CLSERROR )
             {
                hb_xfree( pFuncSym );
-               
+
                // NEEDed because Destructor will inspect the symbol value, which was just FREEd
                pItem->item.asSymbol.value = pSym;
-            }            
+            }
          }
          else
          {
             char *sClass = hb_objGetClsName( pSelf );
             //TraceLog( NULL, "METHOD NOT FOUND!\n" );
             hb_vmClassError( uiParams, sClass, pSym->szName, NULL );
-         }         
+         }
       }
       else
       {
          pFunc();
       }
-      
+
       //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
@@ -8365,7 +8365,7 @@ static void hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode )
    uiLocals = HB_PCODE_MKUSHORT( &pCode[ 2 ] );
    usSize -= 4 + ( uiLocals << 1 );
    pBlockCode = ( BYTE * ) pCode + 4 + ( uiLocals << 1 );
-   
+
    if( bDynCode )
    {
       pBlockTemp = pBlockCode;
@@ -8992,6 +8992,16 @@ static void hb_vmPopLocal( SHORT iLocal )
 
    HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
+   if( HB_IS_BYREF( pVal ) )
+   {
+      if( hb_itemUnRef( pVal ) == pLocal )
+      {
+         hb_errRT_BASE( EG_ARG, 9004, NULL, "Cyclic-Reference assignment!", 0 );
+         hb_stackDec();
+         return;
+      }
+   }
+
    if( ( HB_IS_NUMBER( pLocal ) && HB_IS_NUMBER( pVal ) ) || pLocal->type == pVal->type )
    {
       hb_itemForwardValue( pLocal, pVal );
@@ -9005,6 +9015,7 @@ static void hb_vmPopLocal( SHORT iLocal )
    {
       hb_itemForwardValue( pLocal, pVal );
    }
+
    hb_stackDec();
 }
 
@@ -9024,6 +9035,16 @@ static void hb_vmPopStatic( USHORT uiStatic )
    pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.iStatics + uiStatic - 1;
 
    //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
+
+   if( HB_IS_BYREF( pVal ) )
+   {
+      if( hb_itemUnRef( pVal ) == pStatic )
+      {
+         hb_errRT_BASE( EG_ARG, 9004, NULL, "Cyclic-Reference assignment!", 0 );
+         hb_stackDec();
+         return;
+      }
+   }
 
    if( ( HB_IS_NUMBER( pStatic ) && HB_IS_NUMBER( pVal ) ) || pStatic->type == pVal->type )
    {
@@ -9062,6 +9083,7 @@ static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, char * s
              strcmp( pLastSymbols->szModuleName, szModuleName ) == 0 )
          {
             pModuleSymbols = pLastSymbols->pSymbolTable;
+
             for( ui = 0; ui < uiSymbols; ++ui )
             {
                if( ( pSymbols[ ui ].scope.value & ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE ) ) !=
@@ -9071,12 +9093,14 @@ static PSYMBOLS hb_vmFindFreeModule( PHB_SYMB pSymbols, UINT uiSymbols, char * s
                   break;
                }
             }
+
             if( ui == uiSymbols )
             {
                --s_ulFreeSymbols;
                return pLastSymbols;
             }
          }
+
          pLastSymbols = pLastSymbols->pNext;
       }
    }
@@ -9153,16 +9177,20 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
                      hb_vmDo( 0 );
                   }
                }
+
                pLastSymbols->fInitStatics = FALSE;
             }
+
             pLastSymbols->hDynLib = hNewDynLib;
          }
+
          pLastSymbols = pLastSymbols->pNext;
       }
 
       if( fFound )
       {
          pLastSymbols = s_pSymbols;
+
          while( pLastSymbols )
          {
             if( pLastSymbols->hDynLib == hNewDynLib )
@@ -9174,21 +9202,25 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
                   for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                   {
                      scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
+
                      if( scope == HB_FS_INIT )
                      {
                         register int i;
 
                         hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                         hb_vmPushNil();
+
                         for( i = 0; i < argc; ++i )
                         {
                            hb_vmPushString( argv[i], strlen( argv[i] ) );
                         }
+
                         hb_vmDo( (USHORT) argc );
                      }
                   }
                }
             }
+
             pLastSymbols = pLastSymbols->pNext;
          }
       }
@@ -9227,18 +9259,21 @@ void hb_vmExitSymbolGroup( void * hDynLib )
                }
             }
          }
+
          pLastSymbols = pLastSymbols->pNext;
       }
 
       if( fFound )
       {
          pLastSymbols = s_pSymbols;
+
          while( pLastSymbols )
          {
             if( pLastSymbols->hDynLib == hDynLib )
             {
               hb_vmFreeSymbols( pLastSymbols );
             }
+
             pLastSymbols = pLastSymbols->pNext;
          }
       }
@@ -9266,6 +9301,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    {
       pNewSymbols = hb_vmFindFreeModule( pSymbolTable, uiSymbols, szModuleName );
    }
+
    if( pNewSymbols )
    {
       pNewSymbols->fActive = fRecycled = TRUE;
@@ -9309,13 +9345,16 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          PSYMBOLS pLastSymbols;
 
          pLastSymbols = s_pSymbols;
+
          while( pLastSymbols->pNext ) /* locates the latest processed group of symbols */
          {
             pLastSymbols = pLastSymbols->pNext;
          }
+
          pLastSymbols->pNext = pNewSymbols;
       }
    }
+
    pNewSymbols->pGlobals = pGlobals;
 
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
@@ -9328,6 +9367,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          pSymbol->value.pFunPtr = ( pSymbolTable + ui )->value.pFunPtr;
          pSymbol->scope.value = ( pSymbolTable + ui )->scope.value;
       }
+
       if( fDynLib )
       {
          pSymbol->scope.value |= HB_FS_DYNCODE;
