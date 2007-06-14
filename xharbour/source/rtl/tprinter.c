@@ -134,109 +134,89 @@ HB_FUNC( PRINTEREXISTS )
 
 BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 {
+   BOOL Result = FALSE ;
+   OSVERSIONINFO osvi;
+   osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+   GetVersionEx(&osvi);
 
+   if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT && osvi.dwMajorVersion >= 5) /* Windows 2000 or later */
+   {
+      typedef BOOL (WINAPI *DEFPRINTER)( LPTSTR, LPDWORD ) ; // stops warnings
+      DEFPRINTER fnGetDefaultPrinter;
+      HMODULE hWinSpool = LoadLibrary("winspool.drv");
+      if ( hWinSpool )
+      {
+         fnGetDefaultPrinter = GetProcAddress( hWinSpool, "GetDefaultPrinterA" );
+
+         if ( fnGetDefaultPrinter )
+         {
+            Result = ( *fnGetDefaultPrinter)( pPrinterName, pdwBufferSize);
+         }
+         FreeLibrary( hWinSpool );
+      }
+   }
+
+   if ( !Result ) /* Win9X and Windows NT 4.0 or earlier & 2000+ if necessary for some reason i.e. dll could not load!!!! */
+   {
+      DWORD dwSize = GetProfileString( "windows", "device", "", pPrinterName, *pdwBufferSize) ;
+      if ( dwSize && dwSize < *pdwBufferSize)
+      {
+         dwSize = 0 ;
+         while ( pPrinterName[ dwSize ] != '\0' && pPrinterName[ dwSize ] != ',')
+         {
+            dwSize++;
+         }
+         pPrinterName[ dwSize ] = '\0';
+         *pdwBufferSize = dwSize + 1;
+         Result = TRUE ;
+      }
+      else
+      {
+         *pdwBufferSize = dwSize+1 ;
+      }
+   }
+
+   if ( !Result && osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
+   {
 /*
-   BOOL Result= FALSE ;
-   TCHAR cBuffer[ MAXBUFFERSIZE ];
-   DWORD nSize ;
-   *pPrinterName = '\0' ;
-   nSize = GetProfileString( "windows", "device", "", cBuffer, MAXBUFFERSIZE ) ;
+      This option should never be required but is included because of this article
 
-   if (nSize < *pdwBufferSize)
-   {
-     strtok( cBuffer, "," ) ;
-     lstrcpy( pPrinterName, cBuffer ) ;
-      Set buffer size parameter to min required buffer size... 
-     *pdwBufferSize = ( DWORD ) lstrlen( cBuffer )+1;
-     Result = TRUE ;
-   }
-   else
-   {
-      If given buffer too small, set required size and fail... 
-     *pdwBufferSize = nSize+1 ;
-   }
-   return Result ;
+          http://support.microsoft.com/kb/246772/en-us
+
+      This option will not enumerate any network printers.
+
+      From the SDK technical reference for EnumPrinters();
+
+      If Level is 2 or 5, Name is a pointer to a null-terminated string that specifies
+      the name of a server whose printers are to be enumerated.
+      If this string is NULL, then the function enumerates the printers installed on the local machine.
 */
-  OSVERSIONINFO osvi;
-  DWORD Needed, Returned, rc, BuffSize;
-  DWORD nSize;
-  LPPRINTER_INFO_5 PrinterInfo;
-  char* p;
 
-  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-  GetVersionEx(&osvi);
-
-  if (osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
-  {
-    if (!EnumPrinters(PRINTER_ENUM_DEFAULT,NULL,5,NULL,0,&Needed,&Returned))
-    {
-      if ((rc = GetLastError()) != ERROR_INSUFFICIENT_BUFFER)
-        *BufferSize = Needed+1;
-        return FALSE;
-    }
-
-    if ((PrinterInfo = LocalAlloc(LPTR,Needed)) == NULL)
-      rc = GetLastError();
-    else
-    {
-      if (!EnumPrinters(PRINTER_ENUM_DEFAULT,NULL,5,(LPBYTE) PrinterInfo,Needed,&Needed,&Returned))
-        rc = GetLastError();
-      else
+      DWORD dwNeeded, dwReturned, dwSize ;
+      PRINTER_INFO_2 *ppi2 ;
+      if ( EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned) ) ;
       {
-        if (Returned > 0)
-        {
-          if ((DWORD) lstrlen(PrinterInfo->pPrinterName) > *BufferSize-1)
-          {       
-            rc = ERROR_INSUFFICIENT_BUFFER;
-          }
-          else
-          {
-            lstrcpy(PrinterName,PrinterInfo->pPrinterName);      
-            rc = ERROR_SUCCESS;
-          }
-          *BufferSize = (DWORD) lstrlen(PrinterInfo->pPrinterName);
-        }
-        else
-        {
-          *PrinterName = '0';
-          rc = ERROR_SUCCESS;
-        }
+         if ( dwNeeded > 0 )
+         {
+            ppi2 = (PRINTER_INFO_2 *) hb_xgrab(  dwNeeded );
+            if ( ppi2 )
+            {
+               if ( EnumPrinters(PRINTER_ENUM_DEFAULT, NULL, 2, (LPBYTE) ppi2, dwNeeded, &dwNeeded, &dwReturned) && dwReturned > 0 )
+               {
+                  DWORD dwSize = (DWORD) lstrlen( ppi2->pPrinterName) ;
+                  if ( dwSize && dwSize < *pdwBufferSize  )
+                  {
+                     lstrcpy( pPrinterName, ppi2->pPrinterName);
+                     *pdwBufferSize = dwSize + 1;
+                     Result = TRUE ;
+                  }
+               }
+               hb_xfree( ppi2 ) ;
+            }
+         }
       }
-
-      LocalFree(PrinterInfo);
-    }
-  }
-  else if (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)
-  {
-    if (osvi.dwMajorVersion >= 5) /* Windows 2000 or later */
-    {
-      BuffSize = *BufferSize;
-      if (!GetDefaultPrinter(PrinterName,&BuffSize))
-        rc = GetLastError();
-      else
-        rc = ERROR_SUCCESS;
-      *BufferSize =BuffSize;
-    }
-    else /* Windows NT 4.0 or earlier */
-    {
-      nSize =GetProfileString("windows","device","",PrinterName,*BufferSize);
-      if (nSize == *BufferSize-1)
-      {
-        *BufferSize = nSize ;
-        return FALSE;
-      }
-
-      p = PrinterName;
-      while (*p != '0' && *p != ',')
-        ++p;
-      *p = '0';
-
-      rc = ERROR_SUCCESS;
-    }
-  }
-
-  return rc == ERROR_SUCCESS ? TRUE :FALSE ;
-
+   }
+   return( Result ) ;
 }
 
 
