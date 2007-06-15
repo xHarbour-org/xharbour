@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.54 2007/05/03 03:03:11 andresreyesh Exp $
+ * $Id: hbclass.ch,v 1.55 2007/05/09 19:56:23 ronpinkas Exp $
  */
 
 /*
@@ -453,7 +453,7 @@ DECLARE HBClass ;
 
 #xcommand METHOD <MethodName> [ AS <type> ] DEFERRED => ;
    _HB_MEMBER _AsFunc_( <MethodName> ) [ AS <type> ];;
-   s_oClass:AddVirtual( _AsStr( <MethodName> ) )
+   s_oClass:AddVirtual( _AsStr_( <MethodName> ) )
 
 #endif
 
@@ -585,7 +585,7 @@ DECLARE HBClass ;
 
   #xcommand CLASSMETHOD <MethodName>([<params,...>]) [ <clsctor: CONSTRUCTOR> ] [ AS <type> ] [<export: EXPORTED, VISIBLE, PUBLIC>] [<protect: PROTECTED>] [<hidde: HIDDEN, PRIVATE>] [<share: SHARED>] [<sync: SYNC>] [_CLASS_DECLARATION_] => ;
     _HB_MEMBER <MethodName>([ <params>]) [ AS <type> ];;
-    s_oClass:AddClsMethod( _AsStr( <MethodName> ), CLSMETH _CLASS_NAME_ _AsName_( <MethodName> )(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
+    s_oClass:AddClsMethod( _AsStr_( <MethodName> ), CLSMETH _CLASS_NAME_ _AsName_( <MethodName> )(), HBCLSCHOICE( .F., <.export.>, <.protect.>, <.hidde.> ) + iif( <.share.>, HB_OO_CLSTP_SHARED, 0 ) + iif( <.clsctor.>, HB_OO_CLSTP_CLASSCTOR, 0 ) + iif( <.sync.>, HB_OO_CLSTP_SYNC, 0 ) );;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED METHOD _CLASS_NAME_ <MethodName>(\[ \<anyParams>]);;
     #xcommand PROCEDURE <MethodName> \[(\[\<anyParams,...>])] \[DECLCLASS _CLASS_NAME_] _CLASS_IMPLEMENTATION_ => DECLARED PROCEDURE _CLASS_NAME_ <MethodName>(\[ \<anyParams>]);;
     #xcommand METHOD <MethodName> \[(\[\<anyParams,...>])] \<ClassName> _CLASS_IMPLEMENTATION_ => DECLARED METHOD \<ClassName> <MethodName>(\[ \<anyParams>]);;

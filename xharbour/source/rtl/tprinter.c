@@ -146,7 +146,7 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
       HMODULE hWinSpool = LoadLibrary("winspool.drv");
       if ( hWinSpool )
       {
-         fnGetDefaultPrinter = GetProcAddress( hWinSpool, "GetDefaultPrinterA" );
+         fnGetDefaultPrinter = ( DEFPRINTER ) GetProcAddress( hWinSpool, "GetDefaultPrinterA" );
 
          if ( fnGetDefaultPrinter )
          {
