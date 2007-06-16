@@ -192,7 +192,7 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
       If this string is NULL, then the function enumerates the printers installed on the local machine.
 */
 
-      DWORD dwNeeded, dwReturned, dwSize ;
+      DWORD dwNeeded, dwReturned ;
       PRINTER_INFO_2 *ppi2 ;
       if ( EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned) ) ;
       {
