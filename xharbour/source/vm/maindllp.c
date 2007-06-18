@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.16 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.17 2007/04/30 01:16:30 ronpinkas Exp $
  */
 
 /*
@@ -92,10 +92,6 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 /* module symbols initialization */
 HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   va_list ap;
-   USHORT uiModuleSymbols;
-   int iPCodeVer;
-   char *szModule;
    FARPROC pProcessSymbols;
 
    /* notice hb_vmProcessDllSymbols() must be used, and not
