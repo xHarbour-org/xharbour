@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5613 2007/06/16 23:48:02 peterrees Exp $
+ * $Id: ChangeLog,v 1.5614 2007/06/18 12:25:30 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-06-18 10:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+  * source/vm/maindllp.c
+    * fixed error (Undefined symbol 'pModuleSymbols') and 
+      warning (Parameter 'pGlobals' is never used)
 
 2007-06-18 08:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbtypes.h

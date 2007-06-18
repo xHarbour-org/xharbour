@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.17 2007/04/30 01:16:30 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.18 2007/06/18 12:25:31 ronpinkas Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    FARPROC pProcessSymbols;
+   HB_SYMBOL_UNUSED( pGlobals );
 
    /* notice hb_vmProcessDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
@@ -102,7 +103,7 @@ HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 
    if( pProcessSymbols )
    {
-      return ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pModuleSymbols, uiModuleSymbols, szModule, iPCodeVer );
+      return ( ( VM_PROCESS_DLL_SYMBOLS ) pProcessSymbols )( pSymbols, uiModuleSymbols, szModule, iPCodeVer );
    }
    /* else
     *    may we issue an error ? */
