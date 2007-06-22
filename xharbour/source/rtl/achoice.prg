@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.34 2007/02/26 15:05:57 modalsist Exp $
+ * $Id: achoice.prg,v 1.35 2007/02/27 00:01:30 modalsist Exp $
  */
 
 /*
@@ -72,15 +72,15 @@ LOCAL xItem
 /* Clipper compliant. */
 DEFAULT nTop    TO 0
 DEFAULT nLeft   TO 0
-DEFAULT nBottom TO 0 
-DEFAULT nRight  TO 0 
+DEFAULT nBottom TO 0
+DEFAULT nRight  TO 0
 
   // Parameters check.
 
   If !Hb_IsNumeric( nTop ) .or.;
      !Hb_IsNumeric( nLeft ) .or.;
      !Hb_IsNumeric( nBottom ) .or.;
-     !Hb_IsNumeric( nRight ) 
+     !Hb_IsNumeric( nRight )
 
      Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <nTop,nLeft,nBottom,nRight>", "Argument type error" ) )
 
@@ -90,26 +90,30 @@ DEFAULT nRight  TO 0
         Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <nTop> greater than <nBottom>" ) )
      Endif
 
-     If nLeft > nRight 
+     If nLeft > nRight
         Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <nLeft> greater than <nRight>"  ) )
      Endif
 
   Endif
 
 
+  If Hb_IsNil(acItems) .OR. !Hb_IsArray( acItems ) .OR. Empty( acItems ) // This is Clipper compatible
+    RETURN( 0 )
+/*
   If !Hb_IsNil(acItems)
      If !Hb_IsArray( acItems )
         Throw( ErrorNew( "BASE", 0, 1127, Procname()+" <acMenuItems>", "Argument type error"  ) )
      Elseif Empty( acItems )
         Throw( ErrorNew( "BASE", 0, 1127, Procname()+":<acMenuItems>", "Argument error. Empty Array" ) )
-     Else
-        For Each xItem In acItems
-            If !Hb_IsString( xItem )
-               Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
-            Endif
-        Next
-     Endif
-  Endif
+*/
+   Else
+      For Each xItem In acItems
+          If !Hb_IsString( xItem )
+             Throw( ErrorNew( "BASE", 0, 1127, Procname(), "Argument error: <acMenuItems> should contain string values" ) )
+          Endif
+      Next
+   Endif
+//  Endif
 
   IF !Hb_IsNil( uSelect )
      If !Hb_IsArray( uSelect ) .AND. !Hb_IsLogical( uSelect )
@@ -169,7 +173,7 @@ CLASS TAChoice
 
    VAR    cProcName                      // Calling procedure name
    VAR    nProcLine                      // Calling procedure line
-   
+
    VAR    nSize                          // Rows to skip, used to move cursor.
 
    METHOD New    CONSTRUCTOR             // Initializes TAChoice
@@ -491,7 +495,7 @@ LOCAL nDiff := 0
    ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F., .f.)
    ::nFirstRow := Max( Min( ::nFirstRow + nMoveScreen, ::nItems - ::nSize ), 1 )
    DO WHILE nBounce < 2
-      ::nOption += nMove                 
+      ::nOption += nMove
       IF ::nOption < 1
          ::nOption := 1
          nDirection := 1

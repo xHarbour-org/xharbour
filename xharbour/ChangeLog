@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5614 2007/06/18 12:25:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5615 2007/06/18 17:23:16 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,10 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-06-22 16:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/achoice.prg
+    * restore Clipper compatibility, stop RTL error if <acItems>
+      is =NIL, ={} or not array type. Just return 0
 
 2007-06-18 10:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * source/vm/maindllp.c
-    * fixed error (Undefined symbol 'pModuleSymbols') and 
+    * fixed error (Undefined symbol 'pModuleSymbols') and
       warning (Parameter 'pGlobals' is never used)
 
 2007-06-18 08:24 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
