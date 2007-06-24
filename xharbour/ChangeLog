@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5615 2007/06/18 17:23:16 kaddath Exp $
+ * $Id: ChangeLog,v 1.5616 2007/06/22 04:07:14 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-06-23 03:00 UTC-0800 Brian Hays <bhays at abacuslaw.com>
+  * contrib/rdd_ads/ads1.c
+    * Sync'ed with Harbour to bring in new commonError()
+	and miscellaneous error handling;
+	fixes neterr() not being set to TRUE as reported by Patrick.
+
+  Note: Harbour still lacks a few of our fixes, including the "set"
+        internal pointer references being replaced by
+		hb_setext = hb_GetSetStructPtr();
+        This file "should" be fine to post to Harbour as
+	  well to keep in sync, but I haven't downloaded nor
+        tested with their cvs.  It would be good if someone
+        could take the time to do that.
+
 2007-06-22 16:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/achoice.prg
     * restore Clipper compatibility, stop RTL error if <acItems>
