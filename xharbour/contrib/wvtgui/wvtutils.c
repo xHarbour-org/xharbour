@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.13 2007/03/17 18:49:38 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.14 2007/03/18 05:40:46 vouchcac Exp $
  */
 
 /*
@@ -2357,4 +2357,49 @@ HB_FUNC( WIN_NOT )
 }
 
 //----------------------------------------------------------------------//
+
+HB_FUNC( WIN_TRACKPOPUPMENU )
+{
+   HMENU hMenu  = ( HMENU ) hb_parnl( 1 );
+   UINT  uFlags = ISNIL( 2 ) ? TPM_CENTERALIGN | TPM_RETURNCMD : hb_parnl( 2 );
+   HWND  hWnd   = ISNIL( 3 ) ? GetActiveWindow() : ( HWND ) hb_parnl( 3 );
+
+   POINT xy = { 0 };
+
+   GetCursorPos( &xy );
+
+   hb_retnl( TrackPopupMenu( hMenu, uFlags, xy.x, xy.y, 0, hWnd, NULL ) );
+}
+
+//-------------------------------------------------------------------//
+
+HB_FUNC( WIN_CHOOSECOLOR )
+{
+   CHOOSECOLOR cc ;
+   COLORREF    crCustClr[ 16 ] ;
+   int         i ;
+
+   for( i = 0 ; i < 16 ; i++ )
+   {
+     crCustClr[ i ] = ( ISARRAY( 2 ) ? ( COLORREF ) hb_parnl( 2, i+1 ) : GetSysColor( COLOR_BTNFACE ) ) ;
+   }
+
+   cc.lStructSize   = sizeof( CHOOSECOLOR ) ;
+   cc.hwndOwner     = ISNIL( 4 ) ? NULL : (HWND) hb_parnl( 4 );
+   cc.rgbResult     = ISNIL( 1 ) ?  0 : ( COLORREF ) hb_parnl( 1 ) ;
+   cc.lpCustColors  = crCustClr ;
+   cc.Flags         = ( WORD ) ( ISNIL( 3 ) ? CC_ANYCOLOR | CC_RGBINIT | CC_FULLOPEN : hb_parnl( 3 ) );
+
+   if ( ChooseColor( &cc ) )
+   {
+      hb_retnl( cc.rgbResult ) ;
+   }
+   else
+   {
+      hb_retnl( -1 );
+   }
+}
+
+//-------------------------------------------------------------------//
+
 
