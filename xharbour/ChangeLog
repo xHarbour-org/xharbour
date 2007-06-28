@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5616 2007/06/22 04:07:14 peterrees Exp $
+ * $Id: ChangeLog,v 1.5617 2007/06/24 01:05:49 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 11:40 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * contrib/wvtgui/wvtcore.c
+    ! Fixes in Wvt_DrawScrollThumbHorz() and Wvt_DrawScrollThumbVert() 
+  * contrib/wvtgui/wvtclass.prg
+    ! Added few more methods and behavior of SetKey() changed. 
 
 2007-06-23 03:00 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c
