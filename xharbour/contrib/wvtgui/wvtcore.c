@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.9 2007/03/16 21:20:36 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.10 2007/03/17 18:49:38 vouchcac Exp $
  */
 
 /*
@@ -2189,12 +2189,14 @@ HB_FUNC( WVT_DRAWSCROLLTHUMBVERT )
 
    //  Background
    //
+   SetBkMode( _s->hdc, OPAQUE );
    SetBkColor( _s->hdc, RGB( 230,230,230 ) );
    SelectObject( _s->hdc, _s->diagonalBrush );
    SelectObject( _s->hdc, _s->penNull );
    Rectangle( _s->hdc, iLeft, iTop, iRight+1, iBottom+1 );
    if ( _s->bGui )
    {
+      SetBkMode( _s->hGuiDC, OPAQUE );
       SetBkColor( _s->hGuiDC, RGB( 230,230,230 ) );
       SelectObject( _s->hGuiDC, _s->diagonalBrush );
       SelectObject( _s->hGuiDC, _s->penNull );
@@ -2242,12 +2244,14 @@ HB_FUNC( WVT_DRAWSCROLLTHUMBHORZ )
 
    //  Background
    //
+   SetBkMode( _s->hdc, OPAQUE );
    SetBkColor( _s->hdc, RGB( 230,230,230 ) );
    SelectObject( _s->hdc, _s->diagonalBrush );
    SelectObject( _s->hdc, _s->penNull );
    Rectangle( _s->hdc, iLeft, iTop, iRight+1, iBottom+1 );
    if ( _s->bGui )
    {
+      SetBkMode( _s->hGuiDC, OPAQUE );
       SetBkColor( _s->hGuiDC, RGB( 230,230,230 ) );
       SelectObject( _s->hGuiDC, _s->diagonalBrush );
       SelectObject( _s->hGuiDC, _s->penNull );
