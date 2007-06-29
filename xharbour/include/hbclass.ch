@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.55 2007/05/09 19:56:23 ronpinkas Exp $
+ * $Id: hbclass.ch,v 1.56 2007/06/15 09:54:29 alexstrickland Exp $
  */
 
 /*
@@ -371,23 +371,33 @@ DECLARE HBClass ;
      ; #xuntranslate Super() : ;
      ; #xuntranslate Super : ;
      ; #xuntranslate : Super : ;
-     [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
+     ;;
+     [ ; DECLSUPERN <SuperClassN> ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
      ; #translate Super : => ::<SuperClass1>: ;
      ; #translate : Super : => :<SuperClass1>:
 
-#xcommand  DECLSUPER <Func>( <SuperClass1> ) [, <FuncN>( <SuperClassN> ) ] ;
+#xcommand  DECLSUPER <Func>( <SuperClass1> ) [, <SuperClassN> ] ;
       =>;
      ; #xuntranslate Super() : ;
      ; #xuntranslate Super : ;
      ; #xuntranslate : Super : ;
-     [ ; #translate Super( <SuperClassN> ) : => ::<SuperClassN>: ] ;
+     ;;
+     [ ; DECLSUPERN <SuperClassN> ] ;
      ; #translate Super( <SuperClass1> ) : => ::<SuperClass1>: ;
      ; #translate Super() : => ::<SuperClass1>: ;
      ; #translate Super : => ::<SuperClass1>: ;
      ; #translate : Super : => :<SuperClass1>:
 
+#xcommand DECLSUPERN <SuperClass> ;
+      =>;
+      #translate Super( <SuperClass> ) : => ::<SuperClass>:
+
+#xcommand DECLSUPERN <Func>( <SuperClass> ) ;
+      =>;
+      #translate Super( <SuperClass> ) : => ::<SuperClass>:
+      
 /* Disable the message :Class */
 /* CLASSY SYNTAX */
 #IFDEF HB_CLS_CSY
