@@ -1,5 +1,5 @@
 /*
- * $Id: dateshb.c,v 1.17 2007/04/19 13:18:40 walito Exp $
+ * $Id: dateshb.c,v 1.18 2007/05/27 13:23:05 likewolf Exp $
  */
 
 /*
@@ -349,7 +349,7 @@ static int hb_timectot( char const * szTime, int * ph_value, int * pm_value, dou
             break;
          }
       }
-      
+
       if( pm )
       {
          h_value %= 12;
@@ -419,7 +419,23 @@ HB_FUNC( DTOS )
 
 HB_FUNC( STOD )
 {
-   hb_retds( hb_parclen( 1 ) >= 8 ? hb_parc( 1 ) : NULL );
+   ULONG iLen = hb_parclen( 1 ) ;
+   if ( iLen == 8 )
+   {
+     hb_retds( hb_parc( 1 ) );
+   }
+   else if ( iLen < 8 )
+   {
+     hb_retds( NULL );
+   }
+   else
+   {
+     char szDate[ 9 ] ;
+     char *pDate = hb_parcx( 1 ) ;
+     memcpy( szDate, pDate, 8 ) ;
+     szDate[ 8 ] = '\0' ;
+     hb_retds( szDate );
+   }
 }
 
 HB_FUNC( YEAR )
@@ -646,11 +662,11 @@ HB_FUNC( CTOT )
       {
          fin = hb_datectod( szDate, &d_value, &m_value, &y_value );
       }
-      
+
       if( fin < len )
       {
          char szTime[ 13 ];
-   
+
          len -= fin;
          memset( szTime, ' ', 12 );
          memcpy( szTime, szDate+fin+1, (len>12?12:len) );

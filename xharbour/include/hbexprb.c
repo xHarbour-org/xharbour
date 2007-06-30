@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.117 2007/04/30 01:16:29 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.118 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /*
@@ -1808,7 +1808,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   {
                      ULONG i;
                      bEmpty = TRUE;
-                     for ( i=0;i<pArg->ulLength;i++)
+                     for ( i=0 ; i < pArg->ulLength && i < 8 ; i++)
                      {
                         if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
                         {
@@ -2793,9 +2793,9 @@ static HB_EXPR_FUNC( hb_compExprUseRTVariable )
          {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asRTVar.pMacro );
          }
-         
+
 #if defined( HB_MACRO_SUPPORT )
-         if( pSelf->value.asRTVar.szName ) 
+         if( pSelf->value.asRTVar.szName )
          {
              HB_XFREE( pSelf->value.asRTVar.szName );
          }
@@ -3006,7 +3006,7 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
                HB_XFREE( pSelf->value.asMessage.szMessage );
             }
             else
-         #endif   
+         #endif
             {
                if( pSelf->value.asMessage.pMacroMessage )
                {
@@ -3133,7 +3133,7 @@ static HB_EXPR_FUNC( hb_compExprUseWithSend )
             {
                HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asMessage.pParms );
             }
-			
+
          #if defined( HB_MACRO_SUPPORT )
             if( pSelf->value.asMessage.szMessage )
             {

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5618 2007/06/28 18:41:38 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5619 2007/06/29 05:22:53 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,16 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-06-30 15:00 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/dateshb.c
+    * change HB_FUNC( STOD ) to support strings passed longer than 8 char
+       e.g. STOD( "20070630sadasd " )
+  * source/hbexprb.c
+    * alter STOD() optimiser support date strings "YYYYMMDD" passed longer than 8 char
+  * source/common/hbdate.c
+    * hb_dateStrGet() support date strings "YYYYMMDD" passed longer than 8 char
+  * source/rdd/delim.c
+    * support date strings "YYYYMMDD" passed longer than 8 char
 
 2007-05-28 11:19 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbclass.ch
-     + #xcommand DECLSUPERN - for bug in superclass declaration 
+     + #xcommand DECLSUPERN - for bug in superclass declaration
 
 2007-05-28 11:40 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/wvtgui/wvtcore.c
-    ! Fixes in Wvt_DrawScrollThumbHorz() and Wvt_DrawScrollThumbVert() 
+    ! Fixes in Wvt_DrawScrollThumbHorz() and Wvt_DrawScrollThumbVert()
   * contrib/wvtgui/wvtclass.prg
-    ! Added few more methods and behavior of SetKey() changed. 
+    ! Added few more methods and behavior of SetKey() changed.
 
 2007-06-23 03:00 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c

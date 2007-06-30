@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.5 2007/03/27 06:32:50 walito Exp $
+ * $Id: hbdate.c,v 1.6 2007/04/19 13:18:40 walito Exp $
  */
 
 /*
@@ -192,7 +192,7 @@ HB_EXPORT void hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, 
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dateStrGet(%s, %p, %p, %p)", szDate, piYear, piMonth, piDay));
 
-   if( szDate && szDate[ 8 ] == '\0' )
+   if( szDate && strlen( szDate ) >= 8 )
    {
       /* Date string has correct length, so attempt to convert */
       *piYear  = ( ( USHORT ) ( szDate[ 0 ] - '0' ) * 1000 ) +
