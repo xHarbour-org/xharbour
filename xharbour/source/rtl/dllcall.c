@@ -1,5 +1,5 @@
 /*
- * $Id: dllcall.c,v 1.10 2007/04/30 10:18:34 alexstrickland Exp $
+ * $Id: dllcall.c,v 1.11 2007/05/25 16:44:12 enricomaria Exp $
  */
 
 /*
@@ -471,8 +471,16 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
 
             case HB_IT_STRING            :
             case HB_IT_MEMO              :
-               Parm[iCnt].nWidth = sizeof(  void * );
-               Parm[iCnt].pArg = (void *) hb_parc( i );
+               Parm[iCnt].nWidth = sizeof( void * );
+               if ( hb_parinfo( i ) & HB_IT_BYREF )
+               {
+                  Parm[iCnt].pArg = malloc( hb_parclen( i ) );
+                  memcpy( Parm[iCnt].pArg, hb_parc( i ), hb_parclen( i ) );
+               }
+               else
+               {
+                  Parm[iCnt].pArg = (void *) hb_parc( i );
+               }
                Parm[iCnt].dwFlags = DC_FLAG_ARGPTR;  // use the pointer
                break;
 
@@ -500,10 +508,10 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
       }
    }
 
-   SetLastError(0);
+   /*SetLastError(0);*/
    rc = DynaCall(iFlags, lpFunction, iArgCnt, Parm, NULL, 0);
 
-   if( GetLastError() )
+   /*if( GetLastError() )
    {
       LPVOID lpMsgBuf;
 
@@ -518,7 +526,7 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
       MessageBox( GetActiveWindow(), (LPCSTR) lpMsgBuf, "DllExec:DynaCall() failed!", MB_OK | MB_ICONERROR );
 
       LocalFree(lpMsgBuf);
-   }
+   }*/
 
    if( iArgCnt > 0)
    {
@@ -550,6 +558,8 @@ static void DllExec( int iFlags, LPVOID lpFunction, int iParams, int iFirst, int
 
                case HB_IT_STRING            :
                case HB_IT_MEMO              :
+                  hb_storclen( (char *) Parm[iCnt].pArg, hb_parclen( i ), i );
+                  free( Parm[iCnt].pArg );
                   break;
 
                case HB_IT_ARRAY             :

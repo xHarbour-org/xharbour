@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5620 2007/06/30 03:06:54 peterrees Exp $
+ * $Id: ChangeLog,v 1.5621 2007/07/02 04:27:32 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-07-02 15:15 UTC+200 Alex Strickland <sscc@mweb.co.za>
+  * source/rtl/dllcall.c
+    * Fix handling of strings passed by reference to use hb_parclen(), malloc() and free()
+      are used.
+    * Remove MessageBox() announcing result of GetLastError(), and also removed SetLastError().
+
 2007-07-02 16:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/memoedit.prg
     * added K_CTRL_N back into ::aConfigurableKeys in MemoInit()
