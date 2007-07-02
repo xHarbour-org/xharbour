@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.48 2006/09/16 21:12:28 modalsist Exp $
+ * $Id: memoedit.prg,v 1.49 2006/09/21 14:12:36 modalsist Exp $
  */
 
 /*
@@ -126,11 +126,11 @@ LOCAL nUdfReturn,i
 
 #ifdef HB_EXT_INKEY
    /* CTRL_V in not same as K_INS, this works as paste selected text to clipboard. */
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_RET } 
+   ::aConfigurableKeys := { K_CTRL_N, K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W, K_CTRL_RET }
    ::aExtKeys := { K_ALT_W, K_CTRL_A, K_CTRL_C, K_CTRL_V, K_SH_INS, K_CTRL_X, K_SH_DOWN, K_SH_UP, K_SH_DEL, K_SH_RIGHT, K_SH_LEFT, K_SH_END, K_SH_HOME }
 #else
    /* CTRL_V is same as K_INS, so it has special treatment in memoedit. */
-   ::aConfigurableKeys := { K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W }
+   ::aConfigurableKeys := { K_CTRL_N, K_CTRL_Y, K_CTRL_T, K_CTRL_B, K_CTRL_W }
    ::aExtKeys := {}
 #endif
 
@@ -173,7 +173,7 @@ METHOD Edit() CLASS TMemoEditor
 
    nNextKey := 0
 
-   WHILE !::lExitEdit 
+   WHILE !::lExitEdit
 
          if nNextKey == 0
             nKey := Inkey( 0 )
@@ -200,7 +200,7 @@ METHOD Edit() CLASS TMemoEditor
 
          /* 24/10/2005 - <maurilio.longo@libero.it>
                          Taken from clipper norton guide:
-           
+
                            The user function: <cUserFunction>, a user-defined function
                            specified as an argument, handles key exceptions and reconfigures
                            special keys.  The user function is called at various times by
@@ -211,7 +211,7 @@ METHOD Edit() CLASS TMemoEditor
                            default action assigned to them.  In the user function, you perform
                            various actions, depending on the current MEMOEDIT() mode, then
                            RETURN a value telling MEMOEDIT() what to do next.
-           
+
                            When the user function argument is specified, MEMOEDIT() defines two
                            classes of keys: nonconfigurable and key exceptions.  When a
                            nonconfigurable key is pressed, MEMOEDIT() executes it, otherwise a
@@ -220,7 +220,7 @@ METHOD Edit() CLASS TMemoEditor
                            process, the user function is called once again.
          */
 
-         IF ::bKeyBlock == NIL 
+         IF ::bKeyBlock == NIL
 
             IF ( ( nKey IN ::aEditKeys ) .OR.;
                  ( nKey IN ::aAsciiKeys ) .OR.;
@@ -360,7 +360,7 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
          exit
 
       CASE ME_WORDRIGHT    // (100)
-         ::WordRight()      
+         ::WordRight()
          exit
 
       CASE ME_BOTTOMRIGHT  // (101)
@@ -386,7 +386,7 @@ METHOD HandleUdf( nKey, nUdfReturn, lEdited ) CLASS TMemoEditor
         ENDIF
         exit
 #else
-        IF !lEdited .AND. nKey >=1 .AND. nKey <=31 
+        IF !lEdited .AND. nKey >=1 .AND. nKey <=31
            ::Super:Edit( nKey )
         ENDIF
         exit
@@ -524,7 +524,7 @@ FUNCTION MemoEdit(cString,;
 
 
    oEd:ProcName := ProcName( 1 )
-   oEd:ProcLine := ProcLine( 1 )   
+   oEd:ProcLine := ProcLine( 1 )
 
    oEd:MemoInit( xUDF )
    oEd:RefreshWindow()
@@ -536,7 +536,7 @@ FUNCTION MemoEdit(cString,;
       oEd:Edit()
 
       IF oEd:lSaved
-         cString := oEd:GetText( .T. )  // Clipper inserts Soft CR 
+         cString := oEd:GetText( .T. )  // Clipper inserts Soft CR
       ENDIF
 
    ELSE
