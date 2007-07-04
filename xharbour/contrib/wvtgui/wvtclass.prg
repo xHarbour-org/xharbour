@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.3 2007/06/28 18:33:27 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.4 2007/07/04 05:14:19 vouchcac Exp $
  */
 
 /*
@@ -593,8 +593,8 @@ METHOD Inkey() CLASS wvtDialog
             if ( ::lEventHandled )
                if ::oCurObj:nChildren > 0
                   for i := 1 to ::oCurObj:nChildren
-                     if ::nKey IN ::oCurObj:aChildren[ i, OBJ_CHILD_EVENTS ]
-                        ::oCurObj:NotifyChild( i,::nKey )
+                     if ( ::nKey IN ::oCurObj:aChildren[ i, OBJ_CHILD_EVENTS ] )
+                        ::oCurObj:NotifyChild( i, ::nKey, ::oCurObj )
                      endif
                   next
                endif
@@ -1189,8 +1189,8 @@ METHOD HandleEvent( nKey ) CLASS WvtBrowse
 
 //-------------------------------------------------------------------//
 
-METHOD NotifyChild( nIndex, nKey ) CLASS WvtBrowse
-   Local xData, i, nArea, nOrder, nRecNo, lUsed
+METHOD NotifyChild( nIndex, nKey, oCurObj ) CLASS WvtBrowse
+   Local xData
 
    if nIndex > 0 .and. nIndex <= len( ::aChildren )
       if valtype( ::aChildren[ nIndex, OBJ_CHILD_DATABLOCK ] ) == 'B'
@@ -1205,23 +1205,16 @@ METHOD NotifyChild( nIndex, nKey ) CLASS WvtBrowse
             xData )
 
       if ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:nChildren > 0
-         if ( lUsed := used() )
-            nArea  := Select()
-            nOrder := IndexOrd()
-            nRecNo := RecNo()
-         endif
-
-         Select( ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:cAlias )
+         // Pretend if focus is current on this object
+         //
+         Eval( ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:bOnFocus, ::aChildren[ nIndex, OBJ_CHILD_OBJ ] )
 
          for i := 1 to ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:nChildren
-            ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:NotifyChild( i, nKey )
+            ::aChildren[ nIndex, OBJ_CHILD_OBJ ]:NotifyChild( i, nKey, ::aChildren[ nIndex, OBJ_CHILD_OBJ ] )
          next
 
-         if lUsed
-            Select( nArea )
-            set order to nOrder
-            DbGoTo( nRecNo )
-         endif
+         // Restore previous environments
+         Eval( oCurObj:bOnFocus, oCurObj )
       endif
    endif
 

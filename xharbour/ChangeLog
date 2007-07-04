@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5622 2007/07/02 13:21:01 alexstrickland Exp $
+ * $Id: ChangeLog,v 1.5623 2007/07/04 05:16:35 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,7 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-05-28 22:22 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+2007-07-04 14:55 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * contrib/wvtgui/wvtclass.prg
+    ! Additional functionality.
+
+2007-07-03 22:22 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/wvtgui/wvtclass.prg
     ! Added few more Data Members to allow extended functionality.
 
