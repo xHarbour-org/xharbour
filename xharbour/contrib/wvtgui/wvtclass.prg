@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.2 2005/10/19 17:11:49 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.3 2007/06/28 18:33:27 vouchcac Exp $
  */
 
 /*
@@ -149,6 +149,8 @@ CLASS wvtDialog
    DATA   nLastOver             INIT -1
    DATA   nUseObj
    DATA   oMenu
+   DATA   aDialogKeys           INIT {}
+   DATA   cDialogID             INIT ''
 
    //  Tooltip Management
    //
@@ -580,6 +582,12 @@ METHOD Inkey() CLASS wvtDialog
 
       if !( ::lEventHandled )
          if ::nCurObj > 0
+            if !empty( ::aDialogKeys )
+               if ( n := ascan( ::aDialogKeys, {|e_| e_[ 1 ] == ::nKey } ) ) > 0
+                  Eval( ::aDialogKeys[ n, 2 ], self, ::oCurObj )
+               endif
+            endif
+
             ::lEventHandled := ::oCurObj:HandleEvent( ::nKey )
 
             if ( ::lEventHandled )

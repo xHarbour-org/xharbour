@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5621 2007/07/02 04:27:32 peterrees Exp $
+ * $Id: ChangeLog,v 1.5622 2007/07/02 13:21:01 alexstrickland Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-05-28 22:22 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * contrib/wvtgui/wvtclass.prg
+    ! Added few more Data Members to allow extended functionality.
+
 2007-07-02 15:15 UTC+200 Alex Strickland <sscc@mweb.co.za>
   * source/rtl/dllcall.c
     * Fix handling of strings passed by reference to use hb_parclen(), malloc() and free()
