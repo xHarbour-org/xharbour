@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.28 2007/03/25 06:12:50 walito Exp $
+ * $Id: macro.slx,v 1.29 2007/03/27 14:23:01 ronpinkas Exp $
  */
 
 /*
@@ -622,8 +622,6 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
    pYYLVAL = NULL;
    pMacro = pNewMacro;
 
-   RESET_LEX()
-
    DEBUG_INFO( printf( "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length ) );
    //TraceLog( NULL, "*** New Macro: >>>%s<<< Len: %i\n", pMacro->string, pMacro->length );
 
@@ -633,4 +631,6 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
 void hb_compFlexDelete( void * pBuffer )
 {
    HB_SYMBOL_UNUSED( pBuffer );
+   
+   RESET_LEX()
 }

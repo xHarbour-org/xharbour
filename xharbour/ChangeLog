@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5625 2007/07/05 11:09:07 marchuet Exp $
+ * $Id: ChangeLog,v 1.5626 2007/07/05 11:17:25 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-07-05 14:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * contrib/wvtgui/wvtclass.prg
+    * Missing decleration 
+  * include/simplex.c
+  * source/macro/macro.slx
+    * Minor memory leak 
+  * tests/tstcstru1.prg
+    * Corrected sample usage
+    
 2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
     ! fixed casting

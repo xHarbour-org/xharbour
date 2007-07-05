@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.4 2007/07/04 05:14:19 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.5 2007/07/04 21:53:40 vouchcac Exp $
  */
 
 /*
@@ -1190,7 +1190,7 @@ METHOD HandleEvent( nKey ) CLASS WvtBrowse
 //-------------------------------------------------------------------//
 
 METHOD NotifyChild( nIndex, nKey, oCurObj ) CLASS WvtBrowse
-   Local xData
+   Local xData, i
 
    if nIndex > 0 .and. nIndex <= len( ::aChildren )
       if valtype( ::aChildren[ nIndex, OBJ_CHILD_DATABLOCK ] ) == 'B'

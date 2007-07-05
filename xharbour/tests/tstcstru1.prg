@@ -70,7 +70,7 @@ Procedure Main()
    ?
 
    // Change something at C level and return back
-   oStructure:Pointer( Send_To_C_Change_Something_And_Return( oStructure:GetPointer() ) )
+   Send_To_C_Change_Something_And_Return( @oStructure )
 
    // Now Display members (2nd paramenter) and value via QOut() locally (3rd parameter returns a string)
    ? oStructure:SayMembers( "   ", .t., .t. )
@@ -79,7 +79,7 @@ Procedure Main()
    ?
 
    // Here we receive a true C Structure from a C Function.
-   oStructure:Pointer( DemoTransferFromC(), .T. ) // .T. (=lAdopt) it is needed to handle memory correctly
+   oStructure:Buffer( DemoTransferFromC(), .T. ) // .T. (=lAdopt) it is needed to handle memory correctly
                                                   // because structure is created at C level and we have to
                                                   // lock memory at prg level
 
@@ -91,7 +91,8 @@ Return
 
 #pragma BEGINDUMP
   #include "hbapi.h"
-
+  #include "hbvm.h"
+  
   #pragma pack(1)
   typedef struct _MYNESTEDSTRUCTURE
   {
@@ -111,6 +112,16 @@ Return
   } MY_STRUCTURE;
   #pragma pack()
 
+  static PHB_DYNS pVALUE, pDEVALUE;
+  
+  static void TstCStru1_Init( void * cargo )
+  {
+     HB_SYMBOL_UNUSED( cargo );
+
+     pVALUE         = hb_dynsymGetCase( "VALUE" );
+     pDEVALUE       = hb_dynsymGetCase( "DEVALUE" );   
+  }  
+  
   HB_FUNC( DEMOTRANSFERTOC )
   {
      //MY_STRUCTURE *MyStructure = (MY_STRUCTURE * ) hb_param( 1, HB_IT_STRING )->item.asString.value;
@@ -127,20 +138,33 @@ Return
              (char *) MyStructure->Nested.c1, MyStructure->Nested.l2 );
   }
 
-HB_FUNC( SEND_TO_C_CHANGE_SOMETHING_AND_RETURN )
+  HB_FUNC( SEND_TO_C_CHANGE_SOMETHING_AND_RETURN )
   {
-     MY_STRUCTURE *MyStructure = hb_parptr( 1 );
+     PHB_ITEM pStructure = hb_param( 1, HB_IT_BYREF );
 
-     MyStructure->cAge = 38;
+     if( pStructure && HB_IS_OBJECT( pStructure ) )
+     {
+        MY_STRUCTURE *MyStructure;
 
-     printf( "Name: %s Age: %i\ Weight: %u Height: %f Nested._1 %s Nested._2 %i\n",
-             MyStructure->sName, MyStructure->cAge, MyStructure->uiWeight, MyStructure->dHeight,
-             (char *) MyStructure->Nested.c1, MyStructure->Nested.l2 );
+        hb_vmPushSymbol( pVALUE->pSymbol );
+        hb_vmPush( pStructure );
+        hb_vmSend(0);
 
-     hb_retptr( MyStructure );
+        MyStructure = (MY_STRUCTURE *) hb_parc(-1);      
+        MyStructure->cAge = 38;
+
+        printf( "Name: %s Age: %i\ Weight: %u Height: %f Nested._1 %s Nested._2 %i\n",
+                  MyStructure->sName, MyStructure->cAge, MyStructure->uiWeight, MyStructure->dHeight,
+                  (char *) MyStructure->Nested.c1, MyStructure->Nested.l2 );
+                
+        //::DeValue()
+        hb_vmPushSymbol( pDEVALUE->pSymbol );
+        hb_vmPush( pStructure );
+        hb_vmSend(0);
+     }
   }
 
-    HB_FUNC( DEMOTRANSFERFROMC )
+  HB_FUNC( DEMOTRANSFERFROMC )
   {
      // We NEED to release main structure at end
      MY_STRUCTURE *MyStructure = (MY_STRUCTURE *) hb_xgrab( sizeof( MY_STRUCTURE ) );
@@ -168,9 +192,24 @@ HB_FUNC( SEND_TO_C_CHANGE_SOMETHING_AND_RETURN )
 
      MyStructure2->pNext = NULL;
 
-     //hb_retclenAdoptRaw( (char *) MyStructure, sizeof( MY_STRUCTURE ) );
-     hb_retptr( MyStructure );
-     hb_xfree( MyStructure );
+     hb_retclenAdoptRaw( (char *) MyStructure, sizeof( MY_STRUCTURE ) );
   }
 
+  HB_CALL_ON_STARTUP_BEGIN( _tstcstru1_init_ )
+    hb_vmAtInit( TstCStru1_Init, NULL );
+  HB_CALL_ON_STARTUP_END( _tstcstru1_init_ )
+
+  #if defined(HB_PRAGMA_STARTUP)
+   #pragma startup _tstcstru1_init_
+  #elif defined(HB_MSC_STARTUP)
+   #if _MSC_VER >= 1010
+      #pragma data_seg( ".CRT$XIY" )
+      #pragma comment( linker, "/Merge:.CRT=.data" )
+   #else
+      #pragma data_seg( "XIY" )
+   #endif
+   static HB_$INITSYM tstcstru1_init = _tstcstru1_init_;
+   #pragma data_seg()
+  #endif
+  
 #pragma ENDDUMP
