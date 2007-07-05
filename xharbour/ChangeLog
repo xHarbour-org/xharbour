@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5624 2007/07/04 21:55:55 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5625 2007/07/05 11:09:07 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    ! fixed casting
+    % do not copy date value to separate memory buffer but decode dates directly from record buffer
+    * cleaned few warnings
 
 2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/delim1.c
