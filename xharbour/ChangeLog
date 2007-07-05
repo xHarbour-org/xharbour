@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5623 2007/07/04 05:16:35 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5624 2007/07/04 21:55:55 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
+  * source/rdd/delim1.c
+  * source/rdd/dbf1.c
+  * source/rdd/sdf1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+    ! fixed casting
+    % do not copy date value to separate memory buffer but decode dates directly from record buffer
+    * cleaned few warnings
+    ; synced with harbour
+
+  * source/rdd/hbsix/sxcompr.c
+    ! fixed bug in workaround for SIX3 bug ;-)
+    ; synced with harbour
 
 2007-07-04 14:55 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/wvtgui/wvtclass.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.174 2007/05/18 09:36:57 marchuet Exp $
+ * $Id: dbf1.c,v 1.175 2007/05/25 08:40:02 marchuet Exp $
  */
 
 /*
@@ -946,6 +946,8 @@ static ERRCODE hb_dbfLockData( DBFAREAP pArea,
          break;
 #endif
       default:
+         *ulPos = *ulFlSize = *ulRlSize = 0;
+         *iDir = 0;
          return FAILURE;
    }
    return SUCCESS;
@@ -1490,10 +1492,7 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          else
          {
-            char szBuffer[ 9 ];
-            memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], 8 );
-            szBuffer[ 8 ] = 0;
-            hb_itemPutDS( pItem, szBuffer );
+            hb_itemPutDS( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ] );
          }
          break;
 
@@ -2749,8 +2748,7 @@ static ERRCODE hb_dbfInfo( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          HB_FOFFSET ulPos, ulFlSize, ulRlSize;
          int iDir;
 
-         if( hb_dbfLockData( pArea, &ulPos, &ulFlSize, &ulRlSize, &iDir ) == FAILURE )
-            ulPos = 0;
+         hb_dbfLockData( pArea, &ulPos, &ulFlSize, &ulRlSize, &iDir );
          hb_itemPutNInt( pItem, ulPos );
          break;
       }

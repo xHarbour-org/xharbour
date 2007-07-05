@@ -1,5 +1,5 @@
 /*
- * $Id: delim1.c,v 1.26 2007/04/25 01:37:11 ronpinkas Exp $
+ * $Id: delim1.c,v 1.27 2007/05/04 11:29:01 marchuet Exp $
  */
 
 /*
@@ -589,12 +589,7 @@ static ERRCODE hb_delimGetValue( DELIMAREAP pArea, USHORT uiIndex, PHB_ITEM pIte
          break;
 
       case HB_IT_DATE:
-         {
-            char szBuffer[ 9 ];
-            memcpy( szBuffer, pArea->pRecord + pArea->pFieldOffset[ uiIndex ], 8 );
-            szBuffer[ 8 ] = 0;
-            hb_itemPutDS( pItem, szBuffer );
-         }
+         hb_itemPutDS( pItem, ( char * ) pArea->pRecord + pArea->pFieldOffset[ uiIndex ] );
          break;
 
       case HB_IT_LONG:

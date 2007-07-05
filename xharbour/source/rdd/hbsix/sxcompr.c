@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.7 2007/03/02 02:36:23 druzus Exp $
+ * $Id: sxcompr.c,v 1.8 2007/05/04 11:29:02 marchuet Exp $
  */
 
 /*
@@ -695,6 +695,7 @@ HB_FUNC( _SX_STRCOMPRESS )
          /* It's not six compatible - it's a workaround for wrongly defined SIX behavior */
          HB_PUT_LE_UINT32( pBuf, HB_SX_UNCOMPRESED );
          memcpy( pBuf + 4, pStr, ulLen );
+         ulDst = ulLen;
       }
       hb_retclen( ( char * ) pBuf, ulDst + 4 );
       hb_xfree( pBuf );
