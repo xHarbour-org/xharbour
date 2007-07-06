@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.71 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: macro.c,v 1.72 2007/07/06 00:56:01 ronpinkas Exp $
  */
 
 /*
@@ -284,9 +284,14 @@ BOOL HB_EXPORT hb_macroIsIdent( char * szString )
                ++pTmp;
             }
 
+            while( *pTmp == ' ' && pTmp - szString < HB_SYMBOL_NAME_LEN )
+            {
+               ++pTmp;
+            }
+
             /* the name is valid if pTmp is at the end of a string
             */
-            bIsIdent = ( pTmp - szString >= HB_SYMBOL_NAME_LEN || *pTmp == '\0' || *pTmp == ' ' );
+            bIsIdent = ( pTmp - szString >= HB_SYMBOL_NAME_LEN || *pTmp == '\0' );
          }
       }
    }

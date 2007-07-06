@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5628 2007/07/06 00:56:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5629 2007/07/06 13:11:32 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-07-06 09:36 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/macro.c
+    * Minor refinment to my last commit - Clipper accept spaces only at end of Identifier
 
 2007-07-06 09:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * make_pc.bat
@@ -24,7 +28,7 @@
   * source/rtl/tbrowse.prg
   * source/rtl/tbcolumn.prg
     * fixed ::aSetStyle array size as declared in tbrowse.ch.
-      Bug reported by Ed Horbino. 
+      Bug reported by Ed Horbino.
     + added AddStyle() method to allow add more custom styles defined by user.
 
   * source/rtl/tgetlist.prg
