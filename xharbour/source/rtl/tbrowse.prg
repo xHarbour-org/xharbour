@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.170 2007/05/15 15:31:07 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.171 2007/06/06 00:46:33 modalsist Exp $
  */
 
 /*
@@ -611,6 +611,7 @@ CLASS TBrowse
    METHOD TApplyKey( nKey, o )
    METHOD HitTest( nMouseRow,nMouseCol )
    METHOD SetStyle( nMode,lSetting )
+   METHOD AddStyle( nMode,lSetting )      // xHarbour extension
 #endif
 
 
@@ -777,13 +778,14 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::message         := ''
    ::nRow            := 0
    ::nCol            := 0
-   ::aSetStyle       := ARRAY( 5 )
+   ::aSetStyle       := ARRAY( 6 )
 
    ::aSetStyle[ TBR_APPEND    ] := .f.
    ::aSetStyle[ TBR_APPENDING ] := .f.
    ::aSetStyle[ TBR_MODIFY    ] := .f.
    ::aSetStyle[ TBR_MOVE      ] := .f.
    ::aSetStyle[ TBR_SIZE      ] := .f.
+   ::aSetStyle[ TBR_CUSTOM    ] := .f.
 #endif
 
    ::aColumnsSep     := {}
@@ -3470,6 +3472,23 @@ Return lRet
 
 //-------------------------------------------------------------------//
 
+METHOD AddStyle( nMode, lSetting ) CLASS TBrowse
+LOCAL lRet := .F.
+LOCAL nLen := LEN( ::aSetStyle )
+
+   IF nMode != nLen+1
+      RETURN .F.
+   ENDIF
+
+   IF ISLOGICAL( lSetting )
+      AADD( ::aSetStyle, lSetting )
+   ENDIF
+
+   lRet := ( Len(::aSetStyle) == nLen + 1 )
+
+Return lRet
+
+//-------------------------------------------------------------------//
 function TBMOUSE( oBrowse, nMouseRow, nMouseCol )
    LOCAL n
 

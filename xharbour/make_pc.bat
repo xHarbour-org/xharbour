@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.16 2007/03/02 01:26:51 modalsist Exp $
+rem $Id: make_pc.bat,v 1.17 2007/03/11 00:17:48 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -212,29 +212,38 @@ if "%1" == "MT"  goto MT
    REM Cleaning temp bin folder
 
    if exist %BIN_DIR%\harbour.exe          del %BIN_DIR%\harbour.exe
-   if exist %BIN_DIR%\harbour.exp          del %BIN_DIR%\harbour.exp
-
-   if exist %BIN_DIR%\xharbour.exp         del %BIN_DIR%\xharbour.exp
-   if exist %BIN_DIR%\xharbour.exe         del %BIN_DIR%\xharbour.exe
-   if exist %BIN_DIR%\xharbour.dll         del %BIN_DIR%\xharbour.dll
 
    if exist %BIN_DIR%\hbdoc.exe            del %BIN_DIR%\hbdoc.exe
+   if exist %BIN_DIR%\hbdoc.exp            del %BIN_DIR%\hbdoc.exp
+   if exist %BIN_DIR%\hbdoc.lib            del %BIN_DIR%\hbdoc.lib
+
    if exist %BIN_DIR%\hbdocdll.exe         del %BIN_DIR%\hbdocdll.exe
 
    if exist %BIN_DIR%\hbmake.exe           del %BIN_DIR%\hbmake.exe
+   if exist %BIN_DIR%\hbmake.exp           del %BIN_DIR%\hbmake.exp
+   if exist %BIN_DIR%\hbmake.lib           del %BIN_DIR%\hbmake.lib
    if exist %BIN_DIR%\hbmakedll.exe        del %BIN_DIR%\hbmakedll.exe
 
    if exist %BIN_DIR%\hbpp.exe             del %BIN_DIR%\hbpp.exe
+   if exist %BIN_DIR%\hbpp.exp             del %BIN_DIR%\hbpp.exp
+   if exist %BIN_DIR%\hbpp.lib             del %BIN_DIR%\hbpp.lib
 
    if exist %BIN_DIR%\hbrun.exe            del %BIN_DIR%\hbrun.exe
+   if exist %BIN_DIR%\hbrun.exp            del %BIN_DIR%\hbrun.exp
+   if exist %BIN_DIR%\hbrun.lib            del %BIN_DIR%\hbrun.lib
+
    if exist %BIN_DIR%\hbrundll.exe         del %BIN_DIR%\hbrundll.exe
    if exist %BIN_DIR%\hbrunmt.exe          del %BIN_DIR%\hbrunmt.exe
 
    if exist %BIN_DIR%\hbtest.exe           del %BIN_DIR%\hbtest.exe
+   if exist %BIN_DIR%\hbtest.exp           del %BIN_DIR%\hbtest.exp
+   if exist %BIN_DIR%\hbtest.lib           del %BIN_DIR%\hbtest.lib
    if exist %BIN_DIR%\hbtestdll.exe        del %BIN_DIR%\hbtestdll.exe
    if exist %BIN_DIR%\hbtestmt.exe         del %BIN_DIR%\hbtestmt.exe
 
    if exist %BIN_DIR%\xbscript.exe         del %BIN_DIR%\xbscript.exe
+   if exist %BIN_DIR%\xbscript.exp         del %BIN_DIR%\xbscript.exp
+   if exist %BIN_DIR%\xbscript.lib         del %BIN_DIR%\xbscript.lib
    if exist %BIN_DIR%\xbscriptdll.exe      del %BIN_DIR%\xbscriptdll.exe
 
    if exist %BIN_DIR%\ppgen.exe            del %BIN_DIR%\ppgen.exe

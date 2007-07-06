@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.179 2007/02/23 23:59:36 fperillo Exp $
+ * $Id: hbmake.prg,v 1.180 2007/02/24 23:56:17 fperillo Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.17"
+STATIC s_cHbMakeVersion  := "1.19"
 STATIC s_lPrint          := .F.
 STATIC s_lEdit           := .F.
 STATIC s_aDefines        := {}
@@ -146,6 +146,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL nPos
    LOCAL aPpo
    LOCAL cExt := ""
+   LOCAL cExp,cLib
 
    IF Empty(cFile)
       OutStd( "xHarbour Make" + HB_OSNewLine() +;
@@ -353,6 +354,9 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_cAppName := Substr( cFile,1 , AT(".",cFile) -1)
    s_cLog    := s_cAppName + ".log"
 
+   cExp := s_cAppName + ".exp"
+   cLib := s_cAppName + ".lib"
+
    FErase( (s_cAppName+".out") ) // erase old *.out log filename
    FErase( s_cLog )
 
@@ -455,6 +459,13 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       FErase( s_cMap ) 
       FErase( s_cTds ) 
    endif
+
+   IF s_lPocc
+      FErase( cExp )
+      IF !s_lLibrary
+         FErase( cLib )
+      ENDIF
+   ENDIF
 
    SET CURSOR ON
 

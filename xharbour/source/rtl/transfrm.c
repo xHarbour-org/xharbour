@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.49 2007/01/19 21:13:59 modalsist Exp $
+ * $Id: transfrm.c,v 1.50 2007/02/27 15:59:40 druzus Exp $
  */
 
 /*
@@ -970,7 +970,8 @@ HB_FUNC( TRANSFORM )
                szResult[ i++ ] = ')';
             }
 
-            if( ( uiPicFlags & PF_CREDIT ) && dValue >= 0 )
+//            if( ( uiPicFlags & PF_CREDIT ) && dValue >= 0 ) // 2007/JUL/06 - E.F.
+            if( ( uiPicFlags & PF_CREDIT ) && dValue > 0 )
             {
                szResult[ i++ ] = ' ';
                szResult[ i++ ] = 'C';

@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.36 2007/05/05 22:26:43 modalsist Exp $
+# $Id: hrbdll.pc,v 1.37 2007/06/06 00:46:33 modalsist Exp $
 #
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
 # � PELLES C DLL MAKEFILE 넴
@@ -25,11 +25,11 @@ LIB_EXE      = $(CC_DIR)\bin\polib.exe
 CC_LIB_DIR   = $(CC_DIR)\lib
 
 # To go back to access standard inkey codes declared in inkey.ch remove
-# HB_EXT_INKEY flags in HARBOURFLAGS and CFLAGS.
+# HB_EXT_INKEY flags from HARBOURFLAGS and CUSERFLAGS.
 #
-HARBOURFLAGS = -i$(HB_DIR)\include -n1 -q0 -w -es2 -gc0 -D"__EXPORT__" -DHB_EXT_INKEY
+HARBOURFLAGS = -i$(HB_DIR)\include -n1 -q0 -w -es2 -gc0 -D__EXPORT__ -DHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\include -n -q0 -w -es2 -gc0
-CFLAGS       = /Ze /Go /Tx86-coff /I"$(HB_DIR)\include" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__EXPORT__" /D"__WIN32__" /D"WIN32" /D"__WINDOWS__" /D"HB_EXT_INKEY"
+CFLAGS       = /Ze /Go /Tx86-coff /I"$(HB_DIR)\include" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__EXPORT__" /D"__WIN32__"  /D"WIN32" /D"__WINDOWS__" /D"HB_EXT_INKEY"
 DLLFLAGS     = /DLL /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:WINDOWS
 EXEFLAGS     = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE
 

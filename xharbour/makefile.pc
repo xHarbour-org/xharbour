@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.47 2007/05/23 05:21:33 guerra000 Exp $
+# $Id: makefile.pc,v 1.48 2007/06/06 00:46:33 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -21,11 +21,10 @@ CC_LIB_DIR = $(CC_DIR)\lib
 # To go back to access standard inkey codes declared in inkey.ch remove
 # HB_EXT_INKEY flags from HARBOURFLAGS and CUSERFLAGS.
 #
-HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -DHB_EXT_INKEY
+HARBOURFLAGS = -i$(HB_DIR)\INCLUDE -n1 -q0 -w -es2 -gc0 -dHB_EXT_INKEY
 MAINFLAGS    = -i$(HB_DIR)\INCLUDE -n -q0 -w -es2 -gc0
-CUSERFLAGS   = /D"HB_EXT_INKEY"
-CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__WIN32__" /D"NULL=0" $(CUSERFLAGS)
-LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE /NOEXPOBJ
+CFLAGS       = /Ze /Zx /Go /Tx86-coff /I"$(HB_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE" /I"$(CC_DIR)\INCLUDE\WIN" /D"__WIN32__" /D"NULL=0" $(CUSERFLAGS) /D"HB_EXT_INKEY"
+LINKFLAGS    = /LIBPATH:$(CC_LIB_DIR) /LIBPATH:$(CC_LIB_DIR)\WIN /MACHINE:IX86 /SUBSYSTEM:CONSOLE 
 
 !ifdef HB_MT
 CFLAGS = $(CFLAGS) /D"HB_THREAD_SUPPORT" /MT
@@ -184,7 +183,7 @@ HB_CMD       = $(HARBOUR_EXE) $(HARBOURFLAGS) $** -o$@
 CC_CMD       = $(CC_EXE) $(CFLAGS) /Fo$@ $**
 #CC_CMD_DLL  = $(CC_EXE) $(CFLAGS) /D"HB_EXEMEM_USED" /Fo$@ $**
 LIB_CMD      = $(LIB_EXE) /OUT:$@ $**
-CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /Fo$@ $**
+CC_PCREPOS_CMD = $(CC_EXE) /I"$(PCREPOS_DIR)" $(CFLAGS) /D"SUPPORT_UTF8" /D"SUPPORT_UCP" /D"POSIX_MALLOC_THRESHOLD=10" /D"DLL_EXPORT" /Fo$@ $**
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ The Project ³Û

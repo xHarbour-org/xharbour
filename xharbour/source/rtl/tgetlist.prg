@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.38 2007/02/20 19:04:18 lculik Exp $
+ * $Id: tgetlist.prg,v 1.39 2007/03/01 15:33:15 modalsist Exp $
  */
 
 /*
@@ -513,10 +513,12 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
       Default
 
          if nKey >= 32 .and. nKey <= 255
-            // clear buffer and get window when postblock returns .F.
-            if lDelEnd
-               oGet:DelEnd()
-            endif
+            /* 2007/JUL/06 - E.F. Disabled this code by Clipper compatibility.
+            * // clear buffer and get window when postblock returns .F.
+            * if lDelEnd
+            *    oGet:DelEnd() 
+            * endif
+            */
             cKey := Chr( nKey )
             if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," )
                oGet:changed:=.t.  // 2006/DEC/22 - E.F. Fixed by Marco Bernardi. 

@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.17 2006/09/26 00:17:38 modalsist Exp $
+ * $Id: tbcolumn.prg,v 1.18 2006/09/27 13:08:15 modalsist Exp $
  */
 
 /*
@@ -119,9 +119,10 @@ CLASS TBColumn
 
 
    #ifdef HB_COMPAT_C53
-   METHOD  PreBlock(b)      INLINE ::SetValue(b,@::bPreBlock,"B")
-   METHOD  PostBlock(b)     INLINE ::SetValue(b,@::bPostBlock,"B")
+   METHOD PreBlock(b)      INLINE ::SetValue(b,@::bPreBlock,"B")
+   METHOD PostBlock(b)     INLINE ::SetValue(b,@::bPostBlock,"B")
    METHOD SetStyle( nMode, lSetting )
+   METHOD AddStyle( nMode, lSetting )
    #endif
 
    PROTECTED:     /* P R O T E C T E D */
@@ -183,11 +184,12 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
    ::block    := bBlock
 
    #ifdef HB_COMPAT_C53
-   ::aSetStyle := ARRAY( 3 )
+   ::aSetStyle := ARRAY( 4 )
 
    ::aSetStyle[ TBC_READWRITE ] := .f.
    ::aSetStyle[ TBC_MOVE ]      := .f.
    ::aSetStyle[ TBC_SIZE ]      := .f.
+   ::aSetStyle[ TBC_CUSTOM ]    := .f.
    #endif
 
 return Self
@@ -246,6 +248,24 @@ METHOD SetStyle( nMode, lSetting ) CLASS TBColumn
   ENDIF
 
 RETURN lRet
+
+//-------------------------------------------------------------------//
+
+METHOD AddStyle( nMode, lSetting ) CLASS TBColumn
+LOCAL lRet := .F.
+LOCAL nLen := LEN( ::aSetStyle )
+
+   IF nMode != nLen+1
+      RETURN .F.
+   ENDIF
+
+   IF ISLOGICAL( lSetting )
+      AADD( ::aSetStyle, lSetting )
+   ENDIF
+
+   lRet := ( Len(::aSetStyle) == nLen + 1 )
+
+Return lRet
 #endif
 
 //-------------------------------------------------------------------//
