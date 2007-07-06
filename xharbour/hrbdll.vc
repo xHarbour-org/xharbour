@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.105 2007/05/04 12:48:55 andresreyesh Exp $
+# $Id: hrbdll.vc,v 1.106 2007/05/21 15:28:44 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -78,7 +78,7 @@ INCLUDE_DIR  = include
 # Please adjust accordingly
 LIB_DIR         = lib\vc
 HARBOUR_LIB     = $(LIB_DIR)\harbour.lib
-HARBOUR_DLL     = $(BIN_DIR)\harbour.dll
+HARBOUR_DLL     = $(BIN_DIR)\dll\harbour.dll
 HBRUNDLL_EXE    = $(BIN_DIR)\hbrundll.exe
 HBTESTDLL_EXE   = $(BIN_DIR)\hbtestdll.exe
 HBMAKEDLL_EXE   = $(BIN_DIR)\hbmakedll.exe

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.26 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbexpra.c,v 1.27 2007/04/08 07:20:55 ronpinkas Exp $
  */
 
 /*
@@ -291,6 +291,15 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
    #ifdef HB_MACRO_SUPPORT
       HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
+
+      if( pName->ExprType == HB_ET_VARIABLE )
+      {
+         /* DotedMacro.More()
+          * MACROTEXT is compiled into hb_compExprNewVar()
+          * so we must reset to correct context
+          */
+         pName->ExprType = HB_ET_FUNNAME;
+      }
    #endif
 
    pExpr = hb_compExprNew( HB_ET_FUNCALL );

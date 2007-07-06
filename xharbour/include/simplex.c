@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.26 2007/05/17 03:48:14 ronpinkas Exp $
+ * $Id: simplex.c,v 1.27 2007/07/05 18:19:18 ronpinkas Exp $
  */
 
 /*
@@ -110,7 +110,7 @@
    #define YY_BUF_SIZE 16384
 #endif
 
-static char sToken[TOKEN_SIZE];
+static char sToken[ TOKEN_SIZE + 1 ];
 static char szLexBuffer[ YY_BUF_SIZE ];
 
 static char * sPair = NULL;
@@ -522,7 +522,7 @@ static int rulecmp( const void * pLeft, const void * pRight );
 
 YY_DECL
 {
-    if( sPair == NULL )
+   if( sPair == NULL )
 	{
        sPair = (char *) malloc( ( iPairAllocated = STREAM_ALLOC_SIZE ) );
        LEX_USER_SETUP();
@@ -820,10 +820,11 @@ int SimpLex_GetNextToken( void )
                IF_APPEND_DELIMITER( chr )
                {
                   /* Append and Terminate current token and check it. */
-                  sToken[ iLen++ ] = chr;
+                  if( iLen < TOKEN_SIZE )
+                  {
+                     sToken[ iLen++ ] = chr;
+                  }
                   sToken[ iLen ] = '\0';
-
-                  iLastToken = iLen;
 
                   s_szBuffer = szBuffer;
 
@@ -841,7 +842,6 @@ int SimpLex_GetNextToken( void )
                 if( iLen )
                 {
                     /* Will be returned on next cycle. */
-
                     HOLD_TOKEN( acReturn[(int)chr] );
 
                     /* Terminate current token and check it. */
@@ -866,7 +866,10 @@ int SimpLex_GetNextToken( void )
             }
 
             /* Acumulate and scan next Charcter. */
-            sToken[ iLen++ ] = chr;
+            if( iLen < TOKEN_SIZE )
+            {
+               sToken[ iLen++ ] = chr;
+            }
 
             continue;
         }

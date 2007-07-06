@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5626 2007/07/05 11:17:25 marchuet Exp $
+ * $Id: ChangeLog,v 1.5627 2007/07/05 18:19:18 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,35 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-07-05 20:54 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * dll_vc.bat
+  * hrbdll.vc
+    * Moved harbour.dll creation to bin\vc\dll to avoid override of harbour.pdb if building with debug info
+
+  * source/macro/macroa.c
+  * source/compiler/expropta.c
+  * include/hbexpra.c
+    ! Fixed compilation of &DotedMacro.MoreText() by Macro compiler
+
+  * include/simplex.c
+    ! Fixed GPF trap when IDENTIFIER token is longer then TOKEN_SIZE
+    * Fixed minor typos
+
+  * source/macro/macro.slx
+    * Fixed minor typo in defedout code
+
+  * source/vm/macro.c
+    ! Clipper compatability fix when identifier used in macro is longer then HB_SYMBOL_NAME_LEN or has a SPACE
+
 2007-07-05 14:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * contrib/wvtgui/wvtclass.prg
-    * Missing decleration 
+    * Missing decleration
   * include/simplex.c
   * source/macro/macro.slx
-    * Minor memory leak 
+    * Minor memory leak
   * tests/tstcstru1.prg
     * Corrected sample usage
-    
+
 2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
     ! fixed casting

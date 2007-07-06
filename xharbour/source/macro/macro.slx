@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.29 2007/03/27 14:23:01 ronpinkas Exp $
+ * $Id: macro.slx,v 1.30 2007/07/05 18:19:18 ronpinkas Exp $
  */
 
 /*
@@ -366,7 +366,7 @@ LANGUAGE_RULES_ARE {
            TraceLog( NULL, "   DOUBLE = %f\n", pYYLVAL->valDouble.dNumber  ); \
          else if( x < 256 ) \
            if( x == '\n' || x == ';' ) \
-              TraceLog( NULL, "                  NEW LINE %i\n", hb_comp_iLine - 1  ); \
+              TraceLog( NULL, "                  NEW LINE! \n" ); \
            else if( iRet == -1 ) \
               TraceLog( NULL, "!!!<EOF>\n" ); \
            else \
@@ -631,6 +631,6 @@ void * hb_compFlexNew( HB_MACRO_PTR pNewMacro )
 void hb_compFlexDelete( void * pBuffer )
 {
    HB_SYMBOL_UNUSED( pBuffer );
-   
+
    RESET_LEX()
 }
