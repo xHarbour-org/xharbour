@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.15 2007/05/11 16:30:46 hazi01 Exp $
+ * $Id: ftpcln.prg,v 1.16 2007/06/01 19:39:06 toninhofwi Exp $
  */
 
 /*
@@ -63,6 +63,22 @@
    Added method UserCommand( cCommand, lPasv, lReadPort, lGetReply )
 */
 
+/* 2007-07-12, miguelangel@marchuet.net
+   Added method :NoOp()
+   Added method :Rest( nPos )
+   Changed method :LS( cSpec )
+   Changed method :List( cSpec )
+   Changed method :TransferStart()
+   Changed method :Stor( cFile )
+   Changed method :UploadFile( cLocalFile, cRemoteFile )
+   Changed method :DownloadFile( cLocalFile, cRemoteFile )
+
+   Added support to Port transfer mode
+   Added method :Port()
+   Added method :SendPort()
+
+*/
+
 #include "directry.ch"
 #include "hbclass.ch"
 #include "tip.ch"
@@ -80,8 +96,9 @@ CLASS tIPClientFTP FROM tIPClient
    DATA RegPasv
    // Socket opened in response to a port command
    DATA SocketControl
+   DATA SocketPortServer
 
-   METHOD New( oUrl,lTrace, oCredentials)
+   METHOD New( oUrl, lTrace, oCredentials )
    METHOD Open()
    METHOD Read( nLen )
    METHOD Write( nLen )
@@ -93,13 +110,15 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD Pasv()
    METHOD TypeI()
    METHOD TypeA()
+   METHOD NoOp()
+   METHOD Rest( nPos )
    METHOD List()
    METHOD UserCommand( cCommand, lPasv, lReadPort, lGetReply )
    METHOD pwd()
    METHOD Cwd()
    METHOD Dele()
-   //METHOD Port()
-   //METHOD SendPort()
+   METHOD Port()
+   METHOD SendPort()
    METHOD Retr()
    METHOD Stor()
    METHOD Quit()
@@ -246,9 +265,20 @@ METHOD TypeA() CLASS tIPClientFTP
 RETURN ::GetReply()
 
 
+METHOD NoOp() CLASS tIPClientFTP
+   ::InetSendall( ::SocketCon, "NOOP" + ::cCRLF )
+RETURN ::GetReply()
+
+
+METHOD Rest( nPos ) CLASS tIPClientFTP
+   ::InetSendall( ::SocketCon, "REST " + Str( If( Empty( nPos ), 0, nPos ),,, .T. ) + ::cCRLF )
+RETURN ::GetReply()
+
+
 METHOD CWD( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "CWD " + cPath + ::cCRLF )
 RETURN ::GetReply()
+
 
 METHOD PWD() CLASS tIPClientFTP
    LOCAL aDir
@@ -259,6 +289,7 @@ METHOD PWD() CLASS tIPClientFTP
    ::cReply := SubStr( ::cReply, At('"', ::cReply) + 1, ;
                                 Rat('"', ::cReply) - At('"', ::cReply) - 1 )
 RETURN .T.
+
 
 METHOD DELE( cPath ) CLASS tIPClientFTP
    ::InetSendall( ::SocketCon, "DELE " + cPath + ::cCRLF )
@@ -283,7 +314,7 @@ METHOD TransferStart() CLASS tIPClientFTP
       skt := InetConnectIP( ::cDataServer, ::nDataPort )
       IF skt != NIL .and. ::InetErrorCode( skt ) == 0
          // Get the start message from the control connection
-         IF .not. ::GetReply()
+         IF ! ::GetReply()
             InetClose( skt )
             RETURN .F.
          ENDIF
@@ -291,18 +322,24 @@ METHOD TransferStart() CLASS tIPClientFTP
          InetSetTimeout( skt, ::nConnTimeout )
          ::SocketCon := skt
       ENDIF
-   /*ELSE
-      ::SocketCon := InetAccept( ::SocketPortServer )*/
+   ELSE
+      ::SocketCon := InetAccept( ::SocketPortServer )
+      IF Empty( ::SocketCon )
+         ::bInitialized := .F.
+         ::SocketCon := ::SocketControl
+         ::GetReply()
+         RETURN .F.
+      ENDIF
    ENDIF
 
 RETURN .T.
-
 
 
 METHOD Commit() CLASS tIPClientFTP
    InetClose( ::SocketCon )
    ::SocketCon := ::SocketControl
    ::bInitialized := .F.
+
    IF .not. ::GetReply()
       RETURN .F.
    ENDIF
@@ -311,6 +348,7 @@ METHOD Commit() CLASS tIPClientFTP
    IF ::cReply[1] == "5"
       RETURN .F.
    ENDIF
+
 /*
    IF ::GetReply() .and. ::cReply[1] != "5"
       RETURN .T.
@@ -322,9 +360,9 @@ METHOD List(cSpec) CLASS tIPClientFTP
    LOCAL cStr
 
    IF cSpec=nil
-      cSpec:=''
+      cSpec := ''
    else
-      cSpec:=' '+cSpec
+      cSpec := ' ' + cSpec
    ENDIF
    IF ::bUsePasv
       IF .not. ::Pasv()
@@ -333,13 +371,13 @@ METHOD List(cSpec) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-/*   IF .not. ::bUsePasv
+   IF .not. ::bUsePasv
       IF .not. ::Port()
          RETURN .F.
       ENDIF
    ENDIF
-*/
-   ::InetSendAll( ::SocketCon, "LIST"+cSpec + ::cCRLF )
+
+   ::InetSendAll( ::SocketCon, "LIST" + cSpec + ::cCRLF )
    cStr := ::ReadAuxPort()
    ::bEof := .f.
 RETURN cStr
@@ -365,7 +403,7 @@ METHOD UserCommand( cCommand, lPasv, lReadPort, lGetReply ) CLASS tIPClientFTP
       lGetReply = ::GetReply()
    endif
 
-return .t.
+RETURN .t.
 
 
 METHOD ReadAuxPort(cLocalFile) CLASS tIPClientFTP
@@ -399,10 +437,7 @@ METHOD ReadAuxPort(cLocalFile) CLASS tIPClientFTP
 RETURN NIL
 
 
-
 METHOD Stor( cFile ) CLASS tIPClientFTP
-
-   LOCAL nTimeout
 
    IF ::bUsePasv
       IF .not. ::Pasv()
@@ -411,11 +446,14 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-   ::InetSendall( ::SocketCon, "STOR " + cFile+ ::cCRLF )
+   ::InetSendall( ::SocketCon, "STOR " + cFile + ::cCRLF )
+   IF ! ::GetReply()
+      RETURN .F.
+   ENDIF
 
 RETURN ::TransferStart()
 
-/*
+
 METHOD Port() CLASS tIPClientFTP
    LOCAL nPort := 16000
 
@@ -427,23 +465,23 @@ METHOD Port() CLASS tIPClientFTP
       ENDIF
       nPort ++
    ENDDO
-   ::SocketPortServer := NIL
+   //::SocketPortServer := NIL
 
 RETURN .F.
+
 
 METHOD SendPort() CLASS tIPClientFTP
    LOCAL cAddr
    LOCAL cPort, nPort
 
-   cAddr := InetAddress( ::SocketPortServer )
+   cAddr := InetGetHosts( NetName() )[1]
    cAddr := StrTran( cAddr, ".", "," )
    nPort := InetPort( ::SocketPortServer )
-   cPort := "," + AllTrim( Str ( Int( nPort / 256 ) ) ) +  "," + AllTrim( Str ( nPort % 256 ) )
+   cPort := "," + AllTrim( Str( Int( nPort / 256 ) ) ) +  "," + AllTrim( Str( Int( nPort % 256 ) ) )
 
-   ? "PORT " + cAddr + cPort
-   ::InetSendall( ::SocketCom, "PORT " + cAddr + cPort  + ::cCRLF )
+   ::InetSendall( ::SocketCon, "PORT " + cAddr + cPort  + ::cCRLF )
 RETURN ::GetReply()
-*/
+
 
 METHOD Read( nLen ) CLASS tIPClientFTP
    LOCAL cRet
@@ -619,15 +657,19 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
 
       ENDIF
 
-      IF .not. Empty( ::oUrl:cPath )
+      IF ! Empty( ::oUrl:cPath )
 
-         IF .not. ::CWD( ::oUrl:cPath )
+         IF ! ::CWD( ::oUrl:cPath )
             RETURN -1
          ENDIF
 
       ENDIF
 
-      IF .not. ::Stor( ::oUrl:cFile )
+      IF ! ::bUsePasv .AND. ! ::Port()
+         RETURN .F.
+      ENDIF
+
+      IF ! ::Stor( ::oUrl:cFile )
          RETURN -1
       ENDIF
 
@@ -640,25 +682,27 @@ RETURN ::WriteFromFile( cLocalFile )
 
 METHOD LS( cSpec ) CLASS tIPClientFTP
 
-    LOCAL cStr,cfile,x,y
+   LOCAL cStr,cfile,x,y
 
-    IF cSpec == nil
-       cSpec := ''
-     ENDIF
-
-    IF ::bUsePasv
-
-       IF .not. ::Pasv()
-
-          //::bUsePasv := .F.
-          RETURN .F.
-
-       ENDIF
-
+   IF cSpec == nil
+      cSpec := ''
     ENDIF
 
-    ::InetSendAll( ::SocketCon, "NLST "+cSpec + ::cCRLF )
-    cStr := ::ReadAuxPort()
+   IF ::bUsePasv .AND. ! ::Pasv()
+      //::bUsePasv := .F.
+      RETURN .F.
+   ENDIF
+
+   IF ! ::bUsePasv .AND. ! ::Port()
+      RETURN .F.
+   ENDIF
+
+    ::InetSendAll( ::SocketCon, "NLST " + cSpec + ::cCRLF )
+    IF ::GetReply()
+      cStr := ::ReadAuxPort()
+    ELSE
+      cStr := ''
+    ENDIF
 
 RETURN cStr
 
@@ -676,7 +720,7 @@ METHOD Rename( cFrom, cTo ) CLASS tIPClientFTP
 
     ENDIF
 
-Return lResult
+RETURN lResult
 
 METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    LOCAL cFileData
@@ -687,7 +731,7 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    LOCAL cFile := ""
    Local cExt  := ""
 
-   HB_FNameSplit( cLocalFile, @cPath, @cFile,@cExt  )
+   HB_FNameSplit( cLocalFile, @cPath, @cFile, @cExt  )
 
 
    DEFAULT cRemoteFile to cFile+cExt
@@ -695,16 +739,18 @@ METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    ::bEof := .F.
    ::oUrl:cFile := cRemoteFile
 
-   IF .not. ::bInitialized
+   IF ! ::bInitialized
 
-      IF .not. Empty( ::oUrl:cPath )
-         IF .not. ::CWD( ::oUrl:cPath )
-            ::bEof = .T.  // no data for this transaction
-            RETURN .F.
-         ENDIF
+      IF ! Empty( ::oUrl:cPath ) .AND. ! ::CWD( ::oUrl:cPath )
+         ::bEof = .T.  // no data for this transaction
+         RETURN .F.
       ENDIF
 
-      IF .not. ::Retr( ::oUrl:cFile )
+      IF ! ::bUsePasv .AND. ! ::Port()
+         RETURN .F.
+      ENDIF
+
+      IF ! ::Retr( ::oUrl:cFile )
          ::bEof = .T.  // no data for this transaction
          RETURN .F.
       ENDIF

@@ -1,5 +1,5 @@
 /*
- * $Id: client.prg,v 1.14 2007/05/30 19:02:25 toninhofwi Exp $
+ * $Id: client.prg,v 1.15 2007/06/01 19:39:05 toninhofwi Exp $
  */
 
 /*
@@ -347,7 +347,7 @@ METHOD ReadToFile( cFile, nMode, nSize ) CLASS tIPClient
 
    ENDDO
 
-   IF nSent >0
+   IF nSent > 0
       ::Commit()
    Endif
 

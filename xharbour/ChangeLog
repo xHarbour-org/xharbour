@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5629 2007/07/06 13:11:32 modalsist Exp $
+ * $Id: ChangeLog,v 1.5630 2007/07/06 13:39:03 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-07-13 10:43 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/tip/client.prg
+  * source/tip/ftpcln.prg
+    + Added support to PORT transfer mode, alternative to PASV transfer mode. When :bUsePasv will be false
+      PORT mode will be used.
+    + Added method :NoOp()
+    + Added method :Rest( nPos )
+    * Changed method :LS( cSpec )
+    * Changed method :List( cSpec )
+    * Changed method :TransferStart()
+    * Changed method :Stor( cFile )
+    * Changed method :UploadFile( cLocalFile, cRemoteFile )
+    * Changed method :DownloadFile( cLocalFile, cRemoteFile )
+    + Added method :Port()
+    + Added method :SendPort()
+
 
 2007-07-06 09:36 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/macro.c
