@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.180 2007/02/24 23:56:17 fperillo Exp $
+ * $Id: hbmake.prg,v 1.181 2007/07/06 13:11:35 modalsist Exp $
  */
 
 /*
@@ -1984,7 +1984,7 @@ FUNCTION CreateMakeFile( cFile )
   
    IF lUseXharbourDll
       cDefLibGccLibs := cHARso
-      cDefaultLibs   := cHarbDll
+      cDefaultLibs   := cHarbDll + " dllmain.lib " 
    ENDIF
 
    IF lFwh
