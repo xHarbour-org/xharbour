@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.16 2007/06/01 19:39:06 toninhofwi Exp $
+ * $Id: ftpcln.prg,v 1.17 2007/07/13 08:53:31 marchuet Exp $
  */
 
 /*
@@ -77,12 +77,15 @@
    Added method :Port()
    Added method :SendPort()
 
+   Cleaned unused variables.
 */
 
 #include "directry.ch"
 #include "hbclass.ch"
 #include "tip.ch"
 #include "common.ch"
+
+STATIC nPort := 16000
 
 /**
 * Inet service manager: ftp
@@ -112,19 +115,19 @@ CLASS tIPClientFTP FROM tIPClient
    METHOD TypeA()
    METHOD NoOp()
    METHOD Rest( nPos )
-   METHOD List()
+   METHOD List( cSpec )
    METHOD UserCommand( cCommand, lPasv, lReadPort, lGetReply )
-   METHOD pwd()
-   METHOD Cwd()
-   METHOD Dele()
+   METHOD Pwd()
+   METHOD Cwd( cPath )
+   METHOD Dele( cPath )
    METHOD Port()
    METHOD SendPort()
-   METHOD Retr()
-   METHOD Stor()
+   METHOD Retr( cFile )
+   METHOD Stor( cFile )
    METHOD Quit()
    METHOD ScanLength()
    METHOD ReadAuxPort()
-   method mget()
+   METHOD mget()
    // Method bellow contributed by  Rafa Carmona
 
    METHOD LS( cSpec )
@@ -281,7 +284,7 @@ RETURN ::GetReply()
 
 
 METHOD PWD() CLASS tIPClientFTP
-   LOCAL aDir
+
    ::InetSendall( ::SocketCon, "PWD"  + ::cCRLF )
    IF .not. ::GetReply()
       RETURN .F.
@@ -349,14 +352,10 @@ METHOD Commit() CLASS tIPClientFTP
       RETURN .F.
    ENDIF
 
-/*
-   IF ::GetReply() .and. ::cReply[1] != "5"
-      RETURN .T.
-   ENDIF*/
 RETURN .T.
 
 
-METHOD List(cSpec) CLASS tIPClientFTP
+METHOD List( cSpec ) CLASS tIPClientFTP
    LOCAL cStr
 
    IF cSpec=nil
@@ -455,9 +454,9 @@ RETURN ::TransferStart()
 
 
 METHOD Port() CLASS tIPClientFTP
-   LOCAL nPort := 16000
 
    ::SocketPortServer := InetCreate( ::nConnTimeout )
+   nPort ++
    DO WHILE nPort < 24000
       InetServer( nPort, ::SocketPortServer )
       IF ::InetErrorCode( ::SocketPortServer ) == 0
@@ -465,7 +464,6 @@ METHOD Port() CLASS tIPClientFTP
       ENDIF
       nPort ++
    ENDDO
-   //::SocketPortServer := NIL
 
 RETURN .F.
 
@@ -563,8 +561,7 @@ RETURN ::super:Write( cData, nLen, .F. )
  * HZ: What's cLocalFile good for? It's unused
  */
 
-METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
-   LOCAL nTimeout,cRet
+METHOD Retr( cFile ) CLASS tIPClientFTP
 
    IF ::bUsePasv
       IF .not. ::Pasv()
@@ -573,7 +570,7 @@ METHOD Retr( cFile,cLocalFile ) CLASS tIPClientFTP
       ENDIF
    ENDIF
 
-   ::InetSendAll( ::SocketCon, "RETR " + cFile+ ::cCRLF )
+   ::InetSendAll( ::SocketCon, "RETR " + cFile + ::cCRLF )
 
    IF ::TransferStart()
       ::ScanLength()
@@ -636,15 +633,13 @@ RETURN SubStr(cStr,3)
 
 METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
 
-   LOCAL cFileData
-   LOCAL lRet,nRet
    LOCAL cPath := ""
    LOCAL cFile := ""
    Local cExt  := ""
 
    HB_FNameSplit( cLocalFile, @cPath, @cFile,@cExt  )
 
-   DEFAULT cRemoteFile to cFile+cExt
+   DEFAULT cRemoteFile to cFile + cExt
 
    ::bEof := .F.
    ::oUrl:cFile := cRemoteFile
@@ -682,11 +677,11 @@ RETURN ::WriteFromFile( cLocalFile )
 
 METHOD LS( cSpec ) CLASS tIPClientFTP
 
-   LOCAL cStr,cfile,x,y
+   LOCAL cStr
 
    IF cSpec == nil
       cSpec := ''
-    ENDIF
+   ENDIF
 
    IF ::bUsePasv .AND. ! ::Pasv()
       //::bUsePasv := .F.
@@ -697,12 +692,12 @@ METHOD LS( cSpec ) CLASS tIPClientFTP
       RETURN .F.
    ENDIF
 
-    ::InetSendAll( ::SocketCon, "NLST " + cSpec + ::cCRLF )
-    IF ::GetReply()
+   ::InetSendAll( ::SocketCon, "NLST " + cSpec + ::cCRLF )
+   IF ::GetReply()
       cStr := ::ReadAuxPort()
-    ELSE
+   ELSE
       cStr := ''
-    ENDIF
+   ENDIF
 
 RETURN cStr
 
@@ -723,13 +718,10 @@ METHOD Rename( cFrom, cTo ) CLASS tIPClientFTP
 RETURN lResult
 
 METHOD DownLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
-   LOCAL cFileData
-   LOCAL lRet,xRet
 
-   Local nHandle
    LOCAL cPath := ""
    LOCAL cFile := ""
-   Local cExt  := ""
+   LOCAL cExt  := ""
 
    HB_FNameSplit( cLocalFile, @cPath, @cFile, @cExt  )
 
