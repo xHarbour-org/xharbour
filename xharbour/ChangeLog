@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5632 2007/07/17 15:05:47 marchuet Exp $
+ * $Id: ChangeLog,v 1.5633 2007/07/17 21:00:24 andresreyesh Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,16 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-07-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rtl/str.c
+    !fix bug in Str( <nNumber>, [<nLength>], [<nDecimals>], [<lTrim>] ), it ignored 2nd and 3rd parameter
+     when the 4th exists. No uses always 2nd and 3rd parameter, too with [<ltrim>] parameter.
+
+
 2007-07-17 14:56 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/contrib/mysql/tmysql.prg
      !fix TMySQLTable():MakePrimaryKeyWhere() bug when get FieldType
+
 
 2007-07-17 17:01 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/tip/ftpcln.prg

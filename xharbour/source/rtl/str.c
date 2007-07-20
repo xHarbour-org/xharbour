@@ -1,5 +1,5 @@
 /*
- * $Id: str.c,v 1.17 2005/08/04 23:54:13 druzus Exp $
+ * $Id: str.c,v 1.18 2007/05/31 13:01:28 ran_go Exp $
  */
 
 /*
@@ -68,40 +68,26 @@ HB_FUNC( STR )
    {
       bValid = TRUE;
 
-      if( hb_pcount() >= 4 )
+      if( hb_pcount() >= 2 )
+      {
+         pWidth = hb_param( 2, HB_IT_NUMERIC );
+
+         if ( ! pWidth && hb_pcount() < 4 )
+            bValid = FALSE;
+      }
+      if( bValid && hb_pcount() >= 3 )
+      {
+         pDec = hb_param( 3, HB_IT_NUMERIC );
+
+         if ( ! pDec && hb_pcount() < 4 )
+            bValid = FALSE;
+      }
+      if( bValid && hb_pcount() >= 4 )
       {
          PHB_ITEM pLtrim = hb_param( 4, HB_IT_LOGICAL );
 
-         if ( ! pLtrim )
-         {
-            bLtrim = FALSE;
-         }
-         else
-         {
+         if ( pLtrim )
             bLtrim = pLtrim->item.asLogical.value;
-         }
-      }
-      else
-      {
-         if( hb_pcount() >= 2 )
-         {
-            pWidth = hb_param( 2, HB_IT_NUMERIC );
-
-            if ( ! pWidth )
-            {
-               bValid = FALSE;
-            }
-         }
-
-         if( hb_pcount() >= 3 )
-         {
-            pDec = hb_param( 3, HB_IT_NUMERIC );
-
-            if ( ! pDec )
-            {
-               bValid = FALSE;
-            }
-         }
       }
    }
 
