@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5635 2007/07/31 10:37:19 marchuet Exp $
+ * $Id: ChangeLog,v 1.5636 2007/07/31 14:36:44 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -22,6 +22,9 @@
     !fix bug in Str( <nNumber>, [<nLength>], [<nDecimals>], [<lTrim>] ), it ignored 2nd and 3rd parameter
      when the 4th exists. No uses always 2nd and 3rd parameter, too with [<ltrim>] parameter.
 
+2007-07-19 09:00 UTC-0300 Luiz Rafael Culik Guimaraes
+  * utils/hbmake/hbmake.prg
+    !minor fix
 
 2007-07-17 14:56 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/contrib/mysql/tmysql.prg
