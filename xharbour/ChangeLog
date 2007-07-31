@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5634 2007/07/20 07:57:15 marchuet Exp $
+ * $Id: ChangeLog,v 1.5635 2007/07/31 10:37:19 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -14,6 +14,8 @@
       2046 fields - without it corrupted files were created or GPF
       appeared
     synced with harbour
+  * source/rtl/hbrandom.c  
+    ! minor fix, cleaned unused variables.
 
 2007-07-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rtl/str.c
