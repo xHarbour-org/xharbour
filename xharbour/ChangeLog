@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5633 2007/07/17 21:00:24 andresreyesh Exp $
+ * $Id: ChangeLog,v 1.5634 2007/07/20 07:57:15 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-07-31 12:32 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/dbf1.c
+    ! added RT error when someone tires to create DBF with more then
+      2046 fields - without it corrupted files were created or GPF
+      appeared
+    synced with harbour
 
 2007-07-20 09:49 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rtl/str.c
