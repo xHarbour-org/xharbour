@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtarr.prg,v 1.9 2006/06/26 14:26:25 fsgiudice Exp $
+ * $Id: dbgtarr.prg,v 1.10 2006/12/10 12:33:35 ptsarenko Exp $
  */
 
 /*
@@ -151,9 +151,7 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) Class T
    local nSet := oBrwSets:cargo[1]
    local cTemp:=str(nSet,4)
    local cOldname:= ::arrayName
-   Local nPos
 
-   local nRecsToSkip
    do case
       case nKey == K_UP
               oBrwSets:Up()
@@ -264,6 +262,8 @@ return cResult
 
 METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
 
+#ifndef HB_NO_READDBG
+
     LOCAL nKey
     local getlist := {}
     // save state
@@ -305,7 +305,9 @@ METHOD doGet( oBro, pItem, nSet ) Class TDBGArray
         KEYBOARD CHR( nKey )
     END
 
-RETURN  nil
+#endif
+
+RETURN nil
 
 function __DbgArrays( aArray, cArrayName, lEditable )
 
@@ -335,7 +337,7 @@ static procedure RefreshVarsS( oBrowse )
    oBrowse:hilite()
    return
 
-static function ArrayBrowseSkip( nPos, oBrwSets,n )
+static function ArrayBrowseSkip( nPos, oBrwSets )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
       iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;

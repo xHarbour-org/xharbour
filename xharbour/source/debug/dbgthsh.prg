@@ -1,5 +1,5 @@
 /*
- * $Id: dbgthsh.prg,v 1.1 2006/06/26 14:26:25 fsgiudice Exp $
+ * $Id: dbgthsh.prg,v 1.2 2006/12/10 12:33:35 ptsarenko Exp $
  */
 
 /*
@@ -165,9 +165,8 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) Class
 
    local nSet     := oBrwSets:cargo[1]
    local cOldname := ::hashName
-   Local nPos, uValue
+   Local uValue
 
-   local nRecsToSkip
    do case
       case nKey == K_UP
               oBrwSets:Up()
@@ -282,6 +281,8 @@ return cResult
 
 METHOD doGet( oBro, pItem, nSet ) Class TDBGHash
 
+#ifndef HB_NO_READDBG
+
     LOCAL nKey
     local getlist := {}
     // save state
@@ -323,6 +324,8 @@ METHOD doGet( oBro, pItem, nSet ) Class TDBGHash
         KEYBOARD CHR( nKey )
     END
 
+#endif
+
 RETURN  nil
 
 function __DbgHashes( hHash, chashName, lEditable )
@@ -353,7 +356,7 @@ static procedure RefreshVarsS( oBrowse )
    oBrowse:hilite()
    return
 
-static function HashBrowseSkip( nPos, oBrwSets,n )
+static function HashBrowseSkip( nPos, oBrwSets )
 
    return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
       iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;

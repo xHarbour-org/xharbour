@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.8 2006/10/14 09:52:42 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.9 2006/10/15 18:01:51 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 #include "setcurs.ch"
 #include "inkey.ch"
 
-function __dbgShowWorkAreas( oDebugger )
+function __dbgShowWorkAreas()
 
    local oDlg, oCol
    local aAlias, aBrw, aStruc, aInfo

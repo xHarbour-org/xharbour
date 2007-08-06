@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.22 2005/06/14 07:31:39 likewolf Exp $
+# $Id: make_gnu.sh,v 1.23 2006/01/17 02:18:14 druzus Exp $
 #
 
 # ---------------------------------------------------------------
@@ -68,6 +68,22 @@ if [ -z "$HB_MT" ]; then
     export HB_MT
 fi
 
+if [ -z "${HB_WITHOUT_GTSLN}" ]; then
+    HB_WITHOUT_GTSLN=yes
+    case "$HB_ARCHITECTURE" in
+        linux|bsd|darwin|hpux|sunos)
+            for dir in /usr /usr/local /sw /opt/local
+            do
+                if [ -f ${dir}/include/slang.h ] || \
+                   [ -f ${dir}/include/slang/slang.h ]; then
+                    HB_WITHOUT_GTSLN=no
+                fi
+            done
+            ;;
+    esac
+    export HB_WITHOUT_GTSLN
+fi
+
 if [ -z "$HB_MULTI_GT" ]; then export HB_MULTI_GT=yes; fi
 if [ -z "$HB_COMMERCE" ]; then export HB_COMMERCE=no; fi
 
@@ -114,7 +130,6 @@ esac
 if [ -z "$HB_BIN_INSTALL" ]; then export HB_BIN_INSTALL=$HB_INSTALL_PREFIX/bin; fi
 if [ -z "$HB_LIB_INSTALL" ]; then export HB_LIB_INSTALL=$HB_INSTALL_PREFIX/lib$hb_instsubdir; fi
 if [ -z "$HB_INC_INSTALL" ]; then export HB_INC_INSTALL=$HB_INSTALL_PREFIX/include$hb_instsubdir; fi
-
 
 
 if [ -z "$HB_ARCHITECTURE" ]; then
@@ -195,7 +210,8 @@ else
    # ---------------------------------------------------------------
    # Start the GNU make system
 
-   if [ "$HB_ARCHITECTURE" = "bsd" ] || uname|grep "BSD$" &> /dev/null; then
+   if [ "$HB_ARCHITECTURE" = "bsd" ] || uname|grep "BSD$" &> /dev/null || [ "$HB_ARCHITECTURE" = "hpux" ]
+   then
       gmake $*
    else
       make $*

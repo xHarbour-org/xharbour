@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.81 2006/12/10 12:33:35 ptsarenko Exp $
+ * $Id: debugger.prg,v 1.82 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -64,13 +64,11 @@
 
 //#pragma -es0
 
-
 #pragma BEGINDUMP
 
 #include "hbapigt.h"
 
 #pragma ENDDUMP
-
 
 #include "hbclass.ch"
 #include "hbmemvar.ch"
@@ -129,13 +127,10 @@
 
 
 * The dimension of the debugger window
-//#IFDEF __GTWVW__
 #define DEBUGGER_MINROW  0
 #define DEBUGGER_MINCOL  0
 #define DEBUGGER_MAXROW 22
 #define DEBUGGER_MAXCOL 77
-
-//#ENDIF
 
 static s_oDebugger
 
@@ -154,10 +149,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
 
   DO CASE
     CASE nMode == HB_DBG_GETENTRY
-      HB_INLINE() ;
-      {
-         hb_vm_pFunDbgEntry = hb_dbgEntry;
-      }
+      HB_DBG_SetEntry()
 
     CASE nMode == HB_DBG_ACTIVATE
       IF s_oDebugger == NIL
@@ -171,10 +163,7 @@ procedure __dbgEntry( nMode, uParam1, uParam2, uParam3, uParam4, uParam5 )  // d
       s_oDebugger:aBreakPoints := uParam5
       IF bStartup
         IF s_oDebugger:lRunAtStartup
-          HB_INLINE( uParam1 ) ;
-          {
-            hb_dbgSetGo( hb_parptr( 1 ) );
-          }
+          HB_DBG_SetGo( uParam1 )
           RETURN
         ENDIF
       ENDIF
@@ -192,15 +181,17 @@ CLASS TDebugger
    DATA   oWndCode, oWndCommand, oWndStack, oWndVars
    DATA   oBar, oBrwText, cPrgName, oBrwStack, oBrwVars, aVars
    DATA   cImage
-   DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor, nAppDispCount
+   DATA   cAppImage, nAppRow, nAppCol, cAppColors, nAppCursor, nAppCTWindow
+   DATA   nAppDispCount
    DATA   nAppLastKey, bAppInkeyAfter, bAppInkeyBefore, bAppClassScope
-   DATA   nAppCTWindow, nAppDirCase, nAppFileCase, oAppGetList, nAppTypeAhead
+   DATA   nAppDirCase, nAppFileCase, oAppGetList, nAppTypeAhead
    DATA   nMaxRow, nMaxCol
 
    DATA   nAppMaxRow, nAppMaxCol  //x new: app's maxrow/col
    DATA   nAppWindow
 
    DATA   nDebuggerWindow
+   DATA   lDebuggerWindowIsOpen INIT .F.
 
    DATA   aBreakPoints
    DATA   aCallStack    //stack of procedures with debug info
@@ -224,8 +215,6 @@ CLASS TDebugger
    DATA   lRunAtStartup
    DATA   lLineNumbers INIT .T.
 
-   //x for gtwvw:
-   DATA   lDebuggerWindowIsOpen INIT .F.
    DATA   cGTVersion INIT ' '
 
    METHOD New()
@@ -357,7 +346,6 @@ CLASS TDebugger
    METHOD ResizeWindows( oWindow )
    METHOD NotSupported() INLINE Alert( "Not implemented yet!" )
 
-   //x for gtwvw:
    METHOD OpenDebuggerWindow()
    METHOD CloseDebuggerWindow()
 
@@ -443,7 +431,7 @@ METHOD New() CLASS TDebugger
    ::lGo := ::lRunAtStartup
 return Self
 
-//x new
+
 METHOD OpenDebuggerWindow() CLASS TDebugger
   if ::cGTVersion == 'WVW'
     IF !::lDebuggerWindowIsOpen
@@ -461,7 +449,7 @@ METHOD OpenDebuggerWindow() CLASS TDebugger
   endif
 return nil
 
-//x new
+
 METHOD CloseDebuggerWindow() CLASS Tdebugger
 
   if ::cGTVersion == 'WVW'
@@ -674,10 +662,7 @@ return nil
 
 METHOD CodeblockTrace()
   ::oPullDown:GetItemByIdent( "CODEBLOCK" ):checked := ::lCBTrace := ! ::lCBTrace
-  HB_INLINE( ::pInfo, ::lCBTrace ) ;
-  {
-    hb_dbgSetCBTrace( hb_parptr( 1 ), hb_parl( 2 ) );
-  }
+  HB_DBG_SetCBTrace( ::pInfo, ::lCBTrace )
 RETURN NIL
 
 
@@ -771,9 +756,7 @@ RETURN NIL
 
 METHOD CommandWindowProcessKey( nKey ) CLASS TDebugger
 
-   local cCommand, cResult, oE
-   local bLastHandler
-   local lDisplay
+   local cCommand
    local n, nWidth := ::oWndCommand:nRight - ::oWndCommand:nLeft - 3
 
    do case
@@ -1236,30 +1219,7 @@ METHOD GetExprValue( xExpr, lValid ) CLASS TDebugger
   lValid := .F.
   bOldErrorBlock := ErrorBlock( {|oErr| Break( oErr ) } )
   BEGIN SEQUENCE
-    xResult := HB_INLINE( ::pInfo, xExpr, @lValid ) ;
-    {
-      PHB_ITEM item;
-
-      if ( ISCHAR( 2 ) )
-      {
-        item = hb_dbgGetExpressionValue( hb_parptr( 1 ), hb_parc( 2 ) );
-      }
-      else
-      {
-        item = hb_dbgGetWatchValue( hb_parptr( 1 ), hb_parni( 2 ) - 1 );
-      }
-
-      if ( item )
-      {
-        hb_itemRelease( hb_itemReturn( item ) );
-        hb_storl( TRUE, 3 );
-      }
-      else
-      {
-        hb_storl( FALSE, 3 );
-        hb_ret();
-      }
-    }
+    xResult := HB_DBG_GetExprValue( ::pInfo, xExpr, @lValid )
     IF !lValid
       xResult := "Syntax error"
     ENDIF
@@ -1276,18 +1236,13 @@ RETURN xResult
 
 
 METHOD GetSourceFiles() CLASS TDebugger
-RETURN HB_INLINE( ::pInfo ) ;
-       {
-          hb_itemRelease( hb_itemReturn( hb_dbgGetSourceFiles( hb_parptr( 1 ) ) ) );
-       }
+RETURN HB_DBG_GetSourceFiles( ::pInfo )
 
 
 METHOD Global() CLASS TDebugger
-
    ::lShowGlobals := ! ::lShowGlobals
    ::RefreshVars()
-
-return nil
+RETURN NIL
 
 
 METHOD Go() CLASS TDebugger
@@ -1298,10 +1253,7 @@ METHOD Go() CLASS TDebugger
   ENDIF
   ::RestoreAppScreen()
   ::RestoreAppState()
-  HB_INLINE( ::pInfo ) ;
-  {
-    hb_dbgSetGo( hb_parptr( 1 ) );
-  }
+  HB_DBG_SetGo( ::pInfo )
   ::Exit()
 RETURN NIL
 
@@ -1578,7 +1530,10 @@ METHOD InputBox( cMsg, uValue, bValid, lEditable ) CLASS TDebugger
    local lExit
    local oWndInput := TDbWindow():New( nTop, nLeft, nBottom, nRight, cMsg,;
                                        ::oPullDown:cClrPopup )
-   local oGet, bMouseSave
+#ifndef HB_NO_READDBG
+   local bMouseSave
+   local oGet
+#endif
 
    DEFAULT lEditable TO .t.
 
@@ -1687,16 +1642,12 @@ return nil
 
 
 METHOD IsValidStopLine( cName, nLine ) CLASS TDebugger
-RETURN HB_INLINE( ::pInfo, cName, nLine ) ;
-       {
-          hb_retl( hb_dbgIsValidStopLine( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) ) );
-       }
+RETURN HB_DBG_IsValidStopLine( ::pInfo, cName, nLine )
 
 
 METHOD LineNumbers( lLineNumbers ) CLASS TDebugger
 
-   DEFAULT lLineNumbers TO !::lLineNumbers
-
+   If( lLineNumbers == NIL, lLineNumbers := !::lLineNumbers, )
    ::lLineNumbers := lLineNumbers
    ::oPulldown:GetItemByIdent( "LINE" ):checked := ::lLineNumbers
    IF ::oBrwText != NIL
@@ -1784,7 +1735,6 @@ return nil
 METHOD LoadVars() CLASS TDebugger // updates monitored variables
 
    local nCount, n, m, xValue, cName
-   local cStaticName, nStaticIndex, nStaticsBase
    LOCAL aVars
    LOCAL aBVars
 
@@ -1936,10 +1886,7 @@ return nil
 METHOD NextRoutine() CLASS TDebugger
   ::RestoreAppScreen()
   ::RestoreAppState()
-  HB_INLINE( ::pInfo ) ;
-  {
-    hb_dbgSetNextRoutine( hb_parptr( 1 ) );
-  }
+  HB_DBG_SetNextRoutine( ::pInfo )
   ::Exit()
 RETURN self
 
@@ -1971,8 +1918,8 @@ METHOD Open() CLASS TDebugger
    LOCAL nFileName
    LOCAL cFileName
    LOCAL cRealName
-   LOCAL cPrgName
    LOCAL aFiles := ::GetSourceFiles()
+   LOCAL cExt
 
    ASort( aFiles )
    ASize( aFiles, Len( aFiles ) + 1 )
@@ -1999,7 +1946,8 @@ METHOD Open() CLASS TDebugger
          cFileName := cRealName
       endif
       ::cPrgName := cFileName
-      ::lppo := RAT(".PPO", UPPER(cFileName)) > 0
+      hb_FNameSplit( cFileName, NIL, NIL, @cExt )
+      ::lppo := ( Lower( cExt ) == ".ppo" )
       ::oPulldown:GetItemByIdent( "PPO" ):Checked := ::lppo
       ::oBrwText := nil
       ::oBrwText := TBrwText():New( ::oWndCode:nTop + 1, ::oWndCode:nLeft + 1,;
@@ -2016,27 +1964,23 @@ return nil
 
 
 METHOD OpenPPO() CLASS TDebugger
-   LOCAL nPos
    LOCAL lSuccess:=.F.
+   LOCAL cDir, cName, cExt
 
    IF Empty( ::cPrgName )
       RETURN .F.
    ENDIF
 
-   nPos := RAT(".PPO", UPPER(::cPrgName))
-   IF( nPos == 0 )
-      nPos := RAT(".PRG", UPPER(::cPrgName))
-      IF( nPos > 0 )
-         ::cPrgName := LEFT(::cPrgName,nPos-1) + ".ppo"
-      ELSE
-         ::cPrgName += ".ppo"
-      ENDIF
-      lSuccess := FILE(::cPrgName)
-      ::lppo := lSuccess
-   ELSE
-      ::cPrgName := LEFT(::cPrgName,nPos-1) + ".prg"
+   hb_FNameSplit( ::cPrgName, @cDir, @cName, @cExt )
+
+   IF Lower( cExt ) == ".ppo"
+      ::cPrgName := hb_FNameMerge( cDir, cName, ".prg" )
       lSuccess := FILE( ::cPrgName )
       ::lppo := !lSuccess
+   ELSE
+      ::cPrgName := hb_FNameMerge( cDir, cName, ".ppo" )
+      lSuccess := FILE( ::cPrgName )
+      ::lppo := lSuccess
    ENDIF
 
    IF( lSuccess )
@@ -2098,10 +2042,7 @@ return nil
 METHOD Quit() CLASS TDebugger
   ::Exit()
   ::Hide()
-  HB_INLINE( ::pInfo ) ;
-  {
-    hb_dbgSetQuit( hb_parptr( 1 ) );
-  }
+  HB_DBG_SetQuit( ::pInfo )
   s_oDebugger := NIL
   __QUIT()
 RETURN NIL
@@ -2200,7 +2141,7 @@ return nil
 
 
 METHOD ResizeWindows( oWindow ) CLASS TDebugger
-  LOCAL oWindow2, nTop, i, lVisible2 := .F.
+  LOCAL oWindow2, nTop, lVisible2 := .F.
 
   IF oWindow == ::oWndVars
     oWindow2 := ::oWndPnt
@@ -2297,8 +2238,6 @@ RETURN NIL
 
 
 METHOD RestoreSettings() CLASS TDebugger
-
-   local n
 
    ::cSettingsFileName := ::InputBox( "File name", ::cSettingsFileName )
 
@@ -2539,16 +2478,11 @@ METHOD ShowAppScreen() CLASS TDebugger
 
    if LastKey() == K_LBUTTONDOWN
       InKey( 0, INKEY_ALL )
-      InKey( 0, INKEY_ALL )
-   else
-      InKey( 0, INKEY_ALL )
    endif
-
-   while LastKey() == K_MOUSEMOVE
-      InKey( 0, INKEY_ALL )
+   while InKey( 0, INKEY_ALL ) == K_MOUSEMOVE
    end
 
-   ::OpenDebuggerWindow() //x
+   ::OpenDebuggerWindow()
 
    //x was: RestScreen( 0, 0, ::nMaxRow, ::nMaxCol, ::cImage )
    RestScreen( , , , , ::cImage )
@@ -2559,7 +2493,6 @@ return nil
 METHOD ShowCallStack() CLASS TDebugger
 
    local n := 1
-   local oCol
 
    ::lShowCallStack = .t.
 
@@ -2587,7 +2520,7 @@ METHOD ShowCallStack() CLASS TDebugger
       ::oWndStack := TDbWindow():New( 1, ::nMaxCol - 15, ::nMaxRow - 6, ::nMaxCol,;
                                      "Calls" )
       ::oWndStack:bKeyPressed  := { | nKey | ::CallStackProcessKey( nKey ) }
-      ::oWndStack:bLButtonDown := { | nKey | ::CallStackProcessKey( K_LBUTTONDOWN ) }
+      ::oWndStack:bLButtonDown := { || ::CallStackProcessKey( K_LBUTTONDOWN ) }
 
       AAdd( ::aWindows, ::oWndStack )
       //::nCurrentWindow = Len( ::aWindows )
@@ -2608,9 +2541,8 @@ return nil
 
 
 METHOD ShowCodeLine( nProc ) CLASS TDebugger
-   LOCAL nPos, nLevel
+   LOCAL cDir, cName
    LOCAL nLine, cPrgName
-   LOCAL xVal, oErr
 
    // we only update the stack window and up a new browse
    // to view the code if we have just broken execution
@@ -2631,12 +2563,8 @@ METHOD ShowCodeLine( nProc ) CLASS TDebugger
       ENDIF
 
       if( ::lppo )
-         nPos :=RAT(".PRG", UPPER(cPrgName) )
-         IF( nPos > 0 )
-            cPrgName := LEFT( cPrgName, nPos-1 ) + ".ppo"
-         ELSE
-            cPrgName += cPrgName +".ppo"
-         ENDIF
+         hb_FNameSplit( cPrgName, @cDir, @cName, NIL )
+         cPrgName := hb_FNameMerge( cDir, cName, ".ppo" )
       endif
 
       if ! empty( cPrgName )
@@ -2730,7 +2658,7 @@ METHOD ShowVars() CLASS TDebugger
          iif( ::lShowPublics, " Public", "" ) )
 
       ::oWndVars:bLButtonDown := { | nMRow, nMCol | ::WndVarsLButtonDown( nMRow, nMCol ) }
-      ::oWndVars:bLDblClick   := { | nMRow, nMCol | ::EditVar( ::oBrwVars:Cargo[ 1 ] ) }
+      ::oWndVars:bLDblClick   := { || ::EditVar( ::oBrwVars:Cargo[ 1 ] ) }
       ::oWndVars:bPainted     := { || if(Len( ::aVars ) > 0, ( ::oBrwVars:RefreshAll():ForceStable(),RefreshVarsS(::oBrwVars) ),) }
 
       ::oWndVars:bKeyPressed := { | nKey | IIf( Len( ::aVars ) == 0, NIL, ( ;
@@ -2875,10 +2803,7 @@ METHOD ToCursor() CLASS TDebugger
   LOCAL cName := strip_path( ::cPrgName ), nLine := ::oBrwText:nRow
 
   IF ::IsValidStopLine( cName, nLine )
-    HB_INLINE( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow ) ;
-    {
-      hb_dbgSetToCursor( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ) );
-    }
+    HB_DBG_SetToCursor( ::pInfo, strip_path( ::cPrgName ), ::oBrwText:nRow )
     ::RestoreAppScreen()
     ::RestoreAppState()
     ::Exit()
@@ -2891,7 +2816,6 @@ RETURN self
 METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
   // look for a breakpoint which matches both line number and program name
   local nAt
-  LOCAL cLine
 
   IF !::lActive
     RETURN NIL
@@ -2911,20 +2835,14 @@ METHOD ToggleBreakPoint( nLine, cFileName ) CLASS TDebugger
 
   if nAt == 0
     AAdd( ::aBreakPoints, { nLine, cFileName } )     // it was nLine
-    HB_INLINE( ::pInfo, cFileName, nLine ) ;
-    {
-       hb_dbgAddBreak( hb_parptr( 1 ), hb_parc( 2 ), hb_parni( 3 ), NULL );
-    }
+    HB_DBG_AddBreak( ::pInfo, cFileName, nLine )
     IF FILENAME_EQUAL( cFileName, strip_path( ::cPrgName ) )
       ::oBrwText:ToggleBreakPoint( nLine, .T. )
     ENDIF
   else
     ADel( ::aBreakPoints, nAt )
     ASize( ::aBreakPoints, Len( ::aBreakPoints ) - 1 )
-    HB_INLINE( ::pInfo, nAt - 1 ) ;
-    {
-       hb_dbgDelBreak( hb_parptr( 1 ), hb_parni( 2 ) );
-    }
+    HB_DBG_DelBreak( ::pInfo, nAt - 1 )
     IF FILENAME_EQUAL( cFileName, strip_path( ::cPrgName ) )
       ::oBrwText:ToggleBreakPoint( nLine, .F. )
     ENDIF
@@ -2936,19 +2854,13 @@ return nil
 
 
 METHOD Trace() CLASS TDebugger
-  HB_INLINE( ::pInfo ) ;
-  {
-    hb_dbgSetTrace( hb_parptr( 1 ) );
-  }
+  HB_DBG_SetTrace( ::pInfo )
   ::Step() //forces a Step()
 RETURN Self
 
 
 METHOD TracepointAdd( cExpr ) CLASS TDebugger
-   LOCAL cErr
    LOCAL aWatch
-   LOCAL lSuccess
-   LOCAL uValue
 
    IF( cExpr == NIL )
       cExpr:=SPACE(255)
@@ -2963,10 +2875,7 @@ METHOD TracepointAdd( cExpr ) CLASS TDebugger
    ENDIF
    aWatch := {"tp", cExpr, NIL}
    ::RestoreAppState()
-   HB_INLINE( ::pInfo, cExpr ) ;
-   {
-     hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), TRUE );
-   }
+   HB_DBG_AddWatch( ::pInfo, cExpr, .T. )
    ::SaveAppState()
    AADD( ::aWatch, aWatch )
    ::WatchpointsShow()
@@ -3005,7 +2914,6 @@ return ""
 
 METHOD VarGetValue( aVar ) CLASS TDebugger
   LOCAL nProcLevel, uValue
-  LOCAL cProc
   LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
   IF cType == "G"
@@ -3028,7 +2936,6 @@ RETURN uValue
 
 METHOD VarSetValue( aVar, uValue ) CLASS TDebugger
   LOCAL nProcLevel
-  LOCAL cProc
   LOCAL cType := Left( aVar[ VAR_TYPE ], 1 )
 
   IF cType == "G"
@@ -3117,7 +3024,6 @@ RETURN aWatch[WP_EXPR]+" <"+aWatch[WP_TYPE]+", " +cType+">: " +xVal
 
 
 METHOD WatchpointAdd( cExpr ) CLASS TDebugger
-   LOCAL cErr
    LOCAL aWatch
 
    IF( cExpr == NIL )
@@ -3132,10 +3038,7 @@ METHOD WatchpointAdd( cExpr ) CLASS TDebugger
       RETURN self
    ENDIF
    aWatch := { "wp", cExpr }
-   HB_INLINE( ::pInfo, cExpr ) ;
-   {
-      hb_dbgAddWatch( hb_parptr( 1 ), hb_parc( 2 ), FALSE );
-   }
+   HB_DBG_AddWatch( ::pInfo, cExpr, .F. )
    AADD( ::aWatch, aWatch )
    ::WatchpointsShow()
 
@@ -3143,7 +3046,6 @@ RETURN self
 
 
 METHOD WatchpointDel( nPos ) CLASS TDebugger
-   LOCAL nIdx
 
    IF( ::oWndPnt != NIL .AND. ::oWndPnt:lVisible )
       IF( nPos == NIL )
@@ -3155,10 +3057,7 @@ METHOD WatchpointDel( nPos ) CLASS TDebugger
       IF( LastKey() != K_ESC )
          IF( nPos >=0 .AND. nPos < LEN(::aWatch) )
             ::oBrwPnt:gotop()
-            HB_INLINE( ::pInfo, nPos ) ;
-            {
-               hb_dbgDelWatch( hb_parptr( 1 ), hb_parni( 2 ) );
-            }
+            HB_DBG_DelWatch( ::pInfo, nPos )
             ADEL( ::aWatch, nPos+1 )
             ASIZE( ::aWatch, LEN(::aWatch)-1 )
             IF( LEN(::aWatch) == 0 )
@@ -3176,7 +3075,6 @@ RETURN self
 METHOD WatchpointEdit( nPos ) CLASS TDebugger
    LOCAL cExpr
    LOCAL aWatch
-   LOCAL cErr
 
    cExpr:=PADR( ::aWatch[nPos][WP_EXPR], 255 )
    cExpr := ALLTRIM( ::InputBox( "Enter Watchpoint", cExpr ) )
@@ -3188,10 +3086,7 @@ METHOD WatchpointEdit( nPos ) CLASS TDebugger
       RETURN self
    ENDIF
    aWatch := { "wp", cExpr }
-   HB_INLINE( ::pInfo, nPos - 1, cExpr ) ;
-   {
-      hb_dbgSetWatch( hb_parptr( 1 ), hb_parni( 2 ), hb_parc( 3 ), FALSE );
-   }
+   HB_DBG_SetWatch( ::pInfo, nPos - 1, cExpr, .F. )
    ::aWatch[ nPos ] := aWatch
    ::WatchpointsShow()
 
@@ -3228,7 +3123,6 @@ METHOD WatchpointsShow() CLASS TDebugger
    Local oCol
    local lRepaint := .f.
    local nTop
-   LOCAL lFocused
 
    if ::lGo
       return nil
@@ -3316,8 +3210,8 @@ METHOD WatchpointsShow() CLASS TDebugger
       if ! ::oWndPnt:lVisible .OR. lRepaint
          ::ResizeWindows( ::oWndPnt )
       endif
+      DispEnd()
    endif
-   DispEnd()
 return nil
 
 
@@ -3348,7 +3242,6 @@ static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
    local nSet := oBrwSets:cargo[1]
    local cTemp:=str(nSet,4)
 
-   Local nRectoMove
    do case
       case nKey == K_UP
               oBrwSets:Up()
@@ -3376,38 +3269,6 @@ static procedure SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cCaption, bEdit )
 
       oWnd:SetCaption( cCaption + "[" + AllTrim( Str( oBrwSets:Cargo[1] ) ) + ;
                        ".." + AllTrim( Str( nSets ) ) + "]" )
-
-return
-
-static procedure SetsKeyVarPressed( nKey, oBrwSets, nSets, oWnd, bEdit )
-   Local nRectoMove
-   local nSet := oBrwSets:Cargo[1]
-   do case
-      case nKey == K_UP
-              oBrwSets:Up()
-
-      case nKey == K_DOWN
-              oBrwSets:Down()
-
-      case nKey == K_HOME .or. (nKey == K_CTRL_PGUP) .or. (nKey == K_CTRL_HOME)
-              oBrwSets:GoTop()
-      case nKey == K_END .or. (nkey == K_CTRL_PGDN) .or. (nkey == K_CTRL_END )
-              oBrwSets:GoBottom()
-
-      Case nKey == K_PGDN
-              oBrwSets:pageDown()
-      Case nKey == K_PGUP
-              OBrwSets:PageUp()
-
-      case nKey == K_ENTER
-           if bEdit != nil
-              Eval( bEdit )
-           endif
-           if LastKey() == K_ENTER
-              KEYBOARD Chr( K_DOWN )
-           endif
-
-   endcase
 
 return
 
@@ -3510,7 +3371,7 @@ static procedure RefreshVarsS( oBrowse )
 return
 
 
-static function ArrayBrowseSkip( nPos, oBrwSets, n )
+static function ArrayBrowseSkip( nPos, oBrwSets )
 
 return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
        iif( oBrwSets:cargo[ 1 ] + nPos > Len(oBrwSets:cargo[ 2 ][ 1 ]), ;
@@ -3520,7 +3381,7 @@ return iif( oBrwSets:cargo[ 1 ] + nPos < 1, 0 - oBrwSets:cargo[ 1 ] + 1 , ;
 static function PathToArray( cList )
    local nPos
    local aList := {}
-   local cSep, cDirSep, cDir
+   local cSep, cDirSep
 
    cSep := HB_OsPathListSeparator()
    cDirSep := HB_OsPathDelimiters()

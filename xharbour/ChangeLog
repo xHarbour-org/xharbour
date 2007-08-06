@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5637 2007/07/31 20:58:43 lculik Exp $
+ * $Id: ChangeLog,v 1.5638 2007/08/06 12:55:51 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,38 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-07 00:29 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_gnu.sh
+    ! Don't try to build GTSLN if Slang is not found, use gmake under HP-UX
+    (fixes by Przemyslaw Czerpak, mostly synced with Harbour).
+  * include/Makefile
+  + include/hbapidbg.h
+  * include/hbvm.h
+    * Moved debugger API to a separate header (synced with Harbour).
+  * source/debug/dbghelp.prg
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dbgwa.prg
+    % Removed unused variables (synced with Harbour)
+  * source/debug/debugger.prg
+    % Removed unused variables, use wrappers instead of HB_INLINES (mostly
+      synced with Harbour).
+    ! Add a missing DispEnd() call (fix by Przemyslaw Czerpak, borrowed from
+      Harbour)
+  * source/vm/dbgentry.c
+    ! Use less xHarbour structure internals, fix some memory leaks, added a
+      set of HB_DBG_* functions to control the debugger (changes by Przemyslaw
+      Czerpak, mostly synced with Harbour).
+  * source/vm/debug.c
+  * source/vm/hvm.c
+    % Simplified HVM <-> debugger interface (by Przemyslaw Czerpak, synced
+      with Harbour where possible).
+  * source/pp/Makefile
+    ! Fix building ppgen under some odd/old GNU make versions, especially in
+      OS/2 (synced with Harbour).
 
 2007-08-06 09:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source\rtl\tbrowse.prg

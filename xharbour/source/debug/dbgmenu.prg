@@ -1,5 +1,5 @@
 /*
- * $Id: dbgmenu.prg,v 1.9 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: dbgmenu.prg,v 1.10 2006/03/21 20:46:19 likewolf Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
           [ IDENT <nIdent> ] [ ACTION <uAction,...> ] ;
           [ CHECKED <bChecked> ] => ;
    [ <oMenuItem> := ] TDbMenu():AddItem( TDbMenuItem():New( <cPrompt>,;
-   [{|Self|<uAction>}], [<bChecked>], [<nIdent>] ) )
+   [{||<uAction>}], [<bChecked>], [<nIdent>] ) )
 #xcommand SEPARATOR => TDbMenu():AddItem( TDbMenuItem():New( "-" ) )
 #xcommand ENDMENU => ATail( TDbMenu():aMenus ):Build()
 

@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.3 2006/01/18 23:44:05 likewolf Exp $
+ * $Id: dbghelp.prg,v 1.4 2006/10/15 19:25:13 likewolf Exp $
  */
 
 /*
@@ -60,7 +60,7 @@
 
 function __dbgHelp( nTopic )
 
-   local oDlg, n
+   local oDlg
    local cColor := If( __Dbg():lMonoDisplay, "N/W, W/N, W+/W, W+/N",;
                        "N/W, N/BG, R/W, R/BG" )
    local oBrw, aTopics := GetTopics()
@@ -105,7 +105,7 @@ static procedure PaintWindow( oDlg, oBrw, aTopics )
 
 return
 
-static procedure ProcessKey( nKey, oDlg, oBrw, aTopics, cColor )
+static procedure ProcessKey( nKey, oDlg, oBrw, aTopics )
 
    local n, nSkip
 

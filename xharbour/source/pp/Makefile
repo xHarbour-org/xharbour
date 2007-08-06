@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.5 2007/05/27 14:07:27 likewolf Exp $
+# $Id: Makefile,v 1.6 2007/06/03 13:01:01 likewolf Exp $
 #
 
 ROOT = ../../
@@ -16,7 +16,9 @@ LIBNAME=pp
 LIBS=\
 	common \
 
-HB_PPGEN_PATH ?= .
+ifeq ($(HB_PPGEN_PATH),)
+   HB_PPGEN_PATH=.
+endif
 
 include $(TOP)$(ROOT)config/lib.cf
 

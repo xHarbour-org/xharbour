@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.7 2006/06/26 14:26:25 fsgiudice Exp $
+ * $Id: dbgtobj.prg,v 1.8 2006/12/10 12:33:35 ptsarenko Exp $
  */
 
 /*
@@ -169,7 +169,6 @@ method SetsKeyPressed( nKey, oBrwSets, nSets, oWnd ,cName,LenArr,aArray) class t
    local nSet := oBrwSets:Cargo
    local cTemp:=str(nSet,4)
    local cOldname:= ::objname
-   Local nPos
 
    Switch nKey
       case K_UP
@@ -309,6 +308,9 @@ static function ValToStr( uVal )
 return cResult
 
 METHOD doGet(oBro,pItem,nSet) class tdbgObject
+
+#ifndef HB_NO_READDBG
+
     LOCAL column,  nKey
     local getlist:={}
     // save state
@@ -320,6 +322,8 @@ METHOD doGet(oBro,pItem,nSet) class tdbgObject
     // make sure browse is stable
     obro:forcestable()
     // if confirming new record, append blank
+
+
 
     // set insert key to toggle insert mode and cursor
     SetKey( K_INS, ;
@@ -356,6 +360,9 @@ METHOD doGet(oBro,pItem,nSet) class tdbgObject
     IF nKey == K_UP .OR. nKey == K_DOWN .OR. nKey == K_PGUP .OR. nKey == K_PGDN
         KEYBOARD CHR( nKey )
     END
+
+#endif
+
 RETURN nil
 
 static FUNC maxelem( a )
@@ -363,7 +370,6 @@ static FUNC maxelem( a )
    LOCAL max     := 0
    LOCAL tam     := 0
    LOCAL elem
-   LOCAL nCount
 
    for each elem in a
       tam := LEN( elem )

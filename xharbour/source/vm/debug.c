@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.24 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: debug.c,v 1.25 2007/04/20 09:41:31 marchuet Exp $
  */
 
 /*
@@ -53,9 +53,10 @@
 #include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
+#include "hbapidbg.h"
 #include "hbapiitm.h"
-#include "hbstack.h"
 #include "hbapierr.h"
+#include "hbstack.h"
 
 /* $Doc$
  * $FuncName$     AddToArray( <pItem>, <pReturn>, <uiPos> )
@@ -136,7 +137,7 @@ HB_FUNC( HB_DBG_VMSTKGLIST )
  * $FuncName$     <nVars> hb_dbg_vmStkLCount( <nProcLevel> )
  * $Description$  Returns params plus locals amount of the nProcLevel function
  * $End$ */
-static USHORT hb_stackLen( int iLevel )
+static LONG hb_stackLen( int iLevel )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
    USHORT uiCount = 0;
@@ -154,9 +155,7 @@ static USHORT hb_stackLen( int iLevel )
 
 HB_FUNC( HB_DBG_VMSTKLCOUNT )
 {
-   int iLevel = hb_parni( 1 ) + 1;
-
-   hb_retni( hb_stackLen( iLevel ) );
+   hb_retnl( hb_stackLen( hb_parni( 1 ) + 1 ) );
 }
 
 /* $Doc$
@@ -228,8 +227,7 @@ static void hb_dbgStop(void)
 }
 
 HB_EXTERN_BEGIN
-HB_EXPORT PHB_ITEM
-hb_dbg_vmVarLGet( int iLevel, int iLocal )
+HB_EXPORT PHB_ITEM hb_dbg_vmVarLGet( int iLevel, int iLocal )
 {
    PHB_ITEM * pBase = HB_VM_STACK.pBase;
 
@@ -261,19 +259,17 @@ HB_FUNC( HB_DBG_VMVARLGET )
 {
    int iLevel = hb_parni( 1 ) + 1;
    int iLocal = hb_parni( 2 );
-   HB_ITEM *pItem;
+   PHB_ITEM pLocal = hb_dbg_vmVarLGet( iLevel, iLocal );
 
-   pItem = hb_dbg_vmVarLGet( iLevel, iLocal );
-   if (pItem)
+   if( pLocal )
    {
-      hb_itemCopy( &(HB_VM_STACK.Return), pItem );
+      hb_itemReturn( pLocal );
    }
    else
    {
       hb_errRT_BASE( EG_ARG, 9999, NULL, "HB_DBG_VMVARLGET", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
-
 
 HB_FUNC( HB_DBG_VMVARLSET )
 {
@@ -302,35 +298,35 @@ HB_FUNC( HB_DBG_VMVARLSET )
 
 HB_FUNC( __VMSTKLCOUNT )
 {
-   HB_FUNC_EXEC(HB_DBG_VMSTKLCOUNT);
+   HB_FUNC_EXEC( HB_DBG_VMSTKLCOUNT );
 }
 
 HB_FUNC( __VMPARLLIST )
 {
-   HB_FUNC_EXEC(HB_DBG_VMPARLLIST);
+   HB_FUNC_EXEC( HB_DBG_VMPARLLIST );
 }
 
 HB_FUNC( __VMSTKLLIST )
 {
-   HB_FUNC_EXEC(HB_DBG_VMSTKLLIST);
+   HB_FUNC_EXEC( HB_DBG_VMSTKLLIST );
 }
 
 HB_FUNC( __VMVARLGET )
 {
-   HB_FUNC_EXEC(HB_DBG_VMVARLGET);
+   HB_FUNC_EXEC( HB_DBG_VMVARLGET );
 }
 
 HB_FUNC( __VMVARLSET )
 {
-   HB_FUNC_EXEC(HB_DBG_VMVARLSET);
+   HB_FUNC_EXEC( HB_DBG_VMVARLSET );
 }
 
-HB_FUNC( __VMSTKGLIST)
+HB_FUNC( __VMSTKGLIST )
 {
-   HB_FUNC_EXEC(HB_DBG_VMSTKGLIST);
+   HB_FUNC_EXEC( HB_DBG_VMSTKGLIST );
 }
 
 HB_FUNC( __VMSTKGCOUNT )
 {
-   HB_FUNC_EXEC(HB_DBG_VMSTKGCOUNT);
+   HB_FUNC_EXEC( HB_DBG_VMSTKGCOUNT );
 }

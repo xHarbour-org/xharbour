@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.30 2007/05/11 16:30:45 hazi01 Exp $
+# $Id: Makefile,v 1.31 2007/05/27 13:28:14 likewolf Exp $
 #
 
 ROOT = ../
@@ -9,6 +9,7 @@ C_HEADERS=\
 	extend.h     \
 	hbapi.h      \
 	hbole.h      \
+	hbapidbg.h   \
 	hbapierr.h   \
 	hbapifs.h    \
 	hbapigt.h    \
