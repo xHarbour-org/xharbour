@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.171 2007/06/06 00:46:33 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.172 2007/07/06 13:11:34 modalsist Exp $
  */
 
 /*
@@ -165,7 +165,6 @@
 #define TBC_CLR_HEADING   TBC_CLR_STANDARD
 #define TBC_CLR_FOOTING   TBC_CLR_STANDARD
 #endif
-
 
 // ===================================================================================================
 
@@ -560,11 +559,15 @@ CLASS TBrowse
 
    ACCESS footSep INLINE ::cFootSep       // Footing separator character
    ASSIGN footSep( cFootSep ) INLINE ::lConfigured := .f.,;
-                                     ::lFootSep := ! Empty( ::cFootSep := cFootSep )
+                                     ::cFootSep := if( !EmptyStr( cFootSep ), cFootSep, ::cFootSep ),;
+                                     ::lFootSep := !EmptyStr( ::cFootSep ) 
+//                                     ::lFootSep := ! Empty( ::cFootSep := cFootSep )
 
    ACCESS headSep INLINE ::cHeadSep       // Head separator character
    ASSIGN headSep( cHeadSep ) INLINE ::lConfigured := .f.,;
-                                     ::lHeadSep := ! Empty( ::cHeadSep := cHeadSep )
+                                     ::cHeadSep := if( !EmptyStr( cHeadSep ), cHeadSep, ::cHeadSep ),;
+                                     ::lHeadSep := !EmptyStr( ::cHeadSep ) 
+//                                     ::lHeadSep := ! Empty( ::cHeadSep := cHeadSep )
 
    ACCESS freeze INLINE ::nFrozenCols     // Number of columns to freeze/frozen
    ASSIGN freeze( nHowMany )  INLINE ::SetFrozenCols( nHowMany, .t. ), ::lConfigured := .f., ::nFrozenCols
@@ -876,8 +879,8 @@ METHOD Configure( nMode ) CLASS TBrowse
       //                    baded in Tbrwose:HeadSep and TBrowse:FootSep, if any.
       //::lHeaders     := .F.
       //::lFooters     := .F.
-      ::lHeaders     := !Empty( ::cHeadSep )
-      ::lFooters     := !Empty( ::cFootSep )
+      ::lHeaders     := ! EmptyStr( ::cHeadSep )
+      ::lFooters     := ! EmptyStr( ::cFootSep )
       ::lColHeadSep  := .F.
       ::lColFootSep  := .F.
       ::lRedrawFrame := .T.
@@ -3754,6 +3757,13 @@ ELSE
 ENDIF
 
 RETURN ( lBottom )
+
+*-------------------------------
+Static Function EmptyStr( cStr )
+*-------------------------------
+* Check if a string is valid.
+*-------------------------------
+Return !( Hb_IsString( cStr ) .and. Len( cStr ) > 0 )
 
 //-------------------------------------------------------------------//
 //

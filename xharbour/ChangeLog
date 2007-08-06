@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5636 2007/07/31 14:36:44 marchuet Exp $
+ * $Id: ChangeLog,v 1.5637 2007/07/31 20:58:43 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-06 09:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\tbrowse.prg
+    ! fix to accept " " as valid string at headsep and footsep.
+    Bug and fix provided by Budyanto Dj.
+
+  * source\rtl\transfrm.c
+    ! fix to transform int64 numbers. Bug and fix provided by Marcelo Lombardo.
 
 2007-07-31 12:32 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/dbf1.c

@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.50 2007/02/27 15:59:40 druzus Exp $
+ * $Id: transfrm.c,v 1.51 2007/07/06 13:11:35 modalsist Exp $
  */
 
 /*
@@ -606,7 +606,7 @@ HB_FUNC( TRANSFORM )
 
       else if( HB_IS_NUMERIC( pValue ) )
       {
-         double   dPush;
+         double   dPush = 0;
 
          int      iOrigWidth;
          int      iOrigDec;
@@ -631,8 +631,18 @@ HB_FUNC( TRANSFORM )
 
          BOOL     bAdjust = FALSE;
          int      iWidth2 = 0;
+         LONGLONG llValue = 0;
+         LONGLONG llPush  = 0;
 
-         dValue = hb_itemGetND( pValue );
+         if( HB_IS_LONG( pValue ) )
+         {   
+            llValue = hb_itemGetNLL( pValue );
+         }
+         else
+         {
+            dValue = hb_itemGetND( pValue );
+         }
+
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
          // @9 works only if there's no another mask
@@ -693,28 +703,34 @@ HB_FUNC( TRANSFORM )
                    szPic[ i ] == '$' ||
                    szPic[ i ] == '*' )
                {
-		  bTrueDec = TRUE;
+        bTrueDec = TRUE;
                   iWidth++;
                   iDec++;
                }
             }
-	    if( !bTrueDec )
-	    {
+       if( !bTrueDec )
+       {
                iWidth++;
                iDec++;
-	    }
+       }
          }
          else
             iDec = 0;
 
 
-         if( ( uiPicFlags & ( PF_DEBIT + PF_PARNEG + PF_PARNEGWOS ) ) && dValue < 0 )
-            dPush = -dValue;                           /* Always push absolute val */
+         if( ( uiPicFlags & ( PF_DEBIT + PF_PARNEG + PF_PARNEGWOS ) ) && ( dValue < 0 || llValue < 0 ) )
+         {
+            dPush  = -dValue;                           /* Always push absolute val */
+            llPush = -llValue;
+         }
          else
-            dPush = dValue;
+         {
+            dPush  = dValue;
+            llPush = llValue;
+         }
 
          /* Don't empty the result if the number is not zero */
-         if( dPush != 0 && ( uiPicFlags & PF_EMPTY ) )
+         if( (dPush != 0 || llPush != 0) && ( uiPicFlags & PF_EMPTY ) )
                uiPicFlags &= ~PF_EMPTY;
 
          if( iWidth == 0 )                             /* Width calculated ??      */
@@ -733,11 +749,20 @@ HB_FUNC( TRANSFORM )
              bAdjust = TRUE;
          }
 
-         szStr = hb_itemStr(
-            hb_itemPutNDLen( &Number, dPush, -1, iDec ),
-            hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
-            hb_itemPutNI( &Dec, iDec ));
-
+         if( llValue )
+         {
+            szStr = hb_itemStr(
+               hb_itemPutNLLLen( &Number, llValue, iWidth ),
+               hb_itemPutNI( &Width, iWidth ),
+               hb_itemPutNI( &Dec, iDec ));
+         }
+         else
+         {
+            szStr = hb_itemStr(
+               hb_itemPutNDLen( &Number, dValue, -1, iDec ),
+               hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
+               hb_itemPutNI( &Dec, iDec ));
+         }
 
          // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal
          //                    dot in the string.
