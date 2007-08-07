@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.51 2007/07/06 13:11:35 modalsist Exp $
+ * $Id: transfrm.c,v 1.52 2007/08/06 12:55:51 modalsist Exp $
  */
 
 /*
@@ -631,6 +631,8 @@ HB_FUNC( TRANSFORM )
 
          BOOL     bAdjust = FALSE;
          int      iWidth2 = 0;
+
+#ifndef HB_LONG_LONG_OFF
          LONGLONG llValue = 0;
          LONGLONG llPush  = 0;
 
@@ -642,7 +644,9 @@ HB_FUNC( TRANSFORM )
          {
             dValue = hb_itemGetND( pValue );
          }
-
+#else
+            dValue = hb_itemGetND( pValue );
+#endif
          hb_itemGetNLen( pValue, &iOrigWidth, &iOrigDec );
 
          // @9 works only if there's no another mask
@@ -717,7 +721,7 @@ HB_FUNC( TRANSFORM )
          else
             iDec = 0;
 
-
+#ifndef HB_LONG_LONG_OFF
          if( ( uiPicFlags & ( PF_DEBIT + PF_PARNEG + PF_PARNEGWOS ) ) && ( dValue < 0 || llValue < 0 ) )
          {
             dPush  = -dValue;                           /* Always push absolute val */
@@ -732,6 +736,17 @@ HB_FUNC( TRANSFORM )
          /* Don't empty the result if the number is not zero */
          if( (dPush != 0 || llPush != 0) && ( uiPicFlags & PF_EMPTY ) )
                uiPicFlags &= ~PF_EMPTY;
+
+#else
+         if( ( uiPicFlags & ( PF_DEBIT + PF_PARNEG + PF_PARNEGWOS ) ) && dValue < 0 )
+            dPush = -dValue;                           /* Always push absolute val */
+         else
+            dPush = dValue;
+
+         /* Don't empty the result if the number is not zero */
+         if( dPush != 0 && ( uiPicFlags & PF_EMPTY ) )
+               uiPicFlags &= ~PF_EMPTY;
+#endif
 
          if( iWidth == 0 )                             /* Width calculated ??      */
          {
@@ -749,6 +764,7 @@ HB_FUNC( TRANSFORM )
              bAdjust = TRUE;
          }
 
+#ifndef HB_LONG_LONG_OFF
          if( llValue )
          {
             szStr = hb_itemStr(
@@ -763,7 +779,12 @@ HB_FUNC( TRANSFORM )
                hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
                hb_itemPutNI( &Dec, iDec ));
          }
-
+#else
+         szStr = hb_itemStr(
+            hb_itemPutNDLen( &Number, dPush, -1, iDec ),
+            hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
+            hb_itemPutNI( &Dec, iDec ));
+#endif
          // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal
          //                    dot in the string.
          if( bAdjust && iWidth2 > 0 )

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5638 2007/08/06 12:55:51 modalsist Exp $
+ * $Id: ChangeLog,v 1.5639 2007/08/06 20:30:21 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-07 11:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source\rtl\transfrm.c
+    ! Added #ifndef HB_LONG_LONG_OFF directive to avoid compiler error if
+      HB_LONG_LONG_OFF is off, as is on OS/2. Bug reported by Maurilio Longo.
 
 2007-08-07 00:29 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_gnu.sh
