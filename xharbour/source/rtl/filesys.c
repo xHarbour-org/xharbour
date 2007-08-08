@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.160 2006/11/15 08:56:33 marchuet Exp $
+ * $Id: filesys.c,v 1.161 2006/11/15 12:41:05 marchuet Exp $
  */
 
 /*
@@ -250,6 +250,12 @@
 
 #ifndef O_LARGEFILE
    #define O_LARGEFILE  0       /* O_LARGEFILE is used for LFS in 32-bit Linux */
+#endif
+
+
+#if defined(_MSC_VER)
+#define eof  _eof
+#define isatty    _isatty
 #endif
 
 

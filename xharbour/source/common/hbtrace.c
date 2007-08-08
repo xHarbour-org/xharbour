@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.8 2005/01/12 16:36:22 druzus Exp $
+ * $Id: hbtrace.c,v 1.9 2006/07/27 12:21:30 lculik Exp $
  */
 
 /*
@@ -59,6 +59,11 @@
 #include "hb_io.h"
 #include "hbtrace.h"
 
+#if defined(_MSC_VER)
+#define close  _close
+#define dup    _dup
+#define fileno _fileno
+#endif
 HB_EXPORT char * hb_tr_file_ = "";
 HB_EXPORT int    hb_tr_line_ = 0;
 HB_EXPORT int    hb_tr_level_ = 0;

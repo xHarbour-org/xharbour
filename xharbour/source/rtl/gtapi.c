@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.70 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.71 2007/05/28 17:22:53 enricomaria Exp $
  */
 
 /*
@@ -86,6 +86,11 @@
 #include "hb_io.h"
 #include "hbvm.h"
 #include "inkey.ch"
+
+
+#if defined(_MSC_VER)
+#define isatty    _isatty
+#endif
 
 /****************************************************************************/
 /* gt API static */
