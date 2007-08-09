@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5640 2007/08/07 14:28:41 modalsist Exp $
+ * $Id: ChangeLog,v 1.5641 2007/08/08 22:21:04 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-09 13:47 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+  * source/pp/ppcore.c
+    + added support for .T., .F., .Y., .N. in PP and #IF ... / #ELSEIF ...
+      expressions. (synced with Harbour)
+  * source/compiler/harbour.c
+    Warning W0004 ( Codeblock parameter: 'X' declared but not used in function: 'xyz' )
+    only shows with -W4
 
 2007-08-08 19:00 UTC-0300 Luiz Rafael Culik Guimaraes
   * source/common/hbtrace.c
