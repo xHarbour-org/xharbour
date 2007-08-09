@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.256 2007/05/28 17:22:53 enricomaria Exp $
+ * $Id: ppcore.c,v 1.257 2007/06/13 23:21:26 ronpinkas Exp $
  */
 
 /*
@@ -4564,6 +4564,12 @@ static PHB_PP_TOKEN hb_pp_calcValue( PHB_PP_TOKEN pToken, int iPrecedense,
          * pfError = FALSE;
          pToken = pToken->pNext;
       }
+   }
+   else if( HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_LOGICAL )
+   {
+      *plValue = HB_PP_ISTRUE( pToken->value[ 1 ] ) ? 1 : 0;
+      * pfError = FALSE;
+      pToken = pToken->pNext;
    }
    else
       * pfError = TRUE;
