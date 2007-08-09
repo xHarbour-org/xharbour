@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.163 2007/05/24 21:15:25 enricomaria Exp $
+ * $Id: harbour.c,v 1.164 2007/06/03 12:51:30 likewolf Exp $
  */
 
 /*
@@ -5407,7 +5407,7 @@ HB_EXPR_PTR hb_compCodeBlockEnd( BOOL bExt )
    pVar = pCodeblock->pLocals;
    while( pVar )
    {
-      if( hb_comp_iWarnings && pFunc->szName && pVar->szName && ! ( pVar->iUsed & VU_USED ) )
+      if( hb_comp_iWarnings > 3 && pFunc->szName && pVar->szName && ! ( pVar->iUsed & VU_USED ) )
       {
          hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_BLOCKVAR_NOT_USED, pVar->szName, pFunc->szName );
       }
