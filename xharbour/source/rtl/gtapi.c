@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.71 2007/05/28 17:22:53 enricomaria Exp $
+ * $Id: gtapi.c,v 1.72 2007/08/08 22:21:06 lculik Exp $
  */
 
 /*
@@ -88,7 +88,7 @@
 #include "inkey.ch"
 
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && ! defined( __XCC__ )
 #define isatty    _isatty
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.161 2006/11/15 12:41:05 marchuet Exp $
+ * $Id: filesys.c,v 1.162 2007/08/08 22:21:06 lculik Exp $
  */
 
 /*
@@ -253,7 +253,7 @@
 #endif
 
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && ! defined( __XCC__ )
 #define eof  _eof
 #define isatty    _isatty
 #endif

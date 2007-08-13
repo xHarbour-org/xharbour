@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.9 2006/07/27 12:21:30 lculik Exp $
+ * $Id: hbtrace.c,v 1.10 2007/08/08 22:21:06 lculik Exp $
  */
 
 /*
@@ -59,7 +59,7 @@
 #include "hb_io.h"
 #include "hbtrace.h"
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && ! defined( __XCC__ )
 #define close  _close
 #define dup    _dup
 #define fileno _fileno
