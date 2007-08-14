@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.17 2007/07/13 08:53:31 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.18 2007/07/17 15:05:47 marchuet Exp $
  */
 
 /*
@@ -635,7 +635,7 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
 
    LOCAL cPath := ""
    LOCAL cFile := ""
-   Local cExt  := ""
+   LOCAL cExt  := ""
 
    HB_FNameSplit( cLocalFile, @cPath, @cFile,@cExt  )
 
@@ -644,18 +644,16 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
    ::bEof := .F.
    ::oUrl:cFile := cRemoteFile
 
-   IF .not. ::bInitialized
+   IF ! ::bInitialized
 
       IF Empty( ::oUrl:cFile )
-
-         RETURN -1
-
+         RETURN .F.
       ENDIF
 
       IF ! Empty( ::oUrl:cPath )
 
          IF ! ::CWD( ::oUrl:cPath )
-            RETURN -1
+            RETURN .F.
          ENDIF
 
       ENDIF
@@ -665,7 +663,7 @@ METHOD UpLoadFile( cLocalFile, cRemoteFile ) CLASS tIPClientFTP
       ENDIF
 
       IF ! ::Stor( ::oUrl:cFile )
-         RETURN -1
+         RETURN .F.
       ENDIF
 
       // now channel is open
