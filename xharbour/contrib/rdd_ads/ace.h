@@ -1,5 +1,5 @@
 // Copyright (c) 2001-2005 Extended Systems, Inc.
-// Portions Copyright (c) 2005-2006, iAnywhere Solutions, Inc.
+// Portions Copyright (c) 2005-2007, iAnywhere Solutions, Inc.
 // All rights reserved. All unpublished rights reserved.
 //
 // This source code can be used, modified, or copied by the licensee as long as
@@ -499,6 +499,7 @@
 #define AE_FREETABLEFAILED              5199
 #define AE_BLURRY_SNAPSHOT              5200
 #define AE_INVALID_VERTICAL_FILTER      5201
+#define AE_INVALID_USE_OF_HANDLE_IN_AEP 5202 
 
 /* Supported file types */
 #define ADS_DATABASE_TABLE       ADS_DEFAULT
@@ -1033,6 +1034,7 @@ typedef struct _ADD_FIELD_DESC_
 #define ADS_DD_SUBSCR_ENABLED             1705    // boolean flag:  Replication enabled on this subscription?
 #define ADS_DD_SUBSCR_QUEUE_NAME          1706    // replication queue
 #define ADS_DD_SUBSCR_OPTIONS             1707    // for future use
+#define ADS_DD_SUBSCR_QUEUE_NAME_RELATIVE 1708    // replication queue relative to the DD 
 
 
 #define ADS_DD_LEVEL_0  0
