@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5645 2007/08/17 12:42:14 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5646 2007/08/20 18:43:39 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-20 21:30 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * harbour/source/rdd/dbcmd.c
+    * cleaned DBSKIPPER() code
+	synced with harbour
+
+  * harbour/source/rtl/browdb.prg
+    * use written in C DBSKIPPER() function instead of static .prg Skipped()
+      when HB_COMPAT_XPP macro is enabled
+	synced with harbour
 
 2007-08-20 20:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/compiler/harbour.sly
