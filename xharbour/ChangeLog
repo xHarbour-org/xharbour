@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5644 2007/08/14 14:59:47 patrickmast Exp $
+ * $Id: ChangeLog,v 1.5645 2007/08/17 12:42:14 toninhofwi Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-20 20:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/compiler/harbour.sly
+    ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
+	
+	It can be tested with:
+		proc main()
+		local o:=errorNew()
+		while .t.
+		   with object o
+		      ? :tries++
+		      loop
+		   end
+		enddo
+		return
 
 2007-08-17 09:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h

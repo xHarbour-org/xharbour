@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.121 2007/05/18 17:27:41 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.122 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -90,9 +90,10 @@ typedef struct __ELSEIF
 
 typedef struct _LOOPEXIT
 {
-   ULONG ulOffset;
-   int iLine;
-   USHORT wSeqCounter;
+   ULONG              ulOffset;
+   int                iLine;
+   USHORT             wSeqCounter;
+   USHORT             wWithObjCounter;
    struct _LOOPEXIT * pLoopList;
    struct _LOOPEXIT * pExitList;
    struct _LOOPEXIT * pNext;
@@ -2793,18 +2794,22 @@ ForEach    : FOREACH IdentName  /* 1  2 */
                }
            ;
 
-WithObject   : WITHOBJ Expression {
-                                     hb_compLinePush();
-                                     hb_compGenWithObject($2);
+WithObject   : WITHOBJ Expression Crlf
+				 {
+                    hb_compLinePush();
+                    hb_compGenWithObject($2);
 
-                                     if( s_iControlLevel++ == 0 )
-                                     {
-                                        s_iLastControlLine = hb_comp_iLine;
-                                     }
-                                  }
-                       Crlf
-                 EmptyStats
-               END                { hb_compGenEndWithObject(); s_iControlLevel--; }
+                    if( s_iControlLevel++ == 0 )
+                    {
+						s_iLastControlLine = hb_comp_iLine;
+                    }
+                 }
+               EmptyStats
+               END  
+				 { 
+					hb_compGenEndWithObject(); 
+					s_iControlLevel--; 
+				 }
              ;
 
 BeginSeq   : BEGINSEQ {
@@ -3296,12 +3301,13 @@ static void hb_compLoopStart( void )
       hb_comp_pLoops = pLoop;
    }
 
-   pLoop->pNext       = NULL;
-   pLoop->pExitList   = NULL;
-   pLoop->pLoopList   = NULL;
-   pLoop->ulOffset    = hb_comp_functions.pLast->lPCodePos;  /* store the start position */
-   pLoop->iLine       = hb_comp_iLine;
-   pLoop->wSeqCounter = hb_comp_wSeqCounter;  /* store current SEQUENCE counter */
+   pLoop->pNext           = NULL;
+   pLoop->pExitList       = NULL;
+   pLoop->pLoopList       = NULL;
+   pLoop->ulOffset        = hb_comp_functions.pLast->lPCodePos;  /* store the start position */
+   pLoop->iLine           = hb_comp_iLine;
+   pLoop->wSeqCounter     = hb_comp_wSeqCounter;  /* store current SEQUENCE counter */
+   pLoop->wWithObjCounter = hb_comp_wWithObjCounter;  /* store current WITH OBJECT counter */   
 }
 
 /*
@@ -3316,11 +3322,6 @@ static void hb_compLoopLoop( void )
    else
    {
       PTR_LOOPEXIT pLast, pLoop, pLastNonSwitch = NULL;
-
-      pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
-
-      pLoop->pLoopList = NULL;
-      pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
 
       pLast = hb_comp_pLoops;
       if( pLast->wSeqCounter != (USHORT) -1 )
@@ -3359,11 +3360,21 @@ static void hb_compLoopLoop( void )
       }
       else
       {
+		 USHORT wWithObjCounter = pLast->wWithObjCounter;
+		 
+		 pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+  		 pLoop->pLoopList = NULL;
          while( pLast->pLoopList )
             pLast = pLast->pLoopList;
-
          pLast->pLoopList = pLoop;
 
+         while( wWithObjCounter < hb_comp_wWithObjCounter )
+         {
+			hb_compGenEndWithObject();
+            wWithObjCounter++;
+         }
+      
+		 pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }
@@ -3382,16 +3393,9 @@ static void hb_compLoopExit( void )
    {
       PTR_LOOPEXIT pLast, pLoop;
 
-      pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
-
-      pLoop->pExitList = NULL;
-      pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
-
       pLast = hb_comp_pLoops;
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
 
       if( pLast->wSeqCounter != hb_comp_wSeqCounter && pLast->wSeqCounter != (USHORT) -1 )
       {
@@ -3403,13 +3407,21 @@ static void hb_compLoopExit( void )
       }
       else
       {
+	     USHORT wWithObjCounter = pLast->wWithObjCounter;
+			   
+		 pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+ 		 pLoop->pExitList = NULL;
          while( pLast->pExitList )
-         {
             pLast = pLast->pExitList;
-         }
-
          pLast->pExitList = pLoop;
 
+		 while( wWithObjCounter < hb_comp_wWithObjCounter )
+         {
+			hb_compGenEndWithObject();
+            wWithObjCounter++;
+         }
+		 
+		 pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }
@@ -3420,16 +3432,15 @@ static void hb_compLoopExit( void )
  */
 static void hb_compLoopHere( void )
 {
-   PTR_LOOPEXIT pLoop = hb_comp_pLoops, pFree;
+   PTR_LOOPEXIT pLoop = hb_comp_pLoops, pFree, pLast;
 
    if( pLoop )
    {
       while( pLoop->pNext )
-      {
          pLoop = pLoop->pNext;
-      }
 
-      pLoop = pLoop->pLoopList;
+      pLast = pLoop;
+	  pLoop = pLoop->pLoopList;
       while( pLoop )
       {
          hb_compGenJumpHere( pLoop->ulOffset + 1 );
@@ -3437,6 +3448,7 @@ static void hb_compLoopHere( void )
          pLoop = pLoop->pLoopList;
          hb_xfree( ( void * ) pFree );
       }
+	  pLast->pLoopList = NULL;
    }
 }
 
@@ -3456,7 +3468,6 @@ static void hb_compLoopEnd( void )
       }
 
       pExit = pLoop->pExitList;
-
       while( pExit )
       {
          hb_compGenJumpHere( pExit->ulOffset + 1 );
@@ -3466,12 +3477,8 @@ static void hb_compLoopEnd( void )
       }
 
       pLast->pNext = NULL;
-
       if( pLoop == hb_comp_pLoops )
-      {
          hb_comp_pLoops = NULL;
-      }
-
       hb_xfree( ( void * ) pLoop );
    }
 }
