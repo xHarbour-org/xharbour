@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.138 2007/05/24 16:03:14 ronpinkas Exp $
+ * $Id: genc.c,v 1.139 2007/05/24 21:41:36 enricomaria Exp $
  */
 
 /*
@@ -1158,7 +1158,7 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
       }
 
       szTmp2 = strchr( szTmp, ')' );
-      if( szTmp == NULL )
+      if( szTmp2 == NULL )
       {
          continue;
       }
