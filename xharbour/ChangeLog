@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5647 2007/08/20 19:32:36 marchuet Exp $
+ * $Id: ChangeLog,v 1.5648 2007/08/20 22:31:39 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-21 11:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
+  * make_macosx.sh
+    + Added build script to Mac OSX
+  * doc/howto_macosx.txt
+    + Added instructions to build and install in Mac OSX
 
 2007-08-21 02:26 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/genc.c
@@ -25,7 +31,7 @@
 2007-08-20 20:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/compiler/harbour.sly
     ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
-	
+
 	It can be tested with:
 		proc main()
 		local o:=errorNew()
@@ -43,7 +49,7 @@
 
 2007-08-14 16:58 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
   * source\tip\ftpcln.prg
-    ! Fixed return values from -1 to .F. in method UploadFile() when it was failing. 
+    ! Fixed return values from -1 to .F. in method UploadFile() when it was failing.
 
 2007-08-13 06:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/common/hbtrace.c
