@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5648 2007/08/20 22:31:39 likewolf Exp $
+ * $Id: ChangeLog,v 1.5649 2007/08/21 14:50:49 mlombardo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-21 22:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/common/hbdate.c
+    ! Fixed aleatory GFP produced by unterminated char * at strlen.
 
 2007-08-21 11:50 UTC-0300 Marcelo Lombardo <marcelo@xharbour.com.br>
   * make_macosx.sh
