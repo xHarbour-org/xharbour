@@ -1,11 +1,14 @@
 ﻿
-1 – Download and install Xcode from Apple web site. It contains latest gcc, make, CVS, bison and a nice IDE.
+1 – Download and install Xcode from Apple web site. It contains latest gcc, make, CVS, bison and 
+    a nice IDE. You should also install X11SDK package from Packages folder inside Xcode Tools.
 
-2 – Update bison parser generator. The version that comes with Xcode is very old. You can do it by downloading and installing Darwin Ports for Mac OS X from http://darwinports.com/
+2 – Update bison parser generator. The version that comes with Xcode is very old. You can do it 
+    by downloading and installing Darwin Ports for Mac OS X from http://darwinports.com/
 
 3 – Run make_macosx.sh from xharbour folder
 
-4 – Run make_macosx install. In order to install xHarbour in correct folders, you will need root access. You can follow these steps to get ‘su’ running in Mac OS X Tiger:
+4 – Run make_macosx install. In order to install xHarbour in correct folders, you will need root 
+    access. You can follow these steps to get ‘su’ running in Mac OS X Tiger:
 
 http://www.informit.com/library/content.asp?b=Mac_OS_X_Unleashed&seqNum=104
 

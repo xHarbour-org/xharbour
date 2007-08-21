@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: make_drw.sh,v 1.11 2005/03/13 12:44:13 likewolf Exp $
+# $Id: make_macosx.sh,v 1.1 2007/08/21 14:50:50 mlombardo Exp $
 #
 
 # ---------------------------------------------------------------
@@ -13,6 +13,6 @@
 # ---------------------------------------------------------------
 
 export HB_WITHOUT_GTSLN=yes
-export HB_WITHOUT_X11=yes
+#export HB_WITHOUT_X11=yes
 
 . `dirname $0`/make_gnu.sh $*
