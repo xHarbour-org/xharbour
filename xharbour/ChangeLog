@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5650 2007/08/21 20:40:47 marchuet Exp $
+ * $Id: ChangeLog,v 1.5651 2007/08/22 09:54:02 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2007-08-22 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/compiler/harbour.sly
+    ! Fixed EXIT and LOOP can't be used inside FINALLY block of TRY statement
+
 2007-08-22 11:45 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/compiler/harbour.sly
+  * source/compiler/harbour.c
     ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
       the second exit too solved.
 

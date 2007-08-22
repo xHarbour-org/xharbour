@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.123 2007/08/20 18:43:39 marchuet Exp $
+ * $Id: harbour.sly,v 1.124 2007/08/22 09:54:03 marchuet Exp $
  */
 
 /*
@@ -2881,8 +2881,8 @@ RecoverUsing : RECOVERUSING IdentName
                }
              ;
 
-Try          : TRY
-               {
+Try          : TRY  /* 1 */
+               {    /* 2 */
                   ++hb_comp_wSeqCounter;
                   $<lNumber>$ = hb_compTryBegin();
                   if( s_iControlLevel++ == 0 )
@@ -2896,6 +2896,7 @@ Try          : TRY
                    */
                   hb_compGenJumpHere( $<lNumber>2 );
                   $<lNumber>$ = hb_compTryEnd();
+                  //$<lNumber>4 = hb_compLoopCount();
                }
                Catch
                {
@@ -2907,7 +2908,13 @@ Try          : TRY
                }
                Finally
                {
-                  //printf( "Value: %i\n", $<lNumber>8 );
+                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
+                  //long lLoopCount = hb_compLoopCount();
+                  //if( $<lNumber>4 != lLoopCount )
+                  //   {
+                  //      /* FINALLY statement after CATCH with EXIT/LOOP statments */
+                  //      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
+                  //   }
                   if( $<lNumber>6 == 0 )
                      hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
                }
@@ -2919,14 +2926,10 @@ Try          : TRY
                    */
                   if( $<lNumber>8 )
                   {
-                     //printf( "Finalized END to %li\n", $<lNumber>8 );
                      hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 );
 
                      if( $<lNumber>6 )
-                     {
-                        //printf( "Recover to %li\n", $<lNumber>8 );
                         hb_compGenJumpThere( $<lNumber>6 + 1, $<lNumber>8 );
-                     }
                      else
                      {
                         /* Only if there is no CATCH clause */
