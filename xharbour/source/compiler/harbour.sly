@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.122 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.123 2007/08/20 18:43:39 marchuet Exp $
  */
 
 /*
@@ -63,7 +63,8 @@ extern "C" int yywrap( void );
 extern int yywrap( void );     /* manages the EOF of current processed file */
 #endif
 
-static void hb_compLoopStart( void );
+static void hb_compLoopStart( BOOL );
+static long hb_compLoopCount( void );
 static void hb_compLoopEnd( void );
 static void hb_compLoopLoop( void );
 static void hb_compLoopExit( void );
@@ -91,6 +92,7 @@ typedef struct __ELSEIF
 typedef struct _LOOPEXIT
 {
    ULONG              ulOffset;
+   BOOL               fCanLoop;   
    int                iLine;
    USHORT             wSeqCounter;
    USHORT             wWithObjCounter;
@@ -142,9 +144,9 @@ static void hb_compDebugStart( void ) { };
 
 %union                  /* special structure used by lex and yacc to share info */
 {
-   char *    string;       /* to hold a string returned by lex */
-   int       iNumber;      /* to hold a temporary integer number */
-   HB_LONG   lNumber;      /* to hold a temporary long number */
+   char *  string;       /* to hold a string returned by lex */
+   int     iNumber;      /* to hold a temporary integer number */
+   HB_LONG lNumber;      /* to hold a temporary long number */
    struct
    {
       int    iNumber;      /* to hold a number returned by lex */
@@ -191,7 +193,6 @@ static void hb_compDebugStart( void ) { };
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
-
 %left  POST
 
 /*assigment - from right to left*/
@@ -444,9 +445,7 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         hb_comp_cVarType = ' ';
 
                         if( hb_comp_wSeqCounter )
-                        {
                            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
-                        }
 
                         hb_compExprDelete( hb_compExprGenPush( $3 ) );   /* TODO: check if return value agree with declared value */
 
@@ -1149,15 +1148,10 @@ WithData    : ':' SendId                 {
                                             if( hb_comp_wWithObjCounter == 0 )
                                             {
                                                if( $2->ExprType == HB_ET_FUNNAME )
-                                               {
                                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $2->value.asSymbol, NULL );
-                                               }
                                                else
-                                               {
                                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
-                                               }
                                             }
-
                                             $$ = hb_compExprNewWithSendExp( $2 );
                                          }
            ;
@@ -1167,6 +1161,7 @@ ObjectDataAlias : ObjectData ALIASOP     { $$ = $1; }
 
 /* Object's method
  */
+ 
 ObjectMethod : ObjectData '(' ArgList ')'    { $$ = hb_compExprNewMethodCall( $1, $3 ); }
              ;
 
@@ -2438,7 +2433,7 @@ SwitchBegin : SWITCH Expression {
                                    // Disallow EXIT flag.
                                    hb_comp_wSeqCounter = (USHORT) -1;
 
-                                   hb_compLoopStart();
+                                   hb_compLoopStart( FALSE );
 
                                    // Reset
                                    hb_comp_wSeqCounter = wSeqCounter;
@@ -2631,7 +2626,7 @@ WhileBegin : WHILE {
                       $$ = hb_comp_functions.pLast->lPCodePos;
                       hb_compLinePushIfInside();
                       ++hb_comp_wWhileCounter;
-                      hb_compLoopStart();
+                      hb_compLoopStart( TRUE );
 
                       if( s_iControlLevel++ == 0 )
                       {
@@ -2653,7 +2648,7 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                }
              TO Expression StepExpr                   /* 6  7  8 */
                {
-                  hb_compLoopStart();
+                  hb_compLoopStart( TRUE );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 9 */
                   hb_compExprGenPush( $2 );              /* counter */
                   hb_compExprGenPush( $7 );              /* end */
@@ -2772,7 +2767,7 @@ ForEach    : FOREACH IdentName  /* 1  2 */
                   hb_compGenPCode1( HB_P_FOREACH );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 6 */
                   hb_compGenPCode1( HB_P_ENUMERATE );
-                  hb_compLoopStart();
+                  hb_compLoopStart( TRUE );
                }
              Crlf                                     /* 7 */
                { /* 8 */
@@ -2794,23 +2789,20 @@ ForEach    : FOREACH IdentName  /* 1  2 */
                }
            ;
 
-WithObject   : WITHOBJ Expression Crlf
-				 {
-                    hb_compLinePush();
-                    hb_compGenWithObject($2);
-
-                    if( s_iControlLevel++ == 0 )
-                    {
-						s_iLastControlLine = hb_comp_iLine;
-                    }
-                 }
-               EmptyStats
-               END  
-				 { 
-					hb_compGenEndWithObject(); 
-					s_iControlLevel--; 
-				 }
-             ;
+WithObject : WITHOBJ Expression Crlf
+				   {
+                  hb_compLinePush();
+                  hb_compGenWithObject($2);
+                  if( s_iControlLevel++ == 0 )
+						   s_iLastControlLine = hb_comp_iLine;
+               }
+             EmptyStats
+             END  
+				   { 
+					   hb_compGenEndWithObject(); 
+					   s_iControlLevel--; 
+			  	   }
+           ;
 
 BeginSeq   : BEGINSEQ {
                          ++hb_comp_wSeqCounter;
@@ -2870,7 +2862,8 @@ RecoverEmpty : RECOVER
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
-                  --hb_comp_wSeqCounter;
+                  if( hb_comp_wSeqCounter )                  
+                     --hb_comp_wSeqCounter;
                   hb_compLinePush();
                   hb_compGenPCode2( HB_P_SEQRECOVER, HB_P_POP, ( BOOL ) 0 );
                }
@@ -2880,7 +2873,8 @@ RecoverUsing : RECOVERUSING IdentName
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
-                  --hb_comp_wSeqCounter;
+                  if( hb_comp_wSeqCounter )                  
+                     --hb_comp_wSeqCounter;
                   hb_compLinePush();
                   hb_compGenPCode1( HB_P_SEQRECOVER );
                   hb_compGenPopVar( $2 );
@@ -2890,13 +2884,9 @@ RecoverUsing : RECOVERUSING IdentName
 Try          : TRY
                {
                   ++hb_comp_wSeqCounter;
-
                   $<lNumber>$ = hb_compTryBegin();
-
                   if( s_iControlLevel++ == 0 )
-                  {
                      s_iLastControlLine = hb_comp_iLine;
-                  }
                }
                Crlf
                EmptyStats
@@ -2913,17 +2903,13 @@ Try          : TRY
                    * HB_P_TRYBEGIN opcode if there is RECOVER clause
                    */
                   if( $<lNumber>6 )
-                  {
                      hb_compGenJumpThere( $<lNumber>2, $<lNumber>6 );
-                  }
                }
                Finally
                {
                   //printf( "Value: %i\n", $<lNumber>8 );
                   if( $<lNumber>6 == 0 )
-                  {
                      hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
-                  }
                }
                END
                {
@@ -3281,7 +3267,7 @@ int yywrap( void )   /* handles the EOF of the currently processed file */
  * This function stores the position in pcode buffer where the FOR/WHILE
  * loop starts. It will be used to fix any LOOP/EXIT statements
  */
-static void hb_compLoopStart( void )
+static void hb_compLoopStart( BOOL fCanLoop )
 {
    PTR_LOOPEXIT pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
 
@@ -3290,24 +3276,59 @@ static void hb_compLoopStart( void )
       PTR_LOOPEXIT pLast = hb_comp_pLoops;
 
       while( pLast->pNext )
-      {
          pLast = pLast->pNext;
-      }
-
       pLast->pNext = pLoop;
    }
    else
-   {
       hb_comp_pLoops = pLoop;
-   }
 
-   pLoop->pNext           = NULL;
-   pLoop->pExitList       = NULL;
-   pLoop->pLoopList       = NULL;
    pLoop->ulOffset        = hb_comp_functions.pLast->lPCodePos;  /* store the start position */
+   pLoop->fCanLoop        = fCanLoop;   /* can we use LOOP inside */
    pLoop->iLine           = hb_comp_iLine;
    pLoop->wSeqCounter     = hb_comp_wSeqCounter;  /* store current SEQUENCE counter */
    pLoop->wWithObjCounter = hb_comp_wWithObjCounter;  /* store current WITH OBJECT counter */   
+
+   pLoop->pExitList       = NULL;
+   pLoop->pLoopList       = NULL;
+   pLoop->pNext           = NULL;
+}
+
+/*
+ * return number of LOOP of EXIT statement in the top most structure
+ */
+static long hb_compLoopCount( void )
+{
+   PTR_LOOPEXIT pLastLoop, pLastExit, pLoop;
+   long lCount = 0;
+
+   pLastLoop = pLastExit = NULL;
+   pLoop = hb_comp_pLoops;
+   while( pLoop )
+   {
+      if( pLoop->fCanLoop )
+         pLastLoop = pLoop;
+      pLastExit = pLoop;
+      pLoop = pLoop->pNext;
+   }
+
+   if( pLastLoop )
+   {
+      while( pLastLoop->pLoopList )
+      {
+         ++lCount;
+         pLastLoop = pLastLoop->pLoopList;
+      }
+   }
+   if( pLastExit )
+   {
+      while( pLastExit->pExitList )
+      {
+         ++lCount;
+         pLastExit = pLastExit->pExitList;
+      }
+   }
+
+   return lCount;
 }
 
 /*
@@ -3315,41 +3336,22 @@ static void hb_compLoopStart( void )
  */
 static void hb_compLoopLoop( void )
 {
-   if( ! hb_comp_pLoops )
+   PTR_LOOPEXIT pLast = NULL, pLoop;
+     
+   pLoop = hb_comp_pLoops;
+   while( pLoop )
+   {
+      if( pLoop->fCanLoop )
+         pLast = pLoop;
+      pLoop = pLoop->pNext;
+   }
+
+   if( ! pLast )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
    }
    else
    {
-      PTR_LOOPEXIT pLast, pLoop, pLastNonSwitch = NULL;
-
-      pLast = hb_comp_pLoops;
-      if( pLast->wSeqCounter != (USHORT) -1 )
-      {
-         pLastNonSwitch = pLast;
-      }
-
-      while( pLast->pNext )
-      {
-         pLast = pLast->pNext;
-         if( pLast->wSeqCounter != (USHORT) -1 )
-         {
-            pLastNonSwitch = pLast;
-         }
-      }
-
-      if( pLast->wSeqCounter == (USHORT) -1 )
-      {
-         if( pLastNonSwitch )
-         {
-            pLast = pLastNonSwitch;
-         }
-         else
-         {
-            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_EXIT, "LOOP", NULL );
-         }
-      }
-
       if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
          /* Attempt to LOOP from BEGIN/END sequence
@@ -3360,21 +3362,21 @@ static void hb_compLoopLoop( void )
       }
       else
       {
-		 USHORT wWithObjCounter = pLast->wWithObjCounter;
+		   USHORT wWithObjCounter = pLast->wWithObjCounter;
 		 
-		 pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
-  		 pLoop->pLoopList = NULL;
+		   pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+  		   pLoop->pLoopList = NULL;
          while( pLast->pLoopList )
             pLast = pLast->pLoopList;
          pLast->pLoopList = pLoop;
 
          while( wWithObjCounter < hb_comp_wWithObjCounter )
          {
-			hb_compGenEndWithObject();
+			   hb_compGenPCode1( HB_P_ENDWITHOBJECT );
             wWithObjCounter++;
          }
       
-		 pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
+		   pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }
@@ -3407,21 +3409,21 @@ static void hb_compLoopExit( void )
       }
       else
       {
-	     USHORT wWithObjCounter = pLast->wWithObjCounter;
+	      USHORT wWithObjCounter = pLast->wWithObjCounter;
 			   
-		 pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
- 		 pLoop->pExitList = NULL;
+  		   pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+ 		   pLoop->pExitList = NULL;
          while( pLast->pExitList )
             pLast = pLast->pExitList;
          pLast->pExitList = pLoop;
 
-		 while( wWithObjCounter < hb_comp_wWithObjCounter )
+		   while( wWithObjCounter < hb_comp_wWithObjCounter )
          {
-			hb_compGenEndWithObject();
+            hb_compGenPCode1( HB_P_ENDWITHOBJECT );
             wWithObjCounter++;
          }
 		 
-		 pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
+		   pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }

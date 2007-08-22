@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5649 2007/08/21 14:50:49 mlombardo Exp $
+ * $Id: ChangeLog,v 1.5650 2007/08/21 20:40:47 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-22 11:45 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/compiler/harbour.sly
+    ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
+      the second exit too solved.
+
+	It can be tested with:
+             proc main()
+                local o:=errorNew()
+                WHILE ! Empty( o )
+                   WITH OBJECT o
+                      IF :ClassName() == 'TDIALOG'
+                         EXIT
+                      ELSEIF :ClassName() $ "TMDICHILD;TWINDOW"
+                         EXIT
+                      ENDIF
+                   END
+                END
+             return
+
 
 2007-08-21 22:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/common/hbdate.c

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.164 2007/06/03 12:51:30 likewolf Exp $
+ * $Id: harbour.c,v 1.165 2007/08/09 11:55:59 patrickmast Exp $
  */
 
 /*
@@ -2548,7 +2548,8 @@ void hb_compGenWithObject( HB_EXPR_PTR pObject )
 void hb_compGenEndWithObject( void )
 {
    hb_compGenPCode1( HB_P_ENDWITHOBJECT );
-   hb_comp_wWithObjCounter--;
+   if( hb_comp_wWithObjCounter )
+      hb_comp_wWithObjCounter--;
 }
 
 void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
