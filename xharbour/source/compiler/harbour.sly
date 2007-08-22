@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.124 2007/08/22 09:54:03 marchuet Exp $
+ * $Id: harbour.sly,v 1.125 2007/08/22 10:18:52 marchuet Exp $
  */
 
 /*
@@ -2896,7 +2896,7 @@ Try          : TRY  /* 1 */
                    */
                   hb_compGenJumpHere( $<lNumber>2 );
                   $<lNumber>$ = hb_compTryEnd();
-                  //$<lNumber>4 = hb_compLoopCount();
+                  $<lNumber>4 = hb_compLoopCount();
                }
                Catch
                {
@@ -2908,13 +2908,12 @@ Try          : TRY  /* 1 */
                }
                Finally
                {
-                  hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
-                  //long lLoopCount = hb_compLoopCount();
-                  //if( $<lNumber>4 != lLoopCount )
-                  //   {
-                  //      /* FINALLY statement after CATCH with EXIT/LOOP statments */
-                  //      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
-                  //   }
+                  long lLoopCount = hb_compLoopCount();
+                  if( $<lNumber>4 != lLoopCount )
+                     {
+                        /* FINALLY statement after CATCH with EXIT/LOOP statments */
+                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
+                     }
                   if( $<lNumber>6 == 0 )
                      hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
                }
