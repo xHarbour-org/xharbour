@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5651 2007/08/22 09:54:02 marchuet Exp $
+ * $Id: ChangeLog,v 1.5652 2007/08/22 10:18:50 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2007-08-22 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+   * source/compiler/harbour.sly
+     ! Fixed FINALLY can't be used in TRY/CATCH statement when CATCH code
+       has LOOP or EXIT statements. In this example FINALLY code is
+       never executed but memory is consumed in infinite loop.
 
 2007-08-22 12:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/compiler/harbour.sly
