@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.126 2007/08/22 10:30:55 marchuet Exp $
+ * $Id: harbour.sly,v 1.127 2007/08/23 11:23:13 marchuet Exp $
  */
 
 /*
@@ -2356,8 +2356,6 @@ Switch    : SwitchBegin
                SwitchCases
             EndSwitch
                {
-                  if( hb_compLoopCount() )
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
                   hb_compLoopEnd();
                   //hb_compElseIfFix( $2 ); // No default BREAK in SWITCH.
                   hb_compGenPCode1( HB_P_POP );
@@ -2368,8 +2366,6 @@ Switch    : SwitchBegin
                Default
             EndSwitch
                {
-                  if( hb_compLoopCount() )
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
                   hb_compLoopEnd();
                   //hb_compElseIfFix( $2 );
                   hb_compGenPCode1( HB_P_POP );
@@ -2428,18 +2424,10 @@ EndSwitch  : END
            ;
 
 SwitchBegin : SWITCH Expression {
-                                   USHORT wSeqCounter = hb_comp_wSeqCounter;
-
                                    hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0;
                                    hb_compExprDelete( hb_compExprGenPush( $2 ) );
 
-                                   // Disallow EXIT flag.
-                                   hb_comp_wSeqCounter = (USHORT) -1;
-
                                    hb_compLoopStart( FALSE );
-
-                                   // Reset
-                                   hb_comp_wSeqCounter = wSeqCounter;
 
                                    if( s_iControlLevel++ == 0 )
                                    {
@@ -2845,10 +2833,8 @@ BeginSeq   : BEGINSEQ {
                 hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
 
                 /* only if there is no RECOVER clause */
-                if( !$<lNumber>6 )
-                {
+                if( !$<lNumber>6 && hb_comp_wSeqCounter ) 
                    --hb_comp_wSeqCounter;  /* RECOVER is also considered as end of sequence */
-                }
 
                 hb_compSequenceFinish( (ULONG)$<lNumber>2, (int)$<lNumber>4 );
                 hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
@@ -2969,8 +2955,8 @@ CatchError   : CATCH IdentName
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
-                  --hb_comp_wSeqCounter;
-                  //hb_compLinePush();
+                  if ( hb_comp_wSeqCounter )
+                     --hb_comp_wSeqCounter;
                   hb_compGenPCode4( HB_P_TRYRECOVER, 0, 0, 0, TRUE );
                   hb_compPrepareOptimize();
                   hb_compGenPopVar( $2 );
@@ -2979,8 +2965,8 @@ CatchError   : CATCH IdentName
                {
                   hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE;
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;
-                  --hb_comp_wSeqCounter;
-                  //hb_compLinePush();
+                  if ( hb_comp_wSeqCounter )
+                     --hb_comp_wSeqCounter;
                   hb_compGenPCode4( HB_P_TRYRECOVER, 0, 0, 0, TRUE );
                   hb_compPrepareOptimize();
                   hb_compGenPCode1( HB_P_POP );
@@ -3404,7 +3390,7 @@ static void hb_compLoopExit( void )
       while( pLast->pNext )
          pLast = pLast->pNext;
 
-      if( pLast->wSeqCounter != hb_comp_wSeqCounter && pLast->wSeqCounter != (USHORT) -1 )
+      if( pLast->wSeqCounter != hb_comp_wSeqCounter )
       {
          /* Attempt to LOOP from BEGIN/END sequence
          * Current SEQUENCE counter is different then at the beginning of loop
