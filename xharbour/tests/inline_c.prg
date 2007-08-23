@@ -1,5 +1,5 @@
 /*
- * $Id: inline_c.prg,v 1.4 2005/03/30 21:31:53 andijahja Exp $
+ * $Id: inline_c.prg,v 1.5 2005/04/06 21:12:50 andijahja Exp $
  */
 PROCEDURE MAIN( cLine, cDelim )
 
@@ -14,8 +14,7 @@ PROCEDURE MAIN( cLine, cDelim )
       ? '"' + a[ i ] + '"'
    NEXT i
 
-   QOut( HB_INLINE() )
-         { hb_retc( "\na C String, including { and \" { \n" ); }
+   QOut( HB_INLINE() { hb_retc( "\na C String, including { and \" { \n" ); } )
 
    QOut( C_Func() )
 
@@ -33,7 +32,7 @@ FUNCTION aTokens( cLine, cDelimiter )
          cDelimiter := ' '
       ENDIF
 
-      HB_INLINE( aTokens, cLine, Asc( cDelimiter ) )
+      HB_INLINE( aTokens, cLine, Asc( cDelimiter ) ) ;
       {  // Note including {
          PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
          PHB_ITEM pLine  = hb_param( 2, HB_IT_STRING );
