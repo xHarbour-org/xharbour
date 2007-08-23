@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.43 2006/10/13 01:42:19 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.44 2006/11/06 22:31:40 ronpinkas Exp $
  */
 
 /*
@@ -597,13 +597,14 @@ STATIC Function DeValue( lAdopt )
    //aEval( QSelf(), {|xVal| aAdd( aValues, xVal ) }, 1, Len( QSelf() ) - CLASS_PROPERTIES )
 
    IF ValType( Buffer ) != "C" .OR. Len( Buffer ) == 0
-      TraceLog( "EMPTY Buffer passed to " + ProcName() )
+      TraceLog( "EMPTY Buffer", Buffer )
+      Buffer := Replicate( Chr(0), QSelf():SizeOf )
    ELSEIF Len( Buffer ) < QSelf():SizeOf
-      TraceLog( "Should have been caught at ::Buffer()!!!", Buffer )
+      TraceLog( "Should have been caught at ::Buffer()!!!", Len( Buffer ), QSelf():SizeOf )
       Buffer := PadR( Buffer, QSelf():SizeOf, Chr(0) )
-   ELSE
-      HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt, QSelf()  )
    ENDIF
+
+   HB_StructureToArray( Buffer, QSelf():aCTypes, QSelf():nAlign, lAdopt, QSelf()  )
 
 RETURN QSelf()
 
