@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5654 2007/08/23 09:22:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5655 2007/08/23 11:23:10 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-23 08:05 UTC-0500 Paul Tucker <ptucker sympatico.ca>
+   * source/rtl/disksphb.c
+   * doc/en/diskspac.txt
+     * Under windows specifically for now (others may work but are yet
+       untested) - hb_diskspace will accept a numeric parameter.
+       hb_diskspace( [<ndrive> | <cPath>] [,<nType>] ) -> RequestedTypeOfBytes
 
 2007-08-23 13:10 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    * source/compiler/harbour.sly

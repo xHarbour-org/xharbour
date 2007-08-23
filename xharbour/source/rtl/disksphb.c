@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.5 2004/11/21 21:44:17 druzus Exp $
+ * $Id: disksphb.c,v 1.6 2005/01/10 18:45:33 druzus Exp $
  */
 
 /*
@@ -53,7 +53,6 @@
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */
 #define INCL_BASE
 #define INCL_DOSERRORS
-
 #define HB_OS_WIN_32_USED
 
 #include <ctype.h>
@@ -79,9 +78,31 @@
 
 HB_FUNC( HB_DISKSPACE )
 {
-   char * szPath = hb_parc( 1 );
+   char * szPath;
+   char bPath[4];
    USHORT uiType = ISNUM( 2 ) ? hb_parni( 2 ) : HB_DISK_AVAIL;
+   USHORT uiDrive= 0;
    double dSpace = 0.0;
+
+   if( ISCHAR( 1 ))
+   {
+      szPath = hb_parc( 1 );
+   }
+   else
+   {
+      if( ISNUM( 1 ))
+      {
+         uiDrive = hb_parni( 1 );
+         bPath[0] = uiDrive + 'A' - 1;
+      }
+      else
+         bPath[0] = '\0';
+
+      bPath[1] = ':';
+      bPath[2] = '\\';
+      bPath[3] = '\0';
+      szPath = bPath;
+   }
 
    if( uiType > HB_DISK_TOTAL )
       uiType = HB_DISK_AVAIL;
@@ -89,7 +110,19 @@ HB_FUNC( HB_DISKSPACE )
 #if defined(HB_OS_DOS)
 
    {
-      USHORT uiDrive = ( szPath[ 0 ] == '\0' ) ? 0 : ( toupper( szPath[ 0 ] ) - 'A' + 1 );
+      if( uiDrive == 0 && szPath[ 0 ] <> '\0' )
+         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
+
+      if( uiDrive == 0 )
+      {
+         USHORT uiErrorOld = hb_fsError();
+
+         uiDrive = hb_fsCurDrv() + 1;
+
+         hb_fsSetError( uiErrorOld );
+      }
+
+      szPath[ 0 ] = uiDrive + 'A' - 1;
 
       while( TRUE )
       {
@@ -140,12 +173,26 @@ HB_FUNC( HB_DISKSPACE )
 #elif defined(HB_OS_WIN_32)
 
    {
+      if( uiDrive == 0 && szPath[ 0 ] != '\0' )
+         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
+
+      if( uiDrive == 0 )
+      {
+         USHORT uiErrorOld = hb_fsError();
+
+         uiDrive = hb_fsCurDrv() + 1;
+
+         hb_fsSetError( uiErrorOld );
+      }
+
+      szPath[ 0 ] = uiDrive + 'A' - 1;
+
       while( TRUE )
       {
          typedef BOOL ( WINAPI * P_GDFSE )( LPCTSTR, PULARGE_INTEGER,
                                             PULARGE_INTEGER, PULARGE_INTEGER );
 
-         P_GDFSE pGetDiskFreeSpaceEx;
+         P_GDFSE pGetDiskFreeSpaceEx = NULL;
          UINT uiErrMode;
 
          uiErrMode = SetErrorMode( SEM_FAILCRITICALERRORS );
@@ -356,5 +403,4 @@ HB_FUNC( HB_DISKSPACE )
 }
 
 #endif
-
 
