@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5653 2007/08/22 10:35:16 marchuet Exp $
+ * $Id: ChangeLog,v 1.5654 2007/08/23 09:22:32 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-23 13:10 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+   * source/compiler/harbour.sly
+     ! Fixed Using LOOP inside SWITCH/CASE.../END statement leaves dummy value on HVM
+       stack. Repeated in a loop allocates whole system memory for growing up
+       HVM stack.
+     ! fixed SWITCH/CASE.../END statement don't allows to use EXIT inside WHILE.
+       Repeated in a loop allocates whole system memory
+       for growing up HVM stack and exceptions list.
 
 2007-08-23 05:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
    * source\rtl\cstruct.prg
