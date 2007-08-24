@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.7 2007/08/23 12:08:03 paultucker Exp $
+ * $Id: disksphb.c,v 1.8 2007/08/24 07:58:40 paultucker Exp $
  */
 
 /*
@@ -84,6 +84,9 @@ HB_FUNC( HB_DISKSPACE )
    USHORT uiDrive= 0;
    double dSpace = 0.0;
 
+   if( uiType > HB_DISK_TOTAL )
+      uiType = HB_DISK_AVAIL;
+
    if( ISCHAR( 1 ))
    {
       szPath = hb_parc( 1 );
@@ -106,19 +109,12 @@ HB_FUNC( HB_DISKSPACE )
       szPath = bPath;
    }
 
-   if( uiType > HB_DISK_TOTAL )
-      uiType = HB_DISK_AVAIL;
-
-#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
-
    if( bPath[0] == '\0')
       bPath[0] = ' ';
 
    bPath[1] = ':';
    bPath[2] = '\\';
    bPath[3] = '\0';
-
-#endif
 
 #if defined(HB_OS_DOS)
 
@@ -345,7 +341,7 @@ HB_FUNC( HB_DISKSPACE )
       struct _FSALLOCATE fsa;
       USHORT rc;
 
-      if( uiDrive == 0 && szPath[ 0 ] != '\0' )
+      if( uiDrive == 0 && szPath[ 0 ] != '  ' )
          uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
 
       /* Query level 1 info from filesystem */
