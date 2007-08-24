@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.6 2005/01/10 18:45:33 druzus Exp $
+ * $Id: disksphb.c,v 1.7 2007/08/23 12:08:03 paultucker Exp $
  */
 
 /*
@@ -87,6 +87,11 @@ HB_FUNC( HB_DISKSPACE )
    if( ISCHAR( 1 ))
    {
       szPath = hb_parc( 1 );
+      if( hb_parclen( 1 ) < 3 )
+      {
+         *bPath = *szPath;
+         szPath = bPath;
+      }
    }
    else
    {
@@ -96,22 +101,34 @@ HB_FUNC( HB_DISKSPACE )
          bPath[0] = uiDrive + 'A' - 1;
       }
       else
-         bPath[0] = '\0';
+         bPath[0] = ' ';
 
-      bPath[1] = ':';
-      bPath[2] = '\\';
-      bPath[3] = '\0';
       szPath = bPath;
    }
 
    if( uiType > HB_DISK_TOTAL )
       uiType = HB_DISK_AVAIL;
 
+#if defined(HB_OS_DOS) || defined(HB_OS_WIN_32)
+
+   if( bPath[0] == '\0')
+      bPath[0] = ' ';
+
+   bPath[1] = ':';
+   bPath[2] = '\\';
+   bPath[3] = '\0';
+
+#endif
+
 #if defined(HB_OS_DOS)
 
    {
-      if( uiDrive == 0 && szPath[ 0 ] <> '\0' )
-         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
+      char * szBuff = (char *) hb_xgrab( strlen( szPath ) + 1 );
+
+      strcpy( szBuff, szPath );
+
+      if( uiDrive == 0 && szBuff[ 0 ] <> ' ' )
+         uiDrive = toupper( szBuff[ 0 ] ) - 'A' + 1;
 
       if( uiDrive == 0 )
       {
@@ -122,7 +139,7 @@ HB_FUNC( HB_DISKSPACE )
          hb_fsSetError( uiErrorOld );
       }
 
-      szPath[ 0 ] = uiDrive + 'A' - 1;
+      szBuff[ 0 ] = uiDrive + 'A' - 1;
 
       while( TRUE )
       {
@@ -168,13 +185,17 @@ HB_FUNC( HB_DISKSPACE )
          }
          break;
       }
+      bb_xfree( szBuff );
    }
 
 #elif defined(HB_OS_WIN_32)
 
    {
-      if( uiDrive == 0 && szPath[ 0 ] != '\0' )
-         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
+      char * szBuff = (char *) hb_xgrab( strlen( szPath ) + 1 );
+      strcpy( szBuff, szPath );
+
+      if( uiDrive == 0 && szBuff[ 0 ] != ' ' )
+         uiDrive = toupper( szBuff[ 0 ] ) - 'A' + 1;
 
       if( uiDrive == 0 )
       {
@@ -185,7 +206,7 @@ HB_FUNC( HB_DISKSPACE )
          hb_fsSetError( uiErrorOld );
       }
 
-      szPath[ 0 ] = uiDrive + 'A' - 1;
+      szBuff[ 0 ] = uiDrive + 'A' - 1;
 
       while( TRUE )
       {
@@ -209,7 +230,7 @@ HB_FUNC( HB_DISKSPACE )
                            i64FreeBytes,
                            i64RetVal;
 
-            if( pGetDiskFreeSpaceEx( szPath,
+            if( pGetDiskFreeSpaceEx( szBuff,
                                      ( PULARGE_INTEGER ) &i64FreeBytesToCaller,
                                      ( PULARGE_INTEGER ) &i64TotalBytes,
                                      ( PULARGE_INTEGER ) &i64FreeBytes ) )
@@ -275,7 +296,7 @@ HB_FUNC( HB_DISKSPACE )
 
             SetLastError( 0 );
 
-            if( GetDiskFreeSpace( szPath,
+            if( GetDiskFreeSpace( szBuff,
                                   &dwSectorsPerCluster,
                                   &dwBytesPerSector,
                                   &dwNumberOfFreeClusters,
@@ -315,6 +336,7 @@ HB_FUNC( HB_DISKSPACE )
          }
          break;
       }
+      hb_xfree( szBuff );
    }
 
 #elif defined(HB_OS_OS2)
@@ -322,7 +344,9 @@ HB_FUNC( HB_DISKSPACE )
    {
       struct _FSALLOCATE fsa;
       USHORT rc;
-      USHORT uiDrive = ( szPath[ 0 ] == '\0' ) ? 0 : ( toupper( szPath[ 0 ] ) - 'A' + 1 );
+
+      if( uiDrive == 0 && szPath[ 0 ] != '\0' )
+         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
 
       /* Query level 1 info from filesystem */
       while( ( rc = DosQueryFSInfo( uiDrive, 1, &fsa, sizeof( fsa ) ) ) != 0 )

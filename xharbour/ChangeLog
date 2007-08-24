@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5656 2007/08/23 12:08:02 paultucker Exp $
+ * $Id: ChangeLog,v 1.5657 2007/08/23 18:59:32 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,8 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-08-24 04:00 UTC-0500 Paul Tucker <ptucker sympatico.ca>
+   * source/rtl/disksphb.c
+     * corrected szPath handling to not update parc buffer
+     * <nDrive> | <cPath> can now be any of 3, "C", "C:", to mean "C:\"
+
 2007-08-23 20:48 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
-   * tests\tstdspac.prg.prg
+   * tests\tstdspac.prg
      * New sample that shows difference between DiskSpace() and HB_DiskSpace()
 
 2007-08-23 20:06 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
