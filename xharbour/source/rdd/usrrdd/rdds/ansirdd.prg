@@ -1,5 +1,5 @@
 /*
- * $Id: rlcdx.prg,v 1.1 2006/06/02 12:34:12 druzus Exp $
+ * $Id: ansirdd.prg,v 1.1 2007/05/18 10:07:00 marchuet Exp $
  */
 
 /*
@@ -98,6 +98,6 @@ FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, cSuperRDD,;
                             aANSIFunc )
 
-INIT PROCEDURE ANSIRDD_INIT()
+INIT PROCEDURE ANSI_INIT()
    rddRegister( "ANSIRDD", RDT_FULL )
 RETURN
