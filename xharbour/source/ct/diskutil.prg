@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.6 2005/01/19 10:36:59 likewolf Exp $
+ * $Id: diskutil.prg,v 1.7 2006/08/05 11:58:26 druzus Exp $
  */
 /*
  * xHarbour Project source code.
@@ -196,8 +196,6 @@ FUNCTION DiskFree( cDrive )
 *--------------------------
 Local nRet:=0
 
-   default( @cDrive , DiskName() )
-
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
    ENDIF
@@ -220,13 +218,12 @@ FUNCTION DiskReady( cDrive , lMode )
 *-----------------------------------
    LOCAL lReturn, cCurrent := DiskName()
 
-   default( @cDrive , cCurrent )
    default( @lMode , .F. )
 // lMode -> True = Windows/DOS mode. If a disk is not ready, open a dialog.
 //          False = Bios mode. If a disk is not ready don´t open a dialog.
 
    IF empty(cDrive) .OR. !isalpha(cDrive)
-      cDrive := DiskName()
+      cDrive := cCurrent
    ENDIF
 
    IF valtype(lMode) != "L"
@@ -253,7 +250,6 @@ FUNCTION DiskReadyW( cDrive , lMode )
 *------------------------------------
    LOCAL nHd, cFile, lReturn := .F., cCurrent := DiskName()
 
-   default( @cDrive , cCurrent )
    default( @lMode  , .T. )
 // lMode -> Windows/DOS write ready mode. Same as DiskReady().
 
@@ -286,8 +282,6 @@ FUNCTION DiskTotal( cDrive )
 *---------------------------
 LOCAL nRet:=0
 
-   Default( @cDrive , DiskName() )
-   
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
    ENDIF
@@ -308,8 +302,6 @@ FUNCTION DiskUsed( cDrive )
 *--------------------------
 Local nRet := 0
 
-   Default( @cDrive , DiskName() )
-
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
    ENDIF
@@ -320,7 +312,7 @@ Local nRet := 0
 
    IF DiskReady(cDrive)
       // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
-      nRet := ( hb_DiskSpace( cDrive , HB_DISK_TOTAL ) - hb_DiskSpace( cDrive , HB_DISK_FREE ) )
+      nRet := hb_DiskSpace( cDrive , HB_DISK_USED )
    ENDIF
    
 RETURN ( nRet )
@@ -472,8 +464,6 @@ FUNCTION FloppyType( cDrive )
 *----------------------------
 LOCAL nTotalBytes,nFloppyType
 
-   Default( @cDrive , DiskName() )
-
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
    ENDIF
@@ -504,4 +494,3 @@ FUNCTION RenameFile( cOldFileName , cNewFileName )
 *-------------------------------------------------
 // FileMove function source is in "xharbour/source/ct/disk.c"
 RETURN ( FileMove( cOldFileName , cNewFileName )  )
-

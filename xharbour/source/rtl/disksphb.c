@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.8 2007/08/24 07:58:40 paultucker Exp $
+ * $Id: disksphb.c,v 1.9 2007/08/24 08:05:53 paultucker Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ HB_FUNC( HB_DISKSPACE )
          typedef BOOL ( WINAPI * P_GDFSE )( LPCTSTR, PULARGE_INTEGER,
                                             PULARGE_INTEGER, PULARGE_INTEGER );
 
-         P_GDFSE pGetDiskFreeSpaceEx = NULL;
+         P_GDFSE pGetDiskFreeSpaceEx;
          UINT uiErrMode;
 
          uiErrMode = SetErrorMode( SEM_FAILCRITICALERRORS );
