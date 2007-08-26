@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.27 2007/04/08 07:20:55 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.28 2007/07/06 00:56:00 ronpinkas Exp $
  */
 
 /*
@@ -389,11 +389,18 @@ BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pFunc, HB_EXPR_PTR pStaticVar );
 
 static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_PTR pRightExpr )
 {
-   HB_EXPR_PTR pElem = pRightExpr->value.asList.pExprList;
+   HB_EXPR_PTR pElem;
    HB_EXPR_PTR pNext;
    HB_EXPR_PTR * pPrev;
 
+   if( pRightExpr == NULL )
+   {
+      return;
+   }
+
+   pElem = pRightExpr->value.asList.pExprList;
    pPrev = &pRightExpr->value.asList.pExprList;
+
    while( pElem )
    {
       /* NOTE: During reduction the expression can be replaced by the
