@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.257 2007/06/13 23:21:26 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.258 2007/08/09 11:51:06 patrickmast Exp $
  */
 
 /*
@@ -1355,6 +1355,11 @@ static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
        HB_PP_TOKEN_TYPE( pToken->type ) >= HB_PP_TOKEN_ASSIGN &&
        HB_PP_TOKEN_TYPE( pToken->type ) != HB_PP_TOKEN_EQ )
       iSpace = 1;
+   /* This is a workaround for when [...] is reverted into a literal string
+      after it's been tokenized like array, f.e.
+         @ 0,0 SAY [---] */
+   else if( iSpace == 0xFFFF )
+      iSpace = 0;
 
    if( iSpace > 0 )
    {
@@ -3499,6 +3504,13 @@ static BOOL hb_pp_tokenCanStartExp( PHB_PP_TOKEN pToken )
             }
             if( !pEoc && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_EOC )
                pEoc = pToken;
+
+            /* This is a workaround for when [...] is reverted into a literal string
+               after it's been tokenized like array, f.e.
+                  @ 0,0 SAY [---] */
+            if( pToken->spaces == 0 )
+               pToken->spaces = 0xFFFF;
+
             pToken = pToken->pNext;
          }
       }
