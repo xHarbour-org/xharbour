@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.118 2007/05/18 13:44:30 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.119 2007/06/30 03:06:55 peterrees Exp $
  */
 
 /*
@@ -1712,7 +1712,10 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      HB_XFREE( pReduced );
                   }
                }
-               #if 0
+             #if 1
+               /*
+                 TODO: Clipper optimizes Upper() but what about codepage support?
+                */
                else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && usCount == 1 )
                {
                   pReduced = pParms->value.asList.pExprList;
@@ -1731,17 +1734,12 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pReduced->value.asString.string[i] = toupper( pReduced->value.asString.string[i] );
                      }
 
-                     pParms->value.asList.pExprList = NULL;
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-
-                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     //pSelf = pReduced;
-                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                     HB_XFREE( pReduced );
+                     pSelf->value.asFunCall.pParms = NULL;
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     pSelf = pReduced;
                   }
                }
-               #endif
+             #endif
                else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && usCount )
                {
                   /* try to change it into a string */

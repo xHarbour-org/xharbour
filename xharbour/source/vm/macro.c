@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.72 2007/07/06 00:56:01 ronpinkas Exp $
+ * $Id: macro.c,v 1.73 2007/07/06 13:39:07 ronpinkas Exp $
  */
 
 /*
@@ -525,14 +525,29 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
    {
       HB_MACRO struMacro;
       int iStatus;
-      const char * szString = pItem->item.asString.value;
+      const char * szString;
       char *szCopy;
-      int iLen = pItem->item.asString.length;
+      ULONG ulLength = pItem->item.asString.length;
 
 #ifdef HB_MACRO_STATEMENTS
       char * pText;
       char * pOut;
 #endif
+
+      /*
+       Clipper appears to expand nested macros staticly vs. by Macro Parser, f.e.:
+
+        PROCEDURE Main()
+           LOCAL cText
+
+           cText := "( v := '2' ) + &v"
+           M->v := "'1'"
+           ? "Macro:", cText
+           ? "Result:", &cText
+        RETURN
+       */
+      szString = hb_macroTextSubst( pItem->item.asString.value, &ulLength );
+
       struMacro.Flags         = HB_MACRO_GEN_PUSH;
       struMacro.uiNameLen     = HB_SYMBOL_NAME_LEN;
       struMacro.status        = HB_MACRO_CONT;
@@ -566,14 +581,13 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       if( struMacro.supported & HB_SM_PREPROC )
       {
          char * ptr;
-         int slen;
 
          pText = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          pOut = ( char * ) hb_xgrab( HB_PP_STR_SIZE );
          ptr = pText;
-         slen = HB_MIN( strlen( szString ), HB_PP_STR_SIZE - 1 );
-         memcpy( pText, szString, slen );
-         pText[ slen ] = 0;
+         ulLength = HB_MIN( ulLength, HB_PP_STR_SIZE - 1 );
+         memcpy( pText, szString, ulLength );
+         pText[ ulLength ] = 0;
          memset( pOut, 0, HB_PP_STR_SIZE );
 
          HB_SKIPTABSPACES( ptr );
@@ -585,21 +599,27 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
 
          hb_pp_ParseExpression( ptr, pOut );
          szCopy = pText;
-         iLen = strlen( szString );
+         ulLength = strlen( szCopy );
       }
 #else
       szCopy = hb_strdup( szString );
 #endif
 
-      iStatus = hb_macroParse( &struMacro, szCopy, iLen );
+      if( szString != pItem->item.asString.value )
+      {
+         hb_xfree( (void *) szString );
+         szString = NULL;
+      }
+
+      iStatus = hb_macroParse( &struMacro, szCopy, ulLength );
 
       if( ! ( iStatus == HB_MACRO_OK && ( struMacro.status & HB_MACRO_CONT ) ) )
       {
-         hb_macroSyntaxError( &struMacro, szString );
+         hb_macroSyntaxError( &struMacro, szCopy );
       }
       else if( iContext && ( ( HB_VM_STACK.iExtraParamsIndex == HB_MAX_MACRO_ARGS ) || ( HB_VM_STACK.iExtraElementsIndex >= HB_MAX_MACRO_ARGS ) ) )
       {
-         hb_macroSyntaxError( &struMacro, szString );
+         hb_macroSyntaxError( &struMacro, szCopy );
       }
 
 #ifdef HB_MACRO_STATEMENTS

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt2.c,v 1.13 2005/11/28 19:47:13 ronpinkas Exp $
+ * $Id: expropt2.c,v 1.14 2007/08/28 15:51:33 ronpinkas Exp $
  */
 
 /*
@@ -465,8 +465,14 @@ HB_EXPR_PTR hb_compExprReduceIN( HB_EXPR_PTR pSelf, HB_MACRO_DECL )
        */
       BOOL bResult;
 
-      bResult = ( hb_strAt( pSelf->value.asOperator.pLeft->value.asString.string, pSelf->value.asOperator.pLeft->ulLength,
-                            pSelf->value.asOperator.pRight->value.asString.string, pSelf->value.asOperator.pRight->ulLength ) != 0 );
+      /* NOTE: CA-Cl*pper has a bug where the $ operator returns .T.
+               when an empty string is searched [vszakats] */
+
+      if( pSelf->value.asOperator.pLeft->ulLength == 0 )
+         bResult = TRUE;
+      else
+         bResult = ( hb_strAt( pSelf->value.asOperator.pLeft->value.asString.string, pSelf->value.asOperator.pLeft->ulLength,
+                     pSelf->value.asOperator.pRight->value.asString.string, pSelf->value.asOperator.pRight->ulLength ) != 0 );
 
       /* NOTE:
        * "" $ "XXX" = .T.
