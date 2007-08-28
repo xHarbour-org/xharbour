@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5665 2007/08/28 15:51:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5666 2007/08/28 19:36:14 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -10,7 +10,7 @@
 
 2007-08-28 15:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include\common.ch
-    * Guard some ValType() optimization rules which may break some odd but Clipper code with #ifdef OPTIMIZE_VALTYPE
+    * Guard some ValType() optimization rules which may break some odd but valid Clipper code with #ifdef OPTIMIZE_VALTYPE
       /* These rules may also be moved to some seperate header with note about this issue */
 
 2007-08-28 14:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
