@@ -1,5 +1,5 @@
 /*
- * $Id: common.ch,v 1.6 2004/07/23 01:43:51 ronpinkas Exp $
+ * $Id: common.ch,v 1.7 2007/04/08 07:20:55 ronpinkas Exp $
  */
 
 /*
@@ -72,6 +72,7 @@
 #xtranslate ISOBJECT( <xValue> )    => HB_ISOBJECT( <xValue> )
 #xtranslate ISPOINTER( <xValue> )   => HB_ISPOINTER( <xValue> )
 
+#ifdef OPTIMIZE_VALTYPE
 #xtranslate VALTYPE( <Expr> ) == "A" => HB_ISARRAY( <Expr> )
 #xtranslate VALTYPE( <Expr> ) == "B" => HB_ISBLOCK( <Expr> )
 #xtranslate VALTYPE( <Expr> ) == "C" => HB_ISSTRING( <Expr> )
@@ -109,6 +110,7 @@
 #xtranslate LEN( <Expr> ) <> 0       => ( ! HB_ISNULL( <Expr> ) )
 #xtranslate LEN( <Expr> ) > 0        => ( ! HB_ISNULL( <Expr> ) )
 #xtranslate LEN( <Expr> ) >= 1       => ( ! HB_ISNULL( <Expr> ) )
+#endif
 
 /* DEFAULT and UPDATE commands */
 #xcommand DEFAULT <v1> TO <x1> [, <vn> TO <xn> ] => ;
