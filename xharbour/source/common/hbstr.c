@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.24 2007/02/27 15:59:34 druzus Exp $
+ * $Id: hbstr.c,v 1.25 2007/05/29 01:52:30 ronpinkas Exp $
  */
 
 /*
@@ -115,7 +115,7 @@ ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szTex
       return ( ulSubPos < ulSubLen ) ? 0 : ( ulPos - ulSubLen + 1 );
    }
    else
-      return 0;
+      return ulSubLen == 0;
 }
 
 char HB_EXPORT * hb_strupr( char * pszText )
