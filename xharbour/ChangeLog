@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5666 2007/08/28 19:36:14 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5667 2007/08/28 19:39:48 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-08-29 13:50 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+   * source\vm\hvm.c
+     * Disabled tracelog output for "*** WARNING! Function: %s in Module: %s is hidden by previously
+       registered Module:..." 
 
 2007-08-28 15:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include\common.ch
