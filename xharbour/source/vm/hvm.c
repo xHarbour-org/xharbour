@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.638 2007/06/13 23:21:26 ronpinkas Exp $
+ * $Id: hvm.c,v 1.639 2007/08/06 20:30:26 likewolf Exp $
  */
 
 /*
@@ -9451,9 +9451,10 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                if( ( pSymbol->scope.value & HB_FS_LOCAL ) && ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) )
                {
                   /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
+                  /* Temporary disabling TraceLog. //PM:08-29-2007
                   TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously registered Module: %s\n",
                             pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
-
+                  */
                   pSymbol->pDynSym = pDynSym;
                   continue;
                }
