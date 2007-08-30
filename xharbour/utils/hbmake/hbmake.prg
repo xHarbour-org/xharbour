@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.181 2007/07/06 13:11:35 modalsist Exp $
+ * $Id: hbmake.prg,v 1.182 2007/07/17 12:45:02 lculik Exp $
  */
 
 /*
@@ -1584,6 +1584,7 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL lWhat32      := .F.
    LOCAL lGtWvt       := .F.
    LOCAL lGtWvw       := .F.
+   LOCAL lMWvw        := .F.
    LOCAL lXwt         := .F.
    LOCAL lxHGtk       := .F.
 
@@ -1762,10 +1763,11 @@ FUNCTION CreateMakeFile( cFile )
                             IIF( oMake:lCw    , "C4W", ;
                             IIF( oMake:lHwGui , "HWGUI", ;
                             IIF( oMake:lGtWvt , "GTWVT", ;
+                            IIF( oMake:lMWvW  , "GTWVW+MWVW", ;
                             IIF( oMake:lGtWvw , "GTWVW", ;
                             IIF( oMake:lXWt   , "XWT", ;
                             IIF( oMake:lWhat32, "WHAT32", ;
-                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) ) )
+                            IIF( oMake:lxHGtk , "XHGTK", "" ) ) ) ) ) ) ) ) ) ))
          cFwhpath        := padr(oMake:cFmc,200)
          cApolloPath     := padr(oMake:cFmc,200)
          cC4WPath        := padr(oMake:cFmc,200)
@@ -1941,7 +1943,7 @@ FUNCTION CreateMakeFile( cFile )
    @ 01,23       say s_aLangMessages[ 29 ]
    @ 01,47,08,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC","MINGW" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
    @ 01,56       say s_aLangMessages[ 30 ]
-   @ 01,67,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
+   @ 01,67,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","GTWVW+MWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
    @ 02,01       say s_aLangMessages[ 48 ]
    @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN cOS == "Win32" .or. cOS == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
    @ 02,30       get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[X ]" message s_aLangMessages[ 54 ]
@@ -1973,10 +1975,11 @@ FUNCTION CreateMakeFile( cFile )
    lWhoo     := "WHOO"     IN alltrim(cGuiLib)
    lWhat32   := "WHAT32"   IN alltrim(cGuiLib)
    lGtWvt    := "GTWVT"    IN alltrim(cGuiLib)
-   lGtWvw    := "GTWVW"    IN alltrim(cGuiLib)   
+   lGtWvw    := "GTWVW"    IN alltrim(cGuiLib)
+   lMWvw     := "MWVW"     IN alltrim(cGuiLib)
    lXwt      := "XWT"      IN alltrim(cGuiLib)
    lxHGtk    := "XHGTK"    IN alltrim(cGuiLib)
-   s_lGui := lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw
+   s_lGui := lWhoo .or. lFwh .or. lC4W .or. lMinigui .or. lGtWvt .or. lHwGui .or. lXwt .or. lWhat32 .or. lxHGtk .or. lGtWvw .or. lMWvw
 
    lRddAds   := "RddAds"   IN cRdd
    lMediator := "Mediator" IN cRdd
@@ -2126,6 +2129,10 @@ FUNCTION CreateMakeFile( cFile )
    IF lCompmod
       cHarbourFlags += " -m "
    ENDIF
+
+   if lMWvw
+      cHarbourFlags += ' -u+mwvw.ch '
+   endif
 
 
    IF s_nWarningLevel >= 0
@@ -2448,6 +2455,11 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, "GTWVT = " + CRLF )
    ELSEIF lGtwvw
       FWrite( s_nMakeFileHandle, "GTWVW = " + CRLF )
+
+      IF lMwvw
+         FWrite( s_nMakeFileHandle, "MWVW = " + CRLF )
+      endif
+
    ELSEIF lXwt
       FWrite( s_nMakeFileHandle, "XWT = " + CRLF )
    ELSEIF lWhoo
@@ -2783,8 +2795,9 @@ FUNCTION CreateMakeFile( cFile )
             cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvt.lib wvtgui.lib")
             cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvt.lib wvtgui.lib")
          elseif lGtwvw
-            cDefaultLibs   := strtran(cDefaultLibs,"gtwin.lib","gtwvw.lib ")
-            cDefaultLibsMt := strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib ")
+            cDefaultLibs   := if(lMWvW,'mwvw.lib ', '') + strtran(cDefaultLibs,"gtwin.lib","gtwvw.lib ")
+            cDefaultLibsMt := if(lMWvW,'mwvw.lib ', '') + strtran(cDefaultLibsMt,"gtwin.lib","gtwvw.lib ")
+
          endif
 
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cDefaultLibs, cDefaultLibsMt ) + CRLF )

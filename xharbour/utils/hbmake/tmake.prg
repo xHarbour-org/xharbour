@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.16 2006/07/06 01:29:36 lculik Exp $
+ * $Id: tmake.prg,v 1.17 2006/08/05 20:15:17 modalsist Exp $
  */
 
 /*
@@ -96,6 +96,7 @@ DATA  lHwgui         init .F.
 DATA  lGui           Init .F.
 DATA  lGtwvt         init .F.
 DATA  lGtwvw         init .F.
+DATA  lMWvW          init .F.
 DATA  lXWT           init .F.
 DATA  lxHGtk         init .F.
 DATA  lWhoo          init .F.
@@ -287,6 +288,11 @@ METHOD ReadMakefile(cFile) CLASS THbMake
                 IF aTemp[ 1 ] == "GTWVW"
                    ::cFMC:= ""
                    ::lGtwvw :=.t.
+                endif
+                IF aTemp[ 1 ] == "MWVW"
+                   ::cFMC:= ""
+                   ::lGtwvw :=.t.
+                   ::lMWvW  :=.t.
                 endif
 
                 IF aTemp[ 1 ] == "XWT"
