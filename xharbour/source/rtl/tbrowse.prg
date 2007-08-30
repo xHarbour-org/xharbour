@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.172 2007/07/06 13:11:34 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.173 2007/08/06 12:55:51 modalsist Exp $
  */
 
 /*
@@ -263,7 +263,8 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
       // I've tried to move past top or bottom margin
       //
-      if nRecsSkipped == 0
+      if Empty( nRecsSkipped ) // PM:08-30-2007 Was nRecsSkipped == 0
+                               // Note: For empty databases, nRecsSkipped was NIL here
 
          if nRecsToSkip > 0
             ::nLastRow := ::nCurRow
