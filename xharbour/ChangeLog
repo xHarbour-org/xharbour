@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5670 2007/08/30 22:06:41 lculik Exp $
+ * $Id: ChangeLog,v 1.5671 2007/08/31 08:34:33 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,13 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-08-31 11:00 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+   * source\tip\ftpcln.prg
+     ! Fixed METHOD Stor() in class tIPClientFTP
+       Remmed out 'IF ! ::GetReply()' because it always makes Stor() returning .F.
+       Causing the uploaded file to be sized ZERO.
+       Note: This may be a wrokaround to get it fixed. Miguel, can you take a
+             closer look to see if this needs more fixing?
 
 2007-08-31 10:33 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
    * source\rtl\tbrowse.prg

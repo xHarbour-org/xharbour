@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.18 2007/07/17 15:05:47 marchuet Exp $
+ * $Id: ftpcln.prg,v 1.19 2007/08/14 14:59:33 patrickmast Exp $
  */
 
 /*
@@ -446,9 +446,11 @@ METHOD Stor( cFile ) CLASS tIPClientFTP
    ENDIF
 
    ::InetSendall( ::SocketCon, "STOR " + cFile + ::cCRLF )
-   IF ! ::GetReply()
-      RETURN .F.
-   ENDIF
+   //PM:08-31-2007 Remmed out 'IF ! ::GetReply()' because it always makes Stor() returning .F.
+   //              Causing the uploaded file to be sized ZERO.
+   //IF ! ::GetReply()
+   //   RETURN .F.
+   //ENDIF
 
 RETURN ::TransferStart()
 
