@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.173 2007/08/06 12:55:51 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.174 2007/08/30 11:17:42 patrickmast Exp $
  */
 
 /*
@@ -3205,7 +3205,8 @@ METHOD EvalSkipBlock( nSkip ) CLASS TBROWSE
    /* 19/10/2005 - <maurilio.longo@libero.it>
                    Why do we do this?
    */
-   if ( lSign .and. nSkipped < 0 ) .or. ( !lSign .and. nSkipped > 0 )
+   //PM:08-31-2007 Added Empty(nSkipped) to this because if browsing an empty database, nSkipped is NIL, instead of 0
+   if Empty(nSkipped) .or. ( lSign .and. nSkipped < 0 ) .or. ( !lSign .and. nSkipped > 0 )
       nSkipped := 0
    endif
 
