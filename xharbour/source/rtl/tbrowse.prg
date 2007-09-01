@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.174 2007/08/30 11:17:42 patrickmast Exp $
+ * $Id: tbrowse.prg,v 1.175 2007/08/31 08:34:34 patrickmast Exp $
  */
 
 /*
@@ -359,7 +359,14 @@ METHOD dbGoBottom() CLASS TDataCache
    Eval( ::oCachedBrowse:GoBottomBlock )
 
    // How many rows are available to top of datasource
-   nToTop := Abs( Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) ) )
+   //PM:09-01-2007 If browsing an empty database, Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
+   //              becomes NIL. So, first need to test if it's empty before trying to do a Abs() on it 
+   nToTop := Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
+   IF Empty( nToTop )
+      nToTop := 0
+   ELSE
+      nToTop := Abs( nToTop )
+   ENDIF
 
    ::nCurRow := 1
    ::nLastRow := nToTop + 1
