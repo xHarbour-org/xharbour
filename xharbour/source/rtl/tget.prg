@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.133 2007/05/29 00:13:08 toninhofwi Exp $
+ * $Id: tget.prg,v 1.134 2007/05/29 02:29:02 ronpinkas Exp $
  */
 
 /*
@@ -2292,10 +2292,10 @@ STATIC FUNCTION BuildGetColor( cColorSpec )
    aTokens := HB_ATOKENS( cCur := Upper( cColorSpec ), "," )
 
    If Len( aTokens ) == 1
-      cColorSpec := cCur + "," + cCur + "," + cCur + "," + cCur
+      cColorSpec := cCur + Replicate( "," + cCur, 3 )
 
    Elseif Len( aTokens ) == 2
-      cColorSpec := cCur + "," + aTokens[ 1 ] + "," + aTokens[ 1 ]
+      cColorSpec := cCur + Replicate( "," + aTokens[ 1 ], 2 )
 
    Elseif Len( aTokens ) == 3
       cColorSpec := cCur + "," + aTokens[ 1 ]
