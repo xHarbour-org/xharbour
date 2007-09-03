@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.25 2006/11/09 16:41:09 marchuet Exp $
+# $Id: makefile.dc,v 1.26 2007/03/25 06:12:49 walito Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -924,6 +924,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\gtapiu.obj \
    $(RTL_OBJ_DIR)\gx.obj \
    $(RTL_OBJ_DIR)\hardcr.obj \
+   $(RTL_OBJ_DIR)\hbtoken.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
    $(RTL_OBJ_DIR)\is.obj \
@@ -988,7 +989,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\strzero.obj \
    $(RTL_OBJ_DIR)\stuff.obj \
    $(RTL_OBJ_DIR)\substr.obj \
-   $(RTL_OBJ_DIR)\teditorl.obj \
    $(RTL_OBJ_DIR)\tone.obj \
    $(RTL_OBJ_DIR)\readline.obj \
    $(RTL_OBJ_DIR)\tprinter.obj \
@@ -1544,6 +1544,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\gtapiu.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\gx.obj       >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\hardcr.obj   >> dmcrtl.rsp
+   $(ECHO) $(RTL_OBJ_DIR)\hbtoken.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\idle.obj     >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\inkey.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\is.obj       >> dmcrtl.rsp
@@ -1608,7 +1609,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\strzero.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\stuff.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\substr.obj   >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\teditorl.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\tone.obj     >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\readline.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\tprinter.obj >> dmcrtl.rsp
@@ -2654,6 +2654,9 @@ $(RTL_OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(RTL_OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC_CMD)
 
+$(RTL_OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(RTL_OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
@@ -2982,9 +2985,6 @@ $(RTL_OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\teditor.obj : $(RTL_OBJ_DIR)\teditor.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.191 2007/05/20 03:26:22 ronpinkas Exp $
+# $Id: makefile.vc,v 1.192 2007/06/02 10:44:21 patrickmast Exp $
 #
 
 #
@@ -468,6 +468,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\hbserv.obj \
    $(OBJ_DIR)$(MT)\hbsrlraw.obj \
    $(OBJ_DIR)$(MT)\hbsyslog.obj \
+   $(OBJ_DIR)$(MT)\hbtoken.obj \
    $(OBJ_DIR)$(MT)\hbxml.obj \
    $(OBJ_DIR)$(MT)\idle.obj \
    $(OBJ_DIR)$(MT)\inkey.obj \
@@ -533,7 +534,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\strzero.obj \
    $(OBJ_DIR)$(MT)\stuff.obj \
    $(OBJ_DIR)$(MT)\substr.obj \
-   $(OBJ_DIR)$(MT)\teditorl.obj \
    $(OBJ_DIR)$(MT)\tone.obj \
    $(OBJ_DIR)$(MT)\tprinter.obj \
    $(OBJ_DIR)$(MT)\trace.obj \

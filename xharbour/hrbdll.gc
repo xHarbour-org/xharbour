@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: hrbdll.gc,v 1.25 2007/03/25 06:12:45 walito Exp $
+# $Id: hrbdll.gc,v 1.26 2007/04/15 20:12:40 ronpinkas Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -116,6 +116,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/hbserv.o \
    $(OBJ_DIR)/hbsrlraw.o \
    $(OBJ_DIR)/hbsyslog.o \
+   $(OBJ_DIR)/hbtoken.o \
    $(OBJ_DIR)/hbxml.o \
    $(OBJ_DIR)/idle.o \
    $(OBJ_DIR)/inkey.o \
@@ -182,7 +183,6 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/strzero.o \
    $(OBJ_DIR)/stuff.o \
    $(OBJ_DIR)/substr.o \
-   $(OBJ_DIR)/teditorl.o \
    $(OBJ_DIR)/tone.o \
    $(OBJ_DIR)/tprinter.o \
    $(OBJ_DIR)/trace.o \
@@ -936,6 +936,9 @@ $(OBJ_DIR)/hbsrlraw.o : $(RTL_DIR)/hbsrlraw.c
 $(OBJ_DIR)/hbsyslog.o : $(RTL_DIR)/hbsyslog.c
 	$(CC_CMD)
 
+$(OBJ_DIR)/hbtoken.o : $(RTL_DIR)/hbtoken.c
+	$(CC_CMD)
+
 $(OBJ_DIR)/hbxml.o : $(RTL_DIR)/hbxml.c
 	$(CC_CMD)
 
@@ -1288,9 +1291,6 @@ $(OBJ_DIR)/teditor.c : $(RTL_DIR)/teditor.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/teditor.o : $(OBJ_DIR)/teditor.c
-	$(CC_CMD)
-
-$(OBJ_DIR)/teditorl.o : $(RTL_DIR)/teditorl.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/terror.c : $(RTL_DIR)/terror.prg

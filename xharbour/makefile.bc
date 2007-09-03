@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.200 2007/05/19 10:14:32 patrickmast Exp $
+# $Id: makefile.bc,v 1.201 2007/05/20 03:26:22 ronpinkas Exp $
 #
 
 #
@@ -360,6 +360,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbserv.obj \
    $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\hbsyslog.obj \
+   $(RTL_OBJ_DIR)\hbtoken.obj \
    $(RTL_OBJ_DIR)\hbxml.obj \
    $(RTL_OBJ_DIR)\idle.obj \
    $(RTL_OBJ_DIR)\inkey.obj \
@@ -425,7 +426,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\strzero.obj \
    $(RTL_OBJ_DIR)\stuff.obj \
    $(RTL_OBJ_DIR)\substr.obj \
-   $(RTL_OBJ_DIR)\teditorl.obj \
    $(RTL_OBJ_DIR)\tone.obj \
    $(RTL_OBJ_DIR)\tprinter.obj \
    $(RTL_OBJ_DIR)\trace.obj \
@@ -2258,6 +2258,9 @@ $(RTL_OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
 $(RTL_OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
    $(CC_CMD)
 
+$(RTL_OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(RTL_OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
    $(CC_CMD)
 
@@ -2598,9 +2601,6 @@ $(RTL_OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HB_CMD)
 
 $(RTL_OBJ_DIR)\teditor.obj : $(RTL_OBJ_DIR)\teditor.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg

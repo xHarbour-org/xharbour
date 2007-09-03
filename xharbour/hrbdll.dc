@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.22 2006/11/09 16:41:08 marchuet Exp $
+# $Id: hrbdll.dc,v 1.23 2007/03/25 06:12:45 walito Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -181,6 +181,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\gtapiu.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
+   $(OBJ_DIR)\hbtoken.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
@@ -245,7 +246,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\strzero.obj \
    $(OBJ_DIR)\stuff.obj \
    $(OBJ_DIR)\substr.obj \
-   $(OBJ_DIR)\teditorl.obj \
    $(OBJ_DIR)\tone.obj \
    $(OBJ_DIR)\readline.obj \
    $(OBJ_DIR)\tprinter.obj \
@@ -724,6 +724,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\gtapiu.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\gx.obj         + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hardcr.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\hbtoken.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\idle.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\inkey.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\is.obj         + >> harbourdll.rsp
@@ -788,7 +789,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\strzero.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\stuff.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\substr.obj     + >> harbourdll.rsp
-   $(ECHO) $(OBJ_DIR)\teditorl.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tone.obj       + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\readline.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\tprinter.obj   + >> harbourdll.rsp
@@ -1500,6 +1500,9 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
@@ -1828,9 +1831,6 @@ $(OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\teditor.obj : $(OBJ_DIR)\teditor.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg

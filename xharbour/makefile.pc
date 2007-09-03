@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.48 2007/06/06 00:46:33 modalsist Exp $
+# $Id: makefile.pc,v 1.49 2007/07/06 13:11:34 modalsist Exp $
 #
 # Makefile for Pelles C compiler
 #
@@ -817,6 +817,7 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\hbserv.obj \
    $(OBJ_DIR)\hbsrlraw.obj \
    $(OBJ_DIR)\hbsyslog.obj \
+   $(OBJ_DIR)\hbtoken.obj \
    $(OBJ_DIR)\hbxml.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
@@ -882,7 +883,6 @@ RTL_LIB_OBJS = \
    $(OBJ_DIR)\strzero.obj \
    $(OBJ_DIR)\stuff.obj \
    $(OBJ_DIR)\substr.obj \
-   $(OBJ_DIR)\teditorl.obj \
    $(OBJ_DIR)\tone.obj \
    $(OBJ_DIR)\tprinter.obj \
    $(OBJ_DIR)\trace.obj \
@@ -1296,6 +1296,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(OBJ_DIR)\hbserv.obj   >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\hbsrlraw.obj >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\hbsyslog.obj >> poccrtl.rsp
+   $(ECHO) $(OBJ_DIR)\hbtoken.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\hbxml.obj    >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\idle.obj     >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\inkey.obj    >> poccrtl.rsp
@@ -1361,7 +1362,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(OBJ_DIR)\strzero.obj  >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\stuff.obj    >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\substr.obj   >> poccrtl.rsp
-   $(ECHO) $(OBJ_DIR)\teditorl.obj >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\tone.obj     >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\tprinter.obj >> poccrtl.rsp
    $(ECHO) $(OBJ_DIR)\trace.obj    >> poccrtl.rsp
@@ -2163,6 +2163,9 @@ $(OBJ_DIR)\hbsrlraw.obj : $(RTL_DIR)\hbsrlraw.c
 $(OBJ_DIR)\hbsyslog.obj : $(RTL_DIR)\hbsyslog.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\hbxml.obj : $(RTL_DIR)\hbxml.c
    $(CC_CMD)
 
@@ -2356,9 +2359,6 @@ $(OBJ_DIR)\stuff.obj : $(RTL_DIR)\stuff.c
    $(CC_CMD)
 
 $(OBJ_DIR)\substr.obj : $(RTL_DIR)\substr.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\tone.obj : $(RTL_DIR)\tone.c

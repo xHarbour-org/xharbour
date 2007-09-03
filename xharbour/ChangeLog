@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5673 2007/09/01 08:53:53 patrickmast Exp $
+ * $Id: ChangeLog,v 1.5674 2007/09/03 13:49:23 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,30 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-09-03 02:05 UTC-0500 Paul Tucker <ptucker sympatico.ca>
+   * source/rtl/disksphb.c
+     * finished up changes for <nDrive> support
+   + source/rtl/hbtoken.c
+     * as implemented in Harbour
+   - source/rtl/teditorl.c
+     * functionality move to hbtoken
+   * hrbdll.bc
+   * hrbdll.dc
+   * hrbdll.gc
+   * hrbdll.pc
+   * hrbdll.vc
+   * hrbdll.wc
+   * Makefile
+   * makefile.bc
+   * makefile.dc
+   * makefile.gc
+   * makefile.pc
+   * makefile.vc
+   * makefile.wc
+   * source/rtl/Makefile
+     + source/rtl/hbtoken.c
+     - source/rtl/teditorl.c
+          
 2007-09-03 11:00 UTC-0300 Luiz Rafael Culik Guimaraes
    * bin/pack_src.sh
      ! added missing pcre dependencies to tar

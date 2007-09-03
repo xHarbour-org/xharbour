@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.137 2007/05/04 11:29:00 marchuet Exp $
+# $Id: hrbdll.bc,v 1.138 2007/05/21 15:28:44 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -223,26 +223,26 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\gtgraph.obj \
   $(OBJ_DIR)\gx.obj \
   $(OBJ_DIR)\hardcr.obj \
-  $(OBJ_DIR)\hbbitf.obj \
-  $(OBJ_DIR)\hbffind.obj \
   $(OBJ_DIR)\hash.obj \
-  $(OBJ_DIR)\hbi18n.obj \
-  $(OBJ_DIR)\hboutdbg.obj \
-  $(OBJ_DIR)\hbrandom.obj \
-  $(OBJ_DIR)\hbserial.obj \
-  $(OBJ_DIR)\hbsrlraw.obj \
-  $(OBJ_DIR)\hbsyslog.obj \
-  $(OBJ_DIR)\hbxml.obj \
-  $(OBJ_DIR)\hbhex2n.obj \
+  $(OBJ_DIR)\hbbitf.obj \
   $(OBJ_DIR)\hbchksum.obj \
   $(OBJ_DIR)\hbcomprs.obj \
   $(OBJ_DIR)\hbcrc32.obj \
   $(OBJ_DIR)\hbcrypt.obj \
+  $(OBJ_DIR)\hbffind.obj \
+  $(OBJ_DIR)\hbhex2n.obj \
+  $(OBJ_DIR)\hbi18n.obj \
   $(OBJ_DIR)\hblog.obj \
   $(OBJ_DIR)\hblognet.obj \
   $(OBJ_DIR)\hbmd5.obj \
+  $(OBJ_DIR)\hboutdbg.obj \
+  $(OBJ_DIR)\hbrandom.obj \
+  $(OBJ_DIR)\hbserial.obj \
   $(OBJ_DIR)\hbserv.obj \
-  $(OBJ_DIR)\txml.obj \
+  $(OBJ_DIR)\hbsrlraw.obj \
+  $(OBJ_DIR)\hbsyslog.obj \
+  $(OBJ_DIR)\hbtoken.obj \
+  $(OBJ_DIR)\hbxml.obj \
   $(OBJ_DIR)\idle.obj \
   $(OBJ_DIR)\inkey.obj \
   $(OBJ_DIR)\is.obj \
@@ -315,12 +315,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\strzero.obj \
   $(OBJ_DIR)\stuff.obj \
   $(OBJ_DIR)\substr.obj \
-  $(OBJ_DIR)\teditorl.obj \
   $(OBJ_DIR)\throw.obj \
   $(OBJ_DIR)\tone.obj \
   $(OBJ_DIR)\trace.obj \
   $(OBJ_DIR)\transfrm.obj \
   $(OBJ_DIR)\trim.obj \
+  $(OBJ_DIR)\txml.obj \
   $(OBJ_DIR)\type.obj \
   $(OBJ_DIR)\val.obj \
   $(OBJ_DIR)\valtostr.obj \
@@ -951,26 +951,26 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\gtgraph.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\gx.obj                + >> hdll.tmp
   echo. $(OBJ_DIR)\hardcr.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbbitf.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hash.obj              + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbi18n.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\hboutdbg.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbrandom.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbserial.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbsrlraw.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbsyslog.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbbitf.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\hbchksum.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbhex2n.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbxml.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\hblog.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\hblognet.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\hbmd5.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcomprs.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcrc32.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\hbcrypt.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbffind.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbhex2n.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbi18n.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hblog.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\hblognet.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbmd5.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\hboutdbg.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbrandom.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbserial.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hbserv.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\txml.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbsrlraw.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbsyslog.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbtoken.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\hbxml.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\idle.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\inkey.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\is.obj                + >> hdll.tmp
@@ -1049,12 +1049,12 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\strzero.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\stuff.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\substr.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\teditorl.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\throw.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\tone.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\trace.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\transfrm.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\trim.obj              + >> hdll.tmp
+  echo. $(OBJ_DIR)\txml.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\type.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\val.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\valtostr.obj          + >> hdll.tmp
@@ -1994,6 +1994,9 @@ $(OBJ_DIR)\hbmd5.obj : $(RTL_DIR)\hbmd5.c
 $(OBJ_DIR)\hbserv.obj : $(RTL_DIR)\hbserv.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
@@ -2334,9 +2337,6 @@ $(OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\teditor.obj : $(OBJ_DIR)\teditor.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg

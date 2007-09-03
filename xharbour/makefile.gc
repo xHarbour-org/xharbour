@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.28 2006/11/09 16:41:09 marchuet Exp $
+# $Id: makefile.gc,v 1.29 2007/03/25 06:12:49 walito Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2604,6 +2604,7 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/hbserv.o \
    $(RTL_OBJ_DIR)/hbsrlraw.o \
    $(RTL_OBJ_DIR)/hbsyslog.o \
+   $(RTL_OBJ_DIR)/hbtoken.o \
    $(RTL_OBJ_DIR)/hbxml.o \
    $(RTL_OBJ_DIR)/idle.o \
    $(RTL_OBJ_DIR)/inkey.o \
@@ -2670,7 +2671,6 @@ $(RTL_LIB) : \
    $(RTL_OBJ_DIR)/strzero.o \
    $(RTL_OBJ_DIR)/stuff.o \
    $(RTL_OBJ_DIR)/substr.o \
-   $(RTL_OBJ_DIR)/teditorl.o \
    $(RTL_OBJ_DIR)/tone.o \
    $(RTL_OBJ_DIR)/tprinter.o \
    $(RTL_OBJ_DIR)/trace.o \
@@ -3096,6 +3096,9 @@ $(RTL_OBJ_DIR)/hbsrlraw.o : $(RTL_DIR)/hbsrlraw.c
 $(RTL_OBJ_DIR)/hbsyslog.o : $(RTL_DIR)/hbsyslog.c
 	$(CC_CMD)
 
+$(RTL_OBJ_DIR)/hbtoken.o : $(RTL_DIR)/hbtoken.c
+	$(CC_CMD)
+
 $(RTL_OBJ_DIR)/hbxml.o : $(RTL_DIR)/hbxml.c
 	$(CC_CMD)
 
@@ -3436,9 +3439,6 @@ $(RTL_OBJ_DIR)/teditor.c : $(RTL_DIR)/teditor.prg
 	$(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)/teditor.o : $(RTL_OBJ_DIR)/teditor.c
-	$(CC_CMD)
-
-$(RTL_OBJ_DIR)/teditorl.o : $(RTL_DIR)/teditorl.c
 	$(CC_CMD)
 
 $(RTL_OBJ_DIR)/terror.c : $(RTL_DIR)/terror.prg

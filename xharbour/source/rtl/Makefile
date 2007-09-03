@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.72 2007/03/25 06:12:50 walito Exp $
+# $Id: Makefile,v 1.73 2007/04/15 18:47:55 andresreyesh Exp $
 #
 
 ROOT = ../../
@@ -67,6 +67,7 @@ C_SOURCES=\
         hbffind.c    \
         hbrandom.c   \
         hbsrlraw.c   \
+        hbtoken.c    \
         hbxml.c      \
         idle.c       \
         inkey.c      \
@@ -130,7 +131,6 @@ C_SOURCES=\
         strzero.c    \
         stuff.c      \
         substr.c     \
-        teditorl.c   \
         tone.c       \
         tprinter.c   \
         trace.c      \

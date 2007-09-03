@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.37 2007/06/06 00:46:33 modalsist Exp $
+# $Id: hrbdll.pc,v 1.38 2007/07/06 13:11:34 modalsist Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -203,6 +203,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\gtapiu.obj \
    $(OBJ_DIR)\gx.obj \
    $(OBJ_DIR)\hardcr.obj \
+   $(OBJ_DIR)\hbtoken.obj \
    $(OBJ_DIR)\idle.obj \
    $(OBJ_DIR)\inkey.obj \
    $(OBJ_DIR)\is.obj \
@@ -267,7 +268,6 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\strzero.obj \
    $(OBJ_DIR)\stuff.obj \
    $(OBJ_DIR)\substr.obj \
-   $(OBJ_DIR)\teditorl.obj \
    $(OBJ_DIR)\tone.obj \
    $(OBJ_DIR)\readline.obj \
    $(OBJ_DIR)\tprinter.obj \
@@ -797,6 +797,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\hbserv.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbsrlraw.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbsyslog.obj   >> make_tmp
+   $(ECHO) $(OBJ_DIR)\hbtoken.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbxml.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\idle.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\inkey.obj      >> make_tmp
@@ -863,7 +864,6 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\strzero.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\stuff.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\substr.obj     >> make_tmp
-   $(ECHO) $(OBJ_DIR)\teditorl.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\tone.obj       >> make_tmp
    $(ECHO) $(OBJ_DIR)\tprinter.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\trace.obj      >> make_tmp
@@ -1633,6 +1633,9 @@ $(OBJ_DIR)\gx.obj : $(RTL_DIR)\gx.c
 $(OBJ_DIR)\hardcr.obj : $(RTL_DIR)\hardcr.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbtoken.obj : $(RTL_DIR)\hbtoken.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\idle.obj : $(RTL_DIR)\idle.c
    $(CC_CMD)
 
@@ -1973,9 +1976,6 @@ $(OBJ_DIR)\teditor.c : $(RTL_DIR)\teditor.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\teditor.obj : $(OBJ_DIR)\teditor.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\teditorl.obj : $(RTL_DIR)\teditorl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\terror.c : $(RTL_DIR)\terror.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.9 2007/08/24 08:05:53 paultucker Exp $
+ * $Id: disksphb.c,v 1.10 2007/08/25 17:42:53 paultucker Exp $
  */
 
 /*
@@ -53,11 +53,11 @@
 /* NOTE: For OS/2. Must be ahead of any and all #include statements */
 #define INCL_BASE
 #define INCL_DOSERRORS
+
 #define HB_OS_WIN_32_USED
 
 #include <ctype.h>
 
-#include "hbapi.h"
 #include "hbapierr.h"
 #include "hbapifs.h"
 
@@ -70,7 +70,7 @@
 #  if defined(__WATCOMC__)
 #     include <sys/stat.h>
 #  else
-#     include <sys/vfs.h>
+#     include <sys/statvfs.h>
 #  endif
 #endif
 
@@ -79,7 +79,7 @@
 HB_FUNC( HB_DISKSPACE )
 {
    char * szPath;
-   char bPath[4];
+   char szPathBuf[4];
    USHORT uiType = ISNUM( 2 ) ? hb_parni( 2 ) : HB_DISK_AVAIL;
    USHORT uiDrive= 0;
    double dSpace = 0.0;
@@ -87,55 +87,64 @@ HB_FUNC( HB_DISKSPACE )
    if( uiType > HB_DISK_TOTAL )
       uiType = HB_DISK_AVAIL;
 
+   szPathBuf[ 0 ] = '@';
+
    if( ISCHAR( 1 ))
    {
-      szPath = hb_parc( 1 );
+      szPath = hb_parcx( 1 );
+#ifdef OS_HAS_DRIVE_LETTER
       if( hb_parclen( 1 ) < 3 )
       {
-         *bPath = *szPath;
-         szPath = bPath;
+         *szPathBuf = *szPath;
+         szPath = szPathBuf;
       }
+#endif
    }
    else
    {
+      szPath = szPathBuf;
+
+#ifdef OS_HAS_DRIVE_LETTER
       if( ISNUM( 1 ))
       {
          uiDrive = hb_parni( 1 );
-         bPath[0] = uiDrive + 'A' - 1;
+         szPathBuf[ 0 ] = ( char ) uiDrive + 'A' - 1;
       }
-      else
-         bPath[0] = ' ';
-
-      szPath = bPath;
+#else
+      szPathBuf[ 0 ] = OS_PATH_DELIMITER;
+      szPathBuf[ 1 ] = '\0';
+#endif
    }
 
-   if( bPath[0] == '\0')
-      bPath[0] = ' ';
 
-   bPath[1] = ':';
-   bPath[2] = '\\';
-   bPath[3] = '\0';
+#ifdef OS_HAS_DRIVE_LETTER
+   szPathBuf[ 1 ] = OS_DRIVE_DELIMITER;
+   szPathBuf[ 2 ] = OS_PATH_DELIMITER;
+   szPathBuf[ 3 ] = '\0';
+#endif
 
 #if defined(HB_OS_DOS)
 
    {
-      char * szBuff = (char *) hb_xgrab( strlen( szPath ) + 1 );
+      char cDrive = toupper( szPath[ 0 ] );
 
-      strcpy( szBuff, szPath );
-
-      if( uiDrive == 0 && szBuff[ 0 ] <> ' ' )
-         uiDrive = toupper( szBuff[ 0 ] ) - 'A' + 1;
+      if( uiDrive == 0 )
+         uiDrive = szPath[ 1 ] != OS_DRIVE_DELIMITER ? 0 :
+                   cDrive >= 'A' && cDrive <= 'Z' ? cDrive - 'A' + 1 : 0;
 
       if( uiDrive == 0 )
       {
+         /* Since the code that follows can accept a '0' uiDrive,
+            I am presuming that this prevents an invalid current drive
+            from presenting an error condition or setting errorlevel?
+            (ie, removed floppy)
+         */
          USHORT uiErrorOld = hb_fsError();
 
          uiDrive = hb_fsCurDrv() + 1;
 
          hb_fsSetError( uiErrorOld );
       }
-
-      szBuff[ 0 ] = uiDrive + 'A' - 1;
 
       while( TRUE )
       {
@@ -181,17 +190,23 @@ HB_FUNC( HB_DISKSPACE )
          }
          break;
       }
-      bb_xfree( szBuff );
    }
 
 #elif defined(HB_OS_WIN_32)
 
    {
-      char * szBuff = (char *) hb_xgrab( strlen( szPath ) + 1 );
-      strcpy( szBuff, szPath );
 
-      if( uiDrive == 0 && szBuff[ 0 ] != ' ' )
-         uiDrive = toupper( szBuff[ 0 ] ) - 'A' + 1;
+      if( uiDrive == 0 )
+      {
+         char cDrive = toupper( szPath[ 0 ] );
+
+         uiDrive = szPath[ 1 ] != OS_DRIVE_DELIMITER ? 0 :
+                   cDrive >= 'A' && cDrive <= 'Z' ? cDrive - 'A' + 1 : 0;
+      }
+
+      /* NOTE: Use of '0' meaning 'default drive' is _very_ _strongly_
+         discouraged in a modern day application.
+      */
 
       if( uiDrive == 0 )
       {
@@ -202,7 +217,8 @@ HB_FUNC( HB_DISKSPACE )
          hb_fsSetError( uiErrorOld );
       }
 
-      szBuff[ 0 ] = uiDrive + 'A' - 1;
+      szPath = ( char * ) hb_strdup( szPath );
+      szPath [ 0 ] = ( char ) uiDrive + 'A' - 1;
 
       while( TRUE )
       {
@@ -226,7 +242,7 @@ HB_FUNC( HB_DISKSPACE )
                            i64FreeBytes,
                            i64RetVal;
 
-            if( pGetDiskFreeSpaceEx( szBuff,
+            if( pGetDiskFreeSpaceEx( szPath,
                                      ( PULARGE_INTEGER ) &i64FreeBytesToCaller,
                                      ( PULARGE_INTEGER ) &i64TotalBytes,
                                      ( PULARGE_INTEGER ) &i64FreeBytes ) )
@@ -292,7 +308,7 @@ HB_FUNC( HB_DISKSPACE )
 
             SetLastError( 0 );
 
-            if( GetDiskFreeSpace( szBuff,
+            if( GetDiskFreeSpace( szPath,
                                   &dwSectorsPerCluster,
                                   &dwBytesPerSector,
                                   &dwNumberOfFreeClusters,
@@ -332,7 +348,7 @@ HB_FUNC( HB_DISKSPACE )
          }
          break;
       }
-      hb_xfree( szBuff );
+      hb_xfree( szPath );
    }
 
 #elif defined(HB_OS_OS2)
@@ -340,9 +356,11 @@ HB_FUNC( HB_DISKSPACE )
    {
       struct _FSALLOCATE fsa;
       USHORT rc;
+      char cDrive = toupper( szPath[ 0 ] );
 
-      if( uiDrive == 0 && szPath[ 0 ] != '  ' )
-         uiDrive = toupper( szPath[ 0 ] ) - 'A' + 1;
+      if( uiDrive == 0 )
+         uiDrive = szPath[ 1 ] != OS_DRIVE_DELIMITER ? 0 :
+                   cDrive >= 'A' && cDrive <= 'Z' ? cDrive - 'A' + 1 : 0;
 
       /* Query level 1 info from filesystem */
       while( ( rc = DosQueryFSInfo( uiDrive, 1, &fsa, sizeof( fsa ) ) ) != 0 )
@@ -375,18 +393,16 @@ HB_FUNC( HB_DISKSPACE )
                break;
          }
       }
+      hb_xfree( szPath );
    }
 
 #elif defined(HB_OS_UNIX) && !defined(__WATCOMC__)
 
    {
-#if defined(HB_OS_SUNOS)
       struct statvfs sf;
+
+      szPath = ( char * ) hb_fileNameConv( hb_strdup( szPath ) );
       if ( statvfs( szPath, &sf ) == 0 )
-#else
-      struct statfs sf;
-      if ( statfs( szPath, &sf ) == 0 )
-#endif
       {
          switch( uiType )
          {
@@ -408,7 +424,9 @@ HB_FUNC( HB_DISKSPACE )
                break;
          }
       }
+      hb_xfree( szPath );
    }
+
 
 #else
 
@@ -423,4 +441,3 @@ HB_FUNC( HB_DISKSPACE )
 }
 
 #endif
-
