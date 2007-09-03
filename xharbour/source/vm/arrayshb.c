@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.69 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.70 2007/04/13 22:09:18 ronpinkas Exp $
  */
 
 /*
@@ -63,7 +63,6 @@
 #include <ctype.h>
 
 #include "hbvmopt.h"
-#include "hbapi.h"
 #include "hbvm.h"
 #include "hbfast.h"
 #include "hbstack.h"
@@ -668,53 +667,6 @@ HB_FUNC( HB_AEXPRESSIONS )
 
       hb_arrayAddForward( &(HB_VM_STACK).Return, hb_itemPutCL( &Exp, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
 
-   }
-}
-
-HB_FUNC( HB_ATOKENS )
-{
-   PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
-   PHB_ITEM pDelim = hb_param( 2, HB_IT_STRING );
-
-   if( pLine )
-   {
-      HB_ITEM_NEW ( Token );
-      char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
-      size_t i, iOffset = 0;
-      BOOL bSkipStrings = hb_parl( 3 );
-      BOOL bDoubleQuoteOnly = hb_parl( 4 );
-
-      hb_arrayNew( &(HB_VM_STACK.Return), 0 );
-
-      for( i = 0; i < pLine->item.asString.length; i++ )
-      {
-         if( bSkipStrings && ( pLine->item.asString.value[i] == '"'
-                               || ( bDoubleQuoteOnly == FALSE && pLine->item.asString.value[i] == '\'' ) ) )
-         {
-            char cTerminator = pLine->item.asString.value[i];
-
-            while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != cTerminator )
-            {
-            }
-         }
-         else if( pLine->item.asString.value[i] == cDelimiter )
-         {
-            hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, i - iOffset ) );
-
-            iOffset = i + 1;
-         }
-      }
-
-      if( iOffset < pLine->item.asString.length )
-      {
-         hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
-      }
-
-   }
-   else
-   {
-      hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_ATOKENS", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
-      return;
    }
 }
 

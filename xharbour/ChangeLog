@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5674 2007/09/03 13:49:23 lculik Exp $
+ * $Id: ChangeLog,v 1.5675 2007/09/03 18:04:25 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -11,6 +11,8 @@
 2007-09-03 02:05 UTC-0500 Paul Tucker <ptucker sympatico.ca>
    * source/rtl/disksphb.c
      * finished up changes for <nDrive> support
+   * source/vm/arrayshb.c
+     * some functions moved to ../rtl/hbtoken.c
    + source/rtl/hbtoken.c
      * as implemented in Harbour
    - source/rtl/teditorl.c
