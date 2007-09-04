@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5677 2007/09/03 18:31:53 paultucker Exp $
+ * $Id: ChangeLog,v 1.5678 2007/09/04 00:37:59 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-04 09:25 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/win32prn.prg
+    ! Fixed :EndPage() description on header (lFinisih -> lStartNewPage)
 
 2007-09-03 21:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * source\rtl\tbrowse.prg
@@ -43,7 +47,7 @@
    * source/rtl/Makefile
      + source/rtl/hbtoken.c
      - source/rtl/teditorl.c
-          
+
 2007-09-03 11:00 UTC-0300 Luiz Rafael Culik Guimaraes
    * bin/pack_src.sh
      ! added missing pcre dependencies to tar
@@ -79,7 +83,7 @@
 2007-08-29 13:50 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
    * source\vm\hvm.c
      * Disabled tracelog output for "*** WARNING! Function: %s in Module: %s is hidden by previously
-       registered Module:..." 
+       registered Module:..."
 
 2007-08-28 15:35 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include\common.ch
@@ -191,7 +195,7 @@
     ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
       the second exit too solved.
 
-	It can be tested with:
+    It can be tested with:
              proc main()
                 local o:=errorNew()
                 WHILE ! Empty( o )
@@ -223,27 +227,27 @@
 2007-08-20 21:30 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * harbour/source/rdd/dbcmd.c
     * cleaned DBSKIPPER() code
-	synced with harbour
+    synced with harbour
 
   * harbour/source/rtl/browdb.prg
     * use written in C DBSKIPPER() function instead of static .prg Skipped()
       when HB_COMPAT_XPP macro is enabled
-	synced with harbour
+    synced with harbour
 
 2007-08-20 20:41 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/compiler/harbour.sly
     ! Fixed EXIT and LOOP inside WITH OBJECT / END statement now resets WITH OBJECT state.
 
-	It can be tested with:
-		proc main()
-		local o:=errorNew()
-		while .t.
-		   with object o
-		      ? :tries++
-		      loop
-		   end
-		enddo
-		return
+    It can be tested with:
+        proc main()
+        local o:=errorNew()
+        while .t.
+           with object o
+              ? :tries++
+              loop
+           end
+        enddo
+        return
 
 2007-08-17 09:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h
@@ -487,14 +491,14 @@
 2007-06-23 03:00 UTC-0800 Brian Hays <bhays at abacuslaw.com>
   * contrib/rdd_ads/ads1.c
     * Sync'ed with Harbour to bring in new commonError()
-	and miscellaneous error handling;
-	fixes neterr() not being set to TRUE as reported by Patrick.
+    and miscellaneous error handling;
+    fixes neterr() not being set to TRUE as reported by Patrick.
 
   Note: Harbour still lacks a few of our fixes, including the "set"
         internal pointer references being replaced by
-		hb_setext = hb_GetSetStructPtr();
+        hb_setext = hb_GetSetStructPtr();
         This file "should" be fine to post to Harbour as
-	  well to keep in sync, but I haven't downloaded nor
+      well to keep in sync, but I haven't downloaded nor
         tested with their cvs.  It would be good if someone
         could take the time to do that.
 

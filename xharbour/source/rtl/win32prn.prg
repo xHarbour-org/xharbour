@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.22 2007/02/21 19:50:52 peterrees Exp $
+ * $Id: win32prn.prg,v 1.23 2007/05/29 21:20:03 peterrees Exp $
  */
 
 /*
@@ -152,7 +152,7 @@ CLASS WIN32PRN
   METHOD StartDoc(cDocame)       // Calls StartPage()
   METHOD EndDoc(lAbortDoc)       // Calls EndPage() if lAbortDoc not .T.
   METHOD StartPage()
-  METHOD EndPage(lFinished)      // If lFinished = .F. then StartPage() is called for the next page of output
+  METHOD EndPage(lStartNewPage)      // If lStartNewPage = .T. then StartPage() is called for the next page of output
   METHOD NewLine()
   METHOD NewPage()
   METHOD SetFont(cFontName, nPointSize, nWidth, nBold, lUnderline, lItalic, nCharSet)
@@ -1152,9 +1152,9 @@ HB_FUNC_STATIC( SETPEN )
 {
    HDC hDC = ( HDC ) hb_parnl( 1 );
    HPEN hPen = CreatePen(
-               hb_parni( 2 ),	// pen style
-               hb_parni( 3 ),	// pen width
-               (COLORREF) hb_parnl( 4 ) 	// pen color
+               hb_parni( 2 ),   // pen style
+               hb_parni( 3 ),   // pen width
+               (COLORREF) hb_parnl( 4 )     // pen color
                );
    HPEN hOldPen = (HPEN) SelectObject( hDC, hPen);
 
