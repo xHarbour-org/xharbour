@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.14 2007/03/25 06:12:49 walito Exp $
+ * $Id: std.ch,v 1.15 2007/05/23 11:11:26 toninhofwi Exp $
  */
 
 /*
@@ -514,13 +514,16 @@
                [<ascend: ASCENDING>] [<descend: DESCENDING>] ;
                [<add: ADDITIVE>] [<cur: USECURRENT>] [<cust: CUSTOM>] ;
                [<noopt: NOOPTIMIZE>] [<mem: MEMORY, TEMPORARY>] ;
-               [<filter: USEFILTER>] [<ex: EXCLUSIVE>] => ;
+               [<filter: USEFILTER>] [<ex: EXCLUSIVE>] ;
+               [CONSTRAINT <cons>];
+               [TARGET <targ> ] ;
+               [KEY <kkey> ] => ;
          ordCondSet( <"for">, <{for}>, [<.all.>], <{while}>, ;
                      <{eval}>, <every>, RECNO(), <next>, <rec>, ;
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>] )
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<kkey>})
 
 #command INDEX ON <key> TAG <(tag)> [TO <(bag)>] ;
                [FOR <for>] [WHILE <while>] [NEXT <next>] ;
@@ -529,13 +532,16 @@
                [<ascend: ASCENDING>] [<descend: DESCENDING>] ;
                [<add: ADDITIVE>] [<cur: USECURRENT>] [<cust: CUSTOM>] ;
                [<noopt: NOOPTIMIZE>] [<mem: MEMORY, TEMPORARY>] ;
-               [<filter: USEFILTER>] [<ex: EXCLUSIVE>] => ;
+               [<filter: USEFILTER>] [<ex: EXCLUSIVE>]  ;
+               [CONSTRAINT <cons>];
+               [TARGET <targ> ] ;
+               [KEY <kkey> ]=> ;
          ordCondSet( <"for">, <{for}>, [<.all.>], <{while}>, ;
                      <{eval}>, <every>, RECNO(), <next>, <rec>, ;
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>] )
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<kkey>} )
 
 #command INDEX ON <key> TO <(file)> [<u: UNIQUE>] => ;
             dbCreateIndex( <(file)>, <"key">, <{key}>, if( <.u.>, .t., NIL ) )
