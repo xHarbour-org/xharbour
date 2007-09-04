@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5676 2007/09/03 18:08:56 paultucker Exp $
+ * $Id: ChangeLog,v 1.5677 2007/09/03 18:31:53 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-03 21:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * source\rtl\tbrowse.prg
+     ! Fixed TBrowse displays 2 rows when browsing empty database.
 
 2007-09-03 02:30 UTC-0500 Paul Tucker <ptucker sympatico.ca>
    * source/rtl/teditor.prg

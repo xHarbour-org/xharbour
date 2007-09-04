@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.175 2007/08/31 08:34:34 patrickmast Exp $
+ * $Id: tbrowse.prg,v 1.176 2007/09/01 08:53:54 patrickmast Exp $
  */
 
 /*
@@ -260,7 +260,7 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
    if nRecsToSkip <> 0
 
       nRecsSkipped := Eval( ::oCachedBrowse:SkipBlock, nRecsToSkip )
-
+    
       // I've tried to move past top or bottom margin
       //
       if Empty( nRecsSkipped ) // PM:08-30-2007 Was nRecsSkipped == 0
@@ -338,6 +338,11 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
       nRecsSkipped := Eval( ::oCachedBrowse:SkipBlock, 0 )
       ::FillRow( ::nCurRow )
    endif
+
+   /* 2007/SEP/03 - E.F. - nRecsSkipped must be a numeric value here to avoid
+                           paint more rows than exist, if database is empty.
+    */
+   default nRecsSkipped to 0
 
 RETURN nRecsSkipped
 
@@ -1088,7 +1093,7 @@ METHOD Configure( nMode ) CLASS TBrowse
    //
    ::nRowData := ::nwTop + iif( ::lHeaders, ::nHeaderHeight, 0 ) + ;
                            iif( ::lHeadSep .OR. ::lColHeadSep, 1, 0 ) - 1
-
+   
    if Len( ::aRedraw ) <> ::RowCount .AND. ::RowCount > 0
       ::aRedraw := Array( ::RowCount )
       // I need a cache of different size
@@ -1187,7 +1192,7 @@ METHOD AddColumn( oCol ) CLASS TBrowse
    if !::lNeverDisplayed .or. ::nColumns == 1
       ::Configure( 1 )
    endif
-
+ 
    ::lConfigured := .f.
 
 Return Self
@@ -2544,6 +2549,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
    // If I have a requested movement still to handle
    //
    if ::nRecsToSkip <> 0
+   
       // If I'm not under cursor
       // maybe I've interrupted an ongoing stabilization
       // I have to set data source to cursor position
@@ -2682,7 +2688,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
    lDisplay := ! ::oDataCache:GetCell( nRow, iif( ::nFrozenCols > 0, 1, ::leftVisible ) ) == NIL
-
+   
    if lDisplay
 
       if ::nFrozenCols == 0
@@ -3692,7 +3698,7 @@ Static Function IsDb(oTb)
 *------------------------
 * Check if datasource used by Tbrowse is a database or not.
 *-------------------------------
-LOCAL lIsDb, aWA, nArea, aArea, lBottom, nSkip, nSkipped
+LOCAL lIsDb, aWA, nArea, aArea, lBottom, nSkip, nSkipped, oCol
 
 lIsDb := .f.
 
@@ -3737,6 +3743,12 @@ IF Used()
             Eval( oTb:SkipBlock, -1 )
          endif
       ENDIF
+
+   ELSEIF HB_IsObject( oCol := oTb:GetColumn(1) )
+
+      if HB_IsBlock( oCol:Block )
+         lIsDb := ( Eval( oCol:block ) == FieldGet( 1 ) )
+      endif
 
    ENDIF
 
