@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.16 2007/09/04 22:03:57 lculik Exp $
+ * $Id: std.ch,v 1.17 2007/09/05 19:48:50 lculik Exp $
  */
 
 /*
@@ -523,7 +523,7 @@
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<"kkey">})
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<(kkey)>})
 
 #command INDEX ON <key> TAG <(tag)> [TO <(bag)>] ;
                [FOR <for>] [WHILE <while>] [NEXT <next>] ;
@@ -541,7 +541,7 @@
                      [<.rest.>], [<.descend.>],, ;
                      [<.add.>], [<.cur.>], [<.cust.>], [<.noopt.>], ;
                      <"while">, [<.mem.>], [<.filter.>], [<.ex.>] ) ;;
-         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<"kkey">} )
+         ordCreate( <(bag)>, <(tag)>, <"key">, <{key}>, [<.unique.>],<"cons">,<"targ"> ,{<(kkey)>} )
 
 #command INDEX ON <key> TO <(file)> [<u: UNIQUE>] => ;
             dbCreateIndex( <(file)>, <"key">, <{key}>, if( <.u.>, .t., NIL ) )
