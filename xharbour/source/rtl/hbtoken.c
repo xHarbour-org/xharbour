@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c 7114 2007-04-06 12:35:15Z druzus $
+ * $Id: hbtoken.c,v 1.1 2007/09/03 19:00:51 paultucker Exp $
  */
 
 /*
@@ -58,7 +58,7 @@ static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
                             char * szDelim, ULONG ulDelim,
                             BOOL fSkipStrings, BOOL fDoubleQuoteOnly )
 {
-   ULONG ul = 0, ulTokens = 1;
+   ULONG ul = 0, ulTokens = HB_MIN( ulLen, 1 );
    char cQuote = 0;
 
    while( ul < ulLen )
