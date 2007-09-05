@@ -63,6 +63,10 @@
 #include <windows.h>
 #endif // __MINGW32__
 
+#ifdef __XCC__      // prevents a bug in mingw32
+#include <windows.h>
+#endif // __XCC__
+
 
 #define DLL_CALLCONV __stdcall
 // The following ifdef block is the standard way of creating macros which make exporting 
