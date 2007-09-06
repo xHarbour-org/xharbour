@@ -1,5 +1,5 @@
 /*
- * $Id: smtpcln.prg,v 1.4 2007/01/29 12:37:04 lculik Exp $
+ * $Id: smtpcln.prg,v 1.5 2007/04/23 14:58:01 hazi01 Exp $
  */
 
 /*
@@ -98,10 +98,10 @@ local n:=1
       if !file("sendmail.log")
          ::nHandle := fcreate("sendmail.log")
       else
-         while file(cFile+alltrim(str(n,2))+".log")
+         while file(cFile+alltrim(str(n,4))+".log")
            n++
          enddo
-         ::nHandle := fcreate(cFile+alltrim(str(n,2))+".log")
+         ::nHandle := fcreate(cFile+alltrim(str(n,4))+".log")
       endif        
    endif
 RETURN Self

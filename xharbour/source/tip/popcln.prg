@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.6 2005/11/24 14:35:12 mauriliolongo Exp $
+ * $Id: popcln.prg,v 1.7 2007/04/23 14:58:01 hazi01 Exp $
  */
 
 /*
@@ -96,10 +96,10 @@ METHOD New( oUrl, lTrace, oCredentials ) CLASS tIPClientPOP
       if !file("pop3.log")
          ::nHandle := fcreate("pop3.log")
       else
-         while file(cFile+alltrim(str(n,2))+".log")
+         while file(cFile+alltrim(str(n,4))+".log")
            n++
          enddo
-         ::nHandle := fcreate(cFile+alltrim(str(n,2))+".log")
+         ::nHandle := fcreate(cFile+alltrim(str(n,4))+".log")
       endif
    endif
 

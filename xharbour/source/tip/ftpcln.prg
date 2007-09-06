@@ -1,5 +1,5 @@
 /*
- * $Id: ftpcln.prg,v 1.19 2007/08/14 14:59:33 patrickmast Exp $
+ * $Id: ftpcln.prg,v 1.20 2007/08/31 09:03:08 patrickmast Exp $
  */
 
 /*
@@ -159,10 +159,10 @@ METHOD New( oUrl,lTrace, oCredentials) CLASS tIPClientFTP
       if !file("ftp.log")
          ::nHandle := fcreate("ftp.log")
       else
-         while file(cFile+alltrim(str(n,2))+".log")
+         while file(cFile+alltrim(str(n,4))+".log")
            n++
          enddo
-         ::nHandle := fcreate(cFile+alltrim(str(n,2))+".log")
+         ::nHandle := fcreate(cFile+alltrim(str(n,4))+".log")
       endif
    endif
 
