@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5684 2007/09/05 22:57:01 lculik Exp $
+ * $Id: ChangeLog,v 1.5685 2007/09/06 15:40:34 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-07 18:17 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
+  * source/vm/macro.c
+    * Commented out unuseful assignment szString = NULL in function hb_macroGetValue()
+
 2007-09-06 12:40 UTC-0300 Luiz Rafael Culik Guimaraes 
   * source/tip/ftpcln.prg
   * source/tip/smtpcln.prg

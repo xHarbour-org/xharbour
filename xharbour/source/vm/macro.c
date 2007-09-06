@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.73 2007/07/06 13:39:07 ronpinkas Exp $
+ * $Id: macro.c,v 1.74 2007/08/28 19:04:55 ronpinkas Exp $
  */
 
 /*
@@ -608,7 +608,7 @@ void HB_EXPORT hb_macroGetValue( HB_ITEM_PTR pItem, BYTE iContext, BYTE flags )
       if( szString != pItem->item.asString.value )
       {
          hb_xfree( (void *) szString );
-         szString = NULL;
+//         szString = NULL;
       }
 
       iStatus = hb_macroParse( &struMacro, szCopy, ulLength );
