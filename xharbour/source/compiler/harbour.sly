@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.128 2007/08/23 11:48:40 marchuet Exp $
+ * $Id: harbour.sly,v 1.129 2007/08/28 12:31:21 ronpinkas Exp $
  */
 
 /*
@@ -423,6 +423,8 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                                            hb_compGenPCode2( HB_P_DOSHORT, 1, ( BOOL ) 1 );
                                            hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE;
                                          }
+           | EXIT      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopExit(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
+           | LOOP      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopLoop(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
            | RETURN CrlfStmnt {
                      if( hb_comp_wSeqCounter )
                         {
@@ -444,7 +446,9 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         hb_comp_cVarType = ' ';
 
                         if( hb_comp_wSeqCounter )
+                        {
                            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "RETURN", NULL );
+                        }
 
                         hb_compExprDelete( hb_compExprGenPush( $3 ) );   /* TODO: check if return value agree with declared value */
 
@@ -466,8 +470,6 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                      ExtVarList
                     { hb_compRTVariableGen( "__MVPRIVATE" ); hb_comp_cVarType = ' '; hb_comp_iVarScope = VS_NONE; } Crlf
 
-           | EXIT      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopExit(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
-           | LOOP      { hb_comp_bDontGenLineNum = !hb_comp_bDebugInfo; } CrlfStmnt { hb_compLoopLoop(); hb_comp_functions.pLast->bFlags |= FUN_BREAK_CODE; }
            | EXTERN ExtList Crlf
            | DYNAMIC DynList Crlf
            | ANNOUNCE IdentName {
@@ -1078,14 +1080,14 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                              }
 
                                              case HB_ET_FUNCALL:
-                                                $$ = $2->value.asFunCall.pFunName;
+                                               $$ = $2->value.asFunCall.pFunName;
 
-                                                $2->value.asFunCall.pFunName = NULL;
-                                                hb_compExprDelete( $2 );
+                                               $2->value.asFunCall.pFunName = NULL;
+                                               hb_compExprDelete( $2 );
 
-                                                $$->ExprType = HB_ET_FUNREF;
-                                                $$->ValType = HB_EV_FUNREF;
-                                                break;
+  											   $$->ExprType = HB_ET_FUNREF;
+                                               $$->ValType = HB_EV_FUNREF;
+                                               break;
 
                                              case HB_ET_SEND:
                                                $$ = $2;
@@ -1664,7 +1666,7 @@ Get        : _Get_ LValue ','
 
              EmptyExpression
                { /* $6 */
-                  HB_EXPR_PTR pVarName = NULL;
+                  HB_EXPR_PTR pVarName;
 
                   switch( $2->ExprType )
                   {
@@ -1717,6 +1719,7 @@ Get        : _Get_ LValue ','
                      }
 
                      default:
+					    pVarName = NULL;
                         hb_compExprDelete( $5 );
                         hb_compErrorLValue( $2 );
                         return 0;
@@ -2740,8 +2743,22 @@ StepExpr   : /* default step expression */       { $<asExpr>$ = NULL; }
            | STEP Expression                     { $<asExpr>$ = hb_compExprReduce( $2 ); }
            ;
 
-ForStatements : EmptyStats NEXT                  { hb_compLinePush(); --hb_comp_wForCounter; s_iControlLevel--; }
-              | EmptyStats END                   { hb_compLinePush(); --hb_comp_wForCounter; s_iControlLevel--; }
+ForStatements : EmptyStats NEXT                  { hb_compLinePush();
+                                                   if( hb_comp_wForCounter )
+                                                      --hb_comp_wForCounter;
+                                                   s_iControlLevel--; }
+              | EmptyStats NEXT IdentName        { hb_compLinePush();
+                                                   if( hb_comp_wForCounter )
+                                                      --hb_comp_wForCounter;
+                                                   s_iControlLevel--; }
+              | EmptyStats END                   { hb_compLinePush();
+                                                   if( hb_comp_wForCounter )
+                                                      --hb_comp_wForCounter;
+                                                   s_iControlLevel--; }
+              | EmptyStats END IdentName         { hb_compLinePush();
+                                                   if( hb_comp_wForCounter )
+                                                      --hb_comp_wForCounter;
+                                                   s_iControlLevel--; }
               ;
 
 ForEach    : FOREACH IdentName  /* 1  2 */
@@ -2820,9 +2837,9 @@ BeginSeq   : BEGINSEQ {
                     * HB_P_SEQBEGIN opcode if there is RECOVER clause
                     */
                    if( $<lNumber>6 )
-                   {
                       hb_compGenJumpThere( $<lNumber>2, $<lNumber>6 );
-                   }
+                   else if( hb_comp_wSeqCounter )
+                     --hb_comp_wSeqCounter;
                 }
              END
              {
@@ -2832,17 +2849,13 @@ BeginSeq   : BEGINSEQ {
                  */
                 hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
 
-                /* only if there is no RECOVER clause */
-                if( !$<lNumber>6 && hb_comp_wSeqCounter )
-                   --hb_comp_wSeqCounter;  /* RECOVER is also considered as end of sequence */
-
                 hb_compSequenceFinish( (ULONG)$<lNumber>2, (int)$<lNumber>4 );
                 hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
                 s_iControlLevel--;
              }
            ;
 
-RecoverSeq : /* no recover */  { $<lNumber>$ = 0; }
+RecoverSeq : /* no recover */  { $<lNumber>$ = 0; hb_comp_functions.pLast->bFlags &= ~ FUN_BREAK_CODE; }
            | RecoverEmpty Crlf EmptyStats
            | RecoverUsing Crlf EmptyStats
            ;
@@ -2898,22 +2911,18 @@ Try          : TRY  /* 1 */
                Finally
                {
                   long lLoopCount = hb_compLoopCount();
-                  if( $<lNumber>4 != lLoopCount )
+                  hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
+                  if( $<lNumber>8 )
+                  {
+                     if( $<lNumber>4 != lLoopCount )
                      {
                         /* FINALLY statement after CATCH with EXIT/LOOP statments */
                         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EXIT_IN_SEQUENCE, "EXIT/LOOP", NULL );
                      }
-                  if( $<lNumber>6 == 0 )
-                     hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
-               }
-               END
-               {
-                  /* Fix END address
-                   * There is no line number after HB_P_TRYEND in case no
-                   * CATCH clause is used
-                   */
-                  if( $<lNumber>8 )
-                  {
+                     if( $<lNumber>6 == 0 )
+                        hb_compGenJumpThere( $<lNumber>2, $<lNumber>8 );
+                     /* replace END address with FINALLY address in
+                        HB_P_ENDFINALLY opcode */
                      hb_compGenJumpThere( $<lNumber>5, $<lNumber>8 );
 
                      if( $<lNumber>6 )
@@ -2943,8 +2952,9 @@ Try          : TRY  /* 1 */
                   //hb_compTryFinish( $<lNumber>2, $<iNumber>4 );
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
 
-                  s_iControlLevel--;
+                  s_iControlLevel--;                     
                }
+               END
              ;
 
 Catch        : /* no recover */  { $<lNumber>$ = 0; }
@@ -3478,20 +3488,23 @@ static void hb_compLoopEnd( void )
 
 void hb_compReleaseLoops( void )
 {
-   PTR_LOOPEXIT pLoop;
-   PTR_LOOPEXIT pExit;
+   PTR_LOOPEXIT pLoop, pFree;
 
    while( hb_comp_pLoops )
    {
       pLoop = hb_comp_pLoops;
-
       while( pLoop->pExitList )
       {
-         pExit = pLoop->pExitList;
-         pLoop->pExitList = pExit->pExitList;
-         hb_xfree( ( void * ) pExit );
+         pFree = pLoop->pExitList;
+         pLoop->pExitList = pFree->pExitList;
+         hb_xfree( ( void * ) pFree );
       }
-
+      while( pLoop->pLoopList )
+      {
+         pFree = pLoop->pLoopList;
+         pLoop->pLoopList = pFree->pLoopList;
+         hb_xfree( ( void * ) pFree );
+      }
       hb_comp_pLoops = pLoop->pNext;
       hb_xfree( ( void * ) pLoop );
    }
