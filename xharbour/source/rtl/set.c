@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.75 2007/03/25 06:12:50 walito Exp $
+ * $Id: set.c,v 1.76 2007/03/27 14:23:01 ronpinkas Exp $
  */
 
 /*
@@ -648,7 +648,7 @@ HB_FUNC( SET )
             }
             else
             {
-               hb_set.HB_SET_MARGIN = set_number( pArg2, hb_set.HB_SET_AUTOSHARE );
+               hb_set.HB_SET_AUTOSHARE = set_number( pArg2, hb_set.HB_SET_AUTOSHARE );
             }
          }
          break;
