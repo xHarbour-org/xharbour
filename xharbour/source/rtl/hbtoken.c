@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.1 2007/09/03 19:00:51 paultucker Exp $
+ * $Id: hbtoken.c,v 1.2 2007/09/05 03:38:46 paultucker Exp $
  */
 
 /*
@@ -340,6 +340,57 @@ HB_FUNC( HB_ATOKENS )
    }
 }
 */
+
+//PM:09-04-2007 Temp to test difference between new and old HB_aTokens()
+#include "hbstack.h"
+HB_FUNC( HB_ATOKENS__ )
+{
+  PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
+  PHB_ITEM pDelim = hb_param( 2, HB_IT_STRING );
+
+  if( pLine )
+  {
+     HB_ITEM_NEW ( Token );
+     char cDelimiter = pDelim ? pDelim->item.asString.value[0] : 32;
+     size_t i, iOffset = 0;
+     BOOL bSkipStrings = hb_parl( 3 );
+     BOOL bDoubleQuoteOnly = hb_parl( 4 );
+
+     hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+
+     for( i = 0; i < pLine->item.asString.length; i++ )
+     {
+        if( bSkipStrings && ( pLine->item.asString.value[i] == '"'
+                              || ( bDoubleQuoteOnly == FALSE && pLine->item.asString.value[i] == '\'' ) ) )
+        {
+           char cTerminator = pLine->item.asString.value[i];
+
+           while( ++i < pLine->item.asString.length && pLine->item.asString.value[i] != cTerminator )
+           {
+           }
+        }
+        else if( pLine->item.asString.value[i] == cDelimiter )
+        {
+           hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, i - iOffset ) );
+
+           iOffset = i + 1;
+        }
+     }
+
+     if( iOffset < pLine->item.asString.length )
+     {
+        hb_arrayAddForward( &(HB_VM_STACK.Return), hb_itemPutCL( &Token, pLine->item.asString.value + iOffset, pLine->item.asString.length - iOffset ) );
+     }
+
+  }
+  else
+  {
+     hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, "HB_ATOKENS__", 3, hb_paramError(1), hb_paramError(2), hb_paramError(3) );
+     return;
+  }
+}
+
+
 HB_FUNC( __STRTOKEN )
 {
    HB_FUNC_EXEC( HB_TOKENGET );

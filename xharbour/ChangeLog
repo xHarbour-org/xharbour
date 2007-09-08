@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5687 2007/09/07 05:42:04 paultucker Exp $
+ * $Id: ChangeLog,v 1.5688 2007/09/07 19:06:12 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-08 21:34 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+   * source\tip\ftpcln.prg
+     * Formatting
+	  + METHOD StartCleanLogFile()
+	    Starts a clean log file, overwriting current logfile.
+	  + METHOD fileSize( cFileSpec )
+	    Calculates the file-size of the given files specifications.
+	  + DATA cLogFile
+	    Holds the filename of the current logfile.
+	  ! Fixed logfilename in New(), now its not limited to 9999 log files anymore
+	  ! Fixed MGet() due to changes in HB_aTokens()
+	  ! Fixed listFiles() due to changes in HB_aTokens()
+	  ! listFiles() is still buggy. Needs to be fixed.
+	* source\rtl\hbtoken.c
+	  + HB_aTokens__()
+	    This is the 'old' hb_aTokens() which returns a 2 elements array for
+	    HB_aTokens__(".","."). I just added HB_aTokens__() as a TEMPORARY 
+	    solution for those who need a quick dirty fix for their existing
+	    source code. This function will be deleted in a future release.
 
 2007-09-07 21:04 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    * source/compiler/harbour.sly
@@ -87,8 +107,6 @@
    * source/rtl/Makefile
      + source/rtl/hbtoken.c
      - source/rtl/teditorl.c
-
-
    * bin/pack_src.sh
      ! added missing pcre dependencies to tar
 
