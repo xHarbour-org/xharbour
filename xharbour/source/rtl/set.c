@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.76 2007/03/27 14:23:01 ronpinkas Exp $
+ * $Id: set.c,v 1.77 2007/09/07 05:42:04 paultucker Exp $
  */
 
 /*
@@ -1793,6 +1793,7 @@ HB_EXPORT int hb_setListenerRemove( int listener )
          listener = -listener;
          if( p_sl_prev ) p_sl_prev->next = p_sl->next;
          else sp_sl_first = p_sl->next;
+         if( p_sl == sp_sl_last ) sp_sl_last = p_sl_prev;
          hb_xfree( p_sl );
          p_sl = NULL;
       }
