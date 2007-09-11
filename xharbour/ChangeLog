@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5690 2007/09/10 12:06:09 paultucker Exp $
+ * $Id: ChangeLog,v 1.5691 2007/09/11 04:53:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-11 15:09 UTC-0300 Walter Negro <anegro/AT/overnet/com/ar>
+  * include/hbclass.ch
+    ! Minor fix in declaration of method, not translated as UTILITY PROCEDURE
+  * source/rtl/transfrm.c
+    ! fix GPF with the next code: x:="3.10";n:=Val(x);Transform(n,"@X")
+      due to side effect in correction to Transform(0.80,".9999")
+  * source/rtl/fastitem.c
+    ! Fix hb_retcAdopt(), hb_retclenAdopt(), hb_retclenAdoptRaw() and hb_retclenStatic()
+      when szText is NULL. (not null string)
 
 2007-09-11 05:05 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/pcre/pcre_globals.c

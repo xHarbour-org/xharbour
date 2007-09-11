@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.52 2007/08/06 12:55:51 modalsist Exp $
+ * $Id: transfrm.c,v 1.53 2007/08/07 14:28:41 modalsist Exp $
  */
 
 /*
@@ -707,16 +707,16 @@ HB_FUNC( TRANSFORM )
                    szPic[ i ] == '$' ||
                    szPic[ i ] == '*' )
                {
-        bTrueDec = TRUE;
+                  bTrueDec = TRUE;
                   iWidth++;
                   iDec++;
                }
             }
-       if( !bTrueDec )
-       {
+            if( !bTrueDec )
+            {
                iWidth++;
                iDec++;
-       }
+            }
          }
          else
             iDec = 0;
@@ -757,7 +757,7 @@ HB_FUNC( TRANSFORM )
          // 2006/NOV/10 - E.F. iWidth need be adjusted to avoid szStr null if
          //                    we have not a number before the decimal dot.
          //                    For example: .9999
-         if( iDec > 0 && (iWidth - iDec == 1) )
+         if( iDec > 0 && (iWidth - iDec == 1) && ulPicLen )
          {
              iWidth2 = iWidth;
              iWidth++;
@@ -787,9 +787,9 @@ HB_FUNC( TRANSFORM )
 #endif
          // 2006/NOV/10 - E.F. szStr need be adjusted to avoid double decimal
          //                    dot in the string.
-         if( bAdjust && iWidth2 > 0 )
+         if( bAdjust && iWidth2 > 0 && ulPicLen )
          {
-           char * szStr2 = (char *) hb_xgrab( iWidth2 );
+           char * szStr2 = (char *) hb_xgrab( iWidth2 + 1 );
 
            for( i = 0; i <= ( ULONG ) iWidth2; i++ )
            {

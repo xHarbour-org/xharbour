@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.107 2007/05/02 13:36:45 ran_go Exp $
+ * $Id: fastitem.c,v 1.108 2007/05/04 20:50:00 ran_go Exp $
  */
 
 /*
@@ -947,20 +947,30 @@ void HB_EXPORT hb_retcAdopt( char * szText )
    }
 
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
-   ( &(HB_VM_STACK.Return) )->item.asString.length = strlen( szText );
 
-   if( ( &(HB_VM_STACK.Return) )->item.asString.length )
+   if( szText )
    {
-      ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
-      *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
-      ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ( &(HB_VM_STACK.Return) )->item.asString.length + 1;
+      ( &(HB_VM_STACK.Return) )->item.asString.length = strlen( szText );
+
+      if( ( &(HB_VM_STACK.Return) )->item.asString.length )
+      {
+         ( &(HB_VM_STACK.Return) )->item.asString.pulHolders = ( HB_COUNTER * ) hb_xgrab( sizeof( HB_COUNTER ) );
+         *( ( &(HB_VM_STACK.Return) )->item.asString.pulHolders ) = 1;
+         ( &(HB_VM_STACK.Return) )->item.asString.allocated  = ( &(HB_VM_STACK.Return) )->item.asString.length + 1;
+      }
+      else
+      {
+         hb_xfree( szText );
+         szText = hb_vm_sNull;
+         ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
+      }
    }
    else
    {
-      hb_xfree( szText );
       szText = hb_vm_sNull;
       ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
    }
+
    ( &(HB_VM_STACK.Return) )->item.asString.value = szText;
 }
 
@@ -989,7 +999,10 @@ void HB_EXPORT hb_retclenAdopt( char * szText, ULONG ulLen )
    }
    else
    {
-      hb_xfree( szText );
+      if( szText )
+      {
+         hb_xfree( szText );
+      }
       szText = hb_vm_sNull;
       ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
    }
@@ -1019,7 +1032,10 @@ void HB_EXPORT hb_retclenAdoptRaw( char * szText, ULONG ulLen )
    }
    else
    {
-      hb_xfree( szText );
+      if( szText )
+      {
+         hb_xfree( szText );
+      }
       szText = hb_vm_sNull;
    }
 
@@ -1043,7 +1059,7 @@ void HB_EXPORT hb_retcStatic( const char * szText )
    ( &(HB_VM_STACK.Return) )->type = HB_IT_STRING;
    ( &(HB_VM_STACK.Return) )->item.asString.allocated = 0;
    ( &(HB_VM_STACK.Return) )->item.asString.value     = ( char * ) szText;
-   ( &(HB_VM_STACK.Return) )->item.asString.length    = strlen( szText );
+   ( &(HB_VM_STACK.Return) )->item.asString.length    = szText?strlen( szText ):0;
 }
 
 #undef hb_retclenStatic

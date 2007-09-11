@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.56 2007/06/15 09:54:29 alexstrickland Exp $
+ * $Id: hbclass.ch,v 1.57 2007/06/29 05:22:14 andresreyesh Exp $
  */
 
 /*
@@ -974,7 +974,7 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand DECLARED PROCEDURE <ClassName> <MethodName>=> ;
-          static procedure <MethodName> ;;
+          UTILITY STATIC PROCEDURE <MethodName> ;;
           local Self AS CLASS <ClassName> := QSelf() AS CLASS <ClassName>
 
 #xcommand ACCESS <AccessName> CLASS <ClassName> => ;
