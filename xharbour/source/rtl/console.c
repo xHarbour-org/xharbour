@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.64 2007/02/26 03:18:27 ronpinkas Exp $
+ * $Id: console.c,v 1.65 2007/03/11 00:18:44 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -82,6 +82,10 @@
 #include "hbset.h"
 #include "hb_io.h"
 #include "thread.h"
+
+#ifdef __WATCOMC__
+   #define _fileno fileno
+#endif
 
 #if  defined( HB_THREAD_SUPPORT )
    #include "hbset.h"

@@ -47,13 +47,21 @@ all threads. However, when compiling for Virtual Pascal, things are done
 differently, and global variables are not used (see pcre.in). */
 
 #include "pcre_internal.h"
-
 #ifndef VPCOMPAT
-PCRE_EXP_DATA_DEFN void *(*pcre_malloc)(size_t) = malloc;
-PCRE_EXP_DATA_DEFN void  (*pcre_free)(void *) = free;
-PCRE_EXP_DATA_DEFN void *(*pcre_stack_malloc)(size_t) = malloc;
-PCRE_EXP_DATA_DEFN void  (*pcre_stack_free)(void *) = free;
-PCRE_EXP_DATA_DEFN int   (*pcre_callout)(pcre_callout_block *) = NULL;
+   #ifdef __WATCOMC__
+      #ifdef PCRE_EXP_DATA_DEFN
+         #undef PCRE_EXP_DATA_DEFN
+      #endif
+      #ifdef __cplusplus
+         #define PCRE_EXP_DATA_DEFN  extern "C"
+      #else
+         #define PCRE_EXP_DATA_DEFN
+      #endif
+   #endif
+   PCRE_EXP_DATA_DEFN void *(*pcre_malloc)(size_t) = malloc;
+   PCRE_EXP_DATA_DEFN void  (*pcre_free)(void *) = free;
+   PCRE_EXP_DATA_DEFN void *(*pcre_stack_malloc)(size_t) = malloc;
+   PCRE_EXP_DATA_DEFN void  (*pcre_stack_free)(void *) = free;
+   PCRE_EXP_DATA_DEFN int   (*pcre_callout)(pcre_callout_block *) = NULL;
 #endif
-
 /* End of pcre_globals.c */
