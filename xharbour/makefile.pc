@@ -1,6 +1,6 @@
-# $Id: makefile.pc,v 1.49 2007/07/06 13:11:34 modalsist Exp $
+# $Id: makefile.pc,v 1.50 2007/09/03 18:04:27 paultucker Exp $
 #
-# Makefile for Pelles C compiler
+# Makefile for Pelles C compiler 4.x
 #
 
 !ifndef ECHO
@@ -3214,7 +3214,7 @@ $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC_CMD)
 
 $(PP_DIR)\pptable.c : $(PPGEN_EXE)
-   $(PPGEN_EXE) $(HB_DIR)include\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
+   $(PPGEN_EXE) $(HB_DIR)\include\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
 
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)

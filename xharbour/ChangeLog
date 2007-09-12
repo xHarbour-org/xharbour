@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5692 2007/09/11 18:24:21 walito Exp $
+ * $Id: ChangeLog,v 1.5693 2007/09/12 12:08:32 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-12 11:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * makefile.pc
+     ! fixed line 3217. Missing of "\" after $(HB_DIR)
+       $(PPGEN_EXE) $(HB_DIR)\include\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
 
 2007-09-12 09:10 UTC-0300 Luiz Rafael Culik Guimaraes 
   * include/std.ch
