@@ -194,7 +194,7 @@ BOOL hb_GetDefaultPrinter( LPTSTR pPrinterName, LPDWORD pdwBufferSize )
 
       DWORD dwNeeded, dwReturned ;
       PRINTER_INFO_2 *ppi2 ;
-      if ( EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned) ) ;
+      if ( EnumPrinters( PRINTER_ENUM_DEFAULT, NULL, 2, NULL, 0, &dwNeeded, &dwReturned) ) 
       {
          if ( dwNeeded > 0 )
          {
