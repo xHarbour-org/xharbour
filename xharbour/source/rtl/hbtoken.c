@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.3 2007/09/08 19:45:36 patrickmast Exp $
+ * $Id: hbtoken.c,v 1.4 2007/09/15 06:15:54 paultucker Exp $
  */
 
 /*
@@ -301,6 +301,166 @@ HB_FUNC( HB_ATOKENS )
 }
 
 #endif
+static char * hb_strToken( char * szText, ULONG ulText,
+                           ULONG ulIndex,
+                           char cDelimiter,
+                           ULONG * pulLen )
+{
+   ULONG ulStart;
+   ULONG ulEnd = 0;
+   ULONG ulCounter = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strToken(%s, %lu, %lu, %d, %p)", szText, ulText, ulIndex, (int) cDelimiter, pulLen));
+
+   do
+   {
+      ulStart = ulEnd;
+
+      if( cDelimiter != ' ' )
+      {
+         if( szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+      else
+      {
+         while( ulStart < ulText && szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+
+      if( ulStart < ulText && szText[ ulStart ] != cDelimiter )
+      {
+         ulEnd = ulStart + 1;
+
+         while( ulEnd < ulText && szText[ ulEnd ] != cDelimiter )
+            ulEnd++;
+      }
+      else
+         ulEnd = ulStart;
+
+   }
+   while( ulCounter++ < ulIndex - 1 && ulEnd < ulText );
+
+   if( ulCounter < ulIndex )
+   {
+      *pulLen = 0;
+      return "";
+   }
+   else
+   {
+      *pulLen = ulEnd - ulStart;
+      return szText + ulStart;
+   }
+}
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * hb_strTokenCount returns the number of tokens inside the string
+*/
+static ULONG hb_strTokenCount( char * szText, ULONG ulText,
+                               char cDelimiter )
+{
+   ULONG ulStart;
+   ULONG ulEnd = 0;
+   ULONG ulCounter = 0;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strTokenCount(%s, %lu, %d)", szText, ulText, (int) cDelimiter));
+
+   do
+   {
+      ulStart = ulEnd;
+
+      if( cDelimiter != ' ' )
+      {
+         if( szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+      else
+      {
+         while( ulStart < ulText && szText[ ulStart ] == cDelimiter )
+            ulStart++;
+      }
+
+      if( ulStart < ulText && szText[ ulStart ] != cDelimiter )
+      {
+         ulEnd = ulStart + 1;
+
+         while( ulEnd < ulText && szText[ ulEnd ] != cDelimiter )
+            ulEnd++;
+      }
+      else
+         ulEnd = ulStart;
+
+      ulCounter++;
+   }
+   while( ulEnd < ulText );
+
+   return ulCounter;
+
+}
+
+/* returns the nth occurence of a substring within a token-delimited string */
+HB_FUNC( __STRTOKEN )
+{
+   char * pszText;
+   ULONG ulLen;
+
+   pszText = hb_strToken( hb_parcx( 1 ), hb_parclen( 1 ),
+                          hb_parnl( 2 ),
+                          ISCHAR( 3 ) ? *hb_parcx( 3 ) : ' ',
+                          &ulLen );
+
+   hb_retclen( pszText, ulLen );
+}
+
+
+/* like __STRTOKEN() but returns next token starting from passed position
+   (0 based) inside string.
+   __StrTkPtr( cString, @nTokPos, Chr( 9 ) )
+*/
+HB_FUNC( __STRTKPTR )
+{
+   char * pszString = hb_parcx( 1 );
+   ULONG ulStrLen = hb_parclen( 1 );
+   ULONG ulLen;
+   ULONG ulPos = hb_parnl( 2 );
+   char * pszText;
+
+   /* move start of string past last returned token */
+   pszString += ulPos;
+
+   /* decrease length of string consequently */
+   ulStrLen -= ulPos + 1;
+
+   pszText = hb_strToken( pszString, ulStrLen,
+                          1,
+                          ISCHAR( 3 ) ? *hb_parcx( 3 ) : ' ',
+                          &ulLen );
+
+   /* return position to start next search from */
+   hb_stornl( pszText - pszString + ulPos + ulLen, 2 );
+
+   /* return token */
+   hb_retclen( pszText, ulLen );
+}
+
+/*
+ * (C) 2003 - Francesco Saverio Giudice
+ *
+ * returns number of tokens within a token-delimited string
+ *
+ * __StrTokenCount( cString, Chr( 9 ) )
+*/
+HB_FUNC( __STRTOKENCOUNT )
+{
+   ULONG ulCounter;
+
+   ulCounter = hb_strTokenCount( hb_parcx( 1 ), hb_parclen( 1 ),
+                          ISCHAR( 2 ) ? *hb_parcx( 2 ) : ' ' );
+
+   hb_retnl( ulCounter );
+}
+
 HB_FUNC( HB_ATOKENS )
 {
    PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
