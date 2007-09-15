@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5698 2007/09/15 07:49:38 paultucker Exp $
+ * $Id: ChangeLog,v 1.5699 2007/09/15 12:28:04 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,48 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-15 19:06 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
+   + source\tip\sendmail.prg
+     ( This is a enhancement on Luiz Rafael Culik Guimaraes's original SendMail() )
+     + Added HB_SendMail() & HB_SetMimeType()
+     * Formatting
+     * Removed unused declared variables
+     * Removed "lPopAuth" as it was not used in SendMail()
+     * Removed "cPopServer" as it was not used in SendMail()
+     * Parameters to HB_SendMail() are now:
+       HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, nPriority, lRead, lTrace)
+       Where:
+       cServer    -> Required. IP or domain name of the mail server
+	    nPort      -> Optional. Port used my email server
+	    cFrom      -> Required. Email address of the sender
+	    aTo        -> Required. Character string or array of email addresses to send the email to
+	    aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
+	    aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
+	    cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
+	    cSubject   -> Optional. Subject of the sending email
+	    aFiles     -> Optional. Array of attachments to the email to send
+	    cUser      -> Required. User name for the POP3 server
+	    cPass      -> Required. Password for cUser
+	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low 
+	    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
+	    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
+	  * Changed hcr(13)+chr(10)'s to HB_OsNewLine()
+	  * Added CC (Carbon Copy)
+	  * Added BCC (Blind Carbon Copy)
+	* hrbdll.bc
+	* makefile.bc
+	* hrbdll.vc
+	* makefile.vc
+	* hrbdll.wc
+	* makefile.wc
+	* hrbdll.pc
+	* makefile.pc
+	* hrbdll.dc
+	* makefile.dc
+	* hrbdll.gc
+	* makefile.gc
+	  + Added sendmail.prg
 
 2007-09-15 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

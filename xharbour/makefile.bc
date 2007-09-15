@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.201 2007/05/20 03:26:22 ronpinkas Exp $
+# $Id: makefile.bc,v 1.202 2007/09/03 18:04:26 paultucker Exp $
 #
 
 #
@@ -884,6 +884,7 @@ TIP_LIB_OBJS = \
    $(TIP_OBJ_DIR)\popcln.obj \
    $(TIP_OBJ_DIR)\smtpcln.obj \
    $(TIP_OBJ_DIR)\thtml.obj \
+   $(TIP_OBJ_DIR)\sendmail.obj \
    $(TIP_OBJ_DIR)\url.obj
 
 #
@@ -3270,6 +3271,12 @@ $(TIP_OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
    $(HB_CMD)
 
 $(TIP_OBJ_DIR)\encb64.obj : $(TIP_OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(TIP_OBJ_DIR)\sendmail.c : $(TIP_DIR)\sendmail.prg
+   $(HB_CMD)
+
+$(TIP_OBJ_DIR)\sendmail.obj : $(TIP_OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(TIP_OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg

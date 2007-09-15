@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.26 2007/04/15 20:12:40 ronpinkas Exp $
+# $Id: hrbdll.gc,v 1.27 2007/09/03 18:04:25 paultucker Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -561,6 +561,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/client.o \
    $(OBJ_DIR)/credent.o \
    $(OBJ_DIR)/encb64.o \
+   $(OBJ_DIR)/sendmail.o \
    $(OBJ_DIR)/encoder.o \
    $(OBJ_DIR)/encqp.o \
    $(OBJ_DIR)/encurl.o \
@@ -2500,6 +2501,12 @@ $(OBJ_DIR)/encb64.c : $(TIP_DIR)/encb64.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/encb64.o : $(OBJ_DIR)/encb64.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/sendmail.c : $(TIP_DIR)/sendmail.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/sendmail.o : $(OBJ_DIR)/sendmail.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/encoder.c : $(TIP_DIR)/encoder.prg

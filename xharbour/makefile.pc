@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.50 2007/09/03 18:04:27 paultucker Exp $
+# $Id: makefile.pc,v 1.51 2007/09/12 14:49:45 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -407,6 +407,7 @@ HBTIP_LIB_OBJS = \
    $(OBJ_DIR)\client.obj \
    $(OBJ_DIR)\credent.obj \
    $(OBJ_DIR)\encb64.obj \
+   $(OBJ_DIR)\sendmail.obj \
    $(OBJ_DIR)\encoder.obj \
    $(OBJ_DIR)\encqp.obj \
    $(OBJ_DIR)\encurl.obj \
@@ -3621,6 +3622,12 @@ $(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sendmail.c : $(TIP_DIR)\sendmail.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sendmail.obj : $(OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg

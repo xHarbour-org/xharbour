@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.dc,v 1.26 2007/03/25 06:12:49 walito Exp $
+# $Id: makefile.dc,v 1.27 2007/09/03 18:04:26 paultucker Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -518,6 +518,7 @@ HBTIP_LIB_OBJS = \
    $(TIP_OBJ_DIR)\client.obj \
    $(TIP_OBJ_DIR)\credent.obj \
    $(TIP_OBJ_DIR)\encb64.obj \
+   $(TIP_OBJ_DIR)\sendmail.obj \
    $(TIP_OBJ_DIR)\encoder.obj \
    $(TIP_OBJ_DIR)\encqp.obj \
    $(TIP_OBJ_DIR)\encurl.obj \
@@ -3952,6 +3953,12 @@ $(TIP_OBJ_DIR)\encb64.c : $(HBTIP_DIR)\encb64.prg
    $(HARBOUR_CMD)
 
 $(TIP_OBJ_DIR)\encb64.obj : $(TIP_OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(TIP_OBJ_DIR)\sendmail.c : $(HBTIP_DIR)\sendmail.prg
+   $(HARBOUR_CMD)
+
+$(TIP_OBJ_DIR)\sendmail.obj : $(TIP_OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(TIP_OBJ_DIR)\encoder.c : $(HBTIP_DIR)\encoder.prg

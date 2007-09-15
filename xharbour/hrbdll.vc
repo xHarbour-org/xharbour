@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.107 2007/07/06 00:56:00 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.108 2007/09/03 18:04:25 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -723,6 +723,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\popcln.obj \
   $(OBJ_DIR)\smtpcln.obj \
   $(OBJ_DIR)\url.obj \
+  $(OBJ_DIR)\sendmail.obj \
 #
 # ctlib
 #
@@ -1214,6 +1215,12 @@ $(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sendmail.c : $(TIP_DIR)\sendmail.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\sendmail.obj : $(OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg

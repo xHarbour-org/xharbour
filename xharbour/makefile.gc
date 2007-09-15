@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.29 2007/03/25 06:12:49 walito Exp $
+# $Id: makefile.gc,v 1.30 2007/09/03 18:04:26 paultucker Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -416,6 +416,7 @@ $(TIP_LIB) : \
   $(OBJ_DIR)/client.o \
   $(OBJ_DIR)/credent.o \
   $(OBJ_DIR)/encb64.o \
+  $(OBJ_DIR)/sendmail.o \
   $(OBJ_DIR)/encoder.o \
   $(OBJ_DIR)/encqp.o \
   $(OBJ_DIR)/encurl.o \
@@ -449,6 +450,12 @@ $(OBJ_DIR)/encb64.c : $(TIP_DIR)/encb64.prg
 	$(HARBOUR_CMD)
 
 $(OBJ_DIR)/encb64.o : $(OBJ_DIR)/encb64.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/sendmail.c : $(TIP_DIR)/sendmail.prg
+	$(HARBOUR_CMD)
+
+$(OBJ_DIR)/sendmail.o : $(OBJ_DIR)/sendmail.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/encoder.c : $(TIP_DIR)/encoder.prg

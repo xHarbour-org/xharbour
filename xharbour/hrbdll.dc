@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.23 2007/03/25 06:12:45 walito Exp $
+# $Id: hrbdll.dc,v 1.24 2007/09/03 18:04:25 paultucker Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -553,6 +553,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\client.obj \
    $(OBJ_DIR)\credent.obj \
    $(OBJ_DIR)\encb64.obj \
+   $(OBJ_DIR)\sendmail.obj \
    $(OBJ_DIR)\encoder.obj \
    $(OBJ_DIR)\encqp.obj \
    $(OBJ_DIR)\encurl.obj \
@@ -1085,6 +1086,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\client.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\credent.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\encb64.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sendmail.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\encoder.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\encqp.obj      + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\encurl.obj     + >> harbourdll.rsp
@@ -2715,6 +2717,12 @@ $(OBJ_DIR)\encb64.c : $(HBTIP_DIR)\encb64.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sendmail.c : $(HBTIP_DIR)\sendmail.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\sendmail.obj : $(OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(OBJ_DIR)\encoder.c : $(HBTIP_DIR)\encoder.prg

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.138 2007/05/21 15:28:44 ronpinkas Exp $
+# $Id: hrbdll.bc,v 1.139 2007/09/03 18:04:25 paultucker Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -637,6 +637,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\popcln.obj \
   $(OBJ_DIR)\smtpcln.obj \
   $(OBJ_DIR)\url.obj \
+  $(OBJ_DIR)\sendmail.obj \
 #
 # ctlib
 #
@@ -1285,6 +1286,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\client.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\credent.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\encb64.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\sendmail.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\encoder.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\encqp.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\encurl.obj            + >> hdll.tmp
@@ -3086,6 +3088,12 @@ $(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sendmail.c : $(TIP_DIR)\sendmail.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\sendmail.obj : $(OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg

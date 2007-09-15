@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.38 2007/07/06 13:11:34 modalsist Exp $
+# $Id: hrbdll.pc,v 1.39 2007/09/03 18:04:25 paultucker Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -588,6 +588,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\client.obj \
    $(OBJ_DIR)\credent.obj \
    $(OBJ_DIR)\encb64.obj \
+   $(OBJ_DIR)\sendmail.obj \
    $(OBJ_DIR)\encoder.obj \
    $(OBJ_DIR)\encqp.obj \
    $(OBJ_DIR)\encurl.obj \
@@ -1229,6 +1230,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\client.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\credent.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\encb64.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\sendmail.obj   >> make_tmp
    $(ECHO) $(OBJ_DIR)\encoder.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\encqp.obj      >> make_tmp
    $(ECHO) $(OBJ_DIR)\encurl.obj     >> make_tmp
@@ -2894,6 +2896,12 @@ $(OBJ_DIR)\encb64.c : $(TIP_DIR)\encb64.prg
    $(HB_CMD)
 
 $(OBJ_DIR)\encb64.obj : $(OBJ_DIR)\encb64.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sendmail.c : $(TIP_DIR)\sendmail.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sendmail.obj : $(OBJ_DIR)\sendmail.c
    $(CC_CMD)
 
 $(OBJ_DIR)\encoder.c : $(TIP_DIR)\encoder.prg

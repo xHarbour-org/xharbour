@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.192 2007/06/02 10:44:21 patrickmast Exp $
+# $Id: makefile.vc,v 1.193 2007/09/03 18:04:27 paultucker Exp $
 #
 
 #
@@ -1296,6 +1296,7 @@ TIP_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\popcln.obj \
    $(OBJ_DIR)$(MT)\smtpcln.obj \
    $(OBJ_DIR)$(MT)\thtml.obj \
+   $(OBJ_DIR)$(MT)\sendmail.obj \
    $(OBJ_DIR)$(MT)\url.obj
 
 
