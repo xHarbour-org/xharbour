@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.2 2007/09/05 03:38:46 paultucker Exp $
+ * $Id: hbtoken.c,v 1.3 2007/09/08 19:45:36 patrickmast Exp $
  */
 
 /*
@@ -50,15 +50,22 @@
  *
  */
 
-#include "hbapi.h"
+#include "hbvmopt.h"
+#include "hbvm.h"
+#include "hbfast.h"
+#include "hbstack.h"
+
 #include "hbapiitm.h"
 #include "hbapierr.h"
+
+#if 0
+/* This functionality will be activated on the next release */
 
 static ULONG hb_tokenCount( char * szLine, ULONG ulLen,
                             char * szDelim, ULONG ulDelim,
                             BOOL fSkipStrings, BOOL fDoubleQuoteOnly )
 {
-   ULONG ul = 0, ulTokens = HB_MIN( ulLen, 1 );
+   ULONG ul = 0, ulTokens = 1;
    char cQuote = 0;
 
    while( ul < ulLen )
@@ -292,7 +299,8 @@ HB_FUNC( HB_ATOKENS )
    else
       hb_errRT_BASE_SubstR( EG_ARG, 1123, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
 }
-/*
+
+#endif
 HB_FUNC( HB_ATOKENS )
 {
    PHB_ITEM pLine  = hb_param( 1, HB_IT_STRING );
@@ -339,9 +347,10 @@ HB_FUNC( HB_ATOKENS )
       return;
    }
 }
-*/
+
 
 //PM:09-04-2007 Temp to test difference between new and old HB_aTokens()
+#if 0
 #include "hbstack.h"
 HB_FUNC( HB_ATOKENS__ )
 {
@@ -405,3 +414,4 @@ HB_FUNC( __STRTOKENCOUNT )
 {
    HB_FUNC_EXEC( HB_TOKENCOUNT );
 }
+#endif

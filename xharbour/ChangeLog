@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5694 2007/09/12 14:49:45 modalsist Exp $
+ * $Id: ChangeLog,v 1.5695 2007/09/14 13:02:20 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-15 02:14 UTC-0500 Paul Tucker <ptucker sympatico.ca>
+  * source/rtl/hbtoken.c
+    * For the moment, the new hb_atokens and related functions have been
+      commented out until after the next release.
 
 2007-09-13 10:10 UTC-0300 Luiz Rafael Culik Guimaraes 
   * include/std.ch
