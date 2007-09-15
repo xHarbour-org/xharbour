@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.21 2005/12/08 19:06:12 oh1 Exp $
+ * $Id: listbox.prg,v 1.22 2005/12/10 00:33:33 oh1 Exp $
  */
 
 /*
@@ -198,7 +198,9 @@ Method New( nTop, nLeft, nBottom, nRight, lDrop )
 
    ::sBlock    := Nil
    ::nCursor   := Nil
+#ifndef __PLATFORM__Windows
    ::Style     := Chr( 240 )
+#endif
    ::TextValue := ""
 
    ::Topitem   := 0
@@ -255,10 +257,10 @@ RETURN ::xDropDown
 
 Method SetCaption( xData ) Class HBListBox
 
-   IF ISCHARACTER( xData ) .and. ISNIL( ::Capcol )
+   IF ISCHARACTER( xData ) //.and. ISNIL( ::Capcol )
       ::cCaption := xData
       ::Caprow   := ::top
-      ::Capcol   := ::left - Len( xData )
+      ::Capcol   := if(IsNil(::CapCol),::left - Len( xData ),::CapCol)
    ENDIF
 
 RETURN ::cCaption

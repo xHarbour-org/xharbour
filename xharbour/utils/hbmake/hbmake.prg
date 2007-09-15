@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.182 2007/07/17 12:45:02 lculik Exp $
+ * $Id: hbmake.prg,v 1.183 2007/08/30 22:06:43 lculik Exp $
  */
 
 /*
@@ -57,7 +57,7 @@
 #define CRLF Hb_OsNewLine()
 #xtranslate TimeToSec(<x>) => ( ( Val( Substr( <x>, 1, 2 ) ) * 3600 ) +( Val( Substr( <x>, 4, 2 ) ) * 60 ) + ( Val( Substr( <x>, 7, 2 ) ) ) )
 
-REQUEST HB_NOMOUSE
+//REQUEST HB_NOMOUSE
 
 #translate DateDiff(<x>,<y>) => (<x>-<y>)
 

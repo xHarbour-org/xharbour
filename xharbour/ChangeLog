@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5697 2007/09/15 06:41:49 paultucker Exp $
+ * $Id: ChangeLog,v 1.5698 2007/09/15 07:49:38 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-15 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    * changed ::aSetStyle data to ::aStyle. This is initialized with
+      TBR_CUSTOM value length of 6 and filled with .f. values.
+    ! fixed SetStyle( nStyle, lSetting ) method to allow add user styles.
+      if <nStyle> is greater than Len( ::aStyle ) then it's will add elements
+      automatically.
+    - removed AddStyle() method. By now is useless.
+
+  * source/rtl/tget.prg
+    ! fixed to don't display get value at right area of an object, when the
+      get is an object f.e. a listbox.
+    ! fixed to display get caption only when the get is not an object.
+      Error reported from comp.lang.xharbour news.
+
+  * source/rtl/listbox.prg
+    ! fixed SetCaption(xData) method to display caption at CapCol and CapRow
+      coordinates properly.
+    * restored original style character "" for Windows platform.
+      Error reported from comp.lang.xharbour news.
+
+  * utils/hbmake/hbmake.prg
+    * reactivated mouse to allow access listboxes and checkboxes by click.
 
 2007-09-15 03:50 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * source/rtl/tprinter.c

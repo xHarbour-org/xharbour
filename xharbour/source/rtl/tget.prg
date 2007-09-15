@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.134 2007/05/29 02:29:02 ronpinkas Exp $
+ * $Id: tget.prg,v 1.135 2007/09/03 18:31:54 paultucker Exp $
  */
 
 /*
@@ -596,24 +596,39 @@ METHOD Display( lForced ) CLASS Get
 
       ENDIF
 
+      /* 2007/SEP/14 - E.F. - Display buffer content only if not object as
+                              ListBox, CheckCob, PushButton or RadioGroup.
+      */
+      #ifdef HB_COMPAT_C53
+      if Valtype( ::Control ) != "O"
+      #endif
+         DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
+                    cDisplay,;
+                    hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
 
-      DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ),;
-                 cDisplay,;
-                 hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
+         if nDispReduce > 0
 
+            DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ) + ::nDispLen,;
+                       space(nDispReduce), hb_ColorIndex( ::ColorSpec, 4 ), .T. )
+         endif
 
-      IF nDispReduce > 0
+         if ! ( ::cDelimit == NIL )
+            DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
+            DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
+         endif
 
-         DispOutAt( ::Row, ::Col + if( ::cDelimit == NIL, 0, 1 ) + ::nDispLen,;
-                    space(nDispReduce), hb_ColorIndex( ::ColorSpec, 4 ), .T. )
-      ENDIF
-
-      IF ! ( ::cDelimit == NIL )
-         DispOutAt( ::Row, ::Col, Substr( ::cDelimit, 1, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
-         DispOutAt( ::Row, ::Col + ::nDispLen + 1, Substr( ::cDelimit, 2, 1), hb_ColorIndex( ::ColorSpec, iif( ::HasFocus, GET_CLR_ENHANCED, GET_CLR_UNSELECTED ) ), .T. )
-      ENDIF
+      #ifdef HB_COMPAT_C53
+      Endif
+      #endif
 
    ENDIF
+
+   #ifdef HB_COMPAT_C53
+   /* 2007/SEP/14 - EF - The Caption below is only for plain get caption,
+                         no object get. This display it's own ones.
+   */
+   if Valtype( ::Control ) != "O"
+   #endif
 
    IF !Empty( ::Caption )
       cCaption := StrTran( ::Caption, "&", "" )
@@ -622,6 +637,10 @@ METHOD Display( lForced ) CLASS Get
          DispOutAt( ::Row, ::Col - Len( cCaption ) - 2 + At( "&", ::Caption ), cCaption[At( "&", ::Caption )], cClrAcc, .T. )
       ENDIF
    ENDIF
+
+   #ifdef HB_COMPAT_C53
+   Endif
+   #endif
 
    ::nOldPos := ::nDispPos
 
@@ -637,7 +656,9 @@ METHOD Display( lForced ) CLASS Get
          nCol := ::Col + ::nMaxLen - 1
          ::Left(.F.)
       ENDIF
+
       SetPos( ::Row, nCol  )
+
    ENDIF
 
    SetCursor( nOldCursor )

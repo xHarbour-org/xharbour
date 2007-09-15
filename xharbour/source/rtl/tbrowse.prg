@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.176 2007/09/01 08:53:54 patrickmast Exp $
+ * $Id: tbrowse.prg,v 1.177 2007/09/04 00:37:59 modalsist Exp $
  */
 
 /*
@@ -626,8 +626,7 @@ CLASS TBrowse
    METHOD InitKeys( Self )
    METHOD TApplyKey( nKey, o )
    METHOD HitTest( nMouseRow,nMouseCol )
-   METHOD SetStyle( nMode,lSetting )
-   METHOD AddStyle( nMode,lSetting )      // xHarbour extension
+   METHOD SetStyle( nStyle,lSetting )
 #endif
 
 
@@ -721,7 +720,7 @@ CLASS TBrowse
 #ifdef HB_COMPAT_C53
    DATA rect
    DATA aVisibleCols
-   DATA aSetStyle
+   DATA aStyle                            // see SetStyle() method.
 #endif
    DATA aColorSpec                        // Holds colors of Tbrowse:ColorSpec
 
@@ -794,14 +793,8 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::message         := ''
    ::nRow            := 0
    ::nCol            := 0
-   ::aSetStyle       := ARRAY( 6 )
-
-   ::aSetStyle[ TBR_APPEND    ] := .f.
-   ::aSetStyle[ TBR_APPENDING ] := .f.
-   ::aSetStyle[ TBR_MODIFY    ] := .f.
-   ::aSetStyle[ TBR_MOVE      ] := .f.
-   ::aSetStyle[ TBR_SIZE      ] := .f.
-   ::aSetStyle[ TBR_CUSTOM    ] := .f.
+   ::aStyle          := Array( TBR_CUSTOM ) 
+   Afill( ::aStyle, .F. )
 #endif
 
    ::aColumnsSep     := {}
@@ -3473,36 +3466,32 @@ Return nRet
 
 //-------------------------------------------------------------------//
 
-METHOD SetStyle( nMode, lSetting ) CLASS TBrowse
-   LOCAL lRet := .F.
+METHOD SetStyle( nStyle, lSetting ) CLASS TBrowse
 
-   IF nMode > LEN( ::aSetStyle )
-      RETURN .F.
-   ENDIF
+LOCAL lRet := .f.
+LOCAL n,nLen
 
-   lRet := ::aSetStyle[ nMode ]
+if Hb_IsNumeric( nStyle ) .and. Hb_IsLogical( lSetting )
 
-   IF ISLOGICAL( lSetting )
-      ::aSetStyle[ nMode ] := lSetting
-   ENDIF
+   if nStyle > 0
 
-Return lRet
+      nLen := Len( ::aStyle )
 
-//-------------------------------------------------------------------//
+      if nStyle > nLen
 
-METHOD AddStyle( nMode, lSetting ) CLASS TBrowse
-LOCAL lRet := .F.
-LOCAL nLen := LEN( ::aSetStyle )
+         for n := nLen to nStyle
+             aadd( ::aStyle, .f. )
+         next
 
-   IF nMode != nLen+1
-      RETURN .F.
-   ENDIF
+      endif
 
-   IF ISLOGICAL( lSetting )
-      AADD( ::aSetStyle, lSetting )
-   ENDIF
+      ::aStyle[ nStyle ] := lSetting
 
-   lRet := ( Len(::aSetStyle) == nLen + 1 )
+      lRet := .t.
+
+   endif
+
+endif
 
 Return lRet
 
