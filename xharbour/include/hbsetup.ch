@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.ch,v 1.3 2004/06/07 04:37:52 bdj Exp $
+ * $Id: hbsetup.ch,v 1.4 2006/10/12 17:25:28 ronpinkas Exp $
  */
 
 /*
@@ -66,7 +66,7 @@
 #define HB_COMPAT_C53             /* Enable CA-Cl*pper 5.3x extensions */
 #define HB_COMPAT_XPP             /* Enable Alaska Xbase++ extensions */
 /* #define HB_COMPAT_VO */        /* Enable CA-VO extensions */
-#define HB_COMPAT_FLAGSHIP */     /* Enable Flagship extensions */
+#define HB_COMPAT_FLAGSHIP        /* Enable Flagship extensions */
 /* #define HB_COMPAT_FOXPRO */    /* Enable FoxPro extensions */
 /* #define HB_COMPAT_DBASE */     /* Enable dBase extensions */
 
