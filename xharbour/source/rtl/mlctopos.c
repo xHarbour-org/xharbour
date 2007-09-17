@@ -1,5 +1,5 @@
 /*
- * $Id: mlctopos.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: mlctopos.c,v 1.3 2005/03/31 03:58:52 druzus Exp $
  */
 
 /*
@@ -61,7 +61,7 @@ HB_FUNC( MLCTOPOS )
    ULONG  ulTabLength  = ISNUM( 5 ) ? hb_parni( 5 ) : 4;
    ULONG  ulLastSpace  = 0;
    ULONG  ulCurLength  = 0;
-   BOOL   bWordWrap    = ISLOG( 5 ) ? hb_parl( 5 ) : TRUE;
+   BOOL   bWordWrap    = ISLOG( 6 ) ? hb_parl( 6 ) : TRUE;
    ULONG  ulLen        = hb_parclen( 1 );
    ULONG  ulLines      = 0;
    ULONG  ulPos;
@@ -110,7 +110,7 @@ HB_FUNC( MLCTOPOS )
             if( ulLastSpace == 0 )
                ulCurLength = 1;
             else
-               ulCurLength = ulCurLength - ulLastSpace;
+               ulCurLength -= ulLastSpace;
          }
          else
             ulCurLength = 1;
@@ -118,7 +118,7 @@ HB_FUNC( MLCTOPOS )
          ulLines++;
          ulLastSpace = 0;
          ulBegOfLine = ulPos - ulCurLength;
-         ulLastLen   = ulCurLength ;
+         ulLastLen   = ulCurLength;
       }
    }
 
@@ -126,15 +126,14 @@ HB_FUNC( MLCTOPOS )
    {
       ulLines++;
       ulBegOfLine = ulPos - ulCurLength;
-      ulLastLen   = ulCurLength ;
+      ulLastLen   = ulCurLength;
    }
 
    if( ulLine == ulLines )
    {
       ulLastLen--;   /* Column is zero based */
-      hb_retnl( ulBegOfLine + ( ( ulCol < ulLastLen ) ? ulCol : ulLastLen ) );
+	  ulLen = ulBegOfLine + ( ( ulCol < ulLastLen ) ? ulCol : ulLastLen );
    }
-   else
-      hb_retnl( ulLen );
-}
 
+   hb_retnl( ulLen );
+}
