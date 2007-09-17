@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5702 2007/09/17 11:10:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5703 2007/09/17 11:28:17 jfgimenez Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-17 09:06 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+   * source\tip\sendmail.prg
+     ! added two missing parameters that conntrol smtp autentication
+       now the function is correct with the correct parameters as bellow
+     * Parameters to HB_SendMail() are now:
+       HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer,nPriority, lRead, lTrace, lPopAuth)
+       Where:
+       cServer    -> Required. IP or domain name of the mail server
+	    nPort      -> Optional. Port used my email server
+	    cFrom      -> Required. Email address of the sender
+	    aTo        -> Required. Character string or array of email addresses to send the email to
+	    aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
+	    aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
+	    cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
+	    cSubject   -> Optional. Subject of the sending email
+	    aFiles     -> Optional. Array of attachments to the email to send
+	    cUser      -> Required. User name for the POP3 server
+	    cPass      -> Required. Password for cUser
+            cPopServer -> Requered. IP or domain name of the pop3 mail server
+	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
+	    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
+	    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
+            lPopAuth   -> Optional. Flag to indicate that pop3 autentication is used. Standard setting is  .T.
+
+
 
 2007-09-17 13:30 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
    * include/hbapi.h
@@ -102,7 +128,7 @@
     * For the moment, the new hb_atokens and related functions have been
       commented out until after the next release.
 
-2007-09-13 10:10 UTC-0300 Luiz Rafael Culik Guimaraes
+2007-09-13 10:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * include/std.ch
     ! Fixed the save to rules
 

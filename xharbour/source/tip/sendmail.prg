@@ -1,7 +1,7 @@
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.0 2007/09/15 08:53:31 patrickmast Exp $
+ * $Id: sendmail.prg,v 1.1 2007/09/15 17:37:46 patrickmast Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "common.ch"
 
 
-FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, nPriority, lRead, lTrace)
+FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer, nPriority, lRead, lTrace, lPopAuth)
 
    /*
    cServer    -> Required. IP or domain name of the mail server
@@ -72,12 +72,13 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    aFiles     -> Optional. Array of attachments to the email to send
    cUser      -> Required. User name for the POP3 server
    cPass      -> Required. Password for cUser
+   cPopServer -> Required. Pop3 server name or address   
    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low 
    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
    */
 
-   LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cFname, cFext, cData
+   LOCAL oInMail, cBodyTemp, oUrl, oMail, oAttach, aThisFile, cFile, cFname, cFext, cData, oUrl1
 
    LOCAL cTmp          :=""
    LOCAL cMimeText     := ""
@@ -98,6 +99,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    DEFAULT nPriority   TO 3
    DEFAULT lRead       TO .F.
    DEFAULT lTrace      TO .F.
+   DEFAULT lPopAuth to .T.   
 
    cUser := StrTran( cUser, "@", "&at;" )
    
@@ -153,6 +155,23 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       cBCC := Alltrim( aBCC )
    ENDIF
    
+   IF cPopServer != NIL .AND. lPopAuth
+      Try
+         oUrl1 := tUrl():New( "pop://" + cUser + ":" + cPass + "@" + cPopServer + "/" )
+         oUrl1:cUserid := Strtran( cUser, "&at;", "@" )      
+         opop:= tIPClientPOP():New( oUrl1, lTrace ) 
+         IF oPop:Open()
+            oPop:Close()
+         ENDIF
+      Catch    
+         lReturn := .F.
+      END      
+
+   ENDIF
+   
+   IF !lReturn
+      RETURN .F.
+   ENDIF      
    
    TRY
     oUrl := tUrl():New( "smtp://" + cUser + "@" + cServer + '/' + cTo )
