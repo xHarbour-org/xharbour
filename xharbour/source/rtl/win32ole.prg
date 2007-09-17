@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.149 2007/04/13 20:25:59 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.150 2007/05/02 06:19:56 walito Exp $
  */
 
 /*
@@ -2436,7 +2436,7 @@ RETURN Self
      IDispatch *pDisp;
      DISPID DispID;
      DISPPARAMS DispParams;
-     BOOL bSetFirst = FALSE;
+     BOOL bSetFirst = FALSE, bTryDefault = TRUE;
 
      //TraceLog( NULL, "Class: '%s' Message: '%s', Params: %i Arg1: %i\n", hb_objGetClsName( hb_stackSelfItem() ), ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, hb_pcount(), hb_parinfo(1) );
 
@@ -2553,7 +2553,7 @@ RETURN Self
            PHB_ITEM pReturn = hb_itemNew( NULL );
            PHB_ITEM pOleClassName = hb_itemNew( NULL );
            char *sOleClassName;
-		   int iClassNameLen, iMsgNameLen;
+           int iClassNameLen, iMsgNameLen;
 
            hb_itemForwardValue( pReturn, &HB_VM_STACK.Return );
 
@@ -2564,7 +2564,7 @@ RETURN Self
            iClassNameLen = hb_parclen( -1 );
            iMsgNameLen = strlen( (*HB_VM_STACK.pBase)->item.asSymbol.value->szName );
 
-		   sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
+           sOleClassName = (char *) hb_xgrab( iClassNameLen + 1 + iMsgNameLen + 1 );
 
            strncpy( sOleClassName, hb_parc( - 1 ), iClassNameLen );
            sOleClassName[ iClassNameLen ] = ':';
@@ -2588,8 +2588,10 @@ RETURN Self
      else
      {
         // Try to apply the requested message to the DEFAULT Method of the object if any.
-        if( SUCCEEDED( ( s_nOleError = OleGetValue( pDisp ) ) ) )
+        if( bTryDefault && SUCCEEDED( ( /* s_nOleError = */ OleGetValue( pDisp ) ) ) )
         {
+           bTryDefault = FALSE;
+
            //TraceLog( NULL, "Try using DISPID_VALUE\n" );
            pDisp = OleVal.n1.n2.n3.pdispVal;
            goto OleGetID;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5700 2007/09/15 17:37:44 patrickmast Exp $
+ * $Id: ChangeLog,v 1.5701 2007/09/16 00:43:49 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-17 07:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.slx
+    * Minor Formatting
+  * source/rtl/win32ole.prg
+    * Use default property only once
 
 2007-09-15 20:40 UTC-0500 Paul Tucker <ptucker sympatico.ca>
    * include/hbsetup.ch
@@ -34,7 +40,7 @@
 	    aFiles     -> Optional. Array of attachments to the email to send
 	    cUser      -> Required. User name for the POP3 server
 	    cPass      -> Required. Password for cUser
-	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low 
+	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
 	    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
 	    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
 	  * Changed hcr(13)+chr(10)'s to HB_OsNewLine()
@@ -91,7 +97,7 @@
     * For the moment, the new hb_atokens and related functions have been
       commented out until after the next release.
 
-2007-09-13 10:10 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-13 10:10 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
     ! Fixed the save to rules
 
@@ -100,7 +106,7 @@
      ! fixed line 3217. Missing of "\" after $(HB_DIR)
        $(PPGEN_EXE) $(HB_DIR)\include\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
 
-2007-09-12 09:10 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-12 09:10 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
     ! Added missing extended clause to save to/ restore from command
 
@@ -140,7 +146,7 @@
 	* source\rtl\hbtoken.c
 	  + HB_aTokens__()
 	    This is the 'old' hb_aTokens() which returns a 2 elements array for
-	    HB_aTokens__(".","."). I just added HB_aTokens__() as a TEMPORARY 
+	    HB_aTokens__(".","."). I just added HB_aTokens__() as a TEMPORARY
 	    solution for those who need a quick dirty fix for their existing
 	    source code. This function will be deleted in a future release.
 
@@ -158,17 +164,17 @@
   * source/vm/macro.c
     * Commented out unuseful assignment szString = NULL in function hb_macroGetValue()
 
-2007-09-06 12:40 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-06 12:40 UTC-0300 Luiz Rafael Culik Guimaraes
   * source/tip/ftpcln.prg
   * source/tip/smtpcln.prg
   * source/tip/popcln.prg
     ! when trace enable change trace filename to be between 1 and 9999 example ftp993.log
 
-2007-09-05 20:00 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-05 20:00 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
     ! minor fix to previus commit
 
-2007-09-05 17:00 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-05 17:00 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
     ! minor fix to previus commit
 
@@ -176,10 +182,10 @@
   * source/rtl/hbtoken.c
     * corrected for empty source string.
 
-2007-09-04 19:00 UTC-0300 Luiz Rafael Culik Guimaraes 
+2007-09-04 19:00 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
     ! added some missing rules to index on command
-    
+
 2007-09-05 01:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c
     ! Accept :: in expressions inside debugger.

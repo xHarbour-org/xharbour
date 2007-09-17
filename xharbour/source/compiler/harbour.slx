@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.82 2007/04/14 21:47:22 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.83 2007/05/15 21:34:12 ronpinkas Exp $
  */
 
 /*
@@ -1600,17 +1600,23 @@ int yy_lex_input( char *buffer, int iBufferSize )
 
    szLine = hb_pp_nextLine( hb_comp_PP, &ulLen );
    hb_comp_iLine = hb_pp_line( hb_comp_PP ) + 1;
+
    if( szLine && ulLen )
    {
       if( ulLen > ( ULONG ) iBufferSize )
+      {
          ulLen = iBufferSize;
+      }
    }
    else
    {
       ulLen = 0;
    }
+
    memcpy( buffer, szLine, ulLen );
    buffer[ ulLen ] = '\0';
+
+   //printf( ">%s<]\n", buffer );
 
    return ulLen;
 }
