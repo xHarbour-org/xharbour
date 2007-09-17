@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.215 2007/05/29 01:52:30 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.216 2007/05/31 05:18:11 walito Exp $
  */
 
 /*
@@ -62,9 +62,9 @@
 
 HB_EXTERN_BEGIN
 
-#define HB_MAX_MACRO_ARGS   16
-#define HB_MAX_WITH_OBJECTS 16
-#define HB_MAX_ENUMERATIONS 16
+#define HB_MAX_MACRO_ARGS   64
+#define HB_MAX_WITH_OBJECTS 64
+#define HB_MAX_ENUMERATIONS 64
 
 /* items types and type checking macros */
 #define HB_IT_NIL       ( ( HB_TYPE ) 0x0000 )

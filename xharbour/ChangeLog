@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5701 2007/09/16 00:43:49 paultucker Exp $
+ * $Id: ChangeLog,v 1.5702 2007/09/17 11:10:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-17 13:30 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
+   * include/hbapi.h
+     % Increased HB_MAX_MACRO_ARGS, HB_MAX_WITH_OBJECTS and HB_MAX_ENUMERATIONS from 16 to 64
+       NOTE: This is a temporary solution, since Miguel Angel is working on make them unlimited
 
 2007-09-17 07:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.slx
