@@ -1,7 +1,7 @@
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.1 2007/09/15 17:37:46 patrickmast Exp $
+ * $Id: sendmail.prg,v 1.2 2007/09/17 11:58:31 lculik Exp $
  */
 
 /*
@@ -91,6 +91,7 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    LOCAL lAuthLogin    := .F.
    LOCAL lAuthPlain    := .F.
    LOCAL lConnect      := .T.
+   local oPop
 
    DEFAULT cUser       TO ""
    DEFAULT cPass       TO ""
