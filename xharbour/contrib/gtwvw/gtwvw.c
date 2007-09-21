@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c $
+ * $Id: gtwvw.c,v 1.45 2007/05/24 03:05:51 bdj Exp $
  */
 
 /*
@@ -4400,10 +4400,11 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
       HWND hWndCtrl = (HWND) lParam;
       UINT uiXBid;
       byte bStyle;
+      BOOL bTopMost = (s_usNumWindows==usWinNum+1);
 
       /* reject if not accepting input (topmost window not on focus) */
 
-      if ( !hb_wvw_gtAcceptingInput() )
+      if (!bTopMost && !s_bAllowNonTop)
       {
 
         hb_wvw_gtInputNotAllowed( usWinNum, message, wParam, lParam );
@@ -17962,7 +17963,7 @@ HB_FUNC( WVW_EBCREATE)
      uiEBid++;
    }
 
-   dwStyle = WS_BORDER | WS_GROUP | WS_TABSTOP | ES_OEMCONVERT | dwMoreStyle;
+   dwStyle = WS_BORDER | WS_GROUP | WS_TABSTOP | dwMoreStyle;
 
    if ((bEBType & WVW_EB_MULTILINE) == WVW_EB_MULTILINE)
    {

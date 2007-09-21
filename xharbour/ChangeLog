@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5705 2007/09/17 13:20:30 ran_go Exp $
+ * $Id: ChangeLog,v 1.5706 2007/09/21 14:37:24 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,9 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-21 23:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * contrib/gtwvw/gtwvw.c
+    ! WM_HSCROLL and WM_VSCROLL should be controlled by bTopMost || s_bAllowNonTop,
+      not by hb_wvw_gtAcceptingInput(). This may cause problem if WVW_SETFOCUS interferes.
+      Fixed.
+    ! wvw_ebcreate() :: do NOT use ES_OEMCONVERT by default
+
 2007-09-21 12:06 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * source/debug/debugger.prg
-    ! fixes for OpenDebuggerWindow() and CloseDebuggerWindow() when using gtwvw. changes provided by Anatole Kolotovkin <abakkav@rol.ru> 
+    ! fixes for OpenDebuggerWindow() and CloseDebuggerWindow() when using gtwvw. changes provided by Anatole Kolotovkin <abakkav@rol.ru>
 
 2007-09-17 10:20 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rtl/mlctopos.c
@@ -23,20 +31,20 @@
        HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, cPopServer,nPriority, lRead, lTrace, lPopAuth)
        Where:
        cServer    -> Required. IP or domain name of the mail server
-	    nPort      -> Optional. Port used my email server
-	    cFrom      -> Required. Email address of the sender
-	    aTo        -> Required. Character string or array of email addresses to send the email to
-	    aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
-	    aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
-	    cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
-	    cSubject   -> Optional. Subject of the sending email
-	    aFiles     -> Optional. Array of attachments to the email to send
-	    cUser      -> Required. User name for the POP3 server
-	    cPass      -> Required. Password for cUser
+        nPort      -> Optional. Port used my email server
+        cFrom      -> Required. Email address of the sender
+        aTo        -> Required. Character string or array of email addresses to send the email to
+        aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
+        aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
+        cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
+        cSubject   -> Optional. Subject of the sending email
+        aFiles     -> Optional. Array of attachments to the email to send
+        cUser      -> Required. User name for the POP3 server
+        cPass      -> Required. Password for cUser
             cPopServer -> Requered. IP or domain name of the pop3 mail server
-	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
-	    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
-	    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
+        nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
+        lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
+        lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
             lPopAuth   -> Optional. Flag to indicate that pop3 autentication is used. Standard setting is  .T.
 
 
@@ -68,35 +76,35 @@
        HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aFiles, cUser, cPass, nPriority, lRead, lTrace)
        Where:
        cServer    -> Required. IP or domain name of the mail server
-	    nPort      -> Optional. Port used my email server
-	    cFrom      -> Required. Email address of the sender
-	    aTo        -> Required. Character string or array of email addresses to send the email to
-	    aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
-	    aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
-	    cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
-	    cSubject   -> Optional. Subject of the sending email
-	    aFiles     -> Optional. Array of attachments to the email to send
-	    cUser      -> Required. User name for the POP3 server
-	    cPass      -> Required. Password for cUser
-	    nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
-	    lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
-	    lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
-	  * Changed hcr(13)+chr(10)'s to HB_OsNewLine()
-	  * Added CC (Carbon Copy)
-	  * Added BCC (Blind Carbon Copy)
-	* hrbdll.bc
-	* makefile.bc
-	* hrbdll.vc
-	* makefile.vc
-	* hrbdll.wc
-	* makefile.wc
-	* hrbdll.pc
-	* makefile.pc
-	* hrbdll.dc
-	* makefile.dc
-	* hrbdll.gc
-	* makefile.gc
-	  + Added sendmail.prg
+        nPort      -> Optional. Port used my email server
+        cFrom      -> Required. Email address of the sender
+        aTo        -> Required. Character string or array of email addresses to send the email to
+        aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
+        aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
+        cBody      -> Optional. The body message of the email as text, or the filename of the HTML message to send.
+        cSubject   -> Optional. Subject of the sending email
+        aFiles     -> Optional. Array of attachments to the email to send
+        cUser      -> Required. User name for the POP3 server
+        cPass      -> Required. Password for cUser
+        nPriority  -> Optional. Email priority: 1=High, 3=Normal (Standard), 5=Low
+        lRead      -> Optional. If set to .T., a confirmation request is send. Standard setting is .F.
+        lTrace     -> Optional. If set to .T., a log file is created (sendmail<nNr>.log). Standard setting is .F.
+      * Changed hcr(13)+chr(10)'s to HB_OsNewLine()
+      * Added CC (Carbon Copy)
+      * Added BCC (Blind Carbon Copy)
+    * hrbdll.bc
+    * makefile.bc
+    * hrbdll.vc
+    * makefile.vc
+    * hrbdll.wc
+    * makefile.wc
+    * hrbdll.pc
+    * makefile.pc
+    * hrbdll.dc
+    * makefile.dc
+    * hrbdll.gc
+    * makefile.gc
+      + Added sendmail.prg
 
 2007-09-15 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
@@ -171,22 +179,22 @@
 2007-09-08 21:34 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
    * source\tip\ftpcln.prg
      * Formatting
-	  + METHOD StartCleanLogFile()
-	    Starts a clean log file, overwriting current logfile.
-	  + METHOD fileSize( cFileSpec )
-	    Calculates the file-size of the given files specifications.
-	  + DATA cLogFile
-	    Holds the filename of the current logfile.
-	  ! Fixed logfilename in New(), now its not limited to 9999 log files anymore
-	  ! Fixed MGet() due to changes in HB_aTokens()
-	  ! Fixed listFiles() due to changes in HB_aTokens()
-	  ! listFiles() is still buggy. Needs to be fixed.
-	* source\rtl\hbtoken.c
-	  + HB_aTokens__()
-	    This is the 'old' hb_aTokens() which returns a 2 elements array for
-	    HB_aTokens__(".","."). I just added HB_aTokens__() as a TEMPORARY
-	    solution for those who need a quick dirty fix for their existing
-	    source code. This function will be deleted in a future release.
+      + METHOD StartCleanLogFile()
+        Starts a clean log file, overwriting current logfile.
+      + METHOD fileSize( cFileSpec )
+        Calculates the file-size of the given files specifications.
+      + DATA cLogFile
+        Holds the filename of the current logfile.
+      ! Fixed logfilename in New(), now its not limited to 9999 log files anymore
+      ! Fixed MGet() due to changes in HB_aTokens()
+      ! Fixed listFiles() due to changes in HB_aTokens()
+      ! listFiles() is still buggy. Needs to be fixed.
+    * source\rtl\hbtoken.c
+      + HB_aTokens__()
+        This is the 'old' hb_aTokens() which returns a 2 elements array for
+        HB_aTokens__(".","."). I just added HB_aTokens__() as a TEMPORARY
+        solution for those who need a quick dirty fix for their existing
+        source code. This function will be deleted in a future release.
 
 2007-09-07 21:04 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    * source/compiler/harbour.sly
