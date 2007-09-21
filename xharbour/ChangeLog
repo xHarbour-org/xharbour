@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5706 2007/09/21 14:37:24 lculik Exp $
+ * $Id: ChangeLog,v 1.5707 2007/09/21 16:28:53 bdj Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-21 22:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/debug/dbgbrwsr.prg
+  * source/debug/dbghelp.prg
+  * source/debug/dbgmenu.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtmenu.prg
+  * source/debug/dbgtmitm.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dbgtwin.prg
+  * source/debug/dbgwa.prg
+  * source/debug/debugger.prg
+  * source/debug/tbrwtext.prg
+    * Huge formatting and naming cleanup in debugger, mostly synced with
+      Harbour changes by Viktor Szakats.
 
 2007-09-21 23:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
