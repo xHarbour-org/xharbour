@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5704 2007/09/17 11:58:26 lculik Exp $
+ * $Id: ChangeLog,v 1.5705 2007/09/17 13:20:30 ran_go Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,9 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-09-21 12:06 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
+  * source/debug/debugger.prg
+    ! fixes for OpenDebuggerWindow() and CloseDebuggerWindow() when using gtwvw. changes provided by Anatole Kolotovkin <abakkav@rol.ru> 
 
 2007-09-17 10:20 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rtl/mlctopos.c

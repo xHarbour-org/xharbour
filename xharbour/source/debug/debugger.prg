@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.82 2007/02/27 15:59:34 druzus Exp $
+ * $Id: debugger.prg,v 1.83 2007/08/06 20:30:23 likewolf Exp $
  */
 
 /*
@@ -438,10 +438,11 @@ METHOD OpenDebuggerWindow() CLASS TDebugger
       ::nAppMaxRow := maxrow()
       ::nAppMaxCol := maxcol()
       ::nAppWindow := hb_ExecFromArray( 'WVW_NSETCURWINDOW' )
+      ::lDebuggerWindowIsOpen := .t.
       ::nDebuggerWindow := hb_ExecFromArray( 'WVW_NOPENWINDOW', ;
                       { "Debugger", DEBUGGER_MINROW, DEBUGGER_MINCOL, ;
                         DEBUGGER_MAXROW, DEBUGGER_MAXCOL } )
-      ::lDebuggerWindowIsOpen := .t.
+
     ENDIF
     
     hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nDebuggerWindow } )
@@ -454,8 +455,8 @@ METHOD CloseDebuggerWindow() CLASS Tdebugger
 
   if ::cGTVersion == 'WVW'
     //if !::lDebuggerWindowIsOpen
-      hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
-      return nil
+//      hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
+//      return nil
     //endif
 
     /*hb_ExecFromArray( 'WVW_LCLOSEWINDOW' )
@@ -463,6 +464,13 @@ METHOD CloseDebuggerWindow() CLASS Tdebugger
     if !( type( 'WVW_SHOWWINDOW()' ) == 'U' )
       hb_ExecFromArray('WVW_SHOWWINDOW')
     endif*/
+    hb_ExecFromArray( 'WVW_LCLOSEWINDOW' )
+    ::lDebuggerWindowIsOpen := .f.
+    hb_ExecFromArray( 'WVW_NSETCURWINDOW', { ::nAppWindow } )
+    if !( type( 'WVW_SHOWWINDOW()' ) == 'U' )
+       hb_ExecFromArray('WVW_SHOWWINDOW')
+    endif
+
   endif
 
 return nil
