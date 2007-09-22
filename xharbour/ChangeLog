@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5708 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: ChangeLog,v 1.5709 2007/09/22 05:40:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-22 13:35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbset.h
+    ! improper qualifier for global variables:
+      extern HB_EXPORT HB_SET_STRUCT hb_set -> extern HB_SET_STRUCT hb_set
 
 2007-09-22 12:35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rdd/dbcmd.c
