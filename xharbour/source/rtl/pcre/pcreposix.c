@@ -342,4 +342,7 @@ else
   }
 }
 
+void HB_PCREPOS_LIBRARY( void )
+{
+}
 /* End of pcreposix.c */

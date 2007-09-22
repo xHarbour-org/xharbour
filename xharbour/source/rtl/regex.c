@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.59 2006/03/12 22:21:04 fsgiudice Exp $
+ * $Id: regex.c,v 1.60 2007/05/20 03:26:24 ronpinkas Exp $
  */
 
 /*
@@ -74,7 +74,9 @@
 
 #define hb_isregexstring( x )  ( ( x->item.asString.length > 3 && memcmp( x->item.asString.value, "***", 3 ) == 0 ) )
 
-HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
+extern void HB_PCREPOS_LIBRARY( void );
+
+regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree )
 {
    char * szRegEx = hb_itemGetCPtr( pRegEx );
    regex_t * pRetReg = NULL;
@@ -109,14 +111,14 @@ HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL 
    return pRetReg;
 }
 
-void HB_EXPORT hb_freeregex( regex_t *pReg )
+void hb_freeregex( regex_t *pReg )
 {
    regfree( pReg );
    hb_xfree( pReg );
 }
 
 
-HB_EXPORT BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags )
+BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags )
 {
    pRegEx->pReg    = NULL;
    pRegEx->fFree   = FALSE;
@@ -137,7 +139,7 @@ HB_EXPORT BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFla
    return FALSE;
 }
 
-HB_EXPORT BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, int iEFlags )
+BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, int iEFlags )
 {
    char *szRegEx = hb_itemGetCPtr( pRegExItm );
    BOOL fResult = FALSE;
@@ -166,7 +168,7 @@ HB_EXPORT BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, i
    return fResult;
 }
 
-HB_EXPORT void hb_regexFree( PHB_REGEX pRegEx )
+void hb_regexFree( PHB_REGEX pRegEx )
 {
    if( pRegEx )
    {
@@ -180,7 +182,7 @@ HB_EXPORT void hb_regexFree( PHB_REGEX pRegEx )
    }
 }
 
-HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
+BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull )
 {
    BOOL fMatch;
 
@@ -197,7 +199,7 @@ HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull
  *  HVM when executing the HB_P_MATCH and HB_P_LIKE operator. In such case the operands
  *  are passed directly.
  */
-BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
+BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 {
    #ifndef REGEX_MAX_GROUPS
       #define REGEX_MAX_GROUPS 16
@@ -561,7 +563,7 @@ BOOL HB_EXPORT hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
  Caller must allocate sRegEx with enough space for conversion.
  returns the length of the resulting RegEx.
  */
-HB_EXPORT int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
+int Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase )
 {
    char cChar;
    int iLen = strlen( sWild );
@@ -793,4 +795,9 @@ HB_FUNC( HB_ISREGEXSTRING )
    HB_THREAD_STUB_API
    PHB_ITEM pRegEx = hb_param( 1, HB_IT_STRING );
    hb_retl( pRegEx && hb_isregexstring( pRegEx ) );
+}
+
+HB_FUNC( HB_FORCELINK_PCREPOS )
+{
+   HB_PCREPOS_LIBRARY();
 }
