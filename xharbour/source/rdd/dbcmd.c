@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.216 2007/05/29 10:53:46 marchuet Exp $
+ * $Id: dbcmd.c,v 1.217 2007/08/20 19:32:38 marchuet Exp $
  */
 
 /*
@@ -185,7 +185,7 @@ HB_FUNC( ALIAS )
 
 HB_FUNC( DBEVAL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    DBEVALINFO pEvalInfo;
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -291,7 +291,7 @@ HB_FUNC( DBAPPEND )
 
 HB_FUNC( DBCLEARFILTER )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -307,13 +307,13 @@ HB_FUNC( DBCLOSEALL )
 
 HB_FUNC( DBCLOSEAREA )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    hb_rddReleaseCurrentArea();
 }
 
 HB_FUNC( DBCOMMIT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       SELF_FLUSH( pArea );
@@ -323,7 +323,7 @@ HB_FUNC( DBCOMMIT )
 
 HB_FUNC( DBCOMMITALL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    hb_rddFlushAll();
 }
 
@@ -335,6 +335,7 @@ HB_FUNC( DBCOMMITALL )
  */
 HB_FUNC( DBCREATE )
 {
+   HB_THREAD_STUB
    char * szFileName, * szAlias, * szDriver, * szCpId;
    USHORT uiSize, uiLen;
    PHB_ITEM pStruct, pFieldDesc, pDelim;
@@ -407,6 +408,7 @@ HB_FUNC( DBCREATE )
 /* __dbopensdf( cFile, aStruct, cRDD, lKeepOpen, cAlias, cDelimArg, cCodePage, nConnection ) */
 HB_FUNC( __DBOPENSDF )
 {
+   HB_THREAD_STUB
    char * szFileName, * szAlias, * szDriver, * szCpId;
    USHORT uiSize, uiLen;
    PHB_ITEM pStruct, pFieldDesc, pDelim;
@@ -470,7 +472,7 @@ HB_FUNC( __DBOPENSDF )
 
 HB_FUNC( DBDELETE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -498,7 +500,7 @@ HB_FUNC( DBFILTER )
 
 HB_FUNC( DBGOBOTTOM )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -509,7 +511,7 @@ HB_FUNC( DBGOBOTTOM )
 
 HB_FUNC( DBGOTO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -526,7 +528,7 @@ HB_FUNC( DBGOTO )
 
 HB_FUNC( DBGOTOP )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -537,7 +539,7 @@ HB_FUNC( DBGOTOP )
 
 HB_FUNC( __DBLOCATE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    DBSCOPEINFO dbScopeInfo;
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -566,7 +568,7 @@ HB_FUNC( __DBLOCATE )
 
 HB_FUNC( __DBSETLOCATE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    PHB_ITEM pLocate;
    DBSCOPEINFO pScopeInfo;
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
@@ -585,7 +587,7 @@ HB_FUNC( __DBSETLOCATE )
 
 HB_FUNC( __DBCONTINUE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -596,7 +598,7 @@ HB_FUNC( __DBCONTINUE )
 
 HB_FUNC( __DBPACK )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    PHB_ITEM pBlock, pEvery;
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -633,7 +635,7 @@ HB_FUNC( __DBPACK )
 
 HB_FUNC( DBRECALL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       SELF_RECALL( pArea );
@@ -664,7 +666,7 @@ HB_FUNC( DBRLOCK )
 
 HB_FUNC( DBRLOCKLIST )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -680,7 +682,7 @@ HB_FUNC( DBRLOCKLIST )
 
 HB_FUNC( DBRUNLOCK )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -746,7 +748,7 @@ HB_FUNC( DBSELECTAREA )
 
 HB_FUNC( __DBSETFOUND )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -759,7 +761,7 @@ HB_FUNC( __DBSETFOUND )
 
 HB_FUNC( DBSETFILTER )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -793,7 +795,7 @@ HB_FUNC( DBSETFILTER )
 
 HB_FUNC( DBSKIP )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       SELF_SKIP( pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
@@ -812,7 +814,7 @@ HB_FUNC( DBSTRUCT )
 
 HB_FUNC( DBTABLEEXT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    PHB_ITEM pItem = hb_itemPutC( NULL, "" );
 
@@ -841,7 +843,7 @@ HB_FUNC( DBTABLEEXT )
 
 HB_FUNC( DBUNLOCK )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -852,12 +854,13 @@ HB_FUNC( DBUNLOCK )
 
 HB_FUNC( DBUNLOCKALL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    hb_rddUnLockAll();
 }
 
 HB_FUNC( DBUSEAREA )
 {
+   HB_THREAD_STUB
    hb_retl( hb_rddOpenTable( hb_parc( 3 ), hb_parc( 2 ),
          hb_parl( 1 ) ? 0 : hb_rddGetCurrentWorkAreaNumber(),
          hb_parc( 4 ), ISLOG( 5 ) ? hb_parl( 5 ) : !hb_set.HB_SET_EXCLUSIVE,
@@ -866,7 +869,7 @@ HB_FUNC( DBUSEAREA )
 
 HB_FUNC( __DBZAP )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -936,7 +939,7 @@ HB_FUNC( FIELDDEC )
 
 HB_FUNC( FIELDGET )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    PHB_ITEM pItem = hb_itemNew( NULL );
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    USHORT uiField = hb_parni( 1 );
@@ -1014,7 +1017,7 @@ HB_FUNC( FIELDPOS )
 
 HB_FUNC( FIELDPUT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1182,7 +1185,7 @@ HB_FUNC( NETERR )
 
 HB_FUNC( ORDBAGEXT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    DBORDERINFO pInfo;
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
@@ -1213,7 +1216,7 @@ HB_FUNC( ORDBAGEXT )
 
 HB_FUNC( ORDBAGNAME )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1324,7 +1327,7 @@ HB_FUNC( ORDCONDSET )
 
 HB_FUNC( ORDCREATE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1405,7 +1408,7 @@ HB_FUNC( ORDDESTROY )
 
 HB_FUNC( ORDFOR )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1442,7 +1445,7 @@ HB_FUNC( ORDFOR )
 
 HB_FUNC( ORDKEY )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1478,7 +1481,7 @@ HB_FUNC( ORDKEY )
 #ifdef HB_COMPAT_C53
 HB_FUNC( ORDKEYCOUNT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1503,7 +1506,7 @@ HB_FUNC( ORDKEYCOUNT )
 
 HB_FUNC( ORDKEYNO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1527,7 +1530,7 @@ HB_FUNC( ORDKEYNO )
 
 HB_FUNC( ORDKEYGOTO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1546,7 +1549,7 @@ HB_FUNC( ORDKEYGOTO )
 
 HB_FUNC( ORDKEYRELPOS )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1565,7 +1568,7 @@ HB_FUNC( ORDKEYRELPOS )
 
 HB_FUNC( ORDFINDREC )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1585,7 +1588,7 @@ HB_FUNC( ORDFINDREC )
 
 HB_FUNC( ORDSKIPRAW )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       SELF_SKIPRAW( pArea, ISNUM( 1 ) ? hb_parnl( 1 ) : 1 );
@@ -1596,7 +1599,7 @@ HB_FUNC( ORDSKIPRAW )
 
 HB_FUNC( ORDSKIPUNIQUE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1615,7 +1618,7 @@ HB_FUNC( ORDSKIPUNIQUE )
 
 HB_FUNC( ORDKEYVAL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1633,7 +1636,7 @@ HB_FUNC( ORDKEYVAL )
 
 HB_FUNC( ORDKEYADD )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1657,7 +1660,7 @@ HB_FUNC( ORDKEYADD )
 
 HB_FUNC( ORDKEYDEL )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1681,7 +1684,7 @@ HB_FUNC( ORDKEYDEL )
 
 HB_FUNC( ORDDESCEND )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1705,7 +1708,7 @@ HB_FUNC( ORDDESCEND )
 
 HB_FUNC( ORDISUNIQUE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1729,7 +1732,7 @@ HB_FUNC( ORDISUNIQUE )
 
 HB_FUNC( ORDCUSTOM )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1753,7 +1756,7 @@ HB_FUNC( ORDCUSTOM )
 
 HB_FUNC( ORDCOUNT )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1869,7 +1872,7 @@ HB_FUNC( ORDLISTADD )
 
 HB_FUNC( ORDLISTCLEAR )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1880,7 +1883,7 @@ HB_FUNC( ORDLISTCLEAR )
 
 HB_FUNC( ORDLISTREBUILD )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1891,7 +1894,7 @@ HB_FUNC( ORDLISTREBUILD )
 
 HB_FUNC( ORDNAME )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1927,7 +1930,7 @@ HB_FUNC( ORDNAME )
 
 HB_FUNC( ORDNUMBER )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -1952,7 +1955,7 @@ HB_FUNC( ORDNUMBER )
 
 HB_FUNC( ORDSETFOCUS )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2027,7 +2030,7 @@ HB_FUNC( RECCOUNT )
 
 HB_FUNC( RECNO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    PHB_ITEM pRecNo = hb_itemPutNL( NULL, 0 );
 
@@ -2199,7 +2202,7 @@ HB_FUNC( DBRSELECT )  /* (<nRelation>) --> nWorkArea */
 
 HB_FUNC( DBCLEARRELATION )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2263,7 +2266,7 @@ HB_FUNC( DBSETRELATION )
 
 HB_FUNC( __DBARRANGE )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2394,7 +2397,7 @@ HB_FUNC( __DBARRANGE )
 
 HB_FUNC( DBINFO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2419,7 +2422,7 @@ HB_FUNC( DBINFO )
 
 HB_FUNC( DBORDERINFO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2455,7 +2458,7 @@ HB_FUNC( DBORDERINFO )
 
 HB_FUNC( DBFIELDINFO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2483,7 +2486,7 @@ HB_FUNC( DBFIELDINFO )
 
 HB_FUNC( DBRECORDINFO )
 {
-   HB_THREAD_STUB
+   // HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
 
    if( pArea )
@@ -2654,6 +2657,7 @@ HB_FUNC( RDDINFO )
 /* __dbTrans( nDstArea, aFieldsStru, bFor, bWhile, nNext, nRecord, lRest ) */
 HB_FUNC( __DBTRANS )
 {
+   HB_THREAD_STUB
    if( ISNUM( 1 ) )
    {
       USHORT uiSrcArea, uiDstArea;
@@ -2711,6 +2715,7 @@ HB_FUNC( __DBTRANS )
 
 HB_FUNC( __DBAPP )
 {
+   HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       hb_retl( SUCCESS == hb_rddTransRecords( pArea,
@@ -2734,6 +2739,7 @@ HB_FUNC( __DBAPP )
 
 HB_FUNC( __DBCOPY )
 {
+   HB_THREAD_STUB
    AREAP pArea = ( AREAP ) hb_rddGetCurrentWorkAreaPointer();
    if( pArea )
       hb_retl( SUCCESS == hb_rddTransRecords( pArea,

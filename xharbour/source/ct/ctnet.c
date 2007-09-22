@@ -1,5 +1,5 @@
 /*
- * $Id: ctnet.c,v 1.7 2005/10/24 01:04:25 druzus Exp $
+ * $Id: ctnet.c,v 1.8 2007/03/26 21:40:59 modalsist Exp $
  *
  * xHarbour Project source code:
  * NET..() functions to PC-LAN/MS-NET.
@@ -189,7 +189,11 @@ HB_FUNC ( NETPRINTER )
 */
 
    // Query default printer port setted by user.
+#ifndef __EXPORT__
    char *cPrn = hb_set.HB_SET_PRINTFILE;
+#else
+   char *cPrn = hb_setPrintFile();
+#endif
 
    if ( strlen( cPrn ) == 0 || strstr( cPrn, "PRN" ) != NULL )
    {

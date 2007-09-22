@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.216 2007/05/31 05:18:11 walito Exp $
+ * $Id: hbapi.h,v 1.217 2007/09/17 11:28:18 jfgimenez Exp $
  */
 
 /*
@@ -743,7 +743,7 @@ extern HB_EXPORT UINT        * hb_dynsymCount( void );
 /* Command line and environment argument management */
 extern HB_EXPORT void hb_cmdargInit( int argc, char * argv[] ); /* initialize command line argument API's */
 extern int       hb_cmdargARGC( void ); /* retrieve command line argument count */
-extern char **   hb_cmdargARGV( void ); /* retrieve command line argument buffer pointer */
+extern HB_EXPORT char **   hb_cmdargARGV( void ); /* retrieve command line argument buffer pointer */
 extern BOOL      hb_cmdargIsInternal( const char * szArg ); /* determine if a string is an internal setting */
 extern BOOL      hb_cmdargCheck( const char * pszName ); /* Check if a given internal switch (like //INFO) was set */
 extern char *    hb_cmdargString( const char * pszName ); /* Returns the string value of an internal switch (like //TEMPPATH:"C:\") */
@@ -781,7 +781,7 @@ extern           void     hb_memvarSetValue( PHB_SYMB pMemvarSymb, HB_ITEM_PTR p
 extern           ERRCODE  hb_memvarGet( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item */
 extern           void     hb_memvarGetValue( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy an symbol value into an item, with error trapping */
 extern           void     hb_memvarGetRefer( HB_ITEM_PTR pItem, PHB_SYMB pMemvarSymb ); /* copy a reference to a symbol value into an item, with error trapping */
-extern           ULONG    hb_memvarGetPrivatesBase( void ); /* retrieve current PRIVATE variables stack base */
+extern HB_EXPORT ULONG    hb_memvarGetPrivatesBase( void ); /* retrieve current PRIVATE variables stack base */
 extern           void     hb_memvarSetPrivatesBase( ULONG ulBase ); /* release PRIVATE variables created after specified base */
 extern           void     hb_memvarNewParameter( PHB_SYMB pSymbol, PHB_ITEM pValue );
 extern           char   * hb_memvarGetStrValuePtr( char * szVarName, ULONG *pulLen );

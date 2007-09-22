@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.77 2007/09/07 05:42:04 paultucker Exp $
+ * $Id: set.c,v 1.78 2007/09/10 12:06:11 paultucker Exp $
  */
 
 /*
@@ -1809,4 +1809,374 @@ HB_EXPORT int hb_setListenerRemove( int listener )
 HB_EXPORT HB_PATHNAMES * hb_setGetFirstSetPath( void )
 {
    return sp_set_path;
+}
+
+HB_EXPORT FHANDLE hb_setAltHan()
+{
+   return hb_set.hb_set_althan;
+}
+
+HB_EXPORT BOOL hb_setCentury()
+{
+   return hb_set.hb_set_century;
+}
+
+HB_EXPORT FHANDLE hb_setExtraHan()
+{
+   return hb_set.hb_set_extrahan;
+}
+
+HB_EXPORT FHANDLE hb_setPrintHan()
+{
+   return hb_set.hb_set_printhan;
+}
+
+HB_EXPORT BOOL hb_setAlternate()
+{
+   return hb_set.HB_SET_ALTERNATE;
+}
+
+HB_EXPORT char * hb_setAltFile()
+{
+   return hb_set.HB_SET_ALTFILE;
+}
+
+HB_EXPORT BOOL hb_setAutOpen()
+{
+   return hb_set.HB_SET_AUTOPEN;
+}
+
+HB_EXPORT int hb_setAutOrder()
+{
+   return hb_set.HB_SET_AUTORDER;
+}
+
+HB_EXPORT int hb_setAutoShare()
+{
+   return hb_set.HB_SET_AUTOSHARE;
+}
+
+HB_EXPORT BOOL hb_setBell()
+{
+   return hb_set.HB_SET_BELL;
+}
+
+HB_EXPORT BOOL hb_setCancel()
+{
+   return hb_set.HB_SET_CANCEL;
+}
+
+HB_EXPORT char * hb_setColor()
+{
+   return hb_set.HB_SET_COLOR;
+}
+
+HB_EXPORT BOOL hb_setConfirm()
+{
+   return hb_set.HB_SET_CONFIRM;
+}
+
+HB_EXPORT BOOL hb_setConsole()
+{
+   return hb_set.HB_SET_CONSOLE;
+}
+
+HB_EXPORT char * hb_setDateFormat()
+{
+   return hb_set.HB_SET_DATEFORMAT;
+}
+
+HB_EXPORT BOOL hb_setDebug()
+{
+   return hb_set.HB_SET_DEBUG;
+}
+
+HB_EXPORT int hb_setDecimals()
+{
+   return hb_set.HB_SET_DECIMALS;
+}
+
+HB_EXPORT char * hb_setDefault()
+{
+   return hb_set.HB_SET_DEFAULT;
+}
+
+HB_EXPORT BOOL hb_setDeleted()
+{
+   return hb_set.HB_SET_DELETED;
+}
+
+HB_EXPORT char * hb_setDelimChars()
+{
+   return hb_set.HB_SET_DELIMCHARS;
+}
+
+HB_EXPORT BOOL hb_setDelimiters()
+{
+   return hb_set.HB_SET_DELIMITERS;
+}
+
+HB_EXPORT char * hb_setDevice()
+{
+   return hb_set.HB_SET_DEVICE;
+}
+
+HB_EXPORT BOOL hb_setEOF()
+{
+   return hb_set.HB_SET_EOF;
+}
+
+HB_EXPORT int hb_setEpoch()
+{
+   return hb_set.HB_SET_EPOCH;
+}
+
+HB_EXPORT BOOL hb_setEscape()
+{
+   return hb_set.HB_SET_ESCAPE;
+}
+
+HB_EXPORT HB_inkey_enum hb_setEventMask()
+{
+   return hb_set.HB_SET_EVENTMASK;
+}
+
+HB_EXPORT BOOL hb_setExact()
+{
+   return hb_set.HB_SET_EXACT;
+}
+
+HB_EXPORT BOOL hb_setExclusive()
+{
+   return hb_set.HB_SET_EXCLUSIVE;
+}
+
+HB_EXPORT BOOL hb_setExit()
+{
+   return hb_set.HB_SET_EXIT;
+}
+
+HB_EXPORT BOOL hb_setExtra()
+{
+   return hb_set.HB_SET_EXTRA;
+}
+
+HB_EXPORT char * hb_setExtraFile()
+{
+   return hb_set.HB_SET_EXTRAFILE;
+}
+
+HB_EXPORT BOOL hb_setFixed()
+{
+   return hb_set.HB_SET_FIXED;
+}
+
+HB_EXPORT BOOL hb_setIdleRepeat()
+{
+   return hb_set.HB_SET_IDLEREPEAT;
+}
+
+HB_EXPORT BOOL hb_setInsert()
+{
+   return hb_set.HB_SET_INSERT;
+}
+
+HB_EXPORT BOOL hb_setIntensity()
+{
+   return hb_set.HB_SET_INTENSITY;
+}
+
+HB_EXPORT char * hb_setPath()
+{
+   return hb_set.HB_SET_PATH;
+}
+
+HB_EXPORT int hb_setMargin()
+{
+   return hb_set.HB_SET_MARGIN;
+}
+
+HB_EXPORT int hb_setMBlockSize()
+{
+   return hb_set.HB_SET_MBLOCKSIZE;
+}
+
+HB_EXPORT BOOL hb_setMCenter()
+{
+   return hb_set.HB_SET_MCENTER;
+}
+
+HB_EXPORT int hb_setMessage()
+{
+   return hb_set.HB_SET_MESSAGE;
+}
+
+HB_EXPORT char * hb_setMFileExt()
+{
+   return hb_set.HB_SET_MFILEEXT;
+}
+
+HB_EXPORT BOOL hb_setOptimize()
+{
+   return hb_set.HB_SET_OPTIMIZE;
+}
+
+HB_EXPORT BOOL hb_setPrinter()
+{
+   return hb_set.HB_SET_PRINTER;
+}
+
+HB_EXPORT char * hb_setPrintFile()
+{
+   return hb_set.HB_SET_PRINTFILE;
+}
+
+HB_EXPORT BOOL hb_setScoreBoard()
+{
+   return hb_set.HB_SET_SCOREBOARD;
+}
+
+HB_EXPORT BOOL hb_setScrollBreak()
+{
+   return hb_set.HB_SET_SCROLLBREAK;
+}
+
+HB_EXPORT BOOL hb_setSoftSeek()
+{
+   return hb_set.HB_SET_SOFTSEEK;
+}
+
+HB_EXPORT BOOL hb_setStrictRead()
+{
+   return hb_set.HB_SET_STRICTREAD;
+}
+
+HB_EXPORT int hb_setTypeAhead()
+{
+   return hb_set.HB_SET_TYPEAHEAD;
+}
+
+HB_EXPORT BOOL hb_setUnique()
+{
+   return hb_set.HB_SET_UNIQUE;
+}
+
+HB_EXPORT int hb_setFileCase()
+{
+   return hb_set.HB_SET_FILECASE;
+}
+
+HB_EXPORT int hb_setDirCase()
+{
+   return hb_set.HB_SET_DIRCASE;
+}
+
+HB_EXPORT char hb_setDirSeparator()
+{
+   return hb_set.HB_SET_DIRSEPARATOR;
+}
+
+HB_EXPORT int hb_setVideoMode()
+{
+   return hb_set.HB_SET_VIDEOMODE;
+}
+
+HB_EXPORT BOOL hb_setWrap()
+{
+   return hb_set.HB_SET_WRAP;
+}
+
+HB_EXPORT int hb_setDBFLockScheme()
+{
+   return hb_set.HB_SET_DBFLOCKSCHEME;
+}
+
+HB_EXPORT BOOL hb_setTrace()
+{
+   return hb_set.HB_SET_TRACE;
+}
+
+HB_EXPORT char * hb_setTraceFile()
+{
+   return hb_set.HB_SET_TRACEFILE;
+}
+
+HB_EXPORT char hb_setTraceStack()
+{
+   return hb_set.HB_SET_TRACESTACK;
+}
+
+HB_EXPORT int hb_setErrorLoop()
+{
+   return hb_set.HB_SET_ERRORLOOP;
+}
+
+HB_EXPORT BOOL hb_setOutputSafety()
+{
+   return hb_set.HB_SET_OUTPUTSAFETY;
+}
+
+HB_EXPORT BOOL hb_setBackgroundTasks()
+{
+   return hb_set.HB_SET_BACKGROUNDTASKS;
+}
+
+HB_EXPORT BOOL hb_setTrimFileName()
+{
+   return hb_set.HB_SET_TRIMFILENAME;
+}
+
+HB_EXPORT BOOL hb_setWinPrinter()
+{
+   return hb_set.hb_set_winprinter;
+}
+
+HB_EXPORT FHANDLE hb_setWinHan()
+{
+   return hb_set.hb_set_winhan;
+}
+
+HB_EXPORT char * hb_setPrinterJob()
+{
+   return hb_set.hb_set_printerjob;
+}
+
+HB_EXPORT int hb_setGTMode()
+{
+   return hb_set.HB_SET_GTMODE;
+}
+
+HB_EXPORT int hb_setBackGroundTick()
+{
+   return hb_set.HB_SET_BACKGROUNDTICK;
+}
+
+HB_EXPORT BOOL hb_setHardCommit()
+{
+   return hb_set.HB_SET_HARDCOMMIT;
+}
+
+HB_EXPORT BOOL hb_setForceOpt()
+{
+   return hb_set.HB_SET_FORCEOPT;
+}
+
+HB_EXPORT PHB_ITEM hb_setEOL()
+{
+   return hb_set.HB_SET_EOL;
+}
+
+HB_EXPORT BOOL hb_setAppendError()
+{
+   return hb_set.HB_SET_APPENDERROR;
+}
+
+HB_EXPORT char * hb_setErrorLog()
+{
+   return hb_set.HB_SET_ERRORLOG;
+}
+
+HB_EXPORT char * hb_setTimeFormat()
+{
+   return hb_set.HB_SET_TIMEFORMAT;
 }

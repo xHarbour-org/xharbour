@@ -1,5 +1,5 @@
 /*
- * $Id: cmdarg.c,v 1.23 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: cmdarg.c,v 1.24 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -116,7 +116,7 @@ int hb_cmdargARGC( void )
    return s_argc;
 }
 
-char ** hb_cmdargARGV( void )
+HB_EXPORT char ** hb_cmdargARGV( void )
 {
    return s_argv;
 }

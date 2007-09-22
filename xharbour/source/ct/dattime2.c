@@ -1,5 +1,5 @@
 /*
- * $Id: dattime2.c,v 1.2 2006/10/17 04:36:38 paultucker Exp $
+ * $Id: dattime2.c,v 1.3 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -123,7 +123,11 @@ HB_FUNC( CTODOW )
          szDow = hb_strdup( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_DAY + iDow ) );
          hb_strupr( szDow );
 
+#ifndef __EXPORT__
          if( hb_set.HB_SET_EXACT )
+#else
+         if( hb_setExact() )
+#endif
          {
             iEqual = (strlen(szDow) == strlen(szParam)) && ! memcmp(szDow, szParam, strlen(szParam) );
          }
@@ -169,7 +173,11 @@ HB_FUNC( CTOMONTH )
          szMonth = hb_strdup( ( char * ) hb_langDGetItem( HB_LANG_ITEM_BASE_MONTH + iMonth - 1 ) );
          hb_strupr( szMonth );
 
+#ifndef __EXPORT__
          if( hb_set.HB_SET_EXACT )
+#else
+         if( hb_setExact() )
+#endif
          {
             iEqual = (strlen(szMonth) == strlen(szParam)) && ! memcmp(szMonth, szParam, strlen(szParam) );
          }
@@ -249,7 +257,11 @@ HB_FUNC( DMY )
       szMDY[iLen] = ' ';
       iLen ++;
 
+#ifndef __EXPORT__
       if( hb_set.hb_set_century )
+#else
+      if( hb_setCentury() )
+#endif
       {
          snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;
@@ -305,7 +317,11 @@ HB_FUNC( MDY )
       }
       szMDY[iLen++] = ' ';
 
+#ifndef __EXPORT__
       if( hb_set.hb_set_century )
+#else
+      if( hb_setCentury() )
+#endif
       {
          snprintf( szMDY + iLen, 5, "%04d", iYear );
          iLen += 4;

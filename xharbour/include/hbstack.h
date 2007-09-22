@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.42 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.43 2007/04/17 20:46:35 ronpinkas Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ extern HB_STACK * hb_stack_ptr;
 extern HB_STACK hb_stackMT;
 #endif
 
-extern HB_EXPORT BOOL hb_stack_ready;
+extern BOOL hb_stack_ready;
 
 typedef struct
 {

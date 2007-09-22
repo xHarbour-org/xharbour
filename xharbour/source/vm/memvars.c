@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.125 2007/05/14 01:27:50 ronpinkas Exp $
+ * $Id: memvars.c,v 1.126 2007/05/29 01:52:31 ronpinkas Exp $
  */
 
 /*
@@ -443,7 +443,7 @@ static void hb_memvarAddPrivate( PHB_DYNS pDynSym )
 /*
  * This function returns current PRIVATE variables stack base
  */
-ULONG hb_memvarGetPrivatesBase( void )
+HB_EXPORT ULONG hb_memvarGetPrivatesBase( void )
 {
    HB_THREAD_STUB
 

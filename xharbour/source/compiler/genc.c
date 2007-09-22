@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.139 2007/05/24 21:41:36 enricomaria Exp $
+ * $Id: genc.c,v 1.140 2007/08/20 22:31:40 likewolf Exp $
  */
 
 /*
@@ -198,6 +198,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       if( hb_comp_iGenCOutput == HB_COMPGENC_REALCODE )
       {
          fprintf( yyc, "#include \"hbxvm.h\"\n" );
+         fprintf( yyc, "#include \"hbapierr.h\"\n" );
       }
       else if( hb_comp_iGenCOutput != HB_COMPGENC_COMPACT )
       {

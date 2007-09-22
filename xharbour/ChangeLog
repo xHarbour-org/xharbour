@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5707 2007/09/21 16:28:53 bdj Exp $
+ * $Id: ChangeLog,v 1.5708 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,125 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-22 12:35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rdd/dbcmd.c
+    ! fix compile error in MT mode when HB_API_MACROS and HB_STACK_MACROS
+
+  * source/compiler/gen.c
+    + "include hbapierr.h" to output file when compiling prg with /gc3 switch
+
+  * include/hbstack.h
+    ! improper qualifier for global variable:
+      extern HB_EXPORT BOOL hb_stack_ready -> extern BOOL hb_stack_ready
+
+  * include/thread.h
+    ! improper qualifier for global variables:
+      extern HB_EXPORT BOOL hb_vm_bQuitRequest -> extern BOOL hb_vm_bQuitRequest
+
+  * include/hbtrace.h
+    ! improper qualifier for global variables:
+      extern HB_EXPORT char * hb_tr_file_  -> extern char * hb_tr_file_
+      extern HB_EXPORT int    hb_tr_line_  -> extern int    hb_tr_line_
+      extern HB_EXPORT int    hb_tr_level_ -> extern int    hb_tr_level_
+
+      /*
+        NOTE:
+        HB_EXPORTS is only applicable to functions, _NOT_ _VARIABLES_.
+        Some compilers reject this situation. Although it does not have bad
+        effect when applied, but the symbols will appear in imported lib for
+        no valid reasons. I have corrected those ones on 2003 but don't know
+        why they appear again.
+       */
+
+  * include/hbapi.h
+  * source/vm/memvars.c
+  * source/vm/cmdarg.c
+    * hb_memvarGetPrivatesBase() exported
+    * hb_cmdargARGV() exported
+
+  * include/hbset.h
+  * source/rtl/set.c
+    + APIs to access hb_set members (required when working with DLLs):
+       + hb_setAltHan()
+       + hb_setCentury()
+       + hb_setExtraHan()
+       + hb_setPrintHan()
+       + hb_setAlternate()
+       + hb_setAltFile()
+       + hb_setAutOpen()
+       + hb_setAutOrder()
+       + hb_setAutoShare()
+       + hb_setBell()
+       + hb_setCancel()
+       + hb_setColor()
+       + hb_setConfirm()
+       + hb_setConsole()
+       + hb_setDateFormat()
+       + hb_setDebug()
+       + hb_setDecimals()
+       + hb_setDefault()
+       + hb_setDeleted()
+       + hb_setDelimChars()
+       + hb_setDelimiters()
+       + hb_setDevice()
+       + hb_setEOF()
+       + hb_setEpoch()
+       + hb_setEscape()
+       + hb_setEventMask()
+       + hb_setExact()
+       + hb_setExclusive()
+       + hb_setExit()
+       + hb_setExtra()
+       + hb_setExtraFile()
+       + hb_setFixed()
+       + hb_setIdleRepeat()
+       + hb_setInsert()
+       + hb_setIntensity()
+       + hb_setPath()
+       + hb_setMargin()
+       + hb_setMBlockSize()
+       + hb_setMCenter()
+       + hb_setMessage()
+       + hb_setMFileExt()
+       + hb_setOptimize()
+       + hb_setPrinter()
+       + hb_setPrintFile()
+       + hb_setScoreBoard()
+       + hb_setScrollBreak()
+       + hb_setSoftSeek()
+       + hb_setStrictRead()
+       + hb_setTypeAhead()
+       + hb_setUnique()
+       + hb_setFileCase()
+       + hb_setDirCase()
+       + hb_setDirSeparator()
+       + hb_setVideoMode()
+       + hb_setWrap()
+       + hb_setDBFLockScheme()
+       + hb_setTrace()
+       + hb_setTraceFile()
+       + hb_setTraceStack()
+       + hb_setErrorLoop()
+       + hb_setOutputSafety()
+       + hb_setBackgroundTasks()
+       + hb_setTrimFileName()
+       + hb_setWinPrinter()
+       + hb_setWinHan()
+       + hb_setPrinterJob()
+       + hb_setGTMode()
+       + hb_setBackGroundTick()
+       + hb_setHardCommit()
+       + hb_setForceOpt()
+       + hb_setEOL()
+       + hb_setAppendError()
+       + hb_setErrorLog()
+       + hb_setTimeFormat()
+
+  * source/ct/ctnet.c
+  * source/ct/dattime2.c
+  * source/ct/misc3.c
+    ! protect direct access to hb_set when __EXPORT__
 
 2007-09-21 22:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/dbgbrwsr.prg

@@ -1,5 +1,5 @@
 /*
- *  $Id: misc3.c,v 1.1 2005/12/19 23:22:46 ptsarenko Exp $
+ *  $Id: misc3.c,v 1.1 2005/12/19 19:13:51 ptsarenko Exp $
  */
 
 /*
@@ -68,7 +68,11 @@ HB_FUNC( KBDSTAT )
    if ( iState & GTI_KBD_SCROLOCK ) iRet += 0x10;
    if ( iState & GTI_KBD_NUMLOCK ) iRet += 0x20;
    if ( iState & GTI_KBD_CAPSLOCK ) iRet += 0x40;
+#ifndef __EXPORT__
    if ( hb_set.HB_SET_INSERT ) iRet += 0x80;
+#else
+   if ( hb_setInsert() ) iRet += 0x80;
+#endif
 
    hb_retni( iRet );
 }
