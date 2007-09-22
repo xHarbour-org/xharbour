@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.78 2007/09/10 12:06:11 paultucker Exp $
+ * $Id: set.c,v 1.79 2007/09/22 05:41:01 andijahja Exp $
  */
 
 /*
@@ -62,7 +62,7 @@
 #include "hbapilng.h"
 #include "hbset.h"
 
-HB_EXPORT HB_SET_STRUCT hb_set;
+HB_SET_STRUCT hb_set;
 HB_SET_STRUCT * hb_set_ptr = &hb_set;
 
 typedef struct HB_SET_LISTENER_
