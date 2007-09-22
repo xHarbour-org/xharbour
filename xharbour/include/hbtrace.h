@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.14 2005/11/12 20:50:43 ronpinkas Exp $
+ * $Id: hbtrace.h,v 1.15 2006/07/27 12:21:30 lculik Exp $
  */
 
 /*
@@ -216,9 +216,9 @@ extern HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... 
  */
 #define HB_TRACE_STEALTH(l, x)            HB_ECHO_STEALTH_##l(x)
 
-extern HB_EXPORT char * hb_tr_file_;
-extern HB_EXPORT int    hb_tr_line_;
-extern HB_EXPORT int    hb_tr_level_;
+extern char * hb_tr_file_;
+extern int    hb_tr_line_;
+extern int    hb_tr_level_;
 
 extern int  hb_tracestate( int new_state );
 extern int  hb_tracelevel( int new_level );
