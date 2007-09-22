@@ -8,6 +8,10 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-09-22 18:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/common/hbtrace.c
+    ! variables to conform with declarations
+
 2007-09-22 17:55 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/set.c
     ! minor formating, hb_set*() -> hb_set*( void ) - Thanks Przemek

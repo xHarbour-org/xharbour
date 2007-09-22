@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.10 2007/08/08 22:21:06 lculik Exp $
+ * $Id: hbtrace.c,v 1.11 2007/08/13 10:42:02 ronpinkas Exp $
  */
 
 /*
@@ -64,9 +64,9 @@
 #define dup    _dup
 #define fileno _fileno
 #endif
-HB_EXPORT char * hb_tr_file_ = "";
-HB_EXPORT int    hb_tr_line_ = 0;
-HB_EXPORT int    hb_tr_level_ = 0;
+char * hb_tr_file_ = "";
+int    hb_tr_line_ = 0;
+int    hb_tr_level_ = 0;
 
 static int s_enabled = 1;
 static int s_flush   = 0;
