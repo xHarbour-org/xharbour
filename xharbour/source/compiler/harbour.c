@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.165 2007/08/09 11:55:59 patrickmast Exp $
+ * $Id: harbour.c,v 1.166 2007/08/22 09:54:02 marchuet Exp $
  */
 
 /*
@@ -166,7 +166,6 @@ PENUMDEF       hb_comp_pEnum;
 char *         hb_comp_szFromEnum;
 
 int            hb_comp_iLine;                             /* currently processed line number (globaly) */
-PLINEINFO      hb_comp_pLineInfo;                         /* line number info */
 char *         hb_comp_szFile;                            /* File Name of last compiled line */
 char *         hb_comp_FileAsSymbol;                      /* File Name of last compiled line to be used in program body */
 char *         hb_comp_PrgFileName;                       /* Original PRG File Name */
@@ -3260,52 +3259,6 @@ void hb_compLinePush( void ) /* generates the pcode with the currently compiled 
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +1 ] = HB_LOBYTE( iLine );
          hb_comp_functions.pLast->pCode[ hb_comp_ulLastLinePos +2 ] = HB_HIBYTE( iLine );
       }
-
-      /* Add as a valid stop line */
-      if ( hb_comp_bDebugInfo )
-      {
-         PLINEINFO pInfo = hb_comp_pLineInfo;
-
-         while ( pInfo )
-         {
-            if ( !strcmp( hb_pp_fileName( hb_comp_PP ), pInfo->szModule ) )
-            {
-               break;
-            }
-            pInfo = pInfo->pNext;
-         }
-         if ( !pInfo )
-         {
-            pInfo = (PLINEINFO) hb_xgrab( sizeof( LINEINFO ) );
-            pInfo->szModule = hb_strdup( hb_pp_fileName( hb_comp_PP ) );
-            pInfo->ulLineMin = (ULONG)-1;
-            pInfo->ulLineMax = 0;
-            pInfo->ulLineAlloc = 1024;
-            pInfo->pLines = (ULONG *) hb_xgrab( pInfo->ulLineAlloc * sizeof( ULONG ) );
-            pInfo->ulLineCount = 0;
-            pInfo->pNext = hb_comp_pLineInfo;
-            hb_comp_pLineInfo = pInfo;
-         }
-         else if ( pInfo->ulLineAlloc == pInfo->ulLineCount )
-         {
-            pInfo->ulLineAlloc *= 2;
-            pInfo->pLines = (ULONG *) hb_xrealloc( pInfo->pLines,
-                                         pInfo->ulLineAlloc * sizeof( ULONG ) );
-         }
-         if ( pInfo->ulLineCount == 0
-              || pInfo->pLines[ pInfo->ulLineCount - 1 ] != (ULONG)iLine )
-         {
-            pInfo->pLines[ pInfo->ulLineCount++ ] = iLine;
-            if ( (ULONG)iLine < pInfo->ulLineMin )
-            {
-               pInfo->ulLineMin = iLine;
-            }
-            if ( (ULONG)iLine > pInfo->ulLineMax )
-            {
-               pInfo->ulLineMax = iLine;
-            }
-         }
-      }
    }
 
    if( hb_comp_functions.pLast->bFlags & FUN_BREAK_CODE )
@@ -5498,7 +5451,6 @@ static void hb_compInitVars( void )
 
    hb_comp_pEnum          = NULL;
 
-   hb_comp_pLineInfo      = NULL;
    hb_comp_pLineNumberFunc = NULL;
 }
 
@@ -5789,44 +5741,36 @@ static int hb_compCompile( char * szPrg )
 
             if ( hb_comp_bLineNumbers && hb_comp_bDebugInfo )
             {
-               PLINEINFO pInfo;
-               int iModules = 0;
+               PHB_DEBUGINFO pInfo = hb_compGetDebugInfo(), pNext;
 
-               hb_compLineNumberDefStart();
-               while ( ( pInfo = hb_comp_pLineInfo ) != NULL )
+               if ( pInfo )
                {
-                  int iLen;
-                  ULONG i;
-                  BYTE *pBuffer;
+                  int iModules = 0;
 
-                  pInfo->ulLineMin -= pInfo->ulLineMin % 8;
-
-                  iLen = ( pInfo->ulLineMax + 1 - pInfo->ulLineMin + 7 ) / 8;
-                  pBuffer = (BYTE *) hb_xgrab( iLen + 1 );
-                  hb_xmemset( pBuffer, 0, iLen + 1 );
-                  for ( i = 0; i < pInfo->ulLineCount; i++ )
+                  hb_compLineNumberDefStart();
+                  do
                   {
-                     ULONG ulLine = pInfo->pLines[ i ] - pInfo->ulLineMin;
+                     ULONG ulSkip = pInfo->ulFirstLine >> 3;
+                     ULONG ulLen = ( ( pInfo->ulLastLine + 7 ) >> 3 ) - ulSkip;
 
-                     pBuffer[ ulLine / 8 ] |= (BYTE)( 1 << ( ulLine % 8 ) );
-                  }
+                     hb_compGenPushString( pInfo->pszModuleName, strlen( pInfo->pszModuleName ) + 1 );
+                     hb_compGenPushLong( ulSkip << 3 );
+                     hb_compGenPushString( ( char * ) pInfo->pLineMap + ulSkip, ulLen + 1 );
+                     hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
+                     iModules++;
 
-                  hb_compGenPushString( pInfo->szModule, strlen( pInfo->szModule ) + 1 );
-                  hb_compGenPushLong( pInfo->ulLineMin );
-                  hb_compGenPushString( (char *) pBuffer, (size_t)( iLen + 1 ) );
-                  hb_xfree( pBuffer );
-                  hb_compGenPCode3( HB_P_ARRAYGEN, 3, 0, (BOOL)0 );
-                  iModules++;
+                     pNext = pInfo->pNext;
+                     hb_xfree( pInfo->pszModuleName );
+                     hb_xfree( pInfo->pLineMap );
+                     hb_xfree( pInfo );
+                     pInfo = pNext;
+                  } while ( pInfo );
 
-                  hb_comp_pLineInfo = pInfo->pNext;
-                  hb_xfree( pInfo->pLines );
-                  hb_xfree( pInfo->szModule );
-                  hb_xfree( pInfo );
+                  hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), (BOOL)0 );
+                  hb_compGenPCode1( HB_P_RETVALUE );
+                  hb_compLineNumberDefEnd();
+                  hb_compAddInitFunc( hb_comp_pLineNumberFunc );
                }
-               hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), (BOOL)0 );
-               hb_compGenPCode1( HB_P_RETVALUE );
-               hb_compLineNumberDefEnd();
-               hb_compAddInitFunc( hb_comp_pLineNumberFunc );
             }
 
             if( hb_comp_pGlobalsFunc )

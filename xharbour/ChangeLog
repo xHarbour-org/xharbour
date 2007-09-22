@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5711 2007/09/22 07:10:32 andijahja Exp $
+ * $Id: ChangeLog,v 1.5712 2007/09/22 07:21:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-22 13:46 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbcomp.h
+  * source/compiler/harbour.c
+    ! Use hb_compGetDebugInfo() to collect stopline info for debugger
+      after all optimizations instead of collecting it dynamically and
+      not respecting optimizations. Based on Harbour code by Przemyslaw
+      Czerpak.
 
 2007-09-22 14:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/vm/estack.c

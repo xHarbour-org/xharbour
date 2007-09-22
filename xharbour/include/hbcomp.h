@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.55 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbcomp.h,v 1.56 2007/05/24 16:03:14 ronpinkas Exp $
  */
 
 /*
@@ -253,17 +253,6 @@ typedef struct _AUTOOPEN
    struct _AUTOOPEN * pNext;
 } AUTOOPEN, * PAUTOOPEN;      /* support structure for extern symbols */
 
-typedef struct _LINEINFO
-{
-   char *szModule;
-   ULONG ulLineMin;
-   ULONG ulLineMax;
-   ULONG *pLines;
-   ULONG ulLineCount;
-   ULONG ulLineAlloc;
-   struct _LINEINFO *pNext;
-} LINEINFO, *PLINEINFO;       /* support structure for line number info */
-
 typedef struct _HB_DEBUGINFO
 {
    char *   pszModuleName;
@@ -272,7 +261,7 @@ typedef struct _HB_DEBUGINFO
    ULONG    ulAllocated;
    BYTE *   pLineMap;
    struct _HB_DEBUGINFO * pNext;
-} HB_DEBUGINFO, * PHB_DEBUGINFO;
+} HB_DEBUGINFO, * PHB_DEBUGINFO;       /* support structure for line number info */
 
 typedef struct _HB_LABEL_INFO
 {
