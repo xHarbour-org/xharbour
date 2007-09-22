@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.88 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: estack.c,v 1.89 2007/09/22 07:21:25 andijahja Exp $
  */
 
 /*
@@ -78,7 +78,7 @@ HB_STACK hb_stackST;
 HB_STACK * hb_stack_ptr = &hb_stackST;
 #endif
 
-bool hb_stack_ready = FALSE;
+BOOL hb_stack_ready = FALSE;
 
 /* ------------------------------- */
 
