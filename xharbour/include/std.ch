@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.21 2007/09/14 12:59:58 lculik Exp $
+ * $Id: std.ch,v 1.22 2007/09/15 15:29:10 lculik Exp $
  */
 
 /*
@@ -166,6 +166,7 @@
 #command SET MARGIN TO                 => Set( _SET_MARGIN, 0 )
 #command SET DEVICE TO SCREEN          => Set( _SET_DEVICE, "SCREEN" )
 #command SET DEVICE TO PRINTER         => Set( _SET_DEVICE, "PRINTER" )
+#command SET GTMODE TO <m:INLINE,DETACHED> => Set( _SET_GTMODE, <(m)> )
 #command SET COLOR TO [<*c*>]          => SetColor( #<c> )
 #command SET COLOR TO ( <c> )          => SetColor( <c> )
 #command SET COLOUR TO [<*c*>]         => SET COLOR TO [<c>]
