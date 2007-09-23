@@ -8,6 +8,11 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-09-23 11.55 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rtl/cdpapi.c
+  * include/hbapicdp.h
+    + hb_cdppage() to access hb_cdp_page from outside (DLL)
+
 2007-09-23 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/regex.c
   * source/pcre/pcreposix.c

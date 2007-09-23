@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.29 2007/01/11 21:06:52 druzus Exp $
+ * $Id: cdpapi.c,v 1.30 2007/03/02 02:36:23 druzus Exp $
  */
 
 /*
@@ -102,6 +102,10 @@ static HB_CODEPAGE  s_en_codepage = { "EN",CPID_437,UNITB_437,0,NULL,NULL,0,0,0,
 static PHB_CODEPAGE s_cdpList[ HB_CDP_MAX_ ] = { &s_en_codepage };
 PHB_CODEPAGE hb_cdp_page = &s_en_codepage;
 
+HB_EXPORT PHB_CODEPAGE hb_cdppage( void )
+{
+   return hb_cdp_page;
+}
 
 static int utf8Size( USHORT uc )
 {
@@ -255,7 +259,7 @@ static int hb_cdpFindPos( char * pszID )
    return -1;
 }
 
-HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
+BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_cdpRegister(%p)", cdpage));
 
@@ -420,7 +424,7 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
    return FALSE;
 }
 
-HB_EXPORT PHB_CODEPAGE hb_cdpFind( char * pszID )
+PHB_CODEPAGE hb_cdpFind( char * pszID )
 {
    int iPos;
 
@@ -431,7 +435,7 @@ HB_EXPORT PHB_CODEPAGE hb_cdpFind( char * pszID )
    return ( iPos != -1 ) ? s_cdpList[ iPos ] : NULL;
 }
 
-HB_EXPORT PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
+PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
 {
    PHB_CODEPAGE cdpOld = hb_cdp_page;
 
@@ -445,7 +449,7 @@ HB_EXPORT PHB_CODEPAGE hb_cdpSelect( PHB_CODEPAGE cdpage )
    return cdpOld;
 }
 
-HB_EXPORT char * hb_cdpSelectID( char * pszID )
+char * hb_cdpSelectID( char * pszID )
 {
    char * pszIDOld = hb_cdp_page->id;
 
@@ -456,7 +460,7 @@ HB_EXPORT char * hb_cdpSelectID( char * pszID )
    return pszIDOld;
 }
 
-HB_EXPORT void hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut )
+void hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut )
 {
    int n;
 
@@ -478,7 +482,7 @@ HB_EXPORT void hb_cdpTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpO
    }
 }
 
-HB_EXPORT void hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut, ULONG nChars )
+void hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdpOut, ULONG nChars )
 {
    int n;
    ULONG i;
@@ -501,7 +505,7 @@ HB_EXPORT void hb_cdpnTranslate( char* psz, PHB_CODEPAGE cdpIn, PHB_CODEPAGE cdp
    }
 }
 
-HB_EXPORT USHORT hb_cdpGetU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch )
+USHORT hb_cdpGetU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch )
 {
    USHORT u;
 
@@ -517,7 +521,7 @@ HB_EXPORT USHORT hb_cdpGetU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch )
    return u;
 }
 
-HB_EXPORT ULONG hb_cdpUTF8StringLength( BYTE * pSrc, ULONG ulLen )
+ULONG hb_cdpUTF8StringLength( BYTE * pSrc, ULONG ulLen )
 {
    ULONG ul, ulDst;
    USHORT uc;
@@ -535,7 +539,7 @@ HB_EXPORT ULONG hb_cdpUTF8StringLength( BYTE * pSrc, ULONG ulLen )
    return ulDst;
 }
 
-HB_EXPORT ULONG hb_cdpStringInUTF8Length( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE * pSrc, ULONG ulLen )
+ULONG hb_cdpStringInUTF8Length( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE * pSrc, ULONG ulLen )
 {
    ULONG ul, ulDst;
 
@@ -547,7 +551,7 @@ HB_EXPORT ULONG hb_cdpStringInUTF8Length( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE * p
    return ulDst;
 }
 
-HB_EXPORT ULONG hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp, BOOL fCtrl,
+ULONG hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp, BOOL fCtrl,
                                   BYTE * pSrc, ULONG ulSrc,
                                   BYTE * pDst, ULONG ulDst )
 {
@@ -589,7 +593,7 @@ HB_EXPORT ULONG hb_cdpUTF8ToStrn( PHB_CODEPAGE cdp, BOOL fCtrl,
    return ulD;
 }
 
-HB_EXPORT BOOL hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch, int * n, USHORT * uc )
+BOOL hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch, int * n, USHORT * uc )
 {
    if( utf8tou16nextchar( ch, n, uc ) )
    {
@@ -611,7 +615,7 @@ HB_EXPORT BOOL hb_cdpGetFromUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE ch, int * n
    return FALSE;
 }
 
-HB_EXPORT ULONG hb_cdpStrnToUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULONG ulLen, BYTE* pDst )
+ULONG hb_cdpStrnToUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULONG ulLen, BYTE* pDst )
 {
    USHORT u, *uniCodes, nChars;
    ULONG i, n;
@@ -654,7 +658,7 @@ HB_EXPORT ULONG hb_cdpStrnToUTF8( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULON
    return n;
 }
 
-HB_EXPORT ULONG hb_cdpStrnToU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULONG ulLen, BYTE* pDst )
+ULONG hb_cdpStrnToU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULONG ulLen, BYTE* pDst )
 {
    USHORT u, *uniCodes, nChars;
    ULONG i;
@@ -695,7 +699,7 @@ HB_EXPORT ULONG hb_cdpStrnToU16( PHB_CODEPAGE cdp, BOOL fCtrl, BYTE* pSrc, ULONG
    return i<<1;
 }
 
-HB_EXPORT int hb_cdpchrcmp( char cFirst, char cSecond, PHB_CODEPAGE cdpage )
+int hb_cdpchrcmp( char cFirst, char cSecond, PHB_CODEPAGE cdpage )
 {
    int n1, n2;
 
@@ -710,7 +714,7 @@ HB_EXPORT int hb_cdpchrcmp( char cFirst, char cSecond, PHB_CODEPAGE cdpage )
 
 }
 
-HB_EXPORT int hb_cdpcmp( char* szFirst, ULONG ulLenFirst, char* szSecond, ULONG ulLenSecond, PHB_CODEPAGE cdpage, BOOL bExact )
+int hb_cdpcmp( char* szFirst, ULONG ulLenFirst, char* szSecond, ULONG ulLenSecond, PHB_CODEPAGE cdpage, BOOL bExact )
 {
    ULONG ul, ulLen;
    int iRet = 0, n1, n2;
@@ -838,7 +842,7 @@ HB_EXPORT int hb_cdpcmp( char* szFirst, ULONG ulLenFirst, char* szSecond, ULONG 
    return iRet;
 }
 
-HB_EXPORT void hb_cdpReleaseAll( void )
+void hb_cdpReleaseAll( void )
 {
    int iPos = 0;
 
