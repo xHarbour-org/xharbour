@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5718 2007/09/23 05:02:11 andijahja Exp $
+ * $Id: ChangeLog,v 1.5719 2007/09/23 13:05:30 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-23 21:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+   * source\rtl\cstruct.prg
+     * Use HB_ArrayID() when scanning aObjs to avoid possible overloading of ==
+
+  * source/rtl/win32ole.prg
+    + Added explcit implemetations of ::Invoke(), ::Get(), and ::Set() instead of redirection to OnError
+    + Added Xbase++ compatible MESSAGEs ::CallMethod(), ::GetProperty(), and ::SetProperty()
+    * Corrected possible Missing Release() of default value interface
+    * Corrected few typos in oErr:Operation generation
 
 2007-09-23 09:00 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * include/std.ch

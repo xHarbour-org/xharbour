@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.36 2007/04/15 21:55:55 ronpinkas Exp $
+ * $Id: cstr.prg,v 1.37 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             aObjs := {}
             cRet  := cName + " := "
          ELSE
-            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+            IF ( nObj := aScan( aObjs, {|a| HB_ArrayID( a[1] ) == HB_ArrayID( xVal ) } ) ) > 0
                 RETURN aObjs[ nObj ][2] + " /* Cyclic */"
             ENDIF
 
@@ -265,7 +265,7 @@ FUNCTION ValToPrg( xVal, cName, nPad, aObjs )
             aObjs := {}
             cRet  := cName + " := "
          ELSE
-            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+            IF ( nObj := aScan( aObjs, {|a| HB_ArrayID( a[1] ) == HB_ArrayID( xVal ) } ) ) > 0
                 RETURN aObjs[ nObj ][2] + " /* Cyclic */"
             ENDIF
 
@@ -340,7 +340,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
             cName := "M->__ValToPrgExp_Array"
             aObjs := {}
          ELSE
-            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+            IF ( nObj := aScan( aObjs, {|a| HB_ArrayID( a[1] ) == HB_ArrayID( xVal ) } ) ) > 0
                 RETURN  aObjs[ nObj ][2]
             ENDIF
          ENDIF
@@ -392,7 +392,7 @@ FUNCTION ValToPrgExp( xVal, cName, aObjs, lBin )
             cName := "M->__ValToPrgExp_Object"
             aObjs := {}
          ELSE
-            IF ( nObj := aScan( aObjs, {|a| a[1] == xVal } ) ) > 0
+            IF ( nObj := aScan( aObjs, {|a| HB_ArrayID( a[1] ) == HB_ArrayID( xVal ) } ) ) > 0
                 RETURN aObjs[ nObj ][2]
             ENDIF
          ENDIF
