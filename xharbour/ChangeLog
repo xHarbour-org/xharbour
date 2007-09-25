@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5719 2007/09/23 13:05:30 paultucker Exp $
+ * $Id: ChangeLog,v 1.5720 2007/09/24 01:56:06 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-24 22:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/rtl/dllcall.c
+    + Decalre hb_parcstruct() inside HB_EXTERN_BEGIN/HB_EXTERN_END to avoid C++ mangling
+  * source/vm/classesc.c
+    + Added #include "classes.h" to avoid c++ mangling for hb_objGetClass()
 
 2007-09-23 21:55 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
    * source\rtl\cstruct.prg

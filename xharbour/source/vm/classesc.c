@@ -1,5 +1,5 @@
 /*
- * $Id: classesc.c,v 1.3 2007/04/12 05:50:41 andresreyesh Exp $
+ * $Id: classesc.c,v 1.4 2007/04/26 04:06:41 andresreyesh Exp $
  */
 
 /*
@@ -58,18 +58,18 @@
  *    __CLS_PARAM
  *    __CLS_PAR00
  */
- 
+
  /* NOTE: Used by the preprocessor to implement Classy compatibility to Harbour
          Receive an variable number of param and return an array of it.
          No param will return a NULL array */
 
 #define HB_THREAD_OPTIMIZE_STACK
 
-
 #include "hbvmopt.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbapiitm.h"
+#include "classes.h"
 
 #ifdef HB_THREAD_SUPPORT
 #include "thread.h"
@@ -117,7 +117,7 @@ HB_FUNC( __CLS_PAR00 )
    {
       hb_arraySet( &Array, n, hb_param( n, HB_IT_ANY ) );
    }
-   
+
    hb_itemReturnForward( &Array );
 }
 
