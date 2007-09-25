@@ -3,7 +3,7 @@
 # юддддддддддддддддддддддыш
 #  ъъъъъъъъъъъъъъъъъъъъъъъъ
 #
-# $Id: makefile.dc,v 1.27 2007/09/03 18:04:26 paultucker Exp $
+# $Id: makefile.dc,v 1.28 2007/09/15 17:37:46 patrickmast Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -694,7 +694,9 @@ DBFNTX_LIB_OBJS = \
 HBSIX_LIB_OBJS = \
    $(HBSIX_OBJ_DIR)\sxcompr.obj \
    $(HBSIX_OBJ_DIR)\sxcrypt.obj \
-   $(HBSIX_OBJ_DIR)\sxdate.obj
+   $(HBSIX_OBJ_DIR)\sxdate.obj \
+   \
+   $(HBSIX_OBJ_DIR)\sxfunc.obj 
 
 HSX_LIB_OBJS = \
    $(HSX_OBJ_DIR)\hsx.obj \
@@ -1893,6 +1895,12 @@ $(HBSIX_OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 $(HBSIX_OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
    $(CC_CMD)
 
+$(HBSIX_OBJ_DIR)\sxfunc.c : $(HBSIX_DIR)\sxfunc.prg
+   $(HB_CMD)
+
+$(HBSIX_OBJ_DIR)\sxfunc.obj : $(HBSIX_OBJ_DIR)\sxfunc.c
+   $(CC_CMD)      
+   
 # зддддддддддддддддддддддддд©
 # Ё HSX.LIB Dependencies    Ёш
 # юдддддддддддддддддддддддддыш

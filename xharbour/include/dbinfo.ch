@@ -1,5 +1,5 @@
 /*
- * $Id: dbinfo.ch,v 1.23 2006/04/15 18:52:23 druzus Exp $
+ * $Id: dbinfo.ch,v 1.24 2006/06/07 15:57:29 druzus Exp $
  */
 
 /*
@@ -72,12 +72,12 @@
 #define RDDI_REMOTE               11   /* Remote table access? */
 #define RDDI_CONNECTION           12   /* Get/Set default connection */
 #define RDDI_TABLETYPE            13   /* Type of table file */
-#define RDDI_MEMOTYPE             14   /* Type of MEMO file: DBT, SMT, FPT(FP,SIX3,FLEXIII) */
+#define RDDI_MEMOTYPE             14   /* Type of MEMO file DB_MEMO_*: DBT, SMT, FPT(FP,SIX3,FLEXIII) */
 #define RDDI_LARGEFILE            15   /* Is large file size (>=4GB) supported */
 #define RDDI_LOCKSCHEME           16   /* Locking scheme used by RDD */
 #define RDDI_RECORDMAP            17   /* Does RDD support record map functionality? */
 #define RDDI_ENCRYPTION           18   /* Does RDD support encryption */
-#define RDDI_TRIGGERS             19   /* Get/Set default trigger function */
+#define RDDI_TRIGGER              19   /* Get/Set default trigger function */
 #define RDDI_AUTOLOCK             20   /* automatic locking on update */
 
 /* index parameters */
@@ -100,6 +100,11 @@
 #define RDDI_MEMOREADLOCK         35   /* use read lock in memo file access */
 #define RDDI_MEMOREUSE            36   /* reuse free space on write */
 #define RDDI_BLOB_SUPPORT         37   /* can support BLOB files directly */
+
+/* misc */
+#define RDDI_PENDINGTRIGGER       40   /* set pending trigger for next open operation */
+#define RDDI_PENDINGPASSWORD      41   /* set pending password for next open operation */
+#define RDDI_PASSWORD             42   /* Get/Set default password */
 
 /*
    Constants for SELF_ORDINFO ()
@@ -264,6 +269,8 @@
 #define DBI_MEMOVERSION         135  /* sub version of memo file */
 #define DBI_TABLETYPE           136   /* Type of table file */
 #define DBI_SCOPEDRELATION      137   /* Is given relation scoped */
+#define DBI_TRIGGER             138   /* Get/Set trigger function */
+#define DBI_OPENINFO            139   /* DBOPENINFO structure pointer */
 
 /* RECORD MAP (RM) support */
 #define DBI_RM_SUPPORTED        150  /* has WA RDD record map support? */

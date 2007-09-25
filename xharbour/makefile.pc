@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.51 2007/09/12 14:49:45 modalsist Exp $
+# $Id: makefile.pc,v 1.52 2007/09/15 17:37:46 patrickmast Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -541,8 +541,10 @@ DBFNTX_LIB_OBJS = \
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
-   $(OBJ_DIR)\sxdate.obj
-
+   $(OBJ_DIR)\sxdate.obj \
+   \
+   $(OBJ_DIR)\sxfunc.obj
+   
 HSX_LIB_OBJS = \
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj
@@ -1519,6 +1521,12 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
    $(CC_CMD)
+   
+$(OBJ_DIR)\sxfunc.c : $(HBSIX_DIR)\sxfunc.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sxfunc.obj : $(OBJ_DIR)\sxfunc.c
+   $(CC_CMD)   
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
 # � HSX.LIB dependencies 넴

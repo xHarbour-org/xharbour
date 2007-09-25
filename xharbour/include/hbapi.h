@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.217 2007/09/17 11:28:18 jfgimenez Exp $
+ * $Id: hbapi.h,v 1.218 2007/09/22 05:41:00 andijahja Exp $
  */
 
 /*
@@ -67,23 +67,23 @@ HB_EXTERN_BEGIN
 #define HB_MAX_ENUMERATIONS 64
 
 /* items types and type checking macros */
-#define HB_IT_NIL       ( ( HB_TYPE ) 0x0000 )
-#define HB_IT_POINTER   ( ( HB_TYPE ) 0x0001 )
-#define HB_IT_INTEGER   ( ( HB_TYPE ) 0x0002 )
-#define HB_IT_HASH      ( ( HB_TYPE ) 0x0004 )
-#define HB_IT_LONG      ( ( HB_TYPE ) 0x0008 )
-#define HB_IT_DOUBLE    ( ( HB_TYPE ) 0x0010 )
-#define HB_IT_DATE      ( ( HB_TYPE ) 0x0020 )
-#define HB_IT_LOGICAL   ( ( HB_TYPE ) 0x0080 )
-#define HB_IT_SYMBOL    ( ( HB_TYPE ) 0x0100 )
-#define HB_IT_ALIAS     ( ( HB_TYPE ) 0x0200 )
-#define HB_IT_STRING    ( ( HB_TYPE ) 0x0400 )
-#define HB_IT_MEMOFLAG  ( ( HB_TYPE ) 0x0800 )
+#define HB_IT_NIL       ( ( HB_TYPE ) 0x00000 )
+#define HB_IT_POINTER   ( ( HB_TYPE ) 0x00001 )
+#define HB_IT_INTEGER   ( ( HB_TYPE ) 0x00002 )
+#define HB_IT_HASH      ( ( HB_TYPE ) 0x00004 )
+#define HB_IT_LONG      ( ( HB_TYPE ) 0x00008 )
+#define HB_IT_DOUBLE    ( ( HB_TYPE ) 0x00010 )
+#define HB_IT_DATE      ( ( HB_TYPE ) 0x00020 )
+#define HB_IT_LOGICAL   ( ( HB_TYPE ) 0x00080 )
+#define HB_IT_SYMBOL    ( ( HB_TYPE ) 0x00100 )
+#define HB_IT_ALIAS     ( ( HB_TYPE ) 0x00200 )
+#define HB_IT_STRING    ( ( HB_TYPE ) 0x00400 )
+#define HB_IT_MEMOFLAG  ( ( HB_TYPE ) 0x00800 )
 #define HB_IT_MEMO      ( HB_IT_MEMOFLAG | HB_IT_STRING )
-#define HB_IT_BLOCK     ( ( HB_TYPE ) 0x1000 )
-#define HB_IT_BYREF     ( ( HB_TYPE ) 0x2000 )
-#define HB_IT_MEMVAR    ( ( HB_TYPE ) 0x4000 )
-#define HB_IT_ARRAY     ( ( HB_TYPE ) 0x8000 )
+#define HB_IT_BLOCK     ( ( HB_TYPE ) 0x01000 )
+#define HB_IT_BYREF     ( ( HB_TYPE ) 0x02000 )
+#define HB_IT_MEMVAR    ( ( HB_TYPE ) 0x04000 )
+#define HB_IT_ARRAY     ( ( HB_TYPE ) 0x08000 )
 #define HB_IT_DATETIME  ( ( HB_TYPE ) 0x10000 )
 #define HB_IT_TIMESTAMP ( ( HB_TYPE ) 0x20000 )
 #define HB_IT_OLE       ( ( HB_TYPE ) 0x40000 )
@@ -626,6 +626,11 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject); /* returns a duplicate
                           ( c ) == HB_CHAR_LF || \
                           ( c ) == HB_CHAR_CR )
 
+#define HB_ISFIRSTIDCHAR(c)   ( ( (c) >= 'A' && (c) <= 'Z' ) || \
+                                ( (c) >= 'a' && (c) <= 'z' ) || (c) == '_' )
+#define HB_ISNEXTIDCHAR(c)    ( HB_ISFIRSTIDCHAR(c) || \
+                                ( ( (c) >= '0' && (c) <= '9' ) ) )
+                          
 extern const char * hb_szAscii[256];      /* array of 1 character length strings */
 
 extern HB_EXPORT int      hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */
@@ -715,6 +720,7 @@ extern HB_EXPORT PHB_SYMB    hb_dynsymGetSymbol( const char * szName ); /* finds
 extern HB_EXPORT PHB_SYMB    hb_dynsymFindSymbol( const char * szName ); /* finds a dynamic symbol and return pointer to its HB_SYMB structure */
 extern HB_EXPORT PHB_SYMB    hb_dynsymSymbol( PHB_DYNS pDynSym );
 extern HB_EXPORT char *      hb_dynsymName( PHB_DYNS pDynSym ); /* return dynamic symbol name */
+extern HB_EXPORT BOOL        hb_dynsymIsFunction( PHB_DYNS pDynSym );
 extern HB_EXPORT HB_HANDLE   hb_dynsymMemvarHandle( PHB_DYNS pDynSym ); /* return memvar handle number bound with given dynamic symbol */
 extern HB_EXPORT HB_HANDLE   hb_dynsymAreaHandle( PHB_DYNS pDynSym ); /* return work area number bound with given dynamic symbol */
 extern HB_EXPORT void        hb_dynsymSetAreaHandle( PHB_DYNS pDynSym, const int iArea ); /* set work area number for a given dynamic symbol */

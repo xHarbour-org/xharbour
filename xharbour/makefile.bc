@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.202 2007/09/03 18:04:26 paultucker Exp $
+# $Id: makefile.bc,v 1.203 2007/09/15 17:37:45 patrickmast Exp $
 #
 
 #
@@ -667,7 +667,9 @@ BMSIXCDX_LIB_OBJS = \
 HBSIX_LIB_OBJS = \
    $(SIX_OBJ_DIR)\sxcompr.obj \
    $(SIX_OBJ_DIR)\sxcrypt.obj \
-   $(SIX_OBJ_DIR)\sxdate.obj
+   $(SIX_OBJ_DIR)\sxdate.obj \
+   \
+   $(SIX_OBJ_DIR)\sxfunc.obj
 
 HSX_LIB_OBJS = \
    $(HSX_OBJ_DIR)\hsx.obj \
@@ -2947,6 +2949,12 @@ $(SIX_OBJ_DIR)\sxcrypt.obj : $(RDD_DIR)\hbsix\sxcrypt.c
 $(SIX_OBJ_DIR)\sxdate.obj : $(RDD_DIR)\hbsix\sxdate.c
    $(CC_CMD)
 
+$(SIX_OBJ_DIR)\sxfunc.c : $(RDD_DIR)\hbsix\sxfunc.prg
+   $(HB_CMD)
+
+$(SIX_OBJ_DIR)\sxfunc.obj : $(SIX_OBJ_DIR)\sxfunc.c
+   $(CC_CMD)
+   
 #
 # HSX.LIB dependencies
 #

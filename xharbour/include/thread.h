@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.114 2007/03/25 06:12:49 walito Exp $
+* $Id: thread.h,v 1.115 2007/04/17 20:46:35 ronpinkas Exp $
 */
 
 /*
@@ -426,14 +426,17 @@ struct tag_HB_THREAD_ID;
 
 typedef struct tag_HB_STACK
 {
-   PHB_ITEM * pItems;       /* pointer to the stack items */
-   PHB_ITEM * pPos;         /* pointer to the latest used item */
-   LONG     wItems;       /* total items that may be holded on the stack */
-   HB_ITEM  Return;       /* latest returned value */
-   PHB_ITEM * pBase;        /* stack frame position for the current function call */
-   PHB_ITEM * pEvalBase;    /* stack frame position for the evaluated codeblock */
-   int      iStatics;     /* statics base for the current function call */
-   char     szDate[ 26 ];  /* last returned date from _pards() yyyymmdd format */
+   PHB_ITEM * pItems;           /* pointer to the stack items */
+   PHB_ITEM * pPos;             /* pointer to the latest used item */
+   LONG       wItems;           /* total items that may be holded on the stack */
+   HB_ITEM    Return;           /* latest returned value */
+   PHB_ITEM * pBase;            /* stack frame position for the current function call */
+   PHB_ITEM * pEvalBase;        /* stack frame position for the evaluated codeblock */
+   LONG       lStatics;         /* statics base for the current function call */
+   LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
+   ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
+   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */   
+   char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -466,9 +469,6 @@ typedef struct tag_HB_STACK
 
    /* List of error handlers for TRY/CATCH blocks */
    PHB_ITEM aTryCatchHandlerStack;
-   /* VM requests and recover sequence */
-   USHORT uiActionRequest;
-   ULONG lRecoverBase;
 
    /* Mt With Object index */
    HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.89 2007/09/22 07:21:25 andijahja Exp $
+ * $Id: estack.c,v 1.90 2007/09/22 07:27:02 andijahja Exp $
  */
 
 /*
@@ -90,18 +90,28 @@ HB_EXPORT void hb_stackPop( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPop()"));
 
    if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) )
-   {
       hb_itemClear( *( HB_VM_STACK.pPos - 1 ) );
-   }
    else
-   {
       ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL;
-   }
 
    if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
-   {
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
-   }
+}
+
+#undef hb_stackPopReturn
+void hb_stackPopReturn( void )
+{
+   HB_THREAD_STUB
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackPopReturn()"));
+
+   if( HB_IS_COMPLEX( &HB_VM_STACK.Return ) )
+      hb_itemClear( &HB_VM_STACK.Return );
+
+   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
+      hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );      
+
+   hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos );
 }
 
 #undef hb_stackDec
@@ -184,6 +194,20 @@ HB_EXPORT void hb_stackPush( void )
    HB_VM_STACK.pPos++;
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
+}
+
+#undef hb_stackPushReturn
+void hb_stackPushReturn( void )
+{
+   HB_THREAD_STUB
+   
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackPushReturn()"));
+
+   hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return );
+
+   /* enough room for another item ? */
+   if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) 
+      hb_stackIncrease();
 }
 
 void hb_stackIncrease( void )
@@ -296,7 +320,7 @@ HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams
       hb_errInternal( HB_EI_VMNOTSYMBOL, NULL, "hb_vmDo()", NULL );
    }
 
-   pStack->iStatics = HB_VM_STACK.iStatics;
+   pStack->lStatics = HB_VM_STACK.lStatics;
 
    pItem->item.asSymbol.stackbase = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    pItem->item.asSymbol.lineno = 0;
@@ -354,7 +378,7 @@ HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack )
    }
 
    HB_VM_STACK.pBase = HB_VM_STACK.pItems + stackbase;
-   HB_VM_STACK.iStatics = pStack->iStatics;
+   HB_VM_STACK.lStatics = pStack->lStatics;
 
    hb_vmRequest( uiRequest );
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.79 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: workarea.c,v 1.80 2007/05/18 09:36:57 marchuet Exp $
  */
 
 /*
@@ -762,15 +762,21 @@ static ERRCODE hb_waInfo( AREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
  * Called by SELF_ORDINFO if uiIndex is not supported.
  */
 #ifdef HB_COMPAT_C53
-static ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO param )
+static ERRCODE hb_waOrderInfo( AREAP pArea, USHORT index, LPDBORDERINFO pInfo )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_waOrderInfo(%p, %hu, %p)", pArea, index, param));
+   HB_TRACE(HB_TR_DEBUG, ("hb_waOrderInfo(%p, %hu, %p)", pArea, index, pInfo));
 
    HB_SYMBOL_UNUSED( pArea );
    HB_SYMBOL_UNUSED( index );
-   HB_SYMBOL_UNUSED( param );
 
-   hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBORDERINFO" );
+   if( pInfo->itmResult )
+      hb_itemClear( pInfo->itmResult );
+
+   /* CA-Cl*pper does not generate RT error when default ORDERINFO() method
+    * is called
+    */
+   /* hb_errRT_DBCMD( EG_ARG, EDBCMD_BADPARAMETER, NULL, "DBORDERINFO" ); */
+
    return FAILURE;
 }
 #endif
@@ -1627,7 +1633,6 @@ static ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection,
       case RDDI_REMOTE:
       case RDDI_RECORDMAP:
       case RDDI_ENCRYPTION:
-      case RDDI_TRIGGERS:
       case RDDI_AUTOLOCK:
       case RDDI_STRUCTORD:
       case RDDI_LARGEFILE:
@@ -1713,12 +1718,15 @@ static ERRCODE hb_waRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnection,
             hb_itemPutC( pItem, hb_set.HB_SET_MFILEEXT );
             break;
          }
+         /* no break - return FAILURE */
       case RDDI_TABLEEXT:
       case RDDI_ORDBAGEXT:
       case RDDI_ORDEREXT:
       case RDDI_ORDSTRUCTEXT:
       case RDDI_DELIMITER:
       case RDDI_SEPARATOR:
+      case RDDI_TRIGGER:
+      case RDDI_PENDINGTRIGGER:
          hb_itemPutC( pItem, "" );
          /* no break - return FAILURE */
 

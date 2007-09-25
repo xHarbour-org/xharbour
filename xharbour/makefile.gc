@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.30 2007/09/03 18:04:26 paultucker Exp $
+# $Id: makefile.gc,v 1.31 2007/09/15 17:37:46 patrickmast Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -3953,7 +3953,8 @@ $(RDD_OBJ_DIR)/rddsys.o : $(RDD_OBJ_DIR)/rddsys.c
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)/sxcompr.o \
    $(OBJ_DIR)/sxcrypt.o \
-   $(OBJ_DIR)/sxdate.o
+   $(OBJ_DIR)/sxdate.o \
+   $(OBJ_DIR)/sxfunc.o
 	$(AR_CMD)
 
 $(HBSIX_OBJ_DIR)/sxcompr.o : $(HBSIX_DIR)/sxcompr.c
@@ -3965,6 +3966,12 @@ $(HBSIX_OBJ_DIR)/sxcrypt.o : $(HBSIX_DIR)/sxcrypt.c
 $(HBSIX_OBJ_DIR)/sxdate.o : $(HBSIX_DIR)/sxdate.c
 	$(CC_CMD)
 
+$(HBSIX_OBJ_DIR)/sxfunc.c : $(HBSIX_DIR)/sxfunc.prg
+   $(HB_CMD)
+
+$(HBSIX_OBJ_DIR)/sxfunc.obj : $(HBSIX_OBJ_DIR)/sxfunc.c
+   $(CC_CMD)      
+   
 #-------------------------------------------------------------------------------
 # libhsx.a
 #-------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.31 2006/08/20 23:52:09 ronpinkas Exp $
+ * $Id: hbrdddbf.h,v 1.32 2007/05/28 07:48:26 marchuet Exp $
  */
 
 /*
@@ -113,6 +113,11 @@ typedef struct _DBFDATA
    char     szIndexExt[ HB_MAX_FILE_EXT + 1 ];
    char     szMemoExt[ HB_MAX_FILE_EXT + 1 ];
 
+   char *   szPasswd;
+   char *   szPendingPasswd;
+   char *   szTrigger;
+   char *   szPendingTrigger;
+
    BYTE     bLockType;        /* 0 */
    BYTE     bTableType;       /* DB_DBF_STD */
    BYTE     bCryptType;       /* DB_CRYPT_NONE */
@@ -192,6 +197,7 @@ typedef struct _DBFAREA
    BOOL     fAutoInc;               /* WorkArea with auto increment fields */
    BOOL     fHasMemo;               /* WorkArea with Memo fields */
    BOOL     fHasTags;               /* WorkArea with MDX or CDX index */
+   BOOL     fModStamp;              /* WorkArea with modification autoupdate fields */
    BOOL     fDataFlush;             /* data was written to DBF and not commited */
    BOOL     fMemoFlush;             /* data was written to MEMO and not commited */
    BOOL     fShared;                /* Shared file */
@@ -206,6 +212,8 @@ typedef struct _DBFAREA
    BOOL     fUpdateHeader;          /* Update header of file */
    BOOL     fFLocked;               /* TRUE if file is locked */
    BOOL     fHeaderLocked;          /* TRUE if DBF header is locked */
+   BOOL     fTrigger;               /* Execute trigger function */
+   LPDBOPENINFO lpdbOpenInfo;       /* Pointer to current dbOpenInfo structure in OPEN/CREATE methods */
    LPDBRELINFO lpdbPendingRel;      /* Pointer to parent rel struct */
    ULONG *  pLocksPos;              /* List of records locked */
    ULONG    ulNumLocksPos;          /* Number of records locked */

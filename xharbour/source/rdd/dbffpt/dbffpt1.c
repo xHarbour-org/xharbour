@@ -1,5 +1,5 @@
 /*
- * $Id: dbffpt1.c,v 1.87 2007/05/18 09:36:57 marchuet Exp $
+ * $Id: dbffpt1.c,v 1.88 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -438,7 +438,7 @@ static ERRCODE hb_fptPutRootBlock( FPTAREAP pArea, ULONG ulBlock )
                                  nItem is always odd and after read we have
                                  to recalculate it:
                                     nItem = ( nItem - 3 ) / 4
-		if FPTHEADER->flexDir = 0 then we can create it by allocating
+            if FPTHEADER->flexDir = 0 then we can create it by allocating
             two 1024 bytes pages for flexRev and flexDir page.
                FPTHEADER->flexRev[4] 1024 bytes in next free block
                FPTHEADER->flexDir[4] next 1024 bytes
@@ -2177,7 +2177,7 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
          if ( bBufEnd - (*pbMemoBuf) >= 3 )
          {
             hb_itemPutNILen( pItem, ( SHORT ) HB_GET_LE_UINT16( *pbMemoBuf ),
-	                            (*pbMemoBuf)[2] );
+                             (*pbMemoBuf)[2] );
             *pbMemoBuf += 3;
          }
          else
@@ -2220,7 +2220,7 @@ static ERRCODE hb_fptReadFlexItem( FPTAREAP pArea, BYTE ** pbMemoBuf, BYTE * bBu
          if ( bBufEnd - (*pbMemoBuf) >= 3 )
          {
             hb_itemPutNIntLen( pItem, ( USHORT ) HB_GET_LE_UINT16( *pbMemoBuf ),
-	                              (*pbMemoBuf)[2] );
+                               (*pbMemoBuf)[2] );
             *pbMemoBuf += 3;
          }
          else
@@ -2644,7 +2644,7 @@ static ERRCODE hb_fptGetMemo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem,
       {
          pBuffer = ( BYTE * ) hb_xalloc( ulSize + 1 );
       }
-
+      
       if( !pBuffer )
       {
          /* in most cases this means that file is corrupted */
@@ -4692,11 +4692,11 @@ static void hb_dbffptRegisterRDD( USHORT * pusRddId )
    RDDFUNCS * pTable;
    USHORT * uiCount, uiRddId;
 
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiCount = ( USHORT * ) hb_parptr( 1 );
+   pTable = ( RDDFUNCS * ) hb_parptr( 2 );
    uiRddId = hb_parni( 4 );
 
-   HB_TRACE(HB_TR_DEBUG, ("DBFFPT_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+   HB_TRACE(HB_TR_DEBUG, ("DBFFPT_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
    if( pTable )
    {

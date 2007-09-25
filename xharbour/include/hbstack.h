@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.43 2007/04/17 20:46:35 ronpinkas Exp $
+ * $Id: hbstack.h,v 1.44 2007/09/22 05:41:00 andijahja Exp $
  */
 
 /*
@@ -84,19 +84,20 @@ struct hb_class_method;
 #ifndef HB_THREAD_SUPPORT
 typedef struct
 {
-   PHB_ITEM * pItems;       /* pointer to the stack items */
-   PHB_ITEM * pPos;         /* pointer to the latest used item */
-   LONG     wItems;       /* total items that may be holded on the stack */
-   HB_ITEM  Return;       /* latest returned value */
-   PHB_ITEM * pBase;        /* stack frame position for the current function call */
-   PHB_ITEM * pEvalBase;    /* stack frame position for the evaluated codeblock */
-   int      iStatics;     /* statics base for the current function call */
-   char     szDate[ 26 ];  /* last returned date from _pards() yyyymmdd format */
+   PHB_ITEM * pItems;           /* pointer to the stack items */
+   PHB_ITEM * pPos;             /* pointer to the latest used item */
+   LONG       wItems;           /* total items that may be holded on the stack */
+   HB_ITEM    Return;           /* latest returned value */
+   PHB_ITEM * pBase;            /* stack frame position for the current function call */
+   PHB_ITEM * pEvalBase;        /* stack frame position for the evaluated codeblock */
+   LONG       lStatics;         /* statics base for the current function call */
+   LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
+   LONG       lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */   
+   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */   
+   char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
-
-   USHORT uiActionRequest;
 
    HB_ITEM aWithObject[ HB_MAX_WITH_OBJECTS ];
    UINT    wWithObjectCounter;
@@ -129,7 +130,7 @@ extern BOOL hb_stack_ready;
 
 typedef struct
 {
-   LONG iStatics;
+   LONG lStatics;
 } HB_STACK_STATE;    /* used to save/restore stack state in hb_vmDo)_ */
 
 #ifdef HB_STACK_MACROS
@@ -143,44 +144,42 @@ typedef struct
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) ( iItemPos ) ) )
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
    #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
+   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiActionRequest ) 
+   #define hb_stackSetActionRequest( n )     do { HB_VM_STACK.uiActionRequest = ( n ); } while( 0 )
 
-   #define hb_stackDec( )              do \
-                                       { \
+   #define hb_stackDec( )              do { \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                          { \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                          } \
-                                       } \
-                                       while( 0 )
+                                       } while( 0 )
 
-   #define hb_stackPop( )              do \
-                                       { \
+   #define hb_stackPop( )              do { \
                                           if( HB_IS_COMPLEX( *( HB_VM_STACK.pPos - 1 ) ) ) \
-                                          { \
                                              hb_itemClear( *( HB_VM_STACK.pPos - 1 ) ); \
-                                          } \
                                           else \
-                                          { \
                                              ( *( HB_VM_STACK.pPos - 1 ) )->type = HB_IT_NIL; \
-                                          } \
-                                          \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
-                                          { \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
-                                          } \
-                                       } \
-                                       while( 0 )
+                                       } while( 0 )
 
-   #define hb_stackPush( )             do \
-                                       { \
+   #define hb_stackPush( )             do { \
                                           if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
-                                          { \
                                              hb_stackIncrease(); \
-                                          } \
-                                          \
                                           ( *(++HB_VM_STACK.pPos) )->type = HB_IT_NIL; \
-                                       } \
-                                       while( 0 )
+                                       } while( 0 )
+                                       
+   #define hb_stackPopReturn( )        do { \
+                                          if( HB_IS_COMPLEX( &HB_VM_STACK.Return ) ) \
+                                             hb_itemClear( &HB_VM_STACK.Return ); \
+                                          if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
+                                             hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
+                                          hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos ); \
+                                       } while ( 0 )                                       
+
+   #define hb_stackPushReturn( )       do { \
+                                          hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return ); \
+                                          if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
+                                             hb_stackIncrease(); \
+                                       } while ( 0 )                                    
 
 #else
    extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
@@ -197,16 +196,21 @@ typedef struct
    extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
    extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
+   extern HB_EXPORT void        hb_stackPushReturn( void );
+   extern HB_EXPORT void        hb_stackPopReturn( void );   
+   
+   extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
+   extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
 #endif
 
 /* stack management functions */
-extern void    hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
-extern void    hb_stackDispCall( void );
-extern void    hb_stackFree( void );       /* releases all memory used by the stack */
-extern void    hb_stackInit( void );       /* initializes the stack */
-extern void    hb_stackIncrease( void );   /* increase the stack size */
+extern void        hb_stackDispLocal( void );  /* show the types of the items on the stack for debugging purposes */
+extern void        hb_stackDispCall( void );
+extern void        hb_stackFree( void );       /* releases all memory used by the stack */
+extern void        hb_stackInit( void );       /* initializes the stack */
+extern void        hb_stackIncrease( void );   /* increase the stack size */
 
-extern void hb_stackRemove( LONG lUntilPos );
+extern void        hb_stackRemove( LONG lUntilPos );
 HB_EXPORT extern HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
 HB_EXPORT extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
 HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );

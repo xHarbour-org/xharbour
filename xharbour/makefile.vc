@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.193 2007/09/03 18:04:27 paultucker Exp $
+# $Id: makefile.vc,v 1.194 2007/09/15 17:37:46 patrickmast Exp $
 #
 
 #
@@ -909,11 +909,24 @@ DBFFPT_LIB_OBJS = \
 
 {$(RDD_DIR)\hbsix}.c{$(OBJ_DIR)$(MT)}.obj::
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $<
+   
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.c::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+
+{$(RDD_DIR)\hbsix}.prg{$(OBJ_DIR)$(MT)}.obj::
+   $(HARBOUR_EXE) $(HARBOURFLAGS) -o$(OBJ_DIR)$(MT)\ $<
+!if ( "$(MK_FLAGS:AF=)"=="Y" )
+   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
+!else
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HBSIX_LIB)\2
+!endif   
 
 HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
-   $(OBJ_DIR)\sxdate.obj
+   $(OBJ_DIR)\sxdate.obj \
+   \
+   $(OBJ_DIR)\sxfunc.obj
 
 #
 # HSX.LIB rules
