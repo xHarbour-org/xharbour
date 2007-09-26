@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.194 2007/09/15 17:37:46 patrickmast Exp $
+# $Id: makefile.vc,v 1.195 2007/09/25 07:32:27 marchuet Exp $
 #
 
 #
@@ -918,7 +918,7 @@ DBFFPT_LIB_OBJS = \
 !if ( "$(MK_FLAGS:AF=)"=="Y" )
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)$(MT)\ $*.c
 !else
-   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HBSIX_LIB)\2
+   $(MAKE) -nologo /$(MK_FLAGS)f$(MK_FILE) $(HBSIX_LIB)
 !endif   
 
 HBSIX_LIB_OBJS = \
