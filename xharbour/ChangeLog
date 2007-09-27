@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5722 2007/09/25 05:41:56 bdj Exp $
+ * $Id: ChangeLog,v 1.5723 2007/09/25 07:32:22 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-26 22:50 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source\compiler\genc.c
+  * source\vm\hvm.c
+    * Hack to resolve logical ambiguity of module association with HB_FS_LOCAL
+      we didn't know if the linked function is indeed local to the processed module.
 
 2007-09-25 09:17 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/Makefile
@@ -57,24 +63,24 @@
     * updated for DBFAREA structure modifications
     + added some very basic support for order temperature flags
     synced with harbour
-    
+
   * include/hbapi.h
-    + HB_ISFIRSTIDCHAR() and HB_ISNEXTIDCHAR() macros    
+    + HB_ISFIRSTIDCHAR() and HB_ISNEXTIDCHAR() macros
     synced with harbour
-    
+
   * include/hbstack.h
   * source/vm/estack.c
     + Added hb_stackPopReturn, hb_stackPushReturn, hb_stackGetActionRequest, hb_stackSetActionRequest
-  
+
   * include/hbvm.h
   * source/vm/hvm.c
     + Added hb_vmRequestReenter, hb_vmRequestRestore, hb_vmRequestReset;
-    
+
   * source/vm/dynsym.c
   * include/hbapi.h
     + Added hb_dynsymIsFunction
     % optimized __DYNSISFUN
-    
+
   + source/rdd/hbsix/sxfunc.prg
   * makefile.bc
   * makefile.pc
@@ -88,7 +94,7 @@
       Sx_IsSem( xSem )
       Sx_Freeze( xTag, nBag )
       Sx_Warm( xTag, nBag )
-      Sx_Chill( xTag, nBag ) 
+      Sx_Chill( xTag, nBag )
 
 2007-09-25 12:45 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * source/debug/debugger.prg

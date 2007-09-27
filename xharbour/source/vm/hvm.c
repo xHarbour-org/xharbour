@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.640 2007/08/29 11:53:24 patrickmast Exp $
+ * $Id: hvm.c,v 1.641 2007/09/25 07:33:01 marchuet Exp $
  */
 
 /*
@@ -7665,7 +7665,7 @@ static void hb_vmDebugEntry( int nMode, int nLine, char *szName, int nIndex, int
          hb_vmPushNil();
          hb_vmPushInteger( HB_DBG_ENDPROC );
          hb_vmDo( 1 );
-         
+
          hb_itemForwardValue( &(HB_VM_STACK.Return), pReturn ); /* restores the previous returned value */
          hb_stackDec();
          break;
@@ -9275,6 +9275,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    BOOL fRecycled;
    BOOL fPublic;
    BOOL fStatics;
+   PHB_FUNC pModuleFirstFunction, pModuleLastFunction;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRegisterSymbols(%p,%hu,%s,%d,%d,%p)", pSymbolTable, uiSymbols, szModuleName, (int)fDynLib, (int)fClone, pGlobals));
 
@@ -9342,6 +9343,18 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
    pNewSymbols->pGlobals = pGlobals;
 
+   if( uiSymbols > 2 && pNewSymbols->pSymbolTable[ uiSymbols - 1].szName[0] == '!'  && pNewSymbols->pSymbolTable[uiSymbols - 2].szName[0] == '!' )
+   {
+      pModuleFirstFunction = pNewSymbols->pSymbolTable[uiSymbols - 2].value.pFunPtr;
+      pModuleLastFunction  = pNewSymbols->pSymbolTable[uiSymbols - 1].value.pFunPtr;
+      uiSymbols -= 2;
+   }
+   else
+   {
+      pModuleFirstFunction = (PHB_FUNC) 0x00000000;
+      pModuleLastFunction  = (PHB_FUNC) 0xFFFFFFFF;
+   }
+
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
       pSymbol = pNewSymbols->pSymbolTable + ui;
@@ -9382,13 +9395,24 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
       #if 0
          if( fPublic && ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) != 0 )
          {
-            TraceLog( NULL, "Registring STATIC!!!: %s:%s scope %04x\r\n", szModuleName, pSymbol->szName, hSymScope ); fflush(stdout);
+            TraceLog( NULL, "Registring STATIC!!!: %s:%s scope %04x\r\n", szModuleName, pSymbol->szName, hSymScope );
          }
       #endif
 
       if( fPublic )
       {
          PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
+
+         if( ( hSymScope & HB_FS_LOCAL ) != 0 )
+         {
+            if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
+            {
+               hSymScope            &= ~HB_FS_LOCAL;
+               pSymbol->scope.value &= ~HB_FS_LOCAL;
+
+               TraceLog( NULL, "Local Function: '%s' of Module: '%s' is not linked in.\n", pSymbol->szName, szModuleName );
+            }
+         }
 
          if( fDynLib )
          {
@@ -9413,6 +9437,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                       pDynSym->pSymbol = pSymbol;
                       pModuleSymbols = s_pSymbols;
+
                       while( pModuleSymbols )
                       {
                          if( pModuleSymbols->hScope & HB_FS_DEFERRED )
@@ -9425,14 +9450,16 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                             for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
                             {
                                pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
+
                                if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->scope.value & HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
                                {
-                                 pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
-                                 pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
-                                 //TraceLog( NULL, "Deferred: '%s'\n", pSymbol->szName );
+                                  pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
+                                  pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
+                                  //TraceLog( NULL, "Deferred: '%s'\n", pSymbol->szName );
                                }
                             }
                          }
+
                          pModuleSymbols = pModuleSymbols->pNext;
                       }
                    }
@@ -9448,10 +9475,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                if( ( pSymbol->scope.value & HB_FS_LOCAL ) && ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) )
                {
                   /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
-                  /* Temporary disabling TraceLog. //PM:08-29-2007
                   TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously registered Module: %s\n",
                             pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
-                  */
                   pSymbol->pDynSym = pDynSym;
                   continue;
                }
@@ -9859,7 +9884,7 @@ USHORT HB_EXPORT hb_vmRequestQuery( void )
 BOOL hb_vmRequestReenter( void )
 {
    HB_THREAD_STUB
-   
+
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestReenter()"));
 
    hb_stackPushReturn();
@@ -9873,7 +9898,7 @@ BOOL hb_vmRequestReenter( void )
 void hb_vmRequestRestore( void )
 {
    USHORT uiAction;
-   
+
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRequestRestore()"));

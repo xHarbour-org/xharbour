@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.140 2007/08/20 22:31:40 likewolf Exp $
+ * $Id: genc.c,v 1.141 2007/09/22 05:41:00 andijahja Exp $
  */
 
 /*
@@ -214,6 +214,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pFunc = pFunc->pNext; /* No implicit starting procedure */
       }
 
+      fprintf( yyc, "HB_FUNC_STATIC( __begin__ );\n" );
+
       /* write functions prototypes for PRG defined functions */
       while( pFunc )
       {
@@ -356,6 +358,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
       }
+
+      fprintf( yyc, "HB_FUNC_STATIC( __end__ );\n" );
 
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
@@ -532,6 +536,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       */
       hb_writeEndInit( yyc );
 
+      fprintf( yyc, "\nHB_FUNC_STATIC( __begin__ ){}\n\n" );
+
       if( hb_comp_bExplicitStartProc && iStartupOffset >= 0 )
       {
          fprintf( yyc, "extern HB_EXPORT void hb_vmExplicitStartup( PHB_SYMB pSymbol );\n" );
@@ -671,6 +677,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          hb_compGenCInLine( yyc );
       }
+
+      fprintf( yyc, "\nHB_FUNC_STATIC( __end__ ){}\n" );
    }
    else
    {
@@ -943,7 +951,10 @@ static void hb_compGenCAddProtos( FILE *yyc )
 
 static void hb_writeEndInit( FILE* yyc )
 {
-   fprintf( yyc, "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
+   fprintf( yyc, ",\n"
+                 "{ \"!\", {0}, {HB_FUNCNAME( __begin__ )}, NULL },\n"
+                 "{ \"!\", {0}, {HB_FUNCNAME( __end__ )}, NULL }\n"
+                 "HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
                  "#if defined(HB_PRAGMA_STARTUP)\n"
                  "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                  "#elif defined(HB_MSC_STARTUP)\n"
