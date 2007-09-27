@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.82 2006/12/10 12:33:35 ptsarenko Exp $
+/* $Id: teditor.prg,v 1.83 2007/09/03 18:31:54 paultucker Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.82 2006/12/10 12:33:35 ptsarenko Exp $
+/* $Id: teditor.prg,v 1.83 2007/09/03 18:31:54 paultucker Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -2990,27 +2990,23 @@ STATIC function Text2Array( cString, nWordWrapCol )
    cEOL    := WhichEOL( cString )
    nEOLLen := Len( cEOL )
 
-/*
    // __StrTkPtr() needs that string to be tokenized be terminated with a token delimiter
    if ! Right( cString, Len( cEOL ) ) == cEOL
       cString += cEOL
       //GAD so we don't add a blank line by accident at the end of this.
       lTokenized:=.t.
    endif
-*/
 
    nRetLen := 0
    ncSLen  := Len( cString )
 
    // If cString starts with EOL delimiters I have to add empty lines since __StrTkPtr
    // gives back _next_ token and would skip these first EOL delimiters
-/*
    do while SubStr( cString, nTokPos + 1, nEOLLen ) == cEOL
       AAdd( aArray, HBTextLine():New( cLine, .F. ) )
       nTokPos += nEOLLen
       nRetLen += nEOLLen
    enddo
-*/
 
    while nRetLen < ncSLen
       /* TOFIX: Note that __StrToken is not able to cope with delimiters longer than one char */

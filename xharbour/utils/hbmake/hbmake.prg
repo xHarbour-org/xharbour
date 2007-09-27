@@ -1,12 +1,12 @@
 /*
- * $Id: hbmake.prg,v 1.183 2007/08/30 22:06:43 lculik Exp $
+ * $Id: hbmake.prg,v 1.184 2007/09/15 12:28:05 modalsist Exp $
  */
 
 /*
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
  *
- * Copyright 2000-2005 Luiz Rafael Culik <culikr@uol.com.br>
+ * Copyright 2000-2007 Luiz Rafael Culik <culikr@uol.com.br>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,7 +52,10 @@
 #include "fileio.ch"
 #include "common.ch"
 #include "radios.ch"
+#include "inkey.ch"
+
 //#include "wvtgui.ch"
+
 #define EOL Hb_OsNewLine()
 #define CRLF Hb_OsNewLine()
 #xtranslate TimeToSec(<x>) => ( ( Val( Substr( <x>, 1, 2 ) ) * 3600 ) +( Val( Substr( <x>, 4, 2 ) ) * 60 ) + ( Val( Substr( <x>, 7, 2 ) ) ) )
@@ -71,7 +74,7 @@ Default Values for core variables are set here
 New Core vars should only be added on this section
 */
 
-STATIC s_cHbMakeVersion  := "1.19"
+STATIC s_cHbMakeVersion  := "1.20"
 STATIC s_lPrint          := .F.
 STATIC s_lEdit           := .F.
 STATIC s_aDefines        := {}
@@ -122,6 +125,7 @@ STATIC s_nLang           := 2    // default language is english
 STATIC s_lMt             := .F.
 STATIC s_cUserDefine     := ""
 STATIC s_cUserInclude    := ""
+STATIC s_cUserLibs       := ""   // for user libs located other than "xharbour\lib" folder.
 STATIC s_lxFwh           := .F.
 STATIC s_nFilesToAdd     := 5
 STATIC s_nWarningLevel   := 0
@@ -147,38 +151,16 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL aPpo
    LOCAL cExt := ""
    LOCAL cExp,cLib
-
-   IF Empty(cFile)
-      OutStd( "xHarbour Make" + HB_OSNewLine() +;
-              "Copyright 1999-2007, http://www.harbour-project.org, http://www.xharbour.org" + HB_OSNewLine() +;
-              HB_OSNewLine() +;
-              "Syntax:  hbmake <makefile> [switches]" + HB_OSNewLine() +;
-              "Switches:" + HB_OSNewLine() +;
-              "  -b   Use Bcc as the C compiler.This options is default under Win32" + HB_OSNewLine() +;
-              "  -g   Use Gcc as the C compiler.This options is default under OS/2" + HB_OSNewLine() +;
-              "  -gl  Use Gcc as the C compiler on Linux" + HB_OSNewLine() +;
-              "  -v   Use MSVC as the C compiler" + HB_OSNewLine() +;
-              "  -D Define an macro. Multiple macros can be used in an single line" + HB_OSNewLine() +;
-              "       Ex:" + HB_OSNewLine() +;
-              "  -DOB=c.obj;d.obj" + HB_OSNewLine() +;
-              "       and also Multiple -D is also supported" + HB_OSNewLine() +;
-              "  -p   Print all command and defines" + HB_OSNewLine() +;
-              "  -f   Force all files to be rebuild" + HB_OSNewLine() +;
-              "  -e   Open the editor mode." + HB_OSNewLine() +;
-              "  -ex  Open the editor mode in extended mode" + HB_OSNewLine() +;
-              "  -el  Open the editor mode for creating libraries." + HB_OSNewLine() +;
-              "  -elx Open the editor mode for creating librariesin extented mode." + HB_OSNewLine() +;
-              "  -i Ignore errors returned by commands" + HB_OSNewLine() +;
-              "  -r Recurse directories for source code" + HB_OSNewLine() +;
-              HB_OSNewLine() +;
-              "Note:  Linked with " + Version() + HB_OSNewLine() )
-              Return .F.
+   LOCAL lCreateAndCompile := .F.  // for "-c" param only.
+   
+   IF Empty( cFile )
+      ShowHelp()
+      Return .F.
    endif
-
 
    cExt := SubStr( cFile, At(".",cFile) )
 
-   IF !Empty(cExt) .AND. lower(cExt) IN s_cInvalidExt 
+   IF ! Empty(cExt) .AND. lower(cExt) IN s_cInvalidExt 
       Alert("Invalid extension for hbmake script file <"+cFile+">.")
       Return .F.
    ENDIF
@@ -191,7 +173,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    cMakeParams := ConvertParams( @cFile, aFile, p1, p2, p3, p4, p5, p6 )
 
-   IF !empty( cMakeParams )
+   IF ! empty( cMakeParams )
 
       cMakeParams := upper( cMakeParams )
 
@@ -204,6 +186,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       ENDIF
 
    ENDIF
+
    MHIDE()
    
    s_nLang := nLang
@@ -219,6 +202,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
 
    IF PCount() == 0 .or.;
+      "?" IN cMakeParams .or. ;
       "/?" IN cMakeParams .or. ;
       "-?" IN cMakeParams .or. ;
       "/h" IN cMakeParams .or. ;
@@ -271,7 +255,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    IF s_lOS2 .OR. s_lLinux
 
-      s_cEditor := "mcedit "
+      s_cEditor := "mcedit"
 
       s_lGcc   := .T.
       s_lBcc   := .F.
@@ -281,7 +265,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    ELSEIF s_lWin32
 
-      s_cEditor := "edit "
+      s_cEditor := "edit"
 
       s_lGcc   := .F.
 
@@ -372,6 +356,13 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    if !s_lForce .and. s_lEdit  // PCount() > 1
 
+      if ! File( cFile )
+         lCreateAndCompile := ( "-C" IN cMakeParams  )
+      else
+         lCreateAndCompile := .f.
+         cMakeParams := StrTran( cMakeParams, "-C","" )
+      endif
+
       if Hb_IsNil(s_lGenppo) .OR. s_lGenppo == .F.
          Delete_ppo()
       endif
@@ -379,7 +370,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       IF s_lLibrary
          CreateLibMakeFile( cFile )
       ELSE
-         CreateMakeFile( cFile )
+         CreateMakeFile( cFile, lCreateAndCompile  )
       ENDIF
 
       RETURN NIL
@@ -393,7 +384,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
 
    // Make file is parsed here
 
-   IF !ParseMakeFile( cFile )
+   IF ! ParseMakeFile( cFile )
 
       IF s_nLang = 1      // brazilian portuguese 
          s_cAlertMsg := "<"+cFile+ "> n∆o pode ser aberto. FERROR("+Ltrim(Str(FError()))+"). O HbMake ser† fechado."
@@ -441,7 +432,6 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
       __Run( " upx -9 "+ (s_cAppName) )
       SET CURSOR OFF
    ENDIF
-
    
 
    IF s_lasdll .or. lower(right(s_cAppName,3)) == 'dll'
@@ -762,6 +752,10 @@ FUNCTION ParseMakeFile( cFile )
 
             IF aTemp[ 1 ] == "RESFILES"
                s_aResources := ListAsArray2( ReplaceMacros( aTemp[ 2 ] ), " " )
+            ENDIF
+
+            IF aTemp[ 1 ] == "EDITOR"
+               s_cEditor  := Trim( aTemp[ 2 ] )
             ENDIF
 
          ELSE
@@ -1231,7 +1225,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     __run( s_cEditor +(s_cLog) )
+                     __run( s_cEditor +" "+(s_cLog) )
                      SET CURSOR ON
                      QUIT
                   ELSE
@@ -1375,7 +1369,7 @@ FUNCTION CompileFiles()
                      cErrText := Memoread( (s_cLog) )
                      lEnd     := 'Error E' $   cErrText
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        __run( s_cEditor + (s_cLog) )
+                        __run( s_cEditor + " "+(s_cLog) )
                         SET CURSOR ON
                         QUIT
                      ELSE
@@ -1450,7 +1444,7 @@ FUNCTION CompileFiles()
                   lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                   IF ! s_lIgnoreErrors .AND. lEnd
-                     __run( s_cEditor + (s_cLog) )
+                     __run( s_cEditor + " "+(s_cLog) )
                      SET CURSOR ON
                      QUIT
                   ELSE
@@ -1565,9 +1559,9 @@ FUNCTION PrintMacros()
 
 RETURN NIL
 
-*-------------------------------
-FUNCTION CreateMakeFile( cFile )
-*-------------------------------
+*--------------------------------------------------
+FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
+*--------------------------------------------------
 
    LOCAL aInFiles     := {}
    LOCAL aOutFiles    := {}
@@ -1675,6 +1669,9 @@ FUNCTION CreateMakeFile( cFile )
    LOCAL cTempLibs    := ""
    LOCAL aTempLibs
 
+   LOCAL aUserLibs
+   LOCAL cUserLib
+
    #IFdef HBM_USE_DEPENDS
       LOCAL cIncl              := ""
       LOCAL lScanIncludes      := .F.
@@ -1696,6 +1693,7 @@ FUNCTION CreateMakeFile( cFile )
 
    s_cUserInclude  := space(200)
    s_cUserDefine   := space(200)
+   s_cUserLibs     := space(200)
 
 
    IF File( cFile )
@@ -1781,6 +1779,7 @@ FUNCTION CreateMakeFile( cFile )
          s_lExternalLib  := oMake:lExternalLib
          s_cUserInclude  := padr(oMake:cUserInclude,200)
          s_cUserDefine   := padr(oMake:cUserDef,200)
+         s_cUserLibs     := padr(oMake:cUserLib,200)
          s_lxFwh         := oMake:lxFwh
          s_nFilesToAdd   := oMake:cFilesToAdd
          s_lMt           := oMake:lMt
@@ -1790,6 +1789,15 @@ FUNCTION CreateMakeFile( cFile )
          s_cObjDir       := oMake:cObj
          cObjDir         := s_cObjDir + space(20)
          s_lGenCsource   := oMake:lGenCsource
+         s_cEditor       := trim(oMake:cEditor)
+
+         if Empty( s_cEditor )
+            if s_lOS2 .OR. s_lLinux
+               s_cEditor := "mcedit"
+            else
+               s_cEditor := "edit"
+            endif
+         endif
 
          if !s_lRecursive
             s_lRecursive := oMake:lRecurse
@@ -1931,6 +1939,10 @@ FUNCTION CreateMakeFile( cFile )
 
    ENDIF
 
+IF ! lCreateAndCompile
+
+While .t.
+
    CLS
    Setcolor( 'w/b+,b+/w,w+/b,w/b+,w/b,w+/b' )
    @  0,  0, Maxrow(), Maxcol() BOX( Chr( 201 ) + Chr( 205 ) + Chr( 187 ) + Chr( 186 ) + Chr( 188 ) + Chr( 205 ) + Chr( 200 ) + Chr( 186 ) + Space( 1 ) )
@@ -1938,19 +1950,76 @@ FUNCTION CreateMakeFile( cFile )
    Attention( HbMake_Id() + space(10)+s_aLangMessages[ 27 ], 0 )
 
    Attention( s_aLangMessages[ 47 ], maxrow() )
-   @ 01,01       say s_aLangMessages[ 28 ]
-   @ 01,16,06,21 get cOS listbox { "Win32", "OS/2", "Linux" } message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cOS)  DROPDOWN
-   @ 01,23       say s_aLangMessages[ 29 ]
-   @ 01,47,08,52 get cCompiler LISTBOX { "BCC", "MSVC", "GCC", "POCC","MINGW" } MESSAGE s_aLangMessages[ 50 ] STATE OsSpec(getlist,2,@cCompiler) DROPDOWN
-   @ 01,56       say s_aLangMessages[ 30 ]
-   @ 01,67,10,78 get cGuiLib ListBox { "None","C4W","FWH","GTWVT","GTWVW","GTWVW+MWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"} state OsSpec(getlist,3,@cGuiLib) DROPDOWN  When CheckCompiler(cOS) message s_aLangMessages[ 51 ]
-   @ 02,01       say s_aLangMessages[ 48 ]
-   @ 02,16,08,26 get cRdd ListBox { "None","RddAds","Mediator","Apollo"}  WHEN cOS == "Win32" .or. cOS == "Linux" DROPDOWN message s_aLangMessages[ 52 ]
-   @ 02,30       get s_lCompress CheckBox  caption s_aLangMessages[ 53 ] style "[X ]" message s_aLangMessages[ 54 ]
-   @ 02,53       get lUseXHarbourDll CheckBox caption "use xHarbour[.dll|.so]" style "[X ]" WHEN cOS == "Win32" .or. cOS == "Linux" message s_aLangMessages[ 55 ]
-   @ 03,01       say "Obj Files Dir" GET cObjDir PICT "@s20" message s_aLangMessages[ 56 ]
-   @ 04,01       say s_aLangMessages[ 45 ] GET cAppName  pict "@S15"valid !Empty( cAppName ) message s_aLangMessages[ 57 ]
-   @ 04,53       get s_lasdll CheckBox  Caption "Create dll" style "[X ]"
+
+   @ 01,01       SAY s_aLangMessages[ 28 ]
+
+   @ 01,16,06,21 GET cOS;
+                 LISTBOX { "Win32", "OS/2", "Linux" };
+                 MESSAGE s_aLangMessages[ 49 ];
+                 STATE OsSpec(getlist,1,@cOS);
+                 DROPDOWN
+
+   @ 01,23       SAY s_aLangMessages[ 29 ]
+
+   @ 01,47,08,52 GET cCompiler;
+                 LISTBOX { "BCC", "MSVC", "GCC", "POCC","MINGW" };
+                 MESSAGE s_aLangMessages[ 50 ];
+                 STATE OsSpec(getlist,2,@cCompiler);
+                 DROPDOWN
+
+   @ 01,56       SAY s_aLangMessages[ 30 ]
+
+   @ 01,67,10,78 GET cGuiLib;
+                 LISTBOX { "None","C4W","FWH","GTWVT","GTWVW","GTWVW+MWVW","HWGUI","MINIGUI","XWT","WHAT32","WHOO","XHGTK"};
+                 STATE OsSpec(getlist,3,@cGuiLib);
+                 DROPDOWN;
+                 WHEN CheckCompiler(cOS);
+                 MESSAGE s_aLangMessages[ 51 ]
+
+   @ 02,01       SAY s_aLangMessages[ 48 ]
+
+   @ 02,16,08,26 GET cRdd;
+                 LISTBOX { "None","RddAds","Mediator","Apollo"};
+                 WHEN cOS == "Win32" .or. cOS == "Linux";
+                 DROPDOWN;
+                 MESSAGE s_aLangMessages[ 52 ]
+
+   @ 02,30       GET s_lCompress;
+                 CHECKBOX;
+                 CAPTION s_aLangMessages[ 53 ];
+                 STYLE "[X ]";
+                 MESSAGE s_aLangMessages[ 54 ]
+
+   @ 02,53       GET lUseXHarbourDll;
+                 CHECKBOX;
+                 CAPTION "use xHarbour[.dll|.so]" style "[X ]";
+                 WHEN cOS == "Win32" .or. cOS == "Linux";
+                 MESSAGE s_aLangMessages[ 55 ]
+
+   @ 03,01       SAY "Obj Files Dir";
+                 GET cObjDir;
+                 PICT "@S20";
+                 MESSAGE s_aLangMessages[ 56 ]
+
+   @ 03,47       SAY s_aLangMessages[ 66 ]
+
+#ifdef __PLATFORM__Windows
+   @ 03,68,07,77 GET s_cEditor;
+                 LISTBOX { "edit", "notepad" };
+                 MESSAGE s_aLangMessages[ 67 ];
+                 STATE   OsSpec(getlist,4,@s_cEditor);
+                 DROPDOWN
+#endif
+   @ 04,01       SAY s_aLangMessages[ 45 ];
+                 GET cAppName;
+                 PICT "@S15";
+                 VALID ! Empty( cAppName );
+                 MESSAGE s_aLangMessages[ 57 ]
+
+   @ 04,53       GET s_lasdll;
+                 CHECKBOX;
+                 CAPTION "Create dll";
+                 STYLE "[X ]"
 
    READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
 
@@ -1991,23 +2060,37 @@ FUNCTION CreateMakeFile( cFile )
    ENDIF
 
    IF lFwh
-      @  3, 40 SAY "FWH path" GET cFwhPath PICT "@s25"
+      @  3, 40 SAY "FWH path";
+               GET cFwhPath;
+               PICT "@S25"
    ELSEIF lC4W
-      @  3, 40 SAY "C4W path" GET cC4WPath PICT "@s25"
+      @  3, 40 SAY "C4W path";
+               GET cC4WPath;
+               PICT "@S25"
    ELSEIF lMiniGui
-      @  3, 40 SAY "MiniGui path" GET cMiniPath PICT "@s25"
+      @  3, 40 SAY "MiniGui path";
+               GET cMiniPath;
+               PICT "@S25"
    ELSEIF lHwGui
-      @  3, 40 SAY "HwGUI path" GET cHwPath PICT "@s25"
+      @  3, 40 SAY "HwGUI path";
+               GET cHwPath;
+               PICT "@S25"
    ELSEIF lxHGtk
-      @  3, 40 SAY "xHGtk path" GET cxHGPath PICT "@s25"
+      @  3, 40 SAY "xHGtk path";
+               GET cxHGPath;
+               PICT "@S25"
    ENDIF
 
    IF lMediator
-      @  3, 40 SAY "Mediator path" GET cMedPath PICT "@s25"
+      @  3, 40 SAY "Mediator path";
+               GET cMedPath;
+               PICT "@S25"
    ENDIF
 
    IF lApollo
-      @  3, 40 SAY "Apollo path" GET cApolloPath PICT "@s25"
+      @ 03, 40 SAY "Apollo path";
+               GET cApolloPath;
+               PICT "@S25"
    ENDIF
 
    IF nOption = 2 // create a new makefile
@@ -2016,29 +2099,122 @@ FUNCTION CreateMakeFile( cFile )
 
    Attention( s_aLangMessages[ 31 ], 5 )
 
-   @ 06, 01 GET lAutoMemVar  checkbox caption s_aLangMessages[ 32 ] style "[X ]"
-   @ 06, 40 GET lVarIsMemVar checkbox caption s_aLangMessages[ 33 ] style "[X ]"
-   @ 07, 01 GET lDebug       checkbox caption s_aLangMessages[ 34 ] style "[X ]"
-   @ 07, 40 GET lSupressLine checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08, 01 GET s_lGenppo    checkbox caption s_aLangMessages[ 36 ] style "[X ]"
-   @ 08, 40 GET lCompMod     checkbox caption s_aLangMessages[ 37 ] style "[X ]"
-   @ 09, 01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
-   @ 09, 40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
-   @ 10, 01 GET s_lExternalLib checkbox caption s_aLangMessages[ 40 ] style "[X ]"
-   @ 10, 40 GET s_lxFwh        checkbox caption "xHarbour FWH" style "[X ]"
-   @ 11, 01 SAY "Resource file Name: " GET cResName pict "@s55"
-   @ 12, 01 SAY s_aLangMessages[ 43 ] GET s_nFilestoAdd PICT "99" VALID s_nFilestoAdd > 0
-   @ 13, 01 GET s_lMt checkbox caption s_aLangMessages[ 44 ] style "[X ]"
-   @ 13, 40 SAY s_aLangMessages[ 46 ] GET s_nWarningLevel Pict "9" VALID s_nWarningLevel>=0 .AND. s_nWarningLevel <= 4
-   @ 14, 01 GET s_lGenCsource checkbox caption "Generate C-source, not PCode (-go3)" style "[X ]"
+   @ 06, 01 GET lAutoMemVar;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 32 ];
+            STYLE "[X ]"
+
+   @ 06, 40 GET lVarIsMemVar;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 33 ];
+            STYLE "[X ]"
+
+   @ 07, 01 GET lDebug;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 34 ];
+            STYLE "[X ]"
+
+   @ 07, 40 GET lSupressLine;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 35 ];
+            STYLE "[X ]"
+
+   @ 08, 01 GET s_lGenppo;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 36 ];
+            STYLE "[X ]"
+
+   @ 08, 40 GET lCompMod;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 37 ];
+            STYLE "[X ]"
+
+   @ 09, 01 SAY s_aLangMessages[ 38 ];
+            GET s_cUserDefine;
+            PICT "@s23"
+
+   @ 09, 40 SAY s_aLangMessages[ 39 ];
+            GET s_cUserInclude;
+            PICT "@s18"
+
+   @ 10, 01 GET s_lExternalLib;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 40 ];
+            STYLE "[X ]"
+
+   @ 10, 40 GET s_lxFwh;
+            CHECKBOX;
+            CAPTION "xHarbour FWH";
+            STYLE "[X ]"
+
+   @ 11, 01 SAY "Resource file Name: ";
+            GET cResName;
+            PICT "@S55"
+
+   @ 12, 01 SAY s_aLangMessages[ 43 ];
+            GET s_nFilestoAdd;
+            PICT "99";
+            VALID s_nFilestoAdd > 0
+
+   @ 13, 01 GET s_lMt;
+            CHECKBOX;
+            CAPTION s_aLangMessages[ 44 ];
+            STYLE "[X ]"
+
+   @ 13, 40 SAY s_aLangMessages[ 46 ];
+            GET s_nWarningLevel;
+            PICT "9";
+            VALID s_nWarningLevel>=0 .AND. s_nWarningLevel <= 4
+
+   @ 14, 01 GET s_lGenCsource;
+            CHECKBOX;
+            CAPTION "Generate C-source, not PCode (-go3)";
+            STYLE "[X ]"
+
+   @ 15, 01 SAY s_aLangMessages[ 65 ];
+            GET s_cUserLibs;
+            PICT "@S58"
 
    READ msg at maxrow()-1,1,maxcol()-1
+
+   IF LastKey()==K_ESC
+      SET CURSOR ON
+      SetColor("W/N")
+      CLS
+      RETURN NIL
+   ENDIF
+
+   IF Empty( cAppName )
+      IF s_nLang == 1
+         Alert("Falta nome da aplicaá∆o.")
+      ELSEIF s_nLang == 3
+         Alert("Falta lo nombre de la aplicacion.")
+      ELSE
+         Alert("Application name is missing.")
+      ENDIF
+   ELSE
+      EXIT
+   ENDIF
+
+Enddo
+
+Endif // Create and compile
 
    IF ! Empty( s_cUserDefine )
       aUserDefs := ListasArray2(Alltrim( s_cUserDefine ), ";")
 
       FOR EACH cCurrentDef in aUserDefs
          cHarbourFlags += " -D" + Alltrim( cCurrentDef ) + " "
+      NEXT
+   ENDIF
+
+   IF ! Empty( s_cUserLibs )
+      aUserLibs := ListAsArray2( alltrim(s_cUserLibs), ";" )
+      FOR EACH cUserLib IN aUserLibs
+          if !file( cUserLib )
+             alert( "User Lib: "+cUserLib +" not found.")
+             exit
+          endif
       NEXT
    ENDIF
 
@@ -2234,7 +2410,8 @@ FUNCTION CreateMakeFile( cFile )
 
    aOutFiles := AClone( aInFiles )
 
-   if Len( aOutFiles ) > 1
+   //if Len( aOutFiles ) > 1
+   if Len( aOutFiles ) > 1 .AND. ! lCreateAndCompile
 
       Attention( s_aLangMessages[ 41 ], 22 )
 
@@ -2294,6 +2471,8 @@ FUNCTION CreateMakeFile( cFile )
 
    WHILE Len( aSelFiles ) > 1
 
+     IF !lCreateAndCompile
+
       IF s_nLang=1 // PT
          s_cAlertMsg := "Informe o PRG principal da sua aplicaá∆o:"
       ELSEIF s_nLang=3
@@ -2305,16 +2484,21 @@ FUNCTION CreateMakeFile( cFile )
       @ 15,01 say s_cAlertMsg Get cTopFile pict "@S35" valid !empty(cTopFile)
       READ
 
-      if LastKey()=27
+      if LastKey() = K_ESC
          Exit
       endif
+
+     ELSE
+      cTopFile := alltrim(cAppName)+".prg"
+     ENDIF
 
       IF "Win32" IN cOS
          cTopFile := Upper( cTopFile )
       ENDIF
 
 
-      IF !File( alltrim(cTopFile) )
+      IF ! File( alltrim(cTopFile) )
+
          IF s_nLang=1 // PT
             s_cAlertMsg := "Arquivo "+alltrim(cTopFile)+" n∆o encontrado."+iif(s_lRecursive," O flag -r est† ativo. Informe o subdir tambÇm se o PRG principal estiver dentro dele.","")
          ELSEIF s_nLang=3
@@ -2322,7 +2506,15 @@ FUNCTION CreateMakeFile( cFile )
          ELSE
             s_cAlertMsg := "File "+alltrim(cTopFile)+" not found."+iif(s_lRecursive," The flag -r is active. Inform the subdir also if the main PRG is within it.","")
          ENDIF
+
          Alert( s_cAlertMsg )
+
+         IF lCreateAndCompile
+            FClose( s_nMakeFileHandle )
+            FErase( cFile )
+            RETURN NIL
+         ENDIF
+
       ELSE
          EXIT
       ENDIF
@@ -2370,15 +2562,31 @@ FUNCTION CreateMakeFile( cFile )
    ENDIF
 
 #IFDEF HBM_USE_DEPENDS
+
+   if ! lCreateAndCompile
+
    clear typeahead
+
    Attention( "HbMake options", 16 )
-   @ 17, 01 GET lScanIncludes checkbox     caption "Create #DEPENDS from #include" style "[X ]"
+
+   @ 17, 01 GET lScanIncludes;
+            CHECKBOX;
+            CAPTION "Create #DEPENDS from #include";
+            STYLE "[X ]"
    // Provisions for recursive scanning
-   @ 17, 40 GET lScanIncRecursive checkbox caption "Scan recursive" style "[X ]" //when lScanIncludes
-   @ 18, 01 SAY "Excluding these extensions :" GET cExcludeExts WHEN lScanIncludes
+   @ 17, 40 GET lScanIncRecursive;
+            CHECKBOX;
+            CAPTION "Scan recursive" style "[X ]" //when lScanIncludes
+   @ 18, 01 SAY "Excluding these extensions :" ;
+            GET cExcludeExts;
+            WHEN lScanIncludes
    READ
+
+   Endif
+
 #ENDIF
 
+   if ! lCreateAndCompile
 
    AEval( aOutFiles, { | xItem | IIF(  '.c'IN xItem  .OR.  '.C' IN xItem , AAdd( aOutc, xItem ), ) } )
    AEval( aOutc, { | x, z | cItem := x, z := AScan( aOutFiles, { | t | t = cItem } ), IIF( z > 0, aSize( aDel( aOutFiles, z ), Len( aOutFiles ) - 1 ), ) } )
@@ -2386,6 +2594,11 @@ FUNCTION CreateMakeFile( cFile )
    @ 22,01 say space(78)
 
    aOutFiles  := ASort( aOutFiles )
+
+   else
+      aOutFiles := { alltrim(cAppName) }
+   endif
+
    s_aPrgs    := AClone( aOutFiles )
    s_aObjs    := AClone( aOutFiles )
 
@@ -2430,18 +2643,14 @@ FUNCTION CreateMakeFile( cFile )
    FWrite( s_nMakeFileHandle, " " + CRLF )
    FWrite( s_nMakeFileHandle, "SHELL = " + CRLF )
    FWrite( s_nMakeFileHandle, "COMPRESS = " + IIF( s_lCompress, "YES", "NO" ) + CRLF )
-
    FWrite( s_nMakeFileHandle, "EXTERNALLIB = " + IIF( s_lExternalLib, "YES", "NO" ) + CRLF )
-
    FWrite( s_nMakeFileHandle, "XFWH = " + IIF( s_lxFwh, "YES", "NO" ) + CRLF )
-
    FWrite( s_nMakeFileHandle, "FILESTOADD = " + Str( s_nFilesToAdd, 2 ) + CRLF )
-
    FWrite( s_nMakeFileHandle, "WARNINGLEVEL = " + Str(s_nWarningLevel, 2) + CRLF )
-
    FWrite( s_nMakeFileHandle, "USERDEFINE = " + alltrim(s_cUserDefine) + CRLF )
-
    FWrite( s_nMakeFileHandle, "USERINCLUDE = " + alltrim(s_cUserInclude) + CRLF )
+   FWrite( s_nMakeFileHandle, "USERLIBS = " + alltrim(s_cUserLibs) + CRLF )
+   FWrite( s_nMakeFileHandle, "EDITOR = " + s_cEditor + CRLF )
 
    IF lFwh
       FWrite( s_nMakeFileHandle, "FWH = " + alltrim(cFwhPath) + CRLF )
@@ -2850,7 +3059,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( ( lWhoo .OR. lWhat32 .OR. lFwh .OR. lMinigui .OR. lHwgui .or. lGtWvt .or. lGtWvw .or. lXwt .or. lxHGtk ), "c0w32.obj", if(s_lAsDll,"c0d32.obj","c0x32.obj" )) + " $(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) import32.lib " + IIF( s_lMt,"cw32mt.lib", "cw32.lib" )+ CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
 
    ELSEIF s_lMSVcc
@@ -2864,7 +3073,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib " + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib vfw32.lib winmm.lib " + CRLF )
 
    ELSEIF s_lPocc
 
@@ -2877,7 +3086,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = " + IIF( lC4W, "$(C4W)\initc.obj", "" ) + "$(OBJFILES)" + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN)" + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib " + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) "+IIF(s_lMT,"crtmt.lib","crt.lib") + " kernel32.lib user32.lib gdi32.lib winspool.lib comctl32.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib mpr.lib winmm.lib wsock32.lib" + CRLF )
 
    ELSEIF s_lGcc
 
@@ -2891,7 +3100,7 @@ FUNCTION CreateMakeFile( cFile )
       FWrite( s_nMakeFileHandle, " " + CRLF )
       FWrite( s_nMakeFileHandle, "ALLOBJ = $(OBJFILES) " + IIF( s_lExtended, " $(OBJCFILES)", " " ) + CRLF )
       FWrite( s_nMakeFileHandle, "ALLRES = $(RESDEPEN) " + CRLF )
-      FWrite( s_nMakeFileHandle, "ALLLIB = $(LIBFILES) " +if(s_lMinGW," -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32","") + CRLF )
+      FWrite( s_nMakeFileHandle, "ALLLIB = $(USERLIBS) $(LIBFILES) " +if(s_lMinGW," -luser32 -lwinspool -lgdi32 -lcomctl32 -lcomdlg32 -lole32 -loleaut32 -luuid -lmpr -lwsock32 -lws2_32 -lmapi32","") + CRLF )
       FWrite( s_nMakeFileHandle, ".autodepend" + CRLF )
 
    ENDIF
@@ -2981,8 +3190,17 @@ FUNCTION CreateMakeFile( cFile )
          s_cAlertMsg := "Build app ? (Y/N) "
       ENDIF
 
-      @ 20,5 Say s_cAlertMsg Get cBuild PICT "!" Valid cBuild $ iif(s_nLang=2,"YN","SN")
+      if ! lCreateAndCompile
+
+      @ 20,5 SAY s_cAlertMsg;
+             GET cBuild;
+             PICT "!";
+             VALID cBuild $ iif(s_nLang=2,"YN","SN")
       READ
+
+      else
+         cBuild := "Y"
+      endif
 
       IF ( cBuild == "S" .or. cBuild == "Y" )
 
@@ -2998,7 +3216,10 @@ FUNCTION CreateMakeFile( cFile )
                s_cAlertMsg := "Force recompiling for all PRGs </f> ? (Y/N) "
             ENDIF
 
-            @ 21,5 Say s_cAlertMsg Get cBuildForced PICT "!" Valid cBuildForced $ iif(s_nLang=2,"YN","SN")
+            @ 21,5 SAY s_cAlertMsg;
+                   GET cBuildForced;
+                   PICT "!";
+                   VALID cBuildForced $ iif(s_nLang=2,"YN","SN")
             READ
 
          ENDIF
@@ -3252,7 +3473,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        __run( s_cEditor + (s_cLog) )
+                        __run( s_cEditor +" "+ (s_cLog) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3375,7 +3596,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'Error E' $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        __run( s_cEditor + (s_cLog) )
+                        __run( s_cEditor +" "+ (s_cLog) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3451,7 +3672,7 @@ FUNCTION CompileUpdatedFiles()
                      lEnd     := 'C2006' $ cErrText .OR. 'No code generated' $ cErrText .or. "Error E" $ cErrText .or. "Error F" $ cErrText
 
                      IF ! s_lIgnoreErrors .AND. lEnd
-                        __run( s_cEditor + (s_cLog) )
+                        __run( s_cEditor +" "+ (s_cLog) )
                         set cursor on
                         QUIT
                      ELSE
@@ -3685,8 +3906,19 @@ FUNCTION CreateLibMakeFile( cFile )
          lCompMod        := oMake:lCompMod
          s_lGenppo       := oMake:lGenppo
          lInstallLib     := oMake:lInstallLib
-         s_cUserInclude  := PadR(oMake:cUserInclude,200," ")
-         s_cUserDefine   := PadR(oMake:cUserDef,200," ")
+         s_cUserInclude  := PadR(oMake:cUserInclude,200 )
+         s_cUserDefine   := PadR(oMake:cUserDef,200 )
+         s_cUserLibs     := PadR(oMake:cUserLib,200 )
+         s_cEditor       := trim(oMake:cEditor)
+
+         if Empty( s_cEditor )
+            if s_lOS2 .OR. s_lLinux
+               s_cEditor := "mcedit"
+            else
+               s_cEditor := "edit"
+            endif
+         endif
+
          if !empty(oMake:cFmc)
              cLibName    := PadR(oMake:cFmc,200)
          endif
@@ -3840,24 +4072,84 @@ FUNCTION CreateLibMakeFile( cFile )
    SET CURSOR OFF
 
    @ 01,01 SAY s_aLangMessages[ 28 ]
-   @ 01,17,06,24 get cOS listbox { "Win32", "OS/2", "Linux" } message s_aLangMessages[ 49 ] state OsSpec(getlist,1,@cOS)  DROPDOWN
-   @ 01,30 SAY s_aLangMessages[ 29 ]
-   @ 01,54,06,59 get cCompiler listbox { "BCC", "MSVC", "POCC", "GCC","MINGW" }  message s_aLangMessages[ 50 ] state OsSpec(getlist,2,@cCompiler) DROPDOWN
 
-   @ 03,01 SAY s_aLangMessages[ 59 ] GET cLibName PICT "@s15" message s_aLangMessages[ 58 ]
-   @ 03,35 SAY s_aLangMessages[ 60 ] GET cObjDir  PICT "@s15"
+   @ 01,17,06,24 GET cOS;
+                 LISTBOX { "Win32", "OS/2", "Linux" };
+                 MESSAGE s_aLangMessages[ 49 ];
+                 STATE OsSpec(getlist,1,@cOS);
+                 DROPDOWN
+
+   @ 01,30 SAY s_aLangMessages[ 29 ]
+
+   @ 01,54,06,59 GET cCompiler;
+                 LISTBOX { "BCC", "MSVC", "POCC", "GCC","MINGW" };
+                 MESSAGE s_aLangMessages[ 50 ];
+                 STATE OsSpec(getlist,2,@cCompiler);
+                 DROPDOWN
+
+   @ 02,47       SAY s_aLangMessages[ 66 ]
+
+#ifdef __PLATFORM__Windows
+   @ 02,68,06,77 GET s_cEditor;
+                 LISTBOX { "edit", "notepad" };
+                 MESSAGE s_aLangMessages[ 67 ];
+                 STATE   OsSpec(getlist,3,@s_cEditor);
+                 DROPDOWN
+#endif
+
+   @ 03,01 SAY s_aLangMessages[ 59 ];
+           GET cLibName;
+           PICT "@S15";
+           MESSAGE s_aLangMessages[ 58 ]
+
+   @ 03,35 SAY s_aLangMessages[ 60 ];
+           GET cObjDir;
+           PICT "@S15"
 
    Attention( "xHarbour Options", 5 )
 
-   @ 06,01 GET lAutoMemvar   checkbox caption s_aLangMessages[ 32 ] style "[X ]"
-   @ 06,40 GET lVarIsMemvar  checkbox caption s_aLangMessages[ 33 ] style "[X ]"
-   @ 07,01 GET lDebug        checkbox caption s_aLangMessages[ 34 ] style "[X ]"
-   @ 07,40 GET lSupressLine  checkbox caption s_aLangMessages[ 35 ] style "[X ]"
-   @ 08,01 GET s_lGenppo     checkbox caption s_aLangMessages[ 36 ] style "[X ]"
-   @ 08,40 GET lCompMod      checkbox caption s_aLangMessages[ 37 ] style "[X ]"
-   @ 09,01 SAY s_aLangMessages[ 38 ] GET s_cUserDefine PICT "@s23"
-   @ 09,40 SAY s_aLangMessages[ 39 ] GET s_cUserInclude PICT "@s18"
-   @ 10,01 GET lInstallLib   checkbox caption s_aLangMessages[ 61 ] style "[X ]"
+   @ 06,01 GET lAutoMemvar;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 32 ];
+           STYLE "[X ]"
+
+   @ 06,40 GET lVarIsMemvar;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 33 ];
+           STYLE "[X ]"
+
+   @ 07,01 GET lDebug;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 34 ];
+           STYLE "[X ]"
+
+   @ 07,40 GET lSupressLine;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 35 ];
+           STYLE "[X ]"
+
+   @ 08,01 GET s_lGenppo;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 36 ];
+           STYLE "[X ]"
+
+   @ 08,40 GET lCompMod;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 37 ];
+           STYLE "[X ]"
+
+   @ 09,01 SAY s_aLangMessages[ 38 ];
+           GET s_cUserDefine;
+           PICT "@S23"
+
+   @ 09,40 SAY s_aLangMessages[ 39 ];
+           GET s_cUserInclude;
+           PICT "@S18"
+
+   @ 10,01 GET lInstallLib;
+           CHECKBOX;
+           CAPTION s_aLangMessages[ 61 ];
+           STYLE "[X ]"
 
    READ MSG AT MaxRow() - 1, 1, MaxCol() - 1
 
@@ -4197,6 +4489,7 @@ FUNCTION CreateLibMakeFile( cFile )
    FWrite( s_nMakeFileHandle, "INSTALLLIB = " + IIF( lInstallLib, "YES","NO" ) + CRLF )
    FWrite( s_nMakeFileHandle, "USERDEFINE = " + alltrim(s_cUserDefine) + CRLF )
    FWrite( s_nMakeFileHandle, "USERINCLUDE = " + alltrim(s_cUserInclude) + CRLF )
+   FWrite( s_nMakeFileHandle, "EDITOR = " + s_cEditor + CRLF )
 
    IF s_lBcc
 
@@ -4961,6 +5254,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    cParam := Strtran( cParam, "-r", "-R" )
    cParam := Strtran( cParam, "-nr", "-NR" ) // cancel recursive search
    cParam := Strtran( cParam, "-l", "-L" )
+   cParam := Strtran( cParam, "-c", "-C" )  // compile after create.
 
    IF "-EX" IN cParam .OR. "-ELX" IN cParam
       IF "-ELX" IN cParam
@@ -4971,6 +5265,7 @@ FUNCTION ConvertParams( cFile, aFile, p1, p2, p3, p4, p5, p6 )
    IF "-L" IN cParam
       s_cDefLang := Substr( cParam, At( "-L", cParam ) + 2, 2 )
    ENDIF
+
 
 RETURN cParam
 
@@ -5157,286 +5452,235 @@ RETURN NIL
 *-------------------------------
 FUNCTION BuildLangArray( cLang )
 *-------------------------------
-LOCAL aLang := {}
+LOCAL aLang := Array( 67 )
 
    DEFAULT cLang TO "EN"
 
-   /* 1 */
-   AAdd( aLang, HbMake_Id() )
+   AFill( aLang, "" )
 
-   IF cLang == "EN"
+   aLang[1] := HbMake_Id()  // Hbmake identification.
 
-      AAdd( aLang, "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc /ex")
-      AAdd( aLang, "Options:  /e[x]   Create a new Makefile. If /ex is used it create a" )
-      AAdd( aLang, "                  new make file in extended mode." )
-      AAdd( aLang, "          /el[x]  Create a new Makefile. If /elx is used it create a")
-      AAdd( aLang, "                  new make file to build a LIB in extended mode." )
-      AAdd( aLang, "          /D      Define a macro." )
-      AAdd( aLang, "          /p      Print all commands and depedencies." )
-      AAdd( aLang, "          /b      Use Borland C/C++ as C compiler" )
-      AAdd( aLang, "          /g+     Use GNU C/C++ as C compiler" )
-      AAdd( aLang, "          /b+     Use Borland C/C++ as C compiler" )
-      AAdd( aLang, "          /g      Use GNU C/C++ as C compiler" )
-      AAdd( aLang, "          /gl     Use GNU C/C++ as C compiler in Linux" )
-      AAdd( aLang, "          /gl+    Use GNU C/C++ as C compiler in Linux" )
-      AAdd( aLang, "          /v      Use MS-Visual C/C++ as C compiler" )
-      AAdd( aLang, "          /f      Force recompiltion of all files" )
-      AAdd( aLang, "          /i      Ignore errors returned by command" )
-      AAdd( aLang, "          /r /nr  Activate recursive mode. /nr Deactivate recursive mode." )
-      AAdd( aLang, "                  Note: /p and /D can be used together" )
-      AAdd( aLang, "                        /r and /e[x]/el[x] can be used together")
-      AAdd( aLang, "                  Options with + are the default values" )
-      AAdd( aLang, "                  -D switch can accept multiple macros on the same line")
-      AAdd( aLang, "                  or use one macro per -D switch" )
-      AAdd( aLang, "                  /l[LANGID] Specify the language to be used on hbmake")
-      AAdd( aLang, "                  LANGID= (EN/PT/ES). On Windows, the default will be the S.O.")
-      AAdd( aLang, "                  language. On OS/2, FreeBSD and LINUX will be English." )
-      AAdd( aLang, "Enviroment options" )
-      AAdd( aLang, "Select the OS" )
-      AAdd( aLang, "Select the C Compiler" )
-      AAdd( aLang, "Graph Lib" )
-      AAdd( aLang, "xHarbour Options" )
-      AAdd( aLang, "Automatic memvar declaration /a" )
-      AAdd( aLang, "Variables are assumed M-> /v" )
-      AAdd( aLang, "Debug info /b" )
-      AAdd( aLang, "Suppress line number information /l" )
-      AAdd( aLang, "Generate pre-processed output /p" )
-      AAdd( aLang, "compile module only /m" )
-      AAdd( aLang, "User Defines " )
-      AAdd( aLang, "User include Path" )
-      AAdd( aLang, "Use External Libs" )
-      AAdd( aLang, "<Spacebar>-Select <Enter>-Continue process <F5> Sel/Unsel All" )
-      AAdd( aLang, "Warning level /w" )
-      AAdd( aLang, "Numbers of source files per line on makefile" )
-      AAdd( aLang, "Use Multi Thread Library" )
-      AAdd( aLang, "Executable file name" )
-      AAdd( aLang, "Warning Level /w" )
-      AAdd( aLang, "<Tab>-Next <Sh-Tab>-Prev <Enter>-Sel <"+chr(24)+chr(25)+">-Change Sel <Spacebar>-Open Box")
+   IF cLang == "EN"   // English
+      
+      aLang[2]  := "Syntax:  hbmake <cFile>.bc [options] - Example: hbmake hello.bc /ex"
+      aLang[3]  := "Options:  /e[x]   Create a new Makefile. If /ex is used it create a"
+      aLang[4]  := "                  new make file in extended mode." 
+      aLang[5]  := "          /el[x]  Create a new Makefile. If /elx is used it create a"
+      aLang[6]  := "                  new make file to build a LIB in extended mode." 
+      aLang[7]  := "          /D      Define a macro."
+      aLang[8]  := "          /p      Print all commands and depedencies." 
+      aLang[9]  := "          /b      Use Borland C/C++ as C compiler"
+      aLang[10] := "          /g+     Use GNU C/C++ as C compiler" 
+      aLang[11] := "          /b+     Use Borland C/C++ as C compiler" 
+      aLang[12] := "          /g      Use GNU C/C++ as C compiler" 
+      aLang[13] := "          /gl     Use GNU C/C++ as C compiler in Linux" 
+      aLang[14] := "          /gl+    Use GNU C/C++ as C compiler in Linux" 
+      aLang[15] := "          /v      Use MS-Visual C/C++ as C compiler" 
+      aLang[16] := "          /f      Force recompiltion of all files" 
+      aLang[17] := "          /i      Ignore errors returned by command" 
+      aLang[18] := "          /r /nr  Activate recursive mode. /nr Deactivate recursive mode." 
+      aLang[19] := "                  Note: /p and /D can be used together" 
+      aLang[20] := "                        /r and /e[x]/el[x] can be used together"
+      aLang[21] := "                  Options with + are the default values" 
+      aLang[22] := "                  -D switch can accept multiple macros on the same line"
+      aLang[23] := "                  or use one macro per -D switch" 
+      aLang[24] := "                  /l[LANGID] Specify the language to be used on hbmake"
+      aLang[25] := "                  LANGID= (EN/PT/ES). On Windows, the default will be the S.O."
+      aLang[26] := "                  language. On OS/2, FreeBSD and LINUX will be English." 
+      aLang[27] :=  "Enviroment options" 
+      aLang[28] := "Select the OS" 
+      aLang[29] := "Select the C Compiler"
+      aLang[30] := "Graph Lib"
+      aLang[31] := "xHarbour Options" 
+      aLang[32] := "Automatic memvar declaration /a" 
+      aLang[33] := "Variables are assumed M-> /v" 
+      aLang[34] := "Debug info /b" 
+      aLang[35] := "Suppress line number information /l" 
+      aLang[36] := "Generate pre-processed output /p"
+      aLang[37] := "compile module only /m" 
+      aLang[38] := "User Defines " 
+      aLang[39] := "User include Path" 
+      aLang[40] := "Use External Libs" 
+      aLang[41] := "<Spacebar>-Select <Enter>-Continue process <F5> Sel/Unsel All" 
+      aLang[42] := "Warning level /w" 
+      aLang[43] := "Numbers of source files per line on makefile" 
+      aLang[44] := "Use Multi Thread Library" 
+      aLang[45] := "Executable file name" 
+      aLang[46] := "Warning Level /w" 
+      aLang[47] := "<Tab>-Next <Sh-Tab>-Prev <Enter>-Sel <"+chr(24)+chr(25)+">-Change Sel <Spacebar>-Open Box"
       /* Messages Start Here */
-      AAdd( aLang, "3rd Party Rdd")
-      AAdd( aLang, "What OS you Use")
-      AAdd( aLang, "What C compiler  you has")
-      AAdd( aLang, "This app use Graphical libraries")
-      AAdd( aLang, "Do you use 3rd Party Rdd")
-      AAdd( aLang, "Compress this app")
-      AAdd( aLang, "Compress the app after Linked (use upx ?)" )
-      AAdd( aLang, "Your app will be linked to user harbour.dll")
-      AAdd( aLang, "Where the .obj/.o files will be generates")
-      AAdd( aLang, "Inform executable name (without .exe extention)" )
+      aLang[48] := "3rd Party Rdd"
+      aLang[49] := "What OS you Use"
+      aLang[50] := "What C compiler  you has"
+      aLang[51] := "This app use Graphical libraries"
+      aLang[52] := "Do you use 3rd Party Rdd"
+      aLang[53] := "Compress this app"
+      aLang[54] := "Compress the app after Linked (use upx ?)" 
+      aLang[55] := "Your app will be linked to user harbour.dll"
+      aLang[56] := "Where the .obj/.o files will be generates"
+      aLang[57] := "Inform executable name (without .exe extention)" 
       /* More messages for LIB build */
-      AAdd( aLang, "Inform the lib name (without extension)")
+      aLang[58] := "Inform the lib name (without extension)"
       /* More xHarbour options for LIB build */
-      AAdd( aLang, "Lib name:" )
-      AAdd( aLang, "Obj dir files:" )
-      AAdd( aLang, "Install the lib at the xHarbour lib folder" )
-      AAdd( aLang, "          /pc     Use Pelles C/C++ as C compiler" )
-      AAdd( aLang, "          /m      Use MinGW (GCC) as C compiler" )
-      AAdd( aLang, "          /credits") 
+      aLang[59] := "Lib name:" 
+      aLang[60] := "Obj dir files:" 
+      aLang[61] := "Install the lib at the xHarbour lib folder"
+      aLang[62] := "          /pc     Use Pelles C/C++ as C compiler" 
+      aLang[63] := "          /m      Use MinGW (GCC) as C compiler" 
+      aLang[64] := "          /credits" 
 
-   ELSEIF cLang == "ES"
+      aLang[65] := "User Libs: "
+      aLang[66] := "Errorlog Editor:"
+      aLang[67] := "Inform the log error editor for your choice."
 
-      AAdd( aLang, "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc /ex")
-      AAdd( aLang, "Opciones: /e[x]   Crea un Makefile nuevo. Si se usa /ex se crea un nuevo" )
-      AAdd( aLang, "                  makefile en modo extendido." )
-      AAdd( aLang, "          /el[x]  Crea un Makefile nuevo. Si se usa /elx se crea un nuevo" )
-      AAdd( aLang, "                  makefile para construir una LIB en modo extendido." )
-      AAdd( aLang, "          /D      Define una macro." )
-      AAdd( aLang, "          /p      Imprime todos los comandos y dependencias." )
-      AAdd( aLang, "          /b      Usa Borland C/C++ como compilador C" )
-      AAdd( aLang, "          /g+     Usa GNU C/C++ como compilador C" )
-      AAdd( aLang, "          /b+     Usa Borland C/C++ como compilador C" )
-      AAdd( aLang, "          /g      Usa GNU C/C++ como compilador C" )
-      AAdd( aLang, "          /gl     Usa GNU C/C++ como compilador C en Linux" )
-      AAdd( aLang, "          /gl+    Usa GNU C/C++ como compilador C en Linux" )
-      AAdd( aLang, "          /v      Usa MS-Visual C/C++ como compilador C" )
-      AAdd( aLang, "          /f      Forza la recompilaci¢n de todos los archivos" )
-      AAdd( aLang, "          /i      Ignora los errores devueltos por el comando" )
-      AAdd( aLang, "          /r /nr  Activa modo recursivo.  /nr Desactivar modo recursivo." )
-      AAdd( aLang, "                  Nota: /p y /D pueden ser usados juntos" )
-      AAdd( aLang, "                        /r y /e[x]/el[x] pueden ser usados juntos" )
-      AAdd( aLang, "                  Las opciones con + son los valores por omisi¢n" )
-      AAdd( aLang, "                  El parametro -D puede aceptar multiplas macros en la misma" )
-      AAdd( aLang, "                  linea ou use una macro por parametro -D" )
-      AAdd( aLang, "                  /l[LANGID] especifica una linguagem a ser utilizada por")
-      AAdd( aLang, "                   hbmake. LANGID = (EN/PT/ES). En sistemas Windows, Lo padr¢n")
-      AAdd( aLang, "                   es la linguagem de SO. En OS/2, FreeBSD y LINUX ser†n InglÇs.")
-      AAdd( aLang, "Opciones de Ambiente" )
-      AAdd( aLang, "Seleccione SO" )
-      AAdd( aLang, "Seleccione Compilador C" )
-      AAdd( aLang, "Lib Grafica" )
-      AAdd( aLang, "Opciones de lo xHarbour" )
-      AAdd( aLang, "Declaraci¢n automatica de memvar /a" )
-      AAdd( aLang, "Variables ser†n assumidas M-> /v " )
-      AAdd( aLang, "Info. Debug /b" )
-      AAdd( aLang, "Suprime info del n£mero de linea /l" )
-      AAdd( aLang, "Gera salida pre-processada /p" )
-      AAdd( aLang, "Compila solamente lo modulo /m" )
-      AAdd( aLang, "Define del usuarios:" )
-      AAdd( aLang, "Path includes del usuario:" )
-      AAdd( aLang, "Usar libs externas" )
-      AAdd( aLang, "<Espacio>-Seleccionar <Enter>-Continuar proceso <F5> Selec/Deselec todo." )
-      AAdd( aLang, "Nivel del aviso de lo compilador /w" )
-      AAdd( aLang, "Cuantos PRGs por linea no makefile:" )
-      AAdd( aLang, "Usar la libreria Multi Thread" )
-      AAdd( aLang, "Nombre del ejecutable" )
-      AAdd( aLang, "Nivel de Avisos /w" )
-      AAdd( aLang, "<Tab>-Avanzar <Sh-Tab>-Volver <Enter>-Selec <"+chr(24)+chr(25)+">-Mudar Selec <Espacio>-Caja")
+   ELSEIF cLang == "ES"   // Spanish
+
+      aLang[2] := "Sintaxe:  hbmake <cArchivo>.bc [opciones] - Exemplo: hbmake hello.bc /ex"
+      aLang[3] := "Opciones: /e[x]   Crea un Makefile nuevo. Si se usa /ex se crea un nuevo" 
+      aLang[4] := "                  makefile en modo extendido."
+      aLang[5] := "          /el[x]  Crea un Makefile nuevo. Si se usa /elx se crea un nuevo" 
+      aLang[6] := "                  makefile para construir una LIB en modo extendido." 
+      aLang[7] := "          /D      Define una macro." 
+      aLang[8] := "          /p      Imprime todos los comandos y dependencias." 
+      aLang[9] := "          /b      Usa Borland C/C++ como compilador C" 
+      aLang[10] := "          /g+     Usa GNU C/C++ como compilador C" 
+      aLang[11] := "          /b+     Usa Borland C/C++ como compilador C" 
+      aLang[12] := "          /g      Usa GNU C/C++ como compilador C" 
+      aLang[13] := "          /gl     Usa GNU C/C++ como compilador C en Linux" 
+      aLang[14] := "          /gl+    Usa GNU C/C++ como compilador C en Linux" 
+      aLang[15] := "          /v      Usa MS-Visual C/C++ como compilador C"
+      aLang[16] := "          /f      Forza la recompilaci¢n de todos los archivos" 
+      aLang[17] := "          /i      Ignora los errores devueltos por el comando" 
+      aLang[18] := "          /r /nr  Activa modo recursivo.  /nr Desactivar modo recursivo." 
+      aLang[19] := "                  Nota: /p y /D pueden ser usados juntos" 
+      aLang[20] := "                        /r y /e[x]/el[x] pueden ser usados juntos" 
+      aLang[21] := "                  Las opciones con + son los valores por omisi¢n" 
+      aLang[22] := "                  El parametro -D puede aceptar multiplas macros en la misma" 
+      aLang[23] := "                  linea ou use una macro por parametro -D" 
+      aLang[24] := "                  /l[LANGID] especifica una linguagem a ser utilizada por"
+      aLang[25] := "                   hbmake. LANGID = (EN/PT/ES). En sistemas Windows, Lo padr¢n"
+      aLang[26] := "                   es la linguagem de SO. En OS/2, FreeBSD y LINUX ser†n InglÇs."
+      aLang[27] := "Opciones de Ambiente" 
+      aLang[28] := "Seleccione SO" 
+      aLang[29] := "Seleccione Compilador C" 
+      aLang[30] := "Lib Grafica" 
+      aLang[31] := "Opciones de lo xHarbour" 
+      aLang[32] := "Declaraci¢n automatica de memvar /a" 
+      aLang[33] := "Variables ser†n assumidas M-> /v " 
+      aLang[34] := "Info. Debug /b" 
+      aLang[35] := "Suprime info del n£mero de linea /l" 
+      aLang[36] := "Gera salida pre-processada /p" 
+      aLang[37] := "Compila solamente lo modulo /m" 
+      aLang[38] := "Define del usuarios:" 
+      aLang[39] := "Path includes del usuario:" 
+      aLang[40] := "Usar libs externas" 
+      aLang[41] := "<Espacio>-Seleccionar <Enter>-Continuar proceso <F5> Selec/Deselec todo." 
+      aLang[42] := "Nivel del aviso de lo compilador /w" 
+      aLang[43] := "Cuantos PRGs por linea no makefile:" 
+      aLang[44] := "Usar la libreria Multi Thread" 
+      aLang[45] := "Nombre del ejecutable" 
+      aLang[46] := "Nivel de Avisos /w" 
+      aLang[47] := "<Tab>-Avanzar <Sh-Tab>-Volver <Enter>-Selec <"+chr(24)+chr(25)+">-Mudar Selec <Espacio>-Caja"
       /* Messages Start Here */
-      AAdd( aLang, "Rdd Terceros")
-      AAdd( aLang, "Cual OS usted usa")
-      AAdd( aLang, "Cual compilador C usted usa")
-      AAdd( aLang, "Esta App usa Lib Grafica o No")
-      AAdd( aLang, "Usted usa Rdd de terceros")
-      AAdd( aLang, "Comprimir app")
-      AAdd( aLang, "Prensar la App despuÇs de enlazada (usar upx) ?" ) 
-      AAdd( aLang, "Su aplicacion ser† ligada para usar la harbour.dll")
-      AAdd( aLang, "Donde los ficheros *.obj ser†n generados")
-      AAdd( aLang, "Informe lo nombre de lo executable (sin la extension .exe)")
+      aLang[48] := "Rdd Terceros"
+      aLang[49] := "Cual OS usted usa"
+      aLang[50] := "Cual compilador C usted usa"
+      aLang[51] := "Esta App usa Lib Grafica o No"
+      aLang[52] := "Usted usa Rdd de terceros"
+      aLang[53] := "Comprimir app"
+      aLang[54] := "Prensar la App despuÇs de enlazada (usar upx) ?"  
+      aLang[55] := "Su aplicacion ser† ligada para usar la harbour.dll"
+      aLang[56] := "Donde los ficheros *.obj ser†n generados"
+      aLang[57] := "Informe lo nombre de lo executable (sin la extension .exe)"
       /* More messages for LIB build */
-      AAdd( aLang, "Informe lo nombre de la lib (sin la extension)")
+      aLang[58] := "Informe lo nombre de la lib (sin la extension)"
       /* More xHarbour options for LIB build */
-      AAdd( aLang, "Nombre de la Lib:" )
-      AAdd( aLang, "Direct¢rio de los Obj:" )
-      AAdd( aLang, "Alojar la lib en el direct¢rio lib de xHarbour" )
-      AAdd( aLang, "          /pc     Usa Pelles C/C++ como compilador C" )
-      AAdd( aLang, "          /m      Usa MinGW (GCC) como compilador C" )
-      AAdd( aLang, "          /credits") 
+      aLang[59] := "Nombre de la Lib:" 
+      aLang[60] := "Direct¢rio de los Obj:" 
+      aLang[61] := "Alojar la lib en el direct¢rio lib de xHarbour" 
+      aLang[62] := "          /pc     Usa Pelles C/C++ como compilador C" 
+      aLang[63] := "          /m      Usa MinGW (GCC) como compilador C" 
+      aLang[64] := "          /credits" 
+      aLang[65] := "Libs del usuario: "
+      aLang[66] := "Editor de errorlog:"
+      aLang[67] := "Informe lo editor de log de errores de su preferencia."
 
-   ELSEIF cLang == "PT"
+   ELSEIF cLang == "PT"  // Portuguese-Brazil
 
-      /* 2 */
-      AAdd( aLang, "Sintaxe:  hbmake <arquivo>.bc [opá‰es] -  Exemplo: hbmake hello.bc /ex")
-      /* 3 */
-      AAdd( aLang, "Opá‰es:  /e[x]  Cria um Makefile novo. Se for usado /ex cria um makefile" )
-      /* 4 */
-      AAdd( aLang, "                em modo extendido." )
-      /* 5 */
-      AAdd( aLang, "         /el[x] Cria um Makefile novo. Se for usado /elx cria um makefile" )
-      /* 6 */
-      AAdd( aLang, "                para construir uma LIB, em modo extendido." )
-      /* 7 */
-      AAdd( aLang, "         /D     Define uma macro." )
-      /* 8 */
-      AAdd( aLang, "         /p     Imprime todos os comandos e dependàncias." )
-      /* 9 */
-      AAdd( aLang, "         /b     Usa Borland C/C++ como compilador C" )
-      /* 10 */
-      AAdd( aLang, "         /g+    Usa GNU C/C++ como compilador C" )
-      /* 11 */
-      AAdd( aLang, "         /b+    Usa Borland C/C++ como compilador C" )
-      /* 12 */
-      AAdd( aLang, "         /g     Usa GNU C/C++ como compilador C" )
-      /* 13 */
-      AAdd( aLang, "         /gl    Usa GNU C/C++ como compilador C no Linux" )
-      /* 14 */
-      AAdd( aLang, "         /gl+   Usa GNU C/C++ como compilador C no Linux" )
-      /* 15 */
-      AAdd( aLang, "         /v     Usa MS-Visual C/C++ como compilador C" )
-      /* 16 */
-      AAdd( aLang, "         /f     Foráa a recompilaá∆o de todos os arquivos." )
-      /* 17 */
-      AAdd( aLang, "         /i     Ignora os erros devolvidos pelo comando." )
-      /* 18 */
-      AAdd( aLang, "         /r /nr Ativa modo recursivo. /nr Desativar modo recursivo." )
-      /* 19 */
-      AAdd( aLang, "                Nota:  /p e /D podem ser usados juntos" )
-      /* 20 */
-      AAdd( aLang, "                       /r e /e[x]/el[x] podem ser usados juntos" )
-      /* 21 */
-      AAdd( aLang, "                As opá‰es com + s∆o os valores padr∆o." )
-      /* 22 */
-      AAdd( aLang, "                O parÉmetro -D pode aceitar m£ltiplas macros na mesma linha")
-      /* 23 */
-      AAdd( aLang, "                ou use uma macro por parÉmetro -D" )
-      /* 24 */
-      AAdd( aLang, "                /l[LANGID] especifica a linguagem a ser utilizada pelo hbmake,")
-      /* 25 */
-      AAdd( aLang, "                LANGID = (EN/PT/ES). Em Windows, o padr∆o ser† a linguagem")
-      /* 26 */
-      AAdd( aLang, "                definida no S.O. Em OS/2, FreeBSD e LINUX o padr∆o ser† Inglàs.")
-      /* 27 */
-      AAdd( aLang, "Opá‰es de Ambiente" )
-      /* 28 */
-      AAdd( aLang, "Selecione o SO" )
-      /* 29 */
-      AAdd( aLang, "Selecione Compilador C" )
-      /* 30 */
-      AAdd( aLang, "Lib Gr†f." )
-      /* 31 */
-      AAdd( aLang, "Opá‰es do xHarbour" )
-      /* 32 */
-      AAdd( aLang, "Declaraá∆o Autom†tica de Memvar /a" )
-      /* 33 */
-      AAdd( aLang, "Vari†veis s∆o assumidas M-> /v" )
-      /* 34 */
-      AAdd( aLang, "Info. Debug /b" )
-      /* 35 */
-      AAdd( aLang, "Suprime info de n£mero da linha /l" )
-      /* 36 */
-      AAdd( aLang, "Gera sa°da prÇ-processada /p" )
-      /* 37 */
-      AAdd( aLang, "Compila apenas o m¢dulo /m" )
-      /* 38*/
-      AAdd( aLang, "User Defines:" )
-      /* 39 */
-      AAdd( aLang, "User Include Path:" )
-      /* 40 */
-      AAdd( aLang, "Usa Libs Externas ?" )
-      /* 41 */
-      AAdd( aLang, "<Espaáo>-Seleciona <Enter> p/ continuar processo <F5>-Sel/DeSel. tudo." )
-      /* 42 */
-      AAdd( aLang, "N°vel de aviso do compilador /w" )
-      /* 43 */
-      AAdd( aLang, "Qtd de PRGs por linha, no makefile: " )
-      /* 44 */
-      AAdd( aLang, "Usar a biblioteca Multi Thread ?" )
-      /* 45 */
-      AAdd( aLang, "Nome Execut†vel:" )
-      /* 46 */
-      AAdd( aLang, "N°vel de Warnings /w" )
-      /* 47 */
-      AAdd( aLang, "<Tab>-Avanáa <Sh-Tab>-Volta <Enter>-Sel. <"+chr(24)+chr(25)+">-Muda Sel. <Espc>-Abre Box")
+      aLang[2] := "Sintaxe:  hbmake <arquivo>.bc [opá‰es] -  Exemplo: hbmake hello.bc /ex"
+      aLang[3] := "Opá‰es:  /e[x]  Cria um Makefile novo. Se for usado /ex cria um makefile" 
+      aLang[4] := "                em modo extendido." 
+      aLang[5] := "         /el[x] Cria um Makefile novo. Se for usado /elx cria um makefile" 
+      aLang[6] := "                para construir uma LIB, em modo extendido." 
+      aLang[7] := "         /D     Define uma macro." 
+      aLang[8] := "         /p     Imprime todos os comandos e dependàncias." 
+      aLang[9] := "         /b     Usa Borland C/C++ como compilador C" 
+      aLang[10] := "         /g+    Usa GNU C/C++ como compilador C" 
+      aLang[11] := "         /b+    Usa Borland C/C++ como compilador C" 
+      aLang[12] := "         /g     Usa GNU C/C++ como compilador C" 
+      aLang[13] := "         /gl    Usa GNU C/C++ como compilador C no Linux" 
+      aLang[14] := "         /gl+   Usa GNU C/C++ como compilador C no Linux" 
+      aLang[15] := "         /v     Usa MS-Visual C/C++ como compilador C" 
+      aLang[16] := "         /f     Foráa a recompilaá∆o de todos os arquivos." 
+      aLang[17] := "         /i     Ignora os erros devolvidos pelo comando." 
+      aLang[18] := "         /r /nr Ativa modo recursivo. /nr Desativar modo recursivo." 
+      aLang[19] := "                Nota:  /p e /D podem ser usados juntos" 
+      aLang[20] := "                       /r e /e[x]/el[x] podem ser usados juntos" 
+      aLang[21] := "                As opá‰es com + s∆o os valores padr∆o." 
+      aLang[22] := "                O parÉmetro -D pode aceitar m£ltiplas macros na mesma linha"
+      aLang[23] := "                ou use uma macro por parÉmetro -D" 
+      aLang[24] := "                /l[LANGID] especifica a linguagem a ser utilizada pelo hbmake,"
+      aLang[25] := "                LANGID = (EN/PT/ES). Em Windows, o padr∆o ser† a linguagem"
+      aLang[26] := "                definida no S.O. Em OS/2, FreeBSD e LINUX o padr∆o ser† Inglàs."
+      aLang[27] := "Opá‰es de Ambiente" 
+      aLang[28] := "Selecione o SO" 
+      aLang[29] := "Selecione Compilador C" 
+      aLang[30] := "Lib Gr†f." 
+      aLang[31] := "Opá‰es do xHarbour" 
+      aLang[32] := "Declaraá∆o Autom†tica de Memvar /a" 
+      aLang[33] := "Vari†veis s∆o assumidas M-> /v" 
+      aLang[34] := "Info. Debug /b" 
+      aLang[35] := "Suprime info de n£mero da linha /l" 
+      aLang[36] := "Gera sa°da prÇ-processada /p" 
+      aLang[37] := "Compila apenas o m¢dulo /m" 
+      aLang[38] := "User Defines:" 
+      aLang[39] := "User Include Path:" 
+      aLang[40] := "Usa Libs Externas ?"
+      aLang[41] := "<Espaáo>-Seleciona <Enter> p/ continuar processo <F5>-Sel/DeSel. tudo." 
+      aLang[42] := "N°vel de aviso do compilador /w" 
+      aLang[43] := "Qtd de PRGs por linha, no makefile: " 
+      aLang[44] := "Usar a biblioteca Multi Thread ?" 
+      aLang[45] := "Nome Execut†vel:" 
+      aLang[46] := "N°vel de Warnings /w" 
+      aLang[47] := "<Tab>-Avanáa <Sh-Tab>-Volta <Enter>-Sel. <"+chr(24)+chr(25)+">-Muda Sel. <Espc>-Abre Box"
       /* Messages Start Here */
-      /* 48 */
-      AAdd( aLang, "Rdd Terceiros")
-      /* 49 */
-      AAdd( aLang, "Selecione o Sistema Operacional")
-      /* 50 */
-      AAdd( aLang, "Selecione o compilador C/C++")
-      /* 51 */
-      AAdd( aLang, "Esta aplicaá∆o vai usar Lib Grafica ? Qual ?")
-      /* 52 */
-      AAdd( aLang, "Esta aplicaá∆o vai usar Rdd de terceiros ? Qual ?")
-      /* 53 */
-      AAdd( aLang, "Comprimir App ?")
-      /* 54 */
-      AAdd( aLang, "Comprimir a aplicaá∆o ap¢s linkada (usar upx) ?" )
-      /* 55 */
-      AAdd( aLang, "Sua aplicaá∆o ser† linkada para usar a harbour.dll ?")
-      /* 56 */
-      AAdd( aLang, "Informe a pasta onde os arquivos *.obj ser∆o gerados")
-      /* 57 */
-      AAdd( aLang, "Informe o nome do execut†vel (sem a extens∆o .exe)")
+      aLang[48] := "Rdd Terceiros"
+      aLang[49] := "Selecione o Sistema Operacional"
+      aLang[50] := "Selecione o compilador C/C++"
+      aLang[51] := "Esta aplicaá∆o vai usar Lib Grafica ? Qual ?"
+      aLang[52] := "Esta aplicaá∆o vai usar Rdd de terceiros ? Qual ?"
+      aLang[53] := "Comprimir App ?"
+      aLang[54] := "Comprimir a aplicaá∆o ap¢s linkada (usar upx) ?" 
+      aLang[55] := "Sua aplicaá∆o ser† linkada para usar a harbour.dll ?"
+      aLang[56] := "Informe a pasta onde os arquivos *.obj ser∆o gerados"
+      aLang[57] := "Informe o nome do execut†vel (sem a extens∆o .exe)"
       /* More messages for LIB build */
-      /* 58 */
-      AAdd( aLang, "Informe o nome da lib (sem a extens∆o)")
+      aLang[58] := "Informe o nome da lib (sem a extens∆o)"
       /* More xHarbour options for LIB build */
-      /* 59 */
-      AAdd( aLang, "Nome da Lib:" )
-      /* 60 */
-      AAdd( aLang, "Diret¢rio dos Obj:" )
-      /* 61 */
-      AAdd( aLang, "Instalar a lib no diret¢rio lib do xHarbour" )
-      /* 62 */
-      AAdd( aLang, "         /pc    Usa Pelles C/C++ como compilador C" )
-      /* 63 */
-      AAdd( aLang, "         /m     Usa MinGW (GCC) como compilador C" )
-      /* 64 */
-      AAdd( aLang, "         /credits") 
+      aLang[59] := "Nome da Lib:" 
+      aLang[60] := "Diret¢rio dos Obj:" 
+      aLang[61] := "Instalar a lib no diret¢rio lib do xHarbour" 
+      aLang[62] := "         /pc    Usa Pelles C/C++ como compilador C" 
+      aLang[63] := "         /m     Usa MinGW (GCC) como compilador C" 
+      aLang[64] := "         /credits" 
+      aLang[65] := "Libs de usu†rio: "
+      aLang[66] := "Editor de errorlog:"
+      aLang[67] := "Informe o editor de log de erros de sua preferància."
 
    ENDIF
 
 RETURN aLang
+
 
 *------------------------------------------
 FUNCTION GetSelFiles( aInFiles, aOutFiles )
@@ -5516,7 +5760,7 @@ FUNCTION OsSpec(GetList,nPos,cSpec)
    oControl := oGet:Control
    IF oControl != NIL
       cSpec := oControl:GetData( oControl:Value )
-//   keyboard chr(9)
+//   keyboard chr( K_TAB )
    ENDIF
 
 RETURN .T.
@@ -5560,7 +5804,7 @@ RETURN NIL
 *------------------
 FUNCTION ShowHelp()
 *------------------
-
+/*
    CLS
 
    OutStd( s_aLangMessages[ 1 ] + CRLF )
@@ -5609,6 +5853,30 @@ FUNCTION ShowHelp()
    OutStd( s_aLangMessages[ 24 ] + CRLF )
    OutStd( s_aLangMessages[ 25 ] + CRLF )
    OutStd( s_aLangMessages[ 26 ] + CRLF )
+*/
+      OutStd( HbMake_ID() + HB_OSNewLine() +;
+              HbMake_Copyright() + HB_OSNewLine() +;
+              HB_OSNewLine() +;
+              "Syntax:  hbmake <makefile> [switches]" + HB_OSNewLine() +;
+              "Switches:" + HB_OSNewLine() +;
+              "  -b   Use Bcc as the C compiler. This options is default under Win32" + HB_OSNewLine() +;
+              "  -g   Use Gcc as the C compiler. This options is default under OS/2" + HB_OSNewLine() +;
+              "  -gl  Use Gcc as the C compiler on Linux" + HB_OSNewLine() +;
+              "  -v   Use MSVC as the C compiler" + HB_OSNewLine() +;
+              "  -D   Define an macro. Multiple macros can be used in an single line" + HB_OSNewLine() +;
+              "       Ex: -DOBJ=c.obj;d.obj" + HB_OSNewLine() +;
+              "           Multiple -D is also supported" + HB_OSNewLine() +;
+              "  -p   Print all command and defines" + HB_OSNewLine() +;
+              "  -f   Force all files to be rebuild" + HB_OSNewLine() +;
+              "  -e   Open the editor mode." + HB_OSNewLine() +;
+              "  -ec  create/edit and compile (only for a unique prg)" + HB_OSNewLine() +;
+              "  -ex  Open the editor mode in extended mode" + HB_OSNewLine() +;
+              "  -el  Open the editor mode for creating libraries." + HB_OSNewLine() +;
+              "  -elx Open the editor mode for creating libraries in extented mode." + HB_OSNewLine() +;
+              "  -i   Ignore errors returned by commands" + HB_OSNewLine() +;
+              "  -r   Recurse directories for source code" + HB_OSNewLine() +;
+              HB_OSNewLine() +;
+              "Note:  Linked with " + Version() + HB_OSNewLine() )
 
 RETURN NIL
 
@@ -5620,7 +5888,7 @@ RETURN ( "HbMake v"+s_cHbMakeVersion+" - xHarbour Make Utility")
 *--------------------------
 FUNCTION HbMake_Copyright()
 *--------------------------
-RETURN ( "Copyright (C) 2000-2005 xHarbour project - http://www.xharbour.org")
+RETURN ( "Copyright (C) 2000-2007 xHarbour project - http://www.xharbour.org")
 
 *---------------------
 FUNCTION ShowCredits()

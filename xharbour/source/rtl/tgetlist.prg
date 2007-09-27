@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.39 2007/03/01 15:33:15 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.40 2007/07/06 13:11:35 modalsist Exp $
  */
 
 /*
@@ -93,12 +93,13 @@ CLASS HBGetList
    DATA cReadProcName, nReadProcLine
    DATA cVarName
    DATA lHasFocus
+   DATA lInvalid
+   DATA nSaveCursor
 
    #ifdef HB_COMPAT_C53
    Data nHitcode
    Data nNextGet
    Data nMenuID
-   Data nSaveCursor
    #endif
 
    METHOD New( GetList )
@@ -142,6 +143,7 @@ CLASS HBGetList
    METHOD HitTest( nMouseRow, nMouseColumn, oGetMsg ) // Removed STATIC
 #endif
 
+
 ENDCLASS
 
 METHOD New( GetList ) CLASS HBGetList
@@ -157,6 +159,7 @@ METHOD New( GetList ) CLASS HBGetList
    ::nPos           := 1
    ::oGet           := iif( ISARRAY( GetList ) .AND. Len( GetList ) >= 1, GetList[ 1 ], NIL )
    ::lHasFocus      := .F.
+   ::lInvalid       := .F.
 
    #ifdef HB_COMPAT_C53
    ::nHitCode       := 0
@@ -178,7 +181,8 @@ METHOD SetFocus() CLASS HBGetList
 METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
 
    local oGet := ::oGet, nKey, nRow, nCol, nCursor
-   local lDelEnd := .F. // Flag to reset Get when postblock return .F.
+
+   ::lInValid := .F. // Flag to reset Get when postblock return .F.
 
    if ::nLastExitState == GE_SHORTCUT .OR.;
       ::nLastExitState == GE_MOUSEHIT .OR.;
@@ -207,7 +211,7 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
             setCursor( iif( ::nSaveCursor == SC_NONE, SC_NORMAL, ::nSaveCursor ) )
             nKey := INKEY( 0 )
             setCursor( SC_NONE )
-            ::GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd )
+            ::GetApplyKey( nKey, oMenu, oGetMsg )
             oGetMsg:Show( oGet )
          end
 
@@ -216,7 +220,6 @@ METHOD Reader( oMenu, oGetMsg ) CLASS HBGetList
          elseif ! ::GetPostValidate( oGet, oGetMsg )
             oGet:ExitState := GE_NOEXIT
             // postblock returns .F., set flag to reset get
-            lDelEnd := .T.
          endif
       end
 
@@ -237,7 +240,8 @@ return Self
 METHOD Reader() CLASS HBGetList
 
    local oGet := ::oGet
-   local lDelEnd := .F.
+
+   ::lInValid := .F.
 
    if ::GetPreValidate()
 
@@ -257,11 +261,10 @@ METHOD Reader() CLASS HBGetList
          endif
 
          while oGet:exitState == GE_NOEXIT
-            ::GetApplyKey( Inkey( 0 ), lDelEnd )
+            ::GetApplyKey( Inkey( 0 ) )
          end
 
          if ! ::GetPostValidate()
-            lDelEnd := .T.
             oGet:ExitState := GE_NOEXIT
          endif
       end
@@ -274,7 +277,7 @@ return Self
 
 
 #ifdef HB_COMPAT_C53
-METHOD GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd ) CLASS HBGetList
+METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
 
    local oGet := ::oGet
    local cKey
@@ -309,7 +312,7 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg, lDelEnd ) CLASS HBGetList
 
 #else
 
-METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
+METHOD GetApplyKey( nKey ) CLASS HBGetList
 
    local cKey, bKeyBlock, oGet := ::oGet
    local cToPaste, nI, nLen
@@ -320,8 +323,6 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
    endif
 
 #endif
-
-   DEFAULT lDelEnd TO .F.
 
    Switch nKey
       case K_UP
@@ -376,8 +377,13 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
       case K_INS
          Set( _SET_INSERT, ! Set( _SET_INSERT ) )
          ::ShowScoreboard()
-         exit
-
+         /* 2007/SEP/24 - EF - Toggle cursor shape at insert mode on/off
+          *               Uncomment it, if you want this behaviour.
+          *if ::nSaveCursor != SC_NONE
+          *   ::nSaveCursor := if( Set(_SET_INSERT), SC_INSERT, SC_NORMAL )
+          *endif
+          */
+          exit
 #ifdef HB_COMPAT_C53
       case K_LBUTTONDOWN
       case K_LDBLCLK
@@ -512,24 +518,36 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
 
       Default
 
-         if nKey >= 32 .and. nKey <= 255
-            /* 2007/JUL/06 - E.F. Disabled this code by Clipper compatibility.
-            * // clear buffer and get window when postblock returns .F.
-            * if lDelEnd
-            *    oGet:DelEnd() 
-            * endif
-            */
+         if nKey >= 32 .and. nKey <= 255 
+
+            if ::lInValid
+               /*  2007/JUL/06 - E.F. Disabled oGet:DelEnd() for Clipper compatibility.
+                *  clear buffer and get window when postblock returns .F.
+                *  oGet:DelEnd() */
+
+               /* 2007/SEP/24 - EF - Adjust buffer content. */
+               if oGet:Type == "N"
+                  oGet:DelEnd()
+                  if oGet:Untransform()==0
+                     oGet:Clear := .t.
+                  endif
+               endif
+            endif
+
             cKey := Chr( nKey )
-            if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," )
-               oGet:changed:=.t.  // 2006/DEC/22 - E.F. Fixed by Marco Bernardi. 
+            
+            if oGet:type == "N" .and. ( cKey == "." .or. cKey == "," ) 
+               oGet:changed := .t.  // 2006/DEC/22 - E.F. Fixed by Marco Bernardi.
                oGet:ToDecPos()
+
+            /* 2007/SEP/25 -EF - Deny type minus sign more than one time.  */
+            elseif oGet:type == "N" .and. cKey == "-" .and. oGet:Minus  
             else
                if Set( _SET_INSERT )
                   oGet:Insert( cKey )
                else
                   oGet:OverStrike( cKey )
                endif
-
                if oGet:TypeOut
                   if Set( _SET_BELL )
                      ?? Chr( 7 )
@@ -537,10 +555,28 @@ METHOD GetApplyKey( nKey, lDelEnd ) CLASS HBGetList
                   if ! Set( _SET_CONFIRM )
                      oGet:ExitState := GE_ENTER
                   endif
+                  /* 2007/SEP/24 - EF - Adjust buffer content. */
+                  if oGet:Type=="N" .and. oGet:Untransform()=0
+                     oGet:Minus := .f.
+                     oGet:VarPut(0)
+                     oGet:Assign()
+                     oGet:UpdateBuffer()
+                  endif
                endif
             endif
          endif
       end
+
+      /* 2007/SEP/24 - EF - Adjust buffer content. */
+      if oGet:ExitState > GE_NOEXIT .and. oGet:Type == "N"
+         if oGet:Untransform() == 0
+            oGet:Minus := .f.
+            oGet:VarPut(0)
+            oGet:Buffer := StrTran( oGet:Buffer, "-"," ")
+         endif
+         oGet:Assign()
+         oGet:UpdateBuffer()
+      endif
 
 return Self
 
@@ -696,6 +732,8 @@ METHOD GetPostValidate() CLASS HBGetList
          lValid := .t.
       endif
    endif
+
+   ::lInvalid := ! ( lValid )
 
 return lValid
 
@@ -1381,7 +1419,7 @@ METHOD GUIPostValidate( oGUI, oGetMsg ) CLASS HBGetList
    return  lValid
 
 METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
-   Local oTB, nKey, lAutoLite, nSaveCursor, nProcessed
+   Local oTB, nKey, lAutoLite, nCursor, nProcessed
 //   Local nRow, nCol
 //   Local oGui := oGet:control
 
@@ -1394,7 +1432,7 @@ METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
       oGetMsg:Show( oGet )
       ::nLastExitState := 0  // Added.
 
-      nSaveCursor := SetCursor( SC_NONE )
+      nCursor := SetCursor( SC_NONE )
 
       // Activate the GET for reading
       oTB := oGet:Control
@@ -1462,7 +1500,7 @@ METHOD TBReader( oGet, oMenu,  oGetMsg ) Class HBGETLIST
 
       oGetMsg:Erase()
 
-      SetCursor( nSaveCursor )
+      SetCursor( nCursor )
    endif
 
    return Self

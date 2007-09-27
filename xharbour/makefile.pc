@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.52 2007/09/15 17:37:46 patrickmast Exp $
+# $Id: makefile.pc,v 1.53 2007/09/25 07:32:27 marchuet Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -544,7 +544,7 @@ HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxdate.obj \
    \
    $(OBJ_DIR)\sxfunc.obj
-   
+
 HSX_LIB_OBJS = \
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj

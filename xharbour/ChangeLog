@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5723 2007/09/25 07:32:22 marchuet Exp $
+ * $Id: ChangeLog,v 1.5724 2007/09/27 02:50:35 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,47 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-27 08:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * makefile.pc
+    ! minor fix to avoid "Rules must follows target" message after last commit.
+
+  * hrbdll.pc
+    + added new sxfunc.prg.
+
+  * source/rtl/teditor.prg
+    * reverted Text2Array() function to sync with old __StrTkPtr() function.
+
+  * source/rtl/tget.prg
+    * minor fix on display() method to hide "CR" after type 0 in a numeric
+      get with "@C" picture.
+
+  * source/rtl/tgetlist.prg
+    * created HB_GetList:lInvalid property to control postblock return.
+      The old one <lDelEnd> variable is needless by now.
+    ! fixed get value and adjust buffer content when postblock returns false.
+      bug reported by Vicente Guerra.
+    * toggle cursor shape at insert mode on/off.
+      note: By default, this code is commented into GetApplyKey() method.
+            if you want this behaviour, uncomment them.
+    * changed GetApplyKey() to deny type minus sign more than once time when
+      get type is numeric.
+
+  * utils/hbmake/tmake.prg
+    + added cUserLib and cEditor datas.
+
+  * utils/hbmake/hbmake.prg
+    * hbmake version 1.20
+    + created get for user lib path for libs that are on other place than xharbour/lib folder.
+      it's need inform full path.
+    + created listbox for user errorlog editor (edit or notepad) for Windows OS. The default is edit.
+    * reorganized the say/gets for best view.
+    * changed BuildLangArray() function to reorganize the s_aLangMessages array for
+      easy number identification.
+    + created new parameter named "-c" to compile after create a script file.
+      f.e. hbmake <test.bc> -e -c  this will create and compile without open edit 
+      options. This is usefull when we need compile only one prg file.
+    * updated showhelp() function content.
 
 2007-09-26 22:50 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source\compiler\genc.c

@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.135 2007/09/03 18:31:54 paultucker Exp $
+ * $Id: tget.prg,v 1.136 2007/09/15 12:28:05 modalsist Exp $
  */
 
 /*
@@ -576,8 +576,12 @@ METHOD Display( lForced ) CLASS Get
          ::ExitState != NIL .AND. xBuffer != NIL .AND.;
          ::ExitState > GE_NOEXIT .AND. ::ExitState != GE_ESCAPE
 
+/*    2007/SEP/24 - EF - Adjust buffer contents. 
+*         if ( "X" IN ::cPicFunc .and. ::Untransform( xBuffer ) >= 0 ) .or.;
+*            ( "C" IN ::cPicFunc .and. ::Untransform( xBuffer ) < 0 )
+*/
          if ( "X" IN ::cPicFunc .and. ::Untransform( xBuffer ) >= 0 ) .or.;
-            ( "C" IN ::cPicFunc .and. ::Untransform( xBuffer ) < 0 )
+            ( "C" IN ::cPicFunc .and. ::Untransform( xBuffer ) <= 0 )
 
             nDispReduce := 3
 

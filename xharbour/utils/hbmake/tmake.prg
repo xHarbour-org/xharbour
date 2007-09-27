@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.17 2006/08/05 20:15:17 modalsist Exp $
+ * $Id: tmake.prg,v 1.18 2007/08/30 22:06:43 lculik Exp $
  */
 
 /*
@@ -108,6 +108,7 @@ DATA  lExternalLib   init .F.
 DATA  cObj           init ""
 DATA  cUserdef       init ""
 DATA  cUserInclude   init ""
+DATA  cUserLib       init ""
 DATA  lGenppo        init .f.
 DATA  lCompMod       init .f.
 DATA  lAutomemvar    init .f.
@@ -129,6 +130,7 @@ DATA  cRes           init ""
 DATA  cMacro         init ""
 DATA  lGenCsource    init .f.      // Ath added 31-05-2006
 DATA  cShell         init ""
+DATA  cEditor        init ""
 
 METHOD New()
 METHOD ReadMakefile(cFile)
@@ -144,9 +146,12 @@ METHOD New() CLASS THbMake
    ::cObj           := "obj" + Space( 40 )
    ::cUserdef       := Space( 200 )
    ::cUserInclude   := Space( 200 )
+   ::cUserLib       := Space( 200 )
    ::cFMC           := Space( 200 )
    ::cAppLibName    := Space( 20 )
    ::cTopModule     := Space( 20 )
+   ::cEditor        := ""
+
 return self
 
 
@@ -480,8 +485,16 @@ METHOD ReadMakefile(cFile) CLASS THbMake
                    ::cUserInclude := aTemp[ 2 ]
                 endif
 
+                IF aTemp[ 1 ] == "USERLIBS"
+                   ::cUserLib := aTemp[ 2 ]
+                endif
+
                 IF aTemp[ 1 ] == "TOPMODULE"
                    ::cTopModule := aTemp[ 2 ]
+                endif
+
+                IF aTemp[ 1 ] == "EDITOR"
+                   ::cEditor := aTemp[ 2 ]
                 endif
 
             ENDIF

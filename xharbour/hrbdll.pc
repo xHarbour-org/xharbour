@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.39 2007/09/03 18:04:25 paultucker Exp $
+# $Id: hrbdll.pc,v 1.40 2007/09/15 17:37:45 patrickmast Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -719,6 +719,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
+   $(OBJ_DIR)\sxfunc.obj \
    \
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj \
@@ -1085,6 +1086,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\sxcompr.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\sxcrypt.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\sxdate.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\sxfunc.obj     >> make_tmp
 #
 # HSX
 #
@@ -3396,6 +3398,12 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
         $(CC_CMD)
+
+$(OBJ_DIR)\sxfunc.c : $(HBSIX_DIR)\sxfunc.prg
+        $(HB_CMD)
+
+$(OBJ_DIR)\sxfunc.obj : $(OBJ_DIR)\sxfunc.c
+        $(CC_CMD)   
 
 # hsx
 
