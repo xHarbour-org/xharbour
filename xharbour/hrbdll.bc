@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.139 2007/09/03 18:04:25 paultucker Exp $
+# $Id: hrbdll.bc,v 1.140 2007/09/15 17:37:45 patrickmast Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -545,7 +545,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\pcre_globals.obj \
   $(OBJ_DIR)\pcre_info.obj \
   $(OBJ_DIR)\pcre_maketables.obj \
-  $(OBJ_DIR)\pcre_newline.obj \  
+  $(OBJ_DIR)\pcre_newline.obj \
   $(OBJ_DIR)\pcre_ord2utf8.obj \
   $(OBJ_DIR)\pcre_refcount.obj \
   $(OBJ_DIR)\pcre_study.obj \
@@ -748,6 +748,7 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
+   $(OBJ_DIR)\sxfunc.obj \
 #
 #  HSX
 #
@@ -757,7 +758,7 @@ HARBOUR_DLL_OBJS = \
 #  usrrdd
 #
   $(OBJ_DIR)\usrrdd.obj
-  
+
 #
 #  Gt
 #
@@ -1413,6 +1414,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\sxcompr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxdate.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxfunc.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cftsfunc.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\usrrdd.obj            + >> hdll.tmp
@@ -1439,7 +1441,7 @@ $(HARBOUR_DLL)  : \
 !endif
   echo. import32.lib                     + >> hdll.tmp
   echo. uuid.lib                           >> hdll.tmp
-  
+
   ILINK32 -aa -Tpd -Gn -Gi $(LFLAGS) @hdll.tmp
 
 # 旼컴컴컴컴컴컴컴컴컴컴커
@@ -3531,7 +3533,7 @@ $(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
 
 $(OBJ_DIR)\pcre_newline.obj : $(PCREPOS_DIR)\pcre_newline.c
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
-   
+
 $(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
 
@@ -3561,7 +3563,7 @@ $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
 
 $(OBJ_DIR)\pcreposix.obj : $(PCREPOS_DIR)\pcreposix.c
    $(CC) -I$(PCREPOS_DIR) $(CLIBFLAGS) -o$@ $**
-  
+
 
 #
 # HBSIX.LIB dependencies
@@ -3574,6 +3576,12 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
    $(CC_CMD)
 
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxfunc.c : $(HBSIX_DIR)\sxfunc.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\sxfunc.obj : $(OBJ_DIR)\sxfunc.c
    $(CC_CMD)
 
 #
