@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.641 2007/09/25 07:33:01 marchuet Exp $
+ * $Id: hvm.c,v 1.642 2007/09/27 02:50:36 ronpinkas Exp $
  */
 
 /*
@@ -9407,7 +9407,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          {
             if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
             {
-               hSymScope            &= ~HB_FS_LOCAL;
+               //hSymScope            &= ~HB_FS_LOCAL; // It might be used later
                pSymbol->scope.value &= ~HB_FS_LOCAL;
 
                TraceLog( NULL, "Local Function: '%s' of Module: '%s' is not linked in.\n", pSymbol->szName, szModuleName );
