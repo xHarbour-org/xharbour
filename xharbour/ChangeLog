@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5725 2007/09/27 11:09:32 modalsist Exp $
+ * $Id: ChangeLog,v 1.5726 2007/09/28 22:39:51 kaddath Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-09-30 22:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tgetlist.prg
+    ! fixed run-time error at line 571 as reported in xharbour dev-list.
+      Added "if oGet:ExitState != NIL ...". 
 
 2007-09-28 15:37 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc

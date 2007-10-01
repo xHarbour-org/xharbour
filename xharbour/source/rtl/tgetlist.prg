@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.40 2007/07/06 13:11:35 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.41 2007/09/27 11:09:34 modalsist Exp $
  */
 
 /*
@@ -568,7 +568,7 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
       end
 
       /* 2007/SEP/24 - EF - Adjust buffer content. */
-      if oGet:ExitState > GE_NOEXIT .and. oGet:Type == "N"
+      if oGet:ExitState != NIL .and. oGet:ExitState > GE_NOEXIT .and. oGet:Type == "N"
          if oGet:Untransform() == 0
             oGet:Minus := .f.
             oGet:VarPut(0)
