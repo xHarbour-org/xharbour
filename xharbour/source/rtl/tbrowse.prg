@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.177 2007/09/04 00:37:59 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.178 2007/09/15 12:28:05 modalsist Exp $
  */
 
 /*
@@ -1520,6 +1520,7 @@ METHOD PageUp() CLASS TBrowse
 
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
+   ::lPaintBottomUp := .T.
 
 Return Self
 
@@ -2681,7 +2682,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    nColFrom   := iif( ::nFrozenCols > 0, 1, ::leftVisible )
 
    lDisplay := ! ::oDataCache:GetCell( nRow, iif( ::nFrozenCols > 0, 1, ::leftVisible ) ) == NIL
-   
+
    if lDisplay
 
       if ::nFrozenCols == 0
