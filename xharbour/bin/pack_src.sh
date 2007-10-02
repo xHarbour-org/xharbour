@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: pack_src.sh,v 1.23 2006/11/09 11:01:42 lculik Exp $
+# $Id: pack_src.sh,v 1.24 2007/09/03 13:49:23 lculik Exp $
 #
 # This script requires "TAR" utilities for compression.
 
@@ -171,6 +171,7 @@ $hb_collect source/rtl/*.prg
 $hb_collect source/rtl/pcre/Makefile
 $hb_collect source/rtl/pcre/*.[ch]
 $hb_collect source/rtl/pcre/*.[ch].generic
+$hb_collect source/rtl/pcre/*.[ch].dist
 
 # SOURCE\RTL\GT_TPL
 $hb_collect source/rtl/gt_tpl/Makefile
