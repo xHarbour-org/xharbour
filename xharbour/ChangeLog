@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5729 2007/10/01 17:34:56 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5730 2007/10/02 16:34:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-04 08:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! reverted PageUp() method and changed SetColorRect(), DispCell()
+      and FillRow() methods to fix colorrect behaviour after page-up.
 
 2007-10-02 13:30 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * bin/pack_src.sh

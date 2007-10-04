@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.178 2007/09/15 12:28:05 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.179 2007/10/01 13:10:48 modalsist Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ CLASS TDataCache
    // be called ONLY after GetCell() for the same row,col has been called
    METHOD   GetCellColor( nRow, nCol ) INLINE IIF( CacheOK(::aCache,nRow,nCol), IIF( Empty( ::aCache[ nRow ][ nCol ]:aColorRect ),;
                                                    ::aCache[ nRow ][ nCol ]:aColor,;
-                                                   ::aCache[ nRow ][ nCol ]:aColorRect), "" )
+                                                   ::aCache[ nRow ][ nCol ]:aColorRect), {} )
 
    // Sets colorrect to cells defined by aRect, aRect is an array { top, left, bottom, right, aColors }
    METHOD   SetColorRect( aRect )
@@ -397,6 +397,8 @@ METHOD FillRow( nRow ) CLASS TDataCache
    nVideoRow := Row()
    nVideoCol := Col()
 
+   nRectPos  := 0
+
    for each aCol in ::oCachedBrowse:aColsInfo
 
       oCell := TDataCell():New()
@@ -410,7 +412,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
                          DefColorOK(::oCachedBrowse:ColorSpec, Eval( aCol[ TBCI_OBJ ]:colorBlock,:xData ) ) )
 
          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
-            if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
+            if i >= ::aRect[ nRectPos ][ 2 ] .AND. i <= ::aRect[ nRectPos ][ 3 ]
                :aColorRect := ::aRect[ nRectPos ][ 4 ]
             endif
          endif
@@ -460,32 +462,31 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 RETURN IF( CacheOK(::aCache,nRow,nCol), ::aCache[ nRow ][ nCol ]:xData, NIL)
 
 
-
 METHOD SetColorRect( aRect ) CLASS TDataCache
 
    local nRow, nCol
 
+   if Empty( aRect )
+      Return Self
+   endif
+
+   ::aRect := {}
+
    for nRow := aRect[ 1 ] to aRect[ 3 ]
 
-      if Empty( ::aCache[ nRow ] )
+       // A five elements array shrinks to a four one
+       // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
+       AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
 
-         // A five elements array shrinks to a four one
-         // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
-         AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
+       for nCol := aRect[ 2 ] to aRect[ 4 ]
+           IF CacheOK(::aCache,nRow,nCol)
+              ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
+           ENDIF
+       next
 
-      else
-
-         for nCol := aRect[ 2 ] to aRect[ 4 ]
-             IF CacheOK(::aCache,nRow,nCol)
-                ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
-             ENDIF
-         next
-
-      endif
    next
 
 return Self
-
 
 
 METHOD InitCache() CLASS TDataCache
@@ -1520,7 +1521,6 @@ METHOD PageUp() CLASS TBrowse
 
    ::Moved()
    ::nRecsToSkip := - ( ( ::nRowPos - 1 ) + ::RowCount )
-   ::lPaintBottomUp := .T.
 
 Return Self
 
@@ -2479,9 +2479,9 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       DispBegin()
 
       while ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
-
+     
          ::DrawARow( nRowToDraw )
-
+         
          if ! lForceStable
             DispEnd()
             SetCursor( nOldCursor )
@@ -2953,7 +2953,7 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
    aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
 
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
-   if Empty( aCellColor )
+   if Empty( aCellColor ) .or. nRow != ::nNewRowPos
       cColor := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ nColor ] - 1) )
    else
       cColor := hb_ColorIndex( ::cColorSpec, (aCellColor[ nColor ] - 1) )
