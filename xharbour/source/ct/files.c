@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.9 2005/02/12 19:54:02 druzus Exp $
+ * $Id: files.c,v 1.10 2005/05/26 19:08:32 peterrees Exp $
  */
 
 /*
@@ -436,7 +436,7 @@ HB_FUNC( FILESIZE )
 
    #if defined( HB_OS_WIN_32 ) && !defined( __CYGWIN__ )
    {
-      DWORD dwFileSize;
+      HB_LONG dwFileSize;
       LPCTSTR szFile;
       DWORD dwFlags=FILE_ATTRIBUTE_ARCHIVE;
       HANDLE hFind;
@@ -477,11 +477,11 @@ HB_FUNC( FILESIZE )
             {
                if( hFilesFind.nFileSizeHigh>0 )
                {
-                  hb_retnl( ( hFilesFind.nFileSizeHigh*MAXDWORD )+hFilesFind.nFileSizeLow );
+                  hb_retnint( ( hFilesFind.nFileSizeHigh*(MAXDWORD+1) )+hFilesFind.nFileSizeLow );
                }
                else
                {
-                  hb_retnl( hFilesFind.nFileSizeLow );
+                  hb_retnint( hFilesFind.nFileSizeLow );
                }
             }
             else
@@ -500,13 +500,13 @@ HB_FUNC( FILESIZE )
    {
       if( Lastff32.nFileSizeHigh>0 )
       {
-         dwFileSize=( Lastff32.nFileSizeHigh*MAXDWORD )+Lastff32.nFileSizeLow;
+         dwFileSize=( Lastff32.nFileSizeHigh*(MAXDWORD+1) )+Lastff32.nFileSizeLow;
       }
       else
       {
          dwFileSize=Lastff32.nFileSizeLow;
       }
-      hb_retnl( dwFileSize );
+      hb_retnint( dwFileSize );
    }
 }
 
