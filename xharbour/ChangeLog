@@ -9,7 +9,8 @@
 */
 
 2007-10-11 22:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
-   Fixed bug to filesize error that was retuning incorrect values for file with >2GB
+   !source/ct/files.c
+     !Fixed bug to filesize error that was retuning incorrect values for file with >2GB
 
 2007-10-04 08:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
