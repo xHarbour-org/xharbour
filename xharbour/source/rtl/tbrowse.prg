@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.179 2007/10/01 13:10:48 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.180 2007/10/04 11:43:43 modalsist Exp $
  */
 
 /*
@@ -397,8 +397,6 @@ METHOD FillRow( nRow ) CLASS TDataCache
    nVideoRow := Row()
    nVideoCol := Col()
 
-   nRectPos  := 0
-
    for each aCol in ::oCachedBrowse:aColsInfo
 
       oCell := TDataCell():New()
@@ -412,7 +410,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
                          DefColorOK(::oCachedBrowse:ColorSpec, Eval( aCol[ TBCI_OBJ ]:colorBlock,:xData ) ) )
 
          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
-            if i >= ::aRect[ nRectPos ][ 2 ] .AND. i <= ::aRect[ nRectPos ][ 3 ]
+            if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
                :aColorRect := ::aRect[ nRectPos ][ 4 ]
             endif
          endif
@@ -466,24 +464,23 @@ METHOD SetColorRect( aRect ) CLASS TDataCache
 
    local nRow, nCol
 
-   if Empty( aRect )
-      Return Self
-   endif
-
-   ::aRect := {}
-
    for nRow := aRect[ 1 ] to aRect[ 3 ]
 
-       // A five elements array shrinks to a four one
-       // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
-       AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
+      if Empty( ::aCache[ nRow ] )
 
-       for nCol := aRect[ 2 ] to aRect[ 4 ]
-           IF CacheOK(::aCache,nRow,nCol)
-              ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
-           ENDIF
-       next
+         // A five elements array shrinks to a four one
+         // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
+         AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
 
+      else
+
+         for nCol := aRect[ 2 ] to aRect[ 4 ]
+             IF CacheOK(::aCache,nRow,nCol)
+                ::aCache[ nRow ][ nCol ]:aColorRect := aRect[ 5 ]
+             ENDIF
+         next
+
+      endif
    next
 
 return Self
@@ -2953,7 +2950,7 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
    aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
 
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
-   if Empty( aCellColor ) .or. nRow != ::nNewRowPos
+   if Empty( aCellColor )
       cColor := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ nColor ] - 1) )
    else
       cColor := hb_ColorIndex( ::cColorSpec, (aCellColor[ nColor ] - 1) )
@@ -3701,10 +3698,13 @@ IF Used()
    nSkipped := 0
 
    FOR nArea := 1 TO 255
-       if !Empty( alias(nArea) )
+       if ! Empty( alias(nArea) )
           AAdd( aWA, { alias(nArea), &( alias(nArea) )->(recno()) } )
+
+       /* 2007/OCT/18 - EF - A work area can be openned out of sequence.
        else
           EXIT
+       */
        endif
    NEXT
 
