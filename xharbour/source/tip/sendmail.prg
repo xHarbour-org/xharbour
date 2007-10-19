@@ -1,7 +1,7 @@
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.2 2007/09/17 11:58:31 lculik Exp $
+ * $Id: sendmail.prg,v 1.3 2007/09/17 13:40:55 lculik Exp $
  */
 
 /*
@@ -195,7 +195,8 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
       cMimeText := "text/html ; charset=ISO-8859-1"
       oAttach:hHeaders[ "Content-Type" ] := cMimeText
       cBodyTemp := cBody
-      cBody     := MemoRead( cBodyTemp )
+      cBody     := MemoRead( cBodyTemp ) + chr( 13 ) + chr( 10 )
+
    ELSE
       oMail:hHeaders[ "Content-Type" ] := "text/plain; charset=iso8851"
    ENDIF
