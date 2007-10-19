@@ -1,5 +1,5 @@
 /*
- * $Id: Changelog,v 1.38 2005/07/06 00:04:17 rodrigo_moreno Exp $
+ * $Id: Changelog,v 1.39 2005/10/08 15:37:52 rodrigo_moreno Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-19 17:35 UTC-0300 Marcos Antonio Gambeta <marcosgambeta at gmail dot com>
+  * xharbour/contrib/pgsql/makefile.bc
+    ! Fixed line 13: "BIN_DIR = c:\xharbour" changed to "BIN_DIR = ..\..\bin"
 
 2005-10-08 12:40 UTC-0300 Rodrigo Moreno <rodrigo_moreno@yahoo.com>
   * xharbour/contrib/pgsql/postgres.c

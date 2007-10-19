@@ -10,7 +10,7 @@ PG_DIR = C:\PostgreSQL
 INCLUDE_DIR = ..\..\include
 INCLUDE_PQ = $(PG_DIR)\include
 
-BIN_DIR = c:\xharbour\bin
+BIN_DIR = ..\..\bin
 OBJ_DIR = ..\..\obj\b32
 LIB_DIR = ..\..\lib\b32
 
