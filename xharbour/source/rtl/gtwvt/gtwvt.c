@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.172 2007/04/07 02:14:51 jabrecer Exp $
+ * $Id: gtwvt.c,v 1.173 2007/05/24 16:03:15 ronpinkas Exp $
  */
 
 /*
@@ -218,6 +218,8 @@ static USHORT  s_usOldCurStyle;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
+static s_iRelCount = 0;
+
 /* last updated GT object */
 HB_GT_GOBJECT *last_gobject;
 
@@ -242,6 +244,7 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
 {
     /* FSG: filename var for application name */
    PHB_FNAME pFileName;
+   int iCmdShow;
 
     HB_TRACE( HB_TR_DEBUG, ( "hb_gt_Init()" ) );
 
@@ -281,6 +284,18 @@ void HB_GT_FUNC( gt_Init( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr
     {
       hb_wvt_gtCreateToolTipWindow();
     }
+
+    if ( hb_dynsymFind( "HB_NOSTARTUPWINDOW" ) != NULL )
+    {
+       iCmdShow = SW_HIDE;
+    }
+    else
+    {
+      iCmdShow = hb_iCmdShow;
+    }
+
+    ShowWindow( _s.hWnd, iCmdShow );
+    UpdateWindow( _s.hWnd );
 }
 
 //-------------------------------------------------------------------//
@@ -2483,6 +2498,7 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   HB_SYMBOL_UNUSED( hPrevInstance );
   HB_SYMBOL_UNUSED( szCmdLine );
+  HB_SYMBOL_UNUSED( iCmdShow );
 
   InitCommonControls();
 
@@ -2529,6 +2545,7 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
   // at the point you desire in your code.
   //
 
+  /*
   if ( hb_dynsymFind( "HB_NOSTARTUPWINDOW" ) != NULL )
   {
      iCmdShow = SW_HIDE;
@@ -2536,6 +2553,7 @@ static HWND hb_wvt_gtCreateWindow( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   ShowWindow( hWnd, iCmdShow );
   UpdateWindow( hWnd );
+  */
 
   return( hWnd ) ;
 }
@@ -2605,7 +2623,7 @@ static DWORD hb_wvt_gtProcessMessages( void )
    int  iIndex;
    BOOL bProcessed;
 
-   /* See if we have some graphic object to draw */
+   // See if we have some graphic object to draw
    if ( hb_gt_gobjects == NULL )
    {
       last_gobject = NULL;
@@ -2616,7 +2634,13 @@ static DWORD hb_wvt_gtProcessMessages( void )
       InvalidateRect( _s.hWnd, NULL, FALSE );
    }
 
-   while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+   if( ++s_iRelCount > 100 )
+   {
+      s_iRelCount = 0;
+      hb_idleSleep( 0.01 );
+   }
+
+   while ( PeekMessage( &msg, _s.hWnd, 0, 0, PM_REMOVE ) )
    {
       bProcessed = FALSE;
 
@@ -2638,7 +2662,8 @@ static DWORD hb_wvt_gtProcessMessages( void )
          DispatchMessage( &msg );
       }
    }
-  return( msg.wParam );
+
+   return( msg.wParam );
 }
 
 //-------------------------------------------------------------------//

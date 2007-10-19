@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.14 2007/03/18 05:40:46 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.15 2007/06/28 18:51:20 vouchcac Exp $
  */
 
 /*
@@ -2279,7 +2279,7 @@ HB_FUNC( WVT__GETOPENFILENAME )
     ofn.hwndOwner       = ISNIL   (1) ? GetActiveWindow() : ( HWND ) hb_parnl( 1 ) ;
     ofn.lpstrTitle      = ISNIL   (3) ? NULL : hb_parc ( 3 ) ;
     ofn.lpstrFilter     = ISNIL   (4) ? NULL : hb_parc ( 4 );
-    ofn.Flags           = ISNIL   (5) ? OFN_SHOWHELP : hb_parnl( 5 ) ;
+    ofn.Flags           = ISNIL   (5) ? OFN_SHOWHELP|OFN_NOCHANGEDIR : hb_parnl( 5 ) ;
     ofn.lpstrInitialDir = ISNIL   (6) ? NULL : hb_parc ( 6 );
     ofn.lpstrDefExt     = ISNIL   (7) ? NULL : hb_parc ( 7 );
     ofn.nFilterIndex    = ISNIL   (8) ? NULL : hb_parni( 8 );
@@ -2318,7 +2318,7 @@ HB_FUNC( WVT__GETSAVEFILENAME )
    ofn.hwndOwner       = ISNIL   (1) ? GetActiveWindow() : (HWND) hb_parnl( 1 );
    ofn.lpstrTitle      = hb_parc (3);
    ofn.lpstrFilter     = hb_parc (4);
-   ofn.Flags           = (ISNIL  (5) ? OFN_FILEMUSTEXIST|OFN_EXPLORER : hb_parnl( 4 ) );
+   ofn.Flags           = (ISNIL  (5) ? OFN_FILEMUSTEXIST|OFN_EXPLORER|OFN_NOCHANGEDIR : hb_parnl( 4 ) );
    ofn.lpstrInitialDir = hb_parc (6);
    ofn.lpstrDefExt     = hb_parc (7);
    ofn.nFilterIndex    = hb_parni(8);
