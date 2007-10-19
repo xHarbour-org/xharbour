@@ -1,5 +1,5 @@
 /*
- * $Id: msgnl.c,v 1.2 2005/06/10 22:51:37 ronpinkas Exp $
+ * $Id: msgnl.c,v 1.3 2007/10/19 12:38:36 lculik Exp $
  */
 
 /* Language Support Module */
@@ -8,7 +8,7 @@
 /* ISO language code (2 chars): NL */
 /* Codepage: ???? */
 
-#include "hbdefs.h"
+#include "hbapilng.h"
 
 char *hb_dateMonthsName[ 12 ] =
 {
