@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.173 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id: gtwvt.c,v 1.174 2007/10/19 19:58:11 vouchcac Exp $
  */
 
 /*
@@ -218,7 +218,7 @@ static USHORT  s_usOldCurStyle;
 
 static int s_iStdIn, s_iStdOut, s_iStdErr;
 
-static s_iRelCount = 0;
+static int s_iRelCount = 0;
 
 /* last updated GT object */
 HB_GT_GOBJECT *last_gobject;
