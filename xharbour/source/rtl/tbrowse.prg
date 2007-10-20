@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.180 2007/10/04 11:43:43 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.181 2007/10/18 13:09:19 modalsist Exp $
  */
 
 /*
@@ -211,21 +211,24 @@ CLASS TDataCache
       datasource. To reload data a call to RefreshCurrent()/RefreshAll() needs to be done.
    */
    METHOD   Invalidate( nRow )         INLINE  iif( nRow == NIL,;
-                                                    ::lInvalid := .T. ,;
+                                                    (::lInvalid := .T., ::aRectClone := {} ),;
                                                     iif( CacheOK(::aCache,nRow ), ::aCache[ nRow ] := NIL, NIL ) ),;
                                                Self
 
    /* Needed for clipper compatibility, invalidation of cache must happen just before
       stabilization of tbrowse. Note, this handles only full invalidation, not row invalidation
    */
+
    METHOD   PerformInvalidation()      INLINE  iif( ::lInvalid ,;
-                                                    ( AFill( ::aCache, NIL ), ::InitCache(), ::lInvalid := .F., Self ),;
+                                                    ( AFill( ::aCache, NIL ), ::InitCache(), ::lInvalid := .F. , ::SetColorRect(::aRectClone), Self ),;
                                                     Self )
+
    HIDDEN:
 
    DATA  aCache                        // Array with cached data
    DATA  oCachedBrowse                 // TBrowse object I'm caching
    DATA  aRect                         // Array with pending color-rects
+   DATA  aRectClone
    DATA  lInvalid                      // .T. if ::Invalidate() has been called without a recno
 
    METHOD   InitCache( lInternal )     // Resets cache
@@ -244,9 +247,9 @@ METHOD New( oBrowse ) CLASS TDataCache
    ::aCache := Array( nRows )
    ::oCachedBrowse := oBrowse
 
-   ::nCurRow := 1
+   ::nCurRow  := 1
    ::nLastRow := 1
-   ::aRect := {}
+   ::aRect    := {}
    ::lInvalid := .F.
 
 RETURN Self
@@ -383,7 +386,7 @@ RETURN nToTop
 METHOD FillRow( nRow ) CLASS TDataCache
 
    local aCol, oCell
-   local nRectPos,i
+   local nRectPos, nCol 
    local nVideoRow,nVideoCol
 
    IF nRow > Len( ::aCache )
@@ -401,7 +404,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
 
       oCell := TDataCell():New()
 
-      i := hb_EnumIndex()
+      nCol := hb_EnumIndex()
 
       with object oCell
          :xData := Eval( aCol[ TBCI_OBJ ]:block )
@@ -410,14 +413,17 @@ METHOD FillRow( nRow ) CLASS TDataCache
                          DefColorOK(::oCachedBrowse:ColorSpec, Eval( aCol[ TBCI_OBJ ]:colorBlock,:xData ) ) )
 
          if ! Empty( ::aRect ) .AND. ( nRectPos := AScan( ::aRect, { |item| item[ 1 ] == nRow } ) ) > 0
-            if HB_EnumIndex() >= ::aRect[ nRectPos ][ 2 ] .AND. HB_EnumIndex() <= ::aRect[ nRectPos ][ 3 ]
+            if nCol >= ::aRect[ nRectPos ][ 2 ] .AND. nCol <= ::aRect[ nRectPos ][ 3 ]
                :aColorRect := ::aRect[ nRectPos ][ 4 ]
             endif
          endif
+
       end
-      IF CacheOK(::aCache,nRow,i)
-         ::aCache[ nRow ][ i ] := oCell
-      ENDIF
+
+      if CacheOK(::aCache,nRow,nCol)
+         ::aCache[ nRow ][ nCol ] := oCell
+      endif
+
    next
 
    // 2007/FEB/14 - E.F. - Restore cursor position after column filling.
@@ -427,6 +433,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
    if ! Empty( ::aRect ) .AND. nRectPos > 0
       ADel( ::aRect, nRectPos, .T. )
    endif
+
 
 Return Self
 
@@ -464,14 +471,18 @@ METHOD SetColorRect( aRect ) CLASS TDataCache
 
    local nRow, nCol
 
+   if empty( aRect )
+      return self
+   endif
+
    for nRow := aRect[ 1 ] to aRect[ 3 ]
 
-      if Empty( ::aCache[ nRow ] )
+      if Empty( ::aCache[ nRow ] ) 
 
          // A five elements array shrinks to a four one
          // { top, left, bottom, right, aColors } -> { nRow, left, right, aColors }
          AAdd( ::aRect, { nRow, aRect[ 2 ], aRect[ 4 ], aRect[ 5 ] } )
-
+        
       else
 
          for nCol := aRect[ 2 ] to aRect[ 4 ]
@@ -481,7 +492,11 @@ METHOD SetColorRect( aRect ) CLASS TDataCache
          next
 
       endif
+
    next
+
+   /* 2007/OCT/20 - E.F. - This is needed for re-entry in performinvalidate() */
+   ::aRectClone := aRect
 
 return Self
 
@@ -843,11 +858,13 @@ Return Self
 METHOD RefreshAll() CLASS TBrowse
 
    AFill( ::aRedraw, .T. )
-
-   IF ! ::lPaintBottomUp
-      ::oDataCache:Invalidate()
-   ENDIF
-
+/*
+*   2007/OCT/19 - E.F. - Why PG_DN doesn't entry here ? 
+*   IF ! ::lPaintBottomUp  
+*      ::oDataCache:Invalidate()
+*   ENDIF
+*/
+   ::oDataCache:Invalidate()
    ::Stable := .F.
 
 Return Self
@@ -2261,6 +2278,7 @@ METHOD ColorRect( aRect, aColors ) CLASS TBrowse
 
    local i
 
+
    if ::lConfigured
 
       ::oDataCache:SetColorRect( { Max( aRect[ 1 ], 1 ),;
@@ -2281,13 +2299,14 @@ METHOD ColorRect( aRect, aColors ) CLASS TBrowse
       ::ForceStable()
 
    else
-
+      
       // During ::Configure() I could change cache, so I save colorrect parameters
       AAdd( ::aRect, { Max( aRect[ 1 ], 1 ),;
                        Max( aRect[ 2 ], 1 ),;
                        Min( aRect[ 3 ], ::rowCount ),;
                        Min( aRect[ 4 ], ::colCount ),;
                        aColors } )
+
    endif
 
 
@@ -2949,8 +2968,9 @@ METHOD DispCell( nRow, nColumn, xValue, nColor ) CLASS TBrowse
 
    aCellColor := ::oDataCache:GetCellColor( nRow, nColumn )
 
+
    // If cell has not a particular color ( colorblock or colorrect ) use defcolor ( as clipper does )
-   if Empty( aCellColor )
+   if Empty( aCellColor ) 
       cColor := hb_ColorIndex( ::cColorSpec, ( DefColorOK(::cColorSpec,oCol:DefColor)[ nColor ] - 1) )
    else
       cColor := hb_ColorIndex( ::cColorSpec, (aCellColor[ nColor ] - 1) )
@@ -3697,7 +3717,12 @@ IF Used()
    nSkip := 0
    nSkipped := 0
 
-   FOR nArea := 1 TO 255
+   /* 2007/10/19 - EF - Scan all workareas to search openned databases.
+                        65535 is the maximum workareas defined in hbapirdd.ch.
+                        Maybe exist a best way to do it as C level, but for
+                        a while this is way.
+   */
+   For nArea := 1 TO 65535  
        if ! Empty( alias(nArea) )
           AAdd( aWA, { alias(nArea), &( alias(nArea) )->(recno()) } )
 
@@ -3706,7 +3731,8 @@ IF Used()
           EXIT
        */
        endif
-   NEXT
+   Next
+
 
    IF HB_IsBlock( oTb:SkipBlock ) .AND. !Empty( aWA )
 
