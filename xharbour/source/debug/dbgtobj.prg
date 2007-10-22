@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.9 2007/08/06 20:30:23 likewolf Exp $
+ * $Id: dbgtobj.prg,v 1.10 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -153,7 +153,7 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
    oBrwSets:colPos := 2
    ::aWindows[ ::nCurWindow ]:bPainted    := { || oBrwSets:ForceStable() }
    ::aWindows[ ::nCurWindow ]:bKeyPressed := { | nKey | ::SetsKeyPressed( nKey, oBrwSets, Len( aArray ),;
-                                               ::aWindows[ ::nCurWindow ], ::objname, Len( ::Arrayreference ), ::pitems ) }
+                                               ::aWindows[ ::nCurWindow ], ::objname, ::Arrayreference ) }
    ::aWindows[ ::nCurwindow ]:cCaption := ::objname + " is of class: " +::TheObj:ClassName()
 
    SetCursor( SC_NONE )
