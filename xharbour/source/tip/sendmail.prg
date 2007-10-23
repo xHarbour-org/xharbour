@@ -1,7 +1,7 @@
 //-------------------------------------------------------------//
 
 /*
- * $Id: sendmail.prg,v 1.3 2007/09/17 13:40:55 lculik Exp $
+ * $Id: sendmail.prg,v 1.4 2007/10/19 13:09:06 lculik Exp $
  */
 
 /*
@@ -291,10 +291,10 @@ FUNCTION HB_SendMail( cServer, nPort, cFrom, aTo, aCC, aBCC, cBody, cSubject, aF
    
       IF Valtype( aThisFile ) == "C"
          cFile := aThisFile
-         cData := Memoread( cFile )
+         cData := Memoread( cFile ) + chr( 13 ) + chr( 10 )
       ELSEIF Valtype( aThisFile ) == "A" .AND. Len( aThisFile ) >= 2
          cFile := aThisFile[ 1 ]
-         cData := aThisFile[ 2 ]
+         cData := aThisFile[ 2 ] + chr( 13 ) + chr( 10 )
       ELSE
          lReturn := .F.
          EXIT
