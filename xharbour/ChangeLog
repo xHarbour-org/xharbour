@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5742 2007/10/23 13:52:30 lculik Exp $
+ * $Id: ChangeLog,v 1.5743 2007/10/23 15:42:19 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-23 20:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! changed IsBottom() function as suggested by Ken Wantz to fix a bad
+      behaviour of databases under custom indexes.
+    ! fixed IsDb() function to scan max workareas to 65534, because 65535 is
+      reserved.
 
 2007-10-23 13:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    * source\tip\sendmail.prg

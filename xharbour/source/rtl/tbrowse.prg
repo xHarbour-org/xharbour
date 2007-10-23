@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.181 2007/10/18 13:09:19 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.182 2007/10/20 02:30:26 modalsist Exp $
  */
 
 /*
@@ -3718,11 +3718,12 @@ IF Used()
    nSkipped := 0
 
    /* 2007/10/19 - EF - Scan all workareas to search openned databases.
-                        65535 is the maximum workareas defined in hbapirdd.ch.
-                        Maybe exist a best way to do it as C level, but for
+                        65535 is the maximum workareas defined in hbapirdd.ch,
+                        therefore 65535 is reserved.
+                        Maybe exist a best way to do it, as C level, but for
                         a while this is way.
    */
-   For nArea := 1 TO 65535  
+   For nArea := 1 TO 65534  
        if ! Empty( alias(nArea) )
           AAdd( aWA, { alias(nArea), &( alias(nArea) )->(recno()) } )
 
@@ -3775,21 +3776,19 @@ RETURN ( iif(lIsDB,0,1) )
 *-------------------------
 Static Function IsBottom()
 *-------------------------
-* Check if database is positioned at last record.
+* Check if database is positioned at last record, not eof().
 * Don't use OrdKeyNo() == OrdKeyCount() because decrease performance.
 *-------------------------------
-LOCAL lBottom, nRec
-
-nRec := Recno()
+LOCAL lBottom
 
 IF IndexOrd() == 0
-   lBottom := ( nRec == LastRec() )
+   lBottom := ( RecNo() == LastRec() )
 ELSE
-   lBottom := ( eof() .or. bof() )
+   lBottom := eof()
    if !lBottom
       dbSkip()
-      lBottom := EOF()
-      dbGoto( nRec )
+      lBottom := eof()
+      dbSkip(-1)
    endif
 ENDIF
 
