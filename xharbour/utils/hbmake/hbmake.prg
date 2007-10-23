@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.184 2007/09/15 12:28:05 modalsist Exp $
+ * $Id: hbmake.prg,v 1.185 2007/09/27 11:09:34 modalsist Exp $
  */
 
 /*
@@ -49,6 +49,11 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+ /*
+  * Modified By Sandro Freire sandrorrfreire at yahoo.com.br
+  * added suport to OS Unix
+  *
+  */
 #include "fileio.ch"
 #include "common.ch"
 #include "radios.ch"
@@ -96,6 +101,7 @@ STATIC s_nMakeFileHandle
 STATIC s_cMakeFileName   := "makefile.lnk"
 STATIC s_cLinkCommands   := ""
 STATIC s_lLinux          := .F.
+STATIC s_lUnix           := .F.
 STATIC s_lOS2            := .F.
 STATIC s_lWin32          := .F.
 STATIC s_lBcc            := .F.  // Borland C compiler
@@ -199,7 +205,8 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_lOS2   := ( "OS/2" IN OS() )
    s_lLinux := ( "LINUX" IN Upper( OS() ) )
    s_lWin32 := ( "WINDOWS" IN Upper( OS() ) )
-
+   s_lUnix  := IF( ( "UNIX" IN Upper( OS() ) ) .OR. ( "HP-UX" IN Upper( OS() ) ) , .T., .F. )
+   s_lLinux := ( "HP-UX" IN Upper( OS() ) )
 
    IF PCount() == 0 .or.;
       "?" IN cMakeParams .or. ;
@@ -486,6 +493,7 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL lCfgFound   := .F.
    LOCAL aTempCFiles := {}
    LOCAL lLinux      :=  s_lLinux
+   LOCAL lUnix       :=  s_lUnix
    LOCAL aLib
    LOCAL aLibx
    LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
@@ -1587,7 +1595,7 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
    LOCAL lApollo      := .F.
 
 // LOCAL lMt          := .F.
-   LOCAL cOS          := IIF( s_lLinux, "Linux", iif(s_lOS2,"OS/2","Win32") )
+   LOCAL cOS          := IIF( s_lUnix, "Unix", IIF( s_lLinux, "Linux", iif(s_lOS2,"OS/2","Win32") ) )
    LOCAL cCompiler    := IIF( s_lLinux .OR. s_lGcc, "GCC",iif(s_lPocc,"POCC",iif(s_lMSVcc,"MSVC","BCC")))
 
    // External GUI Libs
@@ -1621,17 +1629,20 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
    LOCAL cAppName         := padr(s_cAppName,50)
    LOCAL cDefaultLibs     := "lang.lib vm.lib rtl.lib rdd.lib macro.lib pp.lib dbfntx.lib dbfcdx.lib dbffpt.lib common.lib gtwin.lib codepage.lib ct.lib tip.lib pcrepos.lib hsx.lib hbsix.lib"
    LOCAL cDefGccLibs      := "-lvm -lrtl -lpcrepos -lgtdos -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage  -lm "
+   LOCAL cDefGccLibsUnix  := "-lvm -lcodepage -ltef -lrtl  -lrdd  -lrtl  -lvm  -lmacro  -lpp  -llang  -lcommon  -lnulsys  -lbmdbfcdx  -ldbfntx  -ldbfcdx  -ldbffpt  -lhbsix  -lhsx  -lusrrdd -lpcrepos -lgtnul -lgtsln -lslang -lm -lrt "
    LOCAL cDefGccLibsw     := "-lvm -lrtl -lpcrepos -lgtwin -lgtnul -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2      := "-lvm -lrtl -lpcrepos -lgtos2 -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lm"
    LOCAL cDefLibGccLibs   := "-lvm -lrtl -lpcrepos -lgtcrs -llang -lrdd -lrtl -lvm -lmacro -lpp -ldbfntx -ldbfcdx -ldbffpt -lhsx -lhbsix -lcommon -lcodepage -lgtnul"
    LOCAL cDefaultLibsMt    := "lang.lib vmmt.lib rtlmt.lib rddmt.lib macromt.lib ppmt.lib dbfntxmt.lib dbfcdxmt.lib  dbffptmt.lib common.lib gtwin.lib codepage.lib ctmt.lib tipmt.lib pcrepos.lib hsxmt.lib hbsixmt.lib"
+   LOCAL cDefGccLibsUnixMt := "-lvmmt -lcodepage -ltef -lrtlmt  -lrddmt  -lrtl  -lvmmt  -lmacromt  -lpp  -llang  -lcommon  -lnulsys  -lbmdbfcdx  -ldbfntx  -ldbfcdx  -ldbffpt  -lhbsix  -lhsx  -lusrrdd -lpcrepos -lgtnul -lgtsln -lslang -lm -lrt"
    LOCAL cDefGccLibsMt    := "-lvmmt -lrtlmt -lpcrepos -lgtdos -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
    LOCAL cDefGccLibsMtw    := "-lvmmt -lrtlmt -lpcrepos -lgtwin -lgtnul -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
    LOCAL cGccLibsOs2Mt    := "-lvmmt -lrtlmt -lpcrepos -lgtos2 -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage -lm"
-   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
+//   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtcrs -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
+   LOCAL cDefLibGccLibsMt := "-lvmmt -lrtlmt -lpcrepos -lgtsln -llang -lrddmt -lrtlmt -lvmmt -lmacromt -lppmt -ldbfntxmt -ldbfcdxmt -ldbffptmt -lhsxmt -lhbsixmt -lcommon -lcodepage"
    LOCAL cHarbDll         := "harbour.lib"
    LOCAL cHARso           := "-lxharbour -lncurses -lgpm -lslang -lpthread -lm"
-   LOCAL cSystemLibs      := "-lncurses -lslang -lgpm -lpthread -lm"
+   LOCAL cSystemLibs      := If( s_lUnix, "", "-lncurses " ) + "-lslang " + If( s_lUnix, "", "-lgpm " ) + " -lpthread -lm"
 
    LOCAL cLibs        := ""
    LOCAL citem        := ""
@@ -1648,6 +1659,7 @@ FUNCTION CreateMakeFile( cFile, lCreateAndCompile )
    LOCAL cOldLib      := ""
    LOCAL cHtmlLib     := ""
    LOCAL lLinux       := s_lLinux
+   LOCAL lUnix        := s_lUnix
    LOCAL nWriteFiles  := 0
    LOCAL cResName     := space(200)
    LOCAL aSelFiles
@@ -1954,7 +1966,7 @@ While .t.
    @ 01,01       SAY s_aLangMessages[ 28 ]
 
    @ 01,16,06,21 GET cOS;
-                 LISTBOX { "Win32", "OS/2", "Linux" };
+                 LISTBOX { "Win32", "OS/2", "Linux","Unix" };
                  MESSAGE s_aLangMessages[ 49 ];
                  STATE OsSpec(getlist,1,@cOS);
                  DROPDOWN
@@ -2025,7 +2037,7 @@ While .t.
 
    s_cAppName := alltrim( cAppName )
 
-   IF cOS != "Linux"
+   IF cOS != "Linux" .or.  cOS != "Unix"
       IF s_lasdll
          s_cAppName += ".dll"
       ELSE
@@ -2235,7 +2247,7 @@ Endif // Create and compile
 
    cObjDir  := Alltrim( cObjDir )
 
-   IF "Linux" in cOS
+   IF "Linux" in cOS .or. "Unix" in cOS
        cCurrentDir := "/"+CurDir()
    ELSE
        cCurrentDir := CurDrive()+":\"+CurDir()
@@ -2251,7 +2263,7 @@ Endif // Create and compile
 
    s_aMacros := GetSourceDirMacros( s_lGcc, cOS )
 
-   IF lLinux
+   IF lLinux .or. lUnix 
       cObjDir := Alltrim( cObjDir )
 
       IF ! Empty( cObjDir )
@@ -2287,6 +2299,8 @@ Endif // Create and compile
       cDefGccLibsw     += " -ldebug "
       cGccLibsOs2      += " -ldebug "
       cDefLibGccLibs   += " -ldebug "
+      cDefGccLibsUnix  += " -ldebug "
+      cDefGccLibsUnixMt+= " -ldebug "
       cDefaultLibsMt   += " debug.lib "
       cDefGccLibsMt    += " -ldebug "
       cDefGccLibsMtw   += " -ldebug "
@@ -2331,7 +2345,8 @@ Endif // Create and compile
 
    ELSEIF s_lGcc
 
-      IF  "linux" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux"
+      IF  ("linux" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux" ) .or.;
+          ("unix" IN Lower(Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Unix" .OR. cOS == "HP-UX" )
          AAdd( s_aCommands, { ".cpp.o:", "gcc $(CFLAG1) $(CFLAG2) -o$* $**" } )
          AAdd( s_aCommands, { ".c.o:", "gcc -I/usr/include/xharbour $(CFLAG1) $(CFLAG2) -I. -g -o$* $**" } )
 
@@ -2748,7 +2763,8 @@ Endif // Create and compile
    NEXT
 
    IF s_lGcc
-      IF "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux"
+      IF ( "linux" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Linux" ) .or.;
+         ( "unix" IN Lower( Getenv( "HB_ARCHITECTURE" ) )  .OR. cOS == "Unix" .or. cOS == "HP-UX" ) 
          FWrite( s_nMakeFileHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + " $(PR) " + CRLF )
       ELSE
          FWrite( s_nMakeFileHandle, "PROJECT = " + Alltrim( Lower( cAppName ) ) + ".exe"   + " $(PR) " + CRLF )
@@ -3016,6 +3032,8 @@ Endif // Create and compile
 
       IF cOS == "Linux"
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF(lusexhb, cExtraLibs , "-Wl,--start-group " + IIF( ! s_lMt, cDefLibGccLibs, cDefLibGccLibsMt ) + " -Wl,--end-group " + cSystemLibs ) + CRLF )
+      ELSEIF cOS == "Unix" .or.  cOS == "UP-UX"     
+          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF(lusexhb, cExtraLibs , " " + IIF( ! s_lMt, cDefGccLibsUnix, cDefGccLibsUnixmt ) + " " + cSystemLibs ) + CRLF )
       ELSEIF cOS == "OS/2"
          FWrite( s_nMakeFileHandle, "LIBFILES = " + IIF( ! s_lMt, cGccLibsOs2, cGccLibsOs2Mt ) + CRLF )
       ELSEIF  "MINGW" IN cCompiler
@@ -3090,11 +3108,10 @@ Endif // Create and compile
 
    ELSEIF s_lGcc
 
-      FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude ),"")        + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
-      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" )  + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
-
+      FWrite( s_nMakeFileHandle, "CFLAG1 = $(SHELL) " +IIF( !EMPTY(s_cUserInclude ) ," -I" + Alltrim( s_cUserInclude )  ,"") + IIF( "Unix" in cOs , " -I/usr/include/xharbour ", "" ) + IIF(  "Linux" IN cOS, "-I/usr/include/xharbour", " -I$(HB_DIR)/include" ) + " -c -Wall" + IIF( s_lMt, " -DHB_THREAD_SUPPORT " , "" )  + if(s_lmingw, " -mno-cygwin "," " )+ CRLF )
+      FWrite( s_nMakeFileHandle, "CFLAG2 = " + IIF(  "Linux" IN cOS, "-L$(HB_LIB_INSTALL)", " -L$(HB_DIR)/lib  -L$(CC_DIR)/lib" ) +  IIF( "Unix" in cOs , " -L/usr/lib/xharbour ", "" ) + IIF( lHwgui, " -L$(HWGUI)\lib","" ) + CRLF )
       FWrite( s_nMakeFileHandle, "RFLAGS = " + CRLF )
-      FWrite( s_nMakeFileHandle, "LFLAGS = -Wl,--noinhibit-exec " + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui .and. !s_lMinGW, " `pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","")  + iif(lhwgui .and. s_lMinGW," -mwindows " ,"" )+  iif(s_lLinux .and. s_lmt ," -mt "," "  ) +CRLF )
+      FWrite( s_nMakeFileHandle, "LFLAGS = " + if(!s_lLinux," ","-Wl,--noinhibit-exec ") + IIF(lUseXhb ,IIF(lUseXharbourDll,"","-static ") + if(lXwt .or. lhwgui ,"-gtcgi " , "-gtcrs "), "$(CFLAG2)") + iif(lXwt,"`pkg-config --libs gtk+-2.0` -lxwt -lxwt_gtk -lxwt","") + iif( lxHGtk, "`pkg-config --libs gtk+-2.0 libglade-2.0` -lxhgtk ","") + iif( lhwgui .and. !s_lMinGW, " `pkg-config --libs gtk+-2.0 libglade-2.0 libgnomeprint-2.2` -hwgui ","")  + iif(lhwgui .and. s_lMinGW," -mwindows " ,"" )+  iif(s_lLinux .and. s_lmt ," -mt "," "  ) +CRLF )
       FWrite( s_nMakeFileHandle, "IFLAGS = " + CRLF )
       FWrite( s_nMakeFileHandle, "LINKER = "+ IIF(lusexhb,"xhblnk","gcc") + CRLF )
       FWrite( s_nMakeFileHandle, " " + CRLF )
@@ -3167,6 +3184,8 @@ Endif // Create and compile
       FWrite( s_nMakeFileHandle, "$(PROJECT): $(CFILES) $(OBJFILES) $(RESDEPEN) $(DEFFILE)" + CRLF )
 
       IF 'Linux' IN cOS
+         FWrite( s_nMakeFileHandle, "    $(LINKER) @&&!" + CRLF )
+      ELSEIF 'Unix' IN cOS .or. "HP-UX" IN cOS
          FWrite( s_nMakeFileHandle, "    $(LINKER) @&&!" + CRLF )
       ELSE
          FWrite( s_nMakeFileHandle, "    $(CC_DIR)\bin\$(LINKER) @&&!" + CRLF )

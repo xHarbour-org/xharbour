@@ -1,5 +1,5 @@
 /*
- * $Id: hbmutils.prg,v 1.45 2005/11/05 15:01:52 modalsist Exp $
+ * $Id: hbmutils.prg,v 1.46 2007/03/25 06:12:51 walito Exp $
  */
 /*
  * xHarbour Project source code:
@@ -235,12 +235,23 @@ FUNCTION GetHarbourDir()
     LOCAL cPath   := ''
     LOCAL cEnv    := GETE( "PATH" )
     LOCAL lLinux  := "LINUX" in upper(OS())
-    LOCAL aEnv    := HB_ATokens( cEnv, iif(lLinux,":",";") )
+    LOCAL lUnix   := If( "UNIX" in upper(OS()) .OR. "HP-UX" in upper(OS()), .T., .F. )
+    LOCAL aEnv     
     LOCAL cCurEnv := ""
-    LOCAL cBar    := iif( lLinux, "/" , "\" )
+    LOCAL cBar    := iif( lLinux .or. lUnix, "/" , "\" )
     LOCAL HBSTRG  := ""
+    LOCAL cPathUni:= GETE( "PATH_XHARBOUR" )
 
-    hbstrg := IIF ( lLinux,  "harbour" , "harbour.exe" )
+    hbstrg := IIF ( lLinux .or. lUnix,  "harbour" , "harbour.exe" )
+    
+    If lUnix 
+       If cPathUni == Nil
+          cPathUni := ""
+       EndIF   
+       cEnv += ":" + cPathUni 
+    EndIf
+
+    aEnv    := HB_ATokens( cEnv, iif(lLinux .or. lUnix,":",";") )
 
     FOR EACH cCurEnv IN aEnv
 

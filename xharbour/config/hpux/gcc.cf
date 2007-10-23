@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.1 2004/12/10 03:43:34 mlombardo Exp $
+# $Id: gcc.cf,v 1.13 2005/09/02 18:25:22 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -9,39 +9,80 @@ EXE_EXT =
 LIB_PREF = lib
 LIB_EXT = .a
 
-CC = $(HB_CCACHE) gcc
+CC = gcc
 CC_IN = -c
 CC_OUT = -o
-CPPFLAGS = -I. -I$(HB_INC_COMPILE)
-
-CFLAGS = -DHB_OS_HPUX -Wall -W -fsigned-char
-
-# uncomment this if you want to farce relocateable code for .so libs
-# it's necessary on some platforms but can reduce performance
-#CFLAGS += -fPIC
-
+CPPFLAGS = -I. -I$(TOP)include -I$(HB_INC_COMPILE)
+CFLAGS = -fsigned-char -Wall -W -DHB_OS_HPUX
 ifeq ($(HB_LEX),SIMPLEX)
 CFLAGS += -DSIMPLEX
 endif
 
+ifeq ($(HB_LIBCOMP_MT),)
+#always add thread support if not compiling a lib and using vmmt
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+endif
+else
+#Add thread support to lib compilation only if compiling a _mt lib
+ifeq ($(HB_LIBCOMP_MT),YES)
+CFLAGS+= -DHB_THREAD_SUPPORT -D_THREAD_SAFE -pthread
+HB_MT_FLAGS = -DHB_THREAD_SUPPORT
+endif
+endif
 
-LD = $(HB_CCACHE) gcc
+LD = gcc
 LD_OUT = -o
+
+# Add all libraries specified in HB_USER_LIBS.
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
 LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/lib$(lib)/$(ARCH))
 LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+
+#Adding MT libs on need
+ifeq ($(findstring vmmt,$(LIBS)),vmmt)
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(patsubst %mt,%,$(lib))/$(ARCH_DIR)_mt)
+endif
+
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
-LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(subst lib,,$(lib)))
+#LINKLIBS += -Wl,--start-1
+LINKLIBS += $(foreach lib, $(CONTRIBS), -l$(lib))
 LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
+ifeq ($(findstring rddmt,$(LIBS)),rddmt)
+#DBFNTX and DBFCDX are MTzed
+ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+LINKLIBS += -ldbfcdxmt
+endif
+ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+LINKLIBS += -ldbfntxmt
+endif
+
+#DBFDBT and DBFFTP are not MTzed
+ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+LINKLIBS += -ldbfdbt
+endif
+ifeq ($(findstring dbfftp,$(HB_DB_DRIVERS)),dbfftp)
+LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfftp/$(ARCH)
+LINKLIBS += -ldbfftp
+endif
+
+else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
+endif
 endif
 
 # Add the specified GT driver library and other RTLs
@@ -58,22 +99,23 @@ endif
 LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
 LINKLIBS += -l$(HB_GT_LIB)
 
-# HB_SCREEN_LIB: empty, or one of curses, slang
+# HB_SCREEN_LIB: empty, or one of ncurses, slang
 ifeq ($(HB_GT_LIB),gtcrs)
-HB_SCREEN_LIB:=curses
+HB_SCREEN_LIB:=ncurses
 else
 ifeq ($(HB_GT_LIB),gtsln)
 HB_SCREEN_LIB:=slang
-else
-ifeq ($(HB_GT_LIB),gtalleg)
-HB_GTALLEG:=yes
-LINKLIBS += `allegro-config --static`
 endif
 endif
+HB_SCREEN_LIB:=slang
+ifneq ($(HB_SCREEN_LIB),)
+LINKPATHS += -L/usr/local/lib
+LINKLIBS += -l$(HB_SCREEN_LIB)
 endif
 
-ifneq ($(HB_SCREEN_LIB),)
-LINKLIBS += -l$(HB_SCREEN_LIB)
+# In BSD, slang still needs curses :(
+ifeq ($(HB_GT_LIB),gtsln)
+#LINKLIBS += -lncurses
 endif
 
 ifeq ($(HB_GT_LIB),gtxvt)
@@ -86,19 +128,17 @@ LINKPATHS +=-L/usr/X11R6/lib
 endif
 endif
 
-# HB_GPM_MOUSE: use gpm mouse driver
-ifeq ($(HB_GPM_MOUSE),yes)
-LINKLIBS += -lgpm
-endif
-
 endif
 
 LINKLIBS += -lm -lrt
+#-Wl,--end-group
 
-LDFLAGS = $(LINKPATHS)
+LINKLIBS -= LINKLIBS
+
+LDFLAGS +=  $(LINKPATHS)
 
 AR = ar
 ARFLAGS = $(A_USR)
-AR_RULE = $(AR) $(ARFLAGS) cr $@ $(^F) || $(RM) $@
+AR_RULE = $(AR) $(ARFLAGS) r $@ $(^F) && $(RANLIB) $@ || ( $(RM) $@ && false )
 
 include $(TOP)$(ROOT)config/rules.cf
