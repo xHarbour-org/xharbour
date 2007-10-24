@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5743 2007/10/23 15:42:19 lculik Exp $
+ * $Id: ChangeLog,v 1.5744 2007/10/23 22:55:32 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-24 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/ct/diskutil.prg
+    ! added a workaround on DiskFree(), DiskTotal() and DiskUsed() functions
+      to save/restore the current full path before/after calls them.
+      Note: As these functions calls hb_diskspace() from source\rtl\disksphb.c
+      source, maybe someone could take a look on it.
+      Bug reported from comp.lang.xharbour news.
 
 2007-10-23 20:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

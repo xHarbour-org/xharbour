@@ -1,5 +1,5 @@
 /*
- * $Id: diskutil.prg,v 1.7 2006/08/05 11:58:26 druzus Exp $
+ * $Id: diskutil.prg,v 1.8 2007/08/25 17:42:53 paultucker Exp $
  */
 /*
  * xHarbour Project source code.
@@ -195,6 +195,7 @@ RETURN ( nErr )
 FUNCTION DiskFree( cDrive )
 *--------------------------
 Local nRet:=0
+LOCAL cPath := Diskname()+":"+DirName()
 
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
@@ -205,11 +206,17 @@ Local nRet:=0
    ENDIF
 
    IF DiskReady(cDrive)
-      // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+      /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+       * This function changes directory if you pass a drive letter than current,
+       * so it's need to save the full path before call hb_DiskSpace and restore
+       * them after.
+       */
       nRet := hb_DiskSpace( cDrive , HB_DISK_FREE )
    ENDIF
 
-RETURN (nRet)      
+   DirChange( cPath )
+
+RETURN (nRet)
 
 
 
@@ -259,7 +266,7 @@ FUNCTION DiskReadyW( cDrive , lMode )
 
    IF valtype(lMode) != "L"
       lMode := .T.
-   ENDIF   
+   ENDIF
 
    IF lMode
       IF DiskChange( cDrive )
@@ -281,19 +288,26 @@ RETURN lReturn
 FUNCTION DiskTotal( cDrive )
 *---------------------------
 LOCAL nRet:=0
+LOCAL cPath := Diskname()+":"+DirName()
 
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
    ENDIF
-   
+
    IF at(":",cDrive) == 0
       cDrive += ":"
    ENDIF
 
-   // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
    IF DiskReady( cDrive )
+      /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+       * This function changes directory if you pass a drive letter than current,
+       * so it's need to save the full path before call hb_DiskSpace and restore
+       * them after.
+       */
       nRet := hb_DiskSpace( cDrive , HB_DISK_TOTAL )
    ENDIF
+
+   DirChange( cPath )
 
 RETURN (nRet)
 
@@ -301,6 +315,7 @@ RETURN (nRet)
 FUNCTION DiskUsed( cDrive )
 *--------------------------
 Local nRet := 0
+Local cPath := Diskname()+":"+DirName()
 
    IF empty(cDrive) .OR. !isalpha(cDrive)
       cDrive := DiskName()
@@ -311,10 +326,16 @@ Local nRet := 0
    ENDIF
 
    IF DiskReady(cDrive)
-      // hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+      /* hb_DiskSpace is a xHarbour RT Library FUNCTION. Source is "disksphb.c".
+       * This function changes directory if you pass a drive letter than current,
+       * so it's need to save the full path before call hb_DiskSpace and restore
+       * them after.
+       */
       nRet := hb_DiskSpace( cDrive , HB_DISK_USED )
    ENDIF
-   
+
+   DirChange( cPath )
+
 RETURN ( nRet )
 
 
