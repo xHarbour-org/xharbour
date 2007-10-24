@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.4 2006/07/27 15:49:05 ronpinkas Exp $
+ * $Id: nulsys.c,v 1.5 2007/05/04 11:29:02 marchuet Exp $
  */
 
 /*
@@ -214,3 +214,4 @@ HB_FUNC( ORDNAME ) { hb_retc( NULL ); }
 HB_FUNC( ORDKEY ) { hb_retc( NULL ); }
 
 HB_FUNC( ORDFOR ) { hb_retc( NULL ); }
+HB_FUNC( DBFILTER ) { hb_retc( NULL ); }
