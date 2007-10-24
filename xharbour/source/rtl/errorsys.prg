@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.55 2007/03/20 11:04:10 modalsist Exp $
+ * $Id: errorsys.prg,v 1.56 2007/05/04 11:29:02 marchuet Exp $
  */
 
 /*
@@ -64,6 +64,8 @@
 #include "common.ch"
 #include "error.ch"
 #include "fileio.ch"
+
+REQUEST Select,Alias,RecNo,DbFilter,DbRelation,IndexOrd,IndexKey
 
 PROCEDURE ErrorSys
 
@@ -321,7 +323,7 @@ STATIC FUNCTION LogError( oerr )
         FWriteLine( nHandle, 'Multi Threading....: ' + If( Hb_MultiThread(),"YES","NO" ) )
         FWriteLine( nHandle, 'VM Optimization....: ' + strvalue( Hb_VmMode() ) )
 
-        IF Type( "Select()" ) == "UI"
+        IF Type( "Select()" ) != "UI"
         FWriteLine( nHandle, '' )
         FWriteLine( nHandle, 'Current Area ......:' + strvalue( &("Select()") ) )
         ENDIF
@@ -429,7 +431,7 @@ STATIC FUNCTION LogError( oerr )
         ENDIF
         FWriteLine( nHandle, "" )
 
-        IF Type( "Select()" ) == "UI"
+        IF Type( "Select()" ) != "UI"
            For nCount := 1 To 600
               If !Empty( ( nCount )->( &("Alias()") ) )
                  ( nCount )->( FWriteLine( nHandle, "Work Area No ......: " + strvalue( &("Select()") ) ) )
