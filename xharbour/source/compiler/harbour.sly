@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.130 2007/09/07 19:06:15 marchuet Exp $
+ * $Id: harbour.sly,v 1.131 2007/09/25 07:32:33 marchuet Exp $
  */
 
 /*
@@ -1975,9 +1975,15 @@ VarDef     : IdentName AsType { hb_compVariableAdd( $1, hb_comp_cVarType ); }
                   }
                   else if( hb_comp_iVarScope == VS_GLOBAL || hb_comp_iVarScope == VS_EXTERNGLOBAL )
                   {
-                     hb_compGlobalsDefStart();   /* switch to globals pcode buffer */
-                     hb_compGlobalsDefEnd();
-                     hb_compGenGlobalName( $1 );
+                     /* hb_comp_pGlobals can be NULL after a "Misplaced GLOBAL"
+                      * error in hb_compVariableAdd() call above.
+                      * hb_compGenGlobalName() does not expect such situation */
+                     if( hb_comp_pGlobals )
+                     {
+                        hb_compGlobalsDefStart();   /* switch to globals pcode buffer */
+                        hb_compGlobalsDefEnd();
+                        hb_compGenGlobalName( $1 );
+                     }
                   }
                   else if( hb_comp_iVarScope == VS_PUBLIC || hb_comp_iVarScope == VS_PRIVATE )
                   {

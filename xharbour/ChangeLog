@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5746 2007/10/24 12:09:44 lculik Exp $
+ * $Id: ChangeLog,v 1.5747 2007/10/24 13:36:47 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,13 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-26 00:37 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/harbour.sly
+    ! Fixed compiler segfault when generating debug info after a
+      "Misplaced GLOBAL declaration" error.
+
 2007-10-24 11:40 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
-   * source/rdd/nulsys/nulsys.c
-   ! Added DBfilter function
+  * source/rdd/nulsys/nulsys.c
+    ! Added DBfilter function
 
 2007-10-24 10:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
-   * source/rtl/errorsys.prg
-   ! minor fix on Open work area logs
+  * source/rtl/errorsys.prg
+    ! minor fix on Open work area logs
 
 2007-10-24 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/diskutil.prg
