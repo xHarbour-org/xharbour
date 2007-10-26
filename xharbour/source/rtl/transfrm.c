@@ -1,5 +1,5 @@
 /*
- * $Id: transfrm.c,v 1.53 2007/08/07 14:28:41 modalsist Exp $
+ * $Id: transfrm.c,v 1.54 2007/09/11 18:24:23 walito Exp $
  */
 
 /*
@@ -529,6 +529,11 @@ HB_FUNC( TRANSFORM )
                   {
                   cDtFormat = "DD-MM-YYYY" ;
                   }
+               /* 2007/OCT/25 - EF - Assign default date format */
+               else
+                  {
+                  cDtFormat = "DD/MM/YYYY" ;
+                  }
              }
              else
              {
@@ -568,6 +573,11 @@ HB_FUNC( TRANSFORM )
                else if( strcmp( cDtFormat, "mm-dd-yy") == 0 )
                   {
                   cDtFormat = "DD-MM-YY" ;
+                  }
+               /* 2007/OCT/25 - EF - Assign default date format */
+               else
+                  {
+                  cDtFormat = "DD/MM/YY" ;
                   }
              }
          }
@@ -774,8 +784,9 @@ HB_FUNC( TRANSFORM )
          }
          else
          {
+            /* 2007/OCT/25 - EF - Replaced dValue by dPush. My fault in last commit. */
             szStr = hb_itemStr(
-               hb_itemPutNDLen( &Number, dValue, -1, iDec ),
+               hb_itemPutNDLen( &Number, dPush, -1, iDec ),
                hb_itemPutNI( &Width, iWidth + ( ( ulPicLen || iDec == 0 ) ? 0 : ( iDec + 1 ) ) ),
                hb_itemPutNI( &Dec, iDec ));
          }
