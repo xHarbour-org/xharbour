@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.141 2007/09/22 05:41:00 andijahja Exp $
+ * $Id: genc.c,v 1.142 2007/09/27 02:50:36 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pFunc = pFunc->pNext; /* No implicit starting procedure */
       }
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "HB_FUNC_STATIC( __begin__ );\n" );
+#endif
 
       /* write functions prototypes for PRG defined functions */
       while( pFunc )
@@ -359,7 +361,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          fprintf( yyc, "HB_CALL_ON_STARTUP_END( hb_InitCritical%s )\n", hb_comp_FileAsSymbol );
       }
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "HB_FUNC_STATIC( __end__ );\n" );
+#endif
 
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
@@ -536,7 +540,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       */
       hb_writeEndInit( yyc );
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __begin__ ){}\n\n" );
+#endif
 
       if( hb_comp_bExplicitStartProc && iStartupOffset >= 0 )
       {
@@ -678,7 +684,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          hb_compGenCInLine( yyc );
       }
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
       fprintf( yyc, "\nHB_FUNC_STATIC( __end__ ){}\n" );
+#endif
    }
    else
    {
@@ -951,10 +959,13 @@ static void hb_compGenCAddProtos( FILE *yyc )
 
 static void hb_writeEndInit( FILE* yyc )
 {
-   fprintf( yyc, ",\n"
+   fprintf( yyc,
+#ifdef BROKEN_MODULE_SPACE_LOGIC
+                 ",\n"
                  "{ \"!\", {0}, {HB_FUNCNAME( __begin__ )}, NULL },\n"
-                 "{ \"!\", {0}, {HB_FUNCNAME( __end__ )}, NULL }\n"
-                 "HB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
+                 "{ \"!\", {0}, {HB_FUNCNAME( __end__ )}, NULL }"
+#endif
+                 "\nHB_INIT_SYMBOLS_END( hb_vm_SymbolInit_%s%s )\n\n"
                  "#if defined(HB_PRAGMA_STARTUP)\n"
                  "   #pragma startup hb_vm_SymbolInit_%s%s\n"
                  "#elif defined(HB_MSC_STARTUP)\n"

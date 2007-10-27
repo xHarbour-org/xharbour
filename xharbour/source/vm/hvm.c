@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.642 2007/09/27 02:50:36 ronpinkas Exp $
+ * $Id: hvm.c,v 1.643 2007/10/01 17:34:56 enricomaria Exp $
  */
 
 /*
@@ -9275,7 +9275,9 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    BOOL fRecycled;
    BOOL fPublic;
    BOOL fStatics;
+#ifdef BROKEN_MODULE_SPACE_LOGIC
    PHB_FUNC pModuleFirstFunction, pModuleLastFunction;
+#endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmRegisterSymbols(%p,%hu,%s,%d,%d,%p)", pSymbolTable, uiSymbols, szModuleName, (int)fDynLib, (int)fClone, pGlobals));
 
@@ -9343,6 +9345,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
    pNewSymbols->pGlobals = pGlobals;
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
    if( uiSymbols > 2 && pNewSymbols->pSymbolTable[ uiSymbols - 1].szName[0] == '!'  && pNewSymbols->pSymbolTable[uiSymbols - 2].szName[0] == '!' )
    {
       pModuleFirstFunction = pNewSymbols->pSymbolTable[uiSymbols - 2].value.pFunPtr;
@@ -9354,6 +9357,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
       pModuleFirstFunction = (PHB_FUNC) 0x00000000;
       pModuleLastFunction  = (PHB_FUNC) 0xFFFFFFFF;
    }
+#endif
 
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
@@ -9403,6 +9407,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
       {
          PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
 
+#ifdef BROKEN_MODULE_SPACE_LOGIC
          if( ( hSymScope & HB_FS_LOCAL ) != 0 )
          {
             if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
@@ -9413,6 +9418,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                TraceLog( NULL, "Local Function: '%s' of Module: '%s' is not linked in.\n", pSymbol->szName, szModuleName );
             }
          }
+#endif
 
          if( fDynLib )
          {
@@ -9474,9 +9480,11 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
             {
                if( ( pSymbol->scope.value & HB_FS_LOCAL ) && ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) )
                {
+#ifdef BROKEN_MODULE_SPACE_LOGIC
                   /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
                   TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously registered Module: %s\n",
                             pSymbol->szName, szModuleName, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
+#endif
                   pSymbol->pDynSym = pDynSym;
                   continue;
                }
