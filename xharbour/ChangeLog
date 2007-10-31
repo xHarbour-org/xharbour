@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5753 2007/10/31 08:34:20 marchuet Exp $
+ * $Id: ChangeLog,v 1.5754 2007/10/31 10:44:10 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-31 11:44 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+
+  * source\ct\disk.c
+    * corrected VolSerial because it was returning a decimal value now return a longlong value.
+    
+  * source\rtl\disksphb.c
+    + Added functionality now HB_DISKSPACE support unc paths.
+    synced with harbour
+
 
 2007-10-31 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbver.h

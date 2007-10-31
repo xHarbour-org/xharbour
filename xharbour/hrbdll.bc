@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.142 2007/10/31 08:34:20 marchuet Exp $
+# $Id: hrbdll.bc,v 1.143 2007/10/31 10:12:05 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -1446,16 +1446,16 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cftsfunc.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\usrrdd.obj            + >> hdll.tmp
-  echo. $$(OBJ_DIR)\arrayrdd.obj         + >> hdll.tmp
-  echo. $$(OBJ_DIR)\dbtcdx.obj           + >> hdll.tmp
-  echo. $$(OBJ_DIR)\fcomma.obj           + >> hdll.tmp
-  echo. $$(OBJ_DIR)\fptcdx.obj           + >> hdll.tmp
-  echo. $$(OBJ_DIR)\hscdx.obj            + >> hdll.tmp
-  echo. $$(OBJ_DIR)\rlcdx.obj            + >> hdll.tmp
-  echo. $$(OBJ_DIR)\smtcdx.obj           + >> hdll.tmp
-  echo. $$(OBJ_DIR)\adordd.obj           + >> hdll.tmp
-  echo. $$(OBJ_DIR)\ansirdd.obj          + >> hdll.tmp
-  echo. $$(OBJ_DIR)\vfpcdx.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\arrayrdd.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\dbtcdx.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\fcomma.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\fptcdx.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hscdx.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\rlcdx.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\smtcdx.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\adordd.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\ansirdd.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\vfpcdx.obj            + >> hdll.tmp
 !if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
@@ -3670,6 +3670,88 @@ $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c
 $(OBJ_DIR)\usrrdd.obj : $(USRRDD_DIR)\usrrdd.c
    $(CC) $(CLIBFLAGS) -o$@ $**
 
+   #
+# RDDS.LIB dependencies
+#
+
+$(RDD_OBJ_DIR)\arrayrdd.c : $(RDD_DIR)\usrrdd\rdds\arrayrdd.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\arrayrdd.obj : $(RDD_OBJ_DIR)\arrayrdd.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.c : $(RDD_DIR)\dbdelim.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.obj : $(RDD_OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.c : $(RDD_DIR)\dbjoin.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.obj : $(RDD_OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.c : $(RDD_DIR)\dbsdf.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.obj : $(RDD_OBJ_DIR)\dbsdf.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbtcdx.c : $(RDD_DIR)\usrrdd\rdds\dbtcdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\dbtcdx.obj : $(RDD_OBJ_DIR)\dbtcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\fcomma.c : $(RDD_DIR)\usrrdd\rdds\fcomma.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\fcomma.obj : $(RDD_OBJ_DIR)\fcomma.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\fptcdx.c : $(RDD_DIR)\usrrdd\rdds\fptcdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\fptcdx.obj : $(RDD_OBJ_DIR)\fptcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\hscdx.c : $(RDD_DIR)\usrrdd\rdds\hscdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\hscdx.obj : $(RDD_OBJ_DIR)\hscdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\rlcdx.c : $(RDD_DIR)\usrrdd\rdds\rlcdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\rlcdx.obj : $(RDD_OBJ_DIR)\rlcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\smtcdx.c : $(RDD_DIR)\usrrdd\rdds\smtcdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\smtcdx.obj : $(RDD_OBJ_DIR)\smtcdx.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\adordd.c : $(RDD_DIR)\usrrdd\rdds\adordd.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\adordd.obj : $(RDD_OBJ_DIR)\adordd.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\ansirdd.c : $(RDD_DIR)\usrrdd\rdds\ansirdd.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\ansirdd.obj : $(RDD_OBJ_DIR)\ansirdd.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\vfpcdx.c : $(RDD_DIR)\usrrdd\rdds\vfpcdx.prg
+   $(HRB_CMD)
+
+$(RDD_OBJ_DIR)\vfpcdx.obj : $(RDD_OBJ_DIR)\vfpcdx.c
+   $(CC_CMD)
+   
 #
 # ADS dependencies
 #

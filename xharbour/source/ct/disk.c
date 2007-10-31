@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.12 2006/12/10 12:33:34 ptsarenko Exp $
+ * $Id: disk.c,v 1.13 2007/02/13 19:02:24 druzus Exp $
  */
 /*
  * xHarbour Project source code:
@@ -362,7 +362,7 @@ HB_FUNC( VOLSERIAL )
                                    0 );        // FileSystemSize
 
     if ( retval!=0 )
-       hb_retnd( dSerial );
+       hb_retnll( dSerial );
     else
        hb_retni(-1);
 #endif
