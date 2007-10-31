@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbf.h,v 1.9 2005/09/11 19:39:32 druzus Exp $
+ * $Id: hbdbf.h,v 1.10 2007/05/11 10:22:07 marchuet Exp $
  */
 
 /*
@@ -91,7 +91,7 @@ typedef struct _DBFFIELD
    BYTE bLen;
    BYTE bDec;
    BYTE bFieldFlags;          /* 0x01-system column, 0x02-nullable, 0x04-binary, 0x0c-autoincrement */
-   BYTE bCounter[4];          /* autoincrement counter */
+   BYTE bCounter[ 4 ];        /* autoincrement counter */
    BYTE bStep;                /* autoincrement step */
    BYTE bReserved2[ 7 ];
    BYTE bHasTag;

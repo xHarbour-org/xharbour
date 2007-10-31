@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.1 2007/05/04 11:41:36 marchuet Exp $
+ * $Id: wacore.c,v 1.2 2007/05/07 10:19:54 marchuet Exp $
  */
 
 /*
@@ -133,7 +133,10 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
 
    if( s_uiCurrArea >= s_uiWaNumMax )
    {
-      int iSize = ( ( s_uiCurrArea + 256 ) >> 8 ) << 8;
+      int iSize = ( ( ( int ) s_uiCurrArea + 256 ) >> 8 ) << 8;
+
+      if( iSize > HARBOUR_MAX_RDD_AREA_NUM )
+         iSize = HARBOUR_MAX_RDD_AREA_NUM;
 
       if( s_uiWaNumMax == 0 )
       {

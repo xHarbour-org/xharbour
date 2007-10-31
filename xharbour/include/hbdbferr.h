@@ -1,5 +1,5 @@
 /*
- * $Id: hbdbferr.h,v 1.5 2005/09/15 12:55:35 druzus Exp $
+ * $Id: hbdbferr.h,v 1.6 2006/04/15 18:52:23 druzus Exp $
  */
 
 /*
@@ -88,6 +88,10 @@ HB_EXTERN_BEGIN
 
 #define EDBF_MEMOTYPE                              1056
 #define EDBF_MEMOTOOLONG                           1057
+
+#define EDBF_CREATE_TEMP                           1060
+#define EDBF_WRITE_TEMP                            1061
+#define EDBF_READ_TEMP                             1062
 
 HB_EXTERN_END
 

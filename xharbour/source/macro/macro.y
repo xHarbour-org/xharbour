@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.29 2007/03/25 06:12:50 walito Exp $
+ * $Id: macro.y,v 1.30 2007/05/15 21:34:12 ronpinkas Exp $
  */
 
 /*
@@ -128,7 +128,13 @@ extern void yyerror( char * ); /* parsing error management function */
       hb_compExprDelete( (pExpr), HB_MACRO_PARAM ); \
       YYABORT; \
    }
-
+   
+#if defined( __BORLANDC__ ) || defined( __WATCOMC__ )
+/* The if() inside this macro is always TRUE but it's used to hide BCC warning */
+#define HB_MACRO_ABORT if( !( HB_MACRO_DATA->status & HB_MACRO_CONT ) ) { YYABORT; }
+#else
+#define HB_MACRO_ABORT { YYABORT; }
+#endif
 %}
 
 %union                  /* special structure used by lex and yacc to share info */
@@ -261,38 +267,22 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 
 Main : Expression '\n'  {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
-
                            if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_PUSH )
-                           {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
                            else if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_STATEMENT )
-                           {
                               hb_compExprDelete( hb_compExprGenStatement( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
                            else
-                           {
                               hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
-
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
      | Expression       {
                            HB_MACRO_DATA->exprType = hb_compExprType( $1 );
-
                            if( HB_MACRO_DATA->Flags &  HB_MACRO_GEN_PUSH )
-                           {
                               hb_compExprDelete( hb_compExprGenPush( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
                            else if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_STATEMENT )
-                           {
                               hb_compExprDelete( hb_compExprGenStatement( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
                            else
-                           {
                               hb_compExprDelete( hb_compExprGenPop( $1, HB_MACRO_PARAM ), HB_MACRO_PARAM );
-                           }
-
                            hb_compGenPCode1( HB_P_ENDPROC, HB_MACRO_PARAM );
                         }
      | ByRefArg         {
@@ -337,8 +327,7 @@ Main : Expression '\n'  {
                               hb_xfree( yylval.string );
                               yylval.string = NULL;
                            }
-
-                           YYABORT;
+                           HB_MACRO_ABORT;
                         }
      | error            {
                            // This case is when error maybe nested in say a CodeBlock.
@@ -358,8 +347,7 @@ Main : Expression '\n'  {
                               hb_xfree( yylval.string );
                               yylval.string = NULL;
                            }
-
-                           YYABORT;
+                           HB_MACRO_ABORT;
                         }
      ;
 

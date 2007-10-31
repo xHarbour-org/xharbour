@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.643 2007/10/01 17:34:56 enricomaria Exp $
+ * $Id: hvm.c,v 1.644 2007/10/27 10:12:39 likewolf Exp $
  */
 
 /*
@@ -85,17 +85,17 @@
 #include <ctype.h>
 
 #include "hbvmopt.h"
-#include "hbxvm.h"
 #include "hbapi.h"
 #include "hbfast.h"
 #include "hbstack.h"
-#include "hbapidbg.h"
 #include "hbapierr.h"
+#include "hbapidbg.h"
 #include "hbapiitm.h"
 #include "hbapilng.h"
 #include "hbapirdd.h"
 #include "hbapigt.h"
 #include "hbvm.h"
+#include "hbxvm.h"
 #include "hbpcode.h"
 #include "hbset.h"
 #include "inkey.ch"
@@ -145,17 +145,17 @@ HB_FUNC_EXTERN( SYSINIT );
 /* PCode functions */
 
 /* Operators (mathematical / character / misc) */
-static void     hb_vmNegate( void );          /* negates (-) the latest value on the stack */
-static void     hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd );      /* add integer to given item */
-static void     hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult ); /* sums the latest two values on the stack, removes them and leaves the result */
-static void     hb_vmMinus( void );           /* substracts the latest two values on the stack, removes them and leaves the result */
-static void     hb_vmMult( void );            /* multiplies the latest two values on the stack, removes them and leaves the result */
-static void     hb_vmDivide( void );          /* divides the latest two values on the stack, removes them and leaves the result */
-static void     hb_vmModulus( void );         /* calculates the modulus of latest two values on the stack, removes them and leaves the result */
-static void     hb_vmPower( void );           /* power the latest two values on the stack, removes them and leaves the result */
-static void     hb_vmInc( void );             /* increment the latest numeric value on the stack */
-static void     hb_vmDec( void );             /* decrements the latest numeric value on the stack */
-static void     hb_vmFuncPtr( void );         /* pushes a function address pointer. Removes the symbol from the satck */
+static void    hb_vmNegate( void );          /* negates (-) the latest value on the stack */
+static void    hb_vmAddInt( HB_ITEM_PTR pResult, LONG lAdd );      /* add integer to given item */
+static void    hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult ); /* sums the latest two values on the stack, removes them and leaves the result */
+static void    hb_vmMinus( void );           /* substracts the latest two values on the stack, removes them and leaves the result */
+static void    hb_vmMult( void );            /* multiplies the latest two values on the stack, removes them and leaves the result */
+static void    hb_vmDivide( void );          /* divides the latest two values on the stack, removes them and leaves the result */
+static void    hb_vmModulus( void );         /* calculates the modulus of latest two values on the stack, removes them and leaves the result */
+static void    hb_vmPower( void );           /* power the latest two values on the stack, removes them and leaves the result */
+static void    hb_vmInc( void );             /* increment the latest numeric value on the stack */
+static void    hb_vmDec( void );             /* decrements the latest numeric value on the stack */
+static void    hb_vmFuncPtr( void );         /* pushes a function address pointer. Removes the symbol from the satck */
 
 /* Operators (relational) */
 static void    hb_vmEqual( BOOL bExact );    /* checks if the two latest values on the stack are equal, removes both and leaves result */
@@ -221,9 +221,9 @@ static void    hb_vmPushAliasedVar( PHB_SYMB );   /* pushes an aliased variable 
 static void    hb_vmPushBlock( const BYTE * pCode, USHORT usSize, BOOL bDynCode ); /* creates a codeblock */
 static void    hb_vmPushBlockShort( const BYTE * pCode, USHORT usSize, BOOL bDynCode ); /* creates a codeblock */
 static void    hb_vmPushDoubleConst( double dNumber, int iWidth, int iDec ); /* Pushes a double constant (pcode) */
-static void    hb_vmPushMacroBlock( BYTE * pCode ); /* creates a macro-compiled codeblock */
-static void    hb_vmPushLocal( const SHORT iLocal );    /* pushes the containts of a local onto the stack */
-static void    hb_vmPushLocalByRef( SHORT iLocal );    /* pushes a local by refrence onto the stack */
+static void    hb_vmPushMacroBlock( BYTE * pCode );   /* creates a macro-compiled codeblock */
+static void    hb_vmPushLocal( const SHORT iLocal );  /* pushes the containts of a local onto the stack */
+static void    hb_vmPushLocalByRef( SHORT iLocal );   /* pushes a local by refrence onto the stack */
 static void    hb_vmPushHBLong( HB_LONG lNumber ); /* pushes a HB_LONG number onto the stack */
 #if !defined( HB_LONG_LONG_OFF )
    static void hb_vmPushLongLongConst( LONGLONG lNumber );  /* Pushes a LONGLONG constant (pcode) */
@@ -257,7 +257,7 @@ static void    hb_vmPopStatic( USHORT uiStatic ); /* pops the stack latest value
 static void    hb_vmDoInitStatics( void );        /* executes all _INITSTATICS functions */
 static void    hb_vmDoInitFunctions( void );      /* executes all defined PRGs INIT functions */
 static BOOL    hb_vmDoInitFunc( char *pFuncSym ); /* executes CLIPINIT, HB_OLEINIT and HASHENTRY */
-// HB_EXPORT void hb_vmDoExitFunctions( void );      /* executes all defined PRGs EXIT functions */
+// HB_EXPORT void hb_vmDoExitFunctions( void );   /* executes all defined PRGs EXIT functions */
 
 
 // extern BOOL   hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
@@ -376,7 +376,6 @@ static void hb_vmCleanModuleFunctions( void )
    }
 }
 
-
 static void hb_vmDoModuleFunctions( PHB_FUNC_LIST pFunctions )
 {
    PHB_FUNC_LIST pLst = pFunctions;
@@ -387,7 +386,6 @@ static void hb_vmDoModuleFunctions( PHB_FUNC_LIST pFunctions )
       pLst = pLst->pNext;
    }
 }
-
 
 static BYTE * hb_vmUnhideString( const BYTE uiType, ULONG ulSize, const BYTE * pSource, const ULONG ulBufferSize )
 {
@@ -6387,7 +6385,7 @@ static void hb_vmArrayPop( HB_PCODE pcode )
       if( lIndex > 0 && (ULONG) lIndex <= pArray->item.asArray.value->ulLen )
       {
          /* Remove MEMOFLAG if exists (assignment from field). */
-         pValue->type &= ~HB_IT_MEMOFLAG;
+         pValue->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
 
          if( pcode == HB_P_PLUS )
          {
@@ -6521,7 +6519,7 @@ static void hb_vmArrayGen( const ULONG ulElements ) /* generates an ulElements A
    {
       pItem = hb_stackItemFromTop( ulPos - ulElements );
 
-      pItem->type &= ~HB_IT_MEMOFLAG;
+      pItem->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
       hb_itemForwardValue( itArray.item.asArray.value->pItems + ulPos, pItem );
    }
 
@@ -8045,7 +8043,7 @@ HB_EXPORT void hb_vmPushLogical( BOOL bValue )
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLogical(%d)", (int) bValue));
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_LOGICAL;
-   ( * HB_VM_STACK.pPos )->item.asLogical.value = bValue;
+   ( * HB_VM_STACK.pPos )->item.asLogical.value = bValue ? TRUE : FALSE;
    hb_stackPush();
 }
 
@@ -8973,7 +8971,7 @@ static void hb_vmPopLocal( SHORT iLocal )
    pVal = *( HB_VM_STACK.pPos - 1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
-   pVal->type &= ~HB_IT_MEMOFLAG;
+   pVal->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
 
    HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
@@ -9016,7 +9014,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
    pVal = *( HB_VM_STACK.pPos - 1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
-   pVal->type &= ~HB_IT_MEMOFLAG;
+   pVal->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
    pStatic = s_aStatics.item.asArray.value->pItems + HB_VM_STACK.lStatics + uiStatic - 1;
 
    //TraceLog( NULL, "Assign Static: %i, Class: %s\n", uiStatic, hb_objGetClsName( pVal ) );
@@ -10107,23 +10105,56 @@ HB_EXPORT void hb_vmPushBaseArray( PHB_BASEARRAY pBaseArray )
    hb_stackPush();
 }
 
-HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem, PHB_ITEM * pItemRef[], int iPos )
+/* ------------------------------- */
+/* Extended references             */
+/* ------------------------------- */
+
+/*
+ * extended item reference functions
+ */
+static PHB_ITEM hb_vmItemRefRead( PHB_ITEM pRefer )
 {
-   HB_THREAD_STUB
-   PHB_ITEM pTop;
+   return ( PHB_ITEM ) pRefer->item.asExtRef.value;
+}
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushItemRef(%p, %p, %d)", pItem, pItemRef, iPos));
+static PHB_ITEM hb_vmItemRefWrite( PHB_ITEM pRefer, PHB_ITEM pSource )
+{
+   HB_SYMBOL_UNUSED( pSource );
+   return ( PHB_ITEM ) pRefer->item.asExtRef.value;
+}
 
-#ifdef HB_UNSHARE_REFERENCES
-   pItem = hb_itemUnShare( pItem );
-#endif
-   hb_stackPush();
-   pTop = hb_stackItemFromTop( -1 );
-   ( * pItemRef )[ iPos ] = pItem;
-   pTop->type = HB_IT_BYREF;
-   pTop->item.asRefer.offset = -1;
-   pTop->item.asRefer.BasePtr.itemsbasePtr = pItemRef;
-   pTop->item.asRefer.value = iPos + 1;
+static void hb_vmItemRefCopy( PHB_ITEM pDest )
+{
+   pDest->type = HB_IT_NIL;
+   hb_itemCopy( pDest, ( PHB_ITEM ) pDest->item.asExtRef.value );
+}
+
+static void hb_vmItemRefDummy( void * value )
+{
+   HB_SYMBOL_UNUSED( value );
+}
+
+/*
+ * push extended item reference
+ */
+HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem )
+{
+   static const HB_EXTREF s_ItmExtRef = {
+             hb_vmItemRefRead,
+             hb_vmItemRefWrite,
+             hb_vmItemRefCopy,
+             hb_vmItemRefDummy,
+             hb_vmItemRefDummy };
+
+   PHB_ITEM pRefer;
+   HB_THREAD_STUB   
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushItemRef(%p)", pItem));
+
+   pRefer = hb_stackAllocItem();
+   pRefer->type = HB_IT_BYREF | HB_IT_EXTREF;
+   pRefer->item.asExtRef.value = ( void * ) pItem;
+   pRefer->item.asExtRef.func = &s_ItmExtRef;
 }
 
 HB_FUNC( HB_FUNCPTR )
@@ -11845,7 +11876,7 @@ static void hb_vmArrayItemPop( ULONG ulIndex )
    {
       if( ulIndex > 0 && ulIndex <= pArray->item.asArray.value->ulLen )
       {
-         pValue->type &= ~HB_IT_MEMOFLAG;
+         pValue->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
          hb_itemForwardValue( pArray->item.asArray.value->pItems + ulIndex - 1, pValue );
          hb_stackPop();
          hb_stackDec();    /* value was moved above hb_stackDec() is enough */

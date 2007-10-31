@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.203 2007/09/15 17:37:45 patrickmast Exp $
+# $Id: makefile.bc,v 1.204 2007/09/25 07:32:25 marchuet Exp $
 #
 
 #
@@ -94,7 +94,6 @@ NTX_OBJ_DIR   = $(OBJ_DIR)
 CDX_OBJ_DIR   = $(OBJ_DIR)
 BMCDX_OBJ_DIR = $(OBJ_DIR)
 SIX_OBJ_DIR   = $(OBJ_DIR)
-HSX_OBJ_DIR   = $(OBJ_DIR)
 CT_OBJ_DIR    = $(OBJ_DIR)
 TIP_OBJ_DIR   = $(OBJ_DIR)
 PP_OBJ_DIR    = $(OBJ_DIR)
@@ -668,12 +667,20 @@ HBSIX_LIB_OBJS = \
    $(SIX_OBJ_DIR)\sxcompr.obj \
    $(SIX_OBJ_DIR)\sxcrypt.obj \
    $(SIX_OBJ_DIR)\sxdate.obj \
+   $(SIX_OBJ_DIR)\sxsem.obj \
+   $(SIX_OBJ_DIR)\sxfname.obj \
+   $(SIX_OBJ_DIR)\sxtable.obj \
+   $(SIX_OBJ_DIR)\sxord.obj \
+   $(SIX_OBJ_DIR)\sxutil.obj \
+   $(SIX_OBJ_DIR)\sxredir.obj \
    \
-   $(SIX_OBJ_DIR)\sxfunc.obj
+   $(SIX_OBJ_DIR)\sxcompat.obj \
+   $(SIX_OBJ_DIR)\sxini.obj \
+   $(SIX_OBJ_DIR)\sxtrig.obj
 
 HSX_LIB_OBJS = \
-   $(HSX_OBJ_DIR)\hsx.obj \
-   $(HSX_OBJ_DIR)\cftsfunc.obj
+   $(OBJ_DIR)\hsx.obj \
+   $(OBJ_DIR)\cftsfunc.obj
 
 USRRDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\usrrdd.obj
@@ -687,7 +694,8 @@ RDDS_LIB_OBJS = \
    $(RDD_OBJ_DIR)\rlcdx.obj \
    $(RDD_OBJ_DIR)\smtcdx.obj \
    $(RDD_OBJ_DIR)\adordd.obj \
-   $(RDD_OBJ_DIR)\ansirdd.obj
+   $(RDD_OBJ_DIR)\ansirdd.obj \
+   $(RDD_OBJ_DIR)\vfpcdx.obj
 
 #
 # PP.LIB rules
@@ -2949,10 +2957,40 @@ $(SIX_OBJ_DIR)\sxcrypt.obj : $(RDD_DIR)\hbsix\sxcrypt.c
 $(SIX_OBJ_DIR)\sxdate.obj : $(RDD_DIR)\hbsix\sxdate.c
    $(CC_CMD)
 
-$(SIX_OBJ_DIR)\sxfunc.c : $(RDD_DIR)\hbsix\sxfunc.prg
+$(SIX_OBJ_DIR)\sxsem.obj : $(RDD_DIR)\hbsix\sxsem.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxfname.obj : $(RDD_DIR)\hbsix\sxfname.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxtable.obj : $(RDD_DIR)\hbsix\sxtable.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxord.obj : $(RDD_DIR)\hbsix\sxord.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxutil.obj : $(RDD_DIR)\hbsix\sxutil.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxredir.obj : $(RDD_DIR)\hbsix\sxredir.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxcompat.c : $(RDD_DIR)\hbsix\sxcompat.prg
    $(HB_CMD)
 
-$(SIX_OBJ_DIR)\sxfunc.obj : $(SIX_OBJ_DIR)\sxfunc.c
+$(SIX_OBJ_DIR)\sxcompat.obj : $(SIX_OBJ_DIR)\sxcompat.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxini.c : $(RDD_DIR)\hbsix\sxini.prg
+   $(HB_CMD)
+
+$(SIX_OBJ_DIR)\sxini.obj : $(SIX_OBJ_DIR)\sxini.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxtrig.c : $(RDD_DIR)\hbsix\sxtrig.prg
+   $(HB_CMD)
+
+$(SIX_OBJ_DIR)\sxtrig.obj : $(SIX_OBJ_DIR)\sxtrig.c
    $(CC_CMD)
    
 #
@@ -2960,10 +2998,10 @@ $(SIX_OBJ_DIR)\sxfunc.obj : $(SIX_OBJ_DIR)\sxfunc.c
 #
 
 
-$(HSX_OBJ_DIR)\hsx.obj : $(RDD_DIR)\hsx\hsx.c
+$(OBJ_DIR)\hsx.obj : $(RDD_DIR)\hsx\hsx.c
    $(CC_CMD)
 
-$(HSX_OBJ_DIR)\cftsfunc.obj : $(RDD_DIR)\hsx\cftsfunc.c
+$(OBJ_DIR)\cftsfunc.obj : $(RDD_DIR)\hsx\cftsfunc.c
    $(CC_CMD)
 
 #
@@ -3048,6 +3086,12 @@ $(RDD_OBJ_DIR)\ansirdd.c : $(RDD_DIR)\usrrdd\rdds\ansirdd.prg
    $(HB_CMD)
 
 $(RDD_OBJ_DIR)\ansirdd.obj : $(RDD_OBJ_DIR)\ansirdd.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\vfpcdx.c : $(RDD_DIR)\usrrdd\rdds\vfpcdx.prg
+   $(HB_CMD)
+
+$(RDD_OBJ_DIR)\vfpcdx.obj : $(RDD_OBJ_DIR)\vfpcdx.c
    $(CC_CMD)
 
 

@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.108 2007/05/04 20:50:00 ran_go Exp $
+ * $Id: fastitem.c,v 1.109 2007/09/11 18:24:23 walito Exp $
  */
 
 /*
@@ -140,6 +140,19 @@ PHB_ITEM HB_EXPORT hb_itemReturnForward( PHB_ITEM pItem )
    }
 
    return pItem;
+}
+
+HB_EXPORT void hb_itemReturnRelease( PHB_ITEM pItem )
+{
+   HB_THREAD_STUB_STACK
+   
+   HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnRelease(%p)", pItem ) );
+
+   if( pItem )
+   {
+      hb_itemMove( hb_stackReturnItem(), pItem );
+      hb_itemRelease( pItem );
+   }
 }
 
 void HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem )

@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.83 2007/06/06 22:20:06 ronpinkas Exp $
+ * $Id: fm.c,v 1.84 2007/06/06 22:25:12 ronpinkas Exp $
  */
 
 /*
@@ -131,6 +131,13 @@ typedef struct _HB_MEMINFO
 #  define HB_MEMINFO_SIZE     sizeof( HB_MEMINFO )
 #endif
 
+#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE + sizeof( UINT32 ) )
+#define HB_FM_PTR( p )        ( ( PHB_MEMINFO ) ( ( BYTE * ) ( p ) - HB_MEMINFO_SIZE ) )
+
+#define HB_FM_GETSIG( p, n )  HB_GET_UINT32( ( BYTE * )( p ) + ( n ) )
+#define HB_FM_SETSIG( p, n )  HB_PUT_UINT32( ( BYTE * )( p ) + ( n ), HB_MEMINFO_SIGNATURE )
+#define HB_FM_CLRSIG( p, n )  HB_PUT_UINT32( ( BYTE * )( p ) + ( n ), 0 )
+
 static LONG s_lMemoryBlocks = 0;      /* memory blocks used */
 static LONG s_lMemoryMaxBlocks = 0;   /* maximum number of used memory blocks */
 static LONG s_lMemoryMaxConsumed = 0; /* memory size consumed */
@@ -142,7 +149,17 @@ static LONG s_lFreed = 0;
 static PHB_MEMINFO s_pFirstBlock = NULL;
 static PHB_MEMINFO s_pLastBlock = NULL;
 
+#else /* ! HB_FM_STATISTICS */
+
+typedef void * PHB_MEMINFO;
+#define HB_MEMINFO_SIZE       HB_COUNTER_OFFSET
+#define HB_ALLOC_SIZE( n )    ( ( n ) + HB_MEMINFO_SIZE )
+#define HB_FM_PTR( p )        HB_COUNTER_PTR( p )
+#define HB_TRACE_FM           HB_TRACE
+
 #endif
+
+#define HB_MEM_PTR( p )       ( ( void * ) ( ( BYTE * ) ( p ) + HB_MEMINFO_SIZE ) )
 
 #if defined( HB_THREAD_SUPPORT ) && \
     ( !defined( HB_SAFE_ALLOC ) || defined( HB_FM_STATISTICS ) )
@@ -647,6 +664,90 @@ HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 #endif
 }
 #endif
+
+/* increment reference counter */
+#undef hb_xRefInc
+void hb_xRefInc( void * pMem )
+{
+   ++( * HB_COUNTER_PTR( pMem ) );
+}
+
+/* decrement reference counter, return TRUE when 0 reached */
+#undef hb_xRefDec
+BOOL hb_xRefDec( void * pMem )
+{
+   return --( * HB_COUNTER_PTR( pMem ) ) == 0;
+}
+
+/* decrement reference counter and free the block when 0 reached */
+#undef hb_xRefFree
+void hb_xRefFree( void * pMem )
+{
+#ifdef HB_FM_STATISTICS
+
+   if( HB_FM_PTR( pMem )->ulSignature != HB_MEMINFO_SIGNATURE )
+      hb_errInternal( HB_EI_XFREEINV, NULL, NULL, NULL );
+
+   if( --( * HB_COUNTER_PTR( pMem ) ) == 0 )
+      hb_xfree( pMem );
+
+#else
+
+   if( --( * HB_COUNTER_PTR( pMem ) ) == 0 )
+      free( HB_FM_PTR( pMem ) );
+
+#endif
+}
+
+/* return number of references */
+#undef hb_xRefCount
+HB_COUNTER hb_xRefCount( void * pMem )
+{
+   return * HB_COUNTER_PTR( pMem );
+}
+
+/* reallocates memory, create copy if reference counter greater then 1 */
+#undef hb_xRefResize
+void * hb_xRefResize( void * pMem, ULONG ulSave, ULONG ulSize )
+{
+
+#ifdef HB_FM_STATISTICS
+   if( * HB_COUNTER_PTR( pMem ) > 1 )
+   {
+      void * pMemNew = hb_xgrab( ulSize );
+
+      --( * HB_COUNTER_PTR( pMem ) );
+      memcpy( pMemNew, pMem, HB_MIN( ulSave, ulSize ) );
+      return pMemNew;
+   }
+
+   return hb_xrealloc( pMem, ulSize );
+
+#else
+
+   if( * HB_COUNTER_PTR( pMem ) > 1 )
+   {
+      void * pMemNew = malloc( HB_ALLOC_SIZE( ulSize ) );
+
+      if( pMemNew )
+      {
+         --( * HB_COUNTER_PTR( pMem ) );
+         * HB_COUNTER_PTR( HB_MEM_PTR( pMemNew ) ) = 1;
+         memcpy( HB_MEM_PTR( pMemNew ), pMem, HB_MIN( ulSave, ulSize ) );
+         return HB_MEM_PTR( pMemNew );
+      }
+   }
+   else
+   {
+      pMem = realloc( HB_FM_PTR( pMem ), HB_ALLOC_SIZE ( ulSize ) );
+      if( pMem )
+         return HB_MEM_PTR( pMem );
+   }
+
+   hb_errInternal( HB_EI_XREALLOC, NULL, NULL, NULL );
+   return NULL;
+#endif
+}
 
 #undef hb_xautorelease
 HB_EXPORT void hb_xautorelease( void * pMem )            /* set memory to autorelease */

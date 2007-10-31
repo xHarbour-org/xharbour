@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.44 2007/09/22 05:41:00 andijahja Exp $
+ * $Id: hbstack.h,v 1.45 2007/09/25 07:32:32 marchuet Exp $
  */
 
 /*
@@ -180,6 +180,9 @@ typedef struct
                                           if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
                                              hb_stackIncrease(); \
                                        } while ( 0 )                                    
+   #define hb_stackAllocItem( )        ( ( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ? \
+                                           hb_stackIncrease() : (void) 0 ), \
+                                       * ( HB_VM_STACK.pPos - 1 ) )   
 
 #else
    extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
@@ -196,6 +199,7 @@ typedef struct
    extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
    extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
+   extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */   
    extern HB_EXPORT void        hb_stackPushReturn( void );
    extern HB_EXPORT void        hb_stackPopReturn( void );   
    

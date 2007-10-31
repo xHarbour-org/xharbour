@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.142 2007/05/04 20:50:35 ran_go Exp $
+ * $Id: itemapi.c,v 1.143 2007/05/07 15:00:56 ran_go Exp $
  */
 
 /*
@@ -130,7 +130,7 @@
    extern HB_CRITICAL_T hb_gcCollectionMutex;
 #endif
 
-PHB_ITEM HB_EXPORT hb_itemNew( PHB_ITEM pNull )
+HB_EXPORT PHB_ITEM hb_itemNew( PHB_ITEM pNull )
 {
 #ifndef HB_NO_TRACE
    pNull = hb_gcGripGet( pNull );
@@ -144,41 +144,30 @@ PHB_ITEM HB_EXPORT hb_itemNew( PHB_ITEM pNull )
 #endif
 }
 
-PHB_ITEM HB_EXPORT hb_itemParam( USHORT uiParam )
+HB_EXPORT PHB_ITEM hb_itemParam( USHORT uiParam )
 {
-   PHB_ITEM pNew;
-   PHB_ITEM pItem;
-
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParam(%hu)", uiParam));
 
-   pNew = hb_itemNew( NULL );
-   pItem = hb_param( uiParam, HB_IT_ANY );
-
-   if( pItem )
-   {
-      hb_itemCopy( pNew, pItem );
-   }
-
-   return pNew;
+   return hb_itemNew( hb_param( uiParam, HB_IT_ANY ) );
 }
 
 /* Internal Item API. Use this with care. */
 
-PHB_ITEM HB_EXPORT hb_itemParamPtr( USHORT uiParam, LONG lMask )
+HB_EXPORT PHB_ITEM hb_itemParamPtr( USHORT uiParam, LONG lMask )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemParamPtr(%hu, %ld)", uiParam, lMask));
 
    return hb_param( ( int ) uiParam, lMask );
 }
 
-USHORT HB_EXPORT hb_itemPCount( void )
+HB_EXPORT USHORT hb_itemPCount( void )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemPCount()"));
 
    return ( USHORT ) hb_pcount();
 }
 
-BOOL HB_EXPORT hb_itemRelease( PHB_ITEM pItem )
+HB_EXPORT BOOL hb_itemRelease( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemRelease(%p)", pItem));
 
@@ -187,11 +176,11 @@ BOOL HB_EXPORT hb_itemRelease( PHB_ITEM pItem )
       hb_gcGripDrop( pItem );
       return TRUE;
    }
-
-   return FALSE;
+   else
+      return FALSE;
 }
 
-PHB_ITEM HB_EXPORT hb_itemArrayNew( ULONG ulLen )
+HB_EXPORT PHB_ITEM hb_itemArrayNew( ULONG ulLen )
 {
    PHB_ITEM pItem;
 
@@ -204,7 +193,7 @@ PHB_ITEM HB_EXPORT hb_itemArrayNew( ULONG ulLen )
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
+HB_EXPORT PHB_ITEM hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
 {
    PHB_ITEM pItem;
 
@@ -212,31 +201,31 @@ PHB_ITEM HB_EXPORT hb_itemArrayGet( PHB_ITEM pArray, ULONG ulIndex )
 
    pItem = hb_itemNew( NULL );
 
-   hb_arrayGet( pArray, ulIndex, pItem );
+   if( pArray )
+      hb_arrayGet( pArray, ulIndex, pItem );
 
    return pItem;
 }
 
-PHB_ITEM HB_EXPORT hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+HB_EXPORT PHB_ITEM hb_itemArrayPut( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_itemArrayPut(%p, %lu, %p)", pArray, ulIndex, pItem));
 
-   hb_arraySet( pArray, ulIndex, pItem );
+   if( pArray )
+      hb_arraySet( pArray, ulIndex, pItem );
 
    return pArray;
 }
 
-void HB_EXPORT hb_itemSetCMemo( PHB_ITEM pItem )
+HB_EXPORT void hb_itemSetCMemo( PHB_ITEM pItem )
 {
    if( pItem && HB_IS_STRING( pItem ) )
-   {
       pItem->type |= HB_IT_MEMOFLAG;
-   }
 }
 
 /* NOTE: The caller should free the pointer if it's not NULL. [vszakats] */
 
-char HB_EXPORT * hb_itemGetC( PHB_ITEM pItem )
+HB_EXPORT char * hb_itemGetC( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetC(%p)", pItem));
 
@@ -248,56 +237,51 @@ char HB_EXPORT * hb_itemGetC( PHB_ITEM pItem )
 
       return szResult;
    }
-
-   return NULL;
+   else
+      return NULL;
 }
 
 /* NOTE: Caller should not modify the buffer returned by this function.
          [vszakats] */
 
-char HB_EXPORT * hb_itemGetCPtr( PHB_ITEM pItem )
+HB_EXPORT char * hb_itemGetCPtr( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetCPtr(%p)", pItem));
 
    if( pItem && HB_IS_STRING( pItem ) )
-   {
       return pItem->item.asString.value;
-   }
-
-   return "";
+   else
+      return "";
 }
 
-ULONG HB_EXPORT hb_itemGetCLen( PHB_ITEM pItem )
+HB_EXPORT ULONG hb_itemGetCLen( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetCLen(%p)", pItem));
 
    if( pItem && HB_IS_STRING( pItem ) )
-   {
       return pItem->item.asString.length;
-   }
-
-   return 0;
+   else
+      return 0;
 }
 
-ULONG HB_EXPORT hb_itemCopyC( PHB_ITEM pItem, char * szBuffer, ULONG ulLen )
+HB_EXPORT ULONG hb_itemCopyC( PHB_ITEM pItem, char * szBuffer, ULONG ulLen )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemCopyC(%p, %s, %lu)", pItem, szBuffer, ulLen));
 
    if( pItem && HB_IS_STRING( pItem ) )
    {
       if( ulLen == 0 || ulLen > pItem->item.asString.length )
-      {
          ulLen = pItem->item.asString.length;
-      }
+
       hb_xmemcpy( szBuffer, pItem->item.asString.value, ulLen );
 
       return ulLen;
    }
-
-   return 0;
+   else
+      return 0;
 }
 
-BOOL HB_EXPORT hb_itemFreeC( char * szText )
+HB_EXPORT BOOL hb_itemFreeC( char * szText )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemFreeC(%s)", szText));
 
@@ -307,8 +291,8 @@ BOOL HB_EXPORT hb_itemFreeC( char * szText )
 
       return TRUE;
    }
-
-   return FALSE;
+   else
+      return FALSE;
 }
 
 /* NOTE: Clipper is buggy and will not append a trailing zero, although
@@ -317,55 +301,47 @@ BOOL HB_EXPORT hb_itemFreeC( char * szText )
          The correct buffer size is 9 bytes: char szDate[ 9 ]
          [vszakats] */
 
-char HB_EXPORT * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
+HB_EXPORT char * hb_itemGetDS( PHB_ITEM pItem, char * szDate )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDS(%p, %s)", szDate));
 
    if( pItem && HB_IS_DATE( pItem ) )
-   {
       return hb_dateDecStr( szDate, pItem->item.asDate.value );
-   }
-
-   return hb_dateDecStr( szDate, 0 );
+   else
+      return hb_dateDecStr( szDate, 0 );
 }
 
 /* NOTE: The correct buffer size is 19 bytes: char szDate[ 19 ]
          [walter negro] */
 
-char HB_EXPORT * hb_itemGetDTS( PHB_ITEM pItem, char * szDateTime )
+HB_EXPORT char * hb_itemGetDTS( PHB_ITEM pItem, char * szDateTime )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDTS(%p, %s)", szDateTime));
 
    if( pItem && HB_IS_DATE( pItem ) )
-   {
       return hb_datetimeDecStr( szDateTime, pItem->item.asDate.value, pItem->item.asDate.time );
-   }
-
-   return hb_datetimeDecStr( szDateTime, 0, 0 );
+   else
+      return hb_datetimeDecStr( szDateTime, 0, 0 );
 }
 
-LONG HB_EXPORT hb_itemGetDL( PHB_ITEM pItem )
+HB_EXPORT LONG hb_itemGetDL( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetDL(%p)", pItem));
 
    if( pItem && HB_IS_DATE( pItem ) )
-   {
       return pItem->item.asDate.value;
-   }
- 
-   return 0;
+   else 
+      return 0;
 }
 
-LONG HB_EXPORT hb_itemGetT( PHB_ITEM pItem )
+HB_EXPORT LONG hb_itemGetT( PHB_ITEM pItem )
 {
    HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemGetT(%p)", pItem));
 
    if( pItem && HB_IS_DATE( pItem ) )
-   {
       return pItem->item.asDate.time;
-   }
-
-   return 0;
+   else
+      return 0;
 }
 
 double HB_EXPORT hb_itemGetTsec( PHB_ITEM pItem )
@@ -1544,6 +1520,30 @@ PHB_ITEM HB_EXPORT hb_itemUnShare( PHB_ITEM pItem )
          pItem->item.asString.length = ulLen1;
       }
    }
+
+   return pItem;
+}
+
+/* Internal API, not standard Clipper */
+/* UnShare string buffer of given string item */
+
+PHB_ITEM hb_itemUnShareString( PHB_ITEM pItem )
+{
+   HB_TRACE_STEALTH(HB_TR_DEBUG, ("hb_itemUnShareString(%p)", pItem));
+
+   if( pItem->item.asString.allocated == 0 ||
+       hb_xRefCount( pItem->item.asString.value ) > 1 )
+   {
+      ULONG ulLen = pItem->item.asString.length + 1;
+      char *szText = ( char* ) hb_xgrab( ulLen );
+
+      hb_xmemcpy( szText, pItem->item.asString.value, ulLen );
+      if( pItem->item.asString.allocated )
+         hb_xRefDec( pItem->item.asString.value );
+      pItem->item.asString.value = szText;
+      pItem->item.asString.allocated = ulLen;
+   }
+   pItem->type &= ~HB_IT_DEFAULT;
 
    return pItem;
 }

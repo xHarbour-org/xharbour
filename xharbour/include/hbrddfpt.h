@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddfpt.h,v 1.25 2006/05/19 00:44:36 druzus Exp $
+ * $Id: hbrddfpt.h,v 1.26 2006/06/27 21:26:00 druzus Exp $
  */
 
 /*
@@ -299,8 +299,8 @@ static ERRCODE hb_fptInfo( FPTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem );
 static ERRCODE hb_fptStructSize( FPTAREAP pArea, USHORT * uiSize );
 #define hb_fptSysName                              NULL
 #define hb_fptEval                                 NULL
-#define hb_fptPack                                 NULL
-#define hb_fptPackRec                              NULL
+static ERRCODE hb_fptPack( FPTAREAP pArea );
+static ERRCODE hb_fptPackRec( FPTAREAP pArea, ULONG ulRecNo, BOOL *pfWritten );
 #define hb_fptSort                                 NULL
 #define hb_fptTrans                                NULL
 #define hb_fptTransRec                             NULL

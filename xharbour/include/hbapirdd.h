@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.43 2007/05/04 11:29:00 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.44 2007/05/07 10:19:53 marchuet Exp $
  */
 
 /*
@@ -75,9 +75,6 @@ HB_EXTERN_BEGIN
 /* #define HARBOUR_MAX_RDD_FIELDNAME_LENGTH        32 */
 #define HARBOUR_MAX_RDD_AREA_NUM                65535
 
-#define HARBOUR_MAX_RDD_RELTEXT_LENGTH            256
-
-
 /* DBCMD errors */
 
 #define EDBCMD_SEEK_BADPARAMETER          1001
@@ -97,6 +94,45 @@ HB_EXTERN_BEGIN
 #define EDBCMD_DBFILEGETBADPARAMETER      1042
 #define EDBCMD_NOTABLE                    2001
 #define EDBCMD_EVAL_BADPARAMETER          2019
+
+
+
+/* FIeld types */
+
+#define HB_FT_NONE            0
+#define HB_FT_STRING          1     /* "C" */
+#define HB_FT_LOGICAL         2     /* "L" */
+#define HB_FT_DATE            3     /* "D" */
+#define HB_FT_LONG            4     /* "N" */
+#define HB_FT_FLOAT           5     /* "F" */
+#define HB_FT_INTEGER         6     /* "I" */
+#define HB_FT_DOUBLE          7     /* "B" */
+#define HB_FT_DATETIME        8     /* "T" len 8 */
+#define HB_FT_TIMESTAMP       9     /* "@" */
+#define HB_FT_MODTIME         10    /* "=" */
+#define HB_FT_ROWVER          11    /* "^" */
+#define HB_FT_AUTOINC         12    /* "+" */
+#define HB_FT_CURRENCY        13    /* "Y" */
+#define HB_FT_CURDOUBLE       14    /* "Z" */
+#define HB_FT_VARLENGTH       15    /* "Q" */
+#define HB_FT_MEMO            16    /* "M" */
+#define HB_FT_ANY             17    /* "V" */
+#define HB_FT_PICTURE         18    /* "P" */
+#define HB_FT_BLOB            19    /* "W" */
+#define HB_FT_OLE             20    /* "G" */
+#define HB_FT_TIME            21    /* "T" len 4 */
+
+
+
+
+/* FIeld flags */
+
+#define HB_FF_HIDDEN          0x0001 /* System Column (not visible to user) */
+#define HB_FF_NULLABLE        0x0002 /* Column can store null values */
+#define HB_FF_BINARY          0x0004 /* Binary column AND NOCPTRANS*/
+#define HB_FF_AUTOINC         0x0008 /* Column is autoincrementing */
+#define HB_FF_COMPRESSED      0x0010 /* Column is compressed */
+#define HB_FF_ENCRYPTED       0x0020 /* Column is encrypted */
 
 
 
@@ -148,6 +184,8 @@ typedef struct
    USHORT   uiTypeExtended;   /* FIELD type extended */
    USHORT   uiLen;            /* Overall FIELD length */
    USHORT   uiDec;            /* Decimal places of numeric FIELD */
+   USHORT   uiFlags;          /* FIELD flags */
+   USHORT   uiStep;           /* FIELD Step for autoincremental */
 } DBFIELDINFO;
 
 typedef DBFIELDINFO * LPDBFIELDINFO;
@@ -490,13 +528,17 @@ typedef DBLOCKINFO * LPDBLOCKINFO;
 
 typedef struct _FIELD
 {
-   HB_TYPE uiType;           /* Field type */
-   USHORT  uiTypeExtended;   /* Field type - extended */
-   USHORT  uiLen;            /* Field length */
-   USHORT  uiDec;            /* Decimal length */
-   USHORT  uiArea;           /* Area this field resides in */
-   void *  sym;              /* Symbol that represents the field */
-   struct _FIELD * lpfNext;  /* The next field in the list */
+   HB_TYPE  uiType;           /* Field type */
+   USHORT   uiTypeExtended;   /* Field type - extended */
+   USHORT   uiLen;            /* Field length */
+   USHORT   uiDec;            /* Decimal length */
+   USHORT   uiFlags;          /* FIELD flags */
+   USHORT   uiStep;           /* FIELD Step for autoincremental */
+   USHORT   uiArea;           /* Area this field resides in */
+   BYTE     bNullPos;         /* VFP Null position in _NullFlags */
+   BYTE     bVarPos;          /* VFP Var position in _NullFlags */
+   void *   sym;              /* Symbol that represents the field */
+   struct _FIELD * lpfNext;   /* The next field in the list */
 } FIELD;
 
 typedef FIELD * LPFIELD;
@@ -529,6 +571,7 @@ typedef struct _AREA
    void * atomAlias;             /* Pointer to the alias symbol for this workarea */
    USHORT uiFieldExtent;         /* Total number of fields allocated */
    USHORT uiFieldCount;          /* Total number of fields used */
+   USHORT uiFieldHidden;         /* Total number of fields hidden */
    LPFIELD lpFields;             /* Pointer to an array of fields */
    void * lpFieldExtents;        /* Void ptr for additional field properties */
    PHB_ITEM valResult;           /* All purpose result holder */
@@ -547,6 +590,7 @@ typedef struct _AREA
    USHORT rddID;
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
+   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
 } AREA;
 
 typedef AREA * LPAREA;
@@ -677,7 +721,7 @@ typedef struct _RDDFUNCS
    DBENTRYP_V    forceRel;          /* Force relational seeks in the specified WorkArea. */
    DBENTRYP_SVP  relArea;           /*-Obtain the workarea number of the specified relation. */
    DBENTRYP_VR   relEval;           /*-Evaluate a block against the relation in specified WorkArea. */
-   DBENTRYP_SVP  relText;           /*-Obtain the character expression of the specified relation. */
+   DBENTRYP_SI   relText;           /*-Obtain the character expression of the specified relation. */
    DBENTRYP_VR   setRel;            /*-Set a relation in the parent file. */
 
 
@@ -1175,7 +1219,7 @@ extern HB_EXPORT ERRCODE   hb_rddTransRecords(
                               PHB_ITEM pRest,
                               const char *szCpId,
                               PHB_ITEM pDelim );
-extern HB_EXPORT void      hb_tblStructure( AREAP pArea, PHB_ITEM pStruct );
+extern HB_EXPORT void      hb_tblStructure( AREAP pArea, PHB_ITEM pStruct, USHORT uiSize );
 
 #if 0
 extern HB_EXPORT ERRCODE   hb_rddDisinherit( const char * drvName );

@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.15 2006/10/13 22:48:21 ronpinkas Exp $
+ * $Id: rddads.h,v 1.16 2006/11/11 03:48:20 druzus Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ typedef struct _ADSAREA_
    void * atomAlias;             /* Pointer to the alias symbol for this workarea */
    USHORT uiFieldExtent;         /* Total number of fields allocated */
    USHORT uiFieldCount;          /* Total number of fields used */
+   USHORT uiFieldHidden;         /* Total number of fields hidden */
    LPFIELD lpFields;             /* Pointer to an array of fields */
    void * lpFieldExtents;        /* Void ptr for additional field properties */
    PHB_ITEM valResult;           /* All purpose result holder */
@@ -104,6 +105,7 @@ typedef struct _ADSAREA_
    USHORT rddID;
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
+   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
 
    /*
     *  ADS's additions to the workarea structure

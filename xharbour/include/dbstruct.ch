@@ -1,5 +1,5 @@
 /*
- * $Id: dbstruct.ch,v 1.5 2002/10/14 07:19:27 brianhays Exp $
+ * $Id: dbstruct.ch,v 1.2 2002/12/28 12:11:13 horacioroldan Exp $
  */
 
 /*
@@ -58,8 +58,11 @@
 #define DBS_TYPE        2
 #define DBS_LEN         3
 #define DBS_DEC         4
+#define DBS_FLAG        5
 
 /* Length of the field structure array */
-#define DBS_ALEN        4
+#define DBS_ALEN        5
+
+#define DBS_STEP        6
 
 #endif /* _DBSTRUCT_CH */

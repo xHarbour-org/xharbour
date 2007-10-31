@@ -1,5 +1,5 @@
 /*
- * $Id: sxcrypt.c,v 1.2 2005/10/18 12:14:33 druzus Exp $
+ * $Id: sxcrypt.c,v 1.3 2005/10/24 01:04:34 druzus Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbsxfunc.h"
 
 #define rnd_mul1  0x0de6d
-#define rnd_mul2  0x0278D
+#define rnd_mul2  0x0278d
 
 static UINT32 hb_sxInitSeed( BYTE * pKeyVal, UINT16 * puiKey )
 {

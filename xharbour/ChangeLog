@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5751 2007/10/31 02:27:36 patrickmast Exp $
+ * $Id: ChangeLog,v 1.5752 2007/10/31 03:07:48 patrickmast Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,261 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-10-31 10:00 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+
+  * source\rtl\cdpapi.c
+  * source\rtl\seconds.c
+  * source\rtl\setcolor.c
+  * source\rtl\win32ole.prg
+  * include\hbapicdp.h
+    * changed some parameters to const.
+    + added hb_cdpGetChar()
+
+  * source/compiler/harbour.sly
+    - removed some warnings
+
+  * source/macro/macro.y
+    - removed warnings compiling under BCC and watcom
+
+  * source/rdd/workarea.c
+    * initialize uiFlags also when DBS_FLAGS is not set
+
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    * fixed hb_cdxSkipFilter() declaration - it should be 'static' function
+
+  * include/hbapi.h
+  * source/vm/itemapi.c
+  * source/vm/fastitem.c
+  * source/vm/garbage.c
+    + added extended item references - it's universal reference which
+      can be used by HVM for many different things without introducing
+      new item types
+
+  * source/rdd/dbf1.c
+    + Initialized counter value on ZAP for auto incremental fields.
+    + loaded field _NullFlags as hidden and the rest of flags when it exists.
+      
+  * source/rdd/dbf1.c
+  * source/rdd/usrrdd/usrrdd.c
+    * use hb_vmPushItemRef()
+
+  * include/hbapirdd.h
+  * source/rdd/dbcmd.c
+  * source/rdd/workarea.c
+  * source/rdd/dbf1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/usrrdd/usrrdd.c
+  * contrib/rdd_ads/ads1.c
+    * changed second parameter in RELTEXT() method to PHB_ITEM
+      Now RELTEXT() works like FILTERTEXT() and the size of
+      expression is not limited. It's a modification I wanted
+      to make for a long time and I think that now is a good
+      moment to make it together with HB_FT_* modifications
+    - rmoved not longer necessary HARBOUR_MAX_RDD_RELTEXT_LENGTH
+    + Added capabilitie to read memo fields with OLE object as string.
+    
+  * source/rdd/wacore.c
+  * source/rdd/dbcmd.c
+    ! fixed registering workareas with numbers from 65280 to 65534    
+
+  * include/dbinfo.ch
+  * contrib/rdd_ads/ads1.c
+  * source/rdd/workarea.c
+  * source/rdd/delim1.c
+  * source/rdd/dbf1.c
+  * source/rdd/sdf1.c
+    + added support for DBI_POSITIONED flag. Because some RDDs may not
+      support phantom record then checking for EOF() does not have to
+      be enough to detect that the cursor is positioned to phantom
+      record. Checking for RecNo() == LastRec() + 1 does not have to
+      work either because some RDD may use not use continuous record
+      numbers f.e. ADT. So in code like BROWSE() if you want to be sure
+      that current record is phantom one then (!dbInfo(DBI_POSITIONED))
+      should be used.
+
+  * harbour/source/vm/hvm.c
+    * formatting
+    ! fixed hb_vmPushLogical protected against values greater than 1.
+      it was failing: "TV" $ {"TT","TV"} == .T.
+
+  * source/rdd/wafunc.c
+    ! fixed typo which broke array returned by dbStrunct()
+
+  * include/dbinfo.ch
+    + added DBI_ENCRYPT, DBI_DECRYPT, DBI_MEMOPACK, DBI_DIRTYREAD
+    + added DBOI_INDEXTYPE, DBOI_USECURRENT
+    + added RDDI_LOCKRETRY, RDDI_DIRTYREAD
+
+  * include/dbinfo.ch
+  * include/hbrdddbf.h
+  * include/hbrddfpt.h
+  * include/hbrddcdx.h
+  * include/hbrddntx.h
+  * source/rdd/dbf1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbfntx/dbfntx1.c
+  * source/rdd/dbfcdx/dbfcdx1.c
+  * source/rdd/bmdbfcdx/bmdbfcdx1.c
+    + added support for MEMOPACK, table ENCRYPT/DECRYPT, index DIRTYREAD
+
+  * include/hbapirdd.h
+  * include/dbstruct.ch
+  * include/hbusrrdd.ch
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/ace.h
+  * source/rdd/dbfdbt/dbfdbt1.c
+  * source/rdd/dbffpt/dbffpt1.c
+  * source/rdd/dbcmd.c
+  * source/rdd/wafunc.c
+  * source/rdd/workarea.c
+  * source/rdd/dbf1.c
+  * source/rdd/sdf1.c
+  * source/rdd/delim1.c
+    * changed HB_IT_* as field type to HB_FT_*
+    + added field flags HB_FF_*
+    + added support for new field types to core code
+    + added FIELDFLAG( <nField> ) and FIELDSTEP( <nField> )
+    + added DBFIELDINFO( DBS_STEP, <nField> )
+
+  * harbour/source/rdd/dbf1.c
+    + added support for AUTOINC (+), ROWVERSION (^), TIME (T- len 4)
+      and MODTIME (=) fields
+      reamins DATETIME for (T - len 8)
+
+  * contrib/rdd_ads/ads1.c
+  * contrib/rdd_ads/ace.h
+    + added support for ROWVERSION (^), and MODTIME (=) fields
+
+  * harbour/source/rdd/dbcmd.c
+    ! fixed bug in dbSkipper()
+
+  + include/hbsix.ch
+  * hrbdll.dc
+  * hrbdll.gc
+  * hrbdll.pc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+  * source/rdd/hbsix/Makefile
+  * source/rdd/hbsix/sxdate.c
+  * source/rdd/hbsix/sxcompr.c
+  * source/rdd/hbsix/sxcrypt.c
+  + source/rdd/hbsix/sxsem.c
+  + source/rdd/hbsix/sxord.c
+  + source/rdd/hbsix/sxredir.c
+  + source/rdd/hbsix/sxfname.c
+  + source/rdd/hbsix/sxtable.c
+  + source/rdd/hbsix/sxutil.c
+  + source/rdd/hbsix/sxcompat.prg
+  + source/rdd/hbsix/sxtrig.prg
+  + source/rdd/hbsix/sxini.prg
+  - source/rdd/hbsix/sxfunc.prg
+    + added SIx3 compatible functions:
+         RDD_Count(), RDD_Name(), RDD_Info(), SetRDD(),
+         sxChar(), sxNum(), sxDate(), sxLog(),
+         Sx_DToP(), Sx_PToD(),
+         Sx_BLOB2File(), Sx_File2BLOB(),
+         Sx_Compress(), Sx_Decompress(),
+         Sx_FCompress(), Sx_FDecompress(),
+         Sx_AutoOpen(), Sx_AutoShare(),
+         Sx_MemoExt(), Sx_MemoBlk(), Sx_SetMemoBlock(), Sx_MemoPack(),
+         Sx_SetTrigger(), Sx_SetTrig(), Sx_DefTrigger(), 
+         Sx_INIheader(), _sx_INIinit(), _sxOpenInit(),
+         Sx_SetPass(),
+         Sx_Encrypt(), Sx_Decrypt(), Sx_DBFdecrypt(), Sx_DBFencrypt(),
+         sx_MakeSem(), sx_KillSem(), sx_IsSem(),
+         Sx_ClrScope(), Sx_SetScope(),
+         Sx_Freeze(), Sx_Warm(), Sx_Chill(), Sx_Thermometer(),
+         Sx_IsReindex(), Sx_Step(), Sx_KeysIncluded(),
+         Sx_I_IndexName(), Sx_I_TagName(),
+         Sx_IndexCount(), Sx_IndexName(), Sx_IndexType(), Sx_IndexFilter(),
+         Sx_ROXLock(), Sx_ROXUnLock(), Sx_IsMyROX(), Sx_IsROXLock(),
+         Sx_KeyAdd(), Sx_KeyDrop(), Sx_KeyData(),
+         Sx_KeySkip(), Sx_KeyCount(), Sx_KeyNo(), Sx_KeyGoto(),
+         Sx_WildSeek(), Sx_WildMatch(),
+         Sx_IsFLocked(), Sx_IsReadOnly(), Sx_IsShared(),
+         Sx_IsLocked(), Sx_IsDBT(),
+         Sx_IDtype(), Sx_TableType(), Sx_TableName(),
+         Sx_SetTurbo(), Sx_TurboArea(), Sx_SetDirty(), Sx_DirtyArea(),
+         Sx_RLock(), Sx_UnLock(), Sx_GetLocks(), Sx_LockRetry(),
+         Sx_SeekLast(), Sx_FindRec(),
+         Sx_SkipUnique(), Sx_TagUnique(),
+         Sx_TagCount(), Sx_TagOrder(), Sx_TagNo(), Sx_TagName(),
+         Sx_TagInfo(), Sx_Tags(),
+         Sx_SetTag(), Sx_SetTagOrder(), Sx_SetTagNo(),
+         Sx_KillTag(),
+         Sx_FileOrder(), Sx_SetFileOrd(), Sx_ClearOrder(),
+         Sx_VSigLen(), Sx_VFGet(),
+         Sx_dbCreate(), Sx_StrxCheck(), Sx_Rollback(), Sx_SortOption(),
+         _sxCondSet(),
+         Sx_FNameParser(), Sx_SlimFast(),
+         Sx_Version(), Sx_Error(),
+
+    + added SIx3 compatible commands:
+         SET DIRTYREAD ON|OFF
+         USE ... [TRIGGER <cTrigger>] [PASSWORD <cPassword>]
+         SORT ... USECURRENT
+         WILDSEEK <str>
+         WILDSEEKNEXT <str>
+         CLEAR ORDER <order>
+         SET TAGORDER TO [<order>]
+         SET ORDER TO TAG <(tag)> [OF <(bag)>]
+         SET TAG TO [<tag> [OF <(bag)>]]
+         REINDEX OPTION <eval> [STEP <step>]
+         DELETE TAG <(tag1)> [OF <(bag1)>] [, <(tagN)> [OF <(bagN)>]]
+         DELETE TAG ALL [OF <(bag)>]
+         CLEAR SCOPE
+         SET SCOPETOP TO [<value>]
+         SET SCOPEBOTTOM TO [<value>]
+         SET SCOPE TO [<value>]
+         SET TURBOREAD ON|OFF
+         MEMOPACK [BLOCK <size>] [OPTION <opt> [STEP <step>]]
+         SET MEMOBLOCK TO <value>
+         SUBINDEX ON <key> TO <(file)> ;
+               [OPTION <eval> [STEP <every>]] [FILTERON] [EMPTY]
+         SUBINDEX ON <key> TAG <(tag)> [OF <(bag)>] [TO <(bag)>] ;
+               [OPTION <eval> [STEP <every>]] [FILTERON] [EMPTY]
+         INDEX ON <key> [TAG <(tag)>] TO <(bag)> ;
+               [OPTION <eval> [STEP <every>]] [FILTERON] [EMPTY] [SUBINDEX]
+         INDEX ON <key> TAG <(tag)> [OF <(bag)>] [TO <(bag)>] ;
+               [OPTION <eval> [STEP <every>]] [FILTERON] [EMPTY] [SUBINDEX]
+
+      Unlike Ads*() functions the Sx_*() ones can be used with any RDD
+      and will work if RDD supports necessary functionality.
+
+      The global settings in SIx3 are RDD dependent in Harbour, f.e.
+      in SIx3 Sx_MemoExt() change MEMO file extensions in all SIX* RDDs
+      but in Harbour only in default RDD driver.
+      In Harbour default trigger function "Sx_DefTrigger" is not
+      enabled by default. If user needs such functionality then he
+      has to enable it himself using
+         rddInfo( RDDI_TRIGGER, "SX_DEFTRIGGER", [<cRDD>] )
+      f.e. this code:
+         init procedure sx_inittrig()
+            local aRDDs := { "DBF", "DBFNTX", "DBFCDX", "SIXCDX", ;
+                             "RMDBFNTX", "RMDBFCDX", "BMDBFCDX", "BMSIXCDX" }
+            local aRDDList := RddList(), cRdd
+
+            for each cRdd in aRDDs
+               if ascan( aRDDList, { |x| x == cRdd } ) != 0
+                  rddInfo( RDDI_TRIGGER, "SX_DEFTRIGGER", cRDD )
+               endif
+            next
+         return
+      sets SX_DEFTRIGGER as default trigger in DBF* based RDDs.
+
+      I still do not allow to encrypt tables with memo fields to not
+      replicate SIx3 bugs which may cause data corruption.
+      
+   Synced with harbour as posible.
 
 2007-10-30 02:10 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
   * include/hbver.h

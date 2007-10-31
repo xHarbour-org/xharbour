@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.24 2007/09/03 18:04:25 paultucker Exp $
+# $Id: hrbdll.dc,v 1.25 2007/09/15 17:37:45 patrickmast Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -682,6 +682,15 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
+   $(OBJ_DIR)\sxsem.obj \
+   $(OBJ_DIR)\sxfname.obj \
+   $(OBJ_DIR)\sxtable.obj \
+   $(OBJ_DIR)\sxord.obj \
+   $(OBJ_DIR)\sxutil.obj \
+   $(OBJ_DIR)\sxredir.obj
+   $(OBJ_DIR)\sxcompat.obj \
+   $(OBJ_DIR)\sxini.obj \
+   $(OBJ_DIR)\sxtrig.obj \   
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj
 
@@ -1213,6 +1222,15 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\sxcompr.obj           + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\sxcrypt.obj           + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\sxdate.obj            + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxsem.obj             + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxfname.obj           + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxtable.obj           + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxord.obj             + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxutil.obj            + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxredir.obj           + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxcompat.obj          + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxini.obj             + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\sxtrig.obj            + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hsx.obj               + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\cftsfunc.obj          + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\ucp_findchar.obj,       >> harbourdll.rsp

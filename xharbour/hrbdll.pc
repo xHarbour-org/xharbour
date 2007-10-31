@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.40 2007/09/15 17:37:45 patrickmast Exp $
+# $Id: hrbdll.pc,v 1.41 2007/09/27 11:09:33 modalsist Exp $
 #
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
 # � PELLES C DLL MAKEFILE 넴
@@ -719,7 +719,15 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
-   $(OBJ_DIR)\sxfunc.obj \
+   $(OBJ_DIR)\sxsem.obj \
+   $(OBJ_DIR)\sxfname.obj \
+   $(OBJ_DIR)\sxtable.obj \
+   $(OBJ_DIR)\sxord.obj \
+   $(OBJ_DIR)\sxutil.obj \
+   $(OBJ_DIR)\sxredir.obj
+   $(OBJ_DIR)\sxcompat.obj \
+   $(OBJ_DIR)\sxini.obj \
+   $(OBJ_DIR)\sxtrig.obj \
    \
    $(OBJ_DIR)\hsx.obj \
    $(OBJ_DIR)\cftsfunc.obj \

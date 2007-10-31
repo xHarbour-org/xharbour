@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.38 2007/05/08 10:08:29 marchuet Exp $
+ * $Id: dbfdbt1.c,v 1.39 2007/05/18 09:36:57 marchuet Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ static const RDDFUNCS dbtTable =
    ( DBENTRYP_V )     hb_dbtForceRel,
    ( DBENTRYP_SVP )   hb_dbtRelArea,
    ( DBENTRYP_VR )    hb_dbtRelEval,
-   ( DBENTRYP_SVP )   hb_dbtRelText,
+   ( DBENTRYP_SI )    hb_dbtRelText,
    ( DBENTRYP_VR )    hb_dbtSetRel,
 
 
@@ -358,7 +358,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
 
       if( pBuff )
       {
-         memcpy( pBuff, pItem->item.asString.value, ulLen );
+         memcpy( pBuff, hb_itemGetCPtr( pItem ), ulLen );
          pBuff[ ulLen ] = 0x1A;
          hb_cdpnTranslate( ( char * ) pBuff, hb_cdp_page, pArea->cdPage, ulLen );
          hb_fsWriteLarge( pArea->hMemoFile, pBuff, ulLen + 1 );
@@ -366,7 +366,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
       }
       else
       {
-         BYTE pBlock[ DBT_BLOCKSIZE ], *pSrc = ( BYTE * ) pItem->item.asString.value;
+         BYTE pBlock[ DBT_BLOCKSIZE ], *pSrc = ( BYTE * ) hb_itemGetCPtr( pItem );
          ULONG ulWritten = 0, ulRest;
 
          do
@@ -386,7 +386,7 @@ static void hb_dbtWriteMemo( DBTAREAP pArea, ULONG ulBlock, PHB_ITEM pItem, ULON
    {
       BYTE pBlock[ DBT_BLOCKSIZE ];
       memset( pBlock, 0x1A, DBT_BLOCKSIZE );
-      hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) pItem->item.asString.value, ulLen );
+      hb_fsWriteLarge( pArea->hMemoFile, ( BYTE * ) hb_itemGetCPtr( pItem ), ulLen );
       hb_fsWrite( pArea->hMemoFile, pBlock, ( DBT_BLOCKSIZE - ( USHORT ) ( ulLen % DBT_BLOCKSIZE ) ) );
    }
    pArea->fMemoFlush = TRUE;
@@ -410,7 +410,7 @@ static BOOL hb_dbtPutMemo( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtPutMemo(%p, %hu, %p)", pArea, uiIndex, pItem));
 
-   ulLen = pItem->item.asString.length;
+   ulLen = hb_itemGetCLen( pItem );
    if( ulLen > 0 )
    {
       ulBlock = hb_dbfGetMemoBlock( ( DBFAREAP ) pArea, uiIndex );
@@ -441,7 +441,7 @@ static ERRCODE hb_dbtGetVarLen( DBTAREAP pArea, USHORT uiIndex, ULONG * pLength 
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
          return FAILURE;
 
-      if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE )
+      if( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE )
       {
          if( hb_dbtFileLockSh( pArea ) )
          {
@@ -532,7 +532,7 @@ static ERRCODE hb_dbtGetValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE ) )
    {
       /* Force read record */
       if( SELF_DELETED( ( AREAP ) pArea, &bDeleted ) == FAILURE )
@@ -574,7 +574,7 @@ static ERRCODE hb_dbtPutValue( DBTAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    HB_TRACE(HB_TR_DEBUG, ("hb_dbtPutValue(%p, %hu, %p)", pArea, uiIndex, pItem));
 
    if( pArea->fHasMemo && pArea->hMemoFile != FS_ERROR &&
-       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_IT_PICTURE ) )
+       ( pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_MEMO || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_OLE || pArea->lpFields[ uiIndex - 1 ].uiType == HB_FT_PICTURE ) )
    {
       if( HB_IS_MEMO( pItem ) || HB_IS_STRING( pItem ) )
       {
@@ -796,10 +796,10 @@ HB_FUNC( DBFDBT_GETFUNCTABLE )
    RDDFUNCS * pTable;
    USHORT * uiCount;
 
-   uiCount = ( USHORT * ) hb_itemGetPtr( hb_param( 1, HB_IT_POINTER ) );
-   pTable = ( RDDFUNCS * ) hb_itemGetPtr( hb_param( 2, HB_IT_POINTER ) );
+   uiCount = ( USHORT * ) hb_parptr( 1 );
+   pTable = ( RDDFUNCS * ) hb_parptr( 2 );
 
-   HB_TRACE(HB_TR_DEBUG, ("DBFDBT_GETFUNCTABLE(%i, %p)", uiCount, pTable));
+   HB_TRACE(HB_TR_DEBUG, ("DBFDBT_GETFUNCTABLE(%p, %p)", uiCount, pTable));
 
    if( pTable )
    {

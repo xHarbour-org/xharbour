@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.26 2007/02/27 15:59:34 druzus Exp $
+ * $Id: hbgenerr.c,v 1.27 2007/04/08 07:20:56 ronpinkas Exp $
  */
 
 /*
@@ -182,7 +182,7 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
 
 void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2)
 {
-   char * szText = szWarnings[ iWarning - 1 ];
+   const char * szText = szWarnings[ iWarning - 1 ];
    int iLine = hb_comp_iLine - 1;
    char * szFile = hb_pp_fileName( hb_comp_PP );
 

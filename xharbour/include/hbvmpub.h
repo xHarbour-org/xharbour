@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.62 2007/05/04 20:54:01 ran_go Exp $
+ * $Id: hbvmpub.h,v 1.63 2007/05/31 05:18:11 walito Exp $
  */
 
 /*
@@ -162,6 +162,7 @@
    struct _HB_BASEARRAY;
    struct _HB_ITEM;
    struct _HB_VALUE;
+   struct _HB_EXTREF;
 
    /* Internal structures that holds data */
    struct hb_struArray
@@ -243,13 +244,19 @@
       LONG offset;    /* 0 for static variables */
       LONG value;
    };
+   
+   struct hb_struExtRef
+   {
+      void * value;                          /* value item pointer */
+      const struct _HB_EXTREF * func;        /* extended reference functions */
+   };
 
    struct hb_struString
    {
       ULONG           length;
       ULONG           allocated;
-      char            *value;
-      HB_COUNTER      *pulHolders; /* number of holders of this string */
+      char          * value;
+      HB_COUNTER    * pulHolders; /* number of holders of this string */
    };
 
    struct hb_struSymbol
@@ -278,6 +285,7 @@
          struct hb_struMemvar  asMemvar;
          struct hb_struPointer asPointer;
          struct hb_struRefer   asRefer;
+         struct hb_struExtRef  asExtRef;
          struct hb_struString  asString;
          struct hb_struSymbol  asSymbol;
          struct hb_struHash    asHash;
@@ -376,6 +384,20 @@
       void *         cargo;
       struct _HB_FUNC_LIST * pNext;
    } HB_FUNC_LIST, * PHB_FUNC_LIST;
+   
+   typedef void     ( * HB_EXTREF_FUNC0 )( void * );
+   typedef PHB_ITEM ( * HB_EXTREF_FUNC1 )( PHB_ITEM );
+   typedef PHB_ITEM ( * HB_EXTREF_FUNC2 )( PHB_ITEM, PHB_ITEM );
+   typedef void     ( * HB_EXTREF_FUNC3 )( PHB_ITEM );
+
+   typedef struct _HB_EXTREF
+   {
+      HB_EXTREF_FUNC1 read;
+      HB_EXTREF_FUNC2 write;
+      HB_EXTREF_FUNC3 copy;
+      HB_EXTREF_FUNC0 clear;
+      HB_EXTREF_FUNC0 mark;
+   } HB_EXTREF, * PHB_EXTREF, * HB_EXTREF_PTR;   
 
    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x0001 )

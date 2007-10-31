@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.131 2007/09/25 07:32:33 marchuet Exp $
+ * $Id: harbour.sly,v 1.132 2007/10/25 20:41:28 likewolf Exp $
  */
 
 /*
@@ -184,7 +184,7 @@ static void hb_compDebugStart( void ) { };
 %token WITHOBJ FOREACH EPSILON
 %token ENUM
 %token TRY CATCH
-%token SWITCH DEFAULT
+%token SWITCH DEFAULT ENDSWITCH
 %token CRITICAL CRITICAL_STATIC
 %token CBMARKER
 %token BITAND BITOR BITXOR BITSHIFTR BITSHIFTL
@@ -2385,7 +2385,7 @@ Switch    : SwitchBegin
                }
            ;
 
-EndSwitch  : END
+EndSwitch  : EndSwitchID
                {
                   --hb_comp_wCaseCounter;
 
@@ -2435,6 +2435,10 @@ EndSwitch  : END
                   s_iControlLevel--;
                }
            ;
+           
+EndSwitchID : ENDSWITCH
+            | END
+            ;           
 
 SwitchBegin : SWITCH Expression {
                                    hb_comp_alLastSwitchPos[ hb_comp_wCaseCounter++ ] = 0;

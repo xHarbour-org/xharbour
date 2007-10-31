@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.140 2007/09/15 17:37:45 patrickmast Exp $
+# $Id: hrbdll.bc,v 1.141 2007/09/28 22:39:52 kaddath Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -748,7 +748,15 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
-   $(OBJ_DIR)\sxfunc.obj \
+   $(OBJ_DIR)\sxsem.obj \
+   $(OBJ_DIR)\sxfname.obj \
+   $(OBJ_DIR)\sxtable.obj \
+   $(OBJ_DIR)\sxord.obj \
+   $(OBJ_DIR)\sxutil.obj \
+   $(OBJ_DIR)\sxredir.obj
+   $(OBJ_DIR)\sxcompat.obj \
+   $(OBJ_DIR)\sxini.obj \
+   $(OBJ_DIR)\sxtrig.obj \
 #
 #  HSX
 #
@@ -757,8 +765,20 @@ HARBOUR_DLL_OBJS = \
 #
 #  usrrdd
 #
-  $(OBJ_DIR)\usrrdd.obj
-
+  $(OBJ_DIR)\usrrdd.obj \
+#
+#  rdds
+#
+  $(OBJ_DIR)\arrayrdd.obj \
+  $(OBJ_DIR)\dbtcdx.obj \
+  $(OBJ_DIR)\fcomma.obj \
+  $(OBJ_DIR)\fptcdx.obj \
+  $(OBJ_DIR)\hscdx.obj \
+  $(OBJ_DIR)\rlcdx.obj \
+  $(OBJ_DIR)\smtcdx.obj \
+  $(OBJ_DIR)\adordd.obj \
+  $(OBJ_DIR)\ansirdd.obj \
+  $(OBJ_DIR)\vfpcdx.obj
 #
 #  Gt
 #
@@ -1414,10 +1434,28 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\sxcompr.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxcrypt.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\sxdate.obj            + >> hdll.tmp
-  echo. $(OBJ_DIR)\sxfunc.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxsem.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxfname.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxtable.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxord.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxutil.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxredir.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxcompat.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxini.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\sxtrig.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cftsfunc.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\hsx.obj               + >> hdll.tmp
   echo. $(OBJ_DIR)\usrrdd.obj            + >> hdll.tmp
+  echo. $$(OBJ_DIR)\arrayrdd.obj         + >> hdll.tmp
+  echo. $$(OBJ_DIR)\dbtcdx.obj           + >> hdll.tmp
+  echo. $$(OBJ_DIR)\fcomma.obj           + >> hdll.tmp
+  echo. $$(OBJ_DIR)\fptcdx.obj           + >> hdll.tmp
+  echo. $$(OBJ_DIR)\hscdx.obj            + >> hdll.tmp
+  echo. $$(OBJ_DIR)\rlcdx.obj            + >> hdll.tmp
+  echo. $$(OBJ_DIR)\smtcdx.obj           + >> hdll.tmp
+  echo. $$(OBJ_DIR)\adordd.obj           + >> hdll.tmp
+  echo. $$(OBJ_DIR)\ansirdd.obj          + >> hdll.tmp
+  echo. $$(OBJ_DIR)\vfpcdx.obj           + >> hdll.tmp
 !if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
@@ -3578,11 +3616,42 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
    $(CC_CMD)
 
-$(OBJ_DIR)\sxfunc.c : $(HBSIX_DIR)\sxfunc.prg
+$(OBJ_DIR)\sxsem.obj : $(HBSIX_DIR)\sxsem.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxfname.obj : $(HBSIX_DIR)\sxfname.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxtable.obj : $(HBSIX_DIR)\sxtable.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxord.obj : $(HBSIX_DIR)\sxord.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxutil.obj : $(HBSIX_DIR)\sxutil.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxredir.obj : $(HBSIX_DIR)\sxredir.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxcompat.c : $(HBSIX_DIR)\sxcompat.prg
    $(HRB_CMD)
 
-$(OBJ_DIR)\sxfunc.obj : $(OBJ_DIR)\sxfunc.c
+$(OBJ_DIR)\sxcompat.obj : $(OBJ_DIR)\sxcompat.c
    $(CC_CMD)
+
+$(OBJ_DIR)\sxini.c : $(HBSIX_DIR)\sxini.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\sxini.obj : $(OBJ_DIR)\sxini.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxtrig.c : $(HBSIX_DIR)\sxtrig.prg
+   $(HRB_CMD)
+
+$(OBJ_DIR)\sxtrig.obj : $(OBJ_DIR)\sxtrig.c
+   $(CC_CMD)
+
 
 #
 # HSX.LIB dependencies

@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.126 2007/05/29 01:52:31 ronpinkas Exp $
+ * $Id: memvars.c,v 1.127 2007/09/22 05:41:01 andijahja Exp $
  */
 
 /*
@@ -89,11 +89,10 @@
 #include "hbapifs.h" /* for __MVSAVE()/__MVRESTORE() */
 #include "hbdate.h" /* for __MVSAVE()/__MVRESTORE() */
 #include "hbcomp.h" /* for VS_* macros */
-#include "hbstack.h"
-
 #include "error.ch"
 #include "hbmemvar.ch"
 #include "hbset.h"
+#include "hbstack.h"
 #include "hbvm.h"
 #include "classes.h"
 #include "hbregex.h"
@@ -338,8 +337,8 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
 
    pValue = s_globalTable + hValue;
    pValue->pVarItem = ( HB_ITEM_PTR ) hb_xgrab( sizeof( HB_ITEM ) );
-   pValue->counter = 1;
    pValue->pVarItem->type = HB_IT_NIL;
+   pValue->counter = 1;
 
    if( bTrueMemvar )
    {
@@ -348,13 +347,16 @@ HB_HANDLE hb_memvarValueNew( HB_ITEM_PTR pSource, BOOL bTrueMemvar )
       if( pSource )
       {
          hb_itemCopy( pValue->pVarItem, pSource );
+         /* Remove MEMOFLAG if exists (assignment from field). */
+         pValue->pVarItem->type &= ~HB_IT_MEMOFLAG;
       }
    }
    else
    {
       pValue->hPrevMemvar = ( HB_HANDLE ) - 1;    /* detached variable */
 
-      memcpy( pValue->pVarItem, pSource, sizeof(HB_ITEM) );
+      memcpy( pValue->pVarItem, pSource, sizeof( HB_ITEM ) );
+      pValue->pVarItem->type &= ~HB_IT_DEFAULT;
 
       #ifndef HB_ARRAY_USE_COUNTER
          if( pSource->type == HB_IT_ARRAY && pSource->item.asArray.value )

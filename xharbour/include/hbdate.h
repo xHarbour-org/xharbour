@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.8 2005/11/14 00:18:32 druzus Exp $
+ * $Id: hbdate.h,v 1.9 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -57,26 +57,32 @@
 
 HB_EXTERN_BEGIN
 
-extern double   HB_EXPORT hb_dateSeconds( void );
-extern void     HB_EXPORT hb_dateToday( int * piYear, int * piMonth, int * piDay );
-extern void     HB_EXPORT hb_dateTimeStr( char * pszTime );
-extern void     HB_EXPORT hb_dateTime( int * piHour, int * piMinute, double * pdSeconds );
-extern char     HB_EXPORT * hb_dateCMonth( int iMonth );
-extern char     HB_EXPORT * hb_dateCDOW( int iDay );
-extern int      HB_EXPORT hb_dateDOW( int iYear, int iMonth, int iDay );
-extern int      HB_EXPORT hb_dateJulianDOW( LONG lJulian );
-extern char     HB_EXPORT * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
-extern char     HB_EXPORT * hb_timeFormat( const char * szDate, char * szFormattedTime, const char * szTimeFormat );
-extern char     HB_EXPORT * hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, const char * szDateFormat, const char * szTimeFormat );
-extern LONG     HB_EXPORT hb_dateEncode( int iYear, int iMonth, int iDay );
-extern void     HB_EXPORT hb_dateDecode( LONG julian, int * piYear, int * piMonth, int * piDay );
-extern void     HB_EXPORT hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
-extern void     HB_EXPORT hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
-extern char     HB_EXPORT * hb_dateDecStr( char * szDate, LONG lJulian );
-extern LONG     HB_EXPORT hb_dateEncStr( const char * szDate );
+extern HB_EXPORT double hb_dateSeconds( void );
+extern HB_EXPORT double hb_secondsCPU( int n );
+extern HB_EXPORT void   hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec );
+extern HB_EXPORT char * hb_timeStampStr( char * szTime, LONG lMillisec );
+extern HB_EXPORT void   hb_timeStampDecode( LONG lMillisec, int * piHour, int * piMinutes, int * piSeconds, int * piMSec );
+extern HB_EXPORT char * hb_dateTimeStampStr( char * szDateTime, LONG lJulian, LONG lMillisec );
+extern HB_EXPORT void   hb_dateTimeStampStrGet( const char * szDateTime, LONG * plJulian, LONG * plMillisec );
+extern HB_EXPORT void   hb_dateToday( int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT void   hb_dateTimeStr( char * pszTime );
+extern HB_EXPORT void   hb_dateTime( int * piHour, int * piMinute, double * pdSeconds );
+extern HB_EXPORT char * hb_dateCMonth( int iMonth );
+extern HB_EXPORT char * hb_dateCDOW( int iDay );
+extern HB_EXPORT int    hb_dateDOW( int iYear, int iMonth, int iDay );
+extern HB_EXPORT int    hb_dateJulianDOW( LONG lJulian );
+extern HB_EXPORT char * hb_dateFormat( const char * szDate, char * szFormattedDate, const char * szDateFormat );
+extern HB_EXPORT char * hb_timeFormat( const char * szDate, char * szFormattedTime, const char * szTimeFormat );
+extern HB_EXPORT char * hb_datetimeFormat( const char * szDateTime, char * szFormattedDateTime, const char * szDateFormat, const char * szTimeFormat );
+extern HB_EXPORT LONG   hb_dateEncode( int iYear, int iMonth, int iDay );
+extern HB_EXPORT void   hb_dateDecode( LONG julian, int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT void   hb_dateStrPut( char * szDate, int iYear, int iMonth, int iDay );
+extern HB_EXPORT void   hb_dateStrGet( const char * szDate, int * piYear, int * piMonth, int * piDay );
+extern HB_EXPORT char * hb_dateDecStr( char * szDate, LONG lJulian );
+extern HB_EXPORT LONG   hb_dateEncStr( const char * szDate );
 
-extern LONG     HB_EXPORT hb_timeEncStr( const char * szTime );  /* Hecho */
-extern char     HB_EXPORT * hb_timeDecStr( char * szTime, LONG lSeconds );  /* Hecho */
+extern HB_EXPORT LONG   hb_timeEncStr( const char * szTime );  /* Hecho */
+extern HB_EXPORT char * hb_timeDecStr( char * szTime, LONG lSeconds );  /* Hecho */
 
 #define  hb_timeL2Sec( lTime )   ((double) lTime / (double)HB_DATETIMEINSEC)
 

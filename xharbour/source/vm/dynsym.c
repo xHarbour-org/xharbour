@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.48 2007/05/31 17:05:11 marchuet Exp $
+ * $Id: dynsym.c,v 1.49 2007/09/25 07:33:00 marchuet Exp $
  */
 
 /*
@@ -657,7 +657,7 @@ HB_EXPORT PHB_SYMB hb_dynsymSymbol( PHB_DYNS pDynSym )
    return pDynSym->pSymbol;
 }
 
-HB_EXPORT char * hb_dynsymName( PHB_DYNS pDynSym )
+HB_EXPORT const char * hb_dynsymName( PHB_DYNS pDynSym )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymName(%p)", pDynSym));
 

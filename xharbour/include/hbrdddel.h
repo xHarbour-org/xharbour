@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.7 2006/05/30 10:51:23 druzus Exp $
+ * $Id: hbrdddel.h,v 1.8 2006/08/10 12:07:56 druzus Exp $
  */
 
 /*
@@ -75,6 +75,7 @@ typedef struct _DELIMAREA
    void * atomAlias;             /* Pointer to the alias symbol for this workarea */
    USHORT uiFieldExtent;         /* Total number of fields allocated */
    USHORT uiFieldCount;          /* Total number of fields used */
+   USHORT uiFieldHidden;         /* Total number of fields hidden */
    LPFIELD lpFields;             /* Pointer to an array of fields */
    void * lpFieldExtents;        /* Void ptr for additional field properties */
    PHB_ITEM valResult;           /* All purpose result holder */
@@ -93,6 +94,7 @@ typedef struct _DELIMAREA
    USHORT rddID;
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
+   BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
 
    /*
    *  DELIM's additions to the workarea structure

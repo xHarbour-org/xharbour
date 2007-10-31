@@ -1,5 +1,5 @@
 /*
- * $Id: setcolor.c,v 1.2 2001/12/30 01:21:49 ronpinkas Exp $
+ * $Id: setcolor.c,v 1.3 2004/03/18 03:58:37 ronpinkas Exp $
  */
 
 /*
@@ -54,7 +54,7 @@
 #include "hbapigt.h"
 #include "hbset.h"
 
-char * hb_conSetColor( char * szColor )
+char * hb_conSetColor( const char * szColor )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_conSetColor(%s)", szColor));
 

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.195 2007/09/25 07:32:27 marchuet Exp $
+# $Id: makefile.vc,v 1.196 2007/09/26 09:20:09 marchuet Exp $
 #
 
 #
@@ -925,8 +925,16 @@ HBSIX_LIB_OBJS = \
    $(OBJ_DIR)\sxcompr.obj \
    $(OBJ_DIR)\sxcrypt.obj \
    $(OBJ_DIR)\sxdate.obj \
+   $(OBJ_DIR)\sxsem.obj \
+   $(OBJ_DIR)\sxfname.obj \
+   $(OBJ_DIR)\sxtable.obj \
+   $(OBJ_DIR)\sxord.obj \
+   $(OBJ_DIR)\sxutil.obj \
+   $(OBJ_DIR)\sxredir.obj \
    \
-   $(OBJ_DIR)\sxfunc.obj
+   $(OBJ_DIR)\sxcompat.obj \
+   $(OBJ_DIR)\sxini.obj \
+   $(OBJ_DIR)\sxtrig.obj
 
 #
 # HSX.LIB rules
@@ -979,7 +987,9 @@ USRRDD_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\fptcdx.obj \
    $(OBJ_DIR)$(MT)\hscdx.obj \
    $(OBJ_DIR)$(MT)\rlcdx.obj \
-   $(OBJ_DIR)$(MT)\smtcdx.obj
+   $(OBJ_DIR)$(MT)\smtcdx.obj \
+   $(OBJ_DIR)$(MT)\ansirdd.obj \
+   $(OBJ_DIR)$(MT)\vfpcdx.obj
 
 #
 # PP.LIB rules

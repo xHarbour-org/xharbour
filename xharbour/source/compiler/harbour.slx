@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.83 2007/05/15 21:34:12 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.84 2007/09/17 11:10:45 ronpinkas Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ SELF_CONTAINED_WORDS_ARE {
 /* KEYWORDS are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
 #define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
-#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
+#define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDSWITCH, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
 #define REJECT_OP        707
 
@@ -288,13 +288,14 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( DOCASE           ),
                          LEX_WORD( "DO{WS}WHILE"                     ) AS_TOKEN( DO_WHILE         ),
                          LEX_WORD( "DO{WS}WHILE{WS}WITH"             ) AS_TOKEN( DO_WHILE_WITH    ),
-                         LEX_WORD( "DYNAMIC"                         ) AS_TOKEN( HB_WANTS_ID  - DYNAMIC           ),
+                         LEX_WORD( "DYNAMIC"                         ) AS_TOKEN( HB_WANTS_ID  - DYNAMIC          ),
                          LEX_WORD( "ELSE"                            ) AS_TOKEN( HB_WANTS_EOL - ELSE             ),
                          LEX_WORD( "ELSEIF"                          ) AS_TOKEN( HB_WANTS_EXP - ELSEIF           ),
                          LEX_WORD( "END"                             ) AS_TOKEN( HB_WANTS_EOL - END              ),
                          LEX_WORD( "ENDCASE"                         ) AS_TOKEN( HB_WANTS_EOL - ENDCASE          ),
                          LEX_WORD( "ENDDO"                           ) AS_TOKEN( HB_WANTS_EOL - ENDDO            ),
                          LEX_WORD( "ENDIF"                           ) AS_TOKEN( HB_WANTS_EOL - ENDIF            ),
+                         LEX_WORD( "ENDSWITCH"                       ) AS_TOKEN( HB_WANTS_EOL - ENDSWITCH        ),
                          LEX_WORD( "ENUMERATION"                     ) AS_TOKEN( HB_WANTS_ID  - ENUM             ),
                          LEX_WORD( "EXIT"                            ) AS_TOKEN( HB_WANTS_EOL - EXIT             ),
                          LEX_WORD( "EXIT{WS}FUNCTION"                ) AS_TOKEN( HB_EXIT_FUNC     ),

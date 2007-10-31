@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.151 2007/09/17 11:10:45 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.152 2007/09/24 01:56:06 ronpinkas Exp $
  */
 
 /*
@@ -332,7 +332,7 @@ METHOD New( uObj, cClass ) CLASS TOleAuto
       oErr:CanDefault    := .F.
       oErr:CanRetry      := .F.
       oErr:CanSubstitute := .T.
-      oErr:Description   := "Invalid argument to contrustor!"
+      oErr:Description   := "Invalid argument to contructor!"
       oErr:GenCode       := 0
       oErr:Operation     := ProcName()
       oErr:Severity      := ES_ERROR

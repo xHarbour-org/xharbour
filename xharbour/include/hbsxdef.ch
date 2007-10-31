@@ -1,5 +1,5 @@
 /*
- * $Id: hbsxdef.ch 7743 2007-09-13 14:40:24Z druzus $
+ * $Id: hbsxdef.ch,v 1.1 2007/09/25 07:28:36 marchuet Exp $
  */
 
 /*
@@ -74,11 +74,11 @@
 /*
  * Trigger Toggle Values
  */
-#define  TRIGGER_ENABLE       1
-#define  TRIGGER_DISABLE      2
-#define  TRIGGER_REMOVE	      3
-#define  TRIGGER_INSTALL      4
-#define  TRIGGER_PENDING      5  /* Internal Use Only */
+#define TRIGGER_ENABLE        1
+#define TRIGGER_DISABLE       2
+#define TRIGGER_REMOVE        3
+#define TRIGGER_INSTALL       4
+#define TRIGGER_PENDING       5  /* Internal Use Only */
 
 
 /*
@@ -86,5 +86,6 @@
  */
 #define BLOB_FILECOMPRESS     1
 #define BLOB_FILEENCRYPT      2
+
 
 #endif /* HB_SIX_DEF_CH_ */

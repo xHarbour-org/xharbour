@@ -1,5 +1,5 @@
 /*
- * $Id: ansirdd.prg,v 1.1 2007/05/18 10:07:00 marchuet Exp $
+ * $Id: ansirdd.prg,v 1.2 2007/08/24 11:14:56 marchuet Exp $
  */
 
 /*
@@ -88,15 +88,12 @@ REQUEST BMDBFCDX
 
 FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 
-   LOCAL cSuperRDD := 'BMDBFCDX' /* We are inheriting from BMDBFCDX */
    LOCAL aANSIFunc[ UR_METHODCOUNT ]
 
-   aANSIFunc[ UR_INIT ]         := ( @ANSI_INIT() )
    aANSIFunc[ UR_GETVALUE ]     := ( @ANSI_GETVALUE() )
    aANSIFunc[ UR_PUTVALUE ]     := ( @ANSI_PUTVALUE() )
 
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, cSuperRDD,;
-                            aANSIFunc )
+RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'BMDBFCDX', aANSIFunc )
 
 INIT PROCEDURE ANSI_INIT()
    rddRegister( "ANSIRDD", RDT_FULL )

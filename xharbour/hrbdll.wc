@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.59 2007/09/03 18:04:26 paultucker Exp $
+# $Id: hrbdll.wc,v 1.60 2007/09/15 17:37:45 patrickmast Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -709,6 +709,15 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\sxcompr.obj \
   $(OBJ_DIR)\sxcrypt.obj \
   $(OBJ_DIR)\sxdate.obj \
+  $(OBJ_DIR)\sxsem.obj \
+  $(OBJ_DIR)\sxfname.obj \
+  $(OBJ_DIR)\sxtable.obj \
+  $(OBJ_DIR)\sxord.obj \
+  $(OBJ_DIR)\sxutil.obj \
+  $(OBJ_DIR)\sxredir.obj
+  $(OBJ_DIR)\sxcompat.obj \
+  $(OBJ_DIR)\sxini.obj \
+  $(OBJ_DIR)\sxtrig.obj \  
 #
 # hsxlib
 #
@@ -2784,6 +2793,42 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
    $(CC_CMD)
 
+$(OBJ_DIR)\sxsem.obj : $(HBSIX_DIR)\sxsem.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxfname.obj : $(HBSIX_DIR)\sxfname.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxtable.obj : $(HBSIX_DIR)\sxtable.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxord.obj : $(HBSIX_DIR)\sxord.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxutil.obj : $(HBSIX_DIR)\sxutil.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxredir.obj : $(HBSIX_DIR)\sxredir.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxcompat.c : $(HBSIX_DIR)\sxcompat.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sxcompat.obj : $(OBJ_DIR)\sxcompat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxini.c : $(HBSIX_DIR)\sxini.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sxini.obj : $(OBJ_DIR)\sxini.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\sxtrig.c : $(HBSIX_DIR)\sxtrig.prg
+   $(HB_CMD)
+
+$(OBJ_DIR)\sxtrig.obj : $(OBJ_DIR)\sxtrig.c
+   $(CC_CMD)   
+   
 # hsx
 
 $(OBJ_DIR)\hsx.obj : $(HSX_DIR)\hsx.c

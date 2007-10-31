@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.70 2007/09/15 17:37:46 patrickmast Exp $
+# $Id: makefile.wc,v 1.71 2007/09/25 07:32:28 marchuet Exp $
 #
 
 #
@@ -679,8 +679,16 @@ HBSIX_LIB_OBJS = \
    $(HBSIX_OBJ_DIR)\sxcompr.obj \
    $(HBSIX_OBJ_DIR)\sxcrypt.obj \
    $(HBSIX_OBJ_DIR)\sxdate.obj \
+   $(HBSIX_OBJ_DIR)\sxsem.obj \
+   $(HBSIX_OBJ_DIR)\sxfname.obj \
+   $(HBSIX_OBJ_DIR)\sxtable.obj \
+   $(HBSIX_OBJ_DIR)\sxord.obj \
+   $(HBSIX_OBJ_DIR)\sxutil.obj \
+   $(HBSIX_OBJ_DIR)\sxredir.obj \
    \
-   $(HBSIX_OBJ_DIR)\sxfunc.obj 
+   $(HBSIX_OBJ_DIR)\sxcompat.obj \
+   $(HBSIX_OBJ_DIR)\sxini.obj \
+   $(HBSIX_OBJ_DIR)\sxtrig.obj 
 
 HSX_LIB_OBJS = \
    $(HSX_OBJ_DIR)\hsx.obj \
@@ -2845,11 +2853,41 @@ $(HBSIX_OBJ_DIR)\sxcrypt.obj : $(RDD_DIR)\hbsix\sxcrypt.c
 $(HBSIX_OBJ_DIR)\sxdate.obj : $(RDD_DIR)\hbsix\sxdate.c
    $(CC_CMD)
 
-$(HBSIX_OBJ_DIR)\sxfunc.c : $(RDD_DIR)\hbsix\sxfunc.prg
+$(SIX_OBJ_DIR)\sxsem.obj : $(RDD_DIR)\hbsix\sxsem.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxfname.obj : $(RDD_DIR)\hbsix\sxfname.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxtable.obj : $(RDD_DIR)\hbsix\sxtable.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxord.obj : $(RDD_DIR)\hbsix\sxord.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxutil.obj : $(RDD_DIR)\hbsix\sxutil.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxredir.obj : $(RDD_DIR)\hbsix\sxredir.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxcompat.c : $(RDD_DIR)\hbsix\sxcompat.prg
    $(HB_CMD)
 
-$(HBSIX_OBJ_DIR)\sxfunc.obj : $(HBSIX_OBJ_DIR)\sxfunc.c
-   $(CC_CMD)      
+$(SIX_OBJ_DIR)\sxcompat.obj : $(SIX_OBJ_DIR)\sxcompat.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxini.c : $(RDD_DIR)\hbsix\sxini.prg
+   $(HB_CMD)
+
+$(SIX_OBJ_DIR)\sxini.obj : $(SIX_OBJ_DIR)\sxini.c
+   $(CC_CMD)
+
+$(SIX_OBJ_DIR)\sxtrig.c : $(RDD_DIR)\hbsix\sxtrig.prg
+   $(HB_CMD)
+
+$(SIX_OBJ_DIR)\sxtrig.obj : $(SIX_OBJ_DIR)\sxtrig.c
+   $(CC_CMD)
    
 #
 # HSX.LIB dependencies
