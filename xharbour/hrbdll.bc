@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.141 2007/09/28 22:39:52 kaddath Exp $
+# $Id: hrbdll.bc,v 1.142 2007/10/31 08:34:20 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -753,7 +753,7 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\sxtable.obj \
    $(OBJ_DIR)\sxord.obj \
    $(OBJ_DIR)\sxutil.obj \
-   $(OBJ_DIR)\sxredir.obj
+   $(OBJ_DIR)\sxredir.obj \
    $(OBJ_DIR)\sxcompat.obj \
    $(OBJ_DIR)\sxini.obj \
    $(OBJ_DIR)\sxtrig.obj \

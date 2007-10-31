@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.219 2007/09/25 07:32:32 marchuet Exp $
+ * $Id: hbapi.h,v 1.220 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -87,6 +87,7 @@ HB_EXTERN_BEGIN
 #define HB_IT_ENUM      ( ( HB_TYPE ) 0x10000 )
 #define HB_IT_EXTREF    ( ( HB_TYPE ) 0x20000 )
 #define HB_IT_DEFAULT   ( ( HB_TYPE ) 0x40000 )
+#define HB_IT_NULL      ( ( HB_TYPE ) 0x80000 )
 #define HB_IT_OBJECT    HB_IT_ARRAY
 #define HB_IT_NUMERIC   ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG | HB_IT_DOUBLE ) )
 #define HB_IT_NUMINT    ( ( HB_TYPE ) ( HB_IT_INTEGER | HB_IT_LONG ) )
