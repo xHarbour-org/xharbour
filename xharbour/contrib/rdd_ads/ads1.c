@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.122 2007/06/24 01:05:49 kaddath Exp $
+ * $Id: ads1.c,v 1.123 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -1551,7 +1551,7 @@ static ERRCODE adsCreateFields( ADSAREAP pArea, PHB_ITEM pStruct )
             {
                if( ( iNameLen == 1 && uiLen == 8 ) || iNameLen > 4 )
                {
-                  dbFieldInfo.uiType = HB_FT_DATETIME;
+                  dbFieldInfo.uiType = HB_FT_TIMESTAMP;
                   dbFieldInfo.uiTypeExtended = ADS_TIMESTAMP;
                   dbFieldInfo.uiLen = 8;
                }
@@ -1897,7 +1897,7 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_INTEGER:
       case HB_FT_DOUBLE:
       case HB_FT_TIME:
-      case HB_FT_DAYTIME:
+      case HB_FT_TIMESTAMP:
       case HB_FT_MODTIME:
       case HB_FT_ROWVER:
       case HB_FT_AUTOINC:
@@ -2200,7 +2200,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       case HB_FT_INTEGER:
       case HB_FT_DOUBLE:
       case HB_FT_TIME:
-      case HB_FT_DAYTIME:
+      case HB_FT_TIMESTAMP:
       case HB_FT_AUTOINC:
       case HB_FT_CURDOUBLE:
          if( HB_IS_NUMERIC( pItem ) )
@@ -2232,7 +2232,7 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
 
       case HB_FT_MEMO:
       case HB_FT_BLOB:
-      case HB_FT_IMAGE:
+      case HB_FT_PICTURE:
          if( HB_IS_STRING( pItem ) )
          {
             ULONG ulLen;
@@ -2559,7 +2559,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
          case HB_FT_LOGICAL:
          case HB_FT_MEMO:
          case HB_FT_BLOB:
-         case HB_FT_IMAGE:
+         case HB_FT_PICTURE:
             if( pField->uiTypeExtended != ADS_VARCHAR )
             {
                uiFldLen = snprintf( ( char * ) ucBuffer, MAX_STR_LEN, "%.*s,%s;",
@@ -2596,7 +2596,7 @@ static ERRCODE adsCreate( ADSAREAP pArea, LPDBOPENINFO pCreateInfo )
    uRetVal = AdsCreateTable( hConnection, pCreateInfo->abName, pCreateInfo->atomAlias,
                              pArea->iFileType, adsCharType,
                              adsLockType, adsRights,
-                             hb_setGetNL( HB_SET_MBLOCKSIZE ),
+                             hb_set.HB_SET_MBLOCKSIZE,
                              ucfieldDefs, &hTable );
    hb_xfree( ucfieldDefs );
 
@@ -2997,7 +2997,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
             break;
 
          case ADS_TIMESTAMP:
-            dbFieldInfo.uiType = HB_FT_DAYTIME;
+            dbFieldInfo.uiType = HB_FT_TIMESTAMP;
             break;
 
          case ADS_MODTIME:
@@ -3033,7 +3033,7 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
             dbFieldInfo.uiFlags = HB_FF_BINARY;
             break;
          case ADS_IMAGE:
-            dbFieldInfo.uiType = HB_FT_IMAGE;
+            dbFieldInfo.uiType = HB_FT_PICTURE;
             dbFieldInfo.uiFlags = HB_FF_BINARY;
             break;
       }
@@ -3061,12 +3061,12 @@ static ERRCODE adsOpen( ADSAREAP pArea, LPDBOPENINFO pOpenInfo )
       return FAILURE;
    }
 
-   if( hb_setGetNI( HB_SET_AUTORDER ) )
+   if( hb_set.HB_SET_AUTORDER )
    {
       DBORDERINFO pOrderInfo;
       pOrderInfo.itmResult = hb_itemPutNI( NULL, 0 );
       pOrderInfo.itmNewVal = NULL;
-      pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_setGetNI( HB_SET_AUTORDER ) );
+      pOrderInfo.itmOrder  = hb_itemPutNI( NULL, hb_set.HB_SET_AUTORDER );
       pOrderInfo.atomBagName = NULL;
       SELF_ORDLSTFOCUS( ( AREAP ) pArea, &pOrderInfo );
       hb_itemRelease( pOrderInfo.itmOrder );
@@ -4185,7 +4185,7 @@ static ERRCODE adsSetFilter( ADSAREAP pArea, LPDBFILTERINFO pFilterInfo )
          char * szFilter = hb_adsOemToAnsi( pucFilter,
                                  hb_itemGetCLen( pFilterInfo->abFilterText ) );
 
-         if( hb_setGetL( HB_SET_OPTIMIZE ) )
+         if( hb_set.HB_SET_OPTIMIZE )
          {
             u32RetVal = AdsSetAOF( pArea->hTable, (UNSIGNED8*) szFilter, usResolve );
          }
