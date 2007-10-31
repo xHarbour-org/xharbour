@@ -1,5 +1,5 @@
 /*
- * $Id: vfpcdx.prg,v 1.1 2007/10/31 08:28:38 marchuet Exp $
+ * $Id: vfpcdx.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -77,4 +77,4 @@ INIT PROC VFPCDX_INIT()
    rddInfo( RDDI_MEMOTYPE, DB_MEMO_FPT, "VFPCDX" )
    rddInfo( RDDI_MEMOVERSION, DB_MEMOVER_STD, "VFPCDX" )
    rddInfo( RDDI_LOCKSCHEME, DB_DBFLOCK_VFP, "VFPCDX" )
-RETURN Nil
+RETURN

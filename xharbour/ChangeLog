@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5754 2007/10/31 10:44:10 likewolf Exp $
+ * $Id: ChangeLog,v 1.5755 2007/10/31 10:56:48 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-10-31 17:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+
+  * source\rdd\usrrdd\rdds\vfpcdx.c
+    ! fixed warning W0006 Procedure returns value
+  * source\rdd\dbf1.c
+    ! fixed warning Mixing pointers to different 'char' types in function hb_dbfCreate
+  * include\hbapi.h
+  * include\hbapigt.h
+  * source\rtl\gtapi.c
+    ! fixed warning Suspicious pointer conversion in function hb_conSetColor
 
 2007-10-31 11:44 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
 

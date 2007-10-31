@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.72 2007/08/08 22:21:06 lculik Exp $
+ * $Id: gtapi.c,v 1.73 2007/08/13 10:42:02 ronpinkas Exp $
  */
 
 /*
@@ -814,7 +814,7 @@ USHORT HB_EXPORT hb_gtColorToN( char * szColorString )
 }
 
 /****************************************************************************/
-USHORT HB_EXPORT hb_gtSetColorStr( char * szColorString )
+USHORT HB_EXPORT hb_gtSetColorStr( const char * szColorString )
 {
    char c;
    char buff[ 7 ];

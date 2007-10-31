@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.178 2007/09/25 07:32:35 marchuet Exp $
+ * $Id: dbf1.c,v 1.179 2007/10/31 08:34:49 marchuet Exp $
  */
 
 /*
@@ -3150,7 +3150,7 @@ static ERRCODE hb_dbfCreate( DBFAREAP pArea, LPDBOPENINFO pCreateInfo )
          pFieldInfo.uiLen ++;
 
       pFieldInfo.uiTypeExtended = 0;
-      pFieldInfo.atomName = "_NullFlags";
+      memcpy( pFieldInfo.atomName, "_NullFlags", 10 );
       pFieldInfo.uiDec = 0;
       pFieldInfo.uiFlags = HB_FF_HIDDEN;
       pFieldInfo.uiType = HB_FT_NONE;

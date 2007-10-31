@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.47 2006/06/28 00:40:13 druzus Exp $
+ * $Id: hbapigt.h,v 1.48 2006/07/16 19:48:56 druzus Exp $
  */
 
 /*
@@ -260,7 +260,7 @@ extern USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
 extern USHORT HB_EXPORT hb_gtScrDim( USHORT * puiHeight, USHORT * puiWidth );
 extern USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols );
 extern USHORT HB_EXPORT hb_gtSetBlink( BOOL bBlink );
-extern USHORT HB_EXPORT hb_gtSetColorStr( char * pszColorString );
+extern USHORT HB_EXPORT hb_gtSetColorStr( const char * pszColorString );
 extern USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorShape );
 extern USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
 extern USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol );
