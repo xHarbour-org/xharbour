@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.10 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: dbgtobj.prg,v 1.11 2007/10/22 21:52:31 likewolf Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ CREATE CLASS HBDbObject
    METHOD New( oObject, cVarName, lEditable )
    METHOD addWindows( aArray, nRow )
    METHOD doGet( oBrowse, pItem, nSet )
-   METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, aArray )
+   METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, aArray )
 
 ENDCLASS
 

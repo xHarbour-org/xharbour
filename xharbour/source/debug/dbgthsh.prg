@@ -1,5 +1,5 @@
 /*
- * $Id: dbgthsh.prg,v 1.3 2007/08/06 20:30:23 likewolf Exp $
+ * $Id: dbgthsh.prg,v 1.4 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -211,7 +211,7 @@ METHOD doGet( oBrowse, pItem, nSet ) CLASS HBDbHash
 
    RETURN NIL
 
-METHOD SetsKeyPressed( nKey, oBrwSets, nSets, oWnd, cName, LenArr, hHash ) CLASS HBDbHash
+METHOD SetsKeyPressed( nKey, oBrwSets, oWnd, cName, hHash ) CLASS HBDbHash
 
    LOCAL nSet := oBrwSets:cargo[ 1 ]
    LOCAL cOldname := ::hashName
