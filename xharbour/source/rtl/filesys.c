@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.162 2007/08/08 22:21:06 lculik Exp $
+ * $Id: filesys.c,v 1.163 2007/08/13 10:42:02 ronpinkas Exp $
  */
 
 /*
@@ -3704,6 +3704,103 @@ USHORT HB_EXPORT  hb_fsCurDirBuffEx( USHORT uiDrive, BYTE * pbyBuffer, ULONG ulL
 
       return 0; // if it reaches here, it is right.
    }
+}
+
+HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
+{
+/*
+   Convert file and dir case. The allowed SET options are:
+      LOWER - Convert all caracters of file to lower
+      UPPER - Convert all caracters of file to upper
+      MIXED - Leave as is
+
+   The allowed environment options are:
+      FILECASE - define the case of file
+      DIRCASE - define the case of path
+      DIRSEPARATOR - define separator of path (Ex. "/")
+      TRIMFILENAME - strip trailing and leading spaces (also from extension)
+*/
+
+   if( hb_set.HB_SET_TRIMFILENAME ||
+       hb_set.HB_SET_DIRSEPARATOR != '\\' ||
+       hb_set.HB_SET_FILECASE != HB_SET_CASE_MIXED ||
+       hb_set.HB_SET_DIRCASE != HB_SET_CASE_MIXED )
+   {
+      PHB_FNAME pFileName;
+      ULONG ulLen;
+
+      if( pfFree )
+      {
+         BYTE * szNew = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, _POSIX_PATH_MAX );
+         szFileName = szNew;
+         *pfFree = TRUE;
+      }
+
+      if( hb_set.HB_SET_DIRSEPARATOR != '\\' )
+      {
+         BYTE *p = szFileName;
+         while( *p )
+         {
+            if( *p == '\\' )
+               *p = hb_set.HB_SET_DIRSEPARATOR;
+            p++;
+         }
+      }
+
+      pFileName = hb_fsFNameSplit( ( char * ) szFileName );
+
+      /* strip trailing and leading spaces */
+      if( hb_set.HB_SET_TRIMFILENAME )
+      {
+         if( pFileName->szName )
+         {
+            ulLen = strlen( pFileName->szName );
+            ulLen = hb_strRTrimLen( pFileName->szName, ulLen, FALSE );
+            pFileName->szName = hb_strLTrim( pFileName->szName, &ulLen );
+            pFileName->szName[ulLen] = '\0';
+         }
+         if( pFileName->szExtension )
+         {
+            ulLen = strlen( pFileName->szExtension );
+            ulLen = hb_strRTrimLen( pFileName->szExtension, ulLen, FALSE );
+            pFileName->szExtension = hb_strLTrim( pFileName->szExtension, &ulLen );
+            pFileName->szExtension[ulLen] = '\0';
+         }
+      }
+
+      /* FILECASE */
+      if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
+      {
+         if( pFileName->szName )
+            hb_strLower( pFileName->szName, strlen( pFileName->szName ) );
+         if( pFileName->szExtension )
+            hb_strLower( pFileName->szExtension, strlen( pFileName->szExtension ) );
+      }
+      else if( hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER )
+      {
+         if( pFileName->szName )
+            hb_strUpper( pFileName->szName, strlen( pFileName->szName ) );
+         if( pFileName->szExtension )
+            hb_strUpper( pFileName->szExtension, strlen( pFileName->szExtension ) );
+      }
+
+      /* DIRCASE */
+      if( pFileName->szPath )
+      {
+         if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )
+            hb_strLower( pFileName->szPath, strlen( pFileName->szPath ) );
+         else if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
+            hb_strUpper( pFileName->szPath, strlen( pFileName->szPath ) );
+      }
+
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_xfree( pFileName );
+   }
+   else if( pfFree )
+      *pfFree = FALSE;
+
+   return szFileName;
 }
 
 BYTE HB_EXPORT * hb_fileNameConv( char *str ) {

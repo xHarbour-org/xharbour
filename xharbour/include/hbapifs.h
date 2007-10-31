@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.45 2006/11/11 03:48:21 druzus Exp $
+ * $Id: hbapifs.h,v 1.46 2007/01/11 01:00:34 druzus Exp $
  */
 
 /*
@@ -218,6 +218,7 @@ extern USHORT    HB_EXPORT hb_fsAttrFromRaw( ULONG raw_attr );
 extern ULONG     HB_EXPORT hb_fsAttrToRaw( USHORT uiAttr );
 extern USHORT    HB_EXPORT hb_fsAttrEncode( const char * szAttr );
 extern char      HB_EXPORT * hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
+extern HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree );
 extern BYTE HB_EXPORT * hb_fileNameConv( char *str );
 
 extern BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet );
