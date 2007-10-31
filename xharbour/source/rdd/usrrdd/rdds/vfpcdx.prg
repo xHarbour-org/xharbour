@@ -1,5 +1,5 @@
 /*
- * $Id: ansirdd.prg,v 1.2 2007/08/24 11:14:56 marchuet Exp $
+ * $Id: vfpcdx.prg,v 1.1 2007/10/31 08:28:38 marchuet Exp $
  */
 
 /*
@@ -68,7 +68,7 @@ ANNOUNCE VFPCDX
 REQUEST DBFCDX
 REQUEST DBFFPT
 
-FUNCTION ANSIRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
+FUNCTION VPFRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'DBFCDX', {} )
 
 INIT PROC VFPCDX_INIT()

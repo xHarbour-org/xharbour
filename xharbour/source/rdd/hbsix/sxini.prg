@@ -1,5 +1,5 @@
 /*
- * $Id: sxini.prg 7771 2007-09-25 01:21:03Z druzus $
+ * $Id: sxini.prg,v 1.1 2007/10/31 08:30:32 marchuet Exp $
  */
 
 /*
@@ -80,8 +80,8 @@ function _sx_INIinit( nArea )
 
    if Type( "SxIniInfo" ) = "U"
       public SxIniInfo := {=>}
-      HCaseMatch( SxIniInfo, .f. )
-      HAutoAdd( SxIniInfo, .t. )
+      HSetCaseMatch( SxIniInfo, .f. )
+      HSetAutoAdd( SxIniInfo, .t. )
    endif
 
    if nArea == NIL
@@ -91,7 +91,7 @@ function _sx_INIinit( nArea )
    cFile := ( nArea )->( dbInfo( DBI_FULLPATH ) )
    hb_FNameSplit( cFile, @cPath, @cName, @cExt, @cDrive )
    cFile := hb_FNameMerge( cPath, cName, ".ini", cDrive )
-   hIni := hb_IniRead( cFile, .F.,, .F. )
+   hIni := hb_ReadIni( cFile, .F.,, .F. )
 
    if !Empty( hIni )
       if HHasKey( hIni, HB_SIX_SECTION )
@@ -136,8 +136,8 @@ function Sx_INIheader( cHeaderName, nArea )
       nArea := Select()
    endif
 
-   if hb_HHasKey( SxIniInfo, nArea )
-      if hb_HHasKey( SxIniInfo[ nArea ], cHeaderName )
+   if HHasKey( SxIniInfo, nArea )
+      if HHasKey( SxIniInfo[ nArea ], cHeaderName )
          return SxIniInfo[ nArea, cHeaderName ]
       endif
    endif

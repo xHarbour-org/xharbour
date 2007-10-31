@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.20 2004/09/21 04:09:20 druzus Exp $
+ * $Id: strcase.c,v 1.21 2004/12/28 07:16:12 druzus Exp $
  */
 
 /*
@@ -137,6 +137,28 @@ HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
          szText[ i ] = toupper( (BYTE) szText[ i ] );
 
    return szText;
+}
+
+/* converts iChar to upper case */
+int hb_charUpper( int iChar )
+{
+#ifndef HB_CDP_SUPPORT_OFF
+   if( hb_cdp_page->nChars )
+      return (unsigned char) hb_cdp_page->s_upper[ (unsigned char) iChar ];
+   else
+#endif
+      return toupper( (unsigned char) iChar );
+}
+
+/* converts iChar to lower case */
+int hb_charLower( int iChar )
+{
+#ifndef HB_CDP_SUPPORT_OFF
+   if( hb_cdp_page->nChars )
+      return (unsigned char) hb_cdp_page->s_lower[ (unsigned char) iChar ];
+   else
+#endif
+      return tolower( (unsigned char) iChar );
 }
 
 /* converts string to lower case */

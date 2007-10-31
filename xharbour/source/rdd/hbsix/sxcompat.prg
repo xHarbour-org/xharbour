@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompat.prg 7771 2007-09-25 01:21:03Z druzus $
+ * $Id: sxcompat.prg,v 1.1 2007/10/31 08:30:32 marchuet Exp $
  */
 
 /*
@@ -86,6 +86,7 @@
 #include "dbinfo.ch"
 #include "ord.ch"
 #include "hbsxdef.ch"
+#define HB_SYMBOL_UNUSED( symbol )  symbol = symbol
 
 function sxChar( nLen, xKeyVal )
 

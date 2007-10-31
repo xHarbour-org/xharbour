@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.204 2007/09/25 07:32:25 marchuet Exp $
+# $Id: makefile.bc,v 1.205 2007/10/31 08:34:21 marchuet Exp $
 #
 
 #
@@ -3093,7 +3093,6 @@ $(RDD_OBJ_DIR)\vfpcdx.c : $(RDD_DIR)\usrrdd\rdds\vfpcdx.prg
 
 $(RDD_OBJ_DIR)\vfpcdx.obj : $(RDD_OBJ_DIR)\vfpcdx.c
    $(CC_CMD)
-
 
 #
 # DEBUG.LIB dependencies

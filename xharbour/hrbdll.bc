@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.144 2007/10/31 10:56:49 marchuet Exp $
+# $Id: hrbdll.bc,v 1.145 2007/10/31 11:07:19 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -41,6 +41,7 @@ PP_DIR            = source\pp
 RDD_DIR           = source\rdd
 RTL_DIR           = source\rtl
 PCREPOS_DIR       = source\rtl\pcre
+MISC_DIR          = source\misc
 TIP_DIR           = source\tip
 VM_DIR            = source\vm
 HBSIX_DIR         = source\rdd\hbsix
@@ -778,7 +779,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\smtcdx.obj \
   $(OBJ_DIR)\adordd.obj \
   $(OBJ_DIR)\ansirdd.obj \
-  $(OBJ_DIR)\vfpcdx.obj
+  $(OBJ_DIR)\vfpcdx.obj \
+  $(OBJ_DIR)\hb_f.obj
 #
 #  Gt
 #
@@ -1456,6 +1458,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\adordd.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\ansirdd.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\vfpcdx.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\hb_f.obj              + >> hdll.tmp
 !if $d(HB_RDDADS)
   echo. $(OBJ_DIR)\ads1.obj              + >> hdll.tmp
   echo. $(OBJ_DIR)\adsfunc.obj           + >> hdll.tmp
@@ -3732,6 +3735,9 @@ $(OBJ_DIR)\vfpcdx.c : $(RDD_DIR)\usrrdd\rdds\vfpcdx.prg
    $(HRB_CMD)
 
 $(OBJ_DIR)\vfpcdx.obj : $(OBJ_DIR)\vfpcdx.c
+   $(CC_CMD)
+   
+$(OBJ_DIR)\hb_f.obj : $(MISC_DIR)\hb_f.c
    $(CC_CMD)
    
 #

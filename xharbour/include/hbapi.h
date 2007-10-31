@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.220 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbapi.h,v 1.221 2007/10/31 10:12:05 marchuet Exp $
  */
 
 /*
@@ -606,6 +606,7 @@ extern HB_EXPORT LONG      hb_arrayGetT( PHB_ITEM pArray, ULONG ulIndex ); /* re
 extern HB_EXPORT double    hb_arrayGetDTsec( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
 extern HB_EXPORT double    hb_arrayGetDTD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
 extern HB_EXPORT HB_TYPE   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
+extern HB_EXPORT BOOL      hb_arraySetL( PHB_ITEM pArray, ULONG ulIndex, BOOL fValue );
 extern HB_EXPORT void      hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
 extern HB_EXPORT ULONG     hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar ); /* scan an array for a given item, or until code-block item returns TRUE */
 extern HB_EXPORT BOOL      hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */
@@ -669,6 +670,8 @@ extern HB_EXPORT char *    hb_stripOutComments( char* buffer ); /* extract uncom
 extern HB_EXPORT char *    hb_strUpper( char * szText, ULONG ulLen ); /* convert an existing string buffer to upper case */
 extern HB_EXPORT char *    hb_strUpperCopy( char * szText, ULONG ulLen );
 extern HB_EXPORT char *    hb_strLower( char * szText, ULONG ulLen ); /* convert an existing string buffer to lower case */
+extern HB_EXPORT int       hb_charUpper( int iChar );  /* converts iChar to upper case */
+extern HB_EXPORT int       hb_charLower( int iChar );  /* converts iChar to lower case */
 extern HB_EXPORT char *    hb_strncpy( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most ulLen bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
 extern HB_EXPORT char *    hb_strncat( char * pDest, const char * pSource, ULONG ulLen ); /* copy at most ulLen-strlen(pDest) bytes from string buffer to another buffer and _always_ set 0 in destin buffer */
 extern HB_EXPORT char *    hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen );
