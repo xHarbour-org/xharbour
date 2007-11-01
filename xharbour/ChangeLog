@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5755 2007/10/31 10:56:48 marchuet Exp $
+ * $Id: ChangeLog,v 1.5756 2007/10/31 16:20:51 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-01 10:09 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbver.h
+    * Changed CVS HEAD version number to 1.1.0.
 
 2007-10-31 17:12 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
 
@@ -27,7 +31,6 @@
   * source\rtl\disksphb.c
     + Added functionality now HB_DISKSPACE support unc paths.
     synced with harbour
-
 
 2007-10-31 13:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbver.h
@@ -291,7 +294,6 @@
       replicate SIx3 bugs which may cause data corruption.
       
    Synced with harbour as posible.
->>>>>>> 1.5753
 
 2007-10-30 02:10 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
   * include/hbver.h
