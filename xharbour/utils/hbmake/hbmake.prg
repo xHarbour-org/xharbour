@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.185 2007/09/27 11:09:34 modalsist Exp $
+ * $Id: hbmake.prg,v 1.186 2007/10/23 13:52:31 lculik Exp $
  */
 
 /*
@@ -206,7 +206,7 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    s_lLinux := ( "LINUX" IN Upper( OS() ) )
    s_lWin32 := ( "WINDOWS" IN Upper( OS() ) )
    s_lUnix  := IF( ( "UNIX" IN Upper( OS() ) ) .OR. ( "HP-UX" IN Upper( OS() ) ) , .T., .F. )
-   s_lLinux := ( "HP-UX" IN Upper( OS() ) )
+   s_lLinux := ( "LINUX" IN Upper( OS() ) )
 
    IF PCount() == 0 .or.;
       "?" IN cMakeParams .or. ;
