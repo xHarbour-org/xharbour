@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5756 2007/10/31 16:20:51 marchuet Exp $
+ * $Id: ChangeLog,v 1.5757 2007/11/01 07:12:51 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-04 12:22 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.vc
+    * Fixed typos
 
 2007-11-01 10:09 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbver.h
@@ -27,7 +31,7 @@
 
   * source\ct\disk.c
     * corrected VolSerial because it was returning a decimal value now return a longlong value.
-    
+
   * source\rtl\disksphb.c
     + Added functionality now HB_DISKSPACE support unc paths.
     synced with harbour
@@ -72,7 +76,7 @@
   * source/rdd/dbf1.c
     + Initialized counter value on ZAP for auto incremental fields.
     + loaded field _NullFlags as hidden and the rest of flags when it exists.
-      
+
   * source/rdd/dbf1.c
   * source/rdd/usrrdd/usrrdd.c
     * use hb_vmPushItemRef()
@@ -94,10 +98,10 @@
       moment to make it together with HB_FT_* modifications
     - rmoved not longer necessary HARBOUR_MAX_RDD_RELTEXT_LENGTH
     + Added capabilitie to read memo fields with OLE object as string.
-    
+
   * source/rdd/wacore.c
   * source/rdd/dbcmd.c
-    ! fixed registering workareas with numbers from 65280 to 65534    
+    ! fixed registering workareas with numbers from 65280 to 65534
 
   * include/dbinfo.ch
   * contrib/rdd_ads/ads1.c
@@ -205,7 +209,7 @@
          Sx_FCompress(), Sx_FDecompress(),
          Sx_AutoOpen(), Sx_AutoShare(),
          Sx_MemoExt(), Sx_MemoBlk(), Sx_SetMemoBlock(), Sx_MemoPack(),
-         Sx_SetTrigger(), Sx_SetTrig(), Sx_DefTrigger(), 
+         Sx_SetTrigger(), Sx_SetTrig(), Sx_DefTrigger(),
          Sx_INIheader(), _sx_INIinit(), _sxOpenInit(),
          Sx_SetPass(),
          Sx_Encrypt(), Sx_Decrypt(), Sx_DBFdecrypt(), Sx_DBFencrypt(),
@@ -292,7 +296,7 @@
 
       I still do not allow to encrypt tables with memo fields to not
       replicate SIx3 bugs which may cause data corruption.
-      
+
    Synced with harbour as posible.
 
 2007-10-30 02:10 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
@@ -345,14 +349,14 @@
 
 2007-10-23 13:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    * source\tip\sendmail.prg
-     ! minor fix when sending multiples attachments	
+     ! minor fix when sending multiples attachments
 
 2007-10-23 11:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * config/hpux/dir.cf
     config/hpux/gcc.cf
     config/hpux/global.cf
     config/hpux/install.cf
-    ! updated to proper compile on hpux and generate mt libs   
+    ! updated to proper compile on hpux and generate mt libs
   * utils/hbmake/hbmake.prg
     utils/hbmake/hbmutils.prg
     ! changes to work on hpux
@@ -364,8 +368,8 @@
     ! Fixed an RTE when browsing subarrays in object monitor.
 
 2007-10-20 08:30 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
-  * source/rtl/gtwvt/gtwvt.c 
-    ! Missing type declaration. 
+  * source/rtl/gtwvt/gtwvt.c
+    ! Missing type declaration.
 
 2007-10-20 00:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
@@ -375,7 +379,7 @@
 2007-10-19 13:00 UTC-0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/wvtgui/wvtutil.c
     ! Bug fix in Wvt_SaveFileName() and Wvt_OpenFileName()
-  * source/rtl/gtwvt/gtwvt.c 
+  * source/rtl/gtwvt/gtwvt.c
     * Released time-slice after 100 iterations. Adopted from GTWIN.
     * Functionality to open window shifted from hb_wvt_gtCreateWindow() to hb_gtInit().
 
@@ -415,13 +419,13 @@
 
 2007-10-01 10:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! fixed PageUp() method that in any circustancies doesn't diplay 
+    ! fixed PageUp() method that in any circustancies doesn't diplay
       the color defined in colorrect() method. Bug reported by a user directly.
 
 2007-09-30 22:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tgetlist.prg
     ! fixed run-time error at line 571 as reported in xharbour dev-list.
-      Added "if oGet:ExitState != NIL ...". 
+      Added "if oGet:ExitState != NIL ...".
 
 2007-09-28 15:37 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc
@@ -464,7 +468,7 @@
     * changed BuildLangArray() function to reorganize the s_aLangMessages array for
       easy number identification.
     + created new parameter named "-c" to compile after create a script file.
-      f.e. hbmake <test.bc> -e -c  this will create and compile without open edit 
+      f.e. hbmake <test.bc> -e -c  this will create and compile without open edit
       options. This is usefull when we need compile only one prg file.
     * updated showhelp() function content.
 

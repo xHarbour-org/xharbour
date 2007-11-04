@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.109 2007/09/15 17:37:45 patrickmast Exp $
+# $Id: hrbdll.vc,v 1.110 2007/10/31 08:34:20 marchuet Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -539,10 +539,10 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\sxtable.obj \
   $(OBJ_DIR)\sxord.obj \
   $(OBJ_DIR)\sxutil.obj \
-  $(OBJ_DIR)\sxredir.obj
+  $(OBJ_DIR)\sxredir.obj \
   $(OBJ_DIR)\sxcompat.obj \
   $(OBJ_DIR)\sxini.obj \
-  $(OBJ_DIR)\sxtrig.obj \  
+  $(OBJ_DIR)\sxtrig.obj \
 #
 #
 #  HSX
@@ -1893,7 +1893,7 @@ $(OBJ_DIR)\sxcrypt.obj : $(HBSIX_DIR)\sxcrypt.c
 
 $(OBJ_DIR)\sxdate.obj : $(HBSIX_DIR)\sxdate.c
    $(CC_CMD)
-   
+
 $(OBJ_DIR)\sxsem.obj : $(HBSIX_DIR)\sxsem.c
    $(CC_CMD)
 
@@ -1913,22 +1913,22 @@ $(OBJ_DIR)\sxredir.obj : $(HBSIX_DIR)\sxredir.c
    $(CC_CMD)
 
 $(OBJ_DIR)\sxcompat.c : $(HBSIX_DIR)\sxcompat.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\sxcompat.obj : $(OBJ_DIR)\sxcompat.c
    $(CC_CMD)
 
 $(OBJ_DIR)\sxini.c : $(HBSIX_DIR)\sxini.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\sxini.obj : $(OBJ_DIR)\sxini.c
    $(CC_CMD)
 
 $(OBJ_DIR)\sxtrig.c : $(HBSIX_DIR)\sxtrig.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\sxtrig.obj : $(OBJ_DIR)\sxtrig.c
-   $(CC_CMD)   
+   $(CC_CMD)
 
 #
 # HSX.LIB dependencies
@@ -2289,24 +2289,24 @@ $(OBJ_DIR)\smtcdx.c : $(USRRDD_DIR)\rdds\smtcdx.prg
 
 $(OBJ_DIR)\smtcdx.obj : $(OBJ_DIR)\smtcdx.c
    $(CC_CMD)
-   
-$(RDD_OBJ_DIR)\adordd.c : $(USRRDD_DIR)\rdds\adordd.prg
-   $(HB_CMD)
 
-$(RDD_OBJ_DIR)\adordd.obj : $(OBJ_DIR)\adordd.c
+$(OBJ_DIR)\adordd.c : $(USRRDD_DIR)\rdds\adordd.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\adordd.obj : $(OBJ_DIR)\adordd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ansirdd.c : $(USRRDD_DIR)\rdds\ansirdd.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\ansirdd.obj : $(OBJ_DIR)\ansirdd.c
    $(CC_CMD)
 
 $(OBJ_DIR)\vfpcdx.c : $(USRRDD_DIR)\rdds\vfpcdx.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(OBJ_DIR)\vfpcdx.obj : $(OBJ_DIR)\vfpcdx.c
-   $(CC_CMD)   
+   $(CC_CMD)
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴컴컴컴커
 # � XBSCRIPTDLL.EXE dependencies 넴
