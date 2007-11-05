@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.123 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: ads1.c,v 1.124 2007/10/31 09:02:16 marchuet Exp $
  */
 
 /*
@@ -69,6 +69,13 @@
 
 #include <ctype.h>
 
+#ifndef HB_SET_IMPORT
+   78    static HB_SET_STRUCT * s_hb_set_ptr = NULL;
+   79 #  define hb_set              ( * s_hb_set_ptr )
+   80 #  define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
+   81 #else
+   82 #  define HB_ADS_SET_INIT()   do { } while(0)
+   83 #endif
 static int s_iSetListenerHandle = 0;
 static HB_SET_STRUCT * hb_setext = NULL;   // hb_set external reference since DLL builds cannot access hb_set itself
 
@@ -4793,7 +4800,7 @@ static void hb_adsRddInit( void * cargo )
 {
    HB_SYMBOL_UNUSED( cargo );
 
-   HB_ADS_SET_INIT();
+//   HB_ADS_SET_INIT();
 
    if( hb_rddRegister( "ADS", RDT_FULL ) > 1 ||
        hb_rddRegister( "ADT", RDT_FULL ) > 1 ||
