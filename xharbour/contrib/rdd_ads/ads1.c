@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.124 2007/10/31 09:02:16 marchuet Exp $
+ * $Id: ads1.c,v 1.125 2007/11/05 00:33:55 lculik Exp $
  */
 
 /*
@@ -70,12 +70,14 @@
 #include <ctype.h>
 
 #ifndef HB_SET_IMPORT
-   78    static HB_SET_STRUCT * s_hb_set_ptr = NULL;
-   79 #  define hb_set              ( * s_hb_set_ptr )
-   80 #  define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
-   81 #else
-   82 #  define HB_ADS_SET_INIT()   do { } while(0)
-   83 #endif
+   static HB_SET_STRUCT * s_hb_set_ptr = NULL;
+
+   #define hb_set              ( * s_hb_set_ptr )
+   #define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
+#else
+   #define HB_ADS_SET_INIT()   do { } while(0)
+#endif
+
 static int s_iSetListenerHandle = 0;
 static HB_SET_STRUCT * hb_setext = NULL;   // hb_set external reference since DLL builds cannot access hb_set itself
 
