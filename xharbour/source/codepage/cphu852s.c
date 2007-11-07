@@ -1,14 +1,13 @@
 /*
- * $Id: cpeswin.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cphu852s.c 7249 2007-04-18 08:45:07Z vszakats $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish WIN )
+ * National Collation Support Module (HU852S)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 1999-2007 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
- * Spanish Windows support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,31 +50,31 @@
  *
  */
 
-/* Language name: Spanish */
-/* ISO language code (2 chars): ES (please look it up in /doc/lang_id.txt) */
-/* Codepage: ISO-8859-1 */
+/* Language name: Hungarian */
+/* ISO language code (2 chars): HU */
+/* Codepage: 852 (sixhu852 compatible) */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  36    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-    a~€
+      a~€
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,16 +83,22 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ESWIN",
-    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "AÁBCDEÉFGHIÍJKLMNÑOÓPQRSTUÚÜVWXYZ",
-    "aábcdeéfghiíjklmnñoópqrstuúüvwxyz",
+/* NOTE: Ž/„ has been added to make it fully compatible with sixhu852.obj for 
+         S*ccessWare SIx Driver.
+         Moreover the extra chars had to be replicated in the alternative 
+         codepages (WIN, ISO) too, to keep the Harbour codepage translation 
+         work. [vszakats] */
+
+static HB_CODEPAGE s_codepage = { "HU852S",
+    HB_CPID_852, HB_UNITB_852, NUMBER_OF_CHARACTERS,
+    "AµŽBCDEFGHIÖJKLMNOà™ŠPQRSTUéšëVWXYZ",
+    "a „bcde‚fghi¡jklmno¢”‹pqrstu£ûvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( ESWIN )
+HB_CODEPAGE_INIT( HU852S )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_ESWIN
+   #pragma startup hb_codepage_Init_HU852S
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -101,6 +106,6 @@ HB_CODEPAGE_INIT( ESWIN )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ESWIN = hb_codepage_Init_ESWIN;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_HU852S = hb_codepage_Init_HU852S;
    #pragma data_seg()
 #endif

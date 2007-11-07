@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cpbgmik.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
  */
 
 /*
@@ -58,17 +58,38 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
+#define NUMBER_OF_CHARACTERS  32    /* The number of single characters in the
+                                       alphabet, two-as-one aren't considered
+                                       here, accented - are considered. */
+#define IS_LATIN               0    /* Should be 1, if the national alphabet
+                                       is based on Latin */
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+                                       has the same weight as appropriate
+                                       unaccented. */
+#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+                                       sort after their unaccented counterparts
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
+                                       ( interleaving ) */
+
+/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
+   accented characters with the symbol '~' before each of them, for example:
+      a~_
+   If there is two-character sequence, which is considered as one, it should
+   be marked with '.' before and after it, for example:
+      ... h.ch.i ...
+
+   The Upper case string and the Lower case string should be absolutely the
+   same excepting the characters case, of course.
+ */
+
 static HB_CODEPAGE s_codepage = { "BGMIK",
-    CPID_MIK,UNITB_MIK,32,
+    HB_CPID_MIK, HB_UNITB_MIK, NUMBER_OF_CHARACTERS,
     "€‚ƒ„…†‡‰‹‘’“”•–—™›",
     " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξο",
-    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( BGMIK );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_BGMIK )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_BGMIK )
+HB_CODEPAGE_INIT( BGMIK )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_BGMIK
@@ -82,4 +103,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_BGMIK )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_BGMIK = hb_codepage_Init_BGMIK;
    #pragma data_seg()
 #endif
-

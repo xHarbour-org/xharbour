@@ -1,5 +1,5 @@
 /*
- * $Id: uc8859_5.c,v 1.2 2006/02/04 16:16:44 druzus Exp $
+ * $Id: uc8859_5.c,v 1.1 2007/01/09 22:05:22 druzus Exp $
  */
 
 /*
@@ -90,4 +90,4 @@ static USHORT uniCodes[NUMBER_OF_CHARS] = {
    0x0458, 0x0459, 0x045A, 0x045B, 0x045C, 0x00A7, 0x045E, 0x045F,
 };
 
-HB_UNITABLE hb_uniTbl_8859_5 = { CPID_8859_5, NUMBER_OF_CHARS, FALSE, uniCodes };
+HB_UNITABLE hb_uniTbl_8859_5 = { HB_CPID_8859_5, NUMBER_OF_CHARS, FALSE, uniCodes };

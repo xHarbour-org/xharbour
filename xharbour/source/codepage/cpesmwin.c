@@ -1,5 +1,5 @@
 /*
- * $Id: cpesmwin.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpesmwin.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
  */
 
 /*
@@ -85,7 +85,7 @@
  */
 
 static HB_CODEPAGE s_codepage = { "ESMWIN",
-    CPID_8859_1, UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
     "AÁÀÄBCÇDEÉÈËFGHIÍÌÏJKLMNÑOÓÒÖPQRSTUÚÙÜVWXYZ",
     "aáàäbcçdeéèëfghiíìïjklmnñoóòöpqrstuúùüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };

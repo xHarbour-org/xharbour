@@ -1,5 +1,5 @@
 /*
- * $Id: hbapicdp.h,v 1.24 2007/09/23 05:02:15 andijahja Exp $
+ * $Id: hbapicdp.h,v 1.25 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -53,9 +53,10 @@
 #ifndef HB_APICDP_H_
 #define HB_APICDP_H_
 
+#include <ctype.h>
+
 #ifndef HB_CDP_SUPPORT_OFF
 
-#include <ctype.h>
 #include "hbapi.h"
 #include "hbinit.h"
 
@@ -112,47 +113,47 @@ typedef struct _HB_CODEPAGE
    PHB_MULTICHAR  multi;
 } HB_CODEPAGE, * PHB_CODEPAGE;
 
-#define CPID_437        "cp437"
-#define CPID_737        "cp737"
-#define CPID_850        "cp850"
-#define CPID_852        "cp852"
-#define CPID_857        "cp857"
-#define CPID_866        "cp866"
-#define CPID_1250       "cp1250"
-#define CPID_1251       "cp1251"
-#define CPID_1253       "cp1253"
-#define CPID_1254       "cp1254"
-#define CPID_1257       "cp1257"
-#define CPID_8859_1     "iso8859-1"
-#define CPID_8859_1B    "iso8859-1b"
-#define CPID_8859_2     "iso8859-2"
-#define CPID_8859_5     "iso8859-5"
-#define CPID_KOI_8      "koi-8"
-#define CPID_KOI_8U     "koi-8u"
-#define CPID_MAZ        "plmaz"
-#define CPID_KAM        "cskam"
-#define CPID_MIK        "bgmik"
-#define UNITB_437       &hb_uniTbl_437
-#define UNITB_737       &hb_uniTbl_737
-#define UNITB_850       &hb_uniTbl_850
-#define UNITB_852       &hb_uniTbl_852
-#define UNITB_857       &hb_uniTbl_857
-#define UNITB_866       &hb_uniTbl_866
-#define UNITB_1250      &hb_uniTbl_1250
-#define UNITB_1251      &hb_uniTbl_1251
-#define UNITB_1253      &hb_uniTbl_1253
-#define UNITB_1254      &hb_uniTbl_1254
-#define UNITB_1257      &hb_uniTbl_1257
-#define UNITB_8859_1    &hb_uniTbl_8859_1
-#define UNITB_8859_1B   &hb_uniTbl_8859_1b
-#define UNITB_8859_2    &hb_uniTbl_8859_2
-#define UNITB_8859_5    &hb_uniTbl_8859_5
-#define UNITB_KOI_8     &hb_uniTbl_KOI_8
-#define UNITB_KOI_8U    &hb_uniTbl_KOI_8U
-#define UNITB_KAM       &hb_uniTbl_kam
-#define UNITB_MAZ       &hb_uniTbl_mazovia
-#define UNITB_MIK       &hb_uniTbl_MIK
-#define UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
+#define HB_CPID_437        "cp437"
+#define HB_CPID_737        "cp737"
+#define HB_CPID_850        "cp850"
+#define HB_CPID_852        "cp852"
+#define HB_CPID_857        "cp857"
+#define HB_CPID_866        "cp866"
+#define HB_CPID_1250       "cp1250"
+#define HB_CPID_1251       "cp1251"
+#define HB_CPID_1253       "cp1253"
+#define HB_CPID_1254       "cp1254"
+#define HB_CPID_1257       "cp1257"
+#define HB_CPID_8859_1     "iso8859-1"
+#define HB_CPID_8859_1B    "iso8859-1b"
+#define HB_CPID_8859_2     "iso8859-2"
+#define HB_CPID_8859_5     "iso8859-5"
+#define HB_CPID_KOI_8      "koi-8"
+#define HB_CPID_KOI_8U     "koi-8u"
+#define HB_CPID_KAM        "kamenicky"
+#define HB_CPID_MAZ        "plmaz"
+#define HB_CPID_MIK        "bg-mik"
+#define HB_UNITB_437       &hb_uniTbl_437
+#define HB_UNITB_737       &hb_uniTbl_737
+#define HB_UNITB_850       &hb_uniTbl_850
+#define HB_UNITB_852       &hb_uniTbl_852
+#define HB_UNITB_857       &hb_uniTbl_857
+#define HB_UNITB_866       &hb_uniTbl_866
+#define HB_UNITB_1250      &hb_uniTbl_1250
+#define HB_UNITB_1251      &hb_uniTbl_1251
+#define HB_UNITB_1253      &hb_uniTbl_1253
+#define HB_UNITB_1254      &hb_uniTbl_1254
+#define HB_UNITB_1257      &hb_uniTbl_1257
+#define HB_UNITB_8859_1    &hb_uniTbl_8859_1
+#define HB_UNITB_8859_1B   &hb_uniTbl_8859_1b
+#define HB_UNITB_8859_2    &hb_uniTbl_8859_2
+#define HB_UNITB_8859_5    &hb_uniTbl_8859_5
+#define HB_UNITB_KOI_8     &hb_uniTbl_KOI_8
+#define HB_UNITB_KOI_8U    &hb_uniTbl_KOI_8U
+#define HB_UNITB_KAM       &hb_uniTbl_kamenicky
+#define HB_UNITB_MAZ       &hb_uniTbl_mazovia
+#define HB_UNITB_MIK       &hb_uniTbl_MIK
+#define HB_UNITB_UNDEF     NULL /* ((PHB_UNITABLE) (-1)) */
 
 extern HB_UNITABLE hb_uniTbl_437;
 extern HB_UNITABLE hb_uniTbl_737;
@@ -171,8 +172,8 @@ extern HB_UNITABLE hb_uniTbl_8859_2;
 extern HB_UNITABLE hb_uniTbl_8859_5;
 extern HB_UNITABLE hb_uniTbl_KOI_8;
 extern HB_UNITABLE hb_uniTbl_KOI_8U;
+extern HB_UNITABLE hb_uniTbl_kamenicky;
 extern HB_UNITABLE hb_uniTbl_mazovia;
-extern HB_UNITABLE hb_uniTbl_kam;
 extern HB_UNITABLE hb_uniTbl_MIK;
 
 extern HB_EXPORT BOOL          hb_cdpRegister( PHB_CODEPAGE );

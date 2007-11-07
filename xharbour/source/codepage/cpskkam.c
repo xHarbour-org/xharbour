@@ -1,14 +1,13 @@
 /*
- * $Id: cpeswin.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cpskkam.c 7630 2007-08-02 15:45:52Z druzus $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish WIN )
+ * National Collation Support Module ( SKKAM )
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2007 Viktor Szakats <harbour.01 syenar.hu>
  * www - http://www.harbour-project.org
- * Spanish Windows support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,31 +50,31 @@
  *
  */
 
-/* Language name: Spanish */
-/* ISO language code (2 chars): ES (please look it up in /doc/lang_id.txt) */
-/* Codepage: ISO-8859-1 */
+/* Language name: Slovak */
+/* ISO language code (2 chars): SK */
+/* Codepage: Kamenicky ("895") */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  33    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  46    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         1    /* Should be 1, if accented character
                                        has the same weight as appropriate
                                        unaccented. */
-#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+#define ACCENTED_INTERLEAVED   1    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-    a~€
+      a~_
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,16 +83,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ESWIN",
-    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "AÁBCDEÉFGHIÍJKLMNÑOÓPQRSTUÚÜVWXYZ",
-    "aábcdeéfghiíjklmnñoópqrstuúüvwxyz",
+static HB_CODEPAGE s_codepage = { "SKKAM",
+    HB_CPID_KAM, HB_UNITB_KAM, NUMBER_OF_CHARACTERS,
+    "A~~ŽBC€D~….DZ..D’.E~FGH.CH.I~‹JKL~Š~œMN~¥O~•~§PQR~«S›T~†U~—VWXY~Z’",
+    "a~ ~„bc‡d~ƒ.dz..d‘.e~‚fgh.ch.i~¡jkl~~Œmn~¤o~¢~“pqr~ªs¨t~Ÿu~£vwxy~˜z‘",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( ESWIN )
+HB_CODEPAGE_INIT( SKKAM );
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_ESWIN
+   #pragma startup hb_codepage_Init_SKKAM
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -101,6 +100,6 @@ HB_CODEPAGE_INIT( ESWIN )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ESWIN = hb_codepage_Init_ESWIN;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SKKAM = hb_codepage_Init_SKKAM;
    #pragma data_seg()
 #endif

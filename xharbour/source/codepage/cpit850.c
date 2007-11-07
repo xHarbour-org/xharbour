@@ -1,5 +1,5 @@
 /*
- * $Id: cpit850.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: cpit850.c,v 1.5 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -85,16 +85,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "IT850",
-    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
+    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
     "A∑µ∂«éèBCDE‘êFGHIﬁ÷JKLMNO„‡PQRSTUÎÈVWXYZ",
     "aÖ†É∆ÑÜbcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( IT850 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_IT850 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_IT850 )
+HB_CODEPAGE_INIT( IT850 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_IT850

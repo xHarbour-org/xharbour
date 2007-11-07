@@ -1,5 +1,5 @@
 /*
- * $Id: cphr1250.c,v 1.5 2006/04/06 19:22:02 paultucker Exp $
+ * $Id: cphr1250.c,v 1.5 2006/10/09 19:23:44 ptsarenko Exp $
  */
 
 /*
@@ -87,16 +87,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "HR1250",
-    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
+    HB_CPID_1250,HB_UNITB_1250,NUMBER_OF_CHARACTERS,
     "ABCÈÆDÐEFGHIJKLMNOPQRSŠTUVWXYZŽ",
     "abcèædðefghijklmnopqrsštuvwxyzž",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( HR1250 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR1250 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR1250 )
+HB_CODEPAGE_INIT( HR1250 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_HR1250

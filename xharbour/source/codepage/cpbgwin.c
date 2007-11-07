@@ -1,5 +1,5 @@
 /*
- * $Id: cpbgwin.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
+ * $Id: cpbgwin.c,v 1.2 2005/11/21 22:25:34 kaddath Exp $
  */
 
 /*
@@ -58,20 +58,41 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-static HB_CODEPAGE s_codepage = { "BG1251",
-    CPID_1251,UNITB_1251,32,
+#define NUMBER_OF_CHARACTERS  32    /* The number of single characters in the
+                                       alphabet, two-as-one aren't considered
+                                       here, accented - are considered. */
+#define IS_LATIN               0    /* Should be 1, if the national alphabet
+                                       is based on Latin */
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+                                       has the same weight as appropriate
+                                       unaccented. */
+#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+                                       sort after their unaccented counterparts
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
+                                       ( interleaving ) */
+
+/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
+   accented characters with the symbol '~' before each of them, for example:
+      a~€
+   If there is two-character sequence, which is considered as one, it should
+   be marked with '.' before and after it, for example:
+      ... h.ch.i ...
+
+   The Upper case string and the Lower case string should be absolutely the
+   same excepting the characters case, of course.
+ */
+
+static HB_CODEPAGE s_codepage = { "BGWIN",
+    HB_CPID_1251, HB_UNITB_1251, NUMBER_OF_CHARACTERS,
     "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞß",
     "àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ",
-    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( BG1251 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_BG1251 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_BG1251 )
+HB_CODEPAGE_INIT( BGWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_BG1251
+   #pragma startup hb_codepage_Init_BGWIN
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -79,7 +100,6 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_BG1251 )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_BG1251 = hb_codepage_Init_BG1251;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_BGWIN = hb_codepage_Init_BGWIN;
    #pragma data_seg()
 #endif
-

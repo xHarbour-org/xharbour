@@ -1,5 +1,5 @@
 /*
- * $Id: cpptiso.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: cpptiso.c,v 1.5 2006/01/15 22:57:59 modalsist Exp $
  */
 
 /*
@@ -52,9 +52,9 @@
  *
  */
 
-/* Language name: Portuguese */
+/* Language name: Portuguese       */
 /* ISO language code (2 chars): PT */
-/* Codepage: ISO-8859-1 */
+/* Codepage: iso-8859-1            */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -65,13 +65,13 @@
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -86,16 +86,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "PTISO",
-    CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
+    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
     "AÁÀÂÃÄBCÇDEÉÈÊFGHIÍÌÎÏJKLMNÑOÓÒÔÕÖPQRSTUÚÙÛÜVWXYZªº",
     "aáàâãäbcçdeéèêfghiíìîïjklmnñoóòôõöpqrstuúùûüvwxyzªº",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( PTISO );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_PTISO )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_PTISO )
+HB_CODEPAGE_INIT( PTISO )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_PTISO

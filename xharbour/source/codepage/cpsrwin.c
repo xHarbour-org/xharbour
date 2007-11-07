@@ -1,5 +1,5 @@
 /*
- * $Id: cpsrwin.c,v 1.5 2005/12/14 23:22:03 ptsarenko Exp $
+ * $Id: cpsrwin.c,v 1.5 2005/12/14 20:43:30 ptsarenko Exp $
  */
 
 /*
@@ -8,6 +8,7 @@
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ * SERBIAN collating sequence done by Srdjan Dragojlovic <digikv@yahoo.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,17 +59,38 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
+#define NUMBER_OF_CHARACTERS  30    /* The number of single characters in the
+                                       alphabet, two-as-one aren't considered
+                                       here, accented - are considered. */
+#define IS_LATIN               0    /* Should be 1, if the national alphabet
+                                       is based on Latin */
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+                                       has the same weight as appropriate
+                                       unaccented. */
+#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
+                                       sort after their unaccented counterparts
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
+                                       ( interleaving ) */
+
+/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
+   accented characters with the symbol '~' before each of them, for example:
+      a~€
+   If there is two-character sequence, which is considered as one, it should
+   be marked with '.' before and after it, for example:
+      ... h.ch.i ...
+
+   The Upper case string and the Lower case string should be absolutely the
+   same excepting the characters case, of course.
+ */
+
 static HB_CODEPAGE s_codepage = { "SRWIN",
-    CPID_1251,UNITB_1251,32,
-    "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß",
-    "àáâãäåæçèéêëìíîïğñòóôõö÷øùúûüışÿ",
-    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
+   HB_CPID_1251, HB_UNITB_1251, NUMBER_OF_CHARACTERS,
+   "ÀÁÂÃÄ€ÅÆÇÈ£ÊËŠÌÍŒÎÏĞÑÒÓÔÕÖ×Ø",
+   "àáâãäåæçè¼êëšìíœîïğñòóôõö÷Ÿø",
+   IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( SRWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SRWIN )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SRWIN )
+HB_CODEPAGE_INIT( SRWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_SRWIN
@@ -82,4 +104,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_SRWIN )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SRWIN = hb_codepage_Init_SRWIN;
    #pragma data_seg()
 #endif
-

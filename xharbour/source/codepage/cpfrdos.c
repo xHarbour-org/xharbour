@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: cpfrdos.c,v 1.1 2005/12/11 12:36:58 druzus Exp $
  */
 
 /*
@@ -86,16 +86,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "FR",
-    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
+    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
     "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ",
     "a†ÖÉÑbcdeÇäàâfghi°çåãjklmno¢ïìîpqrstu£óñÅvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( FR );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_FR )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_FR )
+HB_CODEPAGE_INIT( FR )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_FR

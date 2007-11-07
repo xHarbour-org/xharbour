@@ -1,5 +1,5 @@
 /*
- * $Id: cptrwin.c,v 1.1 2006/12/19 21:48:45 druzus Exp $
+ * $Id: cptrwin.c,v 1.1 2007/01/09 22:05:22 druzus Exp $
  */
 
 /*
@@ -84,7 +84,7 @@
  */
 
 static HB_CODEPAGE s_codepage = { "TRWIN",
-    CPID_1254,UNITB_1254,NUMBER_OF_CHARACTERS,
+    HB_CPID_1254,HB_UNITB_1254,NUMBER_OF_CHARACTERS,
     "AÂBCÇDEÊFGÐHIÝÎJKLMNOÔÖPRSÞTUÛÜVYZ", 
     "aâbcçdeêfgðhýiîjklmnoôöprsþtuûüvyz", 
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };

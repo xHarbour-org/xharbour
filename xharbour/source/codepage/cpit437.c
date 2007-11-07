@@ -1,5 +1,5 @@
 /*
- * $Id: cpit437.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: cpit437.c,v 1.5 2006/01/12 13:15:59 druzus Exp $
  */
 
 /*
@@ -83,16 +83,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "IT437",
-    CPID_437, UNITB_437, NUMBER_OF_CHARACTERS,
+    HB_CPID_437, HB_UNITB_437, NUMBER_OF_CHARACTERS,
     "AAAAAéèBCDEEêFGHIIIJKLMNOOOPQRSTUUUVWXYZ",
     "aaÖ†ÉÑÜbcdeäÇfghiç°jklmnoï¢pqrstuó£vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( IT437 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_IT437 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_IT437 )
+HB_CODEPAGE_INIT( IT437 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_IT437

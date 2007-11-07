@@ -1,5 +1,5 @@
 /*
- * $Id: ucmik.c,v 1.1 2005/11/19 15:52:04 likewolf Exp $
+ * $Id: ucmik.c,v 1.2 2005/12/11 12:36:58 druzus Exp $
  */
 
 /*
@@ -90,4 +90,4 @@ static USHORT uniCodes[NUMBER_OF_CHARS] = {
    0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0,
 };
 
-HB_UNITABLE hb_uniTbl_MIK = { CPID_MIK, NUMBER_OF_CHARS, FALSE, uniCodes };
+HB_UNITABLE hb_uniTbl_MIK = { HB_CPID_MIK, NUMBER_OF_CHARS, FALSE, uniCodes };

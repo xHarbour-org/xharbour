@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.3 2005/07/08 17:51:39 druzus Exp $
+# $Id: Makefile,v 1.4 2005/09/02 22:29:38 druzus Exp $
 #
 
 ifeq ($(HB_MAIN),)
@@ -26,6 +26,7 @@ LIBS=\
 	macro \
 	pp \
 	common \
+	codepage \
 	ct \
 
 ifeq ($(HB_ARCHITECTURE),OS2)

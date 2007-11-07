@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5759 2007/11/05 10:26:48 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5760 2007/11/07 20:20:54 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,124 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-08 02:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapicdp.h
+  * include/hbextern.ch
+  * source/codepage/Makefile
+  * source/codepage/cp_tpl.c
+  * source/codepage/cpbgmik.c
+  * source/codepage/cpbgwin.c
+  * source/codepage/cpcskam.c
+  * source/codepage/cpeldos.c
+  * source/codepage/cpelwin.c
+  * source/codepage/cpesdos.c
+  * source/codepage/cpesmwin.c
+  * source/codepage/cpeswin.c
+  * source/codepage/cpfrdos.c
+  * source/codepage/cpgedos.c
+  * source/codepage/cpgewin.c
+  * source/codepage/cphr1250.c
+  * source/codepage/cphr437.c
+  * source/codepage/cphr852.c
+  * source/codepage/cphu852.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cpit437.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpltwin.c
+  * source/codepage/cppl852.c
+  * source/codepage/cppliso.c
+  * source/codepage/cpplmaz.c
+  * source/codepage/cpplwin.c
+  * source/codepage/cppt850.c
+  * source/codepage/cpptiso.c
+  * source/codepage/cpru866.c
+  * source/codepage/cprukoi.c
+  * source/codepage/cpruwin.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpsv850.c
+  * source/codepage/cpsvclip.c
+  * source/codepage/cpsvwin.c
+  * source/codepage/cptrdos.c
+  * source/codepage/cptrwin.c
+  * source/codepage/cpua866.c
+  * source/codepage/cpuakoi.c
+  * source/codepage/cpuawin.c
+  * source/codepage/uc1250.c
+  * source/codepage/uc1251.c
+  * source/codepage/uc1253.c
+  * source/codepage/uc1254.c
+  * source/codepage/uc1257.c
+  * source/codepage/uc737.c
+  * source/codepage/uc850.c
+  * source/codepage/uc852.c
+  * source/codepage/uc857.c
+  * source/codepage/uc866.c
+  * source/codepage/uc88591b.c
+  * source/codepage/uc8859_1.c
+  * source/codepage/uc8859_2.c
+  * source/codepage/uc8859_5.c
+  * source/codepage/uckam.c
+  * source/codepage/uckoi8.c
+  * source/codepage/uckoi8u.c
+  * source/codepage/ucmaz.c
+  * source/codepage/ucmik.c
+  * source/rtl/cdpapi.c
+  * utils/hbrun/Makefile
+  * utils/xbscript/Makefile
+    * updated unicode tables for codes 0-31 to point at DOS characters
+    * changed accented character handling and multibyte character
+      comparison to make some operations like:
+         dbSeek(cVal)
+         while ordKeyVal() = cVal
+            ...
+         enddo
+      safe also with such CDPs
+    ! Synced HU WIN and HU ISO codepage lower/uppercase
+      strings with HU 852, so that hb_Translate() works
+      properly. (this means there are now several duplicate
+      chars included in the WIN/ISO versions, along with
+      a non-HU char, all just needed to stay compatible with
+      original CA-Cl*pper HU/852 index ordering and keep
+      hb_Translate() working at the same time.)
+      IMO, we'd need to introduce a separate "collation"
+      string in each cp file to detach index ordering
+      from upper/lowercase and codepage translation without
+      any hacks, since as this example shows these two
+      are not always in sync. (or, as an alternative we might
+      want to make codepage translation more sophisticated,
+      like converting first to unicode and convert back to
+      the other codepage from unicode, but that leads a bit
+      further.). (If I'm missing something, pls don't hesitate
+      to clarify)
+    + Added SixDriver compatible HU ISO/WIN codepage files
+      for the reasons described above.
+    ! #define namespace issue in public API header file 
+      corrected:
+      CPID_* -> HB_CPID_*
+      UNITB_* -> HB_UNITB_*
+    Almost everything synced with Harbour changes by Viktor Szakats and
+    Przemyslaw Czerpak except where xHarbour had better codepage coverage.
+  + source/codepage/cpbg866.c
+  + source/codepage/cpbgiso.c
+  + source/codepage/cpcs852.c
+  + source/codepage/cpcsiso.c
+  + source/codepage/cpcswin.c
+  + source/codepage/cphu852s.c
+  + source/codepage/cphuiso.c
+  + source/codepage/cphuisos.c
+  + source/codepage/cphuwins.c
+  + source/codepage/cpsk852.c
+  + source/codepage/cpskiso.c
+  + source/codepage/cpskkam.c
+  + source/codepage/cpskwin.c
+  + source/codepage/cpsl437.c
+    + Added new codepages from Harbour.
 
 2007-11-07 23:18 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c

@@ -1,5 +1,5 @@
 /*
- * $Id: cpsliso.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpsliso.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -64,13 +64,13 @@
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -85,16 +85,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "SLISO",
-    CPID_8859_2,UNITB_8859_2,NUMBER_OF_CHARACTERS,
+    HB_CPID_8859_2, HB_UNITB_8859_2, NUMBER_OF_CHARACTERS,
     "ABCÈÆDÐEFGHIJKLMNOPQRS©TUVWZ®XY",
-    "abcèdðefghijklmnopqrs¹tuvwz¾xy",
+    "abcèædðefghijklmnopqrs¹tuvwz¾xy",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( SLISO );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SLISO )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SLISO )
+HB_CODEPAGE_INIT( SLISO )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_SLISO
@@ -108,4 +104,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_SLISO )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SLISO = hb_codepage_Init_SLISO;
    #pragma data_seg()
 #endif
-

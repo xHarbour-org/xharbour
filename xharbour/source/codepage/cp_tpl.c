@@ -1,5 +1,5 @@
 /*
- * $Id: cp_tpl.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cp_tpl.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -58,18 +58,24 @@
 #include "hbapi.h"
 #include "hbapicdp.h"
 
+/* NOTE: In order to codepage translate work in Harbour, you must 
+         ensure that the NUMBER_OF_CHARACTERS and the order of the 
+         lowercase/uppercase chars are exactly matching in every 
+         codepage that belong to the same language.
+         [vszakats] */
+
 #define NUMBER_OF_CHARACTERS  26    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -84,16 +90,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "EN",
-    CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
+    HB_CPID_437,HB_UNITB_437,NUMBER_OF_CHARACTERS,
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
     "abcdefghijklmnopqrstuvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( EN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_EN )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_EN )
+HB_CODEPAGE_INIT( EN )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_EN

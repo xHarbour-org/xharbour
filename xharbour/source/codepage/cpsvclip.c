@@ -1,11 +1,13 @@
 /*
+ * $Id$
+ */
+
+/*
  * Harbour Project source code:
- * National Collation Support Module ( SVCLIP )
+ * National Collation Support Module (SVCLIP - Clipper compatible)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2006 Klas Engwall <klas dot engwall at engwall dot com>
  * www - http://www.harbour-project.org
- * Swedish collating sequence (Clipper compatible) done 2006
- * by Klas Engwall <klas dot engwall at engwall dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,16 +106,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "SVCLIP",
-    CPID_437,UNITB_437,NUMBER_OF_CHARACTERS,
+    HB_CPID_437,HB_UNITB_437,NUMBER_OF_CHARACTERS,
     "ABCDEêFGHIJKLMNOPQRSTUVWXYöZèéô",
     "abcdeäfghijklmnopqrstuvwxyÅzÜÑî",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( SVCLIP );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SVCLIP )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SVCLIP )
+HB_CODEPAGE_INIT( SVCLIP )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_SVCLIP
@@ -127,4 +125,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_SVCLIP )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SVCLIP = hb_codepage_Init_SVCLIP;
    #pragma data_seg()
 #endif
-

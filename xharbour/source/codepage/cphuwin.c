@@ -1,12 +1,12 @@
 /*
- * $Id: cphuwin.c,v 1.2 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cphuwin.c,v 1.3 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( HUWIN )
+ * National Collation Support Module (HUWIN)
  *
- * Copyright 1999-2004 Viktor Szakats <viktor.szakats@syenar.hu>
+ * Copyright 1999-2005 Viktor Szakats <viktor.szakats@syenar.hu>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -52,24 +52,24 @@
 
 /* Language name: Hungarian */
 /* ISO language code (2 chars): HU */
-/* Codepage: Windows-1250 */
+/* Codepage: Windows-1250 (ntxhu852 compatible) */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  35    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  42    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -83,17 +83,26 @@
    same excepting the characters case, of course.
  */
 
+/* NOTE: Several chars have been added above the standard 852 Hungarian 
+         ones to make it 100% compatible with ntxhu852.obj for CA-Cl*pper 5.x.
+         Moreover the extra chars had to be replicated in the alternative 
+         codepages (WIN, ISO) too, to keep the Harbour codepage translation 
+         work. [vszakats] */
+
+/* NOTE: Since there is no possibility in Harbour to have different number 
+         of uppercase and lowercase accented chars, a simple workaround 
+         was used to solve the problem; notice that some uppercase chars 
+         have the same lowercase values. Testing showed that both the 
+         ordering and Lower()/Upper() functions worked alright.
+         [20070410] [vszakats] */
+
 static HB_CODEPAGE s_codepage = { "HUWIN",
-    CPID_1250,UNITB_1250,NUMBER_OF_CHARACTERS,
-    "AÁBCDEÉFGHIÍJKLMNOÓÖÕPQRSTUÚÜÛVWXYZ",
-    "aábcdeéfghiíjklmnoóöõpqrstuúüûvwxyz",
+    HB_CPID_1250, HB_UNITB_1250, NUMBER_OF_CHARACTERS,
+    "AÁÁÄBCDEÉFGHIÍÍJKLMNOÓÓÖÕÕPQRSTUÚÚÜÛÛVWXYZ",
+    "aááäbcdeéfghiííjklmnoóóöõõpqrstuúúüûûvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( HUWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HUWIN )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_HUWIN )
+HB_CODEPAGE_INIT( HUWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_HUWIN

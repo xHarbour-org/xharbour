@@ -1,11 +1,13 @@
 /*
+ * $Id$
+ */
+
+/*
  * Harbour Project source code:
- * National Collation Support Module ( SV850 )
+ * National Collation Support Module (SV850 - correct Swedish but not Clipper compatible)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2006 Klas Engwall <klas dot engwall at engwall dot com>
  * www - http://www.harbour-project.org
- * Swedish collating sequence (correct Swedish but not Clipper compatible)
- * done 2006 by Klas Engwall <klas dot engwall at engwall dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,16 +91,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "SV850",
-    CPID_850,UNITB_850,NUMBER_OF_CHARACTERS,
+    HB_CPID_850,HB_UNITB_850,NUMBER_OF_CHARACTERS,
     "A~µ~∑~∂~«BC~ÄDE~ê~‘~“~”FGHI~÷~ﬁ~◊~ÿJKLMN~•O~‡~„~‚~ÂPQRSTU~È~Î~ÍV~WXY~Ì~öZèé~íô~ù",
     "a~†~Ö~É~∆bc~áde~Ç~ä~à~âfghi~°~ç~å~ãjklmn~§o~¢~ï~ì~‰pqrstu~£~ó~ñv~wxy~Ï~ÅzÜÑ~ëî~õ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( SV850 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SV850 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SV850 )
+HB_CODEPAGE_INIT( SV850 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_SV850
@@ -112,4 +110,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_SV850 )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SV850 = hb_codepage_Init_SV850;
    #pragma data_seg()
 #endif
-

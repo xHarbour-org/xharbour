@@ -1,5 +1,5 @@
 /*
- * $Id: cpitisb.c,v 1.6 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: cpitisb.c,v 1.7 2005/10/31 18:41:22 lf_sfnet Exp $
  */
 
 /*
@@ -85,16 +85,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "ITISB",
-    CPID_8859_1B, UNITB_8859_1B, NUMBER_OF_CHARACTERS,
+    HB_CPID_8859_1B, HB_UNITB_8859_1B, NUMBER_OF_CHARACTERS,
     "A¿¡¬√ƒ≈BCDE»…FGHIÃÕJKLMNO“”PQRSTUŸ⁄VWXYZ",
     "a‡·‚„‰ÂbcdeËÈfghiÏÌjklmnoÚÛpqrstu˘˙vwxyz",        
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( ITISB );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ITISB )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ITISB )
+HB_CODEPAGE_INIT( ITISB )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_ITISB

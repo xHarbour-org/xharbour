@@ -1,5 +1,5 @@
 /*
- * $Id: cpesdos.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpesdos.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
  */
 
 /*
@@ -75,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~Ä
+    a~Ä
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,17 +84,13 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ES",
-    CPID_850, UNITB_850, NUMBER_OF_CHARACTERS,
-    "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ",
-    "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
+static HB_CODEPAGE s_codepage = { "ES", 
+   HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
+   "AµBCDEêFGHI÷JKLMN•O‡PQRSTUÈöVWXYZ", 
+   "a†bcdeÇfghi°jklmn§o¢pqrstu£Åvwxyz",
+   IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( ES );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ES )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ES )
+HB_CODEPAGE_INIT( ES )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_ES

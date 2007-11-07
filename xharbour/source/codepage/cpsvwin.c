@@ -1,11 +1,13 @@
 /*
+ * $Id$
+ */
+
+/*
  * Harbour Project source code:
- * National Collation Support Module ( Swedish WIN )
+ * National Collation Support Module (SVWIN)
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2006 Klas Engwall <klas dot engwall at engwall dot com>
  * www - http://www.harbour-project.org
- * Swedish collating sequence done 2006 by Klas Engwall
- * <klas dot engwall at engwall dot com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,16 +84,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "SVWIN",
-    CPID_8859_1,UNITB_8859_1,NUMBER_OF_CHARACTERS,
+    HB_CPID_8859_1,HB_UNITB_8859_1,NUMBER_OF_CHARACTERS,
     "A~Á~À~Â~ÃBC~ÇD~ÐE~É~È~Ê~ËFGHI~Í~Ì~Î~ÏJKLMN~ÑO~Ó~Ò~Ô~ÕPQRSTU~Ú~Ù~ÛV~WXY~Ý~Ÿ~ÜZÅÄ~ÆÖ~Ø~Œ",
     "a~á~à~â~ãbc~çd~ðe~é~è~ê~ëfghi~í~ì~î~ïjklmn~ño~ó~ò~ô~õpqrstu~ú~ù~ûv~wxy~ý~ÿ~üzåä~æö~ø~œ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( SVWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_SVWIN )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_SVWIN )
+HB_CODEPAGE_INIT( SVWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_SVWIN
@@ -105,4 +103,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_SVWIN )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_SVWIN = hb_codepage_Init_SVWIN;
    #pragma data_seg()
 #endif
-

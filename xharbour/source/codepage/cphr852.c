@@ -1,5 +1,5 @@
 /*
- * $Id: cphr852.c,v 1.5 2006/04/06 19:22:02 paultucker Exp $
+ * $Id: cphr852.c,v 1.5 2006/10/09 19:23:44 ptsarenko Exp $
  */
 
 /*
@@ -87,16 +87,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "HR852",
-    CPID_852,UNITB_852,NUMBER_OF_CHARACTERS,
+    HB_CPID_852,HB_UNITB_852,NUMBER_OF_CHARACTERS,
     "ABC¨èD—EFGHIJKLMNOPQRSÊTUVWXYZ¶",
     "abcüÜd–efghijklmnopqrsÁtuvwxyzß",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( HR852 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_HR852 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_HR852 )
+HB_CODEPAGE_INIT( HR852 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_HR852

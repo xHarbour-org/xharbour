@@ -1,5 +1,5 @@
 /*
- * $Id: cpeldos.c,v 1.2 2004/12/31 11:55:49 druzus Exp $
+ * $Id: cpeldos.c,v 1.3 2005/03/06 19:22:02 paultucker Exp $
 */
 
 /*
@@ -84,12 +84,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "EL",
-    CPID_737, UNITB_737, NUMBER_OF_CHARACTERS,
+    HB_CPID_737, HB_UNITB_737, NUMBER_OF_CHARACTERS,
     "А~ъБВГДыЕЖ~ьЗИ~эЙКЛМНО~юПРССТУ~яФХЦЧ~Ё",
     "Ш~сЩЪЫЬ~тЭЮ~уЯа~хбвгдеж~цзийклм~чнопр~щ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( EL );
+HB_CODEPAGE_INIT( EL )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_EL
@@ -103,4 +103,3 @@ HB_CODEPAGE_INIT( EL );
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_EL = hb_codepage_Init_EL;
    #pragma data_seg()
 #endif
-

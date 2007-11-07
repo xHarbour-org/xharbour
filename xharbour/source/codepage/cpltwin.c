@@ -1,5 +1,5 @@
 /*
- * $Id: cpltwin.c,v 1.3 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpltwin.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -86,16 +86,12 @@
  */
 
 static HB_CODEPAGE s_codepage = { "LT",
-    CPID_1257,UNITB_1257,NUMBER_OF_CHARACTERS,
+    HB_CPID_1257,HB_UNITB_1257,NUMBER_OF_CHARACTERS,
     "AÀBCÈDEÆËFGHIÁYJKLMNOPQRSÐTUØÛVWXZÞ",
     "aàbcèdeæëfghiáyjklmnopqrsðtuøûvwxzþ",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( LT );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_LT )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_LT )
+HB_CODEPAGE_INIT( LT )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_LT

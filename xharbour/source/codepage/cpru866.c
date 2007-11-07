@@ -1,5 +1,5 @@
 /*
- * $Id: cpru866.c,v 1.4 2005/02/28 10:17:29 andijahja Exp $
+ * $Id: cpru866.c,v 1.5 2005/03/06 19:22:03 paultucker Exp $
  */
 
 /*
@@ -59,16 +59,12 @@
 #include "hbapicdp.h"
 
 static HB_CODEPAGE s_codepage = { "RU866",
-    CPID_866,UNITB_866,36,
+    HB_CPID_866, HB_UNITB_866, 36,
     "€‚ƒ„…†‡‰‹‘’“”•–—™›πςτφ",
     " ΅Ά£¤¥¦§¨©ª«¬­®―ΰαβγδεζηθικλμνξορσυχ",
     0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-HB_CODEPAGE_ANNOUNCE( RU866 );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_RU866 )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU866 )
+HB_CODEPAGE_INIT( RU866 )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_RU866
@@ -82,4 +78,3 @@ HB_CALL_ON_STARTUP_END( hb_codepage_Init_RU866 )
    static HB_$INITSYM hb_vm_auto_hb_codepage_Init_RU866 = hb_codepage_Init_RU866;
    #pragma data_seg()
 #endif
-
