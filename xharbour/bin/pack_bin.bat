@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: pack_bin.bat,v 1.11 2006/12/13 02:35:04 ronpinkas Exp $
+rem $Id: pack_bin.bat,v 1.12 2007/10/31 03:07:48 patrickmast Exp $
 rem
 
 rem RDDADS separate from this, include headers and readme
@@ -56,6 +56,7 @@ if     "%hb_compiler%"     == "bcc32"   %hb_archbin% %hb_archopt%  %hb_filename%
 if     "%hb_compiler%"     == "msvc"    %hb_archbin% %hb_archopt%  %hb_filename% bin/bld_vc*.bat
 if     "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/*.
 if not "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/harbour.exe
+if not "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/hbmake.exe
 rem if not "%hb_architecture%" == "linux"   %hb_archbin% %hb_archopt%  %hb_filename% bin/*.EXE
                                         %hb_archbin% %hb_archoptr% %hb_filename% doc/*.txt doc/en/*.txt doc/es/*.txt
                                         %hb_archbin% %hb_archopt%  %hb_filename% include/*.api
