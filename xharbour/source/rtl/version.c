@@ -1,5 +1,5 @@
 /*
- * $Id: version.c,v 1.12 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: version.c,v 1.13 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -129,11 +129,11 @@ HB_FUNC( HB_BUILDINFO )
       char * szInfo = hb_arrayGetC( &hbInfo, ui + 1 );
       int iLen = strlen( szInfo );
 
-      if( hb_strnicmp( szInfo, "yes", 3 ) == 0 )
+      if( hb_stricmp( szInfo, "yes" ) == 0 )
       {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, TRUE ) );
       }
-      else if( hb_strnicmp( szInfo, "no", 2 ) == 0 )
+      else if( hb_stricmp( szInfo, "no" ) == 0 )
       {
          hb_arraySetForward( &Return, ui + 1, hb_itemPutL( &Temp, FALSE ) );
       }

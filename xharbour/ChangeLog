@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5760 2007/11/07 20:20:54 likewolf Exp $
+ * $Id: ChangeLog,v 1.5761 2007/11/07 23:34:24 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-10 00:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/version.c
+    ! Fixed a miscomparison which made HB_BUILDINFO( _HB_VER_BUILD_DATE )
+      fail in November builds of any year ;)
 
 2007-11-08 02:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapicdp.h
