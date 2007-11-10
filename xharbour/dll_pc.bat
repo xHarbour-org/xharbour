@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: dll_pc.bat,v 1.8 2006/05/01 23:37:56 modalsist Exp $
+rem $Id: dll_pc.bat,v 1.9 2007/03/11 00:16:20 modalsist Exp $
 rem
 rem Batch file to build harbour.dll for Pelles C
 rem
@@ -32,7 +32,7 @@ SET OBJ_DIR=%HB_DIR%\obj\pocc\dll
 SET LIB_DIR=%HB_DIR%\lib\pocc
 SET BIN_DIR=%HB_DIR%\bin\pocc
 
-SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
+IF %BISON_SIMPLE%.==. SET BISON_SIMPLE=%BISON_DIR%\share\bison\bison.simple
 
 if "%1" == "clean" goto CLEAN
 if "%1" == "CLEAN" goto CLEAN
@@ -140,7 +140,7 @@ if "%1" == "/CLEAN" goto CLEAN
 rem SET CC_DIR=
 rem SET HB_DIR=
 SET BISON_DIR=
-SET BISON_SIMPLE=
+rem SET BISON_SIMPLE=
 
 SET OBJ_DIR=
 SET LIB_DIR=

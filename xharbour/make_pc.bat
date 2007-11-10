@@ -1,5 +1,5 @@
 @ECHO OFF
-rem $Id: make_pc.bat,v 1.17 2007/03/11 00:17:48 modalsist Exp $
+rem $Id: make_pc.bat,v 1.18 2007/07/06 13:11:34 modalsist Exp $
 rem
 rem Make batch file for Pelles C compiler.
 rem
@@ -380,7 +380,7 @@ if "%1" == "MT"  goto MT
 rem SET CC_DIR=
 rem SET HB_DIR=
 SET BISON_DIR=
-SET BISON_SIMPLE=
+rem SET BISON_SIMPLE=
 
 SET OBJ_DIR=
 SET LIB_DIR=

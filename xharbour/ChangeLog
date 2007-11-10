@@ -8,10 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
-2007-11-10 00:05 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
-  * source/rtl/version.c
-    ! Fixed a miscomparison which made HB_BUILDINFO( _HB_VER_BUILD_DATE )
-      fail in November builds of any year ;)
+2007-11-09 22:36 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * ./dll_pc.bat
+  * ./make_pc.bat
+    * BISON_SIMPLE and CC_HRB environment variables will not be cleared.
+      They would be part of the user's environment.
+  * ./hrbdll.pc
+  * ./makefile.pc
+    ! Fixed compilation for new changes.
 
 2007-11-08 02:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapicdp.h
@@ -48,6 +52,13 @@
   * source/codepage/cpru866.c
   * source/codepage/cprukoi.c
   * source/codepage/cpruwin.c
+  * source/codepage/cpsl852.c
+  * source/codepage/cpsliso.c
+  * source/codepage/cpslwin.c
+  * source/codepage/cpsrwin.c
+  * source/codepage/cpsv850.c
+  * source/codepage/cpsvclip.c
+* source/codepage/cpruwin.c
   * source/codepage/cpsl852.c
   * source/codepage/cpsliso.c
   * source/codepage/cpslwin.c

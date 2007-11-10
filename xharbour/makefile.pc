@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.54 2007/09/27 11:09:34 modalsist Exp $
+# $Id: makefile.pc,v 1.55 2007/10/31 08:34:21 marchuet Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -171,7 +171,8 @@ HARBOUR_LIBRARY = \
    $(HBSIX_LIB) \
    $(HSX_LIB) \
    $(PCREPOS_LIB) \
-   $(CT_LIB)
+   $(CT_LIB) \
+   $(CODEPAGE_LIB)
 
 # 旼컴컴컴컴컴컴컴컴컴커
 # � Harbour and CC     넴
@@ -634,6 +635,7 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpuakoi.obj \
    $(OBJ_DIR)\uc1250.obj   \
    $(OBJ_DIR)\uc1251.obj   \
+   $(OBJ_DIR)\uc1254.obj   \
    $(OBJ_DIR)\uc1257.obj   \
    $(OBJ_DIR)\uc850.obj    \
    $(OBJ_DIR)\uc852.obj    \
@@ -645,7 +647,35 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uckoi8u.obj  \
    $(OBJ_DIR)\ucmaz.obj \
    $(OBJ_DIR)\cphu852.obj \
-   $(OBJ_DIR)\cphuwin.obj
+   $(OBJ_DIR)\cphuwin.obj  \
+   $(OBJ_DIR)\cpbg866.obj  \
+   $(OBJ_DIR)\cpbgiso.obj  \
+   $(OBJ_DIR)\cpcs852.obj  \
+   $(OBJ_DIR)\cpcsiso.obj  \
+   $(OBJ_DIR)\cpcskam.obj  \
+   $(OBJ_DIR)\cpcswin.obj  \
+   $(OBJ_DIR)\cpfrdos.obj  \
+   $(OBJ_DIR)\cphu852s.obj \
+   $(OBJ_DIR)\cphuiso.obj  \
+   $(OBJ_DIR)\cphuisos.obj \
+   $(OBJ_DIR)\cphuwins.obj \
+   $(OBJ_DIR)\cpsk852.obj  \
+   $(OBJ_DIR)\cpskiso.obj  \
+   $(OBJ_DIR)\cpskkam.obj  \
+   $(OBJ_DIR)\cpskwin.obj  \
+   $(OBJ_DIR)\cpsl437.obj  \
+   $(OBJ_DIR)\cpsl852.obj  \
+   $(OBJ_DIR)\cpsliso.obj  \
+   $(OBJ_DIR)\cpslwin.obj  \
+   $(OBJ_DIR)\cptrdos.obj  \
+   $(OBJ_DIR)\cptrwin.obj  \
+   $(OBJ_DIR)\uc1253.obj   \
+   $(OBJ_DIR)\uc1257.obj   \
+   $(OBJ_DIR)\uc737.obj    \
+   $(OBJ_DIR)\uc857.obj    \
+   $(OBJ_DIR)\uc8859_5.obj \
+   $(OBJ_DIR)\uckam.obj    \
+   $(OBJ_DIR)\ucmik.obj
 
 LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgen.obj \
@@ -1871,6 +1901,9 @@ $(OBJ_DIR)\uc1250.obj : $(CODEPAGE_DIR)\uc1250.c
 $(OBJ_DIR)\uc1251.obj : $(CODEPAGE_DIR)\uc1251.c
    $(CC_CMD)
 
+$(OBJ_DIR)\uc1254.obj : $(CODEPAGE_DIR)\uc1254.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
    $(CC_CMD)
 
@@ -1905,6 +1938,90 @@ $(OBJ_DIR)\cphu852.obj : $(CODEPAGE_DIR)\cphu852.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cphuwin.obj : $(CODEPAGE_DIR)\cphuwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbg866.obj : $(CODEPAGE_DIR)\cpbg866.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpbgiso.obj : $(CODEPAGE_DIR)\cpbgiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpcs852.obj : $(CODEPAGE_DIR)\cpcs852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpcsiso.obj : $(CODEPAGE_DIR)\cpcsiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpcskam.obj : $(CODEPAGE_DIR)\cpcskam.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpcswin.obj : $(CODEPAGE_DIR)\cpcswin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpfrdos.obj : $(CODEPAGE_DIR)\cpfrdos.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphu852s.obj : $(CODEPAGE_DIR)\cphu852s.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphuiso.obj : $(CODEPAGE_DIR)\cphuiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphuisos.obj : $(CODEPAGE_DIR)\cphuisos.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cphuwins.obj : $(CODEPAGE_DIR)\cphuwins.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsk852.obj : $(CODEPAGE_DIR)\cpsk852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpskiso.obj : $(CODEPAGE_DIR)\cpskiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpskkam.obj : $(CODEPAGE_DIR)\cpskkam.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpskwin.obj : $(CODEPAGE_DIR)\cpskwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsl437.obj : $(CODEPAGE_DIR)\cpsl437.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsl852.obj : $(CODEPAGE_DIR)\cpsl852.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpsliso.obj : $(CODEPAGE_DIR)\cpsliso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cptrdos.obj : $(CODEPAGE_DIR)\cptrdos.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc1253.obj : $(CODEPAGE_DIR)\uc1253.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc1257.obj : $(CODEPAGE_DIR)\uc1257.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc737.obj : $(CODEPAGE_DIR)\uc737.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc857.obj : $(CODEPAGE_DIR)\uc857.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc8859_5.obj : $(CODEPAGE_DIR)\uc8859_5.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uckam.obj : $(CODEPAGE_DIR)\uckam.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
    $(CC_CMD)
 
 # 旼컴컴컴컴컴컴컴컴컴컴컴�
