@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.136 2007/09/15 12:28:05 modalsist Exp $
+ * $Id: tget.prg,v 1.137 2007/09/27 11:09:34 modalsist Exp $
  */
 
 /*
@@ -256,7 +256,7 @@ RETURN Self
 
 METHOD ParsePict( cPicture ) CLASS Get
 
-   Local cChar
+   Local cChar, cMask
    Local nAt
    Local nFor
    Local cNum := ""
@@ -477,9 +477,19 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::decpos := NIL
 
          // 2006/DEC/11 - EF - changed ::cPicMask to uppercase if ::type is character.
-         //IF ::type == 'L'
-         IF ::type == 'L' .OR. ::type == 'C'
+         // 2007/NOV/06 - EF - toggle to uppercase only template chars of the mask.
+         IF ::type == 'L'
             ::cPicMask := Upper( ::cPicMask )
+         ELSEIF ::type == 'C'
+            cMask := ::cPicMask
+            ::cPicMask := ""
+            FOR EACH cChar IN cMask
+                if cChar $ "alnxy"
+                   ::cPicMask += Upper( cChar )
+                else
+                   ::cPicMask += cChar
+                endif
+            NEXT
          ENDIF
       endif
 //   endif

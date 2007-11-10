@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5763 2007/11/10 04:38:32 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5764 2007/11/10 05:15:38 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-10 08:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed ParsePict() method to toggle mask to uppercase only if the
+      character is a template character like "ALNXY". Bug reported on
+      the comp.lang.xharbour news.
 
 2007-11-09 23:13 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./makefile.bc
