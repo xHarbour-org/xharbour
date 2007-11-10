@@ -1,5 +1,5 @@
 /*
- * $Id: disksphb.c,v 1.11 2007/09/03 18:04:27 paultucker Exp $
+ * $Id: disksphb.c,v 1.12 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -62,12 +62,7 @@
 #include "hbapierr.h"
 #include "hbapifs.h"
 
-#if defined(HB_OS_BSD)
-#  include <sys/param.h>
-#  include <sys/mount.h>
-#elif defined(HB_OS_SUNOS)
-#  include <sys/statvfs.h>
-#elif defined(HB_OS_UNIX)
+#if defined(HB_OS_UNIX)
 #  if defined(__WATCOMC__)
 #     include <sys/stat.h>
 #  else

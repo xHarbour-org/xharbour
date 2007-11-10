@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.12 2007/03/28 14:02:31 alexstrickland Exp $
+ * $Id: seconds.c,v 1.13 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ HB_EXPORT void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
    *plJulian = hb_dateEncode( st.wYear, st.wMonth, st.wDay );
    *plMilliSec = ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
                  st.wMilliseconds;
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) && !defined( __WATCOMC__ ) ) || defined( HB_OS_BSD )
    struct timeval tv;
    struct tm st;
    time_t seconds;
@@ -96,19 +96,6 @@ HB_EXPORT void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
    *plJulian = hb_dateEncode( st.tm_year + 1900, st.tm_mon + 1, st.tm_mday );
    *plMilliSec = ( ( st.tm_hour * 60 + st.tm_min ) * 60 + st.tm_sec ) * 1000 +
                  tv.tv_usec / 1000;
-#elif defined( HB_OS_BSD )
-   struct timeval tv;
-   struct tm * st;
-   time_t seconds;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateTimeStamp(%p,%p)", plJulian, plMilliSec));
-
-   gettimeofday( &tv, NULL );
-   seconds = tv.tv_sec;
-   st = localtime( &seconds );
-   *plJulian = hb_dateEncode( st->tm_year + 1900, st->tm_mon + 1, st->tm_mday );
-   *plMilliSec = ( ( st->tm_hour * 60 + st->tm_min ) * 60 + st->tm_sec ) * 1000 +
-                 tv->tv_usec / 1000.0;
 #else
    struct timeb tb;
    struct tm * st;
@@ -139,7 +126,7 @@ HB_EXPORT double hb_dateSeconds( void )
           ( SystemTime.wMinute * 60 ) +
             SystemTime.wSecond +
           ( ( double ) SystemTime.wMilliseconds / 1000.0 );
-#elif defined( HB_OS_LINUX ) && !defined( __WATCOMC__ )
+#elif ( defined( HB_OS_LINUX ) && !defined( __WATCOMC__ ) ) || defined( HB_OS_BSD )
    struct timeval tv;
    struct tm oTime;
    time_t seconds;
@@ -152,20 +139,6 @@ HB_EXPORT double hb_dateSeconds( void )
    return ( oTime.tm_hour * 3600 ) +
           ( oTime.tm_min * 60 ) +
             oTime.tm_sec +
-          ( ( double ) tv.tv_usec / 1000000.0 );
-#elif defined( HB_OS_BSD )
-   struct timeval tv;
-   struct tm * oTime;
-   time_t seconds;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_dateSeconds()"));
-
-   gettimeofday( &tv, NULL );
-   seconds = tv.tv_sec;
-   oTime = localtime( &seconds );
-   return ( oTime->tm_hour * 3600 ) +
-          ( oTime->tm_min * 60 ) +
-            oTime->tm_sec +
           ( ( double ) tv.tv_usec / 1000000.0 );
 #else
    struct timeb tb;
