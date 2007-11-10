@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.7 2007/05/27 14:07:27 likewolf Exp $
+# $Id: make_xmingw.sh,v 1.8 2007/06/03 13:01:01 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -24,6 +24,7 @@ export C_USR="$CC_C_USR $C_USR"
 export CC_PRG_USR="-D__PLATFORM__Windows -undef:__PLATFORM__UNIX -undef:__PLATFORM__$UNAME"
 export PRG_USR="$CC_PRG_USR $PRG_USR"
 
+HOST=linux
 if [ -f /etc/debian_version ]; then
     MINGW_PREFIX=/usr
     TARGET=i586-mingw32msvc
@@ -36,6 +37,7 @@ elif [ "$UNAME" = "FreeBSD" ]; then
     MINGW_PREFIX=/usr/local/mingw32
     TARGET="."
     CCPREFIX=""
+    HOST=bsd
 elif find /usr/local/bin -name "i[3456]86-mingw*-gcc" -maxdepth 1 &>/dev/null; then
     MINGW_PREFIX=/usr/local
     TARGET=`find /usr/local/bin -name "i[3456]86-mingw*-gcc" -maxdepth 1|sed -e '1 !d' -e 's/.*\(i[3456]86-mingw[^-]*\).*/\1/g'`
@@ -60,7 +62,7 @@ else
     exit 1
 fi
 
-(cd `dirname $0`; ln -s `pwd`/source/pp/linux/gcc/ppgen ${HB_BIN_COMPILE}/ppgen.exe)
+(cd `dirname $0`; ln -s `pwd`/source/pp/$HOST/gcc/ppgen ${HB_BIN_COMPILE}/ppgen.exe)
 export HB_PPGEN_PATH=${HB_BIN_COMPILE}
 
 export PATH CCPATH CCPREFIX
