@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.23 2007/05/29 21:20:03 peterrees Exp $
+ * $Id: win32prn.prg,v 1.22 2007/02/21 19:50:52 peterrees Exp $
  */
 
 /*
@@ -69,11 +69,13 @@
 
   Peter Rees 21 January 2004 <peter@rees.co.nz>
 
+  Peter Rees - 20/07/2007 added support for Custom Forms
+
 */
 
 #ifndef __PLATFORM__Windows
 
-   Function Win32Prn()
+   Function WIN32PRN()
    Return nil
 
 #else
@@ -222,12 +224,17 @@ CLASS WIN32PRN
   VAR HavePrinted    INIT .F.
   VAR hPrinterDc     INIT 0
 
+  VAR AskProperties  INIT .f.
+
 // These next 4 variables must be set before calling ::Create() if
 // you wish to alter the defaults
   VAR FormType       INIT 0
   VAR BinNumber      INIT 0
   VAR Landscape      INIT .F.
   VAR Copies         INIT 1
+
+  VAR PaperLength    INIT 0                        // Value is * 1/10 of mm   1000 = 10cm
+  VAR PaperWidth     INIT 0                        //   "    "    "     "       "     "
 
   VAR SetFontOk      INIT .F.
   VAR FontName       INIT ""                        // Current Point size for font
@@ -241,28 +248,31 @@ CLASS WIN32PRN
 
   VAR PixelsPerInchY
   VAR PixelsPerInchX
-  VAR PageHeight     INIT 0
-  VAR PageWidth      INIT 0
-  VAR TopMargin      INIT 0
-  VAR BottomMargin   INIT 0
-  VAR LeftMargin     INIT 0
-  VAR RightMargin    INIT 0
-  VAR LineHeight     INIT 0
-  VAR CharHeight     INIT 0
-  VAR CharWidth      INIT 0
-  VAR fCharWidth     INIT 0      HIDDEN
-  VAR BitmapsOk      INIT .F.
-  VAR NumColors      INIT 1
-  VAR fDuplexType    INIT 0      HIDDEN              //DMDUP_SIMPLEX, 22/02/2007 change to 0 to use default printer settings
-  VAR fPrintQuality  INIT 0     HIDDEN              //DMRES_HIGH, 22/02/2007 change to 0 to use default printer settings
-  VAR fNewDuplexType INIT 0      HIDDEN
-  VAR fNewPrintQuality INIT 0   HIDDEN
-  VAR fOldLandScape  INIT .F.    HIDDEN
-  VAR fOldBinNumber  INIT 0      HIDDEN
-  VAR fOldFormType   INIT 0      HIDDEN
+  VAR PageHeight       INIT 0
+  VAR PageWidth        INIT 0
+  VAR TopMargin        INIT 0
+  VAR BottomMargin     INIT 0
+  VAR LeftMargin       INIT 0
+  VAR RightMargin      INIT 0
+  VAR LineHeight       INIT 0
+  VAR CharHeight       INIT 0
+  VAR CharWidth        INIT 0
+  VAR fCharWidth       INIT 0      HIDDEN
+  VAR BitmapsOk        INIT .F.
+  VAR NumColors        INIT 1
 
-  VAR PosX           INIT 0
-  VAR PosY           INIT 0
+  VAR fDuplexType      INIT 0      HIDDEN              //DMDUP_SIMPLEX, 22/02/2007 change to 0 to use default printer settings
+  VAR fPrintQuality    INIT 0      HIDDEN              //DMRES_HIGH, 22/02/2007 change to 0 to use default printer settings
+  VAR fNewDuplexType   INIT 0      HIDDEN
+  VAR fNewPrintQuality INIT 0      HIDDEN
+  VAR fOldLandScape    INIT .F.    HIDDEN
+  VAR fOldBinNumber    INIT 0      HIDDEN
+  VAR fOldFormType     INIT 0      HIDDEN
+  VAR fOldPaperLength  INIT 0      HIDDEN
+  VAR fOldPaperWidth   INIT 0      HIDDEN
+
+  VAR PosX             INIT 0
+  VAR PosY             INIT 0
 
   VAR TextColor
   VAR BkColor
@@ -288,7 +298,23 @@ METHOD Create() CLASS WIN32PRN
     // Set Orientation
     // Set Duplex mode
     // Set PrintQuality
-    SetDocumentProperties(::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber, ::fDuplexType, ::fPrintQuality)
+
+    if !::AskProperties
+       * old code, //x added some error possibility
+       if !SetDocumentProperties(::hPrinterDC, ::PrinterName, ::FormType, ::Landscape, ::Copies, ::BinNumber, ::fDuplexType, ::fPrintQuality, ::PaperLength, ::PaperWidth)
+          ::Destroy()
+          return .f.
+       endif
+    else
+       * pass some vars byref
+       if !SetDocumentProperties(::hPrinterDC, ::PrinterName, @::FormType, @::Landscape, @::Copies, @::BinNumber, @::fDuplexType, @::fPrintQuality, @::PaperLength, @::PaperWidth )
+          * might be an error, or cancelled
+          ::Destroy()
+          return .f.
+       endif
+       * must update fnew* if * was changed
+    endif
+
     // Set mapping mode to pixels, topleft down
     SetMapMode(::hPrinterDC,MM_TEXT)
 //    SetTextCharacterExtra(::hPrinterDC,0); // do not add extra char spacing even if bold
@@ -309,12 +335,18 @@ METHOD Create() CLASS WIN32PRN
     // supports Colour
     ::NumColors := GetDeviceCaps(::hPrinterDC,NUMCOLORS)
 
+
     // Set the standard font
     ::SetDefaultFont()
     ::HavePrinted:= ::Printing:= .F.
     ::fOldFormType:= ::FormType  // Last formtype used
     ::fOldLandScape:= ::LandScape
     ::fOldBinNumber:= ::BinNumber
+    ::fNewDuplexType := ::fDuplexType
+    ::fNewPrintQuality := ::fPrintQuality
+    ::fOldPaperLength  := ::PaperLength
+    ::fOldPaperWidth   := ::PaperWidth
+
     Result:= .T.
   ENDIF
   RETURN(Result)
@@ -359,7 +391,7 @@ METHOD EndDoc(lAbortDoc) CLASS WIN32PRN
 
 METHOD StartPage() CLASS WIN32PRN
   LOCAL lLLandScape, nLBinNumber, nLFormType, nLDuplexType, nLPrintQuality
-  LOCAL lChangeDP:= .F.
+  LOCAL lChangeDP:= .F., nLPaperLength, nLPaperWidth
   IF ::LandScape <> ::fOldLandScape  // Direct-modify property
     lLLandScape:= ::fOldLandScape := ::LandScape
     lChangeDP:= .T.
@@ -380,8 +412,16 @@ METHOD StartPage() CLASS WIN32PRN
     nLPrintQuality:= ::fPrintQuality:= ::fNewPrintQuality
     lChangeDP:= .T.
   ENDIF
+  IF ::fOldPaperLength <> ::PaperLength  // Get/Set property
+    nLPaperLength:= ::fOldPaperLength:= ::PaperLength
+    lChangeDP:= .T.
+  ENDIF
+  IF ::fOldPaperWidth <> ::PaperWidth  // Get/Set property
+    nLPaperWidth:= ::fOldPaperWidth:= ::PaperWidth
+    lChangeDP:= .T.
+  ENDIF
   IF lChangeDP
-    SetDocumentProperties(::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality)
+    SetDocumentProperties(::hPrinterDC, ::PrinterName, nLFormType, lLLandscape, , nLBinNumber, nLDuplexType, nLPrintQuality, nLPaperLength, nLPaperWidth)
   ENDIF
   StartPage(::hPrinterDC)
   ::PosX:= ::LeftMargin
@@ -967,59 +1007,180 @@ HB_FUNC_STATIC(BITMAPSOK)
   }
   hb_retl(Result) ;
 }
-
+/* //x
+  SetDocumentProperties(hPrinterDC, PrinterName, FormType, Landscape, Copies, BinNumber, fDuplexType, fPrintQuality)
+  NOTE: FormType, Landscape, Copies, BinNumber, fDuplexType, fPrintQuality, PaperLength, PaperWidth
+        (3)       (4)        (5)     (6)        (7)          (8)              (9)          (10)
+        may be passed byref.
+        In that case, user will be prompted with Document Properties
+ */
 HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
 {
-  BOOL Result = FALSE ;
+  BOOL bW9X, Result = FALSE ;
   HDC hDC = (HDC) hb_parnl(1) ;
+  OSVERSIONINFO osvi;
+  osvi.dwOSVersionInfoSize = sizeof( OSVERSIONINFO );
+  GetVersionEx ( &osvi );
+  bW9X = ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS ) ;
   if (hDC)
   {
     HANDLE hPrinter ;
     LPTSTR pszPrinterName = hb_parc(2) ;
-    PDEVMODE pDevMode = NULL ;
-    LONG lSize ;
+
     if (OpenPrinter(pszPrinterName, &hPrinter, NULL))
     {
-      lSize= DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,0);
+
+      PDEVMODE pDevMode = NULL ;
+      LONG lSize= DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,0);
+
       if (lSize > 0 )
       {
         pDevMode= (PDEVMODE) hb_xgrab(lSize) ;
-        if (pDevMode )
+
+        if (pDevMode && DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,DM_OUT_BUFFER) == IDOK )  // Get the current settings
         {
-          DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode,DM_OUT_BUFFER) ;
-          if ( ISNUM(3) && hb_parnl(3) ) // 22/02/2007 don't change if 0
+          BOOL  bAskUser = ISBYREF(3) || ISBYREF(4) || ISBYREF(5) ||
+                           ISBYREF(6) || ISBYREF(7) || ISBYREF(8) || ISBYREF(9) || ISBYREF(10) ; //x 20070421
+          DWORD dInit = 0; //x 20070421
+          DWORD fMode ;
+          BOOL bCustomFormSize  = ( ISNUM( 9 ) && hb_parnl( 9 ) > 0 ) && ( ISNUM( 10 ) && hb_parnl( 10 ) > 0 ) ;  // Must set both Length & Width
+
+          if ( bCustomFormSize )
           {
-            pDevMode->dmPaperSize     = ( short ) hb_parnl(3) ;
+              pDevMode->dmPaperLength = ( short ) hb_parnl( 9 ) ;
+              dInit|= DM_PAPERLENGTH ;
+
+              pDevMode->dmPaperWidth = ( short ) hb_parnl( 10 ) ;
+              dInit|= DM_PAPERWIDTH ;
+
+              pDevMode->dmPaperSize     = DMPAPER_USER ;
+              dInit |= DM_PAPERSIZE;
           }
+          else
+          {
+            if ( ISCHAR( 3 ) )    // this doesn't work for Win9X
+            {
+              if ( !bW9X )
+              {
+                BYTE *cForm = hb_parc( 3 ) ;
+                size_t iLen = ( size_t ) hb_parclen( 3 ) ;
+                if ( cForm && iLen && iLen < CCHFORMNAME  )
+                {
+                  memcpy( pDevMode->dmFormName, cForm, iLen + 1 ) ;  // Copy the trailing '\0'
+                  dInit |= DM_FORMNAME ;
+                }
+              }
+            }
+            else if ( ISNUM(3) && hb_parnl(3) ) // 22/02/2007 don't change if 0
+            {
+              pDevMode->dmPaperSize     = ( short ) hb_parnl(3) ;
+              dInit |= DM_PAPERSIZE;
+            }
+          }
+
           if (ISLOG(4))
           {
             pDevMode->dmOrientation   = ( short ) (hb_parl(4) ? 2 : 1) ;
+            dInit |= DM_ORIENTATION;
           }
+
           if (ISNUM(5) && hb_parnl(5) > 0)
           {
             pDevMode->dmCopies        = ( short ) hb_parnl(5) ;
+            dInit |= DM_COPIES;
           }
+
           if ( ISNUM(6) && hb_parnl(6) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmDefaultSource = ( short ) hb_parnl(6) ;
+            dInit |= DM_DEFAULTSOURCE;
           }
+
           if (ISNUM(7)  && hb_parnl(7) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmDuplex = ( short ) hb_parnl(7) ;
+            dInit |= DM_DUPLEX;
           }
+
           if (ISNUM(8) && hb_parnl(8) ) // 22/02/2007 don't change if 0
           {
             pDevMode->dmPrintQuality = ( short ) hb_parnl(8) ;
+            dInit |= DM_PRINTQUALITY;
           }
-          Result= (BOOL) ResetDC(hDC, pDevMode) ;
+
+          fMode = DM_IN_BUFFER|DM_OUT_BUFFER ;
+
+          if ( bAskUser )
+          {
+            fMode |= DM_IN_PROMPT ;
+          }
+
+          pDevMode->dmFields = dInit;
+
+          /* NOTES:
+             For unknown reasons, Windows98/ME returns IDCANCEL if user clicks OK without changing anything in DocumentProperties.
+             Therefore, we ignore the return value in Win9x, and assume user clicks OK.
+             IOW, DocumentProperties is not cancelable in Win9X.
+           */
+          if ( DocumentProperties(0,hPrinter,pszPrinterName, pDevMode,pDevMode, fMode) == IDOK || bW9X )
+          {
+            if (ISBYREF(3) && !bCustomFormSize )
+            {
+              if ( ISCHAR( 3 ) )
+              {
+                if ( !bW9X )
+                {
+                  hb_storc( (char *) pDevMode->dmFormName,3);
+                }
+              }
+              else
+              {
+                hb_stornl( (LONG) pDevMode->dmPaperSize,3);
+              }
+            }
+            if (ISBYREF(4))
+            {
+               hb_storl(pDevMode->dmOrientation==2,4);
+            }
+            if (ISBYREF(5))
+            {
+               hb_stornl( (LONG) pDevMode->dmCopies,5);
+            }
+            if (ISBYREF(6))
+            {
+               hb_stornl( (LONG) pDevMode->dmDefaultSource,6);
+            }
+            if (ISBYREF(7))
+            {
+               hb_stornl( (LONG) pDevMode->dmDuplex,7);
+            }
+            if (ISBYREF(8))
+            {
+               hb_stornl( (LONG) pDevMode->dmPrintQuality,8);
+            }
+            if (ISBYREF(9))
+            {
+               hb_stornl( (LONG) pDevMode->dmPaperLength, 9 ) ;
+            }
+            if (ISBYREF(10))
+            {
+               hb_stornl( (LONG) pDevMode->dmPaperWidth, 10 ) ;
+            }
+
+            Result= (BOOL) ResetDC(hDC, pDevMode) ;
+          }
+
           hb_xfree(pDevMode) ;
         }
       }
+
       ClosePrinter(hPrinter) ;
+
     }
   }
-  hb_retl(Result) ;
+  hb_retl( Result ) ;
 }
+
 
 // Functions for Loading & Printing bitmaps
 
@@ -1093,8 +1254,8 @@ static int CALLBACK FontEnumCallBack(LOGFONT *lplf, TEXTMETRIC *lpntm, DWORD Fon
 
     hb_arrayNew( &SubItems, 4 );
     hb_itemPutC(  hb_arrayGetItemPtr( &SubItems, 1 ), lplf->lfFaceName                      );
-    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 2 ), lplf->lfPitchAndFamily & FIXED_PITCH );
-    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType & TRUETYPE_FONTTYPE         );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 2 ), lplf->lfPitchAndFamily & FIXED_PITCH  );
+    hb_itemPutL(  hb_arrayGetItemPtr( &SubItems, 3 ), FontType && TRUETYPE_FONTTYPE         );
     hb_itemPutNL( hb_arrayGetItemPtr( &SubItems, 4 ), lpntm->tmCharSet                      );
     hb_arrayAddForward( (PHB_ITEM) pArray, &SubItems);
 
@@ -1152,9 +1313,9 @@ HB_FUNC_STATIC( SETPEN )
 {
    HDC hDC = ( HDC ) hb_parnl( 1 );
    HPEN hPen = CreatePen(
-               hb_parni( 2 ),   // pen style
-               hb_parni( 3 ),   // pen width
-               (COLORREF) hb_parnl( 4 )     // pen color
+               hb_parni( 2 ), // pen style
+               hb_parni( 3 ), // pen width
+               (COLORREF) hb_parnl( 4 )   // pen color
                );
    HPEN hOldPen = (HPEN) SelectObject( hDC, hPen);
 

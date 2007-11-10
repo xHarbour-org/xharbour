@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5764 2007/11/10 05:15:38 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5765 2007/11/10 10:03:42 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-10 23:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
+  * source/rtl/win32prn.prg
+    % Added ::AskProperties
+      If it is assigned .t. prior to calling ::Create(), a DocumentProperties dialog will be displayed.
+      Example:
+      oPrinter:= Win32Prn():New(cPrinter)
+      oPrinter:Landscape:= .t.
+      oPrinter:AskProperties := .t.
+      IF !oPrinter:Create()
+         ...
+
+      NOTES:
+      For unknown reasons, Windows98/ME returns IDCANCEL if user clicks OK without changing anything in DocumentProperties.
+      Therefore, we ignore the return value in Win9x, and assume user clicks OK.
+      IOW, DocumentProperties is not cancelable in Win9X.
+
+    % Added support for Custom Forms (by Peter Rees)
+      Changed use of ::FormType - if set to a string instead of a form number
+      it will set the form of that name. It's not supported on Win9X
+
+      e.g. oPrinter:Formtype:= "Custom"
+
+      Added ::PaperLength & ::PaperWidth to allow setting of custom paper
+      sizes without having to predefine the custom form. Both ::PaperLength &
+      ::PaperWidth must be set i.e. neither can be 0
 
 2007-11-10 08:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -131,7 +157,7 @@
       to clarify)
     + Added SixDriver compatible HU ISO/WIN codepage files
       for the reasons described above.
-    ! #define namespace issue in public API header file 
+    ! #define namespace issue in public API header file
       corrected:
       CPID_* -> HB_CPID_*
       UNITB_* -> HB_UNITB_*
