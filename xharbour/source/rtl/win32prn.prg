@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.22 2007/02/21 19:50:52 peterrees Exp $
+ * $Id: win32prn.prg,v 1.25 2007/11/10 16:24:57 bdj Exp $
  */
 
 /*
@@ -1062,7 +1062,7 @@ HB_FUNC_STATIC( SETDOCUMENTPROPERTIES )
             {
               if ( !bW9X )
               {
-                BYTE *cForm = hb_parc( 3 ) ;
+                BYTE *cForm = (BYTE  *) hb_parc( 3 ) ;
                 size_t iLen = ( size_t ) hb_parclen( 3 ) ;
                 if ( cForm && iLen && iLen < CCHFORMNAME  )
                 {
