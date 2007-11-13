@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.206 2007/10/31 12:03:20 marchuet Exp $
+# $Id: makefile.bc,v 1.207 2007/11/10 05:15:38 guerra000 Exp $
 #
 
 #
@@ -940,48 +940,49 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpua866.obj \
    $(OBJ_DIR)\cpuawin.obj \
    $(OBJ_DIR)\cpuakoi.obj \
-   $(OBJ_DIR)\uc1250.obj   \
-   $(OBJ_DIR)\uc1251.obj   \
-   $(OBJ_DIR)\uc1253.obj   \
-   $(OBJ_DIR)\uc1254.obj   \
-   $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc737.obj    \
-   $(OBJ_DIR)\uc850.obj    \
-   $(OBJ_DIR)\uc852.obj    \
-   $(OBJ_DIR)\uc866.obj    \
+   $(OBJ_DIR)\uc1250.obj \
+   $(OBJ_DIR)\uc1251.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1254.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc850.obj \
+   $(OBJ_DIR)\uc852.obj \
+   $(OBJ_DIR)\uc866.obj \
    $(OBJ_DIR)\uc8859_1.obj \
    $(OBJ_DIR)\uc8859_2.obj \
    $(OBJ_DIR)\uc88591b.obj \
-   $(OBJ_DIR)\uckoi8.obj   \
-   $(OBJ_DIR)\uckoi8u.obj  \
-   $(OBJ_DIR)\ucmaz.obj    \
-   $(OBJ_DIR)\cpbg866.obj  \
-   $(OBJ_DIR)\cpbgiso.obj  \
-   $(OBJ_DIR)\cpcs852.obj  \
+   $(OBJ_DIR)\uckoi8.obj \
+   $(OBJ_DIR)\uckoi8u.obj \
+   $(OBJ_DIR)\ucmaz.obj \
+   $(OBJ_DIR)\cpbg866.obj \
+   $(OBJ_DIR)\cpbgiso.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
+   $(OBJ_DIR)\cpcs852.obj \
    $(OBJ_DIR)\cpcsiso.obj  \
-   $(OBJ_DIR)\cpcskam.obj  \
-   $(OBJ_DIR)\cpcswin.obj  \
-   $(OBJ_DIR)\cpfrdos.obj  \
+   $(OBJ_DIR)\cpcskam.obj \
+   $(OBJ_DIR)\cpcswin.obj \
+   $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
-   $(OBJ_DIR)\cphuiso.obj  \
+   $(OBJ_DIR)\cphuiso.obj \
    $(OBJ_DIR)\cphuisos.obj \
    $(OBJ_DIR)\cphuwins.obj \
-   $(OBJ_DIR)\cpsk852.obj  \
-   $(OBJ_DIR)\cpskiso.obj  \
-   $(OBJ_DIR)\cpskkam.obj  \
-   $(OBJ_DIR)\cpskwin.obj  \
-   $(OBJ_DIR)\cpsl437.obj  \
-   $(OBJ_DIR)\cpsl852.obj  \
-   $(OBJ_DIR)\cpsliso.obj  \
-   $(OBJ_DIR)\cpslwin.obj  \
-   $(OBJ_DIR)\cptrdos.obj  \
-   $(OBJ_DIR)\cptrwin.obj  \
-   $(OBJ_DIR)\uc1253.obj   \
-   $(OBJ_DIR)\uc1257.obj   \
-   $(OBJ_DIR)\uc737.obj    \
-   $(OBJ_DIR)\uc857.obj    \
+   $(OBJ_DIR)\cpsk852.obj \
+   $(OBJ_DIR)\cpskiso.obj \
+   $(OBJ_DIR)\cpskkam.obj \
+   $(OBJ_DIR)\cpskwin.obj \
+   $(OBJ_DIR)\cpsl437.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
+   $(OBJ_DIR)\cptrdos.obj \
+   $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc857.obj \
    $(OBJ_DIR)\uc8859_5.obj \
-   $(OBJ_DIR)\uckam.obj    \
+   $(OBJ_DIR)\uckam.obj \
    $(OBJ_DIR)\ucmik.obj
 
 CT_LIB_OBJS = \
@@ -3832,6 +3833,7 @@ $(HBRUN_EXE) : $(HBRUN_EXE_OBJS)
    $(ECHO) $(HSX_LIB) >> make.tmp
    $(ECHO) $(USRRDD_LIB) >> make.tmp
    $(ECHO) $(RDDS_LIB) >> make.tmp
+   $(ECHO) $(CODEPAGE_LIB) >> make.tmp
 
 
    $(ECHO) $(CODEPAGE_LIB) >> make.tmp

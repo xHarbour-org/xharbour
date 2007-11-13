@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.146 2007/10/31 12:03:20 marchuet Exp $
+# $Id: hrbdll.bc,v 1.147 2007/11/10 05:15:38 guerra000 Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -14,8 +14,8 @@
 
 HARBOUR_EXE = bin\harbour.exe
 CC          = bcc32
-BIN_DIR	    = bin\b32
-LIB_DIR	    = lib\b32
+BIN_DIR       = bin\b32
+LIB_DIR       = lib\b32
 
 # uncomment this line if you want to build harbour with multi-gt capabilities
 #HB_MULTI_GT = yes
@@ -560,95 +560,88 @@ HARBOUR_DLL_OBJS = \
 #
 # Codepage
 #
-  $(OBJ_DIR)\cpbgmik.obj \
-  $(OBJ_DIR)\cpbgwin.obj \
-  $(OBJ_DIR)\cpcskam.obj \
-  $(OBJ_DIR)\cpeldos.obj \
-  $(OBJ_DIR)\cpelwin.obj \
-  $(OBJ_DIR)\cpesdos.obj \
-  $(OBJ_DIR)\cpesmwin.obj \
-  $(OBJ_DIR)\cpeswin.obj \
-  $(OBJ_DIR)\cpfrdos.obj \
-  $(OBJ_DIR)\cpgedos.obj \
-  $(OBJ_DIR)\cpgewin.obj \
-  $(OBJ_DIR)\cphr1250.obj \
-  $(OBJ_DIR)\cphr437.obj \
-  $(OBJ_DIR)\cphr852.obj \
-  $(OBJ_DIR)\cphu852.obj \
-  $(OBJ_DIR)\cphuwin.obj \
-  $(OBJ_DIR)\cpit437.obj \
-  $(OBJ_DIR)\cpit850.obj \
-  $(OBJ_DIR)\cpitisb.obj \
-  $(OBJ_DIR)\cpitiso.obj \
-  $(OBJ_DIR)\cpltwin.obj \
-  $(OBJ_DIR)\cppl852.obj \
-  $(OBJ_DIR)\cppliso.obj \
-  $(OBJ_DIR)\cpplmaz.obj \
-  $(OBJ_DIR)\cpplwin.obj \
-  $(OBJ_DIR)\cppt850.obj \
-  $(OBJ_DIR)\cpptiso.obj \
-  $(OBJ_DIR)\cpru866.obj \
-  $(OBJ_DIR)\cprukoi.obj \
-  $(OBJ_DIR)\cpruwin.obj \
-  $(OBJ_DIR)\cpsl852.obj \
-  $(OBJ_DIR)\cpsliso.obj \
-  $(OBJ_DIR)\cpslwin.obj \
-  $(OBJ_DIR)\cpsrwin.obj \
-  $(OBJ_DIR)\cpsv850.obj \
-  $(OBJ_DIR)\cpsvclip.obj \
-  $(OBJ_DIR)\cpsvwin.obj \
-  $(OBJ_DIR)\cptrdos.obj \
-  $(OBJ_DIR)\cptrwin.obj \
-  $(OBJ_DIR)\cpua866.obj \
-  $(OBJ_DIR)\cpuakoi.obj \
-  $(OBJ_DIR)\cpuawin.obj \
-  $(OBJ_DIR)\uc1250.obj \
-  $(OBJ_DIR)\uc1251.obj \
-  $(OBJ_DIR)\uc1253.obj \
-  $(OBJ_DIR)\uc1254.obj \
-  $(OBJ_DIR)\uc1257.obj \
-  $(OBJ_DIR)\uc737.obj \
-  $(OBJ_DIR)\uc850.obj \
-  $(OBJ_DIR)\uc852.obj \
-  $(OBJ_DIR)\uc857.obj \
-  $(OBJ_DIR)\uc866.obj \
-  $(OBJ_DIR)\uc8859_1.obj \
-  $(OBJ_DIR)\uc8859_2.obj \
-  $(OBJ_DIR)\uc8859_5.obj \
-  $(OBJ_DIR)\uc88591b.obj \
-  $(OBJ_DIR)\uckam.obj \
-  $(OBJ_DIR)\uckoi8.obj \
-  $(OBJ_DIR)\uckoi8u.obj \
-  $(OBJ_DIR)\ucmaz.obj \
-  $(OBJ_DIR)\ucmik.obj \
-  $(OBJ_DIR)\cpbg866.obj  \
-  $(OBJ_DIR)\cpbgiso.obj  \
-  $(OBJ_DIR)\cpcs852.obj  \
-  $(OBJ_DIR)\cpcsiso.obj  \
-  $(OBJ_DIR)\cpcskam.obj  \
-  $(OBJ_DIR)\cpcswin.obj  \
-  $(OBJ_DIR)\cpfrdos.obj     \
-  $(OBJ_DIR)\cphu852s.obj \
-  $(OBJ_DIR)\cphuiso.obj  \
-  $(OBJ_DIR)\cphuisos.obj \
-  $(OBJ_DIR)\cphuwins.obj \
-  $(OBJ_DIR)\cpsk852.obj  \
-  $(OBJ_DIR)\cpskiso.obj  \
-  $(OBJ_DIR)\cpskkam.obj  \
-  $(OBJ_DIR)\cpskwin.obj  \
-  $(OBJ_DIR)\cpsl437.obj  \
-  $(OBJ_DIR)\cpsl852.obj  \
-  $(OBJ_DIR)\cpsliso.obj  \
-  $(OBJ_DIR)\cpslwin.obj  \
-  $(OBJ_DIR)\cptrdos.obj  \
-  $(OBJ_DIR)\cptrwin.obj  \
-  $(OBJ_DIR)\uc1253.obj   \
-  $(OBJ_DIR)\uc1257.obj   \
-  $(OBJ_DIR)\uc737.obj    \
-  $(OBJ_DIR)\uc857.obj    \
-  $(OBJ_DIR)\uc8859_5.obj \
-  $(OBJ_DIR)\uckam.obj    \
-  $(OBJ_DIR)\ucmik.obj    \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
+   $(OBJ_DIR)\cpeldos.obj \
+   $(OBJ_DIR)\cpelwin.obj \
+   $(OBJ_DIR)\cpesdos.obj \
+   $(OBJ_DIR)\cpesmwin.obj \
+   $(OBJ_DIR)\cpeswin.obj \
+   $(OBJ_DIR)\cpgedos.obj \
+   $(OBJ_DIR)\cpgewin.obj \
+   $(OBJ_DIR)\cphr1250.obj \
+   $(OBJ_DIR)\cphr437.obj \
+   $(OBJ_DIR)\cphr852.obj \
+   $(OBJ_DIR)\cphu852.obj \
+   $(OBJ_DIR)\cphuwin.obj \
+   $(OBJ_DIR)\cpit437.obj \
+   $(OBJ_DIR)\cpit850.obj \
+   $(OBJ_DIR)\cpitisb.obj \
+   $(OBJ_DIR)\cpitiso.obj \
+   $(OBJ_DIR)\cpltwin.obj \
+   $(OBJ_DIR)\cppl852.obj \
+   $(OBJ_DIR)\cppliso.obj \
+   $(OBJ_DIR)\cpplmaz.obj \
+   $(OBJ_DIR)\cpplwin.obj \
+   $(OBJ_DIR)\cppt850.obj \
+   $(OBJ_DIR)\cpptiso.obj \
+   $(OBJ_DIR)\cpru866.obj \
+   $(OBJ_DIR)\cprukoi.obj \
+   $(OBJ_DIR)\cpruwin.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
+   $(OBJ_DIR)\cpsrwin.obj \
+   $(OBJ_DIR)\cpsv850.obj \
+   $(OBJ_DIR)\cpsvclip.obj \
+   $(OBJ_DIR)\cpsvwin.obj \
+   $(OBJ_DIR)\cpua866.obj \
+   $(OBJ_DIR)\cpuawin.obj \
+   $(OBJ_DIR)\cpuakoi.obj \
+   $(OBJ_DIR)\uc1250.obj \
+   $(OBJ_DIR)\uc1251.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1254.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc850.obj \
+   $(OBJ_DIR)\uc852.obj \
+   $(OBJ_DIR)\uc866.obj \
+   $(OBJ_DIR)\uc8859_1.obj \
+   $(OBJ_DIR)\uc8859_2.obj \
+   $(OBJ_DIR)\uc88591b.obj \
+   $(OBJ_DIR)\uckoi8.obj \
+   $(OBJ_DIR)\uckoi8u.obj \
+   $(OBJ_DIR)\ucmaz.obj \
+   $(OBJ_DIR)\cpbg866.obj \
+   $(OBJ_DIR)\cpbgiso.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
+   $(OBJ_DIR)\cpcs852.obj \
+   $(OBJ_DIR)\cpcsiso.obj  \
+   $(OBJ_DIR)\cpcskam.obj \
+   $(OBJ_DIR)\cpcswin.obj \
+   $(OBJ_DIR)\cpfrdos.obj \
+   $(OBJ_DIR)\cphu852s.obj \
+   $(OBJ_DIR)\cphuiso.obj \
+   $(OBJ_DIR)\cphuisos.obj \
+   $(OBJ_DIR)\cphuwins.obj \
+   $(OBJ_DIR)\cpsk852.obj \
+   $(OBJ_DIR)\cpskiso.obj \
+   $(OBJ_DIR)\cpskkam.obj \
+   $(OBJ_DIR)\cpskwin.obj \
+   $(OBJ_DIR)\cpsl437.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
+   $(OBJ_DIR)\cptrdos.obj \
+   $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc857.obj \
+   $(OBJ_DIR)\uc8859_5.obj \
+   $(OBJ_DIR)\uckam.obj \
+   $(OBJ_DIR)\ucmik.obj \
 #
 # hbtip
 #
@@ -906,13 +899,11 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cdpapi.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cpbgmik.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpbgwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpcskam.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpeldos.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpelwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpesdos.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpesmwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cpeswin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpfrdos.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpgedos.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpgewin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr1250.obj          + >> hdll.tmp
@@ -941,11 +932,9 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cpsv850.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpsvclip.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cpsvwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cptrdos.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cptrwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpua866.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpuakoi.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpuawin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpuakoi.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1250.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1251.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1253.obj            + >> hdll.tmp
@@ -954,16 +943,41 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\uc737.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc850.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc852.obj             + >> hdll.tmp
-  echo. $(OBJ_DIR)\uc857.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc866.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uc8859_1.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\uc8859_2.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\uc8859_5.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\uc88591b.obj          + >> hdll.tmp
-  echo. $(OBJ_DIR)\uckam.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\uckoi8.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uckoi8u.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\ucmaz.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpbg866.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpbgiso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpbgwin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpcs852.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpcsiso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpcskam.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpcswin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpfrdos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphu852s.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphuiso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphuisos.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cphuwins.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpsk852.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpskiso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpskkam.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpskwin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpsl437.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpsl852.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpsliso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpslwin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cptrdos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cptrwin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1253.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1257.obj            + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc737.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc857.obj             + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc8859_5.obj          + >> hdll.tmp
+  echo. $(OBJ_DIR)\uckam.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\ucmik.obj             + >> hdll.tmp
   echo. $(OBJ_DIR)\colorind.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\console.obj           + >> hdll.tmp
@@ -4237,5 +4251,4 @@ $(OBJ_DIR)\hbrun.c : $(HBRUN_DIR)\hbrun.prg
 
 $(OBJ_DIR)\hbrun.obj : $(OBJ_DIR)\hbrun.c
    $(CC_CMD)
-
 

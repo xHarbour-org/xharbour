@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.197 2007/10/31 08:34:21 marchuet Exp $
+# $Id: makefile.vc,v 1.198 2007/11/13 03:35:34 ronpinkas Exp $
 #
 
 #
@@ -727,6 +727,8 @@ LANG_LIB_OBJS = \
    $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
 
 CODEPAGE_LIB_OBJS = \
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
    $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
@@ -771,24 +773,19 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc737.obj \
    $(OBJ_DIR)\uc850.obj \
    $(OBJ_DIR)\uc852.obj \
-   $(OBJ_DIR)\uc857.obj \
    $(OBJ_DIR)\uc866.obj \
    $(OBJ_DIR)\uc8859_1.obj \
    $(OBJ_DIR)\uc8859_2.obj \
-   $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uc88591b.obj \
-   $(OBJ_DIR)\uckam.obj \
    $(OBJ_DIR)\uckoi8.obj \
    $(OBJ_DIR)\uckoi8u.obj \
    $(OBJ_DIR)\ucmaz.obj \
-   $(OBJ_DIR)\ucmik.obj \
    $(OBJ_DIR)\cpbg866.obj \
    $(OBJ_DIR)\cpbgiso.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpcs852.obj \
+   $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
-   $(OBJ_DIR)\cpcsiso.obj \
    $(OBJ_DIR)\cpcswin.obj \
    $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
@@ -800,9 +797,18 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpskkam.obj \
    $(OBJ_DIR)\cpskwin.obj \
    $(OBJ_DIR)\cpsl437.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
+   $(OBJ_DIR)\cptrdos.obj \
    $(OBJ_DIR)\cptrwin.obj \
-   $(OBJ_DIR)\cptrdos.obj
-
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc857.obj \
+   $(OBJ_DIR)\uc8859_5.obj \
+   $(OBJ_DIR)\uckam.obj \
+   $(OBJ_DIR)\ucmik.obj
 #
 # MACRO.LIB rules
 #

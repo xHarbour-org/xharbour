@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.111 2007/11/04 16:25:37 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.112 2007/11/13 03:35:33 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -663,6 +663,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbgbrwsr.obj \
 #
 # Codepage
+   $(OBJ_DIR)\cpbgmik.obj \
+   $(OBJ_DIR)\cpbgwin.obj \
    $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
    $(OBJ_DIR)\cpesdos.obj \
@@ -707,24 +709,19 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\uc737.obj \
    $(OBJ_DIR)\uc850.obj \
    $(OBJ_DIR)\uc852.obj \
-   $(OBJ_DIR)\uc857.obj \
    $(OBJ_DIR)\uc866.obj \
    $(OBJ_DIR)\uc8859_1.obj \
    $(OBJ_DIR)\uc8859_2.obj \
-   $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uc88591b.obj \
-   $(OBJ_DIR)\uckam.obj \
    $(OBJ_DIR)\uckoi8.obj \
    $(OBJ_DIR)\uckoi8u.obj \
    $(OBJ_DIR)\ucmaz.obj \
-   $(OBJ_DIR)\ucmik.obj \
    $(OBJ_DIR)\cpbg866.obj \
    $(OBJ_DIR)\cpbgiso.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpcs852.obj \
+   $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
-   $(OBJ_DIR)\cpcsiso.obj \
    $(OBJ_DIR)\cpcswin.obj \
    $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
@@ -736,8 +733,18 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\cpskkam.obj \
    $(OBJ_DIR)\cpskwin.obj \
    $(OBJ_DIR)\cpsl437.obj \
-   $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\cpsl852.obj \
+   $(OBJ_DIR)\cpsliso.obj \
+   $(OBJ_DIR)\cpslwin.obj \
    $(OBJ_DIR)\cptrdos.obj \
+   $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\uc1253.obj \
+   $(OBJ_DIR)\uc1257.obj \
+   $(OBJ_DIR)\uc737.obj \
+   $(OBJ_DIR)\uc857.obj \
+   $(OBJ_DIR)\uc8859_5.obj \
+   $(OBJ_DIR)\uckam.obj \
+   $(OBJ_DIR)\ucmik.obj \
 #
 #
 # hbtip

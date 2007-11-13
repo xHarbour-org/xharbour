@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5770 2007/11/13 03:35:32 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5771 2007/11/13 03:46:18 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,9 +8,15 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-11-13 17:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+    * hrbdll.bc
+    * hrbdll.vc
+    * makefile.bc
+    * makefile.vc
+      * Synched codepage/unicode sources
 
 2007-11-13 01:50 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
-   !source/lang/msgnl.c
+  ! source/lang/msgnl.c
      ! fixes to code
 
 2007-11-12 23:33 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
