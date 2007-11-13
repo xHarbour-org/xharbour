@@ -1,5 +1,5 @@
 /*
- * $Id: cpesmwin.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cpesmwin.c,v 1.5 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
@@ -90,11 +90,7 @@ static HB_CODEPAGE s_codepage = { "ESMWIN",
     "aáàäbcçdeéèëfghiíìïjklmnñoóòöpqrstuúùüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_ANNOUNCE( ESMWIN );
-
-HB_CALL_ON_STARTUP_BEGIN( hb_codepage_Init_ESMWIN )
-   hb_cdpRegister( &s_codepage );
-HB_CALL_ON_STARTUP_END( hb_codepage_Init_ESMWIN )
+HB_CODEPAGE_INIT( ESMWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
    #pragma startup hb_codepage_Init_ESMWIN

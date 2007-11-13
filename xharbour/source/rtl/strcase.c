@@ -1,5 +1,5 @@
 /*
- * $Id: strcase.c,v 1.21 2004/12/28 07:16:12 druzus Exp $
+ * $Id: strcase.c,v 1.22 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ HB_EXPORT char * hb_strLower( char * szText, ULONG ulLen )
 #ifndef HB_CDP_SUPPORT_OFF
    if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) hb_cdp_page->s_lower[szText[i]&255];
+         szText[ i ] = (char) hb_cdp_page->s_lower[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -90,7 +90,7 @@ HB_EXPORT char * hb_strLowerCopy( char * szText, ULONG ulLen )
 #ifndef HB_CDP_SUPPORT_OFF
    if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) hb_cdp_page->s_lower[szText[i]&255];
+         szCopy[ i ] = (char) hb_cdp_page->s_lower[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -110,7 +110,7 @@ HB_EXPORT char * hb_strUpperCopy( char * szText, ULONG ulLen )
 #ifndef HB_CDP_SUPPORT_OFF
    if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szCopy[ i ] = (char) hb_cdp_page->s_upper[szText[i]&255];
+         szCopy[ i ] = (char) hb_cdp_page->s_upper[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )
@@ -130,7 +130,7 @@ HB_EXPORT char * hb_strUpper( char * szText, ULONG ulLen )
 #ifndef HB_CDP_SUPPORT_OFF
    if( hb_cdp_page->nChars )
       for( i = 0; i < ulLen; i++ )
-         szText[ i ] = (char) hb_cdp_page->s_upper[szText[i]&255];
+         szText[ i ] = (char) hb_cdp_page->s_upper[ (BYTE) szText[ i ] ];
    else
 #endif
       for( i = 0; i < ulLen; i++ )

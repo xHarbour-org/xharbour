@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.32 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: cdpapi.c,v 1.33 2007/11/08 13:49:07 likewolf Exp $
  */
 
 /*
@@ -388,7 +388,9 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                         cdpage->s_accent[il] = ia + nAddLower;
                      }
                      cdpage->s_upper[iu] = *ptrUpper;
+                     cdpage->s_upper[il] = *ptrUpper;
                      cdpage->s_lower[il] = *ptrLower;
+                     cdpage->s_lower[iu] = *ptrLower;
                   }
                   if( cdpage->lLatin )
                   {

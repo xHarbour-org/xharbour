@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5771 2007/11/13 03:46:18 lculik Exp $
+ * $Id: ChangeLog,v 1.5772 2007/11/13 21:15:45 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-14 00:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/codepage/cpesmwin.c
+    * Use HB_CODEPAGE_INIT().
+  * source/rtl/cdpapi.c
+    ! Fixed uppercase/lowercase table creation in hb_cdpRegister.
+  * source/rtl/strcase.c
+    * Use casting to BYTE instead of ANDing with 255 consistently.
 
 2007-11-13 17:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
     * hrbdll.bc
