@@ -1,5 +1,5 @@
 /*
- * $Id: msgnl.c,v 1.8 2005/06/10 22:51:36 ronpinkas Exp $
+ * $Id: msgnl.c,v 1.5 2007/11/12 22:36:18 lculik Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Dutch",                   /* Name (in native language) */
       "NL",                        /* RFC ID */
       "437",                       /* Codepage */
-      "$Revision: 1.8 $ $Date: 2005/06/10 22:51:36 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2007/11/12 22:36:18 $",         /* Version */
 
       /* Month names */
 
@@ -201,7 +201,7 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( EN );
+HB_LANG_ANNOUNCE( NL );
 
 HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_NL )
    hb_langRegister( &s_lang );
