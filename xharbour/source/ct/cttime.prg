@@ -1,5 +1,5 @@
 /*
- * $Id: time.prg,v 1.1 2004/08/25 17:03:00 lf_sfnet Exp $
+ * $Id: cttime.prg,v 1.1 2004/08/27 14:43:25 paultucker Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ function SECTOTIME( nSec, lHundr )
 local i, h, n
 n := iif( !valtype( nSec ) == "N", seconds(), nSec )
 if valtype( lHundr ) == "L" .and. lHundr
-   h := strzero( ( nSec * 100 ) % 100, 2 )
+   h := strzero( ( nSec * 100 ) % 100, 4 )
 else
    h := ""
 endif
