@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.207 2007/11/10 05:15:38 guerra000 Exp $
+# $Id: makefile.bc,v 1.208 2007/11/13 21:15:45 ronpinkas Exp $
 #
 
 #
@@ -582,6 +582,7 @@ LANG_LIB_OBJS = \
    $(OBJ_DIR)\msgko.obj \
    $(OBJ_DIR)\msgltwin.obj \
    $(OBJ_DIR)\msgpl852.obj \
+   $(OBJ_DIR)\msgnl.obj \
    $(OBJ_DIR)\msgpliso.obj \
    $(OBJ_DIR)\msgplmaz.obj \
    $(OBJ_DIR)\msgplwin.obj \

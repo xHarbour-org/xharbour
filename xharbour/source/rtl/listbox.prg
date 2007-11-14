@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.22 2005/12/10 00:33:33 oh1 Exp $
+ * $Id: listbox.prg,v 1.23 2007/09/15 12:28:05 modalsist Exp $
  */
 
 /*
@@ -1132,6 +1132,7 @@ Static Function LBADJUSTCU( oList )
 RETURN nNewSize
 
 Function Listbox( nTop, nLeft, nBottom, nRight, lDrop )
+   DEFAULT lDrop to .F.
 
    IF ISNUMBER( nTop ) .and. ;
       ISNUMBER( nleft ) .and. ;
