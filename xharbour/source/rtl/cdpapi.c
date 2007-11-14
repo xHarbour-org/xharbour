@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.33 2007/11/08 13:49:07 likewolf Exp $
+ * $Id: cdpapi.c,v 1.34 2007/11/13 21:34:10 likewolf Exp $
  */
 
 /*
@@ -341,7 +341,8 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                   }
                   for( i = ia = 1; *ptrUpper; i++, ia++, ptrUpper++, ptrLower++ )
                   {
-                     if( *ptrUpper == '~' )
+                     if( ( cdpage->lAccEqual || cdpage->lAccInterleave ) &&
+                         *ptrUpper == '~' && *ptrLower == '~' )
                      {
                         for( ptr = ptrUpper + 1; *ptr; ptr++ )
                            *( ptr - 1 ) = *ptr;
@@ -352,7 +353,9 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                         if( cdpage->lAccEqual )
                            i--;
                      }
-                     else if( *ptrUpper == '.' )
+                     else if( *ptrUpper == '.' && *ptrLower == '.' &&
+                              ptrUpper[1] && ptrUpper[2] && ptrUpper[3] == '.' &&
+                              ptrLower[1] && ptrLower[2] && ptrLower[3] == '.' )
                      {
                         multi[nMulti].cFirst[0] = *( ptrUpper + 1 );
                         multi[nMulti].cFirst[1] = *( ptrLower + 1 );
@@ -387,9 +390,7 @@ HB_EXPORT BOOL hb_cdpRegister( PHB_CODEPAGE cdpage )
                         cdpage->s_accent[iu] = ia;
                         cdpage->s_accent[il] = ia + nAddLower;
                      }
-                     cdpage->s_upper[iu] = *ptrUpper;
                      cdpage->s_upper[il] = *ptrUpper;
-                     cdpage->s_lower[il] = *ptrLower;
                      cdpage->s_lower[iu] = *ptrLower;
                   }
                   if( cdpage->lLatin )

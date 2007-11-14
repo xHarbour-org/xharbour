@@ -1,5 +1,5 @@
 /*
- * $Id: cpelwin.c,v 1.3 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cpelwin.c,v 1.4 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
@@ -86,7 +86,7 @@
 
 static HB_CODEPAGE s_codepage = { "ELWIN",
     HB_CPID_1253, HB_UNITB_1253, NUMBER_OF_CHARACTERS,
-    "а~╒бцде╦фг~╧хи~╨йклмно~╪пяссту~╬жвьы~©",
+    "а~╒бцде~╦фг~╧хи~╨йклмно~╪пяссту~╬жвьы~©",
     "А~эБЦДЕ~щФГ~чХИ~ъЙКЛМНО~ЭПЯСРТУ~ЩЖВЬЫ~Ч",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 

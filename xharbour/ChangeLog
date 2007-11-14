@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5772 2007/11/13 21:15:45 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5773 2007/11/13 21:34:10 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-14 13:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/codepage/cpeldos.c
+  * source/codepage/cpelwin.c
+    ! updated accent marker upper letters to be the same as in lower ones
+      Greek users should fix me.
+  * source/rtl/cdpapi.c
+    ! do not use '~' as accented character marker if neither ACCENTED_EQUAL
+      nor ACCENTED_INTERLEAVED is set - in some CPs '~' is a letter
+    ! use '~' as accented character marker only if it exists in UPPER and
+      LOWER letter sets - our CP code cannot properly decode letter sets
+      when this condition is not true - it should be fixed (TOFIX)
+    ! use '.' as multibyte character marker only if it exists in UPPER and
+      LOWER letter sets - our CP code cannot properly decode letter sets
+      when this condition is not true - it should be fixed (TOFIX)
+    Fixes by Przemyslaw Czerpak, borrowed from Harbour.
+
 
 2007-11-14 00:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/codepage/cpesmwin.c
