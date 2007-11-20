@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.269 2007/09/25 07:32:35 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.270 2007/10/31 08:35:10 marchuet Exp $
  */
 
 /*
@@ -724,9 +724,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
    CDXAREAP pArea = pTag->pIndex->pArea;
    PHB_ITEM pItem;
 #ifndef HB_CDP_SUPPORT_OFF
-   /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
-   PHB_CODEPAGE cdpTmp = hb_cdp_page;
-   hb_cdp_page = pArea->cdPage;
+   PHB_CODEPAGE cdpTmp = hb_cdpSelect( pArea->cdPage );
 #endif
 
    if ( pTag->nField )
@@ -753,7 +751,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
    }
 
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdp_page = cdpTmp;
+   hb_cdpSelect( cdpTmp );
 #endif
 
    return pKey;
@@ -5354,13 +5352,15 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
                                 PHB_ITEM pWildItm )
 {
    BOOL fFound = FALSE, fFirst = TRUE;
-   char *szPattern = hb_itemGetCPtr( pWildItm );
+   char *szPattern, *szFree = NULL;
    int iFixed = 0, iStop;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_cdxDBOISkipWild(%p, %p, %i, %p)", pArea, pTag, fForward, pWildItm));
 
    if ( FAST_GOCOLD( ( AREAP ) pArea ) == FAILURE )
       return FALSE;
+
+   szPattern = hb_itemGetCPtr( pWildItm );
 
    if ( ! pTag || pTag->uiType != 'C' || !szPattern || !*szPattern )
    {
@@ -5372,7 +5372,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
 #ifndef HB_CDP_SUPPORT_OFF
    if( pArea->cdPage != hb_cdp_page )
    {
-      szPattern = hb_strdup( szPattern );
+      szPattern = szFree = hb_strdup( szPattern );
       hb_cdpTranslate( szPattern, hb_cdp_page, pArea->cdPage );
    }
 #endif
@@ -5489,12 +5489,8 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    else
       pArea->fEof = FALSE;
 
-#ifndef HB_CDP_SUPPORT_OFF
-   if( pArea->cdPage != hb_cdp_page )
-   {
-      hb_xfree( szPattern );
-   }
-#endif
+   if( szFree )
+      hb_xfree( szFree );
 
    return fFound;
 }
@@ -5507,7 +5503,7 @@ static BOOL hb_cdxRegexMatch( CDXAREAP pArea, PHB_REGEX pRegEx, LPCDXKEY pKey )
 
    if( pArea->cdPage != hb_cdp_page )
    {
-      hb_strncpy( szBuff, szKey, pKey->len );
+      memcpy( szBuff, szKey, pKey->len + 1 );
       hb_cdpnTranslate( szBuff, pArea->cdPage, hb_cdp_page, pKey->len );
       szKey = szBuff;
    }
@@ -9169,9 +9165,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
    ULONG ulRecCount, ulRecNo = pArea->ulRecNo;
    LONG lStep = 0;
 #ifndef HB_CDP_SUPPORT_OFF
-   /* TODO: this hack is not thread safe, hb_cdp_page has to be thread specific */
-   PHB_CODEPAGE cdpTmp = hb_cdp_page;
-   hb_cdp_page = pArea->cdPage;
+   PHB_CODEPAGE cdpTmp = hb_cdpSelect( pArea->cdPage );
 #endif
 
    if ( pArea->lpdbOrdCondInfo )
@@ -9441,7 +9435,7 @@ static void hb_cdxTagDoIndex( LPCDXTAG pTag, BOOL fReindex )
    pArea->pSort = NULL;
 
 #ifndef HB_CDP_SUPPORT_OFF
-   hb_cdp_page = cdpTmp;
+   hb_cdpSelect( cdpTmp );
 #endif
 }
 

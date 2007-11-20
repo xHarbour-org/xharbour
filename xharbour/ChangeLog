@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5775 2007/11/14 18:00:15 lculik Exp $
+ * $Id: ChangeLog,v 1.5776 2007/11/20 08:53:28 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-20 17:48 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbfntx\dbfntx1.c
+    * use hb_cdpSelect() instead of direct accessing hb_cdp_page variable synced with harbour.
 
 2007-11-20 09:44 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source\rdd\dbf1.c
