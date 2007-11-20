@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5776 2007/11/20 08:53:28 marchuet Exp $
+ * $Id: ChangeLog,v 1.5777 2007/11/20 16:57:11 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-20 17:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * bin/bld.bat
+    * Minor GTGUI/GTNUL support
+  * tests/bldtest.bat
+    ! Protected BCC32 specific setting by IF %HB_COMPILER%.==bcc32.
+      /* BCC users please remeber that this is a GENERIC batch file. */
+    + Added support for /GUI /NUL and /FWH
+    * Minor refinment to cleanup and error detection, and retain tds files.
+
+  * source/rtl/gtapi.c
+    ! Fixed multiple GPF traps.
+      /* I'm not using this code, I believe that it should be carefuly reviewed by someone using it. */
 
 2007-11-20 17:48 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source\rdd\bmdbfcdx\bmdbfcdx1.c

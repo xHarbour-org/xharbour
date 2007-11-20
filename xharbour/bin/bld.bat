@@ -1,6 +1,6 @@
 @echo off
 rem
-rem $Id: bld.bat,v 1.68 2007/05/27 15:32:24 paultucker Exp $
+rem $Id: bld.bat,v 1.69 2007/11/08 02:55:47 lculik Exp $
 rem
 
 rem ---------------------------------------------------------------
@@ -272,7 +272,12 @@ rem   if "%HB_MT%" == "" set LDFLAGS=/NODEFAULTLIB:LIBCMT
    set _main=std
    if "%HB_GT_LIB%"=="gtwvt" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtwvt" set _main=win
+   if "%HB_GT_LIB%"=="gtwvw" set _cons=WINDOWS
    if "%HB_GT_LIB%"=="gtwvw" set _main=win
+   if "%HB_GT_LIB%"=="gtgui" set _cons=WINDOWS
+   if "%HB_GT_LIB%"=="gtgui" set _main=win
+   if "%HB_GT_LIB%"=="gtnul" set _cons=WINDOWS
+   if "%HB_GT_LIB%"=="gtnul" set _main=win
    echo cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib> msvc.log
         cl -TP -W3 %CFLAGS% -I%HB_INC_INSTALL% %1.c %HB_2nd_prg% %HB_3rd_prg% /link %LFLAGS% %HB_INSTALL%\obj\vc\main%_main%.obj /subsystem:%_cons% /FORCE:MULTIPLE %LDFLAGS% %HB_LIBLIST% shell32.lib user32.lib winspool.lib ole32.lib oleaut32.lib ws2_32.lib kernel32.lib gdi32.lib comctl32.lib comdlg32.lib advapi32.lib>>msvc.log
    set _cons=

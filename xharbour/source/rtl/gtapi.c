@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.73 2007/08/13 10:42:02 ronpinkas Exp $
+ * $Id: gtapi.c,v 1.74 2007/10/31 16:20:52 marchuet Exp $
  */
 
 /*
@@ -109,7 +109,7 @@ static BOOL   s_ScNone;           /* Cursor invisible (out bounds) */
 
 static USHORT s_uiColorIndex;
 static USHORT s_uiColorCount;
-static int *  s_pColor;
+static int *  s_pColor = NULL;
 
 /* Close event returned by inkey for asynchronous GT kills */
 static int s_closeEvent = 0;
@@ -291,7 +291,12 @@ void hb_gtExit( void )
          hb_itemRelease( s_pOnClose );
          s_pOnClose = NULL;
       }
-      hb_xfree( s_pColor );
+      
+      if( s_pColor )
+      {
+         hb_xfree( s_pColor );
+         s_pColor = NULL;
+      }
    }
 
    hb_gtClearGobjects();
@@ -474,19 +479,16 @@ USHORT HB_EXPORT hb_gtBox( SHORT Top, SHORT Left, SHORT Bottom, SHORT Right,
       {
          if( Left != Right )
          {
-            Ret = hb_gt_Box( Top, Left, Bottom, Right, szBox,
-                             ( BYTE ) s_pColor[ s_uiColorIndex ] );
+            Ret = hb_gt_Box( Top, Left, Bottom, Right, szBox, (BYTE) s_pColor[ s_uiColorIndex ] );
          }
          else
          {
-            Ret = hb_gt_VertLine( Left, Top, Bottom, szBox[ 3 ],
-                                  ( BYTE ) s_pColor[ s_uiColorIndex ] );
+            Ret = hb_gt_VertLine( Left, Top, Bottom, szBox[ 3 ], (BYTE) s_pColor[ s_uiColorIndex ] );
          }
       }
       else
       {
-         Ret = hb_gt_HorizLine( Top, Left, Right, szBox[ 1 ],
-                                ( BYTE ) s_pColor[ s_uiColorIndex ] );
+         Ret = hb_gt_HorizLine( Top, Left, Right, szBox[ 1 ], (BYTE) s_pColor[ s_uiColorIndex ] );
       }
    }
 
@@ -722,11 +724,15 @@ USHORT HB_EXPORT hb_gtGetColorStr( char * pszColorString )
 
 #ifdef HB_C52_STRICT
             if( ( s_pColor[ uiColorIndex ] & 0x80 ) != 0 )
+            {
                pszColorString[ iPos++ ] = '*';
+            }
 #endif
 
             if( ( s_pColor[ uiColorIndex ] & 0x08 ) != 0 )
+            {
                pszColorString[ iPos++ ] = '+';
+            }
 
             pszColorString[ iPos++ ] = '/';
          }
@@ -734,7 +740,9 @@ USHORT HB_EXPORT hb_gtGetColorStr( char * pszColorString )
          else
          {
             if( ( s_pColor[ uiColorIndex ] & 0x80 ) != 0 )
+            {
                pszColorString[ iPos++ ] = '*';
+            }
          }
 #endif
 
@@ -921,13 +929,14 @@ USHORT HB_EXPORT hb_gtSetColorStr( const char * szColorString )
             {
                nFore = s_pColor[ nPos ];
             }
+
             nCount = -1;
+
             if( nPos == s_uiColorCount )
             {
-               s_pColor = ( int * ) hb_xrealloc( s_pColor,
-                                                 sizeof( int ) * ( nPos + 1 ) );
-               ++s_uiColorCount;
+               s_pColor = ( int * ) hb_xrealloc( s_pColor, sizeof( int ) * ++s_uiColorCount );               
             }
+
             if( bHasX )
             {
                nFore &= 0x88F8;
@@ -953,6 +962,7 @@ USHORT HB_EXPORT hb_gtSetColorStr( const char * szColorString )
                   nFore &= 0x888F;
                }
             }
+
             if( ( nFore & 0x8800 ) != 0 && ( ( nFore | nColor ) & 0x0077 ) == 0)
             {
                nFore |= 1;
@@ -1180,8 +1190,7 @@ USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar,
       }
    }
 
-   hb_gt_Replicate( uiRow, uiCol, ( BYTE ) s_pColor[ s_uiColorIndex ],
-                    byChar, uiCount );
+   hb_gt_Replicate( uiRow, uiCol, (BYTE) s_pColor[ s_uiColorIndex ], byChar, uiCount );
 
    return 0;
 }
@@ -1588,8 +1597,7 @@ USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
       hb_gtClearGobjects();
    }
 
-   hb_gt_Scroll( uiTop, uiLeft, uiBottom, uiRight,
-                 ( BYTE ) s_pColor[ s_uiColorIndex ], iRows, iCols );
+   hb_gt_Scroll( uiTop, uiLeft, uiBottom, uiRight, (BYTE) s_pColor[ s_uiColorIndex ], iRows, iCols );
 
    if( p_WFRow != ct_BFRow || p_WFCol != ct_BFCol )
    {
@@ -2562,8 +2570,8 @@ void HB_EXPORT hb_ctWFree( HB_CT_WND * wnd )
    if( wnd->BufSB != NULL)    hb_xfree( wnd->BufSB );
    if( wnd->BufSR != NULL)    hb_xfree( wnd->BufSR );
    if( wnd->s_pColor != NULL) hb_xfree( wnd->s_pColor );
-   hb_xfree( wnd );
 
+   hb_xfree( wnd );
 }
 /****************************************************************************/
 /* Set the usable area within a window */
@@ -2701,23 +2709,27 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 
    wnd = hb_ctWNew( FRow, FCol, LRow, LCol );
 
+   wnd->s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
+   memcpy( wnd->s_pColor, s_pColor, s_uiColorCount * sizeof( int ) );
+
    if( ct_WMax == 0 )
    {
-      wnd->s_pColor = s_pColor;
       wnd->iRow = s_iRow;
       wnd->iCol = s_iCol;
    }
-   else
-   {
-      wnd->s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
-      memcpy( wnd->s_pColor, s_pColor, s_uiColorCount );
-   }
+
    wnd->s_uiColorCount  = s_uiColorCount;
    wnd->s_uiCursorStyle = s_uiCursorStyle;
    wnd->s_uiColorIndex  = s_uiColorIndex;
 
    for ( i = 0; i < ct_WMax; i++ )
-      if ( ct_Wind[ i ] == NULL ) break;
+   {
+      if ( ct_Wind[ i ] == NULL )
+      {
+         break;
+      }
+   }
+
    if ( i >= ct_WMax)
    {
       ct_Wind = ( HB_CT_WND** ) hb_xrealloc( ct_Wind,
@@ -2725,6 +2737,7 @@ SHORT HB_EXPORT hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
       i = ct_WMax;
       ct_WMax++;
    }
+
    wnd->NCur    = i;
    ct_Wind[ i ] = wnd;
 
@@ -2762,11 +2775,21 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
          ct_WCur->s_uiCursorStyle    = s_uiCursorStyle;
          ct_WCur->s_uiColorIndex     = s_uiColorIndex;
          ct_WCur->s_uiColorCount     = s_uiColorCount;
-         ct_WCur->s_pColor           = s_pColor;
+
+         if( ct_WCur->s_pColor )
+         {
+            hb_xfree( (void *) ct_WCur->s_pColor );
+         }
+         ct_WCur->s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
+         memcpy( ct_WCur->s_pColor, s_pColor, s_uiColorCount * sizeof( int ) );
+
          ct_WCur->hb_gt_gobjects     = hb_gt_gobjects;
          ct_WCur->hb_gt_gobjects_end = hb_gt_gobjects_end;
 
-         if ( ct_NCur > 0 ) hb_ctWFSave( ct_WCur );
+         if ( ct_NCur > 0 )
+         {
+            hb_ctWFSave( ct_WCur );
+         }
       }
 
       for( i = 0; i < ct_SMax; i++ )
@@ -2849,7 +2872,14 @@ SHORT HB_EXPORT hb_ctWSelect( SHORT iwnd )
       s_uiCursorStyle    = ct_WCur->s_uiCursorStyle;
       s_uiColorIndex     = ct_WCur->s_uiColorIndex;
       s_uiColorCount     = ct_WCur->s_uiColorCount;
-      s_pColor           = ct_WCur->s_pColor;
+
+      if( s_pColor )
+      {
+         hb_xfree( (void *) s_pColor );
+      }
+      s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
+      memcpy( s_pColor, ct_WCur->s_pColor, s_uiColorCount * sizeof( int ) );
+
       hb_gt_gobjects     = ct_WCur->hb_gt_gobjects;
       hb_gt_gobjects_end = ct_WCur->hb_gt_gobjects_end;
 
@@ -2916,7 +2946,14 @@ SHORT HB_EXPORT hb_ctWAClose( void )
       ct_WCur->s_uiCursorStyle    = s_uiCursorStyle;
       ct_WCur->s_uiColorIndex     = s_uiColorIndex;
       ct_WCur->s_uiColorCount     = s_uiColorCount;
-      ct_WCur->s_pColor           = s_pColor;
+
+      if( ct_WCur->s_pColor )
+      {
+         hb_xfree( (void *) ct_WCur->s_pColor );
+      }
+      ct_WCur->s_pColor = ( int* ) hb_xgrab( s_uiColorCount * sizeof( int ) );
+      memcpy( ct_WCur->s_pColor, s_pColor, s_uiColorCount * sizeof( int ) );
+
       ct_WCur->hb_gt_gobjects     = hb_gt_gobjects;
       ct_WCur->hb_gt_gobjects_end = hb_gt_gobjects_end;
    }
