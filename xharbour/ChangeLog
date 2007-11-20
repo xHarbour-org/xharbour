@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5774 2007/11/14 10:10:59 likewolf Exp $
+ * $Id: ChangeLog,v 1.5775 2007/11/14 18:00:15 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-20 09:44 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source\rdd\dbf1.c
+    ! fixed flags on clipper DBF that don't support it. By the moment are only supported at VFP DBF.
+  * source\rtl\hbhex2n.c
+    ! fixed HEXTONUM when string of len 0 arrive. (Fixed by Juan Galvez)
+
 2007-11-14 16:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   ! source/rtl/listbox.prg
     ! fixed bug on listbox function to default ldrop to .f. , reported on xharbour news by Bill  Robertson

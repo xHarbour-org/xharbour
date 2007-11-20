@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.179 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: dbf1.c,v 1.180 2007/10/31 16:20:51 marchuet Exp $
  */
 
 /*
@@ -3935,7 +3935,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       dbFieldInfo.uiLen = pField->bLen;
       dbFieldInfo.uiDec = 0;
       dbFieldInfo.uiTypeExtended = 0;
-      if( pArea->bTableType == DB_DBF_VFP || pField->bReserved2[1] == '\0' )
+      if( pArea->bTableType == DB_DBF_VFP )
          dbFieldInfo.uiFlags = pField->bFieldFlags;
       else
          dbFieldInfo.uiFlags = 0;

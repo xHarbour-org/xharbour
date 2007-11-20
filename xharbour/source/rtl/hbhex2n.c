@@ -1,5 +1,5 @@
 /*
- * $Id: hbhex2n.c,v 1.15 2006/09/23 18:32:16 ptsarenko Exp $
+ * $Id: hbhex2n.c,v 1.16 2006/10/30 18:48:36 ptsarenko Exp $
  */
 
 /*
@@ -175,6 +175,13 @@ HB_FUNC( STRTOHEX )
   
    cStr = hb_parc( 1 );
    ulLen = hb_parclen( 1 );
+
+   if( ! ulLen )
+   {
+      hb_retc( "" );
+      return;
+   }
+
    c = cOutBuf = (char*) hb_xgrab( ulLen * 2 + ( ulLen - 1 ) * ulLenSep + 1 );
 
    for( ul = 0; ul < ulLen; ul++ )
