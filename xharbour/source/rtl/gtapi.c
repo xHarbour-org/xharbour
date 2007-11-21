@@ -1,5 +1,5 @@
 /*
- * $Id: gtapi.c,v 1.74 2007/10/31 16:20:52 marchuet Exp $
+ * $Id: gtapi.c,v 1.75 2007/11/20 21:47:18 ronpinkas Exp $
  */
 
 /*
@@ -291,7 +291,7 @@ void hb_gtExit( void )
          hb_itemRelease( s_pOnClose );
          s_pOnClose = NULL;
       }
-      
+
       if( s_pColor )
       {
          hb_xfree( s_pColor );
@@ -934,7 +934,7 @@ USHORT HB_EXPORT hb_gtSetColorStr( const char * szColorString )
 
             if( nPos == s_uiColorCount )
             {
-               s_pColor = ( int * ) hb_xrealloc( s_pColor, sizeof( int ) * ++s_uiColorCount );               
+               s_pColor = ( int * ) hb_xrealloc( s_pColor, sizeof( int ) * ++s_uiColorCount );
             }
 
             if( bHasX )
@@ -1701,6 +1701,7 @@ USHORT HB_EXPORT hb_gtResume( void )
    return  0;
 }
 
+
 /****************************************************************************/
 int HB_EXPORT hb_gtIndexedColor( int idx )
 {
@@ -2142,14 +2143,10 @@ static void hb_ctExit( void )
       for( i = ct_SMax - 1; i >= 0; i-- )
       {
          nw = ct_Stac[ i ];
-         if( nw > 0 )
-            {
-               hb_ctWFree( ct_Wind[ nw ] );
-               ct_Wind[ nw ] = NULL;
-            }
-      }
 
-      if( ct_WMax > 0 ) hb_xfree( ct_Wind[ 0 ] );
+         hb_ctWFree( ct_Wind[ nw ] );
+         ct_Wind[ nw ] = NULL;
+      }
 
       hb_xfree( ct_Wind );
       hb_xfree( ct_Stac );
@@ -2158,7 +2155,6 @@ static void hb_ctExit( void )
       ct_WMax = 0;
       ct_NCur = -1;
    }
-
 }
 
 /****************************************************************************/
@@ -2204,8 +2200,7 @@ static void hb_ctSCSave( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol,
 
    if( *uiAddr == NULL )
    {
-      *uiAddr = ( void * ) hb_xgrab( ct_CSize * ( LRow - FRow + 1 ) *
-                                    ( LCol - FCol + 1 ) );
+      *uiAddr = ( void * ) hb_xgrab( ct_CSize * ( LRow - FRow + 1 ) * ( LCol - FCol + 1 ) );
    }
 
    if( FRow >= ct_BFRow && FCol >= ct_BFCol &&
