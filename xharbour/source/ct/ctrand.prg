@@ -1,20 +1,12 @@
 /*
- * $Id: getinfo.prg,v 1.4 2006/11/18 21:32:25 oh1 Exp $
+ * $Id: random.prg,v 1.1 2007/11/23 20:00:00 ptsarenko Exp $
  */
 /*
- * xHarbour Project source code:
- *   CT3 GET/READ Functions
+ * Harbour Project source code:
+ *   CT3 functions: RANDOM(), RAND()
  *
- * COUNTGETS(), CURRENTGET(), GETFLDROW(), GETFLDCOL(), GETFLDVAR()
- * Copyright 2004 Philip Chee <philip@aleytys.pc.my>
- *
- * SAVEGETS(), RESTGETS()
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
- * www - http://www.harbour-project.org
- *
- * GETINPUT()
  * Copyright 2007 Pavel Tsarenko <tpe2@mail.ru>
- * www - http://www.xharbour.org
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,73 +51,12 @@
 
 #include "common.ch"
 
-MEMVAR GetList
+Function Random(lMode)
+DEFAULT lMode TO .T.
+Return if( lMode, HB_RandomInt( 0, 65535 ), HB_RandomInt( -32768, 32767 ) )
 
-/*
-FUNCTION SaveGets()
-  LOCAL aGetList := GetList
-
-  GetList := {}
-
-RETURN aGetList
-
-FUNCTION RestGets( aGetList )
-
-RETURN ( GetList := aGetList ) <> NIL
-*/
-
-FUNCTION CountGets()
-RETURN LEN( GetList )
-
-FUNCTION CurrentGet()
-  LOCAL nPos, ;
-        oActive := GetActive()
-  nPos:= ASCAN( GetList, {|oGet| oGet == oActive } )
-RETURN nPos
-
-FUNCTION GetFldRow( nField )
-  LOCAL nRow := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nRow := GetList[ nField ]:Row
-  ENDIF
-RETURN nRow
-
-FUNCTION GetFldCol( nField )
-  LOCAL nCol := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nCol := GetList[ nField ]:Col
-  ENDIF
-RETURN nCol
-
-FUNCTION GetFldVar( nField )
-  LOCAL nVar := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nVar := GetList[ nField ]:Name
-  ENDIF
-RETURN nVar
-
-FUNCTION GetInput(xDefault, nRow, nCol, lSay, cPrompt)
-Local GetList := {}
-
-if nRow # nil
-  SetPos(nRow, nCol)
+Function Rand(nStart)
+if nStart <> nil
+   HB_RandomSeed(nStart)
 endif
-if cPrompt # nil
-  DispOut(cPrompt)
-  nRow := Row()
-  nCol := Col() + 1
-else
-  nRow := Row()
-  nCol := Col()
-endif
-@ nRow, nCol GET xDefault
-READ
-
-if lSay # nil .and. lSay
-  SetPos(nRow, nCol)
-  DispOut(xDefault)
-endif
-RETURN xDefault
+Return HB_Random()

@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.198 2007/11/13 03:35:34 ronpinkas Exp $
+# $Id: makefile.vc,v 1.199 2007/11/13 21:15:45 ronpinkas Exp $
 #
 
 #
@@ -1412,10 +1412,12 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\dattime2.obj \
    $(OBJ_DIR)$(MT)\dbftools.obj \
    $(OBJ_DIR)$(MT)\disk.obj \
+   $(OBJ_DIR)$(MT)\envparam.obj \
    $(OBJ_DIR)$(MT)\exponent.obj \
    $(OBJ_DIR)$(MT)\files.obj \
    $(OBJ_DIR)$(MT)\finan.obj \
    $(OBJ_DIR)$(MT)\ftoc.obj \
+   $(OBJ_DIR)$(MT)\intneg.obj \
    $(OBJ_DIR)$(MT)\justify.obj \
    $(OBJ_DIR)$(MT)\keyset.obj \
    $(OBJ_DIR)$(MT)\lton.obj \
@@ -1454,6 +1456,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\color.obj \
    $(OBJ_DIR)$(MT)\ct.obj \
    $(OBJ_DIR)$(MT)\ctmisc.obj \
+   $(OBJ_DIR)$(MT)\ctrand.obj \
    $(OBJ_DIR)$(MT)\cttime.obj \
    $(OBJ_DIR)$(MT)\dattime3.obj \
    $(OBJ_DIR)$(MT)\diskutil.obj \
@@ -1470,6 +1473,7 @@ CT_LIB_OBJS = \
    $(OBJ_DIR)$(MT)\scrmark.obj \
    $(OBJ_DIR)$(MT)\setkeys.obj \
    $(OBJ_DIR)$(MT)\spread.obj \
+   $(OBJ_DIR)$(MT)\trapkey.obj \
    $(OBJ_DIR)$(MT)\untext.obj \
    $(OBJ_DIR)$(MT)\util.obj
 

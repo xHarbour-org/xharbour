@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.32 2007/09/25 07:32:26 marchuet Exp $
+# $Id: makefile.gc,v 1.33 2007/10/31 08:34:21 marchuet Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -1491,10 +1491,12 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/ctcrypt.o \
    $(CT_OBJ_DIR)/dbftools.o \
    $(CT_OBJ_DIR)/disk.o \
+   $(CT_OBJ_DIR)/envparam.o \
    $(CT_OBJ_DIR)/exponent.o \
    $(CT_OBJ_DIR)/files.o \
    $(CT_OBJ_DIR)/finan.o \
    $(CT_OBJ_DIR)/ftoc.o \
+   $(CT_OBJ_DIR)/intneg.o \
    $(CT_OBJ_DIR)/justify.o \
    $(CT_OBJ_DIR)/keyset.o \
    $(CT_OBJ_DIR)/misc1.o \
@@ -1526,6 +1528,7 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/color.o \
    $(CT_OBJ_DIR)/ct.o \
    $(CT_OBJ_DIR)/ctmisc.o \
+   $(CT_OBJ_DIR)/ctrand.o \
    $(CT_OBJ_DIR)/getsecrt.o \
    $(CT_OBJ_DIR)/ctwin.o \
    $(CT_OBJ_DIR)/datetime.o \
@@ -1553,6 +1556,7 @@ $(CT_LIB) : \
    $(CT_OBJ_DIR)/setkeys.o \
    $(CT_OBJ_DIR)/setclear.o \
    $(CT_OBJ_DIR)/spread.o \
+   $(CT_OBJ_DIR)/trapkey.o \
    $(CT_OBJ_DIR)/untext.o \
    $(CT_OBJ_DIR)/diskutil.o \
    $(CT_OBJ_DIR)/util.o
@@ -1648,6 +1652,9 @@ $(CT_OBJ_DIR)/ctcrypt.o : $(LIBCT_DIR)/ctcrypt.c
 $(CT_OBJ_DIR)/disk.o : $(LIBCT_DIR)/disk.c
 	$(CC_CMD)
 
+$(CT_OBJ_DIR)/envparam.o : $(LIBCT_DIR)/envparam.c
+	$(CC_CMD)
+
 $(CT_OBJ_DIR)/exponent.o : $(LIBCT_DIR)/exponent.c
 	$(CC_CMD)
 
@@ -1655,6 +1662,9 @@ $(CT_OBJ_DIR)/files.o : $(LIBCT_DIR)/files.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/finan.o : $(LIBCT_DIR)/finan.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/intneg.o : $(LIBCT_DIR)/intneg.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/justify.o : $(LIBCT_DIR)/justify.c
@@ -1757,6 +1767,12 @@ $(CT_OBJ_DIR)/ctmisc.c : $(LIBCT_DIR)/ctmisc.prg
 	$(HARBOUR_CMD)
 
 $(CT_OBJ_DIR)/ctmisc.o : $(CT_OBJ_DIR)/ctmisc.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/ctrand.c : $(LIBCT_DIR)/ctrand.prg
+	$(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)/ctrand.o : $(CT_OBJ_DIR)/ctrand.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/ctwin.o : $(LIBCT_DIR)/ctwin.c
@@ -1901,6 +1917,12 @@ $(CT_OBJ_DIR)/spread.c : $(LIBCT_DIR)/spread.prg
 	$(HARBOUR_CMD)
 
 $(CT_OBJ_DIR)/spread.o : $(CT_OBJ_DIR)/spread.c
+	$(CC_CMD)
+
+$(CT_OBJ_DIR)/trapkey.c : $(LIBCT_DIR)/trapkey.prg
+	$(HARBOUR_CMD)
+
+$(CT_OBJ_DIR)/trapkey.o : $(CT_OBJ_DIR)/trapkey.c
 	$(CC_CMD)
 
 $(CT_OBJ_DIR)/untext.c : $(LIBCT_DIR)/untext.prg

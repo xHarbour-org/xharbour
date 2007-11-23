@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.71 2007/09/25 07:32:28 marchuet Exp $
+# $Id: makefile.wc,v 1.72 2007/10/31 08:34:22 marchuet Exp $
 #
 
 #
@@ -923,10 +923,12 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\ctwin.obj \
    $(CT_OBJ_DIR)\dbftools.obj \
    $(CT_OBJ_DIR)\disk.obj \
+   $(CT_OBJ_DIR)\envparam.obj \
    $(CT_OBJ_DIR)\exponent.obj \
    $(CT_OBJ_DIR)\files.obj \
    $(CT_OBJ_DIR)\finan.obj \
    $(CT_OBJ_DIR)\ftoc.obj \
+   $(CT_OBJ_DIR)\intneg.obj \
    $(CT_OBJ_DIR)\justify.obj \
    $(CT_OBJ_DIR)\keyset.obj \
    $(CT_OBJ_DIR)\lton.obj \
@@ -965,6 +967,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\color.obj \
    $(CT_OBJ_DIR)\ct.obj \
    $(CT_OBJ_DIR)\ctmisc.obj \
+   $(CT_OBJ_DIR)\ctrand.obj \
    $(CT_OBJ_DIR)\cttime.obj \
    $(CT_OBJ_DIR)\datetime.obj \
    $(CT_OBJ_DIR)\dattime2.obj \
@@ -983,6 +986,7 @@ CT_LIB_OBJS = \
    $(CT_OBJ_DIR)\scrmark.obj \
    $(CT_OBJ_DIR)\setkeys.obj \
    $(CT_OBJ_DIR)\spread.obj \
+   $(CT_OBJ_DIR)\trapkey.obj \
    $(CT_OBJ_DIR)\untext.obj \
    $(CT_OBJ_DIR)\util.obj
 
@@ -3322,6 +3326,9 @@ $(CT_OBJ_DIR)\dbftools.obj : $(CT_DIR)\dbftools.c
 $(CT_OBJ_DIR)\disk.obj : $(CT_DIR)\disk.c
   $(CC_CMD)
 
+$(CT_OBJ_DIR)\envparam.obj : $(CT_DIR)\envparam.c
+  $(CC_CMD)
+
 $(CT_OBJ_DIR)\exponent.obj : $(CT_DIR)\exponent.c
   $(CC_CMD)
 
@@ -3332,6 +3339,9 @@ $(CT_OBJ_DIR)\finan.obj : $(CT_DIR)\finan.c
   $(CC_CMD)
 
 $(CT_OBJ_DIR)\ftoc.obj : $(CT_DIR)\ftoc.c
+  $(CC_CMD)
+
+$(CT_OBJ_DIR)\intneg.obj : $(CT_DIR)\intneg.c
   $(CC_CMD)
 
 $(CT_OBJ_DIR)\justify.obj : $(CT_DIR)\justify.c
@@ -3457,6 +3467,12 @@ $(CT_OBJ_DIR)\ctmisc.c : $(CT_DIR)\ctmisc.prg
 $(CT_OBJ_DIR)\ctmisc.obj : $(CT_OBJ_DIR)\ctmisc.c
    $(CC_CMD)
 
+$(CT_OBJ_DIR)\ctrand.c : $(CT_DIR)\ctrand.prg
+   $(HRB_CMD)
+
+$(CT_OBJ_DIR)\ctrand.obj : $(CT_OBJ_DIR)\ctrand.c
+   $(CC_CMD)
+
 $(CT_OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
    $(HRB_CMD)
 
@@ -3560,6 +3576,12 @@ $(CT_OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
    $(HRB_CMD)
 
 $(CT_OBJ_DIR)\spread.obj : $(CT_OBJ_DIR)\spread.c
+   $(CC_CMD)
+
+$(CT_OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
+   $(HRB_CMD)
+
+$(CT_OBJ_DIR)\trapkey.obj : $(CT_OBJ_DIR)\trapkey.c
    $(CC_CMD)
 
 $(CT_OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg

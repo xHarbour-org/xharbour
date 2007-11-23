@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.19 2006/02/21 19:37:07 druzus Exp $
+# $Id: Makefile,v 1.20 2006/10/15 17:50:34 ptsarenko Exp $
 #
 
 ROOT = ../../
@@ -39,10 +39,12 @@ C_SOURCES = \
    dattime2.c \
    dbftools.c \
    disk.c \
+   envparam.c \
    exponent.c \
    files.c \
    finan.c \
    ftoc.c \
+   intneg.c \
    justify.c \
    keyset.c \
    lton.c \
@@ -83,6 +85,7 @@ PRG_SOURCES= \
    color.prg \
    ct.prg \
    ctmisc.prg \
+   ctrand.prg \
    cttime.prg \
    dattime3.prg \
    diskutil.prg \
@@ -99,6 +102,7 @@ PRG_SOURCES= \
    setkeys.prg \
    scrmark.prg \
    spread.prg \
+   trapkey.prg \
    untext.prg \
    util.prg
 

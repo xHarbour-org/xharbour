@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5778 2007/11/20 21:47:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5779 2007/11/21 12:50:40 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,34 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+
+2007-11-23 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
+  + source/ct/ctrand.prg
+    + added CT3 RANDOM(), RAND() functions
+  + source/ct/trapkey.prg
+    + added CT3 TRAPINPUT(), TRAPSHIFT(), INKEYTRAP() functions
+  + source/ct/envparam.c
+    + added CT3 ENVPARAM() function
+  + source/ct/intneg.c
+    + added CT3 INTNEG(), INTPOS() function
+  * source/ct/getinfo.prg
+    + added CT3 GETINPUT() function
+  * source/ct/ctmict.prg
+    + added CT3 SETRC() function
+  * source/ct/Makefile
+  * hrbdll.bc
+  * hrbdll.dc
+  * hrbdll.gc
+  * hrbdll.pc
+  * hrbdll.vc
+  * hrbdll.wc
+  * makefile.bc
+  * makefile.dc
+  * makefile.gc
+  * makefile.pc
+  * makefile.vc
+  * makefile.wc
+    * added ct functions
 
 2007-11-21 08:50 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/gtapi.c

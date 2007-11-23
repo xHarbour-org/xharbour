@@ -1,19 +1,13 @@
 /*
- * $Id: getinfo.prg,v 1.4 2006/11/18 21:32:25 oh1 Exp $
+ * $Id: intneg.c,v 1.1 2006/11/29 22:11:31 ptsarenko Exp $
  */
+
 /*
  * xHarbour Project source code:
- *   CT3 GET/READ Functions
+ *   CT3 numeric functions
  *
- * COUNTGETS(), CURRENTGET(), GETFLDROW(), GETFLDCOL(), GETFLDVAR()
- * Copyright 2004 Philip Chee <philip@aleytys.pc.my>
- *
- * SAVEGETS(), RESTGETS()
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
- * www - http://www.harbour-project.org
- *
- * GETINPUT()
- * Copyright 2007 Pavel Tsarenko <tpe2@mail.ru>
+ * INTNEG(), INTPOS()
+ * Copyright 2004 Pavel Tsarenko <tpe2.mail.ru>
  * www - http://www.xharbour.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -57,75 +51,96 @@
  *
  */
 
-#include "common.ch"
+#include "hbapi.h"
+#include "ct.h"
 
-MEMVAR GetList
+extern HB_ULONG HB_EXPORT hb_hextonum(char *cHex);
 
-/*
-FUNCTION SaveGets()
-  LOCAL aGetList := GetList
+HB_FUNC( INTNEG )
+{
+   LONG lNumber = 0;
+   BOOL b32 = (ISLOG(2) && hb_parl( 2 ) ? 1 : 0);
 
-  GetList := {}
+   if( ISNUM(1) )
+   {
+      lNumber = hb_parnl(1);
+   }
+   else if( ISCHAR(1) )
+   {
+      lNumber = hb_hextonum( hb_parc(1) );
+   }
 
-RETURN aGetList
+   if( b32 )
+   {
+#ifndef HB_LONG_LONG_OFF
+      if( lNumber < 0)
+#endif
+         hb_retnl( lNumber );
+#ifndef HB_LONG_LONG_OFF
+      else
+         hb_retnll( (LONG) lNumber );
+#endif
+   }
+   else
+   {
+      if( lNumber > 65535 )
+      {
+         lNumber &= 0xFFFF;
+      }
 
-FUNCTION RestGets( aGetList )
+      if( lNumber < -32767 )
+      {
+         hb_retni( 0 );
+      }
+      else
+      {
+         hb_retni( (SHORT) ( lNumber & 0xFFFF ) );
+      }
+   }
 
-RETURN ( GetList := aGetList ) <> NIL
-*/
+}
 
-FUNCTION CountGets()
-RETURN LEN( GetList )
+HB_FUNC( INTPOS )
+{
+   LONG lNumber = 0;
+   BOOL b32 = (ISLOG(2) && hb_parl( 2 ) ? 1 : 0);
 
-FUNCTION CurrentGet()
-  LOCAL nPos, ;
-        oActive := GetActive()
-  nPos:= ASCAN( GetList, {|oGet| oGet == oActive } )
-RETURN nPos
 
-FUNCTION GetFldRow( nField )
-  LOCAL nRow := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nRow := GetList[ nField ]:Row
-  ENDIF
-RETURN nRow
+   if( ISNUM(1) )
+   {
+      lNumber = hb_parnl(1);
+   }
+   else if( ISCHAR(1) )
+   {
+      lNumber = hb_hextonum( hb_parc(1) );
+   }
 
-FUNCTION GetFldCol( nField )
-  LOCAL nCol := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nCol := GetList[ nField ]:Col
-  ENDIF
-RETURN nCol
+   if( b32 )
+   {
+#ifndef HB_LONG_LONG_OFF
+      if( lNumber >= 0)
+#endif
+         hb_retnl( lNumber );
+#ifndef HB_LONG_LONG_OFF
+      else
+         hb_retnll( (ULONG) lNumber );
+#endif
+   }
+   else
+   {
+      if( lNumber > 65535 )
+      {
+         lNumber &= 0xFFFF;
+      }
 
-FUNCTION GetFldVar( nField )
-  LOCAL nVar := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nVar := GetList[ nField ]:Name
-  ENDIF
-RETURN nVar
+      if( lNumber < -32767 )
+      {
+         hb_retni( 0 );
+      }
+      else
+      {
+         hb_retni( (USHORT) ( lNumber & 0xFFFF ) );
+      }
+   }
 
-FUNCTION GetInput(xDefault, nRow, nCol, lSay, cPrompt)
-Local GetList := {}
-
-if nRow # nil
-  SetPos(nRow, nCol)
-endif
-if cPrompt # nil
-  DispOut(cPrompt)
-  nRow := Row()
-  nCol := Col() + 1
-else
-  nRow := Row()
-  nCol := Col()
-endif
-@ nRow, nCol GET xDefault
-READ
-
-if lSay # nil .and. lSay
-  SetPos(nRow, nCol)
-  DispOut(xDefault)
-endif
-RETURN xDefault
+}

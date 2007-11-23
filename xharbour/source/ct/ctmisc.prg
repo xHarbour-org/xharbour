@@ -1,5 +1,5 @@
 /*
- * $Id: ctmisc.prg,v 1.6 2006/12/11 20:44:40 ptsarenko Exp $
+ * $Id: ctmisc.prg,v 1.7 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -107,6 +107,10 @@ FUNCTION DOSPARAM
       cRet += if(i==1, "", " ") + HB_ARGV( i )
    NEXT
    RETURN cRet
+
+FUNCTION SetRC(nRow, nCol)
+   SetPos(nRow, nCol)
+   RETURN ""
 
 #ifndef __PLATFORM__Windows
 FUNCTION EXENAME()

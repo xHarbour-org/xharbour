@@ -1,20 +1,12 @@
 /*
- * $Id: getinfo.prg,v 1.4 2006/11/18 21:32:25 oh1 Exp $
+ * $Id: envparam.c,v 1.1 2007/11/23 20:00:00 ptsarenko Exp $
  */
 /*
- * xHarbour Project source code:
- *   CT3 GET/READ Functions
+ * Harbour Project source code:
+ *   CT3 functions: ENVPARAM()
  *
- * COUNTGETS(), CURRENTGET(), GETFLDROW(), GETFLDCOL(), GETFLDVAR()
- * Copyright 2004 Philip Chee <philip@aleytys.pc.my>
- *
- * SAVEGETS(), RESTGETS()
- * Copyright 1999-2001 Viktor Szakats <viktor.szakats@syenar.hu>
- * www - http://www.harbour-project.org
- *
- * GETINPUT()
  * Copyright 2007 Pavel Tsarenko <tpe2@mail.ru>
- * www - http://www.xharbour.org
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,75 +49,82 @@
  *
  */
 
-#include "common.ch"
+#include "hbapi.h"
 
-MEMVAR GetList
+#ifdef HB_OS_WIN_32
+#include <windows.h>
+#endif
 
-/*
-FUNCTION SaveGets()
-  LOCAL aGetList := GetList
+#define CRLF "\x0D\x0A"
 
-  GetList := {}
+HB_FUNC( ENVPARAM )
+{
+#if defined(HB_OS_DOS)
+   {
 
-RETURN aGetList
+   extern char **_environ;
+   char *buffer = NULL;
+   int x;
+   int buffsize = 0;
 
-FUNCTION RestGets( aGetList )
+   // scan strings first and add up total size
+   for (x = 0; ;x++)
+   {
+      if (! _environ[x])
+         break;
+      buffsize += (strlen(_environ[x]) + 2);
+   }
 
-RETURN ( GetList := aGetList ) <> NIL
-*/
+   buffer = ( char * ) hb_xalloc(buffsize + 1);
+   buffer[ 0 ] = 0;
 
-FUNCTION CountGets()
-RETURN LEN( GetList )
+   for (x = 0; ;x++)
+   {
+      if (! _environ[x])
+         break;
 
-FUNCTION CurrentGet()
-  LOCAL nPos, ;
-        oActive := GetActive()
-  nPos:= ASCAN( GetList, {|oGet| oGet == oActive } )
-RETURN nPos
+      strcat( buffer, _environ[x] );
+      strcat( buffer, CRLF );
+   }
 
-FUNCTION GetFldRow( nField )
-  LOCAL nRow := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nRow := GetList[ nField ]:Row
-  ENDIF
-RETURN nRow
+   buffer[ buffsize ] = 0;
+   hb_retclenAdopt(buffer, buffsize);
 
-FUNCTION GetFldCol( nField )
-  LOCAL nCol := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nCol := GetList[ nField ]:Col
-  ENDIF
-RETURN nCol
+}
+#elif defined(HB_OS_WIN_32)
+{
 
-FUNCTION GetFldVar( nField )
-  LOCAL nVar := -1
-  DEFAULT nField  TO  CurrentGet()
-  IF ( nField >= 1 .AND. nField <= LEN( GetList ) )
-    nVar := GetList[ nField ]:Name
-  ENDIF
-RETURN nVar
+   char *buffer;
+   LPVOID lpEnviron = GetEnvironmentStrings();
+   char *sCurEnv;
+   int buffsize = 0;
 
-FUNCTION GetInput(xDefault, nRow, nCol, lSay, cPrompt)
-Local GetList := {}
+   // scan strings first and add up total size
+   for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
+   {
+      buffsize += (strlen( (char*) sCurEnv) + 2 );
+      while (*sCurEnv)
+         *sCurEnv++;
+   }
 
-if nRow # nil
-  SetPos(nRow, nCol)
-endif
-if cPrompt # nil
-  DispOut(cPrompt)
-  nRow := Row()
-  nCol := Col() + 1
-else
-  nRow := Row()
-  nCol := Col()
-endif
-@ nRow, nCol GET xDefault
-READ
+   buffer = ( char * ) hb_xalloc( buffsize + 1 );
+   buffer[ 0 ] = 0;
 
-if lSay # nil .and. lSay
-  SetPos(nRow, nCol)
-  DispOut(xDefault)
-endif
-RETURN xDefault
+   for (sCurEnv = (LPTSTR) lpEnviron; *sCurEnv; sCurEnv++)
+   {
+
+      strcat( buffer, (char*) sCurEnv );
+      strcat( buffer, CRLF );
+
+      while (*sCurEnv)
+         *sCurEnv++;
+   }
+
+   FreeEnvironmentStrings( (LPCH) lpEnviron);
+
+   buffer[ buffsize ] = 0;
+   hb_retclenAdopt(buffer, buffsize);
+}
+
+#endif
+}

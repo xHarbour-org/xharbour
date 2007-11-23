@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.112 2007/11/13 03:35:33 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.113 2007/11/13 21:15:45 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -800,10 +800,12 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dattime2.obj \
   $(OBJ_DIR)\dbftools.obj \
   $(OBJ_DIR)\disk.obj \
+  $(OBJ_DIR)\envparam.obj \
   $(OBJ_DIR)\exponent.obj \
   $(OBJ_DIR)\files.obj \
   $(OBJ_DIR)\finan.obj \
   $(OBJ_DIR)\ftoc.obj \
+  $(OBJ_DIR)\intneg.obj \
   $(OBJ_DIR)\justify.obj \
   $(OBJ_DIR)\keyset.obj \
   $(OBJ_DIR)\lton.obj \
@@ -840,6 +842,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\color.obj \
   $(OBJ_DIR)\ct.obj \
   $(OBJ_DIR)\ctmisc.obj \
+  $(OBJ_DIR)\ctrand.obj \
   $(OBJ_DIR)\cttime.obj \
   $(OBJ_DIR)\ctwin.obj \
   $(OBJ_DIR)\dattime3.obj \
@@ -855,6 +858,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\screen3.obj \
   $(OBJ_DIR)\setkeys.obj \
   $(OBJ_DIR)\scrmark.obj \
+  $(OBJ_DIR)\trapkey.obj \
   $(OBJ_DIR)\spread.obj \
   $(OBJ_DIR)\untext.obj \
   $(OBJ_DIR)\util.obj \
@@ -1794,6 +1798,12 @@ $(OBJ_DIR)\ctmisc.c : $(CT_DIR)\ctmisc.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\ctmisc.obj : $(OBJ_DIR)\ctmisc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ctrand.c : $(CT_DIR)\ctrand.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\ctrand.obj : $(OBJ_DIR)\ctrand.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cttime.c : $(CT_DIR)\cttime.prg
