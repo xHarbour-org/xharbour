@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5779 2007/11/21 12:50:40 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5780 2007/11/23 18:50:37 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,20 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-11-25 11:18 UTC+0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * source/rtl/gtwvt/gtwvt.c
+    + Reintroduced WM_TIMER callback.
+    * Introduced hack to support code being executed in WM_TIMER callback. 
+      Someone please port Harbour's hb_vmRequestReenter()* protocol in xHarbour
+      as Przem has strongly pointed out this anomaly.
+    + Added another callback WVT_KEY which is triggered when some key is placed in input queue.
+  * source/rtl/gtwvt/gtwvt.c
+    + Added PHB_DYNS  pSymWVT_KEY member to GLOBAL_DATA structure.
+  * contrib/wvtgui/wvtclass.prg
+    * ::Sunper():New() => ::Super:New()
+  * contrib/wvtgui/wvtutils.c
+    ! Changed Wvt_SetTimer( nTimeSlice ) => Wvt_SetTimer( nTimerId, nTimeSlice )
+    ! Changed Wvt_KillTimer() => Wvt_KillTimer( nTimerId )
 
 2007-11-23 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   + source/ct/ctrand.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.c,v 1.174 2007/10/19 19:58:11 vouchcac Exp $
+ * $Id: gtwvt.c,v 1.175 2007/10/20 15:28:15 vouchcac Exp $
  */
 
 /*
@@ -617,6 +617,65 @@ void HB_GT_FUNC( gt_GetText( USHORT top, USHORT left, USHORT bottom, USHORT righ
       }
     }
   }
+}
+
+//-------------------------------------------------------------------//
+
+void hb_wvt_GetStringAttrib( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer, BYTE * sAttrib )
+{
+  USHORT irow, icol, index, j;
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetText( %hu, %hu, %hu, %hu, %p )", top, left, bottom, right, sBuffer ) );
+
+  j = 0;
+  for ( irow = top; irow <= bottom; irow++ )
+  {
+    index = hb_wvt_gtGetIndexForTextBuffer( left, irow );
+    for ( icol = left; icol <= right; icol++ )
+    {
+      if ( index >= _s.BUFFERSIZE )
+      {
+        break;
+      }
+      else
+      {
+        sBuffer[ j ] = _s.pBuffer[ index ];
+        sAttrib[ j ] = _s.pAttributes[ index ];
+        index++;
+        j++;
+      }
+    }
+  }
+}
+
+//----------------------------------------------------------------------//
+
+void hb_wvt_PutStringAttrib( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer, BYTE * sAttrib )
+{
+  USHORT irow, icol, index, j;
+
+  HB_TRACE( HB_TR_DEBUG, ( "hb_gt_GetText( %hu, %hu, %hu, %hu, %p )", top, left, bottom, right, sBuffer ) );
+
+  j = 0;
+  for ( irow = top; irow <= bottom; irow++ )
+  {
+    index = hb_wvt_gtGetIndexForTextBuffer( left, irow );
+    for ( icol = left; icol <= right; icol++ )
+    {
+      if ( index >= _s.BUFFERSIZE )
+      {
+        break;
+      }
+      else
+      {
+        _s.pBuffer[ index ] = sBuffer[ j ];
+        _s.pAttributes[ index ] = sAttrib[ j ];
+        j++;
+        index++;
+      }
+    }
+  }
+  hb_wvt_gtSetInvalidRect( left, top, right, bottom );
 }
 
 //-------------------------------------------------------------------//
@@ -2463,20 +2522,20 @@ static LRESULT CALLBACK hb_wvt_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
        hb_idleState( FALSE );
        return( 0 );
     }
-/*
+
     case WM_TIMER:
     {
        if ( _s.pSymWVT_TIMER )
        {
           hb_vmPushState();
-          hb_vmPushSymbol( _s.pSymWVT_TIMER->pSymbol );
+          hb_vmPushSymbol( hb_dynsymSymbol( _s.pSymWVT_TIMER ) );
           hb_vmPushNil();
-          hb_vmDo( 0 );
+          hb_vmPushLong( (LONG) wParam );
+          hb_vmDo( 1 );
           hb_vmPopState();
        }
        return( 0 );
     }
-*/
   }
   return( DefWindowProc( hWnd, message, wParam, lParam ) );
 }
@@ -2640,7 +2699,7 @@ static DWORD hb_wvt_gtProcessMessages( void )
       hb_idleSleep( 0.01 );
    }
 
-   while ( PeekMessage( &msg, _s.hWnd, 0, 0, PM_REMOVE ) )
+   while ( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
    {
       bProcessed = FALSE;
 
@@ -3111,6 +3170,8 @@ static void gt_hbInitStatics( void )
   _s.pSymWVT_KILLFOCUS= hb_dynsymFind( "WVT_KILLFOCUS" ) ;
   _s.pSymWVT_MOUSE    = hb_dynsymFind( "WVT_MOUSE"     ) ;
   _s.pSymWVT_TIMER    = hb_dynsymFind( "WVT_TIMER"     ) ;
+  _s.pSymWVT_KEY      = hb_dynsymFind( "WVT_KEY"       ) ;
+
   _s.rowStart         = 0;
   _s.rowStop          = 0;
   _s.colStart         = 0;
@@ -3156,6 +3217,17 @@ void HB_EXPORT hb_wvt_gtAddCharToInputQueue ( int data )
   {
     _s.Keys[ _s.keyPointerIn ] = data ;
     _s.keyPointerIn = iNextPos ;
+
+    if ( _s.pSymWVT_KEY )
+    {
+       hb_vmPushState();
+       hb_vmPushSymbol( _s.pSymWVT_KEY->pSymbol );
+       hb_vmPushNil();
+       hb_vmPushLong( ( LONG ) data );
+       hb_vmDo( 1 );
+       hb_vmPopState();
+    }
+
   }
 }
 
@@ -4494,6 +4566,8 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
    PHB_ITEM pFunc = NULL;
    PHB_DYNS pDynSym;
 
+   //static char * buffer[ 50 ];
+
    iType = (int) NULL;
 
    for ( iIndex = 0; iIndex < WVT_DLGML_MAX; iIndex++ )
@@ -4531,33 +4605,36 @@ HB_EXPORT BOOL CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM w
 
          case 2:  // Block
          {
-            /* eval the codeblock */
+            /* Hack to not GPF when PCODE is being executed after HVM is shutdown */
+            /* Until Harbour's hb_vmRequestReenter()* is ported to xHarbour - Thanks Przem */
+            if ( ! ( message == WM_DESTROY || message == WM_CLOSE || message == WM_NCDESTROY ) )
+            {
             if ( _s.pFunc[ iIndex ]->type == HB_IT_BLOCK )
             {
               HB_ITEM hihDlg, himessage, hiwParam, hilParam;
               PHB_ITEM pReturn;
 
               hihDlg.type = HB_IT_NIL;
-              hb_itemPutNL( &hihDlg, (ULONG) hDlg );
+              hb_itemPutNL( &hihDlg   , (ULONG) hDlg    );
 
               himessage.type = HB_IT_NIL;
-              hb_itemPutNL( &himessage, (ULONG) message );
+              hb_itemPutNL( &himessage, (UINT)  message );
 
               hiwParam.type = HB_IT_NIL;
-              hb_itemPutNL( &hiwParam, (ULONG) wParam );
+              hb_itemPutNL( &hiwParam , (ULONG) wParam  );
 
               hilParam.type = HB_IT_NIL;
-              hb_itemPutNL( &hilParam, (ULONG) lParam );
+              hb_itemPutNL( &hilParam , (ULONG) lParam  );
 
               pReturn = hb_itemDo( (PHB_ITEM) _s.pFunc[ iIndex ], 4, &hihDlg, &himessage, &hiwParam, &hilParam );
               bReturn = hb_itemGetNL( pReturn );
               hb_itemRelease( pReturn );
             }
+            }
             else
             {
               //internal error: missing codeblock
             }
-
 
             break;
          }

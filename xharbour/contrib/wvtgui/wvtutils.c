@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.15 2007/06/28 18:51:20 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.16 2007/10/19 19:58:11 vouchcac Exp $
  */
 
 /*
@@ -433,14 +433,14 @@ HB_FUNC( WVT_SETGUI )
 
 HB_FUNC( WVT_SETTIMER )
 {
-   hb_retl( SetTimer( _s->hWnd, 101, hb_parni( 1 ), NULL ) );
+   hb_retl( SetTimer( _s->hWnd, hb_parni( 1 ), hb_parni( 2 ), NULL ) );
 }
 
 //-------------------------------------------------------------------//
 
 HB_FUNC( WVT_KILLTIMER )
 {
-   hb_retl( KillTimer( _s->hWnd, 101 ) );
+   hb_retl( KillTimer( _s->hWnd, hb_parni( 1 ) ) );
 }
 
 //-------------------------------------------------------------------//

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.h,v 1.10 2006/03/25 18:06:43 bdj Exp $
+ * $Id: gtwvt.h,v 1.11 2007/02/10 15:40:30 ronpinkas Exp $
  */
 
 /*
@@ -272,6 +272,7 @@ typedef struct global_data
   HBITMAP   hGuiBmp;
   int       iGuiWidth;
   int       iGuiHeight;
+  PHB_DYNS  pSymWVT_KEY;                 // Called : hb_wvt_gtAddCharToInputQueue()
 } GLOBAL_DATA;
 
 typedef GLOBAL_DATA * LPGLOBAL_DATA;
@@ -307,11 +308,14 @@ BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 BOOL   HB_EXPORT hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image );
-
+void   HB_EXPORT hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHORT bottom );
 LPWORD HB_EXPORT lpwAlign( LPWORD lpIn );
 int    HB_EXPORT nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );
 BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
 BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcModal( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
+
+void   HB_EXPORT hb_wvt_GetStringAttrib( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer, BYTE * sAttrib );
+void   HB_EXPORT hb_wvt_PutStringAttrib( USHORT top, USHORT left, USHORT bottom, USHORT right, BYTE * sBuffer, BYTE * sAttrib );
 
 HB_EXPORT GLOBAL_DATA * hb_wvt_gtGetGlobalData( void );
 

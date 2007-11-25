@@ -1,5 +1,5 @@
 /*
- * $Id: wvtclass.prg,v 1.5 2007/07/04 21:53:40 vouchcac Exp $
+ * $Id: wvtclass.prg,v 1.6 2007/07/05 18:19:18 ronpinkas Exp $
  */
 
 /*
@@ -1714,7 +1714,7 @@ METHOD New( oParent, nID, nTop, nLeft, nBottom, nRight ) CLASS WvtToolBar
    DEFAULT nBottom TO 1
    nRight  := oParent:MaxCol()
 
-   ::Super():New( oParent, DLG_OBJ_TOOLBAR, nID, nTop, nLeft, nBottom, nRight )
+   ::Super:New( oParent, DLG_OBJ_TOOLBAR, nID, nTop, nLeft, nBottom, nRight )
 
    ::lActive   := .t.
    ::lFloating := .F.
