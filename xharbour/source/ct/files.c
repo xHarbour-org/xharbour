@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.10 2005/05/26 19:08:32 peterrees Exp $
+ * $Id: files.c,v 1.11 2007/10/12 01:02:51 lculik Exp $
  */
 
 /*
@@ -201,6 +201,7 @@ HB_FUNC( FILEATTR )
 
    #if defined( HB_OS_DOS )
       #if defined( __DJGPP__ ) || defined( __BORLANDC__ )
+      if( ISCHAR(1) )
       {
          char *szFile=hb_parcx( 1 );
          int iAttri=0;
@@ -218,14 +219,25 @@ HB_FUNC( FILEATTR )
 
          hb_retni( iAttri );
       }
+      else
+      {
+         hb_retni( ( int ) fsOldFiles.ff_attrib );
+      }
       #endif
 
    #elif defined( HB_OS_WIN_32 )
    {
       DWORD dAttr;
 
-      LPCTSTR cFile=hb_parcx( 1 );
-      dAttr = GetFileAttributes( cFile );
+      if( ISCHAR(1) )
+      {
+         LPCTSTR cFile = hb_parcx( 1 );
+         dAttr = GetFileAttributes( cFile );
+      }
+      else
+      {
+         dAttr = Lastff32.dwFileAttributes;
+      }
       hb_retnl( dAttr );
 
    }
@@ -257,9 +269,9 @@ HB_FUNC( SETFATTR )
          }
 
          if ( !( iFlags & ~( FA_ARCH | FA_HIDDEN | FA_RDONLY | FA_SYSTEM ) ) )
-    {
-       iReturn = _chmod( szFile, 1, iFlags );
-    }
+         {
+            iReturn = _chmod( szFile, 1, iFlags );
+         }
 
          hb_retni( iReturn );
       }
@@ -358,17 +370,17 @@ HB_FUNC( FILESEEK )
 
          if ( hLastFind != INVALID_HANDLE_VALUE )
          {
-       bFound = TRUE;
+            bFound = TRUE;
             hb_retc( Lastff32.cFileName );
          }
       }
       else
       {
          if ( FindNextFile( hLastFind, &Lastff32 ) )
-    {
-       bFound = TRUE;
+         {
+            bFound = TRUE;
             hb_retc( Lastff32.cFileName );
-    }
+         }
          else
          {
             FindClose( hLastFind );
@@ -401,7 +413,7 @@ HB_FUNC( FILESEEK )
 
          if ( !iFind )
          {
-       bFound = TRUE;
+            bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
       }
@@ -410,7 +422,7 @@ HB_FUNC( FILESEEK )
          iFind = findnext( &fsOldFiles );
          if ( !iFind )
          {
-       bFound = TRUE;
+            bFound = TRUE;
             hb_retc( fsOldFiles.ff_name );
          }
          #if !defined ( __DJGPP__ )
@@ -467,7 +479,7 @@ HB_FUNC( FILESIZE )
             dwFlags |= FILE_ATTRIBUTE_SYSTEM;
 
          if(  iAttr & FA_NORMAL  )
-            dwFlags |=    FILE_ATTRIBUTE_NORMAL;
+            dwFlags |= FILE_ATTRIBUTE_NORMAL;
 
          hFind = FindFirstFile( szFile,&hFilesFind );
 
@@ -490,11 +502,11 @@ HB_FUNC( FILESIZE )
             }
             FindClose( hFind );
          }
-    else
-    {
-       hb_retnl( -1 );
-    }
+      else
+      {
+         hb_retnl( -1 );
       }
+   }
 
    else
    {
@@ -548,7 +560,7 @@ HB_FUNC( FILESIZE )
 #elif defined( OS_UNIX_COMPATIBLE ) || defined(HB_OS_OS2)
 
 {
-   if ( hb_pcount(  ) >0 )
+   if ( hb_pcount( ) > 0 )
    {
       const char *szFile=hb_parcx( 1 );
       USHORT   ushbMask = FA_ARCH;
@@ -616,7 +628,7 @@ HB_FUNC( FILEDATE )
             dwFlags |= FILE_ATTRIBUTE_SYSTEM;
 
          if(  iAttr & FA_NORMAL  )
-            dwFlags |=    FILE_ATTRIBUTE_NORMAL;
+            dwFlags |= FILE_ATTRIBUTE_NORMAL;
 
          hFind = FindFirstFile( szFile,&hFilesFind );
 
@@ -738,7 +750,7 @@ HB_FUNC( FILETIME )
           dwFlags |= FILE_ATTRIBUTE_SYSTEM;
 
       if(  iAttr & FA_NORMAL  )
-          dwFlags |=    FILE_ATTRIBUTE_NORMAL;
+          dwFlags |= FILE_ATTRIBUTE_NORMAL;
 
       hFind = FindFirstFile( szFile, &hFilesFind );
 

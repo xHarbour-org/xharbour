@@ -1,5 +1,5 @@
 /*
- * $Id: copyfile.c,v 1.2 2004/03/18 03:58:37 ronpinkas Exp $
+ * $Id: copyfile.c,v 1.3 2005/08/30 16:30:22 lculik Exp $
  */
 
 /*
@@ -57,6 +57,8 @@
 #if defined(OS_UNIX_COMPATIBLE)
    #include <sys/stat.h>
    #include <unistd.h>
+#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+   #include <windows.h>
 #endif
 
 #define BUFFER_SIZE 8192
@@ -93,6 +95,9 @@ static BOOL hb_fsCopy( char * szSource, char * szDest )
 #if defined(OS_UNIX_COMPATIBLE)
          struct stat struFileInfo;
          int iSuccess = fstat( fhndSource, &struFileInfo );
+#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+         BY_HANDLE_FILE_INFORMATION hFileInfo;
+         BOOL bSuccess = GetFileInformationByHandle( (HANDLE) fhndSource, &hFileInfo);
 #endif
          BYTE * buffer;
          USHORT usRead;
@@ -120,9 +125,21 @@ static BOOL hb_fsCopy( char * szSource, char * szDest )
 #if defined(OS_UNIX_COMPATIBLE)
          if( iSuccess == 0 )
             fchmod( fhndDest, struFileInfo.st_mode );
+#elif ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+         if( bSuccess )
+            SetFileTime( (HANDLE) fhndDest,
+    &hFileInfo.ftCreationTime,
+    &hFileInfo.ftLastAccessTime,
+    &hFileInfo.ftLastWriteTime);
 #endif
 
          hb_fsClose( fhndDest );
+#if ( defined( HB_OS_WIN_32 ) || defined( __MINGW32__ ) ) && !defined( __CYGWIN__ )
+         if( bSuccess )
+         {
+            SetFileAttributes( (LPCSTR) szSource, hFileInfo.dwFileAttributes );
+         }
+#endif
       }
 
       hb_fsClose( fhndSource );

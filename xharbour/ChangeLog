@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5780 2007/11/23 18:50:37 ptsarenko Exp $
+ * $Id: ChangeLog,v 1.5781 2007/11/25 19:32:03 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-26 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
+  * source/rtl/copyfile.c
+    * save file date, time, and attribute for win32 platform in the
+    __CopyFile() function
+  * source/ct/files.c
+    * handling first parameter in FileAttr()
+    * formatting
 
 2007-11-25 11:18 UTC+0800 Pritpal Bedi <pritpal@vouchcac.com>
   * source/rtl/gtwvt/gtwvt.c
