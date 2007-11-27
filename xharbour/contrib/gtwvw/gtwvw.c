@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvw.c,v 1.45 2007/05/24 03:05:51 bdj Exp $
+ * $Id: gtwvw.c,v 1.46 2007/09/21 16:28:53 bdj Exp $
  */
 
 /*
@@ -104,6 +104,12 @@
 
 #include <windows.h>
 #include <commctrl.h>
+
+#if (defined(__MSC6__) || defined(__DMC__))
+   #define LONG_PTR LONG
+   #define SetWindowLongPtr SetWindowLong
+   #define GetWindowLongPtr GetWindowLong
+#endif
 
 #if defined(__WATCOMC__)
   #include <conio.h>
@@ -774,7 +780,7 @@ void HB_GT_FUNC( gt_SetCursorStyle( USHORT usStyle ) )
   HB_TRACE( HB_TR_DEBUG, ( "hb_gt_SetCursorStyle( %hu )", usStyle ) );
 
   pWindowData = (WIN_DATA*) s_pWindows[ s_usNumWindows-1 ];
-  usFullSize = s_bVertCaret ? pWindowData->PTEXTSIZE.x : pWindowData->PTEXTSIZE.y;
+  usFullSize = (USHORT) (s_bVertCaret ? pWindowData->PTEXTSIZE.x : pWindowData->PTEXTSIZE.y);
 
   s_usCursorStyle = usStyle;
   switch( usStyle )
@@ -3861,7 +3867,7 @@ static LRESULT CALLBACK hb_wvw_gtWndProc( HWND hWnd, UINT message, WPARAM wParam
         if (!s_bMainCoordMode)
         {
 
-          hb_gtSetPos(pWindowData->caretPos.y, pWindowData->caretPos.x);
+          hb_gtSetPos((SHORT) pWindowData->caretPos.y, (SHORT) pWindowData->caretPos.x);
         }
         else
         {
@@ -6206,8 +6212,8 @@ static void hb_wvw_GTFUNCPrologue(BYTE byNumCoord, USHORT * pusRow1, USHORT * pu
 {
   USHORT usWinNum;
 
-  if (byNumCoord<2) (*pusCol1) = s_pWindows[0]->caretPos.x;
-  if (byNumCoord<1) (*pusRow1) = s_pWindows[0]->caretPos.y;
+  if (byNumCoord<2) (*pusCol1) = (USHORT) s_pWindows[0]->caretPos.x;
+  if (byNumCoord<1) (*pusRow1) = (USHORT) s_pWindows[0]->caretPos.y;
 
   usWinNum = hb_wvw_gtFindWindow(*pusRow1, *pusCol1);
 
@@ -6281,8 +6287,8 @@ static USHORT hb_wvw_gtSetCurWindow( USHORT usWinNum )
 
   /* tell GTAPI about the new row(), col() */
 
-  hb_gtSetPos( s_pWindows[ s_usCurWindow ]->caretPos.y,
-               s_pWindows[ s_usCurWindow ]->caretPos.x );
+  hb_gtSetPos( (SHORT) s_pWindows[ s_usCurWindow ]->caretPos.y,
+               (SHORT) s_pWindows[ s_usCurWindow ]->caretPos.x );
   /* done updating GTAPI's statics......... */
 
   s_bMainCoordMode = bMainCoordMode;
@@ -7236,8 +7242,8 @@ HB_FUNC( WVW_ADDROWS )
 
   GetWindowRect( pWindowData->hWnd, &wi );
   GetClientRect( pWindowData->hWnd, &ci );
-  diffheight = (wi.bottom-wi.top) - (ci.bottom-ci.top);
-  diffwidth  = (wi.right-wi.left) - (ci.right-ci.left);
+  diffheight = (USHORT) ((wi.bottom-wi.top) - (ci.bottom-ci.top));
+  diffwidth  = (USHORT) ((wi.right-wi.left) - (ci.right-ci.left));
 
   height += diffheight;
   width += diffwidth;
@@ -11170,7 +11176,7 @@ HB_FUNC( WVW_DRAWIMAGE )
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
    POINT xy = { 0 };
-   int   iLeft, iTop, iRight, iBottom;
+   int   iLeft, iTop, iRight = 0, iBottom = 0;
    WIN_DATA * pWindowData;
 
    BOOL     bActBottom = ISNIL( 4 ),
@@ -11371,7 +11377,7 @@ HB_FUNC( WVW_DRAWLABEL )
 HB_FUNC( WVW_DRAWOUTLINE )
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
-   HPEN  hPen, hOldPen;
+   HPEN  hPen = 0, hOldPen = 0;
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
 
@@ -11410,7 +11416,7 @@ HB_FUNC( WVW_DRAWOUTLINE )
    }
    else
    {
-      hPen = 0;
+      //hPen = 0;
       SelectObject( pWindowData->hdc, s_sApp.penBlack );
    }
 
@@ -13242,7 +13248,7 @@ HB_FUNC( WVW_SBCREATE)
      RECT rSB = { 0 };
      if (GetClientRect(hWndSB, &rSB))
      {
-       pWindowData->usSBHeight = rSB.bottom;
+       pWindowData->usSBHeight = (USHORT) rSB.bottom;
      }
      pWindowData->hStatusBar = hWndSB;
 
@@ -13322,7 +13328,7 @@ HB_FUNC (WVW_SBADDPART)
 
      if (GetTextExtentPoint32(hDCSB, hb_parcx(2), hb_parclen(2)+1, &size))
      {
-       usWidth = size.cx;
+       usWidth = (USHORT) size.cx;
      }
 
      SelectObject( hDCSB, hOldFont );
@@ -14107,7 +14113,7 @@ static void hb_wvw_gtTBinitSize( WIN_DATA * pWindowData, HWND hWndTB )
    if (GetClientRect(hWndTB, &rTB))
    {
 
-     USHORT usTBHeight = rTB.bottom;
+     USHORT usTBHeight = (USHORT) rTB.bottom;
 
      pWindowData->usTBHeight = usTBHeight + 2;
 
@@ -14889,7 +14895,7 @@ static void ReposControls(USHORT usWinNum, BYTE byCtrlClass)
          POINT xy = { 0 };
          int  iTop, iLeft, iBottom, iRight;
 
-         xy      = hb_wvw_gtGetXYFromColRow( pWindowData, pcd->rCtrl.left, pcd->rCtrl.top );
+         xy      = hb_wvw_gtGetXYFromColRow( pWindowData, (USHORT) pcd->rCtrl.left, (USHORT) pcd->rCtrl.top );
          iTop    = xy.y + pcd->rOffCtrl.top ;
          iLeft   = xy.x + pcd->rOffCtrl.left;
 
@@ -14965,7 +14971,7 @@ static LRESULT CALLBACK hb_wvw_gtXBProc( HWND hWnd, UINT message, WPARAM wParam,
   USHORT usWinNum;
 
   UINT uiXBid;
-  byte bStyle;
+  //byte bStyle;
   WNDPROC OldProc;
 
   if (message == WM_MOUSEACTIVATE)
@@ -15051,7 +15057,7 @@ static LRESULT CALLBACK hb_wvw_gtXBProc( HWND hWnd, UINT message, WPARAM wParam,
 
   }
 
-  return( CallWindowProc( OldProc, hWnd, message, wParam, lParam ) );
+   return( CallWindowProc( OldProc, hWnd, message, wParam, lParam ) );
 }
 
 /*WVW_XBcreate( [nWinNum], nStyle, nTop, nLeft, nLength, bBlock, aOffset)
@@ -15480,8 +15486,9 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
       BOOL bAlt      = GetKeyState( VK_MENU ) & 0x8000;
       BOOL bCtrl     = GetKeyState( VK_CONTROL ) & 0x8000;
       BOOL bShift    = GetKeyState( VK_SHIFT ) & 0x8000;
+#if 0
       int  c = (int) wParam;
-
+#endif
       if (!bAlt && !bCtrl && !bShift && wParam == VK_SPACE)
       {
         break;
@@ -15492,6 +15499,12 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
         break;
       }
 
+#if 1
+      SetFocus(hWndParent);
+      PostMessage(hWndParent, message, wParam, lParam);
+#endif
+
+#if 0
       switch ( c )
       {
 
@@ -15515,7 +15528,7 @@ static LRESULT CALLBACK hb_wvw_gtBtnProc( HWND hWnd, UINT message, WPARAM wParam
         }
 
       }
-
+#endif
       return 0;
 
     }
@@ -15627,7 +15640,7 @@ static UINT ButtonCreate( USHORT usWinNum, USHORT usTop, USHORT usLeft, USHORT u
         iExpWidth = iRight - iLeft + 1;
         iExpHeight= iBottom - iTop + 1;
         hBitmap = hPrepareBitmap(szBitmap, uiBitmap,
-                                dStretch*iExpWidth, dStretch*iExpHeight,
+                                (int) dStretch*iExpWidth, (int) dStretch*iExpHeight,
                                 bMap3Dcolors,
                                 hWndButton );
 
@@ -15716,7 +15729,7 @@ HB_FUNC( WVW_PBCREATE)
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
-   int   iStyle;
+   //int   iStyle;
    UINT uiPBid;
    USHORT   usTop    = hb_parni( 2 ),
             usLeft   = hb_parni( 3 ),
@@ -16055,7 +16068,7 @@ HB_FUNC( WVW_CXCREATE)
 {
    USHORT usWinNum = WVW_WHICH_WINDOW;
    int   iOffTop, iOffLeft, iOffBottom, iOffRight;
-   int   iStyle;
+   //int   iStyle;
    UINT uiPBid;
    USHORT   usTop    = hb_parni( 2 ),
             usLeft   = hb_parni( 3 ),
@@ -16251,7 +16264,7 @@ HB_FUNC( WVW_CXGETCHECK )
    USHORT usWinNum = WVW_WHICH_WINDOW;
 
    UINT  uiCXid = (UINT) ( ISNIL( 2 ) ? 0  : hb_parni( 2 ) );
-   ULONG ulCheck;
+   ULONG ulCheck = 0;
    CONTROL_DATA * pcd = GetControlData(usWinNum, WVW_CONTROL_CHECKBOX, NULL, uiCXid);
 
    if (pcd->hWndCtrl)
@@ -16844,8 +16857,8 @@ HB_FUNC( WVW_CBCREATE)
             usLeft   = hb_parni( 3 ),
             usBottom = usTop,
             usRight  = usLeft + usWidth - 1;
-   USHORT   usNumElement = ISARRAY(5) ? hb_arrayLen( hb_param(5, HB_IT_ARRAY) ) : 0;
-   USHORT   usListLines  = ISNUM(7) ? hb_parni(7) : 3;
+   USHORT   usNumElement = (USHORT) (ISARRAY(5) ? hb_arrayLen( hb_param(5, HB_IT_ARRAY) ) : 0);
+   USHORT   usListLines  = (USHORT) (ISNUM(7) ? hb_parni(7) : 3);
    BYTE     byCharHeight = hb_wvw_LineHeight(pWindowData);
 
    /* in the future combobox type might be selectable by 8th parameter */
@@ -18000,7 +18013,7 @@ HB_FUNC( WVW_EBCREATE)
    {
      RECT rXB = { 0 }, rOffXB = { 0 };
      WNDPROC OldProc;
-     USHORT i;
+     //USHORT i;
      BOOL    bFromOEM = ( s_pWindows[usWinNum]->CodePage == OEM_CHARSET );
 
      if (bFromOEM)

@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.113 2007/05/25 11:10:05 toninhofwi Exp $
+ * $Id: gtwin.c,v 1.114 2007/10/17 08:08:41 lculik Exp $
  */
 
 /*
@@ -105,6 +105,10 @@
  To disable mouse, initialization was made in cmdarg.c
 */
 extern BOOL b_MouseEnable;
+
+#ifndef MOUSE_WHEELED
+#define MOUSE_WHEELED 0x0004
+#endif
 
 /* *********************************************************************** */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5781 2007/11/25 19:32:03 vouchcac Exp $
+ * $Id: ChangeLog,v 1.5782 2007/11/26 18:33:52 ptsarenko Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,26 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-27 07.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/vm/runner.c
+    ! casting
+
+  * source/rtl/gtwin/gtwin.c
+    ! define MOUSE_WHEELED if not defined (DMC)
+
+  * contrib/rdd_ads/ace.h
+    ! fix compilation for OpenWatcom
+
+  * source/rtl/win32ole.prg
+    ! fix compilation for OpenWatcom (but still not working)
+
+  * contrib/gtwvw/gtwvw.c
+    ! MSVC6/DMC does not have Get/SetWindowLongPtr, use Get/SetWindowLong
+    ! castings
+    ! initialize some var before use (GCC)
+    ! modify switch without case
+    ! commented some unused vars
 
 2007-11-26 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/rtl/copyfile.c

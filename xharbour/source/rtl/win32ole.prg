@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.152 2007/09/24 01:56:06 ronpinkas Exp $
+ * $Id: win32ole.prg,v 1.153 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -133,6 +133,12 @@ RETURN TOleAuto():GetActiveObject( cString )
    static DISPPARAMS s_EmptyDispParams;
 
    static VARIANTARG RetVal, OleVal;
+
+   #ifdef __WATCOMC__
+   const GUID GUID_NULL = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+   const IID IID_IEnumVARIANT = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } } ;
+   const IID IID_IDispatch = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } } ;
+   #endif
 
 #pragma ENDDUMP
 
