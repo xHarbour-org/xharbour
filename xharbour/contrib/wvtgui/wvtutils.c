@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.16 2007/10/19 19:58:11 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.17 2007/11/25 19:31:03 vouchcac Exp $
  */
 
 /*
@@ -1221,9 +1221,9 @@ HB_FUNC( WVT_CREATEDIALOGDYNAMIC )
    PHB_ITEM pFirst = hb_param( 3,HB_IT_ANY );
    PHB_ITEM pFunc  = NULL ;
    PHB_DYNS pExecSym;
-   HWND     hDlg ;
+   HWND     hDlg = 0;
    int      iIndex;
-   int      iType;
+   int      iType = 0;
    int      iResource = hb_parni( 4 );
 
    /* check if we still have room for a new dialog */
@@ -1665,7 +1665,7 @@ HB_FUNC( WVT_DLGSETICON )
 
 HB_FUNC( WIN_SENDMESSAGE )
 {
-   char *cText ;
+   char *cText = NULL;
 
    if( ISBYREF( 4 ) )
    {
@@ -1917,7 +1917,7 @@ HB_FUNC( WIN_LOADICON )
 //
 HB_FUNC( WIN_LOADIMAGE )
 {
-   HBITMAP hImage;
+   HBITMAP hImage = 0;
    int     iSource = hb_parni( 2 );
 
    switch ( iSource )
@@ -2076,7 +2076,7 @@ HB_FUNC( WIN_ISWINDOW )
 
 HB_FUNC( WVT_GETFONTHANDLE )
 {
-   HFONT hFont;
+   HFONT hFont = 0;
    int   iSlot = hb_parni( 1 )-1;
 
    if ( iSlot >= 0 && iSlot < WVT_PICTURES_MAX )
@@ -2282,7 +2282,7 @@ HB_FUNC( WVT__GETOPENFILENAME )
     ofn.Flags           = ISNIL   (5) ? OFN_SHOWHELP|OFN_NOCHANGEDIR : hb_parnl( 5 ) ;
     ofn.lpstrInitialDir = ISNIL   (6) ? NULL : hb_parc ( 6 );
     ofn.lpstrDefExt     = ISNIL   (7) ? NULL : hb_parc ( 7 );
-    ofn.nFilterIndex    = ISNIL   (8) ? NULL : hb_parni( 8 );
+    ofn.nFilterIndex    = ISNIL   (8) ? 0    : hb_parni( 8 );
     ofn.lpstrFile       = szFileName;
     ofn.nMaxFile        = size;
 

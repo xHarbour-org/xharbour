@@ -22,6 +22,9 @@ them both to 0; an emulation function will be used. */
 /* #undef EBCDIC */
 
 /* Define to 1 if you have the `bcopy' function. */
+#ifndef HAVE_BCOPY
+#define HAVE_BCOPY 1
+#endif
 
 /* Define to 1 if you have the <bits/type_traits.h> header file. */
 /* #undef HAVE_BITS_TYPE_TRAITS_H */
@@ -52,6 +55,9 @@ them both to 0; an emulation function will be used. */
 #endif
 
 /* Define to 1 if you have the `memmove' function. */
+#ifndef HAVE_MEMMOVE
+#define HAVE_MEMMOVE 1
+#endif
 
 /* Define to 1 if you have the <memory.h> header file. */
 #ifndef HAVE_MEMORY_H
@@ -161,13 +167,6 @@ them both to 0; an emulation function will be used. */
 /* This limit is parameterized just in case anybody ever wants to change it.
    Care must be taken if it is increased, because it guards against integer
    overflow caused by enormously large patterns. */
-#ifndef MAX_DUPLENGTH
-#define MAX_DUPLENGTH 30000
-#endif
-
-/* This limit is parameterized just in case anybody ever wants to change it.
-   Care must be taken if it is increased, because it guards against integer
-   overflow caused by enormously large patterns. */
 #ifndef MAX_NAME_COUNT
 #define MAX_NAME_COUNT 10000
 #endif
@@ -207,13 +206,13 @@ them both to 0; an emulation function will be used. */
 #define PACKAGE_NAME "PCRE"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE 7.1"
+#define PACKAGE_STRING "PCRE 7.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "7.1"
+#define PACKAGE_VERSION "7.3"
 
 
 /* If you are compiling for a system other than a Unix-like system or
@@ -228,9 +227,7 @@ them both to 0; an emulation function will be used. */
 /* #undef PCRE_EXP_DEFN */
 
 /* Define if linking statically (TODO: make nice with Libtool) */
-#ifndef PCRE_STATIC
-#define PCRE_STATIC 1
-#endif
+/* #undef PCRE_STATIC */
 
 /* When calling PCRE via the POSIX interface, additional working storage is
    required for holding the pointers to capturing substrings because PCRE
@@ -250,18 +247,14 @@ them both to 0; an emulation function will be used. */
 #endif
 
 /* Define to enable support for Unicode properties */
-#ifndef SUPPORT_UCP
-#define SUPPORT_UCP
-#endif
+/* #undef SUPPORT_UCP */
 
 /* Define to enable support for the UTF-8 Unicode encoding. */
-#ifndef SUPPORT_UTF8
-#define SUPPORT_UTF8
-#endif
+/* #undef SUPPORT_UTF8 */
 
 /* Version number of package */
 #ifndef VERSION
-#define VERSION "7.1"
+#define VERSION "7.3"
 #endif
 
 /* Define to empty if `const' does not conform to ANSI C. */

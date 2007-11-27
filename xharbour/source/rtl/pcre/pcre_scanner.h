@@ -47,12 +47,13 @@
 #include <assert.h>
 #include <string>
 #include <vector>
+
 #include <pcrecpp.h>
 #include <pcre_stringpiece.h>
 
 namespace pcrecpp {
 
-class Scanner {
+class PCRECPP_EXP_DEFN Scanner {
  public:
   Scanner();
   explicit Scanner(const std::string& input);

@@ -42,9 +42,21 @@ POSSIBILITY OF SUCH DAMAGE.
 functions. */
 
 
+#include <config.h>
+
+/* Ensure that the PCREPOSIX_EXP_xxx macros are set appropriately for
+compiling these functions. This must come before including pcreposix.h, where
+they are set for an application (using these functions) if they have not
+previously been set. */
+
+#if defined(_WIN32) && !defined(PCRE_STATIC)
+#  define PCREPOSIX_EXP_DECL extern __declspec(dllexport)
+#  define PCREPOSIX_EXP_DEFN __declspec(dllexport)
+#endif
+
+#include <pcre.h>
 #include "pcre_internal.h"
 #include "pcreposix.h"
-#include "stdlib.h"
 
 
 
@@ -80,7 +92,7 @@ static const int eint[] = {
   REG_BADPAT,  /* malformed number or name after (?( */
   REG_BADPAT,  /* conditional group contains more than two branches */
   REG_BADPAT,  /* assertion expected after (?( */
-  REG_BADPAT,  /* (?R or (?digits must be followed by ) */
+  REG_BADPAT,  /* (?R or (?[+-]digits must be followed by ) */
   REG_ECTYPE,  /* unknown POSIX class name */
   REG_BADPAT,  /* POSIX collating elements are not supported */
   REG_INVARG,  /* this version of PCRE is not compiled with PCRE_UTF8 support */
@@ -108,7 +120,9 @@ static const int eint[] = {
   REG_BADPAT,  /* DEFINE group contains more than one branch */
   REG_BADPAT,  /* repeating a DEFINE group is not allowed */
   REG_INVARG,  /* inconsistent NEWLINE options */
-  REG_BADPAT   /* \g is not followed followed by an (optionally braced) non-zero number */
+  REG_BADPAT,  /* \g is not followed followed by an (optionally braced) non-zero number */
+  REG_BADPAT,  /* (?+ or (?- must be followed by a non-zero number */
+  REG_BADPAT   /* number is too big */
 };
 
 /* Table of texts corresponding to POSIX error codes */
@@ -297,7 +311,6 @@ else
   rc = pcre_exec((const struct real_pcre *) (preg->re_pcre), NULL, string, (int)strlen(string), 0, options, ovector, nmatch * 3);
   }
 
-
 if (rc == 0) rc = nmatch;    /* All captured slots were filled in */
 
 if (rc >= 0)
@@ -322,7 +335,6 @@ if (rc >= 0)
     }
   return 0;
   }
-
 else
   {
   if (allocated_ovector) free(ovector);
@@ -345,4 +357,5 @@ else
 void HB_PCREPOS_LIBRARY( void )
 {
 }
+
 /* End of pcreposix.c */

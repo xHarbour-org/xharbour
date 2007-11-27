@@ -1,5 +1,5 @@
 /*
- * $Id: wvtcore.c,v 1.10 2007/03/17 18:49:38 vouchcac Exp $
+ * $Id: wvtcore.c,v 1.11 2007/06/28 18:33:27 vouchcac Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ HB_FUNC( WVT_CORE )
 HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image )
 {
   IStream  *iStream;
-  IPicture *iPicture;
+  IPicture *iPicture = NULL;
   HGLOBAL  hGlobal;
   HANDLE   hFile;
   DWORD    nFileSize;
@@ -146,7 +146,7 @@ HB_EXPORT BOOL hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char *
         if ( ReadFile( hFile, hGlobal, nFileSize, &nReadByte, NULL ) )
         {
           CreateStreamOnHGlobal( hGlobal, TRUE, &iStream );
-          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )&iPicture );
+          OleLoadPicture( iStream, nFileSize, TRUE, (REFIID) &IID_IPicture, ( LPVOID* )iPicture );
 
           if ( iPicture )
           {
@@ -659,7 +659,7 @@ HB_FUNC( WVT_DRAWLABEL )
       SetBkColor( _s->hdc, ISNIL( 7 ) ? _s->background : ( COLORREF ) hb_parnl( 7 ) );
       SetTextColor( _s->hdc, ISNIL( 6 ) ? _s->foreground : ( COLORREF ) hb_parnl( 6 ) );
       SetTextAlign( _s->hdc, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-      hOldFont = SelectObject( _s->hdc, hFont );
+      hOldFont = (HFONT) SelectObject( _s->hdc, hFont );
 
       ExtTextOut( _s->hdc, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
 
@@ -670,7 +670,7 @@ HB_FUNC( WVT_DRAWLABEL )
          SetBkColor( _s->hGuiDC, ISNIL( 7 ) ? _s->background : ( COLORREF ) hb_parnl( 7 ) );
          SetTextColor( _s->hGuiDC, ISNIL( 6 ) ? _s->foreground : ( COLORREF ) hb_parnl( 6 ) );
          SetTextAlign( _s->hGuiDC, ( ISNIL( 4 ) ? TA_LEFT : hb_parni( 4 ) ) );
-         hOldFontGui = SelectObject( _s->hGuiDC, hFont );
+         hOldFontGui = (HFONT) SelectObject( _s->hGuiDC, hFont );
 
          ExtTextOut( _s->hGuiDC, xy.x, xy.y, 0, NULL, hb_parcx( 3 ), strlen( hb_parcx( 3 ) ), NULL );
 
@@ -690,7 +690,7 @@ HB_FUNC( WVT_DRAWLABEL )
 //
 HB_FUNC( WVT_DRAWOUTLINE )
 {
-   HPEN  hPen, hOldPen, hOldPenGUI;
+   HPEN  hPen = 0, hOldPen = 0, hOldPenGUI = 0;
    POINT xy = { 0 };
    int   iTop, iLeft, iBottom, iRight;
 
@@ -711,7 +711,6 @@ HB_FUNC( WVT_DRAWOUTLINE )
    }
    else
    {
-      hPen = 0;
       SelectObject( _s->hdc, _s->penBlack );
    }
 
@@ -754,7 +753,7 @@ HB_FUNC( WVT_DRAWLINE )
    int      iOrient, iFormat, iAlign, iStyle, iThick;
    int      x, y, iOffset;
    COLORREF cr;
-   HPEN     hPen, hOldPen, hOldPenGUI;
+   HPEN     hPen, hOldPen, hOldPenGUI = 0;
 
    //   Resolve Parameters
    iOrient = ISNIL( 5 ) ? 0 : hb_parni( 5 );
@@ -1940,7 +1939,7 @@ HB_FUNC( WVT_DRAWLABELOBJ )
    POINT    xy = { 0 };
    RECT     rect = { 0 };
    int      iTop, iLeft, iBottom, iRight, x, y;
-   int      iAlignHorz, iAlignVert, iAlignH, iAlignV;
+   int      iAlignHorz, iAlignVert, iAlignH = 0, iAlignV;
    UINT     uiOptions;
    SIZE     sz = { 0 };
 
@@ -2339,7 +2338,7 @@ HB_FUNC( WVT_DRAWTEXTBOX )
    int iRight  = ( _s->PTEXTSIZE.x * ( hb_parni( 4 ) + 1 ) ) - 1 + hb_parni( 5,4 );
 
    int iAlignHorz   = ( ISNIL( 7 ) ? 0 : hb_parni( 7 ) );
-   int iAlignH ;
+   int iAlignH = 0;
 
    RECT     rc = { 0 };
 

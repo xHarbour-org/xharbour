@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.153 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: win32ole.prg,v 1.154 2007/11/27 00:06:44 andijahja Exp $
  */
 
 /*
@@ -1493,7 +1493,7 @@ RETURN Self
      {
         VARIANT mElem;
         void *pTarget;
-        char *sArray;
+        char *sArray = NULL;
 
         VariantInit( &mElem );
 
@@ -1643,7 +1643,10 @@ RETURN Self
 
            if( pUnk )
            {
-              pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
+              // pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) &pDisp );
+	      // Not sure if this is correct, but by this change GCC now quiet
+	      // and also the other compilers
+              pUnk->lpVtbl->QueryInterface( pUnk, (REFIID) &IID_IDispatch, (void **) pDisp );
            }
            // Intentionally fall through
 

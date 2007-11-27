@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.22 2007/04/30 01:16:29 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.23 2007/05/15 21:34:11 ronpinkas Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
-         int iIncrement, iLocal;
+         int iIncrement = 0, iLocal;
          BOOL bShort;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
@@ -416,7 +416,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
       if( bOpEq == HB_P_PLUS || bOpEq == HB_P_MINUS )
       {
-         int iIncrement, iLocal;
+         int iIncrement = 0, iLocal;
          BOOL bShort;
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
