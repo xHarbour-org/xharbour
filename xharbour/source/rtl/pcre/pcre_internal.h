@@ -543,10 +543,15 @@ variable-length repeat, or a anything other than literal characters. */
 
 /* Miscellaneous definitions */
 
+/* Miscellaneous definitions */
+#ifndef HB_APIEXT_H_
 typedef int BOOL;
+#endif
 
 #define FALSE   0
-#define TRUE    1
+#ifndef TRUE
+   #define TRUE    1
+#endif
 
 /* Escape items that are just an encoding of a particular data value. */
 
