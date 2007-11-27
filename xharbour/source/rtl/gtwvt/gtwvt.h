@@ -1,5 +1,5 @@
 /*
- * $Id: gtwvt.h,v 1.11 2007/02/10 15:40:30 ronpinkas Exp $
+ * $Id: gtwvt.h,v 1.12 2007/11/25 19:31:27 vouchcac Exp $
  */
 
 /*
@@ -308,7 +308,6 @@ BOOL   HB_EXPORT hb_wvt_gtDestroyPicture( IPicture * iPicture );
 COLORREF HB_EXPORT hb_wvt_gtGetColorData( int iIndex );
 BOOL   HB_EXPORT hb_wvt_gtSetColorData( int iIndex, COLORREF ulCr );
 BOOL   HB_EXPORT hb_wvt_DrawImage( HDC hdc, int x1, int y1, int wd, int ht, char * image );
-void   HB_EXPORT hb_wvt_gtSetInvalidRect( USHORT left, USHORT top, USHORT right, USHORT bottom );
 LPWORD HB_EXPORT lpwAlign( LPWORD lpIn );
 int    HB_EXPORT nCopyAnsiToWideChar( LPWORD lpWCStr, LPSTR lpAnsiIn );
 BOOL   HB_EXPORT CALLBACK hb_wvt_gtDlgProcMLess( HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam );
