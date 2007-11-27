@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.113 2007/11/13 21:15:45 ronpinkas Exp $
+# $Id: hrbdll.vc,v 1.114 2007/11/23 18:50:38 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -858,8 +858,8 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\screen3.obj \
   $(OBJ_DIR)\setkeys.obj \
   $(OBJ_DIR)\scrmark.obj \
-  $(OBJ_DIR)\trapkey.obj \
   $(OBJ_DIR)\spread.obj \
+  $(OBJ_DIR)\trapkey.obj \
   $(OBJ_DIR)\untext.obj \
   $(OBJ_DIR)\util.obj \
 #
@@ -1906,6 +1906,12 @@ $(OBJ_DIR)\spread.c : $(CT_DIR)\spread.prg
    $(HARBOUR_CMD)
 
 $(OBJ_DIR)\spread.obj : $(OBJ_DIR)\spread.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\trapkey.c : $(CT_DIR)\trapkey.prg
+   $(HARBOUR_CMD)
+
+$(OBJ_DIR)\trapkey.obj : $(OBJ_DIR)\trapkey.c
    $(CC_CMD)
 
 $(OBJ_DIR)\untext.c : $(CT_DIR)\untext.prg

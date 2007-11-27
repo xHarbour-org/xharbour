@@ -1,5 +1,5 @@
 /*
- * $Id: ads.ch,v 1.6 2005/02/23 02:50:30 kaddath Exp $
+ * $Id: ads.ch,v 1.7 2005/10/26 08:34:18 brianhays Exp $
  */
 
 /*
@@ -49,6 +49,16 @@
  * If you do not wish that, delete this exception notice.
  *
  */
+
+#ifdef ADS
+  #define __ADS__ ADS
+  #undef ADS
+#endif
+REQUEST ADS
+#ifdef __ADS__
+  #define ADS __ADS__
+  #undef __ADS__
+#endif
 
 /* Supported file types */
 #define ADS_NTX                  1

@@ -84,7 +84,7 @@
 
 #ifdef __HARBOUR__
 
-   EXTERN dbClearRel
+   REQUEST dbClearRel
    REQUEST DBFFPT
 
    #includ "hbmacro.ch"
@@ -177,14 +177,14 @@
 
       REQUEST ErrorSys
 
-      EXTERN CreateObject
-      EXTERN GetActiveObject
+      REQUEST CreateObject
+      REQUEST GetActiveObject
 
-      EXTERN SIN, COS
+      REQUEST SIN, COS
 
-//      #ifdef ADS
-//         moved all to hbextern.ch
-//      #endif
+      #ifdef ADS
+         // All ADS specific externs will be requested by hbextern.ch
+      #endif
 
       #ifdef GD
          #include "gdexternal.ch"
@@ -203,7 +203,7 @@
       #endif
 
       #ifdef ZIP
-         EXTERN ZipCreate
+         REQUEST ZipCreate
          REQUEST RMDBFCDX
       #endif
    #endif
@@ -230,7 +230,7 @@
    #else
       #ifdef WIN
          #COMMAND Alert( <x> ) => MessageBox( 0, CStr( <x> ), "PP for Windows", 0 )
-         EXTERN MessageBox
+         REQUEST MessageBox
       #endif
    #endif
 
@@ -12812,11 +12812,10 @@ RETURN oError
 
 //--------------------------------------------------------------//
 #ifdef ADS
-   ANNOUNCE RDDSYS
-   init procedure RddInit
+   INIT PROCEDURE ADSInit
       rddRegister( "ADS", 1 )
       //AdsSetFileType( ADS_ADT )
-   return
+   RETURN
 #endif
 
 //--------------------------------------------------------------//
