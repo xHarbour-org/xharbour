@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.259 2007/08/27 07:11:26 ronpinkas Exp $
+ * $Id: ppcore.c,v 1.260 2007/11/27 05:32:20 andijahja Exp $
  */
 
 /*
@@ -2054,12 +2054,12 @@ static BOOL hb_pp_setCompilerSwitch( PHB_PP_STATE pState, char * szSwitch,
 
          if( ( fError = ( pState->pSwitchFunc )( pState->cargo, szSwitch, iValue, &iPrevious, cIndex ) ) == FALSE )
          {
-            int iPushed = pState->aaSwitchState[ (int) cIndex[0] ][0] + 1;
+            int iPushed = pState->aaSwitchState[ (unsigned char) cIndex[0] ][0] + 1;
 
             if( iPushed < HB_PP_MAX_SWITCH_STATES )
             {
-               pState->aaSwitchState[ (int) cIndex[0] ][ iPushed ] = iPrevious;
-               pState->aaSwitchState[ (int) cIndex[0] ][0] = iPushed;
+               pState->aaSwitchState[ (unsigned char) cIndex[0] ][ iPushed ] = iPrevious;
+               pState->aaSwitchState[ (unsigned char) cIndex[0] ][0] = iPushed;
             }
             else
             {
@@ -2078,12 +2078,12 @@ static BOOL hb_pp_setCompilerSwitch( PHB_PP_STATE pState, char * szSwitch,
 
 static BOOL hb_pp_pragmaPop( PHB_PP_STATE pState, int * piValue, char cIndex[1] )
 {
-   int iPushed = pState->aaSwitchState[ (int) cIndex[0] ][0];
+   int iPushed = pState->aaSwitchState[ (unsigned char) cIndex[0] ][0];
 
    if( iPushed > 0 && iPushed <= HB_PP_MAX_SWITCH_STATES )
    {
-      *piValue = pState->aaSwitchState[ (int) cIndex[0] ][ iPushed ];
-      pState->aaSwitchState[ (int) cIndex[0] ][0] = --iPushed;
+      *piValue = pState->aaSwitchState[ (unsigned char) cIndex[0] ][ iPushed ];
+      pState->aaSwitchState[ (unsigned char) cIndex[0] ][0] = --iPushed;
 
       return TRUE;
    }
