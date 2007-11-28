@@ -44,7 +44,7 @@ FSM). This is NOT Perl- compatible, but it has advantages in certain
 applications. */
 
 
-#include <config.h>
+#include "config.h"
 
 #define NLBLOCK md             /* Block containing newline information */
 #define PSSTART start_subject  /* Field containing processed string start */
@@ -1078,15 +1078,20 @@ for (;;)
         int ncount = 0;
         switch (c)
           {
-          case 0x000d:
-          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
-          /* Fall through */
-          case 0x000a:
           case 0x000b:
           case 0x000c:
           case 0x0085:
           case 0x2028:
           case 0x2029:
+          if ((md->moptions & PCRE_BSR_ANYCRLF) != 0) break;
+          goto ANYNL01;
+
+          case 0x000d:
+          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
+          /* Fall through */
+
+          ANYNL01:
+          case 0x000a:
           if (count > 0 && codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSPLUS)
             {
             active_count--;           /* Remove non-match possibility */
@@ -1095,6 +1100,7 @@ for (;;)
           count++;
           ADD_NEW_DATA(-state_offset, count, ncount);
           break;
+
           default:
           break;
           }
@@ -1311,15 +1317,20 @@ for (;;)
         int ncount = 0;
         switch (c)
           {
-          case 0x000d:
-          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
-          /* Fall through */
-          case 0x000a:
           case 0x000b:
           case 0x000c:
           case 0x0085:
           case 0x2028:
           case 0x2029:
+          if ((md->moptions & PCRE_BSR_ANYCRLF) != 0) break;
+          goto ANYNL02;
+
+          case 0x000d:
+          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
+          /* Fall through */
+
+          ANYNL02:
+          case 0x000a:
           if (codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSSTAR ||
               codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSQUERY)
             {
@@ -1328,6 +1339,7 @@ for (;;)
             }
           ADD_NEW_DATA(-(state_offset + count), 0, ncount);
           break;
+
           default:
           break;
           }
@@ -1543,15 +1555,20 @@ for (;;)
         int ncount = 0;
         switch (c)
           {
-          case 0x000d:
-          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
-          /* Fall through */
-          case 0x000a:
           case 0x000b:
           case 0x000c:
           case 0x0085:
           case 0x2028:
           case 0x2029:
+          if ((md->moptions & PCRE_BSR_ANYCRLF) != 0) break;
+          goto ANYNL03;
+
+          case 0x000d:
+          if (ptr + 1 < end_subject && ptr[1] == 0x0a) ncount = 1;
+          /* Fall through */
+
+          ANYNL03:
+          case 0x000a:
           if (codevalue == OP_ANYNL_EXTRA + OP_TYPEPOSUPTO)
             {
             active_count--;           /* Remove non-match possibility */
@@ -1562,6 +1579,7 @@ for (;;)
           else
             { ADD_NEW_DATA(-state_offset, count, ncount); }
           break;
+
           default:
           break;
           }
@@ -1742,14 +1760,17 @@ for (;;)
       case OP_ANYNL:
       if (clen > 0) switch(c)
         {
-        case 0x000a:
         case 0x000b:
         case 0x000c:
         case 0x0085:
         case 0x2028:
         case 0x2029:
+        if ((md->moptions & PCRE_BSR_ANYCRLF) != 0) break;
+
+        case 0x000a:
         ADD_NEW(state_offset + 1, 0);
         break;
+
         case 0x000d:
         if (ptr + 1 < end_subject && ptr[1] == 0x0a)
           {
@@ -2572,6 +2593,18 @@ md->end_subject = end_subject;
 md->moptions = options;
 md->poptions = re->options;
 
+/* If the BSR option is not set at match time, copy what was set
+at compile time. */
+
+if ((md->moptions & (PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE)) == 0)
+  {
+  if ((re->options & (PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE)) != 0)
+    md->moptions |= re->options & (PCRE_BSR_ANYCRLF|PCRE_BSR_UNICODE);
+#ifdef BSR_ANYCRLF
+  else md->moptions |= PCRE_BSR_ANYCRLF;
+#endif
+  }
+
 /* Handle different types of newline. The three bits give eight cases. If
 nothing is set at run time, whatever was used at compile time applies. */
 
@@ -2642,7 +2675,7 @@ if (md->tables == NULL) md->tables = _pcre_default_tables;
 used in a loop when finding where to start. */
 
 lcc = md->tables + lcc_offset;
-startline = (re->options & PCRE_STARTLINE) != 0;
+startline = (re->flags & PCRE_STARTLINE) != 0;
 firstline = (re->options & PCRE_FIRSTLINE) != 0;
 
 /* Set up the first character to match, if available. The first_byte value is
@@ -2653,7 +2686,7 @@ studied, there may be a bitmap of possible first characters. */
 
 if (!anchored)
   {
-  if ((re->options & PCRE_FIRSTSET) != 0)
+  if ((re->flags & PCRE_FIRSTSET) != 0)
     {
     first_byte = re->first_byte & 255;
     if ((first_byte_caseless = ((re->first_byte & REQ_CASELESS) != 0)) == TRUE)
@@ -2670,7 +2703,7 @@ if (!anchored)
 /* For anchored or unanchored matches, there may be a "last known required
 character" set. */
 
-if ((re->options & PCRE_REQCHSET) != 0)
+if ((re->flags & PCRE_REQCHSET) != 0)
   {
   req_byte = re->req_byte & 255;
   req_byte_caseless = (re->req_byte & REQ_CASELESS) != 0;
@@ -2847,7 +2880,7 @@ for (;;)
   if (current_subject[-1] == '\r' &&
       current_subject < end_subject &&
       *current_subject == '\n' &&
-      (re->options & PCRE_HASCRORLF) == 0 &&
+      (re->flags & PCRE_HASCRORLF) == 0 &&
         (md->nltype == NLTYPE_ANY ||
          md->nltype == NLTYPE_ANYCRLF ||
          md->nllen == 2))
