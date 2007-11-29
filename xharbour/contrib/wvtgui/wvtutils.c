@@ -1,5 +1,5 @@
 /*
- * $Id: wvtutils.c,v 1.17 2007/11/25 19:31:03 vouchcac Exp $
+ * $Id: wvtutils.c,v 1.18 2007/11/27 05:32:20 andijahja Exp $
  */
 
 /*
@@ -2318,7 +2318,7 @@ HB_FUNC( WVT__GETSAVEFILENAME )
    ofn.hwndOwner       = ISNIL   (1) ? GetActiveWindow() : (HWND) hb_parnl( 1 );
    ofn.lpstrTitle      = hb_parc (3);
    ofn.lpstrFilter     = hb_parc (4);
-   ofn.Flags           = (ISNIL  (5) ? OFN_FILEMUSTEXIST|OFN_EXPLORER|OFN_NOCHANGEDIR : hb_parnl( 4 ) );
+   ofn.Flags           = (ISNIL  (5) ? OFN_FILEMUSTEXIST|OFN_EXPLORER|OFN_NOCHANGEDIR : hb_parnl( 5 ) );
    ofn.lpstrInitialDir = hb_parc (6);
    ofn.lpstrDefExt     = hb_parc (7);
    ofn.nFilterIndex    = hb_parni(8);
