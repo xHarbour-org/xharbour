@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5790 2007/11/28 23:35:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.5791 2007/11/29 07:33:24 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-29 18.15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/clipdefs.h
+    ! BCC and OpenWatcom also do not want WORD/WORDP/PWORD redefined here.
+
+  * include/hbvmpub.h
+    ! define NDEBUG if not yet defined
 
 2007-11-29 14.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/regex.c

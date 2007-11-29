@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.63 2007/05/31 05:18:11 walito Exp $
+ * $Id: hbvmpub.h,v 1.64 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -58,7 +58,9 @@
 #define HB_VMPUB_H_
 
 #if ! ( defined( DEBUG ) || defined( _DEBUG ) )
-   #define NDEBUG
+   #ifndef NDEBUG
+      #define NDEBUG
+   #endif
 #endif
 #include <assert.h>
 
