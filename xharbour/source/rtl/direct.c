@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.57 2005/10/24 01:04:35 druzus Exp $
+ * $Id: direct.c,v 1.58 2007/02/27 15:59:40 druzus Exp $
  */
 
 /*
@@ -110,9 +110,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      HB_ITEM Subarray;
-
-      Subarray.type = HB_IT_NIL;
+      HB_ITEM_NEW( Subarray );
 
       do
       {
@@ -267,15 +265,11 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 {
    static HB_REGEX RegEx;
    static BOOL bInitReg = FALSE;
-   BOOL fResult = FALSE;
 
    if ( bInit || !bInitReg )
    {
       /* compile only once here */
-      if( hb_regexCompile( &RegEx, szMask, 0, 0 ) )
-      {
-         bInitReg = TRUE;
-      }
+      bInitReg = hb_regexCompile( &RegEx, szMask, 0, 0 );
    }
 
    if( !szString && !szMask )
@@ -288,10 +282,10 @@ static BOOL hb_strMatchRegExpDir( const char * szString, const char * szMask, BO
 
    if( bInitReg )
    {
-      fResult = hb_regexMatch( &RegEx, szString, TRUE );
+      return ( hb_regexMatch( &RegEx, szString, TRUE ) );
    }
 
-   return fResult;
+   return FALSE;
 }
 
 static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *szFName, char* szAttributes, char* sRegEx )
@@ -308,9 +302,8 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
          if ( hb_fsIsDirectory( ( BYTE * ) szEntry ) )
          {
             char *szSubdir = hb_xstrcpy( NULL, szEntry, OS_PATH_DELIMITER_STRING, OS_FILE_MASK, NULL );
-            HB_ITEM SubDir;
+            HB_ITEM_NEW( SubDir );
 
-            SubDir.type = HB_IT_NIL;
             hb_fsDirectory( &SubDir, szSubdir, szAttributes, FALSE, TRUE );
 
             hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, sRegEx );
@@ -346,7 +339,7 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    static BOOL s_bTop = TRUE;
    char cCurDsk;
    BYTE *pCurDir;
-   HB_ITEM Dir;
+   HB_ITEM_NEW( Dir );
    // Arbitary value which should be enough
    char sRegEx[ _POSIX_PATH_MAX + _POSIX_PATH_MAX ];
 
@@ -364,7 +357,6 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
       pCurDir = NULL;
    }
 
-   Dir.type = HB_IT_NIL;
    hb_fsDirectory( &Dir, szSkleton, szAttributes, FALSE, TRUE );
 
    hb_arrayNew( pResult, 0 );
@@ -401,14 +393,12 @@ HB_FUNC( DIRECTORYRECURSE )
    BOOL bMatchCase = hb_parl( 3 );
    char *szRecurse = NULL;
    PHB_FNAME fDirSpec;
-   HB_ITEM Dir;
+   HB_ITEM_NEW( Dir );
    char *szFName = NULL;
 #if defined( OS_HAS_DRIVE_LETTER )
    BOOL bAddDrive = TRUE;
 #endif
    char *szAttributes;
-
-   Dir.type = HB_IT_NIL;
 
    if( pDirSpec && pDirSpec->item.asString.length <= _POSIX_PATH_MAX )
    {
@@ -463,6 +453,16 @@ HB_FUNC( DIRECTORYRECURSE )
          else
 #endif
          {
+#if defined(__DMC__)
+	    /*
+               AJ: 11-30-2007
+	       I found these funny lines have to be added for DMC 8.50.4
+	       otherwise GPF on tests/dirtest4.prg.
+	       Anybody to find where the bug may hide please... ?
+	    */
+	    char szDMCBug[1];
+	    sprintf( szDMCBug, "%s", "" );
+#endif
             szRecurse = hb_xstrcpy( NULL, fDirSpec->szPath, OS_FILE_MASK, NULL );
          }
 

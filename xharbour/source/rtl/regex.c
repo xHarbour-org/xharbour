@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.60 2007/05/20 03:26:24 ronpinkas Exp $
+ * $Id: regex.c,v 1.61 2007/09/22 22:23:17 andijahja Exp $
  */
 
 /*
@@ -213,7 +213,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    PHB_ITEM pCaseSensitive = hb_param( 3, HB_IT_LOGICAL );
    PHB_ITEM pNewLine = hb_param( 4, HB_IT_LOGICAL );
-   PHB_ITEM pRetArray;
+   HB_ITEM_NEW( pRetArray );
    BOOL fFree = FALSE;
 
    if( pRegEx == NULL )
@@ -263,19 +263,19 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             iMatches++;
-            pRetArray = hb_itemArrayNew( iMatches );
+            hb_arrayNew( &pRetArray, iMatches );
 
             for ( i = 0; i < iMatches; i++ )
             {
                if (aMatches[i].rm_eo > -1 )
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr( pRetArray, i + 1 ),
+                  hb_itemPutCL( hb_arrayGetItemPtr( &pRetArray, i + 1 ),
                                 pString->item.asString.value + aMatches[i].rm_so,
                                 aMatches[i].rm_eo - aMatches[i].rm_so );
                }
                else
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr( pRetArray, i + 1 ), "", 0 );
+                  hb_itemPutCL( hb_arrayGetItemPtr( &pRetArray, i + 1 ), "", 0 );
                }
             }
 
@@ -283,7 +283,8 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                hb_freeregex( pReg );
             }
-            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
+            hb_itemReturnForward( &pRetArray );
 
             return TRUE;
          }
@@ -308,18 +309,17 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
          case 3: // Split
          {
-            HB_ITEM Match;
+            HB_ITEM_NEW( Match );
             char *str = pString->item.asString.value;
             int iMax = hb_parni( 5 );
             int iCount = 1;
 
-            pRetArray = hb_itemArrayNew( 0 );
+            hb_arrayNew( &pRetArray, 0 );
 
-            Match.type = HB_IT_NIL;
             do
             {
                hb_itemPutCL( &Match, str, aMatches[0].rm_so );
-               hb_arrayAddForward( pRetArray, &Match );
+               hb_arrayAddForward( &pRetArray, &Match );
                str += aMatches[ 0 ].rm_eo;
                iCount++;
             }
@@ -328,13 +328,14 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             /* last match must be done also in case that str is empty; this would
                mean an empty split field at the end of the string */
             hb_itemPutCL( &Match, str, strlen( str ) );
-            hb_arrayAddForward( pRetArray, &Match );
+            hb_arrayAddForward( &pRetArray, &Match );
 
             if( fFree )
             {
                hb_freeregex( pReg );
             }
-            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
+            hb_itemReturnForward( &pRetArray );
 
             return TRUE;
          }
@@ -353,7 +354,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             iMatches++;
-            pRetArray = hb_itemArrayNew( iMatches );
+            hb_arrayNew( &pRetArray, iMatches );
 
             for ( i = 0; i < iMatches; i++ )
             {
@@ -378,19 +379,20 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                   hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
                }
 
-               hb_arraySetForward( pRetArray, i + 1, &aSingleMatch );
+               hb_arraySetForward( &pRetArray, i + 1, &aSingleMatch );
             }
 
             if ( fFree )
                hb_freeregex( pReg );
-            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
+            hb_itemReturnForward( &pRetArray );
 
             return TRUE;
          }
 
          case 5: // Wants *ALL* Results AND positions
          {
-            PHB_ITEM pAtxArray;
+            HB_ITEM_NEW( pAtxArray );
             HB_ITEM aSingleMatch;
 
             char  *str = pString->item.asString.value;
@@ -406,7 +408,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             }
 
             // Set new array
-            pRetArray = hb_itemArrayNew( 0 );
+            hb_arrayNew( &pRetArray, 0 );
 
             do
             {
@@ -429,7 +431,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                     ( iGetMatch < 0 || iGetMatch > iMatches  )
                   )
                {
-                  pAtxArray = hb_itemArrayNew( iMatches );
+                  hb_arrayNew( &pAtxArray, iMatches );
 
                   for ( i = 0; i < iMatches; i++ )
                   {
@@ -470,11 +472,11 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                             hb_itemPutCL( &aSingleMatch, "", 0 );
                          }
                       }
-                      
-                      hb_arraySetForward( pAtxArray, i + 1, &aSingleMatch );
+
+                      hb_arraySetForward( &pAtxArray, i + 1, &aSingleMatch );
                   }
 
-                  hb_arrayAddForward( pRetArray, pAtxArray );
+                  hb_arrayAddForward( &pRetArray, &pAtxArray );
 
                }
                else // Here I get only single matches
@@ -519,7 +521,7 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                      }
                   }
 
-                  hb_arrayAddForward( pRetArray, &aSingleMatch );
+                  hb_arrayAddForward( &pRetArray, &aSingleMatch );
                }
 
                str += aMatches[ 0 ].rm_eo;
@@ -533,7 +535,8 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                hb_freeregex( pReg );
             }
-            hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+
+            hb_itemReturnForward( &pRetArray );
 
             return TRUE;
          }
@@ -549,9 +552,9 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
 
    if( cRequest == 3 )
    {
-      pRetArray = hb_itemArrayNew( 1 );
-      hb_arraySet( pRetArray, 1, pString );
-      hb_itemRelease( hb_itemReturnForward( pRetArray ) );
+      hb_arrayNew( &pRetArray, 1 );
+      hb_arraySet( &pRetArray, 1, pString );
+      hb_itemReturnForward( &pRetArray );
       return TRUE;
    }
 

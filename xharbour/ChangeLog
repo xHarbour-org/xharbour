@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5789 2007/11/28 11:46:16 andijahja Exp $
+ * $Id: ChangeLog,v 1.5790 2007/11/28 23:35:45 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-11-29 14.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/rtl/regex.c
+    ! fix memory leaks on function hb_regex()
+
+  * source/rtl/direct.c
+    ! add 2 "funny" dummy lines for __DMC__ because without these lines __DMC__
+      will GPF running tests/dirtest4.prg (DMC 8.50.4 was in use)
+      NOTE: This is really not funny but the fact is it. These lines will be
+      	    deleted when next version of __DMC__ can survive without it.
+            BCC/MSVC/GCC/WC/XCC/POCC are OK, so my conclusion is, it is DMC bug.
+    % minor formatting
 
 2007-11-28 06.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/pcre/config.h
