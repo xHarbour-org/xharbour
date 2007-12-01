@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.48 2006/07/16 19:48:56 druzus Exp $
+ * $Id: hbapigt.h,v 1.49 2007/10/31 16:20:51 marchuet Exp $
  */
 
 /*
@@ -417,7 +417,7 @@ extern int    hb_gt_RectSize( USHORT rows, USHORT cols );
 extern void   hb_gt_Replicate( USHORT uiTop, USHORT uiLeft, BYTE byAttr, BYTE byChar, ULONG ulLen );
 extern SHORT  hb_gt_Row( void );
 extern void   hb_gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr, SHORT iRows, SHORT iCols );
-extern void   hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
+extern void   HB_EXPORT hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
 extern void   hb_gt_SetBlink( BOOL bBlink );
 extern void   hb_gt_SetCursorStyle( USHORT uiCursorShape );
 extern BOOL   hb_gt_SetMode( USHORT uiRows, USHORT uiCols );
@@ -446,7 +446,7 @@ extern void HB_EXPORT hb_gt_ProcessMessages( void );
                              used for all the Harbour builds that need it */
 
 /* Harbour keyboard support functions */
-extern int  hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );      /* Wait for keyboard input */
+extern HB_EXPORT int  hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );      /* Wait for keyboard input */
 extern int  hb_inkeyGet( HB_inkey_enum event_mask );  /* Extract the next key from the Harbour keyboard buffer */
 extern HB_EXPORT void hb_inkeyPut( int iKey );        /* Inserts an inkey code into the keyboard buffer */
 extern HB_EXPORT int  hb_inkeyLast( HB_inkey_enum event_mask );   /* Return the value of the last key that was extracted */
@@ -520,7 +520,7 @@ extern void HB_EXPORT hb_gtProcessMessages( void );
    to be queried or changed, the parameters are provided to pass status changes;
    different messages may use different parameters.
 */
-extern int  hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
+extern int  HB_EXPORT hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
 
 /* Graphics API */
 extern int  hb_gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor );

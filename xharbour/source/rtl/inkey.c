@@ -1,5 +1,5 @@
 /*
- * $Id: inkey.c,v 1.52 2007/04/25 14:14:49 toninhofwi Exp $
+ * $Id: inkey.c,v 1.53 2007/04/26 14:04:33 toninhofwi Exp $
  */
 
 /*
@@ -315,7 +315,7 @@ int hb_inkeyNext( HB_inkey_enum event_mask )
    return iKey;
 }
 
-int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
+HB_EXPORT int hb_inkey( BOOL fWait, double dSeconds, HB_inkey_enum event_mask )
 {
    clock_t end_clock = 0;
    BOOL fPop;

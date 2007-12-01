@@ -1,5 +1,5 @@
 /*
- * $Id: pos1.c,v 1.4 2006/11/09 20:23:49 ptsarenko Exp $
+ * $Id: pos1.c,v 1.5 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -57,13 +57,18 @@
 
 
 #include "ct.h"
-#include <ctype.h>   
+#include <ctype.h>
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
+  #if 0
   #define ISUPPER(c)    ( hb_cdp_page->nChars ? isupper( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsUpper, ( UCHAR ) c ) != NULL : isupper( ( UCHAR ) c ) )
   #define ISLOWER(c)    ( hb_cdp_page->nChars ? islower( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsLower, ( UCHAR ) c ) != NULL : islower( ( UCHAR ) c ) )
   #define ISALPHA(c)    ( hb_cdp_page->nChars ? isalpha( ( UCHAR ) c ) || strchr( hb_cdp_page->CharsUpper, ( UCHAR ) c ) != NULL || strchr( hb_cdp_page->CharsLower, c ) != NULL : isalpha( ( UCHAR ) c ) )
+  #endif
+  #define ISUPPER(c)    __isupper( ( UCHAR ) c )
+  #define ISLOWER(c)    __islower( ( UCHAR ) c )
+  #define ISALPHA(c)    __isalpha( ( UCHAR ) c )
 #else
   #define ISUPPER(c)    isupper( ( UCHAR ) c )
   #define ISLOWER(c)    islower( ( UCHAR ) c )
@@ -76,6 +81,28 @@
 #define DO_POS1_POSLOWER       1
 #define DO_POS1_POSRANGE       2
 #define DO_POS1_POSUPPER       3
+
+#ifndef HB_CDP_SUPPORT_OFF
+
+static BOOL __isupper( UCHAR c )
+{
+  PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
+  return ( __hb_cdp_page->nChars ? isupper( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL : isupper( c ) );
+}
+
+static BOOL __islower( UCHAR c )
+{
+  PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
+  return ( __hb_cdp_page->nChars ? islower( c ) || strchr( __hb_cdp_page->CharsLower, c ) != NULL : islower( c ) );
+}
+
+static BOOL __isalpha( UCHAR c )
+{
+  PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
+  return ( __hb_cdp_page->nChars ? isalpha( c ) || strchr( __hb_cdp_page->CharsUpper, c ) != NULL || strchr( __hb_cdp_page->CharsLower, c ) != NULL : isalpha( c ) );
+}
+
+#endif /* HB_CDP_SUPPORT_OFF */
 
 /* helper function for the posxxx() functions */
 static void do_pos1 (int iSwitch)
@@ -166,7 +193,7 @@ static void do_pos1 (int iSwitch)
           iDoRet = ISUPPER(*puc);
         }; break;
       }
-  
+
       if ((iMode && !iDoRet) || (!iMode && iDoRet))
       {
         hb_retnl (puc-pcString+1);

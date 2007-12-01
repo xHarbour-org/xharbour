@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5792 2007/11/29 11:15:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.5793 2007/11/29 19:23:23 vouchcac Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-02 05.15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/ct/token1.c
+  * source/ct/pos1.c
+    ! do not directly access hb_cdp_page
+
+  * contrib/libnf/tempfile.prg
+    ! use native xHarbour routine to create temp file, thus eliminate
+      dependence on NTOC() of CT.LIB
+
+  * include/hbapigt.h
+  * source/rtl/inkey.c
+  * source/rtl/gtnul/gtnul.c
+    ! exporting hb_inkey, hb_gt_SetAttribute, hb_gt_info
+
+  * include/hbmath.h
+  * source/rtl/math.c
+    ! exporting hb_mathResetError, hb_mathIsMathErr and hb_mathGetLastError
 
 2007-11-29 11:21 UTC+0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/wvtgui/wvtutils.c

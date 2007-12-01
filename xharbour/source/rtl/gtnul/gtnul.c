@@ -1,5 +1,5 @@
 /*
- * $Id: gtnul.c,v 1.31 2006/06/26 11:27:06 druzus Exp $
+ * $Id: gtnul.c,v 1.32 2006/07/16 19:48:57 druzus Exp $
  */
 
 /*
@@ -864,7 +864,7 @@ void hb_gt_PutText( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight
    GT_FUNCS.PutText( uiTop, uiLeft, uiBottom, uiRight, pbySrc);
 }
 
-void hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr )
+void HB_EXPORT hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr )
 {
    GT_FUNCS.SetAttribute( uiTop, uiLeft, uiBottom, uiRight, (int) byAttr);
 }
@@ -987,7 +987,7 @@ void hb_gt_SetKeyCP(char * pszTermCDP, char * pszHostCDP)
 
 /* ********************************************************************** */
 
-int hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
+int HB_EXPORT hb_gt_info(int iMsgType, BOOL bUpdate, int iParam, void *vpParam )
 {
    return GT_FUNCS.info( iMsgType, bUpdate, iParam, vpParam );
 }

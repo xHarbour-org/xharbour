@@ -1,5 +1,5 @@
 /*
- * $Id: math.c,v 1.20 2006/06/19 21:16:44 druzus Exp $
+ * $Id: math.c,v 1.21 2006/07/20 20:15:34 map Exp $
  */
 
 /*
@@ -90,7 +90,7 @@
 #endif
 
 /* reset math error information */
-void hb_mathResetError (void)
+void HB_EXPORT hb_mathResetError (void)
 {
    HB_TRACE (HB_TR_DEBUG, ("hb_mathResetError()"));
    s_hb_exc.type = HB_MATH_ERR_NONE;
@@ -106,7 +106,7 @@ void hb_mathResetError (void)
 }
 
 /* get last math error */
-int hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc)
+int HB_EXPORT hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc)
 {
    HB_TRACE (HB_TR_DEBUG, ("hb_mathGetLastError(%p)", phb_exc));
    if (phb_exc != NULL)
@@ -126,7 +126,7 @@ int hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc)
 }
 
 /* is it reasonable to install math error handlers ? This depends on the C math lib we are using ! */
-int hb_mathIsMathErr (void)
+int HB_EXPORT hb_mathIsMathErr (void)
 {
    HB_TRACE (HB_TR_DEBUG, ("hb_mathIsMathErr()"));
 #if defined(HB_MATH_HANDLER)

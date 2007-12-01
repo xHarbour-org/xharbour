@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.12 2005/02/28 02:12:31 druzus Exp $
+ * $Id: hbmath.h,v 1.13 2005/03/31 03:15:18 druzus Exp $
  */
 
 /*
@@ -128,9 +128,9 @@ typedef struct _HB_MATH_EXCEPTION
 
 typedef int (* HB_MATH_HANDLERPROC)(HB_MATH_EXCEPTION * err);
 
-extern void hb_mathResetError (void);
-extern int hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc);
-extern int hb_mathIsMathErr (void);
+extern void HB_EXPORT hb_mathResetError (void);
+extern int  HB_EXPORT hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc);
+extern int  HB_EXPORT hb_mathIsMathErr (void);
 
 extern int hb_mathSetDefErrMode (int imode);
 extern int hb_mathGetDefErrMode (void);

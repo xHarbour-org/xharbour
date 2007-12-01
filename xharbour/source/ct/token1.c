@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.4 2006/09/25 18:21:30 ptsarenko Exp $
+ * $Id: token1.c,v 1.5 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -64,13 +64,32 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
   #include "hbapicdp.h"
+  #if 0
   #define TOUPPER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_upper[ ( UCHAR ) c ] : toupper( ( UCHAR ) c) )
   #define TOLOWER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_lower[ ( UCHAR ) c ] : tolower( ( UCHAR ) c) )
+  #endif
+  #define TOUPPER(c)    __toupper( ( UCHAR ) c )
+  #define TOLOWER(c)    __tolower( ( UCHAR ) c )
 #else
   #define TOUPPER(c)    toupper( ( UCHAR ) c )
   #define TOLOWER(c)    tolower( ( UCHAR ) c )
 #endif
 
+#ifndef HB_CDP_SUPPORT_OFF
+
+static BOOL __toupper( UCHAR c )
+{
+  PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
+  return  ( __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : toupper( c ) );
+}
+
+static BOOL __tolower( UCHAR c )
+{
+  PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
+  return ( __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : tolower( c ) );
+}
+
+#endif
 
 /* static const data */
 static const char *spcSeparatorStr = "\x00""\x09""\x0A""\x0C""\x1A""\x20""\x8A""\x8C"",.;:!\?/\\<>()#&%+-*";

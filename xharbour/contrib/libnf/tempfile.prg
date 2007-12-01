@@ -1,5 +1,5 @@
 /*
- * $Id: tempfile.prg,v 1.3 2002/04/18 03:31:51 walito Exp $
+ * $Id: tempfile.prg,v 1.1 2003/10/08 14:03:56 lculik Exp $
  */
 
 /*
@@ -144,6 +144,26 @@
   #include "fileio.ch"
 
   FUNCTION FT_TEMPFIL( cPath, lHide, nHandle )
+
+#ifndef __CT_DEPENDENCE__
+
+  LOCAL cFile
+
+  Default cPath to ".\"
+  Default lHide to .f.
+
+  cPath = alltrim( cPath )
+
+  nHandle := HB_FTempCreate( cPath, nil, if( lHide, FC_HIDDEN, FC_NORMAL ), @cFile )
+
+  if !hb_isbyref( @nHandle )
+     fclose( nHandle )
+  endif
+
+  return cFile
+
+#else
+
   LOCAL nError := 0, cFile
 
   Default cPath to ".\"
@@ -204,7 +224,9 @@
 
   return cFile
 
-#endif
+#endif /* __CT_DEPENDENCE__ */
+
+#endif /* FT_TEMPFILE_ORIGINAL */
 
 #ifdef FT_TEST
   FUNCTION MAIN( cPath, cHide )
