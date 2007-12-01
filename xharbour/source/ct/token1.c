@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.5 2007/02/13 19:02:24 druzus Exp $
+ * $Id: token1.c,v 1.6 2007/12/01 22:33:22 andijahja Exp $
  */
 
 /*
@@ -77,13 +77,13 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 
-static BOOL __toupper( UCHAR c )
+static UCHAR __toupper( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
   return  ( __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : toupper( c ) );
 }
 
-static BOOL __tolower( UCHAR c )
+static UCHAR __tolower( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
   return ( __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : tolower( c ) );
