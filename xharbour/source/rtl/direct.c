@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.58 2007/02/27 15:59:40 druzus Exp $
+ * $Id: direct.c,v 1.59 2007/11/29 07:33:24 andijahja Exp $
  */
 
 /*
@@ -110,8 +110,6 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
    /* Get the file list */
    if( ( ffind = hb_fsFindFirst( (const char *) szDirSpec, uiMask ) ) != NULL )
    {
-      HB_ITEM_NEW( Subarray );
-
       do
       {
          if( !( ( ( uiMask & HB_FA_HIDDEN    ) == 0 && ( ffind->attr & HB_FA_HIDDEN    ) != 0 ) ||
@@ -121,6 +119,7 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
          {
             char buffer[ 32 ];
             BOOL bAddEntry = TRUE;
+            HB_ITEM_NEW( Subarray );
 
             hb_arrayNew( &Subarray, 5 );
 
@@ -155,6 +154,9 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             {
                hb_arrayAddForward( pDir, &Subarray );
             }
+	    else
+               hb_itemClear( &Subarray );
+
          }
       }
       while( hb_fsFindNext( ffind ) );
@@ -309,6 +311,8 @@ static void hb_fsDirectoryCrawler( PHB_ITEM pRecurse, PHB_ITEM pResult, char *sz
             hb_fsDirectoryCrawler( &SubDir, pResult, szFName, szAttributes, sRegEx );
 
             hb_xfree( szSubdir );
+
+            hb_itemClear( &SubDir );
          }
          else
          {
@@ -365,6 +369,8 @@ void HB_EXPORT hb_fsDirectoryRecursive( PHB_ITEM pResult, char *szSkleton, char 
    hb_strMatchRegExpDir( (const char *) szFName, (const char *) sRegEx, TRUE );
 
    hb_fsDirectoryCrawler( &Dir, pResult, szFName, szAttributes, sRegEx );
+
+   hb_itemClear( &Dir );
 
    /* reset regex for next loop */
    hb_strMatchRegExpDir( NULL, NULL, FALSE );
