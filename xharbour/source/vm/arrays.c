@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.144 2007/05/15 01:24:23 ronpinkas Exp $
+ * $Id: arrays.c,v 1.145 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -254,123 +254,150 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
       {
          ULONG ulAllocated;
          ULONG ulPos;
+         PHB_ITEM pItems;
 
-         if( pBaseArray->ulLen == 0 )
+         // release old items
+         if( pBaseArray->ulLen > ulLen )
          {
-            register PHB_ITEM pItems;
-            ulAllocated = ulLen + pBaseArray->ulBlock;
-            pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulAllocated * sizeof( HB_ITEM ) );
-
-            pItems = pBaseArray->pItems + ulAllocated;
-            ulPos = ulAllocated;
-
+            pItems = pBaseArray->pItems + ulLen;
+            ulPos = pBaseArray->ulLen - ulLen;
             do
             {
-               ( --pItems )->type = HB_IT_NIL;
-            } while( --ulPos );
-         }
-         else
-         {
-            ulAllocated = pBaseArray->ulAllocated;
-
-            if( pBaseArray->ulAllocated < ulLen )
-            {
-               #ifndef HB_ARRAY_USE_COUNTER
-                  PHB_ITEM pOldItems = pBaseArray->pItems;
-               #else
-                  PHB_ITEM pOldItems;
-               #endif
-
-               ulAllocated = ulLen + pBaseArray->ulBlock;
-
-               pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulAllocated );
-
-               #ifndef HB_ARRAY_USE_COUNTER
-                  if( pBaseArray->pItems != pOldItems )
-                  {
-                     for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
-                     {
-                        if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
-                        {
-                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
-                        }
-                        else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
-                        {
-                           hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
-                        }
-                     }
-                  }
-               #endif
-
-               /* set value for new items */
-               pOldItems = pBaseArray->pItems + ulAllocated;
-               ulPos = ulAllocated - pBaseArray->ulAllocated;
-               do
+               if( HB_IS_COMPLEX( pItems ) )
                {
-                  ( --pOldItems )->type = HB_IT_NIL;
-               } while( --ulPos );
-            }
-            else if( pBaseArray->ulLen > ulLen )
-            {
-               PHB_ITEM pOldItems;
-
-               /* release old items */
-               pOldItems = pBaseArray->pItems + pBaseArray->ulLen;
-               ulPos = pBaseArray->ulLen - ulLen;
-               do
-               {
-                  --pOldItems;
-                  if( HB_IS_COMPLEX( pOldItems ) )
-                  {
-                     hb_itemClear( pOldItems );
-                  }
-                  else
-                  {
-                     pOldItems->type = HB_IT_NIL;
-                  }
-               } while( --ulPos );
-
-               if( ulLen == 0 )
-               {
-                  hb_xfree( pBaseArray->pItems );
-                  pBaseArray->pItems = NULL;
-                  ulAllocated = 0;
+                  hb_itemClear( pItems );
                }
                else
                {
-                  #ifndef HB_ARRAY_USE_COUNTER
-                     PHB_ITEM pOldItems = pBaseArray->pItems;
-                  #endif
-                  register ULONG ulArrayPrealloc = pBaseArray->ulBlock;
+                  pItems->type = HB_IT_NIL;
+               }
+               pItems++;
+            } while( --ulPos );
+         }
 
-                  if( ulLen + ulArrayPrealloc * 2 <= pBaseArray->ulAllocated )
-                  {
-                     ulAllocated = ulLen + ulArrayPrealloc;
-
-                     pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulAllocated );
-
-                     #ifndef HB_ARRAY_USE_COUNTER
-                        if( pBaseArray->pItems != pOldItems )
-                        {
-                           for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
-                           {
-                              if( ( pBaseArray->pItems + ulPos )->type == HB_IT_ARRAY && ( pBaseArray->pItems + ulPos )->item.asArray.value )
-                              {
-                                 hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asArray.value, (void *) ( pOldItems + ulPos ), (void *) ( pBaseArray->pItems + ulPos ) );
-                              }
-                              else if( ( pBaseArray->pItems + ulPos )->type == HB_IT_BYREF && ( pBaseArray->pItems + ulPos )->item.asRefer.offset == 0 )
-                              {
-                                 hb_arrayResetHolder( ( pBaseArray->pItems + ulPos )->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems + ulPos ), ( void *) ( pBaseArray->pItems + ulPos ) );
-                              }
-                           }
-                        }
-                     #endif
-                  }
+         // New allocated size:
+         ulAllocated = pBaseArray->ulAllocated;
+         if( pBaseArray->ulBlock != 0 )
+         {
+            // Uses specified allocation size pBaseArray->ulBlock
+            if( ulLen == 0 )
+            {
+               ulAllocated = 0;
+            }
+            else if( ulLen > ulAllocated )
+            {
+               ulAllocated = ulLen + pBaseArray->ulBlock;
+            }
+            else if( ulLen + pBaseArray->ulBlock * 2 < ulAllocated )
+            {
+               ulAllocated = ulLen + pBaseArray->ulBlock;
+            }
+         }
+         else if( ulLen > ulAllocated )
+         {
+            // Requires more space
+            if( ulLen < 10 )
+            {
+               // At least 10 allocated items
+               ulAllocated = 10;
+            }
+            else if( ulLen < 100 )
+            {
+               // At least 10 more allocated items
+               ulAllocated = ulLen + 10;
+            }
+            else
+            {
+               // At least 10 percent more allocated items
+               ulAllocated = ulLen * 1.1;
+            }
+         }
+         else if( ulLen < ulAllocated )
+         {
+            if( ulLen == 0 )
+            {
+               // No allocated items
+               ulAllocated = 0;
+            }
+            else if( ulLen < ulAllocated / 2 && ulAllocated > 10 )
+            {
+               // Resizes only if new size is less than a half of the allocated items
+               if( ulLen < 20 )
+               {
+                  // At least 10 allocated items
+                  ulAllocated = 10;
+               }
+               else
+               {
+                  // Reduces allocated items to new size
+                  ulAllocated = ulLen;
                }
             }
          }
-         pBaseArray->ulLen       = ulLen;
-         pBaseArray->ulAllocated = ulAllocated;
+
+         if( ulAllocated != pBaseArray->ulAllocated )
+         {
+            // Buffer will be changed
+            if( ulAllocated == 0 )
+            {
+               // Array is empty
+               hb_xfree( pBaseArray->pItems );
+               pBaseArray->pItems = NULL;
+            }
+            else
+            {
+               // Resizes array buffer
+               if( pBaseArray->pItems )
+               {
+                  // Reallocates buffer
+                  #ifndef HB_ARRAY_USE_COUNTER
+                     PHB_ITEM pOldItems = pBaseArray->pItems;
+                  #endif
+
+                  pBaseArray->pItems = ( PHB_ITEM ) hb_xrealloc( pBaseArray->pItems, sizeof( HB_ITEM ) * ulAllocated );
+
+                  #ifndef HB_ARRAY_USE_COUNTER
+                     if( pBaseArray->pItems != pOldItems )
+                     {
+                        pItems = pBaseArray->pItems;
+                        for( ulPos = 0; ulPos < pBaseArray->ulLen; ulPos++ )
+                        {
+                           if( pItems->type == HB_IT_ARRAY && pItems->item.asArray.value )
+                           {
+                              hb_arrayResetHolder( pItems->item.asArray.value, ( void * ) ( pOldItems + ulPos ), ( void * ) pItems );
+                           }
+                           else if( pItems->type == HB_IT_BYREF && pItems->item.asRefer.offset == 0 )
+                           {
+                              hb_arrayResetHolder( pItems->item.asRefer.BasePtr.pBaseArray, ( void * ) ( pOldItems + ulPos ), ( void * ) pItems );
+                           }
+                           pItems++;
+                        }
+                     }
+                  #endif
+               }
+               else
+               {
+                  // New buffer
+                  pBaseArray->pItems = ( PHB_ITEM ) hb_xgrab( ulAllocated * sizeof( HB_ITEM ) );
+               }
+
+            }
+
+            // Clears new allocated items
+            if( pBaseArray->ulAllocated < ulAllocated )
+            {
+               pItems = pBaseArray->pItems + pBaseArray->ulAllocated;
+               ulPos = ulAllocated - pBaseArray->ulAllocated;
+               do
+               {
+                  ( pItems++ )->type = HB_IT_NIL;
+               } while( --ulPos );
+            }
+
+            pBaseArray->ulAllocated = ulAllocated;
+         }
+         pBaseArray->ulLen = ulLen;
+
       }
 
       return TRUE;
