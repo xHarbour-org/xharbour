@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.145 2007/10/31 12:03:20 marchuet Exp $
+ * $Id: arrays.c,v 1.146 2007/12/02 22:38:23 guerra000 Exp $
  */
 
 /*
@@ -296,12 +296,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
          else if( ulLen > ulAllocated )
          {
             // Requires more space
-            if( ulLen < 10 )
-            {
-               // At least 10 allocated items
-               ulAllocated = 10;
-            }
-            else if( ulLen < 100 )
+            if( ulLen < 100 )
             {
                // At least 10 more allocated items
                ulAllocated = ulLen + 10;
@@ -322,7 +317,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             else if( ulLen < ulAllocated / 2 && ulAllocated > 10 )
             {
                // Resizes only if new size is less than a half of the allocated items
-               if( ulLen < 20 )
+               if( ulLen < 10 )
                {
                   // At least 10 allocated items
                   ulAllocated = 10;
@@ -396,8 +391,8 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 
             pBaseArray->ulAllocated = ulAllocated;
          }
-         pBaseArray->ulLen = ulLen;
 
+         pBaseArray->ulLen = ulLen;
       }
 
       return TRUE;

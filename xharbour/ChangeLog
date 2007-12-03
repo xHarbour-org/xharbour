@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5795 2007/12/02 00:03:22 andijahja Exp $
+ * $Id: ChangeLog,v 1.5796 2007/12/02 22:38:21 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-02 19:09 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
+  * source/vm/arrays.c
+    ! Fixed how many items must be allocated for small arrays.
 
 2007-12-02 16:32 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * source/vm/arrays.c
