@@ -1,5 +1,5 @@
 /*
- * $Id: debugger.prg,v 1.85 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: debugger.prg,v 1.86 2007/09/25 05:41:56 bdj Exp $
  */
 
 /*
@@ -535,7 +535,7 @@ METHOD BarDisplay() CLASS HBDebugger
 METHOD BuildBrowseStack() CLASS HBDebugger
 
    IF ::oBrwStack == NIL
-      ::oBrwStack := TBrowseNew( 2, ::nMaxCol - 14, ::nMaxRow - 7, ::nMaxCol - 1 )
+      ::oBrwStack := HBDbBrowser():New( 2, ::nMaxCol - 14, ::nMaxRow - 7, ::nMaxCol - 1 )
       ::oBrwStack:ColorSpec := ::aColors[ 3 ] + "," + ::aColors[ 4 ] + "," + ::aColors[ 5 ]
       ::oBrwStack:goTopBlock := { || ::oBrwStack:Cargo := 1 }
       ::oBrwStack:goBottomBlock := { || ::oBrwStack:Cargo := Len( ::aProcStack ) }
@@ -740,8 +740,8 @@ METHOD Colors() CLASS HBDebugger
                       "Text High Sel.", "Text PPO Sel.", "Menu", "Menu High",;
                       "Menu Selected", "Menu High Sel." }
 
-   LOCAL oBrwColors := TBrowseNew( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
-                                 oWndColors:nBottom - 1, oWndColors:nRight - 1 )
+   LOCAL oBrwColors := HBDbBrowser():New( oWndColors:nTop + 1, oWndColors:nLeft + 1,;
+                                          oWndColors:nBottom - 1, oWndColors:nRight - 1 )
    LOCAL nWidth := oWndColors:nRight - oWndColors:nLeft - 1
    LOCAL oCol
 
@@ -2783,7 +2783,7 @@ METHOD ShowVars() CLASS HBDebugger
       ENDIF
    ENDIF
 
-   IF Len( ::aVars ) > 0 .AND. ::oBrwVars == NIL
+   IF ::oBrwVars == NIL
       ::oBrwVars := HBDbBrowser():New( nTop + 1, 1, nBottom - 1, ;
                                        ::nMaxCol - iif( ::oWndStack != NIL, ::oWndStack:nWidth(), 0 ) - 1 )
 
@@ -3049,8 +3049,8 @@ METHOD ViewSets() CLASS HBDebugger
                     "EventMask", "VideoMode", "MBlockSize", "MFileExt",;
                     "StrictRead", "Optimize", "Autopen", "Autorder", "AutoShare" }
 
-   LOCAL oBrwSets := TBrowseNew( oWndSets:nTop + 1, oWndSets:nLeft + 1,;
-                                 oWndSets:nBottom - 1, oWndSets:nRight - 1 )
+   LOCAL oBrwSets := HBDbBrowser():new( oWndSets:nTop + 1, oWndSets:nLeft + 1,;
+                                        oWndSets:nBottom - 1, oWndSets:nRight - 1 )
    LOCAL nWidth := oWndSets:nRight - oWndSets:nLeft - 1
    LOCAL oCol
 

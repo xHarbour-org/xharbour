@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.8 2007/06/03 13:01:01 likewolf Exp $
+# $Id: make_xmingw.sh,v 1.9 2007/11/10 21:59:45 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -44,7 +44,7 @@ elif find /usr/local/bin -name "i[3456]86-mingw*-gcc" -maxdepth 1 &>/dev/null; t
     CCPREFIX="$TARGET-"
 else
     echo "Can't determine the location for the MinGW32 cross-compiler."
-    echo "Please add your platform to the $0 script."
+    echo "Please install it or add your platform to the $0 script."
     exit 1
 fi
 CCPATH="$MINGW_PREFIX/bin:$MINGW_PREFIX/$TARGET/bin:"

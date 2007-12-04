@@ -1,5 +1,5 @@
 /*
- * $Id: dbgtobj.prg,v 1.11 2007/10/22 21:52:31 likewolf Exp $
+ * $Id: dbgtobj.prg,v 1.12 2007/10/31 10:44:11 likewolf Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ METHOD addWindows( aArray, nRow ) CLASS HBDbObject
 
    nWidth := oWndSets:nRight - oWndSets:nLeft - 1
 
-   oBrwSets := TBrowseNew( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
+   oBrwSets := HBDbBrowser():New( oWndSets:nTop + 1, oWndSets:nLeft + 1, oWndSets:nBottom - 1, oWndSets:nRight - 1 )
    ::ArrayReference := aArray
 
    oBrwSets:ColorSpec := __Dbg():ClrModal()

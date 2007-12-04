@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_gnu.sh,v 1.23 2006/01/17 02:18:14 druzus Exp $
+# $Id: make_gnu.sh,v 1.24 2007/08/06 20:30:22 likewolf Exp $
 #
 
 # ---------------------------------------------------------------
@@ -23,7 +23,7 @@ if [ -z "$HB_ARCHITECTURE" ]; then
     else
         hb_arch=`uname -s | tr -d "[-]" | tr '[A-Z]' '[a-z]' 2>/dev/null`
         case "$hb_arch" in
-            *windows*|*mingw32*)    hb_arch="w32" ;;
+            *windows*|*mingw32*|msys*)    hb_arch="w32" ;;
             *dos)   hb_arch="dos" ;;
             *bsd)   hb_arch="bsd" ;;
         esac
@@ -186,12 +186,13 @@ if [ -z "$HB_ARCHITECTURE" ] || [ -z "$HB_COMPILER" ]; then
    echo
    read
    echo "    HB_GT_LIB:"
-   echo "      - gtstd (Standard streaming) (for all architectures)"
+   echo "      - gtstd (TTY streaming)      (for all architectures)"
+   echo "      - gtcgi (Standard streaming) (for all architectures)"
+   echo "      - gtpca (PC ANSI console)    (for all architectures)"
    echo "      - gtdos (DOS console)        (for dos architecture)"
    echo "      - gtwin (Win32 console)      (for w32 architecture)"
    echo "      - gtwvt (Win32 win console)  (for w32 architecture)"
    echo "      - gtos2 (OS/2 console)       (for os2 architecture)"
-   echo "      - gtpca (PC ANSI console)    (for all architectures)"
    echo "      - gtcrs (Curses console)     (for *nixes, w32 architectures)"
    echo "      - gtsln (Slang console)      (for *nixes, w32 architectures)"
    echo "      - gtxvt (XWindow console)    (for *nixes architecture)"

@@ -1,5 +1,5 @@
 /*
- * $Id: dbghelp.prg,v 1.5 2007/08/06 20:30:23 likewolf Exp $
+ * $Id: dbghelp.prg,v 1.6 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ FUNCTION __dbgHelp( nTopic )
 
    oDlg := HBDbWindow():New( 2, 2, MaxRow() - 2, MaxCol() - 2, "Help", cColor )
 
-   oBrw := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 12 )
+   oBrw := HBDbBrowser():New( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 12 )
    oBrw:Cargo := 1
    oBrw:AddColumn( TBColumnNew( "", { || aTopics[ oBrw:Cargo ][ 1 ] }, 12 ) )
    oBrw:ColorSpec := StrTran( __Dbg():ClrModal(), ", R/W", "" )

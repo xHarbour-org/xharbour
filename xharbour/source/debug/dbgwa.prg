@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.10 2007/08/06 20:30:23 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.11 2007/09/21 18:33:26 likewolf Exp $
  */
 
 /*
@@ -101,14 +101,14 @@ function __dbgShowWorkAreas()
 
    /* Alias browse */
 
-   aBrw[ 1 ] := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 11 )
+   aBrw[ 1 ] := HBDbBrowser():new( oDlg:nTop + 1, oDlg:nLeft + 1, oDlg:nBottom - 1, oDlg:nLeft + 11 )
 
    aBrw[ 1 ]:Cargo         := ( n1 := cur_id )
    aBrw[ 1 ]:ColorSpec     := oDlg:cColor
-   aBrw[ 1 ]:GoTopBlock    := { || n1 := 1 }
-   aBrw[ 1 ]:GoBottomBlock := { || n1 := Len( aAlias ) }
+   aBrw[ 1 ]:GoTopBlock    := { || aBrw[ 1 ]:Cargo := n1 := 1 }
+   aBrw[ 1 ]:GoBottomBlock := { || aBrw[ 1 ]:Cargo := n1 := Len( aAlias ) }
    aBrw[ 1 ]:SkipBlock     := { | nSkip, nPos | nPos := n1,;
-                                  n1 := iif( nSkip > 0, Min( Len( aAlias ), n1 + nSkip ),;
+                                  aBrw[ 1 ]:Cargo := n1 := iif( nSkip > 0, Min( Len( aAlias ), n1 + nSkip ),;
                                           Max( 1, n1 + nSkip ) ),;
                                   n1 - nPos }
 
@@ -120,15 +120,16 @@ function __dbgShowWorkAreas()
 
    aInfo := ( aAlias[ n1 ][ 1 ] )->( DbfInfo() )
 
-   aBrw[ 2 ] := TBrowseNew( oDlg:nTop + 7, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 50 )
+   aBrw[ 2 ] := HBDbBrowser():new( oDlg:nTop + 7, oDlg:nLeft + 13, oDlg:nBottom - 1, oDlg:nLeft + 50 )
 
    aBrw[ 2 ]:Cargo         := ( n2 := 1 )
    aBrw[ 2 ]:ColorSpec     := oDlg:cColor
    aBrw[ 2 ]:GoTopBlock    := { || aBrw[ 2 ]:Cargo := n2 := 1 }
-   aBrw[ 2 ]:GoBottomBlock := { || n2 := Len( aInfo ) }
-   aBrw[ 2 ]:SkipBlock     := { | nSkip, nPos | nPos := n2,;
-                                  n2 := iif( nSkip > 0, Min( Len( aInfo ), n2 + nSkip ),;
-                                          Max( 1, n2 + nSkip ) ), n2 - nPos }
+   aBrw[ 2 ]:GoBottomBlock := { || aBrw[ 2 ]:Cargo := n2 := Len( aInfo ) }
+   aBrw[ 2 ]:SkipBlock     := { | nSkip, nPos | nPos := n2, ;
+                                aBrw[ 2 ]:Cargo := n2 := iif( nSkip > 0, Min( Len( aInfo ), n2 + nSkip ), ;
+                                                                         Max( 1, n2 + nSkip ) ), ;
+                                n2 - nPos }
 
    aBrw[ 2 ]:AddColumn( oCol := TBColumnNew( "", { || PadR( aInfo[ n2 ], 38 ) } ) )
 
@@ -138,14 +139,14 @@ function __dbgShowWorkAreas()
 
    aStruc := ( aAlias[ n1 ][ 1 ] )->( DbStruct() )
 
-   aBrw[ 3 ] := TBrowseNew( oDlg:nTop + 1, oDlg:nLeft + 52, oDlg:nBottom - 1, oDlg:nLeft + 70 )
+   aBrw[ 3 ] := HBDbBrowser():new( oDlg:nTop + 1, oDlg:nLeft + 52, oDlg:nBottom - 1, oDlg:nLeft + 70 )
 
-   aBrw[ 3 ]:Cargo         := 1
+   aBrw[ 3 ]:Cargo         := n3 := 1
    aBrw[ 3 ]:ColorSpec     := oDlg:cColor
    aBrw[ 3 ]:GoTopBlock    := { || aBrw[ 3 ]:Cargo := n3 := 1 }
-   aBrw[ 3 ]:GoBottomBlock := { || n3 := Len( aStruc ) }
+   aBrw[ 3 ]:GoBottomBlock := { || aBrw[ 3 ]:Cargo := n3 := Len( aStruc ) }
    aBrw[ 3 ]:SkipBlock     := { | nSkip, nPos | nPos := n3,;
-                                  n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
+                                  aBrw[ 3 ]:Cargo := n3 := iif( nSkip > 0, Min( Len( aStruc ), n3 + nSkip ),;
                                           Max( 1, n3 + nSkip ) ), n3 - nPos }
 
    aBrw[ 3 ]:AddColumn( TBColumnNew( "", { || PadR( aStruc[ n3, 1 ], 11 ) + ;

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5799 2007/12/04 06:21:25 andijahja Exp $
+ * $Id: ChangeLog,v 1.5800 2007/12/04 14:56:41 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-05 01:52 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_gnu.sh
+  * make_xmingw.sh
+    ! Fixed architecture detection under new MSYS. Improved syntax
+      message. (Borrowed from Harbour)
+  * source/debug/dbgbrwsr.prg
+  * source/debug/dbghelp.prg
+  * source/debug/dbgtarr.prg
+  * source/debug/dbgthsh.prg
+  * source/debug/dbgtobj.prg
+  * source/debug/dbgwa.prg
+  * source/debug/debugger.prg
+    ! Added an minimalistic TBrowse implementation that is just enough
+      for internal use by the debugger. Fixes miscellaneous problems e.g.
+      when debugging a piece of code with RELATIONs turned on.
 
 2007-12-04 21.50 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * source/compiler/harbour.c
