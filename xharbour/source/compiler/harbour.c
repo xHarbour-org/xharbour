@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.167 2007/09/22 09:49:16 likewolf Exp $
+ * $Id: harbour.c,v 1.168 2007/12/04 06:19:08 andijahja Exp $
  */
 
 /*
@@ -5573,7 +5573,8 @@ static int hb_compCompile( char * szPrg )
       if( hb_comp_bPPO )
       {
          hb_comp_pFileName->szExtension = ".ppo";
-         hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
+         if( hb_comp_ppo_pOutPath )
+            hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
          if( !hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
          {
@@ -5583,7 +5584,8 @@ static int hb_compCompile( char * szPrg )
          if( hb_comp_bTracePP && iStatus == EXIT_SUCCESS )
          {
             hb_comp_pFileName->szExtension = ".ppt";
-            hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
+            if( hb_comp_ppo_pOutPath )
+               hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
             hb_fsFNameMerge( szPptName, hb_comp_pFileName );
             if( !hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
             {

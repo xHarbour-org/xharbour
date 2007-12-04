@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.33 2007/03/21 10:15:51 marchuet Exp $
+ * $Id: cmdcheck.c,v 1.34 2007/12/04 06:19:08 andijahja Exp $
  */
 
 /*
@@ -869,6 +869,9 @@ void hb_compChkEnvironVar( char * szSwitch )
 
              case 'p':
              case 'P':
+
+                hb_comp_bPPO = 1;
+
                 if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
                 {
                    if( *( s + 2 ) == '-' )
@@ -878,7 +881,6 @@ void hb_compChkEnvironVar( char * szSwitch )
 		   }
 		   else
 		   {
-                      hb_comp_bPPO     = 1;
                       hb_comp_bTracePP = 1;
 
                       if( *( s + 2 ) == 'o' || *( s + 2 ) == 'O' )
@@ -902,7 +904,6 @@ void hb_compChkEnvironVar( char * szSwitch )
 		{
                    char * szPath = hb_strdup( s + 2 );
 
-                   hb_comp_bPPO     = 1;
                    hb_comp_bTracePP = 0;
 
                    hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
