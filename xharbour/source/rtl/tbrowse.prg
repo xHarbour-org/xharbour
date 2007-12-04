@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.182 2007/10/20 02:30:26 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.183 2007/10/23 22:55:33 modalsist Exp $
  */
 
 /*
@@ -231,7 +231,7 @@ CLASS TDataCache
    DATA  aRectClone
    DATA  lInvalid                      // .T. if ::Invalidate() has been called without a recno
 
-   METHOD   InitCache( lInternal )     // Resets cache
+   METHOD   InitCache()                // Resets cache
    METHOD   FillRow( nRow )            // Fills a row of aCache with data from datasource
 
 END CLASS
@@ -248,7 +248,8 @@ METHOD New( oBrowse ) CLASS TDataCache
    ::oCachedBrowse := oBrowse
 
    ::nCurRow  := 1
-   ::nLastRow := 1
+   //::nLastRow := 1
+   ::nLastRow := nRows
    ::aRect    := {}
    ::lInvalid := .F.
 
@@ -270,8 +271,11 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
                                // Note: For empty databases, nRecsSkipped was NIL here
 
          if nRecsToSkip > 0
-            ::nLastRow := ::nCurRow
-
+            if nRecsToSkip <= ::nCurRow
+               ::nLastRow := ::nCurRow
+            else
+               ::nLastRow := Len( ::aCache )
+            endif
          endif
 
       elseif nRecsSkipped == nRecsToSkip
@@ -288,11 +292,14 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
                //
                if nRecsSkipped > 0
                   ::nCurRow := Len( ::aCache )
+                  ::nLastRow := 1
 
                else // K_PGUP
                   ::nCurRow := 1
+                  ::nLastRow := Len( ::aCache )
 
                endif
+
                AFill( ::aCache, NIL )
 
             else
@@ -503,25 +510,25 @@ return Self
 
 METHOD InitCache() CLASS TDataCache
 
-   local nCurRow
+   /* This is needed when number of shown rows decreases due to a phantom record
+      being removed; for example, using DBU, dbGoBottom(), Down(), Up()
+      Clipper does this as well! :) */
 
-   // this is needed when number of shown rows decreases due to a phantom record
-   // being removed; for example, using DBU, dbGoBottom(), Down(), Up()
-   // Clipper does this as well! :)
    if ::nCurRow > 1
       ::dbSkip( -( ::nCurRow - 1 ) )
       ::nCurRow := 1
    else
-      // This will force a dbSkip( 0 ), when row gets requested by TBrowse, which,
-      // in turn, forces a reload of row from datasource, this cannot be done now
-      // since data has to be fetched from datasource only during stabilization
-      // phase
+
+      /* This will force a dbSkip( 0 ), when row gets requested by TBrowse, which,
+        in turn, forces a reload of row from datasource, this cannot be done now
+        since data has to be fetched from datasource only during stabilization
+        phase */
+     
       if CacheOK(::aCache,::nCurRow)
          ::aCache[ ::nCurRow ] := NIL
       endif
-   endif
 
-   ::nLastRow := Len( ::aCache )
+   endif
 
 RETURN Self
 
@@ -840,9 +847,8 @@ Return Self
 METHOD Invalidate() CLASS TBrowse
 
    AFill( ::aRedraw, .T. )
-
-   ::stable := .F.
    ::lRedrawFrame := .T.
+   ::Stable := .F.
 
 Return Self
 
@@ -858,12 +864,6 @@ Return Self
 METHOD RefreshAll() CLASS TBrowse
 
    AFill( ::aRedraw, .T. )
-/*
-*   2007/OCT/19 - E.F. - Why PG_DN doesn't entry here ? 
-*   IF ! ::lPaintBottomUp  
-*      ::oDataCache:Invalidate()
-*   ENDIF
-*/
    ::oDataCache:Invalidate()
    ::Stable := .F.
 
@@ -2491,7 +2491,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // Every time I enter stabilization loop I need to draw _at least_ one row.
 
       ::CheckRowsToBeRedrawn()
-
+      
       DispBegin()
 
       while ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
@@ -2520,7 +2520,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // If I'm not already under cursor I have to set data source to cursor position
       //
       if ::oDataCache:nCurRow <> ::nNewRowPos
-         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) 
+         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
       endif
 
       // new cursor position
