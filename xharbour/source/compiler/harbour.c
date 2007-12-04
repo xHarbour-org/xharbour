@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.166 2007/08/22 09:54:02 marchuet Exp $
+ * $Id: harbour.c,v 1.167 2007/09/22 09:49:16 likewolf Exp $
  */
 
 /*
@@ -202,6 +202,7 @@ ULONG          hb_comp_ulSavedModuleNamePos;              /* position of last op
 int            hb_comp_iStaticCnt;                        /* number of defined statics variables on the PRG */
 int            hb_comp_iVarScope;                         /* holds the scope for next variables to be defined */
 PHB_FNAME      hb_comp_pOutPath = NULL;
+PHB_FNAME      hb_comp_ppo_pOutPath = NULL;
 BOOL           hb_comp_bCredits = FALSE;                  /* print credits */
 BOOL           hb_comp_bBuildInfo = FALSE;                /* print build info */
 BOOL           hb_comp_bI18n = FALSE;                     /* Output i18n file */
@@ -299,6 +300,7 @@ int main( int argc, char * argv[] )
    hb_comp_PP = hb_pp_new();;
 
    hb_comp_pOutPath = NULL;
+   hb_comp_ppo_pOutPath = NULL;
 #if defined( HOST_OS_UNIX_COMPATIBLE )
    hb_comp_errFile = stderr;
 #else
@@ -402,6 +404,11 @@ int main( int argc, char * argv[] )
    if( hb_comp_pOutPath )
    {
       hb_xfree( hb_comp_pOutPath );
+   }
+
+   if( hb_comp_ppo_pOutPath )
+   {
+      hb_xfree( hb_comp_ppo_pOutPath );
    }
 
    if( hb_comp_iErrorCount > 0 )
@@ -5566,6 +5573,7 @@ static int hb_compCompile( char * szPrg )
       if( hb_comp_bPPO )
       {
          hb_comp_pFileName->szExtension = ".ppo";
+         hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
          hb_fsFNameMerge( szPpoName, hb_comp_pFileName );
          if( !hb_pp_outFile( hb_comp_PP, szPpoName, NULL ) )
          {
@@ -5575,6 +5583,7 @@ static int hb_compCompile( char * szPrg )
          if( hb_comp_bTracePP && iStatus == EXIT_SUCCESS )
          {
             hb_comp_pFileName->szExtension = ".ppt";
+            hb_comp_pFileName->szPath = hb_comp_ppo_pOutPath->szPath;
             hb_fsFNameMerge( szPptName, hb_comp_pFileName );
             if( !hb_pp_traceFile( hb_comp_PP, szPptName, NULL ) )
             {

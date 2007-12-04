@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.56 2007/05/24 16:03:14 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.57 2007/09/22 09:49:16 likewolf Exp $
  */
 
 /*
@@ -567,6 +567,7 @@ extern int            hb_comp_iErrorCount;
 extern char *         hb_comp_szAnnounce;
 
 extern PHB_FNAME      hb_comp_pOutPath;
+extern PHB_FNAME      hb_comp_ppo_pOutPath;
 extern BOOL           hb_comp_bCredits;
 extern BOOL           hb_comp_bBuildInfo;
 

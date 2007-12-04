@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.32 2007/02/27 15:59:34 druzus Exp $
+ * $Id: cmdcheck.c,v 1.33 2007/03/21 10:15:51 marchuet Exp $
  */
 
 /*
@@ -328,6 +328,13 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
 
                      case 'p' :
                      case 'P' :
+                       Args[i] += (j - 1);
+                       hb_compChkEnvironVar( Args[i] );
+
+                       /* Accept rest as OutputPath and continue with next Args[]. */
+                       j = strlen( Args[i] );
+                       continue;
+#if 0
                        if ( Args[i][j + 1] )
                        {
                           Switch[2] = Args[i][j + 1];
@@ -342,7 +349,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        }
                        hb_compChkEnvironVar( (char*) Switch );
                        continue;
-
+#endif
                      case 'q' :
                      case 'Q' :
                        if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
@@ -865,6 +872,47 @@ void hb_compChkEnvironVar( char * szSwitch )
                 if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
                 {
                    if( *( s + 2 ) == '-' )
+		   {
+                      hb_comp_bPPO     = 0;
+                      hb_comp_bTracePP = 0;
+		   }
+		   else
+		   {
+                      hb_comp_bPPO     = 1;
+                      hb_comp_bTracePP = 1;
+
+                      if( *( s + 2 ) == 'o' || *( s + 2 ) == 'O' )
+	              {
+                         if( *( s + 3 ) == '-' )
+   		         {
+                            hb_comp_bPPO     = 0;
+                            hb_comp_bTracePP = 0;
+		         }
+		         else
+		         {
+                            char * szPath = hb_strdup( s + 3 );
+
+                            hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
+                            hb_xfree( szPath );
+		         }
+		      }
+		   }
+                }
+                else if( *( s + 1 ) == 'o' || *( s + 1 ) == 'O' )
+		{
+                   char * szPath = hb_strdup( s + 2 );
+
+                   hb_comp_bPPO     = 1;
+                   hb_comp_bTracePP = 0;
+
+                   hb_comp_ppo_pOutPath = hb_fsFNameSplit( szPath );
+                   hb_xfree( szPath );
+		}
+		break;
+#if 0
+                if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
+                {
+                   if( *( s + 2 ) == '-' )
                    {
                       hb_comp_bPPO     = 0;
                       hb_comp_bTracePP = 0;
@@ -887,7 +935,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    }
                 }
                 break;
-
+#endif
              case 'q':
              case 'Q':
                 if( *( s + 1 ) == '0' )

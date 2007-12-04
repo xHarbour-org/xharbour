@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5797 2007/12/03 01:16:43 guerra000 Exp $
+ * $Id: ChangeLog,v 1.5798 2007/12/04 00:21:25 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-04 13.15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   * source/compiler/harbour.c
+   * source/compiler/cmdcheck.c
+   * include/hbcomp.h
+     ! enable generation of .ppo/.ppt files in other path.
+       Syntax : harbour my.prg -poc:\temp\
+                harbour my.prg -ptoc:\temp\
+       NOTE:
+       * Please observe path naming, it should be "c:\temp\" not just "c:\temp"
+       * Do not mention ppo/ppt file name, just path
 
 2007-12-03 22:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
