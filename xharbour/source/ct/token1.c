@@ -1,5 +1,5 @@
 /*
- * $Id: token1.c,v 1.6 2007/12/01 22:33:22 andijahja Exp $
+ * $Id: token1.c,v 1.7 2007/12/01 22:54:58 andijahja Exp $
  */
 
 /*
@@ -68,8 +68,8 @@
   #define TOUPPER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_upper[ ( UCHAR ) c ] : toupper( ( UCHAR ) c) )
   #define TOLOWER(c)    ( hb_cdp_page->nChars ? hb_cdp_page->s_lower[ ( UCHAR ) c ] : tolower( ( UCHAR ) c) )
   #endif
-  #define TOUPPER(c)    __toupper( ( UCHAR ) c )
-  #define TOLOWER(c)    __tolower( ( UCHAR ) c )
+  #define TOUPPER(c)    ct__toupper( ( UCHAR ) c )
+  #define TOLOWER(c)    ct__tolower( ( UCHAR ) c )
 #else
   #define TOUPPER(c)    toupper( ( UCHAR ) c )
   #define TOLOWER(c)    tolower( ( UCHAR ) c )
@@ -77,13 +77,13 @@
 
 #ifndef HB_CDP_SUPPORT_OFF
 
-static UCHAR __toupper( UCHAR c )
+static UCHAR ct__toupper( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
   return  ( __hb_cdp_page->nChars ? __hb_cdp_page->s_upper[ c ] : toupper( c ) );
 }
 
-static UCHAR __tolower( UCHAR c )
+static UCHAR ct__tolower( UCHAR c )
 {
   PHB_CODEPAGE __hb_cdp_page = hb_cdppage();
   return ( __hb_cdp_page->nChars ? __hb_cdp_page->s_lower[ c ] : tolower( c ) );
