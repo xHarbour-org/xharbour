@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.9 2007/04/11 06:16:46 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.10 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -65,7 +65,7 @@ HB_FUNC( PVALUE )
    if( uiParam && uiParam <= uiParams ) /* Valid number */
    {
       USHORT uiOffset;
-
+      PHB_ITEM pItem;
 
       if( ( *pBase )->item.asSymbol.locals == HB_VAR_PARAM_FLAG )
       {
@@ -76,7 +76,7 @@ HB_FUNC( PVALUE )
          uiOffset = 0;
       }
 
-      PHB_ITEM pItem = *( pBase + 1 + uiParam + uiOffset );
+      pItem = *( pBase + 1 + uiParam + uiOffset );
 
       hb_itemReturn( pItem );
 
