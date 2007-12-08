@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5803 2007/12/05 06:40:34 andijahja Exp $
+ * $Id: ChangeLog,v 1.5804 2007/12/08 02:31:16 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-07 22:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  + tests/tstdivert.prg
+    + Sample for new DIVERT syntax
 
 2007-12-07 22:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/hvm.c
@@ -39,7 +43,7 @@
   * source/compiler/hbstripl.c
     + Added new systax:
 
-   DIVERT TO <pFuncPointer>|<pMessagePointer> OF <oNewSelfOrNil> [<nDivertFlags>]
+   DIVERT TO <pFuncPointer>|<pMessagePointer> [OF <oNewSelfOrNil>] [<nDivertFlags>]
 
 
 Description:
@@ -172,9 +176,9 @@ Arguments:
 
 
    <oNewSelfOrNil>
-      Optional object used as the Self object if the DIVERT callee
-      is a Method or NIL to force a Function context. Commonly
-      this may be one of the SUPER objects of the curret Self,
+      Optional argument to specify the object used as the Self object
+      if the DIVERT callee is a Method or NIL to force a Function context.
+      Commonly this may be one of the SUPER objects of the curret Self,
       when diverting to a Super Method is desired.
 
 
