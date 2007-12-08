@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.21 2005/09/22 01:11:59 druzus Exp $
+ * $Id: idle.c,v 1.22 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ static void hb_releaseCPU( BOOL bIndefinite )
       usleep( s_uiIdleSleepMsec );
    #elif defined(HB_OS_UNIX)
    {
-      static struct timespec nanosecs = { 0, 1000 };
+      static struct timespec nanosecs = { 0, 1000000 };
       /* Copied from /vm/thread.c */
 /*
       nanosecs.tv_sec = s_uiIdleSleepMsec / 1000;
