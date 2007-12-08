@@ -1,5 +1,5 @@
 /*
- * $Id: fastitem.c,v 1.109 2007/09/11 18:24:23 walito Exp $
+ * $Id: fastitem.c,v 1.110 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ PHB_ITEM HB_EXPORT hb_itemReturnForward( PHB_ITEM pItem )
 HB_EXPORT void hb_itemReturnRelease( PHB_ITEM pItem )
 {
    HB_THREAD_STUB_STACK
-   
+
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_itemReturnRelease(%p)", pItem ) );
 
    if( pItem )
@@ -1101,7 +1101,7 @@ BYTE HB_EXPORT hb_itemParamId( PHB_ITEM pItem )
    PHB_ITEM *pTop;
    BYTE iId = 1;
 
-   pTop = pBase + hb_stackBaseItem()->item.asSymbol.paramcnt + 1;
+   pTop = pBase + hb_stackBaseItem()->item.asSymbol.arguments + 1;
    while( pBase < pTop )
    {
      if( *pBase == pItem )

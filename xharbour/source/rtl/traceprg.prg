@@ -1,5 +1,5 @@
 /*
- * $Id: traceprg.prg,v 1.12 2003/11/12 14:19:01 jonnymind Exp $
+ * $Id: traceprg.prg,v 1.13 2004/12/17 07:50:37 bdj Exp $
  */
 
 /*
@@ -57,11 +57,14 @@
 //--------------------------------------------------------------//
 FUNCTION TraceLog( ... )
 
-   LOCAL cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, xParam
+   // Using PRIVATE instead of LOCALs so TraceLog() is DIVERT friendly.
+   MEMVAR cFile, FileHandle, nLevel, ProcName, xParam
 
    IF ! SET( _SET_TRACE )
       RETURN .T.
    ENDIF
+
+   PRIVATE cFile := SET( _SET_TRACEFILE ), FileHandle, nLevel := SET( _SET_TRACESTACK ), ProcName, xParam
 
    /* File() and FOpen()/FCreate() make different assumptions rgdg path,
       so we have to make sure cFile contains path to avoid ambiguity */

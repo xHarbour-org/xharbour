@@ -1,5 +1,5 @@
 /*
- * $Id: debug.c,v 1.25 2007/04/20 09:41:31 marchuet Exp $
+ * $Id: debug.c,v 1.26 2007/08/06 20:30:26 likewolf Exp $
  */
 
 /*
@@ -209,7 +209,7 @@ HB_FUNC( HB_DBG_VMPARLLIST )
       pBase = HB_VM_STACK.pItems + ( *pBase )->item.asSymbol.stackbase;
    }
 
-   uiLen = ( * pBase )->item.asSymbol.paramcnt;
+   uiLen = ( * pBase )->item.asSymbol.arguments;
 
    Return.type = HB_IT_NIL;
    hb_arrayNew( &Return, uiLen );           /* Create a transfer array  */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbxvm.h,v 1.11 2007/04/22 22:50:27 ronpinkas Exp $
+ * $Id: hbxvm.h,v 1.12 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -238,6 +238,8 @@ extern HB_EXPORT BOOL   hb_xvmArrayItemPop( ULONG ulIndex );
 extern HB_EXPORT BOOL   hb_xvmMultByInt( LONG lValue );
 extern HB_EXPORT BOOL   hb_xvmDivideByInt( LONG lValue );
 extern HB_EXPORT BOOL   hb_xvmAddInt( LONG lValue );
+
+extern HB_EXPORT void   hb_xvmDivert( BOOL bDivertOf );
 
 HB_EXTERN_END
 

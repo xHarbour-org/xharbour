@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.222 2007/10/31 12:03:20 marchuet Exp $
+ * $Id: hbapi.h,v 1.223 2007/10/31 16:20:51 marchuet Exp $
  */
 
 /*
@@ -421,7 +421,9 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
    #define HB_ARRAY_COUNTER_DEFAULT_HOLDERS 1
 #endif
 
-#define HB_VAR_PARAM_FLAG 255
+#define HB_VAR_PARAM_FLAG      0x00FF
+#define HB_VAR_PARAM_NONE      0xFFFE
+#define HB_VAR_PARAM_NOERR     0xFFFD
 
 #ifdef HB_API_MACROS
    #include "hbapiitm.h"
@@ -429,7 +431,7 @@ extern HB_EXPORT LONGLONG   hb_parnll( int iParam, ... ); /* retrieve a numeric 
       #include "hbstack.h"
    #endif
 
-   #define hb_pcount()                          ( ( int ) ( ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt ) )
+   #define hb_pcount()                          ( ( int ) ( ( * HB_VM_STACK.pBase )->item.asSymbol.arguments ) )
 
     #define hb_ret()                             hb_itemClear( hb_stackReturnItem() )
     #define hb_reta( ulLen )                     hb_arrayNew( hb_stackReturnItem(), (ulLen) )
@@ -644,7 +646,7 @@ extern HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pObject); /* returns a duplicate
                                 ( (c) >= 'a' && (c) <= 'z' ) || (c) == '_' )
 #define HB_ISNEXTIDCHAR(c)    ( HB_ISFIRSTIDCHAR(c) || \
                                 ( ( (c) >= '0' && (c) <= '9' ) ) )
-                          
+
 extern const char * hb_szAscii[256];      /* array of 1 character length strings */
 
 extern HB_EXPORT int       hb_stricmp( const char * s1, const char * s2 ); /* compare two strings without regards to case */

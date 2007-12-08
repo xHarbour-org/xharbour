@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.57 2007/06/29 05:22:14 andresreyesh Exp $
+ * $Id: hbclass.ch,v 1.58 2007/09/11 18:24:23 walito Exp $
  */
 
 /*
@@ -100,6 +100,14 @@
 /* #define HB_CLS_ALLOWCLASS */ /* Work in progress, don't define it now */
 /* #define HB_CLS_ENFORCERO FLAG to disable Write access to RO VAR outside */
 /*         of Constructors /!\ Could be related to some incompatibility */
+
+#ifndef HB_CONSTRUCTOR_NO_DIVERT  
+  #define HB_CONSTRUCTOR_USE_DIVERT
+#endif
+  
+#ifdef HB_CONSTRUCTOR_USE_DIVERT
+   DYNAMIC DivertConstructorCall
+#endif
 
 DECLARE HBClass ;
         New( cName AS String, OPTIONAL SuperParams ) AS CLASS HBClass ;
@@ -397,7 +405,7 @@ DECLARE HBClass ;
 #xcommand DECLSUPERN <Func>( <SuperClass> ) ;
       =>;
       #translate Super( <SuperClass> ) : => ::<SuperClass>:
-      
+
 /* Disable the message :Class */
 /* CLASSY SYNTAX */
 #IFDEF HB_CLS_CSY
@@ -881,7 +889,11 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                       END ;;
                       IF PCount() > 0 ;;
+                       #ifdef HB_CONSTRUCTOR_USE_DIVERT ;;
+                         DIVERT TO (@DivertConstructorCall()) OF s_oClass ;;
+                       #else ;;
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
+                       #endif ;;  
                       END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
@@ -897,7 +909,11 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                        oClassInstance := __clsInst( s_oClass:hClass ) ;;
                       END ;;
                       IF PCount() > 0 ;;
+                       #ifdef HB_CONSTRUCTOR_USE_DIVERT;;
+                         DIVERT TO (@DivertConstructorCall()) OF s_oClass ;;
+                       #else ;; 
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
+                       #endif ;; 
                       END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;

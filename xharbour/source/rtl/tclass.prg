@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.24 2007/04/22 22:50:38 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.25 2007/04/29 18:08:11 andresreyesh Exp $
  */
 
 /*
@@ -74,6 +74,7 @@
 
 #include "common.ch"
 #include "hboo.ch"
+#include "divert.ch"
 
 REQUEST HBObject
 
@@ -100,6 +101,7 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetDestructor"  , @SetDestructor()  , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "DivertConstructorCall", @DivertConstructorCall(), HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
 
@@ -469,3 +471,50 @@ STATIC FUNCTION ConstructorCall( oClass, aParams )
    ENDIF
 
 RETURN Self
+
+STATIC PROCEDURE DivertConstructorCall( ... )
+   // From DIVERT parent!
+   local oClassInstance
+   local nScope
+   // End
+
+   LOCAL aConstrMethods
+   LOCAL lOldScope, nPos
+
+   IF __SetClassAutoInit() //.AND. PCount() > 0
+      // Set class scoping off
+      lOldScope := __SetClassScope( .F. )
+
+      // Get method full list but limited to those with class type as constructor
+      aConstrMethods  := __objGetMsgFullList( oClassInstance, .F., HB_MSGLISTALL, HB_OO_CLSTP_CTOR )
+
+      // Search the constructor which is not derived from a parent class
+      //aEval( aConstrMethods, {|aMth| TraceLog( "aScan",  aMth[HB_OO_DATA_SYMBOL], aMth[HB_OO_DATA_SCOPE], ;
+      //                                         hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) ) } )
+      nPos := aScan( aConstrMethods, {|aMth| hb_BitAnd( aMth[HB_OO_DATA_SCOPE], HB_OO_CLSTP_SUPER ) == 0 } )
+
+      // Revert class scoping
+      __SetClassScope( lOldScope )
+
+      IF nPos > 0
+         // Exec method - i have found the constructor in this class
+         //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
+         //RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
+         DIVERT TO aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance DIVERT_RESET_LOCALS
+      ELSE
+         // Get LAST constructor from parent (NOTE: this can be a default and faster way,
+         // but i prefer check rightly before)
+         IF !Empty( aConstrMethods )
+            //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
+            //RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
+            DIVERT TO aConstrMethods[-1][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance DIVERT_RESET_LOCALS
+         ELSE
+            //TraceLog( "Call new default constructor:", "NEW" )
+            // If i have no constructor i call NEW method that is defined is HBOBJECT class
+            //HB_ExecFromArray( oClass, "NEW", aParams )
+            Alert( "Warning! Class function '" + oClassInstance:ClassName + "' called with arguments, but no constructor found." )
+         ENDIF
+      ENDIF
+   ENDIF
+
+RETURN

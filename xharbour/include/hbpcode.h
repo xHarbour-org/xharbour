@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.h,v 1.31 2007/04/08 07:20:55 ronpinkas Exp $
+ * $Id: hbpcode.h,v 1.32 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -240,9 +240,11 @@ typedef enum
    HB_P_LOCALNEARDEC,          /* 174 */
    HB_P_PUSHLOCALNEARINC,      /* 175 */
    HB_P_PUSHLOCALNEARDEC,      /* 176 */
+   HB_P_DIVERT,                /* 177 */
+   HB_P_DIVERTOF,              /* 178*/
 
 /* NOTE: This have to be the last definition */
-   HB_P_LAST_PCODE             /* 177 this defines the number of defined pcodes */
+   HB_P_LAST_PCODE             /* 179 this defines the number of defined pcodes */
 } HB_PCODE;
 
 #endif /* HB_PCODE_H_ */

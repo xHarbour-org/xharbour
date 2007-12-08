@@ -1,5 +1,5 @@
 /*
- * $Id: hboo.ch,v 1.11 2006/08/21 15:16:46 walito Exp $
+ * $Id: hboo.ch,v 1.12 2007/05/22 18:12:54 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@
 #define HB_OO_CLS_ONERROR_SYMB   2048
 #define HB_OO_CLS_DESTRUC_SYMB   4096
 #define HB_OO_CLS_REALLOCINIT    8192 /* Realloc pInitValues in AddMsg */
-#define HB_OO_CLS_ONERROR_SUPER 16384 /* Onerror handler is inherited */ 
+#define HB_OO_CLS_ONERROR_SUPER 16384 /* Onerror handler is inherited */
 
 
 /* Message types */
@@ -114,6 +114,7 @@
 /* Data */
 #define HB_OO_DATA_SYMBOL       1
 #define HB_OO_DATA_VALUE        2
+#define HB_OO_DATA_SYMBOL_PTR   2
 #define HB_OO_DATA_TYPE         3
 #define HB_OO_DATA_SCOPE        4
 #define HB_OO_DATA_PERSISTENT   5

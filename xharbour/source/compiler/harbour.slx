@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.84 2007/09/17 11:10:45 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.85 2007/10/31 08:34:49 marchuet Exp $
  */
 
 /*
@@ -284,6 +284,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "CRITICAL{WS}STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_CRITICAL_STATIC_PROC ),
                          LEX_WORD( "DECLARE"                         ) AS_TOKEN( DECLARE          ),
                          LEX_WORD( "DEFAULT"                         ) AS_TOKEN( HB_WANTS_EOL - DEFAULT          ),
+                         LEX_WORD( "DIVERT{WS}TO"                    ) AS_TOKEN( HB_WANTS_EXP - DIVERT           ),
                          LEX_WORD( "DO"                              ) AS_TOKEN( HB_WANTS_VAR - DO               ),
                          LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( DOCASE           ),
                          LEX_WORD( "DO{WS}WHILE"                     ) AS_TOKEN( DO_WHILE         ),
@@ -391,6 +392,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "LIKE"                             ) AS_TOKEN( HB_AFTER_EXP - LIKE              ),
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),
                      LEX_WORD( "NIL"                              ) AS_TOKEN( NIL                + DONT_REDUCE ),
+                     LEX_WORD( "OF"                               ) AS_TOKEN( HB_AFTER_EXP - OF                ),
                      LEX_WORD( "OPTIONAL"                         ) AS_TOKEN( OPTIONAL           ),
                      LEX_WORD( "PM"                               ) AS_TOKEN( HB_H12PM           ),
 

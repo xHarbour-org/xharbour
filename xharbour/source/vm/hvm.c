@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.644 2007/10/27 10:12:39 likewolf Exp $
+ * $Id: hvm.c,v 1.645 2007/10/31 08:35:13 marchuet Exp $
  */
 
 /*
@@ -109,6 +109,7 @@
 #include "hashapi.h"
 
 #include "hbmemory.ch"
+#include "divert.ch"
 
 #ifdef HB_MACRO_STATEMENTS
    #include "hbpp.h"
@@ -207,6 +208,9 @@ static void    hb_vmLocalName( USHORT uiLocal, char * szLocalName ); /* locals a
 static void    hb_vmStaticName( USHORT uiStatic, char * szStaticName ); /* statics vars information for the debugger */
 static void    hb_vmModuleName( char * szModuleName ); /* PRG and function name information for the debugger */
 static void    hb_vmFrame( unsigned short iLocals, BYTE bParams ); /* increases the stack pointer for the amount of locals and params suplied */
+static void    hb_vmDivertFrame( unsigned short iLocals, BYTE bParams ); /* increases the stack pointer for the amount of locals and params suplied */
+static void    hb_vmSetDivert( BOOL bDivertOf );
+
 static void    hb_vmSFrame( PHB_SYMB pSym );     /* sets the statics frame for a function */
 static void    hb_vmStatics( PHB_SYMB pSym, USHORT uiStatics ); /* increases the global statics array to hold a PRG statics */
 static void    hb_vmEndBlock( void );            /* copies the last codeblock pushed value into the return value */
@@ -2082,7 +2086,6 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             if( bCanFinalize && ( HB_VM_STACK.pSequence->uiStatus & HB_SEQ_FINALIZED ) )
             {
                //#define DEBUG_FINALLY
-
                #ifdef DEBUG_FINALLY
                   printf( "%s-> (TRYBEGIN)- Pending: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence->uiActionRequest );
                #endif
@@ -2209,7 +2212,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                   }
 
                   #ifdef DEBUG_FINALLY
-                     printf( "%s->Finally %li at: %li bCanFinalize: %i Prev: %li\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence, HB_VM_STACK.pSequence->lFinally, HB_VM_STACK.pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE, HB_VM_STACK.pSequence->pPrev );
+                     printf( "%s->Finally %p at: %li bCanFinalize: %i Prev: %li\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence, HB_VM_STACK.pSequence->lFinally, HB_VM_STACK.pSequence->uiStatus & HB_SEQ_PRESET_CANFINALIZE, HB_VM_STACK.pSequence->pPrev );
 
                      if( HB_VM_STACK.pSequence->pPrev )
                      {
@@ -2289,7 +2292,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             hb_itemRelease( HB_VM_STACK.pSequence->pPrevErrBlock );
 
             #ifdef DEBUG_FINALLY
-               printf( "%s->TRYRECOVER: %li Finally: %i bCanFinalize %i got Type: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence, HB_VM_STACK.pSequence->lFinally, bCanFinalize, hb_stackItem( HB_VM_STACK.pSequence->lBase - 1 )->type );
+               printf( "%s->TRYRECOVER: %p Finally: %i bCanFinalize %i got Type: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence, HB_VM_STACK.pSequence->lFinally, bCanFinalize, hb_stackItem( HB_VM_STACK.pSequence->lBase - 1 )->type );
             #endif
 
             // The HB_VM_STACK.pSequence->lBase will now be poped as stack top, but it must be reserved for potential forwarding to outer!
@@ -2338,7 +2341,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
            HB_TRACE( HB_TR_DEBUG, ("HB_P_FINALLY") );
 
            #ifdef DEBUG_FINALLY
-             printf( "%s->Finally status %i: Top: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence->uiStatus, hb_stackItemFromTop(-1)->type );
+             printf( "%s->Finally status: %p request: %i Top: %i\n", hb_stackBaseItem()->item.asSymbol.value->szName, HB_VM_STACK.pSequence->uiStatus, HB_VM_STACK.pSequence->uiActionRequest, hb_stackItemFromTop(-1)->type );
            #endif
 
            HB_VM_STACK.pSequence->uiStatus |= HB_SEQ_FINALIZED;
@@ -3601,6 +3604,19 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             hb_stackSetActionRequest( HB_ENDPROC_REQUESTED );
             break;
 
+
+         case HB_P_DIVERTOF:
+            HB_TRACE(HB_TR_INFO, ("HB_P_DIVERTOF"));
+            hb_vmSetDivert( TRUE );
+            w++;
+            break;
+
+         case HB_P_DIVERT:
+            HB_TRACE(HB_TR_INFO, ("HB_P_DIVERT"));
+            hb_vmSetDivert( FALSE );
+            w++;
+            break;
+
          default:
             /* TODO: Include to failing pcode in the error message */
             hb_errInternal( HB_EI_VMBADOPCODE, NULL, NULL, NULL );
@@ -3661,7 +3677,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          if( hb_stackGetActionRequest() & HB_ENDPROC_REQUESTED )
          {
             /* request to stop current procedure was issued
-             * (from macro evaluation)
+             * (from macro evaluation or diverted call with no DIVERT_RESUME)
              */
             if( bCanFinalize && ( HB_VM_STACK.pSequence->uiStatus & HB_SEQ_FINALIZED ) == 0 )
             {
@@ -3670,7 +3686,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                #endif
 
                HB_VM_STACK.pSequence->uiStatus |= HB_SEQ_FINALIZED;
-               hb_stackSetActionRequest( HB_ENDPROC_REQUESTED );
+               HB_VM_STACK.pSequence->uiActionRequest = HB_ENDPROC_REQUESTED;
 
                w = HB_VM_STACK.pSequence->lFinally;
                hb_stackSetActionRequest( 0 );
@@ -3690,7 +3706,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
                #endif
 
                HB_VM_STACK.pSequence->uiStatus |= HB_SEQ_FINALIZED;
-               hb_stackSetActionRequest( HB_BREAK_REQUESTED );
+               HB_VM_STACK.pSequence->uiActionRequest = HB_BREAK_REQUESTED;
 
                // We didn't realy have a recover section, so do the bCanRecover too!
                if( HB_VM_STACK.pSequence->uiStatus & HB_SEQ_RETHROW )
@@ -3850,7 +3866,7 @@ HB_FUNC( HB_VMEXECUTE )
    }
    else
    {
-      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "HB_vmExecute", 3, hb_paramError( 1 ), hb_paramError( 2 ) );
+      hb_errRT_BASE_SubstR( EG_ARG, 9102, NULL, "HB_vmExecute", 3, hb_paramError( 1 ), hb_paramError( 2 ) );
    }
 }
 
@@ -7782,63 +7798,588 @@ static void hb_vmFrame( unsigned short iLocals, BYTE bParams )
 {
    HB_THREAD_STUB
 
-   int iParams = hb_pcount();
-   int iTotal;
-   int iExtra;
    PHB_ITEM pBase = *HB_VM_STACK.pBase;
+   int iArguments = pBase->item.asSymbol.arguments;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmFrame(%d, %d)", iLocals, (int) bParams));
 
-   /*
-      Variable arguments function is the exception, so it's more efficent
-      to rearrange the stack [once] for this exception, rather then force every local
-      and param read/write access to be calculating possible offset!
-    */
-   if( bParams == HB_VAR_PARAM_FLAG )
+   //#define DEBUG_FRAME
+   //#define DEBUG_DIVERT_FRAME
+
+   // NORMAL CALL
+   if( pBase->item.asSymbol.params == 0 )
    {
-      pBase->item.asSymbol.paramsoffset = iLocals;
-
-      while( iLocals-- > 0 )
+      // Explicit Parameters
+      if( bParams != HB_VAR_PARAM_FLAG )
       {
-         hb_vmPushNil();
-      }
+         int iExtraArguments = ( iArguments > bParams ) ? iArguments - bParams : 0;
+         int iAllocateLocals = ( iLocals > iExtraArguments ) ? iLocals - iExtraArguments : 0;
 
-      iLocals = pBase->item.asSymbol.paramsoffset;
-      while( iParams > 0 )
+         #ifdef DEBUG_FRAME
+            TraceLog( NULL, "SET FRAME sym: %s, Arguments: %i, Params: %i, Locals %i, Stack: %i ", pBase->item.asSymbol.value->szName, iArguments, bParams, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+         #endif
+
+         if( iExtraArguments )
+         {
+            int iPopArguments = ( iExtraArguments > iLocals ) ? iExtraArguments - iLocals : 0;
+            int iClearLocals  = ( iLocals - iAllocateLocals );
+
+            #ifdef DEBUG_FRAME
+               TraceLog( NULL, "Pop: %i, Clear Locals %i", iPopArguments, iClearLocals );
+            #endif
+
+            while( iPopArguments > 0 )
+            {
+               //TraceLog( NULL, "FRAME POP ARG sym: %s, Extra: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+               hb_stackPop();
+               iPopArguments--;
+            }
+
+            while( iClearLocals > 0 )
+            {
+               PHB_ITEM pLocal = hb_stackItemFromBase( bParams + iClearLocals );
+
+               //TraceLog( NULL, "FRAME CLEAR LOCAL sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, iClear, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+               hb_itemClear( pLocal );
+               iClearLocals--;
+            }
+         }
+         else
+         {
+            int iAllocateParams = ( bParams > iArguments ) ? bParams - iArguments : 0;
+
+            #ifdef DEBUG_FRAME
+               TraceLog( NULL, "Alloc Params: %i ", iAllocateParams );
+            #endif
+
+            while( iAllocateParams > 0 )
+            {
+               //TraceLog( NULL, "FRAME ALLOCATe PARAM sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, -iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+               hb_vmPushNil();
+               iAllocateParams--;
+            }
+         }
+
+         #ifdef DEBUG_FRAME
+            TraceLog( NULL, "Alloc Locals: %i\n", iAllocateLocals );
+         #endif
+
+         while( iAllocateLocals > 0 )
+         {
+            //TraceLog( NULL, "FRAME ALLOCATE LOCAL sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, -iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+            hb_vmPushNil();
+            iAllocateLocals--;
+         }
+      }
+      // VARPARAMS (...)
+      else
       {
-         hb_itemSwap( *( HB_VM_STACK.pBase + 1 + iParams ), *( HB_VM_STACK.pBase + 1 + iParams + iLocals ) );
-         iParams--;
-      }
+         if( iLocals )
+         {
+            int iAllocateLocals = iLocals;
 
-      return;
+            #ifdef DEBUG_FRAME
+               TraceLog( NULL, "ALLOCATE LOCALS VARPARAMS: %s %i of: %i\n", pBase->item.asSymbol.value->szName, iAllocateLocals, iLocals );
+            #endif
+
+            // Make space for the Locals.
+            while( iAllocateLocals > 0 )
+            {
+               //TraceLog( NULL, "PUSH FRAME sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, -iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+               hb_vmPushNil();
+               iAllocateLocals--;
+            }
+
+            if( iArguments )
+            {
+               PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
+
+               #ifdef DEBUG_FRAME
+                  TraceLog( NULL, "SWAP VARPARAMS: %s Arguments: %i  Locals: %i\n", pBase->item.asSymbol.value->szName, iArguments, iLocals );
+               #endif
+
+               // Store copy of the arguments pointers.
+               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+
+               // Move the Locals Pointers into bottom of the frame.
+               memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
+
+               // Restore the Arguments Pointers on top of the Locals.
+               memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+
+               // Free the copy
+               hb_xfree( (void *) pStackArguments );
+            }
+         }
+         else
+         {
+            // VARPARAMS with NO locals, nothing to do!
+         }
+      }
+   }
+   // DIVERT frame!
+   else
+   {
+      hb_vmDivertFrame( iLocals, bParams );
    }
 
-   iExtra = iParams - bParams;
+   pBase->item.asSymbol.locals = iLocals;
+   pBase->item.asSymbol.params = bParams;
+}
 
-   while( iExtra > 0 )
+static void hb_vmDivertFrame( unsigned short iLocals, BYTE bParams )
+{
+   HB_THREAD_STUB
+
+   PHB_ITEM pBase = *HB_VM_STACK.pBase;
+   int iArguments = pBase->item.asSymbol.arguments;
+
+   // Explicit Parameters
+   if( bParams != HB_VAR_PARAM_FLAG )
    {
-      PHB_ITEM pExtra = hb_stackItemFromTop( -iExtra );
-
-      if( HB_IS_COMPLEX( pExtra ) )
+      if( pBase->item.asSymbol.params == HB_VAR_PARAM_NOERR )
       {
-         hb_itemClear( pExtra );
+         // Developer's responsible for this time bomb!
+         pBase->item.asSymbol.locals = iLocals;
+         pBase->item.asSymbol.params = bParams;
+
+         return;
+      }
+
+      if( pBase->item.asSymbol.params == HB_VAR_PARAM_NONE )
+      {
+         pBase->item.asSymbol.params = 0;
+      }
+
+      /*
+        DIVERT of parent has declared parameters. DIVERT worker
+        must have same signature or access to parent locals will fail!
+      */
+      if( iLocals && pBase->item.asSymbol.locals && ( pBase->item.asSymbol.params != HB_VAR_PARAM_FLAG ) && ( bParams != pBase->item.asSymbol.params ) )
+      {
+         #ifdef DEBUG_DIVERT_FRAME
+            TraceLog( NULL, "DIVERT FRAME SIGNATURE MISMATCH sym: %s, %i, %i\n", pBase->item.asSymbol.value->szName, bParams, pBase->item.asSymbol.params );
+         #endif
+
+         hb_errRT_BASE( EG_ARG, 9103, "DIVERT parameters declaration mismatch", pBase->item.asSymbol.value->szName, 0 );
       }
       else
       {
-         pExtra->type = HB_IT_NIL;
+         int iParentFrame = ( ( pBase->item.asSymbol.params == HB_VAR_PARAM_FLAG ) ? iArguments : pBase->item.asSymbol.params ) + pBase->item.asSymbol.locals;
+         int iAllocate    = ( bParams + iLocals - iParentFrame );
+         int iClearParams = ( bParams - iArguments );
+
+         #ifdef DEBUG_DIVERT_FRAME
+            TraceLog( NULL, "DIVERT SET FRAME sym: %s, Frame: %i, Arguments: %i, Params: %i, Locals %i, Stack: %i", pBase->item.asSymbol.value->szName, iParentFrame, iArguments, bParams, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+            TraceLog( NULL, " Allocate: %i, Clear Params: %i\n", iAllocate, iClearParams );
+         #endif
+
+         while( iAllocate > 0 )
+         {
+            //TraceLog( NULL, "DIVERT FRAME ALLOCATE LOCAL sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, -iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+            hb_vmPushNil();
+            iAllocate--;
+         }
+
+         while( iClearParams > 0 )
+         {
+            PHB_ITEM pParam = hb_stackItemFromBase( iArguments + iClearParams );
+
+            hb_itemClear( pParam );
+            //TraceLog( NULL, "DIVERT FRAME CLEAR PARAM sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, iClear, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+            iClearParams--;
+         }
       }
-      iExtra--;
    }
-
-   iTotal = iLocals + bParams;
-   if( iTotal )
+   // VARPARAMS (...)
+   else
    {
-      register int i = iTotal - iParams;
-
-      while( i-- > 0 )
+      if( iLocals )
       {
-         hb_vmPushNil();
+         int iParentFrame    = ( ( pBase->item.asSymbol.params == HB_VAR_PARAM_FLAG ) ? iArguments : pBase->item.asSymbol.params ) + pBase->item.asSymbol.locals;
+         int iAllocateLocals = iArguments + iLocals - iParentFrame;
+
+         #ifdef DEBUG_DIVERT_FRAME
+            TraceLog( NULL, "DIVERT FRAME VARPARAMS: '%s' Allocate: %i of: %i \n", pBase->item.asSymbol.value->szName, iAllocateLocals, iLocals );
+         #endif
+
+         // Make space for the Locals.
+         while( iAllocateLocals > 0 )
+         {
+            //TraceLog( NULL, "DIVERT FRAME PUSH sym: %s, Local: %i, Arguments: %i, Locals %i, Stack: %i\n", pBase->item.asSymbol.value->szName, -iOverShort, iArguments, iLocals, hb_stackTopOffset() - hb_stackBaseOffset() );
+            hb_vmPushNil();
+            iAllocateLocals--;
+         }
+
+         /*
+           Variable arguments function is the exception, so it's more efficent
+           to rearrange the stack [once] for this exception, rather then force
+           every local and param read/write access to be calculating possible
+           offset!
+         */
+         if( iArguments )
+         {
+            PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
+
+            #ifdef DEBUG_DIVERT_FRAME
+               TraceLog( NULL, "DIVERT FRAME VARPARAMS: '%s' Swap Arguments: %i  Locals: %i\n", pBase->item.asSymbol.value->szName, iArguments, iLocals );
+            #endif
+
+            // Store copy of the arguments pointers.
+            memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+
+            // Move the Locals Pointers into bottom of the frame.
+            memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
+
+            // Restore the Arguments Pointers on top of the Locals.
+            memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+
+            // Free the copy
+            hb_xfree( (void *) pStackArguments );
+         }
       }
+      else
+      {
+         // VARPARAMS with NO locals, nothing to do!
+      }
+   }
+}
+
+static void hb_vmSetDivert( BOOL bDivertOf )
+{
+   HB_THREAD_STUB
+
+   int iFlags = (int) hb_itemGetNI( hb_stackItemFromTop(-1) );
+   PHB_SYMB pSym = (PHB_SYMB) hb_itemGetPtr( hb_stackItemFromTop(-2) );
+
+   // Flags
+   hb_stackPop();
+   // Symbol
+   hb_stackPop();
+
+   if( pSym )
+   {
+      PHB_ITEM pBase = *HB_VM_STACK.pBase;
+      PHB_SYMB preset_pSym = pBase->item.asSymbol.value;
+      int iBaseLine = s_iBaseLine;
+
+      USHORT params    = pBase->item.asSymbol.params;
+      USHORT arguments = pBase->item.asSymbol.arguments;
+      USHORT locals    = pBase->item.asSymbol.locals;
+      USHORT lineno    = pBase->item.asSymbol.lineno;
+
+      PHB_FUNC pFunc = pSym->value.pFunPtr;
+      PHB_ITEM pSelf = hb_stackSelfItem();
+      PHB_ITEM pDivertSelf;
+
+      if( bDivertOf )
+      {
+         pDivertSelf = hb_itemNew( hb_stackItemFromTop(-1) );
+
+         // OF Object
+         hb_stackPop();
+
+         hb_itemSwap( pSelf, pDivertSelf );
+      }
+      else
+      {
+         pDivertSelf = NULL;
+      }
+
+      //#define DEBUG_DIVERT
+      #ifdef DEBUG_DIVERT
+         TraceLog( NULL, "DIVERT: '%s' TO: '%s' With: %p Params: %i Arguments: %i  Locals Offseted: %i\n", preset_pSym->szName, pSym->szName, pSelf->type, params, arguments, locals );
+      #endif
+
+      // VARPARAMS(...) - UNSWAP to restore original stack.
+      if( params == HB_VAR_PARAM_FLAG && locals && arguments )
+      {
+         const int iLocals = locals, iArguments = arguments;
+         PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
+
+         #ifdef DEBUG_DIVERT
+            TraceLog( NULL, "DIVERT Parent: '%s' UnSwap Arguments: %i  Locals: %i\n", preset_pSym->szName, iArguments, iLocals );
+         #endif
+
+         // Store copy of the Arguments pointers.
+         memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
+
+         // Move the Locals Pointers up beyond the Arguments space.
+         memmove( (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), (void *) ( HB_VM_STACK.pBase + 2 ), iLocals * sizeof( PHB_ITEM ) );
+
+         // Restore the Arguments Pointers to BASE of the Frame.
+         memcpy( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+
+         // Free the copy
+         hb_xfree( (void *) pStackArguments );
+      }
+
+      if( ( iFlags & DIVERT_RESET_LOCALS ) == DIVERT_RESET_LOCALS )
+      {
+         int iClearLocals = locals;
+         int iOffset = ( ( params == HB_VAR_PARAM_FLAG ) ? arguments : params );
+
+         #ifdef DEBUG_DIVERT
+            TraceLog( NULL, "DIVERT Parent: '%s' Reset: %i, Arguments: %i, Params: %i Locals: %i Offset: %i\n", preset_pSym->szName, iClearLocals, arguments, params, locals, iOffset );
+         #endif
+
+         while( iClearLocals > 0 )
+         {
+            PHB_ITEM pLocal = hb_stackItemFromBase( iOffset + iClearLocals );
+
+            //TraceLog( NULL, "DIVERT Parent: '%s' Clear Local %i Pos: %i, Type: %p\n", preset_pSym->szName, iClearLocals, iOffset + iClearLocals, pLocal->type );
+
+            hb_itemClear( pLocal );
+            iClearLocals--;
+         }
+      }
+
+      // Divert!
+      pBase->item.asSymbol.value  = pSym;
+      pBase->item.asSymbol.lineno = 0;
+
+      // Signify the DIVERT for hb_vmFrame()!
+      if( iFlags & DIVERT_IGNORE_SIGNATURE )
+      {
+         // hb_vmFrame() will not enforce signature match but will detect a DIVERT FRAME!
+         pBase->item.asSymbol.params = HB_VAR_PARAM_NOERR;
+      }
+      else
+      {
+         if( params == 0 )
+         {
+            pBase->item.asSymbol.params = HB_VAR_PARAM_NONE;
+         }
+      }
+
+      if( pSelf->type == HB_IT_NIL )
+      {
+         if ( pSym->scope.value & HB_FS_PCODEFUNC )
+         {
+            hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols );
+         }
+         else
+         {
+            pFunc();
+         }
+      }
+      else
+      {
+         BOOL bConstructor = FALSE, bSymbol = FALSE, lPopSuper = FALSE;
+         PHB_BASEARRAY pSelfBase = pSelf->item.asArray.value;
+
+         pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
+
+         if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
+         {
+            HB_ITEM_NEW( RealSelf );
+            USHORT nPos;
+            USHORT uiClass;
+
+            uiClass = pSelfBase->uiClass;
+            pBase->item.asSymbol.uiSuperClass = uiClass;
+
+            /* Replace the current stacked value with real self */
+            hb_itemCopy( &RealSelf, pSelfBase->pItems );
+            hb_itemForwardValue( pSelf, &RealSelf );
+
+            if( HB_IS_OBJECT( pSelf ) )
+            {
+               /* Take back the good pSelfBase */
+               pSelfBase = pSelf->item.asArray.value;
+
+               /* Push current SuperClass handle */
+               lPopSuper = TRUE ;
+
+               if( ! pSelf->item.asArray.value->puiClsTree )
+               {
+                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
+                  pSelf->item.asArray.value->puiClsTree[0] = 0;
+               }
+
+               nPos = (USHORT) ( pSelfBase->puiClsTree[0] + 1 );
+               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
+               pSelfBase->puiClsTree[0] = nPos ;
+               pSelfBase->puiClsTree[ nPos ] = uiClass;
+            }
+         }
+
+         if( bSymbol )
+         {
+            PHB_SYMB pFuncSym = (PHB_SYMB) pFunc;
+            pFunc = pFuncSym->value.pFunPtr;
+
+            if( pFunc )
+            {
+               // Force correct context for the executing function
+               pBase->item.asSymbol.value = pFuncSym;
+
+               if( pFuncSym->scope.value & HB_FS_CLSERROR )
+               {
+                  // Mark the memory as AutoRelease because the function can
+                  // call to QUIT and not return, not free the memory and report
+                  // memory leak.
+                  hb_xautorelease( pFuncSym );
+               }
+
+               if( pFuncSym->scope.value & HB_FS_PCODEFUNC )
+               {
+                  /* Running pCode dynamic function from .HRB */
+                  hb_vmExecute( ( (PHB_PCODEFUNC) pFunc )->pCode, ( (PHB_PCODEFUNC) pFunc )->pSymbols );
+               }
+               else
+               {
+                  pFunc();
+               }
+
+               if( pFuncSym->scope.value & HB_FS_CLSERROR )
+               {
+                  hb_xfree( pFuncSym );
+
+                  // NEEDed because Destructor will inspect the symbol value, which was just FREEd
+                  pBase->item.asSymbol.value = pSym;
+               }
+            }
+            else
+            {
+               char *sClass = hb_objGetClsName( pSelf );
+               hb_vmClassError( hb_pcount(), sClass, pSym->szName, NULL );
+            }
+         }
+         else
+         {
+            pFunc();
+         }
+
+         if( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
+         {
+            USHORT nPos = (USHORT) ( pSelfBase->puiClsTree[0] - 1 );
+
+            /* POP SuperClass handle */
+            if( nPos )
+            {
+               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
+               pSelfBase->puiClsTree[0] = nPos;
+            }
+            else
+            {
+               hb_xfree(pSelfBase->puiClsTree);
+               pSelfBase->puiClsTree = NULL ;
+            }
+         }
+      }
+
+      if( ( iFlags & DIVERT_RESUME ) == 0 )
+      {
+         if( hb_stackGetActionRequest() == 0 )
+         {
+            #ifdef DEBUG_DIVERT
+               TraceLog( NULL, "DIVERT Ended: '%s' After: %s With: %p Return: %p Params: %i Arguments: %i  Locals Offseted: %i\n", pSym->szName, preset_pSym->szName, pSelf->type, HB_VM_STACK.Return.type, params, arguments, locals );
+            #endif
+
+            hb_stackSetActionRequest( HB_ENDPROC_REQUESTED );
+         }
+      }
+      else
+      {
+         #ifdef DEBUG_DIVERT
+            TraceLog( NULL, "DIVERT Resume: '%s' After: '%s' With: %p Params: %i Arguments: %i  Locals Offseted: %i\n", preset_pSym->szName, pSym->szName, pSelf->type, params, arguments, locals );
+         #endif
+      }
+
+      // RESTORE FRAME!
+
+      // Parent was VARPARAMS(...) - RE-SWAP if callee was Normal call.
+      if( params == HB_VAR_PARAM_FLAG )
+      {
+         // DIVERT was ALSO a VARPARAMS(...)
+         if( pBase->item.asSymbol.params == HB_VAR_PARAM_FLAG )
+         {
+            // No need to RESWAP already done HB_P_FRAME of the DIVERT!
+            #ifdef DEBUG_DIVERT
+               TraceLog( NULL, "DIVERT: '%s' was VARPARAM too. Parent: '%s' Params: %i Arguments: %i  Locals Offseted: %i\n", pSym->szName, preset_pSym->szName, params, arguments, locals );
+            #endif
+         }
+         else
+         {
+            if( locals && arguments )
+            {
+               const int iLocals = locals, iArguments = arguments;
+               PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
+
+               #ifdef DEBUG_DIVERT
+                  TraceLog( NULL, "DIVERT '%s' had Normal Frame. ReSwap Parent: '%s' Params: %i Arguments: %i  Locals Offseted: %i\n", pSym->szName, preset_pSym->szName, params, arguments, locals );
+               #endif
+
+               // Store copy of the arguments pointers.
+               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 ), iArguments * sizeof(PHB_ITEM) );
+
+               // Move the Locals Pointers into bottom of the frame.
+               memmove( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), iLocals * sizeof( PHB_ITEM ) );
+
+               // Restore the Arguments Pointers on top of the Locals.
+               memcpy( (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+
+               // Free the copy
+               hb_xfree( (void *) pStackArguments );
+            }
+         }
+      }
+      // Parent was normal call UnSwap if callee was VARPARAM.
+      else
+      {
+         if( pBase->item.asSymbol.params != HB_VAR_PARAM_FLAG )
+         {
+            // No need to RESWAP already done HB_P_FRAME of the DIVERT!
+            #ifdef DEBUG_DIVERT
+              TraceLog( NULL, "DIVERT: '%s' had Normal Frame too. Parent: %s Params: %i Arguments: %i  Locals Offseted: %i\n", pSym->szName, preset_pSym->szName, params, arguments, locals );
+            #endif
+         }
+         else
+         {
+            if( pBase->item.asSymbol.locals && pBase->item.asSymbol.arguments )
+            {
+               const int iLocals = pBase->item.asSymbol.locals, iArguments = pBase->item.asSymbol.arguments;
+               PHB_ITEM * pStackArguments = (PHB_ITEM *) hb_xgrab( iArguments * sizeof( PHB_ITEM ) );
+
+               #ifdef DEBUG_DIVERT
+                  TraceLog( NULL, "DIVERT: '%s' was VARPARAM UN-SWAP Parent: %s, Params: %i Arguments: %i  Locals Offseted: %i\n", pSym->szName, preset_pSym->szName, params, arguments, locals );
+               #endif
+
+               // Store copy of the arguments pointers.
+               memcpy( (void *) pStackArguments, (void *) ( HB_VM_STACK.pBase + 2 + iLocals ), iArguments * sizeof(PHB_ITEM) );
+
+               // Move the Locals Pointers up beyond the Arguments space.
+               memmove( (void *) ( HB_VM_STACK.pBase + 2 + iArguments ), (void *) ( HB_VM_STACK.pBase + 2 ), iLocals * sizeof( PHB_ITEM ) );
+
+               // Restore the Arguments Pointers to the BASE of the Frame.
+               memcpy( (void *) ( HB_VM_STACK.pBase + 2 ), (void *) pStackArguments, iArguments * sizeof( PHB_ITEM ) );
+
+               // Free the copy
+               hb_xfree( (void *) pStackArguments );
+            }
+         }
+      }
+
+      // Restore!
+      if( pDivertSelf )
+      {
+         // Restore!
+         hb_itemForwardValue( pSelf, pDivertSelf );
+         // Free!
+         hb_itemRelease( pDivertSelf );
+      }
+
+      s_iBaseLine = iBaseLine;
+      pBase->item.asSymbol.value     = preset_pSym;
+      pBase->item.asSymbol.lineno    = lineno;
+      //pBase->item.asSymbol.arguments = arguments; //not manipulated!
+      pBase->item.asSymbol.params    = params;
+      pBase->item.asSymbol.locals    = locals;
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 9101, NULL, "DIVERT", 1, hb_stackItemFromTop(-1) );
    }
 }
 
@@ -8309,8 +8850,7 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
 
    ( * HB_VM_STACK.pPos )->type = HB_IT_SYMBOL;
-   ( * HB_VM_STACK.pPos )->item.asSymbol.value = pSym;
-   ( * HB_VM_STACK.pPos )->item.asSymbol.uiSuperClass = 0;
+   ( * HB_VM_STACK.pPos )->item.asSymbol.value        = pSym;
    hb_stackPush();
 }
 
@@ -8979,7 +9519,7 @@ static void hb_vmPopLocal( SHORT iLocal )
    {
       if( hb_itemUnRef( pVal ) == pLocal )
       {
-         hb_errRT_BASE( EG_ARG, 9004, NULL, "Cyclic-Reference assignment!", 0 );
+         hb_errRT_BASE( EG_ARG, 9104, NULL, "Cyclic-Reference assignment!", 0 );
          hb_stackDec();
          return;
       }
@@ -9023,7 +9563,7 @@ static void hb_vmPopStatic( USHORT uiStatic )
    {
       if( hb_itemUnRef( pVal ) == pStatic )
       {
-         hb_errRT_BASE( EG_ARG, 9004, NULL, "Cyclic-Reference assignment!", 0 );
+         hb_errRT_BASE( EG_ARG, 9105, NULL, "Cyclic-Reference assignment!", 0 );
          hb_stackDec();
          return;
       }
@@ -9357,6 +9897,18 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    }
 #endif
 
+//#define DEBUG_SYMBOLS
+#ifdef DEBUG_SYMBOLS
+   if( fDynLib )
+   {
+       TraceLog( NULL, "Module: '%s' is DYNAMIC\n", szModuleName );
+   }
+   else
+   {
+       TraceLog( NULL, "Module: '%s' is NOT DYNAMIC\n", szModuleName );
+   }
+#endif
+
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
       pSymbol = pNewSymbols->pSymbolTable + ui;
@@ -9405,6 +9957,10 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
       {
          PHB_DYNS pDynSym = hb_dynsymFind( pSymbol->szName );
 
+         #ifdef DEBUG_SYMBOLS
+            TraceLog( NULL, "Public: '%s' of Module: '%s'\n", pSymbol->szName, szModuleName );
+         #endif
+
 #ifdef BROKEN_MODULE_SPACE_LOGIC
          if( ( hSymScope & HB_FS_LOCAL ) != 0 )
          {
@@ -9422,6 +9978,10 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          {
             if( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) )
             {
+                #ifdef DEBUG_SYMBOLS
+                   TraceLog( NULL, "Symbol: %s has pointer OR is DEFERRED.\n", pSymbol->szName );
+                #endif
+
                 if( pDynSym )
                 {
                    pSymbol->pDynSym = pDynSym;
@@ -9449,7 +10009,9 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                             PHB_SYMB pModuleSymbol;
                             register UINT ui;
 
-                            //TraceLog( NULL, "Module '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
+                            #ifdef DEBUG_SYMBOLS
+                               TraceLog( NULL, "Module: '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
+                            #endif
 
                             for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
                             {
@@ -9459,17 +10021,31 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                                {
                                   pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
                                   pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
-                                  //TraceLog( NULL, "Deferred: '%s'\n", pSymbol->szName );
+
+                                  #ifdef DEBUG_SYMBOLS
+                                     TraceLog( NULL, "Resolved Deferred: '%s'\n", pSymbol->szName );
+                                  #endif
                                }
                             }
                          }
-
+                        #ifdef DEBUG_SYMBOLS
+                         else
+                         {
+                            TraceLog( NULL, "Module: '%s' does NOT have any Deferred Symbols\n", pModuleSymbols->szModuleName );
+                         }
+                        #endif
                          pModuleSymbols = pModuleSymbols->pNext;
                       }
                    }
 
                    continue;
                 }
+               #ifdef DEBUG_SYMBOLS
+                else
+                {
+                    TraceLog( NULL, "Public '%s' was not yet registered.\n", pSymbol->szName );
+                }
+               #endif
             }
          }
          else
@@ -10147,7 +10723,7 @@ HB_EXPORT void hb_vmPushItemRef( PHB_ITEM pItem )
              hb_vmItemRefDummy };
 
    PHB_ITEM pRefer;
-   HB_THREAD_STUB   
+   HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushItemRef(%p)", pItem));
 
@@ -10266,7 +10842,7 @@ HB_FUNC( HB_SAVEBLOCK )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a Codeblock, or Codeblock exports detached locals!", 1, hb_paramError( 1 ) );
+      hb_errRT_BASE( EG_ARG, 9106, NULL, "Not a Codeblock, or Codeblock exports detached locals!", 1, hb_paramError( 1 ) );
    }
 }
 
@@ -10332,7 +10908,7 @@ HB_FUNC( HB_RESTOREBLOCK )
       }
 	  else
 	  {
-         hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
+         hb_errRT_BASE( EG_ARG, 9107, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
 	  }
 
       hb_itemClear( &ModuleName );
@@ -10342,7 +10918,7 @@ HB_FUNC( HB_RESTOREBLOCK )
    }
    else
    {
-      hb_errRT_BASE( EG_ARG, 9003, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
+      hb_errRT_BASE( EG_ARG, 9108, NULL, "Not a persisted Codeblock!", 1, hb_paramError( 1 ) );
    }
 }
 
@@ -10801,7 +11377,7 @@ HB_EXPORT void hb_xvmFrame( int iLocals, int iParams )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmFrame(%d, %d)", iLocals, iParams));
 
-   hb_vmFrame( ( BYTE ) iLocals, ( BYTE ) iParams );
+   hb_vmFrame( (unsigned short) iLocals, ( BYTE ) iParams );
 }
 
 HB_EXPORT void hb_xvmSFrame( PHB_SYMB pSymbol )
@@ -12568,6 +13144,12 @@ HB_EXPORT void hb_xvmPushStringHidden( BYTE bType, ULONG ulSize, const char * pV
    pBuffer = hb_vmUnhideString( bType, ulSize, ( const BYTE * ) pVal, ulBufferSize );
 
    hb_vmPushString( ( char * ) pBuffer, ulSize - 1 );
+}
+
+
+HB_EXPORT void hb_xvmDivert( BOOL bDivertOf )
+{
+   hb_vmSetDivert( bDivertOf );
 }
 
 /* ------------------------------ */

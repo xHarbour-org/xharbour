@@ -1,5 +1,5 @@
 /*
- * $Id: hbstripl.c,v 1.4 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: hbstripl.c,v 1.5 2007/04/30 01:16:30 ronpinkas Exp $
  */
 
 /*
@@ -278,7 +278,9 @@ static PHB_STRIP_FUNC s_stripLines_table[] =
    NULL,                                            /* HB_P_LOCALNEARINC,         */
    NULL,                                            /* HB_P_LOCALNEARDEC,         */
    NULL,                                            /* HB_P_PUSHLOCALNEARINC,     */
-   NULL                                             /* HB_P_PUSHLOCALNEARDEC,     */
+   NULL,                                            /* HB_P_PUSHLOCALNEARDEC,     */
+   NULL,                                            /* HB_P_DIVERT                */
+   NULL                                             /* HB_P_DIVERTOF              */
 };
 
 void hb_compStripFuncLines( PFUNCTION pFunc )

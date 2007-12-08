@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.146 2007/12/02 22:38:23 guerra000 Exp $
+ * $Id: arrays.c,v 1.147 2007/12/03 01:16:44 guerra000 Exp $
  */
 
 /*
@@ -1660,18 +1660,28 @@ PHB_ITEM HB_EXPORT hb_arrayFromStack( USHORT uiLen )
 PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 {
    PHB_ITEM pArray;
-   USHORT uiPos;
-   USHORT uiPCount;
-   USHORT uiOffset;
 
    if( pBase && HB_IS_SYMBOL( *pBase ) )
    {
+      USHORT uiPos;
+      USHORT uiPCount;
+      USHORT uiOffset;
+      PHB_ITEM pBaseItem = *pBase;
+
       pArray = hb_itemNew( NULL );
-      uiPCount = (*pBase)->item.asSymbol.paramcnt;
 
       HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
-      uiOffset = (*pBase)->item.asSymbol.paramsoffset;
+      if( pBaseItem->item.asSymbol.params == HB_VAR_PARAM_FLAG )
+      {
+         uiOffset = pBaseItem->item.asSymbol.locals;
+         uiPCount = pBaseItem->item.asSymbol.arguments;
+      }
+      else
+      {
+         uiOffset = 0;
+         uiPCount = pBaseItem->item.asSymbol.arguments <= pBaseItem->item.asSymbol.params ? pBaseItem->item.asSymbol.arguments : pBaseItem->item.asSymbol.params;
+      }
 
       hb_arrayNew( pArray, uiPCount );
 
@@ -1683,7 +1693,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
    else
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "Invalid argument to hb_arrayFromParams().", NULL, NULL );
-      pArray = NULL;  // To avoid compiler warnings.
+      return NULL;
    }
 
    return pArray;
@@ -1691,26 +1701,7 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
 HB_EXPORT PHB_ITEM hb_arrayBaseParams( void )
 {
-   PHB_ITEM pArray;
-   register USHORT uiPos;
-   register USHORT uiPCount;
-   register USHORT uiOffset;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_arrayBaseParams()"));
-
-   pArray = hb_itemNew( NULL );
-   uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
-
-   hb_arrayNew( pArray, uiPCount );
-
-   uiOffset = hb_stackBaseItem()->item.asSymbol.paramsoffset;
-
-   for( uiPos = 1; uiPos <= uiPCount; uiPos++ )
-   {
-      hb_arraySet( pArray, uiPos, hb_stackItemFromBase( uiPos + uiOffset ) );
-   }
-
-   return pArray;
+   return hb_arrayFromParams( hb_stackGetBase(0) );
 }
 
 HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
@@ -1722,7 +1713,7 @@ HB_EXPORT PHB_ITEM hb_arraySelfParams( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySelfParams()"));
 
    pArray = hb_itemNew( NULL );
-   uiPCount = hb_stackBaseItem()->item.asSymbol.paramcnt;
+   uiPCount = hb_stackBaseItem()->item.asSymbol.arguments;
 
    hb_arrayNew( pArray, uiPCount + 1 );
 

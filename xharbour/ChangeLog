@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5802 2007/12/04 23:06:19 andijahja Exp $
+ * $Id: ChangeLog,v 1.5803 2007/12/05 06:40:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,199 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-07 22:30 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/hvm.c
+    ! Fixed typos introduced when hb_stackSetActionRequest() was added which broke FINALLY functionality
+
+  * include/hbapi.h
+  * include/hbvmpub.h
+  * source/vm/arrays.c
+  * source/vm/classes.c
+  * source/vm/debug.c
+  * source/vm/estack.c
+  * source/vm/extend.c
+  * source/vm/fastitem.c
+  * source/vm/pcount.c
+  * source/vm/pvalue.c
+    * Renamed members paramcnt and paramsoffset of hb_struSymbol to arguments and locals respectively
+    + Added member USHORT params to hb_struSymbol
+
+  + include/divert.ch
+  * include/hbpcode.h
+  * source/compiler/genc.c
+  * source/compiler/gencc.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/hbdead.c
+  * source/compiler/hbfix.c
+  * source/compiler/hblbl.c
+  * source/compiler/hbpcode.c
+  * source/compiler/hbpcstat.c
+  * source/compiler/hbstripl.c
+    + Added new systax:
+
+   DIVERT TO <pFuncPointer>|<pMessagePointer> OF <oNewSelfOrNil> [<nDivertFlags>]
+
+
+Description:
+------------
+
+The DIVERT statement is an alternative to normal Function/Method call
+when all parameters of the current function/procedure/method are to be
+passed to the called function/procedure/method. It differs from normal
+calls in that the callee literally borrowes the current execution
+context, as if it was called directly by the caller of the current
+Function/Method.
+
+This has performance significance in that a good portion of normal
+Function Call overhead is avoided. There are some logical differences
+as well. Normal function call receives a new Stack Frame, meaning its
+Locals and Formal Parameters are stored in a new dedicated Stack space.
+DIVERT Calls on the other hand adopts the Stack Context of the caller,
+thus it literally shares the Formal Parameters and Locals' Stack Frame
+of its caller. This means that changes made to Formal Parameters in
+the callee are directly effecting the caller Formal Parameters.
+Similiarily changes made to the callee's Locals are directly effecting
+the respective Locals of the caller. Naturally this will only be
+relevant/visible if the DIVERT_RESUME flag is used.
+
+The technical nature of this statement dictates few technical
+observations:
+
+   - The number of Callee's Formal Paramaters must equal the number
+     of Formal Parameters of the caller, except if the caller or
+     callee uses Variable Paramaters decleration (...), or if the
+     callee or caller do not declare any Locals. This restriction
+     can be masked by using the optional DIVERT_IGNORE_SIGNATURE flag,
+     but this does not change the serious technical implications of
+     such scheme.
+
+   - Since Formal Parameters and Locals are implemented as positional
+     place holders in the respective Stack Space, all actions on the
+     callees Formal Parameters and/or Locals will use the respective
+     storage position of the caller's Formal Param and/or Local, based
+     on the relative position of the callee's Formal Parameter and/or
+     Local declaration, regardles of its name. For example let's assume
+     that caller is declared as:
+
+        FUNCTION SomeFunc( p1, p2 )
+           LOCAL l1, l2
+
+     and the callee is declared as:
+
+        FUNCTION OtherFunc( param1, param2 )
+           LOCAL local1, local2
+
+     code of callee such as:
+
+        loacl1++
+
+     will directly manipulate the respective position of the caller,
+     in this case, much like caller's
+
+        l1++
+
+   - IOW manipulation of callee's Locals and/or Formal Parameters
+     will directly manipulate respective Local/Formal Parameter of the
+     caller. This can cause serious problems when used with
+     DIVERT_RESUME by anyone not fully aware of its significance.
+     Make sure that any function called by DIVERT with the
+     DIVERT_RESUME flags is DIVERT friendly, i.e does not declare
+     any Locals, and or usage of its local is intended to manipulate
+     its DIVERT caller if/when activated as a DIVERT call.
+
+   - DIVERT calls default to using exisiting Self object if called
+     from a Method. In order to DIVERT into a Function from a Method
+     it is needed to explictly specifiy NIL using the OF clause,
+     as follows:
+
+        DIVERT TO (@TraceLog) OF NIL
+
+   - DIVERT calls nested within TRY/END or BEGIN SEQUENCE/END will
+     respect the TRY/END or BEGIN SEQUENCE/END control. Beware that
+     if Error is thrown and a CATCH section of caller is activated
+     execution will continue as if the DIVERT_RESUME flag was used.
+
+
+Arguments:
+----------
+
+   <pFunctionPointer>|<pMessagePointer>
+      Pointer to the Function or Method to divert to. This pointer
+      can be retrieved by means of the address of (@) operator, or
+      the HB_FuncPtr() function.
+
+   <nDivertFlags>
+      Optional Numeric value used to control optional behaviour of
+      the DIVERT statement. Valid values are defined in
+      include\divert.ch as:
+
+      DIVERT_NONE
+
+         Same as not specifiying any value.
+
+
+      DIVERT_IGNORE_SIGNATURE
+
+         If this flag is not explictly specified, the default
+         behaviour of DIVERT is verify that DIVERT callee utilises
+         the exact same number of formal parameters as its caller.
+         If formal paramaters are not identical, and this flag is
+         not specified, an error will be raised.
+
+
+      DIVERT_RESUME
+
+         Indicates that the program should resume at next line
+         when the DIVERT worker terminates. This option is thus
+         similiar to normal Function Call, in that the execution
+         will continue at the next line once the callee terminates.
+
+         If this flag is not explictly specified, the default
+         behaviour of DIVERT is to relinquish control to the callee,
+         as if the next line was a RETURN statement. In such case
+         the RETURN value will be the RETURN value of the callee.
+
+
+      DIVERT_RESET_LOCALS
+
+         Forces a cleanup of caller's Locals prior to activation
+         of the callee. Beware that this flag does not change the
+         fact that any subsequent changes to the respective Local
+         of callee are directly manipulating the parent's
+         Local.
+
+
+   <oNewSelfOrNil>
+      Optional object used as the Self object if the DIVERT callee
+      is a Method or NIL to force a Function context. Commonly
+      this may be one of the SUPER objects of the curret Self,
+      when diverting to a Super Method is desired.
+
+
+  * include/hbxvm.h
+  * source/vm/hvm.c
+    + Added HB_P_DIVERT, and HB_P_DIVERTOF to support above syntax
+
+  * include/hboo.ch
+    + Added #define HB_OO_DATA_SYMBOL_PTR   2
+  * include/hbclass.ch
+  * source/rtl/tclass.prg
+    % Optimized class constructor to use new DIVERT syntax. This should make
+      applications which make heavy use of SomeClass( SomeParams ... )
+      significantly faster. This change may be disabled by using:
+
+        -DHB_CONSTRUCTOR_NO_DIVERT
+
+  * source/rtl/traceprg.prg
+    * Removed LOCALs to make it DIVERT_RESUME friendly.
+
+/*
+  NOTE: I tested these changes with FWH, VXH, etc. without any problems
+  but due to the very low level nature of the change I'll appreciate input
+  of any unexpected behaviour.
+ */
 
 2007-12-05 13.35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/hbusage.c

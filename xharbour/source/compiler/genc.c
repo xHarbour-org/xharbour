@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.142 2007/09/27 02:50:36 ronpinkas Exp $
+ * $Id: genc.c,v 1.143 2007/10/27 10:12:39 likewolf Exp $
  */
 
 /*
@@ -3820,6 +3820,32 @@ static HB_GENC_FUNC( hb_p_arraypopplus )
    return 1;
 }
 
+static HB_GENC_FUNC( hb_p_divert )
+{
+   if( (lPCodePos+1) == pFunc->lPCodePos )
+   {
+      fprintf( cargo->yyc, "\tHB_P_DIVERT\n" );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\tHB_P_DIVERT,\n" );
+   }
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_divertof )
+{
+   if( (lPCodePos+1) == pFunc->lPCodePos )
+   {
+      fprintf( cargo->yyc, "\tHB_P_DIVERTOF\n" );
+   }
+   else
+   {
+      fprintf( cargo->yyc, "\tHB_P_DIVERTOF,\n" );
+   }
+   return 1;
+}
+
 /* NOTE: The order of functions has to match the order of opcodes
  *       mnemonics
  */
@@ -4002,7 +4028,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_localnearinc,                                /* HB_P_LOCALNEARINC,         */
    hb_p_localneardec,                                /* HB_P_LOCALNEARDEC,         */
    hb_p_pushlocalnearinc,                            /* HB_P_PUSHLOCALNEARINC,     */
-   hb_p_pushlocalneardec                             /* HB_P_PUSHLOCALNEARDEC,     */
+   hb_p_pushlocalneardec,                            /* HB_P_PUSHLOCALNEARDEC,     */
+   hb_p_divert,                                      /* HB_P_DIVERT                */
+   hb_p_divertof                                     /* HB_P_DIVERTOF              */
 };
 
 static void hb_compGenCReadable( PFUNCTION pFunc, FILE * yyc )

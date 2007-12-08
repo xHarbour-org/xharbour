@@ -1,5 +1,5 @@
 /*
- * $Id: gencc.c,v 1.13 2007/04/22 22:50:28 ronpinkas Exp $
+ * $Id: gencc.c,v 1.14 2007/04/30 01:16:29 ronpinkas Exp $
  */
 
 /*
@@ -1795,6 +1795,22 @@ static HB_GENC_FUNC( hb_p_pushdate )
    return 5;
 }
 
+static HB_GENC_FUNC( hb_p_divert )
+{
+   HB_GENC_LABEL();
+
+   fprintf( cargo->yyc, "\thb_xvmDivert( FALSE );\n" );
+   return 1;
+}
+
+static HB_GENC_FUNC( hb_p_divertof )
+{
+   HB_GENC_LABEL();
+
+   fprintf( cargo->yyc, "\thb_xvmDivert( TRUE );\n" );
+   return 1;
+}
+
 /* NOTE: The  order of functions have to match the order of opcodes
  *       mnemonics
  */
@@ -1977,7 +1993,9 @@ static HB_GENC_FUNC_PTR s_verbose_table[] = {
    hb_p_localnearinc,                               /* HB_P_LOCALNEARINC,         */
    hb_p_localneardec,                               /* HB_P_LOCALNEARDEC,         */
    hb_p_pushlocalnearinc,                           /* HB_P_PUSHLOCALNEARINC,     */
-   hb_p_pushlocalneardec                            /* HB_P_PUSHLOCALNEARDEC,     */
+   hb_p_pushlocalneardec,                           /* HB_P_PUSHLOCALNEARDEC,     */
+   hb_p_divert,                                     /* HB_P_DIVERT                */
+   hb_p_divertof                                    /* HB_P_DIVERTOF              */
 };
 
 void hb_compGenCRealCode( PFUNCTION pFunc, FILE * yyc )

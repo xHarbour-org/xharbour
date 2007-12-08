@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.211 2007/05/22 18:12:54 ronpinkas Exp $
+ * $Id: classes.c,v 1.212 2007/05/31 05:18:11 walito Exp $
  */
 
 /*
@@ -288,7 +288,7 @@ static void hb_clsRelease( PCLASS pClass )
    if( pClass->pFunError )
    {
       if( ( pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ) == HB_OO_CLS_ONERROR_SYMB )
-      {      
+      {
          if( ( pClass->uiScope & HB_OO_CLS_ONERROR_SUPER ) != HB_OO_CLS_ONERROR_SUPER )
          {
             hb_xfree( pClass->pFunError );
@@ -301,7 +301,7 @@ static void hb_clsRelease( PCLASS pClass )
 
    hb_xfree( pClass->szName );
    hb_xfree( pClass->pMethods );
-   hb_xfree( pClass->pMethDyn );   
+   hb_xfree( pClass->pMethDyn );
 }
 
 
@@ -1198,7 +1198,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       s_msgClassFullSel = hb_dynsymGet( "CLASSFULLSEL" );
       s_msgEval         = hb_dynsymGet( "EVAL" );
       s_msgClsParent    = hb_dynsymGet( "ISDERIVEDFROM" );
-      /*s_msgClass     = hb_dynsymGet( "CLASS" );*/      
+      /*s_msgClass     = hb_dynsymGet( "CLASS" );*/
    }
 
    *bSymbol = FALSE;
@@ -1231,9 +1231,9 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
    /* else if( pMsg == s_msgClass )
    {
        return hb___msgClass;
-   } 
+   }
    */
-   
+
    if( lAllowErrFunc && uiClass && uiClass <= s_uiClasses )
    {
       PCLASS pClass  = s_pClasses + ( uiClass - 1 );
@@ -1241,7 +1241,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
       if( pClass->pFunError )
       {
          *bSymbol = (pClass->uiScope & HB_OO_CLS_ONERROR_SYMB ? TRUE : FALSE);
-         
+
          if( *bSymbol )
          {
             PHB_SYMB pSymCloned = (PHB_SYMB) hb_xgrab( sizeof( HB_SYMB ) );
@@ -1254,7 +1254,7 @@ HB_EXPORT PHB_FUNC hb_objGetMthd( PHB_ITEM pObject, PHB_SYMB pMessage, BOOL lAll
             return (PHB_FUNC) pSymCloned;
 //            ( (PHB_SYMB) pClass->pFunError)->szName = pMessage->szName;
          }
-         
+
          return pClass->pFunError;
       }
    }
@@ -1313,7 +1313,7 @@ HB_EXPORT PMETHOD hb_objGetpMthd( PHB_DYNS pMsg, USHORT uiClass )
    {
       return ( pClass->pMethods + uiAt - 1 );
    }
-   
+
    return NULL;
 }
 
@@ -1886,25 +1886,25 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
             break;
       }
 
-      /* 
+      /*
          Clone the execution symbol, into a new symbol with the correct Message Name.
          This way we'll have the correct execution context as well as correct symbolic name.
        */
       if( pNewMeth->uiScope & HB_OO_CLSTP_SYMBOL )
-      {        
+      {
          if( wType != HB_OO_MSG_ONERROR )
-         {         
+         {
             PHB_SYMB pFunc = (PHB_SYMB) pFunc_or_BlockPointer;
             PHB_SYMB pMsg = hb_symbolNew( pMessage->pSymbol->szName );
             char *szMsg = pMsg->szName;
-                  
+
             memcpy( pMsg, pFunc, sizeof(HB_SYMB) );
             pMsg->szName = szMsg;
-         
+
             pNewMeth->pFunction = (PHB_FUNC) pMsg;
          }
       }
-      
+
 #ifdef HB_THREAD_SUPPORT
       if( ( uiScope & HB_OO_CLSTP_SYNC ) && ( wType == HB_OO_MSG_METHOD || wType == HB_OO_MSG_INLINE || wType == HB_OO_MSG_DELEGATE ) && pClass->pMtxSync == NULL )
       {
@@ -2189,7 +2189,7 @@ HB_FUNC( __CLSNEW )
                pNewCls->pFunError = pSprCls->pFunError;
                pNewCls->uiScope |= HB_OO_CLS_ONERROR_SUPER;
             }
-            
+
             pNewCls->pDestructor = pSprCls->pDestructor;
 
             /* CLASS DATA Not Shared ( new array, new value ) */
@@ -3611,7 +3611,10 @@ static HARBOUR hb___msgClsFullSel( void )
                hb_arrayNew( &SubArray, 4 );
 
                hb_itemPutC( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SYMBOL), pMeth->pMessage->pSymbol->szName );
-               // value 2 is VALUE or PFUNCTION
+
+               // 2 is also HB_OO_DATA_VALUE which seems to not be used so overlapped!
+               hb_itemPutPtr( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SYMBOL_PTR ), (void *) pMeth->pMessage->pSymbol );
+
                hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_TYPE ), pMeth->uiType );
                hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SCOPE ), pMeth->uiScope );
 

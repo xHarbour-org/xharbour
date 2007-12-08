@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.64 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbvmpub.h,v 1.65 2007/11/29 11:15:47 andijahja Exp $
  */
 
 /*
@@ -246,7 +246,7 @@
       LONG offset;    /* 0 for static variables */
       LONG value;
    };
-   
+
    struct hb_struExtRef
    {
       void * value;                          /* value item pointer */
@@ -265,8 +265,9 @@
    {
       LONG        stackbase;
       USHORT      lineno;
-      USHORT      paramcnt;
-      USHORT      paramsoffset;
+      USHORT      arguments;
+      USHORT      locals;
+      USHORT      params;
       PHB_SYMB    value;
       UINT        uiSuperClass;
    };
@@ -386,7 +387,7 @@
       void *         cargo;
       struct _HB_FUNC_LIST * pNext;
    } HB_FUNC_LIST, * PHB_FUNC_LIST;
-   
+
    typedef void     ( * HB_EXTREF_FUNC0 )( void * );
    typedef PHB_ITEM ( * HB_EXTREF_FUNC1 )( PHB_ITEM );
    typedef PHB_ITEM ( * HB_EXTREF_FUNC2 )( PHB_ITEM, PHB_ITEM );
@@ -399,7 +400,7 @@
       HB_EXTREF_FUNC3 copy;
       HB_EXTREF_FUNC0 clear;
       HB_EXTREF_FUNC0 mark;
-   } HB_EXTREF, * PHB_EXTREF, * HB_EXTREF_PTR;   
+   } HB_EXTREF, * PHB_EXTREF, * HB_EXTREF_PTR;
 
    /* Harbour Functions scope ( HB_SYMBOLSCOPE ) */
    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x0001 )

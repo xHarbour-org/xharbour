@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.47 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: hbpcode.c,v 1.48 2007/04/30 01:16:30 ronpinkas Exp $
  */
 
 /*
@@ -288,7 +288,9 @@ const BYTE hb_comp_pcode_len[] = {
    2,                                                        /* HB_P_LOCALNEARINC,         */
    2,                                                        /* HB_P_LOCALNEARDEC,         */
    2,                                                        /* HB_P_PUSHLOCALNEARINC,     */
-   2                                                         /* HB_P_PUSHLOCALNEARDEC,     */
+   2,                                                        /* HB_P_PUSHLOCALNEARDEC,     */
+   1,                                                        /* HB_P_DIVERT                */
+   1                                                         /* HB_P_DIVERTOF              */
 };
 
 /*
@@ -475,7 +477,9 @@ static HB_PCODE_FUNC_PTR s_psize_table[] =
    NULL,                                             /* HB_P_LOCALNEARINC,         */
    NULL,                                             /* HB_P_LOCALNEARDEC,         */
    NULL,                                             /* HB_P_PUSHLOCALNEARINC,     */
-   NULL                                              /* HB_P_PUSHLOCALNEARDEC,     */
+   NULL,                                             /* HB_P_PUSHLOCALNEARDEC,     */
+   NULL,                                             /* HB_P_DIVERT                */
+   NULL                                              /* HB_P_DIVERTOF              */
 };
 
 LONG hb_compPCodeSize( PFUNCTION pFunc, ULONG ulOffset )
