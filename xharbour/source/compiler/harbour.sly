@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.133 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: harbour.sly,v 1.134 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -191,7 +191,7 @@ static void hb_compDebugStart( void ) { };
 %token FINALLY
 %token HASHOP
 %token UTILITY
-%token DIVERT OF
+%token DIVERT OF FLAGS
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -283,6 +283,7 @@ static void hb_compDebugStart( void ) { };
 %type <asExpr>  Constant
 %type <iNumber> SwitchCases
 %type <asExpr>  Hash HashList
+%type <asExpr>  DivertFlags
 %%
 
 Main       : { hb_compLinePush(); } Source       { }
@@ -503,19 +504,23 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                         }
                         MemvarList Crlf { hb_comp_iVarScope = VS_NONE; }
 
-           | DIVERT Expression EmptyExpression CrlfStmnt
+           | DIVERT Expression DivertFlags CrlfStmnt
              {
                hb_compExprDelete( hb_compExprGenPush( $2 ) );
                hb_compExprDelete( hb_compExprGenPush( $3 ) );
                hb_compGenPCode1( HB_P_DIVERT );
              }
-           | DIVERT Expression OF Expression EmptyExpression CrlfStmnt
+           | DIVERT Expression OF Expression DivertFlags CrlfStmnt
              {
                hb_compExprDelete( hb_compExprGenPush( $4 ) );
                hb_compExprDelete( hb_compExprGenPush( $2 ) );
                hb_compExprDelete( hb_compExprGenPush( $5 ) );
                hb_compGenPCode1( HB_P_DIVERTOF );
              }
+           ;
+
+DivertFlags: /* No Flags */ { $$ = hb_compExprNewLong(0); }
+           | FLAGS Expression { $$ = $2; }
            ;
 
 CrlfStmnt  : { hb_compLinePushIfInside(); } Crlf

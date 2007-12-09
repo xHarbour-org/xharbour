@@ -12,7 +12,7 @@ PROCEDURE Main(p1)
       Eval( b, ProcName() )
    #endif
 
-   DIVERT TO ( @SomeProc() ) DIVERT_RESUME
+   DIVERT TO ( @SomeProc() ) FLAGS DIVERT_RESUME
    Eval( b )
 RETURN
 

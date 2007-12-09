@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.25 2007/04/29 18:08:11 andresreyesh Exp $
+ * $Id: tclass.prg,v 1.26 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -500,14 +500,14 @@ STATIC PROCEDURE DivertConstructorCall( ... )
          // Exec method - i have found the constructor in this class
          //TraceLog( "Search this class constructor:", aConstrMethods[ nPos ][HB_OO_DATA_SYMBOL] )
          //RETURN HB_ExecFromArray( oClass, aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL ], aParams )
-         DIVERT TO aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance DIVERT_RESET_LOCALS
+         DIVERT TO aConstrMethods[ nPos ][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance FLAGS DIVERT_RESET_LOCALS
       ELSE
          // Get LAST constructor from parent (NOTE: this can be a default and faster way,
          // but i prefer check rightly before)
          IF !Empty( aConstrMethods )
             //TraceLog( "Search parent class constructor:", aTail( aConstrMethods )[HB_OO_DATA_SYMBOL] )
             //RETURN HB_ExecFromArray( oClass, aConstrMethods[-1][ HB_OO_DATA_SYMBOL ], aParams )
-            DIVERT TO aConstrMethods[-1][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance DIVERT_RESET_LOCALS
+            DIVERT TO aConstrMethods[-1][ HB_OO_DATA_SYMBOL_PTR ] OF oClassInstance FLAGS DIVERT_RESET_LOCALS
          ELSE
             //TraceLog( "Call new default constructor:", "NEW" )
             // If i have no constructor i call NEW method that is defined is HBOBJECT class

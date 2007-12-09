@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.147 2007/12/03 01:16:44 guerra000 Exp $
+ * $Id: arrays.c,v 1.148 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -1672,15 +1672,15 @@ PHB_ITEM HB_EXPORT hb_arrayFromParams( PHB_ITEM *pBase )
 
       HB_TRACE(HB_TR_DEBUG, ("hb_arrayFromParams(%p)", pBase));
 
+      uiPCount = pBaseItem->item.asSymbol.arguments;
+
       if( pBaseItem->item.asSymbol.params == HB_VAR_PARAM_FLAG )
       {
          uiOffset = pBaseItem->item.asSymbol.locals;
-         uiPCount = pBaseItem->item.asSymbol.arguments;
       }
       else
       {
          uiOffset = 0;
-         uiPCount = pBaseItem->item.asSymbol.arguments <= pBaseItem->item.asSymbol.params ? pBaseItem->item.asSymbol.arguments : pBaseItem->item.asSymbol.params;
       }
 
       hb_arrayNew( pArray, uiPCount );

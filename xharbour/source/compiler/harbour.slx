@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.85 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: harbour.slx,v 1.86 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -378,6 +378,7 @@ LANGUAGE_WORDS_ARE {
                   /* LEX_WORD( "FIELD"                            ) AS_TOKEN( FIELD              ), */
 
                      LEX_WORD( "FIELD?WS?->"                      ) AS_TOKEN( HB_FIELD_ALIAS     ),
+                     LEX_WORD( "FLAGS"                            ) AS_TOKEN( HB_AFTER_EXP - FLAGS             ),
                      LEX_WORD( "HAS"                              ) AS_TOKEN( HB_AFTER_EXP - MATCH             ),
 
                   /* LEX_WORD( "HB_INLINE"                        ) AS_TOKEN( HB_INLINE          ), */
