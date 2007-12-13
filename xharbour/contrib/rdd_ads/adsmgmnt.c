@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.12 2006/01/30 02:51:23 druzus Exp $
+ * $Id: adsmgmnt.c,v 1.13 2006/10/12 19:44:20 ronpinkas Exp $
  */
 
 /*
@@ -488,6 +488,11 @@ HB_FUNC( ADSMGGETLOCKOWNER )
    else
    {
        hb_retnl( ulRetVal );
+   }
+
+   if ( pstUserInfo )
+   {
+      hb_xfree( pstUserInfo );
    }
 }
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5806 2007/12/08 12:47:47 lculik Exp $
+ * $Id: ChangeLog,v 1.5807 2007/12/09 06:22:11 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-12 21:22 UTC+0800 Pritpal Bedi <pritpal@vouchcac.com>
+  * contrib/rdd_ads/adsmgmnt.c
+    ! Fixed memory leak in HB_FUNC( ADSMGGETLOCKOWNER )
+      if ( pstUserInfo )
+      {
+         hb_xfree( pstUserInfo );
+      }
 
 2007-12-08 02:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source\vm\arrays.c
