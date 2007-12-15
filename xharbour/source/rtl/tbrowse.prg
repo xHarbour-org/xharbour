@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.183 2007/10/23 22:55:33 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.184 2007/12/04 00:21:26 modalsist Exp $
  */
 
 /*
@@ -261,10 +261,21 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
    LOCAL nRecsSkipped
 
+   /* 2007/DEC/14 - E.F. - Avoid to pass after phantom record if tbrowse's
+                           datasource is a database when exist a custom skipblock.
+   */
+   if nRecsToSkip > 0 .and. ::oCachedBrowse:DataSource == 0 .and.;
+      Recno() > LastRec()
+
+      nRecsToSkip := 0
+
+   endif
+
+
    if nRecsToSkip <> 0
 
       nRecsSkipped := Eval( ::oCachedBrowse:SkipBlock, nRecsToSkip )
-    
+
       // I've tried to move past top or bottom margin
       //
       if Empty( nRecsSkipped ) // PM:08-30-2007 Was nRecsSkipped == 0
@@ -307,9 +318,9 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
                // I'm at top or bottom of TBrowse so I can scroll
                //
+
                if ::nCurRow == Len( ::aCache )
                   ADel( ::aCache, 1 )
-
                else
                   AIns( ::aCache, 1 )
                   if ::nLastRow < Len( ::aCache )
@@ -385,7 +396,6 @@ METHOD dbGoBottom() CLASS TDataCache
 
    ::nCurRow := 1
    ::nLastRow := nToTop + 1
-
 RETURN nToTop
 
 
@@ -649,8 +659,6 @@ CLASS TBrowse
    METHOD SetStyle( nStyle,lSetting )
 #endif
 
-
-
    PROTECTED:     /* P R O T E C T E D */
 
    METHOD MGotoYX( nRow, nCol )           // Given screen coordinates nRow, nCol sets TBrowse cursor on underlaying cell
@@ -746,8 +754,8 @@ CLASS TBrowse
 
    DATA nPrevDelColPos                    // Save previous colpos before delcolumn(). For clipper compatibility.
 
-   DATA DataSource  INIT 0                // 0 indicates that data source is a database.
-                                          // 1 indicates that data source can be a database or not (array or text file).
+   DATA DataSource  INIT 0                // 0 indicates tbrowse's data source is a database.
+                                          // 1 indicates tbrowse's data source isn't a database, so can be an array or text file.
 
 ENDCLASS
 
@@ -2544,7 +2552,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    endif
 
    ::lRectPainting := .F.
-
    SetCursor( nOldCursor )
 
 Return .T.
@@ -2556,6 +2563,8 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
    LOCAL nFirstRow                     // Where is on screen first row of TBrowse?
    LOCAL nRow
 
+   LOCAL nToSkip := 0
+
    // If I have a requested movement still to handle
    //
    if ::nRecsToSkip <> 0
@@ -2565,14 +2574,21 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I have to set data source to cursor position
       //
       if ::oDataCache:nCurRow <> ::nNewRowPos
-         ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )  
+         /* 2007/DEC/14 - E.F. Avoided rows movement here. */
+         //::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
+         nToSkip := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) )
       endif
 
-      nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip )
+      /* 2007/DEC/14 - E.F. - Balanced of rows movement. */
+      if ::nRecsToSkip < 0
+         nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip + nToSkip )
+      else
+         nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip - nToSkip )
+      endif
 
       // I've tried to move past top or bottom margin
       //
-      if nRecsSkipped == 0
+      if nRecsSkipped == 0 .and. nToSkip == 0
          if ::nRecsToSkip > 0 
             ::lHitBottom := .T. .and. !::lForceHitsFalse
 
@@ -2581,7 +2597,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
 
          endif
 
-      elseif nRecsSkipped == ::nRecsToSkip
+      elseif nRecsSkipped == ::nRecsToSkip 
          // If after movement I'm still inside present TBrowse
          //
          if ( ::nNewRowPos + nRecsSkipped >= 1 ) .AND. ( ::nNewRowPos + nRecsSkipped <= ::RowCount )
@@ -2597,18 +2613,19 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
          else
             // It was K_PGDN or K_PGUP or K_UP or K_DN
             //
-            if Abs( nRecsSkipped ) >= ::RowCount
+            if Abs( nRecsSkipped ) >= ::RowCount 
                // K_PGDN or K_PGUP
                //
                ::RefreshAll()
 
-            else
+            else  
                // K_DN or K_UP
                // Where does really start first TBrowse row?
                //
                nFirstRow := ::nRowData + 1
                // I'm at top or bottom of TBrowse so I can scroll
                //
+
                if ::nNewRowPos == ::RowCount
                   ScrollFixed( nFirstRow + nRecsSkipped - 1,;
                                ::nwLeft,;
@@ -2690,7 +2707,7 @@ METHOD DrawARow( nRow ) CLASS TBrowse
    LOCAL nColFrom
    LOCAL lDisplay
    LOCAL nCol, nRow2Fill, nLeftColPos
-   LOCAL nRowsToSkip, nSkipped
+//   LOCAL nRowsToSkip, nSkipped
    LOCAL cColBlanks                 // Enough Space()s to fill a column
 
    colorSpec  := ::aColorSpec[ 1 ]
