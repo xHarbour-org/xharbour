@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.5 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: dbgbrwsr.prg,v 1.6 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -99,6 +99,7 @@ CREATE CLASS HBDbBrowser
    METHOD GoTop()              INLINE ::GoTo( 1 ), ::rowPos := 1, ::nFirstVisible := 1, ::RefreshAll()
    METHOD GoBottom()
    METHOD HiLite()             INLINE Self
+   METHOD Invalidate()         INLINE ::RefreshAll()
    METHOD MoveCursor( nSkip )
    METHOD PageDown()           INLINE ::MoveCursor( ::rowCount )
    METHOD PageUp()             INLINE ::MoveCursor( -::rowCount )
