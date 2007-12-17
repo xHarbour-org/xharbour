@@ -1,5 +1,5 @@
 /*
- * $Id: pvalue.c,v 1.10 2007/12/08 02:31:21 ronpinkas Exp $
+ * $Id: pvalue.c,v 1.11 2007/12/08 03:05:19 ronpinkas Exp $
  */
 
 /*
@@ -67,7 +67,7 @@ HB_FUNC( PVALUE )
       USHORT uiOffset;
       PHB_ITEM pItem;
 
-      if( ( *pBase )->item.asSymbol.locals == HB_VAR_PARAM_FLAG )
+      if( ( *pBase )->item.asSymbol.params == HB_VAR_PARAM_FLAG )
       {
          uiOffset = ( *pBase )->item.asSymbol.locals;
       }
