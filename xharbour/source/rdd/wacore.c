@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.2 2007/05/07 10:19:54 marchuet Exp $
+ * $Id: wacore.c,v 1.3 2007/10/31 08:34:53 marchuet Exp $
  */
 
 /*
@@ -51,6 +51,11 @@
  *
  */
 
+#ifdef __XHARBOUR__
+/* JC1: optimizing stack access under MT */ 	 
+#define HB_THREAD_OPTIMIZE_STACK
+#endif
+
 #include "hbapi.h"
 #include "hbapirdd.h"
 #include "hbapiitm.h"
@@ -66,8 +71,30 @@ static USHORT s_uiWaSpace = 0;         /* Number of allocated WA */
 static USHORT * s_WaNums = NULL;       /* Allocated WorkAreas */
 static USHORT s_uiWaNumMax = 0;        /* Number of allocated WA */
 
+#ifndef HB_THREAD_SUPPORT
 static USHORT s_uiCurrArea = 1;        /* Current WokrArea number */
 static AREAP  s_pCurrArea = NULL;      /* Current WorkArea pointer */
+   #define LOCK_AREA
+   #define UNLOCK_AREA
+   #define LOCK_AREA_INIT
+   #define LOCK_AREA_DESTROY
+#else
+   #define s_uiCurrArea    HB_VM_STACK.uiCurrArea 	 
+   #define s_pCurrArea     HB_VM_STACK.pCurrArea
+   HB_CRITICAL_T  s_mtxWorkArea; 	 
+   #if defined (HB_OS_WIN_32) || defined(HB_OS_OS2) 	 
+      static BOOL s_fMtLockInit = FALSE; 	 
+      #define LOCK_AREA          if ( s_fMtLockInit ) HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
+      #define UNLOCK_AREA        if ( s_fMtLockInit ) HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
+      #define LOCK_AREA_INIT     if ( !s_fMtLockInit ) { HB_CRITICAL_INIT( s_mtxWorkArea ); s_fMtLockInit = TRUE; } 	 
+      #define LOCK_AREA_DESTROY  if ( s_fMtLockInit ) { HB_CRITICAL_DESTROY( s_mtxWorkArea ); s_fMtLockInit = FALSE; } 	 
+   #else 	 
+      #define LOCK_AREA HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
+      #define UNLOCK_AREA HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
+      #define LOCK_AREA_INIT 	 
+      #define LOCK_AREA_DESTROY 	 
+   #endif
+#endif
 
 static BOOL s_fNetError = FALSE;       /* Error on Networked environments */
 
@@ -86,9 +113,12 @@ static BOOL s_fNetError = FALSE;       /* Error on Networked environments */
  */
 HB_EXPORT ERRCODE hb_rddSelectFirstAvailable( void )
 {
+   HB_THREAD_STUB
    USHORT uiArea;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectFirstAvailable()"));
+
+   LOCK_AREA
 
    uiArea = 1;
    while( uiArea < s_uiWaNumMax )
@@ -100,6 +130,9 @@ HB_EXPORT ERRCODE hb_rddSelectFirstAvailable( void )
    if( uiArea >= HARBOUR_MAX_RDD_AREA_NUM )
       return FAILURE;
    HB_SET_WA( uiArea );
+
+   UNLOCK_AREA
+
    return SUCCESS;
 }
 
@@ -108,6 +141,8 @@ HB_EXPORT ERRCODE hb_rddSelectFirstAvailable( void )
  */
 HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
 {
+   HB_THREAD_STUB
+
    USHORT uiRddID, uiWaPos;
    LPRDDNODE pRddNode;
    AREAP pArea;
@@ -125,6 +160,11 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
    if( !pArea )
       return 0;
 
+   if ( s_uiWaNumMax == 0 )
+   {
+      LOCK_AREA_INIT
+   }
+
    if( s_uiCurrArea == 0 )
    {
       if( hb_rddSelectFirstAvailable() != SUCCESS )
@@ -140,6 +180,7 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
 
       if( s_uiWaNumMax == 0 )
       {
+         LOCK_AREA_INIT
          s_WaNums = (USHORT *) hb_xgrab( iSize * sizeof(USHORT) );
       }
       else
@@ -182,6 +223,8 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
    s_pCurrArea = s_WaList[ uiWaPos ];
    s_pCurrArea->uiArea = s_uiCurrArea;
 
+   UNLOCK_AREA
+
    return s_uiCurrArea;
 }
 
@@ -191,6 +234,7 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
  */
 HB_EXPORT void hb_rddReleaseCurrentArea( void )
 {
+   HB_THREAD_STUB
    USHORT uiWaPos;
    AREAP pArea = s_pCurrArea;
 
@@ -203,6 +247,8 @@ HB_EXPORT void hb_rddReleaseCurrentArea( void )
       return;
 
    SELF_RELEASE( pArea );
+
+   LOCK_AREA
 
    uiWaPos = s_WaNums[ s_uiCurrArea ];
    s_WaNums[ s_uiCurrArea ] = 0;
@@ -231,6 +277,14 @@ HB_EXPORT void hb_rddReleaseCurrentArea( void )
       }
    }
    s_pCurrArea = NULL;
+
+   UNLOCK_AREA
+}
+
+/* Destroy the workarea mutex */
+HB_EXPORT void hb_rddWaShutDown( void )
+{
+   LOCK_AREA_DESTROY
 }
 
 /*
@@ -238,6 +292,8 @@ HB_EXPORT void hb_rddReleaseCurrentArea( void )
  */
 HB_EXPORT void hb_rddCloseAll( void )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_rddCloseAll()"));
 
    if( s_uiWaMax > 0 )
@@ -245,6 +301,8 @@ HB_EXPORT void hb_rddCloseAll( void )
       BOOL isParents, isFinish = FALSE;
       AREAP pArea;
       USHORT uiIndex;
+
+      LOCK_AREA
 
       do
       {
@@ -281,30 +339,46 @@ HB_EXPORT void hb_rddCloseAll( void )
       s_WaList = NULL;
       s_WaNums = NULL;
       HB_SET_WA( 1 );
+
+      UNLOCK_AREA
    }
 }
 
 HB_EXPORT void hb_rddFlushAll( void )
 {
+   HB_THREAD_STUB
+
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
+
+   LOCK_AREA
 
    for( uiIndex = 1; uiIndex < s_uiWaMax; ++uiIndex )
    {
       hb_rddSelectWorkAreaNumber( s_WaList[ uiIndex ]->uiArea );
       SELF_FLUSH( s_pCurrArea );
    }
+
+   UNLOCK_AREA
+
    hb_rddSelectWorkAreaNumber( uiArea );
 }
 
 HB_EXPORT void hb_rddUnLockAll( void )
 {
+   HB_THREAD_STUB
+
    USHORT uiArea = hb_rddGetCurrentWorkAreaNumber(), uiIndex;
+
+   LOCK_AREA
 
    for( uiIndex = 1; uiIndex < s_uiWaMax; ++uiIndex )
    {
       hb_rddSelectWorkAreaNumber( s_WaList[ uiIndex ]->uiArea );
       SELF_UNLOCK( s_pCurrArea, NULL );
    }
+
+   UNLOCK_AREA
+
    hb_rddSelectWorkAreaNumber( uiArea );
 }
 
@@ -318,12 +392,17 @@ HB_EXPORT ERRCODE hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_rddIterateWorkAreas(%p,%p)", pCallBack, cargo));
 
+   LOCK_AREA
+   
    for( uiIndex = 1; uiIndex < s_uiWaMax; uiIndex++ )
    {
       errCode = pCallBack( s_WaList[ uiIndex ], cargo );
       if( errCode != SUCCESS )
          break;
    }
+
+   UNLOCK_AREA
+
    return errCode;
 }
 
@@ -413,12 +492,18 @@ HB_EXPORT int hb_rddGetCurrentWorkAreaNumber( void )
  */
 HB_EXPORT ERRCODE hb_rddSelectWorkAreaNumber( int iArea )
 {
+   HB_THREAD_STUB
+
    HB_TRACE(HB_TR_DEBUG, ("hb_rddSelectWorkAreaNumber(%d)", iArea));
+
+   LOCK_AREA
 
    if( iArea < 1 || iArea > HARBOUR_MAX_RDD_AREA_NUM )
       HB_SET_WA( 0 );
    else
       HB_SET_WA( iArea );
+
+   UNLOCK_AREA
 
    return ( s_pCurrArea == NULL ) ? FAILURE : SUCCESS;
 }

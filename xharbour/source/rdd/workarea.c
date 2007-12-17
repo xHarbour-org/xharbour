@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.81 2007/09/25 07:32:35 marchuet Exp $
+ * $Id: workarea.c,v 1.82 2007/10/31 08:34:53 marchuet Exp $
  */
 
 /*
@@ -2126,6 +2126,7 @@ HB_EXPORT void hb_rddShutDown( void )
       s_RddList = NULL;
       s_uiRddMax = 0;
    }
+   hb_rddWaShutDown();
 }
 
 /*
@@ -2177,7 +2178,9 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
    }
 
    if( s_uiRddMax == 0 )                /* First RDD node */
+   {
       s_RddList = (LPRDDNODE *) hb_xgrab( sizeof(LPRDDNODE) );
+   }
    else
       s_RddList = (LPRDDNODE *) hb_xrealloc( s_RddList, sizeof(LPRDDNODE) * ( s_uiRddMax + 1 ) );
 

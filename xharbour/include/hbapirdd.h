@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.44 2007/05/07 10:19:53 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.45 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -1174,6 +1174,7 @@ extern HB_EXPORT void *  hb_rddGetCurrentWorkAreaPointer( void );
 extern HB_EXPORT void *  hb_rddGetWorkAreaPointer( int iArea );
 extern HB_EXPORT USHORT  hb_rddInsertAreaNode( const char *szDriver );
 extern HB_EXPORT void    hb_rddReleaseCurrentArea( void );
+extern HB_EXPORT void    hb_rddWaShutDown( void );
 
 extern HB_EXPORT int       hb_rddRegister( const char * szDriver, USHORT uiType );
 extern HB_EXPORT ERRCODE   hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNCS * pSuperTable, const char * szDrvName );
