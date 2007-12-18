@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5811 2007/12/17 16:14:56 likewolf Exp $
+ * $Id: ChangeLog,v 1.5812 2007/12/17 16:48:42 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-19 02:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/std.ch
+    + Re-added SET OUTPUT SAFETY #commands although I haven't noticed any
+      difference with both settings.
+  * source/rdd/wacore.c
+    ! Fixed my bad typo.
+  * source/rdd/wafunc.c
+    * Made USE TEST NEW a threadsafe operation. NB: SELECT (0); USE TEST
+      is still not threadsafe and needs an external mutex. Thanks to
+      Przemek for valuable advice!
+  * tests/mtstress.prg
+    + Test USE ... NEW syntax safety.
 
 2007-12-17 19:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/debug/dbgbrwsr.prg

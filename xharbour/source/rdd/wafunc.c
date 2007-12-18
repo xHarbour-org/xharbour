@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.6 2007/09/25 07:32:35 marchuet Exp $
+ * $Id: wafunc.c,v 1.7 2007/10/31 08:34:53 marchuet Exp $
  */
 
 /*
@@ -599,7 +599,7 @@ ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
       hb_rddReleaseCurrentArea();
    }
    else
-      hb_rddSelectFirstAvailable();
+      hb_rddSelectWorkAreaNumber( 0 );
 
    /* Clipper clears NETERR flag before parameter validation, [druzus]
     */

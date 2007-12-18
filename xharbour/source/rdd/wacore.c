@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.3 2007/10/31 08:34:53 marchuet Exp $
+ * $Id: wacore.c,v 1.4 2007/12/17 16:14:57 likewolf Exp $
  */
 
 /*
@@ -165,6 +165,8 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
       LOCK_AREA_INIT
    }
 
+   LOCK_AREA
+
    if( s_uiCurrArea == 0 )
    {
       if( hb_rddSelectFirstAvailable() != SUCCESS )
@@ -180,7 +182,6 @@ HB_EXPORT USHORT hb_rddInsertAreaNode( const char *szDriver )
 
       if( s_uiWaNumMax == 0 )
       {
-         LOCK_AREA_INIT
          s_WaNums = (USHORT *) hb_xgrab( iSize * sizeof(USHORT) );
       }
       else

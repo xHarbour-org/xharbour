@@ -1,6 +1,6 @@
 ************************************************************
 * threadstress.prg
-* $Id: mtstress.prg,v 1.11 2003/12/04 13:39:08 jonnymind Exp $
+* $Id: mtstress.prg,v 1.12 2003/12/05 18:04:40 jonnymind Exp $
 *
 * Stresstest for thread programs
 * Stress all those feature that are thread-critical:
@@ -22,8 +22,9 @@ PROCEDURE Main( cShow )
    SET OUTPUT SAFETY OFF
 
    CLEAR SCREEN
-   @2,15 SAY "X H A R B O U R - Multithreading / Stress tests"
-   @3,9 SAY "(You'll seen screen glittering: don't worry, its normal)"
+   @1,15 SAY "X H A R B O U R - Multithreading / Stress tests"
+   @2,9 SAY "(You'll seen screen glittering: don't worry, its normal)"
+   @3,9 SAY "(Press space to switch detailed screen output on and off)"
    IF cShow != NIL
       bShow := .F.
    ELSE
@@ -68,21 +69,23 @@ PROCEDURE Stress( nId, nRow )
    @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + " Database test"
 
    IF File( "test.dbf" )
-      Select &nId
-      USE test SHARED Alias &( "Test" + Alltrim( Str(nId)) )
+      USE test SHARED Alias &( "Test" + Alltrim( Str(nId)) ) NEW
+      /*Select &nId
+      USE test SHARED Alias &( "Test" + Alltrim( Str(nId)) )*/
       aData := Array(Fcount())
       aFields(aData)
       GOTO Int( HB_Random( 1, Reccount() ) )
       FOR nCount := 1 TO 10000
          // this is to test if separate threads are able not to
          // change other areas or file pointers
-         Select &nId
          IF bShow
-            @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" DBF test " +;
-            Alltrim( Str( nCount ) ) + ": Record "+Alltrim( Str( Recno( ) ))+;
-               ":" +& ("FIELD->"+aData[1])
+            @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) + ;
+                        " Area " + AllTrim( Str( Select() ) ) + ;
+                        " DBF test " + Alltrim( Str( nCount ) ) + ;
+                        ": Record " + Alltrim( Str( Recno() ) ) + ;
+                        ":" + &( "FIELD->" + aData[ 1 ] )
          ELSE
-            cData := & ("FIELD->"+aData[1])
+            cData := &( "FIELD->" + aData[ 1 ] )
          ENDIF
 
          SKIP // this will create a linear ramp that can be checked
@@ -100,7 +103,7 @@ PROCEDURE Stress( nId, nRow )
    FOR nCount := 1 TO 10000
       aData[ nCount ] := cRndVal[ Int( HB_Random(1, 21) ) ]
       IF bShow
-      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
+          @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach pre-test " +;
           Alltrim( Str( nCount ) )
       ENDIF
    NEXT
@@ -110,7 +113,7 @@ PROCEDURE Stress( nId, nRow )
    nCount := 1
    FOR EACH cData IN aData
       IF bShow
-      @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach test " +;
+          @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" Foreach test " +;
           Alltrim( Str( nCount ) ) + ": " + cData
       ELSE
          cData := cData + cData
@@ -132,7 +135,7 @@ PROCEDURE Stress( nId, nRow )
          cData := :cFirst[ Int( HB_Random(1, 21) ) ] + :cSecond[ Int( HB_Random(1, 21)) ] + ;
                :cThird[ Int( HB_Random(1, 21) ) ] + :cFuorth[ Int( HB_Random(1, 21) ) ]
          IF bShow
-         @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" With Object test " +;
+            @nRow,5 SAY "Thread " + AllTrim( Str( nId ) ) +" With Object test " +;
             Alltrim( Str( nCount ) ) + ": " + cData
          ENDIF
          nCount ++
@@ -200,6 +203,9 @@ PROCEDURE Collector( nRow )
    nCount := 1
 
    DO WHILE HB_ThreadCountStacks() > 2
+      IF Inkey() == 32
+         bShow := !bShow
+      ENDIF
       @nRow, 5 SAY "Collector loop :" + AllTrim( Str( nCount ) )
       HB_GCALL( .T. )
       ThreadSleep( 250 )
