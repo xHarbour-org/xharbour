@@ -1,5 +1,6 @@
+
 /*
- * $Id: fssize.c,v 1.5 2004/04/06 01:50:55 druzus Exp $
+ * $Id: fssize.c,v 1.6 2005/01/11 23:53:45 likewolf Exp $
  */
 
 /*
@@ -51,24 +52,58 @@
  *
  */
 
+#if !defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE
+#endif
+
 #include "hbapi.h"
 #include "hbapifs.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
 
-ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
+#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * define and efectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
+
+HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 {
    ULONG ulRet = 0;
 
    if( bUseDirEntry )
    {
-      struct stat statbuf;
+   #if defined( HB_USE_LARGEFILE64 )
+      BOOL fResult, fFree;
+      struct stat64 statbuf;
+      pszFileName = hb_fsNameConv( pszFileName, &fFree );
+      fResult = stat64( ( char * ) pszFileName, &statbuf ) == 0;
+      if( fFree )
+         hb_xfree( pszFileName );
+      hb_fsSetIOError( fResult, 0 );
+      if( fResult )
+         return ( HB_FOFFSET ) statbuf.st_size;
+   #else
 
-      if( stat( ( char * ) pszFileName, &statbuf ) == 0 )
-      {
-         ulRet = ( ULONG ) statbuf.st_size;
-      }
+      BOOL fResult, fFree;
+      struct stat statbuf;
+      pszFileName = hb_fsNameConv( pszFileName, &fFree );
+      fResult = stat( ( char * ) pszFileName, &statbuf ) == 0;
+      if( fFree )
+         hb_xfree( pszFileName );
+      hb_fsSetIOError( fResult, 0 );
+      if( fResult )
+         return ( HB_FOFFSET ) statbuf.st_size;
+#endif
+
    }
    else
    {
@@ -76,19 +111,21 @@ ULONG hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 
       if( hFileHandle != FS_ERROR )
       {
-         ulRet = hb_fsSeek( hFileHandle, 0, SEEK_END );
+         HB_FOFFSET ulPos;
+
+         ulPos = hb_fsSeekLarge( hFileHandle, 0, SEEK_END );
          hb_fsClose( hFileHandle );
+         return ulPos;
       }
    }
-
-   return ulRet;
+   return 0;
 }
 
 #ifdef HB_EXTENSION
 
 HB_FUNC( HB_FSIZE )
 {
-   hb_retnl( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parcx( 1 ),
+   hb_retnint( ISCHAR( 1 ) ? hb_fsFSize( ( BYTE * ) hb_parcx( 1 ),
                                        ISLOG( 2 ) ? hb_parl( 2 ) : TRUE ) : 0 );
 }
 

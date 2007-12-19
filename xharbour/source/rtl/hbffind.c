@@ -1,5 +1,5 @@
 /*
- * $Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $
+ * $Id: hbffind.c,v 1.31 2006/03/03 06:32:29 mlombardo Exp $
  */
 
 /*
@@ -52,6 +52,10 @@
  *
  */
 
+#if !defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE
+#endif
+
 #define INCL_DOSFILEMGR
 #define INCL_DOSERRORS
 #define HB_OS_WIN_32_USED
@@ -61,7 +65,7 @@
 #include "hbdate.h"
 #include "hb_io.h"
 
-HB_FILE_VER( "$Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $" )
+HB_FILE_VER( "$Id: hbffind.c,v 1.31 2006/03/03 06:32:29 mlombardo Exp $" )
 
 #if !defined(FILE_ATTRIBUTE_ENCRYPTED)
    #define FILE_ATTRIBUTE_ENCRYPTED            0x00000040
@@ -156,7 +160,9 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $" )
    } HB_FFIND_INFO, * PHB_FFIND_INFO;
 
 #elif defined(HB_OS_UNIX)
-
+   #ifndef __USE_BSD
+      #define __USE_BSD
+   #endif
    #include <sys/types.h>
    #include <sys/stat.h>
    #include <fcntl.h>
@@ -177,6 +183,19 @@ HB_FILE_VER( "$Id: hbffind.c,v 1.30 2005/02/24 10:44:07 andijahja Exp $" )
 
    typedef void HB_FFIND_INFO, * PHB_FFIND_INFO;
 
+#endif
+
+#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * define and efectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
 #endif
 
 /* Internal funtion , Convert Windows Error Values to Dos Error Values */
@@ -567,7 +586,13 @@ static void hb_fsFindFill( PHB_FFIND ffind )
    }
 #elif defined(HB_OS_UNIX)
    {
-      struct stat sStat;
+#if defined( HB_USE_LARGEFILE64 )
+            struct stat64 sStat;            
+#else
+            struct stat sStat;            
+#endif
+
+      //struct stat sStat;
       time_t ftime;
       struct tm * ft;
       char   szFindFile[ _POSIX_PATH_MAX + 1 ];
@@ -578,7 +603,14 @@ static void hb_fsFindFill( PHB_FFIND ffind )
       strncpy( szFindFile, info->szRootDir, _POSIX_PATH_MAX );
       strncat( szFindFile, info->entry->d_name, _POSIX_PATH_MAX );
 
+#if defined( HB_USE_LARGEFILE64 )
+            
+      stat64( szFindFile, &sStat )  ;
+#else
+            
       stat( szFindFile, &sStat );
+#endif
+
       ffind->size = sStat.st_size;
       raw_attr = sStat.st_mode;
       ftime = sStat.st_mtime;

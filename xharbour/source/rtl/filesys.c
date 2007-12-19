@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.163 2007/08/13 10:42:02 ronpinkas Exp $
+ * $Id: filesys.c,v 1.164 2007/10/31 12:11:10 marchuet Exp $
  */
 
 /*
@@ -96,6 +96,10 @@
 
    This has been corrected by ptucker
  */
+
+#if !defined( _LARGEFILE64_SOURCE )
+#  define _LARGEFILE64_SOURCE
+#endif
 
 
 #if defined(HB_OS_LINUX)
@@ -203,6 +207,19 @@
 
    #if ( defined(__DMC__) || defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
       #define INVALID_SET_FILE_POINTER ((DWORD)-1)
+   #endif
+#endif
+
+#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * define and efectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
    #endif
 #endif
 
@@ -2059,7 +2076,7 @@ USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount 
       }
       else
       {
-#if defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+#if defined(__USE_LARGEFILE64)
          /*
           * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
           * define and efectively enables lseek64/flock64/ftruncate64 functions
@@ -2261,7 +2278,7 @@ ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCo
       #endif
       else
       {
-#if defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+#if defined(__USE_LARGEFILE64)
          /*
           * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
           * define and efectively enables lseek64/flock64/ftruncate64 functions
@@ -2674,7 +2691,7 @@ BOOL HB_EXPORT hb_fsLockLarge( FHANDLE hFileHandle, HB_FOFFSET ulStart,
       HB_DISABLE_ASYN_CANC
       HB_STACK_LOCK
    }
-#elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+#elif defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64/ftruncate64 functions
@@ -2871,7 +2888,7 @@ HB_FOFFSET HB_EXPORT hb_fsSeekLarge( FHANDLE hFileHandle, HB_FOFFSET llOffset, U
       HB_DISABLE_ASYN_CANC
       HB_STACK_LOCK
    }
-#elif defined(HB_OS_LINUX) && defined(__USE_LARGEFILE64)
+#elif  defined(__USE_LARGEFILE64)
    /*
     * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
     * define and efectively enables lseek64/flock64/ftruncate64 functions
