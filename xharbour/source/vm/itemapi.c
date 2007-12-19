@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.144 2007/10/31 08:35:13 marchuet Exp $
+ * $Id: itemapi.c,v 1.145 2007/12/19 12:03:18 likewolf Exp $
  */
 
 /*
@@ -394,11 +394,11 @@ void HB_EXPORT hb_itemGetDTL( PHB_ITEM pItem, LONG * plDate, LONG * plTime )
    }
    if( plDate ) 
    {
-	 *plDate = lDate;
+      *plDate = lDate;
    }
    if( plTime ) 
    {
-	 *plTime = lTime;
+      *plTime = lTime;
    }
 }
 
@@ -413,17 +413,17 @@ void HB_EXPORT hb_itemGetD( PHB_ITEM pItem, int * piYear, int * piMonth, int * p
    else
    {
       if( piYear ) 
-	  { 
-	    *piYear = 0;
-	  }
+      { 
+         *piYear = 0;
+      }
       if( piMonth ) 
-	  {
-		*piMonth = 0;
-	  }
+      {
+         *piMonth = 0;
+      }
       if( piDay ) 
-	  {
-		*piDay = 0;
-	  }
+      {
+         *piDay = 0;
+      }
    }
 }
 
@@ -439,29 +439,29 @@ void HB_EXPORT hb_itemGetDT( PHB_ITEM pItem, int * piYear, int * piMonth, int * 
    else
    {
       if( piYear )
-	  {
-	    *piYear = 0;
-	  }
+      {
+         *piYear = 0;
+      }
       if( piMonth ) 
-	  {
-		*piMonth = 0;
-	  }
+      {
+         *piMonth = 0;
+      }
       if( piDay )
-	  {
-		*piDay = 0;
-	  }
+      {
+         *piDay = 0;
+      }
       if( piHour )
-	  {
-		*piHour = 0;
-	  }
-	  if( piMin )
-	  {
-		*piMin = 0;
-	  }
+      {
+         *piHour = 0;
+      }
+      if( piMin )
+      {
+         *piMin = 0;
+      }
       if( pdSec ) 
-	  {
-		*pdSec = 0;
-	  }
+      {
+         *pdSec = 0;
+      }
    }
 }
 
@@ -514,13 +514,13 @@ double HB_EXPORT hb_itemGetND( PHB_ITEM pItem )
             return ( double ) pItem->item.asLong.value;
 
          case HB_IT_DATE:
-		 {
+         {
             if( pItem->item.asDate.time == 0 )
             {
               return ( double ) pItem->item.asDate.value;
             }
             return ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
-		 }
+         }
 
          case HB_IT_LOGICAL:
             return ( double ) pItem->item.asLogical.value;
@@ -546,26 +546,26 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
    switch( pItem->type )
    {
       case HB_IT_INTEGER:
-	  {
+      {
          dNumber = ( double ) pItem->item.asInteger.value;
          break;
-	  }
+      }
 
       case HB_IT_LONG:
-	  {
+      {
          dNumber = ( double ) pItem->item.asLong.value;
          break;
-	  }
+      }
 
       case HB_IT_DOUBLE:
-	  {
+      {
          *piDec = (int) pItem->item.asDouble.decimal;
          dNumber = pItem->item.asDouble.value;
          break;
-	  }
+      }
 
       case HB_IT_DATE:
-	  {
+      {
          dNumber = (double) pItem->item.asDate.value;
          if( pItem->item.asDate.time )
          {
@@ -573,20 +573,20 @@ HB_EXPORT double hb_itemGetNDDec( PHB_ITEM pItem, int * piDec )
             dNumber = ( double ) hb_datetimePack( pItem->item.asDate.value, pItem->item.asDate.time );
          }
          break;
-	  }
+      }
 
       case HB_IT_STRING:
-	  {
+      {
          dNumber = (double) ( BYTE ) pItem->item.asString.value[0];
          break;
-	  }
+      }
 
       default:
-	  {
+      {
          dNumber = 0.0;  /* To avoid GCC -O2 warning */
          hb_errInternal( HB_EI_VMPOPINVITEM, "hb_itemGetNDDec()", NULL, NULL );
          break;
-	  }
+      }
    }
 
    return dNumber;
@@ -1244,7 +1244,7 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
    if( pItem )
    {
       if( piDecimal )
-	  {
+      {
         *piDecimal = 0;
       }
       // Only piDecimal? shoud be HB_IT_DOUBLE
@@ -1256,7 +1256,7 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
       switch( pItem->type )
       {
          case HB_IT_DOUBLE:
-		 {
+         {
             if( piWidth )
             {
                *piWidth = ( int ) pItem->item.asDouble.length;
@@ -1266,25 +1266,25 @@ void HB_EXPORT hb_itemGetNLen( PHB_ITEM pItem, int * piWidth, int * piDecimal )
                *piDecimal = ( int ) pItem->item.asDouble.decimal;
             }
             break;
-		 }
+         }
 
          case HB_IT_LONG:
-		 {
+         {
             *piWidth = ( int ) pItem->item.asLong.length;
             break;
-		 }
+         }
 
          case HB_IT_INTEGER:
-		 {
+         {
             *piWidth = ( int ) pItem->item.asInteger.length;
             break;
-		 }
+         }
 
-		 default:
-		 {
+         default:
+         {
             *piWidth = 0;
-			break;
-		 }
+            break;
+         }
       }
    }
 }
@@ -1454,7 +1454,7 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
                if( pItem->item.asRefer.BasePtr.pBaseArray->pItems == NULL || pItem->item.asRefer.BasePtr.pBaseArray->ulLen <= (ULONG) pItem->item.asRefer.value )
                {
                   HB_ITEM Array;
-				  HB_ITEM Index;
+                  HB_ITEM Index;
 
                   Array.type = HB_IT_ARRAY;
                   Array.item.asArray.value = pItem->item.asRefer.BasePtr.pBaseArray;
@@ -1613,11 +1613,11 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
          {
             if( *szFirst != *szSecond )
             {
-			   iRet = 1;
-			   if( ( BYTE ) *szFirst < ( BYTE ) *szSecond )
-			   {
-				 iRet = -1;
-			   }
+               iRet = 1;
+               if( ( BYTE ) *szFirst < ( BYTE ) *szSecond )
+               {
+                  iRet = -1;
+               }
                break;
             }
             szFirst++;
@@ -1630,13 +1630,13 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
          {
             /* Force an exact comparison? */
             if( hb_set.HB_SET_EXACT || bForceExact || ulLenSecond > ulLenFirst )
-			{
-			   iRet = 1;
-			   if( ulLenFirst < ulLenSecond )
-			   {
-				 iRet = -1;
-			   }
-			}
+            {
+               iRet = 1;
+               if( ulLenFirst < ulLenSecond )
+               {
+                  iRet = -1;
+               }
+            }
          }
       }
    }
@@ -1647,18 +1647,18 @@ int HB_EXPORT hb_itemStrCmp( PHB_ITEM pFirst, PHB_ITEM pSecond, BOOL bForceExact
       {
          if( hb_set.HB_SET_EXACT || bForceExact )
          {
-		    iRet = 1;
-			if( ulLenFirst < ulLenSecond )
-			{
-			  iRet = -1;
-			}
+            iRet = 1;
+            if( ulLenFirst < ulLenSecond )
+            {
+               iRet = -1;
+            }
          }
          else
          {
-			if( ulLenSecond )
-			{
-			  iRet = -1;
-			}
+            if( ulLenSecond )
+            {
+               iRet = -1;
+            }
          }
       }
       /* Both empty => Equal!, iRet = 0 */
@@ -1741,11 +1741,11 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       else
       {
          double dInt;
-		 double dFract;
-		 double dDig;
-		 double doBase = 10.0;
+         double dFract;
+         double dDig;
+         double doBase = 10.0;
          int iPrec;
-	     int iFirst = -1;
+         int iFirst = -1;
 
          //dNumber = hb_numRound( dNumber, iDec );
 
@@ -1771,13 +1771,13 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
             dDig = modf( dInt / doBase + 0.01, &dInt ) * doBase;
             szResult[ iPos ] = '0' + ( char ) ( dDig + 0.01 );
             if ( szResult[ iPos ] != '0' )
-			{
+            {
                iFirst = iPos;
-			}
+            }
             if ( dInt < 1 )
-			{
+            {
                break;
-			}
+            }
          }
 
          if( iPos > 0 )
@@ -1810,15 +1810,15 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          if( iPos >= 0 )
          {
             int iZer = 0;
-			int iLast;
+            int iLast;
 
             if( iFirst >= 0 )
             {
                iZer = iSize - iFirst - iPrec;
-			   if( iDec > 0 )
-			   {
-				  iZer--;
-			   }			   
+               if( iDec > 0 )
+               {
+                  iZer--;
+               }
             }
             dFract = modf( dFract * doBase, &dDig );
             iLast = ( int ) ( dDig + 0.01 );
@@ -1830,23 +1830,23 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
                {
                   dFract = modf( dFract * doBase, &dDig );
                   if( dDig + 0.01 < 9 && ( iPos != 1 || dDig < 2 ) )
-				  {
+                  {
                      break;
-				  }
+                  }
                }
                if( iPos == 0 )
-			   {
+               {
                   iLast = 5;
-			   }
+               }
             }
-			if( iLast >= 5 )
-			{
-              iLast = 1;
-			}
-			else
-			{
-			  iLast = 0;
-			}
+            if( iLast >= 5 )
+            {
+               iLast = 1;
+            }
+            else
+            {
+               iLast = 0;
+            }
 
             iPos = iSize;
             while ( iPos-- > 0 )
@@ -1910,35 +1910,35 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
       switch( pNumber->type )
       {
          case HB_IT_INTEGER:
-		 {
+         {
             lNumber = pNumber->item.asInteger.value;
             break;
-		 }
+         }
 
          case HB_IT_LONG:
-		 {
+         {
             lNumber = pNumber->item.asLong.value;
             break;
-		 }
+         }
 
          case HB_IT_DATE:
-		 {
+         {
             lNumber = pNumber->item.asDate.value;
             break;
-		 }
+         }
 
          case HB_IT_STRING:
-		 {
+         {
             lNumber = ( BYTE ) pNumber->item.asString.value[0];
             break;
-		 }
+         }
 
          default:
-		 {
+         {
             lNumber = 0;
             iPos = -1;
             break;
-		 }
+         }
       }
 
       fNeg = ( lNumber < 0 );
@@ -1947,9 +1947,9 @@ BOOL HB_EXPORT hb_itemStrBuf( char *szResult, PHB_ITEM pNumber, int iSize, int i
          szResult[ iPos ] = '0' + ( char ) ( fNeg ? -( lNumber % 10 ) : ( lNumber % 10 ) );
          lNumber /= 10;
          if ( lNumber == 0 )
-		 {
+         {
             break;
-		 }
+         }
       }
       if ( fNeg && iPos-- > 0 )
       {
@@ -2051,10 +2051,10 @@ char HB_EXPORT * hb_itemStr( PHB_ITEM pNumber, PHB_ITEM pWidth, PHB_ITEM pDec )
          /* We at least have a width value */
          int iSize = iWidth;
 
-		 if( iDec > 0 )
-		 {
-		    iSize += iDec + 1;
-		 }
+         if( iDec > 0 )
+         {
+            iSize += iDec + 1;
+         }
 
          szResult = ( char * ) hb_xgrab( iSize + 1 );
          hb_itemStrBuf( szResult, pNumber, iSize, iDec );
@@ -2080,15 +2080,15 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
    {
       case HB_IT_STRING:
       case HB_IT_MEMO:
-	  {
+      {
          buffer = pItem->item.asString.value;
          * ulLen = pItem->item.asString.length;
          * bFreeReq = FALSE;
          break;
-	  }
+      }
 
       case HB_IT_DATE:
-	  {
+      {
          if( pItem->item.asDate.time == 0 )
          {
             char szDate[ 9 ];
@@ -2112,12 +2112,12 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             * bFreeReq = TRUE;
          }
          break;
-	  }
+      }
 
       case HB_IT_DOUBLE:
       case HB_IT_INTEGER:
       case HB_IT_LONG:
-	  {
+      {
          buffer = hb_itemStr( pItem, NULL, NULL );
          if( buffer )
          {
@@ -2131,27 +2131,27 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
             * bFreeReq = FALSE;
          }
          break;
-	  }
+      }
 
       case HB_IT_NIL:
-	  {
+      {
          buffer = "NIL";
          * ulLen = 3;
          * bFreeReq = FALSE;
          break;
-	  }
+      }
 
       case HB_IT_LOGICAL:
-	  {
-		 buffer = "F";
-	     if( hb_itemGetL( pItem ) )
-		 {
-   		    buffer = "T";
-		 }
+      {
+         buffer = "F";
+         if( hb_itemGetL( pItem ) )
+         {
+            buffer = "T";
+         }
          * ulLen = 1;
          * bFreeReq = FALSE;
          break;
-	  }
+      }
 
       case HB_IT_POINTER:
       {
@@ -2186,16 +2186,16 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
 
          * ulLen = strlen( buffer );
          * bFreeReq = TRUE;
-		 break;
+         break;
       }
 
       default:
-	  {
+      {
          buffer = "";
          * ulLen = 0;
          * bFreeReq = FALSE;
-		 break;
-	  }
+         break;
+      }
    }
 
    return buffer;
