@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.143 2007/05/07 15:00:56 ran_go Exp $
+ * $Id: itemapi.c,v 1.144 2007/10/31 08:35:13 marchuet Exp $
  */
 
 /*
@@ -2144,7 +2144,7 @@ char HB_EXPORT * hb_itemString( PHB_ITEM pItem, ULONG * ulLen, BOOL * bFreeReq )
       case HB_IT_LOGICAL:
 	  {
 		 buffer = "F";
-	     if( ( char * ) hb_itemGetL( pItem ) )
+	     if( hb_itemGetL( pItem ) )
 		 {
    		    buffer = "T";
 		 }
