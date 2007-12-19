@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.115 2007/04/17 20:46:35 ronpinkas Exp $
+* $Id: thread.h,v 1.116 2007/09/25 07:32:33 marchuet Exp $
 */
 
 /*
@@ -520,9 +520,10 @@ typedef struct tag_HB_STACK
    ULONG hMemvarsAllocated;
    ULONG hMemvarsLastFree;
 
-   /* Data useful for dbcmd & friends */
+   /* Data useful for source/rdd/wacore.c & friends */
    USHORT uiCurrArea;         /* Selectd area */
    struct _AREA * pCurrArea;  /* Pointer to a selected and valid area */
+   BOOL fNetError;            /* Error on networked environments */
 
    /* Background per-thread jobs */
    struct HB_BACKGROUNDTASK_ **pBackgroundTasks;

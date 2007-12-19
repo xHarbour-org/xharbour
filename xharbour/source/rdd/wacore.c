@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.4 2007/12/17 16:14:57 likewolf Exp $
+ * $Id: wacore.c,v 1.5 2007/12/18 23:58:12 likewolf Exp $
  */
 
 /*
@@ -74,6 +74,7 @@ static USHORT s_uiWaNumMax = 0;        /* Number of allocated WA */
 #ifndef HB_THREAD_SUPPORT
 static USHORT s_uiCurrArea = 1;        /* Current WokrArea number */
 static AREAP  s_pCurrArea = NULL;      /* Current WorkArea pointer */
+static BOOL   s_fNetError = FALSE;     /* Error on Networked environments */
    #define LOCK_AREA
    #define UNLOCK_AREA
    #define LOCK_AREA_INIT
@@ -81,6 +82,7 @@ static AREAP  s_pCurrArea = NULL;      /* Current WorkArea pointer */
 #else
    #define s_uiCurrArea    HB_VM_STACK.uiCurrArea 	 
    #define s_pCurrArea     HB_VM_STACK.pCurrArea
+   #define s_fNetError     HB_VM_STACK.fNetError
    HB_CRITICAL_T  s_mtxWorkArea; 	 
    #if defined (HB_OS_WIN_32) || defined(HB_OS_OS2) 	 
       static BOOL s_fMtLockInit = FALSE; 	 
@@ -96,7 +98,6 @@ static AREAP  s_pCurrArea = NULL;      /* Current WorkArea pointer */
    #endif
 #endif
 
-static BOOL s_fNetError = FALSE;       /* Error on Networked environments */
 
 
 #define HB_SET_WA( n )  do \

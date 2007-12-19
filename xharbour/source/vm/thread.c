@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.204 2007/02/13 19:02:25 druzus Exp $
+* $Id: thread.c,v 1.205 2007/04/17 20:46:36 ronpinkas Exp $
 */
 
 /*
@@ -391,9 +391,10 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->iExtraElements = 0;
    tc->iExtraIndex = 0;
 
-   /* Initialization of dbcmd related variables */
+   /* Initialization of source/rdd/wacore.c related variables */
    tc->uiCurrArea = 1;
    tc->pCurrArea = NULL;
+   tc->fNetError = FALSE;
 
    /* Initialization of private and public memvars */
    hb_memvarsInit( tc );
