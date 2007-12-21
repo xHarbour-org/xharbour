@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.8 2005/11/01 22:05:19 druzus Exp $
+ * $Id: hbfsapi.c,v 1.9 2006/11/11 03:48:21 druzus Exp $
  */
 
 /*
@@ -61,10 +61,11 @@ extern void hb_fhnd_ForceLink( void );
 /*
  * Function that adds zero or more paths to a list of pathnames to search
  */
-void hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList )
+HB_EXPORT void hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList )
 {
    char * pPath;
    char * pDelim;
+   BOOL fFree = TRUE;
 
    while( *pSearchList )
    {
@@ -77,28 +78,32 @@ void hb_fsAddSearchPath( const char * szPath, HB_PATHNAMES ** pSearchList )
       *pDelim = '\0';
       *pSearchList = ( HB_PATHNAMES * ) hb_xgrab( sizeof( HB_PATHNAMES ) );
       (*pSearchList)->szPath = pPath;
+      (*pSearchList)->fFree  = fFree;
       pSearchList = &(*pSearchList)->pNext;
       pPath = pDelim + 1;
+      fFree = FALSE;
    }
    *pSearchList = ( HB_PATHNAMES * ) hb_xgrab( sizeof( HB_PATHNAMES ) );
    (*pSearchList)->szPath = pPath;
    (*pSearchList)->pNext  = NULL;
+   (*pSearchList)->fFree  = fFree;
 }
 
 /*
  * free list of pathnames to search
  */
-void hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList )
+HB_EXPORT void hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList )
 {
    HB_PATHNAMES * pNext;
 
    /* Only the first path holds an allocated string.
       All of the other paths in the list are part of
       that first string. */
-   hb_xfree( pSearchList->szPath );
 
    while( pSearchList )
    {
+      if( pSearchList->fFree )
+         hb_xfree( pSearchList->szPath );
       pNext = pSearchList->pNext;
       hb_xfree( pSearchList );
       pSearchList = pNext;
