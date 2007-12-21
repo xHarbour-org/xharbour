@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.34 2007/12/04 06:19:08 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.35 2007/12/04 14:56:41 andijahja Exp $
  */
 
 /*
@@ -334,22 +334,7 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        /* Accept rest as OutputPath and continue with next Args[]. */
                        j = strlen( Args[i] );
                        continue;
-#if 0
-                       if ( Args[i][j + 1] )
-                       {
-                          Switch[2] = Args[i][j + 1];
-                          Switch[3] = '\0';
-                          j += 2;
-                       }
-                       else
-                       {
-                          /* No optional argument */
-                          Switch[2] = '\0';
-                          j += 1;
-                       }
-                       hb_compChkEnvironVar( (char*) Switch );
-                       continue;
-#endif
+
                      case 'q' :
                      case 'Q' :
                        if( Args[i][j + 1] && isdigit( ( BYTE ) Args[i][j + 1] ) )
@@ -651,56 +636,9 @@ void hb_compChkEnvironVar( char * szSwitch )
                       }
                       break;
 
-                   case 'o':
-                   case 'O':
-                      hb_comp_iLanguage = LANG_OBJ_MODULE;
-
-                      if( strchr( s + 2, 's' ) || strchr( s + 2, 'S' ) )
-                      {
-                         hb_comp_iGenVarList = TRUE;
-                      }
-
-                      switch( *( s + 2 ) )
-                      {
-                         case '0':
-                         case '\0': /* default */
-                            hb_comp_iGenCOutput = HB_COMPGENC_COMPACT;
-                            break;
-
-                         case '1':
-                            hb_comp_iGenCOutput = HB_COMPGENC_NORMAL;
-                            break;
-
-                         case '2':
-                            hb_comp_iGenCOutput = HB_COMPGENC_VERBOSE;
-                            break;
-
-                         case '3':
-                            hb_comp_iGenCOutput = HB_COMPGENC_REALCODE;
-                            break;
-
-                         case '4':
-                            hb_comp_iGenVarList = TRUE;
-                            break;
-
-                         default:
-                            hb_compGenError( hb_comp_szErrors, 'F', HB_COMP_ERR_BADOPTION, s, NULL );
-                      }
-                      break;
-
-                   case 'j':
-                   case 'J':
-                      hb_comp_iLanguage = LANG_JAVA;
-                      break;
-
                    case 'h':
                    case 'H':
                       hb_comp_iLanguage = LANG_PORT_OBJ;
-                      break;
-
-                   case 'w':
-                   case 'W':
-                      hb_comp_iLanguage = LANG_OBJ32;
                       break;
 
                    default:
@@ -910,33 +848,7 @@ void hb_compChkEnvironVar( char * szSwitch )
                    hb_xfree( szPath );
 		}
 		break;
-#if 0
-                if( *( s + 1 ) == 't' || *( s + 1 ) == 'T' )
-                {
-                   if( *( s + 2 ) == '-' )
-                   {
-                      hb_comp_bPPO     = 0;
-                      hb_comp_bTracePP = 0;
-                   }
-                   else
-                   {
-                      hb_comp_bPPO     = 1;
-                      hb_comp_bTracePP = 1;
-                   }
-                }
-                else
-                {
-                   if( *( s + 1 ) == '-' )
-                   {
-                      hb_comp_bPPO = 0;
-                   }
-                   else
-                   {
-                      hb_comp_bPPO = 1;
-                   }
-                }
-                break;
-#endif
+
              case 'q':
              case 'Q':
                 if( *( s + 1 ) == '0' )

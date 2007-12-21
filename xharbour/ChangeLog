@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5822 2007/12/21 17:12:41 likewolf Exp $
+ * $Id: ChangeLog,v 1.5823 2007/12/21 18:44:46 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,22 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2007-12-22 05.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   * include/hbcomp.h
+   * source/compiler/cmdcheck.c
+   * source/compiler/hbusage.c
+   * source/compiler/harbour.c
+   - source/compiler/gencobj.c
+   - source/compiler/genjava.c
+   - source/compiler/genobj32.c
+     ! remove unfunctional features as previously described as /go /gw and /gj
+       NOTE:
+       AFAIK /gw and /gj has never been functional. As to /go, I'm not
+       certainly sure if there are users using it but as I review makefiles,
+       it seems that /go has never been implemented. Should there be users
+       using it, now obj creation can only be done in "surface", meaning that
+       CC is now can only be invoked directly from command line, not from
+       within harbour.exe
 
 2007-12-21 21:43 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapifs.h

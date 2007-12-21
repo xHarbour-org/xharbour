@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.35 2007/03/21 10:15:51 marchuet Exp $
+ * $Id: hbusage.c,v 1.36 2007/12/05 06:40:35 andijahja Exp $
  */
 
 /*
@@ -70,10 +70,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cgc[<type>]      output type: C source (.c) (default)",
            "\n                           <type>: 0=compact 1=normal 2=verbose (default)",
            "\n                                   3=generate variable list (.var) file",
-           "\n          %cgo              output type: Platform dependant object module",
-           "\n          %cgw              output type: Windows/DOS OBJ32 (.obj)",
            "\n          %cgh              output type: Harbour Portable Object (.hrb)",
-           "\n          %cgj              output type: Java source (.java)",
            "\n          %ci<path>         #include file search path",
            "\n          %cj[<file>]       output i18n support [to <file>] to .hil",
            "\n          %ck               compilation mode (type -k? for more data)",
@@ -160,5 +157,5 @@ void hb_compPrintCredits( void )
 void hb_compPrintLogo( void )
 {
    printf( "xHarbour Compiler build %d.%d.%d (%s)\n", HB_VER_MAJOR, HB_VER_MINOR, HB_VER_REVISION, HB_VER_LEX );
-   printf( "Copyright 1999-2007, http://www.xharbour.org http://www.harbour-project.org/\n" );
+   printf( "Copyright 1999-2008, http://www.xharbour.org http://www.harbour-project.org/\n" );
 }

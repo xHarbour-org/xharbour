@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.58 2007/12/04 06:19:08 andijahja Exp $
+ * $Id: hbcomp.h,v 1.59 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -507,10 +507,7 @@ extern char * hb_comp_buffer; /* yacc input buffer */
 
 /* output related functions defined in gen*.c */
 extern void hb_compGenCCode( PHB_FNAME, char *); /* generates the C language output */
-extern void hb_compGenJava( PHB_FNAME );         /* generates the Java language output */
 extern void hb_compGenPortObj( PHB_FNAME );      /* generates the portable objects */
-extern void hb_compGenObj32( PHB_FNAME );        /* generates OBJ 32 bits */
-extern void hb_compGenCObj( PHB_FNAME, char *);  /* generates platform dependant object module */
 
 /* hbident.c   */
 extern char * hb_compIdentifierNew( char * szName, BOOL bCopy ); /* create the reusable identifier */
