@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5820 2007/12/21 15:22:27 likewolf Exp $
+ * $Id: ChangeLog,v 1.5821 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-21 20:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/rtl/console.c
+    ! Don't move cursor to start of row on exit - it breaks output at least in
+      GTSTD. Thanks to Przemyslaw Czerpak.
 
 2007-12-21 19:08 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapifs.h

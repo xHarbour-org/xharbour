@@ -1,5 +1,5 @@
 /*
- * $Id: console.c,v 1.65 2007/03/11 00:18:44 modalsist Exp $
+ * $Id: console.c,v 1.66 2007/09/11 04:53:34 andijahja Exp $
  */
 /*
  * Harbour Project source code:
@@ -239,7 +239,9 @@ void hb_conRelease( void )
       }
       else
       {
-          hb_gtSetPos( iRow, 0 );
+          /* It's not Clipper compatible and breaks cursor positioning on
+           * application exit in some GTs, f.e. GTSTD */
+          /* hb_gtSetPos( iRow, 0 ); */
       }
 
       hb_gtExit();
