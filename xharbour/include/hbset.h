@@ -1,5 +1,5 @@
 /*
- * $Id: hbset.h,v 1.38 2007/09/22 05:41:00 andijahja Exp $
+ * $Id: hbset.h,v 1.39 2007/09/22 06:39:49 andijahja Exp $
  */
 
 /*
@@ -50,12 +50,12 @@
  *
  */
 
-
 #ifndef HB_SET_H_
 #define HB_SET_H_
+
 #include "hbapi.h"
-#include "hbapifs.h"
 #include "hbapigt.h"
+#include "hbapifs.h"
 
 HB_EXTERN_BEGIN
 
@@ -121,8 +121,8 @@ typedef enum
    HB_SET_AUTOSHARE     = 47,
 
    /* Harbour SET extensions start at 100 */
-   HB_SET_LANGUAGE        = 100,
-   HB_SET_IDLEREPEAT      = 101,
+   HB_SET_LANGUAGE      = 100,
+   HB_SET_IDLEREPEAT    = 101,
    HB_SET_TRACE           = 102,
    HB_SET_TRACEFILE       = 103,
    HB_SET_TRACESTACK      = 104,

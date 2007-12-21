@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.h,v 1.9 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbdate.h,v 1.10 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -86,20 +86,20 @@ extern HB_EXPORT char * hb_timeDecStr( char * szTime, LONG lSeconds );  /* Hecho
 
 #define  hb_timeL2Sec( lTime )   ((double) lTime / (double)HB_DATETIMEINSEC)
 
-extern LONG     HB_EXPORT hb_timeEncode( int iHour, int iMinute, double dSeconds );  /* Hecho */
-extern void     HB_EXPORT hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
-extern double   HB_EXPORT hb_timeEncodeSec( int iHour, int iMinute, double dSeconds );  /* Hecho */
-extern void     HB_EXPORT hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT LONG     hb_timeEncode( int iHour, int iMinute, double dSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT double   hb_timeEncodeSec( int iHour, int iMinute, double dSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_timeDecodeSec( double dTime, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 
-extern void     HB_EXPORT hb_datetimeEncode( LONG * plDate, LONG * plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * iOk );  /* Hecho */
-extern void     HB_EXPORT hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
+extern HB_EXPORT void     hb_datetimeEncode( LONG * plDate, LONG * plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * iOk );  /* Hecho */
+extern HB_EXPORT void     hb_datetimeDecode( LONG lDate, LONG lTime, int * piYear, int * piMonth, int * piDay, int * piHour, int * piMinute, double * pdSeconds );  /* Hecho */
 
-extern void     HB_EXPORT hb_datetimeEncStr( const char * szDateTime, LONG *plDate, LONG *plTime );
-extern char     HB_EXPORT * hb_datetimeDecStr( char * szDateTime, LONG lDate, LONG lTime );
+extern HB_EXPORT void     hb_datetimeEncStr( const char * szDateTime, LONG *plDate, LONG *plTime );
+extern HB_EXPORT char     * hb_datetimeDecStr( char * szDateTime, LONG lDate, LONG lTime );
 
-extern void     HB_EXPORT hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime );
-extern double   HB_EXPORT hb_datetimePack( LONG lDate, LONG lTime );
-extern double   HB_EXPORT hb_datetimePackInSec( LONG lJulian, LONG lTime );
+extern HB_EXPORT void     hb_datetimeUnpack( double dDateTime, LONG * plDate, LONG * plTime );
+extern HB_EXPORT double   hb_datetimePack( LONG lDate, LONG lTime );
+extern HB_EXPORT double   hb_datetimePackInSec( LONG lJulian, LONG lTime );
 
 HB_EXTERN_END
 

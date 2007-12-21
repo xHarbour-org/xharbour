@@ -1,5 +1,5 @@
 /*
- * $Id: hbapierr.h,v 1.13 2005/04/26 05:38:04 ronpinkas Exp $
+ * $Id: hbapierr.h,v 1.14 2007/02/13 19:02:24 druzus Exp $
  */
 
 /*
@@ -101,86 +101,88 @@ extern char hb_errFuncName;
 
 /* Standard API */
 
-extern char     HB_EXPORT * hb_errGetDescription    ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetFileName       ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetFlags          ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetGenCode        ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetOperation    ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetOsCode         ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetSeverity       ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetSubCode        ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetSubSystem    ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetTries          ( PHB_ITEM pError );
-extern char     HB_EXPORT * hb_errGetProcName     ( PHB_ITEM pError );
-extern USHORT   HB_EXPORT hb_errGetProcLine       ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetDescription    ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetFileName       ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetFlags          ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetGenCode        ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetOperation    ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetOsCode         ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetSeverity       ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetSubCode        ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetSubSystem    ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetTries          ( PHB_ITEM pError );
+extern HB_EXPORT char     * hb_errGetProcName     ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errGetProcLine       ( PHB_ITEM pError );
 
 #ifdef HB_THREAD_SUPPORT
-extern UINT     HB_EXPORT hb_errGetRunningThreads ( PHB_ITEM pError );
-extern HB_THREAD_T HB_EXPORT hb_errGetThreadId    ( PHB_ITEM pError );
-extern UINT     HB_EXPORT hb_errGetVmThreadId     ( PHB_ITEM pError );
+extern HB_EXPORT UINT     hb_errGetRunningThreads ( PHB_ITEM pError );
+extern HB_EXPORT HB_THREAD_T hb_errGetThreadId    ( PHB_ITEM pError );
+extern HB_EXPORT UINT     hb_errGetVmThreadId     ( PHB_ITEM pError );
 #endif
 
-extern USHORT   HB_EXPORT hb_errLaunch            ( PHB_ITEM pError );
-extern PHB_ITEM HB_EXPORT hb_errNew               ( void );
-extern PHB_ITEM HB_EXPORT hb_errPutArgs           ( PHB_ITEM pError, ULONG ulArgCount, ... );
-extern PHB_ITEM HB_EXPORT hb_errPutDescription    ( PHB_ITEM pError, const char * szDescription );
-extern PHB_ITEM HB_EXPORT hb_errPutFileName       ( PHB_ITEM pError, const char * szFileName );
-extern PHB_ITEM HB_EXPORT hb_errPutFlags          ( PHB_ITEM pError, USHORT uiFlags );
-extern PHB_ITEM HB_EXPORT hb_errPutGenCode        ( PHB_ITEM pError, USHORT uiGenCode );
-extern PHB_ITEM HB_EXPORT hb_errPutModuleName     ( PHB_ITEM pError, const char * szModuleName );
-extern PHB_ITEM HB_EXPORT hb_errPutOperation      ( PHB_ITEM pError, const char * szOperation );
-extern PHB_ITEM HB_EXPORT hb_errPutOsCode         ( PHB_ITEM pError, USHORT uiOsCode );
-extern PHB_ITEM HB_EXPORT hb_errPutSeverity       ( PHB_ITEM pError, USHORT uiSeverity );
-extern PHB_ITEM HB_EXPORT hb_errPutSubCode        ( PHB_ITEM pError, USHORT uiSubCode );
-extern PHB_ITEM HB_EXPORT hb_errPutSubSystem      ( PHB_ITEM pError, const char * szSubSystem );
-extern PHB_ITEM HB_EXPORT hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
-extern PHB_ITEM HB_EXPORT hb_errPutProcName       ( PHB_ITEM pError, const char * szProcname );
-extern PHB_ITEM HB_EXPORT hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
-extern void     HB_EXPORT hb_errRelease           ( PHB_ITEM pError );
+extern HB_EXPORT USHORT   hb_errLaunch            ( PHB_ITEM pError );
+extern HB_EXPORT PHB_ITEM hb_errNew               ( void );
+extern HB_EXPORT PHB_ITEM hb_errPutArgs           ( PHB_ITEM pError, ULONG ulArgCount, ... );
+extern HB_EXPORT PHB_ITEM hb_errPutDescription    ( PHB_ITEM pError, const char * szDescription );
+extern HB_EXPORT PHB_ITEM hb_errPutFileName       ( PHB_ITEM pError, const char * szFileName );
+extern HB_EXPORT PHB_ITEM hb_errPutFlags          ( PHB_ITEM pError, USHORT uiFlags );
+extern HB_EXPORT PHB_ITEM hb_errPutGenCode        ( PHB_ITEM pError, USHORT uiGenCode );
+extern HB_EXPORT PHB_ITEM hb_errPutModuleName     ( PHB_ITEM pError, const char * szModuleName );
+extern HB_EXPORT PHB_ITEM hb_errPutOperation      ( PHB_ITEM pError, const char * szOperation );
+extern HB_EXPORT PHB_ITEM hb_errPutOsCode         ( PHB_ITEM pError, USHORT uiOsCode );
+extern HB_EXPORT PHB_ITEM hb_errPutSeverity       ( PHB_ITEM pError, USHORT uiSeverity );
+extern HB_EXPORT PHB_ITEM hb_errPutSubCode        ( PHB_ITEM pError, USHORT uiSubCode );
+extern HB_EXPORT PHB_ITEM hb_errPutSubSystem      ( PHB_ITEM pError, const char * szSubSystem );
+extern HB_EXPORT PHB_ITEM hb_errPutTries          ( PHB_ITEM pError, USHORT uiTries );
+extern HB_EXPORT PHB_ITEM hb_errPutProcName       ( PHB_ITEM pError, const char * szProcname );
+extern HB_EXPORT PHB_ITEM hb_errPutProcLine       ( PHB_ITEM pError, USHORT uiProcline );
+extern HB_EXPORT void     hb_errRelease           ( PHB_ITEM pError );
 
 #ifdef HB_THREAD_SUPPORT
-extern PHB_ITEM HB_EXPORT hb_errPutRunningThreads ( PHB_ITEM pError, UINT uiCount );
-extern PHB_ITEM HB_EXPORT hb_errPutThreadId       ( PHB_ITEM pError, HB_THREAD_T thId );
-extern PHB_ITEM HB_EXPORT hb_errPutVmThreadId     ( PHB_ITEM pError, UINT uiVmId );
+extern HB_EXPORT PHB_ITEM hb_errPutRunningThreads ( PHB_ITEM pError, UINT uiCount );
+extern HB_EXPORT PHB_ITEM hb_errPutThreadId       ( PHB_ITEM pError, HB_THREAD_T thId );
+extern HB_EXPORT PHB_ITEM hb_errPutVmThreadId     ( PHB_ITEM pError, UINT uiVmId );
 #endif
 
-extern void     HB_EXPORT hb_errRelease           ( PHB_ITEM pError );
+extern HB_EXPORT void     hb_errRelease           ( PHB_ITEM pError );
 
 /* Harbour additions */
 
-extern void     HB_EXPORT hb_errInit              ( void );
-extern void     HB_EXPORT hb_errExit              ( void );
+extern HB_EXPORT void     hb_errInit              ( void );
+extern HB_EXPORT void     hb_errExit              ( void );
 
-extern PHB_ITEM HB_EXPORT hb_errLaunchSubst       ( PHB_ITEM pError );
+extern HB_EXPORT PHB_ITEM  hb_errLaunchSubst( PHB_ITEM pError );
 
-extern PHB_ITEM HB_EXPORT hb_errRT_New( USHORT uiSeverity, const char * szSubSystem,
-   ULONG  ulGenCode,
-   ULONG  ulSubCode,
-   const char * szDescription,
-   const char * szOperation,
-   USHORT uiOsCode,
-   USHORT uiFlags );
+extern HB_EXPORT PHB_ITEM  hb_errRT_New( USHORT uiSeverity,
+                                         const char * szSubSystem,
+                                         ULONG  ulGenCode,
+                                         ULONG  ulSubCode,
+                                         const char * szDescription,
+                                         const char * szOperation,
+                                         USHORT uiOsCode,
+                                         USHORT uiFlags );
 
-extern PHB_ITEM HB_EXPORT hb_errRT_New_Subst( USHORT uiSeverity, const char * szSubSystem,
-   ULONG  ulGenCode,
-   ULONG  ulSubCode,
-   const char * szDescription,
-   const char * szOperation,
-   USHORT uiOsCode,
-   USHORT uiFlags );
+extern HB_EXPORT PHB_ITEM  hb_errRT_New_Subst( USHORT uiSeverity,
+                                         const char * szSubSystem,
+                                         ULONG  ulGenCode,
+                                         ULONG  ulSubCode,
+                                         const char * szDescription,
+                                         const char * szOperation,
+                                         USHORT uiOsCode,
+                                         USHORT uiFlags );
 
-extern PHB_ITEM HB_EXPORT hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
-
-extern USHORT   HB_EXPORT hb_errRT_BASE           ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
-extern USHORT   HB_EXPORT hb_errRT_BASE_Ext1      ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... );
-extern PHB_ITEM HB_EXPORT hb_errRT_BASE_Subst     ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
-extern void     HB_EXPORT hb_errRT_BASE_SubstR    ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
-extern USHORT   HB_EXPORT hb_errRT_TERM           ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOSCode, USHORT uiFlags );
-extern USHORT   HB_EXPORT hb_errRT_DBCMD          ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
-extern USHORT   HB_EXPORT hb_errRT_DBCMD_Ext      ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags );
-extern USHORT   HB_EXPORT hb_errRT_TOOLS          ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
-
-extern void     HB_EXPORT hb_errInternal          ( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 );
+extern HB_EXPORT PHB_ITEM  hb_errRT_SubstParams( const char *szSubSystem, ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
+       
+extern HB_EXPORT USHORT    hb_errRT_BASE        ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
+extern HB_EXPORT USHORT    hb_errRT_BASE_Ext1   ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOsCode, USHORT uiFlags, ULONG ulArgCount, ... );
+extern HB_EXPORT PHB_ITEM  hb_errRT_BASE_Subst  ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
+extern HB_EXPORT void      hb_errRT_BASE_SubstR ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, ULONG ulArgCount, ... );
+extern HB_EXPORT USHORT    hb_errRT_TERM        ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiOSCode, USHORT uiFlags );
+extern HB_EXPORT USHORT    hb_errRT_DBCMD       ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
+extern HB_EXPORT USHORT    hb_errRT_DBCMD_Ext   ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation, USHORT uiFlags );
+extern HB_EXPORT USHORT    hb_errRT_TOOLS       ( ULONG ulGenCode, ULONG ulSubCode, const char * szDescription, const char * szOperation );
+       
+extern HB_EXPORT void      hb_errInternal       ( ULONG ulIntCode, const char * szText, const char * szPar1, const char * szPar2 );
 
 /* Low-level error handling */
 struct HB_ERROR_INFO_;   /* forward declaration */
@@ -197,9 +199,11 @@ typedef struct HB_ERROR_INFO_
    HB_ITEM_PTR ErrorBlock;
 } HB_ERROR_INFO, * HB_ERROR_INFO_PTR;
 
-/*  set/get current error handler */
-extern HB_ERROR_INFO_PTR HB_EXPORT hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler );
-extern PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock );
+/* set/get current error handler */
+extern HB_EXPORT HB_ERROR_INFO_PTR  hb_errorHandler( HB_ERROR_INFO_PTR pNewHandler );
+
+/* current errorblock item */
+extern HB_EXPORT PHB_ITEM hb_errorBlock( PHB_ITEM pNewErrorBlock );
 
 HB_EXTERN_END
 

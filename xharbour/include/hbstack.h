@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.45 2007/09/25 07:32:32 marchuet Exp $
+ * $Id: hbstack.h,v 1.46 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -84,17 +84,17 @@ struct hb_class_method;
 #ifndef HB_THREAD_SUPPORT
 typedef struct
 {
-   PHB_ITEM * pItems;           /* pointer to the stack items */
-   PHB_ITEM * pPos;             /* pointer to the latest used item */
-   LONG       wItems;           /* total items that may be holded on the stack */
-   HB_ITEM    Return;           /* latest returned value */
-   PHB_ITEM * pBase;            /* stack frame position for the current function call */
-   PHB_ITEM * pEvalBase;        /* stack frame position for the evaluated codeblock */
-   LONG       lStatics;         /* statics base for the current function call */
-   LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
-   LONG       lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */   
-   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */   
-   char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
+   PHB_ITEM * pItems;         /* pointer to the stack items */
+   PHB_ITEM * pPos;           /* pointer to the latest used item */
+   LONG       wItems;         /* total items that may be holded on the stack */
+   HB_ITEM    Return;         /* latest returned value */
+   PHB_ITEM * pBase;          /* stack frame position for the current function call */
+   PHB_ITEM * pEvalBase;      /* stack frame position for the evaluated codeblock */
+   LONG       lStatics;       /* statics base for the current function call */
+   LONG       lWithObject;    /* stack offset to base current WITH OBJECT item */
+   LONG       lRecoverBase;   /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
+   USHORT     uiActionRequest;/* Request for some action - stop processing of opcodes */
+   char       szDate[ 26 ];   /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */
    struct hb_class_method * pMethod;        /* Selcted method to send message to */
@@ -215,8 +215,8 @@ extern void        hb_stackInit( void );       /* initializes the stack */
 extern void        hb_stackIncrease( void );   /* increase the stack size */
 
 extern void        hb_stackRemove( LONG lUntilPos );
-HB_EXPORT extern HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
-HB_EXPORT extern void hb_stackOldFrame( HB_STACK_STATE * pStack );
+extern HB_EXPORT HB_ITEM_PTR hb_stackNewFrame( HB_STACK_STATE * pStack, USHORT uiParams );
+extern HB_EXPORT void hb_stackOldFrame( HB_STACK_STATE * pStack );
 HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel );
 
 HB_EXTERN_END

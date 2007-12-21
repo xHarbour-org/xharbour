@@ -1,5 +1,5 @@
 /*
- * $Id: hashapi.h,v 1.5 2005/11/03 07:32:51 ronpinkas Exp $
+ * $Id: hashapi.h,v 1.6 2005/11/12 22:49:30 walito Exp $
  */
 
 /*
@@ -58,45 +58,45 @@
 HB_EXTERN_BEGIN
 #define  HB_HASH_ALLOC_BLOCK  16
 
-PHB_ITEM HB_EXPORT hb_hashNew( PHB_ITEM pItem );
-BOOL HB_EXPORT hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
-BOOL HB_EXPORT hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
-BOOL HB_EXPORT hb_hashRemove( PHB_ITEM pHash, ULONG ulPos );
-BOOL HB_EXPORT hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex );
-BOOL HB_EXPORT hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-BOOL HB_EXPORT hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
-void HB_EXPORT hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase );
+HB_EXPORT PHB_ITEM hb_hashNew( PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashAdd( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
+HB_EXPORT BOOL hb_hashAddForward( PHB_ITEM pHash, ULONG ulPos, PHB_ITEM pKey, PHB_ITEM pValue );
+HB_EXPORT BOOL hb_hashRemove( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT BOOL hb_hashScan( PHB_ITEM pHash, PHB_ITEM pKey, ULONG *ulIndex );
+HB_EXPORT BOOL hb_hashSet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashSetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashGet( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+HB_EXPORT BOOL hb_hashGetForward( PHB_ITEM pHash, ULONG ulIndex, PHB_ITEM pItem );
+HB_EXPORT void hb_hashSetCaseMatch( PHB_ITEM pHash, BOOL bCase );
 
-void HB_EXPORT hb_hashPreallocate( PHB_ITEM pHash, ULONG ulLength );
-PHB_ITEM HB_EXPORT hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDestHash );
-void HB_EXPORT hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
+HB_EXPORT void hb_hashPreallocate( PHB_ITEM pHash, ULONG ulLength );
+HB_EXPORT PHB_ITEM hb_hashClone( PHB_ITEM pSrcHash, PHB_ITEM pDestHash );
+HB_EXPORT void hb_hashMerge( PHB_ITEM pDest, PHB_ITEM pSource,
       ULONG ulStart, ULONG ulEnd, PHB_ITEM pBlock );
 
-BOOL HB_EXPORT  hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent );
+HB_EXPORT  BOOL hb_hashSetAACompatibility( PHB_ITEM pHash, BOOL bCompatAA, BOOL bSilent );
 
 #ifdef HB_API_MACROS
    #define hb_hashLen( pHash )                  ( pHash )->item.asHash.value->ulTotalLen
    #define hb_hashGetCompatibility( pHash )     (( pHash )->item.asHash.value->pAccessAA == NULL?FALSE:TRUE)
    #define hb_hashAAGetRealPos( pHash, ulPos )  ( ( ( ulPos ) > 0 && ( ulPos) <= hb_hashLen( ( pHash ) ) )? *(( pHash )->item.asHash.value->pAccessAA + ( ulPos ) - 1 ) : 0 )
 #else
-   extern ULONG HB_EXPORT hb_hashLen( PHB_ITEM pHash );
-   extern BOOL HB_EXPORT  hb_hashGetCompatibility( PHB_ITEM pHash );
-   extern ULONG HB_EXPORT hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos );
+   extern HB_EXPORT ULONG hb_hashLen( PHB_ITEM pHash );
+   extern HB_EXPORT  BOOL hb_hashGetCompatibility( PHB_ITEM pHash );
+   extern HB_EXPORT ULONG hb_hashAAGetRealPos( PHB_ITEM pHash, ULONG ulPos );
 #endif
 
-PHB_ITEM HB_EXPORT hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash );
-PHB_ITEM HB_EXPORT hb_hashGetValues( PHB_ITEM pValues, PHB_ITEM pHash );
-PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
-PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetKeys( PHB_ITEM pKeys, PHB_ITEM pHash );
+HB_EXPORT PHB_ITEM hb_hashGetValues( PHB_ITEM pValues, PHB_ITEM pHash );
+HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 
 
-PHB_ITEM HB_EXPORT hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
-PHB_ITEM HB_EXPORT hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetKeyAt( PHB_ITEM pHash, ULONG ulPos );
+HB_EXPORT PHB_ITEM hb_hashGetValueAt( PHB_ITEM pHash, ULONG ulPos );
 
 void hb_hashReleaseBase( PHB_BASEHASH pBaseHash );
-BOOL HB_EXPORT hb_hashRelease( PHB_ITEM pHash );
+HB_EXPORT BOOL hb_hashRelease( PHB_ITEM pHash );
 HB_GARBAGE_FUNC( hb_hashReleaseGarbage );
 
 /* Some utility macro */

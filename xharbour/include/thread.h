@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.116 2007/09/25 07:32:33 marchuet Exp $
+* $Id: thread.h,v 1.117 2007/12/19 00:16:39 likewolf Exp $
 */
 
 /*
@@ -782,8 +782,8 @@ extern void hb_threadInit( void );
 extern void hb_threadExit( void );
 extern int hb_threadCountStacks( void );
 extern void hb_threadFillStack( HB_STACK *pStack, PHB_ITEM pArgs );
-extern void HB_EXPORT hb_threadWaitAll( void );
-extern void HB_EXPORT hb_threadKillAll( void );
+extern HB_EXPORT void hb_threadWaitAll( void );
+extern HB_EXPORT void hb_threadKillAll( void );
 extern void hb_threadSleep( int millisec, BOOL bIdleWaitNoCpu );
 extern void hb_mutexForceUnlock( void *);
 extern void hb_rawMutexForceUnlock( void *);
@@ -808,7 +808,7 @@ extern void hb_clsRemutexSync( void );
 extern void hb_memvarsInit( HB_STACK * );
 extern void hb_memvarsRelease( HB_STACK * );
 extern void hb_memvarValueDecRefMT( HB_HANDLE hValue, HB_STACK *pStack );
-extern void HB_EXPORT hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
+extern HB_EXPORT void hb_itemClearMT( PHB_ITEM pItem, HB_STACK *pStack );
 
 /* Used by dynsym thread specific system */
 void hb_threadSetHMemvar( PHB_DYNS pDyn, HB_HANDLE hv );

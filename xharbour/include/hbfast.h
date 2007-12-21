@@ -1,5 +1,5 @@
 /*
- * $Id: hbfast.h,v 1.14 2006/05/16 22:57:08 druzus Exp $
+ * $Id: hbfast.h,v 1.15 2007/02/27 15:59:34 druzus Exp $
  */
 
 /*
@@ -61,16 +61,16 @@
        struct _HB_SCANNED_ARRAYS * pNext;
     } HB_SCANNED_ARRAYS, * PHB_SCANNED_ARRAYS;
 
-   extern PHB_ITEM HB_EXPORT hb_itemPutCStatic( PHB_ITEM pItem, const char * szText );
-   extern PHB_ITEM HB_EXPORT hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen );
-   extern void     HB_EXPORT hb_itemPushForward( PHB_ITEM pItem );
-   extern void     HB_EXPORT hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
-   extern void     HB_EXPORT hb_itemReleaseString( PHB_ITEM pItem );
-   extern void     HB_EXPORT hb_itemPushStaticString( const char * szText, ULONG length );
+   extern HB_EXPORT PHB_ITEM hb_itemPutCStatic( PHB_ITEM pItem, const char * szText );
+   extern HB_EXPORT PHB_ITEM hb_itemPutCLStatic( PHB_ITEM pItem, const char * szText, ULONG ulLen );
+   extern HB_EXPORT void     hb_itemPushForward( PHB_ITEM pItem );
+   extern HB_EXPORT void     hb_itemForwardValue( PHB_ITEM pDest, PHB_ITEM pSource );
+   extern HB_EXPORT void     hb_itemReleaseString( PHB_ITEM pItem );
+   extern HB_EXPORT void     hb_itemPushStaticString( const char * szText, ULONG length );
 
-   extern USHORT HB_EXPORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
-   extern USHORT HB_EXPORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
-   extern BYTE   HB_EXPORT hb_itemParamId( PHB_ITEM pItem );
+   extern HB_EXPORT USHORT hb_itemArrayCyclicCount( PHB_ITEM pArray );
+   extern HB_EXPORT USHORT hb_itemArrayCyclicCountWorker( PHB_BASEARRAY pArray, PHB_SCANNED_ARRAYS pScannedList, PHB_BASEARRAY pTopBaseArray );
+   extern HB_EXPORT BYTE   hb_itemParamId( PHB_ITEM pItem );
 
    #define hb_itemMove( dst, src )     hb_itemForwardValue( (dst), (src) )
 

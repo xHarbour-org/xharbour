@@ -1,5 +1,5 @@
 /*
- * $Id: hbapilng.h,v 1.8 2005/03/31 03:15:16 druzus Exp $
+ * $Id: hbapilng.h,v 1.9 2007/04/20 09:41:30 marchuet Exp $
  */
 
 /*
@@ -79,23 +79,22 @@ typedef struct _HB_LANG
 
 /* Supported language list management */
 
-extern BOOL     HB_EXPORT hb_langRegister         ( PHB_LANG lang );
-extern BOOL     HB_EXPORT hb_langDeRegister       ( char * pszID );
-extern PHB_LANG HB_EXPORT hb_langFind             ( char * pszID );
+extern HB_EXPORT BOOL      hb_langRegister         ( PHB_LANG lang );
+extern HB_EXPORT BOOL      hb_langDeRegister       ( char * pszID );
+extern HB_EXPORT PHB_LANG  hb_langFind             ( char * pszID );
 
 /* Default language selection and data query */
 
-extern PHB_LANG HB_EXPORT hb_langSelect           ( PHB_LANG lang );
-extern char   HB_EXPORT * hb_langSelectID         ( char * pszID );
-extern char   HB_EXPORT * hb_langDGetItem         ( int iIndex );
-extern char   HB_EXPORT * hb_langID               ( void );
-extern char   HB_EXPORT * hb_langName             ( void );
+extern HB_EXPORT PHB_LANG  hb_langSelect           ( PHB_LANG lang );
+extern HB_EXPORT char *    hb_langSelectID         ( char * pszID );
+extern HB_EXPORT char *    hb_langDGetItem         ( int iIndex );
+extern HB_EXPORT char *    hb_langID               ( void );
+extern HB_EXPORT char *    hb_langName             ( void );
 
 /* Compatibility interface */
 
-extern char    HB_EXPORT * hb_langDGetErrorDesc    ( ULONG ulIndex );
+extern HB_EXPORT char *    hb_langDGetErrorDesc    ( ULONG ulIndex );
 
 HB_EXTERN_END
 
 #endif /* HB_APILNG_H_ */
-

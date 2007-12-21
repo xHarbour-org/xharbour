@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomprs.h,v 1.2 2004/04/28 18:22:07 druzus Exp $
+ * $Id: hbcomprs.h,v 1.3 2005/04/05 22:26:06 druzus Exp $
  */
 
 /*
@@ -327,38 +327,38 @@ typedef z_stream FAR *z_streamp;
 extern "C" {
 #endif
 
-extern uLong HB_EXPORT adler32 OF(( uLong adler, const BYTE *buf, UINT len));
-extern uLong HB_EXPORT crc32 OF(( uLong crc, const BYTE *buf, uInt len));
-extern int   HB_EXPORT compress OF((Bytef *dest, uLongf *destLen,
+extern HB_EXPORT uLong adler32 OF(( uLong adler, const BYTE *buf, UINT len));
+extern HB_EXPORT uLong crc32 OF(( uLong crc, const BYTE *buf, uInt len));
+extern HB_EXPORT int   compress OF((Bytef *dest, uLongf *destLen,
                                     const Bytef *source, uLong sourceLen,
                                     int level));
-extern int   HB_EXPORT uncompress OF((Bytef *dest, uLongf *destLen,
+extern HB_EXPORT int   uncompress OF((Bytef *dest, uLongf *destLen,
                                       const Bytef *source, uLong sourceLen));
 
-HB_EXPORT extern const char * zlibVersion OF((void));
-extern int   HB_EXPORT deflate OF((z_streamp strm, int flush));
-extern int   HB_EXPORT deflateCopy OF((z_streamp dest, z_streamp source));
-extern int   HB_EXPORT deflateEnd OF((z_streamp strm));
-extern int   HB_EXPORT deflateInit_ OF(( z_streamp strm, int level, const char *version, int stream_size));
-extern int   HB_EXPORT deflateInit2_ OF((z_streamp strm, int level, int method,
+extern HB_EXPORT const char * zlibVersion OF((void));
+extern HB_EXPORT int   deflate OF((z_streamp strm, int flush));
+extern HB_EXPORT int   deflateCopy OF((z_streamp dest, z_streamp source));
+extern HB_EXPORT int   deflateEnd OF((z_streamp strm));
+extern HB_EXPORT int   deflateInit_ OF(( z_streamp strm, int level, const char *version, int stream_size));
+extern HB_EXPORT int   deflateInit2_ OF((z_streamp strm, int level, int method,
                                      int windowBits, int memLevel, int strategy,
 		                     const char * version, int stream_size));
-extern int   HB_EXPORT deflateParams OF((z_streamp strm,
+extern HB_EXPORT int   deflateParams OF((z_streamp strm,
 				         int level, int strategy));
-extern int   HB_EXPORT deflateReset OF((z_streamp strm));
-extern int   HB_EXPORT deflateSetDictionary OF((z_streamp strm,
+extern HB_EXPORT int   deflateReset OF((z_streamp strm));
+extern HB_EXPORT int   deflateSetDictionary OF((z_streamp strm,
                                     const Bytef *dictionary, uInt dictLength));
-extern int   HB_EXPORT inflate OF((z_streamp strm, int flush));
+extern HB_EXPORT int   inflate OF((z_streamp strm, int flush));
 
-extern int   HB_EXPORT inflateEnd OF((z_streamp strm));
-extern int   HB_EXPORT inflateInit_ OF((z_streamp z, const char *version, int stream_size));
-extern int   HB_EXPORT inflateInit2_ OF((z_streamp z, int w, const char *version, int stream_size));
-extern int   HB_EXPORT inflateReset OF((z_streamp strm));
-extern int   HB_EXPORT inflateSetDictionary OF((z_streamp strm,
+extern HB_EXPORT int   inflateEnd OF((z_streamp strm));
+extern HB_EXPORT int   inflateInit_ OF((z_streamp z, const char *version, int stream_size));
+extern HB_EXPORT int   inflateInit2_ OF((z_streamp z, int w, const char *version, int stream_size));
+extern HB_EXPORT int   inflateReset OF((z_streamp strm));
+extern HB_EXPORT int   inflateSetDictionary OF((z_streamp strm,
                                     const Bytef *dictionary, uInt dictLength));
 
-HB_EXPORT extern const char   * zError        OF((int err));
-HB_EXPORT extern const uLongf * get_crc_table OF((void));
+extern HB_EXPORT const char   * zError        OF((int err));
+extern HB_EXPORT const uLongf * get_crc_table OF((void));
 
 #ifdef __cplusplus
 }

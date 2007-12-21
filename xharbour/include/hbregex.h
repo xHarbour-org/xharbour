@@ -1,5 +1,5 @@
 /*
- * $Id: hbregex.h,v 1.3 2007/01/11 01:00:34 druzus Exp $
+ * $Id: hbregex.h,v 1.4 2007/05/20 03:26:22 ronpinkas Exp $
  */
 
 /*
@@ -59,11 +59,11 @@ typedef HB_REGEX * PHB_REGEX;
 
 /* The functions */
 extern HB_EXPORT regex_t * hb_getregex( PHB_ITEM pRegEx, BOOL lIgnCase, BOOL lNL, BOOL *fFree );
-extern void HB_EXPORT hb_freeregex( regex_t *pReg );
+extern HB_EXPORT void hb_freeregex( regex_t *pReg );
 
 extern HB_EXPORT BOOL hb_regexCompile( PHB_REGEX pRegEx, const char *szRegEx, int iCFlags, int iEFlags );
 extern HB_EXPORT BOOL hb_regexGet( PHB_REGEX pRegEx, PHB_ITEM pRegExItm, int iCFlags, int iEFlags );
-extern HB_EXPORT void hb_regexFree( PHB_REGEX pRegEx );
-extern HB_EXPORT BOOL hb_regexMatch( PHB_REGEX pRegEx, const char *szString, BOOL fFull );
+extern HB_EXPORT void      hb_regexFree( PHB_REGEX pRegEx );
+extern HB_EXPORT BOOL      hb_regexMatch( PHB_REGEX pRegEx, const char * szString, BOOL fFull );
 
 HB_EXTERN_END

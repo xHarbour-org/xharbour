@@ -1,5 +1,5 @@
 /*
- * $Id: hbmath.h,v 1.13 2005/03/31 03:15:18 druzus Exp $
+ * $Id: hbmath.h,v 1.14 2007/12/01 22:33:22 andijahja Exp $
  */
 
 /*
@@ -115,33 +115,33 @@ HB_EXTERN_BEGIN
 
 typedef struct _HB_MATH_EXCEPTION
 {
-  int    type;
-  char * funcname;
-  char * error;
-  double arg1;
-  double arg2;
-  double retval;
-  int    retvalwidth;
-  int    retvaldec;
-  int    handled;
+   int            type;
+   char *         funcname;
+   char *         error;
+   double         arg1;
+   double         arg2;
+   double         retval;
+   int            retvalwidth;
+   int            retvaldec;
+   int            handled;
 } HB_MATH_EXCEPTION;
 
-typedef int (* HB_MATH_HANDLERPROC)(HB_MATH_EXCEPTION * err);
+typedef int ( * HB_MATH_HANDLERPROC )( HB_MATH_EXCEPTION * err );
 
-extern void HB_EXPORT hb_mathResetError (void);
-extern int  HB_EXPORT hb_mathGetLastError (HB_MATH_EXCEPTION * phb_exc);
-extern int  HB_EXPORT hb_mathIsMathErr (void);
+extern HB_EXPORT void hb_mathResetError( void );
+extern HB_EXPORT int  hb_mathGetLastError( HB_MATH_EXCEPTION * phb_exc );
+extern HB_EXPORT int  hb_mathIsMathErr( void );
 
-extern int hb_mathSetDefErrMode (int imode);
-extern int hb_mathGetDefErrMode (void);
-extern int hb_matherr (HB_MATH_EXCEPTION * pexc);
+extern HB_EXPORT int hb_mathSetDefErrMode( int imode );
+extern HB_EXPORT int hb_mathGetDefErrMode( void );
+extern HB_EXPORT int hb_matherr( HB_MATH_EXCEPTION * pexc );
 
-extern HB_MATH_HANDLERPROC hb_mathSetHandler (HB_MATH_HANDLERPROC handlerproc);
-extern HB_MATH_HANDLERPROC hb_mathGetHandler (void);
+extern HB_EXPORT HB_MATH_HANDLERPROC hb_mathSetHandler( HB_MATH_HANDLERPROC handlerproc );
+extern HB_EXPORT HB_MATH_HANDLERPROC hb_mathGetHandler( void );
 
 /* JC1: Providing a prototype for a random number
    Is there any place better to put this? */
-HB_EXPORT double hb_random_num( void );
+extern HB_EXPORT double hb_random_num( void );
 
 /* include defines from math.ch */
 #include <math.ch>

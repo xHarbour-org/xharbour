@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.49 2007/10/31 16:20:51 marchuet Exp $
+ * $Id: hbapigt.h,v 1.50 2007/12/01 22:33:22 andijahja Exp $
  */
 
 /*
@@ -92,6 +92,7 @@ HB_EXTERN_BEGIN
 #define HB_CLR_BACKGROUND       3
 #define HB_CLR_UNSELECTED       4
 #define HB_CLR_MAX_             HB_CLR_UNSELECTED
+
 
 /* strings for borders (same as box.ch, but defined for use by C) */
 
@@ -230,66 +231,66 @@ extern HB_GT_COLDEF hb_gt_gcoldefs[ HB_GT_COLDEF_COUNT ];
 
 extern void   hb_gtInit( int iFilenoStdin, int iFilenoStdout, int iFilenoStderr );
 extern void   hb_gtExit( void );
-extern void   HB_EXPORT hb_gtAdjustPos( int iHandle, const char * pStr, ULONG ulLen );
-extern USHORT HB_EXPORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
-extern USHORT HB_EXPORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
-extern USHORT HB_EXPORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
-extern USHORT HB_EXPORT hb_gtColorSelect( USHORT uiColorIndex );
-extern USHORT HB_EXPORT hb_gtColorToN( char * szColorString );
-extern USHORT HB_EXPORT hb_gtDispBegin( void );
-extern USHORT HB_EXPORT hb_gtDispCount( void );
-extern USHORT HB_EXPORT hb_gtDispEnd( void );
-extern USHORT HB_EXPORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
-extern USHORT HB_EXPORT hb_gtGetBlink( BOOL * pbBlink );
-extern USHORT HB_EXPORT hb_gtGetColorStr( char * pszColorString );
-extern USHORT HB_EXPORT hb_gtGetCursor( USHORT * puiCursorShape );
-extern USHORT HB_EXPORT hb_gtGetPos( SHORT * piRow, SHORT * piCol );
-extern BOOL   HB_EXPORT hb_gtIsColor( void );
-extern USHORT HB_EXPORT hb_gtMaxCol( void );
-extern USHORT HB_EXPORT hb_gtMaxRow( void );
-extern USHORT HB_EXPORT hb_gtPostExt( void );
-extern USHORT HB_EXPORT hb_gtPreExt( void );
-extern USHORT HB_EXPORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
-extern USHORT HB_EXPORT hb_gtResume( void ); /* resume the terminal after the shell output */
-extern int    HB_EXPORT hb_gtExtendedKeySupport( void );
-extern int    HB_EXPORT hb_gtReadKey( HB_inkey_enum eventmask );
-extern USHORT HB_EXPORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
-extern USHORT HB_EXPORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
-extern USHORT HB_EXPORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
-extern USHORT HB_EXPORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
-extern USHORT HB_EXPORT hb_gtScrDim( USHORT * puiHeight, USHORT * puiWidth );
-extern USHORT HB_EXPORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols );
-extern USHORT HB_EXPORT hb_gtSetBlink( BOOL bBlink );
-extern USHORT HB_EXPORT hb_gtSetColorStr( const char * pszColorString );
-extern USHORT HB_EXPORT hb_gtSetCursor( USHORT uiCursorShape );
-extern USHORT HB_EXPORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
-extern USHORT HB_EXPORT hb_gtSetPos( SHORT iRow, SHORT iCol );
-extern USHORT HB_EXPORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode );
-extern USHORT HB_EXPORT hb_gtSetSnowFlag( BOOL bNoSnow );
-extern void   HB_EXPORT hb_gtTone( double dFrequency, double dDuration );
-extern USHORT HB_EXPORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
-extern USHORT HB_EXPORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen, BOOL bSetPos );
-extern USHORT HB_EXPORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
-extern int    HB_EXPORT hb_gtCurrentColor( void );
-extern int    HB_EXPORT hb_gtIndexedColor( int idx );
-extern char   HB_EXPORT * hb_gtVersion( int iType );
+extern HB_EXPORT void   hb_gtAdjustPos( int iHandle, const char * pStr, ULONG ulLen );
+extern HB_EXPORT USHORT hb_gtBox( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight, BYTE * pbyFrame );
+extern HB_EXPORT USHORT hb_gtBoxD( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
+extern HB_EXPORT USHORT hb_gtBoxS( SHORT uiTop, SHORT uiLeft, SHORT uiBottom, SHORT uiRight );
+extern HB_EXPORT USHORT hb_gtColorSelect( USHORT uiColorIndex );
+extern HB_EXPORT USHORT  hb_gtColorToN( char * szColorString );
+extern HB_EXPORT USHORT hb_gtDispBegin( void );
+extern HB_EXPORT USHORT  hb_gtDispCount( void );
+extern HB_EXPORT USHORT hb_gtDispEnd( void );
+extern HB_EXPORT USHORT hb_gtDrawShadow( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
+extern HB_EXPORT USHORT hb_gtGetBlink( BOOL * pbBlink );
+extern HB_EXPORT USHORT hb_gtGetColorStr( char * pszColorString );
+extern HB_EXPORT USHORT hb_gtGetCursor( USHORT * puiCursorShape );
+extern HB_EXPORT USHORT hb_gtGetPos( SHORT * piRow, SHORT * piCol );
+extern HB_EXPORT BOOL    hb_gtIsColor( void );
+extern HB_EXPORT USHORT  hb_gtMaxCol( void );
+extern HB_EXPORT USHORT  hb_gtMaxRow( void );
+extern HB_EXPORT USHORT hb_gtPostExt( void );
+extern HB_EXPORT USHORT hb_gtPreExt( void );
+extern HB_EXPORT USHORT hb_gtSuspend( void ); /* prepare the reminal for shell output */
+extern HB_EXPORT USHORT hb_gtResume( void ); /* resume the terminal after the shell output */
+extern HB_EXPORT int    hb_gtExtendedKeySupport( void );
+extern HB_EXPORT int     hb_gtReadKey( HB_inkey_enum eventmask );
+extern HB_EXPORT USHORT hb_gtRectSize( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, UINT * puiBuffSize );
+extern HB_EXPORT USHORT hb_gtRepChar( USHORT uiRow, USHORT uiCol, BYTE byChar, USHORT uiCount );
+extern HB_EXPORT USHORT hb_gtRest( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
+extern HB_EXPORT USHORT hb_gtSave( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, void * pScrBuff );
+extern HB_EXPORT USHORT hb_gtScrDim( USHORT * puiHeight, USHORT * puiWidth );
+extern HB_EXPORT USHORT hb_gtScroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, SHORT iRows, SHORT iCols );
+extern HB_EXPORT USHORT hb_gtSetBlink( BOOL bBlink );
+extern HB_EXPORT USHORT hb_gtSetColorStr( const char * pszColorString );
+extern HB_EXPORT USHORT hb_gtSetCursor( USHORT uiCursorShape );
+extern HB_EXPORT USHORT hb_gtSetMode( USHORT uiRows, USHORT uiCols );
+extern HB_EXPORT USHORT hb_gtSetPos( SHORT iRow, SHORT iCol );
+extern HB_EXPORT USHORT hb_gtSetPosContext( SHORT iRow, SHORT iCol, SHORT iMode );
+extern HB_EXPORT USHORT hb_gtSetSnowFlag( BOOL bNoSnow );
+extern HB_EXPORT void   hb_gtTone( double dFrequency, double dDuration );
+extern HB_EXPORT USHORT hb_gtWrite( BYTE * pbyStr, ULONG ulLen );
+extern HB_EXPORT USHORT hb_gtWriteAt( USHORT uiRow, USHORT uiCol, BYTE * pbyStr, ULONG ulLen, BOOL bSetPos );
+extern HB_EXPORT USHORT hb_gtWriteCon( BYTE * pbyStr, ULONG ulLen );
+extern HB_EXPORT int    hb_gtCurrentColor( void );
+extern HB_EXPORT int    hb_gtIndexedColor( int idx );
+extern HB_EXPORT char *  hb_gtVersion( int iType );
 #define hb_gtOutStd( pbyStr, ulLen ) hb_gt_OutStd( pbyStr, ulLen )
 #define hb_gtOutErr( pbyStr, ulLen ) hb_gt_OutErr( pbyStr, ulLen )
 
 /* GT Directed close request handler */
-extern void HB_EXPORT hb_gtHandleClose(void);
-extern BOOL HB_EXPORT hb_gtHandleShutdown(void);
-extern BOOL HB_EXPORT hb_gtSetCloseHandler(PHB_ITEM handler);
-extern PHB_ITEM HB_EXPORT hb_gtGetCloseHandler(void);
+extern HB_EXPORT void hb_gtHandleClose(void);
+extern HB_EXPORT BOOL hb_gtHandleShutdown(void);
+extern HB_EXPORT BOOL hb_gtSetCloseHandler(PHB_ITEM handler);
+extern HB_EXPORT PHB_ITEM hb_gtGetCloseHandler(void);
 
-extern int  HB_EXPORT   hb_gtGetCloseEvent( void );
-extern int  HB_EXPORT   hb_gtGetShutdownEvent( void );
-extern void HB_EXPORT   hb_gtSetCloseEvent( int iEvent );
-extern void HB_EXPORT   hb_gtSetShutdownEvent( int iEvent );
+extern HB_EXPORT   int  hb_gtGetCloseEvent( void );
+extern HB_EXPORT   int  hb_gtGetShutdownEvent( void );
+extern HB_EXPORT   void hb_gtSetCloseEvent( int iEvent );
+extern HB_EXPORT   void hb_gtSetShutdownEvent( int iEvent );
 
-extern void HB_EXPORT hb_gtSetResizeEvent( int iEvent );
-extern int  HB_EXPORT hb_gtGetResizeEvent( void );
-extern void HB_EXPORT hb_gtHandleResize( void );
+extern HB_EXPORT void hb_gtSetResizeEvent( int iEvent );
+extern HB_EXPORT int  hb_gtGetResizeEvent( void );
+extern HB_EXPORT void hb_gtHandleResize( void );
 
 /* Undocumented CA-Clipper 5.x GT API calls */
 
@@ -298,22 +299,22 @@ extern void HB_EXPORT hb_gtHandleResize( void );
 #define HB_GT_RGB void
 #define HB_GT_SLR void
 
-extern void   hb_gtWCreate( HB_GT_RECT * rect, HB_GT_WND ** wnd );
-extern void   hb_gtWDestroy( HB_GT_WND * wnd );
-extern BOOL   hb_gtWFlash( void );
-extern void   hb_gtWApp( HB_GT_WND ** wnd );
-extern void   hb_gtWCurrent( HB_GT_WND * wnd );
-extern void   hb_gtWPos( HB_GT_WND * wnd, HB_GT_RECT * rect );
-extern BOOL   hb_gtWVis( HB_GT_WND * wnd, USHORT uiStatus );
-
-extern USHORT HB_EXPORT hb_gtSLR( HB_GT_SLR * pSLR ); /* System Level Request */
-extern USHORT HB_EXPORT hb_gtModalRead( void * );
-extern USHORT HB_EXPORT hb_gtBeginWrite( void );
-extern USHORT HB_EXPORT hb_gtEndWrite( void );
-extern USHORT HB_EXPORT hb_gtFlushCursor( void );
-extern USHORT HB_EXPORT hb_gtSetColor( HB_GT_RGB * color );
-extern USHORT HB_EXPORT hb_gtGetColor( HB_GT_RGB * color );
-extern USHORT HB_EXPORT hb_gtSetBorder( HB_GT_RGB * color );
+extern HB_EXPORT void    hb_gtWCreate( HB_GT_RECT * rect, HB_GT_WND ** wnd );
+extern HB_EXPORT void    hb_gtWDestroy( HB_GT_WND * wnd );
+extern HB_EXPORT BOOL    hb_gtWFlash( void );
+extern HB_EXPORT void    hb_gtWApp( HB_GT_WND ** wnd );
+extern HB_EXPORT void    hb_gtWCurrent( HB_GT_WND * wnd );
+extern HB_EXPORT void    hb_gtWPos( HB_GT_WND * wnd, HB_GT_RECT * rect );
+extern HB_EXPORT BOOL    hb_gtWVis( HB_GT_WND * wnd, USHORT uiStatus );
+       
+extern HB_EXPORT USHORT hb_gtSLR( HB_GT_SLR * pSLR ); /* System Level Request */
+extern HB_EXPORT USHORT hb_gtModalRead( void * );
+extern HB_EXPORT USHORT hb_gtBeginWrite( void );
+extern HB_EXPORT USHORT hb_gtEndWrite( void );
+extern HB_EXPORT USHORT hb_gtFlushCursor( void );
+extern HB_EXPORT USHORT hb_gtSetColor( HB_GT_RGB * color );
+extern HB_EXPORT USHORT hb_gtGetColor( HB_GT_RGB * color );
+extern HB_EXPORT USHORT hb_gtSetBorder( HB_GT_RGB * color );
 
 /* New CT3 Windows GT API calls (oh1) */
 
@@ -356,35 +357,35 @@ typedef struct _hb_gt_wnd
    HB_GT_GOBJECT * hb_gt_gobjects_end;
 } HB_CT_WND;
 
-extern SHORT      HB_EXPORT  hb_ctGetClearA( void );
-extern SHORT      HB_EXPORT  hb_ctGetClearB( void );
-extern SHORT      HB_EXPORT  hb_ctSetClearA( SHORT nClearA );
-extern SHORT      HB_EXPORT  hb_ctSetClearB( SHORT nClearB );
-extern int        HB_EXPORT  hb_ctSetCurColor( int iColor );
-extern SHORT      HB_EXPORT  hb_ctSetPos( SHORT iRow, SHORT iCol );
-extern SHORT      HB_EXPORT  hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
-extern SHORT      HB_EXPORT  hb_ctMaxCol( BOOL lMode );
-extern SHORT      HB_EXPORT  hb_ctMaxRow( BOOL lMode );
-extern int        HB_EXPORT  hb_ctMouseCol( void );
-extern int        HB_EXPORT  hb_ctMouseRow( void );
-extern SHORT      HB_EXPORT  hb_ctWAClose( void );
-extern SHORT      HB_EXPORT  hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern SHORT      HB_EXPORT  hb_ctWCenter( BOOL WCen );
-extern SHORT      HB_EXPORT  hb_ctWClose( void );
-extern HB_EXPORT  HB_CT_WND* hb_ctWCurrent( void );
-extern SHORT      HB_EXPORT  hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern void       HB_EXPORT  hb_ctWFree( HB_CT_WND * wnd );
-extern void       HB_EXPORT  hb_ctWind( HB_CT_WND *** Wind, SHORT * WMax );
-extern void       HB_EXPORT  hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
-extern SHORT      HB_EXPORT  hb_ctWMove( SHORT FRow, SHORT FCol );
-extern HB_EXPORT  HB_CT_WND* hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
-extern SHORT      HB_EXPORT  hb_ctWNum( void );
-extern SHORT      HB_EXPORT  hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol, BOOL lDel );
-extern SHORT      HB_EXPORT  hb_ctWSelect( SHORT iwnd );
-extern BOOL       HB_EXPORT  hb_ctWSetMove( BOOL Mode );
-extern SHORT      HB_EXPORT  hb_ctWSetShadow( SHORT nAttr );
-extern void       HB_EXPORT  hb_ctWStack( SHORT ** Stac, SHORT * SMax );
-extern SHORT      HB_EXPORT  hb_ctWStep( SHORT nRow, SHORT nCol );
+extern HB_EXPORT  SHORT      hb_ctGetClearA( void );
+extern HB_EXPORT  SHORT      hb_ctGetClearB( void );
+extern HB_EXPORT  SHORT      hb_ctSetClearA( SHORT nClearA );
+extern HB_EXPORT  SHORT      hb_ctSetClearB( SHORT nClearB );
+extern HB_EXPORT  int        hb_ctSetCurColor( int iColor );
+extern HB_EXPORT  SHORT      hb_ctSetPos( SHORT iRow, SHORT iCol );
+extern HB_EXPORT  SHORT      hb_ctShadow( SHORT iTop, SHORT iLeft, SHORT iBottom, SHORT iRight, BYTE byAttr );
+extern HB_EXPORT  SHORT      hb_ctMaxCol( BOOL lMode );
+extern HB_EXPORT  SHORT      hb_ctMaxRow( BOOL lMode );
+extern HB_EXPORT  int        hb_ctMouseCol( void );
+extern HB_EXPORT  int        hb_ctMouseRow( void );
+extern HB_EXPORT  SHORT      hb_ctWAClose( void );
+extern HB_EXPORT  SHORT      hb_ctWBoard( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern HB_EXPORT  SHORT      hb_ctWCenter( BOOL WCen );
+extern HB_EXPORT  SHORT      hb_ctWClose( void );
+extern HB_EXPORT  HB_CT_WND * hb_ctWCurrent( void );
+extern HB_EXPORT  SHORT      hb_ctWFormat( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern HB_EXPORT  void       hb_ctWFree( HB_CT_WND * wnd );
+extern HB_EXPORT  void       hb_ctWind( HB_CT_WND *** Wind, SHORT * WMax );
+extern HB_EXPORT  void       hb_ctWMode( BOOL MFRow, BOOL MFCol, BOOL MLRow, BOOL MLCol );
+extern HB_EXPORT  SHORT      hb_ctWMove( SHORT FRow, SHORT FCol );
+extern HB_EXPORT  HB_CT_WND * hb_ctWNew( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol );
+extern HB_EXPORT  SHORT      hb_ctWNum( void );
+extern HB_EXPORT  SHORT      hb_ctWOpen( SHORT FRow, SHORT FCol, SHORT LRow, SHORT LCol, BOOL lDel );
+extern HB_EXPORT  SHORT      hb_ctWSelect( SHORT iwnd );
+extern HB_EXPORT  BOOL       hb_ctWSetMove( BOOL Mode );
+extern HB_EXPORT  SHORT      hb_ctWSetShadow( SHORT nAttr );
+extern HB_EXPORT  void       hb_ctWStack( SHORT ** Stac, SHORT * SMax );
+extern HB_EXPORT  SHORT      hb_ctWStep( SHORT nRow, SHORT nCol );
 
 /* Private interface listed below. these are common to all platforms */
 
@@ -417,7 +418,7 @@ extern int    hb_gt_RectSize( USHORT rows, USHORT cols );
 extern void   hb_gt_Replicate( USHORT uiTop, USHORT uiLeft, BYTE byAttr, BYTE byChar, ULONG ulLen );
 extern SHORT  hb_gt_Row( void );
 extern void   hb_gt_Scroll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr, SHORT iRows, SHORT iCols );
-extern void   HB_EXPORT hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
+extern HB_EXPORT void   hb_gt_SetAttribute( USHORT uiTop, USHORT uiLeft, USHORT uiBottom, USHORT uiRight, BYTE byAttr );
 extern void   hb_gt_SetBlink( BOOL bBlink );
 extern void   hb_gt_SetCursorStyle( USHORT uiCursorShape );
 extern BOOL   hb_gt_SetMode( USHORT uiRows, USHORT uiCols );
@@ -434,10 +435,10 @@ extern void   hb_gt_SetDispCP( char * pszTermCDP, char * pszHostCDP, BOOL bBox )
 extern void   hb_gt_SetKeyCP( char * pszTermCDP, char * pszHostCDP );
 
 /* Clipboard support */
-extern void HB_EXPORT hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize );
-extern void HB_EXPORT hb_gt_SetClipboard( char *szData, ULONG ulSize );
-extern ULONG HB_EXPORT hb_gt_GetClipboardSize( void );
-extern void HB_EXPORT hb_gt_ProcessMessages( void );
+extern HB_EXPORT void hb_gt_GetClipboard( char *szData, ULONG *pulMaxSize );
+extern HB_EXPORT void hb_gt_SetClipboard( char *szData, ULONG ulSize );
+extern HB_EXPORT ULONG hb_gt_GetClipboardSize( void );
+extern HB_EXPORT void hb_gt_ProcessMessages( void );
 
 /* Keyboard related declarations */
 
@@ -446,31 +447,31 @@ extern void HB_EXPORT hb_gt_ProcessMessages( void );
                              used for all the Harbour builds that need it */
 
 /* Harbour keyboard support functions */
-extern HB_EXPORT int  hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );      /* Wait for keyboard input */
-extern int  hb_inkeyGet( HB_inkey_enum event_mask );  /* Extract the next key from the Harbour keyboard buffer */
-extern HB_EXPORT void hb_inkeyPut( int iKey );        /* Inserts an inkey code into the keyboard buffer */
-extern HB_EXPORT int  hb_inkeyLast( HB_inkey_enum event_mask );   /* Return the value of the last key that was extracted */
-extern HB_EXPORT int  hb_setInkeyLast( int iKey );    /* Force a value to LASTKEY and return the previous value */
-extern HB_EXPORT int  hb_inkeyNext( HB_inkey_enum event_mask );           /* Return the next key without extracting it */
-extern HB_EXPORT void hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */
-extern HB_EXPORT void hb_inkeyReset( void );          /* Reset the Harbour keyboard buffer */
-extern HB_EXPORT int  hb_inkeyTranslate( int key, HB_inkey_enum event_make ); /* Translation extended codes to normal codes, if needed */
-extern void hb_inkeyExit( void );
+extern HB_EXPORT int     hb_inkey( BOOL bWait, double dSeconds, HB_inkey_enum event_mask );  /* Wait for keyboard input */
+extern HB_EXPORT int     hb_inkeyGet( HB_inkey_enum event_mask );  /* Extract the next key from the Harbour keyboard buffer */
+extern HB_EXPORT void    hb_inkeyPut( int iKey );        /* Inserts an inkey code into the keyboard buffer */
+extern HB_EXPORT int     hb_inkeyLast( HB_inkey_enum event_mask );   /* Return the value of the last key that was extracted */
+extern HB_EXPORT int     hb_setInkeyLast( int iKey );    /* Force a value to LASTKEY and return the previous value */
+extern HB_EXPORT int     hb_inkeyNext( HB_inkey_enum event_mask );           /* Return the next key without extracting it */
+extern HB_EXPORT void    hb_inkeyPoll( void );           /* Poll the console keyboard to stuff the Harbour buffer */
+extern HB_EXPORT void    hb_inkeyReset( void );          /* Reset the Harbour keyboard buffer */
+extern HB_EXPORT int     hb_inkeyTranslate( int key, HB_inkey_enum event_make ); /* Translation extended codes to normal codes, if needed */
+extern HB_EXPORT void    hb_inkeyExit( void );           /* reset inkey pool to default state and free any allocated resources */
 
 /* Mouse related declarations */
 
 /* Public interface. These should never change, only be added to. */
 
-extern BOOL   HB_EXPORT hb_mouseIsPresent( void );
-extern BOOL   HB_EXPORT hb_mouseGetCursor( void );
-extern void   HB_EXPORT hb_mouseSetCursor( BOOL bVisible );
-extern int    HB_EXPORT hb_mouseCol( void );
-extern int    HB_EXPORT hb_mouseRow( void );
-extern void   HB_EXPORT hb_mouseSetPos( int iRow, int iCol );
-extern BOOL   HB_EXPORT hb_mouseIsButtonPressed( int iButton );
-extern int    HB_EXPORT hb_mouseCountButton( void );
-extern void   HB_EXPORT hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight );
-extern void   HB_EXPORT hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
+extern HB_EXPORT BOOL   hb_mouseIsPresent( void );
+extern HB_EXPORT BOOL   hb_mouseGetCursor( void );
+extern HB_EXPORT void   hb_mouseSetCursor( BOOL bVisible );
+extern HB_EXPORT int    hb_mouseCol( void );
+extern HB_EXPORT int    hb_mouseRow( void );
+extern HB_EXPORT void   hb_mouseSetPos( int iRow, int iCol );
+extern HB_EXPORT BOOL   hb_mouseIsButtonPressed( int iButton );
+extern HB_EXPORT int    hb_mouseCountButton( void );
+extern HB_EXPORT void   hb_mouseSetBounds( int iTop, int iLeft, int iBottom, int iRight );
+extern HB_EXPORT void   hb_mouseGetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight );
 
 /* Private interface listed below. these are common to all platforms */
 
@@ -501,26 +502,26 @@ extern HB_EXPORT void hb_gt_hasChanged( int status );
 extern void hb_gt_update( int status );
 
 /* Support for HB_GT_GOBJECT system */
-extern void HB_EXPORT hb_gtAddGobject( HB_GT_GOBJECT *gobject );
-extern void HB_EXPORT hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
-extern void HB_EXPORT hb_gtClearGobjects( void );
+extern HB_EXPORT void hb_gtAddGobject( HB_GT_GOBJECT *gobject );
+extern HB_EXPORT void hb_gtDestroyGobject( HB_GT_GOBJECT *gobject );
+extern HB_EXPORT void hb_gtClearGobjects( void );
 extern HB_EXPORT HB_GT_COLDEF * hb_gt_gcolorFromString( char *color_name );
-extern BOOL HB_EXPORT hb_gtGobjectInside( HB_GT_GOBJECT *gobject, int x1, int y1, int x2, int y2 );
+extern HB_EXPORT BOOL hb_gtGobjectInside( HB_GT_GOBJECT *gobject, int x1, int y1, int x2, int y2 );
 
 /* Support for clipboard system */
-extern void HB_EXPORT hb_gtGetClipboard( char *szData, ULONG *pulMaxSize );
-extern void HB_EXPORT hb_gtSetClipboard( char *szData, ULONG ulSize );
-extern ULONG HB_EXPORT hb_gtGetClipboardSize( void );
-extern void HB_EXPORT hb_gtPasteFromClipboard( ULONG ulSize );
+extern HB_EXPORT void hb_gtGetClipboard( char *szData, ULONG *pulMaxSize );
+extern HB_EXPORT void hb_gtSetClipboard( char *szData, ULONG ulSize );
+extern HB_EXPORT ULONG hb_gtGetClipboardSize( void );
+extern HB_EXPORT void hb_gtPasteFromClipboard( ULONG ulSize );
 
-extern void HB_EXPORT hb_gtProcessMessages( void );
+extern HB_EXPORT void hb_gtProcessMessages( void );
 
 /*
    GT information query or update. msgType determines the kind of information
    to be queried or changed, the parameters are provided to pass status changes;
    different messages may use different parameters.
 */
-extern int  HB_EXPORT hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
+extern HB_EXPORT int  hb_gt_info(int iMsgType, BOOL bUpdate, int iParm, void *vpParam );
 
 /* Graphics API */
 extern int  hb_gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int iBottom, int iRight, int iColor );
@@ -663,7 +664,7 @@ typedef struct _HB_GT_INIT
     void    (* mouseInit) ( PHB_GT_FUNCS );
 } HB_GT_INIT, * PHB_GT_INIT;
 
-extern BOOL   HB_EXPORT hb_gtRegister( PHB_GT_INIT gtInit );
+extern HB_EXPORT BOOL   hb_gtRegister( PHB_GT_INIT gtInit );
 
 /* Private interface in multi GT version, common to all platforms */
 
@@ -725,11 +726,11 @@ extern void   HB_GT_FUNC( mouse_SetBounds( int iTop, int iLeft, int iBottom, int
 extern void   HB_GT_FUNC( mouse_GetBounds( int * piTop, int * piLeft, int * piBottom, int * piRight ) );
 
 /* Gt clipboard functions */
-extern void HB_EXPORT HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) );
-extern void HB_EXPORT HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) );
-extern ULONG HB_EXPORT HB_GT_FUNC( gt_GetClipboardSize( void ) );
+extern HB_EXPORT void HB_GT_FUNC( gt_GetClipboard( char *szData, ULONG *pulMaxSize ) );
+extern HB_EXPORT void HB_GT_FUNC( gt_SetClipboard( char *szData, ULONG ulSize ) );
+extern HB_EXPORT ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) );
 
-extern void HB_EXPORT HB_GT_FUNC( gt_ProcessMessages( void ) );
+extern HB_EXPORT void HB_GT_FUNC( gt_ProcessMessages( void ) );
 
 /* Gt to driver communication */
 /*
@@ -751,7 +752,7 @@ extern int HB_GT_FUNC( gt_gfxPrimitive( int iMsgType, int iTop, int iLeft, int i
 extern void HB_GT_FUNC( gt_gfxText( int iTop, int iLeft, char *cBuf, int iColor, int iSize, int iWidth ) );
 
 
-extern HB_EXPORT void hb_gtSetDefault( const char * szGtName );
+extern void HB_EXPORT hb_gtSetDefault( const char * szGtName );
 
 #else
 #  define HB_GT_FUNC(x)   HB_GT_FUNC_(x)
@@ -763,8 +764,8 @@ extern HB_EXPORT void hb_gtSetDefault( const char * szGtName );
 
 /* Public interface. These should never change, only be added to. */
 
-extern void   hb_setkeyInit( void );
-extern void   hb_setkeyExit( void );
+extern HB_EXPORT void    hb_setkeyInit( void );
+extern HB_EXPORT void    hb_setkeyExit( void );
 
 /* Private interface listed below. these are common to all platforms */
 

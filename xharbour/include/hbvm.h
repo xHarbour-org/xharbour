@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.56 2007/09/25 07:32:33 marchuet Exp $
+ * $Id: hbvm.h,v 1.57 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -100,16 +100,16 @@ extern HB_EXPORT void     hb_vmExplicitStartup( PHB_SYMB pSymbol );
 extern void hb_vmSymbolInit_RT( void );   /* initialization of runtime support symbols */
 
 /* Harbour virtual machine escaping API */
-extern void    HB_EXPORT hb_vmRequestDebug( void );
-extern void    HB_EXPORT hb_vmRequestBreak( PHB_ITEM pItem );
-extern void    HB_EXPORT hb_vmRequestCancel( void );
-extern void    HB_EXPORT hb_vmRequestQuit( void );
-extern void    HB_EXPORT hb_vmRequestEndProc( void );
-extern USHORT  HB_EXPORT hb_vmRequestQuery( void );
-extern BOOL    HB_EXPORT hb_vmRequestReenter( void );
-extern void    HB_EXPORT hb_vmRequestRestore( void );
-extern void    HB_EXPORT hb_vmRequestReset( void );
-extern void    HB_EXPORT hb_vmRequest( USHORT );
+extern HB_EXPORT void    hb_vmRequestDebug( void );
+extern HB_EXPORT void    hb_vmRequestBreak( PHB_ITEM pItem );
+extern HB_EXPORT void    hb_vmRequestCancel( void );
+extern HB_EXPORT void    hb_vmRequestQuit( void );
+extern HB_EXPORT void    hb_vmRequestEndProc( void );
+extern HB_EXPORT USHORT  hb_vmRequestQuery( void );
+extern HB_EXPORT BOOL    hb_vmRequestReenter( void );
+extern HB_EXPORT void    hb_vmRequestRestore( void );
+extern HB_EXPORT void    hb_vmRequestReset( void );
+extern HB_EXPORT void    hb_vmRequest( USHORT );
 
 /* Return values of hb_vmRequestQuery() */
 #define HB_QUIT_REQUESTED       1   /* immediately quit the application */
@@ -119,14 +119,14 @@ extern void    HB_EXPORT hb_vmRequest( USHORT );
 /* Public PCode functions */
 
 /* Execution */
-HB_EXPORT extern void     hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
-HB_EXPORT extern void     hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
-HB_EXPORT extern void     hb_vmSend( USHORT uiParams ); /* sends a message to an object */
-HB_EXPORT extern PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
+extern HB_EXPORT void     hb_vmDo( USHORT uiParams );      /* invoke the virtual machine */
+extern HB_EXPORT void     hb_vmFunction( USHORT uiParams ); /* executes a function saving its result */
+extern HB_EXPORT void     hb_vmSend( USHORT uiParams ); /* sends a message to an object */
+extern HB_EXPORT PHB_ITEM hb_vmEvalBlock( PHB_ITEM pBlockItem ); /* executes passed codeblock with no arguments */
 /* executes passed codeblock with variable number of arguments */
-HB_EXPORT extern PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
-HB_EXPORT extern PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem ); /* executes codeblock or macro pointed by given item */
-HB_EXPORT extern void     hb_vmDestroyBlockOrMacro( PHB_ITEM pItem ); /* destroy codeblock or macro in given item */
+extern HB_EXPORT PHB_ITEM hb_vmEvalBlockV( PHB_ITEM pBlockItem, ULONG ulArgCount, ... );
+extern HB_EXPORT PHB_ITEM hb_vmEvalBlockOrMacro( PHB_ITEM pItem ); /* executes codeblock or macro pointed by given item */
+extern HB_EXPORT void     hb_vmDestroyBlockOrMacro( PHB_ITEM pItem ); /* destroy codeblock or macro in given item */
 
 /* Push */
 extern HB_EXPORT void     hb_vmPush( PHB_ITEM pItem );     /* pushes a generic item onto the stack */
