@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.165 2007/12/19 13:15:22 lculik Exp $
+ * $Id: filesys.c,v 1.166 2007/12/21 16:09:07 likewolf Exp $
  */
 
 /*
@@ -182,13 +182,11 @@
    extern int fdatasync(int fildes);
 #elif defined(HB_OS_DOS)
    #include <dos.h>
-
 #elif defined(HB_OS_OS2)
    #include <sys/signal.h>
    #include <sys/process.h>
    #include <sys/wait.h>
    #include <share.h>
-
    #ifndef SH_COMPAT
       #define SH_COMPAT SH_DENYNO
    #endif
@@ -205,9 +203,13 @@
 #elif defined( HB_WIN32_IO )
    #include <windows.h>
 
-   #if ( defined(__DMC__) || defined( _MSC_VER ) || defined( __LCC__ ) ) && !defined( INVALID_SET_FILE_POINTER )
+   #if !defined( INVALID_SET_FILE_POINTER ) && \
+       ( defined(__DMC__) || defined( _MSC_VER ) || defined( __LCC__ ) )
       #define INVALID_SET_FILE_POINTER ((DWORD)-1)
    #endif
+#endif
+#if defined( HB_USE_SHARELOCKS ) && defined( HB_USE_BSDLOCKS )
+   #include <sys/file.h>
 #endif
 
 #if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
@@ -223,6 +225,7 @@
    #endif
 #endif
 
+#if defined(OS_HAS_DRIVE_LETTER)
 /* 27/08/2004 - <maurilio.longo@libero.it>
                 HB_FS_GETDRIVE() should return a number in the range 0..25 ('A'..'Z')
                 HB_FS_SETDRIVE() should accept a number inside same range.
@@ -260,6 +263,7 @@
    #define HB_FS_SETDRIVE(n)  _chdrive( ( n ) + 1 )
 
 #endif
+#endif /* OS_HAS_DRIVE_LETTER */
 
 #ifndef O_BINARY
    #define O_BINARY     0       /* O_BINARY not defined on Linux */
@@ -3531,6 +3535,15 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
 #if defined( HB_USE_SHARELOCKS )
    if( hFile != FS_ERROR && uiExFlags & FXO_SHARELOCK )
    {
+#if defined( HB_USE_BSDLOCKS )
+      int iLock;
+      if( ( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ ||
+          ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0 )
+         iLock = LOCK_SH | LOCK_NB;
+      else
+         iLock = LOCK_EX | LOCK_NB;
+      if( flock( hFile, iLock ) != 0 )
+#else
       USHORT uiLock;
       if( ( uiFlags & ( FO_READ | FO_WRITE | FO_READWRITE ) ) == FO_READ ||
           ( uiFlags & ( FO_DENYREAD | FO_DENYWRITE | FO_EXCLUSIVE ) ) == 0 )
@@ -3539,6 +3552,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
          uiLock = FL_LOCK | FLX_EXCLUSIVE;
 
       if( !hb_fsLockLarge( hFile, HB_SHARELOCK_POS, HB_SHARELOCK_SIZE, uiLock ) )
+#endif
       {
          hb_fsClose( hFile );
          hFile = FS_ERROR;

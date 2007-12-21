@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.50 2007/12/21 12:12:21 likewolf Exp $
+ * $Id: hbapifs.h,v 1.51 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -162,6 +162,12 @@ extern HB_EXPORT BOOL hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
 #  define HB_USE_SHARELOCKS
 #  define HB_SHARELOCK_POS          0x7fffffffUL
 #  define HB_SHARELOCK_SIZE         0x1UL
+#  if defined( HB_USE_BSDLOCKS_OFF )
+#     undef HB_USE_BSDLOCKS
+#  elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) ) && \
+        !defined( __WATCOMC__ ) && !defined( HB_USE_BSDLOCKS )
+#     define HB_USE_BSDLOCKS
+#  endif
 #endif
 
 #define HB_MAX_DRIVE_LENGTH   10

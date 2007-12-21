@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5821 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: ChangeLog,v 1.5822 2007/12/21 17:12:41 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,24 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-21 21:43 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapifs.h
+  * source/rtl/filesys.c
+    + added support for DOS/Windows DENY_* flag emulation in POSIX
+      systems using BSD locks. So far such emulatin was done with
+      standard POSIX locks. The new emulation can be enabled by setting
+      HB_USE_BSDLOCKS and disabled by HB_USE_BSDLOCKS_OFF. By default
+      it's enabled in Linux and BSD* based systems.
+      Please not that it BSD locks work in differ way then POSIX ones.
+      They are bound with file handle and process ID not i-node and PID.
+      It will allow to synchronize even single process but it will not
+      work in NFS and some old BSD and Linux kernels. This synchronization
+      cannot be used also between different platforms. If someone needs
+      such synchronization then he should build Harbour on all platforms
+      with HB_USE_BSDLOCKS_OFF and HB_USE_SHARELOCKS with valid multi
+      platform lock offset
+      (Borrowed from Harbour, by Przemyslaw Czerpak)
 
 2007-12-21 20:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/console.c
