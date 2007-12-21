@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.49 2007/12/21 10:42:29 likewolf Exp $
+ * $Id: hbapifs.h,v 1.50 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -143,9 +143,9 @@ extern HB_EXPORT ULONG    hb_fsTell       ( FHANDLE hFileHandle ); /* retrieve t
 extern HB_EXPORT BOOL     hb_fsSetDevMode ( FHANDLE hFileHandle, USHORT uiDevMode ); /* change the device mode of a file (text/binary) */
 extern HB_EXPORT void     hb_fsSetError   ( USHORT uiError ); /* set the file system DOS error number */
 extern HB_EXPORT void     hb_fsSetIOError ( BOOL fResult, USHORT uiOperation ); /* set the file system error number after IO operation */
-extern HB_EXPORT USHORT   hb_fsWrite      ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
-extern HB_EXPORT ULONG    hb_fsWriteLarge ( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
-extern HB_EXPORT FHANDLE  hb_fsPOpen( BYTE * pFilename, BYTE * pMode );
+extern HB_EXPORT USHORT   hb_fsWrite      ( FHANDLE hFileHandle, const BYTE * pBuff, USHORT ulCount ); /* write to an open file from a buffer (<=64K) */
+extern HB_EXPORT ULONG    hb_fsWriteLarge ( FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount ); /* write to an open file from a buffer (>64K) */
+extern HB_EXPORT FHANDLE  hb_fsPOpen      ( BYTE * pFilename, BYTE * pMode );
 extern HB_EXPORT void     hb_fsDirectory( PHB_ITEM Dir, char* szSkleton, char* szAttributes, BOOL bDirOnly, BOOL bFullPath );
 extern HB_EXPORT void     hb_fsDirectoryRecursive( PHB_ITEM Dir, char* szSkleton, char* szFName, char* szAttributes, BOOL bMatchCase );
 
@@ -170,14 +170,14 @@ extern HB_EXPORT BOOL hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
 /* Filename support */
 typedef struct
 {
-   char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
    char * szPath;
    char * szName;
    char * szExtension;
    char * szDrive;
+   char   szBuffer[ _POSIX_PATH_MAX + HB_MAX_DRIVE_LENGTH + 4 ];
 } HB_FNAME, * PHB_FNAME, * HB_FNAME_PTR;
 
-extern HB_EXPORT PHB_FNAME hb_fsFNameSplit( char * pszFileName ); /* Split given filename into path, name and extension */
+extern HB_EXPORT PHB_FNAME hb_fsFNameSplit( const char * pszFileName ); /* Split given filename into path, name and extension */
 extern HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName ); /* This function joins path, name and extension into a string with a filename */
 
 /* Searchable path support */

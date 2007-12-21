@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.9 2007/01/13 18:54:08 ronpinkas Exp $
+ * $Id: hbppdef.h,v 1.1 2007/02/27 15:59:42 druzus Exp $
  */
 
 /*
@@ -110,8 +110,8 @@ extern DEFINES * hb_pp_AddDefine( char *, char *, BOOL );         /* Add new #de
 extern int    hb_pp_lInclude;
 extern int *  hb_pp_aCondCompile;
 extern int    hb_pp_nCondCompile;
-extern char * hb_pp_szErrors[];
-extern char * hb_pp_szWarnings[];
+extern const char * hb_pp_szErrors[];
+extern const char * hb_pp_szWarnings[];
 extern int    hb_pp_nEmptyStrings;
 extern BOOL   hb_pp_bInline;
 extern int    hb_pp_LastOutLine;

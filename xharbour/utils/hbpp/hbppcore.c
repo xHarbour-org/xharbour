@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.234 2007/01/13 18:54:08 ronpinkas Exp $
+ * $Id: hbppcore.c,v 1.1 2007/02/27 15:59:42 druzus Exp $
  */
 
 /*
@@ -233,7 +233,7 @@ int iBeginDump = 0;
 int iEndDump = 0;
 
 /* Table with parse errors */
-char * hb_pp_szErrors[] =
+const char * hb_pp_szErrors[] =
 {
    "Can\'t open #include file: \'%s\'; %s",
    "#else|#elif does not match #if[def]",
@@ -267,7 +267,7 @@ char * hb_pp_szErrors[] =
 };
 
 /* Table with warnings */
-char * hb_pp_szWarnings[] =
+const char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s",
    "1No directives in command definitions file",

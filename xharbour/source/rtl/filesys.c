@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.164 2007/10/31 12:11:10 marchuet Exp $
+ * $Id: filesys.c,v 1.165 2007/12/19 13:15:22 lculik Exp $
  */
 
 /*
@@ -2029,7 +2029,7 @@ USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    return uiRead;
 }
 
-USHORT  HB_EXPORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
+HB_EXPORT USHORT hb_fsWrite( FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
 {
    HB_THREAD_STUB
    USHORT uiWritten;
@@ -2194,7 +2194,7 @@ ULONG   HB_EXPORT hb_fsReadLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCou
    return ulRead;
 }
 
-ULONG   HB_EXPORT hb_fsWriteLarge( FHANDLE hFileHandle, BYTE * pBuff, ULONG ulCount )
+HB_EXPORT ULONG hb_fsWriteLarge( FHANDLE hFileHandle, const BYTE * pBuff, ULONG ulCount )
 {
    HB_THREAD_STUB
    ULONG ulWritten;

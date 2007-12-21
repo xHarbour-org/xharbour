@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.3 2007/04/09 21:06:28 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.4 2007/04/16 03:44:07 ronpinkas Exp $
  */
 
 /*
@@ -31,7 +31,7 @@
 #include <errno.h>
 
 static void hb_pp_ErrorGen( void * cargo,
-                            char * szMsgTable[], char cPrefix, int iErrorCode,
+                            const char * szMsgTable[], char cPrefix, int iErrorCode,
                             const char * szParam1, const char * szParam2 )
 {
    HB_SYMBOL_UNUSED( cargo );

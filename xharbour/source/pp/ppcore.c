@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.260 2007/11/27 05:32:20 andijahja Exp $
+ * $Id: ppcore.c,v 1.261 2007/11/28 11:46:19 andijahja Exp $
  */
 
 /*
@@ -104,14 +104,14 @@
 
 
 /* warning messages */
-static char * hb_pp_szWarnings[] =
+static const char * hb_pp_szWarnings[] =
 {
    "1Redefinition or duplicate definition of #define %s",               /* C1005 */
    "1Overloaded #define %s"                                             /* Non Clipper */
 };
 
 /* error messages */
-static char * hb_pp_szErrors[] =
+static const char * hb_pp_szErrors[] =
 {
    "Illegal character: '\\x%s'",                                        /* C2004 */
    "Unterminated string: '%s'",                                         /* C2007 */
@@ -228,7 +228,7 @@ static void hb_pp_disp( PHB_PP_STATE pState, const char * szMessage )
 
 static void hb_pp_error( PHB_PP_STATE pState, char type, int iError, const char * szParam )
 {
-   char ** szMsgTable = type == 'W' ? hb_pp_szWarnings : hb_pp_szErrors;
+   const char ** szMsgTable = type == 'W' ? hb_pp_szWarnings : hb_pp_szErrors;
 
    if( pState->pErrorFunc )
    {
@@ -1748,7 +1748,7 @@ static PHB_PP_FILE hb_pp_FileNew( PHB_PP_STATE pState, char * szFileName,
    return pFile;
 }
 
-static PHB_PP_FILE hb_pp_FileBufNew( char * pLineBuf, ULONG ulLineBufLen )
+static PHB_PP_FILE hb_pp_FileBufNew( const char * pLineBuf, ULONG ulLineBufLen )
 {
    PHB_PP_FILE pFile;
 
@@ -5240,7 +5240,7 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 /*
  * read preprocess rules from file
  */
-void hb_pp_readRules( PHB_PP_STATE pState, char * szRulesFile )
+void hb_pp_readRules( PHB_PP_STATE pState, const char * szRulesFile )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ];
    PHB_PP_FILE pFile = pState->pFile;
@@ -5283,15 +5283,15 @@ void hb_pp_readRules( PHB_PP_STATE pState, char * szRulesFile )
 /*
  * close all open input files and set the given one as new
  */
-BOOL hb_pp_inFile( PHB_PP_STATE pState, char * szFileName, BOOL fSearchPath,
-                   FILE * file_in, BOOL fError )
+BOOL hb_pp_inFile( PHB_PP_STATE pState, const char * szFileName,
+                   BOOL fSearchPath, FILE * file_in, BOOL fError )
 {
    hb_pp_InFileFree( pState );
 
    pState->fError = FALSE;
 
-   pState->pFile = hb_pp_FileNew( pState, szFileName, FALSE, file_in,
-                                  fSearchPath, NULL );
+   pState->pFile = hb_pp_FileNew( pState, ( char * ) szFileName, FALSE,
+                                  file_in, fSearchPath, NULL );
    if( pState->pFile )
    {
       pState->iFiles++;
@@ -5305,7 +5305,8 @@ BOOL hb_pp_inFile( PHB_PP_STATE pState, char * szFileName, BOOL fSearchPath,
 /*
  * set output (.ppo) file
  */
-BOOL hb_pp_outFile( PHB_PP_STATE pState, char * szOutFileName, FILE * file_out )
+BOOL hb_pp_outFile( PHB_PP_STATE pState, const char * szOutFileName,
+                    FILE * file_out )
 {
    pState->fError = FALSE;
    hb_pp_OutFileFree( pState );
@@ -5334,7 +5335,7 @@ BOOL hb_pp_outFile( PHB_PP_STATE pState, char * szOutFileName, FILE * file_out )
 /*
  * set trace (.ppt) file
  */
-BOOL hb_pp_traceFile( PHB_PP_STATE pState, char * szTraceFileName, FILE * file_trace )
+BOOL hb_pp_traceFile( PHB_PP_STATE pState, const char * szTraceFileName, FILE * file_trace )
 {
    pState->fError = FALSE;
    hb_pp_TraceFileFree( pState );
@@ -5422,7 +5423,8 @@ BOOL hb_pp_eof( PHB_PP_STATE pState )
 /*
  * add new define value
  */
-void hb_pp_addDefine( PHB_PP_STATE pState, char * szDefName, char * szDefValue )
+void hb_pp_addDefine( PHB_PP_STATE pState, const char * szDefName,
+                      const char * szDefValue )
 {
    PHB_PP_TOKEN pMatch, pResult, pToken;
    PHB_PP_FILE pFile;
@@ -5469,7 +5471,7 @@ void hb_pp_addDefine( PHB_PP_STATE pState, char * szDefName, char * szDefValue )
 /*
  * delete define value
  */
-void hb_pp_delDefine( PHB_PP_STATE pState, char * szDefName )
+void hb_pp_delDefine( PHB_PP_STATE pState, const char * szDefName )
 {
    PHB_PP_TOKEN pToken;
 
@@ -5557,7 +5559,7 @@ char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen )
 /*
  * preprocess given buffer
  */
-char * hb_pp_parseLine( PHB_PP_STATE pState, char * pLine, ULONG * pulLen )
+char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, ULONG * pulLen )
 {
    PHB_PP_TOKEN pToken;
    PHB_PP_FILE pFile;
@@ -5613,7 +5615,7 @@ char * hb_pp_parseLine( PHB_PP_STATE pState, char * pLine, ULONG * pulLen )
 /*
  * create new PP context for macro compiler
  */
-PHB_PP_STATE hb_pp_lexNew( char * pMacroString, ULONG ulLen )
+PHB_PP_STATE hb_pp_lexNew( const char * pMacroString, ULONG ulLen )
 {
    PHB_PP_STATE pState = hb_pp_new();
 

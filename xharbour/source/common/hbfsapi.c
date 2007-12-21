@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.9 2006/11/11 03:48:21 druzus Exp $
+ * $Id: hbfsapi.c,v 1.10 2007/12/21 10:42:29 likewolf Exp $
  */
 
 /*
@@ -111,7 +111,7 @@ HB_EXPORT void hb_fsFreeSearchPath( HB_PATHNAMES * pSearchList )
 }
 
 /* Split given filename into path, name and extension, plus determine drive */
-PHB_FNAME hb_fsFNameSplit( char * pszFileName )
+HB_EXPORT PHB_FNAME hb_fsFNameSplit( const char * pszFileName )
 {
    PHB_FNAME pFileName;
    char * pszPos;
@@ -198,9 +198,9 @@ PHB_FNAME hb_fsFNameSplit( char * pszFileName )
 /* NOTE: szFileName buffer must be at least _POSIX_PATH_MAX long */
 
 /* This function joins path, name and extension into a string with a filename */
-char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
+HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
 {
-   static char szPathSep[] = {OS_PATH_DELIMITER,0}; /* see NOTE below */
+   static char s_szPathSep[] = { OS_PATH_DELIMITER, 0 }; /* see NOTE below */
    char * pszName;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsFNameMerge(%p, %p)", pszFileName, pFileName));
@@ -218,8 +218,8 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
       hb_strncat( pszFileName, pFileName->szPath, _POSIX_PATH_MAX - 1 );
 
    /*
-      NOTE: be _very_ careful about 'optimising' this next section code!
-      (specifically, initialising szPathSep) as MSVC with /Ni
+      NOTE: be _very_ careful about "optimizing" this next section code!
+            (specifically, initialising s_szPathSep) as MSVC with /Ni
       (or anything that infers it like /Ox) will cause you trouble.
     */
 
@@ -232,13 +232,13 @@ char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
       if( strchr( OS_PATH_DELIMITER_LIST, pszFileName[ iLen ] ) == NULL )
       {
          /*
-             char szPathSep[2];
+             char s_szPathSep[ 2 ];
 
-             szPathSep[ 0 ] = OS_PATH_DELIMITER;
-             szPathSep[ 1 ] = '\0';
+             s_szPathSep[ 0 ] = OS_PATH_DELIMITER;
+             s_szPathSep[ 1 ] = '\0';
 
           */
-         hb_strncat( pszFileName, szPathSep, _POSIX_PATH_MAX - 1 );
+         hb_strncat( pszFileName, s_szPathSep, _POSIX_PATH_MAX - 1 );
       }
    }
 

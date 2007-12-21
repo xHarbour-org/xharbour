@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.57 2007/09/22 09:49:16 likewolf Exp $
+ * $Id: hbcomp.h,v 1.58 2007/12/04 06:19:08 andijahja Exp $
  */
 
 /*
@@ -354,6 +354,9 @@ extern PCOMDECLARED hb_compMethodAdd( PCOMCLASS pClass, char * );
 extern PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * );
 extern void hb_compDeclaredParameterAdd( char * szVarName, BYTE cValueType );
 
+extern void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 ); /* generic parsing error management function */
+extern void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2); /* generic parsing warning management function */
+
 extern void hb_compGenBreak( void );  /* generate code for BREAK statement */
 extern void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for WITH OBJECT <obj> statement */
 extern void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
@@ -593,8 +596,8 @@ extern char *         hb_Command_Line;
 
 extern char *         hb_comp_szLastMethod;
 
-extern char *         hb_comp_szErrors[];
-extern char *         hb_comp_szWarnings[];
+extern const char *   hb_comp_szErrors[];
+extern const char *   hb_comp_szWarnings[];
 extern char *         hb_pp_STD_CH;
 extern int            hb_pp_STD_CH_ADDITIVE;
 

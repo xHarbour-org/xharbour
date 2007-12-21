@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.27 2007/04/08 07:20:56 ronpinkas Exp $
+ * $Id: hbgenerr.c,v 1.28 2007/10/31 08:34:49 marchuet Exp $
  */
 
 /*
@@ -31,7 +31,7 @@
 extern char *yytext;
 
 /* Table with parse errors */
-char * hb_comp_szErrors[] =
+const char * hb_comp_szErrors[] =
 {
 /* 1 */   "Statement not allowed outside of procedure or function",
    "Redefinition of procedure or function: \'%s\'",
@@ -108,7 +108,7 @@ char * hb_comp_szErrors[] =
 /* NOTE: The first character stores the warning's level that triggers this
  * warning. The warning's level is set by -w<n> command line option.
  */
-char * hb_comp_szWarnings[] =
+const char * hb_comp_szWarnings[] =
 {
    "1Ambiguous reference: \'%s\'",
    "1Ambiguous reference, assuming memvar: \'%s\'",
@@ -141,7 +141,7 @@ char * hb_comp_szWarnings[] =
    "1Redundant \'ANNOUNCE %s\' statement ignored"
 };
 
-void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
+void hb_compGenError( const char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 )
 {
    int iLine = hb_comp_iLine - 1;
    char * szFile = hb_pp_fileName( hb_comp_PP );
@@ -180,7 +180,7 @@ void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * 
    }
 }
 
-void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2)
+void hb_compGenWarning( const char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2)
 {
    const char * szText = szWarnings[ iWarning - 1 ];
    int iLine = hb_comp_iLine - 1;

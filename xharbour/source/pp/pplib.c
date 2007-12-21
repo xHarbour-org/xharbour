@@ -1,5 +1,5 @@
 /*
- * $Id: pplib.c,v 1.1 2007/02/27 19:33:44 druzus Exp $
+ * $Id: pplib.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $
  */
 
 /*
@@ -58,7 +58,7 @@
 #include "hbapierr.h"
 #include "hbvm.h"
 
-static void hb_pp_ErrorMessage( void * cargo, char * szMsgTable[],
+static void hb_pp_ErrorMessage( void * cargo, const char * szMsgTable[],
                                 char cPrefix, int iCode,
                                 const char * szParam1, const char * szParam2 )
 {

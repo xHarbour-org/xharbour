@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.26 2007/02/22 01:55:14 ronpinkas Exp $
+ * $Id: hberrors.h,v 1.27 2007/04/08 07:20:55 ronpinkas Exp $
  */
 
 /*
@@ -198,9 +198,6 @@ HB_EXTERN_BEGIN
 #define HB_PP_WARN_NO_MARKERS                   3
 #define HB_PP_WARN_EXPLICIT                     4
 #define HB_PP_WARN_OVERLOADED_REDEF             5
-
-extern void hb_compGenError( char * szErrors[], char cPrefix, int iError, const char * szError1, const char * szError2 ); /* generic parsing error management function */
-extern void hb_compGenWarning( char * szWarnings[], char cPrefix, int iWarning, const char * szWarning1, const char * szWarning2); /* generic parsing warning management function */
 
 HB_EXTERN_END
 

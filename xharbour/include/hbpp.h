@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.17 2007/04/16 03:44:07 ronpinkas Exp $
+ * $Id: hbpp.h,v 1.18 2007/05/11 02:05:32 ronpinkas Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ HB_EXTERN_BEGIN
 #define HB_PP_INLINE_QUOTE2   6
 
 /* function to open included files */
-#define HB_PP_OPEN_FUNC_( func ) FILE * func( void *, char *, BOOL, char * )
+#define HB_PP_OPEN_FUNC_( func ) FILE * func( void *, const char *, BOOL, char * )
 typedef HB_PP_OPEN_FUNC_( HB_PP_OPEN_FUNC );
 typedef HB_PP_OPEN_FUNC * PHB_PP_OPEN_FUNC;
 
@@ -92,7 +92,7 @@ typedef HB_PP_CLOSE_FUNC_( HB_PP_CLOSE_FUNC );
 typedef HB_PP_CLOSE_FUNC * PHB_PP_CLOSE_FUNC;
 
 /* function to generate errors */
-#define HB_PP_ERROR_FUNC_( func ) void func( void *, char **, char, int, const char *, const char * )
+#define HB_PP_ERROR_FUNC_( func ) void func( void *, const char **, char, int, const char *, const char * )
 typedef HB_PP_ERROR_FUNC_( HB_PP_ERROR_FUNC );
 typedef HB_PP_ERROR_FUNC * PHB_PP_ERROR_FUNC;
 
@@ -536,7 +536,7 @@ typedef struct _HB_PP_FILE
    BOOL     fGenLineInfo;        /* #line information should be generated */
    BOOL     fEof;                /* the end of file reached */
 
-   char *   pLineBuf;            /* buffer for parsing external lines */
+   const char * pLineBuf;        /* buffer for parsing external lines */
    ULONG    ulLineBufLen;        /* size of external line buffer */
 
    struct _HB_PP_FILE * pPrev;   /* previous file, the one which included this file */
@@ -640,14 +640,14 @@ extern void   hb_pp_init( PHB_PP_STATE pState, BOOL fQuiet,
                   PHB_PP_DUMP_FUNC  pDumpFunc, PHB_PP_INLINE_FUNC pInLineFunc,
                   PHB_PP_SWITCH_FUNC pSwitchFunc );
 extern void   hb_pp_initDynDefines( PHB_PP_STATE pState );
-extern void   hb_pp_readRules( PHB_PP_STATE pState, char * szRulesFile );
+extern void   hb_pp_readRules( PHB_PP_STATE pState, const char * szRulesFile );
 extern void   hb_pp_setStdRules( PHB_PP_STATE pState );
 extern void   hb_pp_setStdBase( PHB_PP_STATE pState );
 extern void   hb_pp_setStream( PHB_PP_STATE pState, int iMode );
 extern void   hb_pp_addSearchPath( PHB_PP_STATE pState, const char * szPath, BOOL fReplace );
-extern BOOL   hb_pp_inFile( PHB_PP_STATE pState, char * szFileName, BOOL fSearchPath, FILE * file_in, BOOL fError );
-extern BOOL   hb_pp_outFile( PHB_PP_STATE pState, char * szOutFileName, FILE * file_out );
-extern BOOL   hb_pp_traceFile( PHB_PP_STATE pState, char * szTraceFileName, FILE * file_trace );
+extern BOOL   hb_pp_inFile( PHB_PP_STATE pState, const char * szFileName, BOOL fSearchPath, FILE * file_in, BOOL fError );
+extern BOOL   hb_pp_outFile( PHB_PP_STATE pState, const char * szOutFileName, FILE * file_out );
+extern BOOL   hb_pp_traceFile( PHB_PP_STATE pState, const char * szTraceFileName, FILE * file_trace );
 extern char * hb_pp_fileName( PHB_PP_STATE pState );
 extern int    hb_pp_line( PHB_PP_STATE pState );
 extern BOOL   hb_pp_eof( PHB_PP_STATE pState );
@@ -655,16 +655,16 @@ extern int    hb_pp_lineTot( PHB_PP_STATE pState );
 extern char * hb_pp_outFileName( PHB_PP_STATE pState );
 extern char * hb_pp_traceFileName( PHB_PP_STATE pState );
 extern char * hb_pp_nextLine( PHB_PP_STATE pState, ULONG * pulLen );
-extern char * hb_pp_parseLine( PHB_PP_STATE pState, char * pLine, ULONG * pulLen );
-extern void   hb_pp_addDefine( PHB_PP_STATE pState, char * szDefName, char * szDefValue );
-extern void   hb_pp_delDefine( PHB_PP_STATE pState, char * szDefName );
+extern char * hb_pp_parseLine( PHB_PP_STATE pState, const char * pLine, ULONG * pulLen );
+extern void   hb_pp_addDefine( PHB_PP_STATE pState, const char * szDefName, const char * szDefValue );
+extern void   hb_pp_delDefine( PHB_PP_STATE pState, const char * szDefName );
 extern BOOL   hb_pp_lasterror( PHB_PP_STATE pState );
 extern BOOL   hb_pp_eof( PHB_PP_STATE pState );
 
 extern void   hb_pp_tokenUpper( PHB_PP_TOKEN pToken );
 extern void   hb_pp_tokenToString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken );
 extern char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, int * piType, int * piLen );
-extern PHB_PP_STATE hb_pp_lexNew( char * pString, ULONG ulLen );
+extern PHB_PP_STATE hb_pp_lexNew( const char * pString, ULONG ulLen );
 extern PHB_PP_TOKEN hb_pp_lexGet( PHB_PP_STATE pState );
 extern PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState );
 extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_STATE pState );
