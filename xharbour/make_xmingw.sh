@@ -1,7 +1,7 @@
 #!/bin/sh
 [ "$BASH" ] || exec bash `which $0` ${1+"$@"}
 #
-# $Id: make_xmingw.sh,v 1.9 2007/11/10 21:59:45 likewolf Exp $
+# $Id: make_xmingw.sh,v 1.10 2007/12/04 22:52:49 likewolf Exp $
 #
 # This script simplifies cross-compiling xHarbour for Windows from Unix systems.
 #
@@ -30,8 +30,8 @@ if [ -f /etc/debian_version ]; then
     TARGET=i586-mingw32msvc
     CCPREFIX="$TARGET-"
 elif [ -f /etc/gentoo-release ]; then
-    MINGW_PREFIX=/opt/xmingw
-    TARGET=i386-mingw32msvc
+    MINGW_PREFIX=/usr
+    TARGET=i686-mingw32
     CCPREFIX="$TARGET-"
 elif [ "$UNAME" = "FreeBSD" ]; then
     MINGW_PREFIX=/usr/local/mingw32

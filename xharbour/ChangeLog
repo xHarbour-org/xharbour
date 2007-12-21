@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5818 2007/12/21 10:42:28 likewolf Exp $
+ * $Id: ChangeLog,v 1.5819 2007/12/21 12:12:19 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-21 18:21 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * make_xmingw.sh
+    ! Updated MinGW cross-compiler detection in recent Gentoo Linux releases.
 
 2007-12-21 15:11 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hashapi.h
