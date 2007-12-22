@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.56 2007/11/10 04:38:33 guerra000 Exp $
+# $Id: makefile.pc,v 1.57 2007/11/23 18:50:39 ptsarenko Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -307,9 +307,6 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbpcode.obj \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
-   $(OBJ_DIR)\gencobj.obj \
-   $(OBJ_DIR)\genobj32.obj \
-   $(OBJ_DIR)\genjava.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -1085,9 +1082,6 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbpcode.obj   >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfix.obj     >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj      >> make.tmp
-   $(ECHO) $(OBJ_DIR)\gencobj.obj   >> make.tmp
-   $(ECHO) $(OBJ_DIR)\genobj32.obj  >> make.tmp
-   $(ECHO) $(OBJ_DIR)\genjava.obj   >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj    >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj  >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj  >> make.tmp
@@ -1147,15 +1141,6 @@ $(OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gencc.obj : $(COMPILER_DIR)\gencc.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\genjava.obj : $(COMPILER_DIR)\genjava.c
    $(CC_CMD)
 
 $(OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c

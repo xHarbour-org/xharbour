@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.6 2006/03/29 00:34:40 druzus Exp $
+# $Id: Makefile,v 1.7 2007/02/27 15:59:34 druzus Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -42,10 +42,7 @@ C_SOURCES=\
 	cmdcheck.c \
 	genc.c \
 	gencc.c \
-	gencobj.c \
 	genhrb.c \
-	genjava.c \
-	genobj32.c \
 	hbfunchk.c \
 	hbgenerr.c \
 	hbpcode.c \

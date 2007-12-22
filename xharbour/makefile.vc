@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.199 2007/11/13 21:15:45 ronpinkas Exp $
+# $Id: makefile.vc,v 1.200 2007/11/23 18:50:39 ptsarenko Exp $
 #
 
 #
@@ -1745,11 +1745,8 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\hbfix.c \
    $(COMPILER_DIR)\hbfunchk.c \
    $(COMPILER_DIR)\hbgenerr.c \
-   $(COMPILER_DIR)\genobj32.c \
    $(COMPILER_DIR)\genc.c \
-   $(COMPILER_DIR)\gencobj.c \
    $(COMPILER_DIR)\genhrb.c \
-   $(COMPILER_DIR)\genjava.c \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \
    $(COMPILER_DIR)\exproptc.c \
