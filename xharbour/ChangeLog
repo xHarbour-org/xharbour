@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5824 2007/12/21 22:17:06 andijahja Exp $
+ * $Id: ChangeLog,v 1.5825 2007/12/22 11:17:24 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-22 22:03 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapi.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * include/simplex.c
+  * source/common/expropt1.c
+  * source/common/hbstr.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/macro/macro.slx
+  * source/macro/macro.y
+    * changed parameters in function: hb_compStrToNum() now the string
+      size is passed explicitly so it can work with strings which does
+      not have trailing ASCII NUL character.
+    * fixed \" quoting in extended strings
+    * removed \q quoting
+    + added support for \x<hex> and \<oct> quoting in extended strings
+      (just like in C).
+    ! fixed final string size calculation in extended strings
+    + added hb_strlow
+    ! Extended strings in all contexts can include NULs.
+    (Mostly borrowed from Harbour. I had to do Simplex integration myself,
+    I hope I did not miss anything.)
 
 2007-12-22 09:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
    * makefile.bc

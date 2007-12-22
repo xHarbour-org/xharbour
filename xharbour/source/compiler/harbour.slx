@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.86 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.87 2007/12/09 06:22:12 ronpinkas Exp $
  */
 
 /*
@@ -601,6 +601,7 @@ LANGUAGE_RULES_ARE {
       { \
          if( x == '\\' ) \
          { \
+            char cCode; \
             switch( *szBuffer ) \
             { \
                case '\\' : \
@@ -634,10 +635,41 @@ LANGUAGE_RULES_ARE {
                   iSize--; \
                   break; \
                \
-               case 'q' : \
-                  sPair [ iPairLen++ ] = '"'; \
-                  szBuffer++; \
+               case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : \
+                  cCode = *szBuffer++ - '0'; \
                   iSize--; \
+                  if ( *szBuffer >= '0' && *szBuffer <= '7' ) \
+                  { \
+                     cCode = ( cCode << 3 ) | ( *szBuffer++ - '0' ); \
+                     iSize--; \
+                     if ( *szBuffer >= '0' && *szBuffer <= '7' ) \
+                     { \
+                        cCode = ( cCode << 3 ) | ( *szBuffer++ - '0' ); \
+                        iSize--; \
+                     } \
+                  } \
+                  sPair[ iPairLen++ ] = cCode; \
+                  break; \
+               \
+               case 'x' : \
+                  if ( szBuffer[ 1 ] >= '0' && szBuffer[ 1 ] <= '9' ) \
+                     cCode = *++szBuffer - '0'; \
+                  else if ( szBuffer[ 1 ] >= 'A' && szBuffer[ 1 ] <= 'F' ) \
+                     cCode = *++szBuffer - 'A'; \
+                  else if ( szBuffer[ 1 ] >= 'a' && szBuffer[ 1 ] <= 'f' ) \
+                     cCode = *++szBuffer - 'a'; \
+                  else break; \
+                  iSize -= 2; \
+                  if ( szBuffer[ 1 ] >= '0' && szBuffer[ 1 ] <= '9' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - '0' ); \
+                  else if ( szBuffer[ 1 ] >= 'A' && szBuffer[ 1 ] <= 'F' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - 'A' ); \
+                  else if ( szBuffer[ 1 ] >= 'a' && szBuffer[ 1 ] <= 'f' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - 'a' ); \
+                  else break; \
+                  iSize--; \
+                  szBuffer++; \
+                  sPair[ iPairLen++ ] = cCode; \
                   break; \
                \
                default :\
@@ -692,7 +724,8 @@ LANGUAGE_RULES_ARE {
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
             iSize -= s_szBuffer - szBuffer; \
-            yylval.string = hb_compIdentifierNew( sPair, TRUE ); \
+            yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
+            yylval.valChar.length = iLen; \
             \
             /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
             iPairToken = 0; \
@@ -703,7 +736,8 @@ LANGUAGE_RULES_ARE {
             szBuffer--; \
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
-            yylval.string = hb_compIdentifierNew( szBuffer, TRUE ); \
+            yylval.valChar.string = hb_compIdentifierNew( szBuffer, TRUE ); \
+            yylval.valChar.length = strlen( szBuffer ); \
             iSize = 0; \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
@@ -761,7 +795,7 @@ static int hb_comp_SLX_InterceptAction( int iRet )
 
    #ifdef SHOW_LEX_TOKENS
      if( iRet == IDENTIFIER )       { printf( "   IDENTIFIER = \"%s\"\n", yylval.string  ); }
-     else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\"\n", yylval.string  ); }
+     else if( iRet == LITERAL )     { printf( "   LITERAL = \"%s\" (%d)\n", yylval.valChar.string, yylval.valChar.length  ); }
      else if( iRet == MACROVAR )    { printf( "   MACROVAR = \"%s\"\n", yylval.string  ); }
      else if( iRet == MACROTEXT )   { printf( "   MACROTEXT = \"%s\"\n", yylval.string  ); }
      else if( iRet == NUM_INTEGER ) { printf( "   INTEGER = %i\n", yylval.valInteger.iNumber  ); }
@@ -974,7 +1008,7 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 {
    BOOL fDbl;
 
-   fDbl = hb_compStrToNum( szNum, plVal, pdVal, piDec, piWidth );
+   fDbl = hb_compStrToNum( szNum, strlen( szNum ), plVal, pdVal, piDec, piWidth );
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
 
@@ -1111,8 +1145,9 @@ static int hb_comp_SLX_CustomAction( int x )
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
-         yylval.string = hb_compIdentifierNew( sPair, TRUE );
-         return LITERAL + DONT_REDUCE ;
+         yylval.valChar.string = sPair;
+         yylval.valChar.length = iPairLen;
+         return LITERAL + DONT_REDUCE;
 
       case HB_INIT_PROC :
          aiHold[ iHold++ ] = PROCEDURE + DONT_REDUCE;

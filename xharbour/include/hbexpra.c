@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.28 2007/07/06 00:56:00 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.29 2007/08/26 14:55:13 ronpinkas Exp $
  */
 
 /*
@@ -324,32 +324,6 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
    return pExpr;
 }
-
-/* In macro compiler strings should be automatically deallocated by
- * the expression optimizer
- * In harbour compiler strings are shared in the hash table then they
- * cannot be deallocated by default
-*/
-HB_EXPR_PTR hb_compExprNewString( char *szValue )
-{
-   HB_EXPR_PTR pExpr;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewString(%s)", szValue));
-
-   pExpr = hb_compExprNew( HB_ET_STRING );
-
-   pExpr->value.asString.string = szValue;
-#ifdef HB_MACRO_SUPPORT
-   pExpr->value.asString.dealloc = TRUE;
-#else
-   pExpr->value.asString.dealloc = FALSE;
-#endif
-   pExpr->ulLength = strlen( szValue );
-   pExpr->ValType = HB_EV_STRING;
-
-   return pExpr;
-}
-
 
 /* Creates new array access expression
  *    pArray[ pIndex ]

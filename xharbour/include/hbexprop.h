@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.18 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: hbexprop.h,v 1.19 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -326,7 +326,7 @@ HB_EXPR_PTR hb_compExprNewEmpty( void );
 HB_EXPR_PTR hb_compExprNewNil( void );
 HB_EXPR_PTR hb_compExprNewDouble( double, BYTE, BYTE );
 HB_EXPR_PTR hb_compExprNewLong( HB_LONG );
-HB_EXPR_PTR hb_compExprNewString( char * );
+HB_EXPR_PTR hb_compExprNewString( char *, ULONG, BOOL );
 HB_EXPR_PTR hb_compExprNewLogical( int );
 HB_EXPR_PTR hb_compExprNewDate( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, HB_EXPR_PTR, int, int * );

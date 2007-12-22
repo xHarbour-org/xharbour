@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.28 2007/07/06 00:56:00 ronpinkas Exp $
+ * $Id: simplex.c,v 1.29 2007/07/06 13:39:07 ronpinkas Exp $
  */
 
 /*
@@ -122,6 +122,7 @@ static BOOL bIgnoreWords = FALSE;
 
 static int iPairToken = 0;
 static int iPairAllocated = 0;
+static int iPairLen = 0;
 
 /* Self Contained Words. */
 static char sSelf[ TOKEN_SIZE ];
@@ -661,9 +662,9 @@ int SimpLex_GetNextToken( void )
                }
 
                {
-                  register int iPairLen = 0;
                   register char chrPair;
 
+                  iPairLen = 0;
                   /* Look for the terminator. */
                   while( *szBuffer )
                   {

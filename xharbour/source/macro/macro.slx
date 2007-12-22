@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.30 2007/07/05 18:19:18 ronpinkas Exp $
+ * $Id: macro.slx,v 1.31 2007/07/06 00:56:01 ronpinkas Exp $
  */
 
 /*
@@ -91,6 +91,7 @@
       { \
          if( x == '\\' ) \
          { \
+            char cCode; \
             switch( *szBuffer ) \
             { \
                case '\\' : \
@@ -122,6 +123,43 @@
                   sPair [ iPairLen++ ] = '\r'; \
                   szBuffer++; \
                   iSize--; \
+                  break; \
+               \
+               case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : \
+                  cCode = *szBuffer++ - '0'; \
+                  iSize--; \
+                  if ( *szBuffer >= '0' && *szBuffer <= '7' ) \
+                  { \
+                     cCode = ( cCode << 3 ) | ( *szBuffer++ - '0' ); \
+                     iSize--; \
+                     if ( *szBuffer >= '0' && *szBuffer <= '7' ) \
+                     { \
+                        cCode = ( cCode << 3 ) | ( *szBuffer++ - '0' ); \
+                        iSize--; \
+                     } \
+                  } \
+                  sPair[ iPairLen++ ] = cCode; \
+                  break; \
+               \
+               case 'x' : \
+                  if ( szBuffer[ 1 ] >= '0' && szBuffer[ 1 ] <= '9' ) \
+                     cCode = *++szBuffer - '0'; \
+                  else if ( szBuffer[ 1 ] >= 'A' && szBuffer[ 1 ] <= 'F' ) \
+                     cCode = *++szBuffer - 'A'; \
+                  else if ( szBuffer[ 1 ] >= 'a' && szBuffer[ 1 ] <= 'f' ) \
+                     cCode = *++szBuffer - 'a'; \
+                  else break; \
+                  iSize -= 2; \
+                  if ( szBuffer[ 1 ] >= '0' && szBuffer[ 1 ] <= '9' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - '0' ); \
+                  else if ( szBuffer[ 1 ] >= 'A' && szBuffer[ 1 ] <= 'F' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - 'A' ); \
+                  else if ( szBuffer[ 1 ] >= 'a' && szBuffer[ 1 ] <= 'f' ) \
+                     cCode = ( cCode << 4 ) | ( *++szBuffer - 'a' ); \
+                  else break; \
+                  iSize--; \
+                  szBuffer++; \
+                  sPair[ iPairLen++ ] = cCode; \
                   break; \
                \
                default :\
@@ -176,7 +214,8 @@
             sPair[ iLen ] = '\0'; \
             s_szBuffer = sClose + cTermLen; \
             iSize -= s_szBuffer - szBuffer; \
-            pYYLVAL->string = hb_strdup( sPair ); \
+            pYYLVAL->valChar.string = hb_strdup( sPair ); \
+            pYYLVAL->valChar.length = iLen; \
             \
             /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
             iPairToken = 0; \
@@ -187,7 +226,8 @@
             szBuffer--; \
             szBuffer[strlen(szBuffer)-1] = '\0'; \
             hb_macroError( EG_SYNTAX, YYLEX_PARAM ); \
-            pYYLVAL->string = hb_strdup( szBuffer ); \
+            pYYLVAL->valChar.string = hb_strdup( szBuffer ); \
+            pYYLVAL->valChar.length = strlen( szBuffer ); \
             iSize = 0; \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
@@ -355,7 +395,7 @@ LANGUAGE_RULES_ARE {
          if( x == IDENTIFIER ) \
            TraceLog( NULL, "   IDENTIFIER = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == LITERAL ) \
-           TraceLog( NULL, "   LITERAL = \"%s\"\n", pYYLVAL->string  ); \
+           TraceLog( NULL, "   LITERAL = \"%s\" (%d)\n", pYYLVAL->valChar.string, pYYLVAL->valChar.length  ); \
          else if( x == MACROVAR ) \
            TraceLog( NULL, "   MACROVAR = \"%s\"\n", pYYLVAL->string  ); \
          else if( x == MACROTEXT ) \
@@ -502,7 +542,7 @@ static int hb_comp_SLX_Str2Num( char* szNum, HB_LONG * plVal, double * pdVal, in
 {
    BOOL fDbl;
 
-   fDbl = hb_compStrToNum( szNum, plVal, pdVal, piDec, piWidth );
+   fDbl = hb_compStrToNum( szNum, strlen( szNum ), plVal, pdVal, piDec, piWidth );
    return fDbl ? NUM_DOUBLE : NUM_LONG;
 }
 
@@ -563,8 +603,9 @@ static int hb_macro_SLX_CustomAction( int x, int aiHold[], int *ptr_iHold, char 
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
-         pYYLVAL->string = hb_strdup( sPair );
-         return LITERAL + DONT_REDUCE ;
+         pYYLVAL->valChar.string = hb_strdup( sPair );
+         pYYLVAL->valChar.length = iPairLen;
+         return LITERAL + DONT_REDUCE;
 
       case HB_FIELD_ALIAS :
          aiHold[ (*ptr_iHold)++ ] = ALIASOP;

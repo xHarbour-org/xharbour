@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.20 2007/03/25 06:12:49 walito Exp $
+ * $Id: expropt1.c,v 1.21 2007/05/18 13:44:30 ronpinkas Exp $
  */
 
 /*
@@ -331,6 +331,22 @@ HB_EXPR_PTR hb_compExprNewDateTimeVal( LONG lDate, LONG lTime, USHORT uType )
    pExpr->value.asDate.time = lTime;
 
    pExpr->ValType = HB_EV_DATE;
+
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewString( char *szValue, ULONG ulLen, BOOL fDealloc )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewString(%s,%lu)", szValue, ulLen));
+
+   pExpr = hb_compExprNew( HB_ET_STRING );
+
+   pExpr->value.asString.string = szValue;
+   pExpr->value.asString.dealloc = fDealloc;
+   pExpr->ulLength = ulLen;
+   pExpr->ValType = HB_EV_STRING;
 
    return pExpr;
 }

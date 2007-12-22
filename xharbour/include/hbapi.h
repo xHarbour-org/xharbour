@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.224 2007/12/08 02:31:17 ronpinkas Exp $
+ * $Id: hbapi.h,v 1.225 2007/12/21 12:12:20 likewolf Exp $
  */
 
 /*
@@ -654,12 +654,13 @@ extern HB_EXPORT int       hb_stricmp( const char * s1, const char * s2 ); /* co
 extern HB_EXPORT int       hb_symcmp( const char * s1, const char * s2 ); /* compare a SYMBOL value (LEFT) with unknown case RIGHT agument */
 extern HB_EXPORT int       hb_strnicmp( const char * s1, const char * s2, ULONG ulLen ); /* compare two string without regards to case, limited by length */
 extern HB_EXPORT char *    hb_strupr( char * pszText ); /* convert a string in-place to upper-case */
+extern HB_EXPORT char *    hb_strlow( char * pszText ); /* convert a string in-place to lower-case */
 extern HB_EXPORT char *    hb_strdup( const char * pszText ); /* returns a pointer to a newly allocated copy of the source string */
 extern HB_EXPORT char *    hb_strndup( const char * pszText, ULONG ulLen ); /* returns a pointer to a newly allocated copy of the source string not longer then ulLen */
 extern HB_EXPORT ULONG     hb_strnlen( const char * pszText, ULONG ulLen ); /* like strlen() but result is limited to ulLen */
 extern HB_EXPORT char *    hb_xstrcat( char *dest, const char *src, ... ); /* Concatenates multiple strings into a single result */
 extern HB_EXPORT char *    hb_xstrcpy( char *szDest, const char *szSrc, ...); /* Concatenates multiple strings into a single result */
-extern HB_EXPORT BOOL      hb_compStrToNum( const char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
+extern HB_EXPORT BOOL      hb_compStrToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by compiler */
 extern HB_EXPORT BOOL      hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth );  /* converts string to number, sets iDec, iWidth and returns TRUE if results is double, used by VAL() */
 extern HB_EXPORT BOOL      hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */
 extern HB_EXPORT BOOL      hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal ); /* converts string to number, returns TRUE if results is double */

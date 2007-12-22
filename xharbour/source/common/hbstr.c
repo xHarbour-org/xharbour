@@ -1,5 +1,5 @@
 /*
- * $Id: hbstr.c,v 1.26 2007/08/28 15:51:33 ronpinkas Exp $
+ * $Id: hbstr.c,v 1.27 2007/08/28 19:04:55 ronpinkas Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ const char * hb_szAscii[256] = { "\x00", "\x01", "\x02", "\x03", "\x04", "\x05",
                                  "\xE0", "\xE1", "\xE2", "\xE3", "\xE4", "\xE5", "\xE6", "\xE7", "\xE8", "\xE9", "\xEA", "\xEB", "\xEC", "\xED", "\xEE", "\xEF",
                                  "\xF0", "\xF1", "\xF2", "\xF3", "\xF4", "\xF5", "\xF6", "\xF7", "\xF8", "\xF9", "\xFA", "\xFB", "\xFC", "\xFD", "\xFE", "\xFF" };
 
-ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
+HB_EXPORT ULONG hb_strAt( const char * szSub, ULONG ulSubLen, const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strAt(%s, %lu, %s, %lu)", szSub, ulSubLen, szText, ulLen));
 
@@ -118,19 +118,31 @@ ULONG HB_EXPORT hb_strAt( const char * szSub, ULONG ulSubLen, const char * szTex
       return 0;
 }
 
-char HB_EXPORT * hb_strupr( char * pszText )
+HB_EXPORT char * hb_strupr( char * pszText )
 {
    char * pszPos;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_strupr(%s)", pszText));
 
    for( pszPos = pszText; *pszPos; pszPos++ )
-      *pszPos = toupper( *pszPos );
+      *pszPos = toupper( ( UCHAR ) *pszPos );
 
    return pszText;
 }
 
-char HB_EXPORT * hb_strdup( const char * pszText )
+HB_EXPORT char * hb_strlow( char * pszText )
+{
+   char * pszPos;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_strlow(%s)", pszText));
+
+   for( pszPos = pszText; *pszPos; pszPos++ )
+      *pszPos = tolower( ( UCHAR ) *pszPos );
+
+   return pszText;
+}
+
+HB_EXPORT char * hb_strdup( const char * pszText )
 {
    char * pszDup;
    ULONG ulLen = strlen( pszText ) + 1;
@@ -143,7 +155,7 @@ char HB_EXPORT * hb_strdup( const char * pszText )
    return pszDup;
 }
 
-char HB_EXPORT * hb_strndup( const char * pszText, ULONG ulLen )
+HB_EXPORT char * hb_strndup( const char * pszText, ULONG ulLen )
 {
    char * pszDup;
    ULONG ul;
@@ -164,7 +176,7 @@ char HB_EXPORT * hb_strndup( const char * pszText, ULONG ulLen )
    return pszDup;
 }
 
-ULONG HB_EXPORT hb_strnlen( const char * pszText, ULONG ulLen )
+HB_EXPORT ULONG hb_strnlen( const char * pszText, ULONG ulLen )
 {
    ULONG ul = 0;
 
@@ -197,7 +209,7 @@ HB_EXPORT int hb_stricmp( const char * s1, const char * s2 )
       s1++;
       s2++;
    }
-   while( c1 );
+   while ( c1 );
 
    return rc;
 }
@@ -239,6 +251,7 @@ HB_EXPORT int hb_symcmp( const char * s1, const char * s2 )
    return rc;
 }
 
+/* warning: It is not case sensitive */
 HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
 {
    ULONG ulCount;
@@ -263,15 +276,14 @@ HB_EXPORT int hb_strnicmp( const char * s1, const char * s2, ULONG count )
    return rc;
 }
 
-
 /*
 AJ: 2004-02-23
 Concatenates multiple strings into a single result.
 Eg. hb_xstrcat (buffer, "A", "B", NULL) stores "AB" in buffer.
 */
-char HB_EXPORT * hb_xstrcat ( char *szDest, const char *szSrc, ... )
+HB_EXPORT char * hb_xstrcat( char * szDest, const char * szSrc, ... )
 {
-   char *szResult = szDest;
+   char * szResult = szDest;
    va_list va;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xstrcat(%p, %p, ...)", szDest, szSrc));
@@ -279,18 +291,17 @@ char HB_EXPORT * hb_xstrcat ( char *szDest, const char *szSrc, ... )
    while( *szDest )
       szDest++;
 
-   va_start(va, szSrc);
-
+   va_start( va, szSrc );
    while( szSrc )
    {
       while ( *szSrc )
          *szDest++ = *szSrc++;
-      szSrc = va_arg ( va, char* );
+      szSrc = va_arg( va, char * );
    }
-
    *szDest = '\0';
-   va_end ( va );
-   return ( szResult );
+   va_end( va );
+
+   return szResult;
 }
 
 /*
@@ -303,39 +314,39 @@ allocates a new buffer with the required length and returns that. The
 buffer is allocated using hb_xgrab(), and should eventually be freed
 using hb_xfree().
 */
-char HB_EXPORT * hb_xstrcpy ( char *szDest, const char *szSrc, ...)
+HB_EXPORT char * hb_xstrcpy( char * szDest, const char * szSrc, ... )
 {
-   const char *szSrc_Ptr;
+   char * szResult;
    va_list va;
-   size_t dest_size;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xstrcpy(%p, %p, ...)", szDest, szSrc));
 
-   if (szDest == NULL)
+   if( szDest == NULL )
    {
-       va_start (va, szSrc);
-       szSrc_Ptr = szSrc;
-       dest_size = 1;
-       while (szSrc_Ptr)
-       {
-          dest_size += strlen (szSrc_Ptr);
-          szSrc_Ptr = va_arg (va, char *);
-       }
-       va_end (va);
-
-       szDest = (char *) hb_xgrab( dest_size );
+      const char * szSrcPtr = szSrc;
+      ULONG ulSize = 1;
+      va_start( va, szSrc );
+      while( szSrcPtr )
+      {
+         ulSize += strlen( szSrcPtr );
+         szSrcPtr = va_arg( va, char * );
+      }
+      va_end( va );
+      szDest = ( char * ) hb_xgrab( ulSize );
    }
+   szResult = szDest;
 
-   va_start (va, szSrc);
-   szSrc_Ptr  = szSrc;
-   szDest [0] = '\0';
-   while (szSrc_Ptr)
+   va_start( va, szSrc );
+   while( szSrc )
    {
-      hb_xstrcat (szDest, szSrc_Ptr, NULL );
-      szSrc_Ptr = va_arg (va, char *);
+      while ( *szSrc )
+         *szDest++ = *szSrc++;
+      szSrc = va_arg( va, char * );
    }
-   va_end (va);
-   return (szDest);
+   *szDest = '\0';
+   va_end( va );
+
+   return szResult;
 }
 
 static double hb_numPow10( int nPrecision )
@@ -371,7 +382,7 @@ static double hb_numPow10( int nPrecision )
    return pow(10.0, (double) nPrecision);
 }
 
-double HB_EXPORT hb_numRound( double dNum, int iDec )
+HB_EXPORT double hb_numRound( double dNum, int iDec )
 {
    static const double doBase = 10.0f;
    double doComplete5, doComplete5i, dPow;
@@ -413,7 +424,7 @@ double HB_EXPORT hb_numRound( double dNum, int iDec )
  * use the similar hack in ==, >=, <=, <, > operations if it's set.
  */
 
-//#define HB_NUM_PRECISION  16
+/* #define HB_NUM_PRECISION  16 */
 
 #ifdef HB_NUM_PRECISION
    /*
@@ -500,7 +511,7 @@ double HB_EXPORT hb_numRound( double dNum, int iDec )
       return doComplete5i / dPow;
 }
 
-double HB_EXPORT hb_numInt( double dNum )
+HB_EXPORT double hb_numInt( double dNum )
 {
    double dInt;
 
@@ -690,32 +701,32 @@ static BOOL hb_str2number( BOOL fPCode, const char* szNum, ULONG ulLen, HB_LONG 
    return fDbl;
 }
 
-BOOL HB_EXPORT hb_compStrToNum( const char* szNum, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
+HB_EXPORT BOOL hb_compStrToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_compStrToNum( %s, %p, %p, %p, %p)", szNum, plVal, pdVal, piDec, piWidth ));
-   return hb_str2number( TRUE, szNum, strlen( szNum ), plVal, pdVal, piDec, piWidth );
+   HB_TRACE(HB_TR_DEBUG, ("hb_compStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ));
+   return hb_str2number( TRUE, szNum, ulLen, plVal, pdVal, piDec, piWidth );
 }
 
-BOOL HB_EXPORT hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
+HB_EXPORT BOOL hb_valStrnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal, int * piDec, int * piWidth )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_valStrToNum( %s, %lu, %p, %p, %p, %p)", szNum, ulLen, plVal, pdVal, piDec, piWidth ));
    return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, piDec, piWidth );
 }
 
-BOOL HB_EXPORT hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal )
+HB_EXPORT BOOL hb_strToNum( const char* szNum, HB_LONG * plVal, double * pdVal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %p, %p)", szNum, plVal, pdVal ));
    return hb_str2number( FALSE, szNum, strlen( szNum ), plVal, pdVal, NULL, NULL );
 }
 
-BOOL HB_EXPORT hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal )
+HB_EXPORT BOOL hb_strnToNum( const char* szNum, ULONG ulLen, HB_LONG * plVal, double * pdVal )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_strToNum(%s, %lu, %p, %p)", szNum, ulLen, plVal, pdVal ));
    return hb_str2number( FALSE, szNum, ulLen, plVal, pdVal, NULL, NULL );
 }
 
 /* returns the numeric value of a character string representation of a number */
-double HB_EXPORT hb_strVal( const char * szText, ULONG ulLen )
+HB_EXPORT double hb_strVal( const char * szText, ULONG ulLen )
 {
    HB_LONG lVal;
    double dVal;
@@ -727,7 +738,7 @@ double HB_EXPORT hb_strVal( const char * szText, ULONG ulLen )
    return dVal;
 }
 
-HB_LONG HB_EXPORT hb_strValInt( const char * szText, int * iOverflow )
+HB_EXPORT HB_LONG hb_strValInt( const char * szText, int * iOverflow )
 {
    HB_LONG lVal;
    double dVal;
@@ -819,7 +830,7 @@ HB_EXPORT char * hb_strncpyUpper( char * pDest, const char * pSource, ULONG ulLe
 
    pDest[ ulLen ] ='\0';
 
-   /* some compilers impliment toupper as a macro, and this has side effects! */
+   /* some compilers implement toupper as a macro, and this has side effects! */
    /* *pDest++ = toupper( *pSource++ ); */
    while( ulLen && (*pDest++ = toupper( *pSource )) != '\0' )
    {
@@ -920,8 +931,8 @@ HB_EXPORT char * hb_strncpyTrim( char * pDest, const char * pSource, ULONG ulLen
 
 char * hb_strRemEscSeq( char *str, ULONG *pLen )
 {
-   char *ptr, *dst, ch;
    ULONG ul = *pLen, ulStripped = 0;
+   char *ptr, *dst, ch;
 
    ptr = dst = str;
    while( ul )
@@ -938,28 +949,69 @@ char * hb_strRemEscSeq( char *str, ULONG *pLen )
       if( ch == '\\' )
       {
          ++ulStripped;
-         ch = *ptr++;
-         switch( ch )
+         if( ul )
          {
-            case 'r':
-               ch = '\r';
-               break;
-            case 'n':
-               ch = '\n';
-               break;
-            case 't':
-               ch = '\t';
-               break;
-            case 'b':
-               ch = '\b';
-               break;
-            case 'q':
-               ch = '"';
-               break;
-            case '\\':
-            default:
-               break;
+            ul--;
+            ch = *ptr++;
+            switch( ch )
+            {
+               case 'r':
+                  ch = '\r';
+                  break;
+               case 'n':
+                  ch = '\n';
+                  break;
+               case 't':
+                  ch = '\t';
+                  break;
+               case 'b':
+                  ch = '\b';
+                  break;
+               case '0':
+               case '1':
+               case '2':
+               case '3':
+               case '4':
+               case '5':
+               case '6':
+               case '7':
+                  ch -= '0';
+                  if( ul && *ptr >= '0' && *ptr <= '7' )
+                  {
+                     ch = ( ch << 3 ) | ( *ptr++ - '0' );
+                     ++ulStripped;
+                     if( --ul && *ptr >= '0' && *ptr <= '7' )
+                     {
+                        ch = ( ch << 3 ) | ( *ptr++ - '0' );
+                        ++ulStripped;
+                        --ul;
+                     }
+                  }
+                  break;
+               case 'x':
+                  ch = 0;
+                  while( ul )
+                  {
+                     if( *ptr >= '0' && *ptr <= '9' )
+                        ch = ( ch << 4 ) | ( *ptr++ - '0' );
+                     else if( *ptr >= 'A' && *ptr <= 'F' )
+                        ch = ( ch << 4 ) | ( *ptr++ - 'A' + 10 );
+                     else if( *ptr >= 'a' && *ptr <= 'f' )
+                        ch = ( ch << 4 ) | ( *ptr++ - 'a' + 10 );
+                     else
+                        break;
+                     ++ulStripped;
+                     --ul;
+                  }
+                  break;
+               case '\\':
+               default:
+                  break;
+            }
          }
+         else
+            break;
+            
       }
       *dst++ = ch;
    }

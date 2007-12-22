@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.119 2007/06/30 03:06:55 peterrees Exp $
+ * $Id: hbexprb.c,v 1.120 2007/08/28 19:04:54 ronpinkas Exp $
  */
 
 /*
@@ -585,8 +585,7 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
 
          hb_compExprCBVarDel( ( HB_CBVAR_PTR ) pSelf->value.asList.pIndex );
 
-         /* Delete all expressions of the block.
-         */
+         /* Delete all expressions of the block. */
          while( pExp )
          {
             pNext = pExp->pNext;
@@ -597,7 +596,6 @@ static HB_EXPR_FUNC( hb_compExprUseCodeblock )
          break;
       }
    }
-
    return pSelf;
 }
 
@@ -729,8 +727,8 @@ static HB_EXPR_FUNC( hb_compExprUseArray )
 
             HB_EXPR_GENPCODE3( hb_compGenPCode3, HB_P_ARRAYGEN, HB_LOBYTE( pSelf->ulLength ), HB_HIBYTE( pSelf->ulLength ), ( BOOL ) 1 );
          }
+         break;
       }
-      break;
 
       case HB_EA_POP_PCODE:
          break;
@@ -780,19 +778,25 @@ static HB_EXPR_FUNC( hb_compExprUseVarRef )
    {
       case HB_EA_REDUCE:
          break;
+
       case HB_EA_ARRAY_AT:
          hb_compErrorType( pSelf );
          break;
+
       case HB_EA_ARRAY_INDEX:
          break;
+
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );
          break;
+
       case HB_EA_PUSH_PCODE:
          HB_EXPR_PCODE1( hb_compGenPushVarRef, pSelf->value.asSymbol );
          break;
+
       case HB_EA_POP_PCODE:
          break;
+
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
          hb_compWarnMeaningless( pSelf );
@@ -813,19 +817,25 @@ static HB_EXPR_FUNC( hb_compExprUseMemVarRef )
    {
       case HB_EA_REDUCE:
          break;
+
       case HB_EA_ARRAY_AT:
          hb_compErrorType( pSelf );
          break;
+
       case HB_EA_ARRAY_INDEX:
          break;
+
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );
          break;
+
       case HB_EA_PUSH_PCODE:
          HB_EXPR_PCODE1( hb_compGenPushMemVarRef, pSelf->value.asSymbol );
          break;
+
       case HB_EA_POP_PCODE:
          break;
+
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
          hb_compWarnMeaningless( pSelf );
@@ -869,6 +879,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunRef )
    return pSelf;
 }
 
+
 /* actions for HB_ET_IIF expression
  */
 static HB_EXPR_FUNC( hb_compExprUseIIF )
@@ -889,26 +900,25 @@ static HB_EXPR_FUNC( hb_compExprUseIIF )
          break;
 
       case HB_EA_PUSH_PCODE:
-         {
-            /* this is called if all three parts of IIF expression should be generated
-            */
-            LONG lPosFalse, lPosEnd;
-            HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList;
+      {
+         /* this is called if all three parts of IIF expression should be generated
+         */
+         LONG lPosFalse, lPosEnd;
+         HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList;
 
-            HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
-            lPosFalse = HB_EXPR_PCODE1( hb_compGenJumpFalse, 0 );
-            pExpr =pExpr->pNext;
+         HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
+         lPosFalse = HB_EXPR_PCODE1( hb_compGenJumpFalse, 0 );
+         pExpr =pExpr->pNext;
 
-            HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
-            lPosEnd = HB_EXPR_PCODE1( hb_compGenJump, 0 );
-            pExpr =pExpr->pNext;
+         HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
+         lPosEnd = HB_EXPR_PCODE1( hb_compGenJump, 0 );
+         pExpr =pExpr->pNext;
 
-            HB_EXPR_PCODE1( hb_compGenJumpHere, lPosFalse );
-            HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
-            HB_EXPR_PCODE1( hb_compGenJumpHere, lPosEnd );
-         }
+         HB_EXPR_PCODE1( hb_compGenJumpHere, lPosFalse );
+         HB_EXPR_USE( pExpr, HB_EA_PUSH_PCODE );
+         HB_EXPR_PCODE1( hb_compGenJumpHere, lPosEnd );
          break;
-
+      }
       case HB_EA_POP_PCODE:
          break;
 
@@ -944,27 +954,24 @@ static HB_EXPR_FUNC( hb_compExprUseList )
    switch( iMessage )
    {
       case HB_EA_REDUCE:
+         if( HB_SUPPORT_XBASE )
          {
-            if( HB_SUPPORT_XBASE )
+            if( hb_compExprListLen( pSelf ) == 1 )
             {
-               if( hb_compExprListLen( pSelf ) == 1 )
+               HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList;
+               if( pExpr->ExprType == HB_ET_MACRO &&
+                   pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                {
-                  if( pSelf->value.asList.pExprList->ExprType == HB_ET_MACRO )
-                  {
-                     if( pSelf->value.asList.pExprList->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
-                     {
-                        pSelf->value.asList.pExprList->value.asMacro.SubType |= HB_ET_MACRO_PARE;
-                     }
-                  }
+                  pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
                }
             }
-
-            HB_EXPR_PCODE1( hb_compExprReduceList, pSelf );
-            /* NOTE: if the list contains a single expression then the list
-             * is not reduced to this expression - if you need that reduction
-             * then call hb_compExprListStrip() additionaly
-             */
          }
+
+         HB_EXPR_PCODE1( hb_compExprReduceList, pSelf );
+         /* NOTE: if the list contains a single expression then the list
+          * is not reduced to this expression - if you need that reduction
+          * then call hb_compExprListStrip() additionaly
+          */
          break;
 
       case HB_EA_ARRAY_AT:
@@ -1030,12 +1037,10 @@ static HB_EXPR_FUNC( hb_compExprUseList )
             {
                if( HB_SUPPORT_XBASE )
                {
-                  if( pExpr->ExprType == HB_ET_MACRO )
+                  if( pExpr->ExprType == HB_ET_MACRO &&
+                      pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                   {
-                      if( pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
-                      {
-                         pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
-                      }
+                     pExpr->value.asMacro.SubType |= HB_ET_MACRO_PARE;
                   }
                }
 
@@ -1975,7 +1980,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                               }
                               else /* {|| &cMacro.suffix } -> cMacro + "suffix" */
                               {
-                                 pElem = hb_compExprNewString( pBlock->value.asMacro.szMacro );
+                                 pElem = hb_compExprNewString( pBlock->value.asMacro.szMacro, strlen( pBlock->value.asMacro.szMacro ), FALSE );
                               }
 
                               if( pPrev )
@@ -4982,6 +4987,7 @@ static HB_EXPR_FUNC( hb_compExprUsePower )
       case HB_EA_LVALUE:
          hb_compErrorLValue( pSelf );
          break;
+
       case HB_EA_PUSH_PCODE:
          {
             HB_EXPR_USE( pSelf->value.asOperator.pLeft,  HB_EA_PUSH_PCODE );
