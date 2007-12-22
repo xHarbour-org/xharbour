@@ -1,5 +1,5 @@
 /*
- * $Id: dbgbrwsr.prg,v 1.6 2007/12/04 22:52:49 likewolf Exp $
+ * $Id: dbgbrwsr.prg,v 1.7 2007/12/17 16:48:42 likewolf Exp $
  */
 
 /*
@@ -81,6 +81,7 @@ CREATE CLASS HBDbBrowser
    VAR colCount INIT 0
    VAR colPos INIT 1
    VAR hitBottom INIT .F.
+   VAR freeze INIT 0
 
    VAR aColumns INIT {}
    VAR aRowState INIT {}
