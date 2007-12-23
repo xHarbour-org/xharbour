@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.136 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: harbour.sly,v 1.137 2007/12/23 18:36:26 likewolf Exp $
  */
 
 /*
@@ -39,7 +39,7 @@
 /* Compile using: bison -d -v harbour.y */
 
 /* to pacify some warnings in BCC */
-#if defined( __BORLANDC__ ) && !defined( __STDC__ )
+#if ( defined( __BORLANDC__ ) || defined( _MSC_VER ) ) && !defined( __STDC__ )
 #  define __STDC__
 #endif
 
