@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5828 2007/12/23 02:22:02 likewolf Exp $
+ * $Id: ChangeLog,v 1.5829 2007/12/23 06:23:36 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-23 21:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * makefile.vc
+    * Use generic LIB_CMD.
+  * makefile.wc
+    ! Updated. Tried to sync it as much as possible with makefile.vc.
+  * source/common/expropt1.c
+    ! Fixed two old bad typos spotted by Open Watcom.
+  * source/compiler/harbour.sly
+    ! Added some hacks to allow building with unmodified Bison 2.1 for Borland
+      and Open Watcom.
 
 2007-12-23 13.10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * include/hbapigt.h

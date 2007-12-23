@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.135 2007/12/09 06:22:13 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.136 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -37,6 +37,27 @@
 #include "hbexemem.h"
 
 /* Compile using: bison -d -v harbour.y */
+
+/* to pacify some warnings in BCC */
+#if defined( __BORLANDC__ ) && !defined( __STDC__ )
+#  define __STDC__
+#endif
+
+#undef alloca
+#define alloca  hb_xgrab
+#undef malloc
+#define malloc  hb_xgrab
+#undef realloc
+#define realloc hb_xrealloc
+#undef free
+#define free    hb_xfree
+
+/* NOTE: these symbols are used internally in bison.simple
+ */
+#undef YYFREE
+#define YYFREE hb_xfree
+#undef YYMALLOC
+#define YYMALLOC hb_xgrab
 
 extern FILE *yyin;      /* currently yacc parsed file */
 extern char *yytext;

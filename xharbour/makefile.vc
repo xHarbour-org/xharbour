@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.200 2007/11/23 18:50:39 ptsarenko Exp $
+# $Id: makefile.vc,v 1.201 2007/12/22 11:17:25 modalsist Exp $
 #
 
 #
@@ -297,6 +297,7 @@ HB_GT_LIB = $(LIB_DIR)\$(HB_GT_LIB).lib
 #
 #
 #
+LIB_CMD =lib /out:$@ $**
 
 # TODO: Add GTSLN and GTCRS
 
@@ -1207,16 +1208,6 @@ GTALLEG_LIB_OBJS = \
    $(OBJ_DIR)\ssf.obj
 
 #
-# GTNUL.LIB rules
-#
-
-{$(RTL_DIR)\gtnul}.c{$(OBJ_DIR)}.obj::
-   $(CC) $(CLIBFLAGS) -Fo$(OBJ_DIR)\ $<
-
-GTNUL_LIB_OBJS = \
-   $(OBJ_DIR)\gtnul.obj
-
-#
 # GTPCA.LIB rules
 #
 
@@ -1779,167 +1770,167 @@ $(PPGEN_EXE) : \
 
 !ifdef HB_MT
 $(RTLMT_LIB) : $(RTL_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(PPMT_LIB) : $(PP_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(RDDMT_LIB) : $(RDD_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFCDXMT_LIB) : $(DBFCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(BMDBFCDXMT_LIB) : $(BMDBFCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(SIXCDXMT_LIB) : $(SIXCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(BMSIXCDXMT_LIB) : $(BMSIXCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFFPTMT_LIB) : $(DBFFPT_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFNTXMT_LIB) : $(DBFNTX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(HBSIXMT_LIB) : $(HBSIX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(HSXMT_LIB) : $(HSX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(VMMT_LIB) : $(VM_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(MACROMT_LIB) : $(MACRO_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(ODBCMT_LIB) : $(ODBC_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(TIPMT_LIB) : $(TIP_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(CTMT_LIB) : $(CT_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(CGIMT_LIB) : $(CGI_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(USRRDDMT_LIB) : $(USRRDD_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 !else
 
 $(RTL_LIB) : $(RTL_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(PCREPOS_LIB) : $(PCREPOS_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(COMMON_LIB) : $(COMMON_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(CODEPAGE_LIB) : $(CODEPAGE_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(CT_LIB) : $(CT_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DEBUG_LIB) : $(DEBUG_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(MACRO_LIB) : $(MACRO_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(PP_LIB) : $(PP_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(LANG_LIB) : $(LANG_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(RDD_LIB) : $(RDD_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFCDX_LIB) : $(DBFCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(BMDBFCDX_LIB) : $(BMDBFCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(SIXCDX_LIB) : $(SIXCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(BMSIXCDX_LIB) : $(BMSIXCDX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFFPT_LIB) : $(DBFFPT_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DBFNTX_LIB) : $(DBFNTX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(HBSIX_LIB) : $(HBSIX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(HSX_LIB) : $(HSX_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(NULSYS_LIB) : $(NULSYS_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(USRRDD_LIB) : $(USRRDD_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(VM_LIB) : $(VM_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(TIP_LIB) : $(TIP_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(CGI_LIB) : $(CGI_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTCGI_LIB) : $(GTCGI_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTGUI_LIB) : $(GTGUI_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTNUL_LIB) : $(GTNUL_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTPCA_LIB) : $(GTPCA_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTSTD_LIB) : $(GTSTD_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTWIN_LIB) : $(GTWIN_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTWVT_LIB) : $(GTWVT_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(GTDOS_LIB) : $(GTDOS_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 !ifdef HB_GTALLEG
 $(GTALLEG_LIB) : $(GTALLEG_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 !endif
 
 $(ODBC_LIB) : $(ODBC_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(MISC_LIB) : $(MISC_LIB_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 $(DLL_MAIN_LIB) : $(DLL_MAIN_OBJS)
-   lib /out:$@ $**
+   $(LIB_CMD)
 
 !endif
 

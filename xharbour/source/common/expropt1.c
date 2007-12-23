@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.21 2007/05/18 13:44:30 ronpinkas Exp $
+ * $Id: expropt1.c,v 1.22 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -123,8 +123,8 @@ static char * s_OperTable[] = {
    ">=",           /* HB_EO_GE        */
    "!=",           /* HB_EO_NE        */
    "$",            /* HB_EO_IN        */
-   "LIKE"          /* HB_EO_LIKE      */
-   "MATCH"         /* HB_EO_MATCH     */
+   "LIKE",         /* HB_EO_LIKE      */
+   "MATCH",        /* HB_EO_MATCH     */
    "+",            /* HB_EO_PLUS      */
    "-",            /* HB_EO_MINUS     */
    "*",            /* HB_EO_MULT      */
