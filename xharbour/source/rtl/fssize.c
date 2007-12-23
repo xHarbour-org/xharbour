@@ -1,6 +1,6 @@
 
 /*
- * $Id: fssize.c,v 1.6 2005/01/11 23:53:45 likewolf Exp $
+ * $Id: fssize.c,v 1.7 2007/12/19 13:15:22 lculik Exp $
  */
 
 /*
@@ -77,7 +77,7 @@
 
 HB_FOFFSET hb_fsFSize( BYTE * pszFileName, BOOL bUseDirEntry )
 {
-   ULONG ulRet = 0;
+   //ULONG ulRet = 0;
 
    if( bUseDirEntry )
    {
