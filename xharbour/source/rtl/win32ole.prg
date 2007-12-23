@@ -1,5 +1,5 @@
 /*
- * $Id: win32ole.prg,v 1.154 2007/11/27 00:06:44 andijahja Exp $
+ * $Id: win32ole.prg,v 1.155 2007/11/27 05:32:20 andijahja Exp $
  */
 
 /*
@@ -133,6 +133,7 @@ RETURN TOleAuto():GetActiveObject( cString )
    static DISPPARAMS s_EmptyDispParams;
 
    static VARIANTARG RetVal, OleVal;
+
 
    #ifdef __WATCOMC__
    const GUID GUID_NULL = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
@@ -767,6 +768,7 @@ RETURN Self
   HRESULT hb_oleVariantToItem( PHB_ITEM pItem, VARIANT *pVariant );
   static PHB_ITEM SafeArrayToArray( SAFEARRAY *parray, UINT iDim, long* rgIndices, VARTYPE vt );
 
+  HB_EXTERN_BEGIN
   //---------------------------------------------------------------------------//
   HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
   {
@@ -812,26 +814,6 @@ RETURN Self
   }
 
   //---------------------------------------------------------------------------//
-  HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
-  {
-     char *cString = hb_parc( 1 );
-
-     if( cString )
-     {
-        BSTR wString = hb_oleAnsiToWide( cString );
-
-        if( wString )
-        {
-           hb_retclenAdoptRaw( (char *) wString, SysStringLen( wString ) );
-           return;
-        }
-     }
-
-     hb_ret();
-     return;
-  }
-
-  //---------------------------------------------------------------------------//
   HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
   {
      int nConvertedLen = WideCharToMultiByte( CP_ACP, 0, wString, -1, NULL, 0, NULL, NULL );
@@ -854,26 +836,6 @@ RETURN Self
      //printf( "\nAnsi: '%s'\n", cString );
 
      return NULL;
-  }
-
-  //---------------------------------------------------------------------------//
-  HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
-  {
-     BSTR wString = ( BSTR ) hb_parc( 1 );
-
-     if( wString )
-     {
-        char *cString = hb_oleWideToAnsi( wString );
-
-        if( cString )
-        {
-           hb_retclenAdopt( cString, strlen( cString ) );
-           return;
-        }
-     }
-
-     hb_ret();
-     return;
   }
 
   //---------------------------------------------------------------------------//
@@ -1214,6 +1176,49 @@ RETURN Self
         }
      }
   }
+
+  HB_EXTERN_END
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC( ANSITOWIDE )  // ( cAnsiStr ) -> cWideStr
+  {
+     char *cString = hb_parc( 1 );
+
+     if( cString )
+     {
+        BSTR wString = hb_oleAnsiToWide( cString );
+
+        if( wString )
+        {
+           hb_retclenAdoptRaw( (char *) wString, SysStringLen( wString ) );
+           return;
+        }
+     }
+
+     hb_ret();
+     return;
+  }
+
+  //---------------------------------------------------------------------------//
+  HB_FUNC( WIDETOANSI )  // ( cWideStr, nLen ) -> cAnsiStr
+  {
+     BSTR wString = ( BSTR ) hb_parc( 1 );
+
+     if( wString )
+     {
+        char *cString = hb_oleWideToAnsi( wString );
+
+        if( cString )
+        {
+           hb_retclenAdopt( cString, strlen( cString ) );
+           return;
+        }
+     }
+
+     hb_ret();
+     return;
+  }
+
 
   //---------------------------------------------------------------------------//
   static PHB_ITEM * GetParams( DISPPARAMS *pDispParams, int nOffset )

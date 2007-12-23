@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5827 2007/12/22 19:07:44 likewolf Exp $
+ * $Id: ChangeLog,v 1.5828 2007/12/23 02:22:02 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,32 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-23 13.10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   * include/hbapigt.h
+      + function prototype:
+        USHORT HB_EXPORT hb_gtSaveAll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
+                          USHORT uiRight, void * pScrBuff )
+   * include/hbapiitm.h
+      + function prototype:
+        PHB_ITEM HB_EXPORT hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime )
+        PHB_ITEM HB_EXPORT hb_itemPutDate( PHB_ITEM pItem, LONG lDate )
+        PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+
+   * include/hbapi.h
+      + function prototype:
+        HB_ULONG HB_EXPORT hb_hextonum(char *cHex)
+
+   * source/rtl/win32ole.prg
+      ! add extern "C" attributes to:
+        HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
+        HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
+        HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
+        HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
+
+   * include/hbapirdd.h
+      + function prototype:
+        HB_EXPORT void hb_rddWaShutDown( void )
 
 2007-12-23 05:20 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbexprb.c

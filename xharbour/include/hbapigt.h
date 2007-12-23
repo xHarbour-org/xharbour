@@ -1,5 +1,5 @@
 /*
- * $Id: hbapigt.h,v 1.50 2007/12/01 22:33:22 andijahja Exp $
+ * $Id: hbapigt.h,v 1.51 2007/12/21 12:12:21 likewolf Exp $
  */
 
 /*
@@ -291,6 +291,9 @@ extern HB_EXPORT   void hb_gtSetShutdownEvent( int iEvent );
 extern HB_EXPORT void hb_gtSetResizeEvent( int iEvent );
 extern HB_EXPORT int  hb_gtGetResizeEvent( void );
 extern HB_EXPORT void hb_gtHandleResize( void );
+
+extern USHORT HB_EXPORT hb_gtSaveAll( USHORT uiTop, USHORT uiLeft, USHORT uiBottom,
+                          USHORT uiRight, void * pScrBuff );
 
 /* Undocumented CA-Clipper 5.x GT API calls */
 

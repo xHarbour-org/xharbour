@@ -1174,7 +1174,6 @@ extern HB_EXPORT void *  hb_rddGetCurrentWorkAreaPointer( void );
 extern HB_EXPORT void *  hb_rddGetWorkAreaPointer( int iArea );
 extern HB_EXPORT USHORT  hb_rddInsertAreaNode( const char *szDriver );
 extern HB_EXPORT void    hb_rddReleaseCurrentArea( void );
-extern HB_EXPORT void    hb_rddWaShutDown( void );
 
 extern HB_EXPORT int       hb_rddRegister( const char * szDriver, USHORT uiType );
 extern HB_EXPORT ERRCODE   hb_rddInherit( RDDFUNCS * pTable, const RDDFUNCS * pSubTable, RDDFUNCS * pSuperTable, const char * szDrvName );
@@ -1231,6 +1230,7 @@ extern HB_EXPORT HB_TYPE   hb_rddFieldType( USHORT extendType );
 typedef ERRCODE ( * WACALLBACK )( AREAP, void * );
 extern HB_EXPORT ERRCODE   hb_rddIterateWorkAreas( WACALLBACK pCallBack, void * cargo );
 extern HB_EXPORT ERRCODE   hb_rddGetTempAlias( char * szAliasTmp );
+extern HB_EXPORT void      hb_rddWaShutDown( void );
 
 HB_EXTERN_END
 

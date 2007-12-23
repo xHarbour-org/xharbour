@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.225 2007/12/21 12:12:20 likewolf Exp $
+ * $Id: hbapi.h,v 1.226 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -957,6 +957,7 @@ extern HB_EXPORT char *  hb_strLowerCopy( char * szText, ULONG ulLen );
 extern HB_EXPORT HB_LONG hb_strValInt( const char * szText, int * iOverflow );
 extern HB_EXPORT int     Wild2RegEx( char *sWild, char* sRegEx, BOOL bMatchCase );
 extern HB_EXPORT BOOL    hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString );
+extern HB_ULONG  HB_EXPORT hb_hextonum(char *cHex);
 
 #include "local.h"
 
