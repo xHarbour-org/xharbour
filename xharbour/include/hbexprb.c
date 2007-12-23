@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.120 2007/08/28 19:04:54 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.121 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -1699,9 +1699,16 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                   if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
                   {
-                     if( pSub->value.asString.string[0] == '\0' )
+                     if( pSub->ulLength == 0 )
                      {
-                        pReduced = hb_compExprNewLong( 1 );
+                        /* This is CA-Clipper compiler optimizer behavior,
+                         * macro compiler does not have optimizer [druzus]
+                         */
+                        #ifndef HB_MACRO_SUPPORT
+                           pReduced = hb_compExprNewLong( 1 );
+                        #else
+                           pReduced = hb_compExprNewLong( 0 );
+                        #endif
                      }
                      else
                      {

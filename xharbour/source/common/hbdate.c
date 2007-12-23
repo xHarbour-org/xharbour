@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.8 2007/08/21 20:40:51 marchuet Exp $
+ * $Id: hbdate.c,v 1.9 2007/10/31 08:34:49 marchuet Exp $
  */
 
 /*
@@ -911,7 +911,7 @@ void HB_EXPORT hb_timeDecode( LONG lTime, int * piHour, int * piMinute, double *
    int iHour = 0, iMin = 0;
    double dSec = 0.0;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecode(%d, %p, %p %p)", dTime, piHour, piMinute, pdSeconds));
+   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecode(%ld, %p, %p %p)", lTime, piHour, piMinute, pdSeconds));
 
    if( lTime > 0 )
    {
@@ -956,9 +956,9 @@ void HB_EXPORT hb_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMo
                                     int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk )
 {
    LONG lDate;
-   BOOL iOk
+   BOOL iOk;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p)", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, iOk));
+   HB_TRACE(HB_TR_DEBUG, ("hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p)", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, piOk));
    //printf( "hb_datetimeEncode(%d, %d, %d, %d, %d, %f, %d, %p) Que pasa???\n", iYear, iMonth, iDay, iHour, iMinute, dSeconds, iAmPm, iOk);
 
    lDate = ( LONG ) hb_dateEncode( iYear, iMonth, iDay );

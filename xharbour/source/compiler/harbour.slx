@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.87 2007/12/09 06:22:12 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.88 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -726,6 +726,7 @@ LANGUAGE_RULES_ARE {
             iSize -= s_szBuffer - szBuffer; \
             yylval.valChar.string = hb_compIdentifierNew( sPair, TRUE ); \
             yylval.valChar.length = iLen; \
+            yylval.valChar.dealloc = FALSE; \
             \
             /*printf( "Lit: <%s>, Rest: <%s>\n", sPair, s_szBuffer );*/ \
             iPairToken = 0; \
@@ -738,6 +739,7 @@ LANGUAGE_RULES_ARE {
             hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_STRING_TERMINATOR, szBuffer, NULL ); \
             yylval.valChar.string = hb_compIdentifierNew( szBuffer, TRUE ); \
             yylval.valChar.length = strlen( szBuffer ); \
+            yylval.valChar.dealloc = FALSE; \
             iSize = 0; \
             iPairToken = 0; \
             return LITERAL + DONT_REDUCE; \
@@ -1145,8 +1147,10 @@ static int hb_comp_SLX_CustomAction( int x )
          return '{' + DONT_REDUCE;
 
       case HB_LIT_ACT :
-         yylval.valChar.string = sPair;
+         yylval.valChar.string = (char *) hb_xgrab( iPairLen + 1 );
+         memcpy( yylval.valChar.string, sPair, iPairLen + 1);
          yylval.valChar.length = iPairLen;
+         yylval.valChar.dealloc = TRUE;
          return LITERAL + DONT_REDUCE;
 
       case HB_INIT_PROC :
