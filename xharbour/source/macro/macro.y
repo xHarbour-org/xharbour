@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.31 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: macro.y,v 1.32 2007/12/22 19:04:33 likewolf Exp $
  */
 
 /*
@@ -373,7 +373,7 @@ NilValue   : NIL              { $$ = hb_compExprNewNil(); }
 
 /* Literal string value
  */
-LiteralValue : LITERAL        { $$ = hb_compExprNewString( $1.string, $1.length, FALSE ); }
+LiteralValue : LITERAL        { $$ = hb_compExprNewString( $1.string, $1.length, TRUE ); }
              ;
 
 /* Logical value
