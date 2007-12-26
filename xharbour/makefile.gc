@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.34 2007/11/23 18:50:38 ptsarenko Exp $
+# $Id: makefile.gc,v 1.35 2007/12/22 11:17:25 modalsist Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -4173,6 +4173,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)/hbpcode.o \
    $(OBJ_DIR)/hbfix.o \
    $(OBJ_DIR)/genc.o \
+   $(OBJ_DIR)/gencobj.o \
+   $(OBJ_DIR)/genobj32.o \
    $(OBJ_DIR)/genhrb.o \
    $(OBJ_DIR)/expropta.o \
    $(OBJ_DIR)/exproptb.o \
@@ -4214,6 +4216,12 @@ $(OBJ_DIR)/hbfix.o : $(COMPILER_DIR)/hbfix.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/genc.o : $(COMPILER_DIR)/genc.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/gencobj.o : $(COMPILER_DIR)/gencobj.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/genobj32.o : $(COMPILER_DIR)/genobj32.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/genhrb.o : $(COMPILER_DIR)/genhrb.c

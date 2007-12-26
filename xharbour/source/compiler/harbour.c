@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.169 2007/12/04 14:56:41 andijahja Exp $
+ * $Id: harbour.c,v 1.170 2007/12/21 22:17:07 andijahja Exp $
  */
 
 /*
@@ -5470,8 +5470,16 @@ static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
          hb_compGenCCode( hb_comp_pFileName, szSourceExtension );
          break;
 
+      case LANG_OBJ32:
+         hb_compGenObj32( hb_comp_pFileName );
+         break;
+
       case LANG_PORT_OBJ:
          hb_compGenPortObj( hb_comp_pFileName );
+         break;
+
+      case LANG_OBJ_MODULE:
+         hb_compGenCObj( hb_comp_pFileName, szSourceExtension );
          break;
    }
 }

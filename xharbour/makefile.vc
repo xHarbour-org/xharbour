@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.201 2007/12/22 11:17:25 modalsist Exp $
+# $Id: makefile.vc,v 1.202 2007/12/23 18:36:25 likewolf Exp $
 #
 
 #
@@ -1737,6 +1737,8 @@ $(HARBOUR_EXE) : \
    $(COMPILER_DIR)\hbfunchk.c \
    $(COMPILER_DIR)\hbgenerr.c \
    $(COMPILER_DIR)\genc.c \
+   $(COMPILER_DIR)\gencobj.c \
+   $(COMPILER_DIR)\genobj32.c \
    $(COMPILER_DIR)\genhrb.c \
    $(COMPILER_DIR)\expropta.c \
    $(COMPILER_DIR)\exproptb.c \

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5833 2007/12/24 11:34:48 likewolf Exp $
+ * $Id: ChangeLog,v 1.5834 2007/12/25 05:32:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,28 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-26 12:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+   * makefile.bc
+   * makefile.dc
+   * makefile.gc
+   * makefile.pc
+   * makefile.vc
+   * makefile.wc
+   * source\compiler\MakeFile
+     + restored gencobj.c and genobj32.c files.
+
+   * source\compiler\harbour.c
+   * source\compiler\cmdcheck.c
+   * source\compiler\hbusage.c
+     ! restored -go and -gw flags.
+
+   * source\compiler\gencobj.c
+   * source\compiler\genobj32.c
+     + restored to complier.
+
+   * source\rtl\tbrowse.prg
+     ! fixed GoBottom() method behaviour. Suggested by Pavel Tsarenko.
 
 2007-12-25 12.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * source/tip/thtml.prg

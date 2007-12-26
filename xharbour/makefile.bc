@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.210 2007/11/23 18:50:38 ptsarenko Exp $
+# $Id: makefile.bc,v 1.211 2007/12/22 11:17:25 modalsist Exp $
 #
 
 #
@@ -1102,6 +1102,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbstripl.obj \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
+   $(OBJ_DIR)\gencobj.obj \
+   $(OBJ_DIR)\genobj32.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -1652,6 +1654,8 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbstripl.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfix.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gencobj.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genobj32.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
@@ -1704,6 +1708,12 @@ $(OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c
    $(CC_CMD)
 
 $(OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
    $(CC_CMD)
 
 $(OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c

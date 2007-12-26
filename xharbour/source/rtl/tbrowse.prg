@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.184 2007/12/04 00:21:26 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.185 2007/12/15 01:44:39 modalsist Exp $
  */
 
 /*
@@ -1560,7 +1560,9 @@ METHOD GoBottom() CLASS TBrowse
    ::nRecsToSkip := ::RowCount - 1
 
    //  From top of TBrowse new row position is nToTop + 1 records away
-   ::nNewRowPos := nToTop + 1
+   //::nNewRowPos := nToTop + 1
+   /* 2007/DEC/25 - E.F. - Suggested by P.Tasarenko */
+   ::nNewRowPos := Max(::RowCount - 1, nToTop ) + 1
 
    ::nRowPos := 1
    ::RefreshAll()
@@ -2422,6 +2424,11 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    */
    ::nColPos := Max( Min( ::nColPos, ::nColumns ), 1)
 
+/* 2007/DEC/25 - E.F. - Moved DispBegin(). See comment below. */
+   if ! ::Stable
+      DispBegin()
+   endif
+
    // Configure the browse if not configured . Pritpal Bedi
    //
    if ! ::lConfigured .or. ::lNeverDisplayed
@@ -2499,8 +2506,9 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // Every time I enter stabilization loop I need to draw _at least_ one row.
 
       ::CheckRowsToBeRedrawn()
-      
-      DispBegin()
+
+/* 2007/DEC/25 - E.F. Moved DispBegin() to top */
+//      DispBegin()
 
       while ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
      
@@ -2508,6 +2516,9 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
          
          if ! lForceStable
             DispEnd()
+            if ::lPaintBottomUp .and. nRowToDraw != ::nRowPos
+               ::DrawARow( ::nRowPos )
+            endif
             SetCursor( nOldCursor )
             return .F.
          endif
@@ -2522,11 +2533,14 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
       // Here I use :nLastRow because I'm testing if cache has fewer records than
       // tbrowse displayable area
+
       if ::oDataCache:nLastRow < ::nNewRowPos
          ::nNewRowPos := ::oDataCache:nCurRow
       endif
+
       // If I'm not already under cursor I have to set data source to cursor position
       //
+
       if ::oDataCache:nCurRow <> ::nNewRowPos
          ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
       endif
@@ -2543,8 +2557,11 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
 
    endif
 
-   // NOTE: DBU relies upon current cell being reHilited() even if already stable
-   // 18/11/2005 - ::ColorRect() sets ::lRectPainting, when set, ::Hilite should not be called since we're only painting a color-rect region
+   // NOTE: DBU relies upon current cell being reHilited() even if already
+   //       stable
+   // 18/11/2005 - ::ColorRect() sets ::lRectPainting, when set, ::Hilite
+   // should not be called since we're only painting a color-rect region
+
    if ! ::lRectPainting .AND. ::AutoLite
       ::Hilite()
    else

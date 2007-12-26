@@ -1,5 +1,5 @@
 #
-# $Id: makefile.wc,v 1.74 2007/12/22 11:17:25 modalsist Exp $
+# $Id: makefile.wc,v 1.75 2007/12/23 18:36:25 likewolf Exp $
 #
 
 #
@@ -1699,6 +1699,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbstripl.obj \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
+   $(OBJ_DIR)\gencobj.obj \
+   $(OBJ_DIR)\genobj32.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -1725,6 +1727,8 @@ $(HARBOUR_EXE) : \
    $(ECHO) $(OBJ_DIR)\hbstripl.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfix.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gencobj.obj >> make.tmp
+   $(ECHO) $(OBJ_DIR)\genobj32.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
