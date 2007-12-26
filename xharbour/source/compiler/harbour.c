@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.170 2007/12/21 22:17:07 andijahja Exp $
+ * $Id: harbour.c,v 1.171 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -286,7 +286,11 @@ char **ArgV;
 
 /* ************************************************************************* */
 
+#if defined(__WATCOMC__)
+int _main( int argc, char * argv[] )
+#else
 int main( int argc, char * argv[] )
+#endif
 {
    int iStatus = EXIT_SUCCESS;
    int i;
@@ -426,8 +430,10 @@ int main( int argc, char * argv[] )
    return iStatus;
 }
 
-#if defined(HB_OS_WIN_32) && !defined(__WATCOMC__)
+#if defined(HB_OS_WIN_32)
 #include <windows.h>
+
+#define MAX_ARGS 20
 
 int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     HINSTANCE hPrevInstance,  /* handle to previous instance */
@@ -435,10 +441,12 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
                     int iCmdShow )            /* show state of window */
 {
    int argc = 0;
-   char *argv[ 20 ];
+   char *argv[ MAX_ARGS ];
    LPSTR pArgs = ( LPSTR ) LocalAlloc( LMEM_FIXED, strlen( lpCmdLine ) + 1 ), pArg = pArgs;
    char szAppName[ _POSIX_PATH_MAX + 1 ];
    int iResult;
+   LPSTR pStart;
+   BOOL bInQuotedParam;
 
    strcpy( pArgs, lpCmdLine );
 
@@ -450,41 +458,77 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
    GetModuleFileName( hInstance, szAppName, _POSIX_PATH_MAX );
    argv[ 0 ] = szAppName;
 
-   if( * pArgs != 0 )
+   while ( *pArgs && argc < MAX_ARGS )
    {
-      argv[ ++argc ] = pArgs;
-   }
-
-   while( *pArg != 0 )
-   {
-      if( *pArg == ' ' )
+      while (*pArgs== ' ')
       {
-         *pArg++ = 0;
-         argc++;
-
-         while( *pArg == ' ' )
+         pArgs++ ;
+      }
+      if (*pArgs)
+      {
+         pStart= NULL ;
+         bInQuotedParam= FALSE;
+         while (*pArgs)
          {
-            pArg++;
+            if (*pArgs == '"')
+            {
+               pArgs++;
+               if ( bInQuotedParam )
+               {
+                  if (pStart == NULL)
+                  {
+                     pStart = pArg;
+                  }
+                  break ;
+               }
+               else
+               {
+                  bInQuotedParam = TRUE ;
+               }
+            }
+            else if (*pArgs== ' ')
+            {
+               if ( bInQuotedParam )
+               {
+                  *pArg = *pArgs++ ;
+                  if (pStart == NULL)
+                  {
+                     pStart = pArg;
+                  }
+                  pArg++;
+               }
+               else
+               {
+                  pArgs++ ;
+                  break ;
+               }
+            }
+            else
+            {
+               *pArg = *pArgs++ ;
+               if (pStart == NULL)
+               {
+                  pStart = pArg;
+               }
+               pArg++;
+            }
          }
 
-         if( *pArg != 0 )
+         if (pStart)
          {
-            argv[ argc ] = pArg++;
-         }
-         else
-         {
-            argc--;
+            *pArg++ = '\0';
+            argv[ ++argc ] = pStart ;
          }
       }
-      else
-      {
-         pArg++;
-      }
    }
 
-   argc++;
+   argc ++;
 
-   iResult = main( argc, argv );
+#if defined(__WATCOMC__)
+   iResult = _main( argc, argv );
+#else
+   iResult =  main( argc, argv );
+#endif
 
    LocalFree( pArgs );
 

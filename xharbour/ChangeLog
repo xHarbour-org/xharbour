@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5835 2007/12/26 14:53:38 modalsist Exp $
+ * $Id: ChangeLog,v 1.5836 2007/12/26 20:21:33 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-27 05.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/compiler/harbour.c
+    ! minor fix (for Windows OS) to allow define and include path in
+      quotation marks and compile prg with long file name eg:
+      harbour "my long program" -d"__FOO__" -i"C:\My Long Include Path"
 
 2007-12-26 18:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * include\hbcomp.h
