@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2004/03/22 17:58:25 mauriliolongo Exp $
+# $Id: global.cf,v 1.5 2004/05/04 16:04:46 mauriliolongo Exp $
 #
 
 ifndef MK
@@ -42,7 +42,8 @@ dirbase_mt::
 	-@for %d in ($(HB_ARCHITECTURE) $(OS2_ARCH_DIR)_mt) do if not exist %d\. $(MD) %d
 
 clean::
-	-@for %f in ($(OS2_ARCH_DIR)\*.* $(OS2_ARCH_DIR)_mt\*.*) do $(RM) %f
+	if exist $(OS2_ARCH_DIR)\*.* del $(OS2_ARCH_DIR)\*.* /N
+	if exist $(OS2_ARCH_DIR)_mt\*.* del $(OS2_ARCH_DIR)_mt\*.* /N
 	-@for %d in ($(OS2_ARCH_DIR) $(OS2_ARCH_DIR)_mt $(HB_ARCHITECTURE)) do if exist %d $(RD) %d
 
 else  # bash
