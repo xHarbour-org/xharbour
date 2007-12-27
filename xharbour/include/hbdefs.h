@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.87 2007/01/11 01:00:34 druzus Exp $
+ * $Id: hbdefs.h,v 1.88 2007/02/21 09:26:34 mauriliolongo Exp $
  */
 
 /*
@@ -127,7 +127,6 @@
    #define INCL_DOSMISC
 
    #include <os2.h>
-   #define HB_LONG_LONG_OFF
    #define HB_DONT_DEFINE_BASIC_TYPES
 
 #elif defined( HB_OS_DOS )
@@ -196,21 +195,37 @@
    #undef TRUE
    #define TRUE   (!0)
 
+#else  /* HB_DONT_DEFINE_BASIC_TYPES */
+
+   /* 21/02/07 - <maurilio.longo@libero.it>
+                 Needed when HB_DONT_DEFINE_BASIC_TYPES is defined but
+                 some definition is missing from the include files which
+                 require the use of HB_DONT_DEFINE_BASIC_TYPES in the first place.
+                 Here SCHAR is needed using GCC on OS/2
+   */
+   #if ! defined( SCHAR )
+      typedef signed char SCHAR;          /* 1 byte signed */
+   #endif
+
+#endif /* HB_DONT_DEFINE_BASIC_TYPES */
+
 #ifndef HB_LONG_LONG_OFF
 
-   #if ! defined(_WINNT_H)
-      #if !defined(LONGLONG)
-         #if defined(__GNUC__)
-            typedef long long LONGLONG;
-         #else
-            typedef __int64 LONGLONG;
+   #if ! defined( HB_DONT_DEFINE_BASIC_TYPES )
+      #if ! defined(_WINNT_H)
+         #if !defined(LONGLONG)
+            #if defined(__GNUC__)
+               typedef long long LONGLONG;
+            #else
+               typedef __int64 LONGLONG;
+            #endif
          #endif
-      #endif
-      #if !defined(ULONGLONG)
-         #if defined(__GNUC__)
-            typedef unsigned long long ULONGLONG;
-         #else
-            typedef unsigned __int64 ULONGLONG;
+         #if !defined(ULONGLONG)
+            #if defined(__GNUC__)
+               typedef unsigned long long ULONGLONG;
+            #else
+               typedef unsigned __int64 ULONGLONG;
+            #endif
          #endif
       #endif
    #endif
@@ -249,20 +264,6 @@
       #endif
    #endif
 #endif /* HB_LONG_LONG_OFF */
-
-#else  /* HB_DONT_DEFINE_BASIC_TYPES */
-
-   /* 21/02/07 - <maurilio.longo@libero.it>
-                 Needed when HB_DONT_DEFINE_BASIC_TYPES is defined but
-                 some definition is missing from the include files which
-                 require the use of HB_DONT_DEFINE_BASIC_TYPES in the first place.
-                 Here SCHAR is needed using GCC on OS/2
-   */
-   #if ! defined( SCHAR )
-      typedef signed char SCHAR;          /* 1 byte signed */
-   #endif
-
-#endif /* HB_DONT_DEFINE_BASIC_TYPES */
 
 /*
  * below are some hacks which don't have to be true on some machines
