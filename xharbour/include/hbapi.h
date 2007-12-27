@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.226 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: hbapi.h,v 1.227 2007/12/23 06:23:37 andijahja Exp $
  */
 
 /*
@@ -549,11 +549,7 @@ extern HB_EXPORT void    hb_xexit( void );                         /* Deinitiali
    extern HB_EXPORT void *  hb_xrealloc( void * pMem, ULONG ulSize ); /* reallocates memory */
 #endif
 
-#ifdef HB_FM_STATISTICS
-   extern HB_EXPORT void    hb_xautorelease( void * pMem );
-#else
-   #define  hb_xautorelease( pMem )
-#endif
+extern HB_EXPORT void    hb_xautorelease( void * pMem );
 
 extern HB_EXPORT ULONG   hb_xsize( void * pMem );                  /* returns the size of an allocated memory block */
 extern HB_EXPORT ULONG   hb_xquery( USHORT uiMode );               /* Query different types of memory information */
