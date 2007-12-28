@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5843 2007/12/28 08:53:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.5844 2007/12/28 13:10:54 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-28 18:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbpp.h
+  * source/pp/ppcore.c
+    % added some speed optimizations - it's not done in the way I want to
+      have in the final version but with some very small modifications it
+      should make people using a lot of #[x]translate (Enrico ;-)) happy.
+    (Borrowed from Harbour, by Przemyslaw Czerpak)
 
 2007-12-28 16:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/common/hbver.c
