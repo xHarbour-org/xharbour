@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.38 2007/12/23 21:57:40 likewolf Exp $
+ * $Id: hbver.c,v 1.39 2007/12/28 02:11:02 likewolf Exp $
  */
 
 /*
@@ -200,7 +200,7 @@ char * hb_verPlatform( void )
 
       if( GetVersionExA( &osVer ) )
       {
-         const char *szName;
+         const char *szName = NULL;
          const char *szProduct = NULL;
 
          switch( osVer.dwPlatformId )
@@ -340,7 +340,7 @@ char * hb_verPlatform( void )
          }
 
          snprintf( pszPlatform, 256, "Windows %s%s %lu.%02lu.%04d",
-                   szName, szProduct ? szProduct : "",
+                   szName ? szName : NULL, szProduct ? szProduct : "",
                    ( ULONG ) osVer.dwMajorVersion,
                    ( ULONG ) osVer.dwMinorVersion,
                    ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
