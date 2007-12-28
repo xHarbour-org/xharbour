@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5839 2007/12/27 16:21:54 mauriliolongo Exp $
+ * $Id: ChangeLog,v 1.5840 2007/12/27 16:39:05 mauriliolongo Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,18 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-27 22:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * include\hbcomp.h
+    - removed LANG_JAVA from LANGUAGES.
+
+  * contrib\pgsql
+    + added make_pc.bat (to build libhbpg.lib)
+    + added makefile.pc (idem)
+    + added pocc.mak (to build libpq from Postgresql sources under Pelles C).
+    + added readmepc.txt (explain how to build libpq under Pelles C).
+    + created pgrdd subfolder
+    ! moved pgrdd.prg and tstpgrdd.prg to pgrdd subfolder.
 
 2007-12-27 17.40 UTC+0100 Maurilio Longo <maurilio.longo@libero.it>
    * config/os2

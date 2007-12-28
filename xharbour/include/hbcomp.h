@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.60 2007/12/21 22:17:07 andijahja Exp $
+ * $Id: hbcomp.h,v 1.61 2007/12/26 20:21:34 modalsist Exp $
  */
 
 /*
@@ -75,7 +75,6 @@ typedef enum
 {
    LANG_C,                      /* C language (by default) <file.c> */
    LANG_OBJ32,                  /* DOS/Windows 32 bits <file.obj> */
-   LANG_JAVA,                   /* Java <file.java> */
    LANG_PORT_OBJ,               /* Portable objects <file.hrb> */
    LANG_OBJ_MODULE              /* Platform dependant object module <file.obj> */
 } LANGUAGES;                    /* supported Harbour output languages */
