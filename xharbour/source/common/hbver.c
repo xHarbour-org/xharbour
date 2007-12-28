@@ -1,5 +1,5 @@
 /*
- * $Id: hbver.c,v 1.37 2007/04/19 19:49:34 toninhofwi Exp $
+ * $Id: hbver.c,v 1.38 2007/12/23 21:57:40 likewolf Exp $
  */
 
 /*
@@ -194,30 +194,30 @@ char * hb_verPlatform( void )
 #elif defined(HB_OS_WIN_32)
 
    {
-      /* NOTE: Must be larger than 128, which is the maximum size of
-               osVer.szCSDVersion (Win32). [vszakats] */
-      char szName[128] = "Windows";
       OSVERSIONINFO osVer;
 
       osVer.dwOSVersionInfoSize = sizeof( osVer );
 
       if( GetVersionExA( &osVer ) )
       {
+         const char *szName;
+         const char *szProduct = NULL;
+
          switch( osVer.dwPlatformId )
          {
             case VER_PLATFORM_WIN32_WINDOWS:
 
                if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion < 10 )
                {
-                  hb_strncat( szName, " 95", sizeof( szName ) );
+                  szName = " 95";
                }
                else if( osVer.dwMajorVersion == 4 && osVer.dwMinorVersion == 10 )
                {
-                  hb_strncat( szName, " 98", sizeof( szName ) );
+                  szName = " 98";
                }
                else
                {
-                  hb_strncat( szName, " ME", sizeof( szName ) );
+                  szName = " ME";
                }
 
                break;
@@ -226,30 +226,29 @@ char * hb_verPlatform( void )
 
                if( osVer.dwMajorVersion == 6 )
                {
-                  hb_strncat( szName, " Windows Vista", sizeof( szName ) );
+                  szName = " Windows Vista";
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 2 )
                {
-                  hb_strncat( szName, " Server 2003", sizeof( szName ) );
+                  szName = " Server 2003";
                }
                else if( osVer.dwMajorVersion == 5 && osVer.dwMinorVersion == 1 )
                {
-                  hb_strncat( szName, " XP", sizeof( szName ) );
+                  szName = " XP";
                }
                else if( osVer.dwMajorVersion == 5 )
                {
-                  hb_strncat( szName, " 2000", sizeof( szName ) );
+                  szName = " 2000";
                }
                else
                {
-                  hb_strncat( szName, " NT", sizeof( szName ) );
+                  szName = " NT";
                }
 
                /* test for specific product on Windows NT 4.0 SP6 and later */
 
                {
                   HBOSVERSIONINFOEX osVerEx;  /* NOTE */
-                  char *szProduct = NULL;
 
                   osVerEx.dwOSVersionInfoSize = sizeof( osVerEx );
 
@@ -327,25 +326,21 @@ char * hb_verPlatform( void )
                         }
                      }
                   }
-                  if ( szProduct )
-                  {
-                     hb_strncat( szName, szProduct, sizeof( szName ) );
-                  }
                }
 
                break;
 
             case VER_PLATFORM_WIN32s:
-               hb_strncat( szName, " 32s", sizeof( szName ) );
+               szName = " 32s";
                break;
 
             case VER_PLATFORM_WIN32_CE:
-               hb_strncat( szName, " CE", sizeof( szName ) );
+               szName = " CE";
                break;
          }
 
-         snprintf( pszPlatform, 256, "%s %lu.%02lu.%04d",
-                   szName,
+         snprintf( pszPlatform, 256, "Windows %s%s %lu.%02lu.%04d",
+                   szName, szProduct ? szProduct : "",
                    ( ULONG ) osVer.dwMajorVersion,
                    ( ULONG ) osVer.dwMinorVersion,
                    ( USHORT ) LOWORD( osVer.dwBuildNumber ) );
