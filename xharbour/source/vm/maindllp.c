@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.18 2007/06/18 12:25:31 ronpinkas Exp $
+ * $Id: maindllp.c,v 1.19 2007/06/18 17:23:16 kaddath Exp $
  */
 
 /*
@@ -61,6 +61,10 @@
 
 #if defined( HB_OS_WIN_32 )
 HB_EXTERN_BEGIN
+
+static HMODULE hModule = NULL;
+static FARPROC pExtIsArray = NULL;
+
 #if defined(HB_DLL_REQUIRED_DLLMAIN)
 BOOL HB_EXPORT WINAPI DllMain( HINSTANCE hInstance, DWORD fdwReason, PVOID pvReserved )
 {
@@ -80,9 +84,12 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
    switch( fdwReason )
    {
       case DLL_PROCESS_ATTACH:
+	   hModule = GetModuleHandle( NULL );
+           pExtIsArray = GetProcAddress( hModule, "_hb_extIsArray" );
            break;
 
       case DLL_PROCESS_DETACH:
+	   hModule = NULL;
            break;
    }
 
@@ -92,14 +99,17 @@ BOOL HB_EXPORT WINAPI DllEntryPoint( HINSTANCE hInstance, DWORD fdwReason, PVOID
 /* module symbols initialization */
 HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
-   FARPROC pProcessSymbols;
+   static FARPROC pProcessSymbols = NULL;
    HB_SYMBOL_UNUSED( pGlobals );
 
    /* notice hb_vmProcessDllSymbols() must be used, and not
     * hb_vmProcessSymbols(), as some special symbols pointers
     * adjustments are required
     */
-   pProcessSymbols = GetProcAddress( GetModuleHandle( NULL ), "_hb_vmProcessDllSymbols" );
+   if ( !pProcessSymbols )
+   {
+      pProcessSymbols = GetProcAddress( hModule, "_hb_vmProcessDllSymbols" );
+   }
 
    if( pProcessSymbols )
    {
@@ -113,7 +123,12 @@ HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbol
 
 void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 {
-   FARPROC pExecute = GetProcAddress( GetModuleHandle( NULL ), "_hb_vmExecute" );
+   static FARPROC pExecute = NULL;
+
+   if ( !pExecute )
+   {
+      pExecute = GetProcAddress( hModule, "_hb_vmExecute" );
+   }
 
    if( pExecute )
    {
@@ -128,8 +143,12 @@ void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols )
 
 char * hb_parc( int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pParC = GetProcAddress( GetModuleHandle( NULL ), "_hb_parc" );
+   static FARPROC pParC = NULL;
+
+   if ( !pParC )
+   {
+      pParC = GetProcAddress( hModule, "_hb_parc" );
+   }
 
    if( pExtIsArray && pParC )
    {
@@ -158,7 +177,12 @@ char * hb_parc( int iParam, ... )
 PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 {
    PHB_ITEM pReturn;
-   FARPROC pParam=GetProcAddress( GetModuleHandle( NULL ), "_hb_param" );
+   static FARPROC pParam = NULL;
+
+   if ( !pParam )
+   {
+      pParam=GetProcAddress( hModule, "_hb_param" );
+   }
 
    if( pParam )
    {
@@ -171,7 +195,12 @@ PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or a NIL item if param not provided */
 {
    PHB_ITEM pReturn;
-   FARPROC pParamError=GetProcAddress( GetModuleHandle( NULL ), "_hb_paramError" );
+   static FARPROC pParamError = NULL;
+
+   if ( !pParamError )
+   {
+      pParamError=GetProcAddress( hModule, "_hb_paramError" );
+   }
 
    if( pParamError )
    {
@@ -185,20 +214,49 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
 int HB_EXPORT  hb_pcount( void )          /* returns the number of suplied parameters */
 {
    int iReturn;
-   FARPROC pCounts=GetProcAddress( GetModuleHandle( NULL ), "_hb_pcount" );
+   static FARPROC pCounts = NULL;
+
+   if ( !pCounts )
+   {
+      pCounts=GetProcAddress( hModule, "_hb_pcount" );
+   }
 
    if( pCounts )
    {
-      iReturn=( ( HB_PCOUNTS ) pCounts )();
+      iReturn = ( ( HB_PCOUNTS ) pCounts )();
    }
 
    return iReturn;
 }
 
+//----------------------------------------------------------------------------//
+#undef hb_ret
+void hb_ret( void )
+{
+   static HB_RET pFunc=NULL;
+
+   if ( !pFunc )
+   {
+      pFunc=(HB_RET) GetProcAddress( hModule, "_hb_ret" );
+   }
+
+   if( pFunc )
+   {
+      pFunc ();
+   }
+
+   return;
+}
+
 #undef hb_retc
 void hb_retc( const char * szText )   /* returns a string */
 {
-   FARPROC pRetc=GetProcAddress( GetModuleHandle( NULL ), "_hb_retc" );
+   static FARPROC pRetc = NULL;
+
+   if ( !pRetc )
+   {
+      pRetc = GetProcAddress( hModule, "_hb_retc" );
+   }
 
    if( pRetc )
    {
@@ -209,7 +267,12 @@ void hb_retc( const char * szText )   /* returns a string */
 #undef hb_retclen
 void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a specific length */
 {
-   FARPROC pRetclen=GetProcAddress( GetModuleHandle( NULL ), "_hb_retclen" );
+   static FARPROC pRetclen = NULL;
+
+   if ( !pRetclen )
+   {
+      pRetclen=GetProcAddress( hModule, "_hb_retclen" );
+   }
 
    if( pRetclen )
    {
@@ -220,7 +283,12 @@ void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a s
 #undef hb_retds
 void hb_retds( const char * szDate )  /* returns a date, must use yyyymmdd format */
 {
-   FARPROC pRetds=GetProcAddress( GetModuleHandle( NULL ), "_hb_retds" );
+   static FARPROC pRetds = NULL;
+
+   if ( !pRetds )
+   {
+      pRetds=GetProcAddress( hModule, "_hb_retds" );
+   }
 
    if( pRetds )
    {
@@ -231,7 +299,12 @@ void hb_retds( const char * szDate )  /* returns a date, must use yyyymmdd forma
 #undef hb_retd
 void hb_retd( int iYear, int iMonth, int iDay ) /* returns a date */
 {
-   FARPROC pRetd=GetProcAddress( GetModuleHandle( NULL ), "_hb_retd" );
+   static FARPROC pRetd = NULL;
+
+   if ( !pRetd )
+   {
+      pRetd = GetProcAddress( hModule, "_hb_retd" );
+   }
 
    if( pRetd )
    {
@@ -242,7 +315,12 @@ void hb_retd( int iYear, int iMonth, int iDay ) /* returns a date */
 #undef hb_retdl
 void hb_retdl( LONG lJulian )   /* returns a LONG value as a julian date */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retdl" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retdl" );
+   }
 
    if( pRet )
    {
@@ -254,7 +332,12 @@ void hb_retdl( LONG lJulian )   /* returns a LONG value as a julian date */
 #undef hb_retl
 void hb_retl( int iTrueFalse ) /*  returns a logical integer */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retl" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retl" );
+   }
 
    if( pRet )
    {
@@ -265,7 +348,12 @@ void hb_retl( int iTrueFalse ) /*  returns a logical integer */
 #undef hb_retnd
 void hb_retnd( double dNumber ) /* returns a double */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnd" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retnd" );
+   }
 
    if( pRet )
    {
@@ -276,7 +364,12 @@ void hb_retnd( double dNumber ) /* returns a double */
 #undef hb_retni
 void hb_retni( int iNumber )    /* returns a integer number */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retni" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retni" );
+   }
 
    if( pRet )
    {
@@ -287,7 +380,12 @@ void hb_retni( int iNumber )    /* returns a integer number */
 #undef hb_retnl
 void hb_retnl( LONG lNumber )   /* returns a LONG number */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnl" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retnl" );
+   }
 
    if( pRet )
    {
@@ -298,7 +396,12 @@ void hb_retnl( LONG lNumber )   /* returns a LONG number */
 #undef hb_retnlen
 void hb_retnlen( double dNumber, int iWidth, int iDec ) /* returns a double, with specific width and decimals */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnlen" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retnlen" );
+   }
 
    if( pRet )
    {
@@ -309,7 +412,12 @@ void hb_retnlen( double dNumber, int iWidth, int iDec ) /* returns a double, wit
 #undef hb_retndlen
 void hb_retndlen( double dNumber, int iWidth, int iDec ) /* returns a double, with specific width and decimals */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retndlen" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retndlen" );
+   }
 
    if( pRet )
    {
@@ -320,7 +428,12 @@ void hb_retndlen( double dNumber, int iWidth, int iDec ) /* returns a double, wi
 #undef hb_retnilen
 void hb_retnilen( int iNumber, int iWidth ) /* returns a integer number, with specific width */
 {
-    FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnilen" );
+    static FARPROC pRet = NULL;
+
+    if ( !pRet )
+    {
+       pRet = GetProcAddress( hModule, "_hb_retnilen" );
+    }
 
     if( pRet )
     {
@@ -331,7 +444,12 @@ void hb_retnilen( int iNumber, int iWidth ) /* returns a integer number, with sp
 #undef hb_retnllen
 void hb_retnllen( LONG lNumber, int iWidth ) /* returns a LONG number, with specific width */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_retnilen" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_retnilen" );
+   }
 
    if( pRet )
    {
@@ -342,7 +460,12 @@ void hb_retnllen( LONG lNumber, int iWidth ) /* returns a LONG number, with spec
 #undef hb_reta
 void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
 {
-   FARPROC pRet=GetProcAddress( GetModuleHandle( NULL ), "_hb_reta" );
+   static FARPROC pRet = NULL;
+
+   if ( !pRet )
+   {
+      pRet = GetProcAddress( hModule, "_hb_reta" );
+   }
 
    if( pRet )
    {
@@ -354,7 +477,12 @@ void hb_reta( ULONG ulLen )  /* returns an array with a specific length */
 ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or element type of an array parameter */
 {
    ULONG ulReturn;
-   FARPROC pParinfa=GetProcAddress( GetModuleHandle( NULL ), "_hb_parinfa" );
+   static FARPROC pParinfa = NULL;
+
+   if ( !pParinfa )
+   {
+      pParinfa = GetProcAddress( hModule, "_hb_parinfa" );
+   }
 
    if( pParinfa )
    {
@@ -368,7 +496,12 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
 ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 {
    ULONG ulReturn;
-   FARPROC pParinfo=GetProcAddress( GetModuleHandle( NULL ), "_hb_parinfo" );
+   static FARPROC pParinfo = NULL;
+
+   if ( !pParinfo )
+   {
+      pParinfo = GetProcAddress( hModule, "_hb_parinfo" );
+   }
 
    if( pParinfo )
    {
@@ -381,8 +514,12 @@ ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 #undef hb_parclen
 ULONG hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
 {
-   FARPROC pParC= GetProcAddress( GetModuleHandle( NULL ), "_hb_parclen" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParC = NULL;
+
+   if ( !pParC )
+   {
+      pParC = GetProcAddress( hModule, "_hb_parclen" );
+   }
 
    if( pExtIsArray && pParC )
    {
@@ -411,8 +548,12 @@ ULONG hb_parclen( int iParam, ... ) /* retrieve a string parameter length */
 #undef hb_parcsiz
 ULONG hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter length, including terminator */
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pParcSiz= GetProcAddress( GetModuleHandle( NULL ), "_hb_parcsiz" );
+   static FARPROC pParcSiz = NULL;
+
+   if ( !pParcSiz )
+   {
+      pParcSiz = GetProcAddress( hModule, "_hb_parcsiz" );
+   }
 
    if( pExtIsArray && pParcSiz )
    {
@@ -441,8 +582,12 @@ ULONG hb_parcsiz( int iParam, ... ) /* retrieve a by-reference string parameter 
 #undef hb_pards
 char * hb_pards( int iParam, ... ) /* retrieve a date as a string yyyymmdd */
 {
-   FARPROC pParDs= GetProcAddress( GetModuleHandle( NULL ), "_hb_pards" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParDs = NULL;
+
+   if ( !pParDs )
+   {
+      pParDs = GetProcAddress( hModule, "_hb_pards" );
+   }
 
    if( pExtIsArray && pParDs )
    {
@@ -471,8 +616,12 @@ char * hb_pards( int iParam, ... ) /* retrieve a date as a string yyyymmdd */
 #undef hb_pardsbuff
 char * hb_pardsbuff( char * szDate, int iParam, ... ) /* retrieve a date as a string yyyymmdd */
 {
-   FARPROC pParDsBuff = GetProcAddress( GetModuleHandle( NULL ), "_hb_pardsbuff" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParDsBuff = NULL;
+
+   if ( !pParDsBuff )
+   {
+      pParDsBuff = GetProcAddress( hModule, "_hb_pardsbuff" );
+   }
 
    if( pExtIsArray && pParDsBuff )
    {
@@ -502,8 +651,12 @@ char * hb_pardsbuff( char * szDate, int iParam, ... ) /* retrieve a date as a st
 int hb_parl( int iParam, ... ) /* retrieve a logical parameter as an int */
 {
    /* int iReturn; */
-   FARPROC pParL=GetProcAddress( GetModuleHandle( NULL ), "_hb_parl" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParL = NULL;
+
+   if ( !pParL )
+   {
+      pParL = GetProcAddress( hModule, "_hb_parl" );
+   }
 
    if( pExtIsArray && pParL )
    {
@@ -532,8 +685,12 @@ int hb_parl( int iParam, ... ) /* retrieve a logical parameter as an int */
 #undef hb_parnd
 double hb_parnd( int iParam, ... ) /* retrieve a numeric parameter as a double */
 {
-   FARPROC pParNd=GetProcAddress( GetModuleHandle( NULL ), "_hb_parnd" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParNd = NULL;
+
+   if ( !pParNd )
+   {
+      pParNd = GetProcAddress( hModule, "_hb_parnd" );
+   }
 
    if( pExtIsArray && pParNd )
    {
@@ -563,8 +720,12 @@ double hb_parnd( int iParam, ... ) /* retrieve a numeric parameter as a double *
 int hb_parni( int iParam, ... ) /* retrieve a numeric parameter as a integer */
 {
    /* int iReturn; */
-   FARPROC pParNi=GetProcAddress( GetModuleHandle( NULL ), "_hb_parni" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParNi = NULL;
+
+   if ( !pParNi )
+   {
+      pParNi = GetProcAddress( hModule, "_hb_parni" );
+   }
 
    if( pExtIsArray && pParNi )
    {
@@ -593,8 +754,12 @@ int hb_parni( int iParam, ... ) /* retrieve a numeric parameter as a integer */
 #undef hb_parnl
 LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
 {
-   FARPROC pParNl=GetProcAddress( GetModuleHandle( NULL ), "_hb_parnl" );
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
+   static FARPROC pParNl = NULL;
+
+   if ( !pParNl )
+   {
+      pParNl = GetProcAddress( hModule, "_hb_parnl" );
+   }
 
    if( pExtIsArray && pParNl )
    {
@@ -623,8 +788,12 @@ LONG hb_parnl( int iParam, ... ) /* retrieve a numeric parameter as a LONG */
 #undef hb_storc
 void hb_storc( char * szText, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorC = GetProcAddress( GetModuleHandle( NULL ), "_hb_storc" );
+   static FARPROC pStorC = NULL;
+
+   if ( !pStorC )
+   {
+      pStorC = GetProcAddress( hModule, "_hb_storc" );
+   }
 
    if( pExtIsArray && pStorC )
    {
@@ -649,8 +818,12 @@ void hb_storc( char * szText, int iParam, ... )
 #undef hb_storclen
 void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorC = GetProcAddress( GetModuleHandle( NULL ), "_hb_storclen" );
+   static FARPROC pStorC = NULL;
+
+   if ( !pStorC )
+   {
+      pStorC = GetProcAddress( hModule, "_hb_storclen" );
+   }
 
    if( pExtIsArray && pStorC )
    {
@@ -675,8 +848,12 @@ void hb_storclen( char * szText, ULONG ulLen, int iParam, ... )
 #undef hb_stords
 void hb_stords( char * szDate, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorDs = GetProcAddress( GetModuleHandle( NULL ), "_hb_stords" );
+   static FARPROC pStorDs = NULL;
+
+   if ( !pStorDs )
+   {
+      pStorDs = GetProcAddress( hModule, "_hb_stords" );
+   }
 
    if( pExtIsArray && pStorDs )
    {
@@ -701,8 +878,12 @@ void hb_stords( char * szDate, int iParam, ... )
 #undef hb_storl
 void hb_storl( int iLogical, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorL = GetProcAddress( GetModuleHandle( NULL ), "_hb_storl" );
+   static FARPROC pStorL = NULL;
+
+   if ( !pStorL )
+   {
+      pStorL = GetProcAddress( hModule, "_hb_storl" );
+   }
 
    if( pExtIsArray && pStorL )
    {
@@ -727,8 +908,12 @@ void hb_storl( int iLogical, int iParam, ... )
 #undef hb_storni
 void hb_storni( int iValue, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorNi = GetProcAddress( GetModuleHandle( NULL ), "_hb_storni" );
+   static FARPROC pStorNi = NULL;
+
+   if ( !pStorNi )
+   {
+      pStorNi = GetProcAddress( hModule, "_hb_storni" );
+   }
 
    if( pExtIsArray && pStorNi )
    {
@@ -753,8 +938,12 @@ void hb_storni( int iValue, int iParam, ... )
 #undef hb_stornl
 void hb_stornl( LONG lValue, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorNl = GetProcAddress( GetModuleHandle( NULL ), "_hb_stornl" );
+   static FARPROC pStorNl = NULL;
+
+   if ( !pStorNl )
+   {
+      pStorNl = GetProcAddress( hModule, "_hb_stornl" );
+   }
 
    if( pExtIsArray && pStorNl )
    {
@@ -779,8 +968,12 @@ void hb_stornl( LONG lValue, int iParam, ... )
 #undef hb_stornd
 void hb_stornd( double dNumber, int iParam, ... )
 {
-   FARPROC pExtIsArray = GetProcAddress( GetModuleHandle( NULL ), "_hb_extIsArray" );
-   FARPROC pStorNd = GetProcAddress( GetModuleHandle( NULL ), "_hb_stornd" );
+   static FARPROC pStorNd = NULL;
+
+   if ( !pStorNd )
+   {
+      pStorNd = GetProcAddress( hModule, "_hb_stornd" );
+   }
 
    if( pExtIsArray && pStorNd )
    {
@@ -804,7 +997,12 @@ void hb_stornd( double dNumber, int iParam, ... )
 
 BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen )  /* creates a new array */
 {
-   HB_ARRAYNEW  pArrayNew =( HB_ARRAYNEW ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayNew" );
+   static HB_ARRAYNEW pArrayNew = NULL;
+
+   if ( !pArrayNew )
+   {
+      pArrayNew = ( HB_ARRAYNEW ) GetProcAddress( hModule, "_hb_arrayNew" );
+   }
 
    if( pArrayNew )
    {
@@ -818,7 +1016,12 @@ BOOL hb_arrayNew( PHB_ITEM pItem, ULONG ulLen )  /* creates a new array */
 
 ULONG hb_arrayLen( PHB_ITEM pArray )  /* retrives the array len */
 {
-   HB_ARRAYLEN  pArrayLen = ( HB_ARRAYLEN ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayLen" );
+   static HB_ARRAYLEN pArrayLen = NULL;
+
+   if ( !pArrayLen )
+   {
+      pArrayLen = ( HB_ARRAYLEN ) GetProcAddress( hModule, "_hb_arrayLen" );
+   }
 
    if( pArrayLen )
    {
@@ -832,7 +1035,12 @@ ULONG hb_arrayLen( PHB_ITEM pArray )  /* retrives the array len */
 
 BOOL hb_arrayIsObject( PHB_ITEM pArray )  /* retrives if the array is an object */
 {
-   HB_ARRAYISOBJECT  pArrayIsObject = ( HB_ARRAYISOBJECT ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayIsObject" );
+   static HB_ARRAYISOBJECT pArrayIsObject = NULL;
+
+   if ( !pArrayIsObject )
+   {
+      pArrayIsObject = ( HB_ARRAYISOBJECT ) GetProcAddress( hModule, "_hb_arrayIsObject" );
+   }
 
    if( pArrayIsObject )
    {
@@ -846,7 +1054,12 @@ BOOL hb_arrayIsObject( PHB_ITEM pArray )  /* retrives if the array is an object 
 
 BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue )  /* add a new item to the end of an array item */
 {
-   HB_ARRAYADD  pArrayAdd = ( HB_ARRAYADD ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayAdd" );
+   static HB_ARRAYADD pArrayAdd = NULL;
+
+   if ( !pArrayAdd )
+   {
+      pArrayAdd = ( HB_ARRAYADD ) GetProcAddress( hModule, "_hb_arrayAdd" );
+   }
 
    if( pArrayAdd )
    {
@@ -860,7 +1073,12 @@ BOOL hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pItemValue )  /* add a new item to t
 
 BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )  /* insert a nil item into an array, without changing the length */
 {
-   HB_ARRAYINS  pArrayIns = ( HB_ARRAYINS ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayIns" );
+   static HB_ARRAYINS pArrayIns = NULL;
+
+   if ( !pArrayIns )
+   {
+      pArrayIns = ( HB_ARRAYINS ) GetProcAddress( hModule, "_hb_arrayIns" );
+   }
 
    if( pArrayIns )
    {
@@ -874,7 +1092,12 @@ BOOL hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )  /* insert a nil item into an
 
 BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )  /* delete an array item, without changing length */
 {
-   HB_ARRAYDEL  pArrayDel = ( HB_ARRAYDEL ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayDel" );
+   static HB_ARRAYDEL pArrayDel = NULL;
+
+   if ( !pArrayDel )
+   {
+      pArrayDel = ( HB_ARRAYDEL ) GetProcAddress( hModule, "_hb_arrayDel" );
+   }
 
    if( pArrayDel )
    {
@@ -888,7 +1111,12 @@ BOOL hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )  /* delete an array item, wit
 
 BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )  /* sets the array total length */
 {
-   HB_ARRAYSIZE  pArraySize = ( HB_ARRAYSIZE ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arraySize" );
+   static HB_ARRAYSIZE pArraySize = NULL;
+
+   if ( !pArraySize )
+   {
+      pArraySize = ( HB_ARRAYSIZE ) GetProcAddress( hModule, "_hb_arraySize" );
+   }
 
    if( pArraySize )
    {
@@ -902,7 +1130,12 @@ BOOL hb_arraySize( PHB_ITEM pArray, ULONG ulLen )  /* sets the array total lengt
 
 BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )  /* retrieve last item in an array */
 {
-   HB_ARRAYLAST pArrayLast = ( HB_ARRAYLAST ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayLast" );
+   static HB_ARRAYLAST pArrayLast = NULL;
+
+   if ( !pArrayLast )
+   {
+      pArrayLast = ( HB_ARRAYLAST ) GetProcAddress( hModule, "_hb_arrayLast" );
+   }
 
    if( pArrayLast )
    {
@@ -916,7 +1149,12 @@ BOOL hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )  /* retrieve last item in
 
 BOOL hb_arrayRelease( PHB_ITEM pArray )  /* releases an array - don't call it - use ItemRelease() !!! */
 {
-   HB_ARRAYRELEASE pArrayRelease = ( HB_ARRAYRELEASE ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayRelease" );
+   static HB_ARRAYRELEASE pArrayRelease = NULL;
+
+   if ( !pArrayRelease )
+   {
+      pArrayRelease = ( HB_ARRAYRELEASE ) GetProcAddress( hModule, "_hb_arrayRelease" );
+   }
 
    if( pArrayRelease )
    {
@@ -930,7 +1168,12 @@ BOOL hb_arrayRelease( PHB_ITEM pArray )  /* releases an array - don't call it - 
 
 BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* sets an array element */
 {
-   HB_ARRAYSET pArraySet = ( HB_ARRAYSET ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arraySet" );
+   static HB_ARRAYSET pArraySet = NULL;
+
+   if ( !pArraySet )
+   {
+      pArraySet = ( HB_ARRAYSET ) GetProcAddress( hModule, "_hb_arraySet" );
+   }
 
    if( pArraySet )
    {
@@ -944,7 +1187,12 @@ BOOL hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* sets an a
 
 BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves an item */
 {
-   HB_ARRAYGET  pArrayGet = ( HB_ARRAYGET ) GetProcAddress( GetModuleHandle( NULL ), "_hb_arrayGet" );
+   static HB_ARRAYGET pArrayGet = NULL;
+
+   if ( !pArrayGet )
+   {
+      pArrayGet = ( HB_ARRAYGET ) GetProcAddress( hModule, "_hb_arrayGet" );
+   }
 
    if( pArrayGet )
    {
@@ -958,7 +1206,12 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves
 
 void hb_xinit( void )                         /* Initialize fixed memory subsystem */
 {
-   HB_XINIT pXinit =  ( HB_XINIT ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xinit" );
+   static HB_XINIT pXinit = NULL;
+
+   if ( !pXinit )
+   {
+      pXinit =  ( HB_XINIT ) GetProcAddress( hModule, "_hb_xinit" );
+   }
 
    if( pXinit )
    {
@@ -968,7 +1221,12 @@ void hb_xinit( void )                         /* Initialize fixed memory subsyst
 
 void hb_xexit( void )                         /* Deinitialize fixed memory subsystem */
 {
-   HB_XEXIT pXexit =  ( HB_XEXIT ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xexit" );
+   static HB_XEXIT pXexit = NULL;
+
+   if ( !pXexit )
+   {
+      pXexit = ( HB_XEXIT ) GetProcAddress( hModule, "_hb_xexit" );
+   }
 
    if( pXexit )
    {
@@ -978,7 +1236,12 @@ void hb_xexit( void )                         /* Deinitialize fixed memory subsy
 
 void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NULL on failure */
 {
-   HB_XALLOC pXalloc = ( HB_XALLOC ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xalloc" );
+   static HB_XALLOC pXalloc = NULL;
+
+   if ( !pXalloc )
+   {
+      pXalloc = ( HB_XALLOC ) GetProcAddress( hModule, "_hb_xalloc" );
+   }
 
    if( pXalloc )
    {
@@ -990,7 +1253,12 @@ void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NUL
 
 void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on failure */
 {
-   HB_XGRAB pXgrab = ( HB_XGRAB ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xgrab" );
+   static HB_XGRAB pXgrab = NULL;
+
+   if ( !pXgrab )
+   {
+      pXgrab = ( HB_XGRAB ) GetProcAddress( hModule, "_hb_xgrab" );
+   }
 
    if( pXgrab )
    {
@@ -1002,7 +1270,12 @@ void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on fa
 
 void hb_xfree( void * pMem )                  /* frees memory */
 {
-   HB_XFREE pXfree = ( HB_XFREE ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xfree" );
+   static HB_XFREE pXfree = NULL;
+
+   if ( !pXfree )
+   {
+      pXfree = ( HB_XFREE ) GetProcAddress( hModule, "_hb_xfree" );
+   }
 
    if( pXfree )
    {
@@ -1012,7 +1285,12 @@ void hb_xfree( void * pMem )                  /* frees memory */
 
 void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
 {
-   HB_XREALLOC pXrealloc =  ( HB_XREALLOC ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xrealloc" );
+   static HB_XREALLOC pXrealloc = NULL;
+
+   if ( !pXrealloc )
+   {
+      pXrealloc =  ( HB_XREALLOC ) GetProcAddress( hModule, "_hb_xrealloc" );
+   }
 
    if( pXrealloc )
    {
@@ -1024,7 +1302,12 @@ void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
 
 ULONG hb_xsize( void * pMem )                  /* returns the size of an allocated memory block */
 {
-   HB_XSIZE pXsize =  ( HB_XSIZE ) GetProcAddress( GetModuleHandle( NULL ), "_hb_xsize" );
+   static HB_XSIZE pXsize = NULL;
+
+   if ( !pXsize )
+   {
+      pXsize = ( HB_XSIZE ) GetProcAddress( hModule, "_hb_xsize" );
+   }
 
    if( pXsize )
    {
@@ -1033,5 +1316,145 @@ ULONG hb_xsize( void * pMem )                  /* returns the size of an allocat
 
    return 0;
 }
+
+//----------------------------------------------------------------------------//
+#undef hb_fsDelete
+BOOL hb_fsDelete( BYTE * pszFileName )
+{
+   BOOL pReturn;
+   static HB_FSDELETE pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc=(HB_FSDELETE) GetProcAddress( hModule, "_hb_fsDelete" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( pszFileName );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsWrite
+USHORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+{
+   USHORT pReturn;
+   static HB_FSWRITE pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSWRITE) GetProcAddress( hModule, "_hb_fsWrite" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( hFileHandle, pBuff, ulCount );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsSeek
+ULONG hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
+{
+   ULONG pReturn;
+   static HB_FSSEEK pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSSEEK) GetProcAddress( hModule, "_hb_fsSeek" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( hFileHandle, lOffset, uiMode );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsCreate
+FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
+{
+   FHANDLE pReturn;
+   static HB_FSCREATE pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSCREATE) GetProcAddress( hModule, "_hb_fsCreate" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( pszFileName, uiAttr );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsRead
+USHORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
+{
+   USHORT pReturn;
+   static HB_FSREAD pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSREAD) GetProcAddress( hModule, "_hb_fsRead" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( hFileHandle, pBuff, ulCount );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsOpen
+FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
+{
+   FHANDLE pReturn;
+   static HB_FSOPEN pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSOPEN) GetProcAddress( hModule, "_hb_fsOpen" );
+   }
+
+   if( pFunc )
+   {
+      pReturn = pFunc ( pszFileName, uiFlags );
+   }
+
+   return pReturn;
+}
+
+//----------------------------------------------------------------------------//
+#undef hb_fsClose
+void hb_fsClose( FHANDLE hFileHandle  )
+{
+   static HB_FSCLOSE pFunc = NULL;
+
+   if ( !pFunc )
+   {
+      pFunc = (HB_FSCLOSE) GetProcAddress( hModule, "_hb_fsClose" );
+   }
+
+   if( pFunc )
+   {
+      pFunc ( hFileHandle );
+   }
+
+   return;
+}
+
 HB_EXTERN_END
 #endif

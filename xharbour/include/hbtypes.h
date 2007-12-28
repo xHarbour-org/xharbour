@@ -1,5 +1,5 @@
 /*
- * $Id: hbtypes.h,v 1.6 2007/05/11 10:22:07 marchuet Exp $
+ * $Id: hbtypes.h,v 1.7 2007/06/18 12:25:31 ronpinkas Exp $
  */
 
 /*
@@ -135,5 +135,12 @@ typedef void *   ( * HB_XGRAB)( ULONG ulSize );                 /* allocates mem
 typedef void     ( * HB_XFREE)( void * pMem );                  /* frees memory */
 typedef void *   ( * HB_XREALLOC)( void * pMem, ULONG ulSize ); /* reallocates memory */
 typedef ULONG    ( * HB_XSIZE)( void * pMem );                  /* returns the size of an allocated memory block */
+typedef void     ( * HB_FSCLOSE  ) ( FHANDLE hFileHandle );
+typedef BOOL     ( * HB_FSDELETE ) ( BYTE * pszFileName );
+typedef FHANDLE  ( * HB_FSOPEN   ) ( BYTE * pszFileName, USHORT uiFlags );
+typedef USHORT   ( * HB_FSREAD   ) ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
+typedef ULONG    ( * HB_FSSEEK   ) ( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode );
+typedef USHORT   ( * HB_FSWRITE  ) ( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount );
+typedef FHANDLE  ( * HB_FSCREATE ) ( BYTE * pszFileName, USHORT uiAttr );
 
 #endif /* HB_TYPES_H_ */
