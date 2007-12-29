@@ -1,5 +1,5 @@
 /*
- * $Id: errorapi.c,v 1.79 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: errorapi.c,v 1.80 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -1614,7 +1614,7 @@ void HB_EXPORT hb_errInternal( ULONG ulIntCode, const char * szText, const char 
 
    if( szText )
    {
-      fpError = fopen( "error.log", "w" );
+      fpError = hb_fopen( "error.log", "w" );
 
       if( fpError )
       {

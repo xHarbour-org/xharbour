@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.143 2007/10/27 10:12:39 likewolf Exp $
+ * $Id: genc.c,v 1.144 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -121,7 +121,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       *pTmp = '/';
    }
 
-   yyc = fopen( szFileName, "wb" );
+   yyc = hb_fopen( szFileName, "wb" );
 
    if( ! yyc )
    {

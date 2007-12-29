@@ -1,12 +1,12 @@
 /*
- * $Id: ppgen.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $
+ * $Id: ppgen.c,v 1.3 2007/05/15 21:34:15 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
  *    preprocessor static rules generator.
  *    It creates .c file with tables for defines/[x]translates/[x]commands
- *    found in given file .ch or .prg file
+ *    found in given .ch or .prg file
  *
  * Copyright 2006 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
@@ -212,7 +212,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.2 2007/04/10 18:21:12 ronpinkas Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.3 2007/05/15 21:34:15 ronpinkas Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"
@@ -283,7 +283,7 @@ static int hb_pp_preprocesfile( PHB_PP_STATE pState, char * szRuleFile )
    {
       FILE * foutr;
 
-      foutr = fopen( szRuleFile, "w" );
+      foutr = hb_fopen( szRuleFile, "w" );
       if( !foutr )
       {
          perror( szRuleFile );

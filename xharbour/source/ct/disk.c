@@ -1,5 +1,5 @@
 /*
- * $Id: disk.c,v 1.13 2007/02/13 19:02:24 druzus Exp $
+ * $Id: disk.c,v 1.14 2007/10/31 10:56:49 marchuet Exp $
  */
 /*
  * xHarbour Project source code:
@@ -255,43 +255,46 @@ HB_FUNC( VOLUME )
 {
    BOOL bReturn = FALSE;
 
-if ( !ct_getsafety() ) 
-{                                             
-   PHB_FNAME fname;
-   BYTE * sDiskName;
-   char * sRoot=NULL;
-   char * sVolName=NULL;
-   char   sRootBuf[3], sVolNameBuf[12];
-
-   if( ISCHAR(1) && hb_parclen(1) > 0 )
+   if( !ct_getsafety() )
    {
-     sDiskName = hb_fileNameConv( hb_strdup( hb_parcx(1) ) );
+      PHB_FNAME fname;
+      BYTE *sDiskName;
+      char *sRoot = NULL;
+      char *sVolName = NULL;
+      char sRootBuf[3], sVolNameBuf[12];
+      BOOL fFree;
 
-     if( ( fname = hb_fsFNameSplit( (char*) sDiskName ) ) != NULL )
-     {
-        if( fname->szPath )
-        {
-         strncpy( sRootBuf, fname->szPath, 3 );
-         sRoot = sRootBuf;
-        }
-        if( fname->szName )
-        {   
-         strncpy( sVolNameBuf, fname->szName, 11 );
-         sVolName = sVolNameBuf;
-        }     
+      if( ISCHAR( 1 ) && hb_parclen( 1 ) > 0 )
+      {
+         sDiskName = hb_fsNameConv( ( BYTE * ) hb_parc( 1 ), &fFree );
 
-        hb_xfree( fname );
-     }                      
-     else
-     {
-       strncpy( sVolNameBuf, (char *) sDiskName, 11 );
-       sVolName = sVolNameBuf;
-     }
-   }
+         if( ( fname = hb_fsFNameSplit( ( char * ) sDiskName ) ) != NULL )
+         {
+            if( fname->szPath )
+            {
+               strncpy( sRootBuf, fname->szPath, 3 );
+               sRoot = sRootBuf;
+            }
+            if( fname->szName )
+            {
+               strncpy( sVolNameBuf, fname->szName, 11 );
+               sVolName = sVolNameBuf;
+            }
+
+            hb_xfree( fname );
+         }
+         else
+         {
+            strncpy( sVolNameBuf, ( char * ) sDiskName, 11 );
+            sVolName = sVolNameBuf;
+         }
+         if( fFree )
+            hb_xfree( sDiskName );
+      }
 #if defined(HB_OS_WIN_32)
-   bReturn = SetVolumeLabel( sRoot, sVolName );
+      bReturn = SetVolumeLabel( sRoot, sVolName );
 #endif
-}  
+   }
    hb_retl( bReturn );
 }
 

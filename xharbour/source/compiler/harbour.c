@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.172 2007/12/26 22:35:30 andijahja Exp $
+ * $Id: harbour.c,v 1.173 2007/12/29 01:27:48 likewolf Exp $
  */
 
 /*
@@ -99,13 +99,12 @@
    #include <windows.h>
 #endif
 
-#include <errno.h>
-
 #include "hbcomp.h"
 #include "hbhash.h"
 #include "hbi18n.h"
 #include "hbexemem.h"
 #include "hbmemory.ch"
+#include "hbset.h"
 #include "hbdate.h"
 
 #if defined(HB_OS_DOS) && defined(__BORLANDC__)
@@ -820,28 +819,23 @@ void hb_xexit( void )
       hb_conOutErr( hb_conNewLine(), 0 );
       hb_conOutErr( "----------------------------------------", 0 );
       hb_conOutErr( hb_conNewLine(), 0 );
-      sprintf( szBuffer, "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
+      snprintf( szBuffer, sizeof( szBuffer ), "Total memory allocated: %lu bytes (%lu blocks)", s_ulMemoryMaxConsumed, s_ulMemoryMaxBlocks );
       hb_conOutErr( szBuffer, 0 );
 
       if( s_ulMemoryBlocks )
       {
          hb_conOutErr( hb_conNewLine(), 0 );
-         sprintf( szBuffer, "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
+         snprintf( szBuffer, sizeof( szBuffer ), "WARNING! Memory allocated but not released: %lu bytes (%lu blocks)", s_ulMemoryConsumed, s_ulMemoryBlocks );
          hb_conOutErr( szBuffer, 0 );
       }
 
       hb_conOutErr( hb_conNewLine(), 0 );
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
-      {
-         sprintf( szBuffer, "Block %i %p (size %lu) \"", i,
-                  ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize );
-         hb_conOutErr( szBuffer, 0 );
-         hb_conOutErr( hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
-                                    pMemBlock->ulSize ), 0 );
-         hb_conOutErr( "\"", 0 );
-         hb_conOutErr( hb_conNewLine(), 0 );
-      }
+         HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %lu) \"%s\"", i,
+                ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
+                hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
+                             pMemBlock->ulSize ) ) );
    }
 #endif
 }
@@ -857,6 +851,103 @@ void hb_conOutErr( const char * pStr, ULONG ulLen )
 char * hb_conNewLine( void )
 {
    return "\n";
+}
+
+static int  s_iFileCase = HB_SET_CASE_MIXED;
+static int  s_iDirCase  = HB_SET_CASE_MIXED;
+static BOOL s_fFnTrim   = FALSE;
+static char s_cDirSep   = OS_PATH_DELIMITER;
+
+HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
+{
+   if( s_fFnTrim || s_cDirSep != OS_PATH_DELIMITER ||
+       s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )
+   {
+      PHB_FNAME pFileName;
+      ULONG ulLen;
+
+      if( pfFree )
+      {
+         BYTE * szNew = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, _POSIX_PATH_MAX );
+         szFileName = szNew;
+         *pfFree = TRUE;
+      }
+
+      if( s_cDirSep != OS_PATH_DELIMITER )
+      {
+         BYTE *p = szFileName;
+         while( *p )
+         {
+            if( *p == s_cDirSep )
+               *p = OS_PATH_DELIMITER;
+            p++;
+         }
+      }
+
+      pFileName = hb_fsFNameSplit( ( char * ) szFileName );
+
+      /* strip trailing and leading spaces */
+      if( s_fFnTrim )
+      {
+         if( pFileName->szName )
+         {
+            ulLen = strlen( pFileName->szName );
+            while( ulLen && pFileName->szName[ulLen - 1] == ' ' )
+               --ulLen;
+            while( ulLen && pFileName->szName[0] == ' ' )
+            {
+               ++pFileName->szName;
+               --ulLen;
+            }
+            pFileName->szName[ulLen] = '\0';
+         }
+         if( pFileName->szExtension )
+         {
+            ulLen = strlen( pFileName->szExtension );
+            while( ulLen && pFileName->szExtension[ulLen - 1] == ' ' )
+               --ulLen;
+            while( ulLen && pFileName->szExtension[0] == ' ' )
+            {
+               ++pFileName->szExtension;
+               --ulLen;
+            }
+            pFileName->szExtension[ulLen] = '\0';
+         }
+      }
+
+      /* FILECASE */
+      if( s_iFileCase == HB_SET_CASE_LOWER )
+      {
+         if( pFileName->szName )
+            hb_strlow( pFileName->szName );
+         if( pFileName->szExtension )
+            hb_strlow( pFileName->szExtension );
+      }
+      else if( s_iFileCase == HB_SET_CASE_UPPER )
+      {
+         if( pFileName->szName )
+            hb_strupr( pFileName->szName );
+         if( pFileName->szExtension )
+            hb_strupr( pFileName->szExtension );
+      }
+
+      /* DIRCASE */
+      if( pFileName->szPath )
+      {
+         if( s_iDirCase == HB_SET_CASE_LOWER )
+            hb_strlow( pFileName->szPath );
+         else if( s_iDirCase == HB_SET_CASE_UPPER )
+            hb_strupr( pFileName->szPath );
+      }
+
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_xfree( pFileName );
+   }
+   else if( pfFree )
+      *pfFree = FALSE;
+
+   return szFileName;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -5606,7 +5697,7 @@ static int hb_compCompile( char * szPrg )
       {
          hb_comp_pFileName->szExtension = ".var";
          hb_fsFNameMerge( szVarListName, hb_comp_pFileName );
-         hb_comp_VariableList = fopen( szVarListName, "w" );
+         hb_comp_VariableList = hb_fopen( szVarListName, "w" );
       }
 
       if( hb_comp_bPPO )
@@ -5652,7 +5743,7 @@ static int hb_compCompile( char * szPrg )
          }
 
          // if the file already exists...
-         hb_comp_HILfile = fopen( szHILName, "r+b" );
+         hb_comp_HILfile = hb_fopen( szHILName, "r+b" );
          if( hb_comp_HILfile != NULL )
          {
             //... just go to the end
@@ -5663,7 +5754,7 @@ static int hb_compCompile( char * szPrg )
             HB_I18N_TAB_HEADER head;
 
             // try to create it...
-            hb_comp_HILfile = fopen( szHILName, "wb" );
+            hb_comp_HILfile = hb_fopen( szHILName, "wb" );
             if( hb_comp_HILfile == NULL )
             {
                hb_compGenError( hb_comp_szErrors,
@@ -6318,7 +6409,7 @@ static int hb_compProcessRSPFile( char* szRspName )
 
    szRspName ++;
 
-   inFile = fopen( szRspName, "r" );
+   inFile = hb_fopen( szRspName, "r" );
    i = 0;
 
    if ( !inFile )

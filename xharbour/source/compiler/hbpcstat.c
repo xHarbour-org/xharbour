@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcstat.c,v 1.4 2007/04/30 01:16:30 ronpinkas Exp $
+ * $Id: hbpcstat.c,v 1.5 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -251,7 +251,7 @@ void hb_compPCodeStat( PHB_FNAME pFileName )
    szExt = pFileName->szExtension;
    pFileName->szExtension = ".p";
    hb_fsFNameMerge( szOutFile, pFileName );
-   outfile = fopen( szOutFile,"wb" );
+   outfile = hb_fopen( szOutFile,"wb" );
    pFileName->szExtension = szExt;
 
    if( outfile )

@@ -1,5 +1,5 @@
 /*
- * $Id: chrmap.c,v 1.5 2004/02/07 11:41:01 druzus Exp $
+ * $Id: chrmap.c,v 1.6 2005/10/02 12:35:11 druzus Exp $
  */
 
 /*
@@ -285,7 +285,7 @@ int HB_GT_FUNC(gt_chrmapread( char *pszFile, char *pszTerm, int *nTransTbl ))
     char buf[256], *ptr, *pTerm;
     int isTerm = -1;
 
-    fp = fopen(pszFile, "r");
+    fp = hb_fopen(pszFile, "r");
 
     if ( fp != NULL )
     {

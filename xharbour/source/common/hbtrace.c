@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.c,v 1.11 2007/08/13 10:42:02 ronpinkas Exp $
+ * $Id: hbtrace.c,v 1.12 2007/09/22 11:06:58 andijahja Exp $
  */
 
 /*
@@ -56,6 +56,7 @@
 #include <string.h>
 
 #include "hbapi.h"
+#include "hbapifs.h"
 #include "hb_io.h"
 #include "hbtrace.h"
 
@@ -120,7 +121,7 @@ HB_EXPORT int hb_tr_level( void )
       env = hb_getenv( "HB_TR_OUTPUT" );
       if( env != NULL && env[ 0 ] != '\0' )
       {
-         s_fp = fopen( env, "w" );
+         s_fp = hb_fopen( env, "w" );
 
          if( s_fp == NULL )
             s_fp = stderr;

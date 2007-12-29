@@ -1,5 +1,5 @@
  /*
- * $Id: fstemp.c,v 1.23 2007/05/18 13:28:31 toninhofwi Exp $
+ * $Id: fstemp.c,v 1.24 2007/05/19 13:06:15 toninhofwi Exp $
  */
 
 /*
@@ -234,7 +234,7 @@ FHANDLE HB_EXPORT hb_fsCreateTemp( const BYTE * pszDir, const BYTE * pszPrefix, 
             pszName[ iLen++ ] = n + ( n > 9 ? 'a' - 10 : '0' );
          }
          pszName[iLen++] = '\0';
-         hb_fileNameConv( ( char * ) pszName );
+         hb_fsNameConv( pszName, NULL );
          fd = hb_fsCreateEx( pszName, uiAttr, FO_EXCLUSIVE | FO_EXCL );
       }
 #if !defined(__WATCOMC__) && ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) )

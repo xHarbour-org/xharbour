@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.84 2007/06/06 22:25:12 ronpinkas Exp $
+ * $Id: fm.c,v 1.85 2007/10/31 08:35:13 marchuet Exp $
  */
 
 /*
@@ -901,7 +901,7 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
 
       if( s_lMemoryBlocks )
       {
-         hLog = fopen( "fm.log", "a+" );
+         hLog = hb_fopen( "fm.log", "a+" );
       }
 
       hb_conOutErr( hb_conNewLine(), 0 );

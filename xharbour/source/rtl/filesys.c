@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.166 2007/12/21 16:09:07 likewolf Exp $
+ * $Id: filesys.c,v 1.167 2007/12/21 18:44:46 likewolf Exp $
  */
 
 /*
@@ -1612,15 +1612,16 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
 }
 
 
-FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
+HB_EXPORT FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 {
    HB_THREAD_STUB
 
    FHANDLE hFileHandle;
+   BOOL fFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsOpen(%p, %hu)", pFilename, uiFlags));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fsNameConv( pFilename, &fFree );
 
    // Unlocking stack to allow cancelation points
    HB_STACK_UNLOCK
@@ -1705,19 +1706,21 @@ FHANDLE HB_EXPORT hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
-   hb_xfree( pFilename );
+   if( fFree )
+      hb_xfree( pFilename );
 
    return hFileHandle;
 }
 
-FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
+HB_EXPORT FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
+   BOOL fFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreate(%p, %hu)", pFilename, uiAttr));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fsNameConv( pFilename, &fFree );
 
    HB_STACK_UNLOCK
    // allowing async cancelation here
@@ -1795,7 +1798,8 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
-   hb_xfree( pFilename );
+   if( fFree )
+      hb_xfree( pFilename );
 
    return hFileHandle;
 }
@@ -1806,14 +1810,15 @@ FHANDLE HB_EXPORT hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
          [vszakats]
  */
 
-FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
+HB_EXPORT FHANDLE hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags )
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
+   BOOL fFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsCreateEx(%p, %hu, %hu)", pFilename, uiAttr, uiFlags));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fsNameConv( pFilename, &fFree );
 
    HB_STACK_UNLOCK
    // allowing async cancelation here
@@ -1889,11 +1894,13 @@ FHANDLE HB_EXPORT hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
    HB_DISABLE_ASYN_CANC
    HB_STACK_LOCK
 
-   hb_xfree( pFilename );
+   if( fFree )
+      hb_xfree( pFilename );
+
    return hFileHandle;
 }
 
-void    HB_EXPORT hb_fsClose( FHANDLE hFileHandle )
+HB_EXPORT void hb_fsClose( FHANDLE hFileHandle )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsClose(%p)", hFileHandle));
@@ -2974,10 +2981,11 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   BOOL fFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsDelete(%s)", (char*) pFilename));
 
-   pFilename = hb_fileNameConv( hb_strdup( ( char * ) pFilename ) );
+   pFilename = hb_fsNameConv( pFilename, &fFree );
 
    HB_STACK_UNLOCK
 
@@ -3011,20 +3019,22 @@ BOOL HB_EXPORT hb_fsDelete( BYTE * pFilename )
 
    HB_STACK_LOCK
 
-   hb_xfree( pFilename ) ;
+   if( fFree )
+      hb_xfree( pFilename );
 
    return bResult;
 }
 
-BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
+HB_EXPORT BOOL hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   BOOL fFreeOld, fFreeNew;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRename(%s, %s)", (char*) pOldName, (char*) pNewName));
 
-   pOldName = hb_fileNameConv( hb_strdup( ( char * ) pOldName ) );
-   pNewName = hb_fileNameConv( hb_strdup( ( char * ) pNewName ) );
+   pOldName = hb_fsNameConv( pOldName, &fFreeOld );
+   pNewName = hb_fsNameConv( pNewName, &fFreeNew );
 
    HB_STACK_UNLOCK
 
@@ -3052,18 +3062,23 @@ BOOL HB_EXPORT hb_fsRename( BYTE * pOldName, BYTE * pNewName )
 
    HB_STACK_LOCK
 
-   hb_xfree( pOldName ) ;
-   hb_xfree( pNewName ) ;
+   if( fFreeOld )
+      hb_xfree( pOldName );
+   if( fFreeNew )
+      hb_xfree( pNewName );
 
    return bResult;
 }
 
-BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
+HB_EXPORT BOOL hb_fsMkDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   BOOL fFree;
 
-   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
+
+   pDirname = hb_fsNameConv( pDirname, &fFree );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsMkDir(%s)", (char*) pDirname));
 
@@ -3096,19 +3111,21 @@ BOOL HB_EXPORT    hb_fsMkDir( BYTE * pDirname )
 #endif
 
    HB_STACK_LOCK
-   hb_xfree(pDirname) ;
+   if( fFree )
+      hb_xfree( pDirname );
 
    return bResult;
 }
 
-BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
+HB_EXPORT BOOL hb_fsChDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   BOOL fFree;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", ( char* ) pDirname));
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsChDir(%s)", (char*) pDirname));
 
-   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
+   pDirname = hb_fsNameConv( pDirname, &fFree );
 
    HB_STACK_UNLOCK
 
@@ -3133,18 +3150,21 @@ BOOL HB_EXPORT    hb_fsChDir( BYTE * pDirname )
 #endif
 
    HB_STACK_LOCK
-   hb_xfree( pDirname );
+   if( fFree )
+      hb_xfree( pDirname );
+
    return bResult;
 }
 
-BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
+HB_EXPORT BOOL hb_fsRmDir( BYTE * pDirname )
 {
    HB_THREAD_STUB
    BOOL bResult;
+   BOOL fFree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_fsRmDir(%s)", (char*) pDirname));
 
-   pDirname = hb_fileNameConv( hb_strdup( ( char * ) pDirname ) );
+   pDirname = hb_fsNameConv( pDirname, &fFree );
 
    HB_STACK_LOCK
 
@@ -3168,7 +3188,9 @@ BOOL HB_EXPORT    hb_fsRmDir( BYTE * pDirname )
 #endif
 
    HB_STACK_UNLOCK
-   hb_xfree( pDirname ) ;
+   if( fFree )
+      hb_xfree( pDirname );
+
    return bResult;
 }
 
@@ -3430,9 +3452,9 @@ BYTE   HB_EXPORT  hb_fsCurDrv( void )
 
 /* TODO: Implement hb_fsExtOpen */
 
-FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
-                                 USHORT uiExFlags, BYTE * pPaths,
-                                 PHB_ITEM pError )
+HB_EXPORT FHANDLE hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
+                                USHORT uiExFlags, BYTE * pPaths,
+                                PHB_ITEM pError )
 {
    HB_PATHNAMES *pSearchPath = NULL, *pNextPath;
    PHB_FNAME pFilepath;
@@ -3507,7 +3529,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
          hb_fsFNameMerge( ( char * ) szPath, pFilepath );
       }
    }
-   else if( pPaths )
+   else if( pPaths && *pPaths )
    {
       hb_fsAddSearchPath( ( char * ) pPaths, &pSearchPath );
       pNextPath = pSearchPath;
@@ -3518,6 +3540,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
          fIsFile = hb_fsFile( szPath );
          pNextPath = pNextPath->pNext;
       }
+      hb_fsFreeSearchPath( pSearchPath );
       if( !fIsFile )
       {
          pFilepath->szPath = NULL;
@@ -3598,7 +3621,7 @@ FHANDLE HB_EXPORT  hb_fsExtOpen( BYTE * pFilename, BYTE * pDefExt,
    }
 
    if( uiExFlags & FXO_COPYNAME && hFile != FS_ERROR )
-      strcpy( ( char * ) pFilename, ( char * ) szPath );
+      hb_strncpy( ( char * ) pFilename, ( char * ) szPath, _POSIX_PATH_MAX );
 
    hb_xfree( szPath );
    return hFile;
@@ -3834,78 +3857,19 @@ HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
    return szFileName;
 }
 
-BYTE HB_EXPORT * hb_fileNameConv( char *str ) {
-/*
-   // Convert file and dir case. The allowed SET options are:
-   // LOWER - Convert all caracters of file to lower
-   // UPPER - Convert all caracters of file to upper
-   // MIXED - Leave as is
+HB_EXPORT BYTE * hb_fileNameConv( char * szFileName )
+{
+   BOOL fFree;
+   BYTE * szNew;
 
-   // The allowed environment options are:
-   // FILECASE - define the case of file
-   // DIRCASE - define the case of path
-   // DIRSEPARATOR - define separator of path (Ex. "/")
-*/
-   char *filename;
-   ULONG ulDirLen, ulFileLen;
-
-   if ( hb_set.HB_SET_TRIMFILENAME )
+   szNew = hb_fsNameConv( ( BYTE * ) szFileName, &fFree );
+   if( fFree )
    {
-      char *szFileTrim;
-      ULONG ulLen;
-
-      ulLen = hb_strRTrimLen( str, strlen( str ), FALSE );
-      szFileTrim = hb_strLTrim( str, &ulLen );
-      if ( str != szFileTrim )
-      {
-         memmove( str, szFileTrim, ulLen );
-      }
-      str[ulLen] = '\0';
+      hb_strncpy( szFileName, ( char * ) szNew, strlen( szFileName ) );
+      hb_xfree( szNew );
    }
 
-   /* Look for filename (Last "\" or DIRSEPARATOR) */
-   if( hb_set.HB_SET_DIRSEPARATOR != '\\' )
-   {
-      char *p = str;
-      while ( *p )
-      {
-         if( *p == '\\' )
-         {
-            *p = hb_set.HB_SET_DIRSEPARATOR;
-         }
-         p++;
-      }
-   }
-
-   if ( ( filename = strrchr( str, hb_set.HB_SET_DIRSEPARATOR ) ) != NULL )
-   {
-      filename++;
-   }
-   else
-   {
-      filename = str;
-   }
-   ulFileLen = strlen( filename );
-   ulDirLen = filename - str;
-
-   /* FILECASE */
-   if ( ulFileLen > 0 )
-   {
-      if( hb_set.HB_SET_FILECASE == HB_SET_CASE_LOWER )
-         hb_strLower( filename, strlen(filename) );
-      else if( hb_set.HB_SET_FILECASE == HB_SET_CASE_UPPER )
-         hb_strUpper( filename, strlen(filename) );
-   }
-
-   /* DIRCASE */
-   if ( ulDirLen > 0 )
-   {
-      if ( hb_set.HB_SET_DIRCASE == HB_SET_CASE_LOWER )
-         hb_strLower( str, ulDirLen );
-      else if( hb_set.HB_SET_DIRCASE == HB_SET_CASE_UPPER )
-         hb_strUpper( str, ulDirLen );
-   }
-   return (( BYTE * ) str);
+   return ( BYTE * ) szFileName;
 }
 
 BOOL HB_EXPORT hb_fsDisableWaitLocks( int iSet )

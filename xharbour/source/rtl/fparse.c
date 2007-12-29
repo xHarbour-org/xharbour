@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.14 2005/09/22 01:11:59 druzus Exp $
+ * $Id: fparse.c,v 1.15 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
@@ -73,8 +73,10 @@ FPARSE( cFile, cDelimiter ) -> array
 */
 
 #include "hbapi.h"
+#include "hbapifs.h"
 #include "hbapiitm.h"
 #include "hbfast.h"
+
 /* adjustable, but this should be sufficient in normal situation */
 #define MAX_READ 4096
 //----------------------------------------------------------------------------//
@@ -381,7 +383,7 @@ HB_FUNC( FPARSE )
    }
 
    /* open file for read */
-   inFile = fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( pSrc->item.asString.value, "r" );
 
    /* return empty array on failure */
    if ( !inFile )
@@ -459,7 +461,7 @@ HB_FUNC( FPARSEEX )
    }
 
    /* open file for read */
-   inFile = fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( pSrc->item.asString.value, "r" );
 
    /* return empty array on failure */
    if ( !inFile )
@@ -523,7 +525,7 @@ HB_FUNC( FWORDCOUNT )
    }
 
    /* open file for read */
-   inFile = fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( pSrc->item.asString.value, "r" );
 
    /* return 0 on failure */
    if ( !inFile )
@@ -580,7 +582,7 @@ HB_FUNC( FLINECOUNT )
    }
 
    /* open file for read */
-   inFile = fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( pSrc->item.asString.value, "r" );
 
    /* return 0 on failure */
    if ( !inFile )
@@ -627,7 +629,7 @@ HB_FUNC( FCHARCOUNT )
    }
 
    /* open file for read */
-   inFile = fopen( pSrc->item.asString.value, "r" );
+   inFile = hb_fopen( pSrc->item.asString.value, "r" );
 
    /* return 0 on failure */
    if ( !inFile )

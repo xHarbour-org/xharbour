@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5845 2007/12/28 15:17:03 likewolf Exp $
+ * $Id: ChangeLog,v 1.5846 2007/12/29 01:27:48 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-29 15:48 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapifs.h
+  * include/hbpp.h
+  * source/common/Makefile
+  + source/common/hbfopen.c
+  * source/common/hbfsapi.c
+  * source/common/hbtrace.c
+  * source/compiler/genc.c
+  * source/compiler/gencobj.c
+  * source/compiler/genhrb.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbpcstat.c
+  * source/compiler/ppcomp.c
+  * source/ct/disk.c
+  * source/ct/files.c
+  * source/pp/ppcore.c
+  * source/pp/ppgen.c
+  * source/rtl/direct.c
+  * source/rtl/file.c
+  * source/rtl/filesys.c
+  * source/rtl/fparse.c
+  * source/rtl/fstemp.c
+  * source/rtl/set.c
+  * source/rtl/trace.c
+  * source/rtl/gtcrs/chrmap.c
+  * source/vm/errorapi.c
+  * source/vm/fm.c
+  * utils/hbpp/hbppcore.c
+    * some GPF guards
+    * use hb_fsNameConv() instead of hb_fileNameConv()
+    + added hb_fopen() function - it's a wrapper to fopen() function but
+      calls internally hb_fsNameConv()
+    * use hb_fopen() instead of fopen()
+    + added hb_fsMaxFilesError()
+    * use hb_fsMaxFilesError() to avoid direct accessing of errno
+      value - some compilers/platforms do not support errno
+    * eliminated unnecessary errno access
+    * redirect error messages when error trap is not defined into
+      user dispout function
+    (Borrowed from Harbour, by Przemyslaw Czerpak)
 
 2007-12-29 04:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.c

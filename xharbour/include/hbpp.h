@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.19 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: hbpp.h,v 1.20 2007/12/28 15:17:04 likewolf Exp $
  */
 
 /*
@@ -82,7 +82,7 @@ HB_EXTERN_BEGIN
 #define HB_PP_INLINE_QUOTE2   6
 
 /* function to open included files */
-#define HB_PP_OPEN_FUNC_( func ) FILE * func( void *, const char *, BOOL, char * )
+#define HB_PP_OPEN_FUNC_( func ) FILE * func( void *, const char *, BOOL, BOOL *, char * )
 typedef HB_PP_OPEN_FUNC_( HB_PP_OPEN_FUNC );
 typedef HB_PP_OPEN_FUNC * PHB_PP_OPEN_FUNC;
 

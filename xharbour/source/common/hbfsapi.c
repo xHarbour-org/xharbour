@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.10 2007/12/21 10:42:29 likewolf Exp $
+ * $Id: hbfsapi.c,v 1.11 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -53,6 +53,9 @@
 #include "hbapi.h"
 #include "hbapifs.h"
 #include "hbexemem.h"
+#if !defined( HB_WIN32_IO )
+   #include <errno.h>
+#endif
 
 /* NOTE: Not really belongs here, but until we can't find a better place 
          it will do it. [vszakats] */
@@ -220,7 +223,7 @@ HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
    /*
       NOTE: be _very_ careful about "optimizing" this next section code!
             (specifically, initialising s_szPathSep) as MSVC with /Ni
-      (or anything that infers it like /Ox) will cause you trouble.
+            (or anything that infers it like /Ox) will cause you trouble.
     */
 
    /* If we have a path, append a path separator to the path if there
@@ -264,4 +267,15 @@ HB_EXPORT char * hb_fsFNameMerge( char * pszFileName, PHB_FNAME pFileName )
    HB_TRACE(HB_TR_INFO, ("hb_fsFNameMerge: Filename: |%s|\n", pszFileName));
 
    return pszFileName;
+}
+
+HB_EXPORT BOOL hb_fsMaxFilesError( void )
+{
+   HB_TRACE(HB_TR_DEBUG, ("hb_fsMaxFilesError()"));
+
+#if defined( HB_WIN32_IO )
+   return GetLastError() == ERROR_TOO_MANY_OPEN_FILES;
+#else
+   return errno == EMFILE;
+#endif
 }

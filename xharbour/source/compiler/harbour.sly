@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.137 2007/12/23 18:36:26 likewolf Exp $
+ * $Id: harbour.sly,v 1.138 2007/12/23 21:57:40 likewolf Exp $
  */
 
 /*
@@ -3292,7 +3292,7 @@ BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearch )
 {
    PFILE pFile;
 
-   yyin = fopen( szFileName, "r" );
+   yyin = hb_fopen( szFileName, "r" );
    if( ! yyin )
    {
       if( pSearch )
@@ -3305,7 +3305,7 @@ BOOL hb_compInclude( char * szFileName, HB_PATHNAMES * pSearch )
 
             pFileName->szPath = pSearch->szPath;
             hb_fsFNameMerge( szFName, pFileName );
-            yyin = fopen( szFName, "r" );
+            yyin = hb_fopen( szFName, "r" );
             if( ! yyin )
             {
                pSearch = pSearch->pNext;

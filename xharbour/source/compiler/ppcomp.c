@@ -1,5 +1,5 @@
 /*
- * $Id: ppcomp.c,v 1.4 2007/04/16 03:44:07 ronpinkas Exp $
+ * $Id: ppcomp.c,v 1.5 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -28,7 +28,6 @@
 
 
 #include "hbcomp.h"
-#include <errno.h>
 
 static void hb_pp_ErrorGen( void * cargo,
                             const char * szMsgTable[], char cPrefix, int iErrorCode,

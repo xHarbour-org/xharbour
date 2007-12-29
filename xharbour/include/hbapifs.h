@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.51 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: hbapifs.h,v 1.52 2007/12/21 18:44:46 likewolf Exp $
  */
 
 /*
@@ -123,7 +123,7 @@ extern HB_EXPORT USHORT   hb_fsError      ( void ); /* retrieve file system erro
 extern HB_EXPORT USHORT   hb_fsOsError    ( void ); /* retrieve system dependant file system error */
 extern HB_EXPORT BOOL     hb_fsFile       ( BYTE * pszFileName ); /* determine if a file exists */
 extern HB_EXPORT BOOL     hb_fsIsDirectory( BYTE * pFilename ); /* Determine if given name is a directory */
-extern HB_EXPORT HB_FOFFSET hb_fsFSize      ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
+extern HB_EXPORT HB_FOFFSET hb_fsFSize    ( BYTE * pszFileName, BOOL bUseDirEntry ); /* determine the size of a file */
 extern HB_EXPORT FHANDLE  hb_fsExtOpen    ( BYTE * pszFileName, BYTE * pDefExt,
                                             USHORT uiFlags, BYTE * pPaths, PHB_ITEM pError ); /* open a file using default extension and a list of paths */
 extern HB_EXPORT USHORT   hb_fsIsDrv      ( BYTE nDrive ); /* determine if a drive number is a valid drive */
@@ -227,6 +227,10 @@ extern HB_EXPORT USHORT    hb_fsAttrEncode( const char * szAttr );
 extern HB_EXPORT char *    hb_fsAttrDecode( USHORT uiAttr, char * szAttr );
 extern HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree );
 extern HB_EXPORT BYTE * hb_fileNameConv( char *str );
+extern HB_EXPORT BOOL hb_fsMaxFilesError( void );
+
+/* wrapper to fopen() which calls hb_fsNameConv() */
+extern FILE * hb_fopen( const char *path, const char *mode );
 
 extern HB_EXPORT BOOL hb_fsDisableWaitLocks( int iSet );
 

@@ -1,5 +1,5 @@
 /*
- * $Id: gencobj.c,v 1.14 2005/11/12 18:47:29 druzus Exp $
+ * $Id: gencobj.c,v 1.16 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ void hb_compGenCObj( PHB_FNAME pFileName, char *szSourceExtension )
    if( pszCfg )
    {
 
-      yyc = fopen( pszCfg, "rt" );
+      yyc = hb_fopen( pszCfg, "rt" );
       if( ! yyc )
       {
          fprintf( hb_comp_errFile, "\nError: Can't open %s file.\n", pszCfg );

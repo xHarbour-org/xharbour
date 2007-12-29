@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.11 2007/10/12 01:02:51 lculik Exp $
+ * $Id: files.c,v 1.12 2007/11/26 18:33:52 ptsarenko Exp $
  */
 
 /*
@@ -997,15 +997,15 @@ HB_FUNC( FILEDELETE )
 {
    BOOL bReturn = FALSE;
 
-   if ( ISCHAR( 1 ) )
+   if( ISCHAR( 1 ) )
    {
-      BYTE *pDirSpec;
+      BYTE * pDirSpec;
       PHB_FFIND ffind;
       USHORT uiAttr = HB_FA_ALL;
+      BOOL fFree;
 
-      pDirSpec = hb_fileNameConv( hb_strdup( hb_parcx( 1 ) ) );
-
-      if ( ISNUM( 2 ) )
+      pDirSpec = hb_fsNameConv( ( BYTE * ) hb_parc( 1 ), &fFree );
+      if( ISNUM( 2 ) )
       {
          uiAttr = hb_parni( 2 );
       }
@@ -1053,8 +1053,8 @@ HB_FUNC( FILEDELETE )
          hb_fsChDir( ( BYTE *) sRoot ) ;
          hb_fsChDir( pCurDir );
       }
-
-      hb_xfree( pDirSpec );
+      if( fFree )
+         hb_xfree( pDirSpec );
    }
 
    hb_retl( bReturn );

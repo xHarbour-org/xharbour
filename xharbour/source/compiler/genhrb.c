@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.2 2002/06/19 21:52:48 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.3 2005/04/11 01:46:34 druzus Exp $
  */
 
 /*
@@ -47,7 +47,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       pFileName->szExtension = ".hrb";
    hb_fsFNameMerge( szFileName, pFileName );
 
-   yyc = fopen( szFileName, "wb" );
+   yyc = hb_fopen( szFileName, "wb" );
    if( ! yyc )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );

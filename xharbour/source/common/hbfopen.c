@@ -1,12 +1,12 @@
 /*
- * $Id: trace.c,v 1.20 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * The Clipper tracing API.
+ * 
  *
- * Copyright 1999 Gonzalo A. Diethelm <gonzalo.diethelm@iname.com>
+ * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -50,113 +50,17 @@
  *
  */
 
-#include "hbtrace.h"
 #include "hbapifs.h"
-#include "hbapierr.h"
 
-#ifdef HB_EXTENSION
-
-#ifdef HB_THREAD_SUPPORT
-   static HB_CRITICAL_T s_CriticalMutex;
-#endif
-
-// It is Thread Safe - It's manipulated only once at primary thread startup.
-static BOOL s_bEmpty = TRUE;
-
-void hb_traceInit( void )
+FILE * hb_fopen( const char *path, const char *mode )
 {
-   FILE *fpTrace;
-   PHB_DYNS pTraceLog = hb_dynsymFind( "TRACELOG" );
+   BOOL fFree;
+   char * pszFile = ( char * ) hb_fsNameConv( ( BYTE * ) path, &fFree );
+   FILE * file = fopen( pszFile, mode );
 
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_INIT( s_CriticalMutex );
-   #endif
+   if( fFree )
+      hb_xfree( pszFile );
 
-   if( s_bEmpty && pTraceLog && pTraceLog->pSymbol->value.pFunPtr && hb_fsFile( ( BYTE *) "trace.log" ) )
-   {
-      /* Empty the file if it exists. */
-      fpTrace = hb_fopen( "trace.log", "w" );
-
-      if( fpTrace )
-      {
-         fclose( fpTrace );
-      }
-      else
-      {
-         //hb_errInternal( HB_EI_ERRUNRECOV, "Unable to create trace.log file", NULL, NULL );
-      }
-   }
+   return file;
 }
-
-void hb_traceExit( void )
-{
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_DESTROY( s_CriticalMutex );
-   #endif
-}
-
-HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... )
-{
-   FILE *hFile;
-
-   if( ! sTraceMsg )
-   {
-      return;
-   }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_LOCK( s_CriticalMutex );
-   #endif
-
-   if( sFile == NULL )
-   {
-      if( s_bEmpty )
-      {
-         s_bEmpty = FALSE;
-
-         /* Empty the file if it exists. */
-         hFile = hb_fopen( "trace.log", "w" );
-      }
-      else
-      {
-         hFile = hb_fopen( "trace.log", "a" );
-      }
-   }
-   else
-   {
-      hFile = hb_fopen( sFile, "a" );
-   }
-
-   if( hFile )
-   {
-      va_list ap;
-
-      va_start( ap, sTraceMsg );
-      vfprintf( hFile, sTraceMsg, ap );
-      va_end( ap );
-
-      fclose( hFile );
-   }
-
-   #ifdef HB_THREAD_SUPPORT
-      HB_CRITICAL_UNLOCK( s_CriticalMutex );
-   #endif
-}
-
-HB_FUNC( HB_TRACESTATE )
-{
-   hb_retni( hb_tracestate( ISNUM( 1 ) ? hb_parni( 1 ) : -1 ) );
-}
-
-HB_FUNC( HB_TRACELEVEL )
-{
-   hb_retni( hb_tracelevel( ISNUM( 1 ) ? hb_parni( 1 ) : -1 ) );
-}
-
-HB_FUNC( HB_TRACESTRING )
-{
-   HB_TRACE(HB_TR_ALWAYS, (hb_parcx( 1 )) );
-}
-
-#endif
 

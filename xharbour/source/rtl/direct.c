@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.59 2007/11/29 07:33:24 andijahja Exp $
+ * $Id: direct.c,v 1.60 2007/12/02 00:03:23 andijahja Exp $
  */
 
 /*
@@ -182,7 +182,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 */
 
    PHB_FNAME fDirSpec = NULL;
-   BOOL bAlloc = FALSE;
+   BOOL fFree = FALSE;
    /* Get the passed attributes and convert them to Harbour Flags */
 
    uiMask = HB_FA_ARCHIVE
@@ -218,8 +218,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
 
    if ( szSkleton && strlen( szSkleton ) > 0 )
    {
-      szDirSpec = (BYTE *) hb_fileNameConv( hb_strdup( szSkleton ) );
-      bAlloc = TRUE;
+      szDirSpec = (BYTE *) hb_fsNameConv( ( BYTE * ) szSkleton, &fFree );
    }
    else
    {
@@ -257,7 +256,7 @@ void HB_EXPORT hb_fsDirectory( PHB_ITEM pDir, char* szSkleton, char* szAttribute
       hb_xfree( fDirSpec );
    }
 
-   if( bAlloc )
+   if( fFree )
    {
       hb_xfree( szDirSpec );
    }

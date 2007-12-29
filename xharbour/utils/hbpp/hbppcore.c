@@ -1,5 +1,5 @@
 /*
- * $Id: hbppcore.c,v 1.1 2007/02/27 15:59:42 druzus Exp $
+ * $Id: hbppcore.c,v 1.2 2007/12/21 16:09:07 likewolf Exp $
  */
 
 /*
@@ -1132,7 +1132,7 @@ int hb_pp_ParseDirective( char * sLine )
 
         if( ! OpenInclude( sLine, hb_comp_pIncludePath, hb_comp_pFileName, ( cDelimChar == '>' ), szInclude ) )
         {
-           if( errno == 0 || errno == EMFILE )
+           if( hb_fsMaxFilesError() )
            {
               hb_compGenError( hb_pp_szErrors, 'F', HB_PP_ERR_TOO_MANY_INCLUDES, sLine, NULL );
            }
@@ -7537,7 +7537,7 @@ static BOOL OpenInclude( char * szFileName, HB_PATHNAMES * pSearch, PHB_FNAME pM
      hb_xfree( pFileName );
   }
 
-  if( !fptr && pSearch && errno != EMFILE )
+  if( !fptr && pSearch && !hb_fsMaxFilesError() )
   {
       pFileName = hb_fsFNameSplit( szFileName );
       pFileName->szName = szFileName;

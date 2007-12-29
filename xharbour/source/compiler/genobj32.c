@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.6 2007/05/24 16:03:15 ronpinkas Exp $
+ * $Id: genobj32.c,v 1.8 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -73,7 +73,7 @@ void hb_compGenObj32( PHB_FNAME pFileName )
     pFileName->szExtension = ".obj";
   hb_fsFNameMerge( szFileName, pFileName );
 
-  if( ( hObjFile = fopen( szFileName, "wb" ) ) == NULL )
+  if( ( hObjFile = hb_fopen( szFileName, "wb" ) ) == NULL )
     {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
       return;

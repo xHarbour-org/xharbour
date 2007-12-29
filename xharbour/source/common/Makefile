@@ -1,11 +1,12 @@
 #
-# $Id: Makefile,v 1.3 2005/06/22 15:30:16 druzus Exp $
+# $Id: Makefile,v 1.4 2007/02/27 15:59:34 druzus Exp $
 #
 
 ROOT = ../../
 
 C_SOURCES=\
 	hbfhnd.c \
+	hbfopen.c \
 	hbfsapi.c \
 	hbgete.c \
 	hbhash.c \
