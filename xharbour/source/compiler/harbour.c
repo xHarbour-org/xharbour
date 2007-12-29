@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.171 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: harbour.c,v 1.172 2007/12/26 22:35:30 andijahja Exp $
  */
 
 /*
@@ -798,8 +798,8 @@ static char * hb_memToStr( char * szBuffer, void * pMem, ULONG ulSize )
       {
          int iLo = byMem[ i ] & 0x0f, iHi = byMem[ i ] >> 4;
          * pDest++ = '\\';
-         * pDest++ = iHi < 9 ? '0' + iHi : 'A' - 10 + iHi;
-         * pDest++ = iLo < 9 ? '0' + iLo : 'A' - 10 + iLo;
+         * pDest++ = iHi <= 9 ? '0' + iHi : 'A' - 10 + iHi;
+         * pDest++ = iLo <= 9 ? '0' + iLo : 'A' - 10 + iLo;
       }
    }
    * pDest = '\0';
