@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.263 2007/12/28 15:17:04 likewolf Exp $
+ * $Id: ppcore.c,v 1.264 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -58,8 +58,6 @@
 
 #include "hbpp.h"
 #include "hbdate.h"
-#include <ctype.h>
-
 
 #define HB_PP_WARN_DEFINE_REDEF                 1     /* C1005 */
 #ifndef HB_C52_STRICT
@@ -569,11 +567,16 @@ static void hb_pp_tokenAddNext( PHB_PP_STATE pState, const char * value, ULONG u
       type = HB_PP_TOKEN_DIRECTIVE | HB_PP_TOKEN_STATIC;
    }
 
+#ifndef HB_C52_STRICT
+   if( pState->iSpacesMin != 0 && pState->iSpaces == 0 &&
+       HB_PP_TOKEN_TYPE( type ) == HB_PP_TOKEN_KEYWORD )
+      pState->iSpaces = pState->iSpacesMin;
+#endif
    hb_pp_tokenAdd( &pState->pNextTokenPtr, value, ulLen, pState->iSpaces, type );
    pState->pFile->iTokens++;
    pState->fNewStatement = FALSE;
 
-   pState->iSpaces = 0;
+   pState->iSpaces = pState->iSpacesMin = 0;
    pState->iLastType = HB_PP_TOKEN_TYPE( type );
 
    if( pState->iInLineState != HB_PP_INLINE_OFF )
@@ -625,8 +628,7 @@ static void hb_pp_tokenAddStreamFunc( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
 
 static void hb_pp_readLine( PHB_PP_STATE pState )
 {
-   int ch, iLine;
-
+   int ch, iLine = 0;
 
    while( TRUE )
    {
@@ -643,13 +645,16 @@ static void hb_pp_readLine( PHB_PP_STATE pState )
       }
       else
          ch = fgetc( pState->pFile->file_in );
+
       if( ch == EOF )
       {
          pState->pFile->fEof = TRUE;
          break;
       }
+
+      iLine = 1;
       /* In Clipper ^Z works like \n */
-      else if( ch == '\n' || ch == '\x1a' )
+      if( ch == '\n' || ch == '\x1a' )
       {
          break;
       }
@@ -659,7 +664,7 @@ static void hb_pp_readLine( PHB_PP_STATE pState )
          hb_membufAddCh( pState->pBuffer, ch );
       }
    }
-   ++pState->iLineTot;
+   pState->iLineTot += iLine;
    iLine = ++pState->pFile->iCurrentLine / 100;
    if( !pState->fQuiet &&
        iLine != pState->pFile->iLastDisp )
@@ -798,11 +803,12 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
    char * pBuffer, ch;
    ULONG ulLen, ul;
    BOOL fDump = FALSE;
+   int iLines = 0;
 
    pInLinePtr = NULL;
    hb_pp_tokenListFree( &pState->pFile->pTokenList );
    pState->pNextTokenPtr = &pState->pFile->pTokenList;
-   pState->pFile->iTokens = pState->iSpaces = 0;
+   pState->pFile->iTokens = pState->iSpaces = pState->iSpacesMin = 0;
    pState->fCanNextLine = pState->fDirective = FALSE;
    pState->fNewStatement = TRUE;
    pState->iLastType = HB_PP_TOKEN_NUL;
@@ -818,17 +824,12 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
       ulLen = hb_membufLen( pState->pBuffer );
       if( pState->fCanNextLine )
       {
-         #ifdef HB_C52_STRICT
-            pState->iSpaces = pState->iSpacesNL;
-         #else
-            /* Clipper considers line concatenation (';' '/n') as white space (token delimiter)
-               but ppo output will be buggy, showing a false concatenation of the last token of
-               previous line and first token of new line.
-
-               This becomes a serious bug when the 2 tokens are keywords, due to automatic word concatenation  */
-
-            pState->iSpaces = pState->iSpacesNL ? pState->iSpacesNL : 1;
-         #endif
+         pState->iSpaces = pState->iSpacesNL;
+         /*
+          * set minimum number of leading spaces to 1 to avoid problems
+          * with automatic word concatenation which is not Clipper compatible
+          */
+         pState->iSpacesMin = 1;
          pState->fCanNextLine = FALSE;
          /* Clipper left only last leading blank character from
             concatenated lines */
@@ -863,17 +864,16 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
                      pState->iStreamDump = HB_PP_STREAM_OFF;
                      /* Clipper clear number of leading spaces when multiline
                         comment ends */
-#ifdef HB_C52_STRICT
                      pState->iSpaces = 0;
-#else
                      /*
                       * but we cannot make the same because we have automatic
                       * word concatenation which is not Clipper compatible and
                       * will break code like:
                       */
+#if 0
                       //   if /**/lVar; endif
-                     pState->iSpaces = 1;
 #endif
+                     pState->iSpacesMin = 1;
                      ++ul;
                   }
                }
@@ -1302,7 +1302,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
             if( pOperator )
             {
                hb_pp_tokenAddNext( pState, pOperator->value,
-					     strlen( pOperator->value ),
+                                   strlen( pOperator->value ),
                                    pOperator->type );
                ul = pOperator->len;
             }
@@ -1318,8 +1318,9 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
 
       if( pState->fCanNextLine == FALSE && pState->iExtBlock )
       {
-         //pState->pFile->iCurrentLine--;
+         iLines++;
          hb_pp_tokenAdd( &pState->pNextTokenPtr, "\n", 1, 0, HB_PP_TOKEN_EOL | HB_PP_TOKEN_STATIC );
+         pState->iSpaces = pState->iSpacesMin = 0;
          pState->pFile->iTokens++;
          pState->fNewStatement = TRUE;
 
@@ -1346,6 +1347,7 @@ static void hb_pp_getLine( PHB_PP_STATE pState )
       hb_pp_tokenAdd( &pState->pNextTokenPtr, "\n", 1, 0, HB_PP_TOKEN_EOL | HB_PP_TOKEN_STATIC );
       pState->pFile->iTokens++;
    }
+   pState->pFile->iCurrentLine -= iLines;
 }
 
 static int hb_pp_tokenStr( PHB_PP_TOKEN pToken, PHB_MEM_BUFFER pBuffer,
@@ -2885,7 +2887,7 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
             }
             else
             {
-               PHB_PP_TOKEN pToken, pOptional = ( * pTokenPtr )->pNext;
+               PHB_PP_TOKEN pToken, pOptTok = ( * pTokenPtr )->pNext;
                pToken = * pStopOptPtr;
                * pStopOptPtr = NULL;
                ( * pTokenPtr )->pNext = pToken->pNext;
@@ -2895,10 +2897,10 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
                if( ( * pTokenPtr )->spaces > 1 )
                   ( * pTokenPtr )->spaces = 1;
                ( * pTokenPtr )->type |= HB_PP_TOKEN_MATCHMARKER;
-               ( * pTokenPtr )->pMTokens = pOptional;
+               ( * pTokenPtr )->pMTokens = pOptTok;
                if( pLastPtr && !hb_pp_matchHasKeywords( * pLastPtr ) )
                {
-                  if( !hb_pp_matchHasKeywords( pOptional ) )
+                  if( !hb_pp_matchHasKeywords( pOptTok ) )
                   {
                      hb_pp_error( pState, 'E', HB_PP_ERR_AMBIGUOUS_MATCH_PATTERN, NULL );
                      return FALSE;
@@ -2906,7 +2908,7 @@ static BOOL hb_pp_matchPatternNew( PHB_PP_STATE pState, PHB_PP_TOKEN * pTokenPtr
                   /* replace the order for these optional tokens to keep
                      the ones with keywords 1-st */
                   ( * pTokenPtr )->pMTokens = * pLastPtr;
-                  * pLastPtr = pOptional;
+                  * pLastPtr = pOptTok;
                }
                pLastPtr = &( * pTokenPtr )->pMTokens;
                /* to skip resetting pLastPtr below */
@@ -5182,6 +5184,11 @@ void hb_pp_setStdBase( PHB_PP_STATE pState )
    hb_pp_ruleSetId( pState, pState->pDefinitions, HB_PP_DEFINE );
    hb_pp_ruleSetId( pState, pState->pTranslations, HB_PP_TRANSLATE );
    hb_pp_ruleSetId( pState, pState->pCommands, HB_PP_COMMAND );
+
+   /* clear total number of preprocessed lines so we will report only
+    * lines in compiled .prg files
+    */
+   pState->iLineTot = 0;
 }
 
 /*

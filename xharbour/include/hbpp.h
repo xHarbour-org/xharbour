@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.20 2007/12/28 15:17:04 likewolf Exp $
+ * $Id: hbpp.h,v 1.21 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -596,6 +596,7 @@ typedef struct
    PHB_MEM_BUFFER pBuffer;       /* buffer for input and output line */
    int      iSpaces;             /* leading spaces for next token */
    int      iSpacesNL;           /* leading spaces ';' token (fCanNextLine) if it will not be line concatenator */
+   int      iSpacesMin;          /* minimal number of leading spaces for next token */
    int      iLastType;           /* last token type */
    BOOL     fCanNextLine;        /* ';' token found and we do not know yet if it's command separator or line concatenator */
    BOOL     fDirective;          /* # directives is parsed */
