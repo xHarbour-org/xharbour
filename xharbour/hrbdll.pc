@@ -1,4 +1,4 @@
-# $Id: hrbdll.pc,v 1.43 2007/11/10 04:38:32 guerra000 Exp $
+# $Id: hrbdll.pc,v 1.44 2007/11/23 18:50:38 ptsarenko Exp $
 #
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ PELLES C DLL MAKEFILE ³Û
@@ -421,6 +421,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\errorapi.obj \
    \
    $(OBJ_DIR)\hbfhnd.obj \
+   $(OBJ_DIR)\hbfopen.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
    $(OBJ_DIR)\hbhash.obj \
@@ -1112,6 +1113,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
 # COMMON
 #
    $(ECHO) $(OBJ_DIR)\hbfhnd.obj     >> make_tmp
+   $(ECHO) $(OBJ_DIR)\hbfopen.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbfsapi.obj    >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbgete.obj     >> make_tmp
    $(ECHO) $(OBJ_DIR)\hbhash.obj     >> make_tmp
@@ -2429,6 +2431,9 @@ $(OBJ_DIR)\hbdate.obj : $(COMMON_DIR)\hbdate.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbfopen.obj : $(COMMON_DIR)\hbfopen.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c

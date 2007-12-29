@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.gc,v 1.29 2007/10/31 08:34:20 marchuet Exp $
+# $Id: hrbdll.gc,v 1.30 2007/11/23 18:50:37 ptsarenko Exp $
 # makefile for creating Harbour.dll with MINGW32 compiler
 #
 
@@ -315,6 +315,7 @@ DLL_OBJECTS = \
    $(OBJ_DIR)/harbinit.o \
    \
    $(OBJ_DIR)/hbfhnd.o \
+   $(OBJ_DIR)/hbfopen.o \
    $(OBJ_DIR)/hbfsapi.o \
    $(OBJ_DIR)/hbgete.o \
    $(OBJ_DIR)/hbhash.o \
@@ -1606,6 +1607,9 @@ $(OBJ_DIR)/thread.o : $(VM_DIR)/thread.c
 # COMMON
 
 $(OBJ_DIR)/hbfhnd.o : $(COMMON_DIR)/hbfhnd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbfopen.o : $(COMMON_DIR)/hbfopen.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/hbfsapi.o : $(COMMON_DIR)/hbfsapi.c

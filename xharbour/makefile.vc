@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.202 2007/12/23 18:36:25 likewolf Exp $
+# $Id: makefile.vc,v 1.203 2007/12/26 14:53:40 modalsist Exp $
 #
 
 #
@@ -1080,6 +1080,7 @@ DEBUG_LIB_OBJS = \
 
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
+   $(OBJ_DIR)\hbfopen.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
    $(OBJ_DIR)\hbhash.obj \

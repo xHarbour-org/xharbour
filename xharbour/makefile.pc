@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.58 2007/12/22 11:17:25 modalsist Exp $
+# $Id: makefile.pc,v 1.59 2007/12/26 14:53:40 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -740,6 +740,7 @@ PP_LIB_OBJS = \
 
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
+   $(OBJ_DIR)\hbfopen.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
    $(OBJ_DIR)\hbhash.obj \
@@ -749,7 +750,7 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\expropt1.obj \
    $(OBJ_DIR)\expropt2.obj \
    $(OBJ_DIR)\reserved.obj \
-   $(OBJ_DIR)\hbdate.obj
+   $(OBJ_DIR)\hbdate.obj 
 
 GTSTD_LIB_OBJS = \
    $(OBJ_DIR)\gtstd.obj \
@@ -3246,6 +3247,9 @@ $(OBJ_DIR)\throw.obj : $(VM_DIR)\throw.c
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
 $(OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbfopen.obj : $(COMMON_DIR)\hbfopen.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c

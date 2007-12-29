@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.gc,v 1.35 2007/12/22 11:17:25 modalsist Exp $
+# $Id: makefile.gc,v 1.36 2007/12/26 14:53:39 modalsist Exp $
 # makefile for MINGW32 compiler
 #
 
@@ -2093,6 +2093,7 @@ $(GTWVW_OBJ_DIR)/gtwvw.o : $(HARBOUR_DIR)/contrib/gtwvw/gtwvw.c
 
 $(COMMON_LIB) : \
    $(OBJ_DIR)/hbfhnd.o \
+   $(OBJ_DIR)/hbfopen.o \
    $(OBJ_DIR)/hbfsapi.o \
    $(OBJ_DIR)/hbgete.o \
    $(OBJ_DIR)/hbhash.o \
@@ -2105,6 +2106,9 @@ $(COMMON_LIB) : \
 	$(AR_CMD)
 
 $(OBJ_DIR)/hbfhnd.o : $(COMMON_DIR)/hbfhnd.c
+	$(CC_CMD)
+
+$(OBJ_DIR)/hbfopen.o : $(COMMON_DIR)/hbfopen.c
 	$(CC_CMD)
 
 $(OBJ_DIR)/hbfsapi.o : $(COMMON_DIR)/hbfsapi.c

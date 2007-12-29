@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: hrbdll.dc,v 1.26 2007/10/31 08:34:20 marchuet Exp $
+# $Id: hrbdll.dc,v 1.27 2007/11/23 18:50:37 ptsarenko Exp $
 # makefile for creating Harbour.dll with DigitalMars C/C++ compiler
 #
 
@@ -392,6 +392,7 @@ HRBDLL_OBJS = \
    $(OBJ_DIR)\errorapi.obj \
    \
    $(OBJ_DIR)\hbfhnd.obj \
+   $(OBJ_DIR)\hbfopen.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
    $(OBJ_DIR)\hbhash.obj \
@@ -947,6 +948,7 @@ $(HARBOUR_DLL) : $(HRBDLL_OBJS)
    $(ECHO) $(OBJ_DIR)\do.obj         + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\errorapi.obj   + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hbfhnd.obj     + >> harbourdll.rsp
+   $(ECHO) $(OBJ_DIR)\hbfopen.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hbfsapi.obj    + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hbgete.obj     + >> harbourdll.rsp
    $(ECHO) $(OBJ_DIR)\hbhash.obj     + >> harbourdll.rsp
@@ -2227,6 +2229,9 @@ $(OBJ_DIR)\trace.obj : $(RTL_DIR)\trace.c
 # COMMON
 
 $(OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbfopen.obj : $(COMMON_DIR)\hbfopen.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c

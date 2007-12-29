@@ -3,7 +3,7 @@
 # ¿ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒŸ€
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 #
-# $Id: makefile.dc,v 1.32 2007/12/22 11:17:25 modalsist Exp $
+# $Id: makefile.dc,v 1.33 2007/12/26 14:53:39 modalsist Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -838,6 +838,7 @@ PP_LIB_OBJS = \
 
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
+   $(OBJ_DIR)\hbfopen.obj \
    $(OBJ_DIR)\hbfsapi.obj \
    $(OBJ_DIR)\hbgete.obj \
    $(OBJ_DIR)\hbhash.obj \
@@ -3411,6 +3412,9 @@ $(VM_OBJ_DIR)\trace.obj : $(RTL_DIR)\trace.c
 #  ﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂﬂ
 
 $(OBJ_DIR)\hbfhnd.obj : $(COMMON_DIR)\hbfhnd.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbfopen.obj : $(COMMON_DIR)\hbfopen.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c

@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.wc,v 1.61 2007/10/31 08:34:21 marchuet Exp $
+# $Id: hrbdll.wc,v 1.62 2007/11/23 18:50:38 ptsarenko Exp $
 #
 #
 # This make file is for creating harbour.dll with Open-Watcom 1.2
@@ -406,6 +406,7 @@ HARBOUR_DLL_OBJS = \
   $(OBJ_DIR)\dbupdat.obj \
   $(OBJ_DIR)\rddord.obj \
   $(OBJ_DIR)\rddsys.obj \
+  $(OBJ_DIR)\hbfopen.obj \
   $(OBJ_DIR)\hbfsapi.obj \
   $(OBJ_DIR)\hbgete.obj \
   $(OBJ_DIR)\hbini.obj \
@@ -765,6 +766,9 @@ $(HARBOUR_DLL) : $(HARBOUR_DLL_OBJS)
 # ³ object file creation ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
+
+$(OBJ_DIR)\hbfopen.obj : $(COMMON_DIR)\hbfopen.c
+   $(CC_CMD)
 
 $(OBJ_DIR)\hbfsapi.obj : $(COMMON_DIR)\hbfsapi.c
    $(CC_CMD)

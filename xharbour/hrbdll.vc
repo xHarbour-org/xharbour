@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.114 2007/11/23 18:50:38 ptsarenko Exp $
+# $Id: hrbdll.vc,v 1.115 2007/11/27 23:47:06 ronpinkas Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -494,6 +494,7 @@ HARBOUR_DLL_OBJS = \
 # Common c
 #
   $(OBJ_DIR)\hbfhnd.obj \
+  $(OBJ_DIR)\hbfopen.obj \
   $(OBJ_DIR)\hbfsapi.obj \
   $(OBJ_DIR)\hbgete.obj \
   $(OBJ_DIR)\hbhash.obj \
