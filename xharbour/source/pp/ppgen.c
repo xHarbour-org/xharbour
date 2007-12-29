@@ -1,5 +1,5 @@
 /*
- * $Id: ppgen.c,v 1.3 2007/05/15 21:34:15 ronpinkas Exp $
+ * $Id: ppgen.c,v 1.4 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -73,6 +73,7 @@
 char * hb_conNewLine( void ) { return "\n"; }
 void hb_conOutErr( const char * pStr, ULONG ulLen ) { fprintf( stderr, "%.*s", ( int ) ( ulLen ? ulLen : strlen( pStr ) ), pStr ); }
 ULONG hb_xquery( USHORT uiMode ) { HB_SYMBOL_UNUSED( uiMode ); return 0; }
+BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }
 
 
 /*
@@ -212,7 +213,7 @@ static void hb_pp_generateRules( FILE * fout, PHB_PP_STATE pState )
 {
    int iDefs = 0, iTrans = 0, iCmds = 0;
 
-   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.3 2007/05/15 21:34:15 ronpinkas Exp $\n */\n\n/*\n"
+   fprintf( fout, "/*\n * $Id: ppgen.c,v 1.4 2007/12/29 12:50:55 likewolf Exp $\n */\n\n/*\n"
          " * Harbour Project source code:\n"
          " *    Build in preprocessor rules.\n"
          " *\n"

@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.11 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: hbfsapi.c,v 1.12 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -55,6 +55,9 @@
 #include "hbexemem.h"
 #if !defined( HB_WIN32_IO )
    #include <errno.h>
+#endif
+#if defined( __WIN32__ )
+   #include <windows.h>
 #endif
 
 /* NOTE: Not really belongs here, but until we can't find a better place 
