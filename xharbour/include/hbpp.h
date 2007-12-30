@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.h,v 1.21 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: hbpp.h,v 1.22 2007/12/29 13:42:47 likewolf Exp $
  */
 
 /*
@@ -62,6 +62,7 @@ HB_EXTERN_BEGIN
 #define HB_BLOCK_MACRO     1
 #define HB_BLOCK_LATEEVAL  2
 #define HB_BLOCK_VPARAMS   4
+#define HB_BLOCK_EXT       8
 
 /* #pragma {__text,__stream,__cstream}|functionOut|functionEnd|functionStart */
 #define HB_PP_STREAM_OFF      0 /* standard preprocessing */
@@ -106,7 +107,7 @@ typedef HB_PP_DISP_FUNC * PHB_PP_DISP_FUNC;
 typedef HB_PP_DUMP_FUNC_( HB_PP_DUMP_FUNC );
 typedef HB_PP_DUMP_FUNC * PHB_PP_DUMP_FUNC;
 
-/* function for catching #pragma dump data */
+/* function for catching HB_INLINE(...){...} data */
 #define HB_PP_INLINE_FUNC_( func ) void func( void *, char *, char *, ULONG, int )
 typedef HB_PP_INLINE_FUNC_( HB_PP_INLINE_FUNC );
 typedef HB_PP_INLINE_FUNC * PHB_PP_INLINE_FUNC;
@@ -272,6 +273,7 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 #define HB_PP_TOKEN_ISNEUTRAL(t) ( HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_DEC || \
                                    HB_PP_TOKEN_TYPE(t) == HB_PP_TOKEN_INC )
 
+/* Intentional deviation from Harbour, see ChangeLog 2007-04-08 03:18 UTC-0500 Ron Pinkas <ron/at/xharbour.com> */
 #define HB_PP_TOKEN_NEEDLEFT(t)  ( HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_ASSIGN || \
                                    HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_PLUSEQ || \
                                    HB_PP_TOKEN_TYPE((t)->type) == HB_PP_TOKEN_MINUSEQ || \
@@ -342,14 +344,10 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
                                       ( (t)->pNext && HB_PP_TOKEN_ISUNARY( (t)->type ) && \
                                         HB_PP_TOKEN_ISEXPVAL( (t)->pNext->type ) ) )
 
-#define HB_PP_TOKEN_ISEXTBLOCK(t)   ( HB_PP_TOKEN_TYPE( (t)->type ) == HB_PP_TOKEN_LT && \
-                                      (t)->pNext && HB_PP_TOKEN_TYPE( (t)->pNext->type ) == HB_PP_TOKEN_PIPE )
-
 #ifdef HB_C52_STRICT
 /* Clipper supports quoting by [] for 1-st token in the line so we
-   are checking for HB_PP_TOKEN_NUL in this macro */
-#define HB_PP_TOKEN_CANQUOTE(t)     ( HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_NUL && \
-                                      HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_KEYWORD && \
+   are not checking for HB_PP_TOKEN_NUL in this macro */
+#define HB_PP_TOKEN_CANQUOTE(t)     ( HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_KEYWORD && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_MACROVAR && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_MACROTEXT && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_RIGHT_PB && \
@@ -359,9 +357,8 @@ typedef HB_PP_SWITCH_FUNC * PHB_PP_SWITCH_FUNC;
 /* Disable string quoting by [] for next token if current one is
    constant value - it's not Clipper compatible but we need it for
    accessing string characters by array index operator or introduce
-   similar extensions in the future */
-#define HB_PP_TOKEN_CANQUOTE(t)     ( HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_NUL && \
-                                      HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_KEYWORD && \
+   similar extensions for other types in the future */
+#define HB_PP_TOKEN_CANQUOTE(t)     ( HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_KEYWORD && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_MACROVAR && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_MACROTEXT && \
                                       HB_PP_TOKEN_TYPE(t) != HB_PP_TOKEN_RIGHT_PB && \
@@ -411,6 +408,7 @@ HB_PP_TOKEN, * PHB_PP_TOKEN;
 #define HB_PP_CMP_DBASE       2 /* dbase keyword comparison (accepts at least four character shortcuts) ignore the case of the characters */
 #define HB_PP_CMP_CASE        3 /* case sensitive comparison */
 
+/* xHarbour additions to allow overloaded defines */
 #define HB_PP_CMP_KEY        0x1000
 #define HB_PP_CMP_MATCHRULE  0x2000
 
@@ -587,6 +585,7 @@ typedef struct
 
    BOOL     fError;              /* error during preprocessing */
    BOOL     fQuiet;              /* do not show standard information */
+   BOOL     fEscStr;             /* use \ in strings as escape character */
    int      iCondCompile;        /* current conditional compilation flag, when not 0 disable preprocessing and output */
    int      iCondCount;          /* number of nested #if[n]def directive */
    int      iCondStackSize;      /* size of conditional compilation stack */
@@ -609,7 +608,8 @@ typedef struct
    int      iInLineCount;        /* number of hb_inLine() functions */
    int      iInLineState;        /* hb_inLine() state */
    int      iInLineBraces;       /* braces counter for hb_inLine() */
-   int      iExtBlock;
+   int      iNestedBlock;        /* nested extended block counter */
+   int      iBlockState;         /* state of extended block declaration */
 
    PHB_PP_FILE pFile;            /* currently preprocessed file structure */
    int      iFiles;              /* number of open files */
@@ -624,6 +624,7 @@ typedef struct
    PHB_PP_SWITCH_FUNC pSwitchFunc; /* function for compiler switches with #pragma ... */
 
    int aaSwitchState[ 'z' ][ HB_PP_MAX_SWITCH_STATES + 1 ];
+   int iPushPop;
 }
 HB_PP_STATE, * PHB_PP_STATE;
 
@@ -675,7 +676,7 @@ extern char * hb_pp_tokenBlockString( PHB_PP_STATE pState, PHB_PP_TOKEN pToken, 
 extern PHB_PP_STATE hb_pp_lexNew( const char * pString, ULONG ulLen );
 extern PHB_PP_TOKEN hb_pp_lexGet( PHB_PP_STATE pState );
 extern PHB_PP_TOKEN hb_pp_tokenGet( PHB_PP_STATE pState );
-extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr, PHB_PP_STATE pState );
+extern BOOL   hb_pp_tokenNextExp( PHB_PP_TOKEN * pTokenPtr );
 
 HB_EXTERN_END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5850 2007/12/29 22:19:57 andijahja Exp $
+ * $Id: ChangeLog,v 1.5851 2007/12/30 17:49:05 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-30 22:51 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbpp.h
+  * source/pp/ppcore.c
+    ! fixed typo in quoting condition for 1-st line token
+    + added #ytranslate, #ycommand, #yuntranslate, #yuncommand
+      case sensitive version of corresponding #x* directives
+      (but not supporting overloading!)
+    * most extended codeblock support code in PP synced with Harbour
+    % some little optimizations
+    (Mostly borrowed from Harbour, by Przemyslaw Czerpak)
 
 2007-12-30 20:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/w32/msvc.cf
