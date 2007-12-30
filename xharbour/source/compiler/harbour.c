@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.173 2007/12/29 01:27:48 likewolf Exp $
+ * $Id: harbour.c,v 1.174 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -300,7 +300,7 @@ int main( int argc, char * argv[] )
    ArgC = argc;
    ArgV = (char **) argv;
 
-   hb_comp_PP = hb_pp_new();;
+   hb_comp_PP = hb_pp_new();
 
    hb_comp_pOutPath = NULL;
    hb_comp_ppo_pOutPath = NULL;

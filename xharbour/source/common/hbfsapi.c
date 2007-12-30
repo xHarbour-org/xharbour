@@ -1,5 +1,5 @@
 /*
- * $Id: hbfsapi.c,v 1.12 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: hbfsapi.c,v 1.13 2007/12/29 22:19:57 andijahja Exp $
  */
 
 /*
@@ -50,14 +50,19 @@
  *
  */
 
+/* OS2 */
+#define INCL_DOSFILEMGR   /* File Manager values */
+#define INCL_DOSERRORS    /* DOS error values    */
+
+/* W32 */
+#define HB_OS_WIN_32_USED
+
 #include "hbapi.h"
 #include "hbapifs.h"
+#include "hb_io.h"
 #include "hbexemem.h"
 #if !defined( HB_WIN32_IO )
    #include <errno.h>
-#endif
-#if defined( __WIN32__ )
-   #include <windows.h>
 #endif
 
 /* NOTE: Not really belongs here, but until we can't find a better place 
