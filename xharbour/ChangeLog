@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5851 2007/12/30 17:49:05 likewolf Exp $
+ * $Id: ChangeLog,v 1.5852 2007/12/30 19:52:43 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-31 14.10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/vm/maindllp.c
+    ! add efforts to find function address in 3 ways:
+      1. conventional         eg. "_hb_parc"
+      2. ms flavor            eg. "hb_parc"
+      3. Watcom register call eg. "hb_parc_"
+      This will enable pCode.DLL to call function in cross-compiled module as
+      long as it was compiled using cdecl calling convention (xHarbour default)
+      NOTE:
+      OpenWatcom has 2 types of cdecl, ie. stack call and register call.
+      Stack call prepend "_" before function name, ie "_hb_retni" while register
+      call append "_" thereafter ie "hb_retni_". (Am not aware of others)
+
 
 2007-12-30 22:51 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbpp.h
