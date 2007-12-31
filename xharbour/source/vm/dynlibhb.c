@@ -1,5 +1,5 @@
 /*
- * $Id: dynlibhb.c,v 1.12 2006/04/23 00:36:00 druzus Exp $
+ * $Id: dynlibhb.c,v 1.13 2006/05/16 22:57:08 druzus Exp $
  */
 
 /*
@@ -187,4 +187,14 @@ HB_FUNC( HB_LIBDO )
          hb_vmDo( uiPCount - 1 );
       }
    }
+}
+
+HB_FUNC( HB_LIBLOAD )
+{
+   HB_FUNC_EXEC( LIBLOAD );
+}
+
+HB_FUNC( HB_LIBFREE )
+{
+   HB_FUNC_EXEC( LIBFREE );
 }

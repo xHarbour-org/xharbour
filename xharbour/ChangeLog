@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5852 2007/12/30 19:52:43 likewolf Exp $
+ * $Id: ChangeLog,v 1.5853 2007/12/31 07:24:08 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-31 16.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/vm/dynlibhb.c
+    + HB_LIBLOAD() and HB_LIBFREE(), wrappers of LIBLOAD() and LIBFREE() just
+      for similarity in function name space of pCode DLL utilities.
 
 2007-12-31 14.10 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/vm/maindllp.c
