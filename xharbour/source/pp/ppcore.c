@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.265 2007/12/29 13:42:47 likewolf Exp $
+ * $Id: ppcore.c,v 1.266 2007/12/30 19:52:43 likewolf Exp $
  */
 
 /*
@@ -3268,7 +3268,10 @@ static void hb_pp_directiveNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken,
             pMatch = pToken->pNext;
 
             if( pStart->pNext )
+            {
                pToken->pNext = pStart->pNext->pNext;
+               hb_pp_tokenFree( pStart->pNext );
+            }
             else
                pToken->pNext = NULL;
 
