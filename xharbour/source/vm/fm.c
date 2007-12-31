@@ -1,5 +1,5 @@
 /*
- * $Id: fm.c,v 1.85 2007/10/31 08:35:13 marchuet Exp $
+ * $Id: fm.c,v 1.86 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -308,13 +308,13 @@ HB_EXPORT void * hb_xalloc( ULONG ulSize )
 
 #ifdef hb_xgrab
    #undef hb_xgrab
-   HB_EXPORT void * hb_xgrab( ULONG ulSize )
+   HB_FORCE_EXPORT void * hb_xgrab( ULONG ulSize )
    {
       return malloc( ulSize);
    }
 #else
 /* allocates fixed memory, exits on failure */
-void HB_EXPORT * hb_xgrab( ULONG ulSize )
+void HB_FORCE_EXPORT * hb_xgrab( ULONG ulSize )
 {
    void * pMem;
 
@@ -572,12 +572,12 @@ void HB_EXPORT * hb_xrealloc( void * pMem, ULONG ulSize )       /* reallocates m
 
 #ifdef hb_xfree
    #undef hb_xfree
-   HB_EXPORT void hb_xfree( void *pMem )
+   HB_FORCE_EXPORT void hb_xfree( void *pMem )
    {
       free( pMem );
    }
 #else
-HB_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
+HB_FORCE_EXPORT void hb_xfree( void * pMem )            /* frees fixed memory */
 {
 
 #ifdef HB_FM_STATISTICS
@@ -988,6 +988,10 @@ void HB_EXPORT hb_xexit( void ) /* Deinitialize fixed memory subsystem */
          fclose( hLog );
       }
    }
+#ifdef __WIN32__
+   else
+      OutputDebugString( "HB_XEXIT(): No Memory Leak Detected" );
+#endif
 
 #endif
 }

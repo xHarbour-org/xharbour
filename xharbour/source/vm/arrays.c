@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.148 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: arrays.c,v 1.149 2007/12/09 06:22:13 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@
 
 int hb_arrayMode( void );
 
-BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
+BOOL HB_FORCE_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array */
 {
    PHB_BASEARRAY pBaseArray = ( PHB_BASEARRAY ) hb_gcAlloc( sizeof( HB_BASEARRAY ), hb_arrayReleaseGarbage );
 
@@ -156,7 +156,7 @@ BOOL HB_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new array
    return TRUE;
 }
 
-BOOL HB_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
+BOOL HB_FORCE_EXPORT hb_arrayAdd( PHB_ITEM pArray, PHB_ITEM pValue )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayAdd(%p, %p)", pArray, pValue));
 
@@ -216,7 +216,7 @@ BOOL HB_EXPORT hb_arrayAddForward( PHB_ITEM pArray, PHB_ITEM pValue )
    return FALSE;
 }
 
-ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
+ULONG HB_FORCE_EXPORT hb_arrayLen( PHB_ITEM pArray )
 {
    ULONG ulLen = 0;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayLen(%p)", pArray));
@@ -229,7 +229,7 @@ ULONG HB_EXPORT hb_arrayLen( PHB_ITEM pArray )
    return ulLen;
 }
 
-BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
+BOOL HB_FORCE_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
 {
    BOOL bObj = FALSE;
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIsObject(%p)", pArray));
@@ -242,7 +242,7 @@ BOOL HB_EXPORT hb_arrayIsObject( PHB_ITEM pArray )
    return bObj;
 }
 
-BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
+BOOL HB_FORCE_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySize(%p, %lu)", pArray, ulLen));
 
@@ -401,7 +401,7 @@ BOOL HB_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
+BOOL HB_FORCE_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayDel(%p, %lu)", pArray, ulIndex));
 
@@ -433,7 +433,7 @@ BOOL HB_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
+BOOL HB_FORCE_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayIns(%p, %lu)", pArray, ulIndex));
 
@@ -466,7 +466,7 @@ BOOL HB_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+BOOL HB_FORCE_EXPORT hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arraySet(%p, %lu, %p)", pArray, ulIndex, pItem));
 
@@ -514,7 +514,7 @@ BOOL HB_EXPORT hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
    return FALSE;
 }
 
-BOOL HB_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
+BOOL HB_FORCE_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_arrayGet(%p, %lu, %p) Base: %p Items: %p", pArray, ulIndex, pItem, pArray->item.asArray.value, pArray->item.asArray.value->pItems));
 
@@ -886,7 +886,7 @@ HB_EXPORT BOOL hb_arraySetL( PHB_ITEM pArray, ULONG ulIndex, BOOL fValue )
       return FALSE;
 }
 
-BOOL HB_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
+BOOL HB_FORCE_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
 {
    BOOL bRet = FALSE;
 
@@ -1383,7 +1383,7 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
    //TraceLog( NULL, "DONE Releasing Basearray %p\n", pBaseArray );
 }
 
-BOOL HB_EXPORT hb_arrayRelease( PHB_ITEM pArray )
+BOOL HB_FORCE_EXPORT hb_arrayRelease( PHB_ITEM pArray )
 {
    HB_TRACE( HB_TR_DEBUG, ("hb_arrayRelease(%p) %p", pArray, pArray->item.asArray.value ) );
 

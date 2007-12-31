@@ -1,5 +1,5 @@
 /*
- * $Id: filesys.c,v 1.167 2007/12/21 18:44:46 likewolf Exp $
+ * $Id: filesys.c,v 1.168 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -1612,7 +1612,7 @@ BOOL HB_EXPORT hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle )
 }
 
 
-HB_EXPORT FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
+HB_FORCE_EXPORT FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
 {
    HB_THREAD_STUB
 
@@ -1712,7 +1712,7 @@ HB_EXPORT FHANDLE hb_fsOpen( BYTE * pFilename, USHORT uiFlags )
    return hFileHandle;
 }
 
-HB_EXPORT FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
+HB_FORCE_EXPORT FHANDLE hb_fsCreate( BYTE * pFilename, USHORT uiAttr )
 {
    HB_THREAD_STUB
    FHANDLE hFileHandle;
@@ -1900,7 +1900,7 @@ HB_EXPORT FHANDLE hb_fsCreateEx( BYTE * pFilename, USHORT uiAttr, USHORT uiFlags
    return hFileHandle;
 }
 
-HB_EXPORT void hb_fsClose( FHANDLE hFileHandle )
+HB_FORCE_EXPORT void hb_fsClose( FHANDLE hFileHandle )
 {
    HB_THREAD_STUB
    HB_TRACE(HB_TR_DEBUG, ("hb_fsClose(%p)", hFileHandle));
@@ -1993,7 +1993,7 @@ BOOL    HB_EXPORT hb_fsSetDevMode( FHANDLE hFileHandle, USHORT uiDevMode )
 #endif
 }
 
-USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
+USHORT  HB_FORCE_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
 {
    HB_THREAD_STUB
    USHORT uiRead;
@@ -2040,7 +2040,7 @@ USHORT  HB_EXPORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT uiCount )
    return uiRead;
 }
 
-HB_EXPORT USHORT hb_fsWrite( FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
+HB_FORCE_EXPORT USHORT hb_fsWrite( FHANDLE hFileHandle, const BYTE * pBuff, USHORT uiCount )
 {
    HB_THREAD_STUB
    USHORT uiWritten;

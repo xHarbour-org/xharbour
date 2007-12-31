@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5853 2007/12/31 07:24:08 andijahja Exp $
+ * $Id: ChangeLog,v 1.5854 2007/12/31 09:02:00 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,27 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-12-31 21.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbdefs.h
+  * include/hbapi.h
+  * include/hbapifs.h
+  * include/hbvm.h
+  * include/hbvmpub.h
+  * include/hbinit.h
+  * source/rtl/filesys.c
+  * source/vm/arrays.c
+  * source/vm/extend.c
+  * source/vm/fm.c
+  * source/vm/hvm.c
+    + HB_FORCE_EXPORT constant to force exporting functions contained in
+      source/vm/maindllp.c to ease pCode DLL features without changing
+      compiler flags in order to enable pCode DLL features with standard builds.
+    + __NO_EXPORT__ constant to hide functions of same name to avoid compiler
+      confusion during linking time when one has to include imported lib of
+      pCode DLL into app (mainly C level routines)
+  * source/vm/maindllp.c
+    + implementation of __NO_EXPORT__ define constant
 
 2007-12-31 16.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/vm/dynlibhb.c

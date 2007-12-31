@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.645 2007/10/31 08:35:13 marchuet Exp $
+ * $Id: hvm.c,v 1.646 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -10078,7 +10078,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    return pNewSymbols;
 }
 
-HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
+HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ) /* module symbols initialization */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_vmProcessSymbols(%p, %dl )", pSymbols));
 

@@ -1,5 +1,5 @@
 /*
- * $Id: extend.c,v 1.61 2007/04/11 07:58:58 ronpinkas Exp $
+ * $Id: extend.c,v 1.62 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -104,7 +104,7 @@
 
 HB_EXTERN_BEGIN
 
-PHB_ITEM HB_EXPORT hb_param( int iParam, LONG lMask )
+PHB_ITEM HB_FORCE_EXPORT hb_param( int iParam, LONG lMask )
 {
    HB_THREAD_STUB_ANY
 
@@ -158,7 +158,7 @@ PHB_ITEM  HB_EXPORT hb_paramError( int iParam )
 /* function to be called from pcode DLLs to detect if the extend system
  * is going to use an array item */
 
-BOOL HB_EXPORT hb_extIsArray( int iParam )
+BOOL HB_FORCE_EXPORT hb_extIsArray( int iParam )
 {
    HB_THREAD_STUB_ANY
 
@@ -192,7 +192,7 @@ HB_EXPORT BOOL hb_extIsObject( int iParam )
 /* NOTE: Caller should not modify the buffer returned by this function.
          [vszakats] */
 
-char HB_EXPORT * hb_parc( int iParam, ... )
+char HB_FORCE_EXPORT * hb_parc( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -262,7 +262,7 @@ char HB_EXPORT * hb_parcx( int iParam, ... )
    return "";
 }
 
-ULONG  HB_EXPORT hb_parclen( int iParam, ... )
+ULONG  HB_FORCE_EXPORT hb_parclen( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -637,7 +637,7 @@ double HB_EXPORT hb_pardtd( int iParam, ... )
    return hb_itemGetDTD( NULL );
 }
 
-int  HB_EXPORT hb_parl( int iParam, ... )
+int  HB_FORCE_EXPORT hb_parl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -739,7 +739,7 @@ double  HB_EXPORT hb_parnd( int iParam, ... )
    return 0;
 }
 
-int  HB_EXPORT hb_parni( int iParam, ... )
+int  HB_FORCE_EXPORT hb_parni( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -790,7 +790,7 @@ int  HB_EXPORT hb_parni( int iParam, ... )
    return 0;
 }
 
-LONG  HB_EXPORT hb_parnl( int iParam, ... )
+LONG  HB_FORCE_EXPORT hb_parnl( int iParam, ... )
 {
    HB_THREAD_STUB_ANY
 
@@ -1006,7 +1006,7 @@ ULONG  HB_EXPORT hb_parinfa( int iParamNum, ULONG uiArrayIndex )
       return 0;
 }
 
-ULONG  HB_EXPORT hb_parinfo( int iParam )
+ULONG  HB_FORCE_EXPORT hb_parinfo( int iParam )
 {
    HB_THREAD_STUB_ANY
 
@@ -1052,7 +1052,7 @@ int  HB_EXPORT hb_pcount( void )
 }
 
 #undef hb_ret
-void  HB_EXPORT hb_ret( void )
+void  HB_FORCE_EXPORT hb_ret( void )
 {
    HB_THREAD_STUB_ANY
 
@@ -1075,7 +1075,7 @@ void  HB_EXPORT hb_ret( void )
 #endif
 
 #undef hb_reta
-void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
+void  HB_FORCE_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_reta(%lu)", ulLen));
 
@@ -1083,7 +1083,7 @@ void  HB_EXPORT hb_reta( ULONG ulLen )  /* undocumented hb_reta() */
 }
 
 #undef hb_retc
-void HB_EXPORT  hb_retc( const char * szText )
+void HB_FORCE_EXPORT  hb_retc( const char * szText )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retc(%s)", szText));
 
@@ -1091,7 +1091,7 @@ void HB_EXPORT  hb_retc( const char * szText )
 }
 
 #undef hb_retclen
-void  HB_EXPORT hb_retclen( const char * szText, ULONG ulLen )
+void  HB_FORCE_EXPORT hb_retclen( const char * szText, ULONG ulLen )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retclen(%s, %lu)", szText, ulLen));
 
@@ -1159,7 +1159,7 @@ void HB_EXPORT hb_retdtl( LONG lDate, LONG lTime )
 }
 
 #undef hb_retl
-void HB_EXPORT hb_retl( int iLogical )
+void HB_FORCE_EXPORT hb_retl( int iLogical )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retl(%d)", iLogical));
 
@@ -1175,7 +1175,7 @@ void HB_EXPORT hb_retnd( double dNumber )
 }
 
 #undef hb_retni
-void HB_EXPORT hb_retni( int iNumber )
+void HB_FORCE_EXPORT hb_retni( int iNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retni(%d)", iNumber));
 
@@ -1183,7 +1183,7 @@ void HB_EXPORT hb_retni( int iNumber )
 }
 
 #undef hb_retnl
-void HB_EXPORT hb_retnl( LONG lNumber )
+void HB_FORCE_EXPORT hb_retnl( LONG lNumber )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_retnl(%ld)", lNumber));
 
@@ -1255,7 +1255,7 @@ void HB_EXPORT hb_retnintlen( HB_LONG lNumber, int iWidth )
    hb_itemPutNIntLen( hb_stackReturnItem(), lNumber, iWidth );
 }
 
-void HB_EXPORT hb_storc( char * szText, int iParam, ... )
+void HB_FORCE_EXPORT hb_storc( char * szText, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storc(%s, %d, ...)", szText, iParam));
 
@@ -1622,7 +1622,7 @@ void HB_EXPORT hb_storl( int iLogical, int iParam, ... )
    }
 }
 
-void HB_EXPORT hb_storni( int iValue, int iParam, ... )
+void HB_FORCE_EXPORT hb_storni( int iValue, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_storni(%d, %d, ...)", iValue, iParam));
 
@@ -1655,7 +1655,7 @@ void HB_EXPORT hb_storni( int iValue, int iParam, ... )
    }
 }
 
-void HB_EXPORT hb_stornl( LONG lValue, int iParam, ... )
+void HB_FORCE_EXPORT hb_stornl( LONG lValue, int iParam, ... )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_stornl(%ld, %d, ...)", lValue, iParam));
 

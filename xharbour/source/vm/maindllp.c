@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.20 2007/12/28 08:53:47 andijahja Exp $
+ * $Id: maindllp.c,v 1.21 2007/12/31 07:24:09 andijahja Exp $
  */
 
 /*
@@ -55,11 +55,13 @@
  *
  */
 
+// #define __NO_EXPORT__
 #define HB_OS_WIN_32_USED
 #include "hbtypes.h"
 
-#if defined( HB_OS_WIN_32 )
 HB_EXTERN_BEGIN
+
+#if defined( HB_OS_WIN_32 )
 
 static HMODULE hModule = NULL;
 static FARPROC pExtIsArray = NULL;
@@ -1247,6 +1249,7 @@ BOOL hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )  /* retrieves
    }
 }
 
+#undef hb_xinit
 void hb_xinit( void )                         /* Initialize fixed memory subsystem */
 {
    static HB_XINIT pXinit = NULL;
@@ -1262,6 +1265,7 @@ void hb_xinit( void )                         /* Initialize fixed memory subsyst
    }
 }
 
+#undef hb_xexit
 void hb_xexit( void )                         /* Deinitialize fixed memory subsystem */
 {
    static HB_XEXIT pXexit = NULL;
@@ -1277,6 +1281,7 @@ void hb_xexit( void )                         /* Deinitialize fixed memory subsy
    }
 }
 
+#undef hb_xalloc
 void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NULL on failure */
 {
    static HB_XALLOC pXalloc = NULL;
@@ -1294,6 +1299,7 @@ void * hb_xalloc( ULONG ulSize )                /* allocates memory, returns NUL
    return NULL;
 }
 
+#undef hb_xgrab
 void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on failure */
 {
    static HB_XGRAB pXgrab = NULL;
@@ -1311,6 +1317,7 @@ void * hb_xgrab( ULONG ulSize )                 /* allocates memory, exits on fa
    return NULL;
 }
 
+#undef hb_xfree
 void hb_xfree( void * pMem )                  /* frees memory */
 {
    static HB_XFREE pXfree = NULL;
@@ -1326,6 +1333,7 @@ void hb_xfree( void * pMem )                  /* frees memory */
    }
 }
 
+#undef hb_xrealloc
 void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
 {
    static HB_XREALLOC pXrealloc = NULL;
@@ -1343,6 +1351,7 @@ void * hb_xrealloc( void * pMem, ULONG ulSize ) /* reallocates memory */
    return NULL;
 }
 
+#undef hb_xsize
 ULONG hb_xsize( void * pMem )                  /* returns the size of an allocated memory block */
 {
    static HB_XSIZE pXsize = NULL;

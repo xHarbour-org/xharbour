@@ -1,5 +1,5 @@
 /*
- * $Id: hbvm.h,v 1.57 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbvm.h,v 1.58 2007/12/21 12:12:22 likewolf Exp $
  */
 
 /*
@@ -150,8 +150,8 @@ extern HB_EXPORT void     hb_vmPopState( void ); /* pop current VM state from st
 extern HB_EXPORT void     hb_vmPushItemRef( PHB_ITEM pItem ); /* push item reference */
 
 extern HB_EXPORT PSYMBOLS hb_vmLastModule( void );
-extern HB_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
-extern HB_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer, PHB_ITEM *pGlobals ); /* statics symbols initialization */
+extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSymbols, char *szModule, int iPCodeVer );
 extern HB_EXPORT PSYMBOLS * hb_vmSymbols( void );
 extern HB_EXPORT void     hb_vmDoExitFunctions( void );
 extern HB_EXPORT void     hb_vmPushNumType( double dNumber, int iDec, int iType1, int iType2 );
