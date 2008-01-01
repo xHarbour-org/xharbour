@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.89 2007/12/27 16:21:54 mauriliolongo Exp $
+ * $Id: hbdefs.h,v 1.90 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -1141,7 +1141,7 @@ typedef PHB_FUNC HB_FUNC_PTR;
       #define HB_FORCE_EXPORT __attribute__ ((visibility ("default")))
 
    #elif defined( __BORLANDC__ )
-      #define HB_FORCE_EXPORT _declspec( dllexport )
+      #define HB_FORCE_EXPORT __declspec( dllexport )
 
    #elif defined( __WATCOMC__ )
       #define HB_FORCE_EXPORT __declspec( dllexport )
