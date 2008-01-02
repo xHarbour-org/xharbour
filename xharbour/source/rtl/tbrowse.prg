@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.185 2007/12/15 01:44:39 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.186 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -186,7 +186,7 @@ END CLASS
 CLASS TDataCache
                    // FSG - 14/06/2006 - Removed READONLY attribute to permit direct access for forced repositioning
    DATA  nCurRow   //READONLY            // Current Row inside cache
-   DATA  nLastRow  READONLY            // Last Row inside cache which has data ( it can be < Len( ::aCache ) )
+   DATA  nLastRow  //READONLY            // Last Row inside cache which has data ( it can be < Len( ::aCache ) )
 
    METHOD   New( oBrowse )             // Which tbrowse this cache is bound to
 
@@ -303,7 +303,6 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
                //
                if nRecsSkipped > 0
                   ::nCurRow := Len( ::aCache )
-                  ::nLastRow := 1
 
                else // K_PGUP
                   ::nCurRow := 1
@@ -374,6 +373,7 @@ METHOD dbGoTop() CLASS TDataCache
    Eval( ::oCachedBrowse:GoTopBlock )
 
    ::nCurRow := 1
+   ::nLastRow := Len( ::aCache )
 
 RETURN NIL
 
@@ -538,6 +538,10 @@ METHOD InitCache() CLASS TDataCache
          ::aCache[ ::nCurRow ] := NIL
       endif
 
+   endif
+
+   if ::oCachedBrowse:DataSource == 1  // array datasource.
+      ::nLastRow := Len( ::aCache )
    endif
 
 RETURN Self
@@ -2424,11 +2428,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    */
    ::nColPos := Max( Min( ::nColPos, ::nColumns ), 1)
 
-/* 2007/DEC/25 - E.F. - Moved DispBegin(). See comment below. */
-   if ! ::Stable
-      DispBegin()
-   endif
-
    // Configure the browse if not configured . Pritpal Bedi
    //
    if ! ::lConfigured .or. ::lNeverDisplayed
@@ -2471,6 +2470,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    if ::lRedrawFrame
       // Draw border
       //
+      DispBegin()
       if Len( ::cBorder ) == 8
          //@::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::colorSpec
          DispBox(::nTop,::nLeft,::nBottom,::nRight,::cBorder,::colorSpec)
@@ -2491,7 +2491,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // displayed columns change
       //
       ::lRedrawFrame := .F.
-
+      DispEnd()
    endif
 
    /* From this point there is stabilization of rows which is made up of three phases
@@ -2579,7 +2579,7 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
    LOCAL nRecsSkipped                  // How many records do I really skipped?
    LOCAL nFirstRow                     // Where is on screen first row of TBrowse?
    LOCAL nRow
-
+   LOCAL nSkipped := 0
    LOCAL nToSkip := 0
 
    // If I have a requested movement still to handle
@@ -2591,21 +2591,24 @@ METHOD CheckRowsToBeRedrawn() CLASS TBrowse
       // I have to set data source to cursor position
       //
       if ::oDataCache:nCurRow <> ::nNewRowPos
-         /* 2007/DEC/14 - E.F. Avoided rows movement here. */
+         /* 2007/DEC/14 - E.F. Assign rows skipped here. */
          //::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow )
-         nToSkip := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) )
+         nSkipped := Abs( ::EvalSkipBlock( ::nNewRowPos - ::oDataCache:nCurRow ) )
       endif
 
-      /* 2007/DEC/14 - E.F. - Balanced of rows movement. */
-      if ::nRecsToSkip < 0
-         nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip + nToSkip )
-      else
-         nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip - nToSkip )
+      /* 2007/DEC/31 - EF - Store rows to go back after goBottom movement */
+      if nSkipped > 0 .and. nSkipped >= ( ::RowCount - 1 ) .and.;
+         ::nRecsToSkip >= (::RowCount-1 )
+
+         nToSkip := -(nSkipped)
+
       endif
+
+      nRecsSkipped := ::EvalSkipBlock( ::nRecsToSkip + nToSkip )
 
       // I've tried to move past top or bottom margin
       //
-      if nRecsSkipped == 0 .and. nToSkip == 0
+      if nRecsSkipped == 0 
          if ::nRecsToSkip > 0 
             ::lHitBottom := .T. .and. !::lForceHitsFalse
 

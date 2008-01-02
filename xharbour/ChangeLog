@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5856 2007/12/31 17:47:58 likewolf Exp $
+ * $Id: ChangeLog,v 1.5857 2008/01/01 22:26:15 enricomaria Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-01 14:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed bug about down/up/pgdn/pgup/top/bottom movements when datasource
+      is an array.
+
+  * makefile.pc
+    * erase bin\ppgen.exe after pptable.c generation. 
 
 2008-01-01 23:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include/hbdefs.h

@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.59 2007/12/26 14:53:40 modalsist Exp $
+# $Id: makefile.pc,v 1.60 2007/12/29 16:34:27 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -3388,6 +3388,7 @@ $(OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
 
 $(PP_DIR)\pptable.c : $(PPGEN_EXE)
    $(PPGEN_EXE) $(HB_DIR)\include\hbstdgen.ch -o$(PP_DIR)\pptable.c -q
+   -@erase $(PPGEN_EXE)
 
 $(OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)
