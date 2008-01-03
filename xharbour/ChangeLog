@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5858 2008/01/02 00:30:57 modalsist Exp $
+ * $Id: ChangeLog,v 1.5859 2008/01/03 05:42:59 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2007-01-03 18.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * source/compiler/genc.c
+    + /vd now produces *.ext file for ease inclusion in main program when
+      using pCode.DLL (just in case). It is the least list of EXTERNAL
+      functions required by PRG being compiled and must exist in main thread;
+      but this may not be a complete list because it is impossible to list all
+      functions in deeper/nested stacks based on PRG being compiled.
 
 2007-01-03 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/hbcomp.h

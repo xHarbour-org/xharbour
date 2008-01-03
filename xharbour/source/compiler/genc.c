@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.145 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: genc.c,v 1.146 2008/01/03 05:43:00 andijahja Exp $
  */
 
 /*
@@ -83,11 +83,13 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
+   char szExtName[ _POSIX_PATH_MAX ];
    char szFileName[ _POSIX_PATH_MAX ];
    char szSourceName[ _POSIX_PATH_MAX ], *pTmp;
    PFUNCTION pFunc = hb_comp_functions.pFirst;
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    FILE * yyc; /* file handle for C output */
+   FILE * fCodeExt = NULL; /* file handle for external function required by pCode.DLL */
    PINLINE pInline = hb_comp_inlines.pFirst;
    short iLocalGlobals = 0, iGlobals = 0;
 
@@ -105,6 +107,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    PSSYMLIST pTemp;
    BOOL bSymFIRST = FALSE;
 
+   BOOL bBeginExt = FALSE;
+
    if( ! pFileName->szExtension )
    {
       pFileName->szExtension = ".c";
@@ -115,6 +119,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    pFileName->szExtension = szSourceExtension;
    pFileName->szPath = NULL;
    hb_fsFNameMerge( szSourceName, pFileName );
+
 
    while( ( pTmp = strchr( szSourceName, '\\' ) ) != NULL )
    {
@@ -127,6 +132,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
       return;
+   }
+
+   /*
+    Create *.ext when /vd is used
+   */
+   if ( hb_comp_autoDeferred )
+   {
+      pFileName->szExtension = ".ext";
+      hb_fsFNameMerge( szExtName, pFileName );
+      fCodeExt = hb_fopen( szExtName, "wb" );
    }
 
    /*
@@ -320,6 +335,19 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   if ( hb_comp_autoDeferred )
 		  {
                      pSym->cScope |= HB_FS_DEFERRED;
+
+                     if ( fCodeExt )
+		     {
+                        if ( !bBeginExt )
+			{
+                           fprintf( fCodeExt, "// External Functions Required by Module: \"%s\"\n\n", szSourceName );
+                           fprintf( fCodeExt, "#ifndef __%s_EXTERNALS__\n", pFileName->szName );
+                           fprintf( fCodeExt, "#define __%s_EXTERNALS__\n\n", pFileName->szName );
+                           bBeginExt = TRUE;
+			}
+
+                        fprintf( fCodeExt, "EXTERNAL %s\n", pFunc->szName );
+		     }
 		  }
 		  else
 		  {
@@ -746,6 +774,12 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    }
 
    fclose( yyc );
+
+   if ( fCodeExt )
+   {
+      fprintf( fCodeExt, "\n#endif\n" );
+      fclose( fCodeExt );
+   }
 
 #ifdef HB_BACK_END
    if( HB_BACK_END == 0 )
