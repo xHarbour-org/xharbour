@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.144 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: genc.c,v 1.145 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -317,7 +317,15 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                if( ! hb_compCStaticSymbolFound( pFunc->szName, HB_PROTO_FUNC_PUBLIC ) )
                {
-                  fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunc->szName );
+                  if ( hb_comp_autoDeferred )
+		  {
+                     pSym->cScope |= HB_FS_DEFERRED;
+		  }
+		  else
+		  {
+                     fprintf( yyc, "HB_FUNC_EXTERN( %s );\n", pFunc->szName );
+		  }
+
                }
             }
          }

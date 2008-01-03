@@ -1,5 +1,5 @@
 /*
- * $Id: cmdcheck.c,v 1.35 2007/12/04 14:56:41 andijahja Exp $
+ * $Id: cmdcheck.c,v 1.37 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -361,6 +361,13 @@ void hb_compChkCompilerSwitch( int iArg, char * Args[] )
                        hb_compChkEnvironVar( Args[i] );
 
                        /* Accept rest as part of .CH Path or "undef:<id>" and continue with next Args[]. */
+                       j = strlen( Args[i] );
+                       continue;
+
+                     case 'v' :
+                     case 'V' :
+                       Args[i] += (j - 1);
+                       hb_compChkEnvironVar( Args[i] );
                        j = strlen( Args[i] );
                        continue;
 
@@ -976,6 +983,10 @@ void hb_compChkEnvironVar( char * szSwitch )
                 if( *( s + 1 ) == '-' )
                 {
                    hb_comp_bForceMemvars = FALSE;
+                }
+                else if( toupper( *( s + 1 ) ) == 'D' )
+                {
+                   hb_comp_autoDeferred = TRUE;
                 }
                 else
                 {

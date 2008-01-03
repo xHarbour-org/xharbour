@@ -1,5 +1,5 @@
 /*
- * $Id: hbusage.c,v 1.36 2007/12/05 06:40:35 andijahja Exp $
+ * $Id: hbusage.c,v 1.38 2007/12/26 14:53:40 modalsist Exp $
  */
 
 /*
@@ -93,6 +93,7 @@ void hb_compPrintUsage( char * szSelf )
            "\n          %cu[[+]<file>]    use command def set in <file> (or none)",
            "\n          %cundef:<id>      #undef <id>",
            "\n          %cv               variables are assumed M->",
+           "\n          %cvd              external functions are assumed as dynamic functions",
            "\n          %cw[<level>]      set warning level number (0..3, default 1)",
            "\n          %cx[<prefix>]     set symbol init function name prefix (for .c only)",
 #ifdef YYDEBUG

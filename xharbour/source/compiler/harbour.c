@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.174 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: harbour.c,v 1.175 2007/12/30 17:49:06 likewolf Exp $
  */
 
 /*
@@ -276,6 +276,9 @@ FILE *hb_comp_VariableList = NULL;
 
 /* PreProcessor Tracing support. */
 BOOL hb_comp_bTracePP = FALSE;
+
+/* auto conert external function to dynamic ones */
+BOOL hb_comp_autoDeferred = FALSE;
 
 #define MAX_MEM_COMMAND_LINE 10240
 

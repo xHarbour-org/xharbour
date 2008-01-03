@@ -1,5 +1,5 @@
 /*
- * $Id: maindllp.c,v 1.21 2007/12/31 07:24:09 andijahja Exp $
+ * $Id: maindllp.c,v 1.22 2007/12/31 14:36:45 andijahja Exp $
  */
 
 /*
@@ -55,7 +55,7 @@
  *
  */
 
-// #define __NO_EXPORT__
+#define __NO_EXPORT__
 #define HB_OS_WIN_32_USED
 #include "hbtypes.h"
 
@@ -231,7 +231,7 @@ PHB_ITEM hb_param( int iParam, LONG lMask ) /* retrieve a generic parameter */
 
    if( pParam )
    {
-      pReturn=( ( HB_PARAM ) pParam )( iParam,lMask );
+      pReturn = ( ( HB_PARAM ) pParam )( iParam,lMask );
    }
 
    return pReturn;
@@ -249,7 +249,7 @@ PHB_ITEM hb_paramError( int iParam ) /* Returns either the generic parameter or 
 
    if( pParamError )
    {
-      pReturn=( ( HB_PARAMERROR ) pParamError )( iParam );
+      pReturn = ( ( HB_PARAMERROR ) pParamError )( iParam );
    }
 
    return pReturn;
@@ -278,11 +278,11 @@ int HB_EXPORT  hb_pcount( void )          /* returns the number of suplied param
 #undef hb_ret
 void hb_ret( void )
 {
-   static HB_RET pFunc=NULL;
+   static HB_RET pFunc = NULL;
 
    if ( !pFunc )
    {
-      pFunc=(HB_RET) hb_GetProcAddress( "_hb_ret" );
+      pFunc = (HB_RET) hb_GetProcAddress( "_hb_ret" );
    }
 
    if( pFunc )
@@ -316,7 +316,7 @@ void hb_retclen( const char * szText, ULONG ulLen ) /* returns a string with a s
 
    if ( !pRetclen )
    {
-      pRetclen=hb_GetProcAddress( "_hb_retclen" );
+      pRetclen = hb_GetProcAddress( "_hb_retclen" );
    }
 
    if( pRetclen )
@@ -531,7 +531,7 @@ ULONG hb_parinfa( int iParamNum, ULONG uiArrayIndex ) /* retrieve length or elem
 
    if( pParinfa )
    {
-      ulReturn=( ( HB_PARINFA ) pParinfa )( iParamNum,uiArrayIndex );
+      ulReturn = ( ( HB_PARINFA ) pParinfa )( iParamNum,uiArrayIndex );
    }
 
    return ulReturn;
@@ -550,7 +550,7 @@ ULONG hb_parinfo( int iParam ) /* Determine the param count or data type */
 
    if( pParinfo )
    {
-      ulReturn=( ( HB_PARINFO ) pParinfo )( iParam );
+      ulReturn = ( ( HB_PARINFO ) pParinfo )( iParam );
    }
 
    return ulReturn;
@@ -1373,12 +1373,12 @@ ULONG hb_xsize( void * pMem )                  /* returns the size of an allocat
 #undef hb_fsDelete
 BOOL hb_fsDelete( BYTE * pszFileName )
 {
-   BOOL pReturn;
+   BOOL pReturn = FALSE;
    static HB_FSDELETE pFunc = NULL;
 
    if ( !pFunc )
    {
-      pFunc=(HB_FSDELETE) hb_GetProcAddress( "_hb_fsDelete" );
+      pFunc = (HB_FSDELETE) hb_GetProcAddress( "_hb_fsDelete" );
    }
 
    if( pFunc )
@@ -1393,7 +1393,7 @@ BOOL hb_fsDelete( BYTE * pszFileName )
 #undef hb_fsWrite
 USHORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 {
-   USHORT pReturn;
+   USHORT pReturn = 0;
    static HB_FSWRITE pFunc = NULL;
 
    if ( !pFunc )
@@ -1413,7 +1413,7 @@ USHORT hb_fsWrite( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 #undef hb_fsSeek
 ULONG hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
 {
-   ULONG pReturn;
+   ULONG pReturn = 0;
    static HB_FSSEEK pFunc = NULL;
 
    if ( !pFunc )
@@ -1433,7 +1433,7 @@ ULONG hb_fsSeek( FHANDLE hFileHandle, LONG lOffset, USHORT uiMode )
 #undef hb_fsCreate
 FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
 {
-   FHANDLE pReturn;
+   FHANDLE pReturn = NULL;
    static HB_FSCREATE pFunc = NULL;
 
    if ( !pFunc )
@@ -1453,7 +1453,7 @@ FHANDLE hb_fsCreate( BYTE * pszFileName, USHORT uiAttr )
 #undef hb_fsRead
 USHORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 {
-   USHORT pReturn;
+   USHORT pReturn = 0;
    static HB_FSREAD pFunc = NULL;
 
    if ( !pFunc )
@@ -1473,7 +1473,7 @@ USHORT hb_fsRead( FHANDLE hFileHandle, BYTE * pBuff, USHORT ulCount )
 #undef hb_fsOpen
 FHANDLE hb_fsOpen( BYTE * pszFileName, USHORT uiFlags )
 {
-   FHANDLE pReturn;
+   FHANDLE pReturn = NULL;
    static HB_FSOPEN pFunc = NULL;
 
    if ( !pFunc )

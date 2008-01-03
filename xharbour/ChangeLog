@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5857 2008/01/01 22:26:15 enricomaria Exp $
+ * $Id: ChangeLog,v 1.5858 2008/01/02 00:30:57 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,13 +8,40 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2007-01-03 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbcomp.h
+  * source/compiler/cmdcheck.c
+  * source/compiler/harbour.c
+  * source/compiler/genc.c
+  * source/compiler/hbusage.c
+    + add compiler switch /vd (assume EXTERNALs=DYNAMICs) to free programmers
+      from declaring DYNAMIC FUNCTIONs manually.
+      NOTE/TIPS:
+      1) using /vd, now pCode programming is a lot easier. Programmers no
+         longer required to declare DYNAMIC FUNCTIONS since /vd automatically
+         assumed EXTERNALs as DYNAMICs. Source code should be much cleaner
+         particularly on complex PRG codes.
+      2) /vd _SHOULD_ _ONLY_ be used for creating pCode DLL.
+      3) pCode.DLL _SHOULD_ _NEVER_ have function MAIN(), else unpredicted
+         result may occur (eg DLL won't load) and ..
+      4) do not use functions of same name which exist in main thread (EXE)
+      5) in the main thread (EXE) one still have to REQUEST functions that are
+         supposed to be required by pCode.DLL because, at linking time, linker
+         is unable to auto-detect if they are required.
+
+  * source/vm/maindllp.c
+    ! minor formatting and uncomment __NO_EXPORT__
+
+  + tests/pdll55.bat
+    is batch file to create pCode.DLL for Borland 5.5.1 ( demonstrating /vd )
+
 2008-01-01 14:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! fixed bug about down/up/pgdn/pgup/top/bottom movements when datasource
       is an array.
 
   * makefile.pc
-    * erase bin\ppgen.exe after pptable.c generation. 
+    * erase bin\ppgen.exe after pptable.c generation.
 
 2008-01-01 23:23 UTC+0100 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * include/hbdefs.h

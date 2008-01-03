@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.61 2007/12/26 20:21:34 modalsist Exp $
+ * $Id: hbcomp.h,v 1.62 2007/12/28 00:31:59 modalsist Exp $
  */
 
 /*
@@ -621,6 +621,9 @@ extern const BYTE     hb_comp_pcode_len[];
 
 /* error messages output */
 extern FILE           *hb_comp_errFile;
+
+/* auto convert external function to dynamic when -vd is turned-on */
+extern BOOL           hb_comp_autoDeferred;
 
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0
