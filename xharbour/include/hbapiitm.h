@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.46 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbapiitm.h,v 1.47 2007/12/23 06:23:37 andijahja Exp $
  */
 
 /*
@@ -130,7 +130,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutL       ( PHB_ITEM pItem, BOOL bValue );
 extern HB_EXPORT PHB_ITEM   hb_itemPutND      ( PHB_ITEM pItem, double dNumber );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNDDec   ( PHB_ITEM pItem, double dNumber, int iDec );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNI      ( PHB_ITEM pItem, int iNumber );
-extern HB_EXPORT PHB_ITEM   hb_itemPutNL      ( PHB_ITEM pItem, LONG lNumber );
+extern HB_EXPORT PHB_ITEM   hb_itemPutNL      ( PHB_ITEM pItem, const LONG lNumber );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNInt    ( PHB_ITEM pItem, HB_LONG lNumber );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNLen    ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNDLen   ( PHB_ITEM pItem, double dNumber, int iWidth, int iDec );

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.175 2007/12/30 17:49:06 likewolf Exp $
+ * $Id: harbour.c,v 1.176 2008/01/03 05:43:00 andijahja Exp $
  */
 
 /*
@@ -287,8 +287,7 @@ int  ArgC = 0;
 char **ArgV;
 
 /* ************************************************************************* */
-
-#if defined(__WATCOMC__)
+#if ( defined(__WATCOMC__) && (__WATCOMC__ >= 1270) )
 int _main( int argc, char * argv[] )
 #else
 int main( int argc, char * argv[] )
@@ -433,6 +432,8 @@ int main( int argc, char * argv[] )
 }
 
 #if defined(HB_OS_WIN_32)
+#if ( defined(__WATCOMC__) && (__WATCOMC__ < 1270) )
+#else
 #include <windows.h>
 
 #define MAX_ARGS 20
@@ -536,7 +537,7 @@ int WINAPI WinMain( HINSTANCE hInstance,      /* handle to current instance */
 
    return iResult;
 }
-
+#endif
 #endif
 
 /*

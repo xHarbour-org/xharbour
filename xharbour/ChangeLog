@@ -8,11 +8,28 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-01-07 04.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * ChangeLog
+    ! fix my last 2 entries, 2007 -> 2008
+
+  * source/compiler/harbour.c
+    ! fix compilation for OpenWatcom 1.3
+
+  * include/hbvm.h
+    ! function prototype to be the same as function body:
+      hb_vmAtInit( HB_INIT_FUNC pFunc, void * cargo ) -> hb_vmAtInit( const HB_INIT_FUNC pFunc, void * cargo )
+      hb_vmAtExit( HB_INIT_FUNC pFunc, void * cargo ) -> hb_vmAtExit( const HB_INIT_FUNC pFunc, void * cargo )
+
+  * include/hbapiitm.h
+    ! function prototype to be the same as function body:
+      hb_itemPutNL( PHB_ITEM pItem, LONG lNumber ) -> hb_itemPutNL( PHB_ITEM pItem, const LONG lNumber );
+
 2008-01-06 13:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * makefile.dc
     ! fixed compilation under Digital Mars
 
-2007-01-03 18.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+
+2008-01-03 18.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/genc.c
     + /vd now produces *.ext file for ease inclusion in main program when
       using pCode.DLL (just in case). It is the least list of EXTERNAL
@@ -20,7 +37,7 @@
       but this may not be a complete list because it is impossible to list all
       functions in deeper/nested stacks based on PRG being compiled.
 
-2007-01-03 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+2008-01-03 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/hbcomp.h
   * source/compiler/cmdcheck.c
   * source/compiler/harbour.c
