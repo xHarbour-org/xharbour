@@ -1,5 +1,5 @@
 /*
- * $Id: win32prn.prg,v 1.25 2007/11/10 16:24:57 bdj Exp $
+ * $Id: win32prn.prg,v 1.26 2007/11/12 18:51:34 ronpinkas Exp $
  */
 
 /*
@@ -54,9 +54,9 @@
 
 /*
 
-  TPRINT() was designed to make it easy to emulate Clipper Dot Matrix printing.
+  win32prn() was designed to make it easy to emulate Clipper Dot Matrix printing.
   Dot Matrix printing was in CPI ( Characters per inch & Lines per inch ).
-  Even though "Mapping Mode" for TPRINT() is MM_TEXT, ::SetFont() accepts the
+  Even though "Mapping Mode" for win32prn() is MM_TEXT, ::SetFont() accepts the
   nWidth parameter in CPI not Pixels. Also the default ::LineHeight is for
   6 lines per inch so ::NewLine() works as per "LineFeed" on Dot Matrix printers.
   If you do not like this then inherit from the class and override anything you want
@@ -142,6 +142,18 @@
 #define DMDUP_VERTICAL   2
 #define DMDUP_HORIZONTAL 3
 
+/* Text Alignment Options */
+#define TA_NOUPDATECP                0
+#define TA_UPDATECP                  1
+
+#define TA_LEFT                      0
+#define TA_RIGHT                     2
+#define TA_CENTER                    6
+
+#define TA_TOP                       0
+#define TA_BOTTOM                    8
+#define TA_BASELINE                  24
+
 #define MM_TO_INCH 25.4
 
 CLASS WIN32PRN
@@ -180,8 +192,8 @@ CLASS WIN32PRN
          ::TextColor:=nClrText, ::BkColor:=nClrPane, ::TextAlign:=nAlign,;
          SetColor( ::hPrinterDC, nClrText, nClrPane, nAlign) )
 
-  METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign)     // nAlign : 0 = left, 1 = right, 2 = centered
-  METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlign) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
+  METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert)     // set TA_* defines above
+  METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlighVert) // **WARNING** : (Col,Row) _NOT_ (Row,Col)
 
 
   METHOD SetPen(nStyle, nWidth, nColor) INLINE (;
@@ -212,7 +224,7 @@ CLASS WIN32PRN
 
   METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize,;     // Print text string at location
                      nWidth, nBold, lUnderLine, lItalic, lNewLine,; // in specified font and color.
-                     lUpdatePosX, nColor, nAlign )                  // Restore original font and colour
+                     lUpdatePosX, nColor, nAlignHori, nAlignVert )                  // Restore original font and colour
                                                                     // after printing.
   METHOD SetBkMode( nMode )  INLINE SetBkMode( ::hPrinterDc, nMode ) // OPAQUE= 2 or TRANSPARENT= 1
                                                                      // Set Background mode
@@ -235,6 +247,9 @@ CLASS WIN32PRN
 
   VAR PaperLength    INIT 0                        // Value is * 1/10 of mm   1000 = 10cm
   VAR PaperWidth     INIT 0                        //   "    "    "     "       "     "
+
+  VAR SetTextHori    INIT TA_LEFT    // Default horizontal alignment SetTextAlign() (TEXTOUT)
+  VAR SetTextVert    INIT TA_BOTTOM  // Default vertical alignment for SetTextAlign() (TEXTOUT)
 
   VAR SetFontOk      INIT .F.
   VAR FontName       INIT ""                        // Current Point size for font
@@ -282,9 +297,11 @@ CLASS WIN32PRN
   VAR PenWidth
   VAR PenColor
 
+
+
 ENDCLASS
 
-METHOD New(cPrinter) CLASS WIN32PRN
+METHOD New( cPrinter ) CLASS WIN32PRN
   ::PrinterName := IIF(!EMPTY(cPrinter), cPrinter, GetDefaultPrinter())
   RETURN(Self)
 
@@ -569,10 +586,13 @@ METHOD SetPos(nPosX, nPosY) CLASS WIN32PRN
   ENDIF
   RETURN(Result)
 
-METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
+METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
   LOCAL nPosX
-  IF nAlign == NIL
-     nAlign:= 0
+  IF nAlignHori == NIL
+     nAlignHori:= ::SetTextHori
+  ENDIF
+  IF nAlignVert == NIL
+     nAlignVert:= ::SetTextVert
   ENDIF
   IF lUpdatePosX == NIL
      lUpdatePosX:=.T.
@@ -581,7 +601,7 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
     lNewLine:= .F.
   ENDIF
   IF cString!=NIL
-    nPosX:= TextOut(::hPrinterDC,::PosX, ::PosY, cString, LEN(cString), ::fCharWidth, nAlign)
+    nPosX:= TextOut(::hPrinterDC,::PosX, ::PosY, cString, LEN(cString), ::fCharWidth, nAlignHori, nAlignVert)
     ::HavePrinted:= .T.
     IF lUpdatePosX
       ::PosX+= nPosX
@@ -592,7 +612,7 @@ METHOD TextOut(cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
   ENDIF
   RETURN( .T. )
 
-METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN32PRN
+METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert) CLASS WIN32PRN
   IF lNewLine == NIL
     lNewLine:= .F.
   ENDIF
@@ -600,7 +620,7 @@ METHOD TextOutAt(nPosX,nPosY, cString, lNewLine, lUpdatePosX, nAlign) CLASS WIN3
     lUpdatePosX:= .T.
   ENDIF
   ::SetPos(nPosX,nPosY)
-  ::TextOut(cString, lNewLine, lUpdatePosX, nAlign)
+  ::TextOut(cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
   RETURN(.T.)
 
 METHOD GetCharWidth() CLASS WIN32PRN
@@ -664,7 +684,7 @@ METHOD INCH_TO_POSX( nInch ) CLASS WIN32PRN
 METHOD INCH_TO_POSY( nInch ) CLASS WIN32PRN
   RETURN( INT( ( nInch * ::PixelsPerInchY ) - ::TopMargin ) )
 
-METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor, nAlign ) CLASS WIN32PRN
+METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnderLine, lItalic, nCharSet, lNewLine, lUpdatePosX, nColor, nAlignHori, nAlignVert ) CLASS WIN32PRN
   LOCAL lCreated:= .F., nDiv:= 0, cType
   DEFAULT nPointSize TO ::FontPointSize
   IF cFont != NIL
@@ -680,7 +700,7 @@ METHOD TextAtFont( nPosX, nPosY, cString, cFont, nPointSize, nWidth, nBold, lUnd
   IF nColor != NIL
     nColor:= SetColor( ::hPrinterDC, nColor )
   ENDIF
-  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlign)
+  ::TextOutAt( nPosX, nPosY, cString, lNewLine, lUpdatePosX, nAlignHori, nAlignVert)
   IF lCreated
     ::SetFont()  // Reset font
   ENDIF
@@ -825,6 +845,8 @@ HB_FUNC_STATIC(TEXTOUT)
 {
   LONG Result = 0 ;
   HDC hDC = (HDC) hb_parnl(1) ;
+  UINT uiAlignHori = ( UINT ) hb_parnl( 7 ) ;
+  UINT uiAlignVert = ( UINT ) hb_parnl( 8 ) ;
   SIZE sSize ;
   if (hDC)
   {
@@ -835,21 +857,7 @@ HB_FUNC_STATIC(TEXTOUT)
       int iCol   = (int) hb_parnl(3) ;
       char *pszData = hb_parc(4) ;
       int iWidth = ISNUM(6) ? (int) hb_parnl(6) : 0 ;
-      if (ISNUM(7) && (hb_parnl(7) == 1 || hb_parnl(7) == 2))
-      {
-        if (hb_parnl(7) == 1)
-        {
-          SetTextAlign((HDC) hDC, TA_BOTTOM | TA_RIGHT | TA_NOUPDATECP) ;
-        }
-        else
-        {
-          SetTextAlign((HDC) hDC, TA_BOTTOM | TA_CENTER | TA_NOUPDATECP) ;
-        }
-      }
-      else
-      {
-        SetTextAlign((HDC) hDC, TA_BOTTOM | TA_LEFT | TA_NOUPDATECP) ;
-      }
+      SetTextAlign((HDC) hDC, uiAlignHori | uiAlignVert | TA_NOUPDATECP) ;
       if (iWidth < 0 && iLen < 1024 )
       {
         int n= iLen, aFixed[1024] ;

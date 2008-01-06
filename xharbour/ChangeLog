@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5860 2008/01/03 11:23:45 andijahja Exp $
+ * $Id: ChangeLog,v 1.5862 2008/01/06 21:35:47 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,13 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-01-07 10:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/win32prn.prg
+    * added ability to set text alignment via following
+    *    VAR SetTextHori    INIT TA_LEFT    // Default horizontal alignment SetTextAlign() (TEXTOUT)
+    *    VAR SetTextVert    INIT TA_BOTTOM  // Default vertical alignment for SetTextAlign() (TEXTOUT)
+    *
+    * altered METHOD's TEXTOUT(), TEXTOUTAT() and TEXTATFONT() to accept additional parameter "nAlignVert"
 
 2008-01-07 04.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * ChangeLog
