@@ -3,7 +3,7 @@
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßß
 #
-# $Id: makefile.dc,v 1.33 2007/12/26 14:53:39 modalsist Exp $
+# $Id: makefile.dc,v 1.34 2007/12/29 16:34:27 modalsist Exp $
 # makefile for DigitlMars C++ compiler
 #
 
@@ -26,8 +26,6 @@ CFLAGS       = $(CFLAGS) $(MTFLAGS)
 #  ßßßßßßßßßßßßßßßßßßßßßß
 
 GTWVW_DIR    = $(XHARBOUR_ROOT)\contrib\gtwvw
-HTML_DIR     = $(XHARBOUR_ROOT)\contrib\htmllib
-DESIGN_DIR   = $(XHARBOUR_ROOT)\contrib\design
 DEBUG_DIR    = $(XHARBOUR_ROOT)\source\debug
 COMPILER_DIR = $(XHARBOUR_ROOT)\source\compiler
 MISC_DIR     = $(XHARBOUR_ROOT)\source\misc
@@ -51,6 +49,7 @@ ODBC_DIR     = $(XHARBOUR_ROOT)\source\odbc
 PP_DIR       = $(XHARBOUR_ROOT)\source\pp
 VM_DIR       = $(XHARBOUR_ROOT)\source\vm
 RTL_DIR      = $(XHARBOUR_ROOT)\source\rtl
+PCREPOS_DIR  = $(XHARBOUR_ROOT)\source\rtl\pcre
 LANG_DIR     = $(XHARBOUR_ROOT)\source\lang
 RDD_DIR      = $(XHARBOUR_ROOT)\source\rdd
 NF_DIR       = $(XHARBOUR_ROOT)\contrib\libnf
@@ -60,8 +59,8 @@ NF_DIR       = $(XHARBOUR_ROOT)\contrib\libnf
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßß
 
-HTML_OBJ_DIR    = $(OBJ_DIR)\html
-DESIGN_OBJ_DIR  = $(OBJ_DIR)\design
+HBSIX_OBJ_DIR   = $(OBJ_DIR)
+BMCDX_OBJ_DIR   = $(OBJ_DIR)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ Library Names ³Û
@@ -88,7 +87,6 @@ HSX_LIB      = $(LIB_DIR)\hsx$(THREAD_MODE).lib
 RTL_LIB      = $(LIB_DIR)\rtl$(THREAD_MODE).lib
 PCREPOS_LIB  = $(LIB_DIR)\pcrepos$(THREAD_MODE).lib
 VM_LIB       = $(LIB_DIR)\vm$(THREAD_MODE).lib
-SAMPLES_LIB  = $(LIB_DIR)\samples$(THREAD_MODE).lib
 RDD_LIB      = $(LIB_DIR)\rdd$(THREAD_MODE).lib
 CT_LIB       = $(LIB_DIR)\ct$(THREAD_MODE).lib
 TIP_LIB      = $(LIB_DIR)\tip$(THREAD_MODE).lib
@@ -111,8 +109,6 @@ GTPCA_LIB    = $(LIB_DIR)\gtpca.lib
 GTSTD_LIB    = $(LIB_DIR)\gtstd.lib
 GTWIN_LIB    = $(LIB_DIR)\gtwin.lib
 GTNUL_LIB    = $(LIB_DIR)\gtnul.lib
-DESIGN_LIB   = $(LIB_DIR)\design.lib
-HTML_LIB     = $(LIB_DIR)\html.lib
 
 DMC_LIBRARY = \
    $(DMCLIB_DIR)\snn.lib + \
@@ -133,9 +129,11 @@ HARBOUR_LIBRARY = \
    $(SIXCDX_LIB) + \
    $(DBFFPT_LIB) + \
    $(DBFNTX_LIB) + \
+   $(HBSIX_LIB) + \
    $(RDD_LIB) + \
    $(COMMON_LIB) + \
    $(RTL_LIB) + \
+   $(PCREPOS_LIB) + \
    $(MACRO_LIB) + \
    $(LANG_LIB)
 
@@ -147,7 +145,9 @@ HBTEST_LIBRARY = \
    $(LIB_DIR)\sixcdx.lib \
    $(LIB_DIR)\dbffpt.lib \
    $(LIB_DIR)\dbfntx.lib \
+   $(LIB_DIR)\hbsix.lib \
    $(LIB_DIR)\rtl.lib \
+   $(LIB_DIR)\pcrepos.lib \
    $(LIB_DIR)\vm.lib \
    $(LIB_DIR)\rdd.lib \
    $(LIB_DIR)\common.lib \
@@ -181,7 +181,6 @@ PROJECT = \
    $(RTL_LIB) \
    $(PCREPOS_LIB) \
    $(VM_LIB) \
-   $(SAMPLES_LIB) \
    $(RDD_LIB) \
    $(GTWVW_LIB) \
    $(GTWVT_LIB) \
@@ -201,8 +200,6 @@ PROJECT = \
    $(GTNUL_LIB) \
    $(GTCGI_LIB) \
    $(GTPCA_LIB) \
-   $(DESIGN_LIB) \
-   $(HTML_LIB) \
    $(HBDOC_EXE) \
    $(HBMAKE_EXE) \
    $(HBPP_EXE) \
@@ -217,16 +214,6 @@ ALL: $(PROJECT)
 # ÀÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßß
 
-SAMPLES_LIB_OBJS =  \
-   $(SAM_OBJ_DIR)\environ.obj \
-   $(SAM_OBJ_DIR)\date.obj   \
-   $(SAM_OBJ_DIR)\dbf.obj    \
-   $(SAM_OBJ_DIR)\gauge.obj  \
-   $(SAM_OBJ_DIR)\num.obj    \
-   $(SAM_OBJ_DIR)\stack.obj   \
-   $(SAM_OBJ_DIR)\status.obj \
-   $(SAM_OBJ_DIR)\time.obj
-
 GTNUL_LIB_OBJS = \
    $(OBJ_DIR)\gtext.obj \
    $(OBJ_DIR)\gtnul.obj \
@@ -240,28 +227,6 @@ GTCGI_LIB_OBJS = \
 GTPCA_LIB_OBJS = \
    $(OBJ_DIR)\gtpca.obj \
    $(OBJ_DIR)\mousepca.obj
-
-HTML_LIB_OBJS = \
-   $(HTML_OBJ_DIR)\counter.obj \
-   $(HTML_OBJ_DIR)\hterrsys.obj \
-   $(HTML_OBJ_DIR)\htmbrows.obj \
-   $(HTML_OBJ_DIR)\htmutil.obj \
-   $(HTML_OBJ_DIR)\jlist.obj \
-   $(HTML_OBJ_DIR)\jwindow.obj \
-   $(HTML_OBJ_DIR)\ocgi.obj \
-   $(HTML_OBJ_DIR)\oedit.obj \
-   $(HTML_OBJ_DIR)\ofile.obj \
-   $(HTML_OBJ_DIR)\oframe.obj \
-   $(HTML_OBJ_DIR)\ohtm.obj \
-   $(HTML_OBJ_DIR)\oini.obj
-
-DESIGN_LIB_OBJS = \
-   $(DESIGN_OBJ_DIR)\general.obj \
-   $(DESIGN_OBJ_DIR)\tbox.obj \
-   $(DESIGN_OBJ_DIR)\tcheck.obj \
-   $(DESIGN_OBJ_DIR)\tmenu.obj \
-   $(DESIGN_OBJ_DIR)\tradio.obj \
-   $(DESIGN_OBJ_DIR)\twindow.obj
 
 GTWVW_OBJS = \
    $(GTWVW_OBJ_DIR)\gtwvw.obj
@@ -409,6 +374,8 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbident.obj \
    $(OBJ_DIR)\hbgenerr.obj \
    $(OBJ_DIR)\hbpcode.obj \
+   $(OBJ_DIR)\hbdead.obj \
+   $(OBJ_DIR)\hbstripl.obj \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
    $(OBJ_DIR)\gencobj.obj \
@@ -418,10 +385,14 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\exproptb.obj \
    $(OBJ_DIR)\exproptc.obj \
    $(OBJ_DIR)\hbfunchk.obj \
+   $(OBJ_DIR)\gencc.obj \
+   $(OBJ_DIR)\hbpcstat.obj \
+   $(OBJ_DIR)\hbdbginf.obj \
+   $(OBJ_DIR)\hblbl.obj \
    $(PP_LIB) \
    $(COMMON_LIB) \
-   $(OBJ_DIR)\hbslex.obj \
-   $(OBJ_DIR)\calconst.obj
+   $(OBJ_DIR)\ppcomp.obj
+   $(OBJ_DIR)\hbslex.obj
 
 HBTEST_EXE_OBJS = \
    $(OBJ_DIR)\hbtest.obj \
@@ -652,7 +623,7 @@ CT_LIB_OBJS = \
 #
 
 PCREPOS_LIB_OBJS = \
-   $(OBJ_DIR)\chartables.obj \
+   $(OBJ_DIR)\pcre_chartables.obj \
    $(OBJ_DIR)\pcreposix.obj \
    $(OBJ_DIR)\pcre_compile.obj \
    $(OBJ_DIR)\pcre_config.obj \
@@ -664,16 +635,14 @@ PCREPOS_LIB_OBJS = \
    $(OBJ_DIR)\pcre_info.obj \
    $(OBJ_DIR)\pcre_maketables.obj \
    $(OBJ_DIR)\pcre_ord2utf8.obj \
-   $(OBJ_DIR)\pcre_printint.obj \
    $(OBJ_DIR)\pcre_refcount.obj \
    $(OBJ_DIR)\pcre_study.obj \
    $(OBJ_DIR)\pcre_tables.obj \
    $(OBJ_DIR)\pcre_try_flipped.obj \
-   $(OBJ_DIR)\pcre_ucp_findchar.obj \
+   $(OBJ_DIR)\pcre_ucp_searchfuncs.obj \
    $(OBJ_DIR)\pcre_valid_utf8.obj \
    $(OBJ_DIR)\pcre_version.obj \
-   $(OBJ_DIR)\pcre_xclass.obj \
-   $(OBJ_DIR)\ucp_findchar.obj
+   $(OBJ_DIR)\pcre_xclass.obj
 
 
 NULSYS_LIB_OBJS = \
@@ -704,7 +673,6 @@ HBSIX_LIB_OBJS = \
    $(HBSIX_OBJ_DIR)\sxord.obj \
    $(HBSIX_OBJ_DIR)\sxutil.obj \
    $(HBSIX_OBJ_DIR)\sxredir.obj \
-   \
    $(HBSIX_OBJ_DIR)\sxcompat.obj \
    $(HBSIX_OBJ_DIR)\sxini.obj \
    $(HBSIX_OBJ_DIR)\sxtrig.obj 
@@ -721,12 +689,17 @@ RDD_LIB_OBJS = \
    $(RDD_OBJ_DIR)\dbupdat.obj \
    $(RDD_OBJ_DIR)\dbsort.obj \
    $(RDD_OBJ_DIR)\dblist.obj \
+   $(RDD_OBJ_DIR)\dbdelim.obj \
    $(RDD_OBJ_DIR)\dbfuncs.obj \
+   $(RDD_OBJ_DIR)\dbjoin.obj \
+   $(RDD_OBJ_DIR)\dbsdf.obj \
    $(RDD_OBJ_DIR)\dbf1.obj \
    $(RDD_OBJ_DIR)\sdf1.obj \
    $(RDD_OBJ_DIR)\delim1.obj \
    $(RDD_OBJ_DIR)\dbcmd.obj \
    $(RDD_OBJ_DIR)\workarea.obj \
+   $(RDD_OBJ_DIR)\wacore.obj \
+   $(RDD_OBJ_DIR)\wafunc.obj \
    $(RDD_OBJ_DIR)\hbdbsort.obj \
    $(RDD_OBJ_DIR)\dbnubs.obj \
 
@@ -831,10 +804,11 @@ MACRO_LIB_OBJS = \
    $(MACRO_OBJ_DIR)\macroslx.obj
 
 PP_LIB_OBJS = \
+   $(PP_OBJ_DIR)\ppcore.obj \
    $(PP_OBJ_DIR)\pptable.obj \
-   $(PP_OBJ_DIR)\pragma.obj \
-   $(PP_OBJ_DIR)\ppcomp.obj \
-   $(PP_OBJ_DIR)\ppcore.obj
+   $(PP_OBJ_DIR)\pplib.obj \
+   $(PP_OBJ_DIR)\pplib2.obj \
+   $(PP_OBJ_DIR)\pplib3.obj
 
 COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbfhnd.obj \
@@ -847,7 +821,8 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\hbver.obj \
    $(OBJ_DIR)\expropt1.obj \
    $(OBJ_DIR)\expropt2.obj \
-   $(OBJ_DIR)\reserved.obj
+   $(OBJ_DIR)\reserved.obj \
+   $(OBJ_DIR)\hbdate.obj
 
 GTSTD_LIB_OBJS = \
    $(OBJ_DIR)\gtstd.obj \
@@ -1024,10 +999,7 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\browse.obj \
    $(RTL_OBJ_DIR)\checkbox.obj \
    $(RTL_OBJ_DIR)\cstr.obj \
-   $(RTL_OBJ_DIR)\dbdelim.obj \
    $(RTL_OBJ_DIR)\dbedit.obj \
-   $(RTL_OBJ_DIR)\dbjoin.obj \
-   $(RTL_OBJ_DIR)\dbsdf.obj \
    $(RTL_OBJ_DIR)\decode.obj \
    $(RTL_OBJ_DIR)\devoutp.obj \
    $(RTL_OBJ_DIR)\dircmd.obj \
@@ -1093,7 +1065,6 @@ RTL_LIB_OBJS = \
    $(RTL_OBJ_DIR)\hbini.obj \
    $(RTL_OBJ_DIR)\hbsrlraw.obj \
    $(RTL_OBJ_DIR)\trpccli.obj \
-   $(RTL_OBJ_DIR)\pplib.obj \
    $(RTL_OBJ_DIR)\hbbitf.obj \
    $(RTL_OBJ_DIR)\hblog.obj \
    $(RTL_OBJ_DIR)\hblognet.obj \
@@ -1125,6 +1096,8 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbident.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbgenerr.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbpcode.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdead.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbstripl.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfix.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\gencobj.obj + >> make.tmp
@@ -1134,7 +1107,11 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\exproptb.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptc.obj + >> make.tmp
    $(ECHO) $(OBJ_DIR)\hbfunchk.obj + >> make.tmp
-   $(ECHO) $(OBJ_DIR)\calconst.obj, >> make.tmp
+   $(ECHO) $(OBJ_DIR)\gencc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbpcstat.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbdbginf.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hblbl.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\ppcomp.obj, >> make.tmp
    $(ECHO) $(HARBOUR_EXE),, >> make.tmp
    $(ECHO) $(PP_LIB) + >> make.tmp
    $(ECHO) $(COMMON_LIB) >> make.tmp
@@ -1151,7 +1128,7 @@ $(OBJ_DIR)\harboury.obj : $(OBJ_DIR)\harboury.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbslex.obj : $(COMPILER_DIR)\hbslex.c
-   $(CC) $(CFLAGS) -D"NEED_DUMMY_RETURN" -I$(OBJ_DIR) /o$@ $**
+   $(CC) $(CFLAGS) -D"NEED_DUMMY_RETURN" -I$(OBJ_DIR) -o$@ $**
 
 $(OBJ_DIR)\cmdcheck.obj : $(COMPILER_DIR)\cmdcheck.c
    $(CC_CMD)
@@ -1166,6 +1143,12 @@ $(OBJ_DIR)\hbgenerr.obj : $(COMPILER_DIR)\hbgenerr.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbpcode.obj : $(COMPILER_DIR)\hbpcode.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbdead.obj : $(COMPILER_DIR)\hbdead.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbstripl.obj : $(COMPILER_DIR)\hbstripl.c
    $(CC_CMD)
 
 $(OBJ_DIR)\hbfix.obj : $(COMPILER_DIR)\hbfix.c
@@ -1195,19 +1178,25 @@ $(OBJ_DIR)\exproptc.obj : $(COMPILER_DIR)\exproptc.c
 $(OBJ_DIR)\hbfunchk.obj : $(COMPILER_DIR)\hbfunchk.c
    $(CC_CMD)
 
-$(OBJ_DIR)\calconst.obj : $(COMPILER_DIR)\calconst.c
+$(OBJ_DIR)\gencc.obj : $(COMPILER_DIR)\gencc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbpcstat.obj : $(COMPILER_DIR)\hbpcstat.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbdbginf.obj : $(COMPILER_DIR)\hbdbginf.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hblbl.obj : $(COMPILER_DIR)\hblbl.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\ppcomp.obj : $(COMPILER_DIR)\ppcomp.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ LIB Creation ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßß
-
-$(HTML_LIB): $(HTML_LIB_OBJS)
-   $(DMCLIB_CMD)
-
-$(DESIGN_LIB): $(DESIGN_LIB_OBJS)
-   $(DMCLIB_CMD)
 
 $(GTWVW_LIB): $(GTWVW_OBJS)
    $(DMCLIB_CMD)
@@ -1380,9 +1369,6 @@ $(VM_LIB) : $(VM_LIB_OBJS)
    $(DMCLIB_CMD)
 
 $(LIBMISC_LIB) : $(LIBMISC_LIB_OBJS)
-   $(DMCLIB_CMD)
-
-$(SAMPLES_LIB) : $(SAMPLES_LIB_OBJS)
    $(DMCLIB_CMD)
 
 $(CT_LIB) : $(CT_LIB_OBJS)
@@ -1644,10 +1630,7 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\browse.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\checkbox.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\cstr.obj     >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbdelim.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dbedit.obj   >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbjoin.obj   >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\dbsdf.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\decode.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\devoutp.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\dircmd.obj   >> dmcrtl.rsp
@@ -1714,7 +1697,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\hbini.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\hbsrlraw.obj >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\trpccli.obj  >> dmcrtl.rsp
-   $(ECHO) $(RTL_OBJ_DIR)\pplib.obj    >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\hbffind.obj  >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\hbbitf.obj   >> dmcrtl.rsp
    $(ECHO) $(RTL_OBJ_DIR)\hblog.obj    >> dmcrtl.rsp
@@ -1728,130 +1710,6 @@ $(RTL_LIB) : $(RTL_LIB_OBJS)
    $(ECHO) $(RTL_OBJ_DIR)\trace.obj    >> dmcrtl.rsp
    $(DMLIB) -c $(RTL_LIB) @dmcrtl.rsp
    @IF EXIST dmcrtl.rsp $(DEL) dmcrtl.rsp
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ HTML.LIB Dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(HTML_OBJ_DIR)\counter.c : $(HTML_DIR)\counter.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\counter.obj : $(HTML_OBJ_DIR)\counter.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\hterrsys.c : $(HTML_DIR)\hterrsys.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\hterrsys.obj : $(HTML_OBJ_DIR)\hterrsys.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\htmbrows.c : $(HTML_DIR)\htmbrows.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\htmbrows.obj : $(HTML_OBJ_DIR)\htmbrows.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\htmutil.c : $(HTML_DIR)\htmutil.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\htmutil.obj : $(HTML_OBJ_DIR)\htmutil.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\jlist.c : $(HTML_DIR)\jlist.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\jlist.obj : $(HTML_OBJ_DIR)\jlist.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\jwindow.c : $(HTML_DIR)\jwindow.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\jwindow.obj : $(HTML_OBJ_DIR)\jwindow.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\ocgi.c : $(HTML_DIR)\ocgi.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\ocgi.obj : $(HTML_OBJ_DIR)\ocgi.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\oedit.c : $(HTML_DIR)\oedit.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\oedit.obj : $(HTML_OBJ_DIR)\oedit.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\ofile.c : $(HTML_DIR)\ofile.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\ofile.obj : $(HTML_OBJ_DIR)\ofile.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\oframe.c : $(HTML_DIR)\oframe.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\oframe.obj : $(HTML_OBJ_DIR)\oframe.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\ohtm.c : $(HTML_DIR)\ohtm.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\ohtm.obj : $(HTML_OBJ_DIR)\ohtm.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\oini.c : $(HTML_DIR)\oini.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\oini.obj : $(HTML_OBJ_DIR)\oini.c
-   $(CC_CMD)
-
-$(HTML_OBJ_DIR)\outil.c : $(HTML_DIR)\outil.prg
-   $(HARBOUR_EXE) -i$(HTML_DIR)\include $(HARBOURFLAGS) $** -o$@
-
-$(HTML_OBJ_DIR)\outil.obj : $(HTML_OBJ_DIR)\outil.c
-   $(CC_CMD)
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ DESIGN.LIB Dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(DESIGN_OBJ_DIR)\general.c : $(DESIGN_DIR)\general.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\general.obj : $(DESIGN_OBJ_DIR)\general.c
-   $(CC_CMD)
-
-$(DESIGN_OBJ_DIR)\tbox.c : $(DESIGN_DIR)\tbox.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\tbox.obj : $(DESIGN_OBJ_DIR)\tbox.c
-   $(CC_CMD)
-
-$(DESIGN_OBJ_DIR)\tcheck.c : $(DESIGN_DIR)\tcheck.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\tcheck.obj : $(DESIGN_OBJ_DIR)\tcheck.c
-   $(CC_CMD)
-
-$(DESIGN_OBJ_DIR)\tmenu.c : $(DESIGN_DIR)\tmenu.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\tmenu.obj : $(DESIGN_OBJ_DIR)\tmenu.c
-   $(CC_CMD)
-
-$(DESIGN_OBJ_DIR)\tradio.c : $(DESIGN_DIR)\tradio.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\tradio.obj : $(DESIGN_OBJ_DIR)\tradio.c
-   $(CC_CMD)
-
-$(DESIGN_OBJ_DIR)\twindow.c : $(DESIGN_DIR)\twindow.prg
-   $(HARBOUR_CMD)
-
-$(DESIGN_OBJ_DIR)\twindow.obj : $(DESIGN_OBJ_DIR)\twindow.c
-   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ DBFCDX.LIB Dependencies ³Û
@@ -1926,19 +1784,19 @@ $(HBSIX_OBJ_DIR)\sxredir.obj : $(HBSIX_DIR)\sxredir.c
    $(CC_CMD)
 
 $(HBSIX_OBJ_DIR)\sxcompat.c : $(HBSIX_DIR)\sxcompat.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(HBSIX_OBJ_DIR)\sxcompat.obj : $(HBSIX_OBJ_DIR)\sxcompat.c
    $(CC_CMD)
 
 $(HBSIX_OBJ_DIR)\sxini.c : $(HBSIX_DIR)\sxini.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(HBSIX_OBJ_DIR)\sxini.obj : $(HBSIX_OBJ_DIR)\sxini.c
    $(CC_CMD)
 
 $(HBSIX_OBJ_DIR)\sxtrig.c : $(HBSIX_DIR)\sxtrig.prg
-   $(HB_CMD)
+   $(HARBOUR_CMD)
 
 $(HBSIX_OBJ_DIR)\sxtrig.obj : $(HBSIX_OBJ_DIR)\sxtrig.c
    $(CC_CMD)
@@ -1965,6 +1823,12 @@ $(RDD_OBJ_DIR)\dbcmd.obj : $(RDD_DIR)\dbcmd.c
 $(RDD_OBJ_DIR)\workarea.obj : $(RDD_DIR)\workarea.c
    $(CC_CMD)
 
+$(RDD_OBJ_DIR)\wacore.obj : $(RDD_DIR)\wacore.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\wafunc.obj : $(RDD_DIR)\wafunc.c
+   $(CC_CMD)
+
 $(RDD_OBJ_DIR)\dbf1.obj : $(RDD_DIR)\dbf1.c
    $(CC_CMD)
 
@@ -1974,10 +1838,28 @@ $(RDD_OBJ_DIR)\dblist.c : $(RDD_DIR)\dblist.prg
 $(RDD_OBJ_DIR)\dblist.obj : $(RDD_OBJ_DIR)\dblist.c
    $(CC_CMD)
 
+$(RDD_OBJ_DIR)\dbdelim.c : $(RDD_DIR)\dbdelim.prg
+   $(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)\dbdelim.obj : $(RDD_OBJ_DIR)\dbdelim.c
+   $(CC_CMD)
+
 $(RDD_OBJ_DIR)\dbfuncs.c : $(RDD_DIR)\dbfuncs.prg
    $(HARBOUR_CMD)
 
 $(RDD_OBJ_DIR)\dbfuncs.obj : $(RDD_OBJ_DIR)\dbfuncs.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.c : $(RDD_DIR)\dbjoin.prg
+   $(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)\dbjoin.obj : $(RDD_OBJ_DIR)\dbjoin.c
+   $(CC_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.c : $(RDD_DIR)\dbsdf.prg
+   $(HARBOUR_CMD)
+
+$(RDD_OBJ_DIR)\dbsdf.obj : $(RDD_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(RDD_OBJ_DIR)\dbsort.c : $(RDD_DIR)\dbsort.prg
@@ -2032,7 +1914,7 @@ $(RDD_OBJ_DIR)\rddsys.obj : $(RDD_OBJ_DIR)\rddsys.c
 # ³ PCREPOS.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-$(OBJ_DIR)\chartables.obj : $(PCREPOS_DIR)\chartables.c
+$(OBJ_DIR)\pcre_chartables.obj : $(PCREPOS_DIR)\pcre_chartables.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
 $(OBJ_DIR)\dftables.obj : $(PCREPOS_DIR)\dftables.c
@@ -2071,9 +1953,6 @@ $(OBJ_DIR)\pcre_maketables.obj : $(PCREPOS_DIR)\pcre_maketables.c
 $(OBJ_DIR)\pcre_ord2utf8.obj : $(PCREPOS_DIR)\pcre_ord2utf8.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
-$(OBJ_DIR)\pcre_printint.obj : $(PCREPOS_DIR)\pcre_printint.c
-   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
-
 $(OBJ_DIR)\pcre_refcount.obj : $(PCREPOS_DIR)\pcre_refcount.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
@@ -2086,7 +1965,7 @@ $(OBJ_DIR)\pcre_tables.obj : $(PCREPOS_DIR)\pcre_tables.c
 $(OBJ_DIR)\pcre_try_flipped.obj : $(PCREPOS_DIR)\pcre_try_flipped.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
-$(OBJ_DIR)\pcre_ucp_findchar.obj : $(PCREPOS_DIR)\pcre_ucp_findchar.c
+$(OBJ_DIR)\pcre_ucp_searchfuncs.obj : $(PCREPOS_DIR)\pcre_ucp_searchfuncs.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
 $(OBJ_DIR)\pcre_valid_utf8.obj : $(PCREPOS_DIR)\pcre_valid_utf8.c
@@ -2098,38 +1977,6 @@ $(OBJ_DIR)\pcre_version.obj : $(PCREPOS_DIR)\pcre_version.c
 $(OBJ_DIR)\pcre_xclass.obj : $(PCREPOS_DIR)\pcre_xclass.c
    $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
 
-$(OBJ_DIR)\ucp_findchar.obj : $(PCREPOS_DIR)\ucp_findchar.c
-   $(CC) -i$(PCREPOS_DIR) $(CFLAGS) -D"SUPPORT_UTF8" -D"SUPPORT_UCP" -D"POSIX_MALLOC_THRESHOLD=10" -o$@ $**
-
-
-# ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-# ³ SAMPLES.LIB dependencies ³Û
-# ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
-#  ßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-
-$(SAM_OBJ_DIR)\environ.obj : $(MISC_DIR)\environ.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\date.obj : $(MISC_DIR)\date.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\dbf.obj : $(MISC_DIR)\dbf.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\gauge.obj : $(MISC_DIR)\gauge.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\num.obj : $(MISC_DIR)\num.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\stack.obj : $(MISC_DIR)\stack.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\status.obj : $(MISC_DIR)\status.c
-   $(CC_CMD)
-
-$(SAM_OBJ_DIR)\time.obj : $(MISC_DIR)\time.c
-   $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ CODEPAGE.LIB dependencies ³Û
@@ -2506,28 +2353,10 @@ $(RTL_OBJ_DIR)\datehb.obj : $(RTL_DIR)\datehb.c
 $(RTL_OBJ_DIR)\dateshb.obj : $(RTL_DIR)\dateshb.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\dbdelim.c : $(RTL_DIR)\dbdelim.prg
-   $(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)\dbdelim.obj : $(RTL_OBJ_DIR)\dbdelim.c
-   $(CC_CMD)
-
 $(RTL_OBJ_DIR)\dbedit.c : $(RTL_DIR)\dbedit.prg
    $(HARBOUR_CMD)
 
 $(RTL_OBJ_DIR)\dbedit.obj : $(RTL_OBJ_DIR)\dbedit.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.c : $(RTL_DIR)\dbjoin.prg
-   $(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)\dbjoin.obj : $(RTL_OBJ_DIR)\dbjoin.c
-   $(CC_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.c : $(RTL_DIR)\dbsdf.prg
-   $(HARBOUR_CMD)
-
-$(RTL_OBJ_DIR)\dbsdf.obj : $(RTL_OBJ_DIR)\dbsdf.c
    $(CC_CMD)
 
 $(RTL_OBJ_DIR)\decode.c : $(RTL_DIR)\decode.prg
@@ -3221,9 +3050,6 @@ $(RTL_OBJ_DIR)\mssgline.c : $(RTL_DIR)\mssgline.prg
 $(RTL_OBJ_DIR)\mssgline.obj : $(RTL_OBJ_DIR)\mssgline.c
    $(CC_CMD)
 
-$(RTL_OBJ_DIR)\pplib.obj : $(RTL_DIR)\pplib.c
-   $(CC_CMD)
-
 $(RTL_OBJ_DIR)\hbffind.obj : $(RTL_DIR)\hbffind.c
    $(CC_CMD)
 
@@ -3444,6 +3270,9 @@ $(OBJ_DIR)\expropt2.obj : $(COMMON_DIR)\expropt2.c
 $(OBJ_DIR)\reserved.obj : $(COMMON_DIR)\reserved.c
    $(CC_CMD)
 
+$(OBJ_DIR)\hbdate.obj : $(COMMON_DIR)\hbdate.c
+   $(CC_CMD)
+
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 # ³ GTWVW.LIB dependencies ³Û
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
@@ -3533,13 +3362,16 @@ $(MACRO_OBJ_DIR)\macroc.obj : $(MACRO_DIR)\macroc.c
 $(PP_OBJ_DIR)\ppcore.obj : $(PP_DIR)\ppcore.c
    $(CC_CMD)
 
-$(PP_OBJ_DIR)\ppcomp.obj : $(PP_DIR)\ppcomp.c
-   $(CC_CMD)
-
 $(PP_OBJ_DIR)\pptable.obj : $(PP_DIR)\pptable.c
    $(CC_CMD)
 
-$(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
+$(PP_OBJ_DIR)\pplib.obj : $(PP_DIR)\pplib.c
+   $(CC_CMD)
+
+$(PP_OBJ_DIR)\pplib2.obj : $(PP_DIR)\pplib2.c
+   $(CC_CMD)
+
+$(PP_OBJ_DIR)\pplib3.obj : $(PP_DIR)\pplib3.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -3547,10 +3379,7 @@ $(PP_OBJ_DIR)\pragma.obj : $(PP_DIR)\pragma.c
 # ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙÛ
 #  ßßßßßßßßßßßßßßßßßßßßßßßßßßß
 
-$(OBJ_DIR)\nulsys.c : $(RDD_DIR)\nulsys\nulsys.prg
-   $(HARBOUR_CMD)
-
-$(OBJ_DIR)\nulsys.obj : $(OBJ_DIR)\nulsys.c
+$(OBJ_DIR)\nulsys.obj : $(RDD_DIR)\nulsys\nulsys.c
    $(CC_CMD)
 
 # ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
@@ -5261,11 +5090,19 @@ $(OBJ_DIR)\xbscript.obj : $(OBJ_DIR)\xbscript.c
 
 $(HBPP_EXE) : \
    $(OBJ_DIR)\hbpp.obj \
-   $(OBJ_DIR)\calconst.obj \
+   $(OBJ_DIR)\hbppcalc.obj \
+   $(OBJ_DIR)\hbppcomp.obj \
+   $(OBJ_DIR)\hbppcore.obj \
+   $(OBJ_DIR)\hbpptbl.obj \
+   $(OBJ_DIR)\pragma.obj \
    $(PP_LIB_OBJS) \
    $(COMMON_LIB_OBJS)
    $(ECHO) $(OBJ_DIR)\hbpp.obj + > make.tmp
-   $(ECHO) $(OBJ_DIR)\calconst.obj, >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcalc.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcomp.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbppcore.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\hbpptbl.obj + >> make.tmp
+   $(ECHO) $(OBJ_DIR)\pragma.obj, + >> make.tmp
    $(ECHO) $(HBPP_EXE),, >> make.tmp
    $(ECHO) $(PP_LIB) + >> make.tmp
    $(ECHO) $(COMMON_LIB) + >> make.tmp
@@ -5273,4 +5110,19 @@ $(HBPP_EXE) : \
    $(DMLINK) @make.tmp
 
 $(OBJ_DIR)\hbpp.obj : $(HBPP_DIR)\hbpp.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbppcalc.obj : $(HBPP_DIR)\hbppcalc.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbppcomp.obj : $(HBPP_DIR)\hbppcomp.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbppcore.obj : $(HBPP_DIR)\hbppcore.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\hbpptbl.obj : $(HBPP_DIR)\hbpptbl.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\pragma.obj : $(HBPP_DIR)\pragma.c
    $(CC_CMD)
