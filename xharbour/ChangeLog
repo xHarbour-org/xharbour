@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5862 2008/01/06 21:35:47 andijahja Exp $
+ * $Id: ChangeLog,v 1.5863 2008/01/06 21:43:54 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,16 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-07 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+  * include/hbdefs.h
+    - HARBOUR_START_PROCEDURE "MAIN" no longer required by:
+      * OpenWatcom 1.2 (and above)
+      * MinGW 3.4.5 (did not test it with lower version)
+      NOTE: Tested _ONLY_ with versions as mentioned above; this resolves
+            previously non-running xbscript.exe under OpenWatcom and MinGW
+            due to non-existence of "MAIN" in program.
+
 2008-01-07 10:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     * added ability to set text alignment via following
@@ -34,7 +44,6 @@
 2008-01-06 13:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * makefile.dc
     ! fixed compilation under Digital Mars
-
 
 2008-01-03 18.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/genc.c

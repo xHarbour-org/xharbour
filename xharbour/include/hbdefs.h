@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.90 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hbdefs.h,v 1.91 2008/01/01 22:26:15 enricomaria Exp $
  */
 
 /*
@@ -1104,8 +1104,15 @@ typedef unsigned long HB_COUNTER;
  *                 if there are no problems in the near future.
  *
  * By default we are using automatic lookup (symbol not defined)
+ *
+ * - 07/jan/2008 - Andi Jahja <harbour/AT/cbn/net/id>
+ *                 No longer requires starting procedure:
+ *                 OpenWatcom C/C++ 1.2 and above
+ *                 MinGW 3.4.5
+ *
 */
-#if defined(__WATCOMC__) || ( defined(__GNUC__) && !defined(__DJGPP__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
+#if ( defined(__WATCOMC__) && (__WATCOMC__<1220) ) || \
+    ( defined(__GNUC__) && !defined(__DJGPP__) && !defined(__MINGW32__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
    #define HARBOUR_START_PROCEDURE "MAIN"
 #endif
 
