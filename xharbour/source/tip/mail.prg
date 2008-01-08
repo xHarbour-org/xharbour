@@ -1,5 +1,5 @@
-/*
- * $Id: mail.prg,v 1.2 2006/08/10 15:02:04 gdrouillard Exp $
+ /*
+ * $Id: mail.prg,v 1.3 2007/04/23 14:58:01 hazi01 Exp $
  */
 
 /*
@@ -101,7 +101,7 @@ CLASS TipMail
    METHOD isMultiPart()
    METHOD getMultiParts()
 
-   METHOD setHeader
+   METHOD setHeader( cSubject, cFrom, cTo, cCC, cBCC ) 
    METHOD attachFile( cFileName )
    METHOD detachFile( cPath )
    METHOD getFileName()
