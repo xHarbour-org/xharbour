@@ -1,5 +1,5 @@
 /*
- * $Id: dbfcdx1.c,v 1.270 2007/10/31 08:35:10 marchuet Exp $
+ * $Id: dbfcdx1.c,v 1.271 2007/11/20 16:57:12 marchuet Exp $
  */
 
 /*
@@ -2339,7 +2339,7 @@ static void hb_cdxPageStore( LPCDXPAGE pPage )
    else if ( pPage->iKeys > pPage->TagParent->MaxKeys )
       hb_cdxErrInternal( "hb_cdxPageStore: number of keys exceed!." );
 #endif
-   HB_PUT_LE_UINT16( pPage->node.intNode.attr, pPage->PageType );
+   HB_PUT_LE_UINT16( pPage->node.intNode.attr, ( UINT16 ) pPage->PageType );
    HB_PUT_LE_UINT16( pPage->node.intNode.nKeys, pPage->iKeys );
    HB_PUT_LE_UINT32( pPage->node.intNode.leftPtr, pPage->Left );
    HB_PUT_LE_UINT32( pPage->node.intNode.rightPtr, pPage->Right );

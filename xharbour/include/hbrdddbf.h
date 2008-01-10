@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddbf.h,v 1.33 2007/09/25 07:32:32 marchuet Exp $
+ * $Id: hbrdddbf.h,v 1.34 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -185,6 +185,7 @@ typedef struct _DBFAREA
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
    /*
    *  DBFS's additions to the workarea structure

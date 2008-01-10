@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.180 2007/10/31 16:20:51 marchuet Exp $
+ * $Id: dbf1.c,v 1.181 2007/11/20 08:53:28 marchuet Exp $
  */
 
 /*
@@ -391,7 +391,7 @@ static void hb_dbfSetBlankRecord( DBFAREAP pArea, int iType )
          {
             HB_LONG nValue = hb_dbfGetNextValue( pArea, uiCount );
             if( pField->uiDec )
-               nValue = ( HB_LONG ) hb_numDecConv( nValue, - ( int ) pField->uiDec );
+               nValue = ( HB_LONG ) hb_numDecConv( ( double ) nValue, - ( int ) pField->uiDec );
             if( pField->uiType == HB_FT_INTEGER ||
                 pField->uiType == HB_FT_AUTOINC )
             {
@@ -2080,6 +2080,10 @@ static ERRCODE hb_dbfGetValue( DBFAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
       hb_itemRelease( pError );
       return FAILURE;
    }
+
+   uiIndex = pArea->uNullFlagField;
+   if( uiIndex && pField->bNullPos && ( pArea->pRecord[ pArea->pFieldOffset[ uiIndex ] ] & pField->bNullPos ) )
+      hb_itemPutNull( pItem );
 
    if( pArea->fTrigger )
    {
@@ -4090,7 +4094,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             break;
             
          case '0':
-             /* TODO: NULLABLE and VARLENGTH support 
+             /* NULLABLE and VARLENGTH support 
                if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
                For each Varchar and Varbinary field, one bit, or "varlength" bit, is allocated 
                in the last system field, which is a hidden field and stores the null status for 
@@ -4102,6 +4106,8 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
             {
                dbFieldInfo.uiType = HB_FT_NONE;
+               dbFieldInfo.uiFlags |= HB_FF_HIDDEN; /* To support it under all DBF formats */
+               pArea->uNullFlagField = uiCount;
                break;
             }
 

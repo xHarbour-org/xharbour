@@ -1,5 +1,5 @@
 /*
- * $Id: vfpcdx.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
+ * $Id: vfpcdx.prg,v 1.3 2007/10/31 16:20:52 marchuet Exp $
  */
 
 /*
@@ -49,27 +49,19 @@
  * If you do not wish that, delete this exception notice.
  *
  */
-
-/*
- * A simple RDD which introduce lock counters. It has full DBFCDX
- * functionality from which it inherits but if you execute DBRLOCK(100)
- * twice then you will have to also repeat call to DBRUNLOCK(100) to
- * really unlock the record 100. The same if for FLOCK()
- * This idea comes from one of messages sent by Mindaugas Kavaliauskas.
- */
-
 #include "rddsys.ch"
 #include "dbinfo.ch"
 #include "usrrdd.ch"
 
-ANNOUNCE VFPCDX
-
-/* Force linking BMDBFCDX from which our RDD inherits */
+/* Force linking DBFCDX from which our RDD inherits */
 REQUEST DBFCDX
 REQUEST DBFFPT
 
-FUNCTION VPFRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
-RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, 'DBFCDX', {} )
+ANNOUNCE VFPCDX
+
+FUNCTION VFPCDX_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
+RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, ;
+                            "DBFCDX", {} ) /* We are inheriting from DBFCDX */
 
 INIT PROC VFPCDX_INIT()
    rddRegister( "VFPCDX", RDT_FULL )

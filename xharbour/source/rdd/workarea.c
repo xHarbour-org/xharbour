@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.82 2007/10/31 08:34:53 marchuet Exp $
+ * $Id: workarea.c,v 1.83 2007/12/17 16:14:57 likewolf Exp $
  */
 
 /*
@@ -274,7 +274,6 @@ static ERRCODE hb_waAddField( AREAP pArea, LPDBFIELDINFO pFieldInfo )
       pArea->uiFieldHidden ++;
 
    pArea->uiFieldCount ++;
-   
    return SUCCESS;
 }
 
@@ -2178,9 +2177,7 @@ HB_EXPORT int hb_rddRegister( const char * szDriver, USHORT uiType )
    }
 
    if( s_uiRddMax == 0 )                /* First RDD node */
-   {
       s_RddList = (LPRDDNODE *) hb_xgrab( sizeof(LPRDDNODE) );
-   }
    else
       s_RddList = (LPRDDNODE *) hb_xrealloc( s_RddList, sizeof(LPRDDNODE) * ( s_uiRddMax + 1 ) );
 

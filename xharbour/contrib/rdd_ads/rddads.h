@@ -1,5 +1,5 @@
 /*
- * $Id: rddads.h,v 1.16 2006/11/11 03:48:20 druzus Exp $
+ * $Id: rddads.h,v 1.17 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -106,6 +106,7 @@ typedef struct _ADSAREA_
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
    /*
     *  ADS's additions to the workarea structure

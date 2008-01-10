@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.35 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.36 2007/11/20 16:57:12 marchuet Exp $
  */
 
 /*
@@ -3913,7 +3913,7 @@ static BOOL hb_cdxCheckRecordScope( CDXAREAP pArea, ULONG ulRec )
 }
 
 /*
- * check and avaluate record filter
+ * check and evaluate record filter
  */
 static BOOL hb_cdxCheckRecordFilter( CDXAREAP pArea, ULONG ulRecNo )
 {
@@ -9072,6 +9072,12 @@ static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec )
 
    if ( pPtr == NULL )
    {
+      LPBM_FILTER pMap = pArea->dbfi.lpvCargo;
+      if( pArea->dbfi.fFilter && pMap &&
+          !BM_GetBit( pMap->rmap, pMap->Size, *plRec ) )
+      {
+         *plRec = 0;
+      }
       return SUCCESS;
    }
    return SUPER_COUNTSCOPE( ( AREAP ) pArea, pPtr, plRec );

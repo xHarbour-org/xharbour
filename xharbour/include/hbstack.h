@@ -1,5 +1,5 @@
 /*
- * $Id: hbstack.h,v 1.46 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbstack.h,v 1.47 2007/12/21 12:12:22 likewolf Exp $
  */
 
 /*
@@ -86,6 +86,7 @@ typedef struct
 {
    PHB_ITEM * pItems;         /* pointer to the stack items */
    PHB_ITEM * pPos;           /* pointer to the latest used item */
+   PHB_ITEM * pEnd;           /* pointer to the end of stack items */
    LONG       wItems;         /* total items that may be holded on the stack */
    HB_ITEM    Return;         /* latest returned value */
    PHB_ITEM * pBase;          /* stack frame position for the current function call */
@@ -144,7 +145,8 @@ typedef struct
    #define hb_stackItem( iItemPos )    ( * ( HB_VM_STACK.pItems + (LONG) ( iItemPos ) ) )
    #define hb_stackReturnItem( )       ( &(HB_VM_STACK.Return) )
    #define hb_stackDateBuffer()        ( HB_VM_STACK.szDate )
-   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiActionRequest ) 
+   #define hb_stackItemBasePtr( )      ( &HB_VM_STACK.pItems )
+   #define hb_stackGetActionRequest( ) ( HB_VM_STACK.uiActionRequest )
    #define hb_stackSetActionRequest( n )     do { HB_VM_STACK.uiActionRequest = ( n ); } while( 0 )
 
    #define hb_stackDec( )              do { \
@@ -162,28 +164,38 @@ typedef struct
                                        } while( 0 )
 
    #define hb_stackPush( )             do { \
-                                          if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
+                                          if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
                                              hb_stackIncrease(); \
-                                          ( *(++HB_VM_STACK.pPos) )->type = HB_IT_NIL; \
-                                       } while( 0 )
-                                       
+                                       } while ( 0 )
+
    #define hb_stackPopReturn( )        do { \
                                           if( HB_IS_COMPLEX( &HB_VM_STACK.Return ) ) \
                                              hb_itemClear( &HB_VM_STACK.Return ); \
                                           if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems ) \
                                              hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL ); \
                                           hb_itemMove( &HB_VM_STACK.Return, * HB_VM_STACK.pPos ); \
-                                       } while ( 0 )                                       
+                                       } while ( 0 )
 
    #define hb_stackPushReturn( )       do { \
                                           hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return ); \
-                                          if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ) \
+                                          if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ) \
                                              hb_stackIncrease(); \
-                                       } while ( 0 )                                    
-   #define hb_stackAllocItem( )        ( ( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems ? \
-                                           hb_stackIncrease() : (void) 0 ), \
-                                       * ( HB_VM_STACK.pPos - 1 ) )   
+                                       } while ( 0 )
 
+
+   #define hb_stackAllocItem( )        ( ( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd ? \
+                                           hb_stackIncrease() : (void) 0 ), \
+                                         * ( HB_VM_STACK.pPos - 1 ) )
+/*
+   #define hb_stackLocalVariable( p )  ( ( ( ( *HB_VM_STACK.pBase )->item.asSymbol.paramcnt > \
+                                             ( * HB_VM_STACK.pBase )->item.asSymbol.paramdeclcnt ) && \
+                                           ( * (p) ) > ( * HB_VM_STACK.pBase )->item.asSymbol.paramdeclcnt ) ? \
+                                         ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) += \
+                                             ( * HB_VM_STACK.pBase )->item.asSymbol.paramcnt - \
+                                             ( * HB_VM_STACK.pBase )->item.asSymbol.paramdeclcnt ) + 1 ) ) : \
+                                         ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) ) )
+*/
+   #define hb_stackLocalVariable( p )  ( * ( HB_VM_STACK.pBase + ( int ) ( * (p) ) + 1 ) )
 #else
    extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromTop( int nFromTop );
    extern HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase );
@@ -199,12 +211,15 @@ typedef struct
    extern HB_EXPORT void        hb_stackDec( void );        /* pops an item from the stack without clearing it's contents */
    extern HB_EXPORT void        hb_stackPop( void );        /* pops an item from the stack */
    extern HB_EXPORT void        hb_stackPush( void );       /* pushes an item on to the stack */
-   extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */   
+   extern HB_EXPORT HB_ITEM_PTR hb_stackAllocItem( void );  /* allocates new item on the top of stack, returns pointer to it */
    extern HB_EXPORT void        hb_stackPushReturn( void );
-   extern HB_EXPORT void        hb_stackPopReturn( void );   
-   
+   extern HB_EXPORT void        hb_stackPopReturn( void );
+
    extern HB_EXPORT USHORT      hb_stackGetActionRequest( void );
    extern HB_EXPORT void        hb_stackSetActionRequest( USHORT uiAction );
+
+   extern HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase );
+   extern HB_EXPORT PHB_ITEM ** hb_stackItemBasePtr( void );
 #endif
 
 /* stack management functions */

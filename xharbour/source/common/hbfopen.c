@@ -1,10 +1,10 @@
 /*
- * $Id$
+ * $Id: hbfopen.c,v 1.1 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * 
+ *
  *
  * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
@@ -51,6 +51,104 @@
  */
 
 #include "hbapifs.h"
+#include "hbset.h"
+
+static int  s_iFileCase = HB_SET_CASE_MIXED;
+static int  s_iDirCase  = HB_SET_CASE_MIXED;
+static BOOL s_fFnTrim   = FALSE;
+static char s_cDirSep   = OS_PATH_DELIMITER;
+
+BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
+{
+   if( s_fFnTrim || s_cDirSep != OS_PATH_DELIMITER ||
+       s_iFileCase != HB_SET_CASE_MIXED || s_iDirCase != HB_SET_CASE_MIXED )
+   {
+      PHB_FNAME pFileName;
+      ULONG ulLen;
+
+      if( pfFree )
+      {
+         BYTE * szNew = ( BYTE * ) hb_xgrab( _POSIX_PATH_MAX + 1 );
+         hb_strncpy( ( char * ) szNew, ( char * ) szFileName, _POSIX_PATH_MAX );
+         szFileName = szNew;
+         *pfFree = TRUE;
+      }
+
+      if( s_cDirSep != OS_PATH_DELIMITER )
+      {
+         BYTE *p = szFileName;
+         while( *p )
+         {
+            if( *p == s_cDirSep )
+               *p = OS_PATH_DELIMITER;
+            p++;
+         }
+      }
+
+      pFileName = hb_fsFNameSplit( ( char * ) szFileName );
+
+      /* strip trailing and leading spaces */
+      if( s_fFnTrim )
+      {
+         if( pFileName->szName )
+         {
+            ulLen = strlen( pFileName->szName );
+            while( ulLen && pFileName->szName[ulLen - 1] == ' ' )
+               --ulLen;
+            while( ulLen && pFileName->szName[0] == ' ' )
+            {
+               ++pFileName->szName;
+               --ulLen;
+            }
+            pFileName->szName[ulLen] = '\0';
+         }
+         if( pFileName->szExtension )
+         {
+            ulLen = strlen( pFileName->szExtension );
+            while( ulLen && pFileName->szExtension[ulLen - 1] == ' ' )
+               --ulLen;
+            while( ulLen && pFileName->szExtension[0] == ' ' )
+            {
+               ++pFileName->szExtension;
+               --ulLen;
+            }
+            pFileName->szExtension[ulLen] = '\0';
+         }
+      }
+
+      /* FILECASE */
+      if( s_iFileCase == HB_SET_CASE_LOWER )
+      {
+         if( pFileName->szName )
+            hb_strlow( pFileName->szName );
+         if( pFileName->szExtension )
+            hb_strlow( pFileName->szExtension );
+      }
+      else if( s_iFileCase == HB_SET_CASE_UPPER )
+      {
+         if( pFileName->szName )
+            hb_strupr( pFileName->szName );
+         if( pFileName->szExtension )
+            hb_strupr( pFileName->szExtension );
+      }
+
+      /* DIRCASE */
+      if( pFileName->szPath )
+      {
+         if( s_iDirCase == HB_SET_CASE_LOWER )
+            hb_strlow( pFileName->szPath );
+         else if( s_iDirCase == HB_SET_CASE_UPPER )
+            hb_strupr( pFileName->szPath );
+      }
+
+      hb_fsFNameMerge( ( char * ) szFileName, pFileName );
+      hb_xfree( pFileName );
+   }
+   else if( pfFree )
+      *pfFree = FALSE;
+
+   return szFileName;
+}
 
 FILE * hb_fopen( const char *path, const char *mode )
 {
@@ -63,4 +161,5 @@ FILE * hb_fopen( const char *path, const char *mode )
 
    return file;
 }
+
 

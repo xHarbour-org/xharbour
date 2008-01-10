@@ -1,5 +1,5 @@
 /*
- * $Id: hbrdddel.h,v 1.8 2006/08/10 12:07:56 druzus Exp $
+ * $Id: hbrdddel.h,v 1.9 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -95,6 +95,7 @@ typedef struct _DELIMAREA
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
    /*
    *  DELIM's additions to the workarea structure

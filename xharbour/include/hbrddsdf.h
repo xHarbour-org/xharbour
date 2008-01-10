@@ -1,5 +1,5 @@
 /*
- * $Id: hbrddsdf.h,v 1.7 2006/05/30 10:51:23 druzus Exp $
+ * $Id: hbrddsdf.h,v 1.8 2007/10/31 08:34:22 marchuet Exp $
  */
 
 /*
@@ -95,6 +95,7 @@ typedef struct _SDFAREA
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */
 
    /*
    *  SDFS's additions to the workarea structure

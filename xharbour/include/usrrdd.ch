@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.ch,v 1.4 2007/05/18 09:36:57 marchuet Exp $
+ * $Id: usrrdd.ch,v 1.5 2007/10/31 10:56:49 marchuet Exp $
  */
 
 /*
@@ -239,7 +239,9 @@
 #define UR_FI_TYPEEXT         3
 #define UR_FI_LEN             4
 #define UR_FI_DEC             5
-#define UR_FI_SIZE            5
+#define UR_FI_FLAGS           6
+#define UR_FI_STEP            7
+#define UR_FI_SIZE            7
 
 /* DBLOCKINFO */
 #define UR_LI_RECORD          1

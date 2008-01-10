@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.47 2007/12/23 06:23:37 andijahja Exp $
+ * $Id: hbapiitm.h,v 1.48 2008/01/06 21:35:47 andijahja Exp $
  */
 
 /*
@@ -141,6 +141,7 @@ extern HB_EXPORT PHB_ITEM   hb_itemPutPtr     ( PHB_ITEM pItem, void * pValue );
 extern HB_EXPORT PHB_ITEM   hb_itemPutPtrGC   ( PHB_ITEM pItem, void * pValue );
 extern HB_EXPORT PHB_ITEM   hb_itemPutHBLong  ( PHB_ITEM pItem, HB_LONG lNumber );
 extern HB_EXPORT PHB_ITEM   hb_itemPutNumType ( PHB_ITEM pItem, double dNumber, int iDec, int iType1, int iType2 );
+extern HB_EXPORT PHB_ITEM   hb_itemPutNull    ( PHB_ITEM pItem );
 
 extern HB_EXPORT BOOL       hb_itemRelease      ( PHB_ITEM pItem );
 extern HB_EXPORT PHB_ITEM   hb_itemReturn       ( PHB_ITEM pItem );

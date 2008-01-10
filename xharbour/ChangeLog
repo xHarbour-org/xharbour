@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5864 2008/01/07 04:57:35 andijahja Exp $
+ * $Id: ChangeLog,v 1.5865 2008/01/08 11:44:48 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,75 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-10 11:47 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * contrib\rdd_ads\rddads.h
+  * include\hbapi.h
+  * include\hbapiitm.h
+  * include\hbapirdd.h
+  * include\hbrddbmc.h
+  * include\hbrddcdx.h
+  * include\hbrdddbf.h
+  * include\hbrdddel.h
+  * include\hbrddntx.h
+  * include\hbrddsdf.h
+  * source\rdd\bmdbfcdx\bmdbfcdx1.c
+  * source\rdd\dbf1.c
+  * source\rdd\dbfcdx\dbfcdx1.c
+  * source\rdd\dbffpt\dbffpt1.c  
+  * source\compiler\harbour.slx
+  * source\compiler\harbour.sly  
+  * source\rtl\valtype.c  
+  * source\rdd\workarea.c
+    + Adding NULL fields capabilities in progress
+    
+  * include\usrrdd.ch
+  * source\rdd\usrrdd\usrrdd.c  
+    + Added support to incremental fields and flags.
+    
+  * include\hbtrace.h
+    ! fixed miror redefine warnings.
+    
+  * include\thread.h
+    * Introduced pEnd for more quick stack control.
+    
+  * source\common\hbdate.c
+    ! fixed TRACE in hb_timeDecStr( char * szTime, LONG lSeconds )
+    
+  * source\common\hbfopen.c
+    + added hb_fsNameConv nedded to compile PP aplicacion.
+
+  * source\rdd\usrrdd\rdds\adordd.prg
+    ! corrected some bugs when catalog can't be created.
+
+  * source\rdd\wafunc.c
+    * changed hb_rddOpenTable to use hb_rddSelectFirstAvailable() instead of hb_rddSelectWorkAreaNumber( 0 );
+  
+  * source\vm\hvm.c
+    ! fixed HB_P_POPGLOBAL missing ;
+    ! fixed TRACE in hb_vmPushMacroBlock( BYTE * pCode )
+    ! fixed TRACE in hb_xvmLocalSetInt( int iLocal, int iVal )
+    ! fixed TRACE in hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
+    * hb_vmPushSymbol( PHB_SYMB pSym ), hb_vmPushLocalByRef( SHORT iLocal ) to use new hb_stackAllocItem()
+    * hb_vmPopLocal( SHORT iLocal )
+
+  * include\hbstack.h    
+  * source\vm\arrays.c
+  * source\vm\estack.c
+  * source\vm\fastitem.c
+  * source\vm\garbage.c
+  * source\vm\hvm.c
+  * source\vm\itemapi.c
+    ! fixed flag type HB_IT_EXTREF, HB_IT_MEMVAR.
+    * Used if else if instead of switch over type comparison, because type sometimes has flags as 
+      HB_IT_EXTREF, HB_IT_MEMVAR, HB_IT_BYREF or HB_IT_NULL conbined with other types.
+    * Introduced pEnd for more quick stack control.
+    + added  hb_stackItemBasePtr().
+    * Removed some random GPF's when conbined types was used.
+
+  * source\rdd\usrrdd\rdds\vfpcdx.prg
+    ! some minor sintax fixes
+
 2008-01-08 10:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   * source/tip/mail.prg
     ! minor fix on class declaration
@@ -323,6 +392,10 @@
 2007-12-25 12.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * source/tip/thtml.prg
      * hb_strAtI() as extern "C"
+
+2007-12-24 09:30 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source\rdd\usrrdd\rdds\vfpcdx.prg
+    ! fixed some stupid bugs, 2 letters changed.
 
 2007-12-24 14:34 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/macro/macro.y

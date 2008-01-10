@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.10 2007/05/17 22:08:34 marchuet Exp $
+ * $Id: usrrdd.c,v 1.11 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -94,8 +94,7 @@ static BOOL hb_usrIsMethod( PHB_ITEM pMethods, USHORT uiMethod )
 {
    PHB_ITEM pItem = hb_arrayGetItemPtr( pMethods, uiMethod );
 
-   return pItem && ( HB_IS_POINTER( pItem ) || HB_IS_SYMBOL( pItem ) ||
-                     HB_IS_BLOCK( pItem ) );
+   return pItem && ( HB_IS_POINTER( pItem ) || HB_IS_SYMBOL( pItem ) || HB_IS_BLOCK( pItem ) );
 }
 
 static BOOL hb_usrPushMethod( PHB_ITEM pMethods, USHORT uiMethod )
@@ -118,7 +117,7 @@ static BOOL hb_usrPushMethod( PHB_ITEM pMethods, USHORT uiMethod )
       }
       else if( HB_IS_BLOCK( pItem ) )
       {
-         hb_vmPushSymbol( &hb_symEval );
+         hb_vmPushEvalSym();
          hb_vmPush( pItem );
          return TRUE;
       }
@@ -208,6 +207,8 @@ static PHB_ITEM hb_usrFieldInfoToItem( LPDBFIELDINFO pFieldInfo )
    hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_FI_TYPEEXT ), pFieldInfo->uiTypeExtended );
    hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_FI_LEN ), pFieldInfo->uiLen );
    hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_FI_DEC ), pFieldInfo->uiDec );
+   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_FI_FLAGS ), pFieldInfo->uiFlags );
+   hb_itemPutNI( hb_arrayGetItemPtr( pItem, UR_FI_STEP ), pFieldInfo->uiStep );
 
    return pItem;
 }
@@ -221,6 +222,8 @@ static BOOL hb_usrItemToFieldInfo( PHB_ITEM pItem, LPDBFIELDINFO pFieldInfo )
       pFieldInfo->uiTypeExtended = hb_arrayGetNI( pItem, UR_FI_TYPEEXT );
       pFieldInfo->uiLen          = hb_arrayGetNI( pItem, UR_FI_LEN );
       pFieldInfo->uiDec          = hb_arrayGetNI( pItem, UR_FI_DEC );
+      pFieldInfo->uiFlags        = hb_arrayGetNI( pItem, UR_FI_FLAGS );
+      pFieldInfo->uiStep         = hb_arrayGetNI( pItem, UR_FI_STEP );
       return TRUE;
    }
    return FALSE;
@@ -1513,16 +1516,16 @@ static ERRCODE hb_usrRecNo( AREAP pArea, ULONG * pulRecNo )
 
 static ERRCODE hb_usrRecId( AREAP pArea, PHB_ITEM pRecId )
 {
+   ERRCODE errCode;
+   ULONG ulRecNo;
+
    HB_TRACE(HB_TR_DEBUG, ("hb_usrRecId(%p,%p)", pArea, pRecId));
 
-   if( !hb_usrPushMethod( SELF_USRNODE( pArea )->pMethods, UR_RECID ) )
-      return SUPER_RECID( pArea, pRecId );
+   errCode = SELF_RECNO( ( AREAP ) pArea, &ulRecNo );
 
-   hb_vmPushInteger( pArea->uiArea );
-   hb_vmPushItemRef( pRecId );
-   hb_vmDo( 2 );
+   hb_itemPutNInt( pRecId, ulRecNo );
 
-   return hb_usrReturn();
+   return errCode;
 }
 
 static ERRCODE hb_usrFieldInfo( AREAP pArea, USHORT uiIndex, USHORT uiInfoType, PHB_ITEM pInfo )
@@ -2358,7 +2361,7 @@ static ERRCODE hb_usrEvalBlock( AREAP pArea, PHB_ITEM pBlock )
 /*
  * Network operations
  */
- 
+
 static ERRCODE hb_usrRawLock( AREAP pArea, USHORT uiAction, ULONG ulRecNo )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_usrRawLock(%p,%hu,%lu)", pArea, uiAction, ulRecNo));

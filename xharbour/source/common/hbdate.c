@@ -1,5 +1,5 @@
 /*
- * $Id: hbdate.c,v 1.9 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: hbdate.c,v 1.10 2007/12/23 02:22:03 likewolf Exp $
  */
 
 /*
@@ -1051,7 +1051,7 @@ char HB_EXPORT * hb_timeDecStr( char * szTime, LONG lSeconds )
    int iHour, iMinute;
    double dSeconds;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecStr(%s,%f)", szTime,dSeconds));
+   HB_TRACE(HB_TR_DEBUG, ("hb_timeDecStr(%s,%f)", szTime, lSeconds ));
 
    hb_timeDecode( lSeconds, &iHour, &iMinute, &dSeconds );
 

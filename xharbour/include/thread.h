@@ -1,5 +1,5 @@
 /*
-* $Id: thread.h,v 1.117 2007/12/19 00:16:39 likewolf Exp $
+* $Id: thread.h,v 1.118 2007/12/21 12:12:22 likewolf Exp $
 */
 
 /*
@@ -428,6 +428,7 @@ typedef struct tag_HB_STACK
 {
    PHB_ITEM * pItems;           /* pointer to the stack items */
    PHB_ITEM * pPos;             /* pointer to the latest used item */
+   PHB_ITEM * pEnd;             /* pointer to the end of stack items */
    LONG       wItems;           /* total items that may be holded on the stack */
    HB_ITEM    Return;           /* latest returned value */
    PHB_ITEM * pBase;            /* stack frame position for the current function call */
@@ -435,7 +436,7 @@ typedef struct tag_HB_STACK
    LONG       lStatics;         /* statics base for the current function call */
    LONG       lWithObject;      /* stack offset to base current WITH OBJECT item */
    ULONG      lRecoverBase;     /* current SEQUENCE envelope offset or 0 if no SEQUENCE is active */
-   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */   
+   USHORT     uiActionRequest;  /* Request for some action - stop processing of opcodes */
    char       szDate[ 26 ];     /* last returned date from _pards() yyyymmdd format */
 
    /* JC1: thread safe classes messaging */

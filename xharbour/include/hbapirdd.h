@@ -1,5 +1,5 @@
 /*
- * $Id: hbapirdd.h,v 1.45 2007/10/31 08:34:22 marchuet Exp $
+ * $Id: hbapirdd.h,v 1.47 2007/12/23 06:23:37 andijahja Exp $
  */
 
 /*
@@ -591,6 +591,7 @@ typedef struct _AREA
    USHORT uiMaxFieldNameLength;
    PHB_CODEPAGE cdPage;          /* Area's codepage pointer */
    BYTE bFlagCount;              /* How many flags are allocated in _NullFlags*/
+   USHORT uNullFlagField;        /* position of NullFlag field 0 if doesn't exists */   
 } AREA;
 
 typedef AREA * LPAREA;

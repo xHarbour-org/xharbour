@@ -1,5 +1,5 @@
 /*
- * $Id: hbtrace.h,v 1.15 2006/07/27 12:21:30 lculik Exp $
+ * $Id: hbtrace.h,v 1.16 2007/09/22 10:57:37 andijahja Exp $
  */
 
 /*
@@ -83,21 +83,27 @@ extern HB_EXPORT void TraceLog( const char * sFile, const char * sTraceMsg, ... 
  */
 
 #ifdef HB_TR_LEVEL_ALWAYS
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_ALWAYS
 #endif
 #ifdef HB_TR_LEVEL_FATAL
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_FATAL
 #endif
 #ifdef HB_TR_LEVEL_ERROR
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_ERROR
 #endif
 #ifdef HB_TR_LEVEL_WARNING
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_WARNING
 #endif
 #ifdef HB_TR_LEVEL_INFO
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_INFO
 #endif
 #ifdef HB_TR_LEVEL_DEBUG
+#undef HB_TR_LEVEL
 #define HB_TR_LEVEL     HB_TR_DEBUG
 #endif
 

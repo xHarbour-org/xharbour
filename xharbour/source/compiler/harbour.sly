@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.138 2007/12/23 21:57:40 likewolf Exp $
+ * $Id: harbour.sly,v 1.139 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -198,7 +198,7 @@ static void hb_compDebugStart( void ) { };
 };
 
 %token FUNCTION PROCEDURE IDENTIFIER RETURN NIL NUM_DOUBLE INASSIGN NUM_INTEGER NUM_LONG
-%token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE
+%token LOCAL STATIC GLOBAL EXTERNGLOBAL IIF IF ELSE ELSEIF END ENDIF LITERAL TRUEVALUE FALSEVALUE NULLVALUE
 %token ANNOUNCE DYNAMIC EXTERN INIT EXIT AND OR NOT PUBLIC EQ NE1 NE2
 %token INC DEC ALIASOP DOCASE CASE OTHERWISE ENDCASE ENDDO MEMVAR
 %token WHILE LOOP FOR NEXT TO STEP LE GE FIELD IN PARAMETERS H12AM H12PM
@@ -617,6 +617,11 @@ NumAlias   : NUM_INTEGER  ALIASOP      { $$ = hb_compExprNewLong( $1.iNumber ); 
            | NUM_LONG     ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
            | NUM_DOUBLE   ALIASOP      { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
            ;
+           
+/* NULL flag
+*/
+//NullValue  : NULLVALUE                { $$ = hb_compExprNewNull(); }
+//;
 
 /* NIL value
  */

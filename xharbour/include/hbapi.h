@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.228 2007/12/27 11:40:20 andijahja Exp $
+ * $Id: hbapi.h,v 1.229 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -214,6 +214,7 @@ HB_EXTERN_BEGIN
 #define ISBLOCK( n )       ( hb_param( n, HB_IT_BLOCK ) != NULL )    /* Not available in CA-Cl*pper. */
 #define ISPOINTER( n )     ( hb_param( n, HB_IT_POINTER ) != NULL )  /* Not available in CA-Cl*pper. */
 #define ISHASH( n )        ( hb_param( n, HB_IT_HASH ) != NULL )     /* Not available in CA-Cl*pper. */
+#define ISNULL( n )        ( hb_param( n, HB_IT_ANY ) == NULL || HB_IS_NULL( hb_param( n, HB_IT_ANY ) ) )     /* Not available in CA-Cl*pper. */
 
 #define HB_ITEM_GET_NUMINTRAW( p )  ( HB_IS_INTEGER( p ) ? \
                                       ( HB_LONG ) p->item.asInteger.value : \
