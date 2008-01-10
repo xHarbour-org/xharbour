@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.91 2007/09/25 07:33:00 marchuet Exp $
+ * $Id: estack.c,v 1.92 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -121,79 +121,44 @@ HB_EXPORT void hb_stackDec( void )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDec()"));
 
-   if( --HB_VM_STACK.pPos < HB_VM_STACK.pItems )
-   {
+   if( --HB_VM_STACK.pPos <= HB_VM_STACK.pBase )
       hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
-   }
+}
+
+#undef hb_stackDecrease
+void hb_stackDecrease( ULONG ulItems )
+{
+   HB_THREAD_STUB
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackDecrease()"));
+
+   if( ( HB_VM_STACK.pPos -= ulItems ) <= HB_VM_STACK.pBase )
+      hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
 }
 
 #undef hb_stackPush
 HB_EXPORT void hb_stackPush( void )
 {
-   LONG CurrIndex;   /* index of current top item */
-   LONG TopIndex;    /* index of the topmost possible item */
-
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackPush()"));
 
-   CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
-   TopIndex  = HB_VM_STACK.wItems - 1;
-
    /* enough room for another item ? */
-   if( !( TopIndex > CurrIndex ) )
-   {
-      #ifndef HB_ARRAY_USE_COUNTER
-         PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
-      #endif
+   if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd )
+      hb_stackIncrease();
+}
 
-      LONG BaseIndex;   /* index of stack base */
-      LONG i;
+#undef hb_stackAllocItem
+HB_ITEM_PTR hb_stackAllocItem( void )
+{
+   HB_THREAD_STUB
 
-      BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
+   HB_TRACE(HB_TR_DEBUG, ("hb_stackAllocItem()"));
 
-      /* no, make more headroom: */
-      /* hb_stackDispLocal(); */
-      HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( (void *) HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
-                                ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
+   if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd )
+      hb_stackIncrease();
 
-      /* fix possibly invalid pointers: */
-      HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
-      HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
-      HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
-
-      #ifndef HB_ARRAY_USE_COUNTER
-         if( HB_VM_STACK.pItems != pOldItems )
-         {
-            //TraceLog( NULL, "Expanding Stack: %p\n", pOldItems );
-
-            for( i = 0; i < CurrIndex; i++ )
-            {
-               if( HB_VM_STACK.pItems[ i ]->type == HB_IT_ARRAY && HB_VM_STACK.pItems[ i ]->item.asArray.value )
-               {
-                  hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
-               }
-               else if( HB_VM_STACK.pItems[ i ]->type == HB_IT_BYREF && HB_VM_STACK.pItems[ i ]->item.asRefer.offset == 0 )
-               {
-                  hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
-               }
-            }
-
-            //TraceLog( NULL, "New Stack: %p\n", HB_VM_STACK.pItems );
-         }
-      #endif
-
-      for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; i++ )
-      {
-         HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
-      }
-      /* hb_stackDispLocal(); */
-   }
-
-   /* now, push it: */
-   HB_VM_STACK.pPos++;
-
-   ( * HB_VM_STACK.pPos )->type = HB_IT_NIL;
+   return * ( HB_VM_STACK.pPos - 1 );
 }
 
 #undef hb_stackPushReturn
@@ -206,7 +171,7 @@ void hb_stackPushReturn( void )
    hb_itemMove( * HB_VM_STACK.pPos, &HB_VM_STACK.Return );
 
    /* enough room for another item ? */
-   if( HB_VM_STACK.wItems - 1 <= HB_VM_STACK.pPos - HB_VM_STACK.pItems )
+   if( ++HB_VM_STACK.pPos == HB_VM_STACK.pEnd )
       hb_stackIncrease();
 }
 
@@ -214,14 +179,19 @@ void hb_stackIncrease( void )
 {
    LONG BaseIndex;   /* index of stack base */
    LONG CurrIndex;   /* index of current top item */
-   LONG i;
+   LONG EndIndex;    /* index of current top item */
 
    HB_THREAD_STUB
 
    HB_TRACE(HB_TR_DEBUG, ("hb_stackIncrease()"));
 
+   #ifndef HB_ARRAY_USE_COUNTER
+      PHB_ITEM *pOldItems = HB_VM_STACK.pItems;
+   #endif
+
    BaseIndex = HB_VM_STACK.pBase - HB_VM_STACK.pItems;
    CurrIndex = HB_VM_STACK.pPos - HB_VM_STACK.pItems;
+   EndIndex  = HB_VM_STACK.pEnd - HB_VM_STACK.pItems;
 
    /* no, make more headroom: */
    /* hb_stackDispLocal(); */
@@ -229,11 +199,40 @@ void hb_stackIncrease( void )
                              ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
    /* fix possibly modified by realloc pointers: */
-   HB_VM_STACK.pPos = HB_VM_STACK.pItems + CurrIndex;
-   HB_VM_STACK.pBase = HB_VM_STACK.pItems + BaseIndex;
+   HB_VM_STACK.pPos   = HB_VM_STACK.pItems + CurrIndex;
+   HB_VM_STACK.pBase  = HB_VM_STACK.pItems + BaseIndex;
    HB_VM_STACK.wItems += STACK_EXPANDHB_ITEMS;
-   for( i = CurrIndex + 1; i < HB_VM_STACK.wItems; ++i )
-      HB_VM_STACK.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+   HB_VM_STACK.pEnd   = HB_VM_STACK.pItems + HB_VM_STACK.wItems;
+
+   #ifndef HB_ARRAY_USE_COUNTER
+      if( HB_VM_STACK.pItems != pOldItems )
+      {
+         LONG i;
+         //TraceLog( NULL, "Expanding Stack: %p\n", pOldItems );
+
+         for( i = 0; i < CurrIndex; i++ )
+         {
+            if( HB_VM_STACK.pItems[ i ]->type == HB_IT_ARRAY && HB_VM_STACK.pItems[ i ]->item.asArray.value )
+            {
+               hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asArray.value, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
+            }
+            else if( HB_VM_STACK.pItems[ i ]->type == HB_IT_BYREF && HB_VM_STACK.pItems[ i ]->item.asRefer.offset == 0 )
+            {
+               hb_arrayResetHolder( HB_VM_STACK.pItems[ i ]->item.asRefer.BasePtr.pBaseArray, (void *) ( pOldItems[i] ), (void *) ( HB_VM_STACK.pItems[i] ) );
+            }
+         }
+
+         //TraceLog( NULL, "New Stack: %p\n", HB_VM_STACK.pItems );
+      }
+   #endif
+
+   do
+   {
+      HB_VM_STACK.pItems[ EndIndex ] = ( PHB_ITEM ) hb_xgrab( sizeof( HB_ITEM ) );
+      HB_VM_STACK.pItems[ EndIndex ]->type = HB_IT_NIL;
+   }
+   while( ++EndIndex < HB_VM_STACK.wItems );
+
 }
 
 void hb_stackInit( void )
@@ -246,15 +245,16 @@ void hb_stackInit( void )
    hb_stackST.pBase  = hb_stackST.pItems;
    hb_stackST.pPos   = hb_stackST.pItems;     /* points to the first stack item */
    hb_stackST.wItems = STACK_INITHB_ITEMS;
+   hb_stackST.pEnd   = hb_stackST.pItems + hb_stackST.wItems;
 
    {
       LONG i;
       for( i = 0; i < hb_stackST.wItems; ++i )
       {
          hb_stackST.pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+         hb_stackST.pItems[ i ]->type = HB_IT_NIL;
       }
    }
-   ( * hb_stackST.pPos )->type = HB_IT_NIL;
    hb_stackST.Return.type = HB_IT_NIL;
 
 #else
@@ -286,6 +286,7 @@ void hb_stackFree( void )
    hb_stackST.pItems = NULL;
    hb_stackST.pBase  = NULL;
    hb_stackST.pPos   = NULL;
+   hb_stackST.pEnd   = NULL;
    hb_stackST.wItems = 0;
 
 #else
@@ -399,6 +400,12 @@ HB_EXPORT LONG hb_stackBaseOffset( void )
    return HB_VM_STACK.pBase - HB_VM_STACK.pItems + 1;
 }
 
+#undef hb_stackItemBasePtr
+PHB_ITEM ** hb_stackItemBasePtr( void )
+{
+   HB_THREAD_STUB
+   return &HB_VM_STACK.pItems;
+}
 
 /**
  JC1: from that point on, stack optimization is no longer needed:
@@ -446,6 +453,29 @@ HB_EXPORT HB_ITEM_PTR hb_stackItemFromBase( int nFromBase )
    //printf( "Local %i Params: %i\n", nFromBase, hb_stackBaseItem()->item.asSymbol.arguments );
 
    return ( * ( HB_VM_STACK.pBase + nFromBase + 1 ) );
+}
+
+#undef hb_stackLocalVariable
+HB_EXPORT HB_ITEM_PTR hb_stackLocalVariable( int *piFromBase )
+{
+//   HB_ITEM_PTR pBase = *HB_VM_STACK.pBase;
+
+
+   if( *piFromBase <= 0 )
+      hb_errInternal( HB_EI_STACKUFLOW, NULL, NULL, NULL );
+
+   //if( pBase->item.asSymbol.paramcnt > pBase->item.asSymbol.paramdeclcnt )
+   //{
+      /* function with variable number of parameters:
+       * FUNCTION foo( a,b,c,...)
+       * LOCAL x,y,z
+       * number of passed parameters is bigger then number of declared
+       * parameters - skip additional parameters only for local variables
+       */
+   //   if( *piFromBase > pBase->item.asSymbol.paramdeclcnt )
+   //      *piFromBase += pBase->item.asSymbol.paramcnt - pBase->item.asSymbol.paramdeclcnt;
+   //}
+   return * ( HB_VM_STACK.pBase + *piFromBase + 1 );
 }
 
 #undef hb_stackTopItem

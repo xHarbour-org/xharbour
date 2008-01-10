@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.145 2007/12/19 12:03:18 likewolf Exp $
+ * $Id: itemapi.c,v 1.146 2007/12/19 12:13:17 likewolf Exp $
  */
 
 /*
@@ -330,7 +330,7 @@ HB_EXPORT LONG hb_itemGetDL( PHB_ITEM pItem )
 
    if( pItem && HB_IS_DATE( pItem ) )
       return pItem->item.asDate.value;
-   else 
+   else
       return 0;
 }
 
@@ -392,11 +392,11 @@ void HB_EXPORT hb_itemGetDTL( PHB_ITEM pItem, LONG * plDate, LONG * plTime )
      lDate = pItem->item.asDate.value;
      lTime = pItem->item.asDate.time;
    }
-   if( plDate ) 
+   if( plDate )
    {
       *plDate = lDate;
    }
-   if( plTime ) 
+   if( plTime )
    {
       *plTime = lTime;
    }
@@ -412,15 +412,15 @@ void HB_EXPORT hb_itemGetD( PHB_ITEM pItem, int * piYear, int * piMonth, int * p
    }
    else
    {
-      if( piYear ) 
-      { 
+      if( piYear )
+      {
          *piYear = 0;
       }
-      if( piMonth ) 
+      if( piMonth )
       {
          *piMonth = 0;
       }
-      if( piDay ) 
+      if( piDay )
       {
          *piDay = 0;
       }
@@ -442,7 +442,7 @@ void HB_EXPORT hb_itemGetDT( PHB_ITEM pItem, int * piYear, int * piMonth, int * 
       {
          *piYear = 0;
       }
-      if( piMonth ) 
+      if( piMonth )
       {
          *piMonth = 0;
       }
@@ -458,7 +458,7 @@ void HB_EXPORT hb_itemGetDT( PHB_ITEM pItem, int * piYear, int * piMonth, int * 
       {
          *piMin = 0;
       }
-      if( pdSec ) 
+      if( pdSec )
       {
          *pdSec = 0;
       }
@@ -1329,33 +1329,43 @@ char HB_EXPORT * hb_itemTypeStr( PHB_ITEM pItem )
 
    switch( pItem->type )
    {
-      case HB_IT_ARRAY:
-         return ( ( char * ) ( hb_arrayIsObject( pItem ) ? "O" : "A" ) );
-
-      case HB_IT_BLOCK:
-         return "B";
-
-      case HB_IT_DATE:
-         return "D";
-
-      case HB_IT_LOGICAL:
-         return "L";
+      case HB_IT_STRING:
+      case HB_IT_STRING | HB_IT_NULL:
+         return "C";
 
       case HB_IT_INTEGER:
       case HB_IT_LONG:
       case HB_IT_DOUBLE:
+      case HB_IT_INTEGER | HB_IT_NULL:
+      case HB_IT_LONG | HB_IT_NULL:
+      case HB_IT_DOUBLE | HB_IT_NULL:
          return "N";
 
-      case HB_IT_STRING:
-         return "C";
+      case HB_IT_ARRAY:
+      case HB_IT_ARRAY | HB_IT_NULL:
+         return ( ( char * ) ( hb_arrayIsObject( pItem ) ? "O" : "A" ) );
+
+      case HB_IT_BLOCK:
+      case HB_IT_BLOCK | HB_IT_NULL:
+         return "B";
+
+      case HB_IT_DATE:
+      case HB_IT_DATE | HB_IT_NULL:
+         return "D";
+
+      case HB_IT_LOGICAL:
+      case HB_IT_LOGICAL | HB_IT_NULL:
+         return "L";
 
       case HB_IT_MEMO:
          return "M";
 
       case HB_IT_POINTER:
+      case HB_IT_POINTER | HB_IT_NULL:
          return "P";
 
       case HB_IT_HASH:
+      case HB_IT_HASH | HB_IT_NULL:
          return "H";
    }
 
@@ -1444,6 +1454,10 @@ PHB_ITEM HB_EXPORT hb_itemUnRefOnce( PHB_ITEM pItem )
 
          pValue = *( pItem->item.asMemvar.itemsbase ) + pItem->item.asMemvar.offset + pItem->item.asMemvar.value;
          pItem = pValue->pVarItem;
+      }
+      else if( HB_IS_EXTREF( pItem ) )
+      {
+         pItem = pItem->item.asExtRef.func->read( pItem );
       }
       else
       {
@@ -2478,4 +2492,10 @@ HB_EXPORT PHB_ITEM hb_itemPutNumType( PHB_ITEM pItem, double dNumber, int iDec, 
    }
 
    return hb_itemPutND( pItem, dNumber );
+}
+
+HB_EXPORT PHB_ITEM hb_itemPutNull( PHB_ITEM pItem )
+{
+   pItem->type |= HB_IT_NULL;
+   return pItem;
 }

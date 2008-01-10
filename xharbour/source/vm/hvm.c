@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.646 2007/12/08 02:31:21 ronpinkas Exp $
+ * $Id: hvm.c,v 1.647 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -3160,7 +3160,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
          case HB_P_POPGLOBAL:
          {
             PHB_ITEM pTop = hb_stackItemFromTop( -1 );
-            PHB_ITEM pGlobal = HB_GETGLOBALS()[ pCode[ w + 1 ] ]
+            PHB_ITEM pGlobal = HB_GETGLOBALS()[ pCode[ w + 1 ] ];
 
             HB_TRACE( HB_TR_DEBUG, ("HB_P_POPGLOBAL") );
 
@@ -8848,10 +8848,12 @@ HB_EXPORT void hb_vmPushSymbol( PHB_SYMB pSym )
    HB_THREAD_STUB
 
    HB_TRACE_STEALTH( HB_TR_DEBUG, ("hb_vmPushSymbol(%p) \"%s\"", pSym, pSym->szName ) );
+   {
+    PHB_ITEM pItem = hb_stackAllocItem();
 
-   ( * HB_VM_STACK.pPos )->type = HB_IT_SYMBOL;
-   ( * HB_VM_STACK.pPos )->item.asSymbol.value        = pSym;
-   hb_stackPush();
+    pItem->type = HB_IT_SYMBOL;
+    pItem->item.asSymbol.value = pSym;
+   }
 }
 
 HB_EXPORT void hb_vmPushDynSym( PHB_DYNS pDynSym )
@@ -8991,7 +8993,7 @@ static void hb_vmPushMacroBlock( BYTE * pCode )
    HB_THREAD_STUB
    PHB_ITEM pTop;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushMacroBlock(%p, %p)", pCode, pSymbols));
+   HB_TRACE(HB_TR_DEBUG, ("hb_vmPushMacroBlock(%p)", pCode));
 
    pTop = hb_stackTopItem();
    hb_stackPush();
@@ -9119,20 +9121,25 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pTop = ( * HB_VM_STACK.pPos );
+   HB_ITEM_PTR pTop = hb_stackAllocItem();
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPushLocalByRef(%hd)", iLocal));
 
-   pTop->type = HB_IT_BYREF;
    /* we store its stack offset instead of a pointer to support a dynamic stack */
-   pTop->item.asRefer.offset = hb_stackBaseOffset();
-
    if( iLocal >= 0 )
    {
+
+      PHB_ITEM pLocal = hb_stackLocalVariable( &iLocal );
+      if( HB_IS_BYREF( pLocal ) && !HB_IS_ENUM( pLocal ) )
+      {
+         hb_itemCopy( pTop, pLocal );
+         return;
+      }
+      /*
       #ifdef HB_UNSHARE_REFERENCES
         hb_itemUnShare( *( HB_VM_STACK.pBase + iLocal + 1 ) );
-      #endif
-      pTop->item.asRefer.BasePtr.itemsbasePtr = &HB_VM_STACK.pItems;
+      #endif*/
+      pTop->item.asRefer.BasePtr.itemsbasePtr = hb_stackItemBasePtr();
    }
    else
    {
@@ -9142,8 +9149,9 @@ static void hb_vmPushLocalByRef( SHORT iLocal )
       */
       pTop->item.asRefer.BasePtr.block = (hb_stackSelfItem())->item.asBlock.value;
    }
+   pTop->type = HB_IT_BYREF;
    pTop->item.asRefer.value = iLocal;
-   hb_stackPush();
+   pTop->item.asRefer.offset = hb_stackBaseOffset();
 }
 
 static void hb_vmPushStatic( USHORT uiStatic )
@@ -9503,12 +9511,11 @@ static void hb_vmPopLocal( SHORT iLocal )
 {
    HB_THREAD_STUB
 
-   PHB_ITEM pLocal;
-   PHB_ITEM pVal;
+   PHB_ITEM pLocal, pVal;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_vmPopLocal(%hd)", iLocal));
 
-   pVal = *( HB_VM_STACK.pPos - 1 );
+   pVal = hb_stackItemFromTop( -1 );
 
    /* Remove MEMOFLAG if exists (assignment from field). */
    pVal->type &= ~( HB_IT_MEMOFLAG | HB_IT_DEFAULT );
@@ -12822,7 +12829,7 @@ HB_EXPORT void hb_xvmLocalSetInt( int iLocal, int iVal )
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%hu, %d)", usLocal, iVal));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%d, %d)", iLocal, iVal));
 
    HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 
@@ -12842,7 +12849,7 @@ HB_EXPORT void hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
    HB_THREAD_STUB_STACK
    PHB_ITEM pLocal;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%hu,%p,%lu)", usLocal, pVal, ulLen));
+   HB_TRACE(HB_TR_DEBUG, ("hb_xvmLocalSetInt(%d,%p,%lu)", iLocal, pVal, ulLen));
 
    HB_STACK_OR_BLOCK_LOCAL( pLocal, iLocal );
 

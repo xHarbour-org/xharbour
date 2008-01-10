@@ -1,5 +1,5 @@
 /*
- * $Id: valtype.c,v 1.10 2004/07/19 21:11:17 guerra000 Exp $
+ * $Id: valtype.c,v 1.11 2007/04/17 01:17:42 toninhofwi Exp $
  */
 
 /*
@@ -69,6 +69,10 @@
  *    HB_ISPOINTER()
  *    HB_ISNULL()
  *
+ *  Copyright 2007-2008 Miguel Angel Marchuet <miguelangel@marchuet.net>
+ *    ISNULL()
+ *    SETNULL()
+ *
  * See doc/license.txt for licensing terms.
  *
  */
@@ -85,6 +89,20 @@ HB_FUNC( VALTYPE )
    hb_retc( hb_itemTypeStr( hb_param( 1, HB_IT_ANY ) ) );
 }
 
+HB_FUNC( ISNULL )
+{
+   hb_retl( ISNULL( 1 ) );
+}
+
+HB_FUNC( SETNULL )
+{
+   if( hb_pcount() )
+   {
+      PHB_ITEM pItem = hb_param( 1, HB_IT_ANY );
+      pItem->type |= HB_IT_NULL;
+   }
+}
+
 HB_FUNC( HB_ISBYREF )
 {
    PHB_ITEM pItem;
@@ -93,11 +111,11 @@ HB_FUNC( HB_ISBYREF )
    {
       pItem = hb_stackItemFromBase( 1 );
 
-      if( pItem->type & HB_IT_BYREF )
+      if( HB_IS_BYREF( pItem ) )
       {
          pItem = hb_itemUnRefOnce( pItem );
 
-         if( pItem->type & HB_IT_BYREF )
+         if( HB_IS_BYREF( pItem ) )
 
             hb_retl( TRUE );
 

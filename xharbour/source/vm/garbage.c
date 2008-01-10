@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.92 2007/04/10 18:21:13 ronpinkas Exp $
+ * $Id: garbage.c,v 1.93 2007/04/11 06:16:45 ronpinkas Exp $
  */
 
 /*
@@ -450,6 +450,11 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
    while( HB_IS_BYREF( pItem ) )
    {
+      if( HB_IS_EXTREF( pItem ) )
+      {
+         pItem->item.asExtRef.func->mark( pItem->item.asExtRef.value );
+         return;
+      }
       if( HB_IS_MEMVAR( pItem ) == FALSE && pItem->item.asRefer.offset == 0 )
       {
          HB_ITEM FakedItem;
