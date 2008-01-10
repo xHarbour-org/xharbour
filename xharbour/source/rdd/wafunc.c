@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.8 2007/12/18 23:58:12 likewolf Exp $
+ * $Id: wafunc.c,v 1.9 2008/01/10 11:18:02 marchuet Exp $
  */
 
 /*
@@ -119,7 +119,7 @@ HB_EXPORT void * hb_rddNewAreaNode( LPRDDNODE pRddNode, USHORT uiRddID )
       if( SELF_STRUCTSIZE( &Area, &uiSize ) != SUCCESS )
 	  {
          return NULL;
-	  }	   
+	  }
 	  assert( uiSize > 0 ); /* Size of WorkArea valid? */
 
       pRddNode->uiAreaSize = uiSize;  /* Update the size of WorkArea */
@@ -599,7 +599,7 @@ ERRCODE hb_rddOpenTable( const char * szFileName, const char * szDriver,
       hb_rddReleaseCurrentArea();
    }
    else
-      hb_rddSelectFirstAvailable();
+      hb_rddSelectWorkAreaNumber( 0 ); /* nedded instead of  hb_rddSelectFirstAvailable() for thread safe */
 
    /* Clipper clears NETERR flag before parameter validation, [druzus]
     */
