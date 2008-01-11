@@ -1,5 +1,5 @@
 /*
- * $Id: mysqlrdd.prg,v 1.2 2006/09/30 20:37:29 areainformatica Exp $
+ * $Id: mysqlrdd.prg,v 1.3 2006/12/11 12:29:44 marceloanelli Exp $
  */
 
 /*
@@ -99,7 +99,7 @@ FUNCTION DBMYSQLCONNECTION( cConnString )
 
    IF oServer:NetErr()
       alert( oServer:ErrorMsg() )
-      RETURN FAILURE
+      RETURN 0
    ELSE
       oServer:SelectDB( cDataBase )
       aadd( s_aConnections, oServer )
@@ -389,6 +389,7 @@ FUNCTION MYSQLRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aMyFunc[ UR_GOTOID       ] := ( @MYSQL_GOTOID()       )
    aMyFunc[ UR_GOTOP        ] := ( @MYSQL_GOTOP()        )
    aMyFunc[ UR_GOBOTTOM     ] := ( @MYSQL_GOBOTTOM()     )
+   aMyFunc[ UR_RECNO ]        := ( @MYSQL_RECID() )
    aMyFunc[ UR_RECCOUNT     ] := ( @MYSQL_RECCOUNT()     )
    aMyFunc[ UR_RECID        ] := ( @MYSQL_RECID()        )
    aMyFunc[ UR_BOF          ] := ( @MYSQL_BOF()          )

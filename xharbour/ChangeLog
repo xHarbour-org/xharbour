@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5866 2008/01/10 11:17:58 marchuet Exp $
+ * $Id: ChangeLog,v 1.5867 2008/01/10 12:28:54 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-10 22:03 UTC-4:40 Marcelo Anelli C. <marceloanelli@users.sourceforge.net>
+  * contrib\mysql\mysqlrdd.prg
+    ! fixed Rreturn FAILURE to Return 0, to avoid confusion from return succes-
+      fully from 1st connection
+    + added entry to bind to UR_RECNO, in this specific case == UR_RECID
 
 2008-01-10 13:25 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source\rdd\wafunc.c
