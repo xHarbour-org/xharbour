@@ -1,5 +1,5 @@
 /*
- * $Id: set.c,v 1.81 2007/09/22 10:57:37 andijahja Exp $
+ * $Id: set.c,v 1.82 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -1576,6 +1576,28 @@ HB_FUNC( SET )
          }
          break;
 
+      case HB_SET_MACROBLOCKVARS:
+         if( pArg3 && HB_IS_BLOCK( pArg3 ) )
+         {
+            if( !pArg3->item.asBlock.value->bDynamic )
+            {
+               hb_errRT_BASE( EG_ARG, 2020, NULL, "SET", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+               break;
+            }
+
+            hb_retl( pArg3->item.asBlock.value->bPrivVars );
+            pArg3->item.asBlock.value->bPrivVars = set_logical( pArg2, pArg3->item.asBlock.value->bPrivVars );
+         }
+         else
+         {
+            hb_retl( hb_set.HB_SET_MACROBLOCKVARS );
+            if( args > 1 )
+            {
+               hb_set.HB_SET_MACROBLOCKVARS = set_logical( pArg2, hb_set.HB_SET_MACROBLOCKVARS );
+            }
+         }
+         break;
+
       default:
          /* Return NIL if called with invalid SET specifier */
          break;
@@ -1709,6 +1731,8 @@ void hb_setInitialize( void )
    hb_set.HB_SET_TIMEFORMAT = ( char * ) hb_xgrab( 12 );
 
    memcpy( hb_set.HB_SET_TIMEFORMAT, "hh:mm:ss.cc", 12 );
+
+   hb_set.HB_SET_MACROBLOCKVARS = FALSE;
 
    sp_sl_first = sp_sl_last = NULL;
    s_next_listener = 1;
