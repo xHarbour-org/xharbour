@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.5 2007/12/18 23:58:12 likewolf Exp $
+ * $Id: wacore.c,v 1.6 2007/12/19 00:16:39 likewolf Exp $
  */
 
 /*
@@ -91,10 +91,10 @@ static BOOL   s_fNetError = FALSE;     /* Error on Networked environments */
       #define LOCK_AREA_INIT     if ( !s_fMtLockInit ) { HB_CRITICAL_INIT( s_mtxWorkArea ); s_fMtLockInit = TRUE; } 	 
       #define LOCK_AREA_DESTROY  if ( s_fMtLockInit ) { HB_CRITICAL_DESTROY( s_mtxWorkArea ); s_fMtLockInit = FALSE; } 	 
    #else 	 
-      #define LOCK_AREA HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
-      #define UNLOCK_AREA HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
-      #define LOCK_AREA_INIT 	 
-      #define LOCK_AREA_DESTROY 	 
+      #define LOCK_AREA          HB_CRITICAL_LOCK( s_mtxWorkArea ); 	 
+      #define UNLOCK_AREA        HB_CRITICAL_UNLOCK( s_mtxWorkArea ); 	 
+      #define LOCK_AREA_INIT 	 HB_CRITICAL_INIT( s_mtxWorkArea );
+      #define LOCK_AREA_DESTROY  HB_CRITICAL_DESTROY( s_mtxWorkArea);
    #endif
 #endif
 
