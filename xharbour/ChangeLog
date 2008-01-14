@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5873 2008/01/14 18:28:01 likewolf Exp $
+ * $Id: ChangeLog,v 1.5874 2008/01/14 23:28:48 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-15 02:36 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/vm/hvm.c
+    % Use hb_stackAllocItem() whenever possible.
+  * source/vm/thread.c
+    ! Fixed stack initialization in MT mode after last Miguel's changes.
 
 2008-01-14 21:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

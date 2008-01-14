@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.205 2007/04/17 20:46:36 ronpinkas Exp $
+* $Id: thread.c,v 1.206 2007/12/19 00:16:39 likewolf Exp $
 */
 
 /*
@@ -359,8 +359,8 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    for( i = 0; i < tc->wItems; i++ )
    {
       tc->pItems[ i ] = (HB_ITEM *) hb_xgrab( sizeof( HB_ITEM ) );
+      tc->pItems[ i ]->type = HB_IT_NIL;
    }
-   ( * (tc->pPos) )->type = HB_IT_NIL;
 
    /* Initialization of "foreach" and "with object" */
    for ( uCount = 0; uCount < HB_MAX_WITH_OBJECTS; uCount++  )
