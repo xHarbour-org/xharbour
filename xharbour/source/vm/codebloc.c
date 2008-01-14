@@ -1,5 +1,5 @@
 /*
- * $Id: codebloc.c,v 1.55 2007/04/22 22:50:39 ronpinkas Exp $
+ * $Id: codebloc.c,v 1.56 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -92,8 +92,6 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
 
-   pCBlock->symbol = NULL;
-
    /* Store the number of referenced local variables
     */
    pCBlock->uiLocals = uiLocals;
@@ -178,6 +176,8 @@ HB_CODEBLOCK_PTR hb_codeblockNew( const BYTE * pBuffer,
 
    pCBlock->symbol  = pSymbol;
    pCBlock->ulCounter = 1;
+   pCBlock->bPrivVars = FALSE;
+   pCBlock->bDynamic = FALSE;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 
@@ -191,8 +191,6 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
    HB_TRACE(HB_TR_DEBUG, ("hb_codeblockMacroNew(%p, %i)", pBuffer, usLen));
 
    pCBlock = ( HB_CODEBLOCK_PTR ) hb_gcAlloc( sizeof( HB_CODEBLOCK ), hb_codeblockDeleteGarbage );
-
-   pCBlock->symbol = NULL;
 
    /* Store the number of referenced local variables
     */
@@ -209,6 +207,8 @@ HB_EXPORT HB_CODEBLOCK_PTR hb_codeblockMacroNew( BYTE * pBuffer, USHORT usLen )
 
    pCBlock->symbol  = NULL; /* macro-compiled codeblock cannot acces a local symbol table */
    pCBlock->ulCounter = 1;
+   pCBlock->bPrivVars = FALSE;
+   pCBlock->bDynamic = TRUE;
 
    HB_TRACE(HB_TR_INFO, ("codeblock created (%li) %lx", pCBlock->ulCounter, pCBlock));
 

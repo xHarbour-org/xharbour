@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.647 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hvm.c,v 1.648 2008/01/10 11:27:17 marchuet Exp $
  */
 
 /*
@@ -7442,7 +7442,7 @@ static HARBOUR hb_vmDoBlock( void )
 
    PHB_ITEM pBaseSym = (*HB_VM_STACK.pBase);
    PHB_ITEM pBlock;
-   PSYMBOLS pModuleSymbols;
+   PSYMBOLS pModuleSymbols = NULL;
    int iParam;
    LONG lStatics;
    USHORT uiLine;
@@ -7485,7 +7485,10 @@ static HARBOUR hb_vmDoBlock( void )
    // Change Statics context to that of the module where the Block was defined.
    HB_VM_STACK.lStatics = pBlock->item.asBlock.statics;
 
-   pModuleSymbols = HB_SYM_GETMODULESYM( pBaseSym->item.asSymbol.value );
+   if( !pBlock->item.asBlock.value->bPrivVars )
+   {
+      pModuleSymbols = HB_SYM_GETMODULESYM( pBaseSym->item.asSymbol.value );
+   }
    //TraceLog( NULL, "Set Module: %s for Block: %s(%i)\n", pModuleSymbols ? pModuleSymbols->szModuleName : "", pBlock->item.asBlock.value->symbol->szName, pBlock->item.asBlock.value->lineno );
 
    hb_vmExecute( pBlock->item.asBlock.value->pCode, pModuleSymbols ? pModuleSymbols->pSymbolTable : NULL );
@@ -9013,6 +9016,8 @@ static void hb_vmPushMacroBlock( BYTE * pCode )
     */
    pTop->item.asBlock.value->symbol = ( *HB_VM_STACK.pBase )->item.asSymbol.value;
    pTop->item.asBlock.value->lineno = ( *HB_VM_STACK.pBase )->item.asSymbol.lineno;
+
+   pTop->item.asBlock.value->bPrivVars = hb_set.HB_SET_MACROBLOCKVARS;
 
    pTop->item.asBlock.value->uiClass = 0;
    //TraceLog( NULL, "PROC Block: '%s' Line: %i\n", ( *HB_VM_STACK.pBase )->item.asSymbol.value->szName, ( *HB_VM_STACK.pBase )->item.asSymbol.lineno );

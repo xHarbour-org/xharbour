@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.23 2007/09/23 13:05:30 paultucker Exp $
+ * $Id: std.ch,v 1.24 2007/12/18 23:58:12 likewolf Exp $
  */
 
 /*
@@ -689,8 +689,8 @@
    #command SET DIRCASE <(x)>             => Set( _SET_DIRCASE, <(x)> )
    #command SET DIRCASE (<x>)             => Set( _SET_DIRCASE, <x> )
    #command SET DIRSEPARATOR <x>          => Set( _SET_DIRSEPARATOR, <x> )
-   #command SET OUTPUT SAFETY ON          => Set( _SET_OUTPUTSAFETY, .T. )
-   #command SET OUTPUT SAFETY OFF         => Set( _SET_OUTPUTSAFETY, .F. )
+   #command SET OUTPUT SAFETY <x:ON,OFF,&> => Set( _SET_OUTPUTSAFETY, <(x)> )
+   #command SET OUTPUT SAFETY (<x>)       => Set( _SET_OUTPUTSAFETY, <x> )
    #command SET DBFLOCKSCHEME TO <x>      => Set( _SET_DBFLOCKSCHEME, <x> )
    #command SET DBFLOCKSCHEME TO          => Set( _SET_DBFLOCKSCHEME, 0 )
    #command SET HARDCOMMIT <x:ON,OFF,&>   => Set( _SET_HARDCOMMIT, <(x)> )
@@ -702,6 +702,11 @@
    #command SET BACKGROUNDTICK <x>        => Set( _SET_BACKGROUNDTICK, <x> )
    #command SET ERRORLOG TO [<filename>] [<additive: ADDITIVE>] => Set( _SET_ERRORLOG, <(filename)>, <.additive.> )
    #command SET TIME FORMAT [TO] <f>      => Set( _SET_TIMEFORMAT, <f> )
+   #command SET MACRO BLOCK VARS <x:ON,OFF,&> => Set( _SET_MACROBLOCKVARS, <(x)> )
+   #command SET MACRO BLOCK VARS XHARBOUR => Set( _SET_MACROBLOCKVARS, .T. )
+   #command SET MACRO BLOCK VARS CLIPPER  => Set( _SET_MACROBLOCKVARS, .F. )
+   #command SET MACRO BLOCK VARS (<x>)    => Set( _SET_MACROBLOCKVARS, <x> )
+
 #endif
 
 #endif /* HB_STD_CH_ */

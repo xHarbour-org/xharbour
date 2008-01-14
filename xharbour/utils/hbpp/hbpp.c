@@ -1,5 +1,5 @@
 /*
- * $Id: hbpp.c,v 1.16 2007/05/15 21:34:15 ronpinkas Exp $
+ * $Id: hbpp.c,v 1.17 2007/12/21 16:09:07 likewolf Exp $
  */
 
 /*
@@ -689,3 +689,6 @@ PINLINE   hb_compInlineAdd( char * szFunName )
    HB_SYMBOL_UNUSED( szFunName );
    return NULL;
 }
+
+/* Needed for trace */
+BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree ) { if( pfFree ) * pfFree = FALSE; return szFileName; }

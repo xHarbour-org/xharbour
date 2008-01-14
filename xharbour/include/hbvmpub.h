@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.67 2007/12/21 12:12:22 likewolf Exp $
+ * $Id: hbvmpub.h,v 1.68 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -353,6 +353,8 @@
       BOOL       dynBuffer;      /* is pcode buffer allocated dynamically */
       USHORT     uLen;
       USHORT     uiClass;
+      BOOL       bPrivVars;      /* Share PRIVATE vars with caller */
+      BOOL       bDynamic;       /* the block is macro-compiled */
    } HB_CODEBLOCK, * PHB_CODEBLOCK, * HB_CODEBLOCK_PTR;
 
 

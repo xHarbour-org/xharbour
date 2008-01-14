@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5868 2008/01/11 02:44:03 marceloanelli Exp $
+ * $Id: ChangeLog,v 1.5869 2008/01/14 11:08:29 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,37 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-14 10:40 UTC-0200 Walter Negro <anegro/at/overnet.com.ar >
+  * utils/hbpp/hbpp.c
+    + Add hb_fsNameConv function to compile with trace.
+
+2008-01-14 10:40 UTC-0200 Walter Negro <anegro/at/overnet.com.ar >
+  * include/hbset.h
+  * include/hbvmpub.h
+  * include/set.ch
+  * include/std.ch
+  * source/vm/codebloc.c
+  * source/vm/hvm.c
+  * tests/macrovars.prg
+    + Implementation of SET MACRO BLOCK VARS [ON|OFF|XHARBOUR|CLIPPER] and
+      Set( _SET_MACROBLOCKVARS, [<lNewSet>], [<bBlock>] ).
+      The set ON is equal to XHARBOUR, and OFF is equal to CLIPPER.
+      By default is OFF.
+
+      This SET permit use the next code without error
+      //------------------------------------//
+      PROCEDURE Main()
+           LOCAL b
+           SET MACRO BLOCK XHARBOUR
+
+           b := &("{|| M->NewPrivate := 1 }")
+
+           Eval( b )
+           ? M->NewPrivate
+      RETURN
+      //------------------------------------//
+
 
 2007-01-14 14:07 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/common/hbfopen.c
