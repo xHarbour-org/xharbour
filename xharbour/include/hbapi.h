@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.229 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hbapi.h,v 1.230 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -139,7 +139,7 @@ HB_EXTERN_BEGIN
 #define HB_IS_ENUM( p )       ( HB_ITEM_TYPE( p ) == ( HB_IT_ENUM | HB_IT_BYREF ) )
 #define HB_IS_EXTREF( p )     ( HB_ITEM_TYPE( p ) == ( HB_IT_EXTREF | HB_IT_BYREF ) )
 #define HB_IS_STRING( p )     ( ( HB_ITEM_TYPE( p ) & ~HB_IT_MEMOFLAG ) == HB_IT_STRING )
-#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & ~HB_IT_MEMVAR ) == HB_IT_BYREF )
+#define HB_IS_BYREF( p )      ( ( HB_ITEM_TYPE( p ) & ~(HB_IT_MEMVAR | HB_IT_EXTREF) ) == HB_IT_BYREF )
 #define HB_IS_NUMBER( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMERIC ) != 0 )
 #define HB_IS_NUMERIC( p )    ( HB_IS_NUMBER( p ) || HB_IS_DATE(p) || ( HB_IS_STRING(p) && (p)->item.asString.length == 1 ) )
 #define HB_IS_NUMINT( p )     ( ( HB_ITEM_TYPE( p ) & HB_IT_NUMINT ) != 0 )
