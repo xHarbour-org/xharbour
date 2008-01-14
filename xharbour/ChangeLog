@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5869 2008/01/14 11:08:29 likewolf Exp $
+ * $Id: ChangeLog,v 1.5870 2008/01/14 12:44:28 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-14 10:50 UTC-0200 Walter Negro <anegro/at/overnet.com.ar >
+  * source/rtl/set.c
+    ! Implementation of SET MACRO BLOCK VARS [ON|OFF|XHARBOUR|CLIPPER] and
+      Set( _SET_MACROBLOCKVARS, [<lNewSet>], [<bBlock>] ).
 
 2008-01-14 10:40 UTC-0200 Walter Negro <anegro/at/overnet.com.ar >
   * utils/hbpp/hbpp.c
