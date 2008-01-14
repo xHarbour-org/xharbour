@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.35 2007/02/27 00:01:30 modalsist Exp $
+ * $Id: achoice.prg,v 1.36 2007/06/22 04:07:14 peterrees Exp $
  */
 
 /*
@@ -248,7 +248,7 @@ LOCAL nPage := ::nSize + 1
    nUserMode := AC_NOITEM     // Something different to AC_IDLE
 
    // Main loop
-   DO WHILE nMode > AC_SELECT
+   DO WHILE nMode > AC_SELECT   
 
       // Refresh?
       IF nMode == AC_REDRAW
@@ -262,10 +262,17 @@ LOCAL nPage := ::nSize + 1
          nUserMode := AC_NOITEM
          nMode := AC_ABORT
       ELSEIF NextKey() != 0
-         // There are pending keys
-         nKey := INKEY()
-         nUserMode := AC_EXCEPT
-         nMode := AC_GOTO
+/* 2008/JAN/14 - E.F. - Clipper's achoice avoid pending keys.
+*        // There are pending keys
+*        nKey := INKEY()
+*        nUserMode := AC_EXCEPT
+*        nMode := AC_GOTO
+*/
+         While Nextkey() != 0
+           Inkey()
+           keyboard 0
+         Enddo
+
       ELSEIF nUserMode == AC_IDLE
          // AC_IDLE state was processed by user's function. Wait for a key
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
@@ -281,14 +288,18 @@ LOCAL nPage := ::nSize + 1
 
       IF ( bAction := SetKey( nKey ) ) != NIL
          Eval( bAction, ::cProcName, ::nProcLine, "" )
+
          // Key was processed
          nUserMode := AC_NO_USER_FUNCTION
+          
          nMode := AC_GOTO
          nKey := 0
+
          IF ! ::ValidateArray()
             nUserMode := AC_NOITEM
             nMode := AC_ABORT
          ENDIF
+
       ENDIF
 
       SWITCH nKey
@@ -425,8 +436,8 @@ LOCAL nPage := ::nSize + 1
             nMode := Do( ::uUserFunc, nUserMode, ::nOption, ::nOption - ::nFirstRow )
          Endif
 
-         // 2007/FEB/12 - E.F. To avoid nMode = NIL returned by UDF.
-         DEFAULT nMode TO 0
+         /* 2007/FEB/12 - E.F. Abort when UDF returns NIL. Clipper compliance. */
+         DEFAULT nMode TO 0   // AC_ABORT
 
          IF nMode < 0 .OR. nMode > AC_MAXVALUE
             nMode := AC_CONT

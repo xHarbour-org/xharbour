@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.186 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.187 2008/01/02 00:30:57 modalsist Exp $
  */
 
 /*
@@ -187,6 +187,7 @@ CLASS TDataCache
                    // FSG - 14/06/2006 - Removed READONLY attribute to permit direct access for forced repositioning
    DATA  nCurRow   //READONLY            // Current Row inside cache
    DATA  nLastRow  //READONLY            // Last Row inside cache which has data ( it can be < Len( ::aCache ) )
+   DATA  nMaxRow
 
    METHOD   New( oBrowse )             // Which tbrowse this cache is bound to
 
@@ -248,8 +249,9 @@ METHOD New( oBrowse ) CLASS TDataCache
    ::oCachedBrowse := oBrowse
 
    ::nCurRow  := 1
-   //::nLastRow := 1
-   ::nLastRow := nRows
+   ::nLastRow := nRows 
+   ::nMaxRow  := nRows
+
    ::aRect    := {}
    ::lInvalid := .F.
 
@@ -317,7 +319,6 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
                // I'm at top or bottom of TBrowse so I can scroll
                //
-
                if ::nCurRow == Len( ::aCache )
                   ADel( ::aCache, 1 )
                else
@@ -325,7 +326,6 @@ METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
                   if ::nLastRow < Len( ::aCache )
                      ::nLastRow += 1
                   endif
-
                endif
 
             endif
@@ -437,7 +437,7 @@ METHOD FillRow( nRow ) CLASS TDataCache
 
       end
 
-      if CacheOK(::aCache,nRow,nCol)
+      if CacheOK(::aCache,nRow,nCol) 
          ::aCache[ nRow ][ nCol ] := oCell
       endif
 
@@ -460,17 +460,16 @@ METHOD GetCell( nRow, nCol ) CLASS TDataCache
 
    local nSkipped
 
-   IF empty(nRow).or.empty(nCol)
+   IF empty(nRow) .or. empty(nCol)
       return(nil)
    elseif Empty( ::aCache[ nRow ] )
 
       // No more rows contain data
-      if nRow > ::nLastRow
+      if nRow > Max( ::nLastRow, ::nMaxRow )
          return NIL
-
       elseif ( nSkipped := ::dbSkip( nRow - ::nCurRow ) ) <> 0 .OR. nRow - ::nCurRow == 0
          // dbSkip( 0 ) already refills current row
-         if nSkipped <> 0
+         if nSkipped <> 0 
             ::FillRow( nRow )
          endif
 
@@ -538,6 +537,11 @@ METHOD InitCache() CLASS TDataCache
          ::aCache[ ::nCurRow ] := NIL
       endif
 
+   endif
+
+   if HB_IsBlock( ::oCachedBrowse:Skipblock )
+      ::nMaxRow := Eval( ::oCachedBrowse:SkipBlock, Len(::aCache) )
+      Eval( ::oCachedBrowse:SkipBlock, -::nMaxRow  )
    endif
 
    if ::oCachedBrowse:DataSource == 1  // array datasource.
@@ -2406,6 +2410,7 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    LOCAL colorSpec
    LOCAL nRowToDraw
    LOCAL cCurColor
+   Local lDispBegin := .f.
 
    if ::nColumns == 0
       // Return TRUE to avoid infinite loop ( do while !stabilize;end )
@@ -2443,7 +2448,10 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    // I need to set columns width If TBrowse was never displayed before
    //
    if ::lNeverDisplayed
-
+      if ! lDispBegin
+         DispBegin()
+         lDispBegin := .t.
+      endif
       // NOTE: It must be before call to ::SetFrozenCols() since this call
       //       tests this iVar value, and I set it to .F. since I'm going to display TBrowse
       //       for first time
@@ -2463,14 +2471,16 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       ::CheckRowPos()
    endif
 
-
    ColorSpec  := ::aColorSpec[ 1 ]
    nOldCursor := SetCursor( SC_NONE )
 
    if ::lRedrawFrame
       // Draw border
       //
-      DispBegin()
+      if ! lDispBegin
+         DispBegin()
+         lDispBegin := .t.
+      endif
       if Len( ::cBorder ) == 8
          //@::nTop,::nLeft,::nBottom,::nRight BOX ::cBorder COLOR ::colorSpec
          DispBox(::nTop,::nLeft,::nBottom,::nRight,::cBorder,::colorSpec)
@@ -2491,7 +2501,6 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
       // displayed columns change
       //
       ::lRedrawFrame := .F.
-      DispEnd()
    endif
 
    /* From this point there is stabilization of rows which is made up of three phases
@@ -2501,25 +2510,25 @@ METHOD PerformStabilization( lForceStable ) CLASS TBrowse
    */
    if ! ::stable
 
+      if ! lDispBegin 
+         DispBegin()
+      endif
       // NOTE: I can enter here because of a movement key or a ::RefreshAll():ForceStable() call
 
       // Every time I enter stabilization loop I need to draw _at least_ one row.
 
       ::CheckRowsToBeRedrawn()
 
-/* 2007/DEC/25 - E.F. Moved DispBegin() to top */
-//      DispBegin()
-
       while ( nRowToDraw := iif( ::lPaintBottomUp, RAScan( ::aRedraw, .T. ), AScan( ::aRedraw, .T. ) ) ) <> 0
      
          ::DrawARow( nRowToDraw )
          
          if ! lForceStable
-            DispEnd()
             if ::lPaintBottomUp .and. nRowToDraw != ::nRowPos
                ::DrawARow( ::nRowPos )
             endif
             SetCursor( nOldCursor )
+            DispEnd()
             return .F.
          endif
 
