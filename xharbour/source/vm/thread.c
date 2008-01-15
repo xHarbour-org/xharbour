@@ -1,5 +1,5 @@
 /*
-* $Id: thread.c,v 1.206 2007/12/19 00:16:39 likewolf Exp $
+* $Id: thread.c,v 1.207 2008/01/14 23:39:04 likewolf Exp $
 */
 
 /*
@@ -321,6 +321,7 @@ void hb_threadSetupStack( HB_STACK *tc, HB_THREAD_T th )
    tc->pBase  = tc->pItems;
    tc->pPos   = tc->pItems;     /* points to the first stack item */
    tc->wItems = STACK_THREADHB_ITEMS;
+   tc->pEnd   = tc->pItems + tc->wItems;
    tc->pMethod = NULL;
    tc->pSyncId = NULL;
    tc->Return.type = HB_IT_NIL;
