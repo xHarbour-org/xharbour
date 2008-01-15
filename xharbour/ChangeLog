@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5878 2008/01/15 10:13:43 marchuet Exp $
+ * $Id: ChangeLog,v 1.5879 2008/01/15 10:50:25 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-15 17:16 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/usrrdd/usrrdd.c
+    * added missing 'const' to few variable declarations
+  synced with harbour as possible.
 
 2008-01-15 08:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/vm/harbinit.prg
@@ -16,14 +21,14 @@
   * source/rdd/dbcmd.c
     * changed hb_retnl() in LASTREC() to hb_retnint() to increase maximum
       record number to 2^32 - unsigned 32bit integer instead of signed one.
-  synced with harbour as posible.
+  synced with harbour as possible.
 
   * source/rdd/dbf1.c
     ! fixed possible memory leak/GPF when sx_DBFencrypt() is called when
       table already has password set
     * added support for password passing in sx_DBFdecrypt() - it's accepted
       only when table has no password
-  synced with harbour as posible.
+  synced with harbour as possible.
 
   * source/rdd/hbsix/sxcompat.prg
     - removed SX_SETPASS()
@@ -32,7 +37,7 @@
       some undocumented SIX3 actions
     ! fixed problem with setting password for currently open table
       with SX_SETPASS( <cPass> )
-  synced with harbour as posible.
+  synced with harbour as possible.
 
   * source/rdd/usrrdd/rdds/adordd.prg
     + added the next functions working to relations with other areas with diferents rdd:
