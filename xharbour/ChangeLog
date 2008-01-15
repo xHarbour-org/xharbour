@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5876 2008/01/15 01:00:29 likewolf Exp $
+ * $Id: ChangeLog,v 1.5877 2008/01/15 09:32:58 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-15 10:48 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+  * source/rdd/dbcmd.c
+    * changed hb_retnl() in LASTREC() to hb_retnint() to increase maximum
+      record number to 2^32 - unsigned 32bit integer instead of signed one.
+  synced with harbour as posible.
+
+  * source/rdd/dbf1.c
+    ! fixed possible memory leak/GPF when sx_DBFencrypt() is called when
+      table already has password set
+    * added support for password passing in sx_DBFdecrypt() - it's accepted
+      only when table has no password
+  synced with harbour as posible.
+
+  * source/rdd/hbsix/sxcompat.prg
+    - removed SX_SETPASS()
+  * source/rdd/hbsix/sxtable.c
+    + added new SX_SETPASS() implementation which supports
+      some undocumented SIX3 actions
+    ! fixed problem with setting password for currently open table
+      with SX_SETPASS( <cPass> )
+  synced with harbour as posible.
+
+  * source/rdd/usrrdd/rdds/adordd.prg
+    + added the next functions working to relations with other areas with diferents rdd:
+      ADO_FORCEREL( nWA )
+      ADO_RELEVAL( nWA, aRelInfo )
+      ADO_EVALBLOCK() 
+      ADO_SEEK() 
 
 2008-01-15 07:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg

@@ -1,5 +1,5 @@
 /*
- * $Id: sxcrypt.c,v 1.3 2005/10/24 01:04:34 druzus Exp $
+ * $Id: sxcrypt.c,v 1.4 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -183,8 +183,6 @@ HB_FUNC( SX_ENCRYPT )
          hb_itemReturn( hb_param( 1, HB_IT_ANY ) );
       }
    }
-   else
-      hb_ret();
 }
 
 HB_FUNC( SX_DECRYPT )
@@ -206,6 +204,4 @@ HB_FUNC( SX_DECRYPT )
          hb_itemReturn( hb_param( 1, HB_IT_ANY ) );
       }
    }
-   else
-      hb_ret();
 }

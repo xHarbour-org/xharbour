@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompat.prg,v 1.1 2007/10/31 08:30:32 marchuet Exp $
+ * $Id: sxcompat.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -35,7 +35,6 @@
  *          Sx_LockRetry()
  *          Sx_IsLocked()
  *          Sx_SetTrigger()
- *          Sx_SetPass()
  *          Sx_VFGet()
  *
  * Copyright 2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
@@ -86,7 +85,6 @@
 #include "dbinfo.ch"
 #include "ord.ch"
 #include "hbsxdef.ch"
-#define HB_SYMBOL_UNUSED( symbol )  symbol = symbol
 
 function sxChar( nLen, xKeyVal )
 
@@ -552,13 +550,3 @@ function Sx_SetTrigger( nAction, cTriggerName, cRDD /* Harbour extensions */ )
    endif
 
 return cPrevTrigger
-
-function Sx_SetPass( cPass, nMode, cRdd /* Harbour extensions */ )
-
-   HB_SYMBOL_UNUSED( nMode )
-
-   if valtype( cPass ) == "C"
-      rddInfo( RDDI_PENDINGPASSWORD, cPass, cRdd )
-   endif
-
-return nil

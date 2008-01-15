@@ -1,5 +1,5 @@
 /*
- * $Id: nulsys.c,v 1.5 2007/05/04 11:29:02 marchuet Exp $
+ * $Id: nulsys.c,v 1.6 2007/10/24 13:36:47 lculik Exp $
  */
 
 /*
@@ -174,6 +174,10 @@ HB_FUNC( DBRELATION ) { hb_retc( NULL ); }
 
 HB_FUNC( DBRSELECT ) { hb_retni( 0 ); }
 
+HB_FUNC( DBFILTER ) { hb_retc( NULL ); }
+
+HB_FUNC( DBEVAL ) {}
+
 HB_FUNC( SELECT ) { hb_retni( 0 ); }
 
 HB_FUNC( ALIAS ) { hb_retc( NULL ); }
@@ -214,4 +218,3 @@ HB_FUNC( ORDNAME ) { hb_retc( NULL ); }
 HB_FUNC( ORDKEY ) { hb_retc( NULL ); }
 
 HB_FUNC( ORDFOR ) { hb_retc( NULL ); }
-HB_FUNC( DBFILTER ) { hb_retc( NULL ); }

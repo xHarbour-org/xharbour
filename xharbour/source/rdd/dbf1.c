@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.181 2007/11/20 08:53:28 marchuet Exp $
+ * $Id: dbf1.c,v 1.182 2008/01/10 11:18:02 marchuet Exp $
  */
 
 /*
@@ -675,8 +675,6 @@ static void hb_dbfTableCrypt( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fEncrypt )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dbfTableCrypt(%p,%p,%d)", pArea, pPasswd, fEncrypt));
 
-   printf("\r\nhb_dbfTableCrypt(%d)\r\n", fEncrypt);fflush(stdout);
-
    if( !pArea->fReadonly && !pArea->fShared &&
        fEncrypt ? !pArea->fTableEncrypted && !pArea->fHasMemo :
                    pArea->fTableEncrypted )
@@ -689,8 +687,17 @@ static void hb_dbfTableCrypt( DBFAREAP pArea, PHB_ITEM pPasswd, BOOL fEncrypt )
          BYTE * pOldCryptKey, * pNewCryptKey;
 
          pOldCryptKey = pArea->pCryptKey;
+         pArea->pCryptKey = NULL;
          hb_dbfPasswordSet( pArea, pPasswd, FALSE );
          pNewCryptKey = pArea->pCryptKey;
+         if( !fEncrypt && pNewCryptKey )
+         {
+            if( pOldCryptKey )
+               hb_xfree( pNewCryptKey );
+            else
+               pOldCryptKey = pNewCryptKey;
+            pNewCryptKey = NULL;
+         }
          for( ulRecNo = 1; ulRecNo <= ulRecords; ++ulRecNo )
          {
             pArea->pCryptKey = pOldCryptKey;
@@ -3848,7 +3855,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
       uiFields = ( pArea->uiHeaderLen - sizeof( DBFHEADER ) ) / sizeof( DBFFIELD );
       uiSize = uiFields * sizeof( DBFFIELD );
       pBuffer = uiFields ? ( BYTE * ) hb_xgrab( uiSize ) : NULL;
-      
+
       /* Read fields and exit if error */
       do
       {

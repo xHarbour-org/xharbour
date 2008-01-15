@@ -1,5 +1,5 @@
 /*
- * $Id: sxcompr.c,v 1.8 2007/05/04 11:29:02 marchuet Exp $
+ * $Id: sxcompr.c,v 1.9 2007/07/05 11:09:09 marchuet Exp $
  */
 
 /*
@@ -736,7 +736,7 @@ HB_FUNC( _SX_STRDECOMPRESS )
             {
                PHB_ITEM pItem = hb_errRT_SubstParams( "SIXCOMPRESS", EG_MEM, 0, "possible compressed string corruption", "_SX_STRDECOMPRESS" );
                if( pItem )
-                  hb_itemRelease( hb_itemReturn( pItem ) );
+                  hb_itemReturnRelease( pItem );
                return;
             }
          }

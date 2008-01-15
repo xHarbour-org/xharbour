@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.212 2007/12/26 14:53:39 modalsist Exp $
+# $Id: makefile.bc,v 1.213 2007/12/29 16:34:27 modalsist Exp $
 #
 
 #
@@ -744,7 +744,7 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\expropt1.obj \
    $(OBJ_DIR)\expropt2.obj \
    $(OBJ_DIR)\reserved.obj \
-   $(OBJ_DIR)\hbdate.obj \
+   $(OBJ_DIR)\hbdate.obj 
 
 #
 # VM.LIB rules
