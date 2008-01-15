@@ -1,5 +1,5 @@
 /*
- * $Id: harbinit.prg,v 1.7 2005/04/26 17:30:36 ronpinkas Exp $
+ * $Id: harbinit.prg,v 1.8 2007/03/16 03:37:16 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,11 @@ RETURN
 
 PROCEDURE __SetHelpK()
 
-   SET KEY K_F1 TO __XHELP
+   /* 2008/JAN/15 - E.F. - Set key K_F1 ON only if user help() exists.
+                           Clipper compliance */
+   if _ExistHelp()
+      SET KEY K_F1 TO __XHELP
+   endif
 
 RETURN
 
@@ -124,3 +128,19 @@ PROCEDURE __MinimalErrorHandler( oError )
    QUIT
 
 RETURN
+
+#pragma BEGINDUMP
+#include "hbapi.h"
+
+HB_FUNC_STATIC( _EXISTHELP )
+{
+   PHB_DYNS pDynSym = hb_dynsymFind( "HELP" );
+   BOOL     bResult = FALSE;
+
+   if( pDynSym )
+   {
+     bResult = TRUE;
+   }
+   hb_retl( bResult );
+}
+#pragma ENDDUMP
