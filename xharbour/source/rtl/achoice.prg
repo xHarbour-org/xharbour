@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.36 2007/06/22 04:07:14 peterrees Exp $
+ * $Id: achoice.prg,v 1.37 2008/01/14 23:28:48 modalsist Exp $
  */
 
 /*
@@ -262,17 +262,10 @@ LOCAL nPage := ::nSize + 1
          nUserMode := AC_NOITEM
          nMode := AC_ABORT
       ELSEIF NextKey() != 0
-/* 2008/JAN/14 - E.F. - Clipper's achoice avoid pending keys.
-*        // There are pending keys
-*        nKey := INKEY()
-*        nUserMode := AC_EXCEPT
-*        nMode := AC_GOTO
-*/
-         While Nextkey() != 0
-           Inkey()
-           keyboard 0
-         Enddo
-
+         // There are pending keys
+         nKey := INKEY()
+         nUserMode := AC_EXCEPT
+         nMode := AC_GOTO
       ELSEIF nUserMode == AC_IDLE
          // AC_IDLE state was processed by user's function. Wait for a key
          ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .T. )
@@ -445,6 +438,15 @@ LOCAL nPage := ::nSize + 1
          IF ! ::ValidateArray()
             nMode := AC_ABORT
          ENDIF
+
+         /* 2008/JAN/15 - E.F. - Clipper's achoice avoid pending keys
+          *                      from udf.
+          */
+         While Nextkey() != 0
+           Inkey()
+           keyboard 0
+         Enddo
+
       ENDIF
 
 
