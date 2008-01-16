@@ -1,5 +1,5 @@
 /*
- * $Id: wacore.c,v 1.6 2007/12/19 00:16:39 likewolf Exp $
+ * $Id: wacore.c,v 1.7 2008/01/14 18:28:01 likewolf Exp $
  */
 
 /*
@@ -245,12 +245,16 @@ HB_EXPORT void hb_rddReleaseCurrentArea( void )
    if( !pArea )
       return;
 
+   LOCK_AREA
+
    if( SELF_CLOSE( pArea ) == FAILURE )
+   {
+      UNLOCK_AREA
+
       return;
+   }
 
    SELF_RELEASE( pArea );
-
-   LOCK_AREA
 
    uiWaPos = s_WaNums[ s_uiCurrArea ];
    s_WaNums[ s_uiCurrArea ] = 0;

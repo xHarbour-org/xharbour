@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.49 2007/09/25 07:33:00 marchuet Exp $
+ * $Id: dynsym.c,v 1.50 2007/10/31 08:35:12 marchuet Exp $
  */
 
 /*
@@ -422,9 +422,11 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
 
          if( iCmp == 0 )
          {
+            PHB_DYNS pDynSym = s_pDynItems[ uiMiddle ].pDynSym;
+
             s_uiClosestDynSym = uiMiddle;
             hb_dynsymUnlock();
-            return s_pDynItems[ uiMiddle ].pDynSym;
+            return pDynSym;
          }
          else if( iCmp < 0 )
          {
@@ -492,8 +494,10 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
 
          if (bOk)
          {
+            PHB_DYNS pDynSym = s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+
             hb_dynsymUnlock();
-            return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+            return pDynSym;
          }
       }
 
@@ -526,9 +530,11 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
 
             if( iCmp == 0 )
             {
+               PHB_DYNS pDynSym = s_pDynItems[ uiMiddle ].pDynSym;
+
                s_uiClosestDynSym = uiMiddle;
                hb_dynsymUnlock();
-               return s_pDynItems[ uiMiddle ].pDynSym;
+               return pDynSym;
             }
             else if( iCmp < 0 )
             {
@@ -580,9 +586,11 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
 
             if( iCmp == 0 )
             {
+               PHB_DYNS pDynSym = s_pDynItems[ uiMiddle ].pDynSym;
+
                s_uiClosestDynSym = uiMiddle;
                hb_dynsymUnlock();
-               return s_pDynItems[ uiMiddle ].pDynSym;
+               return pDynSym;
             }
             else if( iCmp < 0 )
             {
@@ -614,8 +622,10 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
 
             if (bOk)
             {
+               PHB_DYNS pDynSym = s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+
                hb_dynsymUnlock();
-               return s_pDynItems[ s_uiClosestDynSym ].pDynSym;
+               return pDynSym;
             }
          }
       }
