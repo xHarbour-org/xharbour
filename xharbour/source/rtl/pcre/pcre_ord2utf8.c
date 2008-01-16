@@ -1,3 +1,7 @@
+/*
+ * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -63,6 +67,10 @@ Returns:     number of characters placed in the buffer
 int
 _pcre_ord2utf8(int cvalue, uschar *buffer)
 {
+#ifndef SUPPORT_UTF8
+   (void) cvalue;
+   (void) buffer;
+#endif
 #ifdef SUPPORT_UTF8
 register int i, j;
 for (i = 0; i < _pcre_utf8_table1_size; i++)

@@ -1,4 +1,9 @@
+/*
+ * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ */
+
 #ifndef _CONFIG_H
+   #define _CONFIG_H
 
    #if !defined(_WIN32)
       #define _WIN32

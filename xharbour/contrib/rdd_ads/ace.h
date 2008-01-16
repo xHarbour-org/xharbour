@@ -69,8 +69,9 @@
 /* This forces a warning for single equals in if statements */
 #ifdef ADS_WIN32
    // 16-bit compiler doesn't seem to like this
+   #ifndef __MINGW32__
    #pragma warning( error : 4706 )
-
+   #endif
    #define ADS_PATH_DELIMITER    '\\'
 #endif
 
@@ -1247,8 +1248,8 @@ UNSIGNED32 ENTRYPOINT AdsAppendRecord( ADSHANDLE hTable );
 typedef UNSIGNED32 (WINAPI *ADSAPPENDRECORD_PTR)( ADSHANDLE hTable );
 
 
-UNSIGNED32 ENTRYPOINT AdsApplicationExit();
-typedef UNSIGNED32 (WINAPI *ADSAPPLICATIONEXIT_PTR)();
+UNSIGNED32 ENTRYPOINT AdsApplicationExit( void );
+typedef UNSIGNED32 (WINAPI *ADSAPPLICATIONEXIT_PTR)( void );
 
 
 UNSIGNED32 ENTRYPOINT AdsAtBOF( ADSHANDLE    hTable,

@@ -1,5 +1,5 @@
 /*
- * $Id: mlctopos.c,v 1.3 2005/03/31 03:58:52 druzus Exp $
+ * $Id: mlctopos.c,v 1.4 2007/09/17 13:19:17 ran_go Exp $
  */
 
 /*
@@ -137,3 +137,4 @@ HB_FUNC( MLCTOPOS )
 
    hb_retnl( ulLen );
 }
+

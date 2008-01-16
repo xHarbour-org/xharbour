@@ -1,3 +1,7 @@
+/*
+ * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ */
+
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
 *************************************************/
@@ -44,6 +48,7 @@ functions. */
 
 #include "config.h"
 
+
 /* Ensure that the PCREPOSIX_EXP_xxx macros are set appropriately for
 compiling these functions. This must come before including pcreposix.h, where
 they are set for an application (using these functions) if they have not
@@ -57,7 +62,6 @@ previously been set. */
 #include "pcre.h"
 #include "pcre_internal.h"
 #include "pcreposix.h"
-
 
 
 /* Table to translate PCRE compile time error codes into POSIX error codes. */
@@ -122,7 +126,9 @@ static const int eint[] = {
   REG_INVARG,  /* inconsistent NEWLINE options */
   REG_BADPAT,  /* \g is not followed followed by an (optionally braced) non-zero number */
   REG_BADPAT,  /* (?+ or (?- must be followed by a non-zero number */
-  REG_BADPAT   /* number is too big */
+  REG_BADPAT,  /* number is too big */
+  REG_BADPAT,  /* subpattern name expected */
+  REG_BADPAT   /* digit expected after (?+ */
 };
 
 /* Table of texts corresponding to POSIX error codes */

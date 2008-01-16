@@ -1,5 +1,5 @@
 /*
- * $Id: itemapi.c,v 1.146 2007/12/19 12:13:17 likewolf Exp $
+ * $Id: itemapi.c,v 1.147 2008/01/10 11:27:18 marchuet Exp $
  */
 
 /*
@@ -2499,3 +2499,4 @@ HB_EXPORT PHB_ITEM hb_itemPutNull( PHB_ITEM pItem )
    pItem->type |= HB_IT_NULL;
    return pItem;
 }
+
