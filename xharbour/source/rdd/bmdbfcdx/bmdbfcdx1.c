@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.36 2007/11/20 16:57:12 marchuet Exp $
+ * $Id: bmdbfcdx1.c,v 1.37 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -759,7 +759,7 @@ static LPCDXKEY hb_cdxKeyEval( LPCDXKEY pKey, LPCDXTAG pTag )
       pKey = hb_cdxKeyPutItem( pKey, pItem, pArea->ulRecNo, pTag, FALSE, TRUE );
       hb_itemRelease( pItem );
    }
-   else 
+   else
    {
       int iCurrArea = hb_rddGetCurrentWorkAreaNumber();
 
@@ -993,13 +993,13 @@ static void hb_cdxTagRefreshScope( LPCDXTAG pTag )
    if ( hb_itemType( pTag->topScope ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->topScope );
-      pTag->topScopeKey = hb_cdxKeyPutItem( pTag->topScopeKey, pItem, 
+      pTag->topScopeKey = hb_cdxKeyPutItem( pTag->topScopeKey, pItem,
                                  pTag->topScopeKey->rec, pTag, TRUE, FALSE );
    }
    if ( hb_itemType( pTag->bottomScope ) == HB_IT_BLOCK )
    {
       pItem = hb_vmEvalBlock( pTag->bottomScope );
-      pTag->bottomScopeKey = hb_cdxKeyPutItem( pTag->bottomScopeKey, pItem, 
+      pTag->bottomScopeKey = hb_cdxKeyPutItem( pTag->bottomScopeKey, pItem,
                                  pTag->bottomScopeKey->rec, pTag, TRUE, FALSE );
    }
 }
@@ -5479,7 +5479,7 @@ static BOOL hb_cdxDBOISkipWild( CDXAREAP pArea, LPCDXTAG pTag, BOOL fForward,
    {
       LPCDXKEY pKey;
 
-      pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed, 
+      pKey = hb_cdxKeyPut( NULL, ( BYTE * ) szPattern, iFixed,
                      pTag->UsrAscend ? CDX_IGNORE_REC_NUM : CDX_MAX_REC_NUM );
       if( !hb_cdxTagKeyFind( pTag, pKey ) )
       {
@@ -8603,7 +8603,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
 
       case DBOI_RELKEYPOS:
          if ( pInfo->itmNewVal && HB_IS_NUMERIC( pInfo->itmNewVal ) )
-            hb_cdxDBOISetRelKeyPos( pArea, pTag, 
+            hb_cdxDBOISetRelKeyPos( pArea, pTag,
                                     hb_itemGetND( pInfo->itmNewVal ) );
          else
             pInfo->itmResult = hb_itemPutND( pInfo->itmResult,
@@ -8618,7 +8618,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
 
       case DBOI_FINDRECCONT:
          pInfo->itmResult = hb_itemPutL( pInfo->itmResult,
-                  hb_cdxDBOIFindRec( pArea, pTag, 
+                  hb_cdxDBOIFindRec( pArea, pTag,
                               hb_itemGetNL( pInfo->itmNewVal ), TRUE ) );
          break;
 
@@ -8895,7 +8895,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
                   SELF_FORCEREL( ( AREAP ) pArea );
 
                if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
+                   ( pTag->pForItem &&
                      !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
                {
                   pInfo->itmResult = hb_itemPutL( pInfo->itmResult, FALSE );
@@ -8935,7 +8935,7 @@ static ERRCODE hb_cdxOrderInfo( CDXAREAP pArea, USHORT uiIndex, LPDBORDERINFO pI
                   SELF_FORCEREL( ( AREAP ) pArea );
 
                if( !pArea->fPositioned ||
-                   ( pTag->pForItem && 
+                   ( pTag->pForItem &&
                      !hb_cdxEvalCond( pArea, pTag->pForItem, TRUE ) ) )
                {
                   pInfo->itmResult = hb_itemPutL( pInfo->itmResult, FALSE );
@@ -9072,7 +9072,7 @@ static ERRCODE hb_cdxCountScope( CDXAREAP pArea, void * pPtr, LONG * plRec )
 
    if ( pPtr == NULL )
    {
-      LPBM_FILTER pMap = pArea->dbfi.lpvCargo;
+      LPBM_FILTER pMap = (LPBM_FILTER) pArea->dbfi.lpvCargo;
       if( pArea->dbfi.fFilter && pMap &&
           !BM_GetBit( pMap->rmap, pMap->Size, *plRec ) )
       {
