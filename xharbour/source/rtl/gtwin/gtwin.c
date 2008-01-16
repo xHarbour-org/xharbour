@@ -1,5 +1,5 @@
 /*
- * $Id: gtwin.c,v 1.114 2007/10/17 08:08:41 lculik Exp $
+ * $Id: gtwin.c,v 1.115 2007/11/27 00:06:44 andijahja Exp $
  */
 
 /*
@@ -2563,17 +2563,22 @@ ULONG HB_GT_FUNC( gt_GetClipboardSize( void ) )
 
 static int kbdShiftsState( void )
 {
-   int  kbdShifts;
-   kbdShifts = 0;
-   if ( GetKeyState( VK_SHIFT ) & 0x080 ) kbdShifts += GTI_KBD_SHIFT;
-   if ( GetKeyState( VK_CONTROL ) & 0x080 ) kbdShifts += GTI_KBD_CTRL;
-   //if ( GetKeyState( VK_MENU ) & 0x080 ) kbdShifts += GTI_KBD_ALT;
-   if ( GetKeyState( VK_LWIN ) & 0x080 ) kbdShifts += GTI_KBD_LWIN;
-   if ( GetKeyState( VK_RWIN ) & 0x080 ) kbdShifts += GTI_KBD_RWIN;
-   if ( GetKeyState( VK_APPS ) & 0x080 ) kbdShifts += GTI_KBD_MENU;
-   if ( GetKeyState( VK_SCROLL ) & 0x01 ) kbdShifts += GTI_KBD_SCROLOCK;
-   if ( GetKeyState( VK_NUMLOCK ) & 0x01 ) kbdShifts += GTI_KBD_NUMLOCK;
-   if ( GetKeyState( VK_CAPITAL ) & 0x01 ) kbdShifts += GTI_KBD_CAPSLOCK;
+   int  kbdShifts = 0;
+   DWORD dwIndex, dwState;
+
+   for (dwIndex = s_cNumRead - 1; dwIndex >= 0; dwIndex --)
+      if ( (s_irInBuf[ dwIndex ].EventType == KEY_EVENT) && (s_irInBuf[ dwIndex ].Event.KeyEvent.bKeyDown) )
+      {
+         dwState = s_irInBuf[ dwIndex ].Event.KeyEvent.dwControlKeyState;
+         if ( dwState & SHIFT_PRESSED ) kbdShifts += GTI_KBD_SHIFT;
+         if ( (dwState & RIGHT_CTRL_PRESSED) || (dwState & LEFT_CTRL_PRESSED) ) kbdShifts += GTI_KBD_CTRL;
+         if ( (dwState & RIGHT_ALT_PRESSED) || (dwState & LEFT_ALT_PRESSED) ) kbdShifts += GTI_KBD_ALT;
+         if ( dwState & SCROLLLOCK_ON ) kbdShifts += GTI_KBD_SCROLOCK;
+         if ( dwState & NUMLOCK_ON ) kbdShifts += GTI_KBD_NUMLOCK;
+         if ( dwState & CAPSLOCK_ON ) kbdShifts += GTI_KBD_CAPSLOCK;
+         break;
+      }
+
    return kbdShifts;
 }
 

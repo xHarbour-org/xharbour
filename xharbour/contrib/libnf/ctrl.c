@@ -1,5 +1,5 @@
 /*
- * $Id: ctrl.c,v 1.1 2003/10/08 14:03:56 lculik Exp $
+ * $Id: ctrl.c,v 1.2 2005/04/25 01:17:15 andijahja Exp $
  */
 
 /*
@@ -60,11 +60,7 @@
  */
 
 #include <hbapi.h>
-
-#if defined(__WIN32__)
-   #include <windows.h>
-   #define HB_VK_CONTROL        0x11
-#endif
+#include <hbapigt.h>
 
 HB_FUNC( FT_CTRL )
 {
@@ -74,13 +70,9 @@ HB_FUNC( FT_CTRL )
       hb_retl( ( int ) ( ( *( char * ) 0x00400017 ) & 0x4 ) );
       return;
    }
-#elif defined(__WIN32__)
+#else
 
-   BYTE kbBuffer[ 256 ];
-
-   GetKeyboardState( kbBuffer );
-
-   hb_retl( kbBuffer[ HB_VK_CONTROL ] & 0x01 );
+   hb_retl( hb_gt_info( GTI_KBDSHIFTS, FALSE, 0, NULL) & GTI_KBD_CTRL );
 
 #endif
 }
