@@ -1,5 +1,5 @@
 /*
- * $Id: achoice.prg,v 1.37 2008/01/14 23:28:48 modalsist Exp $
+ * $Id: achoice.prg,v 1.38 2008/01/15 09:32:58 modalsist Exp $
  */
 
 /*
@@ -248,11 +248,21 @@ LOCAL nPage := ::nSize + 1
    nUserMode := AC_NOITEM     // Something different to AC_IDLE
 
    // Main loop
-   DO WHILE nMode > AC_SELECT   
+//   DO WHILE nMode > AC_SELECT   
+   DO WHILE nMode > AC_ABORT   
 
       // Refresh?
       IF nMode == AC_REDRAW
          ::DrawRows( 0, ::nSize, .F. )
+      ENDIF
+
+      /* 2008/JAN/17 - E.F. Force to process pending key, if any */
+      IF nMode == AC_SELECT
+         if NextKey() == 0
+            EXIT
+         else
+            ::DrawRows( ::nOption - ::nFirstRow, ::nOption - ::nFirstRow, .F. )
+         endif
       ENDIF
 
       // What will do?
@@ -438,14 +448,6 @@ LOCAL nPage := ::nSize + 1
          IF ! ::ValidateArray()
             nMode := AC_ABORT
          ENDIF
-
-         /* 2008/JAN/15 - E.F. - Clipper's achoice avoid pending keys
-          *                      from udf.
-          */
-         While Nextkey() != 0
-           Inkey()
-           keyboard 0
-         Enddo
 
       ENDIF
 
