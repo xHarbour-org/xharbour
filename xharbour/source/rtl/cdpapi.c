@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.34 2007/11/13 21:34:10 likewolf Exp $
+ * $Id: cdpapi.c,v 1.35 2007/11/14 10:10:59 likewolf Exp $
  */
 
 /*
@@ -8,6 +8,9 @@
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ *
+ * HB_UTF8CHR()
+ * Copyright 2008 Phil Krylov <phil a t newstar.rinet.ru>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1198,6 +1201,23 @@ HB_FUNC( HB_STRTOUTF8 )
       hb_retclen_buffer( szDest, ulDest );
    else
       hb_retc( NULL );
+}
+
+HB_FUNC( HB_UTF8CHR )
+{
+   if ( ISNUM( 1 ) )
+   {
+      UINT uc = hb_parnl( 1 );
+      int len = utf8Size( uc );
+      char *szResult = hb_xgrab( len + 1 );
+
+      u16toutf8( ( BYTE * ) szResult, uc );
+      hb_retclen_buffer( szResult, len );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 3012, NULL, &hb_errFuncName, HB_ERR_ARGS_BASEPARAMS );
+   }
 }
 
 HB_FUNC( HB_UTF8TOSTR )
