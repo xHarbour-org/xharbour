@@ -1,10 +1,10 @@
 /*
- * $Id: msgltwin.c,v 1.4 2005/03/06 19:22:03 paultucker Exp $
+ * $Id: msgltwin.c,v 1.5 2005/06/10 22:51:37 ronpinkas Exp $
  */
 
 /*
  * Harbour Project source code:
- * Language Support Module ( LT )
+ * Language Support Module ( LTWIN )
  *
  * Copyright 2003 Mindaugas Kavaliauskas <dbtopas@dbtopas.lt>
  * www - http://www.harbour-project.org
@@ -61,12 +61,12 @@ static HB_LANG s_lang =
    {
       /* Identification */
 
-      "LT",                        /* ID */
+      "LTWIN",                     /* ID */
       "Lithuanian",                /* Name (in English) */
       "Lietuviø",                  /* Name (in native language) */
       "LT",                        /* RFC ID */
       "Windows-1257",              /* Codepage */
-      "$Revision: 1.4 $ $Date: 2005/03/06 19:22:03 $",         /* Version */
+      "$Revision: 1.5 $ $Date: 2005/06/10 22:51:37 $",         /* Version */
 
       /* Month names */
 
@@ -74,7 +74,7 @@ static HB_LANG s_lang =
       "Vasaris",
       "Kovas",
       "Balandis",
-      "Kovas",
+      "Geguþë",
       "Birþelis",
       "Liepa",
       "Rugpjûtis",
@@ -201,14 +201,14 @@ static HB_LANG s_lang =
    }
 };
 
-HB_LANG_ANNOUNCE( LT );
+HB_LANG_ANNOUNCE( LTWIN );
 
-HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_LT )
+HB_CALL_ON_STARTUP_BEGIN( hb_lang_Init_LTWIN )
    hb_langRegister( &s_lang );
-HB_CALL_ON_STARTUP_END( hb_lang_Init_LT )
+HB_CALL_ON_STARTUP_END( hb_lang_Init_LTWIN )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_lang_Init_LT
+   #pragma startup hb_lang_Init_LTWIN
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -216,6 +216,6 @@ HB_CALL_ON_STARTUP_END( hb_lang_Init_LT )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_lang_Init_LT = hb_lang_Init_LT;
+   static HB_$INITSYM hb_vm_auto_hb_lang_Init_LTWIN = hb_lang_Init_LTWIN;
    #pragma data_seg()
 #endif

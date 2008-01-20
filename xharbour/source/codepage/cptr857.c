@@ -1,14 +1,13 @@
 /*
- * $Id: cpitiso.c,v 1.9 2007/11/07 23:34:26 likewolf Exp $
+ * $Id: cptrdos.c,v 1.2 2007/11/07 23:34:27 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Italian ISO-8859-1 )
+ * National Collation Support Module ( Turkish -- DOS )
  *
- * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
+ * Copyright 2006 Bicahi Esgici <esgici@yahoo.com> 
  * www - http://www.harbour-project.org
- * Spanish MS-DOS support by Antonio Linares <alinares@fivetechsoft.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,31 +50,31 @@
  *
  */
 
-/* Language name: Italian */
-/* ISO language code (2 chars): IT */
-/* Codepage: ISO-8859-1 */
+/* Language name: Turkish */
+/* ISO language code TR : ( please look it up in /doc/lang_id.txt ) */
+/* Codepage: 857 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  40    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  34    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all
-                                       characters being compared are the same
+                                       only if the unaccented versions of all 
+                                       characters being compared are the same 
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~Ç
+      a~€
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -84,16 +83,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ITISO",
-    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
-    "AÀÁÂÃÄÅBCDEÈÉFGHIÌÍJKLMNOÒÓPQRSTUÙÚVWXYZ",
-    "aàáâãäåbcdeèéfghiìíjklmnoòópqrstuùúvwxyz",
+static HB_CODEPAGE s_codepage = { "TR857",
+    HB_CPID_857,HB_UNITB_857,NUMBER_OF_CHARACTERS,
+    "A¶BC€DEÒFG¦HI˜×JKLMNOâ™PRSžTUêšVYZ", 
+    "aƒbc‡deˆfg§hiŒjklmno“”prsŸtu–vyz", 
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( ITISO )
+HB_CODEPAGE_INIT( TR857 )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_ITISO
+   #pragma startup hb_codepage_Init_TR857
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -101,6 +100,6 @@ HB_CODEPAGE_INIT( ITISO )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ITISO = hb_codepage_Init_ITISO;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_TR857 = hb_codepage_Init_TR857;
    #pragma data_seg()
 #endif

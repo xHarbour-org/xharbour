@@ -1,13 +1,15 @@
 /*
- * $Id: cptrdos.c,v 1.1 2007/01/09 22:05:22 druzus Exp $
+ * $Id: cpfrdos.c,v 1.2 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Turkish -- DOS )
+ * National Collation Support Module ( French MS-DOS 850 )
  *
- * Copyright 2006 Bicahi Esgici <esgici@yahoo.com> 
+ * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ * French collating sequence (FR) done by
+ * Przemyslaw Czerpak < druzus /at/ priv.onet.pl >
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,26 +52,26 @@
  *
  */
 
-/* Language name: Turkish */
-/* ISO language code TR : ( please look it up in /doc/lang_id.txt ) */
-/* Codepage: 857 */
+/* Language name: French */
+/* ISO language code (2 chars): FR */
+/* Codepage: 850 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  34    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  46    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
 #define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
                                        sort after their unaccented counterparts
-                                       only if the unaccented versions of all 
-                                       characters being compared are the same 
+                                       only if the unaccented versions of all
+                                       characters being compared are the same
                                        ( interleaving ) */
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
@@ -83,16 +85,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "TR857",
-    HB_CPID_857,HB_UNITB_857,NUMBER_OF_CHARACTERS,
-    "A¶BC€DEÒFG¦HI˜×JKLMNOâ™PRSžTUêšVYZ", 
-    "aƒbc‡deˆfg§hiŒjklmno“”prsŸtu–vyz", 
+static HB_CODEPAGE s_codepage = { "FR850",
+    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
+    "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ",
+    "a …ƒ„bcde‚Šˆ‰fghi¡Œ‹jklmno¢•“”pqrstu£—–vwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( TR857 )
+HB_CODEPAGE_INIT( FR850 )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_TR857
+   #pragma startup hb_codepage_Init_FR850
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -100,6 +102,6 @@ HB_CODEPAGE_INIT( TR857 )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_TR857 = hb_codepage_Init_TR857;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_FR850 = hb_codepage_Init_FR850;
    #pragma data_seg()
 #endif

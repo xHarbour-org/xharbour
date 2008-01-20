@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.20 2007/01/09 22:05:22 druzus Exp $
+# $Id: Makefile,v 1.21 2007/11/07 23:34:24 likewolf Exp $
 #
 
 ROOT = ../../
@@ -14,14 +14,15 @@ C_SOURCES=\
 	cpcsiso.c     \
 	cpcskam.c     \
 	cpcswin.c     \
-	cpeldos.c     \
+	cpde850.c     \
+	cpdeiso.c     \
+	cpdewin.c     \
+	cpel737.c     \
 	cpelwin.c     \
-	cpesdos.c     \
+	cpes850.c     \
 	cpeswin.c     \
 	cpesmwin.c    \
-	cpfrdos.c     \
-	cpgedos.c     \
-	cpgewin.c     \
+	cpfr850.c     \
 	cphr1250.c    \
 	cphr437.c     \
 	cphr852.c     \
@@ -44,6 +45,7 @@ C_SOURCES=\
 	cpptiso.c     \
 	cpru866.c     \
 	cprukoi.c     \
+	cpruiso.c     \
 	cpruwin.c     \
 	cpsk852.c     \
 	cpskiso.c     \
@@ -57,13 +59,14 @@ C_SOURCES=\
 	cpsv850.c     \
 	cpsvclip.c    \
 	cpsvwin.c     \
-	cptrdos.c     \
+	cptr857.c     \
 	cptrwin.c     \
 	cpua866.c     \
 	cpuakoi.c     \
 	cpuawin.c     \
 	uc1250.c      \
 	uc1251.c      \
+	uc1252.c      \
 	uc1253.c      \
 	uc1254.c      \
 	uc1257.c      \

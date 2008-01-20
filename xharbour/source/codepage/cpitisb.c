@@ -1,10 +1,10 @@
 /*
- * $Id: cpitisb.c,v 1.7 2005/10/31 18:41:22 lf_sfnet Exp $
+ * $Id: cpitisb.c,v 1.8 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( Italian ISO-8859-1b )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org

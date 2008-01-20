@@ -1,13 +1,14 @@
 /*
- * $Id: cpeldos.c,v 1.4 2007/11/07 23:34:25 likewolf Exp $
-*/
+ * $Id: cpgewin.c,v 1.5 2007/11/07 23:34:25 likewolf Exp $
+ */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( template )
+ * National Collation Support Module ( German ISO )
  *
- * Copyright 2004 Pete Dionisopoulos <pete_westg@yahoo.gr>
+ * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
+ * v1.0 2003 Guenther Steiner <byte-one@aon.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,20 +51,20 @@
  *
  */
 
-/* Language name: <Greek dos> */
-/* ISO language code (2 chars): EL */
-/* Codepage: 737 */
+/* Language name: German */
+/* ISO language code (2 chars): DE (please look it up in /doc/lang_id.txt) */
+/* Codepage: ISO-8859-1 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  32    /* The number of single characters in the
+#define NUMBER_OF_CHARACTERS  30    /* The number of single characters in the
                                        alphabet, two-as-one aren't considered
                                        here, accented - are considered. */
-#define IS_LATIN               0    /* Should be 1, if the national alphabet
+#define IS_LATIN               1    /* Should be 1, if the national alphabet
                                        is based on Latin */
-#define ACCENTED_EQUAL         1    /* Should be 1, if accented character 
+#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
                                        has the same weight as appropriate
                                        unaccented. */
 #define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
@@ -74,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-      a~_
+    a~€
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -83,16 +84,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "EL",
-    HB_CPID_737, HB_UNITB_737, NUMBER_OF_CHARACTERS,
-    "€~ê‚ƒ„~ë…†~ì‡ˆ~í‰Š‹ŒŽ~î‘‘’“~ï”•–—~ð",
-    "˜~á™š›œ~âž~ãŸ ~å¡¢£¤¥¦~æ§¨©ª«¬~ç­®¯à~é",
+static HB_CODEPAGE s_codepage = { "DEISO",
+    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    "AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ",
+    "aäbcdefghijklmnoöpqrsßtuüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( EL )
+HB_CODEPAGE_INIT( DEISO )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_EL
+   #pragma startup hb_codepage_Init_DEISO
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -100,6 +101,6 @@ HB_CODEPAGE_INIT( EL )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_EL = hb_codepage_Init_EL;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_DEISO = hb_codepage_Init_DEISO;
    #pragma data_seg()
 #endif

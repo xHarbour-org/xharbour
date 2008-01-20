@@ -1,5 +1,5 @@
 /*
- * $Id: cphuwins.c 7249 2007-04-18 08:45:07Z vszakats $
+ * $Id: cphuwins.c,v 1.1 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 /* Language name: Hungarian */
 /* ISO language code (2 chars): HU */
-/* Codepage: Windows-1250 (sixhu852 compatible) */
+/* Codepage: Windows-1250 (sixhu852 flavour) */
 
 #include <ctype.h>
 #include "hbapi.h"

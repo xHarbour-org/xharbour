@@ -1,14 +1,13 @@
 /*
- * $Id: cpgedos.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id$
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( German MS-DOS )
+ * National Collation Support Module (RUISO)
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
- * v1.0 2003 Guenther Steiner <byte-one@aon.at>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,49 +50,24 @@
  *
  */
 
-/* Language name: German */
-/* ISO language code (2 chars): DE */
-/* Codepage: 850 */
+/* Language name: Russian */
+/* ISO language code (2 chars): RU */
+/* Codepage: ISO-8859-5 */
 
 #include <ctype.h>
 #include "hbapi.h"
 #include "hbapicdp.h"
 
-#define NUMBER_OF_CHARACTERS  30    /* The number of single characters in the
-                                       alphabet, two-as-one aren't considered
-                                       here, accented - are considered. */
-#define IS_LATIN               1    /* Should be 1, if the national alphabet
-                                       is based on Latin */
-#define ACCENTED_EQUAL         0    /* Should be 1, if accented character 
-                                       has the same weight as appropriate
-                                       unaccented. */
-#define ACCENTED_INTERLEAVED   0    /* Should be 1, if accented characters
-                                       sort after their unaccented counterparts
-                                       only if the unaccented versions of all 
-                                       characters being compared are the same 
-                                       ( interleaving ) */
+static HB_CODEPAGE s_codepage = { "RUISO",
+    HB_CPID_8859_5, HB_UNITB_8859_5, 36,
+    "°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ¡¤§®",
+    "ÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïñô÷þ",
+    0,0,0,0,0,NULL,NULL,NULL,NULL,0,NULL };
 
-/* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
-   accented characters with the symbol '~' before each of them, for example:
-    a~€
-   If there is two-character sequence, which is considered as one, it should
-   be marked with '.' before and after it, for example:
-      ... h.ch.i ...
-
-   The Upper case string and the Lower case string should be absolutely the
-   same excepting the characters case, of course.
- */
-
-static HB_CODEPAGE s_codepage = { "DE",
-    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
-    "AŽBCDEFGHIJKLMNO™PQRSáTUšVWXYZ",
-    "a„bcdefghijklmno”pqrsátuvwxyz",
-    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
-
-HB_CODEPAGE_INIT( DE )
+HB_CODEPAGE_INIT( RUISO )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_DE
+   #pragma startup hb_codepage_Init_RUISO
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -101,6 +75,6 @@ HB_CODEPAGE_INIT( DE )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_DE = hb_codepage_Init_DE;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_RUISO = hb_codepage_Init_RUISO;
    #pragma data_seg()
 #endif

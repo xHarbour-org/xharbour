@@ -1,5 +1,5 @@
 /*
- * $Id: cpgewin.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cpgewin.c,v 1.5 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* Language name: German */
 /* ISO language code (2 chars): DE (please look it up in /doc/lang_id.txt) */
-/* Codepage: ISO-8859-1 */
+/* Codepage: Windows-1252 */
 
 #include <ctype.h>
 #include "hbapi.h"
@@ -75,7 +75,7 @@
 
 /* If ACCENTED_EQUAL or ACCENTED_INTERLEAVED is 1, you need to mark the
    accented characters with the symbol '~' before each of them, for example:
-    a~€
+    a~á
    If there is two-character sequence, which is considered as one, it should
    be marked with '.' before and after it, for example:
       ... h.ch.i ...
@@ -85,7 +85,7 @@
  */
 
 static HB_CODEPAGE s_codepage = { "DEWIN",
-    HB_CPID_8859_1, HB_UNITB_8859_1, NUMBER_OF_CHARACTERS,
+    HB_CPID_1252, HB_UNITB_1252, NUMBER_OF_CHARACTERS,
     "AÄBCDEFGHIJKLMNOÖPQRSßTUÜVWXYZ",
     "aäbcdefghijklmnoöpqrsßtuüvwxyz",
     IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };

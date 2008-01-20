@@ -1,5 +1,5 @@
 /*
- * $Id: cpcswin.c 7249 2007-04-18 08:45:07Z vszakats $
+ * $Id: cpcswin.c,v 1.1 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
@@ -53,7 +53,7 @@
 
 /* Language name: Czech */
 /* ISO language code (2 chars): CS */
-/* Codepage: Windows-1520 */
+/* Codepage: Windows-1250 */
 
 #include <ctype.h>
 #include "hbapi.h"

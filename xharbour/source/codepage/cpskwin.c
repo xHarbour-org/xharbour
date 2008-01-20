@@ -1,5 +1,5 @@
 /*
- * $Id: cpskwin.c 7630 2007-08-02 15:45:52Z druzus $
+ * $Id: cpskwin.c,v 1.1 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
@@ -52,7 +52,7 @@
 
 /* Language name: Slovak */
 /* ISO language code (2 chars): SK */
-/* Codepage: Windows-1520 */
+/* Codepage: Windows-1250 */
 
 #include <ctype.h>
 #include "hbapi.h"

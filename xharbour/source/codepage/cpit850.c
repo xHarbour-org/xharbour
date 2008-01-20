@@ -1,10 +1,10 @@
 /*
- * $Id: cpit850.c,v 1.5 2006/01/12 13:15:59 druzus Exp $
+ * $Id: cpit850.c,v 1.6 2007/11/07 23:34:26 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( Italian MS-DOS cp 850 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
