@@ -1,10 +1,10 @@
 /*
- * $Id: cpesdos.c,v 1.4 2005/03/06 19:22:02 paultucker Exp $
+ * $Id: cpesdos.c,v 1.5 2007/11/07 23:34:25 likewolf Exp $
  */
 
 /*
  * Harbour Project source code:
- * National Collation Support Module ( Spanish MS-DOS )
+ * National Collation Support Module ( Spanish MS-DOS 850 )
  *
  * Copyright 2002 Alexander S.Kresin <alex@belacy.belgorod.su>
  * www - http://www.harbour-project.org
@@ -84,16 +84,16 @@
    same excepting the characters case, of course.
  */
 
-static HB_CODEPAGE s_codepage = { "ES", 
+static HB_CODEPAGE s_codepage = { "ES850", 
    HB_CPID_850, HB_UNITB_850, NUMBER_OF_CHARACTERS,
    "AµBCDEFGHIÖJKLMN¥OàPQRSTUéšVWXYZ", 
    "a bcde‚fghi¡jklmn¤o¢pqrstu£vwxyz",
    IS_LATIN, ACCENTED_EQUAL, ACCENTED_INTERLEAVED, 0, 0, NULL, NULL, NULL, NULL, 0, NULL };
 
-HB_CODEPAGE_INIT( ES )
+HB_CODEPAGE_INIT( ES850 )
 
 #if defined(HB_PRAGMA_STARTUP)
-   #pragma startup hb_codepage_Init_ES
+   #pragma startup hb_codepage_Init_ES850
 #elif defined(HB_MSC_STARTUP)
    #if _MSC_VER >= 1010
       #pragma data_seg( ".CRT$XIY" )
@@ -101,6 +101,6 @@ HB_CODEPAGE_INIT( ES )
    #else
       #pragma data_seg( "XIY" )
    #endif
-   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ES = hb_codepage_Init_ES;
+   static HB_$INITSYM hb_vm_auto_hb_codepage_Init_ES850 = hb_codepage_Init_ES850;
    #pragma data_seg()
 #endif

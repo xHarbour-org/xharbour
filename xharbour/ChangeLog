@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5886 2008/01/19 13:56:28 likewolf Exp $
+ * $Id: ChangeLog,v 1.5887 2008/01/20 13:33:10 paultucker Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,51 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-21 00:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + source/codepage/cpes850.c
+  - source/codepage/cpesdos.c
+    Renamed according to actual language and codepage codes. 
+  (by Viktor Szakats, borrowed from Harbour).
+
+2008-01-21 00:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  + source/codepage/cpde850.c
+  + source/codepage/cpdeiso.c
+  + source/codepage/cpel737.c
+  + source/codepage/cpfr850.c
+  + source/codepage/cptr857.c
+  - source/codepage/cpeldos.c
+  - source/codepage/cpgedos.c
+  - source/codepage/cpgewin.c
+  - source/codepage/cpfrdos.c
+  - source/codepage/cptrdos.c
+    Renamed according to actual language and codepage codes. 
+  * source/codepage/cpcswin.c
+  * source/codepage/cpit850.c
+  * source/codepage/cpitisb.c
+  * source/codepage/cpitiso.c
+  * source/codepage/cpskwin.c
+    ! Some errors in comments fixed.
+  * source/codepage/cphuiso.c
+  * source/codepage/cphuisos.c
+  * source/codepage/cphuwin.c
+  * source/codepage/cphuwins.c
+    ! Fixed sloppy wording in comment. (Thanks Chen)
+  (by Viktor Szakats, borrowed from Harbour).
+  * source/lang/msgltwin.c
+  * source/codepage/cpltwin.c
+    * changed language ID to: LTWIN
+    * month name typo
+  (by Mindaugas Kavaliauskas, borrowed from Harbour).
+  * include/hbapicdp.h
+  + source/codepage/cpruiso.c
+  + source/codepage/cpdewin.c
+  + source/codepage/uc1252.c
+    + Added RUISO (Russian ISO-8859-5) and DEWIN (German CP1252, actually
+      identical to DEISO) codepages and a CP1252<->Unicode table.
+  * include/hbextern.ch
+  * source/codepage/Makefile
+    * Updated.
 
 2008-01-20 08:30 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * source/rtl/cdpapi.c
