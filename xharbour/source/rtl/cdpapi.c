@@ -1,5 +1,5 @@
 /*
- * $Id: cdpapi.c,v 1.35 2007/11/14 10:10:59 likewolf Exp $
+ * $Id: cdpapi.c,v 1.36 2008/01/19 13:56:29 likewolf Exp $
  */
 
 /*
@@ -1209,7 +1209,7 @@ HB_FUNC( HB_UTF8CHR )
    {
       UINT uc = hb_parnl( 1 );
       int len = utf8Size( uc );
-      char *szResult = hb_xgrab( len + 1 );
+      char *szResult = (char *) hb_xgrab( len + 1 );
 
       u16toutf8( ( BYTE * ) szResult, uc );
       hb_retclen_buffer( szResult, len );
