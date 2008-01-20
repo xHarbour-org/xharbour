@@ -1,5 +1,5 @@
 /*
- * $Id$
+ * $Id: hbvmopt.h,v 1.1 2005/10/24 01:04:25 druzus Exp $
  */
 
 /*
@@ -66,3 +66,6 @@
 #  define HB_STACK_MACROS
 #endif
 
+#if !defined( _HB_API_INTERNAL_ )
+#  define _HB_API_INTERNAL_
+#endif

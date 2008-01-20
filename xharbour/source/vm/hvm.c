@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.649 2008/01/14 12:44:30 walito Exp $
+ * $Id: hvm.c,v 1.650 2008/01/14 23:39:04 likewolf Exp $
  */
 
 /*
@@ -197,7 +197,7 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM, PHB_SYMB );  /* select the workare
 static void    hb_vmSwapAlias( void );           /* swaps items on the eval stack and pops the workarea number */
 
 /* Hash */
-static void    hb_vmHashGen( const ULONG ulPairs ); /* generates an ulElements Array and fills it from the stack values */
+static void    hb_vmHashGen( const ULONG ulPairs ); /* generates an ulElements Hash and fills it from the stack values */
 
 /* Execution */
 static HARBOUR hb_vmDoBlock( void );             /* executes a codeblock */
@@ -1388,49 +1388,22 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
             break;
 
          case HB_P_FUNCTION:
-         {
-            USHORT uiParams = HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) );
-
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTION") );
 
-            //hb_vmFunction( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
-
-            if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-            {
-               hb_itemClear( &(HB_VM_STACK.Return) );
-            }
-            else
-            {
-               ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
-            }
-            hb_vmDo( uiParams );
-
+            hb_itemSetNil( hb_stackReturnItem() );
+            hb_vmDo( HB_PCODE_MKUSHORT( &( pCode[ w + 1 ] ) ) );
             hb_stackPushReturn();
             w += 3;
             break;
-         }
 
          case HB_P_FUNCTIONSHORT:
-         {
-            USHORT uiParams = pCode[ w + 1 ];
-
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTIONSHORT") );
-
-            //hb_vmFunction( pCode[ w + 1 ] );
-
-            if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-            {
-               hb_itemClear( &(HB_VM_STACK.Return) );
-            }
-            else
-            {
-               ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
-            }
-            hb_vmDo( uiParams );
+            
+            hb_itemSetNil( hb_stackReturnItem() );
+            hb_vmDo( pCode[ w + 1 ] );
             hb_stackPushReturn();
             w += 2;
             break;
-         }
 
          case HB_P_WITHOBJECT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_WITHOBJECT") );
@@ -6827,20 +6800,14 @@ static ERRCODE hb_vmSelectWorkarea( PHB_ITEM pAlias, PHB_SYMB pField )
                }
                else
                {
-                  if( HB_IS_COMPLEX( pAlias ) )
-                     hb_itemClear( pAlias );
-                  else
-                     pAlias->type = HB_IT_NIL;
+                  hb_itemSetNil( pAlias );
                   errCode = FAILURE;
                }
             }
             else
             {
                hb_rddSelectWorkAreaNumber( -1 );
-               if( HB_IS_COMPLEX( pAlias ) )
-                  hb_itemClear( pAlias );
-               else
-                  pAlias->type = HB_IT_NIL;
+               hb_itemSetNil( pAlias );
             }
             break;
       }
@@ -7071,14 +7038,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
    //TraceLog( NULL, "From: '%s'\n", hb_stackBaseItem()->item.asSymbol.value->szName );
 
-   if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-   {
-      hb_itemClear( &(HB_VM_STACK.Return) );
-   }
-   else
-   {
-      ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
-   }
+   hb_itemSetNil( hb_stackReturnItem() );
 
    //printf( "\n VmSend nItems: %i Params: %i Extra %i\n", HB_VM_STACK.pPos - HB_VM_STACK.pBase, uiParams, hb_vm_aiExtraParams[hb_vm_iExtraParamsIndex - 1] );
 
@@ -7617,15 +7577,7 @@ HB_EXPORT void hb_vmFunction( USHORT uiParams )
    }
    else
    {
-      if( HB_IS_COMPLEX( &(HB_VM_STACK.Return) ) )
-      {
-         hb_itemClear( &(HB_VM_STACK.Return) );
-      }
-      else
-      {
-         ( &(HB_VM_STACK.Return) )->type = HB_IT_NIL;
-      }
-
+      hb_itemSetNil( hb_stackReturnItem() );
       hb_vmDo( uiParams );
    }
 
@@ -11403,11 +11355,7 @@ HB_EXPORT BOOL hb_xvmFunction( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmFunction(%hu)", uiParams));
 
-   if( HB_IS_COMPLEX( hb_stackReturnItem() ) )
-      hb_itemClear( hb_stackReturnItem() );
-   else
-      hb_stackReturnItem()->type = HB_IT_NIL;
-
+   hb_itemSetNil( hb_stackReturnItem() );
    hb_vmDo( uiParams );
    hb_stackPushReturn();
 
@@ -11420,11 +11368,7 @@ HB_EXPORT BOOL hb_xvmSend( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmSend(%hu)", uiParams));
 
-   if( HB_IS_COMPLEX( hb_stackReturnItem() ) )
-      hb_itemClear( hb_stackReturnItem() );
-   else
-      hb_stackReturnItem()->type = HB_IT_NIL;
-
+   hb_itemSetNil( hb_stackReturnItem() );
    hb_vmSend( uiParams );
    hb_stackPushReturn();
 
@@ -11437,15 +11381,7 @@ HB_EXPORT BOOL hb_xvmSendWith( USHORT uiParams )
 
    HB_TRACE(HB_TR_DEBUG, ("hb_xvmSendWith(%hu)", uiParams));
 
-   if( HB_IS_COMPLEX( hb_stackReturnItem() ) )
-   {
-      hb_itemClear( hb_stackReturnItem() );
-   }
-   else
-   {
-      hb_stackReturnItem()->type = HB_IT_NIL;
-   }
-
+   hb_itemSetNil( hb_stackReturnItem() );
    hb_vmSend( uiParams );
    hb_stackPushReturn();
 

@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.150 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: arrays.c,v 1.151 2008/01/10 11:27:17 marchuet Exp $
  */
 
 /*
@@ -263,14 +263,7 @@ BOOL HB_FORCE_EXPORT hb_arraySize( PHB_ITEM pArray, ULONG ulLen )
             ulPos = pBaseArray->ulLen - ulLen;
             do
             {
-               if( HB_IS_COMPLEX( pItems ) )
-               {
-                  hb_itemClear( pItems );
-               }
-               else
-               {
-                  pItems->type = HB_IT_NIL;
-               }
+               hb_itemSetNil( pItems );
                pItems++;
             } while( --ulPos );
          }
@@ -418,14 +411,7 @@ BOOL HB_FORCE_EXPORT hb_arrayDel( PHB_ITEM pArray, ULONG ulIndex )
             hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ( ulIndex + 1 ) );
          }
 
-         if( HB_IS_COMPLEX( pBaseArray->pItems + ( ulLen - 1 ) ) )
-         {
-            hb_itemClear( pBaseArray->pItems + ( ulLen - 1 ) );
-         }
-         else
-         {
-            ( pBaseArray->pItems + ( ulLen - 1 ) )->type = HB_IT_NIL;
-         }
+         hb_itemSetNil( pBaseArray->pItems + ( ulLen - 1 ) );
       }
       return TRUE;
    }
@@ -450,14 +436,7 @@ BOOL HB_FORCE_EXPORT hb_arrayIns( PHB_ITEM pArray, ULONG ulIndex )
             hb_itemForwardValue( pBaseArray->pItems + ulLen, pBaseArray->pItems + ( ulLen - 1 ) );
          }
 
-         if( HB_IS_COMPLEX( pBaseArray->pItems + ulLen ) )
-         {
-            hb_itemClear( pBaseArray->pItems + ulLen );
-         }
-         else
-         {
-            ( pBaseArray->pItems + ulLen )->type = HB_IT_NIL;
-         }
+         hb_itemSetNil( pBaseArray->pItems + ulLen );
       }
 
       return TRUE;
@@ -533,17 +512,9 @@ BOOL HB_FORCE_EXPORT hb_arrayGet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem
    }
    else
    {
-      if( HB_IS_COMPLEX( pItem ) )
-      {
-         hb_itemClear( pItem );
-      }
-      else
-      {
-         pItem->type = HB_IT_NIL;
-      }
+      hb_itemSetNil( pItem );
+      return FALSE;
    }
-
-   return FALSE;
 }
 
 BOOL HB_EXPORT hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
@@ -563,17 +534,11 @@ BOOL HB_EXPORT hb_arrayGetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pIte
       hb_itemForwardValue( pItem, pElement );
       return TRUE;
    }
-
-   if( HB_IS_COMPLEX( pItem ) )
-   {
-     hb_itemClear( pItem );
-   }
    else
    {
-     pItem->type = HB_IT_NIL;
+      hb_itemSetNil( pItem );
+      return FALSE;
    }
-
-   return FALSE;
 }
 
 BOOL HB_EXPORT hb_arrayGetByRef( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem )
@@ -903,14 +868,7 @@ BOOL HB_FORCE_EXPORT hb_arrayLast( PHB_ITEM pArray, PHB_ITEM pResult )
       }
    }
 
-   if( HB_IS_COMPLEX( pResult ) )
-   {
-      hb_itemClear( pResult );
-   }
-   else
-   {
-      pResult->type = HB_IT_NIL;
-   }
+   hb_itemSetNil( pResult );
 
    return bRet;
 }

@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.92 2007/12/08 02:31:21 ronpinkas Exp $
+ * $Id: estack.c,v 1.93 2008/01/10 11:27:17 marchuet Exp $
  */
 
 /*
@@ -195,8 +195,8 @@ void hb_stackIncrease( void )
 
    /* no, make more headroom: */
    /* hb_stackDispLocal(); */
-   HB_VM_STACK.pItems = ( HB_ITEM_PTR * ) hb_xrealloc( ( void *) HB_VM_STACK.pItems, sizeof( HB_ITEM_PTR ) *
-                             ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
+   HB_VM_STACK.pItems = ( PHB_ITEM * ) hb_xrealloc( ( void *) HB_VM_STACK.pItems,
+            sizeof( PHB_ITEM ) * ( HB_VM_STACK.wItems + STACK_EXPANDHB_ITEMS ) );
 
    /* fix possibly modified by realloc pointers: */
    HB_VM_STACK.pPos   = HB_VM_STACK.pItems + CurrIndex;

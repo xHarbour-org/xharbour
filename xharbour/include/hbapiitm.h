@@ -1,5 +1,5 @@
 /*
- * $Id: hbapiitm.h,v 1.48 2008/01/06 21:35:47 andijahja Exp $
+ * $Id: hbapiitm.h,v 1.49 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -174,6 +174,21 @@ extern HB_EXPORT PHB_ITEM   hb_itemClone    ( PHB_ITEM pItem );
    extern HB_EXPORT LONGLONG  hb_itemGetNLL   ( PHB_ITEM pItem );
    extern HB_EXPORT PHB_ITEM  hb_itemPutNLL   ( PHB_ITEM pItem, LONGLONG llNumber );
    extern HB_EXPORT PHB_ITEM  hb_itemPutNLLLen( PHB_ITEM pItem, LONGLONG llNumber, int iWidth );
+#endif
+
+#if defined( _HB_API_INTERNAL_ )
+
+#  define hb_itemSetNil( item )           do { \
+                                             if( HB_IS_COMPLEX( item ) ) \
+                                                hb_itemClear( item ); \
+                                             else \
+                                                (item)->type = HB_IT_NIL; \
+                                          } while( 0 )
+
+#else
+
+#  define hb_itemSetNil( item )           hb_itemClear( (item) )
+
 #endif
 
 HB_EXTERN_END

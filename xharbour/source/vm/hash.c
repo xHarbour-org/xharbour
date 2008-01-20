@@ -1,5 +1,5 @@
 /*
- * $Id: hash.c,v 1.51 2007/03/25 06:12:50 walito Exp $
+ * $Id: hash.c,v 1.52 2007/04/08 07:20:57 ronpinkas Exp $
  */
 
 /*
@@ -1329,14 +1329,7 @@ BOOL HB_EXPORT hb_hashGet( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem )
       }
    }
 
-   if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem->type = HB_IT_NIL;
-   }
+   hb_itemSetNil( pItem );
 
    return FALSE;
 }
@@ -1386,14 +1379,7 @@ BOOL HB_EXPORT hb_hashGetForward( PHB_ITEM pHash, ULONG ulReturn, PHB_ITEM pItem
       }
    }
 
-   if( HB_IS_COMPLEX( pItem ) )
-   {
-      hb_itemClear( pItem );
-   }
-   else
-   {
-      pItem->type = HB_IT_NIL;
-   }
+   hb_itemSetNil( pItem );
 
    return FALSE;
 }
