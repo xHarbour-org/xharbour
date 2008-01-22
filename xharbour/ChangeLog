@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5890 2008/01/22 02:28:16 lculik Exp $
+ * $Id: ChangeLog,v 1.5891 2008/01/22 15:32:25 guerra000 Exp $
  */
 
 /* Use this format for the entry headers:
@@ -9,7 +9,7 @@
 */
 
 2008-01-22 09:30 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
-  * ./makefile.bc
+  * ./makefile.pc
     ! Added missing files.
 
 2008-01-22 00:20 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
