@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.60 2007/12/29 16:34:27 modalsist Exp $
+# $Id: makefile.pc,v 1.61 2008/01/02 00:30:57 modalsist Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -605,13 +605,10 @@ MISC_LIB_OBJS = \
 CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
-   $(OBJ_DIR)\cpesdos.obj \
+   $(OBJ_DIR)\cpes850.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
-   $(OBJ_DIR)\cpgedos.obj \
-   $(OBJ_DIR)\cpgewin.obj \
    $(OBJ_DIR)\cpit437.obj \
    $(OBJ_DIR)\cpit850.obj \
    $(OBJ_DIR)\cpitisb.obj \
@@ -657,7 +654,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj  \
    $(OBJ_DIR)\cpcswin.obj  \
-   $(OBJ_DIR)\cpfrdos.obj  \
    $(OBJ_DIR)\cphu852s.obj \
    $(OBJ_DIR)\cphuiso.obj  \
    $(OBJ_DIR)\cphuisos.obj \
@@ -670,7 +666,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpsl852.obj  \
    $(OBJ_DIR)\cpsliso.obj  \
    $(OBJ_DIR)\cpslwin.obj  \
-   $(OBJ_DIR)\cptrdos.obj  \
    $(OBJ_DIR)\cptrwin.obj  \
    $(OBJ_DIR)\uc1253.obj   \
    $(OBJ_DIR)\uc1257.obj   \
@@ -678,6 +673,15 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\uc857.obj    \
    $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uckam.obj    \
+   $(OBJ_DIR)\cpde850.obj \
+   $(OBJ_DIR)\cpdeiso.obj \
+   $(OBJ_DIR)\cpel737.obj \
+   $(OBJ_DIR)\cpfr850.obj \
+   $(OBJ_DIR)\cptr857.obj \
+   $(OBJ_DIR)\cpruiso.obj \
+   $(OBJ_DIR)\cpdewin.obj \
+   $(OBJ_DIR)\uc1252.obj \
+   
    $(OBJ_DIR)\ucmik.obj
 
 LANG_LIB_OBJS = \
@@ -1802,13 +1806,13 @@ $(OBJ_DIR)\cpbgmik.obj : $(CODEPAGE_DIR)\cpbgmik.c
 $(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
+$(OBJ_DIR)\cpel737.obj : $(CODEPAGE_DIR)\cpel737.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
+$(OBJ_DIR)\cpes850.obj : $(CODEPAGE_DIR)\cpes850.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
@@ -1817,10 +1821,10 @@ $(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
 $(OBJ_DIR)\cpeswin.obj : $(CODEPAGE_DIR)\cpeswin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
+$(OBJ_DIR)\cpde850.obj : $(CODEPAGE_DIR)\cpde850.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
+$(OBJ_DIR)\cpdeiso.obj : $(CODEPAGE_DIR)\cpdeiso.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpit437.obj : $(CODEPAGE_DIR)\cpit437.c
@@ -1958,7 +1962,7 @@ $(OBJ_DIR)\cpcskam.obj : $(CODEPAGE_DIR)\cpcskam.c
 $(OBJ_DIR)\cpcswin.obj : $(CODEPAGE_DIR)\cpcswin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpfrdos.obj : $(CODEPAGE_DIR)\cpfrdos.c
+$(OBJ_DIR)\cpfr850.obj : $(CODEPAGE_DIR)\cpfr850.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cphu852s.obj : $(CODEPAGE_DIR)\cphu852s.c
@@ -1997,7 +2001,7 @@ $(OBJ_DIR)\cpsliso.obj : $(CODEPAGE_DIR)\cpsliso.c
 $(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cptrdos.obj : $(CODEPAGE_DIR)\cptrdos.c
+$(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c

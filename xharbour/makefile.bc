@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.213 2007/12/29 16:34:27 modalsist Exp $
+# $Id: makefile.bc,v 1.214 2008/01/15 10:13:43 marchuet Exp $
 #
 
 #
@@ -906,13 +906,10 @@ TIP_LIB_OBJS = \
 CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
-   $(OBJ_DIR)\cpesdos.obj \
+   $(OBJ_DIR)\cpes850.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
-   $(OBJ_DIR)\cpgedos.obj \
-   $(OBJ_DIR)\cpgewin.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
@@ -964,7 +961,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
    $(OBJ_DIR)\cpcswin.obj \
-   $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
    $(OBJ_DIR)\cphuiso.obj \
    $(OBJ_DIR)\cphuisos.obj \
@@ -977,8 +973,15 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpsl852.obj \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
-   $(OBJ_DIR)\cptrdos.obj \
    $(OBJ_DIR)\cptrwin.obj \
+   $(OBJ_DIR)\cpde850.obj \
+   $(OBJ_DIR)\cpdeiso.obj \
+   $(OBJ_DIR)\cpel737.obj \
+   $(OBJ_DIR)\cpfr850.obj \
+   $(OBJ_DIR)\cptr857.obj \
+   $(OBJ_DIR)\cpruiso.obj \
+   $(OBJ_DIR)\cpdewin.obj \
+   $(OBJ_DIR)\uc1252.obj \
    $(OBJ_DIR)\uc1253.obj \
    $(OBJ_DIR)\uc1257.obj \
    $(OBJ_DIR)\uc737.obj \

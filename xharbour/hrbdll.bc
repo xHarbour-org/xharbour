@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.149 2007/11/23 18:50:37 ptsarenko Exp $
+# $Id: hrbdll.bc,v 1.150 2007/12/29 16:34:26 modalsist Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -563,13 +563,10 @@ HARBOUR_DLL_OBJS = \
 #
    $(OBJ_DIR)\cpbgmik.obj \
    $(OBJ_DIR)\cpbgwin.obj \
-   $(OBJ_DIR)\cpeldos.obj \
    $(OBJ_DIR)\cpelwin.obj \
-   $(OBJ_DIR)\cpesdos.obj \
+   $(OBJ_DIR)\cpes850.obj \
    $(OBJ_DIR)\cpesmwin.obj \
    $(OBJ_DIR)\cpeswin.obj \
-   $(OBJ_DIR)\cpgedos.obj \
-   $(OBJ_DIR)\cpgewin.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \
    $(OBJ_DIR)\cphr852.obj \
@@ -621,7 +618,6 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\cpcsiso.obj  \
    $(OBJ_DIR)\cpcskam.obj \
    $(OBJ_DIR)\cpcswin.obj \
-   $(OBJ_DIR)\cpfrdos.obj \
    $(OBJ_DIR)\cphu852s.obj \
    $(OBJ_DIR)\cphuiso.obj \
    $(OBJ_DIR)\cphuisos.obj \
@@ -634,7 +630,6 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\cpsl852.obj \
    $(OBJ_DIR)\cpsliso.obj \
    $(OBJ_DIR)\cpslwin.obj \
-   $(OBJ_DIR)\cptrdos.obj \
    $(OBJ_DIR)\cptrwin.obj \
    $(OBJ_DIR)\uc1253.obj \
    $(OBJ_DIR)\uc1257.obj \
@@ -642,6 +637,14 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\uc857.obj \
    $(OBJ_DIR)\uc8859_5.obj \
    $(OBJ_DIR)\uckam.obj \
+   $(OBJ_DIR)\cpde850.obj \
+   $(OBJ_DIR)\cpdeiso.obj \
+   $(OBJ_DIR)\cpel737.obj \
+   $(OBJ_DIR)\cpfr850.obj \
+   $(OBJ_DIR)\cptr857.obj \
+   $(OBJ_DIR)\cpruiso.obj \
+   $(OBJ_DIR)\cpdewin.obj \
+   $(OBJ_DIR)\uc1252.obj \      
    $(OBJ_DIR)\ucmik.obj \
 #
 # hbtip
