@@ -1,4 +1,4 @@
-# $Id: makefile.pc,v 1.61 2008/01/02 00:30:57 modalsist Exp $
+# $Id: makefile.pc,v 1.62 2008/01/22 02:28:17 lculik Exp $
 #
 # Makefile for Pelles C compiler 4.x
 #
@@ -681,7 +681,6 @@ CODEPAGE_LIB_OBJS = \
    $(OBJ_DIR)\cpruiso.obj \
    $(OBJ_DIR)\cpdewin.obj \
    $(OBJ_DIR)\uc1252.obj \
-   
    $(OBJ_DIR)\ucmik.obj
 
 LANG_LIB_OBJS = \
@@ -2004,6 +2003,12 @@ $(OBJ_DIR)\cpslwin.obj : $(CODEPAGE_DIR)\cpslwin.c
 $(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
    $(CC_CMD)
 
+$(OBJ_DIR)\cpruiso.obj : $(CODEPAGE_DIR)\cpruiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpdewin.obj : $(CODEPAGE_DIR)\cpdewin.c
+   $(CC_CMD)
+
 $(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c
    $(CC_CMD)
 
@@ -2023,6 +2028,9 @@ $(OBJ_DIR)\uc8859_5.obj : $(CODEPAGE_DIR)\uc8859_5.c
    $(CC_CMD)
 
 $(OBJ_DIR)\uckam.obj : $(CODEPAGE_DIR)\uckam.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc1252.obj : $(CODEPAGE_DIR)\uc1252.c
    $(CC_CMD)
 
 $(OBJ_DIR)\ucmik.obj : $(CODEPAGE_DIR)\ucmik.c
