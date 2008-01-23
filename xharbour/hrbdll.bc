@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.152 2008/01/23 12:24:33 lculik Exp $
+# $Id: hrbdll.bc,v 1.153 2008/01/23 16:06:39 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -3096,8 +3096,6 @@ $(OBJ_DIR)\cpruiso.obj : $(CODEPAGE_DIR)\cpruiso.c
 $(OBJ_DIR)\uc1252.obj : $(CODEPAGE_DIR)\uc1252.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
-   $(CC_CMD)
 
 $(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c
    $(CC_CMD)
