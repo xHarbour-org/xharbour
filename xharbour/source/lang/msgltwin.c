@@ -1,5 +1,5 @@
 /*
- * $Id: msgltwin.c,v 1.5 2005/06/10 22:51:37 ronpinkas Exp $
+ * $Id: msgltwin.c,v 1.6 2008/01/20 21:23:04 likewolf Exp $
  */
 
 /*
@@ -66,7 +66,7 @@ static HB_LANG s_lang =
       "Lietuviø",                  /* Name (in native language) */
       "LT",                        /* RFC ID */
       "Windows-1257",              /* Codepage */
-      "$Revision: 1.5 $ $Date: 2005/06/10 22:51:37 $",         /* Version */
+      "$Revision: 1.6 $ $Date: 2008/01/20 21:23:04 $",         /* Version */
 
       /* Month names */
 
@@ -195,7 +195,7 @@ static HB_LANG s_lang =
 
       /* Texts */
 
-      "YYYY.MM.DD",
+      "YYYY-MM-DD",
       "T",
       "N"
    }
