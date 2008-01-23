@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.151 2008/01/22 02:28:17 lculik Exp $
+# $Id: hrbdll.bc,v 1.152 2008/01/23 12:24:33 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -978,9 +978,9 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cpsl852.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpsliso.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpslwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpruiso.obj + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpdewin.obj + >> hdll.tmp
-  echo. $(OBJ_DIR)\uc1252.obj  + >> hdll.tmp     
+  echo. $(OBJ_DIR)\cpruiso.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpdewin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1252.obj            + >> hdll.tmp     
   echo. $(OBJ_DIR)\cptr857.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cptrwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1253.obj            + >> hdll.tmp
