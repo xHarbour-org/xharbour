@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.bc,v 1.150 2007/12/29 16:34:26 modalsist Exp $
+# $Id: hrbdll.bc,v 1.151 2008/01/22 02:28:17 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Borland C++ 5.5.1
@@ -18,7 +18,7 @@ BIN_DIR       = bin\b32
 LIB_DIR       = lib\b32
 
 # uncomment this line if you want to build harbour with multi-gt capabilities
-#HB_MULTI_GT = yes
+HB_MULTI_GT = yes
 # uncomment this line if you want to add rdd_ads into harbour.dll
 #HB_RDDADS = yes
 # uncomment this line if you want to add wvtgui into harbour.dll
@@ -907,13 +907,13 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cdpapi.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\cpbgmik.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpbgwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpeldos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpel737.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpelwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpesdos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpes850.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpesmwin.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cpeswin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpgedos.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpgewin.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpde850.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpdeiso.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr1250.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr437.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphr852.obj           + >> hdll.tmp
@@ -965,7 +965,7 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cpcsiso.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpcskam.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpcswin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cpfrdos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpfr850.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphu852s.obj          + >> hdll.tmp
   echo. $(OBJ_DIR)\cphuiso.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cphuisos.obj          + >> hdll.tmp
@@ -978,7 +978,10 @@ $(HARBOUR_DLL)  : \
   echo. $(OBJ_DIR)\cpsl852.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpsliso.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cpslwin.obj           + >> hdll.tmp
-  echo. $(OBJ_DIR)\cptrdos.obj           + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpruiso.obj + >> hdll.tmp
+  echo. $(OBJ_DIR)\cpdewin.obj + >> hdll.tmp
+  echo. $(OBJ_DIR)\uc1252.obj  + >> hdll.tmp     
+  echo. $(OBJ_DIR)\cptr857.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\cptrwin.obj           + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1253.obj            + >> hdll.tmp
   echo. $(OBJ_DIR)\uc1257.obj            + >> hdll.tmp
@@ -2979,13 +2982,13 @@ $(OBJ_DIR)\cpbgwin.obj : $(CODEPAGE_DIR)\cpbgwin.c
 $(OBJ_DIR)\cpcskam.obj : $(CODEPAGE_DIR)\cpcskam.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpeldos.obj : $(CODEPAGE_DIR)\cpeldos.c
+$(OBJ_DIR)\cpel737.obj : $(CODEPAGE_DIR)\cpel737.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpelwin.obj : $(CODEPAGE_DIR)\cpelwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpesdos.obj : $(CODEPAGE_DIR)\cpesdos.c
+$(OBJ_DIR)\cpes850.obj : $(CODEPAGE_DIR)\cpes850.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
@@ -2994,13 +2997,13 @@ $(OBJ_DIR)\cpesmwin.obj : $(CODEPAGE_DIR)\cpesmwin.c
 $(OBJ_DIR)\cpeswin.obj : $(CODEPAGE_DIR)\cpeswin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpfrdos.obj : $(CODEPAGE_DIR)\cpfrdos.c
+$(OBJ_DIR)\cpfr850.obj : $(CODEPAGE_DIR)\cpfr850.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpgedos.obj : $(CODEPAGE_DIR)\cpgedos.c
+$(OBJ_DIR)\cpde850.obj : $(CODEPAGE_DIR)\cpde850.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cpgewin.obj : $(CODEPAGE_DIR)\cpgewin.c
+$(OBJ_DIR)\cpdeiso.obj : $(CODEPAGE_DIR)\cpdeiso.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cphr1250.obj : $(CODEPAGE_DIR)\cphr1250.c
@@ -3081,7 +3084,19 @@ $(OBJ_DIR)\cpsvclip.obj : $(CODEPAGE_DIR)\cpsvclip.c
 $(OBJ_DIR)\cpsvwin.obj : $(CODEPAGE_DIR)\cpsvwin.c
    $(CC_CMD)
 
-$(OBJ_DIR)\cptrdos.obj : $(CODEPAGE_DIR)\cptrdos.c
+$(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpdewin.obj : $(CODEPAGE_DIR)\cpdewin.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cpruiso.obj : $(CODEPAGE_DIR)\cpruiso.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\uc1252.obj : $(CODEPAGE_DIR)\uc1252.c
+   $(CC_CMD)
+
+$(OBJ_DIR)\cptr857.obj : $(CODEPAGE_DIR)\cptr857.c
    $(CC_CMD)
 
 $(OBJ_DIR)\cptrwin.obj : $(CODEPAGE_DIR)\cptrwin.c
