@@ -1,5 +1,5 @@
 #
-# $Id: makefile.vc,v 1.204 2007/12/29 16:34:27 modalsist Exp $
+# $Id: makefile.vc,v 1.205 2008/01/22 02:28:16 lculik Exp $
 #
 
 #
@@ -381,6 +381,11 @@ LIBSMT2 = \
    oleaut32.lib \
    advapi32.lib \
    mpr.lib
+
+!ifdef HB_MULTI_GT
+   LIBSMT2 = $(LIBSMT2) \
+   $(GTNUL_LIB)   
+!endif
 
 #
 # RTL.LIB rules
