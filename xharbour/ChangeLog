@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5894 2008/01/23 16:06:39 lculik Exp $
+ * $Id: ChangeLog,v 1.5895 2008/01/23 16:36:56 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-28 00:15 UTC+0100 Francesco Saverio Giudice <info at fsgiudice dot com>
+  * source\rtl\bkgtsks.c
+    * fixed hb_backgroundRun() function to check if midnight is passed and
+      reset counters
+    + added hb_backgroundRunForced() to C and PRG level
+      this function permits to run Background activities also if
+      SET BACKGROUND TASKS is OFF
+      if should be usefull only for demonstration purpose or in specific cases
+
+  * include\hbapi.h
+  * include\hbextern.ch
+    + added HB_BACKGROUNDRUNFORCED()
+
+  * tests\bkgtest.prg
+    * Updated
+
+  * doc\en\bkgtsks.txt
+    * Updated documentation
 
 2008-01-23 14:35 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   *  makefile.vc
@@ -31,9 +50,9 @@
   * makefile.bc
     makefile.vc
     hrbdll.bc
-    makefile.pc 
-    ! updated to new files 
-    
+    makefile.pc
+    ! updated to new files
+
 2008-01-21 02:15 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbvmopt.h
   * include/hbapiitm.h
@@ -48,7 +67,7 @@
 2008-01-21 00:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   + source/codepage/cpes850.c
   - source/codepage/cpesdos.c
-    Renamed according to actual language and codepage codes. 
+    Renamed according to actual language and codepage codes.
   (by Viktor Szakats, borrowed from Harbour).
 
 2008-01-21 00:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
@@ -62,7 +81,7 @@
   - source/codepage/cpgewin.c
   - source/codepage/cpfrdos.c
   - source/codepage/cptrdos.c
-    Renamed according to actual language and codepage codes. 
+    Renamed according to actual language and codepage codes.
   * source/codepage/cpcswin.c
   * source/codepage/cpit850.c
   * source/codepage/cpitisb.c

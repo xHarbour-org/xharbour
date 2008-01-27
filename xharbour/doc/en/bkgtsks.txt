@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.txt,v 1.1 2003/12/29 01:26:30 fsgiudice Exp $
+ * $Id: bkgtsks.txt,v 1.2 2004/03/04 01:08:50 mlombardo Exp $
 */
 
 /*
@@ -9,10 +9,12 @@
  * Copyright 2003 Francesco Saverio Giudice <info@fsgiudice.com>
  *    Documentation for Background Task functions:
  *      HB_BACKGROUNDADD()       HB_BACKGROUNDDEL()    HB_BACKGROUNDRUN()
- *      HB_BACKGROUNDACTIVE()    HB_BACKGROUNDTIME()   HB_BACKGROUNDRESET()
+ *      HB_BACKGROUNDRUNFORCED() HB_BACKGROUNDACTIVE() HB_BACKGROUNDTIME()
+ *      HB_BACKGROUNDRESET()
  *      hb_backgroundAdd()       hb_backgroundDel()    hb_backgroundRun()
- *      hb_backgroundRunSingle() hb_backgroundActive() hb_backgroundTime()
- *      hb_backgroundReset()     hb_backgroundFind()   hb_backgroundShutDown()
+ *      hb_backgroundRunForced() hb_backgroundRunSingle() hb_backgroundActive()
+ *      hb_backgroundTime()      hb_backgroundReset()  hb_backgroundFind()
+ *      hb_backgroundShutDown()
  *
  * See doc/license.txt for licensing terms.
  *
@@ -57,7 +59,7 @@
  *      Similar API function are avalaible at C level.
  *
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD(),SET BACKGROUND TASKS, SET BACKGROUNDTICK,Set()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD(),SET BACKGROUND TASKS, SET BACKGROUNDTICK,Set()
  *  $END$
  */
 
@@ -99,7 +101,7 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME()
+ *      HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME()
  *  $END$
  */
 
@@ -158,7 +160,7 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY(),HB_IDLEADD()
  *  $END$
  */
 
@@ -197,7 +199,7 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME(),HB_EXECFROMARRAY()
  *  $END$
  */
 
@@ -227,7 +229,7 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME()
  *  $END$
  */
 
@@ -237,7 +239,7 @@
  *  $CATEGORY$
  *      Background tasks
  *  $ONELINER$
- *      Forces run of background tasks.
+ *      Forces run of background tasks but only if SET BACKGROUND is ON.
  *  $SYNTAX$
  *      HB_BACKGROUNDRUN( [<nHandle>] )
  *  $ARGUMENTS$
@@ -250,9 +252,10 @@
  *
  *      This function can be used to run all tasks forcely or in the idle state.
  *      If a valid task handle, as returned from HB_BACKGROUNDADD(), is passed as
- *      parameter HB_BACKGROUNDRUN() run only this task.
+ *      parameter HB_BACKGROUNDRUN() run only this task otherwise it will run
+ *      tasks ONLY if SET BACKGROUND is ON.
  *
- *      NOTE: HB_BACKGROUNDRUN( nTask ) will run a task always, also if the time
+ *      NOTE: HB_BACKGROUNDRUN( nTask ) will run that task always, also if the time
  *            is not elapsed and even if the task is not active.
  *
  *  $EXAMPLES$
@@ -272,7 +275,48 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDTIME(),HB_IDLEADD()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUNFORCED(),HB_BACKGROUNDTIME(),HB_IDLEADD()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      HB_BACKGROUNDRUNFORCED()
+ *  $CATEGORY$
+ *      Background tasks
+ *  $ONELINER$
+ *      Forces run of all background tasks also if SET BACKGROUND TASKS is OFF.
+ *  $SYNTAX$
+ *      HB_BACKGROUNDRUNFORCED()
+ *  $ARGUMENTS$
+ *      None
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      HB_BACKGROUNDRUNFORCED() run all like HB_BACKGROUNDRUN() also if
+ *      SET BACKGROUND TASK is OFF.
+ *
+ *      This function should be usefull only for testing purpose otherwise
+ *      it is better follow the sequence of SET BACKGROUND TASK ON / OFF.
+ *
+ *  $EXAMPLES$
+ *      // First we define a ticker with a time of half a second
+ *      nTask := HB_BACKGROUNDADD( {|| DisplayTicker()}, 500 )
+ *      SET BACKGROUND TASKS OFF
+ *      // We need that background tasks have to run always
+ *      HB_IDLEADD( {|| HB_BACKGROUNDRUNFORCED() } )
+ *      ...
+ *      Inkey(0) // At this time background tasks will be run as an idle task
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDTIME(),HB_IDLEADD()
  *  $END$
  */
 
@@ -316,7 +360,7 @@
  *  $FILES$
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
- *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN()
+ *      HB_BACKGROUNDACTIVE(),HB_BACKGROUNDADD(),HB_BACKGROUNDDEL(),HB_BACKGROUNDRESET(),HB_BACKGROUNDRUN(),HB_BACKGROUNDRUNFORCED()
  *  $END$
  */
 
@@ -481,7 +525,7 @@
  *  $CATEGORY$
  *      Background tasks API
  *  $ONELINER$
- *      Forces run of background tasks.
+ *      Forces run of background tasks but only if SET BACKGROUND TASKS is ON.
  *  $SYNTAX$
  *      void hb_backgroundRun( void );
  *  $ARGUMENTS$
@@ -503,6 +547,36 @@
  *      source/rtl/bkgtsks.c
  *  $SEEALSO$
  *      HB_BACKGROUNDRUN(),hb_backgroundActive(),hb_backgroundAdd(),hb_backgroundDel(),hb_backgroundFind(),hb_backgroundReset(),hb_backgroundRunSingle(),hb_backgroundShutDown(),hb_backgroundTime()
+ *  $END$
+ */
+
+/*  $DOC$
+ *  $FUNCNAME$
+ *      hb_backgroundRunForced()
+ *  $CATEGORY$
+ *      Background tasks API
+ *  $ONELINER$
+ *      Forces run of background tasks also if SET BACKGROUND TASKS is OFF.
+ *  $SYNTAX$
+ *      void hb_backgroundRun( void );
+ *  $ARGUMENTS$
+ *      None.
+ *  $RETURNS$
+ *      Nothing.
+ *  $DESCRIPTION$
+ *      API C level function.
+ *      See HB_BACKGROUNDRUNFORCED() for details.
+ *  $EXAMPLES$
+ *  $STATUS$
+ *      R
+ *  $COMPLIANCE$
+ *      xHarbour extension
+ *  $PLATFORMS$
+ *      All
+ *  $FILES$
+ *      source/rtl/bkgtsks.c
+ *  $SEEALSO$
+ *      HB_BACKGROUNDRUNFORCED()
  *  $END$
  */
 
@@ -647,7 +721,7 @@
  *  $SYNTAX$
  *      SET BACKGROUNDTICK <nPcodes>;
  *  $ARGUMENTS$
- *      nPcodes    Is the number of xHarbour pCodes to run before check for tasks to 
+ *      nPcodes    Is the number of xHarbour pCodes to run before check for tasks to
  *                 execute
  *  $RETURNS$
  *  $DESCRIPTION$

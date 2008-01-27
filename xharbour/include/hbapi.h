@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.230 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: hbapi.h,v 1.231 2008/01/14 13:07:30 walito Exp $
  */
 
 /*
@@ -907,7 +907,8 @@ typedef struct HB_BACKGROUNDTASK_
 } HB_BACKGROUNDTASK, * PHB_BACKGROUNDTASK, * HB_BACKGROUNDTASK_PTR;
 
 extern void     hb_backgroundRunSingle( ULONG ulID ); /* run a single background routine */
-extern void     hb_backgroundRun( void ); /* run all background routines */
+extern void     hb_backgroundRunForced( void ); /* run all background routines also if them are not active*/
+extern void     hb_backgroundRun( void ); /* run all background routines but only if them are active*/
 extern void     hb_backgroundReset( void ); /* reset internal counter */
 extern void     hb_backgroundShutDown( void ); /* closes all background tasks */
 extern ULONG    hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive ); /* Adds a codeblock or an executable array */

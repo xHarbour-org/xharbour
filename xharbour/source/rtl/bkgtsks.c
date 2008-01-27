@@ -1,12 +1,12 @@
 /*
- * $Id: bkgtsks.c,v 1.19 2005/09/30 23:44:05 druzus Exp $
+ * $Id: bkgtsks.c,v 1.20 2005/10/24 01:04:35 druzus Exp $
  */
 
 /*
  * Harbour Project source code:
  * The background tasks - an extension of idle state
  *
- * Copyright 2003 Francesco Saverio Giudice <info@fsgiudice.com>
+ * Copyright 2003-2008 Francesco Saverio Giudice <info@fsgiudice.com>
  * www - http://www.xharbour.org - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -88,7 +88,7 @@ static ULONG s_ulBackgroundID = 0;
 */
 static HB_BACKGROUNDTASK_PTR * s_pBackgroundTasks = NULL;
 
-/* flag to prevent recursive calls of hb_backgroundState() */
+/* flag to prevent recursive calls of hb_backgroundRun() */
 static BOOL s_bIamBackground = FALSE;
 
 /* current task to be executed */
@@ -119,7 +119,6 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
    pBkgTask = ( PHB_BACKGROUNDTASK ) hb_xgrab( sizeof( HB_BACKGROUNDTASK ) );
 
    pBkgTask->pTask    = hb_itemNew( pBlock );
-   //pBkgTask->dSeconds = hb_secondsCPU( 3 );
    pBkgTask->dSeconds = hb_seconds();
    pBkgTask->millisec = nMillisec;
    pBkgTask->bActive  = bActive;
@@ -165,7 +164,7 @@ ULONG hb_backgroundAddFunc( PHB_ITEM pBlock, int nMillisec, BOOL bActive )
 
 }
 
-/* RUN all tasks defined in background state */
+/* RUN all tasks defined in background state but only if SET BACKGROUND TASKS is ON*/
 void hb_backgroundRun( void )
 {
    HB_THREAD_STUB
@@ -177,19 +176,23 @@ void hb_backgroundRun( void )
 
       if( s_uiBackgroundTask < s_uiBackgroundMaxTask )
       {
+         double dCurrSeconds = hb_seconds();
          pBkgTask = (PHB_BACKGROUNDTASK) s_pBackgroundTasks[ s_uiBackgroundTask ];
+
+         /* check if hb_seconds() is lower than pBkgTask->dSeconds, if so midnight is reached */
+        if ( !( pBkgTask->dSeconds ) || dCurrSeconds < pBkgTask->dSeconds  )
+        {
+            pBkgTask->dSeconds = dCurrSeconds;
+        }
 
          /* Check if a task can run */
          if( pBkgTask->bActive &&
               ( pBkgTask->millisec == 0 ||
-                !( pBkgTask->dSeconds ) ||
-                //( ( ( hb_secondsCPU( 3 ) - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
                 ( ( ( hb_seconds() - pBkgTask->dSeconds ) * 1000 ) >= pBkgTask->millisec )
               )
             )
          {
             hb_itemRelease( hb_itemDo( pBkgTask->pTask, 0 ) );
-            //pBkgTask->dSeconds = hb_secondsCPU( 3 );
             pBkgTask->dSeconds = hb_seconds();
          }
          ++s_uiBackgroundTask;
@@ -204,6 +207,19 @@ void hb_backgroundRun( void )
       }
       s_bIamBackground = FALSE;
    }
+}
+
+/* RUN all tasks also if SET BACKGROUND TASKS is OFF */
+void hb_backgroundRunForced( void )
+{
+   HB_THREAD_STUB
+   BOOL bOldSet   = hb_set.HB_SET_BACKGROUNDTASKS;
+
+   hb_set.HB_SET_BACKGROUNDTASKS = TRUE;
+
+   hb_backgroundRun();
+
+   hb_set.HB_SET_BACKGROUNDTASKS = bOldSet;
 }
 
 /* RUN only one tasks, intentionally no check if bacground are active is done */
@@ -380,6 +396,21 @@ HB_FUNC( HB_BACKGROUNDRUN )
       {
          hb_backgroundRun();
       }
+   }
+}
+
+/* forces to run Background functions */
+HB_FUNC( HB_BACKGROUNDRUNFORCED )
+{
+   HB_THREAD_STUB
+   if ( hb_parinfo( 1 ) & HB_IT_NUMERIC )
+   {
+      ULONG ulID = hb_parnl( 1 );
+      hb_backgroundRunSingle( ulID );
+   }
+   else
+   {
+      hb_backgroundRunForced();
    }
 }
 

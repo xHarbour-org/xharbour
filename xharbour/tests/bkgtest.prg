@@ -1,7 +1,7 @@
 ***********************************************************
 * bkgtest.prg
 *
-* $Id: bkgtest.prg,v 1.4 2003/12/27 02:57:13 fsgiudice Exp $
+* $Id: bkgtest.prg,v 1.5 2003/12/29 23:38:58 jonnymind Exp $
 *
 * This test demonstrates usage of BACKGROUND functions that are an extension of IDLE functions;
 * this is a variant of idle functions that runs only on idle state (as inkey(0) does)
@@ -52,9 +52,11 @@ PROCEDURE Main()
    SecondsSleep( 3 )
    DispInfo( "Background functions running manually" )
    FOR n := 1 TO 100000
-       HB_BackgroundRun()
-       IF Inkey() == K_ESC
-          EXIT
+       HB_BackgroundRunForced() // Runs background tasks also if SET BACKGROUND TASKS is OFF
+       IF n % 1000 == 0
+          IF Inkey() == K_ESC
+             EXIT
+          ENDIF
        ENDIF
    NEXT
    DispInfo( "Now you will see idle functions running until you press any key" )
@@ -112,21 +114,32 @@ PROCEDURE Main()
 RETURN
 
 PROCEDURE DispInfo( cMsg )
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
   IF cMsg == NIL
      cMsg := ""
   ENDIF
   @ 23, 0 SAY PadC( cMsg, MaxCol() )
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE IdleFunc( nRow, cStr )
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
+
    @nRow, 10 SAY cStr
    ThreadSleep( 100 )
    @nRow, 10 SAY Space(69)
+
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE CheckFunc()
   STATIC nSeconds
   STATIC nElapsed
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
+
   IF nSeconds == NIL
      nSeconds := Seconds()
   ENDIF
@@ -137,14 +150,21 @@ PROCEDURE CheckFunc()
      Inkey(0)
      QUIT
   ENDIF
+
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE TimerFunc()
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
   @ 15, 60 SAY "Time: " + Time()
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE Counter1Func()
   STATIC nCount
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
 
   IF nCount == NIL
      nCount := 0
@@ -152,10 +172,13 @@ PROCEDURE Counter1Func()
   @ 16, 60 SAY "Count1: " + Str( nCount )
   nCount++
 
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE Counter2Func()
   STATIC nCount
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
 
   IF nCount == NIL
      nCount := 0
@@ -163,10 +186,13 @@ PROCEDURE Counter2Func()
   @ 17, 60 SAY "Count2: " + Str( nCount )
   nCount++
 
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE Counter3Func()
   STATIC nCount
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
 
   IF nCount == NIL
      nCount := 0
@@ -174,12 +200,16 @@ PROCEDURE Counter3Func()
   @ 18, 60 SAY "Count3: " + Str( nCount )
   nCount++
 
+  SetPos( nOldRow, nOldCol )
 RETURN
 
 PROCEDURE Ticker()
   STATIC nPos
   STATIC cText
   LOCAL cString
+  LOCAL nOldRow := Row()
+  LOCAL nOldCol := Col()
+
   IF cText == NIL
      cText := "This is a sample text. You can press ESC in any moment to exit.    Please note the different speed of counters.    "
      nPos   := 1
@@ -190,4 +220,6 @@ PROCEDURE Ticker()
   IF nPos > Len( cText )
      nPos := 1
   ENDIF
+
+  SetPos( nOldRow, nOldCol )
 RETURN
