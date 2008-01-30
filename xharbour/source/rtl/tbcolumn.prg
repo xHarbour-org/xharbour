@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.18 2006/09/27 13:08:15 modalsist Exp $
+ * $Id: tbcolumn.prg,v 1.19 2007/07/06 13:11:34 modalsist Exp $
  */
 
 /*
@@ -181,7 +181,12 @@ METHOD New( cHeading, bBlock ) CLASS TBColumn
             if there are columns which have a footing and others which don't
    */
    ::Footing  := ""
-   ::block    := bBlock
+//   ::block    := bBlock
+   if HB_Isblock( bBlock )
+     ::block := bBlock
+   else
+     ::block := {|| NIL }
+   endif
 
    #ifdef HB_COMPAT_C53
    ::aSetStyle := ARRAY( 4 )

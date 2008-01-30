@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5896 2008/01/27 23:14:41 fsgiudice Exp $
+ * $Id: ChangeLog,v 1.5897 2008/01/30 00:20:03 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,15 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-01-30 16:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed dbgotop() and dbgobottom() methods to run only if ::SkipTopBlock
+      and ::SkipBottomBlock are defined.
+
+  * source/rtl/tbcolumn.prg
+    ! fixed new() method to init ::bBlock only if a block is valid, otherwise
+      init as nil block.
 
 2008-01-29 22:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg

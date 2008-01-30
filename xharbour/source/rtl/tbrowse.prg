@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.187 2008/01/02 00:30:57 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.188 2008/01/14 23:28:48 modalsist Exp $
  */
 
 /*
@@ -370,6 +370,10 @@ RETURN nRecsSkipped
 
 METHOD dbGoTop() CLASS TDataCache
 
+   if ! HB_IsBlock( ::oCachedBrowse:GoTopBlock )
+      RETURN NIL
+   endif
+
    Eval( ::oCachedBrowse:GoTopBlock )
 
    ::nCurRow := 1
@@ -382,12 +386,17 @@ METHOD dbGoBottom() CLASS TDataCache
 
    local nToTop 
 
+   if ! HB_IsBlock( ::oCachedBrowse:GoBottomBlock )
+      RETURN 0
+   endif
+
    Eval( ::oCachedBrowse:GoBottomBlock )
 
    // How many rows are available to top of datasource
    //PM:09-01-2007 If browsing an empty database, Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
    //              becomes NIL. So, first need to test if it's empty before trying to do a Abs() on it 
    nToTop := Eval( ::oCachedBrowse:SkipBlock, - ( Len( ::aCache )  - 1 ) )
+
    IF Empty( nToTop )
       nToTop := 0
    ELSE
