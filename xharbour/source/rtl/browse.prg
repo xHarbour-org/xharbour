@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.11 2007/05/01 23:42:57 modalsist Exp $
+ * $Id: browse.prg,v 1.12 2007/05/15 15:31:06 modalsist Exp $
  */
 
 /*
@@ -196,6 +196,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
             exit
 
          case K_PGDN
+
             s_ldbAppend := ( s_ldbBottom .or. s_ldbEmpty )
             if s_ldbAppend
                oBrw:Down()
@@ -563,18 +564,14 @@ Local lBot, nRec
 // 2007/MAY/15 - E.F. - Don't use OrdKey..() functions because decrease performance.
 //RETURN ( if( IndexOrd() == 0 , Recno() == LastRec() , OrdKeyNo() == OrdKeyCount() ) )
 
-nRec := recno()
+ lBot := eof()
 
-if IndexOrd() == 0
-   lBot := ( Recno() == LastRec() )
-else
-   lBot := ( eof() .or. bof() )
-   if !lBot 
-      dbskip()
-      lBot := eof()
-      dbGoto( nRec )
-   endif
-endif
+ if ! lBot
+    nRec := recno()
+    dbskip()
+    lBot := eof()
+    dbgoto(nRec)
+ endif
 
 RETURN ( lBot )
 
