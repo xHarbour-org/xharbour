@@ -1,5 +1,5 @@
 /*
- * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
  */
 
 // Copyright (c) 2005, Google Inc.
@@ -84,9 +84,9 @@ class PCRECPP_EXP_DEFN Scanner {
   // If it returns true, it skips over the matched input and any
   // following input that matches the "skip" regular expression.
   bool Consume(const RE& re,
-               const Arg& arg0 = no_arg,
-               const Arg& arg1 = no_arg,
-               const Arg& arg2 = no_arg
+               const Arg& arg0 = RE::no_arg,
+               const Arg& arg1 = RE::no_arg,
+               const Arg& arg2 = RE::no_arg
                // TODO: Allow more arguments?
                );
 

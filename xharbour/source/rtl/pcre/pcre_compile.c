@@ -1,5 +1,5 @@
 /*
- * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2007 University of Cambridge
+           Copyright (c) 1997-2008 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -1328,11 +1328,6 @@ find_bracket(const uschar *code, BOOL utf8, int number)
 for (;;)
   {
   register int c = *code;
-
-#ifndef SUPPORT_UTF8
-  (void) utf8;
-#endif
-
   if (c == OP_END) return NULL;
 
   /* XCLASS is used for classes that cannot be represented just by a bit
@@ -1434,11 +1429,6 @@ find_recurse(const uschar *code, BOOL utf8)
 for (;;)
   {
   register int c = *code;
-
-#ifndef SUPPORT_UTF8
-  (void) utf8;
-#endif
-
   if (c == OP_END) return NULL;
   if (c == OP_RECURSE) return code;
 
@@ -2217,10 +2207,6 @@ switch(op_code)
   {
   case OP_CHAR:
   case OP_CHARNC:
-#ifndef SUPPORT_UTF8
-  (void) utf8_char;
-#endif
-
 #ifdef SUPPORT_UTF8
   if (utf8 && item > 127) { GETCHAR(item, utf8_char); }
 #endif
@@ -2392,6 +2378,7 @@ uschar classbits[32];
 BOOL class_utf8;
 BOOL utf8 = (options & PCRE_UTF8) != 0;
 uschar *class_utf8data;
+uschar *class_utf8data_base;
 uschar utf8_char[6];
 #else
 BOOL utf8 = FALSE;
@@ -2703,6 +2690,7 @@ for (;; ptr++)
 #ifdef SUPPORT_UTF8
     class_utf8 = FALSE;                       /* No chars >= 256 */
     class_utf8data = code + LINK_SIZE + 2;    /* For UTF-8 items */
+    class_utf8data_base = class_utf8data;     /* For resetting in pass 1 */
 #endif
 
     /* Process characters until ] is reached. By writing this as a "do" it
@@ -2718,6 +2706,18 @@ for (;; ptr++)
         {                           /* Braces are required because the */
         GETCHARLEN(c, ptr, ptr);    /* macro generates multiple statements */
         }
+
+      /* In the pre-compile phase, accumulate the length of any UTF-8 extra
+      data and reset the pointer. This is so that very large classes that
+      contain a zillion UTF-8 characters no longer overwrite the work space
+      (which is on the stack). */
+
+      if (lengthptr != NULL)
+        {
+        *lengthptr += class_utf8data - class_utf8data_base;
+        class_utf8data = class_utf8data_base;
+        }
+
 #endif
 
       /* Inside \Q...\E everything is literal except \E */
@@ -5822,7 +5822,6 @@ this purpose. The same space is used in the second phase for remembering where
 to fill in forward references to subpatterns. */
 
 uschar cworkspace[COMPILE_WORK_SIZE];
-
 
 /* Set this early so that early errors get offset 0. */
 

@@ -1,5 +1,5 @@
 /*
- * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
  */
 
 /*************************************************
@@ -13,7 +13,7 @@
 Compatible Regular Expression library. It defines the things POSIX says should
 be there. I hope.
 
-            Copyright (c) 1997-2007 University of Cambridge
+            Copyright (c) 1997-2008 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without

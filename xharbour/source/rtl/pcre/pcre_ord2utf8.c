@@ -1,5 +1,5 @@
 /*
- * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2007 University of Cambridge
+           Copyright (c) 1997-2008 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -67,10 +67,6 @@ Returns:     number of characters placed in the buffer
 int
 _pcre_ord2utf8(int cvalue, uschar *buffer)
 {
-#ifndef SUPPORT_UTF8
-   (void) cvalue;
-   (void) buffer;
-#endif
 #ifdef SUPPORT_UTF8
 register int i, j;
 for (i = 0; i < _pcre_utf8_table1_size; i++)

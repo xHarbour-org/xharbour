@@ -1,5 +1,5 @@
 /*
- * $Id: pcre.c,v 1.0 2008/01/16 12:00:00 andijahja Exp $
+ * $Id: config.h,v 1.8 2008/01/16 05:17:32 andijahja Exp $
  */
 
 /*************************************************
@@ -10,7 +10,7 @@
 and semantics are as close as possible to those of the Perl 5 language.
 
                        Written by Philip Hazel
-           Copyright (c) 1997-2007 University of Cambridge
+           Copyright (c) 1997-2008 University of Cambridge
 
 -----------------------------------------------------------------------------
 Redistribution and use in source and binary forms, with or without
@@ -79,10 +79,6 @@ Returns:       < 0    if the string is a valid UTF-8 string
 int
 _pcre_valid_utf8(const uschar *string, int length)
 {
-#ifndef SUPPORT_UTF8
-  (void) string;
-  (void) length;
-#endif
 #ifdef SUPPORT_UTF8
 register const uschar *p;
 
