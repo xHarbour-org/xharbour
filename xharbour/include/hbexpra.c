@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.30 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: hbexpra.c,v 1.31 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -391,7 +391,11 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 HB_EXPR_PTR hb_compExprNewFunName( char * szName )
 {
    HB_EXPR_PTR pExpr;
-   char *szNamespace, *pTmp;
+   char *szNamespace;
+
+   #if ! defined( HB_MACRO_SUPPORT )
+      char *pTmp;
+   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunName(%s)", szName));
 
@@ -493,6 +497,9 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
    #ifdef HB_C52_STRICT
       HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
    #else
+      #ifdef HB_MACRO_SUPPORT
+         HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
+      #endif
      /* xHarbour supports type overloading.*/
    #endif
 

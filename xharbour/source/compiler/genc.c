@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.147 2008/01/03 11:23:45 andijahja Exp $
+ * $Id: genc.c,v 1.148 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -82,367 +82,229 @@ typedef HB_GENC_FUNC_ * HB_GENC_FUNC_PTR;
 #define HB_PROTO_FUNC_EXIT    4
 
 
-#define INPLACE_STRUCT
+PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
+{
+    FILE *yyc = *( (FILE **) pCargo );
+    FILE *yycOuter = yyc;
+    PNAMESPACE pOuter = NULL;
+    PNAMESPACE pMember;
+    int iLevel;
+    char *szFileName;
 
-#ifdef INPLACE_STRUCT
-
-    PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
+    if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
     {
-        FILE *yyc = *( (FILE **) pCargo );
-        FILE *yycOuter = yyc;
-        PNAMESPACE pOuter;
-        PNAMESPACE pMember;
-        int iLevel;
-        char *szFileName;
-
-        if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-        {
-           szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
-           yyc = hb_fopen( szFileName, "ab" );
-        }
-        else
-        {
-           szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".xns", NULL );
-           yyc = hb_fopen( szFileName, "wb" );
-        }
-
-        if( ! yyc )
-        {
-           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
-        }
-
-        hb_xfree( szFileName );
-
-        if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-        {
-           fprintf( yyc, "#if defined( NAMESPACE_TYPEDEF ) && ! defined( %s_TYPEDEF )\n", pNamespace->szName );
-           fprintf( yyc, "#define %s_TYPEDEF\n", pNamespace->szName );
-
-           fprintf( yyc, "#if defined( __PRG__ )\n" );
-           fprintf( yyc, "DEFINE NAMESPACE %s\n", pNamespace->szName );
-           fprintf( yyc, "#else\n" );
-           fprintf( yyc, "struct\n" );
-        }
-        else
-        {
-           fprintf( yyc, "#ifndef NAMESPACE_%s\n", pNamespace->szName );
-           fprintf( yyc, "#define NAMESPACE_%s\n", pNamespace->szName );
-
-           fprintf( yyc, "#if defined( __PRG__ )\n" );
-           fprintf( yyc, "DEFINE NAMESPACE %s\n", pNamespace->szName );
-           fprintf( yyc, "#else\n" );
-           fprintf( yyc, "typedef struct\n" );
-        }
-        fprintf( yyc, "{\n" );
-        fprintf( yyc, "#endif\n" );
-
-        iLevel = 1;
-        pMember = pNamespace->pNext;
-
-        while( pMember )
-        {
-           if( pMember->type & NSTYPE_SPACE )
-           {
-              if( ( pMember->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS && pMember->extra.pOuter == NULL )
-              {
-                 hb_compGenerateXNS( pMember, pCargo );
-                 pMember = hb_compNamespaceEnumSkipMembers( pMember->pNext );
-                 pMember = pMember->pNext;
-                 continue;
-              }
-              else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
-              {
-                 fprintf( yyc, "   #define NAMESPACE_TYPEDEF\n" );
-                 fprintf( yyc, "   #include \"%s.hxns\"\n", pMember->szName );
-                 fprintf( yyc, "   #undef NAMESPACE_TYPEDEF\n" );
-
-                 pMember = pMember->pNext;
-                 continue;
-              }
-
-              ++iLevel;
-              pOuter = pMember;
-
-              fprintf( yyc, "   #if defined( __PRG__ )\n" );
-              fprintf( yyc, "   DEFINE NAMESPACE %s\n", pMember->szName );
-              fprintf( yyc, "   #else\n" );
-              fprintf( yyc, "   struct /* %s */\n", pMember->szName );
-              fprintf( yyc, "   {\n" );
-              fprintf( yyc, "   #endif\n" );
-           }
-           else if( pMember->type & NSTYPE_MEMBER )
-           {
-              if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
-              {
-                 // Don't publish
-              }
-              else
-              {
-                 fprintf( yyc, "   #if defined( __PRG__ )\n" );
-                 fprintf( yyc, "   DEFINE NAMESPACE MEMBER %s\n", pMember->szName );
-                 fprintf( yyc, "   #else\n" );
-                 fprintf( yyc, "   PHB_FUNC %s;\n\n", pMember->szName ); // Don't remove DOUBLE \n!!!
-                 fprintf( yyc, "   #endif\n" );
-              }
-           }
-
-           if( pMember->type & NSTYPE_END )
-           {
-              if( --iLevel == 0 )
-              {
-                 break;
-              }
-
-              fprintf( yyc, "   #if defined( __PRG__ )\n" );
-              fprintf( yyc, "   END\n" );
-              fprintf( yyc, "   #else\n" );
-              fprintf( yyc, "   } %s;\n\n", pOuter->szName ); // Don't remove DOUBLE \n!!!
-              fprintf( yyc, "   #endif\n" );
-
-              pOuter = pOuter->extra.pOuter;
-           }
-
-           pMember = pMember->pNext;
-        }
-
-        if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-        {
-           fprintf( yyc, "#if defined( __PRG__ )\n" );
-           fprintf( yyc, "END\n" );
-           fprintf( yyc, "#else\n" );
-           fprintf( yyc, "} %s;\n\n", pNamespace->szName ); // Don't remove DOUBLE \n!!!
-           fprintf( yyc, "#endif\n" );
-           fprintf( yyc, "#endif\n" );
-           fprintf( yyc, "\n" );
-           fprintf( yyc, "#if defined( NAMESPACE_INIT ) && ! defined( __PRG__ ) \n" );
-        }
-        else
-        {
-           fprintf( yyc, "#if defined( __PRG__ )\n" );
-           fprintf( yyc, "END\n" );
-           fprintf( yyc, "#else\n" );
-           fprintf( yyc, "} HB_NS_%s;\n\n", pNamespace->szName ); // Don't remove DOUBLE \n!!!
-           fprintf( yyc, "#endif\n" );
-           fprintf( yyc, "#endif\n" );
-
-           fclose( yyc );
-
-           yyc = yycOuter;
-
-           fprintf( yyc, "\n#include \"%s.xns\"\n", pNamespace->szName );
-
-           fprintf( yyc, "\nHB_NS_%s %s =\n", pNamespace->szName, pNamespace->szName );
-        }
-
-        fprintf( yyc, "   {\n" );
-
-        iLevel  = 1;
-        pOuter  = pNamespace;
-        pMember = pNamespace->pNext;
-
-        while( pMember )
-        {
-           if( pMember->type & NSTYPE_SPACE )
-           {
-              if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
-              {
-                 fprintf( yyc, "   #define NAMESPACE_INIT\n" );
-                 fprintf( yyc, "   #include \"%s.hxns\"\n", pMember->szName );
-                 fprintf( yyc, "   #undef NAMESPACE_INIT\n" );
-
-                 pMember = pMember->pNext;
-                 continue;
-              }
-
-              ++iLevel;
-              pOuter = pMember;
-
-              fprintf( yyc, "   { /* %s */\n", pMember->szName );
-           }
-           else if( pMember->type & NSTYPE_MEMBER )
-           {
-              if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
-              {
-                 // Don't publish
-              }
-              else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-              {
-                 fprintf( yyc, "     /* %s = */ HB_FUNCNAME( %s ),\n", pMember->szName, pMember->szName );
-              }
-              else
-              {
-                 if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-                 {
-                    fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
-                 }
-                 else
-                 {
-                    fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pOuter->iID, pMember->szName );
-                 }
-              }
-           }
-
-           if( pMember->type & NSTYPE_END )
-           {
-              if( --iLevel == 0 )
-              {
-                 break;
-              }
-
-              pOuter = pOuter->extra.pOuter;
-
-              fprintf( yyc, "   },\n" );
-           }
-
-           pMember = pMember->pNext;
-        }
-
-        if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-        {
-           fprintf( yyc, "   },\n" );
-           fprintf( yyc, "#endif\n" );
-        }
-        else
-        {
-           fprintf( yyc, "   };\n" );
-        }
-
-        return pNamespace;
+       szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
+       yyc = hb_fopen( szFileName, "ab" );
+    }
+    else
+    {
+       szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".xns", NULL );
+       yyc = hb_fopen( szFileName, "wb" );
     }
 
-#else
-
-    PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
+    if( ! yyc )
     {
-       FILE *yyc = *( (FILE **) pCargo );
-       static FILE *yycOuter;
+       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
+    }
 
-       if( pNamespace->type & NSTYPE_SPACE )
+    hb_xfree( szFileName );
+
+    if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+    {
+       fprintf( yyc, "#if defined( NAMESPACE_TYPEDEF ) && ! defined( %s_TYPEDEF )\n", pNamespace->szName );
+       fprintf( yyc, "#define %s_TYPEDEF\n", pNamespace->szName );
+
+       fprintf( yyc, "#if defined( __PRG__ )\n" );
+       fprintf( yyc, "DEFINE NAMESPACE %s\n", pNamespace->szName );
+       fprintf( yyc, "#else\n" );
+       fprintf( yyc, "struct\n" );
+    }
+    else
+    {
+       fprintf( yyc, "#ifndef NAMESPACE_%s\n", pNamespace->szName );
+       fprintf( yyc, "#define NAMESPACE_%s\n", pNamespace->szName );
+
+       fprintf( yyc, "#if defined( __PRG__ )\n" );
+       fprintf( yyc, "DEFINE NAMESPACE %s\n", pNamespace->szName );
+       fprintf( yyc, "#else\n" );
+       fprintf( yyc, "typedef struct\n" );
+    }
+    fprintf( yyc, "{\n" );
+    fprintf( yyc, "#endif\n" );
+
+    iLevel = 1;
+    pMember = pNamespace->pNext;
+
+    while( pMember )
+    {
+       if( pMember->type & NSTYPE_SPACE )
        {
-          if( pNamespace->type & NSENUM_SPACEADVISE )
+          if( ( pMember->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS && pMember->extra.pOuter == NULL )
           {
-             if( pNamespace->extra.pOuter == NULL )
-             {
-                char *szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".xns", NULL );
-
-                yycOuter = yyc;
-
-                yyc = hb_fopen( szFileName, "wb" );
-
-                if( ! yyc )
-                {
-                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
-                }
-
-                *pCargo = (void *) yyc;
-                hb_xfree( szFileName );
-
-                fprintf( yyc, "#ifndef NAMESPACE_%s\n", pNamespace->szName );
-                fprintf( yyc, "#define NAMESPACE_%s\n", pNamespace->szName );
-             }
+             hb_compGenerateXNS( pMember, pCargo );
+             pMember = hb_compNamespaceEnumSkipMembers( pMember->pNext );
+             pMember = pMember->pNext;
+             continue;
           }
-          else if( pNamespace->type & NSENUM_SPACEBEGIN )
+          else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
           {
-             if( pNamespace->type & NSTYPE_END )
-             {
-                fprintf( yyc, "/* Skipped empty namespace: '%s' */\n", pNamespace->szName );
-             }
-             else
-             {
-                fprintf( yyc, "\n" );
-                fprintf( yyc, "typedef struct _HB_NS_%s\n", pNamespace->szName );
-                fprintf( yyc, "{\n" );
-             }
+             fprintf( yyc, "   #define NAMESPACE_TYPEDEF\n" );
+             fprintf( yyc, "   #include \"%s.hxns\"\n", pMember->szName );
+             fprintf( yyc, "   #undef NAMESPACE_TYPEDEF\n" );
+
+             pMember = pMember->pNext;
+             continue;
           }
-          else if( pNamespace->type & NSENUM_SPACEEND )
-          {
-             fprintf( yyc, "} HB_NS_%s;\n", pNamespace->szName );
 
-             if( pNamespace->extra.pOuter == NULL )
-             {
-                PNAMESPACE pMember = pNamespace->pNext;
-                PNAMESPACE pOuter = pNamespace;
-                int iLevel = 1;
+          ++iLevel;
+          pOuter = pMember;
 
-                fprintf( yyc, "#endif\n" );
-
-                fclose( yyc );
-
-                yyc = yycOuter;
-                *pCargo = (void *) yyc;
-
-                fprintf( yyc, "\n#include \"%s.xns\"\n", pNamespace->szName );
-
-                fprintf( yyc, "\nHB_NS_%s %s =\n", pNamespace->szName, pNamespace->szName );
-                fprintf( yyc, "   {\n" );
-
-                while( pMember )
-                {
-                   if( pMember->type & NSTYPE_SPACE )
-                   {
-                      ++iLevel;
-                      pOuter = pMember;
-                      fprintf( yyc, "   { /* %s */\n", pMember->szName );
-                   }
-                   else if( pMember->type & NSTYPE_MEMBER )
-                   {
-                      if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
-                      {
-                         // Don't publish
-                      }
-                      else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                      {
-                         fprintf( yyc, "     /* %s = */ HB_FUNCNAME( %s ),\n", pMember->szName, pMember->szName );
-                      }
-                      else
-                      {
-                         fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pOuter->iID, pMember->szName );
-                      }
-                   }
-
-                   if( pMember->type & NSTYPE_END )
-                   {
-                      if( --iLevel == 0 )
-                      {
-                         break;
-                      }
-
-                      fprintf( yyc, "   },\n" );
-
-                      pOuter = pOuter->extra.pOuter;
-                   }
-
-                   pMember = pMember->pNext;
-                }
-
-                fprintf( yyc, "   };\n" );
-             }
-          }
-          else
-          {
-             fprintf( yyc, "   HB_NS_%s %s;\n", pNamespace->szName, pNamespace->szName );
-          }
+          fprintf( yyc, "   #if defined( __PRG__ )\n" );
+          fprintf( yyc, "   DEFINE NAMESPACE %s\n", pMember->szName );
+          fprintf( yyc, "   #else\n" );
+          fprintf( yyc, "   struct /* %s */\n", pMember->szName );
+          fprintf( yyc, "   {\n" );
+          fprintf( yyc, "   #endif\n" );
        }
-       else if( pNamespace->type & NSTYPE_MEMBER )
+       else if( pMember->type & NSTYPE_MEMBER )
        {
-          if( ( pNamespace->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
+          if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
           {
              // Don't publish
           }
           else
           {
-             fprintf( yyc, "   PHB_FUNC %s;\n", pNamespace->szName );
+             fprintf( yyc, "   #if defined( __PRG__ )\n" );
+             fprintf( yyc, "   DEFINE NAMESPACE MEMBER %s\n", pMember->szName );
+             fprintf( yyc, "   #else\n" );
+             fprintf( yyc, "   PHB_FUNC %s;\n\n", pMember->szName ); // Don't remove DOUBLE \n!!!
+             fprintf( yyc, "   #endif\n" );
           }
        }
-       else
+
+       if( pMember->type & NSTYPE_END )
        {
-          fprintf( yyc, "*** Unexpected pNamespace->type: %i in %s\n", pNamespace->type, pNamespace->szName );
+          if( --iLevel == 0 )
+          {
+             break;
+          }
+
+          fprintf( yyc, "   #if defined( __PRG__ )\n" );
+          fprintf( yyc, "   END\n" );
+          fprintf( yyc, "   #else\n" );
+          fprintf( yyc, "   } %s;\n\n", pOuter->szName ); // Don't remove DOUBLE \n!!!
+          fprintf( yyc, "   #endif\n" );
+
+          pOuter = pOuter->extra.pOuter;
        }
 
-       return pNamespace;
+       pMember = pMember->pNext;
     }
 
-#endif
+    if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+    {
+       fprintf( yyc, "#if defined( __PRG__ )\n" );
+       fprintf( yyc, "END\n" );
+       fprintf( yyc, "#else\n" );
+       fprintf( yyc, "} %s;\n\n", pNamespace->szName ); // Don't remove DOUBLE \n!!!
+       fprintf( yyc, "#endif\n" );
+       fprintf( yyc, "#endif\n" );
+       fprintf( yyc, "\n" );
+       fprintf( yyc, "#if defined( NAMESPACE_INIT ) && ! defined( __PRG__ ) \n" );
+    }
+    else
+    {
+       fprintf( yyc, "#if defined( __PRG__ )\n" );
+       fprintf( yyc, "END\n" );
+       fprintf( yyc, "#else\n" );
+       fprintf( yyc, "} HB_NS_%s;\n\n", pNamespace->szName ); // Don't remove DOUBLE \n!!!
+       fprintf( yyc, "#endif\n" );
+       fprintf( yyc, "#endif\n" );
+
+       fclose( yyc );
+
+       yyc = yycOuter;
+
+       fprintf( yyc, "\n#include \"%s.xns\"\n", pNamespace->szName );
+
+       fprintf( yyc, "\nHB_NS_%s %s =\n", pNamespace->szName, pNamespace->szName );
+    }
+
+    fprintf( yyc, "   {\n" );
+
+    iLevel  = 1;
+    pOuter  = pNamespace;
+    pMember = pNamespace->pNext;
+
+    while( pMember )
+    {
+       if( pMember->type & NSTYPE_SPACE )
+       {
+          if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
+          {
+             fprintf( yyc, "   #define NAMESPACE_INIT\n" );
+             fprintf( yyc, "   #include \"%s.hxns\"\n", pMember->szName );
+             fprintf( yyc, "   #undef NAMESPACE_INIT\n" );
+
+             pMember = pMember->pNext;
+             continue;
+          }
+
+          ++iLevel;
+          pOuter = pMember;
+
+          fprintf( yyc, "   { /* %s */\n", pMember->szName );
+       }
+       else if( pMember->type & NSTYPE_MEMBER )
+       {
+          if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
+          {
+             // Don't publish
+          }
+          else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+          {
+             fprintf( yyc, "     /* %s = */ HB_FUNCNAME( %s ),\n", pMember->szName, pMember->szName );
+          }
+          else
+          {
+             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+             {
+                fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
+             }
+             else
+             {
+                fprintf( yyc, "     /* %s = */ HB_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pOuter->iID, pMember->szName );
+             }
+          }
+       }
+
+       if( pMember->type & NSTYPE_END )
+       {
+          if( --iLevel == 0 )
+          {
+             break;
+          }
+
+          pOuter = pOuter->extra.pOuter;
+
+          fprintf( yyc, "   },\n" );
+       }
+
+       pMember = pMember->pNext;
+    }
+
+    if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+    {
+       fprintf( yyc, "   },\n" );
+       fprintf( yyc, "#endif\n" );
+    }
+    else
+    {
+       fprintf( yyc, "   };\n" );
+    }
+
+    return pNamespace;
+}
 
 void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* generates the C language output */
 {
@@ -869,7 +731,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else
             {
-               fprintf( yyc, "/* Skipped: call to: %s in: %s */\n", pFunCall->szName, pFunCall->Namespace );
+               fprintf( yyc, "/* Skipped: call to: %s in: %s */\n", pFunCall->szName, (char *) pFunCall->Namespace );
             }
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
@@ -958,11 +820,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       if( hb_comp_Namespaces.pFirst )
       {
-        #ifdef INPLACE_STRUCT
-            hb_compNamespaceEnumSpaces( hb_comp_Namespaces.pFirst, hb_compGenerateXNS, (void **) &yyc );
-        #else
-            hb_compNamespaceEnumDeep( hb_comp_Namespaces.pFirst, hb_compGenerateXNS, (void **) &yyc );
-        #endif
+        void *pTemp = (void *) yyc;
+
+        hb_compNamespaceEnumSpaces( hb_comp_Namespaces.pFirst, hb_compGenerateXNS, &pTemp );
+
+        yyc = (FILE *)pTemp;
       }
 
       fprintf( yyc, "\n#undef HB_PRG_PCODE_VER\n" );

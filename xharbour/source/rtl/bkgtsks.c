@@ -1,5 +1,5 @@
 /*
- * $Id: bkgtsks.c,v 1.20 2005/10/24 01:04:35 druzus Exp $
+ * $Id: bkgtsks.c,v 1.21 2008/01/27 23:14:43 fsgiudice Exp $
  */
 
 /*
@@ -212,7 +212,6 @@ void hb_backgroundRun( void )
 /* RUN all tasks also if SET BACKGROUND TASKS is OFF */
 void hb_backgroundRunForced( void )
 {
-   HB_THREAD_STUB
    BOOL bOldSet   = hb_set.HB_SET_BACKGROUNDTASKS;
 
    hb_set.HB_SET_BACKGROUNDTASKS = TRUE;

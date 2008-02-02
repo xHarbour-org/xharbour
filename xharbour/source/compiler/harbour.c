@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.177 2008/01/06 21:35:47 andijahja Exp $
+ * $Id: harbour.c,v 1.178 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -2723,24 +2723,7 @@ PFUNCALL hb_compFunCallFind( char * szFuncName, void *Namespace, int iFlags ) /*
 {
    PFUNCALL pFunCall = hb_comp_funcalls.pFirst;
 
-   #if 0
-     char *szNamespace = NULL;
-     PNAMESPACE pNamespace = NULL;
-
-     iFlags &= ~SYMF_FUNCALL;
-
-     if( ( iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH )
-     {
-        szNamespace = (char *) Namespace;
-     }
-     else
-     {
-        if( Namespace )
-        {
-           pNamespace = (PNAMESPACE) Namespace;
-        }
-     }
-   #endif
+   HB_SYMBOL_UNUSED( iFlags );
 
    while( pFunCall )
    {
