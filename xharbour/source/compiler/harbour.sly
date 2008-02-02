@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.139 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: harbour.sly,v 1.140 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -148,7 +148,7 @@ static PTR_LOOPEXIT hb_comp_pLoops   = NULL;
 static PELSEIF      hb_comp_pElseIfs = NULL;
 
 static BOOL bTrancuateBaseArray = FALSE;
-static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray;
+static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray, pGetFunction;
 
 static int s_iBlock = 0;
 static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
@@ -157,6 +157,8 @@ static HB_EXPR_PTR pBlockSimple;
 static int s_iLastControlLine = 0, s_iControlLevel = 0;
 
 extern char * hb_comp_SLX_LastBlock( BOOL bReset );
+
+extern HB_COMP_IDS hb_compExpr_IDs;
 
 char * hb_comp_szAnnounce = NULL;    /* ANNOUNCEd procedure */
 
@@ -219,6 +221,7 @@ static void hb_compDebugStart( void ) { };
 %token HASHOP
 %token UTILITY
 %token DIVERT OF FLAGS
+%token NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -312,6 +315,9 @@ static void hb_compDebugStart( void ) { };
 %type <iNumber> SwitchCases
 %type <asExpr>  Hash HashList
 %type <asExpr>  DivertFlags
+%type <string>  NamespaceID
+%type <iNumber> NamespaceType
+%type <pVoid>   UsedPath
 
 %destructor { if( $$.dealloc ) hb_xfree( $$.string ); } LITERAL
 
@@ -331,6 +337,9 @@ Source     : Crlf
            | Statement
            | Line
            | ProcReq
+           | Namespace
+           | NamespaceDefinition
+           | NamespaceUsing
            | Source Crlf
            | Source VarDefs
            | Source FieldsDef
@@ -341,6 +350,9 @@ Source     : Crlf
            | Source Statement
            | Source Line
            | Source ProcReq
+           | Source Namespace
+           | Source NamespaceDefinition
+           | Source NamespaceUsing
            ;
 
 Line       : LINE NUM_INTEGER LITERAL Crlf
@@ -369,7 +381,12 @@ CompTimeStr : LITERAL {
             }
             ;
 
-Function   : FunScope FUNCTION  IdentName { hb_comp_cVarType = ' '; hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, 0 ); } Params Crlf
+Function   : FunScope FUNCTION  IdentName
+             {
+                hb_comp_cVarType = ' ';
+                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, 0 );
+             }
+             Params Crlf
              {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -380,7 +397,12 @@ Function   : FunScope FUNCTION  IdentName { hb_comp_cVarType = ' '; hb_compFunct
                 hb_comp_wSwitchCounter   = 0;
                 hb_comp_wFinallyCounter  = 0;
              }
-           | FunScope PROCEDURE IdentName { hb_comp_cVarType = ' '; hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, FUN_PROCEDURE ); } Params Crlf
+           | FunScope PROCEDURE IdentName
+             {
+                hb_comp_cVarType = ' ';
+                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, FUN_PROCEDURE );
+             }
+             Params Crlf
              {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -517,27 +539,35 @@ Statement  : ExecFlow { hb_comp_bDontGenLineNum = TRUE; } CrlfStmnt   { }
                      }
            | PUBLIC { hb_compLinePushIfInside(); hb_comp_iVarScope = VS_PUBLIC; }
                      ExtVarList
-                    { hb_compRTVariableGen( "__MVPUBLIC" ); hb_comp_cVarType = ' ';  hb_comp_iVarScope = VS_NONE; } Crlf
+                    { hb_compRTVariableGen( hb_compExpr_IDs.__MVPUBLIC ); hb_comp_cVarType = ' ';  hb_comp_iVarScope = VS_NONE; } Crlf
            | PRIVATE { hb_compLinePushIfInside(); hb_comp_iVarScope = VS_PRIVATE; }
                      ExtVarList
-                    { hb_compRTVariableGen( "__MVPRIVATE" ); hb_comp_cVarType = ' '; hb_comp_iVarScope = VS_NONE; } Crlf
+                    { hb_compRTVariableGen( hb_compExpr_IDs.__MVPRIVATE ); hb_comp_cVarType = ' '; hb_comp_iVarScope = VS_NONE; } Crlf
 
            | EXTERN ExtList Crlf
            | DYNAMIC DynList Crlf
-           | ANNOUNCE IdentName {
-               if( hb_comp_szAnnounce == NULL )
-               {
-                  /* check for reserved name
-                  * NOTE: Clipper doesn't check for it
-                  */
-                  char * szFunction = hb_compReservedName( $2 );
-                  if( szFunction )
-                     hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, $2 );
-                  hb_comp_szAnnounce = $2;
-               }
-               else
-                  hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUPL_ANNOUNCE, $2, NULL );
-             } Crlf
+           | ANNOUNCE IdentName
+                                {
+                                  if( hb_comp_szAnnounce == NULL )
+                                  {
+                                     /* check for reserved name
+                                     * NOTE: Clipper doesn't check for it
+                                     */
+                                     char * szFunction = hb_compReservedName( $2 );
+
+                                     if( szFunction )
+                                     {
+                                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, $2 );
+                                     }
+
+                                     hb_comp_szAnnounce = $2;
+                                  }
+                                  else
+                                  {
+                                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_DUPL_ANNOUNCE, $2, NULL );
+                                  }
+                                }
+             Crlf
            | error  { if( hb_comp_bError == FALSE ) yyerror( NULL ); } Crlf  { yyclearin; yyerrok; }
            | PARAMETERS { if( hb_comp_functions.pLast->bFlags & FUN_USES_LOCAL_PARAMS )
                           {
@@ -617,7 +647,7 @@ NumAlias   : NUM_INTEGER  ALIASOP      { $$ = hb_compExprNewLong( $1.iNumber ); 
            | NUM_LONG     ALIASOP      { $$ = hb_compExprNewLong( $1.lNumber ); }
            | NUM_DOUBLE   ALIASOP      { $$ = hb_compErrorAlias( hb_compExprNewDouble( $1.dNumber, $1.bWidth, $1.bDec ) ); }
            ;
-           
+
 /* NULL flag
 */
 //NullValue  : NULLVALUE                { $$ = hb_compExprNewNull(); }
@@ -845,7 +875,7 @@ DateTimeAlias : DateTime ALIASOP         { $$ = $1; }
 Array      : '{' ArgList '}'          { $$ = hb_compExprNewArray( $2 ); }
            ;
 
-Hash       : '{' HashList '}'         { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( "HASH" ), $2 ); }
+Hash       : '{' HashList '}'         { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compExpr_IDs.HASH ), $2 ); }
            ;
 
 HashList   : /* nothing => nil */ HASHOP /* nothing => nil */    { $$ = NULL; }
@@ -1023,7 +1053,7 @@ MacroExprAlias : MacroExpr ALIASOP     { $$ = $1; }
  */
 /* special case: _FIELD-> and FIELD-> can be nested
  */
-FieldAlias  : FIELD ALIASOP               { $$ = hb_compExprNewAlias( "FIELD" ); }
+FieldAlias  : FIELD ALIASOP               { $$ = hb_compExprNewAlias( hb_compExpr_IDs.FIELD_ ); }
             | FIELD ALIASOP FieldAlias    { $$ = $3; }
             ;
 
@@ -1111,9 +1141,19 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
 VariableAtAlias : VariableAt ALIASOP      { $$ = $1; }
 ;
 
+NamespaceID  : IdentName '.'               { $$ = $1; }
+             | NamespaceID IdentName '.'   {
+                                             char *szNamespace = (char *) hb_xgrab( strlen( $1 ) + 1 + strlen( $2 ) + 1 );
+
+                                             hb_xstrcpy( szNamespace, $1, ".", $2, NULL );
+                                             $$ = hb_compIdentifierNew( szNamespace, TRUE );
+                                           }
+           ;
+
 /* Function call
  */
 FunCall    : IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( $1 ), $3 ); }
+           | NamespaceID IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( $1, $2 ), $4 ); }
            | MacroVar '(' ArgList ')'  { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | MacroExpr '(' ArgList ')' { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | Get                       { $$ = $1; }
@@ -1136,7 +1176,7 @@ Argument   :  EmptyExpression          { $$ = $1; }
 
                                              case HB_ET_ALIASVAR:
                                              {
-                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol;
+                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol.szName;
 
                                                if( strcmp( szAlias, "M" ) == 0 || strncmp( szAlias, "MEMVAR", 4 > strlen( szAlias ) ? 4 : strlen( szAlias ) ) == 0 )
                                                {
@@ -1238,7 +1278,7 @@ WithData    : ':' SendId                 {
                                             if( hb_comp_wWithObjCounter == 0 )
                                             {
                                                if( $2->ExprType == HB_ET_FUNNAME )
-                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $2->value.asSymbol, NULL );
+                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, $2->value.asSymbol.szName, NULL );
                                                else
                                                   hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_WITHOBJECT, "&", NULL );
                                             }
@@ -1629,12 +1669,13 @@ IndexList  : '[' Expression               { $$ = hb_compExprNewArrayAt( $<asExpr
            | IndexList ']' '[' Expression { $$ = hb_compExprNewArrayAt( $1, $4 ); }
            ;
 
-_Get_      : GET { pBaseArrayName = NULL; pGetVarArray = NULL; pGetArgList = NULL; }
+_Get_      : GET { pBaseArrayName = NULL; pGetVarArray = NULL; pGetArgList = NULL; pGetFunction = NULL; }
            ;
 
 Get        : _Get_ LValue ','
                { /* $4 */
                   $2 = hb_compExprListStripSingle( $2, NULL );
+                  $2 = HB_EXPR_USE( $2, HB_EA_REDUCE );
 
                   switch( $2->ExprType )
                   {
@@ -1647,12 +1688,14 @@ Get        : _Get_ LValue ','
 
                         if( $2->ExprType == HB_ET_VARIABLE )
                         {
-                           bSetGet = ( hb_compLocalGetPos( $2->value.asSymbol ) ||
-                                       hb_compStaticGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) ||
-                                       hb_compVariableGetPos( hb_comp_pGlobals, $2->value.asSymbol ) ||
-                                       ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $2->value.asSymbol, hb_comp_functions.pFirst ) ) ||
-                                       hb_compMemvarGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) ||
-                                       hb_compFieldGetPos( $2->value.asSymbol, hb_comp_functions.pLast ) );
+                           char *szName = $2->value.asSymbol.szName;
+
+                           bSetGet = ( hb_compLocalGetPos( szName ) ||
+                                       hb_compStaticGetPos( szName, hb_comp_functions.pLast ) ||
+                                       hb_compVariableGetPos( hb_comp_pGlobals, szName ) ||
+                                       ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( szName, hb_comp_functions.pFirst ) ) ||
+                                       hb_compMemvarGetPos( szName, hb_comp_functions.pLast ) ||
+                                       hb_compFieldGetPos( szName, hb_comp_functions.pLast ) );
                         }
                         else
                         {
@@ -1661,22 +1704,21 @@ Get        : _Get_ LValue ','
 
                         if( bSetGet )
                         {
-                           HB_EXPR_PTR pSetGetBlock, pGetVar = $2, pIsNil, pIfList, pIIF;
+                           HB_EXPR_PTR pSetGetBlock, pGetVar = hb_compExprClone( $2 ), pIsNil, pIfList, pIIF;
 
-                           pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( "_1" ) ), hb_compExprNewNil() );
+                           pIsNil       = hb_compExprSetOperand( hb_compExprNewEQ( hb_compExprNewVar( hb_compExpr_IDs._1 ) ), hb_compExprNewNil() );
 
                            pIfList      = hb_compExprNewList( pIsNil );
                            pIfList      = hb_compExprAddListExpr( pIfList, pGetVar );
-                           pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( "_1" ) ) );
+                           pIfList      = hb_compExprAddListExpr( pIfList, hb_compExprAssign( hb_compExprClone( pGetVar ), hb_compExprNewVar( hb_compExpr_IDs._1 ) ) );
 
                            pIIF         = hb_compExprNewIIF( pIfList );
 
                            pSetGetBlock = hb_compExprNewCodeBlock();
-                           pSetGetBlock = hb_compExprCBVarAdd( pSetGetBlock, "_1", ' ' );
+                           pSetGetBlock = hb_compExprCBVarAdd( pSetGetBlock, hb_compExpr_IDs._1, ' ' );
+                           pSetGetBlock = hb_compExprAddListExpr( pSetGetBlock, pIIF );
 
-                           hb_compExprAddListExpr( pSetGetBlock, pIIF );
-
-                           pGetArgList = hb_compExprNewArgList( pSetGetBlock );
+                           pGetArgList  = hb_compExprNewArgList( pSetGetBlock );
                         }
                         else
                         {
@@ -1693,14 +1735,14 @@ Get        : _Get_ LValue ','
 
                      case HB_ET_ARRAYAT:
                      {
-                        HB_EXPR_PTR pArrayVar;
+                        HB_EXPR_PTR pArrayVar, pSetGetBlock;
 
                         bTrancuateBaseArray = TRUE;
 
-                        pGetVarArray = HB_EXPR_USE( $2, HB_EA_REDUCE );
+                        pGetVarArray = $2;
+                        pGetFunction = hb_compExprNewFunName( hb_compExpr_IDs.__GETA );
 
                         pArrayVar = pGetVarArray->value.asList.pExprList;
-
                         while( pArrayVar->ExprType == HB_ET_ARRAYAT )
                         {
                            pArrayVar = pArrayVar->value.asList.pExprList;
@@ -1710,7 +1752,7 @@ Get        : _Get_ LValue ','
                         {
                            if( pArrayVar->value.asMacro.pExprList )
                            {
-                              pBaseArrayName = pArrayVar->value.asMacro.pExprList;
+                              pBaseArrayName = hb_compExprClone( pArrayVar->value.asMacro.pExprList );
                            }
                            else
                            {
@@ -1726,14 +1768,14 @@ Get        : _Get_ LValue ','
                               }
                            }
 
-                           $2 = hb_compExprNewNil();
+                           pSetGetBlock = hb_compExprNewNil();
                         }
                         else
                         {
-                           $2 = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), pArrayVar );
+                           pSetGetBlock = hb_compExprAddListExpr( hb_compExprNewCodeBlock(), hb_compExprClone( pArrayVar ) );
                         }
 
-                        pGetArgList  = hb_compExprNewArgList( $2 );
+                        pGetArgList = hb_compExprNewArgList( pSetGetBlock );
 
                         break;
                      }
@@ -1753,7 +1795,7 @@ Get        : _Get_ LValue ','
                      case HB_ET_ALIASVAR:
                      case HB_ET_SEND:
                      case HB_ET_WITHSEND:
-                        pVarName = $5;
+                        pVarName = hb_compExprClone( $5 );
                         break;
 
                      case HB_ET_MACRO:
@@ -1761,12 +1803,10 @@ Get        : _Get_ LValue ','
                         if( $2->value.asMacro.cMacroOp == '&' )
                         {
                            pVarName = hb_compExprNewVar( $2->value.asMacro.szMacro );
-                           hb_compExprDelete( $5 );
                         }
                         else if( $2->value.asMacro.szMacro )
                         {
-                           pVarName = $2->value.asMacro.pExprList;
-                           hb_compExprDelete( $5 );
+                           pVarName = hb_compExprClone( $2->value.asMacro.pExprList );
                         }
                         else
                         {
@@ -1774,34 +1814,37 @@ Get        : _Get_ LValue ','
                               Clipper allways error, but we can handle simple macros or macros with no declared symbols!!!
                               hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_GET_COMPLEX_MACRO, NULL, NULL );
                             */
-                           pVarName = $5;
+                           pVarName = hb_compExprClone( $5 );
                         }
                         break;
                      }
 
-                     /* HB_ET_ARRAYAT */
-                     case HB_ET_CODEBLOCK:
-                     case HB_ET_NIL:
-                     {
-                        if( pBaseArrayName )
-                        {
-                           pVarName = pBaseArrayName;
-                           hb_compExprDelete( $5 );
-                        }
-                        else
-                        {
-                           pVarName = $5;
-                        }
-
-                        bTrancuateBaseArray = FALSE;
-                        break;
-                     }
 
                      default:
-					    pVarName = NULL;
-                        hb_compExprDelete( $5 );
-                        hb_compErrorLValue( $2 );
-                        return 0;
+                     {
+	                    /* HB_ET_ARRAYAT */
+	                    if( pGetVarArray )
+	                    {
+	                       if( pBaseArrayName )
+	                       {
+	                          pVarName = pBaseArrayName;
+	                          pBaseArrayName = NULL;
+	                       }
+	                       else
+	                       {
+	                          pVarName = hb_compExprClone( $5 );
+	                       }
+
+	                       bTrancuateBaseArray = FALSE;
+	                       break;
+	                    }
+                        else
+                        {
+                           pVarName = NULL;
+                           hb_compErrorLValue( $2 );
+                           return 0;
+                        }
+                     }
                   }
 
                   hb_compExprAddListExpr( pGetArgList, pVarName ); /* Var Name   */
@@ -1823,17 +1866,18 @@ Get        : _Get_ LValue ','
 
                   if( pGetVarArray )
                   {
-                    HB_EXPR_PTR pArrayVar, pIndex;
+                    HB_EXPR_PTR pArrayVar, pIndex, pTmp;
 
                     // We need to scan the Array backwards and build a list of the Index Expressions.
-                    pArrayVar = HB_EXPR_USE( pGetVarArray->value.asList.pExprList, HB_EA_REDUCE );
-                    pIndex = HB_EXPR_USE( pGetVarArray->value.asList.pIndex, HB_EA_REDUCE );
-                    pIndex->pNext = NULL;
+                    pArrayVar = pGetVarArray->value.asList.pExprList;
+                    pIndex    = hb_compExprClone( pGetVarArray->value.asList.pIndex );
 
                     while( pArrayVar->ExprType == HB_ET_ARRAYAT )
                     {
-                       pArrayVar->value.asList.pIndex->pNext = pIndex;
-                       pIndex = pArrayVar->value.asList.pIndex;
+                       pTmp = hb_compExprClone( pArrayVar->value.asList.pIndex );
+                       pTmp->pNext = pIndex;
+                       pIndex = pTmp;
+
                        pArrayVar = pArrayVar->value.asList.pExprList;
                     }
 
@@ -1846,16 +1890,18 @@ Get        : _Get_ LValue ','
 
              GetAExt ')'
                { /* $17 */
-                  HB_EXPR_PTR pGetFunction;
+                  if( pGetFunction == NULL )
+                  {
+                     pGetFunction = hb_compExprNewFunName( hb_compExpr_IDs.__GET );
+                  }
 
-                  if( pGetVarArray && pGetVarArray->ExprType == HB_ET_ARRAYAT )
+                  if( pBaseArrayName )
                   {
-                     pGetFunction = hb_compExprNewFunName( "__GETA");
+                     hb_compExprDelete( pBaseArrayName );
                   }
-                  else
-                  {
-                     pGetFunction = hb_compExprNewFunName( "__GET");
-                  }
+
+                  hb_compExprDelete( $2 );
+                  hb_compExprDelete( $5 );
 
                   $$ = hb_compExprNewFunCall( pGetFunction, pGetArgList );
                }
@@ -2734,12 +2780,12 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                {
                   hb_compLoopStart( TRUE );
                   $<lNumber>$ = hb_comp_functions.pLast->lPCodePos;  /* 9 */
-                  hb_compExprGenPush( $2 );              /* counter */
-                  hb_compExprGenPush( $7 );              /* end */
+                  $2 = hb_compExprGenPush( $2 );              /* counter */
+                  $7 = hb_compExprGenPush( $7 );              /* end */
 
                   if( $<asExpr>8 )
                   {
-                     hb_compExprGenPush( $<asExpr>8 );   /* step */
+                     $<asExpr>8 = hb_compExprGenPush( $<asExpr>8 );   /* step */
                   }
                }
              Crlf                                     /* 10 */
@@ -2783,7 +2829,7 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                      iStep = 1;
                   }
 
-                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol ) ) != 0 && HB_LIM_INT8( iLocal ) )
+                  if( iStep && ( iLocal = hb_compLocalGetPos( $<asExpr>2->value.asSymbol.szName ) ) != 0 && HB_LIM_INT8( iLocal ) )
                   {
                      if( iStep == 1 )
                      {
@@ -2800,11 +2846,11 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                   }
                   else if( $<asExpr>8 )
                   {
-                     hb_compExprClear( hb_compExprGenStatement( hb_compExprSetOperand( hb_compExprNewPlusEq( $2 ), $<asExpr>8 ) ) );
+                     $<asExpr>8 = hb_compExprGenStatement( hb_compExprSetOperand( hb_compExprNewPlusEq( hb_compExprClone( $2 ) ), $<asExpr>8 ) );
                   }
                   else
                   {
-                     hb_compExprClear( hb_compExprGenStatement( hb_compExprNewPreInc( $2 ) ) );
+                     $<asExpr>8 = hb_compExprGenStatement( hb_compExprNewPreInc( hb_compExprClone( $2 ) ) );
                   }
 
                   hb_compGenJump( $<lNumber>9 - hb_comp_functions.pLast->lPCodePos );
@@ -2813,12 +2859,12 @@ ForNext    : FOR LValue ForAssign Expression          /* 1  2  3  4 */
                   hb_compLoopEnd();
 
                   hb_compExprDelete( $2 );
+                  hb_compExprDelete( $<asExpr>5 ); /* Deletes $5, hb_compExprClone( $2 ), $4 */
                   hb_compExprDelete( $7 );
-                  hb_compExprDelete( $<asExpr>5 ); /* deletes $5, hb_compExprClone( $2 ), $4 */
 
                   if( $<asExpr>8 )
                   {
-                     hb_compExprDelete( $<asExpr>8 );
+                     hb_compExprDelete( $<asExpr>8 ); /* Deletes hb_compExprClone( $2 ), and original $8 */
                   }
 
                   hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
@@ -3106,7 +3152,7 @@ DoProc     : DO DoName
            | DO DoName WITH DoArgList
                { $$ = hb_compExprNewFunCall( $2, $4 ); }
            | WHILE WITH DoArgList
-               { hb_compAutoOpenAdd( "WHILE" ); $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew("WHILE", TRUE) ), $3 ); }
+               { hb_compAutoOpenAdd( hb_compExpr_IDs.WHILE_ ); $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( hb_compExpr_IDs.WHILE_, TRUE) ), $3 ); }
            ;
 
 DoArgList  : ','                       { $$ = hb_compExprAddListExpr( hb_compExprNewArgList( hb_compExprNewNil() ), hb_compExprNewNil() ); }
@@ -3129,9 +3175,124 @@ DoArgument : IdentName                            {
                                                   }
            | '@' IdentName                        { $$ = hb_compExprNewVarRef( $2 ); }
            | '@' IdentName '(' DummyArgList ')' { $$ = hb_compExprNewFunRef( $2 ); }
+           | '@' NamespaceID IdentName '(' DummyArgList ')' { $$ = hb_compExprNewNamespaceFunRef( $2, $3 ); }
            | SimpleExpression                     { $$ = $1; }
            | PareExpList                          { $$ = $1; }
            ;
+
+Namespace  : NamespaceType IdentName Crlf
+                                 {
+                                   if( hb_comp_functions.pLast )
+                                   {
+                                       hb_comp_functions.pLast->bFlags |= FUN_SEALED;
+                                   }
+
+                                   if( ( ( $1 & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS ) && hb_comp_Namespaces.pCurrent )
+                                   {
+                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                   }
+
+                                   hb_compNamespaceNew( $2, $1 );
+                                 }
+             Source
+             END Crlf
+                                 {
+                                   if( hb_comp_functions.pLast )
+                                   {
+                                       hb_comp_functions.pLast->bFlags |= FUN_SEALED;
+                                   }
+
+                                   hb_compNamespaceEnd();
+                                 }
+           | EXTERNAL_NAMESPACE IdentName Crlf
+                                 {
+                                   if( hb_comp_functions.pLast )
+                                   {
+                                       hb_comp_functions.pLast->bFlags |= FUN_SEALED;
+                                   }
+
+                                   hb_compNamespaceNew( $2, NSTYPE_EXTERNAL );
+                                   hb_compNamespaceEnd();
+                                 }
+           ;
+
+NamespaceType : NAMESPACE            { $$ = NSTYPE_SPACE; }
+              | OPTIONAL_NAMESPACE   { $$ = NSTYPE_OPTIONAL; }
+              | IMPLEMENTS_NAMESPACE { $$ = NSTYPE_IMPLEMENTS; }
+              ;
+
+NamespaceDefinition : DEFINE_NAMESPACE IdentName Crlf
+                                 {
+                                   hb_compUsedNamespaceNew( $2, NSTYPE_SPACE );
+                                 }
+                      NamespaceMemberDefinition {}
+                      END Crlf
+                                 {
+                                   hb_compUsedNamespaceEnd();
+                                 }
+
+                    ;
+
+NamespaceMemberDefinition : DEFINE_NAMESPACEMEMBER IdentName Crlf
+                                 {
+                                   hb_compUsedNamespaceNew( $2, NSTYPE_MEMBER );
+                                 }
+                          | NamespaceDefinition
+                          | NamespaceMemberDefinition
+                            DEFINE_NAMESPACEMEMBER IdentName Crlf
+                                 {
+                                   hb_compUsedNamespaceNew( $3, NSTYPE_MEMBER );
+                                 }
+                          | NamespaceMemberDefinition
+                            NamespaceDefinition
+                          ;
+
+
+NamespaceUsing : USING_NAMESPACE UsedPath Crlf
+                                               {
+                                                 if( $2 )
+                                                 {
+                                                    ( (PNAMESPACE) $2 )->type |= NSTYPE_USED;
+                                                 }
+                                               }
+               ;
+
+
+UsedPath : IdentName
+                    {
+                       if( hb_comp_UsedNamespaces.pFirst )
+                       {
+                          $$ = (void *) hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pFirst, $1 );
+                       }
+                       else
+                       {
+                          $$ = NULL;
+                       }
+
+                       if( $$ == NULL )
+                       {
+                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MISSING_NAMESPACE, $1, NULL );
+                       }
+                    }
+         | UsedPath ',' IdentName
+                                  {
+                                     if( $1 )
+                                     {
+                                        if( ( (PNAMESPACE) $1 )->pNext == NULL )
+                                        {
+                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) $1 )->szName, NULL );
+                                        }
+
+                                        $$ = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) $1 )->pNext, $3 );
+
+                                        if( $$ == NULL || ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE )
+                                        {
+                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $3, ( (PNAMESPACE) $1 )->szName );
+                                        }
+                                     }
+                                  }
+         ;
+
 
 Crlf       : '\n'          { hb_comp_bError = FALSE; }
            | ';'           { hb_comp_bDontGenLineNum = TRUE; }
@@ -3172,10 +3333,12 @@ int hb_compYACCMain( char * szName )
       hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
       hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
 
-      pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL );
+      pSym = hb_compSymbolAdd( hb_comp_pInitFunc->szName, NULL, NULL, SYMF_FUNCALL );
       pSym->cScope |= hb_comp_pInitFunc->cScope;
+
       hb_comp_functions.pLast->pNext = hb_comp_pInitFunc;
       hb_comp_functions.pLast = hb_comp_pInitFunc;
+
       hb_compGenPCode1( HB_P_ENDPROC );
       ++hb_comp_functions.iCount;
    }
@@ -3717,7 +3880,7 @@ static void hb_compRTVariableGen( char * szCreateFun )
    HB_RTVAR_PTR pDel;
 
    /* generate the function call frame */
-   hb_compGenPushSymbol( hb_compIdentifierNew( szCreateFun, TRUE ), TRUE, FALSE );
+   hb_compGenPushFunCall( szCreateFun, NULL );
    hb_compGenPushNil();
 
    /* push variable names to create */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.28 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: hbgenerr.c,v 1.29 2007/12/21 16:09:06 likewolf Exp $
  */
 
 /*
@@ -101,7 +101,11 @@ const char * hb_comp_szErrors[] =
    "Memory corruption detected",
    "TRY section requires a CATCH or FINALLY handler",
    "Invalid use of nameless parameter",
-   "Too many arguments to function: \'%s\'"
+   "Too many arguments to function: \'%s\'",
+   "IMPLEMENTS NAMESPACE from within a NAMESPACE: %s",
+   "NAMESPACE \'%s\' is empty",
+   "Definitions not loaded for NAMESPACE: \'%s\'",
+   "NAMESPACE: \'%s\' is not a NAMESPACE of: \'%s\'"
 };
 
 /* Table with parse warnings */

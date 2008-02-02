@@ -1,5 +1,5 @@
 /*
- * $Id: reserved.c,v 1.3 2004/02/14 01:29:41 andijahja Exp $
+ * $Id: reserved.c,v 1.4 2006/04/24 22:24:38 ronpinkas Exp $
  */
 
 /*
@@ -141,8 +141,12 @@ char * hb_compReservedName( char * szName )
       * however SECO32() is a valid name.
       */
       iFound = strncmp( szName, s_szReservedFun[ wNum ], 4 );
+
       if( iFound == 0 )
+      {
          iFound = strncmp( szName, s_szReservedFun[ wNum ], strlen( szName ) );
+      }
+
       ++wNum;
    }
 

@@ -1,11 +1,11 @@
 /*
- * $Id: macroa.c,v 1.2 2006/07/09 18:11:31 ronpinkas Exp $
+ * $Id: macroa.c,v 1.3 2007/07/06 00:56:01 ronpinkas Exp $
  */
 
 /* hbexpra.c is also included from ../compiler/expropta.c
  * However it produces a slighty different code if used in
  * macro compiler (there is an additional parameter passed to some functions)
- * 1.3 - ignore this magic number - this is used to force compilation
+ * 1.30 - ignore this magic number - this is used to force compilation
 */
 
 #define HB_MACRO_SUPPORT

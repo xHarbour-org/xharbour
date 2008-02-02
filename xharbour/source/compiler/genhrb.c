@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.3 2005/04/11 01:46:34 druzus Exp $
+ * $Id: genhrb.c,v 1.4 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -84,20 +84,30 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputs( pSym->szName, yyc );
       fputc( 0, yyc );
       hSymScope = pSym->cScope;
+
       if( ( hSymScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) != 0 )
+      {
          hSymScope &= ~HB_FS_PUBLIC;
+      }
+
       fputc( hSymScope, yyc );
 
       /* specify the function address if it is a defined function or a
          external called function */
-      if( hb_compFunctionFind( pSym->szName ) ) /* is it a defined function ? */
+      if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) /* is it a defined function ? */
+      {
          fputc( SYM_FUNC, yyc );
+      }
       else
       {
-         if( hb_compFunCallFind( pSym->szName ) )
+         if( hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
+         {
             fputc( SYM_EXTERN, yyc );
+         }
          else
+         {
             fputc( SYM_NOLINK, yyc );
+         }
       }
       pSym = pSym->pNext;
    }

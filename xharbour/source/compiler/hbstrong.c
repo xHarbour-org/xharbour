@@ -1,5 +1,5 @@
 /*
- * $Id: hbpcode.c,v 1.44 2006/03/25 02:22:36 druzus Exp $
+ * $Id: hbstrong.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@ static PVAR hb_compPrivateFind( char * szPrivateName )
 
    while ( pPrivate )
    {
-      if( ! strcmp( pPrivate->szName, szPrivateName ) )
+      if( pPrivate->szName == szPrivateName )
       {
          return pPrivate;
       }

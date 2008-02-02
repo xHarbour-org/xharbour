@@ -1,5 +1,5 @@
 /*
- * $Id: hbmacro.h,v 1.11 2007/02/13 23:40:58 ronpinkas Exp $
+ * $Id: hbmacro.h,v 1.12 2007/03/25 06:12:49 walito Exp $
  */
 
 /*
@@ -132,7 +132,7 @@ extern void hb_compGenJumpThere( ULONG ulFrom, ULONG ulTo, HB_BISON_PTR pMacro )
 extern void hb_compGenJumpHere( ULONG ulOffset, HB_BISON_PTR pMacro );
 extern ULONG hb_compGenJumpTrue( LONG lOffset, HB_BISON_PTR pMacro );
 extern void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_BISON_PTR pMacro );
-extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias, HB_BISON_PTR pMacro );
+extern void hb_compGenPushSymbol( char * szSymbolName, char * szNamespace, BOOL bAlias, HB_BISON_PTR pMacro );
 extern void hb_compGenPushLong( HB_LONG lNumber, HB_BISON_PTR pMacro );
 extern void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType, HB_BISON_PTR pMacro );
 extern void hb_compGenMessage( char * szMsgName, HB_BISON_PTR pMacro );
@@ -151,7 +151,7 @@ extern void hb_compGenPushAliasedVar( char * szVarName,
                                       LONG lWorkarea, HB_BISON_PTR pMacro );
 extern void hb_compGenPushLogical( int iTrueFalse, HB_BISON_PTR pMacro );
 extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec, HB_BISON_PTR pMacro );
-extern void hb_compGenPushFunCall( char * szFunName, HB_BISON_PTR pMacro );
+extern void hb_compGenPushFunCall( char * szFunName, char * szNamespace, HB_BISON_PTR pMacro );
 extern void hb_compGenPushString( char * szText, ULONG ulStrLen, HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockStart( HB_BISON_PTR pMacro );
 extern void hb_compCodeBlockEnd( HB_BISON_PTR pMacro );

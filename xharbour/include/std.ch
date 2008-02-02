@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.24 2007/12/18 23:58:12 likewolf Exp $
+ * $Id: std.ch,v 1.25 2008/01/14 12:44:30 walito Exp $
  */
 
 /*
@@ -706,6 +706,14 @@
    #command SET MACRO BLOCK VARS XHARBOUR => Set( _SET_MACROBLOCKVARS, .T. )
    #command SET MACRO BLOCK VARS CLIPPER  => Set( _SET_MACROBLOCKVARS, .F. )
    #command SET MACRO BLOCK VARS (<x>)    => Set( _SET_MACROBLOCKVARS, <x> )
+
+   // Using xtranslate because we need EARLY expansion!
+   #xtranslate __OPEN_XNS <NSX> => #include #<NSX>
+   #xcommand USING NAMESPACE <Name> [, <SubName>] EXPANDED => __OPEN_XNS <Name>\.xns;
+                                                              ; USING NAMESPACE PATH <Name> [, <SubName> ];
+                                                              ; #xuntranslate \. \<Part>
+   #xcommand USING NAMESPACE <Path> =>  #xtranslate . \<Part> => , \<Part>;
+                                       ; USING NAMESPACE <Path> EXPANDED
 
 #endif
 

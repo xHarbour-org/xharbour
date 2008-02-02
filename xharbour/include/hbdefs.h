@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.91 2008/01/01 22:26:15 enricomaria Exp $
+ * $Id: hbdefs.h,v 1.92 2008/01/07 04:57:36 andijahja Exp $
  */
 
 /*
@@ -1250,16 +1250,21 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXTERN_ extern
 #endif
 
-#define HB_FUNC_EXEC( funcname )   HB_FUN_##funcname();
-#define HB_FUNC( funcname )        HB_EXTERN_C_ HB_EXPORT HARBOUR HB_FUN_##funcname ( void )
-#define HB_FUNC_EXTERN( funcname ) HB_EXTERN_C_ HB_EXTERN_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
-#define HB_FUNC_STATIC( funcname ) static HARBOUR HB_FUN_##funcname ( void )
-#define HB_FUNC_INIT( funcname )   static HARBOUR HB_FUN_init_##funcname ( void )
-#define HB_FUNC_EXIT( funcname )   static HARBOUR HB_FUN_exit_##funcname ( void )
-#define HB_FUNC_INITLINES( )       static HARBOUR hb_INITLINES( void )
-#define HB_FUNC_INITSTATICS( )     static HARBOUR hb_INITSTATICS( void )
-#define HB_FUNC_INITGLOBALS( )     static HARBOUR hb_INITGLOBALS( void )
-#define HB_FUNC_REGISTERGLOBAL( )  static HARBOUR hb_REGISTERGLOBALS( void )
+#define HB_FUNC_EXEC( funcname )                          HB_FUN_##funcname();
+#define HB_FUNC( funcname )                               HB_EXTERN_C_ HB_EXPORT HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_EXTERN( funcname )                        HB_EXTERN_C_ HB_EXTERN_ HARBOUR HB_EXPORT HB_FUN_##funcname ( void )
+#define HB_FUNC_STATIC( funcname )                        static HARBOUR HB_FUN_##funcname ( void )
+#define HB_FUNC_INIT( funcname )                          static HARBOUR HB_FUN_init_##funcname ( void )
+#define HB_FUNC_EXIT( funcname )                          static HARBOUR HB_FUN_exit_##funcname ( void )
+#define HB_FUNC_INITLINES( )                              static HARBOUR hb_INITLINES( void )
+#define HB_FUNC_INITSTATICS( )                            static HARBOUR hb_INITSTATICS( void )
+#define HB_FUNC_INITGLOBALS( )                            static HARBOUR hb_INITGLOBALS( void )
+#define HB_FUNC_REGISTERGLOBAL( )                         static HARBOUR hb_REGISTERGLOBALS( void )
+
+#define HB_NAMESPACE_FUNCNAME( namespaceid, funcname )    HB_FUN_##namespaceid##_##funcname
+#define HB_FUNC_NAMESPACE( namespaceid, funcname )        HB_FUNC_STATIC( namespaceid##_##funcname )
+#define HB_FUNC_EXTNAMESPACE( namespaceid, funcname )     HB_FUNC( namespaceid##_##funcname )
+#define HB_FUNC_OPTIONAL_NAMESPACE( namespace, funcname ) HB_FUNC( funcname )
 
 typedef ULONG HB_HANDLE;        /* handle to memvar value */
 typedef SHORT HB_SYMBOLSCOPE;   /* stores symbol's scope */

@@ -1,5 +1,5 @@
 /*
- * $Id: expropt1.c,v 1.22 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: expropt1.c,v 1.23 2007/12/23 18:36:26 likewolf Exp $
  */
 
 /*
@@ -262,27 +262,27 @@ HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR pYear, HB_EXPR_PTR pMonth, HB_EX
    HB_EXPR_PTR pExpr;
 
    pExpr = hb_compExprNew( HB_ET_DATE );
-   
+
    if( pYear )
    {
       if( pSeconds )
       {
          if( pSeconds->value.asNum.NumType == HB_ET_DOUBLE )
          {
-            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, pSeconds->value.asNum.dVal, iAmPm, piOk );
          }
          else
          {
-            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) pSeconds->value.asNum.lVal, iAmPm, piOk );
          }
       }
       else
       {
-         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            (int) pYear->value.asNum.lVal, (int) pMonth->value.asNum.lVal, (int) pDate->value.asNum.lVal,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) 0, iAmPm, piOk );
       }
@@ -293,20 +293,20 @@ HB_EXPR_PTR hb_compExprNewDateTime( HB_EXPR_PTR pYear, HB_EXPR_PTR pMonth, HB_EX
       {
          if( pSeconds->value.asNum.NumType == HB_ET_DOUBLE )
          {
-            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            1899, 12, 30,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, pSeconds->value.asNum.dVal, iAmPm, piOk );
          }
          else
          {
-            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+            hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            1899, 12, 30,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) pSeconds->value.asNum.lVal, iAmPm, piOk );
          }
       }
       else
       {
-         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time, 
+         hb_comp_datetimeEncode( &pExpr->value.asDate.date, &pExpr->value.asDate.time,
                            1899, 12, 30,
                            (int) pHour->value.asNum.lVal, (int) pMinute->value.asNum.lVal, ( double ) 0, iAmPm, piOk );
       }
@@ -413,7 +413,8 @@ HB_EXPR_PTR hb_compExprNewVarRef( char * szVarName )
 
    pExpr = hb_compExprNew( HB_ET_VARREF );
 
-   pExpr->value.asSymbol = szVarName;
+   pExpr->value.asSymbol.szName = szVarName;
+   pExpr->value.asSymbol.szNamespace = NULL;
    pExpr->ValType = HB_EV_VARREF;
    return pExpr;
 }
@@ -426,7 +427,8 @@ HB_EXPR_PTR hb_compExprNewMemVarRef( char * szVarName )
 
    pExpr = hb_compExprNew( HB_ET_MEMVARREF );
 
-   pExpr->value.asSymbol = szVarName;
+   pExpr->value.asSymbol.szName = szVarName;
+   pExpr->value.asSymbol.szNamespace = NULL;
    pExpr->ValType = HB_EV_VARREF;
    return pExpr;
 }
@@ -439,10 +441,12 @@ HB_EXPR_PTR hb_compExprNewFunRef( char * szFunName )
 
    pExpr = hb_compExprNew( HB_ET_FUNREF );
 
-   pExpr->value.asSymbol = szFunName;
+   pExpr->value.asSymbol.szName = szFunName;
+   pExpr->value.asSymbol.szNamespace = NULL;
    pExpr->ValType = HB_EV_FUNREF;
    return pExpr;
 }
+
 
 /* Creates a new literal array { item1, item2, ... itemN }
  *    'pArrList' is a list of array elements
@@ -614,7 +618,7 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, pMessage->value.asSymbol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewSend(%p, %s)", pObject, pMessage->value.asSymbol.szName));
 
    pExpr = hb_compExprNew( HB_ET_SEND );
    pExpr->value.asMessage.pObject       = pObject;
@@ -623,10 +627,10 @@ HB_EXPR_PTR hb_compExprNewSendExp( HB_EXPR_PTR pObject, HB_EXPR_PTR pMessage )
 
    if( pMessage->ExprType == HB_ET_FUNNAME )
    {
-      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
+      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol.szName;
       pExpr->value.asMessage.pMacroMessage = NULL;
 
-	  pMessage->value.asSymbol = NULL;
+      pMessage->value.asSymbol.szName = NULL;
       HB_XFREE( pMessage );
    }
    else
@@ -657,7 +661,7 @@ HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR pMessage )
 {
    HB_EXPR_PTR pExpr;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSendExp(%s)", pMessage->value.asSymbol));
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewWithSendExp(%s)", pMessage->value.asSymbol.szName));
 
    pExpr = hb_compExprNew( HB_ET_WITHSEND );
    pExpr->value.asMessage.pObject   = NULL;
@@ -665,10 +669,10 @@ HB_EXPR_PTR hb_compExprNewWithSendExp( HB_EXPR_PTR pMessage )
 
    if( pMessage->ExprType == HB_ET_FUNNAME )
    {
-      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol;
+      pExpr->value.asMessage.szMessage     = pMessage->value.asSymbol.szName;
       pExpr->value.asMessage.pMacroMessage = NULL;
 
-	  pMessage->value.asSymbol = NULL;
+      pMessage->value.asSymbol.szName = NULL;
       HB_XFREE( pMessage );
    }
    else
@@ -755,7 +759,8 @@ HB_EXPR_PTR hb_compExprNewVar( char * szName )
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewVar(%s)", szName));
 
    pExpr = hb_compExprNew( HB_ET_VARIABLE );
-   pExpr->value.asSymbol = szName;
+   pExpr->value.asSymbol.szName = szName;
+   pExpr->value.asSymbol.szNamespace = NULL;
    return pExpr;
 }
 
@@ -778,19 +783,6 @@ HB_EXPR_PTR hb_compExprNewRTVar( char * szName, HB_EXPR_PTR pMacroVar )
    return pExpr;
 }
 
-/* Create a new symbol used in function calls
- */
-HB_EXPR_PTR hb_compExprNewFunName( char * szName )
-{
-   HB_EXPR_PTR pExpr;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunName(%s)", szName));
-
-   pExpr = hb_compExprNew( HB_ET_FUNNAME );
-   pExpr->value.asSymbol = szName;
-   return pExpr;
-}
-
 /* Create a new symbol used in an alias expressions
  */
 HB_EXPR_PTR hb_compExprNewAlias( char * szName )
@@ -800,7 +792,8 @@ HB_EXPR_PTR hb_compExprNewAlias( char * szName )
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewAlias(%s)", szName));
 
    pExpr = hb_compExprNew( HB_ET_ALIAS );
-   pExpr->value.asSymbol = szName;
+   pExpr->value.asSymbol.szName = szName;
+   pExpr->value.asSymbol.szNamespace = NULL;
    return pExpr;
 }
 

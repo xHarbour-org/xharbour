@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.89 2007/12/23 02:22:03 likewolf Exp $
+ * $Id: harbour.slx,v 1.90 2008/01/10 11:18:00 marchuet Exp $
  */
 
 /*
@@ -285,6 +285,8 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "CRITICAL{WS}STATIC{WS}PROCEDURE" ) AS_TOKEN( HB_CRITICAL_STATIC_PROC ),
                          LEX_WORD( "DECLARE"                         ) AS_TOKEN( DECLARE          ),
                          LEX_WORD( "DEFAULT"                         ) AS_TOKEN( HB_WANTS_EOL - DEFAULT          ),
+                         LEX_WORD( "DEFINE{WS}NAMESPACE"             ) AS_TOKEN( HB_WANTS_ID  - DEFINE_NAMESPACE ),
+                         LEX_WORD( "DEFINE{WS}NAMESPACE{WS}MEMBER"   ) AS_TOKEN( HB_WANTS_ID  - DEFINE_NAMESPACEMEMBER ),
                          LEX_WORD( "DIVERT{WS}TO"                    ) AS_TOKEN( HB_WANTS_EXP - DIVERT           ),
                          LEX_WORD( "DO"                              ) AS_TOKEN( HB_WANTS_VAR - DO               ),
                          LEX_WORD( "DO{WS}CASE"                      ) AS_TOKEN( DOCASE           ),
@@ -303,6 +305,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "EXIT{WS}FUNCTION"                ) AS_TOKEN( HB_EXIT_FUNC     ),
                          LEX_WORD( "EXIT{WS}PROCEDURE"               ) AS_TOKEN( HB_EXIT_PROC     ),
                          LEX_WORD( "EXTERNAL"                        ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
+                         LEX_WORD( "EXTERNAL{WS}NAMESPACE"           ) AS_TOKEN( HB_WANTS_ID  - EXTERNAL_NAMESPACE ),
                          LEX_WORD( "FIELD"                           ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
                          LEX_WORD( "FINALLY"                         ) AS_TOKEN( HB_WANTS_EOL - FINALLY          ),
                          LEX_WORD( "FOR"                             ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
@@ -311,12 +314,15 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "GLOBAL"                          ) AS_TOKEN( HB_WANTS_ID  - GLOBAL           ),
                          LEX_WORD( "GLOBAL{WS}EXTERNAL"              ) AS_TOKEN( EXTERNGLOBAL     ),
                          LEX_WORD( "IF"                              ) AS_TOKEN( HB_WANTS_EXP - IF               ),
+                         LEX_WORD( "IMPLEMENTS{WS}NAMESPACE"         ) AS_TOKEN( HB_WANTS_ID  - IMPLEMENTS_NAMESPACE ),
                          LEX_WORD( "INIT{WS}FUNCTION"                ) AS_TOKEN( HB_INIT_FUNC     ),
                          LEX_WORD( "INIT{WS}PROCEDURE"               ) AS_TOKEN( HB_INIT_PROC     ),
                          LEX_WORD( "LOCAL"                           ) AS_TOKEN( HB_WANTS_ID  - LOCAL            ),
                          LEX_WORD( "LOOP"                            ) AS_TOKEN( HB_WANTS_EOL - LOOP             ),
                          LEX_WORD( "MEMVAR"                          ) AS_TOKEN( HB_WANTS_ID  - MEMVAR           ),
+                         LEX_WORD( "NAMESPACE"                       ) AS_TOKEN( HB_WANTS_ID  - NAMESPACE        ),
                          LEX_WORD( "NEXT"                            ) AS_TOKEN( HB_WANTS_EOL - NEXT             ),
+                         LEX_WORD( "OPTIONAL{WS}NAMESPACE"           ) AS_TOKEN( HB_WANTS_ID  - OPTIONAL_NAMESPACE ),
                          LEX_WORD( "OTHERWISE"                       ) AS_TOKEN( HB_WANTS_EOL - OTHERWISE        ),
                          LEX_WORD( "PARAMETERS"                      ) AS_TOKEN( HB_WANTS_ID  - PARAMETERS       ),
                          LEX_WORD( "PRIVATE"                         ) AS_TOKEN( HB_WANTS_VAR - PRIVATE          ),
@@ -331,6 +337,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "SWITCH"                          ) AS_TOKEN( HB_WANTS_EXP - SWITCH           ),
                       /* LEX_WORD( "TEXT"                            ) AS_TOKEN( HB_TEXT          ),                 */
                          LEX_WORD( "TRY"                             ) AS_TOKEN( HB_WANTS_EOL  - TRY             ),
+                         LEX_WORD( "USING{WS}NAMESPACE{WS}PATH"      ) AS_TOKEN( HB_WANTS_ID  - USING_NAMESPACE  ),
                          LEX_WORD( "UTILITY{WS}FUNCTION"             ) AS_TOKEN( HB_UTIL_FUNC     ),
                          LEX_WORD( "UTILITY{WS}PROCEDURE"            ) AS_TOKEN( HB_UTIL_PROC     ),
                          LEX_WORD( "UTILITY{WS}STATIC{WS}FUNCTION"   ) AS_TOKEN( HB_UTIL_STATIC_FUNC ),
@@ -873,6 +880,11 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
    }
    #endif
 
+   if( iTokenLen == 1 && szToken[0] == '.' )
+   {
+      return '.';
+   }
+
    yytext = szToken;
    yyleng = (int) iTokenLen;
 
@@ -938,6 +950,12 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       else
       {
          DEBUG_INFO( printf(  "Element \"%s\" is IDENTIFIER\n", yytext ) );
+
+         if( yyleng > 1 && yytext[ yyleng - 1 ] == '.' )
+         {
+            yytext[ --yyleng ] = '\0';
+            aiHold[ iHold++ ] = '.' + DONT_REDUCE;
+         }
 
          hb_compCheckIllegalChar( yytext );
 
@@ -1706,7 +1724,7 @@ static void hb_compCheckIllegalChar( char * szName )
 
    for ( iSz = 0; iSz < iSzLen ; iSz ++ )
    {
-      if( !isalnum( ( BYTE ) szName[ iSz ] ) && (int) szName [ iSz ] != '_' )
+      if( ! isalnum( ( BYTE ) szName[ iSz ] ) && (int) szName [ iSz ] != '_' && (int) szName [ iSz ] != '.' )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER,
                           hb_szAscii[ (int)(unsigned char) szName [ iSz ] ], NULL );

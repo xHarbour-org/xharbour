@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.266 2007/12/30 19:52:43 likewolf Exp $
+ * $Id: ppcore.c,v 1.267 2007/12/31 17:47:59 likewolf Exp $
  */
 
 /*
@@ -594,7 +594,7 @@ static void hb_pp_tokenAddNext( PHB_PP_STATE pState, const char * value, ULONG u
          else if( pState->iBlockState == 2 &&
                   HB_PP_TOKEN_TYPE( type ) == HB_PP_TOKEN_COMMA )
             pState->iBlockState = 1;
-         else 
+         else
             pState->iBlockState = 0;
       }
 
@@ -2347,7 +2347,7 @@ static void hb_pp_pragmaNew( PHB_PP_STATE pState, PHB_PP_TOKEN pToken )
    PHB_PP_TOKEN pValue = NULL;
    BOOL fError = FALSE, fValue = FALSE;
    int iValue = 0;
-   
+
    pState->iPushPop = 0;
    if( pToken && HB_PP_TOKEN_TYPE( pToken->type ) == HB_PP_TOKEN_KEYWORD )
    {
@@ -5439,6 +5439,8 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 #ifdef HARBOUR_START_PROCEDURE
    hb_pp_addDefine( pState, "__HB_MAIN__", HARBOUR_START_PROCEDURE );
 #endif
+
+   hb_pp_addDefine( pState, "__PRG__", "1" );
 }
 
 /*

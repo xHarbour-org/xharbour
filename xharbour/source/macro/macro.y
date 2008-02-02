@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.32 2007/12/22 19:04:33 likewolf Exp $
+ * $Id: macro.y,v 1.33 2007/12/24 11:34:48 likewolf Exp $
  */
 
 /*
@@ -128,7 +128,7 @@ extern void yyerror( char * ); /* parsing error management function */
       hb_compExprDelete( (pExpr), HB_MACRO_PARAM ); \
       YYABORT; \
    }
-   
+
 #if defined( __BORLANDC__ ) || defined( __WATCOMC__ )
 /* The if() inside this macro is always TRUE but it's used to hide BCC warning */
 #define HB_MACRO_ABORT if( !( HB_MACRO_DATA->status & HB_MACRO_CONT ) ) { YYABORT; }
@@ -691,7 +691,7 @@ Argument   : EmptyExpression           { $$ = $1; }
 
                                              case HB_ET_ALIASVAR:
                                              {
-                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol;
+                                               char *szAlias = $2->value.asAlias.pAlias->value.asSymbol.szName;
 
                                                if( strcmp( szAlias, "M" ) == 0 || strncmp( szAlias, "MEMVAR", 4 > strlen( szAlias ) ? 4 : strlen( szAlias ) ) == 0 )
                                                {

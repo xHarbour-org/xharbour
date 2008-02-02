@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprop.h,v 1.19 2007/03/25 06:12:49 walito Exp $
+ * $Id: hbexprop.h,v 1.20 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -183,7 +183,12 @@ typedef struct HB_EXPR_
 {
    union
    {
-      char *asSymbol;      /* variable name */
+      struct
+      {
+         char *szName;      /* variable name */
+         char *szNamespace;
+      } asSymbol;
+
       BOOL asLogical;      /* logical value */
       struct
       {
@@ -290,7 +295,13 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage, void * pMa
 
 #define HB_MACRO_VARNAME pMacro
 
+#define HB_EXPR_ISEQUAL_IDS( szIdentifier1, szIdentifier2 ) ( strcmp( szIdentifier1, szIdentifier2 ) == 0 )
+#define HB_EXPR_ISBUILTIN_ID( szIdentifier, BuiltInName ) HB_EXPR_ISEQUAL_IDS( szIdentifier, #BuiltInName )
+
 #else
+
+#define HB_EXPR_ISEQUAL_IDS( szIdentifier1, szIdentifier2 ) ( szIdentifier1 == szIdentifier2 )
+#define HB_EXPR_ISBUILTIN_ID( szIdentifier, BuiltInName ) HB_EXPR_ISEQUAL_IDS( szIdentifier, hb_compExpr_IDs. BuiltInName )
 
 #define  HB_EXPR_FUNC( proc )  HB_EXPR_PTR proc( HB_EXPR_PTR pSelf, int iMessage )
 typedef  HB_EXPR_FUNC( HB_EXPR_FUNC_ );
@@ -319,6 +330,8 @@ typedef  HB_EXPR_PTR HB_EXPR_ACTION( HB_EXPR_PTR pSelf, int iMessage );
 #define HB_MACRO_VARNAME pMacro
 #endif
 
+#define HB_EXPR_ISEQUAL_SYMBOLS( Exp1, Exp2 )  HB_EXPR_ISEQUAL_IDS( Exp1->value.asSymbol.szName, Exp2->value.asSymbol.szName )
+#define HB_EXPR_ISBUILTIN_SYMBOL( Exp1, BuiltInName ) HB_EXPR_ISBUILTIN_ID( Exp1->value.asSymbol.szName, BuiltInName )
 
 HB_EXPR_PTR hb_compExprNew( int );
 HB_EXPR_PTR hb_compExprNewExtBlock( BYTE *, ULONG );
@@ -424,6 +437,8 @@ HB_EXPR_PTR hb_compExprSetGetBlock( HB_EXPR_PTR pExpr, HB_MACRO_DECL  );
 
 #else
 
+void hb_compExprINIT( void );
+
 HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprSetOperand( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR );
@@ -433,6 +448,9 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR, HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR, char *, BYTE );
 void hb_compExprDelete( HB_EXPR_PTR );
 HB_EXPR_PTR hb_compExprSetGetBlock( HB_EXPR_PTR pExpr );
+
+HB_EXPR_PTR hb_compExprNewNamespaceFunName( char *, char * );
+HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char *, char * );
 
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprc.c,v 1.23 2007/05/15 21:34:11 ronpinkas Exp $
+ * $Id: hbexprc.c,v 1.24 2007/11/27 05:32:20 andijahja Exp $
  */
 
 /*
@@ -214,7 +214,7 @@ void hb_compExprDelOperator( HB_EXPR_PTR pExpr )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
          }
          else
          {
@@ -421,7 +421,7 @@ void hb_compExprUseOperEq( HB_EXPR_PTR pSelf, HB_PCODE bOpEq )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
          }
          else
          {
@@ -600,7 +600,7 @@ void hb_compExprPushPreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
@@ -667,7 +667,7 @@ void hb_compExprPushPostOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
@@ -736,7 +736,7 @@ void hb_compExprUsePreOp( HB_EXPR_PTR pSelf, BYTE bOper )
 
          if( pSelf->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE )
          {
-            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+            iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
             if( iLocal && HB_LIM_INT8( iLocal ) )
             {
@@ -791,8 +791,9 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
        *    ALIAS->&var is the same as &( "ALIAS->" + var )
        *
        */
-      HB_EXPR_PCODE2( hb_compGenPushString, pAlias->value.asSymbol, strlen(pAlias->value.asSymbol) + 1 );
+      HB_EXPR_PCODE2( hb_compGenPushString, pAlias->value.asSymbol.szName, strlen( pAlias->value.asSymbol.szName ) + 1 );
       HB_EXPR_USE( pVar, HB_EA_PUSH_PCODE );
+
       if( bAction == HB_EA_PUSH_PCODE )
       {
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_MACROPUSHALIASED );
@@ -808,7 +809,7 @@ void hb_compExprUseAliasMacro( HB_EXPR_PTR pAliasedVar, BYTE bAction )
        *    &macro->var is the  same as: &( macro + "->var" )
        */
       HB_EXPR_USE( pAlias, HB_EA_PUSH_PCODE );
-      HB_EXPR_PCODE2( hb_compGenPushString, pVar->value.asSymbol, strlen( pVar->value.asSymbol ) + 1 );
+      HB_EXPR_PCODE2( hb_compGenPushString, pVar->value.asSymbol.szName, strlen( pVar->value.asSymbol.szName ) + 1 );
 
       if( bAction == HB_EA_PUSH_PCODE )
       {

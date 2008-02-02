@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.121 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: hbexprb.c,v 1.122 2007/12/23 02:22:02 likewolf Exp $
  */
 
 /*
@@ -110,6 +110,7 @@ extern int hb_compFieldGetPos( char *, PFUNCTION );
    extern BOOL hb_comp_AmbiguousVar;
    extern int hb_comp_iExitLevel;
 
+   extern HB_COMP_IDS hb_compExpr_IDs;
 #endif
 
 
@@ -791,7 +792,7 @@ static HB_EXPR_FUNC( hb_compExprUseVarRef )
          break;
 
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE1( hb_compGenPushVarRef, pSelf->value.asSymbol );
+         HB_EXPR_PCODE1( hb_compGenPushVarRef, pSelf->value.asSymbol.szName );
          break;
 
       case HB_EA_POP_PCODE:
@@ -802,7 +803,7 @@ static HB_EXPR_FUNC( hb_compExprUseVarRef )
          hb_compWarnMeaningless( pSelf );
       case HB_EA_DELETE:
          #if defined( HB_MACRO_SUPPORT )
-             HB_XFREE( pSelf->value.asSymbol );
+             HB_XFREE( pSelf->value.asSymbol.szName );
          #endif
          break;
    }
@@ -830,7 +831,7 @@ static HB_EXPR_FUNC( hb_compExprUseMemVarRef )
          break;
 
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE1( hb_compGenPushMemVarRef, pSelf->value.asSymbol );
+         HB_EXPR_PCODE1( hb_compGenPushMemVarRef, pSelf->value.asSymbol.szName );
          break;
 
       case HB_EA_POP_PCODE:
@@ -841,7 +842,7 @@ static HB_EXPR_FUNC( hb_compExprUseMemVarRef )
          hb_compWarnMeaningless( pSelf );
       case HB_EA_DELETE:
          #if defined( HB_MACRO_SUPPORT )
-             HB_XFREE( pSelf->value.asSymbol );
+             HB_XFREE( pSelf->value.asSymbol.szName );
          #endif
          break;
    }
@@ -865,7 +866,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunRef )
          hb_compErrorLValue( pSelf );
          break;
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE1( hb_compGenPushFunCall, pSelf->value.asSymbol );
+         HB_EXPR_PCODE2( hb_compGenPushFunCall, pSelf->value.asSymbol.szName, pSelf->value.asSymbol.szNamespace );
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_FUNCPTR );
          break;
       case HB_EA_POP_PCODE:
@@ -959,6 +960,7 @@ static HB_EXPR_FUNC( hb_compExprUseList )
             if( hb_compExprListLen( pSelf ) == 1 )
             {
                HB_EXPR_PTR pExpr = pSelf->value.asList.pExprList;
+
                if( pExpr->ExprType == HB_ET_MACRO &&
                    pExpr->value.asMacro.SubType != HB_ET_MACRO_VAR_REF )
                {
@@ -987,7 +989,9 @@ static HB_EXPR_FUNC( hb_compExprUseList )
             hb_compErrorLValue( pSelf->value.asList.pExprList );
          }
          else
+         {
             hb_compErrorLValue( pSelf );
+         }
          break;
 
       case HB_EA_PUSH_PCODE:
@@ -1054,6 +1058,7 @@ static HB_EXPR_FUNC( hb_compExprUseList )
          if( pSelf->value.asList.pExprList )
          {
             HB_EXPR_PTR pTmp, pExpr = pSelf->value.asList.pExprList;
+
             while( pExpr )
             {
                pTmp = pExpr->pNext;    /* store next expression */
@@ -1127,6 +1132,33 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             pSelf->value.asList.pExprList = HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_REDUCE );
             pSelf->value.asList.pIndex = HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_REDUCE );
 
+         #ifndef HB_C52_STRICT
+            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE || pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
+            {
+               if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
+                   pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
+                   HB_EXPR_ISBUILTIN_SYMBOL( pSelf->value.asList.pIndex->value.asFunCall.pFunName, LEN ) )
+
+               {
+                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
+
+                  if( usCount == 1 )
+                  {
+                     if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
+                         pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
+                     {
+                        if( HB_EXPR_ISEQUAL_SYMBOLS( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList,
+                                                     pSelf->value.asList.pExprList ) )
+                        {
+                            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
+                            pSelf->value.asList.pIndex = hb_compExprNewLong( -1 );
+                        }
+                     }
+                  }
+               }
+            }
+         #endif
+
             if( pSelf->value.asList.pIndex->ExprType == HB_ET_NUMERIC )
             {
                HB_EXPR_PTR pIdx = pSelf->value.asList.pIndex;
@@ -1145,6 +1177,11 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                   else
                   {
                      lIndex = ( LONG ) pIdx->value.asNum.dVal;
+                  }
+
+                  if( lIndex < 0 )
+                  {
+                     lIndex += hb_compExprListLen( pExpr->value.asList.pExprList ) + 1;
                   }
 
                   if( lIndex > 0 )
@@ -1226,7 +1263,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
             {
                #if defined( HB_MACRO_SUPPORT )
-                  if( hb_compLocalVarGetPos( pSelf->value.asList.pExprList->value.asSymbol, HB_MACRO_PARAM ) )
+                  if( hb_compLocalVarGetPos( pSelf->value.asList.pExprList->value.asSymbol.szName, HB_MACRO_PARAM ) )
                   {
                      // Codeblock local - do not change context.
                   }
@@ -1237,14 +1274,16 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                      bRemoveAlias = TRUE;
                   }
                #else
-                  if( hb_compLocalGetPos( pSelf->value.asList.pExprList->value.asSymbol ) ||
-                      hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
-                      hb_compVariableGetPos( hb_comp_pGlobals, pSelf->value.asList.pExprList->value.asSymbol ) ||
-                      hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
-                      hb_compFieldGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pLast ) ||
-                      ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) ||
-                      ( hb_comp_bStartProc == FALSE && hb_compMemvarGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) ||
-                      ( hb_comp_bStartProc == FALSE && hb_compFieldGetPos( pSelf->value.asList.pExprList->value.asSymbol, hb_comp_functions.pFirst ) ) )
+                  char *szName = pSelf->value.asList.pExprList->value.asSymbol.szName;
+
+                  if( hb_compLocalGetPos( szName ) ||
+                      hb_compStaticGetPos( szName, hb_comp_functions.pLast ) ||
+                      hb_compVariableGetPos( hb_comp_pGlobals, szName ) ||
+                      hb_compMemvarGetPos( szName, hb_comp_functions.pLast ) ||
+                      hb_compFieldGetPos( szName, hb_comp_functions.pLast ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( szName, hb_comp_functions.pFirst ) ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compMemvarGetPos( szName, hb_comp_functions.pFirst ) ) ||
+                      ( hb_comp_bStartProc == FALSE && hb_compFieldGetPos( szName, hb_comp_functions.pFirst ) ) )
                   {
                      // Declared var - do not change context.
                   }
@@ -1255,7 +1294,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
                         hb_comp_AmbiguousVar = TRUE;
                      }
 
-                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, pSelf->value.asList.pExprList->value.asSymbol, NULL );
+                     hb_compGenWarning( hb_comp_szWarnings, 'W', HB_COMP_WARN_MEMVAR_ASSUMED, pSelf->value.asList.pExprList->value.asSymbol.szName, NULL );
 
                      // Force MEMVAR context.
                      pSelf->value.asList.pExprList = hb_compExprNewAliasVar( hb_compExprNewAlias( hb_compIdentifierNew( "MEMVAR", TRUE ) ), pSelf->value.asList.pExprList );
@@ -1276,34 +1315,6 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
                HB_EXPR_PCODE1( hb_compExprDelete, pDelete );
             }
-
-         #ifndef HB_C52_STRICT
-            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARIABLE )
-            {
-               if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
-                   pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
-                   strcmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN" ) == 0 )
-
-               {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
-
-                  if( usCount == 1 )
-                  {
-                     if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
-                         pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
-                     {
-                        // No need to use strcmp() because all identifiers share their values.
-                        if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
-                            pSelf->value.asList.pExprList->value.asSymbol )
-                        {
-                            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
-                            pSelf->value.asList.pIndex = hb_compExprNewLong( -1 );
-                        }
-                     }
-                  }
-               }
-            }
-          #endif
 
             if( HB_SUPPORT_XBASE )
             {
@@ -1333,7 +1344,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             /* Force to BYREF incase it's a STRING used as an Array - Real arrays are always BYREF anyway. */
             if( pSelf->value.asList.pExprList->ExprType == HB_ET_ALIASVAR )
             {
-               char *szAlias = pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol;
+               char *szAlias = pSelf->value.asList.pExprList->value.asAlias.pAlias->value.asSymbol.szName;
                int iCmp = strncmp( szAlias, "MEMVAR", 4 );
 
                if( iCmp == 0 )
@@ -1357,7 +1368,7 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
             }
             else if( pSelf->value.asList.pExprList->ExprType == HB_ET_ARRAYAT )
             {
-               if( !pSelf->value.asList.pExprList->value.asList.bByRef )
+               if( ! pSelf->value.asList.pExprList->value.asList.bByRef )
                {
                   pSelf->value.asList.pExprList->value.asList.bByRef =
                   bRemoveRef = TRUE;
@@ -1371,33 +1382,6 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
 
             HB_EXPR_USE( pSelf->value.asList.pExprList, HB_EA_PUSH_PCODE );
 
-         #ifndef HB_C52_STRICT
-            if( pSelf->value.asList.pExprList->ExprType == HB_ET_VARREF )
-            {
-               if( pSelf->value.asList.pIndex->ExprType == HB_ET_FUNCALL &&
-                   pSelf->value.asList.pIndex->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME &&
-                   strcmp( pSelf->value.asList.pIndex->value.asFunCall.pFunName->value.asSymbol, "LEN" ) == 0 )
-
-               {
-                  USHORT usCount = ( USHORT ) hb_compExprListLen( pSelf->value.asList.pIndex->value.asFunCall.pParms );
-
-                  if( usCount == 1 )
-                  {
-                     if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARIABLE ||
-                         pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_VARREF )
-                     {
-                        // No need to use strcmp() because all identifiers share their values.
-                        if( pSelf->value.asList.pIndex->value.asFunCall.pParms->value.asList.pExprList->value.asSymbol ==
-                            pSelf->value.asList.pExprList->value.asSymbol )
-                        {
-                            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
-                            pSelf->value.asList.pIndex = hb_compExprNewLong( -1 );
-                        }
-                     }
-                  }
-               }
-            }
-         #endif
             HB_EXPR_USE( pSelf->value.asList.pIndex, HB_EA_PUSH_PCODE );
 
             if( pSelf->value.asList.PopOp == HB_P_PLUS )
@@ -1443,8 +1427,14 @@ static HB_EXPR_FUNC( hb_compExprUseArrayAt )
          hb_compWarnMeaningless( pSelf );
          break;
       case HB_EA_DELETE:
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pExprList );
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
+         if( pSelf->value.asList.pExprList )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pExprList );
+         }
+         if( pSelf->value.asList.pIndex )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asList.pIndex );
+         }
          break;
    }
    return pSelf;
@@ -1654,29 +1644,31 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
    switch( iMessage )
    {
       case HB_EA_REDUCE:
+      {
+         /* Reduce the expressions on the list of arguments
+          */
+         if( pSelf->value.asFunCall.pParms )
          {
-            /* Reduce the expressions on the list of arguments
-             */
-            if( pSelf->value.asFunCall.pParms )
-            {
-               pSelf->value.asFunCall.pParms = HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_REDUCE );
-            }
+            pSelf->value.asFunCall.pParms = HB_EXPR_USE( pSelf->value.asFunCall.pParms, HB_EA_REDUCE );
+         }
 
-      /* TODO:
-               LEN() (also done by Clipper)
-               ASC() (not done by Clipper)
-               EMPTY() (not done by Clipper)
-               SPACE()
-               REPLICATE()
-       */
+         /* TODO:
+            LEN() (also done by Clipper)
+            ASC() (not done by Clipper)
+            EMPTY() (not done by Clipper)
+            SPACE()
+            REPLICATE()
+         */
 
          #ifndef HB_C52_STRICT
+
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
                HB_EXPR_PTR pName = pSelf->value.asFunCall.pFunName;
                HB_EXPR_PTR pParms = pSelf->value.asFunCall.pParms;
                HB_EXPR_PTR pReduced;
                USHORT usCount = 0;
+               char *szName = pName->value.asSymbol.szName;
 
                if( pParms )
                {
@@ -1688,448 +1680,389 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                   }
                }
 
-               #ifndef HB_MACRO_SUPPORT
-                  hb_compFunCallCheck( pName->value.asSymbol, usCount );
-               #endif
-
-               if( ( strcmp( "AT", pName->value.asSymbol ) == 0 ) && usCount == 2 )
+               if( pName->value.asSymbol.szNamespace == NULL )
                {
-                  HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pText = pSub->pNext;
 
-                  if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
+                #ifndef HB_MACRO_SUPPORT
+                  hb_compFunCallCheck( pName->value.asSymbol.szName, usCount );
+                #endif
+
+                  if( HB_EXPR_ISBUILTIN_ID( szName, AT ) && usCount == 2 )
                   {
-                     if( pSub->ulLength == 0 )
+                     HB_EXPR_PTR pSub  = pParms->value.asList.pExprList;
+                     HB_EXPR_PTR pText = pSub->pNext;
+
+                     if( pSub->ExprType == HB_ET_STRING && pText->ExprType == HB_ET_STRING )
                      {
-                        /* This is CA-Clipper compiler optimizer behavior,
-                         * macro compiler does not have optimizer [druzus]
-                         */
-                        #ifndef HB_MACRO_SUPPORT
-                           pReduced = hb_compExprNewLong( 1 );
-                        #else
-                           pReduced = hb_compExprNewLong( 0 );
-                        #endif
-                     }
-                     else
-                     {
-                        pReduced = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
-                     }
-
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-
-                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     //pSelf = pReduced;
-                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                     HB_XFREE( pReduced );
-                  }
-               }
-             #if 1
-               /*
-                 TODO: Clipper optimizes Upper() but what about codepage support?
-                */
-               else if( ( strcmp( "UPPER", pName->value.asSymbol ) == 0 ) && usCount == 1 )
-               {
-                  pReduced = pParms->value.asList.pExprList;
-
-                  if( pReduced->ExprType == HB_ET_STRING )
-                  {
-                     ULONG i;
-                     char *sCopy = (char *) hb_xgrab( pReduced->ulLength + 1 );
-
-                     memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
-                     pReduced->value.asString.string = sCopy;
-                     pReduced->value.asString.dealloc = TRUE;
-
-                     for ( i = 0; i < pReduced->ulLength; i++ )
-                     {
-                        pReduced->value.asString.string[i] = toupper( pReduced->value.asString.string[i] );
-                     }
-
-                     pSelf->value.asFunCall.pParms = NULL;
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     pSelf = pReduced;
-                  }
-               }
-             #endif
-               else if( ( strcmp( "CHR", pName->value.asSymbol ) == 0 ) && usCount )
-               {
-                  /* try to change it into a string */
-                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
-
-                  if( pArg->ExprType == HB_ET_NUMERIC )
-                  {
-                     /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
-                              CHR() cases where the passed parameter is a constant which
-                              can be divided by 256 but it's not zero, in this case it
-                              will return an empty string instead of a Chr(0). [vszakats] */
-
-                     pReduced = hb_compExprNew( HB_ET_STRING );
-                     pReduced->ValType = HB_EV_STRING;
-
-                     if( pArg->value.asNum.NumType == HB_ET_LONG )
-                     {
-                        if( ( pArg->value.asNum.lVal % 256 ) == 0 && pArg->value.asNum.lVal != 0 )
+                        if( pSub->ulLength == 0 )
                         {
-                           pReduced->value.asString.string = ( char * ) HB_XGRAB( 1 );
-                           pReduced->value.asString.string[ 0 ] = '\0';
-                           pReduced->value.asString.dealloc = TRUE;
-                           pReduced->ulLength = 0;
+                          /* This is CA-Clipper compiler optimizer behavior,
+                           * macro compiler does not have optimizer [druzus]
+                           */
+                           #if defined( HB_MACRO_SUPPORT )
+                              pReduced = hb_compExprNewLong( 0 );
+                           #else
+                              pReduced = hb_compExprNewLong( 1 );
+                           #endif
                         }
                         else
                         {
-                           pReduced->value.asString.string = ( char * ) HB_XGRAB( 2 );
-                           pReduced->value.asString.string[ 0 ] = ( char ) ( pArg->value.asNum.lVal % 256 );
-                           pReduced->value.asString.string[ 1 ] = '\0';
-                           pReduced->value.asString.dealloc = TRUE;
-                           pReduced->ulLength = 1;
+                           pReduced = hb_compExprNewLong( hb_strAt( pSub->value.asString.string, pSub->ulLength, pText->value.asString.string, pText->ulLength ) );
                         }
-                     }
-                     else
-                     {
-                        pReduced->value.asString.string = (char *) HB_XGRAB( 2 );
-                        pReduced->value.asString.string[ 0 ] = (char)( ( LONG ) pArg->value.asNum.dVal % 256 );
-                        pReduced->value.asString.string[ 1 ] = '\0';
-                        pReduced->value.asString.dealloc = TRUE;
-                        pReduced->ulLength = 1;
-                     }
 
-                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-
-                     //pSelf = pReduced;
-                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                     HB_XFREE( pReduced );
-                  }
-               }
-#if 1
-               else if( strcmp( "STOD", pName->value.asSymbol ) == 0 &&
-                        usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
-               {
-                  /* try to change it into a date */
-                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
-                  int iDate = 0;
-                  BOOL bEmpty = ( pArg->ulLength == 0 );
-
-                  //printf( "Optimizing STOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
-
-                  if( !bEmpty )
-                  {
-                     ULONG i;
-                     bEmpty = TRUE;
-                     for ( i=0 ; i < pArg->ulLength && i < 8 ; i++)
-                     {
-                        if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
-                        {
-                           bEmpty = FALSE;
-                           break;
-                        }
-                     }
-                  }
-
-                  //printf( "Optimizing STOD: bEmpty=%d\n", bEmpty );
-                  if( !bEmpty )
-                  {
-                     //printf( "Optimizing STOD: using hb_dateEncStr( %s )\n",pArg->value.asString.string );
-                     iDate = (int) hb_dateEncStr( pArg->value.asString.string );
-                  }
-                  //printf( "Optimizing STOD: Optimized value=%d\n", iDate );
-
-                  pReduced = hb_compExprNewDateTimeVal( iDate, 0, HB_ET_DDATE );
-
-                  //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-
-                  //pSelf = pReduced;
-                  memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                  HB_XFREE( pReduced );
-                  break;
-               }
-               else if( strcmp( "CTOD", pName->value.asSymbol ) == 0 &&
-                       usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
-               {
-                  /* try to change it into a date */
-                  HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
-                  BOOL bEmpty = ( pArg->ulLength == 0 );
-                  //printf( "Optimizing CTOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
-
-                  if( !bEmpty )
-                  {
-                     ULONG i;
-                     bEmpty = TRUE;
-                     for ( i=0;i<pArg->ulLength;i++)
-                     {
-                        if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
-                        {
-                           bEmpty = FALSE;
-                           break;
-                        }
-                     }
-                  }
-                  //printf( "Optimizing CTOD: bEmpty=%d\n", bEmpty );
-
-                  if( bEmpty )
-                  {
-                     //printf( "Optimizing CTOD: using 0\n" );
-                     pReduced = hb_compExprNewDateTimeVal( 0, 0, HB_ET_DDATE );
-
-                     //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-
-                     //pSelf = pReduced;
-                     memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                     HB_XFREE( pReduced );
-                     break;
-                  }
-               }
-#endif
-               else if( ( strcmp( "EVAL", pName->value.asSymbol ) == 0 ) && usCount )
-               {
-                  HB_EXPR_PTR pBlock = pParms->value.asList.pExprList;
-                  HB_EXPR_PTR pArgs = pBlock->pNext;
-
-                  pBlock->pNext = NULL;
-
-                  pReduced = hb_compExprNew( HB_ET_SEND );
-
-                  #if defined( HB_MACRO_SUPPORT )
-                     pReduced->value.asMessage.szMessage = hb_strdup( pName->value.asSymbol );
-                  #else
-                     pReduced->value.asMessage.szMessage = pName->value.asSymbol;
-                  #endif
-                  pReduced->value.asMessage.pMacroMessage = NULL;
-                  pReduced->value.asMessage.pObject = pBlock;
-                  pReduced->value.asMessage.pParms = pParms;
-                  pReduced->value.asMessage.pParms->value.asList.pExprList = pArgs;
-
-                  /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
-                  //pReduced = hb_compExprNewMethodCall( hb_compExprNewSend( pBlock, pName->value.asSymbol ), pArgs );
-
-                  /* Not using:
-                        HB_EXPR_PCODE1( hb_compExprDelete, pName );
                         HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                     because we adopted their content - release container only!
-                  */
-
-                  //pSelf->value.asFunCall.pParms = NULL;
-                  //HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
-                  HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-
-                  //pSelf = pReduced;
-                  memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                  HB_XFREE( pReduced );
-               }
-               else if( HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) &&
-                   (( strcmp( "__DBLIST", pName->value.asSymbol ) == 0 ) && usCount >= 10) )
-               {
-                  HB_EXPR_PTR pArray = pParms->value.asList.pExprList->pNext;
-
-                  if( pArray->ExprType == HB_ET_ARRAY )
-                  {
-                     HB_EXPR_PTR pElem = pArray->value.asList.pExprList;
-                     HB_EXPR_PTR pPrev = NULL, pNext;
-
-                     while( pElem )
-                     {
-                        /* The {|| &cMacro } block is now &( "{||" + cMacro + "}" ) due to early macro expansion in compiler. */
-                        if( pElem->ExprType == HB_ET_MACRO )
-                        {
-                           HB_EXPR_PTR pMacro = pElem->value.asMacro.pExprList;
-
-                           if( pMacro &&
-                               pMacro->ExprType == HB_EO_PLUS &&
-                               pMacro->value.asOperator.pLeft->ExprType == HB_EO_PLUS &&
-                               pMacro->value.asOperator.pLeft->value.asOperator.pRight->ExprType == HB_ET_VARIABLE
-                             )
-                           {
-                              /* Saving the next array element so the list can be relinked after we substitute the macro block. */
-                              pNext = pElem->pNext;
-
-                              /* Instead we only want the macro variable, {|| &cMacro } -> &( "{||" + cMacro + "}" ) -> cMacro */
-                              hb_compExprClear( pElem );
-                              pElem = pMacro->value.asOperator.pLeft->value.asOperator.pRight;
-                              if( pPrev )
-                              {
-                                 /* Previous element should point to the new element. */
-                                 pPrev->pNext = pElem;
-                              }
-                              else
-                              {
-                                 /* Top of array should point to the new first element. */
-                                 pArray->value.asList.pExprList = pElem;
-                              }
-                              pElem->pNext = pNext;
-                           }
-                        }
-                        /* Search for {|| &(cMacro) }. */
-                        else if( pElem->ExprType == HB_ET_CODEBLOCK )
-                        {
-                           HB_EXPR_PTR pBlock = pElem->value.asList.pExprList;
-
-                           /* Search for macros {|| &cMacro }. */
-                           if( pBlock->ExprType == HB_ET_MACRO )
-                           {
-                              /* Saving the next array element so the list can be relinked after we substitute the macro block. */
-                              pNext = pElem->pNext;
-
-                              /* Instead we only want the core expression. */
-                              hb_compExprClear( pElem );
-                              if( pBlock->value.asMacro.pExprList ) /* &( exp ) -> exp */
-                              {
-                                 pElem = pBlock->value.asMacro.pExprList;
-                              }
-                              else if( pBlock->value.asMacro.cMacroOp ) /* simple macro in Flex build {|| &cMacro}, because harbour.y does not support early macros yet*/
-                              {
-                                 pElem = hb_compExprNewVar( pBlock->value.asMacro.szMacro );
-                              }
-                              else /* {|| &cMacro.suffix } -> cMacro + "suffix" */
-                              {
-                                 pElem = hb_compExprNewString( pBlock->value.asMacro.szMacro, strlen( pBlock->value.asMacro.szMacro ), FALSE );
-                              }
-
-                              if( pPrev )
-                              {
-                                 /* Previous element should point to the new element. */
-                                 pPrev->pNext = pElem;
-                              }
-                              else
-                              {
-                                 /* Top of array should point to the new first element. */
-                                 pArray->value.asList.pExprList = pElem;
-                              }
-                              pElem->pNext = pNext;
-                           }
-                        }
-
-                        pPrev = pElem;
-                        pElem = pElem->pNext;
+                        pSelf = pReduced;
                      }
                   }
-               }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 )
-               {
-                  if( usCount > 1 )
+                  /*
+                    TODO: Clipper optimizes Upper() but what about codepage support?
+                   */
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, UPPER ) && usCount == 1 )
                   {
-                     HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
-                     HB_EXPR_PTR pStart  = pString->pNext;
-                     HB_EXPR_PTR pLen    = pStart->pNext;
+                     pReduced = pParms->value.asList.pExprList;
 
-                     if( pString->ExprType == HB_ET_STRING && pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG )
+                     if( pReduced->ExprType == HB_ET_STRING )
                      {
-                        // Can default.
-                        if( pLen == NULL )
+                        ULONG i;
+                        char *sCopy = (char *) hb_xgrab( pReduced->ulLength + 1 );
+
+                        memcpy( sCopy, pReduced->value.asString.string, pReduced->ulLength + 1 );
+
+                        pReduced = hb_compExprNewString( sCopy, pReduced->ulLength, TRUE );
+
+                        for ( i = 0; i < pReduced->ulLength; i++ )
                         {
-                           pLen = hb_compExprNewLong( pString->ulLength );
-                           pStart->pNext = pLen;
+                           sCopy[i] = toupper( sCopy[i] );
                         }
 
-                        // Optimization only possible if BOTH nStart and nLen are numerics.
-                        if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG )
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                        pSelf = pReduced;
+                     }
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, CHR ) && usCount )
+                  {
+                     /* try to change it into a string */
+                     HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+
+                     if( pArg->ExprType == HB_ET_NUMERIC )
+                     {
+                        char *sCopy;
+
+                        /* NOTE: CA-Cl*pper's compiler optimizer will be wrong for those
+                                 CHR() cases where the passed parameter is a constant which
+                                 can be divided by 256 but it's not zero, in this case it
+                                 will return an empty string instead of a Chr(0). [vszakats] */
+
+                        if( pArg->value.asNum.NumType == HB_ET_LONG )
                         {
-                           char *sSubStr;
-
-                           // Start - From Right.
-                           if( pStart->value.asNum.lVal < 0 )
+                           if( ( pArg->value.asNum.lVal % 256 ) == 0 && pArg->value.asNum.lVal != 0 )
                            {
-                              pStart->value.asNum.lVal += pString->ulLength + 1;
+                              sCopy = ( char * ) HB_XGRAB( 1 );
+                              pReduced = hb_compExprNewString( sCopy, 0, TRUE );
                            }
-
-                           // Start - Must be postive.
-                           if( pStart->value.asNum.lVal <= 0 )
+                           else
                            {
-                              pStart->value.asNum.lVal = 1;
-                           }
+                              sCopy = ( char * ) HB_XGRAB( 2 );
+                              sCopy[ 0 ] = ( char ) ( pArg->value.asNum.lVal % 256 );
+                              sCopy[ 1 ] = '\0';
 
-                           // Start - Never beyond terminator.
-                           if( (ULONG) pStart->value.asNum.lVal > pString->ulLength )
+                              pReduced = hb_compExprNewString( sCopy, 1, TRUE );
+                           }
+                        }
+                        else
+                        {
+                           sCopy = (char *) HB_XGRAB( 2 );
+                           sCopy[ 0 ] = (char)( ( LONG ) pArg->value.asNum.dVal % 256 );
+                           sCopy[ 1 ] = '\0';
+
+                           pReduced = hb_compExprNewString( sCopy, 1, TRUE );
+                        }
+
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                        pSelf = pReduced;
+                     }
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, STOD ) && usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
+                  {
+                     /* try to change it into a date */
+                     HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+                     int iDate = 0;
+                     BOOL bEmpty = ( pArg->ulLength == 0 );
+
+                     //printf( "Optimizing STOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
+
+                     if( ! bEmpty )
+                     {
+                        ULONG i;
+                        bEmpty = TRUE;
+
+                        for ( i=0 ; i < pArg->ulLength && i < 8 ; i++)
+                        {
+                           if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
                            {
-                              pStart->value.asNum.lVal = pString->ulLength + 1;
+                              bEmpty = FALSE;
+                              break;
                            }
-
-                           // Len - Never negative.
-                           if( pLen->value.asNum.lVal < 0 )
-                           {
-                              pLen->value.asNum.lVal = 0;
-                           }
-
-                           // Len - Never beyond range.
-                           if( (ULONG) pStart->value.asNum.lVal + (ULONG) pLen->value.asNum.lVal - 1 > pString->ulLength )
-                           {
-                              pLen->value.asNum.lVal = pString->ulLength - pStart->value.asNum.lVal + 1;
-                           }
-
-                           //printf( "String: '%s', Start: %i, Len: %i\n", pString->value.asString.string, pStart->value.asNum.lVal, pLen->value.asNum.lVal );
-
-                           sSubStr = (char *) hb_xgrab( (ULONG) pLen->value.asNum.lVal + 1 );
-
-                           memcpy( (void *) sSubStr,
-                                   (const char *)( pString->value.asString.string + (int)( pStart->value.asNum.lVal - 1 ) ),
-                                   (size_t)( (ULONG)( pLen->value.asNum.lVal ) ) );
-
-                           sSubStr[ (int)( pLen->value.asNum.lVal ) ] = '\0';
-
-                           pReduced = hb_compExprNew( HB_ET_STRING );
-                           pReduced->ValType = HB_EV_STRING;
-
-                           pReduced->value.asString.string = sSubStr;
-                           pReduced->ulLength = ( ULONG ) pLen->value.asNum.lVal;
-                           pReduced->value.asString.dealloc = TRUE;
-
-                           // Delete the pre-optimization components.
-                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-
-                          //pSelf = pReduced;
-                          memcpy( pSelf, pReduced, sizeof( HB_EXPR ) );
-                          HB_XFREE( pReduced );
                         }
                      }
-                     // SubStr( Str, n, 1 ) => Str[n]
-                     else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+
+                     if( ! bEmpty )
                      {
-                        if( pString->ExprType == HB_ET_VARIABLE )
+                        //printf( "Optimizing STOD: using hb_dateEncStr( %s )\n", pArg->value.asString.string );
+                        iDate = (int) hb_dateEncStr( pArg->value.asString.string );
+                     }
+                     //printf( "Optimizing STOD: Optimized value=%d\n", iDate );
+
+                     pReduced = hb_compExprNewDateTimeVal( iDate, 0, HB_ET_DDATE );
+
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     pSelf = pReduced;
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, CTOD ) && usCount && pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
+                  {
+                     /* try to change it into a date */
+                     HB_EXPR_PTR pArg = pParms->value.asList.pExprList;
+                     BOOL bEmpty = ( pArg->ulLength == 0 );
+                     //printf( "Optimizing CTOD: Len=%u String=%s\n", pArg->ulLength, pArg->value.asString.string);
+
+                     if( !bEmpty )
+                     {
+                        ULONG i;
+                        bEmpty = TRUE;
+
+                        for ( i=0; i < pArg->ulLength; i++)
                         {
+                           if( pArg->value.asString.string[i] >= '0' && pArg->value.asString.string[i] <= '9' )
+                           {
+                              bEmpty = FALSE;
+                              break;
+                           }
+                        }
+                     }
+
+                     if( bEmpty )
+                     {
+                        //printf( "Optimizing CTOD: using 0\n" );
+                        pReduced = hb_compExprNewDateTimeVal( 0, 0, HB_ET_DDATE );
+
+                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                        pSelf = pReduced;
+                     }
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, EVAL ) && usCount )
+                  {
+                     HB_EXPR_PTR pBlock = pParms->value.asList.pExprList;
+                     HB_EXPR_PTR pArgs = pBlock->pNext;
+
+                     pBlock->pNext = NULL;
+
+                     /* Optimize Eval( bBlock, [ArgList] ) to: bBlock:Eval( [ArgList] ) */
+                #if defined( HB_MACRO_SUPPORT )
+                     pReduced = hb_compExprNewMethodCall( hb_compExprNewSend( pBlock, hb_strdup( szName ) ), hb_compExprNewArgList( pArgs ) );
+                #else
+                     pReduced = hb_compExprNewMethodCall( hb_compExprNewSend( pBlock, szName ), hb_compExprNewArgList( pArgs ) );
+                #endif
+
+                     pParms->value.asList.pExprList = NULL;
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                     pSelf = pReduced;
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, __DBLIST ) && usCount >= 10 && HB_COMP_ISSUPPORTED( HB_COMPFLAG_XBASE ) )
+                  {
+                     HB_EXPR_PTR pArray = pParms->value.asList.pExprList->pNext;
+
+                     if( pArray->ExprType == HB_ET_ARRAY )
+                     {
+                        HB_EXPR_PTR pElem = pArray->value.asList.pExprList;
+                        HB_EXPR_PTR pPrev = NULL, pNext;
+
+                        while( pElem )
+                        {
+                           /* The {|| &cMacro } block is now &( "{||" + cMacro + "}" ) due to early macro expansion in compiler. */
+                           if( pElem->ExprType == HB_ET_MACRO )
+                           {
+                              HB_EXPR_PTR pMacro = pElem->value.asMacro.pExprList;
+
+                              if( pMacro &&
+                                  pMacro->ExprType == HB_EO_PLUS &&
+                                  pMacro->value.asOperator.pLeft->ExprType == HB_EO_PLUS &&
+                                  pMacro->value.asOperator.pLeft->value.asOperator.pRight->ExprType == HB_ET_VARIABLE
+                                )
+                              {
+                                 /* Saving the next array element so the list can be relinked after we substitute the macro block. */
+                                 pNext = pElem->pNext;
+
+                                 /* Instead we only want the macro variable, {|| &cMacro } -> &( "{||" + cMacro + "}" ) -> cMacro */
+                                 HB_EXPR_PCODE1( hb_compExprDelete, pElem );
+                                 pElem = pMacro->value.asOperator.pLeft->value.asOperator.pRight;
+                                 if( pPrev )
+                                 {
+                                    /* Previous element should point to the new element. */
+                                    pPrev->pNext = pElem;
+                                 }
+                                 else
+                                 {
+                                    /* Top of array should point to the new first element. */
+                                    pArray->value.asList.pExprList = pElem;
+                                 }
+                                 pElem->pNext = pNext;
+                              }
+                           }
+                           /* Search for {|| &(cMacro) }. */
+                           else if( pElem->ExprType == HB_ET_CODEBLOCK )
+                           {
+                              HB_EXPR_PTR pBlock = pElem->value.asList.pExprList;
+
+                              /* Search for macros {|| &cMacro }. */
+                              if( pBlock->ExprType == HB_ET_MACRO )
+                              {
+                                 /* Saving the next array element so the list can be relinked after we substitute the macro block. */
+                                 pNext = pElem->pNext;
+
+                                 /* Instead we only want the core expression. */
+                                 HB_EXPR_PCODE1( hb_compExprDelete, pElem );
+                                 if( pBlock->value.asMacro.pExprList ) /* &( exp ) -> exp */
+                                 {
+                                    pElem = pBlock->value.asMacro.pExprList;
+                                 }
+                                 else if( pBlock->value.asMacro.cMacroOp ) /* simple macro in Flex build {|| &cMacro}, because harbour.y does not support early macros yet*/
+                                 {
+                                    pElem = hb_compExprNewVar( pBlock->value.asMacro.szMacro );
+                                 }
+                                 else /* {|| &cMacro.suffix } -> cMacro + "suffix" */
+                                 {
+                                    pElem = hb_compExprNewString( pBlock->value.asMacro.szMacro, strlen( pBlock->value.asMacro.szMacro ), FALSE );
+                                 }
+
+                                 if( pPrev )
+                                 {
+                                    /* Previous element should point to the new element. */
+                                    pPrev->pNext = pElem;
+                                 }
+                                 else
+                                 {
+                                    /* Top of array should point to the new first element. */
+                                    pArray->value.asList.pExprList = pElem;
+                                 }
+                                 pElem->pNext = pNext;
+                              }
+                           }
+
+                           pPrev = pElem;
+                           pElem = pElem->pNext;
+                        }
+                     }
+                  }
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, SUBSTR ) )
+                  {
+                     if( usCount > 1 )
+                     {
+                        HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                        HB_EXPR_PTR pStart  = pString->pNext;
+                        HB_EXPR_PTR pLen    = pStart->pNext;
+
+                        if( pString->ExprType == HB_ET_STRING && pStart->ExprType == HB_ET_NUMERIC && pStart->value.asNum.NumType == HB_ET_LONG )
+                        {
+                           // Can default.
+                           if( pLen == NULL )
+                           {
+                              pLen = hb_compExprNewLong( pString->ulLength );
+                              pStart->pNext = pLen;
+                           }
+
+                           // Optimization only possible if BOTH nStart and nLen are numerics.
+                           if( pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG )
+                           {
+                              char *sSubStr;
+
+                              // Start - From Right.
+                              if( pStart->value.asNum.lVal < 0 )
+                              {
+                                 pStart->value.asNum.lVal += pString->ulLength + 1;
+                              }
+
+                              // Start - Must be postive.
+                              if( pStart->value.asNum.lVal <= 0 )
+                              {
+                                 pStart->value.asNum.lVal = 1;
+                              }
+
+                              // Start - Never beyond terminator.
+                              if( (ULONG) pStart->value.asNum.lVal > pString->ulLength )
+                              {
+                                 pStart->value.asNum.lVal = pString->ulLength + 1;
+                              }
+
+                              // Len - Never negative.
+                              if( pLen->value.asNum.lVal < 0 )
+                              {
+                                 pLen->value.asNum.lVal = 0;
+                              }
+
+                              // Len - Never beyond range.
+                              if( (ULONG) pStart->value.asNum.lVal + (ULONG) pLen->value.asNum.lVal - 1 > pString->ulLength )
+                              {
+                                 pLen->value.asNum.lVal = pString->ulLength - pStart->value.asNum.lVal + 1;
+                              }
+
+                              //printf( "String: '%s', Start: %i, Len: %i\n", pString->value.asString.string, pStart->value.asNum.lVal, pLen->value.asNum.lVal );
+
+                              sSubStr = (char *) hb_xgrab( (ULONG) pLen->value.asNum.lVal + 1 );
+
+                              memcpy( (void *) sSubStr,
+                                      (const char *)( pString->value.asString.string + (int)( pStart->value.asNum.lVal - 1 ) ),
+                                      (size_t)( (ULONG)( pLen->value.asNum.lVal ) ) );
+
+                              sSubStr[ (int)( pLen->value.asNum.lVal ) ] = '\0';
+
+                              pReduced = hb_compExprNewString( sSubStr, ( ULONG ) pLen->value.asNum.lVal, TRUE );
+
+                              HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+                              pSelf = pReduced;
+                           }
+                        }
+                        // SubStr( Str, n, 1 ) => Str[n]
+                        else if( usCount == 3 && pLen->ExprType == HB_ET_NUMERIC && pLen->value.asNum.NumType == HB_ET_LONG && pLen->value.asNum.lVal == 1 )
+                        {
+                           if( pString->ExprType == HB_ET_VARIABLE )
+                           {
+                              char *szName = pString->value.asSymbol.szName;
+
                            #if defined( HB_MACRO_SUPPORT )
-                              if( hb_compLocalVarGetPos( pString->value.asSymbol, HB_MACRO_PARAM ) == 0 )
+                              if( hb_compLocalVarGetPos( szName, HB_MACRO_PARAM ) == 0 )
                               {
                                  // do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
                                  goto PostOptimization;
                               }
                            #else
-                              if( hb_compLocalGetPos( pString->value.asSymbol ) == 0 &&
-                                  hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pLast ) == 0 &&
-                                  hb_compVariableGetPos( hb_comp_pGlobals, pString->value.asSymbol ) == 0 &&
-                                  ( hb_comp_bStartProc || hb_compStaticGetPos( pString->value.asSymbol, hb_comp_functions.pFirst ) == 0 ) )
+                              if( hb_compLocalGetPos( szName ) == 0 &&
+                                  hb_compStaticGetPos( szName, hb_comp_functions.pLast ) == 0 &&
+                                  hb_compVariableGetPos( hb_comp_pGlobals, szName ) == 0 &&
+                                  ( hb_comp_bStartProc || hb_compStaticGetPos( szName, hb_comp_functions.pFirst ) == 0 ) )
                               {
                                  // do NOT optimize NON declared var, because Array optimization will force MEMVAR context!
                                  goto PostOptimization;
                               }
                            #endif
+                           }
+
+                           // Skipping the first 2 elements of the list, as they are used by the optimization.
+                           pSelf->value.asFunCall.pParms->value.asList.pExprList = pLen;
+                           HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
+
+                      #if defined( HB_MACRO_SUPPORT )
+                           pSelf = hb_compExprNewArrayAt( pString, pStart, HB_MACRO_PARAM );
+                      #else
+                           pSelf = hb_compExprNewArrayAt( pString, pStart );
+                      #endif
+
+                           PostOptimization :
+                           ;
                         }
-
-                        // Delete the pre-optimization components.
-                        // Skipping the first 2 elements of the list, as they are used by the optimization.
-                        pSelf->value.asFunCall.pParms->value.asList.pExprList = pLen;
-                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-                        HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
-
-                        pSelf->ExprType = HB_ET_ARRAYAT;
-                        pSelf->value.asList.pExprList = pString;
-                        pSelf->value.asList.pIndex    = pStart;
-                        pSelf->value.asList.bByRef    = FALSE;
-
-                        PostOptimization :
-                        ;
                      }
                   }
-               }
-               // Right( Str, 1 ) => Str[-1]
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
-               {
-                  if( usCount == 2 )
+                  // Right( Str, 1 ) => Str[-1]
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, RIGHT ) && usCount == 2 )
                   {
                      HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
                      HB_EXPR_PTR pStart  = pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext;
@@ -2137,7 +2070,6 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                      if( pString->ExprType == HB_ET_STRING && pStart->ExprType == HB_ET_NUMERIC &&
                          pStart->value.asNum.NumType == HB_ET_LONG && pStart->value.asNum.lVal == 1 && pSelf->ulLength > 0 )
                      {
-                        // Delete the pre-optimization components.
                         // Skipping the first 2 elements of the list, as they are used by the optimization.
                         pSelf->value.asFunCall.pParms->value.asList.pExprList = NULL;
                         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
@@ -2150,59 +2082,56 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                         pSelf->value.asList.bByRef    = FALSE;
                      }
                   }
-               }
-               // aTail( Array ) => Array[-1]
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ATAIL" ) == 0 )
-               {
-                  if( usCount == 1 )
+                  // aTail( Array ) => Array[-1]
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, ATAIL ) && usCount == 1 )
                   {
                      HB_EXPR_PTR pArray = pSelf->value.asFunCall.pParms->value.asList.pExprList;
 
-                     // Delete the pre-optimization components.
-                     // Skipping the first element of the list, as it's used by the optimization.
                      pSelf->value.asFunCall.pParms->value.asList.pExprList = NULL;
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pParms );
-                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asFunCall.pFunName );
+                     HB_EXPR_PCODE1( hb_compExprDelete, pSelf );
 
-                     pSelf->ExprType = HB_ET_ARRAYAT;
-                     pSelf->value.asList.pExprList = pArray;
-                     pSelf->value.asList.pIndex    = hb_compExprNewLong( -1 );
-                     pSelf->value.asList.bByRef    = FALSE;
+                #if defined( HB_MACRO_SUPPORT )
+                     pSelf = hb_compExprNewArrayAt( pArray, hb_compExprNewLong( -1 ), HB_MACRO_PARAM );
+                #else
+                     pSelf = hb_compExprNewArrayAt( pArray, hb_compExprNewLong( -1 ) );
+                #endif
                   }
-               }
-               // Type( <x> ) => Type( <x>, MacroFlags )
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "TYPE" ) == 0 )
-               {
-                  if( hb_compExprListLen( pSelf->value.asFunCall.pParms ) == 1 )
+                  // Type( <x> ) => Type( <x>, MacroFlags )
+                  else if( HB_EXPR_ISBUILTIN_ID( szName, TYPE ) && usCount == 1 )
                   {
                      pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext =
-                        hb_compExprNewLong(
-                                             #ifndef HB_MACRO_SUPPORT
-                                                ( hb_comp_Supported & HB_COMPFLAG_HARBOUR  ? HB_SM_HARBOUR   : 0 ) |
-                                                ( hb_comp_Supported & HB_COMPFLAG_XBASE    ? HB_SM_XBASE     : 0 ) |
-                                                ( hb_comp_bShortCuts                       ? HB_SM_SHORTCUTS : 0 ) |
-                                                ( hb_comp_Supported & HB_COMPFLAG_RT_MACRO ? HB_SM_RT_MACRO  : 0 )
-                                             #else
-                                                HB_SM_RT_MACRO
-                                             #endif
-                                          );
-                  }
-               }
-               #ifndef HB_MACRO_SUPPORT
-               else if( hb_comp_bI18n && strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "I18N" ) == 0 )
-               {
-                  HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+                           hb_compExprNewLong(
 
-                  if( usCount == 1 && pSelf->value.asFunCall.pParms->value.asList.pExprList->ExprType == HB_ET_STRING )
-                  {
-                     hb_compAddI18nString( pString->value.asString.string );
+                #if defined( HB_MACRO_SUPPORT )
+                                                   ( HB_SM_RT_MACRO )
+                #else
+                                                   ( hb_comp_Supported & HB_COMPFLAG_HARBOUR  ? HB_SM_HARBOUR   : 0 ) |
+                                                   ( hb_comp_Supported & HB_COMPFLAG_XBASE    ? HB_SM_XBASE     : 0 ) |
+                                                   ( hb_comp_bShortCuts                       ? HB_SM_SHORTCUTS : 0 ) |
+                                                   ( hb_comp_Supported & HB_COMPFLAG_RT_MACRO ? HB_SM_RT_MACRO  : 0 )
+                #endif
+                                             );
                   }
-               }
-               #endif
-            }
-          #endif
-         }
+                #if defined( HB_MACRO_SUPPORT )
+                #else
+                  else if( hb_comp_bI18n && szName == hb_compExpr_IDs.I18N && usCount == 1 )
+                  {
+                     HB_EXPR_PTR pString = pSelf->value.asFunCall.pParms->value.asList.pExprList;
+
+                     if( pString->ExprType == HB_ET_STRING )
+                     {
+                        hb_compAddI18nString( pString->value.asString.string );
+                     }
+                  }
+                #endif
+               } /* if( pName->value.asSymbol.szNamespace == NULL ) */
+
+            } /* if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME ) */
+
+         #endif /* #ifndef HB_C52_STRICT */
+
          break;
+      }
 
       case HB_EA_ARRAY_AT:
       case HB_EA_ARRAY_INDEX:
@@ -2224,30 +2153,31 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
                BYTE   bPcode = 0;
+               char *szName = pSelf->value.asFunCall.pFunName->value.asSymbol.szName;
 
-               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 )
+               if( HB_EXPR_ISBUILTIN_ID( szName, LEFT ) )
                {
                   bPcode = HB_P_LEFT;
                   // See more code below!
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, RIGHT ) )
                {
                   bPcode = HB_P_RIGHT;
                   // See more code below!
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_ENUMINDEX" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, HB_ENUMINDEX ) )
                {
                    HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_ENUMINDEX );
 
                    break;
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_QWITH" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, HB_QWITH ) )
                {
                    HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
 
                    break;
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, HB_SETWITH ) )
                {
                    // Push the current Object if any as the RETURN Value.
                    HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_PUSHWITH );
@@ -2264,7 +2194,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                    break;
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, HASH ) )
                {
                    if( usCount )
                    {
@@ -2363,8 +2293,9 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
             if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
             {
-               if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_ENUMINDEX" ) == 0 ||
-                   strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_QWITH" ) == 0 )
+               char *szName = pSelf->value.asFunCall.pFunName->value.asSymbol.szName;
+
+               if( HB_EXPR_ISBUILTIN_ID( szName, HB_ENUMINDEX ) || HB_EXPR_ISBUILTIN_ID( szName, HB_QWITH ) )
                {
                   #if ! defined( HB_MACRO_SUPPORT )
                      hb_compWarnMeaningless( pSelf );
@@ -2372,7 +2303,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
 
                   break;
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HB_SETWITH" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, HB_SETWITH ) )
                {
                    if( usCount )
                    {
@@ -2390,22 +2321,22 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
             #if defined( HB_MACRO_SUPPORT )
                   /* This optimization is not applicable in Macro Compiler. */
             #else
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "AT" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "LEFT" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "RIGHT" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "SUBSTR" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "ARRAY" ) == 0 ||
-                        strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, AT ) ||
+                        HB_EXPR_ISBUILTIN_ID( szName, LEFT ) ||
+                        HB_EXPR_ISBUILTIN_ID( szName, RIGHT ) ||
+                        HB_EXPR_ISBUILTIN_ID( szName, SUBSTR ) ||
+                        HB_EXPR_ISBUILTIN_ID( szName, ARRAY ) ||
+                        HB_EXPR_ISBUILTIN_ID( szName, HASH ) )
                {
                   /* Functions with no side effect as statements! Nothing to do really!
                   */
                   hb_compWarnMeaningless( pSelf );
                   break;
                }
-               else if( strcmp( pSelf->value.asFunCall.pFunName->value.asSymbol, "__CLSSETMODULE" ) == 0  )
+               else if( HB_EXPR_ISBUILTIN_ID( szName, __CLSSETMODULE ) )
                {
                   // Only 1 Paramater allowed!
-                  if( pSelf->value.asFunCall.pParms->value.asList.pExprList->pNext == NULL )
+                  if( usCount == 1 )
                   {
                      HB_EXPR_USE( pSelf->value.asFunCall.pParms->value.asList.pExprList, HB_EA_PUSH_PCODE );
                      HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_CLASSSETMODULE );
@@ -2515,11 +2446,11 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 */
                 if( pSelf->value.asAlias.pVar->ExprType == HB_ET_VARREF )
                 {
-                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, -1 );
+                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, TRUE, pAlias->value.asSymbol.szName, -1 );
                 }
                 else
                 {
-                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, 0 );
+                   HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, TRUE, pAlias->value.asSymbol.szName, 0 );
                 }
             }
             else if( pAlias->ExprType == HB_ET_NUMERIC )
@@ -2530,9 +2461,13 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
-                  HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
+               {
+                  HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
+               }
                else
+               {
                   hb_compErrorAlias( pAlias );
+               }
             }
             else if( bReduced )
             {
@@ -2542,7 +2477,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * NOTE: FALSE = don't push alias value
                 */
                HB_EXPR_USE( pAlias, HB_EA_PUSH_PCODE );
-               HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, FALSE, NULL, 0 );
+               HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, FALSE, NULL, 0 );
             }
             else
                hb_compErrorAlias( pAlias );
@@ -2575,7 +2510,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * FIELD->var
                 * MEMVAR->var
                 */
-               HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, pAlias->value.asSymbol, 0 );
+               HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, TRUE, pAlias->value.asSymbol.szName, 0 );
             }
             else if( pAlias->ExprType == HB_ET_NUMERIC )
             {
@@ -2585,7 +2520,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                 * NOTE: only integer (LONG) values are allowed
                 */
                if( pAlias->value.asNum.NumType == HB_ET_LONG )
-                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
+                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, TRUE, NULL, ( LONG ) pAlias->value.asNum.lVal );
                else
                   hb_compErrorAlias( pAlias );
             }
@@ -2605,7 +2540,7 @@ static HB_EXPR_FUNC( hb_compExprUseAliasVar )
                else
                {
                   HB_EXPR_USE( pAlias, HB_EA_PUSH_PCODE );
-                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol, FALSE, NULL, 0 );
+                  HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asAlias.pVar->value.asSymbol.szName, FALSE, NULL, 0 );
                }
             }
             else
@@ -2698,8 +2633,14 @@ static HB_EXPR_FUNC( hb_compExprUseAliasExpr )
          }
          break;
       case HB_EA_DELETE:
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pAlias );
-         HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pExpList );
+         if( pSelf->value.asAlias.pAlias )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pAlias );
+         }
+         if( pSelf->value.asAlias.pExpList )
+         {
+            HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asAlias.pExpList );
+         }
          break;
    }
    return pSelf;
@@ -2715,7 +2656,7 @@ static HB_EXPR_FUNC( hb_compExprUseAlias )
       case HB_EA_LVALUE:
          break;
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asSymbol, FALSE, TRUE );
+         HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asSymbol.szName, NULL, SYMF_ALIAS );
          break;
       case HB_EA_POP_PCODE:
       case HB_EA_PUSH_POP:
@@ -2723,7 +2664,7 @@ static HB_EXPR_FUNC( hb_compExprUseAlias )
          break;
       case HB_EA_DELETE:
 #if defined( HB_MACRO_SUPPORT )
-             HB_XFREE( pSelf->value.asSymbol );
+             HB_XFREE( pSelf->value.asSymbol.szName );
 #endif
          break;
    }
@@ -2740,14 +2681,14 @@ static HB_EXPR_FUNC( hb_compExprUseFunName )
       case HB_EA_LVALUE:
          break;
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE1( hb_compGenPushFunCall, pSelf->value.asSymbol );
+         HB_EXPR_PCODE2( hb_compGenPushFunCall, pSelf->value.asSymbol.szName, pSelf->value.asSymbol.szNamespace );
          break;
       case HB_EA_POP_PCODE:
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
       case HB_EA_DELETE:
 #if defined( HB_MACRO_SUPPORT )
-             HB_XFREE( pSelf->value.asSymbol );
+             HB_XFREE( pSelf->value.asSymbol.szName );
 #endif
          break;
    }
@@ -2766,7 +2707,7 @@ static HB_EXPR_FUNC( hb_compExprUseRTVariable )
       case HB_EA_PUSH_PCODE:
          if( pSelf->value.asRTVar.szName )
          {
-            HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asRTVar.szName, FALSE, FALSE );  /* this is not a functio */
+            HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asRTVar.szName, NULL, SYMF_SYM );  /*  Not a function nor Alias */
          }
          else
          {
@@ -2837,12 +2778,16 @@ static HB_EXPR_FUNC( hb_compExprUseVariable )
             * genearate alias aware pcode even if we known a variable part only.
             */
             if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_ALIASED )
-               HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asSymbol, FALSE, NULL, 0 );
+            {
+               HB_EXPR_PCODE4( hb_compGenPushAliasedVar, pSelf->value.asSymbol.szName, FALSE, NULL, 0 );
+            }
             else
-               HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol );
+            {
+               HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol.szName );
+            }
          }
 #else
-         HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol );
+         HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol.szName );
 #endif
           break;
 
@@ -2850,25 +2795,29 @@ static HB_EXPR_FUNC( hb_compExprUseVariable )
 #if defined( HB_MACRO_SUPPORT )
          {
             if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_ALIASED )
-               HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asSymbol, FALSE, NULL, 0 );
+            {
+               HB_EXPR_PCODE4( hb_compGenPopAliasedVar, pSelf->value.asSymbol.szName, FALSE, NULL, 0 );
+            }
             else
-               HB_EXPR_PCODE1( hb_compGenPopVar, pSelf->value.asSymbol );
+            {
+               HB_EXPR_PCODE1( hb_compGenPopVar, pSelf->value.asSymbol.szName );
+            }
          }
 #else
-         HB_EXPR_PCODE1( hb_compGenPopVar, pSelf->value.asSymbol );
+         HB_EXPR_PCODE1( hb_compGenPopVar, pSelf->value.asSymbol.szName );
 #endif
          break;
 
       case HB_EA_PUSH_POP:
       case HB_EA_STATEMENT:
-         HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol );
+         HB_EXPR_PCODE1( hb_compGenPushVar, pSelf->value.asSymbol.szName );
          HB_EXPR_GENPCODE1( hb_compGenPCode1, HB_P_POP );
          break;
 
       case HB_EA_DELETE:
          /* NOTE: variable name should be released if macro compilation */
 #if defined( HB_MACRO_SUPPORT )
-             HB_XFREE( pSelf->value.asSymbol );
+             HB_XFREE( pSelf->value.asSymbol.szName );
 #endif
          break;
    }
@@ -2884,7 +2833,7 @@ static HB_EXPR_FUNC( hb_compExprUseSend )
             #ifdef HB_MACRO_SUPPORT
                if( (pSelf->value.asMessage.pObject)->ExprType == HB_ET_VARIABLE )
                {
-                  USHORT usVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol, HB_MACRO_PARAM );
+                  USHORT usVar = hb_compLocalVarGetPos( (pSelf->value.asMessage.pObject)->value.asSymbol.szName, HB_MACRO_PARAM );
 
                   if( usVar == 0 )
                   {
@@ -3195,7 +3144,9 @@ static HB_EXPR_FUNC( hb_compExprUsePostInc )
 
       case HB_EA_DELETE:
          if( pSelf->value.asOperator.pLeft )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asOperator.pLeft );
+         }
          break;
    }
    return pSelf;
@@ -3231,7 +3182,9 @@ static HB_EXPR_FUNC( hb_compExprUsePostDec )
 
       case HB_EA_DELETE:
          if( pSelf->value.asOperator.pLeft )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asOperator.pLeft );
+         }
          break;
    }
    return pSelf;
@@ -3256,10 +3209,10 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
          {
             HB_EXPR_PTR pPlus = pSelf->value.asOperator.pRight;
 
-            //printf( "Var: '%s' assign PLUS\n", pSelf->value.asOperator.pLeft->value.asSymbol );
+            //printf( "Var: '%s' assign PLUS\n", pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
             if( pPlus->value.asOperator.pLeft->ExprType == HB_ET_VARIABLE &&
-                pPlus->value.asOperator.pLeft->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol )
+                pPlus->value.asOperator.pLeft->value.asSymbol.szName == pSelf->value.asOperator.pLeft->value.asSymbol.szName )
             {
                //printf( "*** Optimize Left! ***\n" );
 
@@ -3282,7 +3235,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
             }
             // Order is SIGNIFICANT for NON numerics!!!
             else if( pPlus->value.asOperator.pRight->ExprType == HB_ET_VARIABLE &&
-                     pPlus->value.asOperator.pRight->value.asSymbol == pSelf->value.asOperator.pLeft->value.asSymbol &&
+                     pPlus->value.asOperator.pRight->value.asSymbol.szName == pSelf->value.asOperator.pLeft->value.asSymbol.szName &&
                      pPlus->value.asOperator.pLeft->ExprType == HB_ET_NUMERIC &&
                      pPlus->ExprType == HB_EO_PLUS )
             {
@@ -3339,7 +3292,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                       pSelf->value.asOperator.pRight->value.asNum.lVal >= -32768 &&
                       pSelf->value.asOperator.pRight->value.asNum.lVal <= 32767 )
                   {
-                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
                      if( iLocal && HB_LIM_INT8( iLocal ) )
                      {
@@ -3355,7 +3308,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
                         if( iLocal && HB_LIM_INT8( iLocal ) )
                         {
@@ -3429,7 +3382,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      short iNewVal = ( short ) pSelf->value.asOperator.pRight->value.asNum.lVal;
 
-                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+                     iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
                      if( iLocal && HB_LIM_INT8( iLocal ) )
                      {
@@ -3442,7 +3395,7 @@ static HB_EXPR_FUNC( hb_compExprUseAssign )
                   {
                      if( ! hb_compExprCheckMacroVar( pSelf->value.asOperator.pRight->value.asString.string ) )
                      {
-                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol );
+                        iLocal = hb_compLocalGetPos( pSelf->value.asOperator.pLeft->value.asSymbol.szName );
 
                         if( iLocal && HB_LIM_INT8( iLocal ) )
                         {
@@ -5332,7 +5285,9 @@ static HB_EXPR_FUNC( hb_compExprUseNegate )
 
       case HB_EA_DELETE:
          if( pSelf->value.asOperator.pLeft )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asOperator.pLeft );
+         }
          break;
    }
    return pSelf;
@@ -5372,7 +5327,9 @@ static HB_EXPR_FUNC( hb_compExprUsePreInc )
 
       case HB_EA_DELETE:
          if( pSelf->value.asOperator.pLeft )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asOperator.pLeft );
+         }
          break;
    }
    return pSelf;
@@ -5412,7 +5369,9 @@ static HB_EXPR_FUNC( hb_compExprUsePreDec )
 
       case HB_EA_DELETE:
          if( pSelf->value.asOperator.pLeft )
+         {
             HB_EXPR_PCODE1( hb_compExprDelete, pSelf->value.asOperator.pLeft );
+         }
          break;
    }
    return pSelf;

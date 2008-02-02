@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.8 2007/12/26 14:53:40 modalsist Exp $
+ * $Id: genobj32.c,v 1.9 2007/12/29 12:50:54 likewolf Exp $
  */
 
 /*
@@ -161,7 +161,7 @@ static BOOL IsExternal( ULONG ulSymbol )
   while( ul++ < ulSymbol )
     pSymbol = pSymbol->pNext;
 
-  return ! hb_compFunctionFind( pSymbol->szName );
+  return ! hb_compFunctionFind( pSymbol->szName, pSymbol->Namespace, pSymbol->iFlags );
 }
 
 static USHORT GetExternalPos( char * szExternal )
@@ -317,32 +317,40 @@ static void GenerateCodeSegment( FILE * hObjFile )
 static void GenerateExternals( FILE * hObjFile )
 {
   USHORT w;
-  PFUNCTION pFunc, pFTemp;
+  PFUNCALL pFunCall;
 
   /* calculate amount of externals */
-  pFunc = hb_comp_funcalls.pFirst;
-  while( pFunc )
-    {
-      if( ( pFTemp = hb_compFunctionFind( pFunc->szName ) ) == NULL || pFTemp == hb_comp_functions.pFirst )
+  pFunCall = hb_comp_funcalls.pFirst;
+  while( pFunCall )
+  {
+     if( hb_compFunctionFind( pFunCall->szName, pFunCall->Namespace, pFunCall->iFlags ) == NULL )
+     {
         wExternals++;
-      pFunc = pFunc->pNext;
-    }
-  if( wExternals )
-    {
-      externNames = ( char * * ) hb_xgrab( sizeof( char * ) * ( wExternals + 2 ) );
-      w = 1;
-      externNames[ 0 ] = "_hb_vmExecute";
+     }
 
-      pFunc = hb_comp_funcalls.pFirst;
-      while( pFunc )
-        {
-          if( ( pFTemp = hb_compFunctionFind( pFunc->szName ) ) == NULL || pFTemp == hb_comp_functions.pFirst )
-            externNames[ w++ ] = pFunc->szName;
-          pFunc = pFunc->pNext;
-        }
-      externNames[ w ] = 0;
-      ExternalNames( hObjFile, externNames );
-    }
+     pFunCall = pFunCall->pNext;
+  }
+
+  if( wExternals )
+  {
+     externNames = ( char * * ) hb_xgrab( sizeof( char * ) * ( wExternals + 2 ) );
+     w = 1;
+     externNames[ 0 ] = "_hb_vmExecute";
+
+     pFunCall = hb_comp_funcalls.pFirst;
+     while( pFunCall )
+     {
+         if( ( hb_compFunctionFind( pFunCall->szName, pFunCall->Namespace, pFunCall->iFlags ) ) == NULL )
+         {
+            externNames[ w++ ] = pFunCall->szName;
+         }
+
+         pFunCall = pFunCall->pNext;
+     }
+
+     externNames[ w ] = 0;
+     ExternalNames( hObjFile, externNames );
+   }
 }
 
 static void putbyte( BYTE b, FILE * hObjFile, BYTE * pbChecksum )

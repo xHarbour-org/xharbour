@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.62 2007/12/28 00:31:59 modalsist Exp $
+ * $Id: hbcomp.h,v 1.63 2008/01/03 05:43:00 andijahja Exp $
  */
 
 /*
@@ -155,10 +155,13 @@ typedef struct _VAR
 
 #define HB_MAX_SWITCHES 16
 
+struct __NAMESPACE;
+
 /* structure to hold a Clipper defined function */
 typedef struct __FUNC
 {
    char *         szName;                 /* name of a defined Clipper function */
+   struct __NAMESPACE *pNamespace;
    HB_SYMBOLSCOPE cScope;                 /* scope of a defined Clipper function */
    BYTE           bFlags;                 /* some flags we may need */
    USHORT         wParamCount;            /* number of declared parameters */
@@ -188,6 +191,14 @@ typedef struct __FUNC
    struct __FUNC * pNext;                 /* pointer to the next defined function */
 } _FUNC, * PFUNCTION;
 
+typedef struct __FUNCALL
+{
+   char *             szName;
+   void *             Namespace;
+   int                iFlags;
+   struct __FUNCALL * pNext;
+} _FUNCALL, * PFUNCALL;
+
 /* structure to hold an INLINE block of source */
 typedef struct __INLINE
 {
@@ -207,6 +218,13 @@ typedef struct
    int       iCount;            /* number of defined functions */
 } FUNCTIONS;
 
+typedef struct
+{
+   PFUNCALL pFirst;
+   PFUNCALL pLast;
+   int      iCount;
+} FUNCALLS;
+
 /* structure to control all Clipper defined functions */
 typedef struct
 {
@@ -221,7 +239,8 @@ typedef struct _COMSYMBOL
    char *         szName;     /* the name of the symbol */
    HB_SYMBOLSCOPE cScope;     /* the scope of the symbol */
    BYTE           cType;
-   BOOL           bFunc;      /* is it a function name (TRUE) or memvar (FALSE) */
+   void *         Namespace;      /* is it a function name or memvar (NULL) */
+   int            iFlags;
    union
    {
       PCOMCLASS pClass;
@@ -274,6 +293,42 @@ typedef struct _HB_LABEL_INFO
    ULONG *  pulLabels;
 } HB_LABEL_INFO, * PHB_LABEL_INFO;
 
+typedef struct
+{
+   char * __INITLINES__;
+   char * __INITSTATICS__;
+   char * __CLSSETMODULE;
+   char * __DBGENTRY;
+   char * __DBLIST;
+   char * __GET;
+   char * __GETA;
+   char * __MVPRIVATE;
+   char * __MVPUBLIC;
+   char * _1;
+   char * ARRAY;
+   char * AT;
+   char * ATAIL;
+   char * BREAK_;
+   char * CHR;
+   char * CTOD;
+   char * EVAL;
+   char * FIELD_;
+   char * HASH;
+   char * HB_ENUMINDEX;
+   char * HB_QWITH;
+   char * HB_SETWITH;
+   char * I18N;
+   char * LEFT;
+   char * LEN;
+   char * RIGHT;
+   char * STOD;
+   char * STR;
+   char * SUBSTR;
+   char * TYPE;
+   char * UPPER;
+   char * WHILE_;
+} HB_COMP_IDS;
+
 /* definitions for hb_compPCodeEval() support */
 typedef void * HB_VOID_PTR;
 #define HB_PCODE_FUNC( func, type ) ULONG func( PFUNCTION pFunc, ULONG lPCodePos, type cargo )
@@ -317,18 +372,95 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 #define FUN_BREAK_CODE        8   /* last statement breaks execution flow */
 #define FUN_USES_LOCAL_PARAMS 16  /* parameters are declared using () */
 #define FUN_WITH_RETURN       32  /* there was RETURN statement in previous line */
+#define FUN_SEALED            64  /* there was RETURN statement in previous line */
 
-extern void      hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType ); /* starts a new Clipper language function definition */
-extern PFUNCTION hb_compFunctionFind( char * szFunName ); /* locates a previously defined function */
-extern PINLINE   hb_compInlineFind( char * szFunName );
-extern USHORT    hb_compFunctionGetPos( char * szSymbolName ); /* returns the index + 1 of a function on the functions defined list */
-extern PFUNCTION hb_compFunctionKill( PFUNCTION );    /* releases all memory allocated by function and returns the next one */
-extern void      hb_compAnnounce( char * );
-extern PINLINE   hb_compInlineAdd( char * szFunName );
+#define SYMF_SYM         0x0000
+#define SYMF_ALIAS       0x0001
+#define SYMF_FUNCALL     0x1000
 
-extern PFUNCTION hb_compFunCallAdd( char * szFuntionName );
-extern PFUNCTION hb_compFunCallFind( char * szFunName ); /* locates a previously defined called function */
-extern void      hb_compFunCallCheck( char *, int );
+#define SYMF_NS_EXPLICITPATH ( SYMF_FUNCALL | 0x0010 )
+#define SYMF_NS_EXPLICITPTR  ( SYMF_FUNCALL | 0x0020 )
+#define SYMF_NS_RESOLVE      ( SYMF_FUNCALL | 0x0040 )
+#define SYMF_NS_MEMBER       ( SYMF_FUNCALL | 0x0080 )
+
+#define NSF_NONE         SYMF_FUNCALL
+#define NSF_EXPLICITPATH SYMF_NS_EXPLICITPATH
+#define NSF_EXPLICITPTR  SYMF_NS_EXPLICITPTR
+#define NSF_RESOLVE      SYMF_NS_RESOLVE
+#define NSF_MEMBER       SYMF_NS_MEMBER
+
+#if ! defined(  HB_MACRO_SUPPORT )
+
+    #define NSTYPE_SPACE       0x0001
+    #define NSTYPE_MEMBER      0x0002
+    #define NSTYPE_END         0x0004
+
+    #define NSTYPE_STATIC      0x0100
+    #define NSTYPE_TERMINATOR  ( 0x0200 | NSTYPE_END )
+
+    #define NSTYPE_OPTIONAL    ( 0x1000 | NSTYPE_SPACE )
+    #define NSTYPE_EXTERNAL    ( 0x2000 | NSTYPE_SPACE | NSTYPE_END )
+    #define NSTYPE_IMPLEMENTS  ( 0x4000 | NSTYPE_SPACE )
+    #define NSTYPE_USED        ( 0x8000 | NSTYPE_SPACE )
+
+    #define NSENUM_SPACEADVISE 0x0010
+    #define NSENUM_SPACEBEGIN  0x0020
+    #define NSENUM_SPACEEND    0x0040
+
+    typedef struct __NAMESPACE
+    {
+      int               type;
+      char              *szName;
+      char              *szFullPath;
+      int               iID;
+      union
+      {
+         struct __NAMESPACE *pOuter;
+         PFUNCTION           pFunc;
+      } extra;
+      struct __NAMESPACE *pNext;
+    } _NAMESPACE, *PNAMESPACE;
+
+    typedef struct
+    {
+       PNAMESPACE pFirst;
+       PNAMESPACE pLast;
+       PNAMESPACE pCurrent;
+    } NAMESPACES;
+
+    extern NAMESPACES hb_comp_Namespaces;
+    extern NAMESPACES hb_comp_UsedNamespaces;
+
+    typedef PNAMESPACE (*PHB_COMP_NS_ENUMFUN)( PNAMESPACE, void ** );
+
+    extern PNAMESPACE hb_compNamespaceEnumSkipMembers( PNAMESPACE pNamespace );
+    extern PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pNamespace, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo );
+    extern void       hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo );
+    extern void       hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo );
+    extern PNAMESPACE hb_compNamespaceNew( char *szName, int iType );
+    extern void       hb_compNamespaceEnd( void );
+    extern PNAMESPACE hb_compNamespaceLast( void );
+    extern PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType );
+    extern void       hb_compUsedNamespaceEnd( void );
+    extern PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName );
+    extern PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName );
+
+    extern PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pNamespace );
+    extern char * hb_compFunctionResolveUsed( char *szFunName );
+
+    extern void      hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType ); /* starts a new Clipper language function definition */
+    extern PFUNCTION hb_compFunctionFind( char * szFunName, void *Namespace, int iFlags ); /* locates a previously defined function */
+    extern PINLINE   hb_compInlineFind( char * szFunName );
+    extern USHORT    hb_compFunctionGetPos( char * szSymbolName ); /* returns the index + 1 of a function on the functions defined list */
+    extern PFUNCTION hb_compFunctionKill( PFUNCTION );    /* releases all memory allocated by function and returns the next one */
+    extern void      hb_compAnnounce( char * );
+    extern PINLINE   hb_compInlineAdd( char * szFunName );
+
+#endif
+
+extern PFUNCALL hb_compFunCallAdd( char * szFuntionName, void *Namespace, int iFlags );
+extern PFUNCALL hb_compFunCallFind( char * szFunName, void *Namespace, int iFlags ); /* locates a previously defined called function */
+extern void     hb_compFunCallCheck( char *, int );
 
 extern void hb_compVariableAdd( char * szVarName, BYTE cType ); /* add a new param, local, static variable to a function definition or a public or private */
 extern PVAR hb_compVariableFind( PVAR pVars, USHORT wOrder ); /* returns a variable if defined or zero */
@@ -339,9 +471,9 @@ extern int hb_compStaticGetPos( char *, PFUNCTION ); /* return if passed name is
 extern int hb_compFieldGetPos( char *, PFUNCTION );  /* return if passed name is a field variable */
 extern int hb_compMemvarGetPos( char *, PFUNCTION ); /* return if passed name is a memvar variable */
 
-extern PCOMSYMBOL hb_compSymbolAdd( char *, USHORT *, BOOL );
+extern PCOMSYMBOL hb_compSymbolAdd( char *szName, USHORT *pwPos, void *Namespace, int iFlags);
 extern PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL );    /* releases all memory allocated by symbol and returns the next one */
-extern PCOMSYMBOL hb_compSymbolFind( char *, USHORT *, BOOL ); /* returns a symbol pointer from the symbol table */
+extern PCOMSYMBOL hb_compSymbolFind( char *szName, USHORT *pwPos, void *Namespace, int iFlags ); /* returns a symbol pointer from the symbol table */
 extern PCOMSYMBOL hb_compSymbolGetPos( USHORT );   /* returns a symbol based on its index on the symbol table */
 
 extern PCOMDECLARED hb_compDeclaredAdd( char * );
@@ -404,7 +536,7 @@ extern void hb_compGenMessage( char * szMsgName );       /* sends a message to a
 extern void hb_compGenMessageData( char * szMsg );     /* generates an underscore-symbol name for a data assignment */
 extern void hb_compGenPopVar( char * szVarName );         /* generates the pcode to pop a value from the virtual machine stack onto a variable */
 extern void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec ); /* Pushes a number on the virtual machine stack */
-extern void hb_compGenPushFunCall( char * );             /* generates the pcode to push function's call */
+extern void hb_compGenPushFunCall( char *, char * );             /* generates the pcode to push function's call */
 extern void hb_compGenPushVar( char * szVarName );       /* generates the pcode to push a variable value to the virtual machine stack */
 extern void hb_compGenPushVarRef( char * szVarName );    /* generates the pcode to push a variable by reference to the virtual machine stack */
 extern void hb_compGenPushMemVarRef( char * szVarName ); /* generates the pcode to push a memvar variable by reference to the virtual machine stack */
@@ -414,7 +546,7 @@ extern void hb_compGenPushLong( HB_LONG lNumber );       /* Pushes an integer nu
 extern void hb_compGenPushDate( LONG lDate, LONG lTime, USHORT uType );      /* Pushes a date on the virtual machine stack */
 extern void hb_compGenPushNil( void );                   /* Pushes nil on the virtual machine stack */
 extern void hb_compGenPushString( char * szText, ULONG ulLen );       /* Pushes a string on the virtual machine stack */
-extern void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias ); /* Pushes a symbol on to the Virtual machine stack */
+extern void hb_compGenPushSymbol( char * szSymbolName, void *Namespace, int iFlags ); /* Pushes a symbol on to the Virtual machine stack */
 extern void hb_compGenPushAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPopAliasedVar( char *, BOOL, char *, LONG );
 extern void hb_compGenPushFunRef( char * );
@@ -520,7 +652,7 @@ extern void hb_compIdentifierClose( void ); /* release the table of identifiers 
 extern PHB_PP_STATE   hb_comp_PP;
 extern int            hb_comp_iLine;
 extern FUNCTIONS      hb_comp_functions;
-extern FUNCTIONS      hb_comp_funcalls;
+extern FUNCALLS       hb_comp_funcalls;
 extern COMPSYMBOLS    hb_comp_symbols;
 extern PCOMDECLARED   hb_comp_pFirstDeclared;
 extern PCOMDECLARED   hb_comp_pLastDeclared;
@@ -625,6 +757,8 @@ extern FILE           *hb_comp_errFile;
 /* auto convert external function to dynamic when -vd is turned-on */
 extern BOOL           hb_comp_autoDeferred;
 
+extern char *         hb_comp_szNamespace;
+
 /* /GC command line setting types */
 #define HB_COMPGENC_COMPACT     0
 #define HB_COMPGENC_NORMAL      1
@@ -657,6 +791,7 @@ extern BYTE *         hb_compHideString( int iType, char * szText, ULONG ulStrLe
 
 /* Date and DateTime support */
 extern void           hb_comp_datetimeEncode( LONG *plDate, LONG *plTime, int iYear, int iMonth, int iDay, int iHour, int iMinute, double dSeconds, int iAmPm, int * piOk );
+
 HB_EXTERN_END
 
 #endif /* HB_COMP_H_ */

@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.650 2008/01/14 23:39:04 likewolf Exp $
+ * $Id: hvm.c,v 1.651 2008/01/20 23:21:36 likewolf Exp $
  */
 
 /*
@@ -6898,7 +6898,14 @@ HB_EXPORT void hb_vmDo( USHORT uiParams )
 
    if( HB_IS_NIL( pSelf ) ) /* are we sending a message ? */
    {
-      pFunc = pSym->value.pFunPtr;
+      if( ( pSym->scope.value & HB_FS_INDIRECT ) != HB_FS_INDIRECT )
+      {
+         pFunc = pSym->value.pFunPtr;
+      }
+      else
+      {
+         pFunc = *pSym->value.pIndirectFunPtr;
+      }
 
       if( pFunc )
       {
@@ -9914,7 +9921,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          #endif
 
 #ifdef BROKEN_MODULE_SPACE_LOGIC
-         if( ( hSymScope & HB_FS_LOCAL ) != 0 )
+         if( ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
          {
             if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
             {
@@ -9941,7 +9948,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                    // Should we support dynamic overloading of already resolved HB_FS_DEFERRED as per below?
                    if( pDynSym->pSymbol->value.pFunPtr )
                    {
-                      if( ( pSymbol->scope.value & HB_FS_DEFERRED ) /* && pSymbol->value.pFunPtr == NULL */ )
+                      if( ( pSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pSymbol->value.pFunPtr == NULL */ )
                       {
                          pSymbol->scope.value = ( pSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
                          pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
@@ -9956,7 +9963,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                       while( pModuleSymbols )
                       {
-                         if( pModuleSymbols->hScope & HB_FS_DEFERRED )
+                         if( ( pModuleSymbols->hScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
                          {
                             PHB_SYMB pModuleSymbol;
                             register UINT ui;
@@ -9969,7 +9976,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                             {
                                pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
 
-                               if( pModuleSymbol->pDynSym == pDynSym && pModuleSymbol->scope.value & HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
+                               if( pModuleSymbol->pDynSym == pDynSym && ( ( pModuleSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) /* && pModuleSymbol->value.pFunPtr == NULL */ )
                                {
                                   pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
                                   pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
@@ -10004,7 +10011,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          {
             if( pDynSym )
             {
-               if( ( pSymbol->scope.value & HB_FS_LOCAL ) && ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) )
+               if( ( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL ) && ( ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL ) )
                {
 #ifdef BROKEN_MODULE_SPACE_LOGIC
                   /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */

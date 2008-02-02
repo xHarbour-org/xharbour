@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.68 2007/12/31 14:36:44 andijahja Exp $
+ * $Id: hbvmpub.h,v 1.69 2008/01/14 12:44:30 walito Exp $
  */
 
 /*
@@ -90,6 +90,7 @@
       union
       {
          PHB_FUNC               pFunPtr;       /* function address for function symbol table entries */
+         PHB_FUNC             * pIndirectFunPtr;
          struct _HB_PCODEFUNC * pCodeFunc;
          int                    iStaticsBase;  /* static array index for module */
       } value;
@@ -424,6 +425,14 @@
    #define HB_FS_CLSERROR  ( ( HB_SYMBOLSCOPE ) 0x2000 )
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
+
+   /*
+    * These two flags can never be used together in USER code
+    * Make sure to use like this:
+    * ( ( cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
+    */
+   #define HB_FS_INDIRECT  ( HB_FS_LOCAL | HB_FS_DEFERRED )
+
    /*
     * be careful !!! the symbols: HB_FS_INITEXIT is bitfield.
     * Any comparisons should always look like:

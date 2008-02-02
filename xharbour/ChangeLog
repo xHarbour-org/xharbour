@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5898 2008/01/30 18:19:34 modalsist Exp $
+ * $Id: ChangeLog,v 1.5899 2008/02/01 04:57:34 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,68 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-01 02:12 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * hrbdll.vc
+    * Corrected typo.
+  * include\hbextern.ch
+    - Deffed out some codepage files due to missing externals in hrbdll.vc - sorry need help.
+
+  * include/hbcomp.h
+  * include/hbdefs.h
+  * include/hberrors.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprc.c
+  * include/hbexprop.h
+  * include/hbmacro.h
+  * include/hbvmpub.h
+  * source/common/expropt1.c
+  * source/common/reserved.c
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/hbgenerr.c
+  * source/compiler/hbstrong.c
+  * source/macro/macro.y
+  * source/macro/macroa.c
+  * source/macro/macrob.c
+  * source/vm/macro.c
+  * source/vm/hvm.c
+  * include/std.ch
+    ! Fixed all compiler memory leaks reported in clean build (including contribs).
+      /* PP appears to still have some leak[s] */
+    % Multiple optimizations - Will appreciate reports on speed difference if any.
+    + Added compile time support for namespaces - please review new samples.
+      /* Note: I chose compile time due to the static nature of namespaces,
+         to provide earlier reporting of errors, and also for R.T performance.
+         This choice has also negative aspects, namely no MACRO support and
+         no HRB support.
+
+         Due to time constraints, I did not get to test this feature as much as
+         I'd normally like to do with such complex subject, but it was important
+         to not hold so many changes out of CVS for longer period. For same time
+         constraints I did not get to wrting any documentation, except for the
+         info in the new samples (I hope it should be self descriptive enough).
+       */
+
+  + tests/extnamespace.prg
+  + tests/namespace.prg
+  + tests/tstnamespace.prg
+    + Samples for new namespace features.
+
+    + Added hack to support new USING NAMESPACE ...
+
+  * source/vm/dynsym.c
+    * Corrected & to use ==
+
+  * source/pp/ppcore.c
+    + Added auto define __PRG__
 
 2008-02-01 12:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * source/rtl/pcre/config.h

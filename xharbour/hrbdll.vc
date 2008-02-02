@@ -1,5 +1,5 @@
 #
-# $Id: hrbdll.vc,v 1.116 2007/12/29 16:34:27 modalsist Exp $
+# $Id: hrbdll.vc,v 1.117 2008/01/23 16:06:39 lculik Exp $
 #
 #
 # This make file is for creating harbour.dll with Microsoft Visual C++ 6.0
@@ -674,7 +674,7 @@ HARBOUR_DLL_OBJS = \
    $(OBJ_DIR)\cpde850.obj \
    $(OBJ_DIR)\cpdeiso.obj \
    $(OBJ_DIR)\cpruiso.obj \
-   $(OBJ_DIR)\cpdewin.obj \   
+   $(OBJ_DIR)\cpdewin.obj \
    $(OBJ_DIR)\uc1252.obj \
    $(OBJ_DIR)\cphr1250.obj \
    $(OBJ_DIR)\cphr437.obj \

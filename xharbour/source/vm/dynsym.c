@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.50 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: dynsym.c,v 1.51 2008/01/16 00:54:29 likewolf Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
-      if( ( pSymbol->scope.value & HB_FS_LOCAL ) != 0 )
+      if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
       {
          #if 0
             assert( pModuleSymbols );
@@ -251,7 +251,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    pDynSym->pModuleSymbols = NULL;
    //TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
 
-   if( pSymbol->scope.value & HB_FS_LOCAL )
+   if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
    {
       assert( pModuleSymbols );
       pDynSym->pModuleSymbols = pModuleSymbols;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.29 2007/08/26 14:55:13 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.30 2007/12/22 19:04:32 likewolf Exp $
  */
 
 /*
@@ -141,9 +141,53 @@ static BYTE s_PrecedTable[] = {
    HB_ET_NIL                  /*   HB_EO_PREDEC,      pre-operators */
 };
 
-static HB_CBVAR_PTR hb_compExprCBVarNew( char *, BYTE );
-
 /* ************************************************************************ */
+
+#if defined( HB_MACRO_SUPPORT )
+
+#else
+
+HB_COMP_IDS hb_compExpr_IDs;
+
+/* Initialize the optimizer
+ */
+void hb_compExprINIT( void )
+{
+   hb_compExpr_IDs.__INITLINES__   = hb_compIdentifierNew( "<_INITLINES]", TRUE );
+   hb_compExpr_IDs.__INITSTATICS__ = hb_compIdentifierNew( "(_INITSTATICS)", TRUE );
+   hb_compExpr_IDs.__CLSSETMODULE  = hb_compIdentifierNew( "__CLSSETMODULE", TRUE );
+   hb_compExpr_IDs.__DBGENTRY      = hb_compIdentifierNew( "__DBGENTRY", TRUE );
+   hb_compExpr_IDs.__DBLIST        = hb_compIdentifierNew( "__DBLIST", TRUE );
+   hb_compExpr_IDs.__GET           = hb_compIdentifierNew( "__GET", TRUE );
+   hb_compExpr_IDs.__GETA          = hb_compIdentifierNew( "__GETA", TRUE );
+   hb_compExpr_IDs.__MVPRIVATE     = hb_compIdentifierNew( "__MVPRIVATE", TRUE );
+   hb_compExpr_IDs.__MVPUBLIC      = hb_compIdentifierNew( "__MVPUBLIC", TRUE );
+   hb_compExpr_IDs._1              = hb_compIdentifierNew( "_1", TRUE );
+   hb_compExpr_IDs.ARRAY           = hb_compIdentifierNew( "ARRAY", TRUE );
+   hb_compExpr_IDs.AT              = hb_compIdentifierNew( "AT", TRUE );
+   hb_compExpr_IDs.ATAIL           = hb_compIdentifierNew( "ATAIL", TRUE );
+   hb_compExpr_IDs.BREAK_          = hb_compIdentifierNew( "BREAK", TRUE );
+   hb_compExpr_IDs.CHR             = hb_compIdentifierNew( "CHR", TRUE );
+   hb_compExpr_IDs.CTOD            = hb_compIdentifierNew( "CTOD", TRUE );
+   hb_compExpr_IDs.EVAL            = hb_compIdentifierNew( "EVAL", TRUE );
+   hb_compExpr_IDs.FIELD_          = hb_compIdentifierNew( "FIELD", TRUE );
+   hb_compExpr_IDs.HASH            = hb_compIdentifierNew( "HASH", TRUE );
+   hb_compExpr_IDs.HB_ENUMINDEX    = hb_compIdentifierNew( "HB_ENUMINDEX", TRUE );
+   hb_compExpr_IDs.HB_QWITH        = hb_compIdentifierNew( "HB_QWITH", TRUE );
+   hb_compExpr_IDs.HB_SETWITH      = hb_compIdentifierNew( "HB_SETWITH", TRUE );
+   hb_compExpr_IDs.I18N            = hb_compIdentifierNew( "I18n", TRUE );
+   hb_compExpr_IDs.LEFT            = hb_compIdentifierNew( "LEFT", TRUE );
+   hb_compExpr_IDs.LEN             = hb_compIdentifierNew( "LEN", TRUE );
+   hb_compExpr_IDs.RIGHT           = hb_compIdentifierNew( "RIGHT", TRUE );
+   hb_compExpr_IDs.STOD            = hb_compIdentifierNew( "STOD", TRUE );
+   hb_compExpr_IDs.STR             = hb_compIdentifierNew( "STR", TRUE );
+   hb_compExpr_IDs.SUBSTR          = hb_compIdentifierNew( "SUBSTR", TRUE );
+   hb_compExpr_IDs.TYPE            = hb_compIdentifierNew( "TYPE", TRUE );
+   hb_compExpr_IDs.UPPER           = hb_compIdentifierNew( "UPPER", TRUE );
+   hb_compExpr_IDs.WHILE_          = hb_compIdentifierNew( "WHILE", TRUE );
+}
+
+#endif
 
 /* Delete all components and delete self
  */
@@ -182,6 +226,23 @@ void hb_compExprErrorType( HB_EXPR_PTR pExpr, HB_MACRO_DECL )
    HB_SYMBOL_UNUSED( HB_MACRO_VARNAME );
 }
 
+/* Create a new declaration for codeblock local variable
+ */
+static HB_CBVAR_PTR hb_compExprCBVarNew( char * szVarName, BYTE bType )
+{
+   HB_CBVAR_PTR pVar;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprCBVarNew(%s)", szVarName));
+
+   pVar = ( HB_CBVAR_PTR ) HB_XGRAB( sizeof( HB_CBVAR ) );
+
+   pVar->szName = szVarName;
+   pVar->bType  = bType;
+   pVar->pNext  = NULL;
+
+   return pVar;
+}
+
 /* Add a new local variable declaration
  */
 #ifdef HB_MACRO_SUPPORT
@@ -201,7 +262,7 @@ HB_EXPR_PTR hb_compExprCBVarAdd( HB_EXPR_PTR pCB, char * szVarName, BYTE bType )
       pVar = ( HB_CBVAR_PTR ) pCB->value.asList.pIndex;
       while( pVar )
       {
-         if( pVar->szName && szVarName && strcmp( szVarName, pVar->szName ) == 0 )
+         if( pVar->szName && szVarName && HB_EXPR_ISEQUAL_IDS( szVarName, pVar->szName ) )
          {
             hb_compErrorDuplVar( szVarName );
          }
@@ -276,7 +337,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
        * e.g. &MyVar()
        */
 
-      HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunCall(%s)", pName->value.asSymbol));
+      HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunCall(%s)", pName->value.asSymbol.szName));
    }
 
    if( pName->ExprType == HB_ET_MACRO )
@@ -294,7 +355,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
       if( pName->ExprType == HB_ET_VARIABLE )
       {
-         /* DotedMacro.More()
+         /* &DotedMacro.More()
           * MACROTEXT is compiled into hb_compExprNewVar()
           * so we must reset to correct context
           */
@@ -313,7 +374,7 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
       #else
         if( pName->ExprType == HB_ET_FUNNAME )
         {
-           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol, NULL );
+           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_TOOMANY_ARGS, pName->value.asSymbol.szName, NULL );
         }
         else
         {
@@ -324,6 +385,85 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 
    return pExpr;
 }
+
+/* Create a new symbol used in function calls
+ */
+HB_EXPR_PTR hb_compExprNewFunName( char * szName )
+{
+   HB_EXPR_PTR pExpr;
+   char *szNamespace, *pTmp;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunName(%s)", szName));
+
+   #ifdef HB_MACRO_SUPPORT
+      szNamespace = NULL;
+   #else
+      pTmp = strrchr( szName, '.' );
+
+      if( pTmp )
+      {
+         pTmp[0] = '\0';
+         szNamespace = hb_compIdentifierNew( szName, TRUE );
+
+         szName = hb_compIdentifierNew( pTmp + 1, TRUE );
+      }
+      else
+      {
+         szNamespace = NULL;
+      }
+   #endif
+
+   pExpr = hb_compExprNew( HB_ET_FUNNAME );
+   pExpr->value.asSymbol.szName = szName;
+   pExpr->value.asSymbol.szNamespace = szNamespace;
+   return pExpr;
+}
+
+#if ! defined( HB_MACRO_SUPPORT )
+
+HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName )
+{
+   HB_EXPR_PTR pExpr;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunRef(%s)", szFunName));
+
+   pExpr = hb_compExprNew( HB_ET_FUNREF );
+
+   pExpr->value.asSymbol.szName = szFunName;
+   pExpr->value.asSymbol.szNamespace = szNamespace;
+   pExpr->ValType = HB_EV_FUNREF;
+   return pExpr;
+}
+
+HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
+{
+   HB_EXPR_PTR pExpr;
+   char *pTmp = strrchr( szName, '.' );
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewNamespaceFunName(%s, %s)", szNamespace, szName));
+
+   if( pTmp )
+   {
+      char *szNamespace2, *szConcat;
+
+      pTmp[0] = '\0';
+      szNamespace2 = szName;
+
+      szConcat = (char *) hb_xgrab( strlen( szNamespace ) + 1 + strlen( szNamespace2 ) + 1 );
+      hb_xstrcpy( szConcat, szNamespace, ".", szNamespace2, NULL );
+      szNamespace = hb_compIdentifierNew( szConcat, TRUE );
+
+      // Must stay last!!!
+      szName = hb_compIdentifierNew( pTmp + 1, TRUE );
+   }
+
+   pExpr = hb_compExprNew( HB_ET_FUNNAME );
+   pExpr->value.asSymbol.szName = szName;
+   pExpr->value.asSymbol.szNamespace = szNamespace;
+   return pExpr;
+}
+
+#endif
 
 /* Creates new array access expression
  *    pArray[ pIndex ]
@@ -343,9 +483,19 @@ HB_EXPR_PTR hb_compExprNewArrayAt( HB_EXPR_PTR pArray, HB_EXPR_PTR pIndex )
    pExpr = hb_compExprNew( HB_ET_ARRAYAT );
 
    /* Check if this expression can be indexed */
-   HB_EXPR_USE( pArray, HB_EA_ARRAY_AT );
+   #ifdef HB_C52_STRICT
+      HB_EXPR_USE( pArray, HB_EA_ARRAY_AT );
+   #else
+     /* xHarbour supports type overloading.*/
+   #endif
+
    /* Check if this expression can be an index */
-   HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
+   #ifdef HB_C52_STRICT
+      HB_EXPR_USE( pIndex, HB_EA_ARRAY_INDEX );
+   #else
+     /* xHarbour supports type overloading.*/
+   #endif
+
    pExpr->value.asList.pExprList = pArray;
    pExpr->value.asList.pIndex = pIndex;
    pExpr->value.asList.bByRef = FALSE;
@@ -388,7 +538,7 @@ static void hb_compExprCheckStaticInitializers( HB_EXPR_PTR pStaticVar, HB_EXPR_
       {
          if( ! hb_compCanUseAsConstant( pElem, pStaticVar ) )
          {
-            hb_compErrorStatic( pStaticVar->value.asSymbol, pElem );
+            hb_compErrorStatic( pStaticVar->value.asSymbol.szName, pElem );
          }
       }
 
@@ -411,8 +561,8 @@ BOOL hb_compCanUseAsConstant( HB_EXPR_PTR pInit, HB_EXPR_PTR pStaticVar )
       return FALSE;
    }
 
-   if( strcmp( pInit->value.asFunCall.pFunName->value.asSymbol, "ARRAY" ) == 0 ||
-       strcmp( pInit->value.asFunCall.pFunName->value.asSymbol, "HASH" ) == 0 )
+   if( pInit->value.asFunCall.pFunName->value.asSymbol.szName == hb_compExpr_IDs.ARRAY ||
+       pInit->value.asFunCall.pFunName->value.asSymbol.szName == hb_compExpr_IDs.HASH )
    {
       // We must validate the arguments!
       hb_compExprCheckStaticInitializers( pStaticVar, pInit->value.asFunCall.pParms );
@@ -456,7 +606,7 @@ HB_EXPR_PTR hb_compExprAssignStatic( HB_EXPR_PTR pLeftExpr, HB_EXPR_PTR pRightEx
       {
          /* Illegal initializer for static variable (not a constant value)
           */
-          hb_compErrorStatic( pLeftExpr->value.asSymbol, pRightExpr );
+          hb_compErrorStatic( pLeftExpr->value.asSymbol.szName, pRightExpr );
       }
    }
    else if( pRightExpr->ExprType == HB_ET_ARRAY )
@@ -612,23 +762,6 @@ HB_EXPR_PTR hb_compExprGenPop( HB_EXPR_PTR pExpr )
 }
 
 /* ************************************************************************* */
-
-/* Create a new declaration for codeblock local variable
- */
-static HB_CBVAR_PTR hb_compExprCBVarNew( char * szVarName, BYTE bType )
-{
-   HB_CBVAR_PTR pVar;
-
-   HB_TRACE(HB_TR_DEBUG, ("hb_compExprCBVarNew(%s)", szVarName));
-
-   pVar = ( HB_CBVAR_PTR ) HB_XGRAB( sizeof( HB_CBVAR ) );
-
-   pVar->szName = szVarName;
-   pVar->bType  = bType;
-   pVar->pNext  = NULL;
-
-   return pVar;
-}
 
 /* NOTE: This deletes all linked variables
  */

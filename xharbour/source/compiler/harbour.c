@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.176 2008/01/03 05:43:00 andijahja Exp $
+ * $Id: harbour.c,v 1.177 2008/01/06 21:35:47 andijahja Exp $
  */
 
 /*
@@ -50,50 +50,6 @@
  * See doc/license.txt for licensing terms.
  *
  */
-
-/*
-   Very odd bug with realloc() under MSVC 6 SP5 - Even more strange an Access Violation error
-   on malloc() call sizeof( HB_HASH_ITEM ) (line 52 of hbhash.c) discovered when compiling
-   PP -dMINIGUI, line 2290 of MiniGUI which is:
-
-      Function IsWindowDefined ( FormName )
-
-   harbour.slx line 661:
-
-     yylval.string = hb_compIdentifierNew( yytext, TRUE ); //yytext = "ISWINDOWDEFINED"
-
-   hb_compIdentifierNew line 52 in hbident.c:
-
-      hb_hashTableAdd( s_comp_Identifiers, (void *)szIdent );
-
-   hb_hashTableAdd line 193:
-
-      pItem->next = hb_hashItemNew( ulKey, pValue );
-
-   hb_hashItemNew line 57:
-
-      HB_HASH_ITEM_PTR pItem = (HB_HASH_ITEM_PTR) hb_xgrab( sizeof( HB_HASH_ITEM ) );
-
-   Causes Access Violation Error (memory could not be "written").
-
-   I have replaced hb_xgrab() with direct malloc() call and verified that was the last
-   line to be executed before the GPF (actually broke the line in 2).
-
-   The realloc bug was discoved when compiling MiniGUI.prg line 2486:
-
-     next i
-
-   The realloc() bug is on:
-
-      hb_comp_functions.pLast->pJumps = ( ULONG * ) hb_xrealloc( hb_comp_functions.pLast->pJumps,
-      sizeof( ULONG ) * hb_comp_functions.pLast->iJumps );
-
-   Where hb_comp_functions.pLast->iJumps is 5 - increasing hb_comp_functions.pLast->pJumps from 16
-   to 20 bytes - I verified that hb_comp_functions.pLast->pJumps is valid pointer and was NOT
-   deallocated!
-
-   Also found an MS article describing a bug in realloc() to do with reallocation of small blocks.
-*/
 
 #ifdef _MSC_VER
    #include <windows.h>
@@ -148,7 +104,7 @@ char *         hb_pp_STD_CH;
 int            hb_pp_STD_CH_ADDITIVE;
 
 FUNCTIONS      hb_comp_functions;
-FUNCTIONS      hb_comp_funcalls;
+FUNCALLS       hb_comp_funcalls;
 COMPSYMBOLS    hb_comp_symbols;
 PCOMDECLARED   hb_comp_pFirstDeclared;
 PCOMDECLARED   hb_comp_pLastDeclared;
@@ -252,6 +208,8 @@ static BOOL hb_comp_bExternal   = FALSE;
 */
 BOOL hb_comp_AmbiguousVar = FALSE;
 
+NAMESPACES hb_comp_Namespaces, hb_comp_UsedNamespaces;
+
 /* linked list with EXTERNAL symbols declarations
  */
 static PEXTERN hb_comp_pExterns = NULL;
@@ -285,6 +243,8 @@ BOOL hb_comp_autoDeferred = FALSE;
 // Used in hb_compAutoOpen()
 int  ArgC = 0;
 char **ArgV;
+
+extern HB_COMP_IDS hb_compExpr_IDs;
 
 /* ************************************************************************* */
 #if ( defined(__WATCOMC__) && (__WATCOMC__ >= 1270) )
@@ -567,6 +527,7 @@ typedef struct _HB_MEMINFO
    struct _HB_MEMINFO * pPrevBlock;
    struct _HB_MEMINFO * pNextBlock;
    ULONG  ulSize;
+   int  iSourceLine;
    UINT32 Signature;
 } HB_MEMINFO, * PHB_MEMINFO;
 
@@ -603,6 +564,7 @@ void * hb_xgrab( ULONG ulSize )        /* allocates fixed memory, exits on failu
       ( ( PHB_MEMINFO ) pMem )->pPrevBlock = NULL;
       s_pMemBlocks = ( PHB_MEMINFO ) pMem;
       ( ( PHB_MEMINFO ) pMem )->ulSize = ulSize;
+      ( ( PHB_MEMINFO ) pMem )->iSourceLine = hb_comp_iLine;
       ( ( PHB_MEMINFO ) pMem )->Signature = HB_MEMINFO_SIGNATURE;
       HB_PUT_LE_UINT32( ( ( BYTE * ) pMem ) + HB_MEMINFO_SIZE + ulSize, HB_MEMINFO_SIGNATURE );
 
@@ -836,7 +798,7 @@ void hb_xexit( void )
       hb_conOutErr( hb_conNewLine(), 0 );
 
       for( i = 1, pMemBlock = s_pMemBlocks; pMemBlock; ++i, pMemBlock = pMemBlock->pNextBlock )
-         HB_TRACE( HB_TR_ERROR, ( "Block %i %p (size %lu) \"%s\"", i,
+         HB_TRACE( HB_TR_ERROR, ( "Line %i Block %i %p (size %lu) \"%s\"", pMemBlock->iSourceLine - 1, i,
                 ( char * ) pMemBlock + HB_MEMINFO_SIZE, pMemBlock->ulSize,
                 hb_memToStr( szBuffer, ( char * ) pMemBlock + HB_MEMINFO_SIZE,
                              pMemBlock->ulSize ) ) );
@@ -964,24 +926,36 @@ HB_EXPORT BYTE * hb_fsNameConv( BYTE * szFileName, BOOL * pfFree )
  * as they have to be placed on the symbol table later than the first
  * public symbol
  */
-PFUNCTION hb_compFunCallAdd( char * szFunctionName )
+PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
 {
-   PFUNCTION pFunc = hb_compFunctionNew( szFunctionName, 0 );
+   PFUNCALL pFunCall;
 
-   if( ! hb_comp_funcalls.iCount )
+   pFunCall = hb_compFunCallFind( szName, Namespace, iFlags );
+
+   if( pFunCall == NULL )
    {
-      hb_comp_funcalls.pFirst = pFunc;
-      hb_comp_funcalls.pLast  = pFunc;
-   }
-   else
-   {
-      ( ( PFUNCTION ) hb_comp_funcalls.pLast )->pNext = pFunc;
-      hb_comp_funcalls.pLast = pFunc;
+      pFunCall = ( PFUNCALL ) hb_xgrab( sizeof( _FUNCALL ) );
+
+      pFunCall->szName    = szName;
+      pFunCall->Namespace = Namespace;
+      pFunCall->iFlags    = iFlags;
+      pFunCall->pNext     = NULL;
+
+      if( ! hb_comp_funcalls.iCount )
+      {
+         hb_comp_funcalls.pFirst = pFunCall;
+         hb_comp_funcalls.pLast  = pFunCall;
+      }
+      else
+      {
+         hb_comp_funcalls.pLast->pNext = pFunCall;
+         hb_comp_funcalls.pLast = pFunCall;
+      }
+
+      hb_comp_funcalls.iCount++;
    }
 
-   hb_comp_funcalls.iCount++;
-
-   return pFunc;
+   return pFunCall;
 }
 
 /*
@@ -1246,11 +1220,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
                   hb_comp_functions.pLast->wParamCount = hb_comp_functions.pLast->wParamNum;
                }
 
-               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, NULL, SYMF_SYM ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_SYM );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1266,7 +1240,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                while( pMemVar )
                {
-                  if( strcmp( pMemVar->szName, pVar->szName ) == 0 )
+                  if( pMemVar->szName == pVar->szName )
                   {
                      break;
                   }
@@ -1305,11 +1279,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_PRIVATE:
             {
-               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, NULL, SYMF_SYM ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_SYM );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1323,7 +1297,7 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
                while( pMemVar )
                {
-                  if( strcmp( pMemVar->szName, pVar->szName ) == 0 )
+                  if( pMemVar->szName == pVar->szName )
                   {
                      break;
                   }
@@ -1362,11 +1336,11 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
 
          case VS_PUBLIC:
             {
-               pSym = hb_compSymbolFind( szVarName, &wPos, FALSE ); /* check if symbol exists already */
+               pSym = hb_compSymbolFind( szVarName, &wPos, NULL, SYMF_SYM ); /* check if symbol exists already */
 
                if( ! pSym )
                {
-                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( szVarName, TRUE ), &wPos, FALSE );
+                  pSym = hb_compSymbolAdd( szVarName, &wPos, NULL, SYMF_SYM );
                }
 
                pSym->cScope |= VS_MEMVAR;
@@ -1683,7 +1657,7 @@ PCOMCLASS hb_compClassFind( char * szClassName )
 
    while( pClass )
    {
-      if( ! strcmp( pClass->szName, szClassName ) )
+      if( pClass->szName == szClassName )
       {
          return pClass;
       }
@@ -1759,7 +1733,7 @@ PCOMDECLARED hb_compMethodFind( PCOMCLASS pClass, char * szMethodName )
 
    while( pMethod )
    {
-      if( ! strcmp( pMethod->szName, szMethodName ) )
+      if( pMethod->szName == szMethodName )
       {
          return pMethod;
       }
@@ -2300,7 +2274,7 @@ PCOMDECLARED hb_compDeclaredAdd( char * szDeclaredName )
    return pDeclared;
 }
 
-PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction )
+PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespace, int iFlags )
 {
    PCOMSYMBOL pSym;
 
@@ -2310,13 +2284,15 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction
        * NOTE: an empty name is passed for a fake starting function when
        * '-n' switch is used
        */
+
       pSym = ( PCOMSYMBOL ) hb_xgrab( sizeof( COMSYMBOL ) );
 
-      pSym->szName = szSymbolName;
-      pSym->cScope = HB_FS_PUBLIC;
-      pSym->cType = hb_comp_cVarType;
-      pSym->pNext = NULL;
-      pSym->bFunc = bFunction;
+      pSym->cScope    = HB_FS_PUBLIC;
+      pSym->szName    = szSymbolName;
+      pSym->cType     = hb_comp_cVarType;
+      pSym->iFlags    = iFlags;
+      pSym->Namespace = Namespace;
+      pSym->pNext     = NULL;
 
       if( ! hb_comp_symbols.iCount )
       {
@@ -2328,6 +2304,7 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, BOOL bFunction
          ( ( PCOMSYMBOL ) hb_comp_symbols.pLast )->pNext = pSym;
          hb_comp_symbols.pLast = pSym;
       }
+
       hb_comp_symbols.iCount++;
 
       if( pwPos )
@@ -2354,6 +2331,7 @@ static PFUNCTION hb_compFunctionNew( char * szName, HB_SYMBOLSCOPE cScope )
 
    pFunc                  = ( PFUNCTION ) hb_xgrab( sizeof( _FUNC ) );
    pFunc->szName          = szName;
+   pFunc->pNamespace      = hb_comp_Namespaces.pCurrent;
    pFunc->cScope          = cScope;
    pFunc->pLocals         = NULL;
    pFunc->pStatics        = NULL;
@@ -2410,6 +2388,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
    PCOMSYMBOL   pSym;
    PFUNCTION pFunc;
    char * szFunction;
+   PNAMESPACE pNamespace = NULL;
 
    hb_compFinalizeFunction();    /* fix all previous function returns offsets */
 
@@ -2427,7 +2406,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       szFunName = hb_compIdentifierNew( szFunName, FALSE );
    }
 
-   pFunc = hb_compFunctionFind( szFunName );
+   pFunc = hb_compFunctionFind( szFunName, (void *)hb_comp_Namespaces.pCurrent, NSF_MEMBER );
 
    if( pFunc )
    {
@@ -2439,38 +2418,44 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       }
    }
 
-   szFunction = hb_compReservedName( szFunName );
-
-   if( szFunction && !( hb_comp_functions.iCount==0 && !hb_comp_bStartProc ) )
+   if( hb_comp_Namespaces.pCurrent == NULL )
    {
-      /* We are ignoring it when it is the name of PRG file and we are
-       * not creating implicit starting procedure
-       */
-      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, szFunName );
+      szFunction = hb_compReservedName( szFunName );
+
+      if( szFunction && !( hb_comp_functions.iCount== 0 && !hb_comp_bStartProc ) )
+      {
+         /* We are ignoring it when it is the name of PRG file and we are
+          * not creating implicit starting procedure
+          */
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_FUNC_RESERVED, szFunction, szFunName );
+      }
+   }
+   else
+   {
+      pNamespace = hb_compNamespaceNew( szFunName, NSTYPE_MEMBER | ( ( cScope & HB_FS_STATIC ) ?  NSTYPE_STATIC : 0 ) );
    }
 
    hb_comp_iFunctionCnt++;
 
-   pSym = hb_compSymbolFind( szFunName, NULL, TRUE );
-
-   if( pSym )
+   if( szFunName[0] && ( hb_comp_Namespaces.pCurrent == NULL || ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) ) )
    {
-      pSym->cScope |= cScope;
-   }
-   else
-   {
-      /* There is not a symbol on the symbol table for this function name yet. */
-      pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
+      pSym = hb_compSymbolFind( szFunName, NULL, hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
 
-      if( pSym )
+      if( pSym == NULL )
       {
-         /* HB_FS_PUBLIC should have the lowest priority and can be covered by other symbols */
-         pSym->cScope |= cScope;
+         pSym = hb_compSymbolAdd( szFunName, NULL, hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
       }
+
+      pSym->cScope |= ( HB_FS_LOCAL | cScope );
    }
 
    pFunc = hb_compFunctionNew( szFunName, cScope );
    pFunc->bFlags |= (BYTE)iType;
+
+   if( pNamespace )
+   {
+      pNamespace->extra.pFunc = pFunc;
+   }
 
    if( hb_comp_functions.iCount == 0 )
    {
@@ -2515,18 +2500,16 @@ PINLINE hb_compInlineAdd( char * szFunName )
 
    if( szFunName )
    {
-      pSym = hb_compSymbolFind( szFunName, NULL, TRUE );
+      pSym = hb_compSymbolFind( szFunName, NULL, NULL, SYMF_FUNCALL );
 
       if( ! pSym )
       {
-         pSym = hb_compSymbolAdd( szFunName, NULL, TRUE );
+         pSym = hb_compSymbolAdd( szFunName, NULL, NULL, SYMF_FUNCALL );
       }
 
-      if( pSym )
-      {
-         pSym->cScope |= HB_FS_STATIC | HB_FS_LOCAL;
-      }
+      pSym->cScope |= ( HB_FS_STATIC | HB_FS_LOCAL );
    }
+
    pInline = hb_compInlineNew( szFunName );
 
    if( hb_comp_inlines.iCount == 0 )
@@ -2551,7 +2534,7 @@ void hb_compAnnounce( char * szFunName )
 {
    PFUNCTION pFunc;
 
-   pFunc = hb_compFunctionFind( szFunName );
+   pFunc = hb_compFunctionFind( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
 
    if( pFunc )
    {
@@ -2567,8 +2550,12 @@ void hb_compAnnounce( char * szFunName )
    {
       /* create a new procedure
        */
-      hb_compSymbolAdd( szFunName, NULL, TRUE );
-      /* pSym->cScope = HB_FS_PUBLIC; // already is */
+      if( hb_comp_Namespaces.pCurrent == NULL )
+      {
+         PCOMSYMBOL pSym = hb_compSymbolAdd( szFunName, NULL, hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+
+         pSym->cScope |= HB_FS_LOCAL;
+      }
 
       pFunc = hb_compFunctionNew( szFunName, HB_FS_PUBLIC | HB_FS_LOCAL );
       pFunc->bFlags |= FUN_PROCEDURE;
@@ -2660,7 +2647,11 @@ PFUNCTION hb_compFunctionKill( PFUNCTION pFunc )
       hb_xfree( ( void * ) pFunc->pJumps );
    }
 
-   hb_xfree( ( void * ) pFunc->pCode );
+   if( pFunc->pCode )
+   {
+      hb_xfree( ( void * ) pFunc->pCode );
+   }
+
 /* hb_xfree( ( void * ) pFunc->szName ); The name will be released in hb_compSymbolKill() */
    hb_xfree( ( void * ) pFunc );
 
@@ -2679,7 +2670,7 @@ PCOMSYMBOL hb_compSymbolKill( PCOMSYMBOL pSym )
 
 void hb_compGenBreak( void )
 {
-   hb_compGenPushSymbol( hb_compIdentifierNew( "BREAK", TRUE ), TRUE, FALSE );
+   hb_compGenPushFunCall( hb_compExpr_IDs.BREAK_, NULL );
    hb_compGenPushNil();
 }
 
@@ -2708,25 +2699,19 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
 
    while( hb_comp_pExterns )
    {
-      PCOMSYMBOL pSym;
+      PCOMSYMBOL pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
 
-      if( ( pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, TRUE ) ) != NULL )
+      if( pSym == NULL )
       {
-         if( ! hb_compFunCallFind( hb_comp_pExterns->szName ) )
-         {
-            hb_compFunCallAdd( hb_comp_pExterns->szName );
-         }
-      }
-      else
-      {
-         pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, TRUE );
-         hb_compFunCallAdd( hb_comp_pExterns->szName );
+         pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
       }
 
-      if( hb_comp_pExterns->cScope & HB_FS_DEFERRED )
+      if( ( hb_comp_pExterns->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
       {
          pSym->cScope |= HB_FS_DEFERRED;
       }
+
+      hb_compFunCallAdd( hb_comp_pExterns->szName, NULL, NSF_NONE );
 
       pDelete  = hb_comp_pExterns;
       hb_comp_pExterns = hb_comp_pExterns->pNext;
@@ -2734,52 +2719,116 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
    }
 }
 
-PFUNCTION hb_compFunCallFind( char * szFunctionName ) /* returns a previously called defined function */
+PFUNCALL hb_compFunCallFind( char * szFuncName, void *Namespace, int iFlags ) /* returns a previously called defined function */
 {
-   PFUNCTION pFunc = hb_comp_funcalls.pFirst;
+   PFUNCALL pFunCall = hb_comp_funcalls.pFirst;
 
-   while( pFunc )
+   #if 0
+     char *szNamespace = NULL;
+     PNAMESPACE pNamespace = NULL;
+
+     iFlags &= ~SYMF_FUNCALL;
+
+     if( ( iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH )
+     {
+        szNamespace = (char *) Namespace;
+     }
+     else
+     {
+        if( Namespace )
+        {
+           pNamespace = (PNAMESPACE) Namespace;
+        }
+     }
+   #endif
+
+   while( pFunCall )
    {
-      if( ! strcmp( pFunc->szName, szFunctionName ) )
+      if( pFunCall->szName == szFuncName && pFunCall->Namespace == Namespace )
       {
-         return pFunc;
+         return pFunCall;
       }
-      else
-      {
-         if( pFunc->pNext )
-         {
-            pFunc = pFunc->pNext;
-         }
-         else
-         {
-            return NULL;
-         }
-      }
+
+      pFunCall = pFunCall->pNext;
    }
+
    return NULL;
 }
 
-PFUNCTION hb_compFunctionFind( char * szFunctionName ) /* returns a previously defined function */
+PFUNCTION hb_compFunctionFind( char * szFunctionName, void *Namespace, int iFlags ) /* returns a previously defined function */
 {
    PFUNCTION pFunc = hb_comp_functions.pFirst;
 
    while( pFunc )
    {
-      if( strcmp( pFunc->szName, szFunctionName ) )
+      if( pFunc->szName == szFunctionName )
       {
-         if( pFunc->pNext )
+         if( ( iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH )
          {
-            pFunc = pFunc->pNext;
+            if( Namespace == NULL && pFunc->pNamespace == NULL )
+            {
+               return pFunc;
+            }
+            else if( pFunc->pNamespace && pFunc->pNamespace->szFullPath == (char *) Namespace )
+            {
+               return pFunc;
+            }
+         }
+         else if( ( iFlags & NSF_MEMBER ) == NSF_MEMBER )
+         {
+            if( pFunc->pNamespace == (PNAMESPACE) Namespace )
+            {
+               return pFunc;
+            }
          }
          else
          {
-            return NULL;
+            if( pFunc->pNamespace == NULL )
+            {
+               return pFunc;
+            }
          }
       }
-      else
+
+      pFunc = pFunc->pNext;
+   }
+
+   return NULL;
+}
+
+PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNamespace )
+{
+   PFUNCTION pFunc = hb_comp_functions.pFirst;
+
+   while( pFunc )
+   {
+      if( pFunc->szName == szFunctionName )
       {
-         return pFunc;
+         if( pFunc->pNamespace )
+         {
+            if( pFunc->pNamespace == pCallerNamespace )
+            {
+               return pFunc;
+            }
+            else
+            {
+               PNAMESPACE pOuter = pCallerNamespace->extra.pOuter;
+               PNAMESPACE pNamespace = pFunc->pNamespace;
+
+               while( pOuter )
+               {
+                  if( pNamespace == pOuter )
+                  {
+                     return pFunc;
+                  }
+
+                  pOuter = pOuter->extra.pOuter;
+               }
+            }
+         }
       }
+
+      pFunc = pFunc->pNext;
    }
 
    return NULL;
@@ -2842,7 +2891,7 @@ USHORT hb_compVariableGetPos( PVAR pVars, char * szVarName ) /* returns the orde
 
    while( pVars )
    {
-      if( pVars->szName && ! strcmp( pVars->szName, szVarName ) )
+      if( pVars->szName == szVarName )
       {
          if ( hb_comp_iWarnings < 3 )
          {
@@ -3109,7 +3158,7 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
 
    while( pSym )
    {
-      if( ! strcmp( pSym->szName, szDeclaredName ) )
+      if( pSym->szName == szDeclaredName )
       {
          return pSym;
       }
@@ -3128,7 +3177,7 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
    return NULL;
 }
 
-PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, BOOL bFunction )
+PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespace, int iFlags )
 {
    PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
    USHORT wCnt = 0;
@@ -3140,9 +3189,21 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, BOOL bFunctio
 
    while( pSym )
    {
-      if( strcmp( pSym->szName, szSymbolName ) == 0 )
+      if( pSym->szName == szSymbolName )
       {
-         if( bFunction ? pSym->bFunc : ! pSym->bFunc )
+         if( iFlags & SYMF_FUNCALL )
+         {
+            if( ( pSym->iFlags & SYMF_FUNCALL ) && pSym->Namespace == Namespace )
+            {
+               if( pwPos )
+               {
+                  *pwPos = wCnt;
+               }
+
+               return pSym;
+            }
+         }
+         else
          {
             if( pwPos )
             {
@@ -3183,7 +3244,7 @@ USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found o
 
    while( pFunc )
    {
-      if( ! strcmp( pFunc->szName, szFunctionName ) && pFunc != hb_comp_functions.pFirst )
+      if( pFunc->szName == szFunctionName && pFunc != hb_comp_functions.pFirst )
       {
          return wFunction;
       }
@@ -3200,6 +3261,7 @@ USHORT hb_compFunctionGetPos( char * szFunctionName ) /* return 0 if not found o
          }
       }
    }
+
    return 0;
 }
 
@@ -3348,6 +3410,11 @@ void hb_compGenModuleName( char *szFile, char *szFunc )
 
 void hb_compLinePush( void ) /* generates the pcode with the currently compiled source code line */
 {
+   if( hb_comp_functions.pLast && ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
+   {
+      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
+   }
+
    if( hb_comp_bLineNumbers && ! hb_comp_bDontGenLineNum )
    {
       int iLine = hb_comp_iLine - 1;
@@ -3453,7 +3520,7 @@ void hb_compLinePushIfInside( void ) /* generates the pcode with the currently c
    if( ! hb_comp_bExternal )
    {
  */
-      if( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 )
+      if( ( ! hb_comp_bStartProc && hb_comp_functions.iCount <= 1 ) || ( hb_comp_functions.pLast->bFlags & FUN_SEALED ) )
       {
          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_OUTSIDE, NULL, NULL );
       }
@@ -3554,7 +3621,7 @@ static void hb_compGenFieldPCode( BYTE bPCode, int wVar, char * szVarName, PFUNC
          bPCode = HB_P_PUSHALIASEDFIELD;
       }
 
-      hb_compGenPushSymbol( hb_compIdentifierNew(  pField->szAlias, TRUE ), FALSE, TRUE );
+      hb_compGenPushSymbol( pField->szAlias, NULL, SYMF_ALIAS );
    }
 
    hb_compGenVarPCode( bPCode, szVarName );
@@ -3571,11 +3638,11 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 
    /* Check if this variable name is placed into the symbol table
     */
-   pSym = hb_compSymbolFind( szVarName, &wVar, FALSE );
+   pSym = hb_compSymbolFind( szVarName, &wVar, NULL, SYMF_SYM );
 
    if( ! pSym )
    {
-      pSym = hb_compSymbolAdd( szVarName, &wVar, FALSE );
+      pSym = hb_compSymbolAdd( szVarName, &wVar, NULL, SYMF_SYM );
    }
 
    pSym->cScope |= VS_MEMVAR;
@@ -3597,11 +3664,11 @@ static void hb_compGenVarPCode( BYTE bPCode, char * szVarName )
 void hb_compGenMessage( char * szMsgName )       /* sends a message to an object */
 {
    USHORT wSym;
-   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym, FALSE );
+   PCOMSYMBOL pSym = hb_compSymbolFind( szMsgName, &wSym, NULL, SYMF_SYM );
 
    if( ! pSym )
    {
-      pSym = hb_compSymbolAdd( szMsgName, &wSym, FALSE );
+      pSym = hb_compSymbolAdd( szMsgName, &wSym, NULL, SYMF_SYM );
    }
 
    pSym->cScope |= HB_FS_MESSAGE;
@@ -3798,7 +3865,7 @@ void hb_compGenPopAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_compIdentifierNew(  szAlias, TRUE ), FALSE, TRUE );
+                  hb_compGenPushSymbol( szAlias, NULL, SYMF_ALIAS );
                   hb_compGenVarPCode( HB_P_POPALIASEDFIELD, szVarName );
                }
             }
@@ -4118,7 +4185,7 @@ void hb_compGenPushAliasedVar( char * szVarName,
                }
                else
                {  /* database alias */
-                  hb_compGenPushSymbol( hb_compIdentifierNew( szAlias, TRUE ), FALSE, TRUE );
+                  hb_compGenPushSymbol( szAlias, NULL, SYMF_ALIAS );
                   hb_compGenVarPCode( HB_P_PUSHALIASEDFIELD, szVarName );
                }
             }
@@ -4164,22 +4231,80 @@ void hb_compGenPushDouble( double dNumber, BYTE bWidth, BYTE bDec )
    hb_compGenPCodeN( pBuffer, 1 + sizeof( double ) + sizeof( BYTE ) + sizeof( BYTE ), 1 );
 }
 
-void hb_compGenPushFunCall( char * szFunName )
+void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
 {
    char * szFunction;
 
-   szFunction = hb_compReservedName( szFunName );
-
-   if( szFunction )
+   if( ( szNamespace && szNamespace[0] == '*' ) || ( szNamespace == NULL && hb_comp_Namespaces.pCurrent == NULL ) )
    {
-      /* Abbreviated function name was used - change it for whole name
+      /* Abbreviated function might have been used - change it for whole name
        */
-      hb_compGenPushSymbol( hb_compIdentifierNew( szFunction, TRUE ), TRUE, FALSE );
+      szFunction = hb_compReservedName( szFunName );
    }
    else
    {
-      hb_compGenPushSymbol( szFunName, TRUE, FALSE );
+      szFunction = NULL;
    }
+
+   if( szFunction )
+   {
+      szFunction = hb_compIdentifierNew( szFunction, TRUE );
+
+      hb_compFunCallAdd( szFunction, NULL, NSF_NONE );
+      hb_compGenPushSymbol( szFunction, NULL, SYMF_FUNCALL );
+   }
+   else
+   {
+      if( ( szNamespace == NULL ) && hb_comp_UsedNamespaces.pFirst )
+      {
+         szNamespace = hb_compFunctionResolveUsed( szFunName );
+      }
+
+      if( szNamespace )
+      {
+         hb_compFunCallAdd( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+         hb_compGenPushSymbol( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+      }
+      else
+      {
+         if( hb_comp_Namespaces.pCurrent == NULL )
+         {
+            hb_compFunCallAdd( szFunName, NULL, NSF_NONE );
+            hb_compGenPushSymbol( szFunName, NULL, SYMF_FUNCALL );
+         }
+         else
+         {
+            hb_compFunCallAdd( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
+            hb_compGenPushSymbol( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_RESOLVE );
+         }
+      }
+   }
+}
+
+char * hb_compFunctionResolveUsed( char *szFunName )
+{
+   PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst;
+   PNAMESPACE pResolved;
+
+   while( pNamespace )
+   {
+      if( ( pNamespace->type & NSTYPE_SPACE ) )
+      {
+         if( ( pNamespace->type & NSTYPE_USED ) )
+         {
+            pResolved = hb_compNamespaceFindMember( pNamespace->pNext, szFunName );
+
+            if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
+            {
+               return pNamespace->szFullPath;
+            }
+         }
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   return NULL;
 }
 
 /* generates the pcode to push switchcase value on the virtual machine stack */
@@ -4256,12 +4381,12 @@ BYTE * hb_compHideString( int iType, char * szText, ULONG ulStrLen, ULONG * ulBu
    {
       case 1:              // Simple XOR 0xf3 mask
          pBuffer = ( BYTE * ) hb_xgrab( ulStrLen + 1 );
-         
+
          for( ulCount = 0; ulCount < ulStrLen; ulCount++ )
          {
             pBuffer[ ulCount ] = (BYTE)( szText[ ulCount ] ^ 0xf3 );
          }
-         
+
          *ulBufferLen = ulStrLen;
          break;
 
@@ -4350,31 +4475,21 @@ void hb_compGenPushString( char * szText, ULONG ulStrLen )
 }
 
 /* generates the pcode to push a symbol on the virtual machine stack */
-void hb_compGenPushSymbol( char * szSymbolName, BOOL bFunction, BOOL bAlias )
+void hb_compGenPushSymbol( char * szSymbolName, void *Namespace, int iFlags )
 {
    PCOMSYMBOL pSym;
    USHORT wSym;
 
-   if( ( pSym = hb_compSymbolFind( szSymbolName, &wSym, bFunction ) ) != NULL )  /* the symbol was found on the symbol table */
-   {
-      if( bFunction && ! hb_compFunCallFind( szSymbolName ) )
-      {
-         hb_compFunCallAdd( szSymbolName );
-      }
+   pSym = hb_compSymbolFind( szSymbolName, &wSym, Namespace, iFlags );
 
-      if( bAlias )
-      {
-         pSym->cScope |= HB_FS_MEMVAR; /* HB_FS_PUBLIC can be hidden by HB_FS_STATIC */
-      }
+   if( pSym == NULL )
+   {
+      pSym = hb_compSymbolAdd( szSymbolName, &wSym, Namespace, iFlags );
    }
-   else
-   {
-      hb_compSymbolAdd( szSymbolName, &wSym, bFunction );
 
-      if( bFunction )
-      {
-         hb_compFunCallAdd( szSymbolName );
-      }
+   if( iFlags & SYMF_ALIAS )
+   {
+      pSym->cScope |= HB_FS_MEMVAR; /* HB_FS_PUBLIC can be hidden by HB_FS_STATIC */
    }
 
    if( wSym > 255 )
@@ -4391,7 +4506,7 @@ static void hb_compCheckDuplVars( PVAR pVar, char * szVarName )
 {
    while( pVar )
    {
-      if( pVar->szName && szVarName && strcmp( pVar->szName, szVarName ) == 0 )
+      if( pVar->szName == szVarName )
       {
          hb_compErrorDuplVar( szVarName );
          break;
@@ -4511,10 +4626,10 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
    if( pFunc == hb_comp_pInitFunc )
    {
-      if( pFunc->pCode[ 0 ] == HB_P_STATICS &&
-          pFunc->pCode[ 5 ] == HB_P_SFRAME )
+      if( pFunc->pCode[ 0 ] == HB_P_STATICS && pFunc->pCode[ 5 ] == HB_P_SFRAME )
       {
-         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, TRUE );
+         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, NULL, SYMF_FUNCALL );
+
          pFunc->pCode[ 1 ] = HB_LOBYTE( w );
          pFunc->pCode[ 2 ] = HB_HIBYTE( w );
          pFunc->pCode[ 6 ] = HB_LOBYTE( w );
@@ -4617,7 +4732,7 @@ static void hb_compOptimizeFrames( PFUNCTION pFunc )
 
       if( pFunc->bFlags & FUN_USES_STATICS )
       {
-         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, TRUE );
+         hb_compSymbolFind( hb_comp_pInitFunc->szName, &w, NULL, SYMF_FUNCALL );
          pFunc->pCode[ 4 + iOffset ] = HB_LOBYTE( w );
          pFunc->pCode[ 5 + iOffset ] = HB_HIBYTE( w );
          bSkipSFRAME = FALSE;
@@ -5185,7 +5300,7 @@ void hb_compStaticDefStart( void )
    {
       BYTE pBuffer[ 5 ];
 
-      hb_comp_pInitFunc = hb_compFunctionNew( hb_compIdentifierNew( "(_INITSTATICS)", TRUE ), HB_FS_INIT );
+      hb_comp_pInitFunc = hb_compFunctionNew( hb_compExpr_IDs.__INITSTATICS__, HB_FS_INIT );
       hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pInitFunc->bFlags = FUN_USES_STATICS | FUN_PROCEDURE;
       hb_comp_pInitFunc->cScope = HB_FS_INITEXIT;
@@ -5211,6 +5326,7 @@ void hb_compStaticDefStart( void )
    {
       hb_comp_pInitFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_functions.pLast = hb_comp_pInitFunc;
+
       if ( hb_comp_bDebugInfo )
       {
          hb_comp_ulSavedModuleNamePos = hb_comp_ulLastModuleNamePos;
@@ -5284,11 +5400,12 @@ static void hb_compLineNumberDefStart( void )
 {
    if( ! hb_comp_pLineNumberFunc )
    {
-      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_compIdentifierNew( "<_INITLINES>", TRUE ), HB_FS_INIT );
+      hb_comp_pLineNumberFunc = hb_compFunctionNew( hb_compExpr_IDs.__INITLINES__, HB_FS_INIT );
       hb_comp_pLineNumberFunc->pOwner = hb_comp_functions.pLast;
       hb_comp_pLineNumberFunc->bFlags = 0;
       hb_comp_pLineNumberFunc->cScope = HB_FS_INITEXIT;
       hb_comp_functions.pLast = hb_comp_pLineNumberFunc;
+
       if ( hb_comp_bDebugInfo )
       {
          hb_compGenModuleName( hb_comp_pFileName->szName, NULL );
@@ -5598,6 +5715,320 @@ static void hb_compInitVars( void )
    hb_comp_pEnum          = NULL;
 
    hb_comp_pLineNumberFunc = NULL;
+
+   hb_comp_Namespaces.pFirst   = NULL;
+   hb_comp_Namespaces.pLast    = NULL;
+   hb_comp_Namespaces.pCurrent = NULL;
+
+   hb_comp_UsedNamespaces.pFirst   = NULL;
+   hb_comp_UsedNamespaces.pLast    = NULL;
+   hb_comp_UsedNamespaces.pCurrent = NULL;
+}
+
+PNAMESPACE hb_compNamespaceEnumDeep( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+{
+   PNAMESPACE pNamespace = pStart->pNext;
+
+   pStart->type |= NSENUM_SPACEADVISE;
+   pEnumFunc( pStart, pCargo );
+   pStart->type &= ~NSENUM_SPACEADVISE;
+
+   while( pNamespace )
+   {
+      if( pNamespace->type & NSTYPE_SPACE )
+      {
+         pNamespace = hb_compNamespaceEnumDeep( pNamespace, pEnumFunc, pCargo );
+      }
+      else
+      {
+         if( pNamespace && ( pNamespace->type & NSTYPE_END ) )
+         {
+            break;
+         }
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   pStart->type |= NSENUM_SPACEBEGIN;
+   pEnumFunc( pStart, pCargo );
+   pStart->type &= ~NSENUM_SPACEBEGIN;
+
+   pNamespace = pStart->pNext;
+   while( pNamespace )
+   {
+      pEnumFunc( pNamespace, pCargo );
+
+      if( pNamespace->type & NSTYPE_END )
+      {
+         pStart->type |= NSENUM_SPACEEND;
+         pEnumFunc( pStart, pCargo );
+         pStart->type &= ~NSENUM_SPACEEND;
+
+         while( ( pNamespace->type & NSTYPE_END ) && pNamespace->pNext && ( pNamespace->pNext->type & NSTYPE_SPACE ) )
+         {
+            pNamespace = hb_compNamespaceEnumDeep( pNamespace->pNext, pEnumFunc, pCargo );
+         }
+
+         return pNamespace;
+      }
+
+      if( ( pNamespace->type & NSTYPE_SPACE ) )
+      {
+         if( ( pNamespace->type & NSTYPE_END ) != NSTYPE_END )
+         {
+            pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
+         }
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   assert(0);
+   return NULL;
+}
+
+PNAMESPACE hb_compNamespaceEnumSkipMembers( PNAMESPACE pNamespace )
+{
+   int iLevel = 1;
+
+   while( pNamespace )
+   {
+      if( pNamespace->type & NSTYPE_SPACE )
+      {
+         iLevel++;
+      }
+      // Don't else, maybe both if empty!
+      if( pNamespace->type & NSTYPE_END )
+      {
+         if( --iLevel == 0 )
+         {
+            return pNamespace;
+         }
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   assert(0);
+   return NULL;
+}
+
+
+void hb_compNamespaceEnumSpaces( PNAMESPACE pStart, PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+{
+   PNAMESPACE pNamespace;
+
+   pNamespace = pStart;
+
+   while( pNamespace )
+   {
+      if( pNamespace->type & NSTYPE_SPACE )
+      {
+         pEnumFunc( pNamespace, pCargo );
+         pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   return;
+}
+
+void hb_compNamespaceEnumerate( PHB_COMP_NS_ENUMFUN pEnumFunc, void **pCargo )
+{
+   PNAMESPACE pNamespace = hb_comp_Namespaces.pFirst;
+
+   while( pNamespace )
+   {
+      pEnumFunc( pNamespace, pCargo );
+
+      pNamespace = pNamespace->pNext;
+   }
+}
+
+PNAMESPACE hb_compNamespaceNew( char *szName, int iType )
+{
+   PNAMESPACE pNew;
+
+   pNew = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
+
+   pNew->type   = iType;
+   pNew->szName = szName;
+   pNew->pNext  = NULL;
+
+   if( hb_comp_Namespaces.pCurrent )
+   {
+      char *szFullPath = (char *) hb_xgrab( strlen( hb_comp_Namespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
+
+      hb_xstrcpy( szFullPath, hb_comp_Namespaces.pCurrent->szFullPath, ".", szName, NULL );
+      pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
+   }
+   else
+   {
+      pNew->szFullPath = szName;
+   }
+
+   if( hb_comp_Namespaces.pFirst )
+   {
+      if( iType & NSTYPE_SPACE )
+      {
+         pNew->iID = hb_comp_Namespaces.pLast->iID + 1;
+      }
+      else
+      {
+         pNew->iID = hb_comp_Namespaces.pLast->iID;
+      }
+
+      hb_comp_Namespaces.pLast->pNext = pNew;
+   }
+   else
+   {
+      pNew->iID = 1;
+
+      hb_comp_Namespaces.pFirst = pNew;
+   }
+
+   if( iType & NSTYPE_SPACE )
+   {
+      pNew->extra.pOuter = hb_comp_Namespaces.pCurrent;
+
+      if( pNew->extra.pOuter )
+      {
+         pNew->type |= pNew->extra.pOuter->type;
+      }
+
+      hb_comp_Namespaces.pCurrent = pNew;
+   }
+   else
+   {
+      pNew->extra.pOuter = NULL;
+   }
+
+   hb_comp_Namespaces.pLast = pNew;
+
+   return pNew;
+}
+
+void hb_compNamespaceEnd( void )
+{
+   if( ( hb_comp_Namespaces.pLast->type & NSTYPE_END ) )
+   {
+      hb_compNamespaceNew( "", NSTYPE_TERMINATOR );
+   }
+   else
+   {
+      hb_comp_Namespaces.pLast->type |= NSTYPE_END;
+   }
+
+   hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->extra.pOuter;
+}
+
+PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName )
+{
+   while( pNamespace )
+   {
+      if( pNamespace->szName == szName )
+      {
+         return pNamespace;
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   return NULL;
+}
+
+PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName )
+{
+   while( pNamespace )
+   {
+      if( pNamespace->szName == szName )
+      {
+         return pNamespace;
+      }
+
+      if( ( pNamespace->type & NSTYPE_END ) )
+      {
+         return NULL;
+      }
+
+      if( ( pNamespace->type & NSTYPE_SPACE ) )
+      {
+         pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
+      }
+
+      pNamespace = pNamespace->pNext;
+   }
+
+   return NULL;
+}
+
+PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType )
+{
+   PNAMESPACE pNew;
+
+   pNew = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
+
+   pNew->type   = iType;
+   pNew->szName = szName;
+   pNew->iID    = 0;
+   pNew->pNext  = NULL;
+
+   if( hb_comp_UsedNamespaces.pCurrent )
+   {
+      char *szFullPath = (char *) hb_xgrab( strlen( hb_comp_UsedNamespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
+
+      hb_xstrcpy( szFullPath, hb_comp_UsedNamespaces.pCurrent->szFullPath, ".", szName, NULL );
+      pNew->szFullPath = hb_compIdentifierNew( szFullPath, FALSE );
+   }
+   else
+   {
+      pNew->szFullPath = szName;
+   }
+
+   if( hb_comp_UsedNamespaces.pFirst )
+   {
+      hb_comp_UsedNamespaces.pLast->pNext = pNew;
+   }
+   else
+   {
+      hb_comp_UsedNamespaces.pFirst = pNew;
+   }
+
+   if( iType & NSTYPE_SPACE )
+   {
+      pNew->extra.pOuter = hb_comp_UsedNamespaces.pCurrent;
+
+      if( pNew->extra.pOuter )
+      {
+         pNew->type |= pNew->extra.pOuter->type;
+      }
+
+      hb_comp_UsedNamespaces.pCurrent = pNew;
+   }
+   else
+   {
+      pNew->extra.pOuter = NULL;
+   }
+
+   hb_comp_UsedNamespaces.pLast = pNew;
+
+   return pNew;
+}
+
+void hb_compUsedNamespaceEnd( void )
+{
+   if( ( hb_comp_UsedNamespaces.pLast->type & NSTYPE_END ) )
+   {
+      hb_compUsedNamespaceNew( hb_comp_UsedNamespaces.pCurrent->szName, NSTYPE_TERMINATOR );
+   }
+   else
+   {
+      hb_comp_UsedNamespaces.pLast->type |= NSTYPE_END;
+   }
+
+   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->extra.pOuter;
 }
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
@@ -5648,15 +6079,17 @@ static void hb_compOutputFile( void )
    }
 }
 
-
 static void hb_compAddInitFunc( PFUNCTION pFunc )
 {
-   PCOMSYMBOL pSym = hb_compSymbolAdd( pFunc->szName, NULL, TRUE );
+   PCOMSYMBOL pSym = hb_compSymbolAdd( pFunc->szName, NULL, NULL, SYMF_FUNCALL );
 
    pSym->cScope |= pFunc->cScope;
+
    hb_comp_functions.pLast->pNext = pFunc;
    hb_comp_functions.pLast = pFunc;
+
    hb_compGenPCode1( HB_P_ENDPROC );
+
    ++hb_comp_functions.iCount;
 }
 
@@ -5664,7 +6097,7 @@ static int hb_compCompile( char * szPrg )
 {
    int iStatus = EXIT_SUCCESS;
    PHB_FNAME pFileName;
-   BOOL bFunc;
+   BOOL bFunc, bKillGlobalsFunc = FALSE;
 
    hb_comp_pFileName = hb_fsFNameSplit( szPrg );
 
@@ -5823,6 +6256,8 @@ static int hb_compCompile( char * szPrg )
                hb_compFunctionAdd( hb_compIdentifierNew( "", TRUE ), HB_FS_PUBLIC, FUN_PROCEDURE );
             }
 
+            hb_compExprINIT();
+
             yyparse();
 
             if( hb_comp_bPPO && hb_comp_yyppo )
@@ -5850,7 +6285,7 @@ static int hb_compCompile( char * szPrg )
 
                hb_comp_pAutoOpen = hb_comp_pAutoOpen->pNext;
 
-               if( ! hb_compFunctionFind( pAutoOpen->szName ) )
+               if( ! hb_compFunctionFind( pAutoOpen->szName, NULL, NSF_NONE ) )
                {
                   hb_compAutoOpen( pAutoOpen->szName, &bSkipGen );
                }
@@ -5877,6 +6312,7 @@ static int hb_compCompile( char * szPrg )
                hb_comp_pInitFunc->pCode[ 3 ] = HB_LOBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->pCode[ 4 ] = HB_HIBYTE( hb_comp_iStaticCnt );
                hb_comp_pInitFunc->iStaticsBase = hb_comp_iStaticCnt;
+
                /* Update pseudo function name */
                sprintf( szNewName, "(_INITSTATICS%05d)", hb_comp_iStaticCnt );
                hb_comp_pInitFunc->szName = hb_compIdentifierNew( szNewName, TRUE );
@@ -5913,7 +6349,9 @@ static int hb_compCompile( char * szPrg )
 
                   hb_compGenPCode3( HB_P_ARRAYGEN, HB_LOBYTE( iModules ), HB_HIBYTE( iModules ), (BOOL)0 );
                   hb_compGenPCode1( HB_P_RETVALUE );
+
                   hb_compLineNumberDefEnd();
+
                   hb_compAddInitFunc( hb_comp_pLineNumberFunc );
                }
             }
@@ -5925,6 +6363,10 @@ static int hb_compCompile( char * szPrg )
                if( hb_comp_pGlobalsFunc->pCode )
                {
                   hb_compAddInitFunc( hb_comp_pGlobalsFunc );
+               }
+               else
+               {
+                  bKillGlobalsFunc = TRUE;
                }
 
                // Any NON EXTERN Globals?
@@ -5943,7 +6385,7 @@ static int hb_compCompile( char * szPrg )
                {
                   PCOMSYMBOL pSym;
 
-                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( "{_REGISTERGLOBALS}", TRUE ), NULL, TRUE );
+                  pSym = hb_compSymbolAdd( hb_compIdentifierNew( "{_REGISTERGLOBALS}", TRUE ), NULL, NULL, SYMF_FUNCALL );
                   pSym->cScope = HB_FS_INITEXIT;
                }
             }
@@ -6021,8 +6463,8 @@ static int hb_compCompile( char * szPrg )
 
                if( szFirstFunction )
                {
-                  PCOMSYMBOL pSym = hb_compSymbolFind( szFirstFunction,
-                                                       NULL, TRUE );
+                  PCOMSYMBOL pSym = hb_compSymbolFind( szFirstFunction, NULL, NULL, SYMF_FUNCALL );
+
                   if ( pSym )
                   {
                      pSym->cScope |= HB_FS_FIRST;
@@ -6082,17 +6524,22 @@ static int hb_compCompile( char * szPrg )
       while( pFunc );
    }
 
+   if( bKillGlobalsFunc )
+   {
+      hb_compFunctionKill( hb_comp_pGlobalsFunc );
+   }
+
    if( hb_comp_funcalls.pFirst )
    {
-      PFUNCTION pFunc = hb_comp_funcalls.pFirst;
+      PFUNCALL pFunCall = hb_comp_funcalls.pFirst;
 
       do
       {
-         hb_comp_funcalls.pFirst = pFunc->pNext;
-         hb_xfree( ( void * ) pFunc );  /* NOTE: szName will be released by hb_compSymbolKill() */
-         pFunc = hb_comp_funcalls.pFirst;
+         hb_comp_funcalls.pFirst = pFunCall->pNext;
+         hb_xfree( ( void * ) pFunCall );  /* NOTE: szName will be released by hb_compSymbolKill() */
+         pFunCall = hb_comp_funcalls.pFirst;
       }
-      while( pFunc );
+      while( pFunCall );
    }
 
    if( hb_comp_inlines.pFirst )
@@ -6171,6 +6618,32 @@ static int hb_compCompile( char * szPrg )
       while( pGlobal );
    }
 
+   if( hb_comp_Namespaces.pFirst )
+   {
+      PNAMESPACE pNamespace = hb_comp_Namespaces.pFirst, pDelete;
+
+      do
+      {
+         pDelete = pNamespace;
+         pNamespace = pNamespace->pNext;
+         hb_xfree( pDelete );
+      }
+      while( pNamespace );
+   }
+
+   if( hb_comp_UsedNamespaces.pFirst )
+   {
+      PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst, pDelete;
+
+      do
+      {
+         pDelete = pNamespace;
+         pNamespace = pNamespace->pNext;
+         hb_xfree( pDelete );
+      }
+      while( pNamespace );
+   }
+
    /* have we got i18n file ? */
    if ( hb_comp_HILfile != NULL )
    {
@@ -6224,7 +6697,7 @@ static BOOL hb_compAutoOpenFind( char * szName )
       return FALSE;
    }
 
-   if( strcmp( pLast->szName, szName ) == 0 )
+   if( pLast->szName == szName )
    {
       return TRUE;
    }
@@ -6234,7 +6707,7 @@ static BOOL hb_compAutoOpenFind( char * szName )
       {
          pLast = pLast->pNext;
 
-         if( strcmp( pLast->szName, szName ) == 0 )
+         if( pLast->szName == szName )
          {
             return TRUE;
          }
