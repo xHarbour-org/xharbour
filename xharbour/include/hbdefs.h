@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.92 2008/01/07 04:57:36 andijahja Exp $
+ * $Id: hbdefs.h,v 1.93 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -1112,7 +1112,7 @@ typedef unsigned long HB_COUNTER;
  *
 */
 #if ( defined(__WATCOMC__) && (__WATCOMC__<1220) ) || \
-    ( defined(__GNUC__) && !defined(__DJGPP__) && !defined(__MINGW32__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
+    ( defined(__GNUC__) && !defined(__DJGPP__) && !defined(__WIN32__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
    #define HARBOUR_START_PROCEDURE "MAIN"
 #endif
 
