@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.148 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: genc.c,v 1.149 2008/02/02 16:09:30 ronpinkas Exp $
  */
 
 /*
@@ -694,7 +694,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          do
          {
-            if( ( pUsedNamespace->type & NSTYPE_SPACE ) && pUsedNamespace->extra.pOuter == NULL )
+            if( pUsedNamespace->szName[0] != '*' && ( pUsedNamespace->type & NSTYPE_SPACE ) && pUsedNamespace->extra.pOuter == NULL )
             {
                fprintf( yyc, "\n#include \"%s.xns\"\n", pUsedNamespace->szName );
                fprintf( yyc, "extern HB_NS_%s %s;\n", pUsedNamespace->szName, pUsedNamespace->szName );

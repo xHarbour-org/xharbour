@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.140 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: harbour.sly,v 1.141 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -221,7 +221,7 @@ static void hb_compDebugStart( void ) { };
 %token HASHOP
 %token UTILITY
 %token DIVERT OF FLAGS
-%token NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE
+%token NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -315,7 +315,7 @@ static void hb_compDebugStart( void ) { };
 %type <iNumber> SwitchCases
 %type <asExpr>  Hash HashList
 %type <asExpr>  DivertFlags
-%type <string>  NamespaceID
+%type <string>  NamespacePath NamespaceName
 %type <iNumber> NamespaceType
 %type <pVoid>   UsedPath
 
@@ -338,8 +338,10 @@ Source     : Crlf
            | Line
            | ProcReq
            | Namespace
+           | ExtNamespace
            | NamespaceDefinition
            | NamespaceUsing
+           | WithNamespace
            | Source Crlf
            | Source VarDefs
            | Source FieldsDef
@@ -351,8 +353,10 @@ Source     : Crlf
            | Source Line
            | Source ProcReq
            | Source Namespace
+           | Source ExtNamespace
            | Source NamespaceDefinition
            | Source NamespaceUsing
+           | Source WithNamespace
            ;
 
 Line       : LINE NUM_INTEGER LITERAL Crlf
@@ -1141,19 +1145,29 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
 VariableAtAlias : VariableAt ALIASOP      { $$ = $1; }
 ;
 
-NamespaceID  : IdentName '.'               { $$ = $1; }
-             | NamespaceID IdentName '.'   {
-                                             char *szNamespace = (char *) hb_xgrab( strlen( $1 ) + 1 + strlen( $2 ) + 1 );
 
-                                             hb_xstrcpy( szNamespace, $1, ".", $2, NULL );
-                                             $$ = hb_compIdentifierNew( szNamespace, TRUE );
-                                           }
+NamespacePath : '*' '.'                     { $$ = "*"; }
+              | IdentName '.'               { $$ = $1; }
+              | NamespacePath IdentName '.' {
+                                              if( $1[0] == '*' )
+                                              {
+                                                 hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $2, "*" );
+                                                 $$ = $1;
+                                              }
+                                              else
+                                              {
+                                                 char *szNamespace = (char *) hb_xgrab( strlen( $1 ) + 1 + strlen( $2 ) + 1 );
+
+                                                 hb_xstrcpy( szNamespace, $1, ".", $2, NULL );
+                                                 $$ = hb_compIdentifierNew( szNamespace, FALSE );
+                                              }
+                                            }
            ;
 
 /* Function call
  */
 FunCall    : IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExprNewFunName( $1 ), $3 ); }
-           | NamespaceID IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( $1, $2 ), $4 ); }
+           | NamespacePath IdentName '(' ArgList ')' { $$ = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( $1, $2 ), $4 ); }
            | MacroVar '(' ArgList ')'  { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | MacroExpr '(' ArgList ')' { $$ = hb_compExprNewFunCall( $1, $3 ); }
            | Get                       { $$ = $1; }
@@ -3152,7 +3166,7 @@ DoProc     : DO DoName
            | DO DoName WITH DoArgList
                { $$ = hb_compExprNewFunCall( $2, $4 ); }
            | WHILE WITH DoArgList
-               { hb_compAutoOpenAdd( hb_compExpr_IDs.WHILE_ ); $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compIdentifierNew( hb_compExpr_IDs.WHILE_, TRUE) ), $3 ); }
+               { hb_compAutoOpenAdd( hb_compExpr_IDs.WHILE_ ); $$ = hb_compExprNewFunCall( hb_compExprNewFunName( hb_compExpr_IDs.WHILE_ ), $3 ); }
            ;
 
 DoArgList  : ','                       { $$ = hb_compExprAddListExpr( hb_compExprNewArgList( hb_compExprNewNil() ), hb_compExprNewNil() ); }
@@ -3175,10 +3189,61 @@ DoArgument : IdentName                            {
                                                   }
            | '@' IdentName                        { $$ = hb_compExprNewVarRef( $2 ); }
            | '@' IdentName '(' DummyArgList ')' { $$ = hb_compExprNewFunRef( $2 ); }
-           | '@' NamespaceID IdentName '(' DummyArgList ')' { $$ = hb_compExprNewNamespaceFunRef( $2, $3 ); }
+           | '@' NamespacePath IdentName '(' DummyArgList ')' { $$ = hb_compExprNewNamespaceFunRef( $2, $3 ); }
            | SimpleExpression                     { $$ = $1; }
            | PareExpList                          { $$ = $1; }
            ;
+
+WithNamespace : WITH_NAMESPACE NamespaceName Crlf
+                                 {
+                                   PNAMESPACE pNamespace;
+
+                                   if( hb_comp_UsedNamespaces.pFirst )
+                                   {
+                                      pNamespace = hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, $2 );
+                                   }
+                                   else
+                                   {
+                                      if( $2[0] == '*' )
+                                      {
+                                         pNamespace = hb_compUsedNamespaceNew( "*", NSTYPE_SPACE );
+                                         hb_compUsedNamespaceEnd();
+                                      }
+                                      else
+                                      {
+                                         pNamespace = NULL;
+                                      }
+                                   }
+
+                                   if( pNamespace == NULL || ( ( pNamespace->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
+                                   {
+                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $2, NULL );
+                                   }
+                                   else
+                                   {
+                                      PNAMESPACE pClone;
+
+                                      pClone = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
+                                      memcpy( (void *) pClone, (void *) pNamespace, sizeof( _NAMESPACE ) );
+
+                                      pClone->extra.pOuter = hb_comp_UsedNamespaces.pCurrent;
+                                      hb_comp_UsedNamespaces.pCurrent = pClone;
+                                   }
+                                 }
+                Source
+                END Crlf
+                                 {
+                                   PNAMESPACE pClone;
+
+                                   pClone = hb_comp_UsedNamespaces.pCurrent;
+                                   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->extra.pOuter;
+                                   hb_xfree( pClone );
+                                 }
+              ;
+
+NamespaceName : IdentName { $$ = $1; }
+              | '*'       { $$ = "*"; }
+              ;
 
 Namespace  : NamespaceType IdentName Crlf
                                  {
@@ -3204,17 +3269,27 @@ Namespace  : NamespaceType IdentName Crlf
 
                                    hb_compNamespaceEnd();
                                  }
-           | EXTERNAL_NAMESPACE IdentName Crlf
+           ;
+
+
+
+ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                  {
                                    if( hb_comp_functions.pLast )
                                    {
                                        hb_comp_functions.pLast->bFlags |= FUN_SEALED;
                                    }
 
-                                   hb_compNamespaceNew( $2, NSTYPE_EXTERNAL );
-                                   hb_compNamespaceEnd();
+                                   if( hb_comp_Namespaces.pCurrent )
+                                   {
+                                      hb_compNamespaceNew( $2, NSTYPE_EXTERNAL );
+                                      hb_compNamespaceEnd();
+                                   }
+                                   else
+                                   {
+                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
+                                   }
                                  }
-           ;
 
 NamespaceType : NAMESPACE            { $$ = NSTYPE_SPACE; }
               | OPTIONAL_NAMESPACE   { $$ = NSTYPE_OPTIONAL; }
@@ -3262,16 +3337,17 @@ UsedPath : IdentName
                     {
                        if( hb_comp_UsedNamespaces.pFirst )
                        {
-                          $$ = (void *) hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pFirst, $1 );
+                          $$ = (void *) hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, $1 );
                        }
                        else
                        {
                           $$ = NULL;
                        }
 
-                       if( $$ == NULL )
+                       if( $$ == NULL || ( ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
                        {
-                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_MISSING_NAMESPACE, $1, NULL );
+                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $1, NULL );
+                          $$ = NULL;
                        }
                     }
          | UsedPath ',' IdentName
@@ -3285,7 +3361,7 @@ UsedPath : IdentName
 
                                         $$ = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) $1 )->pNext, $3 );
 
-                                        if( $$ == NULL || ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE )
+                                        if( $$ == NULL || ( ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
                                         {
                                            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $3, ( (PNAMESPACE) $1 )->szName );
                                         }

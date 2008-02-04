@@ -5,6 +5,16 @@ NAMESPACE MyNameSpace
      ? ProcName()
 
      // No qualifier needed for SAME level memebers.
+     ? Str(1)
+     // Explicit qualifier to the Global namespace
+     ? *.Str(1)
+     // Or for code section
+     WITH NAMESPACE *
+        ? Str(2)
+        ? Str(3)
+     END
+
+     // No qualifier needed for SAME level memebers.
      StaticProc()
      // Or explicit.
      MyNamespace.StaticProc() // Can only be called in same compilation unit!!!
@@ -22,6 +32,19 @@ NAMESPACE MyNameSpace
         MyNameSpace.SubExtern.SubSubExtern.SubExtStatic()
      #endif
 
+   RETURN
+
+   FUNCTION Str(x)
+      // Using *. to call the global Str() function.
+   RETURN "!" + AllTrim( *.Str(x) ) + "!"
+
+   PROCEDURE SomeProc()
+      ? ProcName()
+   RETURN
+
+   // STATIC members can not be called from OUTSIDE this compilation unit!
+   STATIC PROCEDURE StaticProc()
+      ? ProcName()
    RETURN
 
    NAMESPACE Sub
@@ -43,20 +66,22 @@ NAMESPACE MyNameSpace
    // WARNING: You MUST compile the extern module FIRST!!!
    EXTERNAL NAMESPACE SubExtern
 
-   PROCEDURE SomeProc()
-      ? ProcName()
-   RETURN
-
-   // STATIC members can not be called from OUTSIDE this compilation unit!
-   STATIC PROCEDURE StaticProc()
-      ? ProcName()
-   RETURN
 END
 
 NAMESPACE MyNameSpace2
-  PROCEDURE FunOf2()
-     ? ProcName()
-  RETURN
+
+   PROCEDURE ProcOf2()
+      ? ProcName()
+   RETURN
+
+   FUNCTION FunOf2()
+   RETURN ProcName()
+
+
+   FUNCTION Str(x)
+      // Using *. to call the global Str() function.
+   RETURN "**" + AllTrim( *.Str(x) ) + "**"
+
 END
 
 // Members of OPTIONAL NAMESPACE can be called WITH or withOUT the namespace qualifier!

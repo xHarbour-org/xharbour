@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.31 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.32 2008/02/02 16:09:30 ronpinkas Exp $
  */
 
 /*
@@ -407,8 +407,8 @@ HB_EXPR_PTR hb_compExprNewFunName( char * szName )
       if( pTmp )
       {
          pTmp[0] = '\0';
-         szNamespace = hb_compIdentifierNew( szName, TRUE );
 
+         szNamespace = hb_compIdentifierNew( szName, TRUE );
          szName = hb_compIdentifierNew( pTmp + 1, TRUE );
       }
       else
@@ -432,7 +432,6 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunRef(%s)", szFunName));
 
    pExpr = hb_compExprNew( HB_ET_FUNREF );
-
    pExpr->value.asSymbol.szName = szFunName;
    pExpr->value.asSymbol.szNamespace = szNamespace;
    pExpr->ValType = HB_EV_FUNREF;
@@ -455,11 +454,17 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
 
       szConcat = (char *) hb_xgrab( strlen( szNamespace ) + 1 + strlen( szNamespace2 ) + 1 );
       hb_xstrcpy( szConcat, szNamespace, ".", szNamespace2, NULL );
-      szNamespace = hb_compIdentifierNew( szConcat, TRUE );
+      szNamespace = hb_compIdentifierNew( szConcat, FALSE );
 
       // Must stay last!!!
       szName = hb_compIdentifierNew( pTmp + 1, TRUE );
    }
+
+   if( szNamespace[0] == '*' && szNamespace[1] != '\0' )
+   {
+       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, szNamespace + 2, "*" );
+       szNamespace = "*";
+    }
 
    pExpr = hb_compExprNew( HB_ET_FUNNAME );
    pExpr->value.asSymbol.szName = szName;

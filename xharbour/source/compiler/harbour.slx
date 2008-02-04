@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.90 2008/01/10 11:18:00 marchuet Exp $
+ * $Id: harbour.slx,v 1.91 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -118,6 +118,11 @@ ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 
 #define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
 
+#define USE_FIRST
+RETURN_DELIMITERS_IF_FIRST         {
+                                     LEX_DELIMITER( '.'  ) AS_TOKEN( '.' ),
+                                   };
+
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( ','  ) AS_TOKEN( ',' ),
                                      LEX_DELIMITER( '('  ) AS_TOKEN( '(' ),
@@ -203,7 +208,7 @@ SELF_CONTAINED_WORDS_ARE {
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
 #define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDSWITCH, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
-#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH */
+#define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH WITH_NAMESPACE */
 #define REJECT_OP        707
 
 //#define HB_TEXT          708
@@ -344,6 +349,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "UTILITY{WS}STATIC{WS}PROCEDURE"  ) AS_TOKEN( HB_UTIL_STATIC_PROC ),
                          LEX_WORD( "WHILE"                           ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
                          LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( WITHOBJ          ),
+                         LEX_WORD( "WITH{WS}PATH"                    ) AS_TOKEN( WITH_NAMESPACE   ),
                          LEX_WORD( "_HB_CLASS"                       ) AS_TOKEN( DECLARE_CLASS    ),
                          LEX_WORD( "_HB_MEMBER"                      ) AS_TOKEN( DECLARE_MEMBER   ),
                          LEX_WORD( "_PROCREQ_"                       ) AS_TOKEN( PROCREQ          )
@@ -553,7 +559,7 @@ LANGUAGE_RULES_ARE {
 
                     IF_SEQUENCE_IS( '&'         , '\''        , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
                     IF_SEQUENCE_IS( '&'         , '"'         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ),
-                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ) // MIGHT NEED COMMA !!!
+                    IF_SEQUENCE_IS( '&'         , '['         , 0      , 0          ) REDUCE_TO( HB_MACRO_ERR      , 0             ) // Might need a COMMA
 
                  /* IF_SEQUENCE_IS( HB_TEXT     , IDENTIFIER  , ','    , _ID_ON_HOLD) REDUCE_TO( HB_TEXT_BLOCK     , 0             ),
                     IF_SEQUENCE_IS( HB_TEXT     , 0           , 0      , 0          ) REDUCE_TO( HB_TEXT_ID        , 0             ) */
@@ -760,6 +766,9 @@ LANGUAGE_RULES_ARE {
                                    iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || \
                                    iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL /* || iLastToken == HB_TEXT */ )
 
+#undef IF_BELONG_RIGHT
+   #define IF_BELONG_RIGHT( chr, next ) if( isdigit( next[0] ) || ( next[0] == '.' && next[1] == '.' ) )
+
 /* Support Functions. */
 static int hb_comp_SLX_InterceptAction( int iRet )
 {
@@ -879,11 +888,6 @@ static int hb_comp_SLX_ElementToken( char* szToken, unsigned int iTokenLen )
       }
    }
    #endif
-
-   if( iTokenLen == 1 && szToken[0] == '.' )
-   {
-      return '.';
-   }
 
    yytext = szToken;
    yyleng = (int) iTokenLen;

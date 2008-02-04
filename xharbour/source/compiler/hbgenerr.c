@@ -1,5 +1,5 @@
 /*
- * $Id: hbgenerr.c,v 1.29 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: hbgenerr.c,v 1.30 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -105,7 +105,8 @@ const char * hb_comp_szErrors[] =
    "IMPLEMENTS NAMESPACE from within a NAMESPACE: %s",
    "NAMESPACE \'%s\' is empty",
    "Definitions not loaded for NAMESPACE: \'%s\'",
-   "NAMESPACE: \'%s\' is not a NAMESPACE of: \'%s\'"
+   "NAMESPACE: \'%s\' not found in: \'%s\'",
+   "EXTERNAL NAMESPACE [%s] with no NAMESPACE in sight."
 };
 
 /* Table with parse warnings */

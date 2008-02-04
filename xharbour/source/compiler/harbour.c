@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.178 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: harbour.c,v 1.179 2008/02/02 16:09:30 ronpinkas Exp $
  */
 
 /*
@@ -4218,7 +4218,9 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
 {
    char * szFunction;
 
-   if( ( szNamespace && szNamespace[0] == '*' ) || ( szNamespace == NULL && hb_comp_Namespaces.pCurrent == NULL ) )
+   if( ( szNamespace && szNamespace[0] == '*' ) || 
+       ( hb_comp_UsedNamespaces.pCurrent && hb_comp_UsedNamespaces.pCurrent->szName[0] == '*' ) ||
+       ( szNamespace == NULL && hb_comp_Namespaces.pCurrent == NULL && hb_comp_UsedNamespaces.pCurrent == NULL ) )
    {
       /* Abbreviated function might have been used - change it for whole name
        */
@@ -4240,13 +4242,43 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
    {
       if( ( szNamespace == NULL ) && hb_comp_UsedNamespaces.pFirst )
       {
-         szNamespace = hb_compFunctionResolveUsed( szFunName );
+         if( hb_comp_UsedNamespaces.pCurrent )
+         {
+            if( hb_comp_UsedNamespaces.pCurrent->szName[0] == '*' )
+            {
+                szNamespace = "*";
+            }
+            else
+            {
+               PNAMESPACE pResolved;
+
+               if( pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName ) )
+               {
+                  if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
+                  {
+                     szNamespace = hb_comp_UsedNamespaces.pCurrent->szFullPath;
+                  }
+               }
+            }
+         }
+         else
+         {
+            szNamespace = hb_compFunctionResolveUsed( szFunName );
+         }
       }
 
       if( szNamespace )
       {
-         hb_compFunCallAdd( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
-         hb_compGenPushSymbol( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+         if( szNamespace[0] == '*' )
+         {
+            hb_compFunCallAdd( szFunName, NULL, NSF_NONE );
+            hb_compGenPushSymbol( szFunName, NULL, SYMF_FUNCALL );
+         }
+         else
+         {
+            hb_compFunCallAdd( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+            hb_compGenPushSymbol( szFunName, (void *) szNamespace, NSF_EXPLICITPATH );
+         }
       }
       else
       {

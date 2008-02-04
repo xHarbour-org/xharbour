@@ -1,5 +1,5 @@
 /*
- * $Id: hberrors.h,v 1.28 2007/12/21 16:09:06 likewolf Exp $
+ * $Id: hberrors.h,v 1.29 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -131,8 +131,9 @@ HB_EXTERN_BEGIN
 #define HB_COMP_ERR_TOOMANY_ARGS                69
 #define HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE     70
 #define HB_COMP_ERR_EMPTY_NAMESPACE             71
-#define HB_COMP_ERR_MISSING_NAMESPACE           72
+#define HB_COMP_ERR_UNKNOWN_NAMESPACE           72
 #define HB_COMP_ERR_NONMEMBER_NAMESPACE         73
+#define HB_COMP_ERR_UNMATCHED_NAMESPACE         74
 
 #define HB_COMP_WARN_AMBIGUOUS_VAR              1
 #define HB_COMP_WARN_MEMVAR_ASSUMED             2

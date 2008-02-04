@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5901 2008/02/02 16:09:30 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5902 2008/02/03 23:01:22 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,43 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-04 12:33 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/simplex.c
+    + Added support for delimiters, when 1st character of a token.
+  * source/compiler/harbour.slx
+    + Added '.' as delimiter when appears as 1st character in a token.
+
+  * include/hberrors.h
+  * source/compiler/hbgenerr.c
+  * include/hbexpra.c
+  * source/compiler/expropta.c
+  * source/macro/macroa.c
+  * source/compiler/harbour.sly
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * include/std.ch
+    + Added support for:
+
+        *.<FunName>()
+
+      to force GLOBAL function call context.
+
+      /*
+         NOTE: Because * at begin of line is a COMMENT marker, you should use:
+
+            ( *.MyGlobalFunCall() ) // Note the use of PARENTHESIS
+       */
+
+    + Added support for:
+
+        WITH NAMESPACE <namespace> [. <subnamespace> ]
+           ...
+        END
+
+  * tests/tstnamespace.prg
+  * tests/namespace.prg
+    * Updated samples
 
 2008-02-04 06:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * include/hbdefs.h

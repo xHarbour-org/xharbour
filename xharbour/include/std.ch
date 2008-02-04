@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.25 2008/01/14 12:44:30 walito Exp $
+ * $Id: std.ch,v 1.26 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -709,11 +709,23 @@
 
    // Using xtranslate because we need EARLY expansion!
    #xtranslate __OPEN_XNS <NSX> => #include #<NSX>
+
+   #xcommand USING NAMESPACE <Path>                        => #xtranslate . \<Part> => , \<Part>;
+                                                              ; USING NAMESPACE <Path> EXPANDED
+
    #xcommand USING NAMESPACE <Name> [, <SubName>] EXPANDED => __OPEN_XNS <Name>\.xns;
                                                               ; USING NAMESPACE PATH <Name> [, <SubName> ];
                                                               ; #xuntranslate \. \<Part>
-   #xcommand USING NAMESPACE <Path> =>  #xtranslate . \<Part> => , \<Part>;
-                                       ; USING NAMESPACE <Path> EXPANDED
+
+
+   #xcommand WITH NAMESPACE <Path>                         => #xtranslate . \<Part> => , \<Part>;
+                                                              ; WITH NAMESPACE <Path> EXPANDED
+
+   #xcommand WITH NAMESPACE <Name> [, <SubName>] EXPANDED  => __OPEN_XNS <Name>\.xns;
+                                                              ; WITH PATH <Name> [, <SubName> ];
+                                                              ; #xuntranslate \. \<Part>
+
+   #xcommand WITH NAMESPACE *                              => WITH PATH *
 
 #endif
 
