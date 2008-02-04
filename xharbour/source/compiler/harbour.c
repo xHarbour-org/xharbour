@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.179 2008/02/02 16:09:30 ronpinkas Exp $
+ * $Id: harbour.c,v 1.180 2008/02/04 17:06:26 ronpinkas Exp $
  */
 
 /*
@@ -4218,7 +4218,7 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
 {
    char * szFunction;
 
-   if( ( szNamespace && szNamespace[0] == '*' ) || 
+   if( ( szNamespace && szNamespace[0] == '*' ) ||
        ( hb_comp_UsedNamespaces.pCurrent && hb_comp_UsedNamespaces.pCurrent->szName[0] == '*' ) ||
        ( szNamespace == NULL && hb_comp_Namespaces.pCurrent == NULL && hb_comp_UsedNamespaces.pCurrent == NULL ) )
    {
@@ -4250,14 +4250,11 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
             }
             else
             {
-               PNAMESPACE pResolved;
+               PNAMESPACE pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName );
 
-               if( pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName ) )
+               if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
                {
-                  if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
-                  {
-                     szNamespace = hb_comp_UsedNamespaces.pCurrent->szFullPath;
-                  }
+                  szNamespace = hb_comp_UsedNamespaces.pCurrent->szFullPath;
                }
             }
          }
