@@ -1,10 +1,10 @@
 // Sends a query to Google and displays the Links from the response HTML page
 
 PROCEDURE Main
-   LOCAL oHttp, cHtml, hQuery, aLink, oNode
+   LOCAL oHttp, cHtml, hQuery, aLink, oNode, oDoc
 
    oHttp:= TIpClientHttp():new( "http://www.google.de/search" )
-
+   
    // build the Google query
    hQUery := Hash()
    hSetCaseMatch( hQuery, .F. )
@@ -22,7 +22,7 @@ PROCEDURE Main
       QUIT
    ENDIF
 
-   // downlowad the Google response
+   // download the Google response
    cHtml   := oHttp:readAll()
    oHttp:close()
    ? Len(cHtml), "bytes received "

@@ -1,12 +1,22 @@
 /*
- * $Id: ChangeLog,v 1.5905 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5906 2008/02/06 01:16:43 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
-   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
+   YYYY-MM-DD HH:M   * UTC[-|+]hhm   * Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-06 14:26 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/genc.c
+    * Missing fclose() 
+  * source/compiler/harbour.sly
+    + Added #ifdef FORCE_MEM_STD to allow usage of malloc/realloc/free 
+  * source/vm/hvm.c
+    * Minor optimization
+  * tests/tiptest/loadhtml.prg
+    * Typos  
 
 2008-02-05 20:37 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c
@@ -23,7 +33,7 @@
   * include/hbexpra.c
   * include/std.ch
   * source/compiler/harbour.sly
-    * Changed the Explicit Global Namespace' symbolic name, from * to Global (.NET convention)
+    * Changed the Explicit Global Namespace' symbolic name, fro   * * to Global (.NET convention)
       as suggested by Phile & Patrick
 
   * source/compiler/hbslex.c
@@ -231,7 +241,7 @@
 2008-01-23 08:38 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/lang/msgltwin.c
     ! Updated date format in Lithuanian locale.
-    (borrowed from Harbour, by Mindaugas Kavaliauskas)
+    (borrowed fro   * Harbour, by Mindaugas Kavaliauskas)
 
 2008-01-22 09:30 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
   * ./makefile.pc
@@ -259,7 +269,7 @@
   + source/codepage/cpes850.c
   - source/codepage/cpesdos.c
     Renamed according to actual language and codepage codes.
-  (by Viktor Szakats, borrowed from Harbour).
+  (by Viktor Szakats, borrowed fro   * Harbour).
 
 2008-01-21 00:16 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   + source/codepage/cpde850.c
@@ -284,12 +294,12 @@
   * source/codepage/cphuwin.c
   * source/codepage/cphuwins.c
     ! Fixed sloppy wording in comment. (Thanks Chen)
-  (by Viktor Szakats, borrowed from Harbour).
+  (by Viktor Szakats, borrowed fro   * Harbour).
   * source/lang/msgltwin.c
   * source/codepage/cpltwin.c
     * changed language ID to: LTWIN
     * month name typo
-  (by Mindaugas Kavaliauskas, borrowed from Harbour).
+  (by Mindaugas Kavaliauskas, borrowed fro   * Harbour).
   * include/hbapicdp.h
   + source/codepage/cpruiso.c
   + source/codepage/cpdewin.c
@@ -311,7 +321,7 @@
 
 2008-01-17 21:45 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg
-    * refixed to process pending keys from udf.
+    * refixed to process pending keys fro   * udf.
 
 2008-01-16 23:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
    * source/rtl/gtwin/gtwin.c
@@ -400,7 +410,7 @@
   * source/rdd/hbsix/sxtable.c
     + added new SX_SETPASS() implementation which supports
       some undocumented SIX3 actions
-    ! fixed problem with setting password for currently open table
+    ! fixed proble   * with setting password for currently open table
       with SX_SETPASS( <cPass> )
   synced with harbour as possible.
 
@@ -413,7 +423,7 @@
 
 2008-01-15 07:30 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/achoice.prg
-    * fix to avoid pending keys only from udf.
+    * fix to avoid pending keys only fro   * udf.
 
 2008-01-15 04:00 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/thread.c
@@ -442,7 +452,7 @@
 2008-01-14 21:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rdd/wacore.c
     ! Fixed non-initialized mutex in MT mode under HB_OS_UNIX (a bug dating
-      from 2004).
+      fro   * 2004).
 
 2008-01-14 11:00 UTC-0200 Walter Negro <anegro/at/overnet.com.ar >
   * include/hbapi.h
@@ -492,8 +502,8 @@
 
 2008-01-10 22:03 UTC-4:40 Marcelo Anelli C. <marceloanelli@users.sourceforge.net>
   * contrib\mysql\mysqlrdd.prg
-    ! fixed Rreturn FAILURE to Return 0, to avoid confusion from return succes-
-      fully from 1st connection
+    ! fixed Rreturn FAILURE to Return 0, to avoid confusion fro   * return succes-
+      fully fro   * 1st connection
     + added entry to bind to UR_RECNO, in this specific case == UR_RECID
 
 2008-01-10 13:25 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
@@ -548,7 +558,7 @@
     ! fixed TRACE in hb_vmPushMacroBlock( BYTE * pCode )
     ! fixed TRACE in hb_xvmLocalSetInt( int iLocal, int iVal )
     ! fixed TRACE in hb_xvmLocalSetStr( int iLocal, const char * pVal, ULONG ulLen )
-    * hb_vmPushSymbol( PHB_SYMB pSym ), hb_vmPushLocalByRef( SHORT iLocal ) to use new hb_stackAllocItem()
+    * hb_vmPushSymbol( PHB_SYMB pSy   * ), hb_vmPushLocalByRef( SHORT iLocal ) to use new hb_stackAllocItem()
     * hb_vmPopLocal( SHORT iLocal )
 
   * include\hbstack.h
@@ -563,7 +573,7 @@
       HB_IT_EXTREF, HB_IT_MEMVAR, HB_IT_BYREF or HB_IT_NULL conbined with other types.
     * Introduced pEnd for more quick stack control.
     + added  hb_stackItemBasePtr().
-    * Removed some random GPF's when conbined types was used.
+    * Removed some rando   * GPF's when conbined types was used.
 
   * source\rdd\usrrdd\rdds\vfpcdx.prg
     ! some minor sintax fixes
@@ -575,17 +585,17 @@
 2008-01-07 12.00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/hbdefs.h
     - HARBOUR_START_PROCEDURE "MAIN" no longer required by:
-      * OpenWatcom 1.2 (and above)
+      * OpenWatco   * 1.2 (and above)
       * MinGW 3.4.5 (did not test it with lower version)
       NOTE: Tested _ONLY_ with versions as mentioned above; this resolves
-            previously non-running xbscript.exe under OpenWatcom and MinGW
+            previously non-running xbscript.exe under OpenWatco   * and MinGW
             due to non-existence of "MAIN" in program.
 
 2008-01-07 10:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/win32prn.prg
     * added ability to set text alignment via following
     *    VAR SetTextHori    INIT TA_LEFT    // Default horizontal alignment SetTextAlign() (TEXTOUT)
-    *    VAR SetTextVert    INIT TA_BOTTOM  // Default vertical alignment for SetTextAlign() (TEXTOUT)
+    *    VAR SetTextVert    INIT TA_BOTTO   *  // Default vertical alignment for SetTextAlign() (TEXTOUT)
     *
     * altered METHOD's TEXTOUT(), TEXTOUTAT() and TEXTATFONT() to accept additional parameter "nAlignVert"
 
@@ -594,7 +604,7 @@
     ! fix my last 2 entries, 2007 -> 2008
 
   * source/compiler/harbour.c
-    ! fix compilation for OpenWatcom 1.3
+    ! fix compilation for OpenWatco   * 1.3
 
   * include/hbvm.h
     ! function prototype to be the same as function body:
@@ -603,7 +613,7 @@
 
   * include/hbapiitm.h
     ! function prototype to be the same as function body:
-      hb_itemPutNL( PHB_ITEM pItem, LONG lNumber ) -> hb_itemPutNL( PHB_ITEM pItem, const LONG lNumber );
+      hb_itemPutNL( PHB_ITE   * pItem, LONG lNumber ) -> hb_itemPutNL( PHB_ITE   * pItem, const LONG lNumber );
 
 2008-01-06 13:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * makefile.dc
@@ -611,7 +621,7 @@
 
 2008-01-03 18.20 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/genc.c
-    + /vd now produces *.ext file for ease inclusion in main program when
+    + /vd now produces *.ext file for ease inclusion in main progra   * when
       using pCode.DLL (just in case). It is the least list of EXTERNAL
       functions required by PRG being compiled and must exist in main thread;
       but this may not be a complete list because it is impossible to list all
@@ -624,7 +634,7 @@
   * source/compiler/genc.c
   * source/compiler/hbusage.c
     + add compiler switch /vd (assume EXTERNALs=DYNAMICs) to free programmers
-      from declaring DYNAMIC FUNCTIONs manually.
+      fro   * declaring DYNAMIC FUNCTIONs manually.
       NOTE/TIPS:
       1) using /vd, now pCode programming is a lot easier. Programmers no
          longer required to declare DYNAMIC FUNCTIONS since /vd automatically
@@ -646,7 +656,7 @@
 
 2008-01-01 14:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! fixed bug about down/up/pgdn/pgup/top/bottom movements when datasource
+    ! fixed bug about down/up/pgdn/pgup/top/botto   * movements when datasource
       is an array.
 
   * makefile.pc
@@ -694,13 +704,13 @@
     ! add efforts to find function address in 3 ways:
       1. conventional         eg. "_hb_parc"
       2. ms flavor            eg. "hb_parc"
-      3. Watcom register call eg. "hb_parc_"
+      3. Watco   * register call eg. "hb_parc_"
       This will enable pCode.DLL to call function in cross-compiled module as
       long as it was compiled using cdecl calling convention (xHarbour default)
       NOTE:
-      OpenWatcom has 2 types of cdecl, ie. stack call and register call.
+      OpenWatco   * has 2 types of cdecl, ie. stack call and register call.
       Stack call prepend "_" before function name, ie "_hb_retni" while register
-      call append "_" thereafter ie "hb_retni_". (Am not aware of others)
+      call append "_" thereafter ie "hb_retni_". (A   * not aware of others)
 
 
 2007-12-30 22:51 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
@@ -712,7 +722,7 @@
       (but not supporting overloading!)
     * most extended codeblock support code in PP synced with Harbour
     % some little optimizations
-    (Mostly borrowed from Harbour, by Przemyslaw Czerpak)
+    (Mostly borrowed fro   * Harbour, by Przemyslaw Czerpak)
 
 2007-12-30 20:47 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/w32/msvc.cf
@@ -752,7 +762,7 @@
   * source/pp/ppcore.c
     ! added protection against automatic word concatenation in some cases
     ! line numbering fixes
-   (Borrowed from Harbour, by Przemyslaw Czerpak)
+   (Borrowed fro   * Harbour, by Przemyslaw Czerpak)
 
 2007-12-29 15:48 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapifs.h
@@ -795,7 +805,7 @@
     * eliminated unnecessary errno access
     * redirect error messages when error trap is not defined into
       user dispout function
-    (Borrowed from Harbour, by Przemyslaw Czerpak)
+    (Borrowed fro   * Harbour, by Przemyslaw Czerpak)
 
 2007-12-29 04:27 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.c
@@ -807,7 +817,7 @@
     % added some speed optimizations - it's not done in the way I want to
       have in the final version but with some very small modifications it
       should make people using a lot of #[x]translate (Enrico ;-)) happy.
-    (Borrowed from Harbour, by Przemyslaw Czerpak)
+    (Borrowed fro   * Harbour, by Przemyslaw Czerpak)
 
 2007-12-28 16:10 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/common/hbver.c
@@ -822,16 +832,16 @@
 
 2007-12-28 05:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/common/hbver.c
-    ! Fixed memory corruption from my previous commit.
+    ! Fixed memory corruption fro   * my previous commit.
 
 2007-12-27 22:20 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * include\hbcomp.h
-    - removed LANG_JAVA from LANGUAGES.
+    - removed LANG_JAVA fro   * LANGUAGES.
 
   * contrib\pgsql
     + added make_pc.bat (to build libhbpg.lib)
     + added makefile.pc (idem)
-    + added pocc.mak (to build libpq from Postgresql sources under Pelles C).
+    + added pocc.mak (to build libpq fro   * Postgresql sources under Pelles C).
     + added readmepc.txt (explain how to build libpq under Pelles C).
     + created pgrdd subfolder
     ! moved pgrdd.prg and tstpgrdd.prg to pgrdd subfolder.
@@ -847,7 +857,7 @@
 
 2007-12-27 18.35 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/hbapi.h
-    ! minor fix on declaration of hb_xautorelease( void * pMem )
+    ! minor fix on declaration of hb_xautorelease( void * pMe   * )
 
 2007-12-27 05.30 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/compiler/harbour.c
@@ -904,7 +914,7 @@
     * Commented out unused variable ulRet in function hb_fsFSize()
 
   * source/ct/envparam.c
-    * Removed unuseful * operator in the expression *sCurEnv++ in function HB_FUNC( ENVPARAM )
+    * Removed unuseful * operator in the expression *sCurEnv++ in function HB_FUNC( ENVPARA   * )
 
 2007-12-23 21:33 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * makefile.vc
@@ -924,9 +934,9 @@
                           USHORT uiRight, void * pScrBuff )
    * include/hbapiitm.h
       + function prototype:
-        PHB_ITEM HB_EXPORT hb_itemPutDTsec( PHB_ITEM pItem, double dDateTime )
-        PHB_ITEM HB_EXPORT hb_itemPutDate( PHB_ITEM pItem, LONG lDate )
-        PHB_ITEM HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
+        PHB_ITE   * HB_EXPORT hb_itemPutDTsec( PHB_ITE   * pItem, double dDateTime )
+        PHB_ITE   * HB_EXPORT hb_itemPutDate( PHB_ITE   * pItem, LONG lDate )
+        PHB_ITE   * HB_EXPORT hb_itemDoCRef( char * szFunc, ULONG ulRefMask, ULONG ulPCount, ... )
 
    * include/hbapi.h
       + function prototype:
@@ -936,7 +946,7 @@
       ! add extern "C" attributes to:
         HB_EXPORT BSTR hb_oleAnsiToSysString( LPSTR cString )
         HB_EXPORT LPWSTR hb_oleAnsiToWide( LPSTR cString )
-        HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITEM pItem )
+        HB_EXPORT void hb_oleItemToVariant( VARIANT *pVariant, PHB_ITE   * pIte   * )
         HB_EXPORT LPSTR hb_oleWideToAnsi( BSTR wString )
 
    * include/hbapirdd.h
@@ -978,7 +988,7 @@
     ! fixed final string size calculation in extended strings
     + added hb_strlow
     ! Extended strings in all contexts can include NULs.
-    (Mostly borrowed from Harbour. I had to do Simplex integration myself,
+    (Mostly borrowed fro   * Harbour. I had to do Simplex integration myself,
     I hope I did not miss anything.)
 
 2007-12-22 09:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -1001,11 +1011,11 @@
    - source/compiler/genobj32.c
      ! remove unfunctional features as previously described as /go /gw and /gj
        NOTE:
-       AFAIK /gw and /gj has never been functional. As to /go, I'm not
+       AFAIK /gw and /gj has never been functional. As to /go, I'   * not
        certainly sure if there are users using it but as I review makefiles,
        it seems that /go has never been implemented. Should there be users
        using it, now obj creation can only be done in "surface", meaning that
-       CC is now can only be invoked directly from command line, not from
+       CC is now can only be invoked directly fro   * command line, not from
        within harbour.exe
 
 2007-12-21 21:43 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
@@ -1023,8 +1033,8 @@
       cannot be used also between different platforms. If someone needs
       such synchronization then he should build Harbour on all platforms
       with HB_USE_BSDLOCKS_OFF and HB_USE_SHARELOCKS with valid multi
-      platform lock offset
-      (Borrowed from Harbour, by Przemyslaw Czerpak)
+      platfor   * lock offset
+      (Borrowed fro   * Harbour, by Przemyslaw Czerpak)
 
 2007-12-21 20:12 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/rtl/console.c
@@ -1045,7 +1055,7 @@
   * utils/hbpp/hbpp.c
   * utils/hbpp/hbppcore.c
   * utils/hbpp/hbppdef.h
-    * char * -> const char * changes, borrowed from Harbour.
+    * char * -> const char * changes, borrowed fro   * Harbour.
 
 2007-12-21 18:21 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * make_xmingw.sh
@@ -1075,7 +1085,7 @@
 2007-12-21 13:42 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapifs.h
   * source/common/hbfsapi.c
-    ! Some compiler/PP memory leaks fixed (borrowed from Harbour).
+    ! Some compiler/PP memory leaks fixed (borrowed fro   * Harbour).
 
 2007-12-19 11:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   ! source/rtl/filesys.c
@@ -1129,9 +1139,9 @@
 
 2007-12-14 23:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
-    ! fixed bug reported by Pavel Tsarenko from comp.lang.xharbour news:
-      ( Small Tbrowse incompatibility ). After dbgobottom and forcestable
-      the tbrowse is going to phantom record under custom skipblock.
+    ! fixed bug reported by Pavel Tsarenko fro   * comp.lang.xharbour news:
+      ( Small Tbrowse incompatibility ). After dbgobotto   * and forcestable
+      the tbrowse is going to phanto   * record under custo   * skipblock.
 
 2007-12-12 21:22 UTC+0800 Pritpal Bedi <pritpal@vouchcac.com>
   * contrib/rdd_ads/adsmgmnt.c
@@ -1143,7 +1153,7 @@
 
 2007-12-08 02:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source\vm\arrays.c
-    * Correct minor bug in hb_arrayFromParams() when called from function with no stack frame.
+    * Correct minor bug in hb_arrayFromParams() when called fro   * function with no stack frame.
 
   * source\compiler\harbour.slx
   * source\compiler\harbour.sly
@@ -1156,7 +1166,7 @@
 
 2007-11-08 11:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   ! source/rtl/idle.c
-    ! fixed problem that make 100% usage on linux on newer kernels
+    ! fixed proble   * that make 100% usage on linux on newer kernels
 
 2007-12-07 22:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   + tests/tstdivert.prg
@@ -1201,7 +1211,7 @@ Description:
 
 The DIVERT statement is an alternative to normal Function/Method call
 when all parameters of the current function/procedure/method are to be
-passed to the called function/procedure/method. It differs from normal
+passed to the called function/procedure/method. It differs fro   * normal
 calls in that the callee literally borrowes the current execution
 context, as if it was called directly by the caller of the current
 Function/Method.
@@ -1232,7 +1242,7 @@ observations:
    - Since Formal Parameters and Locals are implemented as positional
      place holders in the respective Stack Space, all actions on the
      callees Formal Parameters and/or Locals will use the respective
-     storage position of the caller's Formal Param and/or Local, based
+     storage position of the caller's Formal Para   * and/or Local, based
      on the relative position of the callee's Formal Parameter and/or
      Local declaration, regardles of its name. For example let's assume
      that caller is declared as:
@@ -1264,7 +1274,7 @@ observations:
      its DIVERT caller if/when activated as a DIVERT call.
 
    - DIVERT calls default to using exisiting Self object if called
-     from a Method. In order to DIVERT into a Function from a Method
+     fro   * a Method. In order to DIVERT into a Function fro   * a Method
      it is needed to explictly specifiy NIL using the OF clause,
      as follows:
 
@@ -1305,7 +1315,7 @@ Arguments:
 
       DIVERT_RESUME
 
-         Indicates that the program should resume at next line
+         Indicates that the progra   * should resume at next line
          when the DIVERT worker terminates. This option is thus
          similiar to normal Function Call, in that the execution
          will continue at the next line once the callee terminates.
@@ -1367,7 +1377,7 @@ Arguments:
   * make_gnu.sh
   * make_xmingw.sh
     ! Fixed architecture detection under new MSYS. Improved syntax
-      message. (Borrowed from Harbour)
+      message. (Borrowed fro   * Harbour)
   * source/debug/dbgbrwsr.prg
   * source/debug/dbghelp.prg
   * source/debug/dbgtarr.prg
@@ -1399,7 +1409,7 @@ Arguments:
   * source/rtl/tbrowse.prg
     ! fixed bug reported by xHB bug reporter at number 20071128-001.
     ( RefreshallForceStable change the current record ). Moved ::nLastRow
-    var from InitCache() and fixed ::nLastRow from dbSkip() method.
+    var fro   * InitCache() and fixed ::nLastRow fro   * dbSkip() method.
     Cleaned refreshall() method.
 
 2007-12-02 19:09 UTC-0600 Vicente Guerra <vicente@guerra.com.mx>
@@ -1440,7 +1450,7 @@ Arguments:
 
 2007-11-29 18.15 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * include/clipdefs.h
-    ! BCC and OpenWatcom also do not want WORD/WORDP/PWORD redefined here.
+    ! BCC and OpenWatco   * also do not want WORD/WORDP/PWORD redefined here.
 
   * include/hbvmpub.h
     ! define NDEBUG if not yet defined
@@ -1585,7 +1595,7 @@ Arguments:
     ! fix compilation for OpenWatcom
 
   * source/rtl/win32ole.prg
-    ! fix compilation for OpenWatcom (but still not working)
+    ! fix compilation for OpenWatco   * (but still not working)
 
   * contrib/gtwvw/gtwvw.c
     ! MSVC6/DMC does not have Get/SetWindowLongPtr, use Get/SetWindowLong
@@ -1596,7 +1606,7 @@ Arguments:
 
 2007-11-26 20:00 UTC+0200 Pavel Tsarenko <tpe2/at/mail.ru>
   * source/rtl/copyfile.c
-    * save file date, time, and attribute for win32 platform in the
+    * save file date, time, and attribute for win32 platfor   * in the
     __CopyFile() function
   * source/ct/files.c
     * handling first parameter in FileAttr()
@@ -1607,7 +1617,7 @@ Arguments:
     + Reintroduced WM_TIMER callback.
     * Introduced hack to support code being executed in WM_TIMER callback.
       Someone please port Harbour's hb_vmRequestReenter()* protocol in xHarbour
-      as Przem has strongly pointed out this anomaly.
+      as Prze   * has strongly pointed out this anomaly.
     + Added another callback WVT_KEY which is triggered when some key is placed in input queue.
   * source/rtl/gtwvt/gtwvt.c
     + Added PHB_DYNS  pSymWVT_KEY member to GLOBAL_DATA structure.
@@ -1660,7 +1670,7 @@ Arguments:
 
   * source/rtl/gtapi.c
     ! Fixed multiple GPF traps.
-      /* I'm not using this code, I believe that it should be carefuly reviewed by someone using it. */
+      /* I'   * not using this code, I believe that it should be carefuly reviewed by someone using it. */
 
 2007-11-20 17:48 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source\rdd\bmdbfcdx\bmdbfcdx1.c
@@ -1672,7 +1682,7 @@ Arguments:
   * source\rdd\dbf1.c
     ! fixed flags on clipper DBF that don't support it. By the moment are only supported at VFP DBF.
   * source\rtl\hbhex2n.c
-    ! fixed HEXTONUM when string of len 0 arrive. (Fixed by Juan Galvez)
+    ! fixed HEXTONU   * when string of len 0 arrive. (Fixed by Juan Galvez)
 
 2007-11-14 16:00 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
   ! source/rtl/listbox.prg
@@ -1692,7 +1702,7 @@ Arguments:
     ! use '.' as multibyte character marker only if it exists in UPPER and
       LOWER letter sets - our CP code cannot properly decode letter sets
       when this condition is not true - it should be fixed (TOFIX)
-    Fixes by Przemyslaw Czerpak, borrowed from Harbour.
+    Fixes by Przemyslaw Czerpak, borrowed fro   * Harbour.
 
 
 2007-11-14 00:30 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
@@ -1750,14 +1760,14 @@ Arguments:
       Therefore, we ignore the return value in Win9x, and assume user clicks OK.
       IOW, DocumentProperties is not cancelable in Win9X.
 
-    % Added support for Custom Forms (by Peter Rees)
-      Changed use of ::FormType - if set to a string instead of a form number
-      it will set the form of that name. It's not supported on Win9X
+    % Added support for Custo   * Forms (by Peter Rees)
+      Changed use of ::FormType - if set to a string instead of a for   * number
+      it will set the for   * of that name. It's not supported on Win9X
 
       e.g. oPrinter:Formtype:= "Custom"
 
-      Added ::PaperLength & ::PaperWidth to allow setting of custom paper
-      sizes without having to predefine the custom form. Both ::PaperLength &
+      Added ::PaperLength & ::PaperWidth to allow setting of custo   * paper
+      sizes without having to predefine the custo   * form. Both ::PaperLength &
       ::PaperWidth must be set i.e. neither can be 0
 
 2007-11-10 08:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
@@ -1873,13 +1883,13 @@ Arguments:
       hb_Translate() working at the same time.)
       IMO, we'd need to introduce a separate "collation"
       string in each cp file to detach index ordering
-      from upper/lowercase and codepage translation without
+      fro   * upper/lowercase and codepage translation without
       any hacks, since as this example shows these two
       are not always in sync. (or, as an alternative we might
       want to make codepage translation more sophisticated,
       like converting first to unicode and convert back to
-      the other codepage from unicode, but that leads a bit
-      further.). (If I'm missing something, pls don't hesitate
+      the other codepage fro   * unicode, but that leads a bit
+      further.). (If I'   * missing something, pls don't hesitate
       to clarify)
     + Added SixDriver compatible HU ISO/WIN codepage files
       for the reasons described above.
@@ -1903,13 +1913,13 @@ Arguments:
   + source/codepage/cpskkam.c
   + source/codepage/cpskwin.c
   + source/codepage/cpsl437.c
-    + Added new codepages from Harbour.
+    + Added new codepages fro   * Harbour.
 
 2007-11-07 23:18 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/vm/dbgentry.c
-    * changed the name of global static variable from 'info' to
+    * changed the name of global static variable fro   * 'info' to
       's_pInfo' to avoid possible typos - fix by Przemyslaw Czerpak,
-      borrowed from Harbour.
+      borrowed fro   * Harbour.
 
 2007-11-05 06:25 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * contrib/rdd_ads/ads1.c
@@ -1976,9 +1986,9 @@ Arguments:
   * source/vm/itemapi.c
   * source/vm/fastitem.c
   * source/vm/garbage.c
-    + added extended item references - it's universal reference which
-      can be used by HVM for many different things without introducing
-      new item types
+    + added extended ite   * references - it's universal reference which
+      can be used by HV   * for many different things without introducing
+      new ite   * types
 
   * source/rdd/dbf1.c
     + Initialized counter value on ZAP for auto incremental fields.
@@ -2008,7 +2018,7 @@ Arguments:
 
   * source/rdd/wacore.c
   * source/rdd/dbcmd.c
-    ! fixed registering workareas with numbers from 65280 to 65534
+    ! fixed registering workareas with numbers fro   * 65280 to 65534
 
   * include/dbinfo.ch
   * contrib/rdd_ads/ads1.c
@@ -2017,12 +2027,12 @@ Arguments:
   * source/rdd/dbf1.c
   * source/rdd/sdf1.c
     + added support for DBI_POSITIONED flag. Because some RDDs may not
-      support phantom record then checking for EOF() does not have to
+      support phanto   * record then checking for EOF() does not have to
       be enough to detect that the cursor is positioned to phantom
       record. Checking for RecNo() == LastRec() + 1 does not have to
       work either because some RDD may use not use continuous record
       numbers f.e. ADT. So in code like BROWSE() if you want to be sure
-      that current record is phantom one then (!dbInfo(DBI_POSITIONED))
+      that current record is phanto   * one then (!dbInfo(DBI_POSITIONED))
       should be used.
 
   * harbour/source/vm/hvm.c
@@ -2163,7 +2173,7 @@ Arguments:
          DELETE TAG ALL [OF <(bag)>]
          CLEAR SCOPE
          SET SCOPETOP TO [<value>]
-         SET SCOPEBOTTOM TO [<value>]
+         SET SCOPEBOTTO   * TO [<value>]
          SET SCOPE TO [<value>]
          SET TURBOREAD ON|OFF
          MEMOPACK [BLOCK <size>] [OPTION <opt> [STEP <step>]]
@@ -2243,14 +2253,14 @@ Arguments:
   * source/ct/diskutil.prg
     ! added a workaround on DiskFree(), DiskTotal() and DiskUsed() functions
       to save/restore the current full path before/after calls them.
-      Note: As these functions calls hb_diskspace() from source\rtl\disksphb.c
+      Note: As these functions calls hb_diskspace() fro   * source\rtl\disksphb.c
       source, maybe someone could take a look on it.
-      Bug reported from comp.lang.xharbour news.
+      Bug reported fro   * comp.lang.xharbour news.
 
 2007-10-23 20:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     ! changed IsBottom() function as suggested by Ken Wantz to fix a bad
-      behaviour of databases under custom indexes.
+      behaviour of databases under custo   * indexes.
     ! fixed IsDb() function to scan max workareas to 65534, because 65535 is
       reserved.
 
@@ -2287,8 +2297,8 @@ Arguments:
   * contrib/wvtgui/wvtutil.c
     ! Bug fix in Wvt_SaveFileName() and Wvt_OpenFileName()
   * source/rtl/gtwvt/gtwvt.c
-    * Released time-slice after 100 iterations. Adopted from GTWIN.
-    * Functionality to open window shifted from hb_wvt_gtCreateWindow() to hb_gtInit().
+    * Released time-slice after 100 iterations. Adopted fro   * GTWIN.
+    * Functionality to open window shifted fro   * hb_wvt_gtCreateWindow() to hb_gtInit().
 
 2007-10-19 11:10 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    * source\tip\sendmail.prg
@@ -2296,7 +2306,7 @@ Arguments:
 
 2007-10-19 10:40 UTC-0300 Luiz Rafael Culik Guimaraes <luiz at xharbour.com.br>
    !source/lang/msgnl.c
-     ! Fixed problem on lang registration(was missing on source)
+     ! Fixed proble   * on lang registration(was missing on source)
 
 2007-10-18 11:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
@@ -2334,7 +2344,7 @@ Arguments:
     ! fixed run-time error at line 571 as reported in xharbour dev-list.
       Added "if oGet:ExitState != NIL ...".
 
-2007-09-28 15:37 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2007-09-28 15:37 UTC-0800 Luis Krause Mantilla <lkrause   * /*at*/ shaw /*dot*/ ca>
   * hrbdll.bc
     + added sxfunc.prg
 
@@ -2369,7 +2379,7 @@ Arguments:
   * utils/hbmake/hbmake.prg
     * hbmake version 1.20
     + created get for user lib path for libs that are on other place than xharbour/lib folder.
-      it's need inform full path.
+      it's need infor   * full path.
     + created listbox for user errorlog editor (edit or notepad) for Windows OS. The default is edit.
     * reorganized the say/gets for best view.
     * changed BuildLangArray() function to reorganize the s_aLangMessages array for
@@ -2408,8 +2418,8 @@ Arguments:
             when WA does not have open indexes
             SIx3 executes EVENT_UPDATE only when at least one index is
             open without checking if it's updated or not
-         4) EVENT_POSTUSE is executed from OPEN() method in "DBF" RDD not
-            from index RDDs so before the indexes are open
+         4) EVENT_POSTUSE is executed fro   * OPEN() method in "DBF" RDD not
+            fro   * index RDDs so before the indexes are open
             SIx3 executes EVENT_POSTUSE after opening indexes
             It's possible that I'll change this condition in the future
     synced with harbour
@@ -2460,9 +2470,9 @@ Arguments:
   * makefile.gc
   * makefile.dc
     + Added some SIx functions to hbsix.lib aported by Prezemek.
-      Sx_MakeSem( xSem )
-      Sx_KillSem( xSem )
-      Sx_IsSem( xSem )
+      Sx_MakeSem( xSe   * )
+      Sx_KillSem( xSe   * )
+      Sx_IsSem( xSe   * )
       Sx_Freeze( xTag, nBag )
       Sx_Warm( xTag, nBag )
       Sx_Chill( xTag, nBag )
@@ -2495,20 +2505,20 @@ Arguments:
 2007-09-23 11.55 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/cdpapi.c
   * include/hbapicdp.h
-    + hb_cdppage() to access hb_cdp_page from outside (DLL)
+    + hb_cdppage() to access hb_cdp_page fro   * outside (DLL)
 
 2007-09-23 05:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/regex.c
   * source/pcre/pcreposix.c
     ! temporary solution to force link pcrepos.lib
 
-2007-09-22 09:36 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2007-09-22 09:36 UTC-0800 Luis Krause Mantilla <lkrause   * /*at*/ shaw /*dot*/ ca>
   * include/hbextern.ch
     ! Added RecurseDirectory so it works with xbscript.exe
 
 2007-09-22 18:00 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/common/hbtrace.c
-    ! variables to conform with declarations
+    ! variables to confor   * with declarations
 
 2007-09-22 17:55 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/set.c
@@ -2673,7 +2683,7 @@ Arguments:
 2007-09-21 23:30 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/gtwvw.c
     ! WM_HSCROLL and WM_VSCROLL should be controlled by bTopMost || s_bAllowNonTop,
-      not by hb_wvw_gtAcceptingInput(). This may cause problem if WVW_SETFOCUS interferes.
+      not by hb_wvw_gtAcceptingInput(). This may cause proble   * if WVW_SETFOCUS interferes.
       Fixed.
     ! wvw_ebcreate() :: do NOT use ES_OEMCONVERT by default
 
@@ -2694,7 +2704,7 @@ Arguments:
        Where:
        cServer    -> Required. IP or domain name of the mail server
         nPort      -> Optional. Port used my email server
-        cFrom      -> Required. Email address of the sender
+        cFro   *      -> Required. Email address of the sender
         aTo        -> Required. Character string or array of email addresses to send the email to
         aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
         aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
@@ -2713,8 +2723,8 @@ Arguments:
 
 2007-09-17 13:30 UTC+0100 Jose F. Gimenez <jfgimenez/at/wanadoo.es>
    * include/hbapi.h
-     % Increased HB_MAX_MACRO_ARGS, HB_MAX_WITH_OBJECTS and HB_MAX_ENUMERATIONS from 16 to 64
-       NOTE: This is a temporary solution, since Miguel Angel is working on make them unlimited
+     % Increased HB_MAX_MACRO_ARGS, HB_MAX_WITH_OBJECTS and HB_MAX_ENUMERATIONS fro   * 16 to 64
+       NOTE: This is a temporary solution, since Miguel Angel is working on make the   * unlimited
 
 2007-09-17 07:08 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.slx
@@ -2739,7 +2749,7 @@ Arguments:
        Where:
        cServer    -> Required. IP or domain name of the mail server
         nPort      -> Optional. Port used my email server
-        cFrom      -> Required. Email address of the sender
+        cFro   *      -> Required. Email address of the sender
         aTo        -> Required. Character string or array of email addresses to send the email to
         aCC        -> Optional. Character string or array of email adresses for CC (Carbon Copy)
         aBCC       -> Optional. Character string or array of email adresses for BCC (Blind Carbon Copy)
@@ -2771,7 +2781,7 @@ Arguments:
 2007-09-15 09:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg
     * changed ::aSetStyle data to ::aStyle. This is initialized with
-      TBR_CUSTOM value length of 6 and filled with .f. values.
+      TBR_CUSTO   * value length of 6 and filled with .f. values.
     ! fixed SetStyle( nStyle, lSetting ) method to allow add user styles.
       if <nStyle> is greater than Len( ::aStyle ) then it's will add elements
       automatically.
@@ -2781,13 +2791,13 @@ Arguments:
     ! fixed to don't display get value at right area of an object, when the
       get is an object f.e. a listbox.
     ! fixed to display get caption only when the get is not an object.
-      Error reported from comp.lang.xharbour news.
+      Error reported fro   * comp.lang.xharbour news.
 
   * source/rtl/listbox.prg
     ! fixed SetCaption(xData) method to display caption at CapCol and CapRow
       coordinates properly.
     * restored original style character "" for Windows platform.
-      Error reported from comp.lang.xharbour news.
+      Error reported fro   * comp.lang.xharbour news.
 
   * utils/hbmake/hbmake.prg
     * reactivated mouse to allow access listboxes and checkboxes by click.
@@ -2798,7 +2808,7 @@ Arguments:
 
 2007-09-15 02:40 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * source/rtl/hbtoken.c
-    * Added in functionality from old teditorl.c
+    * Added in functionality fro   * old teditorl.c
 
 2007-09-15 02:14 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * source/rtl/hbtoken.c
@@ -2816,7 +2826,7 @@ Arguments:
 
 2007-09-12 09:10 UTC-0300 Luiz Rafael Culik Guimaraes
   * include/std.ch
-    ! Added missing extended clause to save to/ restore from command
+    ! Added missing extended clause to save to/ restore fro   * command
 
 2007-09-11 15:09 UTC-0300 Walter Negro <anegro/AT/overnet/com/ar>
   * include/hbclass.ch
@@ -2830,9 +2840,9 @@ Arguments:
 
 2007-09-11 05:05 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
   * source/rtl/pcre/pcre_globals.c
-    * work-around for OpenWatcom 1.7
+    * work-around for OpenWatco   * 1.7
   * source/rtl/console.c
-    * _fileno -> fileno, for OpenWatcom 1.7
+    * _fileno -> fileno, for OpenWatco   * 1.7
 
 2007-09-10 08:05 UTC-0500 Paul Tucker <ptucker sympatico.ca>
    * source/rtl/set.c
@@ -2861,8 +2871,8 @@ Arguments:
 2007-09-07 21:04 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    * source/compiler/harbour.sly
      ! Fixed Using EXIT inside SWITCH/CASE.../END statement leaves dummy value on HVM
-       stack. Repeated in a loop allocates whole system memory for growing up
-       HVM stack.
+       stack. Repeated in a loop allocates whole syste   * memory for growing up
+       HV   * stack.
 
 2007-09-07 01:40 UTC-0500 Paul Tucker <ptucker sympatico.ca>
   * source/rtl/set.c
@@ -3011,7 +3021,7 @@ Arguments:
 
 2007-08-27 03:10 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/pp/ppcore.c
-    * Workaround for spacing problem in revertion of [...] into literal string after tokenization as array index
+    * Workaround for spacing proble   * in revertion of [...] into literal string after tokenization as array index
 
 2007-08-26 15:52 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
    * include\hbexpra.c
@@ -3057,11 +3067,11 @@ Arguments:
 2007-08-23 13:10 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
    * source/compiler/harbour.sly
      ! Fixed Using LOOP inside SWITCH/CASE.../END statement leaves dummy value on HVM
-       stack. Repeated in a loop allocates whole system memory for growing up
-       HVM stack.
+       stack. Repeated in a loop allocates whole syste   * memory for growing up
+       HV   * stack.
      ! fixed SWITCH/CASE.../END statement don't allows to use EXIT inside WHILE.
-       Repeated in a loop allocates whole system memory
-       for growing up HVM stack and exceptions list.
+       Repeated in a loop allocates whole syste   * memory
+       for growing up HV   * stack and exceptions list.
 
 2007-08-23 05:20 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
    * source\rtl\cstruct.prg
@@ -3139,11 +3149,11 @@ Arguments:
 
 2007-08-17 09:30 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * contrib/rdd_ads/ace.h
-    ! updated to version 8.1 from the Advantage SDK package.
+    ! updated to version 8.1 fro   * the Advantage SDK package.
 
 2007-08-14 16:58 UTC+0100 Patrick Mast <patrick/dot/mast/at/xharbour.com>
   * source\tip\ftpcln.prg
-    ! Fixed return values from -1 to .F. in method UploadFile() when it was failing.
+    ! Fixed return values fro   * -1 to .F. in method UploadFile() when it was failing.
 
 2007-08-13 06:40 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/common/hbtrace.c
@@ -3196,7 +3206,7 @@ Arguments:
       Czerpak, mostly synced with Harbour).
   * source/vm/debug.c
   * source/vm/hvm.c
-    % Simplified HVM <-> debugger interface (by Przemyslaw Czerpak, synced
+    % Simplified HV   * <-> debugger interface (by Przemyslaw Czerpak, synced
       with Harbour where possible).
   * source/pp/Makefile
     ! Fix building ppgen under some odd/old GNU make versions, especially in
@@ -3208,7 +3218,7 @@ Arguments:
     Bug and fix provided by Budyanto Dj.
 
   * source\rtl\transfrm.c
-    ! fix to transform int64 numbers. Bug and fix provided by Marcelo Lombardo.
+    ! fix to transfor   * int64 numbers. Bug and fix provided by Marcelo Lombardo.
 
 2007-07-31 12:32 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * source/rdd/dbf1.c
@@ -3276,7 +3286,7 @@ Arguments:
   * source/rtl/tbcolumn.prg
     * fixed ::aSetStyle array size as declared in tbrowse.ch.
       Bug reported by Ed Horbino.
-    + added AddStyle() method to allow add more custom styles defined by user.
+    + added AddStyle() method to allow add more custo   * styles defined by user.
 
   * source/rtl/tgetlist.prg
     * disabled oGet:DelEnd() at line 518 of GetApplyKey() method to don't
@@ -3319,7 +3329,7 @@ Arguments:
 2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/bmdbfcdx/bmdbfcdx1.c
     ! fixed casting
-    % do not copy date value to separate memory buffer but decode dates directly from record buffer
+    % do not copy date value to separate memory buffer but decode dates directly fro   * record buffer
     * cleaned few warnings
 
 2007-07-05 12:56 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
@@ -3328,7 +3338,7 @@ Arguments:
   * source/rdd/sdf1.c
   * source/rdd/dbfcdx/dbfcdx1.c
     ! fixed casting
-    % do not copy date value to separate memory buffer but decode dates directly from record buffer
+    % do not copy date value to separate memory buffer but decode dates directly fro   * record buffer
     * cleaned few warnings
     ; synced with harbour
 
@@ -3395,7 +3405,7 @@ Arguments:
     * restore Clipper compatibility, stop RTL error if <acItems>
       is =NIL, ={} or not array type. Just return 0
 
-2007-06-18 10:20 UTC-0800 Luis Krause Mantilla <lkrausem /*at*/ shaw /*dot*/ ca>
+2007-06-18 10:20 UTC-0800 Luis Krause Mantilla <lkrause   * /*at*/ shaw /*dot*/ ca>
   * source/vm/maindllp.c
     * fixed error (Undefined symbol 'pModuleSymbols') and
       warning (Parameter 'pGlobals' is never used)
@@ -3428,7 +3438,7 @@ Arguments:
     ! Raise error on attempt to assign cyclic reference to local or static var
 
     /*
-       I'm not sure if there maybe a valid reason for such assignment,
+       I'   * not sure if there maybe a valid reason for such assignment,
        Clipper appears to ignore this error:
 
        LOCAL SomeLocal
@@ -3485,7 +3495,7 @@ Arguments:
   * make_xmingw.sh
   * source/pp/Makefile
     * Cosmetic changes by Przemyslaw Czerpak to the cross-compiling system
-      (borrowed from Harbour).
+      (borrowed fro   * Harbour).
 
 2007-06-03 16:58 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * source/compiler/harbour.c
@@ -3502,7 +3512,7 @@ Arguments:
   * source/tip/client.prg
     + Added data ::nWrite to work like ::nRead for upload stream
   * source/tip/ftpcln.prg
-    + Added method ::UserCommand() that permit users sent custom commands
+    + Added method ::UserCommand() that permit users sent custo   * commands
 
 2007-05-31 16:22 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/rdd/wafunc.c
@@ -3544,7 +3554,7 @@ Arguments:
   * include/hbapi.h
   * source/vm/fm.c
     + Add funcion hb_xautorelease( void *) to set a memory block to auto release
-      at the end of program and avoid memory leak report.
+      at the end of progra   * and avoid memory leak report.
 
 2007-05-30 16:01 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
   * source/tip/client.prg
@@ -3641,7 +3651,7 @@ inkey(0)
   * include/hbrddntx.h
   * source/rdd/dbfntx/dbfntx1.c
     * moved static variables holding RDDI_* settings to RDDNODE data so
-      they can be set separately for each RDD which inherits from DBFNTX
+      they can be set separately for each RDD which inherits fro   * DBFNTX
     synced with harbour
 
 2007-05-27 18:18 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
@@ -3652,8 +3662,8 @@ inkey(0)
   * bin\bld.bat
    * commented out line that removed any default libcmt.lib references from
    * included libs for msvc non-mt builds.
-   * Suddenly, this is now a problem as MS Windows update is deleting
-   * libc.lib from VC 8 builds!
+   * Suddenly, this is now a proble   * as MS Windows update is deleting
+   * libc.lib fro   * VC 8 builds!
    * We are now forced to use libcmt even though we may not be doing an MT
    * build.  (Which I suppose we should consider making the default...)
 
@@ -3677,7 +3687,7 @@ inkey(0)
 
 2007-05-26 01:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples/ebget.ch
-    * missed from prev commit.
+    * missed fro   * prev commit.
 
 2007-05-25 18:35 UTC+0200 Enrico Maria Giordano <e.m.giordano@emagsoftware.it>
   * source/rtl/dllcall.c
@@ -3686,7 +3696,7 @@ inkey(0)
 2007-05-25 23:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   + contrib/gtwvw/samples/ebtest7.prg
     * sample on how to organize editboxes in commands similar to @..GET
-      This sample uses some code from Minigui for masking input in editbox.
+      This sample uses some code fro   * Minigui for masking input in editbox.
   * contrib/gtwvw/doc/whatsnew.txt
     * note this change
 
@@ -3783,7 +3793,7 @@ inkey(0)
 2007-05-24 10:00 UTC+0700 Budyanto Dj. <budyanto@centrin.net.id>
   * contrib/gtwvw/hbgtwvw.h
   * contrib/gtwvw/gtwvw.c
-    ! Fix wrong handling of HB_ITEM causing memory leak, for the following functions:
+    ! Fix wrong handling of HB_ITE   * causing memory leak, for the following functions:
       HB_FUNC( WVW_CLIENTTOSCREEN )
       HB_FUNC( WVW_GETXYFROMROWCOL )
       HB_FUNC( WVW_GETROWCOLFROMXY )
@@ -3929,19 +3939,19 @@ inkey(0)
     * Renamed PCRE source [?]
 
   + source/rtl/pcre/pcre_chartables.c.dist
-    + This is the Native file from PCRE distribution
+    + This is the Native file fro   * PCRE distribution
       it is now #included as-is by a simple wrapper pcre_chartables.c
   + source/rtl/pcre/pcre_chartables.c
     * New simple wrapper to just #include pcre_chartables.c.generic
 
   + source/rtl/pcre/config.h.generic
-    + This is the Native file from PCRE distribution
+    + This is the Native file fro   * PCRE distribution
       it is now #included as-is by a simple wrapper config.h
   * source/rtl/pcre/config.h
     * Now a simple wrapper to just #include config.h.generic
 
   + source/rtl/pcre/pcre.h.generic
-    + This is the Native file from PCRE distribution
+    + This is the Native file fro   * PCRE distribution
       it is now #included as-is by a simple wrapper pcre.h
   * source/rtl/pcre/pcre.h
     * Now a simple wrapper to just #include pcre.h.generic
@@ -4023,7 +4033,7 @@ inkey(0)
   * source/rdd/usrrdd/rdds/makefile
   * makefile.bc
   * makefile.pc
-    + RDD that inhiretes from BMDBFCDX manage OEM data at DBF field and
+    + RDD that inhiretes fro   * BMDBFCDX manage OE   * data at DBF field and
       automatically convert to ANSI
 
 2007-05-18 11:32 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
@@ -4055,7 +4065,7 @@ inkey(0)
      + Re-added hb_objGetClass() for Harbour compatability
   * source/vm/classes.c
     * Trace info for debug of class dictionary guarded by #if 0
-      /* Walter this is what I used to trace the Message not found TClipGet:VarGet problem */
+      /* Walter this is what I used to trace the Message not found TClipGet:VarGet proble   * */
 
 2007-05-17 00:41 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.c
@@ -4173,7 +4183,7 @@ inkey(0)
 2007-05-11 10:00 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/vm/eval.c
     * Minor optimizations
-    * Fix my mistake at line 187, uiParam count LEN to 0 (Thanks Toninho!)
+    * Fix my mistake at line 187, uiPara   * count LEN to 0 (Thanks Toninho!)
 
 2007-05-11 13:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * include/adordd.ch
@@ -4236,11 +4246,11 @@ inkey(0)
      + Added function HB_AdoRddGetRecordSet( [<nWorkArea>] ) --> oAdoRecordset
      + New functions HB_AdoRddGetConnection( [<nWorkArea>] ) --> oAdoConnection
        and HB_AdoRddGetCatalog( [<nWorkArea>] ) --> oAdoCatalog
-     Borrowed from harbour
+     Borrowed fro   * harbour
 
 2007-05-09 11:00 UTC+0100 Miguel Angel Marchuet (miguelangel/at/marchuet.net)
   * source/rdd/userrdd/rdds/adordd.prg
-    + added support to all dbf fieldtypes supported in dbf format from xharbour.
+    + added support to all dbf fieldtypes supported in dbf format fro   * xharbour.
       and added support to autoconection for create files .xls and .db
 
         CASE aStruct[ n ][ DBS_TYPE ] == "V"
@@ -4334,7 +4344,7 @@ inkey(0)
   + source\rdd\usrrdd\rdds\adordd\make_b32.bat
   + source\rdd\usrrdd\rdds\adordd\makefile.bc
   + source\rdd\usrrdd\rdds\adordd\mysql1.prg
-     +added user rdd ADORDD borrowed from harbour with few changes.
+     +added user rdd ADORDD borrowed fro   * harbour with few changes.
       will be changed in next releases SET FILTER TO to be compatible
       with other workareas which can be using another formats.
 
@@ -4418,9 +4428,9 @@ inkey(0)
 
 2007-05-04 06:40 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * source/cgi/tcgi.prg
-    * Changue __CLS_PARAM TO  {}
+    * Changue __CLS_PARA   * TO  {}
   * source/rtl/ttable.prg
-    * Changue __CLS_PARAM TO  {}
+    * Changue __CLS_PARA   * TO  {}
   * hrbdll.vc
     + Add classesc
 
@@ -4441,11 +4451,11 @@ inkey(0)
   + source/rdd/wafunc.c
   * source/rdd/workarea.c
     * cleaned RDD code:
-      * the default work area implementation from which each RDD inherits
+      * the default work area implementation fro   * which each RDD inherits
         and RDD management is now in workarea.c file - this part will be
         common for all threads in future MT version
       * the code to mange workareas and aliases moved to wacore.c - this
-        code uses some static variables which will be moved to HVM stack
+        code uses some static variables which will be moved to HV   * stack
         in MT version
       * helper RDD functions thread independent moved to wafunc.c
     Synched with Harbour.
@@ -4508,7 +4518,7 @@ inkey(0)
 2007-05-02 20:51 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbclass.ch
     ! Fixed "Super" translate
-    * CLASS <classname> FROM <FromFunc>( <FromClass> )
+    * CLASS <classname> FRO   * <FromFunc>( <FromClass> )
       /*
          If you declare a class with the clause FUNCTION,
 
@@ -4517,10 +4527,10 @@ inkey(0)
              CLASS MyClass FUNCTION MyNewClass
                 ...
 
-         if this must be inherit from other class you need to do
+         if this must be inherit fro   * other class you need to do
 
-             CLASS MyClass2 FROM MyNewClass( MyClass )
-                   ^ClassName    ^Function   ^From ClassName
+             CLASS MyClass2 FRO   * MyNewClass( MyClass )
+                   ^ClassName    ^Function   ^Fro   * ClassName
 
     **Only in these cases**
       */
@@ -4538,7 +4548,7 @@ inkey(0)
 
 2007-05-02 09:07 UTC-0700 Andres Reyes <andresreyes_mzt/at/yahoo.com.mx>
   * include/hbclass.ch
-    ! Fixed Broken INHERIT FROM Scalar Classes
+    ! Fixed Broken INHERIT FRO   * Scalar Classes
 
 2007-05-02 10:35 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
   * source/makefile.vc
@@ -4580,7 +4590,7 @@ inkey(0)
     * replaced @..SAY to DispOut() functions to speed up browse initialization.
     ! fixed to add picture "@Sn" if char field width is larger than column.
     ! fixed browse performance under index operation.
-    ! fixed memo edit window minimum coordinates.
+    ! fixed memo edit window minimu   * coordinates.
     ! fixed to call rlock()/dbUnlock() if database is in shared mode.
 
 2007-05-01 11:17 UTC-0300 Ranier Vilela <ranier/at/cultura.com.br>
@@ -4620,7 +4630,7 @@ inkey(0)
 2007-04-30 12:15 UTC+0200 Alex Strickland <sscc/at/mweb.co.za>
   * source/rtl/dllcall.c
   *  Add CALLDLL()
-  *   Call a DLL function from (x)Harbour, the first parameter is a pointer returned from
+  *   Call a DLL function fro   * (x)Harbour, the first parameter is a pointer returned from
   *   GetProcAddress above. Note that it is hardcoded to use PASCAL calling convention.
 
 2007-04-29 21:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
@@ -4686,7 +4696,7 @@ inkey(0)
     * Now Resolved with preprocesor
 
   * utils/xbscript/xbs_harb.ch
-    * change FROM CHARACTER to FROM _CHARACTER
+    * change FRO   * CHARACTER to FRO   * _CHARACTER
 
   /* Please make a clean copy */
 
@@ -4715,7 +4725,7 @@ inkey(0)
   * include/classes.h
     * Modified pDestructor member of CLASS to PMETHOD
   * source/vm/classes.c
-    * Resolved thread safety problem of ->pDestructor using a static symbol
+    * Resolved thread safety proble   * of ->pDestructor using a static symbol
 
   * include/hbinit.h
   * include/hbvmpub.h
@@ -4756,7 +4766,7 @@ inkey(0)
 2007-04-24 20:10 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
     * minor position adjust after press K_UP, K_PGUP or K_CTRL_PGUP to go
-      back from new row to last row.
+      back fro   * new row to last row.
 
 2007-04-24 08:55 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
@@ -4770,7 +4780,7 @@ inkey(0)
 
   * source/rtl/tbrowse.prg
     ! fixed IsDb() static function to syncronize row position when tbrowse is
-      initialized over a database in bottom record.
+      initialized over a database in botto   * record.
 
 2007-04-22 18:45 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbclass.ch
@@ -4948,7 +4958,7 @@ inkey(0)
 
 2007-04-16 12:25 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/browse.prg
-    ! fixed to go bottom record as reported in comp.lang.xharbour news.
+    ! fixed to go botto   * record as reported in comp.lang.xharbour news.
 
   * hrbdll.bc
     + added tscalar.prg
@@ -5018,7 +5028,7 @@ inkey(0)
   * source/vm/classes.c
     /*
       I reduced the size of the final object, when this it is inherited
-      At VM level OOPS Engine only use the first element of the object to
+      At V   * level OOPS Engine only use the first element of the object to
       store a reference to real self, Really we only need to have free the
       first element of Object.
     */
@@ -5029,7 +5039,7 @@ inkey(0)
   * include/cstruct.ch
     + Added CTYPE_VOID
   * include/hbdll.ch
-    + Added support for new native syntax, which allow quick Cut & Paste from C headers.
+    + Added support for new native syntax, which allow quick Cut & Paste fro   * C headers.
     + Added #include "cstruct.ch" and "wintypes.ch"
   * include/hbvmpub.h
   * source/compiler/harbour.c
@@ -5038,7 +5048,7 @@ inkey(0)
     + Added support for new UTILITY [STATIC] FUNCTION|PROCEDURE syntax.
       /* The UTILITY attribute indicates that such Func/Proc should NOT be used as STARTUP code even if
         it is the FIRST procedure in source. This means Utility Functions such as auto generated DLL wrappers
-        no longer have to be placed at BOTTOM of source, which is counter intuitive. */
+        no longer have to be placed at BOTTO   * of source, which is counter intuitive. */
   * source/rtl/dllcall.c
     * Fixed silly typo (&& HB_IT_BYREF)
     * Fixed pushing pArg to not dereference (Paul is this correct?)
@@ -5085,7 +5095,7 @@ inkey(0)
   * source/vm/hvm.c
     * Reverted silly factorization of HB_QSELF()
   * source/rtl/win32ole.prg
-    * Do NOT inherit from HB_Object() to avoid OLE namespace pollution
+    * Do NOT inherit fro   * HB_Object() to avoid OLE namespace pollution
 
 2007-04-13 11:38 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbpp.h
@@ -5159,12 +5169,12 @@ inkey(0)
 
 2007-04-11 02:15 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * include/hbstack.h
-    * Removed redundant member lBaseItem from HB _STACK_STATE
+    * Removed redundant member lBaseIte   * fro   * HB _STACK_STATE
     + Added hb_stackgetBase()
   * include/hbvmpub.h
     + Added member paramsoffset to hb_struSymbol
   * source/vm/arrays.c
-    * Use ->item.asSymbol.paramsoffset when building param arrays
+    * Use ->item.asSymbol.paramsoffset when building para   * arrays
   * source/vm/arrayshb.c
     * Sumplified HB_APARAMS to use new hb_stackGetBase()
   * source/vm/estack.c
@@ -5226,11 +5236,11 @@ inkey(0)
 
 2007-04-09 14:48 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/tbrowse.prg
-    Adjust behavior of ::lHitBottom & ::lHitTop, based on Eduardo Fernandes observations.
+    Adjust behavior of ::lHitBotto   * & ::lHitTop, based on Eduardo Fernandes observations.
 
 2007-04-09 17:05 UTC-0500 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/ppcomp.c
-    ! Fixed loading of system defines to precede processing of user defined rules
+    ! Fixed loading of syste   * defines to precede processing of user defined rules
     * Readded support of hb_pp_STD_CH_ADDITIVE
   * source/pp/ppcore.c
     * Synched with some Harbour modifications
@@ -5250,7 +5260,7 @@ inkey(0)
     * Minor typo
 
   * include/hbpp.h
-    * Removed HB_PP_TOKEN_SEND from HB_PP_TOKEN_NEEDLEFT() to allow unconditional support for send as starting exp
+    * Removed HB_PP_TOKEN_SEND fro   * HB_PP_TOKEN_NEEDLEFT() to allow unconditional support for send as starting exp
 
   * include/hbapi.h
     + Added #define HB_VAR_PARAM_FLAG 255
@@ -5292,7 +5302,7 @@ inkey(0)
 
 2007-04-06 19:15 UTC-0800 Tony Bretado <tony@bretado.com>
   * source/rtl/gtapi.c
-    + New function hb_gtSaveAll(). Needed to Save WHOLE Screen from inside a CT Window.
+    + New function hb_gtSaveAll(). Needed to Save WHOLE Screen fro   * inside a CT Window.
     ! Fix hb_ctShadow(). In order to draw shadow attribute CA-Tools compatible.
       Now it calls hb_gt_SetAttributeCT() defined in gtwvt.c
          /* Please check other gt libraries! */
@@ -5348,7 +5358,7 @@ inkey(0)
 
 2007-03-31 13:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
-    ! fixed "@B" picture behaviour as reported from xharbour-dev's list.
+    ! fixed "@B" picture behaviour as reported fro   * xharbour-dev's list.
 
 2007-03-30 14:10 UTC+0100 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
   * include/hbpp.h
@@ -5393,7 +5403,7 @@ inkey(0)
 
   * source/compiler/harbour.slx
   * source/macro/macro.slx
-    * Simplified processing of new AM and PM tokens.
+    * Simplified processing of new A   * and P   * tokens.
 
   * tests/dates5.prg
     * Minor formating
@@ -5402,7 +5412,7 @@ inkey(0)
    * source/common/hbdate.c
     ! Correct some Warnings
   * source/compiler/harbour.slx
-     ! Correct compilation of AM and PM as Identifier
+     ! Correct compilation of A   * and P   * as Identifier
 
 2007-03-26 18:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/ct/ctnet.c
@@ -5494,4 +5504,4 @@ inkey(0)
   * source/vm/classes.c
     * Minor cleanup
   * source/vm/cmdarg.c
-    * Corrected possible GPF trap f.e. when VM is loaded as a stand alone DLL
+    * Corrected possible GPF trap f.e. when V   * is loaded as a stand alone DLL

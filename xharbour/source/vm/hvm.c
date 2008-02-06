@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.651 2008/01/20 23:21:36 likewolf Exp $
+ * $Id: hvm.c,v 1.652 2008/02/02 07:33:30 ronpinkas Exp $
  */
 
 /*
@@ -9923,19 +9923,25 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 #ifdef BROKEN_MODULE_SPACE_LOGIC
          if( ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
          {
+            //TraceLog( NULL, "Local Function: '%s' of Module: '%s'\n", pSymbol->szName, szModuleName );
+            
             if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
             {
-               //hSymScope            &= ~HB_FS_LOCAL; // It might be used later
+               hSymScope            &= ~HB_FS_LOCAL;
                pSymbol->scope.value &= ~HB_FS_LOCAL;
 
                TraceLog( NULL, "Local Function: '%s' of Module: '%s' is not linked in.\n", pSymbol->szName, szModuleName );
             }
+            //else
+            //{
+            //   TraceLog( NULL, "LINKED Local Function: '%s' of Module: '%s' %p > %p < %p\n", pSymbol->szName, szModuleName, pModuleFirstFunction, pSymbol->value.pFunPtr, pModuleLastFunction );            
+            //}
          }
 #endif
 
          if( fDynLib )
          {
-            if( pSymbol->value.pFunPtr || ( pSymbol->scope.value & HB_FS_DEFERRED ) )
+            if( pSymbol->value.pFunPtr || ( hSymScope & HB_FS_DEFERRED ) )
             {
                 #ifdef DEBUG_SYMBOLS
                    TraceLog( NULL, "Symbol: %s has pointer OR is DEFERRED.\n", pSymbol->szName );
@@ -9950,7 +9956,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                    {
                       if( ( pSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pSymbol->value.pFunPtr == NULL */ )
                       {
-                         pSymbol->scope.value = ( pSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                         pSymbol->scope.value = (  hSymScope & ~HB_FS_PCODEFUNC ) | ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
                          pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
                       }
                    }
@@ -9978,7 +9984,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
                                if( pModuleSymbol->pDynSym == pDynSym && ( ( pModuleSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) /* && pModuleSymbol->value.pFunPtr == NULL */ )
                                {
-                                  pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( pSymbol->scope.value & HB_FS_PCODEFUNC );
+                                  pModuleSymbol->scope.value = ( pModuleSymbol->scope.value & ~HB_FS_PCODEFUNC ) | ( hSymScope & HB_FS_PCODEFUNC );
                                   pModuleSymbol->value.pFunPtr = pSymbol->value.pFunPtr;
 
                                   #ifdef DEBUG_SYMBOLS

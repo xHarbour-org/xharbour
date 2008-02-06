@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.142 2008/02/04 17:06:28 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.143 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /*
@@ -44,20 +44,32 @@
 #endif
 
 #undef alloca
-#define alloca  hb_xgrab
-#undef malloc
-#define malloc  hb_xgrab
-#undef realloc
-#define realloc hb_xrealloc
-#undef free
-#define free    hb_xfree
+#define alloca  malloc
+
+#ifdef FORCE_MEM_STD
+   #undef  hb_xgrab 
+   #define hb_xgrab malloc
+   
+   #undef  hb_xrealloc
+   #define hb_xrealloc realloc
+   
+   #undef  hb_xfree 
+   #define hb_xfree free
+#else   
+   #undef malloc
+   #define malloc  hb_xgrab
+   #undef realloc
+   #define realloc hb_xrealloc
+   #undef free
+   #define free    hb_xfree
+#endif
 
 /* NOTE: these symbols are used internally in bison.simple
  */
 #undef YYFREE
-#define YYFREE hb_xfree
+#define YYFREE free
 #undef YYMALLOC
-#define YYMALLOC hb_xgrab
+#define YYMALLOC malloc
 
 extern FILE *yyin;      /* currently yacc parsed file */
 extern char *yytext;

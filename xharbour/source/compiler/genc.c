@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.149 2008/02/02 16:09:30 ronpinkas Exp $
+ * $Id: genc.c,v 1.150 2008/02/04 17:06:25 ronpinkas Exp $
  */
 
 /*
@@ -297,6 +297,8 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
     {
        fprintf( yyc, "   },\n" );
        fprintf( yyc, "#endif\n" );
+       
+       fclose( yyc );
     }
     else
     {
