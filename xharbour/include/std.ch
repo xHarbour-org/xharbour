@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.26 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: std.ch,v 1.27 2008/02/04 17:06:25 ronpinkas Exp $
  */
 
 /*
@@ -722,10 +722,10 @@
                                                               ; WITH NAMESPACE <Path> EXPANDED
 
    #xcommand WITH NAMESPACE <Name> [, <SubName>] EXPANDED  => __OPEN_XNS <Name>\.xns;
-                                                              ; WITH PATH <Name> [, <SubName> ];
+                                                              ; WITH NAMESPACE PATH <Name> [, <SubName> ];
                                                               ; #xuntranslate \. \<Part>
 
-   #xcommand WITH NAMESPACE *                              => WITH PATH *
+   #xcommand WITH NAMESPACE Global                         => WITH NAMESPACE PATH Global
 
 #endif
 

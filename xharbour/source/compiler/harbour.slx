@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.91 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.92 2008/02/04 17:06:28 ronpinkas Exp $
  */
 
 /*
@@ -118,8 +118,8 @@ ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 
 #define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
 
-#define USE_FIRST
-RETURN_DELIMITERS_IF_FIRST         {
+#define USE_CONDITIONAL_DELIMITERS
+CONDITIONAL_DELIMITERS_ARE         {
                                      LEX_DELIMITER( '.'  ) AS_TOKEN( '.' ),
                                    };
 
@@ -348,8 +348,8 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "UTILITY{WS}STATIC{WS}FUNCTION"   ) AS_TOKEN( HB_UTIL_STATIC_FUNC ),
                          LEX_WORD( "UTILITY{WS}STATIC{WS}PROCEDURE"  ) AS_TOKEN( HB_UTIL_STATIC_PROC ),
                          LEX_WORD( "WHILE"                           ) AS_TOKEN( HB_WANTS_EXP - WHILE            ),
+                         LEX_WORD( "WITH{WS}NAMESPACE{WS}PATH"       ) AS_TOKEN( WITH_NAMESPACE   ),
                          LEX_WORD( "WITH{WS}OBJECT"                  ) AS_TOKEN( WITHOBJ          ),
-                         LEX_WORD( "WITH{WS}PATH"                    ) AS_TOKEN( WITH_NAMESPACE   ),
                          LEX_WORD( "_HB_CLASS"                       ) AS_TOKEN( DECLARE_CLASS    ),
                          LEX_WORD( "_HB_MEMBER"                      ) AS_TOKEN( DECLARE_MEMBER   ),
                          LEX_WORD( "_PROCREQ_"                       ) AS_TOKEN( PROCREQ          )
@@ -766,8 +766,33 @@ LANGUAGE_RULES_ARE {
                                    iLastToken == WANTS_VAR || iLastToken == DECLARE || iLastToken == FIELD || /*iLastToken == SELF ||*/ iLastToken == QSELF || \
                                    iLastToken == IIF || iLastToken == PROCREQ || iLastToken == OPTIONAL /* || iLastToken == HB_TEXT */ )
 
-#undef IF_BELONG_RIGHT
-   #define IF_BELONG_RIGHT( chr, next ) if( isdigit( next[0] ) || ( next[0] == '.' && next[1] == '.' ) )
+#undef IF_ACCEPT_AS_DELIMITER
+#undef IF_ACCEPT_AS_DELIMITER
+   /* We know chr to only be '.', so ignoring chr! */
+   #define IF_ACCEPT_AS_DELIMITER( chr ) BOOL bAccept = TRUE; \
+                                         \
+                                         if( iLen == 0 ) \
+                                         { \
+                                            bAccept = ! ( isdigit( szBuffer[0] ) || ( szBuffer[0] == '.' && szBuffer[1] == '.' ) ); \
+                                         } \
+                                         else \
+                                         { \
+                                            if( isdigit( sToken[0] ) ) \
+                                            { \
+                                              bAccept = FALSE; \
+                                            } \
+                                            else if( sToken[0] == '.' ) \
+                                            { \
+                                              bAccept = FALSE; \
+                                            } \
+                                            else \
+                                            { \
+                                              sToken[iLen] = '\0'; \
+                                              bAccept = strchr( sToken, '&' ) == NULL; \
+                                            } \
+                                         } \
+                                         \
+                                         if( bAccept )
 
 /* Support Functions. */
 static int hb_comp_SLX_InterceptAction( int iRet )
@@ -1724,14 +1749,13 @@ char * hb_comp_SLX_LastBlock( BOOL bReset )
 
 static void hb_compCheckIllegalChar( char * szName )
 {
-   int iSz, iSzLen = strlen( szName );
+   int i, iLen = strlen( szName );
 
-   for ( iSz = 0; iSz < iSzLen ; iSz ++ )
+   for ( i = 0; i < iLen ; i++ )
    {
-      if( ! isalnum( ( BYTE ) szName[ iSz ] ) && (int) szName [ iSz ] != '_' && (int) szName [ iSz ] != '.' )
+      if( ( ! isalnum( szName[i] ) ) && szName[ i ] != '_' )
       {
-         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER,
-                          hb_szAscii[ (int)(unsigned char) szName [ iSz ] ], NULL );
+         hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_ILLEGAL_CHARACTER, hb_szAscii[ (int)(unsigned char) szName[i] ], NULL );
       }
    }
 }

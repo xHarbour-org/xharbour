@@ -1,5 +1,5 @@
 /*
- * $Id: simplex.c,v 1.30 2007/12/22 19:04:32 likewolf Exp $
+ * $Id: simplex.c,v 1.31 2008/02/04 17:06:25 ronpinkas Exp $
  */
 
 /*
@@ -65,9 +65,8 @@
 #define LANGUAGE_WORDS_ARE static LEX_WORD aWords[] =
 #define LANGUAGE_RULES_ARE static int aiRules[][ MAX_MATCH + 2 ] =
 #define ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE(x) static char *szOmmit = x
-#define RETURN_DELIMITERS_IF_FIRST static LEX_DELIMITER aDelimitersIfFirst[] =
+#define CONDITIONAL_DELIMITERS_ARE static LEX_DELIMITER aConditionalDelimiters[] =
 #define ACCEPT_TOKEN_AND_RETURN_DELIMITERS static LEX_DELIMITER aDelimiters[] =
-#define DELIMITER_BELONGS_TO_TOKEN_IF_ONE_OF_THESE(x) static char *szAppend = x
 #define START_NEW_LINE_IF_ONE_OF_THESE(x) static char *szNewLine = x
 #define IF_SEQUENCE_IS(a, b, c, d) {a, b, c, d
 #define REDUCE_TO(x, y) ,x, y }
@@ -251,8 +250,8 @@ static BOOL bTmp, bRecursive = FALSE;
 static unsigned int iWords             = (int) ( sizeof( aWords             ) / LEX_WORD_SIZE      );
 static unsigned int iSelfs             = (int) ( sizeof( aSelfs             ) / LEX_WORD_SIZE      );
 static unsigned int iPairs             = (int) ( sizeof( aPairs             ) / LEX_PAIR_SIZE      );
-#ifdef USE_FIRST
-   static unsigned int iDelimitersIfFirst = (int) ( sizeof( aDelimitersIfFirst ) / LEX_DELIMITER_SIZE );
+#ifdef USE_CONDITIONAL_DELIMITERS
+   static unsigned int iConditionalDelimiters = (int) ( sizeof( aConditionalDelimiters ) / LEX_DELIMITER_SIZE );
 #endif
 static unsigned int iDelimiters        = (int) ( sizeof( aDelimiters        ) / LEX_DELIMITER_SIZE );
 static unsigned int iRules             = (int) ( sizeof( aiRules            ) / LEX_RULE_SIZE      );
@@ -267,7 +266,7 @@ typedef struct _TREE_NODE
 static TREE_NODE aPairNodes[256], aSelfNodes[256], aKeyNodes[256], aWordNodes[256], aRuleNodes[MAX_RULES];
 static char acOmmit[256], acNewLine[256];
 static int acReturn[256];
-static int acReturnFirst[256];
+static int acConditionalReturn[256];
 
 static int Reduce( int iToken );
 int SimpLex_GetNextToken( void );
@@ -450,14 +449,6 @@ static int rulecmp( const void * pLeft, const void * pRight );
                         /* Exception. */ \
                         if( *tmpPtr )
 
-#define IF_APPEND_DELIMITER(chr) \
-            /* Delimiter to Append? */ \
-            tmpPtr = (char*) szAppend; \
-            while ( *tmpPtr && chr != *tmpPtr ) tmpPtr++; \
-            \
-            /* Delimiter to Append found. */ \
-            if( *tmpPtr )
-
 #ifndef IF_BELONG_LEFT
    #define IF_BELONG_LEFT(chr) \
             /* Give precedence to associate rules */ \
@@ -466,12 +457,12 @@ static int rulecmp( const void * pLeft, const void * pRight );
             if( 0 )
 #endif
 
-#ifndef IF_BELONG_RIGHT
-   #define IF_BELONG_RIGHT(chr) \
+#ifndef IF_ACCEPT_AS_DELIMITER
+   #define IF_ACCEPT_AS_DELIMITER(chr) \
             /* Give precedence to associate rules */ \
-            DEBUG_INFO( printf(  "Defaulting Belong Right for: '%c' Next: '%c' to TRUE.\n", chr, szBuffer[0] ) ); \
+            DEBUG_INFO( printf(  "Defaulting Conditional Delimiter: '%c' to FALSE.\n", chr ) ); \
             \
-            if( 1 )
+            if( 0 )
 #endif
 
 #define RETURN_READY_TOKEN() \
@@ -829,49 +820,6 @@ int SimpLex_GetNextToken( void )
                }
             }
 
-            #ifdef USE_BELONGS
-               IF_APPEND_DELIMITER( chr )
-               {
-                   /* Append and Terminate current token and check it. */
-                   if( iLen < TOKEN_SIZE )
-                   {
-                      sToken[ iLen++ ] = chr;
-                   }
-                   sToken[ iLen ] = '\0';
-
-                   s_szBuffer = szBuffer;
-
-                   DEBUG_INFO( printf(  "Token: \"%s\" Appended: \'%c\'\n", sToken, chr ) );
-                   return SimpLex_CheckToken();
-               }
-            #endif
-
-            #ifdef USE_FIRST
-               if( iLen == 0 && acReturnFirst[(int)chr] )
-               {
-                   IF_BELONG_RIGHT( chr, szBuffer )
-                   {
-                   }
-                   else
-                   {
-                       s_szBuffer = szBuffer;
-
-                       iLastLen = 1;
-
-                       bIgnoreWords = FALSE;
-
-                       if( bNewLine )
-                       {
-                          bNewLine = FALSE;
-                          NEW_LINE_ACTION();
-                       }
-
-                       DEBUG_INFO( printf(  "Reducing First Delimiter: '%c' As: %i\n", chr, acReturnFirst[(int)chr] ) );
-                       return acReturnFirst[(int)chr];
-                   }
-               }
-            #endif
-
             if( acReturn[(int)chr] )
             {
                 s_szBuffer = szBuffer;
@@ -903,6 +851,42 @@ int SimpLex_GetNextToken( void )
                     return acReturn[(int)chr];
                 }
             }
+         #ifdef USE_CONDITIONAL_DELIMITERS
+            else if( acConditionalReturn[(int)chr] )
+            {
+                IF_ACCEPT_AS_DELIMITER( chr )
+                {
+                    s_szBuffer = szBuffer;
+
+                    iLastLen = 1;
+
+                    if( iLen )
+                    {
+                        /* Will be returned on next cycle. */
+                        HOLD_TOKEN( acConditionalReturn[(int)chr] );
+
+                        /* Terminate current token and check it. */
+                        sToken[ iLen ] = '\0';
+
+                        DEBUG_INFO( printf(  "Token: \"%s\" Holding Conditional: \'%c\' As: %i \n", sToken, chr, iRet ) );
+                        return SimpLex_CheckToken();
+                    }
+                    else
+                    {
+                        bIgnoreWords = FALSE;
+
+                        if( bNewLine )
+                        {
+                           bNewLine = FALSE;
+                           NEW_LINE_ACTION();
+                        }
+
+                        DEBUG_INFO( printf(  "Reducing Conditional Delimiter: '%c' As: %i\n", chr, acConditionalReturn[(int)chr] ) );
+                        return acConditionalReturn[(int)chr];
+                    }
+                }
+            }
+         #endif
 
             /* Acumulate and scan next Charcter. */
             if( iLen < TOKEN_SIZE )
@@ -1639,20 +1623,20 @@ static void GenTrees( void )
    i = 0;
    while( i < 256 )
    {
-      acOmmit[i]         = 0;
-      acNewLine[i]       = 0;
-      acReturn[i]        = 0;
-      acReturnFirst[i]   = 0;
-      aPairNodes[i].iMin = -1;
-      aPairNodes[i].iMax = -1;
-      aSelfNodes[i].iMin = -1;
-      aSelfNodes[i].iMax = -1;
-      aKeyNodes[i].iMin  = -1;
-      aKeyNodes[i].iMax  = -1;
-      aWordNodes[i].iMin = -1;
-      aWordNodes[i].iMax = -1;
-      aRuleNodes[i].iMin = -1;
-      aRuleNodes[i].iMax = -1;
+      acOmmit[i]             = 0;
+      acNewLine[i]           = 0;
+      acReturn[i]            = 0;
+      acConditionalReturn[i] = 0;
+      aPairNodes[i].iMin     = -1;
+      aPairNodes[i].iMax     = -1;
+      aSelfNodes[i].iMin     = -1;
+      aSelfNodes[i].iMax     = -1;
+      aKeyNodes[i].iMin      = -1;
+      aKeyNodes[i].iMax      = -1;
+      aWordNodes[i].iMin     = -1;
+      aWordNodes[i].iMax     = -1;
+      aRuleNodes[i].iMin     = -1;
+      aRuleNodes[i].iMax     = -1;
       i++;
    }
 
@@ -1677,11 +1661,11 @@ static void GenTrees( void )
       i++;
    }
 
-   #ifdef USE_FIRST
+   #ifdef USE_CONDITIONAL_DELIMITERS
       i = 0;
-      while ( i < iDelimitersIfFirst )
+      while ( i < iConditionalDelimiters )
       {
-         acReturnFirst[ (int)(aDelimitersIfFirst[i].cDelimiter) ] = aDelimitersIfFirst[i].iToken;
+         acConditionalReturn[ (int)(aConditionalDelimiters[i].cDelimiter) ] = aConditionalDelimiters[i].iToken;
          i++;
       }
    #endif

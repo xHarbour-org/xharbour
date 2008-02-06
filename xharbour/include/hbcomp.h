@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.63 2008/01/03 05:43:00 andijahja Exp $
+ * $Id: hbcomp.h,v 1.64 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -313,6 +313,7 @@ typedef struct
    char * CTOD;
    char * EVAL;
    char * FIELD_;
+   char * GLOBAL_;
    char * HASH;
    char * HB_ENUMINDEX;
    char * HB_QWITH;

@@ -7,9 +7,9 @@ NAMESPACE MyNameSpace
      // No qualifier needed for SAME level memebers.
      ? Str(1)
      // Explicit qualifier to the Global namespace
-     ? *.Str(1)
+     ? Global.Str(1)
      // Or for code section
-     WITH NAMESPACE *
+     WITH NAMESPACE Global
         ? Str(2)
         ? Str(3)
      END
@@ -35,8 +35,7 @@ NAMESPACE MyNameSpace
    RETURN
 
    FUNCTION Str(x)
-      // Using *. to call the global Str() function.
-   RETURN "!" + AllTrim( *.Str(x) ) + "!"
+   RETURN "!" + AllTrim( Global.Str(x) ) + "!"
 
    PROCEDURE SomeProc()
       ? ProcName()
@@ -79,8 +78,7 @@ NAMESPACE MyNameSpace2
 
 
    FUNCTION Str(x)
-      // Using *. to call the global Str() function.
-   RETURN "**" + AllTrim( *.Str(x) ) + "**"
+   RETURN "**" + AllTrim( Global.Str(x) ) + "**"
 
 END
 

@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.32 2008/02/02 16:09:30 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.33 2008/02/04 17:06:25 ronpinkas Exp $
  */
 
 /*
@@ -171,6 +171,7 @@ void hb_compExprINIT( void )
    hb_compExpr_IDs.CTOD            = hb_compIdentifierNew( "CTOD", TRUE );
    hb_compExpr_IDs.EVAL            = hb_compIdentifierNew( "EVAL", TRUE );
    hb_compExpr_IDs.FIELD_          = hb_compIdentifierNew( "FIELD", TRUE );
+   hb_compExpr_IDs.GLOBAL_         = hb_compIdentifierNew( "GLOBAL", TRUE );
    hb_compExpr_IDs.HASH            = hb_compIdentifierNew( "HASH", TRUE );
    hb_compExpr_IDs.HB_ENUMINDEX    = hb_compIdentifierNew( "HB_ENUMINDEX", TRUE );
    hb_compExpr_IDs.HB_QWITH        = hb_compIdentifierNew( "HB_QWITH", TRUE );
@@ -391,35 +392,12 @@ HB_EXPR_PTR hb_compExprNewFunCall( HB_EXPR_PTR pName, HB_EXPR_PTR pParms )
 HB_EXPR_PTR hb_compExprNewFunName( char * szName )
 {
    HB_EXPR_PTR pExpr;
-   char *szNamespace;
-
-   #if ! defined( HB_MACRO_SUPPORT )
-      char *pTmp;
-   #endif
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewFunName(%s)", szName));
 
-   #ifdef HB_MACRO_SUPPORT
-      szNamespace = NULL;
-   #else
-      pTmp = strrchr( szName, '.' );
-
-      if( pTmp )
-      {
-         pTmp[0] = '\0';
-
-         szNamespace = hb_compIdentifierNew( szName, TRUE );
-         szName = hb_compIdentifierNew( pTmp + 1, TRUE );
-      }
-      else
-      {
-         szNamespace = NULL;
-      }
-   #endif
-
    pExpr = hb_compExprNew( HB_ET_FUNNAME );
    pExpr->value.asSymbol.szName = szName;
-   pExpr->value.asSymbol.szNamespace = szNamespace;
+   pExpr->value.asSymbol.szNamespace = NULL;
    return pExpr;
 }
 
@@ -441,30 +419,8 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName 
 HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
 {
    HB_EXPR_PTR pExpr;
-   char *pTmp = strrchr( szName, '.' );
 
    HB_TRACE(HB_TR_DEBUG, ("hb_compExprNewNamespaceFunName(%s, %s)", szNamespace, szName));
-
-   if( pTmp )
-   {
-      char *szNamespace2, *szConcat;
-
-      pTmp[0] = '\0';
-      szNamespace2 = szName;
-
-      szConcat = (char *) hb_xgrab( strlen( szNamespace ) + 1 + strlen( szNamespace2 ) + 1 );
-      hb_xstrcpy( szConcat, szNamespace, ".", szNamespace2, NULL );
-      szNamespace = hb_compIdentifierNew( szConcat, FALSE );
-
-      // Must stay last!!!
-      szName = hb_compIdentifierNew( pTmp + 1, TRUE );
-   }
-
-   if( szNamespace[0] == '*' && szNamespace[1] != '\0' )
-   {
-       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, szNamespace + 2, "*" );
-       szNamespace = "*";
-    }
 
    pExpr = hb_compExprNew( HB_ET_FUNNAME );
    pExpr->value.asSymbol.szName = szName;

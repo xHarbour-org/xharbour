@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.141 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.142 2008/02/04 17:06:28 ronpinkas Exp $
  */
 
 /*
@@ -1146,9 +1146,8 @@ VariableAtAlias : VariableAt ALIASOP      { $$ = $1; }
 ;
 
 
-NamespacePath : '*' '.'                     { $$ = "*"; }
-              | IdentName '.'               { $$ = $1; }
-              | NamespacePath IdentName '.' {
+NamespacePath : NamespaceName '.'           { $$ = $1; }
+              | NamespacePath IdentName '.' { /* IdentName not NamespaceName is intentional - we don't want Global -> except when 1st! */
                                               if( $1[0] == '*' )
                                               {
                                                  hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $2, "*" );
@@ -3241,8 +3240,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
                                  }
               ;
 
-NamespaceName : IdentName { $$ = $1; }
-              | '*'       { $$ = "*"; }
+NamespaceName : IdentName { $$ = ( $1 == hb_compExpr_IDs.GLOBAL_ ? "*" : $1 ); }
               ;
 
 Namespace  : NamespaceType IdentName Crlf

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5903 2008/02/04 17:06:23 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5904 2008/02/04 17:52:17 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,31 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-05 20:37 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/simplex.c
+    + Added support for generic conditional delimiters, instead of first letter only
+  * source/compiler/harbour.slx
+    + Treat '.' as an operator unless used in valid contexs (0.1 / .1 / &Macro. / ...)
+
+  * include/hbexpra.c
+  * source/compiler/harbour.sly
+    - Remove hacks used to detect and handle '.' inside IDENTIFIER token, used as NAmespace operator
+
+  * include/hbcomp.h
+  * include/hbexpra.c
+  * include/std.ch
+  * source/compiler/harbour.sly
+    * Changed the Explicit Global Namespace' symbolic name, from * to Global (.NET convention)
+      as suggested by Phile & Patrick
+
+  * source/compiler/hbslex.c
+  * source/compiler/expropta.c
+  * source/macro/macroa.c
+    * Touched to force compilation
+
+  * tests/namespace.prg
+    * Updated to reflect change of Explicit Global Namespace' symbolic name.
 
 2008-02-04 13:20 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.c
