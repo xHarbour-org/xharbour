@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5904 2008/02/04 17:52:17 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5905 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -12,7 +12,8 @@
   * include/simplex.c
     + Added support for generic conditional delimiters, instead of first letter only
   * source/compiler/harbour.slx
-    + Treat '.' as an operator unless used in valid contexs (0.1 / .1 / &Macro. / ...)
+    + Treat '.' as an operator unless specifically valid as a token character:
+      (0.1 / .1 / &Macro. / &Macro.Suffix / Prefix&Macro. / Prefix&Macro.Suffix / ...)
 
   * include/hbexpra.c
   * source/compiler/harbour.sly
