@@ -1,5 +1,5 @@
 /*
- * $Id: hbexpra.c,v 1.33 2008/02/04 17:06:25 ronpinkas Exp $
+ * $Id: hbexpra.c,v 1.34 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /*
@@ -401,8 +401,6 @@ HB_EXPR_PTR hb_compExprNewFunName( char * szName )
    return pExpr;
 }
 
-#if ! defined( HB_MACRO_SUPPORT )
-
 HB_EXPR_PTR hb_compExprNewNamespaceFunRef( char * szNamespace, char * szFunName )
 {
    HB_EXPR_PTR pExpr;
@@ -427,8 +425,6 @@ HB_EXPR_PTR hb_compExprNewNamespaceFunName( char * szNamespace, char * szName )
    pExpr->value.asSymbol.szNamespace = szNamespace;
    return pExpr;
 }
-
-#endif
 
 /* Creates new array access expression
  *    pArray[ pIndex ]

@@ -27,6 +27,10 @@ PROCEDURE Main()
       ? Str( 100 )
    END
 
+   // Namespace2 is a RUNTIME NS, so we can call it even in Macros.
+   // Macro namespace calls must always be fully qualified as macro has no knowledge of WITH NAMESPACE, etc.
+   ? &( "MyNamespace2.Str(1000)" )
+
    MyOptional.SomeOptional()
    // Because this namespace is OPTIONAL we can also call it withOUT qualifier!
    SomeOptional()

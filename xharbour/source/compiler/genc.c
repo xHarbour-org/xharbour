@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.150 2008/02/04 17:06:25 ronpinkas Exp $
+ * $Id: genc.c,v 1.151 2008/02/06 18:58:51 ronpinkas Exp $
  */
 
 /*
@@ -297,7 +297,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
     {
        fprintf( yyc, "   },\n" );
        fprintf( yyc, "#endif\n" );
-       
+
        fclose( yyc );
     }
     else
@@ -890,7 +890,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   {
                      pSym->cScope |= HB_FS_LOCAL;
 
-                     if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+                     if( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+                     {
+                     }
+                     else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
                      {
                      }
                      else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
@@ -903,7 +906,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                   }
                   else
                   {
-                     pSym->cScope |= HB_FS_INDIRECT;
+                     if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
+                     {
+                        pSym->cScope |= HB_FS_INDIRECT;
+                     }
                   }
                }
                else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
@@ -953,7 +959,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                }
             }
 
-            fprintf( yyc, "{ \"%s\", {", pSym->szName );
+            if( ( pSym->iFlags & SYMF_NS_RUNTIME ) == SYMF_NS_RUNTIME )
+            {
+               fprintf( yyc, "{ \"%s.%s\", {", ( (PNAMESPACE) pSym->Namespace )->szFullPath, pSym->szName );
+            }
+            else
+            {
+               fprintf( yyc, "{ \"%s\", {", pSym->szName );
+            }
 
             if( pSym->cScope & HB_FS_STATIC )
             {
@@ -980,7 +993,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, "HB_FS_PUBLIC" );
             }
 
-            if( ( pSym->cScope & HB_FS_INDIRECT ) != HB_FS_INDIRECT )
+            if( ! ( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT ) )
             {
                if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
                {
@@ -1016,7 +1029,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                fprintf( yyc, "}, {(PHB_FUNC) &%s.%s}, &ModuleFakeDyn }", (char *) pSym->Namespace, pSym->szName );
             }
-            else if( pSym->iFlags & SYMF_FUNCALL && ( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL ) ) /* is it a function defined in this module */
+            else if( ( pSym->iFlags & SYMF_FUNCALL ) && ( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL ) ) /* is it a function defined in this module */
             {
                if( pSym->cScope & HB_FS_INIT )
                {

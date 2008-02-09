@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.33 2007/12/24 11:34:48 likewolf Exp $
+ * $Id: macro.y,v 1.34 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -266,6 +266,7 @@ int yylex( YYSTYPE *, HB_MACRO_PTR );
 %type <asExpr>  PostOp
 %type <asExpr>  WithData WithMethod
 %type <asExpr>  Hash HashList
+%type <string>  NamespacePath
 %%
 
 Main : Expression '\n'  {
@@ -627,6 +628,12 @@ VariableAt  : NilValue      ArrayIndex    { $$ = $2; }
             | PareExpList   ArrayIndex    { $$ = $2; }
             ;
 
+NamespacePath : IDENTIFIER '.'           { $$ = $1; }
+              | NamespacePath IDENTIFIER '.' {
+                                               $$ = hb_xstrcpy( NULL, $1, ".", $2, NULL );
+                                               hb_xfree( $1 );
+                                             }
+
 /* Function call
  */
 FunCall     : IDENTIFIER '(' ArgList ')'   {
@@ -638,6 +645,15 @@ FunCall     : IDENTIFIER '(' ArgList ')'   {
                                                s_iPending--;
                                             }
                                           }
+            | NamespacePath IdentName '(' ArgList ')' {
+                                                        $$ = hb_compExprNewFunCall( hb_compExprNewNamespaceFunName( $1, $2 ), $4, HB_MACRO_PARAM );
+                                                        HB_MACRO_CHECK( $$ );
+
+                                                        if( s_iPending && s_Pending[ s_iPending - 1 ] == $4 )
+                                                        {
+                                                           s_iPending--;
+                                                        }
+                                                      }
             | MacroVar '(' ArgList ')'    {
                                             $$ = hb_compExprNewFunCall( $1, $3, HB_MACRO_PARAM );
                                             HB_MACRO_CHECK( $$ );

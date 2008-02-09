@@ -67,7 +67,7 @@ NAMESPACE MyNameSpace
 
 END
 
-NAMESPACE MyNameSpace2
+RUNTIME NAMESPACE MyNameSpace2
 
    PROCEDURE ProcOf2()
       ? ProcName()
@@ -80,6 +80,9 @@ NAMESPACE MyNameSpace2
    FUNCTION Str(x)
    RETURN "**" + AllTrim( Global.Str(x) ) + "**"
 
+   STATIC PROCEDURE StatOf2()
+      ? ProcName()
+   RETURN
 END
 
 // Members of OPTIONAL NAMESPACE can be called WITH or withOUT the namespace qualifier!

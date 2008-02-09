@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.143 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.144 2008/02/06 18:58:51 ronpinkas Exp $
  */
 
 /*
@@ -47,15 +47,15 @@
 #define alloca  malloc
 
 #ifdef FORCE_MEM_STD
-   #undef  hb_xgrab 
+   #undef  hb_xgrab
    #define hb_xgrab malloc
-   
+
    #undef  hb_xrealloc
    #define hb_xrealloc realloc
-   
-   #undef  hb_xfree 
+
+   #undef  hb_xfree
    #define hb_xfree free
-#else   
+#else
    #undef malloc
    #define malloc  hb_xgrab
    #undef realloc
@@ -233,7 +233,7 @@ static void hb_compDebugStart( void ) { };
 %token HASHOP
 %token UTILITY
 %token DIVERT OF FLAGS
-%token NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
+%token NAMESPACE RUNTIME_NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -641,12 +641,16 @@ Statements : LineStat                  { $<lNumber>$ = $<lNumber>1; }
            | Statements LineStat       { $<lNumber>$ += $<lNumber>2; }
            ;
 
-ExtList    : IdentName                      { hb_compExternAdd( $1, (HB_SYMBOLSCOPE) 0 ); }
-           | ExtList ',' IdentName          { hb_compExternAdd( $3, (HB_SYMBOLSCOPE) 0 ); }
+ExtList    : IdentName                      { hb_compExternAdd( $1, NULL, (HB_SYMBOLSCOPE) 0 ); }
+           | NamespacePath IdentName        { hb_compExternAdd( $2, $1, (HB_SYMBOLSCOPE) 0 ); }
+           | ExtList ',' IdentName          { hb_compExternAdd( $3, NULL, (HB_SYMBOLSCOPE) 0 ); }
+           | ExtList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, (HB_SYMBOLSCOPE) 0 ); }
            ;
 
-DynList    : IdentName                      { hb_compExternAdd( $1, HB_FS_DEFERRED ); }
-           | DynList ',' IdentName          { hb_compExternAdd( $3, HB_FS_DEFERRED ); }
+DynList    : IdentName                               { hb_compExternAdd( $1, NULL, HB_FS_DEFERRED ); }
+           | NamespacePath IdentName             { hb_compExternAdd( $2, $1, HB_FS_DEFERRED ); }
+           | DynList ',' IdentName                   { hb_compExternAdd( $3, NULL, HB_FS_DEFERRED ); }
+           | DynList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, HB_FS_DEFERRED ); }
            ;
 
 IdentName  : IDENTIFIER       { $$ = $1; }
@@ -3302,6 +3306,7 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                  }
 
 NamespaceType : NAMESPACE            { $$ = NSTYPE_SPACE; }
+              | RUNTIME_NAMESPACE    { $$ = NSTYPE_RUNTIME; }
               | OPTIONAL_NAMESPACE   { $$ = NSTYPE_OPTIONAL; }
               | IMPLEMENTS_NAMESPACE { $$ = NSTYPE_IMPLEMENTS; }
               ;

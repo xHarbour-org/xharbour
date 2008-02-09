@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.75 2007/09/06 16:17:54 enricomaria Exp $
+ * $Id: macro.c,v 1.76 2008/02/02 07:33:30 ronpinkas Exp $
  */
 
 /*
@@ -1399,8 +1399,12 @@ void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, 
 {
    HB_DYNS_PTR pSym;
 
-   HB_SYMBOL_UNUSED( szNamespace );
    HB_SYMBOL_UNUSED( bAlias );
+
+   if( szNamespace )
+   {
+      szSymbolName = hb_xstrcpy( NULL, szNamespace, ".", szSymbolName, NULL );
+   }
 
    if( HB_MACRO_DATA->Flags & HB_MACRO_GEN_TYPE )
    {
@@ -1429,6 +1433,11 @@ void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, 
    else
    {
       pSym = hb_dynsymGet( szSymbolName );
+   }
+
+   if( szNamespace )
+   {
+      hb_xfree( szSymbolName );
    }
 
    hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
@@ -1801,7 +1810,7 @@ void hb_compGenPushFunCall( char * szFunName, char *szNamespace, HB_MACRO_DECL )
    {
       /* Abbreviated function name was used - change it for whole name
        */
-      hb_compGenPushSymbol( szFunction, NULL, FALSE, HB_MACRO_PARAM );
+      hb_compGenPushSymbol( szFunction, szNamespace, FALSE, HB_MACRO_PARAM );
    }
    else
    {

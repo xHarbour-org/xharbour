@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.31 2007/07/06 00:56:01 ronpinkas Exp $
+ * $Id: macro.slx,v 1.32 2007/12/22 19:04:33 likewolf Exp $
  */
 
 /*
@@ -258,6 +258,39 @@ void * yy_bytes_buffer( char * pBuffer, int iBufSize );
 ACCEPT_TOKEN_AND_DROP_DELIMITER_IF_ONE_OF_THESE( " \t" );
 
 #define HB_CHK_BLOCK    LEX_CUSTOM_ACTION - 1
+
+#define USE_CONDITIONAL_DELIMITERS
+CONDITIONAL_DELIMITERS_ARE         {
+                                     LEX_DELIMITER( '.'  ) AS_TOKEN( '.' ),
+                                   };
+
+#undef IF_ACCEPT_AS_DELIMITER
+#undef IF_ACCEPT_AS_DELIMITER
+   /* We know chr to only be '.', so ignoring chr! */
+   #define IF_ACCEPT_AS_DELIMITER( chr ) BOOL bAccept = TRUE; \
+                                         \
+                                         if( iLen == 0 ) \
+                                         { \
+                                            bAccept = ! ( isdigit( szBuffer[0] ) || ( szBuffer[0] == '.' && szBuffer[1] == '.' ) ); \
+                                         } \
+                                         else \
+                                         { \
+                                            if( isdigit( sToken[0] ) ) \
+                                            { \
+                                              bAccept = FALSE; \
+                                            } \
+                                            else if( sToken[0] == '.' ) \
+                                            { \
+                                              bAccept = FALSE; \
+                                            } \
+                                            else \
+                                            { \
+                                              sToken[iLen] = '\0'; \
+                                              bAccept = strchr( sToken, '&' ) == NULL; \
+                                            } \
+                                         } \
+                                         \
+                                         if( bAccept )
 
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
                                      LEX_DELIMITER( ','  ) AS_TOKEN( ','   + DONT_REDUCE ),

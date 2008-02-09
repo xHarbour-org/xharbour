@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.122 2007/12/23 02:22:02 likewolf Exp $
+ * $Id: hbexprb.c,v 1.123 2008/02/02 07:32:54 ronpinkas Exp $
  */
 
 /*
@@ -2150,7 +2150,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                --usCount;
             }
 
-            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
+            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME && pSelf->value.asFunCall.pFunName->value.asSymbol.szNamespace == NULL )
             {
                BYTE   bPcode = 0;
                char *szName = pSelf->value.asFunCall.pFunName->value.asSymbol.szName;
@@ -2291,7 +2291,7 @@ static HB_EXPR_FUNC( hb_compExprUseFunCall )
                --usCount;
             }
 
-            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME )
+            if( pSelf->value.asFunCall.pFunName->ExprType == HB_ET_FUNNAME && pSelf->value.asFunCall.pFunName->value.asSymbol.szNamespace == NULL )
             {
                char *szName = pSelf->value.asFunCall.pFunName->value.asSymbol.szName;
 
@@ -2689,6 +2689,10 @@ static HB_EXPR_FUNC( hb_compExprUseFunName )
       case HB_EA_DELETE:
 #if defined( HB_MACRO_SUPPORT )
              HB_XFREE( pSelf->value.asSymbol.szName );
+             if( pSelf->value.asSymbol.szNamespace )
+             {
+                HB_XFREE( pSelf->value.asSymbol.szNamespace );
+             }
 #endif
          break;
    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.64 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.65 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /*
@@ -260,6 +260,7 @@ typedef struct
 typedef struct __EXTERN
 {
    char * szName;
+   char * szNamespace;
    HB_SYMBOLSCOPE cScope;
    struct __EXTERN * pNext;
 } _EXTERN, * PEXTERN;      /* support structure for extern symbols */
@@ -379,12 +380,16 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 #define SYMF_ALIAS       0x0001
 #define SYMF_FUNCALL     0x1000
 
+#define SYMF_NS_RUNTIME      ( SYMF_FUNCALL | 0x2000 )
+
 #define SYMF_NS_EXPLICITPATH ( SYMF_FUNCALL | 0x0010 )
 #define SYMF_NS_EXPLICITPTR  ( SYMF_FUNCALL | 0x0020 )
 #define SYMF_NS_RESOLVE      ( SYMF_FUNCALL | 0x0040 )
 #define SYMF_NS_MEMBER       ( SYMF_FUNCALL | 0x0080 )
 
 #define NSF_NONE         SYMF_FUNCALL
+
+#define NSF_RUNTIME      SYMF_NS_RUNTIME
 #define NSF_EXPLICITPATH SYMF_NS_EXPLICITPATH
 #define NSF_EXPLICITPTR  SYMF_NS_EXPLICITPTR
 #define NSF_RESOLVE      SYMF_NS_RESOLVE
@@ -398,6 +403,8 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 
     #define NSTYPE_STATIC      0x0100
     #define NSTYPE_TERMINATOR  ( 0x0200 | NSTYPE_END )
+
+    #define NSTYPE_RUNTIME     ( 0x0800 | NSTYPE_SPACE )
 
     #define NSTYPE_OPTIONAL    ( 0x1000 | NSTYPE_SPACE )
     #define NSTYPE_EXTERNAL    ( 0x2000 | NSTYPE_SPACE | NSTYPE_END )
@@ -494,7 +501,7 @@ extern void hb_compGenWithObject( HB_EXPR_PTR pObject );  /* generate code for W
 extern void hb_compGenEndWithObject( void );  /* generate code for END //WITH OBJECT <obj> statement */
 
 extern void hb_compExternGen( void ); /* generates the symbols for the EXTERN names */
-extern void hb_compExternAdd( char * szExternName, HB_SYMBOLSCOPE cScope ); /* defines a new extern name */
+extern void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cScope ); /* defines a new extern name */
 
 extern void hb_compAutoOpenAdd( char * szName );
 

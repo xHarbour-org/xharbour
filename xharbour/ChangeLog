@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5906 2008/02/06 01:16:43 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5907 2008/02/06 18:58:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,15 +8,47 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-02-08 22:17 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+    + Added support for RUNTIME NAMESPACE ... END
+    + Added support for EXTERNAL Namespace[.more].Fun
+    + Added support for DYNAMIC Namespace[.more].Fun
+  * include/hbcomp.h
+  * include/hbexpra.c
+  * include/hbexprb.c
+  * include/hbexprop.h
+  * source/compiler/expropta.c
+  * source/compiler/exproptb.c
+  * source/compiler/genc.c
+  * source/compiler/harbour.c
+  * source/macro/macro.slx
+  * source/macro/macro.y
+  * source/macro/macroa.c
+  * source/macro/macrob.c
+  * source/vm/macro.c
+  * source/vm/proc.c
+    + Added initial R/T support for Namespaces - now Macro can resolve namespaces
+      if the namespace is flaged as RUNTIME.
+      /*
+         NOTE: I was not sure if the default of NAMESPACE should support R/T or not
+               and decided to allow R/T support only if explictly specified. We can
+               easily reverse this, if the group thinks so.
+       */
+
+  * tests/namespace.prg
+  * tests/tstnamespace.prg
+    + Added sample usage of RUNTIME NAMESPACE and Macro resolution.
+
 2008-02-06 14:26 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/genc.c
-    * Missing fclose() 
+    * Missing fclose()
   * source/compiler/harbour.sly
-    + Added #ifdef FORCE_MEM_STD to allow usage of malloc/realloc/free 
+    + Added #ifdef FORCE_MEM_STD to allow usage of malloc/realloc/free
   * source/vm/hvm.c
     * Minor optimization
   * tests/tiptest/loadhtml.prg
-    * Typos  
+    * Typos
 
 2008-02-05 20:37 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/simplex.c

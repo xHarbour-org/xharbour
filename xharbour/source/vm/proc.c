@@ -1,5 +1,5 @@
 /*
- * $Id: proc.c,v 1.31 2007/04/11 06:16:46 ronpinkas Exp $
+ * $Id: proc.c,v 1.32 2007/04/22 22:50:39 ronpinkas Exp $
  */
 
 /*
@@ -194,7 +194,16 @@ HB_EXPORT char * hb_procinfo( int iLevel, char *szName, USHORT *uLine, char *szM
          }
          else
          {
-            strncpy( szName, ( *pBase )->item.asSymbol.value->szName, HB_SYMBOL_NAME_LEN + 1 );
+            char *pPureName = strrchr( ( *pBase )->item.asSymbol.value->szName, '.' );
+
+            if( pPureName )
+            {
+               strncpy( szName, pPureName + 1, HB_SYMBOL_NAME_LEN + 1 );
+            }
+            else
+            {
+               strncpy( szName, ( *pBase )->item.asSymbol.value->szName, HB_SYMBOL_NAME_LEN + 1 );
+            }
          }
       }
 

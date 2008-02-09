@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.180 2008/02/04 17:06:26 ronpinkas Exp $
+ * $Id: harbour.c,v 1.181 2008/02/04 17:52:17 ronpinkas Exp $
  */
 
 /*
@@ -963,14 +963,15 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
  * as they have to be placed on the symbol table later than the first
  * public symbol
  */
-void hb_compExternAdd( char * szExternName, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
+void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
 {
    PEXTERN pExtern, pLast;
 
    pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
 
-   pExtern->szName = szExternName;
-   pExtern->cScope = cScope;
+   pExtern->szName      = szExternName;
+   pExtern->szNamespace = szNamespace;
+   pExtern->cScope      = cScope;
 
    pExtern->pNext  = NULL;
 
@@ -2406,7 +2407,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
       szFunName = hb_compIdentifierNew( szFunName, FALSE );
    }
 
-   pFunc = hb_compFunctionFind( szFunName, (void *)hb_comp_Namespaces.pCurrent, NSF_MEMBER );
+   pFunc = hb_compFunctionFind( szFunName, (void *) hb_comp_Namespaces.pCurrent, NSF_MEMBER );
 
    if( pFunc )
    {
@@ -2437,13 +2438,29 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_comp_iFunctionCnt++;
 
-   if( szFunName[0] && ( hb_comp_Namespaces.pCurrent == NULL || ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) ) )
+   if( szFunName[0] &&
+       ( hb_comp_Namespaces.pCurrent == NULL ||
+         ( ( ( cScope & HB_FS_STATIC ) == 0 ) &&
+           ( ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME ) ||
+             ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) ) ) ) )
    {
-      pSym = hb_compSymbolFind( szFunName, NULL, hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+      pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
 
       if( pSym == NULL )
       {
-         pSym = hb_compSymbolAdd( szFunName, NULL, hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+         pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+      }
+
+      if( hb_comp_Namespaces.pCurrent )
+      {
+      	 if( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+      	 {
+            pSym->iFlags |= ( SYMF_NS_RUNTIME | SYMF_NS_EXPLICITPTR );
+         }
+         //else
+         //{
+            //pSym->iFlags |= SYMF_NS_EXPLICITPTR;
+         //}
       }
 
       pSym->cScope |= ( HB_FS_LOCAL | cScope );
@@ -2694,24 +2711,40 @@ void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
 
    if( hb_comp_bDebugInfo )
    {
-      hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), (HB_SYMBOLSCOPE) 0 );
+      hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, (HB_SYMBOLSCOPE) 0 );
    }
 
    while( hb_comp_pExterns )
    {
-      PCOMSYMBOL pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
+      PCOMSYMBOL pSym;
 
-      if( pSym == NULL )
+      if( hb_comp_pExterns->szNamespace )
       {
-         pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
+         pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, (void *) hb_comp_pExterns->szNamespace, SYMF_NS_EXPLICITPATH );
+
+         if( pSym == NULL )
+         {
+            pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, hb_comp_pExterns->szNamespace, SYMF_NS_EXPLICITPATH );
+         }
+
+         hb_compFunCallAdd( hb_comp_pExterns->szName, hb_comp_pExterns->szNamespace, NSF_EXPLICITPATH );
+      }
+      else
+      {
+         pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
+
+         if( pSym == NULL )
+         {
+            pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
+         }
+
+         hb_compFunCallAdd( hb_comp_pExterns->szName, NULL, NSF_NONE );
       }
 
       if( ( hb_comp_pExterns->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
       {
          pSym->cScope |= HB_FS_DEFERRED;
       }
-
-      hb_compFunCallAdd( hb_comp_pExterns->szName, NULL, NSF_NONE );
 
       pDelete  = hb_comp_pExterns;
       hb_comp_pExterns = hb_comp_pExterns->pNext;
