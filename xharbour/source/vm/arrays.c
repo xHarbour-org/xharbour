@@ -1,5 +1,5 @@
 /*
- * $Id: arrays.c,v 1.151 2008/01/10 11:27:17 marchuet Exp $
+ * $Id: arrays.c,v 1.152 2008/01/20 23:21:36 likewolf Exp $
  */
 
 /*
@@ -135,7 +135,6 @@ BOOL HB_FORCE_EXPORT hb_arrayNew( PHB_ITEM pItem, ULONG ulLen ) /* creates a new
    pBaseArray->ulAllocated = ulLen;
    pBaseArray->uiClass     = 0;
    pBaseArray->uiPrevCls   = 0;
-   pBaseArray->puiClsTree  = NULL;
    pBaseArray->ulBlock     = 0;
    pBaseArray->uiDestroyed = 0;
 
@@ -1274,13 +1273,6 @@ void hb_arrayReleaseBase( PHB_BASEARRAY pBaseArray )
 
    pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
 
-   /* Release object tree as needed */
-   if( pBaseArray->puiClsTree )
-   {
-      hb_xfree( pBaseArray->puiClsTree );
-      pBaseArray->puiClsTree = NULL;
-   }
-
    if( pBaseArray->pItems )
    {
       register ULONG ulLen = pBaseArray->ulLen;
@@ -1518,7 +1510,6 @@ PHB_ITEM hb_arrayCloneEx( PHB_ITEM pSrcArray, PHB_ITEM pDstArray, PHB_NESTED_CLO
 
       pDstBaseArray             = pDstArray->item.asArray.value;
       pDstBaseArray->uiClass    = pSrcBaseArray->uiClass;
-      pDstBaseArray->puiClsTree = NULL;
 
       for( ulCount = 0; ulCount < ulSrcLen; ulCount++ )
       {
@@ -1714,14 +1705,6 @@ HB_GARBAGE_FUNC( hb_arrayReleaseGarbage )
    pBaseArray->uiDestroyed = 2;  // Second step of Release, avoid call to methods of this object from others destructor in the same GC recollection session.
 
    //TraceLog( NULL, "hb_arrayReleaseGarbage( %p )\n", pBaseArray );
-
-   /* Release object tree as needed */
-   if( pBaseArray->puiClsTree )
-   {
-      HB_TRACE( HB_TR_INFO, ( "Release Tree, %p )", pBaseArray ) );
-      hb_xfree( pBaseArray->puiClsTree );
-      pBaseArray->puiClsTree = NULL;
-   }
 
    if( pBaseArray->pItems )
    {

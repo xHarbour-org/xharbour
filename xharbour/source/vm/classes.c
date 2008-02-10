@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.212 2007/05/31 05:18:11 walito Exp $
+ * $Id: classes.c,v 1.213 2007/12/08 02:31:21 ronpinkas Exp $
  */
 
 /*
@@ -877,10 +877,12 @@ HB_EXPORT char * hb_objGetClsName( PHB_ITEM pObject )
  */
 HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
 {
+   HB_THREAD_STUB
+
    PHB_DYNS pMsg = hb_dynsymFindName( szName );
-   USHORT uiClass;
+   PHB_ITEM pBase = hb_stackBaseItem();
+   USHORT uiClass = 0;
    USHORT uiCurCls;
-   USHORT uiClsTree;
 
    HB_TRACE(HB_TR_DEBUG, ("hb_objGetRealCls(%p, %s)", pObject, szName));
 
@@ -889,41 +891,22 @@ HB_EXPORT USHORT hb_objGetRealCls( PHB_ITEM pObject, char * szName )
       return 0;
    }
 
-   uiClass = hb_objClassH( pObject );
-
-   /* default value to current class object */
-   if( pObject->item.asArray.value->puiClsTree && pObject->item.asArray.value->puiClsTree[0] )
+   uiCurCls = pBase->item.asSymbol.uiSuperClass;
+   if( uiCurCls == 0 )
    {
-      uiClsTree = pObject->item.asArray.value->puiClsTree[0] ;
-      uiCurCls  = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
-   }
-   else
-   {
-      uiClsTree = 1;          /* Flag value */
-      uiCurCls = uiClass;
+      uiCurCls = hb_objClassH( pObject );
    }
 
-   while( uiClsTree )
+   if( uiCurCls && uiCurCls <= s_uiClasses )
    {
-      if( uiCurCls && uiCurCls <= s_uiClasses )
+      PMETHOD pMethod = hb_objGetpMthd( pMsg, uiCurCls );
+
+      if( pMethod )
       {
-         PMETHOD pMethod = hb_objGetpMthd( pMsg, uiCurCls );
-
-         if( pMethod )
+         if( pMethod->uiSprClass )
          {
             uiClass = pMethod->uiSprClass;
-            uiClsTree = 1; /* Flag Value */
          }
-         else
-         {
-            uiClass = 0;
-            break;
-         }
-      }
-
-      if( --uiClsTree )
-      {
-         uiCurCls = pObject->item.asArray.value->puiClsTree[uiClsTree] ;
       }
    }
 
@@ -2560,7 +2543,6 @@ HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
       pSelf->item.asArray.value->uiPrevCls  = 0;
       /* pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) ); */
       /* pSelf->item.asArray.value->puiClsTree[0]=0; */
-      pSelf->item.asArray.value->puiClsTree = NULL;
 
       if( pClass->pInitValues )
       {
@@ -3713,6 +3695,7 @@ static HARBOUR hb___msgEvalInline( void )
    uiClass = hb_objClassH( pSelf );
 
    hb_vmPushSymbol( &hb_symEval );
+   hb_stackItemFromTop(-1)->item.asSymbol.uiSuperClass = hb_stackBaseItem()->item.asSymbol.uiSuperClass;
    hb_vmPush( hb_arrayGetItemPtr( s_pClasses[ uiClass - 1 ].pInlines, (HB_VM_STACK.pMethod)->uiData ) );
    hb_vmPush( pSelf );            /* Push self                */
 
@@ -3767,24 +3750,16 @@ static HARBOUR hb___msgSuper( void )
    HB_THREAD_STUB
 
    PHB_ITEM pObject = hb_stackSelfItem();
-   //ULONG ulLen = pObject->item.asArray.value->ulLen;
-   HB_ITEM Super;
-   USHORT uiClass;
+   PHB_ITEM pReturn = hb_stackReturnItem();
 
-   uiClass = hb_objClassH( pObject );
-
-   Super.type = HB_IT_NIL;
-   hb_arrayNew( &Super, 1 );
+   hb_arrayNew( pReturn, 1 );
 
    /* Now save the Self object as the 1st elem. */
-   hb_arraySet( &Super, 1 , pObject );
+   hb_arraySet( pReturn, 1 , pObject );
 
    /* And transform it into a fake object */
-   Super.item.asArray.value->uiPrevCls  = uiClass; /* backup of actual handel */
-   Super.item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;                /* superclass handel casting */
-   Super.item.asArray.value->puiClsTree = NULL;
-
-   hb_itemReturnForward( &Super );
+   pReturn->item.asArray.value->uiPrevCls  = hb_objClassH( pObject ); /* backup of actual handel */
+   pReturn->item.asArray.value->uiClass    = (HB_VM_STACK.pMethod)->uiSprClass;     /* superclass handel casting */
 }
 
 /*

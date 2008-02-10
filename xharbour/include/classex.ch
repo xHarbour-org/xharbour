@@ -1,5 +1,5 @@
 /*
- * $Id: classex.ch,v 1.3 2003/03/18 22:12:35 ronpinkas Exp $
+ * $Id: classex.ch,v 1.4 2007/05/11 15:35:53 ronpinkas Exp $
  */
 
 /*
@@ -123,6 +123,7 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED  ;;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )           ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
@@ -130,6 +131,7 @@
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] READ <rf> WRITE <wf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )          ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
@@ -139,12 +141,14 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED   ;;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] WRITE <wf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ASSIGN <x>(v) INLINE ::<wf>( [ <i>, ] v)
 
@@ -152,12 +156,14 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED   ;;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )
 
 #xcommand PROPERTY <x>  [AS <astype>] [INDEX <i>] READ <rf> [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] PROTECTED [INIT <d>] ;;
            ACCESS <x>    INLINE ::<rf>( [ <i> ] )
 
@@ -166,11 +172,13 @@
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
            DATA T_<x>    AS STRING INIT <(type)> PROTECTED   ;;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] EXPORTED  [INIT <d>]
 
 #xcommand PROPERTY <x>  [AS <astype>] [DEFAULT <d>];
                         [<scope: EXPORTED, EXPORT, VISIBLE, PUBLIC, PROTECTED, HIDDEN, PRIVATE, READONLY, RO, PUBLISHED >] ;
            =>  ;
+           #xtranslate __FNAME(<x>) => F<x> ;;
            DATA __FNAME(<x>)     [AS <astype>] EXPORTED  [INIT <d>]
 
 #xtranslate __FNAME(<x>) => F<x>

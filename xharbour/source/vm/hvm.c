@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.652 2008/02/02 07:33:30 ronpinkas Exp $
+ * $Id: hvm.c,v 1.653 2008/02/06 18:58:51 ronpinkas Exp $
  */
 
 /*
@@ -7134,7 +7134,6 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
          if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
             HB_ITEM_NEW( RealSelf );
-            USHORT nPos;
             USHORT uiClass;
 
             //printf( "\n VmSend Method: %s \n", pSym->szName );
@@ -7147,25 +7146,6 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
             hb_itemCopy( &RealSelf, pSelfBase->pItems );
             hb_itemForwardValue( pSelf, &RealSelf );
 
-            if( HB_IS_OBJECT( pSelf ) )
-            {
-               /* Take back the good pSelfBase */
-               pSelfBase = pSelf->item.asArray.value;
-
-               /* Push current SuperClass handle */
-               lPopSuper = TRUE ;
-
-               if( ! pSelf->item.asArray.value->puiClsTree )
-               {
-                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                  pSelf->item.asArray.value->puiClsTree[0] = 0;
-               }
-
-               nPos = (USHORT) ( pSelfBase->puiClsTree[0] + 1 );
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-               pSelfBase->puiClsTree[0] = nPos ;
-               pSelfBase->puiClsTree[ nPos ] = uiClass;
-            }
          }
       }
    }
@@ -7312,23 +7292,6 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
       //TraceLog( NULL, "Done\n" );
 
       HB_TRACE( HB_TR_DEBUG, ("Done: %s", pSym->szName));
-
-      if( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
-      {
-         USHORT nPos = (USHORT) ( pSelfBase->puiClsTree[0] - 1 );
-
-         /* POP SuperClass handle */
-         if( nPos )
-         {
-            pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-            pSelfBase->puiClsTree[0] = nPos;
-         }
-         else
-         {
-            hb_xfree(pSelfBase->puiClsTree);
-            pSelfBase->puiClsTree = NULL ;
-         }
-      }
 
       #ifndef HB_NO_PROFILER
          if( bProfiler )
@@ -8136,7 +8099,6 @@ static void hb_vmSetDivert( BOOL bDivertOf )
          if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
             HB_ITEM_NEW( RealSelf );
-            USHORT nPos;
             USHORT uiClass;
 
             uiClass = pSelfBase->uiClass;
@@ -8146,25 +8108,6 @@ static void hb_vmSetDivert( BOOL bDivertOf )
             hb_itemCopy( &RealSelf, pSelfBase->pItems );
             hb_itemForwardValue( pSelf, &RealSelf );
 
-            if( HB_IS_OBJECT( pSelf ) )
-            {
-               /* Take back the good pSelfBase */
-               pSelfBase = pSelf->item.asArray.value;
-
-               /* Push current SuperClass handle */
-               lPopSuper = TRUE ;
-
-               if( ! pSelf->item.asArray.value->puiClsTree )
-               {
-                  pSelf->item.asArray.value->puiClsTree   = ( USHORT * ) hb_xgrab( sizeof( USHORT ) );
-                  pSelf->item.asArray.value->puiClsTree[0] = 0;
-               }
-
-               nPos = (USHORT) ( pSelfBase->puiClsTree[0] + 1 );
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos+1) ) ;
-               pSelfBase->puiClsTree[0] = nPos ;
-               pSelfBase->puiClsTree[ nPos ] = uiClass;
-            }
          }
 
          if( bSymbol )
@@ -8214,22 +8157,6 @@ static void hb_vmSetDivert( BOOL bDivertOf )
             pFunc();
          }
 
-         if( ( pSym != &hb_symEval ) && lPopSuper && pSelfBase->puiClsTree )
-         {
-            USHORT nPos = (USHORT) ( pSelfBase->puiClsTree[0] - 1 );
-
-            /* POP SuperClass handle */
-            if( nPos )
-            {
-               pSelfBase->puiClsTree = ( USHORT * ) hb_xrealloc( pSelfBase->puiClsTree, sizeof( USHORT ) * (nPos + 1) );
-               pSelfBase->puiClsTree[0] = nPos;
-            }
-            else
-            {
-               hb_xfree(pSelfBase->puiClsTree);
-               pSelfBase->puiClsTree = NULL ;
-            }
-         }
       }
 
       if( ( iFlags & DIVERT_RESUME ) == 0 )
