@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5910 2008/02/10 06:34:32 walito Exp $
+ * $Id: ChangeLog,v 1.5911 2008/02/10 07:55:49 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -37,6 +37,10 @@
              2. RECOMPILE of ALL .HRB files is a MUST!
     */
 
+2008-02-10  11:15 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+  * source/ct/files.c
+    ! fixed to return correct filesize on *nix when file >=4Gb
+    
 2008-02-10 04:00 UTC-0200 Walter Negro <anegro/at/overnet.com.ar>
   * Reinit Changelog
   + Changelog.027

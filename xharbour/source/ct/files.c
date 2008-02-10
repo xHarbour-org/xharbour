@@ -1,5 +1,5 @@
 /*
- * $Id: files.c,v 1.12 2007/11/26 18:33:52 ptsarenko Exp $
+ * $Id: files.c,v 1.13 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -59,6 +59,18 @@
 #include <hbapi.h>
 #include <hbapifs.h>
 
+#if !defined( HB_USE_LARGEFILE64 ) && defined( OS_UNIX_COMPATIBLE )
+   #if defined( __USE_LARGEFILE64 )
+      /*
+       * The macro: __USE_LARGEFILE64 is set when _LARGEFILE64_SOURCE is
+       * define and efectively enables lseek64/flock64/ftruncate64 functions
+       * on 32bit machines.
+       */
+      #define HB_USE_LARGEFILE64
+   #elif defined( HB_OS_HPUX ) && defined( O_LARGEFILE )
+      #define HB_USE_LARGEFILE64
+   #endif
+#endif
 #if defined( HB_OS_DOS ) && !defined( __WATCOMC__ )
    static struct ffblk fsOldFiles;
 #endif
@@ -565,29 +577,36 @@ HB_FUNC( FILESIZE )
       const char *szFile=hb_parcx( 1 );
       USHORT   ushbMask = FA_ARCH;
       USHORT   usFileAttr;
+#if  defined(__USE_LARGEFILE64)      
+      struct stat64 sStat;
+#else
       struct stat sStat;
+#endif      
 
       if ( ISNUM( 2 ) )
       {
          ushbMask=hb_parni( 2 );
       }
-
-      if ( stat( szFile,&sStat  ) != -1 )
+#if  defined(__USE_LARGEFILE64)      
+      if ( stat64( szFile,&sStat  ) != -1 )
+#else
+     if ( stat( szFile,&sStat  ) != -1 )
+#endif      
       {
          usFileAttr=osToHarbourMask( sStat.st_mode );
 
          if ( ( ushbMask>0 ) & ( ushbMask&usFileAttr ) )
-            hb_retnl( sStat.st_size );
+            hb_retnint( sStat.st_size );
          else
-            hb_retnl( sStat.st_size );
+            hb_retnint( sStat.st_size );
       }
       else
-         hb_retnl( -1 );
+         hb_retnint( -1 );
    }
 }
    #else
    {
-      hb_retl( -1 );
+      hb_retnint( -1 );
    }
    #endif
 }
