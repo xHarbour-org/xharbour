@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.152 2008/02/09 02:53:18 ronpinkas Exp $
+ * $Id: genc.c,v 1.153 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -698,11 +698,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             // No prototype for Namespace function calls!
             if( pFunc && pFunc->pNamespace )
             {
-               fprintf( yyc, "/* Skipped: call to %s resolved to: %s */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
+               fprintf( yyc, "/* Skipped: call to '%s' resolved of: '%s' */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
             }
             else
             {
-               fprintf( yyc, "/* Skipped: call to: %s in: %s */\n", pFunCall->szName, (char *) pFunCall->Namespace );
+               fprintf( yyc, "/* Skipped: call to: '%s' of: '%s' */\n", pFunCall->szName, (char *) pFunCall->Namespace );
             }
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
@@ -714,11 +714,22 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                if( pSym->Namespace )
                {
-                  fprintf( yyc, "/* Skipped DEFERRED call to: %s in: %s */\n", pSym->szName, ( (PNAMESPACE) pSym->Namespace )->szFullPath );
+                  if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
+                  {
+                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, ( (PNAMESPACE) pSym->Namespace )->szFullPath );
+                  }
+                  else if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
+                  {
+                     fprintf( yyc, "/* Skipped DEFERRED call to: '%s' of: '%s' */\n", pSym->szName, (char *) pSym->Namespace );
+                  }
+                  else
+                  {
+                     assert(0);
+                  }
                }
                else
                {
-                  fprintf( yyc, "/* Skipped DEFERRED call to: %s */\n", pSym );
+                  fprintf( yyc, "/* Skipped DEFERRED call to: '%s' */\n", pSym->szName );
                }
             }
             else if( hb_compCStaticSymbolFound( pFunCall->szName, HB_PROTO_FUNC_STATIC ) )
