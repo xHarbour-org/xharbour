@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.65 2008/02/06 01:09:47 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.66 2008/02/09 02:53:17 ronpinkas Exp $
  */
 
 /*
@@ -380,12 +380,12 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 #define SYMF_ALIAS       0x0001
 #define SYMF_FUNCALL     0x1000
 
-#define SYMF_NS_RUNTIME      ( SYMF_FUNCALL | 0x2000 )
-
 #define SYMF_NS_EXPLICITPATH ( SYMF_FUNCALL | 0x0010 )
 #define SYMF_NS_EXPLICITPTR  ( SYMF_FUNCALL | 0x0020 )
 #define SYMF_NS_RESOLVE      ( SYMF_FUNCALL | 0x0040 )
 #define SYMF_NS_MEMBER       ( SYMF_FUNCALL | 0x0080 )
+
+#define SYMF_NS_DEFER        ( SYMF_FUNCALL | SYMF_NS_EXPLICITPATH | 0x0100 )
 
 #define NSF_NONE         SYMF_FUNCALL
 
@@ -394,6 +394,7 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 #define NSF_EXPLICITPTR  SYMF_NS_EXPLICITPTR
 #define NSF_RESOLVE      SYMF_NS_RESOLVE
 #define NSF_MEMBER       SYMF_NS_MEMBER
+#define NSF_DEFER        SYMF_NS_DEFER
 
 #if ! defined(  HB_MACRO_SUPPORT )
 

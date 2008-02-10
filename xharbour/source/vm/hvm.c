@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.653 2008/02/06 18:58:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.654 2008/02/10 06:34:34 walito Exp $
  */
 
 /*
@@ -434,7 +434,7 @@ static void hb_vmDoInitError( void )
     */
    HB_THREAD_STUB_STACK
 
-   if( !hb_vmDoInitFunc( "__ERRORBLOCK" ) )
+   if( ! hb_vmDoInitFunc( "__ERRORBLOCK" ) )
    {
       hb_errInternal( HB_EI_ERRUNRECOV, "Error! missing __ErrorBlock()", NULL, NULL );
    }
@@ -474,6 +474,53 @@ static BOOL hb_vmDoInitFunc( char *pFuncSym )
    return FALSE;
 }
 
+void hb_vmSymbolResolveDeferred( void )
+{
+   PSYMBOLS pModuleSymbols = s_pSymbols;
+
+   while( pModuleSymbols )
+   {
+      if( ( pModuleSymbols->hScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
+      {
+         PHB_DYNS pDynSym;
+         PHB_SYMB pModuleSymbol;
+         register UINT ui;
+
+         //#define DEBUG_RESOLVE_SYMBOLS
+         #ifdef DEBUG_RESOLVE_SYMBOLS
+            TraceLog( NULL, "Resolve Module: '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
+         #endif
+
+         for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )
+         {
+            pModuleSymbol = pModuleSymbols->pSymbolTable + ui;
+
+            if( ( pModuleSymbol->scope.value & HB_FS_DEFERRED ) == HB_FS_DEFERRED /* && pModuleSymbol->value.pFunPtr == NULL */ )
+            {
+               pDynSym = hb_dynsymFind( pModuleSymbol->szName );
+
+               if ( pDynSym && pDynSym->pSymbol->value.pFunPtr )
+               {
+                  pModuleSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
+                  pModuleSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
+
+                  #ifdef DEBUG_RESOLVE_SYMBOLS
+                     TraceLog( NULL, "Resolved Deferred: '%s'\n", pModuleSymbol->szName );
+                  #endif
+               }
+            }
+         }
+      }
+     #ifdef DEBUG_RESOLVE_SYMBOLS
+      else
+      {
+         TraceLog( NULL, "Module: '%s' does NOT have any Deferred Symbols\n", pModuleSymbols->szModuleName );
+      }
+     #endif
+
+      pModuleSymbols = pModuleSymbols->pNext;
+   }
+}
 
 /* application entry point */
 void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
@@ -492,7 +539,6 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
    s_aStatics.type = HB_IT_NIL;
    s_iErrorLevel = 0;
    s_bDebugging = FALSE;
-
 
    s_pDynsDbgEntry = hb_dynsymFind( "__DBGENTRY" );
    hb_xinit();
@@ -565,6 +611,7 @@ void HB_EXPORT hb_vmInit( BOOL bStartMainProc )
 
    HB_TRACE( HB_TR_INFO, ("SymbolInit_RT") );
    hb_vmSymbolInit_RT();      /* initialize symbol table with runtime support functions */
+   hb_vmSymbolResolveDeferred();
 
    /* Set the language to the default */
    hb_langSelectID( HB_MACRO2STRING( HB_LANG_DEFAULT ) );
@@ -1398,7 +1445,7 @@ void HB_EXPORT hb_vmExecute( register const BYTE * pCode, register PHB_SYMB pSym
 
          case HB_P_FUNCTIONSHORT:
             HB_TRACE( HB_TR_DEBUG, ("HB_P_FUNCTIONSHORT") );
-            
+
             hb_itemSetNil( hb_stackReturnItem() );
             hb_vmDo( pCode[ w + 1 ] );
             hb_stackPushReturn();
@@ -9783,7 +9830,9 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    }
 #endif
 
+
 //#define DEBUG_SYMBOLS
+
 #ifdef DEBUG_SYMBOLS
    if( fDynLib )
    {
@@ -9851,7 +9900,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          if( ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
          {
             //TraceLog( NULL, "Local Function: '%s' of Module: '%s'\n", pSymbol->szName, szModuleName );
-            
+
             if( (void *)pSymbol->value.pFunPtr < (void *)pModuleFirstFunction || (void *)pSymbol->value.pFunPtr > (void *)pModuleLastFunction )
             {
                hSymScope            &= ~HB_FS_LOCAL;
@@ -9861,7 +9910,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
             }
             //else
             //{
-            //   TraceLog( NULL, "LINKED Local Function: '%s' of Module: '%s' %p > %p < %p\n", pSymbol->szName, szModuleName, pModuleFirstFunction, pSymbol->value.pFunPtr, pModuleLastFunction );            
+            //   TraceLog( NULL, "LINKED Local Function: '%s' of Module: '%s' %p > %p < %p\n", pSymbol->szName, szModuleName, pModuleFirstFunction, pSymbol->value.pFunPtr, pModuleLastFunction );
             //}
          }
 #endif
@@ -9902,7 +9951,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                             register UINT ui;
 
                             #ifdef DEBUG_SYMBOLS
-                               TraceLog( NULL, "Module: '%s' has Deferred Symbols\n", pModuleSymbols->szModuleName );
+                               TraceLog( NULL, "Module: '%s' has Deferred Symbols, resolving: '%s' \n", pModuleSymbols->szModuleName, pSymbol->szName );
                             #endif
 
                             for( ui = 0; ui < pModuleSymbols->uiModuleSymbols; ui++ )

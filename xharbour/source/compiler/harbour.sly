@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.144 2008/02/06 18:58:51 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.145 2008/02/09 02:53:19 ronpinkas Exp $
  */
 
 /*
@@ -3216,6 +3216,13 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
                                    if( hb_comp_UsedNamespaces.pFirst )
                                    {
                                       pNamespace = hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, $2 );
+
+                                      if( pNamespace == NULL && $2[0] == '*' )
+                                      {
+                                         pNamespace = hb_compUsedNamespaceNew( "*", NSTYPE_SPACE );
+                                         hb_compUsedNamespaceEnd();
+                                      }
+
                                    }
                                    else
                                    {

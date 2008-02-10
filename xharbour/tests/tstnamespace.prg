@@ -6,7 +6,11 @@
 
 USING NAMESPACE MyNamespace
 
+DYNAMIC HrbNamespace.HrbProc
+
 PROCEDURE Main()
+
+   LOCAL h
 
    // Because we have USING NAMESPACE MyNamespace we don't need explicit qualifier!
    Main()
@@ -29,10 +33,23 @@ PROCEDURE Main()
 
    // Namespace2 is a RUNTIME NS, so we can call it even in Macros.
    // Macro namespace calls must always be fully qualified as macro has no knowledge of WITH NAMESPACE, etc.
-   ? &( "MyNamespace2.Str(1000)" )
+   ? &( "MyNamespace2.Str( 1000 )" )
 
    MyOptional.SomeOptional()
    // Because this namespace is OPTIONAL we can also call it withOUT qualifier!
    SomeOptional()
 
+   __Run( "harbour namespace -gh -n -w -i../include" )
+   h := __hrbLoad( "namespace.hrb" )
+   HrbNamespace.HrbProc()
+   __hrbUnLoad( h )
+
 RETURN
+
+RUNTIME NAMESPACE DynNamespace
+
+   PROCEDURE SomeDyn()
+      ? ProcName()
+   RETURN
+
+END

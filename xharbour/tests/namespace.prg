@@ -1,3 +1,8 @@
+#ifdef __HRB__
+   // Callback into PRG host
+   DYNAMIC DynNamespace.SomeDyn
+#endif
+
 NAMESPACE MyNameSpace
 
    PROCEDURE Main()
@@ -25,12 +30,16 @@ NAMESPACE MyNameSpace
      // Call to member defined EXTERNALly by means of EXTERNAL NAMESPACE below!
      // WARNING 1: You can NOT use USING for Namespaces defined in SAME source because you'll create a cyclic dependancy!!!
      // WARNING 2: You MUST compile the EXTERNAL module FIRST!!!
-     MyNameSpace.SubExtern.Ext1()
+     #ifndef __HRB__
+        MyNameSpace.SubExtern.Ext1()
 
-     // STATIC members of EXTERNAL namespaces can not be accessed because they belong to a different compilation unit!
-     #ifdef SHOW_COMPILE_ERR
-        MyNameSpace.SubExtern.SubSubExtern.SubExtStatic()
+        // STATIC members of EXTERNAL namespaces can not be accessed because they belong to a different compilation unit!
+        #ifdef SHOW_COMPILE_ERR
+           MyNameSpace.SubExtern.SubSubExtern.SubExtStatic()
+        #endif
      #endif
+
+     MyOptional.SomeOptional()
 
    RETURN
 
@@ -60,10 +69,12 @@ NAMESPACE MyNameSpace
 
    END
 
-   // Complete sub level[s] definition at external compilation unit!
-   //NOTE: More than 1 namespace can use the *same* EXTERNAL NAMESPACE unit!
-   // WARNING: You MUST compile the extern module FIRST!!!
-   EXTERNAL NAMESPACE SubExtern
+   #ifndef __HRB__
+      // Complete sub level[s] definition at external compilation unit!
+      //NOTE: More than 1 namespace can use the *same* EXTERNAL NAMESPACE unit!
+      // WARNING: You MUST compile the extern module FIRST!!!
+      EXTERNAL NAMESPACE SubExtern
+   #endif
 
 END
 
@@ -92,3 +103,15 @@ OPTIONAL NAMESPACE MyOptional
   RETURN
 END
 
+#ifdef __HRB__
+   RUNTIME NAMESPACE HrbNamespace
+
+      PROCEDURE HrbProc()
+         ? ProcName()
+
+         // Callback into PRG host
+         DynNamespace.SomeDyn()
+      RETURN
+
+   END
+#endif

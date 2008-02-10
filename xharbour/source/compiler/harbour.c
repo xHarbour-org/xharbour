@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.181 2008/02/04 17:52:17 ronpinkas Exp $
+ * $Id: harbour.c,v 1.182 2008/02/09 02:53:18 ronpinkas Exp $
  */
 
 /*
@@ -953,6 +953,30 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
       }
 
       hb_comp_funcalls.iCount++;
+
+      if( ( pFunCall->iFlags & NSF_EXPLICITPATH ) == NSF_EXPLICITPATH && ( pFunCall->iFlags & NSF_DEFER ) != NSF_DEFER )
+      {
+         char *szNamespace = (char *) Namespace;
+         char *pTmp = strchr( szNamespace, '.' ) ;
+
+         if( pTmp )
+         {
+             pTmp[0] = '\0';
+         }
+
+         szNamespace = hb_compIdentifierNew( szNamespace, TRUE );
+
+         if( hb_compNamespaceFindName( hb_comp_Namespaces.pFirst, szNamespace ) == NULL && hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, szNamespace ) == NULL )
+         {
+            hb_compUsedNamespaceNew( szNamespace, NSTYPE_SPACE );
+            hb_compUsedNamespaceEnd();
+         }
+
+         if( pTmp )
+         {
+             pTmp[0] = '.';
+         }
+      }
    }
 
    return pFunCall;
@@ -966,14 +990,14 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
 void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cScope ) /* defines a new extern name */
 {
    PEXTERN pExtern, pLast;
+   PCOMSYMBOL pSym;
 
    pExtern = ( PEXTERN ) hb_xgrab( sizeof( _EXTERN ) );
 
    pExtern->szName      = szExternName;
    pExtern->szNamespace = szNamespace;
    pExtern->cScope      = cScope;
-
-   pExtern->pNext  = NULL;
+   pExtern->pNext       = NULL;
 
    if( hb_comp_pExterns == NULL )
    {
@@ -989,6 +1013,58 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
       }
 
       pLast->pNext = pExtern;
+   }
+
+   if( szNamespace )
+   {
+      PNAMESPACE pNamespace;
+      char *szConcat = hb_xstrcpy( NULL, szNamespace, ".", szExternName, NULL );
+
+      szNamespace = hb_compIdentifierNew( szConcat, FALSE );
+
+      pNamespace = hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, szNamespace );
+
+      if( pNamespace )
+      {
+         //TODO: Duplicate error!
+      }
+      else
+      {
+         hb_compUsedNamespaceNew( szNamespace, NSF_DEFER );
+      }
+
+      pSym = hb_compSymbolFind( pExtern->szName, NULL, (void *) pExtern->szNamespace, SYMF_NS_EXPLICITPATH );
+
+      if( pSym == NULL )
+      {
+         pSym = hb_compSymbolAdd( pExtern->szName, NULL, pExtern->szNamespace, SYMF_NS_EXPLICITPATH );
+      }
+
+      if( pExtern->cScope & HB_FS_DEFERRED )
+      {
+         hb_compFunCallAdd( pExtern->szName, pExtern->szNamespace, NSF_DEFER );
+      }
+      else
+      {
+         hb_compFunCallAdd( pExtern->szName, pExtern->szNamespace, NSF_EXPLICITPATH );
+      }
+
+   }
+   else
+   {
+      pSym = hb_compSymbolFind( pExtern->szName, NULL, NULL, SYMF_FUNCALL );
+
+      if( pSym == NULL )
+      {
+         pSym = hb_compSymbolAdd( pExtern->szName, NULL, NULL, SYMF_FUNCALL );
+      }
+
+      hb_compFunCallAdd( pExtern->szName, NULL, NSF_NONE );
+   }
+
+   if( ( pExtern->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
+   {
+      pSym->cScope |= HB_FS_DEFERRED;
    }
 
 /*
@@ -2444,23 +2520,23 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
            ( ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME ) ||
              ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) ) ) ) )
    {
-      pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
-
-      if( pSym == NULL )
-      {
-         pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
-      }
-
       if( hb_comp_Namespaces.pCurrent )
       {
-      	 if( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
-      	 {
-            pSym->iFlags |= ( SYMF_NS_RUNTIME | SYMF_NS_EXPLICITPTR );
+         pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
+
+         if( pSym == NULL )
+         {
+            pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
          }
-         //else
-         //{
-            //pSym->iFlags |= SYMF_NS_EXPLICITPTR;
-         //}
+      }
+      else
+      {
+         pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+
+         if( pSym == NULL )
+         {
+            pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+         }
       }
 
       pSym->cScope |= ( HB_FS_LOCAL | cScope );
@@ -2705,53 +2781,6 @@ void hb_compGenEndWithObject( void )
       hb_comp_wWithObjCounter--;
 }
 
-void hb_compExternGen( void ) /* generates the symbols for the EXTERN names */
-{
-   PEXTERN pDelete;
-
-   if( hb_comp_bDebugInfo )
-   {
-      hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, (HB_SYMBOLSCOPE) 0 );
-   }
-
-   while( hb_comp_pExterns )
-   {
-      PCOMSYMBOL pSym;
-
-      if( hb_comp_pExterns->szNamespace )
-      {
-         pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, (void *) hb_comp_pExterns->szNamespace, SYMF_NS_EXPLICITPATH );
-
-         if( pSym == NULL )
-         {
-            pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, hb_comp_pExterns->szNamespace, SYMF_NS_EXPLICITPATH );
-         }
-
-         hb_compFunCallAdd( hb_comp_pExterns->szName, hb_comp_pExterns->szNamespace, NSF_EXPLICITPATH );
-      }
-      else
-      {
-         pSym = hb_compSymbolFind( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
-
-         if( pSym == NULL )
-         {
-            pSym = hb_compSymbolAdd( hb_comp_pExterns->szName, NULL, NULL, SYMF_FUNCALL );
-         }
-
-         hb_compFunCallAdd( hb_comp_pExterns->szName, NULL, NSF_NONE );
-      }
-
-      if( ( hb_comp_pExterns->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
-      {
-         pSym->cScope |= HB_FS_DEFERRED;
-      }
-
-      pDelete  = hb_comp_pExterns;
-      hb_comp_pExterns = hb_comp_pExterns->pNext;
-      hb_xfree( ( void * ) pDelete );
-   }
-}
-
 PFUNCALL hb_compFunCallFind( char * szFuncName, void *Namespace, int iFlags ) /* returns a previously called defined function */
 {
    PFUNCALL pFunCall = hb_comp_funcalls.pFirst;
@@ -2786,6 +2815,13 @@ PFUNCTION hb_compFunctionFind( char * szFunctionName, void *Namespace, int iFlag
                return pFunc;
             }
             else if( pFunc->pNamespace && pFunc->pNamespace->szFullPath == (char *) Namespace )
+            {
+               return pFunc;
+            }
+         }
+         else if( ( iFlags & NSF_EXPLICITPTR ) == NSF_EXPLICITPTR )
+         {
+            if( pFunc->pNamespace == (PNAMESPACE) Namespace )
             {
                return pFunc;
             }
@@ -6020,7 +6056,7 @@ PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType )
    pNew->iID    = 0;
    pNew->pNext  = NULL;
 
-   if( hb_comp_UsedNamespaces.pCurrent )
+   if( hb_comp_UsedNamespaces.pCurrent && ( ( iType & NSF_EXPLICITPATH ) != NSF_EXPLICITPATH ) )
    {
       char *szFullPath = (char *) hb_xgrab( strlen( hb_comp_UsedNamespaces.pCurrent->szFullPath ) + 1 + strlen( szName ) + 1 );
 
@@ -6157,6 +6193,10 @@ static int hb_compCompile( char * szPrg )
 
       /* Clear and reinitialize preprocessor state */
       hb_pp_reset( hb_comp_PP );
+      if( hb_comp_iLanguage == LANG_PORT_OBJ )
+      {
+         hb_pp_addDefine( hb_comp_PP, "__HRB__", "1" );
+      }
 
       hb_comp_FileAsSymbol = hb_comp_pFileName->szName ;
 
@@ -6347,7 +6387,23 @@ static int hb_compCompile( char * szPrg )
             /* fix all previous function returns offsets */
             hb_compFinalizeFunction();
 
-            hb_compExternGen();       /* generates EXTERN symbols names */
+            if( hb_comp_bDebugInfo )
+            {
+               hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
+            }
+
+            if( hb_comp_pExterns )
+            {
+               PEXTERN pDelete;
+
+               do
+               {
+                  pDelete  = hb_comp_pExterns;
+                  hb_comp_pExterns = hb_comp_pExterns->pNext;
+                  hb_xfree( ( void * ) pDelete );
+               }
+               while( hb_comp_pExterns );
+            }
 
             if( hb_comp_pInitFunc )
             {

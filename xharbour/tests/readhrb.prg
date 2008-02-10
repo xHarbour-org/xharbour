@@ -1,5 +1,5 @@
 //
-// $Id: readhrb.prg,v 1.1.1.1 2001/12/21 10:46:24 ronpinkas Exp $
+// $Id: readhrb.prg,v 1.2 2004/11/25 23:01:03 mauriliolongo Exp $
 //
 
 /*
@@ -30,14 +30,18 @@ function Main( cFrom )
    local nLenCount
    local nIdx
    local aTypes := { "NOLINK", "FUNC", "EXTERN" }
-   local aScopes  := { { "HB_FS_PUBLIC", 0x01 } ,;
-                       { "HB_FS_STATIC", 0x02 } ,;
-                       { "HB_FS_FIRST",  0x04 } ,;
-                       { "HB_FS_INIT" ,  0x08 } ,;
-                       { "HB_FS_EXIT" ,  0x10 } ,;
-                       { "HB_FS_CRITICAL", 0x20 },;
-                       { "HB_FS_MESSAGE" , 0x40 } ,;
-                       { "HB_FS_MEMVAR"  , 0x80  } }
+   local aScopes  := { { "HB_FS_PUBLIC"  , 0x0001 },;
+                       { "HB_FS_STATIC"  , 0x0002 },;
+                       { "HB_FS_FIRST"   , 0x0004 },;
+                       { "HB_FS_INIT"    , 0x0008 },;
+                       { "HB_FS_EXIT"    , 0x0010 },;
+                       { "HB_FS_CRITICAL", 0x0020 },;
+                       { "HB_FS_MESSAGE" , 0x0040 },;
+                       { "HB_FS_MEMVAR"  , 0x0080 },; 
+                       { "HB_FS_LOCAL"   , 0x0200 },; 
+                       { "HB_FS_DYNCODE" , 0x0400 },; 
+                       { "HB_FS_DEFERRED", 0x0800 }; 
+                     }
 
    set( _SET_EXACT, .T. )
    set( _SET_ALTERNATE, "readhrb.out" )
@@ -57,10 +61,11 @@ function Main( cFrom )
       fReadStr( hFile, 6 )
 
       cBlock := fReadStr( hFile, 4 )
-      nSymbols := asc(substr(cBlock,1,1))           +;
-                  asc(substr(cBlock,2,1)) *256      +;
-                  asc(substr(cBlock,3,1)) *65536    +;
-                  asc(substr(cBlock,4,1)) *16777216
+      
+      nSymbols := asc(substr(cBlock,1,1))            +;
+                  asc(substr(cBlock,2,1)) * 256      +;
+                  asc(substr(cBlock,3,1)) * 65536    +;
+                  asc(substr(cBlock,4,1)) * 16777216
 
       for n := 1 to nSymbols
          cFrom := ""
@@ -72,16 +77,23 @@ function Main( cFrom )
 
          QQOut(PadR(cFrom, 20))
 
-         cBLock := fReadStr( hFile, 1 )
-         QQOut(" Scope ", Hex2Val(asc(cBlock)))
-         nScope := Asc(cBlock)
+         cBLock := fReadStr( hFile, 4 )
+         
+         nScope := asc(substr(cBlock,1,1))            +;
+                   asc(substr(cBlock,2,1)) * 256      +;
+                   asc(substr(cBlock,3,1)) * 65536    +;
+                   asc(substr(cBlock,4,1)) * 16777216
+         
+         QQOut(" Scope ", nScope )
          cBlock := " "
+         
          for m := 1 to Len(aScopes)
             if ( nScope & aScopes[m][2] ) == aScopes[m][2]
                cBlock += aScopes[m][1] + "|"
             endif
          next
-         cBlock[Len(cBlock)] := ""
+         
+         cBlock[-1] := ""
          QQOut(cBlock)
          cBlock := fReadStr( hFile, 1 )
          nIdx   := asc( cBlock ) + 1
@@ -142,5 +154,4 @@ return HexDigit( int(nVal / 16) ) + HexDigit( int(nVal % 16) )
 function HexDigit( nDigit )
 
 return if(nDigit>=10, chr( 55 + nDigit ), chr( 48 + nDigit ) )
-
 

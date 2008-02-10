@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.70 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.71 2008/02/10 06:34:33 walito Exp $
  */
 
 /*
@@ -426,12 +426,7 @@
 
    #define HB_FS_INITEXIT  ( HB_FS_INIT | HB_FS_EXIT )
 
-   /*
-    * These two flags can never be used together in USER code
-    * Make sure to use like this:
-    * ( ( cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
-    */
-   #define HB_FS_INDIRECT  ( HB_FS_LOCAL | HB_FS_DEFERRED )
+   #define HB_FS_INDIRECT  ( ( HB_SYMBOLSCOPE ) 0x4000 )
 
    /*
     * be careful !!! the symbols: HB_FS_INITEXIT is bitfield.

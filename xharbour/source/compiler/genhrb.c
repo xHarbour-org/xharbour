@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.4 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: genhrb.c,v 1.5 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -44,10 +44,14 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    FILE * yyc;             /* file handle for C output */
 
    if( ! pFileName->szExtension )
+   {
       pFileName->szExtension = ".hrb";
+   }
+
    hb_fsFNameMerge( szFileName, pFileName );
 
    yyc = hb_fopen( szFileName, "wb" );
+
    if( ! yyc )
    {
       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_CREATE_OUTPUT, szFileName, NULL );
@@ -63,11 +67,13 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    /* writes the symbol table */
 
    lSymbols = 0;                /* Count number of symbols */
+
    while( pSym )
    {
       lSymbols++;
       pSym = pSym->pNext;
    }
+
    fputc( ( BYTE ) 192, yyc );
    fputs( "HRB", yyc );
    fputc( 2, yyc );
@@ -79,10 +85,131 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    fputc( ( BYTE ) ( ( lSymbols >> 24 ) & 255 ), yyc );
 
    pSym = hb_comp_symbols.pFirst;
+
    while( pSym )
    {
+      pFunc = NULL;
+
+      if( ( pSym->iFlags & SYMF_FUNCALL ) >= SYMF_FUNCALL )
+      {
+         //printf( "Sym: '%s' Namespace: '%s', Scope: %i\n", pSym->szName, pSym->szNamespace, pSym->cScope );
+
+         if( ( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH ) || ( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR ) )
+         {
+            if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
+            {
+               pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPATH );
+            }
+            else
+            {
+               pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPTR );
+            }
+
+            if( pFunc )
+            {
+               pSym->cScope |= HB_FS_LOCAL;
+
+               if( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+               {
+               }
+               else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+               {
+               }
+               else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+               {
+               }
+               else
+               {
+                  pSym->cScope |= HB_FS_STATIC;
+               }
+            }
+            else
+            {
+               if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
+               {
+                  pSym->cScope |= HB_FS_INDIRECT;
+               }
+            }
+         }
+         else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
+         {
+            pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace );
+
+            if( pFunc && pFunc->pNamespace )
+            {
+               if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
+               {
+                  pSym->cScope |= HB_FS_STATIC;
+               }
+
+               pSym->cScope |= HB_FS_LOCAL;
+
+               pSym->iFlags &= ~SYMF_NS_RESOLVE;
+               pSym->iFlags |= SYMF_NS_EXPLICITPTR;
+
+               pSym->Namespace = (void *) pFunc->pNamespace;
+            }
+            else
+            {
+               pSym->iFlags &= ~SYMF_NS_RESOLVE;
+               pSym->iFlags |= SYMF_FUNCALL;
+
+               pSym->Namespace = NULL;
+
+               if( pFunc == NULL )
+               {
+                  pFunc = hb_compFunctionFind( pSym->szName, NULL, SYMF_FUNCALL );
+
+                  if( pFunc )
+                  {
+                     pSym->cScope |= HB_FS_LOCAL;
+                  }
+               }
+            }
+         }
+         else if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
+         {
+            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPTR );
+         }
+         else if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
+         {
+            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags );
+         }
+         else if( ( pSym->cScope & HB_FS_LOCAL ) != HB_FS_LOCAL )
+         {
+            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags );
+
+            /* is it a function defined in this module */
+            if( pFunc )
+            {
+               pSym->cScope |= HB_FS_LOCAL;
+            }
+         }
+      }
+
+      if( pSym->Namespace )
+      {
+         if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
+         {
+            if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
+            {
+               fputs( ( (PNAMESPACE) pSym->Namespace )->szFullPath, yyc );
+               fputc( '.', yyc );
+            }
+         }
+         else if( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH )
+         {
+            if( pFunc == NULL || ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL ) )
+            {
+               fputs( (char *) pSym->Namespace, yyc );
+               fputc( '.', yyc );
+            }
+         }
+      }
+
       fputs( pSym->szName, yyc );
       fputc( 0, yyc );
+
       hSymScope = pSym->cScope;
 
       if( ( hSymScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) != 0 )
@@ -90,17 +217,20 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          hSymScope &= ~HB_FS_PUBLIC;
       }
 
-      fputc( hSymScope, yyc );
+      fputc( ( BYTE ) ( ( hSymScope       ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( hSymScope >> 8  ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( hSymScope >> 16 ) & 255 ), yyc );
+      fputc( ( BYTE ) ( ( hSymScope >> 24 ) & 255 ), yyc );
 
       /* specify the function address if it is a defined function or a
          external called function */
-      if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) /* is it a defined function ? */
+      if( pFunc ) /* is it a defined function ? */
       {
          fputc( SYM_FUNC, yyc );
       }
       else
       {
-         if( hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
+         if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL )//hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
          {
             fputc( SYM_EXTERN, yyc );
          }
@@ -109,19 +239,25 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
             fputc( SYM_NOLINK, yyc );
          }
       }
+
       pSym = pSym->pNext;
    }
 
    pFunc = hb_comp_functions.pFirst;
+
    if( ! hb_comp_bStartProc )
+   {
       pFunc = pFunc->pNext;
+   }
 
    lSymbols = 0;                /* Count number of symbols */
+
    while( pFunc )
    {
       lSymbols++;
       pFunc = pFunc->pNext;
    }
+
    fputc( ( BYTE ) ( ( lSymbols       ) & 255 ), yyc ); /* Write number symbols */
    fputc( ( BYTE ) ( ( lSymbols >> 8  ) & 255 ), yyc );
    fputc( ( BYTE ) ( ( lSymbols >> 16 ) & 255 ), yyc );
@@ -135,8 +271,18 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
    while( pFunc )
    {
+      if( pFunc->pNamespace )
+      {
+         if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
+         {
+            fputs( pFunc->pNamespace->szFullPath, yyc );
+            fputc( '.', yyc );
+         }
+      }
+
       fputs( pFunc->szName, yyc );
       fputc( 0, yyc );
+
       ulCodeLength = pFunc->lPCodePos;
       fputc( ( BYTE ) ( ( ulCodeLength       ) & 255 ), yyc ); /* Write size */
       fputc( ( BYTE ) ( ( ulCodeLength >> 8  ) & 255 ), yyc );

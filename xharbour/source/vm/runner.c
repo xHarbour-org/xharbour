@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.50 2007/04/25 01:37:12 ronpinkas Exp $
+ * $Id: runner.c,v 1.51 2007/11/27 00:06:44 andijahja Exp $
  */
 
 /*
@@ -577,8 +577,8 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       {
          PHB_SYMB pSymbol = pSymRead + ul;
 
-         pSymbol->szName  = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
-         pSymbol->scope.value  = ( BYTE ) szHrbBody[ulBodyOffset++];
+         pSymbol->szName          = hb_hrbReadId( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
+         pSymbol->scope.value     = ( HB_SYMBOLSCOPE ) hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
          pSymbol->value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
 
          if( ( pSymbol->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) == 0 )
@@ -654,6 +654,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
                char szName[21];
 
                strncpy( szName, pSymRead[ ul ].szName, 20 );
+               szName[20] = '\0';
 
                hb_hrbUnLoad( pHrbBody );
                hb_errRT_BASE( EG_ARG, 9999, "Unknown or unregistered symbol", szName, 0 );

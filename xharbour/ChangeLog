@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5909 2008/02/09 16:22:37 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5910 2008/02/10 06:34:32 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-10 03:00 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbcomp.h
+  * include/hbdefs.h
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/vm/hvm.c
+  * source/vm/runner.c
+    + Added support for Namespace Publishing & Consuming to HRB compiled modules.
+
+  * source/compiler/harbour.c
+    + Adde auto define __HRB__ when -gh is used
+
+  * tests/readhrb.prg
+    * Updated for latest hrb format
+
+  * tests/namespace.prg
+  * tests/dynamic.prg
+  * tests/tstnamespace.prg
+    * Updated to show dynamic namespace usage into/outof HRB compiled modules
+
+   /*
+      NOTES:
+             1. CLEAN BUILD is a MUST!
+             2. RECOMPILE of ALL .HRB files is a MUST!
+    */
 
 2008-02-10 04:00 UTC-0200 Walter Negro <anegro/at/overnet.com.ar>
   * Reinit Changelog
