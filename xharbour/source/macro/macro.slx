@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.33 2008/02/09 02:53:19 ronpinkas Exp $
+ * $Id: macro.slx,v 1.34 2008/02/11 01:27:49 ronpinkas Exp $
  */
 
 /*
@@ -272,12 +272,7 @@ CONDITIONAL_DELIMITERS_ARE         {
                                          if( iLen == 0 ) \
                                          { \
                                             bAccept = ! ( isdigit( szBuffer[0] ) || \
-                                                          ( szBuffer[0] == '.' && szBuffer[1] == '.' ) || \
-                                                          ( strchr( "tfynTFYN", szBuffer[0] ) && szBuffer[1] == '.' ) || \
-                                                          ( toupper( szBuffer[0] ) == 'A' && toupper( szBuffer[1] ) == 'N' && toupper( szBuffer[2] ) == 'D' && szBuffer[3] == '.' ) || \
-                                                          ( toupper( szBuffer[0] ) == 'N' && toupper( szBuffer[1] ) == 'O' && toupper( szBuffer[2] ) == 'T' && szBuffer[3] == '.' ) || \
-                                                          ( toupper( szBuffer[0] ) == 'O' && toupper( szBuffer[1] ) == 'R' && szBuffer[2] == '.' ) || \
-                                                          ( toupper( szBuffer[0] ) == 'N' && toupper( szBuffer[1] ) == 'U' && toupper( szBuffer[2] ) == 'L' && toupper( szBuffer[3] ) == 'L' && szBuffer[4] == '.' ) \
+                                                          ( szBuffer[0] == '.' && szBuffer[1] == '.' ) \
                                                         ); \
                                          } \
                                          else \
@@ -300,29 +295,29 @@ CONDITIONAL_DELIMITERS_ARE         {
                                          if( bAccept )
 
 ACCEPT_TOKEN_AND_RETURN_DELIMITERS {
-                                     LEX_DELIMITER( ','  ) AS_TOKEN( ','   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '('  ) AS_TOKEN( '(' ),
-                                     LEX_DELIMITER( ')'  ) AS_TOKEN( ')' ),
-                                     LEX_DELIMITER( '['  ) AS_TOKEN( '[' ),
-                                     LEX_DELIMITER( ']'  ) AS_TOKEN( ']'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '}'  ) AS_TOKEN( '}'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( ':'  ) AS_TOKEN( ':' ),
-                                     LEX_DELIMITER( '='  ) AS_TOKEN( '='   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '#'  ) AS_TOKEN( NE1   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '@'  ) AS_TOKEN( '@'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '<'  ) AS_TOKEN( '<'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '>'  ) AS_TOKEN( '>'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '!'  ) AS_TOKEN( NOT   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK ),
-                                     LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
-                                     LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR    + DONT_REDUCE ),
-                                     LEX_DELIMITER( '^' )  AS_TOKEN( POWER + DONT_REDUCE ),
-                                     LEX_DELIMITER( '%'  ) AS_TOKEN( '%'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '*'  ) AS_TOKEN( '*'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '/'  ) AS_TOKEN( '/'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '+'  ) AS_TOKEN( '+'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '-'  ) AS_TOKEN( '-'   + DONT_REDUCE ),
-                                     LEX_DELIMITER( '$'  ) AS_TOKEN( '$'   + DONT_REDUCE )
+                                     LEX_DELIMITER( ','  ) AS_TOKEN( ','          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '('  ) AS_TOKEN( '('                        ),
+                                     LEX_DELIMITER( ')'  ) AS_TOKEN( ')'                        ),
+                                     LEX_DELIMITER( '['  ) AS_TOKEN( '['                        ),
+                                     LEX_DELIMITER( ']'  ) AS_TOKEN( ']'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '}'  ) AS_TOKEN( '}'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( ':'  ) AS_TOKEN( ':'                        ),
+                                     LEX_DELIMITER( '='  ) AS_TOKEN( '='          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '#'  ) AS_TOKEN( NE1          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '@'  ) AS_TOKEN( '@'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '<'  ) AS_TOKEN( '<'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '>'  ) AS_TOKEN( '>'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '!'  ) AS_TOKEN( NOT          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '{'  ) AS_TOKEN( HB_CHK_BLOCK               ),
+                                     LEX_DELIMITER( '\\' ) AS_TOKEN( CBMARKER     + DONT_REDUCE ), /* CodeBlock Marker '|' converted to '\' */
+                                     LEX_DELIMITER( '|'  ) AS_TOKEN( BITOR        + DONT_REDUCE ),
+                                     LEX_DELIMITER( '^' )  AS_TOKEN( POWER        + DONT_REDUCE ),
+                                     LEX_DELIMITER( '%'  ) AS_TOKEN( '%'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '*'  ) AS_TOKEN( '*'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '/'  ) AS_TOKEN( '/'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '+'  ) AS_TOKEN( '+'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '-'  ) AS_TOKEN( '-'          + DONT_REDUCE ),
+                                     LEX_DELIMITER( '$'  ) AS_TOKEN( '$'          + DONT_REDUCE )
 				   };
 
 #define HB_AFTER_EXP    LEX_CUSTOM_ACTION - 2560 /* IN, LIKE, MATCH */
@@ -343,30 +338,35 @@ START_NEW_LINE_IF_ONE_OF_THESE( "\n;" );
 #define HB_SELF         LEX_CUSTOM_ACTION - 3
 
 SELF_CONTAINED_WORDS_ARE {
-                           LEX_WORD( ".AND." ) AS_TOKEN( AND      + DONT_REDUCE ),
-                           LEX_WORD( ".NOT." ) AS_TOKEN( NOT      + DONT_REDUCE ),
-                           LEX_WORD( ".OR."  ) AS_TOKEN( OR       + DONT_REDUCE ),
-                           LEX_WORD( ":="    ) AS_TOKEN( INASSIGN + DONT_REDUCE ),
-                           LEX_WORD( "::"    ) AS_TOKEN( HB_SELF    ),
-                           LEX_WORD( "=="    ) AS_TOKEN( EQ       + DONT_REDUCE ),
-                           LEX_WORD( "=>"    ) AS_TOKEN( HASHOP   + DONT_REDUCE ),
-                           LEX_WORD( "<<"    ) AS_TOKEN( BITSHIFTL  + DONT_REDUCE ),
-                           LEX_WORD( "<>"    ) AS_TOKEN( NE2      + DONT_REDUCE ),
-                           LEX_WORD( "<="    ) AS_TOKEN( LE       + DONT_REDUCE ),
-                           LEX_WORD( ">="    ) AS_TOKEN( GE       + DONT_REDUCE ),
-                           LEX_WORD( ">>"    ) AS_TOKEN( BITSHIFTR  + DONT_REDUCE ),
-                           LEX_WORD( "!="    ) AS_TOKEN( NE2      + DONT_REDUCE ),
-                           LEX_WORD( "++"    ) AS_TOKEN( INC      + DONT_REDUCE ),
-                           LEX_WORD( "+="    ) AS_TOKEN( PLUSEQ   + DONT_REDUCE ),
-                           LEX_WORD( "--"    ) AS_TOKEN( DEC      + DONT_REDUCE ),
-                           LEX_WORD( "-="    ) AS_TOKEN( MINUSEQ  + DONT_REDUCE ),
-                           LEX_WORD( "->"    ) AS_TOKEN( ALIASOP    ),
-                           LEX_WORD( "*="    ) AS_TOKEN( MULTEQ   + DONT_REDUCE ),
-                           LEX_WORD( "**"    ) AS_TOKEN( POWER    + DONT_REDUCE ),
-                           LEX_WORD( "/="    ) AS_TOKEN( DIVEQ    + DONT_REDUCE ),
-                           LEX_WORD( "^="    ) AS_TOKEN( EXPEQ    + DONT_REDUCE ),
-                           LEX_WORD( "^^"    ) AS_TOKEN( BITXOR   + DONT_REDUCE ),
-                           LEX_WORD( "%="    ) AS_TOKEN( MODEQ    + DONT_REDUCE )
+                           LEX_WORD( ".AND."  ) AS_TOKEN( AND        + DONT_REDUCE ),
+                           LEX_WORD( ".F."    ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
+                           LEX_WORD( ".N."    ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
+                           LEX_WORD( ".NOT."  ) AS_TOKEN( NOT        + DONT_REDUCE ),
+                           LEX_WORD( ".NULL." ) AS_TOKEN( NULLVALUE  + DONT_REDUCE ),
+                           LEX_WORD( ".T."    ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
+                           LEX_WORD( ".Y."    ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
+                           LEX_WORD( ".OR."   ) AS_TOKEN( OR         + DONT_REDUCE ),
+                           LEX_WORD( ":="     ) AS_TOKEN( INASSIGN   + DONT_REDUCE ),
+                           LEX_WORD( "::"     ) AS_TOKEN( HB_SELF                  ),
+                           LEX_WORD( "=="     ) AS_TOKEN( EQ         + DONT_REDUCE ),
+                           LEX_WORD( "=>"     ) AS_TOKEN( HASHOP     + DONT_REDUCE ),
+                           LEX_WORD( "<<"     ) AS_TOKEN( BITSHIFTL  + DONT_REDUCE ),
+                           LEX_WORD( "<>"     ) AS_TOKEN( NE2        + DONT_REDUCE ),
+                           LEX_WORD( "<="     ) AS_TOKEN( LE         + DONT_REDUCE ),
+                           LEX_WORD( ">="     ) AS_TOKEN( GE         + DONT_REDUCE ),
+                           LEX_WORD( ">>"     ) AS_TOKEN( BITSHIFTR  + DONT_REDUCE ),
+                           LEX_WORD( "!="     ) AS_TOKEN( NE2        + DONT_REDUCE ),
+                           LEX_WORD( "++"     ) AS_TOKEN( INC        + DONT_REDUCE ),
+                           LEX_WORD( "+="     ) AS_TOKEN( PLUSEQ     + DONT_REDUCE ),
+                           LEX_WORD( "--"     ) AS_TOKEN( DEC        + DONT_REDUCE ),
+                           LEX_WORD( "-="     ) AS_TOKEN( MINUSEQ    + DONT_REDUCE ),
+                           LEX_WORD( "->"     ) AS_TOKEN( ALIASOP                  ),
+                           LEX_WORD( "*="     ) AS_TOKEN( MULTEQ     + DONT_REDUCE ),
+                           LEX_WORD( "**"     ) AS_TOKEN( POWER      + DONT_REDUCE ),
+                           LEX_WORD( "/="     ) AS_TOKEN( DIVEQ      + DONT_REDUCE ),
+                           LEX_WORD( "^="     ) AS_TOKEN( EXPEQ      + DONT_REDUCE ),
+                           LEX_WORD( "^^"     ) AS_TOKEN( BITXOR     + DONT_REDUCE ),
+                           LEX_WORD( "%="     ) AS_TOKEN( MODEQ      + DONT_REDUCE )
                          };
 
 /* Intermediate Words when ambigious. */
@@ -379,10 +379,6 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* Words. */
 LANGUAGE_WORDS_ARE {
-                     LEX_WORD( ".F."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
-                     LEX_WORD( ".N."          ) AS_TOKEN( FALSEVALUE + DONT_REDUCE  ),
-                     LEX_WORD( ".T."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
-                     LEX_WORD( ".Y."          ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE  ),
                      LEX_WORD( "AM"           ) AS_TOKEN( HB_H12AM    ),
                   /* LEX_WORD( "FIELD"        ) AS_TOKEN( FIELD       ), */
                      LEX_WORD( "FIELD?WS?->"  ) AS_TOKEN( HB_FIELD_ALIAS     ),
