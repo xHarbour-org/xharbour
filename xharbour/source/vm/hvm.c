@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.655 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: hvm.c,v 1.656 2008/02/11 01:36:34 walito Exp $
  */
 
 /*
@@ -8136,7 +8136,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
       }
       else
       {
-         BOOL bConstructor = FALSE, bSymbol = FALSE
+         BOOL bConstructor = FALSE, bSymbol = FALSE;
          PHB_BASEARRAY pSelfBase = pSelf->item.asArray.value;
 
          pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
