@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.153 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: genc.c,v 1.154 2008/02/10 19:09:35 ronpinkas Exp $
  */
 
 /*
@@ -1376,8 +1376,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          printf( "Done.\n" );
       }
    }
-
-   hb_xfree( hb_comp_PrgFileName );
 
    pTemp = pStatSymb;
 

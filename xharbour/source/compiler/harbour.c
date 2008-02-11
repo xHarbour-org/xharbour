@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.182 2008/02/09 02:53:18 ronpinkas Exp $
+ * $Id: harbour.c,v 1.183 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -6298,7 +6298,6 @@ static int hb_compCompile( char * szPrg )
          }
       }
 
-
       if( iStatus == EXIT_SUCCESS )
       {
          /* Initialize support variables */
@@ -6392,18 +6391,6 @@ static int hb_compCompile( char * szPrg )
                hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
             }
 
-            if( hb_comp_pExterns )
-            {
-               PEXTERN pDelete;
-
-               do
-               {
-                  pDelete  = hb_comp_pExterns;
-                  hb_comp_pExterns = hb_comp_pExterns->pNext;
-                  hb_xfree( ( void * ) pDelete );
-               }
-               while( hb_comp_pExterns );
-            }
 
             if( hb_comp_pInitFunc )
             {
@@ -6490,7 +6477,6 @@ static int hb_compCompile( char * szPrg )
                   pSym->cScope = HB_FS_INITEXIT;
                }
             }
-
 
             if( hb_comp_szAnnounce )
             {
@@ -6588,20 +6574,6 @@ static int hb_compCompile( char * szPrg )
             /* printf( "No code generated\n" ); */
             iStatus = EXIT_FAILURE;
          }
-
-         /*
-         while( hb_comp_pExterns )
-         {
-            PEXTERN pExtern = hb_comp_pExterns;
-
-            hb_comp_pExterns = hb_comp_pExterns->pNext;
-
-            hb_xfree( pExtern->szName );
-            hb_xfree( pExtern );
-         }
-
-         hb_comp_bExternal = FALSE;
-         */
       }
    }
    else
@@ -6610,10 +6582,12 @@ static int hb_compCompile( char * szPrg )
       iStatus = EXIT_FAILURE;
    }
 
+   hb_xfree( hb_comp_PrgFileName );
+
    hb_compReleaseRTVars();
    hb_compReleaseLoops();
    hb_compReleaseElseIfs();
-
+   
    if( hb_comp_functions.pFirst )
    {
       PFUNCTION pFunc = hb_comp_functions.pFirst;
@@ -6643,6 +6617,20 @@ static int hb_compCompile( char * szPrg )
       while( pFunCall );
    }
 
+   if( hb_comp_pExterns )
+   {
+      PEXTERN pDelete;
+
+      do
+      {
+         pDelete  = hb_comp_pExterns;
+         hb_comp_pExterns = hb_comp_pExterns->pNext;
+         hb_xfree( ( void * ) pDelete );
+      }
+      while( hb_comp_pExterns );
+   }
+   
+   
    if( hb_comp_inlines.pFirst )
    {
       PINLINE pInline = hb_comp_inlines.pFirst;
