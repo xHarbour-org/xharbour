@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.34 2008/02/11 01:27:49 ronpinkas Exp $
+ * $Id: macro.slx,v 1.35 2008/02/11 02:20:14 ronpinkas Exp $
  */
 
 /*
@@ -342,7 +342,6 @@ SELF_CONTAINED_WORDS_ARE {
                            LEX_WORD( ".F."    ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
                            LEX_WORD( ".N."    ) AS_TOKEN( FALSEVALUE + DONT_REDUCE ),
                            LEX_WORD( ".NOT."  ) AS_TOKEN( NOT        + DONT_REDUCE ),
-                           LEX_WORD( ".NULL." ) AS_TOKEN( NULLVALUE  + DONT_REDUCE ),
                            LEX_WORD( ".T."    ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
                            LEX_WORD( ".Y."    ) AS_TOKEN( TRUEVALUE  + DONT_REDUCE ),
                            LEX_WORD( ".OR."   ) AS_TOKEN( OR         + DONT_REDUCE ),
