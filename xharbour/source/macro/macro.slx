@@ -1,5 +1,5 @@
 /*
- * $Id: macro.slx,v 1.32 2007/12/22 19:04:33 likewolf Exp $
+ * $Id: macro.slx,v 1.33 2008/02/09 02:53:19 ronpinkas Exp $
  */
 
 /*
@@ -271,7 +271,14 @@ CONDITIONAL_DELIMITERS_ARE         {
                                          \
                                          if( iLen == 0 ) \
                                          { \
-                                            bAccept = ! ( isdigit( szBuffer[0] ) || ( szBuffer[0] == '.' && szBuffer[1] == '.' ) ); \
+                                            bAccept = ! ( isdigit( szBuffer[0] ) || \
+                                                          ( szBuffer[0] == '.' && szBuffer[1] == '.' ) || \
+                                                          ( strchr( "tfynTFYN", szBuffer[0] ) && szBuffer[1] == '.' ) || \
+                                                          ( toupper( szBuffer[0] ) == 'A' && toupper( szBuffer[1] ) == 'N' && toupper( szBuffer[2] ) == 'D' && szBuffer[3] == '.' ) || \
+                                                          ( toupper( szBuffer[0] ) == 'N' && toupper( szBuffer[1] ) == 'O' && toupper( szBuffer[2] ) == 'T' && szBuffer[3] == '.' ) || \
+                                                          ( toupper( szBuffer[0] ) == 'O' && toupper( szBuffer[1] ) == 'R' && szBuffer[2] == '.' ) || \
+                                                          ( toupper( szBuffer[0] ) == 'N' && toupper( szBuffer[1] ) == 'U' && toupper( szBuffer[2] ) == 'L' && toupper( szBuffer[3] ) == 'L' && szBuffer[4] == '.' ) \
+                                                        ); \
                                          } \
                                          else \
                                          { \
