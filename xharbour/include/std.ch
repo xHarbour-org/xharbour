@@ -1,5 +1,5 @@
 /*
- * $Id: std.ch,v 1.27 2008/02/04 17:06:25 ronpinkas Exp $
+ * $Id: std.ch,v 1.28 2008/02/06 01:09:47 ronpinkas Exp $
  */
 
 /*
@@ -110,6 +110,7 @@
 #command SET CENTURY <x:ON,OFF,&>      => __SetCentury( <(x)> )
 #command SET CENTURY (<x>)             => __SetCentury( <x> )
 #command SET DATE FORMAT [TO] <f>      => Set( _SET_DATEFORMAT, <f> )
+#command SET EOL   TO <y>              => Set( _SET_EOL, <y> )
 #command SET EPOCH TO <y>              => Set( _SET_EPOCH, <y> )
 
 #command SET DECIMALS TO <x>           => Set( _SET_DECIMALS, <x> )
