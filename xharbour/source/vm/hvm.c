@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.654 2008/02/10 06:34:34 walito Exp $
+ * $Id: hvm.c,v 1.655 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -7070,10 +7070,8 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
    PHB_SYMB       pSym;
    PHB_ITEM       pSelf;
    PHB_FUNC       pFunc = NULL;
-   PHB_BASEARRAY  pSelfBase = NULL;
    HB_STACK_STATE sStackState;
    int            iPresetBase = s_iBaseLine;
-   BOOL           lPopSuper = FALSE;
    BOOL           bConstructor = FALSE;
    BOOL           bSymbol = FALSE;
    BOOL           bDebugPrevState;
@@ -7176,7 +7174,7 @@ HB_EXPORT void hb_vmSend( USHORT uiParams )
 
       if( HB_IS_OBJECT( pSelf ) )
       {
-         pSelfBase = pSelf->item.asArray.value;
+         PHB_BASEARRAY pSelfBase = pSelf->item.asArray.value;
 
          if( pSelfBase->uiPrevCls ) /* Is is a Super cast ? */
          {
@@ -8138,7 +8136,7 @@ static void hb_vmSetDivert( BOOL bDivertOf )
       }
       else
       {
-         BOOL bConstructor = FALSE, bSymbol = FALSE, lPopSuper = FALSE;
+         BOOL bConstructor = FALSE, bSymbol = FALSE
          PHB_BASEARRAY pSelfBase = pSelf->item.asArray.value;
 
          pFunc = hb_objGetMthd( pSelf, pSym, TRUE, &bConstructor, FALSE, &bSymbol );
