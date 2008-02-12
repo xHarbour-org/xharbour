@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5917 2008/02/11 20:43:42 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5918 2008/02/11 23:58:13 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-12 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed to reset display content after lose focus when "@S" is used.
+      Bug reported from xharbour.comp.lang news.
+
 2008-02-12  22:00 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
   * include/std.ch
     ! added missing SET EOL command

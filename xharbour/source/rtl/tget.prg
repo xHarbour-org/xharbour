@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.137 2007/09/27 11:09:34 modalsist Exp $
+ * $Id: tget.prg,v 1.138 2007/11/10 10:03:42 modalsist Exp $
  */
 
 /*
@@ -563,9 +563,14 @@ METHOD Display( lForced ) CLASS Get
       ENDIF
    ENDIF
 
-   IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) )
+   IF xBuffer != NIL .and. ( lForced .or. ( ::nDispPos != ::nOldPos ) ) 
 
-      cDisplay := SubStr( xBuffer, ::nDispPos, ::nDispLen )
+      /* 2008/FEB/12 - EF - Reset buffer content when "@S" is used, after lose focus. */ 
+      if ::HasScroll() .and. !::HasFocus
+         cDisplay := SubStr( xBuffer, 1, ::nDispLen )
+      else
+         cDisplay := SubStr( xBuffer, ::nDispPos, ::nDispLen )
+      endif
 
       IF Len( cDisplay ) < ::nDispLen
 /* 2007/MAY/18 - E.F. - Adjust display length
