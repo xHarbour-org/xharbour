@@ -32,3 +32,14 @@ IMPLEMENTS NAMESPACE SubExtern
    END
 
 END
+
+PROCEDURE ExtMember() IMPLEMENTS NAMESPACE MyNamespace
+   ? ProcName()
+RETURN
+
+#pragma BEGINDUMP
+HB_FUNC_EXTERNAL_NAMESPACE( NSID_MYNAMESPACE, EXTMEMBER2 )
+{
+   hb_retc( "Namespace Function in C" );
+}
+#pragma ENDDUMP

@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.183 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: harbour.c,v 1.184 2008/02/11 20:43:43 ronpinkas Exp $
  */
 
 /*
@@ -1153,8 +1153,6 @@ void hb_compVariableAdd( char * szVarName, BYTE cValueType )
    PVAR pVar, pLastVar;
    PFUNCTION pFunc = hb_comp_functions.pLast;
    BOOL bUsed = FALSE;
-
-   HB_SYMBOL_UNUSED( cValueType );
 
    //printf( "Variable: %s\n", szVarName );
 
@@ -2848,40 +2846,40 @@ PFUNCTION hb_compFunctionFind( char * szFunctionName, void *Namespace, int iFlag
    return NULL;
 }
 
-PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNamespace )
+PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNamespace, PCOMSYMBOL pSymbol )
 {
-   PFUNCTION pFunc = hb_comp_functions.pFirst;
+   PNAMESPACE pNamespace = pCallerNamespace, pMember;
 
-   while( pFunc )
+   do
    {
-      if( pFunc->szName == szFunctionName )
+      pMember = hb_compNamespaceFindMember( pNamespace->pNext, szFunctionName, NSTYPE_MEMBER );
+
+      if( pMember )
       {
-         if( pFunc->pNamespace )
+         if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
          {
-            if( pFunc->pNamespace == pCallerNamespace )
+            if( pSymbol  )
             {
-               return pFunc;
-            }
-            else
-            {
-               PNAMESPACE pOuter = pCallerNamespace->extra.pOuter;
-               PNAMESPACE pNamespace = pFunc->pNamespace;
+               assert( ( pSymbol->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE );
 
-               while( pOuter )
-               {
-                  if( pNamespace == pOuter )
-                  {
-                     return pFunc;
-                  }
-
-                  pOuter = pOuter->extra.pOuter;
-               }
+               pSymbol->Namespace = (void *) pNamespace;
+               pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
+               pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
             }
+
+            return (PFUNCTION) 1;
+         }
+         else
+         {
+            return pMember->extra.pFunc;
          }
       }
-
-      pFunc = pFunc->pNext;
+      else
+      {
+         pNamespace = pNamespace->extra.pOuter;
+      }
    }
+   while( pNamespace );
 
    return NULL;
 }
@@ -4319,9 +4317,9 @@ void hb_compGenPushFunCall( char *szFunName, char *szNamespace )
             }
             else
             {
-               PNAMESPACE pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName );
+               PNAMESPACE pResolved = hb_compNamespaceFindMember( hb_comp_UsedNamespaces.pCurrent->pNext, szFunName, NSTYPE_MEMBER );
 
-               if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
+               if( pResolved )
                {
                   szNamespace = hb_comp_UsedNamespaces.pCurrent->szFullPath;
                }
@@ -4373,9 +4371,9 @@ char * hb_compFunctionResolveUsed( char *szFunName )
       {
          if( ( pNamespace->type & NSTYPE_USED ) )
          {
-            pResolved = hb_compNamespaceFindMember( pNamespace->pNext, szFunName );
+            pResolved = hb_compNamespaceFindMember( pNamespace->pNext, szFunName, NSTYPE_MEMBER );
 
-            if( pResolved && ( pResolved->type & NSTYPE_MEMBER ) )
+            if( pResolved )
             {
                return pNamespace->szFullPath;
             }
@@ -5879,6 +5877,7 @@ PNAMESPACE hb_compNamespaceEnumSkipMembers( PNAMESPACE pNamespace )
       {
          iLevel++;
       }
+
       // Don't else, maybe both if empty!
       if( pNamespace->type & NSTYPE_END )
       {
@@ -6020,21 +6019,23 @@ PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName )
    return NULL;
 }
 
-PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName )
+PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName, int type )
 {
    while( pNamespace )
    {
-      if( pNamespace->szName == szName )
+      if( pNamespace->szName == szName && ( ( pNamespace->type & type ) == type ) )
       {
          return pNamespace;
       }
 
       if( ( pNamespace->type & NSTYPE_END ) )
       {
-         return NULL;
+         if( ( pNamespace->type & NSTYPE_SPACE ) == 0 )
+         {
+            return NULL;
+         }
       }
-
-      if( ( pNamespace->type & NSTYPE_SPACE ) )
+      else if( ( pNamespace->type & NSTYPE_SPACE ) )
       {
          pNamespace = hb_compNamespaceEnumSkipMembers( pNamespace->pNext );
       }
@@ -6587,7 +6588,7 @@ static int hb_compCompile( char * szPrg )
    hb_compReleaseRTVars();
    hb_compReleaseLoops();
    hb_compReleaseElseIfs();
-   
+
    if( hb_comp_functions.pFirst )
    {
       PFUNCTION pFunc = hb_comp_functions.pFirst;
@@ -6629,8 +6630,8 @@ static int hb_compCompile( char * szPrg )
       }
       while( hb_comp_pExterns );
    }
-   
-   
+
+
    if( hb_comp_inlines.pFirst )
    {
       PINLINE pInline = hb_comp_inlines.pFirst;

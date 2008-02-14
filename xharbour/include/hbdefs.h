@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.95 2008/02/09 16:22:40 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.96 2008/02/10 07:55:50 ronpinkas Exp $
  */
 
 /*
@@ -1250,20 +1250,20 @@ typedef PHB_FUNC HB_FUNC_PTR;
    #define HB_EXTERN_ extern
 #endif
 
-#define HB_NAMESPACE_NAME( namespaceid, funcname )              _##namespaceid##_##funcname
+#define HB_NAMESPACE_NAME( namespaceid, funcname )             _##namespaceid##_##funcname
 #define HB_NAMESPACE_FUNCNAME( namespaceid, funcname )          HB_NSF_##namespaceid##_##funcname
 #define HB_OPTIONAL_NAMESPACE_FUNCNAME( namespaceid, funcname ) HB_FUNCNAME( funcname )
 #define HB_EXTERNAL_NAMESPACE_FUNCNAME( namespaceid, funcname ) HB_NAMESPACE_FUNCNAME( namespaceid, funcname )
 
-#define HB_FUNC_NAMESPACE( namespaceid, funcname )        _HB_NS_FUNC_STATIC( HB_NAMESPACE_NAME( namespaceid, funcname ) )
+#define HB_FUNC_NAMESPACE( namespaceid, funcname )              _HB_NS_FUNC_STATIC( HB_NAMESPACE_NAME( namespaceid, funcname ) )
 #define HB_FUNC_EXTERNAL_NAMESPACE( namespaceid, funcname )     _HB_NS_FUNC( HB_NAMESPACE_NAME( namespaceid, funcname ) )
-#define HB_FUNC_OPTIONAL_NAMESPACE( namespace, funcname ) HB_FUNC( funcname )
+#define HB_FUNC_OPTIONAL_NAMESPACE( namespace, funcname )       HB_FUNC( funcname )
 
-#define _HB_NS_FUNC_STATIC( expandedmacro )               HB_NS_FUNC_STATIC( expandedmacro )
-#define _HB_NS_FUNC( expandedmacro )                      HB_NS_FUNC( expandedmacro )
+#define _HB_NS_FUNC_STATIC( expandedmacro )                     HB_NS_FUNC_STATIC( expandedmacro )
+#define _HB_NS_FUNC( expandedmacro )                            HB_NS_FUNC( expandedmacro )
 
-#define HB_NS_FUNC( funcname )                            HB_EXTERN_C_ HB_EXPORT HARBOUR HB_NSF##funcname ( void )
-#define HB_NS_FUNC_STATIC( funcname )                     static HARBOUR HB_NSF##funcname ( void )
+#define HB_NS_FUNC( funcname )                                  HB_EXTERN_C_ HB_EXPORT HARBOUR HB_NSF##funcname ( void )
+#define HB_NS_FUNC_STATIC( funcname )                           static HARBOUR HB_NSF##funcname ( void )
 
 #define HB_FUNC_EXEC( funcname )                          HB_FUN_##funcname();
 #define HB_FUNC( funcname )                               HB_EXTERN_C_ HB_EXPORT HARBOUR HB_FUN_##funcname ( void )

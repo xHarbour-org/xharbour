@@ -41,6 +41,11 @@ NAMESPACE MyNameSpace
 
      MyOptional.SomeOptional()
 
+     #ifndef __HRB__
+        // Defined as C function in extnamespace.prg
+        ? ExtMember2()
+     #endif
+
    RETURN
 
    FUNCTION Str(x)
@@ -74,6 +79,12 @@ NAMESPACE MyNameSpace
       //NOTE: More than 1 namespace can use the *same* EXTERNAL NAMESPACE unit!
       // WARNING: You MUST compile the extern module FIRST!!!
       EXTERNAL NAMESPACE SubExtern
+   #endif
+
+
+   #ifndef __HRB__
+      EXTERNAL NAMESPACE MEMBER ExtMember
+      EXTERNAL NAMESPACE MEMBER ExtMember2
    #endif
 
 END

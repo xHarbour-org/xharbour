@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.slx,v 1.95 2008/02/11 01:27:49 ronpinkas Exp $
+ * $Id: harbour.slx,v 1.96 2008/02/11 02:20:14 ronpinkas Exp $
  */
 
 /*
@@ -236,7 +236,7 @@ SELF_CONTAINED_WORDS_ARE {
 
 /* KEYWORDS are grouped based on the next token they require. */
 #define WANTS_VAR        703 /* Wants Variable (including Macros): DO, FOR, PRIVATE, PUBLIC */
-#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, PARAMETERS, PROCEDURE, ENUM, STATIC */
+#define WANTS_ID         704 /* Wants Identifier: ANNOUNCE, ENUM, EXTERN, FIELD, FUNCTION, LOCAL, GLOBAL, EXTERNGLOBAL, MEMVAR, NAMESPACE PARAMETERS, PROCEDURE, STATIC */
 #define WANTS_EOL        705 /* Wants EOL: ELSE, END, ENDSWITCH, ENDCASE, ENDDO, ENDIF, EXIT, LOOP, NEXT, OTHERWISE, RECOVER TRY*/
 #define WANTS_EXP        706 /* Wants Expression: BREAK, CASE, ELSEIF, IF, IN, RETURN, WHILE, WITHOBJ SWITCH WITH_NAMESPACE */
 #define REJECT_OP        707
@@ -341,6 +341,7 @@ LANGUAGE_KEY_WORDS_ARE {
                          LEX_WORD( "EXIT{WS}PROCEDURE"               ) AS_TOKEN( HB_EXIT_PROC     ),
                          LEX_WORD( "EXTERNAL"                        ) AS_TOKEN( HB_WANTS_ID  - EXTERN           ),
                          LEX_WORD( "EXTERNAL{WS}NAMESPACE"           ) AS_TOKEN( HB_WANTS_ID  - EXTERNAL_NAMESPACE ),
+                         LEX_WORD( "EXTERNAL{WS}NAMESPACE{WS}MEMBER" ) AS_TOKEN( HB_WANTS_ID  - EXTERNAL_NAMESPACE_MEMBER ),
                          LEX_WORD( "FIELD"                           ) AS_TOKEN( HB_WANTS_ID  - FIELD            ),
                          LEX_WORD( "FINALLY"                         ) AS_TOKEN( HB_WANTS_EOL - FINALLY          ),
                          LEX_WORD( "FOR"                             ) AS_TOKEN( HB_WANTS_VAR - FOR              ),
@@ -434,6 +435,7 @@ LANGUAGE_WORDS_ARE {
                      LEX_WORD( "IF?WS?("                          ) AS_TOKEN( HB_IIF_OPEN        ),
 
                      LEX_WORD( "IIF?WS?("                         ) AS_TOKEN( HB_IIF_OPEN        ),
+                     LEX_WORD( "IMPLEMENTS{WS}NAMESPACE"          ) AS_TOKEN( HB_WANTS_ID - IMPLEMENTS_NAMESPACE ),
                      LEX_WORD( "IN"                               ) AS_TOKEN( HB_IN              ),
                      LEX_WORD( "LIKE"                             ) AS_TOKEN( HB_AFTER_EXP - LIKE              ),
                      LEX_WORD( "LINE"                             ) AS_TOKEN( _LINE_             ),

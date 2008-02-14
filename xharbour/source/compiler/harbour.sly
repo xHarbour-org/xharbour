@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.145 2008/02/09 02:53:19 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.146 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -174,6 +174,17 @@ extern HB_COMP_IDS hb_compExpr_IDs;
 
 char * hb_comp_szAnnounce = NULL;    /* ANNOUNCEd procedure */
 
+BOOL   hb_comp_bVarParams = FALSE;
+
+typedef struct _LOCALPARAM
+{
+  char *szName;
+  char cType;
+  struct _LOCALPARAM *pNext;
+} LOCALPARAM, *PLOCALPARAM;
+
+PLOCALPARAM hb_comp_LocalParams = NULL;
+
 static void hb_compDebugStart( void ) { };
 
 %}
@@ -233,7 +244,8 @@ static void hb_compDebugStart( void ) { };
 %token HASHOP
 %token UTILITY
 %token DIVERT OF FLAGS
-%token NAMESPACE RUNTIME_NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE IMPLEMENTS_NAMESPACE DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
+%token NAMESPACE RUNTIME_NAMESPACE OPTIONAL_NAMESPACE EXTERNAL_NAMESPACE EXTERNAL_NAMESPACE_MEMBER IMPLEMENTS_NAMESPACE
+%token DEFINE_NAMESPACE DEFINE_NAMESPACEMEMBER USING_NAMESPACE WITH_NAMESPACE
 
 /*the lowest precedence*/
 /*postincrement and postdecrement*/
@@ -283,7 +295,6 @@ static void hb_compDebugStart( void ) { };
 %type <valInteger>  NUM_INTEGER
 %type <valLong>     NUM_LONG
 %type <iNumber> FunScope
-%type <iNumber> Params ParamList ExtBlockParams
 %type <iNumber> IfBegin VarList ExtVarList
 %type <iNumber> FieldList
 %type <lNumber> WhileBegin
@@ -327,9 +338,10 @@ static void hb_compDebugStart( void ) { };
 %type <iNumber> SwitchCases
 %type <asExpr>  Hash HashList
 %type <asExpr>  DivertFlags
-%type <string>  NamespacePath NamespaceName
+%type <string>  NamespacePath NamespaceName ImplementsNamespace
 %type <iNumber> NamespaceType
 %type <pVoid>   UsedPath
+%type <pVoid>   ParamList;
 
 %destructor { if( $$.dealloc ) hb_xfree( $$.string ); } LITERAL
 
@@ -400,9 +412,36 @@ CompTimeStr : LITERAL {
 Function   : FunScope FUNCTION  IdentName
              {
                 hb_comp_cVarType = ' ';
-                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, 0 );
+                hb_comp_bVarParams = FALSE;
              }
-             Params Crlf
+             Params
+             ImplementsNamespace
+             {
+                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, 0 );
+
+                if( hb_comp_bVarParams )
+                {
+                   hb_comp_functions.pLast->pCode[2] = HB_VAR_PARAM_FLAG;
+                }
+                else
+                {
+                   while( hb_comp_LocalParams )
+                   {
+                      PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+                      hb_compVariableAdd( hb_comp_LocalParams->szName, hb_comp_LocalParams->cType );
+
+                      hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+                      hb_xfree( (void *) pDelete );
+                   }
+                }
+
+                if( $6 )
+                {
+                   hb_compNamespaceEnd();
+                }
+             }
+             Crlf
              {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -416,9 +455,36 @@ Function   : FunScope FUNCTION  IdentName
            | FunScope PROCEDURE IdentName
              {
                 hb_comp_cVarType = ' ';
-                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, FUN_PROCEDURE );
+                hb_comp_bVarParams = FALSE;
              }
-             Params Crlf
+             Params
+             ImplementsNamespace
+             {
+                hb_compFunctionAdd( $3, ( HB_SYMBOLSCOPE ) $1, FUN_PROCEDURE );
+
+                if( hb_comp_bVarParams )
+                {
+                   hb_comp_functions.pLast->pCode[2] = HB_VAR_PARAM_FLAG;
+                }
+                else
+                {
+                   while( hb_comp_LocalParams )
+                   {
+                      PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+                      hb_compVariableAdd( hb_comp_LocalParams->szName, hb_comp_LocalParams->cType );
+
+                      hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+                      hb_xfree( (void *) pDelete );
+                   }
+                }
+
+                if( $6 )
+                {
+                   hb_compNamespaceEnd();
+                }
+             }
+             Crlf
              {
                 hb_comp_wSeqCounter      = 0;
                 hb_comp_wForCounter      = 0;
@@ -434,17 +500,17 @@ Function   : FunScope FUNCTION  IdentName
 FunScope   :                  { $$ = HB_FS_PUBLIC; }
            | STATIC           { $$ = HB_FS_STATIC; }
            | UTILITY          { $$ = HB_FS_UTILITY; }
-           | UTILITY STATIC   { $$ =  HB_FS_UTILITY | HB_FS_STATIC; }
+           | UTILITY STATIC   { $$ = ( HB_FS_UTILITY | HB_FS_STATIC ); }
            | INIT             { $$ = HB_FS_INIT | HB_FS_PUBLIC; }
            | EXIT             { $$ = HB_FS_EXIT | HB_FS_PUBLIC; }
            | CRITICAL         { $$ = HB_FS_CRITICAL | HB_FS_PUBLIC; }
            | CRITICAL_STATIC  { $$ = ( HB_FS_CRITICAL | HB_FS_STATIC ); }
            ;
 
-Params     :                                                         { $$ = 0; }
-           | '(' ')'                                                 { $$ = 0; }
-           | '(' { hb_comp_iVarScope = VS_PARAMETER; } ParamList ')' { $$ = $3; }
-           | '(' EPSILON ')'                                         { $$ = 0; hb_comp_functions.pLast->pCode[2] = 255; }
+Params     :
+           | '(' ')'
+           | '(' { hb_comp_iVarScope = VS_PARAMETER; } ParamList ')'
+           | '(' EPSILON ')'                                         { hb_comp_bVarParams = TRUE; }
            ;
 
 AsType     : /* not specified */           { hb_comp_cVarType = ' '; }
@@ -475,9 +541,40 @@ AsArray    : AS_ARRAY                      { hb_comp_cVarType = 'A'; }
            | AS_ENUM_ARRAY IdentName       { hb_comp_cVarType = 'e'; hb_comp_szFromEnum = $2; }
            ;
 
-ParamList  : IdentName AsType                { hb_compVariableAdd( $1, hb_comp_cVarType ); $$ = 1; }
-           | ParamList ',' IdentName AsType  { hb_compVariableAdd( $3, hb_comp_cVarType ); $$++; }
+ParamList  : IdentName AsType                {
+                                               hb_comp_LocalParams = (PLOCALPARAM) hb_xgrab( sizeof( LOCALPARAM ) );
+                                               hb_comp_LocalParams->szName = $1;
+                                               hb_comp_LocalParams->cType  = hb_comp_cVarType;
+                                               hb_comp_LocalParams->pNext  = NULL;
+
+                                               $$ = (void *) hb_comp_LocalParams;
+                                             }
+           | ParamList ',' IdentName AsType  {
+                                               PLOCALPARAM pLocalParam = (PLOCALPARAM) hb_xgrab( sizeof( LOCALPARAM ) );
+
+                                               pLocalParam->szName = $3;
+                                               pLocalParam->cType  = hb_comp_cVarType;
+                                               pLocalParam->pNext  = NULL;
+
+                                               ( (PLOCALPARAM) $$ )->pNext = pLocalParam;
+
+                                               $$ = (void *) pLocalParam;
+                                             }
            ;
+
+ImplementsNamespace : /* Empty */                    { $$ = NULL; }
+                    | IMPLEMENTS_NAMESPACE IdentName
+                                                     {
+                                                       $$ = $2;
+
+                                                       if( hb_comp_Namespaces.pCurrent )
+                                                       {
+                                                          hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
+                                                       }
+
+                                                       hb_compNamespaceNew( $$, NSTYPE_STEALTH );
+                                                     }
+                    ;
 
 /* NOTE: This allows the use of Expression as a statement.
  *    The Expression is validated later in reduction phase of
@@ -2010,7 +2107,7 @@ CodeBlock2  : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAME
                }
             ;
 
-ExtBlockParams : /* empty list */    { $$ = 0; }
+ExtBlockParams : /* empty list */
                | ParamList
 	       ;
 
@@ -3303,7 +3400,7 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
 
                                    if( hb_comp_Namespaces.pCurrent )
                                    {
-                                      hb_compNamespaceNew( $2, NSTYPE_EXTERNAL );
+                                      hb_compNamespaceNew( $2, NSTYPE_EXTERNAL | NSTYPE_SPACE );
                                       hb_compNamespaceEnd();
                                    }
                                    else
@@ -3311,6 +3408,27 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                       hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
                                    }
                                  }
+             | EXTERNAL_NAMESPACE_MEMBER IdentName Crlf
+                                 {
+                                   if( hb_comp_functions.pLast )
+                                   {
+                                       hb_comp_functions.pLast->bFlags |= FUN_SEALED;
+                                   }
+
+                                   if( hb_comp_Namespaces.pCurrent )
+                                   {
+                                      hb_compNamespaceNew( $2, ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) );
+                                      hb_comp_Namespaces.pLast->extra.pOuter = hb_comp_Namespaces.pCurrent;
+
+                                      hb_compSymbolAdd( $2, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
+                                   }
+                                   else
+                                   {
+                                      hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNMATCHED_NAMESPACE, $2, NULL );
+                                   }
+                                 }
+             ;
+
 
 NamespaceType : NAMESPACE            { $$ = NSTYPE_SPACE; }
               | RUNTIME_NAMESPACE    { $$ = NSTYPE_RUNTIME; }
@@ -3381,9 +3499,9 @@ UsedPath : IdentName
                                            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_EMPTY_NAMESPACE, ( (PNAMESPACE) $1 )->szName, NULL );
                                         }
 
-                                        $$ = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) $1 )->pNext, $3 );
+                                        $$ = (void *) hb_compNamespaceFindMember( ( (PNAMESPACE) $1 )->pNext, $3, NSTYPE_SPACE );
 
-                                        if( $$ == NULL || ( ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
+                                        if( $$ == NULL )
                                         {
                                            hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_NONMEMBER_NAMESPACE, $3, ( (PNAMESPACE) $1 )->szName );
                                         }

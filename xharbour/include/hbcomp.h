@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.66 2008/02/09 02:53:17 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.67 2008/02/10 07:55:50 ronpinkas Exp $
  */
 
 /*
@@ -402,13 +402,15 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
     #define NSTYPE_MEMBER      0x0002
     #define NSTYPE_END         0x0004
 
+    #define NSTYPE_STEALTH     ( 0x0008 | NSTYPE_SPACE )
+
     #define NSTYPE_STATIC      0x0100
     #define NSTYPE_TERMINATOR  ( 0x0200 | NSTYPE_END )
 
     #define NSTYPE_RUNTIME     ( 0x0800 | NSTYPE_SPACE )
 
     #define NSTYPE_OPTIONAL    ( 0x1000 | NSTYPE_SPACE )
-    #define NSTYPE_EXTERNAL    ( 0x2000 | NSTYPE_SPACE | NSTYPE_END )
+    #define NSTYPE_EXTERNAL    0x2000
     #define NSTYPE_IMPLEMENTS  ( 0x4000 | NSTYPE_SPACE )
     #define NSTYPE_USED        ( 0x8000 | NSTYPE_SPACE )
 
@@ -452,9 +454,9 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
     extern PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType );
     extern void       hb_compUsedNamespaceEnd( void );
     extern PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName );
-    extern PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName );
+    extern PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName, int type );
 
-    extern PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pNamespace );
+    extern PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pNamespace, PCOMSYMBOL pSym );
     extern char * hb_compFunctionResolveUsed( char *szFunName );
 
     extern void      hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType ); /* starts a new Clipper language function definition */

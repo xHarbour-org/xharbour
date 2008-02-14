@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5918 2008/02/11 23:58:13 lculik Exp $
+ * $Id: ChangeLog,v 1.5919 2008/02/12 11:45:10 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,30 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-14 15:05 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbdefs.h
+    * Minor formatting
+  * include/hbcomp.h
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.slx
+  * source/compiler/harbour.sly
+  * source/compiler/hbslex.c
+    + Added support for new syntax:
+
+      EXTERNAL NAMESPACE MEMBER <SomeFunc>
+
+      [STATIC] PROCEDURE|FUNCTION <SomeName> IMPLEMENTS NAMEDSPACE <NamsespaceName>
+
+    + Added support for Namespace functions implemented as C code:
+
+         HB_FUNC_EXTERNAL_NAMESPACE( NSID_<NamespaceName>, <SomeFunc> )
+
+  * tests/extnamespace.prg
+  * tests/namespace.prg
+    * Updated to show new syntax and functionality
 
 2008-02-12 09:40 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -21,7 +45,7 @@
   * source/compiler/genc.c
   * source/compiler/harbour.c
     * Memory leak
-    
+
 2008-02-10 09:45 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.slx
   * source/macro/macro.slx

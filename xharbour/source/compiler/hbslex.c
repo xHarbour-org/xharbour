@@ -1,6 +1,8 @@
 /*
- * $Id: hbslex.c,v 1.92 2008/02/04 17:06:28 ronpinkas Exp $
+ * $Id: hbslex.c,v 1.16 2008/02/06 01:09:47 ronpinkas Exp $
  */
+
+/* harbour.slx version: 1.96 */
 
 #include "hbcomp.h"
 #include "harboury.h"

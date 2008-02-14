@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.154 2008/02/10 19:09:35 ronpinkas Exp $
+ * $Id: genc.c,v 1.155 2008/02/11 20:43:43 ronpinkas Exp $
  */
 
 /*
@@ -91,7 +91,11 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
     int iLevel;
     char *szFileName;
 
-    if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+    if( ( pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
+    {
+       return pNamespace;
+    }
+    else if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
     {
        szFileName = hb_xstrcpy( NULL, pNamespace->szName, ".hxns", NULL );
        yyc = hb_fopen( szFileName, "ab" );
@@ -127,6 +131,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
        fprintf( yyc, "#if defined( __PRG__ )\n" );
        fprintf( yyc, "DEFINE NAMESPACE %s\n", pNamespace->szName );
        fprintf( yyc, "#else\n" );
+       fprintf( yyc, "#define NSID_%s %d\n", pNamespace->szName, pNamespace->iID );
        fprintf( yyc, "typedef struct\n" );
     }
     fprintf( yyc, "{\n" );
@@ -261,6 +266,10 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
+          else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
+          {
+             fprintf( yyc, "     /* %s = */ HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pNamespace->iID, pMember->szName );
+          }
           else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
           {
              fprintf( yyc, "     /* %s = */ HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
@@ -329,8 +338,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    BOOL bIsLineNumberInfo;
 
    BOOL bCritical = FALSE;
-
-   BOOL bImplementsNS = FALSE;
 
    int  iSymOffset, iStartupOffset;
 
@@ -454,6 +461,28 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       fprintf( yyc, "#define __PRG_SOURCE__ \"%s\"\n\n", hb_comp_PrgFileName );
 
+
+      if( hb_comp_Namespaces.pFirst )
+      {
+         PNAMESPACE pNamespace = hb_comp_Namespaces.pFirst;
+
+         do
+         {
+            if( pNamespace->type & NSTYPE_SPACE )
+            {
+               if( ( pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
+               {
+                  fprintf( yyc, "#include \"%s.xns\"\n", pNamespace->szName );
+               }
+            }
+
+            pNamespace = pNamespace->pNext;
+         }
+         while ( pNamespace );
+
+         fprintf( yyc, "\n" );
+      }
+
       pFunc = hb_comp_functions.pFirst;
 
       if( ! hb_comp_bStartProc )
@@ -495,9 +524,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
-               bImplementsNS = TRUE;
-
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
+            }
+            else if( ( pFunc->pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
+            {
+               fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ NSID_%s, %s );\n", pFunc->pNamespace->szFullPath, pFunc->pNamespace->szName, pFunc->szName );
             }
             else
             {
@@ -543,11 +574,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          pFunc = pFunc->pNext;
       }
 
-      if( bImplementsNS )
       {
          PNAMESPACE pNamespace = hb_comp_Namespaces.pFirst;
 
-         do
+         while( pNamespace )
          {
             if( ( pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
@@ -609,10 +639,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                    break;
                 }
             }
+            else if( ( pNamespace->type & ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) ) == ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) )
+            {
+               fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->extra.pOuter->iID, pNamespace->szName );
+            }
 
             pNamespace = pNamespace->pNext;
          }
-         while( pNamespace );
       }
 
       if( hb_comp_Namespaces.pFirst )
@@ -621,7 +654,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          do
          {
-            if( ( pNamespace->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
+            if( ( pNamespace->type & ( NSTYPE_EXTERNAL | NSTYPE_SPACE ) ) == ( NSTYPE_EXTERNAL | NSTYPE_SPACE ) )
             {
                 fprintf( yyc, "#define NAMESPACE_DECFUNCS\n" );
                 fprintf( yyc, "#include \"%s.hxns\"\n", pNamespace->szName );
@@ -688,21 +721,26 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          {
             if( ( pFunCall->iFlags & NSF_RESOLVE ) == NSF_RESOLVE )
             {
-               pFunc = hb_compFunctionResolve( pFunCall->szName, (PNAMESPACE) pFunCall->Namespace );
+               pFunc = hb_compFunctionResolve( pFunCall->szName, (PNAMESPACE) pFunCall->Namespace, NULL );
                //fprintf( yyc, "/* %s from %s resolved to %s */\n", pFunCall->szName, ( (PNAMESPACE) pFunCall->Namespace )->szName , pFunc && pFunc->pNamespace ? pFunc->pNamespace->szFullPath  : "global" );
             }
          }
 
-         if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc && pFunc->pNamespace ) ) )
+         if( pFunc == (PFUNCTION) 1 )
+         {
+            fprintf( yyc, "/* Skipped: call to '%s' resolved to external */\n", pFunCall->szName );
+            pFunc = NULL;
+         }
+         else if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc && pFunc->pNamespace ) ) )
          {
             // No prototype for Namespace function calls!
             if( pFunc && pFunc->pNamespace )
             {
-               fprintf( yyc, "/* Skipped: call to '%s' resolved of: '%s' */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
+               fprintf( yyc, "/* Skipped: call to '%s' resolved to: '%s' */\n", pFunCall->szName, pFunc->pNamespace->szFullPath );
             }
             else
             {
-               fprintf( yyc, "/* Skipped: call to: '%s' of: '%s' */\n", pFunCall->szName, (char *) pFunCall->Namespace );
+               fprintf( yyc, "/* Skipped: call to: '%s' to: '%s' */\n", pFunCall->szName, (char *) pFunCall->Namespace );
             }
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
@@ -907,9 +945,16 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                }
                else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
                {
-                  pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace );
+                  pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace, pSym );
 
-                  if( pFunc && pFunc->pNamespace )
+                  if( pFunc == (PFUNCTION) 1 )
+                  {
+                     // Resolved to external member.
+                     pFunc = NULL;
+
+                     pSym->cScope |= HB_FS_INDIRECT;
+                  }
+                  else if( pFunc && pFunc->pNamespace )
                   {
                      if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
                      {
@@ -967,10 +1012,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                }
                else if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
                {
-                  assert( pFunc );
+                  //assert( pFunc );
 
                   //if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                  if( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+
+                  if( ( ( (PNAMESPACE) pSym->Namespace )->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
                   {
                      fprintf( yyc, "{ \"%s.%s\", {", ( (PNAMESPACE) pSym->Namespace )->szFullPath, pSym->szName );
                   }
@@ -1216,6 +1262,10 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
             {
                fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->iID, pFunc->szName );
+            }
+            else if( ( pFunc->pNamespace->type & NSTYPE_STEALTH ) == NSTYPE_STEALTH )
+            {
+               fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ NSID_%s, %s )", pFunc->pNamespace->szFullPath, pFunc->pNamespace->szName, pFunc->szName );
             }
             else
             {

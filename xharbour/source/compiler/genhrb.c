@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.5 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.6 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -90,7 +90,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    {
       pFunc = NULL;
 
-      if( ( pSym->iFlags & SYMF_FUNCALL ) >= SYMF_FUNCALL )
+      if( ( pSym->iFlags & SYMF_FUNCALL ) == SYMF_FUNCALL )
       {
          //printf( "Sym: '%s' Namespace: '%s', Scope: %i\n", pSym->szName, pSym->szNamespace, pSym->cScope );
 
@@ -133,9 +133,16 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          }
          else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
          {
-            pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace );
+            pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace, pSym );
 
-            if( pFunc && pFunc->pNamespace )
+            if( pFunc == (PFUNCTION) 1 )
+            {
+               // Resolved to external member.
+               pFunc = NULL;
+
+               //TODO: Error message
+            }
+            else if( pFunc && pFunc->pNamespace )
             {
                if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
                {
