@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.146 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.147 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -2109,6 +2109,17 @@ CodeBlock2  : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAME
 
 ExtBlockParams : /* empty list */
                | ParamList
+                 {
+                   while( hb_comp_LocalParams )
+                   {
+                      PLOCALPARAM pDelete = hb_comp_LocalParams;
+
+                      hb_compVariableAdd( hb_comp_LocalParams->szName, hb_comp_LocalParams->cType );
+
+                      hb_comp_LocalParams = hb_comp_LocalParams->pNext;
+                      hb_xfree( (void *) pDelete );
+                   }
+                 }
 	       ;
 
 /* NOTE: This uses $-2 then don't use BlockExpList in other context

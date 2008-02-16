@@ -1,5 +1,5 @@
 /*
- * $Id: ppcore.c,v 1.267 2007/12/31 17:47:59 likewolf Exp $
+ * $Id: ppcore.c,v 1.268 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -5441,6 +5441,7 @@ void hb_pp_initDynDefines( PHB_PP_STATE pState )
 #endif
 
    hb_pp_addDefine( pState, "__PRG__", "1" );
+   hb_pp_addDefine( pState, "__NAMESPACE__", "1" );
 }
 
 /*
