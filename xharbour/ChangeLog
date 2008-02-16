@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5921 2008/02/16 15:01:10 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5922 2008/02/16 16:02:03 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-16 20:15 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    + create the new "@2" and "@4" pictures to force get date with 2 or 4
+      digits on year format, independent of set century. Contribution
+      by Brian Hays.
 
 2008-02-16 14:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

@@ -171,6 +171,7 @@ CLASS Get
    METHOD SetColorSpec( cColorSpec )
    METHOD SetPicture( cPicture )
 
+
    HIDDEN:              /*  H I D D E N  */
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
@@ -195,6 +196,9 @@ CLASS Get
    METHOD LastEditable( )
 
    METHOD HasScroll() INLINE ::nDispLen != ::nMaxLen
+
+   DATA lForceCentury                 // to "@2" or "@4" masks.
+   DATA lCentury INIT __SetCentury()  // idem
 
 ENDCLASS
 
@@ -304,12 +308,9 @@ METHOD ParsePict( cPicture ) CLASS Get
 
       if "D" IN ::cPicFunc
 
-         ::cPicMask := Set( _SET_DATEFORMAT )
-         ::cPicMask := StrTran( ::cPicmask, "y", "9" )
+         ::cPicMask := Upper( Set( _SET_DATEFORMAT ) )
          ::cPicMask := StrTran( ::cPicmask, "Y", "9" )
-         ::cPicMask := StrTran( ::cPicmask, "m", "9" )
          ::cPicMask := StrTran( ::cPicmask, "M", "9" )
-         ::cPicMask := StrTran( ::cPicmask, "d", "9" )
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
 
       endif
@@ -365,6 +366,17 @@ METHOD ParsePict( cPicture ) CLASS Get
          ::cPicture := StrTran(::cPicture, "L", "")
       endif
 
+      /* 2008/FEB/16 - E.F. - Set force century behaviour. */
+      ::lForceCentury := if("4" IN ::cPicFunc .and. ! ::lCentury, .T.,;
+                         if("2" IN ::cPicFunc .and. ::lCentury, .F.,NIL))
+
+      if Hb_IsLogical( ::lForceCentury )
+         ::cPicFunc := StrTran(::cPicFunc, "4", "")
+         ::cPicture := StrTran(::cPicture, "4", "")
+         ::cPicFunc := StrTran(::cPicFunc, "2", "")
+         ::cPicture := StrTran(::cPicture, "2", "")
+      endif
+
       if ::cPicFunc == "@"
          ::cPicFunc := ""
       endif
@@ -399,13 +411,20 @@ METHOD ParsePict( cPicture ) CLASS Get
       Switch ::type
       case "D"
 
-         ::cPicMask := Set( _SET_DATEFORMAT )
-         ::cPicMask := StrTran( ::cPicmask, "y", "9" )
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lForceCentury,"ON","OFF") )
+         endif
+
+         ::cPicMask := Upper( Set( _SET_DATEFORMAT ) )
+
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lCentury,"ON","OFF") )
+         endif
+
          ::cPicMask := StrTran( ::cPicmask, "Y", "9" )
-         ::cPicMask := StrTran( ::cPicmask, "m", "9" )
          ::cPicMask := StrTran( ::cPicmask, "M", "9" )
-         ::cPicMask := StrTran( ::cPicmask, "d", "9" )
          ::cPicMask := StrTran( ::cPicmask, "D", "9" )
+
          exit
 
       case "N"
@@ -1208,11 +1227,22 @@ METHOD Untransform( cBuffer ) CLASS Get
       exit
 
    case "D"
+
+      if Hb_IsLogical( ::lForceCentury )
+         __SetCentury( if(::lForceCentury,"ON","OFF") )
+      endif
+
       if "E" IN ::cPicFunc
          //cBuffer := SubStr( cBuffer, 4, 3 ) + SubStr( cBuffer, 1, 3 ) + SubStr( cBuffer, 7 )
          cBuffer := InvertDwM( cBuffer )
       endif
+
       xValue := CToD( cBuffer )
+
+      if Hb_IsLogical( ::lForceCentury )
+         __SetCentury( if(::lCentury,"ON","OFF") )
+      endif
+
       exit
 
    end
@@ -1769,7 +1799,15 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       endif
    endif
 
+   if ::Type == "D" .and. Hb_IsLogical( ::lForceCentury )
+      __SetCentury( if(::lForceCentury,"ON","OFF") )
+   endif
+
    cBuffer := Transform( xValue, if( Empty( cPicFunc ), if( ::lCleanZero .and. !::HasFocus, "@Z ", "" ), cPicFunc + if( ::lCleanZero .and. !::HasFocus, "Z", "" ) + " " ) + cMask )
+
+   if ::Type == "D" .and. Hb_IsLogical( ::lForceCentury )
+      __SetCentury( if(::lCentury,"ON","OFF") )
+   endif
 
    /* 2007/MAY/20 - E.F. */
    ::lDispLenChanged := ( ::Type=="N" .AND. ("DB" IN cBuffer .OR. "CR" IN cBuffer .OR. "(" IN cBuffer .OR. ")" IN cBuffer ) )
@@ -1867,7 +1905,14 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
       If ::BadDate .and. ::Buffer != nil
          cBuffer := ::Buffer
       Elseif ::Buffer == NIL .and. "E" IN ::cPicFunc
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lForceCentury,"ON","OFF") )
+         endif
          cBuffer := InvertDwM( DtoC( xValue ) )
+         if Hb_IsLogical( ::lForceCentury )
+            __SetCentury( if(::lCentury,"ON","OFF") )
+         endif
+
       Endif
    Endif
 
