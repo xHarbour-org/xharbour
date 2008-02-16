@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.41 2007/09/27 11:09:34 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.42 2007/10/01 01:50:33 modalsist Exp $
  */
 
 /*
@@ -142,7 +142,6 @@ CLASS HBGetList
    METHOD Accelerator( nKey, oGetMsg ) // Removed STATIC
    METHOD HitTest( nMouseRow, nMouseColumn, oGetMsg ) // Removed STATIC
 #endif
-
 
 ENDCLASS
 
@@ -475,10 +474,18 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 
       case K_BS
          oGet:BackSpace()
+         if oGet:NToL
+            oGet:NumToLeft()
+         endif
          exit
 
       case K_DEL
-         oGet:Delete()
+         if oGet:NToL
+            oGet:BackSpace()
+            oGet:NumToLeft()
+         else
+            oGet:Delete()
+         endif
          exit
 
       case K_CTRL_T
@@ -487,6 +494,9 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 
       case K_CTRL_Y
          oGet:DelEnd()
+         if oGet:NToL
+            oGet:NumToLeft()
+         endif
          exit
 
       case K_CTRL_BS
@@ -563,6 +573,9 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
                      oGet:UpdateBuffer()
                   endif
                endif
+            endif
+            if oGet:NToL
+               oGet:NumToLeft()
             endif
          endif
       end

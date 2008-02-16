@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.138 2007/11/10 10:03:42 modalsist Exp $
+ * $Id: tget.prg,v 1.139 2008/02/12 11:45:11 modalsist Exp $
  */
 
 /*
@@ -159,6 +159,8 @@ CLASS Get
    METHOD HitTest(mrow, mcol)
    #endif
 
+   ACCESS NTOL INLINE ::lNumToLeft
+   MESSAGE NumToLeft() METHOD _NumToLeft()
 
    PROTECTED:           /*  P R O T E C T E D  */
 
@@ -169,7 +171,6 @@ CLASS Get
    METHOD SetColorSpec( cColorSpec )
    METHOD SetPicture( cPicture )
 
-
    HIDDEN:              /*  H I D D E N  */
 
    DATA cPicMask, cPicFunc, nMaxLen, lEdit, lDecRev, lPicComplex
@@ -177,10 +178,13 @@ CLASS Get
    DATA lMinusPrinted, xVarGet
    DATA lDispLen INIT .F.
    DATA lUndo INIT .F.
-   DATA lLeftJust INIT .F.   // to "@B" mask
+   DATA lLeftJust INIT .F.         // to "@B" mask
 
    DATA lDispLenChanged  INIT .F.  // to "@X", "@C", "(" and ")" pictures.
    DATA nDispLenReduce   INIT 0    // idem.
+
+   DATA lNumToLeft  INIT .F.       // to "@L" mask
+   METHOD _NumToLeft()             // idem.
 
    METHOD ParsePict( cPicture )
    METHOD DeleteAll()
@@ -348,6 +352,17 @@ METHOD ParsePict( cPicture ) CLASS Get
       if ::lLeftJust
          ::cPicFunc := StrTran(::cPicFunc, "B", "")
          ::cPicture := StrTran(::cPicture, "B", "")
+      endif
+
+      /* 2008/FEB/15 - E.F. - Set NumToLeft @L behaviour. */
+      if ! ::lNumToLeft
+         ::lNumToLeft := ::Type == "N" .and. ( "L" IN ::cPicFunc )
+      endif
+
+      /* 2008/FEB/15 - E.F. - Extract "@L" from mask. */
+      if ::lNumToLeft .or. "L" IN ::cPicFunc
+         ::cPicFunc := StrTran(::cPicFunc, "L", "")
+         ::cPicture := StrTran(::cPicture, "L", "")
       endif
 
       if ::cPicFunc == "@"
@@ -676,6 +691,15 @@ METHOD Display( lForced ) CLASS Get
          ::Left(.F.)
       ENDIF
 
+      /* 2008/FEB/15 - E.F. - Adjust col pos when @L is used. */
+      if ::lNumtoLeft
+         if ::DecPos != NIL .and. ::DecPos > 0
+            nCol := ::Col + ::DecPos - 2
+         else
+            nCol := ::Col + ::nMaxLen - 1
+         endif
+      endif
+
       SetPos( ::Row, nCol  )
 
    ENDIF
@@ -748,7 +772,7 @@ return Self
 
 METHOD Home() CLASS Get
 
-   if ::HasFocus
+   if ::HasFocus 
       ::Pos := ::FirstEditable()
       ::TypeOut := .f.
       ::Clear := .f.
@@ -1463,7 +1487,7 @@ METHOD WordRight() CLASS Get
 
    local nPos, nLastEditable
 
-   if ! ::hasfocus
+   if ! ::hasfocus 
       return Self
    endif
 
@@ -1885,6 +1909,8 @@ METHOD BackSpace( lDisplay ) CLASS Get
 
    if ::Pos < nPos
       ::Delete( lDisplay )
+   elseif ::lNumToLeft
+      ::DeleteAll()
    endif
 
 return Self
@@ -1917,7 +1943,7 @@ METHOD _Delete( lDisplay ) CLASS Get
    /* 2006/OCT/06 - E.F. Added new @K+ functionality to empty
     *               get buffer if first key pressed is DEL key.
     */
-   if "K+" IN ::cPicFunc .AND. ::Pos == ::FirstEditable()
+   if ( "K+" IN ::cPicFunc .and. ::Pos == ::FirstEditable() ) 
       ::DeleteAll()
    else
       ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1 ) + ;
@@ -2008,6 +2034,7 @@ METHOD DelEnd() CLASS Get
    ::Pos := ::nMaxEdit
 
    ::Delete( .f. )
+
    do while ::Pos > nPos
       ::BackSpace( .f. )
    enddo
@@ -2220,6 +2247,37 @@ METHOD LastEditable( ) CLASS GET
    ::TypeOut := .t.
 
 Return 0
+
+//---------------------------------------------------------------------------//
+
+METHOD _NumToLeft() CLASS GET
+
+LOCAL cColor 
+
+ /* 2008/FEB/15 - E.F. - Scroll numbers from right to left as calculator.
+  *                      Contributed by Julio Cesar Cantillo Molina.
+  */
+  IF ::Type == "N"  
+     HBConsoleLock()
+     DispBegin()
+     cColor   := substr( ::colorSpec, at(",",::colorSpec)+1 )
+     //
+     DispOutAt( ::Row, ::Col, " ", cColor )
+     DispOutAt( ::Row, ::Col, Transform( ::UnTransform(), SubStr( ::picture, at( "9", ::Picture ) ) ), cColor )
+     IF ( at( "-", ::buffer ) > 0 .and. ::UnTransform() = 0 )
+        DispOutAt( ::Row, ::Col, "-", cColor )
+     ENDIF
+
+     IF ( ::DecPos > 0 )
+     // SetPos( ::row, ::col + IF( ::decpos > ::pos, ::decPos, ::Pos ) - 1 )
+        SetPos( ::row, ::col + Min( Len(::buffer),Max(::decpos-1,::Pos ) ) - 1 )
+     ENDIF
+     DispEnd()
+     HBConsoleUnLock()
+  ENDIF
+
+RETURN SELF
+
 
 //---------------------------------------------------------------------------//
 /*

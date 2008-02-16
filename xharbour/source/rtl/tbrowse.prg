@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.188 2008/01/14 23:28:48 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.189 2008/01/30 18:19:34 modalsist Exp $
  */
 
 /*
@@ -674,6 +674,7 @@ CLASS TBrowse
    METHOD TApplyKey( nKey, o )
    METHOD HitTest( nMouseRow,nMouseCol )
    METHOD SetStyle( nStyle,lSetting )
+   ACCESS Style INLINE ::aStyle
 #endif
 
    PROTECTED:     /* P R O T E C T E D */
@@ -830,7 +831,7 @@ METHOD New( nTop, nLeft, nBottom, nRight ) CLASS TBrowse
    ::lConfigured     := .f.
    ::aColorSpec      := {}
 
- #ifdef HB_COMPAT_C53
+#ifdef HB_COMPAT_C53
    ::mColPos         := 0
    ::mRowPos         := 0
    ::rect            := { nTop, nLeft, nBottom, nRight }
@@ -3541,32 +3542,27 @@ Return nRet
 
 METHOD SetStyle( nStyle, lSetting ) CLASS TBrowse
 
-LOCAL lRet := .f.
-LOCAL n,nLen
+LOCAL n, nLen
 
-if Hb_IsNumeric( nStyle ) .and. Hb_IsLogical( lSetting )
+nLen := Len( ::aStyle ) 
 
-   if nStyle > 0
+if Hb_IsNumeric( nStyle )
 
-      nLen := Len( ::aStyle )
+   if nStyle > nLen
 
-      if nStyle > nLen
+      for n := (nLen+1) to nStyle
+          aadd( ::aStyle, .f. )
+      next
 
-         for n := nLen to nStyle
-             aadd( ::aStyle, .f. )
-         next
+   endif
 
-      endif
-
+   if Hb_IsLogical( lSetting )
       ::aStyle[ nStyle ] := lSetting
-
-      lRet := .t.
-
    endif
 
 endif
 
-Return lRet
+Return Self
 
 //-------------------------------------------------------------------//
 function TBMOUSE( oBrowse, nMouseRow, nMouseCol )

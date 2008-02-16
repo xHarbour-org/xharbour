@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5920 2008/02/14 19:38:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5921 2008/02/16 15:01:10 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,23 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-16 14:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! fixed SetStyle() method. Reported by Eduardo Horbino.
+    + created Style access to return ::aStyle data.
+
+  * source/rtl/tget.prg
+  * source/rtl/tgetlist.prg
+    + created the new "@L" picture to scroll number from right to left
+      direction as calculator. This picture will acts only over numeric vars.
+      NumToLeft() code used in get class is a contrib by Julio Cesar Molina.
+
+      Note about navigation and editing keys under "@L" picture:
+      Right, Left, Ctrl-Right, Ctrl-Left, Home, End, Ctrl-Home, Ctrl-End and
+      Ctrl-BackSpc are without effect.
+      Del,BackSpc  Delete character at cursor position, but clear all
+                   text if the first key is Del.
 
 2008-02-16 10:30 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.sly
