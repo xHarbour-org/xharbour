@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.156 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: genc.c,v 1.157 2008/02/18 16:32:07 ronpinkas Exp $
  */
 
 /*
@@ -729,7 +729,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          if( pFunc == (PFUNCTION) 1 )
          {
             fprintf( yyc, "/* Skipped: call to '%s' resolved to external */\n", pFunCall->szName );
-            pFunc = NULL;
          }
          else if( pFunCall->Namespace && ( ( ( pFunCall->iFlags & NSF_RESOLVE ) != NSF_RESOLVE ) || ( pFunc && pFunc->pNamespace ) ) )
          {

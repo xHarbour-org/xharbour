@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.148 2008/02/16 15:01:12 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.149 2008/02/18 16:32:07 ronpinkas Exp $
  */
 
 /*
@@ -3371,7 +3371,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
                                  }
               ;
 
-NamespaceName : IdentName { $$ = ( $1 == hb_compExpr_IDs.GLOBAL_ ? "*" : $1 ); }
+NamespaceName : IdentName { $$ = ( $1 == hb_compExpr_IDs.GLOBAL_ ? (char *) "*" : $1 ); }
               ;
 
 Namespace  : NamespaceType IdentName Crlf
