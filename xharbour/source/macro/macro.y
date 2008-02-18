@@ -1,7 +1,7 @@
 %pure_parser
 %{
 /*
- * $Id: macro.y,v 1.34 2008/02/02 07:32:55 ronpinkas Exp $
+ * $Id: macro.y,v 1.35 2008/02/09 02:53:19 ronpinkas Exp $
  */
 
 /*
@@ -531,6 +531,7 @@ MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                     if( $1 != szVarName )
                                     {
                                        hb_xfree( $1 );
+                                       $1 = NULL;
                                     }
                                     HB_MACRO_CHECK( $$ );
                                  }
@@ -540,6 +541,7 @@ MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
                                      */
                                     HB_TRACE(HB_TR_DEBUG, ("macro -> invalid variable name: %s", $1));
                                     hb_xfree( $1 );
+                                    $1 = NULL;
                                     YYABORT;
                                  }
                               }
@@ -632,6 +634,7 @@ NamespacePath : IDENTIFIER '.'           { $$ = $1; }
               | NamespacePath IDENTIFIER '.' {
                                                $$ = hb_xstrcpy( NULL, $1, ".", $2, NULL );
                                                hb_xfree( $1 );
+                                               $1 = NULL;
                                              }
 
 /* Function call

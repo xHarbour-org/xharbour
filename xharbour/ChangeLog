@@ -1,12 +1,19 @@
 /*
- * $Id: ChangeLog,v 1.5925 2008/02/18 16:32:07 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5926 2008/02/18 16:46:18 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
-   YYYY-MM-DD HH:M   * UTC[-|+]hhm   * Your Full Name <your_email@address>
+   YYYY-MM-DD HH:MM UTC[-|+]hhmm Your Full Name <your_email@address>
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-18 19:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * ChangeLog
+    ! Fixed corrupt ChangeLog formatting hint.
+  * source/compiler/harbour.sly
+  * source/macro/macro.y
+    ! Fixed some possible GPF traps.
 
 2008-02-18 19:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbdefs.h

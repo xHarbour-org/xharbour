@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.149 2008/02/18 16:32:07 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.150 2008/02/18 16:36:34 ronpinkas Exp $
  */
 
 /*
@@ -403,9 +403,15 @@ CompTimeStr : LITERAL {
                hb_strncat( hb_strncpy( szFileName, $1.string, _POSIX_PATH_MAX ), $3.string, _POSIX_PATH_MAX );
                hb_compAutoOpenAdd( hb_compIdentifierNew( szFileName, TRUE ) );
                if( $1.dealloc )
+               {
                   hb_xfree( $1.string );
+                  $1.dealloc = FALSE;
+               }
                if( $3.dealloc )
+               {
                   hb_xfree( $3.string );
+                  $3.dealloc = FALSE;
+               }
             }
             ;
 
