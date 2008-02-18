@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.185 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: harbour.c,v 1.186 2008/02/18 00:35:51 likewolf Exp $
  */
 
 /*
@@ -1062,7 +1062,7 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
       hb_compFunCallAdd( pExtern->szName, NULL, NSF_NONE );
    }
 
-   if( ( pExtern->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
+   if( ( cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED )
    {
       pSym->cScope |= HB_FS_DEFERRED;
    }
@@ -2850,6 +2850,8 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
 {
    PNAMESPACE pNamespace = pCallerNamespace, pMember;
 
+   assert( pSymbol == NULL || ( pSymbol->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE );
+
    do
    {
       pMember = hb_compNamespaceFindMember( pNamespace->pNext, szFunctionName, NSTYPE_MEMBER );
@@ -2860,17 +2862,24 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
          {
             if( pSymbol  )
             {
-               assert( ( pSymbol->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE );
-
                pSymbol->Namespace = (void *) pNamespace;
                pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
                pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
+               //REVIEW: pSymbol->cScope |= HB_FS_LOCAL;
             }
 
             return (PFUNCTION) 1;
          }
          else
          {
+            if( pSymbol  )
+            {
+               pSymbol->Namespace = (void *) pNamespace;
+               pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
+               pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
+               pSymbol->cScope |= HB_FS_LOCAL;
+            }
+
             return pMember->extra.pFunc;
          }
       }
@@ -2880,6 +2889,19 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
       }
    }
    while( pNamespace );
+
+   if( pSymbol )
+   {
+      PCOMSYMBOL pGlobalSym = hb_compSymbolFind( szFunctionName, NULL, NULL, SYMF_FUNCALL );
+
+      if( pGlobalSym && ( pGlobalSym->cScope & HB_FS_DEFERRED ) )
+      {
+         pSymbol->cScope |=  HB_FS_DEFERRED;
+      }
+      
+      pSymbol->Namespace = NULL;
+      pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
+   }
 
    return NULL;
 }
@@ -6512,7 +6534,7 @@ static int hb_compCompile( char * szPrg )
             if( ! hb_comp_bSyntaxCheckOnly && ! bSkipGen && ( hb_comp_iErrorCount == 0 ) )
             {
                PFUNCTION pFunc;
-               char *szFirstFunction = NULL;
+               BOOL bDoFirst = TRUE;
 
                /* we create the output file name */
                hb_compOutputFile();
@@ -6542,23 +6564,37 @@ static int hb_compCompile( char * szPrg )
                      fprintf(hb_comp_VariableList,"\n");
                   }
 
-                  if( szFirstFunction == NULL && pFunc->szName[0] && ( pFunc->cScope & HB_FS_INITEXIT ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) == 0 )
+                  if( bDoFirst && pFunc->szName[0] && ( pFunc->cScope & HB_FS_INITEXIT ) == 0 && ( pFunc->cScope & HB_FS_UTILITY ) == 0 )
                   {
-                     szFirstFunction = pFunc->szName;
+                     PCOMSYMBOL pSym;
+
+                     if( pFunc->pNamespace )
+                     {
+                        pSym = hb_compSymbolFind( pFunc->szName, NULL, pFunc->pNamespace, SYMF_NS_EXPLICITPTR );
+
+                        if( pSym == NULL )
+                        {
+                           pSym = hb_compSymbolAdd( pFunc->szName, NULL, pFunc->pNamespace, SYMF_NS_EXPLICITPTR );
+                        }
+                     }
+                     else
+                     {
+                        pSym = hb_compSymbolFind( pFunc->szName, NULL, NULL, SYMF_FUNCALL );
+
+                        // TODO: Can this ever be true?
+                        if( pSym == NULL )
+                        {
+                           pSym = hb_compSymbolAdd( pFunc->szName, NULL, NULL, SYMF_FUNCALL );
+                        }
+                     }
+
+                     pSym->cScope |= HB_FS_FIRST;
+
+                     bDoFirst = FALSE;
                   }
 
                   pFunc = pFunc->pNext;
 
-               }
-
-               if( szFirstFunction )
-               {
-                  PCOMSYMBOL pSym = hb_compSymbolFind( szFirstFunction, NULL, NULL, SYMF_FUNCALL );
-
-                  if ( pSym )
-                  {
-                     pSym->cScope |= HB_FS_FIRST;
-                  }
                }
 
                if( ! hb_comp_bQuiet )

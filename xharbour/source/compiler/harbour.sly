@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.147 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.148 2008/02/16 15:01:12 ronpinkas Exp $
  */
 
 /*
@@ -744,9 +744,9 @@ ExtList    : IdentName                      { hb_compExternAdd( $1, NULL, (HB_SY
            | ExtList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, (HB_SYMBOLSCOPE) 0 ); }
            ;
 
-DynList    : IdentName                               { hb_compExternAdd( $1, NULL, HB_FS_DEFERRED ); }
+DynList    : IdentName                           { hb_compExternAdd( $1, NULL, HB_FS_DEFERRED ); }
            | NamespacePath IdentName             { hb_compExternAdd( $2, $1, HB_FS_DEFERRED ); }
-           | DynList ',' IdentName                   { hb_compExternAdd( $3, NULL, HB_FS_DEFERRED ); }
+           | DynList ',' IdentName               { hb_compExternAdd( $3, NULL, HB_FS_DEFERRED ); }
            | DynList ',' NamespacePath IdentName { hb_compExternAdd( $4, $3, HB_FS_DEFERRED ); }
            ;
 

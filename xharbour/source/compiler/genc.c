@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.155 2008/02/11 20:43:43 ronpinkas Exp $
+ * $Id: genc.c,v 1.156 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -509,7 +509,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             bCritical = TRUE;
          }
 
-         if( pFunc->pNamespace )
+         if( pFunc->pNamespace && ( isalpha( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
          {
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {
@@ -960,13 +960,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                      {
                         pSym->cScope |= HB_FS_STATIC;
                      }
-
-                     pSym->cScope |= HB_FS_LOCAL;
-
-                     pSym->iFlags &= ~SYMF_NS_RESOLVE;
-                     pSym->iFlags |= SYMF_NS_EXPLICITPTR;
-
-                     pSym->Namespace = (void *) pFunc->pNamespace;
                   }
                   else
                   {
@@ -1246,7 +1239,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
 
-         if( pFunc->pNamespace )
+         if( pFunc->pNamespace && ( isalpha( pFunc->szName[0] ) || pFunc->szName[0] == '_' ) )
          {
             if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
             {
