@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.184 2008/02/11 20:43:43 ronpinkas Exp $
+ * $Id: harbour.c,v 1.185 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -6389,7 +6389,9 @@ static int hb_compCompile( char * szPrg )
 
             if( hb_comp_bDebugInfo )
             {
-               hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
+               hb_compExternAdd( hb_compIdentifierNew( "__DBGENTRY", TRUE ), NULL, (HB_SYMBOLSCOPE) 0 );
+               /*hb_compFunCallAdd( "__DBGENTRY", NULL, NSF_NONE );
+               pSyn*/
             }
 
 
