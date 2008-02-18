@@ -1,5 +1,5 @@
 /*
- * $Id: hbdefs.h,v 1.96 2008/02/10 07:55:50 ronpinkas Exp $
+ * $Id: hbdefs.h,v 1.97 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -1110,9 +1110,11 @@ typedef unsigned long HB_COUNTER;
  *                 OpenWatcom C/C++ 1.2 and above
  *                 MinGW 3.4.5
  *
-*/
+ * - 18/feb/2008 - Phil Krylov <phil a t newstar.rinet.ru>
+ *                 Most MinGW versions still need it, including some 3.4.5 builds.
+ */
 #if ( defined(__WATCOMC__) && (__WATCOMC__<1220) ) || \
-    ( defined(__GNUC__) && !defined(__DJGPP__) && !defined(__WIN32__) /*&& !defined(HARBOUR_GCC_OS2)*/ )
+    ( defined(__GNUC__) && !defined(__DJGPP__) /* && !defined(HARBOUR_GCC_OS2)*/ )
    #define HARBOUR_START_PROCEDURE "MAIN"
 #endif
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5924 2008/02/18 00:35:51 likewolf Exp $
+ * $Id: ChangeLog,v 1.5925 2008/02/18 16:32:07 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-18 19:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbdefs.h
+    ! Restored HARBOUR_START_PROCEDURE under MinGW - even if some versions
+      don't need it, other versions do.
 
 2008-02-18 11:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/genc.c
