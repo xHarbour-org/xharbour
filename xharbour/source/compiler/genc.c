@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.158 2008/02/18 16:36:33 ronpinkas Exp $
+ * $Id: genc.c,v 1.159 2008/02/21 16:43:19 ronpinkas Exp $
  */
 
 /*
@@ -266,13 +266,13 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
-          else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
-          {
-             fprintf( yyc, "     /* %s = */ HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pNamespace->iID, pMember->szName );
-          }
           else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
           {
              fprintf( yyc, "     /* %s = */ HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
+          }
+          else if( ( pMember->type & NSTYPE_EXTERNAL ) == NSTYPE_EXTERNAL )
+          {
+             fprintf( yyc, "     /* %s = */ HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pNamespace->iID, pMember->szName );
           }
           else
           {

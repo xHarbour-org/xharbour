@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5926 2008/02/18 16:46:18 likewolf Exp $
+ * $Id: ChangeLog,v 1.5927 2008/02/18 16:55:14 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,20 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-21 12:36 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source\compiler\genc.c
+    * NSTYPE_OPTIONAL supercedes NSTYPE_EXTERNAL
+
+2008-02-21 12:10 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include\hbclass.ch
+    + Added support for CLASS ... IMPLEMENTS NAMESPACE <NamepaceName>
+
+  * include\hbcomp.h
+  * source\compiler\genc.c
+  * source\compiler\harbour.c
+  * source\compiler\harbour.sly
+    + Added support for ... IMPLEMENTS NAMESPACE <NamespaceName> in the same compilation unit of the Namespace definition
 
 2008-02-18 19:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * ChangeLog
