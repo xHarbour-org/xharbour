@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.157 2008/02/18 16:32:07 ronpinkas Exp $
+ * $Id: genc.c,v 1.158 2008/02/18 16:36:33 ronpinkas Exp $
  */
 
 /*
@@ -739,7 +739,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else
             {
-               fprintf( yyc, "/* Skipped: call to: '%s' to: '%s' */\n", pFunCall->szName, (char *) pFunCall->Namespace );
+               fprintf( yyc, "/* Skipped: call to: '%s' of: '%s' */\n", pFunCall->szName, (char *) pFunCall->Namespace );
             }
          }
          else if( hb_compFunctionFind( pFunCall->szName, NULL, NSF_NONE ) == NULL && hb_compInlineFind( pFunCall->szName ) == NULL )
@@ -1056,16 +1056,13 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, "HB_FS_PUBLIC" );
             }
 
-            if( ! ( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT ) )
+            if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
             {
-               if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
-               {
-                  fprintf( yyc, " | HB_FS_LOCAL" );
-               }
-               else if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) // MUTUALLY EXCLUSIVE
-               {
-                  fprintf( yyc, " | HB_FS_DEFERRED" );
-               }
+               fprintf( yyc, " | HB_FS_LOCAL" );
+            }
+            else if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) // MUTUALLY EXCLUSIVE
+            {
+               fprintf( yyc, " | HB_FS_DEFERRED" );
             }
 
             if( pSym->cScope & VS_MEMVAR )

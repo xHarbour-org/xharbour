@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.150 2008/02/18 16:36:34 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.151 2008/02/18 16:55:14 likewolf Exp $
  */
 
 /*
@@ -571,6 +571,8 @@ ParamList  : IdentName AsType                {
 ImplementsNamespace : /* Empty */                    { $$ = NULL; }
                     | IMPLEMENTS_NAMESPACE IdentName
                                                      {
+                                                       PNAMESPACE pNamespace;
+
                                                        $$ = $2;
 
                                                        if( hb_comp_Namespaces.pCurrent )
@@ -578,7 +580,15 @@ ImplementsNamespace : /* Empty */                    { $$ = NULL; }
                                                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_IMPLEMENTS_IN_NAMESPACE, hb_comp_Namespaces.pCurrent->szName, NULL );
                                                        }
 
+                                                       /* Might be IMPLEMENTS NAMESPACE in same compilation as namespace definition */
+                                                       pNamespace = hb_compNamespaceFind( hb_comp_Namespaces.pFirst, $$, NSTYPE_SPACE );
+
                                                        hb_compNamespaceNew( $$, NSTYPE_STEALTH );
+
+                                                       if( pNamespace )
+                                                       {
+                                                          hb_comp_Namespaces.pCurrent->iID = pNamespace->iID;
+                                                       }
                                                      }
                     ;
 
@@ -3329,7 +3339,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
 
                                    if( hb_comp_UsedNamespaces.pFirst )
                                    {
-                                      pNamespace = hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, $2 );
+                                      pNamespace = hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, $2, NSTYPE_SPACE );
 
                                       if( pNamespace == NULL && $2[0] == '*' )
                                       {
@@ -3494,14 +3504,14 @@ UsedPath : IdentName
                     {
                        if( hb_comp_UsedNamespaces.pFirst )
                        {
-                          $$ = (void *) hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, $1 );
+                          $$ = (void *) hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, $1, NSTYPE_SPACE );
                        }
                        else
                        {
                           $$ = NULL;
                        }
 
-                       if( $$ == NULL || ( ( ( (PNAMESPACE) $$ )->type & NSTYPE_SPACE ) != NSTYPE_SPACE ) )
+                       if( $$ == NULL )
                        {
                           hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_UNKNOWN_NAMESPACE, $1, NULL );
                           $$ = NULL;

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.67 2008/02/10 07:55:50 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.68 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -453,7 +453,7 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
     extern PNAMESPACE hb_compNamespaceLast( void );
     extern PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType );
     extern void       hb_compUsedNamespaceEnd( void );
-    extern PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName );
+    extern PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char *szName, int type );
     extern PNAMESPACE hb_compNamespaceFindMember( PNAMESPACE pNamespace, char *szName, int type );
 
     extern PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pNamespace, PCOMSYMBOL pSym );

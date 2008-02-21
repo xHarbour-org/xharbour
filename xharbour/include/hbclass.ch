@@ -1,5 +1,5 @@
 /*
- * $Id: hbclass.ch,v 1.58 2007/09/11 18:24:23 walito Exp $
+ * $Id: hbclass.ch,v 1.59 2007/12/08 02:31:20 ronpinkas Exp $
  */
 
 /*
@@ -101,10 +101,10 @@
 /* #define HB_CLS_ENFORCERO FLAG to disable Write access to RO VAR outside */
 /*         of Constructors /!\ Could be related to some incompatibility */
 
-#ifndef HB_CONSTRUCTOR_NO_DIVERT  
+#ifndef HB_CONSTRUCTOR_NO_DIVERT
   #define HB_CONSTRUCTOR_USE_DIVERT
 #endif
-  
+
 #ifdef HB_CONSTRUCTOR_USE_DIVERT
    DYNAMIC DivertConstructorCall
 #endif
@@ -331,9 +331,9 @@ DECLARE HBClass ;
 
 #xtranslate DECLMETH <ClassName> <MethodName> => <ClassName>_<MethodName>
 
-#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN> ] ] [<static: STATIC>] [ FUNCTION <FuncName> ] => ;
+#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN> ] ] [<static: STATIC>] [ FUNCTION <FuncName> ] [ IMPLEMENTS NAMESPACE <ns> ] => ;
    _HB_CLASS <ClassName> ;;
-   UTILITY <static> FUNCTION __OPT__( [ _AsName_( <FuncName> ), ] _AsName_( <ClassName> ))(...) ;;
+   UTILITY <static> FUNCTION __OPT__( [ _AsName_( <FuncName> ), ] _AsName_( <ClassName> ))(...) [ IMPLEMENTS NAMESPACE <ns> ];;
       static s_oClass ;;
       local oClassInstance ;;
       local nScope ;;
@@ -353,9 +353,9 @@ DECLARE HBClass ;
 
 #else
 
-#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] [ FUNCTION <FuncName> ] => ;
+#xcommand CLASS <ClassName> [METACLASS <metaClass>] [ <frm: FROM, INHERIT> <SuperClass1> [,<SuperClassN>] ] [<static: STATIC>] [ FUNCTION <FuncName> ] [ IMPLEMENTS NAMESPACE <ns> ] => ;
    _HB_CLASS <ClassName> ;;
-   UTILITY <static> FUNCTION __OPT__( [ _AsName_( <FuncName> ), ] _AsName_( <ClassName> ))(...) ;;
+   UTILITY <static> FUNCTION __OPT__( [ _AsName_( <FuncName> ), ] _AsName_( <ClassName> ))(...) [ IMPLEMENTS NAMESPACE <ns> ] ;;
       static s_oClass  ;;
       local oClassInstance ;;
       local nScope ;;
@@ -893,7 +893,7 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                          DIVERT TO (@DivertConstructorCall()) OF s_oClass ;;
                        #else ;;
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
-                       #endif ;;  
+                       #endif ;;
                       END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;
@@ -911,9 +911,9 @@ s_oClass:AddInline( <(op)>, {|Self [, <xArg>] | <Code> }, HBCLSCHOICE( .F., <.ex
                       IF PCount() > 0 ;;
                        #ifdef HB_CONSTRUCTOR_USE_DIVERT;;
                          DIVERT TO (@DivertConstructorCall()) OF s_oClass ;;
-                       #else ;; 
+                       #else ;;
                          RETURN s_oClass:ConstructorCall( oClassInstance, hb_aparams() ) ;;
-                       #endif ;; 
+                       #endif ;;
                       END ;;
                       RETURN oClassInstance AS CLASS _CLASS_NAME_ ;;
                       #undef  _CLASS_MODE_ ;;

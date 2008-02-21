@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.186 2008/02/18 00:35:51 likewolf Exp $
+ * $Id: harbour.c,v 1.187 2008/02/18 16:32:07 ronpinkas Exp $
  */
 
 /*
@@ -966,7 +966,7 @@ PFUNCALL hb_compFunCallAdd( char *szName, void *Namespace, int iFlags )
 
          szNamespace = hb_compIdentifierNew( szNamespace, TRUE );
 
-         if( hb_compNamespaceFindName( hb_comp_Namespaces.pFirst, szNamespace ) == NULL && hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, szNamespace ) == NULL )
+         if( hb_compNamespaceFind( hb_comp_Namespaces.pFirst, szNamespace, NSTYPE_SPACE ) == NULL && hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, szNamespace, NSTYPE_SPACE ) == NULL )
          {
             hb_compUsedNamespaceNew( szNamespace, NSTYPE_SPACE );
             hb_compUsedNamespaceEnd();
@@ -1022,7 +1022,7 @@ void hb_compExternAdd( char * szExternName, char *szNamespace, HB_SYMBOLSCOPE cS
 
       szNamespace = hb_compIdentifierNew( szConcat, FALSE );
 
-      pNamespace = hb_compNamespaceFindName( hb_comp_UsedNamespaces.pFirst, szNamespace );
+      pNamespace = hb_compNamespaceFind( hb_comp_UsedNamespaces.pFirst, szNamespace, 0 );
 
       if( pNamespace )
       {
@@ -2898,7 +2898,7 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
       {
          pSymbol->cScope |=  HB_FS_DEFERRED;
       }
-      
+
       pSymbol->Namespace = NULL;
       pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
    }
@@ -6026,11 +6026,11 @@ void hb_compNamespaceEnd( void )
    hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->extra.pOuter;
 }
 
-PNAMESPACE hb_compNamespaceFindName( PNAMESPACE pNamespace, char *szName )
+PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char *szName, int type )
 {
    while( pNamespace )
    {
-      if( pNamespace->szName == szName )
+      if( pNamespace->szName == szName && ( ( pNamespace->type & type ) == type ) )
       {
          return pNamespace;
       }
