@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5927 2008/02/18 16:55:14 likewolf Exp $
+ * $Id: ChangeLog,v 1.5928 2008/02/21 17:08:38 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,12 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-22 12:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
+   * source/compiler/genc.c
+     ! remove use of hb_stripOutComments() in hb_compGenCInLineSymbol() because
+       it is broken on certain cases, causing incorrect function declaration
+       in generated C code which avoid certain C compilers from compiling.
 
 2008-02-21 12:36 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source\compiler\genc.c

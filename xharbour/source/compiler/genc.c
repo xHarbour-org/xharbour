@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.159 2008/02/21 16:43:19 ronpinkas Exp $
+ * $Id: genc.c,v 1.160 2008/02/21 17:08:39 ronpinkas Exp $
  */
 
 /*
@@ -1750,6 +1750,8 @@ static void hb_compGenCCheckInLineStatic( char *sInline )
    int iOption;
    char *sBase = sInline;
 
+   //printf( "%s\n", sInline );
+
    while( ( sInline = strstr( sInline, "HB_FUNC" ) ) != NULL )
    {
       sInline += 7;
@@ -1869,7 +1871,9 @@ static void hb_compGenCInLineSymbol()
 
    while( pInline )
    {
-      char *sInline = hb_stripOutComments( (char*) pInline->pCode );
+      char *sInline = (char*) hb_xgrab( strlen( (char*) pInline->pCode) + 1 );
+      sprintf( sInline, "%s", pInline->pCode );
+
       if( sInline )
       {
          hb_compGenCCheckInLineStatic( sInline );
