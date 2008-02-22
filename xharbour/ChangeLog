@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5928 2008/02/21 17:08:38 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5929 2008/02/22 05:37:52 andijahja Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-02-22 19:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/genhrb.c
+    ! Fixed debug info generated for .hrb modules to allow setting breakpoints
+      and running to cursor.
 
 2008-02-22 12:40 UTC+0700 Andi Jahja <harbour/AT/cbn/net/id>
    * source/compiler/genc.c

@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.6 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.7 2008/02/14 19:38:40 ronpinkas Exp $
  */
 
 /*
@@ -214,7 +214,14 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          }
       }
 
-      fputs( pSym->szName, yyc );
+      if ( pSym->szName[ 0 ] == '<' )
+      {
+         fputs( "(_INITLINES)", yyc );
+      }
+      else
+      {
+         fputs( pSym->szName, yyc );
+      }
       fputc( 0, yyc );
 
       hSymScope = pSym->cScope;
@@ -287,7 +294,14 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          }
       }
 
-      fputs( pFunc->szName, yyc );
+      if ( pFunc->szName[ 0 ] == '<' )
+      {
+         fputs( "(_INITLINES)", yyc );
+      }
+      else
+      {
+         fputs( pFunc->szName, yyc );
+      }
       fputc( 0, yyc );
 
       ulCodeLength = pFunc->lPCodePos;
