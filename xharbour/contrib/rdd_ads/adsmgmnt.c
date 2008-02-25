@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.13 2006/10/12 19:44:20 ronpinkas Exp $
+ * $Id: adsmgmnt.c,v 1.14 2007/12/13 05:29:27 vouchcac Exp $
  */
 
 /*
@@ -512,24 +512,88 @@ HB_FUNC( ADSMGGETSERVERTYPE )   /* Determine OS ADS is running on; see ADS_MGMT_
    }
 }
 
-/*
-
 HB_FUNC( ADSMGGETOPENTABLES )
 {
-   UNSIGNED32  ulRetVal ;
-   UNSIGNED32  ulMaxUsers = 100 ;        // needed for array memory allocation; caller can set with 2nd arg
-   UNSIGNED32  ulCount;
-   UNSIGNED16  usStructSize = sizeof( ADS_MGMT_USER_INFO );
-   ADS_MGMT_USER_INFO*  pastUserInfo;
-Get # of tables from ADS_MGMT_ACTIVITY_INFO
+   UNSIGNED32  ulRetVal;
+   UNSIGNED16  pusArrayLen = 300;
+   UNSIGNED16  ulCount;
+   UNSIGNED16  pusStructSize = sizeof( ADS_MGMT_TABLE_INFO );
+   ADS_MGMT_TABLE_INFO * astOpenTableInfo;
+
+   if( ISNUM( 2 ) )
+   {
+       pusArrayLen = (UNSIGNED16) hb_parnl( 1 );
+   }
+
+   astOpenTableInfo = ( ADS_MGMT_TABLE_INFO * ) hb_xgrab( sizeof( ADS_MGMT_TABLE_INFO ) * pusArrayLen );
+
+   ulRetVal = AdsMgGetOpenTables( hMgmtHandle,
+                                  NULL,
+                                  0,
+                                  astOpenTableInfo,
+                                  &pusArrayLen,
+                                  &pusStructSize );
+
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      PHB_ITEM pArray = hb_itemArrayNew( pusArrayLen );
+
+      for( ulCount = 1; ulCount <= pusArrayLen; ulCount++ )
+      {
+           hb_itemPutC( hb_arrayGetItemPtr( pArray, ( ULONG ) ulCount ), ( char * ) astOpenTableInfo[ ulCount - 1 ].aucTableName );
+      }
+      hb_itemRelease( hb_itemReturn( pArray ) );
+   }
+   else
+   {
+      hb_reta( 0 );
+   }
+   hb_xfree( astOpenTableInfo );
 }
+
+//------------------------------------------------------------------------------------------------------------------//
 
 HB_FUNC( ADSMGGETOPENINDEXES )
 {
-   UNSIGNED32              ulRetVal = AE_SUCCESS;
-   AdsMgGetOpenIndexes();
+   UNSIGNED32  ulRetVal;
+   UNSIGNED16  pusArrayLen = 300;
+   UNSIGNED16  ulCount;
+   UNSIGNED16  pusStructSize = sizeof( ADS_MGMT_INDEX_INFO );
+   ADS_MGMT_INDEX_INFO * astOpenIndexInfo;
+
+   if( ISNUM( 1 ) )
+   {
+       pusArrayLen = (UNSIGNED16) hb_parnl( 1 );
+   }
+
+   astOpenIndexInfo = ( ADS_MGMT_INDEX_INFO * ) hb_xgrab( sizeof( ADS_MGMT_INDEX_INFO ) * pusArrayLen );
+
+   ulRetVal = AdsMgGetOpenIndexes( hMgmtHandle,
+                                   NULL,
+                                   NULL,
+                                   0,
+                                   astOpenIndexInfo,
+                                   &pusArrayLen,
+                                   &pusStructSize );
+
+   if ( ulRetVal == AE_SUCCESS )
+   {
+      PHB_ITEM pArray = hb_itemArrayNew( pusArrayLen );
+
+      for( ulCount = 1; ulCount <= pusArrayLen; ulCount++ )
+      {
+           hb_itemPutC( hb_arrayGetItemPtr( pArray, ( ULONG ) ulCount ), ( char * ) astOpenIndexInfo[ ulCount - 1 ].aucIndexName );
+      }
+      hb_itemRelease( hb_itemReturn( pArray ) );
+   }
+   else
+   {
+      hb_reta( 0 );
+   }
+   hb_xfree( astOpenIndexInfo );
 }
 
+/*
 HB_FUNC( ADSMGGETLOCKS )
 {
    UNSIGNED32              ulRetVal = AE_SUCCESS;
