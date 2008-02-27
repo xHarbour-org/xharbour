@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.139 2008/02/12 11:45:11 modalsist Exp $
+ * $Id: tget.prg,v 1.141 2008/02/16 22:27:14 modalsist Exp $
  */
 
 /*
@@ -186,6 +186,7 @@ CLASS Get
 
    DATA lNumToLeft  INIT .F.       // to "@L" mask
    METHOD _NumToLeft()             // idem.
+   METHOD StopMoveH()               // idem
 
    METHOD ParsePict( cPicture )
    METHOD DeleteAll()
@@ -199,6 +200,7 @@ CLASS Get
 
    DATA lForceCentury                 // to "@2" or "@4" masks.
    DATA lCentury INIT __SetCentury()  // idem
+   DATA lDecPos INIT .F.
 
 ENDCLASS
 
@@ -711,12 +713,15 @@ METHOD Display( lForced ) CLASS Get
       ENDIF
 
       /* 2008/FEB/15 - E.F. - Adjust col pos when @L is used. */
-      if ::lNumtoLeft
+      if ::lNumtoLeft 
          if ::DecPos != NIL .and. ::DecPos > 0
-            nCol := ::Col + ::DecPos - 2
+            if ::Pos < ::DecPos
+               nCol := ::Col + ::DecPos - 2
+            endif
          else
             nCol := ::Col + ::nMaxLen - 1
          endif
+
       endif
 
       SetPos( ::Row, nCol  )
@@ -735,7 +740,7 @@ METHOD End() CLASS Get
 
    local nLastCharPos, nPos, nFor
 
-   if ::HasFocus != nil .and. ::HasFocus
+   if ::HasFocus != nil .and. ::HasFocus .and. ! ::StopMoveH()
 
       /* 2006/JUN/03 - E.F. if cursor is already in last get value entered
        * position +1, then go to the end display position.
@@ -791,7 +796,7 @@ return Self
 
 METHOD Home() CLASS Get
 
-   if ::HasFocus 
+   if ::HasFocus .and. !::StopMoveH()
       ::Pos := ::FirstEditable()
       ::TypeOut := .f.
       ::Clear := .f.
@@ -1411,6 +1416,8 @@ METHOD _Right( lDisplay ) CLASS Get
       return Self
    endif
 
+if ! ::StopMoveH()
+
    ::TypeOut := .f.
    ::Clear   := .f.
 
@@ -1435,6 +1442,12 @@ METHOD _Right( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
+   if ::DecPos != NIL .and. ::Pos > ::DecPos
+      ::lDecPos := .t.
+   endif
+
+endif
+
 return Self
 
 //---------------------------------------------------------------------------//
@@ -1448,6 +1461,8 @@ METHOD _Left( lDisplay ) CLASS Get
    if ! ::hasfocus
       return Self
    endif
+
+if ! ::StopMoveH()
 
    ::TypeOut := .f.
    ::Clear   := .f.
@@ -1473,6 +1488,8 @@ METHOD _Left( lDisplay ) CLASS Get
       ::Display( .f. )
    endif
 
+endif
+
 return Self
 
 //---------------------------------------------------------------------------//
@@ -1484,6 +1501,8 @@ METHOD WordLeft() CLASS Get
    if ! ::hasfocus
       return Self
    endif
+
+if ! ::StopMoveH()
 
    ::TypeOut := .f.
    ::Clear   := .f.
@@ -1509,6 +1528,8 @@ METHOD WordLeft() CLASS Get
 
    ::Display( .f. )
 
+endif
+
 return Self
 
 //---------------------------------------------------------------------------//
@@ -1520,6 +1541,8 @@ METHOD WordRight() CLASS Get
    if ! ::hasfocus 
       return Self
    endif
+
+if ! ::StopMoveH()
 
    ::TypeOut := .f.
    ::Clear   := .f.
@@ -1544,6 +1567,8 @@ METHOD WordRight() CLASS Get
    ::Pos := nPos
 
    ::Display( .f. )
+
+endif
 
 return Self
 
@@ -1570,6 +1595,7 @@ LOCAL xBuffer
    xBuffer   := ::UnTransform()
    ::Buffer  := ::PutMask( xBuffer, .f. )
    ::Pos     := ::DecPos + 1
+   ::lDecPos := .t.
 
    ::Display( .t. )
 
@@ -1952,10 +1978,14 @@ METHOD BackSpace( lDisplay ) CLASS Get
 
    ::Left()
 
-   if ::Pos < nPos
+   if ::Pos < nPos 
       ::Delete( lDisplay )
    elseif ::lNumToLeft
-      ::DeleteAll()
+//    ::DeleteAll()
+      if ::Pos=1 .and. nPos=1 
+         ::Pos := if(::DecPos != NIL .and. ::DecPos > 0, ::DecPos - 2, ::nMaxLen - 1 )
+         ::Delete( lDisplay )
+      endif
    endif
 
 return Self
@@ -1988,12 +2018,28 @@ METHOD _Delete( lDisplay ) CLASS Get
    /* 2006/OCT/06 - E.F. Added new @K+ functionality to empty
     *               get buffer if first key pressed is DEL key.
     */
-   if ( "K+" IN ::cPicFunc .and. ::Pos == ::FirstEditable() ) 
+   if ( "K+" IN ::cPicFunc .and. ::Pos == ::FirstEditable() ) .or.;
+      ::lNumToLeft .and. !IsDigit( SubStr(::buffer, ::Pos, 1 ) )
       ::DeleteAll()
    else
+      /* 2007/FEB/24 - E.F. - Adjust ::Pos value under @L picture */
+      if ::lNumToLeft
+         if ::lDecPos
+            if ::Pos < ::DecPos 
+               ::Pos++
+            endif
+            if ::Pos-1 < ::DecPos
+               ::lDecPos := .f.
+            endif
+         elseif IsDigit( Right(::buffer,1)) .and. ::Pos+1 == ::nMaxLen
+            ::Pos++
+         endif
+      endif
+
       ::buffer := PadR( SubStr( ::buffer, 1, ::Pos - 1 ) + ;
                   SubStr( ::buffer, ::Pos + 1, nMaxLen - ::Pos ) + " " +;
                   SubStr( ::buffer, nMaxLen + 1 ), ::nMaxLen )
+
    endif
 
 
@@ -2297,32 +2343,85 @@ Return 0
 
 METHOD _NumToLeft() CLASS GET
 
-LOCAL cColor 
+LOCAL nRow,nCol
+LOCAL cColor, cBuff, nValue 
 
  /* 2008/FEB/15 - E.F. - Scroll numbers from right to left as calculator.
   *                      Contributed by Julio Cesar Cantillo Molina.
   */
   IF ::Type == "N"  
+
      HBConsoleLock()
      DispBegin()
-     cColor   := substr( ::colorSpec, at(",",::colorSpec)+1 )
-     //
-     DispOutAt( ::Row, ::Col, " ", cColor )
-     DispOutAt( ::Row, ::Col, Transform( ::UnTransform(), SubStr( ::picture, at( "9", ::Picture ) ) ), cColor )
-     IF ( at( "-", ::buffer ) > 0 .and. ::UnTransform() = 0 )
-        DispOutAt( ::Row, ::Col, "-", cColor )
+
+     nRow := ::Row
+     nCol := ::Col
+
+     nValue := ::UnTransform()
+     cBuff := Transform( nValue, SubStr( ::picture, at( "9", ::Picture ) ) )
+
+     IF "," IN ::cPicture .AND. "." IN ::cPicture
+        IF "R" IN ::cPicFunc .AND. !("E" IN ::cPicFunc)
+           cBuff := StrTran(cBuff, ".", "" )
+           cBuff := StrTran(cBuff, ",", "" )
+           cBuff := Transform( cBuff, ::cPicture )
+        ELSEIF "E" IN ::cPicFunc
+           IF "R" IN ::cPicFunc
+              cBuff := Transform( cBuff, ::cPicMask )
+           ELSE
+              cBuff := Transform( cBuff, ::cPicture )
+           ENDIF
+           cBuff := StrTran(cBuff, ".", chr(1) )
+           cBuff := StrTran(cBuff, ",", "." )
+           cBuff := StrTran(cBuff, chr(1), "," )
+        ENDIF
+     ENDIF
+
+     cColor := substr( ::colorSpec, at(",",::colorSpec)+1 )
+
+     DispOutAt( nRow, nCol, " ", cColor )
+     DispOutAt( nRow, nCol, cBuff , cColor )
+
+     IF ( at( "-", ::buffer ) > 0 .and. nValue = 0 )
+        DispOutAt( nRow, nCol, "-", cColor )
      ENDIF
 
      IF ( ::DecPos > 0 )
-     // SetPos( ::row, ::col + IF( ::decpos > ::pos, ::decPos, ::Pos ) - 1 )
-        SetPos( ::row, ::col + Min( Len(::buffer),Max(::decpos-1,::Pos ) ) - 1 )
+     // SetPos( nRow, nCol + IF( ::decpos > ::pos, ::decPos, ::Pos ) - 1 )
+        SetPos( nRow, nCol + Min( Len(::buffer),Max(::decpos-1,::Pos ) ) - 1 )
      ENDIF
+
      DispEnd()
      HBConsoleUnLock()
+
   ENDIF
 
 RETURN SELF
 
+//--------------------------------------------------------------------------//
+
+METHOD StopMoveH() CLASS Get
+* stop horizontal cursor movement under @L picture.
+
+Local lStop := .f.
+Local nKey := Lastkey()
+
+ if ::lNumToLeft .and. ! ::lDecPos .and.;
+    ( nKey == K_LEFT  .or.;
+      nKey == K_RIGHT .or.;
+      nKey == K_HOME  .or.;
+      nKey == K_END   .or.;
+      nKey == K_CTRL_RIGHT .or.;
+      nKey == K_CTRL_LEFT )
+
+    if ::DecPos != NIL .and. ::DecPos > 0
+       lStop := ( ::Pos < ::DecPos )
+    else
+       lStop := .t. 
+    endif
+ endif
+
+Return lStop
 
 //---------------------------------------------------------------------------//
 /*
@@ -2474,3 +2573,5 @@ LOCAL r := 0
  NEXT
 
 RETURN r
+
+

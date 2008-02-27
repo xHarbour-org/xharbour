@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.189 2008/01/30 18:19:34 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.190 2008/02/16 16:02:04 modalsist Exp $
  */
 
 /*
@@ -262,6 +262,10 @@ RETURN Self
 METHOD dbSkip( nRecsToSkip ) CLASS TDataCache
 
    LOCAL nRecsSkipped
+
+   if ! HB_IsBlock( ::oCachedBrowse:SkipBlock )
+      RETURN 0
+   endif
 
    /* 2007/DEC/14 - E.F. - Avoid to pass after phantom record if tbrowse's
                            datasource is a database when exist a custom skipblock.

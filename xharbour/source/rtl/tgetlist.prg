@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.42 2007/10/01 01:50:33 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.43 2008/02/16 16:02:05 modalsist Exp $
  */
 
 /*
@@ -481,8 +481,12 @@ METHOD GetApplyKey( nKey ) CLASS HBGetList
 
       case K_DEL
          if oGet:NToL
-            oGet:BackSpace()
-            oGet:NumToLeft()
+            if oGet:DecPos != nil .and. oGet:Pos > oGet:DecPos
+               oGet:Delete()
+            else
+               oGet:BackSpace()
+               oGet:NumToLeft()
+            endif
          else
             oGet:Delete()
          endif
