@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5931 2008/02/25 16:01:01 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5932 2008/02/27 13:03:58 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,10 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+2008-03-03 08:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
+  * source/rtl/teditor.prg
+    ! fixed RTL in HBEditor():DelTextSelection() when last line of text
+      deleted by {Shift + DownArrow}
 
 2008-02-27 10:00 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tget.prg
@@ -14,7 +18,7 @@
     ! fixed buffer content after DEL operation under @L picture.
 
   * source/rtl/tbrowse.prg
-    ! fixed dbSkip() method to return 0 when SkipBlock is null.  
+    ! fixed dbSkip() method to return 0 when SkipBlock is null.
 
 2008-02-25 13:00 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
    * contrib/rdd_ads/adsmgmnt.c

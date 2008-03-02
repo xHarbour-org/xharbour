@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.83 2007/09/03 18:31:54 paultucker Exp $
+/* $Id: teditor.prg,v 1.84 2007/09/27 11:09:34 modalsist Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.83 2007/09/03 18:31:54 paultucker Exp $
+/* $Id: teditor.prg,v 1.84 2007/09/27 11:09:34 modalsist Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -316,7 +316,7 @@ METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabS
 
    ::nWordWrapCol := nLineLength - 1  // please don't change it.
 
-   
+
    if lEditMode != NIL
       ::lEditAllow := lEditMode
    endif
@@ -461,16 +461,16 @@ METHOD RefreshWindow() CLASS HBEditor
    // C is faster than a VM loop!!
    //
    //ScrollFixed( ::nTop, ::nLeft, ::nBottom, ::nRight )
-   
+
    for i := 0 to Min( ::nNumRows - 1, ::LastRow() - 1 )
 
       // 2006/JUL/23 - E.F. Adjusted to avoid out of bound.
       //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here,
-      //               because getline return line number in tbrwtext.prg (debug). 
+      //               because getline return line number in tbrwtext.prg (debug).
       DispOutAt( Min(::nTop + i,::nBottom), ::nLeft, ;
                  PadR( iif(::nFirstRow+i <= ::LastRow(), SubStr( ::GetLine( ::nFirstRow + i ), ::nFirstCol, ::nNumCols ),Space(::nNumCols) ) , ::nNumCols ), ;
                  ::LineColor( ::nFirstRow + i ) )
-  
+
    next
 
    ScrollFixed( ::nTop + i, ::nLeft, ::nBottom, ::nRight )
@@ -491,12 +491,12 @@ METHOD LineColor( nRow ) CLASS HBEditor
    local cColor
 
    if ::lSelActive .and. ( ( nRow >= ::nRowSelStart ) .and. ( nRow <= ::nRowSelEnd ) )  .and.;
-      ::nRowSelStart > 0 .and. ::nRowSelEnd > 0 
+      ::nRowSelStart > 0 .and. ::nRowSelEnd > 0
       cColor := hb_ColorIndex( ::cColorSpec, CLR_ENHANCED )
    else
-      cColor := hb_ColorIndex( ::cColorSpec, CLR_STANDARD )         
+      cColor := hb_ColorIndex( ::cColorSpec, CLR_STANDARD )
    endif
- 
+
 return cColor
 //-------------------------------------------------------------------//
 //
@@ -510,9 +510,9 @@ METHOD ColColor() CLASS HBEditor
       ::nColSelStart <= ::nColSelEnd
       cColor := hb_ColorIndex( ::cColorSpec, CLR_ENHANCED )
    else
-      cColor := hb_ColorIndex( ::cColorSpec, CLR_STANDARD )         
+      cColor := hb_ColorIndex( ::cColorSpec, CLR_STANDARD )
    endif
- 
+
 return cColor
 
 //-------------------------------------------------------------------//
@@ -536,7 +536,7 @@ METHOD RefreshLine( lRefreshColSel ) CLASS HBEditor
 
       // 2006/AUG/02 - E.F.
       //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here
-      //               because getline return line number in tbrwtext.prg (debug). 
+      //               because getline return line number in tbrwtext.prg (debug).
       DispOutAt( ::Row(), ::nLeft, PadR( SubStr( ::GetLine( ::nRow ), ::nFirstCol, ::nNumCols ), ::nNumCols, " " ), ::LineColor( ::nRow ) )
 
       if lRefreshColSel
@@ -579,7 +579,7 @@ METHOD RefreshColumn() CLASS HBEditor
 
    // 2006/AUG/02 - E.F.
    //               Don't replace ::GetLine(nRow) by ::aText[nRow]:cText here
-   //               because getline return line number in tbrwtext.prg (debug). 
+   //               because getline return line number in tbrwtext.prg (debug).
    for i := 0 to Min( ::nNumRows - 1, ::LastRow() - 1 )
       DispOutAt( ::nTop + i, nOCol, SubStr( ::GetLine(::nFirstRow + i ), ::nCol, 1 ), ::LineColor( ::nFirstRow + i ) )
    next
@@ -693,7 +693,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
    LOCAL nKey
    LOCAL lOldInsert
    LOCAL lDelAppend
-   LOCAL lSingleKeyProcess := .F. 
+   LOCAL lSingleKeyProcess := .F.
 
 
    // If user pressed an exiting key ( K_ESC or K_ALT_W ) or I've received
@@ -747,7 +747,7 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
             case K_SH_UP
                if ::nRow > 1
                   ::SetTextSelection( "ROW", -1 )
-               endif 
+               endif
                exit
 
             case K_SH_RIGHT
@@ -817,12 +817,12 @@ METHOD Edit( nPassedKey ) CLASS HBEditor
                   ::ClrTextSelection()
                   ::ReformParagraph() // 2006/JUL/29 -E.F. Added.
                endif
-               exit 
+               exit
 #else
             case K_ALT_W
                  exit
 
-            case K_CTRL_W  
+            case K_CTRL_W
                  ::lSaved := .T.
                  ::lExitEdit := .T.
                   SetCursor( ::nOrigCursor )   // restore original cursor saved at startup
@@ -1075,7 +1075,7 @@ Return Self
 METHOD Bottom() CLASS HBEditor
    LOCAL nRowTo := min( ::nFirstRow + ::nNumRows-1, ::LastRow() )
 
-   ::GotoLine( nRowTo ) 
+   ::GotoLine( nRowTo )
 
 RETURN Self
 
@@ -1171,7 +1171,7 @@ RETURN Self
 METHOD Right() CLASS HBEditor
 
    if ( ::lWordWrap )
-      // 2006/07/19 - E.F. Changed max right point to pos cursor to next. 
+      // 2006/07/19 - E.F. Changed max right point to pos cursor to next.
       //
       IF ::nCol > ::nWordWrapCol .AND. ::nRow < ::LastRow()
          ::GotoPos( ::nRow + 1, 1, .T. )
@@ -1208,7 +1208,7 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
    endif
 
    dispbegin()  // to minimize flicker.
- 
+
    // 2006/JUL/21 - E.F. Changed to verify empty character instead space.
    //                    In any circunstancies wordright stop at space.
    //                    Added verification in not wordwrap mode if reach
@@ -1218,7 +1218,7 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
    while ::nCol <= nMaxCol .AND. !Empty( ::GetCol( ::nRow, ::nCol ) )
       ::Right()
       if ::nCol > nMaxCol  .OR.;
-         (!::lWordWrap .AND. ::nCol >= nMaxCol )  
+         (!::lWordWrap .AND. ::nCol >= nMaxCol )
          exit
       endif
    enddo
@@ -1226,7 +1226,7 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
    while ::nCol <= nMaxCol .AND. Empty( ::GetCol( ::nRow, ::nCol ) )
       ::Right()
       if ::nCol > nMaxCol .OR.;
-         (!::lWordWrap .AND. ::nCol >= nMaxCol )  
+         (!::lWordWrap .AND. ::nCol >= nMaxCol )
          exit
       endif
    enddo
@@ -1235,7 +1235,7 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
       while ::nCol > 1 .AND. !Empty( ::GetCol( ::nRow, ::nCol ) )
         ::Left()
       enddo
-      while ::nCol < nMaxCol .AND. empty( ::GetCol(::nRow,::nCol ) )  
+      while ::nCol < nMaxCol .AND. empty( ::GetCol(::nRow,::nCol ) )
          ::right()
       enddo
    endif
@@ -1250,17 +1250,17 @@ LOCAL nMaxCol := Min( ::nWordWrapCol+1, ::LineLen( ::nRow ) )
          if ::nCol > nMaxCol .and. ::nRow < ::LastRow()
             ::Down()
             ::Home()
-            if Empty(::GetCol( ::nRow, ::nCol )) 
+            if Empty(::GetCol( ::nRow, ::nCol ))
                ::WordRight()
             endif
          // 2006/JUL/21 - E.F. - If cursor stop at empty char and it is the
          //                      last reachable position go back to the previous word.
-         elseif ::nCol >= nMaxCol .and. ::nRow == ::LastRow() 
+         elseif ::nCol >= nMaxCol .and. ::nRow == ::LastRow()
             if !Empty( ::GetCol( ::nRow, ::nCol ) )
                ::end()
             endif
             ::WordLeft()
-         elseif ::nCol = 1 .and. Empty( ::GetCol( ::nRow, ::nCol ) )       
+         elseif ::nCol = 1 .and. Empty( ::GetCol( ::nRow, ::nCol ) )
             ::WordRight()
          endif
       else
@@ -1571,7 +1571,7 @@ METHOD K_Del() CLASS HBEditor
       // in case of softcr, reparse the paragraph.
       //
       IF ::aText[ ::nRow ]:lSoftCR == .T.
-         IF ::aText[ ::nRow ]:cText[ -1 ] != " " 
+         IF ::aText[ ::nRow ]:cText[ -1 ] != " "
             ::aText[ ::nRow ]:cText += " "
          ENDIF
 
@@ -1596,7 +1596,7 @@ METHOD K_Del() CLASS HBEditor
       // 2006/07/19 - E.F. Merge line only if ::nRow+1 is valid,
       //                   to avoid bound error.
       //
-      IF ::nRow+1 <= ::LastRow() 
+      IF ::nRow+1 <= ::LastRow()
          // copy the other line
          ::aText[ ::nRow ]:cText += ::aText[ ::nRow + 1 ]:cText
          // copy its softcr setting
@@ -1752,7 +1752,7 @@ METHOD K_Esc() CLASS HBEditor
 
       // 2006/JUL/21 - E.F - Exit only if "Y" is pressed.
       //
-      ::lExitEdit := ( Upper( Chr(nKey) ) == "Y" ) 
+      ::lExitEdit := ( Upper( Chr(nKey) ) == "Y" )
    ENDIF
 
    IF ::lExitEdit
@@ -1791,7 +1791,7 @@ METHOD InsertLine( cLine, lSoftCR, nRow ) CLASS HBEditor
       IF Len( cLine ) == 0
          lSoftCR := .F.
       ENDIF
-      ::AddLine( cLine, lSoftCR ) 
+      ::AddLine( cLine, lSoftCR )
    ELSE
       AIns( ::aText, nRow, HBTextLine():New( cLine, lSoftCR ), .T. )
    ENDIF
@@ -2151,7 +2151,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
    nStartRow  := nRow
    cLine      := GetParagraph( Self, nRow )
 
-   while Len( cLine ) >= ::nWordWrapCol 
+   while Len( cLine ) >= ::nWordWrapCol
       // Added + 1 because it is possible that line ends when there is a space
       // next to nWordWrapCol
       //
@@ -2189,7 +2189,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       //
 //GAD
       if right( cSplittedLine,1 ) <> " " .AND. nFirstSpace > 1
-         // 2006/JUL/21 - E.F. - Added condition to not stay out of max columns. 
+         // 2006/JUL/21 - E.F. - Added condition to not stay out of max columns.
          if Len(cSplittedLine) < ::nNumCols
             cSplittedLine += " "
          endif
@@ -2197,7 +2197,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
       // We must not trim the line as split occurs next to a space
       //
       ::InsertLine( cSplittedLine, .T., nStartRow++ )
-      cLine := Substr( cLine, Len( cSplittedLine ) + 1 ) 
+      cLine := Substr( cLine, Len( cSplittedLine ) + 1 )
    enddo
 
    // insert EVEN an empty row (it will be added at bottom)
@@ -2620,7 +2620,7 @@ METHOD SetTextSelection( cAction, nCount ) CLASS HBEditor
             if ::nRow > 1
                ::GotoLine( ::nRow - 1 )
             endif
-            
+
             if ::nRow >= ::nRowSelStart .AND. ::nRow <= ::nRowSelEnd
                if ::nRowSelEnd - ::nRowSelStart > 0
                   ::nRowSelEnd := ::nRow - 1
@@ -2784,10 +2784,10 @@ METHOD DelTextSelection() CLASS HBEditor
 
          ::ClrTextSelection()
 
-      else 
+      else
 
          if ::nColSelStart > 0 .and. ::nColSelEnd > 0
-            if empty( nRowSelStart )         
+            if empty( nRowSelStart )
                nRowSelStart := ::nColSelRow
             endif
             cText := ::aText[::nRow]:cText
@@ -2801,6 +2801,11 @@ METHOD DelTextSelection() CLASS HBEditor
             endif
          endif
 
+      endif
+      // 3/03/2008 8:26a.m. added next 4 lines to fix array out of bounds RTL
+      if ::nRow > ::LastRow()
+         ::Addline("", .F. )
+         ::GoBottom()
       endif
 
    endif
@@ -2839,7 +2844,7 @@ METHOD AddText( cString, lAtPos ) CLASS HBEditor
          next
       else
          nAtRow--
-         for i := 1 to nLines 
+         for i := 1 to nLines
              AIns( ::aText, nAtRow+i, aTmpText[ i ], .T. )
          next
          if nLines > 0
