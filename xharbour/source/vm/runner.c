@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.51 2007/11/27 00:06:44 andijahja Exp $
+ * $Id: runner.c,v 1.52 2008/02/10 07:55:51 ronpinkas Exp $
  */
 
 /*
@@ -91,6 +91,7 @@ typedef struct
    PHB_DYNF pDynFunc;                           /* Functions read           */
    PSYMBOLS pModuleSymbols;
    HB_DYNS  ModuleFakeDyn;
+   char *pNamespaces;
 } HRB_BODY, * PHRB_BODY;
 
 
@@ -357,17 +358,17 @@ static ULONG hb_hrbFindSymbol( char * szName, PHB_DYNF pDynFunc, ULONG ulLoaded 
    return SYM_NOT_FOUND;
 }
 
-static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
+static void hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
-   BYTE szHead[] = { (BYTE)192,'H','R','B' };
+   BYTE szHead[] = { (BYTE) 192, 'H','R','B' };
    char cInt[ 2 ];
 
    HB_TRACE(HB_TR_DEBUG, ("hb_hrbReadHead(%p,%i,%i)", szBody, ulBodySize, * ulBodyOffset ));
 
    if( ulBodySize < 6 || strncmp( ( char * ) szHead, ( char * ) szBody, 4 ) )
    {
-      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
-      return 0;
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD()->hb_hrbReadHead()", 0 );
+      return;
    }
 
    cInt[0] = szBody[(*ulBodyOffset)+4];
@@ -375,7 +376,13 @@ static int hb_hrbReadHead( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset
 
    * ulBodyOffset += 6;    // header + version offset
 
-   return HB_PCODE_MKSHORT( cInt );
+   if( HB_PCODE_MKSHORT( cInt ) != HB_HRB_VER )
+   {
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "Incompatible HRB version", 0 );
+      return;
+   }
+
+   return ;
 }
 
 /* ReadId
@@ -392,7 +399,7 @@ static char * hb_hrbReadId( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffse
    {
       if ( *ulBodyOffset > ulBodySize )
       {
-         hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
+         hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD()->hb_hrbReadId", 0 );
          szIdx = "";
          break;
       }
@@ -402,6 +409,40 @@ static char * hb_hrbReadId( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffse
    return hb_strdup( szIdx );
 }
 
+static char * hb_hrbReadNamespaces( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
+{
+   char *pNamespaces;
+
+   if( szBody[ ( *ulBodyOffset ) ] == '\0' )
+   {
+      pNamespaces = NULL;
+      ( *ulBodyOffset )++;
+   }
+   else
+   {
+      ULONG ulStart = *ulBodyOffset, ulLen;
+
+      do
+      {
+         do
+         {
+            if ( *ulBodyOffset > ulBodySize )
+            {
+               hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD()->hb_hrbReadNamespaces()", 0 );
+               break;
+            }
+         }
+         while( szBody[ ( *ulBodyOffset )++ ] );
+      }
+      while( szBody[ ( *ulBodyOffset )++ ] );
+
+      ulLen = ( *ulBodyOffset ) -  ulStart;
+      pNamespaces = (char *) hb_xgrab( ulLen );
+      hb_xmemcpy( pNamespaces, szBody + ulStart, ulLen );
+   }
+
+   return pNamespaces;
+}
 
 static LONG hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffset )
 {
@@ -411,7 +452,7 @@ static LONG hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffse
 
    if ( (* ulBodyOffset + 4) > ulBodySize )
    {
-      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD()->hb_hrbReadLong()", 0 );
       return 0;
    }
 
@@ -421,7 +462,7 @@ static LONG hb_hrbReadLong( char * szBody, ULONG ulBodySize, ULONG * ulBodyOffse
 
    if( cLong[ 3 ] )                             /* Convert to long if ok    */
    {
-      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD", 0 );
+      hb_errRT_BASE( EG_CORRUPTION, 9999, NULL, "__HRBLOAD()->hb_hrbReadLong()", 0 );
       return 0;
    }
    else
@@ -514,6 +555,11 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
 
    hb_hrbExit( pHrbBody );
 
+   if( pHrbBody->pNamespaces )
+   {
+      hb_xfree( pHrbBody->pNamespaces );
+   }
+
    if( pHrbBody->pModuleSymbols )
    {
       hb_vmFreeSymbols( pHrbBody->pModuleSymbols );
@@ -552,12 +598,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       PHB_DYNF pDynFunc;                           /* Functions read           */
       PHB_DYNS pDynSym;
 
-      int nVersion = hb_hrbReadHead( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );
-
-      if( !nVersion )
-      {
-         return NULL;
-      }
+      hb_hrbReadHead( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );
 
       pHrbBody = ( PHRB_BODY ) hb_xgrab( sizeof( HRB_BODY ) );
 
@@ -567,8 +608,9 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       pHrbBody->ulFuncs = 0;
       pHrbBody->pSymRead = NULL;
       pHrbBody->pDynFunc = NULL;
-      pHrbBody->ulSymbols = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
       pHrbBody->pModuleSymbols = NULL;
+      pHrbBody->pNamespaces = hb_hrbReadNamespaces( (char *) szHrbBody, (ULONG) ulBodySize, &ulBodyOffset );;
+      pHrbBody->ulSymbols = hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
       memset( &( pHrbBody->ModuleFakeDyn ), 0, sizeof( HB_DYNS ) );
 
       pSymRead = ( PHB_SYMB ) hb_xgrab( pHrbBody->ulSymbols * sizeof( HB_SYMB ) );
@@ -613,7 +655,6 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
          pDynFunc[ ul ].pCodeFunc = (PHB_PCODEFUNC) hb_xgrab( sizeof( HB_PCODEFUNC ) );
          pDynFunc[ ul ].pCodeFunc->pCode    = pDynFunc[ ul ].pCode;
          pDynFunc[ ul ].pCodeFunc->pSymbols = pSymRead;
-         pDynFunc[ ul ].pCodeFunc->pGlobals = NULL;
       }
 
       pHrbBody->pSymRead = pSymRead;
@@ -666,6 +707,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
       if( pHrbBody )
       {
          pHrbBody->pModuleSymbols = hb_vmRegisterSymbols( pHrbBody->pSymRead, ( USHORT ) pHrbBody->ulSymbols, szHrb ? szHrb : (char*) "PCODE_HRB.hrb", TRUE, FALSE, NULL );
+         pHrbBody->pModuleSymbols->pNamespaces = pHrbBody->pNamespaces;
          pHrbBody->ModuleFakeDyn.pModuleSymbols = pHrbBody->pModuleSymbols;
 
          if( pHrbBody->pModuleSymbols->pSymbolTable != pSymRead )

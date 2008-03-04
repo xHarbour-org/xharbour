@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.656 2008/02/11 01:36:34 walito Exp $
+ * $Id: hvm.c,v 1.657 2008/02/11 02:22:34 ronpinkas Exp $
  */
 
 /*
@@ -462,6 +462,7 @@ static BOOL hb_vmDoInitFunc( char *pFuncSym )
    assert( pFuncSym != NULL );
 
    pDynSym = hb_dynsymFind( pFuncSym );
+
    if ( pDynSym && pDynSym->pSymbol->value.pFunPtr )
    {
       hb_vmPushSymbol( pDynSym->pSymbol );
@@ -802,15 +803,19 @@ void hb_vmReleaseLocalSymbols( void )
             if( ( pSymbol->scope.value & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )
             {
                pDynSym = HB_SYM_GETDYNSYM( pSymbol );
+
                if( pDynSym && pDynSym->pSymbol == pSymbol )
                {
                   pDynSym->pSymbol = NULL;
                }
             }
+
             hb_xfree( pSymbol->szName );
          }
+
          hb_xfree( pDestroy->pSymbolTable );
       }
+
       hb_xfree( pDestroy );
    }
 
@@ -9939,6 +9944,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                       PSYMBOLS pModuleSymbols;
 
                       pDynSym->pSymbol = pSymbol;
+                      pDynSym->pModuleSymbols = pNewSymbols;
                       pModuleSymbols = s_pSymbols;
 
                       while( pModuleSymbols )

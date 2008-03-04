@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.187 2008/02/18 16:32:07 ronpinkas Exp $
+ * $Id: harbour.c,v 1.188 2008/02/21 16:43:19 ronpinkas Exp $
  */
 
 /*
@@ -4391,7 +4391,7 @@ char * hb_compFunctionResolveUsed( char *szFunName )
    {
       if( ( pNamespace->type & NSTYPE_SPACE ) )
       {
-         if( ( pNamespace->type & NSTYPE_USED ) )
+         if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
          {
             pResolved = hb_compNamespaceFindMember( pNamespace->pNext, szFunName, NSTYPE_MEMBER );
 

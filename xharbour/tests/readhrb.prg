@@ -1,5 +1,5 @@
 //
-// $Id: readhrb.prg,v 1.2 2004/11/25 23:01:03 mauriliolongo Exp $
+// $Id: readhrb.prg,v 1.3 2008/02/10 07:55:52 ronpinkas Exp $
 //
 
 /*
@@ -37,10 +37,10 @@ function Main( cFrom )
                        { "HB_FS_EXIT"    , 0x0010 },;
                        { "HB_FS_CRITICAL", 0x0020 },;
                        { "HB_FS_MESSAGE" , 0x0040 },;
-                       { "HB_FS_MEMVAR"  , 0x0080 },; 
-                       { "HB_FS_LOCAL"   , 0x0200 },; 
-                       { "HB_FS_DYNCODE" , 0x0400 },; 
-                       { "HB_FS_DEFERRED", 0x0800 }; 
+                       { "HB_FS_MEMVAR"  , 0x0080 },;
+                       { "HB_FS_LOCAL"   , 0x0200 },;
+                       { "HB_FS_DYNCODE" , 0x0400 },;
+                       { "HB_FS_DEFERRED", 0x0800 };
                      }
 
    set( _SET_EXACT, .T. )
@@ -60,8 +60,21 @@ function Main( cFrom )
       // Throw away header
       fReadStr( hFile, 6 )
 
+      cFrom := ""
+      cBlock := fReadStr( hFile, 1 )
+      do while Asc( cBlock ) <> 0
+         do while Asc( cBlock ) <> 0
+            cFrom += cBlock
+            cBlock := fReadStr( hFile, 1 )
+         enddo
+         cFrom += ';'
+         cBlock := fReadStr( hFile, 1 )
+      enddo
+      QOut( "Namespaces:", cFrom )
+      Qout()
+
       cBlock := fReadStr( hFile, 4 )
-      
+
       nSymbols := asc(substr(cBlock,1,1))            +;
                   asc(substr(cBlock,2,1)) * 256      +;
                   asc(substr(cBlock,3,1)) * 65536    +;
@@ -78,21 +91,21 @@ function Main( cFrom )
          QQOut(PadR(cFrom, 20))
 
          cBLock := fReadStr( hFile, 4 )
-         
+
          nScope := asc(substr(cBlock,1,1))            +;
                    asc(substr(cBlock,2,1)) * 256      +;
                    asc(substr(cBlock,3,1)) * 65536    +;
                    asc(substr(cBlock,4,1)) * 16777216
-         
+
          QQOut(" Scope ", nScope )
          cBlock := " "
-         
+
          for m := 1 to Len(aScopes)
             if ( nScope & aScopes[m][2] ) == aScopes[m][2]
                cBlock += aScopes[m][1] + "|"
             endif
          next
-         
+
          cBlock[-1] := ""
          QQOut(cBlock)
          cBlock := fReadStr( hFile, 1 )

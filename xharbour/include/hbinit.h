@@ -1,5 +1,5 @@
 /*
- * $Id: hbinit.h,v 1.28 2007/05/24 16:03:14 ronpinkas Exp $
+ * $Id: hbinit.h,v 1.29 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -85,6 +85,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
 
 
 #define HB_MODULE_GLOBALS NULL
+#define HB_MODULE_NAMESPACES NULL
 
 #if defined(HARBOUR_STRICT_ANSI_C)
 
@@ -99,6 +100,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       void func( void ) \
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
@@ -127,6 +129,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       static void __attribute__ ((constructor)) func( void ) \
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }
@@ -153,6 +156,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       static int func( void ) \
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
          return 0; \
@@ -192,6 +196,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       static int func( void ) \
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
          return 0; \
@@ -234,6 +239,7 @@ extern HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT u
       static void func( void ) \
       { \
          pModuleSymbols = hb_vmProcessSymbols( symbols_table, (USHORT) ( sizeof( symbols_table ) / sizeof( HB_SYMB ) ), __PRG_SOURCE__, (int) HB_PRG_PCODE_VER, HB_MODULE_GLOBALS ); \
+         pModuleSymbols->pNamespaces = HB_MODULE_NAMESPACES; \
          symbols = pModuleSymbols->pSymbolTable; \
          ModuleFakeDyn.pModuleSymbols = pModuleSymbols; \
       }

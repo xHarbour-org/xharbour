@@ -1,5 +1,5 @@
 /*
- * $Id: hbrun.prg,v 1.1.1.1 2001/12/21 10:44:58 ronpinkas Exp $
+ * $Id: hbrun.prg,v 1.2 2005/02/17 12:22:31 andijahja Exp $
  */
 
 /*
@@ -52,8 +52,7 @@
 
 #include "hbextern.ch"
 
-FUNCTION Main( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
-   LOCAL xRetVal
+STATIC PROCEDURE Main( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
 
    IF Empty( cHRBFile )
       OutStd( "xHarbour Runner" + HB_OSNewLine() +;
@@ -63,8 +62,8 @@ FUNCTION Main( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8,
               HB_OSNewLine() +;
               "Note:  Linked with " + Version() + HB_OSNewLine() )
    ELSE
-      xRetVal := __hrbRun( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
+      __hrbRun( cHRBFile, cPar1, cPar2, cPar3, cPar4, cPar5, cPar6, cPar7, cPar8, cPar9 )
    ENDIF
 
-   RETURN xRetVal
+RETURN
 

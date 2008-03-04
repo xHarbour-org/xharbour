@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.7 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.8 2008/02/22 16:44:06 likewolf Exp $
  */
 
 /*
@@ -42,6 +42,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
    LONG lSymbols;
    ULONG ulCodeLength;
    FILE * yyc;             /* file handle for C output */
+   char cInt[ 2 ];
 
    if( ! pFileName->szExtension )
    {
@@ -76,7 +77,31 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
    fputc( ( BYTE ) 192, yyc );
    fputs( "HRB", yyc );
-   fputc( 2, yyc );
+
+   HB_PUT_LE_UINT16( cInt, HB_HRB_VER );
+
+   fputc( cInt[0], yyc );
+   fputc( cInt[1], yyc );
+
+   if( hb_comp_UsedNamespaces.pFirst )
+   {
+      PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst;
+
+      do
+      {
+         if( ( pNamespace->type & NSTYPE_SPACE ) )
+         {
+            if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
+            {
+               fputs( pNamespace->szName, yyc );
+               fputc( 0, yyc );
+            }
+         }
+
+         pNamespace = pNamespace->pNext;
+      }
+      while ( pNamespace );
+   }
    fputc( 0, yyc );
 
    fputc( ( BYTE ) ( ( lSymbols       ) & 255 ), yyc ); /* Write number symbols */

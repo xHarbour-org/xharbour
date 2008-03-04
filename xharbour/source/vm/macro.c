@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.76 2008/02/02 07:33:30 ronpinkas Exp $
+ * $Id: macro.c,v 1.77 2008/02/09 02:53:19 ronpinkas Exp $
  */
 
 /*
@@ -968,7 +968,7 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
-         pDynSym = hb_dynsymGet( szString );
+         pDynSym = hb_dynsymGetCaseWithNamespaces( szString, HB_GETNAMESPACES() );
 
          hb_stackPop();    /* remove compiled string */
 
@@ -1381,7 +1381,7 @@ void hb_compMemvarGenPCode( BYTE bPCode, char * szVarName, HB_MACRO_DECL )
 
    /* Find the address of passed symbol - create the symbol if doesn't exist
     * (Clipper compatibility). */
-   pSym = hb_dynsymGet( szVarName );
+   pSym = hb_dynsymGetCase( szVarName );
 
    hb_compGenPCode1( bPCode, HB_MACRO_PARAM );
    {
@@ -1410,11 +1410,12 @@ void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, 
    {
       /* we are determining the type of expression (called from TYPE() function)
        */
-      pSym = hb_dynsymFind( szSymbolName );
+
+      pSym = hb_dynsymFindWithNamespaces( szSymbolName, szNamespace ? NULL : HB_GETNAMESPACES() );
 
       if( pSym )
       {
-         if( ! pSym->hArea && ( HB_MACRO_DATA->status & HB_MACRO_UDF && pSym->pSymbol->value.pFunPtr == NULL ) )
+         if( bAlias == FALSE && pSym->pSymbol->value.pFunPtr == NULL )
          {
             HB_MACRO_DATA->status |= HB_MACRO_UNKN_SYM;
             HB_MACRO_DATA->status &= ~HB_MACRO_CONT;  /* don't run this pcode */
@@ -1432,12 +1433,12 @@ void hb_compGenPushSymbol( char * szSymbolName, char *szNamespace, BOOL bAlias, 
    }
    else
    {
-      pSym = hb_dynsymGet( szSymbolName );
+      pSym = hb_dynsymGetCaseWithNamespaces( szSymbolName, szNamespace ? NULL : HB_GETNAMESPACES() );
    }
 
    if( szNamespace )
    {
-      hb_xfree( szSymbolName );
+      hb_xfree( szSymbolName ); // Not a typo, see above hb_xstrcpy()
    }
 
    hb_compGenPCode1( HB_P_MPUSHSYM, HB_MACRO_PARAM );
@@ -1521,7 +1522,7 @@ void hb_compGenMessage( char * szMsgName, HB_MACRO_DECL )
     */
    HB_DYNS_PTR pSym;
 
-   pSym = hb_dynsymGet( szMsgName );
+   pSym = hb_dynsymGetCase( szMsgName );
 
    hb_compGenPCode1( HB_P_MMESSAGE, HB_MACRO_PARAM );
    {

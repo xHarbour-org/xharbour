@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.231 2008/01/14 13:07:30 walito Exp $
+ * $Id: hbapi.h,v 1.232 2008/01/27 23:14:43 fsgiudice Exp $
  */
 
 /*
@@ -732,8 +732,10 @@ extern HB_EXPORT USHORT   hb_objGetRealCls( PHB_ITEM pObject, char * szName );
 /* dynamic symbol table management */
 extern HB_EXPORT PHB_DYNS  hb_dynsymGet( const char * szName );    /* finds and creates a dynamic symbol if not found */
 extern HB_EXPORT PHB_DYNS  hb_dynsymGetCase( const char * szName );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
+extern HB_EXPORT PHB_DYNS  hb_dynsymGetCaseWithNamespaces( const char * szName, const char * pNamespaces );    /* finds and creates a dynamic symbol if not found CASE SENSTIVE! */
 extern HB_EXPORT PHB_DYNS  hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols ); /* creates a new dynamic symbol based on a local one */
 extern HB_EXPORT PHB_DYNS  hb_dynsymFind( const char * szName );   /* finds a dynamic symbol */
+extern HB_EXPORT PHB_DYNS  hb_dynsymFindWithNamespaces( const char * szName, const char *pNamespaces );   /* finds a dynamic symbol */
 extern HB_EXPORT PHB_DYNS  hb_dynsymFindName( const char * szName ); /* converts to uppercase and finds a dynamic symbol */
 extern HB_EXPORT void      hb_dynsymLog( void );             /* displays all dynamic symbols */
 extern HB_EXPORT void      hb_dynsymRelease( void );         /* releases the memory of the dynamic symbol table */

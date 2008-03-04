@@ -2295,7 +2295,6 @@
 
               pDynFunc->pCode = pcode;
               pDynFunc->pSymbols = symbols;
-              pDynFunc->pGlobals = NULL;
 
               pDynSym = hb_dynsymGet( sFunctionName );
               //TraceLog( "ppgendyn.log", "Dyn: %p %s\n", pDynSym, sFunctionName );

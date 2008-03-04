@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.51 2008/01/16 00:54:29 likewolf Exp $
+ * $Id: dynsym.c,v 1.52 2008/02/02 07:33:30 ronpinkas Exp $
  */
 
 /*
@@ -345,6 +345,34 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCase( const char * szName )  /* finds and creates
    return pDynSym;
 }
 
+PHB_DYNS HB_EXPORT hb_dynsymGetCaseWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+{
+   HB_THREAD_STUB_STACK
+   PHB_DYNS pDynSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
+
+   //TraceLog( NULL, "Searching: %s\n", szName );
+
+   /* JC1: read the notice for hb_dynsymGet() */
+   hb_dynsymLock();
+
+   pDynSym = hb_dynsymFindWithNamespaces( szName, pNamespaces );
+
+   if( !pDynSym )       /* Does it exists ? */
+   {
+      //TraceLog( NULL, "Creating: %s\n", szName );
+      pDynSym = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() );   /* Make new symbol */
+      pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
+   }
+
+   hb_dynsymUnlock();
+
+   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+
+   return pDynSym;
+}
+
 PHB_DYNS HB_EXPORT hb_dynsymFindName( const char * szName )  /* finds a symbol */
 {
    char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
@@ -636,6 +664,38 @@ PHB_DYNS HB_EXPORT hb_dynsymFind( const char * szName )
    hb_dynsymUnlock();
 
    return NULL;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymFindWithNamespaces( const char * szName, const char *pNamespaces )
+{
+   if( pNamespaces )
+   {
+      char *szNamespace = (char *) pNamespaces;
+      PHB_DYNS pDynSym;
+
+      while ( *szNamespace )
+      {
+         char *szQualified = hb_xstrcpy( NULL, szNamespace, ".", szName, NULL );
+
+         pDynSym = hb_dynsymFind( szQualified );
+
+         hb_xfree( szQualified );
+
+         if( pDynSym )
+         {
+            return pDynSym;
+         }
+
+         szNamespace += strlen( szNamespace ) + 1;
+      }
+
+      return NULL;
+   }
+   else
+   {
+      return hb_dynsymFind( szName );
+   }
+
 }
 
 HB_EXPORT PHB_SYMB hb_dynsymGetSymbol( const char * szName )

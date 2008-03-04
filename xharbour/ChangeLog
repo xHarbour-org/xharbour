@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5933 2008/03/02 19:35:56 peterrees Exp $
+ * $Id: ChangeLog,v 1.5934 2008/03/04 00:45:43 modalsist Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,35 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-04 13:04 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * utils/xbscript/xbs_harb.ch
+    - Removed unused structure memeber
+
+  * include/hbapi.h
+  * include/hbinit.h
+  * include/hbsetup.h
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/harbour.c
+  * source/vm/dynsym.c
+  * source/vm/hvm.c
+  * source/vm/macro.c
+  * source/vm/runner.c
+    + Added support for R/T resolution of compilation unit USING NAMESPACE ... in Macros.
+
+  * tests/readhrb.prg
+    * Updated for new format
+
+  * utils/hbrun/hbrun.prg
+    * FUNCTION Main() -> STATIC PROCEDURE Main
+      /* Does STATIC Main causes any problems in *nix? */
+
+  + tests/macronamespace.prg
+  + tests/macronamespace2.prg
+    + New samples to demo R/T resolution of Namespaces in Macros.
+
 
 2008-03-03 21:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
   * source/rtl/tbrowse.prg

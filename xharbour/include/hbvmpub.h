@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.71 2008/02/10 06:34:33 walito Exp $
+ * $Id: hbvmpub.h,v 1.72 2008/02/10 07:55:50 ronpinkas Exp $
  */
 
 /*
@@ -102,6 +102,7 @@
 
    #define HB_SYM_GETGLOBALS(pSym)     ( HB_SYM_GETMODULESYM(pSym)->pGlobals )
    #define HB_SYM_GETGLOBALSPTR(pSym)  &( HB_SYM_GETMODULESYM(pSym)->pGlobals)
+   #define HB_SYM_GETNAMESPACES(pSym)  ( HB_SYM_GETMODULESYM(pSym) ? HB_SYM_GETMODULESYM(pSym)->pNamespaces : NULL )
 
    #define HB_GETSYM()                 ( ( *HB_VM_STACK.pBase )->item.asSymbol.value )
 
@@ -110,6 +111,7 @@
    #define HB_GETDYNSYM()              HB_SYM_GETDYNSYM( HB_GETSYM() )
    #define HB_GETGLOBALS()             HB_SYM_GETGLOBALS( HB_GETSYM() )
    #define HB_GETGLOBALSPTR()          HB_SYM_GETGLOBALSPTR( HB_GETSYM() )
+   #define HB_GETNAMESPACES()          HB_SYM_GETNAMESPACES( HB_GETSYM() )
 
    #define HB_BASE_GETSYM(pBase)       ( (*pBase)->item.asSymbol.value )
    #define HB_BASE_GETMODULESYM(pBase) HB_SYM_GETMODULESYM( HB_BASE_GETSYM( pBase ) )
@@ -139,7 +141,7 @@
 
    typedef struct _SYMBOLS
    {
-      PHB_SYMB pSymbolTable;   /* pointer to a one module own symbol table */
+      PHB_SYMB pSymbolTable;     /* pointer to the module's symbol table */
       UINT     uiModuleSymbols;  /* number of symbols on that table */
       struct _SYMBOLS * pNext;   /* pointer to the next SYMBOLS structure */
       HB_SYMBOLSCOPE hScope;     /* scope collected from all symbols in module used to speed initialization code */
@@ -149,6 +151,7 @@
       BOOL     fInitStatics;     /* static initialization should be executed */
       char *   szModuleName;     /* module name */
       struct _HB_ITEM **pGlobals;/* pointer to the module &pConstantGlobals[0] */
+      char *   pNamespaces;
    } SYMBOLS, * PSYMBOLS;        /* structure to keep track of all modules symbol tables */
 
    extern PSYMBOLS hb_vmFindModule( PHB_SYMB pModuleSymbols );
@@ -379,7 +382,6 @@
    {
       BYTE *      pCode;      /* function body - PCODE */
       PHB_SYMB    pSymbols;   /* module symbol table */
-      PHB_ITEM ** pGlobals;   /* globals */
    } HB_PCODEFUNC, * PHB_PCODEFUNC;
 
    typedef void (*HB_INIT_FUNC)(void *);

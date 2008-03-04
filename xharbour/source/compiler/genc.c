@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.160 2008/02/21 17:08:39 ronpinkas Exp $
+ * $Id: genc.c,v 1.161 2008/02/22 05:37:52 andijahja Exp $
  */
 
 /*
@@ -345,6 +345,8 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
    BOOL bSymFIRST = FALSE;
 
    BOOL bBeginExt = FALSE;
+
+   BOOL bIsUsedNamespaces = FALSE;
 
    if( ! pFileName->szExtension )
    {
@@ -858,6 +860,51 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       fprintf( yyc, "#define HB_PRG_PCODE_VER %i\n", (int) HB_PCODE_VER );
 
       hb_compWriteDeclareGlobal( yyc );
+
+      if( hb_comp_UsedNamespaces.pFirst )
+      {
+         PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst;
+
+         do
+         {
+            if( pNamespace->type & NSTYPE_SPACE )
+            {
+               if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
+               {
+                  bIsUsedNamespaces = TRUE;
+                  break;
+               }
+            }
+
+            pNamespace = pNamespace->pNext;
+         }
+         while ( pNamespace );
+      }
+
+      if( bIsUsedNamespaces )
+      {
+         PNAMESPACE pNamespace = hb_comp_UsedNamespaces.pFirst;
+
+         fprintf( yyc, "\nstatic char *pNamespaces = \"" );
+
+         do
+         {
+            if( ( pNamespace->type & NSTYPE_SPACE ) )
+            {
+               if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
+               {
+                  fprintf( yyc, "%s\\0", pNamespace->szName );
+               }
+            }
+
+            pNamespace = pNamespace->pNext;
+         }
+         while ( pNamespace );
+
+         fprintf( yyc, "\";\n"
+                       "#undef HB_MODULE_NAMESPACES\n"
+                       "#define HB_MODULE_NAMESPACES pNamespaces\n" );
+      }
 
       /* writes the symbol table */
       /* Generate the wrapper that will initialize local symbol table
@@ -1556,7 +1603,7 @@ static void hb_compWriteDeclareGlobal( FILE *yyc )
       fprintf( yyc, "                                           };\n"
                     "static PHB_ITEM *pGlobals = (PHB_ITEM *) pConstantGlobals;\n"
                     "#undef HB_MODULE_GLOBALS\n"
-                    "#define HB_MODULE_GLOBALS pGlobals\n\n" );
+                    "#define HB_MODULE_GLOBALS pGlobals\n" );
    }
 }
 
