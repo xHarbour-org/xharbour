@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5932 2008/02/27 13:03:58 modalsist Exp $
+ * $Id: ChangeLog,v 1.5933 2008/03/02 19:35:56 peterrees Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-03 21:50 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tbrowse.prg
+    ! minor fix on InitCache() method to initialize ::nMaxRow properly.
+
 2008-03-03 08:30 UTC+1200 Peter Rees <peter(AT)rees.co.nz>
   * source/rtl/teditor.prg
     ! fixed RTL in HBEditor():DelTextSelection() when last line of text

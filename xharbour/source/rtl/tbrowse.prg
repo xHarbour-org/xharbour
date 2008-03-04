@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.190 2008/02/16 16:02:04 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.191 2008/02/27 13:03:58 modalsist Exp $
  */
 
 /*
@@ -250,7 +250,7 @@ METHOD New( oBrowse ) CLASS TDataCache
 
    ::nCurRow  := 1
    ::nLastRow := nRows 
-   ::nMaxRow  := nRows
+   ::nMaxRow  := 1
 
    ::aRect    := {}
    ::lInvalid := .F.
@@ -531,6 +531,7 @@ return Self
 
 
 METHOD InitCache() CLASS TDataCache
+Local nSkipped
 
    /* This is needed when number of shown rows decreases due to a phantom record
       being removed; for example, using DBU, dbGoBottom(), Down(), Up()
@@ -552,9 +553,10 @@ METHOD InitCache() CLASS TDataCache
 
    endif
 
-   if HB_IsBlock( ::oCachedBrowse:Skipblock )
-      ::nMaxRow := Eval( ::oCachedBrowse:SkipBlock, Len(::aCache) )
-      Eval( ::oCachedBrowse:SkipBlock, -::nMaxRow  )
+   if HB_IsBlock( ::oCachedBrowse:SkipBlock )  
+      nSkipped := Eval( ::oCachedBrowse:SkipBlock, Len(::aCache) )
+      Eval( ::oCachedBrowse:SkipBlock, -nSkipped )
+      ::nMaxRow := Max( ::nMaxRow, nSkipped ) 
    endif
 
    if ::oCachedBrowse:DataSource == 1  // array datasource.
