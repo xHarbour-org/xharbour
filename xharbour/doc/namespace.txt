@@ -12,7 +12,7 @@ Namespace definition syntax:
          - EXTERNAL NAMESPACE MEMBER <Member> declaration[s]
          - Nested NAMESPACE definition[s]
 
-      At least one public member must be defined. Functions/Procedures which 
+      At least one public member must be defined. Functions/Procedures which
       are not explicitly using one of the following attributes:
 
          STATIC
@@ -33,7 +33,7 @@ Namespace definition syntax:
          The RUNTIME attribute tells the compiler to publish the namespace
          at run-time so that dynamically loaded code and/or macro can access
          namespace members ( explicitly and/or implicitly). Without this
-         attribute the namespace members are hidden for from Macros and/or
+         attribute the namespace members are hidden from Macros and/or
          dynamically loaded code.
 
       IMPLEMENTS
@@ -123,7 +123,7 @@ Namespace usage syntax:
    DYNAMIC declaration will generate the reference in such way that the
    container namespace is not required at link time.
 
-5. <Name>.[.<SubName>]<Func>([...])
+5. <Name>[.<SubName>].<Func>([...])
 
    The Namespace Qualifier syntax tells the compiler that the subsequent
    function call targets the function member of the specified namespace.
