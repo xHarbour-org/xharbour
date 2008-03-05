@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.141 2008/02/16 22:27:14 modalsist Exp $
+ * $Id: tget.prg,v 1.142 2008/02/27 13:03:58 modalsist Exp $
  */
 
 /*
@@ -318,6 +318,7 @@ METHOD ParsePict( cPicture ) CLASS Get
       endif
 
       if ( nAt := At( "S", ::cPicFunc ) ) > 0
+
          for nFor := nAt + 1 to Len( ::cPicFunc )
             if ! IsDigit( SubStr( ::cPicFunc, nFor, 1 ) )
                exit
@@ -325,6 +326,7 @@ METHOD ParsePict( cPicture ) CLASS Get
                cNum += SubStr( ::cPicFunc, nFor, 1 )
             endif
          next
+
          if Val(cNum) > 0
             ::nDispLen := Val(cNum)
             ::lDispLen := .t.
@@ -471,7 +473,6 @@ METHOD ParsePict( cPicture ) CLASS Get
          else
             ::cPicMask := Replicate( '9', Len( cNum ) )
          endif
-
          exit
 
        case "C"
@@ -576,7 +577,6 @@ METHOD Display( lForced ) CLASS Get
    ENDIF
 
    HBConsoleLock()
-
 
    /* E.F. 2006/MAY/23 - Display minus sign in the front of xBuffer value.
     * IF ! ::lMinusPrinted .AND. ! Empty( ::DecPos ) .AND. ::minus .AND. SubStr( xBuffer, ::DecPos - 1, 1 ) == "0"
@@ -965,7 +965,7 @@ return xValue
 METHOD VarGet() CLASS Get
 
    LOCAL xVarGet, aIndex, nDim, aGetVar, nCounter
-   LOCAL cVarGet, nDecPos, nLen, nDec
+   LOCAL cVarGet, nDecPos, nLen, nDec, cMask
 
    IF ! HB_IsBlock( ::Block )
       ::xVarGet := NIL
@@ -997,17 +997,21 @@ METHOD VarGet() CLASS Get
 
       nDecPos := ::DecPos
 
-      IF !Empty(::cPicMask)
-         nLen := HowMuchNumeric(::cPicMask) + 1 + iif(::minus,1,0)
-         nLen := Min(nLen,Len(::cPicMask))
-         nDec := Len( ::cPicMask) - Rat(".",::cPicMask)
+      IF ! Empty( ::cPicMask )
+         /* 2008/MAR/04 - E.F. Discard any no number char after last digit of the mask. */
+         cMask :=  SubStr( ::cPicMask, 1, Rat("9",::cPicMask) )
+         nLen := HowMuchNumeric( cMask ) + 1 + iif(::minus,1,0)
+         nLen := Min(nLen,Len( cMask) )
+         nDec := Len( cMask) - Rat(".", cMask)
          IF nDec >= nLen
             nDec := 0
          ENDIF
-      ELSEIF !Empty( ::cPicture)
-         nLen := HowMuchNumeric(::cPicture) + 1 + iif(::minus,1,0)
-         nLen := Min(nLen,Len(::cPicture))
-         nDec := Len( ::cPicture) - Rat(".",::cPicture)
+      ELSEIF ! Empty( ::cPicture )
+         /* 2008/MAR/04 - E.F. Discard any no number char after last digit of the pict. */
+         cMask :=  SubStr( ::cPicture, 1, Rat("9",::cPicture) )
+         nLen := HowMuchNumeric( cMask ) + 1 + iif(::minus,1,0)
+         nLen := Min(nLen, Len(cMask) )
+         nDec := Len( cMask) - Rat(".",cMask)
          IF nDec >= nLen
             nDec := 0
          ENDIF
@@ -1019,9 +1023,7 @@ METHOD VarGet() CLASS Get
          ENDIF
          nLen := 10 + iif(nDec>0,1,0) + nDec
       ENDIF
-
       cVarGet := Str( xVarGet, nLen, nDec )
-
       // Insert "0" before decimal dot, if empty.
       IF Empty( SubStr( cVarGet, 1, nDecPos-1) )
          cVarGet := Stuff( cVarGet, nDecPos-1, 1, "0")

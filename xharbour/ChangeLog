@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5935 2008/03/04 17:37:00 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5936 2008/03/04 20:21:15 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-04 21:05 UTC-0300 Eduardo Fernandes <modalsist@yahoo.com.br>
+  * source/rtl/tget.prg
+    ! fixed VarGet() method to assign proper mask when numeric get have chars
+      others than numbers. Bug reported from comp.lang.xharbour news.
 
 2008-03-04 15:50 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/rtl/tbrowse.prg
