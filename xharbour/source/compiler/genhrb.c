@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.8 2008/02/22 16:44:06 likewolf Exp $
+ * $Id: genhrb.c,v 1.9 2008/03/04 17:37:02 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
          {
             if( ( pNamespace->type & NSTYPE_USED ) == NSTYPE_USED )
             {
-               fputs( pNamespace->szName, yyc );
+               fputs( pNamespace->szFullPath, yyc );
                fputc( 0, yyc );
             }
          }
