@@ -1,0 +1,130 @@
+Namespace definition syntax:
+----------------------------
+
+ 1. [OPTIONAL|RUNTIME|IMPLEMENTS] NAMESPACE <Name>
+       ...
+    END
+
+      The ... can be any combination of:
+
+         - Procedure/Function/Class definition[s]
+         - EXTERNAL NAMESPACE <SubName> declaration[s]
+         - EXTERNAL NAMESPACE MEMBER <Member> declaration[s]
+         - Nested NAMESPACE definition[s]
+
+      At least one public member must be defined. Functions/Procedures which 
+      are not explicitly using one of the following attributes:
+
+         STATIC
+         INIT
+         EXIT
+
+      are public members.
+
+      OPTIONAL
+
+         The OPTIONAL attribute tells the compiler that namespace functions
+         should be visible even without the namespace qualifier. Without
+         this attribute the namespace functions will only be visible to
+         code which specifically reference the namespace.
+
+      RUNTIME
+
+         The RUNTIME attribute tells the compiler to publish the namespace
+         at run-time so that dynamically loaded code and/or macro can access
+         namespace members ( explicitly and/or implicitly). Without this
+         attribute the namespace members are hidden for from Macros and/or
+         dynamically loaded code.
+
+      IMPLEMENTS
+
+         The IMPLEMENTS attribute tells the compiler that the namespace
+         definition is the actual implementation of sub-namespace which
+         was declared elsewhere using the:
+
+             EXTERNAL NAMESPACE <SubName>
+
+         syntax.
+
+2. EXTERNAL NAMESPACE <SubName>
+
+      This declaration tells the compiler that the sub-namespace definition
+      exists elsewhere.
+
+3. EXTERNAL NAMESPACE MEMBER <Member>
+
+      This declaration tells the compiler that the definition of the member
+      function exists elsewhere.
+
+
+4. PROCEDURE|FUNCTION <SomeName> IMPLEMENTS NAMESPACE <Name>
+
+      The IMPLEMENTS NAMESPACE attribute tells the compiler that the
+      function definition is the actual implementation of a namespace member
+      which was declared elsewhere using the:
+
+          EXTERNAL NAMESPACE MEMBER <Member>
+
+       syntax.
+
+Namespace usage syntax:
+-----------------------
+
+1. USING NAMESPACE <Name>[.<SubName>]
+
+   The USING NAMESPACE declaration tells the compiler to attempt to resolve
+   all non qualified function calls using the given namespace. If the
+   function called is found as a member of the specified namespace[s]
+   (or any of it's outer spaces if any), then the compiler will treat the
+   function call as-if it was explicitly namespace qualified, i.e:
+
+      <Func>([...])
+
+   will be treated as:
+
+      <Name>[.<SubName>].<Func>([...])
+
+   Please note that the USING NAMESPACE declaration has a global scope,
+   meaning it must be placed before any function definition, and it will be
+   used to resolve all function calls in that compilation unit.
+
+2. WITH NAMESPACE <Name>[.<SubName>]
+      ...
+   END
+
+   The WITH NAMESPACE ... END code enclosure, tells the compiler to attempt
+   to resolve all non qualified function calls (inside the closure) using
+   the given namespace. If the function called is found as a member of the
+   specified namespace[s] (or any of it's outer spaces if any), then the
+   compiler will treat the function call as-if it was explicitly namespace
+   qualified, i.e:
+
+      <Func>([...])
+
+   will be treated as:
+
+      <Name>[.<SubName>].<Func>([...])
+
+   Please note that unlike the USING NAMESPACE declaration, the
+   WITH NAMESPACE closure has a local scope, it only affect function calls
+   up-to the END statement.
+
+3. EXTERNAL <Name>[.<SubName>].<Func>
+
+   The EXTERNAL declaration tells the compiler to generate a reference to
+   the specified namespace function, as if such namespace function call
+   existed in the executable code. The generated code will require the
+   linkage of the namespace container of the member function.
+
+4. DYNAMIC <Name>[.<SubName>].<Func>
+
+   The DYNAMIC declaration tells the compiler to generate a reference to
+   the specified namespace function. Unlike the EXTERNAL declaration the
+   DYNAMIC declaration will generate the reference in such way that the
+   container namespace is not required at link time.
+
+5. <Name>.[.<SubName>]<Func>([...])
+
+   The Namespace Qualifier syntax tells the compiler that the subsequent
+   function call targets the function member of the specified namespace.
+   This syntax can be used to resolve possible ambiguities.
