@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.162 2008/03/04 17:37:02 ronpinkas Exp $
+ * $Id: genc.c,v 1.163 2008/03/05 00:44:13 ronpinkas Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
     {
        if( pMember->type & NSTYPE_SPACE )
        {
-          if( ( pMember->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS && pMember->extra.pOuter == NULL )
+          if( ( pMember->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS && pMember->pOuter == NULL )
           {
              hb_compGenerateXNS( pMember, pCargo );
              pMember = hb_compNamespaceEnumSkipMembers( pMember->pNext );
@@ -200,7 +200,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           fprintf( yyc, "   } %s;\n\n", pOuter->szName ); // Don't remove DOUBLE \n!!!
           fprintf( yyc, "   #endif\n" );
 
-          pOuter = pOuter->extra.pOuter;
+          pOuter = pOuter->pOuter;
        }
 
        pMember = pMember->pNext;
@@ -266,7 +266,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
-          else if( ( pMember->extra.pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+          else if( ( pMember->pOuter->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
           {
              fprintf( yyc, "     /* %s = */ HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s ),\n", pMember->szName, pMember->iID, pMember->szName );
           }
@@ -294,7 +294,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
              break;
           }
 
-          pOuter = pOuter->extra.pOuter;
+          pOuter = pOuter->pOuter;
 
           fprintf( yyc, "   },\n" );
        }
@@ -445,7 +445,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       hb_xfree( szHrb );
    }
 
-   if( hb_comp_iFunctionCnt )
+   if( hb_comp_iFunctionCnt || hb_comp_Namespaces.pFirst )
    {
       fprintf( yyc, "#include \"hbvmpub.h\"\n" );
 
@@ -605,7 +605,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                 {
                    if( pMember->type & NSTYPE_MEMBER )
                    {
-                      if( ( pMember->extra.pFunc->cScope & HB_FS_STATIC ) == 0 )
+                      if( ( pMember->pFunc->cScope & HB_FS_STATIC ) == 0 )
                       {
                          fprintf( yyc, "   HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->iID, pMember->szName );
                       }
@@ -643,7 +643,14 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else if( ( pNamespace->type & ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) ) == ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) )
             {
-               fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->szFullPath, pNamespace->extra.pOuter->iID, pNamespace->szName );
+               if( ( pNamespace->pOuter->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL  )
+               {
+                  fprintf( yyc, "HB_FUNC_OPTIONAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->pOuter->szFullPath, pNamespace->pOuter->iID, pNamespace->szName );
+               }
+               else
+               {
+                  fprintf( yyc, "HB_FUNC_EXTERNAL_NAMESPACE( /* %s */ %d, %s );\n", pNamespace->pOuter->szFullPath, pNamespace->pOuter->iID, pNamespace->szName );
+               }
             }
 
             pNamespace = pNamespace->pNext;
@@ -700,7 +707,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
          do
          {
-            if( pUsedNamespace->szName[0] != '*' && ( pUsedNamespace->type & NSTYPE_SPACE ) && pUsedNamespace->extra.pOuter == NULL )
+            if( pUsedNamespace->szName[0] != '*' && ( pUsedNamespace->type & NSTYPE_SPACE ) && pUsedNamespace->pOuter == NULL )
             {
                fprintf( yyc, "\n#include \"%s.xns\"\n", pUsedNamespace->szName );
                fprintf( yyc, "extern HB_NS_%s %s;\n", pUsedNamespace->szName, pUsedNamespace->szName );

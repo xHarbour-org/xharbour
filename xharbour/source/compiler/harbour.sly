@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.151 2008/02/18 16:55:14 likewolf Exp $
+ * $Id: harbour.sly,v 1.152 2008/02/21 16:43:19 ronpinkas Exp $
  */
 
 /*
@@ -3372,7 +3372,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
                                       pClone = (PNAMESPACE) hb_xgrab( sizeof( _NAMESPACE ) );
                                       memcpy( (void *) pClone, (void *) pNamespace, sizeof( _NAMESPACE ) );
 
-                                      pClone->extra.pOuter = hb_comp_UsedNamespaces.pCurrent;
+                                      pClone->pOuter = hb_comp_UsedNamespaces.pCurrent;
                                       hb_comp_UsedNamespaces.pCurrent = pClone;
                                    }
                                  }
@@ -3382,7 +3382,7 @@ WithNamespace : WITH_NAMESPACE NamespaceName Crlf
                                    PNAMESPACE pClone;
 
                                    pClone = hb_comp_UsedNamespaces.pCurrent;
-                                   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->extra.pOuter;
+                                   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->pOuter;
                                    hb_xfree( pClone );
                                  }
               ;
@@ -3445,7 +3445,7 @@ ExtNamespace : EXTERNAL_NAMESPACE IdentName Crlf
                                    if( hb_comp_Namespaces.pCurrent )
                                    {
                                       hb_compNamespaceNew( $2, ( NSTYPE_EXTERNAL | NSTYPE_MEMBER ) );
-                                      hb_comp_Namespaces.pLast->extra.pOuter = hb_comp_Namespaces.pCurrent;
+                                      hb_comp_Namespaces.pLast->pOuter = hb_comp_Namespaces.pCurrent;
 
                                       hb_compSymbolAdd( $2, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
                                    }

@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.68 2008/02/14 19:38:40 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.69 2008/02/21 16:42:55 ronpinkas Exp $
  */
 
 /*
@@ -424,11 +424,8 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
       char              *szName;
       char              *szFullPath;
       int               iID;
-      union
-      {
-         struct __NAMESPACE *pOuter;
-         PFUNCTION           pFunc;
-      } extra;
+      struct __NAMESPACE *pOuter;
+      PFUNCTION           pFunc;
       struct __NAMESPACE *pNext;
     } _NAMESPACE, *PNAMESPACE;
 

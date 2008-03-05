@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.188 2008/02/21 16:43:19 ronpinkas Exp $
+ * $Id: harbour.c,v 1.189 2008/03/04 17:37:02 ronpinkas Exp $
  */
 
 /*
@@ -2545,7 +2545,7 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    if( pNamespace )
    {
-      pNamespace->extra.pFunc = pFunc;
+      pNamespace->pFunc = pFunc;
    }
 
    if( hb_comp_functions.iCount == 0 )
@@ -2880,12 +2880,12 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
                pSymbol->cScope |= HB_FS_LOCAL;
             }
 
-            return pMember->extra.pFunc;
+            return pMember->pFunc;
          }
       }
       else
       {
-         pNamespace = pNamespace->extra.pOuter;
+         pNamespace = pNamespace->pOuter;
       }
    }
    while( pNamespace );
@@ -5991,20 +5991,17 @@ PNAMESPACE hb_compNamespaceNew( char *szName, int iType )
       hb_comp_Namespaces.pFirst = pNew;
    }
 
+   pNew->pOuter = hb_comp_Namespaces.pCurrent;
+   pNew->pFunc  = NULL;
+
    if( iType & NSTYPE_SPACE )
    {
-      pNew->extra.pOuter = hb_comp_Namespaces.pCurrent;
-
-      if( pNew->extra.pOuter )
+      if( pNew->pOuter )
       {
-         pNew->type |= pNew->extra.pOuter->type;
+         pNew->type |= pNew->pOuter->type;
       }
 
       hb_comp_Namespaces.pCurrent = pNew;
-   }
-   else
-   {
-      pNew->extra.pOuter = NULL;
    }
 
    hb_comp_Namespaces.pLast = pNew;
@@ -6023,7 +6020,7 @@ void hb_compNamespaceEnd( void )
       hb_comp_Namespaces.pLast->type |= NSTYPE_END;
    }
 
-   hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->extra.pOuter;
+   hb_comp_Namespaces.pCurrent = hb_comp_Namespaces.pCurrent->pOuter;
 }
 
 PNAMESPACE hb_compNamespaceFind( PNAMESPACE pNamespace, char *szName, int type )
@@ -6100,20 +6097,17 @@ PNAMESPACE hb_compUsedNamespaceNew( char *szName, int iType )
       hb_comp_UsedNamespaces.pFirst = pNew;
    }
 
+   pNew->pOuter = hb_comp_UsedNamespaces.pCurrent;
+   pNew->pFunc  = NULL;
+
    if( iType & NSTYPE_SPACE )
    {
-      pNew->extra.pOuter = hb_comp_UsedNamespaces.pCurrent;
-
-      if( pNew->extra.pOuter )
+      if( pNew->pOuter )
       {
-         pNew->type |= pNew->extra.pOuter->type;
+         pNew->type |= pNew->pOuter->type;
       }
 
       hb_comp_UsedNamespaces.pCurrent = pNew;
-   }
-   else
-   {
-      pNew->extra.pOuter = NULL;
    }
 
    hb_comp_UsedNamespaces.pLast = pNew;
@@ -6132,7 +6126,7 @@ void hb_compUsedNamespaceEnd( void )
       hb_comp_UsedNamespaces.pLast->type |= NSTYPE_END;
    }
 
-   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->extra.pOuter;
+   hb_comp_UsedNamespaces.pCurrent = hb_comp_UsedNamespaces.pCurrent->pOuter;
 }
 
 static void hb_compGenOutput( int iLanguage, char *szSourceExtension )
