@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.189 2008/03/04 17:37:02 ronpinkas Exp $
+ * $Id: harbour.c,v 1.190 2008/03/05 14:16:52 ronpinkas Exp $
  */
 
 /*
@@ -2512,32 +2512,34 @@ void hb_compFunctionAdd( char * szFunName, HB_SYMBOLSCOPE cScope, int iType )
 
    hb_comp_iFunctionCnt++;
 
-   if( szFunName[0] &&
-       ( hb_comp_Namespaces.pCurrent == NULL ||
-         ( ( ( cScope & HB_FS_STATIC ) == 0 ) &&
-           ( ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME ) ||
-             ( ( hb_comp_Namespaces.pCurrent->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) ) ) ) )
+   if( szFunName[0] )
    {
-      if( hb_comp_Namespaces.pCurrent )
-      {
-         pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
+       if( hb_comp_Namespaces.pCurrent == NULL ||
+           ( cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) != 0 ||
+           ( ( hb_comp_Namespaces.pCurrent->type & ( ( NSTYPE_RUNTIME | NSTYPE_OPTIONAL ) & ~NSTYPE_SPACE ) ) != 0 &&
+             ( cScope & HB_FS_STATIC ) == 0 ) )
+       {
+          if( hb_comp_Namespaces.pCurrent )
+          {
+             pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
 
-         if( pSym == NULL )
-         {
-            pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
-         }
-      }
-      else
-      {
-         pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+             if( pSym == NULL )
+             {
+                pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_NS_EXPLICITPTR );
+             }
+          }
+          else
+          {
+             pSym = hb_compSymbolFind( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
 
-         if( pSym == NULL )
-         {
-            pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
-         }
-      }
+             if( pSym == NULL )
+             {
+                pSym = hb_compSymbolAdd( szFunName, NULL, (void *) hb_comp_Namespaces.pCurrent, SYMF_FUNCALL );
+             }
+          }
 
-      pSym->cScope |= ( HB_FS_LOCAL | cScope );
+          pSym->cScope |= ( HB_FS_LOCAL | cScope );
+       }
    }
 
    pFunc = hb_compFunctionNew( szFunName, cScope );

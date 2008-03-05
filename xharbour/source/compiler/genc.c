@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.163 2008/03/05 00:44:13 ronpinkas Exp $
+ * $Id: genc.c,v 1.164 2008/03/05 14:16:52 ronpinkas Exp $
  */
 
 /*
@@ -177,6 +177,10 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
+          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) )
+          {
+             // Don't publish
+          }
           else
           {
              fprintf( yyc, "   #if defined( __PRG__ )\n" );
@@ -263,6 +267,10 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
        else if( pMember->type & NSTYPE_MEMBER )
        {
           if( ( pMember->type & NSTYPE_STATIC ) == NSTYPE_STATIC )
+          {
+             // Don't publish
+          }
+          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) )
           {
              // Don't publish
           }
@@ -1085,12 +1093,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, "{ \"%s\", {", pSym->szName );
             }
 
-            if( pSym->cScope & HB_FS_STATIC )
-            {
-               pSym->cScope &= ~HB_FS_PUBLIC;
-               fprintf( yyc, "HB_FS_STATIC" );
-            }
-            else if( pSym->cScope & HB_FS_INIT )
+            if( pSym->cScope & HB_FS_INIT )
             {
                pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_INIT" );
@@ -1099,6 +1102,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             {
                pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_EXIT" );
+            }
+            else if( pSym->cScope & HB_FS_STATIC )
+            {
+               pSym->cScope &= ~HB_FS_PUBLIC;
+               fprintf( yyc, "HB_FS_STATIC" );
             }
             else if( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
             {
@@ -1152,7 +1160,28 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             }
             else if( ( pSym->iFlags & SYMF_FUNCALL ) && ( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL ) ) /* is it a function defined in this module */
             {
-               if( pSym->cScope & HB_FS_INIT )
+               if( ( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH ) || ( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR ) )
+               {
+                  assert( pFunc );
+
+                  // pFunc is NOT a typo - resolved above!
+                  if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
+                  {
+                     // pFunc is NOT a typo - resolved above!
+                     fprintf( yyc, "}, {HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
+                  }
+                  else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+                  {
+                     // pFunc is NOT a typo - resolved above!
+                     fprintf( yyc, "}, {HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
+                  }
+                  else
+                  {
+                     // pFunc is NOT a typo - resolved above!
+                     fprintf( yyc, "}, {HB_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
+                  }
+               }
+               else if( pSym->cScope & HB_FS_INIT )
                {
                   fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, &ModuleFakeDyn }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
@@ -1162,31 +1191,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                }
                else
                {
-                  if( ( ( pSym->iFlags & SYMF_NS_EXPLICITPATH ) == SYMF_NS_EXPLICITPATH ) || ( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR ) )
-                  {
-                     assert( pFunc );
-
-                     // pFunc is NOT a typo - resolved above!
-                     if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-                     {
-                        // pFunc is NOT a typo - resolved above!
-                        fprintf( yyc, "}, {HB_EXTERNAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                     }
-                     else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                     {
-                        // pFunc is NOT a typo - resolved above!
-                        fprintf( yyc, "}, {HB_OPTIONAL_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                     }
-                     else
-                     {
-                        // pFunc is NOT a typo - resolved above!
-                        fprintf( yyc, "}, {HB_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
-                     }
-                  }
-                  else
-                  {
-                     fprintf( yyc, "}, {HB_FUNCNAME( %s )}, &ModuleFakeDyn }", pSym->szName );
-                  }
+                  fprintf( yyc, "}, {HB_FUNCNAME( %s )}, &ModuleFakeDyn }", pSym->szName );
                }
             }
             else if( pSym->iFlags & SYMF_FUNCALL ) //&& hb_compFunCallFind( pSym->szName, pSym->Namespace, pSym->iFlags ) ) /* is it a function called from this module */
