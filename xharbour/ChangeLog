@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5940 2008/03/05 17:02:18 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5941 2008/03/05 18:59:55 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-07 01:30 UTC-0200 Walter Negro <anegro/at/overnet.com.ar>
+  * include/classes.h
+  * include/hbclass.ch
+  * include/hboo.ch
+  * source/rtl/tclass.prg
+  * source/vm/classes.c
+  * source/vm/runner.prg
+    + Support for unload and reload HRB files that declare class.
+      Now when call to class or method with HRB unloaded receive runtime error not GPF.
+      When reload the same or other HRB that declare the same class the symbols and
+      methods are re-linked.
+    * Support for inherit tclass from another class.
+    * Support for pointer to C function in hb_clsAddMsg() function using
+      HB_OO_CLSTP_PFUNC as scope.
 
 2008-03-05 14:28 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   + doc\namespace.txt

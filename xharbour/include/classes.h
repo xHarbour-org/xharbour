@@ -1,5 +1,5 @@
 /*
- * $Id: classes.h,v 1.27 2007/04/29 18:07:49 andresreyesh Exp $
+ * $Id: classes.h,v 1.28 2007/05/17 05:01:45 ronpinkas Exp $
  */
 
 /*
@@ -145,6 +145,7 @@ typedef struct
    PMETHDYN pMethDyn;
    USHORT * pFriends;
    PHB_ITEM pMtxSync;
+   BOOL     bActive;
 
 } CLASS, * PCLASS;
 
@@ -175,6 +176,7 @@ extern HB_EXPORT UINT hb_clsGetHandleFromName( char *szClassName );
 extern HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf );
 
 extern HB_EXPORT USHORT hb_objGetClass( PHB_ITEM pItem );
+extern HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule );
 
 HB_EXTERN_END
 #endif

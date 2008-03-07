@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.52 2008/02/10 07:55:51 ronpinkas Exp $
+ * $Id: runner.c,v 1.53 2008/03/04 17:37:03 ronpinkas Exp $
  */
 
 /*
@@ -69,7 +69,7 @@
 #include "hbvm.h"
 #include "hbpcode.h"
 #include "hb_io.h"
-
+#include "classes.h"
 /* TODO: Fill the error codes with valid ones (instead of 9999) */
 /* TOFIX: Fix the memory leak on error. */
 
@@ -554,6 +554,8 @@ void hb_hrbUnLoad( PHRB_BODY pHrbBody )
    ULONG ul;
 
    hb_hrbExit( pHrbBody );
+
+   hb_clsDeactiveClass( pHrbBody->pModuleSymbols );
 
    if( pHrbBody->pNamespaces )
    {

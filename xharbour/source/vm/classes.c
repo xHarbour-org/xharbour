@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.213 2007/12/08 02:31:21 ronpinkas Exp $
+ * $Id: classes.c,v 1.214 2008/02/10 06:34:33 walito Exp $
  */
 
 /*
@@ -1648,10 +1648,18 @@ void hb_clsAddMsg( USHORT uiClass, char *szMessage, void * pFunc_or_BlockPointer
       {
          case HB_OO_MSG_METHOD:
             pNewMeth->pFunction = (PHB_FUNC) pFunc_or_BlockPointer;
-            pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
+//            pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
             pNewMeth->uiData = 0;
-            pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
-            //TraceLog( NULL, "NEW Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
+            if( uiScope & HB_OO_CLSTP_PFUNC )
+            {
+               pNewMeth->uiScope &= ~((USHORT) HB_OO_CLSTP_PFUNC);
+            }
+            else
+            {
+               pNewMeth->uiScope = uiScope | HB_OO_CLSTP_SYMBOL;
+               pNewMeth->pModuleSymbols = HB_SYM_GETMODULESYM( (PHB_SYMB )pFunc_or_BlockPointer );
+               //TraceLog( NULL, "NEW Method: %s:%s defined in: %s->%s\n", pClass->szName, pMessage->pSymbol->szName, pNewMeth->pModuleSymbols ? pNewMeth->pModuleSymbols->szModuleName : "", ((PHB_SYMB)pFunc_or_BlockPointer)->szName );
+            }
 
             pClass->uiScope |= ( uiScope & HB_OO_CLSTP_CLASSCTOR );
             break;
@@ -2097,6 +2105,7 @@ HB_FUNC( __CLSNEW )
    memset( pNewCls, 0, sizeof( CLASS ) );
    pNewCls->szName = ( char * ) hb_xgrab( hb_parclen( 1 ) + 1 );
    memcpy( pNewCls->szName, hb_parcx( 1 ), hb_parclen( 1 ) + 1 );
+   pNewCls->bActive = TRUE;
 
 /*
    pNewCls->uiDataFirst = 0;
@@ -2451,6 +2460,84 @@ HB_FUNC( __CLSNEW )
    #endif
 
    hb_retni( uiClass );
+}
+
+HB_EXPORT BOOL hb_clsDeactiveClass( PSYMBOLS pModule )
+{
+   PCLASS pClass = s_pClasses;
+   UINT uiPos = s_uiClasses;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_clsDeactiveClass(%p)", pModule));
+
+   while ( uiPos && HB_SYM_GETMODULESYM( pClass->pClsSymbol ) != pModule )
+   {
+      uiPos--;
+      pClass++;
+   }
+
+   if( uiPos )
+   {
+      pClass->bActive = FALSE;
+      return TRUE;
+   }
+   return FALSE;
+}
+
+HB_FUNC( __CLSISACTIVE )
+{
+   HB_THREAD_STUB_API
+
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   BOOL bActive = FALSE;
+
+   if( uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      bActive = pClass->bActive;
+   }
+   hb_retl( bActive );
+}
+
+HB_FUNC( __CLSACTIVE )
+{
+   HB_THREAD_STUB_ANY
+
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM *pBase = hb_stackGetBase( 1 );
+
+   if( pBase && uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+
+      if( pClass->pClsSymbol == (*pBase)->item.asSymbol.value )
+      {
+         pClass->bActive = TRUE;
+         hb_retl( TRUE );
+         return;
+      }
+   }
+   hb_retl( FALSE );
+}
+
+HB_FUNC( __CLSSETMODULE )
+{
+   HB_THREAD_STUB_ANY
+
+   USHORT uiClass = ( USHORT ) hb_parni( 1 );
+   PHB_ITEM *pBase = hb_stackGetBase( 1 );
+
+   if( pBase && uiClass && uiClass <= s_uiClasses )
+   {
+      PCLASS pClass = s_pClasses + ( uiClass - 1 );
+      if( !pClass->bActive )
+      {
+         pClass->pClsSymbol = (*pBase)->item.asSymbol.value;
+         //TraceLog( NULL, "NEW Class: '%s' defined in: %s->%s\n", pNewCls->szName, HB_SYM_GETMODULESYM( pNewCls->pClsSymbol ) ? HB_SYM_GETMODULESYM( pNewCls->pClsSymbol )->szModuleName : "", pNewCls->pClsSymbol->szName );
+         hb_retl( TRUE );
+         return;
+      }
+   }
+   hb_retl( FALSE );
 }
 
 /*
@@ -2862,6 +2949,37 @@ HB_FUNC( __OBJGETCLSNAME )
    hb_retc( hb_objGetClsName( hb_param( 1, HB_IT_ANY ) ) );
 }
 
+
+/*
+ * <lRet> := __clsHasMsg( <oObj | hClass>, <cSymbol> )
+ *
+ * Is <cSymbol> a valid message for the <oObj | hClass>
+ */
+HB_FUNC( __CLSHASMSG )
+{
+   HB_THREAD_STUB_API
+   PHB_ITEM pObject = hb_param( 1, HB_IT_OBJECT );
+   PHB_ITEM pString = hb_param( 2, HB_IT_STRING );
+   USHORT uiClass;
+
+   if( pObject )
+   {
+      uiClass = pObject->item.asArray.value->uiClass;
+   }
+   else
+   {
+      uiClass = (USHORT) hb_parnl( 1 );
+   }
+
+   if( uiClass && uiClass <= s_uiClasses && pString )
+   {
+      hb_retl( hb_clsHasMsg( uiClass, pString->item.asString.value ) );
+   }
+   else
+   {
+      hb_errRT_BASE_SubstR( EG_ARG, 1099, NULL, "__ClsHasMsg", 2, hb_paramError( 1 ), hb_paramError( 2 ) );
+   }
+}
 
 /*
  * <lRet> := __objHasMsg( <oObj>, <cSymbol> )

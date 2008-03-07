@@ -1,5 +1,5 @@
 /*
- * $Id: tclass.prg,v 1.26 2007/12/08 02:31:20 ronpinkas Exp $
+ * $Id: tclass.prg,v 1.27 2007/12/09 06:22:13 ronpinkas Exp $
  */
 
 /*
@@ -83,7 +83,7 @@ FUNCTION HBClass()
    STATIC s_hClass /* NOTE: Automatically default to NIL */
 
    IF s_hClass == NIL
-      s_hClass := __clsNew( "HBCLASS", 13, 18 )
+      s_hClass := __clsNew( "HBCLASS", 13, 22 )
       __ClsSetModule( s_hClass )
 
       __clsAddMsg( s_hClass, "New"            , @New()            , HB_OO_MSG_METHOD )
@@ -97,11 +97,15 @@ FUNCTION HBClass()
       __clsAddMsg( s_hClass, "AddClsMethod"   , @AddClsMethod()   , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "AddVirtual"     , @AddVirtual()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "AddDelegate"    , @AddDelegate()    , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModInline"      , @ModInline()      , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModMethod"      , @ModMethod()      , HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "ModClsMethod"   , @ModClsMethod()   , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "Instance"       , @Instance()       , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetOnError"     , @SetOnError()     , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "SetDestructor"  , @SetDestructor()  , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "ConstructorCall", @ConstructorCall(), HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "DivertConstructorCall", @DivertConstructorCall(), HB_OO_MSG_METHOD )
+      __clsAddMsg( s_hClass, "Refresh"        , @Refresh()        , HB_OO_MSG_METHOD )
       __clsAddMsg( s_hClass, "cSuper"         , {| Self | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, NIL, ::acSuper[ 1 ] ) }, HB_OO_MSG_INLINE )
       __clsAddMsg( s_hClass, "_cSuper"        , {| Self, xVal | IIF( ::acSuper == NIL .OR. Len( ::acSuper ) == 0, ( ::acSuper := { xVal } ), ::acSuper[ 1 ] := xVal ), xVal }, HB_OO_MSG_INLINE )
 
@@ -175,11 +179,17 @@ STATIC PROCEDURE Create( MetaClass )
    LOCAL nExtraMsgs := Len( ::aMethods ) +  ( 2 * Len( ::aClsDatas ) ) + Len( ::aInlines ) + Len( ::aVirtuals )
    LOCAL cDato
    LOCAL hSuper
+   LOCAL nClassModule := 1
+
+   // This code allows HBClass itself to be inherited
+   WHILE Self == HB_QSelf( nClassModule )
+      nClassModule++
+   ENDDO
 
    IF nLen == 0
       //Maybe this class is a super class, and the oop engine store
       //in the first element a real self, when call a super method
-      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs, , 1 )
+      hClass := __ClsNew( ::cName, nLenDatas + 1, nExtraMsgs, , nClassModule )
       nDataBegin := 1
    ELSE                                         // Multi inheritance
       FOR EACH cDato IN ::acSuper
@@ -201,7 +211,7 @@ STATIC PROCEDURE Create( MetaClass )
          ENDIF
       NEXT
 
-      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper, 1 )
+      hClass := __ClsNew( ::cName, nLenDatas , nExtraMsgs, ahSuper, nClassModule )
 
       FOR EACH cDato IN ahSuper
          nDataBegin   += __cls_CntData( cDato )        // Get offset for new Datas
@@ -268,6 +278,39 @@ STATIC PROCEDURE Create( MetaClass )
       __clsAddMsg( hClass, "__Destructor", ::nDestructor, HB_OO_MSG_DESTRUCTOR )
    ENDIF
 
+RETURN
+
+//----------------------------------------------------------------------------//
+
+STATIC PROCEDURE Refresh()
+   LOCAL Self := QSelf()
+   LOCAL nLen := Len( ::acSuper )
+   LOCAL ahSuper := Array( nLen )
+   LOCAL cDato, hClass := ::hClass
+
+      FOR EACH cDato IN ::acSuper
+         ahSuper[ HB_EnumIndex() ] := __clsInstSuper( Upper( cDato ) )
+      NEXT
+
+      FOR EACH cDato IN ::aClsMethods
+          IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
+             __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
+          ENDIF
+      NEXT
+
+      FOR EACH cDato IN ::aMethods
+          IF __clsHasMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ] )
+             __clsModMsg( hClass, cDato[ HB_OO_MTHD_SYMBOL ], cDato[ HB_OO_MTHD_PFUNCTION ] )
+          ENDIF
+      NEXT
+
+      IF ::nOnError != NIL
+         __clsModMsg( hClass, "__OnError", ::nOnError )
+      ENDIF
+
+      IF ::nDestructor != NIL
+         __clsModMsg( hClass, "__Destructor", ::nDestructor )
+      ENDIF
 RETURN
 
 //----------------------------------------------------------------------------//
@@ -361,7 +404,7 @@ RETURN
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddInline( cMethod, bCode, nScope, lPersistent )
 
-   LOCAL Self := QSelf(), nAt
+   LOCAL Self := QSelf()
 
    AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
 
@@ -370,7 +413,7 @@ RETURN
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddMethod( cMethod, nFuncPtr, nScope, lPersistent )
 
-   LOCAL Self := QSelf(), nAt
+   LOCAL Self := QSelf()
 
    AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
 
@@ -379,7 +422,7 @@ RETURN
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddClsMethod( cMethod, nFuncPtr, nScope )
 
-   LOCAL Self := QSelf(), nAt
+   LOCAL Self := QSelf()
 
    AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
 
@@ -388,7 +431,7 @@ RETURN
 //----------------------------------------------------------------------------//
 STATIC PROCEDURE AddVirtual( cMethod )
 
-   LOCAL Self := QSelf(), nAt
+   LOCAL Self := QSelf()
 
    AAdd( ::aVirtuals, cMethod )
 
@@ -400,6 +443,45 @@ STATIC PROCEDURE AddDelegate( cMethod, cDelegate, cObject, nScope, lPersistent )
    LOCAL Self := QSelf()
 
    AAdd( ::aDelegates, { cMethod, cDelegate, nScope, lPersistent, cObject } )
+
+RETURN
+
+//----------------------------------------------------------------------------//
+STATIC PROCEDURE ModInline( cMethod, bCode, nScope, lPersistent )
+
+   LOCAL Self := QSelf(), nAt
+
+   if ( nAt := AScan( ::aInlines, {|a| a[1] == cMethod } ) ) > 0
+      ::aInlines[ nAt ] := { cMethod, bCode, nScope, lPersistent }
+   else
+      AAdd( ::aInlines, { cMethod, bCode, nScope, lPersistent } )
+   endif
+
+RETURN
+
+//----------------------------------------------------------------------------//
+STATIC PROCEDURE ModMethod( cMethod, nFuncPtr, nScope, lPersistent )
+
+   LOCAL Self := QSelf(), nAt
+
+   if ( nAt := AScan( ::aMethods, {|a| a[1] == cMethod } ) ) > 0
+      ::aMethods[ nAt ] := { cMethod, nFuncPtr, nScope, lPersistent }
+   else
+      AAdd( ::aMethods, { cMethod, nFuncPtr, nScope, lPersistent } )
+   endif
+
+RETURN
+
+//----------------------------------------------------------------------------//
+STATIC PROCEDURE ModClsMethod( cMethod, nFuncPtr, nScope )
+
+   LOCAL Self := QSelf(), nAt
+
+   if ( nAt := AScan( ::aClsMethods, {|a| a[1] == cMethod } ) ) > 0
+      ::aClsMethods[ nAt ] := { cMethod, nFuncPtr, nScope }
+   else
+      AAdd( ::aClsMethods, { cMethod, nFuncPtr, nScope } )
+   endif
 
 RETURN
 
