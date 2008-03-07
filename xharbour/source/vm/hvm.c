@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.657 2008/02/11 02:22:34 ronpinkas Exp $
+ * $Id: hvm.c,v 1.658 2008/03/04 17:37:02 ronpinkas Exp $
  */
 
 /*
@@ -10777,13 +10777,13 @@ HB_FUNC( HB_SAVEBLOCK )
 
       hb_arrayNew( &( HB_VM_STACK.Return ), 7 );
 
-      hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 1 ), pModuleSymbols ? pModuleSymbols->szModuleName : "" );
-      hb_itemPutCL( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 2 ), (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
-      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 3 ), pBlock->item.asBlock.paramcnt );
-      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 4 ), pBlock->item.asBlock.value->uiClass );
-      hb_itemPutC(  hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 5 ), pBlock->item.asBlock.value->symbol->szName );
-      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 6 ), pBlock->item.asBlock.value->lineno );
-      hb_itemPutNI( hb_arrayGetItemPtr( &( HB_VM_STACK.Return ), 7 ), pBlock->item.asBlock.statics );
+      hb_arraySetC(  &( HB_VM_STACK.Return ), 1, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+      hb_arraySetCL( &( HB_VM_STACK.Return ), 2, (char *) pBlock->item.asBlock.value->pCode, pBlock->item.asBlock.value->uLen );
+      hb_arraySetNI( &( HB_VM_STACK.Return ), 3, pBlock->item.asBlock.paramcnt );
+      hb_arraySetNI( &( HB_VM_STACK.Return ), 4, pBlock->item.asBlock.value->uiClass );
+      hb_arraySetC(  &( HB_VM_STACK.Return ), 5, pBlock->item.asBlock.value->symbol->szName );
+      hb_arraySetNI( &( HB_VM_STACK.Return ), 6, pBlock->item.asBlock.value->lineno );
+      hb_arraySetNI( &( HB_VM_STACK.Return ), 7, pBlock->item.asBlock.statics );
    }
    else
    {

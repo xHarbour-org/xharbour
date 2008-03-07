@@ -1,5 +1,5 @@
 /*
- * $Id: classes.c,v 1.214 2008/02/10 06:34:33 walito Exp $
+ * $Id: classes.c,v 1.215 2008/03/07 03:53:46 walito Exp $
  */
 
 /*
@@ -2751,14 +2751,14 @@ HB_EXPORT void hb_clsInst( USHORT uiClass, PHB_ITEM pSelf )
          PMETHOD pMethod = pClass->pMethods;
          PHB_ITEM pArray = hb_itemArrayNew( 3 );
 
-         hb_itemPutNI( hb_arrayGetItemPtr( pArray, 3 ), HB_OO_MCLSCTOR_INSTANCE );
+         hb_arraySetNI( pArray, 3, HB_OO_MCLSCTOR_INSTANCE );
          hb_arraySetForward( pArray, 1, pSelf );
 
          for( uiAt = pClass->uiMethods + 1; --uiAt; pMethod++ )
          {
             if( pMethod->uiScope & HB_OO_CLSTP_CLASSCTOR )
             {
-               hb_itemPutC( hb_arrayGetItemPtr( pArray, 2 ), pMethod->pMessage->pSymbol->szName );
+               hb_arraySetC( pArray, 2, pMethod->pMessage->pSymbol->szName );
                hb_execFromArray( pArray );
             }
          }
@@ -3021,14 +3021,14 @@ HB_EXPORT PHB_ITEM hb_objClone( PHB_ITEM pSrcObject )
          USHORT uiAt      = pClass->uiMethods + 1;
          PHB_ITEM pArray  = hb_itemArrayNew( 3 );
 
-         hb_itemPutNI( hb_arrayGetItemPtr( pArray, 3 ), HB_OO_MCLSCTOR_CLONE );
+         hb_arraySetNI( pArray, 3, HB_OO_MCLSCTOR_CLONE );
          hb_arraySet( pArray, 1, pDstObject );
 
          for( ; --uiAt; pMethod++ )
          {
             if( pMethod->uiScope & HB_OO_CLSTP_CLASSCTOR )
             {
-               hb_itemPutC( hb_arrayGetItemPtr( pArray, 2 ), pMethod->pMessage->pSymbol->szName );
+               hb_arraySetC( pArray, 2, pMethod->pMessage->pSymbol->szName );
                hb_execFromArray( pArray );
             }
          }
@@ -3429,7 +3429,7 @@ HB_FUNC( __CLASSSEL )
       for( uiAt++; --uiAt; pMeth++ )
       {
                                                 /* Add to array             */
-         hb_itemPutC( hb_arrayGetItemPtr( &Return, ++uiPos), pMeth->pMessage->pSymbol->szName );
+         hb_arraySetC( &Return, ++uiPos, pMeth->pMessage->pSymbol->szName );
       }
    }
 
@@ -3710,13 +3710,13 @@ static HARBOUR hb___msgClsFullSel( void )
 
                hb_arrayNew( &SubArray, 4 );
 
-               hb_itemPutC( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SYMBOL), pMeth->pMessage->pSymbol->szName );
+               hb_arraySetC( &SubArray, HB_OO_DATA_SYMBOL, pMeth->pMessage->pSymbol->szName );
 
                // 2 is also HB_OO_DATA_VALUE which seems to not be used so overlapped!
-               hb_itemPutPtr( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SYMBOL_PTR ), (void *) pMeth->pMessage->pSymbol );
+               hb_arraySetPtr( &SubArray, HB_OO_DATA_SYMBOL_PTR, (void *) pMeth->pMessage->pSymbol );
 
-               hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_TYPE ), pMeth->uiType );
-               hb_itemPutNI( hb_arrayGetItemPtr( &SubArray, HB_OO_DATA_SCOPE ), pMeth->uiScope );
+               hb_arraySetNI( &SubArray, HB_OO_DATA_TYPE, pMeth->uiType );
+               hb_arraySetNI( &SubArray, HB_OO_DATA_SCOPE, pMeth->uiScope );
 
                hb_arraySetForward( &Return, ++uiPos, &SubArray );
             }
@@ -3785,7 +3785,7 @@ static HARBOUR hb___msgClsSel( void )
          {
             if( uiScope == 0 || pMeth->uiScope & uiScope )
             {
-               hb_itemPutC( hb_arrayGetItemPtr( &Return, ++uiPos), pMeth->pMessage->pSymbol->szName );
+               hb_arraySetC( &Return, ++uiPos, pMeth->pMessage->pSymbol->szName );
             }
          }
       }
@@ -4399,7 +4399,7 @@ HB_FUNC( __CLSGETPROPERTIESANDVALUES )
                hb_arraySet( &SubArray, 2, pTemp );
             }
 
-            hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMeth->pMessage->pSymbol->szName );
+            hb_arraySetC( &SubArray, 1, pMeth->pMessage->pSymbol->szName );
 
             hb_arrayAddForward( &Return, &SubArray );
          }
@@ -4441,7 +4441,7 @@ HB_FUNC( __CLSGETIVARNAMESANDVALUES )
                 pMeth->pFunction == hb___msgGetShrData )
             {
                hb_arrayNew( &SubArray, 2 );
-               hb_itemPutC( hb_arrayGetItemPtr( &SubArray, 1), pMeth->pMessage->pSymbol->szName );
+               hb_arraySetC( &SubArray, 1, pMeth->pMessage->pSymbol->szName );
 
                pTemp = hb_arrayGetItemPtr( pObject, pMeth->uiData );
                if( pTemp )

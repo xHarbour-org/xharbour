@@ -1,5 +1,5 @@
 /*
- * $Id: charlist.c,v 1.2 2005/09/22 01:11:59 druzus Exp $
+ * $Id: charlist.c,v 1.3 2006/08/05 11:58:26 druzus Exp $
  */
 
 /*
@@ -174,7 +174,7 @@ static void do_list (int iSwitch)
 
         for (sCnt = 0; sCnt < 256; sCnt++)
         {
-          hb_itemPutNL( hb_arrayGetItemPtr( pArray, sCnt+1 ), asCharCnt[sCnt] );
+          hb_arraySetNL( pArray, sCnt+1, asCharCnt[sCnt] );
         }
         hb_itemRelease( hb_itemReturn( pArray ) );
       }; break;

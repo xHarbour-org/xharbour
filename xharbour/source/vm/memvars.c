@@ -1,5 +1,5 @@
 /*
- * $Id: memvars.c,v 1.127 2007/09/22 05:41:01 andijahja Exp $
+ * $Id: memvars.c,v 1.128 2007/10/31 08:35:13 marchuet Exp $
  */
 
 /*
@@ -2414,7 +2414,7 @@ static HB_DYNS_FUNC( hb_GetSymbolInfo )
     SubItems.type = HB_IT_NIL;
 
     hb_arrayNew( &SubItems, 2 );
-    hb_itemPutC( hb_arrayGetItemPtr( &SubItems, 1 ), pDynSymbol->pSymbol->szName );
+    hb_arraySetC( &SubItems, 1, pDynSymbol->pSymbol->szName );
     hb_itemCopy( hb_arrayGetItemPtr( &SubItems, 2 ), pItem );
     hb_arrayAddForward( pArray, &SubItems );
   }

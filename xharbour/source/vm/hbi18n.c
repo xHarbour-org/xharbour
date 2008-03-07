@@ -1,5 +1,5 @@
 /*
- * $Id: hbi18n.c,v 1.22 2006/09/06 15:30:31 snaiperis Exp $
+ * $Id: hbi18n.c,v 1.23 2006/09/08 11:42:28 snaiperis Exp $
  */
 
 /*
@@ -215,12 +215,12 @@ PHB_ITEM hb_i18n_read_table_header( FHANDLE handle )
 
    pRet = hb_itemNew( NULL );
    hb_arrayNew( pRet, 6 ); // six fields.
-   hb_itemPutC( hb_arrayGetItemPtr( pRet, 1 ), header.signature  );
-   hb_itemPutC( hb_arrayGetItemPtr( pRet, 2 ), header.author   );
-   hb_itemPutC( hb_arrayGetItemPtr( pRet, 3 ), header.language   );
-   hb_itemPutC( hb_arrayGetItemPtr( pRet, 4 ), header.language_int);
-   hb_itemPutC( hb_arrayGetItemPtr( pRet, 5 ), header.language_code );
-   hb_itemPutNI( hb_arrayGetItemPtr( pRet, 6 ), header.entries );
+   hb_arraySetC( pRet, 1, header.signature );
+   hb_arraySetC( pRet, 2, header.author );
+   hb_arraySetC( pRet, 3, header.language );
+   hb_arraySetC( pRet, 4, header.language_int );
+   hb_arraySetC( pRet, 5, header.language_code );
+   hb_arraySetNI( pRet, 6, header.entries );
 
    return pRet;
 }

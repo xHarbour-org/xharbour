@@ -1,5 +1,5 @@
 /*
- * $Id: fparse.c,v 1.15 2005/10/24 01:04:35 druzus Exp $
+ * $Id: fparse.c,v 1.16 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -415,7 +415,7 @@ HB_FUNC( FPARSE )
       /* add parsed text to array */
       for (iToken = 0; tokens [iToken]; iToken++)
       {
-         hb_itemPutC( hb_arrayGetItemPtr( &Item, iToken + 1 ), tokens [iToken] );
+         hb_arraySetC( &Item, iToken + 1, tokens [iToken] );
       }
 
       /* add array containing parsed text to main array */

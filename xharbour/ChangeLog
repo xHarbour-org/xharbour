@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5941 2008/03/05 18:59:55 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5942 2008/03/07 03:53:46 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,29 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-07 23:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapi.h
+  * source/vm/arrays.c
+    + added set of hb_arraySet*() functions - I hope they will help 3-rd
+      party developers to eliminate using C stack level HB_ITEM and
+      reduce usage of potentially danger function like hb_arrayGetItemPtr()
+    (by Przemyslaw Czerpak, borrowed from Harbour)
+  * source/ct/charlist.c
+  * source/rdd/dbf1.c
+  * source/rdd/workarea.c
+  * source/rtl/direct.c
+  * source/rtl/fparse.c
+  * source/rtl/hbserv.c
+  * source/rtl/hbtoken.c
+  * source/rtl/regex.c
+  * source/rtl/win32prn.prg
+  * source/rtl/winos.prg
+  * source/vm/classes.c
+  * source/vm/hbi18n.c
+  * source/vm/hvm.c
+  * source/vm/memvars.c
+    % Use hb_arraySet*(...) instead of hb_itemPut*( hb_arrayGetItemPtr(...), ...).
 
 2008-03-07 01:30 UTC-0200 Walter Negro <anegro/at/overnet.com.ar>
   * include/classes.h

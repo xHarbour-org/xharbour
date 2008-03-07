@@ -1,5 +1,5 @@
 /*
- * $Id: winos.prg,v 1.7 2005/08/14 20:58:04 peterrees Exp $
+ * $Id: winos.prg,v 1.8 2007/02/11 20:00:50 peterrees Exp $
  */
 
 /*
@@ -298,20 +298,20 @@ HB_FUNC( OS_VERSIONINFO )
   OSVERSIONINFO osvi;
   PHB_ITEM pArray = hb_itemArrayNew( 5 );
   getwinver( &osvi );
-  hb_itemPutNL( hb_arrayGetItemPtr( pArray, 1 ), osvi.dwMajorVersion );
-  hb_itemPutNL( hb_arrayGetItemPtr( pArray, 2 ), osvi.dwMinorVersion );
+  hb_arraySetNL( pArray, 1, osvi.dwMajorVersion );
+  hb_arraySetNL( pArray, 2, osvi.dwMinorVersion );
   if ( osvi.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS )
   {
     osvi.dwBuildNumber = LOWORD( osvi.dwBuildNumber );
   }
-  hb_itemPutNL( hb_arrayGetItemPtr( pArray, 3 ), osvi.dwBuildNumber  );
+  hb_arraySetNL( pArray, 3, osvi.dwBuildNumber  );
 /*
   #define VER_PLATFORM_WIN32s             0
   #define VER_PLATFORM_WIN32_WINDOWS      1
   #define VER_PLATFORM_WIN32_NT           2
 */
-  hb_itemPutNL( hb_arrayGetItemPtr( pArray, 4 ), osvi.dwPlatformId   );
-  hb_itemPutC(  hb_arrayGetItemPtr( pArray, 5 ), osvi.szCSDVersion   );
+  hb_arraySetNL( pArray, 4, osvi.dwPlatformId   );
+  hb_arraySetC( pArray, 5, osvi.szCSDVersion   );
   hb_itemRelease( hb_itemReturn( pArray) );
 }
 

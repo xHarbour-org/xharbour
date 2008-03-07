@@ -1,5 +1,5 @@
 /*
- * $Id: workarea.c,v 1.83 2007/12/17 16:14:57 likewolf Exp $
+ * $Id: workarea.c,v 1.84 2008/01/10 11:18:02 marchuet Exp $
  */
 
 /*
@@ -2072,7 +2072,7 @@ HB_EXPORT PHB_ITEM hb_rddList( USHORT uiType )
    {
       pNode = s_RddList[ uiCount ];
       if( uiType == 0 || pNode->uiType == uiType )
-         hb_itemPutC( hb_arrayGetItemPtr( pRddArray, ++uiIndex ), pNode->szName );
+         hb_arraySetC( pRddArray, ++uiIndex, pNode->szName );
    }
    return pRddArray;
 }

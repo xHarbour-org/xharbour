@@ -1,5 +1,5 @@
 /*
- * $Id: hbapi.h,v 1.232 2008/01/27 23:14:43 fsgiudice Exp $
+ * $Id: hbapi.h,v 1.233 2008/03/04 17:37:01 ronpinkas Exp $
  */
 
 /*
@@ -612,7 +612,21 @@ extern HB_EXPORT LONG      hb_arrayGetT( PHB_ITEM pArray, ULONG ulIndex ); /* re
 extern HB_EXPORT double    hb_arrayGetDTsec( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
 extern HB_EXPORT double    hb_arrayGetDTD( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the date packed value contained in an array element, as a double */
 extern HB_EXPORT HB_TYPE   hb_arrayGetType( PHB_ITEM pArray, ULONG ulIndex ); /* retrieves the type of an array item */
+extern HB_EXPORT BOOL      hb_arraySet( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element */
+extern HB_EXPORT BOOL      hb_arraySetForward( PHB_ITEM pArray, ULONG ulIndex, PHB_ITEM pItem ); /* sets an array element by forwarding it's value */
+extern HB_EXPORT BOOL      hb_arraySetDS( PHB_ITEM pArray, ULONG ulIndex, char * szDate );
+extern HB_EXPORT BOOL      hb_arraySetDL( PHB_ITEM pArray, ULONG ulIndex, LONG lDate );
 extern HB_EXPORT BOOL      hb_arraySetL( PHB_ITEM pArray, ULONG ulIndex, BOOL fValue );
+extern HB_EXPORT BOOL      hb_arraySetNI( PHB_ITEM pArray, ULONG ulIndex, int iNumber );
+extern HB_EXPORT BOOL      hb_arraySetNL( PHB_ITEM pArray, ULONG ulIndex, LONG lNumber );
+extern HB_EXPORT BOOL      hb_arraySetNLL( PHB_ITEM pArray, ULONG ulIndex, LONGLONG llNumber );
+extern HB_EXPORT BOOL      hb_arraySetNInt( PHB_ITEM pArray, ULONG ulIndex, HB_LONG lNumber );
+extern HB_EXPORT BOOL      hb_arraySetND( PHB_ITEM pArray, ULONG ulIndex, double dNumber );
+extern HB_EXPORT BOOL      hb_arraySetC( PHB_ITEM pArray, ULONG ulIndex, const char * szText );
+extern HB_EXPORT BOOL      hb_arraySetCL( PHB_ITEM pArray, ULONG ulIndex, const char * szText, ULONG ulLen );
+extern HB_EXPORT BOOL      hb_arraySetCPtr( PHB_ITEM pArray, ULONG ulIndex, char * szText, ULONG ulLen );
+extern HB_EXPORT BOOL      hb_arraySetPtr( PHB_ITEM pArray, ULONG ulIndex, void * pValue );
+extern HB_EXPORT BOOL      hb_arraySetPtrGC( PHB_ITEM pArray, ULONG ulIndex, void * pValue );
 extern HB_EXPORT void      hb_arrayFill( PHB_ITEM pArray, PHB_ITEM pValue, ULONG ulStart, ULONG ulCount ); /* fill an array with a given item */
 extern HB_EXPORT ULONG     hb_arrayScan( PHB_ITEM pArray, PHB_ITEM pValue, ULONG * pulStart, ULONG * pulCount, BOOL bExact, BOOL bAllowChar ); /* scan an array for a given item, or until code-block item returns TRUE */
 extern HB_EXPORT BOOL      hb_arrayEval( PHB_ITEM pArray, PHB_ITEM bBlock, ULONG * pulStart, ULONG * pulCount ); /* execute a code-block for every element of an array item */

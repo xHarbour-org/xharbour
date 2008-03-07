@@ -1,5 +1,5 @@
 /*
-* $Id: hbserv.c,v 1.33 2005/10/18 12:14:33 druzus Exp $
+* $Id: hbserv.c,v 1.34 2005/10/24 01:04:35 druzus Exp $
 */
 
 /*
@@ -182,7 +182,7 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          // for now just 2 parameters
          pExecArray = hb_itemArrayNew( 3 );
          hb_arraySet( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
-         hb_itemPutNI( hb_arrayGetItemPtr( pExecArray, 2), uiSig );
+         hb_arraySetNI( pExecArray, 2, uiSig );
 
          // the third parameter is an array:
 
@@ -194,17 +194,17 @@ static void s_signalHandler( int sig, siginfo_t *info, void *v )
          #else
          hb_arrayNew( pRet, 6 );
          #endif
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), sig );
+         hb_arraySetNI( pRet, HB_SERVICE_OSSIGNAL, sig );
          #if !( defined( HARBOUR_GCC_OS2 ) || defined( __WATCOMC__ ) )
          #if defined( HB_OS_BSD )
          if (info)
          #endif
          {
-            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), info->si_code );
-            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR), info->si_errno );
-            hb_itemPutPtr( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS), (void *) info->si_addr );
-            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), info->si_pid );
-            hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID), info->si_uid );
+            hb_arraySetNI( pRet, HB_SERVICE_OSSUBSIG, info->si_code );
+            hb_arraySetNI( pRet, HB_SERVICE_OSERROR, info->si_errno );
+            hb_arraySetPtr( pRet, HB_SERVICE_ADDRESS, (void *) info->si_addr );
+            hb_arraySetNI( pRet, HB_SERVICE_PROCESS, info->si_pid );
+            hb_arraySetNI( pRet, HB_SERVICE_UID, info->si_uid );
          }
          #endif
 
@@ -434,7 +434,7 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          // for now just 2 parameters
          pExecArray = hb_itemArrayNew( 3 );
          hb_arraySetForward( pExecArray, 1, hb_arrayGetItemPtr( pFunction, 2 ) );
-         hb_itemPutNI( hb_arrayGetItemPtr( pExecArray, 2), uiSig );
+         hb_arraySetNI( pExecArray, 2, uiSig );
 
          /* the third parameter is an array:
          * 1: low-level signal
@@ -448,25 +448,23 @@ static LONG s_signalHandler( int type, int sig, PEXCEPTION_RECORD exc )
          pRet = hb_arrayGetItemPtr( pExecArray, 3);
          hb_arrayNew( pRet, 6 );
 
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSIGNAL), type );
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSSUBSIG), sig );
+         hb_arraySetNI( pRet, HB_SERVICE_OSSIGNAL, type );
+         hb_arraySetNI( pRet, HB_SERVICE_OSSUBSIG, sig );
          //could be meaningless, but does not matter here
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_OSERROR),
-               GetLastError() );
+         hb_arraySetNI( pRet, HB_SERVICE_OSERROR, GetLastError() );
 
          if (type == 0 ) //exception
          {
-            hb_itemPutPtr( hb_arrayGetItemPtr( pRet,
-                  HB_SERVICE_ADDRESS), ( void * ) exc->ExceptionAddress );
+            hb_arraySetPtr( pRet, HB_SERVICE_ADDRESS, ( void * ) exc->ExceptionAddress );
          }
          else
          {
-            hb_itemPutPtr( hb_arrayGetItemPtr( pRet, HB_SERVICE_ADDRESS ), NULL );
+            hb_arraySetPtr( pRet, HB_SERVICE_ADDRESS, NULL );
          }
          //TODO:
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_PROCESS), GetCurrentThreadId() );
+         hb_arraySetNI( pRet, HB_SERVICE_PROCESS, GetCurrentThreadId() );
          //TODO:
-         hb_itemPutNI( hb_arrayGetItemPtr( pRet, HB_SERVICE_UID ), 0 );
+         hb_arraySetNI( pRet, HB_SERVICE_UID, 0 );
 
          pRet = hb_itemDo( pExecArray, 0 );
          iRet = hb_itemGetNI( pRet );
@@ -867,7 +865,7 @@ HB_FUNC( HB_PUSHSIGNALHANDLER )
    }
 
    pHandEntry = hb_itemArrayNew( 2 );
-   hb_itemPutNI( hb_arrayGetItemPtr( pHandEntry, 1), iMask );
+   hb_arraySetNI( pHandEntry, 1, iMask );
    hb_arraySet( pHandEntry, 2, pFunc );
 
    /* if the hook is not initialized, initialize it */

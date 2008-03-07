@@ -1,5 +1,5 @@
 /*
- * $Id: regex.c,v 1.61 2007/09/22 22:23:17 andijahja Exp $
+ * $Id: regex.c,v 1.62 2007/11/29 07:33:24 andijahja Exp $
  */
 
 /*
@@ -269,13 +269,13 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
             {
                if (aMatches[i].rm_eo > -1 )
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr( &pRetArray, i + 1 ),
+                  hb_arraySetCL( &pRetArray, i + 1,
                                 pString->item.asString.value + aMatches[i].rm_so,
                                 aMatches[i].rm_eo - aMatches[i].rm_so );
                }
                else
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr( &pRetArray, i + 1 ), "", 0 );
+                  hb_arraySetCL( &pRetArray, i + 1, "", 0 );
                }
             }
 
@@ -364,19 +364,19 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                if ( aMatches[i].rm_eo != -1 )
                {
                   //matched string
-                  hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
+                  hb_arraySetCL( &aSingleMatch, 1, pString->item.asString.value + aMatches[i].rm_so, aMatches[i].rm_eo - aMatches[i].rm_so );
 
                   // begin of match
-                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), aMatches[i].rm_so + 1 );
+                  hb_arraySetNI( &aSingleMatch, 2, aMatches[i].rm_so + 1 );
 
                   // End of match
-                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), aMatches[i].rm_eo );
+                  hb_arraySetNI( &aSingleMatch, 3, aMatches[i].rm_eo );
                }
                else
                {
-                  hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
-                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
-                  hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
+                  hb_arraySetCL( &aSingleMatch, 1, "", 0 );
+                  hb_arraySetNI( &aSingleMatch, 2, 0 );
+                  hb_arraySetNI( &aSingleMatch, 3, 0 );
                }
 
                hb_arraySetForward( &pRetArray, i + 1, &aSingleMatch );
@@ -445,19 +445,19 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                          {
 
                             //matched string
-                            hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                            hb_arraySetCL( &aSingleMatch, 1, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
 
                             // begin of match
-                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
+                            hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[i].rm_so + 1 );
 
                             // End of match
-                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
+                            hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[i].rm_eo );
                          }
                          else
                          {
-                            hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
-                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
-                            hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
+                            hb_arraySetCL( &aSingleMatch, 1, "", 0 );
+                            hb_arraySetNI( &aSingleMatch, 2, 0 );
+                            hb_arraySetNI( &aSingleMatch, 3, 0 );
                          }
                       }
                       else
@@ -493,19 +493,19 @@ BOOL hb_regex( char cRequest, PHB_ITEM pRegEx, PHB_ITEM pString )
                      if ( aMatches[i].rm_eo != -1 )
                      {
                         //matched string
-                        hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
+                        hb_arraySetCL( &aSingleMatch, 1, str + aMatches[i].rm_so, ( aMatches[i].rm_eo - aMatches[i].rm_so ) );
 
                         // begin of match
-                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), ulOffSet + aMatches[i].rm_so + 1 );
+                        hb_arraySetNI( &aSingleMatch, 2, ulOffSet + aMatches[i].rm_so + 1 );
 
                         // End of match
-                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), ulOffSet + aMatches[i].rm_eo );
+                        hb_arraySetNI( &aSingleMatch, 3, ulOffSet + aMatches[i].rm_eo );
                      }
                      else
                      {
-                        hb_itemPutCL( hb_arrayGetItemPtr( &aSingleMatch, 1 ), "", 0 );
-                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 2 ), 0 );
-                        hb_itemPutNI( hb_arrayGetItemPtr( &aSingleMatch, 3 ), 0 );
+                        hb_arraySetCL( &aSingleMatch, 1, "", 0 );
+                        hb_arraySetNI( &aSingleMatch, 2, 0 );
+                        hb_arraySetNI( &aSingleMatch, 3, 0 );
                      }
                   }
                   else

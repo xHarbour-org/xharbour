@@ -1,5 +1,5 @@
 /*
- * $Id: hbtoken.c,v 1.4 2007/09/15 06:15:54 paultucker Exp $
+ * $Id: hbtoken.c,v 1.5 2007/09/15 06:41:49 paultucker Exp $
  */
 
 /*
@@ -163,7 +163,7 @@ static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
          else if( szLine[ ul ] == szDelim[ 0 ] &&
                   ( ulDelim == 1 || !memcmp( szLine + ul, szDelim, ulDelim ) ) )
          {
-            hb_itemPutCL( hb_arrayGetItemPtr( pArray, ++ulToken ), szLine + ulStart, ul - ulStart );
+            hb_arraySetCL( pArray, ++ulToken, szLine + ulStart, ul - ulStart );
             if( ulDelim == 1 && *szDelim == ' ' )
             {
                while( ul < ulLen && szLine[ ul + 1 ] == ' ' )
@@ -172,7 +172,7 @@ static PHB_ITEM hb_tokenArray( char * szLine, ULONG ulLen,
             ulStart = ul + ulDelim;
          }
       }
-      hb_itemPutCL( hb_arrayGetItemPtr( pArray, ++ulToken ), szLine + ulStart, ul - ulStart );
+      hb_arraySetCL( pArray, ++ulToken, szLine + ulStart, ul - ulStart );
    }
 
    return pArray;

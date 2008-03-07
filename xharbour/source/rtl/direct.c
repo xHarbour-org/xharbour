@@ -1,5 +1,5 @@
 /*
- * $Id: direct.c,v 1.60 2007/12/02 00:03:23 andijahja Exp $
+ * $Id: direct.c,v 1.61 2007/12/29 12:50:55 likewolf Exp $
  */
 
 /*
@@ -126,18 +126,18 @@ static void hb_fsGrabDirectory( PHB_ITEM pDir, const char * szDirSpec, USHORT ui
             if ( bFullPath )
             {
                char *szFullName = hb_xstrcpy(NULL,fDirSpec->szPath?fDirSpec->szPath:"",ffind->szName,NULL);
-               hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_NAME), szFullName );
+               hb_arraySetC( &Subarray, F_NAME, szFullName );
                hb_xfree( szFullName );
             }
             else
             {
-               hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_NAME), ffind->szName );
+               hb_arraySetC( &Subarray, F_NAME, ffind->szName );
             }
 
-            hb_itemPutNInt( hb_arrayGetItemPtr( &Subarray, F_SIZE ), ffind->size );
-            hb_itemPutDL( hb_arrayGetItemPtr( &Subarray, F_DATE ), ffind->lDate );
-            hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_TIME ), ffind->szTime );
-            hb_itemPutC( hb_arrayGetItemPtr( &Subarray, F_ATTR ), hb_fsAttrDecode( ffind->attr, buffer ) );
+            hb_arraySetNInt( &Subarray, F_SIZE, ffind->size );
+            hb_arraySetDL( &Subarray, F_DATE, ffind->lDate );
+            hb_arraySetC( &Subarray, F_TIME, ffind->szTime );
+            hb_arraySetC( &Subarray, F_ATTR, hb_fsAttrDecode( ffind->attr, buffer ) );
 
             /* Don't exit when array limit is reached */
             if ( bDirOnly )
