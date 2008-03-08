@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5942 2008/03/07 03:53:46 walito Exp $
+ * $Id: ChangeLog,v 1.5943 2008/03/07 20:27:16 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,19 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-07 20:03 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/vm/dynsym.c
+    + 2 asserts()
+    - Branch that should never take place or is superceded by hb_vmRegisterSymbols()
+  * source/vm/hvm.c
+    + Added small logic to force single function definition in prg code, when linker allowed multiple definitions
+    + Added alternate branch controlled by HB_STARTUP_REVERSED_LINK_ORDER to assume last registered module is
+      the correct module of function definition when multiple modules claims some function defnition as HB_FS_LOCAL.
+      If HB_STARTUP_REVERSED_LINK_ORDER is *not* defined then first registered module is assumed to be the first 
+      linked module, and thus the correct module. (This appear to be with BCC, MSVC, and xCC). Please enable TraceLog()
+      on line 9759 to check if registration order is same or reveresed, or otherwise - so we can add the #define if needed
+      or other hacks as needed for some linker[s].
 
 2008-03-07 23:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapi.h

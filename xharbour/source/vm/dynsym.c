@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.52 2008/02/02 07:33:30 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.53 2008/03/04 17:37:02 ronpinkas Exp $
  */
 
 /*
@@ -144,6 +144,8 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
 
    if( pDynSym )            /* If name exists */
    {
+      assert(0);
+      
       if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
       {
          #if 0
@@ -170,20 +172,13 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
             #endif
                {
                   // This is the symbol of the function definition module.
+                  assert( pSymbol->value.pFunPtr );      
                   pDynSym->pSymbol = pSymbol;
                }
          }
 
          pDynSym->pModuleSymbols = pModuleSymbols;
          //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
-      }
-      else
-      {
-         if( pSymbol->value.pFunPtr && pDynSym->pSymbol->value.pFunPtr == NULL )
-         {
-            //The DynSym existed without function pointer
-            pDynSym->pSymbol = pSymbol;
-         }
       }
 
       pSymbol->pDynSym = pDynSym;    /* place a pointer to DynSym */
@@ -247,15 +242,20 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
       pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
    }
 #endif
-
-   pDynSym->pModuleSymbols = NULL;
+   
    //TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
 
    if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
-   {
+   {      
+      // This is the true local symbol 
+      assert( pSymbol->value.pFunPtr );      
       assert( pModuleSymbols );
       pDynSym->pModuleSymbols = pModuleSymbols;
       //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
+   }
+   else
+   {
+      pDynSym->pModuleSymbols = NULL;
    }
 
    pDynSym->pSymbol = pSymbol;
@@ -888,10 +888,14 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
    hb_dynsymLock();
 
    if( lIndex >= 1 && lIndex <= (LONG) s_uiDynSymbols )
+   {
       hb_retl( hb_dynsymIsFunction( s_pDynItems[ lIndex - 1 ].pDynSym ) );
+   }
    else
+   {
       hb_retl( FALSE );
-
+   }
+   
    hb_dynsymUnlock();
 }
 
