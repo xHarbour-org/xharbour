@@ -1,5 +1,5 @@
 /*
- * $Id: hbsetup.h,v 1.47 2007/04/25 01:37:10 ronpinkas Exp $
+ * $Id: hbsetup.h,v 1.48 2008/03/04 17:37:01 ronpinkas Exp $
  */
 
 /*
@@ -58,6 +58,9 @@
 
 /* Don't change - this is the default for older compiled prgs.!!! */
 #define HB_PRG_PCODE_VER 0
+
+#define __STR__(x) #x
+#define __STR(x) __STR__(x)
 
 #include <limits.h>
 

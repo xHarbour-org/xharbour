@@ -1,5 +1,5 @@
 /*
- * $Id: dynsym.c,v 1.53 2008/03/04 17:37:02 ronpinkas Exp $
+ * $Id: dynsym.c,v 1.54 2008/03/08 00:36:39 ronpinkas Exp $
  */
 
 /*
@@ -145,7 +145,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
    if( pDynSym )            /* If name exists */
    {
       assert(0);
-      
+
       if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
       {
          #if 0
@@ -172,7 +172,7 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
             #endif
                {
                   // This is the symbol of the function definition module.
-                  assert( pSymbol->value.pFunPtr );      
+                  assert( pSymbol->value.pFunPtr );
                   pDynSym->pSymbol = pSymbol;
                }
          }
@@ -242,13 +242,13 @@ PHB_DYNS HB_EXPORT hb_dynsymNew( PHB_SYMB pSymbol, PSYMBOLS pModuleSymbols )    
       pSymbol = hb_symbolNew( pSymbol->szName ); /* clone the symbol */
    }
 #endif
-   
+
    //TraceLog( NULL, "Symbol: '%s' IMPORTED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
 
    if( ( pSymbol->scope.value & HB_FS_LOCAL ) == HB_FS_LOCAL )
-   {      
-      // This is the true local symbol 
-      assert( pSymbol->value.pFunPtr );      
+   {
+      // This is the true local symbol
+      assert( pSymbol->value.pFunPtr );
       assert( pModuleSymbols );
       pDynSym->pModuleSymbols = pModuleSymbols;
       //TraceLog( NULL, "Symbol: '%s' DEFINED in Module: '%s'\n", pSymbol->szName, pModuleSymbols ? pModuleSymbols->szModuleName : "" );
@@ -358,6 +358,34 @@ PHB_DYNS HB_EXPORT hb_dynsymGetCaseWithNamespaces( const char * szName, const ch
    hb_dynsymLock();
 
    pDynSym = hb_dynsymFindWithNamespaces( szName, pNamespaces );
+
+   if( !pDynSym )       /* Does it exists ? */
+   {
+      //TraceLog( NULL, "Creating: %s\n", szName );
+      pDynSym = hb_dynsymNew( hb_symbolNew( szName ), HB_GETMODULESYM() );   /* Make new symbol */
+      pDynSym->pSymbol->scope.value = HB_FS_PUBLIC;
+   }
+
+   hb_dynsymUnlock();
+
+   //TraceLog( NULL, "Returning: %p\n", pDynSym );
+
+   return pDynSym;
+}
+
+PHB_DYNS HB_EXPORT hb_dynsymGetWithNamespaces( const char * szName, const char *pNamespaces )  /* finds and creates a symbol if not found CASE SENSITIVE! */
+{
+   HB_THREAD_STUB_STACK
+   PHB_DYNS pDynSym;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetCase(%s)", szName));
+
+   //TraceLog( NULL, "Searching: %s\n", szName );
+
+   /* JC1: read the notice for hb_dynsymGet() */
+   hb_dynsymLock();
+
+   pDynSym = hb_dynsymFindNameWithNamespaces( szName, pNamespaces );
 
    if( !pDynSym )       /* Does it exists ? */
    {
@@ -698,6 +726,57 @@ PHB_DYNS HB_EXPORT hb_dynsymFindWithNamespaces( const char * szName, const char 
 
 }
 
+PHB_DYNS HB_EXPORT hb_dynsymFindNameWithNamespaces( const char * szName, const char *pNamespaces )
+{
+   if( pNamespaces )
+   {
+      char *szNamespace = (char *) pNamespaces;
+      PHB_DYNS pDynSym;
+      char szUprName[ HB_SYMBOL_NAME_LEN + 1 ];
+
+      {
+         int iLen = HB_SYMBOL_NAME_LEN;
+         char * pDest = szUprName;
+
+         do
+         {
+            char cChar = *szName++;
+            if( cChar == 0 || cChar == ' ' || cChar == '\t' )
+               break;
+            else if( cChar >= 'a' && cChar <= 'z' )
+               *pDest++ = cChar - ( 'a' - 'A' );
+            else
+               *pDest++ = cChar;
+         }
+         while( --iLen );
+         *pDest = '\0';
+      }
+
+      while ( *szNamespace )
+      {
+         char *szQualified = hb_xstrcpy( NULL, szNamespace, ".", szUprName, NULL );
+
+         pDynSym = hb_dynsymFindName( szQualified );
+
+         hb_xfree( szQualified );
+
+         if( pDynSym )
+         {
+            return pDynSym;
+         }
+
+         szNamespace += strlen( szNamespace ) + 1;
+      }
+
+      return NULL;
+   }
+   else
+   {
+      return hb_dynsymFindName( szName );
+   }
+
+}
+
 HB_EXPORT PHB_SYMB hb_dynsymGetSymbol( const char * szName )
 {
    HB_TRACE(HB_TR_DEBUG, ("hb_dynsymGetSymbol(%s)", szName));
@@ -895,7 +974,7 @@ HB_FUNC( __DYNSISFUN ) /* returns .t. if a symbol has a function/procedure point
    {
       hb_retl( FALSE );
    }
-   
+
    hb_dynsymUnlock();
 }
 

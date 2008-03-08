@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.659 2008/03/07 20:27:19 likewolf Exp $
+ * $Id: hvm.c,v 1.660 2008/03/08 00:36:39 ronpinkas Exp $
  */
 
 /*
@@ -4112,7 +4112,9 @@ static void hb_vmPlus( PHB_ITEM pLeft, PHB_ITEM pRight, PHB_ITEM pResult )
                   }
                   hb_xmemcpy( (void *) ( pResult->item.asString.value + ulLen1 ), (void *) pRight->item.asString.value, ulLen2 );
 
-               } else {
+               }
+               else
+               {
                   char *sResult = (char *) hb_xgrab( ulNewLen + 1 );
 
                   hb_xmemcpy( sResult, pLeft->item.asString.value, ulLen1 );
@@ -10075,9 +10077,8 @@ HB_FORCE_EXPORT PSYMBOLS hb_vmProcessSymbols( PHB_SYMB pSymbols, USHORT uiModule
       sprintf( szPCode, "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
-                      "'%s' was compiled by older version, "
-                      "PCODE version %s is no longer supported - "
-                      "Please recompile.\n", szModule, szPCode );
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, s_fCloneSym, s_fCloneSym, pGlobals );
@@ -10101,9 +10102,8 @@ HB_EXPORT PSYMBOLS hb_vmProcessDllSymbols( PHB_SYMB pSymbols, USHORT uiModuleSym
       sprintf( szPCode, "%i", iPCodeVer );
 
       hb_errInternal( HB_EI_ERRUNRECOV,
-                      "'%s' was compiled by older version, "
-                      "PCODE version %s is no longer supported - "
-                      "Please recompile.\n", szModule, szPCode );
+                      "Module: '%s' was compiled into PCODE version: %s,"
+                      "this version of xHarbour expects version: " __STR( HB_PCODE_VER ), szModule, szPCode );
    }
 
    return hb_vmRegisterSymbols( pSymbols, uiModuleSymbols, szModule, TRUE, s_fCloneSym, NULL );

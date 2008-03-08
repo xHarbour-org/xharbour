@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5943 2008/03/07 20:27:16 likewolf Exp $
+ * $Id: ChangeLog,v 1.5944 2008/03/08 00:36:39 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,21 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-08 00:22 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbapi.h
+  * source/vm/dynsym.c
+  * source/vm/macro.c
+    * Silly but critical oversight in last commit
+
+  * include/hbsetup.h
+    + Added __STR() and __STR__() macros
+
+  * source/vm/garbage.c
+    ! Fixed GPF trap when collecting after memvars been released but scaned item is a BYREF to a MEMVAR
+
+  * source/vm/hvm.c
+    * Improved error message on PCODE version mismatch
 
 2008-03-07 20:03 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/vm/dynsym.c
@@ -16,7 +31,7 @@
     + Added small logic to force single function definition in prg code, when linker allowed multiple definitions
     + Added alternate branch controlled by HB_STARTUP_REVERSED_LINK_ORDER to assume last registered module is
       the correct module of function definition when multiple modules claims some function defnition as HB_FS_LOCAL.
-      If HB_STARTUP_REVERSED_LINK_ORDER is *not* defined then first registered module is assumed to be the first 
+      If HB_STARTUP_REVERSED_LINK_ORDER is *not* defined then first registered module is assumed to be the first
       linked module, and thus the correct module. (This appear to be with BCC, MSVC, and xCC). Please enable TraceLog()
       on line 9759 to check if registration order is same or reveresed, or otherwise - so we can add the #define if needed
       or other hacks as needed for some linker[s].

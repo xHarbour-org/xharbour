@@ -1,5 +1,5 @@
 /*
- * $Id: macro.c,v 1.77 2008/02/09 02:53:19 ronpinkas Exp $
+ * $Id: macro.c,v 1.78 2008/03/04 17:37:03 ronpinkas Exp $
  */
 
 /*
@@ -968,7 +968,7 @@ void HB_EXPORT hb_macroPushSymbol( HB_ITEM_PTR pItem )
          /* NOTE: checking for valid function name (valid pointer) is done
           * in hb_vmDo()
           */
-         pDynSym = hb_dynsymGetCaseWithNamespaces( szString, HB_GETNAMESPACES() );
+         pDynSym = hb_dynsymGetWithNamespaces( szString, HB_GETNAMESPACES() );
 
          hb_stackPop();    /* remove compiled string */
 

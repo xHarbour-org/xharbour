@@ -1,5 +1,5 @@
 /*
- * $Id: garbage.c,v 1.93 2007/04/11 06:16:45 ronpinkas Exp $
+ * $Id: garbage.c,v 1.94 2008/01/10 11:27:17 marchuet Exp $
  */
 
 /*
@@ -448,6 +448,8 @@ HB_EXPORT void *hb_gcUnlock( void *pBlock )
 */
 void hb_gcItemRef( HB_ITEM_PTR pItem )
 {
+   HB_THREAD_STUB
+
    while( HB_IS_BYREF( pItem ) )
    {
       if( HB_IS_EXTREF( pItem ) )
@@ -465,7 +467,14 @@ void hb_gcItemRef( HB_ITEM_PTR pItem )
          hb_gcItemRef( &FakedItem );
       }
 
-      pItem = hb_itemUnRefOnce( pItem );
+      if( HB_IS_MEMVAR( pItem ) && HB_VM_STACK.pPos == HB_VM_STACK.pItems )
+      {
+         pItem->type = HB_IT_NIL;
+      }
+      else
+      {
+         pItem = hb_itemUnRefOnce( pItem );
+      }
    }
 
    if( HB_IS_ARRAY( pItem ) )
