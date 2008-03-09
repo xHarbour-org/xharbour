@@ -1,5 +1,5 @@
 /*
- * $Id: seconds.c,v 1.13 2007/10/31 08:35:12 marchuet Exp $
+ * $Id: seconds.c,v 1.14 2007/11/10 18:21:57 likewolf Exp $
  */
 
 /*
@@ -113,6 +113,37 @@ HB_EXPORT void hb_dateTimeStamp( LONG * plJulian, LONG * plMilliSec )
 #endif
 }
 
+HB_EXPORT HB_ULONG hb_dateMilliSeconds( void )
+{
+#if defined(HB_OS_WIN_32)
+   SYSTEMTIME st;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+
+   GetLocalTime( &st );
+
+   return ( HB_ULONG ) hb_dateEncode( st.wYear, st.wMonth, st.wDay ) * 86400000L +
+          ( ( st.wHour * 60 + st.wMinute ) * 60 + st.wSecond ) * 1000 +
+          st.wMilliseconds;
+#elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) ) && !defined( __WATCOMC__ )
+   struct timeval tv;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+
+   gettimeofday( &tv, NULL );
+
+   return ( HB_ULONG ) tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#else
+   struct timeb tb;
+
+   HB_TRACE(HB_TR_DEBUG, ("hb_dateMilliSeconds()"));
+
+   ftime( &tb );
+
+   return ( HB_ULONG ) tb.time * 1000 + tb.millitm;
+#endif
+}
+
 HB_EXPORT double hb_dateSeconds( void )
 {
 #if defined(HB_OS_WIN_32)
@@ -158,7 +189,22 @@ HB_EXPORT double hb_dateSeconds( void )
 #endif
 }
 
+HB_FUNC( SECONDS )
+{
+   hb_retnd( hb_dateSeconds() );
+}
+
 #ifdef HB_EXTENSION
+
+HB_FUNC( SECONDSCPU )
+{
+   hb_retnd( hb_secondsCPU( hb_parni( 1 ) ) );
+}
+
+HB_FUNC( HB_CLOCKS2SECS )
+{
+   hb_retnd( (double) hb_parnl( 1 ) / CLOCKS_PER_SEC );
+}
 
 /*
    secondsCPU(n) -> nTime
@@ -240,25 +286,6 @@ HB_EXPORT double hb_secondsCPU( int n )
    }
 #endif
    return d;
-}
-
-#endif
-
-HB_FUNC( SECONDS )
-{
-   hb_retnd( hb_dateSeconds() );
-}
-
-#ifdef HB_EXTENSION
-
-HB_FUNC( SECONDSCPU )
-{
-   hb_retnd( hb_secondsCPU( hb_parni( 1 ) ) );
-}
-
-HB_FUNC( HB_CLOCKS2SECS )
-{
-   hb_retnd( (double) hb_parnl( 1 ) / CLOCKS_PER_SEC );
 }
 
 #endif

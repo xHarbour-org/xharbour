@@ -1,5 +1,5 @@
 /*
- * $Id: idle.c,v 1.22 2005/09/30 23:44:05 druzus Exp $
+ * $Id: idle.c,v 1.23 2007/12/08 12:47:53 lculik Exp $
  */
 
 /*
@@ -75,12 +75,13 @@
 #include "hbfast.h"
 #include "hbset.h"
 #include "hbvm.h"
+#include "hbdate.h"
 #include "error.ch"
-#include <time.h>
 #if defined( HB_OS_UNIX )
-  #include <sys/times.h>
-  #include <unistd.h>
+   #include <sys/times.h>
+   #include <unistd.h>
 #endif
+#include <time.h>
 
 /* list of background tasks
  * A pointer into an array of pointers to items with a codeblock
@@ -248,23 +249,16 @@ void hb_idleShutDown( void )
 
 void hb_idleSleep( double dSeconds )
 {
-#if defined( HB_OS_UNIX )
-   /* NOTE: clock() returns a time used by a program - if it is suspended
-    * then this time will be zero
-    */
-   clock_t end_clock;
-   struct tms tm;
-
-   end_clock = times( &tm ) + ( clock_t ) ( dSeconds * sysconf(_SC_CLK_TCK) );
-   while( times( &tm ) < end_clock )
-#else
-   clock_t end_clock = clock() + ( clock_t ) ( dSeconds * CLOCKS_PER_SEC );
-   while( clock() < end_clock )
-#endif
+   if( dSeconds >= 0 )
    {
-      hb_idleState( FALSE );
+      HB_ULONG end_timer = hb_dateMilliSeconds() + ( HB_ULONG ) ( dSeconds * 1000 );
+
+      while( hb_dateMilliSeconds() < end_timer )
+      {
+         hb_idleState( FALSE );
+      }
+      hb_idleReset();
    }
-   hb_idleReset();
 }
 
 /* signal that the user code is in idle state */
