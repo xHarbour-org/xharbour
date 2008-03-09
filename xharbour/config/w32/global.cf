@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.17 2005/02/18 21:20:04 druzus Exp $
+# $Id: global.cf,v 1.18 2006/06/26 11:27:06 druzus Exp $
 #
 
 ifndef MK
@@ -27,8 +27,8 @@ ifeq ($(SHLVL),) # COMMAND.COM
 # There is a conflict with the use of '\' and '/' characters
 # The MAKE requires '/' in filenames (ARCH_DIR) however some compilers
 # and some DOS commands require '\' (ARCH_DOS)
-ARCH_DIR = $(subst \,/,$(ARCH))
-ARCH_DOS = $(subst /,\,$(ARCH))
+ARCH_DIR = $(subst \,/,$(HB_ARCH))
+ARCH_DOS = $(subst /,\,$(HB_ARCH))
 MK := $(subst \,/,$(subst \~,~,$(MAKE)))
 
 ifeq ($(COMSPEC),) #location of command.com
@@ -96,7 +96,7 @@ endif
 
 else  # bash
 
-ARCH_DIR = $(ARCH)
+ARCH_DIR = $(HB_ARCH)
 MK = $(MAKE)
 
 RM = rm -f
@@ -117,8 +117,8 @@ dirbase_mt::
 	 [ -d $(ARCH_DIR)_mt ] || $(MD) $(ARCH_DIR)_mt
 
 clean::
-	-$(RD) $(ARCH)
-	-$(RD) $(ARCH)_mt
+	-$(RD) $(ARCH_DIR)
+	-$(RD) $(ARCH_DIR)_mt
 
 endif
 endif

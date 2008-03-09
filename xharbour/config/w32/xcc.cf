@@ -1,5 +1,5 @@
 #
-# $Id: xcc.cf,v 1.3 2005/03/16 16:01:35 druzus Exp $
+# $Id: xcc.cf,v 1.4 2007/01/11 01:00:34 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -32,8 +32,8 @@ LD_OUT = -OUT:
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -LIBPATH:$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-LINKPATHS += $(foreach lib, $(LIBS), -LIBPATH:$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(CONTRIBS), -LIBPATH:$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+LINKPATHS += $(foreach lib, $(LIBS), -LIBPATH:$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 else
 LINKPATHS += -LIBPATH:$(HB_LIB_COMPILE)
 endif
@@ -43,7 +43,7 @@ LINKLIBS += $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
 endif
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
 endif
@@ -52,18 +52,18 @@ endif
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 endif
 LINKLIBS += pcrepos$(LIB_EXT)
 
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
 endif
 LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
 
 ifeq ($(HB_MULTI_GT),yes)
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
 endif
 LINKLIBS += gtnul$(LIB_EXT)
 endif

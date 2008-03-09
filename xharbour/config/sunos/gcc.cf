@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.1 2004/11/21 21:43:18 druzus Exp $
+# $Id: gcc.cf,v 1.2 2005/09/02 18:28:25 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -30,8 +30,8 @@ LD_OUT = -o
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 endif
@@ -40,22 +40,22 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 endif
 
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LINKLIBS += -lpcrepos
 
 ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
 LINKLIBS += -lgtnul
 endif
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
 LINKLIBS += -l$(HB_GT_LIB)
 
 # HB_SCREEN_LIB: empty, or one of curses, slang

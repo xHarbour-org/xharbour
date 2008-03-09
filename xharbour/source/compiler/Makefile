@@ -1,5 +1,5 @@
 #
-# $Id: Makefile,v 1.8 2007/12/22 11:17:25 modalsist Exp $
+# $Id: Makefile,v 1.9 2007/12/26 14:53:40 modalsist Exp $
 #
 
 HB_LEX := SIMPLEX
@@ -43,7 +43,6 @@ C_SOURCES=\
 	genc.c \
 	gencc.c \
         gencobj.c \
-        genobj32.c \
 	genhrb.c \
 	hbfunchk.c \
 	hbgenerr.c \

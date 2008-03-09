@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5946 2008/03/09 17:55:13 likewolf Exp $
+ * $Id: ChangeLog,v 1.5947 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,44 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-09 21:45 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * source/compiler/Makefile
+    - Removed non-functional genobj32.c.
+  * config/global.cf
+  * config/header.cf
+  * config/lib.cf
+  * config/bsd/gcc.cf
+  * config/bsd/global.cf
+  * config/darwin/gcc.cf
+  * config/darwin/global.cf
+  * config/dos/bcc16.cf
+  * config/dos/djgpp.cf
+  * config/dos/global.cf
+  * config/dos/rsx32.cf
+  * config/dos/watcom.cf
+  * config/hpux/gcc.cf
+  * config/hpux/global.cf
+  * config/linux/gcc.cf
+  * config/linux/global.cf
+  * config/linux/owatcom.cf
+  * config/os2/gcc.cf
+  * config/os2/global.cf
+  * config/os2/icc.cf
+  * config/sunos/gcc.cf
+  * config/sunos/global.cf
+  * config/w32/bcc32.cf
+  * config/w32/dm.cf
+  * config/w32/gcc.cf
+  * config/w32/global.cf
+  * config/w32/mingw32.cf
+  * config/w32/msvc.cf
+  * config/w32/pellesc.cf
+  * config/w32/rsxnt.cf
+  * config/w32/watcom.cf
+  * config/w32/xcc.cf
+    * GNU make system cleanup (changed $(ARCH) to $(HB_ARCH) or $(ARCH_DIR)
+      according to actual usage).
 
 2008-03-09 13:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * makefile.bc

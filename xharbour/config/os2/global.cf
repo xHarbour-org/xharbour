@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.5 2004/05/04 16:04:46 mauriliolongo Exp $
+# $Id: global.cf,v 1.6 2007/12/27 16:39:05 mauriliolongo Exp $
 #
 
 ifndef MK
@@ -19,8 +19,8 @@ endif
 
 ifeq ($(SHLVL),) # An OS/2 command shell
 
-ARCH_DIR = $(ARCH)
-OS2_ARCH_DIR = $(subst /,\,$(ARCH))
+ARCH_DIR = $(HB_ARCH)
+OS2_ARCH_DIR = $(subst /,\,$(HB_ARCH))
 MK = $(subst /,\,$(subst \~,~,$(MAKE)))
 
 ifeq ($(OS2_SHELL),)
@@ -48,7 +48,7 @@ clean::
 
 else  # bash
 
-ARCH_DIR = $(ARCH)/
+ARCH_DIR = $(HB_ARCH)/
 MK = $(MAKE)
 
 RM = rm -f
@@ -59,11 +59,11 @@ MD = mkdir
 
 dirbase::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	 [ -d $(ARCH) ] || $(MD) $(ARCH)
+	 [ -d $(ARCH_DIR) ] || $(MD) $(ARCH_DIR)
 
 dirbase_mt::
 	@[ -d $(HB_ARCHITECTURE) ] || $(MD) $(HB_ARCHITECTURE); \
-	[ -d $(ARCH)_mt ] || $(MD) $(ARCH)_mt
+	[ -d $(ARCH_DIR)_mt ] || $(MD) $(ARCH_DIR)_mt
 
 
 clean::

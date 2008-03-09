@@ -1,5 +1,5 @@
 #
-# $Id: mingw32.cf,v 1.29 2005/09/02 18:28:44 druzus Exp $
+# $Id: mingw32.cf,v 1.30 2006/07/16 19:48:56 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -38,13 +38,13 @@ LINKPATHS =
 LDLIBS =
 
 # Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 LDLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 
 #Adding MT libs on need
 ifeq ($(findstring vmmt,$(LIBS)),vmmt)
@@ -60,11 +60,11 @@ LDLIBS += $(foreach lib, $(LIBS), -l$(lib))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)_mt)
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR)_mt)
 LDLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv)mt)
 else
 ifeq ($(findstring rdd,$(LIBS)),rdd)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
 LDLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
 endif
 endif
@@ -72,20 +72,20 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
 LDLIBS += -lpcrepos
 
 ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
 LDLIBS += -lgtnul
 endif
 ifneq ($(HB_GT_DEFAULT),$(HB_GT_LIB))
 ifneq ($(HB_GT_DEFAULT),)
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH_DIR)
 LDLIBS += -l$(HB_GT_DEFAULT)
 endif
 endif
-LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
 LDLIBS += -l$(HB_GT_LIB)
 
 endif

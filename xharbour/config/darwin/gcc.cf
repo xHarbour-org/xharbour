@@ -1,5 +1,5 @@
 #
-# $Id: gcc.cf,v 1.17 2005/03/13 12:44:40 likewolf Exp $
+# $Id: gcc.cf,v 1.18 2005/09/02 18:25:41 druzus Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -49,13 +49,13 @@ LD = gcc
 LD_OUT = -o
 
 # Add all libraries specified in HB_USER_LIBS.
-LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += $(foreach lib, $(HB_USER_LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 LINKLIBS += $(foreach lib, $(HB_USER_LIBS), -l$(lib))
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-  LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-  LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+  LINKPATHS += $(foreach lib, $(CONTRIBS), -L$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+  LINKPATHS += $(foreach lib, $(LIBS), -L$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 
   # Adding MT libs on need
   ifeq ($(findstring vmmt,$(LIBS)),vmmt)
@@ -73,27 +73,27 @@ LINKLIBS += $(foreach lib, $(LIBS), -l$(lib))
 ifeq ($(findstring rddmt,$(LIBS)),rddmt)
   #DBFNTX and DBFCDX are MTzed
   ifeq ($(findstring dbfcdx,$(HB_DB_DRIVERS)),dbfcdx)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH)_mt
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfcdx/$(ARCH_DIR)_mt
     LINKLIBS += -ldbfcdxmt
   endif
   ifeq ($(findstring dbfntx,$(HB_DB_DRIVERS)),dbfntx)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH)_mt
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfntx/$(ARCH_DIR)_mt
     LINKLIBS += -ldbfntxmt
   endif
 
   # DBFDBT and DBFFPT are not MTzed
   ifeq ($(findstring dbfdbt,$(HB_DB_DRIVERS)),dbfdbt)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbfdbt/$(ARCH_DIR)
     LINKLIBS += -ldbfdbt
   endif
   ifeq ($(findstring dbffpt,$(HB_DB_DRIVERS)),dbffpt)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rdd/dbffpt/$(ARCH_DIR)
     LINKLIBS += -ldbffpt
   endif
 
 else
   ifeq ($(findstring rdd,$(LIBS)),rdd)
-    LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+    LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -L$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
     LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), -l$(drv))
   endif
 endif
@@ -101,15 +101,15 @@ endif
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
 
-  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH)
+  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)
   LINKLIBS += -lpcrepos
 
   ifeq ($(HB_MULTI_GT),yes)
-    LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+    LINKPATHS += -L$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
     LINKLIBS += -lgtnul
   endif
 
-  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+  LINKPATHS += -L$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
   LINKLIBS += -l$(HB_GT_LIB)
 
   # HB_SCREEN_LIB: empty, or one of ncurses, slang

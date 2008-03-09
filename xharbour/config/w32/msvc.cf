@@ -1,5 +1,5 @@
 #
-# $Id: msvc.cf,v 1.6 2004/10/31 13:15:46 druzus Exp $
+# $Id: msvc.cf,v 1.7 2007/12/30 17:49:06 likewolf Exp $
 #
 
 include $(TOP)$(ROOT)config/$(HB_ARCHITECTURE)/global.cf
@@ -20,8 +20,8 @@ LD_OUT = -Fe
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKPATHS += -link $(foreach lib, $(CONTRIBS), -LIBPATH:$(TOP)$(ROOT)contrib/$(lib)/$(ARCH))
-LINKPATHS += -link $(foreach lib, $(LIBS), -LIBPATH:$(TOP)$(ROOT)source/$(lib)/$(ARCH))
+LINKPATHS += -link $(foreach lib, $(CONTRIBS), -LIBPATH:$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR))
+LINKPATHS += -link $(foreach lib, $(LIBS), -LIBPATH:$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR))
 else
 LINKPATHS += -link -LIBPATH:$(HB_LIB_COMPILE)
 endif
@@ -30,16 +30,16 @@ LINKLIBS += $(foreach lib, $(LIBS), $(lib)$(LIB_EXT))
 
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
-LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH))
+LINKPATHS += $(foreach drv, $(HB_DB_DRIVERS), -LIBPATH:$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR))
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
 endif
 
 # Add the specified GT driver library
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)
 LINKLIBS += $(HB_GT_LIB)$(LIB_EXT)
 ifeq ($(HB_MULTI_GT),yes)
-LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)
+LINKPATHS += -LIBPATH:$(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)
 LINKLIBS += gtnul$(LIB_EXT)
 endif
 endif

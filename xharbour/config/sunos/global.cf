@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.1 2004/10/14 19:36:48 druzus Exp $
+# $Id: global.cf,v 1.1 2004/11/21 21:43:18 druzus Exp $
 #
 
 all : first
@@ -30,7 +30,7 @@ ifeq ($(HB_GT_LIB),)
    HB_GT_LIB = gtstd
 endif
 
-ARCH_DIR = $(ARCH)/
+ARCH_DIR = $(HB_ARCH)/
 MK = $(MAKE)
 RM = rm -f
 RD = rm -f -r

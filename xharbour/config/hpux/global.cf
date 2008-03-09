@@ -1,5 +1,5 @@
 #
-# $Id: global.cf,v 1.4 2004/09/14 20:15:37 druzus Exp $
+# $Id: global.cf,v 1.2 2007/10/23 13:52:31 lculik Exp $
 #
 
 all : first
@@ -25,7 +25,7 @@ endif
 
 MAKE = gmake
 
-ARCH_DIR = $(ARCH)
+ARCH_DIR = $(HB_ARCH)
 
 MK = $(MAKE)
 

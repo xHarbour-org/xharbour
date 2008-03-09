@@ -1,5 +1,5 @@
 #
-# $Id: lib.cf,v 1.4 2003/06/17 00:54:33 druzus Exp $
+# $Id: lib.cf,v 1.5 2003/08/25 16:24:52 druzus Exp $
 #
 
 ifneq ($(HB_ARCHITECTURE),)
@@ -59,7 +59,7 @@ $(MT_LIB_NAME) : $(ALL_OBJS)
 ifeq ($(MT_LIB_NAME),)
 INSTALL_OBJS = $(LIB_ARCH)
 else
-INSTALL_OBJS = $(LIB_ARCH) $(ARCH)_mt/$(MT_LIB_NAME)
+INSTALL_OBJS = $(LIB_ARCH) $(ARCH_DIR)_mt/$(MT_LIB_NAME)
 endif
 
 INSTALL_DIR = $(HB_LIB_INSTALL)

@@ -1,5 +1,5 @@
 #
-# $Id: bcc32.cf,v 1.9 2007/01/11 01:00:34 druzus Exp $
+# $Id: bcc32.cf,v 1.10 2007/05/01 00:48:40 toninhofwi Exp $
 #
 # The Harbour Project
 # GNU MAKE file for Borland C/C++ 32bit (4.x, 5.x)
@@ -23,8 +23,8 @@ endif
 
 # Add all libraries specified in CONTRIBS and LIBS.
 ifeq ($(HB_LIB_COMPILE),)
-LINKLIBS += $(foreach lib, $(CONTRIBS), $(TOP)$(ROOT)/contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))$(LIB_EXT))
-LINKLIBS += $(foreach lib, $(LIBS), $(TOP)$(ROOT)/source/$(lib)/$(ARCH)/$(lib)$(LIB_EXT))
+LINKLIBS += $(foreach lib, $(CONTRIBS), $(TOP)$(ROOT)/contrib/$(lib)/$(ARCH_DIR)/$(subst lib,,$(lib))$(LIB_EXT))
+LINKLIBS += $(foreach lib, $(LIBS), $(TOP)$(ROOT)/source/$(lib)/$(ARCH_DIR)/$(lib)$(LIB_EXT))
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 LINKLIBS += $(foreach lib, $(CONTRIBS), $(subst lib,,$(lib))$(lib)$(LIB_EXT))
@@ -34,7 +34,7 @@ endif
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
 ifeq ($(HB_LIB_COMPILE),)
-LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(TOP)$(ROOT)/source/rdd/$(drv)/$(ARCH)/$(drv)$(LIB_EXT))
+LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(TOP)$(ROOT)/source/rdd/$(drv)/$(ARCH_DIR)/$(drv)$(LIB_EXT))
 else
 LINKPATHS += -L$(HB_LIB_COMPILE)
 LINKLIBS += $(foreach drv, $(HB_DB_DRIVERS), $(drv)$(LIB_EXT))
@@ -43,11 +43,11 @@ endif
 
 # Add the specified GT driver library and other RTLs
 ifeq ($(findstring rtl,$(LIBS)),rtl)
-LINKLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)$(LIB_EXT)
+LINKLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)/$(HB_GT_LIB)$(LIB_EXT)
 ifeq ($(HB_MULTI_GT),yes)
-LINKLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul$(LIB_EXT)
+LINKLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)/gtnul$(LIB_EXT)
 endif
-LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH)/pcrepos$(LIB_EXT)
+LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)/pcrepos$(LIB_EXT)
 endif
 
 ifneq ($(HB_SCREEN_LIB),)

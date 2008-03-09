@@ -1,5 +1,5 @@
 #
-# $Id: watcom.cf,v 1.25 2005/09/02 18:28:44 druzus Exp $
+# $Id: watcom.cf,v 1.26 2006/07/16 19:48:56 druzus Exp $
 #
 # The Harbour project
 # GNU MAKE file for Watcom C/C++ 10.x
@@ -74,11 +74,11 @@ endef
 LD = wlink
 LDFLAGS = debug all OP osn=NT OP stack=65536 OP CASEEXACT
 
-HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
+HB_USER_LIBS := $(foreach lib, $(HB_USER_LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR)/$(lib)))
 
 ifeq ($(HB_LIB_COMPILE),)
-  LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH)/$(subst lib,,$(lib))))
-  LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH)/$(lib)))
+  LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(TOP)$(ROOT)contrib/$(lib)/$(ARCH_DIR)/$(subst lib,,$(lib))))
+  LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(TOP)$(ROOT)source/$(lib)/$(ARCH_DIR)/$(lib)))
 else
   LINKLIBS := $(foreach lib, $(CONTRIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
   LINKLIBS += $(foreach lib, $(LIBS), $(subst \,/,$(HB_LIB_COMPILE)/$(lib)))
@@ -87,7 +87,7 @@ endif
 # If LIBS specifies the rdd library, add all DB drivers.
 ifeq ($(findstring rdd,$(LIBS)),rdd)
   ifeq ($(HB_LIB_COMPILE),)
-    RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH)/$(drv)))
+    RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(TOP)$(ROOT)source/rdd/$(drv)/$(ARCH_DIR)/$(drv)))
   else
     RDDLIBS := $(foreach drv, $(HB_DB_DRIVERS), $(subst \,/,$(HB_LIB_COMPILE)/$(drv)))
   endif
@@ -95,10 +95,10 @@ endif
 
 ifeq ($(findstring rtl,$(LIBS)),rtl)
   ifeq ($(HB_LIB_COMPILE),)
-    LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH)/pcrepos
-    GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH)/$(HB_GT_LIB)
+    LINKLIBS += $(TOP)$(ROOT)source/rtl/pcre/$(ARCH_DIR)/pcrepos
+    GTLIBS := $(TOP)$(ROOT)source/rtl/$(HB_GT_LIB)/$(ARCH_DIR)/$(HB_GT_LIB)
     ifeq ($(HB_MULTI_GT),yes)
-      GTLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH)/gtnul
+      GTLIBS += $(TOP)$(ROOT)source/rtl/gtnul/$(ARCH_DIR)/gtnul
     endif
   else
     LINKLIBS += $(HB_LIB_COMPILE)/pcrepos
@@ -110,7 +110,7 @@ ifeq ($(findstring rtl,$(LIBS)),rtl)
   ifneq ($(HB_GT_DEFAULT),$(HB_GT_LIB))
     ifneq ($(HB_GT_DEFAULT),)
       ifeq ($(HB_LIB_COMPILE),)
-        GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH)/$(HB_GT_DEFAULT)
+        GTLIBS += $(TOP)$(ROOT)source/rtl/$(HB_GT_DEFAULT)/$(ARCH_DIR)/$(HB_GT_DEFAULT)
       else
         GTLIBS += $(HB_LIB_COMPILE)/$(HB_GT_DEFAULT)
       endif
