@@ -1,5 +1,5 @@
 /*
- * $Id: runner.c,v 1.53 2008/03/04 17:37:03 ronpinkas Exp $
+ * $Id: runner.c,v 1.54 2008/03/07 03:53:46 walito Exp $
  */
 
 /*
@@ -625,7 +625,7 @@ PHRB_BODY hb_hrbLoad( char* szHrbBody, ULONG ulBodySize, char* szHrb )
          pSymbol->scope.value     = ( HB_SYMBOLSCOPE ) hb_hrbReadLong( (char *) szHrbBody, ulBodySize, &ulBodyOffset );
          pSymbol->value.pCodeFunc = ( PHB_PCODEFUNC ) ( HB_PTRDIFF ) szHrbBody[ulBodyOffset++];
 
-         if( ( pSymbol->scope.value & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) == 0 )
+         if( ( pSymbol->scope.value & HB_FS_PUBLIC ) == 0 )
          {
             pSymbol->pDynSym = &( pHrbBody->ModuleFakeDyn );
          }

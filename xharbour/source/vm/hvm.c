@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.660 2008/03/08 00:36:39 ronpinkas Exp $
+ * $Id: hvm.c,v 1.661 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /*
@@ -9867,7 +9867,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
       hSymScope = pSymbol->scope.value;
       pNewSymbols->hScope |= hSymScope;
-      fPublic = ( hSymScope & ( HB_FS_PUBLIC | HB_FS_MESSAGE | HB_FS_MEMVAR ) ) != 0;
+      fPublic = ( hSymScope & HB_FS_PUBLIC ) != 0;
 
       if( fStatics )
       {
@@ -10002,47 +10002,47 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
                if( ( hSymScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
                {
                   assert( pSymbol->value.pFunPtr );
-                                    
+
                   if( ( pDynSym->pSymbol->scope.value & HB_FS_LOCAL ) != HB_FS_LOCAL )
-                  {                     
+                  {
                      // This is the first candidate of true local symbol.
                      pDynSym->pSymbol = pSymbol;
                      pDynSym->pModuleSymbols = pNewSymbols;
                   }
                   else if( pDynSym->pSymbol->value.pFunPtr == pSymbol->value.pFunPtr )
-                  {                  
+                  {
                      #ifdef HB_STARTUP_REVERSED_LINK_ORDER
                        /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
                        TraceLog( NULL, "*** WARNING! Function: %s in Module: %s shadows previously registered Module: %p %s\n",
                                  pSymbol->szName, szModuleName, pDynSym->pModuleSymbols, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
                        pDynSym->pModuleSymbols = pNewSymbols;
-                     #else  
+                     #else
                        /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
                        TraceLog( NULL, "*** WARNING! Function: %s in Module: %s is hidden by previously linked Module: %p %s\n",
                                  pSymbol->szName, szModuleName, pDynSym->pModuleSymbols, pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>" );
-                     #endif                     
+                     #endif
                   }
                   else
                   {
                      assert( pDynSym->pSymbol->value.pFunPtr );
-                     
+
                      /* NOTE: hb_traceInit() is not yet executed, but it uses s_bEmpty to not override output preceding hb_vmInit() */
                      TraceLog( NULL, "*** WARNING! Function: %s Duplicate Definition: %p in Module: %s is hidden by previously registered Module: %s Definition: %p\n",
-                               pSymbol->szName, pSymbol->value.pFunPtr, szModuleName, 
+                               pSymbol->szName, pSymbol->value.pFunPtr, szModuleName,
                                pDynSym->pModuleSymbols ? pDynSym->pModuleSymbols->szModuleName : "<unspecified>", pDynSym->pSymbol->value.pFunPtr );
-                             
-                     /* 
-                                                             Force all local symbols instances of public function to use the first registered definition, 
+
+                     /*
+                                                             Force all local symbols instances of public function to use the first registered definition,
                                                              This will force a single function implementation at prg level, even if linkerd allowed multiple definitions.
                                                          */
                      pSymbol->value.pFunPtr = pDynSym->pSymbol->value.pFunPtr;
-                        
+
                      pSymbol->scope.value &= ~( HB_FS_LOCAL | HB_FS_PCODEFUNC );
-                     pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );                     
+                     pSymbol->scope.value |= ( pDynSym->pSymbol->scope.value & HB_FS_PCODEFUNC );
                      //hSymScope = pSymbol->scope.value; // End of loop - no longer used!
                   }
                }
-                              
+
                pSymbol->pDynSym = pDynSym;
                continue;
             }

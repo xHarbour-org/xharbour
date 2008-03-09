@@ -1,5 +1,5 @@
 /*
- * $Id: genobj32.c,v 1.9 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: genobj32.c,v 1.10 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -292,7 +292,7 @@ static void GenerateCodeSegment( FILE * hObjFile )
 
   while( pFunc )
     {
-      if( !( pFunc->cScope & ( HB_FS_STATIC | HB_FS_INIT | HB_FS_EXIT ) ) )
+      if( !( pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) )
         PubDef( hObjFile, pFunc->szName, 1, w * sizeof( prgFunction ) );
       w++;
       pFunc = pFunc->pNext;

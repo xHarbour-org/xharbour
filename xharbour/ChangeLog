@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5945 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5946 2008/03/09 17:55:13 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,25 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-09 13:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * makefile.bc
+  * makefile.vc
+    - Removed non functional genobj32
+
+  * include/hbcomp.h
+  * include/hbexprb.c
+  * include/hbvmpub.h
+  * source/compiler/genc.c
+  * source/compiler/genhrb.c
+  * source/compiler/genobj32.c
+  * source/compiler/harbour.c
+  * source/compiler/harbour.sly
+  * source/compiler/hbstrong.c
+  * source/vm/hvm.c
+  * source/vm/runner.c
+    - Removed redndant HB_FS_MEMVAR and HB_FS_MESSAGE
+    * Claned symbol table generation to avoid redundancies, conflicting attributed, and other hacks
 
 2008-03-09 20:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbapifs.h

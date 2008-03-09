@@ -1,5 +1,5 @@
 /*
- * $Id: hbcomp.h,v 1.69 2008/02/21 16:42:55 ronpinkas Exp $
+ * $Id: hbcomp.h,v 1.70 2008/03/05 14:16:52 ronpinkas Exp $
  */
 
 /*
@@ -376,8 +376,9 @@ extern void hb_compPCodeStat( PHB_FNAME pFileName );
 #define FUN_WITH_RETURN       32  /* there was RETURN statement in previous line */
 #define FUN_SEALED            64  /* there was RETURN statement in previous line */
 
-#define SYMF_SYM         0x0000
-#define SYMF_ALIAS       0x0001
+#define SYMF_PUBLIC      0x0001 // HB_FS_PUBLIC
+#define SYMF_STATIC      0x0002 //HB_FS_STATIC
+
 #define SYMF_FUNCALL     0x1000
 
 #define SYMF_NS_EXPLICITPATH ( SYMF_FUNCALL | 0x0010 )
@@ -647,7 +648,7 @@ extern char * hb_comp_buffer; /* yacc input buffer */
 /* output related functions defined in gen*.c */
 extern void hb_compGenCCode( PHB_FNAME, char *); /* generates the C language output */
 extern void hb_compGenPortObj( PHB_FNAME );      /* generates the portable objects */
-extern void hb_compGenObj32( PHB_FNAME );        /* generates OBJ 32 bits */
+//extern void hb_compGenObj32( PHB_FNAME );        /* generates OBJ 32 bits */
 extern void hb_compGenCObj( PHB_FNAME, char *);  /* generates platform dependant object module */
 
 /* hbident.c   */

@@ -1,5 +1,5 @@
 /*
- * $Id: hbstrong.c,v 1.1 2006/03/29 00:34:40 druzus Exp $
+ * $Id: hbstrong.c,v 1.2 2008/02/02 07:32:55 ronpinkas Exp $
  */
 
 /*
@@ -112,7 +112,7 @@ void hb_compStrongType( int iSize )
 
        pFunc->iStackIndex--;
 
-       pSym = hb_compSymbolFind( pFunc->szName, NULL, TRUE );
+       pSym = hb_compSymbolFind( pFunc->szName, NULL, NULL, SYMF_FUNCALL );
 
        if( pSym && pSym->szName )
        {

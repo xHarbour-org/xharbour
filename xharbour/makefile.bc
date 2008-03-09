@@ -1,5 +1,5 @@
 #
-# $Id: makefile.bc,v 1.214 2008/01/15 10:13:43 marchuet Exp $
+# $Id: makefile.bc,v 1.215 2008/01/22 02:28:16 lculik Exp $
 #
 
 #
@@ -744,7 +744,7 @@ COMMON_LIB_OBJS = \
    $(OBJ_DIR)\expropt1.obj \
    $(OBJ_DIR)\expropt2.obj \
    $(OBJ_DIR)\reserved.obj \
-   $(OBJ_DIR)\hbdate.obj 
+   $(OBJ_DIR)\hbdate.obj
 
 #
 # VM.LIB rules
@@ -1107,7 +1107,6 @@ HARBOUR_EXE_OBJS = \
    $(OBJ_DIR)\hbfix.obj \
    $(OBJ_DIR)\genc.obj \
    $(OBJ_DIR)\gencobj.obj \
-   $(OBJ_DIR)\genobj32.obj \
    $(OBJ_DIR)\genhrb.obj \
    $(OBJ_DIR)\expropta.obj \
    $(OBJ_DIR)\exproptb.obj \
@@ -1662,7 +1661,6 @@ $(HARBOUR_EXE) : $(HARBOUR_EXE_OBJS)
    $(ECHO) $(OBJ_DIR)\hbfix.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genc.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\gencobj.obj >> make.tmp
-   $(ECHO) $(OBJ_DIR)\genobj32.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\genhrb.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\expropta.obj >> make.tmp
    $(ECHO) $(OBJ_DIR)\exproptb.obj >> make.tmp
@@ -1718,9 +1716,6 @@ $(OBJ_DIR)\genc.obj : $(COMPILER_DIR)\genc.c
    $(CC_CMD)
 
 $(OBJ_DIR)\gencobj.obj : $(COMPILER_DIR)\gencobj.c
-   $(CC_CMD)
-
-$(OBJ_DIR)\genobj32.obj : $(COMPILER_DIR)\genobj32.c
    $(CC_CMD)
 
 $(OBJ_DIR)\genhrb.obj : $(COMPILER_DIR)\genhrb.c

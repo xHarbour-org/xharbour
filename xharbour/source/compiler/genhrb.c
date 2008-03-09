@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.9 2008/03/04 17:37:02 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.10 2008/03/05 00:44:13 ronpinkas Exp $
  */
 
 /*
@@ -250,11 +250,6 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
       fputc( 0, yyc );
 
       hSymScope = pSym->cScope;
-
-      if( ( hSymScope & ( HB_FS_STATIC | HB_FS_INITEXIT ) ) != 0 )
-      {
-         hSymScope &= ~HB_FS_PUBLIC;
-      }
 
       fputc( ( BYTE ) ( ( hSymScope       ) & 255 ), yyc );
       fputc( ( BYTE ) ( ( hSymScope >> 8  ) & 255 ), yyc );

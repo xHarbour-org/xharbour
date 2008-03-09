@@ -1,5 +1,5 @@
 /*
- * $Id: genc.c,v 1.164 2008/03/05 14:16:52 ronpinkas Exp $
+ * $Id: genc.c,v 1.165 2008/03/05 17:02:20 ronpinkas Exp $
  */
 
 /*
@@ -177,7 +177,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
-          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) )
+          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) )
           {
              // Don't publish
           }
@@ -270,7 +270,7 @@ PNAMESPACE hb_compGenerateXNS( PNAMESPACE pNamespace, void **pCargo )
           {
              // Don't publish
           }
-          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) ) )
+          else if( pMember->pFunc && ( pMember->pFunc->cScope & ( HB_FS_INIT | HB_FS_EXIT ) & ~HB_FS_STATIC ) )
           {
              // Don't publish
           }
@@ -507,9 +507,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       /* write functions prototypes for PRG defined functions */
       while( pFunc )
       {
-         bIsStaticFunction = ( pFunc->cScope & HB_FS_STATIC );
-         bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
-         bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
+         bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT & ~HB_FS_STATIC ) ;
+         bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT & ~HB_FS_STATIC ) ;
+         bIsStaticFunction = bIsInitFunction == FALSE && bIsExitFunction == FALSE && ( pFunc->cScope & HB_FS_STATIC ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
@@ -691,7 +691,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
       {
          if( pInline->szName )
          {
-            if( !hb_compCStaticSymbolFound( pInline->szName, HB_PROTO_FUNC_STATIC ) )
+            if( ! hb_compCStaticSymbolFound( pInline->szName, HB_PROTO_FUNC_STATIC ) )
             {
                fprintf( yyc, "HB_FUNC_STATIC( %s );\n", pInline->szName );
             }
@@ -980,32 +980,32 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
                   if( pFunc )
                   {
-                     pSym->cScope |= HB_FS_LOCAL;
-
-                     if( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+                     if( ( pSym->cScope & HB_FS_LOCAL ) )
                      {
-                     }
-                     else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-                     {
-                     }
-                     else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-                     {
+                        assert( ( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME ) ||
+                                ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) );
+                        assert( ( pFunc->cScope & HB_FS_PUBLIC ) );
                      }
                      else
                      {
-                        pSym->cScope |= HB_FS_STATIC;
+                        assert( ( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) != NSTYPE_RUNTIME ) ||
+                                ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL ) );
+
+                        pSym->cScope |= ( HB_FS_LOCAL | HB_FS_STATIC );
                      }
                   }
                   else
                   {
                      if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
                      {
-                        pSym->cScope |= HB_FS_INDIRECT;
+                        pSym->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
                      }
                   }
                }
                else if( ( pSym->iFlags & SYMF_NS_RESOLVE ) == SYMF_NS_RESOLVE )
                {
+                  assert( ( pSym->cScope & HB_FS_PUBLIC ) == 0 );
+
                   pFunc = hb_compFunctionResolve( pSym->szName, (PNAMESPACE) pSym->Namespace, pSym );
 
                   if( pFunc == (PFUNCTION) 1 )
@@ -1013,7 +1013,7 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                      // Resolved to external member.
                      pFunc = NULL;
 
-                     pSym->cScope |= HB_FS_INDIRECT;
+                     pSym->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
                   }
                   else if( pFunc && pFunc->pNamespace )
                   {
@@ -1029,24 +1029,63 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
                      pSym->Namespace = NULL;
 
-                     #if 0 // Avoid duplicate registration of HB_FS_LOCAL
-                       if( hb_compFunctionFind( pSym->szName, NULL, SYMF_FUNCALL ) || hb_compInlineFind( pSym->szName ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
-                       {
-                          pSym->cScope |= HB_FS_LOCAL;
-                       }
-                     #endif
+                     /* is it a function defined in this module */
+                     if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
+                     {
+                        if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                        {
+                           pSym->cScope |= HB_FS_PUBLIC;
+                        }
+
+                        // Avoid duplicate registration of HB_FS_LOCAL
+                        //pSym->cScope |= HB_FS_LOCAL;
+                     }
+                     else if(  hb_compInlineFind( pSym->szName ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
+                     {
+                        if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                        {
+                           pSym->cScope |= HB_FS_STATIC;
+                        }
+
+                        // Avoid duplicate registration of HB_FS_LOCAL
+                        //pSym->cScope |= HB_FS_LOCAL;
+                     }
+                     else
+                     {
+                        if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                        {
+                           pSym->cScope |= HB_FS_PUBLIC;
+                        }
+                     }
                   }
                }
                else if( ( pSym->cScope & HB_FS_LOCAL ) != HB_FS_LOCAL )
                {
                   /* is it a function defined in this module */
-                  if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) || hb_compInlineFind( pSym->szName ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
+                  if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_PUBLIC ) )
                   {
+                     if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                     {
+                        pSym->cScope |= HB_FS_PUBLIC;
+                     }
+
                      pSym->cScope |= HB_FS_LOCAL;
                   }
-                  else if ( hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
+                  else if(  hb_compInlineFind( pSym->szName ) || hb_compCStaticSymbolFound( pSym->szName, HB_PROTO_FUNC_STATIC ) )
                   {
-                     pSym->cScope |= HB_FS_STATIC | HB_FS_LOCAL;
+                     if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                     {
+                        pSym->cScope |= HB_FS_STATIC;
+                     }
+
+                     pSym->cScope |= HB_FS_LOCAL;
+                  }
+                  else
+                  {
+                     if( ( pSym->cScope & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 )
+                     {
+                        pSym->cScope |= HB_FS_PUBLIC;
+                     }
                   }
                }
             }
@@ -1093,24 +1132,23 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                fprintf( yyc, "{ \"%s\", {", pSym->szName );
             }
 
-            if( pSym->cScope & HB_FS_INIT )
+            assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) );
+            assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) != ( HB_FS_PUBLIC | HB_FS_STATIC ) );
+
+            if( pSym->cScope & HB_FS_INIT & ~HB_FS_STATIC )
             {
-               pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_INIT" );
             }
-            else if( pSym->cScope & HB_FS_EXIT )
+            else if( pSym->cScope & HB_FS_EXIT & ~HB_FS_STATIC )
             {
-               pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_EXIT" );
             }
             else if( pSym->cScope & HB_FS_STATIC )
             {
-               pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_STATIC" );
             }
             else if( ( pSym->cScope & HB_FS_INDIRECT ) == HB_FS_INDIRECT )
             {
-               pSym->cScope &= ~HB_FS_PUBLIC;
                fprintf( yyc, "HB_FS_INDIRECT" );
             }
             else
@@ -1125,16 +1163,6 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
             else if( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) // MUTUALLY EXCLUSIVE
             {
                fprintf( yyc, " | HB_FS_DEFERRED" );
-            }
-
-            if( pSym->cScope & VS_MEMVAR )
-            {
-               fprintf( yyc, " | HB_FS_MEMVAR" );
-            }
-
-            if( pSym->cScope & HB_FS_MESSAGE )
-            {
-               fprintf( yyc, " | HB_FS_MESSAGE" );
             }
 
             if ( ( pSym->cScope & HB_FS_FIRST ) &&  ( ! hb_comp_bNoStartUp ) )
@@ -1181,11 +1209,11 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
                      fprintf( yyc, "}, {HB_NAMESPACE_FUNCNAME( %d, %s )}, &ModuleFakeDyn }", pFunc->pNamespace->iID, pSym->szName );
                   }
                }
-               else if( pSym->cScope & HB_FS_INIT )
+               else if( pSym->cScope & HB_FS_INIT & ~HB_FS_STATIC )
                {
                   fprintf( yyc, "}, {HB_INIT_FUNCNAME( %.*s )}, &ModuleFakeDyn }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
-               else if( pSym->cScope & HB_FS_EXIT )
+               else if( pSym->cScope & HB_FS_EXIT & ~HB_FS_STATIC )
                {
                   fprintf( yyc, "}, {HB_EXIT_FUNCNAME( %.*s )}, &ModuleFakeDyn }", (int) strlen( pSym->szName ) - 1, pSym->szName );
                }
@@ -1287,9 +1315,9 @@ void hb_compGenCCode( PHB_FNAME pFileName, char *szSourceExtension )      /* gen
 
       while( pFunc )
       {
-         bIsStaticFunction = ( pFunc->cScope & HB_FS_STATIC ) ;
-         bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT ) ;
-         bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT ) ;
+         bIsInitFunction   = ( pFunc->cScope & HB_FS_INIT & ~HB_FS_STATIC ) ;
+         bIsExitFunction   = ( pFunc->cScope & HB_FS_EXIT & ~HB_FS_STATIC ) ;
+         bIsStaticFunction = bIsInitFunction == FALSE && bIsExitFunction == FALSE && ( pFunc->cScope & HB_FS_STATIC ) ;
          bIsStaticVariable = ( pFunc == hb_comp_pInitFunc ) ;
          bIsGlobalVariable = ( pFunc == hb_comp_pGlobalsFunc ) ;
          bIsLineNumberInfo = ( pFunc == hb_comp_pLineNumberFunc );
@@ -1748,7 +1776,6 @@ static BOOL hb_compCStaticSymbolFound( char* szSymbol, int iOption )
       }
 
       pTemp = pTemp->pNext;
-
    }
 
    return bFound;

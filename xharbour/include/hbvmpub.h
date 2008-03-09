@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.72 2008/02/10 07:55:50 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.73 2008/03/04 17:37:02 ronpinkas Exp $
  */
 
 /*
@@ -411,12 +411,12 @@
    #define HB_FS_PUBLIC    ( ( HB_SYMBOLSCOPE ) 0x0001 )
    #define HB_FS_STATIC    ( ( HB_SYMBOLSCOPE ) 0x0002 )
    #define HB_FS_FIRST     ( ( HB_SYMBOLSCOPE ) 0x0004 )
-   #define HB_FS_INIT      ( ( HB_SYMBOLSCOPE ) 0x0008 )
-   #define HB_FS_EXIT      ( ( HB_SYMBOLSCOPE ) 0x0010 )
+   #define HB_FS_INIT      ( ( HB_SYMBOLSCOPE ) 0x0008 | HB_FS_STATIC )
+   #define HB_FS_EXIT      ( ( HB_SYMBOLSCOPE ) 0x0010 | HB_FS_STATIC )
    #define HB_FS_CRITICAL  ( ( HB_SYMBOLSCOPE ) 0x0020 )
+   //                      ( ( HB_SYMBOLSCOPE ) 0x0040 )
+   //                      ( ( HB_SYMBOLSCOPE ) 0x0080 )
 
-   #define HB_FS_MESSAGE   ( ( HB_SYMBOLSCOPE ) 0x0040 )
-   #define HB_FS_MEMVAR    ( ( HB_SYMBOLSCOPE ) 0x0080 )
    #define HB_FS_PCODEFUNC ( ( HB_SYMBOLSCOPE ) 0x0100 )
    #define HB_FS_LOCAL     ( ( HB_SYMBOLSCOPE ) 0x0200 )
    #define HB_FS_DYNCODE   ( ( HB_SYMBOLSCOPE ) 0x0400 )

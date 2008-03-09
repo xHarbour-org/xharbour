@@ -1,5 +1,5 @@
 /*
- * $Id: hbexprb.c,v 1.123 2008/02/02 07:32:54 ronpinkas Exp $
+ * $Id: hbexprb.c,v 1.124 2008/02/09 02:53:17 ronpinkas Exp $
  */
 
 /*
@@ -2656,7 +2656,7 @@ static HB_EXPR_FUNC( hb_compExprUseAlias )
       case HB_EA_LVALUE:
          break;
       case HB_EA_PUSH_PCODE:
-         HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asSymbol.szName, NULL, SYMF_ALIAS );
+         HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asSymbol.szName, NULL, SYMF_PUBLIC );
          break;
       case HB_EA_POP_PCODE:
       case HB_EA_PUSH_POP:
@@ -2711,7 +2711,7 @@ static HB_EXPR_FUNC( hb_compExprUseRTVariable )
       case HB_EA_PUSH_PCODE:
          if( pSelf->value.asRTVar.szName )
          {
-            HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asRTVar.szName, NULL, SYMF_SYM );  /*  Not a function nor Alias */
+            HB_EXPR_PCODE3( hb_compGenPushSymbol, pSelf->value.asRTVar.szName, NULL, SYMF_PUBLIC );  /*  Not a function nor Alias */
          }
          else
          {
