@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5944 2008/03/08 00:36:39 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5945 2008/03/08 04:54:22 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,11 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-09 20:55 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * include/hbapifs.h
+    ! Disable HB_USE_BSDLOCKS for HB_OS_BSD, because FreeBSD 6.2 and Mac OS X
+      deadlock when using this feature.
 
 2008-03-08 00:22 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbapi.h

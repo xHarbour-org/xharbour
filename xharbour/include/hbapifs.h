@@ -1,5 +1,5 @@
 /*
- * $Id: hbapifs.h,v 1.53 2007/12/29 12:50:54 likewolf Exp $
+ * $Id: hbapifs.h,v 1.54 2007/12/31 14:36:44 andijahja Exp $
  */
 
 /*
@@ -164,8 +164,9 @@ extern HB_EXPORT BOOL hb_fsCloseProcess( FHANDLE fhProc, BOOL bGentle );
 #  define HB_SHARELOCK_SIZE         0x1UL
 #  if defined( HB_USE_BSDLOCKS_OFF )
 #     undef HB_USE_BSDLOCKS
-#  elif ( defined( HB_OS_LINUX ) || defined( HB_OS_BSD ) ) && \
+#  elif ( defined( HB_OS_LINUX ) /*|| defined( HB_OS_BSD )*/ ) && \
         !defined( __WATCOMC__ ) && !defined( HB_USE_BSDLOCKS )
+      /* At least FreeBSD 6.2 and Mac OS X deadlock using BSDLOCKS so I disabled them -- Ph. */
 #     define HB_USE_BSDLOCKS
 #  endif
 #endif
