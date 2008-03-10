@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.192 2008/03/09 18:13:44 ronpinkas Exp $
+ * $Id: harbour.c,v 1.193 2008/03/10 17:19:03 ronpinkas Exp $
  */
 
 /*
@@ -3298,6 +3298,8 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespa
     */
    if( pSym == NULL && ( iFlags & SYMF_PUBLIC ) )
    {
+      pSym = hb_comp_symbols.pFirst;
+
       while( pSym )
       {
          if( pSym->szName == szSymbolName && pSym->Namespace == Namespace )
