@@ -1,12 +1,12 @@
 /*
- * $Id: set.ch,v 1.19 2007/03/25 06:12:49 walito Exp $
+ * $Id: set.ch,v 1.20 2008/01/14 12:44:30 walito Exp $
  */
 
 /*
  * Harbour Project source code:
  * Header file for SET() function
  *
- * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
+ * Copyright 1999-2003 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -136,8 +136,9 @@
 #define _SET_ERRORLOG        119 /* Harbour extension */
 #define _SET_TIMEFORMAT      120 /* Harbour extension */
 #define _SET_MACROBLOCKVARS  121 /* Harbour extension */
+#define _SET_EOF             122 /* Harbour extension */
 
-#define HB_SET_BASE        100
-#define HB_SET_COUNT       22
+#define HB_SET_BASE           100
+#define HB_SET_COUNT          23
 
 #endif /* _SET_CH */

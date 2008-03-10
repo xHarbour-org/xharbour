@@ -1,13 +1,13 @@
 /*
- * $Id: set.c,v 1.82 2007/12/29 12:50:55 likewolf Exp $
+ * $Id: set.c,v 1.83 2008/01/14 12:52:40 walito Exp $
  */
 
 /*
- * xHarbour Project source code:
+ * Harbour Project source code:
  * Set functions
  *
- * Copyright 1999-2001 David G. Holm <dholm@jsd-llc.com>
- * www - http://www.xharbour.org
+ * Copyright 1999-2003 David G. Holm <dholm@jsd-llc.com>
+ * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -243,9 +243,10 @@ static void close_text( FHANDLE handle )
       /* Close the file handle without disrupting the current
          user file error value */
       USHORT user_ferror = hb_fsError();
-      #if ! defined(OS_UNIX_COMPATIBLE)
+      if( hb_set.HB_SET_EOF )
+      {
          hb_fsWrite( handle, ( BYTE * ) "\x1A", 1 );
-      #endif
+      }
       hb_fsClose( handle );
       hb_fsSetError( user_ferror );
    }
@@ -328,24 +329,24 @@ static FHANDLE open_handle( char * file_name, BOOL bAppend, char * def_ext, HB_s
                handle = hb_fsOpen( ( BYTE * ) szPrnFile, FO_READWRITE);
                if( handle != FS_ERROR )
                {  /* Position to EOF */
-#if defined(OS_UNIX_COMPATIBLE)
-                  hb_fsSeek( handle, 0, FS_END );
-#else
-                  /* Non-Unix needs special binary vs. text file handling */
+                  /* Special binary vs. text file handling - even for UN*X, now
+                     that there's an HB_SET_EOF flag. */
                   if( set_specifier == HB_SET_PRINTFILE )
-                  {  /* PRINTFILE is binary and needs no special handling. */
+                  {  /* PRINTFILE is always binary and needs no special handling. */
                      hb_fsSeek( handle, 0, FS_END );
                   }
                   else
                   {  /* All other files are text files and may have an EOF
-                        ('\x1A') character at the end (non-UNIX only). */
+                        ('\x1A') character at the end (both UN*X and non-UN*X,
+                        now that theres an HB_SET_EOF flag). */
                      char cEOF = '\0';
                      hb_fsSeek( handle, -1, FS_END ); /* Position to last char. */
                      hb_fsRead( handle, ( BYTE * ) &cEOF, 1 );   /* Read the last char. */
                      if( cEOF == '\x1A' )             /* If it's an EOF, */
+                     {
                         hb_fsSeek( handle, -1, FS_END ); /* Then write over it. */
+                     }
                   }
-#endif
                }
             }
             else bCreate = TRUE; /* Otherwise create a new file. */
@@ -816,7 +817,10 @@ HB_FUNC( SET )
 
          }
          break;
-
+      case HB_SET_EOF        :
+         hb_retl( hb_set.HB_SET_EOF );
+         if( args > 1 ) hb_set.HB_SET_EOF = set_logical( pArg2, hb_set.HB_SET_EOF );
+         break;
       case HB_SET_EPOCH      :
          hb_retni( hb_set.HB_SET_EPOCH );
          if( args > 1 )
@@ -1654,6 +1658,11 @@ void hb_setInitialize( void )
 
    memcpy( hb_set.HB_SET_DEVICE, "SCREEN", 7 );
 
+#if defined(OS_UNIX_COMPATIBLE)
+   hb_set.HB_SET_EOF = FALSE;
+#else
+   hb_set.HB_SET_EOF = TRUE;
+#endif
    hb_set.HB_SET_EPOCH = 1900;
    hb_set.HB_SET_ESCAPE = TRUE;
    hb_set.HB_SET_EVENTMASK = INKEY_KEYBOARD;

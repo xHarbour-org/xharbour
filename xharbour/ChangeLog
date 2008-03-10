@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5948 2008/03/09 18:44:26 likewolf Exp $
+ * $Id: ChangeLog,v 1.5949 2008/03/09 19:18:23 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,17 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-10 14:25 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * doc/en/set.txt
+  * include/set.ch
+  * include/hbset.h
+  * source/rtl/set.c
+    + New SET value named _SET_EOF. Defaults to FALSE on UN*X, but defaults
+      to TRUE on everything else. If set to FALSE, then CHR(26) does not get
+      written when closing any of the various text files that are created
+      using various SET values.
+  (by David G. Holm, borrowed from Harbour)
 
 2008-03-09 22:20 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * include/hbdate.h

@@ -1,12 +1,12 @@
 /*
- * $Id: hbset.h,v 1.40 2007/12/21 12:12:22 likewolf Exp $
+ * $Id: hbset.h,v 1.41 2008/01/14 12:44:29 walito Exp $
  */
 
 /*
  * Harbour Project source code:
  * Header file for the Set API
  *
- * Copyright 1999 David G. Holm <dholm@jsd-llc.com>
+ * Copyright 1999-2003 David G. Holm <dholm@jsd-llc.com>
  * www - http://www.harbour-project.org
  *
  * This program is free software; you can redistribute it and/or modify
@@ -142,7 +142,8 @@ typedef enum
    HB_SET_EOL             = 118,
    HB_SET_ERRORLOG        = 119,
    HB_SET_TIMEFORMAT      = 120,
-   HB_SET_MACROBLOCKVARS  = 121
+   HB_SET_MACROBLOCKVARS  = 121,
+   HB_SET_EOF             = 122
 
 } HB_set_enum;
 

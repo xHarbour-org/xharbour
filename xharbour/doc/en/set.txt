@@ -1,5 +1,5 @@
 /*
- * $Id: set.txt,v 1.7 2004/07/27 09:58:33 patrickmast Exp $
+ * $Id: set.txt,v 1.8 2005/02/15 09:53:45 patrickmast Exp $
  */
 
 /*
@@ -207,6 +207,14 @@
  *                   file set by _SET_PRINTFILE. When set to anything else,
  *                   all output is sent to the screen. Defaults to "SCREEN".
  *
+ *              _SET_EOF         <lFlag> | <cOnOff>
+ *
+ *                   Defaults to FALSE on UN*X, but defaults to TRUE on
+ *                   everything else. If set to FALSE, then CHR(26) does not
+ *                   get written when closing any of the various text files
+ *                   that are created using various SET values.
+ *                   [This is a Harbour extension]
+ *
  *              _SET_EPOCH       <nYear>
  *
  *                   Determines how to handle the conversion of 2-digit years
@@ -221,8 +229,8 @@
  *                   and 2-digit years in the range 00 to 49 get converted
  *                   to 20xx.
  *
- *              _SET_ESCAPE      <lFlag> | <cOnOff>   *
-
+ *              _SET_ESCAPE      <lFlag> | <cOnOff>
+ *
  *                   When enabled, which is the default, pressing Esc will
  *                   exit a READ. When disabled, pressing Esc during a READ
  *                   is ignored, unless the Esc key has been assigned to a
