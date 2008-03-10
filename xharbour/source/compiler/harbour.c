@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.191 2008/03/05 17:02:20 ronpinkas Exp $
+ * $Id: harbour.c,v 1.192 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -2330,7 +2330,10 @@ PCOMSYMBOL hb_compSymbolAdd( char * szSymbolName, USHORT * pwPos, void *Namespac
       {
          pSym->iFlags |= iFlags;
          pSym->cScope |= ( iFlags & ( HB_FS_PUBLIC | HB_FS_STATIC ) );
+
+         // Can never be both!
          assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) != ( HB_FS_PUBLIC | HB_FS_STATIC ) );
+
          return pSym;
       }
 
@@ -2583,6 +2586,7 @@ PINLINE hb_compInlineAdd( char * szFunName )
    if( szFunName )
    {
       pSym = hb_compSymbolAdd( szFunName, NULL, NULL, SYMF_FUNCALL | SYMF_STATIC );
+      pSym->cScope |= HB_FS_LOCAL;
    }
 
    pInline = hb_compInlineNew( szFunName );
@@ -2849,6 +2853,8 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
                pSymbol->Namespace = (void *) pNamespace;
                pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
                pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
+               pSymbol->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
+
                //REVIEW: pSymbol->cScope |= HB_FS_LOCAL;
             }
 
@@ -2862,6 +2868,18 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
                pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
                pSymbol->iFlags |= SYMF_NS_EXPLICITPTR;
                pSymbol->cScope |= HB_FS_LOCAL;
+
+               if( ( pSymbol->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) == 0 )
+               {
+                  if( ( pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_RUNTIME || ( pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
+                  {
+                     pSymbol->cScope |= HB_FS_PUBLIC;
+                  }
+                  else
+                  {
+                     pSymbol->cScope |= HB_FS_STATIC;
+                  }
+               }
             }
 
             return pMember->pFunc;
@@ -2878,13 +2896,19 @@ PFUNCTION hb_compFunctionResolve( char * szFunctionName, PNAMESPACE pCallerNames
    {
       PCOMSYMBOL pGlobalSym = hb_compSymbolFind( szFunctionName, NULL, NULL, SYMF_FUNCALL );
 
-      if( pGlobalSym && ( pGlobalSym->cScope & HB_FS_DEFERRED ) )
+      if( pGlobalSym )
       {
-         pSymbol->cScope |=  HB_FS_DEFERRED;
+         pSymbol->cScope |= ( pGlobalSym->cScope & ( HB_FS_DEFERRED | HB_FS_LOCAL | HB_FS_STATIC ) );
+      }
+
+      if( ( pSymbol->cScope & HB_FS_STATIC ) == 0 )
+      {
+         pSymbol->cScope |= HB_FS_PUBLIC;
       }
 
       pSymbol->Namespace = NULL;
       pSymbol->iFlags &= ~SYMF_NS_RESOLVE;
+      pSymbol->iFlags |= SYMF_FUNCALL;
    }
 
    return NULL;
@@ -3235,7 +3259,7 @@ PCOMDECLARED hb_compDeclaredFind( char * szDeclaredName )
 
 PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespace, int iFlags )
 {
-   PCOMSYMBOL pSym = hb_comp_symbols.pFirst;
+   PCOMSYMBOL pSym;
    USHORT wCnt = 0;
 
    if( pwPos )
@@ -3243,42 +3267,66 @@ PCOMSYMBOL hb_compSymbolFind( char * szSymbolName, USHORT * pwPos, void *Namespa
       *pwPos = 0;
    }
 
-   while( pSym )
+   // First we want a function [call] symbol if exists.
+   if( ( iFlags & SYMF_FUNCALL ) )
    {
-      if( pSym->szName == szSymbolName )
+      pSym = hb_comp_symbols.pFirst;
+
+      while( pSym )
       {
-         if( ( ( iFlags & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 && ( pSym->iFlags & SYMF_FUNCALL ) ) || ( pSym->iFlags & ( SYMF_PUBLIC | SYMF_STATIC ) ) == 0 ||
-             ( iFlags & ( SYMF_PUBLIC | SYMF_STATIC ) ) == ( pSym->iFlags & ( SYMF_PUBLIC | SYMF_STATIC ) ) )
+         if( pSym->szName == szSymbolName && pSym->Namespace == Namespace )
          {
-            if( iFlags & SYMF_FUNCALL )
+            // Function symbol is always valid match for function call
+            if( ( pSym->iFlags & SYMF_FUNCALL ) )
             {
-               if( pSym->Namespace == Namespace )
-               {
-                  if( pwPos )
-                  {
-                     *pwPos = wCnt;
-                  }
-
-                  return pSym;
-               }
-            }
-            else
-            {
-               if( pwPos )
-               {
-                  *pwPos = wCnt;
-               }
-
-               return pSym;
+               break;
             }
          }
-      }
 
-      pSym = pSym->pNext;
-      ++wCnt;
+         pSym = pSym->pNext;
+         ++wCnt;
+      }
+   }
+   else
+   {
+      pSym = NULL;
    }
 
-   return NULL;
+   /*
+      0 or SYMF_STATIC can only be a function [call] so already scanned above.
+      Non function public, or 2nd scan for public function.
+    */
+   if( pSym == NULL && ( iFlags & SYMF_PUBLIC ) )
+   {
+      while( pSym )
+      {
+         if( pSym->szName == szSymbolName && pSym->Namespace == Namespace )
+         {
+            if( ( pSym->iFlags & SYMF_PUBLIC ) )
+            {
+               /*
+                  Public Function must be a *definition* thus it can adopt any
+                  Public symbol. Once a public symbol is used by a function
+                  definition all subsequent public usages are also acceptable.
+                */
+               break;
+            }
+         }
+
+         pSym = pSym->pNext;
+         ++wCnt;
+      }
+   }
+
+   if( pSym )
+   {
+      if( pwPos )
+      {
+         *pwPos = wCnt;
+      }
+   }
+
+   return pSym;
 }
 
 /* returns a symbol based on its index on the symbol table

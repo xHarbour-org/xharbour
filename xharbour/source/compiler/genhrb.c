@@ -1,5 +1,5 @@
 /*
- * $Id: genhrb.c,v 1.10 2008/03/05 00:44:13 ronpinkas Exp $
+ * $Id: genhrb.c,v 1.11 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -132,27 +132,26 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
             if( pFunc )
             {
-               pSym->cScope |= HB_FS_LOCAL;
-
-               if( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME )
+               if( ( pSym->cScope & HB_FS_LOCAL ) )
                {
-               }
-               else if( ( pFunc->pNamespace->type & NSTYPE_IMPLEMENTS ) == NSTYPE_IMPLEMENTS )
-               {
-               }
-               else if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL )
-               {
+                  assert( ( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) == NSTYPE_RUNTIME ) ||
+                          ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) == NSTYPE_OPTIONAL ) );
+                  assert( ( pFunc->cScope & HB_FS_PUBLIC ) );
                }
                else
                {
-                  pSym->cScope |= HB_FS_STATIC;
+                  assert( ( ( pFunc->pNamespace->type & NSTYPE_RUNTIME ) != NSTYPE_RUNTIME ) ||
+                          ( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL ) );
+
+                  assert( ( pSym->cScope & ( HB_FS_PUBLIC | HB_FS_STATIC ) ) == 0 );
+                  pSym->cScope |= ( HB_FS_LOCAL | HB_FS_STATIC );
                }
             }
             else
             {
                if( ! ( ( pSym->cScope & HB_FS_DEFERRED ) == HB_FS_DEFERRED ) )
                {
-                  pSym->cScope |= HB_FS_INDIRECT;
+                  pSym->cScope |= ( HB_FS_INDIRECT | HB_FS_PUBLIC );
                }
             }
          }
@@ -167,54 +166,18 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
 
                //TODO: Error message
             }
-            else if( pFunc && pFunc->pNamespace )
-            {
-               if( ( pFunc->pNamespace->type & NSTYPE_OPTIONAL ) != NSTYPE_OPTIONAL )
-               {
-                  pSym->cScope |= HB_FS_STATIC;
-               }
-
-               pSym->cScope |= HB_FS_LOCAL;
-
-               pSym->iFlags &= ~SYMF_NS_RESOLVE;
-               pSym->iFlags |= SYMF_NS_EXPLICITPTR;
-
-               pSym->Namespace = (void *) pFunc->pNamespace;
-            }
-            else
-            {
-               pSym->iFlags &= ~SYMF_NS_RESOLVE;
-               pSym->iFlags |= SYMF_FUNCALL;
-
-               pSym->Namespace = NULL;
-
-               if( pFunc == NULL )
-               {
-                  pFunc = hb_compFunctionFind( pSym->szName, NULL, SYMF_FUNCALL );
-
-                  if( pFunc )
-                  {
-                     pSym->cScope |= HB_FS_LOCAL;
-                  }
-               }
-            }
-         }
-         else if( ( pSym->iFlags & SYMF_NS_EXPLICITPTR ) == SYMF_NS_EXPLICITPTR )
-         {
-            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, SYMF_NS_EXPLICITPTR );
-         }
-         else if( ( pSym->cScope & HB_FS_LOCAL ) == HB_FS_LOCAL )
-         {
-            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags );
          }
          else if( ( pSym->cScope & HB_FS_LOCAL ) != HB_FS_LOCAL )
          {
-            pFunc = hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags );
-
             /* is it a function defined in this module */
-            if( pFunc )
+            if( hb_compFunctionFind( pSym->szName, pSym->Namespace, pSym->iFlags ) )
             {
-               pSym->cScope |= HB_FS_LOCAL;
+               assert( 0 );
+            }
+            else
+            {
+               assert( ( pSym->cScope & SYMF_STATIC ) == 0 );
+               pSym->cScope |= HB_FS_PUBLIC;
             }
          }
       }
@@ -236,6 +199,10 @@ void hb_compGenPortObj( PHB_FNAME pFileName )
                fputs( (char *) pSym->Namespace, yyc );
                fputc( '.', yyc );
             }
+         }
+         else
+         {
+            assert(0);
          }
       }
 
