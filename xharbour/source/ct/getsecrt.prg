@@ -1,5 +1,5 @@
 /*
- * $Id: getsecrt.prg,v 1.2 2005/11/29 15:21:31 ghodgson Exp $
+ * $Id: getsecrt.prg,v 1.9 2006/02/01 19:47:21 gdrouillard Exp $
  */
 
 /*
@@ -73,9 +73,7 @@ MEMVAR nLen
 #include "common.ch"
 proc GetPassword( oGet, nLen )
 
-  LOCAL nKey,              ;
-      nChar,             ;
-      cKey
+  LOCAL nKey
   Local nSaveCursor := 0
 
   // read the GET if the WHEN condition is satisfied

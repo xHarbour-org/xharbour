@@ -1,5 +1,5 @@
 /*
- * $Id: dbedit.prg,v 1.41 2007/02/20 19:33:59 modalsist Exp $
+ * $Id: dbedit.prg,v 1.42 2007/03/01 15:33:15 modalsist Exp $
  */
 
 /*
@@ -114,7 +114,7 @@ FUNCTION DBEdit(nTop,;                //  1§
 
 LOCAL oTBR,;
       oTBC,;
-      i,k,;
+      i,;
       nRet := DE_REFRESH,;
       nKey := Nil,;
       bFun,;

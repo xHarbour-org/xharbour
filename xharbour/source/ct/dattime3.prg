@@ -1,5 +1,5 @@
 /*
- * $Id: dattime3.prg,v 1.7 2006/12/02 14:11:12 modalsist Exp $
+ * $Id: dattime3.prg,v 1.8 2006/12/06 17:20:52 ronpinkas Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ RETURN NIL
 *----------------------------------------------------------------
 STATIC FUNCTION hb_ShowTimeEvent( cIDName, lActiv, bCode, nTime )
 *----------------------------------------------------------------
-Local nHPos, cIdDel, nHDel
+   LOCAL nHPos
 
    IF ValType( cIDName ) == "U" .AND. ValType( lActiv ) == "U"
       RETURN NIL

@@ -1,5 +1,5 @@
 /*
- * $Id: genasc.prg,v 1.1.1.1 2001/12/21 10:45:13 ronpinkas Exp $
+ * $Id: teeasc.prg,v 1.1 2004/08/25 17:02:57 lf_sfnet Exp $
  */
 
 /*
@@ -67,7 +67,6 @@ FUNCTION TeeFiles()
    LOCAL i
    LOCAL nFiles      := LEN( aDirList )
    LOCAL cFileName 
-   LOCAL lEof
    LOCAL lDoc
    LOCAL cBuffer
    LOCAL nReadHandle

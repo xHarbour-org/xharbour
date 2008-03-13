@@ -1,5 +1,5 @@
 /*
- * $Id: tfile.prg,v 1.2 2005/10/14 06:31:47 lf_sfnet Exp $
+ * $Id: tfile.prg,v 1.3 2005/10/15 09:34:38 lf_sfnet Exp $
  */
 
 /*
@@ -204,9 +204,6 @@ RETURN ( nLength )
 
 METHOD _Read( nSize, cBuff ) CLASS TCgiFile
 
-   
-   LOCAL nBytesRead
-
    DEFAULT nSize TO 1024
    DEFAULT cBuff TO Space( nSize )
 
@@ -224,8 +221,6 @@ RETURN ( cBuff )    //nBytesRead )
 
 METHOD ReadAhead( nSize, cBuff ) CLASS TCgiFile
 
-   
-   LOCAL nBytesRead
    LOCAL nCurrent
 
    DEFAULT nSize TO 1024
@@ -279,8 +274,6 @@ RETURN ::Buffer
 
 METHOD ReadByte() CLASS TCgiFile
 
-   
-   LOCAL nRet
    LOCAL nBytes
    LOCAL cBuff  := Space( 1 )
 
@@ -295,8 +288,6 @@ RETURN ( IIF( nBytes > 0, Asc( cBuff ), - 1 ) )
 
 METHOD ReadInt() CLASS TCgiFile
 
-   
-   LOCAL nRet
    LOCAL nBytes
    LOCAL cBuff  := Space( 2 )
 
@@ -311,8 +302,6 @@ RETURN ( IIF( nBytes > 0, Bin2i( cBuff ), - 1 ) )
 
 METHOD ReadLong() CLASS TCgiFile
 
-   
-   LOCAL nRet
    LOCAL nBytes
    LOCAL cBuff  := Space( 4 )
 

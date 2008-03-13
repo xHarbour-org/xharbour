@@ -1,5 +1,5 @@
 /*
- * $Id: listbox.prg,v 1.23 2007/09/15 12:28:05 modalsist Exp $
+ * $Id: listbox.prg,v 1.24 2007/11/14 18:00:24 lculik Exp $
  */
 
 /*
@@ -223,8 +223,6 @@ RETURN ::vScrolls
 
 Method SetTop( xData ) Class HBListBox
 
-   Local nTop
-
    IF !( ISNIL( xData ) .and. ISNUMBER( xData ) ) .and. ;
         ISNUMBER( ::xTop := xData ) .and. ;
         ISOBJECT( ::vScroll )
@@ -296,12 +294,6 @@ Method ADDITEM( cText, xValue ) Class HBListBox
 RETURN SELF
 
 Method Close() Class HBListBox
-
-   Local Local1
-   Local Local2
-   Local Local3
-   Local cColor
-   Local Local5
 
    IF ::isOpen
 
@@ -896,7 +888,6 @@ Method HitTest( nMouseRow, nMouseCol ) Class HBListBox
 
    Local Local1
    Local Local2 := 0
-   Local Local3
    Local cColor
 
    IF ! ::isopen
@@ -976,8 +967,6 @@ Method HitTest( nMouseRow, nMouseCol ) Class HBListBox
 RETURN 0
 
 Method KillFocus() Class HBListBox
-
-   Local Local1
 
    IF ::hasfocus
       ::hasfocus := .F.

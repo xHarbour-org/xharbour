@@ -1,5 +1,5 @@
 /*
- * $Id: popcln.prg,v 1.7 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: popcln.prg,v 1.8 2007/09/06 15:40:35 lculik Exp $
  */
 
 /*
@@ -285,7 +285,7 @@ RETURN cRet
 METHOD Retrieve( nId, nLen ) CLASS tIPClientPOP
 
    LOCAL nPos
-   LOCAL cStr, cRet, nRetLen, cBuffer, nRead
+   LOCAL cRet, nRetLen, cBuffer, nRead
    LOCAL cEOM := ::cCRLF + "." + ::cCRLF        // End Of Mail
 
    IF .not. ::bInitialized

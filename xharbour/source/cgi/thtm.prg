@@ -1,5 +1,5 @@
 /*
- * $Id: thtm.prg,v 1.6 2006/05/13 16:48:34 lculik Exp $
+ * $Id: thtm.prg,v 1.7 2006/06/22 03:50:13 lculik Exp $
  */
 
 /*
@@ -462,8 +462,6 @@ METHOD New( cTitle, cLinkTitle, cCharSet, aScriptSRC, ;
 
 METHOD NewAlt(cType) CLASS THtml
 
-   LOCAL i
-   
    ::nH    := STD_OUT 
    ::cStr +=  'Content-Type: '+cType + CRLF() + CRLF() 
 
@@ -2055,8 +2053,6 @@ FUNCTION HtmlPageObject()
 */
 
 FUNCTION HtmlDecodeURL( cString )
-
-   LOCAL i
 
    DO WHILE "%26" $ cString
       cString := Stuff( cString, At( "%26", cString ), 3, "&" )

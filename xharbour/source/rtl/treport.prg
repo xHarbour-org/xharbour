@@ -1,5 +1,5 @@
 /*
- * $Id: treport.prg,v 1.5 2004/02/15 11:57:49 lculik Exp $
+ * $Id: treport.prg,v 1.6 2005/11/04 14:09:31 lculik Exp $
  */
 
 /*
@@ -180,7 +180,7 @@ METHOD NEW(cFrmName,lPrinter,cAltFile,lNoConsole,bFor,bWhile,nNext,nRecord,;
 
    LOCAL lPrintOn, lConsoleOn // Status of PRINTER and CONSOLE
    LOCAL cExtraFile, lExtraState // Status of EXTRA
-   LOCAL nCol, nGroup
+   LOCAL nGroup
    LOCAL xBreakVal, lBroke := .F.
    LOCAL err
    LOCAL aReport, aTotal
@@ -458,7 +458,7 @@ METHOD ReportHeader() CLASS HBReportForm
    LOCAL nLinesInHeader := 0
    LOCAL aPageHeader    := {}
    LOCAL nHeadingLength := ::aReportData[RPT_WIDTH] - ::aReportData[RPT_LMARGIN] -30
-   LOCAL nCol,nLine,nMaxColLength,nGroup,cHeader
+   LOCAL nLine, nMaxColLength, cHeader
    LOCAL nHeadline
    LOCAL nRPageSize
    LOCAL aTempPgHeader
@@ -570,7 +570,6 @@ METHOD ExecuteReport() CLASS HBReportForm
    LOCAL nMaxLines                     // Number of lines needed by record
    LOCAL nLine                         // Counter for each record line
    LOCAL cLine                         // Current line of text for parsing
-   LOCAL nLastElement                  // Last element pointer if record is
    LOCAL aReport
 
    LOCAL lAnySubTotals
@@ -924,8 +923,6 @@ METHOD LoadReportFile(cFrmFile) CLASS HBReportForm
    LOCAL aPaths            // array of paths
    LOCAL cPath             // iteration paths
 
-   LOCAL s, paths
-   LOCAL i
    LOCAL aHeader                           // temporary storage for report form headings
    LOCAL nHeaderIndex              // index into temporary header array
 

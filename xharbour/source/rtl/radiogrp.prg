@@ -1,5 +1,5 @@
 /*
- * $Id: radiogrp.prg,v 1.10 2004/07/13 19:35:57 paultucker Exp $
+ * $Id: radiogrp.prg,v 1.11 2004/07/15 23:57:16 paultucker Exp $
  */
 
 /*
@@ -262,7 +262,6 @@ RETURN Self
 
 METHOD KillFocus()       CLASS HBRadioGroup
 
-   local nPos, nCount, aItems
    Local oItems
 
    IF ::HasFocus

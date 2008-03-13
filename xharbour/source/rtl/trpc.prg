@@ -1,5 +1,5 @@
 /*
- * $Id: trpc.prg,v 1.29 2004/09/26 16:37:02 jonnymind Exp $
+ * $Id: trpc.prg,v 1.30 2005/09/30 23:44:05 druzus Exp $
  */
 
 /*
@@ -489,8 +489,6 @@ METHOD Run() CLASS tRPCServeCon
    LOCAL lBreak := .F.
    LOCAL aData
    LOCAL nSafeStatus
-   LOCAL cRes
-
 
    DO WHILE InetErrorCode( ::skRemote ) == 0 .and. .not. lBreak
 
@@ -690,7 +688,7 @@ RETURN .T.
 
 METHOD RecvAuth( lEncrypt ) CLASS tRPCServeCon
    LOCAL cLength := Space(8), nLen, nPos
-   LOCAL cUserID, cPassword, cEncId
+   LOCAL cUserID, cPassword
    LOCAL cReadIn
 
    IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
@@ -765,7 +763,6 @@ RETURN .T.
 
 METHOD RecvChallenge() CLASS tRPCServeCon
    LOCAL cNumber := Space( 8 )
-   LOCAL nCount
 
    IF InetRecvAll( ::skRemote, @cNumber ) != 8
       RETURN .F.
@@ -796,9 +793,7 @@ RETURN .T.
 METHOD RecvFunction( bComp, bMode ) CLASS tRPCServeCon
    LOCAL cLength := Space(8), nLen, nComp
    LOCAL cMode := " "
-   LOCAL nBegin, nEnd, nStep
    LOCAL cData
-   LOCAL cSer
 
    /* Original lenght of data */
    IF InetRecvAll( ::skRemote, @cLength, 8 ) != 8
@@ -957,7 +952,6 @@ RETURN .T.
 
 METHOD FunctionRunner( cFuncName, oFunc, nMode, aParams, aDesc ) CLASS tRPCServeCon
    LOCAL nCount
-   LOCAL cOrigLen, cCompLen
    LOCAL oRet, oElem, aRet
    LOCAL aSubst, nSubstPos
 

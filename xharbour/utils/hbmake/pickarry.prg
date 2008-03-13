@@ -1,5 +1,5 @@
 /*
- * $Id: pickarry.prg,v 1.12 2005/03/31 16:54:00 modalsist Exp $
+ * $Id: pickarry.prg,v 1.12 2005/03/31 20:24:54 modalsist Exp $
  */
  * xHarbour Project source code:
  * hbmake.prg xHarbour make utility main file
@@ -68,8 +68,6 @@ LOCAL lIsChecked := .f.
 LOCAL aItems     := IN_ARRAY
 LOCAL aTemp
 LOCAL cItem
-LOCAL cItem1
-LOCAL cTemp
 LOCAL cOldColor  := Setcolor()
 
 DEFAULT lAllowAll TO .F.

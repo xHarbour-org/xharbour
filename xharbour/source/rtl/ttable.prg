@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.7 2005/09/24 01:29:31 jabrecer Exp $
+ * $Id: ttable.prg,v 1.8 2007/05/04 12:49:45 andresreyesh Exp $
  */
 
 /*
@@ -404,8 +404,6 @@ RETURN
 
 FUNCTION NetCommitAll()
 
-   //컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
-   LOCAL i
    LOCAL n
 
    FOR n := 1 TO MAX_TABLE_AREAS

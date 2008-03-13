@@ -1,5 +1,5 @@
 /*
- * $Id: dbgwa.prg,v 1.11 2007/09/21 18:33:26 likewolf Exp $
+ * $Id: dbgwa.prg,v 1.12 2007/12/04 22:52:49 likewolf Exp $
  */
 
 /*
@@ -235,7 +235,7 @@ static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
    do case
    case s_nFocus == 1
       nAlias := aBrw[ 1 ]:Cargo
-      WorkAreasKeyPressed( nKey, aBrw[ 1 ], oDlg, Len( aAlias ) )
+      WorkAreasKeyPressed( nKey, aBrw[ 1 ], Len( aAlias ) )
       if nAlias != aBrw[ 1 ]:Cargo
          aBrw[ 2 ]:GoTop()
          aBrw[ 2 ]:Invalidate()
@@ -258,14 +258,14 @@ static function DlgWorkAreaKey( nKey, oDlg, aBrw, aAlias, aStruc, aInfo )
          UpdateInfo( oDlg, aAlias[ aBrw[ 1 ]:Cargo ][ 2 ] )
       endif
    case s_nFocus == 2
-      WorkAreasKeyPressed( nKey, aBrw[ 2 ], oDlg, Len( aInfo ) )
+      WorkAreasKeyPressed( nKey, aBrw[ 2 ], Len( aInfo ) )
    case s_nFocus == 3
-      WorkAreasKeyPressed( nKey, aBrw[ 3 ], oDlg, Len( aStruc ) )
+      WorkAreasKeyPressed( nKey, aBrw[ 3 ], Len( aStruc ) )
    endcase
 
 return nil
 
-static procedure WorkAreasKeyPressed( nKey, oBrw, oDlg, nTotal )
+static procedure WorkAreasKeyPressed( nKey, oBrw, nTotal )
 
    do case
    case nKey == K_UP

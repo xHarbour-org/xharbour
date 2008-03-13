@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5953 2008/03/12 11:46:37 walito Exp $
+ * $Id: ChangeLog,v 1.5954 2008/03/13 04:26:08 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,59 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-13 13:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
+  * config/rules.cf
+    + Use -w2 warning level for compiling .prg sources.
+  * source/cgi/tcgi.prg
+  * source/cgi/tfile.prg
+  * source/cgi/thtm.prg
+  * source/ct/dattime3.prg
+  * source/ct/getsecrt.prg
+  * source/ct/screen3.prg
+  * source/debug/dbgwa.prg
+  * source/odbc/todbc.prg
+  * source/rdd/hbsix/sxini.prg
+  * source/rtl/alert.prg
+  * source/rtl/browse.prg
+  * source/rtl/checkbox.prg
+  * source/rtl/cstruct.prg
+  * source/rtl/dbedit.prg
+  * source/rtl/dumpvar.prg
+  * source/rtl/hblog.prg
+  * source/rtl/hbserial.prg
+  * source/rtl/listbox.prg
+  * source/rtl/memoedit.prg
+  * source/rtl/persist.prg
+  * source/rtl/radiobtn.prg
+  * source/rtl/radiogrp.prg
+  * source/rtl/regexrpl.prg
+  * source/rtl/scrollbr.prg
+  * source/rtl/tbcolumn.prg
+  * source/rtl/tbrowse.prg
+  * source/rtl/teditor.prg
+  * source/rtl/tget.prg
+  * source/rtl/tgetint.prg
+  * source/rtl/tgetlist.prg
+  * source/rtl/tlabel.prg
+  * source/rtl/treport.prg
+  * source/rtl/trpc.prg
+  * source/rtl/trpccli.prg
+  * source/rtl/ttable.prg
+  * source/tip/cgi.prg
+  * source/tip/httpcln.prg
+  * source/tip/mail.prg
+  * source/tip/popcln.prg
+  * source/tip/thtml.prg
+  * utils/hbdoc/teeasc.prg
+  * utils/hbmake/checks.prg
+  * utils/hbmake/hbmake.prg
+  * utils/hbmake/pickarry.prg
+  * utils/hbmake/radios.prg
+  * utils/hbmake/tmake.prg
+  * utils/xbscript/xbscript.prg
+    ! Most -w2 warnings fixed. Ones that still remain I leave to maintainers
+      of corresponding code.
 
 2008-03-12 23:52 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * source/compiler/harbour.c

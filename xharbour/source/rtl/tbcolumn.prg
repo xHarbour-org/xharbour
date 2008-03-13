@@ -1,5 +1,5 @@
 /*
- * $Id: tbcolumn.prg,v 1.19 2007/07/06 13:11:34 modalsist Exp $
+ * $Id: tbcolumn.prg,v 1.20 2008/01/30 18:19:34 modalsist Exp $
  */
 
 /*
@@ -163,8 +163,6 @@ ENDCLASS
 
 METHOD New( cHeading, bBlock ) CLASS TBColumn
 
-   local xRes, cType, nTokenPos := 0, nL
-
    DEFAULT cHeading TO ""
 
    #ifdef HB_COMPAT_C53
@@ -205,7 +203,7 @@ METHOD SetValue(uValue,uData,cType) CLASS TBColumn
 RETURN ( uData )
 //-------------------------------------------------------------------//
 METHOD SetDefColor( aDef ) CLASS TBColumn
-LOCAL i,a
+  LOCAL a
 
   a := ::aDefColor
 

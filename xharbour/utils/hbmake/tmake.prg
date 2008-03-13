@@ -1,5 +1,5 @@
 /*
- * $Id: tmake.prg,v 1.18 2007/08/30 22:06:43 lculik Exp $
+ * $Id: tmake.prg,v 1.19 2007/09/27 11:09:34 modalsist Exp $
  */
 
 /*
@@ -159,7 +159,6 @@ return self
 METHOD ReadMakefile(cFile) CLASS THbMake
 *---------------------------------------
 
-    LOCAL nPos
     LOCAL cBuffer     := {}
     LOCAL cMacro      := ::cMacro
     LOCAL cDep        := "#DEPENDS"
@@ -541,7 +540,6 @@ RETURN self
 METHOD ReplaceMacros( cMacros ) CLass THBMAKE
 *--------------------------------------------
 
-    LOCAL nPos
     LOCAL nCount       := 0
     LOCAL aTempMacros  := {}
     LOCAL aLocalMacros := {}

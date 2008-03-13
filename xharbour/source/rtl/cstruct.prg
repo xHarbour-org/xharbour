@@ -1,5 +1,5 @@
 /*
- * $Id: cstruct.prg,v 1.44 2006/11/06 22:31:40 ronpinkas Exp $
+ * $Id: cstruct.prg,v 1.45 2007/08/23 09:22:32 ronpinkas Exp $
  */
 
 /*
@@ -75,7 +75,7 @@ RETURN
 //---------------------------------------------------------------------------//
 Function __ActiveStructure( cStructure, nAlign )
 
-   LOCAL oErr
+   /*LOCAL oErr*/
    LOCAL acMembers, aCTypes, hClass, Counter, cMember
 
    IF s_lInitLongs
@@ -318,8 +318,6 @@ Function HB_CStructure( cStructure, nAlign )
    LOCAL hClass
    LOCAL oStructure
    LOCAL nID
-   LOCAL aMemberDefinition
-   LOCAL aStructure
    LOCAL oErr
 
    cStructure := Upper( cStructure )
@@ -370,7 +368,6 @@ Return
 Function HB_CStructureFromID( nID, nAlign )
 
    LOCAL hClass, oStructure, lInplace
-   LOCAL CType
    LOCAL oErr
 
    //TraceLog( nId, s_aClasses )
@@ -490,7 +487,7 @@ RETURN Left( x:ClassName(), 11 ) == "C Structure"
 //---------------------------------------------------------------------------//
 Static Function SayMembers( cPad, lShowMembers, lReturnString )
 
-   LOCAL xProperty, acMembers, cOut := ""
+   LOCAL xProperty, cOut := ""
 
    IF cPad == NIL
       cPad := ""
@@ -589,7 +586,7 @@ RETURN QSelf():InternalBuffer
 STATIC Function DeValue( lAdopt )
 
    //LOCAL aValues := {}
-   LOCAL xProperty, nLen := Len( QSelf() ) - CLASS_PROPERTIES
+   LOCAL nLen := Len( QSelf() ) - CLASS_PROPERTIES
    LOCAL Buffer := QSelf():InternalBuffer
 
    //TraceLog( QSelf():ClassName(), QSelf():nAlign, Buffer, Len( Buffer ), lAdopt )
@@ -620,7 +617,7 @@ RETURN aValues
 //---------------------------------------------------------------------------//
 STATIC Function Init( aValues )
 
-   LOCAL xProperty, Counter, nLen := Len( aValues )
+   LOCAL xProperty, nLen := Len( aValues )
 
    FOR EACH xProperty IN QSelf()
       IF HB_EnumIndex() > nLen

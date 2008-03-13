@@ -1,5 +1,5 @@
 /*
- * $Id: browse.prg,v 1.12 2007/05/15 15:31:06 modalsist Exp $
+ * $Id: browse.prg,v 1.13 2008/01/30 00:20:05 modalsist Exp $
  */
 
 /*
@@ -70,7 +70,7 @@ function Browse( nTop, nLeft, nBottom, nRight )
    Local lRefresh
    Local bAction
    Local lKeyPressed
-   Local aRect, cField, oCol, lShared
+   Local aRect, cField, lShared
 
    if ! Used()
       return .f.

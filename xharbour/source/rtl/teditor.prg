@@ -1,4 +1,4 @@
-/* $Id: teditor.prg,v 1.84 2007/09/27 11:09:34 modalsist Exp $
+/* $Id: teditor.prg,v 1.85 2008/03/02 19:35:57 peterrees Exp $
 *
 * Teditor Fix: teditorx.prg  -- V 3.0beta 2004/04/17
 * Copyright 2004 Giancarlo Niccolai <antispam /at/ niccolai /dot/ ws>
@@ -29,7 +29,7 @@
 * Modifications are based upon the following source file:
 */
 
-/* $Id: teditor.prg,v 1.84 2007/09/27 11:09:34 modalsist Exp $
+/* $Id: teditor.prg,v 1.85 2008/03/02 19:35:57 peterrees Exp $
  * Harbour Project source code:
  * Editor Class (base for Memoedit(), debugger, etc.)
  *
@@ -260,7 +260,6 @@ ENDCLASS
 //-------------------------------------------------------------------//
 
 METHOD New( cString, nTop, nLeft, nBottom, nRight, lEditMode, nLineLength, nTabSize, nTextRow, nTextCol, nWndRow, nWndCol ) CLASS HBEditor
-   Local nRow, nCol
 
    default  cString     to ""
    default  nTop        to 0
@@ -691,8 +690,6 @@ return .T.
 METHOD Edit( nPassedKey ) CLASS HBEditor
 
    LOCAL nKey
-   LOCAL lOldInsert
-   LOCAL lDelAppend
    LOCAL lSingleKeyProcess := .F.
 
 
@@ -2113,10 +2110,7 @@ METHOD SplitLine( nRow ) CLASS HBEditor
    LOCAL cLine
    LOCAL cSplittedLine
    LOCAL nStartRow
-   LOCAL nOCol
-   LOCAL nORow
    LOCAL nPosInWord
-   LOCAL nI
 
    // Do something only if Word Wrapping is on
    IF .NOT. ::lWordWrap // .OR. ( ::LineLen( nRow ) <= ::nWordWrapCol )
@@ -2352,7 +2346,7 @@ return Self
 // 2006/JUL/15  - E.F. - Display "<insert>" message
 //
 METHOD DisplayInsert(lInsert) CLASS HBEditor
-   LOCAL cScreenMsg, nCurRow, nCurCol, nCursor
+   LOCAL nCurRow, nCurCol, nCursor
 
    if Set( _SET_SCOREBOARD )
 
@@ -2979,7 +2973,7 @@ STATIC function Text2Array( cString, nWordWrapCol )
    LOCAL nFirstSpace
    LOCAL cSplittedLine
    LOCAL nTokPos := 0
-   LOCAL cTemp,lTokenized:=.f.
+   LOCAL lTokenized:=.f.
    LOCAL cSoftCR := CHR(141)+CHR(10)
 
    // 2005/JUL/19 - E.F. - SoftCR must be removed before convert string to

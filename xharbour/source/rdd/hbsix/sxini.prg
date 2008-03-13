@@ -1,5 +1,5 @@
 /*
- * $Id: sxini.prg,v 1.1 2007/10/31 08:30:32 marchuet Exp $
+ * $Id: sxini.prg,v 1.2 2007/10/31 12:03:20 marchuet Exp $
  */
 
 /*
@@ -71,7 +71,7 @@ RETURN NIL
 function _sx_INIinit( nArea )
    local cFile, cPath, cName, cExt, cDrive, cSection
    local xShared, xReadOnly, xAlias, xTrigger
-   local hIni, item, sect, h, a
+   local hIni, item, sect, h
 
    /* SIX3 keeps information about ini sections in array[250] stored
     * in public variable called "SxIniInfo". This array is indexed

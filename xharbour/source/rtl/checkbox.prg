@@ -1,5 +1,5 @@
 /*
- * $Id: checkbox.prg,v 1.8 2004/07/15 23:57:16 paultucker Exp $
+ * $Id: checkbox.prg,v 1.9 2006/09/23 18:03:05 lf_sfnet Exp $
  */
 
 /*
@@ -88,7 +88,6 @@ ENDCLASS
 METHOD New( nRow, nCol, cCaption )
 
    LOCAL cColor := ''
-   LOCAL oCheck
 
    ::Buffer  := .F.
    ::Caption := cCaption

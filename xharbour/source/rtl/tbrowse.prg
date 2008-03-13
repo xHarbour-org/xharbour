@@ -1,5 +1,5 @@
 /*
- * $Id: tbrowse.prg,v 1.191 2008/02/27 13:03:58 modalsist Exp $
+ * $Id: tbrowse.prg,v 1.192 2008/03/04 00:45:43 modalsist Exp $
  */
 
 /*
@@ -1945,7 +1945,7 @@ METHOD HowManyCol() CLASS TBrowse
    LOCAL aColsInfo    := ::aColsInfo
    LOCAL colPos       := ::ncolPos
    LOCAL nToAdd       := 0
-   LOCAL nColsVisible, nColsWidth, n
+   LOCAL nColsVisible, nColsWidth
    LOCAL nLeftCol, tryLeftVisible, saveColsWidth, oErr
 
    nColsWidth   := 0
@@ -2748,7 +2748,6 @@ Return .f.
 METHOD DrawARow( nRow ) CLASS TBrowse
 
    LOCAL colorSpec, cColor
-   LOCAL lColorRect
    LOCAL nColFrom
    LOCAL lDisplay
    LOCAL nCol, nRow2Fill, nLeftColPos

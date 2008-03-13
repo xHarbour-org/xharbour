@@ -1,5 +1,5 @@
  /*
- * $Id: mail.prg,v 1.3 2007/04/23 14:58:01 hazi01 Exp $
+ * $Id: mail.prg,v 1.4 2008/01/08 11:44:50 lculik Exp $
  */
 
 /*
@@ -284,7 +284,6 @@ RETURN ::aAttachments[ ::nAttachPos ]
 
 METHOD ToString() CLASS TipMail
    LOCAL cBoundary, cElem, i
-   LOCAL oSubPart
    LOCAL cRet := ""
    // this is a multipart message; we need a boundary
     IF Len( ::aAttachments ) > 0
@@ -663,7 +662,7 @@ RETURN ( "multipart/" $ Lower( ::GetFieldPart("Content-Type")) )
 
 
 METHOD getMultiParts( aParts ) CLASS TipMail
-   LOCAL i, imax, oSubPart, lReset := .F.
+   LOCAL oSubPart, lReset := .F.
 
    ::resetAttachment()
 

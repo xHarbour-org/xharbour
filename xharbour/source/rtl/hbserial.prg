@@ -1,5 +1,5 @@
 /*
- * $Id: hbserial.prg,v 1.14 2006/09/26 20:58:31 mlombardo Exp $
+ * $Id: hbserial.prg,v 1.15 2007/05/02 06:19:56 walito Exp $
  */
 
 /*
@@ -171,7 +171,7 @@ RETURN cSerial
 
 FUNCTION HB_Deserialize( cSerial, nMaxLen, lRecursive, aObj, aHash, aArray, aBlock )
    LOCAL oObject
-   LOCAL oElem, cClassName, aProperties, oVal, lScope
+   LOCAL oElem, cClassName, oVal, lScope
    LOCAL nLen, nClassID
    LOCAL nLenBytes,nClassNameLen,oErr
    

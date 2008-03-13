@@ -1,5 +1,5 @@
 /*
-* $Id: hblog.prg,v 1.21 2005/08/17 00:22:09 kaddath Exp $
+* $Id: hblog.prg,v 1.22 2005/10/29 18:53:39 likewolf Exp $
 */
 
 /*
@@ -98,8 +98,6 @@ PROCEDURE HB_InitStandardLog( ... )
 RETURN
 
 PROCEDURE HB_OpenStandardLog()
-
-   LOCAL nCount
 
    StdLogger:Open()
 
@@ -550,7 +548,7 @@ RETURN .T.
 
 METHOD Send( nStyle, cMessage, cProgName, nPrio ) CLASS HB_LogFile
 
-   LOCAL cExt, nCount
+   LOCAL nCount
 
    FWrite( ::nFileHandle, ::Format( nStyle, cMessage, cProgName, nPrio ) + HB_OsNewLine() )
    HB_FCommit( ::nFileHandle );

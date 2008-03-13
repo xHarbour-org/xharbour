@@ -1,5 +1,5 @@
 /*
- * $Id: tgetint.prg,v 1.5 2004/07/13 19:51:41 paultucker Exp $
+ * $Id: tgetint.prg,v 1.6 2006/07/05 02:44:00 ronpinkas Exp $
  */
 
 /*
@@ -95,9 +95,6 @@ FUNCTION __GET( bSetGet, cVarName, cPicture, bValid, bWhen )
 FUNCTION __GETA( bGetArray, cVarName, cPicture, bValid, bWhen, aIndex )
 
    LOCAL oGet
-   LOCAL nDim := Len( aIndex )
-   LOCAL aGetVar
-   LOCAL nCounter
 
    IF bGetArray == NIL
       IF Left( cVarName, 3 ) == "M->"

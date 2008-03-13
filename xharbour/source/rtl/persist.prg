@@ -1,5 +1,5 @@
 /*
- * $Id: persist.prg,v 1.29 2006/09/07 20:51:31 ronpinkas Exp $
+ * $Id: persist.prg,v 1.30 2007/04/25 01:37:11 ronpinkas Exp $
  */
 
 /*
@@ -93,7 +93,7 @@ METHOD LoadFromText( cObjectText, lIgnoreBadIVars, lPropertiesOnly ) CLASS HBPer
    LOCAL xProperty
    LOCAL lFix
    LOCAL nWith
-   LOCAL oError, cError
+   LOCAL oError
 
    #define HB_PERSIST_VER_2 "// HBPersistent Ver 2.0"
 

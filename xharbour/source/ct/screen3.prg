@@ -1,5 +1,5 @@
 /*
- * $Id: screen3.prg,v 1.5 2006/10/04 20:58:03 enricomaria Exp $
+ * $Id: screen3.prg,v 1.6 2006/10/04 21:12:56 enricomaria Exp $
  */
 
 /*
@@ -133,37 +133,40 @@ Return ''
 
 
 Function ColorWin(nTop, nLeft, nBottom, nRight, xAttr, xOld)
-Local cScr, nAttr, cAttr, nOld, ser, np
-Local nCSize := GetCSize()
+#ifdef __PLATFORM__Windows
+   LOCAL cScr, cAttr, ser, np
+   LOCAL nCSize := GetCSize()
+#endif
+   LOCAL nAttr, nOld
 
-DEFAULT nTop    TO Row()
-DEFAULT nLeft   TO Col()
-DEFAULT nBottom TO MaxRow()
-DEFAULT nRight  TO MaxCol()
+   DEFAULT nTop    TO Row()
+   DEFAULT nLeft   TO Col()
+   DEFAULT nBottom TO MaxRow()
+   DEFAULT nRight  TO MaxCol()
 
-if xAttr == nil
-   nAttr := GetClearA()
-elseif ValType(xAttr) = 'C'
-   nAttr := ColorToN(xAttr)
-else
-   nAttr := xAttr
-endif
-if xOld # nil
-   nOld := if(ValType(xOld) = 'C', ColorToN(xOld), xOld)
-endif
+   if xAttr == nil
+      nAttr := GetClearA()
+   elseif ValType(xAttr) = 'C'
+      nAttr := ColorToN(xAttr)
+   else
+      nAttr := xAttr
+   endif
+   if xOld # nil
+      nOld := if(ValType(xOld) = 'C', ColorToN(xOld), xOld)
+   endif
 
 #ifdef __PLATFORM__Windows   
-cScr := SaveScreen(nTop, nLeft, nBottom, nRight)
-for ser := 1 to len(cScr) / nCSize
-   np := (ser-1)*nCSize + 2
-   cAttr := Substr(cScr, np, 1)
-   if nOld == nil .or. nOld == Asc(cAttr)
-      cScr := Stuff(cScr, np, 1, Chr(nAttr))
-   endif
-next
-RestScreen(nTop, nLeft, nBottom, nRight, cScr)
+   cScr := SaveScreen(nTop, nLeft, nBottom, nRight)
+   for ser := 1 to len(cScr) / nCSize
+      np := (ser-1)*nCSize + 2
+      cAttr := Substr(cScr, np, 1)
+      if nOld == nil .or. nOld == Asc(cAttr)
+         cScr := Stuff(cScr, np, 1, Chr(nAttr))
+      endif
+   next
+   RestScreen(nTop, nLeft, nBottom, nRight, cScr)
 #else
-SetAttribute(nTop, nLeft, nBottom, nRight, nAttr)
+   SetAttribute(nTop, nLeft, nBottom, nRight, nAttr)
 #endif
 Return ''
 

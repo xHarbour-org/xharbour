@@ -1010,7 +1010,7 @@ RETURN IIF( nPos == Len(aNodes), NIL, aNodes[nPos+1] )
 
 // returns previous node
 METHOD prevNode() CLASS THtmlNode
-   LOCAL nPos, aNodes, oPrevNode
+   LOCAL nPos, aNodes
 
    IF ::htmlTagName == "_root_"
       RETURN NIL
@@ -1400,7 +1400,7 @@ RETURN ::getAttributes()
 METHOD delAttribute( cName ) CLASS THtmlNode
    LOCAL xVal := ::getAttribute( cName )
    LOCAL lRet := .F.
-   LOCAL nPos
+
    IF xVal <> NIL
       TRY
          HDel( ::htmlAttributes, cName )
@@ -1437,7 +1437,7 @@ RETURN ::noAttribute( __GetMessage(), aParams )
 
 // Non existent message -> returns and/or creates Tag or Attribute
 METHOD noAttribute( cName, aValue ) CLASS THtmlNode
-   LOCAL aNodes, oNode
+   LOCAL oNode
 
    cName := lower(cName)
 
@@ -4390,7 +4390,6 @@ FUNCTION AnsiToHtml( cAnsiText )
          nStart    := nEnd
          cHtmlText += "&amp;" + SubStr( cText, 2 )
          LOOP
-         EXIT
       END
 
       nStart := parser:p_pos

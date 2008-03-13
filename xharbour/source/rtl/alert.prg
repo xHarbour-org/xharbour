@@ -1,5 +1,5 @@
 /*
- * $Id: alert.prg,v 1.24 2007/01/18 11:23:07 enricomaria Exp $
+ * $Id: alert.prg,v 1.25 2007/02/27 15:59:40 druzus Exp $
  */
 
 /*
@@ -53,7 +53,7 @@ STATIC s_lNoAlert
 FUNCTION Alert( xMessage, aOptions, cColorNorm, nDelay )
 
    LOCAL nChoice
-   LOCAL aSay, nPos, nWidth, nOpWidth, nInitRow, nInitCol, nEval
+   LOCAL aSay, nPos, nWidth, nOpWidth, nInitRow, nInitCol
    LOCAL nKey, aPos, nCurrent, aHotkey, aOptionsOK, cEval
    LOCAL cColorHigh
 

@@ -1,5 +1,5 @@
 #
-# $Id: rules.cf,v 1.10 2004/08/04 23:25:12 mauriliolongo Exp $
+# $Id: rules.cf,v 1.11 2004/10/31 13:15:45 druzus Exp $
 #
 
 # How to run yacc.
@@ -24,7 +24,7 @@ HB := $(HB)clipper$(EXE_EXT)
 HB_FLAGS = -n -q -w -es2 $(HB_USER_FLAGS)
 else
 HB := $(HB)harbour$(EXE_EXT)
-HB_FLAGS = -n -q0 -w -es2 -gc0 $(HB_USER_FLAGS) -I$(TOP) -I$(TOP)include -I$(HB_INC_COMPILE) $(HB_MT_FLAGS)
+HB_FLAGS = -n -q0 -w2 -es2 -gc0 $(HB_USER_FLAGS) -I$(TOP) -I$(TOP)include -I$(HB_INC_COMPILE) $(HB_MT_FLAGS)
 endif
 
 # The rule to link an executable.

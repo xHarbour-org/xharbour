@@ -1,5 +1,5 @@
 /*
- * $Id: tget.prg,v 1.142 2008/02/27 13:03:58 modalsist Exp $
+ * $Id: tget.prg,v 1.143 2008/03/05 00:09:07 modalsist Exp $
  */
 
 /*
@@ -1789,11 +1789,6 @@ METHOD PutMask( xValue, lEdit ) CLASS Get
    local cBuffer
    local cPicFunc
    local cMask
-   local cMaskDel
-
-   local nFor
-   local nAt
-   local nNoEditable := 0
 
    DEFAULT lEdit  TO ::HasFocus
    DEFAULT xValue TO ::UnTransform()

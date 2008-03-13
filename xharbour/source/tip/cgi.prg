@@ -1,5 +1,5 @@
 /*
- * $Id: httpcln.prg,v 1.5 2005/12/01 13:41:14 snaiperis Exp $
+ * $Id: cgi.prg,v 1.3 2007/01/07 09:49:54 lf_sfnet Exp $
  */
 
 /*
@@ -439,7 +439,7 @@ METHOD SessionDecode( cData ) CLASS TIpCgi
 
    local lRet := .t.
    local cSerial := HB_DeserialBegin( cData )
-   local xVal, cKey, aElem
+   local xVal, aElem
 
    do while ( xVal := HB_DeserialNext( @cSerial ) ) != nil
       switch ValType( xVal )

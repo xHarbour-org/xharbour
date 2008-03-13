@@ -1,5 +1,5 @@
 /*
- * $Id: dumpvar.prg,v 1.4 2004/01/03 20:51:47 fsgiudice Exp $
+ * $Id: dumpvar.prg,v 1.5 2004/03/03 11:41:10 ronpinkas Exp $
  */
 
 /*
@@ -201,7 +201,7 @@ STATIC FUNCTION DShowArray( aVar, lRecursive, nIndent )
 RETURN cString
 
 STATIC FUNCTION DShowHash( hVar, lRecursive, nIndent )
-  LOCAL xVal, nChar, xKey, aKeys
+  LOCAL xVal, xKey, aKeys
   LOCAL cString := ""
 
   DEFAULT nIndent TO 0

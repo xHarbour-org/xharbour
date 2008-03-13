@@ -1,6 +1,6 @@
 
 /*
- * $Id: tcgi.prg,v 1.4 2006/06/28 20:56:31 lculik Exp $
+ * $Id: tcgi.prg,v 1.5 2007/05/04 12:49:15 andresreyesh Exp $
  */
 
 /*
@@ -87,9 +87,7 @@ ENDCLASS
 
 METHOD New( cInBuffer ) CLASS TCgi
 
-   LOCAL cBuff
    LOCAL i
-   LOCAL nBuff
    LOCAL aTemp := {}
    LOCAL aVar  := {}
 
@@ -159,15 +157,9 @@ METHOD New( cInBuffer ) CLASS TCgi
 METHOD ToObject() CLASS TCgi
 
    LOCAL i
-   LOCAL bBlock
-   LOCAL cFldName
    LOCAL nScope    := 1
    LOCAL aDb
-   LOCAL oDb
-   LOCAL hNewClass
    LOCAL oNew
-   LOCAL n
-   LOCAL hNew
    STATIC sn       := 0
 
    // --> create new oObject class from this one...

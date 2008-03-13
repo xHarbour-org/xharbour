@@ -1,5 +1,5 @@
 /*
- * $Id: trpccli.prg,v 1.29 2005/09/30 23:44:05 druzus Exp $
+ * $Id: trpccli.prg,v 1.30 2005/10/29 18:53:39 likewolf Exp $
  */
 
 /*
@@ -612,7 +612,7 @@ RETURN .T.
 
 
 METHOD Call( ... ) CLASS tRPCClient
-   LOCAL oCalling, xParam
+   LOCAL oCalling
    LOCAL cFunction, aParams
    LOCAL nCount
 
@@ -1058,7 +1058,7 @@ RETURN cData
 
 
 METHOD GetServerAddress( xId ) CLASS tRpcClient
-   LOCAL cData, nPos
+   LOCAL cData
 
    IF ValType( xID ) == "A"
       cData := xId[1]

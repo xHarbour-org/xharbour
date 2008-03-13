@@ -3948,7 +3948,6 @@ RETURN 0
 PROCEDURE RP_Dot()
 
    LOCAL GetList := {}, sLine := Space(256)
-   LOCAL nDefines, nCommands, nTranslates
 
    LOCAL aCpyDefRules, aCpyDefResults
    LOCAL aCpyCommRules, aCpyCommResults
@@ -4206,10 +4205,8 @@ RETURN
 FUNCTION PP_CompileLine( sPPed, nLine, aProcedures, aInitExit, nProcId )
 
    LOCAL nNext, sBlock, sTemp
-   LOCAL sSymbol
    LOCAL Dummy
    LOCAL oError
-   LOCAL nTemp
 
    ExtractLeadingWS( @sPPed )
    DropTrailingWS( @sPPed )
@@ -4364,8 +4361,8 @@ RETURN cLValue + cOp + cPad + sBlock
 
 FUNCTION PP_Run( cFile, aParams, sPPOExt, bBlanks )
 
-   LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule, nProc
-   LOCAL oError, bErrorHandler
+   LOCAL nBaseProc := s_nProcId, sPresetModule := s_sModule
+   LOCAL bErrorHandler
    LOCAL aProcedures
 
    IF bBlanks == NIL
@@ -4829,7 +4826,7 @@ RETURN nIf
 FUNCTION PP_PreProFile( sSource, sPPOExt, bBlanks, bDirectivesOnly, aPendingLines )
 
    LOCAL hSource, sBuffer, sLine, nPosition, sExt, cPrev
-   LOCAL nLen, nMaxPos, cChar := '', nClose, nBase, nNext, nLine := 0
+   LOCAL nLen, nMaxPos, cChar := '', nClose, nNext, nLine := 0
    LOCAL sRight, nPath := 0, nPaths := Len( s_asPaths ), nNewLine
    LOCAL sPath := "", oError, sPrevFile := s_sFile
    LOCAL sTmp, nLastPosition := 0
@@ -5595,7 +5592,7 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
 
    LOCAL sDirective, bX, sToken, nRule
    LOCAL nNewLineAt, nLines, Counter
-   LOCAL sLeft, sPassed, asOutLines := {}, sOut := '', cChar
+   LOCAL sLeft, sPassed, asOutLines := {}, sOut := ''
    LOCAL nLen, nCycles := 0, aDefined := {}, aTranslated := {}, aCommanded := {}
    //LOCAL nIdAt, sRight
    LOCAL oError
@@ -5604,7 +5601,6 @@ FUNCTION PP_PreProLine( sLine, nLine, sSource )
    LOCAL bArrayPrefix
    LOCAL bPresetCompile
    LOCAL sRight, nAt, sConstant
-   LOCAL sTemp
 
    //TraceLog( sLine, nLine )
 
@@ -7165,7 +7161,7 @@ RETURN 0
 
 STATIC FUNCTION NextExp( sLine, cType, aWords, sNextAnchor, bX )
 
-  LOCAL sExp, sTemp, Counter, sPad, sToken, sList
+  LOCAL sExp, sTemp, Counter, sToken, sList
   LOCAL sNextLine, sNextToken, sLastToken, sJustToken, sJustNext, cLastChar
   LOCAL s1, s2, s4, s5, sNext1, sNext2, sNext3, sNext4, sNext5, nLen, nNextLen
   LOCAL sWorkLine, sPrimaryStopper, nStoppers, nStopper, sStopLine, sStopper
@@ -11907,7 +11903,6 @@ RETURN
 FUNCTION PP_PreProText( sLines, asLines, bBlanks, bAutoCompile, nStartLine, sSource )
 
    LOCAL nOpen, nClose, sTemp := "", nLine, nLines
-   LOCAL oError
 
    //TraceLog( sLines )
 
@@ -12148,7 +12143,7 @@ RETURN xRet
 FUNCTION PP_RunArray( asLines, aParams )
 
    LOCAL aProcedures := {}, aInitExit := { {}, {} }, nProcId := 0, ;
-         nLine, nLines, nOpen, nClose
+         nLine, nLines
 
    LOCAL xRet
 
@@ -12173,7 +12168,7 @@ RETURN xRet
   FUNCTION PP_Eval( cExp, aParams, aProcedures, nLine, bScriptProc )
 
      LOCAL bErrHandler, oError, xRet
-     LOCAL aProcedure, bPreset, aPresetProcedures
+     LOCAL aPresetProcedures
      LOCAL nProc
 
      IF nLine == NIL
@@ -12263,7 +12258,7 @@ FUNCTION PP_Exec( aProcedures, aInitExit, nScriptProcs, aParams, nStartup )
 
    LOCAL nProc, nProcs, xRet
    LOCAL bErrHandler, oError
-   LOCAL aProc, bPreset, aPresetProcedures
+   LOCAL bPreset, aPresetProcedures
    LOCAL aStack
 
    #ifdef __CONCILE_PCODE__
@@ -12522,7 +12517,7 @@ RETURN bRet
 //--------------------------------------------------------------//
 STATIC FUNCTION DefRTEHandler( e )
 
-   LOCAL cMessage, aOptions, nChoice, nLevel
+   LOCAL cMessage, aOptions, nChoice
 
    IF e:genCode == EG_ZERODIV .AND. e:CanSubStitute
      RETURN 0

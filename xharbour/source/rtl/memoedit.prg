@@ -1,5 +1,5 @@
 /*
- * $Id: memoedit.prg,v 1.49 2006/09/21 14:12:36 modalsist Exp $
+ * $Id: memoedit.prg,v 1.50 2007/07/02 04:27:32 peterrees Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ ENDCLASS
 
 METHOD MemoInit( xUDF ) CLASS TMemoEditor
 
-LOCAL nUdfReturn,i
+   LOCAL nUdfReturn
 
    DEFAULT xUDF TO NIL
 

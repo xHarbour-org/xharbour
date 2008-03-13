@@ -1,5 +1,5 @@
 /*
- * $Id: hbmake.prg,v 1.186 2007/10/23 13:52:31 lculik Exp $
+ * $Id: hbmake.prg,v 1.187 2007/11/01 12:33:32 lculik Exp $
  */
 
 /*
@@ -153,8 +153,6 @@ FUNCTION MAIN( cFile, p1, p2, p3, p4, p5, p6 )
    LOCAL aDef        := {}
    LOCAL cMakeParams := ""
    LOCAL nLang       := GETUSERLANG()
-   LOCAL nPos
-   LOCAL aPpo
    LOCAL cExt := ""
    LOCAL cExp,cLib
    LOCAL lCreateAndCompile := .F.  // for "-c" param only.
@@ -472,7 +470,6 @@ RETURN NIL
 FUNCTION ParseMakeFile( cFile )
 *------------------------------
 
-   LOCAL nPos
    LOCAL cBuffer     := {}
    LOCAL cMacro      := iif(s_lMSVcc,"#MSVC",iif(s_lPocc,"#POCC",iif(s_lGcc,"#GCC","#BCC")))
    LOCAL cDep        := "#DEPENDS"
@@ -498,7 +495,6 @@ FUNCTION ParseMakeFile( cFile )
    LOCAL aLibx
    LOCAL lDjgpp      := "GNU C" in HB_COMPILER()
    LOCAL x           := 1
-   LOCAL ct
    LOCAL nFHandle
    LOCAL cTrash :=""
 
@@ -857,7 +853,6 @@ RETURN .T.
 FUNCTION Checkdefine( cTemp )
 *----------------------------
 
-   LOCAL cDef
    LOCAL nPos
    LOCAL cRead
    LOCAL aSet     := {}
@@ -900,7 +895,6 @@ FUNCTION Setcommands( cTemp )
 *----------------------------
 
    LOCAL cRead        := Alltrim( readln( @s_lEof ) )
-   LOCAL nPos
    LOCAL nCount       := 0
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
@@ -921,7 +915,6 @@ RETURN NIL
 FUNCTION SetDependencies( cTemp )
 *--------------------------------
 
-   LOCAL nPos
    LOCAL nCount       := 0
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
@@ -980,7 +973,6 @@ RETURN cRead
 FUNCTION ReplaceMacros( cMacros )
 *--------------------------------
 
-   LOCAL nPos
    LOCAL nCount       := 0
    LOCAL aTempMacros  := {}
    LOCAL aLocalMacros := {}
@@ -1033,7 +1025,6 @@ FUNCTION SetBuild()
    LOCAL nPos
    LOCAL aMacro
    LOCAL aTemp
-   LOCAL nCount
    LOCAL cCurrentRead := ''
    LOCAL cMacro
    LOCAL xInfo
@@ -1175,7 +1166,6 @@ FUNCTION CompileFiles()
    LOCAL cComm
    LOCAL cOld
    LOCAL nPos
-   LOCAL nCount
    LOCAL nFiles
    LOCAL cErrText := ""
    LOCAL aOrder   := ListAsArray2( s_aBuildOrder[ 2 ], " " )
@@ -1543,8 +1533,6 @@ RETURN NIL
 *---------------------
 FUNCTION PrintMacros()
 *---------------------
-
-   LOCAL nPos
 
    Outstd( HbMake_Id()+ " "+HbMake_Copyright()+ CRLF )
    Outstd( "" + CRLF )
@@ -3425,7 +3413,6 @@ FUNCTION CompileUpdatedFiles()
    LOCAL cComm
    LOCAL cOld
    LOCAL nPos
-   LOCAL nCount
 
    LOCAL aCtocompile := {}
    LOCAL aOrder      := ListAsArray2( s_aBuildOrder[ 2 ], " " )
@@ -3829,7 +3816,6 @@ FUNCTION CreateLibMakeFile( cFile )
    LOCAL lCompMod        := .F.
    LOCAL lInstallLib     := .F.
    LOCAL x
-   LOCAL y
    LOCAL nPos
 //   LOCAL lGenppo         := .F.
    LOCAL GetList         := {}

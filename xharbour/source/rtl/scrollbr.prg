@@ -1,5 +1,5 @@
 /*
- * $Id: scrollbr.prg,v 1.5 2004/07/15 23:57:16 paultucker Exp $
+ * $Id: scrollbr.prg,v 1.6 2004/11/23 22:25:00 guerra000 Exp $
  */
 
 /*
@@ -198,9 +198,6 @@ RETURN lDisplay
 
 METHOD HitTest( nRow, nCol ) CLASS HBScrollBar
 
-   LOCAL Local1
-   LOCAL Local2
-
    IF ::Orient == 1
 
       DO CASE
@@ -265,7 +262,6 @@ METHOD Update() CLASS HBScrollBar
 
    LOCAL nCurRow
    LOCAL nCurCol
-   LOCAL cCurColor
    LOCAL lUpdated  := .F.
    LOCAL nThumbPos := ::ThumbPos
 

@@ -1,5 +1,5 @@
 /*
- * $Id: tlabel.prg,v 1.2 2002/11/13 04:31:27 walito Exp $
+ * $Id: tlabel.prg,v 1.3 2002/11/29 20:15:17 walito Exp $
  */
 
 /*
@@ -121,7 +121,6 @@ METHOD New( cLBLName, lPrinter, cAltFile, lNoConsole, bFor, ;
    LOCAL xBreakVal, lBroke := .F.
    LOCAL err
    LOCAL OldMargin
-   LOCAL nLen
 
    ::aBandToPrint:={} // ARRAY(5)
    ::nCurrentCol := 1

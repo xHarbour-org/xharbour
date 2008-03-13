@@ -1,5 +1,5 @@
 /*
- * $Id: radios.prg,v 1.1.1.1 2001/12/21 10:45:03 ronpinkas Exp $
+ * $Id: radios.prg,v 1.2 2004/12/25 23:52:18 modalsist Exp $
  */
 /*
  * Harbour Project source code:
@@ -130,9 +130,7 @@ RETURN
 
 PROC RadioApplyKey(oGet, nKey, aGetList)
 
-LOCAL cKey
-LOCAL bKeyBlock
-LOCAL nSaveRow, nSaveCol
+  LOCAL bKeyBlock
 
   // check for SET KEY first
   IF ( (bKeyBlock := SetKey(nKey)) <> NIL )

@@ -1,5 +1,5 @@
 /*
- * $Id: cstr.prg,v 1.29 2006/03/11 12:35:24 likewolf Exp $
+ * $Id: regexrpl.prg,v 1.1 2006/03/17 01:18:51 fsgiudice Exp $
  */
 
 /*
@@ -59,7 +59,6 @@ FUNCTION hb_RegexReplace( cRegex, cString, cReplace, lCaseSensitive, lNewLine, n
 
    LOCAL pRegex
    LOCAL aMatches, aMatch
-   LOCAL nReplace
    LOCAL cReturn
    LOCAL nOffSet := 0
    LOCAL cSearch, nStart, nEnd, nLenSearch, nLenReplace
