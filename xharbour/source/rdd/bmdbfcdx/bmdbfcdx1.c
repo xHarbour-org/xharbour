@@ -1,5 +1,5 @@
 /*
- * $Id: bmdbfcdx1.c,v 1.38 2008/01/16 04:28:59 ronpinkas Exp $
+ * $Id: bmdbfcdx1.c,v 1.39 2008/03/13 11:12:06 marchuet Exp $
  */
 
 /*
@@ -7995,7 +7995,9 @@ static ERRCODE hb_cdxOrderCreate( CDXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo
          uiLen = 1;
          break;
       case 'C':
-         uiLen = HB_CDXMAXKEY( hb_itemGetCLen( pResult ) );
+         uiLen = ( USHORT ) hb_itemGetCLen( pResult );
+         if( uiLen > CDX_MAXKEY )
+            uiLen = CDX_MAXKEY;
          break;
       default:
          bType = 'U';
