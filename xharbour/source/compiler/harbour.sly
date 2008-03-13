@@ -1,6 +1,6 @@
 %{
 /*
- * $Id: harbour.sly,v 1.153 2008/03/05 14:16:52 ronpinkas Exp $
+ * $Id: harbour.sly,v 1.154 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -162,7 +162,6 @@ static PELSEIF      hb_comp_pElseIfs = NULL;
 static BOOL bTrancuateBaseArray = FALSE;
 static HB_EXPR_PTR pGetArgList, pBaseArrayName = NULL, pGetVarArray, pGetFunction;
 
-static int s_iBlock = 0;
 static BOOL s_bBlockMacro = FALSE, s_bBlockDeclared = FALSE;
 static HB_EXPR_PTR pBlockSimple;
 
@@ -184,6 +183,14 @@ typedef struct _LOCALPARAM
 } LOCALPARAM, *PLOCALPARAM;
 
 PLOCALPARAM hb_comp_LocalParams = NULL;
+
+typedef struct _BLOCKSLIST
+{
+  HB_EXPR_PTR pBlock;
+  struct _BLOCKSLIST *pOuter;
+} BLOCKSLIST, *PBLOCKSLIST;
+
+PBLOCKSLIST hb_comp_BlocksList = NULL;
 
 static void hb_compDebugStart( void ) { };
 
@@ -1031,15 +1038,31 @@ ArrayAtAlias : ArrayAt ALIASOP      { $$ = $1; }
 /* Variables
  */
 Variable    : IdentName         {
-                                  $$ = hb_compExprNewVar( $1 );
-                                  if( s_iBlock )
-                                  {
-                                     s_bBlockDeclared = ( s_bBlockDeclared ||
-                                                          hb_compLocalGetPos( $1 ) ||
-                                                          hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
-                                                          hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
-                                                          ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
-                                  }
+                                   $$ = hb_compExprNewVar( $1 );
+
+                                   if( hb_comp_BlocksList )
+                                   {
+                                      HB_CBVAR_PTR pVar = ( HB_CBVAR_PTR ) hb_comp_BlocksList->pBlock->value.asList.pIndex;
+
+                                      while( pVar )
+                                      {
+                                         if( pVar->szName && HB_EXPR_ISEQUAL_IDS( $1, pVar->szName ) )
+                                         {
+                                            break;
+                                         }
+
+                                         pVar = pVar->pNext;
+                                      }
+
+                                      if( pVar == NULL )
+                                      {
+                                         s_bBlockDeclared = ( s_bBlockDeclared ||
+                                                              hb_compLocalGetPos( $1 ) ||
+                                                              hb_compStaticGetPos( $1, hb_comp_functions.pLast ) ||
+                                                              hb_compVariableGetPos( hb_comp_pGlobals, $1 ) ||
+                                                              ( hb_comp_bStartProc == FALSE && hb_compStaticGetPos( $1, hb_comp_functions.pFirst ) ) );
+                                      }
+                                   }
                                 }
 ;
 
@@ -1048,8 +1071,10 @@ VarAlias    : IdentName ALIASOP      { $$ = hb_compExprNewAlias( $1 ); }
 
 /* Macro variables
  */
-MacroVar    : MACROVAR        { $$ = hb_compExprNewMacro( NULL, '&', $1 );
-                                if( s_iBlock )
+MacroVar    : MACROVAR        {
+                                $$ = hb_compExprNewMacro( NULL, '&', $1 );
+
+                                if( hb_comp_BlocksList )
                                 {
                                    s_bBlockDeclared = ( s_bBlockDeclared ||
                                                         hb_compLocalGetPos( $1 ) ||
@@ -1346,7 +1371,7 @@ Argument   :  EmptyExpression          { $$ = $1; }
                                                $2->value.asFunCall.pFunName = NULL;
                                                hb_compExprDelete( $2 );
 
-  											   $$->ExprType = HB_ET_FUNREF;
+                                               $$->ExprType = HB_ET_FUNREF;
                                                $$->ValType = HB_EV_FUNREF;
                                                break;
 
@@ -1964,22 +1989,22 @@ Get        : _Get_ LValue ','
 
                      default:
                      {
-	                    /* HB_ET_ARRAYAT */
-	                    if( pGetVarArray )
-	                    {
-	                       if( pBaseArrayName )
-	                       {
-	                          pVarName = pBaseArrayName;
-	                          pBaseArrayName = NULL;
-	                       }
-	                       else
-	                       {
-	                          pVarName = hb_compExprClone( $5 );
-	                       }
+                        /* HB_ET_ARRAYAT */
+                        if( pGetVarArray )
+                        {
+                           if( pBaseArrayName )
+                           {
+                              pVarName = pBaseArrayName;
+                              pBaseArrayName = NULL;
+                           }
+                           else
+                           {
+                              pVarName = hb_compExprClone( $5 );
+                           }
 
-	                       bTrancuateBaseArray = FALSE;
-	                       break;
-	                    }
+                           bTrancuateBaseArray = FALSE;
+                           break;
+                        }
                         else
                         {
                            pVarName = NULL;
@@ -2057,41 +2082,70 @@ GetAExt    : { /* Nothing*/ }
            | ',' GetArgList
            ;
 
-CodeBlock  : '{' CBMARKER { s_iBlock++; $<asExpr>$ = hb_compExprNewCodeBlock(); } BlockParams CBMARKER BlockExpList '}'
-     	       {
-     		  if( s_bBlockMacro )
-     		  {
-     		     if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
-     		     {
-     		        HB_EXPR_PTR pMacroVar, pBlockString;
+CodeBlock  : '{' CBMARKER
 
-     		        pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
-     		        pBlockString = hb_compExprNewString( "{||", 3, FALSE );
-     		        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
-     		        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}", 1, FALSE ) );
-     		        $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
-     		     }
-     		     else if( s_bBlockDeclared )
-     		     {
-     		        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
-     		        $<asExpr>$ = $<asExpr>3;
-     		     }
-     		     else
-     		     {
+               {
+                  $<asExpr>$ = hb_compExprNewCodeBlock();
+
+                  if( hb_comp_BlocksList == NULL )
+                  {
+                     hb_comp_BlocksList = (PBLOCKSLIST) hb_xgrab( sizeof( BLOCKSLIST ) );
+                     hb_comp_BlocksList->pBlock = $<asExpr>$;
+                     hb_comp_BlocksList->pOuter = NULL;
+                  }
+                  else
+                  {
+                     PBLOCKSLIST pBlocksList = (PBLOCKSLIST) hb_xgrab( sizeof( BLOCKSLIST ) );
+
+                     pBlocksList->pBlock = $<asExpr>$;
+                     pBlocksList->pOuter = hb_comp_BlocksList;
+
+                     hb_comp_BlocksList = pBlocksList;
+                  }
+               }
+
+              BlockParams CBMARKER BlockExpList '}'
+
+              {
+                  PBLOCKSLIST pDelete = hb_comp_BlocksList;
+
+                  if( s_bBlockMacro )
+                  {
+                     if( pBlockSimple && pBlockSimple->ExprType == HB_ET_MACRO && pBlockSimple->value.asMacro.SubType == HB_ET_MACRO_VAR )
+                     {
+                        HB_EXPR_PTR pMacroVar, pBlockString;
+
+                        pMacroVar    = hb_compExprNewVar( pBlockSimple->value.asMacro.szMacro );
+                        pBlockString = hb_compExprNewString( "{||", 3, FALSE );
+                        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), pMacroVar );
+                        pBlockString = hb_compExprSetOperand( hb_compExprNewPlus( pBlockString ), hb_compExprNewString( "}", 1, FALSE ) );
+                        $<asExpr>$   = hb_compExprNewMacro( pBlockString, 0, NULL );
+                     }
+                     else if( s_bBlockDeclared )
+                     {
+                        hb_compGenError( hb_comp_szErrors, 'E', HB_COMP_ERR_BLOCK, NULL, NULL );
+                        $<asExpr>$ = $<asExpr>3;
+                     }
+                     else
+                     {
                         char *szLastBlock = hb_comp_SLX_LastBlock( FALSE );
-     		        $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( szLastBlock, strlen( szLastBlock ), FALSE ), 0, NULL );
-     		     }
-     		  }
-     		  else
-     		  {
-     		     $$ = $<asExpr>3;
-     		  }
+                        $<asExpr>$ = hb_compExprNewMacro( hb_compExprNewString( szLastBlock, strlen( szLastBlock ), FALSE ), 0, NULL );
+                     }
+                  }
+                  else
+                  {
+                     $$ = $<asExpr>3;
+                  }
 
-     		  if( --s_iBlock == 0 )
-     		  {
-     		     hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
-     		  }
-     	       }
+                  hb_comp_BlocksList = hb_comp_BlocksList->pOuter;
+
+                  hb_xfree( (void *) pDelete );
+
+                  if( hb_comp_BlocksList == NULL )
+                  {
+                     hb_comp_SLX_LastBlock( TRUE ); s_bBlockMacro = FALSE; s_bBlockDeclared = FALSE;
+                  }
+               }
            ;
 
 BlockParams : /* empty list */    { $$ = NULL; }
@@ -2113,7 +2167,7 @@ BlockParams : /* empty list */    { $$ = NULL; }
                                 }
                              }
                            }
-	    ;
+            ;
 
 CodeBlock2  : '<' BITOR { hb_compCodeBlockStart(); hb_comp_iVarScope = VS_PARAMETER; } ExtBlockParams BITOR Crlf
                  Source
@@ -2136,7 +2190,7 @@ ExtBlockParams : /* empty list */
                       hb_xfree( (void *) pDelete );
                    }
                  }
-	       ;
+               ;
 
 /* NOTE: This uses $-2 then don't use BlockExpList in other context
  */
@@ -3087,18 +3141,20 @@ ForEach    : FOREACH IdentName  /* 1  2 */
            ;
 
 WithObject : WITHOBJ Expression Crlf
-				   {
+               {
                   hb_compLinePush();
                   hb_compGenWithObject($2);
                   if( s_iControlLevel++ == 0 )
-						   s_iLastControlLine = hb_comp_iLine;
+                  {
+                     s_iLastControlLine = hb_comp_iLine;
+                  }
                }
              EmptyStats
              END
-				   {
-					   hb_compGenEndWithObject();
-					   s_iControlLevel--;
-			  	   }
+               {
+                  hb_compGenEndWithObject();
+                  s_iControlLevel--;
+               }
            ;
 
 BeginSeq   : BEGINSEQ {
@@ -3139,7 +3195,8 @@ BeginSeq   : BEGINSEQ {
                 hb_compGenJumpThere( $<lNumber>5, hb_comp_functions.pLast->lPCodePos );
 
                 hb_compSequenceFinish( (ULONG)$<lNumber>2, (int)$<lNumber>4 );
-                hb_comp_functions.pLast->bFlags &= ~ FUN_WITH_RETURN;
+
+                hb_comp_functions.pLast->bFlags &= ~ ( FUN_WITH_RETURN | FUN_BREAK_CODE );
                 s_iControlLevel--;
              }
            ;
@@ -3872,21 +3929,25 @@ static void hb_compLoopLoop( void )
       }
       else
       {
-		   USHORT wWithObjCounter = pLast->wWithObjCounter;
+         USHORT wWithObjCounter = pLast->wWithObjCounter;
 
-		   pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
-  		   pLoop->pLoopList = NULL;
+         pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+         pLoop->pLoopList = NULL;
+
          while( pLast->pLoopList )
+         {
             pLast = pLast->pLoopList;
+         }
+
          pLast->pLoopList = pLoop;
 
          while( wWithObjCounter < hb_comp_wWithObjCounter )
          {
-			   hb_compGenPCode1( HB_P_ENDWITHOBJECT );
+            hb_compGenPCode1( HB_P_ENDWITHOBJECT );
             wWithObjCounter++;
          }
 
-		   pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
+         pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }
@@ -3925,21 +3986,21 @@ static void hb_compLoopExit( void )
       }
       else
       {
-	      USHORT wWithObjCounter = pLast->wWithObjCounter;
+         USHORT wWithObjCounter = pLast->wWithObjCounter;
 
-  		   pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
- 		   pLoop->pExitList = NULL;
+         pLoop = ( PTR_LOOPEXIT ) hb_xgrab( sizeof( LOOPEXIT ) );
+         pLoop->pExitList = NULL;
          while( pLast->pExitList )
-            pLast = pLast->pExitList;
+         pLast = pLast->pExitList;
          pLast->pExitList = pLoop;
 
-		   while( wWithObjCounter < hb_comp_wWithObjCounter )
+         while( wWithObjCounter < hb_comp_wWithObjCounter )
          {
             hb_compGenPCode1( HB_P_ENDWITHOBJECT );
             wWithObjCounter++;
          }
 
-		   pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
+         pLoop->ulOffset = hb_comp_functions.pLast->lPCodePos;  /* store the position to fix */
          hb_compGenJump( 0 );
       }
    }
@@ -3955,10 +4016,13 @@ static void hb_compLoopHere( void )
    if( pLoop )
    {
       while( pLoop->pNext )
+      {
          pLoop = pLoop->pNext;
+      }
 
       pLast = pLoop;
-	  pLoop = pLoop->pLoopList;
+      pLoop = pLoop->pLoopList;
+
       while( pLoop )
       {
          hb_compGenJumpHere( pLoop->ulOffset + 1 );
@@ -3966,7 +4030,8 @@ static void hb_compLoopHere( void )
          pLoop = pLoop->pLoopList;
          hb_xfree( ( void * ) pFree );
       }
-	  pLast->pLoopList = NULL;
+
+      pLast->pLoopList = NULL;
    }
 }
 

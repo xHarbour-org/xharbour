@@ -1,5 +1,5 @@
 /*
- * $Id: harbour.c,v 1.193 2008/03/10 17:19:03 ronpinkas Exp $
+ * $Id: harbour.c,v 1.194 2008/03/10 17:37:31 ronpinkas Exp $
  */
 
 /*
@@ -1568,6 +1568,7 @@ void hb_compGenStaticName( char *szVarName )
          hb_compStaticDefStart();
          bGlobal = 1;
       }
+
       pFunc = hb_comp_functions.pLast;
       pBuffer = ( BYTE * ) hb_xgrab( strlen( szVarName ) + 5 );
       iVar = hb_compStaticGetPos( szVarName, pFunc );
@@ -3010,14 +3011,16 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
       /* we are in a function/procedure -we don't need any tricks */
       if( pFunc->pOwner )
       {
-         pFunc =pFunc->pOwner;
+         pFunc = pFunc->pOwner;
       }
+
       iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
    }
    else
    {
       /* we are in a codeblock */
       iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
+
       if( iVar == 0 )
       {
          /* this is not a current codeblock parameter
@@ -3028,9 +3031,11 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
          BOOL bStatic;
 
          pFunc = pFunc->pOwner;
+
          while( pFunc )
          {
             bStatic = FALSE;
+
             if( ( pFunc->cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
             {
                /* we are in a codeblock used to initialize a static variable -
@@ -3041,6 +3046,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
             }
 
             iVar = hb_compVariableGetPos( pFunc->pLocals, szVarName );
+
             if( iVar )
             {
                if( pFunc->pOwner )
@@ -3089,6 +3095,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                    * variables are not accessible.
                    */
                   iVar = -hb_compVariableGetPos( pOutBlock->pStatics, szVarName );
+
                   if( iVar == 0 )
                   {
                      /* this variable was not referenced yet - add it to the list */
@@ -3105,6 +3112,7 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                       * variable from a codeblock
                       */
                      iVar = -1;  /* first variable */
+
                      if( ! pOutBlock->pStatics )
                      {
                         pOutBlock->pStatics = pVar;
@@ -3114,22 +3122,27 @@ int hb_compLocalGetPos( char * szVarName ) /* returns the order + 1 of a variabl
                         PVAR pLastVar = pOutBlock->pStatics;
 
                         --iVar;   /* this will be at least second variable */
+
                         while( pLastVar->pNext )
                         {
                            pLastVar = pLastVar->pNext;
                            --iVar;
                         }
+
                         pLastVar->pNext = pVar;
                      }
                   }
+
                   return iVar;
                }
             }
+
             pOutBlock = pFunc;
             pFunc = pFunc->pOwner;
          }
       }
    }
+
    return iVar;
 }
 
@@ -3798,6 +3811,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    int iVar;
 
    iVar = hb_compLocalGetPos( szVarName );
+
    if( iVar )
    {
       /* local variable
@@ -3832,6 +3846,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    }
 
    iVar = hb_compStaticGetPos( szVarName, pFunc );
+
    if( iVar )
    {
       /* Static variable declared in current function
@@ -3843,6 +3858,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    }
 
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+
    if( iVar )
    {
       hb_compGenPCode2( HB_P_POPGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
@@ -3851,6 +3867,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    }
 
    iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* field declared in current function
@@ -3861,6 +3878,7 @@ void hb_compGenPopVar( char * szVarName ) /* generates the pcode to pop a value 
    }
 
    iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* Memvar variable declared in current functions
@@ -3989,6 +4007,7 @@ void hb_compGenPushVar( char * szVarName )
    int iVar;
 
    iVar = hb_compLocalGetPos( szVarName );
+
    if( iVar )
    {
       /* local variable
@@ -4010,6 +4029,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* Static variable declared in current function
@@ -4021,6 +4041,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+
    if( iVar )
    {
       hb_compGenPCode2( HB_P_PUSHGLOBAL, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
@@ -4029,6 +4050,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* field declared in current function
@@ -4039,6 +4061,7 @@ void hb_compGenPushVar( char * szVarName )
    }
 
    iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* Memvar variable declared in current functions
@@ -4100,6 +4123,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    int iVar;
 
    iVar = hb_compLocalGetPos( szVarName );
+
    if( iVar )
    {
       /* local variable
@@ -4110,6 +4134,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    iVar = hb_compStaticGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* Static variable declared in current function
@@ -4121,6 +4146,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    iVar = hb_compVariableGetPos( hb_comp_pGlobals, szVarName );
+
    if( iVar )
    {
       hb_compGenPCode2( HB_P_PUSHGLOBALREF, (BYTE)( iVar - 1 ), ( BOOL ) 1 );
@@ -4129,6 +4155,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    iVar = hb_compFieldGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* pushing fields by reference is not allowed */
@@ -4138,6 +4165,7 @@ void hb_compGenPushVarRef( char * szVarName ) /* generates the pcode to push a v
    }
 
    iVar = hb_compMemvarGetPos( szVarName, hb_comp_functions.pLast );
+
    if( iVar )
    {
       /* Memvar variable declared in current functions
@@ -4977,7 +5005,9 @@ static void hb_compOptimizeJumps( void )
    int iPass;
 
    if( ! HB_COMP_ISSUPPORTED(HB_COMPFLAG_OPTJUMP) )
+   {
       return;
+   }
 
    hb_compCodeTraceMarkDead( hb_comp_functions.pLast );
 
@@ -4986,7 +5016,9 @@ static void hb_compOptimizeJumps( void )
       LONG lOffset;
 
       if( iPass == 2 && ! hb_comp_bDebugInfo && hb_comp_bLineNumbers )
+      {
          hb_compStripFuncLines( hb_comp_functions.pLast );
+      }
 
       if( hb_comp_functions.pLast->iJumps > 0 )
       {
@@ -5014,19 +5046,26 @@ static void hb_compOptimizeJumps( void )
             {
                case HB_P_JUMPNEAR:
                   if( ( signed char ) pCode[ ulJumpAddr + 1 ] == 2 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 2, FALSE, FALSE );
+                  }
                   break;
 
                case HB_P_JUMPFALSENEAR:
                case HB_P_JUMPTRUENEAR:
                   if( ( signed char ) pCode[ ulJumpAddr + 1 ] == 2 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 2, TRUE, FALSE );
+                  }
                   break;
 
                case HB_P_JUMP:
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 3 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, FALSE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPNEAR;
@@ -5036,8 +5075,11 @@ static void hb_compOptimizeJumps( void )
 
                case HB_P_JUMPFALSE:
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 3 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, TRUE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPFALSENEAR;
@@ -5047,8 +5089,11 @@ static void hb_compOptimizeJumps( void )
 
                case HB_P_JUMPTRUE:
                   lOffset = HB_PCODE_MKSHORT( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 3 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 3, TRUE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPTRUENEAR;
@@ -5058,8 +5103,11 @@ static void hb_compOptimizeJumps( void )
 
                case HB_P_JUMPFAR:
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 4 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, FALSE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPNEAR;
@@ -5074,8 +5122,11 @@ static void hb_compOptimizeJumps( void )
 
                case HB_P_JUMPFALSEFAR:
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 4 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, TRUE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPFALSENEAR;
@@ -5090,8 +5141,11 @@ static void hb_compOptimizeJumps( void )
 
                case HB_P_JUMPTRUEFAR:
                   lOffset = HB_PCODE_MKINT24( &pCode[ ulJumpAddr + 1 ] );
+
                   if( lOffset == 4 )
+                  {
                      hb_compNOOPfill( hb_comp_functions.pLast, ulJumpAddr, 4, TRUE, FALSE );
+                  }
                   else if( HB_LIM_INT8( lOffset ) )
                   {
                      pCode[ ulJumpAddr ] = HB_P_JUMPTRUENEAR;
@@ -5106,13 +5160,13 @@ static void hb_compOptimizeJumps( void )
             }
 
             /* remove dummy jumps (over dead code) */
-            if( pCode[ ulJumpAddr ] == HB_P_NOOP ||
-                pCode[ ulJumpAddr ] == HB_P_POP )
+            if( pCode[ ulJumpAddr ] == HB_P_NOOP ||  pCode[ ulJumpAddr ] == HB_P_POP )
             {
                if( hb_comp_functions.pLast->iJumps > iJump + 1 )
-                  memmove( &pJumps[ iJump ], &pJumps[ iJump + 1 ],
-                           ( hb_comp_functions.pLast->iJumps - iJump - 1 ) *
-                           sizeof( ULONG ) );
+               {
+                  memmove( &pJumps[ iJump ], &pJumps[ iJump + 1 ], ( hb_comp_functions.pLast->iJumps - iJump - 1 ) * sizeof( ULONG ) );
+               }
+
                hb_comp_functions.pLast->iJumps--;
             }
          }
@@ -5126,7 +5180,9 @@ static void hb_compOptimizeJumps( void )
       }
 
       if( hb_comp_functions.pLast->iNOOPs == 0 )
+      {
          return;
+      }
 
       pNOOPs = hb_comp_functions.pLast->pNOOPs;
 
@@ -5144,7 +5200,9 @@ static void hb_compOptimizeJumps( void )
          plShifts = ( LONG * ) hb_xgrab( ulSize );
 
          for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps; iJump++ )
+         {
             plSizes[ iJump ] = plShifts[ iJump ] = 0;
+         }
 
          /* First Scan NOOPS - Adjust Jump addresses. */
          for( iNOOP = 0; iNOOP < hb_comp_functions.pLast->iNOOPs; iNOOP++ )
@@ -5154,6 +5212,7 @@ static void hb_compOptimizeJumps( void )
             for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps ; iJump++ )
             {
                ulJumpAddr = pJumps[ iJump ];
+
                switch( pCode[ ulJumpAddr ] )
                {
                   case HB_P_JUMPNEAR:
@@ -5209,6 +5268,7 @@ static void hb_compOptimizeJumps( void )
          for( iJump = 0; iJump < hb_comp_functions.pLast->iJumps; iJump++ )
          {
             lOffset = plSizes[ iJump ];
+
             if( lOffset != 0 )
             {
                ulJumpAddr = pJumps[ iJump ];
@@ -5234,8 +5294,10 @@ static void hb_compOptimizeJumps( void )
                      break;
                }
             }
+
             pJumps[ iJump ] -= plShifts[ iJump ];
          }
+
          hb_xfree( plSizes );
          hb_xfree( plShifts );
       }
@@ -5356,6 +5418,7 @@ void hb_compSequenceFinish( ULONG ulStartPos, int bUsualStmts )
                hb_compNOOPadd( hb_comp_functions.pLast, ulStartPos - 1 );
                ++ulStartPos;
             }
+
             hb_comp_ulLastLinePos = ulStartPos - 5;
          }
       }

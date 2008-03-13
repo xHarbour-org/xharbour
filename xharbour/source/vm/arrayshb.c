@@ -1,5 +1,5 @@
 /*
- * $Id: arrayshb.c,v 1.70 2007/04/13 22:09:18 ronpinkas Exp $
+ * $Id: arrayshb.c,v 1.71 2007/09/03 18:08:56 paultucker Exp $
  */
 
 /*
@@ -126,7 +126,7 @@ HB_FUNC( ARRAY )
 
       if( ! bError )
       {
-         hb_arrayNewRagged( &(HB_VM_STACK.Return), 1 );
+         hb_arrayNewRagged( hb_stackReturnItem(), 1 );
       }
    }
 }
@@ -143,11 +143,11 @@ HB_FUNC( AADD )
       {
          if( hb_stackItemFromBase( 2 )->type & HB_IT_BYREF )
          {
-            hb_itemCopy( &(HB_VM_STACK.Return), pValue );
+            hb_itemCopy( hb_stackReturnItem(), pValue );
          }
          else
          {
-            hb_itemForwardValue( &(HB_VM_STACK.Return), pValue );
+            hb_itemForwardValue( hb_stackReturnItem(), pValue );
          }
       }
       else
@@ -179,7 +179,7 @@ HB_FUNC( HB_ARRAYID )  /* for debugging: returns the array's "address" so dual r
 HB_FUNC( HB_THISARRAY )
 {
    PHB_ITEM pArrayID = hb_param( 1, HB_IT_POINTER | HB_IT_NUMINT );
-   PHB_ITEM pArray = &(HB_VM_STACK.Return);
+   PHB_ITEM pArray = hb_stackReturnItem();
 
    hb_itemClear( pArray );
 
@@ -220,11 +220,11 @@ HB_FUNC( ASIZE )
       /* ASize() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
 #ifdef HB_COMPAT_C53 /* From CA-Cl*pper 5.3a */
@@ -247,11 +247,11 @@ HB_FUNC( ASIZEALLOC )
       /* returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
 }
@@ -272,7 +272,7 @@ HB_FUNC( ATAIL )
 
    if( pArray )
    {
-      hb_arrayLast( pArray, &(HB_VM_STACK.Return) );
+      hb_arrayLast( pArray, hb_stackReturnItem() );
    }
 }
 
@@ -306,11 +306,11 @@ HB_FUNC( AINS )
       /* AIns() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
 }
@@ -347,11 +347,11 @@ HB_FUNC( ADEL )
       /* ADel() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
 }
@@ -376,11 +376,11 @@ HB_FUNC( AFILL )
             /* AFill() returns the array itself */
             if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
             {
-               hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+               hb_itemCopy( hb_stackReturnItem(), pArray );
             }
             else
             {
-               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+               hb_itemForwardValue( hb_stackReturnItem(), pArray );
             }
 
             return;
@@ -397,11 +397,11 @@ HB_FUNC( AFILL )
             /* AFill() returns the array itself */
             if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
             {
-               hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+               hb_itemCopy( hb_stackReturnItem(), pArray );
             }
             else
             {
-               hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+               hb_itemForwardValue( hb_stackReturnItem(), pArray );
             }
 
             return;
@@ -425,11 +425,11 @@ HB_FUNC( AFILL )
                /* AFill() returns the array itself */
                if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
                {
-                  hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+                  hb_itemCopy( hb_stackReturnItem(), pArray );
                }
                else
                {
-                  hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+                  hb_itemForwardValue( hb_stackReturnItem(), pArray );
                }
 
                return;
@@ -442,11 +442,11 @@ HB_FUNC( AFILL )
       /* AFill() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
    else
@@ -501,11 +501,11 @@ HB_FUNC( AEVAL )
       /* AEval() returns the array itself */
       if( hb_stackItemFromBase( 1 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pArray );
+         hb_itemCopy( hb_stackReturnItem(), pArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pArray );
       }
    }
    else
@@ -541,11 +541,11 @@ HB_FUNC( ACOPY )
       /* ACopy() returns the target array */
       if( hb_stackItemFromBase( 2 )->type & HB_IT_BYREF )
       {
-         hb_itemCopy( &(HB_VM_STACK.Return), pDstArray );
+         hb_itemCopy( hb_stackReturnItem(), pDstArray );
       }
       else
       {
-         hb_itemForwardValue( &(HB_VM_STACK.Return), pDstArray );
+         hb_itemForwardValue( hb_stackReturnItem(), pDstArray );
       }
    }
 }
@@ -590,7 +590,7 @@ HB_FUNC( HB_AEXPRESSIONS )
    }
 
    HB_VM_STACK.Return.type = HB_IT_NIL;
-   hb_arrayNew( &(HB_VM_STACK.Return), 0 );
+   hb_arrayNew( hb_stackReturnItem(), 0 );
 
    for( i = 0; i < pLine->item.asString.length; i++ )
    {
@@ -1589,7 +1589,7 @@ HB_FUNC( HB_ARRAYTOSTRUCTURE )
 
       Buffer = ArrayToStructure( aVar, aDef, uiAlign, &uiSize );
 
-      hb_itemPutCRaw( &(HB_VM_STACK.Return), (char *) Buffer, uiSize );
+      hb_itemPutCRaw( hb_stackReturnItem(), (char *) Buffer, uiSize );
    }
    else
    {
@@ -1851,7 +1851,7 @@ PHB_ITEM StructureToArray( BYTE* Buffer, unsigned long ulBufferLen, PHB_ITEM aDe
             }
 
             hb_objSendMsg( pStructure, "NALIGN", 0 );
-            // uiNestedAlign = ( &(HB_VM_STACK.Return) )->item.asInteger.value;
+            // uiNestedAlign = ( hb_stackReturnItem() )->item.asInteger.value;
 
             hb_objSendMsg( pStructure, "SizeOf", 0 );
             uiNestedSize = (unsigned int) hb_itemGetNL( &HB_VM_STACK.Return );
@@ -1948,7 +1948,7 @@ HB_FUNC( HB_STRUCTURETOARRAY )
          bAdopt = FALSE;
       }
 
-      hb_itemForwardValue( &(HB_VM_STACK.Return), StructureToArray( Buffer, Structure->item.asString.length, aDef, uiAlign, bAdopt, pRet ) );
+      hb_itemForwardValue( hb_stackReturnItem(), StructureToArray( Buffer, Structure->item.asString.length, aDef, uiAlign, bAdopt, pRet ) );
    }
    else
    {
@@ -2018,7 +2018,7 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
             hb_vmPushLong( ulStart + 1 );
             hb_vmSend( 2 );
 
-            if( HB_IS_LOGICAL( &(HB_VM_STACK.Return) ) && HB_VM_STACK.Return.item.asLogical.value )
+            if( HB_IS_LOGICAL( hb_stackReturnItem() ) && HB_VM_STACK.Return.item.asLogical.value )
             {
                hb_retnl( ulStart + 1 );             // arrays start from 1
                return;
@@ -2141,4 +2141,200 @@ HB_FUNC( RASCAN )  // Reverse AScan... no hashes supported :(
    }
 
    hb_retnl( 0 );
+}
+
+// aSplice( <aArray> [, <nPos>] [, <nCount>] [,<xVal1] [, ...] [, <xValN>]  ) => <aDeleted>
+HB_FUNC( ASPLICE )  // Removes elements and return them as array, optionally add items
+{
+   PHB_ITEM pArray = hb_param( 1, HB_IT_ARRAY );
+
+   if( pArray )
+   {
+      ULONG ulStart, ulRemove, ulIndex, ulAdd;
+      PHB_BASEARRAY pBaseArray = pArray->item.asArray.value, pDestBaseArray;
+      ULONG ulLen = pBaseArray->ulLen;
+      PHB_ITEM pReturn = hb_stackReturnItem();
+
+      if( ulLen == 0 )
+      {
+         hb_arrayNew( pReturn, 0 );
+         return;
+      }
+
+      if( ISNUM( 2 ) )
+      {
+         ulStart = (ULONG) hb_parnl(2);
+      }
+      else
+      {
+         if( hb_pcount() > 3 && ISNUM(3) == FALSE )
+         {
+            ulStart = ulLen + 1;
+         }
+         else
+         {
+            ulStart = ulLen;
+         }
+      }
+
+      if( ISNUM( 3 ) )
+      {
+         ulRemove = (ULONG) hb_parnl(3);
+      }
+      else
+      {
+         if( hb_pcount() > 3 && ulStart == ulLen + 1 )
+         {
+            ulRemove = 0;
+         }
+         else
+         {
+            ulRemove = 1;
+         }
+      }
+
+      if( ulStart == 0 || ulStart > ulLen )
+      {
+         if( ! ( ulStart == ulLen + 1 && hb_pcount() > 3 && ulRemove == 0 ) )
+         {
+            hb_errRT_BASE( EG_ARG, 1003, NULL, hb_stackBaseItem()->item.asSymbol.value->szName, 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+            return;
+         }
+      }
+
+      if( ulStart + ulRemove - 1 > ulLen )
+      {
+         ulRemove = ulLen - ulStart + 1;
+      }
+
+      hb_arrayNew( pReturn, ulRemove );
+      pDestBaseArray = pReturn->item.asArray.value;
+
+      // 0 Based
+      ulStart--;
+
+      for( ulIndex = ulStart; ( ulIndex - ulStart ) < ulRemove; ulIndex++ )
+      {
+         hb_itemForwardValue( pDestBaseArray->pItems +  ( ulIndex - ulStart ), pBaseArray->pItems + ulIndex );
+      }
+
+      if( hb_pcount() > 3 )
+      {
+         ULONG ulNew = 0;
+         ulAdd = hb_pcount() - 3;
+
+         if( ulAdd > ulRemove )
+         {
+            ULONG ulMore = ulAdd - ulRemove;
+            ULONG ulShift = ulLen - (ulStart + ulRemove);
+
+            hb_arraySize( pArray, ulLen + ulMore );
+
+            // Shift right BEFORE adding, so that new items will not override existing values.
+            for( ulIndex = ulLen - 1; ulShift--; ulIndex-- )
+            {
+               hb_itemForwardValue( pBaseArray->pItems + ulIndex + ulMore , pBaseArray->pItems + ulIndex );
+
+               if( ulIndex == 0 )
+               {
+                  break;
+               }
+            }
+
+            // Now insert new values into emptied space.
+            for( ulIndex = ulStart; ++ulNew <= ulAdd; ulIndex++ )
+            {
+               hb_itemForwardValue( pBaseArray->pItems + ulIndex, hb_param( 3 + ulNew, HB_IT_ANY ) );
+            }
+         }
+         else
+         {
+            // Insert over the space emptied by removed items
+            for( ulIndex = ulStart; ++ulNew <= ulAdd; ulIndex++ )
+            {
+               hb_itemForwardValue( pBaseArray->pItems + ulIndex, hb_param( 3 + ulNew, HB_IT_ANY ) );
+            }
+
+            if( ulRemove > ulAdd )
+            {
+               ulRemove -= ulAdd;
+
+               // Shift left to compact the emptied hole.
+               for( ulIndex = ulStart + ulAdd; ulIndex + ulRemove < ulLen; ulIndex++ )
+               {
+                  hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ulIndex + ulRemove );
+               }
+            }
+         }
+      }
+      else
+      {
+         for( ulIndex = ulStart; ulIndex + ulRemove < ulLen; ulIndex++ )
+         {
+            hb_itemForwardValue( pBaseArray->pItems + ulIndex, pBaseArray->pItems + ulIndex + ulRemove );
+         }
+
+         hb_arraySize( pArray, ulLen - ulRemove );
+      }
+   }
+}
+
+// Synonym of aSplice() Xbase++ compatability (extended with optional replacemenet values)
+HB_FUNC( AREMOVE )
+{
+   HB_FUNC_EXEC( ASPLICE )
+}
+
+//aMerge( <aTarget>, <aSource> [, <nPos>] ) => aTarget
+HB_FUNC( AMERGE )
+{
+   PHB_ITEM pArray1 = hb_param( 1, HB_IT_ARRAY );
+   PHB_ITEM pArray2 = hb_param( 2, HB_IT_ARRAY );
+
+   if( pArray1 && pArray2 )
+   {
+      PHB_BASEARRAY pTargetBaseArray = pArray1->item.asArray.value;
+      PHB_BASEARRAY pSourceBaseArray = pArray2->item.asArray.value;
+      ULONG ulLen = pTargetBaseArray->ulLen;
+      ULONG ulAdd = pSourceBaseArray->ulLen;
+      ULONG ulIndex, ulStart;
+
+      hb_arraySize( pArray1, ulLen + ulAdd );
+
+      if( ISNUM(3) )
+      {
+         ULONG ulShift;
+
+         ulStart = hb_parnl(3) - 1;
+         ulShift = ulLen - ulStart;
+
+         if( ulStart > ulLen )
+         {
+            hb_errRT_BASE( EG_ARG, 1003, NULL, "aMerge", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+            return;
+         }
+
+         // Shift right BEFORE merging, so that merged items will not override existing values.
+         for( ulIndex = ulLen - 1; ulShift--; ulIndex-- )
+         {
+            hb_itemForwardValue( pTargetBaseArray->pItems + ulIndex + ulAdd , pTargetBaseArray->pItems + ulIndex );
+         }
+      }
+      else
+      {
+         ulStart = ulLen;
+      }
+
+      for( ulIndex = 0; ulIndex < ulAdd; ulIndex++ )
+      {
+         hb_itemCopy( pTargetBaseArray->pItems + ulStart + ulIndex, pSourceBaseArray->pItems + ulIndex );
+      }
+   }
+   else
+   {
+      hb_errRT_BASE( EG_ARG, 1003, NULL, "aMerge", 3, hb_paramError( 1 ), hb_paramError( 2 ), hb_paramError( 3 ) );
+      return;
+   }
+
+   hb_itemCopy( hb_stackReturnItem(), pArray1 );
 }

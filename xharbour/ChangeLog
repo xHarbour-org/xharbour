@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5952 2008/03/10 17:37:31 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5953 2008/03/12 11:46:37 walito Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,49 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-12 23:52 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * source/compiler/harbour.c
+    * Formatting
+
+  * source/compiler/harbour.sly
+    ! Fixed codeblock to not interfere with unused vars warning
+    ! Fixed END OF BEGIN SEQUENCE to reset FUN_BREAK_CODE
+
+  * source/vm/arrayshb.c
+    + aSplice( <aArray> [, <nPos>] [, <nCount>] [,<xVal1] [, ...] [, <xValN>]  ) => <aDeleted>
+        aSplice() is an array manipulation function which allows bulk removal and/or additions of elements.
+           Args:
+           -----
+           <aArray>    - Array to be processed
+           <nPos>      - Optional Start position of elements to be deleted and/or added.
+                         Default is Last element, unless <nCount> is 0 and <xVal1> present,
+                         in such case values <xVal1-N> will be added after that last existing element.
+           <nCount>    - Optional number of elements to be deleted. Default is 1, unless <nPos> was
+                         not passed or was set to Len( aArray ) + 1, and <xVal1> is present, in such
+                         case the default will be 0.
+
+                         IOW, if both <nPos> and <nCount> are ommited and <xVal1> is passed then
+                         <xVal1-N> will be added to the array without any element being deleted.
+
+           <xVal1...N> - Optional values to be inserted starting at <nPos>
+
+           Returns: <aDeleted> is an array of the deleted elements.
+
+    + aRemove()
+        aRemove is an alias to aSplice() to provide Xbase++ compatability (extended with [,<xVal1> [, ...] [, <xValN>] )
+
+    + aMerge( <aTarget>, <aSource> [, <nPos> ] ) => <aTarget>
+        aMerge() is an array manipulation function which allows to merge the content of any two array.
+           Args:
+           -----
+           <aTarget>   - Array to contain the aggregation of itself and the <aSource> content
+           <aSource>   - Array to be inserted or added into <aTarget>
+           <nPos>      - An optional postion where the inserted array should be inserted. The default is
+                         just beyond the last element of <aTarget>.
+  + tests/tstsplice.prg
+    + Test sample for new aSplce(), aRemove(), aMerge()
+
 
 2008-03-12 09:40 UTC-0200 Walter Negro <anegro/at/overnet.com.ar>
   * include/hbclass.ch
