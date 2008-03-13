@@ -1,5 +1,5 @@
 /*
- * $Id: dbfdbt1.c,v 1.39 2007/05/18 09:36:57 marchuet Exp $
+ * $Id: dbfdbt1.c,v 1.40 2007/10/31 08:35:11 marchuet Exp $
  */
 
 /*
@@ -208,8 +208,8 @@ static const RDDFUNCS dbtTable =
    /* non WorkArea functions       */
    ( DBENTRYP_R )     hb_dbtInit,
    ( DBENTRYP_R )     hb_dbtExit,
-   ( DBENTRYP_RVV )   hb_dbtDrop,
-   ( DBENTRYP_RVV )   hb_dbtExists,
+   ( DBENTRYP_RVVL )  hb_dbtDrop,
+   ( DBENTRYP_RVVL )  hb_dbtExists,
    ( DBENTRYP_RSLV )  hb_dbtRddInfo,
 
    /* Special and reserved methods */

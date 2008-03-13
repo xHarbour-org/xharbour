@@ -1,5 +1,5 @@
 /*
- * $Id: estack.c,v 1.93 2008/01/10 11:27:17 marchuet Exp $
+ * $Id: estack.c,v 1.94 2008/01/20 23:21:36 likewolf Exp $
  */
 
 /*
@@ -540,6 +540,17 @@ HB_EXPORT PHB_ITEM * hb_stackGetBase( int iLevel )
    return NULL;
 }
 
+#undef hb_stackGetActionRequest
+HB_EXPORT USHORT hb_stackGetActionRequest( void )
+{
+   return HB_VM_STACK.uiActionRequest;
+}
+
+#undef hb_stackSetActionRequest
+HB_EXPORT void hb_stackSetActionRequest( USHORT uiAction )
+{
+   HB_VM_STACK.uiActionRequest = uiAction;
+}
 
 /* NOTE: DEBUG function */
 void hb_stackDispLocal( void )
@@ -549,7 +560,9 @@ void hb_stackDispLocal( void )
    HB_TRACE(HB_TR_DEBUG, ("hb_stackDispLocal()"));
 
    printf( hb_conNewLine() );
-   printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"), ( *(HB_VM_STACK.pBase) )->item.asSymbol.value->szName, ( *(HB_VM_STACK.pBase) )->item.asSymbol.lineno );
+   printf( HB_I_("Virtual Machine Stack Dump at %s(%i):"),
+           ( *(HB_VM_STACK.pBase) )->item.asSymbol.value->szName,
+           ( *(HB_VM_STACK.pBase) )->item.asSymbol.lineno );
    printf( hb_conNewLine() );
    printf( "--------------------------" );
 

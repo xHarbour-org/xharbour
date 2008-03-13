@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5954 2008/03/13 04:26:08 ronpinkas Exp $
+ * $Id: ChangeLog,v 1.5955 2008/03/13 10:49:39 likewolf Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,53 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-13 09:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
+  * source/rdd/dbcmd.c
+    ! fixed DBRELATION() called without numeric parameters or with 0 to
+      return first relation expression (Clipper compatible)
+  * source/rdd/workarea.c
+  * source/rdd/dbf1.c
+    ! always restore current workarea in WA EVAL() method
+    ! always use EVAL() method for user codeblocks and macros
+
+  * harbour/source/rdd/dbfntx/dbfntx1.c
+  * harbour/source/rdd/dbfcdx/dbfcdx1.c
+    ! cleanup warnings
+
+  * harbour/source/rdd/wafunc.c
+  * harbour/source/rdd/dbffpt/dbffpt1.c
+  * harbour/source/rdd/hbsix/sxcrypt.c
+    * formatting
+
+  * contrib/rddads/ads1.c
+    ! fixed binary number formatting
+
+    synced with harbour (Coded by Przemyslaw Czerpak)
+
+  * harbour/source/rdd/bmdbfcdx/bmdbfcdx1.c
+    ! cleanup warnings
+
+  * harbour/source/wm/estack.c
+    + Added missing hb_stackGetActionRequest( void ) and hb_stackSetActionRequest( USHORT uiAction )
+
+  * contrib\rdd_ads\ads1.c
+  * include\hbapirdd.h
+  * include\hbrdddbf.h
+  * source\rdd\dbcmd.c
+  * source\rdd\dbcmdx.c
+  * source\rdd\dbf1.c
+  * source\rdd\usrrdd\usrrdd.c
+  * source\rdd\workarea.c
+    + Added ulConnect as 4 parameter, it can be usefull at REMOTE rdd
+      LETO, ADS, ADORDD, SQLRDD
+
+  * source\rdd\usrrdd\rdds\adordd.prg
+    + Added
+      ADO_FORCEREL( nWA )
+      ADO_RELEVAL( nWA, aRelInfo )
+      ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
+      ADO_DROP(  nRdd, cTable, cIndex, ulConnect )
 
 2008-03-13 13:50 UTC+0300 Phil Krylov <phil a t newstar.rinet.ru>
   * config/rules.cf

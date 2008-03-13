@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmd.c,v 1.220 2007/10/31 08:34:49 marchuet Exp $
+ * $Id: dbcmd.c,v 1.221 2008/01/15 10:13:43 marchuet Exp $
  */
 
 /*
@@ -10,7 +10,7 @@
  * Copyright 2004-2007 Przemyslaw Czerpak <druzus / at / priv.onet.pl>
  * www - http://www.harbour-project.org
  *
- * Copyright 2007 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
+ * Copyright 2007-2008 Miguel Angel Marchuet <miguelangel/at/marchuet.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,8 +60,8 @@
  * ordKeyAdd()
  * ordKeyDel()
  * hb_rddIterateWorkAreas()
- * hb_rddGetTempAlias
- * __RDDGETTEMPALIAS
+ * hb_rddGetTempAlias()
+ * hb_RDDGETTEMPALIAS()
  *
  */
 
@@ -2167,7 +2167,8 @@ HB_FUNC( DBRELATION )  /* (<nRelation>) --> cLinkExp */
    if( pArea )
    {
       PHB_ITEM pRelExpr = hb_itemPutC( NULL, "" );
-      SELF_RELTEXT( pArea, hb_parni( 1 ), pRelExpr ) ;
+      USHORT uiRelNo = ( USHORT ) hb_parni( 1 );
+      SELF_RELTEXT( pArea, uiRelNo ? uiRelNo : 1, pRelExpr );
       hb_itemReturnRelease( pRelExpr );
    }
    else
@@ -2578,7 +2579,7 @@ HB_FUNC( DBDROP )
    }
 
    hb_retl( SELF_DROP( pRDDNode, hb_param( 1, HB_IT_STRING ),
-                                 hb_param( 2, HB_IT_STRING ) ) == SUCCESS );
+                                 hb_param( 2, HB_IT_STRING ), hb_parnl( 4 ) ) == SUCCESS );
 }
 
 HB_FUNC( DBEXISTS )
@@ -2603,7 +2604,7 @@ HB_FUNC( DBEXISTS )
    }
 
    hb_retl( SELF_EXISTS( pRDDNode, hb_param( 1, HB_IT_STRING ),
-                                   hb_param( 2, HB_IT_STRING ) ) == SUCCESS );
+                                   hb_param( 2, HB_IT_STRING ), hb_parnl( 4 ) ) == SUCCESS );
 }
 
 

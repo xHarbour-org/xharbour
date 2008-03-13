@@ -1,5 +1,5 @@
 /*
- * $Id: dbf1.c,v 1.183 2008/01/15 10:13:43 marchuet Exp $
+ * $Id: dbf1.c,v 1.184 2008/03/07 20:27:19 likewolf Exp $
  */
 
 /*
@@ -170,8 +170,8 @@ static const RDDFUNCS dbfTable = { ( DBENTRYP_BP ) hb_dbfBof,
                                    ( DBENTRYP_V ) hb_dbfWriteDBHeader,
                                    ( DBENTRYP_R ) hb_dbfInit,
                                    ( DBENTRYP_R ) hb_dbfExit,
-                                   ( DBENTRYP_RVV ) hb_dbfDrop,
-                                   ( DBENTRYP_RVV ) hb_dbfExists,
+                                   ( DBENTRYP_RVVL ) hb_dbfDrop,
+                                   ( DBENTRYP_RVVL ) hb_dbfExists,
                                    ( DBENTRYP_RSLV ) hb_dbfRddInfo,
                                    ( DBENTRYP_SVP ) hb_dbfWhoCares
                                  };
@@ -1143,7 +1143,20 @@ HB_EXPORT ERRCODE hb_dbfGetMemoData( DBFAREAP pArea, USHORT uiIndex,
             if( bByte >= '0' && bByte <= '9' )
                ulValue = ulValue * 10 + ( bByte - '0' );
             else if( bByte != ' ' || ulValue )
-               return FAILURE;
+            {
+               PHB_ITEM pError = hb_errNew();
+               ERRCODE uiError;
+
+               hb_errPutGenCode( pError, EG_CORRUPTION );
+               hb_errPutSubCode( pError, EDBF_CORRUPT );
+               hb_errPutDescription( pError, hb_langDGetErrorDesc( EG_CORRUPTION ) );
+               hb_errPutFileName( pError, pArea->szDataFileName );
+               hb_errPutFlags( pError, EF_CANDEFAULT );
+               uiError = SELF_ERROR( ( AREAP ) pArea, pError );
+               hb_itemRelease( pError );
+
+               return uiError == E_DEFAULT ? SUCCESS : FAILURE;
+            }
          }
          *pulBlock = ulValue;
       }
@@ -3950,7 +3963,6 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
          dbFieldInfo.uiFlags = pField->bFieldFlags;
       else
          dbFieldInfo.uiFlags = 0;
-         
       switch( pField->bType )
       {
          case 'C':
@@ -4099,7 +4111,7 @@ static ERRCODE hb_dbfOpen( DBFAREAP pArea, LPDBOPENINFO pOpenInfo )
             dbFieldInfo.uiFlags |= HB_FF_BINARY;
             pArea->fHasMemo = TRUE;
             break;
-            
+
          case '0':
              /* NULLABLE and VARLENGTH support 
                if( memcmp( dbFieldInfo.atomName, "_NullFlags", 10 ) == 0 )
@@ -4314,7 +4326,8 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
          if( ++ulEvery >= ulUserEvery )
          {
             ulEvery = 0;
-            hb_vmEvalBlock( pBlock );
+            if( SELF_EVALBLOCK( ( AREAP ) pArea, pBlock ) != SUCCESS )
+               return FAILURE;
          }
       }
 
@@ -4338,7 +4351,8 @@ static ERRCODE hb_dbfPack( DBFAREAP pArea )
    /* Execute the Code Block for pending record */
    if( pBlock && ulEvery > 0 )
    {
-      hb_vmEvalBlock( pBlock );
+      if( SELF_EVALBLOCK( ( AREAP ) pArea, pBlock ) != SUCCESS )
+         return FAILURE;
    }
 
    if( pArea->ulRecCount != ulRecOut )
@@ -4395,7 +4409,7 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    ulRecNo = 1;
    if( pSortInfo->dbtri.dbsci.itmRecID )
    {
-      uiError = SELF_GOTO( ( AREAP ) pArea, hb_itemGetNL( pSortInfo->dbtri.dbsci.itmRecID ) );
+      uiError = SELF_GOTOID( ( AREAP ) pArea, pSortInfo->dbtri.dbsci.itmRecID );
       bMoreRecords = bLimited = TRUE;
    }
    else if( pSortInfo->dbtri.dbsci.lNext )
@@ -4417,10 +4431,24 @@ static ERRCODE hb_dbfSort( DBFAREAP pArea, LPDBSORTINFO pSortInfo )
    while( uiError == SUCCESS && !pArea->fEof && bMoreRecords )
    {
       if( pSortInfo->dbtri.dbsci.itmCobWhile )
-         bMoreRecords = hb_itemGetL( hb_vmEvalBlock( pSortInfo->dbtri.dbsci.itmCobWhile ) );
+      {
+         if( SELF_EVALBLOCK( ( AREAP ) pArea, pSortInfo->dbtri.dbsci.itmCobWhile ) != SUCCESS )
+         {
+            hb_dbQSortExit( &dbQuickSort );
+            return FAILURE;
+         }
+         bMoreRecords = hb_itemGetL( pArea->valResult );
+      }
 
       if( bMoreRecords && pSortInfo->dbtri.dbsci.itmCobFor )
-         bValidRecord = hb_itemGetL( hb_vmEvalBlock( pSortInfo->dbtri.dbsci.itmCobFor ) );
+      {
+         if( SELF_EVALBLOCK( ( AREAP ) pArea, pSortInfo->dbtri.dbsci.itmCobFor ) != SUCCESS )
+         {
+            hb_dbQSortExit( &dbQuickSort );
+            return FAILURE;
+         }
+         bValidRecord = hb_itemGetL( pArea->valResult );
+      }
       else
          bValidRecord = bMoreRecords;
 
@@ -5279,14 +5307,14 @@ static ERRCODE hb_dbfWriteDBHeader( DBFAREAP pArea )
    return errCode;
 }
 
-static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
+static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnection )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile, * szExt;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE, fResult = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p,%p,%p)", pRDD, pItemTable, pItemIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfDrop(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnection));
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )
@@ -5361,14 +5389,14 @@ static ERRCODE hb_dbfDrop( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIn
    return fResult ? SUCCESS : FAILURE;
 }
 
-static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex )
+static ERRCODE hb_dbfExists( LPRDDNODE pRDD, PHB_ITEM pItemTable, PHB_ITEM pItemIndex, ULONG ulConnect )
 {
    char szFileName[ _POSIX_PATH_MAX + 1 ], * szFile;
    PHB_ITEM pFileExt = NULL;
    PHB_FNAME pFileName;
    BOOL fTable = FALSE;
 
-   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p)", pRDD, pItemTable, pItemIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_dbfExists(%p,%p,%p,%ul)", pRDD, pItemTable, pItemIndex, ulConnect));
 
    szFile = hb_itemGetCPtr( pItemIndex );
    if( !szFile[ 0 ] )

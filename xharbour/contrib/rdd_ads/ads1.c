@@ -1,5 +1,5 @@
 /*
- * $Id: ads1.c,v 1.126 2007/11/05 10:26:49 ronpinkas Exp $
+ * $Id: ads1.c,v 1.127 2007/11/27 23:47:06 ronpinkas Exp $
  */
 
 /*
@@ -69,13 +69,16 @@
 
 #include <ctype.h>
 
+/*
+ * This code is a workaround for not working HB_IMPORT attribute
+ * it should not be necessary
+ */
 #ifndef HB_SET_IMPORT
    static HB_SET_STRUCT * s_hb_set_ptr = NULL;
-
-   #define hb_set              ( * s_hb_set_ptr )
-   #define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
+#  define hb_set              ( * s_hb_set_ptr )
+#  define HB_ADS_SET_INIT()   do { s_hb_set_ptr = hb_GetSetStructPtr(); } while(0)
 #else
-   #define HB_ADS_SET_INIT()   do { } while(0)
+#  define HB_ADS_SET_INIT()   do { } while(0)
 #endif
 
 static int s_iSetListenerHandle = 0;
@@ -887,7 +890,7 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    UNSIGNED8 *pszKey;
    double dValue;
    UNSIGNED8  *pucSavedKey = NULL;
-   UNSIGNED16 u16SavedKeyLen = ADS_MAX_KEY_LENGTH;  // this may be longer than the actual seek expression, so we don't pass it along
+   UNSIGNED16 u16SavedKeyLen = ADS_MAX_KEY_LENGTH;  /* this may be longer than the actual seek expression, so we don't pass it along */
 
    HB_TRACE(HB_TR_DEBUG, ("adsSeek(%p, %d, %p, %d)", pArea, bSoftSeek, pKey, bFindLast));
 
@@ -979,7 +982,7 @@ static ERRCODE adsSeek( ADSAREAP pArea, BOOL bSoftSeek, PHB_ITEM pKey, BOOL bFin
    if( pArea->fBof && !pArea->fEof )
    {
       ERRCODE errCode = SELF_GOTO( ( AREAP ) pArea, 0 );
-      //ERRCODE errCode = SELF_GOTOP( ( AREAP ) pArea );
+      /* ERRCODE errCode = SELF_GOTOP( ( AREAP ) pArea ); */
       pArea->fBof = FALSE;
       return errCode;
    }
@@ -1858,7 +1861,6 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
    LPFIELD    pField;
    BYTE *     pBuffer = pArea->pRecord;
    UNSIGNED32 u32Length;
-   DOUBLE     dVal = 0;
    UNSIGNED32 ulRetVal;
 
    HB_TRACE(HB_TR_DEBUG, ("adsGetValue(%p, %hu, %p)", pArea, uiIndex, pItem));
@@ -1901,69 +1903,106 @@ static ERRCODE adsGetValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          hb_itemPutCL( pItem, ( char * ) pBuffer, pField->uiLen );
          break;
 
-      /* TODO: clean the code below, Druzus */
-      case HB_FT_LONG:
-      case HB_FT_INTEGER:
-      case HB_FT_DOUBLE:
-      case HB_FT_TIME:
       case HB_FT_TIMESTAMP:
       case HB_FT_MODTIME:
-      case HB_FT_ROWVER:
-      case HB_FT_AUTOINC:
-      case HB_FT_CURDOUBLE:
+      case HB_FT_TIME:
          u32Length = pArea->maxFieldLen + 1;
-         if ( pField->uiTypeExtended == ADS_TIMESTAMP ||
-              pField->uiTypeExtended == ADS_MODTIME ||
-              pField->uiTypeExtended == ADS_TIME )
-         {
-            ulRetVal = AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE );
-//            ulRetVal = AdsGetFieldRaw( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length );
-//            dVal = (double) *pBuffer;
-//            TraceLog( NULL, "u32Length %d  float %f  pBuffer: %d \n", u32Length , (double) *pBuffer, (double) *pBuffer );
-//            TraceLog( NULL, "u32Length %d  pBuffer: %s \n", u32Length , pBuffer );
-         }
-         else
-         {
-            ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
-         }
-
+         ulRetVal = AdsGetField( pArea->hTable, ADSFIELD( uiIndex ), pBuffer, &u32Length, ADS_NONE );
          if( ulRetVal == AE_NO_CURRENT_RECORD )
          {
             memset( pBuffer, ' ', pArea->maxFieldLen + 1 );
             pArea->fEof = TRUE;
-            dVal = 0.0;
          }
+         hb_itemPutCL( pItem, ( char * ) pBuffer, u32Length );
+         break;
 
-         if( pField->uiDec )
+      case HB_FT_INTEGER:
+      {
+         SIGNED32 lVal = 0;
+         ulRetVal = AdsGetLong( pArea->hTable, ADSFIELD( uiIndex ), &lVal );
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
+         {
+            lVal = 0;
+            pArea->fEof = TRUE;
+         }
+         if( pField->uiTypeExtended == ADS_SHORTINT )
+            hb_itemPutNILen( pItem, ( int ) lVal, 6 );
+         else
+            hb_itemPutNLLen( pItem, ( LONG ) lVal, 11 );
+         break;
+      }
+#ifndef HB_LONG_LONG_OFF
+      case HB_FT_AUTOINC:
+      {
+         SIGNED64 qVal = 0;
+         ulRetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
+         {
+            qVal = 0;
+            pArea->fEof = TRUE;
+         }
+         hb_itemPutNIntLen( pItem, ( HB_LONG ) qVal, 10 );
+         break;
+      }
+      case HB_FT_ROWVER:
+      {
+         SIGNED64 qVal = 0;
+         ulRetVal = AdsGetLongLong( pArea->hTable, ADSFIELD( uiIndex ), &qVal );
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
+         {
+            qVal = 0;
+            pArea->fEof = TRUE;
+         }
+         hb_itemPutNIntLen( pItem, ( HB_LONG ) qVal, 20 );
+         break;
+      }
+#else
+      case HB_FT_AUTOINC:
+      case HB_FT_ROWVER:
+      {
+         DOUBLE   dVal = 0;
+
+         ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
+         {
+            dVal = 0.0;
+            pArea->fEof = TRUE;
+         }
+         hb_itemPutNLen( pItem, dVal,
+                         pField->uiTypeExtended == HB_FT_AUTOINC ? 10 : 20, 0 );
+      }
+#endif
+      case HB_FT_LONG:
+      case HB_FT_DOUBLE:
+      case HB_FT_CURDOUBLE:
+      {
+         DOUBLE   dVal = 0;
+
+         ulRetVal = AdsGetDouble( pArea->hTable, ADSFIELD( uiIndex ), &dVal );
+         if( ulRetVal == AE_NO_CURRENT_RECORD )
+         {
+            dVal = 0.0;
+            pArea->fEof = TRUE;
+         }
+         if( pField->uiTypeExtended == ADS_CURDOUBLE ||
+             pField->uiTypeExtended == ADS_DOUBLE )
          {
             hb_itemPutNDLen( pItem, dVal,
-                           ( int ) pField->uiLen - ( ( int ) pField->uiDec + 1 ),
-                           ( int ) pField->uiDec );
+                             20 - ( pField->uiDec > 0 ? ( pField->uiDec + 1 ) : 0 ),
+                             ( int ) pField->uiDec );
+         }
+         else if( pField->uiDec )
+         {
+            hb_itemPutNDLen( pItem, dVal,
+                             ( int ) pField->uiLen - ( pField->uiDec + 1 ),
+                             ( int ) pField->uiDec );
          }
          else
          {
-            switch ( pField->uiTypeExtended )
-            {
-               case ADS_CURDOUBLE :
-               case ADS_DOUBLE :
-                  hb_itemPutNDLen( pItem, dVal,
-                              ( int ) pField->uiLen,
-                              ( int ) pField->uiDec );
-                  break;
-               /*case ADS_AUTOINC:
-                  hb_itemPutNLen( pItem, dVal, ( int ) 10 , (int) 0 );
-                  break; */
-               case ADS_TIMESTAMP:
-               case ADS_MODTIME:
-               case ADS_TIME:
-                  hb_itemPutCL( pItem, ( char * ) pBuffer, u32Length );
-                  break;
-               default:
-                  hb_itemPutNLen( pItem, dVal, ( int ) pField->uiLen, (int) 0 );
-            }
+            hb_itemPutNLen( pItem, dVal, ( int ) pField->uiLen, 0 );
          }
          break;
-
+      }
       case HB_FT_DATE:
       {
          SIGNED32 lDate;
@@ -2216,9 +2255,9 @@ static ERRCODE adsPutValue( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          {
             bTypeError = FALSE;
             ulRetVal = AdsSetDouble( pArea->hTable, ADSFIELD( uiIndex ), hb_itemGetND( pItem ) );
-            // write to autoincrement field will gen error 5066
-            //   if( pField->uiTypeExtended == ADS_AUTOINC )
-            //AdsShowError( (UNSIGNED8 *) "Error" );
+            /* write to autoincrement field will gen error 5066
+               if( pField->uiTypeExtended == ADS_AUTOINC )
+                  AdsShowError( (UNSIGNED8 *) "Error" ); */
          }
          break;
 
@@ -2702,7 +2741,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          }
          if( !u16Count )
          {
-            hb_arrayNew( pItem, 0 );    // don't return nil
+            hb_arrayNew( pItem, 0 );    /* don't return nil */
          }
 
          break;
@@ -2775,7 +2814,7 @@ static ERRCODE adsInfo( ADSAREAP pArea, USHORT uiIndex, PHB_ITEM pItem )
          break;
 
 
-      // unsupported options
+      /* unsupported options */
       case DBI_FILEHANDLE     :   /* Handle of opened file */
       case DBI_VALIDBUFFER    :   /* Is the current buffer valid */
       case DBI_GETSCOPE       :   /* Locate codeblock */
@@ -3786,7 +3825,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
       case DBOI_POSITION :
          if ( pOrderInfo->itmNewVal && HB_IS_NUMERIC( pOrderInfo->itmNewVal ) )
          {
-            // TODO: results will be wrong if filter is not valid for ADS server
+            /* TODO: results will be wrong if filter is not valid for ADS server */
             AdsGotoTop( hIndex );
             AdsSkip( hIndex, hb_itemGetNL( pOrderInfo->itmNewVal ) - 1 );
             hb_adsUpdateAreaFlags( pArea );
@@ -3974,7 +4013,7 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
                   AdsGetRecordCount( hIndex, ADS_RESPECTFILTERS, &u32 );
                }
             }
-            else                        // no filter set
+            else                        /* no filter set */
             {
                AdsGetRecordCount( hIndex, ADS_RESPECTSCOPES, &u32 );
             }
@@ -4119,21 +4158,21 @@ static ERRCODE adsOrderInfo( ADSAREAP pArea, USHORT uiIndex, LPDBORDERINFO pOrde
          break;
 
 
-/* Unsupported TODO:
+/*
+Unsupported TODO:
 
-DBOI_FILEHANDLE
-DBOI_SETCODEBLOCK
-DBOI_KEYDEC
-DBOI_HPLOCKING
-DBOI_LOCKOFFSET
-DBOI_KEYSINCLUDED
-DBOI_SKIPUNIQUE
- // these are really global settings:
-DBOI_STRICTREAD
-DBOI_OPTIMIZE
-DBOI_AUTOORDER
-DBOI_AUTOSHARE
-
+   DBOI_FILEHANDLE
+   DBOI_SETCODEBLOCK
+   DBOI_KEYDEC
+   DBOI_HPLOCKING
+   DBOI_LOCKOFFSET
+   DBOI_KEYSINCLUDED
+   DBOI_SKIPUNIQUE
+these are really global settings:
+   DBOI_STRICTREAD
+   DBOI_OPTIMIZE
+   DBOI_AUTOORDER
+   DBOI_AUTOSHARE
 */
 
       case DBOI_AUTOOPEN :
@@ -4562,7 +4601,13 @@ static ERRCODE adsExit( LPRDDNODE pRDD )
             hb_setListenerRemove( s_iSetListenerHandle ) ;
             s_iSetListenerHandle = 0;
          }
+#ifdef __BORLANDC__
+   #pragma option push -w-pro
+#endif
          AdsApplicationExit();
+#ifdef __BORLANDC__
+   #pragma option pop
+#endif
       }
    }
 
@@ -4717,8 +4762,8 @@ static const RDDFUNCS adsTable = { ( DBENTRYP_BP ) adsBof,
                                    ( DBENTRYP_V ) adsWriteDBHeader,
                                    ( DBENTRYP_R ) adsInit,
                                    ( DBENTRYP_R ) adsExit,
-                                   ( DBENTRYP_RVV ) adsDrop,
-                                   ( DBENTRYP_RVV ) adsExists,
+                                   ( DBENTRYP_RVVL ) adsDrop,
+                                   ( DBENTRYP_RVVL ) adsExists,
                                    ( DBENTRYP_RSLV ) adsRddInfo,
                                    ( DBENTRYP_SVP ) adsWhoCares
                                  };

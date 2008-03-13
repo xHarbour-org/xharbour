@@ -1,5 +1,5 @@
 /*
- * $Id: adordd.prg,v 1.12 2008/01/10 11:18:03 marchuet Exp $
+ * $Id: adordd.prg,v 1.13 2008/01/15 10:13:45 marchuet Exp $
  */
 
 /*
@@ -26,6 +26,8 @@
  *  ADO_FIELDNAME( nWA, nField )
  *  ADO_FORCEREL( nWA )
  *  ADO_RELEVAL( nWA, aRelInfo )
+ *  ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
+ *  ADO_DROP(  nRdd, cTable, cIndex, ulConnect ) 
  *
  * www - http://www.xharbour.org
  *
@@ -109,6 +111,11 @@
 
 #define WA_SIZE       16
 
+#define RDD_CONNECTION 1
+#define RDD_CATALOG    2
+
+#define RDD_SIZE       2
+
 ANNOUNCE ADORDD
 
 static bError, s_cTableName, s_cEngine, s_cServer, s_cUserName, s_cPassword, s_cQuery := ""
@@ -125,7 +132,7 @@ return If( nPos <= Len( aTokens ), aTokens[ nPos ], "" )
 
 STATIC FUNCTION ADO_INIT( nRDD )
 
-   LOCAL aRData
+   LOCAL aRData := Array( RDD_SIZE )
 
    USRRDD_RDDDATA( nRDD, aRData )
 
@@ -391,6 +398,13 @@ STATIC FUNCTION ADO_OPEN( nWA, aOpenInfo )
    CATCH
    END TRY
 
+   IF Empty( aWAData[ WA_CATALOG ] )
+      TRY
+         aWAData[ WA_CATALOG ] := aWAData[ WA_CONNECTION ]:OpenSchema( adSchemaIndexes )
+      CATCH
+      END TRY
+   ENDIF
+
    aWAData[ WA_RECORDSET ] := oRecordSet
    aWAData[ WA_BOF ] := aWAData[ WA_EOF ] := .F.
 
@@ -525,23 +539,29 @@ STATIC FUNCTION ADO_SKIPRAW( nWA, nToSkip )
    LOCAL aWAData    := USRRDD_AREADATA( nWA )
    LOCAL oRecordSet := aWAData[ WA_RECORDSET ]
    LOCAL nResult    := SUCCESS
-/*
-   IF nRecords != 0
+
+   IF ! Empty( aWAData[ WA_PENDINGREL ] )
+      IF ADO_FORCEREL( nWA ) != SUCCESS
+         RETURN FAILURE
+      ENDIF
+   ENDIF
+
+   IF nToSkip != 0
       IF aWAData[ WA_EOF ]
-         IF nRecords > 0
+         IF nToSkip > 0
             RETURN SUCCESS
          ENDIF
          ADO_GOBOTTOM( nWA )
-         ++nRecords
+         ++nToSkip
       ENDIF
       TRY
          IF aWAData[WA_CONNECTION]:State != adStateClosed
-            IF nRecords < 0 .AND. oRecordSet:AbsolutePosition <= -nRecords
+            IF nToSkip < 0 .AND. oRecordSet:AbsolutePosition <= -nToSkip
                oRecordSet:MoveFirst()
                aWAData[ WA_BOF ] := .T.
                aWAData[ WA_EOF ] := oRecordSet:EOF
-            ELSEIF nRecords != 0
-               oRecordSet:Move( nRecords )
+            ELSEIF nToSkip != 0
+               oRecordSet:Move( nToSkip )
                aWAData[ WA_BOF ] := .F.
                aWAData[ WA_EOF ] := oRecordSet:EOF
             ENDIF
@@ -552,42 +572,7 @@ STATIC FUNCTION ADO_SKIPRAW( nWA, nToSkip )
          nResult := FAILURE
       END
    ENDIF
-*/
-//-----------------------------
-   LOCAL lBof, lEof
 
-   IF ! Empty( aWAData[ WA_PENDINGREL ] )
-      IF ADO_FORCEREL( nWA ) != SUCCESS
-         RETURN FAILURE
-      ENDIF
-   ENDIF
-
-   TRY
-      IF nToSkip == 0
-
-         /* Save flags */
-         lBof = aWAData[ WA_BOF ]
-         lEof = aWAData[ WA_EOF ]
-
-         nResult := ADO_GOTO( nWA, oRecordSet:AbsolutePosition );
-
-         /* Restore flags */
-         aWAData[ WA_BOF ] := lBof
-         aWAData[ WA_EOF ] := lEof
-
-      ELSEIF nToSkip < 0 .AND. ( -nToSkip ) >= oRecordSet:AbsolutePosition
-
-         nResult := ADO_GOTO( nWA, 1 )
-         aWAData[ WA_BOF ] = TRUE
-
-      ELSE
-
-         nResult := ADO_GOTO( nWA, oRecordSet:AbsolutePosition + nToSkip )
-
-      ENDIF
-   CATCH
-      nResult := FAILURE
-   END TRY
 
 RETURN nResult
 
@@ -878,6 +863,10 @@ STATIC FUNCTION ADO_FIELDINFO( nWA, nField, nInfoType, uInfo )
         ELSE
             uInfo := 0
         ENDIF
+   CASE nInfoType == DBS_FLAG
+        uInfo := 0
+   CASE nInfoType == DBS_STEP
+        uInfo := 0
    OTHERWISE
        RETURN FAILURE
    ENDCASE
@@ -1194,6 +1183,50 @@ STATIC FUNCTION ADO_EVALBLOCK( nArea, bBlock, uResult )
 
 RETURN SUCCESS
 
+STATIC FUNCTION ADO_EXISTS( nRdd, cTable, cIndex, ulConnect )
+   LOCAL n
+   LOCAL lRet := FAILURE
+   LOCAL aRData := USRRDD_RDDDATA( nRDD )
+
+   IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
+      TRY
+         n := aRData[ WA_CATALOG ]:Tables( cTable )
+         lRet := SUCCESS
+      CATCH
+      END TRY
+      IF ! Empty( cIndex )
+         TRY
+            n := aRData[ WA_CATALOG ]:Tables( cTable ):Indexes( cIndex )
+            lRet := SUCCESS
+         CATCH
+         END TRY
+      ENDIF
+   ENDIF
+
+RETURN lRet
+
+STATIC FUNCTION ADO_DROP( nRdd, cTable, cIndex, ulConnect )
+   LOCAL n
+   LOCAL lRet := FAILURE
+   LOCAL aRData := USRRDD_RDDDATA( nRDD )
+
+   IF ! Empty( cTable ) .AND. ! Empty( aRData[ WA_CATALOG ] )
+      TRY
+         n := aRData[ WA_CATALOG ]:Tables:Delete( cTable )
+         lRet := SUCCESS
+      CATCH
+      END TRY
+      IF ! Empty( cIndex )
+         TRY
+            n := aRData[ WA_CATALOG ]:Tables( cTable ):Indexes:Delete( cIndex )
+            lRet := SUCCESS
+         CATCH
+         END TRY
+      ENDIF
+   ENDIF
+
+RETURN lRet
+
 STATIC FUNCTION ADO_SEEK( nWA, lSoftSeek, cKey, lFindLast )
 
    LOCAL oRecordSet := USRRDD_AREADATA( nWA )[ WA_RECORDSET ]
@@ -1322,6 +1355,8 @@ FUNCTION ADORDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID )
    aADOFunc[ UR_ORDLSTCLEAR ]  := ( @ADO_ORDLSTCLEAR() )
    aADOFunc[ UR_EVALBLOCK ]    := ( @ADO_EVALBLOCK() )
    aADOFunc[ UR_SEEK ]         := ( @ADO_SEEK() )
+   aADOFunc[ UR_EXISTS ]       := ( @ADO_EXISTS() )
+   aADOFunc[ UR_DROP ]         := ( @ADO_DROP() )
 
 RETURN USRRDD_GETFUNCTABLE( pFuncCount, pFuncTable, pSuperTable, nRddID, cSuperRDD,;
                             aADOFunc )

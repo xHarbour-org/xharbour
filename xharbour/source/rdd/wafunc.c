@@ -1,5 +1,5 @@
 /*
- * $Id: wafunc.c,v 1.9 2008/01/10 11:18:02 marchuet Exp $
+ * $Id: wafunc.c,v 1.10 2008/01/10 12:28:55 marchuet Exp $
  */
 
 /*
@@ -144,7 +144,7 @@ HB_EXPORT ERRCODE hb_rddGetTempAlias( char * szAliasTmp )
 {
    int i, iArea;
 
-   for( i = 1 ; i < 1000 ; i++ )
+   for( i = 1; i < 1000; i++ )
    {
       snprintf( szAliasTmp, 11, "__HBTMP%03i", i);
       if( hb_rddGetAliasNumber( szAliasTmp, &iArea ) != SUCCESS )

@@ -1,5 +1,5 @@
 /*
- * $Id: usrrdd.c,v 1.12 2008/01/10 11:18:03 marchuet Exp $
+ * $Id: usrrdd.c,v 1.13 2008/01/15 16:20:40 marchuet Exp $
  */
 
 /*
@@ -2539,32 +2539,34 @@ static ERRCODE hb_usrWriteDBHeader( AREAP pArea )
  * non WorkArea functions
  */
 
-static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex )
+static ERRCODE hb_usrDrop( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULONG ulConnect )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrDrop(%p,%p,%p)", pRDD, pTable, pIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrDrop(%p,%p,%p,%ul)", pRDD, pTable, pIndex, ulConnect));
 
    if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_DROP ) )
-      return SUPER_DROP( pRDD, pTable, pIndex );
+      return SUPER_DROP( pRDD, pTable, pIndex, ulConnect );
 
    hb_vmPushInteger( pRDD->rddID );
    hb_vmPush( pTable );
    hb_vmPush( pIndex );
-   hb_vmDo( 3 );
+   hb_vmPushLong( ulConnect );   
+   hb_vmDo( 4 );
 
    return hb_usrReturn();
 }
 
-static ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex )
+static ERRCODE hb_usrExists( LPRDDNODE pRDD, PHB_ITEM pTable, PHB_ITEM pIndex, ULONG ulConnect )
 {
-   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p)", pRDD, pTable, pIndex));
+   HB_TRACE(HB_TR_DEBUG, ("hb_usrExists(%p,%p,%p,%ul)", pRDD, pTable, pIndex, ULONG ulConnect));
 
    if( !hb_usrPushMethod( SELF_USRNODE( pRDD )->pMethods, UR_EXISTS ) )
-      return SUPER_EXISTS( pRDD, pTable, pIndex );
+      return SUPER_EXISTS( pRDD, pTable, pIndex, ulConnect );
 
    hb_vmPushInteger( pRDD->rddID );
    hb_vmPush( pTable );
    hb_vmPush( pIndex );
-   hb_vmDo( 3 );
+   hb_vmPushLong( ulConnect );      
+   hb_vmDo( 4 );
 
    return hb_usrReturn();
 }
@@ -2704,8 +2706,8 @@ static const RDDFUNCS usrFuncTable =
    /* non WorkArea functions */
    /* ( DBENTRYP_R )    */ NULL, /* RDD */    /* Init    */
    /* ( DBENTRYP_R )    */ NULL, /* RDD */    /* Exit    */
-   /* ( DBENTRYP_RVV )  */ hb_usrDrop,        /* Drop    */
-   /* ( DBENTRYP_RVV )  */ hb_usrExists,      /* Exists  */
+   /* ( DBENTRYP_RVVL ) */ hb_usrDrop,        /* Drop    */
+   /* ( DBENTRYP_RVVL ) */ hb_usrExists,      /* Exists  */
    /* ( DBENTRYP_RSLV ) */ hb_usrRddInfo,     /* RddInfo */
 
    /* Special and reserved methods */
@@ -2830,8 +2832,8 @@ static const RDDFUNCS rddFuncTable =
    /* non WorkArea functions */
    /* ( DBENTRYP_R )    */ hb_usrInit,        /* Init    */
    /* ( DBENTRYP_R )    */ hb_usrExit,        /* Exit    */
-   /* ( DBENTRYP_RVV )  */ NULL,              /* Drop    */
-   /* ( DBENTRYP_RVV )  */ NULL,              /* Exists  */
+   /* ( DBENTRYP_RVVL ) */ NULL,              /* Drop    */
+   /* ( DBENTRYP_RVVL ) */ NULL,              /* Exists  */
    /* ( DBENTRYP_RSLV ) */ NULL,              /* RddInfo */
 
    /* Special and reserved methods */
@@ -4254,7 +4256,7 @@ HB_FUNC_UR_SUPER( DROP )
 
    if( pRDD )
       hb_retni( SUPER_DROP( pRDD, hb_param( 2, HB_IT_ANY ),
-                                  hb_param( 3, HB_IT_ANY ) ) );
+                                  hb_param( 3, HB_IT_ANY ), hb_parnl( 4 ) ) );
 }
 
 HB_FUNC_UR_SUPER( EXISTS )
@@ -4263,7 +4265,7 @@ HB_FUNC_UR_SUPER( EXISTS )
 
    if( pRDD )
       hb_retni( SUPER_EXISTS( pRDD, hb_param( 2, HB_IT_ANY ),
-                                    hb_param( 3, HB_IT_ANY ) ) );
+                                    hb_param( 3, HB_IT_ANY ), hb_parnl( 4 ) ) );
 }
 
 HB_FUNC_UR_SUPER( RDDINFO )

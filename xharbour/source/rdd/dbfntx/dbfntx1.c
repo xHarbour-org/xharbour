@@ -1,5 +1,5 @@
 /*
- * $Id: dbfntx1.c,v 1.174 2007/10/31 08:35:11 marchuet Exp $
+ * $Id: dbfntx1.c,v 1.175 2007/11/20 16:57:12 marchuet Exp $
  */
 
 /*
@@ -856,15 +856,15 @@ static void hb_ntxTagCheckBuffers( LPTAGINFO pTag )
    ULONG i;
 
    if( ( pTag->HdrChanged || pTag->Owner->Changed ) && !pTag->Owner->lockWrite )
-      hb_errInternal( 9999, "hb_ntxTagCheckBuffers: tag modified in unlocked index", "", "" );
+      hb_errInternal( 9301, "hb_ntxTagCheckBuffers: tag modified in unlocked index", "", "" );
 
    for( i = 0; i < pTag->Owner->ulPages; i++ )
    {
       pPage = pTag->Owner->pages[ i ];
       if( pPage->Changed && !pTag->Owner->lockWrite )
-         hb_errInternal( 9999, "hb_ntxTagCheckBuffers: page modified in unlocked index", "", "" );
+         hb_errInternal( 9302, "hb_ntxTagCheckBuffers: page modified in unlocked index", "", "" );
       if( pPage->iUsed )
-         hb_errInternal( 9999, "hb_ntxTagCheckBuffers: page still allocated", "", "" );
+         hb_errInternal( 9303, "hb_ntxTagCheckBuffers: page still allocated", "", "" );
    }
 }
 
@@ -886,7 +886,7 @@ static void hb_ntxPageCheckKeys( LPPAGEINFO pPage, LPTAGINFO pTag, int iPos, int
                 u - 1, pTag->KeyLength, hb_ntxGetKeyVal( pPage, u - 1 ),
                 u, pTag->KeyLength, hb_ntxGetKeyVal( pPage, u ) );
          fflush(stdout);
-         hb_errInternal( 9999, "hb_ntxPageCheckKeys: keys sorted wrong.", "", "" );
+         hb_errInternal( 9304, "hb_ntxPageCheckKeys: keys sorted wrong.", "", "" );
       }
    }
 }
@@ -1093,9 +1093,9 @@ static LPPAGEINFO hb_ntxPageGetBuffer( LPTAGINFO pTag, ULONG ulPage )
       LPPAGEINFO pPage = pIndex->pFirst;
 
       if( pPage->iUsed )
-         hb_errInternal( 9999, "hb_ntxPageGetBuffer: page used.", "", "" );
+         hb_errInternal( 9305, "hb_ntxPageGetBuffer: page used.", "", "" );
       if( pPage->Changed )
-         hb_errInternal( 9999, "hb_ntxPageGetBuffer: page changed.", "", "" );
+         hb_errInternal( 9306, "hb_ntxPageGetBuffer: page changed.", "", "" );
 
       pIndex->pFirst = pPage->pNext;
       if( pIndex->pFirst )
@@ -1207,7 +1207,7 @@ static void hb_ntxPageRelease( LPTAGINFO pTag, LPPAGEINFO pPage )
       }
    }
    else if( pPage->iUsed < 0 )
-      hb_errInternal( 9999, "hb_ntxPageRelease: unused page freed.", "", "" );
+      hb_errInternal( 9307, "hb_ntxPageRelease: unused page freed.", "", "" );
 }
 
 /*
@@ -1225,6 +1225,7 @@ static LPPAGEINFO hb_ntxPageLoad( LPTAGINFO pTag, ULONG ulPage )
       {
          hb_ntxErrorRT( pTag->Owner->Owner, EG_CORRUPTION, EDBF_CORRUPT,
                         pTag->Owner->IndexName, 0, 0 );
+         return NULL;
       }
    }
    pPage = hb_ntxPageFind( pTag, ulPage );
@@ -1249,10 +1250,13 @@ static LPPAGEINFO hb_ntxPageLoad( LPTAGINFO pTag, ULONG ulPage )
    else
    {
       pPage = hb_ntxPageGetBuffer( pTag, ulPage );
+      pPage->Changed = FALSE;
       if( !hb_ntxBlockRead( pTag->Owner, ulPage,
                             (BYTE *) hb_ntxPageBuffer( pPage ), NTXBLOCKSIZE ) )
+      {
+         hb_ntxPageRelease( pTag, pPage );
          return NULL;
-      pPage->Changed = FALSE;
+      }
       pPage->uiKeys = hb_ntxGetKeyCount( pPage );
    }
    return pPage;
@@ -1950,7 +1954,7 @@ static void hb_ntxIndexFlush( LPNTXINDEX pIndex )
          hb_ntxPageRelease( pIndex->lpTags[0], pPage );
       }
       else
-         hb_errInternal( 9999, "hb_ntxIndexFlush: unchaged page in the list.", "", "" );
+         hb_errInternal( 9308, "hb_ntxIndexFlush: unchaged page in the list.", "", "" );
    }
 
    if( pIndex->Compound )
@@ -3362,7 +3366,8 @@ static double hb_ntxTagCountRelKeyPos( LPTAGINFO pTag )
          ++iKeys;
       else if( iLevel == pTag->stackLevel - 1 )
          dPos = 0.5;
-      dPos = ( dPos + pTag->stack[ iLevel ].ikey ) / iKeys;
+      if( iKeys )
+         dPos = ( dPos + pTag->stack[ iLevel ].ikey ) / iKeys;
       hb_ntxPageRelease( pTag, pPage );
    }
    if( pTag->fUsrDescend == pTag->AscendKey )
@@ -4886,6 +4891,10 @@ static BOOL hb_ntxSortKeyGet( LPNTXSORTINFO pSort, BYTE ** pKeyVal, ULONG *pulRe
       pSort->pSwapPage[ ulPage ].ulKeyBuf--;
       return TRUE;
    }
+
+   *pKeyVal = NULL;
+   *pulRec = 0;
+
    return FALSE;
 }
 
@@ -5082,7 +5091,7 @@ static void hb_ntxSortOut( LPNTXSORTINFO pSort )
       {
          if( hb_vmRequestQuery() != 0 )
             return;
-         hb_errInternal( 9999, "hb_ntxSortOut: memory structure corrupted.", "", "" );
+         hb_errInternal( 9309, "hb_ntxSortOut: memory structure corrupted.", "", "" );
       }
       if( fUnique )
       {
@@ -5111,7 +5120,7 @@ static void hb_ntxSortOut( LPNTXSORTINFO pSort )
                    ulKey, pKeyVal, ulRec, pSort->pLastKey, pSort->ulLastRec); fflush(stdout);
             if( hb_vmRequestQuery() != 0 )
                return;
-            hb_errInternal( 9999, "hb_ntxSortOut: sorting fails.", "", "" );
+            hb_errInternal( 9310, "hb_ntxSortOut: sorting fails.", "", "" );
          }
       }
       memcpy( pSort->pLastKey, pKeyVal, iLen );
@@ -5125,7 +5134,7 @@ static void hb_ntxSortOut( LPNTXSORTINFO pSort )
    {
       if( hb_vmRequestQuery() != 0 )
          return;
-      hb_errInternal( 9999, "hb_ntxSortOut: memory structure corrupted(2).", "", "" );
+      hb_errInternal( 9311, "hb_ntxSortOut: memory structure corrupted(2).", "", "" );
    }
 #endif
 
@@ -5780,7 +5789,7 @@ static ERRCODE ntxGoCold( NTXAREAP pArea )
          if( fAppend && pArea->fShared )
          {
             if( pArea->fNtxAppend )
-               hb_errInternal( 9999, "ntxGoCold: multiple appending without GOCOLD.", "", "" );
+               hb_errInternal( 9312, "ntxGoCold: multiple appending without GOCOLD.", "", "" );
             pArea->fNtxAppend = TRUE;
          }
          else
@@ -5983,7 +5992,7 @@ static ERRCODE ntxClose( NTXAREAP pArea )
 static ERRCODE ntxStructSize( NTXAREAP pArea, USHORT * uiSize )
 
 {
-   HB_TRACE(HB_TR_DEBUG, ("ntxStrucSize(%p, %p)", pArea, uiSize));
+   HB_TRACE(HB_TR_DEBUG, ("ntxStructSize(%p, %p)", pArea, uiSize));
    HB_SYMBOL_UNUSED( pArea );
 
    * uiSize = sizeof( NTXAREA );
@@ -6293,7 +6302,8 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
             if( fOld )
                fOld = ( hb_fsSeekLarge( hFile, 0, FS_END ) != 0 );
          }
-      } while( bRetry );
+      }
+      while( bRetry );
 
       if( hFile == FS_ERROR )
       {
@@ -6354,6 +6364,8 @@ static ERRCODE ntxOrderCreate( NTXAREAP pArea, LPDBORDERCREATEINFO pOrderInfo )
 
    if( ! iTag && pIndex->iTags == CTX_MAX_TAGS )
    {
+      if( fLocked )
+         hb_ntxIndexUnLockWrite( pIndex );
       hb_vmDestroyBlockOrMacro( pKeyExp );
       if( pForExp != NULL )
          hb_vmDestroyBlockOrMacro( pForExp );
@@ -7465,7 +7477,7 @@ static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
 
    HB_TRACE(HB_TR_DEBUG, ("ntxRddInfo(%p, %hu, %lu, %p)", pRDD, uiIndex, ulConnect, pItem));
 
-   pData = ( LPDBFDATA ) pRDD->lpvCargo;
+   pData = NTXNODE_DATA( pRDD );
 
    switch( uiIndex )
    {
@@ -7494,9 +7506,9 @@ static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
 #if defined( HB_NTX_NOMULTITAG )
          hb_itemPutL( pItem, FALSE );
 #else
-         BOOL fMultiTag = NTXNODE_DATA( pRDD )->fMultiTag;
+         BOOL fMultiTag = pData->fMultiTag;
          if( hb_itemType( pItem ) == HB_IT_LOGICAL )
-            NTXNODE_DATA( pRDD )->fMultiTag = hb_itemGetL( pItem );
+            pData->fMultiTag = hb_itemGetL( pItem );
          hb_itemPutL( pItem, fMultiTag );
 #endif
          break;
@@ -7504,36 +7516,36 @@ static ERRCODE ntxRddInfo( LPRDDNODE pRDD, USHORT uiIndex, ULONG ulConnect, PHB_
 
       case RDDI_SORTRECNO:
       {
-         BOOL fSortRecNo = NTXNODE_DATA( pRDD )->fSortRecNo;
+         BOOL fSortRecNo = pData->fSortRecNo;
          if( hb_itemType( pItem ) == HB_IT_LOGICAL )
-            NTXNODE_DATA( pRDD )->fSortRecNo = hb_itemGetL( pItem );
+            pData->fSortRecNo = hb_itemGetL( pItem );
          hb_itemPutL( pItem, fSortRecNo );
          break;
       }
 
       case RDDI_STRUCTORD:
       {
-         BOOL fStruct = NTXNODE_DATA( pRDD )->fStruct;
+         BOOL fStruct = pData->fStruct;
          if( hb_itemType( pItem ) == HB_IT_LOGICAL )
-            NTXNODE_DATA( pRDD )->fStruct = hb_itemGetL( pItem );
+            pData->fStruct = hb_itemGetL( pItem );
          hb_itemPutL( pItem, fStruct );
          break;
       }
 
       case RDDI_STRICTSTRUCT:
       {
-         BOOL fStrictStruct = NTXNODE_DATA( pRDD )->fStrictStruct;
+         BOOL fStrictStruct = pData->fStrictStruct;
          if( hb_itemType( pItem ) == HB_IT_LOGICAL )
-            NTXNODE_DATA( pRDD )->fStrictStruct = hb_itemGetL( pItem );
+            pData->fStrictStruct = hb_itemGetL( pItem );
          hb_itemPutL( pItem, fStrictStruct );
          break;
       }
 
       case RDDI_MULTIKEY:
       {
-         BOOL fMultiKey = NTXNODE_DATA( pRDD )->fMultiKey;
+         BOOL fMultiKey = pData->fMultiKey;
          if( hb_itemType( pItem ) == HB_IT_LOGICAL )
-            NTXNODE_DATA( pRDD )->fMultiKey = hb_itemGetL( pItem );
+            pData->fMultiKey = hb_itemGetL( pItem );
          hb_itemPutL( pItem, fMultiKey );
          break;
       }

@@ -1,5 +1,5 @@
 /*
- * $Id: dbcmdx.c 7832 2007-10-17 09:57:59Z vszakats $
+ * $Id: dbcmdx.c,v 1.1 2007/10/31 08:26:50 marchuet Exp $
  */
 
 /*
@@ -125,7 +125,7 @@ HB_FUNC( DBSKIPPER )
       if( SELF_RECCOUNT( pArea, &ulRecords ) == SUCCESS && ulRecords > 0 )
       {
          if( ISNUM( 1 ) )
-            lRecs = hb_parnl( 1 ) ;
+            lRecs = hb_parnl( 1 );
 
          if( lRecs == 0 )
             SELF_SKIP( pArea, 0 );
