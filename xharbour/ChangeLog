@@ -10,7 +10,7 @@
 
 2008-03-13 10:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/rtl/tgetlist.prg
-   * source/rtl/tgetlist.prg
+   * source/rtl/ttable.prg
      ! cleaned the undeclared variables warings
 
 2008-03-13 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
