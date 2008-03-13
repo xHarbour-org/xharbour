@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.8 2007/05/04 12:49:45 andresreyesh Exp $
+ * $Id: ttable.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -883,16 +883,16 @@ RETURN
 METHOD FldInit() CLASS HBTable
 
    LOCAL i
-   LOCAL bBlock
-   LOCAL cFldName
+
+
    LOCAL nCount    := ( ::Alias )->( FCOUNT() )
    LOCAL aDb
-   LOCAL oDb
-   LOCAL hNewClass
+
+
    LOCAL oNew
-   LOCAL n
+
    LOCAL nScope    := 1
-   LOCAL hNew
+
 
    ::nDataOffset := LEN( self ) - 1
 
@@ -1118,7 +1118,7 @@ METHOD __oTDelete( lKeepBuffer )        // ::Delete()
 RETURN ( lRet )
 
 
-METHOD SetMonitor( lOnOff ) CLASS HBTable
+METHOD SetMonitor( ) CLASS HBTable
 
    LOCAL lTemp := ::lMonitor
    ::lMonitor := !( ::lMonitor )
@@ -1130,7 +1130,7 @@ RETURN lTemp
 
 METHOD Undo( nBuffer, nLevel ) CLASS HBTable
 
-   LOCAL i
+
    LOCAL nLen
    LOCAL lRet      := .F.
    LOCAL lDelState := SET( _SET_DELETED )
@@ -1284,7 +1284,7 @@ RETURN oOrd
 
 METHOD Reindex() CLASS HBTable
 
-   LOCAL i
+
    LOCAL lRet := .F.
    LOCAL nSel := SELECT( ::Alias )
    LOCAL nOrd := ( ::Alias )->( ORDSETFOCUS( 0 ) )
@@ -1333,7 +1333,7 @@ RETURN ( lRet )
 
 METHOD FastReindex() CLASS HBTable
 
-   LOCAL i
+
    LOCAL lRet := .F.
    LOCAL nSel := SELECT( ::Alias )
    LOCAL nOrd := ( ::Alias )->( ORDSETFOCUS( 0 ) )

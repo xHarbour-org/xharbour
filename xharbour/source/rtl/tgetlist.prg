@@ -1,5 +1,5 @@
 /*
- * $Id: tgetlist.prg,v 1.44 2008/02/27 13:03:58 modalsist Exp $
+ * $Id: tgetlist.prg,v 1.45 2008/03/13 10:49:43 likewolf Exp $
  */
 
 /*
@@ -284,6 +284,8 @@ METHOD GetApplyKey( nKey, oMenu, oGetMsg ) CLASS HBGetList
    local nMouseRow, nMouseColumn
    local nButton
    local nHotItem
+   local cToPaste, nI, nLen
+   
 
    if ! ( ( bKeyBlock := Setkey( nKey ) ) == NIL )
       if ::GetDoSetKey( bKeyBlock )
