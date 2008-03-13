@@ -1,5 +1,5 @@
 /*
- * $Id: adsmgmnt.c,v 1.14 2007/12/13 05:29:27 vouchcac Exp $
+ * $Id: adsmgmnt.c,v 1.15 2008/02/25 16:01:03 toninhofwi Exp $
  */
 
 /*
@@ -520,7 +520,7 @@ HB_FUNC( ADSMGGETOPENTABLES )
    UNSIGNED16  pusStructSize = sizeof( ADS_MGMT_TABLE_INFO );
    ADS_MGMT_TABLE_INFO * astOpenTableInfo;
 
-   if( ISNUM( 2 ) )
+   if( ISNUM( 1 ) )
    {
        pusArrayLen = (UNSIGNED16) hb_parnl( 1 );
    }

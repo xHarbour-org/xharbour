@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5956 2008/03/13 11:11:59 marchuet Exp $
+ * $Id: ChangeLog,v 1.5957 2008/03/13 11:31:13 marchuet Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,11 +8,14 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-03-13 08:55 UTC-0300 Antonio Carlos Pantaglione <toninho@fwi.com.br>
+   * contrib/rdd_ads/adsmgmnt.c
+     ! ADSMGGetOpenTables(), corrected silly typo in last commit
+
 2008-03-13 12:31 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * harbour/source/rdd/bmdbfcdx/bmdbfcdx1.c
   * harbour/source/rdd/dbfcdx/dbfcdx1.c
     ! cleanup warnings
-
 
 2008-03-13 09:55 UTC+0100 Miguel Angel Marchuet <miguelangel@marchuet.net>
   * source/rdd/dbcmd.c
