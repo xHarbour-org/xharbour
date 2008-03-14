@@ -1,5 +1,5 @@
 /*
- * $Id: hvm.c,v 1.661 2008/03/08 04:54:22 ronpinkas Exp $
+ * $Id: hvm.c,v 1.662 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -800,7 +800,8 @@ void hb_vmReleaseLocalSymbols( void )
          for( ui = 0; ui < pDestroy->uiModuleSymbols; ui++ )
          {
             pSymbol = pDestroy->pSymbolTable + ui;
-            if( ( pSymbol->scope.value & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) == 0 )
+
+            if( ! HB_ISINITEXIT( pSymbol->scope.value ) )
             {
                pDynSym = HB_SYM_GETDYNSYM( pSymbol );
 
@@ -9580,13 +9581,12 @@ void hb_vmFreeSymbols( PSYMBOLS pSymbols )
 
       for( ui = 0; ui < pSymbols->uiModuleSymbols; ++ui )
       {
-         scope = pSymbols->pSymbolTable[ ui ].scope.value & HB_FS_INITEXIT;
-
          /* do not overwrite already initialized statics' frame */
-         if( scope != HB_FS_INITEXIT )
+         if( ! HB_ISINITEXIT( pSymbols->pSymbolTable[ ui ].scope.value ) )
          {
             pSymbols->pSymbolTable[ ui ].value.pFunPtr = NULL;
          }
+
          pSymbols->pSymbolTable[ ui ].scope.value &= ~( HB_FS_PCODEFUNC | HB_FS_DYNCODE );
       }
 
@@ -9618,6 +9618,7 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
       BOOL fFound = FALSE;
 
       s_hDynLibID = NULL;
+
       while( pLastSymbols )
       {
          if( pLastSymbols->hDynLib == hDynLib )
@@ -9630,8 +9631,7 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
 
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                {
-                  scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-                  if( scope == HB_FS_INITEXIT )
+                  if( HB_ISINITEXIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
                   {
                      hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
@@ -9662,9 +9662,7 @@ void hb_vmInitSymbolGroup( void * hNewDynLib, int argc, char * argv[] )
 
                   for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                   {
-                     scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-
-                     if( scope == HB_FS_INIT )
+                     if( HB_ISINIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
                      {
                         register int i;
 
@@ -9710,8 +9708,7 @@ void hb_vmExitSymbolGroup( void * hDynLib )
 
                for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
                {
-                  scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-                  if( scope == HB_FS_EXIT )
+                  if( HB_ISEXIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
                   {
                      hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                      hb_vmPushNil();
@@ -9852,7 +9849,8 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
    for( ui = 0; ui < uiSymbols; ui++ ) /* register each public symbol on the dynamic symbol table */
    {
       pSymbol = pNewSymbols->pSymbolTable + ui;
-      fStatics = ( pSymbol->scope.value & HB_FS_INITEXIT ) == HB_FS_INITEXIT;
+
+      fStatics = HB_ISINITEXIT( pSymbol->scope.value );
 
       if( fRecycled && !fStatics )
       {
@@ -9879,7 +9877,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
          pSymbol->value.pCodeFunc->pSymbols = pNewSymbols->pSymbolTable;
       }
 
-      if( !s_pSymStart && !fDynLib && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_INITEXIT ) == 0 )
+      if( ! s_pSymStart && ! fDynLib && ( hSymScope & HB_FS_FIRST ) != 0 && ( hSymScope & HB_FS_STATIC ) == 0 )
       {
          /* first public defined symbol to start execution */
          s_pSymStart = pSymbol;
@@ -9887,7 +9885,7 @@ PSYMBOLS hb_vmRegisterSymbols( PHB_SYMB pSymbolTable, UINT uiSymbols, char * szM
 
       /* Enable this code to see static functions which are registered in global dynsym table */
       #if 0
-         if( fPublic && ( hSymScope & ( HB_FS_INITEXIT | HB_FS_STATIC ) ) != 0 )
+         if( fPublic && ( hSymScope & HB_FS_STATIC ) != 0 )
          {
             TraceLog( NULL, "Registring STATIC!!!: %s:%s scope %04x\r\n", szModuleName, pSymbol->szName, hSymScope );
          }
@@ -10156,16 +10154,17 @@ static void hb_vmDoInitStatics( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-            if( scope == HB_FS_INITEXIT )
+            if( HB_ISINITEXIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
             {
                hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
                hb_vmDo( 0 );
             }
          }
+
          pLastSymbols->fInitStatics = FALSE;
       }
+
       pLastSymbols = pLastSymbols->pNext;
 
    } while( pLastSymbols );
@@ -10189,8 +10188,7 @@ HB_EXPORT void hb_vmDoExitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-            if( scope == HB_FS_EXIT )
+            if( HB_ISEXIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
             {
                hb_vmPushSymbol( pLastSymbols->pSymbolTable + ui );
                hb_vmPushNil();
@@ -10225,8 +10223,7 @@ static void hb_vmDoInitFunctions( void )
 
          for( ui = 0; ui < pLastSymbols->uiModuleSymbols; ui++ )
          {
-            scope = ( pLastSymbols->pSymbolTable + ui )->scope.value & HB_FS_INITEXIT;
-            if( scope == HB_FS_INIT )
+            if( HB_ISINIT( ( pLastSymbols->pSymbolTable + ui )->scope.value ) )
             {
                int argc = hb_cmdargARGC();
                register int i;
@@ -10249,6 +10246,7 @@ static void hb_vmDoInitFunctions( void )
             }
          }
       }
+
       pLastSymbols = pLastSymbols->pNext;
 
    } while( pLastSymbols );

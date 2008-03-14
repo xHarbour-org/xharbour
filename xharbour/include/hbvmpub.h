@@ -1,5 +1,5 @@
 /*
- * $Id: hbvmpub.h,v 1.73 2008/03/04 17:37:02 ronpinkas Exp $
+ * $Id: hbvmpub.h,v 1.74 2008/03/09 18:13:44 ronpinkas Exp $
  */
 
 /*
@@ -435,6 +435,15 @@
     * Any comparisons should always look like:
     * ( ( cScope & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
     */
+
+   /*
+      ( ( scope ) | HB_FS_STATIC )
+
+      For compatability with older PCODE 9 when HB_FS_INITEXIT did NOT include HB_FS_STATIC bit flag!
+    */
+   #define HB_ISINITEXIT( scope ) ( ( ( ( scope ) | HB_FS_STATIC ) & HB_FS_INITEXIT ) == HB_FS_INITEXIT )
+   #define HB_ISINIT( scope )     ( ( ( ( scope ) | HB_FS_STATIC ) & HB_FS_INITEXIT ) == HB_FS_INIT )
+   #define HB_ISEXIT( scope )     ( ( ( ( scope ) | HB_FS_STATIC ) & HB_FS_INITEXIT ) == HB_FS_EXIT )
 
    extern HB_FORCE_EXPORT void hb_vmExecute( const BYTE * pCode, PHB_SYMB pSymbols );  /* invokes the virtual machine */
 

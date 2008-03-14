@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5958 2008/03/13 11:54:13 toninhofwi Exp $
+ * $Id: ChangeLog,v 1.5960 2008/03/13 13:33:03 lculik Exp $
  */
 
 /* Use this format for the entry headers:
@@ -7,6 +7,14 @@
    For example:
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
+
+2008-03-14 15:28 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+  * include/hbvmpub.h
+  * source/vm/hvm.c
+    ! Minor fix to allow compatability with prg compiled prior to:
+     2008-03-09 13:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
+     f.e. FWH 8.02 & 8.03, so that recompile is no longer required.
+     Thanks to GPF report from Miguel.
 
 2008-03-13 10:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/rtl/tgetlist.prg
