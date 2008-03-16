@@ -1,5 +1,5 @@
 /*
- * $Id: ttable.prg,v 1.9 2008/03/13 10:49:43 likewolf Exp $
+ * $Id: ttable.prg,v 1.10 2008/03/13 13:31:19 lculik Exp $
  */
 
 /*
@@ -664,7 +664,7 @@ CLASS HBTable
    METHOD SetFocus() INLINE ( ::Alias )->( SELECT( ::ALias ) )
    METHOD Append( l ) INLINE IF( ::isNet, ( ::Alias )->( NetAppend( l ) ), ;
    ( ::alias )->( DBAPPEND() ) )
-   METHOD RECALL( l ) INLINE ( ::Alias )->( NetRecall( l ) )
+   METHOD RECALL(  ) INLINE ( ::Alias )->( NetRecall(  ) )
 
    METHOD LOCATE( bFor, bWhile, nNext, nRec, lRest ) INLINE ;
    ( ::Alias )->( __dbLocate( bFor, bWhile, ;
@@ -681,14 +681,14 @@ CLASS HBTable
 
    METHOD dbIsShared() INLINE ( ::Alias )->( DBINFO( DBI_SHARED ) )
 
-   METHOD dbIsFLocked( n ) INLINE ( ::Alias )->( DBINFO( DBI_ISFLOCK ) )
+   METHOD dbIsFLocked(  ) INLINE ( ::Alias )->( DBINFO( DBI_ISFLOCK ) )
 
    METHOD dbLockCount() INLINE ( ::Alias )->( DBINFO( DBI_LOCKCOUNT ) )
 
    METHOD DBINFO( n, x ) INLINE ( ::Alias )->( DBINFO( n, x ) )
 
-   METHOD dbGetAlias() INLINE ( ::Alias )->( DBINFO( DBI_ALIAS ) )
-
+   METHOD dbGetAlias() INLINE ( ::Alias )
+                                                
    METHOD dbFullPath() INLINE ( ::Alias )->( DBINFO( DBI_FULLPATH ) )
 
    METHOD IsRLocked( n ) INLINE ( ::Alias )->( DBRECORDINFO( DBRI_LOCKED, n ) )
@@ -754,14 +754,9 @@ CLASS HBTable
 
    METHOD DBEVAL( a, b, c, d, e, f ) INLINE ( ::Alias )->( DBEVAL( a, b, c, d, e, f ) )
    METHOD DBSEEK( a, b, c ) INLINE ( ::Alias )->( DBSEEK( a, b, c ) )
-   METHOD LOCATE( bFor, bWhile, ;
-   nNext, nRec, ;
-   lRest ) INLINE ;
-   ( ::Alias )->( __dbLocate( bFor, bWhile, ;
-   nNext, nRec, lRest ) ) ;
 
-   METHOD CONTINUE() INLINE ( ::Alias )->( __dbContinue() )
-   METHOD FOUND() INLINE ( ::Alias )->( FOUND() )
+
+
 
    METHOD DBFILTER() INLINE ( ::Alias )->( DBFILTER() )
    METHOD SetFilter( c ) INLINE ;
@@ -794,6 +789,7 @@ ENDCLASS
 
 METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
                lNET, cPATH, lNEW, lREADONLY ) CLASS HBTable
+   Local cOldRdd
    DEFAULT lNET TO .F.
    DEFAULT lNEW TO .T.
    DEFAULT lREADONLY TO .F.
@@ -801,6 +797,7 @@ METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
    DEFAULT cPATH TO SET( _SET_DEFAULT )
    DEFAULT cAlias TO FixExt( cDbf )
    DEFAULT cOrderBag TO FixExt( cDbf )  //+".CDX"
+   
 
    ::IsNew      := lNEW
    ::IsNet      := lNET
@@ -808,8 +805,10 @@ METHOD New( cDBF, cALIAS, cOrderBag, cDRIVER, ;
    ::cDBF       := cDBF
    ::cPath      := cPATH
    ::cOrderBag  := FixExt( cOrderBag )
-   ::cOrderFile := ::cOrderBag + ORDBAGEXT()                //".CDX"
+   cOldRdd      := rddsetdefault( ::driver )
 
+   ::cOrderFile := ::cOrderBag + ORDBAGEXT()                //".CDX"
+   rddsetdefault( cOldRdd )
    ::Driver      := cDRIVER
    ::aOrders     := {}
    ::Area        := 0
@@ -1118,10 +1117,10 @@ METHOD __oTDelete( lKeepBuffer )        // ::Delete()
 RETURN ( lRet )
 
 
-METHOD SetMonitor( ) CLASS HBTable
+METHOD SetMonitor( l ) CLASS HBTable
 
    LOCAL lTemp := ::lMonitor
-   ::lMonitor := !( ::lMonitor )
+   ::lMonitor := !(  l )
 RETURN lTemp
 
 //

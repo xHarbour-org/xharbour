@@ -1,5 +1,5 @@
 /*
-* $Id: hblognet.prg,v 1.4 2003/12/09 02:53:49 ronpinkas Exp $
+* $Id: hblognet.prg,v 1.5 2003/12/11 14:44:52 jonnymind Exp $
 */
 
 /*
@@ -106,14 +106,14 @@ RETURN SELF
 /**
 * Inet init must be called here
 */
-METHOD Open( cName ) CLASS HB_LogEmail
+METHOD Open( ) CLASS HB_LogEmail
    InetInit()
 RETURN .T.
 
 /**
 * InetCleanup to be called here
 */
-METHOD Close( cName ) CLASS HB_LogEmail
+METHOD Close() CLASS HB_LogEmail
    InetCleanup()
 RETURN .T.
 
@@ -260,7 +260,7 @@ METHOD Open( cName ) CLASS HB_LogInetPort
 RETURN .T.
 
 
-METHOD Close( cName ) CLASS HB_LogInetPort
+METHOD Close( ) CLASS HB_LogInetPort
    LOCAL sk
 
    IF ::skIn == NIL

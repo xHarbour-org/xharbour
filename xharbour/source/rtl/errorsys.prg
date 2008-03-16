@@ -1,5 +1,5 @@
 /*
- * $Id: errorsys.prg,v 1.56 2007/05/04 11:29:02 marchuet Exp $
+ * $Id: errorsys.prg,v 1.57 2007/10/24 12:09:46 lculik Exp $
  */
 
 /*
@@ -248,23 +248,16 @@ STATIC FUNCTION LogError( oerr )
      LOCAL nRange
      LOCAL nCols
      LOCAL nRows
-     LOCAL nFhandle
+
      LOCAL nCount
-     LOCAL nMemHandle
+
      LOCAL nForLoop
-     LOCAL nMemLength
-     LOCAL nMemWidth
      LOCAL cOutString
      LOCAL cSubString
-     LOCAL cVarName
-     LOCAL cVarType
-     LOCAL nLenTemp
-     LOCAL cTemp
-     LOCAL nBytesLocal
-     LOCAL cVarRec
+
      LOCAL nHandle
      LOCAL nBytes
-     LOCAL nMemCount
+
 
      LOCAL nHandle2   := -1
      LOCAL cLogFile2  := "_error.log"

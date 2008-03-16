@@ -1,5 +1,5 @@
 /*
- * $Id: ChangeLog,v 1.5960 2008/03/13 13:33:03 lculik Exp $
+ * $Id: ChangeLog,v 1.5961 2008/03/14 19:57:56 ronpinkas Exp $
  */
 
 /* Use this format for the entry headers:
@@ -8,6 +8,12 @@
    2002-12-01 23:12 UTC+0100 Foo Bar <foo.bar@foobar.org>
 */
 
+2008-03-16 00:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
+   * source/rtl/errorsys.prg
+   * source/rtl/ttable.prg
+   * source/rtl/hblognet.prg
+     ! cleaned the undeclared/not used variables warings
+
 2008-03-14 15:28 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
   * include/hbvmpub.h
   * source/vm/hvm.c
@@ -15,6 +21,7 @@
      2008-03-09 13:40 UTC-0430 Ron Pinkas <ron/at/xharbour.com>
      f.e. FWH 8.02 & 8.03, so that recompile is no longer required.
      Thanks to GPF report from Miguel.
+
 
 2008-03-13 10:30 UTC-0300 Luiz Rafael Culik( luiz at xharbour.com.br)
    * source/rtl/tgetlist.prg
